@@ -166,7 +166,7 @@ describe('RegistrationBar rppr subscribed autocomplete tests', () => {
     expect(accountProductSubscriptions[AccountProductCodes.RPPR].roles).toEqual(['edit'])
     // check autocomplete displayed
     const autocomplete = wrapper.findComponent(RegistrationBarTypeAheadList)
-    expect(autocomplete.text()).toContain('Start a new Registration')
+    expect(autocomplete.text()).toContain('Start a New Personal Property Registration')
     // simulate selection (jest does not pickup autocomplete list)
     autocomplete.vm.$emit('selected', miscCrownChargeRegistrations[3])
     await flushPromises()

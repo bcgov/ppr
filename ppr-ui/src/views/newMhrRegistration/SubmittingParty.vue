@@ -18,8 +18,8 @@
     <section id="mhr-submitting-party-reference" class="mt-10">
       <h2>Attention or Reference Number</h2>
       <p class="mt-2">
-        Add optional Attention information or a Reference Number for your own tracking purposes. This information is not
-        used by the Manufactured Home Registry.
+        Add an optional Attention or Reference Number information for this transaction. If entered, it will appear on
+        the Verification of Service document.
       </p>
 
       <!-- Insert Attention or Reference Number here -->

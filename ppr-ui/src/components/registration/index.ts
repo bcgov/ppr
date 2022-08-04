@@ -1,5 +1,6 @@
 export { default as AmendmentDescription } from './AmendmentDescription.vue'
 export { default as EditTrustIndenture } from './length-trust/EditTrustIndenture.vue'
+export { default as PprRegistrations } from './PprRegistrations.vue'
 export { default as RegistrationBar } from './RegistrationBar.vue'
 export { default as RegistrationBarButtonList } from './RegistrationBarButtonList.vue'
 export { default as RegistrationBarTypeAheadList } from './RegistrationBarTypeAheadList.vue'
