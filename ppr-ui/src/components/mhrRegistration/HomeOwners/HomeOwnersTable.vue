@@ -8,7 +8,6 @@
       hide-default-footer
       :items="homeOwners"
       item-key="id"
-      no-data-text="No owners added yet."
     >
       <template v-slot:item="row">
         <tr v-if="isCurrentlyEditing(homeOwners.indexOf(row.item))">
@@ -56,7 +55,7 @@
               color="primary"
               class="pr-0"
               :ripple="false"
-              :disabled="isAdding || isEditing"
+              :disabled="isAddingMode || isEditingMode"
               @click="openForEditing(homeOwners.indexOf(row.item))"
             >
               <v-icon small>mdi-pencil</v-icon>
@@ -71,7 +70,7 @@
                   v-on="on"
                   color="primary"
                   class="px-0"
-                  :disabled="isAdding"
+                  :disabled="isAddingMode"
                 >
                   <v-icon>mdi-menu-down</v-icon>
                 </v-btn>
@@ -89,6 +88,11 @@
             </v-menu>
           </td>
         </tr>
+      </template>
+      <template v-slot:no-data>
+        <div class="my-6">
+          No owners added yet.
+        </div>
       </template>
     </v-data-table>
   </v-card>
@@ -123,9 +127,10 @@ export default defineComponent({
 
     const localState = reactive({
       currentlyEditingHomeOwnerId: -1,
-      isEditing: computed((): boolean => {
-        return localState.currentlyEditingHomeOwnerId >= 0
-      })
+      isEditingMode: computed(
+        (): boolean => localState.currentlyEditingHomeOwnerId >= 0
+      ),
+      isAddingMode: computed((): boolean => props.isAdding)
     })
 
     const edit = (item): void => {
@@ -152,7 +157,7 @@ export default defineComponent({
     watch(
       () => localState.currentlyEditingHomeOwnerId,
       () => {
-        context.emit('isEditing', localState.isEditing)
+        context.emit('isEditing', localState.isEditingMode)
       }
     )
 
@@ -178,7 +183,6 @@ export default defineComponent({
   i,
   strong {
     color: $gray9;
-    // #212529
   }
   .owner-info td {
     white-space: normal;

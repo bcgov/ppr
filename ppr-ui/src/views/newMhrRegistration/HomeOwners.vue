@@ -9,7 +9,7 @@
         owners.
       </p>
 
-      <SimpleHelpToggle toggleButtonTitle="Help with Owners" class="my-3">
+      <SimpleHelpToggle toggleButtonTitle="Help with Owners" class="my-6">
         <h3 class="text-center mb-2">Help with Owners</h3>
         <h4>Sole Ownership</h4>
         <p>
@@ -61,13 +61,13 @@
           mdi-check
         </v-icon>
         <v-icon v-else color="black">mdi-circle-small</v-icon>
-        <span>At least one owner</span>
+        <span class="ml-1">At least one owner</span>
       </div>
       <v-btn
         outlined
         color="primary"
         :ripple="false"
-        :disabled="disableAddPersonBtn"
+        :disabled="disableAddHomeOwnerBtn"
         @click="showAddPersonSection = true"
       >
         <v-icon class="pr-1">mdi-account-plus</v-icon> Add a Person
@@ -79,7 +79,7 @@
         outlined
         color="primary"
         :ripple="false"
-        :disabled="disableAddOrgBtn"
+        :disabled="disableAddHomeOwnerBtn"
         @click="showAddPersonOrganizationSection = true"
       >
         <v-icon class="pr-1">mdi-domain-plus</v-icon>
@@ -111,6 +111,7 @@
     <div>
       <HomeOwnersTable
         :homeOwners="getMhrRegistrationHomeOwners"
+        :isAdding="disableAddHomeOwnerBtn"
         @isEditing="isEditingMode = $event"
         @edit="editHomeOwner($event)"
         @remove="removeHomeOwner($event)"
@@ -155,15 +156,7 @@ export default class HomeOwners extends Vue {
       : 'Joint Tenants'
   }
 
-  private get disableAddPersonBtn (): boolean {
-    return (
-      this.showAddPersonOrganizationSection ||
-      this.showAddPersonSection ||
-      this.isEditingMode
-    )
-  }
-
-  private get disableAddOrgBtn (): boolean {
+  private get disableAddHomeOwnerBtn (): boolean {
     return (
       this.showAddPersonOrganizationSection ||
       this.showAddPersonSection ||
