@@ -25,31 +25,35 @@
         </tr>
 
         <tr v-else :key="row.item.id" class="owner-info">
-          <td class="owner-name pa-6">
-            <strong v-if="row.item.individualName">
+          <td class="owner-name">
+            <div v-if="row.item.individualName" class="owner-icon-name">
               <v-icon class="mr-2">mdi-account</v-icon>
-              {{ row.item.individualName.first }}
-              {{ row.item.individualName.middle }}
-              {{ row.item.individualName.last }}
-            </strong>
-            <strong v-else>
+              <div>
+                {{ row.item.individualName.first }}
+                {{ row.item.individualName.middle }}
+                {{ row.item.individualName.last }}
+              </div>
+            </div>
+            <div v-else class="owner-icon-name">
               <v-icon class="mr-2">mdi-domain</v-icon>
-              {{ row.item.organizationName }}
-            </strong>
+              <div>
+                {{ row.item.organizationName }}
+              </div>
+            </div>
             <div v-if="row.item.suffix" class="suffix">
               {{ row.item.suffix }}
             </div>
           </td>
-          <td class="pa-6">
+          <td>
             <base-address :schema="addressSchema" :value="row.item.address" />
           </td>
-          <td class="pa-6">
+          <td>
             {{ toDisplayPhone(row.item.phoneNumber) }}
             <span v-if="row.item.phoneExtension">
               Ext {{ row.item.phoneExtension }}
             </span>
           </td>
-          <td class="text-right py-4">
+          <td class="text-right">
             <v-btn
               text
               color="primary"
@@ -184,13 +188,40 @@ export default defineComponent({
   strong {
     color: $gray9;
   }
-  .owner-info td {
-    white-space: normal;
-    vertical-align: top;
+
+  table {
+    tbody > tr > td {
+      padding: 20px 12px;
+    }
+    th:first-child,
+    td:first-child {
+      padding-left: 30px;
+    }
+    td:last-child {
+      padding-right: 30px;
+      padding-top: 8px;
+    }
+  }
+
+  .owner-icon-name {
+    display: flex;
+    align-items: flex-start;
+    div {
+      word-break: break-word;
+    }
+    i {
+      margin-top: -3px;
+    }
+  }
+  .owner-info {
+    td {
+      white-space: normal;
+      vertical-align: top;
+    }
   }
 
   .v-data-table-header th {
-    padding: 0 24px;
+    padding: 0 12px;
   }
 
   .suffix {
