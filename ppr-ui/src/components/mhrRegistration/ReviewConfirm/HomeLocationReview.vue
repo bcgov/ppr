@@ -77,8 +77,10 @@
                 <h3>Civic Address</h3>
               </v-col>
               <v-col cols="9" class="pt-1">
-                <p>{{ getMhrRegistrationLocation.address.street || '(Not Entered)' }} {{ getMhrRegistrationLocation.address.streetAdditional || '' }}<br/>
-                  {{ getMhrRegistrationLocation.address.city || '(City Not Entered)' }} {{ getMhrRegistrationLocation.address.region=='British Columbia'?'BC': '(Province Not Entered)' }}</p>
+                <p>{{ getMhrRegistrationLocation.address.street || '(Not Entered)' }}<br/>
+                  <span v-if="getMhrRegistrationLocation.address.streetAdditional!=''">{{getMhrRegistrationLocation.address.streetAdditional}}<br/></span>
+                  {{ getMhrRegistrationLocation.address.city || '(City Not Entered)' }} {{ getMhrRegistrationLocation.address.region=='British Columbia'?'BC': '(Province Not Entered)' }}
+                </p>
               </v-col>
             </v-row>
           </template>

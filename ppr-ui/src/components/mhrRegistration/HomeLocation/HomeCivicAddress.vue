@@ -5,7 +5,7 @@
         <label class="generic-label" :class="{'error-text': false}">Civic Address</label>
       </v-col>
       <v-col cols="12" sm="10" class="mt-n1">
-          <v-form ref="addressForm" name="address-form" lazy-validation>
+          <v-form ref="addressForm" name="address-form" v-model="isValidCivicAddress" lazy-validation>
               <div class="form__row">
                 <v-text-field
                   id="street"
@@ -60,7 +60,6 @@
               </v-row>
             </div>
           </v-form>
-
       </v-col>
     </v-row>
   </v-card>
@@ -75,25 +74,18 @@ import { useActions } from 'vuex-composition-helpers'
 export default defineComponent({
   name: 'HomeCivicAddress',
   components: {},
-  props: {
-    /* used for readonly mode vs edit mode */
-    editing: {
-      type: Boolean,
-      default: false
-    }
-  },
+  props: {},
   setup () {
     const {
-      setMhrLocation
+      setCivicAddress
     } = useActions<any>([
-      'setMhrLocation'
+      'setCivicAddress'
     ])
 
     const addressSchema = CivicAddressSchema
 
     const localState = reactive({
-      isValidLot: false,
-      showAllAddressErrors: false,
+      isValidCivicAddress: false,
       address: {
         street: '',
         streetAdditional: '',
@@ -103,12 +95,26 @@ export default defineComponent({
     })
 
     /** Apply local model updates to store. **/
-    watch(() => localState, async () => {
+    watch(() => localState.address.street, async () => {
       // Set civic address data to store
-      for (const [key, value] of Object.entries(localState)) {
-        await setMhrLocation({ key, value })
-      }
-    }, { deep: true })
+      await setCivicAddress({ key: 'street', value: localState.address.street })
+    })
+
+    watch(() => localState.address.streetAdditional, async () => {
+      // Set civic address data to store
+      await setCivicAddress({ key: 'streetAdditional', value: localState.address.streetAdditional })
+    })
+
+    watch(() => localState.address.city, async () => {
+      // Set civic address data to store
+      await setCivicAddress({ key: 'city', value: localState.address.city })
+    })
+
+    watch(() => localState.address.region, async () => {
+      // Set civic address data to store
+      await setCivicAddress({ key: 'region', value: localState.address.region })
+    })
+
     /** Clear/reset forms when select option changes. **/
     return { addressSchema, ...toRefs(localState) }
   }
