@@ -54,7 +54,7 @@
             id="reg-next-btn"
             color="primary"
             :disabled="lastStepBcol"
-            class="float-right"
+            class="float-right pl-6"
             @click="submitNext"
           >
             {{ buttonConfig.nextText }}
@@ -65,7 +65,7 @@
               id="reg-back-btn"
               outlined
               color="primary"
-              class="float-right mr-4"
+              class="float-right mr-4 pr-5"
               @click="submitBack"
             >
               <v-icon color="primary">mdi-chevron-left</v-icon> Back

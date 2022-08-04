@@ -8,7 +8,6 @@
       hide-default-footer
       :items="homeOwners"
       item-key="id"
-      no-data-text="No owners added yet"
     >
       <template v-slot:item="row">
         <tr v-if="isCurrentlyEditing(homeOwners.indexOf(row.item))">
@@ -26,37 +25,41 @@
         </tr>
 
         <tr v-else :key="row.item.id" class="owner-info">
-          <td class="owner-name pa-6">
-            <strong v-if="row.item.individualName">
+          <td class="owner-name">
+            <div v-if="row.item.individualName" class="owner-icon-name">
               <v-icon class="mr-2">mdi-account</v-icon>
-              {{ row.item.individualName.first }}
-              {{ row.item.individualName.middle }}
-              {{ row.item.individualName.last }}
-            </strong>
-            <strong v-else>
+              <div>
+                {{ row.item.individualName.first }}
+                {{ row.item.individualName.middle }}
+                {{ row.item.individualName.last }}
+              </div>
+            </div>
+            <div v-else class="owner-icon-name">
               <v-icon class="mr-2">mdi-domain</v-icon>
-              {{ row.item.organizationName }}
-            </strong>
+              <div>
+                {{ row.item.organizationName }}
+              </div>
+            </div>
             <div v-if="row.item.suffix" class="suffix">
               {{ row.item.suffix }}
             </div>
           </td>
-          <td class="pa-6">
+          <td>
             <base-address :schema="addressSchema" :value="row.item.address" />
           </td>
-          <td class="pa-6">
+          <td>
             {{ toDisplayPhone(row.item.phoneNumber) }}
             <span v-if="row.item.phoneExtension">
               Ext {{ row.item.phoneExtension }}
             </span>
           </td>
-          <td class="text-right py-4">
+          <td class="text-right">
             <v-btn
               text
               color="primary"
               class="pr-0"
               :ripple="false"
-              :disabled="isAdding || isEditing"
+              :disabled="isAddingMode || isEditingMode"
               @click="openForEditing(homeOwners.indexOf(row.item))"
             >
               <v-icon small>mdi-pencil</v-icon>
@@ -71,7 +74,7 @@
                   v-on="on"
                   color="primary"
                   class="px-0"
-                  :disabled="isAdding"
+                  :disabled="isAddingMode"
                 >
                   <v-icon>mdi-menu-down</v-icon>
                 </v-btn>
@@ -89,6 +92,11 @@
             </v-menu>
           </td>
         </tr>
+      </template>
+      <template v-slot:no-data>
+        <div class="my-6">
+          No owners added yet.
+        </div>
       </template>
     </v-data-table>
   </v-card>
@@ -123,9 +131,10 @@ export default defineComponent({
 
     const localState = reactive({
       currentlyEditingHomeOwnerId: -1,
-      isEditing: computed((): boolean => {
-        return localState.currentlyEditingHomeOwnerId >= 0
-      })
+      isEditingMode: computed(
+        (): boolean => localState.currentlyEditingHomeOwnerId >= 0
+      ),
+      isAddingMode: computed((): boolean => props.isAdding)
     })
 
     const edit = (item): void => {
@@ -152,7 +161,7 @@ export default defineComponent({
     watch(
       () => localState.currentlyEditingHomeOwnerId,
       () => {
-        context.emit('isEditing', localState.isEditing)
+        context.emit('isEditing', localState.isEditingMode)
       }
     )
 
@@ -178,15 +187,41 @@ export default defineComponent({
   i,
   strong {
     color: $gray9;
-    // #212529
   }
-  .owner-info td {
-    white-space: normal;
-    vertical-align: top;
+
+  table {
+    tbody > tr > td {
+      padding: 20px 12px;
+    }
+    th:first-child,
+    td:first-child {
+      padding-left: 30px;
+    }
+    td:last-child {
+      padding-right: 30px;
+      padding-top: 8px;
+    }
+  }
+
+  .owner-icon-name {
+    display: flex;
+    align-items: flex-start;
+    div {
+      word-break: break-word;
+    }
+    i {
+      margin-top: -3px;
+    }
+  }
+  .owner-info {
+    td {
+      white-space: normal;
+      vertical-align: top;
+    }
   }
 
   .v-data-table-header th {
-    padding: 0 24px;
+    padding: 0 12px;
   }
 
   .suffix {

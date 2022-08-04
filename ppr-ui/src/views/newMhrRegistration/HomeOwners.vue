@@ -1,7 +1,7 @@
 <template>
   <div id="mhr-home-owners-list">
     <section id="mhr-owners" class="mt-10">
-      <h2>Owners</h2>
+      <h2>1. Owners</h2>
       <p class="mt-2 mb-0">
         Add a person or an organization as the owner of the home. You can add
         multiple owners to form joint tenancy or tenants in common ownership.
@@ -9,7 +9,7 @@
         owners.
       </p>
 
-      <simple-help-toggle toggleButtonTitle="Help with Owners" class="my-3">
+      <SimpleHelpToggle toggleButtonTitle="Help with Owners" class="my-6">
         <h3 class="text-center mb-2">Help with Owners</h3>
         <h4>Sole Ownership</h4>
         <p>
@@ -48,12 +48,12 @@
           If your tenancy structure cannot be accommodated by the online system
           please contact the Manufactured Home Registry.
         </p>
-      </simple-help-toggle>
+      </SimpleHelpToggle>
 
       <label class="generic-label">
         Your registration must include the following:
       </label>
-      <div class="mt-5 mb-11">
+      <div class="mt-5 mb-11 reg-owners-check">
         <v-icon
           v-if="getMhrRegistrationHomeOwners.length > 0"
           color="green darken-2"
@@ -61,13 +61,13 @@
           mdi-check
         </v-icon>
         <v-icon v-else color="black">mdi-circle-small</v-icon>
-        At least one owner
+        <span class="ml-1">At least one owner</span>
       </div>
       <v-btn
         outlined
         color="primary"
         :ripple="false"
-        :disabled="disableAddPersonBtn"
+        :disabled="disableAddHomeOwnerBtn"
         @click="showAddPersonSection = true"
       >
         <v-icon class="pr-1">mdi-account-plus</v-icon> Add a Person
@@ -79,7 +79,7 @@
         outlined
         color="primary"
         :ripple="false"
-        :disabled="disableAddOrgBtn"
+        :disabled="disableAddHomeOwnerBtn"
         @click="showAddPersonOrganizationSection = true"
       >
         <v-icon class="pr-1">mdi-domain-plus</v-icon>
@@ -111,6 +111,7 @@
     <div>
       <HomeOwnersTable
         :homeOwners="getMhrRegistrationHomeOwners"
+        :isAdding="disableAddHomeOwnerBtn"
         @isEditing="isEditingMode = $event"
         @edit="editHomeOwner($event)"
         @remove="removeHomeOwner($event)"
@@ -155,15 +156,7 @@ export default class HomeOwners extends Vue {
       : 'Joint Tenants'
   }
 
-  private get disableAddPersonBtn (): boolean {
-    return (
-      this.showAddPersonOrganizationSection ||
-      this.showAddPersonSection ||
-      this.isEditingMode
-    )
-  }
-
-  private get disableAddOrgBtn (): boolean {
+  private get disableAddHomeOwnerBtn (): boolean {
     return (
       this.showAddPersonOrganizationSection ||
       this.showAddPersonSection ||
@@ -194,4 +187,13 @@ export default class HomeOwners extends Vue {
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+
+.reg-owners-check::v-deep {
+  i {
+    vertical-align: baseline;
+  }
+  span {
+    vertical-align: text-bottom;
+  }
+}
 </style>
