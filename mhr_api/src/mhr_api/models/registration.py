@@ -30,9 +30,6 @@ from .party import Party
 from .type_tables import RegistrationType
 
 
-REGISTRATION_PATH = '/mhr/api/v1/registrations/'
-
-
 class CrownChargeTypes(BaseEnum):
     """Render an Enum of the financing statement crown charge registration type class."""
 
@@ -330,14 +327,13 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
 
     @classmethod
     def find_summary_by_mhr_number(cls, account_id: str, mhr_number: str):
-        """Return the registration summary information matching the registration number."""
+        """Return the MHR registration summary information matching the registration number."""
         formatted_mhr = model_utils.format_mhr_number(mhr_number)
         current_app.logger.debug(f'Account_id={account_id}, mhr_number={formatted_mhr}')
         use_legacy_db: bool = current_app.config.get('USE_LEGACY_DB', True)
         if use_legacy_db:
             registration = Db2Manuhome.find_summary_by_mhr_number(formatted_mhr)
             if registration:
-                registration['path'] = REGISTRATION_PATH + mhr_number
                 # Set inUserList to true if MHR number already added to account extra registrations.
                 extra_reg: MhrExtraRegistration = MhrExtraRegistration.find_by_mhr_number(mhr_number, account_id)
                 if extra_reg:
@@ -346,6 +342,22 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
             return registration
 
         raise DatabaseException('Registration.find_summary_by_mhr_number PosgreSQL not yet implemented.')
+
+    @classmethod
+    def find_all_by_account_id(cls, account_id: str):
+        """Return a summary list of recent MHR registrations belonging to an account."""
+        current_app.logger.debug(f'Account_id={account_id}')
+        use_legacy_db: bool = current_app.config.get('USE_LEGACY_DB', True)
+        results = []
+        if use_legacy_db:
+            # 1. get extra registrations from the Posgres table, then query DB2 by set of mhr numbers.
+            mhr_list = MhrExtraRegistration.find_mhr_numbers_by_account_id(account_id)
+            if mhr_list:
+                # 2. Get the summary info from DB2.
+                results = Db2Manuhome.find_summary_by_account_mhr_numbers(mhr_list)
+            return results
+
+        raise DatabaseException('Registration.find_all_by_account_id PosgreSQL not yet implemented.')
 
     @classmethod
     def find_by_registration_number(cls, registration_num: str, account_id: str):
