@@ -420,7 +420,8 @@ export const mockedMHRSearchResults: mockMHRSearchResults = {
         make: 'Honda',
         model: 'Trailer'
       },
-      homeLocation: 'Victoria'
+      homeLocation: 'Victoria',
+      includeLienInfo: false
     },
     {
       id: 2,
@@ -436,7 +437,8 @@ export const mockedMHRSearchResults: mockMHRSearchResults = {
         make: 'Honda',
         model: 'Trailer'
       },
-      homeLocation: 'Victoria'
+      homeLocation: 'Victoria',
+      includeLienInfo: false
     },
     {
       id: 3,
@@ -452,7 +454,8 @@ export const mockedMHRSearchResults: mockMHRSearchResults = {
         make: 'Honda',
         model: 'Trailer'
       },
-      homeLocation: 'Victoria'
+      homeLocation: 'Victoria',
+      includeLienInfo: false
     },
     {
       id: 4,
@@ -468,7 +471,8 @@ export const mockedMHRSearchResults: mockMHRSearchResults = {
         make: 'Honda',
         model: 'Trailer'
       },
-      homeLocation: 'Victoria'
+      homeLocation: 'Victoria',
+      includeLienInfo: false
     },
     {
       id: 5,
@@ -484,7 +488,8 @@ export const mockedMHRSearchResults: mockMHRSearchResults = {
         make: 'Honda',
         model: 'Trailer'
       },
-      homeLocation: 'Victoria'
+      homeLocation: 'Victoria',
+      includeLienInfo: false
     }
   ],
   [UIMHRSearchTypes.MHROWNER_NAME]: [
@@ -502,7 +507,8 @@ export const mockedMHRSearchResults: mockMHRSearchResults = {
         make: 'Honda',
         model: 'Trailer'
       },
-      homeLocation: 'Victoria'
+      homeLocation: 'Victoria',
+      includeLienInfo: false
     },
     {
       id: 2,
@@ -518,7 +524,8 @@ export const mockedMHRSearchResults: mockMHRSearchResults = {
         make: 'Honda',
         model: 'Trailer'
       },
-      homeLocation: 'Victoria'
+      homeLocation: 'Victoria',
+      includeLienInfo: false
     },
     {
       id: 3,
@@ -534,7 +541,8 @@ export const mockedMHRSearchResults: mockMHRSearchResults = {
         make: 'Honda',
         model: 'Trailer'
       },
-      homeLocation: 'Victoria'
+      homeLocation: 'Victoria',
+      includeLienInfo: false
     },
     {
       id: 4,
@@ -550,7 +558,8 @@ export const mockedMHRSearchResults: mockMHRSearchResults = {
         make: 'Honda',
         model: 'Trailer'
       },
-      homeLocation: 'Victoria'
+      homeLocation: 'Victoria',
+      includeLienInfo: false
     }
   ],
   [UIMHRSearchTypes.MHRORGANIZATION_NAME]: [
@@ -568,7 +577,8 @@ export const mockedMHRSearchResults: mockMHRSearchResults = {
         make: 'Honda',
         model: 'Trailer'
       },
-      homeLocation: 'Victoria'
+      homeLocation: 'Victoria',
+      includeLienInfo: false
     },
     {
       id: 2,
@@ -584,7 +594,8 @@ export const mockedMHRSearchResults: mockMHRSearchResults = {
         make: 'Honda',
         model: 'Trailer'
       },
-      homeLocation: 'Victoria'
+      homeLocation: 'Victoria',
+      includeLienInfo: false
     },
     {
       id: 3,
@@ -600,7 +611,8 @@ export const mockedMHRSearchResults: mockMHRSearchResults = {
         make: 'Honda',
         model: 'Trailer'
       },
-      homeLocation: 'Victoria'
+      homeLocation: 'Victoria',
+      includeLienInfo: false
     },
     {
       id: 4,
@@ -616,7 +628,8 @@ export const mockedMHRSearchResults: mockMHRSearchResults = {
         make: 'Honda',
         model: 'Trailer'
       },
-      homeLocation: 'Victoria'
+      homeLocation: 'Victoria',
+      includeLienInfo: false
     }
   ],
   [UIMHRSearchTypes.MHRSERIAL_NUMBER]: [
@@ -634,7 +647,8 @@ export const mockedMHRSearchResults: mockMHRSearchResults = {
         make: 'Honda',
         model: 'Trailer'
       },
-      homeLocation: 'Victoria'
+      homeLocation: 'Victoria',
+      includeLienInfo: false
     },
     {
       id: 2,
@@ -650,7 +664,8 @@ export const mockedMHRSearchResults: mockMHRSearchResults = {
         make: 'Honda',
         model: 'Trailer'
       },
-      homeLocation: 'Victoria'
+      homeLocation: 'Victoria',
+      includeLienInfo: false
     },
     {
       id: 3,
@@ -666,7 +681,8 @@ export const mockedMHRSearchResults: mockMHRSearchResults = {
         make: 'Honda',
         model: 'Trailer'
       },
-      homeLocation: 'Victoria'
+      homeLocation: 'Victoria',
+      includeLienInfo: false
     },
     {
       id: 4,
@@ -682,7 +698,8 @@ export const mockedMHRSearchResults: mockMHRSearchResults = {
         make: 'Honda',
         model: 'Trailer'
       },
-      homeLocation: 'Victoria'
+      homeLocation: 'Victoria',
+      includeLienInfo: false
     }
   ]
 }
@@ -703,7 +720,8 @@ export const mockedMHRSearchResultsSorted: mockMHRSearchResults = {
         make: 'Honda',
         model: 'Trailer'
       },
-      homeLocation: 'Victoria'
+      homeLocation: 'Victoria',
+      includeLienInfo: false
     },
     {
       id: 2,
@@ -719,7 +737,8 @@ export const mockedMHRSearchResultsSorted: mockMHRSearchResults = {
         make: 'Honda',
         model: 'Trailer'
       },
-      homeLocation: 'Victoria'
+      homeLocation: 'Victoria',
+      includeLienInfo: false
     },
     {
       id: 3,
@@ -735,7 +754,8 @@ export const mockedMHRSearchResultsSorted: mockMHRSearchResults = {
         make: 'Honda',
         model: 'Trailer'
       },
-      homeLocation: 'Victoria'
+      homeLocation: 'Victoria',
+      includeLienInfo: false
     },
     {
       id: 5,
@@ -751,7 +771,8 @@ export const mockedMHRSearchResultsSorted: mockMHRSearchResults = {
         make: 'Honda',
         model: 'Trailer'
       },
-      homeLocation: 'Victoria'
+      homeLocation: 'Victoria',
+      includeLienInfo: false
     },
     {
       id: 4,
@@ -767,7 +788,8 @@ export const mockedMHRSearchResultsSorted: mockMHRSearchResults = {
         make: 'Honda',
         model: 'Trailer'
       },
-      homeLocation: 'Victoria'
+      homeLocation: 'Victoria',
+      includeLienInfo: false
     }
   ]
 }
