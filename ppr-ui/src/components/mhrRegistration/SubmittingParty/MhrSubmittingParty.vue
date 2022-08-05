@@ -107,18 +107,18 @@
           <v-row no-gutters>
             <v-col>
               <v-text-field
+                v-mask="'(###) ###-####'"
                 filled
                 id="submitting-party-phone"
                 class="pt-4 pr-3"
                 label="Phone Number"
-                hint="Example: (555) 555-5555"
-                persistent-hint
                 v-model="submittingParty.phoneNumber"
                 :rules="phoneRules"
               />
             </v-col>
             <v-col>
               <v-text-field
+                type="number"
                 filled
                 id="submitting-party-phone-ext"
                 class="pt-4 px-2"
@@ -159,12 +159,17 @@ import { BaseAddress } from '@/composables/address'
 import { SubmittingPartyTypes } from '@/enums'
 import { PartyAddressSchema } from '@/schemas'
 import { cloneDeep } from 'lodash'
+import { VueMaskDirective } from 'v-mask'
+import { mutateOriginalLengthTrust } from '@/store/mutations'
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
   name: 'MhrSubmittingParty',
   components: {
     BaseAddress
+  },
+  directives: {
+    mask: VueMaskDirective
   },
   props: {},
   setup (props, context) {
@@ -183,8 +188,8 @@ export default defineComponent({
     const {
       customRules,
       invalidSpaces,
-      maxLength,
       minLength,
+      maxLength,
       required,
       isStringOrNumber,
       isEmail,
@@ -250,9 +255,7 @@ export default defineComponent({
 
     const phoneRules = customRules(
       required('Enter a phone number'),
-      minLength(10),
-      maxLength(15),
-      invalidSpaces()
+      minLength(10)
     )
 
     const phoneExtensionRules = customRules(isNumber(), invalidSpaces())
