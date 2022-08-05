@@ -267,13 +267,6 @@ export default defineComponent({
       areAllSelected: computed((): boolean => {
         return localState.results?.every(result => result && result.selected === true)
       }),
-      isIndeterminate: computed(() => {
-        return localState.selectAll !== localState.areAllSelected
-      }),
-      isLienIndeterminate: computed((): boolean => {
-        return localState.selectedLiensLength !== 0 &&
-          localState.selectedLiensLength !== localState.selectedMatchesLength
-      }),
       activeResults: computed((): any => {
         const selectedResults = cloneDeep(getSelectedManufacturedHomes).value
         const baseResults = cloneDeep(getManufacturedHomeSearchResults.value.results)
@@ -315,7 +308,7 @@ export default defineComponent({
       return item.selected && !props.isReviewMode ? 'selected' : ''
     }
 
-    const onOwnerCheckboxClick = (item: ManufacturedHomeSearchResultIF) => {
+    const onOwnerCheckboxClick = (item: ManufacturedHomeSearchResultIF): void => {
       if (!item.selected) {
         item.includeLienInfo = false
       }
@@ -365,7 +358,7 @@ export default defineComponent({
       return items
     }
 
-    watch(() => localState.results, () => {
+    watch(() => localState.results, (): void => {
       const selectedManufacturedHomes = cloneDeep(localState.results?.filter(result => result.selected === true))
       setSelectedManufacturedHomes(selectedManufacturedHomes)
       localState.selectedMatchesLength === 0
@@ -376,7 +369,7 @@ export default defineComponent({
       localState.selectAll = localState.results.every(result => result.selected)
     }, { deep: true })
 
-    const onSelectAllClick = () => {
+    const onSelectAllClick = (): void => {
       const val = localState.selectAll
       localState.results = localState.results.map(result => ({ ...result, selected: val }))
       if (val && localState.selectAllLien) {
@@ -387,7 +380,7 @@ export default defineComponent({
       }
     }
 
-    const onSelectAllLienClick = () => {
+    const onSelectAllLienClick = (): void => {
       for (const result of localState.results) {
         if (result.selected) {
           result.includeLienInfo = localState.selectAllLien
