@@ -15,19 +15,19 @@
       <p class="mt-2">
         Enter the Street Address (Number and Name) and City for the location of the home. Must be located in B.C.
       </p>
-
-      <!-- Insert Home Civic Address Component Here -->
+      <HomeCivicAddress :class="{ 'border-error-left': false }" />
     </section>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import { HomeLocationType } from '@/components/mhrRegistration'
+import { HomeLocationType, HomeCivicAddress } from '@/components/mhrRegistration'
 
 @Component({
   components: {
-    HomeLocationType
+    HomeLocationType,
+    HomeCivicAddress
   }
 })
 export default class HomeLocation extends Vue {

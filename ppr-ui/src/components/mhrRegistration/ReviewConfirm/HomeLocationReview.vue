@@ -71,14 +71,17 @@
           </template>
 
           <!-- Civic Address -->
-        <v-row no-gutters class="px-6 pt-1 pb-2">
-          <v-col cols="3" class="pt-1">
-            <h3>Civic Address</h3>
-          </v-col>
-          <v-col cols="9" class="pt-1">
-            <p>{{ '' || '(Not Entered)' }}</p>
-          </v-col>
-        </v-row>
+          <v-row no-gutters class="px-6 pt-2">
+            <v-col cols="3" class="pt-1">
+              <h3>Civic Address</h3>
+            </v-col>
+            <v-col cols="9" class="pt-1">
+              <p>{{ getMhrRegistrationLocation.address.street || '(Not Entered)' }}<br/>
+                <span v-if="getMhrRegistrationLocation.address.streetAdditional!=''">{{getMhrRegistrationLocation.address.streetAdditional}}<br/></span>
+                {{ getMhrRegistrationLocation.address.city || '(City Not Entered)' }} {{ getMhrRegistrationLocation.address.region=='British Columbia'?'BC': '(Province Not Entered)' }}
+              </p>
+            </v-col>
+          </v-row>
       </section>
     </div>
   </v-card>

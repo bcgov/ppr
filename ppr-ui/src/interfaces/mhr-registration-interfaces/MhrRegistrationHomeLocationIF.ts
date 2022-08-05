@@ -5,6 +5,7 @@ export interface MhrRegistrationHomeLocationIF {
   pad: string,
   address: {
     street: string,
+    streetAdditional: string,
     city: string,
     region: string,
     country: string,
