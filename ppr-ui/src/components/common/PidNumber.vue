@@ -13,6 +13,7 @@
         :readonly="enablePidLoader"
         :error-messages="invalidPidMsg"
         v-model="pidOne"
+        @paste="parsePaste($event)"
       />
     </v-col>
 
@@ -26,6 +27,7 @@
         maxlength="3"
         :readonly="enablePidLoader"
         v-model="pidTwo"
+        @paste="parsePaste($event)"
       />
     </v-col>
 
@@ -39,6 +41,7 @@
         maxlength="3"
         :readonly="enablePidLoader"
         v-model="pidThree"
+        @paste="parsePaste($event)"
       />
     </v-col>
 
@@ -47,6 +50,9 @@
         v-if="enablePidLoader"
         indeterminate
         color="primary"
+        class="my-0"
+        :size="25"
+        :width="3"
       ></v-progress-circular>
     </v-col>
   </v-row>
@@ -89,6 +95,17 @@ export default defineComponent({
       })
     })
 
+    /** Handle pasted event into Pid Input Fields **/
+    const parsePaste = (event: any): void => {
+      // Capture pasted text from event and clean spaces/special chars
+      const pasteInput = event.clipboardData.getData('text').replace(/[^A-Z\d]+/ig, '')
+      // Break the value down into 3x3 sections and apply to local model
+      const pidNumberArr = pasteInput.match(/.{1,3}/g)
+      localState.pidOne = pidNumberArr[0]
+      localState.pidTwo = pidNumberArr[1]
+      localState.pidThree = pidNumberArr[2]
+    }
+
     const emitPid = (): void => { context.emit('setPid', localState.pidNumber) }
 
     watch(() => localState.pidOne, () => {
@@ -98,6 +115,12 @@ export default defineComponent({
     watch(() => localState.pidTwo, () => {
       // @ts-ignore - function exists
       if (localState.pidTwo.length === 3) vue.nextTick(() => { context.refs.pidThreeRef.focus() })
+      // @ts-ignore - function exists
+      if (localState.pidTwo.length === 0) vue.nextTick(() => { context.refs.pidOneRef.focus() })
+    })
+    watch(() => localState.pidThree, () => {
+      // @ts-ignore - function exists
+      if (localState.pidThree.length === 0) vue.nextTick(() => { context.refs.pidTwoRef.focus() })
     })
     watch(() => localState.enablePidLoader, () => {
       context.emit('verifyingPid', localState.enablePidLoader)
@@ -116,6 +139,7 @@ export default defineComponent({
     })
 
     return {
+      parsePaste,
       isNumber,
       ...toRefs(localState)
     }
