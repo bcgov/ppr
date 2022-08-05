@@ -30,17 +30,33 @@ from .owner import Db2Owner
 
 
 QUERY_ACCOUNT_ADD_REGISTRATION = """
-SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.attnref), TRIM(d.docutype),
+SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRIM(d.docutype),
        (SELECT XMLSERIALIZE(XMLAGG ( XMLELEMENT ( NAME "owner", TRIM(o2.ownrname))) AS CLOB)
           FROM owner o2, owngroup og2
          WHERE o2.manhomid = mh.manhomid
            AND og2.manhomid = mh.manhomid
            AND og2.owngrpid = o2.owngrpid
-           AND og2.status IN ('3', '4')) as owner_names
+           AND og2.status IN ('3', '4')) as owner_names,
+       TRIM(d.bcolacct)
   FROM manuhome mh, document d
  WHERE mh.mhregnum = :query_mhr_number
    AND mh.mhregnum = d.mhregnum
    AND mh.regdocid = d.documtid
+"""
+QUERY_ACCOUNT_REGISTRATIONS = """
+SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRIM(d.docutype),
+       (SELECT XMLSERIALIZE(XMLAGG ( XMLELEMENT ( NAME "owner", TRIM(o2.ownrname))) AS CLOB)
+          FROM owner o2, owngroup og2
+         WHERE o2.manhomid = mh.manhomid
+           AND og2.manhomid = mh.manhomid
+           AND og2.owngrpid = o2.owngrpid
+           AND og2.status IN ('3', '4')) as owner_names,
+       TRIM(d.bcolacct)
+  FROM manuhome mh, document d
+ WHERE mh.mhregnum IN (?)
+   AND mh.mhregnum = d.mhregnum
+   AND mh.regdocid = d.documtid
+ORDER BY d.regidate DESC
 """
 REGISTRATION_DESC_NEW = 'Manufactured Home Registration'
 LEGACY_STATUS_DESCRIPTION = {
@@ -237,30 +253,68 @@ class Db2Manuhome(db.Model):
             rows = result.fetchall()
             if rows is not None:
                 for row in rows:
-                    timestamp = row[2]
-                    owners = str(row[6])
-                    owners = owners.replace('<owner>', '')
-                    owners = owners.replace('</owner>', '\n')
-                    owner_list = owners.split('\n')
-                    owner_names = ''
-                    for name in owner_list:
-                        if name.strip() != '':
-                            owner_names += Db2Manuhome.get_summary_name(name) + '\n'
-                    summary = {
-                        'mhrNumber': mhr_number,
-                        'registrationDescription': LEGACY_REGISTRATION_DESCRIPTION.get(str(row[5]),
-                                                                                       REGISTRATION_DESC_NEW),
-                        'username': str(row[3]),
-                        'statusType': LEGACY_STATUS_DESCRIPTION.get(str(row[1])),
-                        'createDateTime': model_utils.format_ts(timestamp),
-                        'submittingParty': '',
-                        'clientReferenceId': str(row[4]),
-                        'ownerNames': owner_names,
-                        'inUserList': False
-                    }
+                    summary = Db2Manuhome.__build_summary(row, True)
         except Exception as db_exception:   # noqa: B902; return nicer error
             current_app.logger.error('DB2 find_summary_by_mhr_number exception: ' + str(db_exception))
             raise DatabaseException(db_exception)
+        return summary
+
+    @classmethod
+    def find_summary_by_account_mhr_numbers(cls, mhr_list):
+        """Return a list of MH registration summary information matching the account MHR numbers."""
+        summary_list = []
+        if not mhr_list:
+            return summary_list
+        try:
+            mhr_numbers: str = ''
+            count = 0
+            for mhr in mhr_list:
+                mhr_number = mhr['mhr_number']
+                count += 1
+                if count > 1:
+                    mhr_numbers += ','
+                mhr_numbers += f"'{mhr_number}'"
+            query_text = QUERY_ACCOUNT_REGISTRATIONS.replace('?', mhr_numbers)
+            # current_app.logger.debug('Executing query=' + query_text)
+            query = text(query_text)
+            result = db.get_engine(current_app, 'db2').execute(query)
+            rows = result.fetchall()
+            if rows is not None:
+                for row in rows:
+                    summary_list.append(Db2Manuhome.__build_summary(row, False))
+        except Exception as db_exception:   # noqa: B902; return nicer error
+            current_app.logger.error('DB2 find_summary_by_mhr_number exception: ' + str(db_exception))
+            raise DatabaseException(db_exception)
+        return summary_list
+
+    @classmethod
+    def __build_summary(cls, row, add_in_user_list: bool = True):
+        """Build registration summary from query result."""
+        mhr_number = str(row[0])
+        timestamp = row[2]
+        owners = str(row[6])
+        owners = owners.replace('<owner>', '')
+        owners = owners.replace('</owner>', '\n')
+        owner_list = owners.split('\n')
+        owner_names = ''
+        for name in owner_list:
+            if name.strip() != '':
+                owner_names += Db2Manuhome.get_summary_name(name) + '\n'
+        summary = {
+            'mhrNumber': mhr_number,
+            'registrationDescription': LEGACY_REGISTRATION_DESCRIPTION.get(str(row[5]),
+                                                                           REGISTRATION_DESC_NEW),
+            'username': str(row[7]),
+            'statusType': LEGACY_STATUS_DESCRIPTION.get(str(row[1])),
+            'createDateTime': model_utils.format_ts(timestamp),
+            'submittingParty': str(row[3]),
+            'clientReferenceId': str(row[4]),
+            'ownerNames': owner_names,
+            'path': ''
+        }
+        if add_in_user_list:
+            summary['inUserList'] = False
+
         return summary
 
     @classmethod

@@ -18,6 +18,15 @@ Test-Suite to ensure that the MHR Extra Registrations Model is working as expect
 """
 from mhr_api.models import MhrExtraRegistration
 
+import pytest
+
+
+# testdata pattern is ({account_id}, {count})
+TEST_ACCOUNT_REG_DATA = [
+    ('PS12345', 2),
+    ('TESTXX', 0)
+]
+
 
 def test_find_by_id(session):
     """Assert that find user extra validation by ID contains all expected elements."""
@@ -81,3 +90,31 @@ def test_find_by_mhr_number_invalid_account(session):
     """Assert that find user extra registration by non-existent account id returns the expected result."""
     registration = MhrExtraRegistration.find_by_mhr_number('TEST01', 'XXXXXX')
     assert not registration
+
+
+@pytest.mark.parametrize('account_id, count', TEST_ACCOUNT_REG_DATA)
+def test_find_by_account_id(session, account_id, count):
+    """Assert that finding account extra registrations works as expected."""
+    extra_reg_list = MhrExtraRegistration.find_by_account_id(account_id)
+    if count > 0:
+        assert extra_reg_list
+        assert len(extra_reg_list) >= count
+        for reg in extra_reg_list:
+            assert reg.id > 0
+            assert reg.account_id
+            assert reg.mhr_number
+    else:
+        assert not extra_reg_list
+
+
+@pytest.mark.parametrize('account_id, count', TEST_ACCOUNT_REG_DATA)
+def test_find_mhr_numbers_by_account_id(session, account_id, count):
+    """Assert that finding account extra registration mhr numbers works as expected."""
+    mhr_list = MhrExtraRegistration.find_mhr_numbers_by_account_id(account_id)
+    if count > 0:
+        assert mhr_list
+        assert len(mhr_list) >= count
+        for mhr in mhr_list:
+            assert mhr['mhr_number']
+    else:
+        assert not mhr_list

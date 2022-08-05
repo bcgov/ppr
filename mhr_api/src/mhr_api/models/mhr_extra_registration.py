@@ -53,6 +53,27 @@ class MhrExtraRegistration(db.Model):
         return None
 
     @classmethod
+    def find_by_account_id(cls, account_id: str):
+        """Return a list of user extra registrations matching the account id."""
+        if account_id:
+            return db.session.query(MhrExtraRegistration).\
+                                    filter(MhrExtraRegistration.account_id == account_id).all()
+        return None
+
+    @classmethod
+    def find_mhr_numbers_by_account_id(cls, account_id: str):
+        """Return a list of user extra registration MHR numbers matching the account id."""
+        mhr_numbers = []
+        if account_id:
+            registrations = db.session.query(MhrExtraRegistration).\
+                                             filter(MhrExtraRegistration.account_id == account_id).all()
+            if registrations:
+                for reg in registrations:
+                    mhr = {'mhr_number': reg.mhr_number}
+                    mhr_numbers.append(mhr)
+        return mhr_numbers
+
+    @classmethod
     def delete(cls, mhr_number: str, account_id: str):
         """Delete a user extra registation record by account ID and MHR number."""
         registration = None

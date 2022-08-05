@@ -22,11 +22,9 @@ from http import HTTPStatus
 import pytest
 from flask import current_app
 
-from mhr_api.models import SearchResult, SearchRequest
-from mhr_api.resources.v1.search_results import get_payment_details
-from mhr_api.services.authz import COLIN_ROLE, MHR_ROLE, STAFF_ROLE, BCOL_HELP, GOV_ACCOUNT_ROLE
+from mhr_api.services.authz import COLIN_ROLE, MHR_ROLE, STAFF_ROLE
 
-from tests.unit.services.utils import create_header, create_header_account, create_header_account_report
+from tests.unit.services.utils import create_header, create_header_account
 
 
 # testdata pattern is ({desc}, {roles}, {status}, {has_account}, {mhr_number})

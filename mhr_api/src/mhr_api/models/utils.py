@@ -264,6 +264,7 @@ DB2_PROVINCE_MAPPING = {
 COUNTRY_CA = 'CA'
 COUNTRY_US = 'US'
 PROVINCE_BC = 'BC'
+REGISTRATION_PATH = '/mhr/api/v1/registrations/'
 
 
 def get_max_registrations_size():
