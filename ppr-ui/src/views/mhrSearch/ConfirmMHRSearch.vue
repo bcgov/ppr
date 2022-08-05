@@ -17,7 +17,7 @@
     <div v-if="dataLoaded && !dataLoadError" class="container pa-0" style="min-width: 960px;">
       <v-row no-gutters>
         <v-col cols="9">
-          <h1>Review Search Result</h1>
+          <h1>Review Selection(s)</h1>
           <div class="mt-6">
             <p class="ma-0">
               Review the details of the manufactured home before paying. Your search result will be available in your
@@ -30,7 +30,7 @@
               <v-col cols="auto" class="pa-2">
                 <v-icon color="darkBlue">mdi-home</v-icon>
                 <label class="pl-3" :class="$style['sectionText']">
-                  <strong>Search Results Summary</strong>
+                  <strong>Selection Summary</strong>
                 </label>
               </v-col>
             </v-row>

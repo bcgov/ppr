@@ -3,10 +3,12 @@
     <v-row no-gutters style="min-width: 345px">
       <v-col>
         <div class="actions">
-          <registration-bar-type-ahead-list v-if="hasRPPR"
+          <registration-bar-type-ahead-list
+            v-if="hasRPPR"
             :defaultLabel="labelText"
             :defaultDense="false"
             :defaultClearable="false"
+            :isLightBackGround="!isTabView"
             @selected="newRegistration($event)"
             />
           <registration-bar-button-list v-else @selected="newRegistration($event)"/>
@@ -33,12 +35,18 @@ export default defineComponent({
     RegistrationBarButtonList,
     RegistrationBarTypeAheadList
   },
+  props: {
+    isTabView: {
+      type: Boolean,
+      default: false
+    }
+  },
   emits: ['selected-registration-type'],
   setup (props, { emit }) {
     const { getAccountProductSubscriptions } = useGetters<any>(['getAccountProductSubscriptions'])
     const { setRegistrationTypeOtherDesc } = useActions<any>(['setRegistrationTypeOtherDesc'])
     const localState = reactive({
-      labelText: 'Start a new Registration (Select a type)'
+      labelText: 'Start a New Personal Property Registration'
     })
     const hasRPPR = computed(() => {
       const productSubscriptions = getAccountProductSubscriptions.value as AccountProductSubscriptionIF

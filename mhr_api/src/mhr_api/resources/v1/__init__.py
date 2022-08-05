@@ -20,7 +20,9 @@ from flask import Flask
 from .manufacturer import bp as manufacturers_bp
 from .meta import bp as meta_bp
 from .ops import bp as ops_bp
+from .other_registrations import bp as other_registrations_bp
 from .registration_report_callback import bp as registration_report_callback_bp
+from .registrations import bp as registrations_bp
 from .search_history import bp as search_history_bp
 from .search_report_callback import bp as search_report_callback_bp
 from .search_results import bp as search_result_bp
@@ -44,6 +46,8 @@ class V1Endpoint:
         self.app.register_blueprint(manufacturers_bp)
         self.app.register_blueprint(meta_bp)
         self.app.register_blueprint(ops_bp)
+        self.app.register_blueprint(other_registrations_bp)
+        self.app.register_blueprint(registrations_bp)
         self.app.register_blueprint(searches_bp)
         self.app.register_blueprint(search_history_bp)
         self.app.register_blueprint(search_result_bp)

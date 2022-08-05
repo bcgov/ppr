@@ -38,6 +38,7 @@ PATH_MISMATCH = '{code}: the path value ({path_value}) does not match the data {
 REPORT = '{code}: error generating report. Detail: {detail}'
 DEFAULT = '{code}: error processing request.'
 PAYMENT = '{code}:{status} payment error for account {account_id}.'
+DUPLICATE_REGISTRATION_ERROR = 'MH Registration {0} is already available to the account.'
 
 CERTIFIED_PARAM = 'certified'
 ROUTING_SLIP_PARAM = 'routingSlipNumber'

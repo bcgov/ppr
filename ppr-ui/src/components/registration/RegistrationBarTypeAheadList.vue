@@ -8,9 +8,9 @@
     />
     <v-autocomplete
       class="registrationTypeAhead rounded-top"
-      :class="{ 'reg-filter': isClearable }"
+      :class="{ 'reg-filter': isClearable, 'light-background': isLightBackGround }"
       allow-overflow
-      filled
+      :filled="!isLightBackGround"
       :filter="filterList"
       full-width
       hide-details
@@ -27,7 +27,7 @@
     >
       <template v-slot:item="{ parent, item }">
         <template v-if="item.class === 'registration-list-header'">
-          <v-list-item-content style="padding: 9px 0;">
+          <v-list-item-content>
             <v-row
               :id="`reg-type-drop-${item.group}`"
               style="width: 45rem; pointer-events: all;"
@@ -72,8 +72,18 @@ export default defineComponent({
   props: {
     defaultLabel: String,
     defaultDense: Boolean,
-    defaultClearable: { default: false },
-    defaultClear: { default: false }
+    defaultClearable: {
+      type: Boolean,
+      default: false
+    },
+    defaultClear: {
+      type: Boolean,
+      default: false
+    },
+    isLightBackGround: {
+      type: Boolean,
+      default: false
+    }
   },
   name: 'RegistrationBarTypeAheadList',
   emits: ['selected'],
@@ -197,23 +207,34 @@ export default defineComponent({
 </script>
 <style lang="scss" scoped>
 @import "@/assets/styles/theme.scss";
-::v-deep .v-text-field--filled .v-input__control .v-input__slot {
-  max-height: 45px;
-  min-height: 45px;
+.light-background {
+  padding: 0;
+  background: white;
 }
 
-#registrationTypeAhead ::v-deep .v-select__slot, ::v-deep .v-input__slot {
+::v-deep .v-text-field .v-input__control .v-input__slot {
+  min-height: 45px;
   max-height: 45px;
-  label {
-    color: $gray7 !important;
-    font-size: 14px;
-    margin-top: -4px;
-    padding-left: 6px;
+  padding-left: 10px;
+  padding-right: 10px;
+  .v-input__append-inner {
+    margin-top: 10px;
   }
 }
 
-::v-deep .v-text-field--full-width .v-input__append-inner, .v-text-field--enclosed .v-input__append-inner {
-  margin-top: 11px !important;
+::v-deep .v-text-field--filled .v-input__control .v-input__slot {
+  .v-input__append-inner {
+    margin-top: 10px !important;
+  }
+}
+
+::v-deep .v-select__slot, ::v-deep .v-input__slot {
+  label {
+    color: $gray7 !important;
+    font-size: 14px;
+    margin-top: -2px;
+    padding-left: 6px;
+  }
 }
 
 ::v-deep .theme--light.v-list-item:not(.v-list-item--active):not(.v-list-item--disabled) {

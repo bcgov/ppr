@@ -93,10 +93,6 @@ tbody {
   color: $gray7 !important;
 }
 
-.registrationTypeAhead.theme--light.v-text-field--filled .v-input__control .v-input__slot {
-  background-color: white;
-}
-
 input#reg-textfield.v-text-field.v-input--dense:not(.v-text-field--outlined),
 .my-reg-filter .col .v-input.v-text-field .v-input__control .v-input__slot {
   cursor: pointer !important;

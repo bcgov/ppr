@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="help-toggle-container">
     <v-btn
       text
       color="primary"
@@ -7,15 +7,15 @@
       :ripple="false"
       @click="isHelpContentOpen = !isHelpContentOpen"
     >
-      <v-icon>
-        mdi-information-outline
+      <v-icon class="mr-1">
+        mdi-help-circle-outline
       </v-icon>
       {{ isHelpContentOpen ? 'Hide ' + title : title }}
     </v-btn>
     <v-expand-transition>
-      <div v-show="isHelpContentOpen" class="help-content">
+      <div v-show="isHelpContentOpen" class="help-content mb-10">
         <hr class="my-4" />
-        <slot></slot>
+        <slot class="content"></slot>
         <div class="align-right" v-if="showBottomToggle">
           <v-btn
             text
@@ -58,26 +58,37 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-// Remove background on hover
-.help-btn::before,
-.hide-help-btn::before {
-  display: none;
-}
+@import '@/assets/styles/theme.scss';
 
-.help-btn {
-  font-size: 16px;
-}
+#help-toggle-container::v-deep {
+  // Remove background on hover
+  .help-btn::before,
+  .hide-help-btn::before {
+    display: none;
+  }
 
-.hide-help-btn {
-  font-size: 14px;
-  text-decoration: underline;
-  height: 25px;
-}
+  .help-btn {
+    font-size: 16px;
+    height: 24px;
+  }
 
-.help-content {
-  h3,
-  h4 {
-    color: #495057;
+  .hide-help-btn {
+    font-size: 14px;
+    text-decoration: underline;
+    height: 25px;
+  }
+
+  .help-content {
+    h3 {
+      color: $gray9;
+    }
+    h4,
+    p {
+      color: $gray7;
+    }
+    hr {
+      border-top: 1px dashed $gray6;
+    }
   }
 }
 </style>

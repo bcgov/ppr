@@ -602,14 +602,15 @@ export const homeOwnersTableHeaders: Array<BaseHeaderIF> = [
     class: 'column-lg',
     sortable: false,
     text: 'Mailing Address',
-    value: 'mailingAddress'
+    value: 'mailingAddress',
+    width: '14rem'
   },
   {
     class: 'column-mdl',
     sortable: false,
     text: 'Phone Number',
     value: 'phoneNumber',
-    width: '9rem'
+    width: '10rem'
   },
   {
     class: 'actions',

@@ -264,6 +264,7 @@ DB2_PROVINCE_MAPPING = {
 COUNTRY_CA = 'CA'
 COUNTRY_US = 'US'
 PROVINCE_BC = 'BC'
+REGISTRATION_PATH = '/mhr/api/v1/registrations/'
 
 
 def get_max_registrations_size():
@@ -839,3 +840,9 @@ def get_country_from_province(province: str, default: str = COUNTRY_US):
     if province == PROVINCE_BC or DB2_PROVINCE_MAPPING.get(province):
         return COUNTRY_CA
     return default
+
+
+def format_mhr_number(mhr_number: str):
+    """Trim and pad with zeroes search query mhr number query."""
+    formatted = mhr_number.strip().rjust(6, '0')
+    return formatted

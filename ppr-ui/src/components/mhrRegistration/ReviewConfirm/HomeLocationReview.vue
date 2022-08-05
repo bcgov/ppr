@@ -71,7 +71,7 @@
           </template>
 
           <!-- Civic Address -->
-          <v-row no-gutters class="px-6 pt-1">
+          <v-row no-gutters class="px-6 pt-2">
             <v-col cols="3" class="pt-1">
               <h3>Civic Address</h3>
             </v-col>
