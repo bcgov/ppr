@@ -1,5 +1,10 @@
 import { MHRSearchTypes, SearchTypes } from '@/resources'
-import { APIMHRSearchTypes, APIMHRMapSearchTypes } from '@/enums'
+import { APIMHRSearchTypes, APIMHRMapSearchTypes, ErrorCategories } from '@/enums'
+import { axios } from '@/utils'
+import { SearchResponseI } from '@/interfaces'
+import { StatusCodes } from 'http-status-codes'
+
+const SEARCH_RESULT_SIZE = 100
 
 export const useSearch = () => {
   const isMHRSearchType = (type: string): boolean => {
@@ -19,10 +24,49 @@ export const useSearch = () => {
       return APIMHRSearchTypes[Object.keys(APIMHRSearchTypes)[index]]
     }
   }
+  const getSearchConfig = (params: object = null) => {
+    const url = sessionStorage.getItem('REGISTRIES_SEARCH_API_URL')
+    const apiKey = sessionStorage.getItem('REGISTRIES_SEARCH_API_KEY')
+    const currentAccount = sessionStorage.getItem('CURRENT_ACCOUNT')
+
+    if (!url) console.error('Error: REGISTRY_SEARCH_API_URL expected, but not found.')
+    if (!apiKey) console.error('Error: REGISTRY_SEARCH_API_KEY expected, but not found.')
+    if (!currentAccount) console.error('Error: current account expected, but not found.')
+
+    const currentAccountId = JSON.parse(currentAccount)?.id
+
+    return { baseURL: url, headers: { 'Account-Id': currentAccountId, 'x-apikey': apiKey }, params: params }
+  }
+  const searchBusiness = async (searchValue: string): Promise<SearchResponseI> => {
+    if (!searchValue) return
+    // basic params
+    const params = { query: `value:${searchValue}`, start: 0, rows: SEARCH_RESULT_SIZE }
+    // add search-api config stuff
+    const config = getSearchConfig(params)
+    return axios.get<SearchResponseI>('businesses/search/facets', config)
+      .then(response => {
+        const data: SearchResponseI = response?.data
+        if (!data) {
+          throw new Error('Invalid API response')
+        }
+        return data
+      }).catch(error => {
+        return {
+          searchResults: null,
+          error: {
+            statusCode: error?.response?.status || StatusCodes.NOT_FOUND,
+            message: error?.response?.data?.message,
+            category: ErrorCategories.SEARCH,
+            type: error?.parsed?.rootCause?.type
+          }
+        }
+      })
+  }
 
   return {
     isMHRSearchType,
     isPPRSearchType,
-    mapMhrSearchType
+    mapMhrSearchType,
+    searchBusiness
   }
 }

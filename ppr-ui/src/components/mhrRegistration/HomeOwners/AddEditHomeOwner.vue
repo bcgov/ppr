@@ -203,7 +203,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, ref, toRefs } from '@vue/composition-api'
+import { defineComponent, reactive, ref, toRefs, watch } from '@vue/composition-api'
 import { useInputRules } from '@/composables/useInputRules'
 import { useHomeOwners } from '@/composables/mhrRegistration'
 
@@ -215,6 +215,8 @@ import { focusOnFirstError } from '@/utils'
 /* eslint-disable no-unused-vars */
 import { MhrRegistrationHomeOwnersIF } from '@/interfaces/mhr-registration-interfaces'
 import { SimpleHelpToggle } from '@/components/common'
+import { useSearch } from '@/composables/useSearch'
+import { SearchResponseI } from '@/interfaces'
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
@@ -243,6 +245,8 @@ export default defineComponent({
     )
     const addressSchema = PartyAddressSchema
     const addHomeOwnerForm = ref(null)
+
+    const { searchBusiness } = useSearch()
 
     const defaultHomeOwner: MhrRegistrationHomeOwnersIF = {
       phoneNumber: props.editHomeOwner?.phoneNumber || '',
@@ -305,6 +309,17 @@ export default defineComponent({
     const cancel = (): void => {
       context.emit('cancel')
     }
+
+    watch(() => localState.owner.organizationName, async (val: string) => {
+      if (val.length >= 3) {
+        const result: SearchResponseI = await searchBusiness(val)
+        if (!result.error) {
+          console.log(result.searchResults)
+        } else {
+          console.log(result.error)
+        }
+      }
+    })
 
     return {
       getSideTitle,

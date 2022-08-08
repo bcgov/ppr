@@ -53,6 +53,13 @@ export async function fetchConfig (): Promise<any> {
   sessionStorage.setItem('MHR_API_KEY', mhrApiKey)
   console.log('Set MHR API URL to: ' + mhrApiUrl)
 
+  const searchApiUrl: string = response.data.REGISTRIES_SEARCH_API_URL +
+    response.data.REGISTRIES_SEARCH_API_VERSION + '/'
+  const searchApiKey: string = response.data.REGISTRY_SEARCH_API_KEY
+  sessionStorage.setItem('REGISTRIES_SEARCH_API_URL', searchApiUrl)
+  sessionStorage.setItem('REGISTRIES_SEARCH_API_KEY', searchApiKey)
+  console.log('Set REGISTRIES SEARCH API URL to: ' + searchApiUrl)
+
   const registryUrl: string = response.data.REGISTRY_URL
   sessionStorage.setItem('REGISTRY_URL', registryUrl)
   console.log('Set REGISTRY URL to: ' + registryUrl)
