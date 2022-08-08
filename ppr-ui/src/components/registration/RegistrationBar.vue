@@ -3,8 +3,17 @@
     <v-row no-gutters style="min-width: 345px">
       <v-col>
         <div class="actions">
+          <v-btn
+            v-if="isMhr"
+            filled
+            class="mhr-registration-bar-btn px-5"
+            @click="newRegistration(MhrRegistrationType)"
+          >
+            <v-icon class="pr-1">mdi-home-plus</v-icon>
+            <span class="pr-2"> Register a Manufactured Home</span>
+          </v-btn>
           <registration-bar-type-ahead-list
-            v-if="hasRPPR"
+            v-else-if="hasRPPR"
             :defaultLabel="labelText"
             :defaultDense="false"
             :defaultClearable="false"
@@ -29,6 +38,7 @@ import {
   APIRegistrationTypes
 } from '@/enums'
 import { AccountProductSubscriptionIF, RegistrationTypeIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { MhrRegistrationType } from '@/resources'
 
 export default defineComponent({
   components: {
@@ -36,6 +46,10 @@ export default defineComponent({
     RegistrationBarTypeAheadList
   },
   props: {
+    isMhr: {
+      type: Boolean,
+      default: false
+    },
     isTabView: {
       type: Boolean,
       default: false
@@ -64,8 +78,18 @@ export default defineComponent({
     return {
       hasRPPR,
       newRegistration,
+      MhrRegistrationType,
       ...toRefs(localState)
     }
   }
 })
 </script>
+<style lang="scss" scoped>
+@import "@/assets/styles/theme.scss";
+
+.mhr-registration-bar-btn {
+  background-color: $app-blue !important;
+  color: white;
+  box-shadow: none;
+}
+</style>

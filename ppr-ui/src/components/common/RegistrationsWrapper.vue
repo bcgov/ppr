@@ -1,10 +1,5 @@
 <template>
-  <div>
-    <!-- Page Overlay -->
-    <v-overlay :value="loading">
-      <v-progress-circular color="primary" size="50" indeterminate />
-    </v-overlay>
-
+  <div id="registrations-wrapper">
     <!-- Registration Dialogs -->
     <base-dialog
       id="myRegAddDialog"
@@ -27,10 +22,11 @@
     />
 
     <!-- Registrations Upper Section -->
-    <v-row class="pt-15" align="baseline" no-gutters>
+    <v-row class="pt-10" align="baseline" no-gutters>
       <v-col cols="auto">
         <registration-bar
           class="soft-corners-bottom"
+          :isMhr="isMhr"
           :isTabView="isTabView"
           @selected-registration-type="startNewRegistration($event)"
         />
@@ -67,7 +63,7 @@
               :filled="isTabView"
               :error-messages="myRegAddInvalid ? 'error' : ''"
               hide-details
-              label="Personal Property Registration Number"
+              :label="`${registrationLabel} Registration Number`"
               :name="Math.random()"
               persistent-hint
               single-line
@@ -94,7 +90,7 @@
           no-gutters
         >
           <v-col cols="auto">
-            <b>Registrations</b> ({{ getRegTableTotalRowCount }})
+            <b>{{registrationLabel}} Registrations</b> ({{ getRegTableTotalRowCount }})
           </v-col>
           <v-col>
             <v-row justify="end" no-gutters>
@@ -158,7 +154,7 @@
 /* eslint-disable no-unused-vars */
 import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
 import { useActions, useGetters } from 'vuex-composition-helpers'
-import RegistrationBar from './RegistrationBar.vue'
+import RegistrationBar from '../registration/RegistrationBar.vue'
 import { RegistrationTable } from '@/components/tables'
 import { BaseDialog, RegistrationConfirmation } from '@/components/dialogs'
 import { AllRegistrationTypes, registrationTableHeaders } from '@/resources'
@@ -192,7 +188,7 @@ import { cloneDeep } from 'lodash'
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
-  name: 'PprRegistrations',
+  name: 'RegistrationsWrapper',
   components: {
     BaseDialog,
     RegistrationConfirmation,
@@ -205,6 +201,14 @@ export default defineComponent({
       default: false
     },
     appLoadingData: {
+      type: Boolean,
+      default: false
+    },
+    isPpr: {
+      type: Boolean,
+      default: false
+    },
+    isMhr: {
       type: Boolean,
       default: false
     },
@@ -265,6 +269,9 @@ export default defineComponent({
         return ![0, 7].includes(
           localState.myRegAdd?.trim().length || 0) || (localState.myRegAdd && !localState.myRegAdd?.trim()
         )
+      }),
+      registrationLabel: computed((): string => {
+        return props.isMhr ? 'Manufactured Home' : 'Personal Property'
       })
     })
 

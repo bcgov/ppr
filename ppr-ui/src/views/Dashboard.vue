@@ -68,7 +68,7 @@
             @snackBarMsg="snackBarEvent($event)"
           />
           <!-- To include MHR only table here conditionally when built -->
-          <PprRegistrations
+          <RegistrationsWrapper
             v-else
             :appLoadingData="appLoadingData"
             :appReady="appReady"
@@ -88,17 +88,9 @@ import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { ProductCode, RouteNames } from '@/enums'
 import {
   ActionBindingIF, // eslint-disable-line no-unused-vars
-  DraftResultIF, // eslint-disable-line no-unused-vars
   ErrorIF, // eslint-disable-line no-unused-vars
   ManufacturedHomeSearchResponseIF, // eslint-disable-line no-unused-vars
-  RegistrationSortIF, // eslint-disable-line no-unused-vars
-  RegistrationSummaryIF, // eslint-disable-line no-unused-vars
-  RegistrationTypeIF, // eslint-disable-line no-unused-vars
-  RegTableNewItemI, // eslint-disable-line no-unused-vars
-  SearchResponseIF, // eslint-disable-line no-unused-vars
-  SearchTypeIF, // eslint-disable-line no-unused-vars
-  StateModelIF, // eslint-disable-line no-unused-vars
-  UserSettingsIF // eslint-disable-line no-unused-vars
+  SearchResponseIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
 
 import {
@@ -106,10 +98,9 @@ import {
   searchHistory,
   navigate
 } from '@/utils'
-import { BaseSnackbar } from '@/components/common'
+import { BaseSnackbar, RegistrationsWrapper } from '@/components/common'
 import { SearchHistory } from '@/components/tables'
 import { SearchBar } from '@/components/search'
-import { PprRegistrations } from '@/components/registration'
 import { useSearch } from '@/composables/useSearch'
 import { DashboardTabs } from '@/components/dashboard'
 
@@ -119,7 +110,7 @@ import { DashboardTabs } from '@/components/dashboard'
     DashboardTabs,
     SearchBar,
     SearchHistory,
-    PprRegistrations
+    RegistrationsWrapper
   }
 })
 export default class Dashboard extends Vue {
@@ -136,23 +127,13 @@ export default class Dashboard extends Vue {
   @Getter getUserProductSubscriptionsCodes: Array<ProductCode>
 
   @Action resetNewRegistration: ActionBindingIF
-  @Action setRegTableSortOptions: ActionBindingIF
-  @Action setRegTableSortPage: ActionBindingIF
-  @Action setRegTableTotalRowCount: ActionBindingIF
   @Action setSearchDebtorName: ActionBindingIF
   @Action setRegistrationType: ActionBindingIF
   @Action setSearchHistory: ActionBindingIF
-  @Action setSearchHistoryLength: ActionBindingIF
   @Action setSearchResults: ActionBindingIF
   @Action setManufacturedHomeSearchResults: ActionBindingIF
   @Action setSearchedType: ActionBindingIF
   @Action setSearchedValue: ActionBindingIF
-  @Action setStateModel: ActionBindingIF
-  @Action setLengthTrust: ActionBindingIF
-  @Action setAddCollateral: ActionBindingIF
-  @Action setAddSecuredPartiesAndDebtors: ActionBindingIF
-  @Action setUnsavedChanges: ActionBindingIF
-  @Action setUserSettings: ActionBindingIF
 
   @Prop({ default: false })
   private appLoadingData: boolean
@@ -184,7 +165,7 @@ export default class Dashboard extends Vue {
   }
 
   private get enableDashboardTabs (): boolean {
-    return getFeatureFlag('mhr-registration-enabled') && this.hasPprRole && this.hasMhrRole
+    return getFeatureFlag('mhr-registration-enabled') && this.hasPprRole && this.hasMhrRole && this.isRoleStaff
   }
 
   private get isAuthenticated (): boolean {
