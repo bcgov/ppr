@@ -61,19 +61,34 @@
           :items="results"
           item-key="id"
           :items-per-page="-1"
+          :item-class="getItemClass"
           mobile-breakpoint="0"
           return-object
         >
 
           <template  v-if="!isReviewMode" v-slot:[`header.ownerName`]>
-            <v-checkbox
-              id="select-all-checkbox"
-              class="header-checkbox ma-0 pa-0"
-              hide-details
-              :label="personOrOrgLabel"
-              v-model="selectAll"
-              :indeterminate="isIndeterminate"
-            />
+            <v-tooltip
+              top
+              content-class="top-tooltip"
+              transition="fade-transition"
+              nudge-left="73"
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <span v-bind="attrs" v-on="on">
+                  <v-checkbox
+                    id="select-all-checkbox"
+                    class="header-checkbox ma-0 pa-0"
+                    hide-details
+                    :label="personOrOrgLabel"
+                    v-model="selectAll"
+                    @click="onSelectAllClick()"
+                  />
+                </span>
+              </template>
+              <div class="pt-2 pb-2">
+                Select this to include all manufactured homes.
+              </div>
+            </v-tooltip>
           </template>
 
           <template  v-else v-slot:[`header.ownerName`]>
@@ -87,7 +102,8 @@
               hide-details
               label="Include lien information for all selections"
               v-model="selectAllLien"
-              :indeterminate="isLienIndeterminate"
+              :disabled="selectedMatchesLength === 0"
+              @click="onSelectAllLienClick()"
             />
           </template>
 
@@ -111,11 +127,11 @@
           </template>
 
           <template v-slot:[`item.ownerName`]="{ item }">
-            <v-row class="align-baseline">
+            <v-row class="align-baseline" :class="item.selected && !$props.isReviewMode ? 'selected' : ''">
               <v-col cols="2">
-                <v-checkbox v-model="item.selected"/>
+                <v-checkbox v-model="item.selected" @click="onOwnerCheckboxClick(item)"/>
               </v-col>
-              <v-col class="owner-name-text" @click="item.selected = !item.selected">
+              <v-col class="owner-name-text" @click="item.selected = !item.selected; onOwnerCheckboxClick(item)">
                 {{ getOwnerName(item) }}
               </v-col>
             </v-row>
@@ -155,12 +171,14 @@
                   <v-checkbox
                     :label="`${!isReviewMode ? 'Include lien' : 'Lien'} information`"
                     v-model="item.includeLienInfo"
+                    :disabled="!item.selected"
                   />
                 </span>
               </template>
               <div class="pt-2 pb-2">
-                Select this to include a Personal Property Registry (PPR) lien search for this manufactured home for an
-                additional fee.
+                Select this to include a Personal Property Registry (PPR) lien search for the manufactured home
+                for an additional fee.
+                You must have the manufactured home selected before you can include the home's lien search.
               </div>
             </v-tooltip>
           </template>
@@ -249,15 +267,6 @@ export default defineComponent({
       areAllSelected: computed((): boolean => {
         return localState.results?.every(result => result && result.selected === true)
       }),
-      isIndeterminate: computed((): boolean => {
-        return localState.selectAll !== localState.areAllSelected
-      }),
-      areAllLienSelected: computed((): boolean => {
-        return localState.results?.every(result => result && result.includeLienInfo === true)
-      }),
-      isLienIndeterminate: computed((): boolean => {
-        return localState.selectAllLien !== localState.areAllLienSelected
-      }),
       activeResults: computed((): any => {
         const selectedResults = cloneDeep(getSelectedManufacturedHomes).value
         const baseResults = cloneDeep(getManufacturedHomeSearchResults.value.results)
@@ -295,6 +304,19 @@ export default defineComponent({
       } else return '-'
     }
 
+    const getItemClass = (item: ManufacturedHomeSearchResultIF): string => {
+      return item.selected && !props.isReviewMode ? 'selected' : ''
+    }
+
+    const onOwnerCheckboxClick = (item: ManufacturedHomeSearchResultIF): void => {
+      if (!item.selected) {
+        item.includeLienInfo = false
+      }
+      if (item.selected && localState.selectAllLien) {
+        item.includeLienInfo = true
+      }
+    }
+
     const getOwnerStatus = (ownerStatus: string): string => {
       if (ownerStatus) {
         if (ownerStatus === 'PREVIOUS') return 'HISTORICAL'
@@ -314,6 +336,9 @@ export default defineComponent({
       localState.searched = true
       localState.searchType = getSearchedType.value?.searchTypeUI || ''
       localState.results = sortByStatus(localState.activeResults)
+      if (!props.isReviewMode) {
+        localState.results = localState.results.map(result => ({ ...result, includeLienInfo: false }))
+      }
       localState.totalResultsLength = resp.totalResultsSize
       const date = new Date(resp.searchDateTime)
       localState.searchTime = pacificDate(date)
@@ -333,32 +358,45 @@ export default defineComponent({
       return items
     }
 
-    watch(() => localState.results, () => {
+    watch(() => localState.results, (): void => {
       const selectedManufacturedHomes = cloneDeep(localState.results?.filter(result => result.selected === true))
       setSelectedManufacturedHomes(selectedManufacturedHomes)
+      localState.selectedMatchesLength === 0
+        ? localState.selectAllLien = false
+        : localState.selectAllLien = localState.results
+          .filter(result => result.selected)
+          .every(result => result.includeLienInfo)
+      localState.selectAll = localState.results.every(result => result.selected)
     }, { deep: true })
 
-    watch(() => localState.selectAll, (val: boolean) => {
+    const onSelectAllClick = (): void => {
+      const val = localState.selectAll
       localState.results = localState.results.map(result => ({ ...result, selected: val }))
-    })
+      if (val && localState.selectAllLien) {
+        localState.results = localState.results.map(result => ({ ...result, includeLienInfo: val }))
+      }
+      if (!val) {
+        localState.results = localState.results.map(result => ({ ...result, includeLienInfo: val }))
+      }
+    }
 
-    watch(() => localState.selectAllLien, (val: boolean) => {
-      localState.results = localState.results.map(result => ({ ...result, includeLienInfo: val }))
-    })
-
-    watch(() => localState.areAllSelected, (val: boolean) => {
-      if (!props.isReviewMode && val) localState.selectAll = localState.areAllSelected
-    })
-
-    watch(() => localState.areAllLienSelected, (val: boolean) => {
-      if (!props.isReviewMode && val) localState.selectAllLien = localState.areAllLienSelected
-    })
+    const onSelectAllLienClick = (): void => {
+      for (const result of localState.results) {
+        if (result.selected) {
+          result.includeLienInfo = localState.selectAllLien
+        }
+      }
+    }
 
     return {
       reviewAndConfirm,
       getOwnerName,
       getOwnerStatus,
       updateFolioOrReference,
+      getItemClass,
+      onOwnerCheckboxClick,
+      onSelectAllClick,
+      onSelectAllLienClick,
       ...toRefs(localState)
     }
   }
@@ -418,6 +456,17 @@ th {
     font-size: 0.875rem !important;
     font-weight: bold;
   }
+  .v-input__control .v-input--selection-controls__input i { //checkbox border color
+    color: $primary-blue !important;
+  }
+  // disabled checkbox border color
+  .v-input--selection-controls.v-input--is-disabled:not(.v-input--indeterminate) .v-icon {
+    // primary blue 40% opacity
+    color: #1669bb28 !important;
+  }
+  .v-label--is-disabled { // disabled label
+    color: #757575;
+  }
   .results-table .lien-info {
     width: 100%;
   }
@@ -442,6 +491,13 @@ th {
       td:not(:last-child) {
         word-break: break-word;
       }
+    }
+    .selected {
+      background-color: $blueSelected !important;
+    }
+    tr:hover:not(.selected) {
+      // $gray1 at 75%
+      background-color: #f1f3f5BF !important;
     }
   }
 }
