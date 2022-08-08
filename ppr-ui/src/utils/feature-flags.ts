@@ -9,8 +9,8 @@ export const defaultFlagSet: LDFlagSet = {
   'bcregistry-ui-mhr-enabled': false,
   'search-registration-number': false,
   'search-serial-number': false,
-  'mhr-ui-enabled': true,
-  'mhr-registration-enabled': true
+  'mhr-ui-enabled': false,
+  'mhr-registration-enabled': false
 }
 /**
  * The Launch Darkly client instance.
