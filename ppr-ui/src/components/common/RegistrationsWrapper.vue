@@ -154,7 +154,7 @@
 /* eslint-disable no-unused-vars */
 import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
 import { useActions, useGetters } from 'vuex-composition-helpers'
-import RegistrationBar from '../registration/RegistrationBar.vue'
+import { RegistrationBar } from '@/components/registration'
 import { RegistrationTable } from '@/components/tables'
 import { BaseDialog, RegistrationConfirmation } from '@/components/dialogs'
 import { AllRegistrationTypes, registrationTableHeaders } from '@/resources'
