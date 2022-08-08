@@ -11,32 +11,34 @@
       tabindex="0"
       class="tab upper-border"
       :ripple="false"
-      :class="{ 'mt-1': tabNumber === 1 }"
+      :class="{ 'mt-1': isMhrTab }"
     >
-      <v-icon class="mr-2" :class="{'whiteIcon': tabNumber === 1}">mdi-car</v-icon>
+      <v-icon class="mr-2" :class="{'whiteIcon': isMhrTab}">mdi-car</v-icon>
       <b>Personal Property Registrations</b><span class="pl-1">({{ registrationsCount }})</span>
     </v-tab>
     <v-tab
       tabindex="1"
       class="tab upper-border"
       :ripple="false"
-      :class="{ 'mt-1': tabNumber === 0 }"
+      :class="{ 'mt-1': isPprTab }"
     >
-      <v-icon class="mr-2" :class="{'whiteIcon': tabNumber === 0}">mdi-home</v-icon>
+      <v-icon class="mr-2" :class="{'whiteIcon': isPprTab}">mdi-home</v-icon>
       <b>Manufactured Home Registrations</b><span class="pl-1">(10)</span>
     </v-tab>
     <v-tabs-items class="rounded-b" v-model="tabNumber" touchless>
       <v-tab-item class="px-7">
-        <PprRegistrations
+        <RegistrationsWrapper
           isTabView
+          :isPpr="isPprTab"
           :appReady="appReady"
           :appLoadingData="appLoadingData"
           @snackBarMsg="snackBarEvent($event)"
         />
       </v-tab-item>
       <v-tab-item class="px-7">
-        <PprRegistrations
+        <RegistrationsWrapper
           isTabView
+          :isMhr="isMhrTab"
           :appReady="appReady"
           :appLoadingData="appLoadingData"
           @snackBarMsg="snackBarEvent($event)"
@@ -49,14 +51,14 @@
 <script lang="ts">
 // Components
 /* eslint-disable no-unused-vars */
-import { defineComponent, reactive, toRefs } from '@vue/composition-api'
-import { PprRegistrations } from '@/components/registration'
+import { computed, defineComponent, reactive, toRefs } from '@vue/composition-api'
+import { RegistrationsWrapper } from '@/components/common'
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
   name: 'DashboardTabs',
   components: {
-    PprRegistrations
+    RegistrationsWrapper
   },
   props: {
     appReady: {
@@ -74,7 +76,13 @@ export default defineComponent({
   },
   setup (props, context) {
     const localState = reactive({
-      tabNumber: null
+      tabNumber: null,
+      isPprTab: computed((): boolean => {
+        return localState.tabNumber === 0
+      }),
+      isMhrTab: computed((): boolean => {
+        return localState.tabNumber === 1
+      })
     })
 
     const snackBarEvent = (msg: string): void => {
@@ -98,8 +106,9 @@ export default defineComponent({
   min-height: 64px !important;
   background-color: $BCgovBlue5;
   color: white !important;
-  font-size: 1rem;
+  font-size: 1.125rem;
   letter-spacing: 0;
+  text-transform: none !important;
   &:hover:not(.active-tab) {
     background-color: $primary-blue
   }

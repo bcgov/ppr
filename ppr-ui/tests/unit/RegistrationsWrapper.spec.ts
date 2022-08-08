@@ -9,20 +9,13 @@ import flushPromises from 'flush-promises'
 import sinon from 'sinon'
 import { StatusCodes } from 'http-status-codes'
 import { cloneDeep } from 'lodash'
-// local components
-import { PprRegistrations } from '@/components/registration'
-import { BaseSnackbar } from '@/components/common'
-import { RegistrationConfirmation } from '@/components/dialogs'
-import { SearchBar } from '@/components/search'
-import { RegistrationTable, SearchHistory } from '@/components/tables'
-import { AuthRoles, ProductCode, RouteNames, SettingOptions, TableActions, UISearchTypes } from '@/enums'
+import { RegistrationsWrapper } from '@/components/common'
+import { RegistrationTable } from '@/components/tables'
+import { SettingOptions, TableActions } from '@/enums'
 import { DraftResultIF, RegistrationSummaryIF, RegTableNewItemI } from '@/interfaces'
 import { registrationTableHeaders } from '@/resources'
 import {
-  amendConfirmationDialog,
-  dischargeConfirmationDialog,
   registrationFoundDialog,
-  renewConfirmationDialog,
   tableDeleteDialog,
   tableRemoveDialog
 } from '@/resources/dialogOptions'
@@ -37,9 +30,7 @@ import {
   mockedRegistration2,
   mockedUpdateRegTableUserSettingsResponse
 } from './test-data'
-import { getLastEvent, setupIntersectionObserverMock } from './utils'
-import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
-import { defaultFlagSet } from '@/utils'
+import { setupIntersectionObserverMock } from './utils'
 
 Vue.use(Vuetify)
 
@@ -120,7 +111,7 @@ describe('Ppr registration table tests', () => {
     localVue.use(VueRouter)
     const router = mockRouter.mock()
     await router.push({ name: 'dashboard' })
-    wrapper = mount(PprRegistrations, {
+    wrapper = mount(RegistrationsWrapper, {
       localVue,
       store,
       propsData: { appReady: true },
@@ -139,7 +130,7 @@ describe('Ppr registration table tests', () => {
   })
 
   it('displays my registration header and content', () => {
-    expect(wrapper.findComponent(PprRegistrations).exists()).toBe(true)
+    expect(wrapper.findComponent(RegistrationsWrapper).exists()).toBe(true)
     // myRegDrafts contains a child that will be put into a baseReg
     expect(store.getters.getRegTableDraftsBaseReg).toEqual(parentDrafts)
     expect(store.getters.getRegTableBaseRegs).toEqual(myRegHistoryWithChildren)
@@ -308,7 +299,7 @@ describe('Dashboard add registration tests', () => {
     localVue.use(VueRouter)
     const router = mockRouter.mock()
     await router.push({ name: 'dashboard' })
-    wrapper = mount(PprRegistrations, {
+    wrapper = mount(RegistrationsWrapper, {
       localVue,
       store,
       propsData: { appReady: true },

@@ -14,6 +14,7 @@ export { default as PidNumber } from './PidNumber.vue'
 export { default as Stepper } from './Stepper.vue'
 export { default as StickyContainer } from './StickyContainer.vue'
 export { default as SimpleHelpToggle } from './SimpleHelpToggle.vue'
+export { default as RegistrationsWrapper } from './RegistrationsWrapper.vue'
 
 // Shared DatePicker Component
 export { DatePicker as SharedDatePicker } from '@bcrs-shared-components/date-picker'
