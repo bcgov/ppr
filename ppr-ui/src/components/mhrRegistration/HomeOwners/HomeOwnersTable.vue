@@ -7,25 +7,17 @@
       hide-default-footer
       :items="homeOwners"
       item-key="groupId"
-      :group-by="showGroupsUI ? 'groupId' : null"
+      :group-by="showGroups ? 'groupId' : null"
       disable-sort
       disable-pagination
       no-data-text="No owners added yet"
     >
       <template
-        v-slot:group.header="{ group, items: owners }"
-        class="group-header"
+        v-slot:group.header="{ group, items }"
+        class="group-header-slot"
       >
-        <td :colspan="4" class="py-4">
-          <span class="ma-2 font-weight-bold">Group {{ group }}</span>
-          |
-          <span class="ma-2">Owners: {{ owners.length }} </span>
-          |
-          <span class="ma-2">Group Tenancy Type: </span>
-          |
-          <span class="ma-2">
-            {{ getOwnershipInterest(Number(group) - 1) }}
-          </span>
+        <td :colspan="4" class="py-1">
+          <TableGroupHeader :groupId="group" :owners="items" />
         </td>
       </template>
 
@@ -79,7 +71,7 @@
               color="primary"
               class="pr-0"
               :ripple="false"
-              :disabled="isAddingMode || isEditingMode"
+              :disabled="isAddingMode || isEditingMode || isGlobalEditingMode"
               @click="openForEditing(homeOwners.indexOf(row.item))"
             >
               <v-icon small>mdi-pencil</v-icon>
@@ -94,7 +86,7 @@
                   v-on="on"
                   color="primary"
                   class="px-0"
-                  :disabled="isAddingMode"
+                  :disabled="isAddingMode || isGlobalEditingMode"
                 >
                   <v-icon>mdi-menu-down</v-icon>
                 </v-btn>
@@ -136,6 +128,8 @@ import { useHomeOwners } from '@/composables/mhrRegistration'
 import { PartyAddressSchema } from '@/schemas'
 import { toDisplayPhone } from '@/utils'
 import { AddEditHomeOwner } from '@/components/mhrRegistration/HomeOwners'
+import TableGroupHeader from '@/components/mhrRegistration/HomeOwners/TableGroupHeader.vue'
+
 import { useGetters } from 'vuex-composition-helpers'
 
 export default defineComponent({
@@ -146,7 +140,8 @@ export default defineComponent({
   },
   components: {
     BaseAddress,
-    AddEditHomeOwner
+    AddEditHomeOwner,
+    TableGroupHeader
   },
   setup (props, context) {
     const addressSchema = PartyAddressSchema
@@ -155,7 +150,13 @@ export default defineComponent({
       'getMhrRegistrationHomeOwnerGroups'
     ])
 
-    const { showGroupsUI, removeOwner } = useHomeOwners()
+    const {
+      showGroups,
+      removeOwner,
+      deleteGroup,
+      isGlobalEditingMode,
+      setGlobalEditingMode
+    } = useHomeOwners()
 
     const localState = reactive({
       currentlyEditingHomeOwnerId: -1,
@@ -185,17 +186,11 @@ export default defineComponent({
       return index === localState.currentlyEditingHomeOwnerId
     }
 
-    // Get interest based on idex of the group
-    const getOwnershipInterest = (index: number): string => {
-      const interest = getMhrRegistrationHomeOwnerGroups.value[index]?.interest
-      return interest ? 'Interest: ' + interest : ''
-    }
-
     // Emit whenever editing mode is on or off
     watch(
       () => localState.currentlyEditingHomeOwnerId,
       () => {
-        context.emit('isEditing', localState.isEditingMode)
+        setGlobalEditingMode(localState.isEditingMode)
       }
     )
 
@@ -205,10 +200,12 @@ export default defineComponent({
       homeOwnersTableHeaders,
       openForEditing,
       isCurrentlyEditing,
-      showGroupsUI,
-      getOwnershipInterest,
+      showGroups,
       edit,
       remove,
+      deleteGroup,
+      isGlobalEditingMode,
+      getMhrRegistrationHomeOwnerGroups,
       ...toRefs(localState)
     }
   }
@@ -242,6 +239,10 @@ export default defineComponent({
       padding-right: 30px;
       padding-top: 8px;
     }
+    tbody > tr.v-row-group__header,
+    tbody > tr.v-row-group__header:hover {
+      background: #e2e8ee !important;
+    }
   }
 
   .owner-icon-name {
@@ -265,17 +266,14 @@ export default defineComponent({
     padding: 0 12px;
   }
 
-  .v-row-group__header {
-    button {
-      display: none;
-    }
-  }
-
   .suffix {
     color: #495057;
     font-size: 14px;
     line-height: 22px;
     margin-left: 34px;
   }
+}
+.v-menu__content {
+  cursor: pointer;
 }
 </style>

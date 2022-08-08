@@ -265,8 +265,8 @@ export default defineComponent({
       getGroupForOwner,
       addOwnerToTheGroup,
       editHomeOwner,
-      showGroupsUI,
-      setShowGroupsUI
+      showGroups,
+      setShowGroups
     } = useHomeOwners(props.isHomeOwnerPerson, props.editHomeOwner == null)
 
     const addressSchema = PartyAddressSchema
@@ -303,11 +303,11 @@ export default defineComponent({
     }
 
     const localState = reactive({
-      ownersGroupId: showGroupsUI.value
+      ownersGroupId: showGroups.value
         ? getGroupForOwner(props.editHomeOwner?.id)?.groupId
         : null,
       owner: { ...defaultHomeOwner },
-      ownerGroupId: props.editHomeOwner?.groupId || undefined,
+      ownerGroupId: undefined,
       isPerson: props.isHomeOwnerPerson,
       isAddingHomeOwner: props.editHomeOwner == null,
       isHomeOwnerFormValid: false,
@@ -346,7 +346,7 @@ export default defineComponent({
             localState.ownerGroupId as string
           )
         }
-        localState.ownerGroupId && setShowGroupsUI(true)
+        localState.ownerGroupId && setShowGroups(true)
 
         cancel()
       } else {

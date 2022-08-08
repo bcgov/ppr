@@ -112,7 +112,6 @@
       <HomeOwnersTable
         :homeOwners="getMhrRegistrationHomeOwners"
         :isAdding="disableAddHomeOwnerBtn"
-        @isEditing="isEditingMode = $event"
         @edit="editHomeOwner($event)"
         @remove="removeHomeOwner($event)"
       />
@@ -121,70 +120,94 @@
 </template>
 
 <script lang="ts">
+import { useActions, useGetters } from 'vuex-composition-helpers'
 import {
   AddEditHomeOwner,
   HomeOwnersTable
 } from '@/components/mhrRegistration/HomeOwners'
-import { Component, Vue } from 'vue-property-decorator'
-import { Action, Getter } from 'vuex-class'
-/* eslint-disable no-unused-vars */
-import { ActionBindingIF } from '@/interfaces/store-interfaces/action-interface'
-import {
-  MhrRegistrationHomeOwnersIF,
-  MhrRegistrationHomeOwnerGroupIF
-} from '@/interfaces/mhr-registration-interfaces'
-import { SimpleHelpToggle } from '@/components/common'
-/* eslint-enable no-unused-vars */
 
-@Component({
+import { SimpleHelpToggle } from '@/components/common'
+import {
+  computed,
+  defineComponent,
+  reactive,
+  toRefs,
+  watch
+} from '@vue/composition-api'
+import { useHomeOwners } from '@/composables/mhrRegistration'
+
+export default defineComponent({
+  name: 'HomeOwners',
   components: {
+    SimpleHelpToggle,
     AddEditHomeOwner,
-    HomeOwnersTable,
-    SimpleHelpToggle
+    HomeOwnersTable
+  },
+  setup () {
+    const { getMhrRegistrationHomeOwners } = useGetters<any>([
+      'getMhrRegistrationHomeOwners'
+    ])
+
+    const { setMhrRegistrationHomeOwners } = useActions<any>([
+      'setMhrRegistrationHomeOwners'
+    ])
+
+    const { setGlobalEditingMode } = useHomeOwners()
+
+    const localState = reactive({
+      showAddPersonSection: false,
+      showAddPersonOrganizationSection: false,
+      disableAddHomeOwnerBtn: computed(() => {
+        return (
+          localState.showAddPersonOrganizationSection ||
+          localState.showAddPersonSection
+        )
+      }),
+      tenancyType: computed(() => {
+        if (getMhrRegistrationHomeOwners.value?.length === 0) return 'N/A'
+        return getMhrRegistrationHomeOwners.value?.length === 1
+          ? 'Sole Ownership'
+          : 'Joint Tenants'
+      })
+    })
+
+    // Enable editing mode whenever adding Person or Business
+    // This would disabled all Edit buttons
+    watch(
+      () => localState.disableAddHomeOwnerBtn,
+      (isAdding: Boolean) => {
+        setGlobalEditingMode(isAdding)
+      }
+    )
+
+    const addHomeOwner = owner => {
+      const homeOwners = [...getMhrRegistrationHomeOwners.value]
+      homeOwners.push(owner)
+      setMhrRegistrationHomeOwners(homeOwners)
+    }
+
+    const editHomeOwner = owner => {
+      const homeOwners = [...getMhrRegistrationHomeOwners.value]
+      const { id, ...editedOwner } = owner
+      homeOwners[owner.id] = editedOwner
+      setMhrRegistrationHomeOwners(homeOwners)
+    }
+
+    const removeHomeOwner = owner => {
+      const homeOwners = [...getMhrRegistrationHomeOwners.value]
+      homeOwners.splice(homeOwners.indexOf(owner), 1)
+      setMhrRegistrationHomeOwners(homeOwners)
+    }
+
+    return {
+      getMhrRegistrationHomeOwners,
+      addHomeOwner,
+      editHomeOwner,
+      removeHomeOwner,
+      ...toRefs(localState)
+    }
   }
 })
-export default class HomeOwners extends Vue {
-  @Getter getMhrRegistrationHomeOwners: MhrRegistrationHomeOwnersIF[]
-  @Action setMhrRegistrationHomeOwners: ActionBindingIF
-
-  private showAddPersonSection = false
-  private showAddPersonOrganizationSection = false
-  private isEditingMode = false
-
-  private get tenancyType (): string {
-    if (this.getMhrRegistrationHomeOwners?.length === 0) return 'N/A'
-    return this.getMhrRegistrationHomeOwners?.length === 1
-      ? 'Sole Ownership'
-      : 'Joint Tenants'
-  }
-
-  private get disableAddHomeOwnerBtn (): boolean {
-    return (
-      this.showAddPersonOrganizationSection ||
-      this.showAddPersonSection ||
-      this.isEditingMode
-    )
-  }
-
-  private async addHomeOwner (owner): Promise<void> {
-    const homeOwners = [...this.getMhrRegistrationHomeOwners]
-    homeOwners.push(owner)
-    this.setMhrRegistrationHomeOwners(homeOwners)
-  }
-
-  private async editHomeOwner (owner): Promise<void> {
-    const homeOwners = [...this.getMhrRegistrationHomeOwners]
-    const { id, ...editedOwner } = owner
-    homeOwners[owner.id] = editedOwner
-    this.setMhrRegistrationHomeOwners(homeOwners)
-  }
-
-  private async removeHomeOwner (owner): Promise<void> {
-    const homeOwners = [...this.getMhrRegistrationHomeOwners]
-    homeOwners.splice(homeOwners.indexOf(owner), 1)
-    this.setMhrRegistrationHomeOwners(homeOwners)
-  }
-}
 </script>
 
 <style lang="scss" scoped>

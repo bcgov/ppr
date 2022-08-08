@@ -4,14 +4,17 @@ import {
 } from '@/interfaces'
 import '@/utils/use-composition-api'
 
-import { ref, computed, readonly } from '@vue/composition-api'
+import { ref, computed, readonly, watch } from '@vue/composition-api'
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import { find, remove, set, findIndex } from 'lodash'
+import { Watch } from 'vue-property-decorator'
 
-// when home owners not added to any groups
-// then do not show it on the UI
-const showGroupsUI = ref(false)
 const DEFAULT_GROUP_ID = '1'
+
+// Show or hide grouping of the Owners in the table
+const showGroups = ref(false)
+// Set global edit mode to enable or disable all Edit and dropdown buttons
+const isGlobalEditingMode = ref(false)
 
 export function useHomeOwners (
   isPerson: boolean = false,
@@ -34,18 +37,24 @@ export function useHomeOwners (
     }
   })
 
-  const setShowGroupsUI = show => {
-    showGroupsUI.value = show
+  // Show or hide groups in the owner's table
+  const setShowGroups = show => {
+    showGroups.value = show
   }
 
-  // WORKING WITH GROUPS FUNCTIONS
+  // Set global editing to enable or disable all Edit buttons
+  const setGlobalEditingMode = isEditing => {
+    isGlobalEditingMode.value = isEditing
+  }
+
+  // WORKING WITH GROUPS
 
   // Generate dropdown items for the group selection
-  const getGroupsDropdownItems = (isAddingHomeOwner: Boolean): Array<any> => {
+  const getGroupDropdownItems = (isAddingHomeOwner: Boolean): Array<any> => {
     // Make additional Group available in dropdown when adding a new home owner
     // const additionalGroup = isAddingHomeOwner ? 1 : 0
 
-    if (showGroupsUI.value) {
+    if (showGroups.value) {
       return Array(getMhrRegistrationHomeOwnerGroups.value.length + 1)
         .fill({})
         .map((v, i) => {
@@ -64,7 +73,6 @@ export function useHomeOwners (
   const getGroupForOwner = (
     ownerId: string
   ): MhrRegistrationHomeOwnerGroupIF => {
-    // if (!showGroupsUI.value) return null
     return find(getMhrRegistrationHomeOwnerGroups.value, group => {
       return find(group.owners, { id: ownerId })
     })
@@ -111,7 +119,8 @@ export function useHomeOwners (
     if (groupToUpdate.groupId === newGroupId) {
       // need to update owner in the same group
       const i = findIndex(groupToUpdate.owners, { id: updatedOwner.id })
-      set(groupToUpdate.owners, `owners[${i}]`, updatedOwner)
+      set(groupToUpdate, `owners[${i}]`, updatedOwner)
+      setMhrRegistrationHomeOwnerGroups(homeOwnerGroups)
     } else {
       // need to move the owner to new group
       remove(groupToUpdate.owners, owner => owner.id === updatedOwner.id)
@@ -119,18 +128,9 @@ export function useHomeOwners (
     }
 
     removeEmptyGroups()
-
-    // if we removed all owners from all groups - reset the groups UI flag
-    if (homeOwnerGroups.length === 0) {
-      setShowGroupsUI(false)
-    }
   }
 
-  /**
-   * Remove Owner from the Group it belongs to.
-   *
-   * @param owner owner to be removed
-   */
+  // Remove Owner from the Group it belongs to
   const removeOwner = (owner: MhrRegistrationHomeOwnersIF) => {
     const homeOwnerGroups = [
       ...getMhrRegistrationHomeOwnerGroups.value
@@ -153,16 +153,9 @@ export function useHomeOwners (
     if (groupToUpdate.owners.length === 0) {
       removeEmptyGroups()
     }
-
-    // if we removed all owners from all groups - reset the groups UI flag
-    if (homeOwnerGroups.length === 0) {
-      setShowGroupsUI(false)
-    }
   }
 
-  /**
-   * Remove all groups without owners.
-   */
+  // Remove all groups without owners
   const removeEmptyGroups = () => {
     const homeOwnerGroups = [
       ...getMhrRegistrationHomeOwnerGroups.value
@@ -172,10 +165,8 @@ export function useHomeOwners (
     const newOwnerGroups = homeOwnerGroups.filter(
       group => group.owners.length > 0
     )
-
     // update owner group ids with new values
     // to make them sequential again (e.g groups 1,3,5 -> 1,2,3)
-
     newOwnerGroups.forEach((group, index) => {
       group.groupId = (index + 1).toString()
     })
@@ -183,14 +174,40 @@ export function useHomeOwners (
     setMhrRegistrationHomeOwnerGroups(newOwnerGroups)
   }
 
+  // Delete group with its owners
+  const deleteGroup = groupId => {
+    const homeOwnerGroups = [...getMhrRegistrationHomeOwnerGroups.value]
+    remove(homeOwnerGroups, group => group.groupId === groupId)
+
+    homeOwnerGroups.forEach((group, index) => {
+      group.groupId = (index + 1).toString()
+    })
+
+    setMhrRegistrationHomeOwnerGroups(homeOwnerGroups)
+  }
+
+  // Do not show groups in the owner's table when there are no groups (e.g. after Group deletion)
+  watch(
+    () => getMhrRegistrationHomeOwnerGroups.value,
+    () => {
+      if (getMhrRegistrationHomeOwnerGroups.value.length === 0) {
+        setShowGroups(false)
+      }
+    }
+  )
+
   return {
-    showGroupsUI: readonly(showGroupsUI),
+    showGroups: readonly(showGroups),
+    isGlobalEditingMode: readonly(isGlobalEditingMode),
     getSideTitle,
     addOwnerToTheGroup,
     editHomeOwner,
     removeOwner,
-    getGroupsDropdownItems,
+    getGroupDropdownItems,
     getGroupForOwner,
-    setShowGroupsUI
+    setShowGroups,
+    setGlobalEditingMode,
+    removeEmptyGroups,
+    deleteGroup
   }
 }

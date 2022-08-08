@@ -22,6 +22,7 @@
       class="owner-groups-select my-8"
       filled
       @change="setOwnerGroupId($event)"
+      :clearable="groups.length === 1"
     ></v-select>
   </div>
 </template>
@@ -44,13 +45,13 @@ export default defineComponent({
   },
   setup (props, { emit }) {
     const { required } = useInputRules()
-    const { getGroupsDropdownItems, showGroupsUI } = useHomeOwners()
+    const { getGroupDropdownItems, showGroups } = useHomeOwners()
 
     const localState = reactive({
       ownerGroupId: props.groupId,
-      groups: computed(() => getGroupsDropdownItems(props.isAddingHomeOwner)),
+      groups: computed(() => getGroupDropdownItems(props.isAddingHomeOwner)),
       groupRules: computed(() =>
-        showGroupsUI.value ? required('Select a group for this owner') : []
+        showGroups.value ? required('Select a group for this owner') : []
       )
     })
 
