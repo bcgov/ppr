@@ -135,7 +135,9 @@ import {
   watch
 } from '@vue/composition-api'
 import { useHomeOwners } from '@/composables/mhrRegistration'
+/* eslint-disable no-unused-vars */
 import { MhrRegistrationHomeOwnersIF } from '@/interfaces'
+/* eslint-enable no-unused-vars */
 
 export default defineComponent({
   name: 'HomeOwners',
