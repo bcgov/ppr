@@ -50,12 +50,12 @@ export default defineComponent({
     const localState = reactive({
       ownerGroupId: props.groupId,
       groups: computed(() => getGroupDropdownItems(props.isAddingHomeOwner)),
-      groupRules: computed(() =>
-        showGroups.value ? required('Select a group for this owner') : []
-      )
+      groupRules: computed(() => {
+        return showGroups.value ? required('Select a group for this owner') : []
+      })
     })
 
-    const setOwnerGroupId = groupId => {
+    const setOwnerGroupId = (groupId: string) => {
       emit('setOwnerGroupId', groupId)
     }
 

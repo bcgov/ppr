@@ -135,6 +135,7 @@ import {
   watch
 } from '@vue/composition-api'
 import { useHomeOwners } from '@/composables/mhrRegistration'
+import { MhrRegistrationHomeOwnersIF } from '@/interfaces'
 
 export default defineComponent({
   name: 'HomeOwners',
@@ -180,20 +181,20 @@ export default defineComponent({
       }
     )
 
-    const addHomeOwner = owner => {
+    const addHomeOwner = (owner: MhrRegistrationHomeOwnersIF) => {
       const homeOwners = [...getMhrRegistrationHomeOwners.value]
       homeOwners.push(owner)
       setMhrRegistrationHomeOwners(homeOwners)
     }
 
-    const editHomeOwner = owner => {
+    const editHomeOwner = (owner: MhrRegistrationHomeOwnersIF) => {
       const homeOwners = [...getMhrRegistrationHomeOwners.value]
       const { id, ...editedOwner } = owner
       homeOwners[owner.id] = editedOwner
       setMhrRegistrationHomeOwners(homeOwners)
     }
 
-    const removeHomeOwner = owner => {
+    const removeHomeOwner = (owner: MhrRegistrationHomeOwnersIF) => {
       const homeOwners = [...getMhrRegistrationHomeOwners.value]
       homeOwners.splice(homeOwners.indexOf(owner), 1)
       setMhrRegistrationHomeOwners(homeOwners)

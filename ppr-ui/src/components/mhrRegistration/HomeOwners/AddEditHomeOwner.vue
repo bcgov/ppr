@@ -177,7 +177,7 @@
           <HomeOwnerGroups
             :groupId="ownersGroupId"
             :isAddingHomeOwner="isAddingHomeOwner"
-            @setOwnerGroupId="updateGroupIdForOwner($event)"
+            @setOwnerGroupId="ownerGroupId = $event"
           />
         </v-form>
         <v-row>
@@ -220,7 +220,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, ref, toRefs, watch } from '@vue/composition-api'
+import { computed, defineComponent, reactive, ref, toRefs, watch } from '@vue/composition-api'
 import { useInputRules } from '@/composables/useInputRules'
 import { useHomeOwners } from '@/composables/mhrRegistration'
 
@@ -235,7 +235,7 @@ import { SimpleHelpToggle } from '@/components/common'
 import { useSearch } from '@/composables/useSearch'
 import { SearchResponseI } from '@/interfaces'
 /* eslint-enable no-unused-vars */
-import HomeOwnerGroups from '@/components/mhrRegistration/HomeOwners/HomeOwnerGroups.vue'
+import HomeOwnerGroups from './HomeOwnerGroups.vue'
 
 let DEFAULT_OWNER_ID = 1
 
@@ -303,9 +303,11 @@ export default defineComponent({
     }
 
     const localState = reactive({
-      ownersGroupId: showGroups.value
-        ? getGroupForOwner(props.editHomeOwner?.id)?.groupId
-        : null,
+      ownersGroupId: computed(() =>
+        showGroups.value
+          ? getGroupForOwner(props.editHomeOwner?.id)?.groupId
+          : null
+      ),
       owner: { ...defaultHomeOwner },
       ownerGroupId: undefined,
       isPerson: props.isHomeOwnerPerson,
@@ -326,10 +328,6 @@ export default defineComponent({
       )
     })
 
-    const updateGroupIdForOwner = (groupId: string) => {
-      localState.ownerGroupId = groupId
-    }
-
     const done = (): void => {
       // @ts-ignore - function exists
       context.refs.addHomeOwnerForm.validate()
@@ -338,12 +336,12 @@ export default defineComponent({
         if (props.editHomeOwner) {
           editHomeOwner(
             localState.owner as MhrRegistrationHomeOwnersIF,
-            (localState.ownerGroupId as string) || '1'
+            localState.ownerGroupId || '1'
           )
         } else {
           addOwnerToTheGroup(
             localState.owner as MhrRegistrationHomeOwnersIF,
-            localState.ownerGroupId as string
+            localState.ownerGroupId
           )
         }
         localState.ownerGroupId && setShowGroups(true)
@@ -378,7 +376,6 @@ export default defineComponent({
       remove,
       cancel,
       addHomeOwnerForm,
-      updateGroupIdForOwner,
       maxLength,
       addressSchema,
       ...toRefs(localState)

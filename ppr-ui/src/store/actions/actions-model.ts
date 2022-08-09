@@ -319,9 +319,6 @@ export const setCivicAddress: ActionIF = ({ commit }, { key, value }): void => {
   commit('mutateCivicAddress', { key, value })
 }
 
-export const setMhrRegistrationHomeOwnerGroups: ActionIF = (
-  { commit },
-  groups: MhrRegistrationHomeOwnerGroupIF[]
-): void => {
+export const setMhrRegistrationHomeOwnerGroups: ActionIF = ({ commit }, groups: MhrRegistrationHomeOwnerGroupIF[]): void => {
   commit('mutateMhrHomeOwnerGroups', groups)
 }
