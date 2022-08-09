@@ -3,7 +3,6 @@ import Vue from 'vue'
 import Vuetify from 'vuetify'
 import VueRouter from 'vue-router'
 import { getVuexStore } from '@/store'
-import CompositionApi from '@vue/composition-api'
 import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
 import flushPromises from 'flush-promises'
 
@@ -43,7 +42,6 @@ const titleInfo = '.sub-header-info'
  */
 function createComponent (): Wrapper<any> {
   const localVue = createLocalVue()
-  localVue.use(CompositionApi)
   localVue.use(Vuetify)
   // Prevent the warning "[Vuetify] Unable to locate target [data-app]"
   document.body.setAttribute('data-app', 'true')
