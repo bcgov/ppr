@@ -2,7 +2,6 @@
 import Vue from 'vue'
 import Vuetify from 'vuetify'
 import { getVuexStore } from '@/store'
-import CompositionApi from '@vue/composition-api'
 import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
 import flushPromises from 'flush-promises'
 
@@ -12,8 +11,17 @@ import { RegistrationTable } from '@/components/tables'
 import { TableRow } from '@/components/tables/common'
 import { RegistrationBarTypeAheadList } from '@/components/registration'
 // local types/helpers/etc.
-import { AccountProductCodes, AccountProductMemberships, TableActions } from '@/enums'
-import { DraftResultIF, RegistrationSummaryIF, RegTableDataI, RegTableNewItemI } from '@/interfaces'
+import {
+  AccountProductCodes,
+  AccountProductMemberships,
+  TableActions
+} from '@/enums'
+import {
+  DraftResultIF,
+  RegistrationSummaryIF,
+  RegTableDataI,
+  RegTableNewItemI
+} from '@/interfaces'
 import { registrationTableHeaders } from '@/resources'
 // unit test data/helpers
 import {
@@ -45,7 +53,6 @@ const dateFilter = '.date-filter'
  */
 function createComponent (): Wrapper<any> {
   const localVue = createLocalVue()
-  localVue.use(CompositionApi)
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
   return mount(RegistrationTable, {
@@ -104,7 +111,12 @@ describe('Test registration table with results', () => {
     expect(rows.length).toBe(0)
 
     // no data text
-    expect(wrapper.findAll(regTable).at(0).text()).toContain('No registrations to show.')
+    expect(
+      wrapper
+        .findAll(regTable)
+        .at(0)
+        .text()
+    ).toContain('No registrations to show.')
   })
 
   it('updates table headers when given new ones', async () => {
@@ -133,18 +145,29 @@ describe('Test registration table with results', () => {
     expect(wrapper.findAll(tableRow).length).toBe(0)
     // test adding 1 row
     await wrapper.setProps({ setRegistrationHistory: registrationHistory })
-    expect(wrapper.vm.$props.setRegistrationHistory).toEqual(registrationHistory)
+    expect(wrapper.vm.$props.setRegistrationHistory).toEqual(
+      registrationHistory
+    )
     expect(wrapper.findComponent(TableRow).exists()).toBe(true)
     expect(wrapper.findAllComponents(TableRow).length).toBe(1)
-    expect(wrapper.findAllComponents(TableRow).at(0).vm.$props.setChild).toBe(false)
-    expect(wrapper.findAllComponents(TableRow).at(0).vm.$props.setHeaders).toEqual(wrapper.vm.headers)
-    expect(wrapper.findAllComponents(TableRow).at(0).vm.$props.setIsExpanded).toBe(false)
-    expect(wrapper.findAllComponents(TableRow).at(0).vm.$props.setItem)
-      .toEqual(wrapper.vm.$props.setRegistrationHistory[0])
+    expect(wrapper.findAllComponents(TableRow).at(0).vm.$props.setChild).toBe(
+      false
+    )
+    expect(
+      wrapper.findAllComponents(TableRow).at(0).vm.$props.setHeaders
+    ).toEqual(wrapper.vm.headers)
+    expect(
+      wrapper.findAllComponents(TableRow).at(0).vm.$props.setIsExpanded
+    ).toBe(false)
+    expect(wrapper.findAllComponents(TableRow).at(0).vm.$props.setItem).toEqual(
+      wrapper.vm.$props.setRegistrationHistory[0]
+    )
 
     // test adding multiple rows + drafts
     await wrapper.setProps({ setRegistrationHistory: newRegistrationHistory })
-    expect(wrapper.vm.$props.setRegistrationHistory).toEqual(newRegistrationHistory)
+    expect(wrapper.vm.$props.setRegistrationHistory).toEqual(
+      newRegistrationHistory
+    )
     const rows = wrapper.findAllComponents(TableRow)
     expect(rows.length).toBe(newRegistrationHistory.length)
     for (let i = 0; i < rows.length; i++) {
@@ -171,8 +194,12 @@ describe('Test registration table with results', () => {
         await flushPromises()
         expect(rows.at(i).vm.$props.setIsExpanded).toEqual(false)
         // verify next row in table is not the child
-        expect(wrapper.findAllComponents(TableRow).at(i + 1).vm.$props.setChild).toBe(false)
-        expect(wrapper.findAllComponents(TableRow).at(i + 1).vm.$props.setItem).not.toEqual(reg.changes[0])
+        expect(
+          wrapper.findAllComponents(TableRow).at(i + 1).vm.$props.setChild
+        ).toBe(false)
+        expect(
+          wrapper.findAllComponents(TableRow).at(i + 1).vm.$props.setItem
+        ).not.toEqual(reg.changes[0])
       }
     }
   })
@@ -180,7 +207,9 @@ describe('Test registration table with results', () => {
   it('filters table data properly', async () => {
     // FUTURE: add tests for all filters
     await wrapper.setProps({ setRegistrationHistory: newRegistrationHistory })
-    expect(wrapper.vm.$props.setRegistrationHistory).toEqual(newRegistrationHistory)
+    expect(wrapper.vm.$props.setRegistrationHistory).toEqual(
+      newRegistrationHistory
+    )
     expect(wrapper.findAllComponents(TableRow).length).toBe(5)
     // clear filters button only shows when a filter is active
     expect(wrapper.findAll('.v-btn.registration-action').length).toBe(0)
@@ -239,7 +268,9 @@ describe('Test registration table with results', () => {
     await wrapper.setProps({ setRegistrationHistory: registrationHistory })
     expect(wrapper.findComponent(RegistrationTable).exists()).toBe(true)
     await flushPromises()
-    expect(wrapper.findComponent(RegistrationBarTypeAheadList).exists()).toBe(true)
+    expect(wrapper.findComponent(RegistrationBarTypeAheadList).exists()).toBe(
+      true
+    )
     const autocomplete = wrapper.findComponent(RegistrationBarTypeAheadList)
     expect(autocomplete.text()).toContain('Registration Type')
   })
@@ -258,7 +289,9 @@ describe('Test registration table with results', () => {
     expect(wrapper.findComponent(DatePicker).isVisible()).toBe(true)
     const startDate = '2021-10-24'
     const endDate = '2021-10-26'
-    wrapper.findComponent(DatePicker).vm.$emit('submit', { endDate: endDate, startDate: startDate })
+    wrapper
+      .findComponent(DatePicker)
+      .vm.$emit('submit', { endDate: endDate, startDate: startDate })
     await flushPromises()
     // wait for debounce
     setTimeout(async () => {
@@ -274,44 +307,57 @@ describe('Test registration table with results', () => {
     expect(wrapper.findComponent(RegistrationTable).exists()).toBe(true)
     expect(wrapper.findAllComponents(TableRow).length).toBeGreaterThan(0)
     // complete reg actions
-    const actions = [TableActions.AMEND, TableActions.DISCHARGE, TableActions.RENEW, TableActions.REMOVE]
+    const actions = [
+      TableActions.AMEND,
+      TableActions.DISCHARGE,
+      TableActions.RENEW,
+      TableActions.REMOVE
+    ]
     for (let i = 0; i < actions.length; i++) {
-      wrapper.findAllComponents(TableRow).at(0).vm.$emit(
-        'action',
-        { action: actions[i], regNum: mockedRegistration1.baseRegistrationNumber }
-      )
+      wrapper
+        .findAllComponents(TableRow)
+        .at(0)
+        .vm.$emit('action', {
+          action: actions[i],
+          regNum: mockedRegistration1.baseRegistrationNumber
+        })
       await flushPromises()
-      expect(getLastEvent(wrapper, 'action')).toEqual(
-        { action: actions[i], docId: undefined, regNum: mockedRegistration1.baseRegistrationNumber }
-      )
+      expect(getLastEvent(wrapper, 'action')).toEqual({
+        action: actions[i],
+        docId: undefined,
+        regNum: mockedRegistration1.baseRegistrationNumber
+      })
     }
 
     // edit new draft
-    wrapper.findAllComponents(TableRow).at(0).vm.$emit(
-      'action',
-      { action: TableActions.EDIT_NEW, docId: mockedDraft1.documentId }
-    )
+    wrapper
+      .findAllComponents(TableRow)
+      .at(0)
+      .vm.$emit('action', {
+        action: TableActions.EDIT_NEW,
+        docId: mockedDraft1.documentId
+      })
     await flushPromises()
-    expect(getLastEvent(wrapper, 'action')).toEqual(
-      { action: TableActions.EDIT_NEW, docId: mockedDraft1.documentId, regNum: undefined }
-    )
+    expect(getLastEvent(wrapper, 'action')).toEqual({
+      action: TableActions.EDIT_NEW,
+      docId: mockedDraft1.documentId,
+      regNum: undefined
+    })
     // edit amendment draft
-    wrapper.findAllComponents(TableRow).at(0).vm.$emit(
-      'action',
-      {
+    wrapper
+      .findAllComponents(TableRow)
+      .at(0)
+      .vm.$emit('action', {
         action: TableActions.EDIT_AMEND,
         docId: mockedDraftAmend.documentId,
         regNum: mockedDraftAmend.baseRegistrationNumber
-      }
-    )
+      })
     await flushPromises()
-    expect(getLastEvent(wrapper, 'action')).toEqual(
-      {
-        action: TableActions.EDIT_AMEND,
-        docId: mockedDraftAmend.documentId,
-        regNum: mockedDraftAmend.baseRegistrationNumber
-      }
-    )
+    expect(getLastEvent(wrapper, 'action')).toEqual({
+      action: TableActions.EDIT_AMEND,
+      docId: mockedDraftAmend.documentId,
+      regNum: mockedDraftAmend.baseRegistrationNumber
+    })
   })
 
   it('works as expected for new added registrations', async () => {
@@ -319,14 +365,21 @@ describe('Test registration table with results', () => {
     const firstItem = newRegistrationHistory[0] as DraftResultIF
     const baseRegItem = newRegistrationHistory[2] as RegistrationSummaryIF
     const childDraftItem = baseRegItem.changes[0] as DraftResultIF
-    const childRegItem = (newRegistrationHistory[3] as RegistrationSummaryIF).changes[0] as RegistrationSummaryIF
+    const childRegItem = (newRegistrationHistory[3] as RegistrationSummaryIF)
+      .changes[0] as RegistrationSummaryIF
     const testItems = [firstItem, baseRegItem, childDraftItem, childRegItem]
 
     const newRegFirstItem: RegTableNewItemI = {
-      addedReg: firstItem.documentId, addedRegParent: '', addedRegSummary: firstItem, prevDraft: ''
+      addedReg: firstItem.documentId,
+      addedRegParent: '',
+      addedRegSummary: firstItem,
+      prevDraft: ''
     }
     const newRegBaseItem: RegTableNewItemI = {
-      addedReg: baseRegItem.registrationNumber, addedRegParent: '', addedRegSummary: baseRegItem, prevDraft: ''
+      addedReg: baseRegItem.registrationNumber,
+      addedRegParent: '',
+      addedRegSummary: baseRegItem,
+      prevDraft: ''
     }
     const newRegChildDraftItem: RegTableNewItemI = {
       addedReg: childDraftItem.documentId,
@@ -341,7 +394,12 @@ describe('Test registration table with results', () => {
       prevDraft: ''
     }
 
-    const emptyNewReg: RegTableNewItemI = { addedReg: '', addedRegParent: '', addedRegSummary: null, prevDraft: '' }
+    const emptyNewReg: RegTableNewItemI = {
+      addedReg: '',
+      addedRegParent: '',
+      addedRegSummary: null,
+      prevDraft: ''
+    }
 
     await wrapper.setProps({ setRegistrationHistory: newRegistrationHistory })
 
@@ -350,7 +408,8 @@ describe('Test registration table with results', () => {
     for (const i in testItems) {
       expect(wrapper.vm.isNewRegItem(testItems[i])).toBe(false)
       expect(wrapper.vm.isNewRegParentItem(testItems[i])).toBe(false)
-      if (i === '0') expect(wrapper.vm.setRowRef(testItems[i])).toBe('firstItem')
+      if (i === '0')
+        expect(wrapper.vm.setRowRef(testItems[i])).toBe('firstItem')
       else expect(wrapper.vm.setRowRef(testItems[i])).toBe('')
     }
 
@@ -392,7 +451,8 @@ describe('Test registration table with results', () => {
     for (const i in testItems) {
       expect(wrapper.vm.isNewRegItem(testItems[i])).toBe(false)
       expect(wrapper.vm.isNewRegParentItem(testItems[i])).toBe(false)
-      if (i === '0') expect(wrapper.vm.setRowRef(testItems[i])).toBe('firstItem')
+      if (i === '0')
+        expect(wrapper.vm.setRowRef(testItems[i])).toBe('firstItem')
       else expect(wrapper.vm.setRowRef(testItems[i])).toBe('')
     }
   })

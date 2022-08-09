@@ -2,7 +2,6 @@ import Vue from 'vue'
 import Vuetify from 'vuetify'
 import { getVuexStore } from '@/store'
 import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
-import CompositionApi from '@vue/composition-api'
 import flushPromises from 'flush-promises'
 // local
 import { BaseDialog } from '@/components/dialogs'
@@ -53,26 +52,24 @@ describe('Base Dialog tests', () => {
 
   beforeEach(async () => {
     const localVue = createLocalVue()
-    localVue.use(CompositionApi)
     localVue.use(Vuetify)
-    wrapper = mount(BaseDialog,
-      {
-        localVue,
-        store,
-        propsData: {
-          setAttach: '',
-          setDisplay: true,
-          setOptions: {
-            acceptText: 'default accept',
-            cancelText: 'default cancel',
-            hasContactInfo: false,
-            text: 'default text',
-            textExtra: [],
-            title: 'default title'
-          } as DialogOptionsIF
-        },
-        vuetify
-      })
+    wrapper = mount(BaseDialog, {
+      localVue,
+      store,
+      propsData: {
+        setAttach: '',
+        setDisplay: true,
+        setOptions: {
+          acceptText: 'default accept',
+          cancelText: 'default cancel',
+          hasContactInfo: false,
+          text: 'default text',
+          textExtra: [],
+          title: 'default title'
+        } as DialogOptionsIF
+      },
+      vuetify
+    })
     await flushPromises()
   })
   afterEach(() => {
@@ -85,11 +82,21 @@ describe('Base Dialog tests', () => {
     expect(wrapper.findComponent(DialogButtons).exists()).toBe(true)
     expect(wrapper.findComponent(DialogContent).isVisible()).toBe(true)
     expect(wrapper.findComponent(DialogButtons).isVisible()).toBe(true)
-    expect(wrapper.findComponent(DialogContent).vm.$props.setBaseText).toBe('default text')
-    expect(wrapper.findComponent(DialogContent).vm.$props.setExtraText).toEqual([])
-    expect(wrapper.findComponent(DialogContent).vm.$props.setHasContactInfo).toBe(false)
-    expect(wrapper.findComponent(DialogButtons).vm.$props.setAcceptText).toBe('default accept')
-    expect(wrapper.findComponent(DialogButtons).vm.$props.setCancelText).toBe('default cancel')
+    expect(wrapper.findComponent(DialogContent).vm.$props.setBaseText).toBe(
+      'default text'
+    )
+    expect(wrapper.findComponent(DialogContent).vm.$props.setExtraText).toEqual(
+      []
+    )
+    expect(
+      wrapper.findComponent(DialogContent).vm.$props.setHasContactInfo
+    ).toBe(false)
+    expect(wrapper.findComponent(DialogButtons).vm.$props.setAcceptText).toBe(
+      'default accept'
+    )
+    expect(wrapper.findComponent(DialogButtons).vm.$props.setCancelText).toBe(
+      'default cancel'
+    )
     expect(wrapper.vm.$props.setDisplay).toBe(true)
     expect(wrapper.findAll(title).length).toBe(1)
     expect(wrapper.find(title).text()).toBe('default title')
@@ -113,11 +120,21 @@ describe('Base Dialog tests', () => {
       expect(wrapper.findComponent(DialogButtons).isVisible()).toBe(true)
       expect(wrapper.findAll(title).length).toBe(1)
       expect(wrapper.find(title).text()).toBe(options.title)
-      expect(wrapper.findComponent(DialogContent).vm.$props.setBaseText).toBe(options.text)
-      expect(wrapper.findComponent(DialogContent).vm.$props.setExtraText).toEqual(options.textExtra || [])
-      expect(wrapper.findComponent(DialogContent).vm.$props.setHasContactInfo).toBe(options.hasContactInfo || false)
-      expect(wrapper.findComponent(DialogButtons).vm.$props.setAcceptText).toBe(options.acceptText)
-      expect(wrapper.findComponent(DialogButtons).vm.$props.setCancelText).toBe(options.cancelText)
+      expect(wrapper.findComponent(DialogContent).vm.$props.setBaseText).toBe(
+        options.text
+      )
+      expect(
+        wrapper.findComponent(DialogContent).vm.$props.setExtraText
+      ).toEqual(options.textExtra || [])
+      expect(
+        wrapper.findComponent(DialogContent).vm.$props.setHasContactInfo
+      ).toBe(options.hasContactInfo || false)
+      expect(wrapper.findComponent(DialogButtons).vm.$props.setAcceptText).toBe(
+        options.acceptText
+      )
+      expect(wrapper.findComponent(DialogButtons).vm.$props.setCancelText).toBe(
+        options.cancelText
+      )
     }
   })
 

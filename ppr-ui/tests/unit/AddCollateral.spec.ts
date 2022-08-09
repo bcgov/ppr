@@ -3,7 +3,7 @@ import Vue from 'vue'
 import Vuetify from 'vuetify'
 import VueRouter from 'vue-router'
 import { getVuexStore } from '@/store'
-import CompositionApi from '@vue/composition-api'
+
 import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
 import flushPromises from 'flush-promises'
 import { TiptapVuetifyPlugin } from 'tiptap-vuetify'
@@ -50,7 +50,6 @@ const titleInfo: string = '.sub-header-info'
  */
 function createComponent (): Wrapper<any> {
   const localVue = createLocalVue()
-  localVue.use(CompositionApi)
   localVue.use(Vuetify)
   // Prevent the warning "[Vuetify] Unable to locate target [data-app]"
   document.body.setAttribute('data-app', 'true')
@@ -99,19 +98,31 @@ describe('Add Collateral new registration component', () => {
     expect(wrapper.findComponent(AddCollateral).exists()).toBe(true)
     expect(wrapper.findComponent(Stepper).exists()).toBe(true)
     expect(wrapper.findComponent(StickyContainer).exists()).toBe(true)
-    expect(wrapper.findComponent(StickyContainer).vm.$props.setShowFeeSummary).toBe(true)
-    expect(wrapper.findComponent(StickyContainer).vm.$props.setFeeType).toBe(FeeSummaryTypes.NEW)
-    expect(wrapper.findComponent(StickyContainer).vm.$props.setRegistrationLength).toEqual({
+    expect(
+      wrapper.findComponent(StickyContainer).vm.$props.setShowFeeSummary
+    ).toBe(true)
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setFeeType).toBe(
+      FeeSummaryTypes.NEW
+    )
+    expect(
+      wrapper.findComponent(StickyContainer).vm.$props.setRegistrationLength
+    ).toEqual({
       lifeInfinite: false,
       lifeYears: 0
     })
-    expect(wrapper.findComponent(StickyContainer).vm.$props.setRegistrationType).toBe(
-      UIRegistrationTypes.SECURITY_AGREEMENT
-    )
-    expect(wrapper.findComponent(StickyContainer).vm.$props.setShowButtons).toBe(false)
+    expect(
+      wrapper.findComponent(StickyContainer).vm.$props.setRegistrationType
+    ).toBe(UIRegistrationTypes.SECURITY_AGREEMENT)
+    expect(
+      wrapper.findComponent(StickyContainer).vm.$props.setShowButtons
+    ).toBe(false)
     expect(wrapper.findComponent(ButtonFooter).exists()).toBe(true)
-    expect(wrapper.findComponent(ButtonFooter).vm.$props.currentStatementType).toBe(StatementTypes.FINANCING_STATEMENT)
-    expect(wrapper.findComponent(ButtonFooter).vm.$props.currentStepName).toBe(RouteNames.ADD_COLLATERAL)
+    expect(
+      wrapper.findComponent(ButtonFooter).vm.$props.currentStatementType
+    ).toBe(StatementTypes.FINANCING_STATEMENT)
+    expect(wrapper.findComponent(ButtonFooter).vm.$props.currentStepName).toBe(
+      RouteNames.ADD_COLLATERAL
+    )
     expect(wrapper.findComponent(Collateral).exists()).toBe(true)
     expect(wrapper.find(header).exists()).toBe(true)
     expect(wrapper.find(title).exists()).toBe(true)
@@ -123,7 +134,9 @@ describe('Add Collateral new registration component', () => {
     await store.dispatch('setRegistrationFlowType', RegistrationFlowType.NEW)
     wrapper = createComponent()
     await flushPromises()
-    expect(wrapper.findComponent(StickyContainer).vm.$props.setRegistrationLength).toEqual({
+    expect(
+      wrapper.findComponent(StickyContainer).vm.$props.setRegistrationLength
+    ).toEqual({
       lifeInfinite: false,
       lifeYears: 0
     })
@@ -134,7 +147,9 @@ describe('Add Collateral new registration component', () => {
       lifeYears: 0
     }
     await store.dispatch('setLengthTrust', newLengthTrust1)
-    expect(wrapper.findComponent(StickyContainer).vm.$props.setRegistrationLength).toEqual({
+    expect(
+      wrapper.findComponent(StickyContainer).vm.$props.setRegistrationLength
+    ).toEqual({
       lifeInfinite: newLengthTrust1.lifeInfinite,
       lifeYears: newLengthTrust1.lifeYears
     })
@@ -145,7 +160,9 @@ describe('Add Collateral new registration component', () => {
       lifeYears: 0
     }
     await store.dispatch('setLengthTrust', newLengthTrust2)
-    expect(wrapper.findComponent(StickyContainer).vm.$props.setRegistrationLength).toEqual({
+    expect(
+      wrapper.findComponent(StickyContainer).vm.$props.setRegistrationLength
+    ).toEqual({
       lifeInfinite: newLengthTrust2.lifeInfinite,
       lifeYears: newLengthTrust2.lifeYears
     })
@@ -165,11 +182,13 @@ describe('Add Collateral new registration component', () => {
       await store.dispatch('setRegistrationFlowType', RegistrationFlowType.NEW)
       wrapper = createComponent()
       await flushPromises()
-      expect(wrapper.findComponent(StickyContainer).vm.$props.setRegistrationType).toBe(
+      expect(
+        wrapper.findComponent(StickyContainer).vm.$props.setRegistrationType
+      ).toBe(RegistrationTypes[i].registrationTypeUI)
+      // header
+      expect(wrapper.find(header).text()).toContain(
         RegistrationTypes[i].registrationTypeUI
       )
-      // header
-      expect(wrapper.find(header).text()).toContain(RegistrationTypes[i].registrationTypeUI)
       // title
       expect(wrapper.find(title).text()).toContain('Add Collateral')
       // message

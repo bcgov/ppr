@@ -3,7 +3,6 @@ import Vue from 'vue'
 import Vuetify from 'vuetify'
 import { getVuexStore } from '@/store'
 import VueRouter from 'vue-router'
-import CompositionApi from '@vue/composition-api'
 import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
 
 // local components
@@ -28,7 +27,6 @@ const store = getVuexStore()
 */
 function createComponent (): Wrapper<any> {
   const localVue = createLocalVue()
-  localVue.use(CompositionApi)
   localVue.use(Vuetify)
   localVue.use(VueRouter)
   const router = mockRouter.mock()

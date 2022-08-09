@@ -2,7 +2,6 @@
 import Vue from 'vue'
 import Vuetify from 'vuetify'
 import { getVuexStore } from '@/store'
-import CompositionApi from '@vue/composition-api'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import flushPromises from 'flush-promises'
 
@@ -29,7 +28,6 @@ function createComponent (
   invalidSection: boolean
 ): Wrapper<any> {
   const localVue = createLocalVue()
-  localVue.use(CompositionApi)
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
   return mount(EditParty, {
@@ -111,6 +109,8 @@ describe('Secured Party validation tests - individual', () => {
     const messages = wrapper.findAll('.v-messages__message')
     expect(messages.length).toBe(2)
     expect(messages.at(0).text()).toBe('Please enter a valid email address')
-    expect(messages.at(1).text()).toBe('Street address, PO box, rural route, or general delivery address')
+    expect(messages.at(1).text()).toBe(
+      'Street address, PO box, rural route, or general delivery address'
+    )
   })
 })

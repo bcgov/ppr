@@ -4,7 +4,6 @@ import Vuetify from 'vuetify'
 import VueRouter from 'vue-router'
 import { getVuexStore } from '@/store'
 import { createLocalVue, Wrapper, mount, shallowMount } from '@vue/test-utils'
-import CompositionApi from '@vue/composition-api'
 import flushPromises from 'flush-promises'
 import sinon from 'sinon'
 import { StatusCodes } from 'http-status-codes'
@@ -111,7 +110,6 @@ describe('Dashboard component', () => {
     )))
     // create a Local Vue and install router on it
     const localVue = createLocalVue()
-    localVue.use(CompositionApi)
     localVue.use(Vuetify)
     localVue.use(VueRouter)
     const router = mockRouter.mock()
@@ -325,7 +323,6 @@ describe('Dashboard error modal tests', () => {
     )))
 
     const localVue = createLocalVue()
-    localVue.use(CompositionApi)
     localVue.use(Vuetify)
     localVue.use(VueRouter)
     const router = mockRouter.mock()

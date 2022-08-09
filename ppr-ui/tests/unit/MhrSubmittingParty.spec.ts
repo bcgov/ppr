@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import Vuetify from 'vuetify'
 import { getVuexStore } from '@/store'
-import CompositionApi from '@vue/composition-api'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import { MhrSubmittingParty } from '@/components/mhrRegistration/SubmittingParty'
 
@@ -15,7 +14,6 @@ const vuetify = new Vuetify({})
  */
 function createComponent (): Wrapper<any> {
   const localVue = createLocalVue()
-  localVue.use(CompositionApi)
   return mount(MhrSubmittingParty, {
     localVue,
     store,

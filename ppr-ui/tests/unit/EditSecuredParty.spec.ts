@@ -2,7 +2,6 @@
 import Vue from 'vue'
 import Vuetify from 'vuetify'
 import { getVuexStore } from '@/store'
-import CompositionApi from '@vue/composition-api'
 import flushPromises from 'flush-promises'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import { mockedRegisteringParty1, mockedSecuredParties2 } from './test-data'
@@ -32,7 +31,6 @@ function createComponent (
   invalidSection: boolean
 ): Wrapper<any> {
   const localVue = createLocalVue()
-  localVue.use(CompositionApi)
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
   return mount(EditParty, {

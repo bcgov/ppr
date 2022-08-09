@@ -2,7 +2,6 @@
 import Vue from 'vue'
 import Vuetify from 'vuetify'
 import { getVuexStore } from '@/store'
-import CompositionApi from '@vue/composition-api'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import sinon from 'sinon'
 import { axios as vonAxios } from '@/utils/axios-von'
@@ -12,7 +11,11 @@ import { AutoComplete } from '@/components/search'
 
 // Other
 import { SearchTypes } from '@/resources'
-import { AutoCompleteResponseIF, SearchResponseIF, SearchTypeIF } from '@/interfaces'
+import {
+  AutoCompleteResponseIF,
+  SearchResponseIF,
+  SearchTypeIF
+} from '@/interfaces'
 import { mockedSearchResponse, mockedVonResponse } from './test-data'
 import { UISearchTypes } from '@/enums'
 import { getLastEvent } from './utils'
@@ -40,7 +43,6 @@ function createComponent (
   searchValue: string
 ): Wrapper<any> {
   const localVue = createLocalVue()
-  localVue.use(CompositionApi)
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
   return mount(AutoComplete, {
@@ -55,7 +57,8 @@ describe('AutoComplete component', () => {
   let wrapper: Wrapper<any>
   sessionStorage.setItem('VON_API_URL', 'mock-url-von')
   let sandbox
-  const resp: SearchResponseIF = mockedSearchResponse[UISearchTypes.BUSINESS_DEBTOR]
+  const resp: SearchResponseIF =
+    mockedSearchResponse[UISearchTypes.BUSINESS_DEBTOR]
   const vonResp: AutoCompleteResponseIF = mockedVonResponse
   const select: SearchTypeIF = SearchTypes[2]
 
@@ -63,9 +66,13 @@ describe('AutoComplete component', () => {
     sandbox = sinon.createSandbox()
     // GET autocomplete results
     const get = sandbox.stub(vonAxios, 'get')
-    get.returns(new Promise(resolve => resolve({
-      data: vonResp
-    })))
+    get.returns(
+      new Promise(resolve =>
+        resolve({
+          data: vonResp
+        })
+      )
+    )
     wrapper = createComponent(true, '')
   })
   afterEach(() => {
@@ -94,11 +101,21 @@ describe('AutoComplete component', () => {
     const autoCompleteNames = wrapper.findAll('.auto-complete-item')
     // 6 in the response, but should only display up to 5
     expect(autoCompleteNames.length).toBe(5)
-    expect(autoCompleteNames.at(0).text()).toEqual(mockedVonResponse.results[0].value)
-    expect(autoCompleteNames.at(1).text()).toEqual(mockedVonResponse.results[1].value)
-    expect(autoCompleteNames.at(2).text()).toEqual(mockedVonResponse.results[2].value)
-    expect(autoCompleteNames.at(3).text()).toEqual(mockedVonResponse.results[3].value)
-    expect(autoCompleteNames.at(4).text()).toEqual(mockedVonResponse.results[4].value)
+    expect(autoCompleteNames.at(0).text()).toEqual(
+      mockedVonResponse.results[0].value
+    )
+    expect(autoCompleteNames.at(1).text()).toEqual(
+      mockedVonResponse.results[1].value
+    )
+    expect(autoCompleteNames.at(2).text()).toEqual(
+      mockedVonResponse.results[2].value
+    )
+    expect(autoCompleteNames.at(3).text()).toEqual(
+      mockedVonResponse.results[3].value
+    )
+    expect(autoCompleteNames.at(4).text()).toEqual(
+      mockedVonResponse.results[4].value
+    )
     expect(getLastEvent(wrapper, hideDetails)).toBeTruthy()
     expect(getLastEvent(wrapper, searchValue)).toBeNull()
   })
