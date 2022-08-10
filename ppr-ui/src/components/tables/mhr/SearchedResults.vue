@@ -361,12 +361,10 @@ export default defineComponent({
     watch(() => localState.results, (): void => {
       const selectedManufacturedHomes = cloneDeep(localState.results?.filter(result => result.selected === true))
       setSelectedManufacturedHomes(selectedManufacturedHomes)
-      localState.selectedMatchesLength === 0
-        ? localState.selectAllLien = false
-        : localState.selectAllLien = localState.results
-          .filter(result => result.selected)
-          .every(result => result.includeLienInfo)
       localState.selectAll = localState.results.every(result => result.selected)
+      if (localState.selectedMatchesLength === 0) {
+        localState.selectAllLien = false
+      }
     }, { deep: true })
 
     const onSelectAllClick = (): void => {
