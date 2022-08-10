@@ -362,6 +362,9 @@ export default defineComponent({
       const selectedManufacturedHomes = cloneDeep(localState.results?.filter(result => result.selected === true))
       setSelectedManufacturedHomes(selectedManufacturedHomes)
       localState.selectAll = localState.results.every(result => result.selected)
+      if (localState.selectedMatchesLength === 0) {
+        localState.selectAllLien = false
+      }
     }, { deep: true })
 
     const onSelectAllClick = (): void => {
@@ -372,7 +375,6 @@ export default defineComponent({
       }
       if (!val) {
         localState.results = localState.results.map(result => ({ ...result, includeLienInfo: val }))
-        localState.selectAllLien = val
       }
     }
 
