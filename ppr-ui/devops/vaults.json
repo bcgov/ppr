@@ -32,7 +32,8 @@
             "pay-api",
             "ppr-api",
             "status-api",
-            "von-api"
+            "von-api",
+            "registries-search-api"
         ]
     },
     {
