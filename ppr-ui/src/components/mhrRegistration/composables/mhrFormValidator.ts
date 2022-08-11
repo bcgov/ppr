@@ -1,4 +1,3 @@
-import { validateSearchAction } from '@/utils'
 import { Validators, createFormValidation } from '@lemoncode/fonk'
 
 const validationSchema = {
@@ -11,8 +10,8 @@ const validationSchema = {
     ],
     phoneNumber: [
       {
-        validator: Validators.minLength,
-        customArgs: { length: 13 },
+        validator: Validators.minLength.validator,
+        customArgs: { length: 14 },
         message: 'Length must be 10 numbers eg. (999) 999-9999'
       }
     ]

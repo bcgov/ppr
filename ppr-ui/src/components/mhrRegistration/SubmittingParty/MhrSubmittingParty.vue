@@ -105,6 +105,7 @@
                           : ''
                       "
             @blur="onBlur('emailAddress')"
+            persistent-hint
           />
 
           <!-- Phone Number -->
@@ -124,6 +125,7 @@
                           : ''
                       "
                 @blur="onBlur('phoneNumber')"
+                pesistent-hint
             />
             </v-col>
             <v-col>
@@ -280,7 +282,7 @@ export default defineComponent({
     }
 
     const onBlur = (fieldname) => {
-      validateInput(fieldname, localState.submittingParty.emailAddress)
+      validateInput(fieldname, localState.submittingParty[fieldname])
     }
 
     /** Apply store properties to local model. **/
