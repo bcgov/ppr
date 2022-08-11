@@ -105,7 +105,6 @@
                           : ''
                       "
             @blur="onBlur('emailAddress')"
-            persistent-hint
           />
 
           <!-- Phone Number -->
@@ -125,7 +124,6 @@
                           : ''
                       "
                 @blur="onBlur('phoneNumber')"
-                pesistent-hint
             />
             </v-col>
             <v-col>
