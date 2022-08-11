@@ -12,7 +12,7 @@ const validationSchema = {
       {
         validator: Validators.minLength.validator,
         customArgs: { length: 14 },
-        message: 'Length must be 10 numbers eg. (999) 999-9999'
+        message: 'Phone must be 10 numbers eg. (999) 999-9999'
       }
     ]
   }

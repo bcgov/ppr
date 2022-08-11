@@ -202,7 +202,6 @@ export default defineComponent({
     const {
       customRules,
       invalidSpaces,
-      minLength,
       maxLength,
       isStringOrNumber,
       required,
@@ -267,12 +266,6 @@ export default defineComponent({
       required('Business name is required'),
       maxLength(70),
       invalidSpaces()
-    )
-
-    const phoneRules = customRules(
-      required('Enter a phone number'),
-      maxLength(10),
-      minLength(10)
     )
 
     const phoneExtensionRules = customRules(isNumber(), invalidSpaces())
@@ -342,7 +335,6 @@ export default defineComponent({
       middleNameRules,
       lastNameRules,
       businessNameRules,
-      phoneRules,
       phoneExtensionRules,
       onBlur,
       errors,
