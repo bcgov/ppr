@@ -5,8 +5,8 @@
       <label class="font-weight-bold pl-2">Submitting Party</label>
     </header>
 
-    <div :class="{ 'invalid-section': false }">
-      <section class="mx-6 pt-8" v-if="true">
+    <div :class="{ 'invalid-section': !getStepValidation(MhrSectVal.SUBMITTING_PARTY_VALID)}">
+      <section class="mx-6 pt-8" v-if="!getStepValidation(MhrSectVal.SUBMITTING_PARTY_VALID)">
         <span>
           <v-icon color="error">mdi-information-outline</v-icon>
           <span class="error-text mx-1">This step is unfinished.</span>
@@ -97,6 +97,7 @@ import { useGetters } from 'vuex-composition-helpers'
 import { BaseAddress } from '@/composables/address'
 import { PartyAddressSchema } from '@/schemas'
 import { toDisplayPhone } from '@/utils'
+import { useMhrValidations } from '@/composables'
 
 export default defineComponent({
   name: 'SubmittingPartyReview',
@@ -107,11 +108,18 @@ export default defineComponent({
   setup () {
     const {
       getMhrRegistrationSubmittingParty,
-      getMhrAttentionReferenceNum
+      getMhrAttentionReferenceNum,
+      getMhrRegistrationValidationModel
     } = useGetters<any>([
       'getMhrRegistrationSubmittingParty',
-      'getMhrAttentionReferenceNum'
+      'getMhrAttentionReferenceNum',
+      'getMhrRegistrationValidationModel'
     ])
+
+    const {
+      MhrSectVal,
+      getStepValidation
+    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
     const localState = reactive({
       address: computed(() => getMhrRegistrationSubmittingParty.value.address),
@@ -146,8 +154,10 @@ export default defineComponent({
     return {
       RouteNames,
       addressSchema,
+      MhrSectVal,
       getMhrRegistrationSubmittingParty,
       getMhrAttentionReferenceNum,
+      getStepValidation,
       getSubmittingPartyName,
       parsePhoneNumber,
       ...toRefs(localState)

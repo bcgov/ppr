@@ -52,65 +52,65 @@ describe('Home Certification', () => {
     expect(wrapper.find('#certification-option-btns').exists()).toBe(true)
 
     // Verify Forms hidden before radio btn selection
-    expect(wrapper.find('#csa-form').exists()).toBe(false)
-    expect(wrapper.find('#engineer-form').exists()).toBe(false)
+    expect(wrapper.find('#csa-form').isVisible()).toBe(false)
+    expect(wrapper.find('#engineer-form').isVisible()).toBe(false)
   })
 
   it('opens the CSA Form when selected', async () => {
     // Verify Forms hidden before radio btn selection
-    expect(wrapper.find('#csa-form').exists()).toBe(false)
-    expect(wrapper.find('#engineer-form').exists()).toBe(false)
+    expect(wrapper.find('#csa-form').isVisible()).toBe(false)
+    expect(wrapper.find('#engineer-form').isVisible()).toBe(false)
 
     // Click the btn
     await wrapper.find('#csa-option').trigger('click')
 
     // Verify CSA Form
-    expect(wrapper.find('#csa-form').exists()).toBe(true)
-    expect(wrapper.find('#csa-number').exists()).toBe(true)
-    expect(wrapper.find('#csa-standard').exists()).toBe(true)
+    expect(wrapper.find('#csa-form').isVisible()).toBe(true)
+    expect(wrapper.find('#csa-number').isVisible()).toBe(true)
+    expect(wrapper.find('#csa-standard').isVisible()).toBe(true)
 
     // Verify Engineer Form
-    expect(wrapper.find('#engineer-form').exists()).toBe(false)
-    expect(wrapper.find('#engineer-name').exists()).toBe(false)
+    expect(wrapper.find('#engineer-form').isVisible()).toBe(false)
+    expect(wrapper.find('#engineer-name').isVisible()).toBe(false)
     expect(wrapper.find('#date-of-engineer-report').exists()).toBe(false)
   })
 
   it('opens the Engineer Form when selected', async () => {
     // Verify Forms hidden before radio btn selection
-    expect(wrapper.find('#csa-form').exists()).toBe(false)
-    expect(wrapper.find('#engineer-form').exists()).toBe(false)
+    expect(wrapper.find('#csa-form').isVisible()).toBe(false)
+    expect(wrapper.find('#engineer-form').isVisible()).toBe(false)
 
     // Click the btn
     await wrapper.find('#engineer-option').trigger('click')
 
     // Verify Engineer Form
-    expect(wrapper.find('#engineer-form').exists()).toBe(true)
-    expect(wrapper.find('#engineer-name').exists()).toBe(true)
-    expect(wrapper.find('#date-of-engineer-report').exists()).toBe(true)
+    expect(wrapper.find('#engineer-form').isVisible()).toBe(true)
+    expect(wrapper.find('#engineer-name').isVisible()).toBe(true)
+    expect(wrapper.find('#date-of-engineer-report').isVisible()).toBe(true)
 
     // Verify CSA Form
-    expect(wrapper.find('#csa-form').exists()).toBe(false)
-    expect(wrapper.find('#csa-number').exists()).toBe(false)
-    expect(wrapper.find('#csa-standard').exists()).toBe(false)
+    expect(wrapper.find('#csa-form').isVisible()).toBe(false)
+    expect(wrapper.find('#csa-number').isVisible()).toBe(false)
+    expect(wrapper.find('#csa-standard').isVisible()).toBe(false)
   })
 
   it('toggles between form options', async () => {
     // Verify Forms hidden before radio btn selection
-    expect(wrapper.find('#csa-form').exists()).toBe(false)
-    expect(wrapper.find('#engineer-form').exists()).toBe(false)
+    expect(wrapper.find('#csa-form').isVisible()).toBe(false)
+    expect(wrapper.find('#engineer-form').isVisible()).toBe(false)
 
     // Click the btn
     await wrapper.find('#engineer-option').trigger('click')
 
     // Verify Engineer Form
-    expect(wrapper.find('#engineer-form').exists()).toBe(true)
-    expect(wrapper.find('#engineer-name').exists()).toBe(true)
-    expect(wrapper.find('#date-of-engineer-report').exists()).toBe(true)
+    expect(wrapper.find('#engineer-form').isVisible()).toBe(true)
+    expect(wrapper.find('#engineer-name').isVisible()).toBe(true)
+    expect(wrapper.find('#date-of-engineer-report').isVisible()).toBe(true)
 
     // Verify CSA Form
-    expect(wrapper.find('#csa-form').exists()).toBe(false)
-    expect(wrapper.find('#csa-number').exists()).toBe(false)
-    expect(wrapper.find('#csa-standard').exists()).toBe(false)
+    expect(wrapper.find('#csa-form').isVisible()).toBe(false)
+    expect(wrapper.find('#csa-number').isVisible()).toBe(false)
+    expect(wrapper.find('#csa-standard').isVisible()).toBe(false)
 
     // Verify Form Toggle
 
@@ -118,13 +118,13 @@ describe('Home Certification', () => {
     await wrapper.find('#csa-option').trigger('click')
 
     // Verify CSA Form
-    expect(wrapper.find('#csa-form').exists()).toBe(true)
-    expect(wrapper.find('#csa-number').exists()).toBe(true)
-    expect(wrapper.find('#csa-standard').exists()).toBe(true)
+    expect(wrapper.find('#csa-form').isVisible()).toBe(true)
+    expect(wrapper.find('#csa-number').isVisible()).toBe(true)
+    expect(wrapper.find('#csa-standard').isVisible()).toBe(true)
 
     // Verify Engineer Form
-    expect(wrapper.find('#engineer-form').exists()).toBe(false)
-    expect(wrapper.find('#engineer-name').exists()).toBe(false)
+    expect(wrapper.find('#engineer-form').isVisible()).toBe(false)
+    expect(wrapper.find('#engineer-name').isVisible()).toBe(false)
     expect(wrapper.find('#date-of-engineer-report').exists()).toBe(false)
   })
 

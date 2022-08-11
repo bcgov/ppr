@@ -1,5 +1,5 @@
 <template>
-  <div id="mhr-submitting-party-shim">
+  <div id="mhr-submitting-party">
     <section id="mhr-add-submitting-party" class="mt-10">
       <h2>Submitting Party</h2>
       <p class="mt-2">
@@ -12,7 +12,7 @@
       <PartySearch isMhrPartySearch />
 
       <!-- Mhr Submitting Party Form -->
-      <MhrSubmittingParty />
+      <MhrSubmittingParty :validate="validateSubmitter" :class="{'border-error-left': validateSubmitter}"/>
     </section>
 
     <section id="mhr-submitting-party-reference" class="mt-10">
@@ -23,59 +23,119 @@
       </p>
 
       <!-- Insert Attention or Reference Number here -->
-      <v-card flat rounded id="attention-or-reference-number-card" class="mt-8 pa-8 pr-6 pb-3">
-        <v-row no-gutters class="pt-3">
-          <v-col cols="12" sm="2" >
-            <label class="generic-label" :class="{'error-text': false}">Attention or Reference Number</label>
-          </v-col>
-          <v-col cols="12" sm="10" class="px-1">
-            <v-text-field
-              filled
-              id="attention-or-reference-number"
-              class="pr-2"
-              label="Attention or Reference Number (Optional)"
-              v-model="attentionReferenceNum"
-              :rules="attentionReferenceNumRule"
-            />
-          </v-col>
-        </v-row>
-      </v-card>
+      <v-form ref="reference-number-form" v-model="isRefNumValid">
+        <v-card
+          flat rounded
+          id="attention-or-reference-number-card"
+          class="mt-8 pa-8 pr-6 pb-3"
+          :class="{'border-error-left': validateRefNum}"
+        >
+          <v-row no-gutters class="pt-3">
+            <v-col cols="12" sm="2" >
+              <label class="generic-label" :class="{'error-text': validateRefNum}">
+                Attention or Reference Number
+              </label>
+            </v-col>
+            <v-col cols="12" sm="10" class="px-1">
+              <v-text-field
+                filled
+                id="attention-or-reference-number"
+                class="pr-2"
+                label="Attention or Reference Number (Optional)"
+                v-model="attentionReferenceNum"
+                :rules="maxLength(40)"
+              />
+            </v-col>
+          </v-row>
+        </v-card>
+      </v-form>
     </section>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue, Watch } from 'vue-property-decorator'
-import { MhrSubmittingParty } from '@/components/mhrRegistration'
+import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
+import { MhrSubmittingParty } from '@/components/mhrRegistration/SubmittingParty'
 import { PartySearch } from '@/components/parties/party'
-import { Action } from 'vuex-class'
-// eslint-disable-next-line no-unused-vars
-import { ActionBindingIF } from '@/interfaces'
+import { useMhrValidations } from '@/composables/mhrRegistration/mhr-validations'
+import { useActions, useGetters } from 'vuex-composition-helpers'
 import { useInputRules } from '@/composables'
 
-@Component({
+export default defineComponent({
+  name: 'SubmittingParty',
   components: {
     PartySearch,
     MhrSubmittingParty
+  },
+  props: {},
+  setup () {
+    const {
+      getMhrRegistrationValidationModel
+    } = useGetters<any>([
+      'getMhrRegistrationValidationModel'
+    ])
+
+    const {
+      setMhrAttentionReferenceNum
+    } = useActions<any>([
+      'setMhrAttentionReferenceNum'
+    ])
+
+    const {
+      maxLength
+    } = useInputRules()
+
+    const {
+      MhrCompVal,
+      MhrSectVal,
+      hasError,
+      setValidation,
+      getSectionValidation,
+      scrollToInvalid
+    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
+
+    const localState = reactive({
+      attentionReferenceNum: '',
+      isRefNumValid: false,
+      validateSubmitter: computed(() => {
+        return getSectionValidation(MhrSectVal.SUBMITTING_PARTY_VALID, MhrCompVal.SUBMITTER_VALID)
+      }),
+      validateRefNum: computed(() => {
+        return getSectionValidation(MhrSectVal.SUBMITTING_PARTY_VALID, MhrCompVal.REF_NUM_VALID)
+      })
+    })
+
+    watch(() => localState.attentionReferenceNum, (val: string) => {
+      setMhrAttentionReferenceNum(val)
+    })
+
+    watch(() => localState.isRefNumValid, (val: boolean) => {
+      setValidation(MhrSectVal.SUBMITTING_PARTY_VALID, MhrCompVal.REF_NUM_VALID, val)
+    })
+
+    const scrollOnValidationUpdates = () => {
+      scrollToInvalid(MhrSectVal.SUBMITTING_PARTY_VALID, 'mhr-submitting-party')
+    }
+
+    watch(() => localState, () => {
+      setTimeout(scrollOnValidationUpdates, 300)
+    }, { deep: true })
+
+    return {
+      MhrCompVal,
+      MhrSectVal,
+      maxLength,
+      hasError,
+      getSectionValidation,
+      ...toRefs(localState)
+    }
   }
 })
-export default class SubmittingParty extends Vue {
-  @Action setMhrAttentionReferenceNum : ActionBindingIF
-
-  private attentionReferenceNum = ''
-
-  private attentionReferenceNumRule = useInputRules().maxLength(40)
-
-  @Watch('attentionReferenceNum')
-  private updateAttentionReferenceNum (val) {
-    this.setMhrAttentionReferenceNum(val)
-  }
-}
 </script>
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-#mhr-submitting-party-shim {
+#mhr-submitting-party {
   /* Set "header-counter" to 0 */
   counter-reset: header-counter;
 }

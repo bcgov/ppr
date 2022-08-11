@@ -2,7 +2,7 @@
   <v-card flat rounded id="mhr-home-certification" class="mt-8 pa-8 pr-6">
     <v-row no-gutters>
       <v-col cols="12" sm="2">
-        <label class="generic-label" :class="{'error-text': false}">Certification</label>
+        <label class="generic-label" :class="{'error-text': validate}">Certification</label>
       </v-col>
       <v-col cols="12" sm="10" class="pl-1">
         <v-radio-group
@@ -28,7 +28,7 @@
         </v-radio-group>
 
         <!-- CSA Section -->
-        <template v-if="isCsaOption">
+        <div v-show="isCsaOption">
           <v-divider class="my-9 ml-0 mr-2" />
           <v-row no-gutters>
             <v-col cols="12">
@@ -55,10 +55,10 @@
               </v-form>
             </v-col>
           </v-row>
-        </template>
+        </div>
 
         <!-- Engineer Section -->
-        <template v-if="isEngineerOption">
+        <div v-show="isEngineerOption">
           <v-divider class="my-9 ml-0 mr-2" />
           <v-row no-gutters>
             <v-col cols="12">
@@ -75,6 +75,7 @@
 
                 <label class="generic-label" for="date-of-engineer-report">Date of Engineer's Report</label>
                 <SharedDatePicker
+                  v-if="isEngineerOption"
                   ref="datePicker"
                   id="date-of-engineer-report"
                   class="pt-4 pr-2"
@@ -83,13 +84,14 @@
                   :maxDate="today"
                   :nudge-top="180"
                   :nudge-right="150"
-                  :inputRules="engineerReportDate ? required('Select a date of engineer\'s report'): []"
-                  @emitDate="engineerReportDate = $event "
+                  :inputRules="required('Select a date of engineer\'s report')"
+                  @emitDate="engineerReportDate = $event"
+                  @emitCancel="engineerReportDate = ''"
                 />
               </v-form>
             </v-col>
           </v-row>
-        </template>
+        </div>
       </v-col>
     </v-row>
   </v-card>
@@ -100,7 +102,7 @@
 import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
 import { SharedDatePicker } from '@/components/common'
 import { HomeCertificationOptions } from '@/enums'
-import { useInputRules } from '@/composables'
+import { useInputRules, useMhrValidations } from '@/composables'
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import { createUtcDate, dateToYyyyMmDd } from '@/utils'
 
@@ -109,7 +111,12 @@ export default defineComponent({
   components: {
     SharedDatePicker
   },
-  props: {},
+  props: {
+    validate: {
+      type: Boolean,
+      default: false
+    }
+  },
   setup (props, context) {
     const {
       setMhrHomeDescription
@@ -117,9 +124,11 @@ export default defineComponent({
       'setMhrHomeDescription'
     ])
     const {
-      getMhrRegistrationHomeDescription
+      getMhrRegistrationHomeDescription,
+      getMhrRegistrationValidationModel
     } = useGetters<any>([
-      'getMhrRegistrationHomeDescription'
+      'getMhrRegistrationHomeDescription',
+      'getMhrRegistrationValidationModel'
     ])
 
     // Composable(s)
@@ -129,6 +138,12 @@ export default defineComponent({
       maxLength,
       required
     } = useInputRules()
+
+    const {
+      MhrCompVal,
+      MhrSectVal,
+      setValidation
+    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
     const localState = reactive({
       homeCertificationValid: false,
@@ -162,7 +177,7 @@ export default defineComponent({
       }),
       isHomeCertificationValid: computed((): boolean => {
         return (localState.isCsaOption && localState.isCsaValid) ||
-          (localState.isEngineerOption && localState.isEngineerValid)
+          (localState.isEngineerOption && localState.isEngineerValid && !!localState.engineerReportDate)
       }),
       today: computed(() => {
         const todayDate = new Date()
@@ -174,6 +189,19 @@ export default defineComponent({
         return dateToYyyyMmDd(utcDate)
       })
     })
+
+    const validateForms = async () => {
+      if (localState.isCsaOption) {
+        // @ts-ignore - function exists
+        await context.refs.csaForm?.validate()
+      }
+      if (localState.isEngineerOption) {
+        // @ts-ignore - function exists
+        await context.refs.engineerForm?.validate()
+        // @ts-ignore - function exists
+        await context.refs.datePicker?.validateForm()
+      }
+    }
 
     /** Apply local models to store when they change. **/
     watch(() => localState.certificationOption, () => {
@@ -191,18 +219,28 @@ export default defineComponent({
     watch(() => localState.engineerReportDate, () => {
       setMhrHomeDescription({ key: 'engineerReportDate', value: localState.engineerReportDate })
     })
+    watch(() => localState.isHomeCertificationValid, (val: boolean) => {
+      setValidation(MhrSectVal.YOUR_HOME_VALID, MhrCompVal.HOME_CERTIFICATION_VALID, val)
+    })
+    watch(() => props.validate, async (val: boolean) => {
+      await validateForms()
+    })
 
     /** Clear/reset forms when select option changes. **/
     watch(() => localState.certificationOption, async () => {
       if (localState.isCsaOption) {
         // @ts-ignore - function exists
         await context.refs.engineerForm?.resetValidation()
+        props.validate && await validateForms()
+
         localState.engineerName = ''
         localState.engineerReportDate = ''
       }
       if (localState.isEngineerOption) {
         // @ts-ignore - function exists
         await context.refs.csaForm?.resetValidation()
+        props.validate && await validateForms()
+
         localState.csaNumber = ''
         localState.csaStandard = ''
       }

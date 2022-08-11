@@ -3,7 +3,7 @@ import {
   AddPartiesIF, AddCollateralIF, CourtOrderIF, DebtorNameIF, DraftIF, IndividualNameIF,
   ManufacturedHomeSearchResponseIF, ManufacturedHomeSearchResultIF, LengthTrustIF, AccountProductSubscriptionIF,
   AccountInformationIF, AuthorizationIF, CertifyIF, RegistrationTypeIF, SearchResponseIF, SearchTypeIF, RegTableDataI,
-  UserInfoIF, MhrRegistrationIF, UserProductSubscriptionIF
+  UserInfoIF, MhrRegistrationIF, UserProductSubscriptionIF, MhrValidationStateIF
 } from '@/interfaces'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 
@@ -56,4 +56,5 @@ export interface StateModelIF {
   staffPayment: StaffPaymentIF
   unsavedChanges: Boolean // used for cancel flows
   userInfo: UserInfoIF
+  mhrValidationState?: MhrValidationStateIF
 }

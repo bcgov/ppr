@@ -9,7 +9,7 @@
                 <h1>Manufactured Home Registration</h1>
               </v-col>
             </v-row>
-            <stepper class="mt-4" />
+            <stepper class="mt-4" :showStepErrorsFlag="validateMhrRegistration"/>
             <!-- Component Steps -->
             <component
               v-for="step in getSteps"
@@ -51,23 +51,16 @@
 import { Component, Emit, Prop, Vue, Watch } from 'vue-property-decorator'
 import { Action, Getter } from 'vuex-class'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
-import {
-  APIRegistrationTypes,
-  RegistrationFlowType,
-  RouteNames,
-  StatementTypes
-} from '@/enums'
-import {
-  ActionBindingIF,
-  ErrorIF,
-  LengthTrustIF,
-  RegistrationTypeIF,
-  StepIF
-} from '@/interfaces'
+import { APIRegistrationTypes, RegistrationFlowType, RouteNames, StatementTypes } from '@/enums'
+import { ActionBindingIF, ErrorIF, MhrValidationStateIF, RegistrationTypeIF, StepIF } from '@/interfaces'
 import { getFeatureFlag } from '@/utils'
 import { Stepper, StickyContainer } from '@/components/common'
 import ButtonFooter from '@/components/common/ButtonFooter.vue'
+import { useMhrValidations } from '@/composables'
+import { MhrCompVal, MhrSectVal } from '@/composables/mhrRegistration/enums'
+import { toRefs } from '@vue/composition-api'
 /* eslint-enable no-unused-vars */
+
 @Component({
   components: {
     ButtonFooter,
@@ -80,8 +73,11 @@ export default class MhrRegistration extends Vue {
   @Getter getRegistrationType: RegistrationTypeIF
   @Getter getRegistrationOther: string
   @Getter getSteps!: Array<StepIF>
+  @Getter getMhrRegistrationValidationModel!: MhrValidationStateIF
+
   @Action setRegistrationFlowType!: ActionBindingIF
   @Action setRegistrationType!: ActionBindingIF
+
   /** Whether App is ready. */
   @Prop({ default: false })
   private appReady: boolean
@@ -92,6 +88,7 @@ export default class MhrRegistration extends Vue {
   private dataLoaded = false
   private feeType = null // To be determined by fee codes
   private statementType = StatementTypes.FINANCING_STATEMENT
+
   private get isAuthenticated (): boolean {
     return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
   }
@@ -101,6 +98,11 @@ export default class MhrRegistration extends Vue {
       return this.getRegistrationOther || ''
     }
     return this.getRegistrationType?.registrationTypeUI || ''
+  }
+
+  private get validateMhrRegistration (): boolean {
+    return useMhrValidations(toRefs(this.getMhrRegistrationValidationModel))
+      .getValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_APP)
   }
 
   /** Helper to check is the current route matches */

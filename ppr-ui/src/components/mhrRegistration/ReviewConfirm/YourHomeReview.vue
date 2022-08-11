@@ -5,8 +5,8 @@
       <label class="font-weight-bold pl-2">Your Home</label>
     </header>
 
-    <div :class="{ 'invalid-section': false }">
-      <section class="mx-6 pt-8" v-if="true">
+    <div :class="{'border-error-left': !getStepValidation(MhrSectVal.YOUR_HOME_VALID)}">
+      <section class="mx-6 pt-8" v-if="!getStepValidation(MhrSectVal.YOUR_HOME_VALID)">
         <span>
           <v-icon color="error">mdi-information-outline</v-icon>
           <span class="error-text mx-1">This step is unfinished.</span>
@@ -163,6 +163,7 @@ import { useGetters } from 'vuex-composition-helpers'
 import { HomeCertificationOptions, RouteNames } from '@/enums'
 import { yyyyMmDdToPacificDate, formatAsHtml } from '@/utils'
 import { HomeSections } from '@/components/mhrRegistration'
+import { useMhrValidations } from '@/composables'
 
 export default defineComponent({
   name: 'YourHomeReview',
@@ -171,10 +172,21 @@ export default defineComponent({
   },
   props: {},
   setup () {
-    const { getMhrRegistrationHomeDescription, getMhrRegistrationOtherInfo } = useGetters<any>([
+    const {
+      getMhrRegistrationHomeDescription,
+      getMhrRegistrationOtherInfo,
+      getMhrRegistrationValidationModel
+    } = useGetters<any>([
       'getMhrRegistrationOtherInfo',
-      'getMhrRegistrationHomeDescription'
+      'getMhrRegistrationHomeDescription',
+      'getMhrRegistrationValidationModel'
     ])
+
+    const {
+      MhrSectVal,
+      getStepValidation
+    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
+
     const localState = reactive({
       isCSA: computed((): boolean => {
         return getMhrRegistrationHomeDescription.value?.certificationOption === HomeCertificationOptions.CSA
@@ -191,6 +203,8 @@ export default defineComponent({
     return {
       formatAsHtml,
       RouteNames,
+      MhrSectVal,
+      getStepValidation,
       getMhrRegistrationOtherInfo,
       getMhrRegistrationHomeDescription,
       ...toRefs(localState)

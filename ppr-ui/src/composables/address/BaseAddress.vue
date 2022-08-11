@@ -71,7 +71,7 @@
             :name="Math.random()"
             rows="1"
             v-model="addressLocal.streetAdditional"
-            :rules="[...schemaLocal.streetAdditional]"
+            :rules="!!addressLocal.streetAdditional ? [...schemaLocal.streetAdditional] : []"
           />
         </div>
         <div class="form__row three-column">
@@ -124,7 +124,7 @@
             :name="Math.random()"
             rows="2"
             v-model="addressLocal.deliveryInstructions"
-            :rules="[...schemaLocal.deliveryInstructions]"
+            :rules="!!addressLocal.deliveryInstructions ? [...schemaLocal.deliveryInstructions] : []"
           />
         </div>
       </v-form>
@@ -223,7 +223,7 @@ export default defineComponent({
         addressLocal.value.region = ''
         addressLocal.value.postalCode = ''
       }
-      resetValidation()
+      !props.triggerErrors && resetValidation()
     }
 
     onMounted(() => {
