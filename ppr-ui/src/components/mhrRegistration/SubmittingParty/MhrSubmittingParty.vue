@@ -99,7 +99,12 @@
             class="pt-4 pr-2"
             label="Email Address"
             v-model="submittingParty.emailAddress"
-            :rules="emailRules"
+            :error-messages="
+                        errors.emailAddress.message
+                          ? errors.emailAddress.message
+                          : ''
+                      "
+            @blur="onBlur('emailAddress')"
           />
 
           <!-- Phone Number -->
@@ -113,8 +118,13 @@
                 class="pt-4 pr-3"
                 label="Phone Number"
                 v-model="submittingParty.phoneNumber"
-                :rules="phoneRules"
-              />
+                :error-messages="
+                        errors.phoneNumber.message
+                          ? errors.phoneNumber.message
+                          : ''
+                      "
+                @blur="onBlur('phoneNumber')"
+            />
             </v-col>
             <v-col>
               <v-text-field
@@ -160,7 +170,9 @@ import { SubmittingPartyTypes } from '@/enums'
 import { PartyAddressSchema } from '@/schemas'
 import { cloneDeep } from 'lodash'
 import { VueMaskDirective } from 'v-mask'
+import { useSubmittingPartyValidation } from '@/components/mhrRegistration/composables/useSubmittingPartyValidation'
 import { mutateOriginalLengthTrust } from '@/store/mutations'
+
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
@@ -190,11 +202,15 @@ export default defineComponent({
       invalidSpaces,
       minLength,
       maxLength,
-      required,
       isStringOrNumber,
-      isEmail,
+      required,
       isNumber
     } = useInputRules()
+
+    const {
+      errors,
+      validateInput
+    } = useSubmittingPartyValidation()
 
     const localState = reactive({
       enableLookUp: true,
@@ -251,10 +267,9 @@ export default defineComponent({
       invalidSpaces()
     )
 
-    const emailRules = customRules(required('Email address is required'), invalidSpaces(), isEmail())
-
     const phoneRules = customRules(
       required('Enter a phone number'),
+      maxLength(10),
       minLength(10)
     )
 
@@ -262,6 +277,10 @@ export default defineComponent({
 
     const updateValidity = (valid) => {
       localState.addressValid = valid
+    }
+
+    const onBlur = (fieldname) => {
+      validateInput(fieldname, localState.submittingParty.emailAddress)
     }
 
     /** Apply store properties to local model. **/
@@ -321,9 +340,10 @@ export default defineComponent({
       middleNameRules,
       lastNameRules,
       businessNameRules,
-      emailRules,
       phoneRules,
       phoneExtensionRules,
+      onBlur,
+      errors,
       ...toRefs(localState)
     }
   }
