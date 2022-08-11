@@ -170,7 +170,7 @@ import { SubmittingPartyTypes } from '@/enums'
 import { PartyAddressSchema } from '@/schemas'
 import { cloneDeep } from 'lodash'
 import { VueMaskDirective } from 'v-mask'
-import { useSubmittingPartyValidation } from '@/components/mhrRegistration/composables/useSubmittingPartyValidation'
+import { usemhrFormValidation } from '@/components/mhrRegistration/composables/usemhrFormValidation'
 import { mutateOriginalLengthTrust } from '@/store/mutations'
 
 /* eslint-enable no-unused-vars */
@@ -210,7 +210,7 @@ export default defineComponent({
     const {
       errors,
       validateInput
-    } = useSubmittingPartyValidation()
+    } = usemhrFormValidation()
 
     const localState = reactive({
       enableLookUp: true,
