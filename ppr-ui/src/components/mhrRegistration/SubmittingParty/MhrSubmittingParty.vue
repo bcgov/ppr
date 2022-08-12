@@ -100,7 +100,6 @@
             label="Email Address"
             v-model="submittingParty.emailAddress"
             :rules="emailRules"
-            validate-on-blur
           />
 
           <!-- Phone Number -->
