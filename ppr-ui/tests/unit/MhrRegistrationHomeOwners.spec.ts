@@ -13,8 +13,7 @@ import {
 import { SimpleHelpToggle } from '@/components/common'
 import { mockedPerson, mockedOrganization } from './test-data/mock-mhr-registration'
 import { getTestId } from './utils/helper-functions'
-import { MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnersIF } from '@/interfaces'
-import { BaseAddress } from '@/composables/address'
+import { MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF } from '@/interfaces'
 
 Vue.use(Vuetify)
 
@@ -112,7 +111,7 @@ describe('Home Owners', () => {
   })
 
   it('renders home owner (person and org) via store dispatch', async () => {
-    const owners = [mockedPerson] as MhrRegistrationHomeOwnersIF[]
+    const owners = [mockedPerson] as MhrRegistrationHomeOwnerIF[]
     const homeOwnerGroup = [{ groupId: '1', owners: owners }] as MhrRegistrationHomeOwnerGroupIF[]
 
     // add a person

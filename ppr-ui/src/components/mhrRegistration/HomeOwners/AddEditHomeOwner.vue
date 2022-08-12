@@ -232,7 +232,7 @@ import { PartyAddressSchema } from '@/schemas'
 import { focusOnFirstError } from '@/utils'
 
 /* eslint-disable no-unused-vars */
-import { MhrRegistrationHomeOwnersIF } from '@/interfaces/mhr-registration-interfaces'
+import { MhrRegistrationHomeOwnerIF } from '@/interfaces/mhr-registration-interfaces'
 import { SimpleHelpToggle } from '@/components/common'
 import { useSearch } from '@/composables/useSearch'
 import { SearchResponseI } from '@/interfaces'
@@ -251,7 +251,7 @@ export default defineComponent({
   },
   props: {
     editHomeOwner: {
-      type: Object as () => MhrRegistrationHomeOwnersIF,
+      type: Object as () => MhrRegistrationHomeOwnerIF,
       default: null
     },
     isHomeOwnerPerson: {
@@ -276,7 +276,7 @@ export default defineComponent({
 
     const { searchBusiness } = useSearch()
 
-    const defaultHomeOwner: MhrRegistrationHomeOwnersIF = {
+    const defaultHomeOwner: MhrRegistrationHomeOwnerIF = {
       id: props.editHomeOwner?.id || (DEFAULT_OWNER_ID++).toString(),
       phoneNumber: props.editHomeOwner?.phoneNumber || '',
       phoneExtension: props.editHomeOwner?.phoneExtension || null,
@@ -323,7 +323,7 @@ export default defineComponent({
       lastNameRules: customRules(required('Enter a last name'), maxLength(25)),
       orgNameRules: customRules(
         required('Enter an organization name'),
-        maxLength(150)
+        maxLength(70)
       ),
       phoneNumberRules: customRules(
         required('Enter a phone number'),
@@ -338,12 +338,12 @@ export default defineComponent({
       if (localState.isHomeOwnerFormValid) {
         if (props.editHomeOwner) {
           editHomeOwner(
-            localState.owner as MhrRegistrationHomeOwnersIF,
+            localState.owner as MhrRegistrationHomeOwnerIF,
             localState.ownerGroupId || '1'
           )
         } else {
           addOwnerToTheGroup(
-            localState.owner as MhrRegistrationHomeOwnersIF,
+            localState.owner as MhrRegistrationHomeOwnerIF,
             localState.ownerGroupId
           )
         }
