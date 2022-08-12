@@ -45,12 +45,7 @@ const emptyAddress: AddressIF = {
  *
  * @returns a Wrapper<SearchBar> object with the given parameters.
  */
-function createComponent (
-  value: AddressIF,
-  schema: SchemaIF,
-  editing: boolean,
-  triggerErrors: boolean
-): Wrapper<any> {
+function createComponent (value: AddressIF, schema: SchemaIF, editing: boolean, triggerErrors: boolean): Wrapper<any> {
   const localVue = createLocalVue()
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')

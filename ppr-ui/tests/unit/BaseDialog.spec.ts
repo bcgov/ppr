@@ -82,21 +82,11 @@ describe('Base Dialog tests', () => {
     expect(wrapper.findComponent(DialogButtons).exists()).toBe(true)
     expect(wrapper.findComponent(DialogContent).isVisible()).toBe(true)
     expect(wrapper.findComponent(DialogButtons).isVisible()).toBe(true)
-    expect(wrapper.findComponent(DialogContent).vm.$props.setBaseText).toBe(
-      'default text'
-    )
-    expect(wrapper.findComponent(DialogContent).vm.$props.setExtraText).toEqual(
-      []
-    )
-    expect(
-      wrapper.findComponent(DialogContent).vm.$props.setHasContactInfo
-    ).toBe(false)
-    expect(wrapper.findComponent(DialogButtons).vm.$props.setAcceptText).toBe(
-      'default accept'
-    )
-    expect(wrapper.findComponent(DialogButtons).vm.$props.setCancelText).toBe(
-      'default cancel'
-    )
+    expect(wrapper.findComponent(DialogContent).vm.$props.setBaseText).toBe('default text')
+    expect(wrapper.findComponent(DialogContent).vm.$props.setExtraText).toEqual([])
+    expect(wrapper.findComponent(DialogContent).vm.$props.setHasContactInfo).toBe(false)
+    expect(wrapper.findComponent(DialogButtons).vm.$props.setAcceptText).toBe('default accept')
+    expect(wrapper.findComponent(DialogButtons).vm.$props.setCancelText).toBe('default cancel')
     expect(wrapper.vm.$props.setDisplay).toBe(true)
     expect(wrapper.findAll(title).length).toBe(1)
     expect(wrapper.find(title).text()).toBe('default title')
@@ -120,21 +110,11 @@ describe('Base Dialog tests', () => {
       expect(wrapper.findComponent(DialogButtons).isVisible()).toBe(true)
       expect(wrapper.findAll(title).length).toBe(1)
       expect(wrapper.find(title).text()).toBe(options.title)
-      expect(wrapper.findComponent(DialogContent).vm.$props.setBaseText).toBe(
-        options.text
-      )
-      expect(
-        wrapper.findComponent(DialogContent).vm.$props.setExtraText
-      ).toEqual(options.textExtra || [])
-      expect(
-        wrapper.findComponent(DialogContent).vm.$props.setHasContactInfo
-      ).toBe(options.hasContactInfo || false)
-      expect(wrapper.findComponent(DialogButtons).vm.$props.setAcceptText).toBe(
-        options.acceptText
-      )
-      expect(wrapper.findComponent(DialogButtons).vm.$props.setCancelText).toBe(
-        options.cancelText
-      )
+      expect(wrapper.findComponent(DialogContent).vm.$props.setBaseText).toBe(options.text)
+      expect(wrapper.findComponent(DialogContent).vm.$props.setExtraText).toEqual(options.textExtra || [])
+      expect(wrapper.findComponent(DialogContent).vm.$props.setHasContactInfo).toBe(options.hasContactInfo || false)
+      expect(wrapper.findComponent(DialogButtons).vm.$props.setAcceptText).toBe(options.acceptText)
+      expect(wrapper.findComponent(DialogButtons).vm.$props.setCancelText).toBe(options.cancelText)
     }
   })
 

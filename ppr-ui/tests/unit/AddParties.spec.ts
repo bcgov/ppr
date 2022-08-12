@@ -13,12 +13,7 @@ import ButtonFooter from '@/components/common/ButtonFooter.vue'
 import { AddSecuredPartiesAndDebtors } from '@/views'
 // Local types/helpers
 import { FeeSummaryTypes } from '@/composables/fees/enums'
-import {
-  RegistrationFlowType,
-  RouteNames,
-  StatementTypes,
-  UIRegistrationTypes
-} from '@/enums'
+import { RegistrationFlowType, RouteNames, StatementTypes, UIRegistrationTypes } from '@/enums'
 import { RegistrationTypes } from '@/resources'
 import { LengthTrustIF } from '@/interfaces'
 // unit test helpers/data
@@ -68,10 +63,7 @@ describe('Add Parties new registration component', () => {
     id: 'test_id'
   }
   sessionStorage.setItem('CURRENT_ACCOUNT', JSON.stringify(currentAccount))
-  sessionStorage.setItem(
-    'AUTH_API_URL',
-    'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/'
-  )
+  sessionStorage.setItem('AUTH_API_URL', 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/')
 
   beforeEach(async () => {
     await store.dispatch('setRegistrationType', null)
@@ -92,38 +84,24 @@ describe('Add Parties new registration component', () => {
     await store.dispatch('setRegistrationFlowType', RegistrationFlowType.NEW)
     wrapper = createComponent()
     await flushPromises()
-    expect(wrapper.vm.$route.name).toBe(
-      RouteNames.ADD_SECUREDPARTIES_AND_DEBTORS
-    )
+    expect(wrapper.vm.$route.name).toBe(RouteNames.ADD_SECUREDPARTIES_AND_DEBTORS)
     expect(wrapper.vm.appReady).toBe(true)
     expect(wrapper.vm.dataLoaded).toBe(true)
-    expect(wrapper.findComponent(AddSecuredPartiesAndDebtors).exists()).toBe(
-      true
-    )
+    expect(wrapper.findComponent(AddSecuredPartiesAndDebtors).exists()).toBe(true)
     expect(wrapper.findComponent(Stepper).exists()).toBe(true)
     expect(wrapper.findComponent(StickyContainer).exists()).toBe(true)
-    expect(
-      wrapper.findComponent(StickyContainer).vm.$props.setShowFeeSummary
-    ).toBe(true)
-    expect(wrapper.findComponent(StickyContainer).vm.$props.setFeeType).toBe(
-      FeeSummaryTypes.NEW
-    )
-    expect(
-      wrapper.findComponent(StickyContainer).vm.$props.setRegistrationLength
-    ).toEqual({
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setShowFeeSummary).toBe(true)
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setFeeType).toBe(FeeSummaryTypes.NEW)
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setRegistrationLength).toEqual({
       lifeInfinite: false,
       lifeYears: 0
     })
-    expect(
-      wrapper.findComponent(StickyContainer).vm.$props.setRegistrationType
-    ).toBe(UIRegistrationTypes.SECURITY_AGREEMENT)
-    expect(
-      wrapper.findComponent(StickyContainer).vm.$props.setShowButtons
-    ).toBe(false)
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setRegistrationType).toBe(
+      UIRegistrationTypes.SECURITY_AGREEMENT
+    )
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setShowButtons).toBe(false)
     expect(wrapper.findComponent(ButtonFooter).exists()).toBe(true)
-    expect(
-      wrapper.findComponent(ButtonFooter).vm.$props.currentStatementType
-    ).toBe(StatementTypes.FINANCING_STATEMENT)
+    expect(wrapper.findComponent(ButtonFooter).vm.$props.currentStatementType).toBe(StatementTypes.FINANCING_STATEMENT)
     expect(wrapper.findComponent(ButtonFooter).vm.$props.currentStepName).toBe(
       RouteNames.ADD_SECUREDPARTIES_AND_DEBTORS
     )
@@ -138,9 +116,7 @@ describe('Add Parties new registration component', () => {
     await store.dispatch('setRegistrationFlowType', RegistrationFlowType.NEW)
     wrapper = createComponent()
     await flushPromises()
-    expect(
-      wrapper.findComponent(StickyContainer).vm.$props.setRegistrationLength
-    ).toEqual({
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setRegistrationLength).toEqual({
       lifeInfinite: false,
       lifeYears: 0
     })
@@ -151,9 +127,7 @@ describe('Add Parties new registration component', () => {
       lifeYears: 0
     }
     await store.dispatch('setLengthTrust', newLengthTrust1)
-    expect(
-      wrapper.findComponent(StickyContainer).vm.$props.setRegistrationLength
-    ).toEqual({
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setRegistrationLength).toEqual({
       lifeInfinite: newLengthTrust1.lifeInfinite,
       lifeYears: newLengthTrust1.lifeYears
     })
@@ -164,9 +138,7 @@ describe('Add Parties new registration component', () => {
       lifeYears: 0
     }
     await store.dispatch('setLengthTrust', newLengthTrust2)
-    expect(
-      wrapper.findComponent(StickyContainer).vm.$props.setRegistrationLength
-    ).toEqual({
+    expect(wrapper.findComponent(StickyContainer).vm.$props.setRegistrationLength).toEqual({
       lifeInfinite: newLengthTrust2.lifeInfinite,
       lifeYears: newLengthTrust2.lifeYears
     })
@@ -186,17 +158,13 @@ describe('Add Parties new registration component', () => {
       await store.dispatch('setRegistrationFlowType', RegistrationFlowType.NEW)
       wrapper = createComponent()
       await flushPromises()
-      expect(
-        wrapper.findComponent(StickyContainer).vm.$props.setRegistrationType
-      ).toBe(RegistrationTypes[i].registrationTypeUI)
-      // header
-      expect(wrapper.find(header).text()).toContain(
+      expect(wrapper.findComponent(StickyContainer).vm.$props.setRegistrationType).toBe(
         RegistrationTypes[i].registrationTypeUI
       )
+      // header
+      expect(wrapper.find(header).text()).toContain(RegistrationTypes[i].registrationTypeUI)
       // title
-      expect(wrapper.find(title).text()).toContain(
-        'Add Secured Parties and Debtors'
-      )
+      expect(wrapper.find(title).text()).toContain('Add Secured Parties and Debtors')
       // message
       expect(wrapper.find(titleInfo).text()).toContain(
         'Add the people and businesses who have an interest in this registration.'

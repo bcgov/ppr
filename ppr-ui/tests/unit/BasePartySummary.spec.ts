@@ -99,23 +99,16 @@ describe('Secured Party list tests', () => {
   })
 
   it('displays the correct rows when data is present', () => {
-    const rowCount = wrapper.vm.$el.querySelectorAll('.v-data-table .party-row')
-      .length
+    const rowCount = wrapper.vm.$el.querySelectorAll('.v-data-table .party-row').length
     expect(rowCount).toEqual(1)
   })
 
   it('displays the correct data in the table rows', () => {
     const item1 = wrapper.vm.$el.querySelectorAll('.v-data-table .party-row')[0]
 
-    expect(item1.querySelectorAll('td')[0].textContent).toContain(
-      'SECURED PARTY COMPANY LTD.'
-    )
-    expect(item1.querySelectorAll('td')[1].textContent).toContain(
-      '1234 Fort St.'
-    )
-    expect(item1.querySelectorAll('td')[2].textContent).toContain(
-      'test@company.com'
-    )
+    expect(item1.querySelectorAll('td')[0].textContent).toContain('SECURED PARTY COMPANY LTD.')
+    expect(item1.querySelectorAll('td')[1].textContent).toContain('1234 Fort St.')
+    expect(item1.querySelectorAll('td')[2].textContent).toContain('test@company.com')
   })
 })
 
@@ -143,8 +136,7 @@ describe('Debtor list tests', () => {
   })
 
   it('displays the correct rows when data is present', () => {
-    const rowCount = wrapper.vm.$el.querySelectorAll('.v-data-table .party-row')
-      .length
+    const rowCount = wrapper.vm.$el.querySelectorAll('.v-data-table .party-row').length
 
     expect(rowCount).toEqual(1)
   })
@@ -152,15 +144,9 @@ describe('Debtor list tests', () => {
   it('displays the correct data in the table rows', () => {
     const item1 = wrapper.vm.$el.querySelectorAll('.v-data-table .party-row')[0]
 
-    expect(item1.querySelectorAll('td')[0].textContent).toContain(
-      'TEST 1 INDIVIDUAL DEBTOR'
-    )
-    expect(item1.querySelectorAll('td')[1].textContent).toContain(
-      '1234 Fort St.'
-    )
-    expect(item1.querySelectorAll('td')[3].textContent).toContain(
-      'June 15, 1990'
-    )
+    expect(item1.querySelectorAll('td')[0].textContent).toContain('TEST 1 INDIVIDUAL DEBTOR')
+    expect(item1.querySelectorAll('td')[1].textContent).toContain('1234 Fort St.')
+    expect(item1.querySelectorAll('td')[3].textContent).toContain('June 15, 1990')
   })
 })
 
@@ -168,22 +154,15 @@ describe('Secured Party amendment list tests', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
-    await store.dispatch(
-      'setRegistrationFlowType',
-      RegistrationFlowType.AMENDMENT
-    )
-    wrapper = createComponent(
-      partyTableHeaders,
-      mockedSecuredPartiesAmendment,
-      {
-        enableNoDataAction: false,
-        header: 'true',
-        iconColor: '',
-        iconImage: '',
-        isDebtorSummary: false,
-        isRegisteringParty: false
-      }
-    )
+    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.AMENDMENT)
+    wrapper = createComponent(partyTableHeaders, mockedSecuredPartiesAmendment, {
+      enableNoDataAction: false,
+      header: 'true',
+      iconColor: '',
+      iconImage: '',
+      isDebtorSummary: false,
+      isRegisteringParty: false
+    })
   })
   afterEach(() => {
     wrapper.destroy()
@@ -196,8 +175,7 @@ describe('Secured Party amendment list tests', () => {
   })
 
   it('displays the correct rows when data is present', () => {
-    const rowCount = wrapper.vm.$el.querySelectorAll('.v-data-table .party-row')
-      .length
+    const rowCount = wrapper.vm.$el.querySelectorAll('.v-data-table .party-row').length
     expect(rowCount).toEqual(3)
   })
 

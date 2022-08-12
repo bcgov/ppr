@@ -25,11 +25,7 @@ const removeButtonSelector: string = '#remove-btn-debtor'
  *
  * @returns a Wrapper<EditDebtor> object with the given parameters.
  */
-function createComponent (
-  activeIndex: Number,
-  isBusiness: boolean,
-  invalidSection: boolean
-): Wrapper<any> {
+function createComponent (activeIndex: Number, isBusiness: boolean, invalidSection: boolean): Wrapper<any> {
   const localVue = createLocalVue()
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')

@@ -220,7 +220,7 @@ describe('Home Owners', () => {
 
     expect(wrapper.findComponent(AddEditHomeOwner).exists()).toBeFalsy()
 
-    let ownersTable = wrapper.findComponent(HomeOwners).findComponent(HomeOwnersTable)
+    const ownersTable = wrapper.findComponent(HomeOwners).findComponent(HomeOwnersTable)
     expect(ownersTable.findAllComponents(TableGroupHeader).length).toBe(2)
     expect(ownersTable.text()).toContain('Group 1')
     expect(ownersTable.text()).toContain('Group 2')

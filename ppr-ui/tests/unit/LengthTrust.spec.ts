@@ -12,13 +12,7 @@ import { ButtonFooter, Stepper, StickyContainer } from '@/components/common'
 import { RegistrationLengthTrust } from '@/components/registration'
 // Local types/helpers
 import { FeeSummaryTypes } from '@/composables/fees/enums'
-import {
-  APIRegistrationTypes,
-  RegistrationFlowType,
-  RouteNames,
-  StatementTypes,
-  UIRegistrationTypes
-} from '@/enums'
+import { APIRegistrationTypes, RegistrationFlowType, RouteNames, StatementTypes, UIRegistrationTypes } from '@/enums'
 import { RegistrationTypes } from '@/resources'
 import { LengthTrustIF } from '@/interfaces'
 // unit test helpers/data

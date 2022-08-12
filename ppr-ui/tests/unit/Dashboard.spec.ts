@@ -93,8 +93,10 @@ describe('Dashboard component', () => {
     getDraft.returns(new Promise(resolve => resolve({ data: mockedDraftFinancingStatementAll })))
     const getMyRegDrafts = getStub.withArgs('drafts?fromUI=true&sortCriteriaName=startDateTime&sortDirection=desc')
     getMyRegDrafts.returns(new Promise(resolve => resolve({ data: [] })))
-    const getMyRegHistory = getStub.withArgs('financing-statements/registrations?collapse=true&pageNumber=1&fromUI' +
-      '=true&sortCriteriaName=startDateTime&sortDirection=desc')
+    const getMyRegHistory = getStub.withArgs(
+      'financing-statements/registrations?collapse=true&pageNumber=1&fromUI' +
+        '=true&sortCriteriaName=startDateTime&sortDirection=desc'
+    )
     getMyRegHistory.returns(new Promise(resolve => resolve({ data: [] })))
     const getRegistration = getStub.withArgs(`financing-statements/${regNum}`)
     getRegistration.returns(new Promise(resolve => resolve({ data: mockedFinancingStatementComplete })))
@@ -105,9 +107,7 @@ describe('Dashboard component', () => {
     await store.dispatch('setAuthRoles', [AuthRoles.PUBLIC, 'ppr'])
     await store.dispatch('setUserProductSubscriptionsCodes', [ProductCode.PPR])
 
-    patchUserSettings.returns(new Promise(resolve => resolve(
-      { data: mockedUpdateRegTableUserSettingsResponse }
-    )))
+    patchUserSettings.returns(new Promise(resolve => resolve({ data: mockedUpdateRegTableUserSettingsResponse })))
     // create a Local Vue and install router on it
     const localVue = createLocalVue()
     localVue.use(Vuetify)
@@ -143,7 +143,7 @@ describe('Dashboard component', () => {
     // fee settings set correctly based on store
     expect(wrapper.vm.$store.state.stateModel.userInfo.feeSettings).toBeNull()
     expect(wrapper.findComponent(SearchBar).vm.$props.isNonBillable).toBe(false)
-    expect(wrapper.findComponent(SearchBar).vm.$props.serviceFee).toBe(1.50)
+    expect(wrapper.findComponent(SearchBar).vm.$props.serviceFee).toBe(1.5)
     // update fee settings and check search bar updates
     wrapper.vm.$store.state.stateModel.userInfo.feeSettings = {
       isNonBillable: true,
@@ -213,17 +213,13 @@ describe('Dashboard component', () => {
 
   it('completes the beginning of discharge flow', async () => {
     // emit discharge action
-    wrapper.findComponent(RegistrationTable).vm.$emit(
-      'action', { action: TableActions.DISCHARGE, regNum: regNum }
-    )
+    wrapper.findComponent(RegistrationTable).vm.$emit('action', { action: TableActions.DISCHARGE, regNum: regNum })
     await flushPromises()
     // dialog shows
     expect(wrapper.findComponent(RegistrationConfirmation).exists()).toBe(true)
     expect(wrapper.findComponent(RegistrationConfirmation).vm.$props.display).toBe(true)
-    expect(wrapper.findComponent(RegistrationConfirmation).vm.$props.options)
-      .toEqual(dischargeConfirmationDialog)
-    expect(wrapper.findComponent(RegistrationConfirmation).vm.$props.registrationNumber)
-      .toBe(regNum)
+    expect(wrapper.findComponent(RegistrationConfirmation).vm.$props.options).toEqual(dischargeConfirmationDialog)
+    expect(wrapper.findComponent(RegistrationConfirmation).vm.$props.registrationNumber).toBe(regNum)
     // emit proceed to discharge
     wrapper.findComponent(RegistrationConfirmation).vm.$emit('proceed', true)
     await flushPromises()
@@ -233,17 +229,13 @@ describe('Dashboard component', () => {
 
   it('completes the beginning of renew flow', async () => {
     // emit renew action
-    wrapper.findComponent(RegistrationTable).vm.$emit(
-      'action', { action: TableActions.RENEW, regNum: regNum }
-    )
+    wrapper.findComponent(RegistrationTable).vm.$emit('action', { action: TableActions.RENEW, regNum: regNum })
     await flushPromises()
     // dialog shows
     expect(wrapper.findComponent(RegistrationConfirmation).exists()).toBe(true)
     expect(wrapper.findComponent(RegistrationConfirmation).vm.$props.display).toBe(true)
-    expect(wrapper.findComponent(RegistrationConfirmation).vm.$props.options)
-      .toEqual(renewConfirmationDialog)
-    expect(wrapper.findComponent(RegistrationConfirmation).vm.$props.registrationNumber)
-      .toBe(regNum)
+    expect(wrapper.findComponent(RegistrationConfirmation).vm.$props.options).toEqual(renewConfirmationDialog)
+    expect(wrapper.findComponent(RegistrationConfirmation).vm.$props.registrationNumber).toBe(regNum)
     // emit proceed to renew
     wrapper.findComponent(RegistrationConfirmation).vm.$emit('proceed', true)
     // goes to renew page
@@ -252,17 +244,13 @@ describe('Dashboard component', () => {
 
   it('completes the beginning of new amend flow', async () => {
     // emit amend action
-    wrapper.findComponent(RegistrationTable).vm.$emit(
-      'action', { action: TableActions.AMEND, regNum: regNum }
-    )
+    wrapper.findComponent(RegistrationTable).vm.$emit('action', { action: TableActions.AMEND, regNum: regNum })
     await flushPromises()
     // dialog shows
     expect(wrapper.findComponent(RegistrationConfirmation).exists()).toBe(true)
     expect(wrapper.findComponent(RegistrationConfirmation).vm.$props.display).toBe(true)
-    expect(wrapper.findComponent(RegistrationConfirmation).vm.$props.options)
-      .toEqual(amendConfirmationDialog)
-    expect(wrapper.findComponent(RegistrationConfirmation).vm.$props.registrationNumber)
-      .toBe(regNum)
+    expect(wrapper.findComponent(RegistrationConfirmation).vm.$props.options).toEqual(amendConfirmationDialog)
+    expect(wrapper.findComponent(RegistrationConfirmation).vm.$props.registrationNumber).toBe(regNum)
     // emit proceed to amend
     wrapper.findComponent(RegistrationConfirmation).vm.$emit('proceed', true)
     // goes to amend page
@@ -270,17 +258,15 @@ describe('Dashboard component', () => {
   })
 
   it('routes to edit financing statement after table emits edit draft action', async () => {
-    wrapper.findComponent(RegistrationTable).vm.$emit(
-      'action', { action: TableActions.EDIT_NEW, docId: draftDocId }
-    )
+    wrapper.findComponent(RegistrationTable).vm.$emit('action', { action: TableActions.EDIT_NEW, docId: draftDocId })
     await flushPromises()
     expect(wrapper.vm.$route.name).toBe(RouteNames.LENGTH_TRUST)
   })
 
   it('routes to edit amendment statement after table emits edit amend action', async () => {
-    wrapper.findComponent(RegistrationTable).vm.$emit(
-      'action', { action: TableActions.EDIT_AMEND, docId: draftDocId, regNum: regNum }
-    )
+    wrapper
+      .findComponent(RegistrationTable)
+      .vm.$emit('action', { action: TableActions.EDIT_AMEND, docId: draftDocId, regNum: regNum })
     await flushPromises()
     expect(wrapper.vm.$route.name).toBe(RouteNames.AMEND_REGISTRATION)
   })
@@ -302,25 +288,23 @@ describe('Dashboard error modal tests', () => {
     getSearchHistory.returns(new Promise(resolve => resolve({ data: { searches: [] } })))
     const getMyRegDrafts = getStub.withArgs('drafts?fromUI=true&sortCriteriaName=startDateTime&sortDirection=desc')
     getMyRegDrafts.returns(new Promise(resolve => resolve({ data: [] })))
-    const getMyRegHistory = getStub.withArgs('financing-statements/registrations?collapse=true&pageNumber=1&fromUI' +
-      '=true&sortCriteriaName=startDateTime&sortDirection=desc')
+    const getMyRegHistory = getStub.withArgs(
+      'financing-statements/registrations?collapse=true&pageNumber=1&fromUI' +
+        '=true&sortCriteriaName=startDateTime&sortDirection=desc'
+    )
     getMyRegHistory.returns(new Promise(resolve => resolve({ data: [mockedRegistration2] })))
 
-    const getMyRegAdd = getStub.withArgs(
-      `financing-statements/registrations/${myRegAdd.baseRegistrationNumber}`
-    )
+    const getMyRegAdd = getStub.withArgs(`financing-statements/registrations/${myRegAdd.baseRegistrationNumber}`)
     getMyRegAdd.returns(new Promise(resolve => resolve({ data: myRegAdd })))
 
-    const postMyRegAdd = sandbox.stub(axios, 'post').withArgs(
-      `financing-statements/registrations/${myRegAdd.baseRegistrationNumber}`
-    )
+    const postMyRegAdd = sandbox
+      .stub(axios, 'post')
+      .withArgs(`financing-statements/registrations/${myRegAdd.baseRegistrationNumber}`)
     postMyRegAdd.returns(new Promise(resolve => resolve({ data: myRegAdd })))
     // patch stubs
     const patchStub = sandbox.stub(axios, 'patch')
     const patchUserSettings = patchStub.withArgs('user-profile')
-    patchUserSettings.returns(new Promise(resolve => resolve(
-      { data: mockedUpdateRegTableUserSettingsResponse }
-    )))
+    patchUserSettings.returns(new Promise(resolve => resolve({ data: mockedUpdateRegTableUserSettingsResponse })))
 
     const localVue = createLocalVue()
     localVue.use(Vuetify)

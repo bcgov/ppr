@@ -23,10 +23,7 @@ const doneButtonSelector: string = '#done-btn-party'
  *
  * @returns a Wrapper<EditParty> object with the given parameters.
  */
-function createComponent (
-  activeIndex: Number,
-  invalidSection: boolean
-): Wrapper<any> {
+function createComponent (activeIndex: Number, invalidSection: boolean): Wrapper<any> {
   const localVue = createLocalVue()
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
@@ -109,8 +106,6 @@ describe('Secured Party validation tests - individual', () => {
     const messages = wrapper.findAll('.v-messages__message')
     expect(messages.length).toBe(2)
     expect(messages.at(0).text()).toBe('Please enter a valid email address')
-    expect(messages.at(1).text()).toBe(
-      'Street address, PO box, rural route, or general delivery address'
-    )
+    expect(messages.at(1).text()).toBe('Street address, PO box, rural route, or general delivery address')
   })
 })

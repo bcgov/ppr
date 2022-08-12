@@ -26,10 +26,7 @@ const removeButtonSelector: string = '#remove-btn-party'
  *
  * @returns a Wrapper<SearchBar> object with the given parameters.
  */
-function createComponent (
-  activeIndex: Number,
-  invalidSection: boolean
-): Wrapper<any> {
+function createComponent (activeIndex: Number, invalidSection: boolean): Wrapper<any> {
   const localVue = createLocalVue()
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
@@ -61,9 +58,7 @@ describe('Secured Party add individual tests', () => {
     expect(wrapper.find(doneButtonSelector).exists()).toBe(true)
     expect(wrapper.find(cancelButtonSelector).exists()).toBe(true)
     expect(wrapper.find(removeButtonSelector).exists()).toBe(true)
-    expect(wrapper.find(removeButtonSelector).attributes('disabled')).toBe(
-      'disabled'
-    )
+    expect(wrapper.find(removeButtonSelector).attributes('disabled')).toBe('disabled')
   })
 
   it('adds a secured party to the store', async () => {
@@ -86,9 +81,7 @@ describe('Secured Party add individual tests', () => {
 
     expect(wrapper.emitted().resetEvent).toBeTruthy()
     // store should have 1 item now
-    expect(
-      store.getters.getAddSecuredPartiesAndDebtors.securedParties.length
-    ).toBe(1)
+    expect(store.getters.getAddSecuredPartiesAndDebtors.securedParties.length).toBe(1)
   })
 })
 
@@ -139,10 +132,7 @@ describe('Secured Party add business tests', () => {
 
     expect(wrapper.emitted().resetEvent).toBeTruthy()
     // store should have 1 item now
-    expect(
-      store.getters.getAddSecuredPartiesAndDebtors.securedParties[1]
-        .businessName
-    ).toBe('TONYS TOOLS')
+    expect(store.getters.getAddSecuredPartiesAndDebtors.securedParties[1].businessName).toBe('TONYS TOOLS')
   })
 })
 
@@ -162,12 +152,8 @@ describe('Secured Party edit individual tests', () => {
   it('renders secured party when editing', async () => {
     expect(wrapper.findComponent(EditParty).exists()).toBe(true)
     expect(wrapper.vm.currentSecuredParty.personName.first).toEqual('TEST')
-    expect(wrapper.vm.currentSecuredParty.personName.last).toEqual(
-      'INDIVIDUAL PARTY'
-    )
-    expect(wrapper.vm.currentSecuredParty.emailAddress).toEqual(
-      'test@person.com'
-    )
+    expect(wrapper.vm.currentSecuredParty.personName.last).toEqual('INDIVIDUAL PARTY')
+    expect(wrapper.vm.currentSecuredParty.emailAddress).toEqual('test@person.com')
   })
 
   it('Emits reset event', async () => {

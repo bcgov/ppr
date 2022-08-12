@@ -2,7 +2,7 @@ import {
   MhrRegistrationDescriptionIF,
   MhrRegistrationHomeOwnersIF,
   MhrRegistrationHomeOwnerGroupIF,
-  MhrRegistrationHomeLocationIF,
+  MhrRegistrationHomeLocationIF
 } from '@/interfaces'
 export interface MhrRegistrationIF {
   clientReferenceId: string
