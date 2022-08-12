@@ -145,13 +145,7 @@
                 :rules="phoneNumberRules"
                 label="Phone Number"
                 data-test-id="phone-number"
-                :error-messages="
-                        errors.phoneNumber.message
-                          ? errors.phoneNumber.message
-                          : ''
-                      "
-                @blur="onBlur('phoneNumber')"
-                persistent-hint
+                validate-on-blur
               />
             </v-col>
             <v-col cols="6">
@@ -235,7 +229,6 @@ import { MhrRegistrationHomeOwnersIF } from '@/interfaces/mhr-registration-inter
 import { SimpleHelpToggle } from '@/components/common'
 /* eslint-enable no-unused-vars */
 import { VueMaskDirective } from 'v-mask'
-import { usemhrFormValidation } from '@/components/mhrRegistration/composables/usemhrFormValidation'
 
 export default defineComponent({
   name: 'AddEditHomeOwner',
@@ -258,7 +251,7 @@ export default defineComponent({
     }
   },
   setup (props, context) {
-    const { required, customRules, maxLength } = useInputRules()
+    const { required, customRules, maxLength, minLength } = useInputRules()
 
     const { getSideTitle } = useHomeOwners(
       props.isHomeOwnerPerson,
@@ -310,14 +303,9 @@ export default defineComponent({
       ),
       phoneNumberRules: customRules(
         required('Enter a phone number'),
-        maxLength(15)
+        minLength(14)
       )
     })
-
-    const {
-      errors,
-      validateInput
-    } = usemhrFormValidation()
 
     const done = (): void => {
       // @ts-ignore - function exists
@@ -337,9 +325,6 @@ export default defineComponent({
       context.emit('cancel')
     }
 
-    const onBlur = (fieldname) => {
-      validateInput(fieldname, localState.owner.phoneNumber)
-    }
     return {
       getSideTitle,
       done,
@@ -347,9 +332,8 @@ export default defineComponent({
       cancel,
       addHomeOwnerForm,
       maxLength,
+      minLength,
       addressSchema,
-      onBlur,
-      errors,
       ...toRefs(localState)
     }
   }

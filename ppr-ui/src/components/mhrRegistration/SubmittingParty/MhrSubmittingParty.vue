@@ -99,12 +99,8 @@
             class="pt-4 pr-2"
             label="Email Address"
             v-model="submittingParty.emailAddress"
-            :error-messages="
-                        errors.emailAddress.message
-                          ? errors.emailAddress.message
-                          : ''
-                      "
-            @blur="onBlur('emailAddress')"
+            :rules="emailRules"
+            validate-on-blur
           />
 
           <!-- Phone Number -->
@@ -118,12 +114,9 @@
                 class="pt-4 pr-3"
                 label="Phone Number"
                 v-model="submittingParty.phoneNumber"
-                :error-messages="
-                        errors.phoneNumber.message
-                          ? errors.phoneNumber.message
-                          : ''
-                      "
-                @blur="onBlur('phoneNumber')"
+                :rules="phoneRules"
+                validate-on-
+                blur
             />
             </v-col>
             <v-col>
@@ -200,16 +193,13 @@ export default defineComponent({
     const {
       customRules,
       invalidSpaces,
+      minLength,
       maxLength,
       isStringOrNumber,
       required,
-      isNumber
+      isNumber,
+      isEmail
     } = useInputRules()
-
-    const {
-      errors,
-      validateInput
-    } = usemhrFormValidation()
 
     const localState = reactive({
       enableLookUp: true,
@@ -252,6 +242,15 @@ export default defineComponent({
       invalidSpaces()
     )
 
+    const emailRules = customRules(
+      isEmail(),
+      invalidSpaces()
+    )
+
+    const phoneRules = customRules(
+      minLength(14),
+      invalidSpaces()
+    )
     const middleNameRules = customRules(isStringOrNumber(), maxLength(15), invalidSpaces())
 
     const lastNameRules = customRules(
@@ -270,10 +269,6 @@ export default defineComponent({
 
     const updateValidity = (valid) => {
       localState.addressValid = valid
-    }
-
-    const onBlur = (fieldname) => {
-      validateInput(fieldname, localState.submittingParty[fieldname])
     }
 
     /** Apply store properties to local model. **/
@@ -329,13 +324,13 @@ export default defineComponent({
       updateValidity,
       PartyAddressSchema,
       SubmittingPartyTypes,
+      emailRules,
       firstNameRules,
       middleNameRules,
       lastNameRules,
       businessNameRules,
+      phoneRules,
       phoneExtensionRules,
-      onBlur,
-      errors,
       ...toRefs(localState)
     }
   }
