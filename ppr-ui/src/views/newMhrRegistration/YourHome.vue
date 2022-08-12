@@ -6,7 +6,11 @@
         Enter the Year of Manufacture (not the model year), Make, and Model of
         the home.
       </p>
-      <ManufacturerMakeModel />
+
+      <ManufacturerMakeModel
+        :validate="validateMakeModel"
+        :class="{'border-error-left': validateMakeModel}"
+      />
     </section>
 
     <section id="mhr-home-sections" class="mt-10">
@@ -14,7 +18,9 @@
       <p class="mt-2">Add the Serial Number and dimensions for each section of the home. You can include up to four
       sections in a home.</p>
 
-      <HomeSections />
+      <HomeSections
+        :validate="validateSections"
+      />
     </section>
 
     <section id="mhr-home-certification" class="mt-10">
@@ -23,7 +29,10 @@
         Enter either the Canadian Standards Association (CSA) number OR the Engineer's inspection information.
       </p>
 
-      <HomeCertification :class="{ 'border-error-left': false }" />
+      <HomeCertification
+        :validate="validateCertification"
+        :class="{'border-error-left': validateCertification}"
+      />
     </section>
 
     <section id="mhr-rebuilt-status" class="mt-10">
@@ -33,7 +42,11 @@
         declaration).
       </p>
 
-      <RebuiltStatus class="mt-6" :class="{ 'border-error-left': false }" />
+      <RebuiltStatus
+        class="mt-6"
+        :validate="validateRebuilt"
+        :class="{'border-error-left': validateRebuilt}"
+      />
     </section>
 
     <section id="mhr-other-information" class="mt-10">
@@ -42,13 +55,18 @@
         Include an other relevant information about the home.
       </p>
 
-      <OtherInformation class="mt-6" :class="{ 'border-error-left': false }" />
+      <OtherInformation
+        class="mt-6"
+        :validate="validateOther"
+        :class="{'border-error-left': validateOther}"
+      />
     </section>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
+import { useGetters } from 'vuex-composition-helpers'
 import {
   HomeCertification,
   HomeSections,
@@ -56,17 +74,66 @@ import {
   RebuiltStatus,
   OtherInformation
 } from '@/components/mhrRegistration/YourHome'
+import { useMhrValidations } from '@/composables/mhrRegistration/mhr-validations'
 
-@Component({
+export default defineComponent({
+  name: 'YourHome',
   components: {
     HomeCertification,
     HomeSections,
     ManufacturerMakeModel,
     RebuiltStatus,
     OtherInformation
+  },
+  props: {},
+  setup () {
+    const {
+      getMhrRegistrationValidationModel
+    } = useGetters<any>([
+      'getMhrRegistrationValidationModel'
+    ])
+
+    const {
+      MhrCompVal,
+      MhrSectVal,
+      getSectionValidation,
+      scrollToInvalid
+    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
+
+    const localState = reactive({
+      validateMakeModel: computed(() => {
+        return getSectionValidation(MhrSectVal.YOUR_HOME_VALID, MhrCompVal.MAKE_MODEL_VALID)
+      }),
+      validateSections: computed(() => {
+        return getSectionValidation(MhrSectVal.YOUR_HOME_VALID, MhrCompVal.HOME_SECTION_VALID)
+      }),
+      validateCertification: computed(() => {
+        return getSectionValidation(MhrSectVal.YOUR_HOME_VALID, MhrCompVal.HOME_CERTIFICATION_VALID)
+      }),
+      validateRebuilt: computed(() => {
+        return getSectionValidation(MhrSectVal.YOUR_HOME_VALID, MhrCompVal.REBUILT_STATUS_VALID)
+      }),
+      validateOther: computed(() => {
+        return getSectionValidation(MhrSectVal.YOUR_HOME_VALID, MhrCompVal.OTHER_VALID)
+      })
+    })
+
+    const scrollOnValidationUpdates = () => {
+      scrollToInvalid(MhrSectVal.YOUR_HOME_VALID, 'mhr-describe-your-home')
+    }
+
+    watch(() => localState, () => {
+      setTimeout(scrollOnValidationUpdates, 300)
+    }, { deep: true })
+
+    return {
+      MhrCompVal,
+      MhrSectVal,
+      getSectionValidation,
+      ...toRefs(localState)
+    }
   }
 })
-export default class YourHome extends Vue {}
 </script>
 
 <style lang="scss" scoped>

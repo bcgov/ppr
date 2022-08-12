@@ -220,5 +220,30 @@ export const stateModel: StateModelIF = {
       paymentConfirmationDialog: true,
       selectConfirmationDialog: true
     }
+  },
+  mhrValidationState: {
+    yourHomeValid: {
+      makeModelValid: false,
+      homeSectionsValid: false,
+      homeCertificationValid: false,
+      rebuiltStatusValid: false,
+      otherValid: false
+    },
+    submittingPartyValid: {
+      submitterValid: false,
+      refNumValid: false
+    },
+    homeOwnersValid: {
+      OwnersValid: false
+    },
+    locationValid: {
+      locationTypeValid: false,
+      civicAddressValid: false
+    },
+    reviewConfirmValid: {
+      validateApp: false,
+      authorizationValid: false,
+      staffPaymentValid: false
+    }
   }
 }

@@ -43,34 +43,46 @@
 </template>
 
 <script lang="ts">
-// Libraries
-import { Component, Vue, Prop } from 'vue-property-decorator'
-import { Getter } from 'vuex-class'
+import { defineComponent, reactive, toRefs } from '@vue/composition-api'
+import { useGetters } from 'vuex-composition-helpers'
 
-// Interfaces
-import { StepIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+export default defineComponent({
+  name: 'Stepper',
+  components: {},
+  props: {
+    showStepErrorsFlag: {
+      type: Boolean,
+      default: false
+    }
+  },
+  setup (props, context) {
+    const { getSteps, showStepErrors } = useGetters<any>([
+      'getSteps', 'showStepErrors'
+    ])
 
-@Component({})
-export default class Stepper extends Vue {
-  @Getter getSteps!: Array<StepIF>
-  @Getter showStepErrors: boolean
+    const goTo = (step) => {
+      context.root.$router.push(step.to).catch(error => error)
+    }
 
-  @Prop({ default: false })
-  showStepErrorsFlag: boolean
+    const isCurrentStep = (step): boolean => {
+      return context.root.$route.name === step.to
+    }
 
-  private goTo (step) {
-    this.$router.push(step.to).catch(error => error)
+    const showInvalid = (step): boolean => {
+      return ((showStepErrors.value || props.showStepErrorsFlag) && (!step.valid))
+    }
+
+    const localState = reactive({})
+
+    return {
+      getSteps,
+      goTo,
+      isCurrentStep,
+      showInvalid,
+      ...toRefs(localState)
+    }
   }
-
-  private isCurrentStep (step): boolean {
-    return this.$route.name === step.to
-  }
-
-  private showInvalid (step): boolean {
-    return ((this.showStepErrors || this.showStepErrorsFlag) &&
-      (!step.valid))
-  }
-}
+})
 </script>
 
 <style lang="scss" module>

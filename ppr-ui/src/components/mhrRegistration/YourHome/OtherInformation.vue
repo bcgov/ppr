@@ -3,7 +3,7 @@
     <v-card id="mhr-home-other-information" flat class="py-6 px-8 rounded">
       <v-row>
         <v-col cols="2">
-          <label class="generic-label" for="other-remarks" :class="{'error-text': false}">Other</label>
+          <label class="generic-label" for="other-remarks" :class="{'error-text': validate}">Other</label>
         </v-col>
         <v-col cols="10">
           <v-textarea
@@ -26,31 +26,54 @@
 <script lang="ts">
 import { defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
 import { useActions, useGetters } from 'vuex-composition-helpers'
-import { useInputRules } from '@/composables/useInputRules'
+import { useInputRules, useMhrValidations } from '@/composables/'
 
 export default defineComponent({
-  setup () {
-    const { maxLength } = useInputRules()
-
-    const { getMhrRegistrationOtherInfo } = useGetters<any>([
-      'getMhrRegistrationOtherInfo'
+  props: {
+    validate: {
+      type: Boolean,
+      default: false
+    }
+  },
+  setup (props, context) {
+    const {
+      getMhrRegistrationOtherInfo,
+      getMhrRegistrationValidationModel
+    } = useGetters<any>([
+      'getMhrRegistrationOtherInfo',
+      'getMhrRegistrationValidationModel'
     ])
 
-    const { setMhrHomeDescription } = useActions<any>([
+    const {
+      setMhrHomeDescription
+    } = useActions<any>([
       'setMhrHomeDescription'
     ])
+
+    const { maxLength } = useInputRules()
+    const {
+      MhrCompVal,
+      MhrSectVal,
+      setValidation
+    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
     const localState = reactive({
       isOtherInfoValid: false,
       otherRemarks: getMhrRegistrationOtherInfo.value
     })
 
-    watch(
-      () => localState.otherRemarks,
-      (val: string) => {
-        setMhrHomeDescription({ key: 'otherRemarks', value: val })
-      }
-    )
+    watch(() => localState.otherRemarks, (val: string) => {
+      setMhrHomeDescription({ key: 'otherRemarks', value: val })
+    })
+
+    watch(() => localState.isOtherInfoValid, (val: boolean) => {
+      setValidation(MhrSectVal.YOUR_HOME_VALID, MhrCompVal.OTHER_VALID, val)
+    })
+
+    watch(() => props.validate, async () => {
+      // @ts-ignore - function exists
+      await context.refs.otherInformationForm.validate()
+    })
 
     return { maxLength, ...toRefs(localState) }
   }

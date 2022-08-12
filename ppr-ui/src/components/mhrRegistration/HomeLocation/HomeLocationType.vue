@@ -2,7 +2,7 @@
   <v-card flat rounded id="mhr-home-location-type" class="mt-8 pa-8">
     <v-row no-gutters class="pt-1">
       <v-col cols="12" sm="2">
-        <label class="generic-label" :class="{'error-text': false}">Location Type</label>
+        <label class="generic-label" :class="{'error-text': validate}">Location Type</label>
       </v-col>
       <v-col cols="12" sm="10" class="mt-n1">
         <v-radio-group
@@ -24,7 +24,7 @@
               />
               <v-expand-transition>
                 <v-form
-                  v-if="locationTypeOption === HomeLocationTypes.LOT"
+                  v-show="locationTypeOption === HomeLocationTypes.LOT"
                   ref="lotForm"
                   v-model="isValidLot"
                 >
@@ -52,7 +52,7 @@
               />
               <v-expand-transition>
                 <v-form
-                  v-if="locationTypeOption === HomeLocationTypes.HOME_PARK"
+                  v-show="locationTypeOption === HomeLocationTypes.HOME_PARK"
                   ref="homeParkForm"
                   v-model="isValidHomePark"
                 >
@@ -149,10 +149,10 @@
 <script lang="ts">
 /* eslint-disable no-unused-vars */
 import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
-import { useActions } from 'vuex-composition-helpers'
+import { useActions, useGetters } from 'vuex-composition-helpers'
 import { HomeLocationTypes } from '@/enums'
 import { PidNumber } from '@/components/common'
-import { useInputRules } from '@/composables'
+import { useInputRules, useMhrValidations } from '@/composables'
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
@@ -160,8 +160,18 @@ export default defineComponent({
   components: {
     PidNumber
   },
-  props: {},
-  setup () {
+  props: {
+    validate: {
+      type: Boolean,
+      default: false
+    }
+  },
+  setup (props, context) {
+    const {
+      getMhrRegistrationValidationModel
+    } = useGetters<any>([
+      'getMhrRegistrationValidationModel'
+    ])
     const {
       setMhrLocation
     } = useActions<any>([
@@ -169,6 +179,11 @@ export default defineComponent({
     ])
 
     const { customRules, maxLength, required } = useInputRules()
+    const {
+      MhrCompVal,
+      MhrSectVal,
+      setValidation
+    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
     const localState = reactive({
       isValidLot: false,
@@ -179,8 +194,43 @@ export default defineComponent({
       dealerManufacturerLot: '',
       homeParkName: '',
       homeParkPad: '',
-      pidNumber: ''
+      pidNumber: '',
+      dealerManufacturerLotRules: computed(() => {
+        return localState.locationTypeOption as any === HomeLocationTypes.LOT
+          ? customRules(required('Enter a dealer or manufacturer name'), maxLength(60))
+          : []
+      }),
+      homeParkNameRules: computed(() => {
+        return localState.locationTypeOption as any === HomeLocationTypes.HOME_PARK
+          ? customRules(required('Enter a park name'), maxLength(40))
+          : []
+      }),
+      homeParkPadRules: computed(() => {
+        return localState.locationTypeOption as any === HomeLocationTypes.HOME_PARK
+          ? maxLength(6)
+          : []
+      }),
+      isLocationTypeValid: computed((): boolean => {
+        // Return false if there is no radio selection
+        if (!localState.locationTypeOption) return false
+
+        switch (localState.locationTypeOption as any) {
+          case HomeLocationTypes.LOT:
+            return localState.isValidLot
+          case HomeLocationTypes.HOME_PARK:
+            return localState.isValidHomePark
+        }
+      })
     })
+
+    const validateForms = (): void => {
+      if (props.validate) {
+        // @ts-ignore - function exists
+        if (props.validate) context.refs.lotForm.validate()
+        // @ts-ignore - function exists
+        if (props.validate) context.refs.homeParkForm.validate()
+      }
+    }
 
     /** Apply local models to store when they change. **/
     watch(() => localState.dealerManufacturerLot, () => {
@@ -200,6 +250,9 @@ export default defineComponent({
     })
     watch(() => localState.otherTypeOption, () => {
       setMhrLocation({ key: 'otherType', value: localState.otherTypeOption })
+    })
+    watch(() => localState.isLocationTypeValid, (val: boolean) => {
+      setValidation(MhrSectVal.LOCATION_VALID, MhrCompVal.LOCATION_TYPE_VALID, val)
     })
 
     /** Clear/reset forms when select option changes. **/
@@ -222,33 +275,20 @@ export default defineComponent({
           localState.dealerManufacturerLot = ''
           break
       }
+      validateForms()
     })
     watch(() => localState.otherTypeOption, () => {
       localState.pidNumber = ''
     })
-    const dealerManufacturerLotRules = computed(() => {
-      return localState.locationTypeOption as any === HomeLocationTypes.LOT
-        ? customRules(required('Enter a dealer or manufacturer name'), maxLength(60))
-        : []
+    watch(() => localState.validate, () => {
+      validateForms()
     })
-    const homeParkNameRules = computed(() => {
-      return localState.locationTypeOption as any === HomeLocationTypes.HOME_PARK
-        ? customRules(required('Enter a park name'), maxLength(40))
-        : []
-    })
-    const homeParkPadRules = computed(() => {
-      return localState.locationTypeOption as any === HomeLocationTypes.HOME_PARK
-        ? maxLength(6)
-        : []
-    })
+
     return {
       HomeLocationTypes,
       customRules,
       required,
       maxLength,
-      dealerManufacturerLotRules,
-      homeParkNameRules,
-      homeParkPadRules,
       ...toRefs(localState)
     }
   }

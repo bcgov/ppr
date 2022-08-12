@@ -2,7 +2,7 @@
   <v-card flat rounded id="submitting-party" class="mt-8 pa-8 pr-6">
     <v-row no-gutters>
       <v-col cols="12" sm="2">
-        <label class="generic-label" :class="{'error-text': false}">Add Submitting Party</label>
+        <label class="generic-label" :class="{'error-text': validate}">Add Submitting Party</label>
       </v-col>
       <v-col cols="12" sm="10" class="px-1">
         <v-radio-group
@@ -38,7 +38,7 @@
 
         <v-form id="submitting-party-form" ref="submittingPartyForm" v-model="submittingPartyValid">
           <!-- Person Name Input -->
-          <template v-if="isPersonOption">
+          <div v-show="isPersonOption">
             <label class="generic-label" for="first-name">Person's Name</label>
             <v-row no-gutters>
               <v-col>
@@ -48,7 +48,7 @@
                   class="pt-4 pr-2"
                   label="First Name"
                   v-model="submittingParty.personName.first"
-                  :rules="firstNameRules"
+                  :rules="isPersonOption ? firstNameRules : []"
                 />
               </v-col>
               <v-col>
@@ -58,7 +58,7 @@
                   class="pt-4 px-2"
                   label="Middle Name (Optional)"
                   v-model="submittingParty.personName.middle"
-                  :rules="middleNameRules"
+                  :rules="isPersonOption ? middleNameRules : []"
                 />
               </v-col>
               <v-col>
@@ -68,14 +68,14 @@
                   class="pt-4 px-2"
                   label="Last Name"
                   v-model="submittingParty.personName.last"
-                  :rules="lastNameRules"
+                  :rules="isPersonOption ? lastNameRules : []"
                 />
               </v-col>
             </v-row>
-          </template>
+          </div>
 
           <!-- Business Name Input -->
-          <template v-if="isBusinessOption">
+          <div v-show="isBusinessOption">
             <label class="generic-label" for="business-name">Business Name</label>
             <v-row no-gutters>
               <v-col>
@@ -85,11 +85,11 @@
                   class="pt-4 pr-2"
                   label="Business Name"
                   v-model="submittingParty.businessName"
-                  :rules="businessNameRules"
+                  :rules="isBusinessOption ? businessNameRules : []"
                 />
               </v-col>
             </v-row>
-          </template>
+          </div>
 
           <!-- Email Address -->
           <label class="generic-label" for="submitting-party-email">Email Address</label>
@@ -141,6 +141,7 @@
               id="submitting-party-address"
               :schema="PartyAddressSchema"
               :value="submittingParty.address"
+              :triggerErrors="validate"
               @valid="updateValidity($event)"
             />
           </article>
@@ -153,7 +154,7 @@
 <script lang="ts">
 /* eslint-disable no-unused-vars */
 import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
-import { useInputRules } from '@/composables'
+import { useInputRules, useMhrValidations } from '@/composables'
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import { BaseAddress } from '@/composables/address'
 import { SubmittingPartyTypes } from '@/enums'
@@ -166,7 +167,12 @@ export default defineComponent({
   components: {
     BaseAddress
   },
-  props: {},
+  props: {
+    validate: {
+      type: Boolean,
+      default: false
+    }
+  },
   setup (props, context) {
     const {
       setMhrSubmittingParty
@@ -174,9 +180,11 @@ export default defineComponent({
       'setMhrSubmittingParty'
     ])
     const {
-      getMhrRegistrationSubmittingParty
+      getMhrRegistrationSubmittingParty,
+      getMhrRegistrationValidationModel
     } = useGetters<any>([
-      'getMhrRegistrationSubmittingParty'
+      'getMhrRegistrationSubmittingParty',
+      'getMhrRegistrationValidationModel'
     ])
 
     // InputField Rules
@@ -191,10 +199,17 @@ export default defineComponent({
       isNumber
     } = useInputRules()
 
+    const {
+      MhrCompVal,
+      MhrSectVal,
+      setValidation
+    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
+
     const localState = reactive({
       enableLookUp: true,
       submittingPartyType: '',
-      submittingPartyValid: '',
+      submittingPartyValid: false,
+      addressValid: false,
       submittingParty: {
         personName: {
           first: '',
@@ -215,13 +230,15 @@ export default defineComponent({
           deliveryInstructions: ''
         }
       },
-      addressValid: true,
       isBusinessLookup: false,
       isPersonOption: computed((): boolean => {
         return localState.submittingPartyType === SubmittingPartyTypes.PERSON
       }),
       isBusinessOption: computed((): boolean => {
         return localState.submittingPartyType === SubmittingPartyTypes.BUSINESS
+      }),
+      isSubmitterValid: computed(() => {
+        return localState.submittingPartyValid && localState.addressValid
       })
     })
 
@@ -307,6 +324,15 @@ export default defineComponent({
           last: ''
         }
       }
+    })
+
+    watch(() => props.validate, async () => {
+      // @ts-ignore - function exists
+      await context.refs.submittingPartyForm.validate()
+    })
+
+    watch(() => localState.isSubmitterValid, (val: boolean) => {
+      setValidation(MhrSectVal.SUBMITTING_PARTY_VALID, MhrCompVal.SUBMITTER_VALID, val)
     })
 
     return {

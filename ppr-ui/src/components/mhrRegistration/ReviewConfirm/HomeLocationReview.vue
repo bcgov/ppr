@@ -5,8 +5,8 @@
       <label class="font-weight-bold pl-2">Location of Home</label>
     </header>
 
-    <div :class="{ 'invalid-section': false }">
-      <section class="mx-6 pt-8" v-if="true">
+    <div :class="{ 'border-error-left': !getStepValidation(MhrSectVal.LOCATION_VALID)}">
+      <section class="mx-6 pt-8" v-if="!getStepValidation(MhrSectVal.LOCATION_VALID)">
         <span>
           <v-icon color="error">mdi-information-outline</v-icon>
           <span class="error-text mx-1">This step is unfinished.</span>
@@ -95,6 +95,7 @@
 import { computed, defineComponent, reactive, toRefs } from '@vue/composition-api'
 import { HomeLocationTypes, RouteNames } from '@/enums'
 import { useGetters } from 'vuex-composition-helpers'
+import { useMhrValidations } from '@/composables'
 
 export default defineComponent({
   name: 'HomeLocationReview',
@@ -102,10 +103,17 @@ export default defineComponent({
   props: {},
   setup () {
     const {
-      getMhrRegistrationLocation
+      getMhrRegistrationLocation,
+      getMhrRegistrationValidationModel
     } = useGetters<any>([
-      'getMhrRegistrationLocation'
+      'getMhrRegistrationLocation',
+      'getMhrRegistrationValidationModel'
     ])
+
+    const {
+      MhrSectVal,
+      getStepValidation
+    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
     const localState = reactive({
       includesPid: computed((): boolean => {
@@ -138,6 +146,8 @@ export default defineComponent({
     return {
       HomeLocationTypes,
       RouteNames,
+      MhrSectVal,
+      getStepValidation,
       getMhrRegistrationLocation,
       ...toRefs(localState)
     }
