@@ -115,8 +115,7 @@
                 label="Phone Number"
                 v-model="submittingParty.phoneNumber"
                 :rules="phoneRules"
-                validate-on-
-                blur
+                validate-on-blur
             />
             </v-col>
             <v-col>
