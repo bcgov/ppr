@@ -28,7 +28,6 @@
               <AddEditHomeOwner
                 :editHomeOwner="row.item"
                 :isHomeOwnerPerson="!row.item.organizationName"
-                @done="edit($event)"
                 @cancel="currentlyEditingHomeOwnerId = -1"
                 @remove="remove(row.item)"
               />
@@ -144,7 +143,7 @@ export default defineComponent({
     AddEditHomeOwner,
     TableGroupHeader
   },
-  setup (props, context) {
+  setup (props) {
     const addressSchema = PartyAddressSchema
 
     const { getMhrRegistrationHomeOwnerGroups } = useGetters<any>([
@@ -166,13 +165,6 @@ export default defineComponent({
       ),
       isAddingMode: computed((): boolean => props.isAdding)
     })
-
-    const edit = (item): void => {
-      context.emit('edit', {
-        ...item,
-        id: localState.currentlyEditingHomeOwnerId
-      })
-    }
 
     const remove = (item): void => {
       localState.currentlyEditingHomeOwnerId = -1
@@ -202,7 +194,6 @@ export default defineComponent({
       openForEditing,
       isCurrentlyEditing,
       showGroups,
-      edit,
       remove,
       deleteGroup,
       isGlobalEditingMode,

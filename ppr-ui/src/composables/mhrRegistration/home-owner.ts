@@ -1,6 +1,6 @@
 import {
   MhrRegistrationHomeOwnerGroupIF,
-  MhrRegistrationHomeOwnersIF
+  MhrRegistrationHomeOwnerIF
 } from '@/interfaces'
 import '@/utils/use-composition-api'
 
@@ -78,7 +78,7 @@ export function useHomeOwners (
   }
 
   const addOwnerToTheGroup = (
-    owner: MhrRegistrationHomeOwnersIF,
+    owner: MhrRegistrationHomeOwnerIF,
     groupId: string
   ) => {
     const homeOwnerGroups = [...getMhrRegistrationHomeOwnerGroups.value]
@@ -96,7 +96,7 @@ export function useHomeOwners (
       // No groups exist, need to create a new one
       const newGroup = {
         groupId: groupId || DEFAULT_GROUP_ID,
-        owners: [owner] as MhrRegistrationHomeOwnersIF[]
+        owners: [owner] as MhrRegistrationHomeOwnerIF[]
       } as MhrRegistrationHomeOwnerGroupIF
       homeOwnerGroups.push(newGroup)
     }
@@ -105,7 +105,7 @@ export function useHomeOwners (
   }
 
   const editHomeOwner = (
-    updatedOwner: MhrRegistrationHomeOwnersIF,
+    updatedOwner: MhrRegistrationHomeOwnerIF,
     newGroupId: string
   ) => {
     const homeOwnerGroups = [...getMhrRegistrationHomeOwnerGroups.value]
@@ -130,7 +130,7 @@ export function useHomeOwners (
   }
 
   // Remove Owner from the Group it belongs to
-  const removeOwner = (owner: MhrRegistrationHomeOwnersIF) => {
+  const removeOwner = (owner: MhrRegistrationHomeOwnerIF) => {
     const homeOwnerGroups = [
       ...getMhrRegistrationHomeOwnerGroups.value
     ] as MhrRegistrationHomeOwnerGroupIF[]

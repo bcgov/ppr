@@ -18,7 +18,8 @@ import {
   ManufacturedHomeSearchResultIF,
   MhrRegistrationDescriptionIF,
   MhrRegistrationHomeLocationIF,
-  MhrRegistrationHomeOwnersIF, MhrValidationStateIF,
+  MhrRegistrationHomeOwnerIF, 
+  MhrValidationStateIF,
   RegistrationSortIF,
   RegistrationSummaryIF,
   RegistrationTypeIF,
@@ -654,7 +655,7 @@ export const getMhrRegistrationHomeDescription = (state: StateIF): MhrRegistrati
 export const getMhrRegistrationSubmittingParty = (state: StateIF): any => {
   return state.stateModel.mhrRegistration.submittingParty
 }
-export const getMhrRegistrationHomeOwners = (state: StateIF): MhrRegistrationHomeOwnersIF[] => {
+export const getMhrRegistrationHomeOwners = (state: StateIF): MhrRegistrationHomeOwnerIF[] => {
   const owners = []
   state.stateModel.mhrRegistration.ownerGroups.forEach(group => {
     group.owners.forEach(owner => owners.push({ ...owner, groupId: group.groupId }))

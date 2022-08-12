@@ -97,7 +97,6 @@
       <AddEditHomeOwner
         v-if="showAddPersonSection"
         :isHomeOwnerPerson="true"
-        @done="addHomeOwner($event)"
         @cancel="showAddPersonSection = false"
       />
     </v-expand-transition>
@@ -105,7 +104,6 @@
     <v-expand-transition>
       <AddEditHomeOwner
         v-if="showAddPersonOrganizationSection"
-        @done="addHomeOwner($event)"
         @cancel="showAddPersonOrganizationSection = false"
       />
     </v-expand-transition>
@@ -114,15 +112,13 @@
       <HomeOwnersTable
         :homeOwners="getMhrRegistrationHomeOwners"
         :isAdding="disableAddHomeOwnerBtn"
-        @edit="editHomeOwner($event)"
-        @remove="removeHomeOwner($event)"
       />
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { useActions, useGetters } from 'vuex-composition-helpers'
+import { useGetters } from 'vuex-composition-helpers'
 import {
   AddEditHomeOwner,
   HomeOwnersTable
@@ -137,9 +133,6 @@ import {
   watch
 } from '@vue/composition-api'
 import { useHomeOwners } from '@/composables/mhrRegistration'
-/* eslint-disable no-unused-vars */
-import { MhrRegistrationHomeOwnersIF } from '@/interfaces'
-/* eslint-enable no-unused-vars */
 
 export default defineComponent({
   name: 'HomeOwners',
@@ -151,10 +144,6 @@ export default defineComponent({
   setup () {
     const { getMhrRegistrationHomeOwners } = useGetters<any>([
       'getMhrRegistrationHomeOwners'
-    ])
-
-    const { setMhrRegistrationHomeOwners } = useActions<any>([
-      'setMhrRegistrationHomeOwners'
     ])
 
     const { setGlobalEditingMode } = useHomeOwners()
@@ -185,30 +174,8 @@ export default defineComponent({
       }
     )
 
-    const addHomeOwner = (owner: MhrRegistrationHomeOwnersIF) => {
-      const homeOwners = [...getMhrRegistrationHomeOwners.value]
-      homeOwners.push(owner)
-      setMhrRegistrationHomeOwners(homeOwners)
-    }
-
-    const editHomeOwner = (owner: MhrRegistrationHomeOwnersIF) => {
-      const homeOwners = [...getMhrRegistrationHomeOwners.value]
-      const { id, ...editedOwner } = owner
-      homeOwners[owner.id] = editedOwner
-      setMhrRegistrationHomeOwners(homeOwners)
-    }
-
-    const removeHomeOwner = (owner: MhrRegistrationHomeOwnersIF) => {
-      const homeOwners = [...getMhrRegistrationHomeOwners.value]
-      homeOwners.splice(homeOwners.indexOf(owner), 1)
-      setMhrRegistrationHomeOwners(homeOwners)
-    }
-
     return {
       getMhrRegistrationHomeOwners,
-      addHomeOwner,
-      editHomeOwner,
-      removeHomeOwner,
       ...toRefs(localState)
     }
   }
