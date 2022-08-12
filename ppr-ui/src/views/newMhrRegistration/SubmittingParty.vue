@@ -117,7 +117,7 @@ export default defineComponent({
       scrollToInvalid(MhrSectVal.SUBMITTING_PARTY_VALID, 'mhr-submitting-party')
     }
 
-    watch(() => localState, () => {
+    watch(() => localState.validateSubmitter, () => {
       setTimeout(scrollOnValidationUpdates, 300)
     }, { deep: true })
 

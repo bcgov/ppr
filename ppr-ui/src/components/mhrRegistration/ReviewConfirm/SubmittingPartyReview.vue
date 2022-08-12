@@ -5,7 +5,7 @@
       <label class="font-weight-bold pl-2">Submitting Party</label>
     </header>
 
-    <div :class="{ 'invalid-section': !getStepValidation(MhrSectVal.SUBMITTING_PARTY_VALID)}">
+    <div :class="{ 'border-error-left': !getStepValidation(MhrSectVal.SUBMITTING_PARTY_VALID)}">
       <section class="mx-6 pt-8" v-if="!getStepValidation(MhrSectVal.SUBMITTING_PARTY_VALID)">
         <span>
           <v-icon color="error">mdi-information-outline</v-icon>

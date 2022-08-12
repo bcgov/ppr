@@ -6,8 +6,10 @@
         Indicate the type of location for the home.
       </p>
 
-      <!-- Home Location Type -->
-      <HomeLocationType :class="{ 'border-error-left': false }" />
+      <HomeLocationType
+        :validate="validateLocationType"
+        :class="{ 'border-error-left': validateLocationType }"
+      />
     </section>
 
     <section id="mhr-home-civic-address-wrapper" class="mt-10">
@@ -15,23 +17,64 @@
       <p class="mt-2">
         Enter the Street Address (Number and Name) and City for the location of the home. Must be located in B.C.
       </p>
-      <HomeCivicAddress :class="{ 'border-error-left': false }" />
+
+      <HomeCivicAddress
+        :validate="validateCivicAddress"
+        :class="{ 'border-error-left': validateCivicAddress }"
+      />
     </section>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
+import { useGetters } from 'vuex-composition-helpers'
 import { HomeLocationType, HomeCivicAddress } from '@/components/mhrRegistration'
+import { useMhrValidations } from '@/composables/mhrRegistration/mhr-validations'
 
-@Component({
+export default defineComponent({
+  name: 'HomeLocation',
   components: {
     HomeLocationType,
     HomeCivicAddress
+  },
+  props: {},
+  setup () {
+    const {
+      getMhrRegistrationValidationModel
+    } = useGetters<any>([
+      'getMhrRegistrationValidationModel'
+    ])
+
+    const {
+      MhrCompVal,
+      MhrSectVal,
+      getSectionValidation,
+      scrollToInvalid
+    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
+
+    const localState = reactive({
+      validateLocationType: computed(() => {
+        return getSectionValidation(MhrSectVal.LOCATION_VALID, MhrCompVal.LOCATION_TYPE_VALID)
+      }),
+      validateCivicAddress: computed(() => {
+        return getSectionValidation(MhrSectVal.LOCATION_VALID, MhrCompVal.CIVIC_ADDRESS_VALID)
+      })
+    })
+
+    const scrollOnValidationUpdates = () => {
+      scrollToInvalid(MhrSectVal.LOCATION_VALID, 'mhr-home-location')
+    }
+
+    watch(() => localState, () => {
+      setTimeout(scrollOnValidationUpdates, 300)
+    }, { deep: true })
+
+    return {
+      ...toRefs(localState)
+    }
   }
 })
-export default class HomeLocation extends Vue {
-}
 </script>
 
 <style lang="scss" scoped>
