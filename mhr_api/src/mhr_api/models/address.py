@@ -43,6 +43,7 @@ class Address(db.Model):  # pylint: disable=too-many-instance-attributes
     # Relationships - CountryType
     country_type = db.relationship('CountryType', foreign_keys=[country],
                                    back_populates='address', cascade='all, delete', uselist=False)
+    mhr_party = db.relationship('MhrParty', uselist=False, back_populates='address')
 
     def save(self):
         """Save the object to the database immediately. Only used for unit testing."""

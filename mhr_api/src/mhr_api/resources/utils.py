@@ -15,12 +15,13 @@
 from enum import Enum
 from http import HTTPStatus
 
-from flask import jsonify, current_app, request
+from flask import jsonify, current_app
 
 from mhr_api.exceptions import ResourceErrorCodes
 # from mhr_api.models import utils as model_utils
 from mhr_api.services.authz import user_orgs, is_reg_staff_account, is_sbc_office_account, is_bcol_help
 from mhr_api.services.payment.exceptions import SBCPaymentException
+from mhr_api.utils import registration_validator
 
 
 # Resource error messages
@@ -44,6 +45,8 @@ CERTIFIED_PARAM = 'certified'
 ROUTING_SLIP_PARAM = 'routingSlipNumber'
 DAT_NUMBER_PARAM = 'datNumber'
 BCOL_NUMBER_PARAM = 'bcolAccountNumber'
+PRIORITY_PARAM = 'priority'
+CLIENT_REF_PARAM = 'clientReferenceId'
 
 REG_STAFF_DESC = 'BC Registries Staff'
 SBC_STAFF_DESC = 'SBC Staff'
@@ -234,24 +237,7 @@ def get_account_name(token: str, account_id: str = None):  # pylint: disable=too
         return None
 
 
-def build_staff_registration_payment(req: request, pay_trans_type: str, fee_quantity: int):
-    """Extract payment information from request parameters."""
-    payment_info = {
-        'transactionType': pay_trans_type,
-        'feeQuantity': fee_quantity,
-        'waiveFees': False
-    }
-
-    routing_slip = req.args.get(ROUTING_SLIP_PARAM)
-    bcol_number = req.args.get(BCOL_NUMBER_PARAM)
-    dat_number = req.args.get(DAT_NUMBER_PARAM)
-    if routing_slip is not None:
-        payment_info[ROUTING_SLIP_PARAM] = str(routing_slip)
-    if bcol_number is not None:
-        payment_info[BCOL_NUMBER_PARAM] = str(bcol_number)
-    if dat_number is not None:
-        payment_info[DAT_NUMBER_PARAM] = str(dat_number)
-    if not routing_slip and not bcol_number:
-        payment_info['waiveFees'] = True
-
-    return payment_info
+def validate_registration(json_data, is_staff: bool = False):
+    """Perform non-schema extra validation on a non-financing registrations."""
+    error_msg = registration_validator.validate_registration(json_data, is_staff)
+    return error_msg

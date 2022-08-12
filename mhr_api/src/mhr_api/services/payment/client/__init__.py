@@ -35,7 +35,8 @@ TRANSACTION_TO_FILING_TYPE = {
     'SEARCH_COMBO': 'CSRCH',
     'SEARCH_STAFF': 'MSRCS',
     'SEARCH_STAFF_COMBO': 'CSRCS',
-    'CERTIFIED': 'MHRCD'
+    'CERTIFIED': 'MHRCD',
+    'REGISTRATION': 'INREG'
 }
 
 # Mapping from normal filing type to staff version of filing type
@@ -294,15 +295,15 @@ class SBCPaymentClient(BaseClient):
         return data
 
     @staticmethod
-    def create_payment_data(transaction_type, quantity=1, ppr_id=None, client_reference_id=None, processing_fee=None):
+    def create_payment_data(transaction_type, quantity=1, mhr_id=None, client_reference_id=None, processing_fee=None):
         """Build the payment-request body formatted as JSON."""
         data = copy.deepcopy(PAYMENT_REQUEST_TEMPLATE)
         filing_type = TRANSACTION_TO_FILING_TYPE[transaction_type]
         data['filingInfo']['filingTypes'][0]['filingTypeCode'] = filing_type
         if quantity != 1:
             data['filingInfo']['filingTypes'][0]['quantity'] = quantity
-        if ppr_id:
-            data['filingInfo']['filingIdentifier'] = ppr_id
+        if mhr_id:
+            data['filingInfo']['filingIdentifier'] = mhr_id
         else:
             del data['filingInfo']['filingIdentifier']
 
@@ -327,30 +328,31 @@ class SBCPaymentClient(BaseClient):
         return data
 
     @staticmethod
-    def create_payment_staff_registration_data(transaction_info, client_reference_id=None, processing_fee=None):
+    def create_payment_staff_data(transaction_info, client_reference_id=None):
         """Build the payment-request body formatted as JSON."""
         data = copy.deepcopy(PAYMENT_REQUEST_TEMPLATE)
         filing_type = TRANSACTION_TO_FILING_TYPE[transaction_info['transactionType']]
         data['filingInfo']['filingTypes'][0]['filingTypeCode'] = filing_type
         if transaction_info['feeQuantity'] != 1:
             data['filingInfo']['filingTypes'][0]['quantity'] = transaction_info['feeQuantity']
-        if 'transaction_id' in transaction_info:
-            data['filingInfo']['filingIdentifier'] = transaction_info['transaction_id']
+        if 'transactionId' in transaction_info:
+            data['filingInfo']['filingIdentifier'] = transaction_info['transactionId']
         else:
             del data['filingInfo']['filingIdentifier']
 
-        if processing_fee:
+        # Don't need this for MHR?
+        # if processing_fee:
             # alter fee code to staff fee code
-            if filing_type in TO_STAFF_FILING_TYPE:
-                data['filingInfo']['filingTypes'][0]['filingTypeCode'] = TO_STAFF_FILING_TYPE[filing_type]
+        #    if filing_type in TO_STAFF_FILING_TYPE:
+        #        data['filingInfo']['filingTypes'][0]['filingTypeCode'] = TO_STAFF_FILING_TYPE[filing_type]
             # add processing fee item
-            processing_filing_type = TRANSACTION_TO_FILING_TYPE[processing_fee]
-            data['filingInfo']['filingTypes'].append({
-                'filingTypeCode': processing_filing_type,
-                'priority': False,
-                'futureEffective': False,
-                'quantity': 1
-            })
+        #    processing_filing_type = TRANSACTION_TO_FILING_TYPE[processing_fee]
+        #    data['filingInfo']['filingTypes'].append({
+        #        'filingTypeCode': processing_filing_type,
+        #        'priority': False,
+        #        'futureEffective': False,
+        #        'quantity': 1
+        #    })
 
         if client_reference_id:
             data['filingInfo']['folioNumber'] = client_reference_id
@@ -359,8 +361,9 @@ class SBCPaymentClient(BaseClient):
 
         if 'waiveFees' in transaction_info and transaction_info['waiveFees']:
             data['filingInfo']['filingTypes'][0]['waiveFees'] = True
+            return data
         # set up FAS payment
-        elif 'routingSlipNumber' in transaction_info:
+        if 'routingSlipNumber' in transaction_info:
             account_info = {
                 'routingSlip': transaction_info['routingSlipNumber']
             }
@@ -373,21 +376,27 @@ class SBCPaymentClient(BaseClient):
             if 'datNumber' in transaction_info:
                 account_info['datNumber'] = transaction_info['datNumber']
             data['accountInfo'] = account_info
+
+        # Add priority filing type
         if transaction_info.get('priority'):
-            data['filingInfo']['filingTypes'][0]['priority'] = True
+            data['filingInfo']['filingTypes'].append(PRIORITY_FILING_TYPE)
+
         return data
 
     def create_payment(  # pylint: disable=too-many-arguments
             self,
             transaction_type,
             quantity=1,
-            ppr_id=None,
+            mhr_id=None,
             client_reference_id=None,
             processing_fee=None
     ):
-        """Submit a payment request for the PPR API transaction."""
-        data = SBCPaymentClient.create_payment_data(
-            transaction_type, quantity, ppr_id, client_reference_id, processing_fee)
+        """Submit a payment request for the MHR API transaction."""
+        data = SBCPaymentClient.create_payment_data(transaction_type,
+                                                    quantity,
+                                                    mhr_id,
+                                                    client_reference_id,
+                                                    processing_fee)
         if self.detail_label and self.detail_value:
             data['details'][0]['label'] = self.detail_label
             data['details'][0]['value'] = self.detail_value
@@ -396,16 +405,8 @@ class SBCPaymentClient(BaseClient):
         # current_app.logger.debug('create paymnent payload:')
         # current_app.logger.debug(json.dumps(data))
         invoice_data = self.call_api(HttpVerbs.POST, PATH_PAYMENT, data)
-        invoice_id = str(invoice_data['id'])
-        receipt_path = self.api_url.replace('https://', '')
-        receipt_path = receipt_path[receipt_path.find('/'): None] + PATH_RECEIPT.format(invoice_id=invoice_id)
-        # Return the pay reference to include in the API response.
-        pay_reference = {
-            'invoiceId': invoice_id,
-            'receipt': receipt_path
-        }
-
-        return pay_reference
+        # current_app.logger.debug(invoice_data)
+        return SBCPaymentClient.build_pay_reference(invoice_data, self.api_url)
 
     def create_payment_search(self, selections, mhr_id=None, client_reference_id=None, staff_gov=False):
         """Submit a non-staff payment search request for the MHR API transaction."""
@@ -430,7 +431,7 @@ class SBCPaymentClient(BaseClient):
         return pay_reference
 
     def create_payment_staff_search(self, selections, transaction_info, mhr_id=None, client_reference_id=None):
-        """Submit a staff search payment request for the PPR API transaction."""
+        """Submit a staff search payment request for the MHR API transaction."""
         current_app.logger.debug('Setting up staff search data.')
         data = SBCPaymentClient.create_payment_staff_search_data(selections,
                                                                  transaction_info,
@@ -446,17 +447,17 @@ class SBCPaymentClient(BaseClient):
         invoice_data = self.call_api(HttpVerbs.POST, PATH_PAYMENT, data, include_account=False)
         return SBCPaymentClient.build_pay_reference(invoice_data, self.api_url)
 
-    def create_payment_staff_registration(self, transaction_info, client_reference_id=None, processing_fee=None):
-        """Submit a staff registration payment request for the PPR API transaction."""
-        data = SBCPaymentClient.create_payment_staff_registration_data(
-            transaction_info, client_reference_id, processing_fee)
+    def create_payment_staff(self, transaction_info, client_reference_id=None):
+        """Submit a staff registration payment request for the MHR API transaction."""
+        current_app.logger.debug('Setting up staff registration data.')
+        data = SBCPaymentClient.create_payment_staff_data(transaction_info, client_reference_id)
         if self.detail_label and self.detail_value:
             data['details'][0]['label'] = self.detail_label
             data['details'][0]['value'] = self.detail_value
         else:
             del data['details']
-        current_app.logger.debug('staff registration create payment payload: ')
-        current_app.logger.debug(json.dumps(data))
+        # current_app.logger.debug('staff registration create payment payload: ')
+        # current_app.logger.debug(json.dumps(data))
         invoice_data = self.call_api(HttpVerbs.POST, PATH_PAYMENT, data, include_account=False)
         return SBCPaymentClient.build_pay_reference(invoice_data, self.api_url)
 

@@ -54,8 +54,9 @@ TO_NOTE_DESCRIPTION = {
 
 
 class ReportTypes(BaseEnum):
-    """Render an Enum of the PPR PDF report types."""
+    """Render an Enum of the MHR PDF report types."""
 
+    MHR_REGISTRATION = 'mhrRegistration'
     SEARCH_DETAIL_REPORT = 'searchDetail'
 
 

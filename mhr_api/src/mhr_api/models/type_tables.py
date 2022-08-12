@@ -11,9 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""This module holds model definitions for the PPR type tables."""
+"""This module holds model definitions for the MHR type tables."""
 
-from __future__ import annotations
+from sqlalchemy.dialects.postgresql import ENUM as PG_ENUM
+
+from mhr_api.utils.base import BaseEnum
 
 from .db import db
 
@@ -146,3 +148,181 @@ class SerialType(db.Model):  # pylint: disable=too-few-public-methods
 
     # Relationships - VehicleCollateral
     vehicle_collateral = db.relationship('VehicleCollateral', back_populates='serial_type')
+
+
+# MHR specific type table enums below
+class MhrNoteStatusTypes(BaseEnum):
+    """Render an Enum of the MHR note status types."""
+
+    ACTIVE = 'ACTIVE'
+    CANCELLED = 'CANCELLED'
+    EXPIRED = 'EXPIRED'
+    CORRECTED = 'CORRECTED'
+
+
+class MhrOwnerStatusTypes(BaseEnum):
+    """Render an Enum of the MHR owner/owner group status types."""
+
+    ACTIVE = 'ACTIVE'
+    EXEMPT = 'EXEMPT'
+    PREVIOUS = 'PREVIOUS'
+
+
+class MhrPartyTypes(BaseEnum):
+    """Render an Enum of the MHR party types."""
+
+    OWNER_BUS = 'OWNER_BUS'
+    OWNER_IND = 'OWNER_IND'
+    SUBMITTING = 'SUBMITTING'
+
+
+class MhrRegistrationStatusTypes(BaseEnum):
+    """Render an Enum of the MHR registration status types."""
+
+    ACTIVE = 'ACTIVE'
+    DRAFT = 'DRAFT'
+    EXEMPT = 'EXEMPT'
+    HISTORICAL = 'HISTORICAL'
+
+
+class MhrRegistrationTypes(BaseEnum):
+    """Render an Enum of the MHR registration types."""
+
+    MHREG = 'MHREG'
+
+
+class MhrStatusTypes(BaseEnum):
+    """Render an Enum of the MHR general status types."""
+
+    ACTIVE = 'ACTIVE'
+    DRAFT = 'DRAFT'
+    HISTORICAL = 'HISTORICAL'
+
+
+class MhrTenancyTypes(BaseEnum):
+    """Render an Enum of the MHR tenancy types."""
+
+    COMMON = 'COMMON'
+    JOINT = 'JOINT'
+    SOLE = 'SOLE'
+
+
+# MHR specific type tables below
+class MhrNoteStatusType(db.Model):  # pylint: disable=too-few-public-methods
+    """This class defines the model for the mhr_note_status_types table."""
+
+    __tablename__ = 'mhr_note_status_types'
+
+    status_type = db.Column('status_type', PG_ENUM(MhrNoteStatusTypes), primary_key=True)
+    status_type_desc = db.Column('status_type_desc', db.String(100), nullable=False)
+    legacy_status_type = db.Column('legacy_status_type', db.String(1), nullable=False)
+
+    # Relationships -
+
+    @classmethod
+    def find_all(cls):
+        """Return all the type records."""
+        return db.session.query(MhrNoteStatusType).all()
+
+
+class MhrOwnerStatusType(db.Model):  # pylint: disable=too-few-public-methods
+    """This class defines the model for the mhr_owner_status_types table."""
+
+    __tablename__ = 'mhr_owner_status_types'
+
+    status_type = db.Column('status_type', PG_ENUM(MhrOwnerStatusTypes), primary_key=True)
+    status_type_desc = db.Column('status_type_desc', db.String(100), nullable=False)
+    legacy_status_type = db.Column('legacy_status_type', db.String(1), nullable=False)
+
+    # Relationships -
+
+    @classmethod
+    def find_all(cls):
+        """Return all the type records."""
+        return db.session.query(MhrOwnerStatusType).all()
+
+
+class MhrPartyType(db.Model):  # pylint: disable=too-few-public-methods
+    """This class defines the model for the mhr_party_types table."""
+
+    __tablename__ = 'mhr_party_types'
+
+    party_type = db.Column('party_type', PG_ENUM(MhrPartyTypes), primary_key=True)
+    party_type_desc = db.Column('party_type_desc', db.String(100), nullable=False)
+    legacy_party_type = db.Column('legacy_party_type', db.String(1), nullable=True)
+
+    # Relationships -
+
+    @classmethod
+    def find_all(cls):
+        """Return all the type records."""
+        return db.session.query(MhrPartyType).all()
+
+
+class MhrRegistrationStatusType(db.Model):  # pylint: disable=too-few-public-methods
+    """This class defines the model for the mhr_registration_status_types table."""
+
+    __tablename__ = 'mhr_registration_status_types'
+
+    status_type = db.Column('status_type', PG_ENUM(MhrRegistrationStatusTypes), primary_key=True)
+    status_type_desc = db.Column('status_type_desc', db.String(100), nullable=False)
+    legacy_status_type = db.Column('legacy_status_type', db.String(1), nullable=False)
+
+    # Relationships -
+
+    @classmethod
+    def find_all(cls):
+        """Return all the type records."""
+        return db.session.query(MhrRegistrationStatusType).all()
+
+
+class MhrRegistrationType(db.Model):  # pylint: disable=too-few-public-methods
+    """This class defines the model for the mhr_registration_types table."""
+
+    __tablename__ = 'mhr_registration_types'
+
+    registration_type = db.Column('registration_type', PG_ENUM(MhrRegistrationTypes), primary_key=True)
+    registration_type_desc = db.Column('registration_type_desc', db.String(100), nullable=False)
+    legacy_registration_type = db.Column('legacy_registration_type', db.String(4), nullable=False)
+
+    # Relationships - MHR Registration
+    registration = db.relationship('MhrRegistration', back_populates='reg_type')
+
+    @classmethod
+    def find_all(cls):
+        """Return all the type records."""
+        return db.session.query(MhrRegistrationType).all()
+
+
+class MhrStatusType(db.Model):  # pylint: disable=too-few-public-methods
+    """This class defines the model for the mhr_status_types table."""
+
+    __tablename__ = 'mhr_status_types'
+
+    status_type = db.Column('status_type', PG_ENUM(MhrStatusTypes), primary_key=True)
+    status_type_desc = db.Column('status_type_desc', db.String(100), nullable=False)
+    legacy_status_type = db.Column('legacy_status_type', db.String(1), nullable=False)
+
+    # Relationships -
+
+    @classmethod
+    def find_all(cls):
+        """Return all the type records."""
+        return db.session.query(MhrStatusType).all()
+
+
+class MhrTenancyType(db.Model):  # pylint: disable=too-few-public-methods
+    """This class defines the model for the mhr_tenancy_types table."""
+
+    __tablename__ = 'mhr_tenancy_types'
+
+    tenancy_type = db.Column('tenancy_type', PG_ENUM(MhrTenancyTypes), primary_key=True)
+    tenancy_type_desc = db.Column('tenancy_type_desc', db.String(100), nullable=False)
+    legacy_tenancy_type = db.Column('legacy_tenancy_type', db.String(2), nullable=False)
+
+    # Relationships -
+
+    @classmethod
+    def find_all(cls):
+        """Return all the type records."""
+        return db.session.query(MhrTenancyType).all()
