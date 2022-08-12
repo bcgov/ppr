@@ -171,10 +171,10 @@ export default defineComponent({
   components: {
     BaseAddress
   },
-  directives: {
+  props: {},
+    directives: {
     mask: VueMaskDirective
   },
-  props: {},
   setup (props, context) {
     const {
       setMhrSubmittingParty

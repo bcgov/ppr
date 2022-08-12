@@ -223,12 +223,13 @@ import { AutoComplete } from '@/components/search'
 import { BaseAddress } from '@/composables/address'
 import { PartyAddressSchema } from '@/schemas'
 import { focusOnFirstError } from '@/utils'
+import { VueMaskDirective } from 'v-mask'
 
 /* eslint-disable no-unused-vars */
 import { MhrRegistrationHomeOwnersIF } from '@/interfaces/mhr-registration-interfaces'
 import { SimpleHelpToggle } from '@/components/common'
 /* eslint-enable no-unused-vars */
-import { VueMaskDirective } from 'v-mask'
+
 
 export default defineComponent({
   name: 'AddEditHomeOwner',
