@@ -18,7 +18,7 @@ import {
   ManufacturedHomeSearchResultIF,
   MhrRegistrationDescriptionIF,
   MhrRegistrationHomeLocationIF,
-  MhrRegistrationHomeOwnerIF, 
+  MhrRegistrationHomeOwnerIF,
   MhrValidationStateIF,
   RegistrationSortIF,
   RegistrationSummaryIF,
