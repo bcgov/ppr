@@ -230,7 +230,6 @@ import { MhrRegistrationHomeOwnersIF } from '@/interfaces/mhr-registration-inter
 import { SimpleHelpToggle } from '@/components/common'
 /* eslint-enable no-unused-vars */
 
-
 export default defineComponent({
   name: 'AddEditHomeOwner',
   components: {
