@@ -323,7 +323,7 @@ export default defineComponent({
       lastNameRules: customRules(required('Enter a last name'), maxLength(25)),
       orgNameRules: customRules(
         required('Enter an organization name'),
-        maxLength(150)
+        maxLength(70)
       ),
       phoneNumberRules: customRules(
         required('Enter a phone number'),

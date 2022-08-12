@@ -39,17 +39,17 @@
           <td class="owner-name">
             <div v-if="row.item.individualName" class="owner-icon-name">
               <v-icon class="mr-2">mdi-account</v-icon>
-              <div>
+              <strong>
                 {{ row.item.individualName.first }}
                 {{ row.item.individualName.middle }}
                 {{ row.item.individualName.last }}
-              </div>
+              </strong>
             </div>
             <div v-else class="owner-icon-name">
               <v-icon class="mr-2">mdi-domain</v-icon>
-              <div>
+              <strong>
                 {{ row.item.organizationName }}
-              </div>
+              </strong>
             </div>
             <div v-if="row.item.suffix" class="suffix">
               {{ row.item.suffix }}
@@ -219,6 +219,11 @@ export default defineComponent({
     color: $gray9;
   }
 
+  .v-btn.v-btn--disabled {
+    color: $app-blue !important;
+    opacity: 0.4;
+  }
+
   table {
     tbody > tr > td {
       padding: 20px 12px;
@@ -259,7 +264,7 @@ export default defineComponent({
   }
 
   .suffix {
-    color: #495057;
+    color: $gray7;
     font-size: 14px;
     line-height: 22px;
     margin-left: 34px;
