@@ -3,7 +3,6 @@ import Vue from 'vue'
 import Vuetify from 'vuetify'
 import VueRouter from 'vue-router'
 import { getVuexStore } from '@/store'
-import CompositionApi from '@vue/composition-api'
 import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
 import flushPromises from 'flush-promises'
 
@@ -13,13 +12,7 @@ import { ButtonFooter, Stepper, StickyContainer } from '@/components/common'
 import { RegistrationLengthTrust } from '@/components/registration'
 // Local types/helpers
 import { FeeSummaryTypes } from '@/composables/fees/enums'
-import {
-  APIRegistrationTypes,
-  RegistrationFlowType,
-  RouteNames,
-  StatementTypes,
-  UIRegistrationTypes
-} from '@/enums'
+import { APIRegistrationTypes, RegistrationFlowType, RouteNames, StatementTypes, UIRegistrationTypes } from '@/enums'
 import { RegistrationTypes } from '@/resources'
 import { LengthTrustIF } from '@/interfaces'
 // unit test helpers/data
@@ -43,7 +36,6 @@ const titleInfo = '.sub-header-info'
  */
 function createComponent (): Wrapper<any> {
   const localVue = createLocalVue()
-  localVue.use(CompositionApi)
   localVue.use(Vuetify)
   // Prevent the warning "[Vuetify] Unable to locate target [data-app]"
   document.body.setAttribute('data-app', 'true')

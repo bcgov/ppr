@@ -2,7 +2,6 @@
 import Vue from 'vue'
 import Vuetify from 'vuetify'
 import { getVuexStore } from '@/store'
-import CompositionApi from '@vue/composition-api'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 
 // Components
@@ -46,14 +45,8 @@ const emptyAddress: AddressIF = {
  *
  * @returns a Wrapper<SearchBar> object with the given parameters.
  */
-function createComponent (
-  value: AddressIF,
-  schema: SchemaIF,
-  editing: boolean,
-  triggerErrors: boolean
-): Wrapper<any> {
+function createComponent (value: AddressIF, schema: SchemaIF, editing: boolean, triggerErrors: boolean): Wrapper<any> {
   const localVue = createLocalVue()
-  localVue.use(CompositionApi)
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
   return mount(BaseAddress, {

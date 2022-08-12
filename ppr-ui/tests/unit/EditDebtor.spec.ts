@@ -2,13 +2,9 @@
 import Vue from 'vue'
 import Vuetify from 'vuetify'
 import { getVuexStore } from '@/store'
-import CompositionApi from '@vue/composition-api'
 import flushPromises from 'flush-promises'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
-import {
-  mockedDebtors1,
-  mockedDebtors2
-} from './test-data'
+import { mockedDebtors1, mockedDebtors2 } from './test-data'
 
 // Components
 import { EditDebtor } from '@/components/parties/debtor'
@@ -28,13 +24,8 @@ const removeButtonSelector: string = '#remove-btn-debtor'
  *
  * @returns a Wrapper<SearchBar> object with the given parameters.
  */
-function createComponent (
-  activeIndex: Number,
-  isBusiness: boolean,
-  invalidSection: boolean
-): Wrapper<any> {
+function createComponent (activeIndex: Number, isBusiness: boolean, invalidSection: boolean): Wrapper<any> {
   const localVue = createLocalVue()
-  localVue.use(CompositionApi)
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
   return mount(EditDebtor, {

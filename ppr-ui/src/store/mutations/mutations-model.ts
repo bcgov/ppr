@@ -27,7 +27,8 @@ import {
   ManufacturedHomeSearchResultIF,
   UserProductSubscriptionIF,
   HomeSectionIF,
-  MhrRegistrationHomeOwnersIF
+  MhrRegistrationHomeOwnersIF,
+  MhrRegistrationHomeOwnerGroupIF
 } from '@/interfaces'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 
@@ -366,6 +367,7 @@ export const mutateMhrSubmittingParty = (state: StateIF, { key, value }) => {
   state.stateModel.mhrRegistration.submittingParty[key] = value
 }
 
+// TODO: Delete this call
 export const mutateMhrHomeOwners = (state: StateIF, owners: Array<MhrRegistrationHomeOwnersIF>) => {
   state.stateModel.mhrRegistration.owners = owners
 }
@@ -380,4 +382,11 @@ export const mutateMhrLocation = (state: StateIF, { key, value }) => {
 
 export const mutateCivicAddress = (state: StateIF, { key, value }) => {
   state.stateModel.mhrRegistration.location.address[key] = value
+}
+
+export const mutateMhrHomeOwnerGroups = (
+  state: StateIF,
+  groups: Array<MhrRegistrationHomeOwnerGroupIF>
+) => {
+  state.stateModel.mhrRegistration.ownerGroups = groups
 }

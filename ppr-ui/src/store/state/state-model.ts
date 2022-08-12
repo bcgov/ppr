@@ -109,6 +109,7 @@ export const stateModel: StateModelIF = {
       phoneNumber: null,
       phoneExtension: null
     },
+    ownerGroups: [],
     owners: [],
     attentionReferenceNum: '',
     location: {

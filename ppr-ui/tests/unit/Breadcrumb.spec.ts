@@ -3,7 +3,6 @@ import Vue from 'vue'
 import Vuetify from 'vuetify'
 import VueRouter from 'vue-router'
 import { getVuexStore } from '@/store'
-import CompositionApi from '@vue/composition-api'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 
 // Components
@@ -39,13 +38,8 @@ const backBtn = '#breadcrumb-back-btn'
  *
  * @returns a Wrapper<any> object with the given parameters.
  */
-function createComponent (
-  mockRoute: string,
-  setCurrentPath: string,
-  setCurrentPathName: RouteNames
-): Wrapper<any> {
+function createComponent (mockRoute: string, setCurrentPath: string, setCurrentPathName: RouteNames): Wrapper<any> {
   const localVue = createLocalVue()
-  localVue.use(CompositionApi)
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
   localVue.use(VueRouter)
@@ -54,7 +48,10 @@ function createComponent (
 
   return mount(Breadcrumb, {
     localVue,
-    propsData: { setCurrentPath: setCurrentPath, setCurrentPathName: setCurrentPathName },
+    propsData: {
+      setCurrentPath: setCurrentPath,
+      setCurrentPathName: setCurrentPathName
+    },
     store,
     router,
     vuetify
@@ -62,7 +59,10 @@ function createComponent (
 }
 
 async function assertBreadcrumbItemForRole (
-  wrapper: Wrapper<any>, roles: Array<AuthRoles>, breadcrumbItemContent: string, subscribedProductsCodes: Array<ProductCode> = []
+  wrapper: Wrapper<any>,
+  roles: Array<AuthRoles>,
+  breadcrumbItemContent: string,
+  subscribedProductsCodes: Array<ProductCode> = []
 ) {
   await store.dispatch('setAuthRoles', roles)
   await store.dispatch('setRoleSbc', !roles.includes(AuthRoles.PUBLIC))
@@ -298,6 +298,9 @@ describe('Breadcrumb component tests', () => {
     await assertBreadcrumbItemForRole(wrapper, STAFF_MHR, 'Staff Asset Registries')
     await assertBreadcrumbItemForRole(wrapper, CLIENT_MHR, 'My Manufactured Home Registry', [ProductCode.MHR])
     await assertBreadcrumbItemForRole(wrapper, STAFF_PPR_MHR, 'Staff Asset Registries', [])
-    await assertBreadcrumbItemForRole(wrapper, CLIENT_PPR_MHR, 'My Asset Registries', [ProductCode.MHR, ProductCode.PPR])
+    await assertBreadcrumbItemForRole(wrapper, CLIENT_PPR_MHR, 'My Asset Registries', [
+      ProductCode.MHR,
+      ProductCode.PPR
+    ])
   })
 })

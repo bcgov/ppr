@@ -2,7 +2,6 @@ import Vue from 'vue'
 import Vuetify from 'vuetify'
 import { getVuexStore } from '@/store'
 import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
-import CompositionApi from '@vue/composition-api'
 import flushPromises from 'flush-promises'
 // local
 import { BaseDialog } from '@/components/dialogs'
@@ -53,26 +52,24 @@ describe('Base Dialog tests', () => {
 
   beforeEach(async () => {
     const localVue = createLocalVue()
-    localVue.use(CompositionApi)
     localVue.use(Vuetify)
-    wrapper = mount(BaseDialog,
-      {
-        localVue,
-        store,
-        propsData: {
-          setAttach: '',
-          setDisplay: true,
-          setOptions: {
-            acceptText: 'default accept',
-            cancelText: 'default cancel',
-            hasContactInfo: false,
-            text: 'default text',
-            textExtra: [],
-            title: 'default title'
-          } as DialogOptionsIF
-        },
-        vuetify
-      })
+    wrapper = mount(BaseDialog, {
+      localVue,
+      store,
+      propsData: {
+        setAttach: '',
+        setDisplay: true,
+        setOptions: {
+          acceptText: 'default accept',
+          cancelText: 'default cancel',
+          hasContactInfo: false,
+          text: 'default text',
+          textExtra: [],
+          title: 'default title'
+        } as DialogOptionsIF
+      },
+      vuetify
+    })
     await flushPromises()
   })
   afterEach(() => {
