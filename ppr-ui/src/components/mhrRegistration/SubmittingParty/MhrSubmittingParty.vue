@@ -172,7 +172,7 @@ export default defineComponent({
     BaseAddress
   },
   props: {},
-    directives: {
+  directives: {
     mask: VueMaskDirective
   },
   setup (props, context) {
