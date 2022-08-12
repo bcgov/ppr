@@ -69,6 +69,7 @@
         :ripple="false"
         :disabled="disableAddHomeOwnerBtn"
         @click="showAddPersonSection = true"
+        data-test-id="add-person-btn"
       >
         <v-icon class="pr-1">mdi-account-plus</v-icon> Add a Person
       </v-btn>
@@ -81,6 +82,7 @@
         :ripple="false"
         :disabled="disableAddHomeOwnerBtn"
         @click="showAddPersonOrganizationSection = true"
+        data-test-id="add-org-btn"
       >
         <v-icon class="pr-1">mdi-domain-plus</v-icon>
         Add a Business or Organization

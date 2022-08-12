@@ -199,6 +199,7 @@
                 :ripple="false"
                 large
                 @click="done()"
+                data-test-id="done-btn"
               >
                 Done
               </v-btn>
@@ -208,6 +209,7 @@
                 color="primary"
                 outlined
                 @click="cancel()"
+                data-test-id="cancel-btn"
               >
                 Cancel
               </v-btn>
@@ -310,6 +312,7 @@ export default defineComponent({
       ),
       owner: { ...defaultHomeOwner },
       ownerGroupId: undefined,
+      showGroups: showGroups,
       isPerson: props.isHomeOwnerPerson,
       isAddingHomeOwner: props.editHomeOwner == null,
       isHomeOwnerFormValid: false,

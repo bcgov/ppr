@@ -7,7 +7,6 @@ import '@/utils/use-composition-api'
 import { ref, computed, readonly, watch } from '@vue/composition-api'
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import { find, remove, set, findIndex } from 'lodash'
-import { Watch } from 'vue-property-decorator'
 
 const DEFAULT_GROUP_ID = '1'
 
@@ -156,7 +155,7 @@ export function useHomeOwners (
   }
 
   // Remove all groups without owners
-  const removeEmptyGroups = () => {
+  const removeEmptyGroups = (): void => {
     const homeOwnerGroups = [
       ...getMhrRegistrationHomeOwnerGroups.value
     ] as MhrRegistrationHomeOwnerGroupIF[]
@@ -175,7 +174,7 @@ export function useHomeOwners (
   }
 
   // Delete group with its owners
-  const deleteGroup = groupId => {
+  const deleteGroup = (groupId: string): void => {
     const homeOwnerGroups = [...getMhrRegistrationHomeOwnerGroups.value]
     remove(homeOwnerGroups, group => group.groupId === groupId)
 

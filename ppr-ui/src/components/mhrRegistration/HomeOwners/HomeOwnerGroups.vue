@@ -23,6 +23,7 @@
       filled
       @change="setOwnerGroupId($event)"
       :clearable="groups.length === 1"
+      data-test-id="owner-group-select"
     ></v-select>
   </div>
 </template>

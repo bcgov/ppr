@@ -73,6 +73,7 @@
               :ripple="false"
               :disabled="isAddingMode || isEditingMode || isGlobalEditingMode"
               @click="openForEditing(homeOwners.indexOf(row.item))"
+              data-test-id="table-edit-btn"
             >
               <v-icon small>mdi-pencil</v-icon>
               <span>Edit</span>
