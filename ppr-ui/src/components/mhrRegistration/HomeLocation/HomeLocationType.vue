@@ -33,6 +33,7 @@
                     class="ml-8 pt-2"
                     label="Dealer / Manufacturer Name"
                     v-model="dealerManufacturerLot"
+                    :rules="dealerManufacturerLotRules"
                   />
                 </v-form>
               </v-expand-transition>
@@ -60,13 +61,15 @@
                     class="ml-8 pt-2"
                     label="Park Name"
                     v-model="homeParkName"
+                    :rules="homeParkNameRules"
                   />
 
                   <v-text-field
                     filled
                     class="ml-8"
-                    label="Pad Number"
+                    label="Pad (Optional)"
                     v-model="homeParkPad"
+                    :rules="homeParkPadRules"
                   />
                 </v-form>
               </v-expand-transition>
@@ -145,10 +148,11 @@
 
 <script lang="ts">
 /* eslint-disable no-unused-vars */
-import { defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
+import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
 import { useActions } from 'vuex-composition-helpers'
 import { HomeLocationTypes } from '@/enums'
 import { PidNumber } from '@/components/common'
+import { useInputRules } from '@/composables'
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
@@ -163,6 +167,8 @@ export default defineComponent({
     } = useActions<any>([
       'setMhrLocation'
     ])
+
+    const { customRules, maxLength, required } = useInputRules()
 
     const localState = reactive({
       isValidLot: false,
@@ -220,8 +226,29 @@ export default defineComponent({
     watch(() => localState.otherTypeOption, () => {
       localState.pidNumber = ''
     })
+    const dealerManufacturerLotRules = computed(() => {
+      return localState.locationTypeOption as any === HomeLocationTypes.LOT
+        ? customRules(required('Enter a dealer or manufacturer name'), maxLength(60))
+        : []
+    })
+    const homeParkNameRules = computed(() => {
+      return localState.locationTypeOption as any === HomeLocationTypes.HOME_PARK
+        ? customRules(required('Enter a park name'), maxLength(40))
+        : []
+    })
+    const homeParkPadRules = computed(() => {
+      return localState.locationTypeOption as any === HomeLocationTypes.HOME_PARK
+        ? maxLength(6)
+        : []
+    })
     return {
       HomeLocationTypes,
+      customRules,
+      required,
+      maxLength,
+      dealerManufacturerLotRules,
+      homeParkNameRules,
+      homeParkPadRules,
       ...toRefs(localState)
     }
   }

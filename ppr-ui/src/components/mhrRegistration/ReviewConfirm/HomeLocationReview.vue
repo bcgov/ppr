@@ -53,7 +53,7 @@
                 <h3>Pad Number</h3>
               </v-col>
               <v-col cols="9" class="pt-1">
-                <p>{{ getMhrRegistrationLocation.pad || '(Not Entered)' }}</p>
+                <p>{{ getMhrRegistrationLocation.pad || 'N/A' }}</p>
               </v-col>
             </v-row>
           </template>
