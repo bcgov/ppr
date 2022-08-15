@@ -2,13 +2,8 @@
 import Vue from 'vue'
 import Vuetify from 'vuetify'
 import { getVuexStore } from '@/store'
-import CompositionApi from '@vue/composition-api'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
-import {
-  mockedDebtors1,
-  mockedDebtorsAmendment,
-  mockedDebtorsDeleted
-} from './test-data'
+import { mockedDebtors1, mockedDebtorsAmendment, mockedDebtorsDeleted } from './test-data'
 
 // Components
 import { Debtors, EditDebtor } from '@/components/parties/debtor'
@@ -29,10 +24,8 @@ const addBusinessSelector: string = '#btn-add-business'
  *
  * @returns a Wrapper<Debtors> object with the given parameters.
  */
-function createComponent (
-): Wrapper<any> {
+function createComponent (): Wrapper<any> {
   const localVue = createLocalVue()
-  localVue.use(CompositionApi)
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
   return mount(Debtors, {

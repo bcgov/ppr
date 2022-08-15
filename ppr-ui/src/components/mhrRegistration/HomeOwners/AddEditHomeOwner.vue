@@ -173,8 +173,13 @@
             class="mt-2"
             hideAddressHint
           />
+          <hr class="mt-3 mb-10" />
+          <HomeOwnerGroups
+            :groupId="ownersGroupId"
+            :isAddingHomeOwner="isAddingHomeOwner"
+            @setOwnerGroupId="ownerGroupId = $event"
+          />
         </v-form>
-
         <v-row>
           <v-col>
             <div class="form__row form__btns">
@@ -194,6 +199,7 @@
                 :ripple="false"
                 large
                 @click="done()"
+                data-test-id="done-btn"
               >
                 Done
               </v-btn>
@@ -203,6 +209,7 @@
                 color="primary"
                 outlined
                 @click="cancel()"
+                data-test-id="cancel-btn"
               >
                 Cancel
               </v-btn>
@@ -215,7 +222,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, ref, toRefs } from '@vue/composition-api'
+import { computed, defineComponent, reactive, ref, toRefs, watch } from '@vue/composition-api'
 import { useInputRules } from '@/composables/useInputRules'
 import { useHomeOwners } from '@/composables/mhrRegistration'
 
@@ -228,14 +235,20 @@ import { VueMaskDirective } from 'v-mask'
 /* eslint-disable no-unused-vars */
 import { MhrRegistrationHomeOwnersIF } from '@/interfaces/mhr-registration-interfaces'
 import { SimpleHelpToggle } from '@/components/common'
+import { useSearch } from '@/composables/useSearch'
+import { SearchResponseI } from '@/interfaces'
 /* eslint-enable no-unused-vars */
+import HomeOwnerGroups from './HomeOwnerGroups.vue'
+
+let DEFAULT_OWNER_ID = 1
 
 export default defineComponent({
   name: 'AddEditHomeOwner',
   components: {
     AutoComplete,
     BaseAddress,
-    SimpleHelpToggle
+    SimpleHelpToggle,
+    HomeOwnerGroups
   },
   directives: {
     mask: VueMaskDirective
@@ -253,14 +266,22 @@ export default defineComponent({
   setup (props, context) {
     const { required, customRules, maxLength, minLength } = useInputRules()
 
-    const { getSideTitle } = useHomeOwners(
-      props.isHomeOwnerPerson,
-      props.editHomeOwner == null
-    )
+    const {
+      getSideTitle,
+      getGroupForOwner,
+      addOwnerToTheGroup,
+      editHomeOwner,
+      showGroups,
+      setShowGroups
+    } = useHomeOwners(props.isHomeOwnerPerson, props.editHomeOwner == null)
+
     const addressSchema = PartyAddressSchema
     const addHomeOwnerForm = ref(null)
 
+    const { searchBusiness } = useSearch()
+
     const defaultHomeOwner: MhrRegistrationHomeOwnersIF = {
+      id: props.editHomeOwner?.id || (DEFAULT_OWNER_ID++).toString(),
       phoneNumber: props.editHomeOwner?.phoneNumber || '',
       phoneExtension: props.editHomeOwner?.phoneExtension || null,
       suffix: props.editHomeOwner?.suffix || '',
@@ -288,7 +309,14 @@ export default defineComponent({
     }
 
     const localState = reactive({
+      ownersGroupId: computed(() =>
+        showGroups.value
+          ? getGroupForOwner(props.editHomeOwner?.id)?.groupId
+          : null
+      ),
       owner: { ...defaultHomeOwner },
+      ownerGroupId: undefined,
+      showGroups: showGroups,
       isPerson: props.isHomeOwnerPerson,
       isAddingHomeOwner: props.editHomeOwner == null,
       isHomeOwnerFormValid: false,
@@ -310,8 +338,21 @@ export default defineComponent({
     const done = (): void => {
       // @ts-ignore - function exists
       context.refs.addHomeOwnerForm.validate()
-      if (localState.isHomeOwnerFormValid && localState.isAddressFormValid) {
-        context.emit('done', localState.owner)
+
+      if (localState.isHomeOwnerFormValid) {
+        if (props.editHomeOwner) {
+          editHomeOwner(
+            localState.owner as MhrRegistrationHomeOwnersIF,
+            localState.ownerGroupId || '1'
+          )
+        } else {
+          addOwnerToTheGroup(
+            localState.owner as MhrRegistrationHomeOwnersIF,
+            localState.ownerGroupId
+          )
+        }
+        localState.ownerGroupId && setShowGroups(true)
+
         cancel()
       } else {
         localState.triggerAddressErrors = !localState.triggerAddressErrors
@@ -324,6 +365,17 @@ export default defineComponent({
     const cancel = (): void => {
       context.emit('cancel')
     }
+
+    watch(() => localState.owner.organizationName, async (val: string) => {
+      if (val.length >= 3) {
+        const result: SearchResponseI = await searchBusiness(val)
+        if (!result.error) {
+          console.log(result.searchResults)
+        } else {
+          console.log(result.error)
+        }
+      }
+    })
 
     return {
       getSideTitle,

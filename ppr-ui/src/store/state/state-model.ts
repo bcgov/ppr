@@ -109,6 +109,7 @@ export const stateModel: StateModelIF = {
       phoneNumber: null,
       phoneExtension: null
     },
+    ownerGroups: [],
     owners: [],
     attentionReferenceNum: '',
     location: {
@@ -218,6 +219,31 @@ export const stateModel: StateModelIF = {
       defaultTableFilters: true,
       paymentConfirmationDialog: true,
       selectConfirmationDialog: true
+    }
+  },
+  mhrValidationState: {
+    yourHomeValid: {
+      makeModelValid: false,
+      homeSectionsValid: false,
+      homeCertificationValid: false,
+      rebuiltStatusValid: false,
+      otherValid: false
+    },
+    submittingPartyValid: {
+      submitterValid: false,
+      refNumValid: false
+    },
+    homeOwnersValid: {
+      OwnersValid: false
+    },
+    locationValid: {
+      locationTypeValid: false,
+      civicAddressValid: false
+    },
+    reviewConfirmValid: {
+      validateApp: false,
+      authorizationValid: false,
+      staffPaymentValid: false
     }
   }
 }

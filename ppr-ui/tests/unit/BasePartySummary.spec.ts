@@ -2,7 +2,6 @@
 import Vue from 'vue'
 import Vuetify from 'vuetify'
 import { getVuexStore } from '@/store'
-import CompositionApi from '@vue/composition-api'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import {
   mockedSecuredParties1,
@@ -29,10 +28,11 @@ const store = getVuexStore()
  * @returns a Wrapper<Debtors> object with the given parameters.
  */
 function createComponent (
-  setHeaders: Array<BaseHeaderIF>, setItems: Array<PartyIF>, setOptions: PartySummaryOptionsI
+  setHeaders: Array<BaseHeaderIF>,
+  setItems: Array<PartyIF>,
+  setOptions: PartySummaryOptionsI
 ): Wrapper<any> {
   const localVue = createLocalVue()
-  localVue.use(CompositionApi)
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
   return mount(BasePartySummary, {

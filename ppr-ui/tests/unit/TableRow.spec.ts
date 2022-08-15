@@ -114,7 +114,6 @@ describe('TableRow tests', () => {
         setChild: isChild,
         setItem: baseReg
       })
-      expect(wrapper.vm.isChild).toBe(isChild)
       expect(wrapper.vm.item).toEqual(baseReg)
 
       // it sets addRegEffect when given

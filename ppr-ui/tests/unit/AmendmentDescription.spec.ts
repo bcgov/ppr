@@ -2,7 +2,6 @@
 import Vue from 'vue'
 import Vuetify from 'vuetify'
 import { getVuexStore } from '@/store'
-import CompositionApi from '@vue/composition-api'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 
 // Components
@@ -25,12 +24,8 @@ const showError = '.invalid-message'
  *
  * @returns a Wrapper<any> object with the given parameters.
  */
-function createComponent (
-  showInvalid: boolean,
-  summaryView: boolean
-): Wrapper<any> {
+function createComponent (showInvalid: boolean, summaryView: boolean): Wrapper<any> {
   const localVue = createLocalVue()
-  localVue.use(CompositionApi)
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
   return mount(AmendmentDescription, {

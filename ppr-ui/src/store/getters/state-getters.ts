@@ -16,8 +16,9 @@ import {
   LengthTrustIF,
   ManufacturedHomeSearchResponseIF,
   ManufacturedHomeSearchResultIF,
-  MhrRegistrationDescriptionIF, MhrRegistrationHomeLocationIF,
-  MhrRegistrationHomeOwnersIF,
+  MhrRegistrationDescriptionIF,
+  MhrRegistrationHomeLocationIF,
+  MhrRegistrationHomeOwnersIF, MhrValidationStateIF,
   RegistrationSortIF,
   RegistrationSummaryIF,
   RegistrationTypeIF,
@@ -29,10 +30,19 @@ import {
   StateModelIF,
   UserProductSubscriptionIF,
   UserSettingsIF,
-  VehicleCollateralIF
+  VehicleCollateralIF,
+  MhrRegistrationHomeOwnerGroupIF
 } from '@/interfaces'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
-import { YourHome, HomeLocation, HomeOwners, SubmittingParty, MhrReviewConfirm } from '@/views'
+import { HomeLocation, HomeOwners, MhrReviewConfirm, SubmittingParty, YourHome } from '@/views'
+import { useMhrValidations } from '@/composables'
+import { toRefs } from '@vue/composition-api'
+import { MhrSectVal } from '@/composables/mhrRegistration/enums'
+
+/** Convenient when there is a need to access several properties. */
+export const getStateModel = (state: StateIF): StateModelIF => {
+  return state.stateModel
+}
 
 /** The current account id. */
 export const getAccountId = (state: StateIF): number => {
@@ -201,11 +211,6 @@ export const getSearchHistory = (state: StateIF): Array<SearchResponseIF> => {
 
 export const getSearchHistoryLength = (state: StateIF): Number => {
   return state.stateModel.search.searchHistoryLength
-}
-
-/** Convenient when there is a need to access several properties. */
-export const getStateModel = (state: StateIF): StateModelIF => {
-  return state.stateModel
 }
 
 /** The current user's email. */
@@ -390,7 +395,8 @@ export const getMhrSteps = (state: any, getters: any): Array<any> => {
     text: 'Describe <br />your Home',
     to: RouteNames.YOUR_HOME,
     disabled: getters.isBusySaving,
-    valid: false,
+    valid: useMhrValidations(toRefs(getMhrRegistrationValidationModel(state)))
+      .getStepValidation(MhrSectVal.YOUR_HOME_VALID),
     component: YourHome
   },
   {
@@ -400,7 +406,8 @@ export const getMhrSteps = (state: any, getters: any): Array<any> => {
     text: 'Submitting <br />Party',
     to: RouteNames.SUBMITTING_PARTY,
     disabled: getters.isBusySaving,
-    valid: false,
+    valid: useMhrValidations(toRefs(getMhrRegistrationValidationModel(state)))
+      .getStepValidation(MhrSectVal.SUBMITTING_PARTY_VALID),
     component: SubmittingParty
   },
   {
@@ -410,7 +417,8 @@ export const getMhrSteps = (state: any, getters: any): Array<any> => {
     text: 'List Home <br />Owners',
     to: RouteNames.HOME_OWNERS,
     disabled: getters.isBusySaving,
-    valid: false,
+    valid: useMhrValidations(toRefs(getMhrRegistrationValidationModel(state)))
+      .getStepValidation(MhrSectVal.HOME_OWNERS_VALID),
     component: HomeOwners
   },
   {
@@ -420,7 +428,8 @@ export const getMhrSteps = (state: any, getters: any): Array<any> => {
     text: 'Location <br />of Home',
     to: RouteNames.HOME_LOCATION,
     disabled: getters.isBusySaving,
-    valid: false,
+    valid: useMhrValidations(toRefs(getMhrRegistrationValidationModel(state)))
+      .getStepValidation(MhrSectVal.LOCATION_VALID),
     component: HomeLocation
   },
   {
@@ -430,7 +439,8 @@ export const getMhrSteps = (state: any, getters: any): Array<any> => {
     text: 'Review <br />and Confirm',
     to: RouteNames.MHR_REVIEW_CONFIRM,
     disabled: getters.isBusySaving,
-    valid: false,
+    valid: useMhrValidations(toRefs(getMhrRegistrationValidationModel(state)))
+      .getStepValidation(MhrSectVal.REVIEW_CONFIRM_VALID),
     component: MhrReviewConfirm
   }]
 }
@@ -644,9 +654,12 @@ export const getMhrRegistrationHomeDescription = (state: StateIF): MhrRegistrati
 export const getMhrRegistrationSubmittingParty = (state: StateIF): any => {
   return state.stateModel.mhrRegistration.submittingParty
 }
-
 export const getMhrRegistrationHomeOwners = (state: StateIF): MhrRegistrationHomeOwnersIF[] => {
-  return state.stateModel.mhrRegistration.owners
+  const owners = []
+  state.stateModel.mhrRegistration.ownerGroups.forEach(group => {
+    group.owners.forEach(owner => owners.push({ ...owner, groupId: group.groupId }))
+  })
+  return owners
 }
 
 export const getMhrAttentionReferenceNum = (state: StateIF): any => {
@@ -655,4 +668,12 @@ export const getMhrAttentionReferenceNum = (state: StateIF): any => {
 
 export const getMhrRegistrationLocation = (state: StateIF): MhrRegistrationHomeLocationIF => {
   return state.stateModel.mhrRegistration.location
+}
+
+export const getMhrRegistrationHomeOwnerGroups = (state: StateIF): MhrRegistrationHomeOwnerGroupIF[] => {
+  return state.stateModel.mhrRegistration.ownerGroups
+}
+
+export const getMhrRegistrationValidationModel = (state: StateIF): MhrValidationStateIF => {
+  return state.stateModel.mhrValidationState
 }

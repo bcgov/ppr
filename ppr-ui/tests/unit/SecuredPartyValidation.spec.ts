@@ -2,7 +2,6 @@
 import Vue from 'vue'
 import Vuetify from 'vuetify'
 import { getVuexStore } from '@/store'
-import CompositionApi from '@vue/composition-api'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import flushPromises from 'flush-promises'
 
@@ -24,12 +23,8 @@ const doneButtonSelector: string = '#done-btn-party'
  *
  * @returns a Wrapper<EditParty> object with the given parameters.
  */
-function createComponent (
-  activeIndex: Number,
-  invalidSection: boolean
-): Wrapper<any> {
+function createComponent (activeIndex: Number, invalidSection: boolean): Wrapper<any> {
   const localVue = createLocalVue()
-  localVue.use(CompositionApi)
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
   return mount(EditParty, {

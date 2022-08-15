@@ -66,20 +66,61 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable no-unused-vars */
-import { Component, Vue } from 'vue-property-decorator'
+import { defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
 import { HomeLocationReview, SubmittingPartyReview, YourHomeReview } from '@/components/mhrRegistration/ReviewConfirm'
-/* eslint-enable no-unused-vars */
+import { useMhrValidations } from '@/composables'
+import { RouteNames } from '@/enums'
+import { useGetters } from 'vuex-composition-helpers'
 
-@Component({
+export default defineComponent({
+  name: 'MhrReviewConfirm',
   components: {
     YourHomeReview,
     SubmittingPartyReview,
     HomeLocationReview
+  },
+  props: {},
+  setup (props, context) {
+    const {
+      getMhrRegistrationValidationModel
+    } = useGetters<any>([
+      'getMhrRegistrationValidationModel'
+    ])
+
+    const {
+      MhrCompVal,
+      MhrSectVal,
+      setValidation,
+      scrollToInvalid
+    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
+
+    const localState = reactive({})
+
+    watch(() => context.root.$route.name, (route: string) => {
+      switch (route) {
+        case RouteNames.YOUR_HOME:
+          scrollToInvalid(MhrSectVal.YOUR_HOME_VALID, 'mhr-describe-your-home')
+          break
+        case RouteNames.SUBMITTING_PARTY:
+          scrollToInvalid(MhrSectVal.SUBMITTING_PARTY_VALID, 'mhr-submitting-party')
+          break
+        case RouteNames.HOME_OWNERS:
+          scrollToInvalid(MhrSectVal.HOME_OWNERS_VALID, 'mhr-home-owners-list')
+          break
+        case RouteNames.HOME_LOCATION:
+          scrollToInvalid(MhrSectVal.LOCATION_VALID, 'mhr-home-location')
+          break
+        case RouteNames.MHR_REVIEW_CONFIRM:
+          setValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_APP, true)
+          break
+      }
+    })
+
+    return {
+      ...toRefs(localState)
+    }
   }
 })
-export default class MhrReviewConfirm extends Vue {
-}
 </script>
 
 <style lang="scss" scoped>

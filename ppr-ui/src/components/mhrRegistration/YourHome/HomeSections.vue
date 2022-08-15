@@ -18,7 +18,7 @@
 
     <v-row no-gutters class="mt-6">
       <p v-if="!isReviewMode" id="section-count">Number of Sections: {{getMhrHomeSections.length}}</p>
-      <span v-if="false && hasMinimumHomeSections" class="pl-4 error-text">
+      <span v-if="validate && !hasMinimumHomeSections" class="pl-4 error-text">
           Your registration must contain at least one section
         </span>
     </v-row>
@@ -35,7 +35,7 @@
 
     <!-- Home Sections Table -->
     <HomeSectionsTable
-      :class="{ 'border-error-left': false }"
+      :class="{ 'border-error-left': validate }"
       :isAdding="showAddEditHomeSections"
       :homeSections="getMhrHomeSections"
       :isReviewMode="isReviewMode"
@@ -48,15 +48,15 @@
 
 <script lang="ts">
 /* eslint-disable no-unused-vars */
-import { computed, defineComponent, reactive, toRefs } from '@vue/composition-api'
+import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
 import { useActions, useGetters } from 'vuex-composition-helpers'
-import {
-  IndividualNameIF,
-  HomeSectionIF, BaseHeaderIF
-} from '@/interfaces'
+import { HomeSectionIF } from '@/interfaces'
 import AddEditHomeSections from '@/components/mhrRegistration/YourHome/AddEditHomeSections.vue'
 import HomeSectionsTable from '@/components/tables/mhr/HomeSectionsTable.vue'
 import { setMhrHomeDescription } from '@/store/actions'
+import { useMhrValidations } from '@/composables'
+/* eslint-enable no-unused-vars */
+
 export default defineComponent({
   name: 'HomeSections',
   components: {
@@ -67,6 +67,10 @@ export default defineComponent({
     isReviewMode: {
       type: Boolean,
       default: false
+    },
+    validate: {
+      type: Boolean,
+      default: false
     }
   },
   setup () {
@@ -75,11 +79,21 @@ export default defineComponent({
     } = useActions<any>([
       'setMhrHomeDescription'
     ])
+
     const {
-      getMhrHomeSections
+      getMhrHomeSections,
+      getMhrRegistrationValidationModel
     } = useGetters<any>([
-      'getMhrHomeSections'
+      'getMhrHomeSections',
+      'getMhrRegistrationValidationModel'
     ])
+
+    const {
+      MhrCompVal,
+      MhrSectVal,
+      setValidation
+    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
+
     const localState = reactive({
       isEditingHomeSection: false,
       isNewHomeSection: true,
@@ -92,18 +106,21 @@ export default defineComponent({
         return getMhrHomeSections.value.length >= 1
       })
     })
+
     const openAddNewHomeSectionForm = (): void => {
       if (!localState.isMaxHomeSections) {
         localState.showAddEditHomeSections = true
         localState.displayHomeSectionsError = false
       } else localState.displayHomeSectionsError = true
     }
+
     const addHomeSection = (homeSection: HomeSectionIF): void => {
       const homeSections = [...getMhrHomeSections.value]
       // Add new home section to array
       homeSections.push(homeSection)
       setMhrHomeDescription({ key: 'sections', value: homeSections })
     }
+
     const editHomeSection = (homeSection: HomeSectionIF): void => {
       const homeSections = [...getMhrHomeSections.value]
       // Create edited homeSection without id
@@ -113,12 +130,28 @@ export default defineComponent({
 
       setMhrHomeDescription({ key: 'sections', value: homeSections })
     }
+
     const removeHomeSection = (homeSection: HomeSectionIF): void => {
       const homeSections = [...getMhrHomeSections.value]
       // Remove home section from array
       homeSections.splice(homeSections.indexOf(homeSection), 1)
       setMhrHomeDescription({ key: 'sections', value: homeSections })
     }
+
+    watch(() => localState.hasMinimumHomeSections, (val: boolean) => {
+      setValidation(MhrSectVal.YOUR_HOME_VALID, MhrCompVal.HOME_SECTION_VALID, val)
+    })
+
+    watch(() => localState.showAddEditHomeSections, (val: boolean) => {
+      setValidation(MhrSectVal.YOUR_HOME_VALID, MhrCompVal.HOME_SECTION_VALID,
+        !localState.showAddEditHomeSections && localState.hasMinimumHomeSections)
+    })
+
+    watch(() => localState.isEditingHomeSection, (val: boolean) => {
+      setValidation(MhrSectVal.YOUR_HOME_VALID, MhrCompVal.HOME_SECTION_VALID,
+        !localState.isEditingHomeSection && localState.hasMinimumHomeSections)
+    })
+
     return {
       addHomeSection,
       editHomeSection,

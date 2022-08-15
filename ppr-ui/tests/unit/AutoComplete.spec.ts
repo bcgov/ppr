@@ -2,7 +2,6 @@
 import Vue from 'vue'
 import Vuetify from 'vuetify'
 import { getVuexStore } from '@/store'
-import CompositionApi from '@vue/composition-api'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import sinon from 'sinon'
 import { axios as vonAxios } from '@/utils/axios-von'
@@ -35,12 +34,8 @@ const closeButtonSelector: string = '.auto-complete-close-btn'
  *
  * @returns a Wrapper<AutoComplete> object with the given parameters.
  */
-function createComponent (
-  setAutoCompleteIsActive: boolean,
-  searchValue: string
-): Wrapper<any> {
+function createComponent (setAutoCompleteIsActive: boolean, searchValue: string): Wrapper<any> {
   const localVue = createLocalVue()
-  localVue.use(CompositionApi)
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
   return mount(AutoComplete, {
@@ -63,9 +58,13 @@ describe('AutoComplete component', () => {
     sandbox = sinon.createSandbox()
     // GET autocomplete results
     const get = sandbox.stub(vonAxios, 'get')
-    get.returns(new Promise(resolve => resolve({
-      data: vonResp
-    })))
+    get.returns(
+      new Promise(resolve =>
+        resolve({
+          data: vonResp
+        })
+      )
+    )
     wrapper = createComponent(true, '')
   })
   afterEach(() => {

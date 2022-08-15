@@ -22,6 +22,8 @@ export * from './authRoles'
 export * from './homeCertificationOptions'
 export * from './homeLocationTypes'
 export * from './submittingPartyTypes'
+export * from './business-statuses'
+export * from './business-types'
 
 // external enums
 export { CorpTypeCd } from '@bcrs-shared-components/corp-type-module'

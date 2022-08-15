@@ -3,12 +3,24 @@
     <v-data-table
       id="mh-home-owners-table"
       class="home-owners-table"
-      disable-sort
       :headers="homeOwnersTableHeaders"
       hide-default-footer
       :items="homeOwners"
-      item-key="id"
+      item-key="groupId"
+      :group-by="showGroups ? 'groupId' : null"
+      disable-sort
+      disable-pagination
+      no-data-text="No owners added yet"
     >
+      <template
+        v-slot:group.header="{ group, items }"
+        class="group-header-slot"
+      >
+        <td :colspan="4" class="py-1">
+          <TableGroupHeader :groupId="group" :owners="items" />
+        </td>
+      </template>
+
       <template v-slot:item="row">
         <tr v-if="isCurrentlyEditing(homeOwners.indexOf(row.item))">
           <td class="pa-0" :colspan="homeOwnersTableHeaders.length">
@@ -59,8 +71,9 @@
               color="primary"
               class="pr-0"
               :ripple="false"
-              :disabled="isAddingMode || isEditingMode"
+              :disabled="isAddingMode || isEditingMode || isGlobalEditingMode"
               @click="openForEditing(homeOwners.indexOf(row.item))"
+              data-test-id="table-edit-btn"
             >
               <v-icon small>mdi-pencil</v-icon>
               <span>Edit</span>
@@ -74,7 +87,7 @@
                   v-on="on"
                   color="primary"
                   class="px-0"
-                  :disabled="isAddingMode"
+                  :disabled="isAddingMode || isGlobalEditingMode"
                 >
                   <v-icon>mdi-menu-down</v-icon>
                 </v-btn>
@@ -112,9 +125,13 @@ import {
 } from '@vue/composition-api'
 import { homeOwnersTableHeaders } from '@/resources/tableHeaders'
 import { BaseAddress } from '@/composables/address'
+import { useHomeOwners } from '@/composables/mhrRegistration'
 import { PartyAddressSchema } from '@/schemas'
 import { toDisplayPhone } from '@/utils'
 import { AddEditHomeOwner } from '@/components/mhrRegistration/HomeOwners'
+import TableGroupHeader from '@/components/mhrRegistration/HomeOwners/TableGroupHeader.vue'
+
+import { useGetters } from 'vuex-composition-helpers'
 
 export default defineComponent({
   name: 'HomeOwnersTable',
@@ -124,10 +141,23 @@ export default defineComponent({
   },
   components: {
     BaseAddress,
-    AddEditHomeOwner
+    AddEditHomeOwner,
+    TableGroupHeader
   },
   setup (props, context) {
     const addressSchema = PartyAddressSchema
+
+    const { getMhrRegistrationHomeOwnerGroups } = useGetters<any>([
+      'getMhrRegistrationHomeOwnerGroups'
+    ])
+
+    const {
+      showGroups,
+      removeOwner,
+      deleteGroup,
+      isGlobalEditingMode,
+      setGlobalEditingMode
+    } = useHomeOwners()
 
     const localState = reactive({
       currentlyEditingHomeOwnerId: -1,
@@ -146,7 +176,7 @@ export default defineComponent({
 
     const remove = (item): void => {
       localState.currentlyEditingHomeOwnerId = -1
-      context.emit('remove', item)
+      removeOwner(item)
     }
 
     const openForEditing = (index: number) => {
@@ -161,7 +191,7 @@ export default defineComponent({
     watch(
       () => localState.currentlyEditingHomeOwnerId,
       () => {
-        context.emit('isEditing', localState.isEditingMode)
+        setGlobalEditingMode(localState.isEditingMode)
       }
     )
 
@@ -171,8 +201,12 @@ export default defineComponent({
       homeOwnersTableHeaders,
       openForEditing,
       isCurrentlyEditing,
+      showGroups,
       edit,
       remove,
+      deleteGroup,
+      isGlobalEditingMode,
+      getMhrRegistrationHomeOwnerGroups,
       ...toRefs(localState)
     }
   }
@@ -183,6 +217,11 @@ export default defineComponent({
 @import '@/assets/styles/theme.scss';
 
 .home-owners-table ::v-deep {
+  tr.v-row-group__header,
+  tbody tr.v-row-group__header:hover {
+    background-color: #e2e8ee;
+  }
+
   .owner-name,
   i,
   strong {
@@ -200,6 +239,10 @@ export default defineComponent({
     td:last-child {
       padding-right: 30px;
       padding-top: 8px;
+    }
+    tbody > tr.v-row-group__header,
+    tbody > tr.v-row-group__header:hover {
+      background: #e2e8ee !important;
     }
   }
 
@@ -230,5 +273,8 @@ export default defineComponent({
     line-height: 22px;
     margin-left: 34px;
   }
+}
+.v-menu__content {
+  cursor: pointer;
 }
 </style>
