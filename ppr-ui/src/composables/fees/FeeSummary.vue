@@ -196,7 +196,8 @@ export default defineComponent({
         return props.setRegistrationLength
       }),
       isValid: computed((): boolean => {
-        return getLengthTrust.value.valid || (localState.feeType === FeeSummaryTypes.MHSEARCH)
+        return getLengthTrust.value.valid ||
+          [FeeSummaryTypes.MHSEARCH, FeeSummaryTypes.NEW_MHR].includes(localState.feeType)
       }),
       feeLabel: computed((): string => {
         return mapFeeTypeToDisplayName(localState.feeType)

@@ -1,14 +1,12 @@
 <template>
   <div id="mhr-review-confirm">
     <!-- Review and Confirm -->
-    <section class="mt-10">
-      <article>
-        <h2>Review and Confirm</h2>
-        <p class="mt-4">
-          Review the information in your registration and complete the additional information below. If you need to
-          change anything, return to the previous step to make the necessary change.
-        </p>
-      </article>
+    <div class="mt-10">
+      <h2>Review and Confirm</h2>
+      <p class="mt-4">
+        Review the information in your registration and complete the additional information below. If you need to
+        change anything, return to the previous step to make the necessary change.
+      </p>
 
       <!-- Your Home Summary -->
       <YourHomeReview />
@@ -18,31 +16,16 @@
 
       <!-- Home Location Review -->
       <HomeLocationReview />
-    </section>
+    </div>
 
-    <!-- Transactional Folio Number -->
-    <section id="folio-number-section" class="mt-10" v-if="false">
+    <!-- Authorization -->
+    <section id="certify-section" class="mt-10">
       <article>
-        <h2>Folio or Reference Number</h2>
+        <h2>Authorization</h2>
         <p class="mt-4">
-          Enter the folio or reference number you want to use for this filing for your own tracking
-          purposes. The Business Folio or Reference Number is displayed below (if available).
-          Entering a different value below will not change the Business Folio or Reference Number.
-          Only the number below will appear on the transaction report and receipt for this filing.
-        </p>
-      </article>
-
-      <v-card flat class="mt-6">
-       <!-- Folio Number Placeholder -->
-      </v-card>
-    </section>
-
-    <!-- Certify -->
-    <section id="certify-section" class="mt-10" v-if="false">
-      <article>
-        <h2>Certify</h2>
-        <p class="mt-4">
-          Confirm the legal name of the person authorized to complete and submit this dissolution.
+          The following account information will be recorded by BC Registries upon registration and payment. This
+          information is used to confirm you have the authority to submit this registration and will not appear on the
+          verification statement.
         </p>
       </article>
 
@@ -52,7 +35,7 @@
     </section>
 
     <!-- Staff Payment -->
-    <section id="staff-payment-section" class="mt-10" v-if="false">
+    <section id="staff-payment-section" class="mt-10" v-if="true">
       <article>
         <h2>Staff Payment</h2>
         <p class="mt-4"></p>
@@ -91,7 +74,8 @@ export default defineComponent({
       MhrCompVal,
       MhrSectVal,
       setValidation,
-      scrollToInvalid
+      scrollToInvalid,
+      getStepValidation
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
     const localState = reactive({})
@@ -111,7 +95,14 @@ export default defineComponent({
           scrollToInvalid(MhrSectVal.LOCATION_VALID, 'mhr-home-location')
           break
         case RouteNames.MHR_REVIEW_CONFIRM:
-          setValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_APP, true)
+          scrollToInvalid(MhrSectVal.REVIEW_CONFIRM_VALID, 'mhr-review-confirm',
+            [
+              getStepValidation(MhrSectVal.YOUR_HOME_VALID),
+              getStepValidation(MhrSectVal.SUBMITTING_PARTY_VALID),
+              getStepValidation(MhrSectVal.HOME_OWNERS_VALID),
+              getStepValidation(MhrSectVal.LOCATION_VALID)
+            ])
+          setValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_STEPS, true)
           break
       }
     })

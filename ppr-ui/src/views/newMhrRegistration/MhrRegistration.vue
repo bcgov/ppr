@@ -25,6 +25,7 @@
                   :setRightOffset="true"
                   :setShowFeeSummary="true"
                   :setFeeType="feeType"
+                  :setRegistrationLength="registrationLength"
                   :setRegistrationType="registrationTypeUI"
                 />
               </affix>
@@ -39,7 +40,8 @@
           :currentStatementType="statementType"
           :currentStepName="$route.name"
           :router="$router"
-          @error="emitError($event)"
+          @registration-incomplete="registrationIncomplete()"
+          @error="emitError()"
         />
       </v-col>
     </v-row>
@@ -48,106 +50,222 @@
 
 <script lang="ts">
 /* eslint-disable no-unused-vars */
-import { Component, Emit, Prop, Vue, Watch } from 'vue-property-decorator'
-import { Action, Getter } from 'vuex-class'
+import { computed, defineComponent, onMounted, reactive, toRefs } from '@vue/composition-api'
+import { useGetters } from 'vuex-composition-helpers'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
-import { APIRegistrationTypes, RegistrationFlowType, RouteNames, StatementTypes } from '@/enums'
-import { ActionBindingIF, ErrorIF, MhrValidationStateIF, RegistrationTypeIF, StepIF } from '@/interfaces'
+import { RegistrationFlowType, RouteNames, StatementTypes } from '@/enums'
+import { RegistrationTypeIF } from '@/interfaces'
 import { getFeatureFlag } from '@/utils'
 import { Stepper, StickyContainer } from '@/components/common'
 import ButtonFooter from '@/components/common/ButtonFooter.vue'
 import { useMhrValidations } from '@/composables'
-import { MhrCompVal, MhrSectVal } from '@/composables/mhrRegistration/enums'
-import { toRefs } from '@vue/composition-api'
+import { FeeSummaryTypes } from '@/composables/fees/enums'
+import { RegistrationLengthI } from '@/composables/fees/interfaces'
 /* eslint-enable no-unused-vars */
 
-@Component({
+export default defineComponent({
+  name: 'MhrRegistration',
   components: {
     ButtonFooter,
     Stepper,
     StickyContainer
+  },
+  props: {
+    appReady: {
+      type: Boolean,
+      default: false
+    },
+    isJestRunning: {
+      type: Boolean,
+      default: false
+    }
+  },
+  setup (props, context) {
+    const {
+      getRegistrationFlowType,
+      getRegistrationType,
+      getSteps,
+      getMhrRegistrationValidationModel
+    } = useGetters<any>([
+      'getRegistrationFlowType',
+      'getRegistrationType',
+      'getSteps',
+      'getMhrRegistrationValidationModel'
+    ])
+
+    const {
+      MhrCompVal,
+      MhrSectVal,
+      setValidation,
+      scrollToInvalid
+    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
+
+    const localState = reactive({
+      dataLoaded: false,
+      feeType: FeeSummaryTypes.NEW_MHR,
+      statementType: StatementTypes.FINANCING_STATEMENT,
+      isAuthenticated: computed((): boolean => {
+        return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
+      }),
+      registrationLength: computed((): RegistrationLengthI => {
+        return { lifeInfinite: true, lifeYears: 0 }
+      }),
+      registrationTypeUI: computed((): RegistrationTypeIF => {
+        return getRegistrationType.value?.registrationTypeUI || ''
+      }),
+      validateMhrRegistration: computed(() => {
+        return useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
+          .getValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_APP)
+      })
+    })
+
+    /** Helper to check is the current route matches */
+    const isRouteName = (routeName: RouteNames): boolean => {
+      return (context.root.$route.name === routeName)
+    }
+
+    const registrationIncomplete = (): void => {
+      scrollToInvalid(MhrSectVal.REVIEW_CONFIRM_VALID, 'mhr-review-confirm')
+      setValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_APP, true)
+    }
+
+    const emitError = (): void => {
+      context.emit('error', true)
+    }
+
+    const goToDash = (): void => {
+      context.root.$router.push({
+        name: RouteNames.DASHBOARD
+      })
+    }
+
+    onMounted((): void => {
+      // do not proceed if app is not ready
+      // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
+      if (!props.appReady || !localState.isAuthenticated ||
+        (!props.isJestRunning && !getFeatureFlag('mhr-registration-enabled'))) {
+        goToDash()
+        return
+      }
+      // redirect if store doesn't contain all needed data (happens on page reload, etc.)
+      if (!getRegistrationType.value || getRegistrationFlowType.value !== RegistrationFlowType.NEW) {
+        goToDash()
+        return
+      }
+
+      // page is ready to view
+      context.emit('emitHaveData', true)
+      localState.dataLoaded = true
+    })
+
+    return {
+      getSteps,
+      emitError,
+      isRouteName,
+      registrationIncomplete,
+      ...toRefs(localState)
+    }
   }
 })
-export default class MhrRegistration extends Vue {
-  @Getter getRegistrationFlowType: RegistrationFlowType
-  @Getter getRegistrationType: RegistrationTypeIF
-  @Getter getRegistrationOther: string
-  @Getter getSteps!: Array<StepIF>
-  @Getter getMhrRegistrationValidationModel!: MhrValidationStateIF
 
-  @Action setRegistrationFlowType!: ActionBindingIF
-  @Action setRegistrationType!: ActionBindingIF
-
-  /** Whether App is ready. */
-  @Prop({ default: false })
-  private appReady: boolean
-
-  @Prop({ default: false })
-  private isJestRunning: boolean
-
-  private dataLoaded = false
-  private feeType = null // To be determined by fee codes
-  private statementType = StatementTypes.FINANCING_STATEMENT
-
-  private get isAuthenticated (): boolean {
-    return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
-  }
-
-  private get registrationTypeUI (): string {
-    if (this.getRegistrationType?.registrationTypeAPI === APIRegistrationTypes.OTHER) {
-      return this.getRegistrationOther || ''
-    }
-    return this.getRegistrationType?.registrationTypeUI || ''
-  }
-
-  private get validateMhrRegistration (): boolean {
-    return useMhrValidations(toRefs(this.getMhrRegistrationValidationModel))
-      .getValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_APP)
-  }
-
-  /** Helper to check is the current route matches */
-  private isRouteName (routeName: RouteNames): boolean {
-    return (this.$route.name === routeName)
-  }
-
-  mounted () {
-    this.onAppReady(this.appReady)
-  }
-
-  /** Emits error to app.vue for handling */
-  @Emit('error')
-  private emitError (error: ErrorIF): void {
-    console.error(error)
-  }
-
-  /** Emits Have Data event. */
-  @Emit('haveData')
-  private emitHaveData (haveData: Boolean = true): void { }
-
-  /** Called when App is ready and this component can load its data. */
-  @Watch('appReady')
-  private async onAppReady (val: boolean): Promise<void> {
-    // do not proceed if app is not ready
-    if (!val) return
-    // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
-    if (!this.isAuthenticated || (!this.isJestRunning && !getFeatureFlag('mhr-registration-enabled'))) {
-      this.$router.push({
-        name: RouteNames.DASHBOARD
-      })
-      return
-    }
-    // redirect if store doesn't contain all needed data (happens on page reload, etc.)
-    if (!this.getRegistrationType || this.getRegistrationFlowType !== RegistrationFlowType.NEW) {
-      this.$router.push({
-        name: RouteNames.DASHBOARD
-      })
-      return
-    }
-    // page is ready to view
-    this.emitHaveData(true)
-    this.dataLoaded = true
-  }
-}
+// @Component({
+//   components: {
+//     ButtonFooter,
+//     Stepper,
+//     StickyContainer
+//   }
+// })
+// export default class MhrRegistration extends Vue {
+//   @Getter getRegistrationFlowType: RegistrationFlowType
+//   @Getter getRegistrationType: RegistrationTypeIF
+//   @Getter getRegistrationOther: string
+//   @Getter getSteps!: Array<StepIF>
+//   @Getter getMhrRegistrationValidationModel!: MhrValidationStateIF
+//
+//   @Action setRegistrationFlowType!: ActionBindingIF
+//   @Action setRegistrationType!: ActionBindingIF
+//
+//   /** Whether App is ready. */
+//   @Prop({ default: false })
+//   private appReady: boolean
+//
+//   @Prop({ default: false })
+//   private isJestRunning: boolean
+//
+//   private dataLoaded = false
+//   private feeType = FeeSummaryTypes.NEW_MHR
+//   private statementType = StatementTypes.FINANCING_STATEMENT
+//
+//   private get isAuthenticated (): boolean {
+//     return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
+//   }
+//
+//   private get registrationTypeUI (): string {
+//     if (this.getRegistrationType?.registrationTypeAPI === APIRegistrationTypes.OTHER) {
+//       return this.getRegistrationOther || ''
+//     }
+//     return this.getRegistrationType?.registrationTypeUI || ''
+//   }
+//
+//   private get registrationLength (): RegistrationLengthI {
+//     return {
+//       lifeInfinite: true,
+//       lifeYears: 0
+//     }
+//   }
+//
+//   private get validateMhrRegistration (): boolean {
+//     return useMhrValidations(toRefs(this.getMhrRegistrationValidationModel))
+//       .getValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_APP)
+//   }
+//
+//   /** Helper to check is the current route matches */
+//   private isRouteName (routeName: RouteNames): boolean {
+//     return (this.$route.name === routeName)
+//   }
+//
+//   private registrationIncomplete (): void {
+//     console.log('Prompt Step Validations and Review and Confirm Scroll')
+//   }
+//
+//   mounted () {
+//     this.onAppReady(this.appReady)
+//   }
+//
+//   /** Emits error to app.vue for handling */
+//   @Emit('error')
+//   private emitError (error: ErrorIF): void {
+//     console.error(error)
+//   }
+//
+//   /** Emits Have Data event. */
+//   @Emit('haveData')
+//   private emitHaveData (haveData: Boolean = true): void { }
+//
+//   /** Called when App is ready and this component can load its data. */
+//   @Watch('appReady')
+//   private async onAppReady (val: boolean): Promise<void> {
+//     // do not proceed if app is not ready
+//     if (!val) return
+//     // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
+//     if (!this.isAuthenticated || (!this.isJestRunning && !getFeatureFlag('mhr-registration-enabled'))) {
+//       this.$router.push({
+//         name: RouteNames.DASHBOARD
+//       })
+//       return
+//     }
+//     // redirect if store doesn't contain all needed data (happens on page reload, etc.)
+//     if (!this.getRegistrationType || this.getRegistrationFlowType !== RegistrationFlowType.NEW) {
+//       this.$router.push({
+//         name: RouteNames.DASHBOARD
+//       })
+//       return
+//     }
+//     // page is ready to view
+//     this.emitHaveData(true)
+//     this.dataLoaded = true
+//   }
+// }
 </script>
 
 <style lang="scss" module>
