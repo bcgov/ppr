@@ -25,6 +25,8 @@ import {
   ManufacturedHomeSearchResponseIF,
   ManufacturedHomeSearchResultIF,
   UserProductSubscriptionIF,
+  HomeSectionIF,
+  MhrRegistrationHomeOwnersIF,
   MhrRegistrationHomeOwnerGroupIF
 } from '@/interfaces'
 import { ActionIF } from '@/interfaces/store-interfaces/action-interface'
@@ -299,6 +301,10 @@ export const setMhrHomeBaseInformation: ActionIF = ({ commit }, { key, value }):
 
 export const setMhrSubmittingParty: ActionIF = ({ commit }, { key, value }): void => {
   commit('mutateMhrSubmittingParty', { key, value })
+}
+
+export const setMhrRegistrationHomeOwners: ActionIF = ({ commit }, owners: MhrRegistrationHomeOwnersIF[]): void => {
+  commit('mutateMhrHomeOwners', owners)
 }
 
 export const setMhrAttentionReferenceNum: ActionIF = ({ commit }, value): void => {

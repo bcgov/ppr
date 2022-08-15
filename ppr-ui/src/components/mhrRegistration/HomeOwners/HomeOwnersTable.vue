@@ -28,6 +28,7 @@
               <AddEditHomeOwner
                 :editHomeOwner="row.item"
                 :isHomeOwnerPerson="!row.item.organizationName"
+                @done="edit($event)"
                 @cancel="currentlyEditingHomeOwnerId = -1"
                 @remove="remove(row.item)"
               />
@@ -39,17 +40,17 @@
           <td class="owner-name">
             <div v-if="row.item.individualName" class="owner-icon-name">
               <v-icon class="mr-2">mdi-account</v-icon>
-              <strong>
+              <div>
                 {{ row.item.individualName.first }}
                 {{ row.item.individualName.middle }}
                 {{ row.item.individualName.last }}
-              </strong>
+              </div>
             </div>
             <div v-else class="owner-icon-name">
               <v-icon class="mr-2">mdi-domain</v-icon>
-              <strong>
+              <div>
                 {{ row.item.organizationName }}
-              </strong>
+              </div>
             </div>
             <div v-if="row.item.suffix" class="suffix">
               {{ row.item.suffix }}
@@ -143,7 +144,7 @@ export default defineComponent({
     AddEditHomeOwner,
     TableGroupHeader
   },
-  setup (props) {
+  setup (props, context) {
     const addressSchema = PartyAddressSchema
 
     const { getMhrRegistrationHomeOwnerGroups } = useGetters<any>([
@@ -165,6 +166,13 @@ export default defineComponent({
       ),
       isAddingMode: computed((): boolean => props.isAdding)
     })
+
+    const edit = (item): void => {
+      context.emit('edit', {
+        ...item,
+        id: localState.currentlyEditingHomeOwnerId
+      })
+    }
 
     const remove = (item): void => {
       localState.currentlyEditingHomeOwnerId = -1
@@ -194,6 +202,7 @@ export default defineComponent({
       openForEditing,
       isCurrentlyEditing,
       showGroups,
+      edit,
       remove,
       deleteGroup,
       isGlobalEditingMode,
@@ -217,11 +226,6 @@ export default defineComponent({
   i,
   strong {
     color: $gray9;
-  }
-
-  .v-btn.v-btn--disabled {
-    color: $app-blue !important;
-    opacity: 0.4;
   }
 
   table {
@@ -264,7 +268,7 @@ export default defineComponent({
   }
 
   .suffix {
-    color: $gray7;
+    color: #495057;
     font-size: 14px;
     line-height: 22px;
     margin-left: 34px;
