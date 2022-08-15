@@ -241,13 +241,11 @@ export default defineComponent({
     )
 
     const emailRules = customRules(
-      required('Enter an email'),
       isEmail(),
       invalidSpaces()
     )
 
     const phoneRules = customRules(
-      required('Enter a phone'),
       minLength(14),
       invalidSpaces()
     )
