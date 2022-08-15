@@ -171,7 +171,12 @@ export default defineComponent({
   components: {
     BaseAddress
   },
-  props: {},
+  props: {
+    validate: {
+      type: Boolean,
+      default: false
+    }
+  },
   directives: {
     mask: VueMaskDirective
   },
@@ -241,11 +246,13 @@ export default defineComponent({
     )
 
     const emailRules = customRules(
+      required('Enter an email'),
       isEmail(),
       invalidSpaces()
     )
 
     const phoneRules = customRules(
+      required('Enter a phone number'),
       minLength(14),
       invalidSpaces()
     )
