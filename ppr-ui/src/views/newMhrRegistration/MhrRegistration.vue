@@ -12,6 +12,7 @@
             <stepper class="mt-4" :showStepErrorsFlag="validateMhrRegistration"/>
             <!-- Component Steps -->
             <component
+              ref="componentsRef"
               v-for="step in getSteps"
               v-show="isRouteName(step.to)"
               :is="step.component"
@@ -152,6 +153,10 @@ export default defineComponent({
         goToDash()
         return
       }
+
+      // Reset validations
+      setValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_STEPS, false)
+      setValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_APP, false)
 
       // page is ready to view
       context.emit('emitHaveData', true)
