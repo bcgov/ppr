@@ -336,9 +336,10 @@ export default defineComponent({
       localState.searched = true
       localState.searchType = getSearchedType.value?.searchTypeUI || ''
       localState.results = sortByStatus(localState.activeResults)
-      if (!props.isReviewMode) {
-        localState.results = localState.results.map(result => ({ ...result, includeLienInfo: false }))
-      }
+      localState.results = localState.results.map(result => {
+        // includeLienInfo needs to be initialized or something weird will happen
+        return result.includeLienInfo !== true ? { ...result, includeLienInfo: false } : result
+      })
       localState.totalResultsLength = resp.totalResultsSize
       const date = new Date(resp.searchDateTime)
       localState.searchTime = pacificDate(date)
