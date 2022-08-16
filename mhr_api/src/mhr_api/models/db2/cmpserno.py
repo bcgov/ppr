@@ -33,13 +33,13 @@ class Db2Cmpserno(db.Model):
     # Relationships
 
     def save(self):
-        """Save the object to the database immediately. Only used for unit testing."""
+        """Save the object to the database immediately."""
         try:
             db.session.add(self)
             db.session.commit()
             # current_app.logger.debug(f'Saved {self.json}')
         except Exception as db_exception:   # noqa: B902; return nicer error
-            # current_app.logger.error('DB2Cmpserno.save exception: ' + str(db_exception))
+            current_app.logger.error('DB2Cmpserno.save exception: ' + str(db_exception))
             raise DatabaseException(db_exception)
 
     @classmethod
@@ -80,4 +80,12 @@ class Db2Cmpserno(db.Model):
     def create_from_json(json_data):
         """Create a a compressed serial number key object from a json document schema object: map json to db."""
         key = Db2Cmpserno.create_from_dict(json_data)
+        return key
+
+    @staticmethod
+    def create_from_registration(registration_id, key_id, compressed_key):
+        """Create a new description object from a new MH registration."""
+        key = Db2Cmpserno(manuhome_id=registration_id,
+                          compressed_id=key_id,
+                          compressed_key=compressed_key)
         return key

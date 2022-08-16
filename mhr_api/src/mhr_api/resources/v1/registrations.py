@@ -87,7 +87,12 @@ def post_registrations():  # pylint: disable=too-many-return-statements
                                                            request_json,
                                                            account_id,
                                                            TransactionTypes.REGISTRATION)
-        response_json = registration.json
+        response_json = {}
+        if registration.manuhome:
+            response_json = registration.manuhome.new_registration_json
+        else:
+            response_json = registration.json
+
         # Return report if request header Accept MIME type is application/pdf.
         if resource_utils.is_pdf(request):
             current_app.logger.info('Report not yet available: returning JSON.')

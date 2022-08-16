@@ -169,7 +169,7 @@ TEST_MHR_NUMBER_DATA = [
 ]
 # testdata pattern is ({search_value}, {count}, {mhr_num}, {serial1}, {serial2}, {serial3}, {serial4})
 TEST_SERIAL_NUMBER_DATA = [
-    ('123ABC', 13, '089036', '123A', '123B', '123C', '123D')
+    ('123ABC', 8, '089036', '123A', '123B', '123C', '123D')
 ]
 
 

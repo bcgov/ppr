@@ -19,6 +19,7 @@ import json
 
 from flask import current_app
 from sqlalchemy.dialects.postgresql import ENUM as PG_ENUM
+from sqlalchemy.sql import text
 
 from mhr_api.exceptions import BusinessException, DatabaseException, ResourceErrorCodes
 from mhr_api.models import utils as model_utils, Db2Manuhome
@@ -39,6 +40,17 @@ select nextval('mhr_registration_id_seq') AS reg_id,
 QUERY_PKEYS_NO_DRAFT = """
 select nextval('mhr_registration_id_seq') AS reg_id,
         get_mhr_number() AS mhr_number
+"""
+QUERY_ACCOUNT_MHR_LEGACY = """
+SELECT mer.mhr_number
+ FROM mhr_extra_registrations mer
+WHERE account_id = :query_value
+  AND (removed_ind IS NULL OR removed_ind != 'Y')
+UNION (
+SELECT mr.mhr_number
+  FROM mhr_registrations mr
+ WHERE account_id = :query_value
+)
 """
 
 
@@ -72,6 +84,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
     parties = db.relationship('MhrParty', order_by='asc(MhrParty.id)', back_populates='registration')
 
     draft_number: str = None
+    manuhome: Db2Manuhome = None
 
     @property
     def json(self) -> dict:
@@ -147,8 +160,20 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         use_legacy_db: bool = current_app.config.get('USE_LEGACY_DB', True)
         results = []
         if use_legacy_db:
-            # 1. get extra registrations from the Posgres table, then query DB2 by set of mhr numbers.
-            mhr_list = MhrExtraRegistration.find_mhr_numbers_by_account_id(account_id)
+            # 1. get account and extra registrations from the Posgres table, then query DB2 by set of mhr numbers.
+            try:
+                query = text(QUERY_ACCOUNT_MHR_LEGACY)
+                result = db.session.execute(query, {'query_value': account_id})
+                rows = result.fetchall()
+            except Exception as db_exception:   # noqa: B902; return nicer error
+                current_app.logger.error('MhrRegstration.find_all_by_account_id exception: ' + str(db_exception))
+                raise DatabaseException(db_exception)
+            mhr_list = []
+            if rows is not None:
+                for row in rows:
+                    mhr = {'mhr_number': str(row[0])}
+                    mhr_list.append(mhr)
+
             if mhr_list:
                 # 2. Get the summary info from DB2.
                 results = Db2Manuhome.find_summary_by_account_mhr_numbers(mhr_list)

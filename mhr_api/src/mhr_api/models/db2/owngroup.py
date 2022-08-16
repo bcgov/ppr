@@ -12,25 +12,45 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """This module holds data for legacy DB2 MHR owner group information."""
-from enum import Enum
-
 from flask import current_app
 
 from mhr_api.exceptions import DatabaseException
 from mhr_api.models import db
+from mhr_api.models.db2.owner import Db2Owner
+from mhr_api.utils.base import BaseEnum
+
+
+LEGACY_STATUS_NEW = {
+    '3': 'ACTIVE',
+    '4': 'EXEMPT',
+    '5': 'PREVIOUS'
+}
+LEGACY_TENANCY_NEW = {
+    'JT': 'JOINT',
+    'TC': 'COMMON',
+    'SO': 'SOLE'
+}
+NEW_TENANCY_LEGACY = {
+    'JOINT': 'J',
+    'COMMON': 'TC',
+    'SOLE': 'SO',
+    'JT': 'JT',
+    'TC': 'TC',
+    'SO': 'SO'
+}
 
 
 class Db2Owngroup(db.Model):
     """This class manages all of the legacy DB2 MHR owner group information."""
 
-    class TenancyTypes(str, Enum):
+    class TenancyTypes(BaseEnum):
         """Render an Enum of the owner group tenancy types."""
 
         SOLE = 'SO'
         JOINT = 'JT'
         COMMON = 'TC'
 
-    class StatusTypes(str, Enum):
+    class StatusTypes(BaseEnum):
         """Render an Enum of the owner group status types."""
 
         ACTIVE = '3'
@@ -59,11 +79,18 @@ class Db2Owngroup(db.Model):
 
     # Relationships
 
+    owners = []
+
     def save(self):
-        """Save the object to the database immediately. Only used for unit testing."""
+        """Save the object to the database immediately."""
         try:
+            # current_app.logger.info('saving owner group')
             db.session.add(self)
             db.session.commit()
+            # current_app.logger.info(self.json)
+            if self.owners:
+                for owner in self.owners:
+                    owner.save()
         except Exception as db_exception:   # noqa: B902; return nicer error
             current_app.logger.error('DB2Owngroup.save exception: ' + str(db_exception))
             raise DatabaseException(db_exception)
@@ -109,6 +136,7 @@ class Db2Owngroup(db.Model):
     def json(self):
         """Return a dict of this object, with keys in JSON format."""
         owngroup = {
+            'manuhomeId': self.manuhome_id,
             'groupId': self.group_id,
             'copyId': self.copy_id,
             'sequenceNumber': self.sequence_number,
@@ -128,11 +156,25 @@ class Db2Owngroup(db.Model):
     @property
     def registration_json(self):
         """Return a search registration dict of this object, with keys in JSON format."""
-        # Response legacy data: allow for any column to be null.
-        owngroup = {
-            'tenancyType': self.tenancy_type
+        self.strip()
+        group = {
+            'groupId': self.group_id,
+            'type': LEGACY_TENANCY_NEW.get(self.tenancy_type),
+            'status': LEGACY_STATUS_NEW.get(self.status),
+            'interest': self.interest,
+            'interestNumerator': self.interest_numerator,
+            'tenancySpecified': False
         }
-        return owngroup
+        if self.tenancy_specified == 'Y':
+            group['tenancySpecified'] = True
+        owners = []
+        if self.owners:
+            for owner in self.owners:
+                owner_json = owner.new_registration_json
+                owner_json['type'] = group['type']
+                owners.append(owner_json)
+        group['owners'] = owners
+        return group
 
     @staticmethod
     def create_from_dict(new_info: dict):
@@ -154,4 +196,34 @@ class Db2Owngroup(db.Model):
         """Create a document object from a json document schema object: map json to db."""
         owngroup = Db2Owngroup.create_from_dict(json_data)
 
+        return owngroup
+
+    @staticmethod
+    def create_from_registration(registration, new_info, group_id: int):
+        """Create a new owner group object from a new MH registration."""
+        # current_app.logger.info('group group id=' + str(group_id))
+        # current_app.logger.info(new_info)
+        tenancy = new_info.get('type', Db2Owngroup.TenancyTypes.SOLE)
+        owngroup = Db2Owngroup(manuhome_id=registration.id,
+                               group_id=group_id,
+                               copy_id=0,
+                               sequence_number=1,
+                               status=Db2Owngroup.StatusTypes.ACTIVE,
+                               pending_flag='',
+                               reg_document_id=new_info.get('documentId', ''),
+                               can_document_id='',
+                               tenancy_type=NEW_TENANCY_LEGACY.get(tenancy),
+                               lessee=new_info.get('lessee', ''),
+                               lessor=new_info.get('lessor', ''),
+                               interest=new_info.get('interest', ''),
+                               interest_numerator=new_info.get('interestNumerator', 0),
+                               tenancy_specified=new_info.get('tenancySpecified', 'N'))
+        owngroup.owners = []
+        if new_info.get('tenancySpecified'):
+            owngroup.tenancy_specified = 'Y'
+        for i, owner in enumerate(new_info.get('owners')):
+            new_owner = Db2Owner.create_from_registration(registration, owner, group_id, (i + 1))
+            # current_app.logger.info('adding new owner i=' + str(i))
+            owngroup.owners.append(new_owner)
+        # current_app.logger.info('new owners size=' + str(len(owngroup.owners)))
         return owngroup

@@ -45,8 +45,7 @@ TEST_CREATE_DATA = [
     ('Staff missing account', True, [MHR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, False),
     ('Invalid role', True, [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, True),
     ('Invalid non-staff role', True, [MHR_ROLE], HTTPStatus.UNAUTHORIZED, True),
-    ('Valid staff', True, [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, True),
-    ('Valid non-staff', True, [MHR_ROLE, REGISTER_MH], HTTPStatus.CREATED, True)
+    ('Valid staff', True, [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, True)
 ]
 
 

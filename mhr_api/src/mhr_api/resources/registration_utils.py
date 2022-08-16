@@ -18,7 +18,7 @@
 from flask import request, current_app, g
 
 from mhr_api.exceptions import DatabaseException
-from mhr_api.models import MhrRegistration
+from mhr_api.models import MhrRegistration, Db2Manuhome
 # from mhr_api.models import utils as model_utils
 # from mhr_api.reports import ReportTypes, get_callback_pdf, get_pdf, get_report_api_payload
 from mhr_api.resources import utils as resource_utils
@@ -83,6 +83,11 @@ def pay_and_save_registration(req: request, request_json, account_id: str, trans
     # Try to save the financing statement: failure throws an exception.
     try:
         registration.save()
+        use_legacy_db: bool = current_app.config.get('USE_LEGACY_DB', True)
+        if use_legacy_db:
+            manuhome: Db2Manuhome = Db2Manuhome.create_from_registration(registration, request_json)
+            manuhome.save()
+            registration.manuhome = manuhome
     except Exception as db_exception:   # noqa: B902; handle all db related errors.
         current_app.logger.error(SAVE_ERROR_MESSAGE.format(account_id, 'registration', str(db_exception)))
         if account_id and invoice_id is not None:

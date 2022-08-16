@@ -96,6 +96,7 @@ def test_owngroup_json(session):
                            tenancy_specified='tenancy_specified')
 
     test_json = {
+        'manuhomeId': owngroup.manuhome_id,
         'groupId': owngroup.group_id,
         'copyId': owngroup.copy_id,
         'sequenceNumber': owngroup.sequence_number,

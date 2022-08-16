@@ -161,5 +161,5 @@ def test_save_new(session):
     registration.save()
     reg_new = MhrRegistration.find_by_mhr_number(registration.mhr_number, 'PS12345')
     assert reg_new
-    draft_new = MhrDraft.find_by_draft_number(registration.draft.draft_number)
+    draft_new = MhrDraft.find_by_draft_number(registration.draft.draft_number, True)
     assert draft_new

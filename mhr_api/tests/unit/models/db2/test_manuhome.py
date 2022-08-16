@@ -16,12 +16,15 @@
 
 Test-Suite to ensure that the legacy DB2 Manuhome Model is working as expected.
 """
+import copy
 from http import HTTPStatus
 
+from flask import current_app
 import pytest
+from registry_schemas.example_data.mhr import REGISTRATION, LOCATION
 
 from mhr_api.exceptions import BusinessException
-from mhr_api.models import Db2Manuhome, utils as model_utils
+from mhr_api.models import Db2Manuhome, utils as model_utils, MhrRegistration
 
 
 # testdata pattern is ({exists}, {id}, {mhr_num}, {status}, {doc_id})
@@ -159,3 +162,58 @@ def test_manuhome_json(session):
         'updateTime': '11:01:47'
     }
     assert manuhome.json == test_json
+
+
+def test_create_new_from_registration(session):
+    """Assert that the new MHR registration is created from a new new MHR registration correctly."""
+    json_data = copy.deepcopy(REGISTRATION)
+    json_data['location'] = copy.deepcopy(LOCATION)
+    json_data['documentId'] = 'UT000001'
+    json_data['attentionReference'] = 'ATTN_REF'
+    # current_app.logger.info(json_data)
+    registration: MhrRegistration = MhrRegistration.create_new_from_json(json_data, 'PS12345')
+    manuhome: Db2Manuhome = Db2Manuhome.create_from_registration(registration, json_data)
+    mh_json = manuhome.new_registration_json
+    current_app.logger.info(mh_json)
+    assert manuhome.id == registration.id
+    assert manuhome.mhr_number == registration.mhr_number
+    assert manuhome.reg_document_id == json_data['documentId'] 
+    assert manuhome.mh_status == Db2Manuhome.StatusTypes.REGISTERED
+    assert manuhome.reg_documents
+    assert len(manuhome.reg_documents) == 1
+    assert manuhome.reg_location
+    assert manuhome.reg_location.status == 'A'
+    assert manuhome.reg_descript
+    assert manuhome.reg_descript.status == 'A'
+    assert manuhome.reg_owner_groups
+    assert len(manuhome.reg_owner_groups) == 2
+    for group in manuhome.reg_owner_groups:
+        assert group.owners
+        assert len(group.owners) == 1
+        assert group.status == '3'
+
+
+def test_save_new(session):
+    """Assert that saving a new MHR registration is working correctly."""
+    json_data = copy.deepcopy(REGISTRATION)
+    json_data['location'] = copy.deepcopy(LOCATION)
+    json_data['documentId'] = 'UT000001'
+    json_data['attentionReference'] = 'ATTN_REF'
+    registration: MhrRegistration = MhrRegistration.create_new_from_json(json_data, 'PS12345')
+    manuhome: Db2Manuhome = Db2Manuhome.create_from_registration(registration, json_data)
+    manuhome.save()
+    mh_json = manuhome.new_registration_json
+    current_app.logger.info(mh_json)
+    reg_new = Db2Manuhome.find_by_mhr_number(registration.mhr_number)
+    assert reg_new
+    assert manuhome.reg_documents
+    assert len(manuhome.reg_documents) == 1
+    assert manuhome.mh_status == 'R'
+    assert manuhome.reg_location
+    assert manuhome.reg_location.status == 'A'
+    assert manuhome.reg_descript
+    assert manuhome.reg_descript.status == 'A'
+    assert manuhome.reg_owner_groups
+    assert len(manuhome.reg_owner_groups) == 2
+    for group in manuhome.reg_owner_groups:
+        assert group.status == '3'

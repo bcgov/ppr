@@ -21,7 +21,7 @@ import pytest
 
 from flask import current_app
 
-from mhr_api.models import Db2Owner
+from mhr_api.models import Db2Owner, Db2Owngroup
 
 
 # testdata pattern is ({exists}, {manuhome_id}, {owner_id}, {type})
@@ -35,7 +35,7 @@ TEST_DATA = [
 @pytest.mark.parametrize('exists,manuhome_id,owner_id,type', TEST_DATA)
 def test_find_by_manuhome_id(session, exists, manuhome_id, owner_id, type):
     """Assert that find owners by manuhome id contains all expected elements."""
-    owners: Db2Owner = Db2Owner.find_by_manuhome_id(manuhome_id)
+    owners: Db2Owner = Db2Owner.find_by_manuhome_id_registration(manuhome_id)
     if exists:
         assert owners
         for owner in owners:
@@ -45,16 +45,15 @@ def test_find_by_manuhome_id(session, exists, manuhome_id, owner_id, type):
             assert owner.owner_type == type
             assert owner.sequence_number is not None
             assert owner.verified_flag is not None
-            assert owner.compressed_name is not None
+            # assert owner.compressed_name is not None
             assert owner.phone_number is not None
             assert owner.postal_code is not None
             assert owner.name is not None
             assert owner.suffix is not None
             assert owner.legacy_address is not None
-            assert owner.owngroup
             reg_json = owner.registration_json
             current_app.logger.debug(reg_json)
-            if owner.owngroup and owner.owngroup.status == owner.owngroup.StatusTypes.PREVIOUS:
+            if owner.status == Db2Owngroup.StatusTypes.PREVIOUS:
                 assert not reg_json
             else:
                 if owner.owner_type == Db2Owner.OwnerTypes.INDIVIDUAL:
@@ -74,7 +73,8 @@ def test_find_by_manuhome_id(session, exists, manuhome_id, owner_id, type):
 
 def test_owner_json(session):
     """Assert that the owner renders to a json format correctly."""
-    owner = Db2Owner(group_id=1,
+    owner = Db2Owner(manuhome_id=1,
+                     group_id=1,
                      owner_id=1,
                      sequence_number=1,
                      owner_type='I',
@@ -86,6 +86,7 @@ def test_owner_json(session):
                      legacy_address='P.O. BOX 1905                           FORT NELSON, BC')
 
     test_json = {
+        'manuhomeId': owner.manuhome_id,
         'groupId': owner.group_id,
         'ownerId': owner.owner_id,
         'sequenceNumber': owner.sequence_number,

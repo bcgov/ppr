@@ -18,10 +18,16 @@ from flask import current_app
 from mhr_api.exceptions import DatabaseException
 from mhr_api.models import utils as model_utils
 from mhr_api.models import db
+from mhr_api.utils.base import BaseEnum
 
 
 class Db2Document(db.Model):
     """This class manages all of the legacy DB2 MHR manufauctured home document information."""
+
+    class DocumentTypes(BaseEnum):
+        """Render an Enum of the legacy document types."""
+
+        MHREG = '101 '
 
     __bind_key__ = 'db2'
     __tablename__ = 'document'
@@ -59,7 +65,7 @@ class Db2Document(db.Model):
     # Relationships
 
     def save(self):
-        """Save the object to the database immediately. Only used for unit testing."""
+        """Save the object to the database immediately."""
         try:
             db.session.add(self)
             db.session.commit()
@@ -191,8 +197,8 @@ class Db2Document(db.Model):
                           routing_slip_number=new_info.get('routingSlipNumber', ''))
         doc.last_service = new_info.get('lastService', '')
         doc.bcol_account = new_info.get('bcolAccount', '')
-        doc.dat_number = new_info.get('examinerId', '')
-        doc.examiner_id = new_info.get('', '')
+        doc.dat_number = new_info.get('datNumber', '')
+        doc.examiner_id = new_info.get('examinerId', '')
         doc.update_id = new_info.get('updateId', '')
         doc.phone_number = new_info.get('phoneNumber', '')
         doc.attention_reference = new_info.get('attentionReference', '')
@@ -219,3 +225,52 @@ class Db2Document(db.Model):
             document.update_id = document.update_id.strip()
 
         return document
+
+    @staticmethod
+    def create_from_registration(registration, reg_json, doc_type: str, local_ts):
+        """Create a new document object from a new MH registration."""
+        doc_id = reg_json.get('documentId', '')
+        doc = Db2Document(id=doc_id,
+                          mhr_number=registration.mhr_number,
+                          document_type=doc_type,
+                          document_reg_id=doc_id,
+                          registration_ts=local_ts,
+                          draft_ts=local_ts,
+                          interimed='',
+                          owner_cross_reference='',
+                          interest_denominator=0,
+                          declared_value=0,
+                          own_land='',
+                          routing_slip_number='')
+        doc.last_service = ''
+        doc.bcol_account = ''
+        doc.dat_number = ''
+        doc.examiner_id = ''
+        doc.update_id = ''
+        doc.number_of_pages = 0
+        doc.consideration_value = ''
+        doc.affirm_by_name = ''
+        doc.liens_with_consent = ''
+        if reg_json.get('submittingParty'):
+            submitting = reg_json.get('submittingParty')
+            if submitting.get('phoneNumber'):
+                doc.phone_number = str(submitting.get('phoneNumber'))[0:9]
+            else:
+                doc.phone_number = ''
+
+            doc.name = str(submitting.get('businessName'))[0:39]
+            doc.legacy_address = model_utils.to_db2_address(submitting.get('address'))
+        else:
+            doc.phone_number = ''
+            doc.name = ''
+            doc.legacy_address = ''
+        if reg_json.get('attentionReference'):
+            doc.attention_reference = str(reg_json['attentionReference'])[0:39]
+        else:
+            doc.attention_reference = ''
+        if registration.client_reference_id:
+            doc.client_reference_id = registration.client_reference_id[0:29]
+        else:
+            doc.client_reference_id = ''
+        doc.transfer_execution_date = model_utils.date_from_iso_format('0001-01-01')
+        return doc

@@ -20,6 +20,8 @@ Validation includes verifying the data combination for various registrations/fil
 
 OWNERS_NOT_ALLOWED = 'Owners not allowed with new registrations: use ownerGroups instead.'
 DOC_ID_REQUIRED = 'Document Number is required for staff registrations.'
+SUBMITTING_REQUIRED = 'Submitting Party is required for MH registrations.'
+OWNER_GROUPS_REQUIRED = 'At least one owner group is required for staff registrations.'
 
 
 def validate_registration(json_data, is_staff: bool = False):
@@ -29,5 +31,8 @@ def validate_registration(json_data, is_staff: bool = False):
         error_msg += DOC_ID_REQUIRED
     if json_data.get('owners'):
         error_msg += OWNERS_NOT_ALLOWED
-    # More to come as the final step in submitting a registration.
+    if not json_data.get('submittingParty'):
+        error_msg += SUBMITTING_REQUIRED
+    if is_staff and not json_data.get('ownerGroups'):
+        error_msg += OWNER_GROUPS_REQUIRED
     return error_msg
