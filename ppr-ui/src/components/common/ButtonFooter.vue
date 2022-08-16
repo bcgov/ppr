@@ -266,6 +266,8 @@ export default defineComponent({
           }
           emit('registration-incomplete', error)
         }
+      } else if (props.currentStepName === RouteNames.MHR_REVIEW_CONFIRM) {
+        emit('submit', true)
       } else {
         props.router.push({
           name: localState.buttonConfig.nextRouteName

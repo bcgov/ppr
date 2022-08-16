@@ -42,6 +42,7 @@
           :router="$router"
           @registration-incomplete="registrationIncomplete()"
           @error="emitError()"
+          @submit="submit()"
         />
       </v-col>
     </v-row>
@@ -55,7 +56,7 @@ import { useGetters } from 'vuex-composition-helpers'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { RegistrationFlowType, RouteNames, StatementTypes } from '@/enums'
 import { RegistrationTypeIF } from '@/interfaces'
-import { getFeatureFlag } from '@/utils'
+import { getFeatureFlag, submitMhrRegistration } from '@/utils'
 import { Stepper, StickyContainer } from '@/components/common'
 import ButtonFooter from '@/components/common/ButtonFooter.vue'
 import { useMhrValidations } from '@/composables'
@@ -85,12 +86,14 @@ export default defineComponent({
       getRegistrationFlowType,
       getRegistrationType,
       getSteps,
-      getMhrRegistrationValidationModel
+      getMhrRegistrationValidationModel,
+      getMhrRegistration
     } = useGetters<any>([
       'getRegistrationFlowType',
       'getRegistrationType',
       'getSteps',
-      'getMhrRegistrationValidationModel'
+      'getMhrRegistrationValidationModel',
+      'getMhrRegistration'
     ])
 
     const {
@@ -162,11 +165,19 @@ export default defineComponent({
       localState.dataLoaded = true
     })
 
+    const submit = (): void => {
+      if (localState.validateMhrRegistration) {
+        console.log(getMhrRegistration.value)
+        submitMhrRegistration(getMhrRegistration.value)
+      }
+    }
+
     return {
       getSteps,
       emitError,
       isRouteName,
       registrationIncomplete,
+      submit,
       ...toRefs(localState)
     }
   }

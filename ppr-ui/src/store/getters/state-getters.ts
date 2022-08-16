@@ -31,7 +31,7 @@ import {
   UserProductSubscriptionIF,
   UserSettingsIF,
   VehicleCollateralIF,
-  MhrRegistrationHomeOwnerGroupIF
+  MhrRegistrationHomeOwnerGroupIF, MhrRegistrationIF
 } from '@/interfaces'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 import { HomeLocation, HomeOwners, MhrReviewConfirm, SubmittingParty, YourHome } from '@/views'
@@ -680,4 +680,8 @@ export const getMhrRegistrationHomeOwnerGroups = (state: StateIF): MhrRegistrati
 
 export const getMhrRegistrationValidationModel = (state: StateIF): MhrValidationStateIF => {
   return state.stateModel.mhrValidationState
+}
+
+export const getMhrRegistration = (state: StateIF): MhrRegistrationIF => {
+  return state.stateModel.mhrRegistration
 }
