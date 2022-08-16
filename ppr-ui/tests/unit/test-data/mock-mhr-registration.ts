@@ -33,7 +33,7 @@ export const mockedPerson: MhrRegistrationHomeOwnersIF = {
     last: 'Smith'
   },
   suffix: 'Sr.',
-  phoneNumber: '5453332211',
+  phoneNumber: '(545) 333-2211',
   phoneExtension: '1234',
   address: mockedAddress
 }
@@ -42,7 +42,7 @@ export const mockedOrganization: MhrRegistrationHomeOwnersIF = {
   id: '20',
   organizationName: 'Smart Track',
   suffix: 'Inc.',
-  phoneNumber: '9998887766',
+  phoneNumber: '(999) 888-7766',
   phoneExtension: '4321',
   address: mockedAddressAlt
 }
