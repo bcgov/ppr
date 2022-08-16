@@ -241,9 +241,10 @@ export const stateModel: StateModelIF = {
       civicAddressValid: false
     },
     reviewConfirmValid: {
-      validateApp: false,
       authorizationValid: false,
-      staffPaymentValid: false
+      staffPaymentValid: false,
+      validateSteps: false,
+      validateApp: false
     }
   }
 }

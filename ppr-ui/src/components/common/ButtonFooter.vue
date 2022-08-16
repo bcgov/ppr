@@ -249,8 +249,9 @@ export default defineComponent({
       if (
         localState.statementType.toUpperCase() ===
           StatementTypes.FINANCING_STATEMENT &&
-        props.currentStepName === RouteNames.REVIEW_CONFIRM
+        [RouteNames.REVIEW_CONFIRM, RouteNames.MHR_REVIEW_CONFIRM].includes(props.currentStepName as RouteNames)
       ) {
+        // -- Intersect here for Submitting MHR Registration --
         if (checkValid()) {
           if (localState.isStaffReg) {
             localState.staffPaymentDialogDisplay = true
@@ -258,7 +259,7 @@ export default defineComponent({
             submitFinancingStatement()
           }
         } else {
-          // emit registation incomplete error
+          // emit registration incomplete error
           const error: ErrorIF = {
             statusCode: 400,
             message: 'Registration incomplete: one or more steps is invalid.'
