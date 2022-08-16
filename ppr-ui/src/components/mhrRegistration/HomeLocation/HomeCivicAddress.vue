@@ -149,4 +149,18 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+.address-region {::v-deep .v-input__slot{
+  border-bottom: thin dashed;
+  color: #212529;
+}}
+.address-region {::v-deep input{
+  color: #212529 !important;
+  font-size: 16px;
+}}
+.address-region {::v-deep .v-label{
+  color: #495057;
+}}
+.address-region {::v-deep .v-text-field__details{
+  color: #495057;
+}}
 </style>
