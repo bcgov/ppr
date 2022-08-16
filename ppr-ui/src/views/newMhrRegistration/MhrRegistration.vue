@@ -12,7 +12,6 @@
             <stepper class="mt-4" :showStepErrorsFlag="validateMhrRegistration"/>
             <!-- Component Steps -->
             <component
-              ref="componentsRef"
               v-for="step in getSteps"
               v-show="isRouteName(step.to)"
               :is="step.component"
