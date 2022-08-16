@@ -18,8 +18,9 @@ export interface MhrValidationStateIF {
     civicAddressValid: boolean
   },
   reviewConfirmValid: {
-    validateApp: boolean
     authorizationValid: boolean
     staffPaymentValid: boolean
+    validateSteps: boolean
+    validateApp: boolean
   }
 }

@@ -26,7 +26,9 @@ export enum MhrCompVal {
   CIVIC_ADDRESS_VALID = 'civicAddressValid',
 
   // Review Confirm Section
-  VALIDATE_APP = 'validateApp', // prompt all APP validations
   AUTHORIZATION_VALID = 'authorizationValid',
-  STAFF_PAYMENT_VALID = 'staffPaymentValid'
+  STAFF_PAYMENT_VALID = 'staffPaymentValid',
+  VALIDATE_STEPS = 'validateSteps', // prompt all Step validations
+  VALIDATE_APP = 'validateApp' // prompt all APP validations
+
 }

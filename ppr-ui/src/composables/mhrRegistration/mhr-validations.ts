@@ -13,7 +13,7 @@ export const useMhrValidations = (validationState: any) => {
 
   /** Is true when app-wide validations is flagged and specified component is invalid . */
   const getSectionValidation = (section: MhrSectVal, component: MhrCompVal): boolean => {
-    return validationState.reviewConfirmValid.value.validateApp && !validationState[section].value[component]
+    return validationState.reviewConfirmValid.value.validateSteps && !validationState[section].value[component]
   }
 
   /** Is true when all flags are true in specified section. */
@@ -23,26 +23,30 @@ export const useMhrValidations = (validationState: any) => {
 
   /** Is true when input field ref is in error. */
   const hasError = (ref: any): boolean => {
-    return ref.hasError
+    return ref?.hasError
   }
 
   /** Scroll to first SECTION tag that is invalid in specified flag block. */
-  const scrollToInvalid = async (flagSection: MhrSectVal, viewId: string): Promise<boolean> => {
-    // Create an array of the _ordered_ validation flags
-    const flagBlockArr = Object.keys(validationState[flagSection].value)
-      .map(key => validationState[flagSection].value[key])
+  const scrollToInvalid =
+    async (flagSection: MhrSectVal, viewId: string, optionalFlags: Array<boolean> = null): Promise<boolean> => {
+      // Create an array of the _ordered_ validation flags
+      const flagBlockArr = Object.keys(validationState[flagSection].value)
+        .map(key => validationState[flagSection].value[key])
 
-    // Find the _first_ corresponding Section that is invalid in the specified view
-    const view = document.getElementById(viewId)
-    const invalidComponent = view.getElementsByTagName('section')[flagBlockArr.indexOf(false)]
+      // Prepend optional flags to array (ie for review pages)
+      if (optionalFlags) flagBlockArr.unshift(...optionalFlags)
 
-    // If there is an invalid component, scroll to it
-    if (invalidComponent) {
-      await invalidComponent.scrollIntoView({ block: 'start', inline: 'nearest', behavior: 'smooth' })
-      return false
+      // Find the _first_ corresponding Section that is invalid in the specified view
+      const view = document.getElementById(viewId)
+      const invalidComponent = view.getElementsByTagName('section')[flagBlockArr.indexOf(false)]
+
+      // If there is an invalid component, scroll to it
+      if (invalidComponent) {
+        await invalidComponent.scrollIntoView({ block: 'start', inline: 'nearest', behavior: 'smooth' })
+        return false
+      }
+      return true
     }
-    return true
-  }
 
   return {
     MhrCompVal,

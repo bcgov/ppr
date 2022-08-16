@@ -85,6 +85,10 @@ export function getFeeSummary (
     if (isStaff) return { ...defaultFeeSummaries[FeeSummaryDefaults.NO_FEE] }
     return { ...defaultFeeSummaries[FeeSummaryDefaults.SEARCH_7] }
   }
+  if (feeType === FeeSummaryTypes.NEW_MHR) {
+    if (isStaff) return { ...defaultFeeSummaries[FeeSummaryDefaults.NO_FEE] }
+    return { ...defaultFeeSummaries[FeeSummaryDefaults.DEFAULT_50] }
+  }
   if (feeType === FeeSummaryTypes.MHR_COMBINED_SEARCH) {
     if (isStaff && isStaffClientPayment) return { ...defaultFeeSummaries[FeeSummaryDefaults.SEARCH_15] }
     if (isStaff) return { ...defaultFeeSummaries[FeeSummaryDefaults.NO_FEE] }
