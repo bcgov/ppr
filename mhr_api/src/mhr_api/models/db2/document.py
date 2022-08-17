@@ -174,7 +174,8 @@ class Db2Document(db.Model):
         """Return a search registration dict of this object, with keys in JSON format."""
         # Response legacy data: allow for any column to be null.
         document = {
-            'documentId': self.document_reg_id,
+            'documentId': self.id,
+            'documentRegistrationId': self.document_reg_id,
             'documentType': self.document_type,
             'mhrNumber': self.mhr_number,
             'declaredValue': self.declared_value,
@@ -235,7 +236,7 @@ class Db2Document(db.Model):
         doc = Db2Document(id=doc_id,
                           mhr_number=registration.mhr_number,
                           document_type=doc_type,
-                          document_reg_id=doc_id,
+                          document_reg_id=registration.doc_reg_number,
                           registration_ts=local_ts,
                           draft_ts=local_ts,
                           interimed='',

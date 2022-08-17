@@ -70,6 +70,7 @@ LEGACY_REGISTRATION_DESCRIPTION = {
     '101': REGISTRATION_DESC_NEW,
     'CONV': REGISTRATION_DESC_NEW
 }
+DOCUMENT_TYPE_REG = '101'
 
 
 class Db2Manuhome(db.Model):
@@ -271,7 +272,8 @@ class Db2Manuhome(db.Model):
         declared_ts: str = None
         if self.reg_documents:
             for doc in self.reg_documents:
-                if self.reg_document_id and self.reg_document_id == doc.id:
+                if self.reg_document_id and self.reg_document_id == doc.id and \
+                        doc.document_type.strip() == DOCUMENT_TYPE_REG:
                     doc_json = doc.registration_json
                     man_home['documentId'] = doc_json.get('documentId', '')
                     man_home['createDateTime'] = doc_json.get('createDateTime', '')

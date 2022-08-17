@@ -34,12 +34,14 @@ from .type_tables import MhrRegistrationType, MhrRegistrationTypes, MhrRegistrat
 QUERY_PKEYS = """
 select nextval('mhr_registration_id_seq') AS reg_id,
        get_mhr_number() AS mhr_number,
+       get_mhr_doc_reg_number() AS doc_reg_id,
        get_mhr_draft_number() AS draft_num,
        nextval('mhr_draft_id_seq') AS draft_id
 """
 QUERY_PKEYS_NO_DRAFT = """
 select nextval('mhr_registration_id_seq') AS reg_id,
-        get_mhr_number() AS mhr_number
+       get_mhr_number() AS mhr_number,
+       get_mhr_doc_reg_number() AS doc_reg_id
 """
 QUERY_ACCOUNT_MHR_LEGACY = """
 SELECT mer.mhr_number
@@ -84,6 +86,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
     parties = db.relationship('MhrParty', order_by='asc(MhrParty.id)', back_populates='registration')
 
     draft_number: str = None
+    doc_reg_number: str = None
     manuhome: Db2Manuhome = None
 
     @property
@@ -228,6 +231,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         registration: MhrRegistration = MhrRegistration()
         registration.id = reg_vals.id  # pylint: disable=invalid-name; allow name of id.
         registration.mhr_number = reg_vals.mhr_number
+        registration.doc_reg_number = reg_vals.doc_reg_number
         registration.registration_ts = model_utils.now_ts()
         registration.registration_type = MhrRegistrationTypes.MHREG
         registration.status_type = MhrRegistrationStatusTypes.ACTIVE
@@ -283,7 +287,8 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         row = result.first()
         registration.id = int(row[0])
         registration.mhr_number = str(row[1])
+        registration.doc_reg_number = str(row[2])
         if not draft:
-            registration.draft_number = str(row[2])
-            registration.draft_id = int(row[3])
+            registration.draft_number = str(row[3])
+            registration.draft_id = int(row[4])
         return registration
