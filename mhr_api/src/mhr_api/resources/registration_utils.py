@@ -152,3 +152,14 @@ def get_payment_details(registration: MhrRegistration, trans_id: str = None):
         'value': registration.reg_type.registration_type_desc
     }
     return details
+
+
+def add_payment_json(registration, reg_json):
+    """Add registration payment info json if payment exists."""
+    if registration.pay_invoice_id and registration.pay_path:
+        payment = {
+            'invoiceId': str(registration.pay_invoice_id),
+            'receipt': registration.pay_path
+        }
+        reg_json['payment'] = payment
+    return reg_json

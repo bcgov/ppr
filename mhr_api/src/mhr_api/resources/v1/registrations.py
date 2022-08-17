@@ -90,6 +90,9 @@ def post_registrations():  # pylint: disable=too-many-return-statements
         response_json = {}
         if registration.manuhome:
             response_json = registration.manuhome.new_registration_json
+            if request_json.get('submittingParty'):
+                response_json['submittingParty'] = request_json.get('submittingParty')
+            response_json = reg_utils.add_payment_json(registration, response_json)
         else:
             response_json = registration.json
 
@@ -138,6 +141,10 @@ def get_registrations(mhr_number: str):  # pylint: disable=too-many-return-state
         response_json = {}
         if registration.manuhome:
             response_json = registration.manuhome.new_registration_json
+            response_json = reg_utils.add_payment_json(registration, response_json)
+            if registration.parties:
+                submitting = registration.parties[0]
+                response_json['submittingParty'] = submitting.json
         else:
             response_json = registration.json
         return response_json, HTTPStatus.OK
