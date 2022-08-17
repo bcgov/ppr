@@ -46,10 +46,11 @@ TEST_ID_DATA = [
     (200000000, True),
     (300000000, False)
 ]
-# testdata pattern is ({mhr_number}, {has_results})
+# testdata pattern is ({mhr_number}, {has_results}, {account_id})
 TEST_MHR_NUM_DATA = [
-    ('UT-001', True),
-    ('UX-XXX', False)
+    ('UT-001', False, 'PS12345'),
+    ('UX-XXX', False, 'PS12345'),
+    ('150062', True, '2523')
 ]
 
 
@@ -108,11 +109,11 @@ def test_find_by_id(session, reg_id, has_results):
         assert not registration
 
 
-@pytest.mark.parametrize('mhr_number, has_results', TEST_MHR_NUM_DATA)
-def test_find_by_mhr_number(session, mhr_number, has_results):
+@pytest.mark.parametrize('mhr_number, has_results, account_id', TEST_MHR_NUM_DATA)
+def test_find_by_mhr_number(session, mhr_number, has_results, account_id):
     """Assert that finding an MHR registration by MHR number works as expected."""
     if has_results:
-        registration: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_number, 'PS12345')
+        registration: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_number, account_id)
         assert registration
         assert registration.id
         assert registration.mhr_number == mhr_number

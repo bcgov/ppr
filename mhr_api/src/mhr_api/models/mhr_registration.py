@@ -182,13 +182,14 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         raise DatabaseException('MhrRegistration.find_all_by_account_id PosgreSQL not yet implemented.')
 
     @classmethod
-    def find_by_mhr_number(cls, mhr_number: str, account_id: str):
+    def find_by_mhr_number(cls, mhr_number: str, account_id: str, staff: bool = False):
         """Return the registration matching the MHR number."""
         current_app.logger.debug(f'Account={account_id}, mhr_number={mhr_number}')
         registration = None
-        if mhr_number:
+        formatted_mhr = model_utils.format_mhr_number(mhr_number)
+        if formatted_mhr:
             try:
-                registration = cls.query.filter(MhrRegistration.mhr_number == mhr_number).one_or_none()
+                registration = cls.query.filter(MhrRegistration.mhr_number == formatted_mhr).one_or_none()
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('DB find_by_mhr_number exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)
@@ -196,9 +197,26 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         if not registration:
             raise BusinessException(
                 error=model_utils.ERR_MHR_REGISTRATION_NOT_FOUND.format(code=ResourceErrorCodes.NOT_FOUND_ERR,
-                                                                        mhr_number=mhr_number),
+                                                                        mhr_number=formatted_mhr),
                 status_code=HTTPStatus.NOT_FOUND
             )
+
+        if not staff and account_id and registration.account_id != account_id:
+            # Check extra registrations
+            extra_reg = MhrExtraRegistration.find_by_mhr_number(formatted_mhr, account_id)
+            if not extra_reg:
+                raise BusinessException(
+                    error=model_utils.ERR_REGISTRATION_ACCOUNT.format(code=ResourceErrorCodes.UNAUTHORIZED_ERR,
+                                                                      account_id=account_id,
+                                                                      mhr_number=formatted_mhr),
+                    status_code=HTTPStatus.UNAUTHORIZED
+                )
+        # Authorized, exists. If legacy transition load legacy data.
+        use_legacy_db: bool = current_app.config.get('USE_LEGACY_DB', True)
+        if use_legacy_db:
+            current_app.logger.info(f'Fetching legacy db registration for {formatted_mhr}.')
+            manuhome: Db2Manuhome = Db2Manuhome.find_by_mhr_number(formatted_mhr, True)
+            registration.manuhome = manuhome
         return registration
 
     @staticmethod

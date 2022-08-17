@@ -24,7 +24,7 @@ from flask import current_app
 from registry_schemas.example_data.mhr import REGISTRATION
 
 from mhr_api.models import MhrRegistration
-from mhr_api.services.authz import COLIN_ROLE, MHR_ROLE, STAFF_ROLE, REGISTER_MH
+from mhr_api.services.authz import COLIN_ROLE, MHR_ROLE, STAFF_ROLE, BCOL_HELP
 from tests.unit.services.utils import create_header, create_header_account
 
 
@@ -46,6 +46,17 @@ TEST_CREATE_DATA = [
     ('Invalid role', True, [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, True),
     ('Invalid non-staff role', True, [MHR_ROLE], HTTPStatus.UNAUTHORIZED, True),
     ('Valid staff', True, [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, True)
+]
+# testdata pattern is ({description}, {roles}, {status}, {account}, {mhr_num})
+TEST_GET_REGISTRATION = [
+    ('Missing account', [MHR_ROLE], HTTPStatus.BAD_REQUEST, None, '150062'),
+    ('Invalid role', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, '2523', '150062'),
+    ('Valid Request', [MHR_ROLE], HTTPStatus.OK, '2523', '150062'),
+    ('Valid Request reg staff', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, STAFF_ROLE, '150062'),
+    ('Valid Request bcol helpdesk', [MHR_ROLE, BCOL_HELP], HTTPStatus.OK, BCOL_HELP, '150062'),
+    ('Valid Request other account', [MHR_ROLE], HTTPStatus.OK, 'PS12345', '150062'),
+    ('Invalid MHR Number', [MHR_ROLE], HTTPStatus.NOT_FOUND, '2523', 'TESTXXXX'),
+    ('Invalid request Staff no account', [MHR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, None, '150062')
 ]
 
 
@@ -109,3 +120,21 @@ def test_create(session, client, jwt, desc, has_submitting, roles, status, has_a
         registration: MhrRegistration = MhrRegistration.find_by_mhr_number(response.json['mhrNumber'],
                                                                            'PS12345')
         assert registration
+
+
+@pytest.mark.parametrize('desc,roles,status,account_id,mhr_num', TEST_GET_REGISTRATION)
+def test_get_registration(session, client, jwt, desc, roles, status, account_id, mhr_num):
+    """Assert that a get account registration by MHR number works as expected."""
+    # setup
+    current_app.config.update(AUTH_SVC_URL=MOCK_AUTH_URL)
+    headers = None
+    if account_id:
+        headers = create_header_account(jwt, roles, 'test-user', account_id)
+    else:
+        headers = create_header(jwt, roles)
+
+    # test
+    response = client.get('/api/v1/registrations/' + mhr_num,
+                          headers=headers)
+    # check
+    assert response.status_code == status

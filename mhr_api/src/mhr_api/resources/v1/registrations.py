@@ -22,7 +22,7 @@ from registry_schemas import utils as schema_utils
 
 from mhr_api.utils.auth import jwt
 from mhr_api.exceptions import BusinessException, DatabaseException
-from mhr_api.services.authz import is_staff, authorized, authorized_role, REGISTER_MH
+from mhr_api.services.authz import authorized, authorized_role, is_staff, is_all_staff_account, REGISTER_MH
 from mhr_api.models import MhrRegistration
 from mhr_api.resources import utils as resource_utils, registration_utils as reg_utils
 from mhr_api.services.payment import TransactionTypes
@@ -110,5 +110,41 @@ def post_registrations():  # pylint: disable=too-many-return-statements
         return resource_utils.pay_exception_response(pay_exception, account_id)
     except BusinessException as exception:
         return resource_utils.business_exception_response(exception)
+    except Exception as default_exception:   # noqa: B902; return nicer default error
+        return resource_utils.default_exception_response(default_exception)
+
+
+@bp.route('/<string:mhr_number>', methods=['GET', 'OPTIONS'])
+@cross_origin(origin='*')
+@jwt.requires_auth
+def get_registrations(mhr_number: str):  # pylint: disable=too-many-return-statements
+    """Get registration information for a previous MH registration created by the account."""
+    try:
+        current_app.logger.info(f'get_registrations mhr_number={mhr_number}')
+        if mhr_number is None:
+            return resource_utils.path_param_error_response('MHR number')
+        # Quick check: must be staff or provide an account ID.
+        account_id = resource_utils.get_account_id(request)
+        if account_id is None:
+            return resource_utils.account_required_response()
+        # Verify request JWT and account ID
+        if not authorized(account_id, jwt):
+            return resource_utils.unauthorized_error_response(account_id)
+        # Try to fetch MH registration by MHR number
+        # Not found throws a business exception.
+        registration: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_number,
+                                                                           account_id,
+                                                                           is_all_staff_account(account_id))
+        response_json = {}
+        if registration.manuhome:
+            response_json = registration.manuhome.new_registration_json
+        else:
+            response_json = registration.json
+        return response_json, HTTPStatus.OK
+    except BusinessException as exception:
+        return resource_utils.business_exception_response(exception)
+    except DatabaseException as db_exception:
+        return resource_utils.db_exception_response(db_exception, account_id,
+                                                    'GET MH registration id=' + mhr_number)
     except Exception as default_exception:   # noqa: B902; return nicer default error
         return resource_utils.default_exception_response(default_exception)

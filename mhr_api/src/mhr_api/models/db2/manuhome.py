@@ -160,13 +160,13 @@ class Db2Manuhome(db.Model):
         return manuhome
 
     @classmethod
-    def find_by_mhr_number(cls, mhr_number: str):
+    def find_by_mhr_number(cls, mhr_number: str, new_reg: bool = False):
         """Return the MH registration matching the MHR number."""
         manuhome = None
         current_app.logger.debug(f'Db2Manuhome.find_by_mhr_number {mhr_number}.')
         if mhr_number:
             try:
-                manuhome = cls.query.filter(Db2Manuhome.mhr_number == mhr_number).one_or_none()
+                manuhome: Db2Manuhome = cls.query.filter(Db2Manuhome.mhr_number == mhr_number).one_or_none()
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('Db2Manuhome.find_by_mhr_number exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)
@@ -180,7 +180,10 @@ class Db2Manuhome(db.Model):
         current_app.logger.debug('Db2Manuhome.find_by_mhr_number Db2Document query.')
         manuhome.reg_documents = Db2Document.find_by_mhr_number(manuhome.mhr_number)
         current_app.logger.debug('Db2Manuhome.find_by_mhr_number Db2Owner query.')
-        manuhome.reg_owners = Db2Owner.find_by_manuhome_id_registration(manuhome.id)
+        if new_reg:
+            manuhome.reg_owner_groups = Db2Owngroup.find_all_by_manuhome_id(manuhome.id)
+        else:
+            manuhome.reg_owners = Db2Owner.find_by_manuhome_id_registration(manuhome.id)
         current_app.logger.debug('Db2Manuhome.find_by_mhr_number Db2Descript query.')
         manuhome.reg_descript = Db2Descript.find_by_manuhome_id_active(manuhome.id)
         current_app.logger.debug('Db2Manuhome.find_by_mhr_number Db2Location query.')
@@ -270,6 +273,7 @@ class Db2Manuhome(db.Model):
             for doc in self.reg_documents:
                 if self.reg_document_id and self.reg_document_id == doc.id:
                     doc_json = doc.registration_json
+                    man_home['documentId'] = doc_json.get('documentId', '')
                     man_home['createDateTime'] = doc_json.get('createDateTime', '')
                     man_home['clientReferenceId'] = doc_json.get('clientReferenceId', '')
                     man_home['attentionReference'] = doc_json.get('attentionReference', '')

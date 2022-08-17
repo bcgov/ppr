@@ -118,6 +118,31 @@ class Db2Owngroup(db.Model):
         return owngroup
 
     @classmethod
+    def find_all_by_manuhome_id(cls, manuhome_id: int):
+        """Return the owner groups and owners matching the manuhome id."""
+        groups = []
+        if manuhome_id and manuhome_id > 0:
+            try:
+                groups = cls.query.filter(Db2Owngroup.manuhome_id == manuhome_id).all()
+            except Exception as db_exception:   # noqa: B902; return nicer error
+                current_app.logger.error('DB2Owngroup.find_all_by_manuhome_id groups exception: ' + str(db_exception))
+                raise DatabaseException(db_exception)
+        if groups:
+            owners = []
+            try:
+                owners = Db2Owner.find_by_manuhome_id(manuhome_id)
+            except Exception as db_exception:   # noqa: B902; return nicer error
+                current_app.logger.error('DB2Owngroup.find_all_by_manuhome_id owners exception: ' + str(db_exception))
+                raise DatabaseException(db_exception)
+            for group in groups:
+                group.strip()
+                group.owners = []
+                for owner in owners:
+                    if owner.group_id == group.group_id:
+                        group.owners.append(owner)
+        return groups
+
+    @classmethod
     def find_by_reg_doc_id(cls, manuhome_id: int, reg_document_id: str):
         """Return the owner group matching the manuhome id and registration document id."""
         owngroup = None

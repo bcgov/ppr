@@ -201,6 +201,7 @@ ERR_SEARCH_COMPLETE = '{code}: search select results failed: results already pro
 ERR_SEARCH_NOT_FOUND = '{code}: search select results failed: invalid search ID {search_id}.'
 ERR_DRAFT_NOT_FOUND = '{code}: no Draft found for Draft Number {draft_number}.'
 ERR_DRAFT_USED = '{code}: Draft for Draft Number {draft_number} has been used.'
+ERR_REGISTRATION_ACCOUNT = '{code}: the account ID {account_id} does not match MHR number {mhr_number}.'
 
 # PPR Error messages
 ERR_FINANCING_NOT_FOUND = '{code}: no Financing Statement found for registration number {registration_num}.'
