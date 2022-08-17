@@ -50,7 +50,7 @@
             </v-row>
             <v-row no-gutters class="px-6 pt-1">
               <v-col cols="3" class="pt-1">
-                <h3>Pad Number</h3>
+                <h3>Pad</h3>
               </v-col>
               <v-col cols="9" class="pt-1">
                 <p>{{ getMhrRegistrationLocation.pad || 'N/A' }}</p>
