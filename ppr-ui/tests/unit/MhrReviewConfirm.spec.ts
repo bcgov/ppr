@@ -3,7 +3,7 @@ import Vue from 'vue'
 import Vuetify from 'vuetify'
 import VueRouter from 'vue-router'
 import { getVuexStore } from '@/store'
-import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
+import { createLocalVue, shallowMount, Wrapper } from '@vue/test-utils'
 
 // Local Components
 import { MhrReviewConfirm } from '@/views'
@@ -30,7 +30,7 @@ function createComponent (): Wrapper<any> {
   const router = mockRouter.mock()
   router.push({ name: RouteNames.MHR_REVIEW_CONFIRM })
 
-  return mount(MhrReviewConfirm, {
+  return shallowMount(MhrReviewConfirm, {
     localVue,
     propsData: {
       appReady: true,
