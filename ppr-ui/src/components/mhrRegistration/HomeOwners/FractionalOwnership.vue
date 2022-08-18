@@ -1,0 +1,143 @@
+<template>
+  <div id="mhr-home-ownership">
+    <label class="generic-label">Fractional Ownership</label>
+    <div v-if="isReadOnly">
+      <p data-test-id="readonly-interest-info">Interest: {{ fractionalInterest }}</p>
+    </div>
+    <div v-else>
+      <p class="mt-3 mb-6">
+        Enter the interest type and fraction of the total ownership owned by Group 1. For example,
+        if there are four owner groups, this group could have 1/4 ownership.
+      </p>
+      <v-text-field
+        :id="`interest-type-group-${groupId}`"
+        label="Interest Type (Optional)"
+        v-model="fractionalInfo.interest"
+        :data-test-id="`interest-type-field-group-${groupId}`"
+      />
+      <div class="owner-fractions">
+        <v-text-field
+          :id="`fraction-amount-group-${groupId}`"
+          label="Amount Owned by this Group"
+          filled
+          v-model="fractionalInfo.interestNumerator"
+          :rules="fractionalAmountRules"
+          :data-test-id="`fraction-amount-field-group-${groupId}`"
+        />
+        <span> </span>
+        <v-text-field
+          :id="`total-fractions-group-${groupId}`"
+          label="Total Available"
+          filled
+          v-model="fractionalInfo.interestTotal"
+          :rules="totalAmountRules"
+          :data-test-id="`total-fractions-field-group-${groupId}`"
+        />
+      </div>
+      <label class="generic-label" for="tenancy-type">Tenancy</label>
+      <v-checkbox :id="`tenancy-type-group-${groupId}`" v-model="fractionalInfo.tenancySpecified">
+        <template v-slot:label>
+          <p class="ma-0">
+            Tenancy not specified
+          </p>
+        </template>
+      </v-checkbox>
+    </div>
+  </div>
+</template>
+
+<script lang="ts">
+/* eslint-disable no-unused-vars */
+import { MhrRegistrationFractionalOwnershipIF, MhrRegistrationHomeOwnerIF } from '@/interfaces'
+/* eslint-enable no-unused-vars */
+
+import { computed, defineComponent, reactive, toRefs } from '@vue/composition-api'
+import { useInputRules } from '@/composables/useInputRules'
+
+let DEFAULT_OWNER_ID = 1
+
+export default defineComponent({
+  name: 'FractionalOwnership',
+  props: {
+    groupId: {
+      type: String,
+      required: true
+    },
+    editHomeOwner: {
+      type: Object as () => MhrRegistrationHomeOwnerIF,
+      default: null
+    },
+    showEditBtn: { type: Boolean, default: true },
+    isReadOnly: { type: Boolean, default: false },
+    fractionalData: {
+      type: Object as () => MhrRegistrationFractionalOwnershipIF,
+      default: {} as () => MhrRegistrationFractionalOwnershipIF,
+      required: true
+    }
+  },
+  setup (props) {
+    const { customRules, required, isNumber, maxLength, greaterThan, lessThan } = useInputRules()
+
+    const localState = reactive({
+      id: props.editHomeOwner?.id || (DEFAULT_OWNER_ID++).toString(),
+      fractionalInfo: props.fractionalData,
+      fractionalInterest: computed(
+        () =>
+          // eslint-disable-next-line max-len
+          `${localState.fractionalInfo.interest} ${localState.fractionalInfo.interestNumerator} / ${localState.fractionalInfo.interestTotal}`
+      ),
+      fractionalAmountRules: computed(() =>
+        customRules(
+          required('Enter amount owned by this group'),
+          isNumber(),
+          maxLength(6),
+          greaterThan(
+            Number(localState.fractionalInfo.interestTotal),
+            'Must be lesser than total available'
+          )
+        )
+      ),
+      totalAmountRules: computed(() =>
+        customRules(
+          required('Enter total available'),
+          isNumber(),
+          maxLength(6),
+          lessThan(
+            Number(localState.fractionalInfo.interestNumerator),
+            'Must be greater than amount owned by group'
+          )
+        )
+      )
+    })
+
+    return {
+      ...toRefs(localState)
+    }
+  }
+})
+</script>
+
+<style lang="scss" scoped>
+#mhr-home-ownership ::v-deep {
+  p {
+    white-space: normal;
+    font-size: 16px;
+    line-height: 24px;
+  }
+
+  .owner-fractions {
+    display: flex;
+    flex-direction: row;
+
+    span {
+      height: 40px;
+      border-right: 1px solid black;
+      width: 30px;
+      transform: rotate(20deg);
+      right: 13px;
+      top: 3px;
+      position: relative;
+    }
+  }
+}
+</style>

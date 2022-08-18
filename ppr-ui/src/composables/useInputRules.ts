@@ -78,6 +78,12 @@ export const useInputRules = () => {
     ]
   }
 
+  const lessThan = (minNumber: number, errorMessage: string) => {
+    return [
+      (v: number) => !v || v >= minNumber || errorMessage
+    ]
+  }
+
   /** Create a custom rules array use predefined rules. **/
   const customRules = (...rules: any) => {
     return [].concat(...rules)
@@ -93,6 +99,7 @@ export const useInputRules = () => {
     isNumber,
     startsWith,
     greaterThan,
+    lessThan,
     minLength,
     maxLength
   }

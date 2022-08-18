@@ -8,7 +8,8 @@ import {
   AddEditHomeOwner,
   HomeOwnersTable,
   HomeOwnerGroups,
-  TableGroupHeader
+  TableGroupHeader,
+  FractionalOwnership
 } from '@/components/mhrRegistration/HomeOwners'
 import { SimpleHelpToggle } from '@/components/common'
 import { mockedPerson, mockedOrganization } from './test-data/mock-mhr-registration'
@@ -21,7 +22,7 @@ Vue.use(Vuetify)
 const vuetify = new Vuetify({})
 const store = getVuexStore()
 
-function createComponent (): Wrapper<any> {
+function createComponent(): Wrapper<any> {
   const localVue = createLocalVue()
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
@@ -233,5 +234,26 @@ describe('Home Owners', () => {
     expect(wrapper.findComponent(HomeOwnersTable).text()).toContain(mockedOrganization.organizationName)
     expect(wrapper.findComponent(HomeOwnersTable).text()).not.toContain(mockedPerson.individualName.first)
     expect(ownersTable.findAllComponents(TableGroupHeader).length).toBe(1)
+  })
+
+  it('should show fractional ownership', async () => {
+
+    const homeOwnerGroup = [
+      { groupId: '1', owners: [mockedPerson, mockedOrganization], interest: 'Undivided', interestNumerator: 123, interestTotal: 432 }
+    ] as MhrRegistrationHomeOwnerGroupIF[]
+
+    // add a person
+    await store.dispatch('setMhrRegistrationHomeOwnerGroups', homeOwnerGroup)
+
+    await wrapper.findComponent(HomeOwners).findComponent(HomeOwnersTable).find(getTestId('table-edit-btn')).trigger('click')
+
+    const addOwnerSection = wrapper.findComponent(HomeOwnersTable).findComponent(AddEditHomeOwner)
+    expect(addOwnerSection.exists()).toBeTruthy()
+
+    // check for readonly fractional ownership
+    const fractionalOwnershipSections = addOwnerSection.findComponent(FractionalOwnership)
+    expect(fractionalOwnershipSections.exists()).toBeTruthy()
+    const readonlyInterest = fractionalOwnershipSections.find(getTestId('readonly-interest-info'))
+    expect(readonlyInterest.text()).toContain('Undivided 123 / 432')
   })
 })

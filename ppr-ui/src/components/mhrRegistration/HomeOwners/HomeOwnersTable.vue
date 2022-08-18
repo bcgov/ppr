@@ -12,10 +12,7 @@
       disable-pagination
       no-data-text="No owners added yet"
     >
-      <template
-        v-slot:group.header="{ group, items }"
-        class="group-header-slot"
-      >
+      <template v-slot:group.header="{ group, items }" class="group-header-slot">
         <td :colspan="4" class="py-1">
           <TableGroupHeader :groupId="group" :owners="items" />
         </td>
@@ -61,9 +58,7 @@
           </td>
           <td>
             {{ toDisplayPhone(row.item.phoneNumber) }}
-            <span v-if="row.item.phoneExtension">
-              Ext {{ row.item.phoneExtension }}
-            </span>
+            <span v-if="row.item.phoneExtension"> Ext {{ row.item.phoneExtension }} </span>
           </td>
           <td class="text-right">
             <v-btn
@@ -82,13 +77,7 @@
             <!-- Actions drop down menu -->
             <v-menu offset-y left nudge-bottom="0">
               <template v-slot:activator="{ on }">
-                <v-btn
-                  text
-                  v-on="on"
-                  color="primary"
-                  class="px-0"
-                  :disabled="isAddingMode || isGlobalEditingMode"
-                >
+                <v-btn text v-on="on" color="primary" class="px-0" :disabled="isAddingMode || isGlobalEditingMode">
                   <v-icon>mdi-menu-down</v-icon>
                 </v-btn>
               </template>
@@ -116,13 +105,7 @@
 </template>
 
 <script lang="ts">
-import {
-  computed,
-  defineComponent,
-  reactive,
-  toRefs,
-  watch
-} from '@vue/composition-api'
+import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
 import { homeOwnersTableHeaders } from '@/resources/tableHeaders'
 import { BaseAddress } from '@/composables/address'
 import { useHomeOwners } from '@/composables/mhrRegistration'
@@ -130,13 +113,14 @@ import { PartyAddressSchema } from '@/schemas'
 import { toDisplayPhone } from '@/utils'
 import { AddEditHomeOwner } from '@/components/mhrRegistration/HomeOwners'
 import TableGroupHeader from '@/components/mhrRegistration/HomeOwners/TableGroupHeader.vue'
-
-import { useGetters } from 'vuex-composition-helpers'
+/* eslint-disable no-unused-vars */
+import { MhrRegistrationHomeOwnerIF } from '@/interfaces'
+/* eslint-enable no-unused-vars */
 
 export default defineComponent({
   name: 'HomeOwnersTable',
   props: {
-    homeOwners: { default: [] },
+    homeOwners: { default: [] as MhrRegistrationHomeOwnerIF[] },
     isAdding: { default: false }
   },
   components: {
@@ -147,23 +131,11 @@ export default defineComponent({
   setup (props, context) {
     const addressSchema = PartyAddressSchema
 
-    const { getMhrRegistrationHomeOwnerGroups } = useGetters<any>([
-      'getMhrRegistrationHomeOwnerGroups'
-    ])
-
-    const {
-      showGroups,
-      removeOwner,
-      deleteGroup,
-      isGlobalEditingMode,
-      setGlobalEditingMode
-    } = useHomeOwners()
+    const { showGroups, removeOwner, deleteGroup, isGlobalEditingMode, setGlobalEditingMode } = useHomeOwners()
 
     const localState = reactive({
       currentlyEditingHomeOwnerId: -1,
-      isEditingMode: computed(
-        (): boolean => localState.currentlyEditingHomeOwnerId >= 0
-      ),
+      isEditingMode: computed((): boolean => localState.currentlyEditingHomeOwnerId >= 0),
       isAddingMode: computed((): boolean => props.isAdding)
     })
 
@@ -206,7 +178,6 @@ export default defineComponent({
       remove,
       deleteGroup,
       isGlobalEditingMode,
-      getMhrRegistrationHomeOwnerGroups,
       ...toRefs(localState)
     }
   }
