@@ -249,8 +249,17 @@ export default class App extends Mixins(AuthMixin) {
           RouteNames.ADD_COLLATERAL,
           RouteNames.REVIEW_CONFIRM
         ]
+        const mhrRoutes = [
+          RouteNames.YOUR_HOME,
+          RouteNames.SUBMITTING_PARTY,
+          RouteNames.HOME_OWNERS,
+          RouteNames.HOME_LOCATION,
+          RouteNames.MHR_REVIEW_CONFIRM
+        ]
+
         const routeName = this.$router.currentRoute.name as RouteNames
-        if (changeRoutes.includes(routeName) || (newAmendRoutes.includes(routeName) && this.hasUnsavedChanges)) {
+        if ((changeRoutes.includes(routeName) || newAmendRoutes.includes(routeName) || mhrRoutes.includes(routeName)) &&
+          this.hasUnsavedChanges) {
           // browser popup
           event.preventDefault()
           // NB: custom text is no longer supported in any major browsers due to security reasons.

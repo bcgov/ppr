@@ -74,7 +74,7 @@ import {
   RebuiltStatus,
   OtherInformation
 } from '@/components/mhrRegistration/YourHome'
-import { useMhrValidations } from '@/composables/mhrRegistration/mhr-validations'
+import { useMhrValidations } from '@/composables/mhrRegistration/useMhrValidations'
 
 export default defineComponent({
   name: 'YourHome',

@@ -57,7 +57,7 @@
 import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
 import { MhrSubmittingParty } from '@/components/mhrRegistration/SubmittingParty'
 import { PartySearch } from '@/components/parties/party'
-import { useMhrValidations } from '@/composables/mhrRegistration/mhr-validations'
+import { useMhrValidations } from '@/composables/mhrRegistration/useMhrValidations'
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import { useInputRules } from '@/composables'
 

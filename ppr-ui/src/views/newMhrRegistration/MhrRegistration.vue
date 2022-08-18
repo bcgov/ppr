@@ -153,6 +153,10 @@ export default defineComponent({
         return
       }
 
+      // Reset validations
+      setValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_STEPS, false)
+      setValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_APP, false)
+
       // page is ready to view
       context.emit('emitHaveData', true)
       localState.dataLoaded = true

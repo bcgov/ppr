@@ -293,14 +293,17 @@ export const setUnsavedChanges: ActionIF = ({ commit }, unsavedChanges: Boolean)
 // MHR Registration
 export const setMhrHomeDescription: ActionIF = ({ commit }, { key, value }): void => {
   commit('mutateMhrHomeDescription', { key, value })
+  commit('mutateUnsavedChanges', true)
 }
 
 export const setMhrHomeBaseInformation: ActionIF = ({ commit }, { key, value }): void => {
   commit('mutateMhrBaseInformation', { key, value })
+  commit('mutateUnsavedChanges', true)
 }
 
 export const setMhrSubmittingParty: ActionIF = ({ commit }, { key, value }): void => {
   commit('mutateMhrSubmittingParty', { key, value })
+  commit('mutateUnsavedChanges', true)
 }
 
 export const setMhrRegistrationHomeOwners: ActionIF = ({ commit }, owners: MhrRegistrationHomeOwnersIF[]): void => {
@@ -309,14 +312,17 @@ export const setMhrRegistrationHomeOwners: ActionIF = ({ commit }, owners: MhrRe
 
 export const setMhrAttentionReferenceNum: ActionIF = ({ commit }, value): void => {
   commit('mutateMhrAttentionReferenceNum', value)
+  commit('mutateUnsavedChanges', true)
 }
 
 export const setMhrLocation: ActionIF = ({ commit }, { key, value }): void => {
   commit('mutateMhrLocation', { key, value })
+  commit('mutateUnsavedChanges', true)
 }
 
 export const setCivicAddress: ActionIF = ({ commit }, { key, value }): void => {
   commit('mutateCivicAddress', { key, value })
+  commit('mutateUnsavedChanges', true)
 }
 
 export const setMhrRegistrationHomeOwnerGroups: ActionIF = (
@@ -324,4 +330,5 @@ export const setMhrRegistrationHomeOwnerGroups: ActionIF = (
   groups: MhrRegistrationHomeOwnerGroupIF[]
 ): void => {
   commit('mutateMhrHomeOwnerGroups', groups)
+  commit('mutateUnsavedChanges', true)
 }

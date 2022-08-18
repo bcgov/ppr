@@ -30,7 +30,7 @@
 import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
 import { useGetters } from 'vuex-composition-helpers'
 import { HomeLocationType, HomeCivicAddress } from '@/components/mhrRegistration'
-import { useMhrValidations } from '@/composables/mhrRegistration/mhr-validations'
+import { useMhrValidations } from '@/composables/mhrRegistration/useMhrValidations'
 
 export default defineComponent({
   name: 'HomeLocation',
