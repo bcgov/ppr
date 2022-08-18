@@ -100,6 +100,7 @@
             label="Email Address"
             v-model="submittingParty.emailAddress"
             :rules="emailRules"
+            validate-on-blur
           />
 
           <!-- Phone Number -->
@@ -107,18 +108,19 @@
           <v-row no-gutters>
             <v-col>
               <v-text-field
+                v-mask="'(###) ###-####'"
                 filled
                 id="submitting-party-phone"
                 class="pt-4 pr-3"
                 label="Phone Number"
-                hint="Example: (555) 555-5555"
-                persistent-hint
                 v-model="submittingParty.phoneNumber"
                 :rules="phoneRules"
-              />
+                validate-on-blur
+            />
             </v-col>
             <v-col>
               <v-text-field
+                type="number"
                 filled
                 id="submitting-party-phone-ext"
                 class="pt-4 px-2"
@@ -160,6 +162,9 @@ import { BaseAddress } from '@/composables/address'
 import { SubmittingPartyTypes } from '@/enums'
 import { PartyAddressSchema } from '@/schemas'
 import { cloneDeep } from 'lodash'
+import { VueMaskDirective } from 'v-mask'
+import { mutateOriginalLengthTrust } from '@/store/mutations'
+
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
@@ -172,6 +177,9 @@ export default defineComponent({
       type: Boolean,
       default: false
     }
+  },
+  directives: {
+    mask: VueMaskDirective
   },
   setup (props, context) {
     const {
@@ -191,12 +199,12 @@ export default defineComponent({
     const {
       customRules,
       invalidSpaces,
-      maxLength,
       minLength,
-      required,
+      maxLength,
       isStringOrNumber,
-      isEmail,
-      isNumber
+      required,
+      isNumber,
+      isEmail
     } = useInputRules()
 
     const {
@@ -249,6 +257,17 @@ export default defineComponent({
       invalidSpaces()
     )
 
+    const emailRules = customRules(
+      required('Enter an email'),
+      isEmail(),
+      invalidSpaces()
+    )
+
+    const phoneRules = customRules(
+      required('Enter a phone number'),
+      minLength(14),
+      invalidSpaces()
+    )
     const middleNameRules = customRules(isStringOrNumber(), maxLength(15), invalidSpaces())
 
     const lastNameRules = customRules(
@@ -260,15 +279,6 @@ export default defineComponent({
     const businessNameRules = customRules(
       required('Business name is required'),
       maxLength(70),
-      invalidSpaces()
-    )
-
-    const emailRules = customRules(required('Email address is required'), invalidSpaces(), isEmail())
-
-    const phoneRules = customRules(
-      required('Enter a phone number'),
-      minLength(10),
-      maxLength(15),
       invalidSpaces()
     )
 
@@ -340,11 +350,11 @@ export default defineComponent({
       updateValidity,
       PartyAddressSchema,
       SubmittingPartyTypes,
+      emailRules,
       firstNameRules,
       middleNameRules,
       lastNameRules,
       businessNameRules,
-      emailRules,
       phoneRules,
       phoneExtensionRules,
       ...toRefs(localState)

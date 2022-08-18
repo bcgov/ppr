@@ -1,4 +1,4 @@
-import { AddressIF, MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF } from '@/interfaces'
+import { AddressIF, MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnersIF } from '@/interfaces'
 
 export const mockedAddress: AddressIF = {
   street: '1234 Fort St.',
@@ -25,7 +25,7 @@ export const mockedEmptyGroup: MhrRegistrationHomeOwnerGroupIF = {
   owners: []
 }
 
-export const mockedPerson: MhrRegistrationHomeOwnerIF = {
+export const mockedPerson: MhrRegistrationHomeOwnersIF = {
   id: '10',
   individualName: {
     first: 'John',
@@ -33,16 +33,16 @@ export const mockedPerson: MhrRegistrationHomeOwnerIF = {
     last: 'Smith'
   },
   suffix: 'Sr.',
-  phoneNumber: '5453332211',
+  phoneNumber: '(545) 333-2211',
   phoneExtension: '1234',
   address: mockedAddress
 }
 
-export const mockedOrganization: MhrRegistrationHomeOwnerIF = {
+export const mockedOrganization: MhrRegistrationHomeOwnersIF = {
   id: '20',
   organizationName: 'Smart Track',
   suffix: 'Inc.',
-  phoneNumber: '9998887766',
+  phoneNumber: '(999) 888-7766',
   phoneExtension: '4321',
   address: mockedAddressAlt
 }

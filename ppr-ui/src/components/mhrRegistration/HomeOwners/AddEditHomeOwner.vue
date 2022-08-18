@@ -139,13 +139,13 @@
             <v-col cols="6">
               <v-text-field
                 id="phone-number"
+                v-mask="'(###) ###-####'"
                 v-model="owner.phoneNumber"
                 filled
                 :rules="phoneNumberRules"
                 label="Phone Number"
                 data-test-id="phone-number"
-                hint="Example: (555) 555-5555"
-                persistent-hint
+                validate-on-blur
               />
             </v-col>
             <v-col cols="6">
@@ -230,9 +230,10 @@ import { AutoComplete } from '@/components/search'
 import { BaseAddress } from '@/composables/address'
 import { PartyAddressSchema } from '@/schemas'
 import { focusOnFirstError } from '@/utils'
+import { VueMaskDirective } from 'v-mask'
 
 /* eslint-disable no-unused-vars */
-import { MhrRegistrationHomeOwnerIF } from '@/interfaces/mhr-registration-interfaces'
+import { MhrRegistrationHomeOwnersIF } from '@/interfaces/mhr-registration-interfaces'
 import { SimpleHelpToggle } from '@/components/common'
 import { useSearch } from '@/composables/useSearch'
 import { SearchResponseI } from '@/interfaces'
@@ -249,9 +250,12 @@ export default defineComponent({
     SimpleHelpToggle,
     HomeOwnerGroups
   },
+  directives: {
+    mask: VueMaskDirective
+  },
   props: {
     editHomeOwner: {
-      type: Object as () => MhrRegistrationHomeOwnerIF,
+      type: Object as () => MhrRegistrationHomeOwnersIF,
       default: null
     },
     isHomeOwnerPerson: {
@@ -260,7 +264,7 @@ export default defineComponent({
     }
   },
   setup (props, context) {
-    const { required, customRules, maxLength } = useInputRules()
+    const { required, customRules, maxLength, minLength } = useInputRules()
 
     const {
       getSideTitle,
@@ -276,7 +280,7 @@ export default defineComponent({
 
     const { searchBusiness } = useSearch()
 
-    const defaultHomeOwner: MhrRegistrationHomeOwnerIF = {
+    const defaultHomeOwner: MhrRegistrationHomeOwnersIF = {
       id: props.editHomeOwner?.id || (DEFAULT_OWNER_ID++).toString(),
       phoneNumber: props.editHomeOwner?.phoneNumber || '',
       phoneExtension: props.editHomeOwner?.phoneExtension || null,
@@ -323,11 +327,11 @@ export default defineComponent({
       lastNameRules: customRules(required('Enter a last name'), maxLength(25)),
       orgNameRules: customRules(
         required('Enter an organization name'),
-        maxLength(70)
+        maxLength(150)
       ),
       phoneNumberRules: customRules(
         required('Enter a phone number'),
-        maxLength(15)
+        minLength(14)
       )
     })
 
@@ -338,12 +342,12 @@ export default defineComponent({
       if (localState.isHomeOwnerFormValid) {
         if (props.editHomeOwner) {
           editHomeOwner(
-            localState.owner as MhrRegistrationHomeOwnerIF,
+            localState.owner as MhrRegistrationHomeOwnersIF,
             localState.ownerGroupId || '1'
           )
         } else {
           addOwnerToTheGroup(
-            localState.owner as MhrRegistrationHomeOwnerIF,
+            localState.owner as MhrRegistrationHomeOwnersIF,
             localState.ownerGroupId
           )
         }
@@ -380,6 +384,7 @@ export default defineComponent({
       cancel,
       addHomeOwnerForm,
       maxLength,
+      minLength,
       addressSchema,
       ...toRefs(localState)
     }
