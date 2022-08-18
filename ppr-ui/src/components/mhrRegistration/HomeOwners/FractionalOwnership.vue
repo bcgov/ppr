@@ -2,12 +2,15 @@
   <div id="mhr-home-ownership">
     <label class="generic-label">Fractional Ownership</label>
     <div v-if="isReadOnly">
-      <p data-test-id="readonly-interest-info">Interest: {{ fractionalInterest }}</p>
+      <p data-test-id="readonly-interest-info">
+        Interest: {{ fractionalInterest }}
+      </p>
     </div>
     <div v-else>
       <p class="mt-3 mb-6">
-        Enter the interest type and fraction of the total ownership owned by Group 1. For example,
-        if there are four owner groups, this group could have 1/4 ownership.
+        Enter the interest type and fraction of the total ownership owned by
+        Group 1. For example, if there are four owner groups, this group could
+        have 1/4 ownership.
       </p>
       <v-text-field
         :id="`interest-type-group-${groupId}`"
@@ -35,7 +38,10 @@
         />
       </div>
       <label class="generic-label" for="tenancy-type">Tenancy</label>
-      <v-checkbox :id="`tenancy-type-group-${groupId}`" v-model="fractionalInfo.tenancySpecified">
+      <v-checkbox
+        :id="`tenancy-type-group-${groupId}`"
+        v-model="fractionalInfo.tenancySpecified"
+      >
         <template v-slot:label>
           <p class="ma-0">
             Tenancy not specified
@@ -48,10 +54,18 @@
 
 <script lang="ts">
 /* eslint-disable no-unused-vars */
-import { MhrRegistrationFractionalOwnershipIF, MhrRegistrationHomeOwnersIF } from '@/interfaces'
+import {
+  MhrRegistrationFractionalOwnershipIF,
+  MhrRegistrationHomeOwnersIF,
+} from '@/interfaces'
 /* eslint-enable no-unused-vars */
 
-import { computed, defineComponent, reactive, toRefs } from '@vue/composition-api'
+import {
+  computed,
+  defineComponent,
+  reactive,
+  toRefs,
+} from '@vue/composition-api'
 import { useInputRules } from '@/composables/useInputRules'
 
 let DEFAULT_OWNER_ID = 1
@@ -61,22 +75,29 @@ export default defineComponent({
   props: {
     groupId: {
       type: String,
-      required: true
+      required: true,
     },
     editHomeOwner: {
       type: Object as () => MhrRegistrationHomeOwnersIF,
-      default: null
+      default: null,
     },
     showEditBtn: { type: Boolean, default: true },
     isReadOnly: { type: Boolean, default: false },
     fractionalData: {
       type: Object as () => MhrRegistrationFractionalOwnershipIF,
       default: {} as () => MhrRegistrationFractionalOwnershipIF,
-      required: true
-    }
+      required: true,
+    },
   },
-  setup (props) {
-    const { customRules, required, isNumber, maxLength, greaterThan, lessThan } = useInputRules()
+  setup(props) {
+    const {
+      customRules,
+      required,
+      isNumber,
+      maxLength,
+      greaterThan,
+      lessThan,
+    } = useInputRules()
 
     const localState = reactive({
       id: props.editHomeOwner?.id || (DEFAULT_OWNER_ID++).toString(),
@@ -107,13 +128,13 @@ export default defineComponent({
             'Must be greater than amount owned by group'
           )
         )
-      )
+      ),
     })
 
     return {
-      ...toRefs(localState)
+      ...toRefs(localState),
     }
-  }
+  },
 })
 </script>
 

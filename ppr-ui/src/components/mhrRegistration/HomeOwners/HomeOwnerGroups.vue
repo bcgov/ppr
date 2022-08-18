@@ -5,11 +5,12 @@
     </label>
     <ul class="my-2">
       <li>
-        Select a group if you have <b>multiple groups of owners</b> (tenants in common).
+        Select a group if you have <b>multiple groups of owners</b> (tenants in
+        common).
       </li>
       <li>
-        Leave this empty if you have <b>only one owner</b>, or <b>one group of owners</b> (sole
-        ownership or joint tenancy).
+        Leave this empty if you have <b>only one owner</b>, or
+        <b>one group of owners</b> (sole ownership or joint tenancy).
       </li>
     </ul>
     <v-select
@@ -39,7 +40,13 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, ref, toRefs } from '@vue/composition-api'
+import {
+  computed,
+  defineComponent,
+  reactive,
+  ref,
+  toRefs,
+} from '@vue/composition-api'
 import { useHomeOwners } from '@/composables/mhrRegistration'
 import { useInputRules } from '@/composables'
 import FractionalOwnership from './FractionalOwnership.vue'
@@ -50,16 +57,16 @@ export default defineComponent({
   name: 'HomeOwnerGroups',
   emits: ['setOwnerGroupId'],
   components: {
-    FractionalOwnership
+    FractionalOwnership,
   },
   props: {
     groupId: { type: String },
     fractionalData: { type: Object },
-    isAddingHomeOwner: { type: Boolean } // make additional Group available in dropdown when adding a new home owner
+    isAddingHomeOwner: { type: Boolean }, // make additional Group available in dropdown when adding a new home owner
   },
-  setup (props, { emit }) {
+  setup(props, { emit }) {
     const { getMhrRegistrationHomeOwnerGroups } = useGetters<any>([
-      'getMhrRegistrationHomeOwnerGroups'
+      'getMhrRegistrationHomeOwnerGroups',
     ])
     const groupDropdown = ref(null)
 
@@ -68,11 +75,15 @@ export default defineComponent({
 
     const localState = reactive({
       ownerGroupId: props.groupId,
-      groupItems: computed(() => getGroupDropdownItems(props.isAddingHomeOwner, props.groupId)),
+      groupItems: computed(() =>
+        getGroupDropdownItems(props.isAddingHomeOwner, props.groupId)
+      ),
       groupRules: computed(() => {
         return showGroups.value ? required('Select a group for this owner') : []
       }),
-      showFractionalOwnership: computed(() => Number(localState.ownerGroupId) > 0),
+      showFractionalOwnership: computed(
+        () => Number(localState.ownerGroupId) > 0
+      ),
       isReadOnlyFractionalOwnership: computed(
         // if group already exists - show fractional ownership as readonly
         () =>
@@ -80,7 +91,7 @@ export default defineComponent({
             getMhrRegistrationHomeOwnerGroups.value,
             group => group.groupId === localState.ownerGroupId
           ) !== undefined
-      )
+      ),
     })
 
     const setOwnerGroupId = (groupId: string) => {
@@ -90,9 +101,9 @@ export default defineComponent({
     return {
       setOwnerGroupId,
       groupDropdown,
-      ...toRefs(localState)
+      ...toRefs(localState),
     }
-  }
+  },
 })
 </script>
 

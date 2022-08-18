@@ -12,7 +12,7 @@
           'If you wish to keep the owners of this group move the ' +
           'owners to a different group prior to deletion.',
         acceptText: 'Delete Group',
-        cancelText: 'Cancel'
+        cancelText: 'Cancel',
       }"
     />
     <div v-if="!isEditingGroupMode" class="group-header-summary">
@@ -47,7 +47,13 @@
 
         <v-menu offset-y left nudge-bottom="0" class="delete-group-menu">
           <template v-slot:activator="{ on }">
-            <v-btn text v-on="on" color="primary" class="pa-0" :disabled="isGlobalEditingMode">
+            <v-btn
+              text
+              v-on="on"
+              color="primary"
+              class="pa-0"
+              :disabled="isGlobalEditingMode"
+            >
               <v-icon>mdi-menu-down</v-icon>
             </v-btn>
           </template>
@@ -55,7 +61,10 @@
           <!-- More actions drop down list -->
           <v-list class="actions-dropdown actions__more-actions">
             <v-list-item class="my-n2">
-              <v-list-item-subtitle class="pa-0" @click="showDeleteGroupDialog = true">
+              <v-list-item-subtitle
+                class="pa-0"
+                @click="showDeleteGroupDialog = true"
+              >
                 <v-icon small style="margin-bottom: 3px;">mdi-delete</v-icon>
                 <span class="ml-1 remove-btn-text">Delete Group</span>
               </v-list-item-subtitle>
@@ -76,17 +85,32 @@
             ref="homeFractionalOwnershipForm"
             v-model="isHomeFractionalOwnershipValid"
           >
-            <FractionalOwnership :groupId="groupId" :fractionalData="fractionalData" />
+            <FractionalOwnership
+              :groupId="groupId"
+              :fractionalData="fractionalData"
+            />
           </v-form>
         </v-col>
       </v-row>
       <v-row>
         <v-col>
           <div class="form__row form__btns">
-            <v-btn color="primary" class="ml-auto" :ripple="false" large @click="done()">
+            <v-btn
+              color="primary"
+              class="ml-auto"
+              :ripple="false"
+              large
+              @click="done()"
+            >
               Done
             </v-btn>
-            <v-btn :ripple="false" large color="primary" outlined @click="cancel()">
+            <v-btn
+              :ripple="false"
+              large
+              color="primary"
+              outlined
+              @click="cancel()"
+            >
               Cancel
             </v-btn>
           </div>
@@ -99,7 +123,14 @@
 <script lang="ts">
 import { BaseDialog } from '@/components/dialogs'
 import { useHomeOwners } from '@/composables/mhrRegistration'
-import { computed, defineComponent, reactive, ref, toRefs, watch } from '@vue/composition-api'
+import {
+  computed,
+  defineComponent,
+  reactive,
+  ref,
+  toRefs,
+  watch,
+} from '@vue/composition-api'
 import FractionalOwnership from './FractionalOwnership.vue'
 import { useGetters } from 'vuex-composition-helpers'
 import { find } from 'lodash'
@@ -111,33 +142,37 @@ export default defineComponent({
   name: 'TableGroupHeader',
   props: {
     groupId: { default: '' },
-    owners: { default: [] }
+    owners: { default: [] },
   },
   components: {
     BaseDialog,
-    FractionalOwnership
+    FractionalOwnership,
   },
-  setup (props, context) {
+  setup(props, context) {
     const { getMhrRegistrationHomeOwnerGroups } = useGetters<any>([
-      'getMhrRegistrationHomeOwnerGroups'
+      'getMhrRegistrationHomeOwnerGroups',
     ])
 
     const {
       isGlobalEditingMode,
       setGlobalEditingMode,
       deleteGroup,
-      setGroupFractionalInterest
+      setGroupFractionalInterest,
     } = useHomeOwners()
 
     const homeFractionalOwnershipForm = ref(null)
 
     const localState = reactive({
-      isEditingGroupMode: computed((): boolean => localState.currentlyEditingGroupId >= 0),
+      isEditingGroupMode: computed(
+        (): boolean => localState.currentlyEditingGroupId >= 0
+      ),
       currentlyEditingGroupId: -1,
       showDeleteGroupDialog: false,
       isHomeFractionalOwnershipValid: false,
       group: computed(() =>
-        find(getMhrRegistrationHomeOwnerGroups.value, { groupId: props.groupId })
+        find(getMhrRegistrationHomeOwnerGroups.value, {
+          groupId: props.groupId,
+        })
       ),
       fractionalData: computed(() => {
         return {
@@ -145,9 +180,9 @@ export default defineComponent({
           interest: localState.group?.interest || '',
           interestNumerator: localState.group?.interestNumerator || null,
           interestTotal: localState.group?.interestTotal || null,
-          tenancySpecified: localState.group?.tenancySpecified || null
+          tenancySpecified: localState.group?.tenancySpecified || null,
         } as MhrRegistrationFractionalOwnershipIF
-      })
+      }),
     })
 
     const openGroupForEditing = groupId => {
@@ -158,7 +193,11 @@ export default defineComponent({
       // const interest = getMhrRegistrationHomeOwnerGroups.value[index]?.interest
       // return interest ? 'Interest: ' + interest : ''
 
-      const { interest, interestNumerator, interestTotal } = localState.fractionalData
+      const {
+        interest,
+        interestNumerator,
+        interestTotal,
+      } = localState.fractionalData
 
       return `${interest} ${interestNumerator}/${interestTotal}`
     }
@@ -202,9 +241,9 @@ export default defineComponent({
       cancel,
       cancelOrProceed,
       homeFractionalOwnershipForm,
-      ...toRefs(localState)
+      ...toRefs(localState),
     }
-  }
+  },
 })
 </script>
 
