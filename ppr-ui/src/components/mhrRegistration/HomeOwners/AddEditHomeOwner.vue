@@ -228,7 +228,7 @@ import {
   reactive,
   ref,
   toRefs,
-  watch
+  watch,
 } from '@vue/composition-api'
 import { useInputRules } from '@/composables/useInputRules'
 import { useHomeOwners, useMhrValidations } from '@/composables/mhrRegistration'
@@ -265,22 +265,22 @@ export default defineComponent({
     AutoComplete,
     BaseAddress,
     SimpleHelpToggle,
-    HomeOwnerGroups
+    HomeOwnerGroups,
   },
   directives: {
-    mask: VueMaskDirective
+    mask: VueMaskDirective,
   },
   props: {
     editHomeOwner: {
       type: Object as () => MhrRegistrationHomeOwnersIF,
-      default: null
+      default: null,
     },
     isHomeOwnerPerson: {
       type: Boolean,
       default: false
     }
   },
-  setup  (props, context) {
+  setup (props, context) {
     const { getMhrRegistrationHomeOwnerGroups } = useGetters<any>(['getMhrRegistrationHomeOwnerGroups'])
     const { required, customRules, maxLength, minLength, isPhone, isNumber, invalidSpaces } = useInputRules()
 
@@ -291,7 +291,7 @@ export default defineComponent({
       editHomeOwner,
       showGroups,
       setShowGroups,
-      setGroupFractionalInterest
+      setGroupFractionalInterest,
     } = useHomeOwners(props.isHomeOwnerPerson, props.editHomeOwner == null)
 
     const {
@@ -458,7 +458,7 @@ export default defineComponent({
       addressSchema,
       ...toRefs(localState)
     }
-  }
+  },
 })
 </script>
 

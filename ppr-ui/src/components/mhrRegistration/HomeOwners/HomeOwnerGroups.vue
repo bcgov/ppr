@@ -5,11 +5,12 @@
     </label>
     <ul class="my-2">
       <li>
-        Select a group if you have <b>multiple groups of owners</b> (tenants in common).
+        Select a group if you have <b>multiple groups of owners</b> (tenants in
+        common).
       </li>
       <li>
-        Leave this empty if you have <b>only one owner</b>, or <b>one group of owners</b> (sole
-        ownership or joint tenancy).
+        Leave this empty if you have <b>only one owner</b>, or
+        <b>one group of owners</b> (sole ownership or joint tenancy).
       </li>
     </ul>
     <v-select
@@ -57,7 +58,13 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, ref, toRefs } from '@vue/composition-api'
+import {
+  computed,
+  defineComponent,
+  reactive,
+  ref,
+  toRefs,
+} from '@vue/composition-api'
 import { useHomeOwners } from '@/composables/mhrRegistration'
 import { useInputRules } from '@/composables'
 import FractionalOwnership from './FractionalOwnership.vue'
@@ -82,7 +89,7 @@ export default defineComponent({
   name: 'HomeOwnerGroups',
   emits: ['setOwnerGroupId'],
   components: {
-    FractionalOwnership
+    FractionalOwnership,
   },
   props: {
     groupId: { type: String },
@@ -100,7 +107,9 @@ export default defineComponent({
 
     const localState = reactive({
       ownerGroupId: props.groupId,
-      groupItems: computed(() => getGroupDropdownItems(props.isAddingHomeOwner, props.groupId)),
+      groupItems: computed(() =>
+        getGroupDropdownItems(props.isAddingHomeOwner, props.groupId)
+      ),
       groupRules: computed(() => {
         return showGroups.value ? required('Select a group for this owner') : []
       }),
@@ -141,9 +150,9 @@ export default defineComponent({
       openEditFractionalOwnership,
       setOwnerGroupId,
       groupDropdown,
-      ...toRefs(localState)
+      ...toRefs(localState),
     }
-  }
+  },
 })
 </script>
 
