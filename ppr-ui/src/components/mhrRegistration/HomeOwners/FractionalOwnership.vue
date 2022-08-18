@@ -48,7 +48,7 @@
 
 <script lang="ts">
 /* eslint-disable no-unused-vars */
-import { MhrRegistrationFractionalOwnershipIF, MhrRegistrationHomeOwnerIF } from '@/interfaces'
+import { MhrRegistrationFractionalOwnershipIF, MhrRegistrationHomeOwnersIF } from '@/interfaces'
 /* eslint-enable no-unused-vars */
 
 import { computed, defineComponent, reactive, toRefs } from '@vue/composition-api'
@@ -64,7 +64,7 @@ export default defineComponent({
       required: true
     },
     editHomeOwner: {
-      type: Object as () => MhrRegistrationHomeOwnerIF,
+      type: Object as () => MhrRegistrationHomeOwnersIF,
       default: null
     },
     showEditBtn: { type: Boolean, default: true },

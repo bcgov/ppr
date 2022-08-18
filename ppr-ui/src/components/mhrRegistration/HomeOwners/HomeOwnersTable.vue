@@ -114,13 +114,13 @@ import { toDisplayPhone } from '@/utils'
 import { AddEditHomeOwner } from '@/components/mhrRegistration/HomeOwners'
 import TableGroupHeader from '@/components/mhrRegistration/HomeOwners/TableGroupHeader.vue'
 /* eslint-disable no-unused-vars */
-import { MhrRegistrationHomeOwnerIF } from '@/interfaces'
+import { MhrRegistrationHomeOwnersIF } from '@/interfaces'
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
   name: 'HomeOwnersTable',
   props: {
-    homeOwners: { default: [] as MhrRegistrationHomeOwnerIF[] },
+    homeOwners: { default: [] as MhrRegistrationHomeOwnersIF[] },
     isAdding: { default: false }
   },
   components: {
