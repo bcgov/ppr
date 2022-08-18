@@ -16,7 +16,7 @@ const showGroups = ref(false)
 // Set global edit mode to enable or disable all Edit and dropdown buttons
 const isGlobalEditingMode = ref(false)
 
-export function useHomeOwners(isPerson: boolean = false, isEditMode: boolean = false) {
+export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = false) {
   const { getMhrRegistrationHomeOwnerGroups } = useGetters<any>([
     'getMhrRegistrationHomeOwnerGroups'
   ])
