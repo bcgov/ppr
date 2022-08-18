@@ -228,7 +228,7 @@ import {
   reactive,
   ref,
   toRefs,
-  watch,
+  watch
 } from '@vue/composition-api'
 import { useInputRules } from '@/composables/useInputRules'
 import { useHomeOwners, useMhrValidations } from '@/composables/mhrRegistration'
@@ -242,7 +242,7 @@ import { VueMaskDirective } from 'v-mask'
 import {
   MhrRegistrationHomeOwnerGroupIF,
   MhrRegistrationHomeOwnersIF,
-  MhrRegistrationFractionalOwnershipIF,
+  MhrRegistrationFractionalOwnershipIF
 } from '@/interfaces/mhr-registration-interfaces'
 import { SearchResponseI } from '@/interfaces'
 /* eslint-enable no-unused-vars */
@@ -260,15 +260,15 @@ export default defineComponent({
     AutoComplete,
     BaseAddress,
     SimpleHelpToggle,
-    HomeOwnerGroups,
+    HomeOwnerGroups
   },
   directives: {
-    mask: VueMaskDirective,
+    mask: VueMaskDirective
   },
   props: {
     editHomeOwner: {
       type: Object as () => MhrRegistrationHomeOwnersIF,
-      default: null,
+      default: null
     },
     isHomeOwnerPerson: {
       type: Boolean,
@@ -285,7 +285,7 @@ export default defineComponent({
       editHomeOwner,
       showGroups,
       setShowGroups,
-      setGroupFractionalInterest,
+      setGroupFractionalInterest
     } = useHomeOwners(props.isHomeOwnerPerson, props.editHomeOwner == null)
 
     const {
@@ -314,15 +314,15 @@ export default defineComponent({
         country: props.editHomeOwner?.address.country || '',
         postalCode: props.editHomeOwner?.address.postalCode || '',
         deliveryInstructions:
-          props.editHomeOwner?.address.deliveryInstructions || '',
-      },
+          props.editHomeOwner?.address.deliveryInstructions || ''
+      }
     }
 
     if (props.isHomeOwnerPerson) {
       defaultHomeOwner.individualName = {
         first: props.editHomeOwner?.individualName.first || '',
         middle: props.editHomeOwner?.individualName.middle || '',
-        last: props.editHomeOwner?.individualName.last || '',
+        last: props.editHomeOwner?.individualName.last || ''
       }
     } else {
       defaultHomeOwner.organizationName =
@@ -346,7 +346,7 @@ export default defineComponent({
         interest: '',
         interestNumerator: null,
         interestTotal: null,
-        tenancySpecified: null,
+        tenancySpecified: null
       } as MhrRegistrationFractionalOwnershipIF,
       fractionalData: computed(() => {
         // TODO: get fractional ownership for the group that either owner belongs to or
@@ -357,7 +357,7 @@ export default defineComponent({
           interest: localState.group?.interest || '',
           interestNumerator: localState.group?.interestNumerator || null,
           interestTotal: localState.group?.interestTotal || null,
-          tenancySpecified: localState.group?.tenancySpecified || null,
+          tenancySpecified: localState.group?.tenancySpecified || null
         } as MhrRegistrationFractionalOwnershipIF
       }),
       isHomeOwnerFormValid: false,
@@ -442,9 +442,9 @@ export default defineComponent({
       maxLength,
       minLength,
       addressSchema,
-      ...toRefs(localState),
+      ...toRefs(localState)
     }
-  },
+  }
 })
 </script>
 
