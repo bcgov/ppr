@@ -19,23 +19,16 @@
     </div>
 
     <!-- Authorization -->
-    <section id="certify-section" class="mt-10">
-      <article>
-        <h2>Authorization</h2>
-        <p class="mt-4">
-          The following account information will be recorded by BC Registries upon registration and payment. This
-          information is used to confirm you have the authority to submit this registration and will not appear on the
-          verification statement.
-        </p>
-      </article>
-
-      <v-card flat class="mt-6">
-        <!-- Certify Placeholder -->
-      </v-card>
+    <section id="mh-certify-section" class="mt-10 pt-4">
+      <CertifyInformation
+        isMhr
+        :setShowErrors="validateReview"
+        @certifyValid="authorizationValid = $event"
+      />
     </section>
 
     <!-- Staff Payment -->
-    <section id="staff-payment-section" class="mt-10" v-if="true">
+    <section id="mhr-staff-payment-section" class="mt-10" v-if="true">
       <article>
         <h2>Staff Payment</h2>
         <p class="mt-4"></p>
@@ -49,8 +42,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
+import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
 import { HomeLocationReview, SubmittingPartyReview, YourHomeReview } from '@/components/mhrRegistration/ReviewConfirm'
+import { CertifyInformation } from '@/components/common'
 import { useMhrValidations } from '@/composables'
 import { RouteNames } from '@/enums'
 import { useGetters } from 'vuex-composition-helpers'
@@ -60,7 +54,8 @@ export default defineComponent({
   components: {
     YourHomeReview,
     SubmittingPartyReview,
-    HomeLocationReview
+    HomeLocationReview,
+    CertifyInformation
   },
   props: {},
   setup (props, context) {
@@ -75,10 +70,18 @@ export default defineComponent({
       MhrSectVal,
       setValidation,
       scrollToInvalid,
-      getStepValidation
+      getValidation,
+      getStepValidation,
+      getSectionValidation
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
-    const localState = reactive({})
+    const localState = reactive({
+      authorizationValid: false,
+      validateReview: computed(() => {
+        return getSectionValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.AUTHORIZATION_VALID) &&
+          getValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_APP)
+      })
+    })
 
     watch(() => context.root.$route.name, (route: string) => {
       switch (route) {

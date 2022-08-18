@@ -1,8 +1,7 @@
 <template>
   <v-container flat class="pa-0" id="certify-summary">
-
     <v-row no-gutters>
-      <v-col class="generic-label"><h2>2. Authorization</h2></v-col>
+      <v-col class="generic-label"><h2><span>{{isMhr ? 1 : 2}}</span>. Authorization</h2></v-col>
     </v-row>
     <v-row no-gutters class="pb-6 pt-4">
       <v-col>
@@ -113,6 +112,10 @@ export default defineComponent({
   },
   props: {
     setShowErrors: {
+      type: Boolean,
+      default: false
+    },
+    isMhr: {
       type: Boolean,
       default: false
     }
