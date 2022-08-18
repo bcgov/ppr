@@ -8,6 +8,7 @@
         <v-form ref="addressForm" name="address-form" v-model="isValidCivicAddress">
           <div class="form__row">
             <v-text-field
+              autocomplete="new-password"
               id="street"
               class="street-address"
               filled
@@ -16,6 +17,8 @@
               persistent-hint
               v-model="address.street"
               :rules="[...addressSchema.street]"
+              @keypress.once="enableAddressComplete()"
+              @click="enableAddressComplete()"
             />
           </div>
           <div class="form__row">
@@ -71,12 +74,54 @@ import { defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
 import { CivicAddressSchema } from '@/schemas/civic-address'
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import { useMhrValidations } from '@/composables'
+import {
+  baseRules,
+  useAddress,
+  useAddressComplete,
+  useCountryRegions,
+  useCountriesProvinces,
+  useBaseValidations,
+  spaceRules
+} from '@/composables/address/factories'
+import { AddressIF } from '@/interfaces'
+import { SchemaIF } from '@/composables/address/interfaces'
 /* eslint-enable no-unused-vars */
 export default defineComponent({
   name: 'HomeCivicAddress',
   components: {},
   props: {
+    value: {
+      type: Object as () => AddressIF,
+      default: () => ({
+        street: '',
+        streetAdditional: '',
+        city: '',
+        region: '',
+        postalCode: '',
+        country: '',
+        deliveryInstructions: ''
+      })
+    },
     validate: {
+      type: Boolean,
+      default: false
+    },
+    editing: {
+      type: Boolean,
+      default: false
+    },
+    /* contains validation for each field */
+    schema: {
+      type: Object as () => SchemaIF,
+      default: null
+    },
+    /* triggers all current form validation errors */
+    triggerErrors: {
+      type: Boolean,
+      default: false
+    },
+    /* Hides the persistent hint field on Address Input */
+    hideAddressHint: {
       type: Boolean,
       default: false
     }
@@ -99,7 +144,13 @@ export default defineComponent({
       setValidation
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
+    const {
+      addressLocal,
+      isSchemaRequired
+    } = useAddress(toRefs(props).value, props.schema)
     const addressSchema = CivicAddressSchema
+
+    const { enableAddressComplete, uniqueIds } = useAddressComplete(addressLocal)
 
     const localState = reactive({
       isValidCivicAddress: false,
@@ -108,7 +159,9 @@ export default defineComponent({
         streetAdditional: '',
         city: '',
         region: 'British Columbia'
-      }
+      },
+      isSchemaRequired,
+      ...uniqueIds
     })
 
     /** Apply local model updates to store. **/
@@ -142,7 +195,7 @@ export default defineComponent({
     })
 
     /** Clear/reset forms when select option changes. **/
-    return { addressSchema, ...toRefs(localState) }
+    return { addressSchema, addressLocal, enableAddressComplete, ...toRefs(localState) }
   }
 })
 </script>
