@@ -30,12 +30,18 @@ BASIC_USER = 'basic'
 PRO_DATA_USER = 'pro_data'
 PUBLIC_USER = 'public_user'
 USER_ORGS_PATH = 'users/orgs'
-GOV_ACCOUNT_ROLE = 'gov_account_user'
-BCOL_HELP = 'helpdesk'
+GOV_ACCOUNT_ROLE = 'mhr_gov_account_user'
+BCOL_HELP = 'mhr_helpdesk'
+# MH keycloak roles for registrations/filings
+REGISTER_MH = 'mhr_register'
+REQUEST_TRANSPORT_PERMIT = 'mhr_transport'
+REQUEST_EXEMPTION_RES = 'mhr_exemption_res'
+REQUEST_EXEMPTION_NON_RES = 'mhr_exemption_non_res'
+TRANFER_SALE_BENEFICIARY = 'mhr_transfer_sale'
+TRANSFER_DEATH_JT = 'mhr_transfer_death'
 
 
-#  def authorized(identifier: str, jwt: JwtManager, action: List[str]) -> bool:
-def authorized(identifier: str, jwt: JwtManager) -> bool:  # pylint: disable=too-many-return-statements
+def authorized(identifier: str, jwt: JwtManager) -> bool:
     """Verify the user is authorized to submit the request by inspecting the web token.
 
     The gateway has already verified the JWT with the OIDC service.
@@ -87,6 +93,13 @@ def authorized(identifier: str, jwt: JwtManager) -> bool:  # pylint: disable=too
 #            current_app.logger.error(f'Authorization connection failure for {identifier}, using svc:{auth_url}', err)
 #            return False
 
+    return False
+
+
+def authorized_role(jwt: JwtManager, user_role: str) -> bool:
+    """Verify the user is authorized to submit a request by inspecting the web token."""
+    if jwt.validate_roles([STAFF_ROLE]) or jwt.validate_roles([user_role]):
+        return True
     return False
 
 

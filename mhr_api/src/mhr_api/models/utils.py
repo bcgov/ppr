@@ -199,12 +199,16 @@ ERR_REGISTRATION_NOT_FOUND_MHR = '{code}: no registration found for MHR number {
 ERR_SEARCH_TOO_OLD = '{code}: search get details search ID {search_id} timestamp too old: must be after {min_ts}.'
 ERR_SEARCH_COMPLETE = '{code}: search select results failed: results already provided for search ID {search_id}.'
 ERR_SEARCH_NOT_FOUND = '{code}: search select results failed: invalid search ID {search_id}.'
+ERR_DRAFT_NOT_FOUND = '{code}: no Draft found for Draft Number {draft_number}.'
+ERR_DRAFT_USED = '{code}: Draft for Draft Number {draft_number} has been used.'
+ERR_REGISTRATION_ACCOUNT = '{code}: the account ID {account_id} does not match MHR number {mhr_number}.'
 
 # PPR Error messages
 ERR_FINANCING_NOT_FOUND = '{code}: no Financing Statement found for registration number {registration_num}.'
 ERR_REGISTRATION_NOT_FOUND = '{code}: no registration found for registration number {registration_num}.'
 ERR_FINANCING_HISTORICAL = \
     '{code}: the Financing Statement for registration number {registration_num} has expired or been discharged.'
+ERR_MHR_REGISTRATION_NOT_FOUND = '{code}: no registration found for MHR number {mhr_number}.'
 
 
 SEARCH_RESULTS_DOC_NAME = 'search-results-report-{search_id}.pdf'
@@ -715,8 +719,46 @@ def get_ind_name_from_db2(db2_name: str):
     return name
 
 
+def to_db2_ind_name(name_json):
+    """Convert an individual name json to a DB2 legacy name."""
+    db2_name = str(name_json['last']).upper().ljust(25, ' ')
+    if name_json.get('middle'):
+        first = str(name_json['first']).upper().ljust(15, ' ')
+        middle = str(name_json['middle']).upper().ljust(30, ' ')
+        db2_name += first + middle
+    else:
+        first = str(name_json['first']).upper().ljust(45, ' ')
+        db2_name += first
+    return db2_name[:70]
+
+
+def to_db2_address(address_json):
+    """Convert address json to a DB2 legacy address."""
+    db2_address = str(address_json['street']).upper().ljust(40, ' ')
+    city = str(address_json['city']).upper().ljust(40, ' ')
+    rest = str(address_json['region']).upper() + ' ' + str(address_json['country']).upper()
+    if address_json.get('streetAdditional'):
+        street_2 = str(address_json['streetAdditional']).upper().ljust(40, ' ')
+        db2_address += street_2 + city
+    else:
+        street_2 = ''.ljust(40, ' ')
+        db2_address += street_2 + city
+    if address_json.get('postalCode'):
+        p_code = address_json.get('postalCode').upper()
+        if len(p_code) == 6:
+            p_code = p_code[0:3] + ' ' + p_code[3:]
+        rest += p_code.rjust(35, ' ')
+        db2_address += rest
+    else:
+        rest = rest.rjust(40, ' ')
+        db2_address += rest
+    return db2_address[:160]
+
+
 def get_address_from_db2(legacy_address: str, postal_code: str = ''):
     """Get an address json from a DB2 legacy address."""
+    if len(legacy_address) == 160:
+        return get_new_address_from_db2(legacy_address, postal_code)
     if len(legacy_address) > 120:
         return get_long_address_from_db2(legacy_address, postal_code)
 
@@ -795,6 +837,32 @@ def get_long_address_from_db2(legacy_address: str, postal_code: str = ''):
         'country': 'CA',
         'postalCode': postal_code
     }
+    if street2:
+        address['streetAdditional'] = street2
+    return address
+
+
+def get_new_address_from_db2(legacy_address: str, postal_code: str = ''):
+    """Get an address json from a new registration DB2 legacy address."""
+    value: str = legacy_address[119:].strip()
+    street = legacy_address[0:39].strip()
+    street2 = legacy_address[39:79].strip()
+    city = legacy_address[79:119].strip()
+    region = value[0:2]
+    country = value[3:5]
+    p_code = ''
+    if len(value) > 5:  # Have postal code
+        p_code = value[5:].strip()
+    address = {
+        'city': city,
+        'street': street,
+        'region': region,
+        'country': country
+    }
+    if postal_code:
+        address['postalCode'] = postal_code
+    elif p_code:
+        address['postalCode'] = p_code
     if street2:
         address['streetAdditional'] = street2
     return address

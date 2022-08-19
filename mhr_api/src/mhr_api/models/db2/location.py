@@ -16,10 +16,25 @@ from flask import current_app
 
 from mhr_api.exceptions import DatabaseException
 from mhr_api.models import db, utils as model_utils
+from mhr_api.utils.base import BaseEnum
+
+
+LEGACY_STATUS_NEW = {
+    'A': 'ACTIVE',
+    'D': 'DRAFT',
+    'H': 'HISTORICAL'
+}
 
 
 class Db2Location(db.Model):
     """This class manages all of the legacy DB2 MHR location information."""
+
+    class StatusTypes(BaseEnum):
+        """Render an Enum of the legacy document types."""
+
+        ACTIVE = 'A'
+        DRAFT = 'D'
+        HISTORICAL = 'H'
 
     __bind_key__ = 'db2'
     __tablename__ = 'location'
@@ -62,7 +77,7 @@ class Db2Location(db.Model):
     # Relationships
 
     def save(self):
-        """Save the object to the database immediately. Only used for unit testing."""
+        """Save the object to the database immediately."""
         try:
             db.session.add(self)
             db.session.commit()
@@ -142,7 +157,7 @@ class Db2Location(db.Model):
             'jurisdiction': self.jurisdiction,
             'rollNumber': self.roll_number,
             'parkName': self.park_name,
-            'parkPad': self.park_pad,
+            'pad': self.park_pad,
             'pidNumber': self.pid_number,
             'lot': self.lot,
             'parcel': self.parcel,
@@ -156,14 +171,13 @@ class Db2Location(db.Model):
             'landDistrict': self.land_district,
             'plan': self.plan,
             'taxCertificate': self.tax_certificate,
-            'leaveBc': self.leave_bc,
-            'exceptPlan': self.except_plan,
+            'leaveProvince': self.leave_bc,
+            'exceptionPlan': self.except_plan,
             'dealerName': self.dealer_name,
             'additionalDescription': self.additional_description
         }
         if self.tax_certificate_date:
             location['taxCertificateDate'] = self.tax_certificate_date.isoformat()
-
         return location
 
     @property
@@ -182,6 +196,49 @@ class Db2Location(db.Model):
         }
         return location
 
+    @property
+    def new_registration_json(self):
+        """Return a dict of this object, with keys in JSON format."""
+        self.strip()
+        location = {
+            'parkName': self.park_name,
+            'pad': self.park_pad,
+            'status': LEGACY_STATUS_NEW.get(self.status),
+            'address': {
+                'street': self.street_number + ' ' + self.street_name,
+                'city': self.town_city,
+                'region': self.province,
+                'country': 'CA',
+                'postalCode': ''
+            },
+            'pidNumber': self.pid_number,
+            'lot': self.lot,
+            'parcel': self.parcel,
+            'block': self.block,
+            'districtLot': self.district_lot,
+            'partOf': self.part_of,
+            'section': self.section,
+            'township': self.township,
+            'range': self.range,
+            'meridian': self.meridian,
+            'landDistrict': self.land_district,
+            'plan': self.plan,
+            'taxCertificate': False,
+            'leaveProvince': False,
+            'exceptionPlan': self.except_plan,
+            'dealerName': self.dealer_name,
+            'additionalDescription': self.additional_description
+        }
+        if self.leave_bc == 'Y':
+            location['leaveProvince'] = True
+        if self.tax_certificate == 'Y':
+            location['taxCertificate'] = True
+        if self.tax_certificate_date:
+            location['taxCertificateDate'] = self.tax_certificate_date.isoformat()
+        if location.get('taxCertificateDate', '') == '0001-01-01':
+            del location['taxCertificateDate']
+        return location
+
     @staticmethod
     def create_from_dict(new_info: dict):
         """Create a location object from dict/json."""
@@ -196,7 +253,7 @@ class Db2Location(db.Model):
                                jurisdiction=new_info.get('jurisdiction', ''),
                                roll_number=new_info.get('rollNumber', ''),
                                park_name=new_info.get('parkName', ''),
-                               park_pad=new_info.get('parkPad', ''),
+                               park_pad=new_info.get('pad', ''),
                                pid_number=new_info.get('pidNumber', ''),
                                lot=new_info.get('lot', ''),
                                parcel=new_info.get('parcel', ''),
@@ -210,14 +267,64 @@ class Db2Location(db.Model):
                                land_district=new_info.get('landDistrict', ''),
                                plan=new_info.get('plan', ''),
                                tax_certificate=new_info.get('taxCertificate', ''),
-                               leave_bc=new_info.get('leaveBc', ''),
-                               except_plan=new_info.get('exceptPlan', ''),
+                               leave_bc=new_info.get('leaveProvince', ''),
+                               except_plan=new_info.get('exceptionPlan', ''),
                                dealer_name=new_info.get('dealerName', ''),
                                additional_description=new_info.get('additionalDescription', ''))
 
         if new_info.get('taxCertificateDate', None):
             location.tax_certificate_date = model_utils.date_from_date_iso_format(new_info.get('taxCertificateDate'))
 
+        return location
+
+    @staticmethod
+    def create_from_registration(registration, reg_json):
+        """Create a new location object from a new MH registration."""
+        new_info = reg_json['location']
+        address = new_info['address']
+        street = str(address['street'])
+        street_info = street.split(' ')
+        street_num = street_info[0]
+        street_name = street[len(street_num):]
+        location = Db2Location(manuhome_id=registration.id,
+                               location_id=1,
+                               status=Db2Location.StatusTypes.ACTIVE,
+                               reg_document_id=reg_json.get('documentId', ''),
+                               can_document_id='',
+                               street_number=street_num,
+                               street_name=street_name[0:24],
+                               town_city=str(address['city'])[0:19],
+                               province=address.get('region', ''),
+                               area='',
+                               jurisdiction='',
+                               roll_number='',
+                               park_name=new_info.get('parkName', ''),
+                               park_pad=new_info.get('pad', ''),
+                               pid_number=new_info.get('pidNumber', ''),
+                               lot=new_info.get('lot', ''),
+                               parcel=new_info.get('parcel', ''),
+                               block=new_info.get('block', ''),
+                               district_lot=new_info.get('districtLot', ''),
+                               part_of=new_info.get('partOf', ''),
+                               section=new_info.get('section', ''),
+                               township=new_info.get('township', ''),
+                               range=new_info.get('range', ''),
+                               meridian=new_info.get('meridian', ''),
+                               land_district=new_info.get('landDistrict', ''),
+                               plan=new_info.get('plan', ''),
+                               except_plan=new_info.get('exceptionPlan', ''),
+                               dealer_name=new_info.get('dealerName', ''),
+                               additional_description=new_info.get('additionalDescription', ''),
+                               leave_bc='N',
+                               tax_certificate='N')
+        if new_info.get('leaveProvince'):
+            location.leave_bc = 'Y'
+        if new_info.get('taxCertificate'):
+            location.tax_certificate = 'Y'
+        if new_info.get('taxCertificateDate', None):
+            location.tax_certificate_date = model_utils.date_from_date_iso_format(new_info.get('taxCertificateDate'))
+        else:
+            location.tax_certificate_date = model_utils.date_from_iso_format('0001-01-01')
         return location
 
     @staticmethod

@@ -32,7 +32,11 @@ from .db2.owngroup import Db2Owngroup
 from .event_tracking import EventTracking
 from .financing_statement import FinancingStatement
 from .general_collateral import GeneralCollateral
+from .mhr_draft import MhrDraft
 from .mhr_extra_registration import MhrExtraRegistration
+from .mhr_party import MhrParty
+from .mhr_registration import MhrRegistration
+from .mhr_registration_report import MhrRegistrationReport
 from .party import Party
 from .registration import Registration
 from .search_request import SearchRequest
@@ -47,7 +51,14 @@ from .type_tables import (
     RegistrationTypeClass,
     SearchType,
     SerialType,
-    StateType
+    StateType,
+    MhrPartyType,
+    MhrNoteStatusType,
+    MhrOwnerStatusType,
+    MhrRegistrationStatusType,
+    MhrRegistrationType,
+    MhrStatusType,
+    MhrTenancyType
 )
 from .vehicle_collateral import VehicleCollateral
 
@@ -55,7 +66,10 @@ __all__ = ('db',
            'AccountBcolId', 'Address', 'ClientCode', 'CountryType', 'CourtOrder',
            'Db2Cmpserno', 'Db2Descript', 'Db2Docdes', 'Db2Document', 'Db2Location', 'Db2Manufact', 'Db2Manuhome',
            'Db2Mhomnote', 'Db2Owner', 'Db2Owngroup',
-           'EventTracking', 'EventTrackingType', 'FinancingStatement', 'GeneralCollateral', 'MhrExtraRegistration',
+           'EventTracking', 'EventTrackingType', 'FinancingStatement', 'GeneralCollateral', 'MhrDraft',
+           'MhrExtraRegistration', 'MhrParty', 'MhrRegistration', 'MhrRegistrationReport',
+           'MhrPartyType', 'MhrNoteStatusType', 'MhrOwnerStatusType', 'MhrRegistrationStatusType',
+           'MhrRegistrationType', 'MhrStatusType', 'MhrTenancyType',
            'Party', 'PartyType', 'ProvinceType', 'Registration', 'RegistrationType',
            'RegistrationTypeClass', 'SearchRequest', 'SearchResult', 'SearchType', 'StateType', 'SerialType',
            'TrustIndenture', 'VehicleCollateral')

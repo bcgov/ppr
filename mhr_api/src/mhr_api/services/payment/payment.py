@@ -137,3 +137,24 @@ class Payment:
 
         except Exception as err:  # noqa: B902; wrapping exception
             raise SBCPaymentException(err)
+
+    def create_payment_staff(self, transaction_info, client_reference_id=None):
+        """Submit a staff payment request for the transaction_info. Token must have a staff role.
+
+        Payment info transaction type is one of the Payment TransactionTypes.
+        Client reference ID if present maps to the pay api folio number.
+        Details label and value if they exist will show up on the account transaction report.
+        """
+        try:
+            api_instance = SBCPaymentClient(self.jwt,
+                                            self.account_id,
+                                            self.api_key,
+                                            self.details)
+            if self.api_url:
+                api_instance.api_url = self.api_url
+            api_response = api_instance.create_payment_staff(transaction_info, client_reference_id)
+            current_app.logger.debug(api_response)
+            return api_response
+
+        except Exception as err:  # noqa: B902; wrapping exception
+            raise SBCPaymentException(err)

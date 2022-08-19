@@ -160,7 +160,7 @@ def test_location_json(session):
         'jurisdiction': location.jurisdiction,
         'rollNumber': location.roll_number,
         'parkName': location.park_name,
-        'parkPad': location.park_pad,
+        'pad': location.park_pad,
         'pidNumber': location.pid_number,
         'lot': location.lot,
         'parcel': location.parcel,
@@ -174,8 +174,8 @@ def test_location_json(session):
         'landDistrict': location.land_district,
         'plan': location.plan,
         'taxCertificate': location.tax_certificate,
-        'leaveBc': location.leave_bc,
-        'exceptPlan': location.except_plan,
+        'leaveProvince': location.leave_bc,
+        'exceptionPlan': location.except_plan,
         'dealerName': location.dealer_name,
         'additionalDescription': location.additional_description
     }

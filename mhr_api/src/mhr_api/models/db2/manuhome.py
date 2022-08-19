@@ -27,6 +27,7 @@ from .document import Db2Document
 from .location import Db2Location
 from .mhomnote import Db2Mhomnote
 from .owner import Db2Owner
+from .owngroup import Db2Owngroup
 
 
 QUERY_ACCOUNT_ADD_REGISTRATION = """
@@ -69,6 +70,7 @@ LEGACY_REGISTRATION_DESCRIPTION = {
     '101': REGISTRATION_DESC_NEW,
     'CONV': REGISTRATION_DESC_NEW
 }
+DOCUMENT_TYPE_REG = '101'
 
 
 class Db2Manuhome(db.Model):
@@ -107,11 +109,23 @@ class Db2Manuhome(db.Model):
     reg_location = None
     reg_descript = None
     reg_notes = []
+    reg_owner_groups = []
 
     def save(self):
-        """Save the object to the database immediately. Only used for unit testing."""
+        """Save the object to the database immediately."""
         try:
             db.session.add(self)
+            db.session.commit()
+            if self.reg_documents:
+                doc: Db2Document = self.reg_documents[0]
+                doc.save()
+            if self.reg_location:
+                self.reg_location.save()
+            if self.reg_descript:
+                self.reg_descript.save()
+            if self.reg_owner_groups:
+                for group in self.reg_owner_groups:
+                    group.save()
             db.session.commit()
         except Exception as db_exception:   # noqa: B902; return nicer error
             current_app.logger.error('Db2Manuhome.save exception: ' + str(db_exception))
@@ -147,13 +161,13 @@ class Db2Manuhome(db.Model):
         return manuhome
 
     @classmethod
-    def find_by_mhr_number(cls, mhr_number: str):
+    def find_by_mhr_number(cls, mhr_number: str, new_reg: bool = False):
         """Return the MH registration matching the MHR number."""
         manuhome = None
         current_app.logger.debug(f'Db2Manuhome.find_by_mhr_number {mhr_number}.')
         if mhr_number:
             try:
-                manuhome = cls.query.filter(Db2Manuhome.mhr_number == mhr_number).one_or_none()
+                manuhome: Db2Manuhome = cls.query.filter(Db2Manuhome.mhr_number == mhr_number).one_or_none()
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('Db2Manuhome.find_by_mhr_number exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)
@@ -167,7 +181,10 @@ class Db2Manuhome(db.Model):
         current_app.logger.debug('Db2Manuhome.find_by_mhr_number Db2Document query.')
         manuhome.reg_documents = Db2Document.find_by_mhr_number(manuhome.mhr_number)
         current_app.logger.debug('Db2Manuhome.find_by_mhr_number Db2Owner query.')
-        manuhome.reg_owners = Db2Owner.find_by_manuhome_id(manuhome.id)
+        if new_reg:
+            manuhome.reg_owner_groups = Db2Owngroup.find_all_by_manuhome_id(manuhome.id)
+        else:
+            manuhome.reg_owners = Db2Owner.find_by_manuhome_id_registration(manuhome.id)
         current_app.logger.debug('Db2Manuhome.find_by_mhr_number Db2Descript query.')
         manuhome.reg_descript = Db2Descript.find_by_manuhome_id_active(manuhome.id)
         current_app.logger.debug('Db2Manuhome.find_by_mhr_number Db2Location query.')
@@ -211,7 +228,8 @@ class Db2Manuhome(db.Model):
                 if self.reg_document_id and self.reg_document_id == doc.id:
                     doc_json = doc.registration_json
                     man_home['createDateTime'] = doc_json.get('createDateTime', '')
-                    man_home['clientReferenceId'] = doc_json.get('attentionReference', '')
+                    man_home['clientReferenceId'] = doc_json.get('clientReferenceId', '')
+                    man_home['attentionReference'] = doc_json.get('attentionReference', '')
                 if doc.declared_value > 0 and declared_value == 0:
                     declared_value = doc.declared_value
                     declared_ts = doc.registration_ts
@@ -241,6 +259,46 @@ class Db2Manuhome(db.Model):
                 notes.append(note.registration_json)
             # Now sort in descending timestamp order.
             man_home['notes'] = Db2Manuhome.__sort_notes(notes)
+        return man_home
+
+    @property
+    def new_registration_json(self):
+        """Return a new registration dict of this object, with keys in JSON format."""
+        man_home = {
+            'mhrNumber': self.mhr_number,
+            'status': LEGACY_STATUS_DESCRIPTION.get(self.mh_status)
+        }
+        declared_value: int = 0
+        declared_ts: str = None
+        if self.reg_documents:
+            for doc in self.reg_documents:
+                if self.reg_document_id and self.reg_document_id == doc.id and \
+                        doc.document_type.strip() == DOCUMENT_TYPE_REG:
+                    doc_json = doc.registration_json
+                    man_home['documentId'] = doc_json.get('documentId', '')
+                    man_home['createDateTime'] = doc_json.get('createDateTime', '')
+                    man_home['clientReferenceId'] = doc_json.get('clientReferenceId', '')
+                    man_home['attentionReference'] = doc_json.get('attentionReference', '')
+                if doc.declared_value > 0 and declared_value == 0:
+                    declared_value = doc.declared_value
+                    declared_ts = doc.registration_ts
+                elif doc.declared_value > 0 and doc.registration_ts and declared_ts and \
+                        doc.registration_ts > declared_ts:
+                    declared_value = doc.declared_value
+                    declared_ts = doc.registration_ts
+        man_home['declaredValue'] = declared_value
+        if declared_ts:
+            man_home['declaredDateTime'] = model_utils.format_ts(declared_ts)
+
+        if self.reg_owner_groups:
+            groups = []
+            for group in self.reg_owner_groups:
+                groups.append(group.registration_json)
+            man_home['ownerGroups'] = groups
+        if self.reg_location:
+            man_home['location'] = self.reg_location.new_registration_json
+        if self.reg_descript:
+            man_home['description'] = self.reg_descript.registration_json
         return man_home
 
     @classmethod
@@ -353,6 +411,45 @@ class Db2Manuhome(db.Model):
         if manuhome.update_id:
             manuhome.update_id = manuhome.update_id.strip()
 
+        return manuhome
+
+    @staticmethod
+    def create_from_registration(registration, reg_json):
+        """Create a new manufactured home object from a new MH registration."""
+        doc_id = reg_json.get('documentId', '')
+        manuhome: Db2Manuhome = Db2Manuhome(id=registration.id,
+                                            mhr_number=registration.mhr_number,
+                                            mh_status=Db2Manuhome.StatusTypes.REGISTERED.value,
+                                            reg_document_id=doc_id,
+                                            exempt_flag='',
+                                            presold_decal='',
+                                            update_count=0,
+                                            update_id='',
+                                            accession_number=0,
+                                            box_number=0)
+        now_local = model_utils.today_local()
+        manuhome.update_date = now_local.date()
+        manuhome.update_time = now_local.time()
+        manuhome.reg_documents = []
+        manuhome.reg_owners = []
+        manuhome.reg_location = None
+        manuhome.reg_descript = None
+        manuhome.reg_notes = []
+        manuhome.reg_owner_groups = []
+
+        # Create document if doc id
+        if doc_id:
+            manuhome.reg_documents.append(Db2Document.create_from_registration(registration,
+                                                                               reg_json,
+                                                                               Db2Document.DocumentTypes.MHREG,
+                                                                               now_local))
+        manuhome.reg_location = Db2Location.create_from_registration(registration, reg_json)
+        manuhome.reg_descript = Db2Descript.create_from_registration(registration, reg_json)
+        if reg_json.get('ownerGroups'):
+            for i, group in enumerate(reg_json.get('ownerGroups')):
+                # current_app.logger.info('ownerGroups i=' + str(i))
+                group = Db2Owngroup.create_from_registration(registration, group, (i + 1))
+                manuhome.reg_owner_groups.append(group)
         return manuhome
 
     @staticmethod

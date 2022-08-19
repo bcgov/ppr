@@ -15,11 +15,26 @@
 from flask import current_app
 
 from mhr_api.exceptions import DatabaseException
-from mhr_api.models import db, utils as model_utils
+from mhr_api.models import db, utils as model_utils, Db2Cmpserno
+from mhr_api.utils.base import BaseEnum
+
+
+LEGACY_STATUS_NEW = {
+    'A': 'ACTIVE',
+    'D': 'DRAFT',
+    'C': 'HISTORICAL'
+}
 
 
 class Db2Descript(db.Model):
     """This class manages all of the legacy DB2 MHR description information."""
+
+    class StatusTypes(BaseEnum):
+        """Render an Enum of the legacy document types."""
+
+        ACTIVE = 'A'
+        DRAFT = 'D'
+        HISTORICAL = 'H'
 
     __bind_key__ = 'db2'
     __tablename__ = 'descript'
@@ -60,17 +75,22 @@ class Db2Descript(db.Model):
     manufacturer_name = db.Column('MANUNAME', db.String(65), nullable=False)
     make_model = db.Column('MAKEMODL', db.String(65), nullable=False)
     rebuilt_remarks = db.Column('REBUILTR', db.String(280), nullable=False)
-    other_remarks = db.Column('OTHERREM', db.String(280), nullable=False)
+    other_remarks = db.Column('OTHERREM', db.String(140), nullable=False)
 
     # parent keys
 
     # Relationships
 
+    compressed_keys = []
+
     def save(self):
-        """Save the object to the database immediately. Only used for unit testing."""
+        """Save the object to the database immediately."""
         try:
             db.session.add(self)
             db.session.commit()
+            if self.compressed_keys:
+                for key in self.compressed_keys:
+                    key.save()
         except Exception as db_exception:   # noqa: B902; return nicer error
             current_app.logger.error('DB2 descript.save exception: ' + str(db_exception))
             raise DatabaseException(db_exception)
@@ -173,6 +193,7 @@ class Db2Descript(db.Model):
     @property
     def registration_json(self):
         """Return a search registration dict of this object, with keys in JSON format."""
+        self.strip()
         sections = [
             {
                 'serialNumber': self.serial_number_1,
@@ -221,10 +242,16 @@ class Db2Descript(db.Model):
             'sections': sections,
             'csaNumber': self.csa_number,
             'csaStandard': self.csa_standard,
-            'engineerName': self.engineer_name
+            'engineerName': self.engineer_name,
+            'rebuiltRemarks': self.rebuilt_remarks,
+            'otherRemarks': self.other_remarks
         }
         if self.engineer_date:
             description['engineerDate'] = self.engineer_date.isoformat()
+        if description.get('engineerDate', '') == '0001-01-01':
+            del description['engineerDate']
+        if self.circa == '?':
+            description['baseInformation']['circa'] = True
         return description
 
     @staticmethod
@@ -272,6 +299,100 @@ class Db2Descript(db.Model):
         if new_info.get('engineerDate', None):
             descript.engineer_date = model_utils.date_from_date_iso_format(new_info.get('engineerDate'))
 
+        return descript
+
+    @staticmethod
+    def create_from_registration(registration, reg_json):
+        """Create a new description object from a new MH registration."""
+        new_info = reg_json['description']
+        base_info = new_info['baseInformation']
+        sections = new_info['sections']
+        make_model: str = base_info.get('make', '') + ' ' + base_info.get('model', ' ')
+        descript = Db2Descript(manuhome_id=registration.id,
+                               description_id=1,
+                               status=Db2Descript.StatusTypes.ACTIVE,
+                               reg_document_id=new_info.get('documentId', ''),
+                               can_document_id='',
+                               csa_number=new_info.get('csaNumber', ''),
+                               csa_standard=new_info.get('csaStandard', ''),
+                               section_count=new_info.get('sectionCount', 0),
+                               square_feet=new_info.get('squareFeet', 0),
+                               year_made=str(base_info.get('year', '')),
+                               circa=' ',
+                               manufacturer_name=new_info.get('manufacturer', ''),
+                               make_model=make_model[0:64],
+                               engineer_name=new_info.get('engineerName', ''),
+                               rebuilt_remarks=new_info.get('rebuiltRemarks', ''),
+                               other_remarks=new_info.get('otherRemarks', ''))
+        descript.compressed_keys = []
+        if base_info.get('circa'):
+            descript.circa = '?'
+        if descript.section_count > 0 and sections:
+            section = sections[0]
+            descript.serial_number_1 = section['serialNumber']
+            descript.length_feet_1 = section['lengthFeet']
+            descript.length_inches_1 = section.get('lengthInches', 0)
+            descript.width_feet_1 = section['widthFeet']
+            descript.width_inches_1 = section.get('widthInches', 0)
+            key = Db2Cmpserno.create_from_registration(registration.id,
+                                                       1,
+                                                       model_utils.get_serial_number_key(descript.serial_number_1))
+            descript.compressed_keys.append(key)
+        if descript.section_count > 1 and len(sections) > 1:
+            section = sections[1]
+            descript.serial_number_2 = section['serialNumber']
+            descript.length_feet_2 = section['lengthFeet']
+            descript.length_inches_2 = section.get('lengthInches', 0)
+            descript.width_feet_2 = section['widthFeet']
+            descript.width_inches_2 = section.get('widthInches', 0)
+            key = Db2Cmpserno.create_from_registration(registration.id,
+                                                       2,
+                                                       model_utils.get_serial_number_key(descript.serial_number_2))
+            descript.compressed_keys.append(key)
+        else:
+            descript.serial_number_2 = ''
+            descript.length_feet_2 = 0
+            descript.length_inches_2 = 0
+            descript.width_feet_2 = 0
+            descript.width_inches_2 = 0
+        if descript.section_count > 2 and len(sections) > 2:
+            section = sections[2]
+            descript.serial_number_3 = section['serialNumber']
+            descript.length_feet_3 = section['lengthFeet']
+            descript.length_inches_3 = section.get('lengthInches', 0)
+            descript.width_feet_3 = section['widthFeet']
+            descript.width_inches_3 = section.get('widthInches', 0)
+            key = Db2Cmpserno.create_from_registration(registration.id,
+                                                       3,
+                                                       model_utils.get_serial_number_key(descript.serial_number_3))
+            descript.compressed_keys.append(key)
+        else:
+            descript.serial_number_3 = ''
+            descript.length_feet_3 = 0
+            descript.length_inches_3 = 0
+            descript.width_feet_3 = 0
+            descript.width_inches_3 = 0
+        if descript.section_count > 3 and len(sections) > 3:
+            section = sections[3]
+            descript.serial_number_4 = section['serialNumber']
+            descript.length_feet_4 = section['lengthFeet']
+            descript.length_inches_4 = section.get('lengthInches', 0)
+            descript.width_feet_4 = section['widthFeet']
+            descript.width_inches_4 = section.get('widthInches', 0)
+            key = Db2Cmpserno.create_from_registration(registration.id,
+                                                       4,
+                                                       model_utils.get_serial_number_key(descript.serial_number_4))
+            descript.compressed_keys.append(key)
+        else:
+            descript.serial_number_4 = ''
+            descript.length_feet_4 = 0
+            descript.length_inches_4 = 0
+            descript.width_feet_4 = 0
+            descript.width_inches_4 = 0
+        if new_info.get('engineerDate', None):
+            descript.engineer_date = model_utils.date_from_date_iso_format(new_info.get('engineerDate'))
+        else:
+            descript.engineer_date = model_utils.date_from_iso_format('0001-01-01')
         return descript
 
     @staticmethod
