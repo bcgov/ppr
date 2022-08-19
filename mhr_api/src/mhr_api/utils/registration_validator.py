@@ -59,7 +59,11 @@ def validate_doc_id(json_data):
 
 def checksum_valid(doc_id: str) -> bool:
     """Validate the document id with a checksum algorithm."""
-    if not doc_id or len(doc_id) != 8 or not doc_id.isnumeric():
+    if not doc_id or len(doc_id) != 8:
+        return False
+    if doc_id.startswith('1') or doc_id.startswith('9') or doc_id.startswith('8') or doc_id.startswith('REG'):
+        return True
+    if not doc_id.isnumeric():
         return False
     dig1: int = int(doc_id[0:1])
     dig2: int = int(doc_id[1:2]) * 2

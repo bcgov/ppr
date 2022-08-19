@@ -29,8 +29,8 @@ DESC_MISSING_SUBMITTING = 'Missing submitting party'
 DESC_MISSING_OWNER_GROUP = 'Missing owner group'
 DESC_DOC_ID_EXISTS = 'Invalid document id exists'
 DOC_ID_EXISTS = '80038730'
-DOC_ID_VALID = '80048756'
-DOC_ID_INVALID_CHECKSUM = '80048721'
+DOC_ID_VALID = '63166035'
+DOC_ID_INVALID_CHECKSUM = '63166034'
 
 # testdata pattern is ({description}, {valid}, {staff}, {doc_id}, {message content})
 TEST_REG_DATA = [
@@ -45,8 +45,11 @@ TEST_REG_DATA = [
 ]
 # testdata pattern is ({doc_id}, {valid})
 TEST_CHECKSUM_DATA = [
-    ('80048756', True),
+    ('80048750', True),
     ('63288993', True),
+    ('13288993', True),
+    ('93288993', True),
+    ('REG88993', True),
     ('63288994', False),
     ('X9948709', False),
     ('9948709', False),
