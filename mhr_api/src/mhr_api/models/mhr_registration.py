@@ -185,6 +185,15 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         raise DatabaseException('MhrRegistration.find_all_by_account_id PosgreSQL not yet implemented.')
 
     @classmethod
+    def get_doc_id_count(cls, doc_id):
+        """Execute a query to count existing document id (must not exist check)."""
+        current_app.logger.debug(f'document id={doc_id}')
+        use_legacy_db: bool = current_app.config.get('USE_LEGACY_DB', True)
+        if use_legacy_db:
+            return Db2Manuhome.get_doc_id_count(doc_id)
+        raise DatabaseException('MhrRegistration.get_doc_id_count PosgreSQL not yet implemented.')
+
+    @classmethod
     def find_by_mhr_number(cls, mhr_number: str, account_id: str, staff: bool = False):
         """Return the registration matching the MHR number."""
         current_app.logger.debug(f'Account={account_id}, mhr_number={mhr_number}')

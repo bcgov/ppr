@@ -52,6 +52,11 @@ TEST_MHR_NUM_DATA = [
     ('UX-XXX', False, 'PS12345'),
     ('150062', True, '2523')
 ]
+# testdata pattern is ({doc_id}, {exist_count})
+TEST_DOC_ID_DATA = [
+    ('80048709', 1),
+    ('80048756', 0)
+]
 
 
 @pytest.mark.parametrize('account_id,mhr_num,exists,reg_desc,in_list', TEST_SUMMARY_REG_DATA)
@@ -164,3 +169,10 @@ def test_save_new(session):
     assert reg_new
     draft_new = MhrDraft.find_by_draft_number(registration.draft.draft_number, True)
     assert draft_new
+
+
+@pytest.mark.parametrize('doc_id, exists_count', TEST_DOC_ID_DATA)
+def test_get_doc_id_count(session, doc_id, exists_count):
+    """Assert that counting existing document id's works as expected."""
+    count: int = MhrRegistration.get_doc_id_count(doc_id)
+    assert count == exists_count
