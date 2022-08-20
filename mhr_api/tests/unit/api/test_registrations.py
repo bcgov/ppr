@@ -93,7 +93,7 @@ def test_get_account_registrations(session, client, jwt, desc, roles, status, ha
 
 @pytest.mark.parametrize('desc,has_submitting,roles,status,has_account', TEST_CREATE_DATA)
 def test_create(session, client, jwt, desc, has_submitting, roles, status, has_account):
-    """Assert that a post financing statement works as expected."""
+    """Assert that a post MH registration works as expected."""
     # setup
     current_app.config.update(PAYMENT_SVC_URL=MOCK_PAY_URL)
     current_app.config.update(AUTH_SVC_URL=MOCK_AUTH_URL)
@@ -106,7 +106,7 @@ def test_create(session, client, jwt, desc, has_submitting, roles, status, has_a
     else:
         headers = create_header(jwt, roles)
     if status == HTTPStatus.CREATED and STAFF_ROLE in roles:
-        json_data['documentId'] = '1234'
+        json_data['documentId'] = '80048756'
 
     # test
     response = client.post('/api/v1/registrations',

@@ -59,6 +59,11 @@ SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRI
    AND mh.regdocid = d.documtid
 ORDER BY d.regidate DESC
 """
+DOC_ID_COUNT_QUERY = """
+SELECT COUNT(documtid)
+  FROM document
+ WHERE documtid = :query_value
+"""
 REGISTRATION_DESC_NEW = 'Manufactured Home Registration'
 LEGACY_STATUS_DESCRIPTION = {
     'R': 'ACTIVE',
@@ -344,6 +349,20 @@ class Db2Manuhome(db.Model):
             current_app.logger.error('DB2 find_summary_by_mhr_number exception: ' + str(db_exception))
             raise DatabaseException(db_exception)
         return summary_list
+
+    @classmethod
+    def get_doc_id_count(cls, doc_id):
+        """Execute a DB2 query to count existing document id (must not exist check)."""
+        try:
+            query = text(DOC_ID_COUNT_QUERY)
+            result = db.get_engine(current_app, 'db2').execute(query, {'query_value': doc_id})
+            row = result.first()
+            exist_count = int(row[0])
+            current_app.logger.debug(f'Existing doc id count={exist_count}.')
+            return exist_count
+        except Exception as db_exception:   # noqa: B902; return nicer error
+            current_app.logger.error('DB2 get_doc_id_count exception: ' + str(db_exception))
+            raise DatabaseException(db_exception)
 
     @classmethod
     def __build_summary(cls, row, add_in_user_list: bool = True):
