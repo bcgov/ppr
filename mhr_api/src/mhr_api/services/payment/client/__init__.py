@@ -333,8 +333,8 @@ class SBCPaymentClient(BaseClient):
         data = copy.deepcopy(PAYMENT_REQUEST_TEMPLATE)
         filing_type = TRANSACTION_TO_FILING_TYPE[transaction_info['transactionType']]
         data['filingInfo']['filingTypes'][0]['filingTypeCode'] = filing_type
-        if transaction_info['feeQuantity'] != 1:
-            data['filingInfo']['filingTypes'][0]['quantity'] = transaction_info['feeQuantity']
+        if transaction_info['quantity'] != 1:
+            data['filingInfo']['filingTypes'][0]['quantity'] = transaction_info['quantity']
         if 'transactionId' in transaction_info:
             data['filingInfo']['filingIdentifier'] = transaction_info['transactionId']
         else:
@@ -456,8 +456,8 @@ class SBCPaymentClient(BaseClient):
             data['details'][0]['value'] = self.detail_value
         else:
             del data['details']
-        # current_app.logger.debug('staff registration create payment payload: ')
-        # current_app.logger.debug(json.dumps(data))
+        current_app.logger.debug('staff registration create payment payload: ')
+        current_app.logger.debug(json.dumps(data))
         invoice_data = self.call_api(HttpVerbs.POST, PATH_PAYMENT, data, include_account=False)
         return SBCPaymentClient.build_pay_reference(invoice_data, self.api_url)
 
