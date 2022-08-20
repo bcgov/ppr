@@ -310,6 +310,11 @@ export const setMhrRegistrationHomeOwners: ActionIF = ({ commit }, owners: MhrRe
   commit('mutateMhrHomeOwners', owners)
 }
 
+export const setMhrRegistrationDocumentId: ActionIF = ({ commit }, value: string): void => {
+  commit('mutateMhrRegistrationDocumentId', value)
+  commit('mutateUnsavedChanges', true)
+}
+
 export const setMhrAttentionReferenceNum: ActionIF = ({ commit }, value): void => {
   commit('mutateMhrAttentionReferenceNum', value)
   commit('mutateUnsavedChanges', true)

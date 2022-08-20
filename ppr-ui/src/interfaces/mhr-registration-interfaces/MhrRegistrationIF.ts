@@ -5,6 +5,7 @@ import {
   MhrRegistrationHomeLocationIF
 } from '@/interfaces'
 export interface MhrRegistrationIF {
+  documentId: string
   clientReferenceId: string
   declaredValue: string
   submittingParty: {

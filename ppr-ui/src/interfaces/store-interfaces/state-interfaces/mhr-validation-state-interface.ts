@@ -7,6 +7,7 @@ export interface MhrValidationStateIF {
     otherValid: boolean
   },
   submittingPartyValid: {
+    documentIdValid: boolean
     submitterValid: boolean
     refNumValid: boolean
   },

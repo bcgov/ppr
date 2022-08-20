@@ -78,6 +78,19 @@
 
           <v-row no-gutters class="px-6 py-7">
             <v-col cols="3">
+              <h3>Document ID</h3>
+            </v-col>
+            <v-col cols="9">
+              <p class="content ref-text">{{getMhrRegistrationDocumentId || '(Not Entered)'}}</p>
+            </v-col>
+          </v-row>
+
+          <div class="px-4">
+            <v-divider />
+          </div>
+
+          <v-row no-gutters class="px-6 py-7">
+            <v-col cols="3">
               <p class="side-header">Attention or<br>Reference Number</p>
             </v-col>
             <v-col cols="9">
@@ -108,10 +121,12 @@ export default defineComponent({
   setup () {
     const {
       getMhrRegistrationSubmittingParty,
+      getMhrRegistrationDocumentId,
       getMhrAttentionReferenceNum,
       getMhrRegistrationValidationModel
     } = useGetters<any>([
       'getMhrRegistrationSubmittingParty',
+      'getMhrRegistrationDocumentId',
       'getMhrAttentionReferenceNum',
       'getMhrRegistrationValidationModel'
     ])
@@ -156,6 +171,7 @@ export default defineComponent({
       addressSchema,
       MhrSectVal,
       getMhrRegistrationSubmittingParty,
+      getMhrRegistrationDocumentId,
       getMhrAttentionReferenceNum,
       getStepValidation,
       getSubmittingPartyName,
@@ -203,5 +219,11 @@ export default defineComponent({
   line-height: 24px;
   font-size: 14px;
   color: $gray7;
+}
+
+#review-submitting-party-section {
+  h3 {
+    line-height: unset;
+  }
 }
 </style>
