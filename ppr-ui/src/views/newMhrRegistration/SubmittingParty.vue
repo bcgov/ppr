@@ -26,10 +26,10 @@
           flat
           rounded
           id="submitting-party"
-          class="mt-8 pa-8 pr-6"
+          class="mt-8 pa-8 pr-6 pb-3"
           :class="{ 'border-error-left': validateDocId }"
         >
-          <v-row no-gutters>
+          <v-row no-gutters class="pt-3">
             <v-col cols="12" sm="2">
               <label class="generic-label" :class="{ 'error-text': validateDocId }">
                 Document ID
