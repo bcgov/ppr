@@ -165,10 +165,14 @@ export default defineComponent({
       localState.dataLoaded = true
     })
 
-    const submit = (): void => {
+    const submit = async () => {
+      console.log(getMhrRegistrationValidationModel.value)
+      setValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_APP, true)
       if (localState.validateMhrRegistration) {
+        console.log('everything valid!!')
         console.log(getMhrRegistration.value)
-        submitMhrRegistration(getMhrRegistration.value)
+        const result = await submitMhrRegistration({ ...getMhrRegistration.value, documentId: '80049275' })
+        console.log(result)
       }
     }
 

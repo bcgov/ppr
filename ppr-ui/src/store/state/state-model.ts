@@ -107,8 +107,8 @@ export const stateModel: StateModelIF = {
         postalCode: ''
       },
       emailAddress: '',
-      phoneNumber: null,
-      phoneExtension: null
+      phoneNumber: '',
+      phoneExtension: ''
     },
     ownerGroups: [],
     owners: [],
@@ -236,7 +236,7 @@ export const stateModel: StateModelIF = {
       refNumValid: false
     },
     homeOwnersValid: {
-      OwnersValid: false
+      ownersValid: false
     },
     locationValid: {
       locationTypeValid: false,

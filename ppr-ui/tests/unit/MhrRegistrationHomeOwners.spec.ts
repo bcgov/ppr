@@ -114,7 +114,7 @@ describe('Home Owners', () => {
 
   it('renders home owner (person and org) via store dispatch', async () => {
     const owners = [mockedPerson] as MhrRegistrationHomeOwnersIF[]
-    const homeOwnerGroup = [{ groupId: '1', owners: owners }] as MhrRegistrationHomeOwnerGroupIF[]
+    const homeOwnerGroup = [{ groupId: 1, owners: owners }] as MhrRegistrationHomeOwnerGroupIF[]
 
     // add a person
     await store.dispatch('setMhrRegistrationHomeOwnerGroups', homeOwnerGroup)
@@ -163,7 +163,7 @@ describe('Home Owners', () => {
 
   it('should edit home owner', async () => {
     const homeOwnerGroup = [
-      { groupId: '1', owners: [mockedPerson, mockedOrganization] }
+      { groupId: 1, owners: [mockedPerson, mockedOrganization] }
     ] as MhrRegistrationHomeOwnerGroupIF[]
 
     await store.dispatch('setMhrRegistrationHomeOwnerGroups', homeOwnerGroup)
@@ -200,8 +200,8 @@ describe('Home Owners', () => {
 
   it('should delete a home owner group', async () => {
     const homeOwnerGroups = [
-      { groupId: '1', owners: [mockedPerson] },
-      { groupId: '2', owners: [mockedOrganization] }
+      { groupId: 1, owners: [mockedPerson] },
+      { groupId: 2, owners: [mockedOrganization] }
     ] as MhrRegistrationHomeOwnerGroupIF[]
 
     await store.dispatch('setMhrRegistrationHomeOwnerGroups', homeOwnerGroups)

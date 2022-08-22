@@ -233,7 +233,7 @@ export default defineComponent({
     })
 
     watch(() => localState.yearOfManufacture, (val: number) => {
-      setMhrHomeBaseInformation({ key: 'year', value: val })
+      setMhrHomeBaseInformation({ key: 'year', value: +val })
     })
 
     watch(() => localState.circa, (val: boolean) => {

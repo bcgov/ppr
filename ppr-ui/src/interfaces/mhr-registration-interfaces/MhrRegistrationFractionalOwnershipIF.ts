@@ -1,5 +1,5 @@
 export interface MhrRegistrationFractionalOwnershipIF {
-  type?: string
+  type: string
   interest?: string
   interestNumerator?: number
   interestTotal?: number
