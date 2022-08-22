@@ -9,8 +9,7 @@
 # an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
 # specific language governing permissions and limitations under the License.
 """Produces a PDF output based on templates and JSON messages."""
-import base64
-import json
+import copy
 from datetime import timedelta
 from http import HTTPStatus
 from pathlib import Path
@@ -22,8 +21,8 @@ from flask import current_app, jsonify
 from mhr_api.exceptions import ResourceErrorCodes
 from mhr_api.models import utils as model_utils
 from mhr_api.reports import ppr_report_utils
-from mhr_api.utils.auth import jwt
-from mhr_api.utils.base import BaseEnum
+from mhr_api.reports.v2 import report_utils
+from mhr_api.reports.v2.report_utils import ReportTypes
 
 
 # Map from API search type to report description
@@ -51,13 +50,8 @@ TO_NOTE_DESCRIPTION = {
     'STAT': 'Dec./Illegal Move',
     'TAXN': 'Tax Sale Notice'
 }
-
-
-class ReportTypes(BaseEnum):
-    """Render an Enum of the MHR PDF report types."""
-
-    MHR_REGISTRATION = 'mhrRegistration'
-    SEARCH_DETAIL_REPORT = 'searchDetail'
+SINGLE_URI = '/forms/chromium/convert/html'
+MERGE_URI = '/forms/pdfengines/merge'
 
 
 class Report:  # pylint: disable=too-few-public-methods
@@ -74,27 +68,61 @@ class Report:  # pylint: disable=too-few-public-methods
         """Generate report data including template data for report api call."""
         return self._setup_report_data()
 
-    def get_pdf(self, report_type=None, token=None):
+    def get_pdf(self, report_type=None):
         """Render a pdf for the report type and report data."""
         if report_type:
             self._report_key = report_type
-        headers = {
-            'Content-Type': 'application/json'
-        }
-        if token is not None:
-            headers['Authorization'] = 'Bearer {}'.format(token)
-        else:
-            headers['Authorization'] = 'Bearer {}'.format(jwt.get_token_auth_header())
+        if self._report_key == ReportTypes.SEARCH_DETAIL_REPORT:
+            current_app.logger.debug('Search report generating TOC page numbers as a second report api call.')
+            return self.get_search_pdf()
         current_app.logger.debug('Account {0} report type {1} setting up report data.'
                                  .format(self._account_id, self._report_key))
         data = self._setup_report_data()
-        url = current_app.config.get('REPORT_SVC_URL')
+        url = current_app.config.get('REPORT_SVC_URL') + SINGLE_URI
         current_app.logger.debug('Account {0} report type {1} calling report-api {2}.'
                                  .format(self._account_id, self._report_key, url))
-        response = requests.post(url=url, headers=headers, data=json.dumps(data))
+        meta_data = report_utils.get_report_meta_data()
+        files = report_utils.get_report_files(data, self._report_key)
+        response = requests.post(url=url, data=meta_data, files=files)
         current_app.logger.debug('Account {0} report type {1} response status: {2}.'
                                  .format(self._account_id, self._report_key, response.status_code))
+        if response.status_code != HTTPStatus.OK:
+            content = ResourceErrorCodes.REPORT_ERR + ': ' + response.content.decode('ascii')
+            current_app.logger.error('Account {0} response status: {1} error: {2}.'
+                                     .format(self._account_id, response.status_code, content))
+            return jsonify(message=content), response.status_code, None
+        return response.content, response.status_code, {'Content-Type': 'application/pdf'}
 
+    def get_search_pdf(self):
+        """Render a search report with TOC page numbers set in a second report call."""
+        current_app.logger.debug('Account {0} report type {1} setting up report data.'
+                                 .format(self._account_id, self._report_key))
+        data_copy = copy.deepcopy(self._report_data)
+        # 1: Generate the search pdf with no TOC page numbers or total page count.
+        data = self._setup_report_data()
+        url = current_app.config.get('REPORT_SVC_URL') + SINGLE_URI
+        current_app.logger.debug('Account {0} report type {1} calling report-api {2}.'
+                                 .format(self._account_id, self._report_key, url))
+        meta_data = report_utils.get_report_meta_data()
+        files = report_utils.get_report_files(data, self._report_key)
+        response_reg = requests.post(url=url, data=meta_data, files=files)
+        current_app.logger.debug('Account {0} report type {1} response status: {2}.'
+                                 .format(self._account_id, self._report_key, response_reg.status_code))
+        if response_reg.status_code != HTTPStatus.OK:
+            content = ResourceErrorCodes.REPORT_ERR + ': ' + response_reg.content.decode('ascii')
+            current_app.logger.error('Account {0} response status: {1} error: {2}.'
+                                     .format(self._account_id, response_reg.status_code, content))
+            return jsonify(message=content), response_reg.status_code, None
+        # 2: Set TOC page numbers in report data from initial search pdf page numbering.
+        self._report_data = report_utils.update_toc_page_numbers(data_copy, response_reg.content)
+        # 3: Generate search report again with TOC page numbers and total page count.
+        data_final = self._setup_report_data()
+        current_app.logger.debug('Account {0} report type {1} calling report-api {2}.'
+                                 .format(self._account_id, self._report_key, url))
+        files = report_utils.get_report_files(data_final, self._report_key)
+        current_app.logger.info('Search report regenerating with TOC page numbers set.')
+        response = requests.post(url=url, data=meta_data, files=files)
+        current_app.logger.info('Search report regeneration with TOC page numbers completed.')
         if response.status_code != HTTPStatus.OK:
             content = ResourceErrorCodes.REPORT_ERR + ': ' + response.content.decode('ascii')
             current_app.logger.error('Account {0} response status: {1} error: {2}.'
@@ -105,7 +133,7 @@ class Report:  # pylint: disable=too-few-public-methods
     def _setup_report_data(self):
         """Set up the report service request data."""
         # current_app.logger.debug('Setup report data template starting.')
-        template = base64.b64encode(bytes(self._get_template(), 'utf-8')).decode() + "'"
+        template = self._get_template()
         current_app.logger.debug('Setup report data template completed, setup data starting.')
         data = {
             'reportName': self._get_report_filename(),
@@ -124,17 +152,19 @@ class Report:  # pylint: disable=too-few-public-methods
 
     def _get_report_date(self):
         """Get the report date for the filename from the report data."""
-        if self._report_key == ReportTypes.SEARCH_DETAIL_REPORT:
+        if self._report_key in (ReportTypes.SEARCH_DETAIL_REPORT, ReportTypes.SEARCH_TOC_REPORT,
+                                ReportTypes.SEARCH_BODY_REPORT):
             return self._report_data['searchDateTime']
-
         return self._report_data['createDateTime']
 
     def _get_report_id(self):
         """Get the report transaction ID for the filename from the report data."""
         report_id = ''
-        if self._report_key == ReportTypes.SEARCH_DETAIL_REPORT and 'payment' in self._report_data:
+        if self._report_key in (ReportTypes.SEARCH_DETAIL_REPORT, ReportTypes.SEARCH_BODY_REPORT) \
+                and 'payment' in self._report_data:
             report_id = self._report_data['payment']['invoiceId']
-
+        elif self._report_key == ReportTypes.MHR_REGISTRATION and self._report_data.get('mhrNumber'):
+            report_id = self._report_data.get('mhrNumber')
         return report_id
 
     def _get_template(self):
@@ -165,10 +195,9 @@ class Report:  # pylint: disable=too-few-public-methods
         """
         template_path = current_app.config.get('REPORT_TEMPLATE_PATH')
         template_parts = [
-            'footer',
-            'style',
-            'stylePage',
-            'stylePageDraft',
+            'v2/style',
+            'v2/stylePage',
+            'v2/stylePageDraft',
             'stylePageMail',
             'logo',
             'macros',
@@ -178,9 +207,9 @@ class Report:  # pylint: disable=too-few-public-methods
             'search-result/notes',
             'search-result/owners',
             'search-result/pprRegistrations',
-            'search-result/selected',
+            'v2/search-result/selected',
             'search-result/sections',
-            'search-result/registration',
+            'v2/search-result/registration',
             'search-result-ppr/financingStatement',
             'search-result-ppr/amendmentStatement',
             'search-result-ppr/changeStatement',
@@ -216,13 +245,18 @@ class Report:  # pylint: disable=too-few-public-methods
     def _get_template_data(self):
         """Get the data for the report, modifying the original for the template output."""
         self._set_meta_info()
-        self._set_addresses()
-        self._set_date_times()
-        self._set_notes()
-        if self._report_key == ReportTypes.SEARCH_DETAIL_REPORT:
+        if self._report_key == ReportTypes.SEARCH_TOC_REPORT:
             self._set_selected()
-            # Add MHR search template setup here:
-            self._set_ppr_search()
+        else:
+            self._set_addresses()
+            self._set_date_times()
+            self._set_notes()
+            if self._report_key == ReportTypes.SEARCH_DETAIL_REPORT:
+                self._set_selected()
+                self._set_ppr_search()
+            elif self._report_key == ReportTypes.SEARCH_BODY_REPORT:
+                # Add PPR search template setup here:
+                self._set_ppr_search()
         return self._report_data
 
     def _set_ppr_search(self):  # pylint: disable=too-many-branches, too-many-statements
@@ -263,7 +297,8 @@ class Report:  # pylint: disable=too-few-public-methods
 
     def _set_addresses(self):
         """Replace address country code with description."""
-        if self._report_key == ReportTypes.SEARCH_DETAIL_REPORT and self._report_data['totalResultsSize'] > 0:
+        if self._report_key in (ReportTypes.SEARCH_DETAIL_REPORT, ReportTypes.SEARCH_BODY_REPORT) and \
+                self._report_data['totalResultsSize'] > 0:
             self._set_search_addresses()
 
     def _set_search_addresses(self):
@@ -283,7 +318,7 @@ class Report:  # pylint: disable=too-few-public-methods
 
     def _set_date_times(self):
         """Replace API ISO UTC strings with local report format strings."""
-        if self._report_key == ReportTypes.SEARCH_DETAIL_REPORT:
+        if self._report_key in (ReportTypes.SEARCH_DETAIL_REPORT, ReportTypes.SEARCH_BODY_REPORT):
             self._report_data['searchDateTime'] = Report._to_report_datetime(self._report_data['searchDateTime'])
             if self._report_data['totalResultsSize'] > 0:
                 for detail in self._report_data['details']:
@@ -342,7 +377,9 @@ class Report:  # pylint: disable=too-few-public-methods
         self._report_data['meta_title'] = ReportMeta.reports[self._report_key]['metaTitle'].upper()
 
         # Appears in the Description section of the PDF Document Properties as Subject.
-        if self._report_key == ReportTypes.SEARCH_DETAIL_REPORT:
+        if self._report_key in (ReportTypes.SEARCH_DETAIL_REPORT,
+                                ReportTypes.SEARCH_TOC_REPORT,
+                                ReportTypes.SEARCH_BODY_REPORT):
             search_type: str = self._report_data['searchQuery']['type']
             search_desc: str = TO_SEARCH_DESCRIPTION[search_type]
             criteria: str = ''
@@ -393,7 +430,19 @@ class ReportMeta:  # pylint: disable=too-few-public-methods
     reports = {
         ReportTypes.SEARCH_DETAIL_REPORT: {
             'reportDescription': 'SearchResult',
-            'fileName': 'searchResult',
+            'fileName': 'searchResultV2',
+            'metaTitle': 'Manufactured Home Registry Search Result',
+            'metaSubject': ''
+        },
+        ReportTypes.SEARCH_TOC_REPORT: {
+            'reportDescription': 'SearchResult',
+            'fileName': 'searchResultTOCV2',
+            'metaTitle': 'Personal Property Registry Search Result',
+            'metaSubject': ''
+        },
+        ReportTypes.SEARCH_BODY_REPORT: {
+            'reportDescription': 'SearchResult',
+            'fileName': 'searchResultBodyV2',
             'metaTitle': 'Manufactured Home Registry Search Result',
             'metaSubject': ''
         }

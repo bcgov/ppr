@@ -1,0 +1,108 @@
+[[macros.html]]
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>{{ meta_title }}</title>
+    <meta charset="UTF-8">
+    <meta name="author" content="BC Registries and Online Services">
+    {% if environment == '' %}
+      [[v2/stylePage.html]]
+    {% else %}
+      [[v2/stylePageDraft.html]]
+    {% endif %}
+    [[v2/style.html]]
+  </head>
+  <body>    
+    <div class="business-details-container">
+
+    {% if meta_subject|length > 70 %}
+      <table class="business-name-header-long ma-0 pa-0" role="presentation">
+        <tr>
+          <td class="lbl-business-name ma-0 pt-3 pb-3">
+            {{ meta_subject }}
+          </td>
+        </tr>
+      </table>
+    {% else %}
+      <div class="business-name-header">
+        <span class="lbl-business-name ma-0 pa-0">{{ meta_subject }}</span>
+      </div>
+    {% endif %}
+
+      <table class="business-details-table" role="presentation">
+        <tr>
+          <td class="lbl-business-detail">Search Date and Time:</td>
+          <td colspan="2">{{searchDateTime}}</td>
+        </tr>
+        <tr>
+          <td class="lbl-business-detail">Account Name:</td>
+          <td colspan="2">
+              {% if meta_account_name is defined %}
+                {{meta_account_name}}
+              {% else %}
+                Not available.
+              {% endif %}
+          </td>
+        </tr>
+        <tr>
+          <td class="lbl-business-detail">Folio Number:</td>
+          <td colspan="2">
+              {% if searchQuery.clientReferenceId is defined and searchQuery.clientReferenceId != "" %}
+                {{searchQuery.clientReferenceId}}
+              {% else %}
+                N/A
+              {% endif %}
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <table class="header-table-toc mt-6" role="presentation">
+      <tr>
+        <th colspan="3" class="header-toc-title pt-2">
+          {% if totalResultsSize > 0 %}
+            TABLE OF CONTENTS
+          {% elif selected is not defined %}
+            NIL RESULT
+          {% else %}
+            NO REGISTRATIONS SELECTED
+          {% endif %}  
+        </th>
+      </tr>
+      <tr class="mt-2">
+          <td>
+            {% if totalResultsSize > 0 %}
+              Registrations in Report: {{ totalResultsSize }}
+            {% else %}
+              0 Registrations
+            {% endif %}  
+          </td>
+          <td></td>
+          <td>Total Search Report Pages:
+            {% if totalResultsSize > 0 %}
+              {{ totalPageCount }}
+            {% else %}
+              0
+            {% endif %}  
+          </td>
+      </tr>
+    </table>
+
+    {% if totalResultsSize > 0 and selected is defined %}
+        [[v2/search-result/selected.html]]
+{#
+    {% else %}
+      <div class="nil-message pt-6">The search returned a NIL result. 0 registrations were found.</div>
+#}
+    {% endif %}
+
+    {% if totalResultsSize > 0 %}
+      {% for detail in details %}
+        <p style="page-break-before: always" ></p>
+        [[v2/search-result/registration.html]]
+      {% endfor %}
+    {% endif %}
+
+</body>
+</html>

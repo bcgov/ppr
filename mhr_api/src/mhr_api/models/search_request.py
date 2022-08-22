@@ -164,6 +164,47 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         return result_json
 
     @classmethod
+    def __build_search_result_mhr(cls, row):
+        """Build a single search summary json from a DB row for an mhr number search."""
+        status = 'ACTIVE'
+        mh_status = str(row[1])
+        exempt = str(row[2])
+        if mh_status != 'R':
+            if exempt and exempt != 'N':
+                status = 'EXEMPT'
+            else:
+                status = 'HISTORIC'
+        # current_app.logger.info('Mapping timestamp')
+        timestamp = row[3]
+        # current_app.logger.info('Timestamp mapped')
+        value: str = str(row[6])
+        year = int(value) if value.isnumeric() else 0
+        result_json = {
+            'mhrNumber': str(row[0]),
+            'status': status,
+            'createDateTime': model_utils.format_ts(timestamp),
+            'homeLocation': str(row[4]).strip(),
+            'serialNumber': str(row[5]).strip(),
+            'baseInformation': {
+                'year': year,
+                'make': str(row[7]).strip(),
+                'model': ''
+            },
+            'mhId': int(row[8])
+        }
+        owner_info = str(row[9])
+        owner_type = owner_info[0:1]
+        owner_status = owner_info[1:2]
+        owner_name = owner_info[2:].strip()
+        if owner_type != 'I':
+            result_json['organizationName'] = owner_name
+        else:
+            result_json['ownerName'] = model_utils.get_ind_name_from_db2(owner_name)
+        result_json['ownerStatus'] = LEGACY_TO_OWNER_STATUS[owner_status]
+        # current_app.logger.info(result_json)
+        return result_json
+
+    @classmethod
     def __build_search_result_serial(cls, row):
         """Build a single search summary json from a DB row for a serial number search."""
         status = 'ACTIVE'
@@ -223,7 +264,7 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
 
         result_json = []
         if row is not None:
-            result_json.append(SearchRequest.__build_search_result(row))
+            result_json.append(SearchRequest.__build_search_result_mhr(row))
             self.returned_results_size = 1
             self.total_results_size = 1
             self.search_response = result_json

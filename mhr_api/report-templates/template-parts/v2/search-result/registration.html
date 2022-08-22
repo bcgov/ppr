@@ -1,0 +1,74 @@
+<div class="business-details-container">
+{#
+  <div class="business-name-header"  id="{{ detail.mhrNumber }}">
+    <span class="lbl-business-name ma-0 pa-0">Manufactured Home Registration Number: {{ detail.mhrNumber }}</span>
+  </div>
+#}
+  <table class="registration-header-table" id="{{ detail.mhrNumber }}"  role="presentation">
+    <tr>
+      <td colspan="2">Manufactured Home Registration Number: {{ detail.mhrNumber }}</td>
+    </tr>
+  </table>
+
+  <table class="business-details-table-grey" role="presentation">
+    <tr>
+      <td>Registration Type:</td>
+      <td>Manufactured Home Act</td>
+    </tr>
+    <tr>
+      <td>Registration Date and Time:</td>
+      <td>
+        {% if detail.createDateTime is defined and detail.createDateTime != '' %}
+          {{detail.createDateTime}} 
+        {% else %}
+          N/A
+        {% endif %}
+      </td>
+    </tr>
+      <tr>
+      <td>Current Status:</td>
+      <td>
+        {% if detail.status == 'C' %}
+          Cancelled
+        {% elif detail.status == 'D' %}
+          Deleted
+        {% elif detail.status == 'E' %}
+          Expired
+        {% else %}
+          Registered
+        {% endif %}
+      </td>
+    </tr>
+    <tr>
+      <td>Declared Value:</td>
+      <td>
+        {% if detail.declaredValue is defined and detail.declaredValue != '' %}
+          {{detail.declaredValue}} 
+          {% if detail.declaredDateTime is defined and detail.declaredDateTime != '' %} as of {{detail.declaredDateTime}}{% endif %}
+        {% else %}
+          N/A
+        {% endif %}
+      </td>
+    </tr>    
+  </table>
+</div>
+
+<div class="no-page-break">
+  <div class="separator-header mt-6"></div>
+  <div class="section-title-centre mt-2">CURRENT REGISTRATION INFORMATION</div>
+  <div class="section-statement mt-0">(as of {{searchDateTime}})</div>
+  <div class="separator-header mt-2"></div>
+</div>
+
+<div class="container pt-4">
+  [[search-result/owners.html]]
+  [[search-result/location.html]]
+  [[search-result/details.html]]
+  [[search-result/sections.html]]
+  [[search-result/notes.html]]
+</div>
+
+{% if detail.pprRegistrations is defined %}
+  [[search-result/pprRegistrations.html]]
+{% endif %}
+

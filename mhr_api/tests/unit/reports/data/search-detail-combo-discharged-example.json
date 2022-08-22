@@ -1,0 +1,308 @@
+{
+  "details": [
+    {
+      "clientReferenceId": "                                        ", 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "declaredDateTime": "2008-05-30T10:06:19+00:00", 
+      "declaredValue": 45000, 
+      "description": {
+        "baseInformation": {
+          "make": "MAJESTIC", 
+          "model": "", 
+          "year": "1986"
+        }, 
+        "csaNumber": "", 
+        "csaStandard": "", 
+        "engineerDate": "0001-01-01", 
+        "engineerName": "", 
+        "manufacturer": "MANCO HOME SYSTEMS LTD.", 
+        "sectionCount": 1, 
+        "sections": [
+          {
+            "lengthFeet": 66, 
+            "lengthInches": 0, 
+            "serialNumber": "A6604", 
+            "widthFeet": 14, 
+            "widthInches": 0
+          }
+        ]
+      }, 
+      "location": {
+        "address": {
+          "city": "PRINCE GEORGE", 
+          "country": "CA", 
+          "postalCode": "", 
+          "region": "BC", 
+          "street": "8474 BUNCE ROAD"
+        }, 
+        "pad": "17", 
+        "parkName": "TRAILER VILLAGE"
+      }, 
+      "mhrNumber": "060664", 
+      "notes": [
+        {
+          "contactAddress": {
+            "city": "PRINCE GEORGE V2K 5B6", 
+            "country": "CA", 
+            "postalCode": "", 
+            "region": "BC", 
+            "street": "5459 HARTWAY DRIVE" 
+          }, 
+          "contactName": "RIDGEWOOD HOMES INC.", 
+          "createDateTime": "1999-05-05T08:40:01+00:00", 
+          "documentId": "90001918", 
+          "documentType": "103", 
+          "expiryDate": "1999-06-04", 
+          "remarks": ""
+        }
+      ], 
+      "ownerGroups": [
+        {
+          "groupId": 4, 
+          "interest": "UNDIVIDED 25/100", 
+          "interestNumerator": 5, 
+          "owners": [
+            {
+              "address": {
+                "city": "LANGLEY", 
+                "country": "CA", 
+                "postalCode": "V3Z 3A4", 
+                "region": "BC", 
+                "street": "2296 - 240TH STREET"
+              }, 
+              "individualName": {
+                "first": "MANJINDER", 
+                "last": "JOHAL", 
+                "middle": "SINGH"
+              }, 
+              "type": "COMMON"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "COMMON"
+        }, 
+        {
+          "groupId": 5, 
+          "interest": "UNDIVIDED 25/100", 
+          "interestNumerator": 5, 
+          "owners": [
+            {
+              "address": {
+                "city": "LANGLEY", 
+                "country": "CA", 
+                "postalCode": "V3Z 3A4", 
+                "region": "BC", 
+                "street": "2296 - 240TH STREET"
+              }, 
+              "individualName": {
+                "first": "PARMINDER", 
+                "last": "JOHAL", 
+                "middle": "SINGH"
+              }, 
+              "type": "COMMON"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "COMMON"
+        }, 
+        {
+          "groupId": 6, 
+          "interest": "UNDIVIDED 15/100", 
+          "interestNumerator": 3, 
+          "owners": [
+            {
+              "address": {
+                "city": "LANGLEY", 
+                "country": "CA", 
+                "postalCode": "V3Z 3A4", 
+                "region": "BC", 
+                "street": "2296 - 240TH STREET"
+              }, 
+              "individualName": {
+                "first": "JASKARAN", 
+                "last": "JOHAL", 
+                "middle": "SINGH"
+              }, 
+              "type": "COMMON"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "COMMON"
+        }, 
+        {
+          "groupId": 7, 
+          "interest": "UNDIVIDED 35/100", 
+          "interestNumerator": 7, 
+          "owners": [
+            {
+              "address": {
+                "city": "LANGLEY", 
+                "country": "CA", 
+                "postalCode": "V3Z 3A4", 
+                "region": "BC", 
+                "street": "2296 - 240TH STREET"
+              }, 
+              "individualName": {
+                "first": "JASNIRMAL", 
+                "last": "SIDHU", 
+                "middle": "SINGH"
+              }, 
+              "type": "COMMON"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "COMMON"
+        }
+      ], 
+      "pprRegistrations": [
+        {
+          "financingStatement": {
+            "baseRegistrationNumber": "087702K", 
+            "changes": [
+              {
+                "baseRegistrationNumber": "087702K", 
+                "createDateTime": "2022-07-21T19:17:49+00:00", 
+                "dischargeRegistrationNumber": "491428N", 
+                "registeringParty": {
+                  "address": {
+                    "city": "PRINCE GEORGE", 
+                    "country": "CA", 
+                    "postalCode": "V2L2K7", 
+                    "region": "BC", 
+                    "street": "879 VICTORIA STREET"
+                  }, 
+                  "businessName": "SPRUCE CREDIT UNION", 
+                  "code": "1860003"
+                }, 
+                "statementType": "DISCHARGE_STATEMENT"
+              }
+            ], 
+            "createDateTime": "2017-06-20T19:49:48+00:00", 
+            "debtors": [
+              {
+                "address": {
+                  "city": "PRINCE GEORGE", 
+                  "country": "CA", 
+                  "postalCode": "V2N6P1", 
+                  "region": "BC", 
+                  "street": "17 8474 BUNCE RD"
+                }, 
+                "birthDate": "1957-01-17T12:59:59+00:00", 
+                "partyId": 447139, 
+                "personName": {
+                  "first": "ROBERT", 
+                  "last": "FOLZ", 
+                  "middle": "ROY"
+                }
+              }, 
+              {
+                "address": {
+                  "city": "PRINCE GEORGE", 
+                  "country": "CA", 
+                  "postalCode": "V2N6P1", 
+                  "region": "BC", 
+                  "street": "17 8474 BUNCE RD"
+                }, 
+                "birthDate": "1965-06-22T12:59:59+00:00", 
+                "partyId": 447140, 
+                "personName": {
+                  "first": "SHARANDA", 
+                  "last": "FOLZ", 
+                  "middle": "ELEN"
+                }
+              }
+            ], 
+            "dischargedDateTime": "2022-07-21T19:17:49+00:00", 
+            "expiryDate": "2022-06-21T06:59:59+00:00", 
+            "generalCollateral": [
+              {
+                "addedDateTime": "2017-06-20T19:49:48+00:00", 
+                "collateralId": 262467, 
+                "description": ", THE PROPERTY DESCRIBED ABOVE COMPLETE WITH ALL PRESENT AND          FUTURE ATTACHMENTS, ACCESSORIES, ACCESSIONS, REPLACEMENTS             AND ADDITIONS AND ALL PROCEEDS THEREOF. PROCEEDS: ALL OF THE          DEBTOR'S PRESENT AND AFTER-ACQUIRED GOODS, SECURITIES,                INSTRUMENTS, DOCUMENTS OF TITLE, CHATTEL PAPER, INTANGIBLES,OR MONEY WHICH ARE PROCEEDS OF COLLATERAL."
+              }
+            ], 
+            "lifeYears": 5, 
+            "registeringParty": {
+              "address": {
+                "city": "PRINCE GEORGE", 
+                "country": "CA", 
+                "postalCode": "V2L2K7", 
+                "region": "BC", 
+                "street": "879 VICTORIA STREET"
+              }, 
+              "businessName": "SPRUCE CREDIT UNION"
+            }, 
+            "registrationAct": "PERSONAL PROPERTY SECURITY ACT", 
+            "registrationDescription": "PPSA SECURITY AGREEMENT", 
+            "securedParties": [
+              {
+                "address": {
+                  "city": "PRINCE GEORGE", 
+                  "country": "CA", 
+                  "postalCode": "V2L2K7", 
+                  "region": "BC", 
+                  "street": "879 VICTORIA STREET"
+                }, 
+                "businessName": "SPRUCE CREDIT UNION", 
+                "partyId": 4548218
+              }
+            ], 
+            "statusType": "HDC", 
+            "trustIndenture": false, 
+            "type": "SA", 
+            "vehicleCollateral": [
+              {
+                "make": "MONARCH", 
+                "manufacturedHomeRegistrationNumber": "060664", 
+                "model": "MAGESTIC", 
+                "type": "MH", 
+                "vehicleId": 221402, 
+                "year": 1986
+              }
+            ]
+          }, 
+          "matchType": "EXACT"
+        }
+      ], 
+      "status": "R"
+    }
+  ], 
+  "getReportURL": "/ppr/api/v1/search-results/9050", 
+  "payment": {
+    "invoiceId": "19289", 
+    "receipt": "/api/v1/payment-requests/19289/receipts"
+  }, 
+  "searchDateTime": "2022-05-19T22:40:51+00:00", 
+  "searchQuery": {
+    "clientReferenceId": "MM-UT-HDC0001", 
+    "criteria": {
+      "value": "060664"
+    }, 
+    "type": "MHR_NUMBER"
+  }, 
+  "selected": [
+    {
+      "baseInformation": {
+        "make": "MAJESTIC", 
+        "model": "", 
+        "year": 1986
+      }, 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "homeLocation": "PRINCE GEORGE", 
+      "includeLienInfo": true, 
+      "mhrNumber": "060664", 
+      "ownerName": {
+        "first": "JOHN", 
+        "last": "CRIPPS", 
+        "middle": "CLINTON"
+      }, 
+      "serialNumber": "A6604", 
+      "status": "ACTIVE"
+    }
+  ], 
+  "totalResultsSize": 1
+}

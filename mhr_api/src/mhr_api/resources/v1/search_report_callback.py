@@ -24,7 +24,8 @@ from mhr_api.exceptions import DatabaseException
 from mhr_api.services.queue_service import GoogleQueueService
 from mhr_api.models import EventTracking, SearchResult, utils as model_utils
 from mhr_api.services.payment.client import SBCPaymentClient
-from mhr_api.reports import ReportTypes, get_callback_pdf
+from mhr_api.reports import get_callback_pdf
+from mhr_api.reports.report import ReportTypes
 from mhr_api.resources import utils as resource_utils
 from mhr_api.services.utils.exceptions import ReportException, ReportDataException, StorageException
 from mhr_api.services.document_storage.storage_service import GoogleStorageService
