@@ -12,7 +12,42 @@
       <PartySearch isMhrPartySearch />
 
       <!-- Mhr Submitting Party Form -->
-      <MhrSubmittingParty :validate="validateSubmitter" :class="{'border-error-left': validateSubmitter}"/>
+      <MhrSubmittingParty :validate="validateSubmitter" :class="{ 'border-error-left': validateSubmitter }" />
+    </section>
+
+    <section id="mhr-submitting-party-doc-id" class="mt-10">
+      <h2>Document ID</h2>
+      <p class="mt-2">
+        Enter the 8-digit Document ID number.
+      </p>
+
+      <v-form ref="documentIdForm" v-model="isDocumentIdValid">
+        <v-card
+          flat
+          rounded
+          id="submitting-party"
+          class="mt-8 pa-8 pr-6 pb-3"
+          :class="{ 'border-error-left': validateDocId }"
+        >
+          <v-row no-gutters class="pt-3">
+            <v-col cols="12" sm="2">
+              <label class="generic-label" :class="{ 'error-text': validateDocId }">
+                Document ID
+              </label>
+            </v-col>
+            <v-col cols="12" sm="10" class="px-1">
+              <v-text-field
+                filled
+                id="doc-id-num"
+                class="pr-2"
+                label="Document ID Number"
+                v-model="documentId"
+                :rules="documentIdRules"
+              />
+            </v-col>
+          </v-row>
+        </v-card>
+      </v-form>
     </section>
 
     <section id="mhr-submitting-party-reference" class="mt-10">
@@ -25,14 +60,15 @@
       <!-- Insert Attention or Reference Number here -->
       <v-form ref="reference-number-form" v-model="isRefNumValid">
         <v-card
-          flat rounded
+          flat
+          rounded
           id="attention-or-reference-number-card"
           class="mt-8 pa-8 pr-6 pb-3"
-          :class="{'border-error-left': validateRefNum}"
+          :class="{ 'border-error-left': validateRefNum }"
         >
           <v-row no-gutters class="pt-3">
-            <v-col cols="12" sm="2" >
-              <label class="generic-label" :class="{'error-text': validateRefNum}">
+            <v-col cols="12" sm="2">
+              <label class="generic-label" :class="{ 'error-text': validateRefNum }">
                 Attention or Reference Number
               </label>
             </v-col>
@@ -68,7 +104,7 @@ export default defineComponent({
     MhrSubmittingParty
   },
   props: {},
-  setup () {
+  setup (props, context) {
     const {
       getMhrRegistrationValidationModel
     } = useGetters<any>([
@@ -76,14 +112,14 @@ export default defineComponent({
     ])
 
     const {
+      setMhrRegistrationDocumentId,
       setMhrAttentionReferenceNum
     } = useActions<any>([
+      'setMhrRegistrationDocumentId',
       'setMhrAttentionReferenceNum'
     ])
 
-    const {
-      maxLength
-    } = useInputRules()
+    const { customRules, required, maxLength, isNumber } = useInputRules()
 
     const {
       MhrCompVal,
@@ -96,13 +132,39 @@ export default defineComponent({
 
     const localState = reactive({
       attentionReferenceNum: '',
+      documentId: '',
+      isDocumentIdValid: false,
       isRefNumValid: false,
+      documentIdRules: computed(() => customRules(required('Enter a Document ID'), maxLength(8, true), isNumber())),
       validateSubmitter: computed(() => {
         return getSectionValidation(MhrSectVal.SUBMITTING_PARTY_VALID, MhrCompVal.SUBMITTER_VALID)
+      }),
+      validateDocId: computed(() => {
+        return getSectionValidation(MhrSectVal.SUBMITTING_PARTY_VALID, MhrCompVal.DOC_ID_VALID)
       }),
       validateRefNum: computed(() => {
         return getSectionValidation(MhrSectVal.SUBMITTING_PARTY_VALID, MhrCompVal.REF_NUM_VALID)
       })
+    })
+
+    watch(
+      () => localState.documentId,
+      (val: string) => {
+        if (localState.documentId.length === 8) {
+          console.log('Looking up Document ID...')
+          // TODO: Implement Document ID look up
+        }
+        setMhrRegistrationDocumentId(val)
+      }
+    )
+
+    watch(() => localState.isDocumentIdValid, (val: boolean) => {
+      setValidation(MhrSectVal.SUBMITTING_PARTY_VALID, MhrCompVal.DOC_ID_VALID, val)
+    })
+
+    watch(() => localState.validateDocId, async () => {
+      // @ts-ignore - function exists
+      await context.refs.documentIdForm.validate()
     })
 
     watch(() => localState.attentionReferenceNum, (val: string) => {

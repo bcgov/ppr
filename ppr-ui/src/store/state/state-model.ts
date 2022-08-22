@@ -89,6 +89,7 @@ export const stateModel: StateModelIF = {
     }
   },
   mhrRegistration: {
+    documentId: '',
     clientReferenceId: '',
     declaredValue: '',
     submittingParty: {
@@ -230,6 +231,7 @@ export const stateModel: StateModelIF = {
       otherValid: false
     },
     submittingPartyValid: {
+      documentIdValid: false,
       submitterValid: false,
       refNumValid: false
     },

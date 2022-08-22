@@ -662,6 +662,10 @@ export const getMhrRegistrationHomeOwners = (state: StateIF): MhrRegistrationHom
   return owners
 }
 
+export const getMhrRegistrationDocumentId = (state: StateIF): string => {
+  return state.stateModel.mhrRegistration.documentId
+}
+
 export const getMhrAttentionReferenceNum = (state: StateIF): any => {
   return state.stateModel.mhrRegistration.attentionReferenceNum
 }

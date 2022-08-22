@@ -16,6 +16,7 @@ export enum MhrCompVal {
 
   // Submitting Party Section
   SUBMITTER_VALID = 'submitterValid',
+  DOC_ID_VALID = 'documentIdValid',
   REF_NUM_VALID = 'refNumValid',
 
   // HomeOwners Section
