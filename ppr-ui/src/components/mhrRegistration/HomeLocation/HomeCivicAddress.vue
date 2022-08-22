@@ -9,14 +9,13 @@
           <div class="form__row">
             <v-text-field
               autocomplete="new-password"
-              id="street"
+              :id="streetId"
               class="street-address"
               filled
               label="Street Address"
               :name="Math.random()"
               persistent-hint
-              v-model="address.street"
-              :rules="[...addressSchema.street]"
+              v-model="addressLocal.street"
               @keypress.once="enableAddressComplete()"
               @click="enableAddressComplete()"
             />
@@ -30,7 +29,7 @@
               label="Additional Street Address (Optional)"
               :name="Math.random()"
               rows="1"
-              v-model="address.streetAdditional"
+              v-model="addressLocal.streetAdditional"
             />
           </div>
           <div class="form__row two-column">
@@ -42,7 +41,7 @@
                   class="item address-city"
                   label="City"
                   :name="Math.random()"
-                  v-model="address.city"
+                  v-model="addressLocal.city"
                   :rules="[...addressSchema.city]"
                 />
               </v-col>
@@ -56,7 +55,7 @@
                   hint="Address must be in B.C."
                   persistent-hint
                   :name="Math.random()"
-                  v-model="address.region"
+                  v-model="addressLocal.region"
                   :rules="[...addressSchema.region]"
                 />
               </v-col>
@@ -75,16 +74,12 @@ import { CivicAddressSchema } from '@/schemas/civic-address'
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import { useMhrValidations } from '@/composables'
 import {
-  baseRules,
   useAddress,
   useAddressComplete,
-  useCountryRegions,
   useCountriesProvinces,
-  useBaseValidations,
-  spaceRules
+  useBaseValidations
 } from '@/composables/address/factories'
 import { AddressIF } from '@/interfaces'
-import { SchemaIF } from '@/composables/address/interfaces'
 /* eslint-enable no-unused-vars */
 export default defineComponent({
   name: 'HomeCivicAddress',
@@ -96,32 +91,13 @@ export default defineComponent({
         street: '',
         streetAdditional: '',
         city: '',
-        region: '',
+        region: 'British Columbia',
         postalCode: '',
-        country: '',
+        country: 'CA',
         deliveryInstructions: ''
       })
     },
     validate: {
-      type: Boolean,
-      default: false
-    },
-    editing: {
-      type: Boolean,
-      default: false
-    },
-    /* contains validation for each field */
-    schema: {
-      type: Object as () => SchemaIF,
-      default: null
-    },
-    /* triggers all current form validation errors */
-    triggerErrors: {
-      type: Boolean,
-      default: false
-    },
-    /* Hides the persistent hint field on Address Input */
-    hideAddressHint: {
       type: Boolean,
       default: false
     }
@@ -144,58 +120,67 @@ export default defineComponent({
       setValidation
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
+    const addressSchema = CivicAddressSchema
+
     const {
       addressLocal,
-      isSchemaRequired
-    } = useAddress(toRefs(props).value, props.schema)
-    const addressSchema = CivicAddressSchema
+      country,
+      schemaLocal,
+      isSchemaRequired,
+      labels
+    } = useAddress(toRefs(props).value, addressSchema)
+
+    const { addressForm, resetValidation, validate } = useBaseValidations()
 
     const { enableAddressComplete, uniqueIds } = useAddressComplete(addressLocal)
 
-    const localState = reactive({
-      isValidCivicAddress: false,
-      address: {
-        street: '',
-        streetAdditional: '',
-        city: '',
-        region: 'British Columbia'
-      },
-      isSchemaRequired,
-      ...uniqueIds
-    })
+    const isValidCivicAddress = false
 
     /** Apply local model updates to store. **/
-    watch(() => localState.address.street, async () => {
+    watch(() => addressLocal.value.street, async () => {
       // Set civic address data to store
-      await setCivicAddress({ key: 'street', value: localState.address.street })
+      await setCivicAddress({ key: 'street', value: addressLocal.value.street })
     })
 
-    watch(() => localState.address.streetAdditional, async () => {
+    watch(() => addressLocal.value.streetAdditional, async () => {
       // Set civic address data to store
-      await setCivicAddress({ key: 'streetAdditional', value: localState.address.streetAdditional })
+      await setCivicAddress({ key: 'streetAdditional', value: addressLocal.value.streetAdditional })
     })
 
-    watch(() => localState.address.city, async () => {
+    watch(() => addressLocal.value.city, async () => {
       // Set civic address data to store
-      await setCivicAddress({ key: 'city', value: localState.address.city })
+      await setCivicAddress({ key: 'city', value: addressLocal.value.city })
     })
 
-    watch(() => localState.address.region, async () => {
+    watch(() => addressLocal.value.region, async () => {
       // Set civic address data to store
-      await setCivicAddress({ key: 'region', value: localState.address.region })
+      addressLocal.value.region = 'British Columbia'
+      await setCivicAddress({ key: 'region', value: 'BC' })
     })
 
-    watch(() => localState.isValidCivicAddress, async (val: boolean) => {
+    watch(() => isValidCivicAddress, async (val: boolean) => {
       setValidation(MhrSectVal.LOCATION_VALID, MhrCompVal.CIVIC_ADDRESS_VALID, val)
     })
 
     watch(() => props.validate, async () => {
       // @ts-ignore - function exists
-      context.refs.addressForm.validate()
+      resetValidation()
+      validate()
     })
 
     /** Clear/reset forms when select option changes. **/
-    return { addressSchema, addressLocal, enableAddressComplete, ...toRefs(localState) }
+    return {
+      addressForm,
+      addressSchema,
+      addressLocal,
+      country,
+      schemaLocal,
+      isSchemaRequired,
+      enableAddressComplete,
+      ...labels,
+      ...uniqueIds,
+      isValidCivicAddress
+    }
   }
 })
 </script>
