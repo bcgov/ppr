@@ -158,27 +158,18 @@ export default defineComponent({
       }
     )
 
-    watch(
-      () => localState.isDocumentIdValid,
-      (val: boolean) => {
-        setValidation(MhrSectVal.SUBMITTING_PARTY_VALID, MhrCompVal.DOC_ID_VALID, val)
-      }
-    )
+    watch(() => localState.isDocumentIdValid, (val: boolean) => {
+      setValidation(MhrSectVal.SUBMITTING_PARTY_VALID, MhrCompVal.DOC_ID_VALID, val)
+    })
 
-    watch(
-      () => localState.validateDocId,
-      async () => {
-        // @ts-ignore - function exists
-        await context.refs.documentIdForm.validate()
-      }
-    )
+    watch(() => localState.validateDocId, async () => {
+      // @ts-ignore - function exists
+      await context.refs.documentIdForm.validate()
+    })
 
-    watch(
-      () => localState.attentionReferenceNum,
-      (val: string) => {
-        setMhrAttentionReferenceNum(val)
-      }
-    )
+    watch(() => localState.attentionReferenceNum, (val: string) => {
+      setMhrAttentionReferenceNum(val)
+    })
 
     watch(() => localState.isRefNumValid, (val: boolean) => {
       setValidation(MhrSectVal.SUBMITTING_PARTY_VALID, MhrCompVal.REF_NUM_VALID, val)
