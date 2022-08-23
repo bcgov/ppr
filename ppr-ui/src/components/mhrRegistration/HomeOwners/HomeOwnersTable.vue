@@ -12,10 +12,7 @@
       disable-pagination
       no-data-text="No owners added yet"
     >
-      <template
-        v-slot:group.header="{ group, items }"
-        class="group-header-slot"
-      >
+      <template v-slot:group.header="{ group, items }" class="group-header-slot">
         <td :colspan="4" class="py-1">
           <TableGroupHeader :groupId="group" :owners="items" />
         </td>
@@ -61,9 +58,7 @@
           </td>
           <td>
             {{ toDisplayPhone(row.item.phoneNumber) }}
-            <span v-if="row.item.phoneExtension">
-              Ext {{ row.item.phoneExtension }}
-            </span>
+            <span v-if="row.item.phoneExtension"> Ext {{ row.item.phoneExtension }} </span>
           </td>
           <td class="text-right">
             <v-btn
@@ -82,13 +77,7 @@
             <!-- Actions drop down menu -->
             <v-menu offset-y left nudge-bottom="0">
               <template v-slot:activator="{ on }">
-                <v-btn
-                  text
-                  v-on="on"
-                  color="primary"
-                  class="px-0"
-                  :disabled="isAddingMode || isGlobalEditingMode"
-                >
+                <v-btn text v-on="on" color="primary" class="px-0" :disabled="isAddingMode || isGlobalEditingMode">
                   <v-icon>mdi-menu-down</v-icon>
                 </v-btn>
               </template>
@@ -97,9 +86,7 @@
               <v-list class="actions-dropdown actions__more-actions">
                 <v-list-item class="my-n2">
                   <v-list-item-subtitle class="pa-0" @click="remove(row.item)">
-                    <v-icon small style="margin-bottom: 3px;"
-                      >mdi-delete</v-icon
-                    >
+                    <v-icon small style="margin-bottom: 3px;">mdi-delete</v-icon>
                     <span class="ml-1 remove-btn-text">Remove</span>
                   </v-list-item-subtitle>
                 </v-list-item>
@@ -118,13 +105,7 @@
 </template>
 
 <script lang="ts">
-import {
-  computed,
-  defineComponent,
-  reactive,
-  toRefs,
-  watch,
-} from '@vue/composition-api'
+import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
 import { homeOwnersTableHeaders } from '@/resources/tableHeaders'
 import { BaseAddress } from '@/composables/address'
 import { useHomeOwners } from '@/composables/mhrRegistration'
@@ -140,23 +121,17 @@ export default defineComponent({
   name: 'HomeOwnersTable',
   props: {
     homeOwners: { default: [] as MhrRegistrationHomeOwnersIF[] },
-    isAdding: { default: false },
+    isAdding: { default: false }
   },
   components: {
     BaseAddress,
     AddEditHomeOwner,
-    TableGroupHeader,
+    TableGroupHeader
   },
-  setup(props, context) {
+  setup (props, context) {
     const addressSchema = PartyAddressSchema
 
-    const {
-      showGroups,
-      removeOwner,
-      deleteGroup,
-      isGlobalEditingMode,
-      setGlobalEditingMode,
-    } = useHomeOwners()
+    const { showGroups, removeOwner, deleteGroup, isGlobalEditingMode, setGlobalEditingMode } = useHomeOwners()
 
     const localState = reactive({
       currentlyEditingHomeOwnerId: -1,
