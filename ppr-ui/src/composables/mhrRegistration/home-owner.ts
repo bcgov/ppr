@@ -1,4 +1,5 @@
 import {
+  MhrRegistrationFractionalOwnershipIF,
   MhrRegistrationHomeOwnerGroupIF,
   MhrRegistrationHomeOwnersIF
 } from '@/interfaces'
@@ -15,10 +16,7 @@ const showGroups = ref(false)
 // Set global edit mode to enable or disable all Edit and dropdown buttons
 const isGlobalEditingMode = ref(false)
 
-export function useHomeOwners (
-  isPerson: boolean = false,
-  isEditMode: boolean = false
-) {
+export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = false) {
   const { getMhrRegistrationHomeOwnerGroups } = useGetters<any>([
     'getMhrRegistrationHomeOwnerGroups'
   ])
@@ -49,12 +47,21 @@ export function useHomeOwners (
   // WORKING WITH GROUPS
 
   // Generate dropdown items for the group selection
-  const getGroupDropdownItems = (isAddingHomeOwner: Boolean): Array<any> => {
+  const getGroupDropdownItems = (isAddingHomeOwner: Boolean, groupId: string): Array<any> => {
     // Make additional Group available in dropdown when adding a new home owner
-    // const additionalGroup = isAddingHomeOwner ? 1 : 0
+    // or when there are more than one owner in the group
+
+    let numOfAdditionalGroupsInDropdown = 0
+
+    if (isAddingHomeOwner) {
+      numOfAdditionalGroupsInDropdown = 1
+    } else {
+      numOfAdditionalGroupsInDropdown =
+        find(getMhrRegistrationHomeOwnerGroups.value, { groupId: groupId })?.owners.length > 1 ? 1 : 0
+    }
 
     if (showGroups.value) {
-      return Array(getMhrRegistrationHomeOwnerGroups.value.length + 1)
+      return Array(getMhrRegistrationHomeOwnerGroups.value.length + numOfAdditionalGroupsInDropdown)
         .fill({})
         .map((v, i) => {
           return { text: 'Group ' + (i + 1), value: (i + 1).toString() }
@@ -69,25 +76,19 @@ export function useHomeOwners (
     }
   }
 
-  const getGroupForOwner = (
-    ownerId: string
-  ): MhrRegistrationHomeOwnerGroupIF => {
+  const getGroupForOwner = (ownerId: string): MhrRegistrationHomeOwnerGroupIF => {
     return find(getMhrRegistrationHomeOwnerGroups.value, group => {
       return find(group.owners, { id: ownerId })
     })
   }
 
-  const addOwnerToTheGroup = (
-    owner: MhrRegistrationHomeOwnersIF,
-    groupId: string
-  ) => {
+  const addOwnerToTheGroup = (owner: MhrRegistrationHomeOwnersIF, groupId: string) => {
     const homeOwnerGroups = [...getMhrRegistrationHomeOwnerGroups.value]
 
     // Try to find a group to add the owner
     const groupToUpdate =
       homeOwnerGroups.find(
-        (group: MhrRegistrationHomeOwnerGroupIF) =>
-          group.groupId === (groupId || DEFAULT_GROUP_ID)
+        (group: MhrRegistrationHomeOwnerGroupIF) => group.groupId === (groupId || DEFAULT_GROUP_ID)
       ) || ({} as MhrRegistrationHomeOwnerGroupIF)
 
     if (groupToUpdate.owners) {
@@ -104,10 +105,7 @@ export function useHomeOwners (
     setMhrRegistrationHomeOwnerGroups(homeOwnerGroups)
   }
 
-  const editHomeOwner = (
-    updatedOwner: MhrRegistrationHomeOwnersIF,
-    newGroupId: string
-  ) => {
+  const editHomeOwner = (updatedOwner: MhrRegistrationHomeOwnersIF, newGroupId: string) => {
     const homeOwnerGroups = [...getMhrRegistrationHomeOwnerGroups.value]
     const groupIdOfOwner = getGroupForOwner(updatedOwner.id).groupId
 
@@ -136,8 +134,7 @@ export function useHomeOwners (
     ] as MhrRegistrationHomeOwnerGroupIF[]
 
     // find group id that owner belongs to
-    const groupIdOfOwner =
-      getGroupForOwner(owner.id)?.groupId || DEFAULT_GROUP_ID
+    const groupIdOfOwner = getGroupForOwner(owner.id)?.groupId || DEFAULT_GROUP_ID
 
     // find group to remove the owner from
     const groupToUpdate = homeOwnerGroups.find(
@@ -161,9 +158,7 @@ export function useHomeOwners (
     ] as MhrRegistrationHomeOwnerGroupIF[]
 
     // find all groups with at least one owner
-    const newOwnerGroups = homeOwnerGroups.filter(
-      group => group.owners.length > 0
-    )
+    const newOwnerGroups = homeOwnerGroups.filter(group => group.owners.length > 0)
     // update owner group ids with new values
     // to make them sequential again (e.g groups 1,3,5 -> 1,2,3)
     newOwnerGroups.forEach((group, index) => {
@@ -182,6 +177,16 @@ export function useHomeOwners (
       group.groupId = (index + 1).toString()
     })
 
+    setMhrRegistrationHomeOwnerGroups(homeOwnerGroups)
+  }
+
+  const setGroupFractionalInterest = (
+    groupId: string,
+    fractionalData: MhrRegistrationFractionalOwnershipIF
+  ): void => {
+    const homeOwnerGroups = [...getMhrRegistrationHomeOwnerGroups.value]
+    const groupToUpdate = find(homeOwnerGroups, { groupId: groupId })
+    Object.assign(groupToUpdate, { ...fractionalData })
     setMhrRegistrationHomeOwnerGroups(homeOwnerGroups)
   }
 
@@ -207,6 +212,7 @@ export function useHomeOwners (
     setShowGroups,
     setGlobalEditingMode,
     removeEmptyGroups,
-    deleteGroup
+    deleteGroup,
+    setGroupFractionalInterest
   }
 }

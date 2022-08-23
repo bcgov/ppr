@@ -1,11 +1,6 @@
-import { AddressIF } from '@/composables/address/interfaces'
 import { MhrRegistrationHomeOwnersIF } from './MhrRegistrationHomeOwnersIF'
-
-export interface MhrRegistrationHomeOwnerGroupIF {
+import { MhrRegistrationFractionalOwnershipIF } from './MhrRegistrationFractionalOwnershipIF'
+export interface MhrRegistrationHomeOwnerGroupIF extends MhrRegistrationFractionalOwnershipIF {
   groupId: string,
-  owners: MhrRegistrationHomeOwnersIF[],
-  type?: string,
-  interest?: string,
-  interestNumerator?: number,
-  tenancySpecified?: Boolean
+  owners: MhrRegistrationHomeOwnersIF[]
 }

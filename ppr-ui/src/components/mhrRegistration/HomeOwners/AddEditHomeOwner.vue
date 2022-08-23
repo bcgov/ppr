@@ -178,6 +178,7 @@
             :groupId="ownersGroupId"
             :isAddingHomeOwner="isAddingHomeOwner"
             @setOwnerGroupId="ownerGroupId = $event"
+            :fractionalData="fractionalData"
           />
         </v-form>
         <v-row>
@@ -222,7 +223,14 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, ref, toRefs, watch } from '@vue/composition-api'
+import {
+  computed,
+  defineComponent,
+  reactive,
+  ref,
+  toRefs,
+  watch
+} from '@vue/composition-api'
 import { useInputRules } from '@/composables/useInputRules'
 import { useHomeOwners } from '@/composables/mhrRegistration'
 
@@ -233,11 +241,15 @@ import { focusOnFirstError } from '@/utils'
 import { VueMaskDirective } from 'v-mask'
 
 /* eslint-disable no-unused-vars */
-import { MhrRegistrationHomeOwnersIF } from '@/interfaces/mhr-registration-interfaces'
-import { SimpleHelpToggle } from '@/components/common'
-import { useSearch } from '@/composables/useSearch'
+import {
+  MhrRegistrationHomeOwnerGroupIF,
+  MhrRegistrationHomeOwnersIF,
+  MhrRegistrationFractionalOwnershipIF
+} from '@/interfaces/mhr-registration-interfaces'
 import { SearchResponseI } from '@/interfaces'
 /* eslint-enable no-unused-vars */
+import { useSearch } from '@/composables/useSearch'
+import { SimpleHelpToggle } from '@/components/common'
 import HomeOwnerGroups from './HomeOwnerGroups.vue'
 
 let DEFAULT_OWNER_ID = 1
@@ -272,7 +284,8 @@ export default defineComponent({
       addOwnerToTheGroup,
       editHomeOwner,
       showGroups,
-      setShowGroups
+      setShowGroups,
+      setGroupFractionalInterest
     } = useHomeOwners(props.isHomeOwnerPerson, props.editHomeOwner == null)
 
     const addressSchema = PartyAddressSchema
@@ -309,16 +322,36 @@ export default defineComponent({
     }
 
     const localState = reactive({
+      group: getGroupForOwner(
+        props.editHomeOwner?.id
+      ) as MhrRegistrationHomeOwnerGroupIF,
       ownersGroupId: computed(() =>
-        showGroups.value
-          ? getGroupForOwner(props.editHomeOwner?.id)?.groupId
-          : null
+        showGroups.value ? localState.group?.groupId : null
       ),
       owner: { ...defaultHomeOwner },
       ownerGroupId: undefined,
       showGroups: showGroups,
       isPerson: props.isHomeOwnerPerson,
       isAddingHomeOwner: props.editHomeOwner == null,
+      fraction: {
+        type: '',
+        interest: '',
+        interestNumerator: null,
+        interestTotal: null,
+        tenancySpecified: null
+      } as MhrRegistrationFractionalOwnershipIF,
+      fractionalData: computed(() => {
+        // TODO: get fractional ownership for the group that either owner belongs to or
+        // the group that is selected from dropdown
+
+        return {
+          type: localState.group?.type || '',
+          interest: localState.group?.interest || '',
+          interestNumerator: localState.group?.interestNumerator || null,
+          interestTotal: localState.group?.interestTotal || null,
+          tenancySpecified: localState.group?.tenancySpecified || null
+        } as MhrRegistrationFractionalOwnershipIF
+      }),
       isHomeOwnerFormValid: false,
       isAddressFormValid: false,
       triggerAddressErrors: false,
@@ -327,11 +360,11 @@ export default defineComponent({
       lastNameRules: customRules(required('Enter a last name'), maxLength(25)),
       orgNameRules: customRules(
         required('Enter an organization name'),
-        maxLength(150)
+        maxLength(70)
       ),
       phoneNumberRules: customRules(
         required('Enter a phone number'),
-        minLength(14)
+        maxLength(15)
       )
     })
 
@@ -351,6 +384,10 @@ export default defineComponent({
             localState.ownerGroupId
           )
         }
+        setGroupFractionalInterest(
+          localState.ownerGroupId || '1',
+          localState.fractionalData
+        )
         localState.ownerGroupId && setShowGroups(true)
 
         cancel()
@@ -366,16 +403,19 @@ export default defineComponent({
       context.emit('cancel')
     }
 
-    watch(() => localState.owner.organizationName, async (val: string) => {
-      if (val.length >= 3) {
-        const result: SearchResponseI = await searchBusiness(val)
-        if (!result.error) {
-          console.log(result.searchResults)
-        } else {
-          console.log(result.error)
+    watch(
+      () => localState.owner.organizationName,
+      async (val: string) => {
+        if (val.length >= 3) {
+          const result: SearchResponseI = await searchBusiness(val)
+          if (!result.error) {
+            console.log(result.searchResults)
+          } else {
+            console.log(result.error)
+          }
         }
       }
-    })
+    )
 
     return {
       getSideTitle,
@@ -392,4 +432,13 @@ export default defineComponent({
 })
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+@import '@/assets/styles/theme.scss';
+
+#addHomeOwnerForm {
+  p {
+    color: $gray7;
+    line-height: 24px;
+  }
+}
+</style>

@@ -67,7 +67,7 @@
         outlined
         color="primary"
         :ripple="false"
-        :disabled="disableAddHomeOwnerBtn"
+        :disabled="isGlobalEditingMode"
         @click="showAddPersonSection = true"
         data-test-id="add-person-btn"
       >
@@ -80,7 +80,7 @@
         outlined
         color="primary"
         :ripple="false"
-        :disabled="disableAddHomeOwnerBtn"
+        :disabled="isGlobalEditingMode"
         @click="showAddPersonOrganizationSection = true"
         data-test-id="add-org-btn"
       >
@@ -157,7 +157,7 @@ export default defineComponent({
       'setMhrRegistrationHomeOwners'
     ])
 
-    const { setGlobalEditingMode } = useHomeOwners()
+    const { setGlobalEditingMode, isGlobalEditingMode } = useHomeOwners()
 
     const localState = reactive({
       showAddPersonSection: false,
@@ -206,6 +206,7 @@ export default defineComponent({
 
     return {
       getMhrRegistrationHomeOwners,
+      isGlobalEditingMode,
       addHomeOwner,
       editHomeOwner,
       removeHomeOwner,
