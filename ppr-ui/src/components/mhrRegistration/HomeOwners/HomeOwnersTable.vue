@@ -86,7 +86,7 @@
               <v-list class="actions-dropdown actions__more-actions">
                 <v-list-item class="my-n2">
                   <v-list-item-subtitle class="pa-0" @click="remove(row.item)">
-                    <v-icon small>mdi-delete</v-icon>
+                    <v-icon small style="margin-bottom: 3px;">mdi-delete</v-icon>
                     <span class="ml-1 remove-btn-text">Remove</span>
                   </v-list-item-subtitle>
                 </v-list-item>
@@ -159,7 +159,6 @@ export default defineComponent({
       return index === localState.currentlyEditingHomeOwnerId
     }
 
-    // Emit whenever editing mode is on or off
     watch(
       () => localState.currentlyEditingHomeOwnerId,
       () => {

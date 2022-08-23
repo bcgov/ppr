@@ -5,8 +5,7 @@
     </label>
     <ul class="my-2">
       <li>
-        Select a group if you have
-        <b>multiple groups of owners</b> (tenants in common).
+        Select a group if you have <b>multiple groups of owners</b> (tenants in common).
       </li>
       <li>
         Leave this empty if you have <b>only one owner</b>, or <b>one group of owners</b> (sole
@@ -15,6 +14,7 @@
     </ul>
     <v-select
       id="home-owner-groups"
+      ref="groupDropdown"
       label="Select a Group"
       v-model="ownerGroupId"
       :items="groupItems"
@@ -23,6 +23,7 @@
       filled
       @change="setOwnerGroupId($event)"
       :clearable="groupItems.length === 1"
+      @click:clear="groupDropdown.blur()"
       :menu-props="{ bottom: true, offsetY: true }"
       data-test-id="owner-group-select"
     ></v-select>
@@ -60,13 +61,14 @@ export default defineComponent({
     const { getMhrRegistrationHomeOwnerGroups } = useGetters<any>([
       'getMhrRegistrationHomeOwnerGroups'
     ])
+    const groupDropdown = ref(null)
 
     const { required } = useInputRules()
     const { getGroupDropdownItems, showGroups } = useHomeOwners()
 
     const localState = reactive({
       ownerGroupId: props.groupId,
-      groupItems: computed(() => getGroupDropdownItems(props.isAddingHomeOwner)),
+      groupItems: computed(() => getGroupDropdownItems(props.isAddingHomeOwner, props.groupId)),
       groupRules: computed(() => {
         return showGroups.value ? required('Select a group for this owner') : []
       }),
@@ -87,6 +89,7 @@ export default defineComponent({
 
     return {
       setOwnerGroupId,
+      groupDropdown,
       ...toRefs(localState)
     }
   }
@@ -98,7 +101,8 @@ export default defineComponent({
 
 #mhr-home-owner-groups::v-deep {
   ul {
-    color: #495057;
+    color: $gray7;
+    line-height: 24px;
   }
 
   .owner-groups-select {

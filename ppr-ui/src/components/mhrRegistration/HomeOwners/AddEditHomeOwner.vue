@@ -432,4 +432,13 @@ export default defineComponent({
 })
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+@import '@/assets/styles/theme.scss';
+
+#addHomeOwnerForm {
+  p {
+    color: $gray7;
+    line-height: 24px;
+  }
+}
+</style>

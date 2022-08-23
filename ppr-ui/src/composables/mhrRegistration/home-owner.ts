@@ -47,12 +47,21 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
   // WORKING WITH GROUPS
 
   // Generate dropdown items for the group selection
-  const getGroupDropdownItems = (isAddingHomeOwner: Boolean): Array<any> => {
+  const getGroupDropdownItems = (isAddingHomeOwner: Boolean, groupId: string): Array<any> => {
     // Make additional Group available in dropdown when adding a new home owner
-    // const additionalGroup = isAddingHomeOwner ? 1 : 0
+    // or when there are more than one owner in the group
+
+    let numOfAdditionalGroupsInDropdown = 0
+
+    if (isAddingHomeOwner) {
+      numOfAdditionalGroupsInDropdown = 1
+    } else {
+      numOfAdditionalGroupsInDropdown =
+        find(getMhrRegistrationHomeOwnerGroups.value, { groupId: groupId })?.owners.length > 1 ? 1 : 0
+    }
 
     if (showGroups.value) {
-      return Array(getMhrRegistrationHomeOwnerGroups.value.length + 1)
+      return Array(getMhrRegistrationHomeOwnerGroups.value.length + numOfAdditionalGroupsInDropdown)
         .fill({})
         .map((v, i) => {
           return { text: 'Group ' + (i + 1), value: (i + 1).toString() }

@@ -10,7 +10,7 @@
           </div>
           <div class="address-block__info-row">
             <span>{{ addressLocal.city }}</span>
-            <span v-if="addressLocal.region">&nbsp;{{ addressLocal.region }}</span>
+            <span v-if="addressLocal.region">&nbsp;{{ addressLocal.region }}&nbsp;</span>
             <span v-if="addressLocal.postalCode">&nbsp;{{ addressLocal.postalCode }}</span>
           </div>
           <div class="address-block__info-row">{{ getCountryName(country) }}</div>
