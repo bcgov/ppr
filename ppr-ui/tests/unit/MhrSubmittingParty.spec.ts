@@ -139,7 +139,7 @@ describe('mhr submitting party', () => {
     expect(submittingPartySection.findAll(ERROR_MSG).length).toBe(0)
 
     const phoneNum = submittingPartySection.find('#submitting-party-phone')
-    phoneNum.setValue('(778) 123-456')
+    phoneNum.setValue('(778) 123-4563')
     await Vue.nextTick()
     await Vue.nextTick()
     expect(submittingPartySection.findAll(ERROR_MSG).length).toBe(0)

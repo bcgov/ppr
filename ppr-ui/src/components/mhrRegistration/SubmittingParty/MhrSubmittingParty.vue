@@ -100,7 +100,6 @@
             label="Email Address"
             v-model="submittingParty.emailAddress"
             :rules="emailRules"
-            validate-on-blur
           />
 
           <!-- Phone Number -->
@@ -108,19 +107,17 @@
           <v-row no-gutters>
             <v-col>
               <v-text-field
-                v-mask="'(###) ###-####'"
+                v-mask="'(NNN) NNN-NNNN'"
                 filled
                 id="submitting-party-phone"
                 class="pt-4 pr-3"
-                label="Phone Number"
+                label="Phone Number (Optional)"
                 v-model="submittingParty.phoneNumber"
                 :rules="phoneRules"
-                validate-on-blur
             />
             </v-col>
             <v-col>
               <v-text-field
-                type="number"
                 filled
                 id="submitting-party-phone-ext"
                 class="pt-4 px-2"
@@ -199,12 +196,12 @@ export default defineComponent({
     const {
       customRules,
       invalidSpaces,
-      minLength,
       maxLength,
       isStringOrNumber,
       required,
       isNumber,
-      isEmail
+      isEmail,
+      isPhone
     } = useInputRules()
 
     const {
@@ -258,15 +255,12 @@ export default defineComponent({
     )
 
     const emailRules = customRules(
-      required('Enter an email'),
       isEmail(),
       invalidSpaces()
     )
 
     const phoneRules = customRules(
-      required('Enter a phone number'),
-      minLength(14),
-      invalidSpaces()
+      isPhone(14, null)
     )
     const middleNameRules = customRules(isStringOrNumber(), maxLength(15), invalidSpaces())
 
@@ -282,7 +276,7 @@ export default defineComponent({
       invalidSpaces()
     )
 
-    const phoneExtensionRules = customRules(isNumber(), invalidSpaces())
+    const phoneExtensionRules = customRules(isNumber(), invalidSpaces(), maxLength(5))
 
     const updateValidity = (valid) => {
       localState.addressValid = valid

@@ -55,12 +55,22 @@ export const useInputRules = () => {
   }
 
   const isEmail = (): Array<Function> => [
-    (v: string) => !!v || 'Email address is required',
+    (v: string) => !!v || 'Enter an email address',
     (v: string) => {
       const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-      return pattern.test(v) || 'Valid email is required'
+      return pattern.test(v) || 'Enter a valid email address'
     }
   ]
+
+  const isPhone = (
+    maxDigits: number = null,
+    customMsg: string = null
+  ): Array<Function> => {
+    return [
+      v => ((v && maxDigits) ? v.length >= maxDigits : true) || 'Minimum 10 characters',
+      v => (v ? /^\d+$/g.test(v.replace('(', '').replace(') ', '').replace('-', '')) : true) || `${customMsg || 'Must contain numbers only'}`
+    ]
+  }
 
   // Check if string starts with any of the search values
   const startsWith = (searchValues: Array<string>, errorMessage: string): Array<Function> => {
@@ -101,6 +111,7 @@ export const useInputRules = () => {
     greaterThan,
     lessThan,
     minLength,
-    maxLength
+    maxLength,
+    isPhone
   }
 }
