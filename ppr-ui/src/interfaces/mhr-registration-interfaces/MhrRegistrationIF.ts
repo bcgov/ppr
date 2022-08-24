@@ -76,6 +76,7 @@ export interface NewMhrRegistrationApiIF {
   // owners: MhrRegistrationHomeOwnersIF[]
   location: MhrRegistrationHomeLocationIF
   description: MhrRegistrationDescriptionIF
+  attentionReferenceNum?: string
   notes?: [
     {
       documentType: string

@@ -108,7 +108,7 @@ export const useNewMhrRegistration = () => {
     }
 
     if (getMhrAttentionReferenceNum.value) {
-      data.clientReferenceId = getMhrAttentionReferenceNum.value
+      data.attentionReferenceNum = getMhrAttentionReferenceNum.value
     }
 
     return data
