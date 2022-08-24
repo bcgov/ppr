@@ -1,375 +1,3160 @@
 {
   "details": [
     {
-      "clientReferenceId": "",
-      "createDateTime": "1995-11-14T00:00:01+00:00",
-      "declaredValue": 0,
+      "attentionReference": "", 
+      "clientReferenceId": "                              ", 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "declaredValue": 0, 
       "description": {
         "baseInformation": {
-          "make": "FLASHBACK",
-          "model": "",
-          "year": "1984"
-        },
-        "csaNumber": "",
-        "csaStandard": "",
-        "engineerDate": "0001-01-01",
-        "engineerName": "",
-        "manufacturer": "CARAVELLE",
-        "sectionCount": 1,
+          "make": "LEISURE HOME", 
+          "model": "", 
+          "year": "1975"
+        }, 
+        "csaNumber": "", 
+        "csaStandard": "", 
+        "engineerName": "", 
+        "manufacturer": "COMMODORE", 
+        "otherRemarks": "", 
+        "rebuiltRemarks": "", 
+        "sectionCount": 2, 
         "sections": [
           {
-            "lengthFeet": 70,
-            "lengthInches": 0,
-            "serialNumber": "117",
-            "widthFeet": 14,
+            "lengthFeet": 56, 
+            "lengthInches": 0, 
+            "serialNumber": "0474UX", 
+            "widthFeet": 24, 
             "widthInches": 0
           }
         ]
-      },
+      }, 
       "location": {
+        "additionalDescription": "", 
         "address": {
-          "city": "SICAMOUS",
-          "country": "CA",
-          "postalCode": "",
-          "region": "BC",
-          "street": " HIGHWAY 97A"
-        },
-        "pad": "6",
-        "parkName": "SICAMOUS CREEK MANUFACTURED HOME PARK"
-      },
-      "mhrNumber": "074026",
-      "owners": [
+          "city": "SURREY", 
+          "country": "CA", 
+          "postalCode": "", 
+          "region": "BC", 
+          "street": "7790 KING GEORGE HIGHWAY"
+        }, 
+        "block": "", 
+        "dealerName": "", 
+        "districtLot": "", 
+        "exceptionPlan": "", 
+        "landDistrict": "", 
+        "leaveProvince": false, 
+        "lot": "", 
+        "meridian": "", 
+        "pad": "158", 
+        "parcel": "", 
+        "parkName": "CRISPEN BAYS MANUFACTURED HOME PARK", 
+        "partOf": "", 
+        "pidNumber": "", 
+        "plan": "", 
+        "range": "  ", 
+        "section": "", 
+        "status": "ACTIVE", 
+        "taxCertificate": false, 
+        "township": "  "
+      }, 
+      "mhrNumber": "002336", 
+      "ownerGroups": [
         {
-          "address": {
-            "city": "SICAMOUS, BC",
-            "country": "CA",
-            "postalCode": "V0E 2V0",
-            "region": "BC",
-            "street": "BOX 166"
-          },
-          "individualName": {
-            "first": "WAYNE",
-            "last": "LOCKERBY",
-            "middle": "NELSON"
-          },
-          "type": "SO"
-        },
-        {
-          "address": {
-            "city": "SICAMOUS BC",
-            "country": "CA",
-            "postalCode": "V0E 2V0",
-            "region": "BC",
-            "street": "BOX 426"
-          },
-          "organizationName": "F&E INVESTMENTS LTD.",
-          "type": "SO"
-        },
-        {
-          "address": {
-            "city": "NORTH VACNOUVER BC",
-            "country": "CA",
-            "postalCode": "V7J 3G9",
-            "region": "BC",
-            "street": "1407 - 2555 WHITELEY COURT"
-          },
-          "individualName": {
-            "first": "JIM",
-            "last": "SUTHERLAND"
-          },
-          "type": "SO"
-        },
-        {
-          "address": {
-            "city": "SICAMOUS, BC",
-            "country": "CA",
-            "postalCode": "V0E 2V1",
-            "region": "BC",
-            "street": "801 GRAHAM ROAD"
-          },
-          "individualName": {
-            "first": "EDWARD",
-            "last": "MCKENNA",
-            "middle": "ROSS"
-          },
-          "type": "JT"
-        },
-        {
-          "address": {
-            "city": "SICAMOUS, BC",
-            "country": "CA",
-            "postalCode": "V0E 2V1",
-            "region": "BC",
-            "street": "801 GRAHAM ROAD"
-          },
-          "individualName": {
-            "first": "DOROTHY",
-            "last": "MCKENNA",
-            "middle": "ANN"
-          },
-          "type": "JT"
-        },
-        {
-          "address": {
-            "city": "SICAMOUS, BC",
-            "country": "CA",
-            "postalCode": "V0E 2V1",
-            "region": "BC",
-            "street": "417 GILLIS AVENUE"
-          },
-          "individualName": {
-            "first": "LAWRENCE",
-            "last": "TAGGART",
-            "middle": "JAMES"
-          },
-          "type": "SO"
-        },
-        {
-          "address": {
-            "city": "SICAMOUS, BC",
-            "country": "CA",
-            "postalCode": "V0E 2V1",
-            "region": "BC",
-            "street": "438 OAK AVENUE"
-          },
-          "individualName": {
-            "first": "LAWRENCE",
-            "last": "TAGGART",
-            "middle": "JAMES"
-          },
-          "type": "JT"
-        },
-        {
-          "address": {
-            "city": "SICAMOUS, BC",
-            "country": "CA",
-            "postalCode": "V0E 2V1",
-            "region": "BC",
-            "street": "438 OAK AVENUE"
-          },
-          "individualName": {
-            "first": "LORRAINE",
-            "last": "MCLEOD",
-            "middle": "JOYCE"
-          },
-          "type": "JT"
-        },
-        {
-          "address": {
-            "city": "SICAMOUS, B.C.",
-            "country": "CA",
-            "postalCode": "V0E 2V1",
-            "region": "BC",
-            "street": "#6 - 05 HIGHWAY 97A"
-          },
-          "individualName": {
-            "first": "HARVEY",
-            "last": "MOORE",
-            "middle": "NORMAN"
-          },
-          "type": "JT"
-        },
-        {
-          "address": {
-            "city": "SICAMOUS, B.C.",
-            "country": "CA",
-            "postalCode": "V0E 2V1",
-            "region": "BC",
-            "street": "#6 - 05 HIGHWAY 97A"
-          },
-          "individualName": {
-            "first": "COLLEEN",
-            "last": "MOORE",
-            "middle": "ANNE"
-          },
-          "type": "JT"
-        },
-        {
-          "address": {
-            "city": "SICAMOUS, BC",
-            "country": "CA",
-            "postalCode": "V0E 2V1",
-            "region": "BC",
-            "street": "6-5 HIGHWAY 97A"
-          },
-          "individualName": {
-            "first": "DAVID",
-            "last": "HAMM",
-            "middle": "ABRAM"
-          },
-          "type": "JT"
-        },
-        {
-          "address": {
-            "city": "SICAMOUS, BC",
-            "country": "CA",
-            "postalCode": "V0E 2V1",
-            "region": "BC",
-            "street": "6-5 HIGHWAY 97A"
-          },
-          "individualName": {
-            "first": "JUNE",
-            "last": "HAMM",
-            "middle": "COLLEEN"
-          },
-          "type": "JT"
+          "groupId": 4, 
+          "interest": "", 
+          "interestNumerator": 0, 
+          "owners": [
+            {
+              "address": {
+                "city": "SURREY", 
+                "country": "CA", 
+                "postalCode": "V3W 5Y4", 
+                "region": "BC", 
+                "street": "158 7790 KING GEORGE BLVD"
+              }, 
+              "individualName": {
+                "first": "DELORI", 
+                "last": "PALLOS", 
+                "middle": "GRACE"
+              }, 
+              "type": "JOINT"
+            }, 
+            {
+              "address": {
+                "city": "SURREY", 
+                "country": "CA", 
+                "postalCode": "V3W 5Y4", 
+                "region": "BC", 
+                "street": "158 7790 KING GEORGE BLVD"
+              }, 
+              "individualName": {
+                "first": "JOHNATHAN", 
+                "last": "HALLETT", 
+                "middle": "ROY"
+              }, 
+              "type": "JOINT"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "JOINT"
         }
-      ],
+      ], 
       "status": "R"
-    },
+    }, 
     {
-      "clientReferenceId": "",
-      "createDateTime": "1995-11-14T00:00:01+00:00",
-      "declaredValue": 0,
+      "attentionReference": "", 
+      "clientReferenceId": "                              ", 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "declaredValue": 0, 
       "description": {
         "baseInformation": {
-          "make": "GLENDALE",
-          "model": "",
-          "year": "1968"
-        },
-        "csaNumber": "",
-        "csaStandard": "",
-        "engineerDate": "0001-01-01",
-        "engineerName": "",
-        "manufacturer": "GLENDALE CORP.",
-        "sectionCount": 1,
+          "make": "MARINER", 
+          "model": "", 
+          "year": "1971"
+        }, 
+        "csaNumber": "", 
+        "csaStandard": "", 
+        "engineerName": "", 
+        "manufacturer": "*", 
+        "otherRemarks": "", 
+        "rebuiltRemarks": "", 
+        "sectionCount": 2, 
         "sections": [
           {
-            "lengthFeet": 50,
-            "lengthInches": 0,
-            "serialNumber": "2427",
-            "widthFeet": 10,
+            "lengthFeet": 44, 
+            "lengthInches": 0, 
+            "serialNumber": "DW186", 
+            "widthFeet": 20, 
             "widthInches": 0
           }
         ]
-      },
+      }, 
       "location": {
+        "additionalDescription": "", 
         "address": {
-          "city": "FORT NELSON",
-          "country": "CA",
-          "postalCode": "",
-          "region": "BC",
-          "street": "4004 POPLAR AVENUE"
-        },
-        "pad": "",
-        "parkName": ""
-      },
-      "mhrNumber": "022911",
+          "city": "NANAIMO", 
+          "country": "CA", 
+          "postalCode": "", 
+          "region": "BC", 
+          "street": "6325 METRAL DRIVE"
+        }, 
+        "block": "", 
+        "dealerName": "", 
+        "districtLot": "", 
+        "exceptionPlan": "", 
+        "landDistrict": "", 
+        "leaveProvince": false, 
+        "lot": "", 
+        "meridian": "", 
+        "pad": "13", 
+        "parcel": "", 
+        "parkName": "SHARMAN MANUFACTURED HOME PARK", 
+        "partOf": "", 
+        "pidNumber": "", 
+        "plan": "", 
+        "range": "  ", 
+        "section": "", 
+        "status": "ACTIVE", 
+        "taxCertificate": false, 
+        "township": "  "
+      }, 
+      "mhrNumber": "003508", 
+      "ownerGroups": [
+        {
+          "groupId": 10, 
+          "interest": "", 
+          "interestNumerator": 0, 
+          "owners": [
+            {
+              "address": {
+                "city": "NANAIMO", 
+                "country": "CA", 
+                "postalCode": "V9T 6K2", 
+                "region": "BC", 
+                "street": "13 - 6325 METRAL DRIVE"
+              }, 
+              "individualName": {
+                "first": "JOHN", 
+                "last": "SMITH", 
+                "middle": "MCCABE"
+              }, 
+              "phoneNumber": "2503245510", 
+              "type": "JOINT"
+            }, 
+            {
+              "address": {
+                "city": "NANAIMO", 
+                "country": "CA", 
+                "postalCode": "V9T 6K2", 
+                "region": "BC", 
+                "street": "13 - 6325 METRAL DRIVE"
+              }, 
+              "individualName": {
+                "first": "JOAN", 
+                "last": "SMITH", 
+                "middle": "OLIVE"
+              }, 
+              "phoneNumber": "2503245510", 
+              "type": "JOINT"
+            }, 
+            {
+              "address": {
+                "city": "NANAIMO", 
+                "country": "CA", 
+                "postalCode": "V9R 6H3", 
+                "region": "BC", 
+                "street": "712 MCBRIDE PLACE"
+              }, 
+              "individualName": {
+                "first": "JARED", 
+                "last": "SMITH", 
+                "middle": "DANIEL"
+              }, 
+              "phoneNumber": "2505911386", 
+              "suffix": "MCCABE", 
+              "type": "JOINT"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "JOINT"
+        }
+      ], 
+      "status": "R"
+    }, 
+    {
+      "attentionReference": "", 
+      "clientReferenceId": "                              ", 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "declaredValue": 0, 
+      "description": {
+        "baseInformation": {
+          "make": "PARAMOUNT", 
+          "model": "", 
+          "year": "1974"
+        }, 
+        "csaNumber": "", 
+        "csaStandard": "", 
+        "engineerName": "", 
+        "manufacturer": "BENDIX", 
+        "otherRemarks": "", 
+        "rebuiltRemarks": "", 
+        "sectionCount": 1, 
+        "sections": [
+          {
+            "lengthFeet": 68, 
+            "lengthInches": 0, 
+            "serialNumber": "GDSDFYMP68X125648", 
+            "widthFeet": 12, 
+            "widthInches": 0
+          }
+        ]
+      }, 
+      "location": {
+        "additionalDescription": "", 
+        "address": {
+          "city": "VICTORIA", 
+          "country": "CA", 
+          "postalCode": "", 
+          "region": "BC", 
+          "street": "2847 SOOKE LAKE ROAD"
+        }, 
+        "block": "", 
+        "dealerName": "", 
+        "districtLot": "", 
+        "exceptionPlan": "", 
+        "landDistrict": "", 
+        "leaveProvince": false, 
+        "lot": "", 
+        "meridian": "", 
+        "pad": "8", 
+        "parcel": "", 
+        "parkName": "GOLDSTREAM MOBILE HOME PARK", 
+        "partOf": "", 
+        "pidNumber": "", 
+        "plan": "", 
+        "range": "  ", 
+        "section": "", 
+        "status": "ACTIVE", 
+        "taxCertificate": false, 
+        "township": "  "
+      }, 
+      "mhrNumber": "011271", 
+      "ownerGroups": [
+        {
+          "groupId": 9, 
+          "interest": "", 
+          "interestNumerator": 0, 
+          "owners": [
+            {
+              "address": {
+                "city": "VICTORIA", 
+                "country": "CA", 
+                "postalCode": "V9B 4P8", 
+                "region": "BC", 
+                "street": "8-2847 SOOKE LAKE ROAD"
+              }, 
+              "individualName": {
+                "first": "BETHANY", 
+                "last": "WIENS", 
+                "middle": "ANNE BARRY"
+              }, 
+              "phoneNumber": "7789778327", 
+              "type": "JOINT"
+            }, 
+            {
+              "address": {
+                "city": "VICTORIA", 
+                "country": "CA", 
+                "postalCode": "V9B 4P8", 
+                "region": "BC", 
+                "street": "8-2847 SOOKE LAKE ROAD"
+              }, 
+              "individualName": {
+                "first": "NICHOLAS", 
+                "last": "ZETHOF", 
+                "middle": "GORDON"
+              }, 
+              "phoneNumber": "7789778327", 
+              "type": "JOINT"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "JOINT"
+        }
+      ], 
+      "status": "R"
+    }, 
+    {
+      "attentionReference": "", 
+      "clientReferenceId": "                              ", 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "declaredValue": 0, 
+      "description": {
+        "baseInformation": {
+          "make": "PARK MANOR #12683", 
+          "model": "", 
+          "year": "1975"
+        }, 
+        "csaNumber": "", 
+        "csaStandard": "", 
+        "engineerName": "", 
+        "manufacturer": "*", 
+        "otherRemarks": "", 
+        "rebuiltRemarks": "", 
+        "sectionCount": 1, 
+        "sections": [
+          {
+            "lengthFeet": 68, 
+            "lengthInches": 0, 
+            "serialNumber": "FM3561", 
+            "widthFeet": 12, 
+            "widthInches": 0
+          }
+        ]
+      }, 
+      "location": {
+        "additionalDescription": "", 
+        "address": {
+          "city": "NAKUSP", 
+          "country": "CA", 
+          "postalCode": "", 
+          "region": "BC", 
+          "street": "799 9A AVENUE NW"
+        }, 
+        "block": "", 
+        "dealerName": "", 
+        "districtLot": "", 
+        "exceptionPlan": "", 
+        "landDistrict": "", 
+        "leaveProvince": false, 
+        "lot": "", 
+        "meridian": "", 
+        "pad": "A6", 
+        "parcel": "", 
+        "parkName": "CANYON COURT MOBILE HOME PARK", 
+        "partOf": "", 
+        "pidNumber": "", 
+        "plan": "", 
+        "range": "  ", 
+        "section": "", 
+        "status": "ACTIVE", 
+        "taxCertificate": false, 
+        "township": "  "
+      }, 
+      "mhrNumber": "012447", 
+      "ownerGroups": [
+        {
+          "groupId": 9, 
+          "interest": "", 
+          "interestNumerator": 0, 
+          "owners": [
+            {
+              "address": {
+                "city": "NEW DENVER", 
+                "country": "CA", 
+                "postalCode": "V0G 1S0", 
+                "region": "BC", 
+                "street": "BOX 423"
+              }, 
+              "individualName": {
+                "first": "CARLA", 
+                "last": "NEMIROFF", 
+                "middle": "MALVINE"
+              }, 
+              "phoneNumber": "7782062701", 
+              "type": "SOLE"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "SOLE"
+        }
+      ], 
+      "status": "R"
+    }, 
+    {
+      "attentionReference": "", 
+      "clientReferenceId": "                              ", 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "declaredValue": 0, 
+      "description": {
+        "baseInformation": {
+          "make": "840", 
+          "model": "", 
+          "year": "1978"
+        }, 
+        "csaNumber": "", 
+        "csaStandard": "", 
+        "engineerName": "", 
+        "manufacturer": "SAFEWAY", 
+        "otherRemarks": "", 
+        "rebuiltRemarks": "", 
+        "sectionCount": 2, 
+        "sections": [
+          {
+            "lengthFeet": 40, 
+            "lengthInches": 0, 
+            "serialNumber": "840F6486", 
+            "widthFeet": 26, 
+            "widthInches": 0
+          }
+        ]
+      }, 
+      "location": {
+        "additionalDescription": "", 
+        "address": {
+          "city": "KIMBERLEY", 
+          "country": "CA", 
+          "postalCode": "", 
+          "region": "BC", 
+          "street": " 311TH AVENUE"
+        }, 
+        "block": "", 
+        "dealerName": "", 
+        "districtLot": "", 
+        "exceptionPlan": "", 
+        "landDistrict": "*", 
+        "leaveProvince": false, 
+        "lot": "24", 
+        "meridian": "", 
+        "pad": "", 
+        "parcel": "", 
+        "parkName": "", 
+        "partOf": "", 
+        "pidNumber": "", 
+        "plan": "10136", 
+        "range": "  ", 
+        "section": "", 
+        "status": "ACTIVE", 
+        "taxCertificate": false, 
+        "township": "  "
+      }, 
+      "mhrNumber": "012714", 
+      "ownerGroups": [
+        {
+          "groupId": 1, 
+          "interest": "", 
+          "interestNumerator": 0, 
+          "owners": [
+            {
+              "address": {
+                "city": "KIMBERLEY", 
+                "country": "CA", 
+                "postalCode": "VOB 1Z0", 
+                "region": "BC", 
+                "street": "112-311TH AVENUE"
+              }, 
+              "individualName": {
+                "first": "JOHN", 
+                "last": "SMITH", 
+                "middle": "EDWARD"
+              }, 
+              "phoneNumber": "604", 
+              "type": "JOINT"
+            }, 
+            {
+              "address": {
+                "city": "KIMBERLEY", 
+                "country": "CA", 
+                "postalCode": "VOB 1Z0", 
+                "region": "BC", 
+                "street": "112-311TH AVENUE"
+              }, 
+              "individualName": {
+                "first": "MARIE", 
+                "last": "SMITH", 
+                "middle": "GORETTI"
+              }, 
+              "phoneNumber": "604", 
+              "type": "JOINT"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": false, 
+          "type": "JOINT"
+        }
+      ], 
+      "status": "R"
+    }, 
+    {
+      "attentionReference": "", 
+      "clientReferenceId": "                              ", 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "declaredValue": 0, 
+      "description": {
+        "baseInformation": {
+          "make": "SKYLINE 50/12 20K", 
+          "model": "", 
+          "year": "1970"
+        }, 
+        "csaNumber": "*", 
+        "csaStandard": "", 
+        "engineerName": "", 
+        "manufacturer": "*", 
+        "otherRemarks": "", 
+        "rebuiltRemarks": "", 
+        "sectionCount": 1, 
+        "sections": [
+          {
+            "lengthFeet": 50, 
+            "lengthInches": 0, 
+            "serialNumber": "51574B", 
+            "widthFeet": 12, 
+            "widthInches": 0
+          }
+        ]
+      }, 
+      "location": {
+        "additionalDescription": "", 
+        "address": {
+          "city": "ALDERGROVE", 
+          "country": "CA", 
+          "postalCode": "", 
+          "region": "BC", 
+          "street": "25770 56TH AVENUE"
+        }, 
+        "block": "", 
+        "dealerName": "", 
+        "districtLot": "", 
+        "exceptionPlan": "", 
+        "landDistrict": "NWD", 
+        "leaveProvince": false, 
+        "lot": "4", 
+        "meridian": "", 
+        "pad": "", 
+        "parcel": "", 
+        "parkName": "", 
+        "partOf": "", 
+        "pidNumber": "", 
+        "plan": "14792", 
+        "range": "  ", 
+        "section": "1", 
+        "status": "ACTIVE", 
+        "taxCertificate": false, 
+        "township": "11"
+      }, 
+      "mhrNumber": "013416", 
       "notes": [
         {
           "contactAddress": {
-            "city": "VICTORIA , BC                           CANADA                        V8W 1H7",
-            "country": "CA",
-            "postalCode": "",
-            "region": "BC",
-            "street": "100 - 895 FORT STREET"
-          },
-          "contactName": "FRANK L. KITTO REGISTRY SERVICES LTD.",
-          "createDateTime": "1999-09-30T11:01:47+00:00",
-          "documentId": "41009149",
-          "documentType": "EXRS",
+            "city": "V3S 2W9", 
+            "country": "CA", 
+            "postalCode": "", 
+            "region": "BC", 
+            "street": "16099 FRASER HIGHWAY", 
+            "streetAdditional": "SURREY              B.C."
+          }, 
+          "contactName": "REGAL HOMES (1994) LTD.", 
+          "createDateTime": "1996-03-20T10:47:57+00:00", 
+          "documentId": "42496548", 
+          "documentType": "103", 
+          "expiryDate": "1996-04-21", 
           "remarks": ""
         }
-      ],
-      "owners": [
+      ], 
+      "ownerGroups": [
         {
-          "address": {
-            "city": "FORT NELSON, BC",
-            "country": "CA",
-            "postalCode": "V0C 1R0",
-            "region": "BC",
-            "street": "P.O. BOX 1905"
-          },
-          "individualName": {
-            "first": "PRITNAM",
-            "last": "SANDHU"
-          },
-          "type": "SO"
-        },
-        {
-          "address": {
-            "city": "FORT NELSON BC",
-            "country": "CA",
-            "postalCode": "V0C 1R0",
-            "region": "BC",
-            "street": "BOX 813"
-          },
-          "individualName": {
-            "first": "DAVID",
-            "last": "HAMM",
-            "middle": "MICHAEL"
-          },
-          "type": "SO"
-        },
-        {
-          "address": {
-            "city": "FORT NELSON BC",
-            "country": "CA",
-            "postalCode": "V0C 1R0",
-            "region": "BC",
-            "street": "BOX 3601"
-          },
-          "individualName": {
-            "first": "DRAGOMIR",
-            "last": "DJURIC"
-          },
-          "type": "SO"
+          "groupId": 3, 
+          "interest": "", 
+          "interestNumerator": 0, 
+          "owners": [
+            {
+              "address": {
+                "city": "NORTH VANCOUVER", 
+                "country": "CA", 
+                "postalCode": "V7P 1C8", 
+                "region": "BC", 
+                "street": "267 TYEE DRIVE"
+              }, 
+              "individualName": {
+                "first": "JACK", 
+                "last": "CAMERON", 
+                "middle": "ALLEN"
+              }, 
+              "phoneNumber": "604", 
+              "type": "JOINT"
+            }, 
+            {
+              "address": {
+                "city": "NORTH VANCOUVER", 
+                "country": "CA", 
+                "postalCode": "V7P 1C8", 
+                "region": "BC", 
+                "street": "267 TYEE DRIVE"
+              }, 
+              "individualName": {
+                "first": "JACQUELINE", 
+                "last": "CAMERON", 
+                "middle": "ANNE"
+              }, 
+              "phoneNumber": "604", 
+              "type": "JOINT"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "JOINT"
         }
-      ],
+      ], 
+      "status": "R"
+    }, 
+    {
+      "attentionReference": "", 
+      "clientReferenceId": "                              ", 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "declaredValue": 0, 
+      "description": {
+        "baseInformation": {
+          "make": "COLONY LTD. 6012-3CK", 
+          "model": "", 
+          "year": "1976"
+        }, 
+        "csaNumber": "", 
+        "csaStandard": "", 
+        "engineerName": "", 
+        "manufacturer": "HOMCO IND. LTD.", 
+        "otherRemarks": "", 
+        "rebuiltRemarks": "", 
+        "sectionCount": 1, 
+        "sections": [
+          {
+            "lengthFeet": 56, 
+            "lengthInches": 0, 
+            "serialNumber": "C61273", 
+            "widthFeet": 12, 
+            "widthInches": 0
+          }
+        ]
+      }, 
+      "location": {
+        "additionalDescription": "", 
+        "address": {
+          "city": "CASSIDY", 
+          "country": "CA", 
+          "postalCode": "", 
+          "region": "BC", 
+          "street": " "
+        }, 
+        "block": "", 
+        "dealerName": "", 
+        "districtLot": "", 
+        "exceptionPlan": "", 
+        "landDistrict": "", 
+        "leaveProvince": false, 
+        "lot": "", 
+        "meridian": "", 
+        "pad": "34", 
+        "parcel": "", 
+        "parkName": "TIMBERLAND MOBILE HOME PARK", 
+        "partOf": "", 
+        "pidNumber": "", 
+        "plan": "", 
+        "range": "  ", 
+        "section": "", 
+        "status": "ACTIVE", 
+        "taxCertificate": false, 
+        "township": "  "
+      }, 
+      "mhrNumber": "017972", 
+      "ownerGroups": [
+        {
+          "groupId": 4, 
+          "interest": "", 
+          "interestNumerator": 0, 
+          "owners": [
+            {
+              "address": {
+                "city": "LADYSMITH", 
+                "country": "CA", 
+                "postalCode": "V9G 1L4", 
+                "region": "BC", 
+                "street": "34 - 3560 HALLBERG ROAD"
+              }, 
+              "individualName": {
+                "first": "FREDERICK", 
+                "last": "LIND", 
+                "middle": "WILLIAM"
+              }, 
+              "phoneNumber": "2508020419", 
+              "type": "SOLE"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "SOLE"
+        }
+      ], 
+      "status": "R"
+    }, 
+    {
+      "attentionReference": "", 
+      "clientReferenceId": "                              ", 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "declaredValue": 0, 
+      "description": {
+        "baseInformation": {
+          "circa": true, 
+          "make": "SCOTIA", 
+          "model": "", 
+          "year": "1964"
+        }, 
+        "csaNumber": "", 
+        "csaStandard": "", 
+        "engineerName": "", 
+        "manufacturer": "WEST COAST TRAILER MANUFACTURING CO.", 
+        "otherRemarks": "LENGTH: APPROX. 38'", 
+        "rebuiltRemarks": "", 
+        "sectionCount": 1, 
+        "sections": [
+          {
+            "lengthFeet": 0, 
+            "lengthInches": 0, 
+            "serialNumber": "83864", 
+            "widthFeet": 8, 
+            "widthInches": 0
+          }
+        ]
+      }, 
+      "location": {
+        "additionalDescription": "", 
+        "address": {
+          "city": "BURNABY", 
+          "country": "CA", 
+          "postalCode": "", 
+          "region": "BC", 
+          "street": "4575 KINGSWAY"
+        }, 
+        "block": "", 
+        "dealerName": "", 
+        "districtLot": "", 
+        "exceptionPlan": "", 
+        "landDistrict": "", 
+        "leaveProvince": false, 
+        "lot": "", 
+        "meridian": "", 
+        "pad": "15", 
+        "parcel": "", 
+        "parkName": "BUENA MANUFACTURED HOME PARK", 
+        "partOf": "", 
+        "pidNumber": "", 
+        "plan": "", 
+        "range": "  ", 
+        "section": "", 
+        "status": "ACTIVE", 
+        "taxCertificate": false, 
+        "township": "  "
+      }, 
+      "mhrNumber": "018140", 
+      "ownerGroups": [
+        {
+          "groupId": 1, 
+          "interest": "", 
+          "interestNumerator": 0, 
+          "owners": [
+            {
+              "address": {
+                "city": "BURNABY", 
+                "country": "CA", 
+                "postalCode": "V5H 2B3", 
+                "region": "BC", 
+                "street": "4575 KINGSWAY #15"
+              }, 
+              "individualName": {
+                "first": "JOHN", 
+                "last": "SMITH", 
+                "middle": "BRADSHAW"
+              }, 
+              "phoneNumber": "604", 
+              "type": "SOLE"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "SOLE"
+        }
+      ], 
+      "status": "R"
+    }, 
+    {
+      "attentionReference": "", 
+      "clientReferenceId": "                              ", 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "declaredValue": 0, 
+      "description": {
+        "baseInformation": {
+          "make": "NOR-WESTERN", 
+          "model": "", 
+          "year": "1972"
+        }, 
+        "csaNumber": "", 
+        "csaStandard": "", 
+        "engineerName": "", 
+        "manufacturer": "GENDALL INDUSTRIES LTD", 
+        "otherRemarks": "", 
+        "rebuiltRemarks": "", 
+        "sectionCount": 1, 
+        "sections": [
+          {
+            "lengthFeet": 68, 
+            "lengthInches": 0, 
+            "serialNumber": "NW68123BRCK2126", 
+            "widthFeet": 12, 
+            "widthInches": 0
+          }
+        ]
+      }, 
+      "location": {
+        "additionalDescription": "", 
+        "address": {
+          "city": "FORT NELSON", 
+          "country": "CA", 
+          "postalCode": "", 
+          "region": "BC", 
+          "street": "5215 40TH STREET"
+        }, 
+        "block": "", 
+        "dealerName": "", 
+        "districtLot": "1535", 
+        "exceptionPlan": "", 
+        "landDistrict": "PEACE RIVER", 
+        "leaveProvince": false, 
+        "lot": "11", 
+        "meridian": "", 
+        "pad": "", 
+        "parcel": "", 
+        "parkName": "", 
+        "partOf": "", 
+        "pidNumber": "", 
+        "plan": "25262", 
+        "range": "  ", 
+        "section": "", 
+        "status": "ACTIVE", 
+        "taxCertificate": false, 
+        "township": "  "
+      }, 
+      "mhrNumber": "019420", 
+      "ownerGroups": [
+        {
+          "groupId": 1, 
+          "interest": "", 
+          "interestNumerator": 0, 
+          "owners": [
+            {
+              "address": {
+                "city": "FORT NELSON", 
+                "country": "CA", 
+                "postalCode": "V0C 1R0", 
+                "region": "BC", 
+                "street": "BOX 2107"
+              }, 
+              "individualName": {
+                "first": "JOHN", 
+                "last": "SMITH", 
+                "middle": "WILLIAM"
+              }, 
+              "phoneNumber": "604", 
+              "type": "JOINT"
+            }, 
+            {
+              "address": {
+                "city": "FORT NELSON", 
+                "country": "CA", 
+                "postalCode": "V0C 1R0", 
+                "region": "BC", 
+                "street": "BOX 2107"
+              }, 
+              "individualName": {
+                "first": "PHYLLIS", 
+                "last": "SMITH", 
+                "middle": "ARLENE"
+              }, 
+              "phoneNumber": "604", 
+              "type": "JOINT"
+            }
+          ], 
+          "status": "EXEMPT", 
+          "tenancySpecified": false, 
+          "type": "JOINT"
+        }
+      ], 
       "status": "E"
+    }, 
+    {
+      "attentionReference": "", 
+      "clientReferenceId": "                              ", 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "declaredValue": 0, 
+      "description": {
+        "baseInformation": {
+          "make": "PARAMOUNT MOBILE HOME", 
+          "model": "", 
+          "year": "1973"
+        }, 
+        "csaNumber": "", 
+        "csaStandard": "", 
+        "engineerName": "", 
+        "manufacturer": "GENERAL COACH WORKS", 
+        "otherRemarks": "", 
+        "rebuiltRemarks": "", 
+        "sectionCount": 1, 
+        "sections": [
+          {
+            "lengthFeet": 65, 
+            "lengthInches": 0, 
+            "serialNumber": "3305", 
+            "widthFeet": 12, 
+            "widthInches": 0
+          }
+        ]
+      }, 
+      "location": {
+        "additionalDescription": "", 
+        "address": {
+          "city": "VICTORIA", 
+          "country": "CA", 
+          "postalCode": "", 
+          "region": "BC", 
+          "street": "2587 SELWYN ROAD"
+        }, 
+        "block": "", 
+        "dealerName": "", 
+        "districtLot": "", 
+        "exceptionPlan": "", 
+        "landDistrict": "", 
+        "leaveProvince": false, 
+        "lot": "", 
+        "meridian": "", 
+        "pad": "45", 
+        "parcel": "", 
+        "parkName": "ARBUTUS RIDGE ESTATES", 
+        "partOf": "", 
+        "pidNumber": "", 
+        "plan": "", 
+        "range": "  ", 
+        "section": "", 
+        "status": "ACTIVE", 
+        "taxCertificate": false, 
+        "township": "  "
+      }, 
+      "mhrNumber": "021951", 
+      "notes": [
+        {
+          "contactAddress": {
+            "city": "VICTORIA BC  V9E 2H3", 
+            "country": "CA", 
+            "postalCode": "", 
+            "region": "BC", 
+            "street": "310 CALDECOTE RD"
+          }, 
+          "contactName": "FRED BONOZEW", 
+          "createDateTime": "2009-10-23T13:48:40+00:00", 
+          "documentId": "50604540", 
+          "documentType": "EXNR", 
+          "expiryDate": "2008-12-01", 
+          "remarks": "USED FOR STORAGE"
+        }
+      ], 
+      "ownerGroups": [
+        {
+          "groupId": 2, 
+          "interest": "", 
+          "interestNumerator": 0, 
+          "owners": [
+            {
+              "address": {
+                "city": "VICTORIA", 
+                "country": "CA", 
+                "postalCode": "V9E 2H3", 
+                "region": "BC", 
+                "street": "310 CALDECOTE RD."
+              }, 
+              "organizationName": "TUSCAN TRADING INC.", 
+              "phoneNumber": "2506589466", 
+              "type": "SOLE"
+            }
+          ], 
+          "status": "EXEMPT", 
+          "tenancySpecified": true, 
+          "type": "SOLE"
+        }
+      ], 
+      "status": "E"
+    }, 
+    {
+      "attentionReference": "", 
+      "clientReferenceId": "                              ", 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "declaredValue": 0, 
+      "description": {
+        "baseInformation": {
+          "make": "PARAMOUNT", 
+          "model": "", 
+          "year": "1973"
+        }, 
+        "csaNumber": "", 
+        "csaStandard": "", 
+        "engineerName": "", 
+        "manufacturer": "BENDIX", 
+        "otherRemarks": "", 
+        "rebuiltRemarks": "", 
+        "sectionCount": 1, 
+        "sections": [
+          {
+            "lengthFeet": 62, 
+            "lengthInches": 0, 
+            "serialNumber": "GCSCFYMP62X123177", 
+            "widthFeet": 12, 
+            "widthInches": 0
+          }
+        ]
+      }, 
+      "location": {
+        "additionalDescription": "", 
+        "address": {
+          "city": "VANDERHOOF", 
+          "country": "CA", 
+          "postalCode": "", 
+          "region": "BC", 
+          "street": "690 DERKSEN ROAD"
+        }, 
+        "block": "", 
+        "dealerName": "", 
+        "districtLot": "", 
+        "exceptionPlan": "", 
+        "landDistrict": "", 
+        "leaveProvince": false, 
+        "lot": "", 
+        "meridian": "", 
+        "pad": "1", 
+        "parcel": "", 
+        "parkName": "MAPLE ACRES M.H.P.", 
+        "partOf": "", 
+        "pidNumber": "", 
+        "plan": "", 
+        "range": "  ", 
+        "section": "", 
+        "status": "ACTIVE", 
+        "taxCertificate": false, 
+        "township": "  "
+      }, 
+      "mhrNumber": "022836", 
+      "ownerGroups": [
+        {
+          "groupId": 3, 
+          "interest": "", 
+          "interestNumerator": 0, 
+          "owners": [
+            {
+              "address": {
+                "city": "VANDERHOOF", 
+                "country": "CA", 
+                "postalCode": "V0J 3A0", 
+                "region": "BC", 
+                "street": "PO BOX 2505"
+              }, 
+              "organizationName": "SUNSET ACRES M.H.P. LTD.", 
+              "phoneNumber": "2505677769", 
+              "type": "SOLE"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "SOLE"
+        }
+      ], 
+      "status": "R"
+    }, 
+    {
+      "attentionReference": "", 
+      "clientReferenceId": "                              ", 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "declaredValue": 0, 
+      "description": {
+        "baseInformation": {
+          "make": "C-30 PREMIER 3BR", 
+          "model": "", 
+          "year": "1972"
+        }, 
+        "csaNumber": "", 
+        "csaStandard": "", 
+        "engineerName": "", 
+        "manufacturer": "MODULINE INDUSTRIES LTD.", 
+        "otherRemarks": "", 
+        "rebuiltRemarks": "", 
+        "sectionCount": 1, 
+        "sections": [
+          {
+            "lengthFeet": 65, 
+            "lengthInches": 0, 
+            "serialNumber": "C1583", 
+            "widthFeet": 12, 
+            "widthInches": 0
+          }
+        ]
+      }, 
+      "location": {
+        "additionalDescription": "", 
+        "address": {
+          "city": "VICTORIA", 
+          "country": "CA", 
+          "postalCode": "", 
+          "region": "BC", 
+          "street": "4337 HAPPY VALLEY ROAD"
+        }, 
+        "block": "", 
+        "dealerName": "", 
+        "districtLot": "", 
+        "exceptionPlan": "", 
+        "landDistrict": "", 
+        "leaveProvince": false, 
+        "lot": "", 
+        "meridian": "", 
+        "pad": "2", 
+        "parcel": "", 
+        "parkName": "HAAS MOBILE HOME PARK", 
+        "partOf": "", 
+        "pidNumber": "", 
+        "plan": "", 
+        "range": "  ", 
+        "section": "", 
+        "status": "ACTIVE", 
+        "taxCertificate": false, 
+        "township": "  "
+      }, 
+      "mhrNumber": "024963", 
+      "ownerGroups": [
+        {
+          "groupId": 4, 
+          "interest": "", 
+          "interestNumerator": 0, 
+          "owners": [
+            {
+              "address": {
+                "city": "VICTORIA", 
+                "country": "CA", 
+                "postalCode": "V8X 3W9", 
+                "region": "BC", 
+                "street": "2 - 4337 HAPPY VALLEY ROAD"
+              }, 
+              "individualName": {
+                "first": "DARLENE", 
+                "last": "SAWYER"
+              }, 
+              "phoneNumber": "2505077127", 
+              "type": "JOINT"
+            }, 
+            {
+              "address": {
+                "city": "VICTORIA", 
+                "country": "CA", 
+                "postalCode": "V8X 3W9", 
+                "region": "BC", 
+                "street": "2 - 4337 HAPPY VALLEY ROAD"
+              }, 
+              "individualName": {
+                "first": "DOREEN", 
+                "last": "GRZYB"
+              }, 
+              "phoneNumber": "2505077127", 
+              "type": "JOINT"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "JOINT"
+        }
+      ], 
+      "status": "R"
+    }, 
+    {
+      "attentionReference": "", 
+      "clientReferenceId": "                              ", 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "declaredValue": 0, 
+      "description": {
+        "baseInformation": {
+          "make": "IMPERIAL", 
+          "model": "", 
+          "year": "1972"
+        }, 
+        "csaNumber": "", 
+        "csaStandard": "", 
+        "engineerName": "", 
+        "manufacturer": "NEONEX HOUSING IND.", 
+        "otherRemarks": "", 
+        "rebuiltRemarks": "", 
+        "sectionCount": 1, 
+        "sections": [
+          {
+            "lengthFeet": 52, 
+            "lengthInches": 0, 
+            "serialNumber": "A1H1722276", 
+            "widthFeet": 12, 
+            "widthInches": 0
+          }
+        ]
+      }, 
+      "location": {
+        "additionalDescription": "14 MILES NE ON HIGHWAY 21 FROM          STRATHMORE; WHEATLAND COUNTY", 
+        "address": {
+          "city": "STRATHMORE", 
+          "country": "CA", 
+          "postalCode": "", 
+          "region": "AB", 
+          "street": " "
+        }, 
+        "block": "", 
+        "dealerName": "", 
+        "districtLot": "", 
+        "exceptionPlan": "", 
+        "landDistrict": "*", 
+        "leaveProvince": false, 
+        "lot": "", 
+        "meridian": "", 
+        "pad": "", 
+        "parcel": "", 
+        "parkName": "", 
+        "partOf": "", 
+        "pidNumber": "", 
+        "plan": "", 
+        "range": "  ", 
+        "section": "", 
+        "status": "ACTIVE", 
+        "taxCertificate": false, 
+        "township": "  "
+      }, 
+      "mhrNumber": "029698", 
+      "ownerGroups": [
+        {
+          "groupId": 1, 
+          "interest": "", 
+          "interestNumerator": 0, 
+          "owners": [
+            {
+              "address": {
+                "city": "FERNIE", 
+                "country": "CA", 
+                "postalCode": "V0B 1M0", 
+                "region": "BC", 
+                "street": "BOX 1236"
+              }, 
+              "individualName": {
+                "first": "JOHN", 
+                "last": "SMITH", 
+                "middle": "ROBERT"
+              }, 
+              "phoneNumber": "604", 
+              "type": "JOINT"
+            }, 
+            {
+              "address": {
+                "city": "FERNIE", 
+                "country": "CA", 
+                "postalCode": "V0B 1M0", 
+                "region": "BC", 
+                "street": "BOX 1236"
+              }, 
+              "individualName": {
+                "first": "CAROL", 
+                "last": "SMITH", 
+                "middle": "VIVIAN"
+              }, 
+              "phoneNumber": "604", 
+              "type": "JOINT"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "JOINT"
+        }
+      ], 
+      "status": "E"
+    }, 
+    {
+      "attentionReference": "", 
+      "clientReferenceId": "                              ", 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "declaredValue": 0, 
+      "description": {
+        "baseInformation": {
+          "make": "HIGHLAND PARK 5603B", 
+          "model": "", 
+          "year": "1981"
+        }, 
+        "csaNumber": "", 
+        "csaStandard": "", 
+        "engineerName": "", 
+        "manufacturer": "FLEETWOOD HOMES OF ALBERTA LTD.", 
+        "otherRemarks": "", 
+        "rebuiltRemarks": "", 
+        "sectionCount": 2, 
+        "sections": [
+          {
+            "lengthFeet": 60, 
+            "lengthInches": 0, 
+            "serialNumber": "ALFL2A0410635121", 
+            "widthFeet": 14, 
+            "widthInches": 0
+          }
+        ]
+      }, 
+      "location": {
+        "additionalDescription": "", 
+        "address": {
+          "city": "WESTBANK", 
+          "country": "CA", 
+          "postalCode": "", 
+          "region": "BC", 
+          "street": "1880 OLD BOUCHERIE ROAD"
+        }, 
+        "block": "", 
+        "dealerName": "", 
+        "districtLot": "", 
+        "exceptionPlan": "", 
+        "landDistrict": "", 
+        "leaveProvince": false, 
+        "lot": "", 
+        "meridian": "", 
+        "pad": "148", 
+        "parcel": "", 
+        "parkName": "WESTGATE MOBILE HOME PARK", 
+        "partOf": "", 
+        "pidNumber": "", 
+        "plan": "", 
+        "range": "  ", 
+        "section": "", 
+        "status": "ACTIVE", 
+        "taxCertificate": false, 
+        "township": "  "
+      }, 
+      "mhrNumber": "047724", 
+      "ownerGroups": [
+        {
+          "groupId": 7, 
+          "interest": "", 
+          "interestNumerator": 0, 
+          "owners": [
+            {
+              "address": {
+                "city": "WESTBANK", 
+                "country": "CA", 
+                "postalCode": "V4T 1Z3", 
+                "region": "BC", 
+                "street": "#148-1880 OLD BOUCHERIE ROAD"
+              }, 
+              "individualName": {
+                "first": "GIOVANNI", 
+                "last": "RIMASSA", 
+                "middle": "UMBERTO"
+              }, 
+              "type": "JOINT"
+            }, 
+            {
+              "address": {
+                "city": "WESTBANK", 
+                "country": "CA", 
+                "postalCode": "V4T 1Z3", 
+                "region": "BC", 
+                "street": "#148-1880 OLD BOUCHERIE ROAD"
+              }, 
+              "individualName": {
+                "first": "LORRAINE", 
+                "last": "RIMASSA", 
+                "middle": "MARGARET"
+              }, 
+              "type": "JOINT"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "JOINT"
+        }
+      ], 
+      "status": "R"
+    }, 
+    {
+      "attentionReference": "", 
+      "clientReferenceId": "                              ", 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "declaredValue": 0, 
+      "description": {
+        "baseInformation": {
+          "make": "MONARCH", 
+          "model": "", 
+          "year": "1981"
+        }, 
+        "csaNumber": "", 
+        "csaStandard": "", 
+        "engineerName": "", 
+        "manufacturer": "MODULINE INDUSTRIES (CANADA) LTD", 
+        "otherRemarks": "", 
+        "rebuiltRemarks": "", 
+        "sectionCount": 1, 
+        "sections": [
+          {
+            "lengthFeet": 66, 
+            "lengthInches": 0, 
+            "serialNumber": "038308", 
+            "widthFeet": 14, 
+            "widthInches": 0
+          }
+        ]
+      }, 
+      "location": {
+        "additionalDescription": "", 
+        "address": {
+          "city": "NANAIMO", 
+          "country": "CA", 
+          "postalCode": "", 
+          "region": "BC", 
+          "street": "1310 SPRUSTON ROAD"
+        }, 
+        "block": "", 
+        "dealerName": "", 
+        "districtLot": "", 
+        "exceptionPlan": "", 
+        "landDistrict": "", 
+        "leaveProvince": false, 
+        "lot": "", 
+        "meridian": "", 
+        "pad": "12A", 
+        "parcel": "", 
+        "parkName": "FOREST GLADE MOBILE HOME PARK", 
+        "partOf": "", 
+        "pidNumber": "", 
+        "plan": "", 
+        "range": "  ", 
+        "section": "", 
+        "status": "ACTIVE", 
+        "taxCertificate": false, 
+        "township": "  "
+      }, 
+      "mhrNumber": "048633", 
+      "ownerGroups": [
+        {
+          "groupId": 5, 
+          "interest": "", 
+          "interestNumerator": 0, 
+          "owners": [
+            {
+              "address": {
+                "city": "NANAIMO", 
+                "country": "CA", 
+                "postalCode": "V9X 1R2", 
+                "region": "BC", 
+                "street": "12A-1310 SPRUSTON ROAD"
+              }, 
+              "individualName": {
+                "first": "GORDON", 
+                "last": "BIBBY", 
+                "middle": "RAYMOND"
+              }, 
+              "type": "JOINT"
+            }, 
+            {
+              "address": {
+                "city": "NANAIMO", 
+                "country": "CA", 
+                "postalCode": "V9X 1R2", 
+                "region": "BC", 
+                "street": "12A-1310 SPRUSTON ROAD"
+              }, 
+              "individualName": {
+                "first": "SHARON", 
+                "last": "FORSHNER", 
+                "middle": "LOUISE"
+              }, 
+              "type": "JOINT"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "JOINT"
+        }
+      ], 
+      "status": "R"
+    }, 
+    {
+      "attentionReference": "", 
+      "clientReferenceId": "                              ", 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "declaredValue": 0, 
+      "description": {
+        "baseInformation": {
+          "make": "MANCO", 
+          "model": "", 
+          "year": "1981"
+        }, 
+        "csaNumber": "*", 
+        "csaStandard": "", 
+        "engineerName": "", 
+        "manufacturer": "MANCO HOME SYSTEMS", 
+        "otherRemarks": "", 
+        "rebuiltRemarks": "", 
+        "sectionCount": 1, 
+        "sections": [
+          {
+            "lengthFeet": 66, 
+            "lengthInches": 0, 
+            "serialNumber": "A5274", 
+            "widthFeet": 14, 
+            "widthInches": 0
+          }
+        ]
+      }, 
+      "location": {
+        "additionalDescription": "", 
+        "address": {
+          "city": "KELOWNA", 
+          "country": "CA", 
+          "postalCode": "", 
+          "region": "BC", 
+          "street": "4075 MCCLAIN ROAD"
+        }, 
+        "block": "", 
+        "dealerName": "", 
+        "districtLot": "", 
+        "exceptionPlan": "", 
+        "landDistrict": "", 
+        "leaveProvince": false, 
+        "lot": "", 
+        "meridian": "", 
+        "pad": "59", 
+        "parcel": "", 
+        "parkName": "MCCULLOCH HEIGHTS MANUFACTURED HOME PARK", 
+        "partOf": "", 
+        "pidNumber": "", 
+        "plan": "", 
+        "range": "  ", 
+        "section": "", 
+        "status": "ACTIVE", 
+        "taxCertificate": false, 
+        "township": "  "
+      }, 
+      "mhrNumber": "050093", 
+      "ownerGroups": [
+        {
+          "groupId": 7, 
+          "interest": "", 
+          "interestNumerator": 0, 
+          "owners": [
+            {
+              "address": {
+                "city": "KELOWNA", 
+                "country": "CA", 
+                "postalCode": "V1W 4R4", 
+                "region": "BC", 
+                "street": "59-4075 MCCLAIN ROAD"
+              }, 
+              "individualName": {
+                "first": "MICHAEL", 
+                "last": "PROCHNAU", 
+                "middle": "NATHAN"
+              }, 
+              "type": "SOLE"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "SOLE"
+        }
+      ], 
+      "status": "R"
+    }, 
+    {
+      "attentionReference": "", 
+      "clientReferenceId": "                              ", 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "declaredValue": 0, 
+      "description": {
+        "baseInformation": {
+          "make": "PARKWOOD D-230", 
+          "model": "", 
+          "year": "1981"
+        }, 
+        "csaNumber": "", 
+        "csaStandard": "", 
+        "engineerName": "", 
+        "manufacturer": "GENERAL HOME SYSTEMS LTD.", 
+        "otherRemarks": "", 
+        "rebuiltRemarks": "", 
+        "sectionCount": 2, 
+        "sections": [
+          {
+            "lengthFeet": 48, 
+            "lengthInches": 0, 
+            "serialNumber": "XF1220AB", 
+            "widthFeet": 24, 
+            "widthInches": 0
+          }
+        ]
+      }, 
+      "location": {
+        "additionalDescription": "", 
+        "address": {
+          "city": "SORRENTO", 
+          "country": "CA", 
+          "postalCode": "", 
+          "region": "BC", 
+          "street": "2932 BUCKLEY ROAD"
+        }, 
+        "block": "", 
+        "dealerName": "", 
+        "districtLot": "", 
+        "exceptionPlan": "", 
+        "landDistrict": "", 
+        "leaveProvince": false, 
+        "lot": "", 
+        "meridian": "", 
+        "pad": "57", 
+        "parcel": "", 
+        "parkName": "SORRENTO PLACE MANUFACTURED HOME PARK", 
+        "partOf": "", 
+        "pidNumber": "", 
+        "plan": "", 
+        "range": "  ", 
+        "section": "", 
+        "status": "ACTIVE", 
+        "taxCertificate": false, 
+        "township": "  "
+      }, 
+      "mhrNumber": "050503", 
+      "ownerGroups": [
+        {
+          "groupId": 5, 
+          "interest": "", 
+          "interestNumerator": 0, 
+          "owners": [
+            {
+              "address": {
+                "city": "SORRENTO", 
+                "country": "CA", 
+                "postalCode": "V0E 2W0", 
+                "region": "BC", 
+                "street": "57 - 2932 BUCKLEY ROAD"
+              }, 
+              "individualName": {
+                "first": "MAUREEN", 
+                "last": "RATHBONE", 
+                "middle": "DAWN"
+              }, 
+              "phoneNumber": "2506754091", 
+              "type": "SOLE"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "SOLE"
+        }
+      ], 
+      "status": "R"
+    }, 
+    {
+      "attentionReference": "", 
+      "clientReferenceId": "                              ", 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "declaredValue": 0, 
+      "description": {
+        "baseInformation": {
+          "make": "PARKWOOD D262", 
+          "model": "", 
+          "year": "1981"
+        }, 
+        "csaNumber": "", 
+        "csaStandard": "", 
+        "engineerName": "", 
+        "manufacturer": "GENERAL HOME SYSTEMS LTD.", 
+        "otherRemarks": "", 
+        "rebuiltRemarks": "", 
+        "sectionCount": 2, 
+        "sections": [
+          {
+            "lengthFeet": 60, 
+            "lengthInches": 0, 
+            "serialNumber": "XF1384AB", 
+            "widthFeet": 24, 
+            "widthInches": 0
+          }
+        ]
+      }, 
+      "location": {
+        "additionalDescription": "", 
+        "address": {
+          "city": "SALMON ARM", 
+          "country": "CA", 
+          "postalCode": "", 
+          "region": "BC", 
+          "street": "3350 10TH AVENUE NORTH EAST"
+        }, 
+        "block": "", 
+        "dealerName": "", 
+        "districtLot": "", 
+        "exceptionPlan": "", 
+        "landDistrict": "", 
+        "leaveProvince": false, 
+        "lot": "", 
+        "meridian": "", 
+        "pad": "126", 
+        "parcel": "", 
+        "parkName": "EVERGREEN PARK", 
+        "partOf": "", 
+        "pidNumber": "", 
+        "plan": "", 
+        "range": "  ", 
+        "section": "", 
+        "status": "ACTIVE", 
+        "taxCertificate": false, 
+        "township": "  "
+      }, 
+      "mhrNumber": "052291", 
+      "ownerGroups": [
+        {
+          "groupId": 5, 
+          "interest": "", 
+          "interestNumerator": 0, 
+          "owners": [
+            {
+              "address": {
+                "city": "SALMON ARM", 
+                "country": "CA", 
+                "postalCode": "V1E 1J6", 
+                "region": "BC", 
+                "street": "#126 3350 10TH AVENUE SE"
+              }, 
+              "individualName": {
+                "first": "MICHEAL", 
+                "last": "MIDDLEMASS", 
+                "middle": "CHRISTOPHER"
+              }, 
+              "phoneNumber": "2508327715", 
+              "type": "JOINT"
+            }, 
+            {
+              "address": {
+                "city": "SALMON ARM", 
+                "country": "CA", 
+                "postalCode": "V1E 1J6", 
+                "region": "BC", 
+                "street": "#126 3350 10TH AVENUE SE"
+              }, 
+              "individualName": {
+                "first": "JESSICA", 
+                "last": "MIDDLEMASS", 
+                "middle": "LINDSAY"
+              }, 
+              "phoneNumber": "2508327715", 
+              "type": "JOINT"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "JOINT"
+        }
+      ], 
+      "status": "R"
+    }, 
+    {
+      "attentionReference": "", 
+      "clientReferenceId": "                              ", 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "declaredValue": 0, 
+      "description": {
+        "baseInformation": {
+          "make": "LEADER S-108", 
+          "model": "", 
+          "year": "1982"
+        }, 
+        "csaNumber": "", 
+        "csaStandard": "", 
+        "engineerName": "", 
+        "manufacturer": "GENERAL HOME SYSTEMS LTD.", 
+        "otherRemarks": "", 
+        "rebuiltRemarks": "", 
+        "sectionCount": 1, 
+        "sections": [
+          {
+            "lengthFeet": 66, 
+            "lengthInches": 0, 
+            "serialNumber": "1522", 
+            "widthFeet": 14, 
+            "widthInches": 0
+          }
+        ]
+      }, 
+      "location": {
+        "additionalDescription": "", 
+        "address": {
+          "city": "ELKFORD", 
+          "country": "CA", 
+          "postalCode": "", 
+          "region": "BC", 
+          "street": "15 DELTA CRESCENT"
+        }, 
+        "block": "", 
+        "dealerName": "", 
+        "districtLot": "3512", 
+        "exceptionPlan": "", 
+        "landDistrict": "KOOTENAY", 
+        "leaveProvince": false, 
+        "lot": "A", 
+        "meridian": "", 
+        "pad": "", 
+        "parcel": "", 
+        "parkName": "", 
+        "partOf": "", 
+        "pidNumber": "", 
+        "plan": "18264", 
+        "range": "  ", 
+        "section": "", 
+        "status": "ACTIVE", 
+        "taxCertificate": false, 
+        "township": "  "
+      }, 
+      "mhrNumber": "053594", 
+      "notes": [
+        {
+          "contactAddress": {
+            "city": "SPARWOOD                  BC V0B 2G0", 
+            "country": "CA", 
+            "postalCode": "", 
+            "region": "BC", 
+            "street": "BOX 1660 - 120 SPRUCE AVENUE"
+          }, 
+          "contactName": "ELK VALLEY LAW", 
+          "createDateTime": "2008-12-05T08:36:37+00:00", 
+          "documentId": "10045220", 
+          "documentType": "EXRS", 
+          "remarks": ""
+        }
+      ], 
+      "ownerGroups": [
+        {
+          "groupId": 2, 
+          "interest": "", 
+          "interestNumerator": 0, 
+          "owners": [
+            {
+              "address": {
+                "city": "ELKFORD", 
+                "country": "CA", 
+                "postalCode": "V0B 1H0", 
+                "region": "BC", 
+                "street": "PO BOX 348"
+              }, 
+              "individualName": {
+                "first": "JOHN", 
+                "last": "SMITH", 
+                "middle": "DAVID"
+              }, 
+              "phoneNumber": "2508657506", 
+              "type": "JOINT"
+            }, 
+            {
+              "address": {
+                "city": "ELKFORD", 
+                "country": "CA", 
+                "postalCode": "V0B 1H0", 
+                "region": "BC", 
+                "street": "PO BOX 348"
+              }, 
+              "individualName": {
+                "first": "PAULA", 
+                "last": "SMITH", 
+                "middle": "JEAN"
+              }, 
+              "phoneNumber": "2508657506", 
+              "type": "JOINT"
+            }
+          ], 
+          "status": "EXEMPT", 
+          "tenancySpecified": true, 
+          "type": "JOINT"
+        }
+      ], 
+      "status": "E"
+    }, 
+    {
+      "attentionReference": "", 
+      "clientReferenceId": "                              ", 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "declaredValue": 0, 
+      "description": {
+        "baseInformation": {
+          "make": "CHANCELLOR 24110", 
+          "model": "", 
+          "year": "1983"
+        }, 
+        "csaNumber": "", 
+        "csaStandard": "", 
+        "engineerName": "", 
+        "manufacturer": "MODULINE INDUSTRIES (CANADA) LTD.", 
+        "otherRemarks": "", 
+        "rebuiltRemarks": "", 
+        "sectionCount": 1, 
+        "sections": [
+          {
+            "lengthFeet": 48, 
+            "lengthInches": 0, 
+            "serialNumber": "039703AB", 
+            "widthFeet": 24, 
+            "widthInches": 0
+          }
+        ]
+      }, 
+      "location": {
+        "additionalDescription": "", 
+        "address": {
+          "city": "VICTORIA", 
+          "country": "CA", 
+          "postalCode": "", 
+          "region": "BC", 
+          "street": "60 COOPER ROAD"
+        }, 
+        "block": "", 
+        "dealerName": "", 
+        "districtLot": "", 
+        "exceptionPlan": "", 
+        "landDistrict": "", 
+        "leaveProvince": false, 
+        "lot": "", 
+        "meridian": "", 
+        "pad": "6", 
+        "parcel": "", 
+        "parkName": "VALLEY VIEW ESTATES", 
+        "partOf": "", 
+        "pidNumber": "", 
+        "plan": "", 
+        "range": "  ", 
+        "section": "", 
+        "status": "ACTIVE", 
+        "taxCertificate": false, 
+        "township": "  "
+      }, 
+      "mhrNumber": "055811", 
+      "ownerGroups": [
+        {
+          "groupId": 7, 
+          "interest": "", 
+          "interestNumerator": 0, 
+          "owners": [
+            {
+              "address": {
+                "city": "VICTORIA", 
+                "country": "CA", 
+                "postalCode": "V9A 4K2", 
+                "region": "BC", 
+                "street": "6 60 COOPER ROAD"
+              }, 
+              "individualName": {
+                "first": "WENDY", 
+                "last": "HUDSON", 
+                "middle": "GAY"
+              }, 
+              "type": "JOINT"
+            }, 
+            {
+              "address": {
+                "city": "VICTORIA", 
+                "country": "CA", 
+                "postalCode": "V9A 4K2", 
+                "region": "BC", 
+                "street": "6 60 COOPER ROAD"
+              }, 
+              "individualName": {
+                "first": "SERGE", 
+                "last": "LAROCHE", 
+                "middle": "BRUNO"
+              }, 
+              "type": "JOINT"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "JOINT"
+        }
+      ], 
+      "status": "R"
+    }, 
+    {
+      "attentionReference": "", 
+      "clientReferenceId": "                              ", 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "declaredValue": 0, 
+      "description": {
+        "baseInformation": {
+          "make": "VELAIRE", 
+          "model": "", 
+          "year": "1979"
+        }, 
+        "csaNumber": "", 
+        "csaStandard": "", 
+        "engineerName": "", 
+        "manufacturer": "ATCO", 
+        "otherRemarks": "", 
+        "rebuiltRemarks": "", 
+        "sectionCount": 1, 
+        "sections": [
+          {
+            "lengthFeet": 66, 
+            "lengthInches": 0, 
+            "serialNumber": "V66486571", 
+            "widthFeet": 14, 
+            "widthInches": 0
+          }
+        ]
+      }, 
+      "location": {
+        "additionalDescription": "PARCEL A (DD12932W)", 
+        "address": {
+          "city": "GANGES", 
+          "country": "CA", 
+          "postalCode": "", 
+          "region": "BC", 
+          "street": "217 DRAKE ROAD"
+        }, 
+        "block": "", 
+        "dealerName": "", 
+        "districtLot": "", 
+        "exceptionPlan": "", 
+        "landDistrict": "COWICHAN", 
+        "leaveProvince": false, 
+        "lot": "1", 
+        "meridian": "", 
+        "pad": "", 
+        "parcel": "", 
+        "parkName": "", 
+        "partOf": "", 
+        "pidNumber": "", 
+        "plan": "6560", 
+        "range": "3 ", 
+        "section": "20", 
+        "status": "ACTIVE", 
+        "taxCertificate": false, 
+        "township": "  "
+      }, 
+      "mhrNumber": "064336", 
+      "ownerGroups": [
+        {
+          "groupId": 1, 
+          "interest": "", 
+          "interestNumerator": 0, 
+          "owners": [
+            {
+              "address": {
+                "city": "GANGES", 
+                "country": "CA", 
+                "postalCode": "V0S 1E0", 
+                "region": "BC", 
+                "street": "DRAKE ROAD, COMP 5, RR 2"
+              }, 
+              "individualName": {
+                "first": "JOHN", 
+                "last": "SMITH", 
+                "middle": "EDWARD"
+              }, 
+              "phoneNumber": "604", 
+              "type": "JOINT"
+            }, 
+            {
+              "address": {
+                "city": "GANGES", 
+                "country": "CA", 
+                "postalCode": "V0S 1E0", 
+                "region": "BC", 
+                "street": "DRAKE ROAD, COMP 5, RR 2"
+              }, 
+              "individualName": {
+                "first": "DONNA", 
+                "last": "SMITH", 
+                "middle": "ELAINE"
+              }, 
+              "phoneNumber": "604", 
+              "type": "JOINT"
+            }
+          ], 
+          "status": "EXEMPT", 
+          "tenancySpecified": false, 
+          "type": "JOINT"
+        }
+      ], 
+      "status": "E"
+    }, 
+    {
+      "attentionReference": "", 
+      "clientReferenceId": "                              ", 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "declaredValue": 0, 
+      "description": {
+        "baseInformation": {
+          "make": "ROYALE/DA200", 
+          "model": "", 
+          "year": "1989"
+        }, 
+        "csaNumber": "", 
+        "csaStandard": "", 
+        "engineerName": "", 
+        "manufacturer": "REGENT HOMES", 
+        "otherRemarks": "", 
+        "rebuiltRemarks": "", 
+        "sectionCount": 2, 
+        "sections": [
+          {
+            "lengthFeet": 52, 
+            "lengthInches": 0, 
+            "serialNumber": "HI1344AB", 
+            "widthFeet": 28, 
+            "widthInches": 0
+          }
+        ]
+      }, 
+      "location": {
+        "additionalDescription": "", 
+        "address": {
+          "city": "LADYSMITH", 
+          "country": "CA", 
+          "postalCode": "", 
+          "region": "BC", 
+          "street": "1331 BIRCHWOOD ROAD"
+        }, 
+        "block": "", 
+        "dealerName": "", 
+        "districtLot": "96", 
+        "exceptionPlan": "", 
+        "landDistrict": "OYSTER", 
+        "leaveProvince": false, 
+        "lot": "65", 
+        "meridian": "", 
+        "pad": "", 
+        "parcel": "", 
+        "parkName": "", 
+        "partOf": "", 
+        "pidNumber": "", 
+        "plan": "36647", 
+        "range": "  ", 
+        "section": "", 
+        "status": "ACTIVE", 
+        "taxCertificate": false, 
+        "township": "  "
+      }, 
+      "mhrNumber": "065279", 
+      "notes": [
+        {
+          "contactAddress": {
+            "city": "CANADA                        V8W 1E1", 
+            "country": "CA", 
+            "postalCode": "", 
+            "region": "BC", 
+            "street": "734 BROUGHTON STREET", 
+            "streetAdditional": "VICTORIA , BC"
+          }, 
+          "contactName": "DYE & DURHAM COMPANY INC. (VICTORIA)", 
+          "createDateTime": "2001-07-24T10:09:45+00:00", 
+          "documentId": "41645283", 
+          "documentType": "EXRS", 
+          "remarks": ""
+        }
+      ], 
+      "ownerGroups": [
+        {
+          "groupId": 2, 
+          "interest": "", 
+          "interestNumerator": 0, 
+          "owners": [
+            {
+              "address": {
+                "city": "LADYSMITH", 
+                "country": "CA", 
+                "postalCode": "V0R 2E0", 
+                "region": "BC", 
+                "street": "RR1 3650 HALLBERG ROAD"
+              }, 
+              "individualName": {
+                "first": "LETTIE", 
+                "last": "POTTS", 
+                "middle": "MAE"
+              }, 
+              "phoneNumber": "604", 
+              "type": "JOINT"
+            }, 
+            {
+              "address": {
+                "city": "LADYSMITH", 
+                "country": "CA", 
+                "postalCode": "V0R 2E0", 
+                "region": "BC", 
+                "street": "RR1 3650 HALLBERG ROAD"
+              }, 
+              "individualName": {
+                "first": "BEVERLY", 
+                "last": "SMITH", 
+                "middle": "ANNE"
+              }, 
+              "phoneNumber": "604", 
+              "type": "JOINT"
+            }, 
+            {
+              "address": {
+                "city": "LADYSMITH", 
+                "country": "CA", 
+                "postalCode": "V0R 2E0", 
+                "region": "BC", 
+                "street": "RR1 3650 HALLBERG ROAD"
+              }, 
+              "individualName": {
+                "first": "JOHN", 
+                "last": "SMITH", 
+                "middle": "CARLTON"
+              }, 
+              "phoneNumber": "604", 
+              "type": "JOINT"
+            }
+          ], 
+          "status": "EXEMPT", 
+          "tenancySpecified": true, 
+          "type": "JOINT"
+        }
+      ], 
+      "status": "E"
+    }, 
+    {
+      "attentionReference": "", 
+      "clientReferenceId": "                              ", 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "declaredValue": 0, 
+      "description": {
+        "baseInformation": {
+          "make": "MODULAR CUSTOM BUILT", 
+          "model": "", 
+          "year": "1989"
+        }, 
+        "csaNumber": "", 
+        "csaStandard": "", 
+        "engineerName": "", 
+        "manufacturer": "LOUIS FRIMET", 
+        "otherRemarks": "", 
+        "rebuiltRemarks": "", 
+        "sectionCount": 2, 
+        "sections": [
+          {
+            "lengthFeet": 61, 
+            "lengthInches": 0, 
+            "serialNumber": "*", 
+            "widthFeet": 26, 
+            "widthInches": 9
+          }
+        ]
+      }, 
+      "location": {
+        "additionalDescription": "", 
+        "address": {
+          "city": "SUMMERLAND", 
+          "country": "CA", 
+          "postalCode": "", 
+          "region": "BC", 
+          "street": "17017 SNOW AVENUE"
+        }, 
+        "block": "", 
+        "dealerName": "", 
+        "districtLot": "", 
+        "exceptionPlan": "", 
+        "landDistrict": "", 
+        "leaveProvince": false, 
+        "lot": "", 
+        "meridian": "", 
+        "pad": "19", 
+        "parcel": "", 
+        "parkName": "SHERWOOD PARK", 
+        "partOf": "", 
+        "pidNumber": "", 
+        "plan": "", 
+        "range": "  ", 
+        "section": "", 
+        "status": "ACTIVE", 
+        "taxCertificate": false, 
+        "township": "  "
+      }, 
+      "mhrNumber": "068547", 
+      "ownerGroups": [
+        {
+          "groupId": 5, 
+          "interest": "", 
+          "interestNumerator": 0, 
+          "owners": [
+            {
+              "address": {
+                "city": "SUMMERLAND", 
+                "country": "CA", 
+                "postalCode": "V0H 1Z6", 
+                "region": "BC", 
+                "street": "19 - 17017 SNOW AVENUE"
+              }, 
+              "individualName": {
+                "first": "SHARON", 
+                "last": "JAMESON", 
+                "middle": "ELIZABETH"
+              }, 
+              "phoneNumber": "6047945637", 
+              "type": "SOLE"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "SOLE"
+        }
+      ], 
+      "status": "R"
+    }, 
+    {
+      "attentionReference": "", 
+      "clientReferenceId": "                              ", 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "declaredValue": 0, 
+      "description": {
+        "baseInformation": {
+          "make": "RIDGEWOOD 507", 
+          "model": "", 
+          "year": "1995"
+        }, 
+        "csaNumber": "18961", 
+        "csaStandard": "", 
+        "engineerName": "", 
+        "manufacturer": "WINALTA SHELTERS INC.", 
+        "otherRemarks": "", 
+        "rebuiltRemarks": "", 
+        "sectionCount": 1, 
+        "sections": [
+          {
+            "lengthFeet": 66, 
+            "lengthInches": 0, 
+            "serialNumber": "5393507", 
+            "widthFeet": 14, 
+            "widthInches": 0
+          }
+        ]
+      }, 
+      "location": {
+        "additionalDescription": "", 
+        "address": {
+          "city": "PRINCE GEORGE", 
+          "country": "CA", 
+          "postalCode": "", 
+          "region": "BC", 
+          "street": "7260 GLENVIEW DR"
+        }, 
+        "block": "", 
+        "dealerName": "", 
+        "districtLot": "", 
+        "exceptionPlan": "", 
+        "landDistrict": "", 
+        "leaveProvince": false, 
+        "lot": "", 
+        "meridian": "", 
+        "pad": "", 
+        "parcel": "", 
+        "parkName": "", 
+        "partOf": "", 
+        "pidNumber": "010876278", 
+        "plan": "", 
+        "range": "  ", 
+        "section": "", 
+        "status": "ACTIVE", 
+        "taxCertificate": false, 
+        "township": "  "
+      }, 
+      "mhrNumber": "077490", 
+      "notes": [
+        {
+          "contactAddress": {
+            "city": "V2K 4W9", 
+            "country": "CA", 
+            "postalCode": "", 
+            "region": "BC", 
+            "street": "4521 STAUBLE RD", 
+            "streetAdditional": "PRINCE GEORGE,B.C."
+          }, 
+          "contactName": "CAMILLE COTE", 
+          "createDateTime": "2007-04-16T15:54:22+00:00", 
+          "documentId": "90008898", 
+          "documentType": "103", 
+          "expiryDate": "2007-05-16", 
+          "remarks": ""
+        }, 
+        {
+          "contactAddress": {
+            "city": "PRINCE GEORGE, BC  V2K 4P7", 
+            "country": "CA", 
+            "postalCode": "", 
+            "region": "BC", 
+            "street": "5459 HARTWAY DRIVE"
+          }, 
+          "contactName": "MORNA GOUSISS", 
+          "createDateTime": "1997-03-24T16:19:10+00:00", 
+          "documentId": "41212614", 
+          "documentType": "103", 
+          "expiryDate": "1997-04-26", 
+          "remarks": ""
+        }, 
+        {
+          "contactAddress": {
+            "city": "PRINCE GEORGE, BC  V2K 4P7", 
+            "country": "CA", 
+            "postalCode": "", 
+            "region": "BC", 
+            "street": "5459 HARWAY DRIVE"
+          }, 
+          "contactName": "SHERRIE SAPARA/RIDGEWOOD HOMES INC.", 
+          "createDateTime": "1996-05-21T09:28:54+00:00", 
+          "documentId": "42435953", 
+          "documentType": "103", 
+          "expiryDate": "1996-06-23", 
+          "remarks": ""
+        }
+      ], 
+      "ownerGroups": [
+        {
+          "groupId": 6, 
+          "interest": "", 
+          "interestNumerator": 0, 
+          "owners": [
+            {
+              "address": {
+                "city": "PRINCE GEORGE", 
+                "country": "CA", 
+                "postalCode": "V2K 2P1", 
+                "region": "BC", 
+                "street": "7260 GLENVIEW DRIVE"
+              }, 
+              "individualName": {
+                "first": "EILEEN", 
+                "last": "SMITH", 
+                "middle": "THERESIA"
+              }, 
+              "phoneNumber": "2509627737", 
+              "type": "JOINT"
+            }, 
+            {
+              "address": {
+                "city": "PRINCE GEORGE", 
+                "country": "CA", 
+                "postalCode": "V2K 5W9", 
+                "region": "BC", 
+                "street": "2945 MUERMANN ROAD"
+              }, 
+              "individualName": {
+                "first": "ANGELA", 
+                "last": "MACELHERON", 
+                "middle": "LOUISE"
+              }, 
+              "phoneNumber": "2506138683", 
+              "type": "JOINT"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "JOINT"
+        }
+      ], 
+      "status": "R"
+    }, 
+    {
+      "attentionReference": "", 
+      "clientReferenceId": "                              ", 
+      "createDateTime": "2010-06-14T15:02:40+00:00", 
+      "declaredValue": 0, 
+      "description": {
+        "baseInformation": {
+          "make": "NOBLE", 
+          "model": "", 
+          "year": "2002"
+        }, 
+        "csaNumber": "42474", 
+        "csaStandard": "", 
+        "engineerName": "", 
+        "manufacturer": "NOBLE ACCEPTANCE LTD.", 
+        "otherRemarks": "", 
+        "rebuiltRemarks": "", 
+        "sectionCount": 1, 
+        "sections": [
+          {
+            "lengthFeet": 44, 
+            "lengthInches": 0, 
+            "serialNumber": "NAL1644021630", 
+            "widthFeet": 16, 
+            "widthInches": 0
+          }
+        ]
+      }, 
+      "location": {
+        "additionalDescription": "", 
+        "address": {
+          "city": "MCBRIDE", 
+          "country": "CA", 
+          "postalCode": "", 
+          "region": "BC", 
+          "street": "3400 DORE RIVER ROAD"
+        }, 
+        "block": "", 
+        "dealerName": "", 
+        "districtLot": "", 
+        "exceptionPlan": "", 
+        "landDistrict": "", 
+        "leaveProvince": false, 
+        "lot": "", 
+        "meridian": "", 
+        "pad": "", 
+        "parcel": "", 
+        "parkName": "", 
+        "partOf": "", 
+        "pidNumber": "023708841", 
+        "plan": "", 
+        "range": "  ", 
+        "section": "", 
+        "status": "ACTIVE", 
+        "taxCertificate": false, 
+        "township": "  "
+      }, 
+      "mhrNumber": "096463", 
+      "notes": [
+        {
+          "contactAddress": {
+            "city": "V0J 2E0", 
+            "country": "CA", 
+            "postalCode": "", 
+            "region": "BC", 
+            "street": "BOX 185", 
+            "streetAdditional": "MCBRIDE  BC"
+          }, 
+          "contactName": "DONALD GORDON", 
+          "createDateTime": "2010-06-14T15:06:08+00:00", 
+          "documentId": "50620283", 
+          "documentType": "103", 
+          "expiryDate": "2010-07-17", 
+          "remarks": ""
+        }
+      ], 
+      "ownerGroups": [
+        {
+          "groupId": 3, 
+          "interest": "", 
+          "interestNumerator": 0, 
+          "owners": [
+            {
+              "address": {
+                "city": "MCBRIDE", 
+                "country": "CA", 
+                "postalCode": "V0J 2E0", 
+                "region": "BC", 
+                "street": "PO BOX 967"
+              }, 
+              "individualName": {
+                "first": "JOCELYN", 
+                "last": "MONROE", 
+                "middle": "MERYLE"
+              }, 
+              "phoneNumber": "2505698855", 
+              "type": "SOLE"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "SOLE"
+        }
+      ], 
+      "status": "R"
     }
-  ],
+  ], 
+  "getReportURL": "/ppr/api/v1/search-results/8109", 
   "payment": {
-    "invoiceId": "19164",
-    "receipt": "/api/v1/payment-requests/19164/receipts"
-  },
-  "searchDateTime": "2022-05-16T20:52:00+00:00",
+    "invoiceId": "21720", 
+    "receipt": "/api/v1/payment-requests/21720/receipts"
+  }, 
+  "searchDateTime": "2022-08-21T00:59:48+00:00", 
   "searchQuery": {
-    "clientReferenceId": "MI-UT-0001",
+    "clientReferenceId": "MI-UT-0005", 
     "criteria": {
       "ownerName": {
-        "first": "David",
-        "last": "Hamm"
+        "first": "JOHN", 
+        "last": "SMITH"
       }
-    },
+    }, 
     "type": "OWNER_NAME"
-  },
+  }, 
   "selected": [
     {
       "baseInformation": {
-        "make": "FLASHBACK",
-        "model": "",
-        "year": 1984
-      },
-      "createDateTime": "1995-11-14T00:00:01+00:00",
-      "homeLocation": "SICAMOUS",
-      "mhrNumber": "074026",
+        "make": "LEISURE HOME", 
+        "model": "", 
+        "year": 1975
+      }, 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "homeLocation": "SURREY", 
+      "mhId": 14787, 
+      "mhrNumber": "002336", 
       "ownerName": {
-        "first": "DAVID",
-        "last": "HAMM",
-        "middle": "ABRAM"
-      },
-      "serialNumber": "117",
+        "first": "JOHNNY", 
+        "last": "SMITH", 
+        "middle": "ALLAN"
+      }, 
+      "ownerStatus": "PREVIOUS", 
+      "serialNumber": "0474UX", 
       "status": "ACTIVE"
-    },
+    }, 
     {
       "baseInformation": {
-        "make": "GLENDALE",
-        "model": "",
-        "year": 1968
-      },
-      "createDateTime": "1995-11-14T00:00:01+00:00",
-      "homeLocation": "FORT NELSON",
-      "includeLienInfo": true,
-      "mhrNumber": "022911",
+        "make": "MARINER", 
+        "model": "", 
+        "year": 1971
+      }, 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "homeLocation": "NANAIMO", 
+      "mhId": 22506, 
+      "mhrNumber": "003508", 
       "ownerName": {
-        "first": "DAVID",
-        "last": "HAMM",
-        "middle": "MICHAEL"
-      },
-      "serialNumber": "2427",
+        "first": "JOHN", 
+        "last": "SMITH", 
+        "middle": "MCCABE"
+      }, 
+      "ownerStatus": "ACTIVE", 
+      "serialNumber": "DW186", 
+      "status": "ACTIVE"
+    }, 
+    {
+      "baseInformation": {
+        "make": "PARAMOUNT", 
+        "model": "", 
+        "year": 1974
+      }, 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "homeLocation": "VICTORIA", 
+      "mhId": 75575, 
+      "mhrNumber": "011271", 
+      "ownerName": {
+        "first": "JOHN", 
+        "last": "SMITH", 
+        "middle": "WAYNE"
+      }, 
+      "ownerStatus": "PREVIOUS", 
+      "serialNumber": "GDSDFYMP68X125648", 
+      "status": "ACTIVE"
+    }, 
+    {
+      "baseInformation": {
+        "make": "PARK MANOR #12683", 
+        "model": "", 
+        "year": 1975
+      }, 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "homeLocation": "NAKUSP", 
+      "mhId": 55734, 
+      "mhrNumber": "012447", 
+      "ownerName": {
+        "first": "JOHN", 
+        "last": "SMITH", 
+        "middle": "STACY"
+      }, 
+      "ownerStatus": "PREVIOUS", 
+      "serialNumber": "FM3561", 
+      "status": "ACTIVE"
+    }, 
+    {
+      "baseInformation": {
+        "make": "840", 
+        "model": "", 
+        "year": 1978
+      }, 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "homeLocation": "KIMBERLEY", 
+      "mhId": 74091, 
+      "mhrNumber": "012714", 
+      "ownerName": {
+        "first": "JOHN", 
+        "last": "SMITH", 
+        "middle": "EDWARD"
+      }, 
+      "ownerStatus": "ACTIVE", 
+      "serialNumber": "840F6486", 
+      "status": "ACTIVE"
+    }, 
+    {
+      "baseInformation": {
+        "make": "SKYLINE 50/12 20K", 
+        "model": "", 
+        "year": 1970
+      }, 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "homeLocation": "ALDERGROVE", 
+      "mhId": 1295, 
+      "mhrNumber": "013416", 
+      "ownerName": {
+        "first": "JOHN", 
+        "last": "SMITH", 
+        "middle": "ARTHUR"
+      }, 
+      "ownerStatus": "PREVIOUS", 
+      "serialNumber": "51574B", 
+      "status": "ACTIVE"
+    }, 
+    {
+      "baseInformation": {
+        "make": "COLONY LTD. 6012-3CK", 
+        "model": "", 
+        "year": 1976
+      }, 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "homeLocation": "CASSIDY", 
+      "mhId": 53556, 
+      "mhrNumber": "017972", 
+      "ownerName": {
+        "first": "JOHN", 
+        "last": "SMITH", 
+        "middle": "CARLTON"
+      }, 
+      "ownerStatus": "PREVIOUS", 
+      "serialNumber": "C61273", 
+      "status": "ACTIVE"
+    }, 
+    {
+      "baseInformation": {
+        "make": "SCOTIA", 
+        "model": "", 
+        "year": 1964
+      }, 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "homeLocation": "BURNABY", 
+      "mhId": 69170, 
+      "mhrNumber": "018140", 
+      "ownerName": {
+        "first": "JOHN", 
+        "last": "SMITH", 
+        "middle": "BRADSHAW"
+      }, 
+      "ownerStatus": "ACTIVE", 
+      "serialNumber": "83864", 
+      "status": "ACTIVE"
+    }, 
+    {
+      "baseInformation": {
+        "make": "NOR-WESTERN", 
+        "model": "", 
+        "year": 1972
+      }, 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "homeLocation": "FORT NELSON", 
+      "mhId": 68005, 
+      "mhrNumber": "019420", 
+      "ownerName": {
+        "first": "JOHN", 
+        "last": "SMITH", 
+        "middle": "WILLIAM"
+      }, 
+      "ownerStatus": "EXEMPT", 
+      "serialNumber": "NW68123BRCK2126", 
       "status": "EXEMPT"
+    }, 
+    {
+      "baseInformation": {
+        "make": "PARAMOUNT MOBILE HOME", 
+        "model": "", 
+        "year": 1973
+      }, 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "homeLocation": "VICTORIA", 
+      "mhId": 65499, 
+      "mhrNumber": "021951", 
+      "ownerName": {
+        "first": "JOHN", 
+        "last": "SMITH", 
+        "middle": "WILLIAM"
+      }, 
+      "ownerStatus": "PREVIOUS", 
+      "serialNumber": "3305", 
+      "status": "HISTORIC"
+    }, 
+    {
+      "baseInformation": {
+        "make": "PARAMOUNT", 
+        "model": "", 
+        "year": 1973
+      }, 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "homeLocation": "VANDERHOOF", 
+      "mhId": 64556, 
+      "mhrNumber": "022836", 
+      "ownerName": {
+        "first": "JOHN", 
+        "last": "SMITH", 
+        "middle": "JAMES"
+      }, 
+      "ownerStatus": "PREVIOUS", 
+      "serialNumber": "GCSCFYMP62X123177", 
+      "status": "ACTIVE"
+    }, 
+    {
+      "baseInformation": {
+        "make": "C-30 PREMIER 3BR", 
+        "model": "", 
+        "year": 1972
+      }, 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "homeLocation": "VICTORIA", 
+      "mhId": 62644, 
+      "mhrNumber": "024963", 
+      "ownerName": {
+        "first": "JOHN", 
+        "last": "SMITH", 
+        "middle": "STEWART"
+      }, 
+      "ownerStatus": "PREVIOUS", 
+      "serialNumber": "C1583", 
+      "status": "ACTIVE"
+    }, 
+    {
+      "baseInformation": {
+        "make": "IMPERIAL", 
+        "model": "", 
+        "year": 1972
+      }, 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "homeLocation": "STRATHMORE", 
+      "mhId": 58135, 
+      "mhrNumber": "029698", 
+      "ownerName": {
+        "first": "JOHN", 
+        "last": "SMITH", 
+        "middle": "ROBERT"
+      }, 
+      "ownerStatus": "ACTIVE", 
+      "serialNumber": "A1H1722276", 
+      "status": "EXEMPT"
+    }, 
+    {
+      "baseInformation": {
+        "make": "HIGHLAND PARK 5603B", 
+        "model": "", 
+        "year": 1981
+      }, 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "homeLocation": "WESTBANK", 
+      "mhId": 39640, 
+      "mhrNumber": "047724", 
+      "ownerName": {
+        "first": "JOHN", 
+        "last": "SMITH", 
+        "middle": "ELMORE"
+      }, 
+      "ownerStatus": "PREVIOUS", 
+      "serialNumber": "ALFL2A0410635121", 
+      "status": "ACTIVE"
+    }, 
+    {
+      "baseInformation": {
+        "make": "MONARCH", 
+        "model": "", 
+        "year": 1981
+      }, 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "homeLocation": "NANAIMO", 
+      "mhId": 38557, 
+      "mhrNumber": "048633", 
+      "ownerName": {
+        "first": "JOHN", 
+        "last": "SMITH", 
+        "middle": "ROLAND"
+      }, 
+      "ownerStatus": "PREVIOUS", 
+      "serialNumber": "038308", 
+      "status": "ACTIVE"
+    }, 
+    {
+      "baseInformation": {
+        "make": "MANCO", 
+        "model": "", 
+        "year": 1981
+      }, 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "homeLocation": "KELOWNA", 
+      "mhId": 1719, 
+      "mhrNumber": "050093", 
+      "ownerName": {
+        "first": "JOHN", 
+        "last": "SMITH", 
+        "middle": "RICHARD"
+      }, 
+      "ownerStatus": "PREVIOUS", 
+      "serialNumber": "A5274", 
+      "status": "ACTIVE"
+    }, 
+    {
+      "baseInformation": {
+        "make": "PARKWOOD D-230", 
+        "model": "", 
+        "year": 1981
+      }, 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "homeLocation": "SORRENTO", 
+      "mhId": 36656, 
+      "mhrNumber": "050503", 
+      "ownerName": {
+        "first": "JOHN", 
+        "last": "SMITH", 
+        "middle": "BAIRD"
+      }, 
+      "ownerStatus": "PREVIOUS", 
+      "serialNumber": "XF1220AB", 
+      "status": "ACTIVE"
+    }, 
+    {
+      "baseInformation": {
+        "make": "PARKWOOD D-230", 
+        "model": "", 
+        "year": 1981
+      }, 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "homeLocation": "SORRENTO", 
+      "mhId": 36656, 
+      "mhrNumber": "050503", 
+      "ownerName": {
+        "first": "JOHN", 
+        "last": "SMITH", 
+        "middle": "BAIRD"
+      }, 
+      "ownerStatus": "PREVIOUS", 
+      "serialNumber": "XF1220AB", 
+      "status": "ACTIVE"
+    }, 
+    {
+      "baseInformation": {
+        "make": "PARKWOOD D262", 
+        "model": "", 
+        "year": 1981
+      }, 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "homeLocation": "SALMON ARM", 
+      "mhId": 34666, 
+      "mhrNumber": "052291", 
+      "ownerName": {
+        "first": "JOHN", 
+        "last": "SMITH", 
+        "middle": "JAMES"
+      }, 
+      "ownerStatus": "PREVIOUS", 
+      "serialNumber": "XF1384AB", 
+      "status": "ACTIVE"
+    }, 
+    {
+      "baseInformation": {
+        "make": "PARKWOOD D262", 
+        "model": "", 
+        "year": 1981
+      }, 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "homeLocation": "SALMON ARM", 
+      "mhId": 34666, 
+      "mhrNumber": "052291", 
+      "ownerName": {
+        "first": "JOHN", 
+        "last": "SMITH", 
+        "middle": "JAMES"
+      }, 
+      "ownerStatus": "PREVIOUS", 
+      "serialNumber": "XF1384AB", 
+      "status": "ACTIVE"
+    }, 
+    {
+      "baseInformation": {
+        "make": "LEADER S-108", 
+        "model": "", 
+        "year": 1982
+      }, 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "homeLocation": "ELKFORD", 
+      "mhId": 33306, 
+      "mhrNumber": "053594", 
+      "ownerName": {
+        "first": "JOHN", 
+        "last": "SMITH", 
+        "middle": "DAVID"
+      }, 
+      "ownerStatus": "EXEMPT", 
+      "serialNumber": "1522", 
+      "status": "EXEMPT"
+    }, 
+    {
+      "baseInformation": {
+        "make": "CHANCELLOR 24110", 
+        "model": "", 
+        "year": 1983
+      }, 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "homeLocation": "VICTORIA", 
+      "mhId": 30728, 
+      "mhrNumber": "055811", 
+      "ownerName": {
+        "first": "JOHN", 
+        "last": "SMITH", 
+        "middle": "FREDRICK"
+      }, 
+      "ownerStatus": "PREVIOUS", 
+      "serialNumber": "039703AB", 
+      "status": "ACTIVE"
+    }, 
+    {
+      "baseInformation": {
+        "make": "VELAIRE", 
+        "model": "", 
+        "year": 1979
+      }, 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "homeLocation": "GANGES", 
+      "mhId": 20670, 
+      "mhrNumber": "064336", 
+      "ownerName": {
+        "first": "JOHN", 
+        "last": "SMITH", 
+        "middle": "EDWARD"
+      }, 
+      "ownerStatus": "EXEMPT", 
+      "serialNumber": "V66486571", 
+      "status": "EXEMPT"
+    }, 
+    {
+      "baseInformation": {
+        "make": "ROYALE/DA200", 
+        "model": "", 
+        "year": 1989
+      }, 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "homeLocation": "LADYSMITH", 
+      "mhId": 10634, 
+      "mhrNumber": "065279", 
+      "ownerName": {
+        "first": "JOHN", 
+        "last": "SMITH", 
+        "middle": "CARLTON"
+      }, 
+      "ownerStatus": "EXEMPT", 
+      "serialNumber": "HI1344AB", 
+      "status": "EXEMPT"
+    }, 
+    {
+      "baseInformation": {
+        "make": "MODULAR CUSTOM BUILT", 
+        "model": "", 
+        "year": 1989
+      }, 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "homeLocation": "SUMMERLAND", 
+      "mhId": 14728, 
+      "mhrNumber": "068547", 
+      "ownerName": {
+        "first": "JOHN", 
+        "last": "SMITH", 
+        "middle": "WILLIAM"
+      }, 
+      "ownerStatus": "PREVIOUS", 
+      "serialNumber": "*", 
+      "status": "ACTIVE"
+    }, 
+    {
+      "baseInformation": {
+        "make": "MODULAR CUSTOM BUILT", 
+        "model": "", 
+        "year": 1989
+      }, 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "homeLocation": "SUMMERLAND", 
+      "mhId": 14728, 
+      "mhrNumber": "068547", 
+      "ownerName": {
+        "first": "JOHN", 
+        "last": "SMITH", 
+        "middle": "WILLIAM"
+      }, 
+      "ownerStatus": "PREVIOUS", 
+      "serialNumber": "*", 
+      "status": "ACTIVE"
+    }, 
+    {
+      "baseInformation": {
+        "make": "RIDGEWOOD 507", 
+        "model": "", 
+        "year": 1995
+      }, 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "homeLocation": "PRINCE GEORGE", 
+      "mhId": 2979, 
+      "mhrNumber": "077490", 
+      "ownerName": {
+        "first": "JOHN", 
+        "last": "SMITH", 
+        "middle": "STANLEY"
+      }, 
+      "ownerStatus": "PREVIOUS", 
+      "serialNumber": "5393507", 
+      "status": "ACTIVE"
+    }, 
+    {
+      "baseInformation": {
+        "make": "NOBLE", 
+        "model": "", 
+        "year": 2002
+      }, 
+      "createDateTime": "2010-06-14T15:02:40+00:00", 
+      "homeLocation": "MCBRIDE", 
+      "mhId": 97987, 
+      "mhrNumber": "096463", 
+      "ownerName": {
+        "first": "JOHN", 
+        "last": "SMITH", 
+        "middle": "WILLIAM"
+      }, 
+      "ownerStatus": "PREVIOUS", 
+      "serialNumber": "NAL1644021630", 
+      "status": "ACTIVE"
     }
-  ],
-  "totalResultsSize": 2
+  ], 
+  "totalResultsSize": 25
 }

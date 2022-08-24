@@ -39,9 +39,16 @@ SEARCH_RESULTS_MAX_SIZE = 5000
 RESULTS_SIZE_LIMIT_CLAUSE = 'FETCH FIRST :max_results_size ROWS ONLY'
 
 MHR_NUM_QUERY = """
-SELECT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate, o.ownrtype, o.ownrname, l.towncity, de.sernumb1, de.yearmade,
-       de.makemodl, mh.manhomid, '3'
-  FROM manuhome mh, document d, owner o, location l, descript de
+SELECT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate, l.towncity, de.sernumb1, de.yearmade,
+       de.makemodl, mh.manhomid,
+       (SELECT o.ownrtype || og.status || o.ownrname
+          FROM owner o, owngroup og
+         WHERE mh.manhomid = o.manhomid
+           AND mh.manhomid = og.manhomid
+           AND o.owngrpid = og.owngrpid
+           AND og.status IN ('3', '4')
+           FETCH FIRST 1 ROWS ONLY) AS owner_info
+  FROM manuhome mh, document d, location l, descript de
  WHERE mh.mhregnum = :query_value
    AND mh.mhregnum = d.mhregnum
    AND mh.regdocid = d.documtid
@@ -49,12 +56,6 @@ SELECT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate, o.ownrtype, o.ownrname
    AND l.status = 'A'
    AND mh.manhomid = de.manhomid
    AND de.status = 'A'
-   AND mh.manhomid = o.manhomid
-   AND o.ownerid = 1
-   AND o.owngrpid IN (SELECT MIN(og2.owngrpid)
-                        FROM owngroup og2
-                       WHERE mh.manhomid = og2.manhomid
-                         AND og2.status IN ('3', '4'))
 """
 
 # Example if changing to include all owner names.

@@ -5,7 +5,13 @@
     <table class="section-data section-data-table mt-4" role="presentation">
         <tr class="no-page-break">
             <td class="col-33">
-                <div class="section-sub-title">{{ detail.location.parkName }}</div>
+                {% if detail.location.parkName is defined and detail.location.parkName != '' %}
+                   <div class="section-sub-title">{{ detail.location.parkName }}</div>
+                {% endif %}
+                {% if detail.location.dealerName is defined and detail.location.dealerName != '' %}
+                    <div class="section-sub-title">Dealer/Manufacturer</div>
+                    <div class="pt-2">{{  detail.location.dealerName }}</div>
+                {% endif %}
             </td>
             <td class="col-33">
                 <div class="section-sub-title">Address</div>
@@ -21,14 +27,12 @@
                 </div>
             </td>
             <td class="col-33">
-                <div class="section-sub-title">Pad Number</div>
-                <div class="pt-2">
-                    {% if detail.location.pad is defined and detail.location.pad != '' %}
+                {% if detail.location.pad is defined and detail.location.pad != '' %}
+                    <div class="section-sub-title">Pad Number</div>
+                    <div class="pt-2">
                         {{ detail.location.pad }}
-                    {% else %}
-                        N/A
-                    {% endif %} 
-                </div>
+                    </div>
+                {% endif %} 
             </td>
          </tr>
     </table>

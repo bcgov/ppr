@@ -41,7 +41,7 @@
       "notes": [
         {
           "contactAddress": {
-            "city": "VICTORIA                  BC V8W 1E1    CANADA",
+            "city": "VICTORIA                  V8W 1E1",
             "country": "CA",
             "postalCode": "",
             "region": "BC",
@@ -54,110 +54,108 @@
           "remarks": ""
         }
       ],
-      "owners": [
+      "ownerGroups": [
         {
-          "address": {
-            "city": "KELOWNA, BC",
-            "country": "CA",
-            "postalCode": "V1X 4K4",
-            "region": "BC",
-            "street": "RR 5, BOX 12, HWY 33 EAST"
-          },
-          "individualName": {
-            "first": "VERDELLE",
-            "last": "MUTTITT",
-            "middle": "MAE"
-          },
-          "type": "SO"
-        },
+          "groupId": 4, 
+          "interest": "UNDIVIDED 25/100", 
+          "interestNumerator": 5, 
+          "owners": [
+            {
+              "address": {
+                "city": "LANGLEY", 
+                "country": "CA", 
+                "postalCode": "V3Z 3A4", 
+                "region": "BC", 
+                "street": "2296 - 240TH STREET"
+              }, 
+              "individualName": {
+                "first": "MANJINDER", 
+                "last": "JOHAL", 
+                "middle": "SINGH"
+              }, 
+              "type": "COMMON"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "COMMON"
+        }, 
         {
-          "address": {
-            "city": "ARMSTRONG, BC",
-            "country": "CA",
-            "postalCode": "VOE 1BO",
-            "region": "BC",
-            "street": "RR 1, COMP 36 FRED"
-          },
-          "individualName": {
-            "first": "HELEN",
-            "last": "FONTAINE",
-            "middle": "VERA"
-          },
-          "type": "SO"
-        },
+          "groupId": 5, 
+          "interest": "UNDIVIDED 25/100", 
+          "interestNumerator": 5, 
+          "owners": [
+            {
+              "address": {
+                "city": "LANGLEY", 
+                "country": "CA", 
+                "postalCode": "V3Z 3A4", 
+                "region": "BC", 
+                "street": "2296 - 240TH STREET"
+              }, 
+              "individualName": {
+                "first": "PARMINDER", 
+                "last": "JOHAL", 
+                "middle": "SINGH"
+              }, 
+              "type": "COMMON"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "COMMON"
+        }, 
         {
-          "address": {
-            "city": "KELOWNA, BC",
-            "country": "CA",
-            "postalCode": "V1W 4N9",
-            "region": "BC",
-            "street": "769 BARNABY ROAD"
-          },
-          "individualName": {
-            "first": "JOCHEN",
-            "last": "WOLF",
-            "middle": "KARL"
-          },
-          "type": "SO"
-        },
+          "groupId": 6, 
+          "interest": "UNDIVIDED 15/100", 
+          "interestNumerator": 3, 
+          "owners": [
+            {
+              "address": {
+                "city": "LANGLEY", 
+                "country": "CA", 
+                "postalCode": "V3Z 3A4", 
+                "region": "BC", 
+                "street": "2296 - 240TH STREET"
+              }, 
+              "individualName": {
+                "first": "JASKARAN", 
+                "last": "JOHAL", 
+                "middle": "SINGH"
+              }, 
+              "type": "COMMON"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "COMMON"
+        }, 
         {
-          "address": {
-            "city": "KELOWNA, B.C.",
-            "country": "CA",
-            "postalCode": "V1W 4N9",
-            "region": "BC",
-            "street": "769C BARNABY ROAD"
-          },
-          "individualName": {
-            "first": "JOCHEN",
-            "last": "WOLF",
-            "middle": "KARL"
-          },
-          "type": "JT"
-        },
-        {
-          "address": {
-            "city": "KELOWNA, B.C.",
-            "country": "CA",
-            "postalCode": "V1W 4N9",
-            "region": "BC",
-            "street": "769C BARNABY ROAD"
-          },
-          "individualName": {
-            "first": "CATHY",
-            "last": "WOLF"
-          },
-          "type": "JT"
-        },
-        {
-          "address": {
-            "city": "KELOWNA, B.C.",
-            "country": "CA",
-            "postalCode": "V1W 4N9",
-            "region": "BC",
-            "street": "769C BARNABY ROAD"
-          },
-          "individualName": {
-            "first": "CATHY",
-            "last": "WOLF"
-          },
-          "type": "SO"
-        },
-        {
-          "address": {
-            "city": "KELOWNA, B.C.",
-            "country": "CA",
-            "postalCode": "V1W 4N9",
-            "region": "BC",
-            "street": "769C BARNABY ROAD"
-          },
-          "individualName": {
-            "first": "CATHERINE",
-            "last": "WOLF"
-          },
-          "type": "SO"
+          "groupId": 7, 
+          "interest": "UNDIVIDED 35/100", 
+          "interestNumerator": 7, 
+          "owners": [
+            {
+              "address": {
+                "city": "LANGLEY", 
+                "country": "CA", 
+                "postalCode": "V3Z 3A4", 
+                "region": "BC", 
+                "street": "2296 - 240TH STREET"
+              }, 
+              "individualName": {
+                "first": "JASNIRMAL", 
+                "last": "SIDHU", 
+                "middle": "SINGH"
+              }, 
+              "type": "COMMON"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "COMMON"
         }
-      ],
+      ], 
       "status": "E"
     },
     {
@@ -201,7 +199,7 @@
       "notes": [
         {
           "contactAddress": {
-            "city": "CRANBROOK                 BC V1C 2M8    CANADA",
+            "city": "CRANBROOK                 V1C 2M8",
             "country": "CA",
             "postalCode": "",
             "region": "BC",
@@ -214,53 +212,108 @@
           "remarks": ""
         }
       ],
-      "owners": [
+      "ownerGroups": [
         {
-          "address": {
-            "city": "CRANBROOK, BC",
-            "country": "CA",
-            "postalCode": "V1C 3L9",
-            "region": "BC",
-            "street": "APT 1, 1803-4TH STREET NORTH"
-          },
-          "individualName": {
-            "first": "DIANE",
-            "last": "DAY",
-            "middle": "MAUREEN"
-          },
-          "type": "SO"
-        },
+          "groupId": 4, 
+          "interest": "UNDIVIDED 25/100", 
+          "interestNumerator": 5, 
+          "owners": [
+            {
+              "address": {
+                "city": "LANGLEY", 
+                "country": "CA", 
+                "postalCode": "V3Z 3A4", 
+                "region": "BC", 
+                "street": "2296 - 240TH STREET"
+              }, 
+              "individualName": {
+                "first": "MANJINDER", 
+                "last": "JOHAL", 
+                "middle": "SINGH"
+              }, 
+              "type": "COMMON"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "COMMON"
+        }, 
         {
-          "address": {
-            "city": "CRANBROOK BC",
-            "country": "CA",
-            "postalCode": "V1C 2A5",
-            "region": "BC",
-            "street": "13 - 714 INNES AVENUE"
-          },
-          "individualName": {
-            "first": "LAURA",
-            "last": "HALL",
-            "middle": "ANNE"
-          },
-          "type": "JT"
-        },
+          "groupId": 5, 
+          "interest": "UNDIVIDED 25/100", 
+          "interestNumerator": 5, 
+          "owners": [
+            {
+              "address": {
+                "city": "LANGLEY", 
+                "country": "CA", 
+                "postalCode": "V3Z 3A4", 
+                "region": "BC", 
+                "street": "2296 - 240TH STREET"
+              }, 
+              "individualName": {
+                "first": "PARMINDER", 
+                "last": "JOHAL", 
+                "middle": "SINGH"
+              }, 
+              "type": "COMMON"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "COMMON"
+        }, 
         {
-          "address": {
-            "city": "CRANBROOK BC",
-            "country": "CA",
-            "postalCode": "V1C 3G5",
-            "region": "BC",
-            "street": "413 - 20TH AVENUE SOUTH"
-          },
-          "individualName": {
-            "first": "DIANE",
-            "last": "DAY",
-            "middle": "MAUREEN"
-          },
-          "type": "JT"
+          "groupId": 6, 
+          "interest": "UNDIVIDED 15/100", 
+          "interestNumerator": 3, 
+          "owners": [
+            {
+              "address": {
+                "city": "LANGLEY", 
+                "country": "CA", 
+                "postalCode": "V3Z 3A4", 
+                "region": "BC", 
+                "street": "2296 - 240TH STREET"
+              }, 
+              "individualName": {
+                "first": "JASKARAN", 
+                "last": "JOHAL", 
+                "middle": "SINGH"
+              }, 
+              "type": "COMMON"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "COMMON"
+        }, 
+        {
+          "groupId": 7, 
+          "interest": "UNDIVIDED 35/100", 
+          "interestNumerator": 7, 
+          "owners": [
+            {
+              "address": {
+                "city": "LANGLEY", 
+                "country": "CA", 
+                "postalCode": "V3Z 3A4", 
+                "region": "BC", 
+                "street": "2296 - 240TH STREET"
+              }, 
+              "individualName": {
+                "first": "JASNIRMAL", 
+                "last": "SIDHU", 
+                "middle": "SINGH"
+              }, 
+              "type": "COMMON"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "COMMON"
         }
-      ],
+      ], 
       "status": "E"
     }
   ],

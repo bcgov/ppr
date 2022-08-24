@@ -1,0 +1,264 @@
+{
+  "details": [
+    {
+      "clientReferenceId": "                                        ", 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "declaredDateTime": "2017-05-15T11:24:01+00:00", 
+      "declaredValue": 144500, 
+      "description": {
+        "baseInformation": {
+          "make": "1989 GIBRALTAR 14332", 
+          "model": "", 
+          "year": "1989"
+        }, 
+        "csaNumber": "", 
+        "csaStandard": "", 
+        "engineerDate": "0001-01-01", 
+        "engineerName": "", 
+        "manufacturer": "MODULINE INDUSTRIES (CANADA) LTD.", 
+        "sectionCount": 1, 
+        "sections": [
+          {
+            "lengthFeet": 66, 
+            "lengthInches": 0, 
+            "serialNumber": "0312194", 
+            "widthFeet": 14, 
+            "widthInches": 0
+          }
+        ]
+      }, 
+      "location": {
+        "address": {
+          "city": "NANOOSE", 
+          "country": "CA", 
+          "postalCode": "", 
+          "region": "BC", 
+          "street": " "
+        }, 
+        "pad": "270", 
+        "parkName": "SCHOONER BAY MANOR"
+      }, 
+      "mhrNumber": "065818", 
+      "ownerGroups": [
+        {
+          "groupId": 4, 
+          "interest": "UNDIVIDED 25/100", 
+          "interestNumerator": 5, 
+          "owners": [
+            {
+              "address": {
+                "city": "LANGLEY", 
+                "country": "CA", 
+                "postalCode": "V3Z 3A4", 
+                "region": "BC", 
+                "street": "2296 - 240TH STREET"
+              }, 
+              "individualName": {
+                "first": "MANJINDER", 
+                "last": "JOHAL", 
+                "middle": "SINGH"
+              }, 
+              "type": "COMMON"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "COMMON"
+        }, 
+        {
+          "groupId": 5, 
+          "interest": "UNDIVIDED 25/100", 
+          "interestNumerator": 5, 
+          "owners": [
+            {
+              "address": {
+                "city": "LANGLEY", 
+                "country": "CA", 
+                "postalCode": "V3Z 3A4", 
+                "region": "BC", 
+                "street": "2296 - 240TH STREET"
+              }, 
+              "individualName": {
+                "first": "PARMINDER", 
+                "last": "JOHAL", 
+                "middle": "SINGH"
+              }, 
+              "type": "COMMON"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "COMMON"
+        }, 
+        {
+          "groupId": 6, 
+          "interest": "UNDIVIDED 15/100", 
+          "interestNumerator": 3, 
+          "owners": [
+            {
+              "address": {
+                "city": "LANGLEY", 
+                "country": "CA", 
+                "postalCode": "V3Z 3A4", 
+                "region": "BC", 
+                "street": "2296 - 240TH STREET"
+              }, 
+              "individualName": {
+                "first": "JASKARAN", 
+                "last": "JOHAL", 
+                "middle": "SINGH"
+              }, 
+              "type": "COMMON"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "COMMON"
+        }, 
+        {
+          "groupId": 7, 
+          "interest": "UNDIVIDED 35/100", 
+          "interestNumerator": 7, 
+          "owners": [
+            {
+              "address": {
+                "city": "LANGLEY", 
+                "country": "CA", 
+                "postalCode": "V3Z 3A4", 
+                "region": "BC", 
+                "street": "2296 - 240TH STREET"
+              }, 
+              "individualName": {
+                "first": "JASNIRMAL", 
+                "last": "SIDHU", 
+                "middle": "SINGH"
+              }, 
+              "type": "COMMON"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "COMMON"
+        }
+      ], 
+      "pprRegistrations": [
+        {
+          "financingStatement": {
+            "baseRegistrationNumber": "005373K", 
+            "createDateTime": "2017-05-15T18:47:03+00:00", 
+            "debtors": [
+              {
+                "address": {
+                  "city": "NANOOSE BAY", 
+                  "country": "CA", 
+                  "postalCode": "V9P9K2", 
+                  "region": "BC", 
+                  "street": "270 2465 APOLLO DRIVE"
+                }, 
+                "birthDate": "1954-01-13T12:59:59+00:00", 
+                "partyId": 427321, 
+                "personName": {
+                  "first": "DOUGLAS", 
+                  "last": "CRANE", 
+                  "middle": "JAMES"
+                }
+              }, 
+              {
+                "address": {
+                  "city": "NANOOSE BAY", 
+                  "country": "CA", 
+                  "postalCode": "V9P9K2", 
+                  "region": "BC", 
+                  "street": "270 2465 APOLLO DRIVE"
+                }, 
+                "birthDate": "1954-06-04T12:59:59+00:00", 
+                "partyId": 427322, 
+                "personName": {
+                  "first": "SHARON", 
+                  "last": "CRANE"
+                }
+              }
+            ], 
+            "expiryDate": "2022-05-16T06:59:59+00:00", 
+            "lifeYears": 5, 
+            "registeringParty": {
+              "address": {
+                "city": "PARKSVILLE", 
+                "country": "CA", 
+                "postalCode": "V9P2H4", 
+                "region": "BC", 
+                "street": "P.O. BOX 1486"
+              }, 
+              "businessName": "JOHN A. HOSSACK, BARRISTER AND SOLICITOR"
+            }, 
+            "registrationAct": "PERSONAL PROPERTY SECURITY ACT", 
+            "registrationDescription": "PPSA SECURITY AGREEMENT", 
+            "securedParties": [
+              {
+                "address": {
+                  "city": "TORONTO", 
+                  "country": "CA", 
+                  "postalCode": "M2P0A2", 
+                  "region": "ON", 
+                  "street": "10 YORK MILLS ROAD 3RD FLOOR"
+                }, 
+                "businessName": "ROYAL BANK OF CANADA (RBC)", 
+                "partyId": 4533969
+              }
+            ], 
+            "statusType": "HEX", 
+            "trustIndenture": false, 
+            "type": "SA", 
+            "vehicleCollateral": [
+              {
+                "make": "MODULINE", 
+                "manufacturedHomeRegistrationNumber": "065818", 
+                "model": "GIBRALTAR", 
+                "serialNumber": "0312194", 
+                "type": "MH", 
+                "vehicleId": 209832, 
+                "year": 1989
+              }
+            ]
+          }, 
+          "matchType": "EXACT"
+        }
+      ], 
+      "status": "R"
+    }
+  ], 
+  "getReportURL": "/ppr/api/v1/search-results/9052", 
+  "payment": {
+    "invoiceId": "19291", 
+    "receipt": "/api/v1/payment-requests/19291/receipts"
+  }, 
+  "searchDateTime": "2022-05-19T23:19:46+00:00", 
+  "searchQuery": {
+    "clientReferenceId": "MM-UT-HEX0002", 
+    "criteria": {
+      "value": "065818"
+    }, 
+    "type": "MHR_NUMBER"
+  }, 
+  "selected": [
+    {
+      "baseInformation": {
+        "make": "1989 GIBRALTAR 14332", 
+        "model": "", 
+        "year": 1989
+      }, 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "homeLocation": "NANOOSE", 
+      "includeLienInfo": true, 
+      "mhrNumber": "065818", 
+      "ownerName": {
+        "first": "WALTER", 
+        "last": "SCHEDEL", 
+        "middle": "JOHN"
+      }, 
+      "serialNumber": "0312194", 
+      "status": "ACTIVE"
+    }
+  ], 
+  "totalResultsSize": 1
+}

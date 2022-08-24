@@ -123,7 +123,7 @@ class Db2Owngroup(db.Model):
         groups = []
         if manuhome_id and manuhome_id > 0:
             try:
-                groups = cls.query.filter(Db2Owngroup.manuhome_id == manuhome_id).all()
+                groups = cls.query.filter(Db2Owngroup.manuhome_id == manuhome_id).order_by(Db2Owngroup.group_id).all()
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('DB2Owngroup.find_all_by_manuhome_id groups exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)

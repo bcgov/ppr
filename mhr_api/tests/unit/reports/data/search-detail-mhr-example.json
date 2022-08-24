@@ -3,8 +3,9 @@
     {
       "clientReferenceId": "",
       "createDateTime": "1995-11-14T00:00:01+00:00",
-      "declaredValue": 0,
-      "description": {
+      "declaredValue": 10000,
+      "declaredDateTime": "2010-11-09T10:37:02+00:00", 
+       "description": {
         "baseInformation": {
           "make": "MONARCH #956",
           "model": "",
@@ -35,29 +36,14 @@
           "street": "969 WALDIE RD"
         },
         "pad": "",
-        "parkName": ""
+        "parkName": "",
+        "dealerName": "AMCO HOMES"
       },
       "mhrNumber": "022000",
       "notes": [
         {
           "contactAddress": {
-            "city": "V1N 1E9",
-            "country": "CA",
-            "postalCode": "",
-            "region": "BC",
-            "street": "740 WOODLAND DR",
-            "streetAdditional": "CASTLEGAR BC"
-          },
-          "contactName": "GEORGE KOLESNIKOFF",
-          "createDateTime": "2006-05-08T14:56:11+00:00",
-          "documentId": "90008255",
-          "documentType": "103",
-          "expiryDate": "2006-06-07",
-          "remarks": ""
-        },
-        {
-          "contactAddress": {
-            "city": "CASTLEGAR BC  V1N4T7",
+            "city": "CASTLEGAR  V1N4T7",
             "country": "CA",
             "postalCode": "",
             "region": "BC",
@@ -69,110 +55,125 @@
           "documentType": "103",
           "expiryDate": "2012-05-30",
           "remarks": ""
+        },
+        {
+          "contactAddress": {
+            "city": "CASTLEGAR V1N 1E9",
+            "country": "CA",
+            "postalCode": "",
+            "region": "BC",
+            "street": "740 WOODLAND DR"
+          },
+          "contactName": "GEORGE KOLESNIKOFF",
+          "createDateTime": "2006-05-08T14:56:11+00:00",
+          "documentId": "90008255",
+          "documentType": "103",
+          "expiryDate": "2006-06-07",
+          "remarks": ""
         }
       ],
-      "owners": [
+      "ownerGroups": [
         {
-          "address": {
-            "city": "ROBSON, BC",
-            "country": "CA",
-            "postalCode": "V0G 1X0",
-            "region": "BC",
-            "street": "BOX 280"
-          },
-          "individualName": {
-            "first": "PHILIP",
-            "last": "BONDEROFF"
-          },
-          "type": "SO"
-        },
+          "groupId": 4, 
+          "interest": "UNDIVIDED 25/100", 
+          "interestNumerator": 5, 
+          "owners": [
+            {
+              "address": {
+                "city": "LANGLEY", 
+                "country": "CA", 
+                "postalCode": "V3Z 3A4", 
+                "region": "BC", 
+                "street": "2296 - 240TH STREET"
+              }, 
+              "individualName": {
+                "first": "MANJINDER", 
+                "last": "JOHAL", 
+                "middle": "SINGH"
+              }, 
+              "type": "COMMON"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "COMMON"
+        }, 
         {
-          "address": {
-            "city": "ROBSON, BC",
-            "country": "CA",
-            "postalCode": "VOG 1XO",
-            "region": "BC",
-            "street": "BOX 280"
-          },
-          "individualName": {
-            "first": "PHILIP",
-            "last": "BONDEROFF"
-          },
-          "type": "JT"
-        },
+          "groupId": 5, 
+          "interest": "UNDIVIDED 25/100", 
+          "interestNumerator": 5, 
+          "owners": [
+            {
+              "address": {
+                "city": "LANGLEY", 
+                "country": "CA", 
+                "postalCode": "V3Z 3A4", 
+                "region": "BC", 
+                "street": "2296 - 240TH STREET"
+              }, 
+              "individualName": {
+                "first": "PARMINDER", 
+                "last": "JOHAL", 
+                "middle": "SINGH"
+              }, 
+              "type": "COMMON"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "COMMON"
+        }, 
         {
-          "address": {
-            "city": "ROBSON, BC",
-            "country": "CA",
-            "postalCode": "VOG 1XO",
-            "region": "BC",
-            "street": "BOX 280"
-          },
-          "individualName": {
-            "first": "KENNETH",
-            "last": "BONDEROFF",
-            "middle": "PHILIP"
-          },
-          "type": "JT"
-        },
+          "groupId": 6, 
+          "interest": "UNDIVIDED 15/100", 
+          "interestNumerator": 3, 
+          "owners": [
+            {
+              "address": {
+                "city": "LANGLEY", 
+                "country": "CA", 
+                "postalCode": "V3Z 3A4", 
+                "region": "BC", 
+                "street": "2296 - 240TH STREET"
+              }, 
+              "individualName": {
+                "first": "JASKARAN", 
+                "last": "JOHAL", 
+                "middle": "SINGH"
+              }, 
+              "type": "COMMON"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "COMMON"
+        }, 
         {
-          "address": {
-            "city": "ROBSON, BC",
-            "country": "CA",
-            "postalCode": "VOG 1XO",
-            "region": "BC",
-            "street": "BOX 280"
-          },
-          "individualName": {
-            "first": "PHILIP",
-            "last": "BONDEROFF"
-          },
-          "type": "JT"
-        },
-        {
-          "address": {
-            "city": "SALMO, BC",
-            "country": "CA",
-            "postalCode": "VOG 1ZO",
-            "region": "BC",
-            "street": "BOX 543"
-          },
-          "individualName": {
-            "first": "KENNETH",
-            "last": "BONDEROFF",
-            "middle": "PHILIP"
-          },
-          "type": "JT"
-        },
-        {
-          "address": {
-            "city": "CASTLEGAR, B.C.",
-            "country": "CA",
-            "postalCode": "V1N 1E9",
-            "region": "BC",
-            "street": "740 WOODLAND DRIVE"
-          },
-          "individualName": {
-            "first": "GEORGE",
-            "last": "KOLESNIKOFF"
-          },
-          "type": "JT"
-        },
-        {
-          "address": {
-            "city": "CASTLEGAR, B.C.",
-            "country": "CA",
-            "postalCode": "V1N 1E9",
-            "region": "BC",
-            "street": "740 WOODLAND DRIVE"
-          },
-          "individualName": {
-            "first": "FIONNA",
-            "last": "KOLESNIKOFF"
-          },
-          "type": "JT"
+          "groupId": 7, 
+          "interest": "UNDIVIDED 35/100", 
+          "interestNumerator": 7, 
+          "owners": [
+            {
+              "address": {
+                "city": "LANGLEY", 
+                "country": "CA", 
+                "postalCode": "V3Z 3A4", 
+                "region": "BC", 
+                "street": "2296 - 240TH STREET"
+              }, 
+              "individualName": {
+                "first": "JASNIRMAL", 
+                "last": "SIDHU", 
+                "middle": "SINGH"
+              }, 
+              "type": "COMMON"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "COMMON"
         }
-      ],
+      ], 
       "status": "R"
     }
   ],

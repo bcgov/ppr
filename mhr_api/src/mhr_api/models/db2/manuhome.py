@@ -154,8 +154,9 @@ class Db2Manuhome(db.Model):
             if doc:
                 documents.append(doc)
             manuhome.reg_documents = documents
-            current_app.logger.debug('Db2Manuhome.find_by_id Db2Owner query.')
-            manuhome.reg_owners = Db2Owner.find_by_manuhome_id_registration(manuhome.id)
+            current_app.logger.debug('Db2Manuhome.find_by_id Db2Owngroup query.')
+            manuhome.reg_owner_groups = Db2Owngroup.find_all_by_manuhome_id(manuhome.id)
+            # manuhome.reg_owners = Db2Owner.find_by_manuhome_id_registration(manuhome.id)
             current_app.logger.debug('Db2Manuhome.find_by_id Db2Descript query.')
             manuhome.reg_descript = Db2Descript.find_by_manuhome_id_active(manuhome.id)
             current_app.logger.debug('Db2Manuhome.find_by_id Db2Location query.')
@@ -166,7 +167,7 @@ class Db2Manuhome(db.Model):
         return manuhome
 
     @classmethod
-    def find_by_mhr_number(cls, mhr_number: str, new_reg: bool = False):
+    def find_by_mhr_number(cls, mhr_number: str, owner_groups: bool = True):
         """Return the MH registration matching the MHR number."""
         manuhome = None
         current_app.logger.debug(f'Db2Manuhome.find_by_mhr_number {mhr_number}.')
@@ -185,10 +186,11 @@ class Db2Manuhome(db.Model):
             )
         current_app.logger.debug('Db2Manuhome.find_by_mhr_number Db2Document query.')
         manuhome.reg_documents = Db2Document.find_by_mhr_number(manuhome.mhr_number)
-        current_app.logger.debug('Db2Manuhome.find_by_mhr_number Db2Owner query.')
-        if new_reg:
+        if owner_groups:
+            current_app.logger.debug('Db2Manuhome.find_by_mhr_number Db2Owngroup query.')
             manuhome.reg_owner_groups = Db2Owngroup.find_all_by_manuhome_id(manuhome.id)
         else:
+            current_app.logger.debug('Db2Manuhome.find_by_mhr_number Db2Owner query.')
             manuhome.reg_owners = Db2Owner.find_by_manuhome_id_registration(manuhome.id)
         current_app.logger.debug('Db2Manuhome.find_by_mhr_number Db2Descript query.')
         manuhome.reg_descript = Db2Descript.find_by_manuhome_id_active(manuhome.id)
@@ -247,13 +249,19 @@ class Db2Manuhome(db.Model):
         if declared_ts:
             man_home['declaredDateTime'] = model_utils.format_ts(declared_ts)
 
-        if self.reg_owners:
-            owners = []
-            for owner in self.reg_owners:
-                owner_json = owner.registration_json
-                if owner_json:
-                    owners.append(owner_json)
-            man_home['owners'] = owners
+        if self.reg_owner_groups:
+            groups = []
+            for group in self.reg_owner_groups:
+                if group.status != Db2Owngroup.StatusTypes.PREVIOUS:
+                    groups.append(group.registration_json)
+            man_home['ownerGroups'] = groups
+        # if self.reg_owners:
+        #    owners = []
+        #    for owner in self.reg_owners:
+        #        owner_json = owner.registration_json
+        #        if owner_json:
+        #            owners.append(owner_json)
+        #    man_home['owners'] = owners
         if self.reg_location:
             man_home['location'] = self.reg_location.registration_json
         if self.reg_descript:

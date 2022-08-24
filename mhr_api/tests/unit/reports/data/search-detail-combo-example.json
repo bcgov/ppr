@@ -1,299 +1,385 @@
 {
   "details": [
     {
-      "clientReferenceId": "",
-      "createDateTime": "1995-11-14T00:00:01+00:00",
-      "declaredValue": 0,
+      "clientReferenceId": "                                        ", 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "declaredValue": 0, 
       "description": {
         "baseInformation": {
-          "make": "MONARCH #956",
-          "model": "",
-          "year": "1976"
-        },
-        "csaNumber": "",
-        "csaStandard": "",
-        "engineerDate": "0001-01-01",
-        "engineerName": "",
-        "manufacturer": "MODULINE",
-        "sectionCount": 1,
+          "make": "PREMIER", 
+          "model": "", 
+          "year": "1973"
+        }, 
+        "csaNumber": "", 
+        "csaStandard": "", 
+        "engineerDate": "0001-01-01", 
+        "engineerName": "", 
+        "manufacturer": "MODULINE INDUSTRIES LTD.", 
+        "sectionCount": 1, 
         "sections": [
           {
-            "lengthFeet": 60,
-            "lengthInches": 0,
-            "serialNumber": "3F6024",
-            "widthFeet": 12,
+            "lengthFeet": 60, 
+            "lengthInches": 0, 
+            "serialNumber": "2452", 
+            "widthFeet": 12, 
             "widthInches": 0
           }
         ]
-      },
+      }, 
       "location": {
         "address": {
-          "city": "CASTLEGAR",
-          "country": "CA",
-          "postalCode": "",
-          "region": "BC",
-          "street": "969 WALDIE RD"
-        },
-        "pad": "",
+          "city": "ABBOTSFORD", 
+          "country": "CA", 
+          "postalCode": "", 
+          "region": "BC", 
+          "street": "3555 ROSS ROAD"
+        }, 
+        "pad": "", 
         "parkName": ""
-      },
-      "mhrNumber": "022000",
-      "notes": [
+      }, 
+      "mhrNumber": "015122", 
+      "ownerGroups": [
         {
-          "contactAddress": {
-            "city": "V1N 1E9",
-            "country": "CA",
-            "postalCode": "",
-            "region": "BC",
-            "street": "740 WOODLAND DR",
-            "streetAdditional": "CASTLEGAR BC"
-          },
-          "contactName": "GEORGE KOLESNIKOFF",
-          "createDateTime": "2006-05-08T14:56:11+00:00",
-          "documentId": "90008255",
-          "documentType": "103",
-          "expiryDate": "2006-06-07",
-          "remarks": ""
-        },
+          "groupId": 4, 
+          "interest": "UNDIVIDED 25/100", 
+          "interestNumerator": 5, 
+          "owners": [
+            {
+              "address": {
+                "city": "LANGLEY", 
+                "country": "CA", 
+                "postalCode": "V3Z 3A4", 
+                "region": "BC", 
+                "street": "2296 - 240TH STREET"
+              }, 
+              "individualName": {
+                "first": "MANJINDER", 
+                "last": "JOHAL", 
+                "middle": "SINGH"
+              }, 
+              "type": "COMMON"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "COMMON"
+        }, 
         {
-          "contactAddress": {
-            "city": "CASTLEGAR BC  V1N4T7",
-            "country": "CA",
-            "postalCode": "",
-            "region": "BC",
-            "street": "962 WALDIE RD"
-          },
-          "contactName": "HANS KOLMAN",
-          "createDateTime": "2012-04-30T13:46:51+00:00",
-          "documentId": "90011305",
-          "documentType": "103",
-          "expiryDate": "2012-05-30",
-          "remarks": ""
+          "groupId": 5, 
+          "interest": "UNDIVIDED 25/100", 
+          "interestNumerator": 5, 
+          "owners": [
+            {
+              "address": {
+                "city": "LANGLEY", 
+                "country": "CA", 
+                "postalCode": "V3Z 3A4", 
+                "region": "BC", 
+                "street": "2296 - 240TH STREET"
+              }, 
+              "individualName": {
+                "first": "PARMINDER", 
+                "last": "JOHAL", 
+                "middle": "SINGH"
+              }, 
+              "type": "COMMON"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "COMMON"
+        }, 
+        {
+          "groupId": 6, 
+          "interest": "UNDIVIDED 15/100", 
+          "interestNumerator": 3, 
+          "owners": [
+            {
+              "address": {
+                "city": "LANGLEY", 
+                "country": "CA", 
+                "postalCode": "V3Z 3A4", 
+                "region": "BC", 
+                "street": "2296 - 240TH STREET"
+              }, 
+              "individualName": {
+                "first": "JASKARAN", 
+                "last": "JOHAL", 
+                "middle": "SINGH"
+              }, 
+              "type": "COMMON"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "COMMON"
+        }, 
+        {
+          "groupId": 7, 
+          "interest": "UNDIVIDED 35/100", 
+          "interestNumerator": 7, 
+          "owners": [
+            {
+              "address": {
+                "city": "LANGLEY", 
+                "country": "CA", 
+                "postalCode": "V3Z 3A4", 
+                "region": "BC", 
+                "street": "2296 - 240TH STREET"
+              }, 
+              "individualName": {
+                "first": "JASNIRMAL", 
+                "last": "SIDHU", 
+                "middle": "SINGH"
+              }, 
+              "type": "COMMON"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "COMMON"
         }
-      ],
-      "owners": [
-        {
-          "address": {
-            "city": "ROBSON, BC",
-            "country": "CA",
-            "postalCode": "V0G 1X0",
-            "region": "BC",
-            "street": "BOX 280"
-          },
-          "individualName": {
-            "first": "PHILIP",
-            "last": "BONDEROFF"
-          },
-          "type": "SO"
-        },
-        {
-          "address": {
-            "city": "ROBSON, BC",
-            "country": "CA",
-            "postalCode": "VOG 1XO",
-            "region": "BC",
-            "street": "BOX 280"
-          },
-          "individualName": {
-            "first": "PHILIP",
-            "last": "BONDEROFF"
-          },
-          "type": "JT"
-        },
-        {
-          "address": {
-            "city": "ROBSON, BC",
-            "country": "CA",
-            "postalCode": "VOG 1XO",
-            "region": "BC",
-            "street": "BOX 280"
-          },
-          "individualName": {
-            "first": "KENNETH",
-            "last": "BONDEROFF",
-            "middle": "PHILIP"
-          },
-          "type": "JT"
-        },
-        {
-          "address": {
-            "city": "ROBSON, BC",
-            "country": "CA",
-            "postalCode": "VOG 1XO",
-            "region": "BC",
-            "street": "BOX 280"
-          },
-          "individualName": {
-            "first": "PHILIP",
-            "last": "BONDEROFF"
-          },
-          "type": "JT"
-        },
-        {
-          "address": {
-            "city": "SALMO, BC",
-            "country": "CA",
-            "postalCode": "VOG 1ZO",
-            "region": "BC",
-            "street": "BOX 543"
-          },
-          "individualName": {
-            "first": "KENNETH",
-            "last": "BONDEROFF",
-            "middle": "PHILIP"
-          },
-          "type": "JT"
-        },
-        {
-          "address": {
-            "city": "CASTLEGAR, B.C.",
-            "country": "CA",
-            "postalCode": "V1N 1E9",
-            "region": "BC",
-            "street": "740 WOODLAND DRIVE"
-          },
-          "individualName": {
-            "first": "GEORGE",
-            "last": "KOLESNIKOFF"
-          },
-          "type": "JT"
-        },
-        {
-          "address": {
-            "city": "CASTLEGAR, B.C.",
-            "country": "CA",
-            "postalCode": "V1N 1E9",
-            "region": "BC",
-            "street": "740 WOODLAND DRIVE"
-          },
-          "individualName": {
-            "first": "FIONNA",
-            "last": "KOLESNIKOFF"
-          },
-          "type": "JT"
-        }
-      ],
+      ], 
       "pprRegistrations": [
         {
           "financingStatement": {
-            "baseRegistrationNumber": "TEST0012",
-            "clientReferenceId": "TEST-SA-0012",
-            "createDateTime": "2022-05-11T02:42:53+00:00",
+            "baseRegistrationNumber": "872922B", 
+            "changes": [
+              {
+                "baseRegistrationNumber": "872922B", 
+                "createDateTime": "2017-05-30T18:19:56+00:00", 
+                "expiryDate": "2033-08-12T06:59:59+00:00", 
+                "lifeYears": 10, 
+                "registeringParty": {
+                  "address": {
+                    "city": "EDMONTON", 
+                    "country": "CA", 
+                    "postalCode": "T5V1P2", 
+                    "region": "AB", 
+                    "street": "12040 - 149 STREET N.W."
+                  }, 
+                  "businessName": "FARM CREDIT CANADA", 
+                  "code": "9800018"
+                }, 
+                "renewalRegistrationNumber": "037088K", 
+                "statementType": "RENEWAL_STATEMENT"
+              }, 
+              {
+                "amendmentRegistrationNumber": "861245I", 
+                "baseRegistrationNumber": "872922B", 
+                "changeType": "AM", 
+                "createDateTime": "2015-09-24T22:37:52+00:00", 
+                "description": "SUBORDINATION AGREEMENT IN FAVOUR OF THE TORONTO-DOMINION BANK, SECURITY AGREEMENT REGISTERED SEPTEMBER 21, 2015 AS BASE REGISTRATION NO. 851627I.", 
+                "registeringParty": {
+                  "address": {
+                    "city": "ABBOTSFORD", 
+                    "country": "CA", 
+                    "postalCode": "V2S2C1", 
+                    "region": "BC", 
+                    "street": "301 33695 SOUTH FRASER WAY"
+                  }, 
+                  "businessName": "RDM LAWYERS LLP", 
+                  "code": "10210008"
+                }, 
+                "statementType": "AMENDMENT_STATEMENT"
+              }, 
+              {
+                "baseRegistrationNumber": "872922B", 
+                "createDateTime": "2015-02-11T18:42:34+00:00", 
+                "expiryDate": "2023-08-12T06:59:59+00:00", 
+                "lifeYears": 6, 
+                "registeringParty": {
+                  "address": {
+                    "city": "EDMONTON", 
+                    "country": "CA", 
+                    "postalCode": "T5V1P2", 
+                    "region": "AB", 
+                    "street": "12040 - 149 STREET N.W."
+                  }, 
+                  "businessName": "FARM CREDIT CANADA", 
+                  "code": "9800018"
+                }, 
+                "renewalRegistrationNumber": "434730I", 
+                "statementType": "RENEWAL_STATEMENT"
+              }, 
+              {
+                "amendmentRegistrationNumber": "115885I", 
+                "baseRegistrationNumber": "872922B", 
+                "changeType": "AM", 
+                "createDateTime": "2014-08-08T20:27:02+00:00", 
+                "description": "PRIORITY AGREEMENT IN FAVOUR OF ENVISION FINANCIAL A DIVISION OF FIRST WEST CREDIT UNION OVER THAT COLLATERAL DECRIBED IN INTER-LENDER PRIORITY AGREEMENT DATED FORREFERENCE JUNE 17, 2014.  ", 
+                "registeringParty": {
+                  "address": {
+                    "city": "CHILLIWACK", 
+                    "country": "CA", 
+                    "postalCode": "V2R5S3", 
+                    "region": "BC", 
+                    "street": "#201 - 45793 LUCKAKUCK WAY"
+                  }, 
+                  "businessName": "WATERSTONE LAW GROUP LLP", 
+                  "code": "53240014"
+                }, 
+                "statementType": "AMENDMENT_STATEMENT"
+              }, 
+              {
+                "baseRegistrationNumber": "872922B", 
+                "createDateTime": "2010-06-29T20:05:19+00:00", 
+                "expiryDate": "2017-08-12T06:59:59+00:00", 
+                "lifeYears": 7, 
+                "registeringParty": {
+                  "address": {
+                    "city": "EDMONTON", 
+                    "country": "CA", 
+                    "postalCode": "T5V1P2", 
+                    "region": "AB", 
+                    "street": "12040 - 149 STREET N.W."
+                  }, 
+                  "businessName": "FARM CREDIT CANADA", 
+                  "code": "9800018"
+                }, 
+                "renewalRegistrationNumber": "637244F", 
+                "statementType": "RENEWAL_STATEMENT"
+              }, 
+              {
+                "addGeneralCollateral": [
+                  {
+                    "addedDateTime": "2004-11-23T17:54:04+00:00", 
+                    "collateralId": 48249, 
+                    "description": "INCLUDING WITHOUT LIMITATION, THE ABOVE-NOTED MANUFACTURED HOME       TOGETHER WITH ALL PARTS, ACCESSORIES AND EQUIPMENT, NOW OR HEREAFTER  ATTACHED TO OR FORMING A PART OF THE GOODS AND CHATTELS DESCRIBED     HEREIN AND ALL PROCEEDS THEREFROM, INCLUDING TRADE-INS, GOODS,        INTANGIBLES, SECURITIES, MONEY, CHATTEL PAPER, DOCUMENTS OF TITLE,    (ALL AS DEFINED IN THE PERSONAL PROPERTY SECURITY ACT, ANY            REGULATIONS THEREUNDER AND ANY AMENDMENTS THERETO) CONTRACT RIGHTS,,RENTAL PAYMENTS, INURANCE PAYMENTS AND OTHER PROPERTY OR OBLIGATIONS  RECEIVED WHEN THE SAID GOODS AND CHATTELS ARE SOLD, DEALT WITH OR     OTHERWISE DISPOSED OF."
+                  }
+                ], 
+                "addVehicleCollateral": [
+                  {
+                    "make": "MODULINE", 
+                    "manufacturedHomeRegistrationNumber": "015122", 
+                    "model": "PREMIER", 
+                    "reg_id": 71954, 
+                    "type": "MH", 
+                    "vehicleId": 12740, 
+                    "year": 1973
+                  }
+                ], 
+                "baseRegistrationNumber": "872922B", 
+                "changeRegistrationNumber": "053924C", 
+                "changeType": "AC", 
+                "createDateTime": "2004-11-23T17:54:04+00:00", 
+                "registeringParty": {
+                  "address": {
+                    "city": "VICTORIA", 
+                    "country": "CA", 
+                    "postalCode": "V8W1E1", 
+                    "region": "BC", 
+                    "street": "734 BROUGHTON, MAIN FLOOR"
+                  }, 
+                  "businessName": "DYE & DURHAM COMPANY INC.", 
+                  "code": "6210007"
+                }, 
+                "statementType": "CHANGE_STATEMENT"
+              }
+            ], 
+            "createDateTime": "2004-08-11T23:02:33+00:00", 
             "debtors": [
               {
                 "address": {
-                  "city": "city",
-                  "country": "CA",
-                  "postalCode": "V8R3A5",
-                  "region": "BC",
-                  "street": "TEST-0012",
-                  "streetAdditional": "line 2"
-                },
-                "partyId": 200000032,
-                "personName": {
-                  "first": "TEST IND",
-                  "last": "DEBTOR",
-                  "middle": "12"
-                }
+                  "city": "ABBOTSFORD", 
+                  "country": "CA", 
+                  "postalCode": "V4X1T1", 
+                  "region": "BC", 
+                  "street": "3555 ROSS ROAD"
+                }, 
+                "businessName": "ROSS LAND MUSHROOM FARM LTD.", 
+                "partyId": 52250
               }
-            ],
-            "expiryDate": "2023-05-11T02:42:53+00:00",
-            "lifeYears": 1,
+            ], 
+            "expiryDate": "2033-08-12T06:59:59+00:00", 
+            "generalCollateral": [
+              {
+                "addedDateTime": "2004-11-23T17:54:04+00:00", 
+                "collateralId": 48249, 
+                "descriptionAdd": "INCLUDING WITHOUT LIMITATION, THE ABOVE-NOTED MANUFACTURED HOME       TOGETHER WITH ALL PARTS, ACCESSORIES AND EQUIPMENT, NOW OR HEREAFTER  ATTACHED TO OR FORMING A PART OF THE GOODS AND CHATTELS DESCRIBED     HEREIN AND ALL PROCEEDS THEREFROM, INCLUDING TRADE-INS, GOODS,        INTANGIBLES, SECURITIES, MONEY, CHATTEL PAPER, DOCUMENTS OF TITLE,    (ALL AS DEFINED IN THE PERSONAL PROPERTY SECURITY ACT, ANY            REGULATIONS THEREUNDER AND ANY AMENDMENTS THERETO) CONTRACT RIGHTS,,RENTAL PAYMENTS, INURANCE PAYMENTS AND OTHER PROPERTY OR OBLIGATIONS  RECEIVED WHEN THE SAID GOODS AND CHATTELS ARE SOLD, DEALT WITH OR     OTHERWISE DISPOSED OF."
+              }, 
+              {
+                "addedDateTime": "2004-08-11T23:02:33+00:00", 
+                "collateralId": 48248, 
+                "description": "ALL OF THE DEBTOR'S PRESENT AND AFTER ACQUIRED PERSONAL PROPERTY PLUS ANY AND ALL PROCEEDS THEREOF BUT EXCLUDING CONSUMER GOODS"
+              }
+            ], 
+            "lifeYears": 29, 
             "registeringParty": {
               "address": {
-                "city": "city",
-                "country": "CA",
-                "postalCode": "V8R3A5",
-                "region": "BC",
-                "street": "TEST-0012",
-                "streetAdditional": "line 2"
-              },
-              "personName": {
-                "first": "TEST",
-                "last": "REGISTERING",
-                "middle": "12"
-              }
-            },
-            "registrationAct": "PERSONAL PROPERTY SECURITY ACT",
-            "registrationDescription": "PPSA SECURITY AGREEMENT",
+                "city": "VICTORIA", 
+                "country": "CA", 
+                "postalCode": "V8W1E1", 
+                "region": "BC", 
+                "street": "734 BROUGHTON, MAIN FLOOR"
+              }, 
+              "businessName": "DYE & DURHAM COMPANY INC.", 
+              "code": "6210007"
+            }, 
+            "registrationAct": "PERSONAL PROPERTY SECURITY ACT", 
+            "registrationDescription": "PPSA SECURITY AGREEMENT", 
             "securedParties": [
               {
                 "address": {
-                  "city": "city",
-                  "country": "CA",
-                  "postalCode": "V8R3A5",
-                  "region": "BC",
-                  "street": "TEST-0012",
-                  "streetAdditional": "line 2"
-                },
-                "businessName": "TEST 12 SECURED PARTY",
-                "partyId": 200000033
+                  "city": "EDMONTON", 
+                  "country": "CA", 
+                  "postalCode": "T5J3P3", 
+                  "region": "AB", 
+                  "street": "1200, 10250-101 STREET"
+                }, 
+                "businessName": "FARM CREDIT CANADA", 
+                "partyId": 4244534
               }
-            ],
-            "statusType": "ACT",
-            "trustIndenture": true,
-            "type": "SA",
+            ], 
+            "statusType": "ACT", 
+            "trustIndenture": false, 
+            "type": "SA", 
             "vehicleCollateral": [
               {
-                "make": "HOMCO IND. LTD DIPLOMAT",
-                "manufacturedHomeRegistrationNumber": "022000",
-                "serialNumber": "9999",
-                "type": "MH",
-                "vehicleId": 200000011,
-                "year": 2012
-              },
-              {
-                "make": "CESSNA",
-                "model": "172R SKYHAWK",
-                "serialNumber": "CFYX",
-                "type": "AC",
-                "vehicleId": 200000012,
-                "year": 1998
-              },
-              {
-                "make": "AIRFRAME make",
-                "model": "AIRFRAME model",
-                "serialNumber": "AF16031",
-                "type": "AF",
-                "vehicleId": 200000013,
-                "year": 1998
+                "added": true, 
+                "make": "MODULINE", 
+                "manufacturedHomeRegistrationNumber": "015122", 
+                "model": "PREMIER", 
+                "type": "MH", 
+                "vehicleId": 12740, 
+                "year": 1973
               }
             ]
-          },
+          }, 
           "matchType": "EXACT"
         }
-      ],
+      ], 
       "status": "R"
     }
-  ],
+  ], 
+  "getReportURL": "/ppr/api/v1/search-results/9038", 
   "payment": {
-    "invoiceId": "1000000",
-    "receipt": "/mockTarget/pay/api/v1/payment-requests/1000000/receipts"
-  },
-  "searchDateTime": "2022-05-12T19:31:45+00:00",
+    "invoiceId": "19285", 
+    "receipt": "/api/v1/payment-requests/19285/receipts"
+  }, 
+  "searchDateTime": "2022-05-19T20:55:14+00:00", 
   "searchQuery": {
-    "clientReferenceId": "T-SQ-MH-1",
-    "criteria": {"value": "022000"},
+    "clientReferenceId": "MM-UT-0003", 
+    "criteria": {
+      "value": "015122"
+    }, 
     "type": "MHR_NUMBER"
-  },
+  }, 
   "selected": [
     {
       "baseInformation": {
-        "make": "GLENDALE",
-        "model": "",
-        "year": 1968
-      },
-      "createDateTime": "1995-11-14T00:00:01+00:00",
-      "homeLocation": "FORT NELSON",
-      "includeLienInfo": true,
-      "mhrNumber": "022000",
-      "ownerName": {
-        "first": "PRITNAM",
-        "last": "SANDHU"
-      },
-      "serialNumber": "2427",
-      "status": "EXEMPT"
+        "make": "PREMIER", 
+        "model": "", 
+        "year": 1973
+      }, 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "homeLocation": "ABBOTSFORD", 
+      "includeLienInfo": true, 
+      "mhrNumber": "015122", 
+      "organizationName": "ROSS LAND MUSHROOM FARM LTD.", 
+      "serialNumber": "2452", 
+      "status": "ACTIVE"
     }
-  ],
+  ], 
   "totalResultsSize": 1
 }

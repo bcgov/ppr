@@ -186,13 +186,31 @@ class Db2Location(db.Model):
         location = {
             'parkName': self.park_name,
             'pad': self.park_pad,
+            'status': LEGACY_STATUS_NEW.get(self.status),
             'address': {
                 'street': self.street_number + ' ' + self.street_name,
                 'city': self.town_city,
                 'region': self.province,
                 'country': 'CA',
                 'postalCode': ''
-            }
+            },
+            'pidNumber': self.pid_number,
+            'lot': self.lot,
+            'parcel': self.parcel,
+            'block': self.block,
+            'districtLot': self.district_lot,
+            'partOf': self.part_of,
+            'section': self.section,
+            'township': self.township,
+            'range': self.range,
+            'meridian': self.meridian,
+            'landDistrict': self.land_district,
+            'plan': self.plan,
+            'taxCertificate': False,
+            'leaveProvince': False,
+            'exceptionPlan': self.except_plan,
+            'dealerName': self.dealer_name,
+            'additionalDescription': self.additional_description
         }
         return location
 

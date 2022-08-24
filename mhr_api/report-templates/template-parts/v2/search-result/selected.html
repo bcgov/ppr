@@ -1,0 +1,187 @@
+<div class="container pt-4">
+    {% if searchQuery.type == 'OWNER_NAME' %}
+    <table class="selected-mhr-table mt-4" role="presentation">
+        <tr class="solid-row-separator selected-mhr-table-header no-page-break">
+            <td class="bottom-align"></td>
+            <td class="bottom-align">MHR Number</td>
+            <td class="bottom-align">Owner Name</td>
+            <td class="bottom-align">Status</td>
+            <td class="bottom-align">Year</td>
+            <td class="bottom-align">Make/Model</td>
+            <td class="bottom-align">Location</td>
+            <td class="bottom-align">Page</td>
+        </tr>
+        {% for result in selected %}
+            <tr class="no-page-break">
+                <td class="top-align">
+                    {% if result.index is defined %}
+                        {{result.index}}.
+                    {% endif %}
+                </td>
+                <td class="top-align">
+                    <a href="#{{result.mhrNumber}}">{{result.mhrNumber}}</a>
+                </td>
+                <td class="top-align">
+                    {{result.ownerName.last}}, {{result.ownerName.first}}
+                    {% if result.ownerName.middle %} {{result.ownerName.middle}}{% endif %}
+                </td>    
+                <td class="top-align">
+                    {{result.status}}
+                </td>
+                <td class="top-align">{{result.baseInformation.year}}</td>
+                <td class="top-align">{{result.baseInformation.make}} 
+                    {% if result.baseInformation.model is defined and result.baseInformation.model != '' %} 
+                        / {{result.baseInformation.model}}
+                    {% endif %}
+                </td>
+                <td class="top-align">{{result.homeLocation}}</td>
+                <td class="top-align right-align">
+                    <a href="#{{result.mhrNumber}}">{{result.pageNumber}}</a>
+                </td>
+                </tr>
+                <tr class="solid-row-separator no-page-break">
+                    <td colspan="8" style="height:1px"/>
+                </tr>
+        {% endfor %}
+    </table>  
+    {% elif searchQuery.type == 'MHR_NUMBER' %}
+    <table class="selected-mhr-table mt-4" role="presentation">
+        <tr class="solid-row-separator selected-mhr-table-header no-page-break">
+            <td class="bottom-align"></td>
+            <td class="bottom-align">MHR Number</td>
+            <td class="bottom-align">
+                {% if selected[0].organizationName is defined %}Organization{% else %}Owner{% endif %} Name
+            </td>
+            <td class="bottom-align">Status</td>
+            <td class="bottom-align">Year</td>
+            <td class="bottom-align">Make/Model</td>
+            <td class="bottom-align">Location</td>
+            <td class="bottom-align">Page</td>
+        </tr>
+        {% for result in selected %}
+            <tr class="no-page-break">
+                <td class="top-align">
+                    {% if result.index is defined %}
+                        {{result.index}}.
+                    {% endif %}
+                </td>
+                <td class="top-align">
+                    <a href="#{{result.mhrNumber}}">{{result.mhrNumber}}</a>
+                </td>
+                <td class="top-align">
+                    {% if result.organizationName is defined %}
+                        {{result.organizationName}}
+                    {% else %}
+                        {{result.ownerName.last}}, {{result.ownerName.first}}
+                        {% if result.ownerName.middle %} {{result.ownerName.middle}}{% endif %}
+                    {% endif %}
+                </td>
+                <td class="top-align">
+                    {{result.status}}
+                </td>
+                <td class="top-align">{{result.baseInformation.year}}</td>
+                <td class="top-align">{{result.baseInformation.make}} 
+                    {% if result.baseInformation.model is defined and result.baseInformation.model != '' %} 
+                        / {{result.baseInformation.model}}
+                    {% endif %}
+                </td>
+                <td class="top-align">{{result.homeLocation}}</td>
+                <td class="top-align right-align">
+                    <a href="#{{result.mhrNumber}}">{{result.pageNumber}}</a>
+                </td>
+                </tr>
+                <tr class="solid-row-separator no-page-break">
+                    <td colspan="8" style="height:1px"/>
+                </tr>
+        {% endfor %}
+    </table>  
+    {% elif searchQuery.type == 'SERIAL_NUMBER' %}
+    <table class="selected-mhr-table mt-4" role="presentation">
+        <tr class="solid-row-separator selected-mhr-table-header no-page-break">
+            <td></td>
+            <td class="bottom-align">MHR Number</td>
+            <td class="bottom-align">Serial Number</td>
+            <td class="bottom-align">Status</td>
+            <td class="bottom-align">Year</td>
+            <td class="bottom-align">Make/Model</td>
+            <td class="bottom-align">Location</td>
+            <td class="bottom-align">Page</td>
+        </tr>
+        {% for result in selected %}
+            <tr class="no-page-break">
+                <td class="top-align">
+                    {% if result.index is defined %}
+                        {{result.index}}.
+                    {% endif %}
+                </td>
+                <td class="top-align">
+                    <a href="#{{result.mhrNumber}}">{{result.mhrNumber}}</a>
+                </td>
+                <td class="top-align">
+                    {{result.serialNumber}}
+                </td>    
+                <td class="top-align">
+                    {{result.status}}
+                </td>
+                <td class="top-align">{{result.baseInformation.year}}</td>
+                <td class="top-align">{{result.baseInformation.make}} 
+                    {% if result.baseInformation.model is defined and result.baseInformation.model != '' %} 
+                        / {{result.baseInformation.model}}
+                    {% endif %}
+                </td>
+                <td class="top-align">{{result.homeLocation}}</td>
+                <td class="top-align right-align">
+                    <a href="#{{result.mhrNumber}}">{{result.pageNumber}}</a>
+                </td>
+                </tr>
+                <tr class="solid-row-separator no-page-break">
+                    <td colspan="8" style="height:1px"/>
+                </tr>
+        {% endfor %}
+    </table>  
+    {% else %}
+    <table class="selected-mhr-table mt-4" role="presentation">
+        <tr class="solid-row-separator selected-mhr-table-header no-page-break">
+            <td class="bottom-align"></td>
+            <td class="bottom-align">MHR Number</td>
+            <td class="bottom-align">Organization Name</td>
+            <td class="bottom-align">Status</td>
+            <td class="bottom-align">Year</td>
+            <td class="bottom-align">Make/Model</td>
+            <td class="bottom-align">Location</td>
+            <td class="bottom-align">Page</td>
+        </tr>
+        {% for result in selected %}
+            <tr class="no-page-break">
+                <td class="top-align">
+                    {% if result.index is defined %}
+                        {{result.index}}.
+                    {% endif %}
+                </td>
+                <td class="top-align">
+                    <a href="#{{result.mhrNumber}}">{{result.mhrNumber}}</a>
+                </td>
+                <td class="top-align">
+                    {{result.organizationName}}
+                </td>    
+                <td class="top-align">
+                    {{result.status}}
+                </td>
+                <td class="top-align">{{result.baseInformation.year}}</td>
+                <td class="top-align">{{result.baseInformation.make}} 
+                    {% if result.baseInformation.model is defined and result.baseInformation.model != '' %} 
+                        / {{result.baseInformation.model}}
+                    {% endif %}
+                </td>
+                <td class="top-align">{{result.homeLocation}}</td>
+                <td class="top-align right-align">
+                    <a href="#{{result.mhrNumber}}">{{result.pageNumber}}</a>
+                </td>
+                </tr>
+                <tr class="solid-row-separator no-page-break">
+                    <td colspan="8" style="height:1px"/>
+                </tr>
+        {% endfor %}
+    </table>  
+    {% endif %}
+</div>

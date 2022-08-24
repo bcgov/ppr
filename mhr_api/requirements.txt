@@ -47,6 +47,7 @@ psycopg2-binary==2.9.3
 pyRFC3339==1.1
 pyasn1==0.4.8
 pycountry==22.1.10
+PyPDF2==2.10.2
 pyrsistent==0.18.1
 python-dotenv==0.19.2
 python-jose==3.3.0
