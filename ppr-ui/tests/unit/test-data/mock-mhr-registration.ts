@@ -22,7 +22,8 @@ export const mockedAddressAlt: AddressIF = {
 
 export const mockedEmptyGroup: MhrRegistrationHomeOwnerGroupIF = {
   groupId: '100',
-  owners: []
+  owners: [],
+  type: 'SO' // TODO: for testing/demo purpose, DELETE AFTERWARDS
 }
 
 export const mockedPerson: MhrRegistrationHomeOwnersIF = {
@@ -35,8 +36,7 @@ export const mockedPerson: MhrRegistrationHomeOwnersIF = {
   suffix: 'Sr.',
   phoneNumber: '(545) 333-2211',
   phoneExtension: '1234',
-  address: mockedAddress,
-  type: 'SO' // TODO: for testing/demo purpose, DELETE AFTERWARDS
+  address: mockedAddress
 }
 
 export const mockedOrganization: MhrRegistrationHomeOwnersIF = {
@@ -45,6 +45,5 @@ export const mockedOrganization: MhrRegistrationHomeOwnersIF = {
   suffix: 'Inc.',
   phoneNumber: '(999) 888-7766',
   phoneExtension: '4321',
-  address: mockedAddressAlt,
-  type: 'SO' // TODO: for testing/demo purpose, DELETE AFTERWARDS
+  address: mockedAddressAlt
 }

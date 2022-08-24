@@ -13,5 +13,5 @@ export interface MhrRegistrationHomeOwnersIF {
   phoneNumber: string,
   phoneExtension: string,
   address: AddressIF
-  type: string
+  // type: string
 }
