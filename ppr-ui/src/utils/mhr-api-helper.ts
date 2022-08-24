@@ -169,7 +169,7 @@ export async function searchMhrPDF (searchId: string): Promise<any> {
     })
 }
 
-export async function submitMhrRegistration (data: MhrRegistrationIF) {
+export async function submitMhrRegistration (data) {
   const url = sessionStorage.getItem('MHR_API_URL')
   const config = { baseURL: url, headers: { Accept: 'application/json' } }
 

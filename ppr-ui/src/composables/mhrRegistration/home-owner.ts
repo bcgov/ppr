@@ -9,7 +9,7 @@ import { ref, computed, readonly, watch } from '@vue/composition-api'
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import { find, remove, set, findIndex } from 'lodash'
 
-const DEFAULT_GROUP_ID = 1
+const DEFAULT_GROUP_ID = '1'
 
 // Show or hide grouping of the Owners in the table
 const showGroups = ref(false)
@@ -162,7 +162,7 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
     // update owner group ids with new values
     // to make them sequential again (e.g groups 1,3,5 -> 1,2,3)
     newOwnerGroups.forEach((group, index) => {
-      group.groupId = index + 1
+      group.groupId = (index + 1).toString()
     })
 
     setMhrRegistrationHomeOwnerGroups(newOwnerGroups)
@@ -174,7 +174,7 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
     remove(homeOwnerGroups, group => group.groupId === groupId)
 
     homeOwnerGroups.forEach((group, index) => {
-      group.groupId = index + 1
+      group.groupId = (index + 1).toString()
     })
 
     setMhrRegistrationHomeOwnerGroups(homeOwnerGroups)

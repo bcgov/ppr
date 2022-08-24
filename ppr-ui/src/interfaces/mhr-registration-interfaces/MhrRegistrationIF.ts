@@ -57,7 +57,7 @@ export interface NewMhrRegistrationApiIF {
     personName?: {
       first: string
       last: string
-      middle: string
+      middle?: string
     }
     businessName?: string
     address: {
@@ -74,7 +74,6 @@ export interface NewMhrRegistrationApiIF {
   ownerGroups: MhrRegistrationHomeOwnerGroupIF[]
   // owners are only included in search detail results.
   // owners: MhrRegistrationHomeOwnersIF[]
-  attentionReferenceNum: string
   location: MhrRegistrationHomeLocationIF
   description: MhrRegistrationDescriptionIF
   notes?: [

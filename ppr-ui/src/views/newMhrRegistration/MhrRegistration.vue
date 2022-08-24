@@ -55,11 +55,11 @@ import { computed, defineComponent, onMounted, reactive, toRefs } from '@vue/com
 import { useGetters } from 'vuex-composition-helpers'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { RegistrationFlowType, RouteNames, StatementTypes } from '@/enums'
-import { RegistrationTypeIF } from '@/interfaces'
+import { RegistrationTypeIF, MhrRegistrationIF } from '@/interfaces'
 import { getFeatureFlag, submitMhrRegistration } from '@/utils'
 import { Stepper, StickyContainer } from '@/components/common'
 import ButtonFooter from '@/components/common/ButtonFooter.vue'
-import { useMhrValidations } from '@/composables'
+import { useMhrValidations, useNewMhrRegistration } from '@/composables'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { RegistrationLengthI } from '@/composables/fees/interfaces'
 /* eslint-enable no-unused-vars */
@@ -165,13 +165,15 @@ export default defineComponent({
       localState.dataLoaded = true
     })
 
+    const { buildApiData } = useNewMhrRegistration()
+
     const submit = async () => {
       console.log(getMhrRegistrationValidationModel.value)
       setValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_APP, true)
       if (localState.validateMhrRegistration) {
         console.log('everything valid!!')
         console.log(getMhrRegistration.value)
-        const result = await submitMhrRegistration({ ...getMhrRegistration.value, documentId: '80049275' })
+        const result = await submitMhrRegistration(buildApiData())
         console.log(result)
       }
     }

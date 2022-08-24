@@ -386,7 +386,7 @@ export default defineComponent({
         if (props.editHomeOwner) {
           editHomeOwner(
             localState.owner as MhrRegistrationHomeOwnersIF,
-            localState.ownerGroupId || 1
+            localState.ownerGroupId || '1'
           )
         } else {
           addOwnerToTheGroup(
@@ -400,9 +400,8 @@ export default defineComponent({
         )
         localState.ownerGroupId && setShowGroups(true)
 
-        // for testing/demo purpose, DELETE AFTERWARDS
+        // TODO: for testing/demo purpose, DELETE AFTERWARDS
         setValidation(MhrSectVal.HOME_OWNERS_VALID, MhrCompVal.OWNERS_VALID, true)
-        localState.owner.type = 'SO'
 
         cancel()
       } else {
