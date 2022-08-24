@@ -139,13 +139,12 @@
             <v-col cols="6">
               <v-text-field
                 id="phone-number"
-                v-mask="'(###) ###-####'"
+                v-mask="'(NNN) NNN-NNNN'"
                 v-model="owner.phoneNumber"
                 filled
                 :rules="phoneNumberRules"
-                label="Phone Number"
+                label="Phone Number (Optional)"
                 data-test-id="phone-number"
-                validate-on-blur
               />
             </v-col>
             <v-col cols="6">
@@ -153,7 +152,7 @@
                 id="phone-ext"
                 v-model="owner.phoneExtension"
                 filled
-                :rules="maxLength(5, true)"
+                :rules="phoneExtensionRules"
                 label="Extension (Optional)"
                 data-test-id="phone-ext"
               />
@@ -276,7 +275,7 @@ export default defineComponent({
     }
   },
   setup (props, context) {
-    const { required, customRules, maxLength, minLength } = useInputRules()
+    const { required, customRules, maxLength, minLength, isPhone, isNumber, invalidSpaces } = useInputRules()
 
     const {
       getSideTitle,
@@ -363,9 +362,9 @@ export default defineComponent({
         maxLength(70)
       ),
       phoneNumberRules: customRules(
-        required('Enter a phone number'),
-        maxLength(15)
-      )
+        isPhone(14, null)
+      ),
+      phoneExtensionRules: customRules(isNumber(), invalidSpaces(), maxLength(5))
     })
 
     const done = (): void => {

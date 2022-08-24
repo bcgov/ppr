@@ -255,6 +255,7 @@ export default defineComponent({
     )
 
     const emailRules = customRules(
+      maxLength(250),
       isEmail(),
       invalidSpaces()
     )
