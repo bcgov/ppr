@@ -681,7 +681,3 @@ export const getMhrRegistrationHomeOwnerGroups = (state: StateIF): MhrRegistrati
 export const getMhrRegistrationValidationModel = (state: StateIF): MhrValidationStateIF => {
   return state.stateModel.mhrValidationState
 }
-
-export const getMhrRegistration = (state: StateIF): MhrRegistrationIF => {
-  return state.stateModel.mhrRegistration
-}

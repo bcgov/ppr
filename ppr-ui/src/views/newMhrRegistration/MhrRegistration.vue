@@ -86,14 +86,12 @@ export default defineComponent({
       getRegistrationFlowType,
       getRegistrationType,
       getSteps,
-      getMhrRegistrationValidationModel,
-      getMhrRegistration
+      getMhrRegistrationValidationModel
     } = useGetters<any>([
       'getRegistrationFlowType',
       'getRegistrationType',
       'getSteps',
-      'getMhrRegistrationValidationModel',
-      'getMhrRegistration'
+      'getMhrRegistrationValidationModel'
     ])
 
     const {
