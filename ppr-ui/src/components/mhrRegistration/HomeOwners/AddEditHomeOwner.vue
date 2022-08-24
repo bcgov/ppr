@@ -316,8 +316,7 @@ export default defineComponent({
         postalCode: props.editHomeOwner?.address.postalCode || '',
         deliveryInstructions:
           props.editHomeOwner?.address.deliveryInstructions || ''
-      },
-      type: props.editHomeOwner?.type || null
+      }
     }
 
     if (props.isHomeOwnerPerson) {
