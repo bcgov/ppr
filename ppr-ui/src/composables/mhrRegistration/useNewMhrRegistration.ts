@@ -67,14 +67,11 @@ export const useNewMhrRegistration = () => {
       Object.values(cleanEmpty(getMhrRegistrationHomeOwnerGroups.value))
     ownerGroups.forEach(ownerGroup => {
       ownerGroup.owners = Object.values(ownerGroup.owners)
-      // @ts-ignore - TODO: api asks for number, maybe fix this in future ticket
+
+      // @ts-ignore - TODO: api asks for number, maybe fix this in future ticket?
       ownerGroup.groupId = parseInt(ownerGroup.groupId)
-      /* TODO: for testing only, DELETE AFTERWARDS */
-      ownerGroup.type = 'SO'
-      // ownerGroup.owners.forEach(owner => {
-      //   owner.type = 'SO'
-      // })
-      /* for testing only, DELETE AFTERWARDS */
+
+      ownerGroup.type = 'SO'// TODO: for testing only, DELETE AFTERWARDS
     })
 
     return ownerGroups
