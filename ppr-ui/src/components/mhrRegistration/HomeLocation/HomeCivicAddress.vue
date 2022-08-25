@@ -8,14 +8,16 @@
         <v-form ref="addressForm" name="address-form" v-model="isValidCivicAddress">
           <div class="form__row">
             <v-text-field
-              id="street"
+              autocomplete="new-password"
+              :id="streetId"
               class="street-address"
               filled
               label="Street Address"
               :name="Math.random()"
               persistent-hint
-              v-model="address.street"
-              :rules="[...addressSchema.street]"
+              v-model="addressLocal.street"
+              @keypress.once="enableAddressComplete()"
+              @click="enableAddressComplete()"
             />
           </div>
           <div class="form__row">
@@ -27,7 +29,7 @@
               label="Additional Street Address (Optional)"
               :name="Math.random()"
               rows="1"
-              v-model="address.streetAdditional"
+              v-model="addressLocal.streetAdditional"
             />
           </div>
           <div class="form__row two-column">
@@ -39,7 +41,7 @@
                   class="item address-city"
                   label="City"
                   :name="Math.random()"
-                  v-model="address.city"
+                  v-model="addressLocal.city"
                   :rules="[...addressSchema.city]"
                 />
               </v-col>
@@ -53,7 +55,7 @@
                   hint="Address must be in B.C."
                   persistent-hint
                   :name="Math.random()"
-                  v-model="address.region"
+                  v-model="addressLocal.region"
                   :rules="[...addressSchema.region]"
                 />
               </v-col>
@@ -71,11 +73,30 @@ import { defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
 import { CivicAddressSchema } from '@/schemas/civic-address'
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import { useMhrValidations } from '@/composables'
+import {
+  useAddress,
+  useAddressComplete,
+  useCountriesProvinces,
+  useBaseValidations
+} from '@/composables/address/factories'
+import { AddressIF } from '@/interfaces'
 /* eslint-enable no-unused-vars */
 export default defineComponent({
   name: 'HomeCivicAddress',
   components: {},
   props: {
+    value: {
+      type: Object as () => AddressIF,
+      default: () => ({
+        street: '',
+        streetAdditional: '',
+        city: '',
+        region: 'British Columbia',
+        postalCode: '',
+        country: 'CA',
+        deliveryInstructions: ''
+      })
+    },
     validate: {
       type: Boolean,
       default: false
@@ -101,48 +122,65 @@ export default defineComponent({
 
     const addressSchema = CivicAddressSchema
 
-    const localState = reactive({
-      isValidCivicAddress: false,
-      address: {
-        street: '',
-        streetAdditional: '',
-        city: '',
-        region: 'British Columbia'
-      }
-    })
+    const {
+      addressLocal,
+      country,
+      schemaLocal,
+      isSchemaRequired,
+      labels
+    } = useAddress(toRefs(props).value, addressSchema)
+
+    const { addressForm, resetValidation, validate } = useBaseValidations()
+
+    const { enableAddressComplete, uniqueIds } = useAddressComplete(addressLocal)
+
+    const isValidCivicAddress = false
 
     /** Apply local model updates to store. **/
-    watch(() => localState.address.street, async () => {
+    watch(() => addressLocal.value.street, async () => {
       // Set civic address data to store
-      await setCivicAddress({ key: 'street', value: localState.address.street })
+      await setCivicAddress({ key: 'street', value: addressLocal.value.street })
     })
 
-    watch(() => localState.address.streetAdditional, async () => {
+    watch(() => addressLocal.value.streetAdditional, async () => {
       // Set civic address data to store
-      await setCivicAddress({ key: 'streetAdditional', value: localState.address.streetAdditional })
+      await setCivicAddress({ key: 'streetAdditional', value: addressLocal.value.streetAdditional })
     })
 
-    watch(() => localState.address.city, async () => {
+    watch(() => addressLocal.value.city, async () => {
       // Set civic address data to store
-      await setCivicAddress({ key: 'city', value: localState.address.city })
+      await setCivicAddress({ key: 'city', value: addressLocal.value.city })
     })
 
-    watch(() => localState.address.region, async () => {
+    watch(() => addressLocal.value.region, async () => {
       // Set civic address data to store
-      await setCivicAddress({ key: 'region', value: localState.address.region })
+      addressLocal.value.region = 'British Columbia'
+      await setCivicAddress({ key: 'region', value: 'BC' })
     })
 
-    watch(() => localState.isValidCivicAddress, async (val: boolean) => {
+    watch(() => isValidCivicAddress, async (val: boolean) => {
       setValidation(MhrSectVal.LOCATION_VALID, MhrCompVal.CIVIC_ADDRESS_VALID, val)
     })
 
     watch(() => props.validate, async () => {
       // @ts-ignore - function exists
-      context.refs.addressForm.validate()
+      resetValidation()
+      validate()
     })
 
     /** Clear/reset forms when select option changes. **/
-    return { addressSchema, ...toRefs(localState) }
+    return {
+      addressForm,
+      addressSchema,
+      addressLocal,
+      country,
+      schemaLocal,
+      isSchemaRequired,
+      enableAddressComplete,
+      ...labels,
+      ...uniqueIds,
+      isValidCivicAddress
+    }
   }
 })
 </script>
