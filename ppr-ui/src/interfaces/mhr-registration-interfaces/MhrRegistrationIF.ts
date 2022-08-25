@@ -72,8 +72,6 @@ export interface NewMhrRegistrationApiIF {
     phoneExtension?: string
   }
   ownerGroups: MhrRegistrationHomeOwnerGroupIF[]
-  // owners are only included in search detail results.
-  // owners: MhrRegistrationHomeOwnersIF[]
   location: MhrRegistrationHomeLocationIF
   description: MhrRegistrationDescriptionIF
   attentionReferenceNum?: string

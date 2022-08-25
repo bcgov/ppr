@@ -6,7 +6,7 @@ import { StaffPaymentOptions } from '@bcrs-shared-components/enums'
 import {
   ManufacturedHomeSearchResultIF,
   SearchResponseIF,
-  MhrSearchCriteriaIF, MhrRegistrationIF
+  MhrSearchCriteriaIF
 } from '@/interfaces'
 import { ErrorCategories, ErrorCodes } from '@/enums'
 import { useSearch } from '@/composables/useSearch'

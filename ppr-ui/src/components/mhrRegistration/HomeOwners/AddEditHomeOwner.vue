@@ -399,7 +399,7 @@ export default defineComponent({
         )
         localState.ownerGroupId && setShowGroups(true)
 
-        // TODO: for testing/demo purpose, DELETE AFTERWARDS
+        // TODO: Mhr-Submission - DELETE after step 3 validation is done
         setValidation(MhrSectVal.HOME_OWNERS_VALID, MhrCompVal.OWNERS_VALID, true)
 
         cancel()

@@ -23,7 +23,7 @@ export const mockedAddressAlt: AddressIF = {
 export const mockedEmptyGroup: MhrRegistrationHomeOwnerGroupIF = {
   groupId: '100',
   owners: [],
-  type: 'SO' // TODO: for testing/demo purpose, DELETE AFTERWARDS
+  type: 'SO' // TODO: Mhr-Submission - UPDATE after the correct type can be determined
 }
 
 export const mockedPerson: MhrRegistrationHomeOwnersIF = {

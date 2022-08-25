@@ -18,7 +18,8 @@ import {
   ManufacturedHomeSearchResultIF,
   MhrRegistrationDescriptionIF,
   MhrRegistrationHomeLocationIF,
-  MhrRegistrationHomeOwnersIF, MhrValidationStateIF,
+  MhrRegistrationHomeOwnersIF,
+  MhrValidationStateIF,
   RegistrationSortIF,
   RegistrationSummaryIF,
   RegistrationTypeIF,
@@ -31,7 +32,7 @@ import {
   UserProductSubscriptionIF,
   UserSettingsIF,
   VehicleCollateralIF,
-  MhrRegistrationHomeOwnerGroupIF, MhrRegistrationIF
+  MhrRegistrationHomeOwnerGroupIF
 } from '@/interfaces'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 import { HomeLocation, HomeOwners, MhrReviewConfirm, SubmittingParty, YourHome } from '@/views'

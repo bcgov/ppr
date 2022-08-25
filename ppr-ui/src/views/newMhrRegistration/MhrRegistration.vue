@@ -170,13 +170,12 @@ export default defineComponent({
     const { buildApiData } = useNewMhrRegistration()
 
     const submit = async () => {
-      // TODO: for testing/demo purpose, DELETE AFTERWARDS
+      // TODO: Mhr-Submission - DELETE after the validations are done across the steps
       setValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_APP, true)
       if (localState.validateMhrRegistration) {
         localState.submitting = true
-        const result = await submitMhrRegistration(buildApiData())
+        await submitMhrRegistration(buildApiData())
         localState.submitting = false
-        console.log(result)
       }
     }
 
