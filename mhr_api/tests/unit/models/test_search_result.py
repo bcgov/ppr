@@ -19,6 +19,7 @@ results) is working as expected.
 """
 import copy
 from http import HTTPStatus
+import json
 
 import pytest
 
@@ -101,6 +102,53 @@ SET_SELECT_SORT = [
      'baseInformation': {'year': 1968, 'make': 'GLENDALE', 'model': ''},
      'ownerName': {'first': 'PRITNAM', 'last': 'SANDHU'}}
 ]
+SELECT_1 = {
+    'mhrNumber': '022911', 'status': 'EXEMPT', 'createDateTime': '1995-11-14T00:00:01+00:00',
+    'homeLocation': 'FORT NELSON', 'serialNumber': '2427',
+    'baseInformation': {'year': 1968, 'make': 'GLENDALE', 'model': ''},
+    'organizationName': 'CRYSTAL RIVER COURT LTD.'
+}
+SELECT_2 = {
+    'mhrNumber': '002200', 'status': 'EXEMPT', 'createDateTime': '1995-11-14T00:00:01+00:00',
+    'homeLocation': 'FORT NELSON', 'serialNumber': '9427',
+    'baseInformation': {'year': 1968, 'make': 'GLENDALE', 'model': ''},
+    'organizationName': 'CRYSTAL POND DESIGN LIMITED'    
+}
+SELECT_3 = {
+    'mhrNumber': '002200', 'status': 'EXEMPT', 'createDateTime': '1995-11-14T00:00:01+00:00',
+    'homeLocation': 'FORT NELSON', 'serialNumber': '2427',
+    'baseInformation': {'year': 1968, 'make': 'GLENDALE', 'model': ''},
+    'organizationName': 'CRYSTAL RIVER COURT LTD.'}
+SELECT_4 = {
+    'mhrNumber': '001999', 'status': 'EXEMPT', 'createDateTime': '1995-11-14T00:00:01+00:00',
+    'homeLocation': 'FORT NELSON', 'serialNumber': '2427',
+    'baseInformation': {'year': 1968, 'make': 'GLENDALE', 'model': ''},
+    'organizationName': 'CRYSTAL RIVER COURT LTD.'
+}
+SELECT_1_IND = {
+    'mhrNumber': '022911', 'status': 'EXEMPT', 'createDateTime': '1995-11-14T00:00:01+00:00',
+    'homeLocation': 'FORT NELSON', 'serialNumber': '2427',
+    'baseInformation': {'year': 1968, 'make': 'GLENDALE', 'model': ''},
+    'ownerName': {'first': 'PRITNAM', 'last': 'SANDHU'}
+}
+SELECT_2_IND = {
+    'mhrNumber': '002200', 'status': 'EXEMPT', 'createDateTime': '1995-11-14T00:00:01+00:00',
+    'homeLocation': 'FORT NELSON', 'serialNumber': '9427',
+    'baseInformation': {'year': 1968, 'make': 'GLENDALE', 'model': ''},
+    'ownerName': {'first': 'JANE', 'last': 'SANDHU'}   
+}
+SELECT_3_IND = {
+    'mhrNumber': '002200', 'status': 'EXEMPT', 'createDateTime': '1995-11-14T00:00:01+00:00',
+    'homeLocation': 'FORT NELSON', 'serialNumber': '2427',
+    'baseInformation': {'year': 1968, 'make': 'GLENDALE', 'model': ''},
+    'ownerName': {'first': 'JOHN', 'last': 'SANDHU'}
+}
+SELECT_4_IND = {
+    'mhrNumber': '001999', 'status': 'EXEMPT', 'createDateTime': '1995-11-14T00:00:01+00:00',
+    'homeLocation': 'FORT NELSON', 'serialNumber': '2427',
+    'baseInformation': {'year': 1968, 'make': 'GLENDALE', 'model': ''},
+    'ownerName': {'first': 'PRITNAM', 'last': 'SANDHU'}
+}
 
 # testdata pattern is ({description}, {search data}, {select data})
 TEST_VALID_DATA = [
@@ -120,13 +168,34 @@ TEST_PPR_SEARCH_DATA = [
     ('Double match mhr number', SET_SELECT_MM_COMBO, '220000', 2)
 ]
 
-# testdata pattern is ({mhr1}, {mhr2}, {mhr3}, mhr4)
+# testdata pattern is ({mhr1}, {mhr2}, {mhr3}, {mhr4}, {search_type})
 TEST_SELECT_SORT_DATA = [
-    ('001999', '002200', '000199', '022911'),
-    ('000199', '002200', '001999', '022911'),
-    ('022911', '002200', '000199', '001999'),
-    ('000199', '001999', '002200', '022911')
+    ('001999', '002200', '000199', '022911', SearchRequest.SearchTypes.SERIAL_NUM),
+    ('000199', '002200', '001999', '022911', SearchRequest.SearchTypes.SERIAL_NUM),
+    ('022911', '002200', '000199', '001999', SearchRequest.SearchTypes.OWNER_NAME),
+    ('000199', '001999', '002200', '022911', SearchRequest.SearchTypes.OWNER_NAME)
 ]
+# testdata pattern is ({mhr1}, {mhr2}, {mhr3}, {mhr4})
+TEST_SELECT_SORT_DATA_SERIAL = [
+    (SELECT_4, SELECT_2, SELECT_3, SELECT_1),
+    (SELECT_2, SELECT_3, SELECT_4, SELECT_1),
+    (SELECT_1, SELECT_2, SELECT_3, SELECT_4),
+    (SELECT_2, SELECT_1, SELECT_3, SELECT_4)
+]
+# testdata pattern is ({mhr1}, {mhr2}, {mhr3}, {mhr4})
+TEST_SELECT_SORT_DATA_ORG = [
+    (SELECT_4, SELECT_2, SELECT_3, SELECT_1),
+    (SELECT_2, SELECT_3, SELECT_4, SELECT_1),
+    (SELECT_1, SELECT_2, SELECT_3, SELECT_4),
+    (SELECT_2, SELECT_1, SELECT_3, SELECT_4)
+]
+TEST_SELECT_SORT_DATA_IND = [
+    (SELECT_4_IND, SELECT_2_IND, SELECT_3_IND, SELECT_1_IND),
+    (SELECT_2_IND, SELECT_3_IND, SELECT_4_IND, SELECT_1_IND),
+    (SELECT_1_IND, SELECT_2_IND, SELECT_3_IND, SELECT_4_IND),
+    (SELECT_2_IND, SELECT_1_IND, SELECT_3_IND, SELECT_4_IND)
+]
+
 
 @pytest.mark.parametrize('desc,search_data,select_data', TEST_VALID_DATA)
 def test_search_valid_db2(session, desc, search_data, select_data):
@@ -201,8 +270,8 @@ def test_search_ppr_by_mhr_number(session, desc, json_data, mhr_num, match_count
                 assert statement['vehicleCollateral'] or statement['generalCollateral']
 
 
-@pytest.mark.parametrize('mhr1,mhr2,mhr3,mhr4', TEST_SELECT_SORT_DATA)
-def test_search_sort(session, client, jwt, mhr1, mhr2, mhr3, mhr4):
+@pytest.mark.parametrize('mhr1,mhr2,mhr3,mhr4,search_type', TEST_SELECT_SORT_DATA)
+def test_search_sort_mhr(session, client, jwt, mhr1, mhr2, mhr3, mhr4, search_type):
     """Assert that submitting a new search selection is sorted as expected."""
     # setup
     select_data = copy.deepcopy(SET_SELECT_SORT)
@@ -213,14 +282,100 @@ def test_search_sort(session, client, jwt, mhr1, mhr2, mhr3, mhr4):
 
     # test
     search_result: SearchResult = SearchResult()
-    search_request: SearchRequest = SearchRequest(search_response=select_data)
+    search_request: SearchRequest = SearchRequest(search_response=select_data, search_type=search_type)
     search_result.search = search_request
     search_result.set_search_selection(select_data)
     sorted_data = search_result.search_select
 
     # check
     assert len(sorted_data) == 4
-    assert sorted_data[0]['mhrNumber'] == '000199'
-    assert sorted_data[1]['mhrNumber'] == '001999'
+    assert sorted_data[0]['mhrNumber'] == '022911'
+    assert sorted_data[1]['mhrNumber'] == '002200'
+    assert sorted_data[2]['mhrNumber'] == '001999'
+    assert sorted_data[3]['mhrNumber'] == '000199'
+
+
+@pytest.mark.parametrize('mhr1,mhr2,mhr3,mhr4', TEST_SELECT_SORT_DATA_SERIAL)
+def test_search_sort_serial(session, client, jwt, mhr1, mhr2, mhr3, mhr4):
+    """Assert that submitting a new serial number search selection is sorted as expected."""
+    # setup
+    select_data = []
+    select_data.append(mhr1)
+    select_data.append(mhr2)
+    select_data.append(mhr3)
+    select_data.append(mhr4)
+
+    # test
+    search_result: SearchResult = SearchResult()
+    search_request: SearchRequest = SearchRequest(search_response=select_data,
+                                                  search_type=SearchRequest.SearchTypes.SERIAL_NUM)
+    search_result.search = search_request
+    search_result.set_search_selection(select_data)
+    sorted_data = search_result.search_select
+
+    # check
+    assert len(sorted_data) == 4
+    assert sorted_data[0]['mhrNumber'] == '022911'
+    assert sorted_data[1]['mhrNumber'] == '002200'
+    assert sorted_data[1]['serialNumber'] == '2427'
     assert sorted_data[2]['mhrNumber'] == '002200'
-    assert sorted_data[3]['mhrNumber'] == '022911'
+    assert sorted_data[2]['serialNumber'] == '9427'
+    assert sorted_data[3]['mhrNumber'] == '001999'
+
+
+@pytest.mark.parametrize('mhr1,mhr2,mhr3,mhr4', TEST_SELECT_SORT_DATA_ORG)
+def test_search_sort_org(session, client, jwt, mhr1, mhr2, mhr3, mhr4):
+    """Assert that submitting a new owner organization search selection is sorted as expected."""
+    # setup
+    select_data = []
+    select_data.append(mhr1)
+    select_data.append(mhr2)
+    select_data.append(mhr3)
+    select_data.append(mhr4)
+    #current_app.logger.info(json.dumps(select_data))
+
+    # test
+    search_result: SearchResult = SearchResult()
+    search_request: SearchRequest = SearchRequest(search_response=select_data,
+                                                  search_type=SearchRequest.SearchTypes.ORGANIZATION_NAME)
+    search_result.search = search_request
+    search_result.set_search_selection(select_data)
+    sorted_data = search_result.search_select
+
+    # check
+    assert len(sorted_data) == 4
+    assert sorted_data[0]['mhrNumber'] == '022911'
+    assert sorted_data[1]['mhrNumber'] == '002200'
+    assert sorted_data[1]['organizationName'] == 'CRYSTAL POND DESIGN LIMITED'
+    assert sorted_data[2]['mhrNumber'] == '002200'
+    assert sorted_data[2]['organizationName'] == 'CRYSTAL RIVER COURT LTD.'
+    assert sorted_data[3]['mhrNumber'] == '001999'
+
+
+@pytest.mark.parametrize('mhr1,mhr2,mhr3,mhr4', TEST_SELECT_SORT_DATA_IND)
+def test_search_sort_ind(session, client, jwt, mhr1, mhr2, mhr3, mhr4):
+    """Assert that submitting a new owner individual search selection is sorted as expected."""
+    # setup
+    select_data = []
+    select_data.append(mhr1)
+    select_data.append(mhr2)
+    select_data.append(mhr3)
+    select_data.append(mhr4)
+    #current_app.logger.info(json.dumps(select_data))
+
+    # test
+    search_result: SearchResult = SearchResult()
+    search_request: SearchRequest = SearchRequest(search_response=select_data,
+                                                  search_type=SearchRequest.SearchTypes.OWNER_NAME)
+    search_result.search = search_request
+    search_result.set_search_selection(select_data)
+    sorted_data = search_result.search_select
+
+    # check
+    assert len(sorted_data) == 4
+    assert sorted_data[0]['mhrNumber'] == '022911'
+    assert sorted_data[1]['mhrNumber'] == '002200'
+    assert sorted_data[1]['ownerName']['first'] == 'JANE'
+    assert sorted_data[2]['mhrNumber'] == '002200'
+    assert sorted_data[2]['ownerName']['first'] == 'JOHN'
+    assert sorted_data[3]['mhrNumber'] == '001999'

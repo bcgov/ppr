@@ -116,7 +116,7 @@ MI_NONE_JSON = {
 SERIAL_NUMBER_JSON = {
     'type': 'SERIAL_NUMBER',
     'criteria': {
-        'value': 'XF1048'
+        'value': '123ABC'  # XF1048
     },
     'clientReferenceId': 'T-SQ-MS-1'
 }

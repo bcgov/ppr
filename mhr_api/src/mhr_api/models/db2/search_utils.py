@@ -82,7 +82,7 @@ SELECT DISTINCT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate,
    AND de.status = 'A'
    AND mh.manhomid = c.manhomid
    AND HEX(c.serialno) = :query_value
-ORDER BY d.regidate ASC
+ORDER BY de.sernumb1 ASC, mh.mhstatus ASC, mh.mhregnum DESC
 """
 
 OWNER_NAME_QUERY = """
@@ -101,7 +101,7 @@ SELECT DISTINCT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate, o.ownrtype, o
    AND o.manhomid = og.manhomid
    AND o.owngrpid = og.owngrpid
    AND og.status IN ('3', '4', '5')
-ORDER BY o.ownrname ASC, d.regidate ASC
+ORDER BY o.ownrname ASC, og.status ASC, mh.mhstatus ASC, mh.mhregnum DESC
 """
 
 ORG_NAME_QUERY = """
@@ -120,7 +120,7 @@ SELECT DISTINCT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate, o.ownrtype, o
    AND o.manhomid = og.manhomid
    AND o.owngrpid = og.owngrpid
    AND og.status IN ('3', '4', '5')
-ORDER BY o.ownrname ASC, d.regidate ASC
+ORDER BY o.ownrname ASC, og.status ASC, mh.mhstatus ASC, mh.mhregnum DESC
 """
 
 

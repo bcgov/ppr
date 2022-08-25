@@ -27,6 +27,7 @@ from mhr_api.exceptions import BusinessException, DatabaseException
 from mhr_api.models import utils as model_utils
 from mhr_api.models import search_utils
 from mhr_api.models.db2 import search_utils as db2_search_utils
+from mhr_api.models.type_tables import MhrRegistrationStatusTypes
 
 from .db import db
 
@@ -40,6 +41,12 @@ LEGACY_TO_OWNER_STATUS = {
     '4': 'EXEMPT',
     '5': 'PREVIOUS'
 }
+LEGACY_TO_REGISTRATION_STATUS = {
+    'R': 'ACTIVE',
+    'E': 'EXEMPT',
+    'C': 'HISTORICAL'
+}
+LEGACY_REGISTRATION_ACTIVE = 'R'
 
 
 class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
@@ -127,14 +134,11 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
     @classmethod
     def __build_search_result(cls, row):
         """Build a single search summary json from a DB row."""
-        status = 'ACTIVE'
         mh_status = str(row[1])
+        status = LEGACY_TO_REGISTRATION_STATUS[mh_status]
         exempt = str(row[2])
-        if mh_status != 'R':
-            if exempt and exempt != 'N':
-                status = 'EXEMPT'
-            else:
-                status = 'HISTORIC'
+        if mh_status != LEGACY_REGISTRATION_ACTIVE and exempt and exempt != 'N':
+            status = MhrRegistrationStatusTypes.EXEMPT
         # current_app.logger.info('Mapping timestamp')
         timestamp = row[3]
         # current_app.logger.info('Timestamp mapped')
@@ -166,14 +170,11 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
     @classmethod
     def __build_search_result_mhr(cls, row):
         """Build a single search summary json from a DB row for an mhr number search."""
-        status = 'ACTIVE'
         mh_status = str(row[1])
+        status = LEGACY_TO_REGISTRATION_STATUS[mh_status]
         exempt = str(row[2])
-        if mh_status != 'R':
-            if exempt and exempt != 'N':
-                status = 'EXEMPT'
-            else:
-                status = 'HISTORIC'
+        if mh_status != LEGACY_REGISTRATION_ACTIVE and exempt and exempt != 'N':
+            status = MhrRegistrationStatusTypes.EXEMPT
         # current_app.logger.info('Mapping timestamp')
         timestamp = row[3]
         # current_app.logger.info('Timestamp mapped')
@@ -207,14 +208,11 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
     @classmethod
     def __build_search_result_serial(cls, row):
         """Build a single search summary json from a DB row for a serial number search."""
-        status = 'ACTIVE'
         mh_status = str(row[1])
+        status = LEGACY_TO_REGISTRATION_STATUS[mh_status]
         exempt = str(row[2])
-        if mh_status != 'R':
-            if exempt and exempt != 'N':
-                status = 'EXEMPT'
-            else:
-                status = 'HISTORIC'
+        if mh_status != LEGACY_REGISTRATION_ACTIVE and exempt and exempt != 'N':
+            status = MhrRegistrationStatusTypes.EXEMPT
         # current_app.logger.info('Mapping timestamp')
         timestamp = row[3]
         # current_app.logger.info('Timestamp mapped')
