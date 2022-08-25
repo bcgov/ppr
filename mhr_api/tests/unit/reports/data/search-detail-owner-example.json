@@ -100,7 +100,7 @@
           "type": "JOINT"
         }
       ], 
-      "status": "R"
+      "status": "ACTIVE"
     }, 
     {
       "attentionReference": "", 
@@ -221,7 +221,7 @@
           "type": "JOINT"
         }
       ], 
-      "status": "R"
+      "status": "ACTIVE"
     }, 
     {
       "attentionReference": "", 
@@ -325,7 +325,7 @@
           "type": "JOINT"
         }
       ], 
-      "status": "R"
+      "status": "ACTIVE"
     }, 
     {
       "attentionReference": "", 
@@ -413,7 +413,7 @@
           "type": "SOLE"
         }
       ], 
-      "status": "R"
+      "status": "ACTIVE"
     }, 
     {
       "attentionReference": "", 
@@ -517,7 +517,7 @@
           "type": "JOINT"
         }
       ], 
-      "status": "R"
+      "status": "ACTIVE"
     }, 
     {
       "attentionReference": "", 
@@ -639,7 +639,7 @@
           "type": "JOINT"
         }
       ], 
-      "status": "R"
+      "status": "ACTIVE"
     }, 
     {
       "attentionReference": "", 
@@ -727,7 +727,7 @@
           "type": "SOLE"
         }
       ], 
-      "status": "R"
+      "status": "ACTIVE"
     }, 
     {
       "attentionReference": "", 
@@ -816,7 +816,7 @@
           "type": "SOLE"
         }
       ], 
-      "status": "R"
+      "status": "ACTIVE"
     }, 
     {
       "attentionReference": "", 
@@ -920,7 +920,7 @@
           "type": "JOINT"
         }
       ], 
-      "status": "E"
+      "status": "EXEMPT"
     }, 
     {
       "attentionReference": "", 
@@ -1021,7 +1021,7 @@
           "type": "SOLE"
         }
       ], 
-      "status": "E"
+      "status": "EXEMPT"
     }, 
     {
       "attentionReference": "", 
@@ -1105,7 +1105,7 @@
           "type": "SOLE"
         }
       ], 
-      "status": "R"
+      "status": "ACTIVE"
     }, 
     {
       "attentionReference": "", 
@@ -1207,7 +1207,7 @@
           "type": "JOINT"
         }
       ], 
-      "status": "R"
+      "status": "ACTIVE"
     }, 
     {
       "attentionReference": "", 
@@ -1311,7 +1311,7 @@
           "type": "JOINT"
         }
       ], 
-      "status": "E"
+      "status": "EXEMPT"
     }, 
     {
       "attentionReference": "", 
@@ -1413,7 +1413,7 @@
           "type": "JOINT"
         }
       ], 
-      "status": "R"
+      "status": "ACTIVE"
     }, 
     {
       "attentionReference": "", 
@@ -1515,7 +1515,7 @@
           "type": "JOINT"
         }
       ], 
-      "status": "R"
+      "status": "ACTIVE"
     }, 
     {
       "attentionReference": "", 
@@ -1602,7 +1602,7 @@
           "type": "SOLE"
         }
       ], 
-      "status": "R"
+      "status": "ACTIVE"
     }, 
     {
       "attentionReference": "", 
@@ -1690,7 +1690,7 @@
           "type": "SOLE"
         }
       ], 
-      "status": "R"
+      "status": "ACTIVE"
     }, 
     {
       "attentionReference": "", 
@@ -1794,7 +1794,7 @@
           "type": "JOINT"
         }
       ], 
-      "status": "R"
+      "status": "ACTIVE"
     }, 
     {
       "attentionReference": "", 
@@ -1914,7 +1914,7 @@
           "type": "JOINT"
         }
       ], 
-      "status": "E"
+      "status": "EXEMPT"
     }, 
     {
       "attentionReference": "", 
@@ -2016,7 +2016,7 @@
           "type": "JOINT"
         }
       ], 
-      "status": "R"
+      "status": "ACTIVE"
     }, 
     {
       "attentionReference": "", 
@@ -2120,7 +2120,7 @@
           "type": "JOINT"
         }
       ], 
-      "status": "E"
+      "status": "EXEMPT"
     }, 
     {
       "attentionReference": "", 
@@ -2257,7 +2257,7 @@
           "type": "JOINT"
         }
       ], 
-      "status": "E"
+      "status": "EXEMPT"
     }, 
     {
       "attentionReference": "", 
@@ -2345,7 +2345,7 @@
           "type": "SOLE"
         }
       ], 
-      "status": "R"
+      "status": "ACTIVE"
     }, 
     {
       "attentionReference": "", 
@@ -2497,7 +2497,7 @@
           "type": "JOINT"
         }
       ], 
-      "status": "R"
+      "status": "ACTIVE"
     }, 
     {
       "attentionReference": "", 
@@ -2603,7 +2603,7 @@
           "type": "SOLE"
         }
       ], 
-      "status": "R"
+      "status": "ACTIVE"
     }
   ], 
   "getReportURL": "/ppr/api/v1/search-results/8109", 
