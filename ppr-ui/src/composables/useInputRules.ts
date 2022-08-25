@@ -67,8 +67,8 @@ export const useInputRules = () => {
     customMsg: string = null
   ): Array<Function> => {
     return [
-      v => ((v && maxDigits) ? v.length >= maxDigits : true) || 'Minimum 10 characters',
-      v => (v ? /^\d+$/g.test(v.replace('(', '').replace(') ', '').replace('-', '')) : true) || `${customMsg || 'Must contain numbers only'}`
+      v => ((v && maxDigits) ? v.length >= maxDigits : true) || 'Minimum 10 digits',
+      v => (v ? /^\d+$/g.test(v.replace('(','').replace(') ','').replace('-','')) : true) || `${customMsg || 'Enter numbers only'}`
     ]
   }
 

@@ -112,7 +112,7 @@
                 id="submitting-party-phone"
                 class="pt-4 pr-3"
                 label="Phone Number (Optional)"
-                v-model="submittingParty.phoneNumber"
+                v-model="displayPhone"
                 :rules="phoneRules"
             />
             </v-col>
@@ -161,6 +161,7 @@ import { PartyAddressSchema } from '@/schemas'
 import { cloneDeep } from 'lodash'
 import { VueMaskDirective } from 'v-mask'
 import { mutateOriginalLengthTrust } from '@/store/mutations'
+import { fromDisplayPhone, toDisplayPhone } from '@/utils'
 
 /* eslint-enable no-unused-vars */
 
@@ -244,7 +245,8 @@ export default defineComponent({
       }),
       isSubmitterValid: computed(() => {
         return localState.submittingPartyValid && localState.addressValid
-      })
+      }),
+      displayPhone: ''
     })
 
     const firstNameRules = customRules(
@@ -261,8 +263,9 @@ export default defineComponent({
     )
 
     const phoneRules = customRules(
-      isPhone(14, null)
+      isPhone(14)
     )
+
     const middleNameRules = customRules(isStringOrNumber(), maxLength(15), invalidSpaces())
 
     const lastNameRules = customRules(
@@ -277,7 +280,10 @@ export default defineComponent({
       invalidSpaces()
     )
 
-    const phoneExtensionRules = customRules(isNumber(), invalidSpaces(), maxLength(5))
+    const phoneExtensionRules = customRules(isNumber(null, null, null, 'Enter numbers only'),
+      invalidSpaces(),
+      maxLength(5, true)
+    )
 
     const updateValidity = (valid) => {
       localState.addressValid = valid
@@ -291,7 +297,7 @@ export default defineComponent({
           ...localState.submittingParty,
           ...getMhrRegistrationSubmittingParty.value
         })
-
+        localState.displayPhone = toDisplayPhone(localState.submittingParty.phoneNumber)
         // Apply party type if data is retrieved through the look-up
         localState.submittingParty.businessName
           ? localState.submittingPartyType = SubmittingPartyTypes.BUSINESS
@@ -307,15 +313,18 @@ export default defineComponent({
     watch(() => localState.submittingParty, async () => {
       // Disable look up during local model changes
       localState.enableLookUp = false
-
       // Set submitting party data to store
       for (const [key, value] of Object.entries(localState.submittingParty)) {
         await setMhrSubmittingParty({ key, value })
       }
-
       // Enable lookup once local model is updated in store
       localState.enableLookUp = true
     }, { deep: true })
+
+    /** Handle Phone changes and write to store. **/
+    watch(() => localState.displayPhone, () => {
+      localState.submittingParty.phoneNumber = fromDisplayPhone(localState.displayPhone)
+    })
 
     /** Handle party type changes. **/
     watch(() => localState.submittingPartyType, () => {

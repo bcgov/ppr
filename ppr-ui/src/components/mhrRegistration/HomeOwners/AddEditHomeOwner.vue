@@ -140,7 +140,7 @@
               <v-text-field
                 id="phone-number"
                 v-mask="'(NNN) NNN-NNNN'"
-                v-model="owner.phoneNumber"
+                v-model="displayPhone"
                 filled
                 :rules="phoneNumberRules"
                 label="Phone Number (Optional)"
@@ -236,7 +236,7 @@ import { useHomeOwners } from '@/composables/mhrRegistration'
 import { AutoComplete } from '@/components/search'
 import { BaseAddress } from '@/composables/address'
 import { PartyAddressSchema } from '@/schemas'
-import { focusOnFirstError } from '@/utils'
+import { focusOnFirstError, fromDisplayPhone } from '@/utils'
 import { VueMaskDirective } from 'v-mask'
 
 /* eslint-disable no-unused-vars */
@@ -355,6 +355,7 @@ export default defineComponent({
       isAddressFormValid: false,
       triggerAddressErrors: false,
       isHelpPanelOpen: false,
+      displayPhone: props.editHomeOwner !== null ? props.editHomeOwner.phoneNumber : '',
       firsNameRules: customRules(required('Enter a first name'), maxLength(15)),
       lastNameRules: customRules(required('Enter a last name'), maxLength(25)),
       orgNameRules: customRules(
@@ -362,15 +363,14 @@ export default defineComponent({
         maxLength(70)
       ),
       phoneNumberRules: customRules(
-        isPhone(14, null)
+        isPhone(14)
       ),
-      phoneExtensionRules: customRules(isNumber(), invalidSpaces(), maxLength(5))
+      phoneExtensionRules: customRules(isNumber(null, null, null, 'Enter numbers only'), invalidSpaces(), maxLength(5, true))
     })
 
     const done = (): void => {
       // @ts-ignore - function exists
       context.refs.addHomeOwnerForm.validate()
-
       if (localState.isHomeOwnerFormValid) {
         if (props.editHomeOwner) {
           editHomeOwner(
@@ -415,6 +415,11 @@ export default defineComponent({
         }
       }
     )
+
+    /** Handle Phone changes and write to store. **/
+    watch(() => localState.displayPhone, () => {
+      localState.owner.phoneNumber = fromDisplayPhone(localState.displayPhone)
+    })
 
     return {
       getSideTitle,
