@@ -194,9 +194,9 @@ export default defineComponent({
       cancel,
       cancelOrProceed,
       homeFractionalOwnershipForm,
-      ...toRefs(localState),
+      ...toRefs(localState)
     }
-  },
+  }
 })
 </script>
 
