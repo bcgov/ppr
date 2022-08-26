@@ -135,9 +135,7 @@ export default defineComponent({
 
     const localState = reactive({
       currentlyEditingHomeOwnerId: -1,
-      isEditingMode: computed(
-        (): boolean => localState.currentlyEditingHomeOwnerId >= 0
-      ),
+      isEditingMode: computed((): boolean => localState.currentlyEditingHomeOwnerId >= 0),
       isAddingMode: computed((): boolean => props.isAdding)
     })
 

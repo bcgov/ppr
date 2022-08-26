@@ -12,7 +12,7 @@
           'If you wish to keep the owners of this group move the ' +
           'owners to a different group prior to deletion.',
         acceptText: 'Delete Group',
-        cancelText: 'Cancel',
+        cancelText: 'Cancel'
       }"
     />
     <div v-if="!isEditGroupMode" class="group-header-summary">
@@ -75,22 +75,10 @@
       <v-row>
         <v-col>
           <div class="form__row form__btns">
-            <v-btn
-              color="primary"
-              class="ml-auto"
-              :ripple="false"
-              large
-              @click="done()"
-            >
+            <v-btn color="primary" class="ml-auto" :ripple="false" large @click="done()">
               Done
             </v-btn>
-            <v-btn
-              :ripple="false"
-              large
-              color="primary"
-              outlined
-              @click="cancel()"
-            >
+            <v-btn :ripple="false" large color="primary" outlined @click="cancel()">
               Cancel
             </v-btn>
           </div>
