@@ -16,7 +16,7 @@ const vuetify = new Vuetify({})
 function createComponent (): Wrapper<any> {
   const localVue = createLocalVue()
   localVue.use(CompositionApi)
-  return mount(HomeCivicAddress , {
+  return mount(HomeCivicAddress, {
     localVue,
     store,
     vuetify
@@ -46,7 +46,7 @@ describe('mhr home civic address', () => {
     civicAddressSection.find('#region').exists()
   })
 
-  it("has the right validations for an address", async () => {
+  it('has the right validations for an address', async () => {
     const civicAddressSection = wrapper.findComponent(HomeCivicAddress)
     expect(civicAddressSection.exists()).toBe(true)
 
@@ -73,5 +73,4 @@ describe('mhr home civic address', () => {
     await Vue.nextTick()
     expect(civicAddressSection.findAll(ERROR_MSG).length).toBe(0)
   })
-
 })

@@ -139,13 +139,12 @@
             <v-col cols="6">
               <v-text-field
                 id="phone-number"
-                v-mask="'(###) ###-####'"
-                v-model="owner.phoneNumber"
+                v-mask="'(NNN) NNN-NNNN'"
+                v-model="displayPhone"
                 filled
                 :rules="phoneNumberRules"
-                label="Phone Number"
+                label="Phone Number (Optional)"
                 data-test-id="phone-number"
-                validate-on-blur
               />
             </v-col>
             <v-col cols="6">
@@ -153,7 +152,7 @@
                 id="phone-ext"
                 v-model="owner.phoneExtension"
                 filled
-                :rules="maxLength(5, true)"
+                :rules="phoneExtensionRules"
                 label="Extension (Optional)"
                 data-test-id="phone-ext"
               />
@@ -237,7 +236,7 @@ import { useHomeOwners } from '@/composables/mhrRegistration'
 import { AutoComplete } from '@/components/search'
 import { BaseAddress } from '@/composables/address'
 import { PartyAddressSchema } from '@/schemas'
-import { focusOnFirstError } from '@/utils'
+import { focusOnFirstError, fromDisplayPhone } from '@/utils'
 import { VueMaskDirective } from 'v-mask'
 
 /* eslint-disable no-unused-vars */
@@ -276,7 +275,7 @@ export default defineComponent({
     }
   },
   setup (props, context) {
-    const { required, customRules, maxLength, minLength } = useInputRules()
+    const { required, customRules, maxLength, minLength, isPhone, isNumber, invalidSpaces } = useInputRules()
 
     const {
       getSideTitle,
@@ -356,6 +355,7 @@ export default defineComponent({
       isAddressFormValid: false,
       triggerAddressErrors: false,
       isHelpPanelOpen: false,
+      displayPhone: props.editHomeOwner !== null ? props.editHomeOwner.phoneNumber : '',
       firsNameRules: customRules(required('Enter a first name'), maxLength(15)),
       lastNameRules: customRules(required('Enter a last name'), maxLength(25)),
       orgNameRules: customRules(
@@ -363,15 +363,14 @@ export default defineComponent({
         maxLength(70)
       ),
       phoneNumberRules: customRules(
-        required('Enter a phone number'),
-        maxLength(15)
-      )
+        isPhone(14)
+      ),
+      phoneExtensionRules: customRules(isNumber(null, null, null, 'Enter numbers only'), invalidSpaces(), maxLength(5, true))
     })
 
     const done = (): void => {
       // @ts-ignore - function exists
       context.refs.addHomeOwnerForm.validate()
-
       if (localState.isHomeOwnerFormValid) {
         if (props.editHomeOwner) {
           editHomeOwner(
@@ -416,6 +415,11 @@ export default defineComponent({
         }
       }
     )
+
+    /** Handle Phone changes and write to store. **/
+    watch(() => localState.displayPhone, () => {
+      localState.owner.phoneNumber = fromDisplayPhone(localState.displayPhone)
+    })
 
     return {
       getSideTitle,

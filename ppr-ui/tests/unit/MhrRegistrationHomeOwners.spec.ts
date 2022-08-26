@@ -22,7 +22,7 @@ Vue.use(Vuetify)
 const vuetify = new Vuetify({})
 const store = getVuexStore()
 
-function createComponent(): Wrapper<any> {
+function createComponent (): Wrapper<any> {
   const localVue = createLocalVue()
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
@@ -237,7 +237,6 @@ describe('Home Owners', () => {
   })
 
   it('should show fractional ownership', async () => {
-
     const homeOwnerGroup = [
       { groupId: '1', owners: [mockedPerson, mockedOrganization], interest: 'Undivided', interestNumerator: 123, interestTotal: 432 }
     ] as MhrRegistrationHomeOwnerGroupIF[]
