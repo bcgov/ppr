@@ -135,13 +135,13 @@ class MhrParty(db.Model):  # pylint: disable=too-many-instance-attributes
             party.business_name = json_data['businessName'].strip().upper()
             party.compressed_name = model_utils.get_compressed_key(party.business_name)
         else:
-            party.last_name = json_data['individualName']['last'].strip().upper()
-            party.first_name = json_data['individualName']['first'].strip().upper()
+            party.last_name = json_data['personName']['last'].strip().upper()
+            party.first_name = json_data['personName']['first'].strip().upper()
             name = party.last_name + ' ' + party.first_name
-            if 'middle' in json_data['individualName']:
-                party.middle_name = json_data['individualName']['middle'].strip().upper()
+            if 'middle' in json_data['personName']:
+                party.middle_name = json_data['personName']['middle'].strip().upper()
                 name += ' ' + party.middle_name
-                party.compressed_name = model_utils.get_compressed_key(name)
+            party.compressed_name = model_utils.get_compressed_key(name)
 
         if 'emailAddress' in json_data:
             party.email_id = json_data['emailAddress'].strip()

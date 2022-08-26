@@ -1,0 +1,66 @@
+<div class="no-page-break">
+    {% if description is defined %}
+        <div class="separator mt-5"></div>
+        <div class="section-title mt-3">Manufactured Home Details</div>
+        <table class="no-page-break section-data details-table mt-4" role="presentation">
+            <tr>
+                <td class="section-sub-title">Year:</td>
+                <td>{{description.baseInformation.year}}</td>
+            </tr>
+            <tr>
+                <td class="section-sub-title">Manufacturer:</td>
+                <td>{{description.manufacturer}}</td>
+            </tr>
+            <tr>
+                <td class="section-sub-title">Make/Model:</td>
+                <td>{{ description.baseInformation.make }}
+                    {% if description.baseInformation.model is defined and description.baseInformation.model != '' %} 
+                    / {{description.baseInformation.model}}
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td class="section-sub-title">CSA Number:</td>
+                <td>
+                    {% if description.csaNumber is defined and description.csaNumber != '' %}
+                        {{description.csaNumber}}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td class="section-sub-title">CSA Standard:</td>
+                <td>
+                    {% if description.csaStandard is defined and description.csaStandard != '' %}
+                        {{description.csaStandard}}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td class="section-sub-title">Engineer's Name:</td>
+                <td>
+                    {% if description.engineerName is defined and description.engineerName != '' %}
+                        {{description.engineerName}}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td class="section-sub-title">Date of Engineer Report:</td>
+                <td>
+                    {% if description.engineerDate is defined and description.engineerDate != '' %}
+                        {{description.engineerDate}}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </td>
+            </tr>
+        </table>
+   {% endif %}
+
+</div>
+ 

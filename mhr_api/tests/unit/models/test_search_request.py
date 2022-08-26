@@ -171,6 +171,11 @@ TEST_MHR_NUMBER_DATA = [
 TEST_SERIAL_NUMBER_DATA = [
     ('123ABC', 8, '089036', '123A', '123B', '123C', '123D')
 ]
+# testdata pattern is ({last_name}, {first_name}, count)
+TEST_OWNER_IND_DATA = [
+    ('Hamm', 'David', 2),
+    ('Hamm', '', 250)
+]
 
 
 def test_search_no_account(session):
@@ -306,3 +311,22 @@ def test_search_serial(session, search_value, count, mhr_num, serial1, serial2, 
             elif match_count == 4:
                 assert match['serialNumber'] == serial4
     assert match_count == 4
+
+
+@pytest.mark.parametrize('last_name,first_name,count', TEST_OWNER_IND_DATA)
+def test_search_owner_ind(session, last_name, first_name, count):
+    """Assert that a search by individual owner returns the expected result."""
+    test_data = copy.deepcopy(OWNER_NAME_JSON)
+    test_data['criteria']['ownerName']['last'] = last_name
+    test_data['criteria']['ownerName']['first'] = first_name
+    SearchRequest.validate_query(test_data)
+    last: str = str(last_name).upper()
+
+    query: SearchRequest = SearchRequest.create_from_json(test_data, 'PS12345', 'UNIT_TEST')
+    query.search()
+    assert not query.updated_selection
+    result = query.json
+    assert result['totalResultsSize'] >= count
+    assert len(result.get('results')) >= count
+    for match in result.get('results'):
+        assert str(match['ownerName'].get('last')).startswith(last)

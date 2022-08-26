@@ -21,15 +21,16 @@ from flask_cors import cross_origin
 from registry_schemas import utils as schema_utils
 
 from mhr_api.exceptions import BusinessException, DatabaseException
-from mhr_api.models import SearchRequest, SearchResult
+from mhr_api.models import SearchRequest, SearchResult, utils as model_utils
 from mhr_api.resources import utils as resource_utils
-from mhr_api.services.authz import authorized
+from mhr_api.services.authz import authorized, is_staff_account
 from mhr_api.utils.auth import jwt
 
 
 bp = Blueprint('SEARCHES1', __name__, url_prefix='/api/v1/searches')  # pylint: disable=invalid-name
 
 VAL_ERROR = 'Search request data validation errors.'  # Validation error prefix
+VAL_ERROR_FIRST_MISSING = 'Search owner individual first name is required.'
 SAVE_ERROR_MESSAGE = 'Account {0} search db save failed: {1}'
 
 
@@ -49,8 +50,13 @@ def post_searches():
             return resource_utils.unauthorized_error_response(account_id)
 
         request_json = request.get_json(silent=True)
+        request_json = staff_update(request_json, is_staff_account(account_id, jwt))
         # Validate request against the schema.
         valid_format, errors = schema_utils.validate(request_json, 'searchQuery', 'mhr')
+        extra_validation_msg = validate_search(request_json, is_staff_account(account_id, jwt))
+        if not valid_format or extra_validation_msg != '':
+            return resource_utils.validation_error_response(errors, VAL_ERROR, extra_validation_msg)
+
         if not valid_format:
             return resource_utils.validation_error_response(errors, VAL_ERROR)
         # Perform any extra data validation such as start and end dates here
@@ -115,3 +121,26 @@ def put_searches(search_id: str):
         return resource_utils.business_exception_response(exception)
     except Exception as default_exception:   # noqa: B902; return nicer default error
         return resource_utils.default_exception_response(default_exception)
+
+
+def staff_update(request_json: dict, reg_staff: bool) -> dict:
+    """Staff conditionally add owner first name to pass schema validation."""
+    if not reg_staff:
+        return request_json
+    search_type: str = model_utils.TO_DB_SEARCH_TYPE[request_json.get('type')] if request_json.get('type') else ''
+    if search_type == SearchRequest.SearchTypes.OWNER_NAME and request_json.get('criteria'):
+        name = request_json['criteria'].get('ownerName')
+        if name and not name.get('first'):
+            request_json['criteria']['ownerName']['first'] = ''
+    return request_json
+
+
+def validate_search(request_json: dict, reg_staff: bool) -> str:
+    """Perform extra search request validation."""
+    error_msg = ''
+    search_type: str = model_utils.TO_DB_SEARCH_TYPE[request_json.get('type')] if request_json.get('type') else ''
+    if search_type == SearchRequest.SearchTypes.OWNER_NAME and request_json.get('criteria'):
+        name = request_json['criteria'].get('ownerName')
+        if name and name.get('first', '') == '' and not reg_staff:
+            error_msg += VAL_ERROR_FIRST_MISSING
+    return error_msg

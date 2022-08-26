@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """API callback endpoint to generate and store MHR search reports after completting search step 2."""
-
+import json
 from http import HTTPStatus
 
 # import requests
@@ -20,14 +20,11 @@ from flask import Blueprint, current_app  # , jsonify, request
 from flask_cors import cross_origin
 
 from mhr_api.exceptions import DatabaseException
-from mhr_api.services.queue_service import GoogleQueueService
-from mhr_api.models import EventTracking
-from mhr_api.resources import utils as resource_utils
-
-
-# from mhr_api.reports import ReportTypes, get_callback_pdf
+from mhr_api.models import EventTracking, MhrRegistration, MhrRegistrationReport, utils as model_utils
+from mhr_api.resources import utils as resource_utils, registration_utils as reg_utils
+from mhr_api.reports import get_callback_pdf
 from mhr_api.services.utils.exceptions import ReportException, ReportDataException, StorageException
-# from mhr_api.services.document_storage.storage_service import GoogleStorageService
+from mhr_api.services.document_storage.storage_service import GoogleStorageService, DocumentTypes
 
 
 bp = Blueprint('REGISTRATION_REPORT1', __name__,  # pylint: disable=invalid-name
@@ -47,7 +44,7 @@ CALLBACK_MESSAGES = {
 
 @bp.route('/<string:registration_id>', methods=['POST', 'OPTIONS'])
 @cross_origin(origin='*')
-def post_registration_report_callback(registration_id: str):
+def post_registration_report_callback(registration_id: str):  # pylint: disable=too-many-return-statements
     """Resource to generate and store a registration report as a callback request."""
     try:
         current_app.logger.info(f'Registration report callback starting id={registration_id}.')
@@ -56,7 +53,7 @@ def post_registration_report_callback(registration_id: str):
         # If exceeded max retries we're done.
         event_count: int = 0
         events = EventTracking.find_by_key_id_type(registration_id,
-                                                   EventTracking.EventTrackingTypes.REGISTRATION_REPORT)
+                                                   EventTracking.EventTrackingTypes.MHR_REGISTRATION_REPORT)
         if events:
             event_count = len(events)
         if event_count > current_app.config.get('EVENT_MAX_RETRIES'):
@@ -64,22 +61,19 @@ def post_registration_report_callback(registration_id: str):
                                                registration_id,
                                                HTTPStatus.INTERNAL_SERVER_ERROR,
                                                'Max retries reached.')
-
-        return registration_callback_error(resource_utils.CallbackExceptionCodes.UNKNOWN_ID,
-                                           registration_id,
-                                           HTTPStatus.NOT_FOUND)
         # Verify the registration ID and request:
-        # registration: Registration = Registration.find_by_id(registration_id)
-        # if not registration:
-        #    return registration_callback_error(resource_utils.CallbackExceptionCodes.UNKNOWN_ID,
-        #                                       registration_id,
-        #                                       HTTPStatus.NOT_FOUND)
-        # if not registration.verification_report:
-        #    return registration_callback_error(resource_utils.CallbackExceptionCodes.SETUP_ERR,
-        #                                       registration_id,
-        #                                       HTTPStatus.BAD_REQUEST,
-        #                                       'No report data found for the registration.')
-        # return get_registration_callback_report(registration)
+        registration: MhrRegistration = MhrRegistration.find_by_id(registration_id)
+        if not registration:
+            return registration_callback_error(resource_utils.CallbackExceptionCodes.UNKNOWN_ID,
+                                               registration_id,
+                                               HTTPStatus.NOT_FOUND)
+        report_info: MhrRegistrationReport = MhrRegistrationReport.find_by_registration_id(registration_id)
+        if not report_info:
+            return registration_callback_error(resource_utils.CallbackExceptionCodes.SETUP_ERR,
+                                               registration_id,
+                                               HTTPStatus.BAD_REQUEST,
+                                               'No report data found for the registration.')
+        return get_registration_callback_report(registration, report_info)
     except DatabaseException as db_exception:
         return resource_utils.db_exception_response(db_exception, None, 'POST registration report event')
     except Exception as default_err:  # noqa: B902; return nicer default error
@@ -87,38 +81,6 @@ def post_registration_report_callback(registration_id: str):
                                            registration_id,
                                            HTTPStatus.INTERNAL_SERVER_ERROR,
                                            str(default_err))
-
-
-def enqueue_registration_report(registration_id):
-    """Add the registration verification report request to the registration queue."""
-    try:
-        # if json_data and report_type:
-        # Signal registration report request is pending: record exists but no doc_storage_url.
-        #    verification_report: VerificationReport = VerificationReport(create_ts=registration.registration_ts,
-        #                                                                 registration_id=registration.id,
-        #                                                                 report_data=json_data,
-        #                                                                 report_type=report_type)
-        #    verification_report.save()
-
-        payload = {
-            'registrationId': registration_id
-        }
-        apikey = current_app.config.get('SUBSCRIPTION_API_KEY')
-        if apikey:
-            payload['apikey'] = apikey
-        GoogleQueueService().publish_registration_report(payload)
-        current_app.logger.info(f'Enqueue registration report successful for id={registration_id}.')
-    except DatabaseException as db_err:
-        # Just log, do not return an error response.
-        msg = f'Enqueue registration report db error for id={registration_id}: ' + str(db_err)
-        current_app.logger.error(msg)
-    except Exception as err:  # noqa: B902; do not alter app processing
-        msg = f'Enqueue registration report failed for id={registration_id}: ' + str(err)
-        current_app.logger.error(msg)
-        EventTracking.create(registration_id,
-                             EventTracking.EventTrackingTypes.REGISTRATION_REPORT,
-                             int(HTTPStatus.INTERNAL_SERVER_ERROR),
-                             msg)
 
 
 def registration_callback_error(code: str, registration_id: int, status_code, message: str = None):
@@ -132,27 +94,50 @@ def registration_callback_error(code: str, registration_id: int, status_code, me
                                                               resource_utils.CallbackExceptionCodes.UNKNOWN_ID,
                                                               resource_utils.CallbackExceptionCodes.SETUP_ERR):
         # set up retry
-        enqueue_registration_report(registration_id)
+        reg_utils.enqueue_registration_report(registration_id, None, None)
     return resource_utils.error_response(status_code, error)
 
 
-def get_registration_callback_report(registration):  # pylint: disable=too-many-return-statements
+def get_registration_callback_report(registration: MhrRegistration,  # pylint: disable=too-many-return-statements
+                                     report_info: MhrRegistrationReport):
     """Attempt to generate and store a registration report. Record the status."""
-    registration_id: int = 0
     try:
-        if registration:
-            registration_id = registration.id
-        # Not yet implemented.
-        return registration_callback_error(resource_utils.CallbackExceptionCodes.REPORT_ERR,
-                                           9999999,
-                                           HTTPStatus.INTERNAL_SERVER_ERROR,
-                                           'Registration report not yet implemented.')
+        registration_id: int = registration.id
+        doc_name = report_info.doc_storage_url
+        if doc_name is not None:
+            current_app.logger.warn(f'Registration report for {registration_id} already exists: {doc_name}.')
+            return {}, HTTPStatus.OK
 
+        # Generate the report
+        current_app.logger.info(f'Generating registration report for {registration_id}.')
+        raw_data, status_code, headers = get_callback_pdf(report_info.report_data,
+                                                          registration.account_id,
+                                                          report_info.report_type,
+                                                          None,
+                                                          None)
+        if not raw_data or not status_code:
+            return registration_callback_error(resource_utils.CallbackExceptionCodes.REPORT_DATA_ERR,
+                                               registration_id,
+                                               HTTPStatus.INTERNAL_SERVER_ERROR,
+                                               'No data or status code.')
+        current_app.logger.debug('report api call status=' + str(status_code) + ' headers=' + json.dumps(headers))
+        if status_code not in (HTTPStatus.OK, HTTPStatus.CREATED):
+            message = f'Status code={status_code}. Response: ' + raw_data.get_data(as_text=True)
+            return registration_callback_error(resource_utils.CallbackExceptionCodes.REPORT_ERR,
+                                               registration_id,
+                                               HTTPStatus.INTERNAL_SERVER_ERROR,
+                                               message)
+        doc_name = model_utils.get_doc_storage_name(registration)
+        current_app.logger.info(f'Saving registration report output to doc storage: name={doc_name}.')
+        response = GoogleStorageService.save_document(doc_name, raw_data, DocumentTypes.REGISTRATION)
+        current_app.logger.info('Save document storage response: ' + json.dumps(response))
+        report_info.doc_storage_url = doc_name
+        report_info.save()
         # Track success event.
-        # EventTracking.create(registration_id,
-        #                     EventTracking.EventTrackingTypes.REGISTRATION_REPORT,
-        #                     int(HTTPStatus.OK))
-        # return response, HTTPStatus.OK
+        EventTracking.create(registration_id,
+                             EventTracking.EventTrackingTypes.REGISTRATION_REPORT,
+                             int(HTTPStatus.OK))
+        return response, HTTPStatus.OK
     except ReportException as report_err:
         return registration_callback_error(resource_utils.CallbackExceptionCodes.REPORT_ERR,
                                            registration_id,
