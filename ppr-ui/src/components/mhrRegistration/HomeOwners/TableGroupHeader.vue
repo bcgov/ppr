@@ -121,7 +121,7 @@ export default defineComponent({
       showDeleteGroupDialog: false,
       isHomeFractionalOwnershipValid: false,
       group: find(getMhrRegistrationHomeOwnerGroups.value, { groupId: props.groupId }),
-      fractionalData: {}
+      fractionalData: {} as MhrRegistrationFractionalOwnershipIF
     })
 
     const openGroupForEditing = (): void => {

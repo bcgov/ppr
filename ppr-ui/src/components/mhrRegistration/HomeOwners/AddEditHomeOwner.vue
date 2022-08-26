@@ -240,6 +240,7 @@ import { VueMaskDirective } from 'v-mask'
 
 /* eslint-disable no-unused-vars */
 import {
+  MhrRegistrationFractionalOwnershipIF,
   MhrRegistrationHomeOwnerGroupIF,
   MhrRegistrationHomeOwnersIF
 } from '@/interfaces/mhr-registration-interfaces'
@@ -250,6 +251,10 @@ import { SimpleHelpToggle } from '@/components/common'
 import HomeOwnerGroups from './HomeOwnerGroups.vue'
 import { useGetters } from 'vuex-composition-helpers'
 import { find } from 'lodash'
+
+interface FractionalOwnershipWithGroupIdIF extends MhrRegistrationFractionalOwnershipIF {
+  groupId: string
+}
 
 let DEFAULT_OWNER_ID = 1
 
@@ -336,7 +341,7 @@ export default defineComponent({
         interestTotal: group?.interestTotal || null,
         tenancySpecified: group?.tenancySpecified || null
       }
-    })
+    }) as FractionalOwnershipWithGroupIdIF[]
 
     const hasMultipleOwnersInGroup =
       find(getMhrRegistrationHomeOwnerGroups.value, { groupId: props.editHomeOwner?.groupId })?.owners.length > 1
@@ -349,7 +354,7 @@ export default defineComponent({
         interestNumerator: null,
         interestTotal: null,
         tenancySpecified: null
-      })
+      } as FractionalOwnershipWithGroupIdIF)
     }
 
     const localState = reactive({
@@ -375,7 +380,11 @@ export default defineComponent({
       phoneNumberRules: customRules(
         isPhone(14)
       ),
-      phoneExtensionRules: customRules(isNumber(null, null, null, 'Enter numbers only'), invalidSpaces(), maxLength(5, true))
+      phoneExtensionRules: customRules(
+        isNumber(null, null, null, 'Enter numbers only'),
+        invalidSpaces(),
+        maxLength(5, true)
+      )
     })
 
     const done = (): void => {
@@ -393,11 +402,14 @@ export default defineComponent({
             localState.ownerGroupId
           )
         }
-        setGroupFractionalInterest(
-          localState.ownerGroupId || '1',
-          localState.fractionalData
-        )
-        localState.ownerGroupId && setShowGroups(true)
+
+        setShowGroups(Number(localState.ownerGroupId) > 0)
+
+        // Get fractional data based on owner's group id
+        const fractionalData = find(
+          allFractionalData,
+          { groupId: localState.ownerGroupId }) as FractionalOwnershipWithGroupIdIF
+        setGroupFractionalInterest(localState.ownerGroupId || '1', fractionalData)
 
         cancel()
       } else {

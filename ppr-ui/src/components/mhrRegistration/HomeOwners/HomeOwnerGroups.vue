@@ -63,6 +63,20 @@ import { useInputRules } from '@/composables'
 import FractionalOwnership from './FractionalOwnership.vue'
 import { useGetters } from 'vuex-composition-helpers'
 import { find } from 'lodash'
+/* eslint-disable no-unused-vars */
+import { MhrRegistrationFractionalOwnershipIF } from '@/interfaces/mhr-registration-interfaces'
+/* eslint-enable no-unused-vars */
+
+// Interface for readonly and Edit button states for Owner Groups
+interface ReadonlyOwnerGroupStateIF {
+  groupId: string,
+  isReadonly: Boolean,
+  hasEditButton: Boolean
+}
+
+interface FractionalOwnershipWithGroupIdIF extends MhrRegistrationFractionalOwnershipIF {
+  groupId: string
+}
 
 export default defineComponent({
   name: 'HomeOwnerGroups',
@@ -72,7 +86,7 @@ export default defineComponent({
   },
   props: {
     groupId: { type: String },
-    fractionalData: { type: Object },
+    fractionalData: { type: Object as () => FractionalOwnershipWithGroupIdIF },
     isAddingHomeOwner: { type: Boolean } // makes additional Group available in dropdown when adding a new home owner
   },
 
@@ -101,17 +115,24 @@ export default defineComponent({
             hasEditButton: true && showGroups.value
           }
         })
-        .concat({ groupId: (homeOwnerGroups.length + 1).toString(), isReadonly: false, hasEditButton: false }),
-      groupState: computed(() => find(localState.allGroupsState, { groupId: localState.ownerGroupId })),
+        .concat({
+          groupId: (homeOwnerGroups.length + 1).toString(),
+          isReadonly: false,
+          hasEditButton: false
+        }) as ReadonlyOwnerGroupStateIF[],
+      groupState: computed(
+        () => find(localState.allGroupsState, { groupId: localState.ownerGroupId }) as ReadonlyOwnerGroupStateIF
+      ),
       showEditFractionalOwnershipBtn: true
     })
 
-    const setOwnerGroupId = (groupId: string) => {
+    const setOwnerGroupId = (groupId: string): void => {
       emit('setOwnerGroupId', groupId)
     }
 
-    const openEditFractionalOwnership = () => {
-      const groupState = find(localState.allGroupsState, { groupId: localState.ownerGroupId.toString() })
+    const openEditFractionalOwnership = (): void => {
+      const groupState = find(
+        localState.allGroupsState, { groupId: localState.ownerGroupId.toString() }) as ReadonlyOwnerGroupStateIF
       groupState.hasEditButton = false
       groupState.isReadonly = false
     }
