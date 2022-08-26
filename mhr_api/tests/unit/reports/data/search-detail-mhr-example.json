@@ -1,210 +1,242 @@
 {
   "details": [
     {
-      "clientReferenceId": "",
-      "createDateTime": "1995-11-14T00:00:01+00:00",
-      "declaredValue": 10000,
-      "declaredDateTime": "2010-11-09T10:37:02+00:00", 
-       "description": {
+      "attentionReference": "                                        ", 
+      "clientReferenceId": "                              ", 
+      "createDateTime": "2022-07-14T14:57:06+00:00", 
+      "declaredValue": 0, 
+      "description": {
         "baseInformation": {
-          "make": "MONARCH #956",
-          "model": "",
-          "year": "1976"
-        },
-        "csaNumber": "",
-        "csaStandard": "",
-        "engineerDate": "0001-01-01",
-        "engineerName": "",
-        "manufacturer": "MODULINE",
-        "sectionCount": 1,
+          "make": "3847J", 
+          "model": "", 
+          "year": "2020"
+        }, 
+        "csaNumber": "28375", 
+        "csaStandard": "", 
+        "engineerName": "", 
+        "manufacturer": "FLEETWOOD", 
+        "otherRemarks": "PORCH AND DECK BUILT ON SIDE.", 
+        "rebuiltRemarks": "", 
+        "sectionCount": 2, 
         "sections": [
           {
-            "lengthFeet": 60,
-            "lengthInches": 0,
-            "serialNumber": "3F6024",
-            "widthFeet": 12,
+            "lengthFeet": 60, 
+            "lengthInches": 0, 
+            "serialNumber": "29DJE83KL976A", 
+            "widthFeet": 16, 
+            "widthInches": 0
+          }, 
+          {
+            "lengthFeet": 60, 
+            "lengthInches": 0, 
+            "serialNumber": "29DJE83KL976B", 
+            "widthFeet": 16, 
             "widthInches": 0
           }
         ]
-      },
+      }, 
       "location": {
+        "additionalDescription": "", 
         "address": {
-          "city": "CASTLEGAR",
-          "country": "CA",
-          "postalCode": "",
-          "region": "BC",
-          "street": "969 WALDIE RD"
-        },
-        "pad": "",
-        "parkName": "",
-        "dealerName": "AMCO HOMES"
-      },
-      "mhrNumber": "022000",
-      "notes": [
-        {
-          "contactAddress": {
-            "city": "CASTLEGAR  V1N4T7",
-            "country": "CA",
-            "postalCode": "",
-            "region": "BC",
-            "street": "962 WALDIE RD"
-          },
-          "contactName": "HANS KOLMAN",
-          "createDateTime": "2012-04-30T13:46:51+00:00",
-          "documentId": "90011305",
-          "documentType": "103",
-          "expiryDate": "2012-05-30",
-          "remarks": ""
-        },
-        {
-          "contactAddress": {
-            "city": "CASTLEGAR V1N 1E9",
-            "country": "CA",
-            "postalCode": "",
-            "region": "BC",
-            "street": "740 WOODLAND DR"
-          },
-          "contactName": "GEORGE KOLESNIKOFF",
-          "createDateTime": "2006-05-08T14:56:11+00:00",
-          "documentId": "90008255",
-          "documentType": "103",
-          "expiryDate": "2006-06-07",
-          "remarks": ""
-        }
-      ],
+          "city": "VICTORIA", 
+          "country": "CA", 
+          "postalCode": "", 
+          "region": "BC", 
+          "street": "6232 RODOLPH ROAD"
+        }, 
+        "block": "", 
+        "dealerName": "", 
+        "districtLot": "", 
+        "exceptionPlan": "", 
+        "landDistrict": "", 
+        "leaveProvince": false, 
+        "lot": "", 
+        "meridian": "", 
+        "pad": "257", 
+        "parcel": "", 
+        "parkName": "HEAVENLY HOMES RETIREMENT PARK", 
+        "partOf": "", 
+        "pidNumber": "", 
+        "plan": "", 
+        "range": "  ", 
+        "section": "", 
+        "status": "ACTIVE", 
+        "taxCertificate": false, 
+        "township": "  "
+      }, 
+      "mhrNumber": "107018", 
       "ownerGroups": [
         {
-          "groupId": 4, 
-          "interest": "UNDIVIDED 25/100", 
-          "interestNumerator": 5, 
+          "groupId": 1, 
+          "interest": "1/12", 
+          "interestNumerator": 1, 
           "owners": [
             {
               "address": {
-                "city": "LANGLEY", 
+                "city": "VICTORIA", 
                 "country": "CA", 
-                "postalCode": "V3Z 3A4", 
+                "postalCode": "V8T2M3", 
                 "region": "BC", 
-                "street": "2296 - 240TH STREET"
+                "street": "940 BLANSHARD STREET"
               }, 
               "individualName": {
-                "first": "MANJINDER", 
-                "last": "JOHAL", 
-                "middle": "SINGH"
+                "first": "MARY", 
+                "last": "CONTRARY"
               }, 
-              "type": "COMMON"
+              "phoneNumber": "2505551212", 
+              "type": "JOINT"
+            }, 
+            {
+              "address": {
+                "city": "VICTORIA", 
+                "country": "CA", 
+                "postalCode": "V8T2M3", 
+                "region": "BC", 
+                "street": "940 BLANSHARD STREET"
+              }, 
+              "individualName": {
+                "first": "SAM", 
+                "last": "DRUCKER"
+              }, 
+              "phoneNumber": "2505551212", 
+              "type": "JOINT"
             }
           ], 
           "status": "ACTIVE", 
           "tenancySpecified": true, 
-          "type": "COMMON"
+          "type": "JOINT"
         }, 
         {
-          "groupId": 5, 
-          "interest": "UNDIVIDED 25/100", 
-          "interestNumerator": 5, 
+          "groupId": 2, 
+          "interest": "4/12", 
+          "interestNumerator": 4, 
           "owners": [
             {
               "address": {
-                "city": "LANGLEY", 
+                "city": "VICTORIA", 
                 "country": "CA", 
-                "postalCode": "V3Z 3A4", 
+                "postalCode": "V2T3B4", 
                 "region": "BC", 
-                "street": "2296 - 240TH STREET"
+                "street": "941 BLANSHARD STREET"
               }, 
               "individualName": {
-                "first": "PARMINDER", 
-                "last": "JOHAL", 
-                "middle": "SINGH"
+                "first": "JEREMY", 
+                "last": "JONES"
               }, 
-              "type": "COMMON"
+              "phoneNumber": "2505551313", 
+              "type": "JOINT"
+            }, 
+            {
+              "address": {
+                "city": "VICTORIA", 
+                "country": "CA", 
+                "postalCode": "V2T3B4", 
+                "region": "BC", 
+                "street": "941 BLANSHARD STREET"
+              }, 
+              "individualName": {
+                "first": "GEORGE", 
+                "last": "FLANIGAN"
+              }, 
+              "phoneNumber": "2505551313", 
+              "type": "JOINT"
             }
           ], 
           "status": "ACTIVE", 
           "tenancySpecified": true, 
-          "type": "COMMON"
+          "type": "JOINT"
         }, 
         {
-          "groupId": 6, 
-          "interest": "UNDIVIDED 15/100", 
-          "interestNumerator": 3, 
-          "owners": [
-            {
-              "address": {
-                "city": "LANGLEY", 
-                "country": "CA", 
-                "postalCode": "V3Z 3A4", 
-                "region": "BC", 
-                "street": "2296 - 240TH STREET"
-              }, 
-              "individualName": {
-                "first": "JASKARAN", 
-                "last": "JOHAL", 
-                "middle": "SINGH"
-              }, 
-              "type": "COMMON"
-            }
-          ], 
-          "status": "ACTIVE", 
-          "tenancySpecified": true, 
-          "type": "COMMON"
-        }, 
-        {
-          "groupId": 7, 
-          "interest": "UNDIVIDED 35/100", 
+          "groupId": 3, 
+          "interest": "7/12", 
           "interestNumerator": 7, 
           "owners": [
             {
               "address": {
-                "city": "LANGLEY", 
+                "city": "VICTORIA", 
                 "country": "CA", 
-                "postalCode": "V3Z 3A4", 
+                "postalCode": "V2T3F4", 
                 "region": "BC", 
-                "street": "2296 - 240TH STREET"
+                "street": "941 BLANSHARD STREET"
               }, 
               "individualName": {
-                "first": "JASNIRMAL", 
-                "last": "SIDHU", 
-                "middle": "SINGH"
+                "first": "HERBERT", 
+                "last": "LANG"
               }, 
-              "type": "COMMON"
+              "phoneNumber": "2505551414", 
+              "type": "JOINT"
+            }, 
+            {
+              "address": {
+                "city": "VICTORIA", 
+                "country": "CA", 
+                "postalCode": "V2T3F5", 
+                "region": "BC", 
+                "street": "942 BLANSHARD STREET"
+              }, 
+              "individualName": {
+                "first": "SARAH", 
+                "last": "TROTTER"
+              }, 
+              "phoneNumber": "2505551515", 
+              "type": "JOINT"
+            }, 
+            {
+              "address": {
+                "city": "VICTORIA", 
+                "country": "CA", 
+                "postalCode": "V2T3F6", 
+                "region": "BC", 
+                "street": "943 BLANSHARD STREET"
+              }, 
+              "individualName": {
+                "first": "BONNIE", 
+                "last": "BENNET"
+              }, 
+              "phoneNumber": "2505551616", 
+              "type": "JOINT"
             }
           ], 
           "status": "ACTIVE", 
           "tenancySpecified": true, 
-          "type": "COMMON"
+          "type": "JOINT"
         }
       ], 
-      "status": "R"
+      "status": "ACTIVE"
     }
-  ],
+  ], 
+  "getReportURL": "/ppr/api/v1/search-results/8115", 
   "payment": {
-    "invoiceId": "1000000",
-    "receipt": "/mockTarget/pay/api/v1/payment-requests/1000000/receipts"
-  },
-  "searchDateTime": "2022-05-12T19:31:45+00:00",
+    "invoiceId": "21784", 
+    "receipt": "/api/v1/payment-requests/21784/receipts"
+  }, 
+  "searchDateTime": "2022-08-23T22:11:49+00:00", 
   "searchQuery": {
-    "clientReferenceId": "T-SQ-MH-1",
-    "criteria": {"value": "022000"},
+    "clientReferenceId": "MM-UT-MR0009", 
+    "criteria": {
+      "value": "107018"
+    }, 
     "type": "MHR_NUMBER"
-  },
+  }, 
   "selected": [
     {
       "baseInformation": {
-        "make": "GLENDALE",
-        "model": "",
-        "year": 1968
-      },
-      "createDateTime": "1995-11-14T00:00:01+00:00",
-      "homeLocation": "FORT NELSON",
-      "includeLienInfo": true,
-      "mhrNumber": "022000",
+        "make": "3847J", 
+        "model": "", 
+        "year": 2020
+      }, 
+      "createDateTime": "2022-07-14T14:57:06+00:00", 
+      "homeLocation": "VICTORIA", 
+      "mhId": 108576, 
+      "mhrNumber": "107018", 
       "ownerName": {
-        "first": "PRITNAM",
-        "last": "SANDHU"
-      },
-      "serialNumber": "2427",
-      "status": "EXEMPT"
+        "first": "MARY", 
+        "last": "CONTRARY"
+      }, 
+      "ownerStatus": "ACTIVE", 
+      "serialNumber": "29DJE83KL976A", 
+      "status": "ACTIVE"
     }
-  ],
+  ], 
   "totalResultsSize": 1
 }

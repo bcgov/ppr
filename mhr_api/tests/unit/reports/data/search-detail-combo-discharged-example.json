@@ -268,7 +268,7 @@
           "matchType": "EXACT"
         }
       ], 
-      "status": "R"
+      "status": "ACTIVE"
     }
   ], 
   "getReportURL": "/ppr/api/v1/search-results/9050", 

@@ -20,12 +20,10 @@
       <tr>
       <td>Current Status:</td>
       <td>
-        {% if detail.status == 'C' %}
+        {% if detail.status == 'HISTORICAL' %}
           Cancelled
-        {% elif detail.status == 'D' %}
-          Deleted
-        {% elif detail.status == 'E' %}
-          Expired
+        {% elif detail.status == 'EXEMPT' %}
+          Exempted
         {% else %}
           Registered
         {% endif %}

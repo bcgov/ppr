@@ -26,6 +26,7 @@ from mhr_api.models import Db2Manuhome, FinancingStatement, utils as model_utils
 
 from .db import db
 # from .financing_statement import FinancingStatement
+from .search_request import SearchRequest
 from .search_utils import GET_HISTORY_DAYS_LIMIT
 
 
@@ -161,18 +162,77 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
                         result['includeLienInfo'] = match.get('includeLienInfo')
                     final_selection.append(result)
                     break
-        self.search_select = SearchResult.__sort_mhr_number(final_selection)
+
+        # Now sort by search type.
+        if self.search.search_type == SearchRequest.SearchTypes.OWNER_NAME:
+            self.search_select = SearchResult.__sort_owner_ind(final_selection)
+        if self.search.search_type == SearchRequest.SearchTypes.ORGANIZATION_NAME:
+            self.search_select = SearchResult.__sort_owner_org(final_selection)
+        if self.search.search_type == SearchRequest.SearchTypes.SERIAL_NUM:
+            self.search_select = SearchResult.__sort_serial_num(final_selection)
+        else:
+            self.search_select = final_selection
 
     @classmethod
-    def __sort_mhr_number(cls, update_select):
-        """Sort selected business debtor names."""
-        update_select.sort(key=SearchResult.__select_sort_mhr_num)
+    def __sort_serial_num(cls, update_select):
+        """Sort selected serial numbers."""
+        update_select.sort(key=SearchResult.__select_sort_year)
+        update_select.sort(key=SearchResult.__select_sort_serial_num)
+        update_select.sort(key=SearchResult.__select_sort_mhr_num, reverse=True)
+        return update_select
+
+    @classmethod
+    def __sort_owner_ind(cls, update_select):
+        """Sort selected individual owner names."""
+        update_select.sort(key=SearchResult.__select_sort_year)
+        update_select.sort(key=SearchResult.__select_sort_owner_middle_name)
+        update_select.sort(key=SearchResult.__select_sort_owner_first_name)
+        update_select.sort(key=SearchResult.__select_sort_owner_last_name)
+        update_select.sort(key=SearchResult.__select_sort_mhr_num, reverse=True)
+        return update_select
+
+    @classmethod
+    def __sort_owner_org(cls, update_select):
+        """Sort selected organization/business owner names."""
+        update_select.sort(key=SearchResult.__select_sort_year)
+        update_select.sort(key=SearchResult.__select_sort_owner_org_name)
+        update_select.sort(key=SearchResult.__select_sort_mhr_num, reverse=True)
         return update_select
 
     @classmethod
     def __select_sort_mhr_num(cls, item):
         """Sort the match list by MHR number."""
         return item['mhrNumber']
+
+    @classmethod
+    def __select_sort_owner_middle_name(cls, item):
+        """Sort the match list by individual owner middle name."""
+        return item['ownerName'].get('middle', '')
+
+    @classmethod
+    def __select_sort_owner_first_name(cls, item):
+        """Sort the match list by individual owner first name."""
+        return item['ownerName']['first']
+
+    @classmethod
+    def __select_sort_owner_last_name(cls, item):
+        """Sort the match list by individual owner last name."""
+        return item['ownerName']['last']
+
+    @classmethod
+    def __select_sort_owner_org_name(cls, item):
+        """Sort the match list by owner organization/business name."""
+        return item['organizationName']
+
+    @classmethod
+    def __select_sort_year(cls, item):
+        """Sort the match list by MH year."""
+        return item['baseInformation'].get('year', 0)
+
+    @classmethod
+    def __select_sort_serial_num(cls, item):
+        """Sort the match list by serial number."""
+        return item['serialNumber']
 
     @classmethod
     def find_by_search_id(cls, search_id: int, limit_by_date: bool = False):

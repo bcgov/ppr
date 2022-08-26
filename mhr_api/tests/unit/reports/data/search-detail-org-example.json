@@ -1,172 +1,2102 @@
 {
   "details": [
     {
-      "clientReferenceId": "",
-      "createDateTime": "1995-11-14T00:00:01+00:00",
-      "declaredValue": 0,
+      "attentionReference": "                                        ", 
+      "clientReferenceId": "                              ", 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "declaredValue": 0, 
       "description": {
         "baseInformation": {
-          "make": "DUTCH VILLA 470-26",
-          "model": "",
-          "year": "1990"
-        },
-        "csaNumber": "*",
-        "csaStandard": "",
-        "engineerDate": "0001-01-01",
-        "engineerName": "",
-        "manufacturer": "TRIPLE E HOMES LTD.",
-        "sectionCount": 1,
+          "make": "MANCHESTER", 
+          "model": "", 
+          "year": "1978"
+        }, 
+        "csaNumber": "", 
+        "csaStandard": "", 
+        "engineerName": "", 
+        "manufacturer": "MANCO", 
+        "otherRemarks": "", 
+        "rebuiltRemarks": "", 
+        "sectionCount": 1, 
         "sections": [
           {
-            "lengthFeet": 66,
-            "lengthInches": 0,
-            "serialNumber": "3774",
-            "widthFeet": 14,
+            "lengthFeet": 66, 
+            "lengthInches": 0, 
+            "serialNumber": "3029", 
+            "widthFeet": 14, 
             "widthInches": 0
           }
         ]
-      },
+      }, 
       "location": {
+        "additionalDescription": "", 
         "address": {
-          "city": "CASSIDY",
-          "country": "CA",
-          "postalCode": "",
-          "region": "BC",
-          "street": " HWY 19S, TIMBERLAND ROAD"
-        },
-        "pad": "130",
-        "parkName": "TIMBERLAND MOBILE HOME PARK"
-      },
-      "mhrNumber": "063644",
+          "city": "HOPE", 
+          "country": "CA", 
+          "postalCode": "", 
+          "region": "BC", 
+          "street": "65367 KAWKAWA LAKE ROAD"
+        }, 
+        "block": "", 
+        "dealerName": "", 
+        "districtLot": "", 
+        "exceptionPlan": "", 
+        "landDistrict": "", 
+        "leaveProvince": false, 
+        "lot": "", 
+        "meridian": "", 
+        "pad": "39", 
+        "parcel": "", 
+        "parkName": "CRYSTAL RIVER COURT", 
+        "partOf": "", 
+        "pidNumber": "", 
+        "plan": "", 
+        "range": "  ", 
+        "section": "", 
+        "status": "ACTIVE", 
+        "taxCertificate": false, 
+        "township": "  "
+      }, 
+      "mhrNumber": "001729", 
       "ownerGroups": [
         {
-          "groupId": 4, 
-          "interest": "UNDIVIDED 25/100", 
-          "interestNumerator": 5, 
-          "owners": [
-            {
-              "address": {
-                "city": "LANGLEY", 
-                "country": "CA", 
-                "postalCode": "V3Z 3A4", 
-                "region": "BC", 
-                "street": "2296 - 240TH STREET"
-              }, 
-              "individualName": {
-                "first": "MANJINDER", 
-                "last": "JOHAL", 
-                "middle": "SINGH"
-              }, 
-              "type": "COMMON"
-            }
-          ], 
-          "status": "ACTIVE", 
-          "tenancySpecified": true, 
-          "type": "COMMON"
-        }, 
-        {
-          "groupId": 5, 
-          "interest": "UNDIVIDED 25/100", 
-          "interestNumerator": 5, 
-          "owners": [
-            {
-              "address": {
-                "city": "LANGLEY", 
-                "country": "CA", 
-                "postalCode": "V3Z 3A4", 
-                "region": "BC", 
-                "street": "2296 - 240TH STREET"
-              }, 
-              "individualName": {
-                "first": "PARMINDER", 
-                "last": "JOHAL", 
-                "middle": "SINGH"
-              }, 
-              "type": "COMMON"
-            }
-          ], 
-          "status": "ACTIVE", 
-          "tenancySpecified": true, 
-          "type": "COMMON"
-        }, 
-        {
-          "groupId": 6, 
-          "interest": "UNDIVIDED 15/100", 
-          "interestNumerator": 3, 
-          "owners": [
-            {
-              "address": {
-                "city": "LANGLEY", 
-                "country": "CA", 
-                "postalCode": "V3Z 3A4", 
-                "region": "BC", 
-                "street": "2296 - 240TH STREET"
-              }, 
-              "individualName": {
-                "first": "JASKARAN", 
-                "last": "JOHAL", 
-                "middle": "SINGH"
-              }, 
-              "type": "COMMON"
-            }
-          ], 
-          "status": "ACTIVE", 
-          "tenancySpecified": true, 
-          "type": "COMMON"
-        }, 
-        {
           "groupId": 7, 
-          "interest": "UNDIVIDED 35/100", 
-          "interestNumerator": 7, 
+          "interest": "", 
+          "interestNumerator": 0, 
           "owners": [
             {
               "address": {
-                "city": "LANGLEY", 
+                "city": "HOPE", 
                 "country": "CA", 
-                "postalCode": "V3Z 3A4", 
+                "postalCode": "V0X 1L1", 
                 "region": "BC", 
-                "street": "2296 - 240TH STREET"
+                "street": "39 - 65367 KAWKAWA LAKE RD."
               }, 
               "individualName": {
-                "first": "JASNIRMAL", 
-                "last": "SIDHU", 
-                "middle": "SINGH"
+                "first": "DAVID", 
+                "last": "BOND", 
+                "middle": "GLENN"
               }, 
-              "type": "COMMON"
+              "type": "JOINT"
+            }, 
+            {
+              "address": {
+                "city": "HOPE", 
+                "country": "CA", 
+                "postalCode": "V0X 1L1", 
+                "region": "BC", 
+                "street": "39 - 65367 KAWKAWA LAKE RD."
+              }, 
+              "individualName": {
+                "first": "DORIS", 
+                "last": "BOND", 
+                "middle": "ANNE"
+              }, 
+              "type": "JOINT"
             }
           ], 
           "status": "ACTIVE", 
           "tenancySpecified": true, 
-          "type": "COMMON"
+          "type": "JOINT"
         }
       ], 
-      "status": "R"
+      "status": "ACTIVE"
+    }, 
+    {
+      "attentionReference": "                                        ", 
+      "clientReferenceId": "                              ", 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "declaredValue": 0, 
+      "description": {
+        "baseInformation": {
+          "make": "SAFEWAY", 
+          "model": "", 
+          "year": "1967"
+        }, 
+        "csaNumber": "", 
+        "csaStandard": "", 
+        "engineerName": "", 
+        "manufacturer": "*", 
+        "otherRemarks": "", 
+        "rebuiltRemarks": "", 
+        "sectionCount": 1, 
+        "sections": [
+          {
+            "lengthFeet": 56, 
+            "lengthInches": 0, 
+            "serialNumber": "02548", 
+            "widthFeet": 12, 
+            "widthInches": 0
+          }
+        ]
+      }, 
+      "location": {
+        "additionalDescription": "", 
+        "address": {
+          "city": "HOPE", 
+          "country": "CA", 
+          "postalCode": "", 
+          "region": "BC", 
+          "street": "65367 KAWKAWA LAKE ROAD"
+        }, 
+        "block": "", 
+        "dealerName": "", 
+        "districtLot": "", 
+        "exceptionPlan": "", 
+        "landDistrict": "", 
+        "leaveProvince": false, 
+        "lot": "", 
+        "meridian": "", 
+        "pad": "43", 
+        "parcel": "", 
+        "parkName": "CRYSTAL RIVER MANUFACTURED HOME PARK", 
+        "partOf": "", 
+        "pidNumber": "", 
+        "plan": "", 
+        "range": "  ", 
+        "section": "", 
+        "status": "ACTIVE", 
+        "taxCertificate": false, 
+        "township": "  "
+      }, 
+      "mhrNumber": "007737", 
+      "ownerGroups": [
+        {
+          "groupId": 6, 
+          "interest": "", 
+          "interestNumerator": 0, 
+          "owners": [
+            {
+              "address": {
+                "city": "VANCOUVER", 
+                "country": "CA", 
+                "postalCode": "V6E 3X2", 
+                "region": "BC", 
+                "street": "#2300 - 1066 W. HASTINGS ST."
+              }, 
+              "organizationName": "CRYSTAL RIVER COURT LTD.", 
+              "phoneNumber": "6046848880", 
+              "type": "SOLE"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "SOLE"
+        }
+      ], 
+      "status": "ACTIVE"
+    }, 
+    {
+      "attentionReference": "                                        ", 
+      "clientReferenceId": "                              ", 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "declaredValue": 0, 
+      "description": {
+        "baseInformation": {
+          "make": "DUCHESS", 
+          "model": "", 
+          "year": "1969"
+        }, 
+        "csaNumber": "", 
+        "csaStandard": "", 
+        "engineerName": "", 
+        "manufacturer": "*", 
+        "otherRemarks": "", 
+        "rebuiltRemarks": "", 
+        "sectionCount": 1, 
+        "sections": [
+          {
+            "lengthFeet": 60, 
+            "lengthInches": 0, 
+            "serialNumber": "E6047", 
+            "widthFeet": 12, 
+            "widthInches": 0
+          }
+        ]
+      }, 
+      "location": {
+        "additionalDescription": "", 
+        "address": {
+          "city": "HOPE", 
+          "country": "CA", 
+          "postalCode": "", 
+          "region": "BC", 
+          "street": "65367 KAWKAWA LAKE ROAD"
+        }, 
+        "block": "", 
+        "dealerName": "", 
+        "districtLot": "", 
+        "exceptionPlan": "", 
+        "landDistrict": "", 
+        "leaveProvince": false, 
+        "lot": "", 
+        "meridian": "", 
+        "pad": "103", 
+        "parcel": "", 
+        "parkName": "CRYSTAL RIVER COURT", 
+        "partOf": "", 
+        "pidNumber": "", 
+        "plan": "", 
+        "range": "  ", 
+        "section": "", 
+        "status": "ACTIVE", 
+        "taxCertificate": false, 
+        "township": "  "
+      }, 
+      "mhrNumber": "008830", 
+      "notes": [
+        {
+          "contactAddress": {
+            "city": "V2T 3R9", 
+            "country": "CA", 
+            "postalCode": "", 
+            "region": "BC", 
+            "street": "41-2800 ALLWOOD ST", 
+            "streetAdditional": "ABBOTSFORD BC"
+          }, 
+          "contactName": "PATRICIA I BAYE", 
+          "createDateTime": "2000-06-12T12:04:39+00:00", 
+          "documentId": "90003145", 
+          "documentType": "103", 
+          "expiryDate": "2000-07-12", 
+          "remarks": ""
+        }
+      ], 
+      "ownerGroups": [
+        {
+          "groupId": 2, 
+          "interest": "", 
+          "interestNumerator": 0, 
+          "owners": [
+            {
+              "address": {
+                "city": "WEST VANCOUVER", 
+                "country": "CA", 
+                "postalCode": "V7T 1A2", 
+                "region": "BC", 
+                "street": "200 - 100 PARK ROYAL SOUTH"
+              }, 
+              "organizationName": "CRYSTAL RIVER COURT LTD.", 
+              "phoneNumber": "6046848880", 
+              "type": "SOLE"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "SOLE"
+        }
+      ], 
+      "status": "ACTIVE"
+    }, 
+    {
+      "attentionReference": "                                        ", 
+      "clientReferenceId": "                              ", 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "declaredValue": 0, 
+      "description": {
+        "baseInformation": {
+          "make": "HEARTHSIDE", 
+          "model": "", 
+          "year": "1974"
+        }, 
+        "csaNumber": "", 
+        "csaStandard": "", 
+        "engineerName": "", 
+        "manufacturer": "MODULINE", 
+        "otherRemarks": "", 
+        "rebuiltRemarks": "", 
+        "sectionCount": 2, 
+        "sections": [
+          {
+            "lengthFeet": 40, 
+            "lengthInches": 0, 
+            "serialNumber": "3376A", 
+            "widthFeet": 24, 
+            "widthInches": 0
+          }
+        ]
+      }, 
+      "location": {
+        "additionalDescription": "", 
+        "address": {
+          "city": "HOPE", 
+          "country": "CA", 
+          "postalCode": "", 
+          "region": "BC", 
+          "street": "65367 KAWKAWA LAKE ROAD"
+        }, 
+        "block": "", 
+        "dealerName": "", 
+        "districtLot": "", 
+        "exceptionPlan": "", 
+        "landDistrict": "", 
+        "leaveProvince": false, 
+        "lot": "", 
+        "meridian": "", 
+        "pad": "60", 
+        "parcel": "", 
+        "parkName": "CRYSTAL RIVER COURT MOBILE HOME PARK", 
+        "partOf": "", 
+        "pidNumber": "", 
+        "plan": "", 
+        "range": "  ", 
+        "section": "", 
+        "status": "ACTIVE", 
+        "taxCertificate": false, 
+        "township": "  "
+      }, 
+      "mhrNumber": "009846", 
+      "ownerGroups": [
+        {
+          "groupId": 10, 
+          "interest": "", 
+          "interestNumerator": 0, 
+          "owners": [
+            {
+              "address": {
+                "city": "HOPE", 
+                "country": "CA", 
+                "postalCode": "V0X 1L1", 
+                "region": "BC", 
+                "street": "60 - 65367 KAWKAWA LAKE ROAD"
+              }, 
+              "individualName": {
+                "first": "LISA", 
+                "last": "MCCONKEY", 
+                "middle": "ANNE SHARON"
+              }, 
+              "phoneNumber": "6042183014", 
+              "type": "SOLE"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "SOLE"
+        }
+      ], 
+      "status": "ACTIVE"
+    }, 
+    {
+      "attentionReference": "                                        ", 
+      "clientReferenceId": "                              ", 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "declaredValue": 0, 
+      "description": {
+        "baseInformation": {
+          "make": "STATESMAN", 
+          "model": "", 
+          "year": "1975"
+        }, 
+        "csaNumber": "", 
+        "csaStandard": "", 
+        "engineerName": "", 
+        "manufacturer": "HOMECO", 
+        "otherRemarks": "", 
+        "rebuiltRemarks": "", 
+        "sectionCount": 2, 
+        "sections": [
+          {
+            "lengthFeet": 44, 
+            "lengthInches": 0, 
+            "serialNumber": "7240", 
+            "widthFeet": 24, 
+            "widthInches": 0
+          }
+        ]
+      }, 
+      "location": {
+        "additionalDescription": "", 
+        "address": {
+          "city": "HOPE", 
+          "country": "CA", 
+          "postalCode": "", 
+          "region": "BC", 
+          "street": "65367 KAWKAWA LAKE ROAD"
+        }, 
+        "block": "", 
+        "dealerName": "", 
+        "districtLot": "", 
+        "exceptionPlan": "", 
+        "landDistrict": "", 
+        "leaveProvince": false, 
+        "lot": "", 
+        "meridian": "", 
+        "pad": "8", 
+        "parcel": "", 
+        "parkName": "CRYSTAL RIVER MOBILE HOME PARK", 
+        "partOf": "", 
+        "pidNumber": "", 
+        "plan": "", 
+        "range": "  ", 
+        "section": "", 
+        "status": "ACTIVE", 
+        "taxCertificate": false, 
+        "township": "  "
+      }, 
+      "mhrNumber": "013690", 
+      "notes": [
+        {
+          "contactAddress": {
+            "city": "V2P 6H7", 
+            "country": "CA", 
+            "postalCode": "", 
+            "region": "BC", 
+            "street": "PO BOX 98", 
+            "streetAdditional": "CHILLIWACK BC"
+          }, 
+          "contactName": "HERMAN ENSZ", 
+          "createDateTime": "2000-03-31T09:07:22+00:00", 
+          "documentId": "90002899", 
+          "documentType": "103", 
+          "expiryDate": "2000-04-30", 
+          "remarks": ""
+        }
+      ], 
+      "ownerGroups": [
+        {
+          "groupId": 7, 
+          "interest": "", 
+          "interestNumerator": 0, 
+          "owners": [
+            {
+              "address": {
+                "city": "HOPE", 
+                "country": "CA", 
+                "postalCode": "V0X 1L0", 
+                "region": "BC", 
+                "street": "107-65367 KAWKAWA LAKE ROAD"
+              }, 
+              "individualName": {
+                "first": "WALTER", 
+                "last": "KREKE", 
+                "middle": "HENRY"
+              }, 
+              "phoneNumber": "6048699354", 
+              "type": "JOINT"
+            }, 
+            {
+              "address": {
+                "city": "HOPE", 
+                "country": "CA", 
+                "postalCode": "V0X 1L0", 
+                "region": "BC", 
+                "street": "107-65367 KAWKAWA LAKE ROAD"
+              }, 
+              "individualName": {
+                "first": "YVETTE", 
+                "last": "KREKE", 
+                "middle": "ALMA"
+              }, 
+              "phoneNumber": "6048699354", 
+              "type": "JOINT"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "JOINT"
+        }
+      ], 
+      "status": "ACTIVE"
+    }, 
+    {
+      "attentionReference": "                                        ", 
+      "clientReferenceId": "                              ", 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "declaredValue": 0, 
+      "description": {
+        "baseInformation": {
+          "make": "SKYLINE", 
+          "model": "", 
+          "year": "1968"
+        }, 
+        "csaNumber": "", 
+        "csaStandard": "", 
+        "engineerName": "", 
+        "manufacturer": "*", 
+        "otherRemarks": "", 
+        "rebuiltRemarks": "", 
+        "sectionCount": 1, 
+        "sections": [
+          {
+            "lengthFeet": 44, 
+            "lengthInches": 0, 
+            "serialNumber": "SB344", 
+            "widthFeet": 12, 
+            "widthInches": 0
+          }
+        ]
+      }, 
+      "location": {
+        "additionalDescription": "", 
+        "address": {
+          "city": "HOPE", 
+          "country": "CA", 
+          "postalCode": "", 
+          "region": "BC", 
+          "street": "65367 KAKAWA LAKE ROAD"
+        }, 
+        "block": "", 
+        "dealerName": "", 
+        "districtLot": "", 
+        "exceptionPlan": "", 
+        "landDistrict": "", 
+        "leaveProvince": false, 
+        "lot": "", 
+        "meridian": "", 
+        "pad": "6", 
+        "parcel": "", 
+        "parkName": "CRYSTAL RIVER COURT", 
+        "partOf": "", 
+        "pidNumber": "", 
+        "plan": "", 
+        "range": "  ", 
+        "section": "", 
+        "status": "ACTIVE", 
+        "taxCertificate": false, 
+        "township": "  "
+      }, 
+      "mhrNumber": "014913", 
+      "ownerGroups": [
+        {
+          "groupId": 7, 
+          "interest": "", 
+          "interestNumerator": 0, 
+          "owners": [
+            {
+              "address": {
+                "city": "VANCOUVER", 
+                "country": "CA", 
+                "postalCode": "V5W 1J1", 
+                "region": "BC", 
+                "street": "716 EAST 38TH AVENUE"
+              }, 
+              "individualName": {
+                "first": "AGATA", 
+                "last": "CISAK", 
+                "middle": "JOANA"
+              }, 
+              "phoneNumber": "7788405599", 
+              "type": "SOLE"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "SOLE"
+        }
+      ], 
+      "status": "ACTIVE"
+    }, 
+    {
+      "attentionReference": "                                        ", 
+      "clientReferenceId": "                              ", 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "declaredValue": 0, 
+      "description": {
+        "baseInformation": {
+          "make": "MEADOWBROOK", 
+          "model": "", 
+          "year": "1976"
+        }, 
+        "csaNumber": "", 
+        "csaStandard": "", 
+        "engineerName": "", 
+        "manufacturer": "MANCO HOME SYSTEMS LTD.", 
+        "otherRemarks": "", 
+        "rebuiltRemarks": "", 
+        "sectionCount": 1, 
+        "sections": [
+          {
+            "lengthFeet": 61, 
+            "lengthInches": 0, 
+            "serialNumber": "A2264", 
+            "widthFeet": 12, 
+            "widthInches": 0
+          }
+        ]
+      }, 
+      "location": {
+        "additionalDescription": "", 
+        "address": {
+          "city": "HOPE", 
+          "country": "CA", 
+          "postalCode": "", 
+          "region": "BC", 
+          "street": "65367 KAWKAWA LAKE ROAD"
+        }, 
+        "block": "", 
+        "dealerName": "", 
+        "districtLot": "", 
+        "exceptionPlan": "", 
+        "landDistrict": "", 
+        "leaveProvince": false, 
+        "lot": "", 
+        "meridian": "", 
+        "pad": "4", 
+        "parcel": "", 
+        "parkName": "CRYSTAL RIVER TRAILER COURT", 
+        "partOf": "", 
+        "pidNumber": "", 
+        "plan": "", 
+        "range": "  ", 
+        "section": "", 
+        "status": "ACTIVE", 
+        "taxCertificate": false, 
+        "township": "  "
+      }, 
+      "mhrNumber": "020391", 
+      "ownerGroups": [
+        {
+          "groupId": 8, 
+          "interest": "", 
+          "interestNumerator": 0, 
+          "owners": [
+            {
+              "address": {
+                "city": "HOPE", 
+                "country": "CA", 
+                "postalCode": "V0X 1L1", 
+                "region": "BC", 
+                "street": "4 - 65367 KAWKAWA LAKE ROAD"
+              }, 
+              "individualName": {
+                "first": "JOHN", 
+                "last": "WAYNE", 
+                "middle": "ALLEN"
+              }, 
+              "phoneNumber": "6042400483", 
+              "type": "SOLE"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "SOLE"
+        }
+      ], 
+      "status": "ACTIVE"
+    }, 
+    {
+      "attentionReference": "", 
+      "clientReferenceId": "                              ", 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "declaredValue": 0, 
+      "description": {
+        "baseInformation": {
+          "make": "CHANCELLOR", 
+          "model": "", 
+          "year": "1976"
+        }, 
+        "csaNumber": "", 
+        "csaStandard": "", 
+        "engineerName": "", 
+        "manufacturer": "MODULINE INDUSTR. (CANADA) LTD.", 
+        "otherRemarks": "", 
+        "rebuiltRemarks": "", 
+        "sectionCount": 2, 
+        "sections": [
+          {
+            "lengthFeet": 56, 
+            "lengthInches": 0, 
+            "serialNumber": "3F5858", 
+            "widthFeet": 24, 
+            "widthInches": 0
+          }
+        ]
+      }, 
+      "location": {
+        "additionalDescription": "", 
+        "address": {
+          "city": "HOPE", 
+          "country": "CA", 
+          "postalCode": "", 
+          "region": "BC", 
+          "street": "65367 KAWKAWA LAKE RD."
+        }, 
+        "block": "", 
+        "dealerName": "", 
+        "districtLot": "", 
+        "exceptionPlan": "", 
+        "landDistrict": "", 
+        "leaveProvince": false, 
+        "lot": "", 
+        "meridian": "", 
+        "pad": "#12", 
+        "parcel": "", 
+        "parkName": "CRYSTAL RIVER COURT", 
+        "partOf": "", 
+        "pidNumber": "", 
+        "plan": "", 
+        "range": "  ", 
+        "section": "", 
+        "status": "ACTIVE", 
+        "taxCertificate": false, 
+        "township": "  "
+      }, 
+      "mhrNumber": "020902", 
+      "notes": [
+        {
+          "contactAddress": {
+            "city": "V3A 4W4", 
+            "country": "CA", 
+            "postalCode": "", 
+            "region": "BC", 
+            "street": "3229 - 200TH STREET", 
+            "streetAdditional": "LANGLEY, B.C."
+          }, 
+          "contactName": "DALE C. BALL", 
+          "createDateTime": "2007-05-14T14:04:37+00:00", 
+          "documentId": "10030574", 
+          "documentType": "103", 
+          "expiryDate": "2007-06-13", 
+          "remarks": ""
+        }
+      ], 
+      "ownerGroups": [
+        {
+          "groupId": 8, 
+          "interest": "", 
+          "interestNumerator": 0, 
+          "owners": [
+            {
+              "address": {
+                "city": "HOPE", 
+                "country": "CA", 
+                "postalCode": "V0X 1L1", 
+                "region": "BC", 
+                "street": "PAD 12", 
+                "streetAdditional": "65367 KAWKAWA LAKE ROAD"
+              }, 
+              "individualName": {
+                "first": "MANUELA", 
+                "last": "BOURRE"
+              }, 
+              "phoneNumber": "5197160174", 
+              "type": "SOLE"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "SOLE"
+        }
+      ], 
+      "status": "ACTIVE"
+    }, 
+    {
+      "attentionReference": "                                        ", 
+      "clientReferenceId": "                              ", 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "declaredValue": 0, 
+      "description": {
+        "baseInformation": {
+          "make": "BERKSHIRE 6812 3CKD", 
+          "model": "", 
+          "year": "1975"
+        }, 
+        "csaNumber": "", 
+        "csaStandard": "", 
+        "engineerName": "", 
+        "manufacturer": "HOMCO INDUSTRIES", 
+        "otherRemarks": "", 
+        "rebuiltRemarks": "", 
+        "sectionCount": 1, 
+        "sections": [
+          {
+            "lengthFeet": 64, 
+            "lengthInches": 0, 
+            "serialNumber": "11052", 
+            "widthFeet": 12, 
+            "widthInches": 0
+          }
+        ]
+      }, 
+      "location": {
+        "additionalDescription": "", 
+        "address": {
+          "city": "HOPE", 
+          "country": "CA", 
+          "postalCode": "", 
+          "region": "BC", 
+          "street": "65367 KAWKAWA LAKE ROAD"
+        }, 
+        "block": "", 
+        "dealerName": "", 
+        "districtLot": "", 
+        "exceptionPlan": "", 
+        "landDistrict": "", 
+        "leaveProvince": false, 
+        "lot": "", 
+        "meridian": "", 
+        "pad": "9E", 
+        "parcel": "", 
+        "parkName": "CRYSTAL RIVER COURT", 
+        "partOf": "", 
+        "pidNumber": "", 
+        "plan": "", 
+        "range": "  ", 
+        "section": "", 
+        "status": "ACTIVE", 
+        "taxCertificate": false, 
+        "township": "  "
+      }, 
+      "mhrNumber": "026085", 
+      "notes": [
+        {
+          "contactAddress": {
+            "city": "CHILLIWACK, B.C. V2R4S1", 
+            "country": "CA", 
+            "postalCode": "", 
+            "region": "BC", 
+            "street": "46777 MCGUIRE ROAD"
+          }, 
+          "contactName": "BILL DRIESEN", 
+          "createDateTime": "1999-05-11T15:40:18+00:00", 
+          "documentId": "90001949", 
+          "documentType": "103", 
+          "expiryDate": "1999-06-10", 
+          "remarks": ""
+        }
+      ], 
+      "ownerGroups": [
+        {
+          "groupId": 8, 
+          "interest": "", 
+          "interestNumerator": 0, 
+          "owners": [
+            {
+              "address": {
+                "city": "MISSION", 
+                "country": "CA", 
+                "postalCode": "V2V 3V1", 
+                "region": "BC", 
+                "street": "7341 JAMES STREET"
+              }, 
+              "individualName": {
+                "first": "BRADLEY", 
+                "last": "PETERS", 
+                "middle": "JAMES"
+              }, 
+              "phoneNumber": "6046153864", 
+              "type": "SOLE"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "SOLE"
+        }
+      ], 
+      "status": "ACTIVE"
+    }, 
+    {
+      "attentionReference": "                                        ", 
+      "clientReferenceId": "                              ", 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "declaredValue": 0, 
+      "description": {
+        "baseInformation": {
+          "make": "HOMCO 3FBGK", 
+          "model": "", 
+          "year": "1973"
+        }, 
+        "csaNumber": "", 
+        "csaStandard": "", 
+        "engineerName": "", 
+        "manufacturer": "MADE IN WESTBANK", 
+        "otherRemarks": "", 
+        "rebuiltRemarks": "", 
+        "sectionCount": 1, 
+        "sections": [
+          {
+            "lengthFeet": 66, 
+            "lengthInches": 0, 
+            "serialNumber": "8216", 
+            "widthFeet": 12, 
+            "widthInches": 0
+          }
+        ]
+      }, 
+      "location": {
+        "additionalDescription": "", 
+        "address": {
+          "city": "HOPE", 
+          "country": "CA", 
+          "postalCode": "", 
+          "region": "BC", 
+          "street": "65367 KAWKAWA LAKE ROAD"
+        }, 
+        "block": "", 
+        "dealerName": "", 
+        "districtLot": "", 
+        "exceptionPlan": "", 
+        "landDistrict": "", 
+        "leaveProvince": false, 
+        "lot": "", 
+        "meridian": "", 
+        "pad": "105", 
+        "parcel": "", 
+        "parkName": "CRYSTAL RIVER MOBILE PARK", 
+        "partOf": "", 
+        "pidNumber": "", 
+        "plan": "", 
+        "range": "  ", 
+        "section": "", 
+        "status": "ACTIVE", 
+        "taxCertificate": false, 
+        "township": "  "
+      }, 
+      "mhrNumber": "027321", 
+      "notes": [
+        {
+          "contactAddress": {
+            "city": "V0X1L0", 
+            "country": "CA", 
+            "postalCode": "", 
+            "region": "BC", 
+            "street": "C17 DOGWOOD VALLEY SITE", 
+            "streetAdditional": "RR3                                     HOPE, BC"
+          }, 
+          "contactName": "HAROLD PARTINGTON", 
+          "createDateTime": "1999-08-25T15:36:22+00:00", 
+          "documentId": "90002409", 
+          "documentType": "103", 
+          "expiryDate": "1999-09-24", 
+          "remarks": ""
+        }
+      ], 
+      "ownerGroups": [
+        {
+          "groupId": 9, 
+          "interest": "", 
+          "interestNumerator": 0, 
+          "owners": [
+            {
+              "address": {
+                "city": "HOPE", 
+                "country": "CA", 
+                "postalCode": "V0X 1L1", 
+                "region": "BC", 
+                "street": "9B-65367 KAWKAWA LAKE ROAD"
+              }, 
+              "individualName": {
+                "first": "MARIE", 
+                "last": "TAYLOR", 
+                "middle": "RIENNE"
+              }, 
+              "phoneNumber": "6047969323", 
+              "suffix": "MARGUERITE", 
+              "type": "SOLE"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "SOLE"
+        }
+      ], 
+      "status": "ACTIVE"
+    }, 
+    {
+      "attentionReference": "                                        ", 
+      "clientReferenceId": "                              ", 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "declaredValue": 0, 
+      "description": {
+        "baseInformation": {
+          "make": "NOR'WESTERN", 
+          "model": "", 
+          "year": "1975"
+        }, 
+        "csaNumber": "", 
+        "csaStandard": "", 
+        "engineerName": "", 
+        "manufacturer": "GENDALL", 
+        "otherRemarks": "", 
+        "rebuiltRemarks": "", 
+        "sectionCount": 1, 
+        "sections": [
+          {
+            "lengthFeet": 64, 
+            "lengthInches": 0, 
+            "serialNumber": "4332", 
+            "widthFeet": 12, 
+            "widthInches": 0
+          }
+        ]
+      }, 
+      "location": {
+        "additionalDescription": "", 
+        "address": {
+          "city": "HOPE", 
+          "country": "CA", 
+          "postalCode": "", 
+          "region": "BC", 
+          "street": "65367 KAWKAWA LAKE ROAD"
+        }, 
+        "block": "", 
+        "dealerName": "", 
+        "districtLot": "", 
+        "exceptionPlan": "", 
+        "landDistrict": "", 
+        "leaveProvince": false, 
+        "lot": "", 
+        "meridian": "", 
+        "pad": "3A", 
+        "parcel": "", 
+        "parkName": "CRYSTAL RIVER COURT MANUFACTURED HOME PK", 
+        "partOf": "", 
+        "pidNumber": "", 
+        "plan": "", 
+        "range": "  ", 
+        "section": "", 
+        "status": "ACTIVE", 
+        "taxCertificate": false, 
+        "township": "  "
+      }, 
+      "mhrNumber": "031898", 
+      "notes": [
+        {
+          "contactAddress": {
+            "city": "V2P 6J7", 
+            "country": "CA", 
+            "postalCode": "", 
+            "region": "BC", 
+            "street": "PO BOX 98", 
+            "streetAdditional": "41415 BERRY RD                          CHILLIWACK BC"
+          }, 
+          "contactName": "TWIN PEAK HOMES LIMITED", 
+          "createDateTime": "1998-03-23T12:29:51+00:00", 
+          "documentId": "90000731", 
+          "documentType": "103", 
+          "expiryDate": "1998-04-22", 
+          "remarks": ""
+        }
+      ], 
+      "ownerGroups": [
+        {
+          "groupId": 8, 
+          "interest": "", 
+          "interestNumerator": 0, 
+          "owners": [
+            {
+              "address": {
+                "city": "HOPE", 
+                "country": "CA", 
+                "postalCode": "V0X 1L1", 
+                "region": "BC", 
+                "street": "3A - 65367 KAWKAWA LAKE ROAD"
+              }, 
+              "individualName": {
+                "first": "DAVID", 
+                "last": "WILLCOX", 
+                "middle": "HARRY"
+              }, 
+              "phoneNumber": "2503766422", 
+              "type": "SOLE"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "SOLE"
+        }
+      ], 
+      "status": "ACTIVE"
+    }, 
+    {
+      "attentionReference": "                                        ", 
+      "clientReferenceId": "                              ", 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "declaredValue": 0, 
+      "description": {
+        "baseInformation": {
+          "make": "COLWOOD", 
+          "model": "", 
+          "year": "1977"
+        }, 
+        "csaNumber": "", 
+        "csaStandard": "", 
+        "engineerName": "", 
+        "manufacturer": "GLEN RIVER IND.", 
+        "otherRemarks": "", 
+        "rebuiltRemarks": "", 
+        "sectionCount": 1, 
+        "sections": [
+          {
+            "lengthFeet": 52, 
+            "lengthInches": 0, 
+            "serialNumber": "D1385", 
+            "widthFeet": 14, 
+            "widthInches": 0
+          }
+        ]
+      }, 
+      "location": {
+        "additionalDescription": "", 
+        "address": {
+          "city": "HOPE", 
+          "country": "CA", 
+          "postalCode": "", 
+          "region": "BC", 
+          "street": "65367 KAWKAWA LAKE ROAD"
+        }, 
+        "block": "", 
+        "dealerName": "", 
+        "districtLot": "", 
+        "exceptionPlan": "", 
+        "landDistrict": "", 
+        "leaveProvince": false, 
+        "lot": "", 
+        "meridian": "", 
+        "pad": "5", 
+        "parcel": "", 
+        "parkName": "CRYSTAL RIVER MANUFACTURED HOME PARK", 
+        "partOf": "", 
+        "pidNumber": "", 
+        "plan": "", 
+        "range": "  ", 
+        "section": "", 
+        "status": "ACTIVE", 
+        "taxCertificate": false, 
+        "township": "  "
+      }, 
+      "mhrNumber": "036647", 
+      "ownerGroups": [
+        {
+          "groupId": 8, 
+          "interest": "", 
+          "interestNumerator": 0, 
+          "owners": [
+            {
+              "address": {
+                "city": "HOPE", 
+                "country": "CA", 
+                "postalCode": "V0X 1L1", 
+                "region": "BC", 
+                "street": "5-65367 KAWKAWA LAKE ROAD"
+              }, 
+              "individualName": {
+                "first": "JANE", 
+                "last": "DAVIDSON", 
+                "middle": "ELIZABETH"
+              }, 
+              "phoneNumber": "6049966275", 
+              "type": "SOLE"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "SOLE"
+        }
+      ], 
+      "status": "ACTIVE"
+    }, 
+    {
+      "attentionReference": "                                        ", 
+      "clientReferenceId": "                              ", 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "declaredValue": 0, 
+      "description": {
+        "baseInformation": {
+          "make": "NEONEX", 
+          "model": "", 
+          "year": "1973"
+        }, 
+        "csaNumber": "", 
+        "csaStandard": "", 
+        "engineerName": "", 
+        "manufacturer": "BRENTWOOD", 
+        "otherRemarks": "", 
+        "rebuiltRemarks": "", 
+        "sectionCount": 1, 
+        "sections": [
+          {
+            "lengthFeet": 68, 
+            "lengthInches": 0, 
+            "serialNumber": "33381", 
+            "widthFeet": 12, 
+            "widthInches": 0
+          }
+        ]
+      }, 
+      "location": {
+        "additionalDescription": "", 
+        "address": {
+          "city": "HOPE", 
+          "country": "CA", 
+          "postalCode": "", 
+          "region": "BC", 
+          "street": "65367 KAWKAWA LAKE ROAD"
+        }, 
+        "block": "", 
+        "dealerName": "", 
+        "districtLot": "", 
+        "exceptionPlan": "", 
+        "landDistrict": "", 
+        "leaveProvince": false, 
+        "lot": "", 
+        "meridian": "", 
+        "pad": "41", 
+        "parcel": "", 
+        "parkName": "CRYSTAL RIVER MOBILE HOME COURT", 
+        "partOf": "", 
+        "pidNumber": "", 
+        "plan": "", 
+        "range": "  ", 
+        "section": "", 
+        "status": "ACTIVE", 
+        "taxCertificate": false, 
+        "township": "  "
+      }, 
+      "mhrNumber": "039852", 
+      "ownerGroups": [
+        {
+          "groupId": 10, 
+          "interest": "", 
+          "interestNumerator": 0, 
+          "owners": [
+            {
+              "address": {
+                "city": "HOPE", 
+                "country": "CA", 
+                "postalCode": "V0X 1L1", 
+                "region": "BC", 
+                "street": "41 - 65367 KAWKAWA LAKE ROAD"
+              }, 
+              "individualName": {
+                "first": "LARRY", 
+                "last": "SMITH", 
+                "middle": "WILLIAM"
+              }, 
+              "phoneNumber": "6049702273", 
+              "type": "JOINT"
+            }, 
+            {
+              "address": {
+                "city": "HOPE", 
+                "country": "CA", 
+                "postalCode": "V0X 1L1", 
+                "region": "BC", 
+                "street": "41 - 65367 KAWKAWA LAKE ROAD"
+              }, 
+              "individualName": {
+                "first": "JENNETT", 
+                "last": "NIXON", 
+                "middle": "VERONICA"
+              }, 
+              "phoneNumber": "6049702273", 
+              "type": "JOINT"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "JOINT"
+        }
+      ], 
+      "status": "ACTIVE"
+    }, 
+    {
+      "attentionReference": "                                        ", 
+      "clientReferenceId": "                              ", 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "declaredValue": 0, 
+      "description": {
+        "baseInformation": {
+          "make": "ESQUIRE", 
+          "model": "", 
+          "year": "1969"
+        }, 
+        "csaNumber": "", 
+        "csaStandard": "", 
+        "engineerName": "", 
+        "manufacturer": "GUERDON IND. INC.", 
+        "otherRemarks": "", 
+        "rebuiltRemarks": "", 
+        "sectionCount": 1, 
+        "sections": [
+          {
+            "lengthFeet": 60, 
+            "lengthInches": 0, 
+            "serialNumber": "6078", 
+            "widthFeet": 12, 
+            "widthInches": 0
+          }
+        ]
+      }, 
+      "location": {
+        "additionalDescription": "", 
+        "address": {
+          "city": "HOPE", 
+          "country": "CA", 
+          "postalCode": "", 
+          "region": "BC", 
+          "street": "65367 KAKAWA LAKE ROAD"
+        }, 
+        "block": "", 
+        "dealerName": "", 
+        "districtLot": "", 
+        "exceptionPlan": "", 
+        "landDistrict": "", 
+        "leaveProvince": false, 
+        "lot": "", 
+        "meridian": "", 
+        "pad": "48", 
+        "parcel": "", 
+        "parkName": "CRYSTAL RIVER COURT", 
+        "partOf": "", 
+        "pidNumber": "", 
+        "plan": "", 
+        "range": "  ", 
+        "section": "", 
+        "status": "ACTIVE", 
+        "taxCertificate": false, 
+        "township": "  "
+      }, 
+      "mhrNumber": "050866", 
+      "ownerGroups": [
+        {
+          "groupId": 8, 
+          "interest": "", 
+          "interestNumerator": 0, 
+          "owners": [
+            {
+              "address": {
+                "city": "HOPE", 
+                "country": "CA", 
+                "postalCode": "V0X1L3", 
+                "region": "BC", 
+                "street": "48 - 65367 KAWKAWA LAKE ROAD"
+              }, 
+              "individualName": {
+                "first": "PAMELA", 
+                "last": "BRITTEN", 
+                "middle": "ANNE"
+              }, 
+              "phoneNumber": "6043024532", 
+              "type": "SOLE"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "SOLE"
+        }
+      ], 
+      "status": "ACTIVE"
+    }, 
+    {
+      "attentionReference": "                                        ", 
+      "clientReferenceId": "                              ", 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "declaredValue": 0, 
+      "description": {
+        "baseInformation": {
+          "make": "LIFESTYLE S327", 
+          "model": "", 
+          "year": "1983"
+        }, 
+        "csaNumber": "", 
+        "csaStandard": "", 
+        "engineerName": "", 
+        "manufacturer": "GEN HOME SYST LTD.", 
+        "otherRemarks": "", 
+        "rebuiltRemarks": "", 
+        "sectionCount": 1, 
+        "sections": [
+          {
+            "lengthFeet": 66, 
+            "lengthInches": 0, 
+            "serialNumber": "XH2330", 
+            "widthFeet": 14, 
+            "widthInches": 0
+          }
+        ]
+      }, 
+      "location": {
+        "additionalDescription": "", 
+        "address": {
+          "city": "HOPE", 
+          "country": "CA", 
+          "postalCode": "", 
+          "region": "BC", 
+          "street": "65367 KAWKAWA LAKE ROAD"
+        }, 
+        "block": "", 
+        "dealerName": "", 
+        "districtLot": "", 
+        "exceptionPlan": "", 
+        "landDistrict": "", 
+        "leaveProvince": false, 
+        "lot": "", 
+        "meridian": "", 
+        "pad": "19", 
+        "parcel": "", 
+        "parkName": "CRYSTAL RIVER COURT", 
+        "partOf": "", 
+        "pidNumber": "", 
+        "plan": "", 
+        "range": "  ", 
+        "section": "", 
+        "status": "ACTIVE", 
+        "taxCertificate": false, 
+        "township": "  "
+      }, 
+      "mhrNumber": "057640", 
+      "ownerGroups": [
+        {
+          "groupId": 3, 
+          "interest": "", 
+          "interestNumerator": 0, 
+          "owners": [
+            {
+              "address": {
+                "city": "HOPE", 
+                "country": "CA", 
+                "postalCode": "V0X1L1", 
+                "region": "BC", 
+                "street": "#19 65367 KAWKAWA LAKE ROAD"
+              }, 
+              "individualName": {
+                "first": "VALERIE", 
+                "last": "DONNELLY", 
+                "middle": "ANN"
+              }, 
+              "phoneNumber": "2503775984", 
+              "type": "SOLE"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "SOLE"
+        }
+      ], 
+      "status": "ACTIVE"
+    }, 
+    {
+      "attentionReference": "                                        ", 
+      "clientReferenceId": "                              ", 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "declaredValue": 0, 
+      "description": {
+        "baseInformation": {
+          "make": "SE-421", 
+          "model": "", 
+          "year": "1989"
+        }, 
+        "csaNumber": "", 
+        "csaStandard": "", 
+        "engineerName": "", 
+        "manufacturer": "NOR-TEC", 
+        "otherRemarks": "", 
+        "rebuiltRemarks": "", 
+        "sectionCount": 1, 
+        "sections": [
+          {
+            "lengthFeet": 66, 
+            "lengthInches": 8, 
+            "serialNumber": "1961", 
+            "widthFeet": 14, 
+            "widthInches": 0
+          }
+        ]
+      }, 
+      "location": {
+        "additionalDescription": "", 
+        "address": {
+          "city": "HOPE", 
+          "country": "CA", 
+          "postalCode": "", 
+          "region": "BC", 
+          "street": "65367 KAWKAWA LAKE ROAD, RR 2"
+        }, 
+        "block": "", 
+        "dealerName": "", 
+        "districtLot": "", 
+        "exceptionPlan": "", 
+        "landDistrict": "", 
+        "leaveProvince": false, 
+        "lot": "", 
+        "meridian": "", 
+        "pad": "42", 
+        "parcel": "", 
+        "parkName": "CRYSTAL RIVER PARK", 
+        "partOf": "", 
+        "pidNumber": "", 
+        "plan": "", 
+        "range": "  ", 
+        "section": "", 
+        "status": "ACTIVE", 
+        "taxCertificate": false, 
+        "township": "  "
+      }, 
+      "mhrNumber": "065646", 
+      "ownerGroups": [
+        {
+          "groupId": 7, 
+          "interest": "", 
+          "interestNumerator": 0, 
+          "owners": [
+            {
+              "address": {
+                "city": "CHILLIWACK", 
+                "country": "CA", 
+                "postalCode": "V2R 3C5", 
+                "region": "BC", 
+                "street": "2-45640 STOREY AVENUE"
+              }, 
+              "individualName": {
+                "first": "PATRICIA", 
+                "last": "GWYNNE", 
+                "middle": "ANNE"
+              }, 
+              "phoneNumber": "6047051338", 
+              "type": "JOINT"
+            }, 
+            {
+              "address": {
+                "city": "HOPE", 
+                "country": "CA", 
+                "postalCode": "V0X 1L1", 
+                "region": "BC", 
+                "street": "42-65367 KAWKAWA LAKE ROAD"
+              }, 
+              "individualName": {
+                "first": "AMANDA", 
+                "last": "GWYNNE", 
+                "middle": "DIANE"
+              }, 
+              "phoneNumber": "6047999370", 
+              "type": "JOINT"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "JOINT"
+        }
+      ], 
+      "status": "ACTIVE"
+    }, 
+    {
+      "attentionReference": "                                        ", 
+      "clientReferenceId": "                              ", 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "declaredValue": 0, 
+      "description": {
+        "baseInformation": {
+          "make": "*", 
+          "model": "", 
+          "year": "1974"
+        }, 
+        "csaNumber": "", 
+        "csaStandard": "", 
+        "engineerName": "", 
+        "manufacturer": "GENDALL", 
+        "otherRemarks": "", 
+        "rebuiltRemarks": "", 
+        "sectionCount": 1, 
+        "sections": [
+          {
+            "lengthFeet": 68, 
+            "lengthInches": 0, 
+            "serialNumber": "20246", 
+            "widthFeet": 14, 
+            "widthInches": 0
+          }
+        ]
+      }, 
+      "location": {
+        "additionalDescription": "", 
+        "address": {
+          "city": "HAGENSBORG", 
+          "country": "CA", 
+          "postalCode": "", 
+          "region": "BC", 
+          "street": "2676 MICHELLE DRIVE"
+        }, 
+        "block": "", 
+        "dealerName": "", 
+        "districtLot": "", 
+        "exceptionPlan": "", 
+        "landDistrict": "", 
+        "leaveProvince": false, 
+        "lot": "", 
+        "meridian": "", 
+        "pad": "", 
+        "parcel": "", 
+        "parkName": "", 
+        "partOf": "", 
+        "pidNumber": "001442074", 
+        "plan": "", 
+        "range": "  ", 
+        "section": "", 
+        "status": "ACTIVE", 
+        "taxCertificate": false, 
+        "township": "  "
+      }, 
+      "mhrNumber": "066869", 
+      "notes": [
+        {
+          "contactAddress": {
+            "city": "V0T 1H0", 
+            "country": "CA", 
+            "postalCode": "", 
+            "region": "BC", 
+            "street": "2674 MICHELLE DRIVE", 
+            "streetAdditional": "HAGENSBORG, B.C."
+          }, 
+          "contactName": "DONNA M L'HIRONDELLE", 
+          "createDateTime": "2016-03-24T10:20:11+00:00", 
+          "documentId": "90012472", 
+          "documentType": "103", 
+          "expiryDate": "2016-04-23", 
+          "remarks": ""
+        }
+      ], 
+      "ownerGroups": [
+        {
+          "groupId": 7, 
+          "interest": "", 
+          "interestNumerator": 0, 
+          "owners": [
+            {
+              "address": {
+                "city": "HAGENSBORG", 
+                "country": "CA", 
+                "postalCode": "V0T 1H0", 
+                "region": "BC", 
+                "street": "BOX 185"
+              }, 
+              "individualName": {
+                "first": "DONNA", 
+                "last": "L'HIRONDELLE", 
+                "middle": "MARGARET"
+              }, 
+              "phoneNumber": "2509820070", 
+              "type": "SOLE"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "SOLE"
+        }
+      ], 
+      "status": "ACTIVE"
+    }, 
+    {
+      "attentionReference": "                                        ", 
+      "clientReferenceId": "                              ", 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "declaredValue": 0, 
+      "description": {
+        "baseInformation": {
+          "make": "1994 GIBRALTAR 14317", 
+          "model": "", 
+          "year": "1994"
+        }, 
+        "csaNumber": "465723", 
+        "csaStandard": "", 
+        "engineerName": "", 
+        "manufacturer": "MODULINE INDUSTRIES (CANADA) LTD.", 
+        "otherRemarks": "", 
+        "rebuiltRemarks": "", 
+        "sectionCount": 1, 
+        "sections": [
+          {
+            "lengthFeet": 66, 
+            "lengthInches": 0, 
+            "serialNumber": "0315631", 
+            "widthFeet": 14, 
+            "widthInches": 0
+          }
+        ]
+      }, 
+      "location": {
+        "additionalDescription": "", 
+        "address": {
+          "city": "HOPE", 
+          "country": "CA", 
+          "postalCode": "", 
+          "region": "BC", 
+          "street": "65367 KAWKAWA LAKE ROAD"
+        }, 
+        "block": "", 
+        "dealerName": "", 
+        "districtLot": "", 
+        "exceptionPlan": "", 
+        "landDistrict": "", 
+        "leaveProvince": false, 
+        "lot": "", 
+        "meridian": "", 
+        "pad": "109", 
+        "parcel": "", 
+        "parkName": "CRYSTAL RIVER COURT MOBILE HOME PARK", 
+        "partOf": "", 
+        "pidNumber": "", 
+        "plan": "", 
+        "range": "  ", 
+        "section": "", 
+        "status": "ACTIVE", 
+        "taxCertificate": false, 
+        "township": "  "
+      }, 
+      "mhrNumber": "074111", 
+      "notes": [
+        {
+          "contactAddress": {
+            "city": "V0X1L1", 
+            "country": "CA", 
+            "postalCode": "", 
+            "region": "BC", 
+            "street": "56-65367 KAWKAWA LAKE ROAD", 
+            "streetAdditional": "HOPE BC"
+          }, 
+          "contactName": "NICK MASSONG", 
+          "createDateTime": "2009-10-28T13:49:30+00:00", 
+          "documentId": "90010478", 
+          "documentType": "103", 
+          "expiryDate": "2009-11-27", 
+          "remarks": ""
+        }
+      ], 
+      "ownerGroups": [
+        {
+          "groupId": 7, 
+          "interest": "", 
+          "interestNumerator": 0, 
+          "owners": [
+            {
+              "address": {
+                "city": "HOPE", 
+                "country": "CA", 
+                "postalCode": "V0X 1L1", 
+                "region": "BC", 
+                "street": "109-65367 KAWKAWA LAKE ROAD"
+              }, 
+              "individualName": {
+                "first": "SHARON", 
+                "last": "BLYTHE", 
+                "middle": "LOUISE"
+              }, 
+              "phoneNumber": "6048695925", 
+              "type": "SOLE"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "SOLE"
+        }
+      ], 
+      "status": "ACTIVE"
     }
-  ],
+  ], 
+  "getReportURL": "/ppr/api/v1/search-results/8112", 
   "payment": {
-    "invoiceId": "19162",
-    "receipt": "/api/v1/payment-requests/19162/receipts"
-  },
-  "searchDateTime": "2022-05-16T20:35:50+00:00",
+    "invoiceId": "21736", 
+    "receipt": "/api/v1/payment-requests/21736/receipts"
+  }, 
+  "searchDateTime": "2022-08-22T20:47:24+00:00", 
   "searchQuery": {
-    "clientReferenceId": "MO-UT-0001",
-    "criteria": {"value": "GUTHRIE HOLDINGS LTD."},
+    "clientReferenceId": "MO-UT-0002", 
+    "criteria": {
+      "value": "CRYSTAL RIVER COURT LTD."
+    }, 
     "type": "ORGANIZATION_NAME"
-  },
+  }, 
   "selected": [
     {
       "baseInformation": {
-        "make": "DUTCH VILLA 470-26",
-        "model": "",
-        "year": 1990
-      },
-      "createDateTime": "1995-11-14T00:00:01+00:00",
-      "homeLocation": "CASSIDY",
-      "mhrNumber": "063644",
-      "organizationName": "GUTHRIE HOLDINGS LTD.",
-      "serialNumber": "3774",
+        "make": "MANCHESTER", 
+        "model": "", 
+        "year": 1978
+      }, 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "homeLocation": "HOPE", 
+      "mhId": 22, 
+      "mhrNumber": "001729", 
+      "organizationName": "CRYSTAL RIVER COURT LTD.", 
+      "ownerStatus": "PREVIOUS", 
+      "serialNumber": "3029", 
+      "status": "ACTIVE"
+    }, 
+    {
+      "baseInformation": {
+        "make": "SAFEWAY", 
+        "model": "", 
+        "year": 1967
+      }, 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "homeLocation": "HOPE", 
+      "mhId": 78754, 
+      "mhrNumber": "007737", 
+      "organizationName": "CRYSTAL RIVER COURT LTD.", 
+      "ownerStatus": "ACTIVE", 
+      "serialNumber": "02548", 
+      "status": "ACTIVE"
+    }, 
+    {
+      "baseInformation": {
+        "make": "DUCHESS", 
+        "model": "", 
+        "year": 1969
+      }, 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "homeLocation": "HOPE", 
+      "mhId": 10719, 
+      "mhrNumber": "008830", 
+      "organizationName": "CRYSTAL RIVER COURT LTD.", 
+      "ownerStatus": "ACTIVE", 
+      "serialNumber": "E6047", 
+      "status": "ACTIVE"
+    }, 
+    {
+      "baseInformation": {
+        "make": "HEARTHSIDE", 
+        "model": "", 
+        "year": 1974
+      }, 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "homeLocation": "HOPE", 
+      "mhId": 76777, 
+      "mhrNumber": "009846", 
+      "organizationName": "CRYSTAL RIVER COURT LTD.", 
+      "ownerStatus": "PREVIOUS", 
+      "serialNumber": "3376A", 
+      "status": "ACTIVE"
+    }, 
+    {
+      "baseInformation": {
+        "make": "HEARTHSIDE", 
+        "model": "", 
+        "year": 1974
+      }, 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "homeLocation": "HOPE", 
+      "mhId": 76777, 
+      "mhrNumber": "009846", 
+      "organizationName": "CRYSTAL RIVER COURT LTD.", 
+      "ownerStatus": "PREVIOUS", 
+      "serialNumber": "3376A", 
+      "status": "ACTIVE"
+    }, 
+    {
+      "baseInformation": {
+        "make": "STATESMAN", 
+        "model": "", 
+        "year": 1975
+      }, 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "homeLocation": "HOPE", 
+      "mhId": 73307, 
+      "mhrNumber": "013690", 
+      "organizationName": "CRYSTAL RIVER COURT LTD.", 
+      "ownerStatus": "PREVIOUS", 
+      "serialNumber": "7240", 
+      "status": "ACTIVE"
+    }, 
+    {
+      "baseInformation": {
+        "make": "SKYLINE", 
+        "model": "", 
+        "year": 1968
+      }, 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "homeLocation": "HOPE", 
+      "mhId": 72231, 
+      "mhrNumber": "014913", 
+      "organizationName": "CRYSTAL RIVER COURT LTD.", 
+      "ownerStatus": "PREVIOUS", 
+      "serialNumber": "SB344", 
+      "status": "ACTIVE"
+    }, 
+    {
+      "baseInformation": {
+        "make": "MEADOWBROOK", 
+        "model": "", 
+        "year": 1976
+      }, 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "homeLocation": "HOPE", 
+      "mhId": 66865, 
+      "mhrNumber": "020391", 
+      "organizationName": "CRYSTAL RIVER COURT LTD.", 
+      "ownerStatus": "PREVIOUS", 
+      "serialNumber": "A2264", 
+      "status": "ACTIVE"
+    }, 
+    {
+      "baseInformation": {
+        "make": "CHANCELLOR", 
+        "model": "", 
+        "year": 1976
+      }, 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "homeLocation": "HOPE", 
+      "mhId": 66494, 
+      "mhrNumber": "020902", 
+      "organizationName": "CRYSTAL RIVER COURT LTD.", 
+      "ownerStatus": "PREVIOUS", 
+      "serialNumber": "3F5858", 
+      "status": "ACTIVE"
+    }, 
+    {
+      "baseInformation": {
+        "make": "CHANCELLOR", 
+        "model": "", 
+        "year": 1976
+      }, 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "homeLocation": "HOPE", 
+      "mhId": 66494, 
+      "mhrNumber": "020902", 
+      "organizationName": "CRYSTAL RIVER COURT LTD.", 
+      "ownerStatus": "PREVIOUS", 
+      "serialNumber": "3F5858", 
+      "status": "ACTIVE"
+    }, 
+    {
+      "baseInformation": {
+        "make": "BERKSHIRE 6812 3CKD", 
+        "model": "", 
+        "year": 1975
+      }, 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "homeLocation": "HOPE", 
+      "mhId": 61868, 
+      "mhrNumber": "026085", 
+      "organizationName": "CRYSTAL RIVER COURT LTD.", 
+      "ownerStatus": "PREVIOUS", 
+      "serialNumber": "11052", 
+      "status": "ACTIVE"
+    }, 
+    {
+      "baseInformation": {
+        "make": "HOMCO 3FBGK", 
+        "model": "", 
+        "year": 1973
+      }, 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "homeLocation": "HOPE", 
+      "mhId": 60402, 
+      "mhrNumber": "027321", 
+      "organizationName": "CRYSTAL RIVER COURT LTD.", 
+      "ownerStatus": "PREVIOUS", 
+      "serialNumber": "8216", 
+      "status": "ACTIVE"
+    }, 
+    {
+      "baseInformation": {
+        "make": "NOR'WESTERN", 
+        "model": "", 
+        "year": 1975
+      }, 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "homeLocation": "HOPE", 
+      "mhId": 55867, 
+      "mhrNumber": "031898", 
+      "organizationName": "CRYSTAL RIVER COURT LTD.", 
+      "ownerStatus": "PREVIOUS", 
+      "serialNumber": "4332", 
+      "status": "ACTIVE"
+    }, 
+    {
+      "baseInformation": {
+        "make": "COLWOOD", 
+        "model": "", 
+        "year": 1977
+      }, 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "homeLocation": "HOPE", 
+      "mhId": 50871, 
+      "mhrNumber": "036647", 
+      "organizationName": "CRYSTAL RIVER COURT LTD.", 
+      "ownerStatus": "PREVIOUS", 
+      "serialNumber": "D1385", 
+      "status": "ACTIVE"
+    }, 
+    {
+      "baseInformation": {
+        "make": "NEONEX", 
+        "model": "", 
+        "year": 1973
+      }, 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "homeLocation": "HOPE", 
+      "mhId": 22576, 
+      "mhrNumber": "039852", 
+      "organizationName": "CRYSTAL RIVER COURT LTD.", 
+      "ownerStatus": "PREVIOUS", 
+      "serialNumber": "33381", 
+      "status": "ACTIVE"
+    }, 
+    {
+      "baseInformation": {
+        "make": "ESQUIRE", 
+        "model": "", 
+        "year": 1969
+      }, 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "homeLocation": "HOPE", 
+      "mhId": 36034, 
+      "mhrNumber": "050866", 
+      "organizationName": "CRYSTAL RIVER COURT LTD.", 
+      "ownerStatus": "PREVIOUS", 
+      "serialNumber": "6078", 
+      "status": "ACTIVE"
+    }, 
+    {
+      "baseInformation": {
+        "make": "LIFESTYLE S327", 
+        "model": "", 
+        "year": 1983
+      }, 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "homeLocation": "HOPE", 
+      "mhId": 28582, 
+      "mhrNumber": "057640", 
+      "organizationName": "CRYSTAL RIVER COURT LTD.", 
+      "ownerStatus": "PREVIOUS", 
+      "serialNumber": "XH2330", 
+      "status": "ACTIVE"
+    }, 
+    {
+      "baseInformation": {
+        "make": "SE-421", 
+        "model": "", 
+        "year": 1989
+      }, 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "homeLocation": "HOPE", 
+      "mhId": 19037, 
+      "mhrNumber": "065646", 
+      "organizationName": "CRYSTAL RIVER COURT LTD.", 
+      "ownerStatus": "PREVIOUS", 
+      "serialNumber": "1961", 
+      "status": "ACTIVE"
+    }, 
+    {
+      "baseInformation": {
+        "make": "*", 
+        "model": "", 
+        "year": 1974
+      }, 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "homeLocation": "HAGENSBORG", 
+      "mhId": 17174, 
+      "mhrNumber": "066869", 
+      "organizationName": "CRYSTAL RIVER COURT LTD.", 
+      "ownerStatus": "PREVIOUS", 
+      "serialNumber": "20246", 
+      "status": "ACTIVE"
+    }, 
+    {
+      "baseInformation": {
+        "make": "1994 GIBRALTAR 14317", 
+        "model": "", 
+        "year": 1994
+      }, 
+      "createDateTime": "1995-11-14T00:00:01+00:00", 
+      "homeLocation": "HOPE", 
+      "mhId": 9487, 
+      "mhrNumber": "074111", 
+      "organizationName": "CRYSTAL RIVER COURT LTD.", 
+      "ownerStatus": "PREVIOUS", 
+      "serialNumber": "0315631", 
       "status": "ACTIVE"
     }
-  ],
-  "totalResultsSize": 1
+  ], 
+  "totalResultsSize": 18
 }
