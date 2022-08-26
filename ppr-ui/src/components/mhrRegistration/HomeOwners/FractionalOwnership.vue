@@ -2,20 +2,17 @@
   <div id="mhr-home-ownership">
     <label class="generic-label">Fractional Ownership</label>
     <div v-if="isReadOnly">
-      <p data-test-id="readonly-interest-info">
-        Interest: {{ fractionalInterest }}
-      </p>
+      <p data-test-id="readonly-interest-info">Interest: {{ fractionalInterest }}</p>
     </div>
     <div v-else>
       <p class="mt-3 mb-6">
-        Enter the interest type and fraction of the total ownership owned by
-        Group 1. For example, if there are four owner groups, this group could
-        have 1/4 ownership.
+        Enter the interest type and fraction of the total ownership owned by Group 1. For example,
+        if there are four owner groups, this group could have 1/4 ownership.
       </p>
       <v-text-field
         :id="`interest-type-group-${groupId}`"
         label="Interest Type (Optional)"
-        v-model="fractionalInfo.interest"
+        v-model="fractionalData.interest"
         :data-test-id="`interest-type-field-group-${groupId}`"
       />
       <div class="owner-fractions">
@@ -23,25 +20,26 @@
           :id="`fraction-amount-group-${groupId}`"
           label="Amount Owned by this Group"
           filled
-          v-model="fractionalInfo.interestNumerator"
+          v-model="fractionalData.interestNumerator"
           :rules="fractionalAmountRules"
           :data-test-id="`fraction-amount-field-group-${groupId}`"
+          ref="interestNumerator"
+          @blur="$refs.interestTotal.validate()"
         />
         <span> </span>
         <v-text-field
           :id="`total-fractions-group-${groupId}`"
           label="Total Available"
           filled
-          v-model="fractionalInfo.interestTotal"
+          v-model="fractionalData.interestTotal"
           :rules="totalAmountRules"
           :data-test-id="`total-fractions-field-group-${groupId}`"
+          ref="interestTotal"
+          @blur="$refs.interestNumerator.validate()"
         />
       </div>
       <label class="generic-label" for="tenancy-type">Tenancy</label>
-      <v-checkbox
-        :id="`tenancy-type-group-${groupId}`"
-        v-model="fractionalInfo.tenancySpecified"
-      >
+      <v-checkbox :id="`tenancy-type-group-${groupId}`" v-model="fractionalData.tenancySpecified">
         <template v-slot:label>
           <p class="ma-0">
             Tenancy not specified
@@ -54,18 +52,10 @@
 
 <script lang="ts">
 /* eslint-disable no-unused-vars */
-import {
-  MhrRegistrationFractionalOwnershipIF,
-  MhrRegistrationHomeOwnersIF,
-} from '@/interfaces'
+import { MhrRegistrationHomeOwnersIF } from '@/interfaces'
 /* eslint-enable no-unused-vars */
 
-import {
-  computed,
-  defineComponent,
-  reactive,
-  toRefs,
-} from '@vue/composition-api'
+import { computed, defineComponent, reactive, toRefs } from '@vue/composition-api'
 import { useInputRules } from '@/composables/useInputRules'
 
 let DEFAULT_OWNER_ID = 1
@@ -75,29 +65,22 @@ export default defineComponent({
   props: {
     groupId: {
       type: String,
-      required: true,
+      required: true
     },
     editHomeOwner: {
       type: Object as () => MhrRegistrationHomeOwnersIF,
-      default: null,
+      default: null
     },
     showEditBtn: { type: Boolean, default: true },
     isReadOnly: { type: Boolean, default: false },
     fractionalData: {
-      type: Object as () => MhrRegistrationFractionalOwnershipIF,
-      default: {} as () => MhrRegistrationFractionalOwnershipIF,
-      required: true,
-    },
+      type: Object,
+      default: null,
+      required: true
+    }
   },
-  setup(props) {
-    const {
-      customRules,
-      required,
-      isNumber,
-      maxLength,
-      greaterThan,
-      lessThan,
-    } = useInputRules()
+  setup (props, context) {
+    const { customRules, required, isNumber, maxLength, greaterThan, lessThan } = useInputRules()
 
     const localState = reactive({
       id: props.editHomeOwner?.id || (DEFAULT_OWNER_ID++).toString(),
@@ -105,36 +88,32 @@ export default defineComponent({
       fractionalInterest: computed(
         () =>
           // eslint-disable-next-line max-len
-          `${localState.fractionalInfo.interest} ${localState.fractionalInfo.interestNumerator} / ${localState.fractionalInfo.interestTotal}`
+          `${props.fractionalData.interest} ${props.fractionalData.interestNumerator} / ${props.fractionalData.interestTotal}`
       ),
-      fractionalAmountRules: computed(() =>
-        customRules(
-          required('Enter amount owned by this group'),
-          isNumber(),
-          maxLength(6),
-          greaterThan(
-            Number(localState.fractionalInfo.interestTotal),
-            'Must be lesser than total available'
+      fractionalAmountRules: computed(() => {
+        const rules = customRules(required('Enter amount owned by this group'), isNumber(), maxLength(6))
+        // additional validation when interest total has some value - UX feedback
+        if (localState.fractionalInfo.interestTotal) {
+          rules.push(
+            ...greaterThan(Number(localState.fractionalInfo.interestTotal), 'Must be lesser than total available')
           )
-        )
-      ),
+        }
+        return rules
+      }),
       totalAmountRules: computed(() =>
         customRules(
           required('Enter total available'),
           isNumber(),
           maxLength(6),
-          lessThan(
-            Number(localState.fractionalInfo.interestNumerator),
-            'Must be greater than amount owned by group'
-          )
+          lessThan(Number(localState.fractionalInfo.interestNumerator), 'Must be greater than amount owned by group')
         )
-      ),
+      )
     })
 
     return {
-      ...toRefs(localState),
+      ...toRefs(localState)
     }
-  },
+  }
 })
 </script>
 
