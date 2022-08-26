@@ -12,7 +12,7 @@ export interface MhrValidationStateIF {
     refNumValid: boolean
   },
   homeOwnersValid: {
-    OwnersValid: boolean
+    ownersValid: boolean
   },
   locationValid: {
     locationTypeValid: boolean

@@ -222,7 +222,7 @@ export default defineComponent({
     const localState = reactive({
       makeModelValid: false,
       manufacturerName: getMhrRegistrationManufacturerName.value,
-      yearOfManufacture: getMhrRegistrationYearOfManufacture.value,
+      yearOfManufacture: getMhrRegistrationYearOfManufacture.value?.toString(),
       circa: getMhrRegistrationIsYearApproximate.value,
       make: getMhrRegistrationHomeMake.value,
       model: getMhrRegistrationHomeModel.value
@@ -232,8 +232,10 @@ export default defineComponent({
       setMhrHomeDescription({ key: 'manufacturer', value: val })
     })
 
-    watch(() => localState.yearOfManufacture, (val: number) => {
-      setMhrHomeBaseInformation({ key: 'year', value: val })
+    watch(() => localState.yearOfManufacture, (val: string) => {
+      if (parseInt(val)) {
+        setMhrHomeBaseInformation({ key: 'year', value: parseInt(val) })
+      }
     })
 
     watch(() => localState.circa, (val: boolean) => {

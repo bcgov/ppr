@@ -231,8 +231,7 @@ import {
   watch
 } from '@vue/composition-api'
 import { useInputRules } from '@/composables/useInputRules'
-import { useHomeOwners } from '@/composables/mhrRegistration'
-
+import { useHomeOwners, useMhrValidations } from '@/composables/mhrRegistration'
 import { AutoComplete } from '@/components/search'
 import { BaseAddress } from '@/composables/address'
 import { PartyAddressSchema } from '@/schemas'
@@ -250,6 +249,8 @@ import { SearchResponseI } from '@/interfaces'
 import { useSearch } from '@/composables/useSearch'
 import { SimpleHelpToggle } from '@/components/common'
 import HomeOwnerGroups from './HomeOwnerGroups.vue'
+import { useGetters } from 'vuex-composition-helpers'
+import { MhrCompVal, MhrSectVal } from '@/composables/mhrRegistration/enums'
 
 let DEFAULT_OWNER_ID = 1
 
@@ -286,6 +287,14 @@ export default defineComponent({
       setShowGroups,
       setGroupFractionalInterest
     } = useHomeOwners(props.isHomeOwnerPerson, props.editHomeOwner == null)
+
+    const {
+      getMhrRegistrationValidationModel
+    } = useGetters<any>([
+      'getMhrRegistrationValidationModel'
+    ])
+
+    const { setValidation } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
     const addressSchema = PartyAddressSchema
     const addHomeOwnerForm = ref(null)
@@ -388,6 +397,9 @@ export default defineComponent({
           localState.fractionalData
         )
         localState.ownerGroupId && setShowGroups(true)
+
+        // TODO: Mhr-Submission - DELETE after step 3 validation is done
+        setValidation(MhrSectVal.HOME_OWNERS_VALID, MhrCompVal.OWNERS_VALID, true)
 
         cancel()
       } else {

@@ -252,6 +252,11 @@ export default defineComponent({
         [RouteNames.REVIEW_CONFIRM, RouteNames.MHR_REVIEW_CONFIRM].includes(props.currentStepName as RouteNames)
       ) {
         // -- Intersect here for Submitting MHR Registration --
+        if (props.currentStepName === RouteNames.MHR_REVIEW_CONFIRM) {
+          emit('submit')
+          return
+        }
+
         if (checkValid()) {
           if (localState.isStaffReg) {
             localState.staffPaymentDialogDisplay = true

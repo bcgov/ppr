@@ -1,5 +1,8 @@
 <template>
   <v-container v-if="dataLoaded" class="view-container pa-0" fluid>
+    <v-overlay v-model="submitting">
+      <v-progress-circular color="primary" size="50" indeterminate />
+    </v-overlay>
     <div class="view-container px-15 py-0">
       <div class="container pa-0 pt-4">
         <v-row no-gutters>
@@ -42,6 +45,7 @@
           :router="$router"
           @registration-incomplete="registrationIncomplete()"
           @error="emitError()"
+          @submit="submit()"
         />
       </v-col>
     </v-row>
@@ -54,11 +58,11 @@ import { computed, defineComponent, onMounted, reactive, toRefs } from '@vue/com
 import { useGetters } from 'vuex-composition-helpers'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { RegistrationFlowType, RouteNames, StatementTypes } from '@/enums'
-import { RegistrationTypeIF } from '@/interfaces'
-import { getFeatureFlag } from '@/utils'
+import { RegistrationTypeIF, MhrRegistrationIF } from '@/interfaces'
+import { getFeatureFlag, submitMhrRegistration } from '@/utils'
 import { Stepper, StickyContainer } from '@/components/common'
 import ButtonFooter from '@/components/common/ButtonFooter.vue'
-import { useMhrValidations } from '@/composables'
+import { useMhrValidations, useNewMhrRegistration } from '@/composables'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { RegistrationLengthI } from '@/composables/fees/interfaces'
 /* eslint-enable no-unused-vars */
@@ -102,6 +106,7 @@ export default defineComponent({
 
     const localState = reactive({
       dataLoaded: false,
+      submitting: false,
       feeType: FeeSummaryTypes.NEW_MHR,
       statementType: StatementTypes.FINANCING_STATEMENT,
       isAuthenticated: computed((): boolean => {
@@ -162,11 +167,24 @@ export default defineComponent({
       localState.dataLoaded = true
     })
 
+    const { buildApiData } = useNewMhrRegistration()
+
+    const submit = async () => {
+      // TODO: Mhr-Submission - DELETE after the validations are done across the steps
+      setValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_APP, true)
+      if (localState.validateMhrRegistration) {
+        localState.submitting = true
+        await submitMhrRegistration(buildApiData())
+        localState.submitting = false
+      }
+    }
+
     return {
       getSteps,
       emitError,
       isRouteName,
       registrationIncomplete,
+      submit,
       ...toRefs(localState)
     }
   }

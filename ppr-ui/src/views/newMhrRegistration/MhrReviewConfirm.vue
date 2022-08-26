@@ -83,6 +83,10 @@ export default defineComponent({
       })
     })
 
+    watch(() => localState.authorizationValid, (val: boolean) => {
+      setValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.AUTHORIZATION_VALID, val)
+    })
+
     watch(() => context.root.$route.name, (route: string) => {
       switch (route) {
         case RouteNames.YOUR_HOME:

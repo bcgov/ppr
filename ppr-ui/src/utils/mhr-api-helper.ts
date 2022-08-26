@@ -168,3 +168,23 @@ export async function searchMhrPDF (searchId: string): Promise<any> {
       }
     })
 }
+
+export async function submitMhrRegistration (data) {
+  const url = sessionStorage.getItem('MHR_API_URL')
+  const config = { baseURL: url, headers: { Accept: 'application/json' } }
+
+  try {
+    const result = await axios.post('registrations', data, config)
+    if (!result?.data) {
+      throw new Error('Invalid API response')
+    }
+    return result.data
+  } catch (error) {
+    return {
+      error: {
+        category: ErrorCategories.REGISTRATION_CREATE,
+        statusCode: error?.response?.status || StatusCodes.NOT_FOUND
+      }
+    }
+  }
+}
