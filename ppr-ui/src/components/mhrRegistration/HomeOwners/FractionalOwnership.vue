@@ -2,15 +2,12 @@
   <div id="mhr-home-ownership">
     <label class="generic-label">Fractional Ownership</label>
     <div v-if="isReadOnly">
-      <p data-test-id="readonly-interest-info">
-        Interest: {{ fractionalInterest }}
-      </p>
+      <p data-test-id="readonly-interest-info">Interest: {{ fractionalInterest }}</p>
     </div>
     <div v-else>
       <p class="mt-3 mb-6">
-        Enter the interest type and fraction of the total ownership owned by
-        Group 1. For example, if there are four owner groups, this group could
-        have 1/4 ownership.
+        Enter the interest type and fraction of the total ownership owned by Group 1. For example,
+        if there are four owner groups, this group could have 1/4 ownership.
       </p>
       <v-text-field
         :id="`interest-type-group-${groupId}`"
@@ -58,12 +55,7 @@
 import { MhrRegistrationHomeOwnersIF } from '@/interfaces'
 /* eslint-enable no-unused-vars */
 
-import {
-  computed,
-  defineComponent,
-  reactive,
-  toRefs,
-} from '@vue/composition-api'
+import { computed, defineComponent, reactive, toRefs } from '@vue/composition-api'
 import { useInputRules } from '@/composables/useInputRules'
 
 let DEFAULT_OWNER_ID = 1
@@ -73,11 +65,11 @@ export default defineComponent({
   props: {
     groupId: {
       type: String,
-      required: true,
+      required: true
     },
     editHomeOwner: {
       type: Object as () => MhrRegistrationHomeOwnersIF,
-      default: null,
+      default: null
     },
     showEditBtn: { type: Boolean, default: true },
     isReadOnly: { type: Boolean, default: false },
@@ -115,13 +107,13 @@ export default defineComponent({
           maxLength(6),
           lessThan(Number(localState.fractionalInfo.interestNumerator), 'Must be greater than amount owned by group')
         )
-      ),
+      )
     })
 
     return {
-      ...toRefs(localState),
+      ...toRefs(localState)
     }
-  },
+  }
 })
 </script>
 
