@@ -58,6 +58,15 @@ export const useNewMhrRegistration = () => {
       delete submittingParty.personName
     }
 
+    /* TODO: Mhr-Submission - DELETE after Api bug has been fixed */
+    if (submittingParty.personName) {
+      const first = submittingParty.personName.firstName
+      const middle = submittingParty.personName.middleName
+      const last = submittingParty.personName.lastName
+      submittingParty.businessName = [first, middle, last].reduce((x, y) => y ? x + ' ' + y : x)
+    }
+    /* DELETE after Api bug has been fixed */
+
     return submittingParty
   }
 
@@ -100,6 +109,9 @@ export const useNewMhrRegistration = () => {
 
     // TODO: Mhr-Submission - DELETE after postal code can be retrieved from UI
     location.address.postalCode = 'V8W 2H3'
+
+    // TODO: Mhr-Submission - UPDATE after confirming how to parse street number
+    location.address.street = location.address.street.replace('-', ' ')
 
     return location
   }
