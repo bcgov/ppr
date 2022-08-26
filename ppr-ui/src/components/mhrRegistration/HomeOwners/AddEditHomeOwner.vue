@@ -250,6 +250,7 @@ import { useSearch } from '@/composables/useSearch'
 import { SimpleHelpToggle } from '@/components/common'
 import HomeOwnerGroups from './HomeOwnerGroups.vue'
 import { useGetters } from 'vuex-composition-helpers'
+import { MhrCompVal, MhrSectVal } from '@/composables/mhrRegistration/enums'
 import { find } from 'lodash'
 
 interface FractionalOwnershipWithGroupIdIF extends MhrRegistrationFractionalOwnershipIF {
@@ -402,6 +403,9 @@ export default defineComponent({
             localState.ownerGroupId
           )
         }
+
+        // TODO: Mhr-Submission - DELETE after step 3 validation is done
+        setValidation(MhrSectVal.HOME_OWNERS_VALID, MhrCompVal.OWNERS_VALID, true)
 
         setShowGroups(Number(localState.ownerGroupId) > 0)
 
