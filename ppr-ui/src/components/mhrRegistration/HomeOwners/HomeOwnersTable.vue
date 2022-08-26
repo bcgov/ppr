@@ -138,13 +138,13 @@ export default defineComponent({
       isEditingMode: computed(
         (): boolean => localState.currentlyEditingHomeOwnerId >= 0
       ),
-      isAddingMode: computed((): boolean => props.isAdding),
+      isAddingMode: computed((): boolean => props.isAdding)
     })
 
     const edit = (item): void => {
       context.emit('edit', {
         ...item,
-        id: localState.currentlyEditingHomeOwnerId,
+        id: localState.currentlyEditingHomeOwnerId
       })
     }
 
@@ -179,9 +179,9 @@ export default defineComponent({
       remove,
       deleteGroup,
       isGlobalEditingMode,
-      ...toRefs(localState),
+      ...toRefs(localState)
     }
-  },
+  }
 })
 </script>
 
