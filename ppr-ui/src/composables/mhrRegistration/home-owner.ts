@@ -17,7 +17,8 @@ const showGroups = ref(false)
 const isGlobalEditingMode = ref(false)
 
 export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = false) {
-  const { getMhrRegistrationHomeOwnerGroups } = useGetters<any>([
+  const { getMhrRegistrationHomeOwners, getMhrRegistrationHomeOwnerGroups } = useGetters<any>([
+    'getMhrRegistrationHomeOwners',
     'getMhrRegistrationHomeOwnerGroups'
   ])
 
@@ -42,6 +43,20 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
   // Set global editing to enable or disable all Edit buttons
   const setGlobalEditingMode = isEditing => {
     isGlobalEditingMode.value = isEditing
+  }
+
+  const getHomeTenancyType = (): string => {
+    const numOfGroups = getMhrRegistrationHomeOwnerGroups.value.length
+    const numOfOwners = getMhrRegistrationHomeOwners.value?.length
+
+    // One Group with multiple owners
+    if (numOfGroups === 1 && numOfOwners > 1 && showGroups.value) return 'Joint Tenants'
+    // More than one Group
+    if (numOfGroups > 1 && showGroups.value) return 'Tenants In Common'
+    // No owners added
+    if (numOfOwners === 0) return 'N/A'
+    // One or more Owner
+    return numOfOwners === 1 ? 'Sole Ownership' : 'Joint Tenants'
   }
 
   // WORKING WITH GROUPS
@@ -180,14 +195,77 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
     setMhrRegistrationHomeOwnerGroups(homeOwnerGroups)
   }
 
-  const setGroupFractionalInterest = (
-    groupId: string,
-    fractionalData: MhrRegistrationFractionalOwnershipIF
-  ): void => {
+  const setGroupFractionalInterest = (groupId: string, fractionalData): void => {
     const homeOwnerGroups = [...getMhrRegistrationHomeOwnerGroups.value]
-    const groupToUpdate = find(homeOwnerGroups, { groupId: groupId })
-    Object.assign(groupToUpdate, { ...fractionalData })
-    setMhrRegistrationHomeOwnerGroups(homeOwnerGroups)
+
+    const allGroupsTotals = homeOwnerGroups.map(group => group.interestTotal)
+
+    // check if dominator is already the same for all Groups
+    const isAlreadyLCM = allGroupsTotals.includes(fractionalData.interestTotal.toString())
+
+    if (homeOwnerGroups.length > 1 && !isAlreadyLCM) {
+      // Calculate common fractions for Groups
+      const { updatedGroups, updatedFractionalData } = updateGroupsWithCommonFractionalInterest(
+        homeOwnerGroups,
+        fractionalData
+      )
+      const groupToUpdate = find(updatedGroups, { groupId: groupId })
+      Object.assign(groupToUpdate, { ...updatedFractionalData })
+      setMhrRegistrationHomeOwnerGroups(updatedGroups)
+    } else {
+      const groupToUpdate = find(homeOwnerGroups, { groupId: groupId })
+      Object.assign(groupToUpdate, { ...fractionalData })
+      setMhrRegistrationHomeOwnerGroups(homeOwnerGroups)
+    }
+  }
+
+  /**
+   * Utility method to calculate and update groups with lowest common denominator.
+   * Used when multiple Home Owner Groups have different fractional interest totals.
+   * @param currentHomeOwnerGroups - existing groups to be updated
+   * @param currentFractionalData - fractional data of the group that is about to be updated
+   * @returns object consisting of: existing groups with new factorial values and updated factorial data
+   */
+  const updateGroupsWithCommonFractionalInterest = (
+    currentHomeOwnerGroups: Array<any>,
+    currentFractionalData
+  ): { updatedGroups: MhrRegistrationHomeOwnerGroupIF[]; updatedFractionalData } => {
+    // Lowest Common Multiplier aka Common Denominator
+    // Starts with 1 so it can be multiplied by all denominators
+    let LCM = 1
+
+    // Calculate LCM for all group that already exists
+    // by multiplying all total interests
+    currentHomeOwnerGroups.every((group: MhrRegistrationHomeOwnerGroupIF) => {
+      LCM = LCM * Number(group.interestTotal)
+    })
+
+    // Since new fractional data is not included in any groups yet,
+    // it needs to be calculated as well for LCM,
+    // but only if new fractional total couldn't be part of LCM
+    // e.g. 1/25, new factorial 1/5 - no need to find a new LCM, as it is 25 already
+    if (LCM % currentFractionalData.interestTotal !== 0) {
+      LCM = LCM * currentFractionalData.interestTotal
+    }
+
+    // Update all fractional amounts for groups that already exist
+    const updatedGroups = currentHomeOwnerGroups.map(group => {
+      const newNumerator = (LCM / group.interestTotal) * group.interestNumerator
+      group.interestNumerator = newNumerator.toString()
+      group.interestTotal = LCM.toString()
+      return group
+    })
+
+    const updatedFractionalData = currentFractionalData
+
+    // Update current fractional data with new values
+    updatedFractionalData.interestNumerator = (
+      (LCM / currentFractionalData.interestTotal) *
+      currentFractionalData.interestNumerator
+    ).toString()
+    updatedFractionalData.interestTotal = LCM.toString()
+
+    return { updatedGroups, updatedFractionalData }
   }
 
   // Do not show groups in the owner's table when there are no groups (e.g. after Group deletion)
@@ -204,6 +282,7 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
     showGroups: readonly(showGroups),
     isGlobalEditingMode: readonly(isGlobalEditingMode),
     getSideTitle,
+    getHomeTenancyType,
     addOwnerToTheGroup,
     editHomeOwner,
     removeOwner,

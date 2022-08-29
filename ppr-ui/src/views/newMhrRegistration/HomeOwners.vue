@@ -89,7 +89,7 @@
       </v-btn>
 
       <div class="my-6">
-        <span class="generic-label">Home Tenancy Type: </span>{{ tenancyType }}
+        <span class="generic-label">Home Tenancy Type: </span>{{ getHomeTenancyType() }}
       </div>
     </section>
 
@@ -157,7 +157,7 @@ export default defineComponent({
       'setMhrRegistrationHomeOwners'
     ])
 
-    const { setGlobalEditingMode, isGlobalEditingMode } = useHomeOwners()
+    const { getHomeTenancyType, setGlobalEditingMode, isGlobalEditingMode } = useHomeOwners()
 
     const localState = reactive({
       showAddPersonSection: false,
@@ -210,6 +210,7 @@ export default defineComponent({
       addHomeOwner,
       editHomeOwner,
       removeHomeOwner,
+      getHomeTenancyType,
       ...toRefs(localState)
     }
   }
