@@ -52,7 +52,7 @@ describe('mhr home civic address', () => {
 
     const street = civicAddressSection.find('.street-address')
     expect(civicAddressSection.exists()).toBe(true)
-    
+
     expect(civicAddressSection.findAll(ERROR_MSG).length).toBe(0)
 
     const streetAdditional = civicAddressSection.find('#streetAdditional')
