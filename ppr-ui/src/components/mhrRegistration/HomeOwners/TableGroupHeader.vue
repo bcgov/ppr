@@ -15,7 +15,7 @@
         cancelText: 'Cancel'
       }"
     />
-    <div v-if="!isEditingGroupMode" class="group-header-summary">
+    <div v-if="!isEditGroupMode" class="group-header-summary">
       <div>
         <span class="mr-2 font-weight-bold">Group {{ groupId }}</span>
         |
@@ -23,12 +23,7 @@
         |
         <span class="ma-2">Group Tenancy Type: </span>
         |
-        <span class="ma-2">
-          Interest:
-          {{
-            `${fractionalData.interest} ${fractionalData.interestNumerator}/${fractionalData.interestTotal}`
-          }}
-        </span>
+        <span class="ma-2"> Interest: {{ getOwnershipInterest() }} </span>
       </div>
 
       <div>
@@ -71,11 +66,8 @@
         </v-col>
         <v-col cols="9">
           <label class="generic-label"> Group {{ groupId }} Details: </label>
-          <v-form
-            class="my-5"
-            ref="homeFractionalOwnershipForm"
-            v-model="isHomeFractionalOwnershipValid"
-          >
+
+          <v-form class="my-5" ref="homeFractionalOwnershipForm" v-model="isHomeFractionalOwnershipValid">
             <FractionalOwnership :groupId="groupId" :fractionalData="fractionalData" />
           </v-form>
         </v-col>
@@ -99,7 +91,7 @@
 <script lang="ts">
 import { BaseDialog } from '@/components/dialogs'
 import { useHomeOwners } from '@/composables/mhrRegistration'
-import { computed, defineComponent, reactive, ref, toRefs, watch } from '@vue/composition-api'
+import { defineComponent, reactive, ref, toRefs, watch } from '@vue/composition-api'
 import FractionalOwnership from './FractionalOwnership.vue'
 import { useGetters } from 'vuex-composition-helpers'
 import { find } from 'lodash'
@@ -118,47 +110,34 @@ export default defineComponent({
     FractionalOwnership
   },
   setup (props, context) {
-    const { getMhrRegistrationHomeOwnerGroups } = useGetters<any>([
-      'getMhrRegistrationHomeOwnerGroups'
-    ])
+    const { getMhrRegistrationHomeOwnerGroups } = useGetters<any>(['getMhrRegistrationHomeOwnerGroups'])
 
-    const {
-      isGlobalEditingMode,
-      setGlobalEditingMode,
-      deleteGroup,
-      setGroupFractionalInterest
-    } = useHomeOwners()
+    const { isGlobalEditingMode, setGlobalEditingMode, deleteGroup, setGroupFractionalInterest } = useHomeOwners()
 
     const homeFractionalOwnershipForm = ref(null)
 
     const localState = reactive({
-      isEditingGroupMode: computed((): boolean => localState.currentlyEditingGroupId >= 0),
-      currentlyEditingGroupId: -1,
+      isEditGroupMode: false,
       showDeleteGroupDialog: false,
       isHomeFractionalOwnershipValid: false,
-      group: computed(() =>
-        find(getMhrRegistrationHomeOwnerGroups.value, { groupId: props.groupId })
-      ),
-      fractionalData: computed(() => {
-        return {
-          type: localState.group?.type || '',
-          interest: localState.group?.interest || '',
-          interestNumerator: localState.group?.interestNumerator || null,
-          interestTotal: localState.group?.interestTotal || null,
-          tenancySpecified: localState.group?.tenancySpecified || null
-        } as MhrRegistrationFractionalOwnershipIF
-      })
+      group: find(getMhrRegistrationHomeOwnerGroups.value, { groupId: props.groupId }),
+      fractionalData: {} as MhrRegistrationFractionalOwnershipIF
     })
 
-    const openGroupForEditing = groupId => {
-      localState.currentlyEditingGroupId = groupId
-    }
-    // Get interest based on idex of the group
-    const getOwnershipInterest = (index: number): string => {
-      // const interest = getMhrRegistrationHomeOwnerGroups.value[index]?.interest
-      // return interest ? 'Interest: ' + interest : ''
+    const openGroupForEditing = (): void => {
+      localState.fractionalData = {
+        type: localState.group?.type || '',
+        interest: localState.group?.interest || '',
+        interestNumerator: localState.group?.interestNumerator || null,
+        interestTotal: localState.group?.interestTotal || null,
+        tenancySpecified: localState.group?.tenancySpecified || null
+      } as MhrRegistrationFractionalOwnershipIF
 
-      const { interest, interestNumerator, interestTotal } = localState.fractionalData
+      localState.isEditGroupMode = true
+    }
+
+    const getOwnershipInterest = (): string => {
+      const { interest, interestNumerator, interestTotal } = localState.group
 
       return `${interest} ${interestNumerator}/${interestTotal}`
     }
@@ -168,24 +147,25 @@ export default defineComponent({
       context.refs.homeFractionalOwnershipForm.validate()
 
       if (localState.isHomeFractionalOwnershipValid) {
-        localState.currentlyEditingGroupId = -1
+        localState.isEditGroupMode = false
         setGroupFractionalInterest(props.groupId, localState.fractionalData)
       }
     }
 
     const cancel = (): void => {
-      localState.currentlyEditingGroupId = -1
+      localState.isEditGroupMode = false
+      localState.group = find(getMhrRegistrationHomeOwnerGroups.value, { groupId: props.groupId })
     }
 
     watch(
-      () => localState.currentlyEditingGroupId,
+      () => localState.isEditGroupMode,
       () => {
-        setGlobalEditingMode(localState.isEditingGroupMode)
+        setGlobalEditingMode(localState.isEditGroupMode)
       }
     )
 
     // Close Delete Group dialog or proceed to deleting a Group
-    const cancelOrProceed = (proceed: boolean, groupId: string) => {
+    const cancelOrProceed = (proceed: boolean, groupId: string): void => {
       if (proceed) {
         deleteGroup(groupId)
         localState.showDeleteGroupDialog = false
