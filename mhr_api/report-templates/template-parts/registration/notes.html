@@ -1,0 +1,63 @@
+{% if notes is defined and notes|length > 0  %}
+    <div class="no-page-break">
+        <div class="separator-header mt-6"></div>
+        <div class="section-title-centre mt-2">UNIT NOTES</div>
+        <div class="section-statement mt-0">(Showing most recent first)</div>
+        <div class="separator-header mt-2"></div>
+    </div>
+
+    {% for note in notes %}
+    <div class="no-page-break">
+        <div class="section-title mt-4">{{note.documentDescription}}</div>      
+        <table class="no-page-break section-data details-table mt-4" role="presentation">
+            <tr>
+                <td class="section-sub-title">MHR Number:</td>
+                <td>{{mhrNumber}}</td>
+            </tr>
+            <tr>
+                <td class="section-sub-title">Document Number:</td>
+                <td>{{note.documentId}}</td>
+            </tr>
+            <tr>
+                <td class="section-sub-title">Registration Date and Time:</td>
+                <td>{{note.createDateTime}}</td>
+            </tr>
+            <tr>
+                <td class="section-sub-title">Expired Date and Time:</td>
+                <td>{% if note.expiryDate is defined and note.expiryDate != '' %} 
+                        {{note.expiryDate}}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td class="section-sub-title">Remarks:</td>
+                <td>{% if note.remarks is defined and note.remarks != '' %} 
+                        {{note.remarks}}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td class="section-sub-title pt-2">Contact:</td>
+                <td class="pt-2">
+                    <div>{{note.contactName}}</div>
+                    {% if note.contactAddress is defined %}
+                        <div>{{ note.contactAddress.street }}</div>
+                        <div>{{ note.contactAddress.streetAdditional }}</div>
+                        <div>{{ note.contactAddress.city }} {{ note.contactAddress.region }}</div>
+                        <div>
+                            {% if note.contactAddress.postalCode is defined and note.contactAddress.postalCode != '' %}
+                                {{ note.contactAddress.postalCode }}&nbsp;&nbsp; 
+                            {% endif %}
+                            {{ note.contactAddress.country }}
+                        </div>
+                    {% endif %}
+                </td>
+            </tr>
+       </table>
+    </div>
+    {% endfor %}
+{% endif %}

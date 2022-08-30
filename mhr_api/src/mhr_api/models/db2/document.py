@@ -260,8 +260,11 @@ class Db2Document(db.Model):
                 doc.phone_number = str(submitting.get('phoneNumber'))[0:9]
             else:
                 doc.phone_number = ''
-
-            doc.name = str(submitting.get('businessName'))[0:39]
+            if submitting.get('businessName'):
+                doc.name = str(submitting.get('businessName'))[0:39]
+            else:
+                ind_name: str = model_utils.to_db2_ind_name(submitting.get('personName'))
+                doc.name = ind_name[0:39]
             doc.legacy_address = model_utils.to_db2_address(submitting.get('address'))
         else:
             doc.phone_number = ''

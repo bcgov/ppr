@@ -450,8 +450,8 @@ def expiry_dt_add_years(current_expiry, add_years: int):
 def get_doc_storage_name(registration):
     """Get a document storage name from the registration in the format YYYY/MM/DD/reg_class-reg_id-reg_num.pdf."""
     name = registration.registration_ts.isoformat()[:10]
-    name = name.replace('-', '/') + '/' + registration.registration_type_cl.lower()
-    name += '-' + str(registration.id) + '-' + registration.registration_num + '.pdf'
+    name = name.replace('-', '/') + '/' + registration.registration_type.lower()
+    name += '-' + str(registration.id) + '-' + registration.mhr_number + '.pdf'
     return name
 
 
@@ -914,3 +914,11 @@ def format_mhr_number(mhr_number: str):
     """Trim and pad with zeroes search query mhr number query."""
     formatted = mhr_number.strip().rjust(6, '0')
     return formatted
+
+
+def report_retry_elapsed(last_ts: _datetime):
+    """Check that a sufficient delay has elapsed since the last report request."""
+    now = now_ts()
+    test_ts = (last_ts + timedelta(minutes=15)).replace(tzinfo=timezone.utc)
+    current_app.logger.info('Comparing now ' + now.isoformat() + ' with last ts ' + test_ts.isoformat())
+    return now > test_ts

@@ -294,6 +294,7 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
     def search_by_owner_name_db2(self):
         """Execute a search by owner name query."""
         result = db2_search_utils.search_by_owner_name(current_app, db, self.request_json)
+        last = str(self.request_json['criteria']['ownerName']['last']).upper().strip()
         rows = None
         try:
             rows = result.fetchall()
@@ -304,7 +305,11 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         if rows is not None:
             results_json = []
             for row in rows:
-                results_json.append(SearchRequest.__build_search_result(row))
+                match = SearchRequest.__build_search_result(row)
+                # Check when searching only by last name that the result name is not too short:
+                # a consequence of compressed key name searching.
+                if str(match['ownerName'].get('last')).startswith(last):
+                    results_json.append(match)
             self.returned_results_size = len(results_json)
             self.total_results_size = self.returned_results_size
             self.search_response = results_json

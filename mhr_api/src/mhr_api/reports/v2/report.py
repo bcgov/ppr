@@ -202,6 +202,11 @@ class Report:  # pylint: disable=too-few-public-methods
             'logo',
             'macros',
             'registrarSignature',
+            'registration/details',
+            'registration/location',
+            'registration/notes',
+            'registration/owners',
+            'registration/sections',
             'search-result/details',
             'search-result/location',
             'search-result/notes',
@@ -250,7 +255,8 @@ class Report:  # pylint: disable=too-few-public-methods
         else:
             self._set_addresses()
             self._set_date_times()
-            self._set_notes()
+            if self._report_key != ReportTypes.MHR_REGISTRATION:
+                self._set_notes()
             if self._report_key == ReportTypes.SEARCH_DETAIL_REPORT:
                 self._set_selected()
                 self._set_ppr_search()
@@ -300,6 +306,8 @@ class Report:  # pylint: disable=too-few-public-methods
         if self._report_key in (ReportTypes.SEARCH_DETAIL_REPORT, ReportTypes.SEARCH_BODY_REPORT) and \
                 self._report_data['totalResultsSize'] > 0:
             self._set_search_addresses()
+        elif self._report_key == ReportTypes.MHR_REGISTRATION:
+            self._set_registration_addresses()
 
     def _set_search_addresses(self):
         """Replace search results addresses country code with description."""
@@ -315,6 +323,17 @@ class Report:  # pylint: disable=too-few-public-methods
                     for note in detail['notes']:
                         if note.get('contactAddress'):
                             Report._format_address(note['contactAddress'])
+
+    def _set_registration_addresses(self):
+        """Replace registration addresses country code with description."""
+        if self._report_data:
+            reg = self._report_data
+            if reg.get('ownerGroups'):
+                for group in reg['ownerGroups']:
+                    for owner in group['owners']:
+                        Report._format_address(owner['address'])
+            if reg.get('location') and 'address' in reg['location']:
+                Report._format_address(reg['location']['address'])
 
     def _set_date_times(self):
         """Replace API ISO UTC strings with local report format strings."""
@@ -336,6 +355,22 @@ class Report:  # pylint: disable=too-few-public-methods
                         else:
                             detail['description']['engineerDate'] = \
                                 Report._to_report_datetime(detail['description']['engineerDate'], False)
+        elif self._report_key == ReportTypes.MHR_REGISTRATION:
+            reg = self._report_data
+            reg['createDateTime'] = Report._to_report_datetime(reg['createDateTime'])
+            if reg.get('declaredDateTime'):
+                reg['declaredDateTime'] = Report._to_report_datetime(reg['declaredDateTime'], False)
+            declared_value = str(reg['declaredValue'])
+            if declared_value.isnumeric() and declared_value != '0':
+                reg['declaredValue'] = '$' + '{:0,.2f}'.format(float(declared_value))
+            else:
+                reg['declaredValue'] = ''
+            if reg.get('description') and 'engineerDate' in reg['description']:
+                if reg['description']['engineerDate'] == '0001-01-01':
+                    reg['description']['engineerDate'] = ''
+                else:
+                    reg['description']['engineerDate'] = \
+                        Report._to_report_datetime(reg['description']['engineerDate'], False)
 
     def _set_selected(self):
         """Replace selection serial type code with description. Remove unselected items."""
@@ -395,6 +430,12 @@ class Report:  # pylint: disable=too-few-public-methods
                 self._report_data['footer_content'] = f'MHR Number Search - "{criteria}"'
             else:
                 self._report_data['footer_content'] = f'MHR {search_desc} Search - "{criteria}"'
+        elif self._report_key == ReportTypes.MHR_REGISTRATION:
+            reg_num = self._report_data.get('mhrNumber', '')
+            self._report_data['footer_content'] = f'MH Registraton Number {reg_num}'
+            self._report_data['meta_subject'] = f'Manufactured Home Registration Number: {reg_num}'
+        if self._get_environment() != '':
+            self._report_data['footer_content'] = 'TEST DATA | ' + self._report_data['footer_content']
 
     @staticmethod
     def _get_environment():
@@ -428,6 +469,12 @@ class ReportMeta:  # pylint: disable=too-few-public-methods
     """Helper class to maintain the report meta information."""
 
     reports = {
+        ReportTypes.MHR_REGISTRATION: {
+            'reportDescription': 'MHRRegistration',
+            'fileName': 'registrationV2',
+            'metaTitle': 'Manufactured Home Registration',
+            'metaSubject': ''
+        },
         ReportTypes.SEARCH_DETAIL_REPORT: {
             'reportDescription': 'SearchResult',
             'fileName': 'searchResultV2',

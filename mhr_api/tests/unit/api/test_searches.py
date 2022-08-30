@@ -23,7 +23,7 @@ from http import HTTPStatus
 import pytest
 from flask import current_app
 
-from mhr_api.models import SearchRequest
+from mhr_api.resources.v1.searches import validate_search, staff_update, VAL_ERROR_FIRST_MISSING
 from mhr_api.models.utils import format_ts, now_ts_offset
 from mhr_api.services.authz import COLIN_ROLE, MHR_ROLE, STAFF_ROLE
 from tests.unit.services.utils import create_header, create_header_account
@@ -106,6 +106,15 @@ TEST_SEARCH_DATA = [
     ('Valid no results', 'MHR_NUMBER', '999999', [MHR_ROLE], '1234', HTTPStatus.CREATED),
     ('Unauthorized', 'MHR_NUMBER', '022911', [COLIN_ROLE], '1234', HTTPStatus.UNAUTHORIZED)
 ]
+# testdata pattern is ({desc}, {last}, {first}, {roles}, {account_id}, {status})
+TEST_SEARCH_IND_OWNER_DATA = [
+    ('Valid staff first empty', 'XXXXYYYY', '', [MHR_ROLE, STAFF_ROLE], 'ppr_staff', HTTPStatus.CREATED),
+    ('Valid staff first none', 'XXXXYYYY', None, [MHR_ROLE, STAFF_ROLE], 'ppr_staff', HTTPStatus.CREATED),
+    ('Valid staff first exists', 'XXXXYYYY', 'JOHN', [MHR_ROLE, STAFF_ROLE], 'ppr_staff', HTTPStatus.CREATED),
+    ('Valid non-staff first exists', 'XXXXYYYY', 'JOHN', [MHR_ROLE], 'PS12345', HTTPStatus.CREATED),
+    ('Invalid non-staff first none', 'XXXXYYYY', None, [MHR_ROLE], 'PS12345', HTTPStatus.BAD_REQUEST),
+    ('Invalid non-staff first empty', 'XXXXYYYY', '', [MHR_ROLE], 'PS12345', HTTPStatus.BAD_REQUEST)
+]
 
 # testdata pattern is ({desc}, {json_data}, {search_id}, {roles}, {account_id}, {status})
 TEST_SELECTED_DATA = [
@@ -115,6 +124,26 @@ TEST_SELECTED_DATA = [
     ('Valid no selection', SELECTED_JSON_NONE, 200000004, [MHR_ROLE], '1234', HTTPStatus.ACCEPTED),
     ('Invalid search id', SELECTED_JSON, 300000004, [MHR_ROLE], '1234', HTTPStatus.NOT_FOUND),
     ('Unauthorized', SELECTED_JSON, 200000004, [COLIN_ROLE], '1234', HTTPStatus.UNAUTHORIZED)
+]
+
+# testdata pattern is ({first_name}, {staff}, {change_value})
+TEST_STAFF_UPDATE_DATA = [
+    ('J', True, 'J'),
+    ('', True, ''),
+    (None, True, ''),
+    ('J', False, 'J'),
+    ('', False, ''),
+    (None, False, None)
+]
+
+# testdata pattern is ({first_name}, {staff}, {error_msg})
+TEST_EXTRA_VALIDATION_DATA = [
+    ('J', True, ''),
+    ('', True, ''),
+    (None, True, ''),
+    ('J', False, ''),
+    ('', False, VAL_ERROR_FIRST_MISSING),
+    (None, False, VAL_ERROR_FIRST_MISSING)
 ]
 
 
@@ -147,6 +176,26 @@ def test_search(session, client, jwt, desc, type, value, roles, account_id, stat
     assert rv.status_code == status
 
 
+@pytest.mark.parametrize('desc,last,first,roles,account_id,status', TEST_SEARCH_IND_OWNER_DATA)
+def test_search_owner(session, client, jwt, desc, last, first, roles, account_id, status):
+    """Assert that valid search criteria returns a 201 status."""
+    # setup
+    json_data = copy.deepcopy(OWNER_NAME_JSON)
+    json_data['criteria']['ownerName']['last'] = last
+    if first or first == '':
+        json_data['criteria']['ownerName']['first'] = first
+    else:
+        del json_data['criteria']['ownerName']['first']
+    headers = create_header_account(jwt, roles) if account_id else create_header(jwt, roles)
+
+    rv = client.post('/api/v1/searches',
+                     json=json_data,
+                     headers=headers,
+                     content_type='application/json')
+    # check
+    assert rv.status_code == status
+
+
 @pytest.mark.parametrize('desc,json_data,search_id,roles,account_id,status', TEST_SELECTED_DATA)
 def test_put_selected(session, client, jwt, desc, json_data, search_id, roles, account_id, status):
     """Assert that valid search criteria returns a 201 status."""
@@ -159,3 +208,41 @@ def test_put_selected(session, client, jwt, desc, json_data, search_id, roles, a
                     content_type='application/json')
     # check
     assert rv.status_code == status
+
+
+@pytest.mark.parametrize('first_name,staff,change_value', TEST_STAFF_UPDATE_DATA)
+def test_staff_update(session, client, jwt, first_name, staff, change_value):
+    """Assert that the conditional staff search update works as expected."""
+    json_data = copy.deepcopy(OWNER_NAME_JSON)
+    if first_name or first_name is not None:
+        json_data['criteria']['ownerName']['first'] = first_name
+    else:
+        del json_data['criteria']['ownerName']['first']
+
+    # check
+    result = staff_update(json_data, staff)
+
+    # test
+    if change_value or change_value == '':
+        assert result['criteria']['ownerName']['first'] == change_value
+    else:
+        assert not result['criteria']['ownerName'].get('first')
+
+
+@pytest.mark.parametrize('first_name,staff,err_msg', TEST_EXTRA_VALIDATION_DATA)
+def test_validate_search(session, client, jwt, first_name, staff, err_msg):
+    """Assert that the search extra validation works as expected."""
+    json_data = copy.deepcopy(OWNER_NAME_JSON)
+    if first_name:
+        json_data['criteria']['ownerName']['first'] = first_name
+    else:
+        del json_data['criteria']['ownerName']['first']
+
+    # check
+    result: str = validate_search(json_data, staff)
+
+    # test
+    if err_msg:
+        assert result.find(err_msg) != -1
+    else:
+        assert result == ''
