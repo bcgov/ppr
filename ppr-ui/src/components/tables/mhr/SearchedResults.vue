@@ -55,7 +55,6 @@
           disable-sort
           fixed
           fixed-header
-          group-by="status"
           :headers="headers"
           hide-default-footer
           :items="results"
@@ -66,7 +65,7 @@
           return-object
         >
 
-          <template  v-if="!isReviewMode" v-slot:[`header.ownerName`]>
+          <template  v-if="!isReviewMode" v-slot:[headerSearchTypeSlot]>
             <v-tooltip
               top
               content-class="top-tooltip"
@@ -79,7 +78,7 @@
                     id="select-all-checkbox"
                     class="header-checkbox ma-0 pa-0"
                     hide-details
-                    :label="personOrOrgLabel"
+                    :label="headerSlotLabel"
                     v-model="selectAll"
                     @click="onSelectAllClick()"
                   />
@@ -91,8 +90,15 @@
             </v-tooltip>
           </template>
 
-          <template  v-else v-slot:[`header.ownerName`]>
-            <span class="pl-8">{{ personOrOrgLabel }}</span>
+          <template  v-else v-slot:[headerSearchTypeSlot]>
+            <span v-if="isOwnerOrOrgSearch" class="pl-8">
+              {{ personOrOrgLabel }} Name
+            </span>
+            <span v-else class="pl-8">{{ headerSlotLabel }}</span>
+          </template>
+
+          <template  v-slot:[`header.ownerStatus`]>
+            <span>{{ personOrOrgLabel }} Status</span>
           </template>
 
           <template  v-if="!isReviewMode" v-slot:[`header.edit`]>
@@ -107,39 +113,37 @@
             />
           </template>
 
-          <template v-slot:[`group.header`]="{ group }">
-            <td
-              class="group-header px-4"
-              :colspan="headers.length"
-            >
-              <span v-if="group === 'ACTIVE'">
-                <span class="pl-8">
-                  ACTIVE HOME REGISTRATIONS ({{ activeMatchesLength }})
-                </span>
-              </span>
-              <span v-else-if="group === 'EXEMPT'" class="pl-8">
-                EXEMPT HOME REGISTRATIONS ({{ exemptMatchesLength }})
-              </span>
-              <span v-else-if="group === 'HISTORIC'" class="pl-8">
-                HISTORICAL HOME REGISTRATIONS ({{ historicalMatchesLength }})
-              </span>
-            </td>
-          </template>
-
           <template v-slot:[`item.ownerName`]="{ item }">
-            <v-row class="align-baseline" :class="item.selected && !$props.isReviewMode ? 'selected' : ''">
+            <v-row
+              v-if="isOwnerOrOrgSearch"
+              class="align-baseline"
+              :class="item.selected && !$props.isReviewMode ? 'selected' : ''"
+            >
               <v-col cols="2">
-                <v-checkbox v-model="item.selected" @click="onOwnerCheckboxClick(item)"/>
+                <v-checkbox v-model="item.selected" @click="onSelectionCheckboxClick(item)"/>
               </v-col>
-              <v-col class="owner-name-text" @click="item.selected = !item.selected; onOwnerCheckboxClick(item)">
+              <v-col class="owner-name-text" @click="item.selected = !item.selected; onSelectionCheckboxClick(item)">
                 {{ getOwnerName(item) }}
               </v-col>
             </v-row>
+            <span v-else>{{ getOwnerName(item) }}</span>
           </template>
           <template v-slot:[`item.mhrNumber`]="{ item }">
-            {{ item.mhrNumber }}
+            <v-row
+              v-if="searchType === UIMHRSearchTypes.MHRMHR_NUMBER"
+              class="align-baseline"
+              :class="item.selected && !$props.isReviewMode ? 'selected' : ''"
+            >
+              <v-col cols="2">
+                <v-checkbox v-model="item.selected" @click="onSelectionCheckboxClick(item)"/>
+              </v-col>
+              <v-col class="owner-name-text" @click="item.selected = !item.selected; onSelectionCheckboxClick(item)">
+                {{ item.mhrNumber }}
+              </v-col>
+            </v-row>
+            <span v-else>{{ item.mhrNumber }}</span>
           </template>
-          <template v-slot:[`item.state`]="{ item }">
+          <template v-slot:[`item.ownerStatus`]="{ item }">
             {{ getOwnerStatus(item.ownerStatus) }}
           </template>
           <template v-if="isReviewMode" v-slot:[`item.yearMakeModel`]="{ item }">
@@ -158,7 +162,19 @@
             {{ item.homeLocation }}
           </template>
           <template v-slot:[`item.serialNumber`]="{ item }">
-            <span>{{ item.serialNumber }}</span>
+            <v-row
+              v-if="searchType === UIMHRSearchTypes.MHRSERIAL_NUMBER"
+              class="align-baseline"
+              :class="item.selected && !$props.isReviewMode ? 'selected' : ''"
+            >
+              <v-col cols="2">
+                <v-checkbox v-model="item.selected" @click="onSelectionCheckboxClick(item)"/>
+              </v-col>
+              <v-col class="serial-number-text" @click="item.selected = !item.selected; onSelectionCheckboxClick(item)">
+                {{ item.serialNumber }}
+              </v-col>
+            </v-row>
+            <span v-else>{{ item.serialNumber }}</span>
           </template>
           <template v-slot:[`item.edit`]="{ item }">
             <v-tooltip
@@ -200,12 +216,18 @@
 <script lang="ts">
 import { computed, defineComponent, reactive, toRefs, onMounted, watch } from '@vue/composition-api'
 import { useActions, useGetters } from 'vuex-composition-helpers' // eslint-disable-line no-unused-vars
-
-import { manufacturedHomeSearchTableHeaders, manufacturedHomeSearchTableHeadersReview } from '@/resources'
+import {
+  mhSearchMhrNumberHeaders,
+  mhSearchMhrNumberHeadersReview,
+  mhSearchNameHeaders,
+  mhSearchNameHeadersReview,
+  mhSearchSerialNumberHeaders,
+  mhSearchSerialNumberHeadersReview
+} from '@/resources'
 import { BaseHeaderIF, ManufacturedHomeSearchResultIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { FolioNumber } from '@/components/common'
 import { pacificDate } from '@/utils'
-import { APIMHRMapSearchTypes, RouteNames } from '@/enums'
+import { APIMHRMapSearchTypes, RouteNames, UIMHRSearchTypes, UIMHRSearchTypeValues } from '@/enums'
 import { cloneDeep } from 'lodash'
 
 export default defineComponent({
@@ -233,7 +255,7 @@ export default defineComponent({
       searched: false,
       searchValue: '',
       searchTime: '',
-      searchType: null,
+      searchType: null as UIMHRSearchTypes,
       selectAll: false,
       selectAllLien: false,
       folioNumber: getFolioOrReferenceNumber.value,
@@ -241,6 +263,28 @@ export default defineComponent({
         'the same registration. That registration will only be shown once in the report.',
       results: [],
       totalResultsLength: 0,
+      headerSearchTypeSlot: computed((): string => {
+        switch (getSearchedType.value?.searchTypeUI) {
+          case UIMHRSearchTypes.MHROWNER_NAME:
+          case UIMHRSearchTypes.MHRORGANIZATION_NAME:
+            return `header.${UIMHRSearchTypeValues.MHROWNER_NAME}`
+          case UIMHRSearchTypes.MHRSERIAL_NUMBER:
+            return `header.${UIMHRSearchTypeValues.MHRSERIAL_NUMBER}`
+          case UIMHRSearchTypes.MHRMHR_NUMBER:
+            return `header.${UIMHRSearchTypeValues.MHRMHR_NUMBER}`
+        }
+      }),
+      itemSearchTypeSlot: computed((): string => {
+        switch (getSearchedType.value?.searchTypeUI) {
+          case UIMHRSearchTypes.MHROWNER_NAME:
+          case UIMHRSearchTypes.MHRORGANIZATION_NAME:
+            return `item.${UIMHRSearchTypeValues.MHROWNER_NAME}`
+          case UIMHRSearchTypes.MHRSERIAL_NUMBER:
+            return `item.${UIMHRSearchTypeValues.MHRSERIAL_NUMBER}`
+          case UIMHRSearchTypes.MHRMHR_NUMBER:
+            return `item.${UIMHRSearchTypeValues.MHRMHR_NUMBER}`
+        }
+      }),
       activeMatchesLength: computed((): number => {
         return localState.results?.filter(item => item.status === 'ACTIVE').length
       }),
@@ -250,26 +294,32 @@ export default defineComponent({
       selectedLiensLength: computed((): number => {
         return localState.results?.filter(item => item.includeLienInfo === true).length
       }),
-      exemptMatchesLength: computed((): number => {
-        return localState.results?.filter(item => item.status === 'EXEMPT').length
-      }),
-      historicalMatchesLength: computed((): number => {
-        return localState.results?.filter(item => item.status === 'HISTORIC').length
-      }),
       headers: computed((): Array<BaseHeaderIF> => {
-        return props.isReviewMode ? manufacturedHomeSearchTableHeadersReview : manufacturedHomeSearchTableHeaders
+        switch (localState.searchType) {
+          case UIMHRSearchTypes.MHROWNER_NAME:
+            return props.isReviewMode ? mhSearchNameHeadersReview : mhSearchNameHeaders
+          case UIMHRSearchTypes.MHRORGANIZATION_NAME:
+            return props.isReviewMode ? mhSearchNameHeadersReview : mhSearchNameHeaders
+          case UIMHRSearchTypes.MHRMHR_NUMBER:
+            return props.isReviewMode ? mhSearchMhrNumberHeadersReview : mhSearchMhrNumberHeaders
+          case UIMHRSearchTypes.MHRSERIAL_NUMBER:
+            return props.isReviewMode ? mhSearchSerialNumberHeadersReview : mhSearchSerialNumberHeaders
+        }
+      }),
+      headerSlotLabel: computed((): string => {
+        return localState.searchType === UIMHRSearchTypes.MHRMHR_NUMBER ? 'Registration Number' : localState.searchType
       }),
       personOrOrgLabel: computed((): string => {
-        return getManufacturedHomeSearchResults.value.searchQuery.type === APIMHRMapSearchTypes.MHRORGANIZATION_NAME
-          ? 'Organization Name'
-          : 'Owner Name'
+        return getManufacturedHomeSearchResults.value?.searchQuery.type === APIMHRMapSearchTypes.MHRORGANIZATION_NAME
+          ? 'Organization'
+          : 'Owner'
       }),
       areAllSelected: computed((): boolean => {
         return localState.results?.every(result => result && result.selected === true)
       }),
       activeResults: computed((): any => {
         const selectedResults = cloneDeep(getSelectedManufacturedHomes).value
-        const baseResults = cloneDeep(getManufacturedHomeSearchResults.value.results)
+        const baseResults = cloneDeep(getManufacturedHomeSearchResults.value?.results)
 
         // Map selected results with base results when user navigates back to edit selections further
         const activeResults = baseResults?.map(result => {
@@ -286,6 +336,9 @@ export default defineComponent({
         return props.isReviewMode
           ? selectedResults
           : activeResults
+      }),
+      isOwnerOrOrgSearch: computed((): boolean => {
+        return [UIMHRSearchTypes.MHROWNER_NAME, UIMHRSearchTypes.MHRORGANIZATION_NAME].includes(localState.searchType)
       })
     })
 
@@ -294,12 +347,12 @@ export default defineComponent({
     }
 
     const getOwnerName = (item: ManufacturedHomeSearchResultIF): string => {
-      if (item.ownerName) {
+      if (item?.ownerName) {
         return `
           ${item.ownerName?.last},
           ${item.ownerName?.first}
           ${item.ownerName?.middle || item.ownerName?.second || ''}`
-      } else if (item.organizationName) {
+      } else if (item?.organizationName) {
         return item.organizationName
       } else return '-'
     }
@@ -308,7 +361,7 @@ export default defineComponent({
       return item.selected && !props.isReviewMode ? 'selected' : ''
     }
 
-    const onOwnerCheckboxClick = (item: ManufacturedHomeSearchResultIF): void => {
+    const onSelectionCheckboxClick = (item: ManufacturedHomeSearchResultIF): void => {
       if (!item.selected) {
         item.includeLienInfo = false
       }
@@ -332,11 +385,11 @@ export default defineComponent({
       const resp = getManufacturedHomeSearchResults.value
       if (!resp) await router.push({ name: RouteNames.DASHBOARD })
 
-      localState.searchValue = resp.searchQuery.criteria.value || getOwnerName(resp.searchQuery.criteria)
+      localState.searchValue = resp?.searchQuery.criteria.value || getOwnerName(resp?.searchQuery.criteria)
       localState.searched = true
       localState.searchType = getSearchedType.value?.searchTypeUI || ''
-      localState.results = sortByStatus(localState.activeResults)
-      localState.results = localState.results.map(result => {
+      localState.results = localState.activeResults
+      localState.results = localState.results?.map(result => {
         // includeLienInfo needs to be initialized or something weird will happen
         return result.includeLienInfo !== true ? { ...result, includeLienInfo: false } : result
       })
@@ -345,24 +398,10 @@ export default defineComponent({
       localState.searchTime = pacificDate(date)
     })
 
-    /** Custom sorting method to handle results by status. */
-    const sortByStatus = (items: Array<ManufacturedHomeSearchResultIF> = []): Array<ManufacturedHomeSearchResultIF> => {
-      items.sort((a, b) => {
-        if (a.status < b.status) {
-          return -1
-        }
-        if (a.status > b.status) {
-          return 1
-        }
-        return 0
-      })
-      return items
-    }
-
     watch(() => localState.results, (): void => {
       const selectedManufacturedHomes = cloneDeep(localState.results?.filter(result => result.selected === true))
       setSelectedManufacturedHomes(selectedManufacturedHomes)
-      localState.selectAll = localState.results.every(result => result.selected)
+      localState.selectAll = localState.results?.every(result => result.selected)
       if (localState.selectedMatchesLength === 0) {
         localState.selectAllLien = false
       }
@@ -388,12 +427,13 @@ export default defineComponent({
     }
 
     return {
+      UIMHRSearchTypes,
       reviewAndConfirm,
       getOwnerName,
       getOwnerStatus,
       updateFolioOrReference,
       getItemClass,
-      onOwnerCheckboxClick,
+      onSelectionCheckboxClick,
       onSelectAllClick,
       onSelectAllLienClick,
       ...toRefs(localState)
@@ -434,7 +474,7 @@ th {
 .main-results-div {
   width: 100%;
 }
-.owner-name-text {
+.owner-name-text, .serial-number-text {
   cursor: pointer;
 }
 .no-results-info {
@@ -498,6 +538,10 @@ th {
       // $gray1 at 75%
       background-color: #f1f3f5BF !important;
     }
+  }
+  .v-data-table > .v-data-table__wrapper > table > tbody > tr > td,
+  .v-data-table > .v-data-table__wrapper > table > thead > tr > th {
+    padding: 0 12px !important;
   }
 }
 </style>

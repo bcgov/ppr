@@ -2,14 +2,22 @@
 import Vue from 'vue'
 import Vuetify from 'vuetify'
 import { getVuexStore } from '@/store'
-import CompositionApi from '@vue/composition-api'
+import CompositionApi, {nextTick} from '@vue/composition-api'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 
 // Components
 import { SearchedResultMhr } from '@/components/tables'
 
 // Other
-import { manufacturedHomeSearchTableHeaders, manufacturedHomeSearchTableHeadersReview } from '@/resources'
+import {
+  MHRSearchTypes,
+  mhSearchMhrNumberHeaders,
+  mhSearchMhrNumberHeadersReview,
+  mhSearchNameHeaders,
+  mhSearchNameHeadersReview,
+  mhSearchSerialNumberHeaders,
+  mhSearchSerialNumberHeadersReview
+} from '@/resources'
 import { ManufacturedHomeSearchResponseIF } from '@/interfaces'
 import { APIMHRSearchTypes, UIMHRSearchTypes } from '@/enums'
 import { mockedMHRSearchResponse, mockedMHRSearchResultsSorted, mockedMHRSearchSelections } from './test-data'
@@ -24,7 +32,7 @@ const noResults: ManufacturedHomeSearchResponseIF = {
   searchDateTime: '2020-02-21T18:56:20Z',
   totalResultsSize: 0,
   searchQuery: {
-    type: APIMHRSearchTypes.MHRSERIAL_NUMBER,
+    type: APIMHRSearchTypes.MHROWNER_NAME,
     criteria: {
       value: 'T1234'
     }
@@ -83,17 +91,18 @@ describe('Serial number results', () => {
 
   beforeEach(async () => {
     await store.dispatch('setManufacturedHomeSearchResults', testResults)
+    await store.dispatch('setSearchedType', MHRSearchTypes[5])
     wrapper = createComponent()
   })
   afterEach(() => {
     wrapper.destroy()
   })
 
-  it('renders Results Component with serial number results data', () => {
+  it('renders Results Component with serial number results data', async () => {
     expect(wrapper.findComponent(SearchedResultMhr).exists()).toBe(true)
     expect(wrapper.vm.$data.searched).toBeTruthy()
     expect(wrapper.vm.$data.searchValue).toEqual(testResults.searchQuery.criteria.value)
-    expect(wrapper.vm.$data.headers).toStrictEqual(manufacturedHomeSearchTableHeaders)
+    expect(wrapper.vm.$data.headers).toStrictEqual(mhSearchSerialNumberHeaders)
     expect(wrapper.vm.$data.results).toStrictEqual(testResults.results)
     expect(wrapper.vm.$data.totalResultsLength).toEqual(testResults.totalResultsSize)
 
@@ -111,12 +120,7 @@ describe('Serial number results', () => {
     const datatable = wrapper.findAll(resultsTable)
     expect(datatable.length).toBe(1)
     const rows = wrapper.findAll('tr')
-    // includes header and 2 group headers (Active, Exempt, Historical) so add 3
-    expect(rows.length).toBe(testResults.results.length + 3)
-
-    const groupHeaders = wrapper.findAll('.group-header')
-    expect(groupHeaders.at(0).text()).toBe('ACTIVE HOME REGISTRATIONS (2)')
-    expect(groupHeaders.at(1).text()).toBe('EXEMPT HOME REGISTRATIONS (2)')
+    expect(rows.length).toBe(testResults.results.length + 1)
 
     for (let i; i < testResults.results; i++) {
       expect(rows.at(i + 1).text()).toContain(testResults.results[i].mhrNumber)
@@ -136,6 +140,8 @@ describe('Serial number results in Review Mode', () => {
   beforeEach(async () => {
     await store.dispatch('setManufacturedHomeSearchResults', testResults)
     await store.dispatch('setSelectedManufacturedHomes', selectedResults)
+    await store.dispatch('setSearchedType', MHRSearchTypes[5])
+
     wrapper = createComponent({ isReviewMode: true })
   })
   afterEach(() => {
@@ -144,7 +150,7 @@ describe('Serial number results in Review Mode', () => {
 
   it('renders Results Component with Serial number data', () => {
     expect(wrapper.findComponent(SearchedResultMhr).exists()).toBe(true)
-    expect(wrapper.vm.$data.headers).toStrictEqual(manufacturedHomeSearchTableHeadersReview)
+    expect(wrapper.vm.$data.headers).toStrictEqual(mhSearchSerialNumberHeadersReview)
     expect(wrapper.vm.$data.results).toStrictEqual(selectedResults)
 
     // Verify base mode features
@@ -159,8 +165,7 @@ describe('Serial number results in Review Mode', () => {
     const datatable = wrapper.findAll(resultsTable)
     expect(datatable.length).toBe(1)
     const rows = wrapper.findAll('tr')
-    // includes group categories (Active)
-    expect(rows.length).toBe(selectedResults.length + 2)
+    expect(rows.length).toBe(selectedResults.length + 1)
   })
 })
 
@@ -171,6 +176,8 @@ describe('Owner name debtor results', () => {
   beforeEach(async () => {
     await store.dispatch('setManufacturedHomeSearchResults', testResults)
     await store.dispatch('setSelectedManufacturedHomes', [])
+    await store.dispatch('setSearchedType', MHRSearchTypes[3])
+
     wrapper = createComponent()
   })
   afterEach(() => {
@@ -181,7 +188,7 @@ describe('Owner name debtor results', () => {
     expect(wrapper.findComponent(SearchedResultMhr).exists()).toBe(true)
     expect(wrapper.vm.$data.searched).toBeTruthy()
     expect(wrapper.vm.$data.searchValue).toEqual(testResults.searchQuery.criteria.value)
-    expect(wrapper.vm.$data.headers).toStrictEqual(manufacturedHomeSearchTableHeaders)
+    expect(wrapper.vm.$data.headers).toStrictEqual(mhSearchNameHeaders)
     expect(wrapper.vm.$data.results).toStrictEqual(testResults.results)
     expect(wrapper.vm.$data.totalResultsLength).toEqual(testResults.totalResultsSize)
 
@@ -199,12 +206,7 @@ describe('Owner name debtor results', () => {
     const datatable = wrapper.findAll(resultsTable)
     expect(datatable.length).toBe(1)
     const rows = wrapper.findAll('tr')
-    // includes header and 2 group headers (Active, Exempt, Historical) so add 3
-    expect(rows.length).toBe(testResults.results.length + 3)
-
-    const groupHeaders = wrapper.findAll('.group-header')
-    expect(groupHeaders.at(0).text()).toBe('ACTIVE HOME REGISTRATIONS (2)')
-    expect(groupHeaders.at(1).text()).toBe('EXEMPT HOME REGISTRATIONS (2)')
+    expect(rows.length).toBe(testResults.results.length + 1)
 
     for (let i; i < testResults.results; i++) {
       expect(rows.at(i + 1).text()).toContain(testResults.results[i].mhrNumber)
@@ -224,6 +226,8 @@ describe('Owner name name in Review Mode', () => {
   beforeEach(async () => {
     await store.dispatch('setManufacturedHomeSearchResults', testResults)
     await store.dispatch('setSelectedManufacturedHomes', selectedResults)
+    await store.dispatch('setSearchedType', MHRSearchTypes[3])
+
     wrapper = createComponent({ isReviewMode: true })
   })
   afterEach(() => {
@@ -232,7 +236,7 @@ describe('Owner name name in Review Mode', () => {
 
   it('renders Results Component with Owner name data', () => {
     expect(wrapper.findComponent(SearchedResultMhr).exists()).toBe(true)
-    expect(wrapper.vm.$data.headers).toStrictEqual(manufacturedHomeSearchTableHeadersReview)
+    expect(wrapper.vm.$data.headers).toStrictEqual(mhSearchNameHeadersReview)
     expect(wrapper.vm.$data.results).toStrictEqual(selectedResults)
 
     // Verify base mode features
@@ -247,18 +251,19 @@ describe('Owner name name in Review Mode', () => {
     const datatable = wrapper.findAll(resultsTable)
     expect(datatable.length).toBe(1)
     const rows = wrapper.findAll('tr')
-    // includes group categories (Active)
-    expect(rows.length).toBe(selectedResults.length + 2)
+    expect(rows.length).toBe(selectedResults.length + 1)
   })
 })
 
-describe('Business debtor results', () => {
+describe('Business organization results', () => {
   let wrapper: Wrapper<any>
   const testResults = mockedMHRSearchResponse[UIMHRSearchTypes.MHRORGANIZATION_NAME]
 
   beforeEach(async () => {
     await store.dispatch('setManufacturedHomeSearchResults', testResults)
     await store.dispatch('setSelectedManufacturedHomes', [])
+    await store.dispatch('setSearchedType', MHRSearchTypes[4])
+
     wrapper = createComponent()
   })
   afterEach(() => {
@@ -269,7 +274,7 @@ describe('Business debtor results', () => {
     expect(wrapper.findComponent(SearchedResultMhr).exists()).toBe(true)
     expect(wrapper.vm.$data.searched).toBeTruthy()
     expect(wrapper.vm.$data.searchValue).toEqual(testResults.searchQuery.criteria.value)
-    expect(wrapper.vm.$data.headers).toStrictEqual(manufacturedHomeSearchTableHeaders)
+    expect(wrapper.vm.$data.headers).toStrictEqual(mhSearchNameHeaders)
     expect(wrapper.vm.$data.results).toStrictEqual(testResults.results)
     expect(wrapper.vm.$data.totalResultsLength).toEqual(testResults.totalResultsSize)
 
@@ -287,12 +292,7 @@ describe('Business debtor results', () => {
     const datatable = wrapper.findAll(resultsTable)
     expect(datatable.length).toBe(1)
     const rows = wrapper.findAll('tr')
-    // includes header and 2 group headers (Active, Exempt) so add 3
-    expect(rows.length).toBe(testResults.results.length + 3)
-
-    const groupHeaders = wrapper.findAll('.group-header')
-    expect(groupHeaders.at(0).text()).toBe('ACTIVE HOME REGISTRATIONS (2)')
-    expect(groupHeaders.at(1).text()).toBe('EXEMPT HOME REGISTRATIONS (2)')
+    expect(rows.length).toBe(testResults.results.length + 1)
 
     for (let i; i < testResults.results; i++) {
       expect(rows.at(i + 1).text()).toContain(testResults.results[i].mhrNumber)
@@ -300,7 +300,7 @@ describe('Business debtor results', () => {
   })
 })
 
-describe('Business debtor results in Review Mode', () => {
+describe('Business organization results in Review Mode', () => {
   let wrapper: Wrapper<any>
   const testResults = mockedMHRSearchResponse[UIMHRSearchTypes.MHRORGANIZATION_NAME]
   const selectedResults = mockedMHRSearchSelections[UIMHRSearchTypes.MHRORGANIZATION_NAME]
@@ -308,6 +308,8 @@ describe('Business debtor results in Review Mode', () => {
   beforeEach(async () => {
     await store.dispatch('setManufacturedHomeSearchResults', testResults)
     await store.dispatch('setSelectedManufacturedHomes', selectedResults)
+    await store.dispatch('setSearchedType', MHRSearchTypes[4])
+
     wrapper = createComponent({ isReviewMode: true })
   })
   afterEach(() => {
@@ -316,7 +318,7 @@ describe('Business debtor results in Review Mode', () => {
 
   it('renders Results Component with business debtor name data', () => {
     expect(wrapper.findComponent(SearchedResultMhr).exists()).toBe(true)
-    expect(wrapper.vm.$data.headers).toStrictEqual(manufacturedHomeSearchTableHeadersReview)
+    expect(wrapper.vm.$data.headers).toStrictEqual(mhSearchNameHeadersReview)
     expect(wrapper.vm.$data.results).toStrictEqual(selectedResults)
 
     // Verify base mode features
@@ -331,18 +333,18 @@ describe('Business debtor results in Review Mode', () => {
     const datatable = wrapper.findAll(resultsTable)
     expect(datatable.length).toBe(1)
     const rows = wrapper.findAll('tr')
-    // includes group categories (Active, Exempt)
-    expect(rows.length).toBe(selectedResults.length + 3)
+    expect(rows.length).toBe(selectedResults.length + 1)
   })
 })
 
 describe('Manufactured home results', () => {
   let wrapper: Wrapper<any>
   const testResults = mockedMHRSearchResponse[UIMHRSearchTypes.MHRMHR_NUMBER]
-  const sortedResults = mockedMHRSearchResultsSorted[UIMHRSearchTypes.MHRMHR_NUMBER]
   beforeEach(async () => {
     await store.dispatch('setManufacturedHomeSearchResults', testResults)
     await store.dispatch('setSelectedManufacturedHomes', [])
+    await store.dispatch('setSearchedType', MHRSearchTypes[2])
+
     wrapper = createComponent()
   })
   afterEach(() => {
@@ -353,8 +355,7 @@ describe('Manufactured home results', () => {
     expect(wrapper.findComponent(SearchedResultMhr).exists()).toBe(true)
     expect(wrapper.vm.$data.searched).toBeTruthy()
     expect(wrapper.vm.$data.searchValue).toEqual(testResults.searchQuery.criteria.value)
-    expect(wrapper.vm.$data.headers).toStrictEqual(manufacturedHomeSearchTableHeaders)
-    expect(wrapper.vm.$data.results).toStrictEqual(sortedResults)
+    expect(wrapper.vm.$data.headers).toStrictEqual(mhSearchMhrNumberHeaders)
     expect(wrapper.vm.$data.totalResultsLength).toEqual(testResults.totalResultsSize)
 
     // Verify base mode features
@@ -371,13 +372,7 @@ describe('Manufactured home results', () => {
     const datatable = wrapper.findAll(resultsTable)
     expect(datatable.length).toBe(1)
     const rows = wrapper.findAll('tr')
-    // includes header and 2 group headers (active / exempt / historical) so add 3
-    expect(rows.length).toBe(testResults.results.length + 4)
-
-    const groupHeaders = wrapper.findAll('.group-header')
-    expect(groupHeaders.at(0).text()).toBe('ACTIVE HOME REGISTRATIONS (2)')
-    expect(groupHeaders.at(1).text()).toBe('EXEMPT HOME REGISTRATIONS (2)')
-    expect(groupHeaders.at(2).text()).toBe('HISTORICAL HOME REGISTRATIONS (1)')
+    expect(rows.length).toBe(testResults.results.length + 1)
 
     for (let i; i < testResults.results; i++) {
       expect(rows.at(i + 1).text()).toContain(testResults.results[i].mhrNumber)
@@ -397,6 +392,8 @@ describe('Manufactured home results in Review Mode', () => {
   beforeEach(async () => {
     await store.dispatch('setManufacturedHomeSearchResults', testResults)
     await store.dispatch('setSelectedManufacturedHomes', selectedResults)
+    await store.dispatch('setSearchedType', MHRSearchTypes[2])
+
     wrapper = createComponent({ isReviewMode: true })
   })
   afterEach(() => {
@@ -405,7 +402,7 @@ describe('Manufactured home results in Review Mode', () => {
 
   it('renders Results Component with manufactured home results data', () => {
     expect(wrapper.findComponent(SearchedResultMhr).exists()).toBe(true)
-    expect(wrapper.vm.$data.headers).toStrictEqual(manufacturedHomeSearchTableHeadersReview)
+    expect(wrapper.vm.$data.headers).toStrictEqual(mhSearchMhrNumberHeadersReview)
     expect(wrapper.vm.$data.results).toStrictEqual(selectedResults)
 
     // Verify base mode features
@@ -420,7 +417,6 @@ describe('Manufactured home results in Review Mode', () => {
     const datatable = wrapper.findAll(resultsTable)
     expect(datatable.length).toBe(1)
     const rows = wrapper.findAll('tr')
-    // includes group categories (Active, Exempt, Historical)
-    expect(rows.length).toBe(selectedResults.length + 3)
+    expect(rows.length).toBe(selectedResults.length + 1)
   })
 })

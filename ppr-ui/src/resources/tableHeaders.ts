@@ -438,12 +438,18 @@ export const registrationTableHeaders: Array<BaseHeaderIF> = [
   }
 ]
 
-export const manufacturedHomeSearchTableHeaders: Array<BaseHeaderIF> = [
+export const mhSearchNameHeaders: Array<BaseHeaderIF> = [
   {
     class: 'column-mdl',
     sortable: false,
     text: 'Owner Name',
     value: 'ownerName'
+  },
+  {
+    class: 'column-mds',
+    sortable: false,
+    text: 'Owner Status',
+    value: 'ownerStatus'
   },
   {
     class: 'column-mds',
@@ -454,11 +460,11 @@ export const manufacturedHomeSearchTableHeaders: Array<BaseHeaderIF> = [
   {
     class: 'column-mds',
     sortable: false,
-    text: 'Owner Status',
-    value: 'state'
+    text: 'Registration Status',
+    value: 'status'
   },
   {
-    class: 'column-sm',
+    class: 'column-xs',
     sortable: false,
     text: 'Year',
     value: 'year'
@@ -470,7 +476,7 @@ export const manufacturedHomeSearchTableHeaders: Array<BaseHeaderIF> = [
     value: 'make'
   },
   {
-    class: 'column-sm',
+    class: 'column-xs',
     sortable: false,
     text: 'Model',
     value: 'model'
@@ -481,7 +487,7 @@ export const manufacturedHomeSearchTableHeaders: Array<BaseHeaderIF> = [
     value: 'homeLocation'
   },
   {
-    class: 'column-md',
+    class: 'column-mds',
     text: 'Serial Number',
     value: 'serialNumber'
   },
@@ -493,7 +499,129 @@ export const manufacturedHomeSearchTableHeaders: Array<BaseHeaderIF> = [
   }
 ]
 
-export const manufacturedHomeSearchTableHeadersReview: Array<BaseHeaderIF> = [
+export const mhSearchSerialNumberHeaders: Array<BaseHeaderIF> = [
+  {
+    class: 'column-md',
+    sortable: false,
+    text: 'Serial Number',
+    value: 'serialNumber'
+  },
+  {
+    class: 'column-mds',
+    sortable: false,
+    text: 'Registration Number',
+    value: 'mhrNumber'
+  },
+  {
+    class: 'column-mds',
+    sortable: false,
+    text: 'Registration Status',
+    value: 'status'
+  },
+  {
+    class: 'column-md',
+    text: 'Owner Name',
+    value: 'ownerName'
+  },
+  {
+    class: 'column-mds',
+    sortable: false,
+    text: 'Owner Status',
+    value: 'ownerStatus'
+  },
+  {
+    class: 'column-xs',
+    sortable: false,
+    text: 'Year',
+    value: 'year'
+  },
+  {
+    class: 'column-mds',
+    sortable: false,
+    text: 'Make',
+    value: 'make'
+  },
+  {
+    class: 'column-xs',
+    sortable: false,
+    text: 'Model',
+    value: 'model'
+  },
+  {
+    class: 'column-mds',
+    text: 'Home Location',
+    value: 'homeLocation'
+  },
+  {
+    class: 'lien-info',
+    sortable: false,
+    text: '',
+    value: 'edit'
+  }
+]
+
+export const mhSearchMhrNumberHeaders: Array<BaseHeaderIF> = [
+  {
+    class: 'column-mdl',
+    sortable: false,
+    text: 'Registration Number',
+    value: 'mhrNumber'
+  },
+  {
+    class: 'column-mds',
+    sortable: false,
+    text: 'Registration Status',
+    value: 'status'
+  },
+  {
+    class: 'column-mds',
+    text: 'Owner Name',
+    value: 'ownerName'
+  },
+  {
+    class: 'column-mds',
+    sortable: false,
+    text: 'Owner Status',
+    value: 'ownerStatus'
+  },
+  {
+    class: 'column-xs',
+    sortable: false,
+    text: 'Year',
+    value: 'year'
+  },
+  {
+    class: 'column-mds',
+    sortable: false,
+    text: 'Make',
+    value: 'make'
+  },
+  {
+    class: 'column-xs',
+    sortable: false,
+    text: 'Model',
+    value: 'model'
+  },
+  {
+    class: 'column-mds',
+    text: 'Home Location',
+    value: 'homeLocation'
+  },
+  {
+    class: 'column-mds',
+    sortable: false,
+    text: 'Serial Number',
+    value: 'serialNumber'
+  },
+  {
+    class: 'lien-info',
+    sortable: false,
+    text: '',
+    value: 'edit'
+  }
+]
+
+export const mhSearchNameHeadersReview: Array<BaseHeaderIF> = [
   {
     class: 'column-mdl',
     sortable: false,
@@ -505,6 +633,80 @@ export const manufacturedHomeSearchTableHeadersReview: Array<BaseHeaderIF> = [
     sortable: false,
     text: 'Registration Number',
     value: 'mhrNumber'
+  },
+  {
+    class: 'column-md',
+    sortable: false,
+    text: 'Year Make Model',
+    value: 'yearMakeModel'
+  },
+  {
+    class: 'column-mds',
+    text: 'Home Location',
+    value: 'homeLocation'
+  },
+  {
+    class: 'column-mds',
+    text: 'Serial Number',
+    value: 'serialNumber'
+  },
+  {
+    class: 'lien-info',
+    sortable: false,
+    text: '',
+    value: 'edit'
+  }
+]
+
+export const mhSearchSerialNumberHeadersReview: Array<BaseHeaderIF> = [
+  {
+    class: 'column-md',
+    text: 'Serial Number',
+    value: 'serialNumber'
+  },
+  {
+    class: 'column-mds',
+    sortable: false,
+    text: 'Registration Number',
+    value: 'mhrNumber'
+  },
+  {
+    class: 'column-md',
+    sortable: false,
+    text: 'Owner Name',
+    value: 'ownerName'
+  },
+  {
+    class: 'column-md',
+    sortable: false,
+    text: 'Year Make Model',
+    value: 'yearMakeModel'
+  },
+  {
+    class: 'column-mds',
+    text: 'Home Location',
+    value: 'homeLocation'
+  },
+  {
+    class: 'lien-info',
+    sortable: false,
+    text: '',
+    value: 'edit'
+  }
+]
+
+export const mhSearchMhrNumberHeadersReview: Array<BaseHeaderIF> = [
+  {
+    class: 'column-mdl',
+    sortable: false,
+    text: 'Registration Number',
+    value: 'mhrNumber'
+  },
+  {
+    class: 'column-md',
+    sortable: false,
+    text: 'Owner Name',
+    value: 'ownerName'
   },
   {
     class: 'column-md',
