@@ -234,9 +234,4 @@ export default defineComponent({
     vertical-align: text-bottom;
   }
 }
-.fractional-error-msg {
-  font-size: 14px;
-  line-height: 16px;
-  color: $error;
-}
 </style>
