@@ -7,7 +7,7 @@
       hide-default-footer
       :items="homeOwners"
       item-key="groupId"
-      group-by="groupId"
+      :group-by="showGroups ? 'groupId' : null"
       disable-sort
       disable-pagination
     >
