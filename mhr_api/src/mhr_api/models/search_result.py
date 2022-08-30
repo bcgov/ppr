@@ -22,7 +22,7 @@ from flask import current_app
 from sqlalchemy.sql import text
 
 from mhr_api.exceptions import BusinessException, DatabaseException, ResourceErrorCodes
-from mhr_api.models import Db2Manuhome, FinancingStatement, utils as model_utils, search_utils
+from mhr_api.models import MhrRegistration, FinancingStatement, utils as model_utils, search_utils
 
 from .db import db
 # from .financing_statement import FinancingStatement
@@ -129,6 +129,7 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
     def build_details(self):
         """Generate the search selection details."""
         new_results = []
+        use_legacy_db: bool = current_app.config.get('USE_LEGACY_DB', True)
         for select in self.search_select:
             if 'selected' not in select or select['selected']:
                 mhr_num = select['mhrNumber']
@@ -139,10 +140,10 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
                             found = True
                 if not found:  # No duplicates.
                     # Load registration details here.
-                    current_app.logger.debug(f'Db2Manuhome.find_by_mhr_number {mhr_num} start')
                     mh_id = select.get('mhId', None)
-                    record: Db2Manuhome = Db2Manuhome.find_by_id(mh_id)
-                    current_app.logger.debug(f'Db2Manuhome.find_by_mhr_number {mhr_num} end')
+                    current_app.logger.debug(f'find_by_id for mhr num {mhr_num} start id={mh_id}')
+                    record = MhrRegistration.find_by_id(mh_id, use_legacy_db)
+                    current_app.logger.debug(f'find_by_id for mhr num {mhr_num} end')
                     result = record.registration_json
                     if select.get('includeLienInfo', False):
                         current_app.logger.info(f'Searching PPR for MHR num {mhr_num}.')

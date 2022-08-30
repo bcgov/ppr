@@ -288,6 +288,35 @@ def format_ts(time_stamp):
     return formatted_ts
 
 
+def format_local_ts(time_stamp):
+    """Build a local timezone ISO 8601 date and time string with no microseconds."""
+    formatted_ts: str = None
+    if time_stamp:
+        try:
+            formatted_ts = time_stamp.replace(tzinfo=LOCAL_TZ).replace(microsecond=0).isoformat()
+        except Exception as format_exception:   # noqa: B902; return nicer error
+            current_app.logger.error('format_ts exception: ' + str(format_exception))
+            formatted_ts = time_stamp.isoformat()
+    return formatted_ts
+
+
+def format_local_date(base_date):
+    """Build a local timezone ISO 8601 date."""
+    formatted_ts = None
+    if base_date:
+        try:
+            # Naive time
+            local_time = time(9, 0, 0, tzinfo=None)
+            base_ts = _datetime.combine(base_date, local_time)
+            # Explicitly set to local timezone.
+            local_ts = LOCAL_TZ.localize(base_ts)
+            formatted_ts = local_ts.replace(tzinfo=LOCAL_TZ).replace(microsecond=0).isoformat()
+        except Exception as format_exception:   # noqa: B902; return nicer error
+            current_app.logger.error('format_local_date exception: ' + str(format_exception))
+            formatted_ts = base_date.isoformat()
+    return formatted_ts[0:10]
+
+
 def now_ts():
     """Create a timestamp representing the current date and time in the UTC time zone."""
     return _datetime.now(timezone.utc)
@@ -317,6 +346,11 @@ def ts_from_iso_format(timestamp_iso: str):
     """Create a datetime object from a timestamp string in the ISO format."""
     time_stamp = _datetime.fromisoformat(timestamp_iso).timestamp()
     return _datetime.utcfromtimestamp(time_stamp).replace(tzinfo=timezone.utc)
+
+
+def ts_from_iso_format_local(timestamp_iso: str):
+    """Create a datetime object from a timestamp string in the ISO format without adjusting for utc."""
+    return _datetime.fromisoformat(timestamp_iso)
 
 
 def ts_from_date_iso_format(date_iso: str):

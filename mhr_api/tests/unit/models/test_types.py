@@ -73,3 +73,21 @@ def test_mhr_party_type(session):
     for result in results:
         assert result.party_type in type_tables.MhrPartyTypes
         assert result.party_type_desc
+
+
+def test_mhr_document_type(session):
+    """Assert that MhrDocumentType.find_all() and find_by_doc_type() contains all expected elements."""
+    results = type_tables.MhrDocumentType.find_all()
+    assert results
+    assert len(results) >= 55
+    for result in results:
+        assert result.document_type in type_tables.MhrDocumentTypes
+        assert result.document_type_desc
+
+    doc_result = type_tables.MhrDocumentType.find_by_doc_type(type_tables.MhrDocumentTypes.REG_101.value)
+    assert doc_result
+    assert doc_result.document_type == type_tables.MhrDocumentTypes.REG_101.value
+    assert doc_result.document_type_desc == 'REGISTER NEW UNIT'
+    assert doc_result.legacy_fee_code == 'MHR400'
+    doc_result = type_tables.MhrDocumentType.find_by_doc_type('XXX')
+    assert not doc_result

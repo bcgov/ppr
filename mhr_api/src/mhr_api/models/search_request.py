@@ -147,7 +147,7 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         result_json = {
             'mhrNumber': str(row[0]),
             'status': status,
-            'createDateTime': model_utils.format_ts(timestamp),
+            'createDateTime': model_utils.format_local_ts(timestamp),
             'homeLocation': str(row[6]).strip(),
             'serialNumber': str(row[7]).strip(),
             'baseInformation': {
@@ -183,7 +183,7 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         result_json = {
             'mhrNumber': str(row[0]),
             'status': status,
-            'createDateTime': model_utils.format_ts(timestamp),
+            'createDateTime': model_utils.format_local_ts(timestamp),
             'homeLocation': str(row[4]).strip(),
             'serialNumber': str(row[5]).strip(),
             'baseInformation': {
@@ -221,7 +221,7 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         result_json = {
             'mhrNumber': str(row[0]),
             'status': status,
-            'createDateTime': model_utils.format_ts(timestamp),
+            'createDateTime': model_utils.format_local_ts(timestamp),
             'homeLocation': str(row[5]).strip(),
             'serialNumber': str(row[6]).strip(),
             'baseInformation': {

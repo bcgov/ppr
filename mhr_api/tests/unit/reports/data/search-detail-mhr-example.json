@@ -3,34 +3,27 @@
     {
       "attentionReference": "                                        ", 
       "clientReferenceId": "                              ", 
-      "createDateTime": "2022-07-14T14:57:06+00:00", 
+      "createDateTime": "1995-11-14T00:00:01-07:53", 
       "declaredValue": 0, 
       "description": {
         "baseInformation": {
-          "make": "3847J", 
+          "make": "500", 
           "model": "", 
-          "year": "2020"
+          "year": "1970"
         }, 
-        "csaNumber": "28375", 
+        "csaNumber": "", 
         "csaStandard": "", 
         "engineerName": "", 
-        "manufacturer": "FLEETWOOD", 
-        "otherRemarks": "PORCH AND DECK BUILT ON SIDE.", 
+        "manufacturer": "WATSON INDUSTRIES", 
+        "otherRemarks": "", 
         "rebuiltRemarks": "", 
-        "sectionCount": 2, 
+        "sectionCount": 1, 
         "sections": [
           {
             "lengthFeet": 60, 
             "lengthInches": 0, 
-            "serialNumber": "29DJE83KL976A", 
-            "widthFeet": 16, 
-            "widthInches": 0
-          }, 
-          {
-            "lengthFeet": 60, 
-            "lengthInches": 0, 
-            "serialNumber": "29DJE83KL976B", 
-            "widthFeet": 16, 
+            "serialNumber": "64M70289", 
+            "widthFeet": 12, 
             "widthInches": 0
           }
         ]
@@ -38,11 +31,11 @@
       "location": {
         "additionalDescription": "", 
         "address": {
-          "city": "VICTORIA", 
+          "city": "CLINTON", 
           "country": "CA", 
           "postalCode": "", 
           "region": "BC", 
-          "street": "6232 RODOLPH ROAD"
+          "street": "1620 CARIBOO HIGHWAY 97"
         }, 
         "block": "", 
         "dealerName": "", 
@@ -52,9 +45,9 @@
         "leaveProvince": false, 
         "lot": "", 
         "meridian": "", 
-        "pad": "257", 
+        "pad": "25", 
         "parcel": "", 
-        "parkName": "HEAVENLY HOMES RETIREMENT PARK", 
+        "parkName": "PINE RIDGE MHP", 
         "partOf": "", 
         "pidNumber": "", 
         "plan": "", 
@@ -64,136 +57,77 @@
         "taxCertificate": false, 
         "township": "  "
       }, 
-      "mhrNumber": "107018", 
+      "mhrNumber": "006010", 
+      "notes": [
+        {
+          "contactAddress": {
+            "city": "KAMLOOPS", 
+            "country": "CA", 
+            "postalCode": "", 
+            "region": "BC", 
+            "street": "6767 DALLAS DRIVE"
+          }, 
+          "contactName": "HALSTON HOMES LIMITED", 
+          "createDateTime": "2011-06-10T11:35:18-07:53", 
+          "documentDescription": "TRANSPORT PERMIT", 
+          "documentId": "10060848", 
+          "documentType": "103", 
+          "expiryDate": "2011-07-10", 
+          "remarks": ""
+        }, 
+        {
+          "contactAddress": {
+            "city": "SALMON ARM", 
+            "country": "CA", 
+            "postalCode": "", 
+            "region": "BC", 
+            "street": "2658 KALSER ROAD"
+          }, 
+          "contactName": "LEONARD MEEK", 
+          "createDateTime": "1997-04-17T10:38:10-07:53", 
+          "documentDescription": "TRANSPORT PERMIT", 
+          "documentId": "41222060", 
+          "documentType": "103", 
+          "expiryDate": "1997-05-20", 
+          "remarks": ""
+        }
+      ], 
       "ownerGroups": [
         {
-          "groupId": 1, 
-          "interest": "1/12", 
-          "interestNumerator": 1, 
+          "groupId": 8, 
+          "interest": "", 
+          "interestNumerator": 0, 
           "owners": [
             {
               "address": {
-                "city": "VICTORIA", 
+                "city": "CLINTON", 
                 "country": "CA", 
-                "postalCode": "V8T2M3", 
+                "postalCode": "V0K 1K0", 
                 "region": "BC", 
-                "street": "940 BLANSHARD STREET"
+                "street": "25-1620 CARIBOO HIGHWAY"
               }, 
               "individualName": {
-                "first": "MARY", 
-                "last": "CONTRARY"
+                "first": "FARON", 
+                "last": "BEEDS", 
+                "middle": "SYDNEY"
               }, 
-              "phoneNumber": "2505551212", 
+              "phoneNumber": "2505741671", 
               "type": "JOINT"
             }, 
             {
               "address": {
-                "city": "VICTORIA", 
+                "city": "CLINTON", 
                 "country": "CA", 
-                "postalCode": "V8T2M3", 
+                "postalCode": "V0K 1K0", 
                 "region": "BC", 
-                "street": "940 BLANSHARD STREET"
+                "street": "25-1620 CARIBOO HIGHWAY"
               }, 
               "individualName": {
-                "first": "SAM", 
-                "last": "DRUCKER"
+                "first": "LYNETTE", 
+                "last": "SCRIVER", 
+                "middle": "MARIE"
               }, 
-              "phoneNumber": "2505551212", 
-              "type": "JOINT"
-            }
-          ], 
-          "status": "ACTIVE", 
-          "tenancySpecified": true, 
-          "type": "JOINT"
-        }, 
-        {
-          "groupId": 2, 
-          "interest": "4/12", 
-          "interestNumerator": 4, 
-          "owners": [
-            {
-              "address": {
-                "city": "VICTORIA", 
-                "country": "CA", 
-                "postalCode": "V2T3B4", 
-                "region": "BC", 
-                "street": "941 BLANSHARD STREET"
-              }, 
-              "individualName": {
-                "first": "JEREMY", 
-                "last": "JONES"
-              }, 
-              "phoneNumber": "2505551313", 
-              "type": "JOINT"
-            }, 
-            {
-              "address": {
-                "city": "VICTORIA", 
-                "country": "CA", 
-                "postalCode": "V2T3B4", 
-                "region": "BC", 
-                "street": "941 BLANSHARD STREET"
-              }, 
-              "individualName": {
-                "first": "GEORGE", 
-                "last": "FLANIGAN"
-              }, 
-              "phoneNumber": "2505551313", 
-              "type": "JOINT"
-            }
-          ], 
-          "status": "ACTIVE", 
-          "tenancySpecified": true, 
-          "type": "JOINT"
-        }, 
-        {
-          "groupId": 3, 
-          "interest": "7/12", 
-          "interestNumerator": 7, 
-          "owners": [
-            {
-              "address": {
-                "city": "VICTORIA", 
-                "country": "CA", 
-                "postalCode": "V2T3F4", 
-                "region": "BC", 
-                "street": "941 BLANSHARD STREET"
-              }, 
-              "individualName": {
-                "first": "HERBERT", 
-                "last": "LANG"
-              }, 
-              "phoneNumber": "2505551414", 
-              "type": "JOINT"
-            }, 
-            {
-              "address": {
-                "city": "VICTORIA", 
-                "country": "CA", 
-                "postalCode": "V2T3F5", 
-                "region": "BC", 
-                "street": "942 BLANSHARD STREET"
-              }, 
-              "individualName": {
-                "first": "SARAH", 
-                "last": "TROTTER"
-              }, 
-              "phoneNumber": "2505551515", 
-              "type": "JOINT"
-            }, 
-            {
-              "address": {
-                "city": "VICTORIA", 
-                "country": "CA", 
-                "postalCode": "V2T3F6", 
-                "region": "BC", 
-                "street": "943 BLANSHARD STREET"
-              }, 
-              "individualName": {
-                "first": "BONNIE", 
-                "last": "BENNET"
-              }, 
-              "phoneNumber": "2505551616", 
+              "phoneNumber": "2505741671", 
               "type": "JOINT"
             }
           ], 
@@ -202,39 +136,40 @@
           "type": "JOINT"
         }
       ], 
-      "status": "ACTIVE"
+      "status": "R"
     }
   ], 
-  "getReportURL": "/ppr/api/v1/search-results/8115", 
+  "getReportURL": "/ppr/api/v1/search-results/8188", 
   "payment": {
-    "invoiceId": "21784", 
-    "receipt": "/api/v1/payment-requests/21784/receipts"
+    "invoiceId": "21876", 
+    "receipt": "/api/v1/payment-requests/21876/receipts"
   }, 
-  "searchDateTime": "2022-08-23T22:11:49+00:00", 
+  "searchDateTime": "2022-08-30T16:28:12+00:00", 
   "searchQuery": {
-    "clientReferenceId": "MM-UT-MR0009", 
+    "clientReferenceId": "MM-UT-0007", 
     "criteria": {
-      "value": "107018"
+      "value": "006010"
     }, 
     "type": "MHR_NUMBER"
   }, 
   "selected": [
     {
       "baseInformation": {
-        "make": "3847J", 
+        "make": "500", 
         "model": "", 
-        "year": 2020
+        "year": 1970
       }, 
-      "createDateTime": "2022-07-14T14:57:06+00:00", 
-      "homeLocation": "VICTORIA", 
-      "mhId": 108576, 
-      "mhrNumber": "107018", 
+      "createDateTime": "1995-11-14T00:00:01-07:53", 
+      "homeLocation": "CLINTON", 
+      "mhId": 80020, 
+      "mhrNumber": "006010", 
       "ownerName": {
-        "first": "MARY", 
-        "last": "CONTRARY"
+        "first": "FARON", 
+        "last": "BEEDS", 
+        "middle": "SYDNEY"
       }, 
       "ownerStatus": "ACTIVE", 
-      "serialNumber": "29DJE83KL976A", 
+      "serialNumber": "64M70289", 
       "status": "ACTIVE"
     }
   ], 

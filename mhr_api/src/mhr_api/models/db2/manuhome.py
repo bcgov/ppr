@@ -216,7 +216,7 @@ class Db2Manuhome(db.Model):
             'boxNumber': self.box_number
         }
         if self.update_date:
-            man_home['updateDate'] = self.update_date.isoformat()
+            man_home['updateDate'] = model_utils.format_local_date(self.update_date)
         if self.update_time:
             man_home['updateTime'] = self.update_time.isoformat(timespec='seconds')
         return man_home
@@ -247,7 +247,7 @@ class Db2Manuhome(db.Model):
 
         man_home['declaredValue'] = declared_value
         if declared_ts:
-            man_home['declaredDateTime'] = model_utils.format_ts(declared_ts)
+            man_home['declaredDateTime'] = model_utils.format_local_ts(declared_ts)
 
         if self.reg_owner_groups:
             groups = []
@@ -255,13 +255,6 @@ class Db2Manuhome(db.Model):
                 if group.status != Db2Owngroup.StatusTypes.PREVIOUS:
                     groups.append(group.registration_json)
             man_home['ownerGroups'] = groups
-        # if self.reg_owners:
-        #    owners = []
-        #    for owner in self.reg_owners:
-        #        owner_json = owner.registration_json
-        #        if owner_json:
-        #            owners.append(owner_json)
-        #    man_home['owners'] = owners
         if self.reg_location:
             man_home['location'] = self.reg_location.registration_json
         if self.reg_descript:
@@ -301,7 +294,7 @@ class Db2Manuhome(db.Model):
                     declared_ts = doc.registration_ts
         man_home['declaredValue'] = declared_value
         if declared_ts:
-            man_home['declaredDateTime'] = model_utils.format_ts(declared_ts)
+            man_home['declaredDateTime'] = model_utils.format_local_ts(declared_ts)
 
         if self.reg_owner_groups:
             groups = []
@@ -391,7 +384,7 @@ class Db2Manuhome(db.Model):
                                                                            REGISTRATION_DESC_NEW),
             'username': str(row[7]),
             'statusType': LEGACY_STATUS_DESCRIPTION.get(str(row[1])),
-            'createDateTime': model_utils.format_ts(timestamp),
+            'createDateTime': model_utils.format_local_ts(timestamp),
             'submittingParty': str(row[3]),
             'clientReferenceId': str(row[4]),
             'ownerNames': owner_names,

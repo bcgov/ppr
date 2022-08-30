@@ -10,7 +10,6 @@
 # specific language governing permissions and limitations under the License.
 """Produces a PDF output based on templates and JSON messages."""
 import copy
-from datetime import timedelta
 from http import HTTPStatus
 from pathlib import Path
 
@@ -31,24 +30,6 @@ TO_SEARCH_DESCRIPTION = {
     'ORGANIZATION_NAME': 'Organization Name',
     'MHR_NUMBER': 'Manufactured Home Registration Number',
     'SERIAL_NUMBER': 'Serial Number'
-}
-TO_NOTE_DESCRIPTION = {
-    '101': 'Register New Unit',
-    '102': 'Decal Replacement',
-    '103': 'Transport Permit',
-    '103E': 'Extend Tran Permit',
-    'CAU': 'Caution',
-    'CAUC': 'Continue Caution',
-    'CAUE': 'Extend Caution',
-    'EXNR': 'Non-Res. Exemption',
-    'EXRS': 'Res. Exemption',
-    'FZE': 'Registrars Freeze',
-    'NCON': 'Confidential Note',
-    'NPUB': 'Public Note',
-    'REGC': 'Reg. Correction',
-    'REST': 'Restraining Order',
-    'STAT': 'Dec./Illegal Move',
-    'TAXN': 'Tax Sale Notice'
 }
 SINGLE_URI = '/forms/chromium/convert/html'
 MERGE_URI = '/forms/pdfengines/merge'
@@ -288,12 +269,6 @@ class Report:  # pylint: disable=too-few-public-methods
             for detail in self._report_data['details']:
                 if detail.get('notes'):
                     for note in detail['notes']:
-                        if note.get('documentType') and TO_NOTE_DESCRIPTION.get(note.get('documentType')):
-                            note['documentDescription'] = TO_NOTE_DESCRIPTION.get(note.get('documentType'))
-                        elif note.get('documentType'):
-                            note['documentDescription'] = note.get('documentType')
-                        else:
-                            note['documentDescription'] = ''
                         if note.get('createDateTime'):
                             note['createDateTime'] = Report._to_report_datetime(note.get('createDateTime'))
                         if note.get('expiryDate') and note['expiryDate'] == '0001-01-01':
@@ -452,10 +427,16 @@ class Report:  # pylint: disable=too-few-public-methods
     @staticmethod
     def _to_report_datetime(date_time: str, include_time: bool = True, expiry: bool = False):
         """Convert ISO formatted date time or date string to report format."""
-        local_datetime = model_utils.to_local_timestamp(model_utils.ts_from_iso_format(date_time))
-        if expiry and local_datetime.hour != 23:  # Expiry dates 15+ years in the future are not ajdusting for DST.
-            offset = 23 - local_datetime.hour
-            local_datetime = local_datetime + timedelta(hours=offset)
+        if len(date_time) == 10:  # Legacy has some date only data.
+            report_date = model_utils.date_from_iso_format(date_time)
+            return report_date.strftime('%B %-d, %Y')
+        zone = date_time[20:]
+        local_datetime = None
+        if not zone.endswith('00'):  # Coming from legacy, already local so ignore timezone adjustment.
+            local_datetime = model_utils.ts_from_iso_format_local(date_time)
+            # current_app.logger.info(f'zone={zone} date_time={date_time}')
+        else:
+            local_datetime = model_utils.to_local_timestamp(model_utils.ts_from_iso_format(date_time))
         if include_time:
             timestamp = local_datetime.strftime('%B %-d, %Y at %-I:%M:%S %p Pacific time')
             if timestamp.find(' AM ') > 0:

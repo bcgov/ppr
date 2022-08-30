@@ -177,7 +177,7 @@ class Db2Location(db.Model):
             'additionalDescription': self.additional_description
         }
         if self.tax_certificate_date:
-            location['taxCertificateDate'] = self.tax_certificate_date.isoformat()
+            location['taxCertificateDate'] = model_utils.format_local_date(self.tax_certificate_date)
         return location
 
     @property
@@ -252,7 +252,7 @@ class Db2Location(db.Model):
         if self.tax_certificate == 'Y':
             location['taxCertificate'] = True
         if self.tax_certificate_date:
-            location['taxCertificateDate'] = self.tax_certificate_date.isoformat()
+            location['taxCertificateDate'] = model_utils.format_local_date(self.tax_certificate_date)
         if location.get('taxCertificateDate', '') == '0001-01-01':
             del location['taxCertificateDate']
         return location
