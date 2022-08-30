@@ -32,7 +32,7 @@
           </td>
         </tr>
 
-        <tr v-else-if="row.item.id !== undefined" :key="row.item.id" class="owner-info">
+        <tr v-else-if="row.item.id" :key="row.item.id" class="owner-info">
           <td class="owner-name">
             <div v-if="row.item.individualName" class="owner-icon-name">
               <v-icon class="mr-2">mdi-account</v-icon>
@@ -95,7 +95,7 @@
         </tr>
         <tr v-else>
           <td :colspan="4" class="py-1">
-            <div class="no-owners-error pa-4">Group must contain at least one owner</div>
+            <div class="error-text pa-4 text-center">Group must contain at least one owner</div>
           </td>
         </tr>
       </template>

@@ -91,7 +91,7 @@
         <div><span class="generic-label">Home Tenancy Type: </span>{{ getHomeTenancyType() }}</div>
         <div v-show="showGroups">
           <span class="generic-label">Total Ownership Allocated: </span>{{ ownershipAllocation.totalAllocation }}
-          <span v-show="ownershipAllocation.hasTotalAllocationError" class="fractional-error-msg ml-3"
+          <span v-show="ownershipAllocation.hasTotalAllocationError" class="error-text fs-14 ml-3"
             >Total ownership must equal 1/1</span
           >
         </div>

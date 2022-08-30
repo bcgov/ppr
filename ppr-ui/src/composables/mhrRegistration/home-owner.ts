@@ -82,6 +82,7 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
    * and an allocation error status if exists
    */
   const getTotalOwnershipAllocationStatus = (): MhrRegistrationTotalOwnershipAllocationIF => {
+    // Sum up all 'interestNumerator' values in different Home Owner groups with a help of sumBy() function from lodash
     const totalFractionalNominator = sumBy(getMhrRegistrationHomeOwnerGroups.value, 'interestNumerator')
     const fractionalDenominator = getMhrRegistrationHomeOwnerGroups.value[0]?.interestTotal || null
 
@@ -230,6 +231,8 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
   /**
    * Utility method to calculate and update groups with lowest common denominator.
    * Used when multiple Home Owner Groups have different fractional interest totals.
+   * To calculate lowest common denominator: multiply all denominators together and then
+   * calculate numerator based on that number
    * @param currentHomeOwnerGroups - existing groups to be updated
    * @param currentFractionalData - fractional data of the group that is about to be updated
    * @returns object consisting of: existing groups with new factorial values and updated factorial data

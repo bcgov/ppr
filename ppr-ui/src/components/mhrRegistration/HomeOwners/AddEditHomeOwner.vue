@@ -391,7 +391,7 @@ export default defineComponent({
     const done = (): void => {
       // @ts-ignore - function exists
       context.refs.addHomeOwnerForm.validate()
-      if (localState.isHomeOwnerFormValid) {
+      if (localState.isHomeOwnerFormValid && localState.isAddressFormValid) {
         if (props.editHomeOwner) {
           editHomeOwner(
             localState.owner as MhrRegistrationHomeOwnersIF,
