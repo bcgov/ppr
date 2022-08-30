@@ -248,5 +248,6 @@ export const stateModel: StateModelIF = {
       validateSteps: false,
       validateApp: false
     }
-  }
+  },
+  mhrSearchResultSelectAllLien: false
 }
