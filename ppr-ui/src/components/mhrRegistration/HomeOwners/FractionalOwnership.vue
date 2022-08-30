@@ -20,7 +20,7 @@
           :id="`fraction-amount-group-${groupId}`"
           label="Amount Owned by this Group"
           filled
-          v-model="fractionalData.interestNumerator"
+          v-model.number="fractionalData.interestNumerator"
           :rules="fractionalAmountRules"
           :data-test-id="`fraction-amount-field-group-${groupId}`"
           ref="interestNumerator"
@@ -31,7 +31,7 @@
           :id="`total-fractions-group-${groupId}`"
           label="Total Available"
           filled
-          v-model="fractionalData.interestTotal"
+          v-model.number="fractionalData.interestTotal"
           :rules="totalAmountRules"
           :data-test-id="`total-fractions-field-group-${groupId}`"
           ref="interestTotal"
@@ -80,7 +80,7 @@ export default defineComponent({
     }
   },
   setup (props) {
-    const { customRules, required, isNumber, maxLength, greaterThan, lessThan } = useInputRules()
+    const { customRules, required, isNumber, greaterThan, lessThan } = useInputRules()
 
     const localState = reactive({
       id: props.editHomeOwner?.id || (DEFAULT_OWNER_ID++).toString(),
@@ -91,7 +91,11 @@ export default defineComponent({
           `${props.fractionalData.interest} ${props.fractionalData.interestNumerator} / ${props.fractionalData.interestTotal}`
       ),
       fractionalAmountRules: computed(() => {
-        const rules = customRules(required('Enter amount owned by this group'), isNumber(), maxLength(6))
+        const rules = customRules(
+          required('Enter amount owned by this group'),
+          isNumber(null, null, null, null), // check for numbers only
+          isNumber(null, 6, null, null) // check for length (maxLength can't be used because field is numeric)
+        )
         // additional validation when interest total has some value - UX feedback
         if (localState.fractionalInfo.interestTotal) {
           rules.push(
@@ -103,8 +107,8 @@ export default defineComponent({
       totalAmountRules: computed(() =>
         customRules(
           required('Enter total available'),
-          isNumber(),
-          maxLength(6),
+          isNumber(null, null, null, null), // check for numbers only
+          isNumber(null, 6, null, null), // check for length (maxLength can't be used because field is numeric)
           lessThan(Number(localState.fractionalInfo.interestNumerator), 'Must be greater than amount owned by group')
         )
       )

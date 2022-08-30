@@ -21,7 +21,7 @@
         |
         <span class="ma-2">Owners: {{ owners.length }} </span>
         |
-        <span class="ma-2">Group Tenancy Type: </span>
+        <span class="ma-2">Group Tenancy Type: {{ group.type }}</span>
         |
         <span class="ma-2"> Interest: {{ getOwnershipInterest() }} </span>
       </div>

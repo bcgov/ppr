@@ -1,5 +1,5 @@
 <template>
-  <v-card flat rounded class="mt-2">
+  <v-card flat rounded class="mt-2" :class="{ 'border-error-left': showTableError }">
     <v-data-table
       id="mh-home-owners-table"
       class="home-owners-table"
@@ -7,18 +7,17 @@
       hide-default-footer
       :items="homeOwners"
       item-key="groupId"
-      :group-by="showGroups ? 'groupId' : null"
+      group-by="groupId"
       disable-sort
       disable-pagination
-      no-data-text="No owners added yet"
     >
       <template v-slot:group.header="{ group, items }" class="group-header-slot">
         <td :colspan="4" class="py-1">
-          <TableGroupHeader :groupId="group" :owners="items" />
+          <TableGroupHeader :groupId="group" :owners="hasActualOwners(items) ? items : []" />
         </td>
       </template>
 
-      <template v-slot:item="row">
+      <template v-slot:item="row" v-if="homeOwners.length">
         <tr v-if="isCurrentlyEditing(homeOwners.indexOf(row.item))">
           <td class="pa-0" :colspan="homeOwnersTableHeaders.length">
             <v-expand-transition>
@@ -33,7 +32,7 @@
           </td>
         </tr>
 
-        <tr v-else :key="row.item.id" class="owner-info">
+        <tr v-else-if="row.item.id !== undefined" :key="row.item.id" class="owner-info">
           <td class="owner-name">
             <div v-if="row.item.individualName" class="owner-icon-name">
               <v-icon class="mr-2">mdi-account</v-icon>
@@ -94,6 +93,11 @@
             </v-menu>
           </td>
         </tr>
+        <tr v-else>
+          <td :colspan="4" class="py-1">
+            <div class="no-owners-error pa-4">Group must contain at least one owner</div>
+          </td>
+        </tr>
       </template>
       <template v-slot:no-data>
         <div class="my-6">
@@ -131,12 +135,20 @@ export default defineComponent({
   setup (props, context) {
     const addressSchema = PartyAddressSchema
 
-    const { showGroups, removeOwner, deleteGroup, isGlobalEditingMode, setGlobalEditingMode } = useHomeOwners()
+    const {
+      showGroups,
+      removeOwner,
+      deleteGroup,
+      isGlobalEditingMode,
+      setGlobalEditingMode,
+      hasEmptyGroup
+    } = useHomeOwners()
 
     const localState = reactive({
       currentlyEditingHomeOwnerId: -1,
       isEditingMode: computed((): boolean => localState.currentlyEditingHomeOwnerId >= 0),
-      isAddingMode: computed((): boolean => props.isAdding)
+      isAddingMode: computed((): boolean => props.isAdding),
+      showTableError: computed((): boolean => hasEmptyGroup.value && showGroups.value)
     })
 
     const edit = (item): void => {
@@ -159,6 +171,14 @@ export default defineComponent({
       return index === localState.currentlyEditingHomeOwnerId
     }
 
+    // To render Group table header the owners array must not be empty
+    // If group is empty, owners array will have a 'placeholder' obj and not the actual owners
+    // This util function will help to show Owners: 0 in the table header
+    const hasActualOwners = (owners: MhrRegistrationHomeOwnersIF[]): boolean => {
+      // check for one 'placeholder' owner which will not have an id
+      return owners.length === 1 && owners[0]?.id !== undefined
+    }
+
     watch(
       () => localState.currentlyEditingHomeOwnerId,
       () => {
@@ -173,6 +193,8 @@ export default defineComponent({
       openForEditing,
       isCurrentlyEditing,
       showGroups,
+      hasEmptyGroup,
+      hasActualOwners,
       edit,
       remove,
       deleteGroup,
@@ -213,6 +235,11 @@ export default defineComponent({
     tbody > tr.v-row-group__header,
     tbody > tr.v-row-group__header:hover {
       background: #e2e8ee !important;
+    }
+
+    .no-owners-error {
+      text-align: center;
+      color: $error;
     }
   }
 

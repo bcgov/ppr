@@ -350,7 +350,7 @@ export default defineComponent({
     if (allFractionalData.length === 0 || props.editHomeOwner == null || hasMultipleOwnersInGroup) {
       allFractionalData.push({
         groupId: (allFractionalData.length + 1).toString(),
-        type: '',
+        type: 'N/A',
         interest: '',
         interestNumerator: null,
         interestTotal: null,
@@ -407,13 +407,16 @@ export default defineComponent({
         // TODO: Mhr-Submission - DELETE after step 3 validation is done
         setValidation(MhrSectVal.HOME_OWNERS_VALID, MhrCompVal.OWNERS_VALID, true)
 
-        setShowGroups(Number(localState.ownerGroupId) > 0)
+        if (Number(localState.ownerGroupId) > 0) {
+          setShowGroups(true)
 
-        // Get fractional data based on owner's group id
-        const fractionalData = find(
-          allFractionalData,
-          { groupId: localState.ownerGroupId }) as FractionalOwnershipWithGroupIdIF
-        setGroupFractionalInterest(localState.ownerGroupId || '1', fractionalData)
+          // Get fractional data based on owner's group id
+          const fractionalData = find(
+            allFractionalData,
+            { groupId: localState.ownerGroupId }) as FractionalOwnershipWithGroupIdIF
+
+          setGroupFractionalInterest(localState.ownerGroupId || '1', fractionalData)
+        }
 
         cancel()
       } else {

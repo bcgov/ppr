@@ -1,13 +1,15 @@
 import {
-  MhrRegistrationFractionalOwnershipIF,
+  MhrRegistrationTotalOwnershipAllocationIF,
   MhrRegistrationHomeOwnerGroupIF,
-  MhrRegistrationHomeOwnersIF
+  MhrRegistrationHomeOwnersIF,
+  MhrRegistrationFractionalOwnershipIF
 } from '@/interfaces'
 import '@/utils/use-composition-api'
 
 import { ref, computed, readonly, watch } from '@vue/composition-api'
 import { useActions, useGetters } from 'vuex-composition-helpers'
-import { find, remove, set, findIndex } from 'lodash'
+import { HomeTenancyTypes } from '@/enums'
+import { find, remove, set, findIndex, sumBy } from 'lodash'
 
 const DEFAULT_GROUP_ID = '1'
 
@@ -15,6 +17,8 @@ const DEFAULT_GROUP_ID = '1'
 const showGroups = ref(false)
 // Set global edit mode to enable or disable all Edit and dropdown buttons
 const isGlobalEditingMode = ref(false)
+// Flag is any of the Groups has no Owners
+const hasEmptyGroup = ref(false)
 
 export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = false) {
   const { getMhrRegistrationHomeOwners, getMhrRegistrationHomeOwnerGroups } = useGetters<any>([
@@ -45,18 +49,46 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
     isGlobalEditingMode.value = isEditing
   }
 
-  const getHomeTenancyType = (): string => {
-    const numOfGroups = getMhrRegistrationHomeOwnerGroups.value.length
+  const getHomeTenancyType = (): HomeTenancyTypes => {
     const numOfOwners = getMhrRegistrationHomeOwners.value?.length
 
-    // One Group with multiple owners
-    if (numOfGroups === 1 && numOfOwners > 1 && showGroups.value) return 'Joint Tenants'
-    // More than one Group
-    if (numOfGroups > 1 && showGroups.value) return 'Tenants In Common'
-    // No owners added
-    if (numOfOwners === 0) return 'N/A'
-    // One or more Owner
-    return numOfOwners === 1 ? 'Sole Ownership' : 'Joint Tenants'
+    if (showGroups.value) {
+      // At leas one group showing with one or more owners
+      return HomeTenancyTypes.COMMON
+    } else if (numOfOwners === 1) {
+      // One owner without groups showing
+      return HomeTenancyTypes.SOLE
+    } else if (numOfOwners > 1) {
+      // More than one owner without groups showing
+      return HomeTenancyTypes.JOINT
+    }
+    return HomeTenancyTypes.NA
+  }
+
+  const getGroupTenancyType = (group: MhrRegistrationHomeOwnerGroupIF): HomeTenancyTypes => {
+    const numOfOwnersInGroup = group.owners.length
+
+    if (numOfOwnersInGroup === 1) {
+      return HomeTenancyTypes.COMMON
+    } else if (numOfOwnersInGroup > 1) {
+      return HomeTenancyTypes.JOINT
+    } else {
+      return HomeTenancyTypes.NA
+    }
+  }
+
+  /**
+   * Get Ownership Allocation status object to conveniently show total allocation
+   * and an allocation error status if exists
+   */
+  const getTotalOwnershipAllocationStatus = (): MhrRegistrationTotalOwnershipAllocationIF => {
+    const totalFractionalNominator = sumBy(getMhrRegistrationHomeOwnerGroups.value, 'interestNumerator')
+    const fractionalDenominator = getMhrRegistrationHomeOwnerGroups.value[0]?.interestTotal || null
+
+    return {
+      totalAllocation: totalFractionalNominator + ' / ' + fractionalDenominator,
+      hasTotalAllocationError: totalFractionalNominator !== fractionalDenominator
+    }
   }
 
   // WORKING WITH GROUPS
@@ -138,8 +170,6 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
       remove(groupToUpdate.owners, owner => owner.id === updatedOwner.id)
       addOwnerToTheGroup(updatedOwner, newGroupId)
     }
-
-    removeEmptyGroups()
   }
 
   // Remove Owner from the Group it belongs to
@@ -159,28 +189,6 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
     // remove the owner from the group
     remove(groupToUpdate.owners, o => o.id === owner.id)
     setMhrRegistrationHomeOwnerGroups(homeOwnerGroups)
-
-    // if there are no more owners in the group - delete the Group as well.
-    if (groupToUpdate.owners.length === 0) {
-      removeEmptyGroups()
-    }
-  }
-
-  // Remove all groups without owners
-  const removeEmptyGroups = (): void => {
-    const homeOwnerGroups = [
-      ...getMhrRegistrationHomeOwnerGroups.value
-    ] as MhrRegistrationHomeOwnerGroupIF[]
-
-    // find all groups with at least one owner
-    const newOwnerGroups = homeOwnerGroups.filter(group => group.owners.length > 0)
-    // update owner group ids with new values
-    // to make them sequential again (e.g groups 1,3,5 -> 1,2,3)
-    newOwnerGroups.forEach((group, index) => {
-      group.groupId = (index + 1).toString()
-    })
-
-    setMhrRegistrationHomeOwnerGroups(newOwnerGroups)
   }
 
   // Delete group with its owners
@@ -195,13 +203,13 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
     setMhrRegistrationHomeOwnerGroups(homeOwnerGroups)
   }
 
-  const setGroupFractionalInterest = (groupId: string, fractionalData): void => {
+  const setGroupFractionalInterest = (groupId: string, fractionalData: MhrRegistrationFractionalOwnershipIF): void => {
     const homeOwnerGroups = [...getMhrRegistrationHomeOwnerGroups.value]
 
     const allGroupsTotals = homeOwnerGroups.map(group => group.interestTotal)
 
     // check if dominator is already the same for all Groups
-    const isAlreadyLCM = allGroupsTotals.includes(fractionalData.interestTotal.toString())
+    const isAlreadyLCM = allGroupsTotals.includes(fractionalData.interestTotal)
 
     if (homeOwnerGroups.length > 1 && !isAlreadyLCM) {
       // Calculate common fractions for Groups
@@ -209,11 +217,11 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
         homeOwnerGroups,
         fractionalData
       )
-      const groupToUpdate = find(updatedGroups, { groupId: groupId })
+      const groupToUpdate = find(updatedGroups, { groupId: groupId }) as MhrRegistrationHomeOwnerGroupIF
       Object.assign(groupToUpdate, { ...updatedFractionalData })
       setMhrRegistrationHomeOwnerGroups(updatedGroups)
     } else {
-      const groupToUpdate = find(homeOwnerGroups, { groupId: groupId })
+      const groupToUpdate = find(homeOwnerGroups, { groupId: groupId }) as MhrRegistrationHomeOwnerGroupIF
       Object.assign(groupToUpdate, { ...fractionalData })
       setMhrRegistrationHomeOwnerGroups(homeOwnerGroups)
     }
@@ -234,7 +242,7 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
     // Starts with 1 so it can be multiplied by all denominators
     let LCM = 1
 
-    // Calculate LCM for all group that already exists
+    // Calculate Lowest Common Multiplier for all group that already exists
     // by multiplying all total interests
     currentHomeOwnerGroups.every((group: MhrRegistrationHomeOwnerGroupIF) => {
       LCM = LCM * Number(group.interestTotal)
@@ -242,7 +250,7 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
 
     // Since new fractional data is not included in any groups yet,
     // it needs to be calculated as well for LCM,
-    // but only if new fractional total couldn't be part of LCM
+    // but only if new fractional total is not LCM already
     // e.g. 1/25, new factorial 1/5 - no need to find a new LCM, as it is 25 already
     if (LCM % currentFractionalData.interestTotal !== 0) {
       LCM = LCM * currentFractionalData.interestTotal
@@ -251,19 +259,17 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
     // Update all fractional amounts for groups that already exist
     const updatedGroups = currentHomeOwnerGroups.map(group => {
       const newNumerator = (LCM / group.interestTotal) * group.interestNumerator
-      group.interestNumerator = newNumerator.toString()
-      group.interestTotal = LCM.toString()
+      group.interestNumerator = newNumerator
+      group.interestTotal = LCM
       return group
     })
 
     const updatedFractionalData = currentFractionalData
 
     // Update current fractional data with new values
-    updatedFractionalData.interestNumerator = (
-      (LCM / currentFractionalData.interestTotal) *
-      currentFractionalData.interestNumerator
-    ).toString()
-    updatedFractionalData.interestTotal = LCM.toString()
+    updatedFractionalData.interestNumerator =
+      (LCM / currentFractionalData.interestTotal) * currentFractionalData.interestNumerator
+    updatedFractionalData.interestTotal = LCM
 
     return { updatedGroups, updatedFractionalData }
   }
@@ -274,6 +280,11 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
     () => {
       if (getMhrRegistrationHomeOwnerGroups.value.length === 0) {
         setShowGroups(false)
+      } else {
+        // update group tenancy for all groups
+        getMhrRegistrationHomeOwnerGroups.value.every(group => set((group.type = getGroupTenancyType(group))))
+        // check if at least one Owner Group has no owners. Used to display an error for the table.
+        hasEmptyGroup.value = !getMhrRegistrationHomeOwnerGroups.value.every(group => group.owners.length > 0)
       }
     }
   )
@@ -281,8 +292,10 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
   return {
     showGroups: readonly(showGroups),
     isGlobalEditingMode: readonly(isGlobalEditingMode),
+    hasEmptyGroup: readonly(hasEmptyGroup),
     getSideTitle,
     getHomeTenancyType,
+    getTotalOwnershipAllocationStatus,
     addOwnerToTheGroup,
     editHomeOwner,
     removeOwner,
@@ -290,7 +303,6 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
     getGroupForOwner,
     setShowGroups,
     setGlobalEditingMode,
-    removeEmptyGroups,
     deleteGroup,
     setGroupFractionalInterest
   }

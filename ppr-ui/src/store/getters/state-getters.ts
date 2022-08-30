@@ -658,7 +658,13 @@ export const getMhrRegistrationSubmittingParty = (state: StateIF): any => {
 export const getMhrRegistrationHomeOwners = (state: StateIF): MhrRegistrationHomeOwnersIF[] => {
   const owners = []
   state.stateModel.mhrRegistration.ownerGroups.forEach(group => {
-    group.owners.forEach(owner => owners.push({ ...owner, groupId: group.groupId }))
+    if (group.owners.length === 0) {
+      // Groups with no owners should have at least one 'placeholder' owner
+      // to be properly displayed in Group Table
+      owners.push({ groupId: group.groupId })
+    } else {
+      group.owners.forEach(owner => owners.push({ ...owner, groupId: group.groupId }))
+    }
   })
   return owners
 }
