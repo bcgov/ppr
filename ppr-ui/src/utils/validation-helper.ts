@@ -14,7 +14,7 @@ type partialSearchState = {
   searchValueSecond?: string
   searchValueLast?: string
   selectedSearchType: SearchTypeIF
-  isStaffBcolReg: boolean
+  isRoleStaffReg: boolean
 }
 
 const specialCharsStrict = /[!@#$%^&*(),.?"{}|<>`~_;:'/\\[\]-]/
@@ -37,7 +37,7 @@ export function validateSearchAction (
   const first = searchState?.searchValueFirst?.trim()
   const second = searchState?.searchValueSecond?.trim()
   const last = searchState?.searchValueLast?.trim()
-  const isMHRStaff = searchState?.isStaffBcolReg
+  const isMHRStaff = searchState?.isRoleStaffReg
   if (!searchState?.selectedSearchType) {
     validation.category.message = 'Please select a category'
     return validation

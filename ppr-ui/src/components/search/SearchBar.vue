@@ -332,6 +332,9 @@ export default defineComponent({
       isStaffBcolReg: computed((): boolean => {
         return isRoleStaffBcol.value || isRoleStaffReg.value
       }),
+      isRoleStaffReg: computed((): boolean => {
+        return isRoleStaffReg.value
+      }),
       isStaffSbc: computed((): boolean => {
         return isRoleStaffSbc.value
       }),
