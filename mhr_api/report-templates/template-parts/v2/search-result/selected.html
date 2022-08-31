@@ -1,7 +1,7 @@
 <div class="container pt-4">
     {% if searchQuery.type == 'OWNER_NAME' %}
     <table class="selected-mhr-table mt-4" role="presentation">
-        <tr class="solid-row-separator selected-mhr-table-header no-page-break">
+        <tr class="selected-mhr-table-header no-page-break">
             <td class="bottom-align"></td>
             <td class="bottom-align">MHR Number</td>
             <td class="bottom-align">Owner Name</td>
@@ -10,6 +10,9 @@
             <td class="bottom-align">Make/Model</td>
             <td class="bottom-align">Location</td>
             <td class="bottom-align">Page</td>
+        </tr>
+        <tr class="solid-row-separator no-page-break">
+            <td colspan="4"></td>
         </tr>
         {% for result in selected %}
             <tr class="no-page-break">
@@ -46,7 +49,7 @@
     </table>  
     {% elif searchQuery.type == 'MHR_NUMBER' %}
     <table class="selected-mhr-table mt-4" role="presentation">
-        <tr class="solid-row-separator selected-mhr-table-header no-page-break">
+        <tr class="selected-mhr-table-header no-page-break">
             <td class="bottom-align"></td>
             <td class="bottom-align">MHR Number</td>
             <td class="bottom-align">
@@ -57,6 +60,9 @@
             <td class="bottom-align">Make/Model</td>
             <td class="bottom-align">Location</td>
             <td class="bottom-align">Page</td>
+        </tr>
+        <tr class="solid-row-separator no-page-break">
+            <td colspan="4"></td>
         </tr>
         {% for result in selected %}
             <tr class="no-page-break">
@@ -97,7 +103,7 @@
     </table>  
     {% elif searchQuery.type == 'SERIAL_NUMBER' %}
     <table class="selected-mhr-table mt-4" role="presentation">
-        <tr class="solid-row-separator selected-mhr-table-header no-page-break">
+        <tr class="selected-mhr-table-header no-page-break">
             <td></td>
             <td class="bottom-align">MHR Number</td>
             <td class="bottom-align">Serial Number</td>
@@ -106,6 +112,9 @@
             <td class="bottom-align">Make/Model</td>
             <td class="bottom-align">Location</td>
             <td class="bottom-align">Page</td>
+        </tr>
+        <tr class="solid-row-separator no-page-break">
+            <td colspan="4"></td>
         </tr>
         {% for result in selected %}
             <tr class="no-page-break">
@@ -141,7 +150,7 @@
     </table>  
     {% else %}
     <table class="selected-mhr-table mt-4" role="presentation">
-        <tr class="solid-row-separator selected-mhr-table-header no-page-break">
+        <tr class="selected-mhr-table-header no-page-break">
             <td class="bottom-align"></td>
             <td class="bottom-align">MHR Number</td>
             <td class="bottom-align">Organization Name</td>
@@ -150,6 +159,9 @@
             <td class="bottom-align">Make/Model</td>
             <td class="bottom-align">Location</td>
             <td class="bottom-align">Page</td>
+        </tr>
+        <tr class="solid-row-separator no-page-break">
+            <td colspan="4"></td>
         </tr>
         {% for result in selected %}
             <tr class="no-page-break">

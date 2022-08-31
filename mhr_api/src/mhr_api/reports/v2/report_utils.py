@@ -24,8 +24,9 @@ HEADER_PATH = '/static/v2/header_replace.html'
 FOOTER_PAGES_PATH = '/static/v2/footer.html'
 HEADER_TITLE_REPLACE = '{{TITLE}}'
 FOOTER_TEXT_REPLACE = '{{FOOTER-TEXT}}'
+# marginTop 1.5
 REPORT_META_DATA = {
-    'marginTop': 1.5,
+    'marginTop': 1.25,
     'marginBottom': 0.7,
     'marginLeft': 0.4,
     'marginRight': 0.4,

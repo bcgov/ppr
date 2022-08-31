@@ -4,38 +4,65 @@
         body {
             margin: 0 !important;
         }
+        .header {
+            width: 95%;
+            margin-top: 0px !important;
+            padding-top: 0px;
+        }
 
         .header-table {
             width: 100%;
-            margin-right: 3rem;
+            margin-right: 3rem !important;
             margin-left: 3rem;
+            margin-top: 0 !important;
+        }
+        .header-table tr {
+            margin-top: 0px !important;
+            padding-top: 0px;
+    	}
+
+        .header-table td {
+            vertical-align: top !important;
+    	}
+
+        .header-table td:nth-child(1) {
+            width: 30%;
+            padding-left: 35px;
+            padding-top: 0px;
+        }
+
+        .header-table td:nth-child(2) {
+            width: 70%;
+            padding-right: 8px;
+            padding-top: 24px;
         }
 
         .report-type {
             font-family: "BC Sans" !important;
             color: #234075;
-            font-size: 14pt !important;
+            font-size: 11pt !important;
+            font-weight: bold;
             text-align: right;
         }
 
         .report-type-desc {
             font-family: 'BC Sans' !important;
             color: #1A5A96;
-            font-size: 11pt !important;
+            font-size: 9pt !important;
             text-align: right;
         }
 
         .header-column-logo {
             display: inline-block;
+            vertical-align: top;
             text-align: center;
-            width: 110px;
-            height: 100px;
-            margin-left: 10px;
+            width: 100px; /* 110px */
+            height: 90px; /* 100px */
         }
 
         .header-column-logo img {
-            width: 70%;
-            height: 70%;
+            width: 73%; /* 70 70 */
+            height: 73%;
         }
 
     </style>

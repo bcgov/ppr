@@ -4,7 +4,7 @@
 {% endif %}
     <div class="section-title mt-3">Debtor Information</div>
 {% if pprDetail.financingStatement.debtors is defined and change is not defined %}
-    <table class="section-data section-data-table mt-4" role="presentation">
+    <table class="section-data section-data-table-new mt-4" role="presentation">
     {% for party in pprDetail.financingStatement.debtors %}
         <tr class="no-page-break">
             <td class="col-40">
@@ -31,11 +31,14 @@
                 <div class="pt-2">{% if party.birthDate is defined %}{{ party.birthDate }}{% endif %}</div>
               {% endif %}
             </td>
-     </tr>
+        </tr>
+        {% if not loop.last %}
+            <tr><td colspan="3"><div class="separator-table-row mt-4 mb-4"></div></td></tr>            
+        {% endif %}
     {% endfor %}
     </table>    
 {% elif change is defined and (change.addDebtors is defined or change.deleteDebtors is defined) %}
-    <table class="section-data section-data-table mt-4" role="presentation">
+    <table class="section-data section-data-table-new mt-4" role="presentation">
     {% if change.addDebtors is defined %}
         {% for party in change.addDebtors %}
             <tr class="no-page-break">
@@ -77,6 +80,9 @@
                   {% endif %}
                 </td>
             </tr>
+            {% if not loop.last %}
+                <tr><td colspan="3"><div class="separator-table-row mt-4 mb-4"></div></td></tr>            
+            {% endif %}
         {% endfor %}
     {% endif %}
     {% if change.deleteDebtors is defined %}
@@ -109,6 +115,9 @@
                   {% endif %}
                 </td>
             </tr>
+            {% endif %}
+            {% if not loop.last %}
+                <tr><td colspan="3"><div class="separator-table-row mt-4 mb-4"></div></td></tr>            
             {% endif %}
         {% endfor %}
     {% endif %}
