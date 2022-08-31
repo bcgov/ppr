@@ -186,7 +186,7 @@ class Db2Descript(db.Model):
             description['widthFeet4'] = self.width_feet_4
             description['widthInches4'] = self.width_inches_4
         if self.engineer_date:
-            description['engineerDate'] = self.engineer_date.isoformat()
+            description['engineerDate'] = model_utils.format_local_date(self.engineer_date)
 
         return description
 
@@ -247,7 +247,7 @@ class Db2Descript(db.Model):
             'otherRemarks': self.other_remarks
         }
         if self.engineer_date:
-            description['engineerDate'] = self.engineer_date.isoformat()
+            description['engineerDate'] = model_utils.format_local_date(self.engineer_date)
         if description.get('engineerDate', '') == '0001-01-01':
             del description['engineerDate']
         if self.circa == '?':

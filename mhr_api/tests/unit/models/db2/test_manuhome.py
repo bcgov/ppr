@@ -58,7 +58,7 @@ def test_find_by_id(session, exists, id, mhr_num, status, doc_id):
         assert manuhome.accession_number is not None
         assert manuhome.box_number is not None
         assert manuhome.reg_documents
-        assert manuhome.reg_owners
+        assert manuhome.reg_owner_groups
         assert manuhome.reg_location
         assert manuhome.reg_descript
         assert manuhome.reg_notes
@@ -68,7 +68,7 @@ def test_find_by_id(session, exists, id, mhr_num, status, doc_id):
         assert report_json.get('createDateTime')
         assert report_json.get('clientReferenceId') is not None
         assert report_json.get('declaredValue') >= 0
-        assert report_json.get('owners')
+        assert report_json.get('ownerGroups')
         assert report_json.get('location')
         assert report_json.get('description')
         assert report_json.get('notes')
@@ -95,7 +95,7 @@ def test_find_by_mhr_number(session, http_status, id, mhr_num, status, doc_id):
         assert manuhome.accession_number is not None
         assert manuhome.box_number is not None
         assert manuhome.reg_documents
-        assert manuhome.reg_owners
+        assert manuhome.reg_owner_groups
         assert manuhome.reg_location
         assert manuhome.reg_descript
         assert manuhome.reg_notes
@@ -105,7 +105,7 @@ def test_find_by_mhr_number(session, http_status, id, mhr_num, status, doc_id):
         assert report_json.get('createDateTime')
         assert report_json.get('clientReferenceId') is not None
         assert report_json.get('declaredValue') >= 0
-        assert report_json.get('owners')
+        assert report_json.get('ownerGroups')
         assert report_json.get('location')
         assert report_json.get('description')
         assert report_json.get('notes')

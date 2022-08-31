@@ -258,6 +258,7 @@
           "createDateTime": "2000-06-12T12:04:39+00:00", 
           "documentId": "90003145", 
           "documentType": "103", 
+          "documentDescription": "TRANSPORT PERMIT",
           "expiryDate": "2000-07-12", 
           "remarks": ""
         }
@@ -448,6 +449,7 @@
           "createDateTime": "2000-03-31T09:07:22+00:00", 
           "documentId": "90002899", 
           "documentType": "103", 
+          "documentDescription": "TRANSPORT PERMIT",
           "expiryDate": "2000-04-30", 
           "remarks": ""
         }
@@ -746,6 +748,7 @@
           "createDateTime": "2007-05-14T14:04:37+00:00", 
           "documentId": "10030574", 
           "documentType": "103", 
+          "documentDescription": "TRANSPORT PERMIT",
           "expiryDate": "2007-06-13", 
           "remarks": ""
         }
@@ -851,6 +854,7 @@
           "createDateTime": "1999-05-11T15:40:18+00:00", 
           "documentId": "90001949", 
           "documentType": "103", 
+          "documentDescription": "TRANSPORT PERMIT",
           "expiryDate": "1999-06-10", 
           "remarks": ""
         }
@@ -957,6 +961,7 @@
           "createDateTime": "1999-08-25T15:36:22+00:00", 
           "documentId": "90002409", 
           "documentType": "103", 
+          "documentDescription": "TRANSPORT PERMIT",
           "expiryDate": "1999-09-24", 
           "remarks": ""
         }
@@ -1064,6 +1069,7 @@
           "createDateTime": "1998-03-23T12:29:51+00:00", 
           "documentId": "90000731", 
           "documentType": "103", 
+          "documentDescription": "TRANSPORT PERMIT",
           "expiryDate": "1998-04-22", 
           "remarks": ""
         }
@@ -1642,6 +1648,7 @@
           "createDateTime": "2016-03-24T10:20:11+00:00", 
           "documentId": "90012472", 
           "documentType": "103", 
+          "documentDescription": "TRANSPORT PERMIT",
           "expiryDate": "2016-04-23", 
           "remarks": ""
         }
@@ -1748,6 +1755,7 @@
           "createDateTime": "2009-10-28T13:49:30+00:00", 
           "documentId": "90010478", 
           "documentType": "103", 
+          "documentDescription": "TRANSPORT PERMIT",
           "expiryDate": "2009-11-27", 
           "remarks": ""
         }

@@ -162,11 +162,11 @@ class Db2Document(db.Model):
             'clientReferenceId': self.client_reference_id
         }
         if self.draft_ts:
-            document['draftDateTime'] = model_utils.format_ts(self.draft_ts)
+            document['draftDateTime'] = model_utils.format_local_ts(self.draft_ts)
         if self.registration_ts:
-            document['createDateTime'] = model_utils.format_ts(self.registration_ts)
+            document['createDateTime'] = model_utils.format_local_ts(self.registration_ts)
         if self.transfer_execution_date:
-            document['transferExecutionDate'] = self.transfer_execution_date.isoformat()
+            document['transferExecutionDate'] = model_utils.format_local_date(self.transfer_execution_date)
         return document
 
     @property
@@ -183,7 +183,7 @@ class Db2Document(db.Model):
             'clientReferenceId': self.client_reference_id
         }
         if self.registration_ts:
-            document['createDateTime'] = model_utils.format_ts(self.registration_ts)
+            document['createDateTime'] = model_utils.format_local_ts(self.registration_ts)
         return document
 
     @staticmethod
