@@ -65,7 +65,7 @@
                 <h3>PID Number</h3>
               </v-col>
               <v-col cols="9" class="pt-1">
-                <p>{{ getMhrRegistrationLocation.pidNumber || '(Not Entered)' }}</p>
+                <p>{{ displayPid || '(Not Entered)' }}</p>
               </v-col>
             </v-row>
           </template>
@@ -123,6 +123,9 @@ export default defineComponent({
       includesPid: computed((): boolean => {
         return [HomeLocationTypes.OTHER_STRATA, HomeLocationTypes.OTHER_TYPE]
           .includes(getMhrRegistrationLocation.value.otherType)
+      }),
+      displayPid: computed((): string => {
+        return getMhrRegistrationLocation.value.pidNumber.replace(/(\d{3})(\d{3})(\d{3})/, '$1-$2-$3')
       }),
       locationType: computed((): string => {
         switch (getMhrRegistrationLocation.value.locationType) {

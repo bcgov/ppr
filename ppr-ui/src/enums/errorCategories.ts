@@ -16,5 +16,6 @@ export enum ErrorCategories {
   REPORT_GENERATION = 'report-generation',
   SEARCH = 'search',
   SEARCH_COMPLETE = 'seach-complete',
-  SEARCH_UPDATE = 'search-update'
+  SEARCH_UPDATE = 'search-update',
+  LTSA_REQUEST = 'ltsa-request'
 }

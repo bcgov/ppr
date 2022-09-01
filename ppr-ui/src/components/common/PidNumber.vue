@@ -1,5 +1,11 @@
 <template>
   <v-row id="pid-number" class="pid-text-input" no-gutters>
+    <base-dialog
+      :setOptions="dialogOptions"
+      :setDisplay="showNotFoundDialog"
+      @proceed="dialogRetry($event)"
+    />
+
     <v-col cols="12">
       <p class="font-weight-bold">PID Number</p>
     </v-col>
@@ -63,11 +69,16 @@
 import vue from 'vue'
 import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
 import { useInputRules } from '@/composables'
+import { ltsaSummary } from '@/utils/ltsa-api-helper'
+import { BaseDialog } from '@/components/dialogs'
+import { pidNotFoundDialog } from '@/resources/dialogOptions'
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
   name: 'PidNumber',
-  components: {},
+  components: {
+    BaseDialog
+  },
   props: {},
   setup (props, context) {
     // Composable(s)
@@ -80,8 +91,10 @@ export default defineComponent({
       pidTwo: '',
       pidThree: '',
       enablePidLoader: false,
+      dialogOptions: pidNotFoundDialog,
+      showNotFoundDialog: false,
       pidNumber: computed(() => {
-        return `${localState.pidOne}-${localState.pidTwo}-${localState.pidThree}`
+        return `${localState.pidOne}${localState.pidTwo}${localState.pidThree}`
       }),
       isValidPid: computed(() => {
         return (
@@ -106,6 +119,31 @@ export default defineComponent({
       localState.pidThree = pidNumberArr[2]
     }
 
+    const dialogRetry = async (retry: boolean): Promise<void> => {
+      localState.showNotFoundDialog = false
+      if (retry) {
+        await validatePid()
+      } else clearPid()
+    }
+
+    const validatePid = async (): Promise<void> => {
+      localState.enablePidLoader = true
+      const ltsaResponse = await ltsaSummary(localState.pidNumber)
+      localState.enablePidLoader = false
+
+      if (ltsaResponse?.error) {
+        localState.showNotFoundDialog = true
+      } else {
+        emitPid()
+      }
+    }
+
+    const clearPid = (): void => {
+      localState.pidOne = ''
+      localState.pidTwo = ''
+      localState.pidThree = ''
+      emitPid()
+    }
     const emitPid = (): void => { context.emit('setPid', localState.pidNumber) }
 
     watch(() => localState.pidOne, () => {
@@ -125,22 +163,16 @@ export default defineComponent({
     watch(() => localState.enablePidLoader, () => {
       context.emit('verifyingPid', localState.enablePidLoader)
     })
-    watch(() => localState.pidNumber, () => {
-      if (localState.isValidPid) {
-        localState.enablePidLoader = localState.pidNumber.length === 11
-
-        // *** TO REMOVE: MOCKED REQUEST FOR PID VERIFICATION ***
-        setTimeout(() => {
-          localState.enablePidLoader = false
-          emitPid() // Mock Set if Verified
-        }, 5000)
-        // *******************************************
+    watch(() => localState.pidNumber, async () => {
+      if (localState.isValidPid && localState.pidNumber.length === 9) {
+        await validatePid()
       }
     })
 
     return {
       parsePaste,
       isNumber,
+      dialogRetry,
       ...toRefs(localState)
     }
   }
