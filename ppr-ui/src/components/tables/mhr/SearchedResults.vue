@@ -205,7 +205,7 @@ import { manufacturedHomeSearchTableHeaders, manufacturedHomeSearchTableHeadersR
 import { BaseHeaderIF, ManufacturedHomeSearchResultIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { FolioNumber } from '@/components/common'
 import { pacificDate } from '@/utils'
-import { APIMHRMapSearchTypes, RouteNames } from '@/enums'
+import { APIMHRMapSearchTypes, RouteNames, UISearchTypes } from '@/enums'
 import { cloneDeep } from 'lodash'
 
 export default defineComponent({
@@ -341,6 +341,10 @@ export default defineComponent({
         return result.includeLienInfo !== true ? { ...result, includeLienInfo: false } : result
       })
       localState.totalResultsLength = resp.totalResultsSize
+      if (localState.searchType === UISearchTypes.MHR_NUMBER && localState.totalResultsLength === 1) {
+        // Select search result if an MHR Number Search and search results equals 1.
+        localState.results = localState.results.map(result => ({ ...result, selected: true }))
+      }
       const date = new Date(resp.searchDateTime)
       localState.searchTime = pacificDate(date)
     })
