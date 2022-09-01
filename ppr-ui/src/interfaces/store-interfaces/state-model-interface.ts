@@ -57,4 +57,5 @@ export interface StateModelIF {
   unsavedChanges: Boolean // used for cancel flows
   userInfo: UserInfoIF
   mhrValidationState?: MhrValidationStateIF
+  mhrSearchResultSelectAllLien: boolean
 }

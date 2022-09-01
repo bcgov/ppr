@@ -242,12 +242,23 @@ export default defineComponent({
       getManufacturedHomeSearchResults,
       getFolioOrReferenceNumber,
       getSearchedType,
-      getSelectedManufacturedHomes
+      getSelectedManufacturedHomes,
+      getMhrSearchResultSelectAllLien
     } = useGetters<any>([
-      'getManufacturedHomeSearchResults', 'getFolioOrReferenceNumber', 'getSearchedType', 'getSelectedManufacturedHomes'
+      'getManufacturedHomeSearchResults',
+      'getFolioOrReferenceNumber',
+      'getSearchedType',
+      'getSelectedManufacturedHomes',
+      'getMhrSearchResultSelectAllLien'
     ])
-    const { setSelectedManufacturedHomes, setFolioOrReferenceNumber } = useActions<any>([
-      'setSelectedManufacturedHomes', 'setFolioOrReferenceNumber'
+    const {
+      setSelectedManufacturedHomes,
+      setFolioOrReferenceNumber,
+      setMhrSearchResultSelectAllLien
+    } = useActions<any>([
+      'setSelectedManufacturedHomes',
+      'setFolioOrReferenceNumber',
+      'setMhrSearchResultSelectAllLien'
     ])
     const router = context.root.$router
 
@@ -393,6 +404,7 @@ export default defineComponent({
         // includeLienInfo needs to be initialized or something weird will happen
         return result.includeLienInfo !== true ? { ...result, includeLienInfo: false } : result
       })
+      localState.selectAllLien = getMhrSearchResultSelectAllLien.value
       localState.totalResultsLength = resp.totalResultsSize
       if (localState.searchType === UIMHRSearchTypes.MHRMHR_NUMBER && localState.totalResultsLength === 1) {
         // Select search result if an MHR Number Search and search results equals 1.
@@ -428,7 +440,14 @@ export default defineComponent({
           result.includeLienInfo = localState.selectAllLien
         }
       }
+      setMhrSearchResultSelectAllLien(localState.selectAllLien)
     }
+
+    watch(() => localState.selectedLiensLength, (): void => {
+      if (localState.selectedLiensLength < localState.selectedMatchesLength) {
+        localState.selectAllLien = false
+      }
+    })
 
     return {
       UIMHRSearchTypes,
