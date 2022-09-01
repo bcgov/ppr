@@ -16,4 +16,5 @@ export interface ManufacturedHomeSearchResultIF {
   homeLocation?: string // Optional
   selected?: boolean // Optional
   includeLienInfo?: boolean // Optional
+  ownerStatus?: string
 }

@@ -104,7 +104,6 @@ describe('Test result table with results', () => {
       }
     })
     for (let i = 0; i < mockedSearchHistory.searches.length; i++) {
-      const temp = mockedSearchHistory.searches[i]
       const searchQuery = mockedSearchHistory.searches[i].searchQuery
       const searchDate = mockedSearchHistory.searches[i].searchDateTime
       const totalResultsSize = mockedSearchHistory.searches[i].totalResultsSize
@@ -174,7 +173,6 @@ describe('Test result table with results', () => {
       }
     })
     for (let i = 0; i < mockedMHRSearchHistory.searches.length; i++) {
-      const temp = mockedMHRSearchHistory.searches[i]
       const searchQuery = mockedMHRSearchHistory.searches[i].searchQuery
       const searchDate = mockedMHRSearchHistory.searches[i].searchDateTime
       const totalResultsSize = mockedMHRSearchHistory.searches[i].totalResultsSize
