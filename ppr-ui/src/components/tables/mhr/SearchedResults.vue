@@ -394,7 +394,7 @@ export default defineComponent({
         return result.includeLienInfo !== true ? { ...result, includeLienInfo: false } : result
       })
       localState.totalResultsLength = resp.totalResultsSize
-      if (localState.searchType === UISearchTypes.MHR_NUMBER && localState.totalResultsLength === 1) {
+      if (localState.searchType === UIMHRSearchTypes.MHRMHR_NUMBER && localState.totalResultsLength === 1) {
         // Select search result if an MHR Number Search and search results equals 1.
         localState.results = localState.results.map(result => ({ ...result, selected: true }))
       }
