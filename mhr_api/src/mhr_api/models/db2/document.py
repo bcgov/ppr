@@ -162,11 +162,11 @@ class Db2Document(db.Model):
             'clientReferenceId': self.client_reference_id
         }
         if self.draft_ts:
-            document['draftDateTime'] = model_utils.format_ts(self.draft_ts)
+            document['draftDateTime'] = model_utils.format_local_ts(self.draft_ts)
         if self.registration_ts:
-            document['createDateTime'] = model_utils.format_ts(self.registration_ts)
+            document['createDateTime'] = model_utils.format_local_ts(self.registration_ts)
         if self.transfer_execution_date:
-            document['transferExecutionDate'] = self.transfer_execution_date.isoformat()
+            document['transferExecutionDate'] = model_utils.format_local_date(self.transfer_execution_date)
         return document
 
     @property
@@ -183,7 +183,7 @@ class Db2Document(db.Model):
             'clientReferenceId': self.client_reference_id
         }
         if self.registration_ts:
-            document['createDateTime'] = model_utils.format_ts(self.registration_ts)
+            document['createDateTime'] = model_utils.format_local_ts(self.registration_ts)
         return document
 
     @staticmethod
@@ -260,8 +260,11 @@ class Db2Document(db.Model):
                 doc.phone_number = str(submitting.get('phoneNumber'))[0:9]
             else:
                 doc.phone_number = ''
-
-            doc.name = str(submitting.get('businessName'))[0:39]
+            if submitting.get('businessName'):
+                doc.name = str(submitting.get('businessName'))[0:39]
+            else:
+                ind_name: str = model_utils.to_db2_ind_name(submitting.get('personName'))
+                doc.name = ind_name[0:39]
             doc.legacy_address = model_utils.to_db2_address(submitting.get('address'))
         else:
             doc.phone_number = ''

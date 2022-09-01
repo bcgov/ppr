@@ -151,6 +151,66 @@ class SerialType(db.Model):  # pylint: disable=too-few-public-methods
 
 
 # MHR specific type table enums below
+class MhrDocumentTypes(BaseEnum):
+    """Render an Enum of the MHR note status types."""
+
+    REG_101 = 'REG_101'
+    REG_102 = 'REG_102'
+    REG_103 = 'REG_103'
+    REG_103E = 'REG_103E'
+    ABAN = 'ABAN'
+    ADDI = 'ADDI'
+    AFFE = 'AFFE'
+    ATTA = 'ATTA'
+    BANK = 'BANK'
+    BCLC = 'BCLC'
+    CAU = 'CAU'
+    CAUC = 'CAUC'
+    CAUE = 'CAUE'
+    COMP = 'COMP'
+    CONF = 'CONF'
+    CONV = 'CONV'
+    COU = 'COU'
+    COUR = 'COUR'
+    DEAT = 'DEAT'
+    DNCH = 'DNCH'
+    EXMN = 'EXMN'
+    EXNR = 'EXNR'
+    EXRE = 'EXRE'
+    EXRS = 'EXRS'
+    FORE = 'FORE'
+    FZE = 'FZE'
+    GENT = 'GENT'
+    INTE = 'INTE'
+    INTW = 'INTW'
+    LETA = 'LETA'
+    MAID = 'MAID'
+    MAIL = 'MAIL'
+    MARR = 'MARR'
+    MEAM = 'MEAM'
+    NAMV = 'NAMV'
+    NCAN = 'NCAN'
+    NCON = 'NCON'
+    NPUB = 'NPUB'
+    NRED = 'NRED'
+    PDEC = 'PDEC'
+    PUBA = 'PUBA'
+    REBU = 'REBU'
+    REGC = 'REGC'
+    REIV = 'REIV'
+    REPV = 'REPV'
+    REST = 'REST'
+    STAT = 'STAT'
+    SZL = 'SZL'
+    TAXN = 'TAXN'
+    TAXS = 'TAXS'
+    THAW = 'THAW'
+    TRAN = 'TRAN'
+    VEST = 'VEST'
+    WHAL = 'WHAL'
+    WILL = 'WILL'
+
+
 class MhrNoteStatusTypes(BaseEnum):
     """Render an Enum of the MHR note status types."""
 
@@ -208,6 +268,30 @@ class MhrTenancyTypes(BaseEnum):
 
 
 # MHR specific type tables below
+class MhrDocumentType(db.Model):  # pylint: disable=too-few-public-methods
+    """This class defines the model for the mhr_document_types table."""
+
+    __tablename__ = 'mhr_document_types'
+
+    document_type = db.Column('document_type', PG_ENUM(MhrDocumentTypes), primary_key=True)
+    document_type_desc = db.Column('document_type_desc', db.String(100), nullable=False)
+    legacy_fee_code = db.Column('legacy_fee_code', db.String(6), nullable=True)
+
+    # Relationships -
+
+    @classmethod
+    def find_all(cls):
+        """Return all the type records."""
+        return db.session.query(MhrDocumentType).all()
+
+    @classmethod
+    def find_by_doc_type(cls, doc_type: str):
+        """Return a specific record by type."""
+        if not doc_type or doc_type not in MhrDocumentTypes:
+            return None
+        return cls.query.filter(MhrDocumentType.document_type == doc_type).one_or_none()
+
+
 class MhrNoteStatusType(db.Model):  # pylint: disable=too-few-public-methods
     """This class defines the model for the mhr_note_status_types table."""
 

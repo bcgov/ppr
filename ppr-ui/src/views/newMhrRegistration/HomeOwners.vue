@@ -87,9 +87,14 @@
         <v-icon class="pr-1">mdi-domain-plus</v-icon>
         Add a Business or Organization
       </v-btn>
-
       <div class="my-6">
-        <span class="generic-label">Home Tenancy Type: </span>{{ tenancyType }}
+        <div><span class="generic-label">Home Tenancy Type: </span>{{ getHomeTenancyType() }}</div>
+        <div v-show="showGroups">
+          <span class="generic-label">Total Ownership Allocated: </span>{{ ownershipAllocation.totalAllocation }}
+          <span v-show="ownershipAllocation.hasTotalAllocationError" class="error-text fs-14 ml-3"
+            >Total ownership must equal 1/1</span
+          >
+        </div>
       </div>
     </section>
 
@@ -138,7 +143,7 @@ import {
 } from '@vue/composition-api'
 import { useHomeOwners } from '@/composables/mhrRegistration'
 /* eslint-disable no-unused-vars */
-import { MhrRegistrationHomeOwnersIF } from '@/interfaces'
+import { MhrRegistrationHomeOwnersIF, MhrRegistrationTotalOwnershipAllocationIF } from '@/interfaces'
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
@@ -157,23 +162,23 @@ export default defineComponent({
       'setMhrRegistrationHomeOwners'
     ])
 
-    const { setGlobalEditingMode, isGlobalEditingMode } = useHomeOwners()
+    const {
+      getHomeTenancyType,
+      setGlobalEditingMode,
+      isGlobalEditingMode,
+      showGroups,
+      getTotalOwnershipAllocationStatus
+    } = useHomeOwners()
 
     const localState = reactive({
       showAddPersonSection: false,
       showAddPersonOrganizationSection: false,
       disableAddHomeOwnerBtn: computed(() => {
-        return (
-          localState.showAddPersonOrganizationSection ||
-          localState.showAddPersonSection
-        )
+        return localState.showAddPersonOrganizationSection || localState.showAddPersonSection
       }),
-      tenancyType: computed(() => {
-        if (getMhrRegistrationHomeOwners.value?.length === 0) return 'N/A'
-        return getMhrRegistrationHomeOwners.value?.length === 1
-          ? 'Sole Ownership'
-          : 'Joint Tenants'
-      })
+      ownershipAllocation: computed(
+        () => getTotalOwnershipAllocationStatus() as MhrRegistrationTotalOwnershipAllocationIF
+      )
     })
 
     // Enable editing mode whenever adding Person or Business
@@ -210,6 +215,8 @@ export default defineComponent({
       addHomeOwner,
       editHomeOwner,
       removeHomeOwner,
+      getHomeTenancyType,
+      showGroups,
       ...toRefs(localState)
     }
   }

@@ -52,6 +52,7 @@
           "createDateTime": "1999-05-05T08:40:01+00:00", 
           "documentId": "90001918", 
           "documentType": "103", 
+          "documentDescription": "TRANSPORT PERMIT",
           "expiryDate": "1999-06-04", 
           "remarks": ""
         }

@@ -12,7 +12,7 @@
       <v-text-field
         :id="`interest-type-group-${groupId}`"
         label="Interest Type (Optional)"
-        v-model="fractionalInfo.interest"
+        v-model="fractionalData.interest"
         :data-test-id="`interest-type-field-group-${groupId}`"
       />
       <div class="owner-fractions">
@@ -20,22 +20,26 @@
           :id="`fraction-amount-group-${groupId}`"
           label="Amount Owned by this Group"
           filled
-          v-model="fractionalInfo.interestNumerator"
+          v-model.number="fractionalData.interestNumerator"
           :rules="fractionalAmountRules"
           :data-test-id="`fraction-amount-field-group-${groupId}`"
+          ref="interestNumerator"
+          @blur="$refs.interestTotal.validate()"
         />
         <span> </span>
         <v-text-field
           :id="`total-fractions-group-${groupId}`"
           label="Total Available"
           filled
-          v-model="fractionalInfo.interestTotal"
+          v-model.number="fractionalData.interestTotal"
           :rules="totalAmountRules"
           :data-test-id="`total-fractions-field-group-${groupId}`"
+          ref="interestTotal"
+          @blur="$refs.interestNumerator.validate()"
         />
       </div>
       <label class="generic-label" for="tenancy-type">Tenancy</label>
-      <v-checkbox :id="`tenancy-type-group-${groupId}`" v-model="fractionalInfo.tenancySpecified">
+      <v-checkbox :id="`tenancy-type-group-${groupId}`" v-model="fractionalData.tenancySpecified">
         <template v-slot:label>
           <p class="ma-0">
             Tenancy not specified
@@ -48,7 +52,7 @@
 
 <script lang="ts">
 /* eslint-disable no-unused-vars */
-import { MhrRegistrationFractionalOwnershipIF, MhrRegistrationHomeOwnersIF } from '@/interfaces'
+import { MhrRegistrationHomeOwnersIF } from '@/interfaces'
 /* eslint-enable no-unused-vars */
 
 import { computed, defineComponent, reactive, toRefs } from '@vue/composition-api'
@@ -70,13 +74,13 @@ export default defineComponent({
     showEditBtn: { type: Boolean, default: true },
     isReadOnly: { type: Boolean, default: false },
     fractionalData: {
-      type: Object as () => MhrRegistrationFractionalOwnershipIF,
-      default: {} as () => MhrRegistrationFractionalOwnershipIF,
+      type: Object,
+      default: null,
       required: true
     }
   },
   setup (props) {
-    const { customRules, required, isNumber, maxLength, greaterThan, lessThan } = useInputRules()
+    const { customRules, required, isNumber, greaterThan, lessThan } = useInputRules()
 
     const localState = reactive({
       id: props.editHomeOwner?.id || (DEFAULT_OWNER_ID++).toString(),
@@ -84,28 +88,28 @@ export default defineComponent({
       fractionalInterest: computed(
         () =>
           // eslint-disable-next-line max-len
-          `${localState.fractionalInfo.interest} ${localState.fractionalInfo.interestNumerator} / ${localState.fractionalInfo.interestTotal}`
+          `${props.fractionalData.interest} ${props.fractionalData.interestNumerator} / ${props.fractionalData.interestTotal}`
       ),
-      fractionalAmountRules: computed(() =>
-        customRules(
+      fractionalAmountRules: computed(() => {
+        const rules = customRules(
           required('Enter amount owned by this group'),
-          isNumber(),
-          maxLength(6),
-          greaterThan(
-            Number(localState.fractionalInfo.interestTotal),
-            'Must be lesser than total available'
-          )
+          isNumber(null, null, null, null), // check for numbers only
+          isNumber(null, 6, null, null) // check for length (maxLength can't be used because field is numeric)
         )
-      ),
+        // additional validation when interest total has some value - UX feedback
+        if (localState.fractionalInfo.interestTotal) {
+          rules.push(
+            ...greaterThan(Number(localState.fractionalInfo.interestTotal), 'Must be lesser than total available')
+          )
+        }
+        return rules
+      }),
       totalAmountRules: computed(() =>
         customRules(
           required('Enter total available'),
-          isNumber(),
-          maxLength(6),
-          lessThan(
-            Number(localState.fractionalInfo.interestNumerator),
-            'Must be greater than amount owned by group'
-          )
+          isNumber(null, null, null, null), // check for numbers only
+          isNumber(null, 6, null, null), // check for length (maxLength can't be used because field is numeric)
+          lessThan(Number(localState.fractionalInfo.interestNumerator), 'Must be greater than amount owned by group')
         )
       )
     })

@@ -41,10 +41,11 @@ TEST_ACCOUNT_REG_DATA = [
     ('PS12345', True),
     ('999999', False)
 ]
-# testdata pattern is ({reg_id}, {has_results})
+# testdata pattern is ({reg_id}, {has_results}, {legacy})
 TEST_ID_DATA = [
-    (200000000, True),
-    (300000000, False)
+    (200000000, True, False),
+    (300000000, False, False),
+    (1, True, True)
 ]
 # testdata pattern is ({mhr_number}, {has_results}, {account_id})
 TEST_MHR_NUM_DATA = [
@@ -99,17 +100,33 @@ def test_find_account_registrations(session, account_id, has_results):
         assert not reg_list
 
 
-@pytest.mark.parametrize('reg_id, has_results', TEST_ID_DATA)
-def test_find_by_id(session, reg_id, has_results):
+@pytest.mark.parametrize('reg_id, has_results, legacy', TEST_ID_DATA)
+def test_find_by_id(session, reg_id, has_results, legacy):
     """Assert that finding an MHR registration by id works as expected."""
-    registration: MhrRegistration = MhrRegistration.find_by_id(reg_id)
+    registration: MhrRegistration = MhrRegistration.find_by_id(reg_id, legacy)
     if has_results:
         assert registration
-        assert registration.id == reg_id
-        assert registration.mhr_number
-        assert registration.status_type
-        assert registration.registration_type
-        assert registration.registration_ts
+        if not legacy:
+            assert registration.id == reg_id
+            assert registration.mhr_number
+            assert registration.status_type
+            assert registration.registration_type
+            assert registration.registration_ts
+        else:
+            assert registration.manuhome
+            report_json = registration.registration_json
+            # current_app.logger.info(report_json)
+            assert report_json['mhrNumber']
+            assert report_json['status']
+            assert report_json.get('createDateTime')
+            assert report_json.get('clientReferenceId') is not None
+            assert report_json.get('declaredValue') >= 0
+            assert report_json.get('ownerGroups')
+            assert report_json.get('location')
+            assert report_json.get('description')
+            assert report_json.get('notes')
+            for note in report_json.get('notes'):
+                assert note['documentDescription']
     else:
         assert not registration
 

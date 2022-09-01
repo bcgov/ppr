@@ -115,7 +115,7 @@ class Db2Mhomnote(db.Model):
             'remarks': self.remarks
         }
         if self.expiry_date and self.expiry_date.isoformat() != '0001-01-01':
-            note['expiryDate'] = self.expiry_date.isoformat()
+            note['expiryDate'] = model_utils.format_local_date(self.expiry_date)
         return note
 
     @property
@@ -129,9 +129,11 @@ class Db2Mhomnote(db.Model):
             'contactAddress': model_utils.get_address_from_db2(self.legacy_address, '')
         }
         if self.document and self.document.registration_ts:
-            note['createDateTime'] = model_utils.format_ts(self.document.registration_ts)
+            current_app.logger.debug('Db2Mhomnote.registration_ts setting createDateTime.')
+            note['createDateTime'] = model_utils.format_local_ts(self.document.registration_ts)
+            current_app.logger.debug('Db2Mhomnote.registration_ts createDateTime set.')
         if self.expiry_date and self.expiry_date.isoformat() != '0001-01-01':
-            note['expiryDate'] = self.expiry_date.isoformat()
+            note['expiryDate'] = model_utils.format_local_date(self.expiry_date)
         return note
 
     @staticmethod

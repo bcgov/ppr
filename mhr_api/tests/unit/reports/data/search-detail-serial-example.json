@@ -51,6 +51,7 @@
           "createDateTime": "2006-11-09T16:41:44+00:00",
           "documentId": "10026607",
           "documentType": "EXRS",
+          "documentDescription": "RESIDENTIAL EXEMPTION",
           "remarks": ""
         }
       ],
@@ -209,6 +210,7 @@
           "createDateTime": "2004-09-24T14:31:21+00:00",
           "documentId": "10006014",
           "documentType": "EXRS",
+          "documentDescription": "RESIDENTIAL EXEMPTION",
           "remarks": ""
         }
       ],

@@ -52,6 +52,7 @@
           "createDateTime": "2006-05-08T14:56:11+00:00",
           "documentId": "90008255",
           "documentType": "103",
+          "documentDescription": "TRANSPORT PERMIT",
           "expiryDate": "2006-06-07",
           "remarks": ""
         },
@@ -67,6 +68,7 @@
           "createDateTime": "2012-04-30T13:46:51+00:00",
           "documentId": "90011305",
           "documentType": "103",
+          "documentDescription": "TRANSPORT PERMIT",
           "expiryDate": "2012-05-30",
           "remarks": ""
         }

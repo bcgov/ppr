@@ -24,6 +24,7 @@ from mhr_api.utils.auth import jwt
 from mhr_api.exceptions import BusinessException, DatabaseException
 from mhr_api.services.authz import authorized, authorized_role, is_staff, is_all_staff_account, REGISTER_MH
 from mhr_api.models import MhrRegistration
+from mhr_api.reports.v2.report_utils import ReportTypes
 from mhr_api.resources import utils as resource_utils, registration_utils as reg_utils
 from mhr_api.services.payment import TransactionTypes
 from mhr_api.services.payment.exceptions import SBCPaymentException
@@ -99,11 +100,10 @@ def post_registrations():  # pylint: disable=too-many-return-statements
         # Return report if request header Accept MIME type is application/pdf.
         if resource_utils.is_pdf(request):
             current_app.logger.info('Report not yet available: returning JSON.')
-            # return reg_utils.get_registration_report(statement.registration[0], response_json,
-            #                                        ReportTypes.FINANCING_STATEMENT_REPORT.value,
+            # return reg_utils.get_registration_report(registration, response_json,
+            #                                        ReportTypes.MHR_REGISTRATION,
             #                                        jwt.get_token_auth_header(), HTTPStatus.CREATED)
-        # resource_utils.enqueue_registration_report(statement.registration[0], response_json,
-        #                                            ReportTypes.FINANCING_STATEMENT_REPORT.value)
+        reg_utils.enqueue_registration_report(registration, response_json, ReportTypes.MHR_REGISTRATION)
         return response_json, HTTPStatus.CREATED
 
     except DatabaseException as db_exception:

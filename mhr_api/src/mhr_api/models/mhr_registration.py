@@ -28,7 +28,7 @@ from mhr_api.models.mhr_extra_registration import MhrExtraRegistration
 from .db import db
 from .mhr_draft import MhrDraft
 from .mhr_party import MhrParty
-from .type_tables import MhrRegistrationType, MhrRegistrationTypes, MhrRegistrationStatusTypes
+from .type_tables import MhrDocumentType, MhrRegistrationType, MhrRegistrationTypes, MhrRegistrationStatusTypes
 
 
 QUERY_PKEYS = """
@@ -54,6 +54,12 @@ SELECT mr.mhr_number
  WHERE account_id = :query_value
 )
 """
+FROM_LEGACY_DOC_TYPE = {
+    '101': 'REG_101',
+    '102': 'REG_102',
+    '103': 'REG_103',
+    '103E': 'REG_103E'
+}
 
 
 class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes, too-many-public-methods
@@ -102,6 +108,25 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         # registration_id = self.id
         return self.__set_payment_json(registration)
 
+    @property
+    def registration_json(self) -> dict:
+        """Return the search version of the registration as a json object."""
+        if self.manuhome:
+            reg_json = self.manuhome.registration_json
+            # Inject note document type descriptions here.
+            if reg_json and reg_json.get('notes'):
+                for note in reg_json.get('notes'):
+                    doc_desc = ''
+                    doc_type = note.get('documentType', '')
+                    if FROM_LEGACY_DOC_TYPE.get(doc_type):
+                        doc_type = FROM_LEGACY_DOC_TYPE.get(doc_type)
+                    doc_type_info: MhrDocumentType = MhrDocumentType.find_by_doc_type(doc_type)
+                    if doc_type_info:
+                        doc_desc = doc_type_info.document_type_desc
+                    note['documentDescription'] = doc_desc
+            return reg_json
+        return self.json
+
     def __set_payment_json(self, registration):
         """Add registration payment info json if payment exists."""
         if self.pay_invoice_id and self.pay_path:
@@ -131,11 +156,16 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                             one_or_none()
 
     @classmethod
-    def find_by_id(cls, registration_id: int):
+    def find_by_id(cls, registration_id: int, legacy: bool = False):
         """Return the registration matching the id."""
         registration = None
         if registration_id:
-            registration = cls.query.get(registration_id)
+            if legacy:
+                registration = MhrRegistration()
+                manuhome: Db2Manuhome = Db2Manuhome.find_by_id(registration_id)
+                registration.manuhome = manuhome
+            else:
+                registration = cls.query.get(registration_id)
         return registration
 
     @classmethod

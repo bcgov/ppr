@@ -107,7 +107,10 @@ def get_report_files(request_data: dict, report_type: str) -> dict:
     files['index.html'] = get_html_from_data(request_data)
     header_text = ''
     footer_text = ''
-    if report_type in (ReportTypes.SEARCH_BODY_REPORT, ReportTypes.SEARCH_DETAIL_REPORT, ReportTypes.SEARCH_TOC_REPORT):
+    if report_type in (ReportTypes.SEARCH_BODY_REPORT,
+                       ReportTypes.SEARCH_DETAIL_REPORT,
+                       ReportTypes.SEARCH_TOC_REPORT,
+                       ReportTypes.MHR_REGISTRATION):
         header_text = request_data['templateVars'].get('meta_title', '')
         footer_text = request_data['templateVars'].get('footer_content', '')
 

@@ -33,24 +33,6 @@ TO_SEARCH_DESCRIPTION = {
     'MHR_NUMBER': 'Manufactured Home Registration Number',
     'SERIAL_NUMBER': 'Serial Number'
 }
-TO_NOTE_DESCRIPTION = {
-    '101': 'Register New Unit',
-    '102': 'Decal Replacement',
-    '103': 'Transport Permit',
-    '103E': 'Extend Tran Permit',
-    'CAU': 'Caution',
-    'CAUC': 'Continue Caution',
-    'CAUE': 'Extend Caution',
-    'EXNR': 'Non-Res. Exemption',
-    'EXRS': 'Res. Exemption',
-    'FZE': 'Registrars Freeze',
-    'NCON': 'Confidential Note',
-    'NPUB': 'Public Note',
-    'REGC': 'Reg. Correction',
-    'REST': 'Restraining Order',
-    'STAT': 'Dec./Illegal Move',
-    'TAXN': 'Tax Sale Notice'
-}
 
 
 class ReportTypes(BaseEnum):
@@ -248,12 +230,6 @@ class Report:  # pylint: disable=too-few-public-methods
             for detail in self._report_data['details']:
                 if detail.get('notes'):
                     for note in detail['notes']:
-                        if note.get('documentType') and TO_NOTE_DESCRIPTION.get(note.get('documentType')):
-                            note['documentDescription'] = TO_NOTE_DESCRIPTION.get(note.get('documentType'))
-                        elif note.get('documentType'):
-                            note['documentDescription'] = note.get('documentType')
-                        else:
-                            note['documentDescription'] = ''
                         if note.get('createDateTime'):
                             note['createDateTime'] = Report._to_report_datetime(note.get('createDateTime'))
                         if note.get('expiryDate') and note['expiryDate'] == '0001-01-01':

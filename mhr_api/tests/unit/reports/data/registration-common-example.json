@@ -1,0 +1,129 @@
+{
+  "attentionReference": "TESTING", 
+  "clientReferenceId": "UT-MHREG0007                  ", 
+  "createDateTime": "2022-08-17T12:22:12+00:00", 
+  "declaredValue": 0, 
+  "description": {
+    "baseInformation": {
+      "make": "WATSON IND. (ALTA) DUCHESS", 
+      "model": "", 
+      "year": "2018"
+    }, 
+    "csaNumber": "786356", 
+    "csaStandard": "Z240", 
+    "engineerName": "", 
+    "manufacturer": "STARLINE", 
+    "otherRemarks": "BC SAFETY AUTHORITY #339556, PERMIT# EL-721296-2018", 
+    "rebuiltRemarks": "REBUILT AS A DOUBLE WIDE, MAKE/MODEL CUSTOM, YEAR 1995", 
+    "sectionCount": 1, 
+    "sections": [
+      {
+        "lengthFeet": 52, 
+        "lengthInches": 0, 
+        "serialNumber": "52D70556", 
+        "widthFeet": 12, 
+        "widthInches": 0
+      }
+    ]
+  }, 
+  "documentId": "UT-00007", 
+  "location": {
+    "additionalDescription": "SPALLUMCHEEN INDIAN RESERVE NO. 2", 
+    "address": {
+      "city": "VICTORIA", 
+      "country": "CA", 
+      "postalCode": "", 
+      "region": "BC", 
+      "street": "940 BLANSHARD STREET"
+    }, 
+    "block": "", 
+    "dealerName": "NOR-TEC DESIGN GROUP LTD.", 
+    "districtLot": "", 
+    "exceptionPlan": "", 
+    "landDistrict": "PEACE RIVER", 
+    "leaveProvince": false, 
+    "lot": "3", 
+    "meridian": "", 
+    "pad": "20", 
+    "parcel": "A (69860M)", 
+    "parkName": "HIDDEN VALLEY TRAILER COURT", 
+    "partOf": "", 
+    "pidNumber": "011625490", 
+    "plan": "", 
+    "range": "16", 
+    "section": "34", 
+    "status": "ACTIVE", 
+    "taxCertificate": false, 
+    "township": "78"
+  }, 
+  "mhrNumber": "150075", 
+  "ownerGroups": [
+    {
+      "groupId": 1, 
+      "interest": "UNDIVIDED 4/5", 
+      "interestNumerator": 4, 
+      "owners": [
+        {
+          "address": {
+            "city": "LANGLEY", 
+            "country": "CA", 
+            "postalCode": "V3A 6H4", 
+            "region": "BC", 
+            "street": "6665 238TH STREET"
+          }, 
+          "individualName": {
+            "first": "MARY-ANNE", 
+            "last": "BICKNELL"
+          }, 
+          "phoneNumber": "604462027", 
+          "type": "COMMON"
+        }
+      ], 
+      "status": "ACTIVE", 
+      "tenancySpecified": true, 
+      "type": "COMMON"
+    }, 
+    {
+      "groupId": 2, 
+      "interest": "UNDIVIDED 1/5", 
+      "interestNumerator": 1, 
+      "owners": [
+        {
+          "address": {
+            "city": "LANGLEY", 
+            "country": "CA", 
+            "postalCode": "V3A 6H4", 
+            "region": "BC", 
+            "street": "6665 238TH STREET"
+          }, 
+          "individualName": {
+            "first": "JOHN", 
+            "last": "CONNOLLY", 
+            "middle": "STEVEN"
+          }, 
+          "phoneNumber": "604462027", 
+          "type": "COMMON"
+        }
+      ], 
+      "status": "ACTIVE", 
+      "tenancySpecified": true, 
+      "type": "COMMON"
+    }
+  ], 
+  "payment": {
+    "invoiceId": "21665", 
+    "receipt": "/api/v1/payment-requests/21665/receipts"
+  }, 
+  "status": "ACTIVE", 
+  "submittingParty": {
+    "address": {
+      "city": "VICTORIA", 
+      "country": "CA", 
+      "postalCode": "V8W 2V8", 
+      "region": "BC", 
+      "street": "222 SUMMER STREET"
+    }, 
+    "businessName": "ABC SEARCHING COMPANY", 
+    "emailAddress": "bsmith@abc-search.com"
+  }
+}

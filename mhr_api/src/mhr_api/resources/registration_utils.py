@@ -12,21 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Helper methods for financing statements and updates to financing statements."""
-# import json
-# from http import HTTPStatus
+import json
+from http import HTTPStatus
 
 from flask import request, current_app, g
 
 from mhr_api.exceptions import DatabaseException
-from mhr_api.models import MhrRegistration, Db2Manuhome
-# from mhr_api.models import utils as model_utils
-# from mhr_api.reports import ReportTypes, get_callback_pdf, get_pdf, get_report_api_payload
+from mhr_api.models import EventTracking, MhrRegistration, MhrRegistrationReport, Db2Manuhome
+from mhr_api.models import utils as model_utils
+from mhr_api.reports import get_pdf  # get_callback_pdf, get_report_api_payload
 from mhr_api.resources import utils as resource_utils
 from mhr_api.services.authz import is_reg_staff_account
 from mhr_api.services.payment.exceptions import SBCPaymentException
 from mhr_api.services.payment.payment import Payment
-# from mhr_api.services.utils.exceptions import ReportDataException, ReportException, StorageException
-# from mhr_api.services.document_storage.storage_service import DocumentTypes, GoogleStorageService
+from mhr_api.services.queue_service import GoogleQueueService
+from mhr_api.services.utils.exceptions import ReportDataException, ReportException, StorageException
+from mhr_api.services.document_storage.storage_service import DocumentTypes, GoogleStorageService
 from mhr_api.utils.auth import jwt
 
 
@@ -163,3 +164,110 @@ def add_payment_json(registration, reg_json):
         }
         reg_json['payment'] = payment
     return reg_json
+
+
+def enqueue_registration_report(registration: MhrRegistration, json_data: dict, report_type: str):
+    """Add the registration report request to the registration queue."""
+    try:
+        if json_data and report_type:
+            # Signal registration report request is pending: record exists but no doc_storage_url.
+            reg_report: MhrRegistrationReport = MhrRegistrationReport(create_ts=registration.registration_ts,
+                                                                      registration_id=registration.id,
+                                                                      report_data=json_data,
+                                                                      report_type=report_type)
+            reg_report.save()
+        payload = {
+            'registrationId': registration.id
+        }
+        apikey = current_app.config.get('SUBSCRIPTION_API_KEY')
+        if apikey:
+            payload['apikey'] = apikey
+        GoogleQueueService().publish_registration_report(payload)
+        current_app.logger.info(f'Enqueue registration report successful for id={registration.id}.')
+    except DatabaseException as db_err:
+        # Just log, do not return an error response.
+        msg = f'Enqueue MHR registration report db error for id={registration.id}: ' + str(db_err)
+        current_app.logger.error(msg)
+    except Exception as err:  # noqa: B902; do not alter app processing
+        msg = f'Enqueue MHR registration report failed for id={registration.id}: ' + str(err)
+        current_app.logger.error(msg)
+        EventTracking.create(registration.id,
+                             EventTracking.EventTrackingTypes.MHR_REGISTRATION_REPORT,
+                             int(HTTPStatus.INTERNAL_SERVER_ERROR),
+                             msg)
+
+
+def get_registration_report(registration: MhrRegistration,  # pylint: disable=too-many-return-statements,too-many-locals
+                            report_data: dict,
+                            report_type: str,
+                            token=None,
+                            response_status: int = HTTPStatus.OK):
+    """Generate a PDF of the provided report type using the provided data."""
+    registration_id = registration.id
+    try:
+        report_info: MhrRegistrationReport = MhrRegistrationReport.find_by_registration_id(registration_id)
+        if report_info and report_info.doc_storage_url:
+            doc_name = report_info.doc_storage_url
+            current_app.logger.info(f'{registration_id} fetching doc storage report {doc_name}.')
+            raw_data = GoogleStorageService.get_document(doc_name, DocumentTypes.REGISTRATION)
+            return raw_data, response_status, {'Content-Type': 'application/pdf'}
+
+        if report_info and not report_info.doc_storage_url:
+            # Check if report api error: more than 15 minutes has elapsed since the request was queued and no report.
+            if not model_utils.report_retry_elapsed(report_info.create_ts):
+                current_app.logger.info(f'Pending report generation for reg id={registration_id}.')
+                return report_data, HTTPStatus.ACCEPTED, {'Content-Type': 'application/json'}
+
+            current_app.logger.info(f'Retrying report generation for reg id={registration_id}.')
+            raw_data, status_code, headers = get_pdf(report_data,
+                                                     registration.account_id,
+                                                     report_type,
+                                                     token)
+            current_app.logger.debug(f'Retry report api call status={status_code}.')
+            if status_code not in (HTTPStatus.OK, HTTPStatus.CREATED):
+                current_app.logger.error(f'{registration_id} retry report api call failed: ' +
+                                         raw_data.get_data(as_text=True))
+            else:
+                doc_name = model_utils.get_doc_storage_name(registration)
+                current_app.logger.info(f'Saving registration report output to doc storage: name={doc_name}.')
+                response = GoogleStorageService.save_document(doc_name, raw_data, DocumentTypes.REGISTRATION)
+                current_app.logger.info('Save document storage response: ' + json.dumps(response))
+                report_info.create_ts = model_utils.now_ts()
+                report_info.doc_storage_url = doc_name
+                report_info.save()
+            return raw_data, response_status, headers
+
+        # Edge case: too large to generate in real time.
+        results_length = len(json.dumps(report_data))
+        if results_length > current_app.config.get('MAX_SIZE_SEARCH_RT'):
+            current_app.logger.info(f'Registration {registration_id} queued, size too large: {results_length}.')
+            enqueue_registration_report(registration, report_data, report_type)
+            return report_data, HTTPStatus.ACCEPTED, {'Content-Type': 'application/json'}
+        # No report in doc storage: generate, store.
+        raw_data, status_code, headers = get_pdf(report_data,
+                                                 registration.account_id,
+                                                 report_type,
+                                                 token)
+        current_app.logger.debug(f'Report api call status={status_code}.')
+        if status_code not in (HTTPStatus.OK, HTTPStatus.CREATED):
+            current_app.logger.error(f'{registration_id} report api call failed: ' + raw_data.get_data(as_text=True))
+        else:
+            doc_name = model_utils.get_doc_storage_name(registration)
+            current_app.logger.info(f'Saving registration report output to doc storage: name={doc_name}.')
+            response = GoogleStorageService.save_document(doc_name, raw_data, DocumentTypes.REGISTRATION)
+            current_app.logger.info('Save document storage response: ' + json.dumps(response))
+            reg_report: MhrRegistrationReport = MhrRegistrationReport(create_ts=model_utils.now_ts(),
+                                                                      registration_id=registration.id,
+                                                                      report_data=report_data,
+                                                                      report_type=report_type,
+                                                                      doc_storage_url=doc_name)
+            reg_report.save()
+        return raw_data, response_status, headers
+    except ReportException as report_err:
+        return resource_utils.service_exception_response('MHR reg report API error: ' + str(report_err))
+    except ReportDataException as report_data_err:
+        return resource_utils.service_exception_response('MHR reg report API data error: ' + str(report_data_err))
+    except StorageException as storage_err:
+        return resource_utils.service_exception_response('MHR reg report storage API error: ' + str(storage_err))
+    except DatabaseException as db_exception:
+        return resource_utils.db_exception_response(db_exception, None, 'Generate MHR registration report state.')

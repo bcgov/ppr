@@ -1,4 +1,4 @@
-{% if detail.notes is defined and detail.notes|length > 0  %}
+{% if notes is defined and notes|length > 0  %}
     <div class="no-page-break">
         <div class="separator-header mt-6"></div>
         <div class="section-title-centre mt-2">UNIT NOTES</div>
@@ -6,13 +6,13 @@
         <div class="separator-header mt-2"></div>
     </div>
 
-    {% for note in detail.notes %}
+    {% for note in notes %}
     <div class="no-page-break">
         <div class="section-title mt-4">{{note.documentDescription}}</div>      
         <table class="no-page-break section-data details-table mt-4" role="presentation">
             <tr>
                 <td class="section-sub-title">MHR Number:</td>
-                <td>{{detail.mhrNumber}}</td>
+                <td>{{mhrNumber}}</td>
             </tr>
             <tr>
                 <td class="section-sub-title">Document Number:</td>

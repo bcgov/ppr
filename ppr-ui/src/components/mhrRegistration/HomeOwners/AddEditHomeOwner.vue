@@ -177,7 +177,7 @@
             :groupId="ownersGroupId"
             :isAddingHomeOwner="isAddingHomeOwner"
             @setOwnerGroupId="ownerGroupId = $event"
-            :fractionalData="fractionalData"
+            :fractionalData="groupFractionalData"
           />
         </v-form>
         <v-row>
@@ -240,9 +240,9 @@ import { VueMaskDirective } from 'v-mask'
 
 /* eslint-disable no-unused-vars */
 import {
+  MhrRegistrationFractionalOwnershipIF,
   MhrRegistrationHomeOwnerGroupIF,
-  MhrRegistrationHomeOwnersIF,
-  MhrRegistrationFractionalOwnershipIF
+  MhrRegistrationHomeOwnersIF
 } from '@/interfaces/mhr-registration-interfaces'
 import { SearchResponseI } from '@/interfaces'
 /* eslint-enable no-unused-vars */
@@ -251,6 +251,11 @@ import { SimpleHelpToggle } from '@/components/common'
 import HomeOwnerGroups from './HomeOwnerGroups.vue'
 import { useGetters } from 'vuex-composition-helpers'
 import { MhrCompVal, MhrSectVal } from '@/composables/mhrRegistration/enums'
+import { find } from 'lodash'
+
+interface FractionalOwnershipWithGroupIdIF extends MhrRegistrationFractionalOwnershipIF {
+  groupId: string
+}
 
 let DEFAULT_OWNER_ID = 1
 
@@ -276,6 +281,7 @@ export default defineComponent({
     }
   },
   setup (props, context) {
+    const { getMhrRegistrationHomeOwnerGroups } = useGetters<any>(['getMhrRegistrationHomeOwnerGroups'])
     const { required, customRules, maxLength, minLength, isPhone, isNumber, invalidSpaces } = useInputRules()
 
     const {
@@ -313,8 +319,7 @@ export default defineComponent({
         region: props.editHomeOwner?.address.region || '',
         country: props.editHomeOwner?.address.country || '',
         postalCode: props.editHomeOwner?.address.postalCode || '',
-        deliveryInstructions:
-          props.editHomeOwner?.address.deliveryInstructions || ''
+        deliveryInstructions: props.editHomeOwner?.address.deliveryInstructions || ''
       }
     }
 
@@ -325,41 +330,43 @@ export default defineComponent({
         last: props.editHomeOwner?.individualName.last || ''
       }
     } else {
-      defaultHomeOwner.organizationName =
-        props.editHomeOwner?.organizationName || ''
+      defaultHomeOwner.organizationName = props.editHomeOwner?.organizationName || ''
     }
 
-    const localState = reactive({
-      group: getGroupForOwner(
-        props.editHomeOwner?.id
-      ) as MhrRegistrationHomeOwnerGroupIF,
-      ownersGroupId: computed(() =>
-        showGroups.value ? localState.group?.groupId : null
-      ),
-      owner: { ...defaultHomeOwner },
-      ownerGroupId: undefined,
-      showGroups: showGroups,
-      isPerson: props.isHomeOwnerPerson,
-      isAddingHomeOwner: props.editHomeOwner == null,
-      fraction: {
-        type: '',
+    const allFractionalData = (getMhrRegistrationHomeOwnerGroups.value || [{}]).map(group => {
+      return {
+        groupId: group.groupId || '1',
+        type: group?.type || '',
+        interest: group?.interest || '',
+        interestNumerator: group?.interestNumerator || null,
+        interestTotal: group?.interestTotal || null,
+        tenancySpecified: group?.tenancySpecified || null
+      }
+    }) as FractionalOwnershipWithGroupIdIF[]
+
+    const hasMultipleOwnersInGroup =
+      find(getMhrRegistrationHomeOwnerGroups.value, { groupId: props.editHomeOwner?.groupId })?.owners.length > 1
+
+    if (allFractionalData.length === 0 || props.editHomeOwner == null || hasMultipleOwnersInGroup) {
+      allFractionalData.push({
+        groupId: (allFractionalData.length + 1).toString(),
+        type: 'N/A',
         interest: '',
         interestNumerator: null,
         interestTotal: null,
         tenancySpecified: null
-      } as MhrRegistrationFractionalOwnershipIF,
-      fractionalData: computed(() => {
-        // TODO: get fractional ownership for the group that either owner belongs to or
-        // the group that is selected from dropdown
+      } as FractionalOwnershipWithGroupIdIF)
+    }
 
-        return {
-          type: localState.group?.type || '',
-          interest: localState.group?.interest || '',
-          interestNumerator: localState.group?.interestNumerator || null,
-          interestTotal: localState.group?.interestTotal || null,
-          tenancySpecified: localState.group?.tenancySpecified || null
-        } as MhrRegistrationFractionalOwnershipIF
-      }),
+    const localState = reactive({
+      group: getGroupForOwner(props.editHomeOwner?.id) as MhrRegistrationHomeOwnerGroupIF,
+      ownersGroupId: computed(() => (showGroups.value ? localState.group?.groupId : null)),
+      owner: { ...defaultHomeOwner },
+      ownerGroupId: props.editHomeOwner?.groupId,
+      showGroups: showGroups,
+      isPerson: props.isHomeOwnerPerson,
+      isAddingHomeOwner: props.editHomeOwner == null,
+      groupFractionalData: computed(() => find(allFractionalData, { groupId: localState.ownerGroupId || '1' })),
       isHomeOwnerFormValid: false,
       isAddressFormValid: false,
       triggerAddressErrors: false,
@@ -374,13 +381,17 @@ export default defineComponent({
       phoneNumberRules: customRules(
         isPhone(14)
       ),
-      phoneExtensionRules: customRules(isNumber(null, null, null, 'Enter numbers only'), invalidSpaces(), maxLength(5, true))
+      phoneExtensionRules: customRules(
+        isNumber(null, null, null, 'Enter numbers only'),
+        invalidSpaces(),
+        maxLength(5, true)
+      )
     })
 
     const done = (): void => {
       // @ts-ignore - function exists
       context.refs.addHomeOwnerForm.validate()
-      if (localState.isHomeOwnerFormValid) {
+      if (localState.isHomeOwnerFormValid && localState.isAddressFormValid) {
         if (props.editHomeOwner) {
           editHomeOwner(
             localState.owner as MhrRegistrationHomeOwnersIF,
@@ -392,14 +403,20 @@ export default defineComponent({
             localState.ownerGroupId
           )
         }
-        setGroupFractionalInterest(
-          localState.ownerGroupId || '1',
-          localState.fractionalData
-        )
-        localState.ownerGroupId && setShowGroups(true)
 
         // TODO: Mhr-Submission - DELETE after step 3 validation is done
         setValidation(MhrSectVal.HOME_OWNERS_VALID, MhrCompVal.OWNERS_VALID, true)
+
+        if (Number(localState.ownerGroupId) > 0) {
+          setShowGroups(true)
+
+          // Get fractional data based on owner's group id
+          const fractionalData = find(
+            allFractionalData,
+            { groupId: localState.ownerGroupId }) as FractionalOwnershipWithGroupIdIF
+
+          setGroupFractionalInterest(localState.ownerGroupId || '1', fractionalData)
+        }
 
         cancel()
       } else {
