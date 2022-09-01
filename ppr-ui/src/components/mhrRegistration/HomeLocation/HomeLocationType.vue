@@ -219,6 +219,16 @@ export default defineComponent({
             return localState.isValidLot
           case HomeLocationTypes.HOME_PARK:
             return localState.isValidHomePark
+          case HomeLocationTypes.OTHER_LAND:
+            switch (localState.otherTypeOption as any) {
+              case HomeLocationTypes.OTHER_RESERVE:
+                return true // Future state includes new fields TBD
+              case HomeLocationTypes.OTHER_STRATA:
+              case HomeLocationTypes.OTHER_TYPE:
+                return localState.pidNumber !== '' // Future state includes new fields TBD
+              default:
+                return false
+            }
         }
       })
     })
@@ -257,24 +267,11 @@ export default defineComponent({
 
     /** Clear/reset forms when select option changes. **/
     watch(() => localState.locationTypeOption, () => {
-      switch (localState.locationTypeOption as any) {
-        case HomeLocationTypes.LOT:
-          localState.homeParkName = ''
-          localState.homeParkPad = ''
-          localState.pidNumber = ''
-          localState.otherTypeOption = null
-          break
-        case HomeLocationTypes.HOME_PARK:
-          localState.dealerManufacturerLot = ''
-          localState.pidNumber = ''
-          localState.otherTypeOption = null
-          break
-        case HomeLocationTypes.OTHER_LAND:
-          localState.homeParkName = ''
-          localState.homeParkPad = ''
-          localState.dealerManufacturerLot = ''
-          break
-      }
+      localState.homeParkName = ''
+      localState.homeParkPad = ''
+      localState.pidNumber = ''
+      localState.otherTypeOption = null
+      localState.dealerManufacturerLot = ''
       validateForms()
     })
     watch(() => localState.otherTypeOption, () => {

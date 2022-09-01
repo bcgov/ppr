@@ -26,3 +26,13 @@ export const notCompleteSearchDialog: DialogOptionsIF = {
   text: 'Your manufactured home search has not been completed. Do you want to exit and discard ' +
     'this search, or return to complete it?'
 }
+
+export const pidNotFoundDialog: DialogOptionsIF = {
+  acceptText: 'Retry',
+  cancelText: 'Cancel',
+  title: 'Unable to retrieve PID number',
+  label: '',
+  text: 'We were unable to retrieve the PID number. Please try again. If this issue persists please contact us for' +
+    'assistance.',
+  hasContactInfo: true
+}

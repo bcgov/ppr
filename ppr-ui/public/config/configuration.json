@@ -5,6 +5,8 @@
   "PPR_API_KEY": "diGbLm3qjmKLjvU4GWIgPNlhxtpLWlN0",
   "MHR_API_URL": "https://bcregistry-dev.apigee.net/mhr",
   "MHR_API_VERSION": "/api/v1",
+  "LTSA_API_URL": "https://bcregistry-dev.apigee.net/ltsa",
+  "LTSA_API_VERSION": "/api/v1",
   "AUTH_WEB_URL": "https://dev.bcregistry.ca/business/auth/",
   "AUTH_API_URL": "https://auth-api-dev.apps.silver.devops.gov.bc.ca",
   "AUTH_API_VERSION": "/api/v1",

@@ -53,6 +53,12 @@ export async function fetchConfig (): Promise<any> {
   sessionStorage.setItem('MHR_API_KEY', mhrApiKey)
   console.log('Set MHR API URL to: ' + mhrApiUrl)
 
+  const ltsaApiUrl: string = response.data.LTSA_API_URL + response.data.LTSA_API_VERSION + '/'
+  const ltsaApiKey: string = response.data.PPR_API_KEY
+  sessionStorage.setItem('LTSA_API_URL', ltsaApiUrl)
+  sessionStorage.setItem('LTSA_API_KEY', ltsaApiKey)
+  console.log('Set LTSA API URL to: ' + ltsaApiUrl)
+
   const searchApiUrl: string = response.data.REGISTRIES_SEARCH_API_URL +
     response.data.REGISTRIES_SEARCH_API_VERSION + '/'
   const searchApiKey: string = response.data.REGISTRY_SEARCH_API_KEY
