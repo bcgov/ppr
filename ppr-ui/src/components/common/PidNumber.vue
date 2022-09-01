@@ -72,6 +72,7 @@ import { useInputRules } from '@/composables'
 import { ltsaSummary } from '@/utils/ltsa-api-helper'
 import { BaseDialog } from '@/components/dialogs'
 import { pidNotFoundDialog } from '@/resources/dialogOptions'
+import { TitleSummariesIF } from '@/interfaces/ltsa-api-interfaces'
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
@@ -122,20 +123,15 @@ export default defineComponent({
     const dialogRetry = async (retry: boolean): Promise<void> => {
       localState.showNotFoundDialog = false
       if (retry) {
-        await validatePid()
+        await validatePid() ? emitPid() : localState.showNotFoundDialog = true
       } else clearPid()
     }
 
-    const validatePid = async (): Promise<void> => {
+    const validatePid = async (): Promise<boolean> => {
       localState.enablePidLoader = true
-      const ltsaResponse = await ltsaSummary(localState.pidNumber)
+      const { titleSummaries } = await ltsaSummary(localState.pidNumber) as TitleSummariesIF
       localState.enablePidLoader = false
-
-      if (ltsaResponse?.error) {
-        localState.showNotFoundDialog = true
-      } else {
-        emitPid()
-      }
+      return titleSummaries?.length > 0
     }
 
     const clearPid = (): void => {
@@ -165,7 +161,7 @@ export default defineComponent({
     })
     watch(() => localState.pidNumber, async () => {
       if (localState.isValidPid && localState.pidNumber.length === 9) {
-        await validatePid()
+        await validatePid() ? emitPid() : localState.showNotFoundDialog = true
       }
     })
 
