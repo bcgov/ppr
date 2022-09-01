@@ -404,7 +404,7 @@ class Db2Manuhome(db.Model):
     @classmethod
     def __sort_key_notes_ts(cls, item):
         """Sort the notes registration timestamp."""
-        return item['createDateTime']
+        return item.get('createDateTime', '')
 
     @staticmethod
     def create_from_dict(new_info: dict):
