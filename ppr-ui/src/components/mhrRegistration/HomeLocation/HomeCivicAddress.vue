@@ -93,7 +93,7 @@ export default defineComponent({
         city: '',
         region: 'British Columbia',
         postalCode: '',
-        country: 'CA',
+        country: '',
         deliveryInstructions: ''
       })
     },
@@ -133,10 +133,10 @@ export default defineComponent({
     const { enableAddressComplete, uniqueIds } = useAddressComplete(addressLocal)
 
     const localState = reactive({
-      isValidCivicAddress: true,
+      isValidCivicAddress: false,
       addressLocal
     })
-    
+
     const validateForm = (): void => {
       if (props.validate) {
         // @ts-ignore - function exists
@@ -171,7 +171,7 @@ export default defineComponent({
 
     watch(() => props.validate, async () => {
       // @ts-ignore - function exists
-      await setCivicAddress({ key: 'region', value: 'BC' })
+      addressLocal.value.region = 'British Columbia'
       validateForm()
     })
     /** Clear/reset forms when select option changes. **/

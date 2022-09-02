@@ -82,7 +82,7 @@
                 <span v-if="!!getMhrRegistrationLocation.address.streetAdditional">
                   {{getMhrRegistrationLocation.address.streetAdditional}}<br/>
                 </span>
-                {{ getMhrRegistrationLocation.address.city }} {{ getMhrRegistrationLocation.address.region }}
+                {{ getMhrRegistrationLocation.address.city }} {{ 'BC' }}
               </p>
               <p v-else>
                 {{ '(Not Entered)' }}
