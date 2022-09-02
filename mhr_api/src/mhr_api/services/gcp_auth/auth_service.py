@@ -17,6 +17,7 @@ import json
 import os
 
 import google.auth.transport.requests
+import google.oauth2.id_token
 from google.oauth2 import service_account
 from flask import current_app
 
@@ -52,6 +53,17 @@ class GoogleAuthService(AuthService):  # pylint: disable=too-few-public-methods
         cls.credentials.refresh(request)
         current_app.logger.info('Call successful: obtained token.')
         return cls.credentials.token
+
+    @classmethod
+    def get_report_api_token(cls):
+        """Generate an OAuth access token with IAM configured auth mhr api container to report api container."""
+        audience = current_app.config.get('REPORT_API_AUDIENCE')
+        if not audience:
+            return None
+        auth_req = google.auth.transport.requests.Request()
+        token = google.oauth2.id_token.fetch_id_token(auth_req, audience)
+        current_app.logger.info('Call successful: obtained token.')
+        return token
 
     @classmethod
     def get_credentials(cls):

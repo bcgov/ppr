@@ -3,12 +3,12 @@
       <div class="separator mt-5"></div>
    {% endif %}
    <div class="section-title mt-3">Vehicle Collateral</div>
-{% if pprDetail.financingStatement.vehicleCollateral is defined and change is not defined %}
-   {% if pprDetail.financingStatement.mhCollateralCount is defined and pprDetail.financingStatement.mhCollateralCount > 0 %}
-      <table class="vehicle-collateral-table-mh mt-4" role="presentation">
-   {% else %}
-      <table class="vehicle-collateral-table mt-4" role="presentation">
-   {% endif %}
+   {% if pprDetail.financingStatement.vehicleCollateral is defined and change is not defined %}
+      {% if pprDetail.financingStatement.mhCollateralCount is defined and pprDetail.financingStatement.mhCollateralCount > 0 %}
+         <table class="vehicle-collateral-table-mh mt-4" role="presentation">
+      {% else %}
+         <table class="vehicle-collateral-table mt-4" role="presentation">
+      {% endif %}
          
       <tr class="vehicle-collateral-table-header no-page-break">
          <td class="top-align">Type</td>
@@ -19,6 +19,11 @@
             <td class="top-align">MHR Number</td>
          {% endif %}
       </tr>
+      {% if pprDetail.financingStatement.mhCollateralCount is defined and pprDetail.financingStatement.mhCollateralCount > 0 %}
+         <tr><td colspan="5" style="height: 2px;"><div class="separator-table-row"></div></td></tr>            
+      {% else %}
+         <tr><td colspan="4" style="height: 2px;"><div class="separator-table-row"></div></td></tr>            
+      {% endif %}
       {% for collateral in pprDetail.financingStatement.vehicleCollateral %}
          <tr class="no-page-break">
             <td>{{collateral.type}}</td>
@@ -39,6 +44,13 @@
                </td>
             {% endif %}
          </tr>
+         {% if not loop.last %}
+            {% if pprDetail.financingStatement.mhCollateralCount is defined and pprDetail.financingStatement.mhCollateralCount > 0 %}
+               <tr><td colspan="5" style="height: 2px;"><div class="separator-table-row"></div></td></tr>            
+            {% else %}
+               <tr><td colspan="4" style="height: 2px;"><div class="separator-table-row"></div></td></tr>            
+            {% endif %}
+         {% endif %}
       {% endfor %}
    </table>
 {% elif change is defined and (change.addVehicleCollateral is defined or change.deleteVehicleCollateral is defined) %}
@@ -57,6 +69,13 @@
             <td class="top-align">MHR Number</td>
          {% endif %}
       </tr>
+
+      {% if change.mhCollateralCount is defined and change.mhCollateralCount > 0 %}
+         <tr><td colspan="5" style="height: 2px;"><div class="separator-table-row"></div></td></tr>            
+      {% else %}
+         <tr><td colspan="4" style="height: 2px;"><div class="separator-table-row"></div></td></tr>            
+      {% endif %}
+      
    {% if change.addVehicleCollateral is defined %}
       {% for collateral in change.addVehicleCollateral %}
          <tr class="no-page-break">
@@ -81,6 +100,15 @@
                </td>
             {% endif %}
          </tr>
+
+         {% if not loop.last %}
+            {% if change.mhCollateralCount is defined and change.mhCollateralCount > 0 %}
+               <tr><td colspan="5" style="height: 2px;"><div class="separator-table-row"></div></td></tr>            
+            {% else %}
+               <tr><td colspan="4" style="height: 2px;"><div class="separator-table-row"></div></td></tr>            
+            {% endif %}
+         {% endif %}
+         
       {% endfor %}
    {% endif %}
    {% if change.deleteVehicleCollateral is defined %}
@@ -109,6 +137,15 @@
             {% endif %}
          </tr>
          {% endif %}
+
+         {% if not loop.last %}
+            {% if change.mhCollateralCount is defined and change.mhCollateralCount > 0 %}
+               <tr><td colspan="5" style="height: 2px;"><div class="separator-table-row"></div></td></tr>            
+            {% else %}
+               <tr><td colspan="4" style="height: 2px;"><div class="separator-table-row"></div></td></tr>            
+            {% endif %}
+         {% endif %}
+
       {% endfor %}
    {% endif %}
    </table>

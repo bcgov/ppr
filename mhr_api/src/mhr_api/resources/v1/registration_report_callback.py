@@ -89,7 +89,10 @@ def registration_callback_error(code: str, registration_id: int, status_code, me
     if message:
         error += ' ' + message
     # Track event here.
-    EventTracking.create(registration_id, EventTracking.EventTrackingTypes.REGISTRATION_REPORT, status_code, message)
+    EventTracking.create(registration_id,
+                         EventTracking.EventTrackingTypes.MHR_REGISTRATION_REPORT,
+                         status_code,
+                         message)
     if status_code != HTTPStatus.BAD_REQUEST and code not in (resource_utils.CallbackExceptionCodes.MAX_RETRIES,
                                                               resource_utils.CallbackExceptionCodes.UNKNOWN_ID,
                                                               resource_utils.CallbackExceptionCodes.SETUP_ERR):
@@ -101,8 +104,8 @@ def registration_callback_error(code: str, registration_id: int, status_code, me
 def get_registration_callback_report(registration: MhrRegistration,  # pylint: disable=too-many-return-statements
                                      report_info: MhrRegistrationReport):
     """Attempt to generate and store a registration report. Record the status."""
+    registration_id: int = registration.id
     try:
-        registration_id: int = registration.id
         doc_name = report_info.doc_storage_url
         if doc_name is not None:
             current_app.logger.warn(f'Registration report for {registration_id} already exists: {doc_name}.')
@@ -130,12 +133,12 @@ def get_registration_callback_report(registration: MhrRegistration,  # pylint: d
         doc_name = model_utils.get_doc_storage_name(registration)
         current_app.logger.info(f'Saving registration report output to doc storage: name={doc_name}.')
         response = GoogleStorageService.save_document(doc_name, raw_data, DocumentTypes.REGISTRATION)
-        current_app.logger.info('Save document storage response: ' + json.dumps(response))
+        current_app.logger.info(f'Updating report tracking doc_storage_url to {doc_name}.')
         report_info.doc_storage_url = doc_name
         report_info.save()
         # Track success event.
         EventTracking.create(registration_id,
-                             EventTracking.EventTrackingTypes.REGISTRATION_REPORT,
+                             EventTracking.EventTrackingTypes.MHR_REGISTRATION_REPORT,
                              int(HTTPStatus.OK))
         return response, HTTPStatus.OK
     except ReportException as report_err:

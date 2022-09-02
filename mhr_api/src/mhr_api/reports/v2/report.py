@@ -22,6 +22,7 @@ from mhr_api.models import utils as model_utils
 from mhr_api.reports import ppr_report_utils
 from mhr_api.reports.v2 import report_utils
 from mhr_api.reports.v2.report_utils import ReportTypes
+from mhr_api.services.gcp_auth.auth_service import GoogleAuthService
 
 
 # Map from API search type to report description
@@ -64,7 +65,11 @@ class Report:  # pylint: disable=too-few-public-methods
                                  .format(self._account_id, self._report_key, url))
         meta_data = report_utils.get_report_meta_data()
         files = report_utils.get_report_files(data, self._report_key)
-        response = requests.post(url=url, data=meta_data, files=files)
+        headers = {}
+        token = GoogleAuthService.get_report_api_token()
+        if token:
+            headers['Authorization'] = 'Bearer {}'.format(token)
+        response = requests.post(url=url, headers=headers, data=meta_data, files=files)
         current_app.logger.debug('Account {0} report type {1} response status: {2}.'
                                  .format(self._account_id, self._report_key, response.status_code))
         if response.status_code != HTTPStatus.OK:
@@ -86,7 +91,11 @@ class Report:  # pylint: disable=too-few-public-methods
                                  .format(self._account_id, self._report_key, url))
         meta_data = report_utils.get_report_meta_data()
         files = report_utils.get_report_files(data, self._report_key)
-        response_reg = requests.post(url=url, data=meta_data, files=files)
+        headers = {}
+        token = GoogleAuthService.get_report_api_token()
+        if token:
+            headers['Authorization'] = 'Bearer {}'.format(token)
+        response_reg = requests.post(url=url, headers=headers, data=meta_data, files=files)
         current_app.logger.debug('Account {0} report type {1} response status: {2}.'
                                  .format(self._account_id, self._report_key, response_reg.status_code))
         if response_reg.status_code != HTTPStatus.OK:
@@ -102,7 +111,7 @@ class Report:  # pylint: disable=too-few-public-methods
                                  .format(self._account_id, self._report_key, url))
         files = report_utils.get_report_files(data_final, self._report_key)
         current_app.logger.info('Search report regenerating with TOC page numbers set.')
-        response = requests.post(url=url, data=meta_data, files=files)
+        response = requests.post(url=url, headers=headers, data=meta_data, files=files)
         current_app.logger.info('Search report regeneration with TOC page numbers completed.')
         if response.status_code != HTTPStatus.OK:
             content = ResourceErrorCodes.REPORT_ERR + ': ' + response.content.decode('ascii')

@@ -2,23 +2,27 @@
 {% if detail.description is defined and detail.description.sections is defined %}
    <div class="separator mt-5"></div>
    <div class="section-title mt-3">Manufactured Home Sections</div>
-   <div class="section-data pt-3"><span class="sections-table-header">Number of Sections:</span> {{ detail.description.sections|length }}</div>
+   <div class="section-data pt-3"><span class="sections-table-header">Number of Sections:</span> {{ detail.description.sections|length }}</div> 
    <table class="sections-table mt-4" role="presentation">         
-      <tr class="sections-table-header no-page-break">
+      <tr class="sections-table-header no-page-break mb-0">
          <td class="top-align">Section</td>
          <td class="top-align">Serial Number</td>
          <td class="top-align">Length</td>
          <td class="top-align">Width</td>
       </tr>
       {% for section in detail.description.sections %}
+         <tr>
+            <td width="100%" colspan="4"><div class="separator-table-row mb-3"></div></td>
+         </tr>
          <tr class="no-page-break">
-            <td>{{loop.index}}.</td>
-            <td>{{section.serialNumber}}</td>
-            <td>{{section.lengthFeet}} feet {{section.lengthInches}} inches</td>
-            <td>{{section.widthFeet}} feet {{section.widthInches}} inches</td>
+            <td><div class="mb-3">{{loop.index}}.</div></td>
+            <td><div class="mb-3">{{section.serialNumber}}</div></td>
+            <td><div class="mb-3">{{section.lengthFeet}} feet {{section.lengthInches}} inches</div></td>
+            <td><div class="mb-3">{{section.widthFeet}} feet {{section.widthInches}} inches</div></td>
          </tr>
       {% endfor %}
    </table>
+
 {% else %}
    <div class="section-data">None</div>
 {% endif %}

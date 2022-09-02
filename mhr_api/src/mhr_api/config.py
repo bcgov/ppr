@@ -169,6 +169,7 @@ class _Config():  # pylint: disable=too-few-public-methods
     USE_LEGACY_DB: bool = bool(os.getenv('USE_LEGACY_DB', 'True'))
     # Default 2, set to 1 to revert to original report api client
     REPORT_VERSION = os.getenv('REPORT_VERSION', '2')
+    REPORT_API_AUDIENCE = os.getenv('REPORT_API_AUDIENCE', '')
 
     # Google APIs and cloud storage
     GCP_PROJECT_ID = os.getenv('GCP_PROJECT_ID')

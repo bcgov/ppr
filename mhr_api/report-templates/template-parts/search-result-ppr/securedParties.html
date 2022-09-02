@@ -1,7 +1,7 @@
 <div class="no-page-break">
     <div class="section-title mt-3">Secured Party Information</div>
 {% if pprDetail.financingStatement.securedParties is defined and change is not defined %}
-    <table class="section-data section-data-table mt-4" role="presentation">
+    <table class="section-data section-data-table-new mt-4" role="presentation">
     {% for party in pprDetail.financingStatement.securedParties %}
         <tr class="no-page-break">
             <td class="col-40">
@@ -23,10 +23,13 @@
                 <div>{{ party.address.postalCode }} {{ party.address.country }}</div>
             </td>
          </tr>
+         {% if not loop.last %}
+            <tr><td colspan="3"><div class="separator-table-row mt-4 mb-4"></div></td></tr>            
+        {% endif %}
     {% endfor %}
     </table>
 {% elif change is defined and (change.addSecuredParties is defined or change.deleteSecuredParties is defined) %}
-    <table class="section-data section-data-table mt-4" role="presentation">
+    <table class="section-data section-data-table-new mt-4" role="presentation">
     {% if change.addSecuredParties is defined %}
         {% for party in change.addSecuredParties %}
             <tr class="no-page-break">
@@ -62,6 +65,9 @@
                     <div>{{ party.address.postalCode }} {{ party.address.country }}</div>
                 </td>
             </tr>
+            {% if not loop.last %}
+                <tr><td colspan="3"><div class="separator-table-row mt-4 mb-4"></div></td></tr>            
+            {% endif %}
         {% endfor %}
     {% endif %}
     {% if change.deleteSecuredParties is defined %}
@@ -88,6 +94,9 @@
                     <div>{{ party.address.postalCode }} {{ party.address.country }}</div>
                 </td>
             </tr>
+            {% endif %}
+            {% if not loop.last %}
+                <tr><td colspan="3"><div class="separator-table-row mt-4 mb-4"></div></td></tr>            
             {% endif %}
         {% endfor %}
     {% endif %}
