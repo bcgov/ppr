@@ -345,7 +345,7 @@ export default defineComponent({
         return localState.validations?.searchValue?.message || ''
       }),
       optionFirst: computed((): string => {
-        return isRoleStaffReg ? 'First Name (Optional)' : 'First Name'
+        return isRoleStaffReg.value ? 'First Name (Optional)' : 'First Name'
       }),
       typeOfSearch: computed((): string => {
         // only show the type of search if authorized to both types
