@@ -32,7 +32,7 @@ export const pidNotFoundDialog: DialogOptionsIF = {
   cancelText: 'Cancel',
   title: 'Unable to retrieve PID number',
   label: '',
-  text: 'We were unable to retrieve the PID number. Please try again. If this issue persists please contact us for' +
+  text: 'We were unable to retrieve the PID number. Please try again. If this issue persists please contact us for ' +
     'assistance.',
   hasContactInfo: true
 }
