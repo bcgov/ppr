@@ -6,13 +6,11 @@
             margin: 0 !important;
             font-size: 8rem;
       }
-
-/*      
-      body {
-          font-size: 8rem;
-          margin: 4rem auto;
-      }
-*/
+      .footer {
+            width: 97%;
+            margin-top: 0px !important;
+            padding-top: 0px;
+        }
 
       .footer-table {
         width: 98%;
@@ -27,28 +25,16 @@
         text-align: left;
       }
       .footer-table td:nth-child(2) {
-        width: 60%;
+        width: 75%;
         text-align: right;
-      }
-      .footer-table td:nth-child(3) {
-        width: 15%;
       }
 
       .footer-text {
         font-family: 'BC Sans' !important;
         color: #003366 !important;
         font-size: 8px; /* 10 */
-  			font-weight: bold;
         text-align: right;
       }
-      .page-count-text {
-        font-family: 'BC Sans' !important;
-        color: #003366 !important;
-        font-size: 8px;  /* 10 */
-  			font-weight: bold;
-        text-align: left;
-      }
-
       .footer-column-logo {
         display: inline-block;
         text-align: center;
@@ -63,6 +49,7 @@
     </style>
   </head>
   <body>
+    <div class="footer">
     <table class="footer-table">
       <tr>
         <td>
@@ -71,12 +58,11 @@
         </div>
         </td>
         <td>
-          <p class="footer-text">{{FOOTER-TEXT}}&nbsp;|</p>
-        </td>
-        <td>
-          <p class="page-count-text">Page <span class="pageNumber"></span> of <span class="totalPages"></span></p>
+          <p class="footer-text">{{FOOTER-TEXT}}&nbsp;| Page 
+            <span class="pageNumber"></span> of <span class="totalPages"></span></p>
         </td>
       </tr>
     </table>
+    </div>
   </body>
 </html>
