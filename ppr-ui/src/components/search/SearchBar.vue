@@ -90,7 +90,7 @@
               filled
               :hint="searchHintFirst"
               persistent-hint
-              placeholder="First Name"
+              :placeholder="optionFirst"
               v-validate=" isStaffBcolReg ? '' : 'required' "
               v-model="searchValueFirst"
               @keypress.enter="searchCheck()"
@@ -343,6 +343,9 @@ export default defineComponent({
       }),
       searchMessage: computed((): string => {
         return localState.validations?.searchValue?.message || ''
+      }),
+      optionFirst: computed((): string => {
+        return isRoleStaffReg ? 'First Name (Optional)' : 'First Name'
       }),
       typeOfSearch: computed((): string => {
         // only show the type of search if authorized to both types
