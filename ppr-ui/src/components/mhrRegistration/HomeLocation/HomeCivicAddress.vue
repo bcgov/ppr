@@ -130,11 +130,19 @@ export default defineComponent({
       labels
     } = useAddress(toRefs(props).value, addressSchema)
 
-    const { addressForm, resetValidation, validate } = useBaseValidations()
-
     const { enableAddressComplete, uniqueIds } = useAddressComplete(addressLocal)
 
-    const isValidCivicAddress = false
+    const localState = reactive({
+      isValidCivicAddress: true,
+      addressLocal
+    })
+    
+    const validateForm = (): void => {
+      if (props.validate) {
+        // @ts-ignore - function exists
+        localState.isValidCivicAddress = true
+      }
+    }
 
     /** Apply local model updates to store. **/
     watch(() => addressLocal.value.street, async () => {
@@ -154,23 +162,20 @@ export default defineComponent({
 
     watch(() => addressLocal.value.region, async () => {
       // Set civic address data to store
-      addressLocal.value.region = 'British Columbia'
       await setCivicAddress({ key: 'region', value: 'BC' })
     })
 
-    watch(() => isValidCivicAddress, async (val: boolean) => {
+    watch(() => localState.isValidCivicAddress, async (val: boolean) => {
       setValidation(MhrSectVal.LOCATION_VALID, MhrCompVal.CIVIC_ADDRESS_VALID, val)
     })
 
     watch(() => props.validate, async () => {
       // @ts-ignore - function exists
-      resetValidation()
-      validate()
+      await setCivicAddress({ key: 'region', value: 'BC' })
+      validateForm()
     })
-
     /** Clear/reset forms when select option changes. **/
     return {
-      addressForm,
       addressSchema,
       addressLocal,
       country,
@@ -179,7 +184,7 @@ export default defineComponent({
       enableAddressComplete,
       ...labels,
       ...uniqueIds,
-      isValidCivicAddress
+      ...toRefs(localState)
     }
   }
 })
