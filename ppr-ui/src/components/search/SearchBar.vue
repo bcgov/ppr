@@ -91,6 +91,7 @@
               :hint="searchHintFirst"
               persistent-hint
               placeholder="First Name"
+              v-validate=" isStaffBcolReg ? '' : 'required' "
               v-model="searchValueFirst"
               @keypress.enter="searchCheck()"
           />
@@ -330,6 +331,9 @@ export default defineComponent({
       }),
       isStaffBcolReg: computed((): boolean => {
         return isRoleStaffBcol.value || isRoleStaffReg.value
+      }),
+      isRoleStaffReg: computed((): boolean => {
+        return isRoleStaffReg.value
       }),
       isStaffSbc: computed((): boolean => {
         return isRoleStaffSbc.value

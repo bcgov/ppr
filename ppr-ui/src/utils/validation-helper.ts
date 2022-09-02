@@ -4,6 +4,7 @@ import {
   SearchTypeIF,
   SearchValidationIF
 } from '@/interfaces'
+import { search } from './ppr-api-helper'
 
 // subset of the localState that includes what the validator needs
 type partialSearchState = {
@@ -13,6 +14,7 @@ type partialSearchState = {
   searchValueSecond?: string
   searchValueLast?: string
   selectedSearchType: SearchTypeIF
+  isRoleStaffReg: boolean
 }
 
 const specialCharsStrict = /[!@#$%^&*(),.?"{}|<>`~_;:'/\\[\]-]/
@@ -35,6 +37,7 @@ export function validateSearchAction (
   const first = searchState?.searchValueFirst?.trim()
   const second = searchState?.searchValueSecond?.trim()
   const last = searchState?.searchValueLast?.trim()
+  const isMHRStaff = searchState?.isRoleStaffReg
   if (!searchState?.selectedSearchType) {
     validation.category.message = 'Please select a category'
     return validation
@@ -70,7 +73,7 @@ export function validateSearchAction (
       }
       break
     case APIMHRMapSearchTypes.MHROWNER_NAME:
-      if (!first) {
+      if (!first && !isMHRStaff) {
         validation.searchValue.messageFirst = 'Enter a first name'
       } else if (first?.length > 15) {
         validation.searchValue.messageFirst = 'Maximum 15 characters'
