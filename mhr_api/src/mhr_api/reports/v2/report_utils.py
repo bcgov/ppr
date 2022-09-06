@@ -143,7 +143,7 @@ def update_toc_page_numbers(json_data, reg_pdf_data):
                     page = bodypdf.pages[i]
                     text = page.extract_text()
                     # current_app.logger.info(text[0:200])
-                    if text[0:200].find(reg_text) > 0:
+                    if text[0:350].find(reg_text) > 0:
                         page_index = i + 1
                         select['pageNumber'] = (i + 1)
                         break

@@ -956,3 +956,8 @@ def report_retry_elapsed(last_ts: _datetime):
     test_ts = (last_ts + timedelta(minutes=15)).replace(tzinfo=timezone.utc)
     current_app.logger.info('Comparing now ' + now.isoformat() + ' with last ts ' + test_ts.isoformat())
     return now > test_ts
+
+
+def is_legacy() -> bool:
+    """Check that the api is using the legacy DB2 database."""
+    return current_app.config.get('USE_LEGACY_DB', True)

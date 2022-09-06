@@ -51,7 +51,7 @@ def get_account_registrations():
             return resource_utils.unauthorized_error_response(account_id)
         # current_app.logger.debug(f'get_account_registrations account={account_id}.')
         # Try to fetch account registrations.
-        statement_list = MhrRegistration.find_all_by_account_id(account_id)
+        statement_list = MhrRegistration.find_all_by_account_id(account_id, is_staff(jwt))
         return jsonify(statement_list), HTTPStatus.OK
 
     except DatabaseException as db_exception:
@@ -147,6 +147,16 @@ def get_registrations(mhr_number: str):  # pylint: disable=too-many-return-state
                 response_json['submittingParty'] = submitting.json
         else:
             response_json = registration.json
+
+        # Return report if request header Accept MIME type is application/pdf.
+        if resource_utils.is_pdf(request):
+            current_app.logger.info(f'Fetching registration report for MHR# {mhr_number}.')
+            return reg_utils.get_registration_report(registration,
+                                                     response_json,
+                                                     ReportTypes.MHR_REGISTRATION,
+                                                     jwt.get_token_auth_header(),
+                                                     HTTPStatus.CREATED)
+
         return response_json, HTTPStatus.OK
     except BusinessException as exception:
         return resource_utils.business_exception_response(exception)
