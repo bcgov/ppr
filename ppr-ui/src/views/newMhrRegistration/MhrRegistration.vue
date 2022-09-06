@@ -167,14 +167,15 @@ export default defineComponent({
       localState.dataLoaded = true
     })
 
-    const { buildApiData } = useNewMhrRegistration()
+    const { buildApiData, parseStaffPayment } = useNewMhrRegistration()
 
     const submit = async () => {
       // TODO: Mhr-Submission - DELETE after the validations are done across the steps
       setValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_APP, true)
       if (localState.validateMhrRegistration) {
         localState.submitting = true
-        await submitMhrRegistration(buildApiData())
+        // passing apiData as payload and staffPayment as query parameters
+        await submitMhrRegistration(buildApiData(), parseStaffPayment())
         localState.submitting = false
       }
     }
