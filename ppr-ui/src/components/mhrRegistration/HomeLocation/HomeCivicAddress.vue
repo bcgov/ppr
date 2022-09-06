@@ -15,7 +15,9 @@
               label="Street Address"
               :name="Math.random()"
               persistent-hint
+              ref="street"
               v-model="addressLocal.street"
+              :rules="[...addressSchema.street]"
               @keypress.once="enableAddressComplete()"
               @click="enableAddressComplete()"
             />
@@ -25,6 +27,7 @@
               id="streetAdditional"
               auto-grow
               filled
+              ref="street"
               class="street-address-additional"
               label="Additional Street Address (Optional)"
               :name="Math.random()"
@@ -40,6 +43,7 @@
                   filled
                   class="item address-city"
                   label="City"
+                  ref="city"
                   :name="Math.random()"
                   v-model="addressLocal.city"
                   :rules="[...addressSchema.city]"
@@ -72,14 +76,13 @@
 import { defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
 import { CivicAddressSchema } from '@/schemas/civic-address'
 import { useActions, useGetters } from 'vuex-composition-helpers'
-import { useMhrValidations } from '@/composables'
+import { useInputRules, useMhrValidations } from '@/composables'
 import {
   useAddress,
-  useAddressComplete,
-  useCountriesProvinces,
-  useBaseValidations
+  useAddressComplete
 } from '@/composables/address/factories'
 import { AddressIF } from '@/interfaces'
+import { setExtra } from '@sentry/minimal'
 /* eslint-enable no-unused-vars */
 export default defineComponent({
   name: 'HomeCivicAddress',
@@ -140,7 +143,8 @@ export default defineComponent({
     const validateForm = (): void => {
       if (props.validate) {
         // @ts-ignore - function exists
-        localState.isValidCivicAddress = true
+        if (context.$refs.street.valid && context.$refs.city.valid) localState.isValidCivicAddress = true
+        // Consider  https://stackoverflow.com/questions/61880334/how-to-tell-if-a-form-field-is-invalid-in-vue-js
       }
     }
 
