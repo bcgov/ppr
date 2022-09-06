@@ -27,7 +27,6 @@
               id="streetAdditional"
               auto-grow
               filled
-              ref="street"
               class="street-address-additional"
               label="Additional Street Address (Optional)"
               :name="Math.random()"
@@ -144,7 +143,6 @@ export default defineComponent({
       if (props.validate) {
         // @ts-ignore - function exists
         if (context.$refs.street.valid && context.$refs.city.valid) localState.isValidCivicAddress = true
-        // Consider  https://stackoverflow.com/questions/61880334/how-to-tell-if-a-form-field-is-invalid-in-vue-js
       }
     }
 
