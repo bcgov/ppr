@@ -136,6 +136,6 @@ export const useNewMhrRegistration = () => {
 
   return {
     buildApiData,
-    staffPayment: parseStaffPayment
+    parseStaffPayment
   }
 }
