@@ -75,7 +75,7 @@
 import { defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
 import { CivicAddressSchema } from '@/schemas/civic-address'
 import { useActions, useGetters } from 'vuex-composition-helpers'
-import { useInputRules, useMhrValidations } from '@/composables'
+import { useMhrValidations } from '@/composables'
 import {
   useAddress,
   useAddressComplete
@@ -139,10 +139,12 @@ export default defineComponent({
       addressLocal
     })
 
-    const validateForm = (): void => {
+    const validateForm = (context): void => {
       if (props.validate) {
         // @ts-ignore - function exists
-        if (context.$refs.street.valid && context.$refs.city.valid) localState.isValidCivicAddress = true
+        if (addressLocal.value.street && addressLocal.value.city) {
+          localState.isValidCivicAddress = context.refs.street.validate() ? context.refs.city.validate() : false
+        }
       }
     }
 
@@ -174,7 +176,7 @@ export default defineComponent({
     watch(() => props.validate, async () => {
       // @ts-ignore - function exists
       addressLocal.value.region = 'British Columbia'
-      validateForm()
+      validateForm(context)
     })
     /** Clear/reset forms when select option changes. **/
     return {
