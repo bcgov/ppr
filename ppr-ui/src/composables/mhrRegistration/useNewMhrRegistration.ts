@@ -1,16 +1,11 @@
 import { useGetters } from 'vuex-composition-helpers'
 import {
-  getMhrAttentionReferenceNum,
-  getMhrRegistrationDocumentId,
-  getMhrRegistrationHomeDescription, getMhrRegistrationHomeOwnerGroups, getMhrRegistrationLocation,
-  getMhrRegistrationSubmittingParty
-} from '@/store/getters'
-import {
   MhrRegistrationDescriptionIF,
   MhrRegistrationHomeLocationIF,
   MhrRegistrationHomeOwnerGroupIF,
   NewMhrRegistrationApiIF
 } from '@/interfaces'
+import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 
 export const useNewMhrRegistration = () => {
   const {
@@ -19,14 +14,17 @@ export const useNewMhrRegistration = () => {
     getMhrRegistrationDocumentId,
     getMhrAttentionReferenceNum,
     getMhrRegistrationLocation,
-    getMhrRegistrationHomeOwnerGroups
+    getMhrRegistrationHomeOwnerGroups,
+    getStaffPayment
   } = useGetters<any>([
     'getMhrRegistrationHomeDescription',
     'getMhrRegistrationSubmittingParty',
     'getMhrRegistrationDocumentId',
     'getMhrAttentionReferenceNum',
     'getMhrRegistrationLocation',
-    'getMhrRegistrationHomeOwnerGroups'
+    'getMhrRegistrationHomeOwnerGroups',
+    'getCertifyInformation',
+    'getStaffPayment'
   ])
 
   /**
@@ -104,6 +102,22 @@ export const useNewMhrRegistration = () => {
     return location
   }
 
+  // Staff Payment will be submitted as request parameters
+  const parseStaffPayment = () => {
+    const staffPayment = Object.create(cleanEmpty(getStaffPayment.value) as StaffPaymentIF)
+
+    // do not need this in the request param
+    delete staffPayment.option
+
+    if (staffPayment.isPriority) {
+      // change the key from isPriority to priority
+      staffPayment.priority = staffPayment.isPriority
+      delete staffPayment.isPriority
+    }
+
+    return staffPayment
+  }
+
   const buildApiData = () => {
     const data: NewMhrRegistrationApiIF = {
       documentId: getMhrRegistrationDocumentId.value,
@@ -121,6 +135,7 @@ export const useNewMhrRegistration = () => {
   }
 
   return {
-    buildApiData
+    buildApiData,
+    staffPayment: parseStaffPayment
   }
 }

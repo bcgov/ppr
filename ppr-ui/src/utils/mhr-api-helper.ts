@@ -169,12 +169,15 @@ export async function searchMhrPDF (searchId: string): Promise<any> {
     })
 }
 
-export async function submitMhrRegistration (data) {
+export async function submitMhrRegistration (payloadData, queryParamData) {
   const url = sessionStorage.getItem('MHR_API_URL')
   const config = { baseURL: url, headers: { Accept: 'application/json' } }
 
   try {
-    const result = await axios.post('registrations', data, config)
+    // assuming the queryParamData (staff payment) is always available because of validation
+    const queryParamString = new URLSearchParams(queryParamData).toString()
+
+    const result = await axios.post(`registrations?${queryParamString}`, payloadData, config)
     if (!result?.data) {
       throw new Error('Invalid API response')
     }
