@@ -14,6 +14,9 @@
       <!-- Submitting Party Review -->
       <SubmittingPartyReview />
 
+      <!-- Home Owners Review -->
+      <HomeOwnersReview />
+
       <!-- Home Location Review -->
       <HomeLocationReview />
     </div>
@@ -50,8 +53,12 @@
 
 <script lang="ts">
 import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
-import { HomeLocationReview, SubmittingPartyReview, YourHomeReview } from '@/components/mhrRegistration/ReviewConfirm'
-import { StaffPayment } from '@bcrs-shared-components/staff-payment'
+import {
+  HomeLocationReview,
+  SubmittingPartyReview,
+  HomeOwnersReview,
+  YourHomeReview
+} from '@/components/mhrRegistration/ReviewConfirm'
 import { CertifyInformation } from '@/components/common'
 import { useMhrValidations } from '@/composables'
 import { RouteNames } from '@/enums'
@@ -66,6 +73,7 @@ export default defineComponent({
   components: {
     YourHomeReview,
     SubmittingPartyReview,
+    HomeOwnersReview,
     HomeLocationReview,
     CertifyInformation,
     StaffPayment
