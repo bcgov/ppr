@@ -94,6 +94,7 @@ export const useNewMhrRegistration = () => {
     // location is always in BC
     location.address.country = 'CA'
     location.address.region = 'BC'
+
     return location
   }
 

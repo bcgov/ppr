@@ -125,8 +125,24 @@
           </v-col>
         </v-row>
         <v-row no-gutters class="white pb-6">
-          <v-col v-if="!appLoadingData" cols="12">
-            <registration-table
+          <v-col v-if="!appLoadingData && isPpr" cols="12">
+            <RegistrationTable
+              :class="{'table-border': isTabView}"
+              :setHeaders="myRegHeaders"
+              :setLoading="myRegDataLoading || myRegDataAdding"
+              :setMorePages="hasMorePages"
+              :setNewRegItem="getRegTableNewItem"
+              :setRegistrationHistory="myRegistrations"
+              :setSearch="myRegFilter"
+              :setSort="getRegTableSortOptions"
+              @action="myRegActionHandler($event)"
+              @error="emitError($event)"
+              @getNext="myRegGetNext()"
+              @sort="myRegSort($event)"
+            />
+          </v-col>
+          <v-col v-if="!appLoadingData && isMhr" cols="12">
+            <MhrRegistrationTable
               :class="{'table-border': isTabView}"
               :setHeaders="myRegHeaders"
               :setLoading="myRegDataLoading || myRegDataAdding"
@@ -156,6 +172,7 @@ import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composi
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import { RegistrationBar } from '@/components/registration'
 import { RegistrationTable } from '@/components/tables'
+import { MhrRegistrationTable } from '@/components/tables/mhr'
 import { BaseDialog, RegistrationConfirmation } from '@/components/dialogs'
 import { AllRegistrationTypes, registrationTableHeaders } from '@/resources'
 import {
@@ -191,6 +208,7 @@ export default defineComponent({
   name: 'RegistrationsWrapper',
   components: {
     BaseDialog,
+    MhrRegistrationTable,
     RegistrationConfirmation,
     RegistrationBar,
     RegistrationTable
