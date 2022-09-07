@@ -16,18 +16,55 @@
 
 Test-Suite to ensure that the legacy DB2 Location Model is working as expected.
 """
+import copy
 
 import pytest
 
 from flask import current_app
+from registry_schemas.example_data.mhr import REGISTRATION
 
-from mhr_api.models import Db2Location
+from mhr_api.models import Db2Location, MhrRegistration
 
 
+TEST_LOCATION = Db2Location(location_id=1,
+    status='A',
+    reg_document_id='1234',
+    can_document_id='5678',
+    street_number='1234',
+    street_name='street name',
+    town_city='town',
+    province='BC',
+    area='',
+    jurisdiction='',
+    roll_number='',
+    park_name='LAZY WHEEL MOBILE HOME PARK',
+    park_pad='37',
+    pid_number='012777846',
+    lot='54',
+    parcel='A 1',
+    block='',
+    district_lot='1535',
+    part_of='',
+    section='N.E. 6',
+    township='9',
+    range='',
+    meridian='',
+    land_district='PEACE RIVER',
+    plan='25262',
+    tax_certificate='Y',
+    leave_bc='N',
+    except_plan='except',
+    dealer_name='dealer',
+    additional_description='additional')
 # testdata pattern is ({exists}, {manuhome_id}, {park_name}, {pad}, {street_num}, {street}, {city}. {count})
 TEST_DATA = [
     (True, 1, '', '', '4004', 'POPLAR AVENUE', 'FORT NELSON', 2),
     (False, 0, None, None, None, None, None, 0)
+]
+# testdata pattern is ({street_num}, {street_name}, {street_json})
+TEST_ADDRESS_DATA = [
+    ('4004', 'POPLAR AVENUE', '4004 POPLAR AVENUE'),
+    ('101-40', '04 POPLAR AVENUE', '101-4004 POPLAR AVENUE')
 ]
 
 
@@ -64,8 +101,8 @@ def test_find_by_manuhome_id(session, exists, manuhome_id, park_name, pad, stree
 
 
 @pytest.mark.parametrize('exists,manuhome_id,park_name,pad,street_num,street,city,count', TEST_DATA)
-def test_find_by_manuhome_id_active(session, exists, manuhome_id, park_name, pad, street_num, street, city, count):
-    """Assert that find the active location by manuhome id contains all expected elements."""
+def test_find_by_manuhome_id(session, exists, manuhome_id, park_name, pad, street_num, street, city, count):
+    """Assert that find locations by manuhome id contains all expected elements."""
     location: Db2Location = Db2Location.find_by_manuhome_id_active(manuhome_id)
     if exists:
         assert location.manuhome_id == manuhome_id
@@ -114,39 +151,42 @@ def test_find_by_manuhome_id_active(session, exists, manuhome_id, park_name, pad
         assert not location
 
 
+@pytest.mark.parametrize('street_num,street_name,street_json', TEST_ADDRESS_DATA)
+def test_create_from_registration(session, street_num, street_name, street_json):
+    """Assert that creating location address data from json works as expected."""
+    json_data = copy.deepcopy(REGISTRATION)
+    json_data['location']['address']['street'] = street_json
+    registration: MhrRegistration = MhrRegistration(id=1)
+    location: Db2Location = Db2Location.create_from_registration(registration, json_data)
+    assert location.street_number == street_num
+    assert location.street_name == street_name
+
+
+@pytest.mark.parametrize('street_num,street_name,street_json', TEST_ADDRESS_DATA)
+def test_registration_json(session, street_num, street_name, street_json):
+    """Assert that creating location json for search from address data works as expected."""
+    location = TEST_LOCATION
+    location.street_number = street_num
+    location.street_name = street_name
+    json_data = location.registration_json
+    assert json_data.get('address')
+    assert json_data['address']['street'] == street_json
+
+
+@pytest.mark.parametrize('street_num,street_name,street_json', TEST_ADDRESS_DATA)
+def test_new_registration_json(session, street_num, street_name, street_json):
+    """Assert that creating location json for new registrations from address data works as expected."""
+    location = TEST_LOCATION
+    location.street_number = street_num
+    location.street_name = street_name
+    json_data = location.new_registration_json
+    assert json_data.get('address')
+    assert json_data['address']['street'] == street_json
+
+
 def test_location_json(session):
     """Assert that the location renders to a json format correctly."""
-    location = Db2Location(location_id=1,
-                           status='A',
-                           reg_document_id='1234',
-                           can_document_id='5678',
-                           street_number='1234',
-                           street_name='street name',
-                           town_city='town',
-                           province='BC',
-                           area='',
-                           jurisdiction='',
-                           roll_number='',
-                           park_name='LAZY WHEEL MOBILE HOME PARK',
-                           park_pad='37',
-                           pid_number='012777846',
-                           lot='54',
-                           parcel='A 1',
-                           block='',
-                           district_lot='1535',
-                           part_of='',
-                           section='N.E. 6',
-                           township='9',
-                           range='',
-                           meridian='',
-                           land_district='PEACE RIVER',
-                           plan='25262',
-                           tax_certificate='Y',
-                           leave_bc='N',
-                           except_plan='except',
-                           dealer_name='dealer',
-                           additional_description='additional')
-
+    location = TEST_LOCATION
     test_json = {
         'locationId': location.location_id,
         'status': location.status,
