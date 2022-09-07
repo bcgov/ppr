@@ -19,11 +19,11 @@ import json
 
 from flask import current_app
 from sqlalchemy.dialects.postgresql import ENUM as PG_ENUM
-from sqlalchemy.sql import text
 
 from mhr_api.exceptions import BusinessException, DatabaseException, ResourceErrorCodes
 from mhr_api.models import utils as model_utils, Db2Manuhome
 from mhr_api.models.mhr_extra_registration import MhrExtraRegistration
+from mhr_api.models.db2 import utils as legacy_utils
 
 from .db import db
 from .mhr_draft import MhrDraft
@@ -42,17 +42,6 @@ QUERY_PKEYS_NO_DRAFT = """
 select nextval('mhr_registration_id_seq') AS reg_id,
        get_mhr_number() AS mhr_number,
        get_mhr_doc_reg_number() AS doc_reg_id
-"""
-QUERY_ACCOUNT_MHR_LEGACY = """
-SELECT mer.mhr_number
- FROM mhr_extra_registrations mer
-WHERE account_id = :query_value
-  AND (removed_ind IS NULL OR removed_ind != 'Y')
-UNION (
-SELECT mr.mhr_number
-  FROM mhr_registrations mr
- WHERE account_id = :query_value
-)
 """
 FROM_LEGACY_DOC_TYPE = {
     '101': 'REG_101',
@@ -162,55 +151,27 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         if registration_id:
             if legacy:
                 registration = MhrRegistration()
-                manuhome: Db2Manuhome = Db2Manuhome.find_by_id(registration_id)
-                registration.manuhome = manuhome
+                registration.manuhome = legacy_utils.find_by_id(registration_id)
             else:
                 registration = cls.query.get(registration_id)
         return registration
 
     @classmethod
-    def find_summary_by_mhr_number(cls, account_id: str, mhr_number: str):
+    def find_summary_by_mhr_number(cls, account_id: str, mhr_number: str, staff: bool = False):
         """Return the MHR registration summary information matching the registration number."""
         formatted_mhr = model_utils.format_mhr_number(mhr_number)
         current_app.logger.debug(f'Account_id={account_id}, mhr_number={formatted_mhr}')
-        use_legacy_db: bool = current_app.config.get('USE_LEGACY_DB', True)
-        if use_legacy_db:
-            registration = Db2Manuhome.find_summary_by_mhr_number(formatted_mhr)
-            if registration:
-                # Set inUserList to true if MHR number already added to account extra registrations.
-                extra_reg: MhrExtraRegistration = MhrExtraRegistration.find_by_mhr_number(mhr_number, account_id)
-                if extra_reg:
-                    registration['inUserList'] = True
-                # For new MHR registrations inject username, submitting party here.
-            return registration
+        if model_utils.is_legacy():
+            return legacy_utils.find_summary_by_mhr_number(account_id, formatted_mhr, staff)
 
         raise DatabaseException('MhrRegistration.find_summary_by_mhr_number PosgreSQL not yet implemented.')
 
     @classmethod
-    def find_all_by_account_id(cls, account_id: str):
+    def find_all_by_account_id(cls, account_id: str, staff: bool = False):
         """Return a summary list of recent MHR registrations belonging to an account."""
         current_app.logger.debug(f'Account_id={account_id}')
-        use_legacy_db: bool = current_app.config.get('USE_LEGACY_DB', True)
-        results = []
-        if use_legacy_db:
-            # 1. get account and extra registrations from the Posgres table, then query DB2 by set of mhr numbers.
-            try:
-                query = text(QUERY_ACCOUNT_MHR_LEGACY)
-                result = db.session.execute(query, {'query_value': account_id})
-                rows = result.fetchall()
-            except Exception as db_exception:   # noqa: B902; return nicer error
-                current_app.logger.error('MhrRegstration.find_all_by_account_id exception: ' + str(db_exception))
-                raise DatabaseException(db_exception)
-            mhr_list = []
-            if rows is not None:
-                for row in rows:
-                    mhr = {'mhr_number': str(row[0])}
-                    mhr_list.append(mhr)
-
-            if mhr_list:
-                # 2. Get the summary info from DB2.
-                results = Db2Manuhome.find_summary_by_account_mhr_numbers(mhr_list)
-            return results
+        if model_utils.is_legacy():
+            return legacy_utils.find_all_by_account_id(account_id, staff)
 
         raise DatabaseException('MhrRegistration.find_all_by_account_id PosgreSQL not yet implemented.')
 
@@ -218,9 +179,9 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
     def get_doc_id_count(cls, doc_id):
         """Execute a query to count existing document id (must not exist check)."""
         current_app.logger.debug(f'document id={doc_id}')
-        use_legacy_db: bool = current_app.config.get('USE_LEGACY_DB', True)
-        if use_legacy_db:
-            return Db2Manuhome.get_doc_id_count(doc_id)
+        if model_utils.is_legacy():
+            return legacy_utils.get_doc_id_count(doc_id)
+
         raise DatabaseException('MhrRegistration.get_doc_id_count PosgreSQL not yet implemented.')
 
     @classmethod
@@ -254,11 +215,8 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                     status_code=HTTPStatus.UNAUTHORIZED
                 )
         # Authorized, exists. If legacy transition load legacy data.
-        use_legacy_db: bool = current_app.config.get('USE_LEGACY_DB', True)
-        if use_legacy_db:
-            current_app.logger.info(f'Fetching legacy db registration for {formatted_mhr}.')
-            manuhome: Db2Manuhome = Db2Manuhome.find_by_mhr_number(formatted_mhr, True)
-            registration.manuhome = manuhome
+        if model_utils.is_legacy():
+            registration.manuhome = legacy_utils.find_by_mhr_number(formatted_mhr)
         return registration
 
     @staticmethod

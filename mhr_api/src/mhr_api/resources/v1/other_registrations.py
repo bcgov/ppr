@@ -23,7 +23,7 @@ from flask_cors import cross_origin
 
 from mhr_api.utils.auth import jwt
 from mhr_api.exceptions import DatabaseException
-from mhr_api.services.authz import authorized
+from mhr_api.services.authz import authorized, is_staff
 from mhr_api.models import MhrRegistration, MhrExtraRegistration
 from mhr_api.resources import utils as resource_utils
 
@@ -52,7 +52,7 @@ def get_other_registration(mhr_number: str):
             return resource_utils.unauthorized_error_response(account_id)
 
         # Try to fetch summary registration by mhr number
-        registration = MhrRegistration.find_summary_by_mhr_number(account_id, mhr_number)
+        registration = MhrRegistration.find_summary_by_mhr_number(account_id, mhr_number, is_staff(jwt))
         if registration is None:
             return resource_utils.not_found_error_response('Manufactured Home registration', mhr_number)
         return registration, HTTPStatus.OK
