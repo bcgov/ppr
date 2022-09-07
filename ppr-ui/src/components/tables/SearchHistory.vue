@@ -242,7 +242,7 @@ export default defineComponent({
       const second = query?.criteria?.[individualKey]?.second || query?.criteria?.[individualKey]?.middle
       const last = query?.criteria?.[individualKey]?.last
       const business = query?.criteria?.debtorName?.business
-      if (first && last) {
+      if (first || last) {
         if (second) {
           return `${first} ${second} ${last}`
         }
