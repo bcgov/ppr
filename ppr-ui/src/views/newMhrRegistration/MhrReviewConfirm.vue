@@ -53,6 +53,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
+import { StaffPayment } from '@bcrs-shared-components/staff-payment'
 import {
   HomeLocationReview,
   SubmittingPartyReview,
