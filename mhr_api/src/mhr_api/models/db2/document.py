@@ -217,7 +217,8 @@ class Db2Document(db.Model):
         if new_info.get('draftDateTime', None):
             doc.draft_ts = model_utils.ts_from_iso_format(new_info.get('draftDateTime'))
         if new_info.get('transferExecutionDate', None):
-            doc.transfer_execution_date = model_utils.date_from_date_iso_format(new_info.get('transferExecutionDate'))
+            date_val: str = str(new_info.get('transferExecutionDate'))[0:10]
+            doc.transfer_execution_date = model_utils.date_from_iso_format(date_val)
         return doc
 
     @staticmethod
