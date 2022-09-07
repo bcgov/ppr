@@ -5,15 +5,20 @@
       <label class="font-weight-bold pl-2">Home Owners</label>
     </header>
 
-    <div v-if="hasHomeOwners">
-      <HomeOwnersTable :homeOwners="homeOwners" />
-    </div>
-    <div v-else class="px-6 py-8" :class="{ 'border-error-left': !getStepValidation(MhrSectVal.HOME_OWNERS_VALID) }">
-      <v-icon color="error">mdi-information-outline</v-icon>
-      <span class="error-text mx-1">This step is unfinished.</span>
-      <router-link :to="{ path: `/${RouteNames.MHR_REGISTRATION}/${RouteNames.HOME_OWNERS}` }"
-        >Return to this step to complete it.
-      </router-link>
+    <div :class="{ 'border-error-left': showStepError }">
+      <div v-show="showStepError" class="px-6 py-8">
+        <v-icon color="error">mdi-information-outline</v-icon>
+        <span class="error-text mx-1">This step is unfinished.</span>
+        <router-link :to="{ path: `/${RouteNames.MHR_REGISTRATION}/${RouteNames.HOME_OWNERS}` }"
+          >Return to this step to complete it.
+        </router-link>
+      </div>
+      <HomeOwnersTable
+        v-if="hasHomeOwners"
+        :homeOwners="homeOwners"
+        isReadonlyTable
+        class="readonly-home-owners-table"
+      />
     </div>
   </v-card>
 </template>
@@ -39,7 +44,8 @@ export default defineComponent({
 
     const localState = reactive({
       homeOwners: computed(() => getMhrRegistrationHomeOwners.value),
-      hasHomeOwners: computed(() => localState.homeOwners.length > 0)
+      hasHomeOwners: computed(() => localState.homeOwners.length > 0),
+      showStepError: computed(() => !getStepValidation(MhrSectVal.HOME_OWNERS_VALID))
     })
 
     return {
@@ -60,5 +66,11 @@ export default defineComponent({
   background-color: $BCgovBlue5O;
   padding: 1.25rem;
   color: $gray9;
+}
+
+.readonly-home-owners-table ::v-deep {
+  table > thead > tr > th {
+    width: 33% !important;
+  }
 }
 </style>

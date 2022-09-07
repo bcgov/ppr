@@ -1,5 +1,5 @@
 <template>
-  <v-card flat rounded class="mt-2" :class="{ 'border-error-left': showTableError }">
+  <v-card flat rounded :class="{ 'border-error-left': showTableError }">
     <v-data-table
       id="mh-home-owners-table"
       class="home-owners-table"
@@ -13,7 +13,11 @@
     >
       <template v-slot:group.header="{ group, items }" class="group-header-slot">
         <td :colspan="4" class="py-1">
-          <TableGroupHeader :groupId="group" :owners="hasActualOwners(items) ? items : []" />
+          <TableGroupHeader
+            :groupId="group"
+            :owners="hasActualOwners(items) ? items : []"
+            :showEditActions="showEditActions"
+          />
         </td>
       </template>
 
@@ -59,7 +63,7 @@
             {{ toDisplayPhone(row.item.phoneNumber) }}
             <span v-if="row.item.phoneExtension"> Ext {{ row.item.phoneExtension }} </span>
           </td>
-          <td class="text-right">
+          <td v-if="showEditActions" class="text-right">
             <v-btn
               text
               color="primary"
@@ -125,7 +129,8 @@ export default defineComponent({
   name: 'HomeOwnersTable',
   props: {
     homeOwners: { default: [] as MhrRegistrationHomeOwnersIF[] },
-    isAdding: { default: false }
+    isAdding: { default: false },
+    isReadonlyTable: { type: Boolean, default: false }
   },
   components: {
     BaseAddress,
@@ -148,7 +153,11 @@ export default defineComponent({
       currentlyEditingHomeOwnerId: -1,
       isEditingMode: computed((): boolean => localState.currentlyEditingHomeOwnerId >= 0),
       isAddingMode: computed((): boolean => props.isAdding),
-      showTableError: computed((): boolean => hasEmptyGroup.value && showGroups.value)
+      showTableError: computed((): boolean => hasEmptyGroup.value && showGroups.value),
+      showEditActions: computed((): boolean => !props.isReadonlyTable),
+      homeOwnersTableHeaders: props.isReadonlyTable
+        ? homeOwnersTableHeaders.filter(header => header.value !== 'actions')
+        : homeOwnersTableHeaders
     })
 
     const edit = (item): void => {
@@ -189,7 +198,6 @@ export default defineComponent({
     return {
       addressSchema,
       toDisplayPhone,
-      homeOwnersTableHeaders,
       openForEditing,
       isCurrentlyEditing,
       showGroups,

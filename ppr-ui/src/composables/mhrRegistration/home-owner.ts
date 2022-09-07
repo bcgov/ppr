@@ -6,9 +6,11 @@ import {
 } from '@/interfaces'
 import '@/utils/use-composition-api'
 
-import { ref, computed, readonly, watch } from '@vue/composition-api'
+import { ref, computed, readonly, watch, toRefs } from '@vue/composition-api'
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import { HomeTenancyTypes } from '@/enums'
+import { MhrCompVal, MhrSectVal } from '@/composables/mhrRegistration/enums'
+import { useMhrValidations } from '@/composables'
 import { find, remove, set, findIndex, sumBy } from 'lodash'
 
 const DEFAULT_GROUP_ID = '1'
@@ -21,14 +23,19 @@ const isGlobalEditingMode = ref(false)
 const hasEmptyGroup = ref(false)
 
 export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = false) {
-  const { getMhrRegistrationHomeOwners, getMhrRegistrationHomeOwnerGroups } = useGetters<any>([
+  const {
+    getMhrRegistrationHomeOwners,
+    getMhrRegistrationHomeOwnerGroups,
+    getMhrRegistrationValidationModel
+  } = useGetters<any>([
     'getMhrRegistrationHomeOwners',
-    'getMhrRegistrationHomeOwnerGroups'
+    'getMhrRegistrationHomeOwnerGroups',
+    'getMhrRegistrationValidationModel'
   ])
 
-  const { setMhrRegistrationHomeOwnerGroups } = useActions<any>([
-    'setMhrRegistrationHomeOwnerGroups'
-  ])
+  const { setMhrRegistrationHomeOwnerGroups } = useActions<any>(['setMhrRegistrationHomeOwnerGroups'])
+
+  const { setValidation } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
   // Title for left side bar
   const getSideTitle = computed((): string => {
@@ -281,6 +288,10 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
   watch(
     () => getMhrRegistrationHomeOwnerGroups.value,
     () => {
+      // set step validation for home owners
+      const isHomeOwnersValid = showGroups.value ? !getTotalOwnershipAllocationStatus().hasTotalAllocationError : true
+      setValidation(MhrSectVal.HOME_OWNERS_VALID, MhrCompVal.OWNERS_VALID, isHomeOwnersValid)
+
       if (getMhrRegistrationHomeOwnerGroups.value.length === 0) {
         setShowGroups(false)
       } else {
