@@ -297,7 +297,8 @@ class Db2Descript(db.Model):
             descript.width_feet_4 = new_info['widthFeet4']
             descript.width_inches_4 = new_info.get('widthInches4', 0)
         if new_info.get('engineerDate', None):
-            descript.engineer_date = model_utils.date_from_date_iso_format(new_info.get('engineerDate'))
+            date_val: str = str(new_info.get('engineerDate'))[0:10]
+            descript.engineer_date = model_utils.date_from_iso_format(date_val)
 
         return descript
 
@@ -390,7 +391,8 @@ class Db2Descript(db.Model):
             descript.width_feet_4 = 0
             descript.width_inches_4 = 0
         if new_info.get('engineerDate', None):
-            descript.engineer_date = model_utils.date_from_date_iso_format(new_info.get('engineerDate'))
+            date_val: str = str(new_info.get('engineerDate'))[0:10]
+            descript.engineer_date = model_utils.date_from_iso_format(date_val)
         else:
             descript.engineer_date = model_utils.date_from_iso_format('0001-01-01')
         return descript

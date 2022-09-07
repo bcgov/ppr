@@ -150,7 +150,8 @@ class Db2Mhomnote(db.Model):
                            remarks=new_info.get('remarks', ''))
 
         if new_info.get('expiryDate', None):
-            note.expiry_date = model_utils.date_from_date_iso_format(new_info.get('expiryDate'))
+            date_val: str = str(new_info.get('expiryDate'))[0:10]
+            note.expiry_date = model_utils.date_from_iso_format(date_val)
         return note
 
     @staticmethod
