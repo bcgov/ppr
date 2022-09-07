@@ -91,14 +91,9 @@ export const useNewMhrRegistration = () => {
 
   const parseLocation = (): MhrRegistrationHomeLocationIF => {
     const location: MhrRegistrationHomeLocationIF = cleanEmpty(getMhrRegistrationLocation.value)
-
     // location is always in BC
     location.address.country = 'CA'
     location.address.region = 'BC'
-
-    // TODO: Mhr-Submission - DELETE after postal code can be retrieved from UI
-    location.address.postalCode = 'V8W 2H3'
-
     return location
   }
 

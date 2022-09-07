@@ -19,8 +19,6 @@ export const CivicAddressSchema = {
     ...spaceRules
   ],
   country: [
-    baseRules[ValidationRule.REQUIRED],
-    ...spaceRules
   ],
   region: [
     baseRules[ValidationRule.REQUIRED],
@@ -31,10 +29,7 @@ export const CivicAddressSchema = {
    * inside the address components
    */
   postalCode: [
-    baseRules[ValidationRule.REQUIRED]
   ],
   deliveryInstructions: [
-    baseRules[ValidationRule.MAX_LENGTH](80),
-    ...spaceRules
   ]
 }

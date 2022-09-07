@@ -76,14 +76,14 @@
               <h3>Civic Address</h3>
             </v-col>
             <v-col cols="9" class="pt-1">
-              <p v-if="getMhrRegistrationLocation.address.street &&
-                       getMhrRegistrationLocation.address.city">
+              <p v-if="getMhrRegistrationLocation.address.street ||
+                        getMhrRegistrationLocation.address.streetAdditional ||
+                        getMhrRegistrationLocation.address.city">
                 {{ getMhrRegistrationLocation.address.street }}<br/>
                 <span v-if="!!getMhrRegistrationLocation.address.streetAdditional">
                   {{getMhrRegistrationLocation.address.streetAdditional}}<br/>
                 </span>
-                {{ getMhrRegistrationLocation.address.city }}
-                {{ getMhrRegistrationLocation.address.region }}
+                {{ getMhrRegistrationLocation.address.city }} {{ 'BC' }}
               </p>
               <p v-else>
                 {{ '(Not Entered)' }}
