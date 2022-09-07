@@ -7,7 +7,7 @@ import { createLocalVue, shallowMount, Wrapper } from '@vue/test-utils'
 
 // Local Components
 import { MhrReviewConfirm } from '@/views'
-import { HomeLocationReview, SubmittingPartyReview, YourHomeReview } from '@/components/mhrRegistration/ReviewConfirm'
+import { HomeLocationReview, HomeOwnersReview, SubmittingPartyReview, YourHomeReview } from '@/components/mhrRegistration/ReviewConfirm'
 import { CertifyInformation } from '@/components/common'
 import { RouteNames } from '@/enums'
 import mockRouter from './MockRouter'
@@ -61,6 +61,7 @@ describe('Mhr Review Confirm registration', () => {
     expect(wrapper.findComponent(MhrReviewConfirm).exists()).toBe(true)
     expect(wrapper.findComponent(YourHomeReview).exists()).toBe(true)
     expect(wrapper.findComponent(SubmittingPartyReview).exists()).toBe(true)
+    expect(wrapper.findComponent(HomeOwnersReview).exists()).toBe(true)
     expect(wrapper.findComponent(HomeLocationReview).exists()).toBe(true)
     expect(wrapper.findComponent(CertifyInformation).exists()).toBe(true)
   })

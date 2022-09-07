@@ -26,7 +26,7 @@
         <span class="ma-2"> Interest: {{ getOwnershipInterest() }} </span>
       </div>
 
-      <div>
+      <div v-show="showEditActions">
         <v-btn
           text
           color="primary"
@@ -103,7 +103,8 @@ export default defineComponent({
   name: 'TableGroupHeader',
   props: {
     groupId: { default: '' },
-    owners: { default: [] }
+    owners: { default: [] },
+    showEditActions: { type: Boolean, default: true }
   },
   components: {
     BaseDialog,
