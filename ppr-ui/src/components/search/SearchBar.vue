@@ -91,7 +91,6 @@
               :hint="searchHintFirst"
               persistent-hint
               :placeholder="optionFirst"
-              v-validate=" isStaffBcolReg ? '' : 'required' "
               v-model="searchValueFirst"
               @keypress.enter="searchCheck()"
           />

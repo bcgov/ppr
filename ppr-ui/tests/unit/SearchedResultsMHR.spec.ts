@@ -2,7 +2,7 @@
 import Vue from 'vue'
 import Vuetify from 'vuetify'
 import { getVuexStore } from '@/store'
-import CompositionApi, {nextTick} from '@vue/composition-api'
+import CompositionApi, { nextTick } from '@vue/composition-api'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 
 // Components
