@@ -14,7 +14,7 @@ export interface MhrRegistrationDescriptionIF {
   csaNumber: string,
   csaStandard: string,
   engineerName: string,
-  engineerReportDate: string,
+  engineerDate: string,
   certificationOption?: HomeCertificationOptions, // Optional because it's a local property. Not used for submission
   rebuiltRemarks: string,
   otherRemarks: string

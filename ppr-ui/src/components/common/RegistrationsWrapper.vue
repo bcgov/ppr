@@ -126,7 +126,7 @@
         </v-row>
         <v-row no-gutters class="white pb-6">
           <v-col v-if="!appLoadingData" cols="12">
-            <registration-table
+            <RegistrationTable
               :class="{'table-border': isTabView}"
               :setHeaders="myRegHeaders"
               :setLoading="myRegDataLoading || myRegDataAdding"

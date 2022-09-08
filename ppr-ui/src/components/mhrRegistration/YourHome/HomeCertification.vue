@@ -85,8 +85,8 @@
                   :nudge-top="180"
                   :nudge-right="150"
                   :inputRules="required('Select a date of engineer\'s report')"
-                  @emitDate="engineerReportDate = $event"
-                  @emitCancel="engineerReportDate = ''"
+                  @emitDate="engineerDate = $event"
+                  @emitCancel="engineerDate = ''"
                 />
               </v-form>
             </v-col>
@@ -152,7 +152,7 @@ export default defineComponent({
       csaStandard: '',
       csaStandardOptions: ['A277', 'Z240'],
       engineerName: '',
-      engineerReportDate: '',
+      engineerDate: '',
       isCsaValid: false,
       isEngineerValid: false,
       isCsaOption: computed((): boolean => {
@@ -177,7 +177,7 @@ export default defineComponent({
       }),
       isHomeCertificationValid: computed((): boolean => {
         return (localState.isCsaOption && localState.isCsaValid) ||
-          (localState.isEngineerOption && localState.isEngineerValid && !!localState.engineerReportDate)
+          (localState.isEngineerOption && localState.isEngineerValid && !!localState.engineerDate)
       }),
       today: computed(() => {
         const todayDate = new Date()
@@ -216,8 +216,8 @@ export default defineComponent({
     watch(() => localState.engineerName, () => {
       setMhrHomeDescription({ key: 'engineerName', value: localState.engineerName })
     })
-    watch(() => localState.engineerReportDate, () => {
-      setMhrHomeDescription({ key: 'engineerReportDate', value: localState.engineerReportDate })
+    watch(() => localState.engineerDate, () => {
+      setMhrHomeDescription({ key: 'engineerDate', value: localState.engineerDate })
     })
     watch(() => localState.isHomeCertificationValid, (val: boolean) => {
       setValidation(MhrSectVal.YOUR_HOME_VALID, MhrCompVal.HOME_CERTIFICATION_VALID, val)
@@ -234,7 +234,7 @@ export default defineComponent({
         props.validate && await validateForms()
 
         localState.engineerName = ''
-        localState.engineerReportDate = ''
+        localState.engineerDate = ''
       }
       if (localState.isEngineerOption) {
         // @ts-ignore - function exists

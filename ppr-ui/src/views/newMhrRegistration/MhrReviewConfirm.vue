@@ -25,24 +25,24 @@
     <section id="mh-certify-section" class="mt-10 pt-4">
       <CertifyInformation
         isMhr
-        :setShowErrors="validateReview"
+        :setShowErrors="validateAuthorization"
         @certifyValid="authorizationValid = $event"
       />
     </section>
 
     <!-- Staff Payment -->
-    <section id="mhr-staff-payment-section" class="mt-10" v-if="true">
+    <section id="mhr-staff-payment-section" class="mt-10" v-if="isRoleStaffReg">
       <h2>
-        <span>{{ isMhr ? '2.' : '3.' }}</span> Staff Payment
+        2. Staff Payment
       </h2>
-      <v-card flat class="mt-6 pa-6" :class="{ 'border-error-left': !staffPaymentValid }">
+      <v-card flat class="mt-6 pa-6" :class="{ 'border-error-left': validateStaffPayment }">
         <StaffPayment
           id="staff-payment"
           :staffPaymentData="staffPaymentData"
-          :validate="validatingStaffPayment || validateApp"
+          :validate="isValidatingApp"
           :displaySideLabel="true"
           :displayPriorityCheckbox="true"
-          :invalidSection="!staffPaymentValid"
+          :invalidSection="validateStaffPayment"
           @update:staffPaymentData="onStaffPaymentDataUpdate($event)"
           @valid="staffPaymentValid = $event"
         />
@@ -56,8 +56,8 @@ import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composi
 import { StaffPayment } from '@bcrs-shared-components/staff-payment'
 import {
   HomeLocationReview,
-  SubmittingPartyReview,
   HomeOwnersReview,
+  SubmittingPartyReview,
   YourHomeReview
 } from '@/components/mhrRegistration/ReviewConfirm'
 import { CertifyInformation } from '@/components/common'
@@ -69,6 +69,7 @@ import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 import { StaffPaymentOptions } from '@bcrs-shared-components/enums'
 /* eslint-enable no-unused-vars */
 
+/* eslint-disable */
 export default defineComponent({
   name: 'MhrReviewConfirm',
   components: {
@@ -81,7 +82,8 @@ export default defineComponent({
   },
   props: {},
   setup (props, context) {
-    const { getMhrRegistrationValidationModel, getStaffPayment } = useGetters<any>([
+    const { getMhrRegistrationValidationModel, getStaffPayment, isRoleStaffReg } = useGetters<any>([
+      'isRoleStaffReg',
       'getMhrRegistrationValidationModel',
       'getStaffPayment'
     ])
@@ -101,9 +103,16 @@ export default defineComponent({
     const localState = reactive({
       isMhr: true,
       authorizationValid: false,
-      validateReview: computed(() => {
-        return getSectionValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.AUTHORIZATION_VALID) &&
-          getValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_APP)
+      isValidatingApp: computed( (): boolean => {
+        return getValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_APP)
+      }),
+      validateAuthorization: computed(() => {
+        return localState.isValidatingApp &&
+          !getValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.AUTHORIZATION_VALID)
+      }),
+      validateStaffPayment: computed(() => {
+        return localState.isValidatingApp &&
+          !getValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.STAFF_PAYMENT_VALID)
       }),
       staffPaymentData:
         getStaffPayment.value ||
@@ -116,11 +125,7 @@ export default defineComponent({
           isPriority: false
         } as StaffPaymentIF),
       paymentOption: StaffPaymentOptions.NONE,
-      staffPaymentValid: false,
-      validatingStaffPayment: false,
-      validateApp: computed(() => {
-        return getValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_APP)
-      })
+      staffPaymentValid: false
     })
 
     const onStaffPaymentDataUpdate = (val: StaffPaymentIF) => {
@@ -129,10 +134,10 @@ export default defineComponent({
       }
 
       if (staffPaymentData.routingSlipNumber || staffPaymentData.bcolAccountNumber || staffPaymentData.datNumber) {
-        localState.validatingStaffPayment = true
+        localState.staffPaymentValid = true
       } else {
         if (staffPaymentData.option !== localState.paymentOption) {
-          localState.validatingStaffPayment = false
+          localState.staffPaymentValid = false
           localState.paymentOption = staffPaymentData.option
         }
       }
@@ -169,6 +174,7 @@ export default defineComponent({
             datNumber: '',
             folioNumber: ''
           }
+          localState.staffPaymentValid = true
           break
         case StaffPaymentOptions.NONE: // should never happen
           break
@@ -194,18 +200,19 @@ export default defineComponent({
     watch(() => context.root.$route.name, (route: string) => {
       switch (route) {
         case RouteNames.YOUR_HOME:
-          scrollToInvalid(MhrSectVal.YOUR_HOME_VALID, 'mhr-describe-your-home')
+          localState.isValidatingApp && scrollToInvalid(MhrSectVal.YOUR_HOME_VALID, 'mhr-describe-your-home')
           break
         case RouteNames.SUBMITTING_PARTY:
-          scrollToInvalid(MhrSectVal.SUBMITTING_PARTY_VALID, 'mhr-submitting-party')
+          localState.isValidatingApp && scrollToInvalid(MhrSectVal.SUBMITTING_PARTY_VALID, 'mhr-submitting-party')
           break
         case RouteNames.HOME_OWNERS:
-          scrollToInvalid(MhrSectVal.HOME_OWNERS_VALID, 'mhr-home-owners-list')
+          localState.isValidatingApp && scrollToInvalid(MhrSectVal.HOME_OWNERS_VALID, 'mhr-home-owners-list')
           break
         case RouteNames.HOME_LOCATION:
-          scrollToInvalid(MhrSectVal.LOCATION_VALID, 'mhr-home-location')
+          localState.isValidatingApp && scrollToInvalid(MhrSectVal.LOCATION_VALID, 'mhr-home-location')
           break
         case RouteNames.MHR_REVIEW_CONFIRM:
+          localState.isValidatingApp &&
           scrollToInvalid(MhrSectVal.REVIEW_CONFIRM_VALID, 'mhr-review-confirm',
             [
               getStepValidation(MhrSectVal.YOUR_HOME_VALID),
@@ -219,6 +226,7 @@ export default defineComponent({
     })
 
     return {
+      isRoleStaffReg,
       onStaffPaymentDataUpdate,
       ...toRefs(localState)
     }

@@ -1,5 +1,5 @@
 import { RegistrationFlowType } from '@/enums'
-import { StateModelIF } from '@/interfaces'
+import { MhrRegistrationIF, StateModelIF } from '@/interfaces'
 
 export const stateModel: StateModelIF = {
   accountInformation: {
@@ -145,7 +145,7 @@ export const stateModel: StateModelIF = {
       csaNumber: '',
       csaStandard: '',
       engineerName: '',
-      engineerReportDate: '',
+      engineerDate: '',
       certificationOption: null,
       rebuiltRemarks: '',
       otherRemarks: ''
@@ -222,6 +222,7 @@ export const stateModel: StateModelIF = {
       selectConfirmationDialog: true
     }
   },
+  mhrSearchResultSelectAllLien: false,
   mhrValidationState: {
     yourHomeValid: {
       makeModelValid: false,
@@ -231,8 +232,8 @@ export const stateModel: StateModelIF = {
       otherValid: false
     },
     submittingPartyValid: {
-      documentIdValid: false,
       submitterValid: false,
+      documentIdValid: false,
       refNumValid: false
     },
     homeOwnersValid: {
@@ -248,6 +249,5 @@ export const stateModel: StateModelIF = {
       validateSteps: false,
       validateApp: false
     }
-  },
-  mhrSearchResultSelectAllLien: false
+  }
 }

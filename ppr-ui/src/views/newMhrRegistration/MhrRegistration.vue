@@ -12,7 +12,7 @@
                 <h1>Manufactured Home Registration</h1>
               </v-col>
             </v-row>
-            <stepper class="mt-4" :showStepErrorsFlag="validateMhrRegistration"/>
+            <stepper class="mt-4" :showStepErrorsFlag="isValidatingApp && !isValidMhrRegistration"/>
             <!-- Component Steps -->
             <component
               v-for="step in getSteps"
@@ -55,10 +55,10 @@
 <script lang="ts">
 /* eslint-disable no-unused-vars */
 import { computed, defineComponent, onMounted, reactive, toRefs } from '@vue/composition-api'
-import { useGetters } from 'vuex-composition-helpers'
+import { useActions, useGetters } from 'vuex-composition-helpers'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { RegistrationFlowType, RouteNames, StatementTypes } from '@/enums'
-import { RegistrationTypeIF, MhrRegistrationIF } from '@/interfaces'
+import { RegistrationTypeIF } from '@/interfaces'
 import { getFeatureFlag, submitMhrRegistration } from '@/utils'
 import { Stepper, StickyContainer } from '@/components/common'
 import ButtonFooter from '@/components/common/ButtonFooter.vue'
@@ -67,6 +67,7 @@ import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { RegistrationLengthI } from '@/composables/fees/interfaces'
 /* eslint-enable no-unused-vars */
 
+/* eslint-disable */
 export default defineComponent({
   name: 'MhrRegistration',
   components: {
@@ -97,12 +98,23 @@ export default defineComponent({
       'getMhrRegistrationValidationModel'
     ])
 
+    const { setEmptyMhr } = useActions<any>(['setEmptyMhr'])
+
     const {
       MhrCompVal,
       MhrSectVal,
       setValidation,
+      getValidation,
+      getStepValidation,
       scrollToInvalid
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
+
+    const {
+      initNewMhr,
+      buildApiData,
+      parseStaffPayment
+    } = useNewMhrRegistration()
+
 
     const localState = reactive({
       dataLoaded: false,
@@ -118,9 +130,15 @@ export default defineComponent({
       registrationTypeUI: computed((): RegistrationTypeIF => {
         return getRegistrationType.value?.registrationTypeUI || ''
       }),
-      validateMhrRegistration: computed(() => {
-        return useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
-          .getValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_APP)
+      isValidatingApp: computed( (): boolean => {
+        return getValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_APP)
+      }),
+      isValidMhrRegistration: computed((): boolean => {
+        return getStepValidation(MhrSectVal.YOUR_HOME_VALID) &&
+            getStepValidation(MhrSectVal.SUBMITTING_PARTY_VALID) &&
+            getStepValidation(MhrSectVal.HOME_OWNERS_VALID) &&
+            getStepValidation(MhrSectVal.LOCATION_VALID) &&
+            getStepValidation(MhrSectVal.REVIEW_CONFIRM_VALID)
       })
     })
 
@@ -163,20 +181,33 @@ export default defineComponent({
       setValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_APP, false)
 
       // page is ready to view
+      setEmptyMhr(initNewMhr())
       context.emit('emitHaveData', true)
       localState.dataLoaded = true
     })
 
-    const { buildApiData, parseStaffPayment } = useNewMhrRegistration()
-
     const submit = async () => {
-      // TODO: Mhr-Submission - DELETE after the validations are done across the steps
+      // Prompt App Validations
       setValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_APP, true)
-      if (localState.validateMhrRegistration) {
+
+      if (localState.isValidMhrRegistration) {
+        // Submit Filing
         localState.submitting = true
-        // passing apiData as payload and staffPayment as query parameters
-        await submitMhrRegistration(buildApiData(), parseStaffPayment())
+        const mhrSubmission = await submitMhrRegistration(buildApiData(), parseStaffPayment())
         localState.submitting = false
+
+        !!mhrSubmission?.mhrNumber
+          ? await context.root.$router.push({ name: RouteNames.DASHBOARD })
+          : console.log(mhrSubmission?.error) // Handle Schema or Api errors here..
+
+      } else {
+        await scrollToInvalid(MhrSectVal.REVIEW_CONFIRM_VALID, 'mhr-review-confirm',
+          [
+            getStepValidation(MhrSectVal.YOUR_HOME_VALID),
+            getStepValidation(MhrSectVal.SUBMITTING_PARTY_VALID),
+            getStepValidation(MhrSectVal.HOME_OWNERS_VALID),
+            getStepValidation(MhrSectVal.LOCATION_VALID)
+          ])
       }
     }
 
