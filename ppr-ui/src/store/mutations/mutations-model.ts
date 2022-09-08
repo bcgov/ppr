@@ -26,9 +26,9 @@ import {
   ManufacturedHomeSearchResponseIF,
   ManufacturedHomeSearchResultIF,
   UserProductSubscriptionIF,
-  HomeSectionIF,
   MhrRegistrationHomeOwnersIF,
-  MhrRegistrationHomeOwnerGroupIF, MhrRegistrationIF
+  MhrRegistrationHomeOwnerGroupIF,
+  MhrRegistrationIF
 } from '@/interfaces'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 

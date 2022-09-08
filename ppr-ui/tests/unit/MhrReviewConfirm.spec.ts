@@ -69,7 +69,7 @@ describe('Mhr Review Confirm registration', () => {
   it('verifies Authorization default values', async () => {
     wrapper = createComponent()
     expect(wrapper.vm.authorizationValid).toBe(false)
-    expect(wrapper.vm.validateReview).toBe(false)
+    expect(wrapper.vm.isValidatingApp).toBe(false)
   })
 
   it('prompts Authorization validation', async () => {
@@ -77,7 +77,7 @@ describe('Mhr Review Confirm registration', () => {
 
     // Verify defaults
     expect(wrapper.vm.authorizationValid).toBe(false)
-    expect(wrapper.vm.validateReview).toBe(false)
+    expect(wrapper.vm.isValidatingApp).toBe(false)
 
     // Update validation state
     reviewConfirmState.validateSteps = true
@@ -85,6 +85,6 @@ describe('Mhr Review Confirm registration', () => {
     await Vue.nextTick()
 
     // Verify prompt
-    expect(wrapper.vm.validateReview).toBe(true)
+    expect(wrapper.vm.isValidatingApp).toBe(true)
   })
 })
