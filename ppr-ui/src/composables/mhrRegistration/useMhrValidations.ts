@@ -11,14 +11,14 @@ export const useMhrValidations = (validationState: any) => {
     return validationState[section].value[component]
   }
 
-  /** Is true when app-wide validations is flagged and specified component is invalid . */
-  const getSectionValidation = (section: MhrSectVal, component: MhrCompVal): boolean => {
-    return validationState.reviewConfirmValid.value.validateSteps && !validationState[section].value[component]
-  }
-
   /** Is true when all flags are true in specified section. */
   const getStepValidation = (section: MhrSectVal): boolean => {
     return Object.values(validationState[section].value).every(val => val)
+  }
+
+  /** Is true when app-wide validations is flagged and specified component is invalid . */
+  const getSectionValidation = (section: MhrSectVal, component: MhrCompVal): boolean => {
+    return validationState.reviewConfirmValid.value.validateSteps && !validationState[section].value[component]
   }
 
   /** Is true when input field ref is in error. */

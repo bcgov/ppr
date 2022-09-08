@@ -186,7 +186,8 @@ export async function submitMhrRegistration (payloadData, queryParamData) {
     return {
       error: {
         category: ErrorCategories.REGISTRATION_CREATE,
-        statusCode: error?.response?.status || StatusCodes.NOT_FOUND
+        statusCode: error?.response?.status || StatusCodes.NOT_FOUND,
+        msg: error?.response?.data?.errorMesage || 'Unknown Error'
       }
     }
   }

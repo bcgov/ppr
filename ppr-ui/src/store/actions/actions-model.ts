@@ -27,7 +27,7 @@ import {
   UserProductSubscriptionIF,
   HomeSectionIF,
   MhrRegistrationHomeOwnersIF,
-  MhrRegistrationHomeOwnerGroupIF
+  MhrRegistrationHomeOwnerGroupIF, MhrRegistrationIF
 } from '@/interfaces'
 import { ActionIF } from '@/interfaces/store-interfaces/action-interface'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
@@ -291,6 +291,10 @@ export const setUnsavedChanges: ActionIF = ({ commit }, unsavedChanges: Boolean)
 }
 
 // MHR Registration
+export const setEmptyMhr: ActionIF = ({ commit }, emptyMhr: MhrRegistrationIF): void => {
+  commit('mutateEmptyMhr', emptyMhr)
+}
+
 export const setMhrHomeDescription: ActionIF = ({ commit }, { key, value }): void => {
   commit('mutateMhrHomeDescription', { key, value })
   commit('mutateUnsavedChanges', true)

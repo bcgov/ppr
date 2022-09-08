@@ -196,7 +196,7 @@ export default defineComponent({
           HomeCertificationOptions.ENGINEER_INSPECTION
       }),
       engineerDisplayDate: computed((): string => {
-        return yyyyMmDdToPacificDate(getMhrRegistrationHomeDescription.value?.engineerReportDate, true)
+        return yyyyMmDdToPacificDate(getMhrRegistrationHomeDescription.value?.engineerDate, true)
       })
     })
 

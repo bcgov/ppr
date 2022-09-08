@@ -55,7 +55,7 @@
 <script lang="ts">
 /* eslint-disable no-unused-vars */
 import { computed, defineComponent, onMounted, reactive, toRefs } from '@vue/composition-api'
-import { useGetters } from 'vuex-composition-helpers'
+import { useActions, useGetters } from 'vuex-composition-helpers'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { RegistrationFlowType, RouteNames, StatementTypes } from '@/enums'
 import { RegistrationTypeIF } from '@/interfaces'
@@ -98,6 +98,8 @@ export default defineComponent({
       'getMhrRegistrationValidationModel'
     ])
 
+    const { setEmptyMhr } = useActions<any>(['setEmptyMhr'])
+
     const {
       MhrCompVal,
       MhrSectVal,
@@ -106,6 +108,13 @@ export default defineComponent({
       getStepValidation,
       scrollToInvalid
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
+
+    const {
+      initNewMhr,
+      buildApiData,
+      parseStaffPayment
+    } = useNewMhrRegistration()
+
 
     const localState = reactive({
       dataLoaded: false,
@@ -172,24 +181,26 @@ export default defineComponent({
       setValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_APP, false)
 
       // page is ready to view
+      setEmptyMhr(initNewMhr())
       context.emit('emitHaveData', true)
       localState.dataLoaded = true
     })
-
-    const { buildApiData, parseStaffPayment } = useNewMhrRegistration()
 
     const submit = async () => {
       // Prompt App Validations
       setValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_APP, true)
 
       if (localState.isValidMhrRegistration) {
-        console.log('Inside Valid')
+        // Submit Filing
         localState.submitting = true
-        // passing apiData as payload and staffPayment as query parameters
-        await submitMhrRegistration(buildApiData(), parseStaffPayment())
+        const mhrSubmission = await submitMhrRegistration(buildApiData(), parseStaffPayment())
         localState.submitting = false
+
+        !!mhrSubmission?.mhrNumber
+          ? await context.root.$router.push({ name: RouteNames.DASHBOARD })
+          : console.log(mhrSubmission?.error) // Handle Schema or Api errors here..
+
       } else {
-        console.log('Inside else')
         await scrollToInvalid(MhrSectVal.REVIEW_CONFIRM_VALID, 'mhr-review-confirm',
           [
             getStepValidation(MhrSectVal.YOUR_HOME_VALID),

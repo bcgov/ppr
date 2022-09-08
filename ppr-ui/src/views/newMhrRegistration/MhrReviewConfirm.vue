@@ -200,18 +200,19 @@ export default defineComponent({
     watch(() => context.root.$route.name, (route: string) => {
       switch (route) {
         case RouteNames.YOUR_HOME:
-          scrollToInvalid(MhrSectVal.YOUR_HOME_VALID, 'mhr-describe-your-home')
+          localState.isValidatingApp && scrollToInvalid(MhrSectVal.YOUR_HOME_VALID, 'mhr-describe-your-home')
           break
         case RouteNames.SUBMITTING_PARTY:
-          scrollToInvalid(MhrSectVal.SUBMITTING_PARTY_VALID, 'mhr-submitting-party')
+          localState.isValidatingApp && scrollToInvalid(MhrSectVal.SUBMITTING_PARTY_VALID, 'mhr-submitting-party')
           break
         case RouteNames.HOME_OWNERS:
-          scrollToInvalid(MhrSectVal.HOME_OWNERS_VALID, 'mhr-home-owners-list')
+          localState.isValidatingApp && scrollToInvalid(MhrSectVal.HOME_OWNERS_VALID, 'mhr-home-owners-list')
           break
         case RouteNames.HOME_LOCATION:
-          scrollToInvalid(MhrSectVal.LOCATION_VALID, 'mhr-home-location')
+          localState.isValidatingApp && scrollToInvalid(MhrSectVal.LOCATION_VALID, 'mhr-home-location')
           break
         case RouteNames.MHR_REVIEW_CONFIRM:
+          localState.isValidatingApp &&
           scrollToInvalid(MhrSectVal.REVIEW_CONFIRM_VALID, 'mhr-review-confirm',
             [
               getStepValidation(MhrSectVal.YOUR_HOME_VALID),

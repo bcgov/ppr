@@ -28,7 +28,7 @@ import {
   UserProductSubscriptionIF,
   HomeSectionIF,
   MhrRegistrationHomeOwnersIF,
-  MhrRegistrationHomeOwnerGroupIF
+  MhrRegistrationHomeOwnerGroupIF, MhrRegistrationIF
 } from '@/interfaces'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 
@@ -355,6 +355,10 @@ export const mutateUnsavedChanges = (state: StateIF, unsavedChanges: Boolean) =>
 }
 
 // MHR Registration
+export const mutateEmptyMhr = (state: StateIF, emptyMhr: MhrRegistrationIF) => {
+  state.stateModel.mhrRegistration = emptyMhr
+}
+
 export const mutateMhrHomeDescription = (state: StateIF, { key, value }) => {
   state.stateModel.mhrRegistration.description[key] = value
 }
@@ -367,7 +371,6 @@ export const mutateMhrSubmittingParty = (state: StateIF, { key, value }) => {
   state.stateModel.mhrRegistration.submittingParty[key] = value
 }
 
-// TODO: Delete this call
 export const mutateMhrHomeOwners = (state: StateIF, owners: Array<MhrRegistrationHomeOwnersIF>) => {
   state.stateModel.mhrRegistration.owners = owners
 }
