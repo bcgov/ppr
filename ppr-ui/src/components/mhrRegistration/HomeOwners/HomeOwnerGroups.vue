@@ -33,7 +33,7 @@
         <v-col>
           <div class="generic-label mb-3">Group {{ ownerGroupId }} Details:</div>
         </v-col>
-        <v-col v-show="groupState.isReadonly" class="align-right">
+        <v-col v-show="groupState.isReadonly" class="align-right pad-top">
           <v-btn
             v-if="groupState.hasEditButton"
             id="edit-fractional-ownership"
@@ -150,14 +150,19 @@ export default defineComponent({
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
 
+.pad-top {
+  padding-top: 0px;
+}
 #mhr-home-owner-groups::v-deep {
   ul {
     color: $gray7;
     line-height: 24px;
   }
-
   .owner-groups-select {
     width: 200px;
+  }
+  .v-application .my-8 {
+    margin-bottom: 0px;
   }
 }
 </style>

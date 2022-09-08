@@ -94,7 +94,7 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
     const fractionalDenominator = getMhrRegistrationHomeOwnerGroups.value[0]?.interestTotal || null
 
     return {
-      totalAllocation: totalFractionalNominator + ' / ' + fractionalDenominator,
+      totalAllocation: totalFractionalNominator + '/' + fractionalDenominator,
       hasTotalAllocationError: totalFractionalNominator !== fractionalDenominator
     }
   }

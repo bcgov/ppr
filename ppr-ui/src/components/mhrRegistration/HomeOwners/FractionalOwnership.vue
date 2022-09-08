@@ -88,7 +88,7 @@ export default defineComponent({
       fractionalInterest: computed(
         () =>
           // eslint-disable-next-line max-len
-          `${props.fractionalData.interest} ${props.fractionalData.interestNumerator} / ${props.fractionalData.interestTotal}`
+          `${props.fractionalData.interest} ${props.fractionalData.interestNumerator}/${props.fractionalData.interestTotal}`
       ),
       fractionalAmountRules: computed(() => {
         const rules = customRules(
