@@ -3,6 +3,7 @@
     <v-data-table
       id="mh-home-owners-table"
       class="home-owners-table"
+      :class="{ 'review-mode' : isReadonlyTable }"
       :headers="homeOwnersTableHeaders"
       hide-default-footer
       :items="homeOwners"
@@ -114,7 +115,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
-import { homeOwnersTableHeaders } from '@/resources/tableHeaders'
+import { homeOwnersTableHeaders, homeOwnersTableHeadersReview } from '@/resources/tableHeaders'
 import { BaseAddress } from '@/composables/address'
 import { useHomeOwners } from '@/composables/mhrRegistration'
 import { PartyAddressSchema } from '@/schemas'
@@ -156,7 +157,7 @@ export default defineComponent({
       showTableError: computed((): boolean => hasEmptyGroup.value && showGroups.value),
       showEditActions: computed((): boolean => !props.isReadonlyTable),
       homeOwnersTableHeaders: props.isReadonlyTable
-        ? homeOwnersTableHeaders.filter(header => header.value !== 'actions')
+        ? homeOwnersTableHeadersReview
         : homeOwnersTableHeaders
     })
 
@@ -222,10 +223,9 @@ export default defineComponent({
     background-color: #e2e8ee;
   }
 
-  .owner-name,
-  i,
-  strong {
-    color: $gray9;
+  .owner-name, i {
+    color: $gray9 !important;
+    font-weight: bold;
   }
 
   table {
@@ -281,5 +281,17 @@ export default defineComponent({
 }
 .v-menu__content {
   cursor: pointer;
+}
+.review-mode ::v-deep {
+  table {
+    th:first-child,
+    td:first-child {
+      padding-left: 0 !important;
+    }
+  }
+  tbody > tr.v-row-group__header {
+    margin-left: 20px !important;
+    padding-left: 20px !important;
+  }
 }
 </style>

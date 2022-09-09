@@ -17,13 +17,13 @@
     />
     <div v-if="!isEditGroupMode" class="group-header-summary">
       <div>
-        <span class="mr-2 font-weight-bold">Group {{ groupId }}</span>
+        <span class="pr-4 font-weight-bold" :class="{'pl-8': !showEditActions }">Group {{ groupId }}</span>
         |
-        <span class="ma-2">Owners: {{ owners.length }} </span>
+        <span class="px-4">Owners: {{ owners.length }} </span>
         |
-        <span class="ma-2">Group Tenancy Type: {{ group.type }}</span>
+        <span class="px-4" :class="{'ml-1': !showEditActions }">Group Tenancy Type: {{ group.type }}</span>
         |
-        <span class="ma-2"> Interest: {{ getOwnershipInterest() }} </span>
+        <span class="px-4"> Interest: {{ getOwnershipInterest() }} </span>
       </div>
 
       <div v-show="showEditActions">

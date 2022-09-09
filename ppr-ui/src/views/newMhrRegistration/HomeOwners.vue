@@ -88,7 +88,7 @@
         Add a Business or Organization
       </v-btn>
       <div class="my-6">
-        <div><span class="generic-label">Home Tenancy Type: </span>{{ getHomeTenancyType() }}</div>
+        <span class="generic-label">Home Tenancy Type: </span>{{ getHomeTenancyType() }}
         <div v-show="showGroups">
           <span class="generic-label">Total Ownership Allocated: </span>{{ ownershipAllocation.totalAllocation }}
           <span v-show="ownershipAllocation.hasTotalAllocationError" class="error-text fs-14 ml-3"

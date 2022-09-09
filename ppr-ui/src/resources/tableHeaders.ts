@@ -794,21 +794,19 @@ export const homeSectionsReviewTableHeaders: Array<BaseHeaderIF> = [
 
 export const homeOwnersTableHeaders: Array<BaseHeaderIF> = [
   {
-    class: 'column-lg',
+    class: 'column-xl',
     sortable: false,
     text: 'Name',
-    value: 'fullName',
-    width: '14rem'
+    value: 'fullName'
+  },
+  {
+    class: 'column-xl',
+    sortable: false,
+    text: 'Mailing Address',
+    value: 'mailingAddress'
   },
   {
     class: 'column-lg',
-    sortable: false,
-    text: 'Mailing Address',
-    value: 'mailingAddress',
-    width: '14rem'
-  },
-  {
-    class: 'column-mdl',
     sortable: false,
     text: 'Phone Number',
     value: 'phoneNumber',
@@ -818,7 +816,27 @@ export const homeOwnersTableHeaders: Array<BaseHeaderIF> = [
     class: 'actions',
     sortable: false,
     text: '',
-    value: 'actions',
-    width: '9rem'
+    value: 'actions'
+  }
+]
+
+export const homeOwnersTableHeadersReview: Array<BaseHeaderIF> = [
+  {
+    class: 'column-xxl',
+    sortable: false,
+    text: 'Name',
+    value: 'fullName'
+  },
+  {
+    class: 'column-xxl',
+    sortable: false,
+    text: 'Mailing Address',
+    value: 'mailingAddress'
+  },
+  {
+    class: 'column-lg',
+    sortable: false,
+    text: 'Phone Number',
+    value: 'phoneNumber'
   }
 ]
