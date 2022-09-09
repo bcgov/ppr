@@ -119,13 +119,14 @@ export default defineComponent({
       'setMhrAttentionReferenceNum'
     ])
 
-    const { customRules, required, maxLength, isNumber } = useInputRules()
+    const { customRules, isNumber, maxLength, minLength, required } = useInputRules()
 
     const {
       MhrCompVal,
       MhrSectVal,
       hasError,
       setValidation,
+      getValidation,
       getSectionValidation,
       scrollToInvalid
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
@@ -135,7 +136,21 @@ export default defineComponent({
       documentId: '',
       isDocumentIdValid: false,
       isRefNumValid: false,
-      documentIdRules: computed(() => customRules(required('Enter a Document ID'), maxLength(8, true), isNumber())),
+      documentIdRules: computed(() => {
+        if (getValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_STEPS)) {
+          return customRules(
+            required('Enter a Document ID'),
+            maxLength(8, true),
+            minLength(8, true),
+            isNumber()
+          )
+        } else {
+          return customRules(
+            maxLength(8, true),
+            isNumber()
+          )
+        }
+      }),
       validateSubmitter: computed(() => {
         return getSectionValidation(MhrSectVal.SUBMITTING_PARTY_VALID, MhrCompVal.SUBMITTER_VALID)
       }),
