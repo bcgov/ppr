@@ -1,6 +1,6 @@
 {
   "name": "ppr-ui",
-  "version": "0.3.24",
+  "version": "0.3.25",
   "private": true,
   "appName": "Assets UI",
   "sbcName": "SBC Common Components",
@@ -18,7 +18,7 @@
     "@bcrs-shared-components/date-picker": "^1.1.18",
     "@bcrs-shared-components/enums": "^1.0.19",
     "@bcrs-shared-components/interfaces": "^1.0.39",
-    "@bcrs-shared-components/staff-payment": "^2.0.9",
+    "@bcrs-shared-components/staff-payment": "^2.0.12",
     "@lemoncode/fonk": "^1.5.1",
     "@lemoncode/fonk-range-number-validator": "^1.1.0",
     "@sentry/browser": "^6.0.4",
