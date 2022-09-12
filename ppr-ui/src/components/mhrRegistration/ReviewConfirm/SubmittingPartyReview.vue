@@ -1,7 +1,7 @@
 <template>
   <v-card flat id="submitting-party-summary" class="mt-6">
     <header class="review-header">
-      <v-icon class="ml-2" color="darkBlue">mdi-account</v-icon>
+      <v-icon class="ml-1" color="darkBlue">mdi-account</v-icon>
       <label class="font-weight-bold pl-2">Submitting Party</label>
     </header>
 

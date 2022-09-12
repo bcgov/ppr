@@ -402,15 +402,6 @@ tr.disabled-text-not-action td, tr.disabled-text-not-first td {
   opacity: 1;
 }
 
-.theme--light.v-data-table > .v-data-table__wrapper > table > tbody
-  tr:not(:last-child).disabled-text-not-action td:last-child,
-.theme--light.v-data-table > .v-data-table__wrapper > table > tbody
-  tr:not(:last-child).disabled-text-not-action td:first-child,
-.theme--light.v-data-table > .v-data-table__wrapper > table > tbody
-  tr:not(:last-child).disabled-text-not-first td:first-child {
-  border-bottom: thin solid rgba(0, 0, 0, 0.12);
-}
-
 .auto-complete-added,
 .v-list .v-list-item--active .v-icon.mdi-check,
 .v-list-item__action .v-icon.mdi-check
