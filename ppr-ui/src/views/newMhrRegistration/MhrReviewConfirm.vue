@@ -38,7 +38,7 @@
       <v-card flat class="mt-6 pa-6" :class="{ 'border-error-left': validateStaffPayment }">
         <StaffPayment
           id="staff-payment"
-          :staffPaymentData="staffPaymentData"
+          :staffPaymentData="staffPayment"
           :validate="isValidatingApp"
           :displaySideLabel="true"
           :displayPriorityCheckbox="true"
@@ -96,8 +96,7 @@ export default defineComponent({
       setValidation,
       scrollToInvalid,
       getValidation,
-      getStepValidation,
-      getSectionValidation
+      getStepValidation
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
     const localState = reactive({
@@ -114,18 +113,16 @@ export default defineComponent({
         return localState.isValidatingApp &&
           !getValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.STAFF_PAYMENT_VALID)
       }),
-      staffPaymentData:
-        getStaffPayment.value ||
-        ({
-          option: StaffPaymentOptions.NONE,
-          routingSlipNumber: '',
-          bcolAccountNumber: '',
-          datNumber: '',
-          folioNumber: '',
-          isPriority: false
-        } as StaffPaymentIF),
       paymentOption: StaffPaymentOptions.NONE,
-      staffPaymentValid: false
+      staffPaymentValid: false,
+      staffPayment: {
+        option: StaffPaymentOptions.NONE,
+        routingSlipNumber: '',
+        bcolAccountNumber: '',
+        datNumber: '',
+        folioNumber: '',
+        isPriority: false
+      }
     })
 
     const onStaffPaymentDataUpdate = (val: StaffPaymentIF) => {
@@ -180,6 +177,7 @@ export default defineComponent({
           break
       }
 
+      localState.staffPayment = staffPaymentData
       setStaffPayment(staffPaymentData)
     }
 
@@ -236,4 +234,15 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+
+#mhr-staff-payment-section {
+  ::v-deep {
+    .theme--light.v-text-field.v-input--is-disabled .v-input__slot::before {
+      border-style: dashed;
+    }
+    .theme--light.v-label--is-disabled {
+      color: $gray7;
+    }
+  }
+}
 </style>
