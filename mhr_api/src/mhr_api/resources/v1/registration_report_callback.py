@@ -16,7 +16,7 @@ import json
 from http import HTTPStatus
 
 # import requests
-from flask import Blueprint, current_app  # , jsonify, request
+from flask import Blueprint, current_app, request
 from flask_cors import cross_origin
 
 from mhr_api.exceptions import DatabaseException
@@ -50,6 +50,11 @@ def post_registration_report_callback(registration_id: str):  # pylint: disable=
         current_app.logger.info(f'Registration report callback starting id={registration_id}.')
         if registration_id is None:
             return resource_utils.path_param_error_response('registration ID')
+
+        # Authenticate with request api key
+        if not resource_utils.valid_api_key(request):
+            return resource_utils.unauthorized_error_response('MHR registration report callback')
+
         # If exceeded max retries we're done.
         event_count: int = 0
         events = EventTracking.find_by_key_id_type(registration_id,

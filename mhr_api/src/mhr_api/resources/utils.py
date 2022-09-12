@@ -241,3 +241,14 @@ def validate_registration(json_data, is_staff: bool = False):
     """Perform non-schema extra validation on a non-financing registrations."""
     error_msg = registration_validator.validate_registration(json_data, is_staff)
     return error_msg
+
+
+def valid_api_key(request) -> bool:
+    """Verify the callback request api key is valid."""
+    key = get_apikey(request)
+    if not key:
+        return False
+    apikey = current_app.config.get('SUBSCRIPTION_API_KEY')
+    if not apikey:
+        return True
+    return key == apikey

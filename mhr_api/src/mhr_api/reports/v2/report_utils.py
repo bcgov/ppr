@@ -21,9 +21,13 @@ from mhr_api.utils.base import BaseEnum
 
 
 HEADER_PATH = '/static/v2/header_replace.html'
+HEADER_REG_PATH = '/static/v2/header_registration.html'
 FOOTER_PAGES_PATH = '/static/v2/footer.html'
 HEADER_TITLE_REPLACE = '{{TITLE}}'
+HEADER_SUBTITLE_REPLACE = '{{SUBTITLE}}'
+HEADER_SUBJECT_REPLACE = '{{SUBJECT}}'
 FOOTER_TEXT_REPLACE = '{{FOOTER-TEXT}}'
+MARGIN_TOP_REG_REPORT = 1.93
 # marginTop 1.5
 REPORT_META_DATA = {
     'marginTop': 1.25,
@@ -54,6 +58,7 @@ class Config:  # pylint: disable=too-few-public-methods
     """Configuration that loads report template static data."""
 
     HEADER_TEMPLATE: str = None
+    HEADER_REG_TEMPLATE: str = None
     FOOTER_TEMPLATE: str = None
 
     @classmethod
@@ -69,6 +74,18 @@ class Config:  # pylint: disable=too-few-public-methods
         return cls.HEADER_TEMPLATE
 
     @classmethod
+    def get_reg_header_template(cls) -> str:
+        """Fetch registration header template data from the file system."""
+        if not cls.HEADER_REG_TEMPLATE:
+            file_path = current_app.config.get('REPORT_TEMPLATE_PATH', '') + HEADER_REG_PATH
+            try:
+                cls.HEADER_REG_TEMPLATE = Path(file_path).read_text()
+                current_app.logger.info(f'Loaded registration header file from path {file_path}')
+            except Exception as err:  # noqa: B902; just logging
+                current_app.logger.error(f'Error loading reg header template from path={file_path}: ' + str(err))
+        return cls.HEADER_REG_TEMPLATE
+
+    @classmethod
     def get_footer_template(cls) -> str:
         """Fetch footer template data from the file system."""
         if not cls.FOOTER_TEMPLATE:
@@ -81,11 +98,20 @@ class Config:  # pylint: disable=too-few-public-methods
         return cls.FOOTER_TEMPLATE
 
 
-def get_header_data(title: str) -> str:
-    """Get report header with the provided title."""
+def get_header_data(title: str, subtitle: str = '') -> str:
+    """Get report header with the provided titles."""
     template = Config().get_header_template()
     if template:
-        return template.replace(HEADER_TITLE_REPLACE, title)
+        return template.replace(HEADER_TITLE_REPLACE, title).replace(HEADER_SUBTITLE_REPLACE, subtitle)
+    return None
+
+
+def get_reg_header_data(title: str, subtitle: str, subject: str) -> str:
+    """Get registration report header with the provided titles and subject."""
+    template = Config().get_reg_header_template()
+    if template:
+        rep_template = template.replace(HEADER_TITLE_REPLACE, title).replace(HEADER_SUBTITLE_REPLACE, subtitle)
+        return rep_template.replace(HEADER_SUBJECT_REPLACE, subject)
     return None
 
 
@@ -97,25 +123,32 @@ def get_footer_data(footer_text: str) -> str:
     return None
 
 
-def get_report_meta_data() -> dict:
+def get_report_meta_data(report_type: str = '') -> dict:
     """Get gotenberg report configuration data."""
-    return copy.deepcopy(REPORT_META_DATA)
+    if not report_type or report_type != ReportTypes.MHR_REGISTRATION:
+        return copy.deepcopy(REPORT_META_DATA)
+    data = copy.deepcopy(REPORT_META_DATA)
+    data['marginTop'] = MARGIN_TOP_REG_REPORT
+    return data
 
 
 def get_report_files(request_data: dict, report_type: str) -> dict:
     """Get gotenberg report generation source file data."""
     files = copy.deepcopy(REPORT_FILES)
     files['index.html'] = get_html_from_data(request_data)
-    header_text = ''
     footer_text = ''
     if report_type in (ReportTypes.SEARCH_BODY_REPORT,
                        ReportTypes.SEARCH_DETAIL_REPORT,
                        ReportTypes.SEARCH_TOC_REPORT,
                        ReportTypes.MHR_REGISTRATION):
-        header_text = request_data['templateVars'].get('meta_title', '')
+        title_text = request_data['templateVars'].get('meta_title', '')
+        subtitle_text = request_data['templateVars'].get('meta_subtitle', '')
         footer_text = request_data['templateVars'].get('footer_content', '')
-
-    files['header.html'] = get_header_data(header_text)
+    if report_type == ReportTypes.MHR_REGISTRATION:
+        subject_text = request_data['templateVars'].get('meta_subject', '')
+        files['header.html'] = get_reg_header_data(title_text, subtitle_text, subject_text)
+    else:
+        files['header.html'] = get_header_data(title_text, subtitle_text)
     files['footer.html'] = get_footer_data(footer_text)
     return files
 

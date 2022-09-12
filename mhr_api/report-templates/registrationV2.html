@@ -7,21 +7,15 @@
     <meta charset="UTF-8">
     <meta name="author" content="BC Registries and Online Services">
     {% if environment == '' %}
-      [[v2/stylePage.html]]
+      [[v2/stylePageRegistration.html]]
     {% else %}
       [[v2/stylePageDraft.html]]
     {% endif %}
     [[v2/style.html]]
   </head>
   <body>
-  <div class="business-details-container">
-    <table class="registration-header-table" role="presentation">
-      <tr>
-        <td colspan="2">Manufactured Home Registration Number: {{ mhrNumber }}</td>
-      </tr>
-    </table>
-
-    <table class="business-details-table-grey" role="presentation">
+  <div class="business-details-container mtn-2">
+    <table class="business-details-table-grey mt-0" role="presentation">
       <tr>
         <td>Registration Type:</td>
         <td>Manufactured Home Act</td>
@@ -48,6 +42,7 @@
           {% endif %}
         </td>
       </tr>
+{#      
       <tr>
         <td>Declared Value:</td>
         <td>
@@ -59,23 +54,47 @@
           {% endif %}
         </td>
       </tr>    
+#}
     </table>
   </div>
-
+{#
   <div class="no-page-break">
     <div class="separator-header mt-6"></div>
     <div class="section-title-centre mt-2">CURRENT REGISTRATION INFORMATION</div>
     <div class="section-statement mt-0">(as of {{searchDateTime}})</div>
     <div class="separator-header mt-2"></div>
   </div>
-
+#}
   <div class="container pt-4">
     [[registration/owners.html]]
     [[registration/location.html]]
     [[registration/details.html]]
     [[registration/sections.html]]
+
+    <div class="no-page-break">
+      <div class="separator mt-5"></div>
+      <div class="section-title mt-3">Rebuilt Status:</div>
+      {% if description.rebuiltRemarks is defined and description.rebuiltRemarks != '' %}
+        <div class="section-data pt-3">{{description.rebuiltRemarks|safe}}</div>
+      {% else %}
+        <div class="section-data pt-3">N/A</div>
+      {% endif %}
+    </div>
+
+    <div class="no-page-break">
+      <div class="separator mt-5"></div>
+      <div class="section-title mt-3">Other Information:</div>
+      {% if description.otherRemarks is defined and description.otherRemarks != '' %}
+        <div class="section-data pt-3">{{description.otherRemarks|safe}}</div>
+      {% else %}
+        <div class="section-data pt-3">N/A</div>
+      {% endif %}
+    </div>
+
+    [[registration/submittingParty.html]]
   </div>
 
+  <p style="page-break-before: always" ></p>
 </body>
 </html>
 
