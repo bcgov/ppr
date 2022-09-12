@@ -20,10 +20,10 @@ from registry_schemas import utils as schema_utils
 from registry_schemas.example_data.mhr import REGISTRATION, OWNER
 
 from mhr_api.utils import registration_validator as validator
+from mhr_api.models.utils import is_legacy
 
 
 DESC_VALID = 'Valid'
-DESC_OWNERS_INVALID = 'Invalid owners'
 DESC_MISSING_DOC_ID = 'Missing document id'
 DESC_MISSING_SUBMITTING = 'Missing submitting party'
 DESC_MISSING_OWNER_GROUP = 'Missing owner group'
@@ -31,12 +31,12 @@ DESC_DOC_ID_EXISTS = 'Invalid document id exists'
 DOC_ID_EXISTS = '80038730'
 DOC_ID_VALID = '63166035'
 DOC_ID_INVALID_CHECKSUM = '63166034'
-
+INVALID_TEXT_CHARSET = 'TEST \U0001d5c4\U0001d5c6/\U0001d5c1 INVALID'
+INVALID_CHARSET_MESSAGE = 'The character set is not supported'
 # testdata pattern is ({description}, {valid}, {staff}, {doc_id}, {message content})
 TEST_REG_DATA = [
     (DESC_VALID, True, True, DOC_ID_VALID, None),
     ('Valid no doc id not staff', True, False, None, None),
-    (DESC_OWNERS_INVALID, False, True, DOC_ID_VALID, validator.OWNERS_NOT_ALLOWED),
     (DESC_MISSING_SUBMITTING, False, True, DOC_ID_VALID, validator.SUBMITTING_REQUIRED),
     (DESC_MISSING_SUBMITTING, False, False, DOC_ID_VALID, validator.SUBMITTING_REQUIRED),
     (DESC_MISSING_OWNER_GROUP, False, True, DOC_ID_VALID, validator.OWNER_GROUPS_REQUIRED),
@@ -55,17 +55,35 @@ TEST_CHECKSUM_DATA = [
     ('9948709', False),
     ('089948709', False),
 ]
-
+# testdata pattern is ({description}, {valid}, {street}, {city}, {message content})
+TEST_LEGACY_REG_DATA = [
+    (DESC_VALID, True, '0123456789012345678901234567890', '01234567890123456789', None),
+    ('Invalid location street too long', False, '01234567890123456789012345678901', 'KAMLOOPS',
+     validator.LEGACY_ADDRESS_STREET_TOO_LONG.format(add_desc='Location')),
+    ('Invalid location city too long', False, '1234 Front St.', '012345678901234567890',
+     validator.LEGACY_ADDRESS_CITY_TOO_LONG.format(add_desc='Location'))
+]
+# testdata pattern is ({description}, {bus_name}, {first}, {middle}, {last}, {message content})
+TEST_PARTY_DATA = [
+    ('Invalid org/bus name', INVALID_TEXT_CHARSET, None, None, None, INVALID_CHARSET_MESSAGE),
+    ('Invalid first name', None, INVALID_TEXT_CHARSET, 'middle', 'last', INVALID_CHARSET_MESSAGE),
+    ('Invalid middle name', None, 'first', INVALID_TEXT_CHARSET, 'last', INVALID_CHARSET_MESSAGE),
+    ('Invalid last name', None, 'first', 'middle', INVALID_TEXT_CHARSET, INVALID_CHARSET_MESSAGE)
+]
+# testdata pattern is ({description}, {park_name}, {dealer}, {additional}, {except_plan}, {message content})
+TEST_LOCATION_DATA = [
+    ('Invalid park name', INVALID_TEXT_CHARSET, None, None, None, INVALID_CHARSET_MESSAGE),
+    ('Invalid dealer name', None, INVALID_TEXT_CHARSET, None, None, INVALID_CHARSET_MESSAGE),
+    ('Invalid additional description', None, None, INVALID_TEXT_CHARSET, None, INVALID_CHARSET_MESSAGE),
+    ('Invalid exception plan', None, None, None, INVALID_TEXT_CHARSET, INVALID_CHARSET_MESSAGE)
+]
 
 @pytest.mark.parametrize('desc,valid,staff,doc_id,message_content', TEST_REG_DATA)
 def test_validate_registration(session, desc, valid, staff, doc_id, message_content):
     """Assert that new MH registration validation works as expected."""
     # setup
     json_data = copy.deepcopy(REGISTRATION)
-    if desc == DESC_OWNERS_INVALID:
-        json_data['owners'] = [OWNER]
-        del json_data['ownerGroups']
-    elif desc == DESC_MISSING_OWNER_GROUP:
+    if desc == DESC_MISSING_OWNER_GROUP:
         del json_data['ownerGroups']
     elif desc == DESC_MISSING_SUBMITTING:
         del json_data['submittingParty']
@@ -84,6 +102,88 @@ def test_validate_registration(session, desc, valid, staff, doc_id, message_cont
         assert error_msg != ''
         if message_content:
             assert error_msg.find(message_content) != -1
+
+
+@pytest.mark.parametrize('desc,bus_name,first,middle,last,message_content', TEST_PARTY_DATA)
+def test_validate_reg_submitting(session, desc, bus_name, first, middle, last, message_content):
+    """Assert that submitting party invalid character set validation works as expected."""
+    # setup
+    json_data = copy.deepcopy(REGISTRATION)
+    party = json_data.get('submittingParty')
+    if bus_name:
+        party['businessName'] = bus_name
+    else:
+        del party['businessName']
+        party['personName'] = {
+            'first': first,
+            'middle': middle,
+            'last': last
+        }
+    error_msg = validator.validate_registration(json_data, False)
+    assert error_msg != ''
+    if message_content:
+        assert error_msg.find(message_content) != -1
+
+
+@pytest.mark.parametrize('desc,bus_name,first,middle,last,message_content', TEST_PARTY_DATA)
+def test_validate_reg_owner(session, desc, bus_name, first, middle, last, message_content):
+    """Assert that owner invalid character set validation works as expected."""
+    # setup
+    json_data = copy.deepcopy(REGISTRATION)
+    group = json_data['ownerGroups'][0]
+    party = group['owners'][0]
+    if bus_name:
+        party['organizationName'] = bus_name
+        del party['individualName']
+    else:
+        party['individualName'] = {
+            'first': first,
+            'middle': middle,
+            'last': last
+        }
+    error_msg = validator.validate_registration(json_data, False)
+    assert error_msg != ''
+    if message_content:
+        assert error_msg.find(message_content) != -1
+
+
+@pytest.mark.parametrize('desc,park_name,dealer,additional,except_plan,message_content', TEST_LOCATION_DATA)
+def test_validate_reg_location(session, desc, park_name, dealer, additional, except_plan, message_content):
+    """Assert that location invalid character set validation works as expected."""
+    # setup
+    json_data = copy.deepcopy(REGISTRATION)
+    location = json_data.get('location')
+    if park_name:
+        location['parkName'] = park_name
+    elif dealer:
+        location['dealerName'] = dealer
+    elif additional:
+        location['additionalDescription'] = additional
+    elif except_plan:
+        location['exceptionPlan'] = except_plan
+    error_msg = validator.validate_registration(json_data, False)
+    assert error_msg != ''
+    if message_content:
+        assert error_msg.find(message_content) != -1
+
+
+@pytest.mark.parametrize('desc,valid,street,city,message_content', TEST_LEGACY_REG_DATA)
+def test_validate_registration_legacy(session, desc, valid, street, city, message_content):
+    """Assert that new MH registration legacy validation works as expected."""
+    if is_legacy():
+        # setup
+        json_data = copy.deepcopy(REGISTRATION)
+        json_data['location']['address']['street'] = street
+        json_data['location']['address']['city'] = city
+        valid_format, errors = schema_utils.validate(json_data, 'registration', 'mhr')
+        # Additional validation not covered by the schema.
+        error_msg = validator.validate_registration(json_data, False)
+        if valid:
+            assert valid_format and error_msg == ''
+        else:
+            assert error_msg != ''
+            if message_content:
+                assert error_msg.find(message_content) != -1
 
 
 @pytest.mark.parametrize('doc_id, valid', TEST_CHECKSUM_DATA)

@@ -12,3 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """This module holds general utility functions and helpers for the main package."""
+
+
+def valid_charset(word: str) -> bool:
+    """Verify word characters adhere to a supported set."""
+    return word == word.encode('ascii', 'ignore').decode('utf-8')

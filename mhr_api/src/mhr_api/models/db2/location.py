@@ -183,12 +183,15 @@ class Db2Location(db.Model):
     @property
     def registration_json(self):
         """Return a search registration dict of this object, with keys in JSON format."""
+        street = self.street_number + ' ' + self.street_name
+        if len(self.street_number) == 6:
+            street = self.street_number + self.street_name
         location = {
             'parkName': self.park_name,
             'pad': self.park_pad,
             'status': LEGACY_STATUS_NEW.get(self.status),
             'address': {
-                'street': self.street_number + ' ' + self.street_name,
+                'street': street,
                 'city': self.town_city,
                 'region': self.province,
                 'country': 'CA',
@@ -218,12 +221,15 @@ class Db2Location(db.Model):
     def new_registration_json(self):
         """Return a dict of this object, with keys in JSON format."""
         self.strip()
+        street = self.street_number + ' ' + self.street_name
+        if len(self.street_number) == 6:
+            street = self.street_number + self.street_name
         location = {
             'parkName': self.park_name,
             'pad': self.park_pad,
             'status': LEGACY_STATUS_NEW.get(self.status),
             'address': {
-                'street': self.street_number + ' ' + self.street_name,
+                'street': street,
                 'city': self.town_city,
                 'region': self.province,
                 'country': 'CA',
@@ -303,7 +309,11 @@ class Db2Location(db.Model):
         street = str(address['street'])
         street_info = street.split(' ')
         street_num = street_info[0]
-        street_name = street[len(street_num):]
+        if len(street_num) < 7:
+            street_name = street[len(street_num):].strip()
+        else:  # Adjust; db table column length is 6.
+            street_num = street[0:6]
+            street_name = street[6:]
         location = Db2Location(manuhome_id=registration.id,
                                location_id=1,
                                status=Db2Location.StatusTypes.ACTIVE,
