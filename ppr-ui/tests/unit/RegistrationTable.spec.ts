@@ -75,6 +75,7 @@ describe('Test registration table with results', () => {
 
   beforeEach(async () => {
     wrapper = createComponent()
+    wrapper.setProps({ isPpr: true })
   })
 
   afterEach(() => {

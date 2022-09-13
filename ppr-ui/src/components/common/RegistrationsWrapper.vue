@@ -89,10 +89,12 @@
           align="center"
           no-gutters
         >
-          <v-col cols="auto">
-            <b>{{registrationLabel}} Registrations</b> ({{ getRegTableTotalRowCount }})
+          <v-col cols="auto" class="py-1">
+            <b>{{registrationLabel}} Registrations </b>
+            <span v-if="isPpr">({{ getRegTableTotalRowCount }})</span>
+            <span v-if="isMhr">({{ getMhRegTableBaseRegs.length }})</span>
           </v-col>
-          <v-col>
+          <v-col v-if="isPpr">
             <v-row justify="end" no-gutters>
               <v-col class="pl-4 py-1" cols="auto">
                 <v-select
@@ -128,6 +130,8 @@
           <v-col v-if="!appLoadingData" cols="12">
             <RegistrationTable
               :class="{'table-border': isTabView}"
+              :isPpr="isPpr"
+              :isMhr="isMhr"
               :setHeaders="myRegHeaders"
               :setLoading="myRegDataLoading || myRegDataAdding"
               :setMorePages="hasMorePages"
@@ -157,7 +161,7 @@ import { useActions, useGetters } from 'vuex-composition-helpers'
 import { RegistrationBar } from '@/components/registration'
 import { RegistrationTable } from '@/components/tables'
 import { BaseDialog, RegistrationConfirmation } from '@/components/dialogs'
-import { AllRegistrationTypes, registrationTableHeaders } from '@/resources'
+import { AllRegistrationTypes, mhRegistrationTableHeaders, registrationTableHeaders } from '@/resources'
 import {
   BaseHeaderIF,
   DialogOptionsIF, DraftResultIF,
@@ -221,11 +225,11 @@ export default defineComponent({
     const {
       getRegTableBaseRegs, getRegTableDraftsBaseReg, isMhrRegistration, getRegTableTotalRowCount, getStateModel,
       getRegTableDraftsChildReg, hasMorePages, getRegTableNewItem, getRegTableSortOptions, getRegTableSortPage,
-      getUserSettings
+      getUserSettings, getMhRegTableBaseRegs
     } = useGetters<any>([
       'getRegTableBaseRegs', 'getRegTableDraftsBaseReg', 'isMhrRegistration', 'getRegTableTotalRowCount',
       'getStateModel', 'getRegTableDraftsChildReg', 'hasMorePages', 'getRegTableNewItem', 'getRegTableSortOptions',
-      'getRegTableSortPage', 'getUserSettings'
+      'getRegTableSortPage', 'getUserSettings', 'getMhRegTableBaseRegs'
     ])
     const {
       resetNewRegistration, setRegistrationType, setRegTableCollapsed, setRegTableNewItem, setLengthTrust,
@@ -256,12 +260,15 @@ export default defineComponent({
       myRegActionDialog: dischargeConfirmationDialog as DialogOptionsIF,
       myRegDataLoading: false,
       myRegDataAdding: false,
-      myRegHeaders: [...registrationTableHeaders],
+      myRegHeaders: props.isPpr ? [...registrationTableHeaders] : [...mhRegistrationTableHeaders],
       myRegHeadersSelected: [...registrationTableHeaders],
       myRegHeadersSelectable: [...registrationTableHeaders].slice(0, -1), // remove actions
       myRegistrations: computed(() => {
-        if (!!getRegTableDraftsBaseReg.value && !!getRegTableBaseRegs.value) {
+        if (props.isPpr && !!getRegTableDraftsBaseReg.value && !!getRegTableBaseRegs.value) {
           return [...getRegTableDraftsBaseReg.value, ...getRegTableBaseRegs.value]
+        }
+        if (props.isMhr) {
+          return [...getMhRegTableBaseRegs.value]
         }
         return []
       }),
@@ -314,10 +321,12 @@ export default defineComponent({
         }
       }
       // update columns selected with user settings
-      if (getUserSettings.value?.[SettingOptions.REGISTRATION_TABLE]?.columns) {
+      if (props.isPpr && getUserSettings.value?.[SettingOptions.REGISTRATION_TABLE]?.columns) {
         localState.myRegHeadersSelected = getUserSettings.value[SettingOptions.REGISTRATION_TABLE].columns
+      } else if (props.isMhr) {
+        localState.myRegHeadersSelected = [...mhRegistrationTableHeaders]
       } else {
-      // set default headers
+        // set default headers
         const headers = []
         for (let i = 0; i < localState.myRegHeadersSelected.length; i++) {
           if (localState.myRegHeadersSelected[i].display) {
@@ -853,7 +862,7 @@ export default defineComponent({
     })
 
     watch(() => localState.myRegHeadersSelected, (val: BaseHeaderIF[]) => {
-      updateMyRegHeaders(val)
+      props.isPpr && updateMyRegHeaders(val)
     })
 
     return {
@@ -864,6 +873,7 @@ export default defineComponent({
       getRegTableNewItem,
       getRegTableTotalRowCount,
       getRegTableSortOptions,
+      getMhRegTableBaseRegs,
       hasMorePages,
       myRegSort,
       myRegActionHandler,

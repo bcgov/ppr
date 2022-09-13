@@ -63,8 +63,6 @@
             v-if="enableDashboardTabs"
             :appLoadingData="appLoadingData"
             :appReady="appReady"
-            :registrationsCount="getRegTableTotalRowCount"
-            :mhrRegistrationsCount="0"
             @snackBarMsg="snackBarEvent($event)"
           />
           <!-- To include MHR only table here conditionally when built -->
@@ -114,7 +112,6 @@ import { DashboardTabs } from '@/components/dashboard'
   }
 })
 export default class Dashboard extends Vue {
-  @Getter getRegTableTotalRowCount: number
   @Getter getSearchHistory: Array<SearchResponseIF>
   @Getter getSearchHistoryLength: number
   @Getter getUserServiceFee!: number

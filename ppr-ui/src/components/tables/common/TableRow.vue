@@ -38,7 +38,7 @@
             </p>
           </div>
           <p v-else class="ma-0">
-            <b>{{ item.baseRegistrationNumber }}</b>
+            <b>{{ item.baseRegistrationNumber || item.mhrNumber }}</b>
           </p>
         </v-col>
       </v-row>
@@ -47,10 +47,11 @@
       v-if="inSelectedHeaders('registrationType')"
       :class="isChild || item.expanded ? $style['border-left']: ''"
     >
-      <div>
+      <div v-if="!!item.registrationType">
         {{ getRegistrationType(item.registrationType) }}
         <span v-if="!isChild"> - Base Registration</span>
       </div>
+      <div v-else class="pr-2">{{ item.registrationDescription }}</div>
       <v-btn
         v-if="item.changes"
         :class="[$style['btn-txt'], 'pa-0']"
@@ -92,16 +93,23 @@
       v-if="inSelectedHeaders('registeringName')"
       :class="isChild || item.expanded ? $style['border-left']: ''"
     >
-      {{ getRegisteringName(item.registeringName) }}
+      <span v-if="item.registeringName">{{ getRegisteringName(item.registeringName) }}</span>
+      <span v-else>{{ item.username || 'N/A' }}</span>
     </td>
     <td
       v-if="inSelectedHeaders('registeringParty')"
       :class="isChild || item.expanded ? $style['border-left']: ''"
     >
-      {{ item.registeringParty || '' }}
+      {{ item.registeringParty || item.submittingParty || '' }}
     </td>
     <td
-      v-if="inSelectedHeaders('securedParties')"
+      v-if="inSelectedHeaders('ownerNames')"
+      :class="isChild || item.expanded ? $style['border-left']: ''"
+    >
+      {{ item.ownerNames }}
+    </td>
+    <td
+      v-if="inSelectedHeaders('securedParties') && isPpr"
       :class="isChild || item.expanded ? $style['border-left']: ''"
     >
       {{ item.securedParties || '' }}
@@ -151,7 +159,7 @@
 
     <!-- Action Btns -->
     <td
-      v-if="headers.length > 1"
+      v-if="headers.length > 1 && isPpr"
       class="actions-cell pl-2 py-4"
       :style="disableActionShadow ? 'box-shadow: none; border-left: none;' : ''"
     >
@@ -300,7 +308,7 @@ import {
   computed,
   watch
 } from '@vue/composition-api'
-import { getRegistrationSummary, registrationPDF } from '@/utils' // eslint-disable-line
+import {getRegistrationSummary, mhRegistrationPDF, registrationPDF} from '@/utils' // eslint-disable-line
 
 // local types/helpers/etc.
 import {
@@ -321,6 +329,7 @@ import moment from 'moment'
 export default defineComponent({
   name: 'TableRow',
   props: {
+    isPpr: { type: Boolean, default: false },
     setAddRegEffect: { default: false },
     setDisableActionShadow: { default: false },
     setChild: { default: false },
@@ -397,7 +406,8 @@ export default defineComponent({
 
     const downloadPDF = async (item: RegistrationSummaryIF): Promise<any> => {
       localState.loadingPDF = item.path
-      const pdf = await registrationPDF(item.path)
+      // const pdf = await registrationPDF(item.path)
+      const pdf = await mhRegistrationPDF(item.path)
       if (pdf.error) {
         emit('error', pdf.error)
       } else {
@@ -422,7 +432,7 @@ export default defineComponent({
           // (only for Standard Registrations)] [Verification Statement Type] - [Registration Number]
           // Example: 2022-01-03 BCPPR SA Registration Verification - 100559B
           const today = new Date()
-          const regClass = getRegistrationClass(item.registrationClass)
+          const regClass = getRegistrationClass(item.registrationClass) || ''
           if (regClass === 'Registration Verification') {
             a.download = today.toISOString().slice(0, 10) + '_BCPPR_' +
               item.registrationType + '_' + regClass.replace(/ /g, '_') + '_' + item.registrationNumber
@@ -463,7 +473,7 @@ export default defineComponent({
     }
 
     const inSelectedHeaders = (search: string) => {
-      return localState.headers.find((header) => { return header.value === search })
+      return props.isPpr ? localState.headers.find((header) => { return header.value === search }) : true
     }
 
     const isActive = (item: RegistrationSummaryIF): boolean => {

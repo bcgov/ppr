@@ -32,7 +32,7 @@ import {
   UserProductSubscriptionIF,
   UserSettingsIF,
   VehicleCollateralIF,
-  MhrRegistrationHomeOwnerGroupIF
+  MhrRegistrationHomeOwnerGroupIF, MhRegistrationSummaryIF
 } from '@/interfaces'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 import { HomeLocation, HomeOwners, MhrReviewConfirm, SubmittingParty, YourHome } from '@/views'
@@ -584,6 +584,11 @@ export const getRegTableData = (state: StateIF): RegTableDataI => {
 /** Returns registration table base regs */
 export const getRegTableBaseRegs = (state: StateIF): RegistrationSummaryIF[] => {
   return state.stateModel.registrationTable.baseRegs
+}
+
+/** Returns Manufacture Home Registration table base regs */
+export const getMhRegTableBaseRegs = (state: StateIF): MhRegistrationSummaryIF[] => {
+  return state.stateModel.registrationTable.baseMhRegs
 }
 
 /** Returns registration table base reg drafts */

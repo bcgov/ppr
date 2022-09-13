@@ -14,7 +14,7 @@
       :class="{ 'mt-1': isMhrTab }"
     >
       <v-icon class="mr-2" :class="{'whiteIcon': isMhrTab}">mdi-car</v-icon>
-      <b>Personal Property Registrations</b><span class="pl-1">({{ registrationsCount }})</span>
+      <b>Personal Property Registrations </b><span class="pl-1">({{ getRegTableTotalRowCount }})</span>
     </v-tab>
     <v-tab
       tabindex="1"
@@ -23,7 +23,7 @@
       :class="{ 'mt-1': isPprTab }"
     >
       <v-icon class="mr-2" :class="{'whiteIcon': isPprTab}">mdi-home</v-icon>
-      <b>Manufactured Home Registrations</b><span class="pl-1">(10)</span>
+      <b>Manufactured Home Registrations </b><span class="pl-1">({{ getMhRegTableBaseRegs.length }})</span>
     </v-tab>
     <v-tabs-items class="rounded-b" v-model="tabNumber" touchless>
       <v-tab-item class="px-7">
@@ -51,8 +51,10 @@
 <script lang="ts">
 // Components
 /* eslint-disable no-unused-vars */
-import { computed, defineComponent, reactive, toRefs } from '@vue/composition-api'
+import { computed, defineComponent, onMounted, reactive, toRefs } from '@vue/composition-api'
 import { RegistrationsWrapper } from '@/components/common'
+import { mhrRegistrationHistory } from '@/utils'
+import { useActions, useGetters } from 'vuex-composition-helpers'
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
@@ -68,13 +70,14 @@ export default defineComponent({
     appLoadingData: {
       type: Boolean,
       default: false
-    },
-    registrationsCount: {
-      type: Number,
-      default: 0
     }
   },
   setup (props, context) {
+    const {
+      getMhRegTableBaseRegs, getRegTableTotalRowCount
+    } = useGetters<any>(['getMhRegTableBaseRegs', 'getRegTableTotalRowCount'])
+    const { setMhrTableHistory } = useActions<any>(['setMhrTableHistory'])
+
     const localState = reactive({
       tabNumber: null,
       isPprTab: computed((): boolean => {
@@ -89,8 +92,15 @@ export default defineComponent({
       context.emit('snackBarMsg', msg)
     }
 
+    onMounted(async () => {
+      const myMhrHistory = await mhrRegistrationHistory()
+      setMhrTableHistory(myMhrHistory)
+    })
+
     return {
       snackBarEvent,
+      getMhRegTableBaseRegs,
+      getRegTableTotalRowCount,
       ...toRefs(localState)
     }
   }

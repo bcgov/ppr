@@ -192,3 +192,71 @@ export async function submitMhrRegistration (payloadData, queryParamData) {
     }
   }
 }
+
+export async function mhrRegistrationHistory () {
+  const url = sessionStorage.getItem('MHR_API_URL')
+  const config = { baseURL: url, headers: { Accept: 'application/json' } }
+
+  try {
+    const result = await axios.get('registrations', config)
+    if (!result?.data) {
+      throw new Error('Invalid API response')
+    }
+
+    return result.data
+  } catch (error) {
+    return {
+      error: {
+        category: ErrorCategories.REGISTRATION_CREATE,
+        statusCode: error?.response?.status || StatusCodes.NOT_FOUND,
+        msg: error?.response?.data?.errorMesage || 'Unknown Error'
+      }
+    }
+  }
+}
+
+// Get pdf for a registration
+export async function mhRegistrationPDF (pdfPath: string): Promise<any> {
+  const url = sessionStorage.getItem('MHR_API_URL')
+  // remove ppr/api/v1 from path
+  pdfPath = pdfPath.replace('/mhr/api/v1', '')
+  const config = {
+    baseURL: url,
+    headers: { Accept: 'application/pdf' },
+    responseType: 'blob' as 'json'
+  }
+  return axios
+    .get(pdfPath, config)
+    .then(response => {
+      const data = response?.data
+      if (!data) {
+        throw new Error('Invalid API response')
+      }
+      return data
+    })
+    .catch(error => {
+      if (error?.response?.data) {
+        try {
+          error.response.data.rootCause = error.response.data.rootCause
+            .replace('detail:', '"detail":"')
+            .replace('type:', '"type":"')
+            .replace('message:', '"message":"')
+            .replace('status_code:', '"statusCode":"')
+            .replaceAll(',', '",')
+          error.response.data.rootCause = `{${error.response.data.rootCause}"}`
+          error.response.data.rootCause = JSON.parse(error.response.data.rootCause)
+        } catch (error) {
+          // continue
+        }
+      }
+      return {
+        error: {
+          category: ErrorCategories.REPORT_GENERATION,
+          statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
+          message: error?.response?.data?.message,
+          detail: error?.response?.data?.rootCause?.detail,
+          type: error?.response?.data?.rootCause?.type?.trim() as ErrorCodes
+        }
+      }
+    })
+}

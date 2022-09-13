@@ -84,6 +84,18 @@ export interface RegistrationSummaryIF {
   vehicleCount?: number // Number of vehicle collateral in the registration
 }
 
+export interface MhRegistrationSummaryIF {
+  clientReferenceId: string
+  createDateTime: string
+  mhrNumber: string
+  ownerNames: string
+  path: string
+  registrationDescription: string
+  statusType: string
+  submittingParty: string
+  username: string
+}
+
 // Discharge Registration interface. Base registration number, debtor name, and registering party are required.
 export interface DischargeRegistrationIF {
   baseRegistrationNumber: string, // The identifier of the financing statement being discharged.

@@ -7,6 +7,7 @@ export const StatusTypes = [
   },
   {
     value: APIStatusTypes.ACTIVE,
+    mhrValue: APIStatusTypes.MHR_ACTIVE,
     text: UIStatusTypes.ACTIVE
   },
   {

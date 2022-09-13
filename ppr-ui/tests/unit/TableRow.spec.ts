@@ -73,6 +73,8 @@ describe('TableRow tests', () => {
 
   beforeEach(async () => {
     wrapper = createComponent(mockedRegistration1)
+
+    wrapper.setProps({ isPpr: true })
   })
 
   afterEach(() => {
@@ -288,6 +290,7 @@ describe('TableRow tests', () => {
     // recreate wrapper with draft
     wrapper.destroy()
     wrapper = createComponent(mockedDraft1)
+    wrapper.setProps({ isPpr: true })
     await flushPromises()
 
     // main buttons: new
