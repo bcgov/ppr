@@ -289,8 +289,10 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
     () => getMhrRegistrationHomeOwnerGroups.value,
     () => {
       // set step validation for home owners
-      const isHomeOwnersValid = showGroups.value ? !getTotalOwnershipAllocationStatus().hasTotalAllocationError : true
-      setValidation(MhrSectVal.HOME_OWNERS_VALID, MhrCompVal.OWNERS_VALID, isHomeOwnersValid)
+      var isHomeOwnersValid = showGroups.value ? !getTotalOwnershipAllocationStatus().hasTotalAllocationError : true
+      if (getMhrRegistrationHomeOwnerGroups.value[0].owners.length === 0) {
+        isHomeOwnersValid = false
+      }
 
       if (getMhrRegistrationHomeOwnerGroups.value.length === 0) {
         setShowGroups(false)
@@ -300,6 +302,8 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
         // check if at least one Owner Group has no owners. Used to display an error for the table.
         hasEmptyGroup.value = !getMhrRegistrationHomeOwnerGroups.value.every(group => group.owners.length > 0)
       }
+
+      setValidation(MhrSectVal.HOME_OWNERS_VALID, MhrCompVal.OWNERS_VALID, isHomeOwnersValid)
     }
   )
 

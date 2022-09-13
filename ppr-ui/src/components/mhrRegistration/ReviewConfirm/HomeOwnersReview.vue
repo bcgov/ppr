@@ -5,8 +5,8 @@
       <label class="font-weight-bold pl-2">Home Owners</label>
     </header>
 
-    <div :class="{ 'border-error-left': showStepError }">
-      <div v-show="showStepError" class="px-6 py-8">
+    <div :class="{ 'border-error-left': !getStepValidation(MhrSectVal.LOCATION_VALID) }">
+      <div v-show="!getStepValidation(MhrSectVal.LOCATION_VALID)" class="px-6 py-8">
         <v-icon color="error">mdi-information-outline</v-icon>
         <span class="error-text mx-1">This step is unfinished.</span>
         <router-link :to="{ path: `/${RouteNames.MHR_REGISTRATION}/${RouteNames.HOME_OWNERS}` }"

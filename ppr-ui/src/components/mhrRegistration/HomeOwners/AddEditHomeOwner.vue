@@ -395,7 +395,7 @@ export default defineComponent({
           )
         }
 
-        if (Number(localState.ownerGroupId) > 0) {
+        if (Number(localState.ownerGroupId) > 0 && !localState.isPerson) {
           setShowGroups(true)
 
           // Get fractional data based on owner's group id
