@@ -423,7 +423,7 @@ class Report:  # pylint: disable=too-few-public-methods
         # Get source ???
         # Appears in the Description section of the PDF Document Properties as Title.
         self._report_data['meta_title'] = ReportMeta.reports[self._report_key]['metaTitle'].upper()
-        self._report_data['meta_subtitle'] = ReportMeta.reports[self._report_key]['metaSubtitle'].upper()
+        self._report_data['meta_subtitle'] = ReportMeta.reports[self._report_key]['metaSubtitle']
 
         # Appears in the Description section of the PDF Document Properties as Subject.
         if self._report_key in (ReportTypes.SEARCH_DETAIL_REPORT,
