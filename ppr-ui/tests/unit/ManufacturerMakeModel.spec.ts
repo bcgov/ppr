@@ -49,6 +49,9 @@ describe('Other Information component', () => {
 
   it('show error messages for Name of Manufacturer field', async () => {
     const manufacturerSection = wrapper.findComponent(ManufacturerMakeModel)
+    manufacturerSection.find(getTestId('manufacturer-name')).setValue('x')
+    await Vue.nextTick()
+    await Vue.nextTick()
     manufacturerSection.find(getTestId('manufacturer-name')).setValue('')
     await Vue.nextTick()
     await Vue.nextTick()
