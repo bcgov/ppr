@@ -47,6 +47,15 @@ describe('Other Information component', () => {
     manufacturerSection.find(getTestId('manufacturer-model')).exists()
   })
 
+  it('show error messages for Name of Manufacturer field', async () => {
+    const manufacturerSection = wrapper.findComponent(ManufacturerMakeModel)
+    manufacturerSection.find(getTestId('manufacturer-name')).setValue('')
+    await Vue.nextTick()
+    await Vue.nextTick()
+    expect(manufacturerSection.findAll(ERROR_MSG).length).toBe(1)
+    expect(manufacturerSection.findAll(ERROR_MSG).at(0).text()).toContain('Enter a manufacturer')
+    })
+
   it('show error messages for Manufacturer Make Model inputs', async () => {
     const manufacturerSection = wrapper.findComponent(ManufacturerMakeModel)
     manufacturerSection.find(getTestId('manufacturer-name')).setValue('x'.repeat(70))
