@@ -38,10 +38,10 @@
       <v-card flat class="mt-6 pa-6" :class="{ 'border-error-left': validateStaffPayment }">
         <StaffPayment
           id="staff-payment"
-          :staffPaymentData="staffPayment"
-          :validate="isValidatingApp"
+          :validate="true"
           :displaySideLabel="true"
           :displayPriorityCheckbox="true"
+          :staffPaymentData="staffPayment"
           :invalidSection="validateStaffPayment"
           @update:staffPaymentData="onStaffPaymentDataUpdate($event)"
           @valid="staffPaymentValid = $event"
@@ -82,10 +82,8 @@ export default defineComponent({
   },
   props: {},
   setup (props, context) {
-    const { getMhrRegistrationValidationModel, getStaffPayment, isRoleStaffReg } = useGetters<any>([
-      'isRoleStaffReg',
-      'getMhrRegistrationValidationModel',
-      'getStaffPayment'
+    const { getMhrRegistrationValidationModel, isRoleStaffReg } = useGetters<any>([
+      'isRoleStaffReg', 'getMhrRegistrationValidationModel'
     ])
 
     const { setStaffPayment } = useActions<any>(['setStaffPayment'])
