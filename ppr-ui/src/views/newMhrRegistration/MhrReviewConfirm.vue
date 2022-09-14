@@ -38,11 +38,11 @@
       <v-card flat class="mt-6 pa-6" :class="{ 'border-error-left': validateStaffPayment }">
         <StaffPayment
           id="staff-payment"
-          :validate="true"
           :displaySideLabel="true"
           :displayPriorityCheckbox="true"
           :staffPaymentData="staffPayment"
           :invalidSection="validateStaffPayment"
+          :validate="hasStaffPaymentValues || isValidatingApp"
           @update:staffPaymentData="onStaffPaymentDataUpdate($event)"
           @valid="staffPaymentValid = $event"
         />
@@ -111,6 +111,17 @@ export default defineComponent({
         return localState.isValidatingApp &&
           !getValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.STAFF_PAYMENT_VALID)
       }),
+      hasStaffPaymentValues: computed(() => {
+        switch (localState.staffPayment.option) {
+          case StaffPaymentOptions.BCOL:
+            return !!localState.staffPayment.bcolAccountNumber
+          case StaffPaymentOptions.FAS:
+            return !!localState.staffPayment.routingSlipNumber
+          case StaffPaymentOptions.NO_FEE:
+          case StaffPaymentOptions.NONE:
+            return true
+        }
+      }),
       paymentOption: StaffPaymentOptions.NONE,
       staffPaymentValid: false,
       staffPayment: {
@@ -126,15 +137,6 @@ export default defineComponent({
     const onStaffPaymentDataUpdate = (val: StaffPaymentIF) => {
       let staffPaymentData: StaffPaymentIF = {
         ...val
-      }
-
-      if (staffPaymentData.routingSlipNumber || staffPaymentData.bcolAccountNumber || staffPaymentData.datNumber) {
-        localState.staffPaymentValid = true
-      } else {
-        if (staffPaymentData.option !== localState.paymentOption) {
-          localState.staffPaymentValid = false
-          localState.paymentOption = staffPaymentData.option
-        }
       }
 
       switch (staffPaymentData.option) {
