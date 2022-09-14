@@ -196,12 +196,6 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
 
     // remove the owner from the group
     remove(groupToUpdate.owners, o => o.id === owner.id)
-    if (groupToUpdate.owners.length === 0) {
-      groupToUpdate.interest = ''
-      groupToUpdate.interestNumerator = null
-      groupToUpdate.interestTotal = null
-    }
-    remove(groupToUpdate, groupIdOfOwner)
     setMhrRegistrationHomeOwnerGroups(homeOwnerGroups)
   }
 
@@ -296,12 +290,12 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
     () => {
       // set step validation for home owners
       var isHomeOwnersValid = showGroups.value ? !getTotalOwnershipAllocationStatus().hasTotalAllocationError : true
-      if (getMhrRegistrationHomeOwnerGroups.value[0].owners.length === 0) {
+      if (getMhrRegistrationHomeOwnerGroups.value.length === 0 || !getMhrRegistrationHomeOwnerGroups.value.owners) {
         isHomeOwnersValid = false
       }
 
       if (getMhrRegistrationHomeOwnerGroups.value.length === 0 ||
-        ((getMhrRegistrationHomeOwnerGroups.value.length === 1 && getMhrRegistrationHomeOwnerGroups.value[0].interestNumerator === null) &&
+        ((getMhrRegistrationHomeOwnerGroups.value.length === 1 && !getMhrRegistrationHomeOwnerGroups.value[0].address) &&
          getMhrRegistrationHomeOwnerGroups.value[0].owners.length <= 1)) {
         setShowGroups(false)
       } else {

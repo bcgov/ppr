@@ -16,7 +16,7 @@
         <td :colspan="4" class="py-1">
           <TableGroupHeader
             :groupId="group"
-            :owners="hasActualOwners(items) ? items : []"
+            :owners="items"
             :showEditActions="showEditActions"
           />
         </td>
