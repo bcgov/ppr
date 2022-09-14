@@ -62,7 +62,7 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
     if (showGroups.value) {
       // At leas one group showing with one or more owners
       return HomeTenancyTypes.COMMON
-    } else if (numOfOwners === 1) {
+    } else if (numOfOwners === 1 && getMhrRegistrationHomeOwners.value[0].address !== undefined) {
       // One owner without groups showing
       return HomeTenancyTypes.SOLE
     } else if (numOfOwners > 1) {
@@ -196,6 +196,12 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
 
     // remove the owner from the group
     remove(groupToUpdate.owners, o => o.id === owner.id)
+    if (groupToUpdate.owners.length === 0) {
+      groupToUpdate.interest = ''
+      groupToUpdate.interestNumerator = null
+      groupToUpdate.interestTotal = null
+    }
+    remove(groupToUpdate, groupIdOfOwner)
     setMhrRegistrationHomeOwnerGroups(homeOwnerGroups)
   }
 
@@ -294,7 +300,9 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
         isHomeOwnersValid = false
       }
 
-      if (getMhrRegistrationHomeOwnerGroups.value.length === 0) {
+      if (getMhrRegistrationHomeOwnerGroups.value.length === 0 ||
+        ((getMhrRegistrationHomeOwnerGroups.value.length === 1 && getMhrRegistrationHomeOwnerGroups.value[0].interestNumerator === null) &&
+         getMhrRegistrationHomeOwnerGroups.value[0].owners.length <= 1)) {
         setShowGroups(false)
       } else {
         // update group tenancy for all groups
