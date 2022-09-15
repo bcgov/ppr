@@ -4,15 +4,22 @@
       <v-form ref="makeModelComboForm" v-model="makeModelValid">
         <v-row id="mhr-home-manufacturer-name">
           <v-col cols="2">
-            <label class="generic-label" for="manufacturer-name">Manufacturer's Name</label>
+            <label
+              class="generic-label"
+              for="manufacturer-name"
+              :class="{ 'error-text': validate && hasError(nameRef) }"
+            >
+              Manufacturer's Name
+            </label>
           </v-col>
           <v-col cols="10">
             <v-text-field
               id="manufacturer-name"
+              ref="nameRef"
               v-model="manufacturerName"
               filled
-              :rules="maxLength(65)"
-              label="Business Legal Name (Optional)"
+              :rules="manufacturerNameRules"
+              label="Business Legal Name"
               data-test-id="manufacturer-name"
             />
           </v-col>
@@ -142,6 +149,7 @@ export default defineComponent({
   setup (props, context) {
     // Form Refs
     const makeModelComboForm = ref(null)
+    const nameRef = ref(null)
     const yearRef = ref(null)
     const makeRef = ref(null)
     const modelRef = ref(null)
@@ -219,6 +227,13 @@ export default defineComponent({
       )
     )
 
+    const manufacturerNameRules = computed((): Array<Function> =>
+      customRules(
+        required("Enter a manufacturer's name or enter \"Unknown\" "),
+        maxLength(65)
+      )
+    )
+
     const localState = reactive({
       makeModelValid: false,
       manufacturerName: getMhrRegistrationManufacturerName.value,
@@ -261,6 +276,7 @@ export default defineComponent({
 
     return {
       hasError,
+      nameRef,
       yearRef,
       makeRef,
       modelRef,
@@ -268,6 +284,7 @@ export default defineComponent({
       manufactureYearRules,
       makeRules,
       modelRules,
+      manufacturerNameRules,
       maxLength,
       greaterThan,
       ...toRefs(localState)
