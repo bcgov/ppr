@@ -693,7 +693,3 @@ export const getMhrRegistrationHomeOwnerGroups = (state: StateIF): MhrRegistrati
 export const getMhrRegistrationValidationModel = (state: StateIF): MhrValidationStateIF => {
   return state.stateModel.mhrValidationState
 }
-
-export const getMhrSearchResultSelectAllLien = (state: StateIF): boolean => {
-  return state.stateModel.mhrSearchResultSelectAllLien
-}

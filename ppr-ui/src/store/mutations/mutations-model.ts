@@ -398,10 +398,6 @@ export const mutateMhrHomeOwnerGroups = (
   state.stateModel.mhrRegistration.ownerGroups = groups
 }
 
-export const mutateMhrSearchResultSelectAllLien = (state: StateIF, value: boolean) => {
-  state.stateModel.mhrSearchResultSelectAllLien = value
-}
-
 export const mutateMhrTableHistory = (state: StateIF, value: MhRegistrationSummaryIF[]) => {
   state.stateModel.registrationTable.baseMhRegs = value
 }

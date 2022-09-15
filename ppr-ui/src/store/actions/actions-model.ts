@@ -342,10 +342,6 @@ export const setMhrRegistrationHomeOwnerGroups: ActionIF = (
   commit('mutateUnsavedChanges', true)
 }
 
-export const setMhrSearchResultSelectAllLien: ActionIF = ({ commit }, value): void => {
-  commit('mutateMhrSearchResultSelectAllLien', value)
-}
-
 export const setMhrTableHistory: ActionIF = ({ commit }, baseRegs: MhRegistrationSummaryIF[]): void => {
   commit('mutateMhrTableHistory', baseRegs)
 }
