@@ -127,6 +127,12 @@ def test_find_by_id(session, reg_id, has_results, legacy):
             assert report_json.get('notes')
             for note in report_json.get('notes'):
                 assert note['documentDescription']
+            registration.mail_version = True
+            report_json = registration.new_registration_json
+            # current_app.logger.debug(report_json)
+            assert report_json.get('documentId')
+            assert report_json.get('documentRegistrationId')
+            assert report_json.get('documentDescription')
     else:
         assert not registration
 

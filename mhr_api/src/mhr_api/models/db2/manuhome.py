@@ -36,6 +36,7 @@ LEGACY_STATUS_DESCRIPTION = {
     'C': 'HISTORICAL'
 }
 DOCUMENT_TYPE_REG = '101'
+DOCUMENT_TYPE_CONV = 'CONV'
 
 
 class Db2Manuhome(db.Model):
@@ -194,6 +195,7 @@ class Db2Manuhome(db.Model):
             for doc in self.reg_documents:
                 if self.reg_document_id and self.reg_document_id == doc.id:
                     doc_json = doc.registration_json
+                    man_home['documentId'] = doc_json.get('documentId', '')
                     man_home['createDateTime'] = doc_json.get('createDateTime', '')
                     man_home['clientReferenceId'] = doc_json.get('clientReferenceId', '')
                     man_home['attentionReference'] = doc_json.get('attentionReference', '')
@@ -239,7 +241,7 @@ class Db2Manuhome(db.Model):
         if self.reg_documents:
             for doc in self.reg_documents:
                 if self.reg_document_id and self.reg_document_id == doc.id and \
-                        doc.document_type.strip() == DOCUMENT_TYPE_REG:
+                        doc.document_type.strip() in (DOCUMENT_TYPE_REG, DOCUMENT_TYPE_CONV):
                     doc_json = doc.registration_json
                     man_home['documentId'] = doc_json.get('documentId', '')
                     man_home['createDateTime'] = doc_json.get('createDateTime', '')

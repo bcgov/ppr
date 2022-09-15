@@ -1,0 +1,78 @@
+[[macros.html]]
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>{{ meta_title }}</title>
+    <meta charset="UTF-8">
+    <meta name="author" content="BC Registries and Online Services">
+    [[v2/stylePageMail.html]]
+    [[v2/styleMail.html]]
+  </head>
+  <body>
+    <div class="container">
+      <div class="cover-data ml-6">
+{#
+        <table class="cover-data-table mt-4-1" role="presentation">
+#}          
+          {% if cover.line3 %}
+          <table class="cover-data-table mt-0" role="presentation">
+          {% else %}
+          <table class="cover-data-table mt-4-1" role="presentation">
+          {% endif %}
+            <tr>
+              <td>
+                <div>{{ cover.line1 }}</div>
+                <div>{{ cover.line2 }}</div>
+                {% if cover.line3 %}
+                  <div>{{ cover.line3 }}</div>
+                {% endif %}
+                <div>
+                  {% set breaks = cover.line4.split('\n') %}
+                  {% for item in breaks %}
+                     {{ item }}
+                     {% if not loop.last %}
+                        &nbsp;&nbsp;
+                     {% endif %}
+                  {% endfor %}
+                </div>
+              </td>
+            </tr>
+          </table> 
+      </div>
+    </div>
+    <div class="container mt-11 ml-6">
+      <div class="cover-data">Attention/Reference Number:
+        {% if attentionReference is defined and attentionReference != '' %}
+         {{ attentionReference }}
+        {% else %}
+          N/A
+        {% endif %}
+      </div>
+      <div class="cover-data mt-4">
+        Your document has been registered under the Manufactured Home Act, details of which appear
+        on the following page(s). If there are any errors or omissions please contact our office within thirty (30) days.
+      </div>
+      <div class="cover-data mt-4"><span class="cover-data-bold">Manufactured Home Registration Number:</span> {{ mhrNumber }}</div>
+      <div class="cover-data mt-4"><span class="cover-data-bold">Document ID:</span> {{ documentId }}</div>
+      <div class="cover-data"><span class="cover-data-bold">Document Type:</span>
+        {% if documentDescription is defined and documentDescription != '' %}
+         {{ documentDescription }}
+        {% else %}
+          N/A
+        {% endif %}
+      </div>
+      <div class="cover-data"><span class="cover-data-bold">Document Registration Number:</span>
+        {% if documentRegistrationId is defined and documentRegistrationId != '' %}
+         {{ documentRegistrationId }}
+        {% else %}
+          N/A
+        {% endif %}
+      </div>
+      <div class="cover-data"><span class="cover-data-bold">Document Registration Date and Time:</span> {{ createDateTime }}</div>
+      <div class="cover-data mt-4"><span class="cover-data-bold">Examiner:</span> N/A</div>
+      <div class="cover-data"><span class="cover-data-bold">Toll-Free Phone:</span> 1-800-526-1526</div>
+    </div>
+  </div>
+</body>
+</html>

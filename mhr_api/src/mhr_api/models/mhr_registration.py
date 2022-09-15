@@ -49,6 +49,11 @@ FROM_LEGACY_DOC_TYPE = {
     '103': 'REG_103',
     '103E': 'REG_103E'
 }
+DOC_TYPE_REPORT_DESCRIPTION = {
+    '101': 'Register New Unit',
+    'CONV': 'Register New Unit',
+    'DEFAULT': ''
+}
 
 
 class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes, too-many-public-methods
@@ -83,6 +88,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
     draft_number: str = None
     doc_reg_number: str = None
     manuhome: Db2Manuhome = None
+    mail_version: bool = False
 
     @property
     def json(self) -> dict:
@@ -113,6 +119,26 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                     if doc_type_info:
                         doc_desc = doc_type_info.document_type_desc
                     note['documentDescription'] = doc_desc
+            return reg_json
+        return self.json
+
+    @property
+    def new_registration_json(self) -> dict:
+        """Return the new registration version of the registration as a json object."""
+        if self.manuhome:
+            reg_json = self.manuhome.new_registration_json
+            if self.mail_version and self.manuhome.reg_documents:
+                reg_doc = None
+                for doc in self.manuhome.reg_documents:
+                    if self.manuhome.reg_document_id and self.manuhome.reg_document_id == doc.id:
+                        reg_doc = doc
+                if reg_doc:
+                    reg_json['documentRegistrationId'] = reg_doc.document_reg_id
+                    doc_type = reg_doc.document_type
+                    if doc_type in DOC_TYPE_REPORT_DESCRIPTION:
+                        reg_json['documentDescription'] = DOC_TYPE_REPORT_DESCRIPTION[doc_type]
+                    else:
+                        reg_json['documentDescription'] = ''
             return reg_json
         return self.json
 

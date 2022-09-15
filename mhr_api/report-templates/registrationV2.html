@@ -6,15 +6,24 @@
     <title>{{ meta_title }}</title>
     <meta charset="UTF-8">
     <meta name="author" content="BC Registries and Online Services">
-    {% if environment == '' %}
-      [[v2/stylePageRegistration.html]]
+    {% if cover is not defined %}
+      {% if environment == '' %}
+        [[v2/stylePageRegistration.html]]
+      {% else %}
+        [[v2/stylePageDraft.html]]
+      {% endif %}
+      [[v2/style.html]]
     {% else %}
-      [[v2/stylePageDraft.html]]
+      [[v2/stylePageMail.html]]
+      [[v2/styleMail.html]]
     {% endif %}
-    [[v2/style.html]]
   </head>
   <body>
+    {% if cover is not defined %}
   <div class="business-details-container mtn-2">
+    {% else %}
+  <div class="business-details-container mtn-25">
+      {% endif %}
     <table class="business-details-table-grey mt-0" role="presentation">
       <tr>
         <td>Registration Type:</td>
@@ -57,14 +66,7 @@
 #}
     </table>
   </div>
-{#
-  <div class="no-page-break">
-    <div class="separator-header mt-6"></div>
-    <div class="section-title-centre mt-2">CURRENT REGISTRATION INFORMATION</div>
-    <div class="section-statement mt-0">(as of {{searchDateTime}})</div>
-    <div class="separator-header mt-2"></div>
-  </div>
-#}
+
   <div class="container pt-4">
     [[registration/owners.html]]
     [[registration/location.html]]
@@ -93,8 +95,9 @@
 
     [[registration/submittingParty.html]]
   </div>
-
-  <p class="last-page"></p>
-</body>
+  {% if cover is not defined %}
+    <p class="last-page"></p>
+  {% endif %}
+  </body>
 </html>
 

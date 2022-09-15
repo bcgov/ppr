@@ -58,6 +58,8 @@ class Report:  # pylint: disable=too-few-public-methods
         if self._report_key == ReportTypes.SEARCH_DETAIL_REPORT:
             current_app.logger.debug('Search report generating TOC page numbers as a second report api call.')
             return self.get_search_pdf()
+        if self._report_key == ReportTypes.MHR_REGISTRATION_MAIL:
+            return self.get_registration_mail_pdf()
         current_app.logger.debug('Account {0} report type {1} setting up report data.'
                                  .format(self._account_id, self._report_key))
         data = self._setup_report_data()
@@ -117,6 +119,61 @@ class Report:  # pylint: disable=too-few-public-methods
         if response.status_code != HTTPStatus.OK:
             content = ResourceErrorCodes.REPORT_ERR + ': ' + response.content.decode('ascii')
             current_app.logger.error('Account {0} response status: {1} error: {2}.'
+                                     .format(self._account_id, response.status_code, content))
+            return jsonify(message=content), response.status_code, None
+        return response.content, response.status_code, {'Content-Type': 'application/pdf'}
+
+    def get_registration_mail_pdf(self):
+        """Render a mail registration report with cover letter."""
+        current_app.logger.debug('Account {0} setting up mail reg report data.'.format(self._account_id,))
+        create_ts = self._report_data['createDateTime']
+        # 1: Generate the cover page report.
+        self._report_key = ReportTypes.MHR_COVER
+        data = self._setup_report_data()
+        url = current_app.config.get('REPORT_SVC_URL') + SINGLE_URI
+        meta_data = report_utils.get_report_meta_data(self._report_key)
+        files = report_utils.get_report_files(data, self._report_key, True)
+        headers = {}
+        token = GoogleAuthService.get_report_api_token()
+        if token:
+            headers['Authorization'] = 'Bearer {}'.format(token)
+        response_cover = requests.post(url=url, headers=headers, data=meta_data, files=files)
+        current_app.logger.debug('Account {0} report type {1} response status: {2}.'
+                                 .format(self._account_id, self._report_key, response_cover.status_code))
+        if response_cover.status_code != HTTPStatus.OK:
+            content = ResourceErrorCodes.REPORT_ERR + ': ' + response_cover.content.decode('ascii')
+            current_app.logger.error('Account {0} response status: {1} error: {2}.'
+                                     .format(self._account_id, response_cover.status_code, content))
+            return jsonify(message=content), response_cover.status_code, None
+
+        # 2: Generate the registration pdf.
+        self._report_key = ReportTypes.MHR_REGISTRATION
+        self._report_data['createDateTime'] = create_ts
+        data = self._setup_report_data()
+        current_app.logger.debug('Account {0} report type {1} calling report-api {2}.'
+                                 .format(self._account_id, self._report_key, url))
+        meta_data = report_utils.get_report_meta_data(self._report_key)
+        files = report_utils.get_report_files(data, self._report_key, True)
+        response_reg = requests.post(url=url, headers=headers, data=meta_data, files=files)
+        current_app.logger.debug('Account {0} report type {1} response status: {2}.'
+                                 .format(self._account_id, self._report_key, response_reg.status_code))
+        if response_reg.status_code != HTTPStatus.OK:
+            content = ResourceErrorCodes.REPORT_ERR + ': ' + response_reg.content.decode('ascii')
+            current_app.logger.error('Account {0} response status: {1} error: {2}.'
+                                     .format(self._account_id, response_reg.status_code, content))
+            return jsonify(message=content), response_reg.status_code, None
+        # 3: Merge cover leter and registraiton reports.
+        url = current_app.config.get('REPORT_SVC_URL') + MERGE_URI
+        files = {
+            'pdf1.pdf': response_cover.content,
+            'pdf2.pdf': response_reg.content
+        }
+        response = requests.post(url=url, headers=headers, files=files)
+        current_app.logger.debug('Merge cover and registration reports response status: {0}.'
+                                 .format(response.status_code))
+        if response.status_code != HTTPStatus.OK:
+            content = ResourceErrorCodes.REPORT_ERR + ': ' + response.content.decode('ascii')
+            current_app.logger.error('Account {0} merge response status: {1} error: {2}.'
                                      .format(self._account_id, response.status_code, content))
             return jsonify(message=content), response.status_code, None
         return response.content, response.status_code, {'Content-Type': 'application/pdf'}
@@ -187,8 +244,10 @@ class Report:  # pylint: disable=too-few-public-methods
         template_path = current_app.config.get('REPORT_TEMPLATE_PATH')
         template_parts = [
             'v2/style',
+            'v2/styleMail',
             'v2/stylePage',
             'v2/stylePageDraft',
+            'v2/stylePageMail',
             'v2/stylePageRegistration',
             'stylePageMail',
             'logo',
@@ -245,6 +304,9 @@ class Report:  # pylint: disable=too-few-public-methods
         self._set_meta_info()
         if self._report_key == ReportTypes.SEARCH_TOC_REPORT:
             self._set_selected()
+        elif self._report_key == ReportTypes.MHR_COVER:
+            self._report_data['cover'] = report_utils.set_cover(self._report_data)
+            self._report_data['createDateTime'] = Report._to_report_datetime(self._report_data['createDateTime'])
         else:
             self._set_addresses()
             self._set_date_times()
@@ -341,6 +403,8 @@ class Report:  # pylint: disable=too-few-public-methods
         """Replace registration addresses country code with description."""
         if self._report_data:
             reg = self._report_data
+            if reg.get('submittingParty'):
+                Report._format_address(reg['submittingParty']['address'])
             if reg.get('ownerGroups'):
                 for group in reg['ownerGroups']:
                     for owner in group['owners']:
@@ -444,7 +508,7 @@ class Report:  # pylint: disable=too-few-public-methods
                 self._report_data['footer_content'] = f'MHR Number Search - "{criteria}"'
             else:
                 self._report_data['footer_content'] = f'MHR {search_desc} Search - "{criteria}"'
-        elif self._report_key == ReportTypes.MHR_REGISTRATION:
+        elif self._report_key in (ReportTypes.MHR_REGISTRATION, ReportTypes.MHR_COVER):
             reg_num = self._report_data.get('mhrNumber', '')
             self._report_data['footer_content'] = f'Manufactured Home Registration #{reg_num}'
             self._report_data['meta_subject'] = f'Manufactured Home Registration Number: {reg_num}'
@@ -491,6 +555,13 @@ class ReportMeta:  # pylint: disable=too-few-public-methods
     """Helper class to maintain the report meta information."""
 
     reports = {
+        ReportTypes.MHR_COVER: {
+            'reportDescription': 'MHRCover',
+            'fileName': 'coverV2',
+            'metaTitle': 'VERIFICATION OF SERVICE',
+            'metaSubtitle': 'Manufactured Home Registry',
+            'metaSubject': ''
+        },
         ReportTypes.MHR_REGISTRATION: {
             'reportDescription': 'MHRRegistration',
             'fileName': 'registrationV2',
