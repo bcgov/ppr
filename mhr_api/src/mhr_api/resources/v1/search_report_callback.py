@@ -17,7 +17,7 @@ from http import HTTPStatus
 import json
 
 # import requests
-from flask import Blueprint, current_app  # , jsonify, request
+from flask import Blueprint, current_app, request
 from flask_cors import cross_origin
 
 from mhr_api.exceptions import DatabaseException
@@ -55,6 +55,10 @@ def post_search_report_callback(  # pylint: disable=too-many-branches,too-many-l
         current_app.logger.info(f'Search report callback starting id={search_id}.')
         if search_id is None:
             return resource_utils.path_param_error_response('search ID')
+
+        # Authenticate with request api key
+        if not resource_utils.valid_api_key(request):
+            return resource_utils.unauthorized_error_response('MHR search report callback')
 
         # If exceeded max retries we're done.
         event_count: int = 0
