@@ -1,5 +1,4 @@
-import { reactive, toRefs, watch } from '@vue/composition-api'
-import _ from 'lodash'
+import { reactive, toRefs } from '@vue/composition-api'
 import { StatusTypes } from '@/resources'
 import {
   APIAmendmentTypes,
@@ -44,7 +43,7 @@ export const useRegistration = (setSort: RegistrationSortIF) => {
   const getStatusDescription = (status: APIStatusTypes): string => {
     if (!status) return UIStatusTypes.DRAFT
     for (let i = 0; i < StatusTypes.length; i++) {
-      if (StatusTypes[i].value === status) {
+      if (StatusTypes[i].value === status || StatusTypes[i].mhrValue === status) {
         return StatusTypes[i].text
       }
     }

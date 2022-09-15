@@ -112,7 +112,7 @@ describe('Ppr registration table tests', () => {
     wrapper = mount(RegistrationsWrapper, {
       localVue,
       store,
-      propsData: { appReady: true },
+      propsData: { appReady: true, isPpr: true },
       router,
       vuetify,
       stubs: {
@@ -135,7 +135,7 @@ describe('Ppr registration table tests', () => {
     const header = wrapper.findAll(myRegHeader)
     expect(header.length).toBe(1)
     expect(header.at(0).text()).toContain(
-      `Registrations (${parentDrafts.length + myRegHistoryWithChildren.length})`
+      `Personal Property Registrations  (${parentDrafts.length + myRegHistoryWithChildren.length})`
     )
     // expect(wrapper.find(myRegTblFilter).exists()).toBe(true)
     expect(wrapper.find(myRegTblColSelection).exists()).toBe(true)

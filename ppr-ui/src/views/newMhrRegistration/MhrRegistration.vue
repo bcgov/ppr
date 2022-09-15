@@ -162,7 +162,7 @@ export default defineComponent({
       })
     }
 
-    onMounted((): void => {
+    onMounted( (): void => {
       // do not proceed if app is not ready
       // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
       if (!props.appReady || !localState.isAuthenticated ||

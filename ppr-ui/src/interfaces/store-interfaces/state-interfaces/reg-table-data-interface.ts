@@ -1,6 +1,7 @@
-import { DraftResultIF, RegistrationSortIF, RegistrationSummaryIF } from '@/interfaces'
+import { DraftResultIF, MhRegistrationSummaryIF, RegistrationSortIF, RegistrationSummaryIF } from '@/interfaces'
 export interface RegTableDataI {
   baseRegs: RegistrationSummaryIF[]
+  baseMhRegs: MhRegistrationSummaryIF[]
   draftsBaseReg: DraftResultIF[]
   draftsChildReg: DraftResultIF[]
   newItem: RegTableNewItemI

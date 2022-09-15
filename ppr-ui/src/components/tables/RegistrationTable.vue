@@ -53,7 +53,7 @@
                   </span>
                 </v-col>
               </v-row>
-              <v-row class="my-reg-filter pl-3 pt-2" no-gutters>
+              <v-row v-if="isPpr" class="my-reg-filter pl-3 pt-2" no-gutters>
                 <v-col>
                   <v-text-field
                     v-if="header.value === 'registrationNumber'"
@@ -199,6 +199,7 @@
           :setHeaders="headers"
           :setIsExpanded="isExpanded || isNewRegParentItem(item)"
           :setItem="item"
+          :isPpr="isPpr"
           @action="emitRowAction($event)"
           @error="emitError($event)"
           @freezeScroll="freezeTableScroll = $event"
@@ -210,6 +211,7 @@
           v-for="change in item.changes"
           :key="`change-${change.documentId || change.registrationNumber}`"
           :ref="setRowRef(change)"
+          :isPpr="isPpr"
           :setAddRegEffect="['newRegItem', 'newAndFirstItem'].includes(setRowRef(change))"
           :setDisableActionShadow="overrideWidth"
           :setChild="true"
@@ -275,6 +277,14 @@ export default defineComponent({
     TableRow
   },
   props: {
+    isPpr: {
+      type: Boolean,
+      default: false
+    },
+    isMhr: {
+      type: Boolean,
+      default: false
+    },
     setHeaders: {
       default: [] as BaseHeaderIF[]
     },

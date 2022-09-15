@@ -169,6 +169,7 @@ export const stateModel: StateModelIF = {
   },
   registrationTable: {
     baseRegs: [],
+    baseMhRegs: [],
     draftsBaseReg: [],
     draftsChildReg: [],
     newItem: {

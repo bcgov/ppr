@@ -407,7 +407,6 @@ export const registrationTableHeaders: Array<BaseHeaderIF> = [
     value: 'securedParties',
     display: false
   },
-
   {
     class: 'min-column-mds',
     sortable: true,
@@ -415,6 +414,7 @@ export const registrationTableHeaders: Array<BaseHeaderIF> = [
     value: 'clientReferenceId',
     display: false
   },
+
   {
     class: 'min-column-sm',
     sortable: false,
@@ -436,6 +436,87 @@ export const registrationTableHeaders: Array<BaseHeaderIF> = [
     value: 'actions',
     display: true
   }
+]
+
+export const mhRegistrationTableHeaders: Array<BaseHeaderIF> = [
+  {
+    class: 'min-column-md',
+    sortable: false,
+    text: 'Registration Number',
+    value: 'mhrNumber',
+    display: true
+  },
+  {
+    class: 'min-column-md',
+    sortable: false,
+    text: 'Registration Type',
+    value: 'registrationDescription',
+    display: true
+  },
+  {
+    class: 'min-column-md',
+    sortable: false,
+    text: 'Date (Pacific Time)',
+    value: 'createDateTime',
+    display: true
+  },
+  {
+    class: 'min-column-sm',
+    sortable: false,
+    text: 'Status',
+    value: 'statusType',
+    display: true
+  },
+  {
+    class: 'min-column-sm',
+    sortable: false,
+    text: 'Username',
+    value: 'registeringName',
+    display: true
+  },
+  {
+    class: 'min-column-mds',
+    sortable: false,
+    text: 'Registering Party',
+    value: 'registeringParty',
+    display: true
+  },
+  {
+    class: 'min-column-mds',
+    sortable: false,
+    text: 'Owners',
+    value: 'ownerNames',
+    display: true
+  },
+  {
+    class: 'min-column-mds',
+    sortable: false,
+    text: 'Folio/Reference Number',
+    value: 'clientReferenceId',
+    display: true
+  },
+  {
+    class: 'min-column-sm',
+    sortable: false,
+    text: 'Days to Expiry (Pacific Time)',
+    value: 'expireDays',
+    display: true
+  },
+  {
+    class: 'min-column-sms',
+    sortable: false,
+    text: 'Documents',
+    value: 'vs',
+    display: true
+  }
+  // TODO: Implement Actions when required
+  // {
+  //   class: 'registration-action',
+  //   sortable: false,
+  //   text: 'Actions',
+  //   value: 'actions',
+  //   display: true
+  // }
 ]
 
 export const mhSearchNameHeaders: Array<BaseHeaderIF> = [
