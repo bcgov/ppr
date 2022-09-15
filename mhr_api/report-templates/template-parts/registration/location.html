@@ -2,23 +2,39 @@
 <div class="no-page-break">
     <div class="separator mt-5"></div>
     <div class="section-title mt-3">Registered Location</div>
-    <table class="section-data section-data-table mt-4" role="presentation">
+    <table class="section-data section-data-table-new mt-4" role="presentation">
+    {% if location.dealerName is defined and location.dealerName != '' %}
         <tr class="no-page-break">
             <td class="col-33">
-                {% if location.parkName is defined and location.parkName != '' %}
-                   <div class="section-sub-title">{{ location.parkName }}</div>
-                {% endif %}
-                {% if location.dealerName is defined and location.dealerName != '' %}
-                    <div class="section-sub-title">Dealer/Manufacturer</div>
-                    <div class="pt-2">{{  location.dealerName }}</div>
-                {% endif %}
+                <div class="section-sub-title">Dealer/Manufacturer</div>
+                <div class="pt-2">{{  location.dealerName }}</div>
             </td>
             <td class="col-33">
                 <div class="section-sub-title">Address</div>
                 <div class="pt-2">{{ location.address.street }}</div>
                 <div>{{ location.address.streetAdditional }}</div>
                 <div>{{ location.address.city }} 
-                     {{ location.address.region }}</div>
+                    {{ location.address.region }}</div>
+                <div>
+                    {% if location.address.postalCode is defined and location.address.postalCode != '' %}
+                        {{ location.address.postalCode }}&nbsp;&nbsp; 
+                    {% endif %}
+                    {{ location.address.country }}
+                </div>
+            </td>
+            <td class="col-33">&nbsp;</td>
+        </tr>
+    {% elif location.parkName is defined and location.parkName != '' %}
+        <tr class="no-page-break">
+            <td class="col-33">
+                <div class="section-sub-title">{{ location.parkName }}</div>
+            </td>
+            <td class="col-33">
+                <div class="section-sub-title">Address</div>
+                <div class="pt-2">{{ location.address.street }}</div>
+                <div>{{ location.address.streetAdditional }}</div>
+                <div>{{ location.address.city }} 
+                    {{ location.address.region }}</div>
                 <div>
                     {% if location.address.postalCode is defined and location.address.postalCode != '' %}
                         {{ location.address.postalCode }}&nbsp;&nbsp; 
@@ -27,14 +43,100 @@
                 </div>
             </td>
             <td class="col-33">
+                <div class="section-sub-title">Pad</div>
                 {% if location.pad is defined and location.pad != '' %}
-                    <div class="section-sub-title">Pad Number</div>
-                    <div class="pt-2">
-                        {{ location.pad }}
-                    </div>
+                    <div class="pt-2">{{ location.pad }}</div>
+                {% else %} 
+                    <div class="pt-2">N/A</div>
                 {% endif %} 
             </td>
-         </tr>
+        </tr>
+    {% else %} 
+        <tr class="no-page-break">
+            <td class="col-33">
+                <div class="section-sub-title">Location Type</div>
+                <div class="pt-2">N/A</div>
+            </td>
+            <td class="col-33">
+                <div class="section-sub-title">Address</div>
+                <div class="pt-2">{{ location.address.street }}</div>
+                <div>{{ location.address.streetAdditional }}</div>
+                <div>{{ location.address.city }} 
+                    {{ location.address.region }}</div>
+                <div>
+                    {% if location.address.postalCode is defined and location.address.postalCode != '' %}
+                        {{ location.address.postalCode }}&nbsp;&nbsp; 
+                    {% endif %}
+                    {{ location.address.country }}
+                </div>
+            </td>
+            <td class="col-33">
+                {% if location.pidNumber is defined and (location.pidNumber != '' or location.hasLTSAInfo) %}
+                    <div class="section-sub-title">Parcel ID Number</div>
+                    {% if location.pidNumber is defined and location.pidNumber != '' %}
+                        <div class="pt-2">{{ location.pidNumber }}</div>
+                    {% else %}
+                        <div class="pt-2">N/A</div>
+                    {% endif %} 
+                {% endif %} 
+            </td>
+        </tr>
+    {% endif %}
+
+    {% if location.hasLTSAInfo or (location.additionalDescription is defined and location.additionalDescription != '') %}
+    <tr class="no-page-break">
+        <td class="pt-3 pb-2">
+            <div class="section-sub-title">Legal Description</div>
+        </td>
+    </tr>
+    <tr class="no-page-break">
+        <td class="col-33">
+            {% if location.lot is defined and location.lot != '' %}
+                <div>LOT: {{ location.lot }}</div>
+            {% endif %} 
+            {% if location.landDistrict is defined and location.landDistrict != '' %}
+                <div>LAND DISTRICT: {{ location.landDistrict }}</div>
+            {% endif %} 
+            {% if location.plan is defined and location.plan != '' %}
+                <div>PLAN: {{ location.plan }}</div>
+            {% endif %} 
+            {% if location.districtLot is defined and location.districtLot != '' %}
+                <div>DISTRICT LOT: {{ location.districtLot }}</div>
+            {% endif %} 
+            {% if location.partOf is defined and location.partOf != '' %}
+                <div>PART OF: {{ location.partOf }}</div>
+            {% endif %} 
+            {% if location.section is defined and location.section != '' %}
+                <div>SECTION: {{ location.section }}</div>
+            {% endif %} 
+            {% if location.township is defined and location.township != '' %}
+                <div>TOWNSHIP: {{ location.township }}</div>
+            {% endif %} 
+            {% if location.range is defined and location.range != '' %}
+                <div>RANGE: {{ location.range }}</div>
+            {% endif %} 
+            {% if location.meridian is defined and location.meridian != '' %}
+                <div>MERIDIAN: {{ location.meridian }}</div>
+            {% endif %} 
+            {% if location.parcel is defined and location.parcel != '' %}
+                <div>PARCEL: {{ location.parcel }}</div>
+            {% endif %} 
+            {% if location.block is defined and location.block != '' %}
+                <div>BLOCK: {{ location.block }}</div>
+            {% endif %} 
+        </td>
+        <td colspan="2">
+            {% if location.exceptionPlan is defined and location.exceptionPlan != '' %}
+                <div>EXCEPT PLAN:</div>
+                <div class="pb-2">{{ location.exceptionPlan }}</div>
+            {% endif %} 
+            {% if location.additionalDescription is defined and location.additionalDescription != '' %}
+                <div>ADDITIONAL DESCRIPTION:</div>
+                <div>{{ location.additionalDescription }}</div>
+            {% endif %} 
+        </td>
+    </tr>
+    {% endif %}
     </table>
 </div>
 {% endif %}

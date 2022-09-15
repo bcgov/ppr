@@ -1,0 +1,34 @@
+{% if submittingParty is defined  %}
+<div class="no-page-break">
+    <div class="separator mt-5"></div>
+    <div class="section-title mt-3">Submitting Party Information</div>
+    <table class="section-data section-data-table-new mt-4" role="presentation">
+        <tr class="no-page-break">
+            <td class="col-33">
+                <div class="section-sub-title">
+                    {% if submittingParty.businessName is defined %}
+                        {{ submittingParty.businessName }}
+                    {% elif submittingParty.personName is defined %}
+                        {{ submittingParty.personName.last }},
+                        {{ submittingParty.personName.first }}
+                        {% if submittingParty.personName.middle is defined %}
+                            &nbsp;{{ submittingParty.personName.middle }}
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </td>
+            <td class="col-33">
+                <div class="section-sub-title">Address</div>
+                <div class="pt-2">{{ submittingParty.address.street }}</div>
+                <div>{{ submittingParty.address.streetAdditional }}</div>
+                <div>{{ submittingParty.address.city }} 
+                     {{ submittingParty.address.region }}</div>
+                <div>{{ submittingParty.address.postalCode }} 
+                     {{ submittingParty.address.country }}</div>
+            </td>
+            <td class="col-33">
+            </td>
+         </tr>
+</table>
+</div>
+{% endif %}

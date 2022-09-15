@@ -13,8 +13,8 @@
     "csaStandard": "Z240", 
     "engineerName": "", 
     "manufacturer": "STARLINE", 
-    "otherRemarks": "BC SAFETY AUTHORITY #339556, PERMIT# EL-721296-2018", 
-    "rebuiltRemarks": "REBUILT AS A DOUBLE WIDE, MAKE/MODEL CUSTOM, YEAR 1995", 
+    "otherRemarks": "", 
+    "rebuiltRemarks": "", 
     "sectionCount": 1, 
     "sections": [
       {
@@ -26,9 +26,11 @@
       }
     ]
   }, 
-  "documentId": "UT-00007", 
+  "documentId": "40590422",
+  "documentRegistrationId": "00022911", 
+  "documentDescription": "Register New Unit", 
   "location": {
-    "additionalDescription": "SPALLUMCHEEN INDIAN RESERVE NO. 2", 
+    "additionalDescription": "", 
     "address": {
       "city": "VICTORIA", 
       "country": "CA", 
@@ -40,21 +42,21 @@
     "dealerName": "NOR-TEC DESIGN GROUP LTD.", 
     "districtLot": "", 
     "exceptionPlan": "", 
-    "landDistrict": "PEACE RIVER", 
+    "landDistrict": "", 
     "leaveProvince": false, 
-    "lot": "3", 
+    "lot": "", 
     "meridian": "", 
-    "pad": "20", 
-    "parcel": "A (69860M)", 
-    "parkName": "HIDDEN VALLEY TRAILER COURT", 
+    "pad": "", 
+    "parcel": "", 
+    "parkName": "", 
     "partOf": "", 
-    "pidNumber": "011625490", 
+    "pidNumber": "", 
     "plan": "", 
-    "range": "16", 
-    "section": "34", 
+    "range": "", 
+    "section": "", 
     "status": "ACTIVE", 
     "taxCertificate": false, 
-    "township": "78"
+    "township": ""
   }, 
   "mhrNumber": "150075", 
   "ownerGroups": [

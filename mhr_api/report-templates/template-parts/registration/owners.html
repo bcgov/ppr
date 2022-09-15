@@ -2,24 +2,25 @@
 {% if ownerGroups is defined %}
     {% if ownerGroups|length > 1 %}
     <div class="no-page-break mt-3">
-        <span class="section-sub-title">Home Tenancy Type:&nbsp;</span>
+        <span class="section-sub-title">Home Tenancy Type:</span>
         <span class="section-data">Tenants in Common</span>
     </div>
+    <div class="separator-section mt-3"></div>
     {% endif %}
     {% for group in ownerGroups %}
         {% if ownerGroups|length > 1 %}
         <div class="mt-3">
             <span class="section-sub-title">Group {{ group.groupId }}:&nbsp;</span>
             {% if group.interest is defined and group.interest != '' %}
-                <span class="section-data">Interest&nbsp;{{ group.interest }}</span>
+                <span class="section-data">Interest {{ group.interest|lower }}</span>
             {% endif %}
         </div>
         {% endif %}
-        <table class="section-data section-data-table mt-4" role="presentation">
+        <table class="section-data section-data-table-new mt-4" role="presentation">
             {% for party in group.owners %}
             <tr class="no-page-break">
                 <td class="col-33">
-                    <div class="section-sub-title">
+                    <div class="section-sub-title pr-6">
                         {% if party.organizationName is defined %}
                             {{ party.organizationName }}
                         {% elif party.individualName is defined %}
@@ -28,6 +29,9 @@
                             {% if party.individualName.middle is defined %}&nbsp;{{ party.individualName.middle }}{% endif %}
                         {% endif %}
                     </div>
+                    {% if party.suffix is defined and party.suffix != '' %}
+                    <div class="pt-2">{{ party.suffix }}</div>
+                    {% endif %} 
                 </td>
                 <td class="col-33">
                     <div class="section-sub-title">Address</div>
@@ -54,8 +58,11 @@
                     </div>
                 </td>
             </tr>
+            {% if not loop.last %}
+                <tr><td colspan="3"><div class="mt-4"></div></td></tr>            
+            {% endif %}
         {% endfor %}
-        </table>
+        </table> 
         {% if not loop.last %}
             <div class="separator-section mt-4 mb-1"></div>
          {% endif %}

@@ -11,7 +11,8 @@
     }, 
     "csaNumber": "786356", 
     "csaStandard": "Z240", 
-    "engineerName": "", 
+    "engineerName": "Dave Smith ENG. LTD.", 
+    "engineerDate": "2018-02-22T07",
     "manufacturer": "STARLINE", 
     "otherRemarks": "BC SAFETY AUTHORITY #339556, PERMIT# EL-721296-2018", 
     "rebuiltRemarks": "REBUILT AS A DOUBLE WIDE, MAKE/MODEL CUSTOM, YEAR 1995", 
@@ -28,7 +29,7 @@
   }, 
   "documentId": "UT-00007", 
   "location": {
-    "additionalDescription": "", 
+    "additionalDescription": "LEGAL SUBDIVISION 8", 
     "address": {
       "city": "VICTORIA", 
       "country": "CA", 
@@ -36,32 +37,32 @@
       "region": "BC", 
       "street": "940 BLANSHARD STREET"
     }, 
-    "block": "", 
+    "block": "87", 
     "dealerName": "", 
-    "districtLot": "", 
-    "exceptionPlan": "", 
-    "landDistrict": "", 
+    "districtLot": "1290", 
+    "exceptionPlan": "H14991, B7426 & KAP47383", 
+    "landDistrict": "PEACE RIVER", 
     "leaveProvince": false, 
-    "lot": "", 
-    "meridian": "", 
-    "pad": "20", 
-    "parcel": "", 
-    "parkName": "HIDDEN VALLEY TRAILER COURT", 
-    "partOf": "", 
-    "pidNumber": "", 
-    "plan": "", 
-    "range": "", 
-    "section": "", 
+    "lot": "3", 
+    "meridian": "W6M", 
+    "pad": "", 
+    "parcel": "A (69860M)", 
+    "parkName": "", 
+    "partOf": "WEST 1/2", 
+    "pidNumber": "011625490", 
+    "plan": "39062", 
+    "range": "16", 
+    "section": "34", 
     "status": "ACTIVE", 
     "taxCertificate": false, 
-    "township": ""
+    "township": "78"
   }, 
   "mhrNumber": "150075", 
   "ownerGroups": [
     {
-      "groupId": 1, 
-      "interest": "UNDIVIDED 4/5", 
-      "interestNumerator": 4, 
+      "groupId": 2, 
+      "interest": "", 
+      "interestNumerator": 0, 
       "owners": [
         {
           "address": {
@@ -74,40 +75,31 @@
           "individualName": {
             "first": "MARY-ANNE", 
             "last": "BICKNELL"
-          }, 
+          },
+          "suffix": "STEPHENIE", 
           "phoneNumber": "604462027", 
-          "type": "COMMON"
-        }
-      ], 
-      "status": "ACTIVE", 
-      "tenancySpecified": true, 
-      "type": "COMMON"
-    }, 
-    {
-      "groupId": 2, 
-      "interest": "UNDIVIDED 1/5", 
-      "interestNumerator": 1, 
-      "owners": [
+          "type": "JOINT"
+        },
         {
-          "address": {
-            "city": "LANGLEY", 
-            "country": "CA", 
-            "postalCode": "V3A 6H4", 
-            "region": "BC", 
-            "street": "6665 238TH STREET"
-          }, 
-          "individualName": {
-            "first": "JOHN", 
-            "last": "CONNOLLY", 
-            "middle": "STEVEN"
-          }, 
-          "phoneNumber": "604462027", 
-          "type": "COMMON"
-        }
-      ], 
+            "address": {
+              "city": "LANGLEY", 
+              "country": "CA", 
+              "postalCode": "V3A 6H4", 
+              "region": "BC", 
+              "street": "6665 238TH STREET"
+            }, 
+            "individualName": {
+              "first": "JOHN", 
+              "last": "CONNOLLY", 
+              "middle": "STEVEN"
+            }, 
+            "phoneNumber": "604462027", 
+            "type": "JOINT"
+          }
+        ], 
       "status": "ACTIVE", 
       "tenancySpecified": true, 
-      "type": "COMMON"
+      "type": "JOINT"
     }
   ], 
   "payment": {

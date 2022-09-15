@@ -29,6 +29,10 @@ REGISTRATON_SOLE_DATAFILE = 'tests/unit/reports/data/registration-sole-example.j
 REGISTRATON_SOLE_PDFFILE = 'tests/unit/reports/data/registration-sole-example.pdf'
 REGISTRATON_COMMON_DATAFILE = 'tests/unit/reports/data/registration-common-example.json'
 REGISTRATON_COMMON_PDFFILE = 'tests/unit/reports/data/registration-common-example.pdf'
+REGISTRATON_JOINT_DATAFILE = 'tests/unit/reports/data/registration-joint-example.json'
+REGISTRATON_JOINT_PDFFILE = 'tests/unit/reports/data/registration-joint-example.pdf'
+REGISTRATON_MAIL_PDFFILE = 'tests/unit/reports/data/registration-mail-example.pdf'
+REGISTRATON_COVER_PDFFILE = 'tests/unit/reports/data/registration-cover-example.pdf'
 REPORT_VERSION_V2 = '2'
 
 
@@ -56,6 +60,45 @@ def test_registration_common(session, client, jwt):
         assert headers
         # verify
         check_response(content, status, REGISTRATON_COMMON_PDFFILE)
+
+
+def test_registration_joint(session, client, jwt):
+    """Assert that generation of an owner joint tenants type report is as expected."""
+    # setup
+    if is_report_v2():
+        json_data = get_json_from_file(REGISTRATON_JOINT_DATAFILE)
+        report = Report(json_data, 'PS12345', ReportTypes.MHR_REGISTRATION, 'Account Name')
+        # test
+        content, status, headers = report.get_pdf()
+        assert headers
+        # verify
+        check_response(content, status, REGISTRATON_JOINT_PDFFILE)
+
+
+def test_cover_registration(session, client, jwt):
+    """Assert that generation of a mail cover page report is as expected."""
+    # setup
+    if is_report_v2():
+        json_data = get_json_from_file(REGISTRATON_SOLE_DATAFILE)
+        report = Report(json_data, 'PS12345', ReportTypes.MHR_COVER, 'Account Name')
+        # test
+        content, status, headers = report.get_pdf()
+        assert headers
+        # verify
+        check_response(content, status, REGISTRATON_COVER_PDFFILE)
+
+
+def test_mail_registration(session, client, jwt):
+    """Assert that generation of a mail report is as expected."""
+    # setup
+    if is_report_v2():
+        json_data = get_json_from_file(REGISTRATON_SOLE_DATAFILE)
+        report = Report(json_data, 'PS12345', ReportTypes.MHR_REGISTRATION_MAIL, 'Account Name')
+        # test
+        content, status, headers = report.get_pdf()
+        assert headers
+        # verify
+        check_response(content, status, REGISTRATON_MAIL_PDFFILE)
 
 
 def get_json_from_file(data_file: str):
