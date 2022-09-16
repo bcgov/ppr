@@ -38,6 +38,5 @@ export const baseRules = {
 
 /* Array of validation rules used by input elements to prevent extra whitespace. */
 export const spaceRules = [
-  (v: string) => !/^\s/g.test(v) || 'Invalid spaces', // leading spaces
-  (v: string) => !/\s\s/g.test(v) || 'Invalid word spacing' // multiple inline spaces
+  (v: string) => !/^\s/g.test(v) || 'Invalid spaces' // leading spaces
 ]

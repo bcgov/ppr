@@ -59,7 +59,7 @@
         class="my-0"
         :size="25"
         :width="3"
-      ></v-progress-circular>
+      />
     </v-col>
   </v-row>
 </template>

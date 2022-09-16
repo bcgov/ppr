@@ -259,3 +259,26 @@ export async function mhRegistrationPDF (pdfPath: string): Promise<any> {
       }
     })
 }
+
+// Request to validate Document exists and is unique
+export async function validateDocumentID (documentId: string) {
+  const url = sessionStorage.getItem('MHR_API_URL')
+  const config = { baseURL: url, headers: { Accept: 'application/json' } }
+
+  try {
+    const result = await axios.get(`documents/verify/${documentId}`, config)
+    if (!result?.data) {
+      throw new Error('Invalid API response')
+    }
+
+    return result.data
+  } catch (error) {
+    return {
+      error: {
+        category: ErrorCategories.DOCUMENT_ID,
+        statusCode: error?.response?.status || StatusCodes.CONFLICT,
+        msg: error?.response?.data?.errorMesage || 'Unknown Error'
+      }
+    }
+  }
+}
