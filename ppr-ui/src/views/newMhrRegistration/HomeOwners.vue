@@ -92,7 +92,7 @@
             >Must include more than one group of owneres</span
           ></span></div>
         <div v-show="showGroups">
-          <span class="generic-label">Total Ownership Allocated: </span>{{ ownershipAllocation.totalAllocation }}
+          <span class="generic-label">Total Ownership Allocated:</span><span> {{ getInterestString() }} </span>{{ ownershipAllocation.totalAllocation }}
           <span v-show="ownershipAllocation.hasTotalAllocationError" class="error-text fs-14 ml-3"
             >Total ownership must equal 1/1</span
           >
@@ -157,13 +157,11 @@ export default defineComponent({
   },
   setup () {
     const { getMhrRegistrationHomeOwners } = useGetters<any>([
-      'getMhrRegistrationHomeOwnerGroups',
       'getMhrRegistrationHomeOwners'
     ])
 
     const { setMhrRegistrationHomeOwners } = useActions<any>([
-      'setMhrRegistrationHomeOwners',
-      'setMhrRegistrationHomeOwnerGroups'
+      'setMhrRegistrationHomeOwners'
     ])
 
     const {
@@ -172,7 +170,8 @@ export default defineComponent({
       isGlobalEditingMode,
       showGroups,
       getTotalOwnershipAllocationStatus,
-      getNumberOfGroups
+      getNumberOfGroups,
+      getInterestString
     } = useHomeOwners()
 
     const localState = reactive({
@@ -222,6 +221,7 @@ export default defineComponent({
       editHomeOwner,
       removeHomeOwner,
       getHomeTenancyType,
+      getInterestString,
       showGroups,
       ...toRefs(localState)
     }
