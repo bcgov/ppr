@@ -183,7 +183,7 @@ export default defineComponent({
       }),
       uniqueDocIdError: computed(() => {
         // Manual error handling for Unique DocId Lookup
-        return localState.displayDocIdError ? ['Document ID must be unique'] : []
+        return localState.displayDocIdError ? ['Must be unique number'] : []
       })
     })
 
