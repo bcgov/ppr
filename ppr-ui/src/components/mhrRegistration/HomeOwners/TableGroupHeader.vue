@@ -68,7 +68,10 @@
           <label class="generic-label"> Group {{ groupId }} Details: </label>
 
           <v-form class="my-5" ref="homeFractionalOwnershipForm" v-model="isHomeFractionalOwnershipValid">
-            <FractionalOwnership :groupId="groupId" :fractionalData="fractionalData" />
+            <FractionalOwnership
+              :groupId="groupId"
+              :fractionalData="fractionalData"
+              :isEditingGroup="isEditGroupMode"/>
           </v-form>
         </v-col>
       </v-row>

@@ -12,7 +12,8 @@
       <v-text-field
         :id="`interest-type-group-${groupId}`"
         label="Interest Type (Optional)"
-        filled
+        :filled="!editingGroup"
+        :class="{ backgroundWhite: editingGroup }"
         v-model="fractionalData.interest"
         :data-test-id="`interest-type-field-group-${groupId}`"
       />
@@ -20,7 +21,8 @@
         <v-text-field
           :id="`fraction-amount-group-${groupId}`"
           label="Amount Owned by this Group"
-          filled
+          :filled="!editingGroup"
+          :class="{ backgroundWhite: editingGroup }"
           v-model.number="fractionalData.interestNumerator"
           :rules="fractionalAmountRules"
           :data-test-id="`fraction-amount-field-group-${groupId}`"
@@ -31,7 +33,8 @@
         <v-text-field
           :id="`total-fractions-group-${groupId}`"
           label="Total Available"
-          filled
+          :filled="!editingGroup"
+          :class="{ backgroundWhite: editingGroup }"
           v-model.number="fractionalData.interestTotal"
           :rules="totalAmountRules"
           :data-test-id="`total-fractions-field-group-${groupId}`"
@@ -78,6 +81,10 @@ export default defineComponent({
       type: Object,
       default: null,
       required: true
+    },
+    isEditingGroup: {
+      type: Boolean,
+      default: false
     }
   },
   setup (props) {
@@ -105,6 +112,7 @@ export default defineComponent({
         }
         return rules
       }),
+      editingGroup: computed(() : boolean => { return props.isEditingGroup }),
       totalAmountRules: computed(() =>
         customRules(
           required('Enter total available'),
@@ -125,6 +133,7 @@ export default defineComponent({
 <style lang="scss" scoped>
 .backgroundWhite {
   background:white;
+  padding-bottom: 0px;
 }
 #mhr-home-ownership ::v-deep {
   p {
