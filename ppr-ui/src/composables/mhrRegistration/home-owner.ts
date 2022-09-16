@@ -290,13 +290,13 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
     () => {
       // set step validation for home owners
       var isHomeOwnersValid = showGroups.value ? !getTotalOwnershipAllocationStatus().hasTotalAllocationError : true
-      if (getMhrRegistrationHomeOwnerGroups.value.length === 0 || !getMhrRegistrationHomeOwnerGroups.value.owners) {
+      if (getMhrRegistrationHomeOwnerGroups.value.length === 0 || !getMhrRegistrationHomeOwnerGroups.value[0].owners) {
         isHomeOwnersValid = false
       }
 
       if (getMhrRegistrationHomeOwnerGroups.value.length === 0 ||
-        ((getMhrRegistrationHomeOwnerGroups.value.length === 1 && !getMhrRegistrationHomeOwnerGroups.value[0].address) &&
-         getMhrRegistrationHomeOwnerGroups.value[0].owners.length <= 1)) {
+        ((getMhrRegistrationHomeOwnerGroups.value.length === 1 && !getMhrRegistrationHomeOwners.value.address) &&
+          getMhrRegistrationHomeOwnerGroups.value[0].owners.length <= 1 && getMhrRegistrationHomeOwnerGroups.value[0].interestNumerator === null)) {
         setShowGroups(false)
       } else {
         // update group tenancy for all groups

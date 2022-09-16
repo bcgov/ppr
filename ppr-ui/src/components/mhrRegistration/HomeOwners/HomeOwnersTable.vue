@@ -41,10 +41,10 @@
           <td class="owner-name">
             <div v-if="row.item.individualName" class="owner-icon-name">
               <v-icon class="mr-2">mdi-account</v-icon>
-              <div>
-                {{ row.item.individualName.first }}
-                {{ row.item.individualName.middle }}
-                {{ row.item.individualName.last }}
+              <div class="owner-name-bold">
+                  {{ row.item.individualName.first }}
+                  {{ row.item.individualName.middle }}
+                  {{ row.item.individualName.last }}
               </div>
             </div>
             <div v-else class="owner-icon-name">
@@ -81,7 +81,10 @@
             <!-- Actions drop down menu -->
             <v-menu offset-y left nudge-bottom="0">
               <template v-slot:activator="{ on }">
-                <v-btn text v-on="on" color="primary" class="px-0" :disabled="isAddingMode || isGlobalEditingMode">
+                <v-btn text v-on="on"
+                 color="primary" class="px-0"
+                 :disabled="isAddingMode || isGlobalEditingMode"
+                >
                   <v-icon>mdi-menu-down</v-icon>
                 </v-btn>
               </template>
@@ -228,6 +231,11 @@ export default defineComponent({
     font-weight: bold;
   }
 
+  .owner-name-bold {
+    color: #212529;
+    font-weight: bold;
+  }
+
   table {
     tbody > tr > td {
       padding: 20px 12px;
@@ -278,7 +286,12 @@ export default defineComponent({
     line-height: 22px;
     margin-left: 34px;
   }
+  .theme--light.v-btn.v-btn--disabled {
+    color:#1669bb !important;
+    opacity: 0.4 !important;
+  }
 }
+
 .v-menu__content {
   cursor: pointer;
 }

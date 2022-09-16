@@ -12,6 +12,7 @@
       <v-text-field
         :id="`interest-type-group-${groupId}`"
         label="Interest Type (Optional)"
+        filled
         v-model="fractionalData.interest"
         :data-test-id="`interest-type-field-group-${groupId}`"
       />
@@ -122,11 +123,15 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+.backgroundWhite {
+  background:white;
+}
 #mhr-home-ownership ::v-deep {
   p {
     white-space: normal;
     font-size: 16px;
     line-height: 24px;
+    color: #495057
   }
 
   .owner-fractions {
@@ -144,4 +149,5 @@ export default defineComponent({
     }
   }
 }
+
 </style>
