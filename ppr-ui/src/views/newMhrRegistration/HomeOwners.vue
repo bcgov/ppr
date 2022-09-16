@@ -88,7 +88,9 @@
         Add a Business or Organization
       </v-btn>
       <div class="my-6">
-        <span class="generic-label">Home Tenancy Type: </span>{{ getHomeTenancyType() }}
+        <div><span class="generic-label">Home Tenancy Type: </span>{{ getHomeTenancyType() }}<span v-show="showGroups"><span v-show="ownershipAllocation.hasTotalAllocationError" class="error-text fs-14 ml-3"
+            >Must include more than one group of owneres</span
+          ></span></div>
         <div v-show="showGroups">
           <span class="generic-label">Total Ownership Allocated: </span>{{ ownershipAllocation.totalAllocation }}
           <span v-show="ownershipAllocation.hasTotalAllocationError" class="error-text fs-14 ml-3"
@@ -155,11 +157,13 @@ export default defineComponent({
   },
   setup () {
     const { getMhrRegistrationHomeOwners } = useGetters<any>([
+      'getMhrRegistrationHomeOwnerGroups',
       'getMhrRegistrationHomeOwners'
     ])
 
     const { setMhrRegistrationHomeOwners } = useActions<any>([
-      'setMhrRegistrationHomeOwners'
+      'setMhrRegistrationHomeOwners',
+      'setMhrRegistrationHomeOwnerGroups'
     ])
 
     const {
@@ -167,7 +171,8 @@ export default defineComponent({
       setGlobalEditingMode,
       isGlobalEditingMode,
       showGroups,
-      getTotalOwnershipAllocationStatus
+      getTotalOwnershipAllocationStatus,
+      getNumberOfGroups
     } = useHomeOwners()
 
     const localState = reactive({
@@ -178,7 +183,8 @@ export default defineComponent({
       }),
       ownershipAllocation: computed(
         () => getTotalOwnershipAllocationStatus() as MhrRegistrationTotalOwnershipAllocationIF
-      )
+      ),
+      isValidGroups: computed(() => { return getNumberOfGroups() })
     })
 
     // Enable editing mode whenever adding Person or Business

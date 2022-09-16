@@ -99,6 +99,9 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
     }
   }
 
+  const getNumberOfGroups = (): boolean => {
+    return !getMhrRegistrationHomeOwnerGroups.value || getMhrRegistrationHomeOwnerGroups.value.length < 2
+  }
   // WORKING WITH GROUPS
 
   // Generate dropdown items for the group selection
@@ -324,6 +327,7 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
     setShowGroups,
     setGlobalEditingMode,
     deleteGroup,
-    setGroupFractionalInterest
+    setGroupFractionalInterest,
+    getNumberOfGroups
   }
 }
