@@ -725,7 +725,7 @@
 					"response": []
 				},
 				{
-					"name": "Get other account registration Copy",
+					"name": "Get other account registration",
 					"protocolProfileBehavior": {
 						"disabledSystemHeaders": {
 							"accept": true
@@ -765,6 +765,54 @@
 								"v1",
 								"other-registrations",
 								"037462"
+							]
+						},
+						"description": "Retrieve the recent history of search requests for the account."
+					},
+					"response": []
+				},
+				{
+					"name": "Verify Document ID",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"accept": true
+						}
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/documents/verify/40590422",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"documents",
+								"verify",
+								"40590422"
 							]
 						},
 						"description": "Retrieve the recent history of search requests for the account."
