@@ -65,9 +65,10 @@
             :appReady="appReady"
             @snackBarMsg="snackBarEvent($event)"
           />
-          <!-- To include MHR only table here conditionally when built -->
+
           <RegistrationsWrapper
             v-else
+            isPpr
             :appLoadingData="appLoadingData"
             :appReady="appReady"
             @snackBarMsg="snackBarEvent($event)"

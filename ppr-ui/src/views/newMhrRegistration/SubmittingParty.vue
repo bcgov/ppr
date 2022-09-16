@@ -40,10 +40,24 @@
                 filled
                 id="doc-id-num"
                 class="pr-2"
+                maxlength="8"
                 label="Document ID Number"
                 v-model="documentId"
                 :rules="documentIdRules"
-              />
+                :error-messages="uniqueDocIdError"
+              >
+                <template v-slot:append>
+                  <v-progress-circular
+                    v-if="loadingDocId"
+                    indeterminate
+                    color="primary"
+                    class="my-0"
+                    :size="25"
+                    :width="3"
+                  />
+                  <v-icon v-if="!loadingDocId && isVerifiedDocId" color="green darken-2">mdi-check</v-icon>
+                </template>
+              </v-text-field>
             </v-col>
           </v-row>
         </v-card>
@@ -96,6 +110,9 @@ import { PartySearch } from '@/components/parties/party'
 import { useMhrValidations } from '@/composables/mhrRegistration/useMhrValidations'
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import { useInputRules } from '@/composables'
+import { validateDocumentID } from '@/utils'
+// eslint-disable-next-line no-unused-vars
+import { MhrDocIdResponseIF } from '@/interfaces'
 
 export default defineComponent({
   name: 'SubmittingParty',
@@ -136,20 +153,21 @@ export default defineComponent({
       documentId: '',
       isDocumentIdValid: false,
       isRefNumValid: false,
+      loadingDocId: false,
+      isUniqueDocId: false,
+      displayDocIdError: false,
       documentIdRules: computed(() => {
-        if (getValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_STEPS)) {
-          return customRules(
+        return getValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_STEPS)
+          ? customRules(
             required('Enter a Document ID'),
             maxLength(8, true),
             minLength(8, true),
             isNumber()
           )
-        } else {
-          return customRules(
+          : customRules(
             maxLength(8, true),
             isNumber()
           )
-        }
       }),
       validateSubmitter: computed(() => {
         return getSectionValidation(MhrSectVal.SUBMITTING_PARTY_VALID, MhrCompVal.SUBMITTER_VALID)
@@ -159,18 +177,30 @@ export default defineComponent({
       }),
       validateRefNum: computed(() => {
         return getSectionValidation(MhrSectVal.SUBMITTING_PARTY_VALID, MhrCompVal.REF_NUM_VALID)
+      }),
+      isVerifiedDocId: computed(() => {
+        return localState.isDocumentIdValid && localState.isUniqueDocId
+      }),
+      uniqueDocIdError: computed(() => {
+        // Manual error handling for Unique DocId Lookup
+        return localState.displayDocIdError ? ['Must be unique number'] : []
       })
     })
 
-    watch(
-      () => localState.documentId,
-      (val: string) => {
-        if (localState.documentId.length === 8) {
-          console.log('Looking up Document ID...')
-          // TODO: Implement Document ID look up
-        }
-        setMhrRegistrationDocumentId(val)
+    watch(() => localState.documentId, async (val: string) => {
+      if (localState.documentId.length === 8) {
+        localState.loadingDocId = true
+        const validateDocId: MhrDocIdResponseIF = await validateDocumentID(localState.documentId)
+        localState.isUniqueDocId = !validateDocId.exists && validateDocId.valid
+        localState.displayDocIdError = !localState.isUniqueDocId
+      } else {
+        localState.isUniqueDocId = false
+        localState.displayDocIdError = false
       }
+
+      localState.loadingDocId = false
+      setMhrRegistrationDocumentId(val)
+    }
     )
 
     watch(() => localState.isDocumentIdValid, (val: boolean) => {

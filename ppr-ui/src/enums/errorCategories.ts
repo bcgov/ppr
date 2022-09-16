@@ -3,6 +3,7 @@ export enum ErrorCategories {
   ACCOUNT_SETTINGS = 'account-settings',
   CREATE_DOCUMENT_ACCESS_REQUEST = 'create-document-access-request',
   DOCUMENT_DOWNLOAD = 'document-download',
+  DOCUMENT_ID = 'document-id',
   DRAFT_DELETE = 'draft-delete',
   DRAFT_LOAD = 'draft-load',
   ENTITY_BASIC = 'entity-basic',
@@ -15,7 +16,7 @@ export enum ErrorCategories {
   REGISTRATION_SAVE = 'registration-save',
   REPORT_GENERATION = 'report-generation',
   SEARCH = 'search',
-  SEARCH_COMPLETE = 'seach-complete',
+  SEARCH_COMPLETE = 'search-complete',
   SEARCH_UPDATE = 'search-update',
   LTSA_REQUEST = 'ltsa-request'
 }
