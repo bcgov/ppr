@@ -95,7 +95,8 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
 
     return {
       totalAllocation: totalFractionalNominator + '/' + fractionalDenominator,
-      hasTotalAllocationError: totalFractionalNominator !== fractionalDenominator
+      hasTotalAllocationError: totalFractionalNominator !== fractionalDenominator,
+      hasMinimumGroupsError: getMhrRegistrationHomeOwnerGroups.value.length < 2
     }
   }
 
@@ -290,6 +291,12 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
     return { updatedGroups, updatedFractionalData }
   }
 
+  const showGroupHeading = (): Boolean => {
+    return getMhrRegistrationHomeOwnerGroups.value.length === 0 ||
+    ((getMhrRegistrationHomeOwnerGroups.value.length === 1 && !getMhrRegistrationHomeOwners.value.address) &&
+      getMhrRegistrationHomeOwnerGroups.value[0].owners.length <= 1 && getMhrRegistrationHomeOwnerGroups.value[0].interestNumerator === null)
+  }
+
   // Do not show groups in the owner's table when there are no groups (e.g. after Group deletion)
   watch(
     () => getMhrRegistrationHomeOwnerGroups.value,
@@ -300,9 +307,7 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
         isHomeOwnersValid = false
       }
 
-      if (getMhrRegistrationHomeOwnerGroups.value.length === 0 ||
-        ((getMhrRegistrationHomeOwnerGroups.value.length === 1 && !getMhrRegistrationHomeOwners.value.address) &&
-          getMhrRegistrationHomeOwnerGroups.value[0].owners.length <= 1 && getMhrRegistrationHomeOwnerGroups.value[0].interestNumerator === null)) {
+      if (showGroupHeading()) {
         setShowGroups(false)
       } else {
         // update group tenancy for all groups
@@ -332,6 +337,7 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
     deleteGroup,
     setGroupFractionalInterest,
     getNumberOfGroups,
-    getInterestString
+    getInterestString,
+    showGroupHeading
   }
 }

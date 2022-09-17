@@ -133,7 +133,6 @@ export default defineComponent({
 <style lang="scss" scoped>
 .backgroundWhite {
   background:white;
-  padding-bottom: 0px;
 }
 #mhr-home-ownership ::v-deep {
   p {
