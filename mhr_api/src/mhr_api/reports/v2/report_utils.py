@@ -32,10 +32,10 @@ HEADER_SUBTITLE_REPLACE = '{{SUBTITLE}}'
 HEADER_SUBJECT_REPLACE = '{{SUBJECT}}'
 FOOTER_TEXT_REPLACE = '{{FOOTER-TEXT}}'
 MARGIN_TOP_REG_REPORT = 1.93
-# marginTop 1.5 bottom 0.7
+# marginTop 1.5 bottom 0.75
 REPORT_META_DATA = {
     'marginTop': 1.25,
-    'marginBottom': 0.75,
+    'marginBottom': 0.9,
     'marginLeft': 0.4,
     'marginRight': 0.4,
     'printBackground': True

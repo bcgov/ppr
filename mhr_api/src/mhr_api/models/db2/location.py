@@ -110,6 +110,8 @@ class Db2Location(db.Model):
         self.except_plan = self.except_plan.strip()
         self.dealer_name = self.dealer_name.strip()
         self.additional_description = self.additional_description.strip()
+        self.range = self.range.strip()
+        self.township = self.township.strip()
 
     @classmethod
     def find_by_manuhome_id(cls, manuhome_id: int):
