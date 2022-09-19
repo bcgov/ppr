@@ -70,8 +70,7 @@
           <v-form class="my-5" ref="homeFractionalOwnershipForm" v-model="isHomeFractionalOwnershipValid">
             <FractionalOwnership
               :groupId="groupId"
-              :fractionalData="fractionalData"
-              :isEditingGroup="isEditGroupMode"/>
+              :fractionalData="fractionalData"/>
           </v-form>
         </v-col>
       </v-row>
@@ -198,6 +197,9 @@ export default defineComponent({
     display: flex;
     align-items: center;
     justify-content: space-between;
+  }
+  .theme--light.v-text-field--filled.background-white > .v-input__control > .v-input__slot {
+    background: white;
   }
 }
 </style>

@@ -101,7 +101,8 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
   }
 
   const getInterestString = (): string => {
-    return getMhrRegistrationHomeOwnerGroups !== undefined && getMhrRegistrationHomeOwnerGroups.value.length >= 1 ? getMhrRegistrationHomeOwnerGroups.value[0].interest : ''
+    return getMhrRegistrationHomeOwnerGroups !== undefined &&
+    getMhrRegistrationHomeOwnerGroups.value.length >= 1 ? getMhrRegistrationHomeOwnerGroups.value[0].interest : ''
   }
   const hasMinimumGroups = (): boolean => {
     return !getMhrRegistrationHomeOwnerGroups.value || getMhrRegistrationHomeOwnerGroups.value.length < 2
@@ -293,17 +294,22 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
 
   /**
   * Both getMhrRegistrationHomeOwnerGroups and getMhrRegistrationHomeOwners are initialized with a Group value of "1"
-  * This logic checks the following and produces the heading based on whether it is a group which contains owners or owners without gropus.
-  * Groups = getMhrRegistrationHomeOwnerGroups.value.length === 0 //not sure if this will ever happen(original code)
+  * This logic checks the following and produces the heading based on whether it is a group which contains owners
+  * or owners without grous. * Groups = getMhrRegistrationHomeOwnerGroups.value.length === 0 //not sure if this
+  * will ever happen.
   * Owners = (getMhrRegistrationHomeOwnerGroups.value.length === 1 && !getMhrRegistrationHomeOwners.value.address) &&
-      getMhrRegistrationHomeOwnerGroups.value[0].owners.length <= 1 && getMhrRegistrationHomeOwnerGroups.value[0].interestNumerator === null
-        (The above code simply checks for the presence of a group with 1 group and one owner.  When all owners are deleted 1 owner still exists without
-          and address and the interestinumerator will be blank... )
+    getMhrRegistrationHomeOwnerGroups.value[0].owners.length <= 1 &&
+     getMhrRegistrationHomeOwnerGroups.value[0].interestNumerator === null
+      (The above code simply checks for the presence of a group with 1 group and one owner.
+      When all owners are deleted 1 owner still exists without
+      and address and the interestinumerator will be blank... )
   */
   const showGroupHeading = (): Boolean => {
     return getMhrRegistrationHomeOwnerGroups.value.length === 0 ||
-    ((getMhrRegistrationHomeOwnerGroups.value.length === 1 && !getMhrRegistrationHomeOwners.value.address) &&
-      getMhrRegistrationHomeOwnerGroups.value[0].owners.length <= 1 && getMhrRegistrationHomeOwnerGroups.value[0].interestNumerator === null)
+    ((getMhrRegistrationHomeOwnerGroups.value.length === 1 &&
+       !getMhrRegistrationHomeOwners.value.address) &&
+      getMhrRegistrationHomeOwnerGroups.value[0].owners.length <= 1 &&
+       getMhrRegistrationHomeOwnerGroups.value[0].interestNumerator === null)
   }
 
   // Do not show groups in the owner's table when there are no groups (e.g. after Group deletion)

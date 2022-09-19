@@ -96,7 +96,8 @@
           </span>
         </div>
         <div v-show="showGroups">
-          <span class="generic-label">Total Ownership Allocated:</span><span> {{ interestType }} </span>{{ ownershipAllocation.totalAllocation }}
+          <span class="generic-label">Total Ownership Allocated:</span>
+          <span> {{ interestType }} </span>{{ ownershipAllocation.totalAllocation }}
           <span v-show="ownershipAllocation.hasTotalAllocationError" class="error-text fs-14 ml-3"
             >Total ownership must equal 1/1</span
           >
