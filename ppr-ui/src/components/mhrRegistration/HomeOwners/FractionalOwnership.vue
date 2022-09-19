@@ -13,7 +13,7 @@
         :id="`interest-type-group-${groupId}`"
         label="Interest Type (Optional)"
         :filled="!editingGroup"
-        :class="{ backgroundWhite: editingGroup }"
+        :class="{ backgroundwhite: editingGroup }"
         v-model="fractionalData.interest"
         :data-test-id="`interest-type-field-group-${groupId}`"
       />
@@ -22,7 +22,7 @@
           :id="`fraction-amount-group-${groupId}`"
           label="Amount Owned by this Group"
           :filled="!editingGroup"
-          :class="{ backgroundWhite: editingGroup }"
+          :class="{ backgroundwhite: editingGroup }"
           v-model.number="fractionalData.interestNumerator"
           :rules="fractionalAmountRules"
           :data-test-id="`fraction-amount-field-group-${groupId}`"
@@ -34,7 +34,7 @@
           :id="`total-fractions-group-${groupId}`"
           label="Total Available"
           :filled="!editingGroup"
-          :class="{ backgroundWhite: editingGroup }"
+          :class="{ backgroundwhite: editingGroup }"
           v-model.number="fractionalData.interestTotal"
           :rules="totalAmountRules"
           :data-test-id="`total-fractions-field-group-${groupId}`"
@@ -131,9 +131,10 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.backgroundWhite {
-  background:white;
+.backgroundwhite {
+  background: white;
 }
+
 #mhr-home-ownership ::v-deep {
   p {
     white-space: normal;
@@ -141,7 +142,6 @@ export default defineComponent({
     line-height: 24px;
     color: #495057
   }
-
   .owner-fractions {
     display: flex;
     flex-direction: row;

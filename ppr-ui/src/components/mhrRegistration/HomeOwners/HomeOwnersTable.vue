@@ -42,9 +42,9 @@
             <div v-if="row.item.individualName" class="owner-icon-name">
               <v-icon class="mr-2">mdi-account</v-icon>
               <div class="owner-name-bold">
-                  {{ row.item.individualName.first }}
-                  {{ row.item.individualName.middle }}
-                  {{ row.item.individualName.last }}
+                {{ row.item.individualName.first }}
+                {{ row.item.individualName.middle }}
+                {{ row.item.individualName.last }}
               </div>
             </div>
             <div v-else class="owner-icon-name">
@@ -110,7 +110,7 @@
         </tr>
       </template>
       <template v-slot:no-data>
-
+        <div class="error-text pa-4 text-center">No owners added yet.</div>
       </template>
     </v-data-table>
   </v-card>

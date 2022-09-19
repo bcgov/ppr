@@ -88,9 +88,13 @@
         Add a Business or Organization
       </v-btn>
       <div class="my-6">
-        <div><span class="generic-label">Home Tenancy Type: </span>{{ homeTenancyType }}<span v-show="showGroups"><span v-show="ownershipAllocation.hasMinimumGroupsError" class="error-text fs-14 ml-3"
-            >Must include more than one group of owners</span
-          ></span></div>
+        <div><span class="generic-label">Home Tenancy Type: </span>{{ homeTenancyType }}
+          <span v-show="showGroups">
+              <span v-show="ownershipAllocation.hasMinimumGroupsError" class="error-text fs-14 ml-3"
+              >Must include more than one group of owners
+              </span>
+          </span>
+        </div>
         <div v-show="showGroups">
           <span class="generic-label">Total Ownership Allocated:</span><span> {{ interestType }} </span>{{ ownershipAllocation.totalAllocation }}
           <span v-show="ownershipAllocation.hasTotalAllocationError" class="error-text fs-14 ml-3"
@@ -171,7 +175,7 @@ export default defineComponent({
       isGlobalEditingMode,
       showGroups,
       getTotalOwnershipAllocationStatus,
-      getNumberOfGroups,
+      hasMinimumGroups,
       getInterestString
     } = useHomeOwners()
 
@@ -184,7 +188,7 @@ export default defineComponent({
       ownershipAllocation: computed(
         () => getTotalOwnershipAllocationStatus() as MhrRegistrationTotalOwnershipAllocationIF
       ),
-      isValidGroups: computed(() => { return getNumberOfGroups() }),
+      isValidGroups: computed(() => { return hasMinimumGroups() }),
       homeTenancyType: computed(() => { return getHomeTenancyType() }),
       interestType: computed(() => { return getInterestString() })
     })

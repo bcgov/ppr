@@ -19,7 +19,7 @@
       v-model="ownerGroupId"
       :items="groupItems"
       :rules="groupRules"
-      class="owner-groups-select my-8"
+      class="owner-groups-select mt-8 mb-0"
       filled
       @change="setOwnerGroupId($event)"
       :clearable="groupItems.length === 1"
@@ -33,7 +33,7 @@
         <v-col>
           <div class="generic-label mb-3">Group {{ ownerGroupId }} Details:</div>
         </v-col>
-        <v-col v-show="groupState.isReadonly" class="align-right pad-top">
+        <v-col v-show="groupState.isReadonly" class="align-right pt-0">
           <v-btn
             v-if="groupState.hasEditButton"
             id="edit-fractional-ownership"
@@ -150,9 +150,6 @@ export default defineComponent({
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
 
-.pad-top {
-  padding-top: 0px;
-}
 #mhr-home-owner-groups::v-deep {
   ul {
     color: $gray7;
@@ -160,9 +157,6 @@ export default defineComponent({
   }
   .owner-groups-select {
     width: 200px;
-  }
-  .v-application .my-8 {
-    margin-bottom: 0px;
   }
 }
 </style>
