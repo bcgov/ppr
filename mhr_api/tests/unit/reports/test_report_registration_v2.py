@@ -25,6 +25,8 @@ from mhr_api.reports.v2.report import Report
 from mhr_api.reports.v2.report_utils import ReportTypes
 
 
+REGISTRATON_TEST_DATAFILE = 'tests/unit/reports/data/registration-test-example.json'
+REGISTRATON_TEST_PDFFILE = 'tests/unit/reports/data/registration-test-example.pdf'
 REGISTRATON_SOLE_DATAFILE = 'tests/unit/reports/data/registration-sole-example.json'
 REGISTRATON_SOLE_PDFFILE = 'tests/unit/reports/data/registration-sole-example.pdf'
 REGISTRATON_COMMON_DATAFILE = 'tests/unit/reports/data/registration-common-example.json'
@@ -34,6 +36,19 @@ REGISTRATON_JOINT_PDFFILE = 'tests/unit/reports/data/registration-joint-example.
 REGISTRATON_MAIL_PDFFILE = 'tests/unit/reports/data/registration-mail-example.pdf'
 REGISTRATON_COVER_PDFFILE = 'tests/unit/reports/data/registration-cover-example.pdf'
 REPORT_VERSION_V2 = '2'
+
+
+def test_registration_test(session, client, jwt):
+    """Assert that generation of a test report is as expected."""
+    # setup
+    if is_report_v2():
+        json_data = get_json_from_file(REGISTRATON_TEST_DATAFILE)
+        report = Report(json_data, 'PS12345', ReportTypes.MHR_REGISTRATION, 'Account Name')
+        # test
+        content, status, headers = report.get_pdf()
+        assert headers
+        # verify
+        check_response(content, status, REGISTRATON_TEST_PDFFILE)
 
 
 def test_registration_sole(session, client, jwt):

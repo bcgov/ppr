@@ -130,11 +130,16 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                 if self.mail_version and self.manuhome.reg_documents:
                     reg_json['documentRegistrationId'] = reg_doc.document_reg_id
                 doc_type = reg_doc.document_type
+                if FROM_LEGACY_DOC_TYPE.get(doc_type):
+                    doc_type = FROM_LEGACY_DOC_TYPE.get(doc_type)
                 doc_type_info: MhrDocumentType = MhrDocumentType.find_by_doc_type(doc_type)
                 if doc_type_info:
                     reg_json['documentDescription'] = doc_type_info.document_type_desc
                 else:
                     reg_json['documentDescription'] = ''
+            if self.parties:
+                submitting = self.parties[0]
+                reg_json['submittingParty'] = submitting.json
             return reg_json
         return self.json
 

@@ -249,6 +249,7 @@ class Report:  # pylint: disable=too-few-public-methods
             'v2/stylePageDraft',
             'v2/stylePageMail',
             'v2/stylePageRegistration',
+            'v2/stylePageRegistrationDraft',
             'stylePageMail',
             'logo',
             'macros',

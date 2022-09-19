@@ -1,0 +1,120 @@
+{
+  "attentionReference": "", 
+  "clientReferenceId": "", 
+  "createDateTime": "2022-09-15T15:12:58-07:53", 
+  "declaredValue": 0, 
+  "description": {
+    "baseInformation": {
+      "make": "WATSON IND. (ALTA) DUCHESS", 
+      "model": "", 
+      "year": "2019"
+    }, 
+    "csaNumber": "1001231", 
+    "csaStandard": "Z240", 
+    "engineerName": "", 
+    "manufacturer": "STARLINE", 
+    "otherRemarks": "Other details of the home.", 
+    "rebuiltRemarks": "Rebuilt status of the home.", 
+    "sectionCount": 1, 
+    "sections": [
+      {
+        "lengthFeet": 75, 
+        "lengthInches": 10, 
+        "serialNumber": "67567009", 
+        "widthFeet": 60, 
+        "widthInches": 8
+      }
+    ]
+  }, 
+  "documentDescription": "REGISTER NEW UNIT", 
+  "documentId": "80049421", 
+  "location": {
+    "additionalDescription": "", 
+    "address": {
+      "city": "Victoria", 
+      "country": "CA", 
+      "postalCode": "", 
+      "region": "BC", 
+      "street": "200-940 Blanshard St"
+    }, 
+    "block": "", 
+    "dealerName": "", 
+    "districtLot": "", 
+    "exceptionPlan": "", 
+    "landDistrict": "", 
+    "leaveProvince": false, 
+    "lot": "", 
+    "meridian": "", 
+    "pad": "", 
+    "parcel": "", 
+    "parkName": "", 
+    "partOf": "", 
+    "pidNumber": "011625490", 
+    "plan": "", 
+    "range": "", 
+    "section": "", 
+    "status": "ACTIVE", 
+    "taxCertificate": false, 
+    "township": ""
+  }, 
+  "mhrNumber": "150133", 
+  "ownerGroups": [
+    {
+      "groupId": 1, 
+      "interest": "", 
+      "interestNumerator": 0, 
+      "owners": [
+        {
+          "address": {
+            "city": "VICTORIA", 
+            "country": "CA", 
+            "postalCode": "V9A 0C5", 
+            "region": "BC", 
+            "street": "3-331 ROBERT ST"
+          }, 
+          "organizationName": "ABC CORP.", 
+          "phoneNumber": "123123231", 
+          "type": "SOLE"
+        }, 
+        {
+          "address": {
+            "city": "VERNON", 
+            "country": "CA", 
+            "postalCode": "V1H 1Z6", 
+            "region": "BC", 
+            "street": "8-5920 HERITAGE DR"
+          }, 
+          "individualName": {
+            "first": "JOHN", 
+            "last": "SMITH", 
+            "middle": "P"
+          }, 
+          "phoneNumber": "234324123", 
+          "suffix": "Jr.", 
+          "type": "SOLE"
+        }
+      ], 
+      "status": "ACTIVE", 
+      "tenancySpecified": false, 
+      "type": "SOLE"
+    }
+  ], 
+  "status": "ACTIVE", 
+  "submittingParty": {
+    "address": {
+      "city": "NORTH VANCOUVER", 
+      "country": "CA", 
+      "postalCode": "V7G 2L3", 
+      "region": "BC", 
+      "street": "21-3824 BROCKTON CRES"
+    }, 
+    "emailAddress": "email@test.ca", 
+    "individualName": {
+      "first": "JAMES", 
+      "last": "SMITH", 
+      "middle": "ROBERT"
+    }, 
+    "phoneExtension": "1", 
+    "phoneNumber": "2342434234"
+  }
+}

@@ -138,16 +138,7 @@ def get_registrations(mhr_number: str):  # pylint: disable=too-many-return-state
         registration: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_number,
                                                                            account_id,
                                                                            is_all_staff_account(account_id))
-        response_json = {}
-        if registration.manuhome:
-            response_json = registration.manuhome.new_registration_json
-            response_json = reg_utils.add_payment_json(registration, response_json)
-            if registration.parties:
-                submitting = registration.parties[0]
-                response_json['submittingParty'] = submitting.json
-        else:
-            response_json = registration.json
-
+        response_json = registration.new_registration_json
         # Return report if request header Accept MIME type is application/pdf.
         if resource_utils.is_pdf(request):
             current_app.logger.info(f'Fetching registration report for MHR# {mhr_number}.')
