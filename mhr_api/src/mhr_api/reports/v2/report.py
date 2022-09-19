@@ -559,14 +559,14 @@ class ReportMeta:  # pylint: disable=too-few-public-methods
             'reportDescription': 'MHRCover',
             'fileName': 'coverV2',
             'metaTitle': 'VERIFICATION OF SERVICE',
-            'metaSubtitle': 'Manufactured Home Registry',
+            'metaSubtitle': 'MANUFACTURED HOME ACT',
             'metaSubject': ''
         },
         ReportTypes.MHR_REGISTRATION: {
             'reportDescription': 'MHRRegistration',
             'fileName': 'registrationV2',
             'metaTitle': 'VERIFICATION OF SERVICE',
-            'metaSubtitle': 'Manufactured Home Registry',
+            'metaSubtitle': 'MANUFACTURED HOME ACT',
             'metaSubject': ''
         },
         ReportTypes.SEARCH_DETAIL_REPORT: {

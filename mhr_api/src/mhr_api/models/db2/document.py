@@ -113,6 +113,9 @@ class Db2Document(db.Model):
         if mhr_number:
             try:
                 documents = cls.query.filter(Db2Document.mhr_number == mhr_number).all()
+                if documents:
+                    for doc in documents:
+                        doc.strip()
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('Db2Document.find_by_mhr_number exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)
@@ -129,7 +132,8 @@ class Db2Document(db.Model):
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('Db2Document.find_by_doc_id exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)
-
+        if document:
+            document.strip()
         return document
 
     @property

@@ -27,7 +27,13 @@
     <table class="business-details-table-grey mt-0" role="presentation">
       <tr>
         <td>Registration Type:</td>
-        <td>Manufactured Home Act</td>
+        <td>
+          {% if documentDescription is defined and documentDescription != '' %}
+            {{documentDescription|title}} 
+          {% else %}
+            Register New Unit
+          {% endif %}                  
+          </td>
       </tr>
       <tr>
         <td>Registration Date and Time:</td>
