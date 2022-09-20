@@ -54,7 +54,7 @@
 
 <script lang="ts">
 /* eslint-disable no-unused-vars */
-import { computed, defineComponent, onMounted, reactive, toRefs } from '@vue/composition-api'
+import { computed, defineComponent, nextTick, onMounted, reactive, toRefs } from '@vue/composition-api'
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { RegistrationFlowType, RouteNames, StatementTypes } from '@/enums'
@@ -188,7 +188,8 @@ export default defineComponent({
 
     const submit = async () => {
       // Prompt App Validations
-      setValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_APP, true)
+      await setValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_APP, true)
+      await nextTick()
 
       if (localState.isValidMhrRegistration) {
         // Submit Filing

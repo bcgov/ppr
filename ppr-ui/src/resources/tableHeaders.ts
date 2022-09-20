@@ -477,7 +477,7 @@ export const mhRegistrationTableHeaders: Array<BaseHeaderIF> = [
   {
     class: 'min-column-mds',
     sortable: false,
-    text: 'Registering Party',
+    text: 'Submitting Party',
     value: 'registeringParty',
     display: true
   },
