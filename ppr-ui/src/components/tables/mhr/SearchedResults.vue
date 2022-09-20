@@ -65,6 +65,14 @@
           return-object
         >
 
+          <template v-if="!isReviewMode" v-slot:[`header.ownerName`]>
+            <span>{{ ownerOrOrgHeader }} Name</span>
+          </template>
+
+          <template v-if="!isReviewMode" v-slot:[`header.ownerStatus`]>
+            <span>{{ ownerOrOrgHeader }} Status</span>
+          </template>
+
           <template  v-if="!isReviewMode" v-slot:[headerSearchTypeSlot]>
             <v-tooltip
               top
@@ -95,10 +103,6 @@
               {{ personOrOrgLabel }} Name
             </span>
             <span v-else class="pl-8">{{ headerSlotLabel }}</span>
-          </template>
-
-          <template  v-slot:[`header.ownerStatus`]>
-            <span>{{ personOrOrgLabel }} Status</span>
           </template>
 
           <template  v-if="!isReviewMode" v-slot:[`header.edit`]>
@@ -320,6 +324,12 @@ export default defineComponent({
         return getManufacturedHomeSearchResults.value?.searchQuery.type === APIMHRMapSearchTypes.MHRORGANIZATION_NAME
           ? 'Organization'
           : 'Owner'
+      }),
+      ownerOrOrgHeader: computed((): string => {
+        const found = getManufacturedHomeSearchResults.value.results
+        if (found) {
+          return found[0]?.organizationName ? 'Organization' : 'Owner'
+        } else return ''
       }),
       areAllSelected: computed((): boolean => {
         return localState.results?.every(result => result && result.selected === true)
