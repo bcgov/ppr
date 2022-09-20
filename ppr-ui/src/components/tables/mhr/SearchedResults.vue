@@ -326,6 +326,12 @@ export default defineComponent({
           return found[0]?.organizationName ? 'Organization' : 'Owner'
         } else return ''
       }),
+      ownerOrOrgHeader: computed((): string => {
+        const found = getManufacturedHomeSearchResults.value.results
+        if (found) {
+          return found[0]?.organizationName ? 'Organization' : 'Owner'
+        } else return ''
+      }),
       areAllSelected: computed((): boolean => {
         return localState.results?.every(result => result && result.selected === true)
       }),
