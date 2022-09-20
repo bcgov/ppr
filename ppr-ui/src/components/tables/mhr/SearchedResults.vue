@@ -100,7 +100,7 @@
 
           <template  v-else v-slot:[headerSearchTypeSlot]>
             <span v-if="isOwnerOrOrgSearch" class="pl-8">
-              {{ personOrOrgLabel }} Name
+              {{ ownerOrOrgHeader }} Name
             </span>
             <span v-else class="pl-8">{{ headerSlotLabel }}</span>
           </template>
@@ -231,7 +231,7 @@ import {
 import { BaseHeaderIF, ManufacturedHomeSearchResultIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { FolioNumber } from '@/components/common'
 import { pacificDate } from '@/utils'
-import { APIMHRMapSearchTypes, RouteNames, UIMHRSearchTypes, UIMHRSearchTypeValues } from '@/enums'
+import { RouteNames, UIMHRSearchTypes, UIMHRSearchTypeValues } from '@/enums'
 import { cloneDeep } from 'lodash'
 
 export default defineComponent({
@@ -319,11 +319,6 @@ export default defineComponent({
       }),
       headerSlotLabel: computed((): string => {
         return localState.searchType === UIMHRSearchTypes.MHRMHR_NUMBER ? 'Registration Number' : localState.searchType
-      }),
-      personOrOrgLabel: computed((): string => {
-        return getManufacturedHomeSearchResults.value?.searchQuery.type === APIMHRMapSearchTypes.MHRORGANIZATION_NAME
-          ? 'Organization'
-          : 'Owner'
       }),
       ownerOrOrgHeader: computed((): string => {
         const found = getManufacturedHomeSearchResults.value.results
