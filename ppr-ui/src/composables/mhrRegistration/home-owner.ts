@@ -294,22 +294,6 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
     return { updatedGroups, updatedFractionalData }
   }
 
-  /**
-  * Both getMhrRegistrationHomeOwnerGroups and getMhrRegistrationHomeOwners are initialized with a Group value of "1"
-  * This logic checks the following and produces the heading based on whether it is a group which contains owners
-  * or owners without grous. * Groups = getMhrRegistrationHomeOwnerGroups.value.length === 0 //not sure if this
-  * will ever happen.
-  * Owners = (getMhrRegistrationHomeOwnerGroups.value.length === 1 && !getMhrRegistrationHomeOwners.value.address) &&
-    getMhrRegistrationHomeOwnerGroups.value[0].owners.length <= 1 &&
-     getMhrRegistrationHomeOwnerGroups.value[0].interestNumerator === null
-      (The above code simply checks for the presence of a group with 1 group and one owner.
-      When all owners are deleted 1 owner still exists without
-      and address and the interestinumerator will be blank... )
-  */
-  const showGroupHeading = (): Boolean => {
-    return getMhrRegistrationHomeOwnerGroups.value.length === 0
-  }
-
   // Do not show groups in the owner's table when there are no groups (e.g. after Group deletion)
   watch(
     () => getMhrRegistrationHomeOwnerGroups.value,
@@ -320,7 +304,7 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
         isHomeOwnersValid = false
       }
 
-      if (showGroupHeading()) {
+      if (getMhrRegistrationHomeOwnerGroups.value.length === 0) {
         setShowGroups(false)
       } else {
         // update group tenancy for all groups
