@@ -182,11 +182,10 @@ export default defineComponent({
     }
 
     // To render Group table header the owners array must not be empty
-    // If group is empty, owners array will have a 'placeholder' obj and not the actual owners
+    // check for at least one owner with an id
     // This util function will help to show Owners: 0 in the table header
     const hasActualOwners = (owners: MhrRegistrationHomeOwnersIF[]): boolean => {
-      // check for one 'placeholder' owner which will not have an id
-      return owners.length === 1 && owners[0]?.id !== undefined
+      return owners.length > 0 && owners[0]?.id !== undefined
     }
 
     watch(
