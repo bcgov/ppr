@@ -338,6 +338,17 @@ class Db2Manuhome(db.Model):
                                                                                Db2Document.DocumentTypes.MHREG,
                                                                                now_local))
         manuhome.reg_location = Db2Location.create_from_registration(registration, reg_json)
+        # Adjust location address info.
+        address = reg_json['location']['address']
+        extra: str = ''
+        if len(address.get('street')) > 31:
+            extra = str(address['street'])[31:]
+        if address.get('streetAdditional'):
+            extra += ' ' + str(address.get('streetAdditional')).strip()
+        manuhome.reg_location.additional_description = extra.strip() + ' ' + \
+            manuhome.reg_location.additional_description
+        if len(manuhome.reg_location.additional_description) > 80:
+            manuhome.reg_location.additional_description = manuhome.reg_location.additional_description[0:80]
         manuhome.reg_descript = Db2Descript.create_from_registration(registration, reg_json)
         if reg_json.get('ownerGroups'):
             for i, group in enumerate(reg_json.get('ownerGroups')):

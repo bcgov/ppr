@@ -27,6 +27,7 @@ from mhr_api.models.db2 import utils as legacy_utils
 
 from .db import db
 from .mhr_draft import MhrDraft
+from .mhr_location import MhrLocation
 from .mhr_party import MhrParty
 from .type_tables import MhrDocumentType, MhrRegistrationType, MhrRegistrationTypes, MhrRegistrationStatusTypes
 
@@ -79,11 +80,13 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                                back_populates='registration', cascade='all, delete', uselist=False)
     draft = db.relationship('MhrDraft', foreign_keys=[draft_id], uselist=False)
     parties = db.relationship('MhrParty', order_by='asc(MhrParty.id)', back_populates='registration')
+    locations = db.relationship('MhrLocation', order_by='asc(MhrLocation.id)', back_populates='registration')
 
     draft_number: str = None
     doc_reg_number: str = None
     manuhome: Db2Manuhome = None
     mail_version: bool = False
+    reg_json: dict = None
 
     @property
     def json(self) -> dict:
@@ -140,7 +143,11 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
             if self.parties:
                 submitting = self.parties[0]
                 reg_json['submittingParty'] = submitting.json
-            return reg_json
+            if self.locations:
+                location = self.locations[0]
+                current_app.logger.debug('Using PostreSQL location in new_registration_json.')
+                reg_json['location'] = location.json
+            return self.__set_payment_json(reg_json)
         return self.json
 
     def __set_payment_json(self, registration):
@@ -163,6 +170,11 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         self.draft_id = draft.id
         db.session.add(self)
         db.session.commit()
+        # Now save legacy data.
+        if model_utils.is_legacy():
+            manuhome: Db2Manuhome = Db2Manuhome.create_from_registration(self, self.reg_json)
+            manuhome.save()
+            self.manuhome = manuhome
 
     def get_registration_type(self):
         """Lookup registration type record if it has not already been fetched."""
@@ -261,6 +273,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         registration.status_type = MhrRegistrationStatusTypes.ACTIVE
         registration.account_id = account_id
         registration.user_id = user_id
+        registration.reg_json = json_data
         if not draft:
             registration.draft_number = reg_vals.draft_number
             registration.draft_id = reg_vals.draft_id
@@ -274,6 +287,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
             registration.client_reference_id = json_data['clientReferenceId']
 
         registration.parties = MhrParty.create_from_registration_json(json_data, registration.id)
+        registration.locations = [MhrLocation.create_from_json(json_data['location'], registration.id)]
         return registration
 
     @staticmethod

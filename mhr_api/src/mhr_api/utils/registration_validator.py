@@ -18,6 +18,7 @@ Validation includes verifying the data combination for various registrations/fil
 from flask import current_app
 
 from mhr_api.models import MhrRegistration
+from mhr_api.models.type_tables import MhrLocationTypes
 from mhr_api.models.utils import is_legacy
 from mhr_api.utils import valid_charset
 
@@ -46,7 +47,11 @@ def validate_registration(json_data, is_staff: bool = False):
             for owner in group.get('owners'):
                 error_msg += validate_owner(owner)
     error_msg += validate_location(json_data)
-    error_msg += validate_registration_legacy(json_data)
+    # Remove default locationType when schema validation update in place.
+    if json_data.get('location'):
+        location = json_data['location']
+        if not location.get('locationType') or location.get('locationType') not in MhrLocationTypes:
+            location['locationType'] = MhrLocationTypes.OTHER
     return error_msg
 
 

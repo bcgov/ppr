@@ -211,6 +211,16 @@ class MhrDocumentTypes(BaseEnum):
     WILL = 'WILL'
 
 
+class MhrLocationTypes(BaseEnum):
+    """Render an Enum of the MHR location types."""
+
+    MANUFACTURER = 'MANUFACTURER'
+    MH_DEALER = 'MH_DEALER'
+    OTHER = 'OTHER'
+    RESERVE = 'RESERVE'
+    STRATA = 'STRATA'
+
+
 class MhrNoteStatusTypes(BaseEnum):
     """Render an Enum of the MHR note status types."""
 
@@ -290,6 +300,22 @@ class MhrDocumentType(db.Model):  # pylint: disable=too-few-public-methods
         if not doc_type or doc_type not in MhrDocumentTypes:
             return None
         return cls.query.filter(MhrDocumentType.document_type == doc_type).one_or_none()
+
+
+class MhrLocationType(db.Model):  # pylint: disable=too-few-public-methods
+    """This class defines the model for the mhr_location_types table."""
+
+    __tablename__ = 'mhr_location_types'
+
+    location_type = db.Column('location_type', PG_ENUM(MhrLocationTypes), primary_key=True)
+    location_type_desc = db.Column('location_type_desc', db.String(100), nullable=False)
+
+    # Relationships -
+
+    @classmethod
+    def find_all(cls):
+        """Return all the type records."""
+        return db.session.query(MhrLocationType).all()
 
 
 class MhrNoteStatusType(db.Model):  # pylint: disable=too-few-public-methods
