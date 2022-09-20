@@ -149,6 +149,7 @@ export default defineComponent({
             datNumber: '',
             folioNumber: ''
           }
+          localState.staffPaymentValid = false
           break
 
         case StaffPaymentOptions.BCOL:
@@ -160,6 +161,7 @@ export default defineComponent({
             isPriority: staffPaymentData.isPriority,
             routingSlipNumber: ''
           }
+          localState.staffPaymentValid = false
           break
 
         case StaffPaymentOptions.NO_FEE:
@@ -190,8 +192,8 @@ export default defineComponent({
 
     watch(
       () => localState.staffPaymentValid,
-      (val: boolean) => {
-        setValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.STAFF_PAYMENT_VALID, val)
+      async (val: boolean) => {
+        await setValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.STAFF_PAYMENT_VALID, val)
       }
     )
 
