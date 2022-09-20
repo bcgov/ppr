@@ -193,6 +193,10 @@ export default defineComponent({
         // Submit Filing
         localState.submitting = true
         const mhrSubmission = await submitMhrRegistration(buildApiData(), parseStaffPayment())
+        setValidation(MhrSectVal.YOUR_HOME_VALID, MhrCompVal.VALIDATE_APP, false)
+        setValidation(MhrSectVal.SUBMITTING_PARTY_VALID, MhrCompVal.VALIDATE_APP, false) 
+        setValidation(MhrSectVal.HOME_OWNERS_VALID, MhrCompVal.VALIDATE_APP, false) 
+        setValidation(MhrSectVal.LOCATION_VALID , MhrCompVal.VALIDATE_APP, false) 
         localState.submitting = false
 
         mhrSubmission?.mhrNumber
