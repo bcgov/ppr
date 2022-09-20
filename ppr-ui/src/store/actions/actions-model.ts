@@ -25,9 +25,10 @@ import {
   ManufacturedHomeSearchResponseIF,
   ManufacturedHomeSearchResultIF,
   UserProductSubscriptionIF,
-  MhrRegistrationHomeOwnersIF,
   MhrRegistrationHomeOwnerGroupIF,
-  MhrRegistrationIF, MhRegistrationSummaryIF, MhrTransferIF
+  MhrTransferIF,
+  MhrRegistrationIF,
+  MhRegistrationSummaryIF
 } from '@/interfaces'
 import { ActionIF } from '@/interfaces/store-interfaces/action-interface'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
@@ -308,10 +309,6 @@ export const setMhrHomeBaseInformation: ActionIF = ({ commit }, { key, value }):
 export const setMhrSubmittingParty: ActionIF = ({ commit }, { key, value }): void => {
   commit('mutateMhrSubmittingParty', { key, value })
   commit('mutateUnsavedChanges', true)
-}
-
-export const setMhrRegistrationHomeOwners: ActionIF = ({ commit }, owners: MhrRegistrationHomeOwnersIF[]): void => {
-  commit('mutateMhrHomeOwners', owners)
 }
 
 export const setMhrRegistrationDocumentId: ActionIF = ({ commit }, value: string): void => {

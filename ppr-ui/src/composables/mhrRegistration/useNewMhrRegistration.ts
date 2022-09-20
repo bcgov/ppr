@@ -52,7 +52,6 @@ export const useNewMhrRegistration = () => {
         phoneExtension: ''
       },
       ownerGroups: [],
-      owners: [],
       attentionReferenceNum: '',
       location: {
         parkName: '',

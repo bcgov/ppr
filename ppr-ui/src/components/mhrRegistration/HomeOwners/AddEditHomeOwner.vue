@@ -260,6 +260,7 @@ let DEFAULT_OWNER_ID = 1
 
 export default defineComponent({
   name: 'AddEditHomeOwner',
+  emits: ['remove', 'cancel'],
   components: {
     AutoComplete,
     BaseAddress,
