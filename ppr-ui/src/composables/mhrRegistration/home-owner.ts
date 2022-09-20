@@ -62,8 +62,10 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
     if (showGroups.value) {
       // At leas one group showing with one or more owners
       return HomeTenancyTypes.COMMON
-    } else if (numOfOwners === 1 && !getMhrRegistrationHomeOwners.value[0].address) {
+    } else if (numOfOwners === 1 && getMhrRegistrationHomeOwners.value[0].address !== undefined) {
       // One owner without groups showing
+      // Added second condition, because when an owner exists as a Sole Ownership, editing and clicking Done,
+      // will change status to Tenants in Common unless above logic is in place..
       return HomeTenancyTypes.SOLE
     } else if (numOfOwners > 1) {
       // More than one owner without groups showing

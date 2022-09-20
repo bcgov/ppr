@@ -81,10 +81,6 @@ export default defineComponent({
       type: Object,
       default: null,
       required: true
-    },
-    isEditingGroup: {
-      type: Boolean,
-      default: false
     }
   },
   setup (props) {
