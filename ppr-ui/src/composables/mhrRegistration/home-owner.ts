@@ -307,11 +307,7 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
       and address and the interestinumerator will be blank... )
   */
   const showGroupHeading = (): Boolean => {
-    return getMhrRegistrationHomeOwnerGroups.value.length === 0 ||
-    ((getMhrRegistrationHomeOwnerGroups.value.length === 1 &&
-       !getMhrRegistrationHomeOwners.value.address) &&
-      getMhrRegistrationHomeOwnerGroups.value[0].owners.length <= 1 &&
-       getMhrRegistrationHomeOwnerGroups.value[0].interestNumerator === null)
+    return getMhrRegistrationHomeOwnerGroups.value.length === 0
   }
 
   // Do not show groups in the owner's table when there are no groups (e.g. after Group deletion)
