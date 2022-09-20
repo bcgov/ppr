@@ -6,8 +6,8 @@
     </div>
     <div v-else>
       <p class="mt-3 mb-6">
-        Enter the interest type and fraction of the total ownership owned by Group 1. For example,
-        if there are four owner groups, this group could have 1/4 ownership.
+        Enter the interest type and fraction of the total ownership owned by Group 1. For example, if there are four
+        owner groups, this group could have 1/4 ownership.
       </p>
       <v-text-field
         :id="`interest-type-group-${groupId}`"
@@ -56,7 +56,7 @@
 
 <script lang="ts">
 /* eslint-disable no-unused-vars */
-import { MhrRegistrationHomeOwnersIF } from '@/interfaces'
+import { MhrRegistrationHomeOwnerIF } from '@/interfaces'
 /* eslint-enable no-unused-vars */
 
 import { computed, defineComponent, reactive, toRefs } from '@vue/composition-api'
@@ -72,7 +72,7 @@ export default defineComponent({
       required: true
     },
     editHomeOwner: {
-      type: Object as () => MhrRegistrationHomeOwnersIF,
+      type: Object as () => MhrRegistrationHomeOwnerIF,
       default: null
     },
     showEditBtn: { type: Boolean, default: true },

@@ -3,7 +3,7 @@
     <v-data-table
       id="mh-home-owners-table"
       class="home-owners-table"
-      :class="{ 'review-mode' : isReadonlyTable }"
+      :class="{ 'review-mode': isReadonlyTable }"
       :headers="homeOwnersTableHeaders"
       hide-default-footer
       :items="homeOwners"
@@ -125,13 +125,13 @@ import { toDisplayPhone } from '@/utils'
 import { AddEditHomeOwner } from '@/components/mhrRegistration/HomeOwners'
 import TableGroupHeader from '@/components/mhrRegistration/HomeOwners/TableGroupHeader.vue'
 /* eslint-disable no-unused-vars */
-import { MhrRegistrationHomeOwnersIF } from '@/interfaces'
+import { MhrRegistrationHomeOwnerIF } from '@/interfaces'
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
   name: 'HomeOwnersTable',
   props: {
-    homeOwners: { default: [] as MhrRegistrationHomeOwnersIF[] },
+    homeOwners: { default: [] as MhrRegistrationHomeOwnerIF[] },
     isAdding: { default: false },
     isReadonlyTable: { type: Boolean, default: false }
   },
@@ -158,9 +158,7 @@ export default defineComponent({
       isAddingMode: computed((): boolean => props.isAdding),
       showTableError: computed((): boolean => hasEmptyGroup.value && showGroups.value),
       showEditActions: computed((): boolean => !props.isReadonlyTable),
-      homeOwnersTableHeaders: props.isReadonlyTable
-        ? homeOwnersTableHeadersReview
-        : homeOwnersTableHeaders
+      homeOwnersTableHeaders: props.isReadonlyTable ? homeOwnersTableHeadersReview : homeOwnersTableHeaders
     })
 
     const remove = (item): void => {
@@ -179,7 +177,7 @@ export default defineComponent({
     // To render Group table header the owners array must not be empty
     // check for at least one owner with an id
     // This util function will help to show Owners: 0 in the table header
-    const hasActualOwners = (owners: MhrRegistrationHomeOwnersIF[]): boolean => {
+    const hasActualOwners = (owners: MhrRegistrationHomeOwnerIF[]): boolean => {
       return owners.length > 0 && owners[0]?.id !== undefined
     }
 
@@ -216,7 +214,8 @@ export default defineComponent({
     background-color: #e2e8ee;
   }
 
-  .owner-name, i {
+  .owner-name,
+  i {
     color: $gray9 !important;
     font-weight: bold;
   }

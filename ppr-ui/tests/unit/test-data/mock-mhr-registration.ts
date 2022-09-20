@@ -1,4 +1,4 @@
-import { AddressIF, MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnersIF } from '@/interfaces'
+import { AddressIF, MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF } from '@/interfaces'
 
 export const mockedAddress: AddressIF = {
   street: '1234 Fort St.',
@@ -26,7 +26,7 @@ export const mockedEmptyGroup: MhrRegistrationHomeOwnerGroupIF = {
   type: 'SO' // TODO: Mhr-Submission - UPDATE after the correct type can be determined
 }
 
-export const mockedPerson: MhrRegistrationHomeOwnersIF = {
+export const mockedPerson: MhrRegistrationHomeOwnerIF = {
   id: '10',
   individualName: {
     first: 'John',
@@ -39,7 +39,7 @@ export const mockedPerson: MhrRegistrationHomeOwnersIF = {
   address: mockedAddress
 }
 
-export const mockedOrganization: MhrRegistrationHomeOwnersIF = {
+export const mockedOrganization: MhrRegistrationHomeOwnerIF = {
   id: '20',
   organizationName: 'Smart Track',
   suffix: 'Inc.',

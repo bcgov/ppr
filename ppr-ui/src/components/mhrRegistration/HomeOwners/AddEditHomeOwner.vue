@@ -242,7 +242,7 @@ import { VueMaskDirective } from 'v-mask'
 import {
   MhrRegistrationFractionalOwnershipIF,
   MhrRegistrationHomeOwnerGroupIF,
-  MhrRegistrationHomeOwnersIF
+  MhrRegistrationHomeOwnerIF
 } from '@/interfaces/mhr-registration-interfaces'
 import { SearchResponseI } from '@/interfaces'
 /* eslint-enable no-unused-vars */
@@ -272,7 +272,7 @@ export default defineComponent({
   },
   props: {
     editHomeOwner: {
-      type: Object as () => MhrRegistrationHomeOwnersIF,
+      type: Object as () => MhrRegistrationHomeOwnerIF,
       default: null
     },
     isHomeOwnerPerson: {
@@ -299,7 +299,7 @@ export default defineComponent({
 
     const { searchBusiness } = useSearch()
 
-    const defaultHomeOwner: MhrRegistrationHomeOwnersIF = {
+    const defaultHomeOwner: MhrRegistrationHomeOwnerIF = {
       id: props.editHomeOwner?.id || (DEFAULT_OWNER_ID++).toString(),
       phoneNumber: props.editHomeOwner?.phoneNumber || '',
       phoneExtension: props.editHomeOwner?.phoneExtension || null,
@@ -386,12 +386,12 @@ export default defineComponent({
       if (localState.isHomeOwnerFormValid && localState.isAddressFormValid) {
         if (props.editHomeOwner) {
           editHomeOwner(
-            localState.owner as MhrRegistrationHomeOwnersIF,
+            localState.owner as MhrRegistrationHomeOwnerIF,
             localState.ownerGroupId || '1'
           )
         } else {
           addOwnerToTheGroup(
-            localState.owner as MhrRegistrationHomeOwnersIF,
+            localState.owner as MhrRegistrationHomeOwnerIF,
             localState.ownerGroupId
           )
         }
@@ -400,9 +400,9 @@ export default defineComponent({
           setShowGroups(true)
 
           // Get fractional data based on owner's group id
-          const fractionalData = find(
-            allFractionalData,
-            { groupId: localState.ownerGroupId }) as FractionalOwnershipWithGroupIdIF
+          const fractionalData = find(allFractionalData, {
+            groupId: localState.ownerGroupId
+          }) as FractionalOwnershipWithGroupIdIF
 
           setGroupFractionalInterest(localState.ownerGroupId || '1', fractionalData)
         }
@@ -436,9 +436,12 @@ export default defineComponent({
     )
 
     /** Handle Phone changes and write to store. **/
-    watch(() => localState.displayPhone, () => {
-      localState.owner.phoneNumber = fromDisplayPhone(localState.displayPhone)
-    })
+    watch(
+      () => localState.displayPhone,
+      () => {
+        localState.owner.phoneNumber = fromDisplayPhone(localState.displayPhone)
+      }
+    )
 
     return {
       getSideTitle,
