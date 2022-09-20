@@ -406,8 +406,7 @@ export default defineComponent({
 
     const downloadPDF = async (item: RegistrationSummaryIF): Promise<any> => {
       localState.loadingPDF = item.path
-      // const pdf = await registrationPDF(item.path)
-      const pdf = await mhRegistrationPDF(item.path)
+      const pdf = props.isPpr ? await registrationPDF(item.path) : await mhRegistrationPDF(item.path)
       if (pdf.error) {
         emit('error', pdf.error)
       } else {
