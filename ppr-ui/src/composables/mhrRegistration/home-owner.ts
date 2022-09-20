@@ -334,7 +334,6 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
     deleteGroup,
     setGroupFractionalInterest,
     hasMinimumGroups,
-    getInterestString,
-    showGroupHeading
+    getInterestString
   }
 }
