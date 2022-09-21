@@ -58,9 +58,9 @@ TEST_CHECKSUM_DATA = [
 # testdata pattern is ({description}, {valid}, {street}, {city}, {message content})
 TEST_LEGACY_REG_DATA = [
     (DESC_VALID, True, '0123456789012345678901234567890', '01234567890123456789', None),
-    ('Invalid location street too long', False, '01234567890123456789012345678901', 'KAMLOOPS',
+    ('Valid location street long', True, '01234567890123456789012345678901', 'KAMLOOPS',
      validator.LEGACY_ADDRESS_STREET_TOO_LONG.format(add_desc='Location')),
-    ('Invalid location city too long', False, '1234 Front St.', '012345678901234567890',
+    ('Valid location city long', True, '1234 Front St.', '012345678901234567890',
      validator.LEGACY_ADDRESS_CITY_TOO_LONG.format(add_desc='Location'))
 ]
 # testdata pattern is ({description}, {bus_name}, {first}, {middle}, {last}, {message content})

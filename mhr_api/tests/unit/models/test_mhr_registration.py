@@ -26,7 +26,7 @@ from registry_schemas.example_data.mhr import REGISTRATION
 
 from mhr_api.exceptions import BusinessException
 from mhr_api.models import MhrRegistration, MhrDraft
-from mhr_api.models.type_tables import MhrPartyTypes, MhrOwnerStatusTypes
+from mhr_api.models.type_tables import MhrLocationTypes, MhrPartyTypes, MhrOwnerStatusTypes, MhrStatusTypes
 from mhr_api.models.type_tables import MhrRegistrationTypes, MhrRegistrationStatusTypes
 
 
@@ -112,6 +112,8 @@ def test_find_by_id(session, reg_id, has_results, legacy):
             assert registration.status_type
             assert registration.registration_type
             assert registration.registration_ts
+            assert registration.locations
+            assert len(registration.locations) == 1
         else:
             assert registration.manuhome
             report_json = registration.registration_json
@@ -130,9 +132,9 @@ def test_find_by_id(session, reg_id, has_results, legacy):
             registration.mail_version = True
             report_json = registration.new_registration_json
             # current_app.logger.debug(report_json)
+            assert report_json.get('documentDescription')
             assert report_json.get('documentId')
             assert report_json.get('documentRegistrationId')
-            assert report_json.get('documentDescription')
     else:
         assert not registration
 
@@ -181,11 +183,18 @@ def test_create_new_from_json(session):
         assert party.party_type in MhrPartyTypes
         assert party.status_type in MhrOwnerStatusTypes
         assert party.compressed_name
+    assert registration.locations
+    location = registration.locations[0]
+    assert location.registration_id > 0
+    assert location.change_registration_id > 0
+    assert location.location_type in MhrLocationTypes
+    assert location.status_type in MhrStatusTypes
 
 
 def test_save_new(session):
     """Assert that saving a new MHR registration is working correctly."""
     json_data = copy.deepcopy(REGISTRATION)
+    json_data['documentId'] = '88878888'
     registration: MhrRegistration = MhrRegistration.create_new_from_json(json_data, 'PS12345')
     registration.save()
     reg_new = MhrRegistration.find_by_mhr_number(registration.mhr_number, 'PS12345')
