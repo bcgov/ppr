@@ -8,7 +8,7 @@ import {
   PartyIF,
   VehicleCollateralIF,
   StateModelIF,
-  AmendmentStatementIF
+  AmendmentStatementIF, MhrTransferValidationStateIF, MhrTransferIF
 } from '@/interfaces'
 import {
   mockedAddress1,
@@ -542,7 +542,10 @@ export const mockedModelAmendmdmentAdd: StateModelIF = {
   unsavedChanges: false,
   selectedManufacturedHomes: null,
   isStaffClientPayment: null,
-  mhrSearchResultSelectAllLien: false
+  mhrSearchResultSelectAllLien: false,
+  mhrInformation: null,
+  mhrTransferValidationState: null,
+  mhrTransfer: null
 }
 
 export const mockedModelAmendmdmentDelete: StateModelIF = {
@@ -654,7 +657,10 @@ export const mockedModelAmendmdmentDelete: StateModelIF = {
   unsavedChanges: false,
   selectedManufacturedHomes: null,
   isStaffClientPayment: null,
-  mhrSearchResultSelectAllLien: false
+  mhrSearchResultSelectAllLien: false,
+  mhrInformation: null,
+  mhrTransferValidationState: null,
+  mhrTransfer: null
 }
 
 export const mockedModelAmendmdmentEdit: StateModelIF = {
@@ -767,7 +773,10 @@ export const mockedModelAmendmdmentEdit: StateModelIF = {
   unsavedChanges: false,
   selectedManufacturedHomes: null,
   isStaffClientPayment: null,
-  mhrSearchResultSelectAllLien: false
+  mhrSearchResultSelectAllLien: false,
+  mhrInformation: null,
+  mhrTransferValidationState: null,
+  mhrTransfer: null
 }
 
 export const mockedModelAmendmdmentCourtOrder: StateModelIF = {
@@ -879,5 +888,8 @@ export const mockedModelAmendmdmentCourtOrder: StateModelIF = {
   unsavedChanges: false,
   selectedManufacturedHomes: null,
   isStaffClientPayment: null,
-  mhrSearchResultSelectAllLien: false
+  mhrSearchResultSelectAllLien: false,
+  mhrInformation: null,
+  mhrTransferValidationState: null,
+  mhrTransfer: null
 }

@@ -53,21 +53,20 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable no-unused-vars */
 import { computed, defineComponent, nextTick, onMounted, reactive, toRefs } from '@vue/composition-api'
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { RegistrationFlowType, RouteNames, StatementTypes } from '@/enums'
-import { RegistrationTypeIF } from '@/interfaces'
 import { getFeatureFlag, submitMhrRegistration } from '@/utils'
 import { Stepper, StickyContainer } from '@/components/common'
 import ButtonFooter from '@/components/common/ButtonFooter.vue'
 import { useMhrValidations, useNewMhrRegistration } from '@/composables'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
+/* eslint-disable no-unused-vars */
+import { RegistrationTypeIF } from '@/interfaces'
 import { RegistrationLengthI } from '@/composables/fees/interfaces'
 /* eslint-enable no-unused-vars */
 
-/* eslint-disable */
 export default defineComponent({
   name: 'MhrRegistration',
   components: {
@@ -115,7 +114,6 @@ export default defineComponent({
       parseStaffPayment
     } = useNewMhrRegistration()
 
-
     const localState = reactive({
       dataLoaded: false,
       submitting: false,
@@ -130,7 +128,7 @@ export default defineComponent({
       registrationTypeUI: computed((): RegistrationTypeIF => {
         return getRegistrationType.value?.registrationTypeUI || ''
       }),
-      isValidatingApp: computed( (): boolean => {
+      isValidatingApp: computed((): boolean => {
         return getValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_APP)
       }),
       isValidMhrRegistration: computed((): boolean => {
@@ -162,7 +160,7 @@ export default defineComponent({
       })
     }
 
-    onMounted( (): void => {
+    onMounted((): void => {
       // do not proceed if app is not ready
       // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
       if (!props.appReady || !localState.isAuthenticated ||
@@ -197,10 +195,9 @@ export default defineComponent({
         const mhrSubmission = await submitMhrRegistration(buildApiData(), parseStaffPayment())
         localState.submitting = false
 
-        !!mhrSubmission?.mhrNumber
+        mhrSubmission?.mhrNumber
           ? await context.root.$router.push({ name: RouteNames.DASHBOARD })
           : console.log(mhrSubmission?.error) // Handle Schema or Api errors here..
-
       } else {
         await scrollToInvalid(MhrSectVal.REVIEW_CONFIRM_VALID, 'mhr-review-confirm',
           [

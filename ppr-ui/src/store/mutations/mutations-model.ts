@@ -28,7 +28,7 @@ import {
   UserProductSubscriptionIF,
   MhrRegistrationHomeOwnersIF,
   MhrRegistrationHomeOwnerGroupIF,
-  MhrRegistrationIF, MhRegistrationSummaryIF
+  MhrRegistrationIF, MhRegistrationSummaryIF, MhrTransferIF, ActionIF
 } from '@/interfaces'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 
@@ -400,4 +400,14 @@ export const mutateMhrHomeOwnerGroups = (
 
 export const mutateMhrTableHistory = (state: StateIF, value: MhRegistrationSummaryIF[]) => {
   state.stateModel.registrationTable.baseMhRegs = value
+}
+
+// MHR Information
+export const mutateMhrInformation = (state: StateIF, mhrInfo: MhRegistrationSummaryIF) => {
+  state.stateModel.mhrInformation = mhrInfo
+}
+
+// MHR Transfer
+export const mutateEmptyMhrTransfer = (state: StateIF, emptyMhrTransfer: MhrTransferIF) => {
+  state.stateModel.mhrTransfer = emptyMhrTransfer
 }

@@ -1,5 +1,5 @@
 import { RegistrationFlowType } from '@/enums'
-import { MhrRegistrationIF, StateModelIF } from '@/interfaces'
+import { StateModelIF } from '@/interfaces'
 
 export const stateModel: StateModelIF = {
   accountInformation: {
@@ -88,6 +88,74 @@ export const stateModel: StateModelIF = {
       debtors: []
     }
   },
+  registrationTable: {
+    baseRegs: [],
+    baseMhRegs: [],
+    draftsBaseReg: [],
+    draftsChildReg: [],
+    newItem: {
+      addedReg: '',
+      addedRegParent: '',
+      addedRegSummary: null,
+      prevDraft: ''
+    },
+    sortHasMorePages: true,
+    sortOptions: {
+      endDate: null,
+      folNum: '',
+      orderBy: 'createDateTime',
+      orderVal: 'desc',
+      regBy: '',
+      regNum: '',
+      regParty: '',
+      regType: '',
+      secParty: '',
+      startDate: null,
+      status: ''
+    },
+    sortPage: 1,
+    totalRowCount: 0
+  },
+  search: {
+    searchDebtorName: null,
+    searchHistory: null,
+    searchHistoryLength: null,
+    searchResults: null,
+    manufacturedHomeSearchResults: null,
+    searchedType: null,
+    searchedValue: '',
+    searching: false,
+    searchCertified: false
+  },
+  selectedManufacturedHomes: [],
+  isStaffClientPayment: false,
+  staffPayment: null,
+  unsavedChanges: false,
+  userInfo: {
+    contacts: [],
+    feeSettings: null,
+    firstname: '',
+    lastname: '',
+    username: '',
+    settings: {
+      defaultDropDowns: true,
+      defaultTableFilters: true,
+      paymentConfirmationDialog: true,
+      selectConfirmationDialog: true
+    }
+  },
+  // MHR State
+  mhrInformation: {
+    clientReferenceId: '',
+    createDateTime: '',
+    mhrNumber: '',
+    ownerNames: '',
+    path: '',
+    registrationDescription: '',
+    statusType: '',
+    submittingParty: '',
+    username: ''
+  },
   mhrRegistration: {
     documentId: '',
     clientReferenceId: '',
@@ -167,62 +235,6 @@ export const stateModel: StateModelIF = {
       }
     ]
   },
-  registrationTable: {
-    baseRegs: [],
-    baseMhRegs: [],
-    draftsBaseReg: [],
-    draftsChildReg: [],
-    newItem: {
-      addedReg: '',
-      addedRegParent: '',
-      addedRegSummary: null,
-      prevDraft: ''
-    },
-    sortHasMorePages: true,
-    sortOptions: {
-      endDate: null,
-      folNum: '',
-      orderBy: 'createDateTime',
-      orderVal: 'desc',
-      regBy: '',
-      regNum: '',
-      regParty: '',
-      regType: '',
-      secParty: '',
-      startDate: null,
-      status: ''
-    },
-    sortPage: 1,
-    totalRowCount: 0
-  },
-  search: {
-    searchDebtorName: null,
-    searchHistory: null,
-    searchHistoryLength: null,
-    searchResults: null,
-    manufacturedHomeSearchResults: null,
-    searchedType: null,
-    searchedValue: '',
-    searching: false,
-    searchCertified: false
-  },
-  selectedManufacturedHomes: [],
-  isStaffClientPayment: false,
-  staffPayment: null,
-  unsavedChanges: false,
-  userInfo: {
-    contacts: [],
-    feeSettings: null,
-    firstname: '',
-    lastname: '',
-    username: '',
-    settings: {
-      defaultDropDowns: true,
-      defaultTableFilters: true,
-      paymentConfirmationDialog: true,
-      selectConfirmationDialog: true
-    }
-  },
   mhrSearchResultSelectAllLien: false,
   mhrValidationState: {
     yourHomeValid: {
@@ -250,5 +262,19 @@ export const stateModel: StateModelIF = {
       validateSteps: false,
       validateApp: false
     }
+  },
+  mhrTransferValidationState: {
+    homeOwnersValid: {
+      ownersValid: false
+    },
+    reviewConfirmValid: {
+      validateApp: false
+    }
+  },
+  mhrTransfer: {
+    mhrNumber: '',
+    ownerGroups: [],
+    owners: [],
+    submittingParty: {}
   }
 }

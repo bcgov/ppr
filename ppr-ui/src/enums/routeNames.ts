@@ -25,5 +25,6 @@ export enum RouteNames {
   SUBMITTING_PARTY = 'submitting-party',
   SIGN_IN = 'signin',
   SIGN_OUT = 'signout',
-  YOUR_HOME = 'your-home'
+  YOUR_HOME = 'your-home',
+  MHR_INFORMATION = 'mhr-information'
 }

@@ -164,12 +164,16 @@ import { BaseDialog, RegistrationConfirmation } from '@/components/dialogs'
 import { AllRegistrationTypes, mhRegistrationTableHeaders, registrationTableHeaders } from '@/resources'
 import {
   BaseHeaderIF,
-  DialogOptionsIF, DraftResultIF,
-  ErrorIF, RegistrationSortIF,
+  DialogOptionsIF,
+  DraftResultIF,
+  ErrorIF,
+  RegistrationSortIF,
   RegistrationSummaryIF,
   RegistrationTypeIF,
   RegTableNewItemI,
-  StateModelIF, UserSettingsIF
+  StateModelIF,
+  UserSettingsIF,
+  MhRegistrationSummaryIF
 } from '@/interfaces'
 import { APIStatusTypes, ErrorCategories, RouteNames, SettingOptions, TableActions } from '@/enums'
 import {
@@ -235,12 +239,13 @@ export default defineComponent({
       resetNewRegistration, setRegistrationType, setRegTableCollapsed, setRegTableNewItem, setLengthTrust,
       setAddCollateral, setAddSecuredPartiesAndDebtors, setUnsavedChanges, setRegTableDraftsBaseReg,
       setRegTableDraftsChildReg, setRegTableTotalRowCount, setRegTableBaseRegs, setRegTableSortPage,
-      setRegTableSortHasMorePages, setRegTableSortOptions, setUserSettings, resetRegTableData
+      setRegTableSortHasMorePages, setRegTableSortOptions, setUserSettings, resetRegTableData, setMhrInformation
     } = useActions<any>([
       'resetNewRegistration', 'setRegistrationType', 'setRegTableCollapsed', 'setRegTableNewItem', 'setLengthTrust',
       'setAddCollateral', 'setAddSecuredPartiesAndDebtors', 'setUnsavedChanges', 'setRegTableDraftsBaseReg',
       'setRegTableDraftsChildReg', 'setRegTableTotalRowCount', 'setRegTableBaseRegs', 'setRegTableSortPage',
-      'setRegTableSortHasMorePages', 'setRegTableSortOptions', 'setUserSettings', 'resetRegTableData'
+      'setRegTableSortHasMorePages', 'setRegTableSortOptions', 'setUserSettings', 'resetRegTableData',
+      'setMhrInformation'
     ])
 
     const localState = reactive({
@@ -467,7 +472,7 @@ export default defineComponent({
       localState.loading = false
     }
 
-    const myRegActionHandler = ({ action, docId, regNum }): void => {
+    const myRegActionHandler = ({ action, docId, regNum, mhrInfo }): void => {
       localState.myRegAction = action as TableActions
       localState.myRegActionDocId = docId as string
       localState.myRegActionRegNum = regNum as string
@@ -500,6 +505,9 @@ export default defineComponent({
           break
         case TableActions.EDIT_NEW:
           editDraftNew(docId)
+          break
+        case TableActions.OPEN:
+          openMhr(mhrInfo)
           break
         default:
           localState.myRegAction = null
@@ -536,6 +544,11 @@ export default defineComponent({
         setRegTableCollapsed(null)
         await context.root.$router.replace({ name: RouteNames.LENGTH_TRUST })
       }
+    }
+
+    const openMhr = async (mhrSummary: MhRegistrationSummaryIF): Promise<void> => {
+      setMhrInformation(mhrSummary)
+      await context.root.$router.replace({ name: RouteNames.MHR_INFORMATION })
     }
 
     const myRegActionDialogHandler = (proceed: boolean): void => {

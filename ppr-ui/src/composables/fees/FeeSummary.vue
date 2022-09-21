@@ -144,11 +144,7 @@ import { useGetters } from 'vuex-composition-helpers'
 import { UIRegistrationTypes } from '@/enums'
 /* eslint-disable no-unused-vars */
 import { FeeSummaryTypes } from './enums'
-import {
-  AdditionalSearchFeeIF,
-  FeeSummaryI,
-  RegistrationLengthI
-} from './interfaces'
+import { AdditionalSearchFeeIF, FeeSummaryI, RegistrationLengthI } from './interfaces'
 // eslint-enable no-unused-vars
 import { getFeeHint, getFeeSummary } from './factories'
 
@@ -197,7 +193,7 @@ export default defineComponent({
       }),
       isValid: computed((): boolean => {
         return getLengthTrust.value.valid ||
-          [FeeSummaryTypes.MHSEARCH, FeeSummaryTypes.NEW_MHR].includes(localState.feeType)
+          [FeeSummaryTypes.MHSEARCH, FeeSummaryTypes.NEW_MHR, FeeSummaryTypes.MHR_TRANSFER].includes(localState.feeType)
       }),
       feeLabel: computed((): string => {
         return mapFeeTypeToDisplayName(localState.feeType)
@@ -260,7 +256,7 @@ export default defineComponent({
       }),
       isComplete: computed((): boolean => {
         return localState.isValid &&
-          (localState.feeSummary?.quantity > 0 || localState.additionalFeeSummary?.quantity > 0) && localState.isValid
+          (localState.feeSummary?.quantity > 0 || localState.additionalFeeSummary?.quantity > 0)
       }),
       totalAmount: computed((): number => {
         if (localState.isValid) {
@@ -299,6 +295,7 @@ export default defineComponent({
         case FeeSummaryTypes.AMEND: return 'Registration Amendment'
         case FeeSummaryTypes.MHSEARCH: return 'Manufactured Home search'
         case FeeSummaryTypes.MHR_COMBINED_SEARCH: return 'Combined Home and Lien search'
+        case FeeSummaryTypes.MHR_TRANSFER: return 'Ownership Transfer or Change'
         default: return localState.registrationType
       }
     }

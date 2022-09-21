@@ -1,9 +1,29 @@
 import { ProductCode, RegistrationFlowType } from '@/enums'
 import {
-  AddPartiesIF, AddCollateralIF, CourtOrderIF, DebtorNameIF, DraftIF, IndividualNameIF,
-  ManufacturedHomeSearchResponseIF, ManufacturedHomeSearchResultIF, LengthTrustIF, AccountProductSubscriptionIF,
-  AccountInformationIF, AuthorizationIF, CertifyIF, RegistrationTypeIF, SearchResponseIF, SearchTypeIF, RegTableDataI,
-  UserInfoIF, MhrRegistrationIF, UserProductSubscriptionIF, MhrValidationStateIF
+  AddPartiesIF,
+  AddCollateralIF,
+  CourtOrderIF,
+  DebtorNameIF,
+  DraftIF,
+  IndividualNameIF,
+  ManufacturedHomeSearchResponseIF,
+  ManufacturedHomeSearchResultIF,
+  LengthTrustIF,
+  AccountProductSubscriptionIF,
+  AccountInformationIF,
+  AuthorizationIF,
+  CertifyIF,
+  RegistrationTypeIF,
+  SearchResponseIF,
+  SearchTypeIF,
+  RegTableDataI,
+  UserInfoIF,
+  MhrRegistrationIF,
+  UserProductSubscriptionIF,
+  MhrValidationStateIF,
+  MhrTransferIF,
+  MhRegistrationSummaryIF,
+  MhrTransferValidationStateIF
 } from '@/interfaces'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 
@@ -38,7 +58,6 @@ export interface StateModelIF {
     registrationTypeOtherDesc: string
     showStepErrors: boolean
   }
-  mhrRegistration: MhrRegistrationIF
   registrationTable: RegTableDataI
   search: {
     searchDebtorName: IndividualNameIF
@@ -56,6 +75,10 @@ export interface StateModelIF {
   staffPayment: StaffPaymentIF
   unsavedChanges: Boolean // used for cancel flows
   userInfo: UserInfoIF
-  mhrValidationState?: MhrValidationStateIF
+  mhrInformation: MhRegistrationSummaryIF
+  mhrRegistration: MhrRegistrationIF
   mhrSearchResultSelectAllLien: boolean
+  mhrValidationState?: MhrValidationStateIF
+  mhrTransferValidationState: MhrTransferValidationStateIF
+  mhrTransfer: MhrTransferIF
 }
