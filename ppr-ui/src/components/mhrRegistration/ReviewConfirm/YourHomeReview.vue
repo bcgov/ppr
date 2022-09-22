@@ -215,13 +215,6 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-.review-header {
-  display: flex; // to align icons
-  background-color: $BCgovBlue5O;
-  padding: 1.25rem;
-  color: $gray9;
-}
-
 #mhr-registration-summary {
   h3 {
     line-height: unset;

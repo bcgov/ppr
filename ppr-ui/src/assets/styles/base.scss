@@ -697,3 +697,10 @@ tr.registration-row.draft-registration-row.added-reg-effect td.actions-cell,
     display: initial;
   }
 }
+
+.review-header {
+  display: flex; // to align icons
+  background-color: $BCgovBlue5O;
+  padding: 1.25rem;
+  color: $gray9;
+}

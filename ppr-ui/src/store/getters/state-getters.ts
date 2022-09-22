@@ -32,7 +32,8 @@ import {
   UserProductSubscriptionIF,
   UserSettingsIF,
   VehicleCollateralIF,
-  MhrRegistrationHomeOwnerGroupIF, MhRegistrationSummaryIF
+  MhrRegistrationHomeOwnerGroupIF,
+  MhRegistrationSummaryIF
 } from '@/interfaces'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 import { HomeLocation, HomeOwners, MhrReviewConfirm, SubmittingParty, YourHome } from '@/views'
@@ -48,6 +49,35 @@ export const getStateModel = (state: StateIF): StateModelIF => {
 /** The current account id. */
 export const getAccountId = (state: StateIF): number => {
   return state.stateModel.accountInformation?.id
+}
+
+/** Whether the current account is a premium account. */
+export const isPremiumAccount = (state: StateIF): boolean => {
+  return (state.stateModel.accountInformation?.accountType === AccountTypes.PREMIUM)
+}
+
+/** Whether the user has 'staff' keycloak role. */
+export const isRoleStaff = (state: StateIF): boolean => {
+  return (
+    state.stateModel.authorization?.authRoles.includes('staff') ||
+    isRoleStaffSbc(state)
+  )
+}
+
+export const isRoleStaffBcol = (state: StateIF): boolean => {
+  return state.stateModel.authorization?.authRoles.includes('helpdesk')
+}
+
+export const isRoleStaffReg = (state: StateIF): boolean => {
+  return state.stateModel.authorization?.authRoles.includes('ppr_staff')
+}
+
+export const isRoleStaffSbc = (state: StateIF): boolean => {
+  return state.stateModel.authorization?.isSbc
+}
+
+export const isRoleQualifiedSupplier = (state: StateIF): boolean => {
+  return state.stateModel.authorization?.authRoles.includes('mhr_transfer_sale')
 }
 
 /** The current account label/name. */
@@ -271,31 +301,6 @@ export const hasUnsavedChanges = (state: StateIF): Boolean => {
 /** Whether the current account is a non billable account. */
 export const isNonBillable = (state: StateIF): boolean => {
   return state.stateModel.userInfo?.feeSettings?.isNonBillable || false
-}
-
-/** Whether the current account is a premium account. */
-export const isPremiumAccount = (state: StateIF): boolean => {
-  return (state.stateModel.accountInformation?.accountType === AccountTypes.PREMIUM)
-}
-
-/** Whether the user has 'staff' keycloak role. */
-export const isRoleStaff = (state: StateIF): boolean => {
-  return (
-    state.stateModel.authorization?.authRoles.includes('staff') ||
-    isRoleStaffSbc(state)
-  )
-}
-
-export const isRoleStaffBcol = (state: StateIF): boolean => {
-  return state.stateModel.authorization?.authRoles.includes('helpdesk')
-}
-
-export const isRoleStaffReg = (state: StateIF): boolean => {
-  return state.stateModel.authorization?.authRoles.includes('ppr_staff')
-}
-
-export const isRoleStaffSbc = (state: StateIF): boolean => {
-  return state.stateModel.authorization?.isSbc
 }
 
 /** Whether the app is processing a search request or not. */
@@ -629,6 +634,7 @@ export const getMhrHomeSections = (state: StateIF): Array<HomeSectionIF> => {
   return state.stateModel.mhrRegistration.description.sections
 }
 
+// MHR Getters
 export const getMhrRegistrationManufacturerName = (state: StateIF): string => {
   return state.stateModel.mhrRegistration.description.manufacturer
 }
@@ -692,4 +698,8 @@ export const getMhrRegistrationHomeOwnerGroups = (state: StateIF): MhrRegistrati
 
 export const getMhrRegistrationValidationModel = (state: StateIF): MhrValidationStateIF => {
   return state.stateModel.mhrValidationState
+}
+
+export const getMhrInformation = (state: StateIF): MhRegistrationSummaryIF => {
+  return state.stateModel.mhrInformation
 }

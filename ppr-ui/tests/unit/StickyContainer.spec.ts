@@ -147,7 +147,6 @@ describe('Sticky Container component tests', () => {
 
     expect(wrapper.findComponent(FeeSummary).exists()).toBe(false)
     expect(wrapper.findComponent(ButtonsStacked).exists()).toBe(true)
-    expect(wrapper.vm.$data.backBtn).toBe(back)
     expect(wrapper.findComponent(ButtonsStacked).vm.$props.setBackBtn).toBe(back)
     expect(wrapper.vm.$data.cancelBtn).toBe(cancel)
     expect(wrapper.findComponent(ButtonsStacked).vm.$props.setCancelBtn).toBe(cancel)

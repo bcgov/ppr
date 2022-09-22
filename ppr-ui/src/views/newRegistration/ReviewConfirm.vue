@@ -328,12 +328,6 @@ export default class ReviewConfirm extends Vue {
     page-break-inside: avoid !important;
   }
 }
-
-.review-header {
-  color: $gray9;
-  font-size: 1.5rem;
-  font-weight: bold;
-}
 .reg-default-btn {
   background-color: $gray3 !important;
 }

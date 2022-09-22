@@ -25,3 +25,12 @@ export interface MhrValidationStateIF {
     validateApp: boolean
   }
 }
+
+export interface MhrTransferValidationStateIF {
+  homeOwnersValid: {
+    ownersValid: boolean
+  },
+  reviewConfirmValid: {
+    validateApp: boolean
+  }
+}

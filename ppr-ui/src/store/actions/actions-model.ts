@@ -27,7 +27,7 @@ import {
   UserProductSubscriptionIF,
   MhrRegistrationHomeOwnersIF,
   MhrRegistrationHomeOwnerGroupIF,
-  MhrRegistrationIF, MhRegistrationSummaryIF
+  MhrRegistrationIF, MhRegistrationSummaryIF, MhrTransferIF
 } from '@/interfaces'
 import { ActionIF } from '@/interfaces/store-interfaces/action-interface'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
@@ -344,4 +344,14 @@ export const setMhrRegistrationHomeOwnerGroups: ActionIF = (
 
 export const setMhrTableHistory: ActionIF = ({ commit }, baseRegs: MhRegistrationSummaryIF[]): void => {
   commit('mutateMhrTableHistory', baseRegs)
+}
+
+// MHR Information
+export const setMhrInformation: ActionIF = ({ commit }, mhrInfo: MhRegistrationSummaryIF): void => {
+  commit('mutateMhrInformation', mhrInfo)
+}
+
+// MHR Transfer
+export const setEmptyMhrTransfer: ActionIF = ({ commit }, emptyMhrTransfer: MhrTransferIF): void => {
+  commit('mutateEmptyMhrTransfer', emptyMhrTransfer)
 }

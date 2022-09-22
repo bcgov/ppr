@@ -251,20 +251,23 @@ import { DatePicker } from '@/components/common'
 import RegistrationBarTypeAheadList from '@/components/registration/RegistrationBarTypeAheadList.vue'
 import { TableObserver, TableRow } from './common'
 // local types/helpers/etc.
+/* eslint-disable no-unused-vars */
 import {
-  RegistrationSummaryIF, // eslint-disable-line no-unused-vars
-  AccountProductSubscriptionIF, // eslint-disable-line no-unused-vars
-  RegistrationTypeIF, // eslint-disable-line no-unused-vars
-  BaseHeaderIF, // eslint-disable-line no-unused-vars
-  DraftResultIF, // eslint-disable-line no-unused-vars
-  RegistrationSortIF, // eslint-disable-line no-unused-vars
-  ErrorIF, // eslint-disable-line no-unused-vars
-  RegTableNewItemI // eslint-disable-line no-unused-vars
+  RegistrationSummaryIF,
+  AccountProductSubscriptionIF,
+  RegistrationTypeIF,
+  BaseHeaderIF,
+  DraftResultIF,
+  RegistrationSortIF,
+  ErrorIF,
+  RegTableNewItemI,
+  MhRegistrationSummaryIF
 } from '@/interfaces'
+/* eslint-enable no-unused-vars */
 import {
-  AccountProductCodes, // eslint-disable-line no-unused-vars
-  AccountProductRoles, // eslint-disable-line no-unused-vars
-  TableActions // eslint-disable-line no-unused-vars
+  AccountProductCodes,
+  AccountProductRoles,
+  TableActions
 } from '@/enums'
 import { useRegistration } from '@/composables/useRegistration'
 import { RegistrationTypesStandard, StatusTypes } from '@/resources'
@@ -436,11 +439,12 @@ export default defineComponent({
       emit('error', error)
     }
 
-    const emitRowAction = ({ action, docId, regNum }): void => {
+    const emitRowAction = ({ action, docId, regNum, mhrInfo }): void => {
       emit('action', {
         action: action as TableActions,
         docId: docId as string,
-        regNum: regNum as string
+        regNum: regNum as string,
+        mhrInfo: mhrInfo as MhRegistrationSummaryIF
       })
     }
 

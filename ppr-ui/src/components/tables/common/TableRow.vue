@@ -159,11 +159,12 @@
 
     <!-- Action Btns -->
     <td
-      v-if="headers.length > 1 && isPpr"
+      v-if="headers.length > 1"
       class="actions-cell pl-2 py-4"
       :style="disableActionShadow ? 'box-shadow: none; border-left: none;' : ''"
     >
-      <v-row v-if="!isChild || isDraft(item)" class="actions" no-gutters>
+      <!-- PPR ACTIONS -->
+      <v-row v-if="isPpr && (!isChild || isDraft(item))" class="actions" no-gutters>
         <v-col class="edit-action pa-0" cols="auto">
           <v-btn
             v-if="isDraft(item)"
@@ -296,33 +297,35 @@
           </v-menu>
         </v-col>
       </v-row>
+
+      <!-- MHR ACTIONS -->
+      <v-row v-else class="actions" :class="$style['mhr-actions']" no-gutters>
+        <v-col class="pa-0" cols="auto">
+          <v-btn
+            v-if="enableOpenMhr(item.statusType)"
+            color="primary"
+            elevation="0"
+            width="100"
+            :class="$style['open-btn']"
+            @click="openMhr(item)"
+          >
+            <span>Open</span>
+          </v-btn>
+        </v-col>
+      </v-row>
     </td>
   </tr>
 </template>
 
 <script lang="ts">
-import {
-  defineComponent,
-  reactive,
-  toRefs,
-  computed,
-  watch
-} from '@vue/composition-api'
-import {getRegistrationSummary, mhRegistrationPDF, registrationPDF} from '@/utils' // eslint-disable-line
+import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
+import { getRegistrationSummary, mhRegistrationPDF, registrationPDF } from '@/utils'
+import { useGetters } from 'vuex-composition-helpers'
 
-// local types/helpers/etc.
-import {
-  RegistrationSummaryIF, // eslint-disable-line no-unused-vars
-  BaseHeaderIF, // eslint-disable-line no-unused-vars
-  DraftResultIF // eslint-disable-line no-unused-vars
-} from '@/interfaces'
-import {
-  APIRegistrationTypes,
-  APIStatusTypes, // eslint-disable-line no-unused-vars
-  DraftTypes, // eslint-disable-line no-unused-vars
-  TableActions, // eslint-disable-line no-unused-vars
-  UIRegistrationClassTypes
-} from '@/enums'
+/* eslint-disable no-unused-vars */
+import { BaseHeaderIF, DraftResultIF, MhRegistrationSummaryIF, RegistrationSummaryIF } from '@/interfaces'
+/* eslint-enable no-unused-vars */
+import { APIRegistrationTypes, APIStatusTypes, DraftTypes, TableActions, UIRegistrationClassTypes } from '@/enums'
 import { useRegistration } from '@/composables/useRegistration'
 import moment from 'moment'
 
@@ -339,6 +342,7 @@ export default defineComponent({
   },
   emits: ['action', 'error', 'freezeScroll', 'toggleExpand'],
   setup (props, { emit }) {
+    const { isRoleQualifiedSupplier } = useGetters<any>(['isRoleQualifiedSupplier'])
     const {
       getFormattedDate,
       getRegistrationType,
@@ -457,6 +461,17 @@ export default defineComponent({
           regNum: item.baseRegistrationNumber
         })
       }
+    }
+
+    const enableOpenMhr = (status: APIStatusTypes) => {
+      return status === APIStatusTypes.MHR_ACTIVE && isRoleQualifiedSupplier.value
+    }
+
+    const openMhr = (item: MhRegistrationSummaryIF): void => {
+      emit('action', {
+        action: TableActions.OPEN,
+        mhrInfo: item
+      })
     }
 
     const getRegistrationClass = (regClass: string): string => {
@@ -627,6 +642,8 @@ export default defineComponent({
       TableActions,
       toggleExpand,
       tooltipTxtPdf,
+      openMhr,
+      enableOpenMhr,
       ...toRefs(localState)
     }
   }
@@ -672,5 +689,15 @@ export default defineComponent({
 .discharge-btn {
   line-height: 14px;
   width: 90px;
+}
+.open-btn {
+  font-size: 14px !important;
+  font-weight: normal !important;
+  height: 35px !important;
+  width: 100px;
+}
+.mhr-actions {
+  margin: auto;
+  width: 80%;
 }
 </style>

@@ -508,15 +508,14 @@ export const mhRegistrationTableHeaders: Array<BaseHeaderIF> = [
     text: 'Documents',
     value: 'vs',
     display: true
+  },
+  {
+    class: 'registration-action',
+    sortable: false,
+    text: 'Actions',
+    value: 'actions',
+    display: true
   }
-  // TODO: Implement Actions when required
-  // {
-  //   class: 'registration-action',
-  //   sortable: false,
-  //   text: 'Actions',
-  //   value: 'actions',
-  //   display: true
-  // }
 ]
 
 export const mhSearchNameHeaders: Array<BaseHeaderIF> = [
