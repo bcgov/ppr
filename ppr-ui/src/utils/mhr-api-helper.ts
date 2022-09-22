@@ -7,10 +7,11 @@ import {
   ManufacturedHomeSearchResultIF,
   SearchResponseIF,
   MhrSearchCriteriaIF,
-  RegistrationSummaryIF
+  MhRegistrationSummaryIF
 } from '@/interfaces'
 import { ErrorCategories, ErrorCodes } from '@/enums'
 import { useSearch } from '@/composables/useSearch'
+import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 const { mapMhrSearchType } = useSearch()
 
 // Submit an mhr search query request.
@@ -100,14 +101,15 @@ function mhrStaffPaymentParameters (staffPayment: StaffPaymentIF) {
 export async function getMHRegistrationSummary (
   registrationNum: string,
   refreshing: boolean
-): Promise<(RegistrationSummaryIF)> {
+): Promise<MhRegistrationSummaryIF> {
   const url = sessionStorage.getItem('MHR_API_URL')
   const config = { baseURL: url, headers: { Accept: 'application/json' } }
 
   return axios
-    .get(`registrations/${registrationNum}`, config)
+    .get(`other-registrations/${registrationNum}`, config)
     .then(response => {
-      const data = response?.data as RegistrationSummaryIF
+      const data = response?.data as MhRegistrationSummaryIF
+      console.log(data)
       if (!data) throw new Error('Invalid API response')
       if (!refreshing && data.inUserList) {
         data.error = {
@@ -133,17 +135,71 @@ export async function getMHRegistrationSummary (
         }
       }
       return {
-        baseRegistrationNumber: '',
+        clientReferenceId: '',
         createDateTime: '',
+        mhrNumber: '',
+        ownerNames: '',
         path: '',
-        registeringParty: '',
-        registrationClass: '',
         registrationDescription: '',
-        registrationNumber: '',
-        registrationType: null,
-        securedParties: '',
+        statusType: '',
+        submittingParty: '',
+        username: '',
         error: {
           category: ErrorCategories.HISTORY_REGISTRATIONS,
+          statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
+          message: error?.response?.data?.message,
+          detail: error?.response?.data?.rootCause?.detail,
+          type: error?.response?.data?.rootCause?.type?.trim() as ErrorCodes
+        }
+      }
+    })
+}
+
+// Add MHR to My Registrations
+export async function addMHRegistrationSummary (registrationNum: string): Promise<MhRegistrationSummaryIF> {
+  const url = sessionStorage.getItem('MHR_API_URL')
+
+  const currentAccount = sessionStorage.getItem(SessionStorageKeys.CurrentAccount)
+  if (!currentAccount) console.error('Error: current account expected, but not found.')
+  const currentAccountId = JSON.parse(currentAccount)?.id
+
+  const config = { baseURL: url, headers: { Accept: 'application/json', 'Account-Id': currentAccountId } }
+
+  return axios
+    .post(`other-registrations/registrations/${registrationNum}`, {}, config)
+    .then(response => {
+      const data = response?.data as MhRegistrationSummaryIF
+      if (!data) {
+        throw new Error('Invalid API response')
+      }
+      return data
+    })
+    .catch(error => {
+      if (error?.response?.data) {
+        try {
+          error.response.data.rootCause = error.response.data.rootCause
+            .replace('detail:', '"detail":"')
+            .replace('type:', '"type":"')
+            .replace('message:', '"message":"')
+            .replace('status_code:', '"statusCode":"')
+            .replaceAll(',', '",')
+          error.response.data.rootCause = `{${error.response.data.rootCause}"}`
+          error.response.data.rootCause = JSON.parse(error.response.data.rootCause)
+        } catch (error) {
+          // continue
+        }
+      }
+      return {
+        clientReferenceId: '',
+        createDateTime: '',
+        mhrNumber: '',
+        ownerNames: '',
+        path: '',
+        registrationDescription: '',
+        statusType: '',
+        submittingParty: '',
+        username: '',
+        error: {
           statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
           message: error?.response?.data?.message,
           detail: error?.response?.data?.rootCause?.detail,
