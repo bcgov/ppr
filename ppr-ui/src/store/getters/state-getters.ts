@@ -77,8 +77,7 @@ export const isRoleStaffSbc = (state: StateIF): boolean => {
 }
 
 export const isRoleQualifiedSupplier = (state: StateIF): boolean => {
-  // Currently MHR Flows are Staff only so this check is obsolete until open to clients
-  return true // state.stateModel.authorization?.authRoles.includes('mhr_transfer_sale')
+  return state.stateModel.authorization?.authRoles.includes('mhr_transfer_sale')
 }
 
 /** The current account label/name. */

@@ -102,6 +102,7 @@ import { SearchHistory } from '@/components/tables'
 import { SearchBar } from '@/components/search'
 import { useSearch } from '@/composables/useSearch'
 import { DashboardTabs } from '@/components/dashboard'
+import { isRoleQualifiedSupplier } from '@/store/getters'
 
 @Component({
   components: {
@@ -122,6 +123,7 @@ export default class Dashboard extends Vue {
   @Getter hasMhrRole!: boolean
   @Getter hasPprRole!: boolean
   @Getter isNonBillable!: boolean
+  @Getter isRoleQualifiedSupplier!: boolean
   @Getter getUserProductSubscriptionsCodes: Array<ProductCode>
 
   @Action resetNewRegistration: ActionBindingIF
@@ -163,7 +165,8 @@ export default class Dashboard extends Vue {
   }
 
   private get enableDashboardTabs (): boolean {
-    return getFeatureFlag('mhr-registration-enabled') && this.hasPprRole && this.hasMhrRole && this.isRoleStaff
+    return getFeatureFlag('mhr-registration-enabled') &&
+      this.hasPprRole && this.hasMhrRole && (this.isRoleStaff || this.isRoleQualifiedSupplier)
   }
 
   private get isAuthenticated (): boolean {
