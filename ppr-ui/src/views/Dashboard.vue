@@ -102,7 +102,6 @@ import { SearchHistory } from '@/components/tables'
 import { SearchBar } from '@/components/search'
 import { useSearch } from '@/composables/useSearch'
 import { DashboardTabs } from '@/components/dashboard'
-import { isRoleQualifiedSupplier } from '@/store/getters'
 
 @Component({
   components: {
