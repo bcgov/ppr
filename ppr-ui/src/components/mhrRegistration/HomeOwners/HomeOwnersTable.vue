@@ -41,7 +41,7 @@
           <td class="owner-name">
             <div v-if="row.item.individualName" class="owner-icon-name">
               <v-icon class="mr-2">mdi-account</v-icon>
-              <div>
+              <div class="owner-name-bold">
                 {{ row.item.individualName.first }}
                 {{ row.item.individualName.middle }}
                 {{ row.item.individualName.last }}
@@ -81,7 +81,10 @@
             <!-- Actions drop down menu -->
             <v-menu offset-y left nudge-bottom="0">
               <template v-slot:activator="{ on }">
-                <v-btn text v-on="on" color="primary" class="px-0" :disabled="isAddingMode || isGlobalEditingMode">
+                <v-btn text v-on="on"
+                 color="primary" class="px-0"
+                 :disabled="isAddingMode || isGlobalEditingMode"
+                >
                   <v-icon>mdi-menu-down</v-icon>
                 </v-btn>
               </template>
@@ -100,14 +103,14 @@
         </tr>
         <tr v-else>
           <td :colspan="4" class="py-1">
-            <div class="error-text pa-4 text-center">Group must contain at least one owner</div>
+            <div class="my-6 text-center">
+              No owners added yet.
+            </div>
           </td>
         </tr>
       </template>
       <template v-slot:no-data>
-        <div class="my-6">
-          No owners added yet.
-        </div>
+        <div class="error-text pa-4 text-center">No owners added yet.</div>
       </template>
     </v-data-table>
   </v-card>
@@ -227,6 +230,11 @@ export default defineComponent({
     font-weight: bold;
   }
 
+  .owner-name-bold {
+    color: #212529;
+    font-weight: bold;
+  }
+
   table {
     tbody > tr > td {
       padding: 20px 12px;
@@ -277,7 +285,12 @@ export default defineComponent({
     line-height: 22px;
     margin-left: 34px;
   }
+  .theme--light.v-btn.v-btn--disabled {
+    color:#1669bb !important;
+    opacity: 0.4 !important;
+  }
 }
+
 .v-menu__content {
   cursor: pointer;
 }

@@ -88,9 +88,16 @@
         Add a Business or Organization
       </v-btn>
       <div class="my-6">
-        <span class="generic-label">Home Tenancy Type: </span>{{ getHomeTenancyType() }}
+        <div><span class="generic-label">Home Tenancy Type: </span>{{ homeTenancyType }}
+          <span v-show="showGroups">
+              <span v-show="ownershipAllocation.hasMinimumGroupsError" class="error-text fs-14 ml-3"
+              >Must include more than one group of owners
+              </span>
+          </span>
+        </div>
         <div v-show="showGroups">
-          <span class="generic-label">Total Ownership Allocated: </span>{{ ownershipAllocation.totalAllocation }}
+          <span class="generic-label">Total Ownership Allocated:</span>
+          <span> {{ interestType }} </span>{{ ownershipAllocation.totalAllocation }}
           <span v-show="ownershipAllocation.hasTotalAllocationError" class="error-text fs-14 ml-3"
             >Total ownership must equal 1/1</span
           >
@@ -144,6 +151,7 @@ import {
 import { useHomeOwners } from '@/composables/mhrRegistration'
 /* eslint-disable no-unused-vars */
 import { MhrRegistrationHomeOwnersIF, MhrRegistrationTotalOwnershipAllocationIF } from '@/interfaces'
+import { HomeTenancyTypes } from '@/enums'
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
@@ -167,7 +175,9 @@ export default defineComponent({
       setGlobalEditingMode,
       isGlobalEditingMode,
       showGroups,
-      getTotalOwnershipAllocationStatus
+      getTotalOwnershipAllocationStatus,
+      hasMinimumGroups,
+      getInterestString
     } = useHomeOwners()
 
     const localState = reactive({
@@ -178,7 +188,10 @@ export default defineComponent({
       }),
       ownershipAllocation: computed(
         () => getTotalOwnershipAllocationStatus() as MhrRegistrationTotalOwnershipAllocationIF
-      )
+      ),
+      isValidGroups: computed(() => { return hasMinimumGroups() }),
+      homeTenancyType: computed(() => { return getHomeTenancyType() }),
+      interestType: computed(() => { return getInterestString() })
     })
 
     // Enable editing mode whenever adding Person or Business
@@ -216,6 +229,7 @@ export default defineComponent({
       editHomeOwner,
       removeHomeOwner,
       getHomeTenancyType,
+      getInterestString,
       showGroups,
       ...toRefs(localState)
     }

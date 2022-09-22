@@ -12,6 +12,8 @@
       <v-text-field
         :id="`interest-type-group-${groupId}`"
         label="Interest Type (Optional)"
+        filled
+        class="background-white"
         v-model="fractionalData.interest"
         :data-test-id="`interest-type-field-group-${groupId}`"
       />
@@ -20,6 +22,7 @@
           :id="`fraction-amount-group-${groupId}`"
           label="Amount Owned by this Group"
           filled
+          class="background-white"
           v-model.number="fractionalData.interestNumerator"
           :rules="fractionalAmountRules"
           :data-test-id="`fraction-amount-field-group-${groupId}`"
@@ -31,6 +34,7 @@
           :id="`total-fractions-group-${groupId}`"
           label="Total Available"
           filled
+          class="background-white"
           v-model.number="fractionalData.interestTotal"
           :rules="totalAmountRules"
           :data-test-id="`total-fractions-field-group-${groupId}`"
@@ -88,7 +92,7 @@ export default defineComponent({
       fractionalInterest: computed(
         () =>
           // eslint-disable-next-line max-len
-          `${props.fractionalData.interest} ${props.fractionalData.interestNumerator} / ${props.fractionalData.interestTotal}`
+          `${props.fractionalData.interest} ${props.fractionalData.interestNumerator}/${props.fractionalData.interestTotal}`
       ),
       fractionalAmountRules: computed(() => {
         const rules = customRules(
@@ -122,13 +126,14 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+
 #mhr-home-ownership ::v-deep {
   p {
     white-space: normal;
     font-size: 16px;
     line-height: 24px;
+    color: #495057
   }
-
   .owner-fractions {
     display: flex;
     flex-direction: row;
@@ -144,4 +149,5 @@ export default defineComponent({
     }
   }
 }
+
 </style>

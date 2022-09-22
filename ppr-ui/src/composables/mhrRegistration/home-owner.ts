@@ -62,8 +62,10 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
     if (showGroups.value) {
       // At leas one group showing with one or more owners
       return HomeTenancyTypes.COMMON
-    } else if (numOfOwners === 1) {
+    } else if (numOfOwners === 1 && getMhrRegistrationHomeOwners.value[0].address !== undefined) {
       // One owner without groups showing
+      // Added second condition, because when an owner exists as a Sole Ownership, editing and clicking Done,
+      // will change status to Tenants in Common unless above logic is in place..
       return HomeTenancyTypes.SOLE
     } else if (numOfOwners > 1) {
       // More than one owner without groups showing
@@ -94,11 +96,19 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
     const fractionalDenominator = getMhrRegistrationHomeOwnerGroups.value[0]?.interestTotal || null
 
     return {
-      totalAllocation: totalFractionalNominator + ' / ' + fractionalDenominator,
-      hasTotalAllocationError: totalFractionalNominator !== fractionalDenominator
+      totalAllocation: totalFractionalNominator + '/' + fractionalDenominator,
+      hasTotalAllocationError: totalFractionalNominator !== fractionalDenominator,
+      hasMinimumGroupsError: getMhrRegistrationHomeOwnerGroups.value.length < 2
     }
   }
 
+  const getInterestString = (): string => {
+    return getMhrRegistrationHomeOwnerGroups !== undefined &&
+    getMhrRegistrationHomeOwnerGroups.value.length >= 1 ? getMhrRegistrationHomeOwnerGroups.value[0].interest : ''
+  }
+  const hasMinimumGroups = (): boolean => {
+    return !getMhrRegistrationHomeOwnerGroups.value || getMhrRegistrationHomeOwnerGroups.value.length < 2
+  }
   // WORKING WITH GROUPS
 
   // Generate dropdown items for the group selection
@@ -289,8 +299,10 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
     () => getMhrRegistrationHomeOwnerGroups.value,
     () => {
       // set step validation for home owners
-      const isHomeOwnersValid = showGroups.value ? !getTotalOwnershipAllocationStatus().hasTotalAllocationError : true
-      setValidation(MhrSectVal.HOME_OWNERS_VALID, MhrCompVal.OWNERS_VALID, isHomeOwnersValid)
+      var isHomeOwnersValid = showGroups.value ? !getTotalOwnershipAllocationStatus().hasTotalAllocationError : true
+      if (getMhrRegistrationHomeOwnerGroups.value.length === 0 || !getMhrRegistrationHomeOwnerGroups.value[0].owners) {
+        isHomeOwnersValid = false
+      }
 
       if (getMhrRegistrationHomeOwnerGroups.value.length === 0) {
         setShowGroups(false)
@@ -300,6 +312,8 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
         // check if at least one Owner Group has no owners. Used to display an error for the table.
         hasEmptyGroup.value = !getMhrRegistrationHomeOwnerGroups.value.every(group => group.owners.length > 0)
       }
+
+      setValidation(MhrSectVal.HOME_OWNERS_VALID, MhrCompVal.OWNERS_VALID, isHomeOwnersValid)
     }
   )
 
@@ -318,6 +332,8 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
     setShowGroups,
     setGlobalEditingMode,
     deleteGroup,
-    setGroupFractionalInterest
+    setGroupFractionalInterest,
+    hasMinimumGroups,
+    getInterestString
   }
 }

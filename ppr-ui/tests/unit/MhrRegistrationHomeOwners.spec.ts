@@ -253,6 +253,6 @@ describe('Home Owners', () => {
     const fractionalOwnershipSections = addOwnerSection.findComponent(FractionalOwnership)
     expect(fractionalOwnershipSections.exists()).toBeTruthy()
     const readonlyInterest = fractionalOwnershipSections.find(getTestId('readonly-interest-info'))
-    expect(readonlyInterest.text()).toContain('Undivided 123 / 432')
+    expect(readonlyInterest.text()).toContain('Undivided 123/432')
   })
 })

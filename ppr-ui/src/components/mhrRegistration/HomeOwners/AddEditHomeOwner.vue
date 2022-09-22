@@ -394,8 +394,8 @@ export default defineComponent({
             localState.ownerGroupId
           )
         }
-
-        if (Number(localState.ownerGroupId) > 0) {
+        // check if group has some fractional data
+        if (localState.groupFractionalData.interestNumerator) {
           setShowGroups(true)
 
           // Get fractional data based on owner's group id
