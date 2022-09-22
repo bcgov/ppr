@@ -73,7 +73,7 @@
               @keypress.enter="findRegistration(myRegAdd)"
             />
             <p v-if="myRegAddInvalid" class="validation-msg mx-3 my-1">
-              Registration numbers contain 7 characters
+              Registration numbers contain {{ isMhr ? '6' : '7' }} characters
             </p>
           </v-col>
         </v-row>
@@ -180,7 +180,7 @@ import {
   addRegistrationSummary,
   convertDate,
   deleteDraft, deleteRegistrationSummary, draftHistory,
-  getRegistrationSummary, registrationHistory,
+  getMHRegistrationSummary, getRegistrationSummary, registrationHistory,
   setupFinancingStatementDraft, updateUserSettings
 } from '@/utils'
 import {
@@ -278,7 +278,8 @@ export default defineComponent({
         return []
       }),
       myRegAddInvalid: computed((): boolean => {
-        return ![0, 7].includes(
+        const maxLength = props.isMhr ? 6 : 7
+        return ![0, maxLength].includes(
           localState.myRegAdd?.trim().length || 0) || (localState.myRegAdd && !localState.myRegAdd?.trim()
         )
       }),
@@ -360,7 +361,7 @@ export default defineComponent({
       localState.loading = true
       localState.myRegAddDialog = null
       regNum = regNum.trim()
-      const reg = await getRegistrationSummary(regNum, false)
+      const reg = await props.isMhr ? getMHRegistrationSummary(regNum, false) : getRegistrationSummary(regNum, false)
       if (!reg.error) {
         myRegAddFoundSetDialog(regNum, reg)
       } else {
