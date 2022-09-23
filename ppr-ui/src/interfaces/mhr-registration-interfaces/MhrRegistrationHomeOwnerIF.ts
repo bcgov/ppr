@@ -1,6 +1,6 @@
 import { AddressIF } from '@/composables/address/interfaces'
 
-export interface MhrRegistrationHomeOwnersIF {
+export interface MhrRegistrationHomeOwnerIF {
   id?: string, // optional property used for editing a home owner
   groupId?: string,
   individualName?: {

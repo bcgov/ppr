@@ -14,8 +14,7 @@ import {
 import { SimpleHelpToggle } from '@/components/common'
 import { mockedPerson, mockedOrganization } from './test-data/mock-mhr-registration'
 import { getTestId } from './utils/helper-functions'
-import { MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnersIF } from '@/interfaces'
-import { BaseAddress } from '@/composables/address'
+import { MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF } from '@/interfaces'
 
 Vue.use(Vuetify)
 
@@ -113,7 +112,7 @@ describe('Home Owners', () => {
   })
 
   it('renders home owner (person and org) via store dispatch', async () => {
-    const owners = [mockedPerson] as MhrRegistrationHomeOwnersIF[]
+    const owners = [mockedPerson] as MhrRegistrationHomeOwnerIF[]
     const homeOwnerGroup = [{ groupId: '1', owners: owners }] as MhrRegistrationHomeOwnerGroupIF[]
 
     // add a person
@@ -238,13 +237,23 @@ describe('Home Owners', () => {
 
   it('should show fractional ownership', async () => {
     const homeOwnerGroup = [
-      { groupId: '1', owners: [mockedPerson, mockedOrganization], interest: 'Undivided', interestNumerator: 123, interestTotal: 432 }
+      {
+        groupId: '1',
+        owners: [mockedPerson, mockedOrganization],
+        interest: 'Undivided',
+        interestNumerator: 123,
+        interestTotal: 432
+      }
     ] as MhrRegistrationHomeOwnerGroupIF[]
 
     // add a person
     await store.dispatch('setMhrRegistrationHomeOwnerGroups', homeOwnerGroup)
 
-    await wrapper.findComponent(HomeOwners).findComponent(HomeOwnersTable).find(getTestId('table-edit-btn')).trigger('click')
+    await wrapper
+      .findComponent(HomeOwners)
+      .findComponent(HomeOwnersTable)
+      .find(getTestId('table-edit-btn'))
+      .trigger('click')
 
     const addOwnerSection = wrapper.findComponent(HomeOwnersTable).findComponent(AddEditHomeOwner)
     expect(addOwnerSection.exists()).toBeTruthy()

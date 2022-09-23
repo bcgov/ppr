@@ -151,6 +151,8 @@ import { useRegistration } from '@/composables/useRegistration'
 import { RegistrationTypesStandard, StatusTypes } from '@/resources'
 
 export default defineComponent({
+  name: 'MhrRegistrationTable',
+  emits: ['action', 'error', 'getNext', 'sort'],
   components: {
     DatePicker,
     RegistrationBarTypeAheadList,

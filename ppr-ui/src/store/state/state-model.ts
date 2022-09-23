@@ -179,7 +179,6 @@ export const stateModel: StateModelIF = {
       phoneExtension: ''
     },
     ownerGroups: [],
-    owners: [],
     attentionReferenceNum: '',
     location: {
       parkName: '',

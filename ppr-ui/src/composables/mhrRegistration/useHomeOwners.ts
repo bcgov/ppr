@@ -1,7 +1,7 @@
 import {
   MhrRegistrationTotalOwnershipAllocationIF,
   MhrRegistrationHomeOwnerGroupIF,
-  MhrRegistrationHomeOwnersIF,
+  MhrRegistrationHomeOwnerIF,
   MhrRegistrationFractionalOwnershipIF
 } from '@/interfaces'
 import '@/utils/use-composition-api'
@@ -147,7 +147,7 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
     })
   }
 
-  const addOwnerToTheGroup = (owner: MhrRegistrationHomeOwnersIF, groupId: string) => {
+  const addOwnerToTheGroup = (owner: MhrRegistrationHomeOwnerIF, groupId: string) => {
     const homeOwnerGroups = [...getMhrRegistrationHomeOwnerGroups.value]
 
     // Try to find a group to add the owner
@@ -162,7 +162,7 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
       // No groups exist, need to create a new one
       const newGroup = {
         groupId: groupId || DEFAULT_GROUP_ID,
-        owners: [owner] as MhrRegistrationHomeOwnersIF[]
+        owners: [owner] as MhrRegistrationHomeOwnerIF[]
       } as MhrRegistrationHomeOwnerGroupIF
       homeOwnerGroups.push(newGroup)
     }
@@ -170,7 +170,7 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
     setMhrRegistrationHomeOwnerGroups(homeOwnerGroups)
   }
 
-  const editHomeOwner = (updatedOwner: MhrRegistrationHomeOwnersIF, newGroupId: string) => {
+  const editHomeOwner = (updatedOwner: MhrRegistrationHomeOwnerIF, newGroupId: string) => {
     const homeOwnerGroups = [...getMhrRegistrationHomeOwnerGroups.value]
     const groupIdOfOwner = getGroupForOwner(updatedOwner.id).groupId
 
@@ -191,10 +191,8 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
   }
 
   // Remove Owner from the Group it belongs to
-  const removeOwner = (owner: MhrRegistrationHomeOwnersIF) => {
-    const homeOwnerGroups = [
-      ...getMhrRegistrationHomeOwnerGroups.value
-    ] as MhrRegistrationHomeOwnerGroupIF[]
+  const removeOwner = (owner: MhrRegistrationHomeOwnerIF) => {
+    const homeOwnerGroups = [...getMhrRegistrationHomeOwnerGroups.value] as MhrRegistrationHomeOwnerGroupIF[]
 
     // find group id that owner belongs to
     const groupIdOfOwner = getGroupForOwner(owner.id)?.groupId || DEFAULT_GROUP_ID

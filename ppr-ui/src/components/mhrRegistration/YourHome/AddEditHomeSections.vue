@@ -119,14 +119,15 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable no-unused-vars */
 import { computed, defineComponent, reactive, toRefs } from '@vue/composition-api'
+/* eslint-disable no-unused-vars */
 import { HomeSectionIF } from '@/interfaces'
 import { useInputRules } from '@/composables/useInputRules'
 /* eslint-disable no-unused-vars */
 
 export default defineComponent({
   name: 'AddEditHomeSections',
+  emits: ['close', 'remove', 'submit'],
   props: {
     isNewHomeSection: { type: Boolean, default: true },
     editHomeSection: { type: Object as () => HomeSectionIF, default: () => {} }

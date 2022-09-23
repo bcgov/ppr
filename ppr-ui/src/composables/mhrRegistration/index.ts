@@ -1,3 +1,3 @@
-export { useHomeOwners } from './home-owner'
+export { useHomeOwners } from './useHomeOwners'
 export { useMhrValidations } from './useMhrValidations'
 export { useNewMhrRegistration } from './useNewMhrRegistration'
