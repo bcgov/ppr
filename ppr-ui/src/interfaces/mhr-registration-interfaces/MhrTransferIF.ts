@@ -1,5 +1,5 @@
 import {
-  MhrRegistrationHomeOwnersIF,
+  MhrRegistrationHomeOwnerIF,
   MhrRegistrationHomeOwnerGroupIF,
   PartyIF
 } from '@/interfaces'
@@ -7,6 +7,6 @@ import {
 export interface MhrTransferIF {
   mhrNumber: string
   ownerGroups: MhrRegistrationHomeOwnerGroupIF[]
-  owners: MhrRegistrationHomeOwnersIF[]
+  owners: MhrRegistrationHomeOwnerIF[]
   submittingParty: PartyIF
 }
