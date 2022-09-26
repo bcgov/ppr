@@ -136,7 +136,8 @@ TEST_PAYMENT_MOCK = [
 TEST_PAYMENT_DATA = [
     ('MHR Registration', TransactionTypes.REGISTRATION, '1234', 'UT-00001', 1),
     ('MHR Registration no client id', TransactionTypes.REGISTRATION, '1234', None, 1),
-    ('MHR Registration no trans id', TransactionTypes.REGISTRATION, None, 'UT-00001', 1)
+    ('MHR Registration no trans id', TransactionTypes.REGISTRATION, None, 'UT-00001', 1),
+    ('MHR Transfer', TransactionTypes.TRANSFER, '1234', 'UT-00001', 1),
 ]
 # testdata pattern is ({type}, {trans_id}, {client_id}, {routingSlip}, {bcolNum}, {datNum}, {waiveFees}, {priority})
 TEST_PAYMENT_DATA_STAFF = [
@@ -378,7 +379,7 @@ def test_create_payment_data_staff(client, jwt, type, trans_id, client_id, routi
     """Assert that the staff payment payment-request body is as expected for a pay transaction type."""
     transaction_info = {
         'transactionType': type,
-        'feeQuantity': 1
+        'quantity': 1
     }
     if routing_slip:
         transaction_info['routingSlipNumber'] = routing_slip
@@ -438,7 +439,7 @@ def test_client_registration_staff_mock(session, client, jwt, type, trans_id, cl
     pay_client.api_url = MOCK_URL_NO_KEY
     transaction_info = {
         'transactionType': type,
-        'feeQuantity': 1
+        'quantity': 1
     }
     if routing_slip:
         transaction_info['routingSlipNumber'] = routing_slip
@@ -474,7 +475,7 @@ def test_pay_registration_staff_mock(session, client, jwt, type, trans_id, clien
     payment.api_url = MOCK_URL_NO_KEY
     transaction_info = {
         'transactionType': type,
-        'feeQuantity': 1
+        'quantity': 1
     }
     if routing_slip:
         transaction_info['routingSlipNumber'] = routing_slip

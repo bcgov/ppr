@@ -37,8 +37,13 @@ REGISTER_MH = 'mhr_register'
 REQUEST_TRANSPORT_PERMIT = 'mhr_transport'
 REQUEST_EXEMPTION_RES = 'mhr_exemption_res'
 REQUEST_EXEMPTION_NON_RES = 'mhr_exemption_non_res'
-TRANFER_SALE_BENEFICIARY = 'mhr_transfer_sale'
+TRANSFER_SALE_BENEFICIARY = 'mhr_transfer_sale'
 TRANSFER_DEATH_JT = 'mhr_transfer_death'
+# MH groups from role combinations
+QUALIFIED_USER_GROUP = 'mhr_qualified_user'
+MANUFACTURER_GROUP = 'mhr_manufacturer'
+GENERAL_USER_GROUP = 'mhr_general_user'
+SEARCH_USER_GROUP = 'mhr_search_user'
 
 
 def authorized(identifier: str, jwt: JwtManager) -> bool:
@@ -257,7 +262,7 @@ def is_sbc_office_account(token: str, account_id: str) -> bool:
         return None
 
 
-def is_gov_account(jwt: JwtManager) -> bool:  # pylint: disable=too-many-return-statements
+def is_gov_account(jwt: JwtManager) -> bool:
     """Return True if the user has the gov account user role."""
     if not jwt:
         return False
@@ -270,3 +275,22 @@ def is_gov_account(jwt: JwtManager) -> bool:  # pylint: disable=too-many-return-
 def is_all_staff_account(account_id: str) -> bool:
     """Return True if the account id is any staff role."""
     return account_id is not None and account_id in (STAFF_ROLE, BCOL_HELP)
+
+
+def get_group(jwt: JwtManager) -> str:  # pylint: disable=too-many-return-statements
+    """Obtain the user group/role by inspecting the web token."""
+    if jwt.validate_roles([STAFF_ROLE]):
+        return STAFF_ROLE
+    if jwt.validate_roles([BCOL_HELP]):
+        return BCOL_HELP
+    if jwt.validate_roles([GOV_ACCOUNT_ROLE]):
+        return GOV_ACCOUNT_ROLE
+    if jwt.validate_roles([REGISTER_MH]) and jwt.validate_roles([TRANSFER_SALE_BENEFICIARY]) and \
+            not jwt.validate_roles([REQUEST_EXEMPTION_RES]):
+        return MANUFACTURER_GROUP
+    if jwt.validate_roles([TRANSFER_DEATH_JT]) and jwt.validate_roles([TRANSFER_SALE_BENEFICIARY]) and \
+            not jwt.validate_roles([REGISTER_MH]):
+        return QUALIFIED_USER_GROUP
+    if jwt.validate_roles([REQUEST_TRANSPORT_PERMIT]):
+        return GENERAL_USER_GROUP
+    return SEARCH_USER_GROUP

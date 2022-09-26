@@ -31,7 +31,7 @@ LEGACY_TENANCY_NEW = {
     'SO': 'SOLE'
 }
 NEW_TENANCY_LEGACY = {
-    'JOINT': 'J',
+    'JOINT': 'JT',
     'COMMON': 'TC',
     'SOLE': 'SO',
     'JT': 'JT',
@@ -80,6 +80,7 @@ class Db2Owngroup(db.Model):
     # Relationships
 
     owners = []
+    modified: bool = False
 
     def save(self):
         """Save the object to the database immediately."""
@@ -88,7 +89,7 @@ class Db2Owngroup(db.Model):
             db.session.add(self)
             db.session.commit()
             # current_app.logger.info(self.json)
-            if self.owners:
+            if self.owners and self.status != Db2Owngroup.StatusTypes.PREVIOUS:
                 for owner in self.owners:
                     owner.save()
         except Exception as db_exception:   # noqa: B902; return nicer error

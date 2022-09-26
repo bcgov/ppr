@@ -312,7 +312,7 @@ class Db2Descript(db.Model):
         descript = Db2Descript(manuhome_id=registration.id,
                                description_id=1,
                                status=Db2Descript.StatusTypes.ACTIVE,
-                               reg_document_id=new_info.get('documentId', ''),
+                               reg_document_id=reg_json.get('documentId', ''),
                                can_document_id='',
                                csa_number=new_info.get('csaNumber', ''),
                                csa_standard=new_info.get('csaStandard', ''),
