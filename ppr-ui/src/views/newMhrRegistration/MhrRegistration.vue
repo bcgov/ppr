@@ -184,6 +184,27 @@ export default defineComponent({
       localState.dataLoaded = true
     })
 
+    const resetAllValidations = (): void => {
+      // Reset your home validations
+      setValidation(MhrSectVal.YOUR_HOME_VALID, MhrCompVal.MAKE_MODEL_VALID, false)
+      setValidation(MhrSectVal.YOUR_HOME_VALID, MhrCompVal.HOME_SECTION_VALID, false)
+      setValidation(MhrSectVal.YOUR_HOME_VALID, MhrCompVal.HOME_CERTIFICATION_VALID, false)
+      setValidation(MhrSectVal.YOUR_HOME_VALID, MhrCompVal.REBUILT_STATUS_VALID, false)
+      setValidation(MhrSectVal.YOUR_HOME_VALID, MhrCompVal.OTHER_VALID, false)
+
+      // Reset submitting party validations
+      setValidation(MhrSectVal.SUBMITTING_PARTY_VALID, MhrCompVal.SUBMITTER_VALID, false)
+      setValidation(MhrSectVal.SUBMITTING_PARTY_VALID, MhrCompVal.DOC_ID_VALID, false)
+      setValidation(MhrSectVal.SUBMITTING_PARTY_VALID, MhrCompVal.REF_NUM_VALID, false)
+
+      // Reset home owner validations
+      setValidation(MhrSectVal.HOME_OWNERS_VALID, MhrCompVal.OWNERS_VALID, false)
+
+      // Reset home location validations
+      setValidation(MhrSectVal.LOCATION_VALID, MhrCompVal.LOCATION_TYPE_VALID, false)
+      setValidation(MhrSectVal.LOCATION_VALID, MhrCompVal.CIVIC_ADDRESS_VALID, false)
+    }
+
     const submit = async () => {
       // Prompt App Validations
       await setValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_APP, true)
@@ -193,15 +214,13 @@ export default defineComponent({
         // Submit Filing
         localState.submitting = true
         const mhrSubmission = await submitMhrRegistration(buildApiData(), parseStaffPayment())
-        setValidation(MhrSectVal.YOUR_HOME_VALID, MhrCompVal.VALIDATE_APP, false)
-        setValidation(MhrSectVal.SUBMITTING_PARTY_VALID, MhrCompVal.VALIDATE_APP, false) 
-        setValidation(MhrSectVal.HOME_OWNERS_VALID, MhrCompVal.VALIDATE_APP, false) 
-        setValidation(MhrSectVal.LOCATION_VALID , MhrCompVal.VALIDATE_APP, false) 
         localState.submitting = false
 
         mhrSubmission?.mhrNumber
           ? await context.root.$router.push({ name: RouteNames.DASHBOARD })
           : console.log(mhrSubmission?.error) // Handle Schema or Api errors here..
+
+        resetAllValidations()
       } else {
         await scrollToInvalid(MhrSectVal.REVIEW_CONFIRM_VALID, 'mhr-review-confirm',
           [
