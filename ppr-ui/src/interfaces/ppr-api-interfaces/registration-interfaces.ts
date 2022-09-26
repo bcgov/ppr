@@ -85,6 +85,8 @@ export interface RegistrationSummaryIF {
 }
 
 export interface MhRegistrationSummaryIF {
+  inUserList?: boolean, // whether the registration is in their table or not
+  error?: ErrorIF,
   clientReferenceId: string
   createDateTime: string
   mhrNumber: string

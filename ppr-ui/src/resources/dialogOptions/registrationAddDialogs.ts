@@ -16,6 +16,7 @@ export const registrationAlreadyAddedDialog: DialogOptionsIF = {
   text: '' // added in component (contains dynamic info)
 }
 
+// PPR dialog content
 export const registrationFoundDialog: DialogOptionsIF = {
   acceptText: 'Add to My Registrations Table',
   cancelText: 'Cancel',
@@ -23,6 +24,18 @@ export const registrationFoundDialog: DialogOptionsIF = {
   label: 'a Renewal',
   text: 'The following existing registration was found. Would you like to add ' +
     'it to your registrations table? Adding the base registration to your ' +
+    'registrations table will automatically include all associated registrations.',
+  textExtra: [] // added in component
+}
+
+// MHR dialog content
+export const mhRegistrationFoundDialog: DialogOptionsIF = {
+  acceptText: 'Add to My Registrations Table',
+  cancelText: 'Cancel',
+  title: 'Registration Found',
+  label: 'a Renewal',
+  text: 'The following existing registration was found. Would you like to add ' +
+    'it to your registrations table? Adding the MH registration to your ' +
     'registrations table will automatically include all associated registrations.',
   textExtra: [] // added in component
 }
