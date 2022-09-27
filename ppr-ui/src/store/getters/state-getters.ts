@@ -33,7 +33,8 @@ import {
   UserSettingsIF,
   VehicleCollateralIF,
   MhrRegistrationHomeOwnerGroupIF,
-  MhRegistrationSummaryIF
+  MhRegistrationSummaryIF,
+  UserInfoIF
 } from '@/interfaces'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 import { HomeLocation, HomeOwners, MhrReviewConfirm, SubmittingParty, YourHome } from '@/views'
@@ -44,6 +45,11 @@ import { MhrSectVal } from '@/composables/mhrRegistration/enums'
 /** Convenient when there is a need to access several properties. */
 export const getStateModel = (state: StateIF): StateModelIF => {
   return state.stateModel
+}
+
+/** The current account id. */
+export const getCurrentUser = (state: StateIF): UserInfoIF => {
+  return state.stateModel.userInfo
 }
 
 /** The current account id. */
@@ -700,6 +706,25 @@ export const getMhrRegistrationValidationModel = (state: StateIF): MhrValidation
   return state.stateModel.mhrValidationState
 }
 
+// Mhr Transfers
 export const getMhrInformation = (state: StateIF): MhRegistrationSummaryIF => {
   return state.stateModel.mhrInformation
+}
+
+export const getMhrTransferHomeOwners = (state: StateIF): MhrRegistrationHomeOwnerIF[] => {
+  const owners = []
+  state.stateModel.mhrTransfer.ownerGroups.forEach(group => {
+    if (group.owners.length === 0) {
+      // Groups with no owners should have at least one 'placeholder' owner
+      // to be properly displayed in Group Table
+      owners.push({ groupId: group.groupId })
+    } else {
+      group.owners.forEach(owner => owners.push({ ...owner, groupId: group.groupId }))
+    }
+  })
+  return owners
+}
+
+export const getMhrTransferHomeOwnerGroups = (state: StateIF): MhrRegistrationHomeOwnerGroupIF[] => {
+  return state.stateModel.mhrTransfer.ownerGroups
 }

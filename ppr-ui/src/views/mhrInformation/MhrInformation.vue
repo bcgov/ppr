@@ -28,8 +28,10 @@
               <!-- MHR Information Review Section -->
               <template v-if="isReviewMode">
                 <HomeOwnersTable
-                  :isReadOnlyTable="true"
-                  :homeOwners="getMhrRegistrationHomeOwners"
+                  class="px-7"
+                  isMhrTransfer
+                  isReadonlyTable
+                  :homeOwners="getMhrTransferHomeOwners"
                 />
               </template>
 
@@ -48,7 +50,7 @@
                   :setBackBtn="showBackBtn"
                   :setCancelBtn="'Cancel'"
                   :setSaveBtn="'Save and Resume Later'"
-                  :setSubmitBtn="'Review and Confirm'"
+                  :setSubmitBtn="reviewConfirmText"
                   :setRightOffset="true"
                   :setShowFeeSummary="true"
                   :setFeeType="feeType"
@@ -71,7 +73,7 @@ import { computed, defineComponent, onMounted, reactive, toRefs } from '@vue/com
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { RouteNames } from '@/enums'
-import { pacificDate } from '@/utils'
+import { pacificDate, submitMhrTransfer } from '@/utils'
 import { StickyContainer } from '@/components/common'
 import { useHomeOwners, useMhrInformation } from '@/composables'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
@@ -93,17 +95,16 @@ export default defineComponent({
   },
   setup (props, context) {
     const {
-      // getMhrInformation to be used future State to Access Full Registration information
-      // eslint-disable-next-line no-unused-vars
-      getMhrInformation, getMhrRegistrationHomeOwners
+      getMhrTransferHomeOwners, getMhrInformation
     } = useGetters<any>([
-      'getMhrInformation', 'getMhrRegistrationHomeOwners'
+      'getMhrTransferHomeOwners', 'getMhrInformation'
     ])
 
     const { setEmptyMhrTransfer } = useActions<any>(['setEmptyMhrTransfer'])
 
     const {
-      initMhrTransfer
+      initMhrTransfer,
+      buildApiData
     } = useMhrInformation()
 
     const {
@@ -130,6 +131,9 @@ export default defineComponent({
       }),
       transferErrorMsg: computed((): string => {
         return localState.validate && !localState.isValidTransfer ? '< Please make any required changes' : ''
+      }),
+      reviewConfirmText: computed((): string => {
+        return localState.isReviewMode ? 'Register Changes and Pay' : 'Review and Confirm'
       })
     })
 
@@ -147,8 +151,17 @@ export default defineComponent({
       localState.dataLoaded = true
     })
 
-    const goToReview = (): void => {
+    const goToReview = async (): Promise<void> => {
       localState.validate = true
+      if (localState.isReviewMode) {
+        localState.submitting = true
+        const mhrTransferFiling = await submitMhrTransfer(buildApiData(), getMhrInformation.value.mhrNumber)
+        localState.submitting = false
+
+        !mhrTransferFiling.error
+          ? goToDash()
+          : console.log(mhrTransferFiling?.error) // Handle Schema or Api errors here..
+      }
       if (localState.isValidTransfer) {
         localState.isReviewMode = true
       }
@@ -163,7 +176,7 @@ export default defineComponent({
     return {
       goToReview,
       goToDash,
-      getMhrRegistrationHomeOwners, // Future: To be a getter from Transfer State
+      getMhrTransferHomeOwners,
       ...toRefs(localState)
     }
   }

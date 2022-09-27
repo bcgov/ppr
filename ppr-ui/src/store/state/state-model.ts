@@ -273,7 +273,6 @@ export const stateModel: StateModelIF = {
   mhrTransfer: {
     mhrNumber: '',
     ownerGroups: [],
-    owners: [],
     submittingParty: {}
   }
 }

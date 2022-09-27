@@ -106,7 +106,8 @@ export default defineComponent({
   props: {
     groupId: { default: '' },
     owners: { default: [] },
-    showEditActions: { type: Boolean, default: true }
+    showEditActions: { type: Boolean, default: true },
+    isMhrTransfer: { type: Boolean, default: false }
   },
   components: {
     BaseDialog,
@@ -170,7 +171,7 @@ export default defineComponent({
     // Close Delete Group dialog or proceed to deleting a Group
     const cancelOrProceed = (proceed: boolean, groupId: string): void => {
       if (proceed) {
-        deleteGroup(groupId)
+        deleteGroup(groupId, props.isMhrTransfer)
         localState.showDeleteGroupDialog = false
       } else {
         localState.showDeleteGroupDialog = false

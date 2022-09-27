@@ -111,6 +111,7 @@
       <AddEditHomeOwner
         v-if="showAddPersonSection"
         :isHomeOwnerPerson="true"
+        :isMhrTransfer="isMhrTransfer"
         @cancel="showAddPersonSection = false"
       />
     </v-expand-transition>
@@ -118,14 +119,16 @@
     <v-expand-transition>
       <AddEditHomeOwner
         v-if="showAddPersonOrganizationSection"
+        :isMhrTransfer="isMhrTransfer"
         @cancel="showAddPersonOrganizationSection = false"
       />
     </v-expand-transition>
 
     <div>
       <HomeOwnersTable
-        :homeOwners="getMhrRegistrationHomeOwners"
+        :homeOwners="getHomeOwners"
         :isAdding="disableAddHomeOwnerBtn"
+        :isMhrTransfer="isMhrTransfer"
       />
     </div>
   </div>
@@ -164,9 +167,9 @@ export default defineComponent({
       default: false
     }
   },
-  setup () {
-    const { getMhrRegistrationHomeOwners } = useGetters<any>([
-      'getMhrRegistrationHomeOwners'
+  setup (props) {
+    const { getMhrRegistrationHomeOwners, getMhrTransferHomeOwners } = useGetters<any>([
+      'getMhrRegistrationHomeOwners', 'getMhrTransferHomeOwners'
     ])
 
     const {
@@ -190,11 +193,16 @@ export default defineComponent({
       ),
       isValidGroups: computed(() => { return hasMinimumGroups() }),
       homeTenancyType: computed(() => { return getHomeTenancyType() }),
-      interestType: computed(() => { return getInterestString() })
+      interestType: computed(() => { return getInterestString() }),
+      getHomeOwners: computed(() => {
+        return props.isMhrTransfer
+          ? getMhrTransferHomeOwners.value
+          : getMhrRegistrationHomeOwners.value
+      })
     })
 
     // Enable editing mode whenever adding Person or Business
-    // This would disabled all Edit buttons
+    // This would disable all Edit buttons
     watch(
       () => localState.disableAddHomeOwnerBtn,
       (isAdding: Boolean) => {

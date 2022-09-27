@@ -5,3 +5,4 @@ export interface MhrRegistrationHomeOwnerGroupIF extends MhrRegistrationFraction
   owners: MhrRegistrationHomeOwnerIF[],
   type: string // type is required for MHR submission
 }
+export interface MhrHomeOwnerGroupIF extends MhrRegistrationHomeOwnerGroupIF {}

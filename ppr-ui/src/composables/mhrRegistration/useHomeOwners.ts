@@ -26,14 +26,22 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
   const {
     getMhrRegistrationHomeOwners,
     getMhrRegistrationHomeOwnerGroups,
-    getMhrRegistrationValidationModel
+    getMhrRegistrationValidationModel,
+    getMhrTransferHomeOwnerGroups
   } = useGetters<any>([
     'getMhrRegistrationHomeOwners',
     'getMhrRegistrationHomeOwnerGroups',
-    'getMhrRegistrationValidationModel'
+    'getMhrRegistrationValidationModel',
+    'getMhrTransferHomeOwnerGroups'
   ])
 
-  const { setMhrRegistrationHomeOwnerGroups } = useActions<any>(['setMhrRegistrationHomeOwnerGroups'])
+  const {
+    setMhrRegistrationHomeOwnerGroups,
+    setMhrTransferHomeOwnerGroups
+  } = useActions<any>([
+    'setMhrRegistrationHomeOwnerGroups',
+    'setMhrTransferHomeOwnerGroups'
+  ])
 
   const { setValidation } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
@@ -141,14 +149,18 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
     }
   }
 
-  const getGroupForOwner = (ownerId: string): MhrRegistrationHomeOwnerGroupIF => {
-    return find(getMhrRegistrationHomeOwnerGroups.value, group => {
+  const getGroupForOwner = (ownerId: string, isTransfer = false): MhrRegistrationHomeOwnerGroupIF => {
+    const homeOwners = isTransfer ? getMhrTransferHomeOwnerGroups.value : getMhrRegistrationHomeOwnerGroups.value
+
+    return find(homeOwners, group => {
       return find(group.owners, { id: ownerId })
     })
   }
 
-  const addOwnerToTheGroup = (owner: MhrRegistrationHomeOwnerIF, groupId: string) => {
-    const homeOwnerGroups = [...getMhrRegistrationHomeOwnerGroups.value]
+  const addOwnerToTheGroup = (owner: MhrRegistrationHomeOwnerIF, groupId: string, isTransfer = false) => {
+    const homeOwnerGroups = isTransfer
+      ? [...getMhrTransferHomeOwnerGroups.value]
+      : [...getMhrRegistrationHomeOwnerGroups.value]
 
     // Try to find a group to add the owner
     const groupToUpdate =
@@ -167,12 +179,16 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
       homeOwnerGroups.push(newGroup)
     }
 
-    setMhrRegistrationHomeOwnerGroups(homeOwnerGroups)
+    isTransfer
+      ? setMhrTransferHomeOwnerGroups(homeOwnerGroups)
+      : setMhrRegistrationHomeOwnerGroups(homeOwnerGroups)
   }
 
-  const editHomeOwner = (updatedOwner: MhrRegistrationHomeOwnerIF, newGroupId: string) => {
-    const homeOwnerGroups = [...getMhrRegistrationHomeOwnerGroups.value]
-    const groupIdOfOwner = getGroupForOwner(updatedOwner.id).groupId
+  const editHomeOwner = (updatedOwner: MhrRegistrationHomeOwnerIF, newGroupId: string, isTransfer = false) => {
+    const homeOwnerGroups = isTransfer
+      ? [...getMhrTransferHomeOwnerGroups.value]
+      : [...getMhrRegistrationHomeOwnerGroups.value]
+    const groupIdOfOwner = getGroupForOwner(updatedOwner.id, isTransfer).groupId
 
     const groupToUpdate = homeOwnerGroups.find(
       group => group.groupId === groupIdOfOwner
@@ -182,20 +198,25 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
       // need to update owner in the same group
       const i = findIndex(groupToUpdate.owners, { id: updatedOwner.id })
       set(groupToUpdate, `owners[${i}]`, updatedOwner)
-      setMhrRegistrationHomeOwnerGroups(homeOwnerGroups)
+
+      isTransfer
+        ? setMhrTransferHomeOwnerGroups(homeOwnerGroups)
+        : setMhrRegistrationHomeOwnerGroups(homeOwnerGroups)
     } else {
       // need to move the owner to new group
       remove(groupToUpdate.owners, owner => owner.id === updatedOwner.id)
-      addOwnerToTheGroup(updatedOwner, newGroupId)
+      addOwnerToTheGroup(updatedOwner, newGroupId, isTransfer)
     }
   }
 
   // Remove Owner from the Group it belongs to
-  const removeOwner = (owner: MhrRegistrationHomeOwnerIF) => {
-    const homeOwnerGroups = [...getMhrRegistrationHomeOwnerGroups.value] as MhrRegistrationHomeOwnerGroupIF[]
+  const removeOwner = (owner: MhrRegistrationHomeOwnerIF, isTransfer = false) => {
+    const homeOwnerGroups = isTransfer
+      ? [...getMhrTransferHomeOwnerGroups.value]
+      : [...getMhrRegistrationHomeOwnerGroups.value]
 
     // find group id that owner belongs to
-    const groupIdOfOwner = getGroupForOwner(owner.id)?.groupId || DEFAULT_GROUP_ID
+    const groupIdOfOwner = getGroupForOwner(owner.id, isTransfer)?.groupId || DEFAULT_GROUP_ID
 
     // find group to remove the owner from
     const groupToUpdate = homeOwnerGroups.find(
@@ -204,19 +225,25 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
 
     // remove the owner from the group
     remove(groupToUpdate.owners, o => o.id === owner.id)
-    setMhrRegistrationHomeOwnerGroups(homeOwnerGroups)
+    isTransfer
+      ? setMhrTransferHomeOwnerGroups(homeOwnerGroups)
+      : setMhrRegistrationHomeOwnerGroups(homeOwnerGroups)
   }
 
   // Delete group with its owners
-  const deleteGroup = (groupId: string): void => {
-    const homeOwnerGroups = [...getMhrRegistrationHomeOwnerGroups.value]
-    remove(homeOwnerGroups, group => group.groupId === groupId)
+  const deleteGroup = (groupId: string, isTransfer = false): void => {
+    const homeOwnerGroups: MhrRegistrationHomeOwnerGroupIF[] = isTransfer
+      ? [...getMhrTransferHomeOwnerGroups.value]
+      : [...getMhrRegistrationHomeOwnerGroups.value]
 
+    remove(homeOwnerGroups, group => group.groupId === groupId)
     homeOwnerGroups.forEach((group, index) => {
       group.groupId = (index + 1).toString()
     })
 
-    setMhrRegistrationHomeOwnerGroups(homeOwnerGroups)
+    isTransfer
+      ? setMhrTransferHomeOwnerGroups(homeOwnerGroups)
+      : setMhrRegistrationHomeOwnerGroups(homeOwnerGroups)
   }
 
   const setGroupFractionalInterest = (groupId: string, fractionalData: MhrRegistrationFractionalOwnershipIF): void => {

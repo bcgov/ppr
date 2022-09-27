@@ -4,7 +4,7 @@
       <v-col>
         <div class="actions">
           <v-btn
-            v-if="isMhr"
+            v-if="isMhr && !isRoleQualifiedSupplier"
             filled
             class="mhr-registration-bar-btn px-5"
             @click="newRegistration(MhrRegistrationType)"
@@ -20,7 +20,7 @@
             :isLightBackGround="!isTabView"
             @selected="newRegistration($event)"
             />
-          <registration-bar-button-list v-else @selected="newRegistration($event)"/>
+          <registration-bar-button-list v-else-if="!isMhr" @selected="newRegistration($event)"/>
         </div>
       </v-col>
     </v-row>
@@ -57,7 +57,8 @@ export default defineComponent({
   },
   emits: ['selected-registration-type'],
   setup (props, { emit }) {
-    const { getAccountProductSubscriptions } = useGetters<any>(['getAccountProductSubscriptions'])
+    const { getAccountProductSubscriptions, isRoleQualifiedSupplier } =
+      useGetters<any>(['getAccountProductSubscriptions', 'isRoleQualifiedSupplier'])
     const { setRegistrationTypeOtherDesc } = useActions<any>(['setRegistrationTypeOtherDesc'])
     const localState = reactive({
       labelText: 'Start a New Personal Property Registration'
@@ -77,6 +78,7 @@ export default defineComponent({
 
     return {
       hasRPPR,
+      isRoleQualifiedSupplier,
       newRegistration,
       MhrRegistrationType,
       ...toRefs(localState)

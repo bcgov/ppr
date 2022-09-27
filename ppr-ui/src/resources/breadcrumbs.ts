@@ -129,7 +129,7 @@ export const tombstoneBreadcrumbMhrInformation: Array<BreadcrumbIF> = [
   {
     disabled: false,
     href: sessionStorage.getItem('BASE_URL') + 'dashboard',
-    text: 'My Personal Property Registry'
+    text: 'My Asset Registries'
   },
   {
     disabled: true,

@@ -14,6 +14,7 @@ export enum ErrorCategories {
   REGISTRATION_DELETE = 'registration-delete',
   REGISTRATION_LOAD = 'registration-load',
   REGISTRATION_SAVE = 'registration-save',
+  REGISTRATION_TRANSFER = 'registration-transfer',
   REPORT_GENERATION = 'report-generation',
   SEARCH = 'search',
   SEARCH_COMPLETE = 'search-complete',

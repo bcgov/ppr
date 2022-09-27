@@ -408,3 +408,10 @@ export const mutateMhrInformation = (state: StateIF, mhrInfo: MhRegistrationSumm
 export const mutateEmptyMhrTransfer = (state: StateIF, emptyMhrTransfer: MhrTransferIF) => {
   state.stateModel.mhrTransfer = emptyMhrTransfer
 }
+
+export const mutateMhrTransferHomeOwnerGroups = (
+  state: StateIF,
+  groups: Array<MhrRegistrationHomeOwnerGroupIF>
+) => {
+  state.stateModel.mhrTransfer.ownerGroups = groups
+}

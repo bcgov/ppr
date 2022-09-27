@@ -1,7 +1,7 @@
 <template>
   <v-container class="header-container view-container px-15 py-0" fluid style="background-color: white;">
     <div class="container pa-0" style="padding: 29px 0 !important;">
-      <tombstone-discharge v-if="displayDischarge || displayRenewal || displayAmendment" />
+      <tombstone-discharge v-if="displayDischarge || displayRenewal || displayAmendment || displayMhrInformation" />
       <tombstone-default v-else />
     </div>
   </v-container>
@@ -36,6 +36,9 @@ export default defineComponent({
       }),
       displayAmendment: computed((): boolean => {
         return localState.currentPath.includes('amend')
+      }),
+      displayMhrInformation: computed((): boolean => {
+        return localState.currentPath.includes('mhr-information')
       })
     })
 

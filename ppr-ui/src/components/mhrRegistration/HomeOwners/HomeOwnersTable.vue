@@ -18,6 +18,7 @@
             :groupId="group"
             :owners="hasActualOwners(items) ? items : []"
             :showEditActions="showEditActions"
+            :isMhrTransfer="isMhrTransfer"
           />
         </td>
       </template>
@@ -29,6 +30,7 @@
               <AddEditHomeOwner
                 :editHomeOwner="row.item"
                 :isHomeOwnerPerson="!row.item.organizationName"
+                :isMhrTransfer="isMhrTransfer"
                 @cancel="currentlyEditingHomeOwnerId = -1"
                 @remove="remove(row.item)"
               />
@@ -133,7 +135,8 @@ export default defineComponent({
   props: {
     homeOwners: { default: [] as MhrRegistrationHomeOwnerIF[] },
     isAdding: { default: false },
-    isReadonlyTable: { type: Boolean, default: false }
+    isReadonlyTable: { type: Boolean, default: false },
+    isMhrTransfer: { type: Boolean, default: false }
   },
   components: {
     BaseAddress,
@@ -163,7 +166,7 @@ export default defineComponent({
 
     const remove = (item): void => {
       localState.currentlyEditingHomeOwnerId = -1
-      removeOwner(item)
+      removeOwner(item, props.isMhrTransfer)
     }
 
     const openForEditing = (index: number) => {
