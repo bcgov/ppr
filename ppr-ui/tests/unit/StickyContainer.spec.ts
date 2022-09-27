@@ -150,7 +150,6 @@ describe('Sticky Container component tests', () => {
     expect(wrapper.findComponent(ButtonsStacked).vm.$props.setBackBtn).toBe(back)
     expect(wrapper.vm.$data.cancelBtn).toBe(cancel)
     expect(wrapper.findComponent(ButtonsStacked).vm.$props.setCancelBtn).toBe(cancel)
-    expect(wrapper.vm.$data.submitBtn).toBe(submit)
     expect(wrapper.findComponent(ButtonsStacked).vm.$props.setSubmitBtn).toBe(submit)
   })
 
