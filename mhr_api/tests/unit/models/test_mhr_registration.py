@@ -31,16 +31,18 @@ from mhr_api.models.type_tables import MhrRegistrationTypes, MhrRegistrationStat
 from mhr_api.services.authz import MANUFACTURER_GROUP, QUALIFIED_USER_GROUP, GOV_ACCOUNT_ROLE
 
 
+REG_DESCRIPTION = 'REGISTER NEW UNIT'
 # testdata pattern is ({account_id}, {mhr_num}, {exists}, {reg_description}, {in_list})
 TEST_SUMMARY_REG_DATA = [
-    ('PS12345', '077741', True, 'Manufactured Home Registration', False),
+    ('PS12345', '077741', True, REG_DESCRIPTION, False),
     ('PS12345', 'TESTXX', False, None, False),
-    ('PS12345', '045349', True, 'Manufactured Home Registration', True),
-    ('2523', '150062', True, 'Manufactured Home Registration', True)
+    ('PS12345', '045349', True, REG_DESCRIPTION, True),
+    ('2523', '150062', True, REG_DESCRIPTION, True)
 ]
 # testdata pattern is ({account_id}, {has_results})
 TEST_ACCOUNT_REG_DATA = [
     ('PS12345', True),
+    ('2523', True),
     ('999999', False)
 ]
 # testdata pattern is ({reg_id}, {has_results}, {legacy})
@@ -92,6 +94,7 @@ def test_find_summary_by_mhr_number(session, account_id, mhr_num, exists, reg_de
         assert registration['clientReferenceId'] is not None
         assert registration['ownerNames'] is not None
         assert registration['path'] is not None
+        assert registration['documentId'] is not None
         assert registration['inUserList'] == in_list
     else:
         assert not registration
@@ -112,6 +115,7 @@ def test_find_account_registrations(session, account_id, has_results):
             assert registration['clientReferenceId'] is not None
             assert registration['ownerNames'] is not None
             assert registration['path'] is not None
+            assert registration['documentId'] is not None
             assert not registration.get('inUserList')
     else:
         assert not reg_list

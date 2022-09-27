@@ -18,10 +18,18 @@ from sqlalchemy.sql import text
 
 from mhr_api.exceptions import DatabaseException
 from mhr_api.models import Db2Manuhome, utils as model_utils
+from mhr_api.models.type_tables import MhrDocumentType, MhrRegistrationTypes
 from mhr_api.models.db import db
 
 
-QUERY_ACCOUNT_MHR_LEGACY = """
+FROM_LEGACY_DOC_TYPE = {
+    '101': 'REG_101',
+    '102': 'REG_102',
+    '103': 'REG_103',
+    '103E': 'REG_103E'
+}
+
+QUERY_ACCOUNT_MHR_LEGACY_LAST = """
 SELECT mer.mhr_number, 'N' AS account_reg,
        (SELECT COUNT(mrr.id)
            FROM mhr_registrations mr, mhr_registration_reports mrr
@@ -43,6 +51,38 @@ SELECT mr.mhr_number, 'Y' AS account_reg,
 WHERE account_id = :query_value
 )
 """
+QUERY_ACCOUNT_MHR_LEGACY = """
+SELECT DISTINCT mer.mhr_number, 'N' AS account_reg
+ FROM mhr_extra_registrations mer
+WHERE account_id = :query_value
+  AND (removed_ind IS NULL OR removed_ind != 'Y')
+UNION (
+SELECT DISTINCT mr.mhr_number, 'Y' AS account_reg
+  FROM mhr_registrations mr
+WHERE account_id = :query_value
+  AND mr.registration_type = 'MHREG'
+)
+"""
+QUERY_ACCOUNT_REGISTRATIONS_SUMMARY = """
+SELECT mr.id, mr.registration_ts, mr.account_id, mr.registration_type, mr.mhr_number, mr.document_id,
+       mrr.create_ts as doc_ts, mrr.doc_storage_url, mrt.registration_type_desc,
+       (SELECT CASE WHEN mr.user_id IS NULL THEN ''
+          ELSE (SELECT u.firstname || ' ' || u.lastname FROM users u WHERE u.username = mr.user_id)
+           END) AS username
+  FROM mhr_registrations mr, mhr_registration_reports mrr, mhr_registration_types mrt
+ WHERE mr.mhr_number IN (SELECT DISTINCT mer.mhr_number
+                           FROM mhr_extra_registrations mer
+                          WHERE account_id = :query_value
+                            AND (removed_ind IS NULL OR removed_ind != 'Y')
+                          UNION (
+                         SELECT DISTINCT mr.mhr_number
+                           FROM mhr_registrations mr
+                          WHERE account_id = :query_value
+                            AND mr.registration_type = 'MHREG'))
+  and mr.id = mrr.registration_id
+  and mrt.registration_type = mr.registration_type
+order by mr.id desc
+"""
 QUERY_MHR_NUMBER_LEGACY = """
 SELECT (SELECT COUNT(mr.id)
            FROM mhr_registrations mr
@@ -52,7 +92,12 @@ SELECT (SELECT COUNT(mr.id)
        (SELECT COUNT(mer.id)
            FROM mhr_extra_registrations mer
           WHERE mer.account_id = :query_value
-            AND mer.mhr_number = :query_value2) as extra_reg_count
+            AND mer.mhr_number = :query_value2) as extra_reg_count,
+       (SELECT  mr.account_id
+           FROM mhr_registrations mr
+          WHERE mr.account_id = :query_value
+            AND mr.mhr_number = :query_value2
+            AND mr.registration_type IN ('MHREG'))
 """
 DOC_ID_COUNT_QUERY = """
 SELECT COUNT(documtid)
@@ -67,13 +112,14 @@ SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRI
            AND og2.manhomid = mh.manhomid
            AND og2.owngrpid = o2.owngrpid
            AND og2.status IN ('3', '4')) as owner_names,
-       TRIM(d.bcolacct)
+       TRIM(d.bcolacct),
+       d.documtid as document_id
   FROM manuhome mh, document d
  WHERE mh.mhregnum = :query_mhr_number
    AND mh.mhregnum = d.mhregnum
    AND mh.regdocid = d.documtid
 """
-QUERY_ACCOUNT_REGISTRATIONS = """
+QUERY_ACCOUNT_REGISTRATIONS_PREV = """
 SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRIM(d.docutype),
        (SELECT XMLSERIALIZE(XMLAGG ( XMLELEMENT ( NAME "owner", o2.ownrtype || TRIM(o2.ownrname))) AS CLOB)
           FROM owner o2, owngroup og2
@@ -88,7 +134,22 @@ SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRI
    AND mh.regdocid = d.documtid
 ORDER BY d.regidate DESC
 """
-REGISTRATION_DESC_NEW = 'Manufactured Home Registration'
+QUERY_ACCOUNT_REGISTRATIONS = """
+SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRIM(d.docutype),
+       (SELECT XMLSERIALIZE(XMLAGG ( XMLELEMENT ( NAME "owner", o2.ownrtype || TRIM(o2.ownrname))) AS CLOB)
+          FROM owner o2, owngroup og2
+         WHERE o2.manhomid = mh.manhomid
+           AND og2.manhomid = mh.manhomid
+           AND og2.owngrpid = o2.owngrpid
+           AND og2.regdocid = d.documtid) as owner_names,
+       TRIM(d.bcolacct),
+       d.documtid as document_id
+  FROM manuhome mh, document d
+ WHERE mh.mhregnum IN (?)
+   AND mh.mhregnum = d.mhregnum
+ORDER BY d.regidate DESC
+"""
+REGISTRATION_DESC_NEW = 'REGISTER NEW UNIT'
 LEGACY_STATUS_DESCRIPTION = {
     'R': 'ACTIVE',
     'E': 'EXEMPT',
@@ -102,6 +163,7 @@ LEGACY_REGISTRATION_DESCRIPTION = {
 DOCUMENT_TYPE_REG = '101'
 OWNER_TYPE_INDIVIDUAL = 'I'
 REGISTRATION_PATH = '/mhr/api/v1/registrations/'
+DOCUMENT_PATH = '/mhr/api/v1/documents/'
 
 
 def find_by_id(registration_id: int):
@@ -120,7 +182,7 @@ def find_summary_by_mhr_number(account_id: str, mhr_number: str, staff: bool):
         rows = result.fetchall()
         if rows is not None:
             for row in rows:
-                registration = __build_summary(row, staff, None, True)
+                registration = __build_summary(row, True)
     except Exception as db_exception:   # noqa: B902; return nicer error
         current_app.logger.error('DB2 find_summary_by_mhr_number exception: ' + str(db_exception))
         raise DatabaseException(db_exception)
@@ -132,12 +194,13 @@ def find_summary_by_mhr_number(account_id: str, mhr_number: str, staff: bool):
             row = result.first()
             reg_count = int(row[0])
             extra_count = int(row[1])
-            current_app.logger.debug(f'reg_count={reg_count}, extra_cout={extra_count}, staff={staff}')
+            reg_account_id = str(row[2])
+            current_app.logger.debug(f'reg_count={reg_count}, extra_count={extra_count}, staff={staff}')
             # Set inUserList to true if MHR number already added to account extra registrations.
             if reg_count > 0 or extra_count > 0:
                 registration['inUserList'] = True
             # Path to download report only available for staff and registrations created by the account.
-            if staff or reg_count > 0:
+            if reg_count > 0 and (staff or account_id == reg_account_id):
                 registration['path'] = REGISTRATION_PATH + mhr_number
         except Exception as db_exception:   # noqa: B902; return nicer error
             current_app.logger.error('find_summary_by_mhr_number mhr extra check exception: ' + str(db_exception))
@@ -150,23 +213,10 @@ def find_all_by_account_id(account_id: str, staff: bool):
     """Return a summary list of recent MHR registrations belonging to an account."""
     results = []
     # 1. get account and extra registrations from the Posgres table, then query DB2 by set of mhr numbers.
-    try:
-        query = text(QUERY_ACCOUNT_MHR_LEGACY)
-        result = db.session.execute(query, {'query_value': account_id})
-        rows = result.fetchall()
-    except Exception as db_exception:   # noqa: B902; return nicer error
-        current_app.logger.error('find_all_by_account_id mhr list exception: ' + str(db_exception))
-        raise DatabaseException(db_exception)
-    mhr_list = []
-    if rows is not None:
-        for row in rows:
-            reg = {
-                'mhr_number': str(row[0]),
-                'account_reg': str(row[1]),
-                'rep_count': int(row[2]),
-                'reg_ts': row[3]
-            }
-            mhr_list.append(reg)
+    mhr_list = __get_mhr_list(account_id)
+    # 2 Get summary list of new application registrations.
+    reg_summary_list = __get_reg_summary_list(account_id)
+    doc_types = MhrDocumentType.find_all()
     if mhr_list:
         # 2. Get the summary info from DB2.
         try:
@@ -185,7 +235,9 @@ def find_all_by_account_id(account_id: str, staff: bool):
             rows = result.fetchall()
             if rows is not None:
                 for row in rows:
-                    results.append(__build_summary(row, staff, mhr_list, False))
+                    results.append(__build_summary(row, False))
+            for result in results:
+                __update_summary_info(result, results, reg_summary_list, doc_types, staff, account_id)
         except Exception as db_exception:   # noqa: B902; return nicer error
             current_app.logger.error('DB2 find_all_by_account_id exception: ' + str(db_exception))
             raise DatabaseException(db_exception)
@@ -216,22 +268,127 @@ def find_by_document_id(document_id: str):
     return Db2Manuhome.find_by_document_id(document_id)
 
 
-def __build_summary(row, staff: bool, mhr_list: dict, add_in_user_list: bool = True):
+def __get_mhr_list(account_id: str) -> dict:
+    """Build a list of mhr numbers associated with the account."""
+    mhr_list = []
+    try:
+        query = text(QUERY_ACCOUNT_MHR_LEGACY)
+        result = db.session.execute(query, {'query_value': account_id})
+        rows = result.fetchall()
+    except Exception as db_exception:   # noqa: B902; return nicer error
+        current_app.logger.error('__get_mhr_list db exception: ' + str(db_exception))
+        raise DatabaseException(db_exception)
+    if rows is not None:
+        for row in rows:
+            reg = {
+                'mhr_number': str(row[0]),
+                'account_reg': str(row[1])
+            }
+            mhr_list.append(reg)
+    return mhr_list
+
+
+def __get_reg_summary_list(account_id: str) -> dict:
+    """Build a registration summary list of new application registrations associated with the account."""
+    summary_list = []
+    try:
+        query = text(QUERY_ACCOUNT_REGISTRATIONS_SUMMARY)
+        result = db.session.execute(query, {'query_value': account_id})
+        rows = result.fetchall()
+    except Exception as db_exception:   # noqa: B902; return nicer error
+        current_app.logger.error('__get_summary_list db exception: ' + str(db_exception))
+        raise DatabaseException(db_exception)
+    if rows is not None:
+        # SELECT mr.id, mr.registration_ts, mr.account_id, mr.registration_type, mr.mhr_number, mr.document_id,
+        #       mrr.create_ts as doc_ts, mrr.doc_storage_url, mrt.registration_type_desc
+        for row in rows:
+            reg = {
+                'id': int(row[0]),
+                'create_ts': row[1],
+                'account_id': str(row[2]),
+                'registration_type': str(row[3]),
+                'mhr_number': str(row[4]),
+                'document_id': str(row[5]),
+                'report_ts': row[6],
+                'report_url': str(row[7]),
+                'reg_description': str(row[8]),
+                'username': str(row[9])
+            }
+            summary_list.append(reg)
+    return summary_list
+
+
+def __get_owner_names(result, results) -> str:
+    """Get owner names from the most recent registration matching the mhr number."""
+    names = ''
+    for reg in results:
+        if reg['mhrNumber'] == result['mhrNumber'] and reg['documentId'] != result['documentId']:
+            return result['ownerNames']
+    return names
+
+
+def __get_summary_result(result, reg_summary_list) -> dict:
+    """Get a new appliction summary result that matches on mhr number and docment id."""
+    match = {}
+    if not reg_summary_list:
+        return match
+    mhr_num = result.get('mhrNumber')
+    doc_id = result.get('documentId')
+    for reg in reg_summary_list:
+        reg_mhr_num = reg.get('mhr_number')
+        reg_doc_id = reg.get('document_id')
+        if reg_mhr_num == mhr_num and reg.get('registration_type') == MhrRegistrationTypes.MHREG:
+            match = reg
+            break
+        if reg_mhr_num == mhr_num and reg_doc_id == doc_id:
+            match = reg
+            break
+    return match
+
+
+def __update_summary_info(result, results, reg_summary_list, doc_types, staff, account_id):
+    """Update summary information with new application matches."""
+    # Some registrations may have no owner change: use the previous owner names.
+    if not result.get('ownerNames'):
+        result['ownerNames'] = __get_owner_names(result, results)
+    summary_result = __get_summary_result(result, reg_summary_list)
+    if not summary_result:
+        doc_type = result.get('documentType')
+        if FROM_LEGACY_DOC_TYPE.get(doc_type):
+            doc_type = FROM_LEGACY_DOC_TYPE[doc_type]
+            for doc_rec in doc_types:
+                if doc_type == doc_rec.document_type:
+                    result['registrationDescription'] = doc_rec.document_type_desc
+                    break
+    else:
+        result['registrationDescription'] = summary_result.get('reg_description')
+        result['username'] = summary_result.get('username')
+        if staff or account_id == summary_result.get('account_id'):
+            if summary_result.get('report_url') or model_utils.report_retry_elapsed(summary_result.get('report_ts')):
+                if summary_result.get('registration_type') == MhrRegistrationTypes.MHREG:
+                    result['path'] = REGISTRATION_PATH + result.get('mhrNumber')
+                else:
+                    result['path'] = DOCUMENT_PATH + result.get('documentId')
+        current_app.logger.info(f'Updated result {result}')
+
+
+def __build_summary(row, add_in_user_list: bool = True):
     """Build registration summary from query result."""
     mhr_number = str(row[0])
     # current_app.logger.info(f'summary mhr#={mhr_number}')
     timestamp = row[2]
     owners = str(row[6])
-    owners = owners.replace('<owner>', '')
-    owners = owners.replace('</owner>', '\n')
-    owner_list = owners.split('\n')
     owner_names = ''
-    for name in owner_list:
-        if name.strip() != '':
-            if name[0:1] == OWNER_TYPE_INDIVIDUAL:
-                owner_names += __get_summary_name(name[1:]) + '\n'
-            else:
-                owner_names += name[1:] + '\n'
+    if owners:
+        owners = owners.replace('<owner>', '')
+        owners = owners.replace('</owner>', '\n')
+        owner_list = owners.split('\n')
+        for name in owner_list:
+            if name.strip() != '':
+                if name[0:1] == OWNER_TYPE_INDIVIDUAL:
+                    owner_names += __get_summary_name(name[1:]) + '\n'
+                else:
+                    owner_names += name[1:] + '\n'
     summary = {
         'mhrNumber': mhr_number,
         'registrationDescription': LEGACY_REGISTRATION_DESCRIPTION.get(str(row[5]),
@@ -242,18 +399,12 @@ def __build_summary(row, staff: bool, mhr_list: dict, add_in_user_list: bool = T
         'submittingParty': str(row[3]),
         'clientReferenceId': str(row[4]),
         'ownerNames': owner_names,
-        'path': ''
+        'path': '',
+        'documentId': str(row[8]),
+        'documentType': str(row[5]),
     }
     if add_in_user_list:
         summary['inUserList'] = False
-    # Update report path if report generated: staff can always access.
-    if mhr_list:
-        for reg in mhr_list:
-            if reg['mhr_number'] == summary.get('mhrNumber') and (staff or reg.get('account_reg') == 'Y'):
-                # Either reg report exists or enough time has elapsed to retry.
-                if reg.get('rep_count') > 0 or \
-                        (reg.get('reg_ts') and model_utils.report_retry_elapsed(reg.get('reg_ts'))):
-                    summary['path'] = REGISTRATION_PATH + summary.get('mhrNumber')
     return summary
 
 

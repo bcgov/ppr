@@ -311,7 +311,7 @@ class Report:  # pylint: disable=too-few-public-methods
         else:
             self._set_addresses()
             self._set_date_times()
-            if self._report_key != ReportTypes.MHR_REGISTRATION:
+            if self._report_key not in (ReportTypes.MHR_REGISTRATION, ReportTypes.MHR_TRANSFER):
                 self._set_notes()
             if self._report_key == ReportTypes.SEARCH_DETAIL_REPORT:
                 self._set_selected()
@@ -319,8 +319,9 @@ class Report:  # pylint: disable=too-few-public-methods
             elif self._report_key == ReportTypes.SEARCH_BODY_REPORT:
                 # Add PPR search template setup here:
                 self._set_ppr_search()
-            self._set_location()
-            self._set_description()
+            if self._report_key != ReportTypes.MHR_TRANSFER:
+                self._set_location()
+                self._set_description()
         return self._report_data
 
     def _set_ppr_search(self):  # pylint: disable=too-many-branches, too-many-statements
@@ -382,7 +383,7 @@ class Report:  # pylint: disable=too-few-public-methods
         if self._report_key in (ReportTypes.SEARCH_DETAIL_REPORT, ReportTypes.SEARCH_BODY_REPORT) and \
                 self._report_data['totalResultsSize'] > 0:
             self._set_search_addresses()
-        elif self._report_key == ReportTypes.MHR_REGISTRATION:
+        elif self._report_key in (ReportTypes.MHR_REGISTRATION, ReportTypes.MHR_TRANSFER):
             self._set_registration_addresses()
 
     def _set_search_addresses(self):
@@ -408,6 +409,14 @@ class Report:  # pylint: disable=too-few-public-methods
                 Report._format_address(reg['submittingParty']['address'])
             if reg.get('ownerGroups'):
                 for group in reg['ownerGroups']:
+                    for owner in group['owners']:
+                        Report._format_address(owner['address'])
+            if reg.get('deleteOwnerGroups'):
+                for group in reg['deleteOwnerGroups']:
+                    for owner in group['owners']:
+                        Report._format_address(owner['address'])
+            if reg.get('addOwnerGroups'):
+                for group in reg['addOwnerGroups']:
                     for owner in group['owners']:
                         Report._format_address(owner['address'])
             if reg.get('location') and 'address' in reg['location']:
@@ -449,6 +458,9 @@ class Report:  # pylint: disable=too-few-public-methods
                 else:
                     reg['description']['engineerDate'] = \
                         Report._to_report_datetime(reg['description']['engineerDate'], False)
+        elif self._report_key == ReportTypes.MHR_TRANSFER:
+            reg = self._report_data
+            reg['createDateTime'] = Report._to_report_datetime(reg['createDateTime'])
 
     def _set_selected(self):
         """Replace selection serial type code with description. Remove unselected items."""
@@ -509,7 +521,7 @@ class Report:  # pylint: disable=too-few-public-methods
                 self._report_data['footer_content'] = f'MHR Number Search - "{criteria}"'
             else:
                 self._report_data['footer_content'] = f'MHR {search_desc} Search - "{criteria}"'
-        elif self._report_key in (ReportTypes.MHR_REGISTRATION, ReportTypes.MHR_COVER):
+        elif self._report_key in (ReportTypes.MHR_REGISTRATION, ReportTypes.MHR_COVER, ReportTypes.MHR_TRANSFER):
             reg_num = self._report_data.get('mhrNumber', '')
             self._report_data['footer_content'] = f'Manufactured Home Registration #{reg_num}'
             self._report_data['meta_subject'] = f'Manufactured Home Registration Number: {reg_num}'
@@ -590,5 +602,12 @@ class ReportMeta:  # pylint: disable=too-few-public-methods
             'metaTitle': 'Manufactured Home Registry Search Result',
             'metaSubtitle': 'BC Registries and Online Services',
             'metaSubject': ''
-        }
+        },
+        ReportTypes.MHR_TRANSFER: {
+            'reportDescription': 'MHRTransfer',
+            'fileName': 'transferV2',
+            'metaTitle': 'VERIFICATION OF SERVICE',
+            'metaSubtitle': 'MANUFACTURED HOME ACT',
+            'metaSubject': ''
+        },
     }

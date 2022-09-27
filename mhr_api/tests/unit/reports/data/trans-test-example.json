@@ -1,0 +1,77 @@
+{
+  "addOwnerGroups": [
+    {
+      "groupId": 9, 
+      "interest": "", 
+      "interestNumerator": 0, 
+      "owners": [
+        {
+          "address": {
+            "street": "11670 79A AVE",
+            "city": "DELTA",
+            "region": "BC",
+            "country": "CA",
+            "postalCode": "V4C 6W1"
+          },
+          "individualName": {
+            "first": "KANWARDEEP", 
+            "last": "AHLUWALIA"
+          }, 
+          "phoneNumber": "604462027", 
+          "type": "SOLE"
+        }
+      ], 
+      "status": "ACTIVE", 
+      "tenancySpecified": false, 
+      "type": "SOLE"
+    }
+  ], 
+  "clientReferenceId": "UT-TRANS0007                  ", 
+  "createDateTime": "2022-09-26T13:59:56-07:53", 
+  "deleteOwnerGroups": [
+    {
+      "groupId": 8, 
+      "interest": "", 
+      "interestNumerator": 0, 
+      "owners": [
+        {
+          "address": {
+            "city": "LANGLEY", 
+            "country": "CA", 
+            "postalCode": "V3A 6H4", 
+            "region": "BC", 
+            "street": "6665 238TH STREET"
+          }, 
+          "individualName": {
+            "first": "MAX", 
+            "last": "BICKNELL"
+          }, 
+          "phoneNumber": "604462027", 
+          "type": "SOLE"
+        }
+      ], 
+      "status": "PREVIOUS", 
+      "tenancySpecified": false, 
+      "type": "SOLE"
+    }
+  ], 
+  "documentDescription": "SALE OR GIFT", 
+  "documentId": "10200036", 
+  "mhrNumber": "103425", 
+  "payment": {
+    "invoiceId": "22308", 
+    "receipt": "/api/v1/payment-requests/22308/receipts"
+  }, 
+  "status": "ACTIVE", 
+  "submittingParty": {
+    "address": {
+      "city": "VICTORIA", 
+      "country": "CA", 
+      "postalCode": "V8W 2V8", 
+      "region": "BC", 
+      "street": "222 SUMMER STREET"
+    }, 
+    "businessName": "ABC SEARCHING COMPANY", 
+    "emailAddress": "bsmith@abc-search.com"
+  }
+}

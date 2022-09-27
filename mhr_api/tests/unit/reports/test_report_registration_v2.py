@@ -35,7 +35,23 @@ REGISTRATON_JOINT_DATAFILE = 'tests/unit/reports/data/registration-joint-example
 REGISTRATON_JOINT_PDFFILE = 'tests/unit/reports/data/registration-joint-example.pdf'
 REGISTRATON_MAIL_PDFFILE = 'tests/unit/reports/data/registration-mail-example.pdf'
 REGISTRATON_COVER_PDFFILE = 'tests/unit/reports/data/registration-cover-example.pdf'
+
+TRANSFER_TEST_DATAFILE = 'tests/unit/reports/data/trans-test-example.json'
+TRANSFER_TEST_PDFFILE = 'tests/unit/reports/data/trans-test-example.pdf'
 REPORT_VERSION_V2 = '2'
+
+
+def test_transfer_trans(session, client, jwt):
+    """Assert that generation of a test report is as expected."""
+    # setup
+    if is_report_v2():
+        json_data = get_json_from_file(TRANSFER_TEST_DATAFILE)
+        report = Report(json_data, 'PS12345', ReportTypes.MHR_TRANSFER, 'Account Name')
+        # test
+        content, status, headers = report.get_pdf()
+        assert headers
+        # verify
+        check_response(content, status, TRANSFER_TEST_PDFFILE)
 
 
 def test_registration_test(session, client, jwt):
@@ -107,7 +123,7 @@ def test_mail_registration(session, client, jwt):
     """Assert that generation of a mail report is as expected."""
     # setup
     if is_report_v2():
-        json_data = get_json_from_file(REGISTRATON_SOLE_DATAFILE)
+        json_data = get_json_from_file(REGISTRATON_TEST_DATAFILE)
         report = Report(json_data, 'PS12345', ReportTypes.MHR_REGISTRATION_MAIL, 'Account Name')
         # test
         content, status, headers = report.get_pdf()

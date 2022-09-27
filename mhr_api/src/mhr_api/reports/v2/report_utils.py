@@ -54,6 +54,7 @@ class ReportTypes(BaseEnum):
     MHR_COVER = 'mhrCover'
     MHR_REGISTRATION = 'mhrRegistration'
     MHR_REGISTRATION_MAIL = 'mhrRegistrationMail'
+    MHR_TRANSFER = 'mhrTransfer'
     SEARCH_DETAIL_REPORT = 'searchDetail'
     # Gotenberg
     SEARCH_TOC_REPORT = 'searchTOC'
@@ -221,7 +222,9 @@ def get_cover_footer_data(footer_text: str) -> str:
 
 def get_report_meta_data(report_type: str = '') -> dict:
     """Get gotenberg report configuration data."""
-    if not report_type or report_type not in (ReportTypes.MHR_REGISTRATION, ReportTypes.MHR_COVER):
+    if not report_type or report_type not in (ReportTypes.MHR_REGISTRATION,
+                                              ReportTypes.MHR_COVER,
+                                              ReportTypes.MHR_TRANSFER):
         return copy.deepcopy(REPORT_META_DATA)
     data = copy.deepcopy(REPORT_META_DATA)
     data['marginTop'] = MARGIN_TOP_REG_REPORT
@@ -237,11 +240,12 @@ def get_report_files(request_data: dict, report_type: str, mail: bool = False) -
                        ReportTypes.SEARCH_DETAIL_REPORT,
                        ReportTypes.SEARCH_TOC_REPORT,
                        ReportTypes.MHR_COVER,
-                       ReportTypes.MHR_REGISTRATION):
+                       ReportTypes.MHR_REGISTRATION,
+                       ReportTypes.MHR_TRANSFER):
         title_text = request_data['templateVars'].get('meta_title', '')
         subtitle_text = request_data['templateVars'].get('meta_subtitle', '')
         footer_text = request_data['templateVars'].get('footer_content', '')
-    if report_type in (ReportTypes.MHR_REGISTRATION, ReportTypes.MHR_COVER):
+    if report_type in (ReportTypes.MHR_REGISTRATION, ReportTypes.MHR_COVER, ReportTypes.MHR_TRANSFER):
         subject_text = request_data['templateVars'].get('meta_subject', '')
         if report_type == ReportTypes.MHR_COVER:
             files['header.html'] = get_cover_header_data(title_text, subtitle_text, subject_text)

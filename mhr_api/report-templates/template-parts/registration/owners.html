@@ -67,4 +67,124 @@
             <div class="separator-section mt-4 mb-1"></div>
          {% endif %}
     {% endfor %}
-{% endif %}
+{% elif addOwnerGroups is defined or deleteOwnerGroups is defined %}
+    {% for group in deleteOwnerGroups %}
+        {% if group.type == 'COMMON' %}
+        <div class="mt-3">
+            <span class="section-sub-title">Group {{ group.groupId }}:&nbsp;</span>
+            {% if group.interest is defined and group.interest != '' %}
+                <span class="section-data">Interest {{ group.interest|lower }}</span>
+            {% endif %}
+        </div>
+        {% endif %}
+    <table class="section-data section-data-table-new mt-4" role="presentation">
+        {% for party in group.owners %}
+        <tr class="no-page-break">
+            <td class="col-33">
+                <div class="section-sub-title pr-6">
+                    {% if party.organizationName is defined %}
+                        {{ party.organizationName }}
+                    {% elif party.individualName is defined %}
+                        {{ party.individualName.last }},
+                        {{ party.individualName.first }}
+                        {% if party.individualName.middle is defined %}&nbsp;{{ party.individualName.middle }}{% endif %}
+                    {% endif %}
+                </div>
+                {% if party.suffix is defined and party.suffix != '' %}
+                <div class="pt-2">{{ party.suffix }}</div>
+                {% endif %} 
+                <div class="pt-2"><span class="label">DELETED</span></div>
+            </td>
+            <td class="col-33">
+                <div class="section-sub-title">Address</div>
+                <div class="pt-2">{{ party.address.street }}</div>
+                <div>{{ party.address.streetAdditional }}</div>
+                <div>{{ party.address.city }} {{ party.address.region }}</div>
+                <div>
+                    {% if party.address.postalCode is defined and party.address.postalCode != '' %}
+                        {{ party.address.postalCode }}&nbsp;&nbsp; 
+                    {% endif %}
+                    {{ party.address.country}}
+                </div>
+            </td>
+            <td class="col-33">
+                <div class="section-sub-title">Tenancy Type</div>
+                <div class="pt-2">
+                    {% if group.type == 'SOLE' %}
+                        Sole Owner
+                    {% elif group.type == 'JOINT' %}
+                        Joint Tenants
+                    {% else %}
+                        Tenants in Common
+                    {% endif %}
+                </div>
+            </td>
+        </tr>
+        {% if not loop.last %}
+            <tr><td colspan="3"><div class="mt-4"></div></td></tr>            
+        {% endif %}
+    {% endfor %}
+    </table> 
+    {% endfor %}
+    {% if addOwnerGroups is defined and deleteOwnerGroups is defined %}
+        <div class="separator-section mt-4 mb-1"></div>
+    {% endif %}
+    {% for group in addOwnerGroups %}
+        {% if group.type == 'COMMON' %}
+        <div class="mt-3">
+            <span class="section-sub-title">Group {{ group.groupId }}:&nbsp;</span>
+            {% if group.interest is defined and group.interest != '' %}
+                <span class="section-data">Interest {{ group.interest|lower }}</span>
+            {% endif %}
+        </div>
+        {% endif %}
+    <table class="section-data section-data-table-new mt-4" role="presentation">
+        {% for party in group.owners %}
+        <tr class="no-page-break">
+            <td class="col-33">
+                <div class="section-sub-title pr-6">
+                    {% if party.organizationName is defined %}
+                        {{ party.organizationName }}
+                    {% elif party.individualName is defined %}
+                        {{ party.individualName.last }},
+                        {{ party.individualName.first }}
+                        {% if party.individualName.middle is defined %}&nbsp;{{ party.individualName.middle }}{% endif %}
+                    {% endif %}
+                </div>
+                {% if party.suffix is defined and party.suffix != '' %}
+                <div class="pt-2">{{ party.suffix }}</div>
+                {% endif %} 
+                <div class="pt-2"><span class="label">ADDED</span></div>
+            </td>
+            <td class="col-33">
+                <div class="section-sub-title">Address</div>
+                <div class="pt-2">{{ party.address.street }}</div>
+                <div>{{ party.address.streetAdditional }}</div>
+                <div>{{ party.address.city }} {{ party.address.region }}</div>
+                <div>
+                    {% if party.address.postalCode is defined and party.address.postalCode != '' %}
+                        {{ party.address.postalCode }}&nbsp;&nbsp; 
+                    {% endif %}
+                    {{ party.address.country}}
+                </div>
+            </td>
+            <td class="col-33">
+                <div class="section-sub-title">Tenancy Type</div>
+                <div class="pt-2">
+                    {% if group.type == 'SOLE' %}
+                        Sole Owner
+                    {% elif group.type == 'JOINT' %}
+                        Joint Tenants
+                    {% else %}
+                        Tenants in Common
+                    {% endif %}
+                </div>
+            </td>
+        </tr>
+        {% if not loop.last %}
+            <tr><td colspan="3"><div class="mt-4"></div></td></tr>            
+        {% endif %}
+    {% endfor %}
+    </table> 
+    {% endfor %}
+ {% endif %}

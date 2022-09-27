@@ -312,7 +312,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         registration = None
         if document_id:
             try:
-                registration = cls.query.filter(MhrRegistration.doc_reg_number == document_id).one_or_none()
+                registration = cls.query.filter(MhrRegistration.doc_id == document_id).one_or_none()
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('DB find_by_document_id exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)
