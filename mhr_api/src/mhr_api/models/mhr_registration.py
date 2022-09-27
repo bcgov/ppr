@@ -74,8 +74,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
     # Always use get_generated_values() to generate PK.
     id = db.Column('id', db.Integer, primary_key=True)
     registration_ts = db.Column('registration_ts', db.DateTime, nullable=False, index=True)
-    mhr_number = db.Column('mhr_number', db.String(7), nullable=False, index=True,
-                           default=db.func.get_mhr_number())
+    mhr_number = db.Column('mhr_number', db.String(7), nullable=False, index=True)
     account_id = db.Column('account_id', db.String(20), nullable=True, index=True)
     client_reference_id = db.Column('client_reference_id', db.String(50), nullable=True)
     pay_invoice_id = db.Column('pay_invoice_id', db.Integer, nullable=True)
@@ -206,13 +205,10 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         db.session.commit()
 
         self.draft_id = draft.id
-        # doc_reg_num = self.doc_reg_number
-        # self.doc_reg_number = self.doc_id
         db.session.add(self)
         db.session.commit()
         # Now save legacy data.
         if model_utils.is_legacy():
-            # self.doc_reg_number = doc_reg_num
             if not self.manuhome:
                 manuhome: Db2Manuhome = Db2Manuhome.create_from_registration(self, self.reg_json)
                 manuhome.save()
@@ -306,6 +302,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
             if not registration:
                 registration: MhrRegistration = MhrRegistration()
             registration.manuhome = legacy_utils.find_by_mhr_number(formatted_mhr)
+            registration.mhr_number = registration.manuhome.mhr_number
         return registration
 
     @classmethod
@@ -342,6 +339,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
             if not registration:
                 registration: MhrRegistration = MhrRegistration()
             registration.manuhome = legacy_utils.find_by_document_id(document_id)
+            registration.mhr_number = registration.manuhome.mhr_number
         return registration
 
     @staticmethod
@@ -415,6 +413,8 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         registration.parties = MhrParty.create_from_registration_json(json_data, registration.id)
         if registration.doc_id and not json_data.get('documentId'):
             json_data['documentId'] = registration.doc_id
+        elif not registration.doc_id and json_data.get('documentId'):
+            registration.doc_id = json_data.get('documentId')
         if base_reg:
             registration.manuhome = base_reg.manuhome
         return registration
