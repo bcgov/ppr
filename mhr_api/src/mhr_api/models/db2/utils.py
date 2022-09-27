@@ -46,7 +46,8 @@ WHERE account_id = :query_value
 QUERY_MHR_NUMBER_LEGACY = """
 SELECT (SELECT COUNT(mr.id)
            FROM mhr_registrations mr
-          WHERE mr.mhr_number = :query_value2
+          WHERE mr.account_id = :query_value
+            AND mr.mhr_number = :query_value2
             AND mr.registration_type IN ('MHREG')) AS reg_count,
        (SELECT COUNT(mer.id)
            FROM mhr_extra_registrations mer
@@ -133,10 +134,10 @@ def find_summary_by_mhr_number(account_id: str, mhr_number: str, staff: bool):
             extra_count = int(row[1])
             current_app.logger.debug(f'reg_count={reg_count}, extra_cout={extra_count}, staff={staff}')
             # Set inUserList to true if MHR number already added to account extra registrations.
-            if extra_count > 0:
+            if reg_count > 0 or extra_count > 0:
                 registration['inUserList'] = True
-            # Path to download report only available for staff and registrations created in the new application.
-            if staff and reg_count > 0:
+            # Path to download report only available for staff and registrations created by the account.
+            if staff or reg_count > 0:
                 registration['path'] = REGISTRATION_PATH + mhr_number
         except Exception as db_exception:   # noqa: B902; return nicer error
             current_app.logger.error('find_summary_by_mhr_number mhr extra check exception: ' + str(db_exception))
@@ -208,6 +209,11 @@ def get_doc_id_count(doc_id: str):
 def find_by_mhr_number(mhr_number: str):
     """Return the registration matching the MHR number."""
     return Db2Manuhome.find_by_mhr_number(mhr_number)
+
+
+def find_by_document_id(document_id: str):
+    """Return the registration matching the MHR number."""
+    return Db2Manuhome.find_by_document_id(document_id)
 
 
 def __build_summary(row, staff: bool, mhr_list: dict, add_in_user_list: bool = True):

@@ -97,6 +97,23 @@ class Db2Manuhome(db.Model):
             current_app.logger.error('Db2Manuhome.save exception: ' + str(db_exception))
             raise DatabaseException(db_exception)
 
+    def save_transfer(self):
+        """Save the object with transfer changes to the database immediately."""
+        try:
+            db.session.add(self)
+            if self.reg_documents:
+                index: int = len(self.reg_documents) - 1
+                doc: Db2Document = self.reg_documents[index]
+                doc.save()
+            if self.reg_owner_groups:
+                for group in self.reg_owner_groups:
+                    if group.modified:
+                        group.save()
+            db.session.commit()
+        except Exception as db_exception:   # noqa: B902; return nicer error
+            current_app.logger.error('Db2Manuhome.save_transfer exception: ' + str(db_exception))
+            raise DatabaseException(db_exception)
+
     @classmethod
     def find_by_id(cls, id: int):
         """Return the mh matching the id."""
@@ -128,7 +145,44 @@ class Db2Manuhome(db.Model):
         return manuhome
 
     @classmethod
-    def find_by_mhr_number(cls, mhr_number: str, owner_groups: bool = True):
+    def find_by_document_id(cls, document_id: str):
+        """Return the mh information that matches the document id."""
+        doc: Db2Document = None
+        manuhome: Db2Manuhome = None
+        if document_id:
+            try:
+                current_app.logger.debug(f'Db2Document.find_by_document_id Db2Document query id={document_id}.')
+                doc = Db2Document.find_by_doc_id(document_id)
+            except Exception as db_exception:   # noqa: B902; return nicer error
+                current_app.logger.error('Db2Manuhome.find_by_document_id exception: ' + str(db_exception))
+                raise DatabaseException(db_exception)
+
+        if not doc:
+            raise BusinessException(
+                error=model_utils.ERR_DOCUMENT_NOT_FOUND_ID.format(code=ResourceErrorCodes.NOT_FOUND_ERR,
+                                                                   document_id=document_id),
+                status_code=HTTPStatus.NOT_FOUND
+            )
+
+        current_app.logger.debug(f'Db2Manuhome.find_by_document_id Db2Manuhome query mhrNum={doc.mhr_number}.')
+        manuhome = Db2Manuhome.find_by_mhr_number(doc.mhr_number, True, True)
+        current_app.logger.debug('Db2Manuhome.find_by_id Db2Document query.')
+        manuhome.reg_documents = [doc]
+        # Document type specific from now on.
+        if doc.document_type in (Db2Document.DocumentTypes.TRAND,
+                                 Db2Document.DocumentTypes.TRANS):
+            current_app.logger.debug('Db2Manuhome.find_by_document_id Db2Owngroup query.')
+            all_groups = Db2Owngroup.find_all_by_manuhome_id(manuhome.id)
+            manuhome.reg_owner_groups = []
+            for group in all_groups:
+                if group.can_document_id and group.can_document_id == document_id:
+                    manuhome.reg_owner_groups.append(group)
+                elif group.reg_document_id == document_id:
+                    manuhome.reg_owner_groups.append(group)
+        return manuhome
+
+    @classmethod
+    def find_by_mhr_number(cls, mhr_number: str, owner_groups: bool = True, just_manuhome: bool = False):
         """Return the MH registration matching the MHR number."""
         manuhome = None
         current_app.logger.debug(f'Db2Manuhome.find_by_mhr_number {mhr_number}.')
@@ -145,6 +199,8 @@ class Db2Manuhome(db.Model):
                                                                         mhr_number=mhr_number),
                 status_code=HTTPStatus.NOT_FOUND
             )
+        if just_manuhome:
+            return manuhome
         current_app.logger.debug('Db2Manuhome.find_by_mhr_number Db2Document query.')
         manuhome.reg_documents = Db2Document.find_by_mhr_number(manuhome.mhr_number)
         if owner_groups:
@@ -164,22 +220,50 @@ class Db2Manuhome(db.Model):
 
     @property
     def json(self):
-        """Return a dict of this object, with keys in JSON format."""
+        """Return a dict of this object representing only the registration changes, with keys in JSON format."""
+        doc_index: int = len(self.reg_documents) - 1
+        doc: Db2Document = self.reg_documents[doc_index]
+        doc_id: int = doc.id
+        doc_json = doc.registration_json
         man_home = {
             'mhrNumber': self.mhr_number,
-            'status': self.mh_status,
-            'registrationDocumentId': self.reg_document_id,
-            'exemptFlag': self.exempt_flag,
-            'presoldDecal': self.presold_decal,
-            'updateCount': self.update_count,
-            'updateId': self.update_id,
-            'accessionNumber': self.accession_number,
-            'boxNumber': self.box_number
+            'status': LEGACY_STATUS_DESCRIPTION.get(self.mh_status),
+            'documentId': doc_json.get('documentId', ''),
+            'documentType': doc_json.get('documentType', ''),
+            'createDateTime': doc_json.get('createDateTime', ''),
+            'clientReferenceId': doc_json.get('clientReferenceId', ''),
+            'submittingParty': doc_json.get('submittingParty')
         }
-        if self.update_date:
-            man_home['updateDate'] = model_utils.format_local_date(self.update_date)
-        if self.update_time:
-            man_home['updateTime'] = self.update_time.isoformat(timespec='seconds')
+        if doc_json.get('attentionReference'):
+            man_home['attentionReference'] = doc_json.get('attentionReference')
+
+        if doc.document_type in (Db2Document.DocumentTypes.TRANS, Db2Document.DocumentTypes.TRAND):
+            add_groups = []
+            delete_groups = []
+            for group in self.reg_owner_groups:
+                if group.can_document_id == doc_id:
+                    delete_groups.append(group.registration_json)
+                elif group.reg_document_id == doc_id:
+                    add_groups.append(group.registration_json)
+            man_home['addOwnerGroups'] = add_groups
+            man_home['deleteOwnerGroups'] = delete_groups
+        else:
+            if self.reg_owner_groups:
+                groups = []
+                for group in self.reg_owner_groups:
+                    groups.append(group.registration_json)
+                man_home['ownerGroups'] = groups
+            if self.reg_location:
+                man_home['location'] = self.reg_location.registration_json
+            if self.reg_descript:
+                man_home['description'] = self.reg_descript.registration_json
+            if self.reg_notes:
+                notes = []
+                for note in self.reg_notes:
+                    notes.append(note.registration_json)
+                # Now sort in descending timestamp order.
+                man_home['notes'] = Db2Manuhome.__sort_notes(notes)
+
         return man_home
 
     @property
@@ -338,10 +422,64 @@ class Db2Manuhome(db.Model):
                                                                                Db2Document.DocumentTypes.MHREG,
                                                                                now_local))
         manuhome.reg_location = Db2Location.create_from_registration(registration, reg_json)
+        # Adjust location address info.
+        address = reg_json['location']['address']
+        extra: str = ''
+        if len(address.get('street')) > 31:
+            extra = str(address['street'])[31:]
+        if address.get('streetAdditional'):
+            extra += ' ' + str(address.get('streetAdditional')).strip()
+        manuhome.reg_location.additional_description = extra.strip() + ' ' + \
+            manuhome.reg_location.additional_description
+        if len(manuhome.reg_location.additional_description) > 80:
+            manuhome.reg_location.additional_description = manuhome.reg_location.additional_description[0:80]
         manuhome.reg_descript = Db2Descript.create_from_registration(registration, reg_json)
         if reg_json.get('ownerGroups'):
-            for i, group in enumerate(reg_json.get('ownerGroups')):
+            for i, new_group in enumerate(reg_json.get('ownerGroups')):
+                new_group['documentId'] = reg_json.get('documentId')
                 # current_app.logger.info('ownerGroups i=' + str(i))
-                group = Db2Owngroup.create_from_registration(registration, group, (i + 1))
+                group = Db2Owngroup.create_from_registration(registration, new_group, (i + 1))
                 manuhome.reg_owner_groups.append(group)
+        return manuhome
+
+    @staticmethod
+    def create_from_transfer(registration, reg_json):
+        """Create a new transfer registration: update manuhome, create document, update owner groups."""
+        if not registration.manuhome:
+            current_app.logger.info(f'registration id={registration.id} no manuhome: nothing to save.')
+            return
+        manuhome = registration.manuhome
+        now_local = model_utils.today_local()
+        manuhome.update_date = now_local.date()
+        manuhome.update_time = now_local.time()
+        doc_type = Db2Document.DocumentTypes.TRANS
+        if reg_json.get('deathOfOwner'):
+            doc_type = Db2Document.DocumentTypes.TRAND
+        # Create document
+        manuhome.reg_documents.append(Db2Document.create_from_registration(registration,
+                                                                           reg_json,
+                                                                           doc_type,
+                                                                           now_local))
+        # Update owner groups: group ID increments with each change.
+        if reg_json.get('deleteOwnerGroups'):
+            for group in reg_json.get('deleteOwnerGroups'):
+                for existing in manuhome.reg_owner_groups:
+                    if existing.group_id == group.get('groupId'):
+                        current_app.logger.info(f'Existing group id={existing.group_id}, status={existing.status}')
+                        existing.status = Db2Owngroup.StatusTypes.PREVIOUS
+                        existing.modified = True
+                        existing.can_document_id = reg_json.get('documentId')
+                        current_app.logger.info(f'Found owner group to remove id={existing.group_id}')
+        group_id: int = len(manuhome.reg_owner_groups) + 1
+        if reg_json.get('addOwnerGroups'):
+            reg_id = registration.id
+            registration.id = manuhome.id  # Temporarily replace to save with original registration manhomid.
+            for new_group in reg_json.get('addOwnerGroups'):
+                current_app.logger.info(f'Creating owner group id={group_id}')
+                new_group['documentId'] = reg_json.get('documentId')
+                group = Db2Owngroup.create_from_registration(registration, new_group, group_id)
+                group.modified = True
+                group_id += 1
+                manuhome.reg_owner_groups.append(group)
+            registration.id = reg_id
         return manuhome

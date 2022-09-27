@@ -88,14 +88,7 @@ def post_registrations():  # pylint: disable=too-many-return-statements
                                                            request_json,
                                                            account_id,
                                                            TransactionTypes.REGISTRATION)
-        response_json = {}
-        if registration.manuhome:
-            response_json = registration.manuhome.new_registration_json
-            if request_json.get('submittingParty'):
-                response_json['submittingParty'] = request_json.get('submittingParty')
-            response_json = reg_utils.add_payment_json(registration, response_json)
-        else:
-            response_json = registration.json
+        response_json = registration.new_registration_json
 
         # Return report if request header Accept MIME type is application/pdf.
         if resource_utils.is_pdf(request):

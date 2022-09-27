@@ -3,7 +3,7 @@
     <v-data-table
       id="mh-home-owners-table"
       class="home-owners-table"
-      :class="{ 'review-mode' : isReadonlyTable }"
+      :class="{ 'review-mode': isReadonlyTable }"
       :headers="homeOwnersTableHeaders"
       hide-default-footer
       :items="homeOwners"
@@ -29,7 +29,6 @@
               <AddEditHomeOwner
                 :editHomeOwner="row.item"
                 :isHomeOwnerPerson="!row.item.organizationName"
-                @done="edit($event)"
                 @cancel="currentlyEditingHomeOwnerId = -1"
                 @remove="remove(row.item)"
               />
@@ -41,7 +40,7 @@
           <td class="owner-name">
             <div v-if="row.item.individualName" class="owner-icon-name">
               <v-icon class="mr-2">mdi-account</v-icon>
-              <div>
+              <div class="owner-name-bold">
                 {{ row.item.individualName.first }}
                 {{ row.item.individualName.middle }}
                 {{ row.item.individualName.last }}
@@ -81,7 +80,10 @@
             <!-- Actions drop down menu -->
             <v-menu offset-y left nudge-bottom="0">
               <template v-slot:activator="{ on }">
-                <v-btn text v-on="on" color="primary" class="px-0" :disabled="isAddingMode || isGlobalEditingMode">
+                <v-btn text v-on="on"
+                 color="primary" class="px-0"
+                 :disabled="isAddingMode || isGlobalEditingMode"
+                >
                   <v-icon>mdi-menu-down</v-icon>
                 </v-btn>
               </template>
@@ -100,14 +102,14 @@
         </tr>
         <tr v-else>
           <td :colspan="4" class="py-1">
-            <div class="error-text pa-4 text-center">Group must contain at least one owner</div>
+            <div class="my-6 text-center">
+              No owners added yet.
+            </div>
           </td>
         </tr>
       </template>
       <template v-slot:no-data>
-        <div class="my-6">
-          No owners added yet.
-        </div>
+        <div class="error-text pa-4 text-center">No owners added yet.</div>
       </template>
     </v-data-table>
   </v-card>
@@ -123,13 +125,13 @@ import { toDisplayPhone } from '@/utils'
 import { AddEditHomeOwner } from '@/components/mhrRegistration/HomeOwners'
 import TableGroupHeader from '@/components/mhrRegistration/HomeOwners/TableGroupHeader.vue'
 /* eslint-disable no-unused-vars */
-import { MhrRegistrationHomeOwnersIF } from '@/interfaces'
+import { MhrRegistrationHomeOwnerIF } from '@/interfaces'
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
   name: 'HomeOwnersTable',
   props: {
-    homeOwners: { default: [] as MhrRegistrationHomeOwnersIF[] },
+    homeOwners: { default: [] as MhrRegistrationHomeOwnerIF[] },
     isAdding: { default: false },
     isReadonlyTable: { type: Boolean, default: false }
   },
@@ -138,7 +140,7 @@ export default defineComponent({
     AddEditHomeOwner,
     TableGroupHeader
   },
-  setup (props, context) {
+  setup (props) {
     const addressSchema = PartyAddressSchema
 
     const {
@@ -156,17 +158,8 @@ export default defineComponent({
       isAddingMode: computed((): boolean => props.isAdding),
       showTableError: computed((): boolean => hasEmptyGroup.value && showGroups.value),
       showEditActions: computed((): boolean => !props.isReadonlyTable),
-      homeOwnersTableHeaders: props.isReadonlyTable
-        ? homeOwnersTableHeadersReview
-        : homeOwnersTableHeaders
+      homeOwnersTableHeaders: props.isReadonlyTable ? homeOwnersTableHeadersReview : homeOwnersTableHeaders
     })
-
-    const edit = (item): void => {
-      context.emit('edit', {
-        ...item,
-        id: localState.currentlyEditingHomeOwnerId
-      })
-    }
 
     const remove = (item): void => {
       localState.currentlyEditingHomeOwnerId = -1
@@ -182,11 +175,10 @@ export default defineComponent({
     }
 
     // To render Group table header the owners array must not be empty
-    // If group is empty, owners array will have a 'placeholder' obj and not the actual owners
+    // check for at least one owner with an id
     // This util function will help to show Owners: 0 in the table header
-    const hasActualOwners = (owners: MhrRegistrationHomeOwnersIF[]): boolean => {
-      // check for one 'placeholder' owner which will not have an id
-      return owners.length === 1 && owners[0]?.id !== undefined
+    const hasActualOwners = (owners: MhrRegistrationHomeOwnerIF[]): boolean => {
+      return owners.length > 0 && owners[0]?.id !== undefined
     }
 
     watch(
@@ -204,7 +196,6 @@ export default defineComponent({
       showGroups,
       hasEmptyGroup,
       hasActualOwners,
-      edit,
       remove,
       deleteGroup,
       isGlobalEditingMode,
@@ -223,8 +214,14 @@ export default defineComponent({
     background-color: #e2e8ee;
   }
 
-  .owner-name, i {
+  .owner-name,
+  i {
     color: $gray9 !important;
+    font-weight: bold;
+  }
+
+  .owner-name-bold {
+    color: #212529;
     font-weight: bold;
   }
 
@@ -278,7 +275,12 @@ export default defineComponent({
     line-height: 22px;
     margin-left: 34px;
   }
+  .theme--light.v-btn.v-btn--disabled {
+    color:#1669bb !important;
+    opacity: 0.4 !important;
+  }
 }
+
 .v-menu__content {
   cursor: pointer;
 }

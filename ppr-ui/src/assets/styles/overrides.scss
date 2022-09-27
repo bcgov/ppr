@@ -519,7 +519,8 @@ input#reg-textfield.v-text-field.v-input--dense:not(.v-text-field--outlined),
 }
 
 #registration-table.v-data-table > .v-data-table__wrapper > table > thead > tr > th {
-    padding-top:20px !important;
+  padding-top:20px !important;
+  padding-bottom: 10px !important;
 }
 
 #registration-table.v-data-table > .v-data-table__wrapper > table > tbody > tr > td.actions-cell {

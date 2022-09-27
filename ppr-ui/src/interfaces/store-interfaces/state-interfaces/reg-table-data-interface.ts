@@ -13,6 +13,6 @@ export interface RegTableDataI {
 export interface RegTableNewItemI {
   addedReg: string // used for highlight / scroll to
   addedRegParent: string // used for expand
-  addedRegSummary: RegistrationSummaryIF | DraftResultIF // new item to add in table
+  addedRegSummary: RegistrationSummaryIF | MhRegistrationSummaryIF | DraftResultIF // new item to add in table
   prevDraft: string // used to remove previous draft
 }

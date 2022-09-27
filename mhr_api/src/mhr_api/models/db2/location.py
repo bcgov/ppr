@@ -299,7 +299,7 @@ class Db2Location(db.Model):
                                additional_description=new_info.get('additionalDescription', ''))
 
         if new_info.get('taxCertificateDate', None):
-            location.tax_certificate_date = model_utils.date_from_date_iso_format(new_info.get('taxCertificateDate'))
+            location.tax_certificate_date = model_utils.date_from_iso_format(new_info.get('taxCertificateDate'))
 
         return location
 
@@ -322,8 +322,8 @@ class Db2Location(db.Model):
                                reg_document_id=reg_json.get('documentId', ''),
                                can_document_id='',
                                street_number=street_num,
-                               street_name=street_name[0:24],
-                               town_city=str(address['city'])[0:19],
+                               street_name=street_name[0:25],
+                               town_city=str(address['city'])[0:20],
                                province=address.get('region', ''),
                                area='',
                                jurisdiction='',
@@ -352,7 +352,7 @@ class Db2Location(db.Model):
         if new_info.get('taxCertificate'):
             location.tax_certificate = 'Y'
         if new_info.get('taxCertificateDate', None):
-            location.tax_certificate_date = model_utils.date_from_date_iso_format(new_info.get('taxCertificateDate'))
+            location.tax_certificate_date = model_utils.date_from_iso_format(new_info.get('taxCertificateDate'))
         else:
             location.tax_certificate_date = model_utils.date_from_iso_format('0001-01-01')
         return location

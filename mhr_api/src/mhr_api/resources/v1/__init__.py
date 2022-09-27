@@ -28,6 +28,7 @@ from .search_history import bp as search_history_bp
 from .search_report_callback import bp as search_report_callback_bp
 from .search_results import bp as search_result_bp
 from .searches import bp as searches_bp
+from .transfers import bp as transfers_bp
 
 
 class V1Endpoint:
@@ -54,6 +55,7 @@ class V1Endpoint:
         self.app.register_blueprint(search_history_bp)
         self.app.register_blueprint(search_result_bp)
         self.app.register_blueprint(search_report_callback_bp)
+        self.app.register_blueprint(transfers_bp)
         self.app.register_blueprint(registration_report_callback_bp)
 
 

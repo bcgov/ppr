@@ -2,20 +2,20 @@
   <div>
     <div v-if="isDoubledUp">
       <v-row no-gutters>
-      <v-col v-if="backBtn">
+      <v-col v-if="setBackBtn">
         <v-btn
           id="btn-stacked-back"
           class="btn-stacked"
           outlined
           @click="back()"
         >
-          <v-icon v-if="backBtn !== 'Save and Resume Later'" color="primary" style="padding-top: 2px;">
+          <v-icon v-if="setBackBtn !== 'Save and Resume Later'" color="primary" style="padding-top: 2px;">
             mdi-chevron-left
           </v-icon>
-          {{ backBtn }}
+          {{ setBackBtn }}
         </v-btn>
       </v-col>
-      <v-col v-if="cancelBtn" :class="{ 'pl-3': backBtn }">
+      <v-col v-if="cancelBtn" :class="{ 'pl-3': setBackBtn }">
         <v-btn
           id="btn-stacked-cancel"
           class="btn-stacked"
@@ -38,17 +38,17 @@
             {{ cancelBtn }}
           </v-btn>
       </div>
-      <div v-if="backBtn" :class="{ 'pt-4': cancelBtn }">
+      <div v-if="setBackBtn" :class="{ 'pt-4': cancelBtn }">
           <v-btn
             id="btn-stacked-back"
             class="btn-stacked"
             outlined
             @click="back()"
           >
-            <v-icon v-if="backBtn !== 'Save and Resume Later'" color="primary" style="padding-top: 2px;">
+            <v-icon v-if="setBackBtn !== 'Save and Resume Later'" color="primary" style="padding-top: 2px;">
               mdi-chevron-left
             </v-icon>
-            {{ backBtn }}
+            {{ setBackBtn }}
           </v-btn>
       </div>
     </div>
@@ -108,7 +108,6 @@ export default defineComponent({
   },
   setup (props, { emit, root }) {
     const localState = reactive({
-      backBtn: props.setBackBtn,
       cancelBtn: props.setCancelBtn,
       submitBtn: props.setSubmitBtn,
       saveBtn: props.setSaveButton,

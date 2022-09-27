@@ -18,10 +18,12 @@ Validation includes verifying the data combination for various registrations/fil
 from flask import current_app
 
 from mhr_api.models import MhrRegistration
+from mhr_api.models.type_tables import MhrRegistrationStatusTypes
 from mhr_api.models.utils import is_legacy
 from mhr_api.utils import valid_charset
 
 
+STATE_NOT_ALLOWED = 'The MH registration is not in a state where changes are allowed.'
 OWNERS_NOT_ALLOWED = 'Owners not allowed with new registrations: use ownerGroups instead. '
 DOC_ID_REQUIRED = 'Document ID is required for staff registrations. '
 SUBMITTING_REQUIRED = 'Submitting Party is required for MH registrations. '
@@ -46,7 +48,20 @@ def validate_registration(json_data, is_staff: bool = False):
             for owner in group.get('owners'):
                 error_msg += validate_owner(owner)
     error_msg += validate_location(json_data)
-    error_msg += validate_registration_legacy(json_data)
+    return error_msg
+
+
+def validate_transfer(registration: MhrRegistration, json_data, is_staff: bool = False):
+    """Perform all transfer data validation checks not covered by schema validation."""
+    error_msg = ''
+    if is_staff:
+        error_msg += validate_doc_id(json_data)
+    error_msg += validate_submitting_party(json_data)
+    if json_data.get('addOwnerGroups'):
+        for group in json_data.get('addOwnerGroups'):
+            for owner in group.get('owners'):
+                error_msg += validate_owner(owner)
+    error_msg += validate_registration_state(registration)
     return error_msg
 
 
@@ -102,19 +117,16 @@ def checksum_valid(doc_id: str) -> bool:
     return (10 - mod_sum) == check_digit
 
 
-def validate_registration_legacy(json_data):
+def validate_registration_state(registration: MhrRegistration):
     """Perform new registration legacy specifc extra validation here."""
     error_msg = ''
-    if not is_legacy():
+    if not registration:
         return error_msg
-    location = json_data.get('location')
-    if location and location.get('address'):
-        address = location.get('address')
-        if address.get('street') and len(address.get('street')) > 31:
-            error_msg = LEGACY_ADDRESS_STREET_TOO_LONG.format(add_desc='Location')
-        if address.get('city') and len(address.get('city')) > 20:
-            error_msg += LEGACY_ADDRESS_CITY_TOO_LONG.format(add_desc='Location')
-
+    if registration.status_type and registration.status_type != MhrRegistrationStatusTypes.ACTIVE:
+        error_msg += STATE_NOT_ALLOWED
+    elif is_legacy() and registration.manuhome and \
+            registration.manuhome.mh_status != registration.manuhome.StatusTypes.REGISTERED:
+        error_msg += STATE_NOT_ALLOWED
     return error_msg
 
 

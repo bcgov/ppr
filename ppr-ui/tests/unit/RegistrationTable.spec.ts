@@ -283,7 +283,8 @@ describe('Test registration table with results', () => {
       expect(getLastEvent(wrapper, 'action')).toEqual({
         action: actions[i],
         docId: undefined,
-        regNum: mockedRegistration1.baseRegistrationNumber
+        regNum: mockedRegistration1.baseRegistrationNumber,
+        mhrInfo: undefined
       })
     }
 

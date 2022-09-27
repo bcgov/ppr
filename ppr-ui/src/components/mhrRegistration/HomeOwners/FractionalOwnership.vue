@@ -6,12 +6,14 @@
     </div>
     <div v-else>
       <p class="mt-3 mb-6">
-        Enter the interest type and fraction of the total ownership owned by Group 1. For example,
-        if there are four owner groups, this group could have 1/4 ownership.
+        Enter the interest type and fraction of the total ownership owned by Group 1. For example, if there are four
+        owner groups, this group could have 1/4 ownership.
       </p>
       <v-text-field
         :id="`interest-type-group-${groupId}`"
         label="Interest Type (Optional)"
+        filled
+        class="background-white"
         v-model="fractionalData.interest"
         :data-test-id="`interest-type-field-group-${groupId}`"
       />
@@ -20,6 +22,7 @@
           :id="`fraction-amount-group-${groupId}`"
           label="Amount Owned by this Group"
           filled
+          class="background-white"
           v-model.number="fractionalData.interestNumerator"
           :rules="fractionalAmountRules"
           :data-test-id="`fraction-amount-field-group-${groupId}`"
@@ -31,6 +34,7 @@
           :id="`total-fractions-group-${groupId}`"
           label="Total Available"
           filled
+          class="background-white"
           v-model.number="fractionalData.interestTotal"
           :rules="totalAmountRules"
           :data-test-id="`total-fractions-field-group-${groupId}`"
@@ -52,7 +56,7 @@
 
 <script lang="ts">
 /* eslint-disable no-unused-vars */
-import { MhrRegistrationHomeOwnersIF } from '@/interfaces'
+import { MhrRegistrationHomeOwnerIF } from '@/interfaces'
 /* eslint-enable no-unused-vars */
 
 import { computed, defineComponent, reactive, toRefs } from '@vue/composition-api'
@@ -68,7 +72,7 @@ export default defineComponent({
       required: true
     },
     editHomeOwner: {
-      type: Object as () => MhrRegistrationHomeOwnersIF,
+      type: Object as () => MhrRegistrationHomeOwnerIF,
       default: null
     },
     showEditBtn: { type: Boolean, default: true },
@@ -88,7 +92,7 @@ export default defineComponent({
       fractionalInterest: computed(
         () =>
           // eslint-disable-next-line max-len
-          `${props.fractionalData.interest} ${props.fractionalData.interestNumerator} / ${props.fractionalData.interestTotal}`
+          `${props.fractionalData.interest} ${props.fractionalData.interestNumerator}/${props.fractionalData.interestTotal}`
       ),
       fractionalAmountRules: computed(() => {
         const rules = customRules(
@@ -122,13 +126,14 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+
 #mhr-home-ownership ::v-deep {
   p {
     white-space: normal;
     font-size: 16px;
     line-height: 24px;
+    color: #495057
   }
-
   .owner-fractions {
     display: flex;
     flex-direction: row;
@@ -144,4 +149,5 @@ export default defineComponent({
     }
   }
 }
+
 </style>

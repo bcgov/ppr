@@ -73,7 +73,7 @@
               @keypress.enter="findRegistration(myRegAdd)"
             />
             <p v-if="myRegAddInvalid" class="validation-msg mx-3 my-1">
-              Registration numbers contain 7 characters
+              Registration numbers contain {{ isMhr ? '6' : '7' }} characters
             </p>
           </v-col>
         </v-row>
@@ -164,19 +164,24 @@ import { BaseDialog, RegistrationConfirmation } from '@/components/dialogs'
 import { AllRegistrationTypes, mhRegistrationTableHeaders, registrationTableHeaders } from '@/resources'
 import {
   BaseHeaderIF,
-  DialogOptionsIF, DraftResultIF,
-  ErrorIF, RegistrationSortIF,
+  DialogOptionsIF,
+  DraftResultIF,
+  ErrorIF,
+  RegistrationSortIF,
+  MhRegistrationSummaryIF,
   RegistrationSummaryIF,
   RegistrationTypeIF,
   RegTableNewItemI,
-  StateModelIF, UserSettingsIF
+  StateModelIF,
+  UserSettingsIF
 } from '@/interfaces'
 import { APIStatusTypes, ErrorCategories, RouteNames, SettingOptions, TableActions } from '@/enums'
 import {
   addRegistrationSummary,
+  addMHRegistrationSummary,
   convertDate,
   deleteDraft, deleteRegistrationSummary, draftHistory,
-  getRegistrationSummary, registrationHistory,
+  getMHRegistrationSummary, getRegistrationSummary, registrationHistory,
   setupFinancingStatementDraft, updateUserSettings
 } from '@/utils'
 import {
@@ -184,6 +189,7 @@ import {
   registrationAddErrorDialog,
   registrationAlreadyAddedDialog,
   registrationFoundDialog,
+  mhRegistrationFoundDialog,
   registrationNotFoundDialog,
   registrationRestrictedDialog, renewConfirmationDialog, tableDeleteDialog, tableRemoveDialog
 } from '@/resources/dialogOptions'
@@ -235,12 +241,13 @@ export default defineComponent({
       resetNewRegistration, setRegistrationType, setRegTableCollapsed, setRegTableNewItem, setLengthTrust,
       setAddCollateral, setAddSecuredPartiesAndDebtors, setUnsavedChanges, setRegTableDraftsBaseReg,
       setRegTableDraftsChildReg, setRegTableTotalRowCount, setRegTableBaseRegs, setRegTableSortPage,
-      setRegTableSortHasMorePages, setRegTableSortOptions, setUserSettings, resetRegTableData
+      setRegTableSortHasMorePages, setRegTableSortOptions, setUserSettings, resetRegTableData, setMhrInformation
     } = useActions<any>([
       'resetNewRegistration', 'setRegistrationType', 'setRegTableCollapsed', 'setRegTableNewItem', 'setLengthTrust',
       'setAddCollateral', 'setAddSecuredPartiesAndDebtors', 'setUnsavedChanges', 'setRegTableDraftsBaseReg',
       'setRegTableDraftsChildReg', 'setRegTableTotalRowCount', 'setRegTableBaseRegs', 'setRegTableSortPage',
-      'setRegTableSortHasMorePages', 'setRegTableSortOptions', 'setUserSettings', 'resetRegTableData'
+      'setRegTableSortHasMorePages', 'setRegTableSortOptions', 'setUserSettings', 'resetRegTableData',
+      'setMhrInformation'
     ])
 
     const localState = reactive({
@@ -273,7 +280,8 @@ export default defineComponent({
         return []
       }),
       myRegAddInvalid: computed((): boolean => {
-        return ![0, 7].includes(
+        const maxLength = props.isMhr ? 6 : 7
+        return ![0, maxLength].includes(
           localState.myRegAdd?.trim().length || 0) || (localState.myRegAdd && !localState.myRegAdd?.trim()
         )
       }),
@@ -355,15 +363,20 @@ export default defineComponent({
       localState.loading = true
       localState.myRegAddDialog = null
       regNum = regNum.trim()
-      const reg = await getRegistrationSummary(regNum, false)
+      const reg = props.isMhr
+        ? await getMHRegistrationSummary(regNum, false)
+        : await getRegistrationSummary(regNum, false)
       if (!reg.error) {
-        myRegAddFoundSetDialog(regNum, reg)
+        props.isMhr
+          ? myMHRegAddFoundSetDialog(regNum, reg as MhRegistrationSummaryIF)
+          : myRegAddFoundSetDialog(regNum, reg as RegistrationSummaryIF)
       } else {
         myRegAddErrSetDialog(reg.error)
       }
       localState.loading = false
     }
 
+    // PPR Found Dialog
     const myRegAddFoundSetDialog = (searchedRegNum: string, reg: RegistrationSummaryIF): void => {
       localState.myRegAddDialog = Object.assign({ ...registrationFoundDialog })
       searchedRegNum = searchedRegNum?.trim()?.toUpperCase()
@@ -402,6 +415,44 @@ export default defineComponent({
       localState.myRegAddDialogDisplay = true
     }
 
+    // MHR Found Dialog
+    const myMHRegAddFoundSetDialog = (searchedRegNum: string, reg: MhRegistrationSummaryIF): void => {
+      localState.myRegAddDialog = Object.assign({ ...mhRegistrationFoundDialog })
+      // if the searched registration is a child of the base registration
+      if (searchedRegNum !== reg.mhrNumber) {
+        localState.myRegAddDialog.text = `The registration number you entered (<b>${searchedRegNum}</b>) ` +
+          'is associated with the following MHR number. Would you like to add this MHR registration to ' +
+          'your table? Adding the MHR registration to your table will automatically include all ' +
+          'associated registrations.'
+      }
+      localState.myRegAddDialog.textExtra = [
+        '<b>MHR Number:</b> ',
+        '<b>MH Registration Date:</b> ',
+        '<b>Registration Type:</b> ',
+        '<b>Submitting Party:</b> '
+      ]
+      localState.myRegAddDialog.textExtra[0] += reg.mhrNumber
+      if (reg.createDateTime) {
+        const createDate = new Date(reg.createDateTime)
+        localState.myRegAddDialog.textExtra[1] += convertDate(createDate, false, false)
+      } else {
+        localState.myRegAddDialog.textExtra[1] += 'N/A'
+      }
+      const regType = AllRegistrationTypes.find((regType: RegistrationTypeIF) => {
+        if (regType.registrationTypeAPI === reg.statusType) {
+          return true
+        }
+      })
+      if (regType) {
+        localState.myRegAddDialog.textExtra[2] += regType.registrationTypeUI
+      } else {
+        // Just in case some type gets added/changed and is not picked up by the UI.
+        localState.myRegAddDialog.textExtra[2] += 'Legacy'
+      }
+      localState.myRegAddDialog.textExtra[3] += reg.submittingParty
+      localState.myRegAddDialogDisplay = true
+    }
+
     const myRegAddErrSetDialog = (error: ErrorIF): void => {
       localState.myRegAddDialogError = error.statusCode
       const regNum = localState.myRegAdd?.trim()?.toUpperCase()
@@ -434,7 +485,7 @@ export default defineComponent({
       // add registration or not
       if (val && !localState.myRegAddDialogError &&
         (localState.myRegAddDialog.title === 'Registration Found')) {
-        addRegistration(localState.myRegAdd)
+        props.isMhr ? addMHRegistration(localState.myRegAdd) : addRegistration(localState.myRegAdd)
       }
       // reset values
       if (localState.myRegAddDialogError !== StatusCodes.NOT_FOUND) {
@@ -444,6 +495,7 @@ export default defineComponent({
       localState.myRegAddDialogDisplay = false
     }
 
+    // Add PPR summary to registration table
     const addRegistration = async (regNum: string): Promise<void> => {
       localState.loading = true
       const addReg = await addRegistrationSummary(regNum)
@@ -467,7 +519,31 @@ export default defineComponent({
       localState.loading = false
     }
 
-    const myRegActionHandler = ({ action, docId, regNum }): void => {
+    // Add MHR summary to registration table
+    const addMHRegistration = async (regNum: string): Promise<void> => {
+      localState.loading = true
+      const addReg = await addMHRegistrationSummary(regNum)
+      if (addReg.error) {
+        myRegAddErrSetDialog(addReg.error)
+      } else {
+      // set new item (watcher will add it etc.)
+        let parentRegNum = ''
+        if (regNum !== addReg.mhrNumber) {
+        // not a base registration so add parent reg num
+          parentRegNum = addReg.mhrNumber
+        }
+        const newRegItem: RegTableNewItemI = {
+          addedReg: regNum.toUpperCase(),
+          addedRegParent: parentRegNum,
+          addedRegSummary: addReg,
+          prevDraft: ''
+        }
+        setRegTableNewItem(newRegItem)
+      }
+      localState.loading = false
+    }
+
+    const myRegActionHandler = ({ action, docId, regNum, mhrInfo }): void => {
       localState.myRegAction = action as TableActions
       localState.myRegActionDocId = docId as string
       localState.myRegActionRegNum = regNum as string
@@ -500,6 +576,9 @@ export default defineComponent({
           break
         case TableActions.EDIT_NEW:
           editDraftNew(docId)
+          break
+        case TableActions.OPEN:
+          openMhr(mhrInfo)
           break
         default:
           localState.myRegAction = null
@@ -536,6 +615,11 @@ export default defineComponent({
         setRegTableCollapsed(null)
         await context.root.$router.replace({ name: RouteNames.LENGTH_TRUST })
       }
+    }
+
+    const openMhr = async (mhrSummary: MhRegistrationSummaryIF): Promise<void> => {
+      setMhrInformation(mhrSummary)
+      await context.root.$router.replace({ name: RouteNames.MHR_INFORMATION })
     }
 
     const myRegActionDialogHandler = (proceed: boolean): void => {

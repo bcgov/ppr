@@ -1,5 +1,5 @@
 import { RegistrationFlowType } from '@/enums'
-import { MhrRegistrationIF, StateModelIF } from '@/interfaces'
+import { StateModelIF } from '@/interfaces'
 
 export const stateModel: StateModelIF = {
   accountInformation: {
@@ -88,85 +88,6 @@ export const stateModel: StateModelIF = {
       debtors: []
     }
   },
-  mhrRegistration: {
-    documentId: '',
-    clientReferenceId: '',
-    declaredValue: '',
-    submittingParty: {
-      personName: {
-        first: '',
-        last: '',
-        middle: ''
-      },
-      businessName: '',
-      address: {
-        street: '',
-        city: '',
-        region: '',
-        country: '',
-        postalCode: ''
-      },
-      emailAddress: '',
-      phoneNumber: '',
-      phoneExtension: ''
-    },
-    ownerGroups: [],
-    owners: [],
-    attentionReferenceNum: '',
-    location: {
-      parkName: '',
-      pad: '',
-      address: {
-        street: '',
-        streetAdditional: '',
-        city: '',
-        region: '',
-        country: '',
-        postalCode: ''
-      },
-      leaveProvince: false,
-      pidNumber: '',
-      taxCertificate: false,
-      dealerName: '',
-      additionalDescription: '',
-      locationType: null,
-      otherType: null
-    },
-    description: {
-      manufacturer: '',
-      baseInformation: {
-        year: null,
-        circa: false,
-        make: '',
-        model: ''
-      },
-      sectionCount: null,
-      sections: [],
-      csaNumber: '',
-      csaStandard: '',
-      engineerName: '',
-      engineerDate: '',
-      certificationOption: null,
-      rebuiltRemarks: '',
-      otherRemarks: ''
-    },
-    notes: [
-      {
-        documentType: '',
-        documentId: '',
-        createDateTime: '',
-        remarks: '',
-        contactName: '',
-        contactAddress: {
-          street: '',
-          city: '',
-          region: '',
-          postalCode: '',
-          country: ''
-        }
-      }
-    ]
-  },
   registrationTable: {
     baseRegs: [],
     baseMhRegs: [],
@@ -223,6 +144,96 @@ export const stateModel: StateModelIF = {
       selectConfirmationDialog: true
     }
   },
+  // MHR State
+  mhrInformation: {
+    clientReferenceId: '',
+    createDateTime: '',
+    mhrNumber: '',
+    ownerNames: '',
+    path: '',
+    registrationDescription: '',
+    statusType: '',
+    submittingParty: '',
+    username: ''
+  },
+  mhrRegistration: {
+    documentId: '',
+    clientReferenceId: '',
+    declaredValue: '',
+    submittingParty: {
+      personName: {
+        first: '',
+        last: '',
+        middle: ''
+      },
+      businessName: '',
+      address: {
+        street: '',
+        city: '',
+        region: '',
+        country: '',
+        postalCode: ''
+      },
+      emailAddress: '',
+      phoneNumber: '',
+      phoneExtension: ''
+    },
+    ownerGroups: [],
+    attentionReferenceNum: '',
+    location: {
+      parkName: '',
+      pad: '',
+      address: {
+        street: '',
+        streetAdditional: '',
+        city: '',
+        region: '',
+        country: '',
+        postalCode: ''
+      },
+      leaveProvince: false,
+      pidNumber: '',
+      taxCertificate: false,
+      dealerName: '',
+      additionalDescription: '',
+      locationType: null,
+      otherType: null
+    },
+    description: {
+      manufacturer: '',
+      baseInformation: {
+        year: null,
+        circa: false,
+        make: '',
+        model: ''
+      },
+      sectionCount: null,
+      sections: [],
+      csaNumber: '',
+      csaStandard: '',
+      engineerName: '',
+      engineerDate: '',
+      certificationOption: null,
+      rebuiltRemarks: '',
+      otherRemarks: ''
+    },
+    notes: [
+      {
+        documentType: '',
+        documentId: '',
+        createDateTime: '',
+        remarks: '',
+        contactName: '',
+        contactAddress: {
+          street: '',
+          city: '',
+          region: '',
+          postalCode: '',
+          country: ''
+        }
+      }
+    ]
+  },
   mhrSearchResultSelectAllLien: false,
   mhrValidationState: {
     yourHomeValid: {
@@ -250,5 +261,19 @@ export const stateModel: StateModelIF = {
       validateSteps: false,
       validateApp: false
     }
+  },
+  mhrTransferValidationState: {
+    homeOwnersValid: {
+      ownersValid: false
+    },
+    reviewConfirmValid: {
+      validateApp: false
+    }
+  },
+  mhrTransfer: {
+    mhrNumber: '',
+    ownerGroups: [],
+    owners: [],
+    submittingParty: {}
   }
 }

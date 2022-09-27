@@ -93,6 +93,9 @@ export function getFeeSummary (
     if (isStaff) return { ...defaultFeeSummaries[FeeSummaryDefaults.NO_FEE] }
     return { ...defaultFeeSummaries[FeeSummaryDefaults.SEARCH_12] }
   }
+  if (feeType === FeeSummaryTypes.MHR_TRANSFER) {
+    return { ...defaultFeeSummaries[FeeSummaryDefaults.DEFAULT_50] }
+  }
   if (feeType === FeeSummaryTypes.DISCHARGE) {
     return { ...defaultFeeSummaries[FeeSummaryDefaults.NO_FEE] }
   }

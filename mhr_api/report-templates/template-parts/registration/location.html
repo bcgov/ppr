@@ -55,7 +55,17 @@
         <tr class="no-page-break">
             <td class="col-33">
                 <div class="section-sub-title">Location Type</div>
-                <div class="pt-2">N/A</div>
+                <div class="pt-2">
+                    {% if location.locationType is defined and location.locationType == 'RESERVE' %}
+                        INDIAN RESERVE
+                    {% elif location.locationType is defined and location.locationType == 'STRATA' %}
+                        STRATA
+                    {% elif location.locationType is defined and location.locationType == 'OTHER' %}
+                        OTHER
+                    {% else %}
+                        N/A 
+                    {% endif %} 
+                </div>
             </td>
             <td class="col-33">
                 <div class="section-sub-title">Address</div>
@@ -83,10 +93,22 @@
         </tr>
     {% endif %}
 
-    {% if location.hasLTSAInfo or (location.additionalDescription is defined and location.additionalDescription != '') %}
+    {% if location.legalDescription is defined and location.legalDescription != '' %}
     <tr class="no-page-break">
         <td class="pt-3 pb-2">
-            <div class="section-sub-title">Legal Description</div>
+            <div class="section-sub-title">Legal Land Description</div>
+        </td>
+    </tr>
+    <tr class="no-page-break">
+        <td colspan="3">
+            {% if location.locationType is defined and location.locationType == 'STRATA' %}STRATA {% endif %}
+            {{ location.legalDescription }}
+        </td>
+    </tr>
+    {% elif location.hasLTSAInfo or (location.additionalDescription is defined and location.additionalDescription != '') %}
+    <tr class="no-page-break">
+        <td class="pt-3 pb-2">
+            <div class="section-sub-title">Legal Land Description</div>
         </td>
     </tr>
     <tr class="no-page-break">

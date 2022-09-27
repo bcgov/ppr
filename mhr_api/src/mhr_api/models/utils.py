@@ -196,6 +196,7 @@ REG_TYPE_TO_REG_CLASS = {
 
 # MHR Error messages
 ERR_REGISTRATION_NOT_FOUND_MHR = '{code}: no registration found for MHR number {mhr_number}.'
+ERR_DOCUMENT_NOT_FOUND_ID = '{code}: no registration found for document ID {document_id}.'
 ERR_SEARCH_TOO_OLD = '{code}: search get details search ID {search_id} timestamp too old: must be after {min_ts}.'
 ERR_SEARCH_COMPLETE = '{code}: search select results failed: results already provided for search ID {search_id}.'
 ERR_SEARCH_NOT_FOUND = '{code}: search select results failed: invalid search ID {search_id}.'

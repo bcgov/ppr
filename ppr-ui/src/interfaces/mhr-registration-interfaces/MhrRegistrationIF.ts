@@ -1,6 +1,5 @@
 import {
   MhrRegistrationDescriptionIF,
-  MhrRegistrationHomeOwnersIF,
   MhrRegistrationHomeOwnerGroupIF,
   MhrRegistrationHomeLocationIF
 } from '@/interfaces'
@@ -27,7 +26,6 @@ export interface MhrRegistrationIF {
     phoneExtension: string
   }
   ownerGroups: MhrRegistrationHomeOwnerGroupIF[]
-  owners: MhrRegistrationHomeOwnersIF[]
   attentionReferenceNum: string
   location: MhrRegistrationHomeLocationIF
   description: MhrRegistrationDescriptionIF

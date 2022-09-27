@@ -17,9 +17,11 @@ import copy
 from flask import current_app
 import pytest
 from registry_schemas import utils as schema_utils
-from registry_schemas.example_data.mhr import REGISTRATION, OWNER
+from registry_schemas.example_data.mhr import REGISTRATION, TRANSFER
 
 from mhr_api.utils import registration_validator as validator
+from mhr_api.models import MhrRegistration
+from mhr_api.models.type_tables import MhrRegistrationStatusTypes
 from mhr_api.models.utils import is_legacy
 
 
@@ -58,17 +60,21 @@ TEST_CHECKSUM_DATA = [
 # testdata pattern is ({description}, {valid}, {street}, {city}, {message content})
 TEST_LEGACY_REG_DATA = [
     (DESC_VALID, True, '0123456789012345678901234567890', '01234567890123456789', None),
-    ('Invalid location street too long', False, '01234567890123456789012345678901', 'KAMLOOPS',
+    ('Valid location street long', True, '01234567890123456789012345678901', 'KAMLOOPS',
      validator.LEGACY_ADDRESS_STREET_TOO_LONG.format(add_desc='Location')),
-    ('Invalid location city too long', False, '1234 Front St.', '012345678901234567890',
+    ('Valid location city long', True, '1234 Front St.', '012345678901234567890',
      validator.LEGACY_ADDRESS_CITY_TOO_LONG.format(add_desc='Location'))
 ]
 # testdata pattern is ({description}, {bus_name}, {first}, {middle}, {last}, {message content})
 TEST_PARTY_DATA = [
-    ('Invalid org/bus name', INVALID_TEXT_CHARSET, None, None, None, INVALID_CHARSET_MESSAGE),
-    ('Invalid first name', None, INVALID_TEXT_CHARSET, 'middle', 'last', INVALID_CHARSET_MESSAGE),
-    ('Invalid middle name', None, 'first', INVALID_TEXT_CHARSET, 'last', INVALID_CHARSET_MESSAGE),
-    ('Invalid last name', None, 'first', 'middle', INVALID_TEXT_CHARSET, INVALID_CHARSET_MESSAGE)
+    ('Reg invalid org/bus name', INVALID_TEXT_CHARSET, None, None, None, INVALID_CHARSET_MESSAGE, REGISTRATION),
+    ('Reg invalid first name', None, INVALID_TEXT_CHARSET, 'middle', 'last', INVALID_CHARSET_MESSAGE, REGISTRATION),
+    ('Reg invalid middle name', None, 'first', INVALID_TEXT_CHARSET, 'last', INVALID_CHARSET_MESSAGE, REGISTRATION),
+    ('Reg invalid last name', None, 'first', 'middle', INVALID_TEXT_CHARSET, INVALID_CHARSET_MESSAGE, REGISTRATION),
+    ('Trans invalid org/bus name', INVALID_TEXT_CHARSET, None, None, None, INVALID_CHARSET_MESSAGE, TRANSFER),
+    ('Trans invalid first name', None, INVALID_TEXT_CHARSET, 'middle', 'last', INVALID_CHARSET_MESSAGE, TRANSFER),
+    ('Trans invalid middle name', None, 'first', INVALID_TEXT_CHARSET, 'last', INVALID_CHARSET_MESSAGE, TRANSFER),
+    ('Trans invalid last name', None, 'first', 'middle', INVALID_TEXT_CHARSET, INVALID_CHARSET_MESSAGE, TRANSFER)
 ]
 # testdata pattern is ({description}, {park_name}, {dealer}, {additional}, {except_plan}, {message content})
 TEST_LOCATION_DATA = [
@@ -77,6 +83,16 @@ TEST_LOCATION_DATA = [
     ('Invalid additional description', None, None, INVALID_TEXT_CHARSET, None, INVALID_CHARSET_MESSAGE),
     ('Invalid exception plan', None, None, None, INVALID_TEXT_CHARSET, INVALID_CHARSET_MESSAGE)
 ]
+# testdata pattern is ({description}, {valid}, {staff}, {doc_id}, {message content}, {status})
+TEST_TRANSFER_DATA = [
+    (DESC_VALID, True, True, DOC_ID_VALID, None, MhrRegistrationStatusTypes.ACTIVE),
+    ('Valid no doc id not staff', True, False, None, None, None),
+    (DESC_MISSING_DOC_ID, False, True, None, validator.DOC_ID_REQUIRED, None),
+    (DESC_DOC_ID_EXISTS, False, True, DOC_ID_EXISTS, validator.DOC_ID_EXISTS, None),
+    ('Invalid EXEMPT', False, False, None, validator.STATE_NOT_ALLOWED, MhrRegistrationStatusTypes.EXEMPT),
+    ('Invalid HISTORICAL', False, False, None, validator.STATE_NOT_ALLOWED, MhrRegistrationStatusTypes.HISTORICAL)
+]
+
 
 @pytest.mark.parametrize('desc,valid,staff,doc_id,message_content', TEST_REG_DATA)
 def test_validate_registration(session, desc, valid, staff, doc_id, message_content):
@@ -104,11 +120,36 @@ def test_validate_registration(session, desc, valid, staff, doc_id, message_cont
             assert error_msg.find(message_content) != -1
 
 
-@pytest.mark.parametrize('desc,bus_name,first,middle,last,message_content', TEST_PARTY_DATA)
-def test_validate_reg_submitting(session, desc, bus_name, first, middle, last, message_content):
+@pytest.mark.parametrize('desc,valid,staff,doc_id,message_content,status', TEST_TRANSFER_DATA)
+def test_validate_transfer(session, desc, valid, staff, doc_id, message_content, status):
+    """Assert that MH transfer validation works as expected."""
+    # setup
+    json_data = copy.deepcopy(TRANSFER)
+    if doc_id:
+        json_data['documentId'] = doc_id
+    elif json_data.get('documentId'):
+        del json_data['documentId']
+    valid_format, errors = schema_utils.validate(json_data, 'transfer', 'mhr')
+    # Additional validation not covered by the schema.
+    registration: MhrRegistration = None
+    if status:
+        registration = MhrRegistration(status_type=status)
+    error_msg = validator.validate_transfer(registration, json_data, staff)
+    if errors:
+        current_app.logger.debug(errors)
+    if valid:
+        assert valid_format and error_msg == ''
+    else:
+        assert error_msg != ''
+        if message_content:
+            assert error_msg.find(message_content) != -1
+
+
+@pytest.mark.parametrize('desc,bus_name,first,middle,last,message_content,data', TEST_PARTY_DATA)
+def test_validate_submitting(session, desc, bus_name, first, middle, last, message_content, data):
     """Assert that submitting party invalid character set validation works as expected."""
     # setup
-    json_data = copy.deepcopy(REGISTRATION)
+    json_data = copy.deepcopy(data)
     party = json_data.get('submittingParty')
     if bus_name:
         party['businessName'] = bus_name
@@ -119,18 +160,26 @@ def test_validate_reg_submitting(session, desc, bus_name, first, middle, last, m
             'middle': middle,
             'last': last
         }
-    error_msg = validator.validate_registration(json_data, False)
+    error_msg = ''
+    if desc.startswith('Reg'):
+        error_msg = validator.validate_registration(json_data, False)
+    else:
+        error_msg = validator.validate_transfer(None, json_data, False)
     assert error_msg != ''
     if message_content:
         assert error_msg.find(message_content) != -1
 
 
-@pytest.mark.parametrize('desc,bus_name,first,middle,last,message_content', TEST_PARTY_DATA)
-def test_validate_reg_owner(session, desc, bus_name, first, middle, last, message_content):
+@pytest.mark.parametrize('desc,bus_name,first,middle,last,message_content,data', TEST_PARTY_DATA)
+def test_validate_owner(session, desc, bus_name, first, middle, last, message_content, data):
     """Assert that owner invalid character set validation works as expected."""
     # setup
-    json_data = copy.deepcopy(REGISTRATION)
-    group = json_data['ownerGroups'][0]
+    json_data = copy.deepcopy(data)
+    group = None
+    if json_data.get('ownerGroups'):
+        group = json_data['ownerGroups'][0]
+    else:
+        group = json_data['addOwnerGroups'][0]
     party = group['owners'][0]
     if bus_name:
         party['organizationName'] = bus_name
@@ -141,7 +190,11 @@ def test_validate_reg_owner(session, desc, bus_name, first, middle, last, messag
             'middle': middle,
             'last': last
         }
-    error_msg = validator.validate_registration(json_data, False)
+    error_msg = ''
+    if desc.startswith('Reg'):
+        error_msg = validator.validate_registration(json_data, False)
+    else:
+        error_msg = validator.validate_transfer(None, json_data, False)
     assert error_msg != ''
     if message_content:
         assert error_msg.find(message_content) != -1

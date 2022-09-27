@@ -91,3 +91,13 @@ def test_mhr_document_type(session):
     assert doc_result.legacy_fee_code == 'MHR400'
     doc_result = type_tables.MhrDocumentType.find_by_doc_type('XXX')
     assert not doc_result
+
+
+def test_mhr_location_type(session):
+    """Assert that MhrLocationType.find_all() contains all expected elements."""
+    results = type_tables.MhrLocationType.find_all()
+    assert results
+    assert len(results) >= 5
+    for result in results:
+        assert result.location_type in type_tables.MhrLocationTypes
+        assert result.location_type_desc

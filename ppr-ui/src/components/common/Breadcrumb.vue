@@ -50,7 +50,8 @@ import {
   tombstoneBreadcrumbRegistration,
   tombstoneBreadcrumbSearch,
   tombstoneBreadcrumbSearchConfirm,
-  breadcrumbsTitles
+  breadcrumbsTitles,
+  tombstoneBreadcrumbMhrInformation
 } from '@/resources'
 import { RouteNames } from '@/enums'
 import { getRoleProductCode } from '@/utils'
@@ -67,9 +68,10 @@ export default defineComponent({
       getRegistrationType,
       isRoleStaff,
       getUserRoles,
-      getUserProductSubscriptionsCodes
+      getUserProductSubscriptionsCodes,
+      getMhrInformation
     } = useGetters<any>(['getRegistrationNumber', 'getRegistrationType',
-      'isRoleStaff', 'getUserRoles', 'getUserProductSubscriptionsCodes'])
+      'isRoleStaff', 'getUserRoles', 'getUserProductSubscriptionsCodes', 'getMhrInformation'])
     const currentPath = toRefs(props).setCurrentPath
     const routeName = toRefs(props).setCurrentPathName as Ref<RouteNames>
     const localState = reactive({
@@ -93,7 +95,8 @@ export default defineComponent({
           tombstoneBreadcrumbAmendment,
           tombstoneBreadcrumbRegistration,
           tombstoneBreadcrumbSearch,
-          tombstoneBreadcrumbSearchConfirm
+          tombstoneBreadcrumbSearchConfirm,
+          tombstoneBreadcrumbMhrInformation
         ]
         if (localState.isStaff) {
           for (const tombstoneBreadcrumb of allTombstoneBreadcrumbs) {
@@ -128,6 +131,10 @@ export default defineComponent({
           amendBreadcrumb[2].text =
             `Base Registration ${getRegistrationNumber.value} - Amendment` || amendBreadcrumb[2].text
           return amendBreadcrumb
+        } else if (routeName.value === RouteNames.MHR_INFORMATION) {
+          const mhrInfoBreadcrumb = [...tombstoneBreadcrumbMhrInformation]
+          mhrInfoBreadcrumb[2].text += ` ${getMhrInformation.value.mhrNumber}`
+          return mhrInfoBreadcrumb
         } else {
           const registrationBreadcrumb = [...tombstoneBreadcrumbRegistration]
           registrationBreadcrumb[1].text = roleBasedBreadcrumbTitle || registrationBreadcrumb[1].text

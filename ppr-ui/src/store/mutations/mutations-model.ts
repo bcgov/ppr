@@ -26,11 +26,13 @@ import {
   ManufacturedHomeSearchResponseIF,
   ManufacturedHomeSearchResultIF,
   UserProductSubscriptionIF,
-  MhrRegistrationHomeOwnersIF,
   MhrRegistrationHomeOwnerGroupIF,
-  MhrRegistrationIF, MhRegistrationSummaryIF
+  MhrTransferIF,
+  MhrRegistrationIF,
+  MhRegistrationSummaryIF
 } from '@/interfaces'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
+import { set } from 'lodash'
 
 export const mutateAccountProductSubscribtion = (
   state: StateIF, productSubscriptions: AccountProductSubscriptionIF
@@ -368,11 +370,7 @@ export const mutateMhrBaseInformation = (state: StateIF, { key, value }) => {
 }
 
 export const mutateMhrSubmittingParty = (state: StateIF, { key, value }) => {
-  state.stateModel.mhrRegistration.submittingParty[key] = value
-}
-
-export const mutateMhrHomeOwners = (state: StateIF, owners: Array<MhrRegistrationHomeOwnersIF>) => {
-  state.stateModel.mhrRegistration.owners = owners
+  set(state.stateModel.mhrRegistration.submittingParty, key, value)
 }
 
 export const mutateMhrRegistrationDocumentId = (state: StateIF, value: string) => {
@@ -400,4 +398,14 @@ export const mutateMhrHomeOwnerGroups = (
 
 export const mutateMhrTableHistory = (state: StateIF, value: MhRegistrationSummaryIF[]) => {
   state.stateModel.registrationTable.baseMhRegs = value
+}
+
+// MHR Information
+export const mutateMhrInformation = (state: StateIF, mhrInfo: MhRegistrationSummaryIF) => {
+  state.stateModel.mhrInformation = mhrInfo
+}
+
+// MHR Transfer
+export const mutateEmptyMhrTransfer = (state: StateIF, emptyMhrTransfer: MhrTransferIF) => {
+  state.stateModel.mhrTransfer = emptyMhrTransfer
 }

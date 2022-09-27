@@ -57,7 +57,7 @@ describe('Other Information component', () => {
     await Vue.nextTick()
     expect(manufacturerSection.findAll(ERROR_MSG).length).toBe(1)
     expect(manufacturerSection.findAll(ERROR_MSG).at(0).text()).toContain('Enter a manufacturer')
-    })
+  })
 
   it('show error messages for Manufacturer Make Model inputs', async () => {
     const manufacturerSection = wrapper.findComponent(ManufacturerMakeModel)

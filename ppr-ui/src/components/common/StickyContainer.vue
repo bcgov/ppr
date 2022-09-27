@@ -16,7 +16,7 @@
     <buttons-stacked
       v-if="showButtons"
       class="pt-4 buttons-stacked overlap"
-      :setBackBtn="backBtn"
+      :setBackBtn="setBackBtn"
       :setCancelBtn="cancelBtn"
       :setSubmitBtn="submitBtn"
       :setSaveButton="saveBtn"
@@ -128,7 +128,6 @@ export default defineComponent({
     )
 
     const localState = reactive({
-      backBtn: props.setBackBtn,
       cancelBtn: props.setCancelBtn,
       errMsg: props.setErrMsg,
       leftOffset: props.setLeftOffset,

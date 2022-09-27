@@ -156,6 +156,8 @@ export default defineComponent({
         setRegisteringParty(newParty)
       } else if (props.isMhrPartySearch) {
         localState.selectedCode = newParty.code
+        // pre-set country code to prevent clearing of base-address component fields (bug 13637)
+        setMhrSubmittingParty({ key: 'address.country', value: newParty.address.country })
         // Set submitting party data to store
         for (const [key, value] of Object.entries(newParty)) {
           setMhrSubmittingParty({ key, value })

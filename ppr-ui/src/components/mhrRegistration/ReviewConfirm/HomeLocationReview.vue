@@ -176,13 +176,6 @@ export default defineComponent({
   }
 }
 
-.review-header {
-  display: flex; // to align icons
-  background-color: $BCgovBlue5O;
-  padding: 1.25rem;
-  color: $gray9;
-}
-
 .error-text {
   font-size: 16px;
 }
