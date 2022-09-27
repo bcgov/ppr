@@ -65,7 +65,7 @@
           return-object
         >
 
-          <template v-if="!isReviewMode" v-slot:[`header.ownerName`]>
+          <template v-slot:[`header.ownerName`]>
             <span>{{ ownerOrOrgHeader }} Name</span>
           </template>
 
