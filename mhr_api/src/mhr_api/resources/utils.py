@@ -238,9 +238,13 @@ def get_account_name(token: str, account_id: str = None):  # pylint: disable=too
 
 
 def validate_registration(json_data, is_staff: bool = False):
-    """Perform non-schema extra validation on a non-financing registrations."""
-    error_msg = registration_validator.validate_registration(json_data, is_staff)
-    return error_msg
+    """Perform non-schema extra validation on a MH new registration."""
+    return registration_validator.validate_registration(json_data, is_staff)
+
+
+def validate_transfer(registration, json_data, is_staff: bool = False):
+    """Perform non-schema extra validation on a transfer registration."""
+    return registration_validator.validate_transfer(registration, json_data, is_staff)
 
 
 def valid_api_key(request) -> bool:

@@ -22,19 +22,21 @@ from http import HTTPStatus
 from flask import current_app
 
 import pytest
-from registry_schemas.example_data.mhr import REGISTRATION
+from registry_schemas.example_data.mhr import REGISTRATION, TRANSFER
 
 from mhr_api.exceptions import BusinessException
-from mhr_api.models import MhrRegistration, MhrDraft
+from mhr_api.models import MhrRegistration, MhrDraft, utils as model_utils
 from mhr_api.models.type_tables import MhrLocationTypes, MhrPartyTypes, MhrOwnerStatusTypes, MhrStatusTypes
 from mhr_api.models.type_tables import MhrRegistrationTypes, MhrRegistrationStatusTypes
+from mhr_api.services.authz import MANUFACTURER_GROUP, QUALIFIED_USER_GROUP, GOV_ACCOUNT_ROLE
 
 
 # testdata pattern is ({account_id}, {mhr_num}, {exists}, {reg_description}, {in_list})
 TEST_SUMMARY_REG_DATA = [
     ('PS12345', '077741', True, 'Manufactured Home Registration', False),
     ('PS12345', 'TESTXX', False, None, False),
-    ('PS12345', '045349', True, 'Manufactured Home Registration', True)
+    ('PS12345', '045349', True, 'Manufactured Home Registration', True),
+    ('2523', '150062', True, 'Manufactured Home Registration', True)
 ]
 # testdata pattern is ({account_id}, {has_results})
 TEST_ACCOUNT_REG_DATA = [
@@ -57,6 +59,21 @@ TEST_MHR_NUM_DATA = [
 TEST_DOC_ID_DATA = [
     ('80048709', 1),
     ('80048756', 0)
+]
+# testdata pattern is ({mhr_num}, {group_id}, {doc_id_prefix}, {account_id})
+TEST_DATA_TRANSFER = [
+    ('150062', GOV_ACCOUNT_ROLE, '9', '2523'),
+    ('150062', MANUFACTURER_GROUP, '8', '2523'),
+    ('150062', QUALIFIED_USER_GROUP, '1', '2523')
+]
+# testdata pattern is ({mhr_num}, {group_id}, {account_id})
+TEST_DATA_TRANSFER_SAVE = [
+    ('150062', QUALIFIED_USER_GROUP, '2523')
+]
+# testdata pattern is ({http_status}, {document_id}, {mhr_num}, {doc_type}, {legacy}, {owner_count})
+TEST_DATA_DOC_ID = [
+    (HTTPStatus.OK, '10104535', '102265', 'TRAN', True, 2),
+    (HTTPStatus.NOT_FOUND, 'XXX04535', None, None, False, 0)
 ]
 
 
@@ -155,7 +172,45 @@ def test_find_by_mhr_number(session, mhr_number, has_results, account_id):
             MhrRegistration.find_by_mhr_number(mhr_number, 'PS12345')
         # check
         assert not_found_err
-        assert not_found_err.value.status_code == HTTPStatus.NOT_FOUND
+
+
+@pytest.mark.parametrize('http_status,doc_id,mhr_num,doc_type,legacy,owner_count', TEST_DATA_DOC_ID)
+def test_find_by_document_id(session, http_status, doc_id, mhr_num, doc_type, legacy, owner_count):
+    """Assert that find manufauctured home information by document id contains all expected elements."""
+    if http_status == HTTPStatus.OK:
+        registration: MhrRegistration = MhrRegistration.find_by_document_id(doc_id, 'PS12345')
+
+        assert registration
+        if not legacy:
+            assert registration.id
+            assert registration.mhr_number == mhr_num
+            assert registration.status_type in MhrRegistrationStatusTypes
+            assert registration.registration_type in MhrRegistrationTypes
+            assert registration.registration_ts
+        else:
+            assert registration.manuhome
+            assert registration.manuhome.mhr_number == mhr_num
+            assert registration.manuhome.reg_documents
+            doc = registration.manuhome.reg_documents[0]
+            assert doc.id == doc_id
+            assert doc.document_type == doc_type
+        report_json = registration.json
+        assert report_json['mhrNumber'] == mhr_num
+        assert report_json.get('status')
+        assert report_json.get('createDateTime')
+        assert report_json.get('clientReferenceId') is not None
+        assert report_json.get('documentId') == doc_id
+        assert report_json.get('submittingParty')
+        if owner_count > 0 and legacy and doc_type in ('TRAN', 'DEAT'):
+            assert len(report_json.get('deleteOwnerGroups')) + len(report_json.get('addOwnerGroups')) == owner_count
+        else:
+            assert len(report_json.get('ownerGroups')) == owner_count
+    else:
+        with pytest.raises(BusinessException) as request_err:
+             MhrRegistration.find_by_document_id(doc_id, 'PS12345')
+        # check
+        assert request_err
+        assert request_err.value.status_code == http_status
 
 
 def test_create_new_from_json(session):
@@ -208,3 +263,74 @@ def test_get_doc_id_count(session, doc_id, exists_count):
     """Assert that counting existing document id's works as expected."""
     count: int = MhrRegistration.get_doc_id_count(doc_id)
     assert count == exists_count
+
+
+@pytest.mark.parametrize('mhr_num,user_group,doc_id_prefix,account_id', TEST_DATA_TRANSFER)
+def test_create_transfer_from_json(session, mhr_num, user_group, doc_id_prefix, account_id):
+    """Assert that an MHR tranfer is created from MHR transfer json correctly."""
+    json_data = copy.deepcopy(TRANSFER)
+    del json_data['documentId']
+    del json_data['documentDescription']
+    del json_data['createDateTime']
+    del json_data['payment']
+    json_data['mhrNumber'] = mhr_num
+    base_reg: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account_id)
+    assert base_reg
+    assert base_reg.manuhome
+    # current_app.logger.info(json_data)
+    registration: MhrRegistration = MhrRegistration.create_transfer_from_json(base_reg,
+                                                                              json_data,
+                                                                              account_id,
+                                                                              'userid',
+                                                                              user_group)
+    assert registration.id > 0
+    assert registration.doc_id
+    assert json_data.get('documentId')
+    assert str(json_data.get('documentId')).startswith(doc_id_prefix)
+    assert registration.mhr_number == mhr_num
+    assert registration.registration_ts
+    assert registration.status_type == MhrRegistrationStatusTypes.ACTIVE
+    assert registration.registration_type == MhrRegistrationTypes.TRANS
+    assert registration.account_id == account_id
+    assert registration.client_reference_id    
+    assert registration.draft
+    assert registration.draft.id > 0
+    assert registration.draft_id == registration.draft.id
+    assert registration.draft.draft_number
+    assert registration.draft.registration_type == registration.registration_type
+    assert registration.draft.create_ts == registration.registration_ts
+    assert registration.draft.account_id == registration.account_id
+    assert registration.parties
+    sub_party = registration.parties[0]
+    assert sub_party.registration_id == registration.id
+    assert sub_party.party_type == MhrPartyTypes.SUBMITTING
+    if model_utils.is_legacy():
+        assert registration.manuhome
+
+
+@pytest.mark.parametrize('mhr_num,user_group,account_id', TEST_DATA_TRANSFER_SAVE)
+def test_save_transfer(session, mhr_num, user_group, account_id):
+    """Assert that an MHR tranfer is created from MHR transfer json correctly."""
+    json_data = copy.deepcopy(TRANSFER)
+    del json_data['documentId']
+    del json_data['documentDescription']
+    del json_data['createDateTime']
+    del json_data['payment']
+    json_data['mhrNumber'] = mhr_num
+    base_reg: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account_id)
+    assert base_reg
+    assert base_reg.manuhome
+    # current_app.logger.info(json_data)
+    registration: MhrRegistration = MhrRegistration.create_transfer_from_json(base_reg,
+                                                                              json_data,
+                                                                              account_id,
+                                                                              'userid',
+                                                                              user_group)
+    registration.save()
+    reg_new = MhrRegistration.find_by_mhr_number(registration.mhr_number,
+                                                 account_id,
+                                                 False,
+                                                 MhrRegistrationTypes.TRANS)
+    assert reg_new
+    draft_new = MhrDraft.find_by_draft_number(registration.draft.draft_number, True)
+    assert draft_new

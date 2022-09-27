@@ -28,6 +28,8 @@ class Db2Document(db.Model):
         """Render an Enum of the legacy document types."""
 
         MHREG = '101 '
+        TRAND = 'DEAT'
+        TRANS = 'TRAN'
 
     __bind_key__ = 'db2'
     __tablename__ = 'document'
@@ -184,11 +186,22 @@ class Db2Document(db.Model):
             'mhrNumber': self.mhr_number,
             'declaredValue': self.declared_value,
             'attentionReference': self.attention_reference,
-            'clientReferenceId': self.client_reference_id
+            'clientReferenceId': self.client_reference_id,
+            'submittingParty': self.submitting_party()
         }
         if self.registration_ts:
             document['createDateTime'] = model_utils.format_local_ts(self.registration_ts)
         return document
+
+    def submitting_party(self):
+        """Build submitting party JSON from the document information."""
+        party = {
+            'businessName': self.name,
+            'address': model_utils.get_address_from_db2(self.legacy_address)
+        }
+        if self.phone_number:
+            party['phoneNumber'] = self.phone_number
+        return party
 
     @staticmethod
     def create_from_dict(new_info: dict):
@@ -283,5 +296,8 @@ class Db2Document(db.Model):
             doc.client_reference_id = registration.client_reference_id[0:29]
         else:
             doc.client_reference_id = ''
-        doc.transfer_execution_date = model_utils.date_from_iso_format('0001-01-01')
+        if doc_type in (Db2Document.DocumentTypes.TRAND, Db2Document.DocumentTypes.TRAND):
+            doc.transfer_execution_date = local_ts.date()
+        else:
+            doc.transfer_execution_date = model_utils.date_from_iso_format('0001-01-01')
         return doc

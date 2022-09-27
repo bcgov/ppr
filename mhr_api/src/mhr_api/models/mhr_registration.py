@@ -24,6 +24,7 @@ from mhr_api.exceptions import BusinessException, DatabaseException, ResourceErr
 from mhr_api.models import utils as model_utils, Db2Manuhome
 from mhr_api.models.mhr_extra_registration import MhrExtraRegistration
 from mhr_api.models.db2 import utils as legacy_utils
+from mhr_api.services.authz import MANUFACTURER_GROUP, QUALIFIED_USER_GROUP, GOV_ACCOUNT_ROLE
 
 from .db import db
 from .mhr_draft import MhrDraft
@@ -44,12 +45,25 @@ select nextval('mhr_registration_id_seq') AS reg_id,
        get_mhr_number() AS mhr_number,
        get_mhr_doc_reg_number() AS doc_reg_id
 """
+CHANGE_QUERY_PKEYS = """
+select nextval('mhr_registration_id_seq') AS reg_id,
+       get_mhr_doc_reg_number() AS doc_reg_id,
+       get_mhr_draft_number() AS draft_num,
+       nextval('mhr_draft_id_seq') AS draft_id
+"""
+CHANGE_QUERY_PKEYS_NO_DRAFT = """
+select nextval('mhr_registration_id_seq') AS reg_id,
+       get_mhr_doc_reg_number() AS doc_reg_id
+"""
 FROM_LEGACY_DOC_TYPE = {
     '101': 'REG_101',
     '102': 'REG_102',
     '103': 'REG_103',
     '103E': 'REG_103E'
 }
+DOC_ID_QUALIFIED_CLAUSE = ',  get_mhr_doc_qualified_id() AS doc_id'
+DOC_ID_MANUFACTURER_CLAUSE = ',  get_mhr_doc_manufacturer_id() AS doc_id'
+DOC_ID_GOV_AGENT_CLAUSE = ',  get_mhr_doc_gov_agent_id() AS doc_id'
 
 
 class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes, too-many-public-methods
@@ -60,13 +74,13 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
     # Always use get_generated_values() to generate PK.
     id = db.Column('id', db.Integer, primary_key=True)
     registration_ts = db.Column('registration_ts', db.DateTime, nullable=False, index=True)
-    mhr_number = db.Column('mhr_number', db.String(7), nullable=False, index=True,
-                           default=db.func.get_mhr_number())
+    mhr_number = db.Column('mhr_number', db.String(7), nullable=False, index=True)
     account_id = db.Column('account_id', db.String(20), nullable=True, index=True)
     client_reference_id = db.Column('client_reference_id', db.String(50), nullable=True)
     pay_invoice_id = db.Column('pay_invoice_id', db.Integer, nullable=True)
     pay_path = db.Column('pay_path', db.String(256), nullable=True)
     user_id = db.Column('user_id', db.String(1000), nullable=True)
+    doc_id = db.Column('document_id', db.String(10), nullable=True)
 
     # parent keys
     draft_id = db.Column('draft_id', db.Integer, db.ForeignKey('mhr_drafts.id'), nullable=False, index=True)
@@ -91,6 +105,29 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
     @property
     def json(self) -> dict:
         """Return the registration as a json object."""
+        if self.manuhome:
+            reg_json = self.manuhome.json
+            doc_type = reg_json.get('documentType')
+            if FROM_LEGACY_DOC_TYPE.get(doc_type):
+                doc_type = FROM_LEGACY_DOC_TYPE.get(doc_type)
+            doc_type_info: MhrDocumentType = MhrDocumentType.find_by_doc_type(doc_type)
+            if doc_type_info:
+                reg_json['documentDescription'] = doc_type_info.document_type_desc
+            else:
+                reg_json['documentDescription'] = ''
+            if self.parties:
+                submitting = self.parties[0]
+                reg_json['submittingParty'] = submitting.json
+            if self.locations:
+                location = self.locations[0]
+                current_app.logger.debug('Using PostreSQL location in registration.json.')
+                reg_json['location'] = location.json
+            if reg_json.get('documentType'):
+                del reg_json['documentType']
+            if self.pay_invoice_id and self.pay_invoice_id > 0:  # Legacy will have no payment info.
+                return self.__set_payment_json(reg_json)
+            return reg_json
+        # Definition after data migration.
         registration = {
             'mhrNumber': self.mhr_number,
             'createDateTime': model_utils.format_ts(self.registration_ts)
@@ -172,9 +209,13 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         db.session.commit()
         # Now save legacy data.
         if model_utils.is_legacy():
-            manuhome: Db2Manuhome = Db2Manuhome.create_from_registration(self, self.reg_json)
-            manuhome.save()
-            self.manuhome = manuhome
+            if not self.manuhome:
+                manuhome: Db2Manuhome = Db2Manuhome.create_from_registration(self, self.reg_json)
+                manuhome.save()
+                self.manuhome = manuhome
+            elif self.registration_type in (MhrRegistrationTypes.TRAND, MhrRegistrationTypes.TRANS):
+                self.manuhome = Db2Manuhome.create_from_transfer(self, self.reg_json)
+                self.manuhome.save_transfer()
 
     def get_registration_type(self):
         """Lookup registration type record if it has not already been fetched."""
@@ -202,7 +243,6 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         current_app.logger.debug(f'Account_id={account_id}, mhr_number={formatted_mhr}')
         if model_utils.is_legacy():
             return legacy_utils.find_summary_by_mhr_number(account_id, formatted_mhr, staff)
-
         raise DatabaseException('MhrRegistration.find_summary_by_mhr_number PosgreSQL not yet implemented.')
 
     @classmethod
@@ -224,26 +264,30 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         raise DatabaseException('MhrRegistration.get_doc_id_count PosgreSQL not yet implemented.')
 
     @classmethod
-    def find_by_mhr_number(cls, mhr_number: str, account_id: str, staff: bool = False):
+    def find_by_mhr_number(cls, mhr_number: str, account_id: str, staff: bool = False, reg_type=None):
         """Return the registration matching the MHR number."""
         current_app.logger.debug(f'Account={account_id}, mhr_number={mhr_number}')
         registration = None
         formatted_mhr = model_utils.format_mhr_number(mhr_number)
+        registration_type = MhrRegistrationTypes.MHREG
+        if reg_type and reg_type in MhrRegistrationTypes:
+            registration_type = reg_type
         if formatted_mhr:
             try:
-                registration = cls.query.filter(MhrRegistration.mhr_number == formatted_mhr).one_or_none()
+                registration = cls.query.filter(MhrRegistration.mhr_number == formatted_mhr,
+                                                MhrRegistration.registration_type == registration_type).one_or_none()
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('DB find_by_mhr_number exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)
 
-        if not registration:
+        if not registration and not model_utils.is_legacy():
             raise BusinessException(
                 error=model_utils.ERR_MHR_REGISTRATION_NOT_FOUND.format(code=ResourceErrorCodes.NOT_FOUND_ERR,
                                                                         mhr_number=formatted_mhr),
                 status_code=HTTPStatus.NOT_FOUND
             )
 
-        if not staff and account_id and registration.account_id != account_id:
+        if not staff and account_id and (not registration or registration.account_id != account_id):
             # Check extra registrations
             extra_reg = MhrExtraRegistration.find_by_mhr_number(formatted_mhr, account_id)
             if not extra_reg:
@@ -255,7 +299,47 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                 )
         # Authorized, exists. If legacy transition load legacy data.
         if model_utils.is_legacy():
+            if not registration:
+                registration: MhrRegistration = MhrRegistration()
             registration.manuhome = legacy_utils.find_by_mhr_number(formatted_mhr)
+            registration.mhr_number = registration.manuhome.mhr_number
+        return registration
+
+    @classmethod
+    def find_by_document_id(cls, document_id: str, account_id: str, staff: bool = False):
+        """Return the registration matching the MHR document ID."""
+        current_app.logger.debug(f'Account={account_id}, document_id={document_id}')
+        registration = None
+        if document_id:
+            try:
+                registration = cls.query.filter(MhrRegistration.doc_reg_number == document_id).one_or_none()
+            except Exception as db_exception:   # noqa: B902; return nicer error
+                current_app.logger.error('DB find_by_document_id exception: ' + str(db_exception))
+                raise DatabaseException(db_exception)
+
+        if not registration and not model_utils.is_legacy():
+            raise BusinessException(
+                error=model_utils.ERR_DOCUMENT_NOT_FOUND_ID.format(code=ResourceErrorCodes.NOT_FOUND_ERR,
+                                                                   document_id=document_id),
+                status_code=HTTPStatus.NOT_FOUND
+            )
+
+        if not staff and account_id and registration and registration.account_id != account_id:
+            # Check extra registrations
+            extra_reg = MhrExtraRegistration.find_by_mhr_number(registration.mhr_number, account_id)
+            if not extra_reg:
+                raise BusinessException(
+                    error=model_utils.ERR_REGISTRATION_ACCOUNT.format(code=ResourceErrorCodes.UNAUTHORIZED_ERR,
+                                                                      account_id=account_id,
+                                                                      mhr_number=registration.mhr_number),
+                    status_code=HTTPStatus.UNAUTHORIZED
+                )
+        # Authorized, exists. If legacy transition load legacy data.
+        if model_utils.is_legacy():
+            if not registration:
+                registration: MhrRegistration = MhrRegistration()
+            registration.manuhome = legacy_utils.find_by_document_id(document_id)
+            registration.mhr_number = registration.manuhome.mhr_number
         return registration
 
     @staticmethod
@@ -273,6 +357,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         registration.status_type = MhrRegistrationStatusTypes.ACTIVE
         registration.account_id = account_id
         registration.user_id = user_id
+        registration.doc_id = json_data.get('documentId', '')
         registration.reg_json = json_data
         if not draft:
             registration.draft_number = reg_vals.draft_number
@@ -288,6 +373,50 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
 
         registration.parties = MhrParty.create_from_registration_json(json_data, registration.id)
         registration.locations = [MhrLocation.create_from_json(json_data['location'], registration.id)]
+        return registration
+
+    @staticmethod
+    def create_transfer_from_json(base_reg,
+                                  json_data,
+                                  account_id: str = None,
+                                  user_id: str = None,
+                                  user_group: str = None):
+        """Create transfer registration objects from dict/json."""
+        # Create or update draft.
+        draft = MhrRegistration.find_draft(json_data)
+        reg_vals: MhrRegistration = MhrRegistration.get_change_generated_values(draft, user_group)
+        registration: MhrRegistration = MhrRegistration()
+        registration.id = reg_vals.id  # pylint: disable=invalid-name; allow name of id.
+        registration.mhr_number = base_reg.mhr_number
+        registration.doc_reg_number = reg_vals.doc_reg_number
+        registration.doc_id = reg_vals.doc_id
+        registration.registration_ts = model_utils.now_ts()
+        if json_data.get('deathOfOwner'):
+            registration.registration_type = MhrRegistrationTypes.TRAND
+        else:
+            registration.registration_type = MhrRegistrationTypes.TRANS
+        registration.status_type = MhrRegistrationStatusTypes.ACTIVE
+        registration.account_id = account_id
+        registration.user_id = user_id
+        registration.reg_json = json_data
+        if not draft:
+            registration.draft_number = reg_vals.draft_number
+            registration.draft_id = reg_vals.draft_id
+            draft = MhrDraft.create_from_registration(registration, json_data)
+        else:
+            draft.draft = json_data
+            registration.draft_id = draft.id
+        registration.draft = draft
+
+        if 'clientReferenceId' in json_data:
+            registration.client_reference_id = json_data['clientReferenceId']
+        registration.parties = MhrParty.create_from_registration_json(json_data, registration.id)
+        if registration.doc_id and not json_data.get('documentId'):
+            json_data['documentId'] = registration.doc_id
+        elif not registration.doc_id and json_data.get('documentId'):
+            registration.doc_id = json_data.get('documentId')
+        if base_reg:
+            registration.manuhome = base_reg.manuhome
         return registration
 
     @staticmethod
@@ -329,4 +458,35 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         if not draft:
             registration.draft_number = str(row[3])
             registration.draft_id = int(row[4])
+        return registration
+
+    @staticmethod
+    def get_change_generated_values(draft, user_group: str = None):
+        """Get db generated identifiers that are in more than one table.
+
+        Get registration_id, mhr_number, and optionally draft_number.
+        """
+        registration = MhrRegistration()
+        # generate reg id, MHR number. If not existing draft also generate draft number
+        query = CHANGE_QUERY_PKEYS
+        if draft:
+            query = CHANGE_QUERY_PKEYS_NO_DRAFT
+        if user_group and user_group == QUALIFIED_USER_GROUP:
+            query += DOC_ID_QUALIFIED_CLAUSE
+        elif user_group and user_group == MANUFACTURER_GROUP:
+            query += DOC_ID_MANUFACTURER_CLAUSE
+        elif user_group and user_group == GOV_ACCOUNT_ROLE:
+            query += DOC_ID_GOV_AGENT_CLAUSE
+        result = db.session.execute(query)
+        row = result.first()
+        registration.id = int(row[0])
+        registration.doc_reg_number = str(row[1])
+        if not draft:
+            registration.draft_number = str(row[2])
+            registration.draft_id = int(row[3])
+        if user_group and user_group in (QUALIFIED_USER_GROUP, MANUFACTURER_GROUP, GOV_ACCOUNT_ROLE):
+            if draft:
+                registration.doc_id = str(row[2])
+            else:
+                registration.doc_id = str(row[4])
         return registration

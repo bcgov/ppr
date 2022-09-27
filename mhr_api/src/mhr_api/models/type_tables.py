@@ -259,6 +259,8 @@ class MhrRegistrationTypes(BaseEnum):
     """Render an Enum of the MHR registration types."""
 
     MHREG = 'MHREG'
+    TRAND = 'TRAND'
+    TRANS = 'TRANS'
 
 
 class MhrStatusTypes(BaseEnum):
