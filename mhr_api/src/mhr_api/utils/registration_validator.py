@@ -65,7 +65,7 @@ def validate_transfer(registration: MhrRegistration, json_data, is_staff: bool =
     return error_msg
 
 
-def validate_doc_id(json_data):
+def validate_doc_id(json_data, check_exists: bool = True):
     """Validate the registration document id."""
     doc_id = json_data.get('documentId')
     current_app.logger.debug(f'Validating doc_id={doc_id}.')
@@ -74,7 +74,7 @@ def validate_doc_id(json_data):
         error_msg += DOC_ID_REQUIRED
     elif not checksum_valid(doc_id):
         error_msg += DOC_ID_INVALID_CHECKSUM
-    else:
+    elif check_exists:
         exists_count = MhrRegistration.get_doc_id_count(doc_id)
         if exists_count > 0:
             error_msg += DOC_ID_EXISTS

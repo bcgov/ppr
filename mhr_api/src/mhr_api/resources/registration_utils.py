@@ -231,10 +231,10 @@ def enqueue_registration_report(registration: MhrRegistration, json_data: dict, 
         current_app.logger.info(f'Enqueue registration report successful for id={registration.id}.')
     except DatabaseException as db_err:
         # Just log, do not return an error response.
-        msg = f'Enqueue MHR registration report db error for id={registration.id}: ' + str(db_err)
+        msg = f'Enqueue MHR registration report type {report_type} db error for id={registration.id}: ' + str(db_err)
         current_app.logger.error(msg)
     except Exception as err:  # noqa: B902; do not alter app processing
-        msg = f'Enqueue MHR registration report failed for id={registration.id}: ' + str(err)
+        msg = f'Enqueue MHR registration report type {report_type} failed for id={registration.id}: ' + str(err)
         current_app.logger.error(msg)
         EventTracking.create(registration.id,
                              EventTracking.EventTrackingTypes.MHR_REGISTRATION_REPORT,
@@ -276,7 +276,7 @@ def get_registration_report(registration: MhrRegistration,  # pylint: disable=to
                 doc_name = model_utils.get_doc_storage_name(registration)
                 current_app.logger.info(f'Saving registration report output to doc storage: name={doc_name}.')
                 response = GoogleStorageService.save_document(doc_name, raw_data, DocumentTypes.REGISTRATION)
-                current_app.logger.info('Save document storage response: ' + json.dumps(response))
+                current_app.logger.info(f'Save document storage response: {response}')
                 report_info.create_ts = model_utils.now_ts()
                 report_info.doc_storage_url = doc_name
                 report_info.save()
@@ -300,7 +300,7 @@ def get_registration_report(registration: MhrRegistration,  # pylint: disable=to
             doc_name = model_utils.get_doc_storage_name(registration)
             current_app.logger.info(f'Saving registration report output to doc storage: name={doc_name}.')
             response = GoogleStorageService.save_document(doc_name, raw_data, DocumentTypes.REGISTRATION)
-            current_app.logger.info('Save document storage response: ' + json.dumps(response))
+            current_app.logger.info(f'Save document storage response: {response}')
             reg_report: MhrRegistrationReport = MhrRegistrationReport(create_ts=model_utils.now_ts(),
                                                                       registration_id=registration.id,
                                                                       report_data=report_data,
