@@ -7,6 +7,7 @@ import {
   NewMhrRegistrationApiIF
 } from '@/interfaces'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
+import { HomeTenancyTypes } from '@/enums'
 
 export const useNewMhrRegistration = () => {
   const {
@@ -128,12 +129,16 @@ export const useNewMhrRegistration = () => {
       // @ts-ignore - TODO: Mhr-Submission - api asks for number, maybe fix this once step 3 is finished?
       ownerGroup.groupId = parseInt(ownerGroup.groupId)
 
-      ownerGroup.type = 'SO'// TODO: Mhr-Submission - DELETE after step 3 has been completed
+      ownerGroup.type = getTenancyTypeFromDescription(ownerGroup.type)
     })
 
     return ownerGroups
   }
 
+  const getTenancyTypeFromDescription = (tenancyType: string): string => {
+    var indexOfType = Object.values(HomeTenancyTypes).indexOf(tenancyType as string as HomeTenancyTypes)
+    return Object.keys(HomeTenancyTypes)[indexOfType]
+  }
   const parseDescription = (): MhrRegistrationDescriptionIF => {
     let description: MhrRegistrationDescriptionIF = getMhrRegistrationHomeDescription.value
 
