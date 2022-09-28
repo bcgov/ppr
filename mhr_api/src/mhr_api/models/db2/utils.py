@@ -218,7 +218,7 @@ def find_all_by_account_id(account_id: str, staff: bool):
     reg_summary_list = __get_reg_summary_list(account_id)
     doc_types = MhrDocumentType.find_all()
     if mhr_list:
-        # 2. Get the summary info from DB2.
+        # 3. Get the summary info from DB2.
         try:
             mhr_numbers: str = ''
             count = 0
@@ -238,6 +238,7 @@ def find_all_by_account_id(account_id: str, staff: bool):
                     results.append(__build_summary(row, False))
             for result in results:
                 __update_summary_info(result, results, reg_summary_list, doc_types, staff, account_id)
+                del result['documentType']  # Not in the schema.
         except Exception as db_exception:   # noqa: B902; return nicer error
             current_app.logger.error('DB2 find_all_by_account_id exception: ' + str(db_exception))
             raise DatabaseException(db_exception)
