@@ -1,4 +1,4 @@
-import { AddressIF, MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF } from '@/interfaces'
+import { AddressIF, MhrRegistrationFractionalOwnershipIF, MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF } from '@/interfaces'
 
 export const mockedAddress: AddressIF = {
   street: '1234 Fort St.',
@@ -46,4 +46,10 @@ export const mockedOrganization: MhrRegistrationHomeOwnerIF = {
   phoneNumber: '(999) 888-7766',
   phoneExtension: '4321',
   address: mockedAddressAlt
+}
+
+export const mockedFractionalOwnership: MhrRegistrationFractionalOwnershipIF = {
+  interest: "Undivided", 
+  interestNumerator: 1,
+  interestTotal: 4
 }
