@@ -128,8 +128,7 @@ export default defineComponent({
     })
 
     const setOwnerGroupId = (groupId: string): void => {
-      console.log(groupId)
-      if (groupId === undefined) {
+      if (!groupId) {
         setShowGroups(false)
       }
       emit('setOwnerGroupId', groupId)
