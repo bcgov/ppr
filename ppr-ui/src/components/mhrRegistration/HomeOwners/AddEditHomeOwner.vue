@@ -278,6 +278,10 @@ export default defineComponent({
     isHomeOwnerPerson: {
       type: Boolean,
       default: false
+    },
+    isMhrTransfer: {
+      type: Boolean,
+      default: false
     }
   },
   setup (props, context) {
@@ -387,12 +391,14 @@ export default defineComponent({
         if (props.editHomeOwner) {
           editHomeOwner(
             localState.owner as MhrRegistrationHomeOwnerIF,
-            localState.ownerGroupId || '1'
+            localState.ownerGroupId || '1',
+            props.isMhrTransfer
           )
         } else {
           addOwnerToTheGroup(
             localState.owner as MhrRegistrationHomeOwnerIF,
-            localState.ownerGroupId
+            localState.ownerGroupId,
+            props.isMhrTransfer
           )
         }
         // check if group has some fractional data
@@ -420,7 +426,7 @@ export default defineComponent({
       context.emit('cancel')
     }
 
-    // TODO: Not sure the purpose of this watcher as we are doing nothing with the response
+    // Future State business lookup?
     watch(
       () => localState.owner.organizationName,
       async (val: string) => {

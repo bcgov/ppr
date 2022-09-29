@@ -65,14 +65,14 @@
     </div>
     <div class="pt-4">
       <v-btn
-        v-if="submitBtn"
+        v-if="setSubmitBtn"
         id="btn-stacked-submit"
         class="btn-stacked"
         color="primary"
         @click="submit"
         :disabled="disableSubmitBtn"
       >
-        {{ submitBtn }}
+        {{ setSubmitBtn }}
         <v-icon color="white" style="padding-top: 2px;">mdi-chevron-right</v-icon>
       </v-btn>
     </div>
@@ -109,11 +109,10 @@ export default defineComponent({
   setup (props, { emit, root }) {
     const localState = reactive({
       cancelBtn: props.setCancelBtn,
-      submitBtn: props.setSubmitBtn,
       saveBtn: props.setSaveButton,
       disableSubmitBtn: props.setDisableSubmitBtn,
       isDoubledUp: computed(() => {
-        if (localState.submitBtn !== 'Review and Complete') {
+        if (props.setSubmitBtn !== 'Review and Complete') {
           return true
         }
         return false

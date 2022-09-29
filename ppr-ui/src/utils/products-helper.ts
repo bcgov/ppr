@@ -6,7 +6,7 @@ import { getFeatureFlag } from '@/utils'
  * Will be used to get respective content/titles for the users based on those values.
  *
  * @param authRoles - List of user's roles
- * @param subscribedProducts - Optional list of products that client is subscribed to
+ * @param subscribedProductCodes - Optional list of products that client is subscribed to
  * If no subscribed products passed, then it is a staff role
  * @returns String to describe user's roles and products. e.g. STAFF_PPR
  */

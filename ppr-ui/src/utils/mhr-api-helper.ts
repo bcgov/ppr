@@ -396,3 +396,24 @@ export async function validateDocumentID (documentId: string) {
     }
   }
 }
+
+export async function submitMhrTransfer (payloadData, mhrNumber) {
+  const url = sessionStorage.getItem('MHR_API_URL')
+  const config = { baseURL: url, headers: { Accept: 'application/json' } }
+
+  try {
+    const result = await axios.post(`transfers/${mhrNumber}`, payloadData, config)
+    if (!result?.data) {
+      throw new Error('Invalid API response')
+    }
+    return result.data
+  } catch (error) {
+    return {
+      error: {
+        category: ErrorCategories.REGISTRATION_TRANSFER,
+        statusCode: error?.response?.status || StatusCodes.NOT_FOUND,
+        msg: error?.response?.data?.errorMesage || 'Unknown Error'
+      }
+    }
+  }
+}

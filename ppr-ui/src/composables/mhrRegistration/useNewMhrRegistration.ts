@@ -217,6 +217,7 @@ export const useNewMhrRegistration = () => {
   return {
     initNewMhr,
     buildApiData,
-    parseStaffPayment
+    parseStaffPayment,
+    cleanEmpty
   }
 }

@@ -352,3 +352,11 @@ export const setMhrInformation: ActionIF = ({ commit }, mhrInfo: MhRegistrationS
 export const setEmptyMhrTransfer: ActionIF = ({ commit }, emptyMhrTransfer: MhrTransferIF): void => {
   commit('mutateEmptyMhrTransfer', emptyMhrTransfer)
 }
+
+export const setMhrTransferHomeOwnerGroups: ActionIF = (
+  { commit },
+  groups: MhrRegistrationHomeOwnerGroupIF[]
+): void => {
+  commit('mutateMhrTransferHomeOwnerGroups', groups)
+  commit('mutateUnsavedChanges', true)
+}

@@ -18,7 +18,7 @@
       class="pt-4 buttons-stacked overlap"
       :setBackBtn="setBackBtn"
       :setCancelBtn="cancelBtn"
-      :setSubmitBtn="submitBtn"
+      :setSubmitBtn="setSubmitBtn"
       :setSaveButton="saveBtn"
       :setDisableSubmitBtn="disableSubmitBtn"
       @back="back()"
@@ -136,7 +136,6 @@ export default defineComponent({
       rightOffset: props.setRightOffset,
       showButtons: props.setShowButtons,
       showFeeSummary: props.setShowFeeSummary,
-      submitBtn: props.setSubmitBtn,
       saveBtn: props.setSaveBtn,
       disableSubmitBtn: props.setDisableSubmitBtn,
       feeOverride: computed(() => {

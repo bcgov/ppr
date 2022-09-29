@@ -47,17 +47,23 @@ export default defineComponent({
       getRegistrationCreationDate,
       getRegistrationExpiryDate,
       getRegistrationNumber,
-      getRegistrationType
+      getRegistrationType,
+      getMhrInformation
     } = useGetters<any>([
       'getRegistrationCreationDate',
       'getRegistrationExpiryDate',
       'getRegistrationNumber',
-      'getRegistrationType'
+      'getRegistrationType',
+      'getMhrInformation'
     ])
     const localState = reactive({
       creationDate: computed((): string => {
         if (getRegistrationCreationDate.value) {
           const date = new Date(getRegistrationCreationDate.value)
+          return pacificDate(date)
+        }
+        if (getMhrInformation.value) {
+          const date = new Date(getMhrInformation.value.createDateTime)
           return pacificDate(date)
         }
         return ''
@@ -70,8 +76,10 @@ export default defineComponent({
         return 'No Expiry'
       }),
       header: computed((): string => {
-        const regNum = getRegistrationNumber.value || ''
-        return 'Base Registration Number ' + regNum
+        const numberType = getRegistrationNumber.value ? 'Base' : 'Manufactured Home'
+        const regNum = getRegistrationNumber.value || getMhrInformation.value.mhrNumber || ''
+
+        return numberType + ' Registration Number ' + regNum
       }),
       registrationType: computed((): string => {
         const registration = getRegistrationType.value as RegistrationTypeIF
