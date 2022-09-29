@@ -23,7 +23,7 @@
       filled
       @change="setOwnerGroupId($event)"
       :clearable="groupItems.length === 1"
-      @click:clear="groupDropdown.blur()"
+      @click:clear="removeGroupDropdownValidation == true && groupDropdown.blur()"
       :menu-props="{ bottom: true, offsetY: true }"
       data-test-id="owner-group-select"
     ></v-select>
@@ -95,14 +95,15 @@ export default defineComponent({
     const groupDropdown = ref(null)
 
     const { required } = useInputRules()
-    const { getGroupDropdownItems, showGroups } = useHomeOwners()
+    const { getGroupDropdownItems, showGroups, setShowGroups } = useHomeOwners()
     const homeOwnerGroups = [...getMhrRegistrationHomeOwnerGroups.value]
 
     const localState = reactive({
       ownerGroupId: props.groupId,
+      removeGroupDropdownValidation: false,
       groupItems: computed(() => getGroupDropdownItems(props.isAddingHomeOwner, props.groupId)),
       groupRules: computed(() => {
-        return showGroups.value ? required('Select a group for this owner') : []
+        return showGroups.value && localState.removeGroupDropdownValidation ? required('Select a group for this owner') : []
       }),
       groupFractionalData: find(getMhrRegistrationHomeOwnerGroups.value, { groupId: props.groupId }),
       fractionalInfo: computed(() => props.fractionalData),
@@ -127,6 +128,10 @@ export default defineComponent({
     })
 
     const setOwnerGroupId = (groupId: string): void => {
+      console.log(groupId)
+      if (groupId === undefined) {
+        setShowGroups(false)
+      }
       emit('setOwnerGroupId', groupId)
     }
 
