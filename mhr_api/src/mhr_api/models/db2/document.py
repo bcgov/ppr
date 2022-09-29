@@ -27,7 +27,9 @@ class Db2Document(db.Model):
     class DocumentTypes(BaseEnum):
         """Render an Enum of the legacy document types."""
 
+        CONV = 'CONV'
         MHREG = '101 '
+        MHREG_TRIM = '101'
         TRAND = 'DEAT'
         TRANS = 'TRAN'
 
@@ -125,12 +127,12 @@ class Db2Document(db.Model):
         return documents
 
     @classmethod
-    def find_by_doc_id(cls, document_id: str):
+    def find_by_doc_id(cls, doc_reg_id: str):
         """Return the document matching the document id."""
         document = None
-        if document_id:
+        if doc_reg_id:
             try:
-                document = cls.query.filter(Db2Document.id == document_id).one_or_none()
+                document = cls.query.filter(Db2Document.id == doc_reg_id).one_or_none()
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('Db2Document.find_by_doc_id exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)

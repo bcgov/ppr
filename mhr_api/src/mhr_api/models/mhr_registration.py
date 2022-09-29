@@ -101,6 +101,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
     manuhome: Db2Manuhome = None
     mail_version: bool = False
     reg_json: dict = None
+    current_view: bool = False
 
     @property
     def json(self) -> dict:
@@ -161,6 +162,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
     def new_registration_json(self) -> dict:
         """Return the new registration version of the registration as a json object."""
         if self.manuhome:
+            self.manuhome.current_view = self.current_view
             reg_json = self.manuhome.new_registration_json
             reg_doc = None
             for doc in self.manuhome.reg_documents:
@@ -246,11 +248,11 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         raise DatabaseException('MhrRegistration.find_summary_by_mhr_number PosgreSQL not yet implemented.')
 
     @classmethod
-    def find_all_by_account_id(cls, account_id: str, staff: bool = False):
+    def find_all_by_account_id(cls, account_id: str, staff: bool = False, collapse: bool = False):
         """Return a summary list of recent MHR registrations belonging to an account."""
         current_app.logger.debug(f'Account_id={account_id}')
         if model_utils.is_legacy():
-            return legacy_utils.find_all_by_account_id(account_id, staff)
+            return legacy_utils.find_all_by_account_id(account_id, staff, collapse)
 
         raise DatabaseException('MhrRegistration.find_all_by_account_id PosgreSQL not yet implemented.')
 
@@ -302,6 +304,46 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
             if not registration:
                 registration: MhrRegistration = MhrRegistration()
             registration.manuhome = legacy_utils.find_by_mhr_number(formatted_mhr)
+            registration.mhr_number = registration.manuhome.mhr_number
+        return registration
+
+    @classmethod
+    def find_original_by_mhr_number(cls, mhr_number: str, account_id: str, staff: bool = False):
+        """Return the original MH registration information matching the MHR number."""
+        current_app.logger.debug(f'Account={account_id}, mhr_number={mhr_number}')
+        registration = None
+        formatted_mhr = model_utils.format_mhr_number(mhr_number)
+        if formatted_mhr:
+            reg_type = MhrRegistrationTypes.MHREG
+            try:
+                registration = cls.query.filter(MhrRegistration.mhr_number == formatted_mhr,
+                                                MhrRegistration.registration_type == reg_type).one_or_none()
+            except Exception as db_exception:   # noqa: B902; return nicer error
+                current_app.logger.error('DB find_by_mhr_number exception: ' + str(db_exception))
+                raise DatabaseException(db_exception)
+
+        if not registration and not model_utils.is_legacy():
+            raise BusinessException(
+                error=model_utils.ERR_MHR_REGISTRATION_NOT_FOUND.format(code=ResourceErrorCodes.NOT_FOUND_ERR,
+                                                                        mhr_number=formatted_mhr),
+                status_code=HTTPStatus.NOT_FOUND
+            )
+
+        if not staff and account_id and (not registration or registration.account_id != account_id):
+            # Check extra registrations
+            extra_reg = MhrExtraRegistration.find_by_mhr_number(formatted_mhr, account_id)
+            if not extra_reg:
+                raise BusinessException(
+                    error=model_utils.ERR_REGISTRATION_ACCOUNT.format(code=ResourceErrorCodes.UNAUTHORIZED_ERR,
+                                                                      account_id=account_id,
+                                                                      mhr_number=formatted_mhr),
+                    status_code=HTTPStatus.UNAUTHORIZED
+                )
+        # Authorized, exists. If legacy transition load legacy data.
+        if model_utils.is_legacy():
+            if not registration:
+                registration: MhrRegistration = MhrRegistration()
+            registration.manuhome = legacy_utils.find_original_by_mhr_number(formatted_mhr)
             registration.mhr_number = registration.manuhome.mhr_number
         return registration
 

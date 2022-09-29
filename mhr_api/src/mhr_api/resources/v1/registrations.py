@@ -32,6 +32,8 @@ from mhr_api.services.payment.exceptions import SBCPaymentException
 
 bp = Blueprint('REGISTRATIONS1',  # pylint: disable=invalid-name
                __name__, url_prefix='/api/v1/registrations')
+CURRENT_PARAM: str = 'current'
+COLLAPSE_PARAM: str = 'collapse'
 
 
 @bp.route('', methods=['GET', 'OPTIONS'])
@@ -51,7 +53,14 @@ def get_account_registrations():
             return resource_utils.unauthorized_error_response(account_id)
         # current_app.logger.debug(f'get_account_registrations account={account_id}.')
         # Try to fetch account registrations.
-        statement_list = MhrRegistration.find_all_by_account_id(account_id, is_staff(jwt))
+        collapse_param = request.args.get(COLLAPSE_PARAM)
+        if collapse_param is None or not isinstance(collapse_param, (bool, str)):
+            collapse_param = False
+        elif isinstance(collapse_param, str) and collapse_param.lower() in ['true', '1', 'y', 'yes']:
+            collapse_param = True
+        elif isinstance(collapse_param, str):
+            collapse_param = False
+        statement_list = MhrRegistration.find_all_by_account_id(account_id, is_staff(jwt), collapse_param)
         return jsonify(statement_list), HTTPStatus.OK
 
     except DatabaseException as db_exception:
@@ -126,11 +135,27 @@ def get_registrations(mhr_number: str):  # pylint: disable=too-many-return-state
         # Verify request JWT and account ID
         if not authorized(account_id, jwt):
             return resource_utils.unauthorized_error_response(account_id)
+
+        # Set to false as default to generate json with original MH registration data.
+        current_param = request.args.get(CURRENT_PARAM)
+        if current_param is None or not isinstance(current_param, (bool, str)):
+            current_param = False
+        elif isinstance(current_param, str) and current_param.lower() in ['true', '1', 'y', 'yes']:
+            current_param = True
+        elif isinstance(current_param, str):
+            current_param = False
+        registration: MhrRegistration = None
         # Try to fetch MH registration by MHR number
-        # Not found throws a business exception.
-        registration: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_number,
-                                                                           account_id,
-                                                                           is_all_staff_account(account_id))
+        # Not found or not in the account list throw exceptions.
+        if current_param:
+            registration = MhrRegistration.find_by_mhr_number(mhr_number,
+                                                              account_id,
+                                                              is_all_staff_account(account_id))
+            registration.current_view = True
+        else:
+            registration = MhrRegistration.find_original_by_mhr_number(mhr_number,
+                                                                       account_id,
+                                                                       is_all_staff_account(account_id))
         response_json = registration.new_registration_json
         # Return report if request header Accept MIME type is application/pdf.
         if resource_utils.is_pdf(request):

@@ -142,6 +142,20 @@ class Db2Descript(db.Model):
             descript.strip()
         return descript
 
+    @classmethod
+    def find_by_doc_id(cls, reg_document_id: str):
+        """Return the description matching the document id."""
+        descript = None
+        if reg_document_id:
+            try:
+                descript = cls.query.filter(Db2Descript.reg_document_id == reg_document_id).one_or_none()
+            except Exception as db_exception:   # noqa: B902; return nicer error
+                current_app.logger.error('DB2 descript.find_by_doc_id exception: ' + str(db_exception))
+                raise DatabaseException(db_exception)
+        if descript:
+            descript.strip()
+        return descript
+
     @property
     def json(self):
         """Return a dict of this object, with keys in JSON format."""

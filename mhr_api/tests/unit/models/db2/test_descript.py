@@ -30,6 +30,11 @@ TEST_DATA = [
     (True, 10, '1974', '3E3947', 2),
     (False, 0, None, None, 0)
 ]
+# testdata pattern is ({exists}, {manhomid}, {doc_reg_id})
+TEST_DATA_DOC_ID = [
+    (True, 1, 'REG22911'),
+    (False, 0, None)
+]
 
 
 @pytest.mark.parametrize('exists,manuhome_id,year,serial,count', TEST_DATA)
@@ -106,6 +111,18 @@ def test_find_by_manuhome_id_active(session, exists, manuhome_id, year, serial, 
             assert section['lengthInches'] == 0
             assert section['widthFeet']
             assert section['widthInches'] == 0
+    else:
+        assert not descript
+
+
+@pytest.mark.parametrize('exists,manuhome_id,doc_id', TEST_DATA_DOC_ID)
+def test_find_by_doc_id(session, exists, manuhome_id, doc_id):
+    """Assert that find descript by document id contains all expected elements."""
+    descript: Db2Descript = Db2Descript.find_by_doc_id(doc_id)
+    if exists:
+        assert descript
+        assert descript.reg_document_id == doc_id
+        assert descript.manuhome_id == manuhome_id
     else:
         assert not descript
 

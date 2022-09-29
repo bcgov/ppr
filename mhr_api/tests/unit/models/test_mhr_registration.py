@@ -178,6 +178,24 @@ def test_find_by_mhr_number(session, mhr_number, has_results, account_id):
         assert not_found_err
 
 
+@pytest.mark.parametrize('mhr_number, has_results, account_id', TEST_MHR_NUM_DATA)
+def test_find_original_by_mhr_number(session, mhr_number, has_results, account_id):
+    """Assert that finding the original MH registration information by MHR number works as expected."""
+    if has_results:
+        registration: MhrRegistration = MhrRegistration.find_original_by_mhr_number(mhr_number, account_id)
+        assert registration
+        assert registration.id
+        assert registration.mhr_number == mhr_number
+        assert registration.status_type in MhrRegistrationStatusTypes
+        assert registration.registration_type in MhrRegistrationTypes
+        assert registration.registration_ts
+    else:
+        with pytest.raises(BusinessException) as not_found_err:
+            MhrRegistration.find_by_mhr_number(mhr_number, 'PS12345')
+        # check
+        assert not_found_err
+
+
 @pytest.mark.parametrize('http_status,doc_id,mhr_num,doc_type,legacy,owner_count', TEST_DATA_DOC_ID)
 def test_find_by_document_id(session, http_status, doc_id, mhr_num, doc_type, legacy, owner_count):
     """Assert that find manufauctured home information by document id contains all expected elements."""

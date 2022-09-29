@@ -17,7 +17,7 @@ Validation includes verifying the data combination for various registrations/fil
 """
 from flask import current_app
 
-from mhr_api.models import MhrRegistration
+from mhr_api.models import MhrRegistration, Db2Owngroup
 from mhr_api.models.type_tables import MhrRegistrationStatusTypes
 from mhr_api.models.utils import is_legacy
 from mhr_api.utils import valid_charset
@@ -30,9 +30,9 @@ SUBMITTING_REQUIRED = 'Submitting Party is required for MH registrations. '
 OWNER_GROUPS_REQUIRED = 'At least one owner group is required for staff registrations. '
 DOC_ID_EXISTS = 'Document ID must be unique: provided value already exists. '
 DOC_ID_INVALID_CHECKSUM = 'Document ID is invalid: checksum failed. '
-LEGACY_ADDRESS_STREET_TOO_LONG = '{add_desc} address street length is too long: maximum length 31 characters. '
-LEGACY_ADDRESS_CITY_TOO_LONG = '{add_desc} address city length is too long: maximum length 20 characters. '
 CHARACTER_SET_UNSUPPORTED = 'The character set is not supported for {desc} value {value}. '
+DELETE_GROUP_ID_INVALID = 'The owner group with ID {group_id} is not active and cannot be changed.'
+DELETE_GROUP_ID_NONEXISTENT = 'No owner group with ID {group_id} exists.'
 
 
 def validate_registration(json_data, is_staff: bool = False):
@@ -62,6 +62,7 @@ def validate_transfer(registration: MhrRegistration, json_data, is_staff: bool =
             for owner in group.get('owners'):
                 error_msg += validate_owner(owner)
     error_msg += validate_registration_state(registration)
+    error_msg += validate_delete_owners(registration, json_data)
     return error_msg
 
 
@@ -118,7 +119,7 @@ def checksum_valid(doc_id: str) -> bool:
 
 
 def validate_registration_state(registration: MhrRegistration):
-    """Perform new registration legacy specifc extra validation here."""
+    """Validate registration state: changes are only allowed on active homes."""
     error_msg = ''
     if not registration:
         return error_msg
@@ -127,6 +128,25 @@ def validate_registration_state(registration: MhrRegistration):
     elif is_legacy() and registration.manuhome and \
             registration.manuhome.mh_status != registration.manuhome.StatusTypes.REGISTERED:
         error_msg += STATE_NOT_ALLOWED
+    return error_msg
+
+
+def validate_delete_owners(registration: MhrRegistration, json_data):
+    """Check groups id's and owners are valid for deleted groups."""
+    error_msg = ''
+    if not registration or not json_data.get('deleteOwnerGroups'):
+        return error_msg
+    for deleted in json_data['deleteOwnerGroups']:
+        if deleted.get('groupId') and is_legacy() and registration.manuhome:
+            group_id = deleted['groupId']
+            found: bool = False
+            for existing in registration.manuhome.reg_owner_groups:
+                if existing.group_id == group_id:
+                    found = True
+                    if existing.status != Db2Owngroup.StatusTypes.ACTIVE:
+                        error_msg += DELETE_GROUP_ID_INVALID.format(group_id=group_id)
+            if not found:
+                error_msg += DELETE_GROUP_ID_NONEXISTENT.format(group_id=group_id)
     return error_msg
 
 

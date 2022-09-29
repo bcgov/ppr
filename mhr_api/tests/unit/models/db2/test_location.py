@@ -66,6 +66,11 @@ TEST_ADDRESS_DATA = [
     ('4004', 'POPLAR AVENUE', '4004 POPLAR AVENUE'),
     ('101-40', '04 POPLAR AVENUE', '101-4004 POPLAR AVENUE')
 ]
+# testdata pattern is ({exists}, {manhomid}, {doc_reg_id})
+TEST_DATA_DOC_ID = [
+    (True, 1, 'REG22911'),
+    (False, 0, None)
+]
 
 
 @pytest.mark.parametrize('exists,manuhome_id,park_name,pad,street_num,street,city,count', TEST_DATA)
@@ -101,7 +106,7 @@ def test_find_by_manuhome_id(session, exists, manuhome_id, park_name, pad, stree
 
 
 @pytest.mark.parametrize('exists,manuhome_id,park_name,pad,street_num,street,city,count', TEST_DATA)
-def test_find_by_manuhome_id(session, exists, manuhome_id, park_name, pad, street_num, street, city, count):
+def test_find_by_manuhome_id_active(session, exists, manuhome_id, park_name, pad, street_num, street, city, count):
     """Assert that find locations by manuhome id contains all expected elements."""
     location: Db2Location = Db2Location.find_by_manuhome_id_active(manuhome_id)
     if exists:
@@ -147,6 +152,18 @@ def test_find_by_manuhome_id(session, exists, manuhome_id, park_name, pad, stree
         assert reg_json['address']['region']
         assert reg_json['address']['country']
         assert reg_json['address']['postalCode'] is not None
+    else:
+        assert not location
+
+
+@pytest.mark.parametrize('exists,manuhome_id,doc_id', TEST_DATA_DOC_ID)
+def test_find_by_doc_id(session, exists, manuhome_id, doc_id):
+    """Assert that find location by document id contains all expected elements."""
+    location: Db2Location = Db2Location.find_by_doc_id(doc_id)
+    if exists:
+        assert location
+        assert location.reg_document_id == doc_id
+        assert location.manuhome_id == manuhome_id
     else:
         assert not location
 

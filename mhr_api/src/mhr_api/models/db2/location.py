@@ -143,6 +143,20 @@ class Db2Location(db.Model):
             location.strip()
         return location
 
+    @classmethod
+    def find_by_doc_id(cls, reg_document_id: str):
+        """Return the location matching the document id."""
+        location = None
+        if reg_document_id:
+            try:
+                location = cls.query.filter(Db2Location.reg_document_id == reg_document_id).one_or_none()
+            except Exception as db_exception:   # noqa: B902; return nicer error
+                current_app.logger.error('DB2 location.find_by_doc_id exception: ' + str(db_exception))
+                raise DatabaseException(db_exception)
+        if location:
+            location.strip()
+        return location
+
     @property
     def json(self):
         """Return a dict of this object, with keys in JSON format."""

@@ -104,6 +104,42 @@ def test_find_by_mhr_number(session, exists, id, mhr_num, doc_type, doc_reg_id):
         assert not docs
 
 
+@pytest.mark.parametrize('exists,id,mhr_num,doc_type,doc_reg_id', TEST_DATA)
+def test_find_by_doc_id(session, exists, id, mhr_num, doc_type, doc_reg_id):
+    """Assert that find document by document id contains all expected elements."""
+    doc = Db2Document.find_by_doc_id(doc_reg_id)
+    if exists:
+        assert doc
+        assert doc.mhr_number == mhr_num
+        if doc.id == id:
+            assert doc.document_type == doc_type
+            assert doc.document_reg_id == doc_reg_id
+            assert doc.draft_ts is not None
+            assert doc.registration_ts is not None
+            assert doc.interimed is not None
+            assert doc.owner_cross_reference is not None
+            assert doc.interest_denominator is not None
+            assert doc.declared_value is not None
+            assert doc.own_land is not None
+            assert doc.routing_slip_number is not None
+            assert doc.last_service is not None
+            assert doc.bcol_account is not None
+            assert doc.dat_number is not None
+            assert doc.examiner_id is not None
+            assert doc.update_id is not None
+            assert doc.phone_number is not None
+            assert doc.attention_reference is not None
+            assert doc.legacy_address is not None
+            assert doc.number_of_pages is not None
+            assert doc.transfer_execution_date is not None
+            assert doc.consideration_value is not None
+            assert doc.affirm_by_name is not None
+            assert doc.liens_with_consent is not None
+            assert doc.client_reference_id is not None
+    else:
+        assert not doc
+
+
 def test_document_json(session):
     """Assert that the document renders to a json format correctly."""
     doc = Db2Document(mhr_number='022911',
