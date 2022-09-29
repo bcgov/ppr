@@ -193,19 +193,17 @@ export default defineComponent({
         const validateDocId: MhrDocIdResponseIF = await validateDocumentID(localState.documentId)
         localState.isUniqueDocId = !validateDocId.exists && validateDocId.valid
         localState.displayDocIdError = !localState.isUniqueDocId
+        setValidation(MhrSectVal.SUBMITTING_PARTY_VALID, MhrCompVal.DOC_ID_VALID, localState.isVerifiedDocId)
       } else {
         localState.isUniqueDocId = false
         localState.displayDocIdError = false
+        setValidation(MhrSectVal.SUBMITTING_PARTY_VALID, MhrCompVal.DOC_ID_VALID, false)
       }
 
       localState.loadingDocId = false
       setMhrRegistrationDocumentId(val)
     }
     )
-
-    watch(() => localState.isDocumentIdValid, (val: boolean) => {
-      setValidation(MhrSectVal.SUBMITTING_PARTY_VALID, MhrCompVal.DOC_ID_VALID, val)
-    })
 
     watch(() => localState.validateDocId, async () => {
       // @ts-ignore - function exists
