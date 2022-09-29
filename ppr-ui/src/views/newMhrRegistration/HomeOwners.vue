@@ -56,7 +56,7 @@
         </label>
         <div class="mt-5 mb-11 reg-owners-check">
           <v-icon
-            v-if="getMhrRegistrationHomeOwners.length > 0"
+            v-if="hasHomeOwners"
             color="green darken-2"
           >
             mdi-check
@@ -191,6 +191,7 @@ export default defineComponent({
       ownershipAllocation: computed(
         () => getTotalOwnershipAllocationStatus() as MhrRegistrationTotalOwnershipAllocationIF
       ),
+      hasHomeOwners: computed(() => !!getMhrRegistrationHomeOwners.value.find(owner => owner.id)),
       isValidGroups: computed(() => { return hasMinimumGroups() }),
       homeTenancyType: computed(() => { return getHomeTenancyType() }),
       interestType: computed(() => { return getInterestString() }),

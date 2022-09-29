@@ -3,14 +3,18 @@ import Vue from 'vue'
 import Vuetify from 'vuetify'
 import VueRouter from 'vue-router'
 import { getVuexStore } from '@/store'
-import { createLocalVue, shallowMount, Wrapper } from '@vue/test-utils'
+import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
 
 // Local Components
 import { MhrReviewConfirm } from '@/views'
 import { HomeLocationReview, HomeOwnersReview, SubmittingPartyReview, YourHomeReview } from '@/components/mhrRegistration/ReviewConfirm'
 import { CertifyInformation } from '@/components/common'
-import { RouteNames } from '@/enums'
+import { HomeTenancyTypes, RouteNames } from '@/enums'
 import mockRouter from './MockRouter'
+import { mockedFractionalOwnership, mockedPerson } from './test-data/mock-mhr-registration'
+import { MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF } from '@/interfaces/mhr-registration-interfaces'
+import { getTestId } from './utils'
+import { HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
 
 Vue.use(Vuetify)
 
@@ -30,7 +34,7 @@ function createComponent (): Wrapper<any> {
   const router = mockRouter.mock()
   router.push({ name: RouteNames.MHR_REVIEW_CONFIRM })
 
-  return shallowMount(MhrReviewConfirm, {
+  return mount(MhrReviewConfirm, {
     localVue,
     propsData: {
       appReady: true,
@@ -86,5 +90,75 @@ describe('Mhr Review Confirm registration', () => {
 
     // Verify prompt
     expect(wrapper.vm.isValidatingApp).toBe(true)
+  })
+
+  it('should show correct Home Ownership section (without a Group)', async () => {
+    wrapper = createComponent()
+
+    const owners = [mockedPerson] as MhrRegistrationHomeOwnerIF[]
+    const homeOwnerGroup = [{ groupId: '1', owners: owners }] as MhrRegistrationHomeOwnerGroupIF[]
+
+    await store.dispatch('setMhrRegistrationHomeOwnerGroups', homeOwnerGroup)
+
+    const HomeOwnerReview = wrapper.findComponent(HomeOwnersReview)
+
+    expect(HomeOwnerReview.exists()).toBeTruthy()
+    expect(HomeOwnerReview.findComponent(HomeOwnersTable).exists()).toBeTruthy()
+
+    const unfinishedError = HomeOwnerReview.get('.error-text')
+    expect(unfinishedError.isVisible()).toBeFalsy()
+
+    const homeTenancyType = HomeOwnerReview.find(getTestId('home-tenancy-type'))
+    expect(homeTenancyType.exists()).toBeTruthy()
+    expect(homeTenancyType.text()).toContain(HomeTenancyTypes.SOLE)
+
+    const totalOwnership = HomeOwnerReview.find(getTestId('total-ownership'))
+    expect(totalOwnership.exists()).toBeFalsy()
+
+    const homeOwnersTable = HomeOwnerReview.find('.home-owners-table')
+    expect(homeOwnersTable.exists()).toBeTruthy()
+    expect(homeOwnersTable.text()).not.toContain('Group 1')
+    expect(homeOwnersTable.text()).toContain(mockedPerson.individualName.first)
+    expect(homeOwnersTable.text()).toContain(mockedPerson.phoneNumber)
+    expect(homeOwnersTable.text()).toContain(mockedPerson.phoneExtension)
+    expect(homeOwnersTable.text()).toContain(mockedPerson.address.city)
+    expect(homeOwnersTable.text()).not.toContain(HomeTenancyTypes.SOLE)
+  })
+
+  it('should show correct Home Ownership section (with a Group)', async () => {
+    wrapper = createComponent()
+
+    const owners = [mockedPerson] as MhrRegistrationHomeOwnerIF[]
+    const homeOwnerGroup = [{ groupId: '1', owners: owners, ...mockedFractionalOwnership }] as MhrRegistrationHomeOwnerGroupIF[]
+
+    await store.dispatch('setMhrRegistrationHomeOwnerGroups', homeOwnerGroup)
+
+    const HomeOwnerReview = wrapper.findComponent(HomeOwnersReview)
+    HomeOwnerReview.vm.$data.showGroups = true // set show groups so 
+    await Vue.nextTick()
+
+    expect(HomeOwnerReview.exists()).toBeTruthy()
+    expect(HomeOwnerReview.findComponent(HomeOwnersTable).exists()).toBeTruthy()
+
+    const unfinishedError = HomeOwnerReview.get('.error-text')
+    expect(unfinishedError.isVisible()).toBeTruthy()
+    expect(unfinishedError.text()).toContain('unfinished')
+
+    const homeTenancyType = HomeOwnerReview.find(getTestId('home-tenancy-type'))
+    expect(homeTenancyType.exists()).toBeTruthy()
+    expect(homeTenancyType.text()).toContain(HomeTenancyTypes.COMMON)
+
+    const totalOwnership = HomeOwnerReview.find(getTestId('total-ownership'))
+    expect(totalOwnership.exists()).toBeTruthy()
+    expect(totalOwnership.text()).toContain(`${mockedFractionalOwnership.interestNumerator}/${mockedFractionalOwnership.interestTotal}`)
+
+    const homeOwnersTable = HomeOwnerReview.find('.home-owners-table')
+    expect(homeOwnersTable.exists()).toBeTruthy()
+    expect(homeOwnersTable.text()).toContain('Group 1')
+    expect(homeOwnersTable.text()).toContain(mockedPerson.individualName.first)
+    expect(homeOwnersTable.text()).toContain(mockedPerson.phoneNumber)
+    expect(homeOwnersTable.text()).toContain(mockedPerson.phoneExtension)
+    expect(homeOwnersTable.text()).toContain(mockedPerson.address.city)
+    expect(homeOwnersTable.text()).toContain(HomeTenancyTypes.COMMON)
   })
 })

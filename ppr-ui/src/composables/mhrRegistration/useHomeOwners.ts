@@ -323,12 +323,6 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
   watch(
     () => getMhrRegistrationHomeOwnerGroups.value,
     () => {
-      // set step validation for home owners
-      var isHomeOwnersValid = showGroups.value ? !getTotalOwnershipAllocationStatus().hasTotalAllocationError : true
-      if (getMhrRegistrationHomeOwnerGroups.value.length === 0 || !getMhrRegistrationHomeOwnerGroups.value[0].owners) {
-        isHomeOwnersValid = false
-      }
-
       if (getMhrRegistrationHomeOwnerGroups.value.length === 0) {
         setShowGroups(false)
       } else {
@@ -337,10 +331,23 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
         // check if at least one Owner Group has no owners. Used to display an error for the table.
         hasEmptyGroup.value = !getMhrRegistrationHomeOwnerGroups.value.every(group => group.owners.length > 0)
       }
-
-      setValidation(MhrSectVal.HOME_OWNERS_VALID, MhrCompVal.OWNERS_VALID, isHomeOwnersValid)
     }
   )
+
+  // Set Validations for Home Owners
+  watch([hasEmptyGroup, showGroups, getMhrRegistrationHomeOwners, getMhrRegistrationHomeOwnerGroups], () => {
+    let isHomeOwnersStepValid = true
+    if (showGroups.value) {
+      // groups must not be empty or have any fractional errors
+      isHomeOwnersStepValid = !hasEmptyGroup.value
+      isHomeOwnersStepValid = !getTotalOwnershipAllocationStatus().hasTotalAllocationError
+      isHomeOwnersStepValid = !getTotalOwnershipAllocationStatus().hasMinimumGroupsError
+    } else {
+      // must have at least one owner with proper id
+      isHomeOwnersStepValid = !!getMhrRegistrationHomeOwners.value.find(owner => owner.id)
+    }
+    setValidation(MhrSectVal.HOME_OWNERS_VALID, MhrCompVal.OWNERS_VALID, isHomeOwnersStepValid)
+  })
 
   return {
     showGroups: readonly(showGroups),

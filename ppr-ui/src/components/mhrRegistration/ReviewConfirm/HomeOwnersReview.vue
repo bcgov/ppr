@@ -15,11 +15,11 @@
       </div>
       <section class="px-6 my-2" v-if="hasHomeOwners">
         <article class="border-btm py-5">
-          <v-row no-gutters>
+          <v-row no-gutters data-test-id="home-tenancy-type">
             <v-col cols="3"><span class="generic-label">Home Tenancy Type </span></v-col>
             <v-col class="pl-2">{{ getHomeTenancyType() || 'N/A' }}</v-col>
           </v-row>
-          <v-row no-gutters class="pt-2">
+          <v-row no-gutters class="pt-2" v-if="showGroups" data-test-id="total-ownership">
             <v-col cols="3"><span class="generic-label">Total Ownership <br>Allocated </span></v-col>
             <v-col class="pl-2">{{ getTotalOwnershipAllocationStatus().totalAllocation || 'N/A' }}</v-col>
           </v-row>
@@ -55,7 +55,8 @@ export default defineComponent({
     const { MhrSectVal, getStepValidation } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
     const {
       getHomeTenancyType,
-      getTotalOwnershipAllocationStatus
+      getTotalOwnershipAllocationStatus,
+      showGroups
     } = useHomeOwners()
 
     const localState = reactive({
@@ -70,6 +71,7 @@ export default defineComponent({
       RouteNames,
       getHomeTenancyType,
       getTotalOwnershipAllocationStatus,
+      showGroups,
       ...toRefs(localState)
     }
   }

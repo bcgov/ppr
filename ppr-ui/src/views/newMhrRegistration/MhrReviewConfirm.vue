@@ -247,4 +247,10 @@ export default defineComponent({
     }
   }
 }
+
+#home-owners-summary ::v-deep {
+  .readonly-home-owners-table {
+    border-left: 0 !important;
+  }
+}
 </style>
