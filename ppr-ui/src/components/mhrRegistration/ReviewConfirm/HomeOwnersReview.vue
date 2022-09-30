@@ -61,7 +61,7 @@ export default defineComponent({
 
     const localState = reactive({
       homeOwners: computed(() => getMhrRegistrationHomeOwners.value),
-      hasHomeOwners: computed(() => localState.homeOwners.length > 0),
+      hasHomeOwners: computed(() => !!getMhrRegistrationHomeOwners.value.find(owner => owner.id)),
       showStepError: computed(() => !getStepValidation(MhrSectVal.HOME_OWNERS_VALID))
     })
 

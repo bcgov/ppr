@@ -339,9 +339,10 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
     let isHomeOwnersStepValid = true
     if (showGroups.value) {
       // groups must not be empty or have any fractional errors
-      isHomeOwnersStepValid = !hasEmptyGroup.value
-      isHomeOwnersStepValid = !getTotalOwnershipAllocationStatus().hasTotalAllocationError
-      isHomeOwnersStepValid = !getTotalOwnershipAllocationStatus().hasMinimumGroupsError
+      isHomeOwnersStepValid =
+        !getTotalOwnershipAllocationStatus().hasMinimumGroupsError &&
+        !getTotalOwnershipAllocationStatus().hasTotalAllocationError &&
+        !hasEmptyGroup.value
     } else {
       // must have at least one owner with proper id
       isHomeOwnersStepValid = !!getMhrRegistrationHomeOwners.value.find(owner => owner.id)
