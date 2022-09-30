@@ -146,17 +146,31 @@ class Db2Owngroup(db.Model):
     @classmethod
     def find_by_reg_doc_id(cls, manuhome_id: int, reg_document_id: str):
         """Return the owner group matching the manuhome id and registration document id."""
-        owngroup = None
+        # current_app.logger.debug(f'manhomid={manuhome_id} doc_id={reg_document_id}')
+        groups = []
         if manuhome_id and manuhome_id > 0 and reg_document_id:
             try:
-                owngroup = cls.query.filter(Db2Owngroup.manuhome_id == manuhome_id,
-                                            Db2Owngroup.reg_document_id == reg_document_id).one_or_none()
+                groups = cls.query.filter(Db2Owngroup.manuhome_id == manuhome_id,
+                                          Db2Owngroup.reg_document_id == reg_document_id)\
+                                  .order_by(Db2Owngroup.group_id).all()
+                # current_app.logger.info(len(groups))
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('DB2Owngroup.find_by_reg_doc_id exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)
-        if owngroup:
-            owngroup.strip()
-        return owngroup
+        if groups:
+            owners = []
+            try:
+                owners = Db2Owner.find_by_manuhome_id(manuhome_id)
+            except Exception as db_exception:   # noqa: B902; return nicer error
+                current_app.logger.error('DB2Owngroup.find_all_by_manuhome_id owners exception: ' + str(db_exception))
+                raise DatabaseException(db_exception)
+            for group in groups:
+                group.strip()
+                group.owners = []
+                for owner in owners:
+                    if owner.group_id == group.group_id:
+                        group.owners.append(owner)
+        return groups
 
     @property
     def json(self):

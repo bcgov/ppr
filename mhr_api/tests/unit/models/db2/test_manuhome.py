@@ -24,7 +24,7 @@ import pytest
 from registry_schemas.example_data.mhr import REGISTRATION, LOCATION, TRANSFER
 
 from mhr_api.exceptions import BusinessException
-from mhr_api.models import Db2Document, Db2Manuhome, Db2Owngroup, utils as model_utils, MhrRegistration
+from mhr_api.models import Db2Document, Db2Manuhome, Db2Owngroup, MhrRegistration
 from mhr_api.services.authz import MANUFACTURER_GROUP, QUALIFIED_USER_GROUP, GOV_ACCOUNT_ROLE
 
 
@@ -76,7 +76,7 @@ def test_find_by_id(session, exists, id, mhr_num, status, doc_id):
         assert manuhome.reg_notes
         report_json = manuhome.registration_json
         assert report_json['mhrNumber'] == mhr_num
-        assert report_json['status'] == status
+        assert report_json['status'] in ('E', 'EXEMPT')
         assert report_json.get('createDateTime')
         assert report_json.get('clientReferenceId') is not None
         assert report_json.get('declaredValue') >= 0
@@ -113,7 +113,7 @@ def test_find_by_mhr_number(session, http_status, id, mhr_num, status, doc_id):
         assert manuhome.reg_notes
         report_json = manuhome.registration_json
         assert report_json['mhrNumber'] == mhr_num
-        assert report_json['status'] == status
+        assert report_json['status'] in ('E', 'EXEMPT')
         assert report_json.get('createDateTime')
         assert report_json.get('clientReferenceId') is not None
         assert report_json.get('declaredValue') >= 0
@@ -121,6 +121,46 @@ def test_find_by_mhr_number(session, http_status, id, mhr_num, status, doc_id):
         assert report_json.get('location')
         assert report_json.get('description')
         assert report_json.get('notes')
+    else:
+        with pytest.raises(BusinessException) as request_err:
+            Db2Manuhome.find_by_mhr_number(mhr_num)
+        # check
+        assert request_err
+        assert request_err.value.status_code == http_status
+
+
+@pytest.mark.parametrize('http_status,id,mhr_num,status,doc_id', TEST_MHR_NUM_DATA)
+def test_find_original_by_mhr_number(session, http_status, id, mhr_num, status, doc_id):
+    """Assert that find the original manufauctured home information by mhr_number contains all expected elements."""
+    if http_status == HTTPStatus.OK:
+        manuhome: Db2Manuhome = Db2Manuhome.find_original_by_mhr_number(mhr_num)
+        assert manuhome
+        assert manuhome.id == id
+        assert manuhome.mhr_number == mhr_num
+        assert manuhome.mh_status == status
+        assert manuhome.reg_document_id == doc_id
+        assert manuhome.exempt_flag is not None
+        assert manuhome.presold_decal is not None
+        assert manuhome.update_count is not None
+        assert manuhome.update_id is not None
+        assert manuhome.update_date is not None
+        assert manuhome.update_time is not None
+        assert manuhome.accession_number is not None
+        assert manuhome.box_number is not None
+        assert manuhome.reg_documents
+        assert manuhome.reg_owner_groups
+        assert manuhome.reg_location
+        assert manuhome.reg_descript
+        report_json = manuhome.new_registration_json
+        # current_app.logger.info(report_json)
+        assert report_json['mhrNumber'] == mhr_num
+        assert report_json['status'] == 'EXEMPT'
+        assert report_json.get('createDateTime')
+        assert report_json.get('clientReferenceId') is not None
+        assert report_json.get('declaredValue') >= 0
+        assert report_json.get('ownerGroups')
+        assert report_json.get('location')
+        assert report_json.get('description')
     else:
         with pytest.raises(BusinessException) as request_err:
             Db2Manuhome.find_by_mhr_number(mhr_num)

@@ -76,6 +76,7 @@ class Db2Manuhome(db.Model):
     reg_descript = None
     reg_notes = []
     reg_owner_groups = []
+    current_view: bool = False
 
     def save(self):
         """Save the object to the database immediately."""
@@ -128,7 +129,7 @@ class Db2Manuhome(db.Model):
         if manuhome:
             current_app.logger.debug('Db2Manuhome.find_by_id Db2Document query.')
             documents = []
-            doc = Db2Document.find_by_doc_id(manuhome.reg_document_id)
+            doc = Db2Document.find_by_id(manuhome.reg_document_id)
             if doc:
                 documents.append(doc)
             manuhome.reg_documents = documents
@@ -152,7 +153,7 @@ class Db2Manuhome(db.Model):
         if document_id:
             try:
                 current_app.logger.debug(f'Db2Document.find_by_document_id Db2Document query id={document_id}.')
-                doc = Db2Document.find_by_doc_id(document_id)
+                doc = Db2Document.find_by_id(document_id)
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('Db2Manuhome.find_by_document_id exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)
@@ -216,6 +217,35 @@ class Db2Manuhome(db.Model):
         current_app.logger.debug('Db2Manuhome.find_by_mhr_number Db2Mhomnote query.')
         manuhome.reg_notes = Db2Mhomnote.find_by_manuhome_id_active(manuhome.id)
         current_app.logger.debug('Db2Manuhome.find_by_mhr_number completed.')
+        return manuhome
+
+    @classmethod
+    def find_original_by_mhr_number(cls, mhr_number: str):
+        """Return the original MH registration information matching the MHR number."""
+        manuhome = None
+        current_app.logger.debug(f'Db2Manuhome.find_original_by_mhr_number {mhr_number}.')
+        if mhr_number:
+            try:
+                manuhome: Db2Manuhome = cls.query.filter(Db2Manuhome.mhr_number == mhr_number).one_or_none()
+            except Exception as db_exception:   # noqa: B902; return nicer error
+                current_app.logger.error('Db2Manuhome.find_original_by_mhr_number exception: ' + str(db_exception))
+                raise DatabaseException(db_exception)
+
+        if not manuhome:
+            raise BusinessException(
+                error=model_utils.ERR_REGISTRATION_NOT_FOUND_MHR.format(code=ResourceErrorCodes.NOT_FOUND_ERR,
+                                                                        mhr_number=mhr_number),
+                status_code=HTTPStatus.NOT_FOUND
+            )
+        current_app.logger.debug('Db2Manuhome.find_original_by_mhr_number Db2Document query.')
+        manuhome.reg_documents = [Db2Document.find_by_id(manuhome.reg_document_id)]
+        current_app.logger.debug('Db2Manuhome.find_original_by_mhr_number Db2Owngroup query.')
+        manuhome.reg_owner_groups = Db2Owngroup.find_by_reg_doc_id(manuhome.id, manuhome.reg_document_id)
+        current_app.logger.debug('Db2Manuhome.find_original_by_mhr_number Db2Descript query.')
+        manuhome.reg_descript = Db2Descript.find_by_doc_id(manuhome.reg_document_id)
+        current_app.logger.debug('Db2Manuhome.find_original_by_mhr_number Db2Location query.')
+        manuhome.reg_location = Db2Location.find_by_doc_id(manuhome.reg_document_id)
+        current_app.logger.debug('Db2Manuhome.find_original_by_mhr_number completed.')
         return manuhome
 
     @property
@@ -345,7 +375,10 @@ class Db2Manuhome(db.Model):
         if self.reg_owner_groups:
             groups = []
             for group in self.reg_owner_groups:
-                groups.append(group.registration_json)
+                if self.current_view and group.status == Db2Owngroup.StatusTypes.ACTIVE:
+                    groups.append(group.registration_json)
+                elif not self.current_view:
+                    groups.append(group.registration_json)
             man_home['ownerGroups'] = groups
         if self.reg_location:
             man_home['location'] = self.reg_location.new_registration_json

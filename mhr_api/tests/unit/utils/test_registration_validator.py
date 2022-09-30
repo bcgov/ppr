@@ -30,6 +30,9 @@ DESC_MISSING_DOC_ID = 'Missing document id'
 DESC_MISSING_SUBMITTING = 'Missing submitting party'
 DESC_MISSING_OWNER_GROUP = 'Missing owner group'
 DESC_DOC_ID_EXISTS = 'Invalid document id exists'
+DESC_INVALID_GROUP_ID = 'Invalid delete owner group id'
+DESC_INVALID_GROUP_TYPE = 'Invalid delete owner group type'
+DESC_NONEXISTENT_GROUP_ID = 'Invalid nonexistent delete owner group id'
 DOC_ID_EXISTS = '80038730'
 DOC_ID_VALID = '63166035'
 DOC_ID_INVALID_CHECKSUM = '63166034'
@@ -60,10 +63,8 @@ TEST_CHECKSUM_DATA = [
 # testdata pattern is ({description}, {valid}, {street}, {city}, {message content})
 TEST_LEGACY_REG_DATA = [
     (DESC_VALID, True, '0123456789012345678901234567890', '01234567890123456789', None),
-    ('Valid location street long', True, '01234567890123456789012345678901', 'KAMLOOPS',
-     validator.LEGACY_ADDRESS_STREET_TOO_LONG.format(add_desc='Location')),
-    ('Valid location city long', True, '1234 Front St.', '012345678901234567890',
-     validator.LEGACY_ADDRESS_CITY_TOO_LONG.format(add_desc='Location'))
+    ('Valid location street long', True, '01234567890123456789012345678901', 'KAMLOOPS', None),
+    ('Valid location city long', True, '1234 Front St.', '012345678901234567890', None)
 ]
 # testdata pattern is ({description}, {bus_name}, {first}, {middle}, {last}, {message content})
 TEST_PARTY_DATA = [
@@ -90,7 +91,12 @@ TEST_TRANSFER_DATA = [
     (DESC_MISSING_DOC_ID, False, True, None, validator.DOC_ID_REQUIRED, None),
     (DESC_DOC_ID_EXISTS, False, True, DOC_ID_EXISTS, validator.DOC_ID_EXISTS, None),
     ('Invalid EXEMPT', False, False, None, validator.STATE_NOT_ALLOWED, MhrRegistrationStatusTypes.EXEMPT),
-    ('Invalid HISTORICAL', False, False, None, validator.STATE_NOT_ALLOWED, MhrRegistrationStatusTypes.HISTORICAL)
+    ('Invalid HISTORICAL', False, False, None, validator.STATE_NOT_ALLOWED, MhrRegistrationStatusTypes.HISTORICAL),
+    (DESC_INVALID_GROUP_ID, False, False, None, validator.DELETE_GROUP_ID_INVALID, MhrRegistrationStatusTypes.ACTIVE),
+    (DESC_NONEXISTENT_GROUP_ID, False, False, None, validator.DELETE_GROUP_ID_NONEXISTENT,
+     MhrRegistrationStatusTypes.ACTIVE),
+    (DESC_INVALID_GROUP_TYPE, False, False, None, validator.DELETE_GROUP_TYPE_INVALID,
+     MhrRegistrationStatusTypes.ACTIVE)
 ]
 
 
@@ -129,11 +135,18 @@ def test_validate_transfer(session, desc, valid, staff, doc_id, message_content,
         json_data['documentId'] = doc_id
     elif json_data.get('documentId'):
         del json_data['documentId']
+    if valid:
+        json_data['deleteOwnerGroups'][0]['groupId'] = 2
+        json_data['deleteOwnerGroups'][0]['type'] = 'JOINT'
+    elif desc == DESC_NONEXISTENT_GROUP_ID:
+        json_data['deleteOwnerGroups'][0]['groupId'] = 10
+    elif desc == DESC_NONEXISTENT_GROUP_ID:
+        json_data['deleteOwnerGroups'][0]['type'] = 'SOLE'
     valid_format, errors = schema_utils.validate(json_data, 'transfer', 'mhr')
     # Additional validation not covered by the schema.
-    registration: MhrRegistration = None
+    registration: MhrRegistration = MhrRegistration.find_by_mhr_number('045349', 'PS12345')
     if status:
-        registration = MhrRegistration(status_type=status)
+        registration.status_type = status
     error_msg = validator.validate_transfer(registration, json_data, staff)
     if errors:
         current_app.logger.debug(errors)
@@ -142,7 +155,14 @@ def test_validate_transfer(session, desc, valid, staff, doc_id, message_content,
     else:
         assert error_msg != ''
         if message_content:
-            assert error_msg.find(message_content) != -1
+            if desc in (DESC_INVALID_GROUP_ID, DESC_INVALID_GROUP_TYPE):
+                expected = message_content.format(group_id=1)
+                assert error_msg.find(expected) != -1
+            elif desc == DESC_NONEXISTENT_GROUP_ID:
+                expected = message_content.format(group_id=10)
+                assert error_msg.find(expected) != -1
+            else:
+                assert error_msg.find(message_content) != -1
 
 
 @pytest.mark.parametrize('desc,bus_name,first,middle,last,message_content,data', TEST_PARTY_DATA)

@@ -17,7 +17,7 @@ from flask import current_app
 from sqlalchemy.sql import text
 
 from mhr_api.exceptions import DatabaseException
-from mhr_api.models import Db2Manuhome, utils as model_utils
+from mhr_api.models import Db2Manuhome, Db2Document, utils as model_utils
 from mhr_api.models.type_tables import MhrDocumentType, MhrRegistrationTypes
 from mhr_api.models.db import db
 
@@ -29,28 +29,6 @@ FROM_LEGACY_DOC_TYPE = {
     '103E': 'REG_103E'
 }
 
-QUERY_ACCOUNT_MHR_LEGACY_LAST = """
-SELECT mer.mhr_number, 'N' AS account_reg,
-       (SELECT COUNT(mrr.id)
-           FROM mhr_registrations mr, mhr_registration_reports mrr
-          WHERE mr.mhr_number = mer.mhr_number
-            AND mr.id = mrr.registration_id
-            AND mrr.doc_storage_url IS NOT NULL) AS report_count,
-      null as registration_ts
- FROM mhr_extra_registrations mer
-WHERE account_id = :query_value
-  AND (removed_ind IS NULL OR removed_ind != 'Y')
-UNION (
-SELECT mr.mhr_number, 'Y' AS account_reg,
-       (SELECT COUNT(mrr.id)
-           FROM mhr_registration_reports mrr
-          WHERE mr.id = mrr.registration_id
-            AND mrr.doc_storage_url IS NOT NULL) AS report_count,
-       mr.registration_ts
-  FROM mhr_registrations mr
-WHERE account_id = :query_value
-)
-"""
 QUERY_ACCOUNT_MHR_LEGACY = """
 SELECT DISTINCT mer.mhr_number, 'N' AS account_reg
  FROM mhr_extra_registrations mer
@@ -119,21 +97,6 @@ SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRI
    AND mh.mhregnum = d.mhregnum
    AND mh.regdocid = d.documtid
 """
-QUERY_ACCOUNT_REGISTRATIONS_PREV = """
-SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRIM(d.docutype),
-       (SELECT XMLSERIALIZE(XMLAGG ( XMLELEMENT ( NAME "owner", o2.ownrtype || TRIM(o2.ownrname))) AS CLOB)
-          FROM owner o2, owngroup og2
-         WHERE o2.manhomid = mh.manhomid
-           AND og2.manhomid = mh.manhomid
-           AND og2.owngrpid = o2.owngrpid
-           AND og2.status IN ('3', '4')) as owner_names,
-       TRIM(d.bcolacct)
-  FROM manuhome mh, document d
- WHERE mh.mhregnum IN (?)
-   AND mh.mhregnum = d.mhregnum
-   AND mh.regdocid = d.documtid
-ORDER BY d.regidate DESC
-"""
 QUERY_ACCOUNT_REGISTRATIONS = """
 SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRIM(d.docutype),
        (SELECT XMLSERIALIZE(XMLAGG ( XMLELEMENT ( NAME "owner", o2.ownrtype || TRIM(o2.ownrname))) AS CLOB)
@@ -147,7 +110,7 @@ SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRI
   FROM manuhome mh, document d
  WHERE mh.mhregnum IN (?)
    AND mh.mhregnum = d.mhregnum
-ORDER BY d.regidate DESC
+ORDER BY mh.updateda DESC, mh.updateti DESC, d.regidate DESC
 """
 REGISTRATION_DESC_NEW = 'REGISTER NEW UNIT'
 LEGACY_STATUS_DESCRIPTION = {
@@ -209,7 +172,7 @@ def find_summary_by_mhr_number(account_id: str, mhr_number: str, staff: bool):
     return registration
 
 
-def find_all_by_account_id(account_id: str, staff: bool):
+def find_all_by_account_id(account_id: str, staff: bool, collapse: bool = False):
     """Return a summary list of recent MHR registrations belonging to an account."""
     results = []
     # 1. get account and extra registrations from the Posgres table, then query DB2 by set of mhr numbers.
@@ -229,7 +192,7 @@ def find_all_by_account_id(account_id: str, staff: bool):
                     mhr_numbers += ','
                 mhr_numbers += f"'{mhr_number}'"
             query_text = QUERY_ACCOUNT_REGISTRATIONS.replace('?', mhr_numbers)
-            # current_app.logger.debug('Executing query=' + query_text)
+            current_app.logger.info('Executing query for mhr numbers=' + mhr_numbers)
             query = text(query_text)
             result = db.get_engine(current_app, 'db2').execute(query)
             rows = result.fetchall()
@@ -238,7 +201,10 @@ def find_all_by_account_id(account_id: str, staff: bool):
                     results.append(__build_summary(row, False))
             for result in results:
                 __update_summary_info(result, results, reg_summary_list, doc_types, staff, account_id)
-                del result['documentType']  # Not in the schema.
+                if not collapse:
+                    del result['documentType']  # Not in the schema.
+            if results and collapse:
+                results = __collapse_results(results)
         except Exception as db_exception:   # noqa: B902; return nicer error
             current_app.logger.error('DB2 find_all_by_account_id exception: ' + str(db_exception))
             raise DatabaseException(db_exception)
@@ -262,6 +228,11 @@ def get_doc_id_count(doc_id: str):
 def find_by_mhr_number(mhr_number: str):
     """Return the registration matching the MHR number."""
     return Db2Manuhome.find_by_mhr_number(mhr_number)
+
+
+def find_original_by_mhr_number(mhr_number: str):
+    """Return the registration matching the MHR number."""
+    return Db2Manuhome.find_original_by_mhr_number(mhr_number)
 
 
 def find_by_document_id(document_id: str):
@@ -357,10 +328,10 @@ def __update_summary_info(result, results, reg_summary_list, doc_types, staff, a
         doc_type = result.get('documentType')
         if FROM_LEGACY_DOC_TYPE.get(doc_type):
             doc_type = FROM_LEGACY_DOC_TYPE[doc_type]
-            for doc_rec in doc_types:
-                if doc_type == doc_rec.document_type:
-                    result['registrationDescription'] = doc_rec.document_type_desc
-                    break
+        for doc_rec in doc_types:
+            if doc_type == doc_rec.document_type:
+                result['registrationDescription'] = doc_rec.document_type_desc
+                break
     else:
         result['registrationDescription'] = summary_result.get('reg_description')
         result['username'] = summary_result.get('username')
@@ -370,7 +341,6 @@ def __update_summary_info(result, results, reg_summary_list, doc_types, staff, a
                     result['path'] = REGISTRATION_PATH + result.get('mhrNumber')
                 else:
                     result['path'] = DOCUMENT_PATH + result.get('documentId')
-        current_app.logger.info(f'Updated result {result}')
 
 
 def __build_summary(row, add_in_user_list: bool = True):
@@ -407,6 +377,24 @@ def __build_summary(row, add_in_user_list: bool = True):
     if add_in_user_list:
         summary['inUserList'] = False
     return summary
+
+
+def __collapse_results(results):
+    """Organized reults as parent-children mh registration-change registrations."""
+    registrations = []
+    for result in results:
+        if result['documentType'] in (Db2Document.DocumentTypes.CONV, Db2Document.DocumentTypes.MHREG_TRIM):
+            registrations.append(result)
+    for reg in registrations:
+        del reg['documentType']
+        changes = []
+        for result in results:
+            if result['mhrNumber'] == reg['mhrNumber'] and result['documentId'] != reg['documentId']:
+                del result['documentType']
+                changes.append(result)
+        if changes:
+            reg['changes'] = changes
+    return registrations
 
 
 def __get_summary_name(db2_name: str):
