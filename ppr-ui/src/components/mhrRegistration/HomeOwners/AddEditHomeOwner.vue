@@ -401,8 +401,10 @@ export default defineComponent({
             props.isMhrTransfer
           )
         }
+
+        // this should occur when trying to add the group and fractional info
         // check if group has some fractional data
-        if (localState.groupFractionalData.interestNumerator) {
+        if (localState.groupFractionalData.interestNumerator && localState.ownerGroupId) {
           setShowGroups(true)
 
           // Get fractional data based on owner's group id
@@ -411,6 +413,14 @@ export default defineComponent({
           }) as FractionalOwnershipWithGroupIdIF
 
           setGroupFractionalInterest(localState.ownerGroupId || '1', fractionalData)
+        } else if (localState.group) {
+          // this condition should only occur when trying to delete a group
+          // clear out any fractional info
+          delete localState.group.type
+          delete localState.group.interest
+          delete localState.group.interestNumerator
+          delete localState.group.interestTotal
+          delete localState.group.tenancySpecified
         }
 
         cancel()

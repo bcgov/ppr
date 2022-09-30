@@ -58,6 +58,7 @@
           <v-icon
             v-if="hasHomeOwners"
             color="green darken-2"
+            data-test-id="reg-owner-checkmark"
           >
             mdi-check
           </v-icon>

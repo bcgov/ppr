@@ -263,5 +263,75 @@ describe('Home Owners', () => {
     expect(fractionalOwnershipSections.exists()).toBeTruthy()
     const readonlyInterest = fractionalOwnershipSections.find(getTestId('readonly-interest-info'))
     expect(readonlyInterest.text()).toContain('Undivided 123/432')
+    clickDoneAddOwner()
+  })
+
+  it('should correctly display At Least One Owner check mark', async () => {
+    await store.dispatch('setMhrRegistrationHomeOwnerGroups', [{ groupId: '1', owners: [mockedPerson] }])
+
+    const registeredOwnerCheck = wrapper.findComponent(HomeOwners).find(getTestId('reg-owner-checkmark'))
+    expect(registeredOwnerCheck.exists()).toBeTruthy()
+    expect(registeredOwnerCheck.isVisible()).toBeTruthy()
+
+    await store.dispatch('setMhrRegistrationHomeOwnerGroups', [])
+    expect(
+      wrapper
+        .findComponent(HomeOwners)
+        .find(getTestId('reg-owner-checkmark'))
+        .exists()
+    ).toBeFalsy()
+  })
+
+  it('should have ability to clear the Group when only one Home Owner is in the table', async () => {
+    // as per requirement, Clear Group selection button (X) should be available in...
+    // ...Group dropdown when there is only one Owner and one Group in the table
+
+    // Testing strategy:
+    // 1. Add Owner and a Group
+    // 2. Test that Group is displayed for the Owner
+    // 3. Expand Edit Owner section and clear Group selection
+    // 4. Test that Fractional Ownership is not displayed for the Owner
+    // 5. Test that Group is not displayed for the Owner in the table
+
+    const homeOwnerGroup = [
+      {
+        groupId: '2',
+        owners: [mockedOrganization],
+        interest: 'Undivided',
+        interestNumerator: 123,
+        interestTotal: 432
+      }
+    ] as MhrRegistrationHomeOwnerGroupIF[]
+
+    await store.dispatch('setMhrRegistrationHomeOwnerGroups', homeOwnerGroup)
+
+    const homeOwnersData = wrapper.findComponent(HomeOwners).vm.$data
+    expect(homeOwnersData.getHomeOwners.length).toBe(1)
+    expect(homeOwnersData.isGlobalEditingMode).toBe(false)
+
+    await wrapper
+      .findComponent(HomeOwners)
+      .findComponent(HomeOwnersTable)
+      .find(getTestId('table-edit-btn'))
+      .trigger('click')
+
+    const addOwnerSection = wrapper.findComponent(HomeOwners).findComponent(AddEditHomeOwner)
+    expect(addOwnerSection.exists()).toBeTruthy()
+
+    const clearGroupButton = addOwnerSection
+      .findComponent(HomeOwnerGroups)
+      .find('.owner-groups-select')
+      .find('.v-icon.mdi-close')
+
+    expect(clearGroupButton.exists()).toBeTruthy()
+    await clearGroupButton.trigger('click')
+
+    expect(addOwnerSection.findComponent(FractionalOwnership).exists()).toBeFalsy()
+    await clickDoneAddOwner()
+
+    const ownersTable = wrapper.findComponent(HomeOwners).findComponent(HomeOwnersTable)
+    expect(ownersTable.text()).not.toContain('Group 1')
+    expect(ownersTable.text()).toContain(mockedOrganization.organizationName)
+    expect(ownersTable.text()).toContain(mockedOrganization.phoneNumber)
   })
 })
