@@ -57,6 +57,9 @@
             <div v-if="row.item.suffix" class="suffix">
               {{ row.item.suffix }}
             </div>
+            <v-chip v-if="isMhrTransfer" class="badge-added ml-8 mt-2" color="primary" label text-color="white" x-small>
+              <b>ADDED</b>
+            </v-chip>
           </td>
           <td>
             <base-address :schema="addressSchema" :value="row.item.address" />
@@ -276,7 +279,7 @@ export default defineComponent({
     color: #495057;
     font-size: 14px;
     line-height: 22px;
-    margin-left: 34px;
+    margin-left: 32px;
   }
   .theme--light.v-btn.v-btn--disabled {
     color:#1669bb !important;
