@@ -76,9 +76,9 @@ describe('Mhr Registration', () => {
   it('should render Added badge after Owner is added to the table', async () => {
 
     const mhrInformationComponent = wrapper.findComponent(MhrInformation)
-    expect(mhrInformationComponent.exists()).toBe(true)
+    expect(mhrInformationComponent.exists()).toBeTruthy()
 
-    expect(mhrInformationComponent.findComponent(HomeOwnersTable).exists()).toBe(true)
+    expect(mhrInformationComponent.findComponent(HomeOwnersTable).exists()).toBeTruthy()
     expect(mhrInformationComponent.findComponent(HomeOwnersTable).find(getTestId('no-data-msg')).isVisible()).toBeTruthy()
 
     const owners = [mockedPerson] as MhrRegistrationHomeOwnerIF[] // same IF for Transfer and Registration
@@ -91,6 +91,6 @@ describe('Mhr Registration', () => {
     expect(ownersTable.text()).toContain(mockedPerson.individualName.last)
 
     const addedBadge = ownersTable.find(getTestId('owner-added-badge'))
-    expect(addedBadge.isVisible()).toBe(true)
+    expect(addedBadge.isVisible()).toBeTruthy()
   })
 })
