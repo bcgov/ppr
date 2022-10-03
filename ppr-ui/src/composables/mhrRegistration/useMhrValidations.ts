@@ -21,6 +21,25 @@ export const useMhrValidations = (validationState: any) => {
     return validationState.reviewConfirmValid.value.validateSteps && !validationState[section].value[component]
   }
 
+  /** Reset submission validations to default . */
+  const resetAllValidations = (): void => {
+    // Reset your home validations
+    setValidation(MhrSectVal.YOUR_HOME_VALID, MhrCompVal.MAKE_MODEL_VALID, false)
+    setValidation(MhrSectVal.YOUR_HOME_VALID, MhrCompVal.HOME_SECTION_VALID, false)
+    setValidation(MhrSectVal.YOUR_HOME_VALID, MhrCompVal.HOME_CERTIFICATION_VALID, false)
+    setValidation(MhrSectVal.YOUR_HOME_VALID, MhrCompVal.REBUILT_STATUS_VALID, false)
+    setValidation(MhrSectVal.YOUR_HOME_VALID, MhrCompVal.OTHER_VALID, false)
+    // Reset submitting party validations
+    setValidation(MhrSectVal.SUBMITTING_PARTY_VALID, MhrCompVal.SUBMITTER_VALID, false)
+    setValidation(MhrSectVal.SUBMITTING_PARTY_VALID, MhrCompVal.DOC_ID_VALID, false)
+    setValidation(MhrSectVal.SUBMITTING_PARTY_VALID, MhrCompVal.REF_NUM_VALID, false)
+    // Reset home owner validations
+    setValidation(MhrSectVal.HOME_OWNERS_VALID, MhrCompVal.OWNERS_VALID, false)
+    // Reset home location validations
+    setValidation(MhrSectVal.LOCATION_VALID, MhrCompVal.LOCATION_TYPE_VALID, false)
+    setValidation(MhrSectVal.LOCATION_VALID, MhrCompVal.CIVIC_ADDRESS_VALID, false)
+  }
+
   /** Is true when input field ref is in error. */
   const hasError = (ref: any): boolean => {
     return ref?.hasError
@@ -56,6 +75,7 @@ export const useMhrValidations = (validationState: any) => {
     getValidation,
     getSectionValidation,
     getStepValidation,
+    resetAllValidations,
     scrollToInvalid
   }
 }
