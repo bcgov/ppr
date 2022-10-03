@@ -49,7 +49,7 @@ export const mockedOrganization: MhrRegistrationHomeOwnerIF = {
 }
 
 export const mockedFractionalOwnership: MhrRegistrationFractionalOwnershipIF = {
-  interest: "Undivided", 
+  interest: 'Undivided',
   interestNumerator: 1,
   interestTotal: 4
 }
