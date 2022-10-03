@@ -103,7 +103,9 @@ export default defineComponent({
       removeGroupDropdownValidation: false,
       groupItems: computed(() => getGroupDropdownItems(props.isAddingHomeOwner, props.groupId)),
       groupRules: computed(() => {
-        return showGroups.value && localState.removeGroupDropdownValidation ? required('Select a group for this owner') : []
+        return showGroups.value && localState.removeGroupDropdownValidation
+          ? required('Select a group for this owner')
+          : []
       }),
       groupFractionalData: find(getMhrRegistrationHomeOwnerGroups.value, { groupId: props.groupId }),
       fractionalInfo: computed(() => props.fractionalData),

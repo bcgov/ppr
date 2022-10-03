@@ -13,7 +13,7 @@
           >Return to this step to complete it.
         </router-link>
       </div>
-      <section class="px-6 my-2" v-if="hasHomeOwners">
+      <section class="px-6 my-2" v-if="hasHomeOwners || hasGroups">
         <article class="border-btm py-5">
           <v-row no-gutters data-test-id="home-tenancy-type">
             <v-col cols="3"><span class="generic-label">Home Tenancy Type </span></v-col>
@@ -47,9 +47,14 @@ export default defineComponent({
   components: { HomeOwnersTable },
   // eslint-disable-next-line
   setup() {
-    const { getMhrRegistrationHomeOwners, getMhrRegistrationValidationModel } = useGetters<any>([
+    const {
+      getMhrRegistrationHomeOwners,
+      getMhrRegistrationValidationModel,
+      getMhrRegistrationHomeOwnerGroups
+    } = useGetters<any>([
       'getMhrRegistrationHomeOwners',
-      'getMhrRegistrationValidationModel'
+      'getMhrRegistrationValidationModel',
+      'getMhrRegistrationHomeOwnerGroups'
     ])
 
     const { MhrSectVal, getStepValidation } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
@@ -61,7 +66,8 @@ export default defineComponent({
 
     const localState = reactive({
       homeOwners: computed(() => getMhrRegistrationHomeOwners.value),
-      hasHomeOwners: computed(() => localState.homeOwners.length > 0),
+      hasHomeOwners: computed(() => !!getMhrRegistrationHomeOwners.value.find(owner => owner.id)),
+      hasGroups: computed(() => getMhrRegistrationHomeOwnerGroups.value.length > 0),
       showStepError: computed(() => !getStepValidation(MhrSectVal.HOME_OWNERS_VALID))
     })
 
