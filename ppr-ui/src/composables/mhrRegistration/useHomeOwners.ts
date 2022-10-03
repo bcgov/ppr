@@ -110,10 +110,6 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
     }
   }
 
-  const getInterestString = (): string => {
-    return getMhrRegistrationHomeOwnerGroups !== undefined &&
-    getMhrRegistrationHomeOwnerGroups.value.length >= 1 ? getMhrRegistrationHomeOwnerGroups.value[0].interest : ''
-  }
   const hasMinimumGroups = (): boolean => {
     return !getMhrRegistrationHomeOwnerGroups.value || getMhrRegistrationHomeOwnerGroups.value.length < 2
   }
@@ -366,7 +362,6 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
     setGlobalEditingMode,
     deleteGroup,
     setGroupFractionalInterest,
-    hasMinimumGroups,
-    getInterestString
+    hasMinimumGroups
   }
 }

@@ -99,8 +99,7 @@
           </span>
         </div>
         <div v-show="showGroups">
-          <span class="generic-label">Total Ownership Allocated:</span>
-          <span> {{ interestType }} </span>{{ ownershipAllocation.totalAllocation }}
+          <span class="generic-label">Total Ownership Allocated:</span> {{ ownershipAllocation.totalAllocation }}
           <span v-show="ownershipAllocation.hasTotalAllocationError" class="error-text fs-14 ml-3"
             >Total ownership must equal 1/1</span
           >
@@ -179,23 +178,21 @@ export default defineComponent({
       isGlobalEditingMode,
       showGroups,
       getTotalOwnershipAllocationStatus,
-      hasMinimumGroups,
-      getInterestString
+      hasMinimumGroups
     } = useHomeOwners()
 
     const localState = reactive({
       showAddPersonSection: false,
       showAddPersonOrganizationSection: false,
-      disableAddHomeOwnerBtn: computed(() => {
-        return localState.showAddPersonOrganizationSection || localState.showAddPersonSection
-      }),
+      disableAddHomeOwnerBtn: computed(
+        () => localState.showAddPersonOrganizationSection || localState.showAddPersonSection
+      ),
       ownershipAllocation: computed(
         () => getTotalOwnershipAllocationStatus() as MhrRegistrationTotalOwnershipAllocationIF
       ),
       hasHomeOwners: computed(() => !!getMhrRegistrationHomeOwners.value.find(owner => owner.id)),
-      isValidGroups: computed(() => { return hasMinimumGroups() }),
-      homeTenancyType: computed(() => { return getHomeTenancyType() }),
-      interestType: computed(() => { return getInterestString() }),
+      isValidGroups: computed(() => hasMinimumGroups()),
+      homeTenancyType: computed(() => getHomeTenancyType()),
       getHomeOwners: computed(() => {
         return props.isMhrTransfer
           ? getMhrTransferHomeOwners.value
@@ -216,7 +213,6 @@ export default defineComponent({
       getMhrRegistrationHomeOwners,
       isGlobalEditingMode,
       getHomeTenancyType,
-      getInterestString,
       showGroups,
       ...toRefs(localState)
     }

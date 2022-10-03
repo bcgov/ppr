@@ -159,10 +159,15 @@ export default defineComponent({
 #mhr-home-owner-groups::v-deep {
   ul {
     color: $gray7;
+    font-size: 16px;
     line-height: 24px;
   }
   .owner-groups-select {
     width: 200px;
+  }
+
+  .v-icon.mdi-close {
+    color: $primary-blue;
   }
 }
 </style>
