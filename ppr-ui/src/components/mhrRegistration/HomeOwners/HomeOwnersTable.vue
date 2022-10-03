@@ -57,6 +57,17 @@
             <div v-if="row.item.suffix" class="suffix">
               {{ row.item.suffix }}
             </div>
+            <v-chip
+              v-if="isMhrTransfer"
+              class="badge-added ml-8 mt-2"
+              color="primary"
+              label
+              text-color="white"
+              x-small
+              data-test-id="owner-added-badge"
+            >
+              <b>ADDED</b>
+            </v-chip>
           </td>
           <td>
             <base-address :schema="addressSchema" :value="row.item.address" />
@@ -111,7 +122,7 @@
         </tr>
       </template>
       <template v-slot:no-data>
-        <div class="error-text pa-4 text-center">No owners added yet.</div>
+        <div class="error-text pa-4 text-center" data-test-id="no-data-msg">No owners added yet.</div>
       </template>
     </v-data-table>
   </v-card>
@@ -276,7 +287,7 @@ export default defineComponent({
     color: #495057;
     font-size: 14px;
     line-height: 22px;
-    margin-left: 34px;
+    margin-left: 32px;
   }
   .theme--light.v-btn.v-btn--disabled {
     color:#1669bb !important;
