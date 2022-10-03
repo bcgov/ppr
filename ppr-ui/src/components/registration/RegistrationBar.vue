@@ -4,7 +4,7 @@
       <v-col>
         <div class="actions">
           <v-btn
-            v-if="isMhr && !isRoleQualifiedSupplier"
+            v-if="isMhr && (!isRoleQualifiedSupplier || isRoleStaff)"
             filled
             class="mhr-registration-bar-btn px-5"
             @click="newRegistration(MhrRegistrationType)"
@@ -57,8 +57,8 @@ export default defineComponent({
   },
   emits: ['selected-registration-type'],
   setup (props, { emit }) {
-    const { getAccountProductSubscriptions, isRoleQualifiedSupplier } =
-      useGetters<any>(['getAccountProductSubscriptions', 'isRoleQualifiedSupplier'])
+    const { getAccountProductSubscriptions, isRoleQualifiedSupplier, isRoleStaff } =
+      useGetters<any>(['getAccountProductSubscriptions', 'isRoleQualifiedSupplier', 'isRoleStaff'])
     const { setRegistrationTypeOtherDesc } = useActions<any>(['setRegistrationTypeOtherDesc'])
     const localState = reactive({
       labelText: 'Start a New Personal Property Registration'
@@ -78,6 +78,7 @@ export default defineComponent({
 
     return {
       hasRPPR,
+      isRoleStaff,
       isRoleQualifiedSupplier,
       newRegistration,
       MhrRegistrationType,
