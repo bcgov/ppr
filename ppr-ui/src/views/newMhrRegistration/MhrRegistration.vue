@@ -105,6 +105,7 @@ export default defineComponent({
       setValidation,
       getValidation,
       getStepValidation,
+      resetAllValidations,
       scrollToInvalid
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
@@ -194,7 +195,7 @@ export default defineComponent({
         localState.submitting = true
         const mhrSubmission = await submitMhrRegistration(buildApiData(), parseStaffPayment())
         localState.submitting = false
-
+        resetAllValidations()
         mhrSubmission?.mhrNumber
           ? await context.root.$router.push({ name: RouteNames.DASHBOARD })
           : console.log(mhrSubmission?.error) // Handle Schema or Api errors here..
