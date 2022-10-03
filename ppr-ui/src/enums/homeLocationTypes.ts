@@ -1,8 +1,8 @@
 export enum HomeLocationTypes {
-  LOT = 'lot',
-  HOME_PARK = 'homePark',
-  OTHER_LAND = 'otherLand',
-  OTHER_RESERVE = 'reserve',
-  OTHER_STRATA = 'strata',
-  OTHER_TYPE = 'otherType'
+  LOT = 'MANUFACTURER',
+  HOME_PARK = 'MH_PARK',
+  OTHER_LAND = 'OTHER',
+  OTHER_RESERVE = 'RESERVE',
+  OTHER_STRATA = 'STRATA',
+  OTHER_TYPE = 'OTHER'
 }
