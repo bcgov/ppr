@@ -6,10 +6,14 @@ import VueRouter from 'vue-router'
 import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
 
 // local components
-import { MhrInformation } from '@/views'
+import { HomeOwners, MhrInformation } from '@/views'
 import { StickyContainer } from '@/components/common'
 import mockRouter from './MockRouter'
 import { RouteNames } from '@/enums'
+import { HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
+import { getTestId } from './utils'
+import { mockedPerson } from './test-data/mock-mhr-registration'
+import { MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF } from '@/interfaces'
 
 Vue.use(Vuetify)
 
@@ -67,5 +71,26 @@ describe('Mhr Registration', () => {
   it('renders and displays the correct sub components', async () => {
     // Sticky container w/ Fee Summary
     expect(wrapper.findComponent(StickyContainer).exists()).toBe(true)
+  })
+
+  it('should render Added badge after Owner is added to the table', async () => {
+
+    const mhrInformationComponent = wrapper.findComponent(MhrInformation)
+    expect(mhrInformationComponent.exists()).toBe(true)
+
+    expect(mhrInformationComponent.findComponent(HomeOwnersTable).exists()).toBe(true)
+    expect(mhrInformationComponent.findComponent(HomeOwnersTable).find(getTestId('no-data-msg')).isVisible()).toBeTruthy()
+
+    const owners = [mockedPerson] as MhrRegistrationHomeOwnerIF[] // same IF for Transfer and Registration
+    const homeOwnerGroup = [{ groupId: '1', owners: owners }] as MhrRegistrationHomeOwnerGroupIF[]
+
+    await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerGroup)
+
+    const ownersTable = mhrInformationComponent.findComponent(HomeOwners).findComponent(HomeOwnersTable)
+    expect(ownersTable.text()).toContain(mockedPerson.individualName.first)
+    expect(ownersTable.text()).toContain(mockedPerson.individualName.last)
+
+    const addedBadge = ownersTable.find(getTestId('owner-added-badge'))
+    expect(addedBadge.isVisible()).toBe(true)
   })
 })

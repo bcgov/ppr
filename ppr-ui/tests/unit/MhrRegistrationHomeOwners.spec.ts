@@ -138,6 +138,10 @@ describe('Home Owners', () => {
     // there should be no grouping shown in the table because we didn't select a group during add
     expect(ownersTable.text()).not.toContain('Group 1')
 
+    // there should be no 'Added' badge shown, as the badge is only for MHR Transfers
+    const addedBadge = ownersTable.find(getTestId('owner-added-badge'))
+    expect(addedBadge.exists()).toBeFalsy()
+
     // add an organization
     homeOwnerGroup[0].owners.push(mockedOrganization)
     await store.dispatch('setMhrRegistrationHomeOwnerGroups', homeOwnerGroup)
