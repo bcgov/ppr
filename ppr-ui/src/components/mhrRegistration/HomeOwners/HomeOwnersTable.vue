@@ -115,8 +115,11 @@
         </tr>
         <tr v-else>
           <td :colspan="4" class="py-1">
-            <div class="error-text my-6 text-center">
+            <div v-if="showGroups" class="error-text my-6 text-center">
               Group must contain at least one owner
+            </div>
+            <div v-else class="my-6 text-center">
+              No owners added yet
             </div>
           </td>
         </tr>
