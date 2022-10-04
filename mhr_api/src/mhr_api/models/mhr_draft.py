@@ -31,7 +31,7 @@ from .db import db
 QUERY_ACCOUNT_DRAFTS_LIMIT = ' FETCH FIRST :max_results_size ROWS ONLY'
 QUERY_ACCOUNT_DRAFTS_DEFAULT_ORDER = ' ORDER BY create_ts DESC'
 QUERY_ACCOUNT_DRAFTS_BASE = """
-SELECT d.mhr_number, d.create_ts, d.registration_type, rt.registration_type_desc,
+SELECT d.draft_number, d.create_ts, d.registration_type, rt.registration_type_desc,
        d.draft ->> 'clientReferenceId' AS clientReferenceId,
        CASE WHEN d.update_ts IS NOT NULL THEN d.update_ts ELSE d.create_ts END last_update_ts,
        CASE WHEN d.draft -> 'submittingParty' IS NOT NULL THEN
@@ -46,7 +46,7 @@ SELECT d.mhr_number, d.create_ts, d.registration_type, rt.registration_type_desc
                     ELSE (SELECT u.firstname || ' ' || u.lastname
                             FROM users u
                            WHERE u.username = d.user_id) END) AS registering_name,
-       d.account_id
+       d.mhr_number
   FROM mhr_drafts d, mhr_registration_types rt
  WHERE d.account_id = :query_account
    AND d.registration_type = rt.registration_type
@@ -95,14 +95,16 @@ class MhrDraft(db.Model):
     @property
     def json(self) -> dict:
         """Return the draft as a json object."""
-        draft = self.draft
-
-        draft['createDateTime'] = model_utils.format_ts(self.create_ts)
+        draft = {
+            'createDateTime': model_utils.format_ts(self.create_ts),
+            'type': self.registration_type,
+            'draftNumber': self.draft_number,
+            'registration': self.draft
+        }
         if self.update_ts:
             draft['lastUpdateDateTime'] = model_utils.format_ts(self.update_ts)
-        if self.draft_number:
-            draft['draftNumber'] = self.draft_number
-
+        else:
+            draft['lastUpdateDateTime'] = model_utils.format_ts(self.create_ts)
         return draft
 
     @classmethod
@@ -134,6 +136,9 @@ class MhrDraft(db.Model):
         ref_id = str(row[4])
         if not ref_id or ref_id == 'None':
             ref_id = ''
+        mhr_num = str(row[8])
+        if not mhr_num or mhr_num == 'None':
+            mhr_num = ''
         draft_json = {
             'draftNumber': str(row[0]),
             'createDateTime': model_utils.format_ts(row[1]),
@@ -143,7 +148,8 @@ class MhrDraft(db.Model):
             'path': '/mhr/api/v1/drafts/' + str(row[0]),
             'submittingParty': str(row[6]),
             'registeringName': registering_name,
-            'clientReferenceId': ref_id
+            'clientReferenceId': ref_id,
+            'mhrNumber': mhr_num
         }
         return draft_json
 
@@ -180,7 +186,7 @@ class MhrDraft(db.Model):
         """Delete a draft statement by document ID."""
         draft = None
         if draft_number:
-            draft = cls.find_by_draft_number(draft_number, True)
+            draft = cls.find_by_draft_number(draft_number, False)
         if draft:
             db.session.delete(draft)
             db.session.commit()
@@ -198,11 +204,11 @@ class MhrDraft(db.Model):
     def update(cls, request_json, draft_number: str = None):
         """Update an existing draft statement by document number."""
         draft = None
-        if request_json and draft_number:
+        if request_json and request_json.get('registration') and draft_number:
             draft = cls.find_by_draft_number(draft_number, False)
         if draft:
             draft.update_ts = model_utils.now_ts()
-            draft.draft = request_json
+            draft.draft = request_json.get('registration')
         return draft
 
     @staticmethod
@@ -210,12 +216,12 @@ class MhrDraft(db.Model):
         """Create a draft object from a json Draft schema object: map json to db."""
         draft: MhrDraft = MhrDraft()
         draft.account_id = account_id
-        draft.registration_type = json_data.get('registrationType', MhrRegistrationTypes.MHREG)
-        draft.draft = json_data
+        draft.registration_type = json_data.get('type', MhrRegistrationTypes.MHREG)
+        draft.draft = json_data.get('registration')
         if user_id:
             draft.user_id = user_id
-        if json_data.get('mhrNumber'):
-            draft.mhr_number = json_data.get('mhrNumber')
+        if json_data.get('registration') and 'mhrNumber' in json_data['registration']:
+            draft.mhr_number = json_data['registration']['mhrNumber']
         # Not null constraint: should be removed if staff can submit requests without an account id.
         if not account_id:
             draft.account_id = 'NA'

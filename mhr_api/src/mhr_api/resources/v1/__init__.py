@@ -18,6 +18,7 @@ from typing import Optional
 from flask import Flask
 
 from .documents import bp as documents_bp
+from .drafts import bp as drafts_bp
 from .manufacturer import bp as manufacturers_bp
 from .meta import bp as meta_bp
 from .ops import bp as ops_bp
@@ -46,6 +47,7 @@ class V1Endpoint:
         self.app = app
 
         self.app.register_blueprint(documents_bp)
+        self.app.register_blueprint(drafts_bp)
         self.app.register_blueprint(manufacturers_bp)
         self.app.register_blueprint(meta_bp)
         self.app.register_blueprint(ops_bp)
