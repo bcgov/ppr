@@ -74,7 +74,6 @@ describe('Mhr Registration', () => {
   })
 
   it('should render Added badge after Owner is added to the table', async () => {
-
     const mhrInformationComponent = wrapper.findComponent(MhrInformation)
     expect(mhrInformationComponent.exists()).toBeTruthy()
 
