@@ -17,11 +17,11 @@
     />
     <div v-if="!isEditGroupMode" class="group-header-summary">
       <div>
-        <span class="pr-4 font-weight-bold" :class="{'pl-8': !showEditActions }">Group {{ groupId }}</span>
+        <span class="pr-4 font-weight-bold group-id" :class="{ 'pl-8': !showEditActions }">Group {{ groupId }}</span>
         |
         <span class="px-4">Owners: {{ owners.length }} </span>
         |
-        <span class="px-4" :class="{'ml-1': !showEditActions }">Group Tenancy Type: {{ group.type }}</span>
+        <span class="px-4" :class="{ 'ml-1': !showEditActions }">Group Tenancy Type: {{ group.type }}</span>
         |
         <span class="px-4"> Interest: {{ getOwnershipInterest() }} </span>
       </div>
@@ -193,11 +193,16 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+@import '@/assets/styles/theme.scss';
 .group-header::v-deep {
   .group-header-summary {
     display: flex;
     align-items: center;
     justify-content: space-between;
+
+    .group-id {
+      color: $gray9 !important;
+    }
   }
   .theme--light.v-text-field--filled.background-white > .v-input__control > .v-input__slot {
     background: white;

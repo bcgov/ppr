@@ -42,7 +42,7 @@
           <td class="owner-name">
             <div v-if="row.item.individualName" class="owner-icon-name">
               <v-icon class="mr-2">mdi-account</v-icon>
-              <div class="owner-name-bold">
+              <div class="font-weight-bold">
                 {{ row.item.individualName.first }}
                 {{ row.item.individualName.middle }}
                 {{ row.item.individualName.last }}
@@ -50,7 +50,7 @@
             </div>
             <div v-else class="owner-icon-name">
               <v-icon class="mr-2">mdi-domain</v-icon>
-              <div>
+              <div class="font-weight-bold">
                 {{ row.item.organizationName }}
               </div>
             </div>
@@ -115,19 +115,19 @@
         </tr>
         <tr v-else>
           <td :colspan="4" class="py-1">
-            <div class="my-6 text-center">
-              No owners added yet.
+            <div class="error-text my-6 text-center">
+              Group must contain at least one owner
             </div>
           </td>
         </tr>
       </template>
       <template v-slot:no-data>
-        <div class="error-text pa-4 text-center" data-test-id="no-data-msg">No owners added yet.</div>
+        <div class="pa-4 text-center" data-test-id="no-data-msg">No owners added yet.</div>
       </template>
     </v-data-table>
   </v-card>
 </template>
-
+``
 <script lang="ts">
 import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
 import { homeOwnersTableHeaders, homeOwnersTableHeadersReview } from '@/resources/tableHeaders'
@@ -163,14 +163,15 @@ export default defineComponent({
       deleteGroup,
       isGlobalEditingMode,
       setGlobalEditingMode,
-      hasEmptyGroup
+      hasEmptyGroup,
+      hasMinimumGroups
     } = useHomeOwners()
 
     const localState = reactive({
       currentlyEditingHomeOwnerId: -1,
       isEditingMode: computed((): boolean => localState.currentlyEditingHomeOwnerId >= 0),
       isAddingMode: computed((): boolean => props.isAdding),
-      showTableError: computed((): boolean => hasEmptyGroup.value && showGroups.value),
+      showTableError: computed((): boolean => showGroups.value && (hasMinimumGroups() || hasEmptyGroup.value)),
       showEditActions: computed((): boolean => !props.isReadonlyTable),
       homeOwnersTableHeaders: props.isReadonlyTable ? homeOwnersTableHeadersReview : homeOwnersTableHeaders
     })
@@ -213,6 +214,7 @@ export default defineComponent({
       remove,
       deleteGroup,
       isGlobalEditingMode,
+      hasMinimumGroups,
       ...toRefs(localState)
     }
   }
@@ -229,14 +231,8 @@ export default defineComponent({
   }
 
   .owner-name,
-  i {
+  .owner-name i {
     color: $gray9 !important;
-    font-weight: bold;
-  }
-
-  .owner-name-bold {
-    color: #212529;
-    font-weight: bold;
   }
 
   table {
@@ -284,7 +280,7 @@ export default defineComponent({
   }
 
   .suffix {
-    color: #495057;
+    color: $gray7;
     font-size: 14px;
     line-height: 22px;
     margin-left: 32px;
