@@ -129,16 +129,12 @@ export const useNewMhrRegistration = () => {
       // @ts-ignore - TODO: Mhr-Submission - api asks for number, maybe fix this once step 3 is finished?
       ownerGroup.groupId = parseInt(ownerGroup.groupId)
 
-      ownerGroup.type = getTenancyTypeFromDescription(ownerGroup.type)
+      ownerGroup.type = Object.keys(HomeTenancyTypes).find(key => HomeTenancyTypes[key] as string === ownerGroup.type)
     })
 
     return ownerGroups
   }
 
-  const getTenancyTypeFromDescription = (tenancyType: string): string => {
-    var indexOfType = Object.values(HomeTenancyTypes).indexOf(tenancyType as string as HomeTenancyTypes)
-    return Object.keys(HomeTenancyTypes)[indexOfType]
-  }
   const parseDescription = (): MhrRegistrationDescriptionIF => {
     let description: MhrRegistrationDescriptionIF = getMhrRegistrationHomeDescription.value
 
