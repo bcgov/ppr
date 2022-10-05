@@ -337,5 +337,47 @@ describe('Home Owners', () => {
     expect(ownersTable.text()).not.toContain('Group 1')
     expect(ownersTable.text()).toContain(mockedOrganization.organizationName)
     expect(ownersTable.text()).toContain(mockedOrganization.phoneNumber)
+
+  })
+
+  it('should keep the Group shown after clearing dropdown but then clicking Cancel', async () => {
+
+    const homeOwnerGroup = [
+      {
+        groupId: '123',
+        owners: [mockedPerson],
+        interest: 'Undivided',
+        interestNumerator: 111,
+        interestTotal: 777
+      }
+    ] as MhrRegistrationHomeOwnerGroupIF[]
+
+    await store.dispatch('setMhrRegistrationHomeOwnerGroups', homeOwnerGroup)
+
+    const homeOwnersData = wrapper.findComponent(HomeOwners).vm.$data
+    expect(homeOwnersData.getHomeOwners.length).toBe(1)
+    expect(homeOwnersData.isGlobalEditingMode).toBe(false)
+
+    await wrapper
+      .findComponent(HomeOwners)
+      .findComponent(HomeOwnersTable)
+      .find(getTestId('table-edit-btn'))
+      .trigger('click')
+
+    const addOwnerSection = wrapper.findComponent(HomeOwners).findComponent(AddEditHomeOwner)
+
+    const clearGroupButton = addOwnerSection
+    .findComponent(HomeOwnerGroups)
+    .find('.owner-groups-select')
+    .find('.v-icon.mdi-close')
+
+    await clearGroupButton.trigger('click')
+    await clickCancelAddOwner()
+
+    const ownersTable = wrapper.findComponent(HomeOwners).findComponent(HomeOwnersTable)
+    expect(ownersTable.text()).toContain('Group 123')
+    expect(ownersTable.text()).toContain(mockedPerson.individualName.first)
+    expect(ownersTable.text()).toContain(mockedPerson.individualName.last)
+    expect(ownersTable.text()).toContain(mockedPerson.phoneNumber)
   })
 })

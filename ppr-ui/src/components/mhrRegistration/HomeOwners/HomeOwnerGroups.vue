@@ -95,7 +95,7 @@ export default defineComponent({
     const groupDropdown = ref(null)
 
     const { required } = useInputRules()
-    const { getGroupDropdownItems, showGroups, setShowGroups } = useHomeOwners()
+    const { getGroupDropdownItems, showGroups } = useHomeOwners()
     const homeOwnerGroups = [...getMhrRegistrationHomeOwnerGroups.value]
 
     const localState = reactive({
@@ -130,9 +130,6 @@ export default defineComponent({
     })
 
     const setOwnerGroupId = (groupId: string): void => {
-      if (!groupId) {
-        setShowGroups(false)
-      }
       emit('setOwnerGroupId', groupId)
     }
 

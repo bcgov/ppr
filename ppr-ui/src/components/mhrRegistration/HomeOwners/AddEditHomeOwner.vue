@@ -388,6 +388,9 @@ export default defineComponent({
       // @ts-ignore - function exists
       context.refs.addHomeOwnerForm.validate()
       if (localState.isHomeOwnerFormValid && localState.isAddressFormValid) {
+        if (!localState.ownerGroupId) {
+          setShowGroups(false)
+        }
         if (props.editHomeOwner) {
           editHomeOwner(
             localState.owner as MhrRegistrationHomeOwnerIF,
@@ -433,6 +436,7 @@ export default defineComponent({
       context.emit('remove')
     }
     const cancel = (): void => {
+      localState.ownerGroupId = props.editHomeOwner?.groupId
       context.emit('cancel')
     }
 
