@@ -8,6 +8,250 @@
 	},
 	"item": [
 		{
+			"name": "drafts",
+			"item": [
+				{
+					"name": "Get account drafts",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"accept": true
+						}
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"value": "{{account_id}}",
+								"type": "text"
+							},
+							{
+								"key": "Prefer",
+								"value": "example=/api/v1/drafts/get",
+								"description": "Prism only local  mock server header.",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/drafts",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"drafts"
+							]
+						},
+						"description": "Get drafts example."
+					},
+					"response": []
+				},
+				{
+					"name": "Create a draft Transfer",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"accept": true
+						}
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"value": "{{account_id}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"TRANS\",\n  \"registration\": {\n    \"mhrNumber\": \"125234\",\n    \"clientReferenceId\": \"EX-TRANS-002\",\n    \"submittingParty\": {\n      \"personName\": {\n        \"first\": \"JOHN\",\n        \"middle\": \"B\",\n        \"last\": \"SMITH\"\n      },\n      \"address\": {\n        \"street\": \"222 SUMMER STREET\",\n        \"city\": \"VICTORIA\",\n        \"region\": \"BC\",\n        \"country\": \"CA\",\n        \"postalCode\": \"V8W 2V8\"\n      },\n      \"emailAddress\": \"jbsmith@gmail.com\",\n      \"phoneNumber\": \"2504930122\",\n      \"phoneExtension\": \"\"\n    },\n    \"deleteOwnerGroups\": [\n      {\n        \"groupId\": 1,\n        \"owners\": [\n          {\n            \"individualName\": {\n              \"first\": \"MARY-ANNE\",\n              \"last\": \"BICKNELL\"\n            },\n            \"address\": {\n              \"street\": \"6665 238TH STREET\",\n              \"city\": \"LANGLEY\",\n              \"region\": \"BC\",\n              \"country\": \"CA\",\n              \"postalCode\": \"V3A 6H4\"\n            },\n            \"phoneNumber\": \"6044620279\"\n          }\n        ],\n        \"type\": \"SOLE\",\n        \"status\": \"ACTIVE\"\n      }\n    ],\n    \"addOwnerGroups\": [\n      {\n        \"groupId\": 2,\n        \"owners\": [\n          {\n            \"individualName\": {\n              \"first\": \"JOHN\",\n              \"middle\": \"STEVEN\",\n              \"last\": \"CONNOLLY\"\n            },\n            \"address\": {\n              \"street\": \"6665 238TH STREET\",\n              \"city\": \"LANGLEY\",\n              \"region\": \"BC\",\n              \"country\": \"CA\",\n              \"postalCode\": \"V3A 6H4\"\n            },\n            \"phoneNumber\": \"6044620279\"\n          }\n        ],\n        \"type\": \"SOLE\"\n      }\n    ],\n    \"deathOfOwner\": false\n  }\n}\n"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/drafts",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"drafts"
+							]
+						},
+						"description": "Example of a request to create a draft of a Financing Statement.."
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve a Transfer draft",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"accept": true
+						}
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Prefer",
+								"value": "example=/api/v1/drafts/D0034002/get",
+								"description": "Prism only local  mock server header.",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/drafts/100169",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"drafts",
+								"100169"
+							]
+						},
+						"description": "Get a draft Amendment Statement example."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Transfer Draft",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"accept": true
+						}
+					},
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Prefer",
+								"value": "example=/api/v1/drafts/D0034001/put",
+								"description": "Prism only local  mock server header.",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"draftId\": \"100169\",\n  \"createDateTime\": \"2022-11-23T14:31:01-08:00\",\n  \"lastUpdateDateTime\": \"2022-11-23T14:31:01-08:00\",\n  \"type\": \"TRANS\",\n  \"registration\": {\n    \"mhrNumber\": \"125234\",\n    \"clientReferenceId\": \"EX-TRANS-0022\",\n    \"submittingParty\": {\n      \"personName\": {\n        \"first\": \"JOHN\",\n        \"middle\": \"BARNARD\",\n        \"last\": \"SMITH\"\n      },\n      \"address\": {\n        \"street\": \"222 SUMMER STREET\",\n        \"city\": \"VICTORIA\",\n        \"region\": \"BC\",\n        \"country\": \"CA\",\n        \"postalCode\": \"V8W 2V8\"\n      },\n      \"emailAddress\": \"jbsmith@gmail.com\",\n      \"phoneNumber\": \"2504930122\",\n      \"phoneExtension\": \"\"\n    },\n    \"deleteOwnerGroups\": [\n      {\n        \"groupId\": 1,\n        \"owners\": [\n          {\n            \"individualName\": {\n              \"first\": \"MARY-ANNE\",\n              \"last\": \"BICKNELL\"\n            },\n            \"address\": {\n              \"street\": \"6665 238TH STREET\",\n              \"city\": \"LANGLEY\",\n              \"region\": \"BC\",\n              \"country\": \"CA\",\n              \"postalCode\": \"V3A 6H4\"\n            },\n            \"phoneNumber\": \"6044620279\"\n          }\n        ],\n        \"type\": \"SOLE\",\n        \"status\": \"ACTIVE\"\n      }\n    ],\n    \"addOwnerGroups\": [\n      {\n        \"groupId\": 2,\n        \"owners\": [\n          {\n            \"individualName\": {\n              \"first\": \"JOHN\",\n              \"middle\": \"STEVEN\",\n              \"last\": \"CONNOLLY\"\n            },\n            \"address\": {\n              \"street\": \"6665 238TH STREET\",\n              \"city\": \"LANGLEY\",\n              \"region\": \"BC\",\n              \"country\": \"CA\",\n              \"postalCode\": \"V3A 6H4\"\n            },\n            \"phoneNumber\": \"6044620279\"\n          }\n        ],\n        \"type\": \"SOLE\"\n      }\n    ],\n    \"deathOfOwner\": false\n  }\n}\n"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/drafts/100169",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"drafts",
+								"100169"
+							]
+						},
+						"description": "Update draft by ID example."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete draft by ID",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"accept": true
+						}
+					},
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Account-Id",
+								"value": "{{account_id}}",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/drafts/100169",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"drafts",
+								"100169"
+							]
+						},
+						"description": "Delete draft by ID example."
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "searches",
 			"item": [
 				{
