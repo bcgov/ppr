@@ -209,72 +209,72 @@ import {
   }
 })
 export default class AmendRegistration extends Vue {
-  @Getter getRegistrationType: RegistrationTypeIF;
-  @Getter getAddSecuredPartiesAndDebtors: AddPartiesIF;
-  @Getter getStateModel: StateModelIF;
-  @Getter getLengthTrust: LengthTrustIF;
-  @Getter getAmendmentDescription: string;
-  @Getter getConfirmDebtorName: DebtorNameIF;
-  @Getter getOriginalAddCollateral: AddCollateralIF;
-  @Getter getOriginalAddSecuredPartiesAndDebtors: AddPartiesIF;
-  @Getter getOriginalLengthTrust: LengthTrustIF;
-  @Getter getAddCollateral: AddCollateralIF;
-  @Getter getCourtOrderInformation: CourtOrderIF;
-  @Getter hasUnsavedChanges: Boolean;
+  @Getter getRegistrationType: RegistrationTypeIF
+  @Getter getAddSecuredPartiesAndDebtors: AddPartiesIF
+  @Getter getStateModel: StateModelIF
+  @Getter getLengthTrust: LengthTrustIF
+  @Getter getAmendmentDescription: string
+  @Getter getConfirmDebtorName: DebtorNameIF
+  @Getter getOriginalAddCollateral: AddCollateralIF
+  @Getter getOriginalAddSecuredPartiesAndDebtors: AddPartiesIF
+  @Getter getOriginalLengthTrust: LengthTrustIF
+  @Getter getAddCollateral: AddCollateralIF
+  @Getter getCourtOrderInformation: CourtOrderIF
+  @Getter hasUnsavedChanges: Boolean
 
-  @Action setAddCollateral: ActionBindingIF;
-  @Action setStaffPayment: ActionBindingIF;
-  @Action setAddSecuredPartiesAndDebtors: ActionBindingIF;
-  @Action setAmendmentDescription: ActionBindingIF;
-  @Action setCourtOrderInformation: ActionBindingIF;
-  @Action setFolioOrReferenceNumber: ActionBindingIF;
-  @Action setLengthTrust: ActionBindingIF;
-  @Action setOriginalAddCollateral: ActionBindingIF;
-  @Action setOriginalAddSecuredPartiesAndDebtors: ActionBindingIF;
-  @Action setOriginalLengthTrust: ActionBindingIF;
-  @Action setRegistrationCreationDate: ActionBindingIF;
-  @Action setRegistrationExpiryDate: ActionBindingIF;
-  @Action setRegistrationNumber: ActionBindingIF;
-  @Action setRegistrationType: ActionBindingIF;
-  @Action setRegistrationFlowType: ActionBindingIF;
-  @Action setCertifyInformation: ActionBindingIF;
-  @Action setCollateralShowInvalid: ActionBindingIF;
-  @Action setRegTableNewItem: ActionBindingIF;
-  @Action setUnsavedChanges: ActionBindingIF;
+  @Action setAddCollateral: ActionBindingIF
+  @Action setStaffPayment: ActionBindingIF
+  @Action setAddSecuredPartiesAndDebtors: ActionBindingIF
+  @Action setAmendmentDescription: ActionBindingIF
+  @Action setCourtOrderInformation: ActionBindingIF
+  @Action setFolioOrReferenceNumber: ActionBindingIF
+  @Action setLengthTrust: ActionBindingIF
+  @Action setOriginalAddCollateral: ActionBindingIF
+  @Action setOriginalAddSecuredPartiesAndDebtors: ActionBindingIF
+  @Action setOriginalLengthTrust: ActionBindingIF
+  @Action setRegistrationCreationDate: ActionBindingIF
+  @Action setRegistrationExpiryDate: ActionBindingIF
+  @Action setRegistrationNumber: ActionBindingIF
+  @Action setRegistrationType: ActionBindingIF
+  @Action setRegistrationFlowType: ActionBindingIF
+  @Action setCertifyInformation: ActionBindingIF
+  @Action setCollateralShowInvalid: ActionBindingIF
+  @Action setRegTableNewItem: ActionBindingIF
+  @Action setUnsavedChanges: ActionBindingIF
 
   /** Whether App is ready. */
   @Prop({ default: false })
-  private appReady: boolean;
+  private appReady: boolean
 
   @Prop({ default: false })
-  private isJestRunning: boolean;
+  private isJestRunning: boolean
 
   private cautionTxt =
-    'The Registry will provide the verification statement to all Secured Parties named in this registration.';
+    'The Registry will provide the verification statement to all Secured Parties named in this registration.'
 
-  private dataLoaded = false; // eslint-disable-line lines-between-class-members
-  private dataLoadError = false;
-  private feeType = FeeSummaryTypes.AMEND;
-  private financingStatementDate: Date = null;
-  private debtorValid = true;
-  private showInvalid = false;
-  private showCourtInvalid = false;
-  private securedPartiesValid = true;
-  private registrationLengthTrustValid = true;
-  private collateralValid = true;
-  private courtOrderValid = true;
-  private fromConfirmation = false;
-  private requireCourtOrder = false;
-  private debtorOpen = false;
-  private securedPartyOpen = false;
-  private errorBar = false;
-  private collateralOpen = false;
-  private lengthTrustOpen = false;
-  private detailsValid = false;
-  private amendErrMsg = '';
-  private options: DialogOptionsIF = unsavedChangesDialog;
-  private showCancelDialog = false;
-  private submitting = false;
+  private dataLoaded = false // eslint-disable-line lines-between-class-members
+  private dataLoadError = false
+  private feeType = FeeSummaryTypes.AMEND
+  private financingStatementDate: Date = null
+  private debtorValid = true
+  private showInvalid = false
+  private showCourtInvalid = false
+  private securedPartiesValid = true
+  private registrationLengthTrustValid = true
+  private collateralValid = true
+  private courtOrderValid = true
+  private fromConfirmation = false
+  private requireCourtOrder = false
+  private debtorOpen = false
+  private securedPartyOpen = false
+  private errorBar = false
+  private collateralOpen = false
+  private lengthTrustOpen = false
+  private detailsValid = false
+  private amendErrMsg = ''
+  private options: DialogOptionsIF = unsavedChangesDialog
+  private showCancelDialog = false
+  private submitting = false
 
   private get asOfDateTime (): string {
     // return formatted date
