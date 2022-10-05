@@ -484,7 +484,7 @@ export default class AmendRegistration extends Vue {
 
   private confirmAmendment (): void {
     this.validateSecuredParties()
-    this.validateDeptors()
+    this.validateDebtors()
     if (this.collateralOpen || this.securedPartyOpen || this.debtorOpen || this.lengthTrustOpen) {
       this.amendErrMsg = '< You have unfinished changes'
       this.showInvalid = true
@@ -672,7 +672,7 @@ export default class AmendRegistration extends Vue {
     }
   }
 
-  private validateDeptors (): void {
+  private validateDebtors (): void {
     const sp = this.getAddSecuredPartiesAndDebtors.debtors
     let debtorCount = 0
     if (this.registrationType === APIRegistrationTypes.SECURITY_AGREEMENT) {
