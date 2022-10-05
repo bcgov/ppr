@@ -438,17 +438,8 @@ export default defineComponent({
       } else {
         localState.myRegAddDialog.textExtra[1] += 'N/A'
       }
-      const regType = AllRegistrationTypes.find((regType: RegistrationTypeIF) => {
-        if (regType.registrationTypeAPI === reg.statusType) {
-          return true
-        }
-      })
-      if (regType) {
-        localState.myRegAddDialog.textExtra[2] += regType.registrationTypeUI
-      } else {
-        // Just in case some type gets added/changed and is not picked up by the UI.
-        localState.myRegAddDialog.textExtra[2] += 'Legacy'
-      }
+      localState.myRegAddDialog.textExtra[2] +=
+        reg.registrationDescription?.length > 0 ? reg.registrationDescription : 'N/A'
       localState.myRegAddDialog.textExtra[3] += reg.submittingParty
       localState.myRegAddDialogDisplay = true
     }
