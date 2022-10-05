@@ -261,6 +261,9 @@ class MhrRegistrationTypes(BaseEnum):
     MHREG = 'MHREG'
     TRAND = 'TRAND'
     TRANS = 'TRANS'
+    EXEMPTION_RES = 'EXEMPTION_RES'
+    EXEMPTION_NON_RES = 'EXEMPTION_NON_RES'
+    PERMIT = 'PERMIT'
 
 
 class MhrStatusTypes(BaseEnum):
