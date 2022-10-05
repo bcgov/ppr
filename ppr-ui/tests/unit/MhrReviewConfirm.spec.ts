@@ -134,7 +134,7 @@ describe('Mhr Review Confirm registration', () => {
     await store.dispatch('setMhrRegistrationHomeOwnerGroups', homeOwnerGroup)
 
     const HomeOwnerReview = wrapper.findComponent(HomeOwnersReview)
-    HomeOwnerReview.vm.$data.showGroups = true // set show groups so 
+    HomeOwnerReview.vm.$data.showGroups = true // set show groups so
     await Vue.nextTick()
 
     expect(HomeOwnerReview.exists()).toBeTruthy()
