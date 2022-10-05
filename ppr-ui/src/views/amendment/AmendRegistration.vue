@@ -482,6 +482,8 @@ export default class AmendRegistration extends Vue {
   }
 
   private confirmAmendment (): void {
+    this.validateSecuredParties()
+    this.validateDebtors()
     if (this.collateralOpen || this.securedPartyOpen || this.debtorOpen || this.lengthTrustOpen) {
       this.amendErrMsg = '< You have unfinished changes'
       this.showInvalid = true
@@ -489,7 +491,7 @@ export default class AmendRegistration extends Vue {
       this.scrollToInvalid()
       return
     }
-    if (!this.hasAmendmentChanged()) {
+    if (!this.hasAmendmentChanged() || !this.debtorValid || !this.securedPartiesValid) {
       this.amendErrMsg = '< Please make any required changes'
       return
     }
@@ -649,6 +651,42 @@ export default class AmendRegistration extends Vue {
       this.amendErrMsg = ''
     }
     this.debtorValid = val
+  }
+
+  private validateSecuredParties (): void {
+    const sp = this.getAddSecuredPartiesAndDebtors.securedParties
+    let securedPartyCount = 0
+    if (this.registrationType === APIRegistrationTypes.SECURITY_AGREEMENT) {
+      for (let i = 0; i < sp.length; i++) {
+        // is valid if there is at least one secured party
+        if (sp[i].action !== ActionTypes.REMOVED) {
+          securedPartyCount++
+        }
+      }
+      if (securedPartyCount >= 1) {
+        this.setValidSecuredParties(true)
+      } else {
+        this.setValidSecuredParties(false)
+      }
+    }
+  }
+
+  private validateDebtors (): void {
+    const sp = this.getAddSecuredPartiesAndDebtors.debtors
+    let debtorCount = 0
+    if (this.registrationType === APIRegistrationTypes.SECURITY_AGREEMENT) {
+      for (let i = 0; i < sp.length; i++) {
+        // is valid if there is at least one secured party
+        if (sp[i].action !== ActionTypes.REMOVED) {
+          debtorCount++
+        }
+      }
+      if (debtorCount >= 1) {
+        this.setValidDebtor(true)
+      } else {
+        this.setValidDebtor(false)
+      }
+    }
   }
 
   private isCrownError (): boolean {
