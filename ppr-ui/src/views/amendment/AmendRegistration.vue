@@ -54,6 +54,7 @@
             @securedPartyOpen="securedPartyOpen = $event"
             :setShowInvalid="showInvalid" class="pt-4"
             :setShowErrorBar="errorBar"
+            @emitSecuredPartyValidityInterface="getSecuredPartyValid"
           />
           <div v-if="!securedPartiesValid">
           <span v-if="isCrownError()" class="invalid-message">
@@ -482,6 +483,8 @@ export default class AmendRegistration extends Vue {
   }
 
   private confirmAmendment (): void {
+    this.validateSecuredParties()
+    this.validateDeptors()
     if (this.collateralOpen || this.securedPartyOpen || this.debtorOpen || this.lengthTrustOpen) {
       this.amendErrMsg = '< You have unfinished changes'
       this.showInvalid = true
@@ -649,6 +652,42 @@ export default class AmendRegistration extends Vue {
       this.amendErrMsg = ''
     }
     this.debtorValid = val
+  }
+
+  private validateSecuredParties (): void {
+    const sp = this.getAddSecuredPartiesAndDebtors.securedParties
+    let securedPartyCount = 0
+    if (this.registrationType === APIRegistrationTypes.SECURITY_AGREEMENT) {
+      for (let i = 0; i < sp.length; i++) {
+      // is valid if there is at least one secured party
+        if (sp[i].action !== ActionTypes.REMOVED) {
+          securedPartyCount++
+        }
+      }
+      if (securedPartyCount >= 1) {
+        this.securedPartiesValid = true
+      } else {
+        this.securedPartiesValid = false
+      }
+    }
+  }
+
+  private validateDeptors (): void {
+    const sp = this.getAddSecuredPartiesAndDebtors.debtors
+    let debtorCount = 0
+    if (this.registrationType === APIRegistrationTypes.SECURITY_AGREEMENT) {
+      for (let i = 0; i < sp.length; i++) {
+      // is valid if there is at least one secured party
+        if (sp[i].action !== ActionTypes.REMOVED) {
+          debtorCount++
+        }
+      }
+      if (debtorCount >= 1) {
+        this.debtorValid = true
+      } else {
+        this.debtorValid = false
+      }
+    }
   }
 
   private isCrownError (): boolean {
