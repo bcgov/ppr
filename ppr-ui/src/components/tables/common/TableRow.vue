@@ -299,18 +299,42 @@
       </v-row>
 
       <!-- MHR ACTIONS -->
-      <v-row v-else class="actions" :class="$style['mhr-actions']" no-gutters>
-        <v-col class="pa-0" cols="auto">
+      <v-row v-else-if="isEnabledMhr(item)" class="actions" no-gutters>
+        <v-col class="edit-action pa-0" cols="auto">
           <v-btn
-            v-if="enableOpenMhr(item.statusType)"
             color="primary"
             elevation="0"
             width="100"
-            :class="$style['open-btn']"
+            :class="$style['edit-btn']"
             @click="openMhr(item)"
           >
             <span>Open</span>
           </v-btn>
+        </v-col>
+        <v-col class="actions__more pa-0" v-if="!isExpired(item) && !isDischarged(item)">
+          <v-menu offset-y left nudge-bottom="4" @input="freezeScrolling($event)">
+            <template v-slot:activator="{ on: onMenu, value }">
+              <v-btn
+                small
+                elevation="0"
+                v-on="onMenu"
+                color="primary"
+                class="actions__more-actions__btn reg-table"
+                :class="$style['down-btn']"
+              >
+                <v-icon v-if="value">mdi-menu-up</v-icon>
+                <v-icon v-else>mdi-menu-down</v-icon>
+              </v-btn>
+            </template>
+            <v-list class="actions__more-actions registration-actions">
+              <v-list-item @click="handleAction(item, TableActions.REMOVE)">
+                <v-list-item-subtitle>
+                  <v-icon small>mdi-delete</v-icon>
+                  <span class="ml-1">Remove From Table</span>
+                </v-list-item-subtitle>
+              </v-list-item>
+            </v-list>
+          </v-menu>
         </v-col>
       </v-row>
     </td>
@@ -325,7 +349,14 @@ import { useGetters } from 'vuex-composition-helpers'
 /* eslint-disable no-unused-vars */
 import { BaseHeaderIF, DraftResultIF, MhRegistrationSummaryIF, RegistrationSummaryIF } from '@/interfaces'
 /* eslint-enable no-unused-vars */
-import { APIRegistrationTypes, APIStatusTypes, DraftTypes, TableActions, UIRegistrationClassTypes } from '@/enums'
+import {
+  APIMhrDescriptionTypes,
+  APIRegistrationTypes,
+  APIStatusTypes,
+  DraftTypes,
+  TableActions,
+  UIRegistrationClassTypes
+} from '@/enums'
 import { useRegistration } from '@/composables/useRegistration'
 import moment from 'moment'
 
@@ -395,8 +426,11 @@ export default defineComponent({
       })
     }
 
-    const tooltipTxtPdf = (item: DraftResultIF): string => {
-      if (!item.registeringName) {
+    const tooltipTxtPdf = (item): string => {
+      if (!props.isPpr) {
+        return 'Documents are only available to the Submitting Party of this filing. To view the details of this ' +
+          'registration you must conduct a search.'
+      } else if (!item.registeringName) {
         return 'Verification Statements are only available ' +
       'to Secured Parties or the Registering Party of this filing. To ' +
       'view the details of this registration you must conduct a search.'
@@ -463,8 +497,9 @@ export default defineComponent({
       }
     }
 
-    const enableOpenMhr = (status: APIStatusTypes) => {
-      return status === APIStatusTypes.MHR_ACTIVE && isRoleQualifiedSupplier.value
+    const isEnabledMhr = (item: MhRegistrationSummaryIF) => {
+      return item.statusType === APIStatusTypes.MHR_ACTIVE && isRoleQualifiedSupplier.value &&
+        item.registrationDescription === APIMhrDescriptionTypes.REGISTER_NEW_UNIT
     }
 
     const openMhr = (item: MhRegistrationSummaryIF): void => {
@@ -482,8 +517,12 @@ export default defineComponent({
       emit('freezeScroll', isMenuOpen)
     }
 
-    const handleAction = (item: RegistrationSummaryIF, action: TableActions): void => {
-      emit('action', { action: action, regNum: item.baseRegistrationNumber })
+    const handleAction = (item, action: TableActions): void => {
+      const registrationNumber = props.isPpr
+        ? item.baseRegistrationNumber
+        : item.mhrNumber
+
+      emit('action', { action: action, regNum: registrationNumber })
     }
 
     const inSelectedHeaders = (search: string) => {
@@ -643,7 +682,7 @@ export default defineComponent({
       toggleExpand,
       tooltipTxtPdf,
       openMhr,
-      enableOpenMhr,
+      isEnabledMhr,
       ...toRefs(localState)
     }
   }

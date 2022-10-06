@@ -7,6 +7,7 @@ import {
 export interface MhrTransferIF {
   mhrNumber: string
   ownerGroups: MhrRegistrationHomeOwnerGroupIF[]
+  currentOwnerGroups?: MhrRegistrationHomeOwnerGroupIF[]
   submittingParty: PartyIF
 }
 

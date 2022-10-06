@@ -1,7 +1,7 @@
 <template>
-  <v-container v-if="dataLoaded" class="view-container pa-0" fluid>
+  <v-container class="view-container pa-0" fluid>
 
-    <v-overlay v-model="submitting">
+    <v-overlay v-model="loading">
       <v-progress-circular color="primary" size="50" indeterminate />
     </v-overlay>
 
@@ -19,7 +19,7 @@
               </v-col>
             </v-row>
 
-            <section>
+            <section v-if="dataLoaded" class="py-4">
               <header class="review-header mt-1">
                 <v-icon class="ml-1" color="darkBlue">mdi-home</v-icon>
                 <label class="font-weight-bold pl-2">Home Owners</label>
@@ -73,7 +73,7 @@ import { computed, defineComponent, onMounted, reactive, toRefs } from '@vue/com
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { RouteNames } from '@/enums'
-import { pacificDate, submitMhrTransfer } from '@/utils'
+import { fetchMhRegistration, pacificDate, submitMhrTransfer } from '@/utils'
 import { StickyContainer } from '@/components/common'
 import { useHomeOwners, useMhrInformation } from '@/composables'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
@@ -100,6 +100,12 @@ export default defineComponent({
       'getMhrTransferHomeOwners', 'getMhrInformation'
     ])
 
+    const {
+      setMhrTransferHomeOwnerGroups, setMhrTransferCurrentHomeOwnerGroups
+    } = useActions<any>([
+      'setMhrTransferHomeOwnerGroups', 'setMhrTransferCurrentHomeOwnerGroups'
+    ])
+
     const { setEmptyMhrTransfer } = useActions<any>(['setEmptyMhrTransfer'])
 
     const {
@@ -113,7 +119,7 @@ export default defineComponent({
 
     const localState = reactive({
       dataLoaded: false,
-      submitting: false,
+      loading: false,
       isReviewMode: false,
       validate: false,
       feeType: FeeSummaryTypes.MHR_TRANSFER, // FUTURE STATE: To be dynamic, dependent on what changes have been made
@@ -137,26 +143,41 @@ export default defineComponent({
       })
     })
 
-    onMounted((): void => {
+    onMounted(async (): Promise<void> => {
       // do not proceed if app is not ready
       // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
       if (!props.appReady || !localState.isAuthenticated) {
         goToDash()
         return
       }
-
       // page is ready to view
-      setEmptyMhrTransfer(initMhrTransfer())
       context.emit('emitHaveData', true)
+
+      localState.loading = true
+      setEmptyMhrTransfer(initMhrTransfer())
+      // Set baseline MHR Information to state
+      await parseMhrInformation()
+      localState.loading = false
+
       localState.dataLoaded = true
     })
+
+    const parseMhrInformation = async (): Promise<void> => {
+      // Future state to parse all relevant MHR Information
+      const { data } = await fetchMhRegistration(getMhrInformation.value.mhrNumber)
+      const currentOwnerGroups = data.ownerGroups || [] // Safety check. Should always have ownerGroups
+      setMhrTransferHomeOwnerGroups(currentOwnerGroups)
+
+      // Store a snapshot of the existing OwnerGroups for baseline of current state
+      setMhrTransferCurrentHomeOwnerGroups(currentOwnerGroups)
+    }
 
     const goToReview = async (): Promise<void> => {
       localState.validate = true
       if (localState.isReviewMode) {
-        localState.submitting = true
+        localState.loading = true
         const mhrTransferFiling = await submitMhrTransfer(buildApiData(), getMhrInformation.value.mhrNumber)
-        localState.submitting = false
+        localState.loading = false
 
         !mhrTransferFiling.error
           ? goToDash()

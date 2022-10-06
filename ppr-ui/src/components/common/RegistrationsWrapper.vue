@@ -182,7 +182,7 @@ import {
   convertDate,
   deleteDraft, deleteRegistrationSummary, draftHistory,
   getMHRegistrationSummary, getRegistrationSummary, registrationHistory,
-  setupFinancingStatementDraft, updateUserSettings
+  setupFinancingStatementDraft, updateUserSettings, deleteMhRegistrationSummary
 } from '@/utils'
 import {
   amendConfirmationDialog, dischargeConfirmationDialog,
@@ -241,13 +241,14 @@ export default defineComponent({
       resetNewRegistration, setRegistrationType, setRegTableCollapsed, setRegTableNewItem, setLengthTrust,
       setAddCollateral, setAddSecuredPartiesAndDebtors, setUnsavedChanges, setRegTableDraftsBaseReg,
       setRegTableDraftsChildReg, setRegTableTotalRowCount, setRegTableBaseRegs, setRegTableSortPage,
-      setRegTableSortHasMorePages, setRegTableSortOptions, setUserSettings, resetRegTableData, setMhrInformation
+      setRegTableSortHasMorePages, setRegTableSortOptions, setUserSettings, resetRegTableData, setMhrInformation,
+      setMhrTableHistory
     } = useActions<any>([
       'resetNewRegistration', 'setRegistrationType', 'setRegTableCollapsed', 'setRegTableNewItem', 'setLengthTrust',
       'setAddCollateral', 'setAddSecuredPartiesAndDebtors', 'setUnsavedChanges', 'setRegTableDraftsBaseReg',
       'setRegTableDraftsChildReg', 'setRegTableTotalRowCount', 'setRegTableBaseRegs', 'setRegTableSortPage',
       'setRegTableSortHasMorePages', 'setRegTableSortOptions', 'setUserSettings', 'resetRegTableData',
-      'setMhrInformation'
+      'setMhrInformation', 'setMhrTableHistory'
     ])
 
     const localState = reactive({
@@ -647,7 +648,9 @@ export default defineComponent({
           removeDraft(localState.myRegActionRegNum, localState.myRegActionDocId)
         }
         if (localState.myRegAction === TableActions.REMOVE) {
-          removeRegistration(localState.myRegActionRegNum)
+          props.isPpr
+            ? removeRegistration(localState.myRegActionRegNum)
+            : removeMhRegistration(localState.myRegActionRegNum)
         }
       }
       localState.myRegAction = null
@@ -695,6 +698,18 @@ export default defineComponent({
       // remove from table
         setRegTableBaseRegs(getRegTableBaseRegs.value.filter(reg => reg.baseRegistrationNumber !== regNum))
         setRegTableTotalRowCount(getRegTableTotalRowCount.value - 1)
+      }
+      localState.loading = false
+    }
+
+    const removeMhRegistration = async (mhrNum: string): Promise<void> => {
+      localState.loading = true
+      const removal = await deleteMhRegistrationSummary(mhrNum)
+      if (removal.statusCode !== StatusCodes.NO_CONTENT) {
+        emitError(removal)
+      } else {
+        // remove from table
+        setMhrTableHistory(getMhRegTableBaseRegs.value.filter(reg => reg.mhrNumber !== mhrNum))
       }
       localState.loading = false
     }

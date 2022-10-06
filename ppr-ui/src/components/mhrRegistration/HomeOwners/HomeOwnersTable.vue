@@ -38,7 +38,7 @@
           </td>
         </tr>
 
-        <tr v-else-if="row.item.id" :key="row.item.id" class="owner-info">
+        <tr v-else-if="row.item" :key="row.item.id" class="owner-info">
           <td class="owner-name">
             <div v-if="row.item.individualName" class="owner-icon-name">
               <v-icon class="mr-2">mdi-account</v-icon>
@@ -58,7 +58,7 @@
               {{ row.item.suffix }}
             </div>
             <v-chip
-              v-if="isMhrTransfer"
+              v-if="hasAddedHomeOwner(row.item.id)"
               class="badge-added ml-8 mt-2"
               color="primary"
               label
@@ -127,7 +127,7 @@
     </v-data-table>
   </v-card>
 </template>
-``
+
 <script lang="ts">
 import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
 import { homeOwnersTableHeaders, homeOwnersTableHeadersReview } from '@/resources/tableHeaders'
@@ -144,7 +144,8 @@ import { MhrRegistrationHomeOwnerIF } from '@/interfaces'
 export default defineComponent({
   name: 'HomeOwnersTable',
   props: {
-    homeOwners: { default: [] as MhrRegistrationHomeOwnerIF[] },
+    homeOwners: { default: () => [] as MhrRegistrationHomeOwnerIF[] },
+    currentHomeOwners: { default: () => [] as MhrRegistrationHomeOwnerIF[] },
     isAdding: { default: false },
     isReadonlyTable: { type: Boolean, default: false },
     isMhrTransfer: { type: Boolean, default: false }
@@ -196,6 +197,10 @@ export default defineComponent({
       return owners.length > 0 && owners[0]?.id !== undefined
     }
 
+    const hasAddedHomeOwner = (id: string): boolean => {
+      return props.currentHomeOwners?.some(currentOwner => currentOwner.id !== id)
+    }
+
     watch(
       () => localState.currentlyEditingHomeOwnerId,
       () => {
@@ -215,6 +220,7 @@ export default defineComponent({
       deleteGroup,
       isGlobalEditingMode,
       hasMinimumGroups,
+      hasAddedHomeOwner,
       ...toRefs(localState)
     }
   }

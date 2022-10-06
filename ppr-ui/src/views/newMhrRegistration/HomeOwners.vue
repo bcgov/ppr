@@ -127,6 +127,7 @@
     <div>
       <HomeOwnersTable
         :homeOwners="getHomeOwners"
+        :currentHomeOwners="getMhrTransferCurrentHomeOwners"
         :isAdding="disableAddHomeOwnerBtn"
         :isMhrTransfer="isMhrTransfer"
       />
@@ -168,9 +169,10 @@ export default defineComponent({
     }
   },
   setup (props) {
-    const { getMhrRegistrationHomeOwners, getMhrTransferHomeOwners } = useGetters<any>([
-      'getMhrRegistrationHomeOwners', 'getMhrTransferHomeOwners'
-    ])
+    const { getMhrRegistrationHomeOwners, getMhrTransferHomeOwners, getMhrTransferCurrentHomeOwners } =
+      useGetters<any>([
+        'getMhrRegistrationHomeOwners', 'getMhrTransferHomeOwners', 'getMhrTransferCurrentHomeOwners'
+      ])
 
     const {
       getHomeTenancyType,
@@ -211,6 +213,7 @@ export default defineComponent({
 
     return {
       getMhrRegistrationHomeOwners,
+      getMhrTransferCurrentHomeOwners,
       isGlobalEditingMode,
       getHomeTenancyType,
       showGroups,
