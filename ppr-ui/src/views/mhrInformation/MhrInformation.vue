@@ -165,7 +165,7 @@ export default defineComponent({
     const parseMhrInformation = async (): Promise<void> => {
       // Future state to parse all relevant MHR Information
       const { data } = await fetchMhRegistration(getMhrInformation.value.mhrNumber)
-      const currentOwnerGroups = data.ownerGroups || [] // Safety check. Should always have ownerGroups
+      const currentOwnerGroups = data?.ownerGroups || [] // Safety check. Should always have ownerGroups
       setMhrTransferHomeOwnerGroups(currentOwnerGroups)
 
       // Store a snapshot of the existing OwnerGroups for baseline of current state
