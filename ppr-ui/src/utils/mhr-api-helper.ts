@@ -418,7 +418,6 @@ export async function submitMhrTransfer (payloadData, mhrNumber) {
   }
 }
 
-// delete registration summary information from table
 export async function fetchMhRegistration (
   mhRegistrationNum: string
 ): Promise<any> {
@@ -455,7 +454,6 @@ export async function fetchMhRegistration (
     })
 }
 
-// delete registration summary information from table
 export async function deleteMhRegistrationSummary (
   mhRegistrationNum: string
 ): Promise<ErrorIF> {

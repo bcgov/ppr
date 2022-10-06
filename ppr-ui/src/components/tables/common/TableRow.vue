@@ -311,7 +311,7 @@
             <span>Open</span>
           </v-btn>
         </v-col>
-        <v-col class="actions__more pa-0" v-if="!isExpired(item) && !isDischarged(item)">
+        <v-col class="actions__more pa-0">
           <v-menu offset-y left nudge-bottom="4" @input="freezeScrolling($event)">
             <template v-slot:activator="{ on: onMenu, value }">
               <v-btn
