@@ -425,7 +425,7 @@ export async function fetchMhRegistration (
   const config = { baseURL: url, headers: { Accept: 'application/json' } }
 
   return axios
-    .get(`registrations/${mhRegistrationNum}`, config)
+    .get(`registrations/${mhRegistrationNum}?current=true`, config)
     .then(response => {
       return response
     })
