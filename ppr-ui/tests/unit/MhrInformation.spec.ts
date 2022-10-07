@@ -14,6 +14,8 @@ import { HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
 import { getTestId } from './utils'
 import { mockedPerson } from './test-data/mock-mhr-registration'
 import { MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF } from '@/interfaces'
+import { nextTick } from '@vue/composition-api'
+import { mockedDebtorNames } from './test-data'
 
 Vue.use(Vuetify)
 
@@ -57,6 +59,30 @@ describe('Mhr Registration', () => {
 
   beforeEach(async () => {
     wrapper = createComponent()
+    await store.dispatch('setMhrTransferCurrentHomeOwnerGroups', [
+      {
+        groupId: 1,
+        interest: '',
+        interestNumerator: 0,
+        owners: [
+          {
+            address: {
+              city: 'KELOWNA, BC V1X 7T1',
+              country: 'CA',
+              postalCode: '',
+              region: 'BC',
+              street: '3075 SEXSMITH ROAD'
+            },
+            organizationName: 'CHAPARRAL INDUSTRIES (86) INC.',
+            phoneNumber: '2507652985',
+            type: 'SOLE'
+          }
+        ],
+        status: 'PREVIOUS',
+        tenancySpecified: true,
+        type: 'SOLE'
+      }
+    ])
   })
 
   afterEach(() => {
@@ -74,9 +100,10 @@ describe('Mhr Registration', () => {
   })
 
   it('should render Added badge after Owner is added to the table', async () => {
-
     const mhrInformationComponent = wrapper.findComponent(MhrInformation)
     expect(mhrInformationComponent.exists()).toBeTruthy()
+    wrapper.vm.$data.dataLoaded = true
+    await nextTick()
 
     expect(mhrInformationComponent.findComponent(HomeOwnersTable).exists()).toBeTruthy()
     expect(mhrInformationComponent.findComponent(HomeOwnersTable).find(getTestId('no-data-msg')).isVisible()).toBeTruthy()

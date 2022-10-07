@@ -360,3 +360,11 @@ export const setMhrTransferHomeOwnerGroups: ActionIF = (
   commit('mutateMhrTransferHomeOwnerGroups', groups)
   commit('mutateUnsavedChanges', true)
 }
+
+// Set a snapshot of the MH Registration home owner groups
+export const setMhrTransferCurrentHomeOwnerGroups: ActionIF = (
+  { commit },
+  groups: MhrRegistrationHomeOwnerGroupIF[]
+): void => {
+  commit('mutateMhrTransferCurrentHomeOwnerGroups', groups)
+}

@@ -7,7 +7,7 @@ import {
   ManufacturedHomeSearchResultIF,
   SearchResponseIF,
   MhrSearchCriteriaIF,
-  MhRegistrationSummaryIF
+  MhRegistrationSummaryIF, ErrorIF
 } from '@/interfaces'
 import { ErrorCategories, ErrorCodes } from '@/enums'
 import { useSearch } from '@/composables/useSearch'
@@ -416,4 +416,76 @@ export async function submitMhrTransfer (payloadData, mhrNumber) {
       }
     }
   }
+}
+
+export async function fetchMhRegistration (
+  mhRegistrationNum: string
+): Promise<any> {
+  const url = sessionStorage.getItem('MHR_API_URL')
+  const config = { baseURL: url, headers: { Accept: 'application/json' } }
+
+  return axios
+    .get(`registrations/${mhRegistrationNum}?current=true`, config)
+    .then(response => {
+      return response
+    })
+    .catch(error => {
+      if (error?.response?.data) {
+        try {
+          error.response.data.rootCause = error.response.data.rootCause
+            .replace('detail:', '"detail":"')
+            .replace('type:', '"type":"')
+            .replace('message:', '"message":"')
+            .replace('status_code:', '"statusCode":"')
+            .replaceAll(',', '",')
+          error.response.data.rootCause = `{${error.response.data.rootCause}"}`
+          error.response.data.rootCause = JSON.parse(error.response.data.rootCause)
+        } catch (error) {
+          // continue
+        }
+      }
+      return {
+        category: ErrorCategories.REGISTRATION_DELETE,
+        statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
+        message: error?.response?.data?.message,
+        detail: error?.response?.data?.rootCause?.detail,
+        type: error?.response?.data?.rootCause?.type?.trim() as ErrorCodes
+      }
+    })
+}
+
+export async function deleteMhRegistrationSummary (
+  mhRegistrationNum: string
+): Promise<ErrorIF> {
+  const url = sessionStorage.getItem('MHR_API_URL')
+  const config = { baseURL: url, headers: { Accept: 'application/json' } }
+
+  return axios
+    .delete(`other-registrations/${mhRegistrationNum}`, config)
+    .then(response => {
+      return { statusCode: response?.status as StatusCodes }
+    })
+    .catch(error => {
+      if (error?.response?.data) {
+        try {
+          error.response.data.rootCause = error.response.data.rootCause
+            .replace('detail:', '"detail":"')
+            .replace('type:', '"type":"')
+            .replace('message:', '"message":"')
+            .replace('status_code:', '"statusCode":"')
+            .replaceAll(',', '",')
+          error.response.data.rootCause = `{${error.response.data.rootCause}"}`
+          error.response.data.rootCause = JSON.parse(error.response.data.rootCause)
+        } catch (error) {
+          // continue
+        }
+      }
+      return {
+        category: ErrorCategories.REGISTRATION_DELETE,
+        statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
+        message: error?.response?.data?.message,
+        detail: error?.response?.data?.rootCause?.detail,
+        type: error?.response?.data?.rootCause?.type?.trim() as ErrorCodes
+      }
+    })
 }

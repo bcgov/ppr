@@ -416,3 +416,10 @@ export const mutateMhrTransferHomeOwnerGroups = (
 ) => {
   state.stateModel.mhrTransfer.ownerGroups = groups
 }
+
+export const mutateMhrTransferCurrentHomeOwnerGroups = (
+  state: StateIF,
+  groups: Array<MhrRegistrationHomeOwnerGroupIF>
+) => {
+  state.stateModel.mhrTransfer.currentOwnerGroups = groups
+}
