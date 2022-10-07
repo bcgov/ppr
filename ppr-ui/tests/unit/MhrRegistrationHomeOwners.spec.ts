@@ -337,11 +337,9 @@ describe('Home Owners', () => {
     expect(ownersTable.text()).not.toContain('Group 1')
     expect(ownersTable.text()).toContain(mockedOrganization.organizationName)
     expect(ownersTable.text()).toContain(mockedOrganization.phoneNumber)
-
   })
 
   it('should keep the Group shown after clearing dropdown but then clicking Cancel', async () => {
-
     const homeOwnerGroup = [
       {
         groupId: '123',
@@ -367,9 +365,9 @@ describe('Home Owners', () => {
     const addOwnerSection = wrapper.findComponent(HomeOwners).findComponent(AddEditHomeOwner)
 
     const clearGroupButton = addOwnerSection
-    .findComponent(HomeOwnerGroups)
-    .find('.owner-groups-select')
-    .find('.v-icon.mdi-close')
+      .findComponent(HomeOwnerGroups)
+      .find('.owner-groups-select')
+      .find('.v-icon.mdi-close')
 
     await clearGroupButton.trigger('click')
     await clickCancelAddOwner()

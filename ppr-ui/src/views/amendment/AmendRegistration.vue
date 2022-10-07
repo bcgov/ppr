@@ -657,17 +657,8 @@ export default class AmendRegistration extends Vue {
     const sp = this.getAddSecuredPartiesAndDebtors.securedParties
     let securedPartyCount = 0
     if (this.registrationType === APIRegistrationTypes.SECURITY_AGREEMENT) {
-      for (let i = 0; i < sp.length; i++) {
-        // is valid if there is at least one secured party
-        if (sp[i].action !== ActionTypes.REMOVED) {
-          securedPartyCount++
-        }
-      }
-      if (securedPartyCount >= 1) {
-        this.setValidSecuredParties(true)
-      } else {
-        this.setValidSecuredParties(false)
-      }
+      securedPartyCount = sp.filter(removed => removed.action !== ActionTypes.REMOVED).length
+      this.setValidSecuredParties(securedPartyCount >= 1)
     }
   }
 
@@ -675,17 +666,8 @@ export default class AmendRegistration extends Vue {
     const sp = this.getAddSecuredPartiesAndDebtors.debtors
     let debtorCount = 0
     if (this.registrationType === APIRegistrationTypes.SECURITY_AGREEMENT) {
-      for (let i = 0; i < sp.length; i++) {
-        // is valid if there is at least one secured party
-        if (sp[i].action !== ActionTypes.REMOVED) {
-          debtorCount++
-        }
-      }
-      if (debtorCount >= 1) {
-        this.setValidDebtor(true)
-      } else {
-        this.setValidDebtor(false)
-      }
+      debtorCount = sp.filter(removed => removed.action !== ActionTypes.REMOVED).length
+      this.setValidDebtor(debtorCount >= 1)
     }
   }
 
