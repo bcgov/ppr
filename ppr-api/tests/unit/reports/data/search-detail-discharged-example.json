@@ -114,7 +114,10 @@
   "selected": [
     {
       "baseRegistrationNumber": "TEST0004", 
-      "matchType": "EXACT"
+      "matchType": "EXACT",
+      "createDateTime": "2021-07-15T15:41:58+00:00", 
+      "registrationType": "SA", 
+      "selected": true
     }
   ], 
   "similarResultsSize": 0, 

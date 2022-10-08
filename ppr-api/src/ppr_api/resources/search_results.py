@@ -62,7 +62,7 @@ class SearchResultsResource(Resource):
     @staticmethod
     @cors.crossdomain(origin='*')
     @jwt.requires_auth
-    def post(search_id):  # pylint: disable=too-many-branches, too-many-locals
+    def post(search_id):  # pylint: disable=too-many-branches
         """Execute a search detail request using selection choices in the request body."""
         try:
             if search_id is None:
@@ -111,24 +111,11 @@ class SearchResultsResource(Resource):
                 return resource_utils.unprocessable_error_response('search result details')
 
             response_data = search_detail.json
-            # Results data that is too large for real time report generation (small number of results) is also
-            # asynchronous.
-            if callback_url is None and search_detail.callback_url is not None:
-                callback_url = search_detail.callback_url
-                is_ui_pdf = True
-            if resource_utils.is_pdf(request) or is_ui_pdf:
-                # If results over threshold return JSON with callbackURL, getReportURL
-                if callback_url is not None:
-                    # Add enqueue report generation event here.
-                    enqueue_search_report(search_id)
-                    response_data['callbackURL'] = requests.utils.unquote(callback_url)
-                    response_data['getReportURL'] = REPORT_URL.format(search_id=search_id)
-                    return jsonify(response_data), HTTPStatus.OK
-
-                # Return report if request header Accept MIME type is application/pdf.
-                return get_pdf(response_data, account_id, ReportTypes.SEARCH_DETAIL_REPORT.value,
-                               jwt.get_token_auth_header())
-
+            # Queue the report generation.
+            enqueue_search_report(search_id)
+            if callback_url is not None:
+                response_data['callbackURL'] = requests.utils.unquote(callback_url)
+            response_data['getReportURL'] = REPORT_URL.format(search_id=search_id)
             return jsonify(response_data), HTTPStatus.OK
 
         except DatabaseException as db_exception:
@@ -198,16 +185,19 @@ class SearchResultsResource(Resource):
 @cors_preflight('POST,OPTIONS')
 @API.route('/callback/<path:search_id>', methods=['POST', 'OPTIONS'])
 class PatchSearchResultsResource(Resource):
-    """Resource to generate a large search result report for a queue callback."""
+    """Resource to generate a search result report for a queue callback."""
 
     @staticmethod
     @cors.crossdomain(origin='*')
     def post(search_id):  # pylint: disable=too-many-branches, too-many-locals
         """Generate and store a report, update search_result.doc_storage_url."""
         try:
+            current_app.logger.info(f'Search report callback starting id={search_id}.')
             if search_id is None:
                 return resource_utils.path_param_error_response('search ID')
-
+            # Authenticate with request api key
+            if not resource_utils.valid_api_key(request):
+                return resource_utils.unauthorized_error_response('Search report callback')
             # If exceeded max retries we're done.
             event_count: int = 0
             events = EventTracking.find_by_key_id_type(search_id, EventTracking.EventTrackingTypes.SEARCH_REPORT)
@@ -229,10 +219,10 @@ class PatchSearchResultsResource(Resource):
                 return {}, HTTPStatus.OK
 
             # Check if search result is async: always have callback_url.
-            if search_detail.callback_url is None:
-                return callback_error(resource_utils.CallbackExceptionCodes.INVALID_ID,
-                                      search_id,
-                                      HTTPStatus.BAD_REQUEST)
+            # if search_detail.callback_url is None:
+            #    return callback_error(resource_utils.CallbackExceptionCodes.INVALID_ID,
+            #                          search_id,
+            #                          HTTPStatus.BAD_REQUEST)
 
             # Generate the report with an API call
             current_app.logger.info(f'Generating search detail report for {search_id}.')
@@ -261,8 +251,8 @@ class PatchSearchResultsResource(Resource):
             EventTracking.create(search_id, EventTracking.EventTrackingTypes.SEARCH_REPORT, int(HTTPStatus.OK))
 
             # Enqueue notication event if not from UI.
-            if search_detail.is_ui_callback():
-                current_app.logger.info(f'Skipping report available notification for UI id={search_id}.')
+            if search_detail.is_ui_callback() or search_detail.callback_url is None:
+                current_app.logger.info(f'Skipping report available notification for id={search_id}.')
             else:  # Enqueue notification event.
                 current_app.logger.info(f'Queueing report notification for id={search_id}, callback=' +
                                         search_detail.callback_url)

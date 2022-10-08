@@ -1,0 +1,164 @@
+[[macros.html]]
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>{{ meta_title }}</title>
+    <meta charset="UTF-8">
+    <meta name="author" content="BC Registries and Online Services">
+    {% if totalResultsSize >= 700 %}
+      [[v2/stylePageLight.html]]
+      [[v2/styleMail.html]]
+    {% else %}
+      {% if environment == '' %}
+        [[v2/stylePage.html]]
+      {% else %}
+        [[v2/stylePageDraft.html]]
+      {% endif %}
+      [[v2/style.html]]
+    {% endif %}
+
+  </head>
+  <body>
+    <div class="business-details-container mtn-2">
+
+    {% if meta_subject|length > 70 %}
+    <table class="business-name-header-long ma-0 pa-0" role="presentation">
+      <tr>
+        <td class="lbl-business-name ma-0 pt-3 pb-3">
+          {{ meta_subject }}
+          </td>
+        </tr>
+      </table>
+    {% else %}
+      <table class="business-name-header" role="presentation">
+        <tr>
+          <td class="lbl-business-name ma-0 pa-0">
+            {{ meta_subject }}
+            </td>
+          </tr>
+        </table>  
+    {% endif %}
+
+    <table class="business-details-table" role="presentation">
+      <tr>
+        <td class="lbl-business-detail">
+          <div>Search Date and Time:</div>
+          <div>Account Name:</div>
+          {% if searchQuery.clientReferenceId is defined and searchQuery.clientReferenceId != "" %}
+            <div>Folio Number:</div>
+          {% endif %}
+        </td>
+        <td>
+          <div>{{searchDateTime}}</div>
+          <div>
+            {% if meta_account_name is defined %}
+              {{meta_account_name}}
+            {% else %}
+              Not available.
+            {% endif %}
+          </div>
+          {% if searchQuery.clientReferenceId is defined and searchQuery.clientReferenceId != "" %}
+            <div>
+                {{searchQuery.clientReferenceId}}
+            </div>
+          {% endif %}
+        </td>
+        <td class="registar-certify-section">
+          {% if searchQuery.certified is defined and searchQuery.certified %}
+            <div class="certified-copy-text">CERTIFIED COPY</div>
+            <div class="doc-description">of a document filed with the</div>
+            <div class="doc-description">Province of British Columbia</div>
+            <div class="registrar-title">Registrar of Personal Property</div>
+            [[registrarSignature.html]]
+            <div class="registrar-name">T.K. SPARKS</div>
+          {% endif %}
+        </td>
+
+      </tr>
+    </table>
+  </div>
+
+  <table class="header-table-toc mt-6" role="presentation">
+    <tr>
+      <th colspan="3" class="header-toc-title pt-2">
+        {% if totalResultsSize > 0 %}
+          TABLE OF CONTENTS
+        {% elif selected is not defined %}
+          NIL RESULT
+        {% else %}
+          NO REGISTRATIONS SELECTED
+        {% endif %}  
+      </th>
+    </tr>
+    <tr class="mt-2">
+        <td>
+          {% if totalResultsSize == 1 %}
+            1 Match in 1 Registration in Report
+          {% elif totalResultsSize > 1 %}
+            {{ selected|length }} Matches in {{ totalResultsSize }} Registrations in Report
+          {% else %}
+            0 Matches in 0 Registrations in Report
+          {% endif %}  
+        </td>
+        <td>Exact Matches: {% if totalResultsSize == 0 %} 0 {% else %} {{ exactMatchCount }} {% endif %} (*)</td>
+        <td>Total Search Report Pages:
+          {% if totalResultsSize > 0 %}
+            {{ totalPageCount }}
+          {% else %}
+            0
+          {% endif %}  
+        </td>
+    </tr>
+  </table>
+  
+  {% if totalResultsSize > 0 %}
+    {% if selected is defined %}
+      [[v2/search-result/selected.html]]
+    {% endif %}
+  {% else %}
+    {% if selected is not defined %}
+      <div class="nil-message pt-6">The search returned a NIL result. 0 registrations were found.</div>
+      <div class="nil-message pt-6">No registered liens or encumbrances have been found on file that match EXACTLY to the search criteria listed above and no similar matches to the criteria have been found.</div>
+    {% else %}
+      <div class="nil-message pt-6">
+        No registered liens or encumbrances have been found on file that match EXACTLY to the search 
+        criteria listed above and no similar matches to the criteria have been selected by the searching party.
+      </div>
+    {% endif %}
+  {% endif %}
+
+  {% if totalResultsSize > 0 %}
+    {% for detail in details %}
+      <p style="page-break-before: always" ></p>
+      [[search-result/financingStatement.html]]
+
+      {% if detail.financingStatement.changes is defined %}
+        <p style="page-break-before: always" ></p>
+        <div class="separator-header mt-4"></div>
+        <div class="section-title-centre mt-2">HISTORY</div>
+        <div class="section-statement mt-0">(Showing most recent first)</div>
+        <div class="separator-header mt-2"></div>
+
+        <div class="container pt-4">
+          {% for change in detail.financingStatement.changes %}
+            {% if change.statementType == 'RENEWAL_STATEMENT' %}
+              [[search-result/renewalStatement.html]]
+            {% elif change.statementType == 'AMENDMENT_STATEMENT' %}
+              [[search-result/amendmentStatement.html]]
+            {% elif change.statementType == 'CHANGE_STATEMENT' %}
+              [[search-result/changeStatement.html]]
+            {% elif change.statementType == 'DISCHARGE_STATEMENT' %}
+              [[search-result/dischargeStatement.html]]
+            {% endif %}
+          {% endfor %}
+        </div>
+
+      {% endif %} 
+    {% endfor %}
+
+  {% endif %}
+
+    <p class="last-page"></p>
+  </body>
+</html>

@@ -21,6 +21,16 @@
             {% endif %}
          </tr>
          {% for collateral in vehicleCollateral %}
+            {% if mhCollateralCount is defined and mhCollateralCount > 0 %}
+               <tr>
+                  <td width="100%" colspan="5"><div class="separator-table-row mt-3 mb-3"></div></td>
+               </tr>              
+            {% else %}
+               <tr>
+                  <td width="100%" colspan="4"><div class="separator-table-row mt-3 mb-3"></div></td>
+               </tr>              
+            {% endif %}
+
             <tr class="no-page-break">
                <td>{{collateral.type}}</td>
                <td>{{collateral.year}}</td>
@@ -55,6 +65,17 @@
          </tr>
       {% if addVehicleCollateral is defined %}
          {% for collateral in addVehicleCollateral %}
+
+            {% if mhCollateralCount is defined and mhCollateralCount > 0 %}
+               <tr>
+                  <td width="100%" colspan="5"><div class="separator-table-row mt-3 mb-3"></div></td>
+               </tr>              
+            {% else %}
+               <tr>
+                  <td width="100%" colspan="4"><div class="separator-table-row mt-3 mb-3"></div></td>
+               </tr>              
+            {% endif %}
+
             <tr class="no-page-break">
                <td>
                   <div class="mt-5">{{collateral.type}}</div>
@@ -76,6 +97,17 @@
       {% if deleteVehicleCollateral is defined %}
          {% for collateral in deleteVehicleCollateral %}
             {% if collateral.edit is not defined %}
+
+            {% if mhCollateralCount is defined and mhCollateralCount > 0 %}
+               <tr>
+                  <td width="100%" colspan="5"><div class="separator-table-row mt-3 mb-3"></div></td>
+               </tr>              
+            {% else %}
+               <tr>
+                  <td width="100%" colspan="4"><div class="separator-table-row mt-3 mb-3"></div></td>
+               </tr>              
+            {% endif %}
+
             <tr class="no-page-break">
                <td>
                   <div class="mt-5">{{collateral.type}}</div>
@@ -114,10 +146,21 @@
          </tr>
       {% if change.addVehicleCollateral is defined %}
          {% for collateral in change.addVehicleCollateral %}
+
+            {% if change.mhCollateralCount is defined and change.mhCollateralCount > 0 %}
+               <tr>
+                  <td width="100%" colspan="5"><div class="separator-table-row mt-3 mb-3"></div></td>
+               </tr>              
+            {% else %}
+               <tr>
+                  <td width="100%" colspan="4"><div class="separator-table-row mt-3 mb-3"></div></td>
+               </tr>              
+            {% endif %}
+
             <tr class="no-page-break">
                <td>
-                  <div class="mt-5">{{collateral.type}}</div>
-                  <div class="mb-2"><span class="label">{% if collateral.edit is not defined %}ADDED{% else %}AMENDED{% endif %}</span></div>
+                  <div>{{collateral.type}}</div>
+                  <div class="mt-2"><span class="label">{% if collateral.edit is not defined %}ADDED{% else %}AMENDED{% endif %}</span></div>
                </td>
                <td>{{collateral.year}}</td>
                <td>{{collateral.make}} 
@@ -135,10 +178,21 @@
       {% if change.deleteVehicleCollateral is defined %}
          {% for collateral in change.deleteVehicleCollateral %}
             {% if collateral.edit is not defined %}
+
+            {% if change.mhCollateralCount is defined and change.mhCollateralCount > 0 %}
+               <tr>
+                  <td width="100%" colspan="5"><div class="separator-table-row mt-3 mb-3"></div></td>
+               </tr>              
+            {% else %}
+               <tr>
+                  <td width="100%" colspan="4"><div class="separator-table-row mt-3 mb-3"></div></td>
+               </tr>              
+            {% endif %}
+
             <tr class="no-page-break">
                <td>
-                  <div class="mt-5">{{collateral.type}}</div>
-                  <div class="mb-2"><span class="label">DELETED</span></div>
+                  <div>{{collateral.type}}</div>
+                  <div class="mt-2"><span class="label">DELETED</span></div>
                </td>
                <td>{{collateral.year}}</td>
                <td>{{collateral.make}} 

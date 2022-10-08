@@ -392,10 +392,8 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
                     mapping = row._mapping  # pylint: disable=protected-access; follows documentation
                     search_id = str(mapping['id'])
                     # Set to pending if async report is not yet available.
-                    callback_url = str(mapping['callback_url'])
                     doc_storage_url = str(mapping['doc_storage_url'])
-                    if callback_url is not None and callback_url.lower() != 'none' and \
-                            (doc_storage_url is None or doc_storage_url.lower() == 'none'):
+                    if doc_storage_url is None or doc_storage_url.lower() == 'none':
                         search_id = REPORT_STATUS_PENDING
                     search = {
                         'searchId': search_id,

@@ -1,0 +1,156 @@
+[[macros.html]]
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>{{ meta_title }}</title>
+    <meta charset="UTF-8">
+    <meta name="author" content="BC Registries and Online Services">
+    {% if cover is not defined %}
+      {% if environment == '' %}
+        [[v2/stylePageRegistration.html]]
+      {% else %}
+        [[v2/stylePageRegistrationDraft.html]]
+      {% endif %}
+      [[v2/style.html]]
+    {% else %}
+      [[v2/stylePageMail.html]]
+      [[v2/styleMail.html]]
+    {% endif %}
+  </head>
+  <body>
+    {% if cover is not defined %}
+  <div class="business-details-container mtn-2">
+    {% else %}
+  <div class="business-details-container mtn-25">
+      {% endif %}
+    <table class="business-details-table-grey mt-0" role="presentation">
+      <tr>
+        <td>Base Registration Date and Time:</td>
+        <td>{{createDateTime}}</td>
+      </tr>
+      {% if changes is not defined %}
+      <tr>
+        <td class="section-sub-title">Registration Length:</td>
+        <td>
+            {% if lifeInfinite is defined and lifeInfinite %}
+                Infinite
+            {% elif lifeYears is not defined or lifeYears == 0 %}
+                180 Days
+            {% elif lifeYears is defined %}
+                {{lifeYears}} {% if lifeYears != 1 %} Years {% else %} Year {% endif %}
+            {% endif %}
+        </td>
+      </tr>
+      {% endif %}
+      {% if dischargedDateTime is defined and changes and changes[0].statementType == 'DISCHARGE_STATEMENT' %}
+      <tr>
+        <td>Discharge Date and Time:</td>
+        <td>{{dischargedDateTime}}</td>
+      </tr>
+      {% elif changes and changes[0].statementType == 'RENEWAL_STATEMENT' %}
+      <tr>
+        <td>Renewal Date and Time:</td>
+        <td>{{changes[0].createDateTime}}</td>
+      </tr>
+      {% elif changes and changes[0].statementType == 'AMENDMENT_STATEMENT' %}
+      <tr>
+        <td>Amendment Date and Time:</td>
+        <td>{{changes[0].createDateTime}}</td>
+      </tr>
+      {% endif %}
+      <tr>
+        <td>Current Expiry Date and Time:</td>
+        <td>
+          {% if lifeInfinite is defined and lifeInfinite %} 
+            Never
+          {% else %}
+            {{expiryDate}}
+            {% if statusType == 'HEX' %} 
+              <span style="color: #d3272c">(Expired)</span>
+            {% endif %}
+          {% endif %}
+        </td>
+      </tr>
+      {% if type == 'RL' %}
+      <tr>
+        <td>Surrender Date:</td>
+        <td>{{surrenderDate}}</td>
+      </tr>
+      <tr>
+        <td>Lien Amount (CAD):</td>
+        <td>{{lienAmount}}</td>
+      </tr>
+      {% endif %}
+      {% if type == 'SA' %}
+      <tr>
+        <td>Trust Indenture:</td>
+        <td>{% if trustIndenture == true %}Yes{% else %}No{% endif %}</td>
+      </tr>
+      {% endif %}
+      {% if not changes and clientReferenceId is defined and clientReferenceId != "" %}
+      <tr>
+        <td>Folio Number:</td>
+        <td>
+            {{clientReferenceId}}
+        </td>
+      </tr>
+      {% elif changes and changes[0].clientReferenceId is defined and changes[0].clientReferenceId != "" %}
+      <tr>
+        <td>Folio Number:</td>
+        <td>
+            {{changes[0].clientReferenceId}}
+        </td>
+      </tr>
+      {% endif %}
+    </table>
+  </div>
+
+
+  {% if changes  %}
+  <div class="no-page-break">
+    <div class="separator-header mt-6"></div>
+    <div class="section-title-centre mt-2">CURRENT REGISTRATION INFORMATION</div>
+    <div class="section-statement mt-0">(as of {{changes[0].createDateTime}})</div>
+    <div class="separator-header mt-2"></div>
+  </div>
+  {% endif %}
+
+
+{# Use search order. #}
+<div class="container pt-4">
+  [[registration/securedParties.html]]
+  [[registration/debtors.html]]
+  [[registration/vehicleCollateral.html]]
+  [[registration/generalCollateral.html]]
+  [[registration/registeringParty.html]]
+</div>
+
+{% if changes is defined %}
+  {# <p style="page-break-before: always" ></p> #}
+  <div class="separator-header mt-4"></div>
+  <div class="section-title-centre mt-4">HISTORY</div>
+  <div class="section-statement">(Showing most recent first)</div>
+  <div class="separator-header mt-4"></div>
+
+  <div class="container pt-4">
+    {% for change in changes %}
+      {% if change.statementType == 'RENEWAL_STATEMENT' %}
+        [[registration/renewalStatement.html]]
+      {% elif change.statementType == 'CHANGE_STATEMENT' %}
+        [[registration/changeStatement.html]]
+      {% elif change.statementType == 'AMENDMENT_STATEMENT' %}
+        [[registration/amendmentStatement.html]]
+      {% elif change.statementType == 'DISCHARGE_STATEMENT' %}
+        [[registration/dischargeStatement.html]]
+      {% endif %}
+    {% endfor %}
+  </div>
+{% endif %} 
+
+  {% if cover is not defined %}
+    <p class="last-page"></p>
+  {% endif %}
+  </body>
+</html>
+
