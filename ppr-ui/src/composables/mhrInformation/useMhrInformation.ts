@@ -1,27 +1,47 @@
 import { MhrTransferApiIF, MhrTransferIF } from '@/interfaces'
 import { useGetters } from 'vuex-composition-helpers'
 import { useNewMhrRegistration } from '@/composables'
+import { readonly, ref } from '@vue/composition-api'
+
+// Validation flag for Transfer Details
+const transferDetailsValid = ref(false)
 
 export const useMhrInformation = () => {
   const {
     getCurrentUser,
     getMhrTransferHomeOwners,
-    getMhrInformation
+    getMhrInformation,
+    getMhrTransferDeclaredValue,
+    getMhrTransferConsideration,
+    getMhrTransferDate,
+    getMhrTransferOwnLand
   } = useGetters<any>([
     'getCurrentUser',
     'getMhrInformation',
-    'getMhrTransferHomeOwners'
+    'getMhrTransferHomeOwners',
+    'getMhrTransferDeclaredValue',
+    'getMhrTransferConsideration',
+    'getMhrTransferDate',
+    'getMhrTransferOwnLand'
   ])
 
   const {
     cleanEmpty
   } = useNewMhrRegistration()
 
+  const setTransferDetailsValid = (isValid: boolean) => {
+    transferDetailsValid.value = isValid
+  }
+
   const initMhrTransfer = (): MhrTransferIF => {
     return {
       mhrNumber: '',
       ownerGroups: [],
-      submittingParty: {}
+      submittingParty: {},
+      declaredValue: null,
+      consideration: '',
+      transferDate: '',
+      ownLand: false
     }
   }
 
@@ -43,6 +63,10 @@ export const useMhrInformation = () => {
   const buildApiData = () => {
     const data: MhrTransferApiIF = {
       mhrNumber: getMhrInformation.value.mhrNumber,
+      declaredValue: getMhrTransferDeclaredValue.value,
+      consideration: getMhrTransferConsideration.value,
+      transferDate: getMhrTransferDate.value,
+      ownLand: getMhrTransferOwnLand.value,
       documentDescription: 'SALE OR GIFT',
       submittingParty: {
         personName: {
@@ -68,6 +92,8 @@ export const useMhrInformation = () => {
   }
 
   return {
+    isTransferDetailsValid: readonly(transferDetailsValid),
+    setTransferDetailsValid,
     initMhrTransfer,
     buildApiData
   }
