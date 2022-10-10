@@ -129,10 +129,12 @@ class Report:  # pylint: disable=too-few-public-methods
         """Render a search report with TOC page numbers set in a second report call."""
         current_app.logger.debug('Account {0} report type {1} setting up report data.'
                                  .format(self._account_id, self._report_key))
+        light_threshold: int = current_app.config.get('REPORT_SEARCH_LIGHT')
+        large_search: bool = self._report_data.get('totalResultsSize', 0) >= light_threshold
+        self._report_data['search_light'] = large_search
         data_copy = copy.deepcopy(self._report_data)
         # 1: Generate the search pdf with no TOC page numbers or total page count.
         data = self._setup_report_data()
-        large_search: bool = self._report_data.get('totalResultsSize', 0) >= 700
         url = current_app.config.get('REPORT_SVC_URL') + SINGLE_URI
         current_app.logger.debug('Account {0} report type {1} calling report-api {2}.'
                                  .format(self._account_id, self._report_key, url))

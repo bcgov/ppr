@@ -196,6 +196,8 @@ class _Config():  # pylint: disable=too-few-public-methods
     # Default 2, set to 1 to revert to original report api client
     REPORT_VERSION = os.getenv('REPORT_VERSION', '2')
     REPORT_API_AUDIENCE = os.getenv('REPORT_API_AUDIENCE', '')
+    # Number of registrations threshold for search report light format. 
+    REPORT_SEARCH_LIGHT: int = int(os.getenv('REPORT_SEARCH_LIGHT', '700'))
 
 
 class DevConfig(_Config):  # pylint: disable=too-few-public-methods

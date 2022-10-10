@@ -1,5 +1,5 @@
 
-<div class="business-details-container">
+<div class="business-details-container no-page-break">
   <table class="registration-header-table" id="{{ detail.financingStatement.baseRegistrationNumber }}"  role="presentation">
     <tr>
       <td>Base Registration Number: {{ detail.financingStatement.baseRegistrationNumber }}</td>
@@ -15,14 +15,14 @@
 
   <table class="business-details-table-grey" role="presentation">
     <tr>
-      <td>Registration Type:</td>
+      <td>Registration Description:</td>
       <td>{{ detail.financingStatement.registrationDescription }}</td>
     </tr>
-    {# Add back when act descriptions are finalized.<tr>
+    <tr>
       <td>Act:</td>
       <td>{{ detail.financingStatement.registrationAct }}</td>
     </tr>
-    <tr>#}
+    <tr>
       <td>Base Registration Date and Time:</td>
       <td>{{detail.financingStatement.createDateTime}}</td>
     </tr>

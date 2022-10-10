@@ -6,7 +6,7 @@
     <title>{{ meta_title }}</title>
     <meta charset="UTF-8">
     <meta name="author" content="BC Registries and Online Services">
-    {% if totalResultsSize >= 700 %}
+    {% if search_light is defined and search_light %}
       [[v2/stylePageLight.html]]
       [[v2/styleMail.html]]
     {% else %}
@@ -130,11 +130,17 @@
 
   {% if totalResultsSize > 0 %}
     {% for detail in details %}
-      <p style="page-break-before: always" ></p>
+      {% if search_light is not defined or not search_light %}
+        <p style="page-break-before: always" ></p>
+      {% else %}
+        <div class="pt-6"></div>
+      {% endif %}
       [[search-result/financingStatement.html]]
 
       {% if detail.financingStatement.changes is defined %}
-        <p style="page-break-before: always" ></p>
+        {% if search_light is not defined or not search_light %}
+          <p style="page-break-before: always" ></p>
+        {% endif %}
         <div class="separator-header mt-4"></div>
         <div class="section-title-centre mt-2">HISTORY</div>
         <div class="section-statement mt-0">(Showing most recent first)</div>
