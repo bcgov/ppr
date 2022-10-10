@@ -15,7 +15,7 @@ import { getTestId } from './utils'
 import { mockedPerson } from './test-data/mock-mhr-registration'
 import { MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF } from '@/interfaces'
 import { nextTick } from '@vue/composition-api'
-import { mockedDebtorNames } from './test-data'
+import { TransferDetails } from '@/components/mhrTransfers'
 
 Vue.use(Vuetify)
 
@@ -48,7 +48,7 @@ function createComponent (): Wrapper<any> {
   })
 }
 
-describe('Mhr Registration', () => {
+describe('Mhr Information', () => {
   let wrapper: Wrapper<any>
   const currentAccount = {
     id: 'test_id'
@@ -106,7 +106,12 @@ describe('Mhr Registration', () => {
     await nextTick()
 
     expect(mhrInformationComponent.findComponent(HomeOwnersTable).exists()).toBeTruthy()
-    expect(mhrInformationComponent.findComponent(HomeOwnersTable).find(getTestId('no-data-msg')).isVisible()).toBeTruthy()
+    expect(
+      mhrInformationComponent
+        .findComponent(HomeOwnersTable)
+        .find(getTestId('no-data-msg'))
+        .isVisible()
+    ).toBeTruthy()
 
     const owners = [mockedPerson] as MhrRegistrationHomeOwnerIF[] // same IF for Transfer and Registration
     const homeOwnerGroup = [{ groupId: '1', owners: owners }] as MhrRegistrationHomeOwnerGroupIF[]
@@ -119,5 +124,27 @@ describe('Mhr Registration', () => {
 
     const addedBadge = ownersTable.find(getTestId('owner-added-badge'))
     expect(addedBadge.isVisible()).toBeTruthy()
+  })
+
+  it('should render Transfer Details component', async () => {
+    const mhrTransferDetailsComponent = wrapper.findComponent(MhrInformation).findComponent(TransferDetails)
+    expect(mhrTransferDetailsComponent.exists()).toBeTruthy()
+
+    // Check for component's fields
+    expect(mhrTransferDetailsComponent.find(getTestId('declared-value')).exists()).toBeTruthy()
+    expect(mhrTransferDetailsComponent.find(getTestId('consideration')).exists()).toBeTruthy()
+    expect(mhrTransferDetailsComponent.find(getTestId('transfer-date')).exists()).toBeTruthy()
+    expect(mhrTransferDetailsComponent.find(getTestId('lease-own-checkbox')).exists()).toBeTruthy()
+
+    mhrTransferDetailsComponent.find(getTestId('declared-value')).setValue(123)
+    mhrTransferDetailsComponent.find(getTestId('declared-value')).trigger('blur')
+    await Vue.nextTick()
+
+    // Check that error/warning is shown for Declared Value less than 500
+    expect(mhrTransferDetailsComponent.find('.v-messages__message').isVisible()).toBeTruthy()
+    await Vue.nextTick()
+
+    // Check that Consideration displayed Declared Value on blur
+    expect(mhrTransferDetailsComponent.vm.$data.consideration).toBe('$123.00')
   })
 })
