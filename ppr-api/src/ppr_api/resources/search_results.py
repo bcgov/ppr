@@ -153,16 +153,14 @@ class SearchResultsResource(Resource):
             # with no exact matches and no results selected - nil, which is valid.
             if search_detail.search_select is None and search_detail.search.total_results_size > 0:
                 return resource_utils.bad_request_response(GET_DETAILS_ERROR)
-
-            # If the request is for an async large report, fetch binary data from doc storage.
-            if resource_utils.is_pdf(request) and search_detail.callback_url is not None:
+            if resource_utils.is_pdf(request):
                 if search_detail.doc_storage_url is None:
                     error_msg = f'Search report not yet available for {search_id}.'
                     current_app.logger.info(error_msg)
                     return resource_utils.bad_request_response(error_msg)
-                doc_name = search_detail.doc_storage_url if not search_detail.doc_storage_url.startswith('http') \
-                    else SEARCH_RESULTS_DOC_NAME.format(search_id=search_id)
-                current_app.logger.info(f'Fetching large search report {doc_name} from doc storage.')
+                # Fetch binary data from doc storage.
+                doc_name = search_detail.doc_storage_url
+                current_app.logger.info(f'Fetching search report {doc_name} from doc storage.')
                 raw_data = GoogleStorageService.get_document(doc_name)
                 return raw_data, HTTPStatus.OK, {'Content-Type': 'application/pdf'}
 
