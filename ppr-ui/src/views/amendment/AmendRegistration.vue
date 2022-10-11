@@ -654,10 +654,9 @@ export default class AmendRegistration extends Vue {
   }
 
   private validateSecuredParties (): void {
-    const sp = this.getAddSecuredPartiesAndDebtors.securedParties
-    let securedPartyCount = 0
     if (this.registrationType === APIRegistrationTypes.SECURITY_AGREEMENT) {
-      securedPartyCount = sp.filter(removed => removed.action !== ActionTypes.REMOVED).length
+      const sp = this.getAddSecuredPartiesAndDebtors.securedParties
+      const securedPartyCount = sp.filter(removed => removed.action !== ActionTypes.REMOVED).length
       this.setValidSecuredParties(securedPartyCount >= 1)
     }
   }
