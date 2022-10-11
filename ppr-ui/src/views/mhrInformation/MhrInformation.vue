@@ -4,7 +4,11 @@
     <v-overlay v-model="loading">
       <v-progress-circular color="primary" size="50" indeterminate />
     </v-overlay>
-
+    <base-dialog
+      :setOptions="options"
+      :setDisplay="showCancelDialog"
+      @proceed="handleDialogResp($event)"
+    />
     <div class="view-container px-15 py-0">
       <div class="container pa-0 pt-4">
         <v-row no-gutters>
@@ -55,7 +59,7 @@
                   :setShowFeeSummary="true"
                   :setFeeType="feeType"
                   :setErrMsg="transferErrorMsg"
-                  @cancel="goToDash()"
+                  @cancel="cancel()"
                   @back="isReviewMode = false"
                   @submit="goToReview()"
                 />
@@ -79,10 +83,13 @@ import { useHomeOwners, useMhrInformation } from '@/composables'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
 import { HomeOwners } from '@/views'
+import { BaseDialog } from '@/components/dialogs'
+import { unsavedChangesDialog } from '@/resources/dialogOptions'
 
 export default defineComponent({
   name: 'MhrInformation',
   components: {
+    BaseDialog,
     HomeOwners,
     HomeOwnersTable,
     StickyContainer
@@ -95,15 +102,15 @@ export default defineComponent({
   },
   setup (props, context) {
     const {
-      getMhrTransferHomeOwners, getMhrInformation
+      getMhrTransferHomeOwners, getMhrInformation, hasUnsavedChanges
     } = useGetters<any>([
-      'getMhrTransferHomeOwners', 'getMhrInformation'
+      'getMhrTransferHomeOwners', 'getMhrInformation', 'hasUnsavedChanges'
     ])
 
     const {
-      setMhrTransferHomeOwnerGroups, setMhrTransferCurrentHomeOwnerGroups
+      setMhrTransferHomeOwnerGroups, setMhrTransferCurrentHomeOwnerGroups,setUnsavedChanges
     } = useActions<any>([
-      'setMhrTransferHomeOwnerGroups', 'setMhrTransferCurrentHomeOwnerGroups'
+      'setMhrTransferHomeOwnerGroups', 'setMhrTransferCurrentHomeOwnerGroups','setUnSavedChanges'
     ])
 
     const { setEmptyMhrTransfer } = useActions<any>(['setEmptyMhrTransfer'])
@@ -116,6 +123,9 @@ export default defineComponent({
     const {
       isGlobalEditingMode
     } = useHomeOwners()
+
+    const options = unsavedChangesDialog
+    var showCancelDialog = false
 
     const localState = reactive({
       dataLoaded: false,
@@ -140,7 +150,9 @@ export default defineComponent({
       }),
       reviewConfirmText: computed((): string => {
         return localState.isReviewMode ? 'Register Changes and Pay' : 'Review and Confirm'
-      })
+      }),
+      options,
+      showCancelDialog
     })
 
     onMounted(async (): Promise<void> => {
@@ -172,6 +184,11 @@ export default defineComponent({
       setMhrTransferCurrentHomeOwnerGroups(currentOwnerGroups)
     }
 
+    const cancel = async (): Promise<void> => {
+      if (hasUnsavedChanges.value === true) localState.showCancelDialog = true
+      else goToDash()
+    }
+
     const goToReview = async (): Promise<void> => {
       localState.validate = true
       if (localState.isReviewMode) {
@@ -194,11 +211,17 @@ export default defineComponent({
       })
     }
 
+    const handleDialogResp = (val: boolean): void => {
+      localState.showCancelDialog = false
+      if (!val) goToDash()
+    }
     return {
       goToReview,
       goToDash,
       getMhrTransferHomeOwners,
-      ...toRefs(localState)
+      ...toRefs(localState),
+      handleDialogResp,
+      cancel
     }
   }
 })
