@@ -62,7 +62,7 @@ class SearchResultsResource(Resource):
     @staticmethod
     @cors.crossdomain(origin='*')
     @jwt.requires_auth
-    def post(search_id):  # pylint: disable=too-many-branches
+    def post(search_id):  # pylint: disable=too-many-branches, too-many-locals
         """Execute a search detail request using selection choices in the request body."""
         try:
             if search_id is None:
@@ -145,7 +145,7 @@ class SearchResultsResource(Resource):
 
             # Try to fetch search detail by search id.
             current_app.logger.info(f'Fetching search detail for {search_id}.')
-            search_detail = SearchResult.find_by_search_id(search_id, True)
+            search_detail: SearchResult = SearchResult.find_by_search_id(search_id, True)
             if not search_detail:
                 return resource_utils.not_found_error_response('searchId', search_id)
 
@@ -153,22 +153,35 @@ class SearchResultsResource(Resource):
             # with no exact matches and no results selected - nil, which is valid.
             if search_detail.search_select is None and search_detail.search.total_results_size > 0:
                 return resource_utils.bad_request_response(GET_DETAILS_ERROR)
-            if resource_utils.is_pdf(request):
-                if search_detail.doc_storage_url is None:
-                    error_msg = f'Search report not yet available for {search_id}.'
-                    current_app.logger.info(error_msg)
-                    return resource_utils.bad_request_response(error_msg)
-                # Fetch binary data from doc storage.
-                doc_name = search_detail.doc_storage_url
-                current_app.logger.info(f'Fetching search report {doc_name} from doc storage.')
-                raw_data = GoogleStorageService.get_document(doc_name)
-                return raw_data, HTTPStatus.OK, {'Content-Type': 'application/pdf'}
 
             response_data = search_detail.json
             if resource_utils.is_pdf(request):
-                # Return report if request header Accept MIME type is application/pdf.
-                return get_pdf(response_data, account_id, ReportTypes.SEARCH_DETAIL_REPORT.value,
-                               jwt.get_token_auth_header())
+                if search_detail.doc_storage_url is not None:
+                    # Fetch binary data from doc storage.
+                    doc_name = search_detail.doc_storage_url
+                    current_app.logger.info(f'Fetching search report {doc_name} from doc storage.')
+                    raw_data = GoogleStorageService.get_document(doc_name)
+                    return raw_data, HTTPStatus.OK, {'Content-Type': 'application/pdf'}
+                if (search_detail.exact_match_count + search_detail.similar_match_count) >= 75 or \
+                        not model_utils.report_retry_elapsed(search_detail.search.search_ts):
+                    error_msg = f'Search report not yet available for {search_id}.'
+                    current_app.logger.info(error_msg)
+                    return resource_utils.bad_request_response(error_msg)
+                # Generate and store report.
+                current_app.logger.info(f'Generating search detail report for {search_id}.')
+                raw_data, status_code, headers = get_pdf(response_data,
+                                                         account_id,
+                                                         ReportTypes.SEARCH_DETAIL_REPORT.value,
+                                                         jwt.get_token_auth_header())
+                current_app.logger.debug(f'report api call status={status_code}, headers=' + json.dumps(headers))
+                if raw_data and status_code in (HTTPStatus.OK, HTTPStatus.CREATED):
+                    doc_name = model_utils.get_search_doc_storage_name(search_detail.search)
+                    current_app.logger.info(f'Saving report output to doc storage: name={doc_name}.')
+                    response = GoogleStorageService.save_document(doc_name, raw_data)
+                    current_app.logger.info('Save document storage response: ' + json.dumps(response))
+                    search_detail.doc_storage_url = doc_name
+                    search_detail.save()
+                    return raw_data, HTTPStatus.OK, {'Content-Type': 'application/pdf'}
 
             return jsonify(response_data), HTTPStatus.OK
 

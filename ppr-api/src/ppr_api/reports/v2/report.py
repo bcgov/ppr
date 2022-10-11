@@ -152,6 +152,9 @@ class Report:  # pylint: disable=too-few-public-methods
             current_app.logger.error('Account {0} response status: {1} error: {2}.'
                                      .format(self._account_id, response_reg.status_code, content))
             return jsonify(message=content), response_reg.status_code, None
+        # Skip TOC page number update and regeneration for large reports.
+        if large_search:
+            return response_reg.content, response_reg.status_code, {'Content-Type': 'application/pdf'}
         # 2: Set TOC page numbers in report data from initial search pdf page numbering.
         self._report_data = report_utils.update_toc_page_numbers(data_copy, response_reg.content)
         # 3: Generate search report again with TOC page numbers and total page count.

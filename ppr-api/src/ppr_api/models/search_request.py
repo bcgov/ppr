@@ -393,14 +393,19 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
                     search_id = str(mapping['id'])
                     # Set to pending if async report is not yet available.
                     doc_storage_url = str(mapping['doc_storage_url'])
+                    selected_value = mapping['selected_match_count']
+                    select_size = int(selected_value) if selected_value else 0
+                    search_ts = mapping['search_ts']
                     if doc_storage_url is None or doc_storage_url.lower() == 'none':
-                        search_id = REPORT_STATUS_PENDING
+                        if select_size >= 75 or not model_utils.report_retry_elapsed(search_ts):
+                            search_id = REPORT_STATUS_PENDING
                     search = {
                         'searchId': search_id,
-                        'searchDateTime': model_utils.format_ts(mapping['search_ts']),
+                        'searchDateTime': model_utils.format_ts(search_ts),
                         'searchQuery': mapping['api_criteria'],
                         'totalResultsSize': int(mapping['total_results_size']),
                         'returnedResultsSize': int(mapping['returned_results_size']),
+                        'selectedResultsSize': select_size,
                         'username': str(mapping['username'])
                     }
                     exact_value = mapping['exact_match_count']
@@ -408,11 +413,6 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
                         search['exactResultsSize'] = int(exact_value)
                     else:
                         search['exactResultsSize'] = 0
-                    selected_value = mapping['selected_match_count']
-                    if selected_value is not None:
-                        search['selectedResultsSize'] = int(selected_value)
-                    else:
-                        search['selectedResultsSize'] = 0
                     history_list.append(search)
                     if from_ui:
                         # if api_result is null then the selections have not been finished
