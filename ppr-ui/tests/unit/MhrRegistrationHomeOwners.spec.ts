@@ -380,4 +380,45 @@ describe('Home Owners', () => {
     expect(ownersTable.text()).toContain(mockedPerson.individualName.last)
     expect(ownersTable.text()).toContain(mockedPerson.phoneNumber)
   })
+  
+  it('should show correct error messages when deleting Owners from the Home Owners table', async () => {
+    // Should show 'Group must contain at least one owner' when there are no Owners in a Group
+    // Should show 'No owners added yet' when there are no Owners and no Groups
+    const GROUP_ID = '12'
+
+    const homeOwnerGroup = [
+      {
+        groupId: GROUP_ID,
+        owners: [mockedPerson],
+        interest: 'Undivided',
+        interestNumerator: 10,
+        interestTotal: 20
+      }
+    ] as MhrRegistrationHomeOwnerGroupIF[]
+
+    await store.dispatch('setMhrRegistrationHomeOwnerGroups', homeOwnerGroup)
+    wrapper.findComponent(HomeOwners).vm.$data.setShowGroups(true)
+    await Vue.nextTick()
+
+    const ownersTable = wrapper.findComponent(HomeOwners).findComponent(HomeOwnersTable)
+    expect(ownersTable.text()).toContain('Group ' + GROUP_ID)
+    expect(ownersTable.findAllComponents(TableGroupHeader).length).toBe(1) // only one Group exists
+    expect(wrapper.findComponent(HomeOwners).vm.$data.getHomeOwners.length).toBe(1) // only one Owner exists
+
+    // Delete Owner and check for correct error message
+    wrapper.findComponent(HomeOwnersTable).vm.$data.remove({ ...mockedPerson, groupId: GROUP_ID })
+    await Vue.nextTick()
+    expect(ownersTable.text()).toContain('Group ' + GROUP_ID)
+    expect(ownersTable.text()).toContain('10/20')
+    expect(ownersTable.find(getTestId('no-owners-msg-group-0'))).toBeTruthy()
+    expect(ownersTable.findAllComponents(TableGroupHeader).length).toBe(1) // only one Group exists
+
+    // Delete Owners Group and check for correct error message
+    ownersTable.findComponent(TableGroupHeader).vm.$data.cancelOrProceed(true, GROUP_ID)
+    await Vue.nextTick()
+    expect(ownersTable.text()).not.toContain('Group ' + GROUP_ID)
+    expect(ownersTable.find(getTestId('no-data-msg'))).toBeTruthy()
+    expect(ownersTable.findAllComponents(TableGroupHeader).length).toBe(0) // no Groups exists
+    expect(wrapper.findComponent(HomeOwners).vm.$data.getHomeOwners.length).toBe(0) // no Owners exists
+  })
 })

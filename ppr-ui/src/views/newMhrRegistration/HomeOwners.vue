@@ -180,7 +180,8 @@ export default defineComponent({
       isGlobalEditingMode,
       showGroups,
       getTotalOwnershipAllocationStatus,
-      hasMinimumGroups
+      hasMinimumGroups,
+      setShowGroups
     } = useHomeOwners()
 
     const localState = reactive({
@@ -217,6 +218,7 @@ export default defineComponent({
       isGlobalEditingMode,
       getHomeTenancyType,
       showGroups,
+      setShowGroups, // expose this for easier unit testing
       ...toRefs(localState)
     }
   }
