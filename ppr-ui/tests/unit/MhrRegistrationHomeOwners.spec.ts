@@ -379,6 +379,7 @@ describe('Home Owners', () => {
     expect(ownersTable.text()).toContain(mockedPerson.individualName.first)
     expect(ownersTable.text()).toContain(mockedPerson.individualName.last)
     expect(ownersTable.text()).toContain(mockedPerson.phoneNumber)
+    ownersTable.findComponent(TableGroupHeader).vm.$data.cancelOrProceed(true, '123')
   })
   
   it('should show correct error messages when deleting Owners from the Home Owners table', async () => {
