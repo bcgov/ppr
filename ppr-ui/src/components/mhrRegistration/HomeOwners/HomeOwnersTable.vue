@@ -38,7 +38,7 @@
           </td>
         </tr>
 
-        <tr v-else-if="row.item" :key="row.item.id" class="owner-info">
+        <tr v-else-if="row.item.id" :key="row.item.id" class="owner-info">
           <td class="owner-name">
             <div v-if="row.item.individualName" class="owner-icon-name">
               <v-icon class="mr-2">mdi-account</v-icon>
@@ -115,10 +115,10 @@
         </tr>
         <tr v-else>
           <td :colspan="4" class="py-1">
-            <div v-if="showGroups" class="error-text my-6 text-center">
+            <div v-if="showGroups" class="error-text my-6 text-center" :data-test-id="`no-owners-msg-group-${homeOwners.indexOf(row.item)}`">
               Group must contain at least one owner
             </div>
-            <div v-else class="my-6 text-center">
+            <div v-else class="my-6 text-center" data-test-id="no-owners-mgs">
               No owners added yet
             </div>
           </td>
