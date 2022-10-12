@@ -38,7 +38,7 @@
           </td>
         </tr>
 
-        <tr v-else-if="row.item" :key="row.item.id" class="owner-info">
+        <tr v-else-if="row.item.id" :key="row.item.id" class="owner-info">
           <td class="owner-name">
             <div v-if="row.item.individualName" class="owner-icon-name">
               <v-icon class="mr-2">mdi-account</v-icon>
@@ -201,7 +201,7 @@ export default defineComponent({
     }
 
     const hasAddedHomeOwner = (id: string): boolean => {
-      return props.currentHomeOwners?.some(currentOwner => currentOwner.id !== id)
+      return !props.currentHomeOwners?.some(currentOwner => currentOwner.id === id)
     }
 
     watch(
