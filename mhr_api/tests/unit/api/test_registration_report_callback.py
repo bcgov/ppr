@@ -19,12 +19,14 @@ Test-Suite to ensure that the /registration-report-callback endpoint is working 
 from http import HTTPStatus
 
 import pytest
+from flask import current_app
 
 
 # testdata pattern is ({desc}, {status}, {registration_id})
 # Add more when report available.
 TEST_CALLBACK_DATA = [
-    ('Invalid id', HTTPStatus.NOT_FOUND, 300000005)
+    ('Invalid id', HTTPStatus.NOT_FOUND, 300000005),
+    ('Unauthorized', HTTPStatus.UNAUTHORIZED, 300000005)
 ]
 
 
@@ -32,7 +34,14 @@ TEST_CALLBACK_DATA = [
 def test_registration_report_callback(session, client, jwt, desc, status, registration_id):
     """Assert that a callback request returns the expected status."""
     # test
+    headers = None
+    if status != HTTPStatus.UNAUTHORIZED:
+        apikey = current_app.config.get('SUBSCRIPTION_API_KEY')
+        if apikey:
+            headers = {
+                'x-apikey': apikey
+            }
     rv = client.post('/api/v1/registration-report-callback/' + str(registration_id),
-                     headers=None)
+                     headers=headers)
     # check
     assert rv.status_code == status

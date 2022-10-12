@@ -215,7 +215,7 @@ class MhrLocationTypes(BaseEnum):
     """Render an Enum of the MHR location types."""
 
     MANUFACTURER = 'MANUFACTURER'
-    MH_DEALER = 'MH_DEALER'
+    MH_PARK = 'MH_PARK'
     OTHER = 'OTHER'
     RESERVE = 'RESERVE'
     STRATA = 'STRATA'

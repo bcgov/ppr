@@ -95,6 +95,7 @@ class Db2Document(db.Model):
         self.affirm_by_name = self.affirm_by_name.strip()
         self.liens_with_consent = self.liens_with_consent.strip()
         self.client_reference_id = self.client_reference_id.strip()
+        self.own_land = self.own_land.strip()
 
     @classmethod
     def find_by_id(cls, doc_id: str):
@@ -140,6 +141,20 @@ class Db2Document(db.Model):
             document.strip()
         return document
 
+    @classmethod
+    def find_by_doc_reg_num(cls, doc_reg_num: str):
+        """Return the document matching the document registration id/number."""
+        document = None
+        if doc_reg_num:
+            try:
+                document = cls.query.filter(Db2Document.document_reg_id == doc_reg_num).one_or_none()
+            except Exception as db_exception:   # noqa: B902; return nicer error
+                current_app.logger.error('Db2Document.find_by_doc_reg_num exception: ' + str(db_exception))
+                raise DatabaseException(db_exception)
+        if document:
+            document.strip()
+        return document
+
     @property
     def json(self):
         """Return a dict of this object, with keys in JSON format."""
@@ -173,8 +188,8 @@ class Db2Document(db.Model):
             document['draftDateTime'] = model_utils.format_local_ts(self.draft_ts)
         if self.registration_ts:
             document['createDateTime'] = model_utils.format_local_ts(self.registration_ts)
-        if self.transfer_execution_date:
-            document['transferExecutionDate'] = model_utils.format_local_date(self.transfer_execution_date)
+        if self.transfer_execution_date and self.transfer_execution_date.year > 1:
+            document['transferDate'] = model_utils.format_local_date(self.transfer_execution_date)
         return document
 
     @property
@@ -187,10 +202,17 @@ class Db2Document(db.Model):
             'documentType': self.document_type,
             'mhrNumber': self.mhr_number,
             'declaredValue': self.declared_value,
+            'ownLand': False,
+            'consideration': self.consideration_value,
             'attentionReference': self.attention_reference,
             'clientReferenceId': self.client_reference_id,
-            'submittingParty': self.submitting_party()
+            'submittingParty': self.submitting_party(),
+            'affirmByName': self.affirm_by_name
         }
+        if self.own_land == 'Y':
+            document['ownLand'] = True
+        if self.transfer_execution_date and self.transfer_execution_date.year > 1900:
+            document['transferDate'] = model_utils.format_local_date(self.transfer_execution_date)
         if self.registration_ts:
             document['createDateTime'] = model_utils.format_local_ts(self.registration_ts)
         return document
@@ -262,8 +284,7 @@ class Db2Document(db.Model):
                           interimed='',
                           owner_cross_reference='',
                           interest_denominator=0,
-                          declared_value=0,
-                          own_land='',
+                          declared_value=reg_json.get('declaredValue', 0),
                           routing_slip_number='')
         doc.last_service = ''
         doc.bcol_account = ''
@@ -271,7 +292,7 @@ class Db2Document(db.Model):
         doc.examiner_id = ''
         doc.update_id = ''
         doc.number_of_pages = 0
-        doc.consideration_value = ''
+        doc.consideration_value = reg_json.get('consideration', '')
         doc.affirm_by_name = ''
         doc.liens_with_consent = ''
         if reg_json.get('submittingParty'):
@@ -298,8 +319,15 @@ class Db2Document(db.Model):
             doc.client_reference_id = registration.client_reference_id[0:29]
         else:
             doc.client_reference_id = ''
-        if doc_type in (Db2Document.DocumentTypes.TRAND, Db2Document.DocumentTypes.TRAND):
-            doc.transfer_execution_date = local_ts.date()
+        if doc_type in (Db2Document.DocumentTypes.TRANS, Db2Document.DocumentTypes.TRAND):
+            if reg_json.get('transferDate'):
+                doc.transfer_execution_date = model_utils.date_from_iso_format(str(reg_json['transferDate'])[0:10])
+            else:
+                doc.transfer_execution_date = local_ts.date()
         else:
             doc.transfer_execution_date = model_utils.date_from_iso_format('0001-01-01')
+        if reg_json.get('ownLand'):
+            doc.own_land = 'Y'
+        else:
+            doc.own_land = 'N'
         return doc

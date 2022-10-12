@@ -56,9 +56,6 @@ def post_searches():
         extra_validation_msg = validate_search(request_json, is_staff_account(account_id, jwt))
         if not valid_format or extra_validation_msg != '':
             return resource_utils.validation_error_response(errors, VAL_ERROR, extra_validation_msg)
-
-        if not valid_format:
-            return resource_utils.validation_error_response(errors, VAL_ERROR)
         # Perform any extra data validation such as start and end dates here
         SearchRequest.validate_query(request_json)
         query: SearchRequest = SearchRequest.create_from_json(request_json, account_id,
@@ -138,7 +135,7 @@ def staff_update(request_json: dict, reg_staff: bool) -> dict:
 def validate_search(request_json: dict, reg_staff: bool) -> str:
     """Perform extra search request validation."""
     error_msg = ''
-    search_type: str = model_utils.TO_DB_SEARCH_TYPE[request_json.get('type')] if request_json.get('type') else ''
+    search_type = model_utils.TO_DB_SEARCH_TYPE.get(request_json.get('type', ''), '')
     if search_type == SearchRequest.SearchTypes.OWNER_NAME and request_json.get('criteria'):
         name = request_json['criteria'].get('ownerName')
         if name and name.get('first', '') == '' and not reg_staff:

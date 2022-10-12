@@ -304,18 +304,19 @@ def format_local_ts(time_stamp):
 def format_local_date(base_date):
     """Build a local timezone ISO 8601 date."""
     formatted_ts = None
-    if base_date:
-        try:
-            # Naive time
-            local_time = time(9, 0, 0, tzinfo=None)
-            base_ts = _datetime.combine(base_date, local_time)
-            # Explicitly set to local timezone.
-            local_ts = LOCAL_TZ.localize(base_ts)
-            formatted_ts = local_ts.replace(tzinfo=LOCAL_TZ).replace(microsecond=0).isoformat()
-        except Exception as format_exception:   # noqa: B902; return nicer error
-            current_app.logger.error('format_local_date exception: ' + str(format_exception))
-            formatted_ts = base_date.isoformat()
-    return formatted_ts[0:10]
+    if not base_date or base_date.year == 1:
+        return formatted_ts
+    try:
+        # Naive time
+        local_time = time(9, 0, 0, tzinfo=None)
+        base_ts = _datetime.combine(base_date, local_time)
+        # Explicitly set to local timezone.
+        local_ts = LOCAL_TZ.localize(base_ts)
+        formatted_ts = local_ts.replace(tzinfo=LOCAL_TZ).replace(microsecond=0).isoformat()
+    except Exception as format_exception:   # noqa: B902; return nicer error
+        current_app.logger.error(f'format_local_date exception ({base_date.isoformat()}): ' + str(format_exception))
+        formatted_ts = base_date.isoformat()
+    return formatted_ts  # [0:10]
 
 
 def now_ts():
