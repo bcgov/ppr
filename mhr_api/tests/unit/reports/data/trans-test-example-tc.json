@@ -1,0 +1,87 @@
+{
+  "addOwnerGroups": [
+    {
+      "groupId": 3, 
+      "interest": "UNDIVIDED 1/5", 
+      "interestNumerator": 1, 
+      "owners": [
+        {
+          "address": {
+            "city": "LANGLEY", 
+            "country": "CA", 
+            "postalCode": "V3A 6H4", 
+            "region": "BC", 
+            "street": "6665 238TH STREET"
+          }, 
+          "individualName": {
+            "first": "JOHN", 
+            "last": "CONNOLLY", 
+            "middle": "STEVEN"
+          }, 
+          "phoneNumber": "604462027", 
+          "type": "COMMON"
+        }
+      ], 
+      "status": "ACTIVE", 
+      "tenancySpecified": true, 
+      "type": "COMMON"
+    }
+  ], 
+  "affirmByName": "BCREG2 Della FORTYTHREE", 
+  "attentionReference": "UT-TRANS-0005", 
+  "clientReferenceId": "UT-TRANS0015", 
+  "consideration": "$100000.00", 
+  "createDateTime": "2022-10-12T12:47:45-07:53", 
+  "declaredValue": 100000, 
+  "deleteOwnerGroups": [
+    {
+      "groupId": 2, 
+      "interest": "", 
+      "interestNumerator": 0, 
+      "owners": [
+        {
+          "address": {
+            "city": "QUEEN CHARLOTTE CITY", 
+            "country": "CA", 
+            "postalCode": "V0T 1S0", 
+            "region": "BC", 
+            "street": "315 2ND AVENUE"
+          }, 
+          "individualName": {
+            "first": "KATHERINE", 
+            "last": "ASHER", 
+            "middle": "DEBORAH"
+          }, 
+          "phoneNumber": "604", 
+          "type": "COMMON"
+        }
+      ], 
+      "status": "PREVIOUS", 
+      "tenancySpecified": true, 
+      "type": "COMMON"
+    }
+  ], 
+  "documentDescription": "SALE OR GIFT", 
+  "documentId": "10200078", 
+  "documentRegistrationNumber": "00500239", 
+  "documentType": "TRAN", 
+  "mhrNumber": "005569", 
+  "ownLand": true, 
+  "payment": {
+    "invoiceId": "22648", 
+    "receipt": "/api/v1/payment-requests/22648/receipts"
+  }, 
+  "status": "ACTIVE", 
+  "submittingParty": {
+    "address": {
+      "city": "VICTORIA", 
+      "country": "CA", 
+      "postalCode": "V8W 2V8", 
+      "region": "BC", 
+      "street": "222 SUMMER STREET"
+    }, 
+    "businessName": "ABC SEARCHING COMPANY", 
+    "emailAddress": "bsmith@abc-search.com"
+  }, 
+  "transferDate": "2022-10-12T09:00:00-07:53"
+}

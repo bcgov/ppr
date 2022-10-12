@@ -38,6 +38,7 @@ DELETE_GROUP_TYPE_INVALID = 'The owner group tenancy type with ID {group_id} is 
 DECLARED_VALUE_REQUIRED = 'Declared value is required and must be greater than 0 for this registration. '
 CONSIDERATION_REQUIRED = 'Consideration required for this registration. '
 TRANSFER_DATE_REQUIRED = 'Transfer date is required for this registration. '
+ADD_SOLE_OWNER_INVALID = 'Only one sole owner and only one sole owner group can be added. '
 
 
 def validate_registration(json_data, is_staff: bool = False):
@@ -63,9 +64,14 @@ def validate_transfer(registration: MhrRegistration, json_data, is_staff: bool =
         error_msg += validate_doc_id(json_data)
     error_msg += validate_submitting_party(json_data)
     if json_data.get('addOwnerGroups'):
+        so_count: int = 0
         for group in json_data.get('addOwnerGroups'):
             for owner in group.get('owners'):
+                if NEW_TENANCY_LEGACY.get(group.get('type', ''), '') == 'SO':
+                    so_count += 1
                 error_msg += validate_owner(owner)
+        if so_count > 1 or (so_count == 1 and len(json_data.get('addOwnerGroups')) > 1):
+            error_msg += ADD_SOLE_OWNER_INVALID
     error_msg += validate_registration_state(registration)
     if is_legacy() and registration and registration.manuhome and json_data.get('deleteOwnerGroups'):
         error_msg += validate_delete_owners_legacy(registration, json_data)

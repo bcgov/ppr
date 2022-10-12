@@ -259,7 +259,7 @@ class Db2Manuhome(db.Model):
             'mhrNumber': self.mhr_number,
             'status': LEGACY_STATUS_DESCRIPTION.get(self.mh_status),
             'documentId': doc_json.get('documentId', ''),
-            'documentRegistrationId': doc_json.get('documentRegistrationId', ''),
+            'documentRegistrationNumber': doc_json.get('documentRegistrationNumber', ''),
             'documentType': doc_json.get('documentType', ''),
             'createDateTime': doc_json.get('createDateTime', ''),
             'clientReferenceId': doc_json.get('clientReferenceId', ''),

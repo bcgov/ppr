@@ -27,6 +27,16 @@
                      {{ submittingParty.address.country }}</div>
             </td>
             <td class="col-33">
+                {% if documentType in ('TRAN', 'DEAT')  %}
+                    <div class="section-sub-title">Affirmed By</div>
+                    <div class="pt-2">
+                        {% if affirmByName is defined and affirmByName != '' %} 
+                            {{ affirmByName }}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </div>
+                 {% endif %}
             </td>
          </tr>
 </table>
