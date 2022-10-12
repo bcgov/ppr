@@ -58,7 +58,7 @@
               {{ row.item.suffix }}
             </div>
             <v-chip
-              v-if="hasAddedHomeOwner(row.item.id)"
+              v-if="isMhrTransfer && hasAddedHomeOwner(row.item.id)"
               class="badge-added ml-8 mt-2"
               color="primary"
               label
