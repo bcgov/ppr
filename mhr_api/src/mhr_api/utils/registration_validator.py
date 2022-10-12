@@ -35,6 +35,9 @@ CHARACTER_SET_UNSUPPORTED = 'The character set is not supported for {desc} value
 DELETE_GROUP_ID_INVALID = 'The owner group with ID {group_id} is not active and cannot be changed. '
 DELETE_GROUP_ID_NONEXISTENT = 'No owner group with ID {group_id} exists. '
 DELETE_GROUP_TYPE_INVALID = 'The owner group tenancy type with ID {group_id} is invalid. '
+DECLARED_VALUE_REQUIRED = 'Declared value is required and must be greater than 0 for this registration. '
+CONSIDERATION_REQUIRED = 'Consideration required for this registration. '
+TRANSFER_DATE_REQUIRED = 'Transfer date is required for this registration. '
 
 
 def validate_registration(json_data, is_staff: bool = False):
@@ -66,6 +69,13 @@ def validate_transfer(registration: MhrRegistration, json_data, is_staff: bool =
     error_msg += validate_registration_state(registration)
     if is_legacy() and registration and registration.manuhome and json_data.get('deleteOwnerGroups'):
         error_msg += validate_delete_owners_legacy(registration, json_data)
+    if not is_staff:
+        if not json_data.get('declaredValue') or json_data.get('declaredValue') < 0:
+            error_msg += DECLARED_VALUE_REQUIRED
+        if not json_data.get('consideration'):
+            error_msg += CONSIDERATION_REQUIRED
+        if not json_data.get('transferDate'):
+            error_msg += TRANSFER_DATE_REQUIRED
     return error_msg
 
 

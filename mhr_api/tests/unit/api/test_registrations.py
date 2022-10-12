@@ -137,4 +137,7 @@ def test_get_registration(session, client, jwt, desc, roles, status, account_id,
     response = client.get('/api/v1/registrations/' + mhr_num,
                           headers=headers)
     # check
-    assert response.status_code == status
+    if status == HTTPStatus.NOT_FOUND:
+        assert response.status_code in (status, HTTPStatus.UNAUTHORIZED)
+    else:
+        assert response.status_code == status

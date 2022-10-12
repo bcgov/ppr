@@ -24,7 +24,7 @@ from mhr_api.models import Db2Document, utils as model_utils
 
 # testdata pattern is ({exists}, {id}, {mhr_num}, {doc_type}, {doc_reg_id})
 TEST_DATA = [
-    (True, 'REG22911', '022911', 'CONV', '00022911'),
+    (True, '10085347', '100013', 'TRAN', '00384555'),
     (False, 0, None, None, None)
 ]
 
@@ -105,9 +105,9 @@ def test_find_by_mhr_number(session, exists, id, mhr_num, doc_type, doc_reg_id):
 
 
 @pytest.mark.parametrize('exists,id,mhr_num,doc_type,doc_reg_id', TEST_DATA)
-def test_find_by_doc_id(session, exists, id, mhr_num, doc_type, doc_reg_id):
-    """Assert that find document by document id contains all expected elements."""
-    doc = Db2Document.find_by_doc_id(doc_reg_id)
+def test_find_by_doc_reg_num(session, exists, id, mhr_num, doc_type, doc_reg_id):
+    """Assert that find document by document registration number contains all expected elements."""
+    doc = Db2Document.find_by_doc_reg_num(doc_reg_id)
     if exists:
         assert doc
         assert doc.mhr_number == mhr_num
@@ -193,8 +193,8 @@ def test_document_json(session):
         'affirmByName': doc.affirm_by_name,
         'liensWithConsent': doc.liens_with_consent,
         'clientReferenceId': doc.client_reference_id,
-        'draftDateTime': '1995-11-10T17:20:22+00:00',
-        'createDateTime': '1995-11-14T08:00:01+00:00',
-        'transferExecutionDate': '0001-01-01'
+        'draftDateTime': '1995-11-10T17:20:22-07:53',
+        'createDateTime': '1995-11-14T08:00:01-07:53',
+        # 'transferDate': '0001-01-01'
     }
     assert doc.json == test_json

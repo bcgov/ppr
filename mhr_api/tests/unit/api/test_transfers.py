@@ -24,11 +24,12 @@ from flask import current_app
 from registry_schemas.example_data.mhr import TRANSFER
 
 from mhr_api.models import MhrRegistration
-from mhr_api.services.authz import MHR_ROLE, STAFF_ROLE, \
+from mhr_api.services.authz import MHR_ROLE, STAFF_ROLE, COLIN_ROLE, \
                                    TRANSFER_DEATH_JT, TRANSFER_SALE_BENEFICIARY
 from tests.unit.services.utils import create_header, create_header_account
 
 
+DOC_ID_VALID = '63166035'
 MOCK_AUTH_URL = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/'
 MOCK_PAY_URL = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/pay/api/v1/'
 
@@ -44,11 +45,13 @@ TEST_CREATE_DATA = [
     ('Valid staff', '098666', [MHR_ROLE, STAFF_ROLE, TRANSFER_SALE_BENEFICIARY], HTTPStatus.CREATED, 'PS12345'),
     ('Valid non-staff legacy', '098666', [MHR_ROLE, TRANSFER_DEATH_JT, TRANSFER_SALE_BENEFICIARY],
      HTTPStatus.CREATED, 'PS12345'),
-    ('Valid non-staff new', '150064', [MHR_ROLE, TRANSFER_DEATH_JT, TRANSFER_SALE_BENEFICIARY],
+    ('Valid non-staff new', '150081', [MHR_ROLE, TRANSFER_DEATH_JT, TRANSFER_SALE_BENEFICIARY],
      HTTPStatus.CREATED, '2523'),
     ('Invalid mhr num', '300655', [MHR_ROLE, TRANSFER_SALE_BENEFICIARY], HTTPStatus.UNAUTHORIZED, 'PS12345'),
     ('Invalid exempt', '098655', [MHR_ROLE, TRANSFER_SALE_BENEFICIARY], HTTPStatus.BAD_REQUEST, 'PS12345'),
-    ('Invalid historical', '099942', [MHR_ROLE, TRANSFER_SALE_BENEFICIARY], HTTPStatus.BAD_REQUEST, 'PS12345')
+    ('Invalid historical', '099942', [MHR_ROLE, TRANSFER_SALE_BENEFICIARY], HTTPStatus.BAD_REQUEST, 'PS12345'),
+    ('Invalid non-staff missing declared value', '098666', [MHR_ROLE, TRANSFER_DEATH_JT, TRANSFER_SALE_BENEFICIARY],
+     HTTPStatus.BAD_REQUEST, 'PS12345')
 ]
 
 
@@ -67,13 +70,14 @@ def test_create(session, client, jwt, desc, mhr_num, roles, status, account):
     json_data['mhrNumber'] = mhr_num
     if desc == 'Invalid schema validation missing submitting':
         del json_data['submittingParty']
+    elif desc == 'Invalid non-staff missing declared value':
+        del json_data['declaredValue']
     if account:
         headers = create_header_account(jwt, roles, 'UT-TEST', account)
     else:
         headers = create_header(jwt, roles)
     if status == HTTPStatus.CREATED and STAFF_ROLE in roles:
-        json_data['documentId'] = '89948756'
-
+        json_data['documentId'] = DOC_ID_VALID
     # test
     response = client.post('/api/v1/transfers/' + mhr_num,
                            json=json_data,

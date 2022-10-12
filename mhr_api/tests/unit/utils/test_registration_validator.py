@@ -98,6 +98,15 @@ TEST_TRANSFER_DATA = [
     (DESC_INVALID_GROUP_TYPE, False, False, None, validator.DELETE_GROUP_TYPE_INVALID,
      MhrRegistrationStatusTypes.ACTIVE)
 ]
+# testdata pattern is ({description}, {valid}, {staff}, {tran_dt}, {dec_val}, {consideration}, {message content})
+TEST_TRANSFER_DATA_EXTRA = [
+    ('Valid staff exists', True, True, True, True, True, None),
+    ('Valid staff missing', True, True, False, False, False, None),
+    ('Valid non-staff exists', True, False, True, True, True, None),
+    ('Invalid non-staff missing transfer date', False, False, False, True, True, validator.TRANSFER_DATE_REQUIRED),
+    ('Invalid non-staff missing declared value', False, False, True, False, True, validator.DECLARED_VALUE_REQUIRED),
+    ('Invalid non-staff missing consideration', False, False, True, True, False, validator.CONSIDERATION_REQUIRED)
+]
 
 
 @pytest.mark.parametrize('desc,valid,staff,doc_id,message_content', TEST_REG_DATA)
@@ -163,6 +172,36 @@ def test_validate_transfer(session, desc, valid, staff, doc_id, message_content,
                 assert error_msg.find(expected) != -1
             else:
                 assert error_msg.find(message_content) != -1
+
+
+@pytest.mark.parametrize('desc,valid,staff,trans_dt,dec_value,consideration,message_content', TEST_TRANSFER_DATA_EXTRA)
+def test_validate_transfer_details(session, desc, valid, staff, trans_dt, dec_value, consideration, message_content):
+    """Assert that MH transfer validation of detail information works as expected."""
+    # setup
+    json_data = copy.deepcopy(TRANSFER)
+    if not trans_dt:
+        del json_data['transferDate']
+    if not dec_value:
+        del json_data['declaredValue']
+    if not consideration:
+        del json_data['consideration']
+    if valid:
+        json_data['deleteOwnerGroups'][0]['groupId'] = 2
+        json_data['deleteOwnerGroups'][0]['type'] = 'JOINT'
+        if staff:
+            json_data['documentId'] = '63166035'
+    valid_format, errors = schema_utils.validate(json_data, 'transfer', 'mhr')
+    # Additional validation not covered by the schema.
+    registration: MhrRegistration = MhrRegistration.find_by_mhr_number('045349', 'PS12345')
+    error_msg = validator.validate_transfer(registration, json_data, staff)
+    if errors:
+        current_app.logger.debug(errors)
+    if valid:
+        assert valid_format and error_msg == ''
+    else:
+        assert error_msg != ''
+        if message_content:
+            assert error_msg.find(message_content) != -1
 
 
 @pytest.mark.parametrize('desc,bus_name,first,middle,last,message_content,data', TEST_PARTY_DATA)

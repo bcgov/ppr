@@ -277,6 +277,11 @@ class Db2Manuhome(db.Model):
                     add_groups.append(group.registration_json)
             man_home['addOwnerGroups'] = add_groups
             man_home['deleteOwnerGroups'] = delete_groups
+            man_home['declaredValue'] = doc_json.get('declaredValue')
+            man_home['consideration'] = doc_json.get('consideration')
+            man_home['ownLand'] = doc_json.get('ownLand')
+            if doc_json.get('transferDate'):
+                man_home['transferDate'] = doc_json.get('transferDate')
         else:
             if self.reg_owner_groups:
                 groups = []

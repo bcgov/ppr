@@ -24,14 +24,14 @@ from mhr_api.models import Db2Owngroup
 
 # testdata pattern is ({exists}, {manuhome_id}, {group_id}, {reg_doc_id}, {type})
 TEST_DATA = [
-    (True, 1, 1, 'REG22911', 'SO'),
+    (True, 101917, 1, '60164729', 'SO'),
     (False, 0, 0, None, None)
 ]
 
 
 @pytest.mark.parametrize('exists,manuhome_id,group_id,reg_doc_id,type', TEST_DATA)
 def test_find_by_manuhome_id(session, exists, manuhome_id, group_id, reg_doc_id, type):
-    """Assert that find document by manuhome id contains all expected elements."""
+    """Assert that find an owner group by manuhome id and group id contains all expected elements."""
     owngroup: Db2Owngroup = Db2Owngroup.find_by_manuhome_id(manuhome_id, group_id)
     if exists:
         assert owngroup
@@ -55,28 +55,53 @@ def test_find_by_manuhome_id(session, exists, manuhome_id, group_id, reg_doc_id,
 
 
 @pytest.mark.parametrize('exists,manuhome_id,group_id,reg_doc_id,type', TEST_DATA)
+def test_find_all_by_manuhome_id(session, exists, manuhome_id, group_id, reg_doc_id, type):
+    """Assert that find all owner groups by manuhome id contains all expected elements."""
+    groups = Db2Owngroup.find_all_by_manuhome_id(manuhome_id)
+    if exists:
+        assert groups
+        for owngroup in groups:
+            assert owngroup.manuhome_id == manuhome_id
+            assert owngroup.group_id == group_id
+            assert owngroup.reg_document_id == reg_doc_id
+            assert owngroup.tenancy_type == type
+            assert owngroup.can_document_id is not None
+            assert owngroup.copy_id is not None
+            assert owngroup.status is not None
+            assert owngroup.sequence_number is not None
+            assert owngroup.pending_flag is not None
+            assert owngroup.lessee is not None
+            assert owngroup.lessor is not None
+            assert owngroup.interest is not None
+            assert owngroup.interest_numerator is not None
+            assert owngroup.tenancy_specified is not None
+    else:
+        assert not groups
+
+
+@pytest.mark.parametrize('exists,manuhome_id,group_id,reg_doc_id,type', TEST_DATA)
 def test_find_by_reg_doc_id(session, exists, manuhome_id, group_id, reg_doc_id, type):
     """Assert that find document by manuhome id contains all expected elements."""
-    owngroup: Db2Owngroup = Db2Owngroup.find_by_reg_doc_id(manuhome_id, reg_doc_id)
+    groups = Db2Owngroup.find_by_reg_doc_id(manuhome_id, reg_doc_id)
     if exists:
-        assert owngroup
-        assert owngroup.manuhome_id == manuhome_id
-        assert owngroup.group_id == group_id
-        assert owngroup.reg_document_id == reg_doc_id
-        assert owngroup.tenancy_type == type
-        assert owngroup.can_document_id is not None
-        assert owngroup.copy_id is not None
-        assert owngroup.status is not None
-        assert owngroup.sequence_number is not None
-        assert owngroup.pending_flag is not None
-        assert owngroup.lessee is not None
-        assert owngroup.lessor is not None
-        assert owngroup.interest is not None
-        assert owngroup.interest_numerator is not None
-        assert owngroup.tenancy_specified is not None
-
+        assert groups
+        for owngroup in groups:
+            assert owngroup.manuhome_id == manuhome_id
+            assert owngroup.group_id == group_id
+            assert owngroup.reg_document_id == reg_doc_id
+            assert owngroup.tenancy_type == type
+            assert owngroup.can_document_id is not None
+            assert owngroup.copy_id is not None
+            assert owngroup.status is not None
+            assert owngroup.sequence_number is not None
+            assert owngroup.pending_flag is not None
+            assert owngroup.lessee is not None
+            assert owngroup.lessor is not None
+            assert owngroup.interest is not None
+            assert owngroup.interest_numerator is not None
+            assert owngroup.tenancy_specified is not None
     else:
-        assert not owngroup
+        assert not groups
 
 
 def test_owngroup_json(session):
