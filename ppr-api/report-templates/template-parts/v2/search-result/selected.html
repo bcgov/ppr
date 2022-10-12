@@ -1,0 +1,192 @@
+<div class="container pt-4">
+    {% if searchQuery.type in ('INDIVIDUAL_DEBTOR', 'BUSINESS_DEBTOR') %}
+    {% if searchQuery.type == 'BUSINESS_DEBTOR' %}
+    <table class="selected-debtor-table mt-4" role="presentation">
+    {% else %}
+    <table class="selected-ind-debtor-table mt-4" role="presentation">
+    {% endif %}
+        <tr class="selected-debtor-table-header no-page-break">
+         <td class="top-align"></td>
+         <td class="top-align">Base Registration</td>
+         <td class="top-align">Base Registration Date</td>
+         <td class="top-align">Debtor Name</td>
+         {% if searchQuery.type == 'INDIVIDUAL_DEBTOR' %}
+         <td class="top-align">Birth Date</td>
+         {% endif %}
+         <td class="top-align">Page</td>
+        </tr>
+        {% for result in selected %}
+        <tr class="no-page-break">
+            <td>
+                {% if result.index is defined %}
+                    {{result.index}}
+                {% endif %}
+            </td>
+            <td>
+                {% if not result.duplicate %}
+                    <a href="#{{result.baseRegistrationNumber}}">{{result.baseRegistrationNumber}}</a>
+                {% endif %}
+            </td>
+            <td>
+                {% if not result.duplicate %}
+                    {{result.createDateTime}}
+                {% endif %}
+            </td>
+            <td>
+                {% if result.matchType == 'EXACT' %}<span class="bold">* {% endif %} 
+                {% if result.debtor.businessName is defined %}
+                    {{ result.debtor.businessName }}
+                {% else %}
+                    {{ result.debtor.personName.last }}, {{ result.debtor.personName.first }}
+                    {% if result.debtor.personName.middle is defined %} &nbsp;{{ result.debtor.personName.middle }} {% endif %}
+                {% endif %}
+                {% if result.matchType == 'EXACT' %}</span>{% endif %}
+            </td>
+            {% if searchQuery.type == 'INDIVIDUAL_DEBTOR' %}
+            <td>
+                {% if result.debtor.birthDate is defined %}
+                    {{ result.debtor.birthDate }}
+                {% endif %}
+            </td>
+            {% endif %}
+            <td class="right-align">
+                {% if not result.duplicate %}
+                    <a href="#{{result.baseRegistrationNumber}}">{{result.pageNumber}}</a>
+                {% endif %}
+            </td>
+         </tr>
+        {% if not result.has_duplicate %}
+            <tr class="solid-row-separator no-page-break">
+                <td colspan="4" style="height:1px"/>
+            </tr>
+        {% endif %}
+      {% endfor %}
+    </table>
+    {% elif searchQuery.type == 'REGISTRATION_NUMBER' %}
+    <table class="selected-reg-num-table mt-4" role="presentation">
+        <tr class="selected-reg-num-table-header no-page-break">
+           <td class="top-align"></td>
+           <td class="top-align">Base Registration</td>
+           <td class="top-align">Base Registration Date</td>
+           <td class="top-align">Registration Type</td>
+           <td class="top-align">Page</td>
+          </tr>
+          <tr class="no-page-break">
+            <td>1</td>
+            <td class="bold"><a href="#{{selected[0].baseRegistrationNumber}}">* {{selected[0].baseRegistrationNumber}}</a></td>
+            <td>{{selected[0].createDateTime}}</td>
+            <td>{{details[0].financingStatement.registrationDescription}}</td>
+            <td class="right-align">
+                <a href="#{{selected[0].baseRegistrationNumber}}">{{selected[0].pageNumber}}</a>
+            </td>
+         </tr>
+         <tr class="solid-row-separator no-page-break">
+            <td colspan="4" style="height:1px"/>
+         </tr>
+      </table>
+    {% elif searchQuery.type != 'MHR_NUMBER' %}
+    <table class="selected-serial-table mt-4" role="presentation">
+        <tr class="selected-serial-table-header no-page-break">
+            <td class="top-align"></td>
+            <td class="top-align">Base Registration</td>
+            <td class="top-align">Base Registration Date</td>
+            <td class="top-align">Serial Number</td>
+            <td class="top-align">Type Code</td>
+             <td class="top-align">Year</td>
+            <td class="top-align">Make/Model</td>
+            <td class="top-align">Page</td>
+        </tr>
+        {% for result in selected %}
+            <tr class="no-page-break">
+                <td>
+                    {% if result.index is defined %}
+                        {{result.index}}
+                    {% endif %}
+                </td>
+                <td>
+                    {% if not result.duplicate %}
+                        <a href="#{{result.baseRegistrationNumber}}">{{result.baseRegistrationNumber}}</a>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if not result.duplicate %}
+                        {{result.createDateTime}}
+                    {% endif %}
+                </td>    
+                <td>
+                    {% if result.matchType == 'EXACT' %}<span class="bold">* {% endif %}
+                    {{result.vehicleCollateral.serialNumber}}
+                    {% if result.matchType == 'EXACT' %}</span>{% endif %}
+                </td>
+                <td>{{result.vehicleCollateral.type}}</td>
+                <td>{{result.vehicleCollateral.year}}</td>
+                <td>{{result.vehicleCollateral.make}} 
+                    {% if result.vehicleCollateral.model is defined %} / {{result.vehicleCollateral.model}}{% endif %}
+                </td>
+                <td class="right-align">
+                    {% if not result.duplicate %}
+                        <a href="#{{result.baseRegistrationNumber}}">{{result.pageNumber}}</a>
+                    {% endif %}
+                </td>
+                </tr>
+            {% if not result.has_duplicate %}
+                <tr class="solid-row-separator no-page-break">
+                    <td colspan="4" style="height:1px"/>
+                </tr>
+            {% endif %}
+        {% endfor %}
+    </table>
+    {% else %}
+    <table class="selected-mhr-table mt-4" role="presentation">
+        <tr class="selected-mhr-table-header no-page-break">
+            <td class="top-align"></td>
+            <td class="top-align">Base Registration</td>
+            <td class="top-align">Base Registration Date</td>
+            <td class="top-align">Serial Number</td>
+            <td class="top-align">Year</td>
+            <td class="top-align">Make/Model</td>
+            <td class="top-align">MHR Number</td>
+            <td class="top-align">Page</td>
+        </tr>
+        {% for result in selected %}
+            <tr class="no-page-break">
+                <td>
+                    {% if result.index is defined %}
+                        {{result.index}}
+                    {% endif %}
+                </td>
+                <td>
+                    {% if not result.duplicate %}
+                        <a href="#{{result.baseRegistrationNumber}}">{{result.baseRegistrationNumber}}</a>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if not result.duplicate %}
+                        {{result.createDateTime}}
+                    {% endif %}
+                </td>    
+                <td>
+                    {% if result.matchType == 'EXACT' %}<span class="bold">* {% endif %}
+                    {{result.vehicleCollateral.serialNumber}}
+                    {% if result.matchType == 'EXACT' %}</span>{% endif %}
+                </td>
+                <td>{{result.vehicleCollateral.year}}</td>
+                <td>{{result.vehicleCollateral.make}} 
+                    {% if result.vehicleCollateral.model is defined %} / {{result.vehicleCollateral.model}}{% endif %}
+                </td>
+                <td>{{result.vehicleCollateral.manufacturedHomeRegistrationNumber}}</td>
+                <td class="right-align">
+                    {% if not result.duplicate %}
+                        <a href="#{{result.baseRegistrationNumber}}">{{result.pageNumber}}</a>
+                    {% endif %}
+                </td>
+                </tr>
+            {% if not result.has_duplicate %}
+                <tr class="solid-row-separator no-page-break">
+                    <td colspan="4" style="height:1px"/>
+                </tr>
+            {% endif %}
+        {% endfor %}
+    </table>  
+    {% endif %}
+</div>

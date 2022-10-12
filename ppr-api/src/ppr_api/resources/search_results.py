@@ -111,24 +111,11 @@ class SearchResultsResource(Resource):
                 return resource_utils.unprocessable_error_response('search result details')
 
             response_data = search_detail.json
-            # Results data that is too large for real time report generation (small number of results) is also
-            # asynchronous.
-            if callback_url is None and search_detail.callback_url is not None:
-                callback_url = search_detail.callback_url
-                is_ui_pdf = True
-            if resource_utils.is_pdf(request) or is_ui_pdf:
-                # If results over threshold return JSON with callbackURL, getReportURL
-                if callback_url is not None:
-                    # Add enqueue report generation event here.
-                    enqueue_search_report(search_id)
-                    response_data['callbackURL'] = requests.utils.unquote(callback_url)
-                    response_data['getReportURL'] = REPORT_URL.format(search_id=search_id)
-                    return jsonify(response_data), HTTPStatus.OK
-
-                # Return report if request header Accept MIME type is application/pdf.
-                return get_pdf(response_data, account_id, ReportTypes.SEARCH_DETAIL_REPORT.value,
-                               jwt.get_token_auth_header())
-
+            # Queue the report generation.
+            enqueue_search_report(search_id)
+            if callback_url is not None:
+                response_data['callbackURL'] = requests.utils.unquote(callback_url)
+            response_data['getReportURL'] = REPORT_URL.format(search_id=search_id)
             return jsonify(response_data), HTTPStatus.OK
 
         except DatabaseException as db_exception:
@@ -158,7 +145,7 @@ class SearchResultsResource(Resource):
 
             # Try to fetch search detail by search id.
             current_app.logger.info(f'Fetching search detail for {search_id}.')
-            search_detail = SearchResult.find_by_search_id(search_id, True)
+            search_detail: SearchResult = SearchResult.find_by_search_id(search_id, True)
             if not search_detail:
                 return resource_utils.not_found_error_response('searchId', search_id)
 
@@ -167,23 +154,34 @@ class SearchResultsResource(Resource):
             if search_detail.search_select is None and search_detail.search.total_results_size > 0:
                 return resource_utils.bad_request_response(GET_DETAILS_ERROR)
 
-            # If the request is for an async large report, fetch binary data from doc storage.
-            if resource_utils.is_pdf(request) and search_detail.callback_url is not None:
-                if search_detail.doc_storage_url is None:
+            response_data = search_detail.json
+            if resource_utils.is_pdf(request):
+                if search_detail.doc_storage_url is not None:
+                    # Fetch binary data from doc storage.
+                    doc_name = search_detail.doc_storage_url
+                    current_app.logger.info(f'Fetching search report {doc_name} from doc storage.')
+                    raw_data = GoogleStorageService.get_document(doc_name)
+                    return raw_data, HTTPStatus.OK, {'Content-Type': 'application/pdf'}
+                if (search_detail.exact_match_count + search_detail.similar_match_count) >= 75 or \
+                        not model_utils.report_retry_elapsed(search_detail.search.search_ts):
                     error_msg = f'Search report not yet available for {search_id}.'
                     current_app.logger.info(error_msg)
                     return resource_utils.bad_request_response(error_msg)
-                doc_name = search_detail.doc_storage_url if not search_detail.doc_storage_url.startswith('http') \
-                    else SEARCH_RESULTS_DOC_NAME.format(search_id=search_id)
-                current_app.logger.info(f'Fetching large search report {doc_name} from doc storage.')
-                raw_data = GoogleStorageService.get_document(doc_name)
-                return raw_data, HTTPStatus.OK, {'Content-Type': 'application/pdf'}
-
-            response_data = search_detail.json
-            if resource_utils.is_pdf(request):
-                # Return report if request header Accept MIME type is application/pdf.
-                return get_pdf(response_data, account_id, ReportTypes.SEARCH_DETAIL_REPORT.value,
-                               jwt.get_token_auth_header())
+                # Generate and store report.
+                current_app.logger.info(f'Generating search detail report for {search_id}.')
+                raw_data, status_code, headers = get_pdf(response_data,
+                                                         account_id,
+                                                         ReportTypes.SEARCH_DETAIL_REPORT.value,
+                                                         jwt.get_token_auth_header())
+                current_app.logger.debug(f'report api call status={status_code}, headers=' + json.dumps(headers))
+                if raw_data and status_code in (HTTPStatus.OK, HTTPStatus.CREATED):
+                    doc_name = model_utils.get_search_doc_storage_name(search_detail.search)
+                    current_app.logger.info(f'Saving report output to doc storage: name={doc_name}.')
+                    response = GoogleStorageService.save_document(doc_name, raw_data)
+                    current_app.logger.info('Save document storage response: ' + json.dumps(response))
+                    search_detail.doc_storage_url = doc_name
+                    search_detail.save()
+                    return raw_data, HTTPStatus.OK, {'Content-Type': 'application/pdf'}
 
             return jsonify(response_data), HTTPStatus.OK
 
@@ -198,16 +196,19 @@ class SearchResultsResource(Resource):
 @cors_preflight('POST,OPTIONS')
 @API.route('/callback/<path:search_id>', methods=['POST', 'OPTIONS'])
 class PatchSearchResultsResource(Resource):
-    """Resource to generate a large search result report for a queue callback."""
+    """Resource to generate a search result report for a queue callback."""
 
     @staticmethod
     @cors.crossdomain(origin='*')
     def post(search_id):  # pylint: disable=too-many-branches, too-many-locals
         """Generate and store a report, update search_result.doc_storage_url."""
         try:
+            current_app.logger.info(f'Search report callback starting id={search_id}.')
             if search_id is None:
                 return resource_utils.path_param_error_response('search ID')
-
+            # Authenticate with request api key
+            if not resource_utils.valid_api_key(request):
+                return resource_utils.unauthorized_error_response('Search report callback')
             # If exceeded max retries we're done.
             event_count: int = 0
             events = EventTracking.find_by_key_id_type(search_id, EventTracking.EventTrackingTypes.SEARCH_REPORT)
@@ -229,10 +230,10 @@ class PatchSearchResultsResource(Resource):
                 return {}, HTTPStatus.OK
 
             # Check if search result is async: always have callback_url.
-            if search_detail.callback_url is None:
-                return callback_error(resource_utils.CallbackExceptionCodes.INVALID_ID,
-                                      search_id,
-                                      HTTPStatus.BAD_REQUEST)
+            # if search_detail.callback_url is None:
+            #    return callback_error(resource_utils.CallbackExceptionCodes.INVALID_ID,
+            #                          search_id,
+            #                          HTTPStatus.BAD_REQUEST)
 
             # Generate the report with an API call
             current_app.logger.info(f'Generating search detail report for {search_id}.')
@@ -261,8 +262,8 @@ class PatchSearchResultsResource(Resource):
             EventTracking.create(search_id, EventTracking.EventTrackingTypes.SEARCH_REPORT, int(HTTPStatus.OK))
 
             # Enqueue notication event if not from UI.
-            if search_detail.is_ui_callback():
-                current_app.logger.info(f'Skipping report available notification for UI id={search_id}.')
+            if search_detail.is_ui_callback() or search_detail.callback_url is None:
+                current_app.logger.info(f'Skipping report available notification for id={search_id}.')
             else:  # Enqueue notification event.
                 current_app.logger.info(f'Queueing report notification for id={search_id}, callback=' +
                                         search_detail.callback_url)

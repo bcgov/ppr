@@ -1,0 +1,64 @@
+[[macros.html]]
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>{{ meta_title }}</title>
+    <meta charset="UTF-8">
+    <meta name="author" content="BC Registries and Online Services">
+    [[v2/stylePageCover.html]]
+    [[v2/styleMail.html]]
+  </head>
+  <body>
+    <div class="container">
+      <div class="section-sub-title pt-2 ml-3">
+        {% if cover.partyType == 'SP' %}
+          Secured Party:
+        {% else %}
+          Registering Party:
+        {% endif %}
+      </div>
+      <div class="cover-data ml-3">
+          {% if cover.line3 %}
+            <table class="cover-data-table mt-825" role="presentation">
+          {% else %}
+            <table class="cover-data-table mt-125" role="presentation">
+          {% endif %}
+            <tr>
+              <td>
+                <div>{{ cover.line1 }}</div>
+                <div>{{ cover.line2 }}</div>
+                {% if cover.line3 %}
+                  <div>{{ cover.line3 }}</div>
+                {% endif %}
+                <div>
+                  {% set breaks = cover.line4.split('\n') %}
+                  {% for item in breaks %}
+                     {{ item }}
+                     {% if not loop.last %}
+                        &nbsp;&nbsp;
+                     {% endif %}
+                  {% endfor %}
+                </div>
+              </td>
+            </tr>
+          </table> 
+      </div>
+    </div>
+    <div class="container mt-32 ml-3">
+      <div class="section-data">
+        {% if cover.statementType == 'AMENDMENT_STATEMENT' %}
+        This report specifies the details of your current registration and any related Financing Change Statements on our files. 
+        Compare the details on the Verification Statement to the statement submitted for registration and if it is recorded as submitted, 
+        file this Verification Statement with your record of the security agreement as a permanent record of what is recorded with the 
+        Personal Property Registry.
+        {% else %}
+        Review the Discharge Verification Statement carefully to ensure that the discharge was authorized and the correct registrations 
+        have been removed from the system. Refer to Section 35(7) of the Personal Property Security Act in the event of an unauthorized
+        discharge or error, and re-register accordingly.
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</body>
+</html>

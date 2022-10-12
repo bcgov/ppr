@@ -779,6 +779,9 @@ class VerificationResource(Resource):
                 return fs_utils.callback_error(resource_utils.CallbackExceptionCodes.SETUP_ERR, registration_id,
                                                HTTPStatus.BAD_REQUEST, party_id,
                                                'No required partyId in message payload.')
+            # Authenticate with request api key
+            if not resource_utils.valid_api_key(request):
+                return resource_utils.unauthorized_error_response('Verification report callback')
             # If exceeded max retries we're done.
             event_count: int = 0
             events = EventTracking.find_by_key_id_type(registration_id,
@@ -829,8 +832,12 @@ class RegistrationReportResource(Resource):
     def post(registration_id):
         """Generate, store report, record request status and possibly retry."""
         try:
+            current_app.logger.info(f'Verification report callback starting id={registration_id}.')
             if registration_id is None:
-                return resource_utils.path_param_error_response('search ID')
+                return resource_utils.path_param_error_response('registration ID')
+            # Authenticate with request api key
+            if not resource_utils.valid_api_key(request):
+                return resource_utils.unauthorized_error_response('Verification report callback')
             # If exceeded max retries we're done.
             event_count: int = 0
             events = EventTracking.find_by_key_id_type(registration_id,

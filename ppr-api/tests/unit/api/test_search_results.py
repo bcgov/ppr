@@ -49,9 +49,9 @@ TEST_GET_DATA = [
 # testdata pattern is ({desc}, {status}, {search_id})
 TEST_CALLBACK_DATA = [
     ('Invalid id', HTTPStatus.NOT_FOUND, 300000005),
-    ('Not async search id', HTTPStatus.BAD_REQUEST, 200000005),
     ('Max retries exceeded', HTTPStatus.INTERNAL_SERVER_ERROR, 200000010),
-    ('Report already exists', HTTPStatus.OK, 200000008)
+    ('Report already exists', HTTPStatus.OK, 200000008),
+    ('Unauthorized', HTTPStatus.UNAUTHORIZED, 200000008)
 ]
 # testdata pattern is ({desc}, {status}, {search_id})
 TEST_NOTIFICATION_DATA = [
@@ -227,7 +227,7 @@ def test_search_detail_no_duplicates_200(session, client, jwt):
     assert 'similarResultsSize' in results
     assert 'searchQuery' in results
     assert 'details' in results
-    assert len(results['details']) >= 1
+    assert len(results['details']) == 1
 
 
 @pytest.mark.parametrize('desc,roles,status,has_account, search_id, is_report', TEST_GET_DATA)
@@ -261,8 +261,15 @@ def test_get_search_detail(session, client, jwt, desc, roles, status, has_accoun
 def test_callback_search_report(session, client, jwt, desc, status, search_id):
     """Assert that a callback request returns the expected status."""
     # test
+    headers = None
+    if status != HTTPStatus.UNAUTHORIZED:
+        apikey = current_app.config.get('SUBSCRIPTION_API_KEY')
+        if apikey:
+            headers = {
+                'x-apikey': apikey
+            }
     rv = client.post('/api/v1/search-results/callback/' + str(search_id),
-                     headers=None)
+                     headers=headers)
     # check
     assert rv.status_code == status
 
@@ -284,10 +291,15 @@ def test_valid_callback_search_report(session, client, jwt):
     search_detail.save()
     select_json = query_json['results']
     search_detail.update_selection(select_json, 'UNIT TEST INC.', 'CALLBACK_URL')
-
+    headers = None
+    apikey = current_app.config.get('SUBSCRIPTION_API_KEY')
+    if apikey:
+        headers = {
+            'x-apikey': apikey
+        }
     # test
     rv = client.post('/api/v1/search-results/callback/' + str(search_detail.search_id),
-                     headers=None)
+                     headers=headers)
     # check
     print(rv.json)
     assert rv.status_code == HTTPStatus.OK

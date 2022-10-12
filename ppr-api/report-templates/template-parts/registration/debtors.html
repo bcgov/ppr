@@ -10,7 +10,7 @@
             {% endif %}
         </div>
     {% if debtors is defined and change is not defined %}
-        <table class="section-data section-data-table mt-4" role="presentation">
+        <table class="section-data section-data-table-new mt-4" role="presentation">
         {% for party in debtors %}
             <tr class="no-page-break">
                 <td class="col-33">
@@ -37,11 +37,14 @@
                     <div class="pt-2">{% if party.birthDate is defined %}{{ party.birthDate }}{% endif %}</div>
                   {% endif %}
                 </td>
-         </tr>
+            </tr>
+            {% if not loop.last %}
+                <tr><td colspan="3"><div class="separator-table-row mt-3 mb-3"></div></td></tr>            
+            {% endif %}
         {% endfor %}
-        </table>    
+    </table>    
     {% elif change is not defined and (addDebtors is defined or deleteDebtors is defined) %}
-        <table class="section-data section-data-table mt-4" role="presentation">
+        <table class="section-data section-data-table-new mt-4" role="presentation">
         {% if addDebtors is defined %}
             {% for party in addDebtors %}
                 <tr class="no-page-break">
@@ -83,6 +86,9 @@
                       {% endif %}
                     </td>
                 </tr>
+                {% if not loop.last %}
+                    <tr><td colspan="3"><div class="separator-table-row mt-3 mb-3"></div></td></tr>            
+                {% endif %}
             {% endfor %}
         {% endif %}
         {% if deleteDebtors is defined %}
@@ -116,11 +122,14 @@
                     </td>
                 </tr>
                 {% endif %}
+                {% if not loop.last %}
+                    <tr><td colspan="3"><div class="separator-table-row mt-3 mb-3"></div></td></tr>            
+                {% endif %}                
             {% endfor %}
         {% endif %}
         </table>
     {% elif change is defined and (change.addDebtors is defined or change.deleteDebtors is defined) %}
-        <table class="section-data section-data-table mt-4" role="presentation">
+        <table class="section-data section-data-table-new mt-4" role="presentation">
         {% if change.addDebtors is defined %}
             {% for party in change.addDebtors %}
                 <tr class="no-page-break">
@@ -162,6 +171,9 @@
                       {% endif %}
                     </td>
                 </tr>
+                {% if not loop.last %}
+                    <tr><td colspan="3"><div class="separator-table-row mt-3 mb-3"></div></td></tr>            
+                {% endif %}                
             {% endfor %}
         {% endif %}
         {% if change.deleteDebtors is defined %}
@@ -195,6 +207,11 @@
                     </td>
                 </tr>
                 {% endif %}
+
+                {% if not loop.last %}
+                    <tr><td colspan="3"><div class="separator-table-row mt-3 mb-3"></div></td></tr>            
+                {% endif %}
+
             {% endfor %}
         {% endif %}
         </table>

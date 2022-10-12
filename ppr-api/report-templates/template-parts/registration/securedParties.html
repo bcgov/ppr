@@ -7,7 +7,7 @@
         {% endif %}
     </div>
 {% if securedParties is defined and change is not defined %}
-    <table class="section-data section-data-table mt-4" role="presentation">
+    <table class="section-data section-data-table-new mt-4" role="presentation">
     {% for party in securedParties %}
         <tr class="no-page-break">
             <td class="col-33">
@@ -31,10 +31,13 @@
             <td class="col-33">
            </td>
          </tr>
+        {% if not loop.last %}
+            <tr><td colspan="3"><div class="separator-table-row mt-3 mb-3"></div></td></tr>            
+        {% endif %}
     {% endfor %}
     </table>
 {% elif change is not defined and (addSecuredParties is defined or deleteSecuredParties is defined) %}
-    <table class="section-data section-data-table mt-4" role="presentation">
+    <table class="section-data section-data-table-new mt-4" role="presentation">
     {% if addSecuredParties is defined %}
         {% for party in addSecuredParties %}
             <tr class="no-page-break">
@@ -72,6 +75,9 @@
                 <td class="col-33">
                 </td>
             </tr>
+            {% if not loop.last %}
+                <tr><td colspan="3"><div class="separator-table-row mt-3 mb-3"></div></td></tr>            
+            {% endif %}
         {% endfor %}
     {% endif %}
     {% if deleteSecuredParties is defined %}
@@ -101,11 +107,14 @@
                 </td>
             </tr>
             {% endif %}
+            {% if not loop.last %}
+                <tr><td colspan="3"><div class="separator-table-row mt-3 mb-3"></div></td></tr>            
+            {% endif %}
         {% endfor %}
     {% endif %}
     </table>
 {% elif change is defined and (change.addSecuredParties is defined or change.deleteSecuredParties is defined) %}
-    <table class="section-data section-data-table mt-4" role="presentation">
+    <table class="section-data section-data-table-new mt-4" role="presentation">
     {% if change.addSecuredParties is defined %}
         {% for party in change.addSecuredParties %}
             <tr class="no-page-break">
@@ -143,6 +152,9 @@
                 <td class="col-33">
                 </td>
             </tr>
+            {% if not loop.last %}
+                <tr><td colspan="3"><div class="separator-table-row mt-3 mb-3"></div></td></tr>            
+            {% endif %}
         {% endfor %}
     {% endif %}
     {% if change.deleteSecuredParties is defined %}
@@ -171,6 +183,9 @@
                 <td class="col-33">
                 </td>
             </tr>
+            {% endif %}
+            {% if not loop.last %}
+                <tr><td colspan="3"><div class="separator-table-row mt-3 mb-3"></div></td></tr>            
             {% endif %}
         {% endfor %}
     {% endif %}

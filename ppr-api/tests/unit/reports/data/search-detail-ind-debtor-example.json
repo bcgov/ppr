@@ -1,443 +1,2375 @@
 {
-  "details": [
-    {
-      "financingStatement": {
-        "baseRegistrationNumber": "TEST0004", 
-        "changes": [
-          {
-            "baseRegistrationNumber": "TEST0004", 
-            "clientReferenceId": "TEST-DIS-0004", 
-            "createDateTime": "2021-07-16T15:41:58+00:00", 
-            "dischargeRegistrationNumber": "TEST00D4", 
-            "registeringParty": {
-              "address": {
-                "city": "city", 
-                "country": "CA", 
-                "postalCode": "V8R3A5", 
-                "region": "BC", 
-                "street": "TEST-00D4", 
-                "streetAdditional": "line 2"
-              }, 
-              "personName": {
-                "first": "TEST-DISCHARGE", 
-                "last": "REGISTERING", 
-                "middle": "4"
-              }
-            }, 
-            "statementType": "DISCHARGE_STATEMENT"
-          }
-        ], 
-        "clientReferenceId": "TEST-SA-0004", 
-        "createDateTime": "2021-07-15T15:41:58+00:00", 
-        "debtors": [
-          {
-            "address": {
-              "city": "city", 
-              "country": "CA", 
-              "postalCode": "V8R3A5", 
-              "region": "BC", 
-              "street": "TEST-0004", 
-              "streetAdditional": "line 2"
-            }, 
-            "partyId": 200000012, 
-            "personName": {
-              "first": "TEST IND", 
-              "last": "DEBTOR", 
-              "middle": "4"
-            }
-          }
-        ], 
-        "dischargedDateTime": "2021-07-16T15:41:58+00:00", 
-        "expiryDate": "2023-07-15T15:41:58+00:00", 
-        "lifeYears": 2, 
-        "registeringParty": {
-          "address": {
-            "city": "city", 
-            "country": "CA", 
-            "postalCode": "V8R3A5", 
-            "region": "BC", 
-            "street": "TEST-0004", 
-            "streetAdditional": "line 2"
-          }, 
-          "personName": {
-            "first": "TEST", 
-            "last": "REGISTERING", 
-            "middle": "4"
-          }
-        }, 
-        "registrationAct": "PPSA SECURITY ACT", 
-        "registrationDescription": "PPSA SECURITY AGREEMENT", 
-        "securedParties": [
-          {
-            "address": {
-              "city": "city", 
-              "country": "CA", 
-              "postalCode": "V8R3A5", 
-              "region": "BC", 
-              "street": "TEST-0004", 
-              "streetAdditional": "line 2"
-            }, 
-            "businessName": "TEST 4 SECURED PARTY", 
-            "partyId": 200000013
-          }
-        ], 
-        "statusType": "HDC", 
-        "trustIndenture": true, 
-        "type": "SA", 
-        "vehicleCollateral": [
-          {
-            "make": "HONDA", 
-            "model": "CIVIC", 
-            "serialNumber": "JU622994", 
-            "type": "MV", 
-            "vehicleId": 200000004, 
-            "year": 2018
-          }
-        ]
-      }, 
-      "matchType": "EXACT"
-    }, 
-    {
-      "financingStatement": {
-        "baseRegistrationNumber": "TEST0005", 
-        "changes": [
-          {
-            "baseRegistrationNumber": "TEST0005", 
-            "clientReferenceId": "TEST-REN-0005", 
-            "createDateTime": "2021-07-15T15:46:58+00:00", 
-            "expiryDate": "2023-07-15T15:41:58+00:00", 
-            "lifeYears": 2, 
-            "registeringParty": {
-              "address": {
-                "city": "city", 
-                "country": "CA", 
-                "postalCode": "V8R3A5", 
-                "region": "BC", 
-                "street": "TEST-00R5", 
-                "streetAdditional": "line 2"
-              }, 
-              "personName": {
-                "first": "TEST-RENEWAL", 
-                "last": "REGISTERING", 
-                "middle": "5"
-              }
-            }, 
-            "renewalRegistrationNumber": "TEST00R5", 
-            "statementType": "RENEWAL_STATEMENT"
-          }
-        ], 
-        "clientReferenceId": "TEST-SA-0005", 
-        "createDateTime": "2021-07-15T15:41:58+00:00", 
-        "debtors": [
-          {
-            "address": {
-              "city": "city", 
-              "country": "CA", 
-              "postalCode": "V8R3A5", 
-              "region": "BC", 
-              "street": "TEST-0005", 
-              "streetAdditional": "line 2"
-            }, 
-            "partyId": 200000016, 
-            "personName": {
-              "first": "TEST IND", 
-              "last": "DEBTOR", 
-              "middle": "5"
-            }
-          }
-        ], 
-        "expiryDate": "2023-07-15T15:41:58+00:00", 
-        "lifeYears": 2, 
-        "registeringParty": {
-          "address": {
-            "city": "city", 
-            "country": "CA", 
-            "postalCode": "V8R3A5", 
-            "region": "BC", 
-            "street": "TEST-0005", 
-            "streetAdditional": "line 2"
-          }, 
-          "personName": {
-            "first": "TEST", 
-            "last": "REGISTERING", 
-            "middle": "5"
-          }
-        }, 
-        "registrationAct": "PPSA SECURITY ACT", 
-        "registrationDescription": "PPSA SECURITY AGREEMENT", 
-        "securedParties": [
-          {
-            "address": {
-              "city": "city", 
-              "country": "CA", 
-              "postalCode": "V8R3A5", 
-              "region": "BC", 
-              "street": "TEST-0005", 
-              "streetAdditional": "line 2"
-            }, 
-            "businessName": "TEST 5 SECURED PARTY", 
-            "partyId": 200000017
-          }
-        ], 
-        "statusType": "ACT", 
-        "trustIndenture": false, 
-        "type": "SA", 
-        "vehicleCollateral": [
-          {
-            "make": "TESLA", 
-            "model": "MODEL 3", 
-            "serialNumber": "YJ46JU622994", 
-            "type": "MV", 
-            "vehicleId": 200000005, 
-            "year": 2018
-          }
-        ]
-      }, 
-      "matchType": "EXACT"
-    }, 
-    {
-      "financingStatement": {
-        "baseRegistrationNumber": "TEST0011", 
-        "clientReferenceId": "TEST-SA-0011", 
-        "createDateTime": "2021-07-15T15:41:58+00:00", 
-        "debtors": [
-          {
-            "address": {
-              "city": "city", 
-              "country": "CA", 
-              "postalCode": "V8R3A5", 
-              "region": "BC", 
-              "street": "TEST-0011", 
-              "streetAdditional": "line 2"
-            }, 
-            "partyId": 200000029, 
-            "personName": {
-              "first": "TEST IND", 
-              "last": "DEBTOR", 
-              "middle": "11"
-            }
-          }
-        ], 
-        "expiryDate": "2022-07-15T15:41:58+00:00", 
-        "lifeYears": 1, 
-        "registeringParty": {
-          "address": {
-            "city": "city", 
-            "country": "CA", 
-            "postalCode": "V8R3A5", 
-            "region": "BC", 
-            "street": "TEST-0011", 
-            "streetAdditional": "line 2"
-          }, 
-          "personName": {
-            "first": "TEST", 
-            "last": "REGISTERING", 
-            "middle": "11"
-          }
-        }, 
-        "registrationAct": "PPSA SECURITY ACT", 
-        "registrationDescription": "PPSA SECURITY AGREEMENT", 
-        "securedParties": [
-          {
-            "address": {
-              "city": "city", 
-              "country": "CA", 
-              "postalCode": "V8R3A5", 
-              "region": "BC", 
-              "street": "TEST-0011", 
-              "streetAdditional": "line 2"
-            }, 
-            "businessName": "TEST 11 SECURED PARTY", 
-            "partyId": 200000030
-          }
-        ], 
-        "statusType": "ACT", 
-        "trustIndenture": true, 
-        "type": "SA", 
-        "vehicleCollateral": [
-          {
-            "make": "HOMCO IND. LTD DIPLOMAT", 
-            "manufacturedHomeRegistrationNumber": "220000", 
-            "serialNumber": "999999", 
-            "type": "MH", 
-            "vehicleId": 200000009, 
-            "year": 2012
-          }, 
-          {
-            "make": "CESSNA", 
-            "model": "172R SKYHAWK", 
-            "serialNumber": "CFYXW", 
-            "type": "AC", 
-            "vehicleId": 200000010, 
-            "year": 1998
-          }
-        ]
-      }, 
-      "matchType": "EXACT"
-    }, 
-    {
-      "financingStatement": {
-        "baseRegistrationNumber": "TEST0012", 
-        "clientReferenceId": "TEST-SA-0012", 
-        "createDateTime": "2021-07-15T15:41:58+00:00", 
-        "debtors": [
-          {
-            "address": {
-              "city": "city", 
-              "country": "CA", 
-              "postalCode": "V8R3A5", 
-              "region": "BC", 
-              "street": "TEST-0012", 
-              "streetAdditional": "line 2"
-            }, 
-            "partyId": 200000032, 
-            "personName": {
-              "first": "TEST IND", 
-              "last": "DEBTOR", 
-              "middle": "12"
-            }
-          }
-        ], 
-        "expiryDate": "2022-07-15T15:41:58+00:00", 
-        "lifeYears": 1, 
-        "registeringParty": {
-          "address": {
-            "city": "city", 
-            "country": "CA", 
-            "postalCode": "V8R3A5", 
-            "region": "BC", 
-            "street": "TEST-0012", 
-            "streetAdditional": "line 2"
-          }, 
-          "personName": {
-            "first": "TEST", 
-            "last": "REGISTERING", 
-            "middle": "12"
-          }
-        }, 
-        "registrationAct": "PPSA SECURITY ACT", 
-        "registrationDescription": "PPSA SECURITY AGREEMENT", 
-        "securedParties": [
-          {
-            "address": {
-              "city": "city", 
-              "country": "CA", 
-              "postalCode": "V8R3A5", 
-              "region": "BC", 
-              "street": "TEST-0012", 
-              "streetAdditional": "line 2"
-            }, 
-            "businessName": "TEST 12 SECURED PARTY", 
-            "partyId": 200000033
-          }
-        ], 
-        "statusType": "ACT", 
-        "trustIndenture": true, 
-        "type": "SA", 
-        "vehicleCollateral": [
-          {
-            "make": "HOMCO IND. LTD DIPLOMAT", 
-            "manufacturedHomeRegistrationNumber": "022000", 
-            "serialNumber": "9999", 
-            "type": "MH", 
-            "vehicleId": 200000011, 
-            "year": 2012
-          }, 
-          {
-            "make": "CESSNA", 
-            "model": "172R SKYHAWK", 
-            "serialNumber": "CFYX", 
-            "type": "AC", 
-            "vehicleId": 200000012, 
-            "year": 1998
-          }, 
-          {
-            "make": "AIRFRAME make", 
-            "model": "AIRFRAME model", 
-            "serialNumber": "AF16031", 
-            "type": "AF", 
-            "vehicleId": 200000013, 
-            "year": 1998
-          }
-        ]
-      }, 
-      "matchType": "EXACT"
-    }
-  ], 
-  "exactResultsSize": 4, 
-  "payment": {
-    "invoiceId": "10754", 
-    "receipt": "/api/v1/payment-requests/10754/receipts"
-  }, 
-  "searchDateTime": "2021-07-20T16:06:36+00:00", 
+  "searchDateTime": "2022-04-20T18:43:38+00:00",
+  "exactResultsSize": 16,
+  "similarResultsSize": 0,
   "searchQuery": {
-    "clientReferenceId": "T-S-DI-001", 
+    "type": "INDIVIDUAL_DEBTOR",
     "criteria": {
       "debtorName": {
-        "first": "Test Ind", 
-        "last": "Debtor"
+        "first": "Mary",
+        "last": "Smith"
       }
-    }, 
-    "type": "INDIVIDUAL_DEBTOR"
-  }, 
+    },
+    "clientReferenceId": ""
+  },
+  "details": [
+    {
+      "matchType": "EXACT",
+      "financingStatement": {
+        "statusType": "ACT",
+        "type": "SA",
+        "baseRegistrationNumber": "683914I",
+        "registrationDescription": "PPSA SECURITY AGREEMENT",
+        "registrationAct": "PERSONAL PROPERTY SECURITY ACT",
+        "createDateTime": "2015-06-24T16:47:28+00:00",
+        "registeringParty": {
+          "businessName": "D+H LIMITED PARTNERSHIP (TDAF)",
+          "address": {
+            "street": "939 EGLINTON AVENUE EAST, SUIT",
+            "city": "TORONTO",
+            "region": "ON",
+            "country": "CA",
+            "postalCode": "M4G4H7"
+          }
+        },
+        "securedParties": [
+          {
+            "partyId": 4396172,
+            "businessName": "TD AUTO FINANCE (CANADA) INC.",
+            "address": {
+              "street": "PO BOX 4086, STATION A",
+              "city": "TORONTO",
+              "region": "ON",
+              "country": "CA",
+              "postalCode": "M5W5K3"
+            }
+          }
+        ],
+        "debtors": [
+          {
+            "partyId": 240451,
+            "personName": {
+              "first": "MARY",
+              "last": "SMITH",
+              "middle": "ELEANOR"
+            },
+            "address": {
+              "street": "942 LEPETICH ROAD",
+              "city": "QUESNEL",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V2J6R2"
+            },
+            "birthDate": "1932-04-16T12:59:59+00:00"
+          }
+        ],
+        "generalCollateral": [
+          {
+            "collateralId": 168514,
+            "description": "ALL ATTACHMENTS, ACCESSORIES, ADDITIONS, ALTERNATIONS, REPLACEMENTS AND REPAIRS (WHETHER PRESENT OR FUTURE) TO THE VEHICLE COLLATERAL. PROCEEDS: ALL CASH AND NON-CASH PROCEEDS OF THE VEHICLE COLLATERAL, INCLUDING, WITHOUT LIMITATION, PROCEEDS DERIVED DIRECTLY OR INDIRECTLY FROM ANY DEALING WITH THE VEHICLE COLLATERAL OR THAT INDEMNIFIES OR COMPENSA,TES THE DEBTOR(S) FOR THE DESTRUCTION OR DAMAGE TO OR LOSS OF THE VEHICLE COLLATERAL. THE PROCEEDS MAY TAKE THE FORM OF ANY ONE OR MORE OF THE FOLLOWING: GOODS, DOCUMENTS OF TITLE, CHATTEL PAPER, INSTRUMENTS, MONEY, INVESTMENT PROPERTY OR INTANGIBLES. ACCORDINGLY, ANY OF THE DEBTOR(S) AFTER ACQUIRED PROPERTY MAY BE PROCEEDS AND THEREFORE SUBJECT TO, THE SECURED PARTY'S SECURITY INTEREST.",
+            "addedDateTime": "2015-06-24T16:47:28+00:00"
+          }
+        ],
+        "vehicleCollateral": [
+          {
+            "vehicleId": 96603,
+            "type": "MV",
+            "year": 2015,
+            "make": "RAM",
+            "model": "1500",
+            "serialNumber": "3C6RR7KTXFG660717"
+          }
+        ],
+        "trustIndenture": false,
+        "lifeYears": 8,
+        "expiryDate": "2023-06-25T06:59:59+00:00"
+      }
+    },
+    {
+      "matchType": "EXACT",
+      "financingStatement": {
+        "statusType": "ACT",
+        "type": "SA",
+        "baseRegistrationNumber": "484019K",
+        "registrationDescription": "PPSA SECURITY AGREEMENT",
+        "registrationAct": "PERSONAL PROPERTY SECURITY ACT",
+        "createDateTime": "2017-12-29T17:27:05+00:00",
+        "registeringParty": {
+          "businessName": "D+H LIMITED PARTNERSHIP (TDAF)",
+          "address": {
+            "street": "2 ROBERT SPECK PARKWAY, 15TH F",
+            "city": "MISSISSAUGA",
+            "region": "ON",
+            "country": "CA",
+            "postalCode": "L4Z1H8"
+          }
+        },
+        "securedParties": [
+          {
+            "partyId": 4622014,
+            "businessName": "TD AUTO FINANCE (CANADA) INC.",
+            "address": {
+              "street": "PO BOX 4086, STATION A",
+              "city": "TORONTO",
+              "region": "ON",
+              "country": "CA",
+              "postalCode": "M5W5K3"
+            }
+          }
+        ],
+        "debtors": [
+          {
+            "partyId": 551812,
+            "personName": {
+              "first": "MARY",
+              "last": "SMITH",
+              "middle": "ANNE"
+            },
+            "address": {
+              "street": "154 CLELAND DRIVE",
+              "city": "PENTICTON",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V2A7L7"
+            },
+            "birthDate": "1959-07-06T12:59:59+00:00"
+          }
+        ],
+        "generalCollateral": [
+          {
+            "collateralId": 305299,
+            "description": "ALL ATTACHMENTS, ACCESSORIES, ADDITIONS, ALTERNATIONS, REPLACEMENTS AND REPAIRS (WHETHER PRESENT OR FUTURE) TO THE VEHICLE COLLATERAL. PROCEEDS: ALL CASH AND NON-CASH PROCEEDS OF THE VEHICLE COLLATERAL, INCLUDING, WITHOUT LIMITATION, PROCEEDS DERIVED DIRECTLY OR INDIRECTLY FROM ANY DEALING WITH THE VEHICLE COLLATERAL OR THAT INDEMNIFIES OR COMPENSA,TES THE DEBTOR(S) FOR THE DESTRUCTION OR DAMAGE TO OR LOSS OF THE VEHICLE COLLATERAL. THE PROCEEDS MAY TAKE THE FORM OF ANY ONE OR MORE OF THE FOLLOWING: GOODS, DOCUMENTS OF TITLE, CHATTEL PAPER, INSTRUMENTS, MONEY, INVESTMENT PROPERTY OR INTANGIBLES. ACCORDINGLY, ANY OF THE DEBTOR(S) AFTER ACQUIRED PROPERTY MAY BE PROCEEDS AND THEREFORE SUBJECT TO, THE SECURED PARTY'S SECURITY INTEREST.",
+            "addedDateTime": "2017-12-29T17:27:05+00:00"
+          }
+        ],
+        "vehicleCollateral": [
+          {
+            "vehicleId": 288815,
+            "type": "MV",
+            "year": 2018,
+            "make": "KIA",
+            "model": "SOUL",
+            "serialNumber": "KNDJP3A52J7523279"
+          }
+        ],
+        "trustIndenture": false,
+        "lifeYears": 7,
+        "expiryDate": "2024-12-30T07:59:59+00:00"
+      }
+    },
+    {
+      "matchType": "EXACT",
+      "financingStatement": {
+        "statusType": "ACT",
+        "type": "SA",
+        "baseRegistrationNumber": "726972K",
+        "registrationDescription": "PPSA SECURITY AGREEMENT",
+        "registrationAct": "PERSONAL PROPERTY SECURITY ACT",
+        "createDateTime": "2018-05-01T16:31:57+00:00",
+        "registeringParty": {
+          "businessName": "D + H LIMITED PARTNERSHIP",
+          "address": {
+            "street": "2 ROBERT SPECK PARKWAY, 15TH F",
+            "city": "MISSISSAUGA",
+            "region": "ON",
+            "country": "CA",
+            "postalCode": "L4J1H8"
+          }
+        },
+        "securedParties": [
+          {
+            "partyId": 4675696,
+            "businessName": "HONDA CANADA FINANCE INC.",
+            "address": {
+              "street": "180 HONDA BLVD",
+              "city": "MARKHAM",
+              "region": "ON",
+              "country": "CA",
+              "postalCode": "L6C0H9"
+            }
+          }
+        ],
+        "debtors": [
+          {
+            "partyId": 634984,
+            "personName": {
+              "first": "DAVID",
+              "last": "SMITH",
+              "middle": "F"
+            },
+            "address": {
+              "street": "608 3RD ST",
+              "city": "NELSON",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V1L2P9"
+            },
+            "birthDate": "1946-02-27T12:59:59+00:00"
+          },
+          {
+            "partyId": 634985,
+            "personName": {
+              "first": "MARY",
+              "last": "SMITH",
+              "middle": "A"
+            },
+            "address": {
+              "street": "608 3RD ST",
+              "city": "NELSON",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V1L2P9"
+            },
+            "birthDate": "1951-11-17T12:59:59+00:00"
+          }
+        ],
+        "vehicleCollateral": [
+          {
+            "vehicleId": 335122,
+            "type": "MV",
+            "year": 2018,
+            "make": "HONDA",
+            "model": "CRV",
+            "serialNumber": "2HKRW2H20JH106735"
+          }
+        ],
+        "trustIndenture": false,
+        "lifeYears": 5,
+        "expiryDate": "2023-05-02T06:59:59+00:00"
+      }
+    },
+    {
+      "matchType": "EXACT",
+      "financingStatement": {
+        "statusType": "ACT",
+        "type": "SA",
+        "baseRegistrationNumber": "932245K",
+        "registrationDescription": "PPSA SECURITY AGREEMENT",
+        "registrationAct": "PERSONAL PROPERTY SECURITY ACT",
+        "createDateTime": "2018-08-01T14:07:45+00:00",
+        "registeringParty": {
+          "businessName": "D + H LIMITED PARTNERSHIP",
+          "address": {
+            "street": "2 ROBERT SPECK PARKWAY, 15TH F",
+            "city": "MISSISSAUGA",
+            "region": "ON",
+            "country": "CA",
+            "postalCode": "L4J1H8"
+          }
+        },
+        "securedParties": [
+          {
+            "partyId": 4726737,
+            "code": "26960001",
+            "businessName": "TOYOTA CREDIT CANADA INC.",
+            "address": {
+              "street": "80 MICRO COURT",
+              "city": "MARKHAM",
+              "region": "ON",
+              "country": "CA",
+              "postalCode": "L3R9Z5"
+            }
+          }
+        ],
+        "debtors": [
+          {
+            "partyId": 721896,
+            "personName": {
+              "first": "RONALD",
+              "last": "SMITH",
+              "middle": "ALLAN"
+            },
+            "address": {
+              "street": "5-644 VICTORIA PARK EAST",
+              "city": "NORTH VANCOUVER",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V7L3G4"
+            },
+            "birthDate": "1948-02-10T12:59:59+00:00"
+          },
+          {
+            "partyId": 721897,
+            "personName": {
+              "first": "MARY",
+              "last": "SMITH",
+              "middle": "LYNN"
+            },
+            "address": {
+              "street": "5-644 VICTORIA PARK EAST",
+              "city": "NORTH VANCOUVER",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V7L3G4"
+            },
+            "birthDate": "1950-09-12T12:59:59+00:00"
+          }
+        ],
+        "vehicleCollateral": [
+          {
+            "vehicleId": 382094,
+            "type": "MV",
+            "year": 2018,
+            "make": "SUBARU",
+            "model": "OUT-JD2LE6",
+            "serialNumber": "4S4BSFNC1J3345316"
+          }
+        ],
+        "trustIndenture": false,
+        "lifeYears": 6,
+        "expiryDate": "2024-08-02T06:59:59+00:00"
+      }
+    },
+    {
+      "matchType": "EXACT",
+      "financingStatement": {
+        "statusType": "ACT",
+        "type": "SA",
+        "baseRegistrationNumber": "054721L",
+        "registrationDescription": "PPSA SECURITY AGREEMENT",
+        "registrationAct": "PERSONAL PROPERTY SECURITY ACT",
+        "createDateTime": "2018-09-28T00:32:06+00:00",
+        "registeringParty": {
+          "businessName": "D + H LIMITED PARTNERSHIP",
+          "address": {
+            "street": "2 ROBERT SPECK PARKWAY, 15TH F",
+            "city": "MISSISSAUGA",
+            "region": "ON",
+            "country": "CA",
+            "postalCode": "L4J1H8"
+          }
+        },
+        "securedParties": [
+          {
+            "partyId": 4757827,
+            "businessName": "FORD CREDIT CANADA COMPANY",
+            "address": {
+              "street": "PO BOX 2400",
+              "city": "EDMONTON",
+              "region": "AB",
+              "country": "CA",
+              "postalCode": "T5J5C7"
+            }
+          }
+        ],
+        "debtors": [
+          {
+            "partyId": 775017,
+            "personName": {
+              "first": "ARTHUR",
+              "last": "SMITH",
+              "middle": "WILSON"
+            },
+            "address": {
+              "street": "9-45348 MAGDALENA PL",
+              "city": "CHILLIWACK",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V2R0K7"
+            },
+            "birthDate": "1940-12-19T12:59:59+00:00"
+          },
+          {
+            "partyId": 775018,
+            "personName": {
+              "first": "MARY",
+              "last": "SMITH",
+              "middle": "LEE"
+            },
+            "address": {
+              "street": "9-45348 MAGDALENA PL",
+              "city": "CHILLIWACK",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V2R0K7"
+            },
+            "birthDate": "1941-03-31T12:59:59+00:00"
+          }
+        ],
+        "vehicleCollateral": [
+          {
+            "vehicleId": 410011,
+            "type": "MV",
+            "year": 2018,
+            "make": "FORD",
+            "model": "EDGE",
+            "serialNumber": "2FMPK4K84JBB60560"
+          }
+        ],
+        "trustIndenture": false,
+        "lifeYears": 6,
+        "expiryDate": "2024-09-28T06:59:59+00:00"
+      }
+    },
+    {
+      "matchType": "EXACT",
+      "financingStatement": {
+        "statusType": "ACT",
+        "type": "SA",
+        "baseRegistrationNumber": "343692L",
+        "registrationDescription": "PPSA SECURITY AGREEMENT",
+        "registrationAct": "PERSONAL PROPERTY SECURITY ACT",
+        "createDateTime": "2019-02-28T20:26:32+00:00",
+        "registeringParty": {
+          "businessName": "D+H LIMITED PARTNERSHIP (TDAF)",
+          "address": {
+            "street": "2 ROBERT SPECK PARKWAY, 15TH F",
+            "city": "MISSISSAUGA",
+            "region": "ON",
+            "country": "CA",
+            "postalCode": "L4Z1H8"
+          }
+        },
+        "securedParties": [
+          {
+            "partyId": 4837779,
+            "businessName": "TD AUTO FINANCE (CANADA) INC.",
+            "address": {
+              "street": "PO BOX 4086, STATION A",
+              "city": "TORONTO",
+              "region": "ON",
+              "country": "CA",
+              "postalCode": "M5W5K3"
+            }
+          }
+        ],
+        "debtors": [
+          {
+            "partyId": 908128,
+            "personName": {
+              "first": "ANDREW",
+              "last": "SMITH",
+              "middle": "JAMES"
+            },
+            "address": {
+              "street": "3091 LINCOLN AVENUE SUITE 407",
+              "city": "COQUITLAM",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V3B0E2"
+            },
+            "birthDate": "1983-06-18T12:59:59+00:00"
+          },
+          {
+            "partyId": 908129,
+            "personName": {
+              "first": "MARY",
+              "last": "MARLOW"
+            },
+            "address": {
+              "street": "303 AFTON LANE SUITE 6",
+              "city": "PORT MOODY",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V3H3V8"
+            },
+            "birthDate": "1957-11-16T12:59:59+00:00"
+          },
+          {
+            "partyId": 908130,
+            "personName": {
+              "first": "ANDREW",
+              "last": "SMITH",
+              "middle": "JAMES"
+            },
+            "address": {
+              "street": "3091 LINCOLN AVENUE SUITE 407",
+              "city": "COQUITLAM",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V3B0E2"
+            },
+            "birthDate": "1983-06-18T12:59:59+00:00"
+          },
+          {
+            "partyId": 908131,
+            "personName": {
+              "first": "MARY",
+              "last": "SMITH"
+            },
+            "address": {
+              "street": "303 AFTON LANE SUITE 6",
+              "city": "PORT MOODY",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V3H3V8"
+            },
+            "birthDate": "1957-11-16T12:59:59+00:00"
+          }
+        ],
+        "generalCollateral": [
+          {
+            "collateralId": 423526,
+            "description": "ALL ATTACHMENTS, ACCESSORIES, ADDITIONS, ALTERNATIONS, REPLACEMENTS AND REPAIRS (WHETHER PRESENT OR FUTURE) TO THE VEHICLE COLLATERAL. PROCEEDS: ALL CASH AND NON-CASH PROCEEDS OF THE VEHICLE COLLATERAL, INCLUDING, WITHOUT LIMITATION, PROCEEDS DERIVED DIRECTLY OR INDIRECTLY FROM ANY DEALING WITH THE VEHICLE COLLATERAL OR THAT INDEMNIFIES OR COMPENSA,TES THE DEBTOR(S) FOR THE DESTRUCTION OR DAMAGE TO OR LOSS OF THE VEHICLE COLLATERAL. THE PROCEEDS MAY TAKE THE FORM OF ANY ONE OR MORE OF THE FOLLOWING: GOODS, DOCUMENTS OF TITLE, CHATTEL PAPER, INSTRUMENTS, MONEY, INVESTMENT PROPERTY OR INTANGIBLES. ACCORDINGLY, ANY OF THE DEBTOR(S) AFTER ACQUIRED PROPERTY MAY BE PROCEEDS AND THEREFORE SUBJECT TO, THE SECURED PARTY'S SECURITY INTEREST.",
+            "addedDateTime": "2019-02-28T20:26:32+00:00"
+          }
+        ],
+        "vehicleCollateral": [
+          {
+            "vehicleId": 481597,
+            "type": "MV",
+            "year": 2012,
+            "make": "FORD",
+            "model": "F150",
+            "serialNumber": "1FTFW1EF5CFA78495"
+          }
+        ],
+        "trustIndenture": false,
+        "lifeYears": 6,
+        "expiryDate": "2025-03-01T07:59:59+00:00"
+      }
+    },
+    {
+      "matchType": "EXACT",
+      "financingStatement": {
+        "statusType": "ACT",
+        "type": "SA",
+        "baseRegistrationNumber": "434833L",
+        "registrationDescription": "PPSA SECURITY AGREEMENT",
+        "registrationAct": "PERSONAL PROPERTY SECURITY ACT",
+        "createDateTime": "2019-04-15T14:16:02+00:00",
+        "registeringParty": {
+          "code": "58450009",
+          "businessName": "AVS SYSTEMS INC.",
+          "address": {
+            "street": "201-1325 POLSON DR.",
+            "city": "VERNON",
+            "region": "BC",
+            "country": "CA",
+            "postalCode": "V1T8H2"
+          }
+        },
+        "securedParties": [
+          {
+            "partyId": 4865704,
+            "businessName": "NISSAN CANADA INC.",
+            "address": {
+              "street": "5290 ORBITOR DRIVE",
+              "city": "MISSISSAUGA",
+              "region": "ON",
+              "country": "CA",
+              "postalCode": "L4W4Z5"
+            }
+          }
+        ],
+        "debtors": [
+          {
+            "partyId": 953784,
+            "personName": {
+              "first": "MARY",
+              "last": "SMITH",
+              "middle": "LOUISE"
+            },
+            "address": {
+              "street": "1554 ARROWHEAD ROAD PO BOX 91",
+              "city": "SQUAMISH",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V8B0A1"
+            },
+            "birthDate": "1987-09-13T12:59:59+00:00"
+          }
+        ],
+        "vehicleCollateral": [
+          {
+            "vehicleId": 506644,
+            "type": "MV",
+            "year": 2018,
+            "make": "MITSUBISHI",
+            "model": "RVR",
+            "serialNumber": "JA4AJ4AW0JZ612797"
+          }
+        ],
+        "trustIndenture": false,
+        "lifeYears": 6,
+        "expiryDate": "2025-04-16T06:59:59+00:00"
+      }
+    },
+    {
+      "matchType": "EXACT",
+      "financingStatement": {
+        "statusType": "ACT",
+        "type": "SA",
+        "baseRegistrationNumber": "552352L",
+        "registrationDescription": "PPSA SECURITY AGREEMENT",
+        "registrationAct": "PERSONAL PROPERTY SECURITY ACT",
+        "createDateTime": "2019-06-06T14:49:53+00:00",
+        "registeringParty": {
+          "businessName": "BANK OF MONTREAL/BANQUE DE MONTREAL",
+          "address": {
+            "street": "1990 COLUMBIA AVE",
+            "city": "CASTLEGAR",
+            "region": "BC",
+            "country": "CA",
+            "postalCode": "V1N2W7"
+          }
+        },
+        "securedParties": [
+          {
+            "partyId": 4902119,
+            "businessName": "BANK OF MONTREAL/BANQUE DE MONTREAL",
+            "address": {
+              "street": "1990 COLUMBIA AVE",
+              "city": "CASTLEGAR",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V1N2W7"
+            }
+          }
+        ],
+        "debtors": [
+          {
+            "partyId": 1013434,
+            "personName": {
+              "first": "DAVID",
+              "last": "SMITH",
+              "middle": "JAMES"
+            },
+            "address": {
+              "street": "1329 FOREST ROAD",
+              "city": "CASTLEGAR",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V1N3L6"
+            },
+            "birthDate": "1956-02-01T12:59:59+00:00"
+          },
+          {
+            "partyId": 1013435,
+            "personName": {
+              "first": "MAUREEN",
+              "last": "SMITH",
+              "middle": "LLYNN"
+            },
+            "address": {
+              "street": "1329 FOREST ROAD",
+              "city": "CASTLEGAR",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V1N3L6"
+            },
+            "birthDate": "1956-03-01T12:59:59+00:00"
+          },
+          {
+            "partyId": 1013436,
+            "personName": {
+              "first": "M",
+              "last": "SMITH",
+              "middle": "L"
+            },
+            "address": {
+              "street": "1329 FOREST ROAD",
+              "city": "CASTLEGAR",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V1N3L6"
+            },
+            "birthDate": "1956-03-01T12:59:59+00:00"
+          }
+        ],
+        "generalCollateral": [
+          {
+            "collateralId": 458663,
+            "description": "0000",
+            "addedDateTime": "2019-06-06T14:49:53+00:00"
+          }
+        ],
+        "vehicleCollateral": [
+          {
+            "vehicleId": 539679,
+            "type": "MV",
+            "year": 2019,
+            "make": "FORD",
+            "model": "EDGE",
+            "serialNumber": "2FMPK4K9XKBB64753"
+          }
+        ],
+        "trustIndenture": false,
+        "lifeYears": 8,
+        "expiryDate": "2027-06-07T06:59:59+00:00"
+      }
+    },
+    {
+      "matchType": "EXACT",
+      "financingStatement": {
+        "statusType": "ACT",
+        "type": "SA",
+        "baseRegistrationNumber": "569689L",
+        "registrationDescription": "PPSA SECURITY AGREEMENT",
+        "registrationAct": "PERSONAL PROPERTY SECURITY ACT",
+        "createDateTime": "2019-06-14T04:33:36+00:00",
+        "registeringParty": {
+          "code": "58450009",
+          "businessName": "AVS SYSTEMS INC.",
+          "address": {
+            "street": "201-1325 POLSON DR.",
+            "city": "VERNON",
+            "region": "BC",
+            "country": "CA",
+            "postalCode": "V1T8H2"
+          }
+        },
+        "securedParties": [
+          {
+            "partyId": 4907221,
+            "businessName": "NISSAN CANADA INC.",
+            "address": {
+              "street": "5290 ORBITOR DRIVE",
+              "city": "MISSISSAUGA",
+              "region": "ON",
+              "country": "CA",
+              "postalCode": "L4W4Z5"
+            }
+          }
+        ],
+        "debtors": [
+          {
+            "partyId": 1021753,
+            "personName": {
+              "first": "MARY",
+              "last": "SMITH",
+              "middle": "J"
+            },
+            "address": {
+              "street": "2595 DALHOUSIE STREET",
+              "city": "VICTORIA",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V8R2P9"
+            },
+            "birthDate": "1954-02-09T12:59:59+00:00"
+          }
+        ],
+        "vehicleCollateral": [
+          {
+            "vehicleId": 544428,
+            "type": "MV",
+            "year": 2019,
+            "make": "INFINITI",
+            "model": "QX50",
+            "serialNumber": "3PCAJ5M3XKF122307"
+          }
+        ],
+        "trustIndenture": false,
+        "lifeYears": 5,
+        "expiryDate": "2024-06-14T06:59:59+00:00"
+      }
+    },
+    {
+      "matchType": "EXACT",
+      "financingStatement": {
+        "statusType": "ACT",
+        "type": "SA",
+        "baseRegistrationNumber": "916559L",
+        "registrationDescription": "PPSA SECURITY AGREEMENT",
+        "registrationAct": "PERSONAL PROPERTY SECURITY ACT",
+        "createDateTime": "2019-11-27T14:11:52+00:00",
+        "registeringParty": {
+          "businessName": "D + H LIMITED PARTNERSHIP",
+          "address": {
+            "street": "2 ROBERT SPECK PARKWAY, 15TH F",
+            "city": "MISSISSAUGA",
+            "region": "ON",
+            "country": "CA",
+            "postalCode": "L4Z1H8"
+          }
+        },
+        "securedParties": [
+          {
+            "partyId": 5020565,
+            "businessName": "HONDA CANADA FINANCE INC.",
+            "address": {
+              "street": "180 HONDA BLVD",
+              "city": "MARKHAM",
+              "region": "ON",
+              "country": "CA",
+              "postalCode": "L6C0H9"
+            }
+          }
+        ],
+        "debtors": [
+          {
+            "partyId": 1209944,
+            "personName": {
+              "first": "MICHELLE",
+              "last": "SMITH",
+              "middle": "L"
+            },
+            "address": {
+              "street": "325 MIAMI RIVER DR",
+              "city": "HARRISON HOT SPRINGS",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V0M1K0"
+            },
+            "birthDate": "1963-10-19T12:59:59+00:00"
+          },
+          {
+            "partyId": 1209945,
+            "personName": {
+              "first": "M",
+              "last": "SMITH"
+            },
+            "address": {
+              "street": "325 MIAMI RIVER DR",
+              "city": "HARRISON HOT SPRINGS",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V0M1K0"
+            },
+            "birthDate": "1963-10-19T12:59:59+00:00"
+          }
+        ],
+        "vehicleCollateral": [
+          {
+            "vehicleId": 646572,
+            "type": "MV",
+            "year": 2019,
+            "make": "HONDA",
+            "model": "CIVIC",
+            "serialNumber": "SHHFK7H91KU302318"
+          }
+        ],
+        "trustIndenture": false,
+        "lifeYears": 5,
+        "expiryDate": "2024-11-28T07:59:59+00:00",
+        "changes": [
+          {
+            "baseRegistrationNumber": "916559L",
+            "createDateTime": "2020-01-11T17:35:47+00:00",
+            "renewalRegistrationNumber": "999689L",
+            "registeringParty": {
+              "businessName": "D + H LIMITED PARTNERSHIP",
+              "address": {
+                "street": "2 ROBERT SPECK PARKWAY, 15TH F",
+                "city": "MISSISSAUGA",
+                "region": "ON",
+                "country": "CA",
+                "postalCode": "L4Z1H8"
+              }
+            },
+            "lifeYears": 4,
+            "expiryDate": "2024-11-28T07:59:59+00:00",
+            "statementType": "RENEWAL_STATEMENT"
+          }
+        ]
+      }
+    },
+    {
+      "matchType": "EXACT",
+      "financingStatement": {
+        "statusType": "ACT",
+        "type": "SA",
+        "baseRegistrationNumber": "931386L",
+        "registrationDescription": "PPSA SECURITY AGREEMENT",
+        "registrationAct": "PERSONAL PROPERTY SECURITY ACT",
+        "createDateTime": "2019-12-04T14:25:05+00:00",
+        "registeringParty": {
+          "businessName": "GENERAL BANK OF CANADA",
+          "address": {
+            "street": "SUITE 100, 11523 - 100 AVE",
+            "city": "EDMONTON",
+            "region": "AB",
+            "country": "CA",
+            "postalCode": "T5K0J8"
+          }
+        },
+        "securedParties": [
+          {
+            "partyId": 5026109,
+            "businessName": "GENERAL BANK OF CANADA",
+            "address": {
+              "street": "SUITE 100, 11523 - 100 AVE",
+              "city": "EDMONTON",
+              "region": "AB",
+              "country": "CA",
+              "postalCode": "T5K0J8"
+            }
+          }
+        ],
+        "debtors": [
+          {
+            "partyId": 1219410,
+            "personName": {
+              "first": "DAVID",
+              "last": "SMITH",
+              "middle": "FRANKLIN"
+            },
+            "address": {
+              "street": "608 THIRD STREET",
+              "city": "NELSON",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V1L2P9"
+            },
+            "birthDate": "1946-02-27T12:59:59+00:00"
+          },
+          {
+            "partyId": 1219411,
+            "personName": {
+              "first": "DAVID",
+              "last": "SMITH",
+              "middle": "F"
+            },
+            "address": {
+              "street": "608 THIRD STREET",
+              "city": "NELSON",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V1L2P9"
+            },
+            "birthDate": "1946-02-27T12:59:59+00:00"
+          },
+          {
+            "partyId": 1219412,
+            "personName": {
+              "first": "MARY",
+              "last": "SMITH",
+              "middle": "ASCHE"
+            },
+            "address": {
+              "street": "608 THIRD STREET",
+              "city": "NELSON",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V1L2P9"
+            },
+            "birthDate": "1951-11-17T12:59:59+00:00"
+          },
+          {
+            "partyId": 1219413,
+            "personName": {
+              "first": "MARY",
+              "last": "SMITH",
+              "middle": "A"
+            },
+            "address": {
+              "street": "608 THIRD STREET",
+              "city": "NELSON",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V1L2P9"
+            },
+            "birthDate": "1951-11-17T12:59:59+00:00"
+          }
+        ],
+        "vehicleCollateral": [
+          {
+            "vehicleId": 651311,
+            "type": "MV",
+            "year": 2012,
+            "make": "TOYOTA",
+            "model": "TACOMA",
+            "serialNumber": "5TFMU4FN7CX008544"
+          }
+        ],
+        "trustIndenture": false,
+        "lifeYears": 5,
+        "expiryDate": "2024-12-05T07:59:59+00:00"
+      }
+    },
+    {
+      "matchType": "EXACT",
+      "financingStatement": {
+        "statusType": "ACT",
+        "type": "SA",
+        "baseRegistrationNumber": "931386L",
+        "registrationDescription": "PPSA SECURITY AGREEMENT",
+        "registrationAct": "PERSONAL PROPERTY SECURITY ACT",
+        "createDateTime": "2019-12-04T14:25:05+00:00",
+        "registeringParty": {
+          "businessName": "GENERAL BANK OF CANADA",
+          "address": {
+            "street": "SUITE 100, 11523 - 100 AVE",
+            "city": "EDMONTON",
+            "region": "AB",
+            "country": "CA",
+            "postalCode": "T5K0J8"
+          }
+        },
+        "securedParties": [
+          {
+            "partyId": 5026109,
+            "businessName": "GENERAL BANK OF CANADA",
+            "address": {
+              "street": "SUITE 100, 11523 - 100 AVE",
+              "city": "EDMONTON",
+              "region": "AB",
+              "country": "CA",
+              "postalCode": "T5K0J8"
+            }
+          }
+        ],
+        "debtors": [
+          {
+            "partyId": 1219410,
+            "personName": {
+              "first": "DAVID",
+              "last": "SMITH",
+              "middle": "FRANKLIN"
+            },
+            "address": {
+              "street": "608 THIRD STREET",
+              "city": "NELSON",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V1L2P9"
+            },
+            "birthDate": "1946-02-27T12:59:59+00:00"
+          },
+          {
+            "partyId": 1219411,
+            "personName": {
+              "first": "DAVID",
+              "last": "SMITH",
+              "middle": "F"
+            },
+            "address": {
+              "street": "608 THIRD STREET",
+              "city": "NELSON",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V1L2P9"
+            },
+            "birthDate": "1946-02-27T12:59:59+00:00"
+          },
+          {
+            "partyId": 1219412,
+            "personName": {
+              "first": "MARY",
+              "last": "SMITH",
+              "middle": "ASCHE"
+            },
+            "address": {
+              "street": "608 THIRD STREET",
+              "city": "NELSON",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V1L2P9"
+            },
+            "birthDate": "1951-11-17T12:59:59+00:00"
+          },
+          {
+            "partyId": 1219413,
+            "personName": {
+              "first": "MARY",
+              "last": "SMITH",
+              "middle": "A"
+            },
+            "address": {
+              "street": "608 THIRD STREET",
+              "city": "NELSON",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V1L2P9"
+            },
+            "birthDate": "1951-11-17T12:59:59+00:00"
+          }
+        ],
+        "vehicleCollateral": [
+          {
+            "vehicleId": 651311,
+            "type": "MV",
+            "year": 2012,
+            "make": "TOYOTA",
+            "model": "TACOMA",
+            "serialNumber": "5TFMU4FN7CX008544"
+          }
+        ],
+        "trustIndenture": false,
+        "lifeYears": 5,
+        "expiryDate": "2024-12-05T07:59:59+00:00"
+      }
+    },
+    {
+      "matchType": "EXACT",
+      "financingStatement": {
+        "statusType": "ACT",
+        "type": "SA",
+        "baseRegistrationNumber": "215274M",
+        "registrationDescription": "PPSA SECURITY AGREEMENT",
+        "registrationAct": "PERSONAL PROPERTY SECURITY ACT",
+        "createDateTime": "2020-05-14T00:15:27+00:00",
+        "registeringParty": {
+          "businessName": "D + H LIMITED PARTNERSHIP",
+          "address": {
+            "street": "2 ROBERT SPECK PARKWAY, 15TH F",
+            "city": "MISSISSAUGA",
+            "region": "ON",
+            "country": "CA",
+            "postalCode": "L4Z1H8"
+          }
+        },
+        "securedParties": [
+          {
+            "partyId": 5123814,
+            "businessName": "FORD CREDIT CANADA LEASING, DIVISION OF CANADIAN ROAD LEASING COMPANY",
+            "address": {
+              "street": "PO BOX 2400",
+              "city": "EDMONTON",
+              "region": "AB",
+              "country": "CA",
+              "postalCode": "T5J5C7"
+            }
+          }
+        ],
+        "debtors": [
+          {
+            "partyId": 1387593,
+            "personName": {
+              "first": "MARY",
+              "last": "SMITH",
+              "middle": "LOUISA"
+            },
+            "address": {
+              "street": "768 ROSEWOOD CRES",
+              "city": "KAMLOOPS",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V2H1S3"
+            },
+            "birthDate": "1935-09-30T12:59:59+00:00"
+          },
+          {
+            "partyId": 1387594,
+            "personName": {
+              "first": "ELWOOD",
+              "last": "SMITH",
+              "middle": "BYRON"
+            },
+            "address": {
+              "street": "768 ROSEWOOD CRES",
+              "city": "KAMLOOPS",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V2H1S3"
+            },
+            "birthDate": "1930-10-02T12:59:59+00:00"
+          },
+          {
+            "partyId": 1387595,
+            "personName": {
+              "first": "MARY",
+              "last": "SMITH",
+              "middle": "L"
+            },
+            "address": {
+              "street": "768 ROSEWOOD CRES",
+              "city": "KAMLOOPS",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V2H1S3"
+            },
+            "birthDate": "1935-09-30T12:59:59+00:00"
+          },
+          {
+            "partyId": 1387596,
+            "personName": {
+              "first": "ELWOOD",
+              "last": "SMITH",
+              "middle": "B"
+            },
+            "address": {
+              "street": "768 ROSEWOOD CRES",
+              "city": "KAMLOOPS",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V2H1S3"
+            },
+            "birthDate": "1930-10-02T12:59:59+00:00"
+          }
+        ],
+        "vehicleCollateral": [
+          {
+            "vehicleId": 737379,
+            "type": "MV",
+            "year": 2020,
+            "make": "LINCOLN",
+            "model": "CORS",
+            "serialNumber": "5LMCJ2D96LUL14594"
+          }
+        ],
+        "trustIndenture": false,
+        "lifeYears": 4,
+        "expiryDate": "2024-05-14T06:59:59+00:00"
+      }
+    },
+    {
+      "matchType": "EXACT",
+      "financingStatement": {
+        "statusType": "ACT",
+        "type": "SA",
+        "baseRegistrationNumber": "215274M",
+        "registrationDescription": "PPSA SECURITY AGREEMENT",
+        "registrationAct": "PERSONAL PROPERTY SECURITY ACT",
+        "createDateTime": "2020-05-14T00:15:27+00:00",
+        "registeringParty": {
+          "businessName": "D + H LIMITED PARTNERSHIP",
+          "address": {
+            "street": "2 ROBERT SPECK PARKWAY, 15TH F",
+            "city": "MISSISSAUGA",
+            "region": "ON",
+            "country": "CA",
+            "postalCode": "L4Z1H8"
+          }
+        },
+        "securedParties": [
+          {
+            "partyId": 5123814,
+            "businessName": "FORD CREDIT CANADA LEASING, DIVISION OF CANADIAN ROAD LEASING COMPANY",
+            "address": {
+              "street": "PO BOX 2400",
+              "city": "EDMONTON",
+              "region": "AB",
+              "country": "CA",
+              "postalCode": "T5J5C7"
+            }
+          }
+        ],
+        "debtors": [
+          {
+            "partyId": 1387593,
+            "personName": {
+              "first": "MARY",
+              "last": "SMITH",
+              "middle": "LOUISA"
+            },
+            "address": {
+              "street": "768 ROSEWOOD CRES",
+              "city": "KAMLOOPS",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V2H1S3"
+            },
+            "birthDate": "1935-09-30T12:59:59+00:00"
+          },
+          {
+            "partyId": 1387594,
+            "personName": {
+              "first": "ELWOOD",
+              "last": "SMITH",
+              "middle": "BYRON"
+            },
+            "address": {
+              "street": "768 ROSEWOOD CRES",
+              "city": "KAMLOOPS",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V2H1S3"
+            },
+            "birthDate": "1930-10-02T12:59:59+00:00"
+          },
+          {
+            "partyId": 1387595,
+            "personName": {
+              "first": "MARY",
+              "last": "SMITH",
+              "middle": "L"
+            },
+            "address": {
+              "street": "768 ROSEWOOD CRES",
+              "city": "KAMLOOPS",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V2H1S3"
+            },
+            "birthDate": "1935-09-30T12:59:59+00:00"
+          },
+          {
+            "partyId": 1387596,
+            "personName": {
+              "first": "ELWOOD",
+              "last": "SMITH",
+              "middle": "B"
+            },
+            "address": {
+              "street": "768 ROSEWOOD CRES",
+              "city": "KAMLOOPS",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V2H1S3"
+            },
+            "birthDate": "1930-10-02T12:59:59+00:00"
+          }
+        ],
+        "vehicleCollateral": [
+          {
+            "vehicleId": 737379,
+            "type": "MV",
+            "year": 2020,
+            "make": "LINCOLN",
+            "model": "CORS",
+            "serialNumber": "5LMCJ2D96LUL14594"
+          }
+        ],
+        "trustIndenture": false,
+        "lifeYears": 4,
+        "expiryDate": "2024-05-14T06:59:59+00:00"
+      }
+    },
+    {
+      "matchType": "EXACT",
+      "financingStatement": {
+        "statusType": "ACT",
+        "type": "SA",
+        "baseRegistrationNumber": "462282M",
+        "registrationDescription": "PPSA SECURITY AGREEMENT",
+        "registrationAct": "PERSONAL PROPERTY SECURITY ACT",
+        "createDateTime": "2020-09-14T14:30:11+00:00",
+        "registeringParty": {
+          "businessName": "D + H LIMITED PARTNERSHIP",
+          "address": {
+            "street": "2 ROBERT SPECK PARKWAY, 15TH F",
+            "city": "MISSISSAUGA",
+            "region": "ON",
+            "country": "CA",
+            "postalCode": "L4Z1H8"
+          }
+        },
+        "securedParties": [
+          {
+            "partyId": 5223033,
+            "businessName": "FORD CREDIT CANADA COMPANY",
+            "address": {
+              "street": "PO BOX 2400",
+              "city": "EDMONTON",
+              "region": "AB",
+              "country": "CA",
+              "postalCode": "T5J5C7"
+            }
+          }
+        ],
+        "debtors": [
+          {
+            "partyId": 1569563,
+            "personName": {
+              "first": "MARY",
+              "last": "SMITH",
+              "middle": "VAUGHAN"
+            },
+            "address": {
+              "street": "E19-220 G AND M RD",
+              "city": "KAMLOOPS",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V2H1A4"
+            },
+            "birthDate": "1950-04-28T12:59:59+00:00"
+          },
+          {
+            "partyId": 1569564,
+            "personName": {
+              "first": "KEITH",
+              "last": "SMITH",
+              "middle": "JAMES"
+            },
+            "address": {
+              "street": "E19-220 G AND M RD",
+              "city": "KAMLOOPS",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V2H1A4"
+            },
+            "birthDate": "1959-01-20T12:59:59+00:00"
+          }
+        ],
+        "vehicleCollateral": [
+          {
+            "vehicleId": 831172,
+            "type": "MV",
+            "year": 2020,
+            "make": "FORD",
+            "model": "F150",
+            "serialNumber": "1FTEW1EP9LKD29112"
+          }
+        ],
+        "trustIndenture": false,
+        "lifeYears": 7,
+        "expiryDate": "2027-09-15T06:59:59+00:00"
+      }
+    },
+    {
+      "matchType": "EXACT",
+      "financingStatement": {
+        "statusType": "ACT",
+        "type": "SA",
+        "baseRegistrationNumber": "475687M",
+        "registrationDescription": "PPSA SECURITY AGREEMENT",
+        "registrationAct": "PERSONAL PROPERTY SECURITY ACT",
+        "createDateTime": "2020-09-18T21:36:47+00:00",
+        "registeringParty": {
+          "businessName": "TERANET COLLATERAL MANAGEMENT SOLUTIONS CORPORATION (TDAF)",
+          "address": {
+            "street": "2 ROBERT SPECK PARKWAY, 15TH F",
+            "city": "MISSISSAUGA",
+            "region": "ON",
+            "country": "CA",
+            "postalCode": "L4Z1H8"
+          }
+        },
+        "securedParties": [
+          {
+            "partyId": 5228623,
+            "businessName": "TD AUTO FINANCE (CANADA) INC.",
+            "address": {
+              "street": "PO BOX 4086, STATION A",
+              "city": "TORONTO",
+              "region": "ON",
+              "country": "CA",
+              "postalCode": "M5W5K3"
+            }
+          }
+        ],
+        "debtors": [
+          {
+            "partyId": 1580037,
+            "personName": {
+              "first": "MARY",
+              "last": "SMITH",
+              "middle": "ANN"
+            },
+            "address": {
+              "street": "1817 ANDERTON ROAD",
+              "city": "COMOX",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V9M4B1"
+            },
+            "birthDate": "1960-01-24T12:59:59+00:00"
+          },
+          {
+            "partyId": 1580038,
+            "personName": {
+              "first": "MARY",
+              "last": "COLWELL",
+              "middle": "A"
+            },
+            "address": {
+              "street": "1817 ANDERTON ROAD",
+              "city": "COMOX",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V9M4B1"
+            },
+            "birthDate": "1960-01-24T12:59:59+00:00"
+          },
+          {
+            "partyId": 1580039,
+            "personName": {
+              "first": "MARYANN",
+              "last": "SMITH",
+              "middle": "A"
+            },
+            "address": {
+              "street": "1817 ANDERTON ROAD",
+              "city": "COMOX",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V9M4B1"
+            },
+            "birthDate": "1960-01-24T12:59:59+00:00"
+          },
+          {
+            "partyId": 1580040,
+            "personName": {
+              "first": "MARYANN",
+              "last": "SMITH",
+              "middle": "H"
+            },
+            "address": {
+              "street": "1817 ANDERTON ROAD",
+              "city": "COMOX",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V9M4B1"
+            },
+            "birthDate": "1960-01-24T12:59:59+00:00"
+          },
+          {
+            "partyId": 1580041,
+            "personName": {
+              "first": "MARY",
+              "last": "SMITH",
+              "middle": "ANN"
+            },
+            "address": {
+              "street": "1817 ANDERTON ROAD",
+              "city": "COMOX",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V9M4B1"
+            },
+            "birthDate": "1960-01-24T12:59:59+00:00"
+          },
+          {
+            "partyId": 1580042,
+            "personName": {
+              "first": "MARY",
+              "last": "SMITH",
+              "middle": "A"
+            },
+            "address": {
+              "street": "1817 ANDERTON ROAD",
+              "city": "COMOX",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V9M4B1"
+            },
+            "birthDate": "1960-01-24T12:59:59+00:00"
+          },
+          {
+            "partyId": 1580043,
+            "personName": {
+              "first": "MARY",
+              "last": "HYNDMAN",
+              "middle": "ANN"
+            },
+            "address": {
+              "street": "1817 ANDERTON ROAD",
+              "city": "COMOX",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V9M4B1"
+            },
+            "birthDate": "1960-01-24T12:59:59+00:00"
+          }
+        ],
+        "generalCollateral": [
+          {
+            "collateralId": 635075,
+            "description": "ALL ATTACHMENTS, ACCESSORIES, ADDITIONS, ALTERNATIONS, REPLACEMENTS AND REPAIRS (WHETHER PRESENT OR FUTURE) TO THE VEHICLE COLLATERAL. PROCEEDS: ALL CASH AND NON-CASH PROCEEDS OF THE VEHICLE COLLATERAL, INCLUDING, WITHOUT LIMITATION, PROCEEDS DERIVED DIRECTLY OR INDIRECTLY FROM ANY DEALING WITH THE VEHICLE COLLATERAL OR THAT INDEMNIFIES OR COMPENSA,TES THE DEBTOR(S) FOR THE DESTRUCTION OR DAMAGE TO OR LOSS OF THE VEHICLE COLLATERAL. THE PROCEEDS MAY TAKE THE FORM OF ANY ONE OR MORE OF THE FOLLOWING: GOODS, DOCUMENTS OF TITLE, CHATTEL PAPER, INSTRUMENTS, MONEY, INVESTMENT PROPERTY OR INTANGIBLES. ACCORDINGLY, ANY OF THE DEBTOR(S) AFTER ACQUIRED PROPERTY MAY BE PROCEEDS AND THEREFORE SUBJECT TO, THE SECURED PARTY'S SECURITY INTEREST.",
+            "addedDateTime": "2020-09-18T21:36:47+00:00"
+          }
+        ],
+        "vehicleCollateral": [
+          {
+            "vehicleId": 836304,
+            "type": "MV",
+            "year": 2016,
+            "make": "CADILLAC",
+            "model": "SRX",
+            "serialNumber": "3GYFNEE35GS507081"
+          }
+        ],
+        "trustIndenture": false,
+        "lifeYears": 5,
+        "expiryDate": "2025-09-19T06:59:59+00:00"
+      }
+    },
+    {
+      "matchType": "EXACT",
+      "financingStatement": {
+        "statusType": "ACT",
+        "type": "SA",
+        "baseRegistrationNumber": "475687M",
+        "registrationDescription": "PPSA SECURITY AGREEMENT",
+        "registrationAct": "PERSONAL PROPERTY SECURITY ACT",
+        "createDateTime": "2020-09-18T21:36:47+00:00",
+        "registeringParty": {
+          "businessName": "TERANET COLLATERAL MANAGEMENT SOLUTIONS CORPORATION (TDAF)",
+          "address": {
+            "street": "2 ROBERT SPECK PARKWAY, 15TH F",
+            "city": "MISSISSAUGA",
+            "region": "ON",
+            "country": "CA",
+            "postalCode": "L4Z1H8"
+          }
+        },
+        "securedParties": [
+          {
+            "partyId": 5228623,
+            "businessName": "TD AUTO FINANCE (CANADA) INC.",
+            "address": {
+              "street": "PO BOX 4086, STATION A",
+              "city": "TORONTO",
+              "region": "ON",
+              "country": "CA",
+              "postalCode": "M5W5K3"
+            }
+          }
+        ],
+        "debtors": [
+          {
+            "partyId": 1580037,
+            "personName": {
+              "first": "MARY",
+              "last": "SMITH",
+              "middle": "ANN"
+            },
+            "address": {
+              "street": "1817 ANDERTON ROAD",
+              "city": "COMOX",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V9M4B1"
+            },
+            "birthDate": "1960-01-24T12:59:59+00:00"
+          },
+          {
+            "partyId": 1580038,
+            "personName": {
+              "first": "MARY",
+              "last": "COLWELL",
+              "middle": "A"
+            },
+            "address": {
+              "street": "1817 ANDERTON ROAD",
+              "city": "COMOX",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V9M4B1"
+            },
+            "birthDate": "1960-01-24T12:59:59+00:00"
+          },
+          {
+            "partyId": 1580039,
+            "personName": {
+              "first": "MARYANN",
+              "last": "SMITH",
+              "middle": "A"
+            },
+            "address": {
+              "street": "1817 ANDERTON ROAD",
+              "city": "COMOX",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V9M4B1"
+            },
+            "birthDate": "1960-01-24T12:59:59+00:00"
+          },
+          {
+            "partyId": 1580040,
+            "personName": {
+              "first": "MARYANN",
+              "last": "SMITH",
+              "middle": "H"
+            },
+            "address": {
+              "street": "1817 ANDERTON ROAD",
+              "city": "COMOX",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V9M4B1"
+            },
+            "birthDate": "1960-01-24T12:59:59+00:00"
+          },
+          {
+            "partyId": 1580041,
+            "personName": {
+              "first": "MARY",
+              "last": "SMITH",
+              "middle": "ANN"
+            },
+            "address": {
+              "street": "1817 ANDERTON ROAD",
+              "city": "COMOX",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V9M4B1"
+            },
+            "birthDate": "1960-01-24T12:59:59+00:00"
+          },
+          {
+            "partyId": 1580042,
+            "personName": {
+              "first": "MARY",
+              "last": "SMITH",
+              "middle": "A"
+            },
+            "address": {
+              "street": "1817 ANDERTON ROAD",
+              "city": "COMOX",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V9M4B1"
+            },
+            "birthDate": "1960-01-24T12:59:59+00:00"
+          },
+          {
+            "partyId": 1580043,
+            "personName": {
+              "first": "MARY",
+              "last": "HYNDMAN",
+              "middle": "ANN"
+            },
+            "address": {
+              "street": "1817 ANDERTON ROAD",
+              "city": "COMOX",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V9M4B1"
+            },
+            "birthDate": "1960-01-24T12:59:59+00:00"
+          }
+        ],
+        "generalCollateral": [
+          {
+            "collateralId": 635075,
+            "description": "ALL ATTACHMENTS, ACCESSORIES, ADDITIONS, ALTERNATIONS, REPLACEMENTS AND REPAIRS (WHETHER PRESENT OR FUTURE) TO THE VEHICLE COLLATERAL. PROCEEDS: ALL CASH AND NON-CASH PROCEEDS OF THE VEHICLE COLLATERAL, INCLUDING, WITHOUT LIMITATION, PROCEEDS DERIVED DIRECTLY OR INDIRECTLY FROM ANY DEALING WITH THE VEHICLE COLLATERAL OR THAT INDEMNIFIES OR COMPENSA,TES THE DEBTOR(S) FOR THE DESTRUCTION OR DAMAGE TO OR LOSS OF THE VEHICLE COLLATERAL. THE PROCEEDS MAY TAKE THE FORM OF ANY ONE OR MORE OF THE FOLLOWING: GOODS, DOCUMENTS OF TITLE, CHATTEL PAPER, INSTRUMENTS, MONEY, INVESTMENT PROPERTY OR INTANGIBLES. ACCORDINGLY, ANY OF THE DEBTOR(S) AFTER ACQUIRED PROPERTY MAY BE PROCEEDS AND THEREFORE SUBJECT TO, THE SECURED PARTY'S SECURITY INTEREST.",
+            "addedDateTime": "2020-09-18T21:36:47+00:00"
+          }
+        ],
+        "vehicleCollateral": [
+          {
+            "vehicleId": 836304,
+            "type": "MV",
+            "year": 2016,
+            "make": "CADILLAC",
+            "model": "SRX",
+            "serialNumber": "3GYFNEE35GS507081"
+          }
+        ],
+        "trustIndenture": false,
+        "lifeYears": 5,
+        "expiryDate": "2025-09-19T06:59:59+00:00"
+      }
+    },
+    {
+      "matchType": "EXACT",
+      "financingStatement": {
+        "statusType": "ACT",
+        "type": "SA",
+        "baseRegistrationNumber": "475687M",
+        "registrationDescription": "PPSA SECURITY AGREEMENT",
+        "registrationAct": "PERSONAL PROPERTY SECURITY ACT",
+        "createDateTime": "2020-09-18T21:36:47+00:00",
+        "registeringParty": {
+          "businessName": "TERANET COLLATERAL MANAGEMENT SOLUTIONS CORPORATION (TDAF)",
+          "address": {
+            "street": "2 ROBERT SPECK PARKWAY, 15TH F",
+            "city": "MISSISSAUGA",
+            "region": "ON",
+            "country": "CA",
+            "postalCode": "L4Z1H8"
+          }
+        },
+        "securedParties": [
+          {
+            "partyId": 5228623,
+            "businessName": "TD AUTO FINANCE (CANADA) INC.",
+            "address": {
+              "street": "PO BOX 4086, STATION A",
+              "city": "TORONTO",
+              "region": "ON",
+              "country": "CA",
+              "postalCode": "M5W5K3"
+            }
+          }
+        ],
+        "debtors": [
+          {
+            "partyId": 1580037,
+            "personName": {
+              "first": "MARY",
+              "last": "SMITH",
+              "middle": "ANN"
+            },
+            "address": {
+              "street": "1817 ANDERTON ROAD",
+              "city": "COMOX",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V9M4B1"
+            },
+            "birthDate": "1960-01-24T12:59:59+00:00"
+          },
+          {
+            "partyId": 1580038,
+            "personName": {
+              "first": "MARY",
+              "last": "COLWELL",
+              "middle": "A"
+            },
+            "address": {
+              "street": "1817 ANDERTON ROAD",
+              "city": "COMOX",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V9M4B1"
+            },
+            "birthDate": "1960-01-24T12:59:59+00:00"
+          },
+          {
+            "partyId": 1580039,
+            "personName": {
+              "first": "MARYANN",
+              "last": "SMITH",
+              "middle": "A"
+            },
+            "address": {
+              "street": "1817 ANDERTON ROAD",
+              "city": "COMOX",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V9M4B1"
+            },
+            "birthDate": "1960-01-24T12:59:59+00:00"
+          },
+          {
+            "partyId": 1580040,
+            "personName": {
+              "first": "MARYANN",
+              "last": "SMITH",
+              "middle": "H"
+            },
+            "address": {
+              "street": "1817 ANDERTON ROAD",
+              "city": "COMOX",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V9M4B1"
+            },
+            "birthDate": "1960-01-24T12:59:59+00:00"
+          },
+          {
+            "partyId": 1580041,
+            "personName": {
+              "first": "MARY",
+              "last": "SMITH",
+              "middle": "ANN"
+            },
+            "address": {
+              "street": "1817 ANDERTON ROAD",
+              "city": "COMOX",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V9M4B1"
+            },
+            "birthDate": "1960-01-24T12:59:59+00:00"
+          },
+          {
+            "partyId": 1580042,
+            "personName": {
+              "first": "MARY",
+              "last": "SMITH",
+              "middle": "A"
+            },
+            "address": {
+              "street": "1817 ANDERTON ROAD",
+              "city": "COMOX",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V9M4B1"
+            },
+            "birthDate": "1960-01-24T12:59:59+00:00"
+          },
+          {
+            "partyId": 1580043,
+            "personName": {
+              "first": "MARY",
+              "last": "HYNDMAN",
+              "middle": "ANN"
+            },
+            "address": {
+              "street": "1817 ANDERTON ROAD",
+              "city": "COMOX",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V9M4B1"
+            },
+            "birthDate": "1960-01-24T12:59:59+00:00"
+          }
+        ],
+        "generalCollateral": [
+          {
+            "collateralId": 635075,
+            "description": "ALL ATTACHMENTS, ACCESSORIES, ADDITIONS, ALTERNATIONS, REPLACEMENTS AND REPAIRS (WHETHER PRESENT OR FUTURE) TO THE VEHICLE COLLATERAL. PROCEEDS: ALL CASH AND NON-CASH PROCEEDS OF THE VEHICLE COLLATERAL, INCLUDING, WITHOUT LIMITATION, PROCEEDS DERIVED DIRECTLY OR INDIRECTLY FROM ANY DEALING WITH THE VEHICLE COLLATERAL OR THAT INDEMNIFIES OR COMPENSA,TES THE DEBTOR(S) FOR THE DESTRUCTION OR DAMAGE TO OR LOSS OF THE VEHICLE COLLATERAL. THE PROCEEDS MAY TAKE THE FORM OF ANY ONE OR MORE OF THE FOLLOWING: GOODS, DOCUMENTS OF TITLE, CHATTEL PAPER, INSTRUMENTS, MONEY, INVESTMENT PROPERTY OR INTANGIBLES. ACCORDINGLY, ANY OF THE DEBTOR(S) AFTER ACQUIRED PROPERTY MAY BE PROCEEDS AND THEREFORE SUBJECT TO, THE SECURED PARTY'S SECURITY INTEREST.",
+            "addedDateTime": "2020-09-18T21:36:47+00:00"
+          }
+        ],
+        "vehicleCollateral": [
+          {
+            "vehicleId": 836304,
+            "type": "MV",
+            "year": 2016,
+            "make": "CADILLAC",
+            "model": "SRX",
+            "serialNumber": "3GYFNEE35GS507081"
+          }
+        ],
+        "trustIndenture": false,
+        "lifeYears": 5,
+        "expiryDate": "2025-09-19T06:59:59+00:00"
+      }
+    },
+    {
+      "matchType": "EXACT",
+      "financingStatement": {
+        "statusType": "ACT",
+        "type": "SA",
+        "baseRegistrationNumber": "842085M",
+        "registrationDescription": "PPSA SECURITY AGREEMENT",
+        "registrationAct": "PERSONAL PROPERTY SECURITY ACT",
+        "createDateTime": "2021-03-19T16:48:27+00:00",
+        "registeringParty": {
+          "businessName": "D + H LIMITED PARTNERSHIP",
+          "address": {
+            "street": "2 ROBERT SPECK PARKWAY, 15TH F",
+            "city": "MISSISSAUGA",
+            "region": "ON",
+            "country": "CA",
+            "postalCode": "L4Z1H8"
+          }
+        },
+        "securedParties": [
+          {
+            "partyId": 5384595,
+            "code": "26960001",
+            "businessName": "TOYOTA CREDIT CANADA INC.",
+            "address": {
+              "street": "80 MICRO COURT",
+              "city": "MARKHAM",
+              "region": "ON",
+              "country": "CA",
+              "postalCode": "L3R9Z5"
+            }
+          }
+        ],
+        "debtors": [
+          {
+            "partyId": 1854939,
+            "businessName": "JOY SMITH CAREGIVING SERVICES",
+            "address": {
+              "street": "2073 BLUEBELL TERRACE",
+              "city": "NANAIMO",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V9S2P9"
+            }
+          },
+          {
+            "partyId": 1854940,
+            "personName": {
+              "first": "MARY",
+              "last": "SMITH",
+              "middle": "JOY"
+            },
+            "address": {
+              "street": "2073 BLUEBELL TERRACE",
+              "city": "NANAIMO",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V9S2P9"
+            },
+            "birthDate": "1983-09-19T12:59:59+00:00"
+          }
+        ],
+        "vehicleCollateral": [
+          {
+            "vehicleId": 1008870,
+            "type": "MV",
+            "year": 2021,
+            "make": "TOYOTA",
+            "model": "TACOMA 4X4",
+            "serialNumber": "5TFDZ5BN1MX059780"
+          }
+        ],
+        "trustIndenture": false,
+        "lifeYears": 5,
+        "expiryDate": "2026-03-20T06:59:59+00:00"
+      }
+    },
+    {
+      "matchType": "EXACT",
+      "financingStatement": {
+        "statusType": "ACT",
+        "type": "SA",
+        "baseRegistrationNumber": "028397N",
+        "registrationDescription": "PPSA SECURITY AGREEMENT",
+        "registrationAct": "PERSONAL PROPERTY SECURITY ACT",
+        "createDateTime": "2021-06-09T14:11:43+00:00",
+        "registeringParty": {
+          "businessName": "D + H LIMITED PARTNERSHIP",
+          "address": {
+            "street": "2 ROBERT SPECK PARKWAY, 15TH F",
+            "city": "MISSISSAUGA",
+            "region": "ON",
+            "country": "CA",
+            "postalCode": "L4Z1H8"
+          }
+        },
+        "securedParties": [
+          {
+            "partyId": 5473782,
+            "businessName": "GENERAL BANK OF CANADA",
+            "address": {
+              "street": "SUITE100, 11523 - 100 AVE",
+              "city": "EDMONTON",
+              "region": "AB",
+              "country": "CA",
+              "postalCode": "T5K0J8"
+            }
+          }
+        ],
+        "debtors": [
+          {
+            "partyId": 2021886,
+            "personName": {
+              "first": "DAVID",
+              "last": "SMITH",
+              "middle": "JAMES"
+            },
+            "address": {
+              "street": "1329 FOREST ROAD",
+              "city": "CASTLEGAR",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V1N3L6"
+            },
+            "birthDate": "1956-02-01T12:59:59+00:00"
+          },
+          {
+            "partyId": 2021887,
+            "personName": {
+              "first": "MAUREEN",
+              "last": "SMITH",
+              "middle": "LYNN"
+            },
+            "address": {
+              "street": "1329 FOREST ROAD",
+              "city": "CASTLEGAR",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V1N3L6"
+            },
+            "birthDate": "1956-03-01T12:59:59+00:00"
+          },
+          {
+            "partyId": 2021888,
+            "personName": {
+              "first": "M",
+              "last": "SMITH",
+              "middle": "L"
+            },
+            "address": {
+              "street": "1329 FOREST ROAD",
+              "city": "CASTLEGAR",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V1N3L6"
+            },
+            "birthDate": "1956-03-01T12:59:59+00:00"
+          }
+        ],
+        "vehicleCollateral": [
+          {
+            "vehicleId": 1090004,
+            "type": "MV",
+            "year": 2018,
+            "make": "FORD",
+            "model": "F150",
+            "serialNumber": "1FTFX1EG6JFA39188"
+          }
+        ],
+        "trustIndenture": false,
+        "lifeYears": 7,
+        "expiryDate": "2028-06-10T06:59:59+00:00"
+      }
+    }
+  ],
   "selected": [
     {
-      "baseRegistrationNumber": "TEST0004", 
-      "createDateTime": "2021-03-16T15:34:38+00:00", 
+      "baseRegistrationNumber": "683914I",
+      "matchType": "EXACT",
+      "createDateTime": "2015-06-24T16:47:28+00:00",
+      "registrationType": "SA",
       "debtor": {
-        "partyId": 200000012, 
         "personName": {
-          "first": "TEST IND", 
-          "last": "DEBTOR", 
-          "middle": "4"
-        }
-      }, 
-      "matchType": "EXACT", 
-      "registrationType": "SA"
-    }, 
+          "last": "SMITH",
+          "first": "MARY",
+          "middle": "ELEANOR"
+        },
+        "partyId": 240451,
+        "birthDate": "1932-04-16T12:59:59+00:00"
+      }
+    },
     {
-      "baseRegistrationNumber": "TEST0012", 
-      "createDateTime": "2021-03-16T15:34:38+00:00", 
+      "baseRegistrationNumber": "484019K",
+      "matchType": "EXACT",
+      "createDateTime": "2017-12-29T17:27:05+00:00",
+      "registrationType": "SA",
       "debtor": {
-        "partyId": 200000032, 
         "personName": {
-          "first": "TEST IND", 
-          "last": "DEBTOR", 
-          "middle": "12"
-        }
-      }, 
-      "matchType": "EXACT", 
-      "registrationType": "SA"
-    }, 
+          "last": "SMITH",
+          "first": "MARY",
+          "middle": "ANNE"
+        },
+        "partyId": 551812,
+        "birthDate": "1959-07-06T12:59:59+00:00"
+      }
+    },
     {
-      "baseRegistrationNumber": "TEST0011", 
-      "createDateTime": "2021-03-16T15:34:38+00:00", 
+      "baseRegistrationNumber": "726972K",
+      "matchType": "EXACT",
+      "createDateTime": "2018-05-01T16:31:57+00:00",
+      "registrationType": "SA",
       "debtor": {
-        "partyId": 200000029, 
         "personName": {
-          "first": "TEST IND", 
-          "last": "DEBTOR", 
-          "middle": "11"
-        }
-      }, 
-      "matchType": "EXACT", 
-      "registrationType": "SA"
-    }, 
+          "last": "SMITH",
+          "first": "MARY",
+          "middle": "A"
+        },
+        "partyId": 634985,
+        "birthDate": "1951-11-17T12:59:59+00:00"
+      }
+    },
     {
-      "baseRegistrationNumber": "TEST0005", 
-      "createDateTime": "2021-03-16T15:34:38+00:00", 
+      "baseRegistrationNumber": "932245K",
+      "matchType": "EXACT",
+      "createDateTime": "2018-08-01T14:07:45+00:00",
+      "registrationType": "SA",
       "debtor": {
-        "partyId": 200000016, 
         "personName": {
-          "first": "TEST IND", 
-          "last": "DEBTOR", 
-          "middle": "5"
-        }
-      }, 
-      "matchType": "EXACT", 
-      "registrationType": "SA"
+          "last": "SMITH",
+          "first": "MARY",
+          "middle": "LYNN"
+        },
+        "partyId": 721897,
+        "birthDate": "1950-09-12T12:59:59+00:00"
+      }
+    },
+    {
+      "baseRegistrationNumber": "054721L",
+      "matchType": "EXACT",
+      "createDateTime": "2018-09-28T00:32:06+00:00",
+      "registrationType": "SA",
+      "debtor": {
+        "personName": {
+          "last": "SMITH",
+          "first": "MARY",
+          "middle": "LEE"
+        },
+        "partyId": 775018,
+        "birthDate": "1941-03-31T12:59:59+00:00"
+      }
+    },
+    {
+      "baseRegistrationNumber": "343692L",
+      "matchType": "EXACT",
+      "createDateTime": "2019-02-28T20:26:32+00:00",
+      "registrationType": "SA",
+      "debtor": {
+        "personName": {
+          "last": "SMITH",
+          "first": "MARY"
+        },
+        "partyId": 908131,
+        "birthDate": "1957-11-16T12:59:59+00:00"
+      }
+    },
+    {
+      "baseRegistrationNumber": "434833L",
+      "matchType": "EXACT",
+      "createDateTime": "2019-04-15T14:16:02+00:00",
+      "registrationType": "SA",
+      "debtor": {
+        "personName": {
+          "last": "SMITH",
+          "first": "MARY",
+          "middle": "LOUISE"
+        },
+        "partyId": 953784,
+        "birthDate": "1987-09-13T12:59:59+00:00"
+      }
+    },
+    {
+      "baseRegistrationNumber": "552352L",
+      "matchType": "EXACT",
+      "createDateTime": "2019-06-06T14:49:53+00:00",
+      "registrationType": "SA",
+      "debtor": {
+        "personName": {
+          "last": "SMITH",
+          "first": "M",
+          "middle": "L"
+        },
+        "partyId": 1013436,
+        "birthDate": "1956-03-01T12:59:59+00:00"
+      }
+    },
+    {
+      "baseRegistrationNumber": "569689L",
+      "matchType": "EXACT",
+      "createDateTime": "2019-06-14T04:33:36+00:00",
+      "registrationType": "SA",
+      "debtor": {
+        "personName": {
+          "last": "SMITH",
+          "first": "MARY",
+          "middle": "J"
+        },
+        "partyId": 1021753,
+        "birthDate": "1954-02-09T12:59:59+00:00"
+      }
+    },
+    {
+      "baseRegistrationNumber": "916559L",
+      "matchType": "EXACT",
+      "createDateTime": "2019-11-27T14:11:52+00:00",
+      "registrationType": "SA",
+      "debtor": {
+        "personName": {
+          "last": "SMITH",
+          "first": "M"
+        },
+        "partyId": 1209945,
+        "birthDate": "1963-10-19T12:59:59+00:00"
+      }
+    },
+    {
+      "baseRegistrationNumber": "931386L",
+      "matchType": "EXACT",
+      "createDateTime": "2019-12-04T14:25:05+00:00",
+      "registrationType": "SA",
+      "debtor": {
+        "personName": {
+          "last": "SMITH",
+          "first": "MARY",
+          "middle": "A"
+        },
+        "partyId": 1219413,
+        "birthDate": "1951-11-17T12:59:59+00:00"
+      }
+    },
+    {
+      "baseRegistrationNumber": "931386L",
+      "matchType": "EXACT",
+      "createDateTime": "2019-12-04T14:25:05+00:00",
+      "registrationType": "SA",
+      "debtor": {
+        "personName": {
+          "last": "SMITH",
+          "first": "MARY",
+          "middle": "ASCHE"
+        },
+        "partyId": 1219412,
+        "birthDate": "1951-11-17T12:59:59+00:00"
+      }
+    },
+    {
+      "baseRegistrationNumber": "215274M",
+      "matchType": "EXACT",
+      "createDateTime": "2020-05-14T00:15:27+00:00",
+      "registrationType": "SA",
+      "debtor": {
+        "personName": {
+          "last": "SMITH",
+          "first": "MARY",
+          "middle": "L"
+        },
+        "partyId": 1387595,
+        "birthDate": "1935-09-30T12:59:59+00:00"
+      }
+    },
+    {
+      "baseRegistrationNumber": "215274M",
+      "matchType": "EXACT",
+      "createDateTime": "2020-05-14T00:15:27+00:00",
+      "registrationType": "SA",
+      "debtor": {
+        "personName": {
+          "last": "SMITH",
+          "first": "MARY",
+          "middle": "LOUISA"
+        },
+        "partyId": 1387593,
+        "birthDate": "1935-09-30T12:59:59+00:00"
+      }
+    },
+    {
+      "baseRegistrationNumber": "462282M",
+      "matchType": "EXACT",
+      "createDateTime": "2020-09-14T14:30:11+00:00",
+      "registrationType": "SA",
+      "debtor": {
+        "personName": {
+          "last": "SMITH",
+          "first": "MARY",
+          "middle": "VAUGHAN"
+        },
+        "partyId": 1569563,
+        "birthDate": "1950-04-28T12:59:59+00:00"
+      }
+    },
+    {
+      "baseRegistrationNumber": "475687M",
+      "matchType": "EXACT",
+      "createDateTime": "2020-09-18T21:36:47+00:00",
+      "registrationType": "SA",
+      "debtor": {
+        "personName": {
+          "last": "SMITH",
+          "first": "MARY",
+          "middle": "A"
+        },
+        "partyId": 1580042,
+        "birthDate": "1960-01-24T12:59:59+00:00"
+      }
+    },
+    {
+      "baseRegistrationNumber": "475687M",
+      "matchType": "EXACT",
+      "createDateTime": "2020-09-18T21:36:47+00:00",
+      "registrationType": "SA",
+      "debtor": {
+        "personName": {
+          "last": "SMITH",
+          "first": "MARY",
+          "middle": "ANN"
+        },
+        "partyId": 1580037,
+        "birthDate": "1960-01-24T12:59:59+00:00"
+      }
+    },
+    {
+      "baseRegistrationNumber": "475687M",
+      "matchType": "EXACT",
+      "createDateTime": "2020-09-18T21:36:47+00:00",
+      "registrationType": "SA",
+      "debtor": {
+        "personName": {
+          "last": "SMITH",
+          "first": "MARY",
+          "middle": "ANN"
+        },
+        "partyId": 1580041,
+        "birthDate": "1960-01-24T12:59:59+00:00"
+      }
+    },
+    {
+      "baseRegistrationNumber": "842085M",
+      "matchType": "EXACT",
+      "createDateTime": "2021-03-19T16:48:27+00:00",
+      "registrationType": "SA",
+      "debtor": {
+        "personName": {
+          "last": "SMITH",
+          "first": "MARY",
+          "middle": "JOY"
+        },
+        "partyId": 1854940,
+        "birthDate": "1983-09-19T12:59:59+00:00"
+      }
+    },
+    {
+      "baseRegistrationNumber": "028397N",
+      "matchType": "EXACT",
+      "createDateTime": "2021-06-09T14:11:43+00:00",
+      "registrationType": "SA",
+      "debtor": {
+        "personName": {
+          "last": "SMITH",
+          "first": "M",
+          "middle": "L"
+        },
+        "partyId": 2021888,
+        "birthDate": "1956-03-01T12:59:59+00:00"
+      }
     }
-  ], 
-  "similarResultsSize": 0, 
-  "totalResultsSize": 4
+  ],
+  "payment": {
+    "invoiceId": "15545",
+    "receipt": "/api/v1/payment-requests/15545/receipts"
+  },
+  "totalResultsSize": 16
 }

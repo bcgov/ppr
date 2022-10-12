@@ -1,13 +1,7 @@
 <style>
-	html body article#search-toc {
-		page: search-toc;
-	}
-
-	html body article#registration {
-		page: registration;
-	}
-	html body article#cover-page {
-		page: cover-page;
+	.last-page {
+		page: last_page;
+		page-break-inside: avoid !important;
 	}
 
 	.fixed-header {
@@ -62,29 +56,31 @@
 	}
 
 	.report-type {
-		font-family: 'BCSans-Bold', sans-serif !important;
-		color: #234075;
+		font-family: 'Calibri', sans-serif !important;
+		color: black;
 		font-size: 15pt !important;
 		text-align: right;
+		font-weight: bold;
 	}
 	.report-type-desc {
-		font-family: 'BCSans-Regular', sans-serif !important;
-		color: #1A5A96;
+		font-family: 'Calibri', sans-serif !important;
+		color: black;
 		font-size: 12pt !important;
 		text-align: right;
 	}
 
 	.financing-type {
-		font-family: 'BCSans-Bold', sans-serif !important;
-		color: #234075;
+		font-family: 'Calibri', sans-serif !important;
+		color: black;
 		font-size: 15pt;
 		text-align: right;
 		background-color: white;
+		font-weight: bold;
 	}
 
 	.financing-act {
-		font-family: 'BCSans-Regular', sans-serif !important;
-		color: #1A5A96;
+		font-family: 'Calibri', sans-serif !important;
+		color: black;
 		font-size: 12pt;
 		text-align: right;
 		background-color: white;
@@ -92,47 +88,43 @@
 
 	.business-name-header {
 		width: 100%;
-		background-color: #234075;
+		background-color: white;
 		height: 44px;
 		text-align: left;
+		color: black;
 		line-height: 44px;
+		border-right: 2px solid #000000;
+		border-top: 2px solid #000000;
+		border-left: 2px solid #000000;
 	}
 
 	.business-name-header-long {
 		width: 100%;
-		background-color: #234075;
+		background-color: white;
 		text-align: left;
+		color: black;
+		border-right: 2px solid #000000;
+		border-top: 2px solid #000000;
+		border-left: 2px solid #000000;
 	}
 
 	.lbl-business-name {
 		padding-left: 27px;
-		font-family: 'BCSans-Bold', sans-serif !important;
+		font-family: 'Calibri', sans-serif !important;
 		font-size: 14pt !important;
-		color: white;
+		color: black;
 		overflow-wrap: break-word;
+		font-weight: bold;
 	}
-/*
+
 	.badge-gold {
-		font-family: 'BCSans-Bold', sans-serif !important;
-		font-size: 7pt;
-		max-height: 13pt;
-		text-align: center;
-		color: #234075;
-		background-color: #e3a82b;
-		padding: 3px 8px;
-		margin: 0px 3px 6px 0px;
-		border-radius: 4px;
-		vertical-align: middle;
-	}
-*/
-	.badge-gold {
-		font-family: 'BCSans-Bold', sans-serif !important;
+		font-family: 'Calibri', sans-serif !important;
 		font-size: 9pt;
 		font-weight: bold !important;
 		height: 14px;
 		text-align: center;
-		color: #234075;
-		background-color: #e3a82b;
+		color: black;
+		background-color: white;
 		padding: 2px 10px;
 		margin: 0px 3px 10px 10px;
 		border-radius: 4px;
@@ -140,16 +132,17 @@
 	}
 
 	.lbl-business-detail {
-		font-family: 'BCSans-Bold', sans-serif !important;
-		color: white !important;
+		font-family: 'Calibri', sans-serif !important;
+		color: black !important;
 		font-size: 11pt;
 		line-height: 18px;
 		text-align: left;
+		font-weight: bold;
 	}
 
 	.nil-message {
-		font-family: 'BCSans-Regular', sans-serif !important;
-		color: #313132 !important;
+		font-family: 'Calibri', sans-serif !important;
+		color: black !important;
 		font-size: 11pt;
 		line-height: 18px;
 		text-align: center;
@@ -162,7 +155,6 @@
 		background-color: white; /* #38698A; */
 		vertical-align: middle;
 		text-align: center;
-		/* margin-top: -90px; */ /* -43px approx 0.45 in */
 	}
 
 	.registration-details-container {
@@ -170,15 +162,19 @@
 		background-color: white; /* #38698A; */
 		vertical-align: middle;
 		text-align: center;
-		margin-top: -22px; /* -43px approx 0.45 in */
+		margin-top: 0px !important;
+		/* margin-top: -22px;  -43px approx 0.45 in */
 	}
 
 	.verification-header-table {
 		width: 100%;
-		background-color: #234075;
+		background-color: white;
 		height: 44px;
 		text-align: left;
 		line-height: 44px;
+		border-style: solid;
+		border-width: 2px;
+		border-color: #000000;
 	}
 
 	.verification-header-table td {
@@ -187,11 +183,12 @@
 
 	.verification-header-table td:nth-child(1) {
 		padding: 0px;
-		font-family: 'BCSans-Bold', sans-serif !important;
+		font-family: 'Calibri', sans-serif !important;
 		font-size: 14pt !important;
-		color: white;
+		color: black;
 		width: 50%;
 		text-align: right;
+		font-weight: bold;
 	}
 
 	.verification-header-table td:nth-child(2) {
@@ -202,10 +199,13 @@
 
 	.registration-header-table {
 		width: 100%;
-		background-color: #234075;
+		background-color: white;
 		height: 44px;
 		text-align: left;
 		line-height: 44px;
+		border-style: solid;
+		border-width: 2px;
+		border-color: #000000;
 	}
 
 	.registration-header-table td {
@@ -215,9 +215,10 @@
 	.registration-header-table td:nth-child(1) {
 		width: 55%;
 		padding-left: 25px;
-		font-family: 'BCSans-Bold', sans-serif !important;
+		font-family: 'Calibri', sans-serif !important;
 		font-size: 14pt !important;
-		color: white;
+		color: black;
+		font-weight: bold;
 	}
 
 	.registration-header-table td:nth-child(2) {
@@ -226,14 +227,16 @@
 
 	.business-details-table {
 		width: 100%;
-		font-family: 'BCSans-Regular', sans-serif !important;
-		color: white !important;
-		background-color: #37598A;
+		font-family: 'Calibri', sans-serif !important;
+		color: black !important;
+		background-color: white;
 		font-size: 11pt;
 		line-height: 18px;
 		text-align: left;
 		padding: 1rem 1rem 1rem 1.5rem;
-		border-top: 1px solid #E3A82B;
+		border-style: solid;
+		border-width: 2px;
+		border-color: #000000;
 	}
 
 	.business-details-table td {
@@ -253,16 +256,18 @@
 		padding: 0px;
 	}
 
-
 	.business-details-table-grey {
 		width: 100%;
-		font-family: 'BCSans-Regular', sans-serif;
-		color: #313132!important;
-		font-size: 11pt;
+		font-family: Calibri;
+		color: black !important;
+		font-size: 13pt;
 		line-height: 18px;
 		text-align: left;
+		margin: 0px !important;
 		padding: 1rem 1rem 0.75rem 1.5rem;
-		background-color: #E2E7ED;
+		border-right: 2px solid #000000;
+		border-bottom: 2px solid #000000;
+		border-left: 2px solid #000000;
 	}
 
 	.business-details-table-grey td {
@@ -272,7 +277,7 @@
 
 	.business-details-table-grey td:nth-child(1) {
 		width: 40%; /* 35 */
-		font-family: 'BCSans-Bold', sans-serif !important;
+		font-family: 'Calibri', sans-serif !important;
 		font-weight: bold;
 	}
 
@@ -282,10 +287,10 @@
 
 	.header-table-toc {
 		width: 100%;
-		font-family: 'BCSans-Regular', sans-serif !important;
-		color: #234075;
-		border-top: 2px solid #234075;
-		border-bottom: 2px solid #234075;
+		font-family: 'Calibri', sans-serif !important;
+		color: black;
+		border-top: 2px solid black;
+		border-bottom: 2px solid black;
 		padding-bottom: 8px;
 	}
 	.header-table-toc td {
@@ -306,9 +311,10 @@
 	}
 
 	.header-toc-title {
-		font-family: 'BCSans-Bold', sans-serif !important;
+		font-family: 'Calibri', sans-serif !important;
 		font-size: 14pt;
 		text-align: center;
+		font-weight: bold;
 	}
 
 	.business-details-note {
@@ -316,14 +322,15 @@
 	}
 
 	.section-header {
-		border-top: solid 2px #234075;
-		border-bottom: solid 2px #234075;
+		border-top: solid 2px black;
+		border-bottom: solid 2px black;
 		height: 33px;
-		font-family: 'BCSans-Bold', sans-serif !important;
+		font-family: 'Calibri', sans-serif !important;
 		text-align: center;
 		font-size: 14pt;
 		line-height: 1rem;
-		color: #234075;
+		color: black;
+		font-weight: bold;
 	}
 
 	.container {
@@ -373,8 +380,8 @@
 	}
 
 	.section-title {
-		font-family: 'BCSans-Bold', sans-serif !important;
-		color: #234075;
+		font-family: 'Calibri', sans-serif !important;
+		color: black;
 		font-size: 12pt;
 		font-weight: bold;
 		text-align: left;
@@ -382,31 +389,33 @@
 	}
 
 	.section-title-centre {
-		font-family: 'BCSans-Bold', sans-serif !important;
-		color: #234075;
+		font-family: 'Calibri', sans-serif !important;
+		color: black;
 		font-size: 14pt;
 		text-align: center;
+		font-weight: bold;
 	}
 
 	.section-sub-title {
-		font-family: 'BCSans-Bold', sans-serif !important;
-		color: #313132;
+		font-family: 'Calibri', sans-serif !important;
+		color: black;
 		font-size: 11pt;
 		font-weight: bold;
 		text-align: left;
 		line-height: 15px;
+		font-weight: bold;
 	}
 
 	.section-statement {
-		font-family: 'BCSans-Regular', sans-serif !important;
-		color: #234075;
+		font-family: 'Calibri', sans-serif !important;
+		color: black;
 		font-size: 12pt;
 		text-align: center;
 	}
 
 	.section-data {
-		font-family: 'BCSans-Regular', sans-serif !important;
-		color: #313132;
+		font-family: 'Calibri', sans-serif !important;
+		color: black;
 		font-size: 11pt;
 		line-height: 13pt;
 		text-align: left;
@@ -414,7 +423,7 @@
 
 	.section-data-gc {
 		font-family: Calibri !important;
-		color: #313132;
+		color: black;
 		font-size: 13pt;
 		line-height: 15pt;
 		text-align: left;
@@ -422,16 +431,16 @@
 	}
 
 	.cover-data {
-		font-family: 'BCSans-Regular', sans-serif !important;
-		color: #313132;
+		font-family: 'Calibri', sans-serif !important;
+		color: black;
 		font-size: 10pt !important;
 		line-height: 11pt !important;
 		text-align: left;
 	}
 
 	.section-data-bold {
-		font-family: 'BCSans-Bold', sans-serif !important;
-		color: #313132;
+		font-family: 'Calibri', sans-serif !important;
+		color: black;
 		font-size: 11pt;
 		font-weight: bold;
 		line-height: 13pt;
@@ -439,8 +448,8 @@
 	}
 
 	.section-data-italic {
-		font-family: 'BCSans-Regular', sans-serif !important;
-		color: #313132;
+		font-family: 'Calibri', sans-serif !important;
+		color: black;
 		font-size: 9pt;
 		font-style: italic;
 		line-height: 15px;
@@ -508,18 +517,17 @@
 	}
 
 	.cover-data {
-		font-family: 'BCSans-Regular', sans-serif !important;
-		color: #313132;
+		font-family: 'Calibri', sans-serif !important;
+		color: black;
 		font-size: 11pt;
 		line-height: 12pt;
 		text-align: left;
 	}
 
-
 	.statement-title {
-		font-family: 'BCSans-Bold', sans-serif !important;
+		font-family: 'Calibri', sans-serif !important;
 		font-weight: bold;
-		color: #234075;
+		color: black;
 		font-size: 12pt;
 		line-height: 22px;
 		text-align: left;
@@ -530,13 +538,15 @@
 	td.col-50 { width: 50%; }
 
 	.director-former-name {
-		font-family: 'BCSans-Italic', sans-serif !important;
+		font-family: 'Calibri', sans-serif !important;
 		font-size: 12pt;
+		font-style: italic;
 	}
 
 	.delivery-instructions {
-		font-family: 'BCSans-Italic', sans-serif !important;
+		font-family: 'Calibri', sans-serif !important;
 		font-size: 12pt;
+		font-style: italic;
 	}
 
 	.nr-name-table {
@@ -566,9 +576,9 @@
 	}
 
 	.bold {
-		font-family: 'BCSans-Bold', sans-serif !important;
+		font-family: 'Calibri', sans-serif !important;
 		font-weight: bold !important;
-		color: #313132;
+		color: black;
 	}
 
 	.column-logo {
@@ -591,9 +601,10 @@
 
 	.certified-copy-text {
 		font-size: 11px;
-		color: white;
-		font-family: 'BCSans-Bold', sans-serif !important;
-		text-align: center
+		color: black;
+		font-family: 'Calibri', sans-serif !important;
+		text-align: center;
+		font-weight: bold;
 	}
 
 	.doc-description,
@@ -619,18 +630,19 @@
 	.registrar-name {
 	    margin-top: -7px;
 		font-size: 9px;
-		font-family: 'BCSans-Bold', sans-serif !important;
-		text-align: center
+		font-family: 'Calibri', sans-serif !important;
+		text-align: center;
+		font-weight: bold;
 	}
 
 	.separator-statement {
 		width: 100%; /* 40px; */
 		margin:auto;
-		border-bottom: 2px solid #234075;
+		border-bottom: 2px solid black;
 	}
 
 	.separator-header {
-		border-bottom: 2px solid #234075;
+		border-bottom: 2px solid black;
 	}
 
 	.separator {
@@ -638,7 +650,8 @@
 	}
 
 	.separator-section {
-		border-bottom: solid 0.5px #BCBEC5;
+		height: 1px;
+		box-shadow: 0 0.5px 0 #BCBEC5 !important;
 	}
 
 	.separator-table-row {
@@ -648,7 +661,7 @@
 	}
 
 	.separator-strong {
-		border-bottom: 4px solid #234075;
+		border-bottom: 4px solid black;
 	}
 
 
@@ -657,7 +670,8 @@
 	}
 
 	.solid-row-separator {
-		border-bottom: solid 0.5px #BCBEC5;
+		height: 1px;
+		box-shadow: 0 0.5px 0 #BCBEC5 !important;
 	}
 
 	.no-page-break {
@@ -693,9 +707,17 @@
 	.mt-10 { margin-top: 2.5rem; }
 	.mt-11 { margin-top: 2.75rem; }
 	.mt-12 { margin-top: 3rem; }
+	.mt-13 { margin-top: 3.25rem; }
 	.mt-14 { margin-top: 3.5rem; }
+	.mt-15 { margin-top: 3.75rem; }
 	.mt-16 { margin-top: 4rem; }
 	.mt-32 { margin-top: 8rem; }
+	.mtn-1 { margin-top: -0.25rem; }
+	.mtn-2 { margin-top: -0.5rem; }
+	.mtn-25 { margin-top: -0.6rem; }
+	.mtn-3 { margin-top: -0.75rem; }
+	.mtn-32 { margin-top: -0.8rem; }
+	.mtn-4 { margin-top: -1rem; }
 
 	.pt-1 { padding-top: 0.25rem; }
 	.pt-2 { padding-top: 0.5rem; }
@@ -760,12 +782,12 @@
 		border-collapse: collapse;
 		font-size: 10pt;
 		line-height: 15px;
-		font-family: 'BCSans-Regular', sans-serif !important;
+		font-family: 'Calibri', sans-serif !important;
 	}
 
 	.vehicle-collateral-table-header {
-		font-family: 'BCSans-Bold', sans-serif !important;
-		color: #313132;
+		font-family: 'Calibri', sans-serif !important;
+		color: black;
 		font-size: 10pt;
 		font-weight: bold;
 		line-height: 15px;
@@ -778,10 +800,12 @@
 	.vehicle-collateral-table-mh tr:last-child {
 		border-bottom: none;
 	}
-*/	
+*/
 	.vehicle-collateral-table-mh td {
 		/* height: 40px; */
 		vertical-align: middle;
+		overflow-wrap: break-word;
+  		word-wrap: break-word;
 	}
 
 	.vehicle-collateral-table-mh td:nth-child(1) {
@@ -809,7 +833,7 @@
 		border-collapse: collapse;
 		font-size: 10pt;
 		line-height: 15px;
-		font-family: 'BCSans-Regular', sans-serif !important;
+		font-family: 'Calibri', sans-serif !important;
 		border-collapse: collapse;
 	}
 /*
@@ -823,6 +847,8 @@
 	.vehicle-collateral-table td {
 		/* height: 40px; */
 		vertical-align: middle;
+		overflow-wrap: break-word;
+  		word-wrap: break-word;
 	}
 
 	.vehicle-collateral-table td:nth-child(1) {
@@ -846,15 +872,15 @@
 		width: 100%;
 		border-collapse: collapse;
 		font-size: 9pt;
-		font-family: 'BCSans-Regular', sans-serif !important;
+		font-family: 'Calibri', sans-serif !important;
 	}
 
 	.selected-debtor-table-header {
-		font-family: 'BCSans-Bold', sans-serif !important;
-		color: #313132;
+		font-family: 'Calibri', sans-serif !important;
+		color: black;
 		font-size: 9pt;
 		font-weight: bold;
-		border-bottom: 2px solid #BCBEC5;
+		border-bottom: 2px solid black;
 	}
 
 	.selected-debtor-table td {
@@ -889,7 +915,7 @@
 		width: 100%;
 		border-collapse: collapse;
 		font-size: 9pt;
-		font-family: 'BCSans-Regular', sans-serif !important;
+		font-family: 'Calibri', sans-serif !important;
 	}
 
 	.selected-ind-debtor-table td {
@@ -927,15 +953,15 @@
 		width: 100%;
 		border-collapse: collapse;
 		font-size: 10pt;
-		font-family: 'BCSans-Regular', sans-serif !important;
+		font-family: 'Calibri', sans-serif !important;
 	}
 
 	.selected-serial-table-header {
-		font-family: 'BCSans-Bold', sans-serif !important;
-		color: #313132;
+		font-family: 'Calibri', sans-serif !important;
+		color: black;
 		font-size: 9pt;
 		font-weight: bold;
-		border-bottom: 2px solid #BCBEC5;
+		border-bottom: 2px solid black;
 	}
 
 	.selected-serial-table td {
@@ -981,12 +1007,12 @@
 		width: 100%;
 		border-collapse: collapse;
 		font-size: 10pt;
-		font-family: 'BCSans-Regular', sans-serif !important;
+		font-family: 'Calibri', sans-serif !important;
 	}
 
 	.selected-mhr-table-header {
-		font-family: 'BCSans-Bold', sans-serif !important;
-		color: #313132;
+		font-family: 'Calibri', sans-serif !important;
+		color: black;
 		font-size: 9pt;
 		font-weight: bold;
 	}
@@ -1035,15 +1061,15 @@
 		width: 100%;
 		border-collapse: collapse;
 		font-size: 10px;
-		font-family: 'BCSans-Regular', sans-serif !important;
+		font-family: 'Calibri', sans-serif !important;
 	}
 
 	.selected-reg-num-table-header {
-		font-family: 'BCSans-Bold', sans-serif !important;
-		color: #313132;
+		font-family: 'Calibri', sans-serif !important;
+		color: black;
 		font-size: 9pt;
 		font-weight: bold;
-		border-bottom: 2px solid #BCBEC5;
+		border-bottom: 2px solid black;
 	}
 
 	.selected-reg-num-table td {
@@ -1076,8 +1102,8 @@
 	.chip {
 		font-size: 8pt;
 		padding: 3px 8px;
-		background-color: #E2E7ED;
-		color: #313132;
+		background-color: white;
+		color: black;
 		border-radius: 2px;
 		margin: 0 3px;
 	}
@@ -1091,19 +1117,19 @@
 	}
 
 	a {
-	    color: #1A5A96;
+	    color: black;
 	}
 
 	.label {
 		font-size: 7pt;
 		line-height: 13px;
-		font-family: 'BCSans-Bold', sans-serif !important;
+		font-family: 'Calibri', sans-serif !important;
 		font-weight: bold;
-		color: #313132;
+		color: black;
 		padding: 3px 8px !important;
 		margin: 0 3px 0 0 !important; /* 0px 8px !important; */
 		border-radius: 4px;
-		background-color:#E2E7ED; /* #e7e7e7; */
+		background-color:white; /* #e7e7e7; */
 	}
 
 	.tocpagenr {
@@ -1116,17 +1142,17 @@
 
 	.footer-reg-num {
 		position: running(reg_num_footer);
-		font-family: 'BCSans-Regular', sans-serif !important;
+		font-family: 'Calibri', sans-serif !important;
 		font-size: 10px;
 		font-weight: bold;
-		color: #003366;
+		color: black;
 		text-align: right;
 	}
 
 	.general-collateral-datetime {
 		height: 22px;
-		color: #313132;
-		font-family: 'BCSans-Bold', sans-serif !important;
+		color: black;
+		font-family: 'Calibri', sans-serif !important;
 		font-size: 11px;
 		font-weight: bold !important;
 		letter-spacing: 0;
