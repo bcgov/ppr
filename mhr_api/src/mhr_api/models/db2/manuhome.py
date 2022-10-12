@@ -259,6 +259,7 @@ class Db2Manuhome(db.Model):
             'mhrNumber': self.mhr_number,
             'status': LEGACY_STATUS_DESCRIPTION.get(self.mh_status),
             'documentId': doc_json.get('documentId', ''),
+            'documentRegistrationId': doc_json.get('documentRegistrationId', ''),
             'documentType': doc_json.get('documentType', ''),
             'createDateTime': doc_json.get('createDateTime', ''),
             'clientReferenceId': doc_json.get('clientReferenceId', ''),
@@ -280,6 +281,7 @@ class Db2Manuhome(db.Model):
             man_home['declaredValue'] = doc_json.get('declaredValue')
             man_home['consideration'] = doc_json.get('consideration')
             man_home['ownLand'] = doc_json.get('ownLand')
+            man_home['affirmByName'] = doc_json.get('affirmByName')
             if doc_json.get('transferDate'):
                 man_home['transferDate'] = doc_json.get('transferDate')
         else:

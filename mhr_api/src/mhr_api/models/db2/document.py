@@ -206,7 +206,8 @@ class Db2Document(db.Model):
             'consideration': self.consideration_value,
             'attentionReference': self.attention_reference,
             'clientReferenceId': self.client_reference_id,
-            'submittingParty': self.submitting_party()
+            'submittingParty': self.submitting_party(),
+            'affirmByName': self.affirm_by_name
         }
         if self.own_land == 'Y':
             document['ownLand'] = True
