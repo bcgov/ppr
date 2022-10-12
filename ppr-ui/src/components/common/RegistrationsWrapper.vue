@@ -185,13 +185,18 @@ import {
   setupFinancingStatementDraft, updateUserSettings, deleteMhRegistrationSummary
 } from '@/utils'
 import {
-  amendConfirmationDialog, dischargeConfirmationDialog,
+  amendConfirmationDialog,
+  dischargeConfirmationDialog,
   registrationAddErrorDialog,
   registrationAlreadyAddedDialog,
   registrationFoundDialog,
   mhRegistrationFoundDialog,
   registrationNotFoundDialog,
-  registrationRestrictedDialog, renewConfirmationDialog, tableDeleteDialog, tableRemoveDialog
+  registrationRestrictedDialog,
+  renewConfirmationDialog,
+  tableDeleteDialog,
+  tableRemoveDialog,
+  mhrTableRemoveDialog
 } from '@/resources/dialogOptions'
 import { StatusCodes } from 'http-status-codes'
 import { cloneDeep } from 'lodash'
@@ -560,7 +565,7 @@ export default defineComponent({
           localState.myRegDeleteDialogDisplay = true
           break
         case TableActions.REMOVE:
-          localState.myRegDeleteDialog = tableRemoveDialog
+          localState.myRegDeleteDialog = props.isMhr ? mhrTableRemoveDialog : tableRemoveDialog
           localState.myRegDeleteDialogDisplay = true
           break
         case TableActions.EDIT_AMEND:
