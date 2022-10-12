@@ -727,7 +727,7 @@ export const getMhrTransferHomeOwners = (state: StateIF): MhrRegistrationHomeOwn
 
 export const getMhrTransferCurrentHomeOwners = (state: StateIF): MhrRegistrationHomeOwnerGroupIF[] => {
   const owners = []
-  state.stateModel.mhrTransfer.currentOwnerGroups?.forEach(group => {
+  state.stateModel.mhrTransfer.currentOwnerGroups.forEach(group => {
     if (group.owners.length === 0) {
       // Groups with no owners should have at least one 'placeholder' owner
       // to be properly displayed in Group Table
