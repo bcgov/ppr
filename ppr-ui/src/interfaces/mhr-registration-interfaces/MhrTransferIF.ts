@@ -1,11 +1,17 @@
 import {
-  MhrRegistrationHomeOwnerIF,
   MhrRegistrationHomeOwnerGroupIF,
-  PartyIF, MhrHomeOwnerGroupIF, PaymentIF, SubmittingPartyIF
+  PartyIF,
+  MhrHomeOwnerGroupIF,
+  PaymentIF,
+  SubmittingPartyIF
 } from '@/interfaces'
 
 export interface MhrTransferIF {
   mhrNumber: string
+  declaredValue: number
+  consideration: string
+  transferDate: string
+  ownLand: boolean
   ownerGroups: MhrRegistrationHomeOwnerGroupIF[]
   currentOwnerGroups?: MhrRegistrationHomeOwnerGroupIF[]
   submittingParty: PartyIF
@@ -16,6 +22,10 @@ export interface MhrTransferApiIF {
   documentId?: number
   documentDescription?: string
   clientReferenceId?: string
+  declaredValue: number
+  consideration: string
+  transferDate: string
+  ownLand: boolean
   submittingParty: SubmittingPartyIF
   deleteOwnerGroups?: Array<MhrHomeOwnerGroupIF>
   addOwnerGroups: Array<MhrHomeOwnerGroupIF>

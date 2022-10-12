@@ -41,6 +41,8 @@
               </template>
             </section>
 
+            <TransferDetails :validateTransferDetails=validateTransferDetails />
+
           </v-col>
           <v-col class="pl-6 pt-5" cols="3">
             <aside>
@@ -78,12 +80,14 @@ import { StickyContainer } from '@/components/common'
 import { useHomeOwners, useMhrInformation } from '@/composables'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
+import TransferDetails from '@/components/mhrTransfers/TransferDetails.vue'
 import { HomeOwners } from '@/views'
 
 export default defineComponent({
   name: 'MhrInformation',
   components: {
     HomeOwners,
+    TransferDetails,
     HomeOwnersTable,
     StickyContainer
   },
@@ -109,6 +113,7 @@ export default defineComponent({
     const { setEmptyMhrTransfer } = useActions<any>(['setEmptyMhrTransfer'])
 
     const {
+      isTransferDetailsValid,
       initMhrTransfer,
       buildApiData
     } = useMhrInformation()
@@ -122,6 +127,7 @@ export default defineComponent({
       loading: false,
       isReviewMode: false,
       validate: false,
+      validateTransferDetails: false,
       feeType: FeeSummaryTypes.MHR_TRANSFER, // FUTURE STATE: To be dynamic, dependent on what changes have been made
       isAuthenticated: computed((): boolean => {
         return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
@@ -133,7 +139,7 @@ export default defineComponent({
         return localState.isReviewMode ? 'Back' : ''
       }),
       isValidTransfer: computed((): boolean => {
-        return !isGlobalEditingMode.value && true // Get Owner Count here > 1 etc
+        return !isGlobalEditingMode.value && isTransferDetailsValid.value && true // Get Owner Count here > 1 etc
       }),
       transferErrorMsg: computed((): string => {
         return localState.validate && !localState.isValidTransfer ? '< Please make any required changes' : ''
@@ -174,6 +180,7 @@ export default defineComponent({
 
     const goToReview = async (): Promise<void> => {
       localState.validate = true
+      localState.validateTransferDetails = true
       if (localState.isReviewMode) {
         localState.loading = true
         const mhrTransferFiling = await submitMhrTransfer(buildApiData(), getMhrInformation.value.mhrNumber)

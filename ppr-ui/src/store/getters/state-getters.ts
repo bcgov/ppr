@@ -351,10 +351,10 @@ export const getSteps = (state: any, getters: any): Array<any> => {
 export const getPprSteps = (state: any, getters: any): Array<any> => {
   const regType: RegistrationTypeIF = getRegistrationType(state)
   let lengthTrustText = 'Registration<br />Length'
-  if (regType.registrationTypeAPI === APIRegistrationTypes.SECURITY_AGREEMENT) {
+  if (regType?.registrationTypeAPI === APIRegistrationTypes.SECURITY_AGREEMENT) {
     lengthTrustText = 'Length and<br />Trust Indenture'
   }
-  if (regType.registrationTypeAPI === APIRegistrationTypes.REPAIRERS_LIEN) {
+  if (regType?.registrationTypeAPI === APIRegistrationTypes.REPAIRERS_LIEN) {
     lengthTrustText = 'Amount and Date<br /> of Surrender'
   }
   return [{
