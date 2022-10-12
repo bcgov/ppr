@@ -32,6 +32,7 @@
                   isMhrTransfer
                   isReadonlyTable
                   :homeOwners="getMhrTransferHomeOwners"
+                  :currentHomeOwners="getMhrTransferCurrentHomeOwners"
                 />
               </template>
 
@@ -99,9 +100,9 @@ export default defineComponent({
   },
   setup (props, context) {
     const {
-      getMhrTransferHomeOwners, getMhrInformation
+      getMhrTransferHomeOwners, getMhrInformation, getMhrTransferCurrentHomeOwners
     } = useGetters<any>([
-      'getMhrTransferHomeOwners', 'getMhrInformation'
+      'getMhrTransferHomeOwners', 'getMhrInformation', 'getMhrTransferCurrentHomeOwners'
     ])
 
     const {
@@ -119,7 +120,8 @@ export default defineComponent({
     } = useMhrInformation()
 
     const {
-      isGlobalEditingMode
+      isGlobalEditingMode,
+      setShowGroups
     } = useHomeOwners()
 
     const localState = reactive({
@@ -168,10 +170,22 @@ export default defineComponent({
       localState.dataLoaded = true
     })
 
+    // Future state to parse all relevant MHR Information
     const parseMhrInformation = async (): Promise<void> => {
-      // Future state to parse all relevant MHR Information
+      await parseCurrentOwnerGroups()
+    }
+
+    const parseCurrentOwnerGroups = async (): Promise<void> => {
       const { data } = await fetchMhRegistration(getMhrInformation.value.mhrNumber)
       const currentOwnerGroups = data?.ownerGroups || [] // Safety check. Should always have ownerGroups
+      // Create an ID to each individual owner for UI Tracking
+      currentOwnerGroups.forEach(ownerGroup => {
+        for (const [index, owner] of ownerGroup.owners.entries()) {
+          owner.id = ownerGroup.groupId + (index + 1)
+        }
+      })
+      setShowGroups(currentOwnerGroups.length > 1)
+      // Set owners to store
       setMhrTransferHomeOwnerGroups(currentOwnerGroups)
 
       // Store a snapshot of the existing OwnerGroups for baseline of current state
@@ -205,6 +219,7 @@ export default defineComponent({
       goToReview,
       goToDash,
       getMhrTransferHomeOwners,
+      getMhrTransferCurrentHomeOwners,
       ...toRefs(localState)
     }
   }

@@ -133,7 +133,7 @@ export default defineComponent({
           return amendBreadcrumb
         } else if (routeName.value === RouteNames.MHR_INFORMATION) {
           const mhrInfoBreadcrumb = [...tombstoneBreadcrumbMhrInformation]
-          mhrInfoBreadcrumb[2].text += ` ${getMhrInformation.value.mhrNumber}`
+          mhrInfoBreadcrumb[2].text = `MHR Number ${getMhrInformation.value.mhrNumber}`
           return mhrInfoBreadcrumb
         } else {
           const registrationBreadcrumb = [...tombstoneBreadcrumbRegistration]

@@ -58,7 +58,7 @@
               {{ row.item.suffix }}
             </div>
             <v-chip
-              v-if="hasAddedHomeOwner(row.item.id)"
+              v-if="isMhrTransfer && hasAddedHomeOwner(row.item.id)"
               class="badge-added ml-8 mt-2"
               color="primary"
               label
@@ -201,7 +201,7 @@ export default defineComponent({
     }
 
     const hasAddedHomeOwner = (id: string): boolean => {
-      return props.currentHomeOwners?.some(currentOwner => currentOwner.id !== id)
+      return !props.currentHomeOwners?.some(currentOwner => currentOwner.id === id)
     }
 
     watch(
