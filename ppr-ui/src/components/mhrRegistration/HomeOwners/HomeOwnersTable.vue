@@ -115,7 +115,11 @@
         </tr>
         <tr v-else>
           <td :colspan="4" class="py-1">
-            <div v-if="showGroups" class="error-text my-6 text-center" :data-test-id="`no-owners-msg-group-${homeOwners.indexOf(row.item)}`">
+            <div
+              v-if="showGroups"
+              class="error-text my-6 text-center"
+              :data-test-id="`no-owners-msg-group-${homeOwners.indexOf(row.item)}`"
+            >
               Group must contain at least one owner
             </div>
             <div v-else class="my-6 text-center" data-test-id="no-owners-mgs">
