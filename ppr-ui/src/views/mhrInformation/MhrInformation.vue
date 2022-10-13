@@ -42,8 +42,7 @@
               </template>
             </section>
 
-            <TransferDetails :validateTransferDetails=validateTransferDetails />
-
+            <TransferDetails :validateTransferDetails="validateTransferDetails" />
           </v-col>
           <v-col class="pl-6 pt-5" cols="3">
             <aside>
@@ -120,6 +119,8 @@ export default defineComponent({
 
     const { setEmptyMhrTransfer } = useActions<any>(['setEmptyMhrTransfer'])
 
+    const isMhrTransfer = true
+
     const {
       isTransferDetailsValid,
       initMhrTransfer,
@@ -129,7 +130,7 @@ export default defineComponent({
     const {
       isGlobalEditingMode,
       setShowGroups
-    } = useHomeOwners()
+    } = useHomeOwners(isMhrTransfer)
 
     const localState = reactive({
       dataLoaded: false,

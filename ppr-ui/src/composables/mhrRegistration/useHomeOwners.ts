@@ -6,7 +6,7 @@ import {
 } from '@/interfaces'
 import '@/utils/use-composition-api'
 
-import { ref, computed, readonly, watch, toRefs } from '@vue/composition-api'
+import { ref, readonly, watch, toRefs } from '@vue/composition-api'
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import { HomeTenancyTypes } from '@/enums'
 import { MhrCompVal, MhrSectVal } from '@/composables/mhrRegistration/enums'
@@ -27,12 +27,14 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
     getMhrRegistrationHomeOwners,
     getMhrRegistrationHomeOwnerGroups,
     getMhrRegistrationValidationModel,
-    getMhrTransferHomeOwnerGroups
+    getMhrTransferHomeOwnerGroups,
+    getMhrTransferHomeOwners
   } = useGetters<any>([
     'getMhrRegistrationHomeOwners',
     'getMhrRegistrationHomeOwnerGroups',
     'getMhrRegistrationValidationModel',
-    'getMhrTransferHomeOwnerGroups'
+    'getMhrTransferHomeOwnerGroups',
+    'getMhrTransferHomeOwners'
   ])
 
   const {
@@ -43,16 +45,13 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
     'setMhrTransferHomeOwnerGroups'
   ])
 
-  const { setValidation } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
+  const getHomeOwners = () => {
+    return isMhrTransfer
+      ? getMhrTransferHomeOwners.value
+      : getMhrRegistrationHomeOwners.value
+  }
 
-  // Title for left side bar
-  const getSideTitle = computed((): string => {
-    if (isPerson) {
-      return isEditMode ? 'Add a Person' : 'Edit Person'
-    } else {
-      return isEditMode ? 'Add a Business or Organization' : 'Edit Business'
-    }
-  })
+  const { setValidation } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
   // Show or hide groups in the owner's table
   const setShowGroups = show => {
