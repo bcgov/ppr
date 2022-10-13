@@ -142,6 +142,7 @@ import { AddEditHomeOwner } from '@/components/mhrRegistration/HomeOwners'
 import TableGroupHeader from '@/components/mhrRegistration/HomeOwners/TableGroupHeader.vue'
 /* eslint-disable no-unused-vars */
 import { MhrRegistrationHomeOwnerIF } from '@/interfaces'
+import { useActions } from 'vuex-composition-helpers'
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
@@ -171,6 +172,8 @@ export default defineComponent({
       hasMinimumGroups
     } = useHomeOwners()
 
+    const { setUnsavedChanges } = useActions<any>(['setUnsavedChanges'])
+
     const localState = reactive({
       currentlyEditingHomeOwnerId: -1,
       isEditingMode: computed((): boolean => localState.currentlyEditingHomeOwnerId >= 0),
@@ -182,6 +185,7 @@ export default defineComponent({
 
     const remove = (item): void => {
       localState.currentlyEditingHomeOwnerId = -1
+      setUnsavedChanges(true)
       removeOwner(item, props.isMhrTransfer)
     }
 

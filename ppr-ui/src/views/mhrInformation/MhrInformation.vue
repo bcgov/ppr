@@ -108,9 +108,9 @@ export default defineComponent({
     ])
 
     const {
-      setMhrTransferHomeOwnerGroups, setMhrTransferCurrentHomeOwnerGroups,setUnsavedChanges
+      setMhrTransferHomeOwnerGroups, setMhrTransferCurrentHomeOwnerGroups, setUnsavedChanges
     } = useActions<any>([
-      'setMhrTransferHomeOwnerGroups', 'setMhrTransferCurrentHomeOwnerGroups','setUnSavedChanges'
+      'setMhrTransferHomeOwnerGroups', 'setMhrTransferCurrentHomeOwnerGroups', 'setUnsavedChanges'
     ])
 
     const { setEmptyMhrTransfer } = useActions<any>(['setEmptyMhrTransfer'])
@@ -172,6 +172,7 @@ export default defineComponent({
       localState.loading = false
 
       localState.dataLoaded = true
+      await setUnsavedChanges(false)
     })
 
     const parseMhrInformation = async (): Promise<void> => {
@@ -195,7 +196,7 @@ export default defineComponent({
         localState.loading = true
         const mhrTransferFiling = await submitMhrTransfer(buildApiData(), getMhrInformation.value.mhrNumber)
         localState.loading = false
-
+        await setUnsavedChanges(false)
         !mhrTransferFiling.error
           ? goToDash()
           : console.log(mhrTransferFiling?.error) // Handle Schema or Api errors here..
