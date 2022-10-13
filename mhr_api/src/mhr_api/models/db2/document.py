@@ -162,7 +162,7 @@ class Db2Document(db.Model):
         document = {
             'mhrNumber': self.mhr_number,
             'documentType': self.document_type,
-            'documentRegistrationId': self.document_reg_id,
+            'documentRegistrationNumber': self.document_reg_id,
             'interimed': self.interimed,
             'ownerCrossReference': self.owner_cross_reference,
             'interestDenominator': self.interest_denominator,
@@ -196,9 +196,10 @@ class Db2Document(db.Model):
     def registration_json(self):
         """Return a search registration dict of this object, with keys in JSON format."""
         # Response legacy data: allow for any column to be null.
+        self.strip()
         document = {
             'documentId': self.id,
-            'documentRegistrationId': self.document_reg_id,
+            'documentRegistrationNumber': self.document_reg_id,
             'documentType': self.document_type,
             'mhrNumber': self.mhr_number,
             'declaredValue': self.declared_value,
@@ -294,6 +295,8 @@ class Db2Document(db.Model):
         doc.number_of_pages = 0
         doc.consideration_value = reg_json.get('consideration', '')
         doc.affirm_by_name = ''
+        if reg_json.get('affirmByName'):
+            doc.affirm_by_name = str(reg_json.get('affirmByName'))[0:40]
         doc.liens_with_consent = ''
         if reg_json.get('submittingParty'):
             submitting = reg_json.get('submittingParty')

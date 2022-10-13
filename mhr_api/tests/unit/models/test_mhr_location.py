@@ -153,13 +153,13 @@ def test_create_from_json(session):
     """Assert that the new MHR location is created from json data correctly."""
     json_data = copy.deepcopy(REGISTRATION)
     loc_json = json_data.get('location')
-    loc_json['locationType'] = MhrLocationTypes.MH_DEALER
+    loc_json['locationType'] = MhrLocationTypes.MH_PARK
     loc_json['legalDescription'] = LTSA_DESCRIPTION
     location: MhrLocation = MhrLocation.create_from_json(loc_json, 1000)
     assert location
     assert location.registration_id == 1000
     assert location.change_registration_id == 1000
-    assert location.location_type == MhrLocationTypes.MH_DEALER
+    assert location.location_type == MhrLocationTypes.MH_PARK
     assert location.status_type == MhrStatusTypes.ACTIVE
     assert location.ltsa_description == LTSA_DESCRIPTION
     assert location.park_name

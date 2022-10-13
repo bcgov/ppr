@@ -113,6 +113,7 @@ def pay_and_save_transfer(req: request,  # pylint: disable=too-many-arguments
                                                                               account_id,
                                                                               token.get('username', None),
                                                                               user_group)
+    request_json['affirmByName'] = get_transfer_affirmby(token)
     invoice_id = None
     pay_ref = None
     if not is_reg_staff_account(account_id):
@@ -316,3 +317,14 @@ def get_registration_report(registration: MhrRegistration,  # pylint: disable=to
         return resource_utils.service_exception_response('MHR reg report storage API error: ' + str(storage_err))
     except DatabaseException as db_exception:
         return resource_utils.db_exception_response(db_exception, None, 'Generate MHR registration report state.')
+
+
+def get_transfer_affirmby(token) -> str:
+    """Get the transfer registration affirm by name from the user token."""
+    firstname = token.get('given_name', None)
+    if not firstname:
+        firstname = token.get('firstname', '')
+    lastname = token.get('family_name', None)
+    if not lastname:
+        lastname = token.get('lastname', '')
+    return firstname + ' ' + lastname

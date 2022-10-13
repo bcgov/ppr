@@ -15,7 +15,7 @@
   </head>
   <body>
   <div class="business-details-container mtn-2">
-    <table class="business-details-table-grey mt-0" role="presentation">
+    <table class="registration-details-table-grey mt-0" role="presentation">
       <tr>
         <td>Document ID:</td>
         <td>{{documentId}} </td>
@@ -31,7 +31,11 @@
           </td>
       </tr>
       <tr>
-        <td>Registration Date and Time:</td>
+        <td>Document Registration Number:</td>
+        <td>{{documentRegistrationNumber}} </td>
+      </tr>
+      <tr>
+        <td>Document Registration Date and Time:</td>
         <td>
           {% if createDateTime is defined and createDateTime != '' %}
             {{createDateTime}} 
@@ -41,14 +45,12 @@
         </td>
       </tr>
         <tr>
-        <td>Status:</td>
+        <td>Attention/Reference Number:</td>
         <td>
-          {% if status == 'HISTORICAL' %}
-            Cancelled
-          {% elif status == 'EXEMPT' %}
-            Exempted
+          {% if attentionReference is defined and attentionReference != '' %}
+            {{attentionReference}} 
           {% else %}
-            Registered
+            N/A
           {% endif %}
         </td>
       </tr>

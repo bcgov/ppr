@@ -172,7 +172,7 @@ def test_document_json(session):
     test_json = {
         'mhrNumber': doc.mhr_number,
         'documentType': doc.document_type,
-        'documentRegistrationId': doc.document_reg_id,
+        'documentRegistrationNumber': doc.document_reg_id,
         'interimed': doc.interimed,
         'ownerCrossReference': doc.owner_cross_reference,
         'interestDenominator': doc.interest_denominator,

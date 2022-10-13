@@ -38,6 +38,86 @@ DOC_ID_VALID = '63166035'
 DOC_ID_INVALID_CHECKSUM = '63166034'
 INVALID_TEXT_CHARSET = 'TEST \U0001d5c4\U0001d5c6/\U0001d5c1 INVALID'
 INVALID_CHARSET_MESSAGE = 'The character set is not supported'
+SO_OWNER_MULTIPLE = [
+    {
+        'groupId': 2,
+        'owners': [
+            {
+            'individualName': {
+                'first': 'James',
+                'last': 'Smith'
+            },
+            'address': {
+                'street': '3122B LYNNLARK PLACE',
+                'city': 'VICTORIA',
+                'region': 'BC',
+                'postalCode': ' ',
+                'country': 'CA'
+            },
+            'phoneNumber': '6041234567'
+            },
+            {
+            'individualName': {
+                'first': 'John',
+                'last': 'Smith'
+            },
+            'address': {
+                'street': '3122B LYNNLARK PLACE',
+                'city': 'VICTORIA',
+                'region': 'BC',
+                'postalCode': ' ',
+                'country': 'CA'
+            },
+            'phoneNumber': '6041234567'
+            }
+        ],
+        'type': 'SOLE'
+    }
+]
+SO_GROUP_MULTIPLE = [
+    {
+        'groupId': 2,
+        'owners': [
+            {
+            'individualName': {
+                'first': 'James',
+                'last': 'Smith'
+            },
+            'address': {
+                'street': '3122B LYNNLARK PLACE',
+                'city': 'VICTORIA',
+                'region': 'BC',
+                'postalCode': ' ',
+                'country': 'CA'
+            },
+            'phoneNumber': '6041234567'
+            }
+        ],
+        'type': 'SOLE'
+    },
+    {
+        'groupId': 3,
+        'owners': [
+            {
+            'individualName': {
+                'first': 'James',
+                'last': 'Smith'
+            },
+            'address': {
+                'street': '3122B LYNNLARK PLACE',
+                'city': 'VICTORIA',
+                'region': 'BC',
+                'postalCode': ' ',
+                'country': 'CA'
+            },
+            'phoneNumber': '6041234567'
+            }
+        ],
+        'type': 'SOLE'
+    }
+]
+
+
 # testdata pattern is ({description}, {valid}, {staff}, {doc_id}, {message content})
 TEST_REG_DATA = [
     (DESC_VALID, True, True, DOC_ID_VALID, None),
@@ -106,6 +186,12 @@ TEST_TRANSFER_DATA_EXTRA = [
     ('Invalid non-staff missing transfer date', False, False, False, True, True, validator.TRANSFER_DATE_REQUIRED),
     ('Invalid non-staff missing declared value', False, False, True, False, True, validator.DECLARED_VALUE_REQUIRED),
     ('Invalid non-staff missing consideration', False, False, True, True, False, validator.CONSIDERATION_REQUIRED)
+]
+# testdata pattern is ({description}, {valid}, {add_group}, {message content})
+TEST_TRANSFER_DATA_SO = [
+    ('Valid', True, None, None),
+    ('Invalid add SO 2 groups', False, SO_GROUP_MULTIPLE, validator.ADD_SOLE_OWNER_INVALID),
+    ('Invalid add SO 2 owners', False, SO_OWNER_MULTIPLE, validator.ADD_SOLE_OWNER_INVALID)
 ]
 
 
@@ -194,6 +280,29 @@ def test_validate_transfer_details(session, desc, valid, staff, trans_dt, dec_va
     # Additional validation not covered by the schema.
     registration: MhrRegistration = MhrRegistration.find_by_mhr_number('045349', 'PS12345')
     error_msg = validator.validate_transfer(registration, json_data, staff)
+    if errors:
+        current_app.logger.debug(errors)
+    if valid:
+        assert valid_format and error_msg == ''
+    else:
+        assert error_msg != ''
+        if message_content:
+            assert error_msg.find(message_content) != -1
+
+
+@pytest.mark.parametrize('desc,valid,add_group,message_content', TEST_TRANSFER_DATA_SO)
+def test_validate_transfer_so(session, desc, valid, add_group, message_content):
+    """Assert that MH transfer validation of SO groups works as expected."""
+    # setup
+    json_data = copy.deepcopy(TRANSFER)
+    json_data['deleteOwnerGroups'][0]['groupId'] = 2
+    json_data['deleteOwnerGroups'][0]['type'] = 'JOINT'
+    if add_group:
+        json_data['addOwnerGroups'] = add_group    
+    valid_format, errors = schema_utils.validate(json_data, 'transfer', 'mhr')
+    # Additional validation not covered by the schema.
+    registration: MhrRegistration = MhrRegistration.find_by_mhr_number('045349', 'PS12345')
+    error_msg = validator.validate_transfer(registration, json_data, False)
     if errors:
         current_app.logger.debug(errors)
     if valid:

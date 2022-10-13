@@ -606,7 +606,7 @@ class ReportMeta:  # pylint: disable=too-few-public-methods
         ReportTypes.MHR_TRANSFER: {
             'reportDescription': 'MHRTransfer',
             'fileName': 'transferV2',
-            'metaTitle': 'VERIFICATION OF SERVICE',
+            'metaTitle': 'TRANSFER VERIFICATION',
             'metaSubtitle': 'MANUFACTURED HOME ACT',
             'metaSubject': ''
         },
