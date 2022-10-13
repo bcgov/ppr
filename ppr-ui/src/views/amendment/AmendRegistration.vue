@@ -662,10 +662,9 @@ export default class AmendRegistration extends Vue {
   }
 
   private validateDebtors (): void {
-    const sp = this.getAddSecuredPartiesAndDebtors.debtors
-    let debtorCount = 0
     if (this.registrationType === APIRegistrationTypes.SECURITY_AGREEMENT) {
-      debtorCount = sp.filter(removed => removed.action !== ActionTypes.REMOVED).length
+      const sp = this.getAddSecuredPartiesAndDebtors.debtors
+      const debtorCount = sp.filter(removed => removed.action !== ActionTypes.REMOVED).length
       this.setValidDebtor(debtorCount >= 1)
     }
   }
