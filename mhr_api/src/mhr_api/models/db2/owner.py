@@ -224,7 +224,7 @@ class Db2Owner(db.Model):
                          sequence_number=1,
                          owner_type=owner_type,
                          verified_flag='',
-                         phone_number=str(new_info.get('phoneNumber', ''))[0:9],
+                         phone_number=str(new_info.get('phoneNumber', ''))[0:10],
                          postal_code=address.get('postalCode', ''),
                          name=name[0:69],
                          compressed_name=compressed_name,
