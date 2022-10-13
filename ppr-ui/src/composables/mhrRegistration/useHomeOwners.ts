@@ -22,7 +22,7 @@ const isGlobalEditingMode = ref(false)
 // Flag is any of the Groups has no Owners
 const hasEmptyGroup = ref(false)
 
-export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = false) {
+export function useHomeOwners (isMhrTransfer: boolean = false) {
   const {
     getMhrRegistrationHomeOwners,
     getMhrRegistrationHomeOwnerGroups,
@@ -352,7 +352,6 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
     showGroups: readonly(showGroups),
     isGlobalEditingMode: readonly(isGlobalEditingMode),
     hasEmptyGroup: readonly(hasEmptyGroup),
-    getSideTitle,
     getHomeTenancyType,
     getTotalOwnershipAllocationStatus,
     addOwnerToTheGroup,

@@ -2,7 +2,7 @@
   <v-card flat class="py-6 px-8 rounded">
     <v-row id="mhr-home-add-person">
       <v-col cols="3">
-        <label class="generic-label"> {{ getSideTitle }} </label>
+        <label class="generic-label"> {{ getSidebarTitle }} </label>
       </v-col>
       <v-col cols="9">
         <v-form
@@ -289,14 +289,13 @@ export default defineComponent({
     const { required, customRules, maxLength, minLength, isPhone, isNumber, invalidSpaces } = useInputRules()
 
     const {
-      getSideTitle,
       getGroupForOwner,
       addOwnerToTheGroup,
       editHomeOwner,
       showGroups,
       setShowGroups,
       setGroupFractionalInterest
-    } = useHomeOwners(props.isHomeOwnerPerson, props.editHomeOwner == null)
+    } = useHomeOwners()
 
     const addressSchema = PartyAddressSchema
     const addHomeOwnerForm = ref(null)
@@ -355,6 +354,13 @@ export default defineComponent({
     }
 
     const localState = reactive({
+      getSidebarTitle: computed((): string => {
+        if (props.isHomeOwnerPerson) {
+          return props.editHomeOwner == null ? 'Add a Person' : 'Edit Person'
+        } else {
+          return props.editHomeOwner == null ? 'Add a Business or Organization' : 'Edit Business'
+        }
+      }),
       group: getGroupForOwner(props.editHomeOwner?.id) as MhrRegistrationHomeOwnerGroupIF,
       ownersGroupId: computed(() => (showGroups.value ? localState.group?.groupId : null)),
       owner: { ...defaultHomeOwner },
@@ -464,7 +470,6 @@ export default defineComponent({
     )
 
     return {
-      getSideTitle,
       done,
       remove,
       cancel,
