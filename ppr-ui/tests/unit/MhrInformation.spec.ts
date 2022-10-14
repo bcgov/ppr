@@ -9,7 +9,7 @@ import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
 import { HomeOwners, MhrInformation } from '@/views'
 import { StickyContainer } from '@/components/common'
 import mockRouter from './MockRouter'
-import { RouteNames } from '@/enums'
+import { HomeTenancyTypes, RouteNames } from '@/enums'
 import { HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
 import { getTestId } from './utils'
 import { mockedOrganization, mockedPerson, mockMhrTransferCurrentHomeOwner } from './test-data'
@@ -128,6 +128,45 @@ describe('Mhr Information', () => {
     const addedBadge = newlyAddedOwner.find(getTestId('owner-added-badge'))
     expect(addedBadge.isVisible()).toBeTruthy()
   })
+
+  it('should show correct Home Tenancy Type for MHR Transfers', async () => {
+    const homeOwnerGroup = [{ groupId: '1', owners: [mockedPerson] }]
+
+    expect(wrapper.findComponent(HomeOwners).vm.$data.getHomeOwners.length).toBe(1)
+    expect(
+      wrapper
+        .findComponent(HomeOwners)
+        .find(getTestId('home-owner-tenancy-type'))
+        .text()
+    ).toBe(HomeTenancyTypes.SOLE)
+
+    // Add a second Owner to the Group
+    homeOwnerGroup.push({ groupId: '1', owners: [mockedOrganization] })
+
+    await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerGroup)
+    await Vue.nextTick()
+
+    expect(wrapper.findComponent(HomeOwners).vm.$data.getHomeOwners.length).toBe(2)
+    expect(
+      wrapper
+        .findComponent(HomeOwners)
+        .find(getTestId('home-owner-tenancy-type'))
+        .text()
+    ).toBe(HomeTenancyTypes.JOINT)
+
+    // Enable Groups
+    wrapper.findComponent(HomeOwners).vm.$data.setShowGroups(true)
+    await Vue.nextTick()
+
+    expect(
+      wrapper
+        .findComponent(HomeOwners)
+        .find(getTestId('home-owner-tenancy-type'))
+        .text()
+    ).toBe(HomeTenancyTypes.COMMON)
+  })
+
+  // TRANSFER DETAILS COMPONENT TESTS
 
   it('should render Transfer Details component', async () => {
     const mhrTransferDetailsComponent = wrapper.findComponent(MhrInformation).findComponent(TransferDetails)
