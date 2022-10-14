@@ -91,7 +91,9 @@
         Add a Business or Organization
       </v-btn>
       <div class="my-6">
-        <div><span class="generic-label">Home Tenancy Type: </span>{{ homeTenancyType }}
+        <div>
+          <span class="generic-label">Home Tenancy Type: </span>
+          <span data-test-id="home-owner-tenancy-type">{{ homeTenancyType }}</span>
           <span v-show="showGroups">
               <span v-show="ownershipAllocation.hasMinimumGroupsError" class="error-text fs-14 ml-3"
               >Must include more than one group of owners
@@ -182,7 +184,7 @@ export default defineComponent({
       getTotalOwnershipAllocationStatus,
       hasMinimumGroups,
       setShowGroups
-    } = useHomeOwners()
+    } = useHomeOwners(props.isMhrTransfer)
 
     const localState = reactive({
       showAddPersonSection: false,
@@ -194,8 +196,8 @@ export default defineComponent({
         () => getTotalOwnershipAllocationStatus() as MhrRegistrationTotalOwnershipAllocationIF
       ),
       hasHomeOwners: computed(() => !!getMhrRegistrationHomeOwners.value.find(owner => owner.id)),
-      isValidGroups: computed(() => hasMinimumGroups()),
-      homeTenancyType: computed(() => getHomeTenancyType()),
+      isValidGroups: computed(() => { return hasMinimumGroups() }),
+      homeTenancyType: computed(() => { return getHomeTenancyType() }),
       getHomeOwners: computed(() => {
         return props.isMhrTransfer
           ? getMhrTransferHomeOwners.value

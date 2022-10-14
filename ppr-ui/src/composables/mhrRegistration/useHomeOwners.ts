@@ -45,11 +45,8 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
     'setMhrTransferHomeOwnerGroups'
   ])
 
-  const getHomeOwners = () => {
-    return isMhrTransfer
-      ? getMhrTransferHomeOwners.value
-      : getMhrRegistrationHomeOwners.value
-  }
+  // Get Transfer or Registration Home Owners
+  const getHomeOwners = () => isMhrTransfer ? getMhrTransferHomeOwners.value : getMhrRegistrationHomeOwners.value
 
   const { setValidation } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
@@ -64,12 +61,12 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
   }
 
   const getHomeTenancyType = (): HomeTenancyTypes => {
-    const numOfOwners = getMhrRegistrationHomeOwners.value?.length
+    const numOfOwners = getHomeOwners()?.length
 
     if (showGroups.value) {
       // At leas one group showing with one or more owners
       return HomeTenancyTypes.COMMON
-    } else if (numOfOwners === 1 && getMhrRegistrationHomeOwners.value[0].address !== undefined) {
+    } else if (numOfOwners === 1 && getHomeOwners()[0]?.address) {
       // One owner without groups showing
       // Added second condition, because when an owner exists as a Sole Ownership, editing and clicking Done,
       // will change status to Tenants in Common unless above logic is in place..
