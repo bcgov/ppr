@@ -85,10 +85,12 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
   const getGroupTenancyType = (group: MhrRegistrationHomeOwnerGroupIF): HomeTenancyTypes => {
     const numOfOwnersInGroup = group.owners.length
 
-    if (numOfOwnersInGroup === 1) {
+    if (group.interestNumerator) {
       return HomeTenancyTypes.COMMON
     } else if (numOfOwnersInGroup > 1) {
       return HomeTenancyTypes.JOINT
+    } else if (numOfOwnersInGroup === 1) {
+      return HomeTenancyTypes.SOLE
     } else {
       return HomeTenancyTypes.NA
     }
