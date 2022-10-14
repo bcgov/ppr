@@ -14,7 +14,8 @@ export const useMhrInformation = () => {
     getMhrTransferDeclaredValue,
     getMhrTransferConsideration,
     getMhrTransferDate,
-    getMhrTransferOwnLand
+    getMhrTransferOwnLand,
+    getMhrTransferCurrentHomeOwners
   } = useGetters<any>([
     'getCurrentUser',
     'getMhrInformation',
@@ -22,7 +23,8 @@ export const useMhrInformation = () => {
     'getMhrTransferDeclaredValue',
     'getMhrTransferConsideration',
     'getMhrTransferDate',
-    'getMhrTransferOwnLand'
+    'getMhrTransferOwnLand',
+    'getMhrTransferCurrentHomeOwners'
   ])
 
   const {
@@ -60,7 +62,7 @@ export const useMhrInformation = () => {
     return ownerGroups
   }
 
-  const buildApiData = () => {
+  const buildApiData = (): MhrTransferApiIF => {
     const data: MhrTransferApiIF = {
       mhrNumber: getMhrInformation.value.mhrNumber,
       declaredValue: getMhrTransferDeclaredValue.value,
@@ -84,7 +86,7 @@ export const useMhrInformation = () => {
         phoneNumber: getCurrentUser.value.contacts[0].phone.replace(/[^0-9.]+/g, '') // Remove special chars
       },
       addOwnerGroups: parseOwnerGroups(),
-      deleteOwnerGroups: parseOwnerGroups(), // Api requires something here - Next iteration includes existing owners
+      deleteOwnerGroups: getMhrTransferCurrentHomeOwners.value, // Api requires owners to delete
       deathOfOwner: false
     }
 
