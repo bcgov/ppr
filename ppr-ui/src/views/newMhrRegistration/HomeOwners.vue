@@ -136,7 +136,7 @@
 </template>
 
 <script lang="ts">
-import { useGetters } from 'vuex-composition-helpers'
+import { useActions, useGetters } from 'vuex-composition-helpers'
 import {
   AddEditHomeOwner,
   HomeOwnersTable
@@ -173,6 +173,8 @@ export default defineComponent({
       useGetters<any>([
         'getMhrRegistrationHomeOwners', 'getMhrTransferHomeOwners', 'getMhrTransferCurrentHomeOwners'
       ])
+
+    const { setUnsavedChanges } = useActions<any>(['setUnsavedChanges'])
 
     const {
       getHomeTenancyType,
@@ -211,14 +213,24 @@ export default defineComponent({
       }
     )
 
+    watch(
+      () => localState.showAddPersonSection,
+      () => {
+        if (isGlobalEditingMode.value === true) setUnsavedChanges(true)
+      }
+    )
     return {
       getMhrRegistrationHomeOwners,
       getMhrTransferCurrentHomeOwners,
       isGlobalEditingMode,
       getHomeTenancyType,
       showGroups,
+      setGlobalEditingMode,
       ...toRefs(localState)
     }
+  },
+  mounted () {
+    this.setGlobalEditingMode(false)
   }
 })
 </script>

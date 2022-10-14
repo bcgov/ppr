@@ -439,6 +439,7 @@ export default defineComponent({
     }
     const cancel = (): void => {
       localState.ownerGroupId = props.editHomeOwner?.groupId
+      setUnsavedChanges(false)
       context.emit('cancel')
     }
 

@@ -102,9 +102,9 @@ export default defineComponent({
   },
   setup (props, context) {
     const {
-      getMhrTransferHomeOwners, getMhrInformation, hasUnsavedChanges
+      getMhrTransferHomeOwners, getMhrInformation, getMhrTransferCurrentHomeOwners, hasUnsavedChanges
     } = useGetters<any>([
-      'getMhrTransferHomeOwners', 'getMhrInformation', 'hasUnsavedChanges'
+      'getMhrTransferHomeOwners', 'getMhrInformation', 'getMhrTransferCurrentHomeOwners', 'hasUnsavedChanges'
     ])
 
     const {
@@ -214,12 +214,17 @@ export default defineComponent({
 
     const handleDialogResp = (val: boolean): void => {
       localState.showCancelDialog = false
-      if (!val) goToDash()
+      if (!val) {
+        setUnsavedChanges(false)
+        goToDash()
+      }
     }
+
     return {
       goToReview,
       goToDash,
       getMhrTransferHomeOwners,
+      getMhrTransferCurrentHomeOwners,
       ...toRefs(localState),
       handleDialogResp,
       cancel
