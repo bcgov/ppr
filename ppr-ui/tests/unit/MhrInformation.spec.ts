@@ -12,7 +12,7 @@ import mockRouter from './MockRouter'
 import { RouteNames } from '@/enums'
 import { HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
 import { getTestId } from './utils'
-import { mockedPerson } from './test-data/mock-mhr-registration'
+import { mockedOrganization, mockedPerson, mockMhrTransferCurrentHomeOwner } from './test-data'
 import { MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF } from '@/interfaces'
 import { nextTick } from '@vue/composition-api'
 import { TransferDetails } from '@/components/mhrTransfers'
@@ -41,11 +41,24 @@ function createComponent (): Wrapper<any> {
     localVue,
     store,
     propsData: {
-      appReady: true
+      appReady: true,
+      isMhrTransfer: true
     },
     vuetify,
     router
   })
+}
+
+// TODO: Remove after API updates to include the ID for Owners
+function addIDsForOwners(ownersGroups): Array<any> {
+  // Create an ID to each individual owner for UI Tracking
+  ownersGroups.forEach(ownerGroup => {
+    for (const [index, owner] of ownerGroup.owners.entries()) {
+      owner.id = ownerGroup.groupId + (index + 1)
+    }
+  })
+
+  return ownersGroups
 }
 
 describe('Mhr Information', () => {
@@ -59,30 +72,15 @@ describe('Mhr Information', () => {
 
   beforeEach(async () => {
     wrapper = createComponent()
-    await store.dispatch('setMhrTransferCurrentHomeOwnerGroups', [
-      {
-        groupId: 1,
-        interest: '',
-        interestNumerator: 0,
-        owners: [
-          {
-            address: {
-              city: 'KELOWNA, BC V1X 7T1',
-              country: 'CA',
-              postalCode: '',
-              region: 'BC',
-              street: '3075 SEXSMITH ROAD'
-            },
-            organizationName: 'CHAPARRAL INDUSTRIES (86) INC.',
-            phoneNumber: '2507652985',
-            type: 'SOLE'
-          }
-        ],
-        status: 'PREVIOUS',
-        tenancySpecified: true,
-        type: 'SOLE'
-      }
-    ])
+    await store.dispatch('setMhrTransferCurrentHomeOwnerGroups', [mockMhrTransferCurrentHomeOwner])
+    // TODO: Remove after API updates to include the ID for Owners
+    const homeOwnerWithIdsArray = addIDsForOwners([mockMhrTransferCurrentHomeOwner])
+    await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerWithIdsArray)
+    wrapper.vm.$data.dataLoaded = true
+
+    expect(wrapper.props().isMhrTransfer).toBe(true)
+    expect(wrapper.vm.$data.getMhrTransferCurrentHomeOwners.length).toBe(1)
+    expect(wrapper.vm.$data.getMhrTransferHomeOwners.length).toBe(1)
   })
 
   afterEach(() => {
@@ -92,6 +90,12 @@ describe('Mhr Information', () => {
   it('renders and displays the Mhr Information View', async () => {
     expect(wrapper.findComponent(MhrInformation).exists()).toBe(true)
     expect(wrapper.find('#mhr-information-header').text()).toContain('Manufactured Home Information')
+
+    expect(wrapper.findComponent(HomeOwners).exists()).toBeTruthy()
+    const homeOwnersTable = wrapper.findComponent(HomeOwnersTable)
+    expect(homeOwnersTable.exists()).toBeTruthy()
+    expect(homeOwnersTable.text()).toContain(mockMhrTransferCurrentHomeOwner.owners[0].organizationName)
+    expect(homeOwnersTable.text()).toContain(mockMhrTransferCurrentHomeOwner.owners[0].address.city)
   })
 
   it('renders and displays the correct sub components', async () => {
@@ -106,23 +110,22 @@ describe('Mhr Information', () => {
     await nextTick()
 
     expect(mhrInformationComponent.findComponent(HomeOwnersTable).exists()).toBeTruthy()
-    expect(
-      mhrInformationComponent
-        .findComponent(HomeOwnersTable)
-        .find(getTestId('no-data-msg'))
-        .isVisible()
-    ).toBeTruthy()
 
     const owners = [mockedPerson] as MhrRegistrationHomeOwnerIF[] // same IF for Transfer and Registration
-    const homeOwnerGroup = [{ groupId: '1', owners: owners }] as MhrRegistrationHomeOwnerGroupIF[]
+    const homeOwnerGroup = [
+      mockMhrTransferCurrentHomeOwner,
+      { groupId: '2', owners: owners }
+    ] as MhrRegistrationHomeOwnerGroupIF[]
 
     await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerGroup)
 
     const ownersTable = mhrInformationComponent.findComponent(HomeOwners).findComponent(HomeOwnersTable)
-    expect(ownersTable.text()).toContain(mockedPerson.individualName.first)
-    expect(ownersTable.text()).toContain(mockedPerson.individualName.last)
 
-    const addedBadge = ownersTable.find(getTestId('owner-added-badge'))
+    const newlyAddedOwner = ownersTable.find(getTestId(`owner-info-${mockedPerson.id}`))
+    expect(newlyAddedOwner.text()).toContain(mockedPerson.individualName.first)
+    expect(newlyAddedOwner.text()).toContain(mockedPerson.individualName.last)
+
+    const addedBadge = newlyAddedOwner.find(getTestId('owner-added-badge'))
     expect(addedBadge.isVisible()).toBeTruthy()
   })
 

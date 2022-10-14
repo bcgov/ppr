@@ -38,7 +38,7 @@
           </td>
         </tr>
 
-        <tr v-else-if="row.item.id" :key="row.item.id" class="owner-info">
+        <tr v-else-if="row.item.id" :key="row.item.id" class="owner-info" :data-test-id="`owner-info-${row.item.id}`">
           <td class="owner-name">
             <div v-if="row.item.individualName" class="owner-icon-name">
               <v-icon class="mr-2">mdi-account</v-icon>

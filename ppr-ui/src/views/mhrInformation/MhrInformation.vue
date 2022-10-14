@@ -102,6 +102,10 @@ export default defineComponent({
     appReady: {
       type: Boolean,
       default: false
+    },
+    isMhrTransfer: {
+      type: Boolean,
+      default: true
     }
   },
   setup (props, context) {
@@ -119,8 +123,6 @@ export default defineComponent({
 
     const { setEmptyMhrTransfer } = useActions<any>(['setEmptyMhrTransfer'])
 
-    const isMhrTransfer = true
-
     const {
       isTransferDetailsValid,
       initMhrTransfer,
@@ -130,7 +132,7 @@ export default defineComponent({
     const {
       isGlobalEditingMode,
       setShowGroups
-    } = useHomeOwners(isMhrTransfer)
+    } = useHomeOwners(props.isMhrTransfer)
 
     const localState = reactive({
       dataLoaded: false,
@@ -187,6 +189,7 @@ export default defineComponent({
       const { data } = await fetchMhRegistration(getMhrInformation.value.mhrNumber)
       const currentOwnerGroups = data?.ownerGroups || [] // Safety check. Should always have ownerGroups
       // Create an ID to each individual owner for UI Tracking
+      // TODO: Remove after API updates to include the ID for Owners
       currentOwnerGroups.forEach(ownerGroup => {
         for (const [index, owner] of ownerGroup.owners.entries()) {
           owner.id = ownerGroup.groupId + (index + 1)
