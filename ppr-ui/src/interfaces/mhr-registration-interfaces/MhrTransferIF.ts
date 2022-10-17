@@ -3,8 +3,9 @@ import {
   PartyIF,
   MhrHomeOwnerGroupIF,
   PaymentIF,
-  SubmittingPartyIF
+  SubmittingPartyIF, ErrorIF
 } from '@/interfaces'
+import { APIMhrTypes } from '@/enums'
 
 export interface MhrTransferIF {
   mhrNumber: string
@@ -15,6 +16,7 @@ export interface MhrTransferIF {
   ownerGroups: MhrRegistrationHomeOwnerGroupIF[]
   currentOwnerGroups?: MhrRegistrationHomeOwnerGroupIF[]
   submittingParty: PartyIF
+  error?: ErrorIF
 }
 
 export interface MhrTransferApiIF {
@@ -32,4 +34,20 @@ export interface MhrTransferApiIF {
   createDateTime?: string
   deathOfOwner?: boolean
   payment?: PaymentIF
+  error?: ErrorIF
+}
+
+export interface MhrDraftTransferApiIF {
+  type: string
+  registration: MhrTransferApiIF
+  error?: ErrorIF
+}
+
+export interface MhrDraftTransferResponseIF {
+  createDateTime: string
+  draftNumber: string
+  lastUpdateDateTime: string
+  registration: MhrTransferApiIF
+  type: APIMhrTypes
+  error?: ErrorIF
 }

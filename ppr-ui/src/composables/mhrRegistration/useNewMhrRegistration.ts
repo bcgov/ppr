@@ -1,4 +1,4 @@
-import { useGetters } from 'vuex-composition-helpers'
+import { useActions, useGetters } from 'vuex-composition-helpers'
 import {
   MhrRegistrationDescriptionIF,
   MhrRegistrationHomeLocationIF,
@@ -8,6 +8,7 @@ import {
 } from '@/interfaces'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 import { HomeTenancyTypes } from '@/enums'
+import { getMhrDrafts, mhrRegistrationHistory } from '@/utils'
 
 export const useNewMhrRegistration = () => {
   const {
@@ -28,6 +29,7 @@ export const useNewMhrRegistration = () => {
     'getCertifyInformation',
     'getStaffPayment'
   ])
+  const { setMhrTableHistory } = useActions<any>(['setMhrTableHistory'])
 
   const initNewMhr = (): MhrRegistrationIF => {
     return {
@@ -193,6 +195,12 @@ export const useNewMhrRegistration = () => {
     return data
   }
 
+  const fetchMhRegistrations = async (): Promise<void> => {
+    const draftFilings = await getMhrDrafts()
+    const myMhrHistory = await mhrRegistrationHistory()
+    setMhrTableHistory([...draftFilings, ...myMhrHistory])
+  }
+
   /**
    * @function cleanEmpty
    *
@@ -219,6 +227,7 @@ export const useNewMhrRegistration = () => {
     initNewMhr,
     buildApiData,
     parseStaffPayment,
+    fetchMhRegistrations,
     cleanEmpty
   }
 }

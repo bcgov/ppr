@@ -60,6 +60,7 @@
                   :setErrMsg="transferErrorMsg"
                   @cancel="goToDash()"
                   @back="isReviewMode = false"
+                  @save="onSave()"
                   @submit="goToReview()"
                 />
               </affix>
@@ -76,7 +77,13 @@ import { computed, defineComponent, onMounted, reactive, toRefs } from '@vue/com
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { RouteNames } from '@/enums'
-import { fetchMhRegistration, pacificDate, submitMhrTransfer } from '@/utils'
+import {
+  createMhrTransferDraft,
+  fetchMhRegistration,
+  getMhrTransferDraft,
+  pacificDate,
+  submitMhrTransfer, updateMhrDraft
+} from '@/utils'
 import { StickyContainer } from '@/components/common'
 import { useHomeOwners, useMhrInformation } from '@/composables'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
@@ -185,8 +192,16 @@ export default defineComponent({
         }
       })
       setShowGroups(currentOwnerGroups.length > 1)
+
       // Set owners to store
-      setMhrTransferHomeOwnerGroups(currentOwnerGroups)
+      if (getMhrInformation.value.draftNumber) {
+        // Retrieve owners from draft if it exists
+        const { registration } = await getMhrTransferDraft(getMhrInformation.value.draftNumber)
+        setMhrTransferHomeOwnerGroups(registration.addOwnerGroups)
+      } else {
+        // Set current owners if there is no draft
+        setMhrTransferHomeOwnerGroups(currentOwnerGroups)
+      }
 
       // Store a snapshot of the existing OwnerGroups for baseline of current state
       setMhrTransferCurrentHomeOwnerGroups(currentOwnerGroups)
@@ -209,6 +224,18 @@ export default defineComponent({
       }
     }
 
+    const onSave = async (): Promise<void> => {
+      localState.loading = true
+      const mhrTransferDraft = getMhrInformation.value.draftNumber
+        ? await updateMhrDraft(getMhrInformation.value.draftNumber, buildApiData())
+        : await createMhrTransferDraft(buildApiData())
+      localState.loading = false
+
+      !mhrTransferDraft.error
+        ? goToDash()
+        : console.log(mhrTransferDraft?.error) // Handle Schema or Api errors here..
+    }
+
     const goToDash = (): void => {
       context.root.$router.push({
         name: RouteNames.DASHBOARD
@@ -217,6 +244,7 @@ export default defineComponent({
 
     return {
       goToReview,
+      onSave,
       goToDash,
       getMhrTransferHomeOwners,
       getMhrTransferCurrentHomeOwners,

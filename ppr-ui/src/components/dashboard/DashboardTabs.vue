@@ -53,8 +53,8 @@
 /* eslint-disable no-unused-vars */
 import { computed, defineComponent, onMounted, reactive, toRefs } from '@vue/composition-api'
 import { RegistrationsWrapper } from '@/components/common'
-import { mhrRegistrationHistory } from '@/utils'
-import { useActions, useGetters } from 'vuex-composition-helpers'
+import { useGetters } from 'vuex-composition-helpers'
+import { useNewMhrRegistration } from '@/composables'
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
@@ -76,7 +76,10 @@ export default defineComponent({
     const {
       getMhRegTableBaseRegs, getRegTableTotalRowCount
     } = useGetters<any>(['getMhRegTableBaseRegs', 'getRegTableTotalRowCount'])
-    const { setMhrTableHistory } = useActions<any>(['setMhrTableHistory'])
+
+    const {
+      fetchMhRegistrations
+    } = useNewMhrRegistration()
 
     const localState = reactive({
       tabNumber: null,
@@ -93,8 +96,7 @@ export default defineComponent({
     }
 
     onMounted(async () => {
-      const myMhrHistory = await mhrRegistrationHistory()
-      setMhrTableHistory(myMhrHistory)
+      await fetchMhRegistrations()
     })
 
     return {
