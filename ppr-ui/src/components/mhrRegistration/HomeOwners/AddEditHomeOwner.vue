@@ -178,6 +178,7 @@
             :isAddingHomeOwner="isAddingHomeOwner"
             @setOwnerGroupId="ownerGroupId = $event"
             :fractionalData="groupFractionalData"
+            :isMhrTransfer="isMhrTransfer"
           />
         </v-form>
         <v-row>
@@ -285,7 +286,11 @@ export default defineComponent({
     }
   },
   setup (props, context) {
-    const { getMhrRegistrationHomeOwnerGroups } = useGetters<any>(['getMhrRegistrationHomeOwnerGroups'])
+    const { getMhrRegistrationHomeOwnerGroups, getMhrTransferHomeOwnerGroups } = useGetters<any>([
+      'getMhrRegistrationHomeOwnerGroups',
+      'getMhrTransferHomeOwnerGroups'
+    ])
+
     const { required, customRules, maxLength, minLength, isPhone, isNumber, invalidSpaces } = useInputRules()
 
     const {
@@ -295,12 +300,15 @@ export default defineComponent({
       showGroups,
       setShowGroups,
       setGroupFractionalInterest
-    } = useHomeOwners()
+    } = useHomeOwners(props.isMhrTransfer)
 
     const addressSchema = PartyAddressSchema
     const addHomeOwnerForm = ref(null)
 
     const { searchBusiness } = useSearch()
+
+    const getTransferOrRegistrationHomeOwnerGroups = () =>
+      props.isMhrTransfer ? getMhrTransferHomeOwnerGroups.value : getMhrRegistrationHomeOwnerGroups.value
 
     const defaultHomeOwner: MhrRegistrationHomeOwnerIF = {
       id: props.editHomeOwner?.id || (DEFAULT_OWNER_ID++).toString(),
@@ -328,7 +336,7 @@ export default defineComponent({
       defaultHomeOwner.organizationName = props.editHomeOwner?.organizationName || ''
     }
 
-    const allFractionalData = (getMhrRegistrationHomeOwnerGroups.value || [{}]).map(group => {
+    const allFractionalData = (getTransferOrRegistrationHomeOwnerGroups() || [{}]).map(group => {
       return {
         groupId: group.groupId || '1',
         type: group?.type || '',
@@ -340,7 +348,7 @@ export default defineComponent({
     }) as FractionalOwnershipWithGroupIdIF[]
 
     const hasMultipleOwnersInGroup =
-      find(getMhrRegistrationHomeOwnerGroups.value, { groupId: props.editHomeOwner?.groupId })?.owners.length > 1
+      find(getTransferOrRegistrationHomeOwnerGroups(), { groupId: props.editHomeOwner?.groupId })?.owners.length > 1
 
     if (allFractionalData.length === 0 || props.editHomeOwner == null || hasMultipleOwnersInGroup) {
       allFractionalData.push({

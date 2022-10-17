@@ -299,7 +299,7 @@ export default defineComponent({
     margin-left: 32px;
   }
   .theme--light.v-btn.v-btn--disabled {
-    color:#1669bb !important;
+    color: #1669bb !important;
     opacity: 0.4 !important;
   }
 }

@@ -191,8 +191,12 @@ export default defineComponent({
       // Create an ID to each individual owner for UI Tracking
       // TODO: Remove after API updates to include the ID for Owners
       currentOwnerGroups.forEach(ownerGroup => {
+        ownerGroup.isCurrentOwnerGroup = true
+        // TODO: refactor all group Ids to be numbers as per spec
+        ownerGroup.groupId = ownerGroup.groupId.toString()
         for (const [index, owner] of ownerGroup.owners.entries()) {
           owner.id = ownerGroup.groupId + (index + 1)
+          owner.isCurrentOwner = true
         }
       })
       setShowGroups(currentOwnerGroups.length > 1)
