@@ -25,12 +25,15 @@
               filled
               :rules="declaredValueRules"
               :messages="
-                declaredValue && declaredValue < 500
+                enableWarningMsg && declaredValue && declaredValue < 500
                   ? 'The declared value entered appears to be low. Confirm this is the correct market value.'
                   : null
               "
               label="Amount in Canadian Dollars"
-              @blur="updateCompensation($event.target.value), $refs.declaredValueRef.validate()"
+              @blur="
+                updateCompensation($event.target.value), $refs.declaredValueRef.validate(), (enableWarningMsg = true)
+              "
+              @focus="enableWarningMsg = false"
               data-test-id="declared-value"
             />
             <span class="mt-4 ml-3">.00</span>
@@ -158,6 +161,7 @@ export default defineComponent({
       consideration: null,
       transferDate: null,
       isOwnLand: false,
+      enableWarningMsg: false,
       showFormError: computed(() => props.validateTransferDetails && !localState.transferDetailsValid)
     })
 
@@ -231,7 +235,7 @@ export default defineComponent({
 
     .declared-value {
       .v-messages__message {
-        color: $error;
+        color: $gray7;
       }
     }
   }
