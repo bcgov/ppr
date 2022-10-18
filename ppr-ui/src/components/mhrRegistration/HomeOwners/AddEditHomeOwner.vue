@@ -427,7 +427,7 @@ export default defineComponent({
           delete localState.group.interestTotal
           delete localState.group.tenancySpecified
         }
-        if (oldOwner !== localState.owner) setUnsavedChanges(true)
+        if (props.isMhrTransfer) setUnsavedChanges(oldOwner !== localState.owner)
         cancel()
       } else {
         localState.triggerAddressErrors = !localState.triggerAddressErrors
@@ -439,7 +439,6 @@ export default defineComponent({
     }
     const cancel = (): void => {
       localState.ownerGroupId = props.editHomeOwner?.groupId
-      setUnsavedChanges(false)
       context.emit('cancel')
     }
 

@@ -124,9 +124,6 @@ export default defineComponent({
       isGlobalEditingMode
     } = useHomeOwners()
 
-    const options = unsavedChangesDialog
-    var showCancelDialog = false
-
     const localState = reactive({
       dataLoaded: false,
       loading: false,
@@ -151,8 +148,8 @@ export default defineComponent({
       reviewConfirmText: computed((): string => {
         return localState.isReviewMode ? 'Register Changes and Pay' : 'Review and Confirm'
       }),
-      options,
-      showCancelDialog
+      options: unsavedChangesDialog,
+      showCancelDialog: false
     })
 
     onMounted(async (): Promise<void> => {
