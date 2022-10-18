@@ -36,7 +36,7 @@ DELETE_GROUP_ID_INVALID = 'The owner group with ID {group_id} is not active and 
 DELETE_GROUP_ID_NONEXISTENT = 'No owner group with ID {group_id} exists. '
 DELETE_GROUP_TYPE_INVALID = 'The owner group tenancy type with ID {group_id} is invalid. '
 DECLARED_VALUE_REQUIRED = 'Declared value is required and must be greater than 0 for this registration. '
-CONSIDERATION_REQUIRED = 'Consideration required for this registration. '
+CONSIDERATION_REQUIRED = 'Consideration is required for this registration. '
 TRANSFER_DATE_REQUIRED = 'Transfer date is required for this registration. '
 ADD_SOLE_OWNER_INVALID = 'Only one sole owner and only one sole owner group can be added. '
 GROUP_JOINT_INVALID = 'Only 1 group is allowed with the Joint Tenants owner group type. '
@@ -44,41 +44,51 @@ GROUP_COMMON_INVALID = 'More than 1 group is required with the Tenants in Common
 GROUP_NUMERATOR_MISSING = 'The owner group interest numerator is required and must be an integer greater than 0. '
 GROUP_DENOMINATOR_MISSING = 'The owner group interest denominator is required and must be an integer greater than 0. '
 GROUP_INTEREST_MISMATCH = 'The owner group interest numerator sum does not equal the interest common denominator. '
+VALIDATOR_ERROR = 'Error performing extra validation. '
 
 
 def validate_registration(json_data, is_staff: bool = False):
     """Perform all registration data validation checks not covered by schema validation."""
     error_msg = ''
-    if is_staff:
-        error_msg += validate_doc_id(json_data)
-        if not json_data.get('ownerGroups'):
-            error_msg += OWNER_GROUPS_REQUIRED
-    error_msg += validate_submitting_party(json_data)
-    error_msg += validate_owner_groups(json_data.get('ownerGroups'), True)
-    error_msg += validate_location(json_data)
+    try:
+        if is_staff:
+            error_msg += validate_doc_id(json_data)
+            if not json_data.get('ownerGroups'):
+                error_msg += OWNER_GROUPS_REQUIRED
+        error_msg += validate_submitting_party(json_data)
+        error_msg += validate_owner_groups(json_data.get('ownerGroups'), True)
+        error_msg += validate_location(json_data)
+    except Exception as validation_exception:   # noqa: B902; eat all errors
+        current_app.logger.error('validate_registration exception: ' + str(validation_exception))
+        error_msg += VALIDATOR_ERROR
     return error_msg
 
 
 def validate_transfer(registration: MhrRegistration, json_data, is_staff: bool = False):
     """Perform all transfer data validation checks not covered by schema validation."""
     error_msg = ''
-    if is_staff:
-        error_msg += validate_doc_id(json_data)
-    error_msg += validate_submitting_party(json_data)
-    error_msg += validate_owner_groups(json_data.get('addOwnerGroups'),
-                                       False,
-                                       registration,
-                                       json_data.get('deleteOwnerGroups'))
-    error_msg += validate_registration_state(registration)
-    if is_legacy() and registration and registration.manuhome and json_data.get('deleteOwnerGroups'):
-        error_msg += validate_delete_owners_legacy(registration, json_data)
-    if not is_staff:
-        if not json_data.get('declaredValue') or json_data.get('declaredValue') < 0:
-            error_msg += DECLARED_VALUE_REQUIRED
-        if not json_data.get('consideration'):
-            error_msg += CONSIDERATION_REQUIRED
-        if not json_data.get('transferDate'):
-            error_msg += TRANSFER_DATE_REQUIRED
+    try:
+        if is_staff:
+            error_msg += validate_doc_id(json_data)
+        error_msg += validate_submitting_party(json_data)
+        error_msg += validate_owner_groups(json_data.get('addOwnerGroups'),
+                                           False,
+                                           registration,
+                                           json_data.get('deleteOwnerGroups'))
+        error_msg += validate_registration_state(registration)
+        if is_legacy() and registration and registration.manuhome and json_data.get('deleteOwnerGroups'):
+            error_msg += validate_delete_owners_legacy(registration, json_data)
+        if not is_staff:
+            if not isinstance(json_data.get('declaredValue', 0), int) or not json_data.get('declaredValue') or \
+                    json_data.get('declaredValue') < 0:
+                error_msg += DECLARED_VALUE_REQUIRED
+            if not json_data.get('consideration'):
+                error_msg += CONSIDERATION_REQUIRED
+            if not json_data.get('transferDate'):
+                error_msg += TRANSFER_DATE_REQUIRED
+    except Exception as validation_exception:   # noqa: B902; eat all errors
+        current_app.logger.error('validate_transfer exception: ' + str(validation_exception))
+        error_msg += VALIDATOR_ERROR
     return error_msg
 
 
