@@ -321,7 +321,9 @@ class Report:  # pylint: disable=too-few-public-methods
                 self._set_ppr_search()
             if self._report_key != ReportTypes.MHR_TRANSFER:
                 self._set_location()
+                current_app.logger.info('5')
                 self._set_description()
+                current_app.logger.info('6')
         return self._report_data
 
     def _set_ppr_search(self):  # pylint: disable=too-many-branches, too-many-statements
@@ -436,15 +438,18 @@ class Report:  # pylint: disable=too-few-public-methods
                         detail['declaredValue'] = '$' + '{:0,.2f}'.format(float(declared_value))
                     else:
                         detail['declaredValue'] = ''
-                    if detail.get('description') and 'engineerDate' in detail['description']:
+                    if detail.get('description') and detail['description'].get('engineerDate'):
                         if detail['description']['engineerDate'] == '0001-01-01':
                             detail['description']['engineerDate'] = ''
                         else:
                             detail['description']['engineerDate'] = \
-                                Report._to_report_datetime(detail['description']['engineerDate'], False)
+                                   Report._to_report_datetime(detail['description']['engineerDate'], False)
+                    else:
+                        detail['description']['engineerDate'] = ''
         elif self._report_key == ReportTypes.MHR_REGISTRATION:
             reg = self._report_data
             reg['createDateTime'] = Report._to_report_datetime(reg['createDateTime'])
+            current_app.logger.info('4')
             if reg.get('declaredDateTime'):
                 reg['declaredDateTime'] = Report._to_report_datetime(reg['declaredDateTime'], False)
             declared_value = str(reg['declaredValue'])
@@ -452,12 +457,14 @@ class Report:  # pylint: disable=too-few-public-methods
                 reg['declaredValue'] = '$' + '{:0,.2f}'.format(float(declared_value))
             else:
                 reg['declaredValue'] = ''
-            if reg.get('description') and 'engineerDate' in reg['description']:
+            if reg.get('description') and reg['description'].get('engineerDate'):
                 if reg['description']['engineerDate'] == '0001-01-01':
                     reg['description']['engineerDate'] = ''
                 else:
                     reg['description']['engineerDate'] = \
                         Report._to_report_datetime(reg['description']['engineerDate'], False)
+            else:
+                reg['description']['engineerDate'] = ''
         elif self._report_key == ReportTypes.MHR_TRANSFER:
             reg = self._report_data
             reg['createDateTime'] = Report._to_report_datetime(reg['createDateTime'])

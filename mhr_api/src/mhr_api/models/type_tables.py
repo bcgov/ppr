@@ -258,12 +258,14 @@ class MhrRegistrationStatusTypes(BaseEnum):
 class MhrRegistrationTypes(BaseEnum):
     """Render an Enum of the MHR registration types."""
 
+    DECAL_REPLACE = 'DECAL_REPLACE'
     MHREG = 'MHREG'
     TRAND = 'TRAND'
     TRANS = 'TRANS'
     EXEMPTION_RES = 'EXEMPTION_RES'
     EXEMPTION_NON_RES = 'EXEMPTION_NON_RES'
     PERMIT = 'PERMIT'
+    PERMIT_EXTENSION = 'PERMIT_EXTENSION'
 
 
 class MhrStatusTypes(BaseEnum):

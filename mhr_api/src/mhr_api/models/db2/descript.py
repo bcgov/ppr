@@ -199,9 +199,8 @@ class Db2Descript(db.Model):
             description['lengthInches4'] = self.length_inches_4
             description['widthFeet4'] = self.width_feet_4
             description['widthInches4'] = self.width_inches_4
-        if self.engineer_date:
+        if self.engineer_date and self.engineer_date.year > 1900:
             description['engineerDate'] = model_utils.format_local_date(self.engineer_date)
-
         return description
 
     @property
@@ -260,10 +259,8 @@ class Db2Descript(db.Model):
             'rebuiltRemarks': self.rebuilt_remarks,
             'otherRemarks': self.other_remarks
         }
-        if self.engineer_date:
+        if self.engineer_date and self.engineer_date.year > 1900:
             description['engineerDate'] = model_utils.format_local_date(self.engineer_date)
-        if description.get('engineerDate', '') == '0001-01-01':
-            del description['engineerDate']
         if self.circa == '?':
             description['baseInformation']['circa'] = True
         return description

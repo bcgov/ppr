@@ -1,5 +1,5 @@
 <div class="section-title mt-3">
-    {% if documentType in ('TRAN', 'DEAT') %}New{% endif %} Registered Owner(s) Information
+    {% if registrationType in ('TRANS', 'TRAND') %}New{% endif %} Registered Owner(s) Information
 </div>
 {% if ownerGroups is defined %}
     {% if ownerGroups|length > 1 %}

@@ -419,8 +419,7 @@ class SBCPaymentClient(BaseClient):
             del data['details']
         # current_app.logger.debug('create non-staff search paymnent payload:')
         # current_app.logger.debug(json.dumps(data))
-        include_account = not staff_gov
-        invoice_data = self.call_api(HttpVerbs.POST, PATH_PAYMENT, data, include_account=include_account)
+        invoice_data = self.call_api(HttpVerbs.POST, PATH_PAYMENT, data)
         invoice_id = str(invoice_data['id'])
         receipt_path = self.api_url.replace('https://', '')
         receipt_path = receipt_path[receipt_path.find('/'): None] + PATH_RECEIPT.format(invoice_id=invoice_id)

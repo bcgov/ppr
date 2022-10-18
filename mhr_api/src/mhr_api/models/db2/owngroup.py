@@ -81,6 +81,7 @@ class Db2Owngroup(db.Model):
 
     owners = []
     modified: bool = False
+    interest_denominator: int = 0
 
     def save(self):
         """Save the object to the database immediately."""
@@ -188,7 +189,8 @@ class Db2Owngroup(db.Model):
             'lessee': self.lessee,
             'lessor': self.lessor,
             'interest': self.interest,
-            'interestNumerator': self.interest_numerator,
+            'interestNumerator': self.get_interest_fraction(True),
+            'interestDenominator': self.get_interest_fraction(False),
             'tenancySpecified': self.tenancy_specified
         }
         return owngroup
@@ -202,11 +204,12 @@ class Db2Owngroup(db.Model):
             'type': LEGACY_TENANCY_NEW.get(self.tenancy_type),
             'status': LEGACY_STATUS_NEW.get(self.status),
             'interest': self.interest,
-            'interestNumerator': self.interest_numerator,
-            'tenancySpecified': False
+            'interestNumerator': self.get_interest_fraction(True),
+            'interestDenominator': self.get_interest_fraction(False),
+            'tenancySpecified': True
         }
-        if self.tenancy_specified == 'Y':
-            group['tenancySpecified'] = True
+        if self.tenancy_specified == 'N':
+            group['tenancySpecified'] = False
         owners = []
         if self.owners:
             for owner in self.owners:
@@ -215,6 +218,21 @@ class Db2Owngroup(db.Model):
                 owners.append(owner_json)
         group['owners'] = owners
         return group
+
+    def get_interest_fraction(self, numerator: bool = False) -> int:
+        """For tenants in common try to get the numerator or denominator from the interest."""
+        value: int = 0
+        if not self.interest or self.tenancy_type != self.TenancyTypes.COMMON:
+            return value
+        tokens = str(self.interest).split()
+        for token in tokens:
+            if token.find('/') > 0:
+                fraction = token.split('/')
+                if numerator:
+                    value = int(fraction[0])
+                else:
+                    value = int(fraction[1])
+        return value
 
     @staticmethod
     def create_from_dict(new_info: dict):
@@ -228,7 +246,7 @@ class Db2Owngroup(db.Model):
                                lessor=new_info.get('lessor', ''),
                                interest=new_info.get('interest', ''),
                                interest_numerator=new_info.get('interestNumerator', 0),
-                               tenancy_specified=new_info.get('tenancySpecified', ''))
+                               tenancy_specified=new_info.get('tenancySpecified', 'Y'))
         return owngroup
 
     @staticmethod
@@ -257,7 +275,8 @@ class Db2Owngroup(db.Model):
                                lessor=new_info.get('lessor', ''),
                                interest=new_info.get('interest', ''),
                                interest_numerator=new_info.get('interestNumerator', 0),
-                               tenancy_specified=new_info.get('tenancySpecified', 'N'))
+                               tenancy_specified=new_info.get('tenancySpecified', 'Y'))
+        owngroup.interest_denominator = new_info.get('interestDenominator', 0)
         owngroup.owners = []
         if new_info.get('tenancySpecified'):
             owngroup.tenancy_specified = 'Y'

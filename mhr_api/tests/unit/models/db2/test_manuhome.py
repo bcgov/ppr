@@ -49,6 +49,13 @@ TEST_DATA_DOC_ID = [
     (HTTPStatus.OK, '10104535', '102265', 'TRAN'),
     (HTTPStatus.NOT_FOUND, 'XXX04535', None, None)
 ]
+# testdata pattern is ({interest}, {numerator}, {denominator}, {new_interest})
+TEST_DATA_GROUP_INTEREST = [
+    ('', 1, 2, '1/2'),
+    ('UNDIVIDED', 1, 2, 'UNDIVIDED 1/2'),
+    ('Undivided', 1, 2, 'UNDIVIDED 1/2'),
+    ('Junk', 1, 2, '1/2')
+]
 
 
 @pytest.mark.parametrize('exists,id,mhr_num,status,doc_id', TEST_DATA)
@@ -198,6 +205,19 @@ def test_find_by_document_id(session, http_status, doc_id, mhr_num, doc_type):
         # check
         assert request_err
         assert request_err.value.status_code == http_status
+
+
+@pytest.mark.parametrize('interest,numerator,denominator,new_interest', TEST_DATA_GROUP_INTEREST)
+def test_adjust_group_interest_new(session, interest, numerator, denominator, new_interest):
+    groups = []
+    group: Db2Owngroup = Db2Owngroup(status=Db2Owngroup.StatusTypes.ACTIVE,
+                                     tenancy_type=Db2Owngroup.TenancyTypes.COMMON,
+                                     interest=interest,
+                                     interest_numerator=numerator,
+                                     interest_denominator=denominator)
+    groups.append(group)
+    Db2Manuhome.adjust_group_interest(groups, True)
+    assert groups[0].interest == new_interest
 
 
 def test_notes_sort_order(session):

@@ -61,6 +61,16 @@ FROM_LEGACY_DOC_TYPE = {
     '103': 'REG_103',
     '103E': 'REG_103E'
 }
+FROM_LEGACY_REGISTRATION_TYPE = {
+    '101': 'MHREG',
+    'TRAN': 'TRANS',
+    'DEAT': 'TRAND',
+    '102': 'DECAL_REPLACE',
+    '103': 'PERMIT',
+    '103E': 'PERMIT_EXTENSION',
+    'EXRS': 'EXEMPTION_RES',
+    'EXNR': 'EXEMPTION_NON_RES'
+}
 DOC_ID_QUALIFIED_CLAUSE = ',  get_mhr_doc_qualified_id() AS doc_id'
 DOC_ID_MANUFACTURER_CLAUSE = ',  get_mhr_doc_manufacturer_id() AS doc_id'
 DOC_ID_GOV_AGENT_CLAUSE = ',  get_mhr_doc_gov_agent_id() AS doc_id'
@@ -109,6 +119,8 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         if self.manuhome:
             reg_json = self.manuhome.json
             doc_type = reg_json.get('documentType')
+            if FROM_LEGACY_REGISTRATION_TYPE.get(doc_type):
+                reg_json['registrationType'] = FROM_LEGACY_REGISTRATION_TYPE.get(doc_type)
             if FROM_LEGACY_DOC_TYPE.get(doc_type):
                 doc_type = FROM_LEGACY_DOC_TYPE.get(doc_type)
             doc_type_info: MhrDocumentType = MhrDocumentType.find_by_doc_type(doc_type)
@@ -123,6 +135,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                 location = self.locations[0]
                 current_app.logger.debug('Using PostreSQL location in registration.json.')
                 reg_json['location'] = location.json
+            del reg_json['documentType']
             if self.pay_invoice_id and self.pay_invoice_id > 0:  # Legacy will have no payment info.
                 return self.__set_payment_json(reg_json)
             return reg_json
@@ -167,9 +180,9 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                 if self.manuhome.reg_document_id and self.manuhome.reg_document_id == doc.id:
                     reg_doc = doc
             if reg_doc:
-                if self.mail_version and self.manuhome.reg_documents:
-                    reg_json['documentRegistrationId'] = reg_doc.document_reg_id
                 doc_type = reg_doc.document_type
+                if FROM_LEGACY_REGISTRATION_TYPE.get(doc_type):
+                    reg_json['registrationType'] = FROM_LEGACY_REGISTRATION_TYPE.get(doc_type)
                 if FROM_LEGACY_DOC_TYPE.get(doc_type):
                     doc_type = FROM_LEGACY_DOC_TYPE.get(doc_type)
                 doc_type_info: MhrDocumentType = MhrDocumentType.find_by_doc_type(doc_type)
