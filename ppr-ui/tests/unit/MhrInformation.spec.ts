@@ -163,7 +163,7 @@ describe('Mhr Information', () => {
     wrapper.vm.$data.dataLoaded = true
     await Vue.nextTick()
 
-    const homeOwnerGroup = [{ groupId: '1', owners: [mockedPerson] }]
+    const homeOwnerGroup = [{ groupId: 1, owners: [mockedPerson] }]
 
     expect(wrapper.findComponent(HomeOwners).vm.$data.getHomeOwners.length).toBe(1)
     expect(
@@ -174,7 +174,7 @@ describe('Mhr Information', () => {
     ).toBe(HomeTenancyTypes.SOLE)
 
     // Add a second Owner
-    homeOwnerGroup.push({ groupId: '1', owners: [mockedOrganization] })
+    homeOwnerGroup.push({ groupId: 1, owners: [mockedOrganization] })
 
     await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerGroup)
     await Vue.nextTick()
