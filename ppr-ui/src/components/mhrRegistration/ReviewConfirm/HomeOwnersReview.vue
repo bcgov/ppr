@@ -13,7 +13,7 @@
           >Return to this step to complete it.
         </router-link>
       </div>
-      <section class="px-6 my-2" v-if="hasHomeOwners || hasGroups">
+      <section class="px-6 my-2" v-if="hasHomeOwners || (hasGroups && showGroups)">
         <article class="border-btm py-5">
           <v-row no-gutters data-test-id="home-tenancy-type">
             <v-col cols="3"><span class="generic-label">Home Tenancy Type </span></v-col>
