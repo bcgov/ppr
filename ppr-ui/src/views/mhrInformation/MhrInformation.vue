@@ -59,7 +59,7 @@
                   :setShowFeeSummary="true"
                   :setFeeType="feeType"
                   :setErrMsg="transferErrorMsg"
-                  @cancel="cancel()"
+                  @cancel="goToDash()"
                   @back="isReviewMode = false"
                   @submit="goToReview()"
                 />
@@ -182,11 +182,6 @@ export default defineComponent({
       setMhrTransferCurrentHomeOwnerGroups(currentOwnerGroups)
     }
 
-    const cancel = async (): Promise<void> => {
-      if (hasUnsavedChanges.value === true) localState.showCancelDialog = true
-      else goToDash()
-    }
-
     const goToReview = async (): Promise<void> => {
       localState.validate = true
       if (localState.isReviewMode) {
@@ -204,9 +199,12 @@ export default defineComponent({
     }
 
     const goToDash = (): void => {
-      context.root.$router.push({
-        name: RouteNames.DASHBOARD
-      })
+      if (hasUnsavedChanges.value === true) localState.showCancelDialog = true
+      else {
+        context.root.$router.push({
+          name: RouteNames.DASHBOARD
+        })
+      }
     }
 
     const handleDialogResp = (val: boolean): void => {
@@ -223,8 +221,7 @@ export default defineComponent({
       getMhrTransferHomeOwners,
       getMhrTransferCurrentHomeOwners,
       ...toRefs(localState),
-      handleDialogResp,
-      cancel
+      handleDialogResp
     }
   }
 })
