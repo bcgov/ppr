@@ -15,6 +15,7 @@ import { SimpleHelpToggle } from '@/components/common'
 import { mockedPerson, mockedOrganization } from './test-data/mock-mhr-registration'
 import { getTestId } from './utils/helper-functions'
 import { MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF } from '@/interfaces'
+import { HomeTenancyTypes } from '@/enums'
 
 Vue.use(Vuetify)
 
@@ -379,7 +380,7 @@ describe('Home Owners', () => {
     expect(ownersTable.text()).toContain(mockedPerson.phoneNumber)
     ownersTable.findComponent(TableGroupHeader).vm.$data.cancelOrProceed(true, '123')
   })
-  
+
   it('should show correct error messages when deleting Owners from the Home Owners table', async () => {
     // Should show 'Group must contain at least one owner' when there are no Owners in a Group
     // Should show 'No owners added yet' when there are no Owners and no Groups
@@ -419,5 +420,45 @@ describe('Home Owners', () => {
     expect(ownersTable.find(getTestId('no-data-msg'))).toBeTruthy()
     expect(ownersTable.findAllComponents(TableGroupHeader).length).toBe(0) // no Groups exists
     expect(wrapper.findComponent(HomeOwners).vm.$data.getHomeOwners.length).toBe(0) // no Owners exists
+  })
+
+  it('should show correct Home Tenancy Type for MHR Registration', async () => {
+    const homeOwnerGroup = [{ groupId: '1', owners: [mockedPerson] }]
+
+    await store.dispatch('setMhrRegistrationHomeOwnerGroups', homeOwnerGroup)
+    await Vue.nextTick()
+
+    expect(wrapper.findComponent(HomeOwners).vm.$data.getMhrRegistrationHomeOwners.length).toBe(1)
+    expect(
+      wrapper
+        .findComponent(HomeOwners)
+        .find(getTestId('home-owner-tenancy-type'))
+        .text()
+    ).toBe(HomeTenancyTypes.SOLE)
+
+    // Add a second Owner to the Group
+    homeOwnerGroup.push({ groupId: '1', owners: [mockedOrganization] })
+
+    await store.dispatch('setMhrRegistrationHomeOwnerGroups', homeOwnerGroup)
+    await Vue.nextTick()
+
+    expect(wrapper.findComponent(HomeOwners).vm.$data.getMhrRegistrationHomeOwners.length).toBe(2)
+    expect(
+      wrapper
+        .findComponent(HomeOwners)
+        .find(getTestId('home-owner-tenancy-type'))
+        .text()
+    ).toBe(HomeTenancyTypes.JOINT)
+
+    // Enable Groups
+    wrapper.findComponent(HomeOwners).vm.$data.setShowGroups(true)
+    await Vue.nextTick()
+
+    expect(
+      wrapper
+        .findComponent(HomeOwners)
+        .find(getTestId('home-owner-tenancy-type'))
+        .text()
+    ).toBe(HomeTenancyTypes.COMMON)
   })
 })

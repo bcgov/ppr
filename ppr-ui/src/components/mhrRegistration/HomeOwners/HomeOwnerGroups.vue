@@ -87,16 +87,23 @@ export default defineComponent({
   props: {
     groupId: { type: String },
     fractionalData: { type: Object as () => FractionalOwnershipWithGroupIdIF },
-    isAddingHomeOwner: { type: Boolean } // makes additional Group available in dropdown when adding a new home owner
+    isAddingHomeOwner: { type: Boolean }, // makes additional Group available in dropdown when adding a new home owner
+    isMhrTransfer: { type: Boolean, default: false }
   },
 
   setup (props, { emit }) {
-    const { getMhrRegistrationHomeOwnerGroups } = useGetters<any>(['getMhrRegistrationHomeOwnerGroups'])
+    const { getMhrRegistrationHomeOwnerGroups, getMhrTransferHomeOwnerGroups } = useGetters<any>([
+      'getMhrRegistrationHomeOwnerGroups',
+      'getMhrTransferHomeOwnerGroups'
+    ])
     const groupDropdown = ref(null)
 
     const { required } = useInputRules()
-    const { getGroupDropdownItems, showGroups } = useHomeOwners()
-    const homeOwnerGroups = [...getMhrRegistrationHomeOwnerGroups.value]
+    const { getGroupDropdownItems, showGroups } = useHomeOwners(props.isMhrTransfer)
+    const getTransferOrRegistrationHomeOwnerGroups = () =>
+      props.isMhrTransfer ? getMhrTransferHomeOwnerGroups.value : getMhrRegistrationHomeOwnerGroups.value
+
+    const homeOwnerGroups = getTransferOrRegistrationHomeOwnerGroups()
 
     const localState = reactive({
       ownerGroupId: props.groupId,
@@ -107,10 +114,9 @@ export default defineComponent({
           ? required('Select a group for this owner')
           : []
       }),
-      groupFractionalData: find(getMhrRegistrationHomeOwnerGroups.value, { groupId: props.groupId }),
-      fractionalInfo: computed(() => props.fractionalData),
+      groupFractionalData: find(getTransferOrRegistrationHomeOwnerGroups(), { groupId: props.groupId }),
       showFractionalOwnership: computed(() => Number(localState.ownerGroupId) > 0),
-      allGroupsState: getMhrRegistrationHomeOwnerGroups.value
+      allGroupsState: getTransferOrRegistrationHomeOwnerGroups()
         .map(group => {
           return {
             groupId: group.groupId.toString(),

@@ -6,7 +6,7 @@ import {
 } from '@/interfaces'
 import '@/utils/use-composition-api'
 
-import { ref, computed, readonly, watch, toRefs } from '@vue/composition-api'
+import { ref, readonly, watch, toRefs } from '@vue/composition-api'
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import { HomeTenancyTypes } from '@/enums'
 import { MhrCompVal, MhrSectVal } from '@/composables/mhrRegistration/enums'
@@ -22,17 +22,19 @@ const isGlobalEditingMode = ref(false)
 // Flag is any of the Groups has no Owners
 const hasEmptyGroup = ref(false)
 
-export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = false) {
+export function useHomeOwners (isMhrTransfer: boolean = false) {
   const {
     getMhrRegistrationHomeOwners,
     getMhrRegistrationHomeOwnerGroups,
     getMhrRegistrationValidationModel,
-    getMhrTransferHomeOwnerGroups
+    getMhrTransferHomeOwnerGroups,
+    getMhrTransferHomeOwners
   } = useGetters<any>([
     'getMhrRegistrationHomeOwners',
     'getMhrRegistrationHomeOwnerGroups',
     'getMhrRegistrationValidationModel',
-    'getMhrTransferHomeOwnerGroups'
+    'getMhrTransferHomeOwnerGroups',
+    'getMhrTransferHomeOwners'
   ])
 
   const {
@@ -43,16 +45,17 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
     'setMhrTransferHomeOwnerGroups'
   ])
 
-  const { setValidation } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
+  // Get Transfer or Registration Home Owners
+  const getTransferOrRegistrationHomeOwners = (): MhrRegistrationHomeOwnerIF[] =>
+    isMhrTransfer ? getMhrTransferHomeOwners.value : getMhrRegistrationHomeOwners.value
 
-  // Title for left side bar
-  const getSideTitle = computed((): string => {
-    if (isPerson) {
-      return isEditMode ? 'Add a Person' : 'Edit Person'
-    } else {
-      return isEditMode ? 'Add a Business or Organization' : 'Edit Business'
-    }
-  })
+  const getTransferOrRegistrationHomeOwnerGroups = (): MhrRegistrationHomeOwnerGroupIF[] =>
+    isMhrTransfer ? getMhrTransferHomeOwnerGroups.value : getMhrRegistrationHomeOwnerGroups.value
+
+  const setTransferOrRegistrationHomeOwnerGroups = (homeOwnerGroups: MhrRegistrationHomeOwnerGroupIF[]) =>
+    isMhrTransfer ? setMhrTransferHomeOwnerGroups(homeOwnerGroups) : setMhrRegistrationHomeOwnerGroups(homeOwnerGroups)
+
+  const { setValidation } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
   // Show or hide groups in the owner's table
   const setShowGroups = show => {
@@ -65,12 +68,12 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
   }
 
   const getHomeTenancyType = (): HomeTenancyTypes => {
-    const numOfOwners = getMhrRegistrationHomeOwners.value?.length
+    const numOfOwners = getTransferOrRegistrationHomeOwners()?.length
 
     if (showGroups.value) {
       // At leas one group showing with one or more owners
       return HomeTenancyTypes.COMMON
-    } else if (numOfOwners === 1 && getMhrRegistrationHomeOwners.value[0].address !== undefined) {
+    } else if (numOfOwners === 1 && getTransferOrRegistrationHomeOwners()[0]?.address) {
       // One owner without groups showing
       // Added second condition, because when an owner exists as a Sole Ownership, editing and clicking Done,
       // will change status to Tenants in Common unless above logic is in place..
@@ -124,15 +127,17 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
 
     let numOfAdditionalGroupsInDropdown = 0
 
+    const homeOwnerGroups = getTransferOrRegistrationHomeOwnerGroups()
+
     if (isAddingHomeOwner) {
       numOfAdditionalGroupsInDropdown = 1
     } else {
       numOfAdditionalGroupsInDropdown =
-        find(getMhrRegistrationHomeOwnerGroups.value, { groupId: groupId })?.owners.length > 1 ? 1 : 0
+        find(homeOwnerGroups, { groupId: groupId })?.owners.length > 1 ? 1 : 0
     }
 
     if (showGroups.value) {
-      return Array(getMhrRegistrationHomeOwnerGroups.value.length + numOfAdditionalGroupsInDropdown)
+      return Array(homeOwnerGroups.length + numOfAdditionalGroupsInDropdown)
         .fill({})
         .map((v, i) => {
           return { text: 'Group ' + (i + 1), value: (i + 1).toString() }
@@ -148,7 +153,7 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
   }
 
   const getGroupForOwner = (ownerId: string, isTransfer = false): MhrRegistrationHomeOwnerGroupIF => {
-    const homeOwners = isTransfer ? getMhrTransferHomeOwnerGroups.value : getMhrRegistrationHomeOwnerGroups.value
+    const homeOwners = getTransferOrRegistrationHomeOwnerGroups()
 
     return find(homeOwners, group => {
       return find(group.owners, { id: ownerId })
@@ -245,7 +250,7 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
   }
 
   const setGroupFractionalInterest = (groupId: string, fractionalData: MhrRegistrationFractionalOwnershipIF): void => {
-    const homeOwnerGroups = [...getMhrRegistrationHomeOwnerGroups.value]
+    const homeOwnerGroups = getTransferOrRegistrationHomeOwnerGroups()
 
     const allGroupsTotals = homeOwnerGroups.map(group => group.interestTotal)
 
@@ -260,11 +265,11 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
       )
       const groupToUpdate = find(updatedGroups, { groupId: groupId }) as MhrRegistrationHomeOwnerGroupIF
       Object.assign(groupToUpdate, { ...updatedFractionalData })
-      setMhrRegistrationHomeOwnerGroups(updatedGroups)
+      setTransferOrRegistrationHomeOwnerGroups(updatedGroups)
     } else {
       const groupToUpdate = find(homeOwnerGroups, { groupId: groupId }) as MhrRegistrationHomeOwnerGroupIF
       Object.assign(groupToUpdate, { ...fractionalData })
-      setMhrRegistrationHomeOwnerGroups(homeOwnerGroups)
+      setTransferOrRegistrationHomeOwnerGroups(homeOwnerGroups)
     }
   }
 
@@ -319,15 +324,15 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
 
   // Do not show groups in the owner's table when there are no groups (e.g. after Group deletion)
   watch(
-    () => getMhrRegistrationHomeOwnerGroups.value,
+    () => getTransferOrRegistrationHomeOwnerGroups(),
     () => {
-      if (getMhrRegistrationHomeOwnerGroups.value.length === 0) {
+      if (getTransferOrRegistrationHomeOwnerGroups().length === 0) {
         setShowGroups(false)
       } else {
         // update group tenancy for all groups
-        getMhrRegistrationHomeOwnerGroups.value.every(group => set((group.type = getGroupTenancyType(group))))
+        getTransferOrRegistrationHomeOwnerGroups().every(group => set((group.type = getGroupTenancyType(group))))
         // check if at least one Owner Group has no owners. Used to display an error for the table.
-        hasEmptyGroup.value = !getMhrRegistrationHomeOwnerGroups.value.every(group => group.owners.length > 0)
+        hasEmptyGroup.value = !getTransferOrRegistrationHomeOwnerGroups().every(group => group.owners.length > 0)
       }
     }
   )
@@ -352,7 +357,6 @@ export function useHomeOwners (isPerson: boolean = false, isEditMode: boolean = 
     showGroups: readonly(showGroups),
     isGlobalEditingMode: readonly(isGlobalEditingMode),
     hasEmptyGroup: readonly(hasEmptyGroup),
-    getSideTitle,
     getHomeTenancyType,
     getTotalOwnershipAllocationStatus,
     addOwnerToTheGroup,
