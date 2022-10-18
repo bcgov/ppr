@@ -36,22 +36,52 @@ REGISTRATON_JOINT_PDFFILE = 'tests/unit/reports/data/registration-joint-example.
 REGISTRATON_MAIL_PDFFILE = 'tests/unit/reports/data/registration-mail-example.pdf'
 REGISTRATON_COVER_PDFFILE = 'tests/unit/reports/data/registration-cover-example.pdf'
 
-TRANSFER_TEST_DATAFILE = 'tests/unit/reports/data/trans-test-example.json'
-TRANSFER_TEST_PDFFILE = 'tests/unit/reports/data/trans-test-example.pdf'
+TRANSFER_TEST_SO_DATAFILE = 'tests/unit/reports/data/trans-test-example.json'
+TRANSFER_TEST_SO_PDFFILE = 'tests/unit/reports/data/trans-test-example-so.pdf'
+TRANSFER_TEST_JT_DATAFILE = 'tests/unit/reports/data/trans-test-example-jt.json'
+TRANSFER_TEST_JT_PDFFILE = 'tests/unit/reports/data/trans-test-example-jt.pdf'
+TRANSFER_TEST_TC_DATAFILE = 'tests/unit/reports/data/trans-test-example-tc.json'
+TRANSFER_TEST_TC_PDFFILE = 'tests/unit/reports/data/trans-test-example-tc.pdf'
 REPORT_VERSION_V2 = '2'
 
 
-def test_transfer_trans(session, client, jwt):
+def test_transfer_trans_so(session, client, jwt):
     """Assert that generation of a test report is as expected."""
     # setup
     if is_report_v2():
-        json_data = get_json_from_file(TRANSFER_TEST_DATAFILE)
+        json_data = get_json_from_file(TRANSFER_TEST_SO_DATAFILE)
         report = Report(json_data, 'PS12345', ReportTypes.MHR_TRANSFER, 'Account Name')
         # test
         content, status, headers = report.get_pdf()
         assert headers
         # verify
-        check_response(content, status, TRANSFER_TEST_PDFFILE)
+        check_response(content, status, TRANSFER_TEST_SO_PDFFILE)
+
+
+def test_transfer_trans_jt(session, client, jwt):
+    """Assert that generation of a test report is as expected."""
+    # setup
+    if is_report_v2():
+        json_data = get_json_from_file(TRANSFER_TEST_JT_DATAFILE)
+        report = Report(json_data, 'PS12345', ReportTypes.MHR_TRANSFER, 'Account Name')
+        # test
+        content, status, headers = report.get_pdf()
+        assert headers
+        # verify
+        check_response(content, status, TRANSFER_TEST_JT_PDFFILE)
+
+
+def test_transfer_trans_tc(session, client, jwt):
+    """Assert that generation of a test report is as expected."""
+    # setup
+    if is_report_v2():
+        json_data = get_json_from_file(TRANSFER_TEST_TC_DATAFILE)
+        report = Report(json_data, 'PS12345', ReportTypes.MHR_TRANSFER, 'Account Name')
+        # test
+        content, status, headers = report.get_pdf()
+        assert headers
+        # verify
+        check_response(content, status, TRANSFER_TEST_TC_PDFFILE)
 
 
 def test_registration_test(session, client, jwt):

@@ -49,7 +49,7 @@
     >
       <div v-if="!!item.registrationType">
         {{ getRegistrationType(item.registrationType) }}
-        <span v-if="!isChild"> - Base Registration</span>
+        <span v-if="isPpr && !isChild"> - Base Registration</span>
       </div>
       <div v-else class="pr-2">{{ item.registrationDescription }}</div>
       <v-btn
@@ -337,6 +337,46 @@
           </v-menu>
         </v-col>
       </v-row>
+
+      <!-- MHR DRAFT ACTIONS -->
+      <v-row v-else-if="!isPpr && isDraft(item)" class="actions" no-gutters>
+        <v-col class="edit-action pa-0" cols="auto">
+          <v-btn
+            color="primary"
+            elevation="0"
+            width="100"
+            :class="$style['edit-btn']"
+            @click="openMhr(item)"
+          >
+            <span>Edit</span>
+          </v-btn>
+        </v-col>
+        <v-col class="actions__more pa-0">
+          <v-menu offset-y left nudge-bottom="4" @input="freezeScrolling($event)">
+            <template v-slot:activator="{ on: onMenu, value }">
+              <v-btn
+                small
+                elevation="0"
+                v-on="onMenu"
+                color="primary"
+                class="actions__more-actions__btn reg-table"
+                :class="$style['down-btn']"
+              >
+                <v-icon v-if="value">mdi-menu-up</v-icon>
+                <v-icon v-else>mdi-menu-down</v-icon>
+              </v-btn>
+            </template>
+            <v-list class="actions__more-actions registration-actions">
+              <v-list-item @click="removeMhrDraft(item)">
+                <v-list-item-subtitle>
+                  <v-icon small>mdi-delete</v-icon>
+                  <span class="ml-1">Delete Draft</span>
+                </v-list-item-subtitle>
+              </v-list-item>
+            </v-list>
+          </v-menu>
+        </v-col>
+      </v-row>
     </td>
   </tr>
 </template>
@@ -509,6 +549,10 @@ export default defineComponent({
       })
     }
 
+    const removeMhrDraft = (item: MhRegistrationSummaryIF): void => {
+      emit('action', { action: TableActions.REMOVE_TRANSFER_DRAFT, regNum: item.draftNumber })
+    }
+
     const getRegistrationClass = (regClass: string): string => {
       return UIRegistrationClassTypes[regClass]
     }
@@ -552,8 +596,8 @@ export default defineComponent({
     }
 
     const isDraft = (item: any): boolean => {
-      // RegistrationSummaryIF | DraftResultIF
-      return item.type !== undefined
+      // RegistrationSummaryIF | DraftResultIF | MhrDraftTransferApiIF
+      return props.isPpr ? item.type !== undefined : item.statusType === undefined
     }
 
     const isExpired = (item: RegistrationSummaryIF): boolean => {
@@ -683,6 +727,7 @@ export default defineComponent({
       tooltipTxtPdf,
       openMhr,
       isEnabledMhr,
+      removeMhrDraft,
       ...toRefs(localState)
     }
   }

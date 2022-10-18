@@ -48,15 +48,6 @@
 </div>
 {% endif %}
 
-{% if change.addVehicleCollateral is defined or change.deleteVehicleCollateral is defined or
-    change.addGeneralCollateral is defined or change.deleteGeneralCollateral is defined %}
-<div class="container pt-4">
-    <div class="section-data">Other vehicle or general collateral/proceeds description exists on this registration.  
-        To obtain complete details, it will be necessary to request a registration number search.
-    </div>
-</div>
-{% endif %}
-
 <div class="container pt-4">
 
   [[search-result/registeringParty.html]]

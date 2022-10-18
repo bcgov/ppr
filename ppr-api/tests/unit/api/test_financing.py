@@ -429,7 +429,8 @@ TEST_VERIFICATION_CALLBACK_DATA = [
     ('Invalid reg id', HTTPStatus.NOT_FOUND, 300000005, 200000022),
     ('Missing party id', HTTPStatus.BAD_REQUEST, 200000010, None),
     ('Invalid party id', HTTPStatus.NOT_FOUND, 200000010, 300000022),
-    ('Max retries exceeded', HTTPStatus.INTERNAL_SERVER_ERROR, 200000030, 9999999)
+    ('Max retries exceeded', HTTPStatus.INTERNAL_SERVER_ERROR, 200000030, 9999999),
+    ('Unauthorized', HTTPStatus.UNAUTHORIZED, 200000010, 300000022)
 ]
 
 
@@ -779,11 +780,18 @@ def test_callback_verification_report_data(session, client, jwt, desc, status, r
         del json_data['registrationId']
     if party_id is None:
         del json_data['partyId']
+    headers = None
+    if status != HTTPStatus.UNAUTHORIZED:
+        apikey = current_app.config.get('SUBSCRIPTION_API_KEY')
+        if apikey:
+            headers = {
+                'x-apikey': apikey
+            }
 
     # test
     rv = client.post('/api/v1/financing-statements/verification-callback',
                      json=json_data,
-                     headers=None,
+                     headers=headers,
                      content_type='application/json')
     # check
     assert rv.status_code == status

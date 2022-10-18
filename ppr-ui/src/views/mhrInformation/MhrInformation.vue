@@ -36,6 +36,7 @@
                   isMhrTransfer
                   isReadonlyTable
                   :homeOwners="getMhrTransferHomeOwners"
+                  :currentHomeOwners="getMhrTransferCurrentHomeOwners"
                 />
               </template>
 
@@ -45,6 +46,7 @@
               </template>
             </section>
 
+            <TransferDetails :validateTransferDetails="validateTransferDetails" />
           </v-col>
           <v-col class="pl-6 pt-5" cols="3">
             <aside>
@@ -61,6 +63,7 @@
                   :setErrMsg="transferErrorMsg"
                   @cancel="goToDash()"
                   @back="isReviewMode = false"
+                  @save="onSave()"
                   @submit="goToReview()"
                 />
               </affix>
@@ -77,11 +80,18 @@ import { computed, defineComponent, onMounted, reactive, toRefs } from '@vue/com
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { RouteNames } from '@/enums'
-import { fetchMhRegistration, pacificDate, submitMhrTransfer } from '@/utils'
+import {
+  createMhrTransferDraft,
+  fetchMhRegistration,
+  getMhrTransferDraft,
+  pacificDate,
+  submitMhrTransfer, updateMhrDraft
+} from '@/utils'
 import { StickyContainer } from '@/components/common'
 import { useHomeOwners, useMhrInformation } from '@/composables'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
+import TransferDetails from '@/components/mhrTransfers/TransferDetails.vue'
 import { HomeOwners } from '@/views'
 import { BaseDialog } from '@/components/dialogs'
 import { unsavedChangesDialog } from '@/resources/dialogOptions'
@@ -91,6 +101,7 @@ export default defineComponent({
   components: {
     BaseDialog,
     HomeOwners,
+    TransferDetails,
     HomeOwnersTable,
     StickyContainer
   },
@@ -98,6 +109,10 @@ export default defineComponent({
     appReady: {
       type: Boolean,
       default: false
+    },
+    isMhrTransfer: {
+      type: Boolean,
+      default: true
     }
   },
   setup (props, context) {
@@ -116,19 +131,22 @@ export default defineComponent({
     const { setEmptyMhrTransfer } = useActions<any>(['setEmptyMhrTransfer'])
 
     const {
+      isTransferDetailsValid,
       initMhrTransfer,
       buildApiData
     } = useMhrInformation()
 
     const {
-      isGlobalEditingMode
-    } = useHomeOwners()
+      isGlobalEditingMode,
+      setShowGroups
+    } = useHomeOwners(props.isMhrTransfer)
 
     const localState = reactive({
       dataLoaded: false,
       loading: false,
       isReviewMode: false,
       validate: false,
+      validateTransferDetails: false,
       feeType: FeeSummaryTypes.MHR_TRANSFER, // FUTURE STATE: To be dynamic, dependent on what changes have been made
       isAuthenticated: computed((): boolean => {
         return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
@@ -140,7 +158,7 @@ export default defineComponent({
         return localState.isReviewMode ? 'Back' : ''
       }),
       isValidTransfer: computed((): boolean => {
-        return !isGlobalEditingMode.value && true // Get Owner Count here > 1 etc
+        return !isGlobalEditingMode.value && isTransferDetailsValid.value && true // Get Owner Count here > 1 etc
       }),
       transferErrorMsg: computed((): string => {
         return localState.validate && !localState.isValidTransfer ? '< Please make any required changes' : ''
@@ -172,11 +190,34 @@ export default defineComponent({
       await setUnsavedChanges(false)
     })
 
+    // Future state to parse all relevant MHR Information
     const parseMhrInformation = async (): Promise<void> => {
-      // Future state to parse all relevant MHR Information
+      await parseCurrentOwnerGroups()
+    }
+
+    const parseCurrentOwnerGroups = async (): Promise<void> => {
       const { data } = await fetchMhRegistration(getMhrInformation.value.mhrNumber)
       const currentOwnerGroups = data?.ownerGroups || [] // Safety check. Should always have ownerGroups
-      setMhrTransferHomeOwnerGroups(currentOwnerGroups)
+      // Create an ID to each individual owner for UI Tracking
+      // TODO: Remove after API updates to include the ID for Owners
+      currentOwnerGroups.forEach(ownerGroup => {
+        for (const [index, owner] of ownerGroup.owners.entries()) {
+          owner.id = ownerGroup.groupId + (index + 1)
+        }
+        // TODO: refactor all group Ids to be numbers as per spec
+        ownerGroup.groupId = ownerGroup.groupId.toString()
+      })
+      setShowGroups(currentOwnerGroups.length > 1)
+
+      // Set owners to store
+      if (getMhrInformation.value.draftNumber) {
+        // Retrieve owners from draft if it exists
+        const { registration } = await getMhrTransferDraft(getMhrInformation.value.draftNumber)
+        setMhrTransferHomeOwnerGroups(registration.addOwnerGroups)
+      } else {
+        // Set current owners if there is no draft
+        setMhrTransferHomeOwnerGroups(currentOwnerGroups)
+      }
 
       // Store a snapshot of the existing OwnerGroups for baseline of current state
       setMhrTransferCurrentHomeOwnerGroups(currentOwnerGroups)
@@ -184,6 +225,7 @@ export default defineComponent({
 
     const goToReview = async (): Promise<void> => {
       localState.validate = true
+      localState.validateTransferDetails = true
       if (localState.isReviewMode) {
         localState.loading = true
         const mhrTransferFiling = await submitMhrTransfer(buildApiData(), getMhrInformation.value.mhrNumber)
@@ -196,6 +238,18 @@ export default defineComponent({
       if (localState.isValidTransfer) {
         localState.isReviewMode = true
       }
+    }
+
+    const onSave = async (): Promise<void> => {
+      localState.loading = true
+      const mhrTransferDraft = getMhrInformation.value.draftNumber
+        ? await updateMhrDraft(getMhrInformation.value.draftNumber, buildApiData())
+        : await createMhrTransferDraft(buildApiData())
+      localState.loading = false
+
+      !mhrTransferDraft.error
+        ? goToDash()
+        : console.log(mhrTransferDraft?.error) // Handle Schema or Api errors here..
     }
 
     const goToDash = (): void => {
@@ -217,11 +271,12 @@ export default defineComponent({
 
     return {
       goToReview,
+      onSave,
       goToDash,
       getMhrTransferHomeOwners,
       getMhrTransferCurrentHomeOwners,
-      ...toRefs(localState),
-      handleDialogResp
+      handleDialogResp,
+      ...toRefs(localState)
     }
   }
 })

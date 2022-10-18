@@ -1,713 +1,850 @@
 {
+  "searchDateTime": "2022-06-15T18:30:58+00:00",
+  "exactResultsSize": 1,
+  "similarResultsSize": 6,
+  "searchQuery": {
+    "type": "SERIAL_NUMBER",
+    "criteria": {"value": "12345"},
+    "clientReferenceId": ""
+  },
   "details": [
     {
+      "matchType": "SIMILAR",
       "financingStatement": {
-        "baseRegistrationNumber": "TEST0001", 
-        "changes": [
-          {
-            "addSecuredParties": [
-              {
-                "address": {
-                  "city": "city", 
-                  "country": "CA", 
-                  "postalCode": "V8R3A5", 
-                  "region": "BC", 
-                  "street": "TEST-00C9", 
-                  "streetAdditional": "line 2"
-                }, 
-                "businessName": "TEST 9 CHANGE TRANSFER SECURED PARTY", 
-                "former_name": "TEST 7 AMEND SECURED PARTY", 
-                "partyId": 200000026, 
-                "reg_id": 200000010
-              }
-            ], 
-            "baseRegistrationNumber": "TEST0001", 
-            "changeRegistrationNumber": "TEST0009", 
-            "changeType": "ST", 
-            "clientReferenceId": "TEST-CH-0009", 
-            "createDateTime": "2021-07-15T15:56:58+00:00", 
-            "deleteSecuredParties": [
-              {
-                "address": {
-                  "city": "city", 
-                  "country": "CA", 
-                  "postalCode": "V8R3A5", 
-                  "region": "BC", 
-                  "street": "TEST-00A7", 
-                  "streetAdditional": "line 2"
-                }, 
-                "businessName": "TEST 7 AMEND SECURED PARTY", 
-                "partyId": 200000022, 
-                "reg_id": 200000010
-              }
-            ], 
-            "registeringParty": {
-              "address": {
-                "city": "city", 
-                "country": "CA", 
-                "postalCode": "V8R3A5", 
-                "region": "BC", 
-                "street": "TEST-00C9", 
-                "streetAdditional": "line 2"
-              }, 
-              "personName": {
-                "first": "TEST-CHANGE-DT", 
-                "last": "REGISTERING", 
-                "middle": "9"
-              }
-            }, 
-            "statementType": "CHANGE_STATEMENT"
-          }, 
-          {
-            "addDebtors": [
-              {
-                "address": {
-                  "city": "city", 
-                  "country": "CA", 
-                  "postalCode": "V8R3A5", 
-                  "region": "BC", 
-                  "street": "TEST-00C8", 
-                  "streetAdditional": "line 2"
-                }, 
-                "businessName": "TEST 8 TRANSFER DEBTOR", 
-                "former_name": "TEST 7 AMEND DEBTOR", 
-                "partyId": 200000024, 
-                "reg_id": 200000009
-              }
-            ], 
-            "baseRegistrationNumber": "TEST0001", 
-            "changeRegistrationNumber": "TEST0008", 
-            "changeType": "DT", 
-            "clientReferenceId": "TEST-CH-0008", 
-            "createDateTime": "2021-07-15T15:51:58+00:00", 
-            "deleteDebtors": [
-              {
-                "address": {
-                  "city": "city", 
-                  "country": "CA", 
-                  "postalCode": "V8R3A5", 
-                  "region": "BC", 
-                  "street": "TEST-00A7", 
-                  "streetAdditional": "line 2"
-                }, 
-                "businessName": "TEST 7 AMEND DEBTOR", 
-                "partyId": 200000021, 
-                "reg_id": 200000009
-              }
-            ], 
-            "registeringParty": {
-              "address": {
-                "city": "city", 
-                "country": "CA", 
-                "postalCode": "V8R3A5", 
-                "region": "BC", 
-                "street": "TEST-00C8", 
-                "streetAdditional": "line 2"
-              }, 
-              "personName": {
-                "first": "TEST-CHANGE-DT", 
-                "last": "REGISTERING", 
-                "middle": "8"
-              }
-            }, 
-            "statementType": "CHANGE_STATEMENT"
-          }, 
-          {
-            "addDebtors": [
-              {
-                "address": {
-                  "city": "city", 
-                  "country": "CA", 
-                  "postalCode": "V8R3A5", 
-                  "region": "BC", 
-                  "street": "TEST-00A7", 
-                  "streetAdditional": "line 2"
-                }, 
-                "businessName": "TEST 7 AMEND DEBTOR", 
-                "former_name": "", 
-                "partyId": 200000021, 
-                "reg_id": 200000008
-              }
-            ], 
-            "addGeneralCollateral": [
-              {
-                "collateralId": 200000002, 
-                "description": "TEST GENERAL COLLATERAL AMEND ADD.", 
-                "reg_id": 200000008
-              }
-            ], 
-            "addSecuredParties": [
-              {
-                "address": {
-                  "city": "city", 
-                  "country": "CA", 
-                  "postalCode": "V8R3A5", 
-                  "region": "BC", 
-                  "street": "TEST-00A7", 
-                  "streetAdditional": "line 2"
-                }, 
-                "businessName": "TEST 7 AMEND SECURED PARTY", 
-                "former_name": "TEST 1 SECURED PARTY", 
-                "partyId": 200000022, 
-                "reg_id": 200000008
-              }
-            ], 
-            "addVehicleCollateral": [
-              {
-                "make": "FORD", 
-                "model": "FIESTA", 
-                "reg_id": 200000008, 
-                "serialNumber": "T346JU622994", 
-                "type": "MV", 
-                "vehicleId": 200000006, 
-                "year": 2018
-              }
-            ], 
-            "amendmentRegistrationNumber": "TEST0007", 
-            "baseRegistrationNumber": "TEST0001", 
-            "changeType": "CO", 
-            "clientReferenceId": "TEST-AM-0007", 
-            "courtOrderInformation": {
-              "courtName": "Supreme Court of British Columbia", 
-              "courtRegistry": "Victoria", 
-              "effectOfOrder": "Court Order to change something.", 
-              "fileNumber": "BC123495", 
-              "orderDate": "2022-01-31T15:41:58+00:00"
-            }, 
-            "createDateTime": "2021-07-15T15:46:58+00:00", 
-            "deleteDebtors": [
-              {
-                "address": {
-                  "city": "city", 
-                  "country": "CA", 
-                  "postalCode": "V8R3A5", 
-                  "region": "BC", 
-                  "street": "TEST-0001", 
-                  "streetAdditional": "line 2"
-                }, 
-                "partyId": 200000001, 
-                "personName": {
-                  "first": "TEST IND", 
-                  "last": "DEBTOR", 
-                  "middle": "1"
-                }, 
-                "reg_id": 200000008
-              }
-            ], 
-            "deleteGeneralCollateral": [
-              {
-                "collateralId": 200000001, 
-                "description": "TEST0001 GC 2", 
-                "reg_id": 200000008
-              }
-            ], 
-            "deleteSecuredParties": [
-              {
-                "address": {
-                  "city": "city", 
-                  "country": "CA", 
-                  "postalCode": "V8R3A5", 
-                  "region": "BC", 
-                  "street": "TEST-0001", 
-                  "streetAdditional": "line 2"
-                }, 
-                "businessName": "TEST 1 SECURED PARTY", 
-                "partyId": 200000003, 
-                "reg_id": 200000008
-              }
-            ], 
-            "deleteVehicleCollateral": [
-              {
-                "make": "HOMCO IND. LTD DIPLOMAT", 
-                "manufacturedHomeRegistrationNumber": "021324", 
-                "reg_id": 200000008, 
-                "serialNumber": "9407", 
-                "type": "MH", 
-                "vehicleId": 200000001, 
-                "year": 2001
-              }
-            ], 
-            "description": "Description of court order.", 
-            "registeringParty": {
-              "address": {
-                "city": "city", 
-                "country": "CA", 
-                "postalCode": "V8R3A5", 
-                "region": "BC", 
-                "street": "TEST-00A7", 
-                "streetAdditional": "line 2"
-              }, 
-              "personName": {
-                "first": "TEST-AMEND-CO", 
-                "last": "REGISTERING", 
-                "middle": "7"
-              }
-            }, 
-            "statementType": "AMENDMENT_STATEMENT"
-          }, 
-          {
-            "addGeneralCollateral": [
-              {
-                "collateralId": 200000003, 
-                "description": "TEST GENERAL COLLATERAL CHANGE ADD.", 
-                "reg_id": 200000011
-              }
-            ], 
-            "addVehicleCollateral": [
-              {
-                "make": "BMW", 
-                "model": "Z4", 
-                "reg_id": 200000011, 
-                "serialNumber": "JU622994", 
-                "type": "MV", 
-                "vehicleId": 200000007, 
-                "year": 2014
-              }, 
-              {
-                "make": "HOMCO IND. LTD DIPLOMAT", 
-                "manufacturedHomeRegistrationNumber": "220000", 
-                "reg_id": 200000011, 
-                "serialNumber": "999999", 
-                "type": "MH", 
-                "vehicleId": 200000008, 
-                "year": 2012
-              }
-            ], 
-            "baseRegistrationNumber": "TEST0001", 
-            "changeRegistrationNumber": "TEST0010", 
-            "changeType": "SU", 
-            "clientReferenceId": "TEST-CH-0010", 
-            "createDateTime": "2021-07-15T15:41:58+00:00", 
-            "deleteGeneralCollateral": [
-              {
-                "collateralId": 200000002, 
-                "description": "TEST GENERAL COLLATERAL AMEND ADD.", 
-                "reg_id": 200000011
-              }
-            ], 
-            "deleteVehicleCollateral": [
-              {
-                "make": "FORD", 
-                "model": "FIESTA", 
-                "reg_id": 200000011, 
-                "serialNumber": "T346JU622994", 
-                "type": "MV", 
-                "vehicleId": 200000006, 
-                "year": 2018
-              }
-            ], 
-            "registeringParty": {
-              "address": {
-                "city": "city", 
-                "country": "CA", 
-                "postalCode": "V8R3A5", 
-                "region": "BC", 
-                "street": "TEST-0010", 
-                "streetAdditional": "line 2"
-              }, 
-              "personName": {
-                "first": "TEST-CHANGE-SU", 
-                "last": "REGISTERING", 
-                "middle": "10"
-              }
-            }, 
-            "statementType": "CHANGE_STATEMENT"
-          }
-        ], 
-        "clientReferenceId": "TEST-SA-0001", 
-        "courtOrderInformation": {
-          "courtName": "Supreme Court of British Columbia", 
-          "courtRegistry": "Victoria", 
-          "effectOfOrder": "Court Order to change something.", 
-          "fileNumber": "BC123495", 
-          "orderDate": "2022-01-31T15:41:58+00:00"
-        }, 
-        "createDateTime": "2021-07-15T15:41:58+00:00", 
-        "debtors": [
-          {
-            "address": {
-              "city": "city", 
-              "country": "CA", 
-              "postalCode": "V8R3A5", 
-              "region": "BC", 
-              "street": "TEST-0001", 
-              "streetAdditional": "line 2"
-            }, 
-            "businessName": "TEST BUS 2 DEBTOR", 
-            "partyId": 200000002
-          }, 
-          {
-            "added": true, 
-            "address": {
-              "city": "city", 
-              "country": "CA", 
-              "postalCode": "V8R3A5", 
-              "region": "BC", 
-              "street": "TEST-00C8", 
-              "streetAdditional": "line 2"
-            }, 
-            "businessName": "TEST 8 TRANSFER DEBTOR", 
-            "partyId": 200000024
-          }
-        ], 
-        "expiryDate": "2023-07-15T15:41:58+00:00", 
-        "generalCollateral": [
-          {
-            "collateralId": 200000000, 
-            "description": "TEST0001 GC 1"
-          }, 
-          {
-            "added": true, 
-            "collateralId": 200000003, 
-            "description": "TEST GENERAL COLLATERAL CHANGE ADD."
-          }
-        ], 
-        "lifeYears": 2, 
+        "statusType": "ACT",
+        "type": "SA",
+        "baseRegistrationNumber": "086978E",
+        "registrationDescription": "PPSA SECURITY AGREEMENT",
+        "registrationAct": "PERSONAL PROPERTY SECURITY ACT",
+        "createDateTime": "2007-12-12T23:13:56+00:00",
         "registeringParty": {
+          "businessName": "CHUDIAK, SCHMIT & CO.",
           "address": {
-            "city": "city", 
-            "country": "CA", 
-            "postalCode": "V8R3A5", 
-            "region": "BC", 
-            "street": "TEST-0001", 
-            "streetAdditional": "line 2"
-          }, 
-          "personName": {
-            "first": "TEST", 
-            "last": "REGISTERING", 
-            "middle": "1"
+            "street": "531 REID STREET",
+            "city": "QUESNEL",
+            "region": "BC",
+            "country": "CA",
+            "postalCode": "V2J 2M8"
           }
-        }, 
-        "registrationAct": "PPSA SECURITY ACT", 
-        "registrationDescription": "PPSA SECURITY AGREEMENT", 
+        },
         "securedParties": [
           {
+            "partyId": 4269984,
+            "businessName": "NORTHLAND MORTGAGES QUESNEL LTD.",
             "address": {
-              "city": "city", 
-              "country": "CA", 
-              "postalCode": "V8R3A5", 
-              "region": "BC", 
-              "street": "TEST 200000000", 
-              "streetAdditional": "line 2"
-            }, 
-            "businessName": "TEST PARTY CODE 1", 
-            "code": "200000000", 
-            "emailAddress": "test-sp-client@gmail.com", 
-            "partyId": 200000004
-          }, 
-          {
-            "added": true, 
-            "address": {
-              "city": "city", 
-              "country": "CA", 
-              "postalCode": "V8R3A5", 
-              "region": "BC", 
-              "street": "TEST-00C9", 
-              "streetAdditional": "line 2"
-            }, 
-            "businessName": "TEST 9 CHANGE TRANSFER SECURED PARTY", 
-            "partyId": 200000026
-          }
-        ], 
-        "statusType": "ACT", 
-        "trustIndenture": true, 
-        "type": "SA", 
-        "vehicleCollateral": [
-          {
-            "make": "HYUNDAI", 
-            "model": "TUSCON", 
-            "serialNumber": "KM8J3CA46JU622994", 
-            "type": "MV", 
-            "vehicleId": 200000000, 
-            "year": 2018
-          }, 
-          {
-            "added": true, 
-            "make": "BMW", 
-            "model": "Z4", 
-            "serialNumber": "JU622994", 
-            "type": "MV", 
-            "vehicleId": 200000007, 
-            "year": 2014
-          }, 
-          {
-            "added": true, 
-            "make": "HOMCO IND. LTD DIPLOMAT", 
-            "manufacturedHomeRegistrationNumber": "220000", 
-            "serialNumber": "999999", 
-            "type": "MH", 
-            "vehicleId": 200000008, 
-            "year": 2012
-          }
-        ]
-      }, 
-      "matchType": "EXACT"
-    }, 
-    {
-      "financingStatement": {
-        "baseRegistrationNumber": "TEST0004", 
-        "changes": [
-          {
-            "baseRegistrationNumber": "TEST0004", 
-            "clientReferenceId": "TEST-DIS-0004", 
-            "createDateTime": "2021-07-16T15:41:58+00:00", 
-            "dischargeRegistrationNumber": "TEST00D4", 
-            "registeringParty": {
-              "address": {
-                "city": "city", 
-                "country": "CA", 
-                "postalCode": "V8R3A5", 
-                "region": "BC", 
-                "street": "TEST-00D4", 
-                "streetAdditional": "line 2"
-              }, 
-              "personName": {
-                "first": "TEST-DISCHARGE", 
-                "last": "REGISTERING", 
-                "middle": "4"
-              }
-            }, 
-            "statementType": "DISCHARGE_STATEMENT"
-          }
-        ], 
-        "clientReferenceId": "TEST-SA-0004", 
-        "createDateTime": "2021-07-15T15:41:58+00:00", 
-        "debtors": [
-          {
-            "address": {
-              "city": "city", 
-              "country": "CA", 
-              "postalCode": "V8R3A5", 
-              "region": "BC", 
-              "street": "TEST-0004", 
-              "streetAdditional": "line 2"
-            }, 
-            "partyId": 200000012, 
-            "personName": {
-              "first": "TEST IND", 
-              "last": "DEBTOR", 
-              "middle": "4"
+              "street": "254 REID STREET",
+              "city": "QUESNEL",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V2J 2M2"
             }
           }
-        ], 
-        "dischargedDateTime": "2021-07-16T15:41:58+00:00", 
-        "expiryDate": "2023-07-15T15:41:58+00:00", 
-        "lifeYears": 2, 
-        "registeringParty": {
-          "address": {
-            "city": "city", 
-            "country": "CA", 
-            "postalCode": "V8R3A5", 
-            "region": "BC", 
-            "street": "TEST-0004", 
-            "streetAdditional": "line 2"
-          }, 
-          "personName": {
-            "first": "TEST", 
-            "last": "REGISTERING", 
-            "middle": "4"
-          }
-        }, 
-        "registrationAct": "PPSA SECURITY ACT", 
-        "registrationDescription": "PPSA SECURITY AGREEMENT", 
-        "securedParties": [
+        ],
+        "debtors": [
           {
+            "partyId": 82461,
+            "personName": {
+              "first": "ROY",
+              "last": "CHERRY",
+              "middle": "CHRISTIE"
+            },
             "address": {
-              "city": "city", 
-              "country": "CA", 
-              "postalCode": "V8R3A5", 
-              "region": "BC", 
-              "street": "TEST-0004", 
-              "streetAdditional": "line 2"
-            }, 
-            "businessName": "TEST 4 SECURED PARTY", 
-            "partyId": 200000013
+              "street": "R5 4531 NAZKO HIGHWAY BOX 4473",
+              "city": "QUESNEL",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V2J 3J4"
+            }
+          },
+          {
+            "partyId": 82462,
+            "businessName": "R C CONTRACTING LTD.",
+            "address": {
+              "street": "1427 NORTH FRASER DRIVE",
+              "city": "QUESNEL",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V2J 1Z8"
+            }
           }
-        ], 
-        "statusType": "HDC", 
-        "trustIndenture": true, 
-        "type": "SA", 
+        ],
         "vehicleCollateral": [
           {
-            "make": "HONDA", 
-            "model": "CIVIC", 
-            "serialNumber": "JU622994", 
-            "type": "MV", 
-            "vehicleId": 200000004, 
-            "year": 2018
+            "vehicleId": 22266,
+            "type": "MV",
+            "make": "MASSEY",
+            "model": "TRACTOR",
+            "serialNumber": "D13043 1916 9"
+          },
+          {
+            "vehicleId": 22267,
+            "type": "MV",
+            "make": "MASSEY",
+            "model": "TRACTOR",
+            "serialNumber": "V06213"
+          },
+          {
+            "vehicleId": 22268,
+            "type": "MV",
+            "make": "D7 CAT",
+            "model": "-",
+            "serialNumber": "17A14759"
+          },
+          {
+            "vehicleId": 22269,
+            "type": "MV",
+            "make": "CLEARING BLADE",
+            "model": "-",
+            "serialNumber": "205 72"
+          },
+          {
+            "vehicleId": 22270,
+            "type": "MV",
+            "year": 2000,
+            "make": "HESSTON SWATHER 1320",
+            "model": "-",
+            "serialNumber": "1320 00629"
+          },
+          {
+            "vehicleId": 22271,
+            "type": "MV",
+            "year": 1999,
+            "make": "BRILLION 10' SEEDER SST10",
+            "model": "-",
+            "serialNumber": "SST10106"
+          },
+          {
+            "vehicleId": 22272,
+            "type": "MV",
+            "year": 1998,
+            "make": "HESSTON 540 ROUND BALER",
+            "model": "-",
+            "serialNumber": "R540 02575"
+          },
+          {
+            "vehicleId": 22273,
+            "type": "MV",
+            "make": "AERWAY 10' MODEL AW100Q",
+            "model": "-",
+            "serialNumber": "BR56N"
+          },
+          {
+            "vehicleId": 22274,
+            "type": "MV",
+            "make": "VICON SPREADER",
+            "model": "-",
+            "serialNumber": "VIC PF754 14045YO"
+          },
+          {
+            "vehicleId": 22275,
+            "type": "MV",
+            "make": "VICON HOPPER EXT.",
+            "model": "-",
+            "serialNumber": "VIC PS1653HE 149"
+          },
+          {
+            "vehicleId": 22276,
+            "type": "MV",
+            "make": "BALE KING PROCESSOR",
+            "model": "-",
+            "serialNumber": "08934"
+          },
+          {
+            "vehicleId": 22277,
+            "type": "MV",
+            "make": "MASSEY",
+            "model": "-",
+            "serialNumber": "001752"
+          },
+          {
+            "vehicleId": 22278,
+            "type": "MV",
+            "year": 1995,
+            "make": "FEATHERLITE HORSE TRAILER",
+            "model": "-",
+            "serialNumber": "4FGL16204SA911112"
+          },
+          {
+            "vehicleId": 22279,
+            "type": "MV",
+            "make": "ROME PLOWCO IAW",
+            "model": "-",
+            "serialNumber": "1AW1077"
+          },
+          {
+            "vehicleId": 22280,
+            "type": "MV",
+            "make": "HORWOOD WAKE STUMP RAKE",
+            "model": "-",
+            "serialNumber": "SN12345"
+          },
+          {
+            "vehicleId": 22281,
+            "type": "MV",
+            "year": 1992,
+            "make": "WESTERN STAR",
+            "model": "TANDEM AXLE",
+            "serialNumber": "2WLNCCCG9NK929811"
+          },
+          {
+            "vehicleId": 22283,
+            "type": "MV",
+            "year": 1992,
+            "make": "WESTERN STAR",
+            "model": "SINGLE AXEL",
+            "serialNumber": "2WLNACFDONK929803"
           }
-        ]
-      }, 
-      "matchType": "EXACT"
-    }, 
-    {
-      "financingStatement": {
-        "baseRegistrationNumber": "TEST0005", 
+        ],
+        "trustIndenture": false,
+        "lifeYears": 16,
+        "expiryDate": "2023-12-13T07:59:59+00:00",
         "changes": [
           {
-            "baseRegistrationNumber": "TEST0005", 
-            "clientReferenceId": "TEST-REN-0005", 
-            "createDateTime": "2021-07-15T15:46:58+00:00", 
-            "expiryDate": "2023-07-15T15:41:58+00:00", 
-            "lifeYears": 2, 
+            "baseRegistrationNumber": "086978E",
+            "createDateTime": "2020-11-04T00:48:40+00:00",
+            "renewalRegistrationNumber": "572403M",
             "registeringParty": {
+              "businessName": "NORTHLAND MORTGAGES QUESNEL LTD.",
               "address": {
-                "city": "city", 
-                "country": "CA", 
-                "postalCode": "V8R3A5", 
-                "region": "BC", 
-                "street": "TEST-00R5", 
-                "streetAdditional": "line 2"
-              }, 
-              "personName": {
-                "first": "TEST-RENEWAL", 
-                "last": "REGISTERING", 
-                "middle": "5"
+                "street": "254 REID STREET",
+                "city": "QUESNEL",
+                "region": "BC",
+                "country": "CA"
               }
-            }, 
-            "renewalRegistrationNumber": "TEST00R5", 
+            },
+            "lifeYears": 3,
+            "expiryDate": "2023-12-13T07:59:59+00:00",
+            "statementType": "RENEWAL_STATEMENT"
+          },
+          {
+            "baseRegistrationNumber": "086978E",
+            "createDateTime": "2017-04-28T22:20:08+00:00",
+            "renewalRegistrationNumber": "972168J",
+            "registeringParty": {
+              "businessName": "NORTHLAND MORTGAGES QUESNEL LTD.",
+              "address": {
+                "street": "254 REID STREET",
+                "city": "QUESNEL",
+                "region": "BC",
+                "country": "CA",
+                "postalCode": "V2J 2M2"
+              }
+            },
+            "lifeYears": 3,
+            "expiryDate": "2020-12-13T07:59:59+00:00",
+            "statementType": "RENEWAL_STATEMENT"
+          },
+          {
+            "baseRegistrationNumber": "086978E",
+            "createDateTime": "2016-07-08T17:32:56+00:00",
+            "changeRegistrationNumber": "399804J",
+            "changeType": "PD",
+            "registeringParty": {
+              "businessName": "CHUDIAK SCHMIT & CO",
+              "address": {
+                "street": "531 REID STREET",
+                "city": "QUESNEL",
+                "region": "BC",
+                "country": "CA",
+                "postalCode": "V2J 2M8"
+              }
+            },
+            "deleteVehicleCollateral": [
+              {
+                "vehicleId": 22282,
+                "type": "MV",
+                "year": 1992,
+                "make": "WESTERN STAR",
+                "model": "TANDEM AXEL",
+                "serialNumber": "2WLNCCCG6NK929815",
+                "reg_id": 405272
+              }
+            ],
+            "statementType": "CHANGE_STATEMENT"
+          },
+          {
+            "baseRegistrationNumber": "086978E",
+            "createDateTime": "2012-11-29T23:40:25+00:00",
+            "renewalRegistrationNumber": "078532H",
+            "registeringParty": {
+              "businessName": "NORTHLAND MORTGAGES QUESNEL LTD",
+              "address": {
+                "street": "254 REID STREET",
+                "city": "QUESNEL",
+                "region": "BC",
+                "country": "CA",
+                "postalCode": "V2J 2M2"
+              }
+            },
+            "lifeYears": 5,
+            "expiryDate": "2017-12-13T07:59:59+00:00",
             "statementType": "RENEWAL_STATEMENT"
           }
-        ], 
-        "clientReferenceId": "TEST-SA-0005", 
-        "createDateTime": "2021-07-15T15:41:58+00:00", 
-        "debtors": [
-          {
-            "address": {
-              "city": "city", 
-              "country": "CA", 
-              "postalCode": "V8R3A5", 
-              "region": "BC", 
-              "street": "TEST-0005", 
-              "streetAdditional": "line 2"
-            }, 
-            "partyId": 200000016, 
-            "personName": {
-              "first": "TEST IND", 
-              "last": "DEBTOR", 
-              "middle": "5"
-            }
-          }
-        ], 
-        "expiryDate": "2023-07-15T15:41:58+00:00", 
-        "lifeYears": 2, 
+        ]
+      }
+    },
+    {
+      "matchType": "EXACT",
+      "financingStatement": {
+        "statusType": "ACT",
+        "type": "SA",
+        "baseRegistrationNumber": "431177K",
+        "registrationDescription": "PPSA SECURITY AGREEMENT",
+        "registrationAct": "PERSONAL PROPERTY SECURITY ACT",
+        "createDateTime": "2017-11-30T14:18:50+00:00",
         "registeringParty": {
+          "businessName": "KUBOTA CANADA LTD",
           "address": {
-            "city": "city", 
-            "country": "CA", 
-            "postalCode": "V8R3A5", 
-            "region": "BC", 
-            "street": "TEST-0005", 
-            "streetAdditional": "line 2"
-          }, 
-          "personName": {
-            "first": "TEST", 
-            "last": "REGISTERING", 
-            "middle": "5"
+            "street": "5900 14TH AVE",
+            "city": "MARKHAM",
+            "region": "ON",
+            "country": "CA",
+            "postalCode": "L3S 4K4"
           }
-        }, 
-        "registrationAct": "PPSA SECURITY ACT", 
-        "registrationDescription": "PPSA SECURITY AGREEMENT", 
+        },
         "securedParties": [
           {
+            "partyId": 4610928,
+            "businessName": "KUBOTA CANADA LTD",
             "address": {
-              "city": "city", 
-              "country": "CA", 
-              "postalCode": "V8R3A5", 
-              "region": "BC", 
-              "street": "TEST-0005", 
-              "streetAdditional": "line 2"
-            }, 
-            "businessName": "TEST 5 SECURED PARTY", 
-            "partyId": 200000017
+              "street": "5900 14TH AVE",
+              "city": "MARKHAM",
+              "region": "ON",
+              "country": "CA",
+              "postalCode": "L3S 4K4"
+            }
           }
-        ], 
-        "statusType": "ACT", 
-        "trustIndenture": false, 
-        "type": "SA", 
+        ],
+        "debtors": [
+          {
+            "partyId": 535597,
+            "businessName": "JUNK BIN RENTALS INC",
+            "address": {
+              "street": "24108 52 AVE",
+              "city": "LANGLEY",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V2Z 2N2"
+            }
+          },
+          {
+            "partyId": 535598,
+            "personName": {
+              "first": "DARREN",
+              "last": "GAGNE",
+              "middle": "MAURICE"
+            },
+            "address": {
+              "street": "24108 52 AVE",
+              "city": "LANGLEY",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V2Z 2N2"
+            }
+          },
+          {
+            "partyId": 535599,
+            "personName": {
+              "first": "RICHARD",
+              "last": "TERRY"
+            },
+            "address": {
+              "street": "24108 52 AVE",
+              "city": "LANGLEY",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V2Z 2N2"
+            },
+            "birthDate": "1970-03-17T12:59:59+00:00"
+          }
+        ],
+        "generalCollateral": [
+          {
+            "collateralId": 298964,
+            "description": "2017 SNAKE RIVER 18 ' TRAILER 5PTBF1821J1028106                       2017 BE FSB7B0500BK 161879                                            2017 WALLENSTEIN WX430 12345                                          2017 BE FSB7B0500BK 161870                                            PRINCIPAL AMOUNT $16,539.00",
+            "addedDateTime": "2017-11-30T14:18:50+00:00"
+          }
+        ],
         "vehicleCollateral": [
           {
-            "make": "TESLA", 
-            "model": "MODEL 3", 
-            "serialNumber": "YJ46JU622994", 
-            "type": "MV", 
-            "vehicleId": 200000005, 
-            "year": 2018
+            "vehicleId": 276938,
+            "type": "MV",
+            "year": 2017,
+            "make": "SNAKE RIVER",
+            "model": "18 ' TRAILER",
+            "serialNumber": "5PTBF1821J1028106"
+          },
+          {
+            "vehicleId": 276939,
+            "type": "MV",
+            "year": 2017,
+            "make": "BE FSB7B0500BK",
+            "model": "-",
+            "serialNumber": "161879"
+          },
+          {
+            "vehicleId": 276940,
+            "type": "MV",
+            "year": 2017,
+            "make": "WALLENSTEIN WX430",
+            "model": "-",
+            "serialNumber": "12345"
+          },
+          {
+            "vehicleId": 276941,
+            "type": "MV",
+            "year": 2017,
+            "make": "BE FSB7B0500BK",
+            "model": "-",
+            "serialNumber": "161870"
           }
-        ]
-      }, 
-      "matchType": "SIMILAR"
+        ],
+        "trustIndenture": false,
+        "lifeYears": 7,
+        "expiryDate": "2024-12-01T07:59:59+00:00"
+      }
+    },
+    {
+      "matchType": "SIMILAR",
+      "financingStatement": {
+        "statusType": "ACT",
+        "type": "SA",
+        "baseRegistrationNumber": "024326M",
+        "registrationDescription": "PPSA SECURITY AGREEMENT",
+        "registrationAct": "PERSONAL PROPERTY SECURITY ACT",
+        "createDateTime": "2020-01-27T15:07:06+00:00",
+        "registeringParty": {
+          "businessName": "D + H LIMITED PARTNERSHIP",
+          "address": {
+            "street": "2 ROBERT SPECK PARKWAY, 15TH F",
+            "city": "MISSISSAUGA",
+            "region": "ON",
+            "country": "CA",
+            "postalCode": "L4Z 1H8"
+          }
+        },
+        "securedParties": [
+          {
+            "partyId": 5058252,
+            "code": "26960001",
+            "businessName": "TOYOTA CREDIT CANADA INC.",
+            "address": {
+              "street": "80 MICRO COURT",
+              "city": "MARKHAM",
+              "region": "ON",
+              "country": "CA",
+              "postalCode": "L3R 9Z5"
+            }
+          }
+        ],
+        "debtors": [
+          {
+            "partyId": 1274511,
+            "personName": {
+              "first": "THI",
+              "last": "LE",
+              "middle": "HOA"
+            },
+            "address": {
+              "street": "6186 FLEMING ST",
+              "city": "VANCOUVER",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V5P 3G8"
+            },
+            "birthDate": "1970-10-09T12:59:59+00:00"
+          }
+        ],
+        "vehicleCollateral": [
+          {
+            "vehicleId": 680914,
+            "type": "MV",
+            "year": 2020,
+            "make": "LEXUS",
+            "model": "NX300",
+            "serialNumber": "JTJSARDZ5L5012345"
+          }
+        ],
+        "trustIndenture": false,
+        "lifeYears": 4,
+        "expiryDate": "2024-01-28T07:59:59+00:00"
+      }
+    },
+    {
+      "matchType": "SIMILAR",
+      "financingStatement": {
+        "statusType": "ACT",
+        "type": "SA",
+        "baseRegistrationNumber": "258472M",
+        "registrationDescription": "PPSA SECURITY AGREEMENT",
+        "registrationAct": "PERSONAL PROPERTY SECURITY ACT",
+        "createDateTime": "2020-06-05T13:11:11+00:00",
+        "registeringParty": {
+          "businessName": "D + H LIMITED PARTNERSHIP",
+          "address": {
+            "street": "2 ROBERT SPECK PARKWAY, 15TH F",
+            "city": "MISSISSAUGA",
+            "region": "ON",
+            "country": "CA",
+            "postalCode": "L4Z 1H8"
+          }
+        },
+        "securedParties": [
+          {
+            "partyId": 5140312,
+            "businessName": "BMW CANADA INC.",
+            "address": {
+              "street": "50 ULTIMATE DRIVE",
+              "city": "RICHMOND HILL",
+              "region": "ON",
+              "country": "CA",
+              "postalCode": "L4S 0C8"
+            }
+          }
+        ],
+        "debtors": [
+          {
+            "partyId": 1417959,
+            "personName": {
+              "first": "YASAMIN",
+              "last": "RAFIPOUR"
+            },
+            "address": {
+              "street": "308 131 3RD STREET E",
+              "city": "NORTH VANCOUVER",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V7L 1E5"
+            },
+            "birthDate": "1990-03-15T12:59:59+00:00"
+          }
+        ],
+        "vehicleCollateral": [
+          {
+            "vehicleId": 753283,
+            "type": "MV",
+            "year": 2015,
+            "make": "BWM",
+            "model": "X5 XDRIVE35D",
+            "serialNumber": "5UXKS4C55F0N12345"
+          }
+        ],
+        "trustIndenture": false,
+        "lifeYears": 6,
+        "expiryDate": "2026-06-06T06:59:59+00:00"
+      }
+    },
+    {
+      "matchType": "SIMILAR",
+      "financingStatement": {
+        "statusType": "ACT",
+        "type": "SA",
+        "baseRegistrationNumber": "578779M",
+        "registrationDescription": "PPSA SECURITY AGREEMENT",
+        "registrationAct": "PERSONAL PROPERTY SECURITY ACT",
+        "createDateTime": "2020-11-06T14:16:08+00:00",
+        "registeringParty": {
+          "businessName": "D + H LIMITED PARTNERSHIP",
+          "address": {
+            "street": "2 ROBERT SPECK PARKWAY, 15TH F",
+            "city": "MISSISSAUGA",
+            "region": "ON",
+            "country": "CA",
+            "postalCode": "L4Z 1H8"
+          }
+        },
+        "securedParties": [
+          {
+            "partyId": 5272043,
+            "businessName": "VW CREDIT CANADA INC.",
+            "address": {
+              "street": "4865 MARC-BLAIN ST., SUITE 300",
+              "city": "ST-LAURENT",
+              "region": "QC",
+              "country": "CA",
+              "postalCode": "H4R 3B2"
+            }
+          }
+        ],
+        "debtors": [
+          {
+            "partyId": 1657942,
+            "personName": {
+              "first": "RADHIKA",
+              "last": "SANDUR"
+            },
+            "address": {
+              "street": "13357 59 AVE",
+              "city": "SURREY",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V3X 2N7"
+            },
+            "birthDate": "1996-11-19T12:59:59+00:00"
+          }
+        ],
+        "vehicleCollateral": [
+          {
+            "vehicleId": 875925,
+            "type": "MV",
+            "year": 2020,
+            "make": "VOLKSWAGEN",
+            "model": "JETTA EXECLINE",
+            "serialNumber": "3VWGB7BU4LM012345"
+          }
+        ],
+        "trustIndenture": false,
+        "lifeYears": 6,
+        "expiryDate": "2026-11-07T07:59:59+00:00"
+      }
+    },
+    {
+      "matchType": "SIMILAR",
+      "financingStatement": {
+        "statusType": "ACT",
+        "type": "SA",
+        "baseRegistrationNumber": "649800M",
+        "registrationDescription": "PPSA SECURITY AGREEMENT",
+        "registrationAct": "PERSONAL PROPERTY SECURITY ACT",
+        "createDateTime": "2020-12-11T18:44:57+00:00",
+        "registeringParty": {
+          "businessName": "D + H LIMITED PARTNERSHIP",
+          "address": {
+            "street": "2 ROBERT SPECK PARKWAY, 15TH F",
+            "city": "MISSISSAUGA",
+            "region": "ON",
+            "country": "CA",
+            "postalCode": "L4Z 1H8"
+          }
+        },
+        "securedParties": [
+          {
+            "partyId": 5301941,
+            "businessName": "TD AUTO FINANCE (CANADA) INC.",
+            "address": {
+              "street": "PO BOX 4086, STATION A",
+              "city": "TORONTO",
+              "region": "ON",
+              "country": "CA",
+              "postalCode": "M5W 5K3"
+            }
+          }
+        ],
+        "debtors": [
+          {
+            "partyId": 1709787,
+            "personName": {
+              "first": "PARMJOT",
+              "last": "SINGH"
+            },
+            "address": {
+              "street": "5129 MANOR STREET",
+              "city": "BURNABY",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V5G 1B4"
+            },
+            "birthDate": "1998-07-07T12:59:59+00:00"
+          }
+        ],
+        "generalCollateral": [
+          {
+            "collateralId": 675345,
+            "description": "ALL ATTACHMENTS, ACCESSORIES, ADDITIONS, ALTERNATIONS, REPLACEMENTS AND REPAIRS (WHETHER PRESENT OR FUTURE) TO THE VEHICLE COLLATERAL. PROCEEDS: ALL CASH AND NON-CASH PROCEEDS OF THE VEHICLE COLLATERAL, INCLUDING, WITHOUT LIMITATION, PROCEEDS DERIVED DIRECTLY OR INDIRECTLY FROM ANY DEALING WITH THE VEHICLE COLLATERAL OR THAT INDEMNIFIES OR COMPENSA,TES THE DEBTOR(S) FOR THE DESTRUCTION OR DAMAGE TO OR LOSS OF THE VEHICLE COLLATERAL. THE PROCEEDS MAY TAKE THE FORM OF ANY ONE OR MORE OF THE FOLLOWING: GOODS, DOCUMENTS OF TITLE, CHATTEL PAPER, INSTRUMENTS, MONEY, INVESTMENT PROPERTY OR INTANGIBLES. ACCORDINGLY, ANY OF THE DEBTOR(S) AFTER ACQUIRED PROPERTY MAY BE PROCEEDS AND THEREFORE SUBJECT TO, THE SECURED PARTY'S SECURITY INTEREST.",
+            "addedDateTime": "2020-12-11T18:44:57+00:00"
+          }
+        ],
+        "vehicleCollateral": [
+          {
+            "vehicleId": 901865,
+            "type": "MV",
+            "year": 2019,
+            "make": "HONDA",
+            "model": "CIVIC",
+            "serialNumber": "2HGFC2F54KH012345"
+          }
+        ],
+        "trustIndenture": false,
+        "lifeYears": 8,
+        "expiryDate": "2028-12-12T07:59:59+00:00"
+      }
+    },
+    {
+      "matchType": "SIMILAR",
+      "financingStatement": {
+        "statusType": "ACT",
+        "type": "SA",
+        "baseRegistrationNumber": "129504N",
+        "registrationDescription": "PPSA SECURITY AGREEMENT",
+        "registrationAct": "PERSONAL PROPERTY SECURITY ACT",
+        "createDateTime": "2021-07-23T13:36:34+00:00",
+        "registeringParty": {
+          "businessName": "D + H LIMITED PARTNERSHIP",
+          "address": {
+            "street": "2 ROBERT SPECK PARKWAY, 15TH F",
+            "city": "MISSISSAUGA",
+            "region": "ON",
+            "country": "CA",
+            "postalCode": "L4Z 1H8"
+          }
+        },
+        "securedParties": [
+          {
+            "partyId": 5526018,
+            "businessName": "HONDA CANADA FINANCE INC.",
+            "address": {
+              "street": "180 HONDA BLVD",
+              "city": "MARKHAM",
+              "region": "ON",
+              "country": "CA",
+              "postalCode": "L6C 0H9"
+            }
+          }
+        ],
+        "debtors": [
+          {
+            "partyId": 2124178,
+            "personName": {
+              "first": "LOIS",
+              "last": "BAK",
+              "middle": "S"
+            },
+            "address": {
+              "street": "207 - 3033 TERRAVISTA PL",
+              "city": "PORT MOODY",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V3H 5A3"
+            },
+            "birthDate": "1986-08-26T12:59:59+00:00"
+          },
+          {
+            "partyId": 2124179,
+            "personName": {
+              "first": "LOIS",
+              "last": "BAK"
+            },
+            "address": {
+              "street": "207 - 3033 TERRAVISTA PL",
+              "city": "PORT MOODY",
+              "region": "BC",
+              "country": "CA",
+              "postalCode": "V3H 5A3"
+            },
+            "birthDate": "1986-08-26T12:59:59+00:00"
+          }
+        ],
+        "vehicleCollateral": [
+          {
+            "vehicleId": 1136433,
+            "type": "MV",
+            "year": 2021,
+            "make": "HONDA",
+            "model": "CIVIC",
+            "serialNumber": "2HGFC2F50MH012345"
+          }
+        ],
+        "trustIndenture": false,
+        "lifeYears": 5,
+        "expiryDate": "2026-07-24T06:59:59+00:00"
+      }
     }
-  ], 
-  "exactResultsSize": 2, 
-  "payment": {
-    "invoiceId": "10752", 
-    "receipt": "/api/v1/payment-requests/10752/receipts"
-  }, 
-  "searchDateTime": "2021-07-20T15:53:05+00:00", 
-  "searchQuery": {
-    "clientReferenceId": "T-S-SS-UT001", 
-    "criteria": {
-      "value": "JU622994"
-    }, 
-    "type": "SERIAL_NUMBER"
-  }, 
+  ],
   "selected": [
     {
-      "baseRegistrationNumber": "TEST0004", 
-      "createDateTime": "2021-04-08T18:43:19+00:00", 
-      "matchType": "EXACT", 
-      "registrationType": "SA", 
+      "baseRegistrationNumber": "086978E",
+      "matchType": "SIMILAR",
+      "createDateTime": "2007-12-12T23:13:56+00:00",
+      "registrationType": "SA",
       "vehicleCollateral": {
-        "make": "HONDA", 
-        "model": "CIVIC", 
-        "serialNumber": "JU622994", 
-        "type": "MV", 
-        "year": 2018
+        "type": "MV",
+        "serialNumber": "SN12345",
+        "make": "HORWOOD WAKE STUMP RAKE",
+        "model": "-"
       }
-    }, 
+    },
     {
-      "baseRegistrationNumber": "TEST0001", 
-      "createDateTime": "2021-04-08T18:43:19+00:00", 
-      "matchType": "EXACT", 
-      "registrationType": "SA", 
+      "baseRegistrationNumber": "431177K",
+      "matchType": "EXACT",
+      "createDateTime": "2017-11-30T14:18:50+00:00",
+      "registrationType": "SA",
       "vehicleCollateral": {
-        "make": "BMW", 
-        "model": "Z4", 
-        "serialNumber": "JU622994", 
-        "type": "MV", 
-        "year": 2014
+        "type": "MV",
+        "serialNumber": "12345",
+        "year": 2017,
+        "make": "WALLENSTEIN WX430",
+        "model": "-"
       }
-    }, 
+    },
     {
-      "baseRegistrationNumber": "200519B", 
-      "createDateTime": "2021-03-09T22:45:22+00:00", 
-      "matchType": "SIMILAR", 
-      "registrationType": "SA", 
-      "selected": true, 
+      "baseRegistrationNumber": "024326M",
+      "matchType": "SIMILAR",
+      "createDateTime": "2020-01-27T15:07:06+00:00",
+      "registrationType": "SA",
       "vehicleCollateral": {
-        "make": "HYUNDAI", 
-        "model": "TUCSON", 
-        "serialNumber": "KM8J3CA46JU622994", 
-        "type": "MV", 
-        "year": 2018
+        "type": "MV",
+        "serialNumber": "JTJSARDZ5L5012345",
+        "year": 2020,
+        "make": "LEXUS",
+        "model": "NX300"
       }
-    }, 
+    },
     {
-      "baseRegistrationNumber": "TEST0005", 
-      "createDateTime": "2021-04-08T18:43:19+00:00", 
-      "matchType": "SIMILAR", 
-      "registrationType": "SA", 
-      "selected": true, 
+      "baseRegistrationNumber": "258472M",
+      "matchType": "SIMILAR",
+      "createDateTime": "2020-06-05T13:11:11+00:00",
+      "registrationType": "SA",
       "vehicleCollateral": {
-        "make": "TESLA", 
-        "model": "MODEL 3", 
-        "serialNumber": "YJ46JU622994", 
-        "type": "MV", 
-        "year": 2018
+        "type": "MV",
+        "serialNumber": "5UXKS4C55F0N12345",
+        "year": 2015,
+        "make": "BWM",
+        "model": "X5 XDRIVE35D"
+      }
+    },
+    {
+      "baseRegistrationNumber": "578779M",
+      "matchType": "SIMILAR",
+      "createDateTime": "2020-11-06T14:16:08+00:00",
+      "registrationType": "SA",
+      "vehicleCollateral": {
+        "type": "MV",
+        "serialNumber": "3VWGB7BU4LM012345",
+        "year": 2020,
+        "make": "VOLKSWAGEN",
+        "model": "JETTA EXECLINE"
+      }
+    },
+    {
+      "baseRegistrationNumber": "649800M",
+      "matchType": "SIMILAR",
+      "createDateTime": "2020-12-11T18:44:57+00:00",
+      "registrationType": "SA",
+      "vehicleCollateral": {
+        "type": "MV",
+        "serialNumber": "2HGFC2F54KH012345",
+        "year": 2019,
+        "make": "HONDA",
+        "model": "CIVIC"
+      }
+    },
+    {
+      "baseRegistrationNumber": "129504N",
+      "matchType": "SIMILAR",
+      "createDateTime": "2021-07-23T13:36:34+00:00",
+      "registrationType": "SA",
+      "vehicleCollateral": {
+        "type": "MV",
+        "serialNumber": "2HGFC2F50MH012345",
+        "year": 2021,
+        "make": "HONDA",
+        "model": "CIVIC"
       }
     }
-  ], 
-  "similarResultsSize": 1, 
-  "totalResultsSize": 3
+  ],
+  "payment": {
+    "invoiceId": "17333",
+    "receipt": "/api/v1/payment-requests/17333/receipts"
+  },
+  "totalResultsSize": 7
 }

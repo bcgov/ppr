@@ -93,7 +93,7 @@
 <script lang="ts">
 import { BaseDialog } from '@/components/dialogs'
 import { useHomeOwners } from '@/composables/mhrRegistration'
-import { defineComponent, reactive, ref, toRefs, watch } from '@vue/composition-api'
+import { computed, defineComponent, reactive, ref, toRefs, watch } from '@vue/composition-api'
 import FractionalOwnership from './FractionalOwnership.vue'
 import { useGetters } from 'vuex-composition-helpers'
 import { find } from 'lodash'
@@ -114,7 +114,8 @@ export default defineComponent({
     FractionalOwnership
   },
   setup (props, context) {
-    const { getMhrRegistrationHomeOwnerGroups } = useGetters<any>(['getMhrRegistrationHomeOwnerGroups'])
+    const { getMhrRegistrationHomeOwnerGroups, getMhrTransferHomeOwnerGroups } =
+      useGetters<any>(['getMhrRegistrationHomeOwnerGroups', 'getMhrTransferHomeOwnerGroups'])
 
     const { isGlobalEditingMode, setGlobalEditingMode, deleteGroup, setGroupFractionalInterest } = useHomeOwners()
 
@@ -124,7 +125,11 @@ export default defineComponent({
       isEditGroupMode: false,
       showDeleteGroupDialog: false,
       isHomeFractionalOwnershipValid: false,
-      group: find(getMhrRegistrationHomeOwnerGroups.value, { groupId: props.groupId }),
+      group: computed((): any =>
+        props.isMhrTransfer
+          ? find(getMhrTransferHomeOwnerGroups.value, { groupId: props.groupId })
+          : find(getMhrRegistrationHomeOwnerGroups.value, { groupId: props.groupId })
+      ),
       fractionalData: {} as MhrRegistrationFractionalOwnershipIF
     })
 
@@ -158,7 +163,9 @@ export default defineComponent({
 
     const cancel = (): void => {
       localState.isEditGroupMode = false
-      localState.group = find(getMhrRegistrationHomeOwnerGroups.value, { groupId: props.groupId })
+      localState.group = props.isMhrTransfer
+        ? find(getMhrTransferHomeOwnerGroups.value, { groupId: props.groupId })
+        : find(getMhrRegistrationHomeOwnerGroups.value, { groupId: props.groupId })
     }
 
     watch(

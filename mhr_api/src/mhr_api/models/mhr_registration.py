@@ -123,8 +123,6 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                 location = self.locations[0]
                 current_app.logger.debug('Using PostreSQL location in registration.json.')
                 reg_json['location'] = location.json
-            if reg_json.get('documentType'):
-                del reg_json['documentType']
             if self.pay_invoice_id and self.pay_invoice_id > 0:  # Legacy will have no payment info.
                 return self.__set_payment_json(reg_json)
             return reg_json

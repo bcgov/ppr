@@ -6,5 +6,6 @@ export enum TableActions {
   EDIT_NEW = 'editFinancingDraft',
   REMOVE = 'remove',
   RENEW = 'renew',
-  OPEN = 'open'
+  REMOVE_TRANSFER_DRAFT = 'removeTransferDraft',
+  OPEN = 'open',
 }

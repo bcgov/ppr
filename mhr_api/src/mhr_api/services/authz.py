@@ -30,7 +30,7 @@ BASIC_USER = 'basic'
 PRO_DATA_USER = 'pro_data'
 PUBLIC_USER = 'public_user'
 USER_ORGS_PATH = 'users/orgs'
-GOV_ACCOUNT_ROLE = 'mhr_gov_account_user'
+GOV_ACCOUNT_ROLE = 'gov_account_user'
 BCOL_HELP = 'mhr_helpdesk'
 # MH keycloak roles for registrations/filings
 REGISTER_MH = 'mhr_register'

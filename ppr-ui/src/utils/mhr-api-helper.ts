@@ -7,23 +7,29 @@ import {
   ManufacturedHomeSearchResultIF,
   SearchResponseIF,
   MhrSearchCriteriaIF,
-  MhRegistrationSummaryIF, ErrorIF
+  MhRegistrationSummaryIF,
+  ErrorIF,
+  MhrTransferApiIF,
+  MhrDraftTransferApiIF, DraftIF
 } from '@/interfaces'
-import { ErrorCategories, ErrorCodes } from '@/enums'
+import { APIMhrTypes, ErrorCategories, ErrorCodes } from '@/enums'
 import { useSearch } from '@/composables/useSearch'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 const { mapMhrSearchType } = useSearch()
+
+// Create default request base URL and headers.
+function getDefaultConfig (): Object {
+  const url = sessionStorage.getItem('MHR_API_URL')
+  return { baseURL: url, headers: { Accept: 'application/json' } }
+}
 
 // Submit an mhr search query request.
 export async function mhrSearch (
   searchCriteria: MhrSearchCriteriaIF,
   extraParams: string
 ): Promise<any> {
-  const url = sessionStorage.getItem('MHR_API_URL')
-  const config = { baseURL: url, headers: { Accept: 'application/json' } }
-
   return axios
-    .post<SearchResponseIF>(`searches${extraParams}`, searchCriteria, config)
+    .post<SearchResponseIF>(`searches${extraParams}`, searchCriteria, getDefaultConfig())
     .then(response => {
       const data = response?.data
       if (!data) {
@@ -102,11 +108,8 @@ export async function getMHRegistrationSummary (
   registrationNum: string,
   refreshing: boolean
 ): Promise<MhRegistrationSummaryIF> {
-  const url = sessionStorage.getItem('MHR_API_URL')
-  const config = { baseURL: url, headers: { Accept: 'application/json' } }
-
   return axios
-    .get(`other-registrations/${registrationNum}`, config)
+    .get(`other-registrations/${registrationNum}`, getDefaultConfig())
     .then(response => {
       const data = response?.data as MhRegistrationSummaryIF
       console.log(data)
@@ -216,9 +219,6 @@ export async function submitSelectedMhr (
   staffPayment: StaffPaymentIF = null,
   isCertified: boolean = false
 ): Promise<number> {
-  const url = sessionStorage.getItem('MHR_API_URL')
-  // change to application/pdf to get the pdf right away
-  const config = { baseURL: url, headers: { Accept: 'application/json' } }
   let extraParams = ''
 
   if (staffPayment) {
@@ -247,7 +247,7 @@ export async function submitSelectedMhr (
   }
 
   return axios
-    .post(`search-results/${searchId}${extraParams}`, selected, config)
+    .post(`search-results/${searchId}${extraParams}`, selected, getDefaultConfig())
     .then(response => {
       return response.status
     })
@@ -284,14 +284,11 @@ export async function searchMhrPDF (searchId: string): Promise<any> {
 }
 
 export async function submitMhrRegistration (payloadData, queryParamData) {
-  const url = sessionStorage.getItem('MHR_API_URL')
-  const config = { baseURL: url, headers: { Accept: 'application/json' } }
-
   try {
     // assuming the queryParamData (staff payment) is always available because of validation
     const queryParamString = new URLSearchParams(queryParamData).toString()
 
-    const result = await axios.post(`registrations?${queryParamString}`, payloadData, config)
+    const result = await axios.post(`registrations?${queryParamString}`, payloadData, getDefaultConfig())
     if (!result?.data) {
       throw new Error('Invalid API response')
     }
@@ -308,11 +305,8 @@ export async function submitMhrRegistration (payloadData, queryParamData) {
 }
 
 export async function mhrRegistrationHistory () {
-  const url = sessionStorage.getItem('MHR_API_URL')
-  const config = { baseURL: url, headers: { Accept: 'application/json' } }
-
   try {
-    const result = await axios.get('registrations', config)
+    const result = await axios.get('registrations', getDefaultConfig())
     if (!result?.data) {
       throw new Error('Invalid API response')
     }
@@ -376,11 +370,8 @@ export async function mhRegistrationPDF (pdfPath: string): Promise<any> {
 
 // Request to validate Document exists and is unique
 export async function validateDocumentID (documentId: string) {
-  const url = sessionStorage.getItem('MHR_API_URL')
-  const config = { baseURL: url, headers: { Accept: 'application/json' } }
-
   try {
-    const result = await axios.get(`documents/verify/${documentId}`, config)
+    const result = await axios.get(`documents/verify/${documentId}`, getDefaultConfig())
     if (!result?.data) {
       throw new Error('Invalid API response')
     }
@@ -398,11 +389,8 @@ export async function validateDocumentID (documentId: string) {
 }
 
 export async function submitMhrTransfer (payloadData, mhrNumber) {
-  const url = sessionStorage.getItem('MHR_API_URL')
-  const config = { baseURL: url, headers: { Accept: 'application/json' } }
-
   try {
-    const result = await axios.post(`transfers/${mhrNumber}`, payloadData, config)
+    const result = await axios.post(`transfers/${mhrNumber}`, payloadData, getDefaultConfig())
     if (!result?.data) {
       throw new Error('Invalid API response')
     }
@@ -421,11 +409,8 @@ export async function submitMhrTransfer (payloadData, mhrNumber) {
 export async function fetchMhRegistration (
   mhRegistrationNum: string
 ): Promise<any> {
-  const url = sessionStorage.getItem('MHR_API_URL')
-  const config = { baseURL: url, headers: { Accept: 'application/json' } }
-
   return axios
-    .get(`registrations/${mhRegistrationNum}?current=true`, config)
+    .get(`registrations/${mhRegistrationNum}?current=true`, getDefaultConfig())
     .then(response => {
       return response
     })
@@ -457,11 +442,8 @@ export async function fetchMhRegistration (
 export async function deleteMhRegistrationSummary (
   mhRegistrationNum: string
 ): Promise<ErrorIF> {
-  const url = sessionStorage.getItem('MHR_API_URL')
-  const config = { baseURL: url, headers: { Accept: 'application/json' } }
-
   return axios
-    .delete(`other-registrations/${mhRegistrationNum}`, config)
+    .delete(`other-registrations/${mhRegistrationNum}`, getDefaultConfig())
     .then(response => {
       return { statusCode: response?.status as StatusCodes }
     })
@@ -487,5 +469,96 @@ export async function deleteMhRegistrationSummary (
         detail: error?.response?.data?.rootCause?.detail,
         type: error?.response?.data?.rootCause?.type?.trim() as ErrorCodes
       }
+    })
+}
+
+// Draft Requests
+// Save a new draft.
+export async function createMhrTransferDraft (draft: MhrTransferApiIF): Promise<MhrTransferApiIF> {
+  const payload: MhrDraftTransferApiIF = {
+    type: APIMhrTypes.TRANSFER_OF_SALE,
+    registration: draft
+  }
+
+  return axios
+    .post('drafts', payload, getDefaultConfig())
+    .then(response => {
+      const data = response?.data
+      if (!data) {
+        throw new Error('Invalid API response')
+      }
+      return data
+    })
+}
+
+// Update an existing draft.
+export async function updateMhrDraft (draftId: string, draft: MhrTransferApiIF): Promise<MhrTransferApiIF> {
+  if (!draftId) {
+    draft.error = {
+      category: ErrorCategories.REGISTRATION_SAVE,
+      statusCode: StatusCodes.BAD_REQUEST,
+      message: 'Draft lookup request invalid: no draft ID.'
+    }
+    return draft
+  }
+  const payload: MhrDraftTransferApiIF = {
+    type: APIMhrTypes.TRANSFER_OF_SALE,
+    registration: draft
+  }
+
+  return axios
+    .put<MhrTransferApiIF>('drafts/' + draftId, payload, getDefaultConfig())
+    .then(response => {
+      const data: MhrTransferApiIF = response?.data
+      if (!data) {
+        throw new Error('Invalid API response')
+      }
+      return data
+    })
+}
+
+// Get all existing drafts
+export async function getMhrDrafts (): Promise<Array<MhrDraftTransferApiIF>> {
+  return axios
+    .get<Array<MhrDraftTransferApiIF>>('drafts', getDefaultConfig())
+    .then(response => {
+      const data: Array<MhrDraftTransferApiIF> = response?.data
+      if (!data) {
+        throw new Error('Invalid API response')
+      }
+      return data
+    })
+}
+
+// Get an existing draft by id.
+export async function getMhrTransferDraft (draftId: string): Promise<MhrDraftTransferApiIF> {
+  const draft = {} as MhrDraftTransferApiIF
+  if (!draftId) {
+    draft.error = {
+      category: ErrorCategories.DRAFT_LOAD,
+      statusCode: StatusCodes.BAD_REQUEST,
+      message: 'Draft lookup request invalid: no draft ID.'
+    }
+    return draft
+  }
+  return axios
+    .get<MhrDraftTransferApiIF>('drafts/' + draftId, getDefaultConfig())
+    .then(response => {
+      const data: MhrDraftTransferApiIF = response?.data
+      if (!data) {
+        throw new Error('Invalid API response')
+      }
+      return data
+    })
+}
+
+// Delete an existing draft (any type) by documentId.
+export async function deleteMhrDraft (draftID: string): Promise<ErrorIF> {
+  if (!draftID) return { statusCode: StatusCodes.BAD_REQUEST, message: 'No draft ID given.' }
+
+  return axios
+    .delete<void>(`drafts/${draftID}`, getDefaultConfig())
+    .then(response => {
+      return { statusCode: response?.status as StatusCodes }
     })
 }

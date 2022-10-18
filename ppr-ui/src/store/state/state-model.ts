@@ -274,6 +274,10 @@ export const stateModel: StateModelIF = {
     mhrNumber: '',
     ownerGroups: [],
     currentOwnerGroups: [],
-    submittingParty: {}
+    submittingParty: {},
+    declaredValue: null,
+    consideration: '',
+    transferDate: '',
+    ownLand: false
   }
 }

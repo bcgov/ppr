@@ -19,6 +19,7 @@ from mhr_api.resources.utils import get_account_name
 
 from .report import Report
 from .v2.report import Report as ReportV2
+from .v2.report_utils import ReportTypes
 
 
 REPORT_VERSION_V2 = '2'

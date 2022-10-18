@@ -177,9 +177,12 @@ def pay_exception_response(exception: SBCPaymentException, account_id: str = Non
 
 def default_exception_response(exception):
     """Build default 500 exception error response."""
-    current_app.logger.error(str(exception))
     message = DEFAULT.format(code=ResourceErrorCodes.DEFAULT_ERR)
-    return jsonify({'message': message, 'detail': str(exception)}), HTTPStatus.INTERNAL_SERVER_ERROR
+    try:
+        current_app.logger.error(str(exception))
+        return jsonify({'message': message, 'detail': str(exception)}), HTTPStatus.INTERNAL_SERVER_ERROR
+    except TypeError:
+        return jsonify({'message': message, 'detail': 'Not available.'}), HTTPStatus.INTERNAL_SERVER_ERROR
 
 
 def service_exception_response(message):
@@ -595,3 +598,14 @@ def get_account_registration_params(req: request, params: AccountRegistrationPar
     if params.registration_number is not None:
         params.registration_number = params.registration_number.strip().upper()
     return params
+
+
+def valid_api_key(req) -> bool:
+    """Verify the callback request api key is valid."""
+    key = get_apikey(req)
+    if not key:
+        return False
+    apikey = current_app.config.get('SUBSCRIPTION_API_KEY')
+    if not apikey:
+        return True
+    return key == apikey

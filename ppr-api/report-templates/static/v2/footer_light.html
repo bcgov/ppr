@@ -1,0 +1,67 @@
+<html>
+  <head>
+    <style>
+
+      body {
+            margin: 0 !important;
+            font-size: 8rem;
+      }
+      .footer {
+            width: 97%;
+            margin-top: 0px !important;
+            padding-top: 0px;
+        }
+
+      .footer-table {
+        width: 98%;
+      }
+      .footer-table td {
+        vertical-align: middle;
+        padding: 0px;
+      }
+
+      .footer-table td:nth-child(1) {
+        width: 25%;
+        text-align: left;
+      }
+      .footer-table td:nth-child(2) {
+        width: 75%;
+        text-align: right;
+      }
+
+      .footer-text {
+        font-family: 'Calibri' !important;
+        color: black !important;
+        font-size: 8px; /* 10 */
+        text-align: right;
+      }
+      .footer-column-logo {
+        display: inline-block;
+        text-align: center;
+        /* margin-left: 10px; */
+      }
+
+      .footer-column-logo img {
+        width: 70%;
+        height: 70%;
+      }
+
+    </style>
+  </head>
+  <body>
+    <div class="footer">
+    <table class="footer-table">
+      <tr>
+        <td>
+          <div class="footer-column-logo">
+        </div>
+        </td>
+        <td>
+          <p class="footer-text">{{FOOTER-TEXT}}&nbsp;| Page 
+            <span class="pageNumber"></span> of <span class="totalPages"></span></p>
+        </td>
+      </tr>
+    </table>
+    </div>
+  </body>
+</html>

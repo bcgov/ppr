@@ -19,27 +19,42 @@ Test-Suite to ensure that the /search-report-callback endpoint is working as exp
 from http import HTTPStatus
 
 import pytest
+from flask import current_app
 
 
 # testdata pattern is ({desc}, {status}, {search_id})
 # Add more when report available.
 TEST_CALLBACK_DATA = [
-    ('Invalid id', HTTPStatus.NOT_FOUND, 300000005)
+    ('Invalid id', HTTPStatus.NOT_FOUND, 300000005),
+    ('Unauthorized', HTTPStatus.UNAUTHORIZED, 300000005)
 ]
 
 
 @pytest.mark.parametrize('desc,status,search_id', TEST_CALLBACK_DATA)
 def test_search_report_callback(session, client, jwt, desc, status, search_id):
     """Assert that a callback request returns the expected status."""
+    headers = None
+    if status != HTTPStatus.UNAUTHORIZED:
+        apikey = current_app.config.get('SUBSCRIPTION_API_KEY')
+        if apikey:
+            headers = {
+                'x-apikey': apikey
+            }
     # test
     rv = client.post('/api/v1/search-report-callback/' + str(search_id),
-                     headers=None)
+                     headers=headers)
     # check
     assert rv.status_code == status
 
 
 def test_search_report_serial(session, client, jwt):
     """Assert that a callback request returns the expected status."""
+    headers = None
+    apikey = current_app.config.get('SUBSCRIPTION_API_KEY')
+    if apikey:
+        headers = {
+            'x-apikey': apikey
+        }
     # test
     rv = client.post('/api/v1/search-report-callback/8958',
-                     headers=None)
+                     headers=headers)

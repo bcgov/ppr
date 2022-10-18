@@ -83,7 +83,7 @@ def test_find_by_manuhome_id_active(session, exists, manuhome_id, doc_id, doc_ty
             if not expiry:
                 assert not reg_json.get('expiryDate')
             else:
-                assert reg_json.get('expiryDate') == expiry
+                assert str(reg_json.get('expiryDate'))[0:10] == expiry
             assert reg_json.get('remarks') is not None
             assert reg_json.get('contactName') is not None
             assert reg_json.get('contactAddress')

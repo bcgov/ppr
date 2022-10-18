@@ -180,21 +180,34 @@ import {
   addRegistrationSummary,
   addMHRegistrationSummary,
   convertDate,
-  deleteDraft, deleteRegistrationSummary, draftHistory,
-  getMHRegistrationSummary, getRegistrationSummary, registrationHistory,
-  setupFinancingStatementDraft, updateUserSettings, deleteMhRegistrationSummary
+  deleteDraft,
+  deleteRegistrationSummary,
+  draftHistory,
+  getMHRegistrationSummary,
+  getRegistrationSummary,
+  registrationHistory,
+  setupFinancingStatementDraft,
+  updateUserSettings,
+  deleteMhRegistrationSummary,
+  deleteMhrDraft
 } from '@/utils'
 import {
-  amendConfirmationDialog, dischargeConfirmationDialog,
+  amendConfirmationDialog,
+  dischargeConfirmationDialog,
   registrationAddErrorDialog,
   registrationAlreadyAddedDialog,
   registrationFoundDialog,
   mhRegistrationFoundDialog,
   registrationNotFoundDialog,
-  registrationRestrictedDialog, renewConfirmationDialog, tableDeleteDialog, tableRemoveDialog
+  registrationRestrictedDialog,
+  renewConfirmationDialog,
+  tableDeleteDialog,
+  tableRemoveDialog,
+  mhrTableRemoveDialog
 } from '@/resources/dialogOptions'
 import { StatusCodes } from 'http-status-codes'
 import { cloneDeep } from 'lodash'
+import { useNewMhrRegistration } from '@/composables'
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
@@ -250,6 +263,10 @@ export default defineComponent({
       'setRegTableSortHasMorePages', 'setRegTableSortOptions', 'setUserSettings', 'resetRegTableData',
       'setMhrInformation', 'setMhrTableHistory'
     ])
+
+    const {
+      fetchMhRegistrations
+    } = useNewMhrRegistration()
 
     const localState = reactive({
       loading: false,
@@ -560,7 +577,7 @@ export default defineComponent({
           localState.myRegDeleteDialogDisplay = true
           break
         case TableActions.REMOVE:
-          localState.myRegDeleteDialog = tableRemoveDialog
+          localState.myRegDeleteDialog = props.isMhr ? mhrTableRemoveDialog : tableRemoveDialog
           localState.myRegDeleteDialogDisplay = true
           break
         case TableActions.EDIT_AMEND:
@@ -571,6 +588,9 @@ export default defineComponent({
           break
         case TableActions.OPEN:
           openMhr(mhrInfo)
+          break
+        case TableActions.REMOVE_TRANSFER_DRAFT:
+          removeMhrDraft(regNum)
           break
         default:
           localState.myRegAction = null
@@ -612,6 +632,13 @@ export default defineComponent({
     const openMhr = async (mhrSummary: MhRegistrationSummaryIF): Promise<void> => {
       setMhrInformation(mhrSummary)
       await context.root.$router.replace({ name: RouteNames.MHR_INFORMATION })
+    }
+
+    const removeMhrDraft = async (mhrNumber: string): Promise<void> => {
+      localState.myRegDataLoading = true
+      await deleteMhrDraft(mhrNumber)
+      await fetchMhRegistrations() // Refresh the table with update Registration History
+      localState.myRegDataLoading = false
     }
 
     const myRegActionDialogHandler = (proceed: boolean): void => {

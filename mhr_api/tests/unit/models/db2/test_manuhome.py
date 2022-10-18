@@ -256,6 +256,10 @@ def test_create_transfer_from_json(session, mhr_num, user_group, doc_id_prefix, 
     del json_data['createDateTime']
     del json_data['payment']
     json_data['mhrNumber'] = mhr_num
+    json_data['consideration'] = '$120000.00'
+    json_data['declaredValue'] = 120000
+    json_data['ownLand'] = 'Y'
+    json_data['transferDate'] = '2022-10-07T18:43:45+00:00'
     base_reg: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account_id)
     assert base_reg
     assert base_reg.manuhome
@@ -284,6 +288,13 @@ def test_create_transfer_from_json(session, mhr_num, user_group, doc_id_prefix, 
         elif group.group_id == 3:
             assert group.status == Db2Owngroup.StatusTypes.ACTIVE
             assert group.reg_document_id == registration.doc_id
+    assert doc.consideration_value
+    assert doc.own_land == 'Y'
+    assert doc.declared_value == 120000
+    assert doc.consideration_value == '$120000.00'
+    assert doc.transfer_execution_date
+    assert doc.transfer_execution_date.year == 2022
+    assert doc.transfer_execution_date.month == 10
 
 
 def test_save_new(session):

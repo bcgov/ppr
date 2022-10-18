@@ -26,7 +26,7 @@ export enum APIRegistrationTypes {
   SPECULATION_VACANCY_TAX = 'SV',
   TOBACCO_TAX = 'TO',
   OTHER = 'OT',
-  // miscelaneous registration other
+  // miscellaneous registration other
   LIEN_UNPAID_WAGES = 'WL',
   HERITAGE_CONSERVATION_NOTICE = 'HN',
   MANUFACTURED_HOME_NOTICE = 'MN',
@@ -44,7 +44,12 @@ export enum APIRegistrationTypes {
   TRANSITION_FINANCING_STATEMENT = 'TF',
   TRANSITION_SALE_OF_GOODS = 'TG',
   TRANSITION_TAX_LIEN = 'TL',
-  TRANSITION_MH = 'TM'
+  TRANSITION_MH = 'TM',
+  TRANSFER_OF_SALE = 'TRANS',
+  TRANSFER_DUE_TO_DEATH = 'TRAND',
+  NON_RESIDENTIAL_EXEMPTION = 'EXEMPTION_NON_RES',
+  RESIDENTIAL_EXEMPTION = 'EXEMPTION_RES',
+  TRANSPORT_PERMIT = 'PERMIT'
 }
 
 export enum UIRegistrationTypes {
@@ -59,7 +64,7 @@ export enum UIRegistrationTypes {
   FORESTRY_CONTRACTOR_LIEN = 'Forestry - Contractor Lien',
   FORESTRY_CONTRACTOR_CHARGE = 'Forestry - Contractor Charge',
   FORESTRY_SUBCONTRACTOR_LIEN = 'Forestry - Sub-contractor Charge',
-  // miscelaneous registration cc
+  // miscellaneous registration cc
   CARBON_TAX = 'Crown Charge - Carbon Tax Act',
   EXCISE_TAX = 'Crown Charge - Excise Tax Act',
   FOREST = 'Crown Charge - Forest Act',
@@ -76,7 +81,7 @@ export enum UIRegistrationTypes {
   SPECULATION_VACANCY_TAX = 'Crown Charge - Speculation and Vacancy Tax Act',
   TOBACCO_TAX = 'Crown Charge - Tobacco Tax Act',
   OTHER = 'Crown Charge - Other',
-    // miscelaneous registration other
+    // miscellaneous registration other
   LIEN_UNPAID_WAGES = 'Lien for Unpaid Wages',
   HERITAGE_CONSERVATION_NOTICE = 'Heritage Conservation Notice',
   MANUFACTURED_HOME_NOTICE = 'Manufactured Home Notice',
@@ -93,7 +98,12 @@ export enum UIRegistrationTypes {
   TRANSITION_FINANCING_STATEMENT = 'PPSA Transition',
   TRANSITION_SALE_OF_GOODS = 'Sales of Goods Transition',
   TRANSITION_TAX_LIEN = 'Tax Lien Transition Social Service/Hotel Room',
-  TRANSITION_MH = 'M.H. Transition'
+  TRANSITION_MH = 'M.H. Transition',
+  TRANSFER_OF_SALE = 'Sale or Transfer',
+  TRANSFER_DUE_TO_DEATH = 'Sale or Gift due to death',
+  NON_RESIDENTIAL_EXEMPTION = 'None Residential Exemption',
+  RESIDENTIAL_EXEMPTION = 'Residential Exemption',
+  TRANSPORT_PERMIT = 'Transport Permit'
 }
 
 export enum StatementTypes {
@@ -158,4 +168,13 @@ export enum UIRegistrationClassTypes {
 export enum APIMhrDescriptionTypes {
   REGISTER_NEW_UNIT = 'REGISTER NEW UNIT',
   SALE_OR_GIFT = 'SALE OR GIFT'
+}
+
+export enum APIMhrTypes {
+  TRANSFER_OF_SALE = 'TRANS',
+  TRANSFER_DUE_TO_DEATH = 'TRAND',
+  NON_RESIDENTIAL_EXEMPTION = 'EXEMPTION_NON_RES',
+  RESIDENTIAL_EXEMPTION = 'EXEMPTION_RES',
+  MANUFACTURED_HOME_REGISTRATION = 'MHREG',
+  TRANSPORT_PERMIT = 'PERMIT'
 }

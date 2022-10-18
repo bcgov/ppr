@@ -1,0 +1,128 @@
+{
+  "addOwnerGroups": [
+    {
+      "groupId": 2, 
+      "interest": "", 
+      "interestNumerator": 0, 
+      "owners": [
+        {
+          "address": {
+            "city": "LANGLEY", 
+            "country": "CA", 
+            "postalCode": "V3A 6H4", 
+            "region": "BC", 
+            "street": "6665 238TH STREET"
+          }, 
+          "individualName": {
+            "first": "JOHN", 
+            "last": "WATSON"
+          }, 
+          "phoneNumber": "604462027", 
+          "type": "JOINT"
+        }, 
+        {
+          "address": {
+            "city": "LANGLEY", 
+            "country": "CA", 
+            "postalCode": "V3A 6H4", 
+            "region": "BC", 
+            "street": "6665 238TH STREET"
+          }, 
+          "individualName": {
+            "first": "SHERLOCK", 
+            "last": "HOLMES"
+          }, 
+          "phoneNumber": "604462027", 
+          "type": "JOINT"
+        }
+      ], 
+      "status": "ACTIVE", 
+      "tenancySpecified": true, 
+      "type": "JOINT"
+    }
+  ], 
+  "affirmByName": "BCREG2 Della FORTYTHREE", 
+  "clientReferenceId": "UT-TRANS0016", 
+  "consideration": "$100000.00", 
+  "createDateTime": "2022-10-12T13:03:36-07:53", 
+  "declaredValue": 100000, 
+  "deleteOwnerGroups": [
+    {
+      "groupId": 1, 
+      "interest": "", 
+      "interestNumerator": 0, 
+      "owners": [
+        {
+          "address": {
+            "city": "COLBERT WA USA", 
+            "country": "CA", 
+            "postalCode": "99005", 
+            "region": "BC", 
+            "street": "4515 ELO DOLCE ROAD"
+          }, 
+          "individualName": {
+            "first": "DAVID", 
+            "last": "SMITH", 
+            "middle": "STANLEY"
+          }, 
+          "phoneNumber": "5092385046", 
+          "type": "JOINT"
+        }, 
+        {
+          "address": {
+            "city": "COLBERT WA USA", 
+            "country": "CA", 
+            "postalCode": "99005", 
+            "region": "BC", 
+            "street": "4515 ELO DOLCE ROAD"
+          }, 
+          "individualName": {
+            "first": "SUSAN", 
+            "last": "SMITH", 
+            "middle": "HEATHER"
+          }, 
+          "phoneNumber": "5092385046", 
+          "type": "JOINT"
+        }, 
+        {
+          "address": {
+            "city": "FORT ST. JOHN", 
+            "country": "CA", 
+            "postalCode": "V1J 4M7", 
+            "region": "BC", 
+            "street": "S 2 SITE 12 COMP 185"
+          }, 
+          "organizationName": "CIMARRON CAMP SERVICES LTD.", 
+          "phoneNumber": "8669201156", 
+          "type": "JOINT"
+        }
+      ], 
+      "status": "PREVIOUS", 
+      "tenancySpecified": true, 
+      "type": "JOINT"
+    }
+  ], 
+  "documentDescription": "SALE OR GIFT", 
+  "documentId": "10200079", 
+  "documentRegistrationNumber": "00500240", 
+  "documentType": "TRAN", 
+  "mhrNumber": "100173", 
+  "ownLand": true, 
+  "payment": {
+    "invoiceId": "22651", 
+    "receipt": "/api/v1/payment-requests/22651/receipts"
+  }, 
+  "status": "ACTIVE", 
+  "submittingParty": {
+    "address": {
+      "city": "VICTORIA", 
+      "country": "CA", 
+      "postalCode": "V8W 2V8", 
+      "region": "BC", 
+      "street": "222 SUMMER STREET"
+    }, 
+    "businessName": "ABC SEARCHING COMPANY", 
+    "emailAddress": "bsmith@abc-search.com"
+  }, 
+  "transferDate": "2022-10-08T09:00:00-07:53"
+}

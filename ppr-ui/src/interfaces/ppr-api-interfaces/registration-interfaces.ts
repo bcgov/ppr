@@ -89,6 +89,7 @@ export interface MhRegistrationSummaryIF {
   error?: ErrorIF,
   clientReferenceId: string
   createDateTime: string
+  draftNumber?: string
   mhrNumber: string
   ownerNames: string
   path: string

@@ -4,7 +4,7 @@
 {% endif %}
     <div class="section-title mt-3">Debtor Information</div>
 {% if detail.financingStatement.debtors is defined and change is not defined %}
-    <table class="section-data section-data-table mt-4" role="presentation">
+    <table class="section-data section-data-table-new mt-4" role="presentation">
     {% for party in detail.financingStatement.debtors %}
         <tr class="no-page-break">
             <td class="col-33">
@@ -32,10 +32,13 @@
               {% endif %}
             </td>
      </tr>
+        {% if not loop.last %}
+            <tr><td colspan="3"><div class="separator-table-row mt-3 mb-3"></div></td></tr>            
+        {% endif %}
     {% endfor %}
     </table>    
 {% elif change is defined and (change.addDebtors is defined or change.deleteDebtors is defined) %}
-    <table class="section-data section-data-table mt-4" role="presentation">
+    <table class="section-data section-data-table-new mt-4" role="presentation">
     {% if change.addDebtors is defined %}
         {% for party in change.addDebtors %}
             <tr class="no-page-break">
@@ -77,38 +80,44 @@
                   {% endif %}
                 </td>
             </tr>
+            {% if not loop.last %}
+                <tr><td colspan="3"><div class="separator-table-row mt-3 mb-3"></div></td></tr>            
+            {% endif %}
         {% endfor %}
     {% endif %}
     {% if change.deleteDebtors is defined %}
         {% for party in change.deleteDebtors %}
             {% if party.edit is not defined %}
-            <tr class="no-page-break">
-                <td class="col-33">
-                    <div class="section-sub-title">
-                        {% if party.businessName is defined %}
-                            {{ party.businessName }}
-                        {% elif party.personName is defined %}
-                            {{ party.personName.last }},
-                            {{ party.personName.first }}
-                            {% if party.personName.middle is defined %}&nbsp;{{ party.personName.middle }}{% endif %}
-                        {% endif %}
-                    </div>
-                    <div><span class="label">DELETED</span></div>
-                </td>
-                <td class="col-33">
-                    <div class="section-sub-title">Address</div>
-                    <div class="pt-2">{{ party.address.street }}</div>
-                    <div>{{ party.address.streetAdditional }}</div>
-                    <div>{{ party.address.city }} {{ party.address.region }}</div>
-                    <div>{{ party.address.postalCode }} {{ party.address.country }}</div>
-                </td>
-                <td class="col-33">
-                  {% if party.personName is defined %}
-                    <div class="section-sub-title">Birthdate</div>
-                    <div class="pt-2">{% if party.birthDate is defined %}{{ party.birthDate }}{% endif %}</div>
-                  {% endif %}
-                </td>
-            </tr>
+                <tr class="no-page-break">
+                    <td class="col-33">
+                        <div class="section-sub-title">
+                            {% if party.businessName is defined %}
+                                {{ party.businessName }}
+                            {% elif party.personName is defined %}
+                                {{ party.personName.last }},
+                                {{ party.personName.first }}
+                                {% if party.personName.middle is defined %}&nbsp;{{ party.personName.middle }}{% endif %}
+                            {% endif %}
+                        </div>
+                        <div><span class="label">DELETED</span></div>
+                    </td>
+                    <td class="col-33">
+                        <div class="section-sub-title">Address</div>
+                        <div class="pt-2">{{ party.address.street }}</div>
+                        <div>{{ party.address.streetAdditional }}</div>
+                        <div>{{ party.address.city }} {{ party.address.region }}</div>
+                        <div>{{ party.address.postalCode }} {{ party.address.country }}</div>
+                    </td>
+                    <td class="col-33">
+                    {% if party.personName is defined %}
+                        <div class="section-sub-title">Birthdate</div>
+                        <div class="pt-2">{% if party.birthDate is defined %}{{ party.birthDate }}{% endif %}</div>
+                    {% endif %}
+                    </td>
+                </tr>
+                {% if not loop.last %}
+                    <tr><td colspan="3"><div class="separator-table-row mt-3 mb-3"></div></td></tr>            
+                {% endif %}
             {% endif %}
         {% endfor %}
     {% endif %}

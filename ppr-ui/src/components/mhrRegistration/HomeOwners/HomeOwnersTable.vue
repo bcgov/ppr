@@ -38,7 +38,7 @@
           </td>
         </tr>
 
-        <tr v-else-if="row.item" :key="row.item.id" class="owner-info">
+        <tr v-else-if="row.item.id" :key="row.item.id" class="owner-info" :data-test-id="`owner-info-${row.item.id}`">
           <td class="owner-name">
             <div v-if="row.item.individualName" class="owner-icon-name">
               <v-icon class="mr-2">mdi-account</v-icon>
@@ -58,7 +58,7 @@
               {{ row.item.suffix }}
             </div>
             <v-chip
-              v-if="hasAddedHomeOwner(row.item.id)"
+              v-if="isMhrTransfer && hasAddedHomeOwner(row.item.id)"
               class="badge-added ml-8 mt-2"
               color="primary"
               label
@@ -115,10 +115,14 @@
         </tr>
         <tr v-else>
           <td :colspan="4" class="py-1">
-            <div v-if="showGroups" class="error-text my-6 text-center">
+            <div
+              v-if="showGroups"
+              class="error-text my-6 text-center"
+              :data-test-id="`no-owners-msg-group-${homeOwners.indexOf(row.item)}`"
+            >
               Group must contain at least one owner
             </div>
-            <div v-else class="my-6 text-center">
+            <div v-else class="my-6 text-center" data-test-id="no-owners-mgs">
               No owners added yet
             </div>
           </td>
@@ -205,7 +209,7 @@ export default defineComponent({
     }
 
     const hasAddedHomeOwner = (id: string): boolean => {
-      return props.currentHomeOwners?.some(currentOwner => currentOwner.id !== id)
+      return !props.currentHomeOwners?.some(currentOwner => currentOwner.id === id)
     }
 
     watch(
@@ -299,7 +303,7 @@ export default defineComponent({
     margin-left: 32px;
   }
   .theme--light.v-btn.v-btn--disabled {
-    color:#1669bb !important;
+    color: #1669bb !important;
     opacity: 0.4 !important;
   }
 }
