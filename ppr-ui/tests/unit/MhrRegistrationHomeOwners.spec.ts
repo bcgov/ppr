@@ -114,7 +114,7 @@ describe('Home Owners', () => {
 
   it('renders home owner (person and org) via store dispatch', async () => {
     const owners = [mockedPerson] as MhrRegistrationHomeOwnerIF[]
-    const homeOwnerGroup = [{ groupId: '1', owners: owners }] as MhrRegistrationHomeOwnerGroupIF[]
+    const homeOwnerGroup = [{ groupId: 1, owners: owners }] as MhrRegistrationHomeOwnerGroupIF[]
 
     // add a person
     await store.dispatch('setMhrRegistrationHomeOwnerGroups', homeOwnerGroup)
@@ -167,7 +167,7 @@ describe('Home Owners', () => {
 
   it('should edit home owner', async () => {
     const homeOwnerGroup = [
-      { groupId: '1', owners: [mockedPerson, mockedOrganization] }
+      { groupId: 1, owners: [mockedPerson, mockedOrganization] }
     ] as MhrRegistrationHomeOwnerGroupIF[]
 
     await store.dispatch('setMhrRegistrationHomeOwnerGroups', homeOwnerGroup)
@@ -204,8 +204,8 @@ describe('Home Owners', () => {
 
   it('should delete a home owner group', async () => {
     const homeOwnerGroups = [
-      { groupId: '1', owners: [mockedPerson] },
-      { groupId: '2', owners: [mockedOrganization] }
+      { groupId: 1, owners: [mockedPerson] },
+      { groupId: 2, owners: [mockedOrganization] }
     ] as MhrRegistrationHomeOwnerGroupIF[]
 
     await store.dispatch('setMhrRegistrationHomeOwnerGroups', homeOwnerGroups)
@@ -232,7 +232,7 @@ describe('Home Owners', () => {
 
     // delete first group (person)
     const homeOwnersTableData = wrapper.findComponent(HomeOwnersTable).vm.$data
-    await homeOwnersTableData.deleteGroup('1')
+    await homeOwnersTableData.deleteGroup(1)
 
     // second group should become first
     expect(wrapper.findComponent(HomeOwnersTable).text()).toContain(mockedOrganization.organizationName)
@@ -243,7 +243,7 @@ describe('Home Owners', () => {
   it('should show fractional ownership', async () => {
     const homeOwnerGroup = [
       {
-        groupId: '1',
+        groupId: 1,
         owners: [mockedPerson, mockedOrganization],
         interest: 'Undivided',
         interestNumerator: 123,
@@ -272,7 +272,7 @@ describe('Home Owners', () => {
   })
 
   it('should correctly display At Least One Owner check mark', async () => {
-    await store.dispatch('setMhrRegistrationHomeOwnerGroups', [{ groupId: '1', owners: [mockedPerson] }])
+    await store.dispatch('setMhrRegistrationHomeOwnerGroups', [{ groupId: 1, owners: [mockedPerson] }])
 
     const registeredOwnerCheck = wrapper.findComponent(HomeOwners).find(getTestId('reg-owner-checkmark'))
     expect(registeredOwnerCheck.exists()).toBeTruthy()
@@ -300,7 +300,7 @@ describe('Home Owners', () => {
 
     const homeOwnerGroup = [
       {
-        groupId: '2',
+        groupId: 2,
         owners: [mockedOrganization],
         interest: 'Undivided',
         interestNumerator: 123,
@@ -343,7 +343,7 @@ describe('Home Owners', () => {
   it('should keep the Group shown after clearing dropdown but then clicking Cancel', async () => {
     const homeOwnerGroup = [
       {
-        groupId: '123',
+        groupId: 123,
         owners: [mockedPerson],
         interest: 'Undivided',
         interestNumerator: 111,
@@ -384,7 +384,7 @@ describe('Home Owners', () => {
   it('should show correct error messages when deleting Owners from the Home Owners table', async () => {
     // Should show 'Group must contain at least one owner' when there are no Owners in a Group
     // Should show 'No owners added yet' when there are no Owners and no Groups
-    const GROUP_ID = '12'
+    const GROUP_ID = 12
 
     const homeOwnerGroup = [
       {

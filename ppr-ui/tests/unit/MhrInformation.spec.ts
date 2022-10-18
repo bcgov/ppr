@@ -140,7 +140,7 @@ describe('Mhr Information', () => {
     const owners = [mockedAddedPerson, mockedRemovedPerson] as MhrRegistrationHomeOwnerIF[] // same IF for Transfer and Registration
     const homeOwnerGroup = [
       mockMhrTransferCurrentHomeOwner,
-      { groupId: '2', owners: owners }
+      { groupId: 1, owners: owners }
     ] as MhrRegistrationHomeOwnerGroupIF[]
 
     await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerGroup)
@@ -229,7 +229,7 @@ describe('Mhr Information', () => {
     const homeOwnerGroups = store.getters.getMhrTransferHomeOwnerGroups as MhrRegistrationHomeOwnerGroupIF[]
 
     // Add a second Group
-    const NEW_GROUP_ID = '3'
+    const NEW_GROUP_ID = 3
     const newHomeOwnerGroup = { groupId: NEW_GROUP_ID, owners: [mockedPerson] } as MhrRegistrationHomeOwnerGroupIF
     homeOwnerGroups.push(newHomeOwnerGroup)
     await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerGroups)

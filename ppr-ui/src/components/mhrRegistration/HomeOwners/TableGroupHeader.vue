@@ -104,7 +104,7 @@ import { MhrRegistrationFractionalOwnershipIF } from '@/interfaces/mhr-registrat
 export default defineComponent({
   name: 'TableGroupHeader',
   props: {
-    groupId: { default: '' },
+    groupId: { default: 1 },
     owners: { default: [] },
     showEditActions: { type: Boolean, default: true },
     isMhrTransfer: { type: Boolean, default: false }
@@ -178,7 +178,7 @@ export default defineComponent({
     )
 
     // Close Delete Group dialog or proceed to deleting a Group
-    const cancelOrProceed = (proceed: boolean, groupId: string): void => {
+    const cancelOrProceed = (proceed: boolean, groupId: number): void => {
       if (proceed) {
         deleteGroup(groupId)
         localState.showDeleteGroupDialog = false

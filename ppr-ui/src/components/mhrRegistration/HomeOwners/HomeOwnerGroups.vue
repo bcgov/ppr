@@ -69,13 +69,13 @@ import { MhrRegistrationFractionalOwnershipIF } from '@/interfaces/mhr-registrat
 
 // Interface for readonly and Edit button states for Owner Groups
 interface ReadonlyOwnerGroupStateIF {
-  groupId: string,
+  groupId: number,
   isReadonly: Boolean,
   hasEditButton: Boolean
 }
 
 interface FractionalOwnershipWithGroupIdIF extends MhrRegistrationFractionalOwnershipIF {
-  groupId: string
+  groupId: number
 }
 
 export default defineComponent({
@@ -85,7 +85,7 @@ export default defineComponent({
     FractionalOwnership
   },
   props: {
-    groupId: { type: String },
+    groupId: { type: Number },
     fractionalData: { type: Object as () => FractionalOwnershipWithGroupIdIF },
     isAddingHomeOwner: { type: Boolean }, // makes additional Group available in dropdown when adding a new home owner
     isMhrTransfer: { type: Boolean, default: false }
@@ -119,13 +119,13 @@ export default defineComponent({
       allGroupsState: getTransferOrRegistrationHomeOwnerGroups()
         .map(group => {
           return {
-            groupId: group.groupId.toString(),
+            groupId: group.groupId,
             isReadonly: true && showGroups.value,
             hasEditButton: true && showGroups.value
           }
         })
         .concat({
-          groupId: (homeOwnerGroups.length + 1).toString(),
+          groupId: (homeOwnerGroups.length + 1),
           isReadonly: false,
           hasEditButton: false
         }) as ReadonlyOwnerGroupStateIF[],
@@ -135,13 +135,13 @@ export default defineComponent({
       showEditFractionalOwnershipBtn: true
     })
 
-    const setOwnerGroupId = (groupId: string): void => {
+    const setOwnerGroupId = (groupId: number): void => {
       emit('setOwnerGroupId', groupId)
     }
 
     const openEditFractionalOwnership = (): void => {
       const groupState = find(
-        localState.allGroupsState, { groupId: localState.ownerGroupId.toString() }) as ReadonlyOwnerGroupStateIF
+        localState.allGroupsState, { groupId: localState.ownerGroupId }) as ReadonlyOwnerGroupStateIF
       groupState.hasEditButton = false
       groupState.isReadonly = false
     }

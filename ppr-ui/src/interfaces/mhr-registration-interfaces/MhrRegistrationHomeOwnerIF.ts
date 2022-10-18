@@ -3,7 +3,7 @@ import { ActionTypes } from '@/enums'
 
 export interface MhrRegistrationHomeOwnerIF {
   id?: string // optional property used for editing a home owner
-  groupId?: string
+  groupId?: number
   action?: ActionTypes
   individualName?: {
     first: string
