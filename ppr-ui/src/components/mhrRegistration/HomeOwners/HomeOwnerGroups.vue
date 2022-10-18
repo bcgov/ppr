@@ -115,7 +115,6 @@ export default defineComponent({
           : []
       }),
       groupFractionalData: find(getTransferOrRegistrationHomeOwnerGroups(), { groupId: props.groupId }),
-      // fractionalInfo: computed(() => props.fractionalData),
       showFractionalOwnership: computed(() => Number(localState.ownerGroupId) > 0),
       allGroupsState: getTransferOrRegistrationHomeOwnerGroups()
         .map(group => {
