@@ -40,90 +40,137 @@
 
         <tr v-else-if="row.item.id" :key="row.item.id" class="owner-info" :data-test-id="`owner-info-${row.item.id}`">
           <td class="owner-name">
-            <div v-if="row.item.individualName" class="owner-icon-name">
-              <v-icon class="mr-2">mdi-account</v-icon>
-              <div class="font-weight-bold">
-                {{ row.item.individualName.first }}
-                {{ row.item.individualName.middle }}
-                {{ row.item.individualName.last }}
+            <div :class="{'removed-owner': isRemovedHomeOwner(row.item)}">
+              <div v-if="row.item.individualName" class="owner-icon-name">
+                <v-icon class="mr-2">mdi-account</v-icon>
+                <div class="font-weight-bold">
+                  {{ row.item.individualName.first }}
+                  {{ row.item.individualName.middle }}
+                  {{ row.item.individualName.last }}
+                </div>
+              </div>
+              <div v-else class="owner-icon-name">
+                <v-icon class="mr-2">mdi-domain</v-icon>
+                <div class="font-weight-bold">
+                  {{ row.item.organizationName }}
+                </div>
+              </div>
+              <div v-if="row.item.suffix" class="suffix">
+                {{ row.item.suffix }}
               </div>
             </div>
-            <div v-else class="owner-icon-name">
-              <v-icon class="mr-2">mdi-domain</v-icon>
-              <div class="font-weight-bold">
-                {{ row.item.organizationName }}
-              </div>
-            </div>
-            <div v-if="row.item.suffix" class="suffix">
-              {{ row.item.suffix }}
-            </div>
-            <v-chip
-              v-if="isMhrTransfer && hasAddedHomeOwner(row.item.id)"
-              class="badge-added ml-8 mt-2"
-              color="primary"
-              label
-              text-color="white"
-              x-small
-              data-test-id="owner-added-badge"
-            >
-              <b>ADDED</b>
-            </v-chip>
-          </td>
-          <td>
-            <base-address :schema="addressSchema" :value="row.item.address" />
-          </td>
-          <td>
-            {{ toDisplayPhone(row.item.phoneNumber) }}
-            <span v-if="row.item.phoneExtension"> Ext {{ row.item.phoneExtension }} </span>
-          </td>
-          <td v-if="showEditActions" class="text-right">
-            <v-btn
-              text
-              color="primary"
-              class="pr-0"
-              :ripple="false"
-              :disabled="isAddingMode || isEditingMode || isGlobalEditingMode"
-              @click="openForEditing(homeOwners.indexOf(row.item))"
-              data-test-id="table-edit-btn"
-            >
-              <v-icon small>mdi-pencil</v-icon>
-              <span>Edit</span>
-              <v-divider class="ma-0 pl-3" vertical />
-            </v-btn>
-            <!-- Actions drop down menu -->
-            <v-menu offset-y left nudge-bottom="0">
-              <template v-slot:activator="{ on }">
-                <v-btn text v-on="on"
-                 color="primary" class="px-0"
-                 :disabled="isAddingMode || isGlobalEditingMode"
-                >
-                  <v-icon>mdi-menu-down</v-icon>
-                </v-btn>
-              </template>
 
-              <!-- More actions drop down list -->
-              <v-list class="actions-dropdown actions__more-actions">
-                <v-list-item class="my-n2">
-                  <v-list-item-subtitle class="pa-0" @click="remove(row.item)">
-                    <v-icon small style="margin-bottom: 3px;">mdi-delete</v-icon>
-                    <span class="ml-1 remove-btn-text">Remove</span>
-                  </v-list-item-subtitle>
-                </v-list-item>
-              </v-list>
-            </v-menu>
+            <!-- Hide Chips for Review Mode -->
+            <template v-if="!isReadonlyTable">
+              <v-chip
+                v-if="isMhrTransfer && isAddedHomeOwner(row.item)"
+                class="badge-added ml-8 mt-2"
+                color="primary"
+                label x-small
+                text-color="white"
+                data-test-id="owner-added-badge"
+              >
+                <b>ADDED</b>
+              </v-chip>
+              <v-chip
+                v-if="isMhrTransfer && isRemovedHomeOwner(row.item)"
+                class="badge-delete ml-8 mt-2"
+                label x-small
+                color="#grey lighten-2"
+                text-color="$gray9"
+                data-test-id="owner-removed-badge"
+              >
+                <b>DELETED</b>
+              </v-chip>
+            </template>
+          </td>
+          <td>
+            <base-address
+              :schema="addressSchema"
+              :value="row.item.address"
+              :class="{'removed-owner': isRemovedHomeOwner(row.item)}"
+            />
+          </td>
+          <td>
+            <div :class="{'removed-owner': isRemovedHomeOwner(row.item)}">
+              {{ toDisplayPhone(row.item.phoneNumber) }}
+              <span v-if="row.item.phoneExtension"> Ext {{ row.item.phoneExtension }} </span>
+            </div>
+          </td>
+          <td v-if="showEditActions" class="row-actions text-right">
+
+            <!-- New Owner Actions -->
+            <template v-if="!isMhrTransfer || isAddedHomeOwner(row.item)">
+              <v-btn
+                text
+                color="primary"
+                class="pr-0"
+                :ripple="false"
+                :disabled="isAddingMode || isEditingMode || isGlobalEditingMode"
+                @click="openForEditing(homeOwners.indexOf(row.item))"
+                data-test-id="table-edit-btn"
+              >
+                <v-icon small>mdi-pencil</v-icon>
+                <span>Edit</span>
+                <v-divider class="ma-0 pl-3" vertical />
+              </v-btn>
+              <!-- Actions drop down menu -->
+              <v-menu offset-y left nudge-bottom="0">
+                <template v-slot:activator="{ on }">
+                  <v-btn text v-on="on"
+                         color="primary" class="px-0"
+                         :disabled="isAddingMode || isGlobalEditingMode"
+                  >
+                    <v-icon>mdi-menu-down</v-icon>
+                  </v-btn>
+                </template>
+
+                <!-- More actions drop down list -->
+                <v-list class="actions-dropdown actions__more-actions">
+                  <v-list-item class="my-n2">
+                    <v-list-item-subtitle class="pa-0" @click="remove(row.item)">
+                      <v-icon small style="margin-bottom: 3px;">mdi-delete</v-icon>
+                      <span class="ml-1 remove-btn-text">Remove</span>
+                    </v-list-item-subtitle>
+                  </v-list-item>
+                </v-list>
+              </v-menu>
+            </template>
+
+            <!-- Existing Owner Actions -->
+            <template v-else>
+              <v-btn
+                v-if="!isRemovedHomeOwner(row.item)"
+                text color="primary" class="pr-0"
+                :ripple="false"
+                :disabled="isAddingMode || isEditingMode || isGlobalEditingMode"
+                @click="markForRemoval(row.item)"
+                data-test-id="table-edit-btn"
+              >
+                <v-icon small>mdi-delete</v-icon>
+                <span>Delete</span>
+              </v-btn>
+              <v-btn
+                v-if="isRemovedHomeOwner(row.item)"
+                text color="primary" class="pr-0"
+                :ripple="false"
+                :disabled="isAddingMode || isEditingMode || isGlobalEditingMode"
+                @click="undoRemoval(row.item)"
+                data-test-id="table-edit-btn"
+              >
+                <v-icon small>mdi-undo</v-icon>
+                <span>Undo</span>
+              </v-btn>
+            </template>
           </td>
         </tr>
         <tr v-else>
-          <td :colspan="4" class="py-1">
+          <td v-if="showGroups" :colspan="4" class="py-1">
             <div
-              v-if="showGroups"
               class="error-text my-6 text-center"
               :data-test-id="`no-owners-msg-group-${homeOwners.indexOf(row.item)}`"
             >
               Group must contain at least one owner
-            </div>
-            <div v-else class="my-6 text-center" data-test-id="no-owners-mgs">
-              No owners added yet
             </div>
           </td>
         </tr>
@@ -146,6 +193,7 @@ import { AddEditHomeOwner } from '@/components/mhrRegistration/HomeOwners'
 import TableGroupHeader from '@/components/mhrRegistration/HomeOwners/TableGroupHeader.vue'
 /* eslint-disable no-unused-vars */
 import { MhrRegistrationHomeOwnerIF } from '@/interfaces'
+import { ActionTypes } from '@/enums'
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
@@ -172,7 +220,8 @@ export default defineComponent({
       isGlobalEditingMode,
       setGlobalEditingMode,
       hasEmptyGroup,
-      hasMinimumGroups
+      hasMinimumGroups,
+      editHomeOwner
     } = useHomeOwners()
 
     const localState = reactive({
@@ -187,6 +236,22 @@ export default defineComponent({
     const remove = (item): void => {
       localState.currentlyEditingHomeOwnerId = -1
       removeOwner(item, props.isMhrTransfer)
+    }
+
+    const markForRemoval = (item: MhrRegistrationHomeOwnerIF): void => {
+      editHomeOwner(
+        { ...item, action: ActionTypes.REMOVED },
+        item.groupId,
+        props.isMhrTransfer
+      )
+    }
+
+    const undoRemoval = (item): void => {
+      editHomeOwner(
+        { ...item, action: null },
+        item.groupId,
+        props.isMhrTransfer
+      )
     }
 
     const openForEditing = (index: number) => {
@@ -204,8 +269,12 @@ export default defineComponent({
       return owners.length > 0 && owners[0]?.id !== undefined
     }
 
-    const hasAddedHomeOwner = (id: string): boolean => {
-      return !props.currentHomeOwners?.some(currentOwner => currentOwner.id === id)
+    const isAddedHomeOwner = (item: MhrRegistrationHomeOwnerIF): boolean => {
+      return item.action === ActionTypes.ADDED
+    }
+
+    const isRemovedHomeOwner = (item: MhrRegistrationHomeOwnerIF): boolean => {
+      return item.action === ActionTypes.REMOVED
     }
 
     watch(
@@ -216,6 +285,7 @@ export default defineComponent({
     )
 
     return {
+      ActionTypes,
       addressSchema,
       toDisplayPhone,
       openForEditing,
@@ -227,7 +297,10 @@ export default defineComponent({
       deleteGroup,
       isGlobalEditingMode,
       hasMinimumGroups,
-      hasAddedHomeOwner,
+      isAddedHomeOwner,
+      isRemovedHomeOwner,
+      markForRemoval,
+      undoRemoval,
       ...toRefs(localState)
     }
   }
@@ -246,6 +319,10 @@ export default defineComponent({
   .owner-name,
   .owner-name i {
     color: $gray9 !important;
+  }
+
+  .removed-owner {
+    opacity: .4;
   }
 
   table {

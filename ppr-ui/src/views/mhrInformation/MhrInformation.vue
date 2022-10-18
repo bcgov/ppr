@@ -31,7 +31,7 @@
                   class="px-7"
                   isMhrTransfer
                   isReadonlyTable
-                  :homeOwners="getMhrTransferHomeOwners"
+                  :homeOwners="reviewOwners"
                   :currentHomeOwners="getMhrTransferCurrentHomeOwners"
                 />
               </template>
@@ -75,7 +75,7 @@
 import { computed, defineComponent, onMounted, reactive, toRefs } from '@vue/composition-api'
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
-import { RouteNames } from '@/enums'
+import { ActionTypes, RouteNames } from '@/enums'
 import {
   createMhrTransferDraft,
   fetchMhRegistration,
@@ -158,6 +158,9 @@ export default defineComponent({
       }),
       reviewConfirmText: computed((): string => {
         return localState.isReviewMode ? 'Register Changes and Pay' : 'Review and Confirm'
+      }),
+      reviewOwners: computed(() => {
+        return getMhrTransferHomeOwners.value.filter(owner => owner.action !== ActionTypes.REMOVED)
       })
     })
 

@@ -323,7 +323,8 @@ export default defineComponent({
         country: props.editHomeOwner?.address.country || '',
         postalCode: props.editHomeOwner?.address.postalCode || '',
         deliveryInstructions: props.editHomeOwner?.address.deliveryInstructions || ''
-      }
+      },
+      action: props.editHomeOwner?.action || null
     }
 
     if (props.isHomeOwnerPerson) {

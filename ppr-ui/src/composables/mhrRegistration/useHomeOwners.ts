@@ -8,7 +8,7 @@ import '@/utils/use-composition-api'
 
 import { ref, readonly, watch, toRefs } from '@vue/composition-api'
 import { useActions, useGetters } from 'vuex-composition-helpers'
-import { HomeTenancyTypes } from '@/enums'
+import { ActionTypes, HomeTenancyTypes } from '@/enums'
 import { MhrCompVal, MhrSectVal } from '@/composables/mhrRegistration/enums'
 import { useMhrValidations } from '@/composables'
 import { find, remove, set, findIndex, sumBy } from 'lodash'
@@ -161,9 +161,14 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
   }
 
   const addOwnerToTheGroup = (owner: MhrRegistrationHomeOwnerIF, groupId: string, isTransfer = false) => {
-    const homeOwnerGroups = isTransfer
-      ? [...getMhrTransferHomeOwnerGroups.value]
-      : [...getMhrRegistrationHomeOwnerGroups.value]
+    let homeOwnerGroups
+
+    if (isTransfer) {
+      homeOwnerGroups = [...getMhrTransferHomeOwnerGroups.value]
+      owner = { ...owner, action: ActionTypes.ADDED }
+    } else {
+      homeOwnerGroups = [...getMhrRegistrationHomeOwnerGroups.value]
+    }
 
     // Try to find a group to add the owner
     const groupToUpdate =
