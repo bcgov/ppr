@@ -422,7 +422,7 @@ export default defineComponent({
 
         // this should occur when trying to add the group and fractional info
         // check if group has some fractional data
-        if (localState.groupFractionalData.interestNumerator && localState.ownerGroupId) {
+        if (localState.groupFractionalData?.interestNumerator && localState.ownerGroupId) {
           setShowGroups(true)
 
           // Get fractional data based on owner's group id

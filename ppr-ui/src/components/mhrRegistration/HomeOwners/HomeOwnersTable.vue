@@ -222,7 +222,7 @@ export default defineComponent({
       hasEmptyGroup,
       hasMinimumGroups,
       editHomeOwner
-    } = useHomeOwners()
+    } = useHomeOwners(props.isMhrTransfer)
 
     const localState = reactive({
       currentlyEditingHomeOwnerId: -1,

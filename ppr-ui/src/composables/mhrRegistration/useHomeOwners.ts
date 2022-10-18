@@ -86,7 +86,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
   }
 
   const getGroupTenancyType = (group: MhrRegistrationHomeOwnerGroupIF): HomeTenancyTypes => {
-    const numOfOwnersInGroup = group.owners.length
+    const numOfOwnersInGroup = group.owners?.length
 
     if (group.interestNumerator) {
       return HomeTenancyTypes.COMMON
@@ -152,7 +152,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
     }
   }
 
-  const getGroupForOwner = (ownerId: string, isTransfer = false): MhrRegistrationHomeOwnerGroupIF => {
+  const getGroupForOwner = (ownerId: string): MhrRegistrationHomeOwnerGroupIF => {
     const homeOwners = getTransferOrRegistrationHomeOwnerGroups()
 
     return find(homeOwners, group => {
@@ -196,7 +196,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
     const homeOwnerGroups = isTransfer
       ? [...getMhrTransferHomeOwnerGroups.value]
       : [...getMhrRegistrationHomeOwnerGroups.value]
-    const groupIdOfOwner = getGroupForOwner(updatedOwner.id, isTransfer).groupId
+    const groupIdOfOwner = getGroupForOwner(updatedOwner.id).groupId
 
     const groupToUpdate = homeOwnerGroups.find(
       group => group.groupId === groupIdOfOwner
@@ -224,7 +224,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
       : [...getMhrRegistrationHomeOwnerGroups.value]
 
     // find group id that owner belongs to
-    const groupIdOfOwner = getGroupForOwner(owner.id, isTransfer)?.groupId || DEFAULT_GROUP_ID
+    const groupIdOfOwner = getGroupForOwner(owner.id)?.groupId || DEFAULT_GROUP_ID
 
     // find group to remove the owner from
     const groupToUpdate = homeOwnerGroups.find(
@@ -373,6 +373,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
     setGlobalEditingMode,
     deleteGroup,
     setGroupFractionalInterest,
-    hasMinimumGroups
+    hasMinimumGroups,
+    getGroupTenancyType
   }
 }

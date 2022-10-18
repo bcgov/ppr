@@ -1,8 +1,7 @@
 import { MhrTransferApiIF, MhrTransferIF } from '@/interfaces'
 import { useGetters } from 'vuex-composition-helpers'
-import { useNewMhrRegistration } from '@/composables'
 import { readonly, ref } from '@vue/composition-api'
-import { ActionTypes } from '@/enums'
+import { ActionTypes, ApiHomeTenancyTypes, HomeTenancyTypes } from '@/enums'
 
 // Validation flag for Transfer Details
 const transferDetailsValid = ref(false)
@@ -16,7 +15,7 @@ export const useMhrInformation = () => {
     getMhrTransferConsideration,
     getMhrTransferDate,
     getMhrTransferOwnLand,
-    getMhrTransferCurrentHomeOwners
+    getMhrTransferHomeOwnerGroups
   } = useGetters<any>([
     'getCurrentUser',
     'getMhrInformation',
@@ -25,12 +24,8 @@ export const useMhrInformation = () => {
     'getMhrTransferConsideration',
     'getMhrTransferDate',
     'getMhrTransferOwnLand',
-    'getMhrTransferCurrentHomeOwners'
+    'getMhrTransferHomeOwnerGroups'
   ])
-
-  const {
-    cleanEmpty
-  } = useNewMhrRegistration()
 
   const setTransferDetailsValid = (isValid: boolean) => {
     transferDetailsValid.value = isValid
@@ -53,10 +48,15 @@ export const useMhrInformation = () => {
 
     getMhrTransferHomeOwners.value.forEach(ownerGroup => {
       const { groupId, ...owners } = ownerGroup
+      const groupType = getMhrTransferHomeOwnerGroups.value.find(group => group.groupId === ownerGroup.groupId)?.type
+      const apiGroupType = ApiHomeTenancyTypes[
+        Object.keys(HomeTenancyTypes).find(key => HomeTenancyTypes[key] as string === groupType)
+      ]
+
       ownerGroups.push({
         owners: [owners].filter(owner => owner.action !== ActionTypes.REMOVED),
         groupId: parseInt(groupId),
-        type: 'SO'
+        type: apiGroupType
       })
     })
 
@@ -68,10 +68,15 @@ export const useMhrInformation = () => {
 
     getMhrTransferHomeOwners.value.forEach(ownerGroup => {
       const { groupId, ...owners } = ownerGroup
+      const groupType = getMhrTransferHomeOwnerGroups.value.find(group => group.groupId === ownerGroup.groupId)?.type
+      const apiGroupType = ApiHomeTenancyTypes[
+        Object.keys(HomeTenancyTypes).find(key => HomeTenancyTypes[key] as string === groupType)
+      ]
+
       ownerGroups.push({
         owners: [owners].filter(owner => owner.action === ActionTypes.REMOVED),
         groupId: parseInt(groupId),
-        type: 'SO'
+        type: apiGroupType
       })
     })
 

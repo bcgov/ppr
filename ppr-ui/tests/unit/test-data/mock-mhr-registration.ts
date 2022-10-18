@@ -30,7 +30,7 @@ export const mockedAddressAlt: AddressIF = {
 export const mockedEmptyGroup: MhrRegistrationHomeOwnerGroupIF = {
   groupId: '100',
   owners: [],
-  type:  Object.keys(HomeTenancyTypes).find(key => HomeTenancyTypes[key] as string === HomeTenancyTypes.SOLE) // TODO: Mhr-Submission - UPDATE after the correct type can be determined
+  type: Object.keys(HomeTenancyTypes).find(key => HomeTenancyTypes[key] as string === HomeTenancyTypes.SOLE) // TODO: Mhr-Submission - UPDATE after the correct type can be determined
 }
 
 export const mockedPerson: MhrRegistrationHomeOwnerIF = {
