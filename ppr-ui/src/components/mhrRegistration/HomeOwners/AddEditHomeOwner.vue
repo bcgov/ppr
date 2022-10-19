@@ -409,14 +409,12 @@ export default defineComponent({
         if (props.editHomeOwner) {
           editHomeOwner(
             localState.owner as MhrRegistrationHomeOwnerIF,
-            localState.ownerGroupId || '1',
-            props.isMhrTransfer
+            localState.ownerGroupId || '1'
           )
         } else {
           addOwnerToTheGroup(
             localState.owner as MhrRegistrationHomeOwnerIF,
-            localState.ownerGroupId,
-            props.isMhrTransfer
+            localState.ownerGroupId
           )
         }
 

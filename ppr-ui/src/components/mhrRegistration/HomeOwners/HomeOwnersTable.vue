@@ -164,13 +164,17 @@
             </template>
           </td>
         </tr>
-        <tr v-else>
-          <td v-if="showGroups" :colspan="4" class="py-1">
+        <tr v-else-if="!isMhrTransfer">
+          <td :colspan="4" class="py-1">
             <div
+              v-if="showGroups"
               class="error-text my-6 text-center"
               :data-test-id="`no-owners-msg-group-${homeOwners.indexOf(row.item)}`"
             >
               Group must contain at least one owner
+            </div>
+            <div v-else class="my-6 text-center" data-test-id="no-owners-mgs">
+              No owners added yet
             </div>
           </td>
         </tr>
@@ -235,22 +239,20 @@ export default defineComponent({
 
     const remove = (item): void => {
       localState.currentlyEditingHomeOwnerId = -1
-      removeOwner(item, props.isMhrTransfer)
+      removeOwner(item)
     }
 
     const markForRemoval = (item: MhrRegistrationHomeOwnerIF): void => {
       editHomeOwner(
         { ...item, action: ActionTypes.REMOVED },
-        item.groupId,
-        props.isMhrTransfer
+        item.groupId
       )
     }
 
     const undoRemoval = (item): void => {
       editHomeOwner(
         { ...item, action: null },
-        item.groupId,
-        props.isMhrTransfer
+        item.groupId
       )
     }
 
