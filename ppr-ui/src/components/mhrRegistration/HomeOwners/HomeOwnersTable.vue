@@ -164,7 +164,7 @@
             </template>
           </td>
         </tr>
-        <tr v-else-if="!isMhrTransfer">
+        <tr>
           <td :colspan="4" class="py-1">
             <div
               v-if="showGroups"
@@ -173,7 +173,7 @@
             >
               Group must contain at least one owner
             </div>
-            <div v-else class="my-6 text-center" data-test-id="no-owners-mgs">
+            <div v-else-if="!isMhrTransfer" class="my-6 text-center" data-test-id="no-owners-mgs">
               No owners added yet
             </div>
           </td>
