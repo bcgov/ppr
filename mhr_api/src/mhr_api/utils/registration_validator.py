@@ -36,52 +36,59 @@ DELETE_GROUP_ID_INVALID = 'The owner group with ID {group_id} is not active and 
 DELETE_GROUP_ID_NONEXISTENT = 'No owner group with ID {group_id} exists. '
 DELETE_GROUP_TYPE_INVALID = 'The owner group tenancy type with ID {group_id} is invalid. '
 DECLARED_VALUE_REQUIRED = 'Declared value is required and must be greater than 0 for this registration. '
-CONSIDERATION_REQUIRED = 'Consideration required for this registration. '
+CONSIDERATION_REQUIRED = 'Consideration is required for this registration. '
 TRANSFER_DATE_REQUIRED = 'Transfer date is required for this registration. '
 ADD_SOLE_OWNER_INVALID = 'Only one sole owner and only one sole owner group can be added. '
+GROUP_JOINT_INVALID = 'Only 1 group is allowed with the Joint Tenants owner group type. '
+GROUP_COMMON_INVALID = 'More than 1 group is required with the Tenants in Common owner group type. '
+GROUP_NUMERATOR_MISSING = 'The owner group interest numerator is required and must be an integer greater than 0. '
+GROUP_DENOMINATOR_MISSING = 'The owner group interest denominator is required and must be an integer greater than 0. '
+GROUP_INTEREST_MISMATCH = 'The owner group interest numerator sum does not equal the interest common denominator. '
+VALIDATOR_ERROR = 'Error performing extra validation. '
 
 
 def validate_registration(json_data, is_staff: bool = False):
     """Perform all registration data validation checks not covered by schema validation."""
     error_msg = ''
-    if is_staff:
-        error_msg += validate_doc_id(json_data)
-        if not json_data.get('ownerGroups'):
-            error_msg += OWNER_GROUPS_REQUIRED
-    error_msg += validate_submitting_party(json_data)
-    if json_data.get('ownerGroups'):
-        for group in json_data.get('ownerGroups'):
-            for owner in group.get('owners'):
-                error_msg += validate_owner(owner)
-    error_msg += validate_location(json_data)
+    try:
+        if is_staff:
+            error_msg += validate_doc_id(json_data)
+            if not json_data.get('ownerGroups'):
+                error_msg += OWNER_GROUPS_REQUIRED
+        error_msg += validate_submitting_party(json_data)
+        error_msg += validate_owner_groups(json_data.get('ownerGroups'), True)
+        error_msg += validate_location(json_data)
+    except Exception as validation_exception:   # noqa: B902; eat all errors
+        current_app.logger.error('validate_registration exception: ' + str(validation_exception))
+        error_msg += VALIDATOR_ERROR
     return error_msg
 
 
 def validate_transfer(registration: MhrRegistration, json_data, is_staff: bool = False):
     """Perform all transfer data validation checks not covered by schema validation."""
     error_msg = ''
-    if is_staff:
-        error_msg += validate_doc_id(json_data)
-    error_msg += validate_submitting_party(json_data)
-    if json_data.get('addOwnerGroups'):
-        so_count: int = 0
-        for group in json_data.get('addOwnerGroups'):
-            for owner in group.get('owners'):
-                if NEW_TENANCY_LEGACY.get(group.get('type', ''), '') == 'SO':
-                    so_count += 1
-                error_msg += validate_owner(owner)
-        if so_count > 1 or (so_count == 1 and len(json_data.get('addOwnerGroups')) > 1):
-            error_msg += ADD_SOLE_OWNER_INVALID
-    error_msg += validate_registration_state(registration)
-    if is_legacy() and registration and registration.manuhome and json_data.get('deleteOwnerGroups'):
-        error_msg += validate_delete_owners_legacy(registration, json_data)
-    if not is_staff:
-        if not json_data.get('declaredValue') or json_data.get('declaredValue') < 0:
-            error_msg += DECLARED_VALUE_REQUIRED
-        if not json_data.get('consideration'):
-            error_msg += CONSIDERATION_REQUIRED
-        if not json_data.get('transferDate'):
-            error_msg += TRANSFER_DATE_REQUIRED
+    try:
+        if is_staff:
+            error_msg += validate_doc_id(json_data)
+        error_msg += validate_submitting_party(json_data)
+        error_msg += validate_owner_groups(json_data.get('addOwnerGroups'),
+                                           False,
+                                           registration,
+                                           json_data.get('deleteOwnerGroups'))
+        error_msg += validate_registration_state(registration)
+        if is_legacy() and registration and registration.manuhome and json_data.get('deleteOwnerGroups'):
+            error_msg += validate_delete_owners_legacy(registration, json_data)
+        if not is_staff:
+            if not isinstance(json_data.get('declaredValue', 0), int) or not json_data.get('declaredValue') or \
+                    json_data.get('declaredValue') < 0:
+                error_msg += DECLARED_VALUE_REQUIRED
+            if not json_data.get('consideration'):
+                error_msg += CONSIDERATION_REQUIRED
+            if not json_data.get('transferDate'):
+                error_msg += TRANSFER_DATE_REQUIRED
+    except Exception as validation_exception:   # noqa: B902; eat all errors
+        current_app.logger.error('validate_transfer exception: ' + str(validation_exception))
+        error_msg += VALIDATOR_ERROR
     return error_msg
 
 
@@ -195,6 +202,88 @@ def validate_owner(owner):
         error_msg += validate_text(owner.get('organizationName'), desc + ' organization name')
     elif owner.get('individualName'):
         error_msg += validate_individual_name(owner.get('individualName'), desc)
+    return error_msg
+
+
+def validate_owner_group(group):
+    """Verify owner group is valid."""
+    error_msg = ''
+    if not group:
+        return error_msg
+    if NEW_TENANCY_LEGACY.get(group.get('type', ''), '') == Db2Owngroup.TenancyTypes.COMMON:
+        if group.get('interestNumerator', 0) < 1:
+            error_msg += GROUP_NUMERATOR_MISSING
+        if group.get('interestDenominator', 0) < 1:
+            error_msg += GROUP_DENOMINATOR_MISSING
+    return error_msg
+
+
+def delete_group(group_id: int, delete_groups):
+    """Check if owner group is flagged for deletion."""
+    if not delete_groups or group_id < 1:
+        return False
+    for group in delete_groups:
+        if group.get('groupId', 0) == group_id:
+            return True
+    return False
+
+
+def validate_group_interest(groups, denominator: int, registration: MhrRegistration = None, delete_groups=None):
+    """Verify owner group interest values are valid."""
+    error_msg = ''
+    numerator_sum: int = 0
+    if is_legacy() and registration and registration.manuhome and registration.manuhome.reg_owner_groups:
+        for existing in registration.manuhome.reg_owner_groups:
+            if existing.status == Db2Owngroup.StatusTypes.ACTIVE and \
+                    existing.tenancy_type == Db2Owngroup.TenancyTypes.COMMON and \
+                    not delete_group(existing.group_id, delete_groups):
+                den = existing.get_interest_fraction(False)
+                if den > 0:
+                    if den == denominator:
+                        numerator_sum += existing.interest_numerator
+                    elif den < denominator:
+                        numerator_sum += (denominator/den * existing.interest_numerator)
+        # current_app.logger.debug(f'existing numerator_sum={numerator_sum}, denominator={denominator}')
+    for group in groups:
+        num = group.get('interestNumerator', 0)
+        den = group.get('interestDenominator', 0)
+        if num > 0 and den > 0:
+            if den == denominator:
+                numerator_sum += num
+            else:
+                numerator_sum += (denominator/den * num)
+    # current_app.logger.debug(f'final numerator_sum={numerator_sum}, denominator={denominator}')
+    if numerator_sum != denominator:
+        error_msg = GROUP_INTEREST_MISMATCH
+    return error_msg
+
+
+def validate_owner_groups(groups, new: bool, registration: MhrRegistration = None, delete_groups=None):
+    """Verify owner groups are valid."""
+    error_msg = ''
+    if not groups:
+        return error_msg
+    so_count: int = 0
+    tc_count: int = 0
+    common_denominator: int = 0
+    for group in groups:
+        if NEW_TENANCY_LEGACY.get(group.get('type', ''), '') == Db2Owngroup.TenancyTypes.COMMON:
+            tc_count += 1
+            if common_denominator == 0:
+                common_denominator = group.get('interestDenominator', 0)
+            elif group.get('interestDenominator', 0) > common_denominator:
+                common_denominator = group.get('interestDenominator', 0)
+        error_msg += validate_owner_group(group)
+        for owner in group.get('owners'):
+            if NEW_TENANCY_LEGACY.get(group.get('type', ''), '') == Db2Owngroup.TenancyTypes.SOLE:
+                so_count += 1
+            error_msg += validate_owner(owner)
+    if so_count > 1 or (so_count == 1 and len(groups) > 1):
+        error_msg += ADD_SOLE_OWNER_INVALID
+    elif tc_count > 0 and new and len(groups) == 1:
+        error_msg += GROUP_COMMON_INVALID
+    elif tc_count > 0:
+        error_msg += validate_group_interest(groups, common_denominator, registration, delete_groups)
     return error_msg
 
 

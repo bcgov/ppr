@@ -27,6 +27,15 @@ TEST_DATA = [
     (True, 101917, 1, '60164729', 'SO'),
     (False, 0, 0, None, None)
 ]
+# testdata pattern is ({interest}, {numerator}, {denominator})
+TEST_DATA_INTEREST = [
+    ('', 0, 0),
+    ('1/2', 1, 2),
+    ('UNDIVIED 9/10', 9, 10),
+    ('UNDIVIDED 3/8', 3, 8),
+    ('UNDIVIDED 1/2 INT.', 1, 2),
+    ('A 55/100 INTEREST', 55, 100)
+]
 
 
 @pytest.mark.parametrize('exists,manuhome_id,group_id,reg_doc_id,type', TEST_DATA)
@@ -104,6 +113,16 @@ def test_find_by_reg_doc_id(session, exists, manuhome_id, group_id, reg_doc_id, 
         assert not groups
 
 
+@pytest.mark.parametrize('interest, numerator, denominator', TEST_DATA_INTEREST)
+def test_get_interest_fraction(interest, numerator, denominator):
+    """Assert that find document by manuhome id contains all expected elements."""
+    owngroup = Db2Owngroup(interest=interest, interest_numerator=1, tenancy_type='TC')
+    num_value = owngroup.get_interest_fraction(True)
+    den_value = owngroup.get_interest_fraction(False)
+    assert num_value == numerator
+    assert den_value == denominator
+
+
 def test_owngroup_json(session):
     """Assert that the owngroup renders to a json format correctly."""
     owngroup = Db2Owngroup(manuhome_id=1,
@@ -118,7 +137,7 @@ def test_owngroup_json(session):
                            lessor='',
                            interest='interest',
                            interest_numerator=0,
-                           tenancy_specified='tenancy_specified')
+                           tenancy_specified='Y')
 
     test_json = {
         'manuhomeId': owngroup.manuhome_id,
@@ -134,6 +153,7 @@ def test_owngroup_json(session):
         'lessor': owngroup.lessor,
         'interest': owngroup.interest,
         'interestNumerator': owngroup.interest_numerator,
+        'interestDenominator': 0,
         'tenancySpecified': owngroup.tenancy_specified
     }
     assert owngroup.json == test_json

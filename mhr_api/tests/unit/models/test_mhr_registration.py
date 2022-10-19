@@ -155,7 +155,7 @@ def test_find_by_id(session, reg_id, has_results, legacy):
             # current_app.logger.debug(report_json)
             assert report_json.get('documentDescription')
             assert report_json.get('documentId')
-            assert report_json.get('documentRegistrationId')
+            assert report_json.get('documentRegistrationNumber')
     else:
         assert not registration
 
@@ -266,6 +266,8 @@ def test_create_new_from_json(session):
     assert location.change_registration_id > 0
     assert location.location_type in MhrLocationTypes
     assert location.status_type in MhrStatusTypes
+    mh_json = registration.new_registration_json
+    assert mh_json
 
 
 def test_save_new(session):
@@ -274,6 +276,8 @@ def test_save_new(session):
     json_data['documentId'] = '88878888'
     registration: MhrRegistration = MhrRegistration.create_new_from_json(json_data, 'PS12345')
     registration.save()
+    mh_json = registration.new_registration_json
+    assert mh_json
     reg_new = MhrRegistration.find_by_mhr_number(registration.mhr_number, 'PS12345')
     assert reg_new
     draft_new = MhrDraft.find_by_draft_number(registration.draft.draft_number, True)

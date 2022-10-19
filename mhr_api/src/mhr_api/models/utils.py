@@ -270,6 +270,7 @@ COUNTRY_CA = 'CA'
 COUNTRY_US = 'US'
 PROVINCE_BC = 'BC'
 REGISTRATION_PATH = '/mhr/api/v1/registrations/'
+OWNER_INTEREST_UNDIVIDED = 'UNDIVIDED'
 
 
 def get_max_registrations_size():

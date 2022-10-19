@@ -62,7 +62,7 @@
   "documentDescription": "SALE OR GIFT", 
   "documentId": "10200077", 
   "documentRegistrationNumber": "00500238", 
-  "documentType": "TRAN", 
+  "registrationType": "TRANS",
   "mhrNumber": "150155", 
   "ownLand": true, 
   "payment": {

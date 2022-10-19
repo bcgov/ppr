@@ -287,8 +287,13 @@ class Db2Manuhome(db.Model):
         else:
             if self.reg_owner_groups:
                 groups = []
+                owner_id = 0  # Added to help UI.
                 for group in self.reg_owner_groups:
-                    groups.append(group.registration_json)
+                    group_json = group.registration_json
+                    for owner in group_json.get('owners'):
+                        owner_id += 1
+                        owner['ownerId'] = owner_id
+                    groups.append(group_json)
                 man_home['ownerGroups'] = groups
             if self.reg_location:
                 man_home['location'] = self.reg_location.registration_json
@@ -334,9 +339,14 @@ class Db2Manuhome(db.Model):
 
         if self.reg_owner_groups:
             groups = []
+            owner_id = 0  # Added to help UI.
             for group in self.reg_owner_groups:
                 if group.status != Db2Owngroup.StatusTypes.PREVIOUS:
-                    groups.append(group.registration_json)
+                    group_json = group.registration_json
+                    for owner in group_json.get('owners'):
+                        owner_id += 1
+                        owner['ownerId'] = owner_id
+                    groups.append(group_json)
             man_home['ownerGroups'] = groups
         if self.reg_location:
             man_home['location'] = self.reg_location.registration_json
@@ -365,6 +375,7 @@ class Db2Manuhome(db.Model):
                         doc.document_type.strip() in (DOCUMENT_TYPE_REG, DOCUMENT_TYPE_CONV):
                     doc_json = doc.registration_json
                     man_home['documentId'] = doc_json.get('documentId', '')
+                    man_home['documentRegistrationNumber'] = doc_json.get('documentRegistrationNumber', '')
                     man_home['createDateTime'] = doc_json.get('createDateTime', '')
                     man_home['clientReferenceId'] = doc_json.get('clientReferenceId', '')
                     man_home['attentionReference'] = doc_json.get('attentionReference', '')
@@ -381,11 +392,20 @@ class Db2Manuhome(db.Model):
 
         if self.reg_owner_groups:
             groups = []
+            owner_id = 0  # Added to help UI.
             for group in self.reg_owner_groups:
                 if self.current_view and group.status == Db2Owngroup.StatusTypes.ACTIVE:
-                    groups.append(group.registration_json)
+                    group_json = group.registration_json
+                    for owner in group_json.get('owners'):
+                        owner_id += 1
+                        owner['ownerId'] = owner_id
+                    groups.append(group_json)
                 elif not self.current_view:
-                    groups.append(group.registration_json)
+                    group_json = group.registration_json
+                    for owner in group_json.get('owners'):
+                        owner_id += 1
+                        owner['ownerId'] = owner_id
+                    groups.append(group_json)
             man_home['ownerGroups'] = groups
         if self.reg_location:
             man_home['location'] = self.reg_location.new_registration_json
@@ -430,6 +450,35 @@ class Db2Manuhome(db.Model):
             manuhome.update_id = manuhome.update_id.strip()
 
         return manuhome
+
+    @staticmethod
+    def adjust_group_interest(groups, new: bool):
+        """For TC groups adjust group interest value."""
+        tc_count: int = 0
+        common_denominator: int = 0
+        for group in groups:
+            if group.tenancy_type == Db2Owngroup.TenancyTypes.COMMON and \
+                    group.status == Db2Owngroup.StatusTypes.ACTIVE:
+                tc_count += 1
+                if common_denominator == 0:
+                    common_denominator = group.interest_denominator
+                elif group.interest_denominator > common_denominator:
+                    common_denominator = group.interest_denominator
+        if tc_count > 0:
+            for group in groups:
+                if new or (group.modified and group.status == Db2Owngroup.StatusTypes.ACTIVE):
+                    num = group.interest_numerator
+                    den = group.interest_denominator
+                    if num > 0 and den > 0:
+                        if den != common_denominator:
+                            group.interest_denominator = common_denominator
+                            group.interest_numerator = (common_denominator/den * num)
+                    if group.interest.upper().startswith(model_utils.OWNER_INTEREST_UNDIVIDED):
+                        group.interest = model_utils.OWNER_INTEREST_UNDIVIDED + ' '
+                    else:
+                        group.interest = ''
+                    group.interest += str(group.interest_numerator) + '/' + str(group.interest_denominator)
+                    current_app.logger.debug('Updating group interest to: ' + group.interest)
 
     @staticmethod
     def create_from_registration(registration, reg_json):
@@ -480,6 +529,7 @@ class Db2Manuhome(db.Model):
                 # current_app.logger.info('ownerGroups i=' + str(i))
                 group = Db2Owngroup.create_from_registration(registration, new_group, (i + 1))
                 manuhome.reg_owner_groups.append(group)
+            Db2Manuhome.adjust_group_interest(manuhome.reg_owner_groups, True)
         return manuhome
 
     @staticmethod
@@ -521,5 +571,6 @@ class Db2Manuhome(db.Model):
                 group.modified = True
                 group_id += 1
                 manuhome.reg_owner_groups.append(group)
-            registration.id = reg_id
+            Db2Manuhome.adjust_group_interest(manuhome.reg_owner_groups, False)
+        registration.id = reg_id
         return manuhome

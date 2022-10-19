@@ -21,7 +21,7 @@ from registry_schemas.example_data.mhr import REGISTRATION, TRANSFER
 
 from mhr_api.utils import registration_validator as validator
 from mhr_api.models import MhrRegistration
-from mhr_api.models.type_tables import MhrRegistrationStatusTypes
+from mhr_api.models.type_tables import MhrRegistrationStatusTypes, MhrTenancyTypes
 from mhr_api.models.utils import is_legacy
 
 
@@ -116,8 +116,141 @@ SO_GROUP_MULTIPLE = [
         'type': 'SOLE'
     }
 ]
-
-
+TC_GROUPS_VALID = [
+    {
+        'groupId': 1,
+        'owners': [
+            {
+            'individualName': {
+                'first': 'James',
+                'last': 'Smith'
+            },
+            'address': {
+                'street': '3122B LYNNLARK PLACE',
+                'city': 'VICTORIA',
+                'region': 'BC',
+                'postalCode': ' ',
+                'country': 'CA'
+            },
+            'phoneNumber': '6041234567'
+            }
+        ],
+        'type': 'COMMON',
+        'interest': 'UNDIVIDED 1/2',
+        'interestNumerator': 1,
+        'interestDenominator': 2
+    },
+    {
+        'groupId': 2,
+        'owners': [
+            {
+            'individualName': {
+                'first': 'James',
+                'last': 'Smith'
+            },
+            'address': {
+                'street': '3122B LYNNLARK PLACE',
+                'city': 'VICTORIA',
+                'region': 'BC',
+                'postalCode': ' ',
+                'country': 'CA'
+            },
+            'phoneNumber': '6041234567'
+            }
+        ],
+        'type': 'COMMON',
+        'interest': 'UNDIVIDED 1/2',
+        'interestNumerator': 1,
+        'interestDenominator': 2
+    }
+]
+TC_GROUP_VALID = {
+    'owners': [
+        {
+        'individualName': {
+            'first': 'James',
+            'last': 'Smith'
+        },
+        'address': {
+            'street': '3122B LYNNLARK PLACE',
+            'city': 'VICTORIA',
+            'region': 'BC',
+            'postalCode': ' ',
+            'country': 'CA'
+        },
+        'phoneNumber': '6041234567'
+        }
+    ],
+    'type': 'COMMON',
+    'interest': 'UNDIVIDED 1/2',
+    'interestNumerator': 1,
+    'interestDenominator': 2
+}
+TC_GROUP_TRANSFER_DELETE = [
+    {
+        'groupId': 4,
+        'owners': [
+            {
+            'individualName': {
+                'first': 'James',
+                'last': 'Smith'
+            },
+            'address': {
+                'street': '3122B LYNNLARK PLACE',
+                'city': 'VICTORIA',
+                'region': 'BC',
+                'postalCode': ' ',
+                'country': 'CA'
+            },
+            'phoneNumber': '6041234567'
+            }
+        ],
+        'type': 'COMMON',
+        'interest': 'UNDIVIDED 1/2',
+        'interestNumerator': 1,
+        'interestDenominator': 2
+    }
+]
+TC_GROUP_TRANSFER_ADD = [
+    {
+        'groupId': 5,
+        'owners': [
+            {
+            'individualName': {
+                'first': 'James',
+                'last': 'Smith'
+            },
+            'address': {
+                'street': '3122B LYNNLARK PLACE',
+                'city': 'VICTORIA',
+                'region': 'BC',
+                'postalCode': ' ',
+                'country': 'CA'
+            },
+            'phoneNumber': '6041234567'
+            }
+        ],
+        'type': 'COMMON',
+        'interest': 'UNDIVIDED 1/2',
+        'interestNumerator': 1,
+        'interestDenominator': 2
+    }
+]
+INTEREST_VALID_1 = [
+    { 'numerator': 1, 'denominator': 2 }, { 'numerator': 1, 'denominator': 2 }
+]
+INTEREST_VALID_2 = [
+    { 'numerator': 1, 'denominator': 2 }, { 'numerator': 1, 'denominator': 4 }, { 'numerator': 1, 'denominator': 4 }
+]
+INTEREST_VALID_3 = [
+    { 'numerator': 1, 'denominator': 10 }, { 'numerator': 1, 'denominator': 2 }, { 'numerator': 2, 'denominator': 5 }
+]
+INTEREST_INVALID_1 = [
+    { 'numerator': 1, 'denominator': 2 }, { 'numerator': 1, 'denominator': 4 }
+]
+INTEREST_INVALID_2 = [
+    { 'numerator': 1, 'denominator': 2 }, { 'numerator': 2, 'denominator': 4 }, { 'numerator': 1, 'denominator': 4 }
+]
 # testdata pattern is ({description}, {valid}, {staff}, {doc_id}, {message content})
 TEST_REG_DATA = [
     (DESC_VALID, True, True, DOC_ID_VALID, None),
@@ -193,13 +326,35 @@ TEST_TRANSFER_DATA_SO = [
     ('Invalid add SO 2 groups', False, SO_GROUP_MULTIPLE, validator.ADD_SOLE_OWNER_INVALID),
     ('Invalid add SO 2 owners', False, SO_OWNER_MULTIPLE, validator.ADD_SOLE_OWNER_INVALID)
 ]
+# testdata pattern is ({description}, {valid}, {numerator}, {denominator}, {message content})
+TEST_REG_DATA_COMMON = [
+    ('Invalid only 1 group', False, 2, 2, validator.GROUP_COMMON_INVALID),
+    ('Invalid numerator missing', False, None, 2, validator.GROUP_NUMERATOR_MISSING),
+    ('Invalid numerator < 1', False, 0, 2, validator.GROUP_NUMERATOR_MISSING),
+    ('Invalid denominator missing', False, 1, None, validator.GROUP_DENOMINATOR_MISSING),
+    ('Invalid denominator < 1', False, 1, 0, validator.GROUP_DENOMINATOR_MISSING)
+]
+# testdata pattern is ({description}, {valid}, {interest_data}, {common_denominator}, {message content})
+TEST_DATA_GROUP_INTEREST = [
+    ('Valid 2 groups', True, INTEREST_VALID_1, 2, None),
+    ('Valid 3 groups', True, INTEREST_VALID_2, 4, None),
+    ('Valid 3 groups', True, INTEREST_VALID_3, 10, None),
+    ('Invalid numerator sum low', False, INTEREST_INVALID_1, 4, validator.GROUP_INTEREST_MISMATCH),
+    ('Inalid numerator sum high', False, INTEREST_INVALID_2, 4, validator.GROUP_INTEREST_MISMATCH)
+]
+# testdata pattern is ({description}, {valid}, {numerator}, {denominator}, {message content})
+TEST_TRANSFER_DATA_GROUP_INTEREST = [
+    ('Valid add', True, 1, 2, None),
+    ('Invalid numerator < 1', False, 1, 4, validator.GROUP_INTEREST_MISMATCH),
+    ('Invalid numerator sum high', False, 3, 4, validator.GROUP_INTEREST_MISMATCH)
+]
 
 
 @pytest.mark.parametrize('desc,valid,staff,doc_id,message_content', TEST_REG_DATA)
 def test_validate_registration(session, desc, valid, staff, doc_id, message_content):
     """Assert that new MH registration validation works as expected."""
     # setup
-    json_data = copy.deepcopy(REGISTRATION)
+    json_data = get_valid_registration(MhrTenancyTypes.SOLE)
     if desc == DESC_MISSING_OWNER_GROUP:
         del json_data['ownerGroups']
     elif desc == DESC_MISSING_SUBMITTING:
@@ -211,6 +366,40 @@ def test_validate_registration(session, desc, valid, staff, doc_id, message_cont
     valid_format, errors = schema_utils.validate(json_data, 'registration', 'mhr')
     # Additional validation not covered by the schema.
     error_msg = validator.validate_registration(json_data, staff)
+    if errors:
+        current_app.logger.debug(errors)
+    if valid:
+        assert valid_format and error_msg == ''
+    else:
+        assert error_msg != ''
+        if message_content:
+            assert error_msg.find(message_content) != -1
+
+
+@pytest.mark.parametrize('desc,valid,numerator,denominator,message_content', TEST_REG_DATA_COMMON)
+def test_validate_registration_common(session, desc, valid, numerator, denominator, message_content):
+    """Assert that new MH registration validation works as expected."""
+    # setup
+    json_data = get_valid_registration(MhrTenancyTypes.COMMON)
+    if json_data.get('documentId'):
+        del json_data['documentId']
+    if desc == 'Invalid only 1 group':
+        del json_data['ownerGroups'][1]
+    else:
+        for group in json_data.get('ownerGroups'):
+            if not numerator:
+                if 'interestNumerator' in group:
+                    del group['interestNumerator']
+                else:
+                    group['interestNumerator'] = numerator
+            if not denominator:
+                if 'interestDenominator' in group:
+                    del group['interestDenominator']
+                else:
+                    group['interestDenominator'] = denominator
+    valid_format, errors = schema_utils.validate(json_data, 'registration', 'mhr')
+    # Additional validation not covered by the schema.
+    error_msg = validator.validate_registration(json_data, False)
     if errors:
         current_app.logger.debug(errors)
     if valid:
@@ -313,6 +502,28 @@ def test_validate_transfer_so(session, desc, valid, add_group, message_content):
             assert error_msg.find(message_content) != -1
 
 
+@pytest.mark.parametrize('desc,valid,numerator,denominator,message_content', TEST_TRANSFER_DATA_GROUP_INTEREST)
+def test_validate_transfer_group_interest(session, desc, valid, numerator, denominator, message_content):
+    """Assert that transfer group interest validation works as expected."""
+    # setup
+    json_data = copy.deepcopy(TRANSFER)
+    json_data['deleteOwnerGroups'] = copy.deepcopy(TC_GROUP_TRANSFER_DELETE)
+    json_data['addOwnerGroups'] = copy.deepcopy(TC_GROUP_TRANSFER_ADD)
+    json_data['addOwnerGroups'][0]['interestNumerator'] = numerator
+    json_data['addOwnerGroups'][0]['interestDenominator'] = denominator
+    valid_format, errors = schema_utils.validate(json_data, 'transfer', 'mhr')
+    registration: MhrRegistration = MhrRegistration.find_by_mhr_number('088912', 'PS12345')
+    error_msg = validator.validate_transfer(registration, json_data, False)
+    if errors:
+        current_app.logger.debug(errors)
+    if valid:
+        assert valid_format and error_msg == ''
+    else:
+        assert error_msg != ''
+        if message_content:
+            assert error_msg.find(message_content) != -1
+
+
 @pytest.mark.parametrize('desc,bus_name,first,middle,last,message_content,data', TEST_PARTY_DATA)
 def test_validate_submitting(session, desc, bus_name, first, middle, last, message_content, data):
     """Assert that submitting party invalid character set validation works as expected."""
@@ -372,7 +583,7 @@ def test_validate_owner(session, desc, bus_name, first, middle, last, message_co
 def test_validate_reg_location(session, desc, park_name, dealer, additional, except_plan, message_content):
     """Assert that location invalid character set validation works as expected."""
     # setup
-    json_data = copy.deepcopy(REGISTRATION)
+    json_data = get_valid_registration(MhrTenancyTypes.SOLE)
     location = json_data.get('location')
     if park_name:
         location['parkName'] = park_name
@@ -393,7 +604,7 @@ def test_validate_registration_legacy(session, desc, valid, street, city, messag
     """Assert that new MH registration legacy validation works as expected."""
     if is_legacy():
         # setup
-        json_data = copy.deepcopy(REGISTRATION)
+        json_data = get_valid_registration(MhrTenancyTypes.SOLE)
         json_data['location']['address']['street'] = street
         json_data['location']['address']['city'] = city
         valid_format, errors = schema_utils.validate(json_data, 'registration', 'mhr')
@@ -412,3 +623,34 @@ def test_checksum_valid(session, doc_id, valid):
     """Assert that the document id checksum validation works as expected."""
     result = validator.checksum_valid(doc_id)
     assert result == valid
+
+
+@pytest.mark.parametrize('desc, valid, interest_data, common_den, message_content', TEST_DATA_GROUP_INTEREST)
+def test_validate_group_interest(session, desc, valid, interest_data, common_den, message_content):
+    """Assert that the group interest validation works as expected."""
+    json_data = []
+    for interest in interest_data:
+        group = copy.deepcopy(TC_GROUP_VALID)
+        group['interestNumerator'] = interest.get('numerator')
+        group['interestDenominator'] = interest.get('denominator')
+        json_data.append(group)
+    error_msg = validator.validate_group_interest(json_data, common_den)
+    if valid:
+        assert error_msg == ''
+    else:
+        assert error_msg != ''
+        if message_content:
+            assert error_msg.find(message_content) != -1
+
+
+def get_valid_registration(type):
+    """Build a valid registration"""
+    json_data = copy.deepcopy(REGISTRATION)
+    if type == MhrTenancyTypes.COMMON:
+        json_data['ownerGroups'] = TC_GROUPS_VALID
+    else:
+        for group in json_data.get('ownerGroups'):
+            if group.get('type', '') in ('TC', 'COMMON'):
+                group['interestNumerator'] = 1
+                group['interestDenominator'] = 2
+    return json_data
