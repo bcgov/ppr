@@ -148,7 +148,7 @@ export default defineComponent({
         customRules(maxLength(80), props.validateTransferDetails ? required('Enter consideration') : [])
     )
 
-    const updateCompensation = (declaredValue: any) => {
+    const updateCompensation = (declaredValue: string) => {
       // copy Declared Value into Consideration field - the initial time only
       if (!localState.consideration && localState.declaredValue && parseInt(declaredValue)) {
         localState.consideration = `$${declaredValue}.00`
@@ -167,7 +167,7 @@ export default defineComponent({
 
     watch(
       () => localState.declaredValue,
-      async (val: any) => {
+      async (val: string) => {
         await setMhrTransferDeclaredValue(parseInt(val) ? parseInt(val) : null)
       }
     )
