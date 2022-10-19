@@ -12,7 +12,7 @@ import mockRouter from './MockRouter'
 import { HomeTenancyTypes, RouteNames } from '@/enums'
 import { HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
 import { getTestId } from './utils'
-import { mockedOrganization, mockedPerson, mockMhrTransferCurrentHomeOwner } from './test-data'
+import { mockedAddedPerson, mockedRemovedPerson, mockedOrganization, mockedPerson, mockMhrTransferCurrentHomeOwner } from './test-data'
 import { MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF } from '@/interfaces'
 import { nextTick } from '@vue/composition-api'
 import { TransferDetails } from '@/components/mhrTransfers'
@@ -50,7 +50,7 @@ function createComponent (): Wrapper<any> {
 }
 
 // TODO: Remove after API updates to include the ID for Owners
-function addIDsForOwners(ownersGroups): Array<any> {
+function addIDsForOwners (ownersGroups): Array<any> {
   // Create an ID to each individual owner for UI Tracking
   ownersGroups.forEach(ownerGroup => {
     for (const [index, owner] of ownerGroup.owners.entries()) {
@@ -61,14 +61,14 @@ function addIDsForOwners(ownersGroups): Array<any> {
   return ownersGroups
 }
 
-async function setupCurrentHomeOwners(): Promise<void> {
+async function setupCurrentHomeOwners (): Promise<void> {
   await store.dispatch('setMhrTransferCurrentHomeOwnerGroups', [mockMhrTransferCurrentHomeOwner])
   // TODO: Remove after API updates to include the ID for Owners
   const homeOwnerWithIdsArray = addIDsForOwners([mockMhrTransferCurrentHomeOwner])
   await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerWithIdsArray)
 }
 
-async function setupCurrentMultipleHomeOwnersGroups(): Promise<void> {
+async function setupCurrentMultipleHomeOwnersGroups (): Promise<void> {
   // setup two groups so they can be shown in the table
   const currentHomeOwnersGroups = [
     mockMhrTransferCurrentHomeOwner,
@@ -137,7 +137,7 @@ describe('Mhr Information', () => {
 
     expect(mhrInformationComponent.findComponent(HomeOwnersTable).exists()).toBeTruthy()
 
-    const owners = [mockedPerson] as MhrRegistrationHomeOwnerIF[] // same IF for Transfer and Registration
+    const owners = [mockedAddedPerson, mockedRemovedPerson] as MhrRegistrationHomeOwnerIF[] // same IF for Transfer and Registration
     const homeOwnerGroup = [
       mockMhrTransferCurrentHomeOwner,
       { groupId: '2', owners: owners }
@@ -153,6 +153,9 @@ describe('Mhr Information', () => {
 
     const addedBadge = newlyAddedOwner.find(getTestId('owner-added-badge'))
     expect(addedBadge.isVisible()).toBeTruthy()
+
+    const removedBadge = ownersTable.find(getTestId('owner-removed-badge'))
+    expect(removedBadge.isVisible()).toBeTruthy()
   })
 
   it('should show correct Home Tenancy Type for MHR Transfers', async () => {

@@ -323,7 +323,8 @@ export default defineComponent({
         country: props.editHomeOwner?.address.country || '',
         postalCode: props.editHomeOwner?.address.postalCode || '',
         deliveryInstructions: props.editHomeOwner?.address.deliveryInstructions || ''
-      }
+      },
+      action: props.editHomeOwner?.action || null
     }
 
     if (props.isHomeOwnerPerson) {
@@ -408,20 +409,18 @@ export default defineComponent({
         if (props.editHomeOwner) {
           editHomeOwner(
             localState.owner as MhrRegistrationHomeOwnerIF,
-            localState.ownerGroupId || '1',
-            props.isMhrTransfer
+            localState.ownerGroupId || '1'
           )
         } else {
           addOwnerToTheGroup(
             localState.owner as MhrRegistrationHomeOwnerIF,
-            localState.ownerGroupId,
-            props.isMhrTransfer
+            localState.ownerGroupId
           )
         }
 
         // this should occur when trying to add the group and fractional info
         // check if group has some fractional data
-        if (localState.groupFractionalData.interestNumerator && localState.ownerGroupId) {
+        if (localState.groupFractionalData?.interestNumerator && localState.ownerGroupId) {
           setShowGroups(true)
 
           // Get fractional data based on owner's group id

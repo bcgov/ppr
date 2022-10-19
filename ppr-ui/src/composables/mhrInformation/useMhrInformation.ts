@@ -1,7 +1,7 @@
 import { MhrTransferApiIF, MhrTransferIF } from '@/interfaces'
 import { useGetters } from 'vuex-composition-helpers'
-import { useNewMhrRegistration } from '@/composables'
 import { readonly, ref } from '@vue/composition-api'
+import { ActionTypes, ApiHomeTenancyTypes, HomeTenancyTypes } from '@/enums'
 
 // Validation flag for Transfer Details
 const transferDetailsValid = ref(false)
@@ -15,7 +15,7 @@ export const useMhrInformation = () => {
     getMhrTransferConsideration,
     getMhrTransferDate,
     getMhrTransferOwnLand,
-    getMhrTransferCurrentHomeOwners
+    getMhrTransferHomeOwnerGroups
   } = useGetters<any>([
     'getCurrentUser',
     'getMhrInformation',
@@ -24,12 +24,8 @@ export const useMhrInformation = () => {
     'getMhrTransferConsideration',
     'getMhrTransferDate',
     'getMhrTransferOwnLand',
-    'getMhrTransferCurrentHomeOwners'
+    'getMhrTransferHomeOwnerGroups'
   ])
-
-  const {
-    cleanEmpty
-  } = useNewMhrRegistration()
 
   const setTransferDetailsValid = (isValid: boolean) => {
     transferDetailsValid.value = isValid
@@ -52,14 +48,39 @@ export const useMhrInformation = () => {
 
     getMhrTransferHomeOwners.value.forEach(ownerGroup => {
       const { groupId, ...owners } = ownerGroup
+      const groupType = getMhrTransferHomeOwnerGroups.value.find(group => group.groupId === ownerGroup.groupId)?.type
+      const apiGroupType = ApiHomeTenancyTypes[
+        Object.keys(HomeTenancyTypes).find(key => HomeTenancyTypes[key] as string === groupType)
+      ]
+
       ownerGroups.push({
-        owners: [owners],
+        owners: [owners].filter(owner => owner.action !== ActionTypes.REMOVED),
         groupId: parseInt(groupId),
-        type: 'SO'
+        type: apiGroupType
       })
     })
 
-    return ownerGroups
+    return ownerGroups.filter(group => group.owners.length !== 0)
+  }
+
+  const parseRemovedOwnerGroups = (): any => {
+    const ownerGroups = []
+
+    getMhrTransferHomeOwners.value.forEach(ownerGroup => {
+      const { groupId, ...owners } = ownerGroup
+      const groupType = getMhrTransferHomeOwnerGroups.value.find(group => group.groupId === ownerGroup.groupId)?.type
+      const apiGroupType = ApiHomeTenancyTypes[
+        Object.keys(HomeTenancyTypes).find(key => HomeTenancyTypes[key] as string === groupType)
+      ]
+
+      ownerGroups.push({
+        owners: [owners].filter(owner => owner.action === ActionTypes.REMOVED),
+        groupId: parseInt(groupId),
+        type: apiGroupType
+      })
+    })
+
+    return ownerGroups.filter(group => group.owners.length !== 0)
   }
 
   const buildApiData = (): MhrTransferApiIF => {
@@ -86,7 +107,7 @@ export const useMhrInformation = () => {
         phoneNumber: getCurrentUser.value.contacts[0].phone.replace(/[^0-9.]+/g, '') // Remove special chars
       },
       addOwnerGroups: parseOwnerGroups(),
-      deleteOwnerGroups: getMhrTransferCurrentHomeOwners.value, // Api requires owners to delete
+      deleteOwnerGroups: parseRemovedOwnerGroups(),
       deathOfOwner: false
     }
 

@@ -1,5 +1,11 @@
-import { HomeTenancyTypes } from './../../../src/enums/homeTenancyTypes';
-import { AddressIF, MhrRegistrationFractionalOwnershipIF, MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF } from '@/interfaces'
+import {HomeTenancyTypes} from './../../../src/enums/homeTenancyTypes';
+import {
+  AddressIF,
+  MhrRegistrationFractionalOwnershipIF,
+  MhrRegistrationHomeOwnerGroupIF,
+  MhrRegistrationHomeOwnerIF
+} from '@/interfaces'
+import {ActionTypes} from "@/enums";
 
 export const mockedAddress: AddressIF = {
   street: '1234 Fort St.',
@@ -24,7 +30,7 @@ export const mockedAddressAlt: AddressIF = {
 export const mockedEmptyGroup: MhrRegistrationHomeOwnerGroupIF = {
   groupId: '100',
   owners: [],
-  type:  Object.keys(HomeTenancyTypes).find(key => HomeTenancyTypes[key] as string === HomeTenancyTypes.SOLE) // TODO: Mhr-Submission - UPDATE after the correct type can be determined
+  type: Object.keys(HomeTenancyTypes).find(key => HomeTenancyTypes[key] as string === HomeTenancyTypes.SOLE) // TODO: Mhr-Submission - UPDATE after the correct type can be determined
 }
 
 export const mockedPerson: MhrRegistrationHomeOwnerIF = {
@@ -38,6 +44,34 @@ export const mockedPerson: MhrRegistrationHomeOwnerIF = {
   phoneNumber: '(545) 333-2211',
   phoneExtension: '1234',
   address: mockedAddress
+}
+
+export const mockedAddedPerson: MhrRegistrationHomeOwnerIF = {
+  id: '10',
+  individualName: {
+    first: 'John',
+    middle: 'A',
+    last: 'Smith'
+  },
+  suffix: 'Sr.',
+  phoneNumber: '(545) 333-2211',
+  phoneExtension: '1234',
+  address: mockedAddress,
+  action: ActionTypes.ADDED
+}
+
+export const mockedRemovedPerson: MhrRegistrationHomeOwnerIF = {
+  id: '10',
+  individualName: {
+    first: 'John',
+    middle: 'A',
+    last: 'Smith'
+  },
+  suffix: 'Sr.',
+  phoneNumber: '(545) 333-2211',
+  phoneExtension: '1234',
+  address: mockedAddress,
+  action: ActionTypes.REMOVED
 }
 
 export const mockedOrganization: MhrRegistrationHomeOwnerIF = {

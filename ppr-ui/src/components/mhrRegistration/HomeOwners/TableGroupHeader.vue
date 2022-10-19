@@ -117,7 +117,9 @@ export default defineComponent({
     const { getMhrRegistrationHomeOwnerGroups, getMhrTransferHomeOwnerGroups } =
       useGetters<any>(['getMhrRegistrationHomeOwnerGroups', 'getMhrTransferHomeOwnerGroups'])
 
-    const { isGlobalEditingMode, setGlobalEditingMode, deleteGroup, setGroupFractionalInterest } = useHomeOwners()
+    const {
+      isGlobalEditingMode, setGlobalEditingMode, deleteGroup, setGroupFractionalInterest
+    } = useHomeOwners(props.isMhrTransfer)
 
     const homeFractionalOwnershipForm = ref(null)
 
@@ -178,7 +180,7 @@ export default defineComponent({
     // Close Delete Group dialog or proceed to deleting a Group
     const cancelOrProceed = (proceed: boolean, groupId: string): void => {
       if (proceed) {
-        deleteGroup(groupId, props.isMhrTransfer)
+        deleteGroup(groupId)
         localState.showDeleteGroupDialog = false
       } else {
         localState.showDeleteGroupDialog = false
