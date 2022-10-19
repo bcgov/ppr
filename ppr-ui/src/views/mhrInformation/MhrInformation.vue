@@ -197,8 +197,6 @@ export default defineComponent({
         for (const [index, owner] of ownerGroup.owners.entries()) {
           owner.id = ownerGroup.groupId + (index + 1)
         }
-        // TODO: refactor all group Ids to be numbers as per spec
-        ownerGroup.groupId = ownerGroup.groupId.toString()
       })
       setShowGroups(currentOwnerGroups.length > 1)
 

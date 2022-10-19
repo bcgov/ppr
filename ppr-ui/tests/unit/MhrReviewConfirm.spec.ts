@@ -96,7 +96,7 @@ describe('Mhr Review Confirm registration', () => {
     wrapper = createComponent()
 
     const owners = [mockedPerson] as MhrRegistrationHomeOwnerIF[]
-    const homeOwnerGroup = [{ groupId: '1', owners: owners }] as MhrRegistrationHomeOwnerGroupIF[]
+    const homeOwnerGroup = [{ groupId: 1, owners: owners }] as MhrRegistrationHomeOwnerGroupIF[]
 
     await store.dispatch('setMhrRegistrationHomeOwnerGroups', homeOwnerGroup)
 
@@ -129,7 +129,7 @@ describe('Mhr Review Confirm registration', () => {
     wrapper = createComponent()
 
     const owners = [mockedPerson] as MhrRegistrationHomeOwnerIF[]
-    const homeOwnerGroup = [{ groupId: '1', owners: owners, ...mockedFractionalOwnership }] as MhrRegistrationHomeOwnerGroupIF[]
+    const homeOwnerGroup = [{ groupId: 1, owners: owners, ...mockedFractionalOwnership }] as MhrRegistrationHomeOwnerGroupIF[]
 
     await store.dispatch('setMhrRegistrationHomeOwnerGroups', homeOwnerGroup)
 

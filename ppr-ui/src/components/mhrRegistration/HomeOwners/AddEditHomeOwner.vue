@@ -254,7 +254,7 @@ import { useGetters } from 'vuex-composition-helpers'
 import { find } from 'lodash'
 
 interface FractionalOwnershipWithGroupIdIF extends MhrRegistrationFractionalOwnershipIF {
-  groupId: string
+  groupId: number
 }
 
 let DEFAULT_OWNER_ID = 1
@@ -339,7 +339,7 @@ export default defineComponent({
 
     const allFractionalData = (getTransferOrRegistrationHomeOwnerGroups() || [{}]).map(group => {
       return {
-        groupId: group.groupId || '1',
+        groupId: group.groupId || 1,
         type: group?.type || '',
         interest: group?.interest || '',
         interestNumerator: group?.interestNumerator || null,
@@ -353,7 +353,7 @@ export default defineComponent({
 
     if (allFractionalData.length === 0 || props.editHomeOwner == null || hasMultipleOwnersInGroup) {
       allFractionalData.push({
-        groupId: (allFractionalData.length + 1).toString(),
+        groupId: (allFractionalData.length + 1),
         type: 'N/A',
         interest: '',
         interestNumerator: null,
@@ -377,7 +377,7 @@ export default defineComponent({
       showGroups: showGroups,
       isPerson: props.isHomeOwnerPerson,
       isAddingHomeOwner: props.editHomeOwner == null,
-      groupFractionalData: computed(() => find(allFractionalData, { groupId: localState.ownerGroupId || '1' })),
+      groupFractionalData: computed(() => find(allFractionalData, { groupId: localState.ownerGroupId || 1 })),
       isHomeOwnerFormValid: false,
       isAddressFormValid: false,
       triggerAddressErrors: false,
@@ -409,7 +409,7 @@ export default defineComponent({
         if (props.editHomeOwner) {
           editHomeOwner(
             localState.owner as MhrRegistrationHomeOwnerIF,
-            localState.ownerGroupId || '1'
+            localState.ownerGroupId || 1
           )
         } else {
           addOwnerToTheGroup(
@@ -428,7 +428,7 @@ export default defineComponent({
             groupId: localState.ownerGroupId
           }) as FractionalOwnershipWithGroupIdIF
 
-          setGroupFractionalInterest(localState.ownerGroupId || '1', fractionalData)
+          setGroupFractionalInterest(localState.ownerGroupId || 1, fractionalData)
         } else if (localState.group) {
           // this condition should only occur when trying to delete a group
           // clear out any fractional info

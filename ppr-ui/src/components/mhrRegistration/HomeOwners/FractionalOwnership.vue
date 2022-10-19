@@ -68,7 +68,7 @@ export default defineComponent({
   name: 'FractionalOwnership',
   props: {
     groupId: {
-      type: String,
+      type: Number,
       required: true
     },
     editHomeOwner: {

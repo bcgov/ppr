@@ -1,7 +1,7 @@
 import { MhrRegistrationHomeOwnerIF } from './MhrRegistrationHomeOwnerIF'
 import { MhrRegistrationFractionalOwnershipIF } from './MhrRegistrationFractionalOwnershipIF'
 export interface MhrRegistrationHomeOwnerGroupIF extends MhrRegistrationFractionalOwnershipIF {
-  groupId: string,
+  groupId: number,
   owners: MhrRegistrationHomeOwnerIF[],
   type: string // type is required for MHR submission
 }

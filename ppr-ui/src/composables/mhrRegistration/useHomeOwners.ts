@@ -13,7 +13,7 @@ import { MhrCompVal, MhrSectVal } from '@/composables/mhrRegistration/enums'
 import { useMhrValidations } from '@/composables'
 import { find, remove, set, findIndex, sumBy } from 'lodash'
 
-const DEFAULT_GROUP_ID = '1'
+const DEFAULT_GROUP_ID = 1
 
 // Show or hide grouping of the Owners in the table
 const showGroups = ref(false)
@@ -121,7 +121,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
   // WORKING WITH GROUPS
 
   // Generate dropdown items for the group selection
-  const getGroupDropdownItems = (isAddingHomeOwner: Boolean, groupId: string): Array<any> => {
+  const getGroupDropdownItems = (isAddingHomeOwner: Boolean, groupId: number): Array<any> => {
     // Make additional Group available in dropdown when adding a new home owner
     // or when there are more than one owner in the group
 
@@ -140,7 +140,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
       return Array(homeOwnerGroups.length + numOfAdditionalGroupsInDropdown)
         .fill({})
         .map((v, i) => {
-          return { text: 'Group ' + (i + 1), value: (i + 1).toString() }
+          return { text: 'Group ' + (i + 1), value: (i + 1) }
         })
     } else {
       return [
@@ -160,7 +160,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
     })
   }
 
-  const addOwnerToTheGroup = (owner: MhrRegistrationHomeOwnerIF, groupId: string) => {
+  const addOwnerToTheGroup = (owner: MhrRegistrationHomeOwnerIF, groupId: number) => {
     let homeOwnerGroups
 
     if (isMhrTransfer) {
@@ -192,7 +192,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
       : setMhrRegistrationHomeOwnerGroups(homeOwnerGroups)
   }
 
-  const editHomeOwner = (updatedOwner: MhrRegistrationHomeOwnerIF, newGroupId: string) => {
+  const editHomeOwner = (updatedOwner: MhrRegistrationHomeOwnerIF, newGroupId: number) => {
     const homeOwnerGroups = isMhrTransfer
       ? [...getMhrTransferHomeOwnerGroups.value]
       : [...getMhrRegistrationHomeOwnerGroups.value]
@@ -239,14 +239,14 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
   }
 
   // Delete group with its owners
-  const deleteGroup = (groupId: string): void => {
+  const deleteGroup = (groupId: number): void => {
     const homeOwnerGroups: MhrRegistrationHomeOwnerGroupIF[] = isMhrTransfer
       ? [...getMhrTransferHomeOwnerGroups.value]
       : [...getMhrRegistrationHomeOwnerGroups.value]
 
     remove(homeOwnerGroups, group => group.groupId === groupId)
     homeOwnerGroups.forEach((group, index) => {
-      group.groupId = (index + 1).toString()
+      group.groupId = (index + 1)
     })
 
     isMhrTransfer
@@ -254,7 +254,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
       : setMhrRegistrationHomeOwnerGroups(homeOwnerGroups)
   }
 
-  const setGroupFractionalInterest = (groupId: string, fractionalData: MhrRegistrationFractionalOwnershipIF): void => {
+  const setGroupFractionalInterest = (groupId: number, fractionalData: MhrRegistrationFractionalOwnershipIF): void => {
     const homeOwnerGroups = getTransferOrRegistrationHomeOwnerGroups()
 
     const allGroupsTotals = homeOwnerGroups.map(group => group.interestTotal)
