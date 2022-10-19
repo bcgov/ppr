@@ -250,7 +250,7 @@ import { SearchResponseI } from '@/interfaces'
 import { useSearch } from '@/composables/useSearch'
 import { SimpleHelpToggle } from '@/components/common'
 import HomeOwnerGroups from './HomeOwnerGroups.vue'
-import { useGetters } from 'vuex-composition-helpers'
+import { useActions, useGetters } from 'vuex-composition-helpers'
 import { find } from 'lodash'
 
 interface FractionalOwnershipWithGroupIdIF extends MhrRegistrationFractionalOwnershipIF {
@@ -290,6 +290,8 @@ export default defineComponent({
       'getMhrRegistrationHomeOwnerGroups',
       'getMhrTransferHomeOwnerGroups'
     ])
+
+    const { setUnsavedChanges } = useActions<any>(['setUnsavedChanges'])
 
     const { required, customRules, maxLength, minLength, isPhone, isNumber, invalidSpaces } = useInputRules()
 
@@ -361,6 +363,8 @@ export default defineComponent({
         tenancySpecified: null
       } as FractionalOwnershipWithGroupIdIF)
     }
+
+    const oldOwner = props.editHomeOwner
 
     const localState = reactive({
       getSidebarTitle: computed((): string => {
@@ -438,6 +442,8 @@ export default defineComponent({
           delete localState.group.interestTotal
           delete localState.group.tenancySpecified
         }
+
+        if (props.isMhrTransfer) setUnsavedChanges(oldOwner !== localState.owner)
 
         cancel()
       } else {

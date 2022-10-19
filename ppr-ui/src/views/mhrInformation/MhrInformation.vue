@@ -5,6 +5,11 @@
       <v-progress-circular color="primary" size="50" indeterminate />
     </v-overlay>
 
+    <base-dialog
+      :setOptions="options"
+      :setDisplay="showCancelDialog"
+      @proceed="handleDialogResp($event)"
+    />
     <div class="view-container px-15 py-0">
       <div class="container pa-0 pt-4">
         <v-row no-gutters>
@@ -89,10 +94,13 @@ import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
 import TransferDetails from '@/components/mhrTransfers/TransferDetails.vue'
 import { HomeOwners } from '@/views'
+import { BaseDialog } from '@/components/dialogs'
+import { unsavedChangesDialog } from '@/resources/dialogOptions'
 
 export default defineComponent({
   name: 'MhrInformation',
   components: {
+    BaseDialog,
     HomeOwners,
     TransferDetails,
     HomeOwnersTable,
@@ -110,15 +118,15 @@ export default defineComponent({
   },
   setup (props, context) {
     const {
-      getMhrTransferHomeOwners, getMhrInformation, getMhrTransferCurrentHomeOwners
+      getMhrTransferHomeOwners, getMhrInformation, getMhrTransferCurrentHomeOwners, hasUnsavedChanges
     } = useGetters<any>([
-      'getMhrTransferHomeOwners', 'getMhrInformation', 'getMhrTransferCurrentHomeOwners'
+      'getMhrTransferHomeOwners', 'getMhrInformation', 'getMhrTransferCurrentHomeOwners', 'hasUnsavedChanges'
     ])
 
     const {
-      setMhrTransferHomeOwnerGroups, setMhrTransferCurrentHomeOwnerGroups
+      setMhrTransferHomeOwnerGroups, setMhrTransferCurrentHomeOwnerGroups, setUnsavedChanges
     } = useActions<any>([
-      'setMhrTransferHomeOwnerGroups', 'setMhrTransferCurrentHomeOwnerGroups'
+      'setMhrTransferHomeOwnerGroups', 'setMhrTransferCurrentHomeOwnerGroups', 'setUnsavedChanges'
     ])
 
     const { setEmptyMhrTransfer } = useActions<any>(['setEmptyMhrTransfer'])
@@ -161,7 +169,10 @@ export default defineComponent({
       }),
       reviewOwners: computed(() => {
         return getMhrTransferHomeOwners.value.filter(owner => owner.action !== ActionTypes.REMOVED)
-      })
+      }),
+      options: unsavedChangesDialog,
+      showCancelDialog: false
+
     })
 
     onMounted(async (): Promise<void> => {
@@ -181,6 +192,7 @@ export default defineComponent({
       localState.loading = false
 
       localState.dataLoaded = true
+      await setUnsavedChanges(false)
     })
 
     // Future state to parse all relevant MHR Information
@@ -221,7 +233,7 @@ export default defineComponent({
         localState.loading = true
         const mhrTransferFiling = await submitMhrTransfer(buildApiData(), getMhrInformation.value.mhrNumber)
         localState.loading = false
-
+        await setUnsavedChanges(false)
         !mhrTransferFiling.error
           ? goToDash()
           : console.log(mhrTransferFiling?.error) // Handle Schema or Api errors here..
@@ -244,9 +256,20 @@ export default defineComponent({
     }
 
     const goToDash = (): void => {
-      context.root.$router.push({
-        name: RouteNames.DASHBOARD
-      })
+      if (hasUnsavedChanges.value === true) localState.showCancelDialog = true
+      else {
+        context.root.$router.push({
+          name: RouteNames.DASHBOARD
+        })
+      }
+    }
+
+    const handleDialogResp = (val: boolean): void => {
+      localState.showCancelDialog = false
+      if (!val) {
+        setUnsavedChanges(false)
+        goToDash()
+      }
     }
 
     return {
@@ -255,7 +278,8 @@ export default defineComponent({
       goToDash,
       getMhrTransferHomeOwners,
       getMhrTransferCurrentHomeOwners,
-      ...toRefs(localState)
+      ...toRefs(localState),
+      handleDialogResp
     }
   }
 })

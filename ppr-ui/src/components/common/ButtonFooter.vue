@@ -199,7 +199,7 @@ export default defineComponent({
       )
     })
     const cancel = () => {
-      if (hasUnsavedChanges.value) localState.showCancelDialog = true
+      if (hasUnsavedChanges.value === true) localState.showCancelDialog = true
       else goToDashboard()
     }
     const goToDashboard = () => {

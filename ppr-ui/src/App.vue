@@ -254,7 +254,8 @@ export default class App extends Mixins(AuthMixin) {
           RouteNames.SUBMITTING_PARTY,
           RouteNames.HOME_OWNERS,
           RouteNames.HOME_LOCATION,
-          RouteNames.MHR_REVIEW_CONFIRM
+          RouteNames.MHR_REVIEW_CONFIRM,
+          RouteNames.MHR_INFORMATION
         ]
 
         const routeName = this.$router.currentRoute.name as RouteNames
