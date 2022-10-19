@@ -148,9 +148,9 @@ export default defineComponent({
         customRules(maxLength(80), props.validateTransferDetails ? required('Enter consideration') : [])
     )
 
-    const updateCompensation = (declaredValue: number) => {
+    const updateCompensation = (declaredValue: string) => {
       // copy Declared Value into Consideration field - the initial time only
-      if (!localState.consideration && localState.declaredValue) {
+      if (!localState.consideration && localState.declaredValue && parseInt(declaredValue)) {
         localState.consideration = `$${declaredValue}.00`
       }
     }
@@ -167,21 +167,21 @@ export default defineComponent({
 
     watch(
       () => localState.declaredValue,
-      async (val: boolean) => {
-        await setMhrTransferDeclaredValue(val)
+      async (val: string) => {
+        await setMhrTransferDeclaredValue(parseInt(val) ? parseInt(val) : null)
       }
     )
 
     watch(
       () => localState.consideration,
-      (val: boolean) => {
+      (val: string) => {
         setMhrTransferConsideration(val)
       }
     )
 
     watch(
       () => localState.transferDate,
-      (val: boolean) => {
+      (val: string) => {
         setMhrTransferDate(val)
       }
     )
