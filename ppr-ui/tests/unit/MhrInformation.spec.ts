@@ -250,6 +250,16 @@ describe('Mhr Information', () => {
   // TRANSFER DETAILS COMPONENT TESTS
 
   it('should render Transfer Details component', async () => {
+    setupCurrentHomeOwners()
+    wrapper.vm.$data.dataLoaded = true
+    await Vue.nextTick()
+
+    expect(wrapper.props().isMhrTransfer).toBe(true)
+    expect(wrapper.vm.$data.getMhrTransferCurrentHomeOwners.length).toBe(1)
+    expect(wrapper.vm.$data.getMhrTransferHomeOwners.length).toBe(1)
+
+    expect(wrapper.findComponent(MhrInformation).exists()).toBe(true)
+    
     const mhrTransferDetailsComponent = wrapper.findComponent(MhrInformation).findComponent(TransferDetails)
     expect(mhrTransferDetailsComponent.exists()).toBeTruthy()
 
