@@ -1,17 +1,17 @@
 import {
-  MhrRegistrationTotalOwnershipAllocationIF,
+  MhrRegistrationFractionalOwnershipIF,
   MhrRegistrationHomeOwnerGroupIF,
   MhrRegistrationHomeOwnerIF,
-  MhrRegistrationFractionalOwnershipIF
+  MhrRegistrationTotalOwnershipAllocationIF
 } from '@/interfaces'
 import '@/utils/use-composition-api'
 
-import { ref, readonly, watch, toRefs } from '@vue/composition-api'
+import { readonly, ref, toRefs, watch } from '@vue/composition-api'
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import { ActionTypes, HomeTenancyTypes } from '@/enums'
 import { MhrCompVal, MhrSectVal } from '@/composables/mhrRegistration/enums'
 import { useMhrValidations } from '@/composables'
-import { find, remove, set, findIndex, sumBy } from 'lodash'
+import { find, findIndex, remove, set, sumBy } from 'lodash'
 
 const DEFAULT_GROUP_ID = 1
 
@@ -68,12 +68,13 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
   }
 
   const getHomeTenancyType = (): HomeTenancyTypes => {
-    const numOfOwners = getTransferOrRegistrationHomeOwners()?.length
+    const owners = getTransferOrRegistrationHomeOwners().filter(owner => owner.action !== ActionTypes.REMOVED)
+    const numOfOwners = owners.length
 
     if (showGroups.value) {
       // At leas one group showing with one or more owners
       return HomeTenancyTypes.COMMON
-    } else if (numOfOwners === 1 && getTransferOrRegistrationHomeOwners()[0]?.address) {
+    } else if (numOfOwners === 1 && owners[0]?.address) {
       // One owner without groups showing
       // Added second condition, because when an owner exists as a Sole Ownership, editing and clicking Done,
       // will change status to Tenants in Common unless above logic is in place..
@@ -86,7 +87,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
   }
 
   const getGroupTenancyType = (group: MhrRegistrationHomeOwnerGroupIF): HomeTenancyTypes => {
-    const numOfOwnersInGroup = group.owners?.length
+    const numOfOwnersInGroup = group.owners.filter(owner => owner.action !== ActionTypes.REMOVED).length
 
     if (group.interestNumerator) {
       return HomeTenancyTypes.COMMON
