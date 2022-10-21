@@ -3,6 +3,11 @@
     <v-overlay v-model="submitting">
       <v-progress-circular color="primary" size="50" indeterminate />
     </v-overlay>
+    <base-dialog
+      :setOptions="options"
+      :setDisplay="showCancelDialog"
+      @proceed="handleDialogResp()"
+    />
     <div class="view-container px-15 py-0">
       <div class="container pa-0 pt-4">
         <v-row no-gutters>
@@ -65,6 +70,8 @@ import { FeeSummaryTypes } from '@/composables/fees/enums'
 /* eslint-disable no-unused-vars */
 import { RegistrationTypeIF } from '@/interfaces'
 import { RegistrationLengthI } from '@/composables/fees/interfaces'
+import BaseDialog from '@/components/dialogs/BaseDialog.vue'
+import { registrationCompleteError } from '@/resources/dialogOptions'
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
@@ -72,7 +79,8 @@ export default defineComponent({
   components: {
     ButtonFooter,
     Stepper,
-    StickyContainer
+    StickyContainer,
+    BaseDialog
   },
   props: {
     appReady: {
@@ -138,7 +146,9 @@ export default defineComponent({
             getStepValidation(MhrSectVal.HOME_OWNERS_VALID) &&
             getStepValidation(MhrSectVal.LOCATION_VALID) &&
             getStepValidation(MhrSectVal.REVIEW_CONFIRM_VALID)
-      })
+      }),
+      options: registrationCompleteError,
+      showCancelDialog: false
     })
 
     /** Helper to check is the current route matches */
@@ -159,6 +169,10 @@ export default defineComponent({
       context.root.$router.push({
         name: RouteNames.DASHBOARD
       })
+    }
+
+    const handleDialogResp = () => {
+      localState.showCancelDialog = false
     }
 
     onMounted((): void => {
@@ -195,10 +209,14 @@ export default defineComponent({
         localState.submitting = true
         const mhrSubmission = await submitMhrRegistration(buildApiData(), parseStaffPayment())
         localState.submitting = false
-        resetAllValidations()
-        mhrSubmission?.mhrNumber
-          ? await context.root.$router.push({ name: RouteNames.DASHBOARD })
-          : console.log(mhrSubmission?.error) // Handle Schema or Api errors here..
+        if (!mhrSubmission.error && mhrSubmission?.mhrNumber) {
+          resetAllValidations()
+          await context.root.$router.push({ name: RouteNames.DASHBOARD })
+        } else {
+          console.log(mhrSubmission?.error) // Handle Schema or Api errors here..
+          localState.options = registrationCompleteError
+          localState.showCancelDialog = true
+        }
       } else {
         await scrollToInvalid(MhrSectVal.REVIEW_CONFIRM_VALID, 'mhr-review-confirm',
           [
@@ -216,7 +234,8 @@ export default defineComponent({
       isRouteName,
       registrationIncomplete,
       submit,
-      ...toRefs(localState)
+      ...toRefs(localState),
+      handleDialogResp
     }
   }
 })

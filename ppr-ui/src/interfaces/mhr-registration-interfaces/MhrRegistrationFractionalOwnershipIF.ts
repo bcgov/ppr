@@ -4,4 +4,5 @@ export interface MhrRegistrationFractionalOwnershipIF {
   interestNumerator?: number
   interestTotal?: number
   tenancySpecified?: Boolean
+  interestDenominator?: number
 }
