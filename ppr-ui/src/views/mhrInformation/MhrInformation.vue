@@ -209,8 +209,6 @@ export default defineComponent({
       // Store a snapshot of the existing OwnerGroups for baseline of current state
       await setMhrTransferCurrentHomeOwnerGroups(cloneDeep(data.ownerGroups))
 
-      // Create an ID to each individual owner for UI Tracking
-      // TODO: Remove after API updates to include the ID for Owners
       currentOwnerGroups.forEach((ownerGroup, index) => {
         ownerGroup.groupId = index + 1
       })

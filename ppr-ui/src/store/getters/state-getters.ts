@@ -725,7 +725,7 @@ export const getMhrTransferHomeOwners = (state: StateIF): MhrRegistrationHomeOwn
   return owners
 }
 
-export const getMhrTransferCurrentHomeOwners = (state: StateIF): any => {
+export const getMhrTransferCurrentHomeOwners = (state: StateIF): MhrRegistrationHomeOwnerGroupIF[] => {
   const ownerGroups = []
 
   state.stateModel.mhrTransfer.currentOwnerGroups.forEach(group => {
