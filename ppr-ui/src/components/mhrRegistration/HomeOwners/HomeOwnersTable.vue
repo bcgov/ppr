@@ -199,6 +199,7 @@ import TableGroupHeader from '@/components/mhrRegistration/HomeOwners/TableGroup
 import { MhrRegistrationHomeOwnerIF } from '@/interfaces'
 import { ActionTypes } from '@/enums'
 /* eslint-enable no-unused-vars */
+import { useActions } from 'vuex-composition-helpers'
 
 export default defineComponent({
   name: 'HomeOwnersTable',
@@ -228,6 +229,8 @@ export default defineComponent({
       editHomeOwner
     } = useHomeOwners(props.isMhrTransfer)
 
+    const { setUnsavedChanges } = useActions<any>(['setUnsavedChanges'])
+
     const localState = reactive({
       currentlyEditingHomeOwnerId: -1,
       isEditingMode: computed((): boolean => localState.currentlyEditingHomeOwnerId >= 0),
@@ -239,6 +242,7 @@ export default defineComponent({
 
     const remove = (item): void => {
       localState.currentlyEditingHomeOwnerId = -1
+      setUnsavedChanges(true)
       removeOwner(item)
     }
 
