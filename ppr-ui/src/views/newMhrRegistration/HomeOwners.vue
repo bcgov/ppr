@@ -171,9 +171,9 @@ export default defineComponent({
     }
   },
   setup (props) {
-    const { getMhrRegistrationHomeOwners, getMhrTransferHomeOwners, getMhrTransferCurrentHomeOwners } =
+    const { getMhrRegistrationHomeOwners, getMhrTransferCurrentHomeOwners } =
       useGetters<any>([
-        'getMhrRegistrationHomeOwners', 'getMhrTransferHomeOwners', 'getMhrTransferCurrentHomeOwners'
+        'getMhrRegistrationHomeOwners', 'getMhrTransferCurrentHomeOwners'
       ])
 
     const { setUnsavedChanges } = useActions<any>(['setUnsavedChanges'])
@@ -185,7 +185,8 @@ export default defineComponent({
       showGroups,
       getTotalOwnershipAllocationStatus,
       hasMinimumGroups,
-      setShowGroups
+      setShowGroups,
+      getTransferOrRegistrationHomeOwners
     } = useHomeOwners(props.isMhrTransfer)
 
     const localState = reactive({
@@ -197,14 +198,10 @@ export default defineComponent({
       ownershipAllocation: computed(
         () => getTotalOwnershipAllocationStatus() as MhrRegistrationTotalOwnershipAllocationIF
       ),
-      hasHomeOwners: computed(() => !!getMhrRegistrationHomeOwners.value.find(owner => owner.id)),
+      hasHomeOwners: computed(() => !!getTransferOrRegistrationHomeOwners().find(owner => owner.ownerId)),
       isValidGroups: computed(() => { return hasMinimumGroups() }),
       homeTenancyType: computed(() => { return getHomeTenancyType() }),
-      getHomeOwners: computed(() => {
-        return props.isMhrTransfer
-          ? getMhrTransferHomeOwners.value
-          : getMhrRegistrationHomeOwners.value
-      })
+      getHomeOwners: computed(() => { return getTransferOrRegistrationHomeOwners() })
     })
 
     // Enable editing mode whenever adding Person or Business

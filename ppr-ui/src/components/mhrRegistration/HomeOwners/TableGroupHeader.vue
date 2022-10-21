@@ -140,17 +140,17 @@ export default defineComponent({
         type: localState.group?.type || '',
         interest: localState.group?.interest || '',
         interestNumerator: localState.group?.interestNumerator || null,
-        interestTotal: localState.group?.interestTotal || null,
-        tenancySpecified: localState.group?.tenancySpecified || null
+        interestDenominator: localState.group?.interestDenominator || null,
+        tenancySpecified: localState.group?.tenancySpecified || false
       } as MhrRegistrationFractionalOwnershipIF
 
       localState.isEditGroupMode = true
     }
 
     const getOwnershipInterest = (): string => {
-      const { interest, interestNumerator, interestTotal } = localState.group
+      const { interest, interestNumerator, interestDenominator } = localState.group
 
-      return `${interest} ${interestNumerator}/${interestTotal}`
+      return `${interest} ${interestNumerator}/${interestDenominator}`
     }
 
     const done = (): void => {

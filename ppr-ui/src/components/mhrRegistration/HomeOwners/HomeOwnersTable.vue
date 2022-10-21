@@ -38,7 +38,12 @@
           </td>
         </tr>
 
-        <tr v-else-if="row.item.id" :key="row.item.id" class="owner-info" :data-test-id="`owner-info-${row.item.id}`">
+        <tr
+          v-else-if="row.item.ownerId"
+          :key="row.item.ownerId + homeOwners.indexOf(row.item)"
+          class="owner-info"
+          :data-test-id="`owner-info-${row.item.ownerId}`"
+        >
           <td class="owner-name">
             <div :class="{'removed-owner': isRemovedHomeOwner(row.item)}">
               <div v-if="row.item.individualName" class="owner-icon-name">
@@ -272,7 +277,7 @@ export default defineComponent({
     // check for at least one owner with an id
     // This util function will help to show Owners: 0 in the table header
     const hasActualOwners = (owners: MhrRegistrationHomeOwnerIF[]): boolean => {
-      return owners.length > 0 && owners[0]?.id !== undefined
+      return owners.length > 0 && owners[0]?.ownerId !== undefined
     }
 
     const isAddedHomeOwner = (item: MhrRegistrationHomeOwnerIF): boolean => {

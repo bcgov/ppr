@@ -2,7 +2,7 @@ import { AddressIF } from '@/composables/address/interfaces'
 import { ActionTypes } from '@/enums'
 
 export interface MhrRegistrationHomeOwnerIF {
-  id?: string // optional property used for editing a home owner
+  ownerId?: number // optional property used for editing a home owner
   groupId?: number
   action?: ActionTypes
   individualName?: {

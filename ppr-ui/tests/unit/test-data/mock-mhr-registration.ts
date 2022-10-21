@@ -1,11 +1,10 @@
-import { HomeTenancyTypes } from './../../../src/enums/homeTenancyTypes'
+import { ActionTypes, HomeTenancyTypes } from '@/enums'
 import {
   AddressIF,
   MhrRegistrationFractionalOwnershipIF,
   MhrRegistrationHomeOwnerGroupIF,
   MhrRegistrationHomeOwnerIF
 } from '@/interfaces'
-import { ActionTypes } from '@/enums'
 
 export const mockedAddress: AddressIF = {
   street: '1234 Fort St.',
@@ -34,7 +33,7 @@ export const mockedEmptyGroup: MhrRegistrationHomeOwnerGroupIF = {
 }
 
 export const mockedPerson: MhrRegistrationHomeOwnerIF = {
-  id: '10',
+  ownerId: 10,
   individualName: {
     first: 'John',
     middle: 'A',
@@ -47,7 +46,7 @@ export const mockedPerson: MhrRegistrationHomeOwnerIF = {
 }
 
 export const mockedAddedPerson: MhrRegistrationHomeOwnerIF = {
-  id: '10',
+  ownerId: 10,
   individualName: {
     first: 'John',
     middle: 'A',
@@ -61,7 +60,7 @@ export const mockedAddedPerson: MhrRegistrationHomeOwnerIF = {
 }
 
 export const mockedRemovedPerson: MhrRegistrationHomeOwnerIF = {
-  id: '10',
+  ownerId: 10,
   individualName: {
     first: 'John',
     middle: 'A',
@@ -75,7 +74,7 @@ export const mockedRemovedPerson: MhrRegistrationHomeOwnerIF = {
 }
 
 export const mockedOrganization: MhrRegistrationHomeOwnerIF = {
-  id: '20',
+  ownerId: 20,
   organizationName: 'Smart Track',
   suffix: 'Inc.',
   phoneNumber: '(999) 888-7766',
@@ -86,5 +85,5 @@ export const mockedOrganization: MhrRegistrationHomeOwnerIF = {
 export const mockedFractionalOwnership: MhrRegistrationFractionalOwnershipIF = {
   interest: 'Undivided',
   interestNumerator: 1,
-  interestTotal: 4
+  interestDenominator: 4
 }

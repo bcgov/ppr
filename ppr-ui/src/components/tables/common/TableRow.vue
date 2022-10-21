@@ -550,7 +550,7 @@ export default defineComponent({
     }
 
     const removeMhrDraft = (item: MhRegistrationSummaryIF): void => {
-      emit('action', { action: TableActions.REMOVE_TRANSFER_DRAFT, regNum: item.draftNumber })
+      emit('action', { action: TableActions.DELETE, regNum: item.draftNumber })
     }
 
     const getRegistrationClass = (regClass: string): string => {

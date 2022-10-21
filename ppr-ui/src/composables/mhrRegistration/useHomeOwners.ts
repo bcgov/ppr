@@ -106,18 +106,18 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
    */
   const getTotalOwnershipAllocationStatus = (): MhrRegistrationTotalOwnershipAllocationIF => {
     // Sum up all 'interestNumerator' values in different Home Owner groups with a help of sumBy() function from lodash
-    const totalFractionalNominator = sumBy(getMhrRegistrationHomeOwnerGroups.value, 'interestNumerator')
-    const fractionalDenominator = getMhrRegistrationHomeOwnerGroups.value[0]?.interestTotal || null
+    const totalFractionalNominator = sumBy(getTransferOrRegistrationHomeOwnerGroups(), 'interestNumerator')
+    const fractionalDenominator = getTransferOrRegistrationHomeOwnerGroups()[0]?.interestDenominator || null
 
     return {
       totalAllocation: totalFractionalNominator + '/' + fractionalDenominator,
       hasTotalAllocationError: totalFractionalNominator !== fractionalDenominator,
-      hasMinimumGroupsError: getMhrRegistrationHomeOwnerGroups.value.length < 2
+      hasMinimumGroupsError: getTransferOrRegistrationHomeOwnerGroups().length < 2
     }
   }
 
   const hasMinimumGroups = (): boolean => {
-    return !getMhrRegistrationHomeOwnerGroups.value || getMhrRegistrationHomeOwnerGroups.value.length < 2
+    return !getTransferOrRegistrationHomeOwnerGroups() || getTransferOrRegistrationHomeOwnerGroups().length < 2
   }
   // WORKING WITH GROUPS
 
@@ -153,11 +153,11 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
     }
   }
 
-  const getGroupForOwner = (ownerId: string): MhrRegistrationHomeOwnerGroupIF => {
+  const getGroupForOwner = (ownerId: number): MhrRegistrationHomeOwnerGroupIF => {
     const homeOwners = getTransferOrRegistrationHomeOwnerGroups()
 
     return find(homeOwners, group => {
-      return find(group.owners, { id: ownerId })
+      return find(group.owners, { ownerId: ownerId })
     })
   }
 
@@ -197,7 +197,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
     const homeOwnerGroups = isMhrTransfer
       ? [...getMhrTransferHomeOwnerGroups.value]
       : [...getMhrRegistrationHomeOwnerGroups.value]
-    const groupIdOfOwner = getGroupForOwner(updatedOwner.id).groupId
+    const groupIdOfOwner = getGroupForOwner(updatedOwner.ownerId).groupId
 
     const groupToUpdate = homeOwnerGroups.find(
       group => group.groupId === groupIdOfOwner
@@ -205,7 +205,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
 
     if (groupToUpdate.groupId === newGroupId) {
       // need to update owner in the same group
-      const i = findIndex(groupToUpdate.owners, { id: updatedOwner.id })
+      const i = findIndex(groupToUpdate.owners, { ownerId: updatedOwner.ownerId })
       set(groupToUpdate, `owners[${i}]`, updatedOwner)
 
       isMhrTransfer
@@ -213,7 +213,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
         : setMhrRegistrationHomeOwnerGroups(homeOwnerGroups)
     } else {
       // need to move the owner to new group
-      remove(groupToUpdate.owners, owner => owner.id === updatedOwner.id)
+      remove(groupToUpdate.owners, owner => owner.ownerId === updatedOwner.ownerId)
       addOwnerToTheGroup(updatedOwner, newGroupId)
     }
   }
@@ -225,7 +225,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
       : [...getMhrRegistrationHomeOwnerGroups.value]
 
     // find group id that owner belongs to
-    const groupIdOfOwner = getGroupForOwner(owner.id)?.groupId || DEFAULT_GROUP_ID
+    const groupIdOfOwner = getGroupForOwner(owner.ownerId)?.groupId || DEFAULT_GROUP_ID
 
     // find group to remove the owner from
     const groupToUpdate = homeOwnerGroups.find(
@@ -233,7 +233,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
     ) as MhrRegistrationHomeOwnerGroupIF
 
     // remove the owner from the group
-    remove(groupToUpdate.owners, o => o.id === owner.id)
+    remove(groupToUpdate.owners, o => o.ownerId === owner.ownerId)
     isMhrTransfer
       ? setMhrTransferHomeOwnerGroups(homeOwnerGroups)
       : setMhrRegistrationHomeOwnerGroups(homeOwnerGroups)
@@ -258,10 +258,10 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
   const setGroupFractionalInterest = (groupId: number, fractionalData: MhrRegistrationFractionalOwnershipIF): void => {
     const homeOwnerGroups = getTransferOrRegistrationHomeOwnerGroups()
 
-    const allGroupsTotals = homeOwnerGroups.map(group => group.interestTotal)
+    const allGroupsTotals = homeOwnerGroups.map(group => group.interestDenominator)
 
     // check if dominator is already the same for all Groups
-    const isAlreadyLCM = allGroupsTotals.includes(fractionalData.interestTotal)
+    const isAlreadyLCM = allGroupsTotals.includes(fractionalData.interestDenominator)
 
     if (homeOwnerGroups.length > 1 && !isAlreadyLCM) {
       // Calculate common fractions for Groups
@@ -299,22 +299,22 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
     // Calculate Lowest Common Multiplier for all group that already exists
     // by multiplying all total interests
     currentHomeOwnerGroups.every((group: MhrRegistrationHomeOwnerGroupIF) => {
-      LCM = LCM * Number(group.interestTotal)
+      LCM = LCM * Number(group.interestDenominator)
     })
 
     // Since new fractional data is not included in any groups yet,
     // it needs to be calculated as well for LCM,
     // but only if new fractional total is not LCM already
     // e.g. 1/25, new factorial 1/5 - no need to find a new LCM, as it is 25 already
-    if (LCM % currentFractionalData.interestTotal !== 0) {
-      LCM = LCM * currentFractionalData.interestTotal
+    if (LCM % currentFractionalData.interestDenominator !== 0) {
+      LCM = LCM * currentFractionalData.interestDenominator
     }
 
     // Update all fractional amounts for groups that already exist
     const updatedGroups = currentHomeOwnerGroups.map(group => {
-      const newNumerator = (LCM / group.interestTotal) * group.interestNumerator
+      const newNumerator = (LCM / group.interestDenominator) * group.interestNumerator
       group.interestNumerator = newNumerator
-      group.interestTotal = LCM
+      group.interestDenominator = LCM
       return group
     })
 
@@ -322,8 +322,8 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
 
     // Update current fractional data with new values
     updatedFractionalData.interestNumerator =
-      (LCM / currentFractionalData.interestTotal) * currentFractionalData.interestNumerator
-    updatedFractionalData.interestTotal = LCM
+      (LCM / currentFractionalData.interestDenominator) * currentFractionalData.interestNumerator
+    updatedFractionalData.interestDenominator = LCM
 
     return { updatedGroups, updatedFractionalData }
   }
@@ -354,7 +354,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
         !hasEmptyGroup.value
     } else {
       // must have at least one owner with proper id
-      isHomeOwnersStepValid = !!getMhrRegistrationHomeOwners.value.find(owner => owner.id)
+      isHomeOwnersStepValid = !!getMhrRegistrationHomeOwners.value.find(owner => owner.ownerId)
     }
     setValidation(MhrSectVal.HOME_OWNERS_VALID, MhrCompVal.OWNERS_VALID, isHomeOwnersStepValid)
   })
@@ -375,6 +375,8 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
     deleteGroup,
     setGroupFractionalInterest,
     hasMinimumGroups,
-    getGroupTenancyType
+    getGroupTenancyType,
+    getTransferOrRegistrationHomeOwners,
+    getTransferOrRegistrationHomeOwnerGroups
   }
 }

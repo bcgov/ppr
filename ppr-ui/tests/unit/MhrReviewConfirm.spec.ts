@@ -150,7 +150,7 @@ describe('Mhr Review Confirm registration', () => {
 
     const totalOwnership = HomeOwnerReview.find(getTestId('total-ownership'))
     expect(totalOwnership.exists()).toBeTruthy()
-    expect(totalOwnership.text()).toContain(`${mockedFractionalOwnership.interestNumerator}/${mockedFractionalOwnership.interestTotal}`)
+    expect(totalOwnership.text()).toContain(`${mockedFractionalOwnership.interestNumerator}/${mockedFractionalOwnership.interestDenominator}`)
 
     const homeOwnersTable = HomeOwnerReview.find('.home-owners-table')
     expect(homeOwnersTable.exists()).toBeTruthy()

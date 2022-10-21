@@ -54,7 +54,7 @@ function addIDsForOwners (ownersGroups): Array<any> {
   // Create an ID to each individual owner for UI Tracking
   ownersGroups.forEach(ownerGroup => {
     for (const [index, owner] of ownerGroup.owners.entries()) {
-      owner.id = ownerGroup.groupId + (index + 1)
+      owner.ownerId = ownerGroup.groupId + (index + 1)
     }
   })
 
@@ -147,7 +147,7 @@ describe('Mhr Information', () => {
 
     const ownersTable = mhrInformationComponent.findComponent(HomeOwners).findComponent(HomeOwnersTable)
 
-    const newlyAddedOwner = ownersTable.find(getTestId(`owner-info-${mockedPerson.id}`))
+    const newlyAddedOwner = ownersTable.find(getTestId(`owner-info-${mockedPerson.ownerId}`))
     expect(newlyAddedOwner.text()).toContain(mockedPerson.individualName.first)
     expect(newlyAddedOwner.text()).toContain(mockedPerson.individualName.last)
 
