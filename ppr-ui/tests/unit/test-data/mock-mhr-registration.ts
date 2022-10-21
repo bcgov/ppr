@@ -1,11 +1,11 @@
-import {HomeTenancyTypes} from './../../../src/enums/homeTenancyTypes';
+import { HomeTenancyTypes } from './../../../src/enums/homeTenancyTypes'
 import {
   AddressIF,
   MhrRegistrationFractionalOwnershipIF,
   MhrRegistrationHomeOwnerGroupIF,
   MhrRegistrationHomeOwnerIF
 } from '@/interfaces'
-import {ActionTypes} from "@/enums";
+import { ActionTypes } from '@/enums'
 
 export const mockedAddress: AddressIF = {
   street: '1234 Fort St.',
