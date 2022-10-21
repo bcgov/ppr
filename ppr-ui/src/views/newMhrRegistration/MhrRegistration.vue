@@ -6,7 +6,7 @@
     <base-dialog
       :setOptions="options"
       :setDisplay="showCancelDialog"
-      @proceed="handleDialogResp()"
+      @proceed="showCancelDialog = false"
     />
     <div class="view-container px-15 py-0">
       <div class="container pa-0 pt-4">
@@ -171,10 +171,6 @@ export default defineComponent({
       })
     }
 
-    const handleDialogResp = () => {
-      localState.showCancelDialog = false
-    }
-
     onMounted((): void => {
       // do not proceed if app is not ready
       // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
@@ -234,8 +230,7 @@ export default defineComponent({
       isRouteName,
       registrationIncomplete,
       submit,
-      ...toRefs(localState),
-      handleDialogResp
+      ...toRefs(localState)
     }
   }
 })
