@@ -132,7 +132,6 @@ export const useNewMhrRegistration = () => {
       ownerGroup.groupId = parseInt(ownerGroup.groupId)
 
       ownerGroup.type = Object.keys(HomeTenancyTypes).find(key => HomeTenancyTypes[key] as string === ownerGroup.type)
-      ownerGroup.interestDenominator = ownerGroup.interestTotal // This will ensure that denomiator is populated.
     })
 
     return ownerGroups
