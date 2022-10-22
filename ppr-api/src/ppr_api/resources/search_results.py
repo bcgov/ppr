@@ -111,11 +111,34 @@ class SearchResultsResource(Resource):
                 return resource_utils.unprocessable_error_response('search result details')
 
             response_data = search_detail.json
-            # Queue the report generation.
-            enqueue_search_report(search_id)
-            if callback_url is not None:
-                response_data['callbackURL'] = requests.utils.unquote(callback_url)
-            response_data['getReportURL'] = REPORT_URL.format(search_id=search_id)
+            # Results data that is too large for real time report generation (small number of results) is also
+            # asynchronous.
+            if callback_url is None and search_detail.callback_url is not None:
+                callback_url = search_detail.callback_url
+                is_ui_pdf = True
+            if resource_utils.is_pdf(request) or is_ui_pdf:
+                # If results over threshold return JSON with callbackURL, getReportURL
+                if callback_url is not None:
+                    # Add enqueue report generation event here.
+                    enqueue_search_report(search_id)
+                    response_data['callbackURL'] = requests.utils.unquote(callback_url)
+                    response_data['getReportURL'] = REPORT_URL.format(search_id=search_id)
+                    return jsonify(response_data), HTTPStatus.OK
+
+                # Return report if request header Accept MIME type is application/pdf.
+                raw_data, status_code, headers = get_pdf(response_data,
+                                                         account_id,
+                                                         ReportTypes.SEARCH_DETAIL_REPORT.value,
+                                                         jwt.get_token_auth_header())
+                current_app.logger.debug(f'report api call status={status_code}, headers=' + json.dumps(headers))
+                if raw_data and status_code in (HTTPStatus.OK, HTTPStatus.CREATED):
+                    doc_name = model_utils.get_search_doc_storage_name(search_detail.search)
+                    response = GoogleStorageService.save_document(doc_name, raw_data)
+                    current_app.logger.info(f'Save {doc_name} document storage response: ' + json.dumps(response))
+                    search_detail.doc_storage_url = doc_name
+                    search_detail.save()
+                    return raw_data, HTTPStatus.OK, {'Content-Type': 'application/pdf'}
+
             return jsonify(response_data), HTTPStatus.OK
 
         except DatabaseException as db_exception:
@@ -133,42 +156,41 @@ class SearchResultsResource(Resource):
         try:
             if search_id is None:
                 return resource_utils.path_param_error_response('search ID')
-
             # Quick check: must have an account ID.
             account_id = resource_utils.get_account_id(request)
             if account_id is None:
                 return resource_utils.account_required_response()
-
             # Verify request JWT and account ID
             if not authorized(account_id, jwt):
                 return resource_utils.unauthorized_error_response(account_id)
-
             # Try to fetch search detail by search id.
             current_app.logger.info(f'Fetching search detail for {search_id}.')
             search_detail: SearchResult = SearchResult.find_by_search_id(search_id, True)
             if not search_detail:
                 return resource_utils.not_found_error_response('searchId', search_id)
-
             # If no search selection (step 2) return an error. Could be results
             # with no exact matches and no results selected - nil, which is valid.
             if search_detail.search_select is None and search_detail.search.total_results_size > 0:
                 return resource_utils.bad_request_response(GET_DETAILS_ERROR)
 
-            response_data = search_detail.json
             if resource_utils.is_pdf(request):
+                # If the request is for an async large report and report not available, return an error.
+                if search_detail.callback_url is not None and search_detail.doc_storage_url is None:
+                    error_msg = f'Search report not yet available for {search_id}.'
+                    current_app.logger.info(error_msg)
+                    return resource_utils.bad_request_response(error_msg)
+
+                # If report in doc storage, fetch and return it.
                 if search_detail.doc_storage_url is not None:
                     # Fetch binary data from doc storage.
                     doc_name = search_detail.doc_storage_url
                     current_app.logger.info(f'Fetching search report {doc_name} from doc storage.')
                     raw_data = GoogleStorageService.get_document(doc_name)
                     return raw_data, HTTPStatus.OK, {'Content-Type': 'application/pdf'}
-                if (search_detail.exact_match_count + search_detail.similar_match_count) >= 75 or \
-                        not model_utils.report_retry_elapsed(search_detail.search.search_ts):
-                    error_msg = f'Search report not yet available for {search_id}.'
-                    current_app.logger.info(error_msg)
-                    return resource_utils.bad_request_response(error_msg)
-                # Generate and store report.
-                current_app.logger.info(f'Generating search detail report for {search_id}.')
+
+                # If get to here report not yet generated: create, store, return it.
+                response_data = search_detail.json
+                current_app.logger.info(f'Generating search report for {search_id}.')
                 raw_data, status_code, headers = get_pdf(response_data,
                                                          account_id,
                                                          ReportTypes.SEARCH_DETAIL_REPORT.value,
@@ -184,7 +206,6 @@ class SearchResultsResource(Resource):
                     return raw_data, HTTPStatus.OK, {'Content-Type': 'application/pdf'}
 
             return jsonify(response_data), HTTPStatus.OK
-
         except DatabaseException as db_exception:
             return resource_utils.db_exception_response(db_exception, account_id, 'GET search details id=' + search_id)
         except BusinessException as exception:
