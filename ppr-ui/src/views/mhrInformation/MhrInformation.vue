@@ -251,7 +251,7 @@ export default defineComponent({
         ? await updateMhrDraft(getMhrInformation.value.draftNumber, apiData)
         : await createMhrTransferDraft(apiData)
       localState.loading = false
-
+      setUnsavedChanges(false)
       !mhrTransferDraft.error
         ? goToDash()
         : console.log(mhrTransferDraft?.error) // Handle Schema or Api errors here..
