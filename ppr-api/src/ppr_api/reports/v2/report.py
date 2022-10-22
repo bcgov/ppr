@@ -22,62 +22,13 @@ from flask import current_app, jsonify
 from ppr_api.exceptions import ResourceErrorCodes
 from ppr_api.models import utils as model_utils
 from ppr_api.reports.v2 import report_utils
-from ppr_api.reports.v2.report_utils import ReportTypes
+from ppr_api.reports.v2.report_utils import ReportTypes, ReportMeta
 from ppr_api.callback.auth.token_service import GoogleStorageTokenService
 
 
-# Map from API search type to report description
-TO_SEARCH_DESCRIPTION = {
-    'AIRCRAFT_DOT': 'Aircraft DOT',
-    'BUSINESS_DEBTOR': 'Business Debtor',
-    'INDIVIDUAL_DEBTOR': 'Individual Debtor',
-    'MHR_NUMBER': 'Manufactured Home Registration Number',
-    'REGISTRATION_NUMBER': 'Registration Number',
-    'SERIAL_NUMBER': 'Serial Number'
-}
-# Map from API vehicle type to report description
-TO_VEHICLE_TYPE_DESCRIPTION = {
-    'AC': 'Aircraft (AC)',
-    'AF': 'Aircraft Airframe (AF)',
-    'AP': 'Airplane (AP)',
-    'BO': 'Boat (BO)',
-    'EV': 'Electric Motor Vehhicle (EV)',
-    'MV': 'Motor Vehicle (MV)',
-    'MH': 'Manufactured or Mobile Home (MH)',
-    'OB': 'Outboard Boat Motor (OB)',
-    'TR': 'Trailer (TR)'
-}
-# Map from API change/amendment registration change type to report description
-TO_CHANGE_TYPE_DESCRIPTION = {
-    'AC': 'Collateral Addition',
-    'AA': 'Collateral Addition',
-    'AM': 'Amendment',
-    'CO': 'Court Order',
-    'DR': 'Debtor Release',
-    'AR': 'Debtor Release',
-    'DT': 'Debtor Transfer',
-    'AD': 'Debtor Transfer',
-    'PD': 'Partial Discharge',
-    'AP': 'Partial Discharge',
-    'ST': 'Secured Party Transfer',
-    'AS': 'Secured Party Transfer',
-    'SU': 'Collateral Substitution',
-    'AU': 'Collateral Substitution',
-    'RC': 'Registry Correction'
-}
-# Map post go-live amendment descriptions
-TO_AMEND_TYPE_DESCRIPTION = {
-    'AA': 'Amendment - Collateral Added',
-    'AM': 'Amendment',
-    'CO': 'Amendment - Court Order',
-    'AR': 'Amendment - Debtors Deleted',
-    'AD': 'Amendment - Debtors Amended',
-    'AP': 'Amendment - Collateral Deleted',
-    'AS': 'Amendment - Secured Parties Amended',
-    'AU': 'Amendment - Collateral Amended'
-}
 SINGLE_URI = '/forms/chromium/convert/html'
 MERGE_URI = '/forms/pdfengines/merge'
+SUBREPORT_SIZE = 500
 
 
 class Report:  # pylint: disable=too-few-public-methods
@@ -99,8 +50,14 @@ class Report:  # pylint: disable=too-few-public-methods
         if report_type:
             self._report_key = report_type
         if self._report_key == ReportTypes.SEARCH_DETAIL_REPORT:
-            current_app.logger.debug('Search report generating TOC page numbers as a second report api call.')
-            return self.get_search_pdf()
+            large_threshold: int = current_app.config.get('REPORT_SEARCH_LIGHT')
+            large_search: bool = self._report_data.get('totalResultsSize', 0) >= large_threshold
+            self._report_data['search_large'] = large_search
+            if not large_search:
+                current_app.logger.debug('Search report generating as 2 report api calls.')
+                return self.get_search_pdf()
+            current_app.logger.debug('Generating large search report.')
+            return self.get_large_search_pdf()
         if self._report_key == ReportTypes.VERIFICATION_STATEMENT_MAIL_REPORT:
             return self.get_registration_mail_pdf()
         current_app.logger.debug('Account {0} report type {1} setting up report data.'
@@ -129,9 +86,6 @@ class Report:  # pylint: disable=too-few-public-methods
         """Render a search report with TOC page numbers set in a second report call."""
         current_app.logger.debug('Account {0} report type {1} setting up report data.'
                                  .format(self._account_id, self._report_key))
-        light_threshold: int = current_app.config.get('REPORT_SEARCH_LIGHT')
-        large_search: bool = self._report_data.get('totalResultsSize', 0) >= light_threshold
-        self._report_data['search_light'] = large_search
         data_copy = copy.deepcopy(self._report_data)
         # 1: Generate the search pdf with no TOC page numbers or total page count.
         data = self._setup_report_data()
@@ -139,11 +93,12 @@ class Report:  # pylint: disable=too-few-public-methods
         current_app.logger.debug('Account {0} report type {1} calling report-api {2}.'
                                  .format(self._account_id, self._report_key, url))
         meta_data = report_utils.get_report_meta_data(self._report_key)
-        files = report_utils.get_report_files(data, self._report_key, False, large_search)
         headers = {}
         token = GoogleStorageTokenService.get_report_api_token()
         if token:
             headers['Authorization'] = 'Bearer {}'.format(token)
+
+        files = report_utils.get_report_files(data, self._report_key, False, False)
         response_reg = requests.post(url=url, headers=headers, data=meta_data, files=files)
         current_app.logger.debug('Account {0} report type {1} response status: {2}.'
                                  .format(self._account_id, self._report_key, response_reg.status_code))
@@ -152,22 +107,92 @@ class Report:  # pylint: disable=too-few-public-methods
             current_app.logger.error('Account {0} response status: {1} error: {2}.'
                                      .format(self._account_id, response_reg.status_code, content))
             return jsonify(message=content), response_reg.status_code, None
-        # Skip TOC page number update and regeneration for large reports.
-        if large_search:
-            return response_reg.content, response_reg.status_code, {'Content-Type': 'application/pdf'}
         # 2: Set TOC page numbers in report data from initial search pdf page numbering.
         self._report_data = report_utils.update_toc_page_numbers(data_copy, response_reg.content)
         # 3: Generate search report again with TOC page numbers and total page count.
         data_final = self._setup_report_data()
         current_app.logger.debug('Account {0} report type {1} calling report-api {2}.'
                                  .format(self._account_id, self._report_key, url))
-        files = report_utils.get_report_files(data_final, self._report_key, False, large_search)
+        files = report_utils.get_report_files(data_final, self._report_key, False, False)
         current_app.logger.info('Search report regenerating with TOC page numbers set.')
         response = requests.post(url=url, headers=headers, data=meta_data, files=files)
         current_app.logger.info('Search report regeneration with TOC page numbers completed.')
         if response.status_code != HTTPStatus.OK:
             content = ResourceErrorCodes.REPORT_ERR + ': ' + response.content.decode('ascii')
             current_app.logger.error('Account {0} response status: {1} error: {2}.'
+                                     .format(self._account_id, response.status_code, content))
+            return jsonify(message=content), response.status_code, None
+        return response.content, response.status_code, {'Content-Type': 'application/pdf'}
+
+    def get_large_search_pdf(self):
+        """Render a large search report as concatenated sub-reports."""
+        current_app.logger.debug(f'Account {self._account_id} large search setting up report data.')
+        data_copy = copy.deepcopy(self._report_data)
+        data_length = len(data_copy['details'])
+        search_ts = data_copy.get('searchDateTime')
+        subreport_count = 0
+        start_index = 0
+        end_index = SUBREPORT_SIZE
+        report_files = {}
+        details = data_copy['details']
+        selected = data_copy['selected']
+        select_index = 0
+        rep_count = int(data_length/SUBREPORT_SIZE) + ((data_length/SUBREPORT_SIZE) % 1 > 0)
+        rep_summary = []
+        self._report_data['pageNumOffset'] = 0
+        while start_index < data_length:
+            subreport_count += 1
+            current_app.logger.info(f'Account {self._account_id} building subreport {subreport_count}')
+            current_app.logger.debug(f'Start index={start_index} end index={end_index}')
+            self._report_data['details'] = details[start_index:end_index]
+            current_app.logger.debug('Details length=' + str(len(self._report_data['details'])))
+            # current_app.logger.debug(f'Select index={select_index} length=' + str(len(selected)))
+            self._report_data['selected'] = report_utils.get_subreport_selected(selected[select_index:],
+                                                                                self._report_data['details'])
+            current_app.logger.debug(f'Select index={select_index} length=' + str(len(self._report_data['selected'])))
+            self._report_data['searchDateTime'] = search_ts
+            self._report_data['subreport'] = f'{subreport_count} of {rep_count}'
+            rep_summary.append(report_utils.get_report_summary(self._report_data['selected'],
+                                                               subreport_count,
+                                                               len(self._report_data['details']),
+                                                               self._report_data['pageNumOffset']))
+            content, status_code, headers = self.get_search_pdf()
+            if status_code != HTTPStatus.OK:
+                return content, status_code, headers
+            report_key = f'pdf{subreport_count}.pdf'
+            report_files[report_key] = content
+            start_index += SUBREPORT_SIZE
+            end_index += SUBREPORT_SIZE
+            select_index += len(self._report_data['selected'])
+
+        # Build cover summary
+        cover_data = {
+            'searchDateTime': search_ts,
+            'reportCount': subreport_count,
+            'totalResultsSize': data_length,
+            'exactResultsSize': report_utils.get_exact_count(selected),
+            'searchQuery': data_copy['searchQuery'],
+            'reports': rep_summary,
+            'reportPageCount': self._report_data['pageNumOffset']
+        }
+        # current_app.logger.info(cover_data)
+        self._report_key = ReportTypes.SEARCH_COVER_REPORT
+        self._report_data = cover_data
+        content, status_code, headers = self.get_pdf()
+        if status_code != HTTPStatus.OK:
+            return content, status_code, headers
+        report_files['cover.pdf'] = content
+        # Merge subreports
+        url = current_app.config.get('REPORT_SVC_URL') + MERGE_URI
+        headers = {}
+        token = GoogleStorageTokenService.get_report_api_token()
+        if token:
+            headers['Authorization'] = 'Bearer {}'.format(token)
+        response = requests.post(url=url, headers=headers, files=report_files)
+        current_app.logger.debug(f'Merge search reports response status: {response.status_code}.')
+        if response.status_code != HTTPStatus.OK:
+            content = ResourceErrorCodes.REPORT_ERR + ': ' + response.content.decode('ascii')
+            current_app.logger.error('Account {0} merge response status: {1} error: {2}.'
                                      .format(self._account_id, response.status_code, content))
             return jsonify(message=content), response.status_code, None
         return response.content, response.status_code, {'Content-Type': 'application/pdf'}
@@ -250,7 +275,7 @@ class Report:  # pylint: disable=too-few-public-methods
     def _get_report_date(self):
         """Get the report date for the filename from the report data."""
         if self._report_key in (ReportTypes.SEARCH_DETAIL_REPORT, ReportTypes.SEARCH_TOC_REPORT,
-                                ReportTypes.SEARCH_BODY_REPORT):
+                                ReportTypes.SEARCH_BODY_REPORT, ReportTypes.SEARCH_COVER_REPORT):
             return self._report_data['searchDateTime']
 
         return self._report_data['createDateTime']
@@ -362,7 +387,11 @@ class Report:  # pylint: disable=too-few-public-methods
             self._set_cover()
         elif self._report_key == ReportTypes.SEARCH_TOC_REPORT:
             self._set_selected()
-            # self._report_data['searchDateTime'] = Report._to_report_datetime(self._report_data['searchDateTime'])
+        elif self._report_key == ReportTypes.SEARCH_COVER_REPORT:
+            self._report_data['searchDateTime'] = Report._to_report_datetime(self._report_data['searchDateTime'])
+            for rep in self._report_data['reports']:
+                rep['startDate'] = Report._to_report_datetime(rep['startDate'], False, False)
+                rep['endDate'] = Report._to_report_datetime(rep['endDate'], False, False)
         else:
             self._set_addresses()
             self._set_date_times()
@@ -532,7 +561,7 @@ class Report:  # pylint: disable=too-few-public-methods
             for collateral in statement['vehicleCollateral']:
                 if collateral['type'] == 'MH':
                     mh_count += 1
-                desc = TO_VEHICLE_TYPE_DESCRIPTION[collateral['type']]
+                desc = report_utils.TO_VEHICLE_TYPE_DESCRIPTION[collateral['type']]
                 collateral['type'] = desc
             statement['mhCollateralCount'] = mh_count
 
@@ -545,13 +574,13 @@ class Report:  # pylint: disable=too-few-public-methods
                 for delete_collateral in statement['deleteVehicleCollateral']:
                     if delete_collateral['type'] == 'MH':
                         mh_count += 1
-                    desc = TO_VEHICLE_TYPE_DESCRIPTION[delete_collateral['type']]
+                    desc = report_utils.TO_VEHICLE_TYPE_DESCRIPTION[delete_collateral['type']]
                     delete_collateral['type'] = desc
             if 'addVehicleCollateral' in statement:
                 for add_collateral in statement['addVehicleCollateral']:
                     if add_collateral['type'] == 'MH':
                         mh_count += 1
-                    desc = TO_VEHICLE_TYPE_DESCRIPTION[add_collateral['type']]
+                    desc = report_utils.TO_VEHICLE_TYPE_DESCRIPTION[add_collateral['type']]
                     add_collateral['type'] = desc
             statement['mhCollateralCount'] = mh_count
 
@@ -712,9 +741,9 @@ class Report:  # pylint: disable=too-few-public-methods
         """Replace non-financing statement API ISO UTC strings with local report format strings."""
         if 'changeType' in statement:
             if statement.get('amendmentRegistrationNumber') and model_utils.after_go_live(statement['createDateTime']):
-                statement['changeType'] = TO_AMEND_TYPE_DESCRIPTION[statement['changeType']].upper()
+                statement['changeType'] = report_utils.TO_AMEND_TYPE_DESCRIPTION[statement['changeType']].upper()
             else:
-                statement['changeType'] = TO_CHANGE_TYPE_DESCRIPTION[statement['changeType']].upper()
+                statement['changeType'] = report_utils.TO_CHANGE_TYPE_DESCRIPTION[statement['changeType']].upper()
         statement['createDateTime'] = Report._to_report_datetime(statement['createDateTime'])
         if 'courtOrderInformation' in statement and 'orderDate' in statement['courtOrderInformation']:
             order_date = Report._to_report_datetime(statement['courtOrderInformation']['orderDate'], False)
@@ -818,7 +847,7 @@ class Report:  # pylint: disable=too-few-public-methods
         # Get source ???
         # Appears in the Header of the PDF Document Properties as title, subtitle.
         if self._report_key in (ReportTypes.SEARCH_DETAIL_REPORT,
-                                ReportTypes.SEARCH_TOC_REPORT,
+                                ReportTypes.SEARCH_TOC_REPORT, ReportTypes.SEARCH_COVER_REPORT,
                                 ReportTypes.SEARCH_BODY_REPORT,
                                 ReportTypes.COVER_PAGE_REPORT):
             self._report_data['meta_title'] = ReportMeta.reports[self._report_key]['metaTitle'].upper()
@@ -829,10 +858,10 @@ class Report:  # pylint: disable=too-few-public-methods
 
         # Appears in the Description section of the PDF Document Properties as Subject.
         if self._report_key in (ReportTypes.SEARCH_DETAIL_REPORT,
-                                ReportTypes.SEARCH_TOC_REPORT,
+                                ReportTypes.SEARCH_TOC_REPORT, ReportTypes.SEARCH_COVER_REPORT,
                                 ReportTypes.SEARCH_BODY_REPORT):
             search_type: str = self._report_data['searchQuery']['type']
-            search_desc: str = TO_SEARCH_DESCRIPTION[search_type]
+            search_desc: str = report_utils.TO_SEARCH_DESCRIPTION[search_type]
             criteria: str = ''
             if search_type == 'BUSINESS_DEBTOR':
                 criteria = self._report_data['searchQuery']['criteria']['debtorName']['business']
@@ -853,6 +882,12 @@ class Report:  # pylint: disable=too-few-public-methods
             self._report_data['meta_subject'] = f'Base Registration Number: {reg_num}'
         if self._get_environment() != '':
             self._report_data['footer_content'] = 'TEST DATA | ' + self._report_data['footer_content']
+        if self._report_key == ReportTypes.SEARCH_DETAIL_REPORT and self._report_data.get('subreport'):
+            if len(self._report_data['footer_content']) > 58:
+                self._report_data['footer_content'] = self._report_data['footer_content'][0:58]
+            self._report_data['footer_content'] += ' | Sub-report ' + self._report_data.get('subreport')
+        elif len(self._report_data['footer_content']) > 78:
+            self._report_data['footer_content'] = self._report_data['footer_content'][0:78]
 
     @staticmethod
     def _get_environment():
@@ -892,45 +927,3 @@ class Report:  # pylint: disable=too-few-public-methods
             local_datetime = local_datetime + timedelta(hours=offset)
         timestamp = local_datetime.strftime('%B %-d, %Y at %-I:%M:%S %p Pacific time')
         return timestamp.replace(' PM ', ' pm ')
-
-
-class ReportMeta:  # pylint: disable=too-few-public-methods
-    """Helper class to maintain the report meta information."""
-
-    reports = {
-        ReportTypes.COVER_PAGE_REPORT: {
-            'reportDescription': 'CoverPage',
-            'fileName': 'coverV2',
-            'metaTitle': 'Personal Property Registry',
-            'metaSubtitle': 'BC Registries and Online Services',
-            'metaSubject': ''
-        },
-        ReportTypes.SEARCH_DETAIL_REPORT: {
-            'reportDescription': 'SearchResult',
-            'fileName': 'searchResultV2',
-            'metaTitle': 'Personal Property Registry Search Result',
-            'metaSubtitle': 'BC Registries and Online Services',
-            'metaSubject': ''
-        },
-        ReportTypes.FINANCING_STATEMENT_REPORT: {
-            'reportDescription': 'FinancingStatement',
-            'fileName': 'financingStatementV2',
-            'metaTitle': 'Personal Property Registry Financing Statement',
-            'metaSubtitle': '',
-            'metaSubject': 'Base Registration Number: {self._get_report_id()}'
-        },
-        ReportTypes.SEARCH_TOC_REPORT: {
-            'reportDescription': 'SearchResult',
-            'fileName': 'searchResultTOCV2',
-            'metaTitle': 'Personal Property Registry Search Result',
-            'metaSubtitle': 'BC Registries and Online Services',
-            'metaSubject': ''
-        },
-        ReportTypes.SEARCH_BODY_REPORT: {
-            'reportDescription': 'SearchResult',
-            'fileName': 'searchResultBodyV2',
-            'metaTitle': 'Personal Property Registry Search Result',
-            'metaSubtitle': 'BC Registries and Online Services',
-            'metaSubject': ''
-        }
-    }

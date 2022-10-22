@@ -1,0 +1,120 @@
+[[macros.html]]
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>{{ meta_title }}</title>
+    <meta charset="UTF-8">
+    <meta name="author" content="BC Registries and Online Services">
+    {% if environment == '' %}
+      [[v2/stylePage.html]]
+    {% else %}
+      [[v2/stylePageDraft.html]]
+    {% endif %}
+    [[v2/style.html]]
+  </head>
+  <body>
+    <div class="business-details-container mtn-2">
+
+    {% if meta_subject|length > 70 %}
+    <table class="business-name-header-long ma-0 pa-0" role="presentation">
+      <tr>
+        <td class="lbl-business-name ma-0 pt-3 pb-3">
+          {{ meta_subject }}
+          </td>
+        </tr>
+      </table>
+    {% else %}
+      <table class="business-name-header" role="presentation">
+        <tr>
+          <td class="lbl-business-name ma-0 pa-0">
+            {{ meta_subject }}
+            </td>
+          </tr>
+        </table>  
+    {% endif %}
+
+    <table class="business-details-table" role="presentation">
+      <tr>
+        <td class="lbl-business-detail">
+          <div>Search Date and Time:</div>
+          <div>Account Name:</div>
+          {% if searchQuery.clientReferenceId is defined and searchQuery.clientReferenceId != "" %}
+            <div>Folio Number:</div>
+          {% endif %}
+          <div>Number of Sub-Reports:</div>
+        </td>
+        <td>
+          <div>{{searchDateTime}}</div>
+          <div>
+            {% if meta_account_name is defined %}
+              {{meta_account_name}}
+            {% else %}
+              Not available.
+            {% endif %}
+          </div>
+          {% if searchQuery.clientReferenceId is defined and searchQuery.clientReferenceId != "" %}
+            <div>{{searchQuery.clientReferenceId}}</div>
+          {% endif %}
+          {% if subreport is defined and subreport != '' %}
+            <div>{{subreport}}</div>
+          {% endif %}
+          <div>{{reportCount}}</div>
+        </td>
+        <td class="registar-certify-section">
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <table class="search-cover-info-table mt-6" role="presentation">
+    <tr>
+      <td>
+          This search result report contains more than 700 registrations and has been divided into multiple sub-reports.
+      </td>
+    </tr>
+  </table>
+
+  <table class="header-table-toc mt-6" role="presentation">
+    <tr>
+      <th colspan="3" class="header-toc-title pt-2">
+        TABLE OF CONTENTS
+      </th>
+    </tr>
+    <tr class="mt-2">
+        <td>
+            Total Registrations in Report: {{ totalResultsSize }}
+        </td>
+        <td>Total Exact Matches: {{ exactResultsSize }}</td>
+        <td>Total Search Report Pages: {{ reportPageCount }}</td>
+    </tr>
+  </table>
+  
+    <div class="container pt-4">
+        <table class="search-cover-summary-table mt-4" role="presentation">
+            <tr class="search-cover-summary-table-header">
+                <td class="top-align"></td>
+                <td class="top-align">Number of Registrations in Sub-report</td>
+                <td class="top-align">Number of Exact Matches in Sub-report</td>
+                <td class="top-align pb-4">First Registration Date</td>
+                <td class="top-align pb-4">Last Registration Date</td>
+                <td class="top-align pb-4">Page</td>
+            </tr>
+            {% for result in reports %}
+               <tr>
+                   <td>{{result.index}}</td>
+                   <td>{{result.registrationCount}}</td>
+                   <td>{{result.exactCount}}</td>
+                   <td>{{result.startDate}}</td>
+                   <td>{{result.endDate}}</td>
+                   <td>{{result.startPage}}</td>
+                </tr>
+                <tr class="solid-row-separator">
+                    <td colspan="3" style="height:1px"/>
+                </tr>
+             {% endfor %}
+        </table>
+    </div>
+    <p class="last-page"></p>
+  </body>
+</html>

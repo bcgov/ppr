@@ -1,0 +1,41 @@
+{
+  "searchDateTime": "2022-10-10T20:06:55+00:00",
+  "exactResultsSize": 1301,
+  "similarResultsSize": 32,
+  "reportCount": 3,
+  "totalResultsSize": 1333,
+  "reportPageCount": 2182,
+  "searchQuery": {
+    "type": "BUSINESS_DEBTOR",
+    "criteria": {
+      "debtorName": {"business": "TELUS COMMUNICATIONS INC."}
+    },
+    "clientReferenceId": "UT-0001"
+  },
+  "reports": [
+    {
+      "index": 1,
+      "registrationCount": 500,
+      "startPage": 1,
+      "exactCount": 482,
+      "startDate": "1997-11-18T20:06:55+00:00",
+      "endDate": "2019-09-27T20:06:55+00:00"
+    },
+    {
+      "index": 2,
+      "registrationCount": 500,
+      "startPage": 881,
+      "exactCount": 506,
+      "startDate": "2019-09-27T20:06:55+00:00",
+      "endDate": "2021-01-04T20:06:55+00:00"
+    },
+    {
+      "index": 3,
+      "registrationCount": 333,
+      "startPage": 1670,
+      "exactCount": 331,
+      "startDate": "2021-01-07T20:06:55+00:00",
+      "endDate": "2022-01-20T20:06:55+00:00"
+    }
+   ]
+}
