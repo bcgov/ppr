@@ -391,14 +391,15 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
                 for row in rows:
                     mapping = row._mapping  # pylint: disable=protected-access; follows documentation
                     search_id = str(mapping['id'])
-                    # Set to pending if async report is not yet available.
                     doc_storage_url = str(mapping['doc_storage_url'])
                     selected_value = mapping['selected_match_count']
                     select_size = int(selected_value) if selected_value else 0
                     search_ts = mapping['search_ts']
-                    if doc_storage_url is None or doc_storage_url.lower() == 'none':
-                        if select_size >= 75 or not model_utils.report_retry_elapsed(search_ts):
-                            search_id = REPORT_STATUS_PENDING
+                    callback_url = str(mapping['callback_url'])
+                    # Signal UI report pending if async report is not yet available.
+                    if callback_url is not None and callback_url.lower() != 'none' and\
+                            (doc_storage_url is None or doc_storage_url.lower() == 'none'):
+                        search_id = REPORT_STATUS_PENDING
                     search = {
                         'searchId': search_id,
                         'searchDateTime': model_utils.format_ts(search_ts),
