@@ -27,7 +27,7 @@
           :rules="fractionalAmountRules"
           :data-test-id="`fraction-amount-field-group-${groupId}`"
           ref="interestNumerator"
-          @blur="$refs.interestTotal.validate()"
+          @blur="$refs.interestDenominator.validate()"
         />
         <span> </span>
         <v-text-field
@@ -35,10 +35,10 @@
           label="Total Available"
           filled
           class="background-white"
-          v-model.number="fractionalData.interestTotal"
+          v-model.number="fractionalData.interestDenominator"
           :rules="totalAmountRules"
           :data-test-id="`total-fractions-field-group-${groupId}`"
-          ref="interestTotal"
+          ref="interestDenominator"
           @blur="$refs.interestNumerator.validate()"
         />
       </div>
@@ -87,12 +87,12 @@ export default defineComponent({
     const { customRules, required, isNumber, greaterThan, lessThan } = useInputRules()
 
     const localState = reactive({
-      id: props.editHomeOwner?.id || (DEFAULT_OWNER_ID++).toString(),
+      id: props.editHomeOwner?.ownerId || (DEFAULT_OWNER_ID++).toString(),
       fractionalInfo: props.fractionalData,
       fractionalInterest: computed(
         () =>
           // eslint-disable-next-line max-len
-          `${props.fractionalData.interest} ${props.fractionalData.interestNumerator}/${props.fractionalData.interestTotal}`
+          `${props.fractionalData.interest} ${props.fractionalData.interestNumerator}/${props.fractionalData.interestDenominator}`
       ),
       fractionalAmountRules: computed(() => {
         const rules = customRules(
@@ -101,9 +101,9 @@ export default defineComponent({
           isNumber(null, 6, null, null) // check for length (maxLength can't be used because field is numeric)
         )
         // additional validation when interest total has some value - UX feedback
-        if (localState.fractionalInfo.interestTotal) {
+        if (localState.fractionalInfo.interestDenominator) {
           rules.push(
-            ...greaterThan(Number(localState.fractionalInfo.interestTotal), 'Must be lesser than total available')
+            ...greaterThan(Number(localState.fractionalInfo.interestDenominator), 'Must be lesser than total available')
           )
         }
         return rules

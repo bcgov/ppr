@@ -8,8 +8,8 @@ const transferDetailsValid = ref(false)
 
 export const useMhrInformation = () => {
   const {
+    getMhrTransferCurrentHomeOwners,
     getCurrentUser,
-    getMhrTransferHomeOwners,
     getMhrInformation,
     getMhrTransferDeclaredValue,
     getMhrTransferConsideration,
@@ -17,6 +17,7 @@ export const useMhrInformation = () => {
     getMhrTransferOwnLand,
     getMhrTransferHomeOwnerGroups
   } = useGetters<any>([
+    'getMhrTransferCurrentHomeOwners',
     'getCurrentUser',
     'getMhrInformation',
     'getMhrTransferHomeOwners',
@@ -43,47 +44,28 @@ export const useMhrInformation = () => {
     }
   }
 
-  const parseOwnerGroups = (): any => {
+  const parseOwnerGroups = (isDraft: boolean = false): any => {
     const ownerGroups = []
 
-    getMhrTransferHomeOwners.value.forEach(ownerGroup => {
-      const { groupId, ...owners } = ownerGroup
-      const groupType = getMhrTransferHomeOwnerGroups.value.find(group => group.groupId === ownerGroup.groupId)?.type
-      const apiGroupType = ApiHomeTenancyTypes[
-        Object.keys(HomeTenancyTypes).find(key => HomeTenancyTypes[key] as string === groupType)
-      ]
-
+    getMhrTransferHomeOwnerGroups.value.forEach(ownerGroup => {
       ownerGroups.push({
-        owners: [owners].filter(owner => owner.action !== ActionTypes.REMOVED),
-        groupId: parseInt(groupId),
-        type: apiGroupType
+        ...ownerGroup,
+        owners: isDraft ? ownerGroup.owners : ownerGroup.owners.filter(owner => owner.action !== ActionTypes.REMOVED),
+        groupId: ownerGroup.groupId + 1, // Increment from baseline groupID to create a new group for API
+        type: ApiHomeTenancyTypes[
+          Object.keys(HomeTenancyTypes).find(key => HomeTenancyTypes[key] as string === ownerGroup.type)
+        ]
       })
     })
 
-    return ownerGroups.filter(group => group.owners.length !== 0)
+    return ownerGroups
   }
 
-  const parseRemovedOwnerGroups = (): any => {
-    const ownerGroups = []
-
-    getMhrTransferHomeOwners.value.forEach(ownerGroup => {
-      const { groupId, ...owners } = ownerGroup
-      const groupType = getMhrTransferHomeOwnerGroups.value.find(group => group.groupId === ownerGroup.groupId)?.type
-      const apiGroupType = ApiHomeTenancyTypes[
-        Object.keys(HomeTenancyTypes).find(key => HomeTenancyTypes[key] as string === groupType)
-      ]
-
-      ownerGroups.push({
-        owners: [owners].filter(owner => owner.action === ActionTypes.REMOVED),
-        groupId: parseInt(groupId),
-        type: apiGroupType
-      })
-    })
-
-    return ownerGroups.filter(group => group.owners.length !== 0)
+  const parseRemovedOwnerGroups = async () => {
+    return getMhrTransferCurrentHomeOwners.value
   }
 
-  const buildApiData = (): MhrTransferApiIF => {
+  const buildApiData = async (isDraft: boolean = false): Promise<MhrTransferApiIF> => {
     const data: MhrTransferApiIF = {
       mhrNumber: getMhrInformation.value.mhrNumber,
       declaredValue: getMhrTransferDeclaredValue.value,
@@ -106,8 +88,8 @@ export const useMhrInformation = () => {
         emailAddress: getCurrentUser.value.contacts[0].email,
         phoneNumber: getCurrentUser.value.contacts[0].phone.replace(/[^0-9.]+/g, '') // Remove special chars
       },
-      addOwnerGroups: parseOwnerGroups(),
-      deleteOwnerGroups: parseRemovedOwnerGroups(),
+      addOwnerGroups: await parseOwnerGroups(isDraft),
+      deleteOwnerGroups: await parseRemovedOwnerGroups(),
       deathOfOwner: false
     }
 

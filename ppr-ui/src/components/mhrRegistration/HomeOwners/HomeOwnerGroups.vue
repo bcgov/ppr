@@ -23,7 +23,7 @@
       filled
       @change="setOwnerGroupId($event)"
       :clearable="groupItems.length === 1"
-      @click:clear="removeGroupDropdownValidation == true && groupDropdown.blur()"
+      @click:clear="removeGroupDropdownValidation === true && groupDropdown.blur()"
       :menu-props="{ bottom: true, offsetY: true }"
       data-test-id="owner-group-select"
     ></v-select>
@@ -61,7 +61,6 @@ import { computed, defineComponent, reactive, ref, toRefs } from '@vue/compositi
 import { useHomeOwners } from '@/composables/mhrRegistration'
 import { useInputRules } from '@/composables'
 import FractionalOwnership from './FractionalOwnership.vue'
-import { useGetters } from 'vuex-composition-helpers'
 import { find } from 'lodash'
 /* eslint-disable no-unused-vars */
 import { MhrRegistrationFractionalOwnershipIF } from '@/interfaces/mhr-registration-interfaces'
@@ -87,23 +86,18 @@ export default defineComponent({
   props: {
     groupId: { type: Number },
     fractionalData: { type: Object as () => FractionalOwnershipWithGroupIdIF },
-    isAddingHomeOwner: { type: Boolean }, // makes additional Group available in dropdown when adding a new home owner
+    isAddingHomeOwner: { type: Boolean }, // makes additional Group available in dropdown when adding a new homeowner
     isMhrTransfer: { type: Boolean, default: false }
   },
 
   setup (props, { emit }) {
-    const { getMhrRegistrationHomeOwnerGroups, getMhrTransferHomeOwnerGroups } = useGetters<any>([
-      'getMhrRegistrationHomeOwnerGroups',
-      'getMhrTransferHomeOwnerGroups'
-    ])
     const groupDropdown = ref(null)
-
     const { required } = useInputRules()
-    const { getGroupDropdownItems, showGroups } = useHomeOwners(props.isMhrTransfer)
-    const getTransferOrRegistrationHomeOwnerGroups = () =>
-      props.isMhrTransfer ? getMhrTransferHomeOwnerGroups.value : getMhrRegistrationHomeOwnerGroups.value
-
-    const homeOwnerGroups = getTransferOrRegistrationHomeOwnerGroups()
+    const {
+      showGroups,
+      getGroupDropdownItems,
+      getTransferOrRegistrationHomeOwnerGroups
+    } = useHomeOwners(props.isMhrTransfer)
 
     const localState = reactive({
       ownerGroupId: props.groupId,
@@ -120,12 +114,12 @@ export default defineComponent({
         .map(group => {
           return {
             groupId: group.groupId,
-            isReadonly: true && showGroups.value,
-            hasEditButton: true && showGroups.value
+            isReadonly: showGroups.value,
+            hasEditButton: showGroups.value
           }
         })
         .concat({
-          groupId: (homeOwnerGroups.length + 1),
+          groupId: (getTransferOrRegistrationHomeOwnerGroups().length + 1),
           isReadonly: false,
           hasEditButton: false
         }) as ReadonlyOwnerGroupStateIF[],

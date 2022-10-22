@@ -12,8 +12,8 @@ import {
   FractionalOwnership
 } from '@/components/mhrRegistration/HomeOwners'
 import { SimpleHelpToggle } from '@/components/common'
-import { mockedPerson, mockedOrganization } from './test-data/mock-mhr-registration'
-import { getTestId } from './utils/helper-functions'
+import { mockedPerson, mockedOrganization } from './test-data'
+import { getTestId } from './utils'
 import { MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF } from '@/interfaces'
 import { HomeTenancyTypes } from '@/enums'
 
@@ -247,7 +247,7 @@ describe('Home Owners', () => {
         owners: [mockedPerson, mockedOrganization],
         interest: 'Undivided',
         interestNumerator: 123,
-        interestTotal: 432
+        interestDenominator: 432
       }
     ] as MhrRegistrationHomeOwnerGroupIF[]
 
@@ -304,7 +304,7 @@ describe('Home Owners', () => {
         owners: [mockedOrganization],
         interest: 'Undivided',
         interestNumerator: 123,
-        interestTotal: 432
+        interestDenominator: 432
       }
     ] as MhrRegistrationHomeOwnerGroupIF[]
 
@@ -347,7 +347,7 @@ describe('Home Owners', () => {
         owners: [mockedPerson],
         interest: 'Undivided',
         interestNumerator: 111,
-        interestTotal: 777
+        interestDenominator: 777
       }
     ] as MhrRegistrationHomeOwnerGroupIF[]
 
@@ -392,7 +392,7 @@ describe('Home Owners', () => {
         owners: [mockedPerson],
         interest: 'Undivided',
         interestNumerator: 10,
-        interestTotal: 20
+        interestDenominator: 20
       }
     ] as MhrRegistrationHomeOwnerGroupIF[]
 

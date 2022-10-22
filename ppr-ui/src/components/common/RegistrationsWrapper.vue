@@ -589,9 +589,6 @@ export default defineComponent({
         case TableActions.OPEN:
           openMhr(mhrInfo)
           break
-        case TableActions.REMOVE_TRANSFER_DRAFT:
-          removeMhrDraft(regNum)
-          break
         default:
           localState.myRegAction = null
           localState.myRegActionDocId = ''
@@ -663,7 +660,9 @@ export default defineComponent({
     const myRegDeleteDialogProceed = (val: boolean): void => {
       if (val) {
         if (localState.myRegAction === TableActions.DELETE) {
-          removeDraft(localState.myRegActionRegNum, localState.myRegActionDocId)
+          props.isPpr
+            ? removeDraft(localState.myRegActionRegNum, localState.myRegActionDocId)
+            : removeMhrDraft(localState.myRegActionRegNum)
         }
         if (localState.myRegAction === TableActions.REMOVE) {
           props.isPpr

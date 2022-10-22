@@ -313,7 +313,7 @@ export default defineComponent({
       props.isMhrTransfer ? getMhrTransferHomeOwnerGroups.value : getMhrRegistrationHomeOwnerGroups.value
 
     const defaultHomeOwner: MhrRegistrationHomeOwnerIF = {
-      id: props.editHomeOwner?.id || (DEFAULT_OWNER_ID++).toString(),
+      ownerId: props.editHomeOwner?.ownerId || (DEFAULT_OWNER_ID++),
       phoneNumber: props.editHomeOwner?.phoneNumber || '',
       phoneExtension: props.editHomeOwner?.phoneExtension || null,
       suffix: props.editHomeOwner?.suffix || '',
@@ -345,8 +345,8 @@ export default defineComponent({
         type: group?.type || '',
         interest: group?.interest || '',
         interestNumerator: group?.interestNumerator || null,
-        interestTotal: group?.interestTotal || null,
-        tenancySpecified: group?.tenancySpecified || null
+        interestDenominator: group?.interestDenominator || null,
+        tenancySpecified: group?.tenancySpecified || false
       }
     }) as FractionalOwnershipWithGroupIdIF[]
 
@@ -359,7 +359,7 @@ export default defineComponent({
         type: 'N/A',
         interest: '',
         interestNumerator: null,
-        interestTotal: null,
+        interestDenominator: null,
         tenancySpecified: null
       } as FractionalOwnershipWithGroupIdIF)
     }
@@ -374,7 +374,7 @@ export default defineComponent({
           return props.editHomeOwner == null ? 'Add a Business or Organization' : 'Edit Business'
         }
       }),
-      group: getGroupForOwner(props.editHomeOwner?.id) as MhrRegistrationHomeOwnerGroupIF,
+      group: getGroupForOwner(props.editHomeOwner?.ownerId) as MhrRegistrationHomeOwnerGroupIF,
       ownersGroupId: computed(() => (showGroups.value ? localState.group?.groupId : null)),
       owner: { ...defaultHomeOwner },
       ownerGroupId: props.editHomeOwner?.groupId,
@@ -439,7 +439,7 @@ export default defineComponent({
           delete localState.group.type
           delete localState.group.interest
           delete localState.group.interestNumerator
-          delete localState.group.interestTotal
+          delete localState.group.interestDenominator
           delete localState.group.tenancySpecified
         }
 

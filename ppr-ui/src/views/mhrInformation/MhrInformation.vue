@@ -86,7 +86,8 @@ import {
   fetchMhRegistration,
   getMhrTransferDraft,
   pacificDate,
-  submitMhrTransfer, updateMhrDraft
+  submitMhrTransfer,
+  updateMhrDraft
 } from '@/utils'
 import { StickyContainer } from '@/components/common'
 import { useHomeOwners, useMhrInformation } from '@/composables'
@@ -96,6 +97,7 @@ import TransferDetails from '@/components/mhrTransfers/TransferDetails.vue'
 import { HomeOwners } from '@/views'
 import { BaseDialog } from '@/components/dialogs'
 import { unsavedChangesDialog } from '@/resources/dialogOptions'
+import { cloneDeep } from 'lodash'
 
 export default defineComponent({
   name: 'MhrInformation',
@@ -203,12 +205,12 @@ export default defineComponent({
     const parseCurrentOwnerGroups = async (): Promise<void> => {
       const { data } = await fetchMhRegistration(getMhrInformation.value.mhrNumber)
       const currentOwnerGroups = data?.ownerGroups || [] // Safety check. Should always have ownerGroups
-      // Create an ID to each individual owner for UI Tracking
-      // TODO: Remove after API updates to include the ID for Owners
-      currentOwnerGroups.forEach(ownerGroup => {
-        for (const [index, owner] of ownerGroup.owners.entries()) {
-          owner.id = ownerGroup.groupId + (index + 1)
-        }
+
+      // Store a snapshot of the existing OwnerGroups for baseline of current state
+      await setMhrTransferCurrentHomeOwnerGroups(cloneDeep(data.ownerGroups))
+
+      currentOwnerGroups.forEach((ownerGroup, index) => {
+        ownerGroup.groupId = index + 1
       })
       setShowGroups(currentOwnerGroups.length > 1)
 
@@ -216,14 +218,11 @@ export default defineComponent({
       if (getMhrInformation.value.draftNumber) {
         // Retrieve owners from draft if it exists
         const { registration } = await getMhrTransferDraft(getMhrInformation.value.draftNumber)
-        setMhrTransferHomeOwnerGroups(registration.addOwnerGroups)
+        setMhrTransferHomeOwnerGroups([...registration.addOwnerGroups])
       } else {
         // Set current owners if there is no draft
         setMhrTransferHomeOwnerGroups(currentOwnerGroups)
       }
-
-      // Store a snapshot of the existing OwnerGroups for baseline of current state
-      setMhrTransferCurrentHomeOwnerGroups(currentOwnerGroups)
     }
 
     const goToReview = async (): Promise<void> => {
@@ -231,7 +230,8 @@ export default defineComponent({
       localState.validateTransferDetails = true
       if (localState.isReviewMode) {
         localState.loading = true
-        const mhrTransferFiling = await submitMhrTransfer(buildApiData(), getMhrInformation.value.mhrNumber)
+        const apiData = await buildApiData()
+        const mhrTransferFiling = await submitMhrTransfer(apiData, getMhrInformation.value.mhrNumber)
         localState.loading = false
         await setUnsavedChanges(false)
         !mhrTransferFiling.error
@@ -245,9 +245,11 @@ export default defineComponent({
 
     const onSave = async (): Promise<void> => {
       localState.loading = true
+      const apiData = await buildApiData(true)
+
       const mhrTransferDraft = getMhrInformation.value.draftNumber
-        ? await updateMhrDraft(getMhrInformation.value.draftNumber, buildApiData())
-        : await createMhrTransferDraft(buildApiData())
+        ? await updateMhrDraft(getMhrInformation.value.draftNumber, apiData)
+        : await createMhrTransferDraft(apiData)
       localState.loading = false
 
       !mhrTransferDraft.error

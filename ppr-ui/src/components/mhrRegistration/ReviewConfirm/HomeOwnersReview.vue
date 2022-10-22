@@ -45,29 +45,33 @@ import { useHomeOwners, useMhrValidations } from '@/composables/mhrRegistration'
 export default defineComponent({
   name: 'HomeOwnersReview',
   components: { HomeOwnersTable },
+  props: {
+    isMhrTransfer: {
+      type: Boolean,
+      default: false
+    }
+  },
   // eslint-disable-next-line
-  setup() {
+  setup(props) {
     const {
-      getMhrRegistrationHomeOwners,
-      getMhrRegistrationValidationModel,
-      getMhrRegistrationHomeOwnerGroups
+      getMhrRegistrationValidationModel
     } = useGetters<any>([
-      'getMhrRegistrationHomeOwners',
-      'getMhrRegistrationValidationModel',
-      'getMhrRegistrationHomeOwnerGroups'
+      'getMhrRegistrationValidationModel'
     ])
 
     const { MhrSectVal, getStepValidation } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
     const {
       getHomeTenancyType,
       getTotalOwnershipAllocationStatus,
-      showGroups
-    } = useHomeOwners()
+      showGroups,
+      getTransferOrRegistrationHomeOwners,
+      getTransferOrRegistrationHomeOwnerGroups
+    } = useHomeOwners(props.isMhrTransfer)
 
     const localState = reactive({
-      homeOwners: computed(() => getMhrRegistrationHomeOwners.value),
-      hasHomeOwners: computed(() => !!getMhrRegistrationHomeOwners.value.find(owner => owner.id)),
-      hasGroups: computed(() => getMhrRegistrationHomeOwnerGroups.value.length > 0),
+      homeOwners: computed(() => getTransferOrRegistrationHomeOwners()),
+      hasHomeOwners: computed(() => !!getTransferOrRegistrationHomeOwners().find(owner => owner.ownerId)),
+      hasGroups: computed(() => getTransferOrRegistrationHomeOwnerGroups().length > 0),
       showStepError: computed(() => !getStepValidation(MhrSectVal.HOME_OWNERS_VALID))
     })
 
