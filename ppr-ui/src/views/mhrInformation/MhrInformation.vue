@@ -22,24 +22,18 @@
             <section v-if="dataLoaded" class="py-4">
               <header class="review-header mt-1">
                 <v-icon class="ml-1" color="darkBlue">mdi-home</v-icon>
-                <label class="font-weight-bold pl-2">Home Owners</label>
+                <label class="font-weight-bold pl-2">
+                  {{isReviewMode ? 'Ownership Transfer or Change - Sale or Beneficiary' : 'Home Owners'}}
+                </label>
               </header>
 
               <!-- MHR Information Review Section -->
               <template v-if="isReviewMode">
-                <section>
-                  <HomeOwnersTable
-                    class="px-7"
-                    isMhrTransfer
-                    isReadonlyTable
-                    :homeOwners="reviewOwners"
-                    :currentHomeOwners="getMhrTransferCurrentHomeOwners"
-                  />
-                </section>
-                <section id="transfer-certify-section" class="mt-10 pt-4 pb-60px">
+                <TransferDetailsReview/>
+                <section id="transfer-certify-section" class="mt-10 py-4">
                   <CertifyInformation
-                  :setShowErrors="validateAuthorizationError"
-                  @certifyValid="authorizationValid = $event"
+                    :setShowErrors="validateAuthorizationError"
+                    @certifyValid="authorizationValid = $event"
                   />
                 </section>
               </template>
@@ -96,6 +90,7 @@ import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
 import TransferDetails from '@/components/mhrTransfers/TransferDetails.vue'
 import { HomeOwners } from '@/views'
+import TransferDetailsReview from '@/components/mhrTransfers/TransferDetailsReview.vue'
 
 export default defineComponent({
   name: 'MhrInformation',
@@ -104,7 +99,8 @@ export default defineComponent({
     TransferDetails,
     HomeOwnersTable,
     StickyContainer,
-    CertifyInformation
+    CertifyInformation,
+    TransferDetailsReview
   },
   props: {
     appReady: {
@@ -134,6 +130,7 @@ export default defineComponent({
     const {
       isTransferDetailsValid,
       initMhrTransfer,
+      getTransferDetails,
       buildApiData
     } = useMhrInformation()
 
@@ -270,6 +267,7 @@ export default defineComponent({
       goToReview,
       onSave,
       goToDash,
+      getTransferDetails,
       getMhrTransferHomeOwners,
       getMhrTransferCurrentHomeOwners,
       ...toRefs(localState)
@@ -280,7 +278,4 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-.pb-60px {
-  padding-bottom: 60px;
-}
 </style>

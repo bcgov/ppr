@@ -2,6 +2,7 @@ import { MhrTransferApiIF, MhrTransferIF } from '@/interfaces'
 import { useGetters } from 'vuex-composition-helpers'
 import { readonly, ref } from '@vue/composition-api'
 import { ActionTypes, ApiHomeTenancyTypes, HomeTenancyTypes } from '@/enums'
+import { TransferDetails } from '@/components/mhrTransfers'
 
 // Validation flag for Transfer Details
 const transferDetailsValid = ref(false)
@@ -29,6 +30,15 @@ export const useMhrInformation = () => {
 
   const setTransferDetailsValid = (isValid: boolean) => {
     transferDetailsValid.value = isValid
+  }
+  const getTransferDetails = () => {
+    var transferDetails = {
+      declaredValue: getMhrTransferDeclaredValue.value,
+      consideration: getMhrTransferConsideration.value,
+      transferDate: getMhrTransferDate.value,
+      transferOwnLand: getMhrTransferOwnLand.value
+    }
+    return transferDetails
   }
 
   const initMhrTransfer = (): MhrTransferIF => {
@@ -117,6 +127,7 @@ export const useMhrInformation = () => {
   return {
     isTransferDetailsValid: readonly(transferDetailsValid),
     setTransferDetailsValid,
+    getTransferDetails,
     initMhrTransfer,
     buildApiData
   }
