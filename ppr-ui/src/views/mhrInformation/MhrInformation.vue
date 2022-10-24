@@ -27,6 +27,8 @@
 
               <!-- MHR Information Review Section -->
               <template v-if="isReviewMode">
+                <!-- TODO: Add some form of transferDetails review, either review flag in existing component or
+                new component. To be added in ticket 13905 -->
                 <section>
                   <HomeOwnersTable
                     class="px-7"
@@ -36,10 +38,10 @@
                     :currentHomeOwners="getMhrTransferCurrentHomeOwners"
                   />
                 </section>
-                <section id="transfer-certify-section" class="mt-10 pt-4 pb-60px">
+                <section id="transfer-certify-section" class="mt-10 py-4">
                   <CertifyInformation
-                  :setShowErrors="validateAuthorizationError"
-                  @certifyValid="authorizationValid = $event"
+                    :setShowErrors="validateAuthorizationError"
+                    @certifyValid="authorizationValid = $event"
                   />
                 </section>
               </template>
@@ -280,7 +282,4 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-.pb-60px {
-  padding-bottom: 60px;
-}
 </style>

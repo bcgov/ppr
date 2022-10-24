@@ -7,7 +7,7 @@ import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
 
 // local components
 import { HomeOwners, MhrInformation } from '@/views'
-import { StickyContainer } from '@/components/common'
+import { ButtonsStacked, StickyContainer } from '@/components/common'
 import mockRouter from './MockRouter'
 import { HomeTenancyTypes, RouteNames } from '@/enums'
 import { HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
@@ -16,6 +16,7 @@ import { mockedAddedPerson, mockedRemovedPerson, mockedOrganization, mockedPerso
 import { MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF } from '@/interfaces'
 import { nextTick } from '@vue/composition-api'
 import { TransferDetails } from '@/components/mhrTransfers'
+import { CertifyInformation } from '@/components/common'
 
 Vue.use(Vuetify)
 
@@ -279,5 +280,31 @@ describe('Mhr Information', () => {
 
     // Check that Consideration displayed Declared Value on blur
     expect(mhrTransferDetailsComponent.vm.$data.consideration).toBe('$123.00')
+  })
+
+  it('should render Authorization component on review', async () => {
+    setupCurrentHomeOwners()
+    wrapper.vm.$data.dataLoaded = true
+    await Vue.nextTick()
+
+    expect(wrapper.props().isMhrTransfer).toBe(true)
+    expect(wrapper.vm.$data.getMhrTransferCurrentHomeOwners.length).toBe(1)
+    expect(wrapper.vm.$data.getMhrTransferHomeOwners.length).toBe(1)
+    expect(wrapper.findComponent(MhrInformation).exists()).toBe(true)
+
+    // Enter review mode
+    expect(wrapper.find('#btn-stacked-submit').exists()).toBe(true)
+    const submitButton = wrapper.find('#btn-stacked-submit')
+    submitButton.trigger('click')
+    await Vue.nextTick()
+
+    // Check if Authorization renders in review mode
+    expect(wrapper.findComponent(MhrInformation).findComponent(CertifyInformation).exists()).toBe(true)
+
+    // Check for component's attributes
+    const authorizationComponent = wrapper.findComponent(MhrInformation).findComponent(CertifyInformation)
+    expect(authorizationComponent.find('#certify-summary').exists()).toBeTruthy()
+    expect(authorizationComponent.find('#certify-information').exists()).toBeTruthy()
+    expect(authorizationComponent.find('#checkbox-certified').exists()).toBeTruthy()
   })
 })
