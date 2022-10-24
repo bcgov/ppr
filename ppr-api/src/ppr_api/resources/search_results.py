@@ -172,7 +172,8 @@ class SearchResultsResource(Resource):
             # with no exact matches and no results selected - nil, which is valid.
             if search_detail.search_select is None and search_detail.search.total_results_size > 0:
                 return resource_utils.bad_request_response(GET_DETAILS_ERROR)
-
+            current_app.logger.info('1')
+            response_data = search_detail.json
             if resource_utils.is_pdf(request):
                 # If the request is for an async large report and report not available, return an error.
                 if search_detail.callback_url is not None and search_detail.doc_storage_url is None:
@@ -189,7 +190,6 @@ class SearchResultsResource(Resource):
                     return raw_data, HTTPStatus.OK, {'Content-Type': 'application/pdf'}
 
                 # If get to here report not yet generated: create, store, return it.
-                response_data = search_detail.json
                 current_app.logger.info(f'Generating search report for {search_id}.')
                 raw_data, status_code, headers = get_pdf(response_data,
                                                          account_id,

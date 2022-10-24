@@ -14,12 +14,8 @@
 """Callback report-api service tests."""
 from http import HTTPStatus
 
-import pytest
-
 from ppr_api.callback.reports.report_service import get_search_report, get_mail_verification_statement
-from ppr_api.exceptions import BusinessException
 from ppr_api.models import Party, Registration, SearchResult, SearchRequest
-
 
 TEST_SEARCH_REPORT_FILE = 'tests/unit/callback/test-get-search-report.pdf'
 TEST_VERIFICATION_MAIL_FILE = 'tests/unit/callback/test-get-verification-mail.pdf'
@@ -54,19 +50,3 @@ def test_get_search_report(session):
     with open(TEST_SEARCH_REPORT_FILE, "wb") as pdf_file:
         pdf_file.write(raw_data)
         pdf_file.close()
-
-
-def test_get_verification_mail_report(session):
-    """Assert that a callback request to generate a surface mail verification report works as expected."""
-    # setup
-    registration: Registration = Registration.find_by_registration_number('TEST0019DC', 'PS12345', True)
-    secured_party: Party = None
-    account_name = 'UNIT TEST ACCOUNT'
-    # Any secured party will do - must have at lease 1:
-    for party in registration.financing_statement.parties:
-        if party.party_type == Party.PartyTypes.SECURED_PARTY.value:
-            secured_party = party
-
-    # test
-    with pytest.raises(BusinessException) as ex:
-        get_mail_verification_statement(registration, secured_party, account_name)

@@ -165,10 +165,10 @@ REG_TYPE_TO_REG_CLASS = {
     'PT': 'CROWNLIEN',
     'RA': 'CROWNLIEN',
     'SC': 'CROWNLIEN',
-    'TO': 'CROWNLIEN',
-    'SV': 'CROWNLIEN',
     'SS': 'CROWNLIEN',
     'TL': 'CROWNLIEN',
+    'SV': 'CROWNLIEN',
+    'TO': 'CROWNLIEN',
     'DC': 'DISCHARGE',
     'HN': 'MISCLIEN',
     'ML': 'MISCLIEN',
@@ -691,7 +691,7 @@ def expiry_dt_from_registration(registration_ts, life_years: int):
     offset = _datetime.fromtimestamp(base_time) - _datetime.utcfromtimestamp(base_time)
     base_ts = reg_local_ts + offset
     base_date = date(base_ts.year, base_ts.month, base_ts.day)
-    current_app.logger.info('Adjusted local reg Date: ' + base_date.isoformat())
+    # current_app.logger.info('Adjusted local reg Date: ' + base_date.isoformat())
     # Naive time
     expiry_time = time(23, 59, 59, tzinfo=None)
     expiry_reg = _datetime.combine(base_date, expiry_time)
@@ -700,7 +700,7 @@ def expiry_dt_from_registration(registration_ts, life_years: int):
         local_ts = LOCAL_TZ.localize(expiry_reg)
         # Add years
         future_ts = local_ts + datedelta(years=life_years)
-        current_app.logger.info('Local expiry timestamp: ' + future_ts.isoformat())
+        # current_app.logger.info('Local expiry timestamp: ' + future_ts.isoformat())
         # Return as UTC
         return _datetime.utcfromtimestamp(future_ts.timestamp()).replace(tzinfo=timezone.utc)
 
@@ -708,7 +708,7 @@ def expiry_dt_from_registration(registration_ts, life_years: int):
     future_ts = expiry_reg + timedelta(days=REPAIRER_LIEN_DAYS)
     # Explicitly set to local timezone which will adjust for daylight savings.
     local_ts = LOCAL_TZ.localize(future_ts)
-    current_app.logger.info('Local expiry timestamp: ' + local_ts.isoformat())
+    # current_app.logger.info('Local expiry timestamp: ' + local_ts.isoformat())
     # Return as UTC before formatting
     return _datetime.utcfromtimestamp(local_ts.timestamp()).replace(tzinfo=timezone.utc)
 
@@ -754,7 +754,7 @@ def to_local_expiry_report(expiry_date_time: str):
     offset: int = 7 if utc_ts.hour == 6 else 8
     # current_app.logger.info('UTC ts: ' + utc_ts.isoformat() + ' offset=' + str(offset))
     local_ts = utc_ts - timedelta(hours=offset)
-    current_app.logger.info('Local expiry timestamp: ' + local_ts.isoformat())
+    # current_app.logger.info('Local expiry timestamp: ' + local_ts.isoformat())
     return local_ts
 
 
@@ -897,5 +897,5 @@ def report_retry_elapsed(last_ts: _datetime):
     """Check that a sufficient delay has elapsed since the last report request."""
     now = now_ts()
     test_ts = (last_ts + timedelta(minutes=15)).replace(tzinfo=timezone.utc)
-    current_app.logger.info('Comparing now ' + now.isoformat() + ' with last ts ' + test_ts.isoformat())
+    # current_app.logger.info('Comparing now ' + now.isoformat() + ' with last ts ' + test_ts.isoformat())
     return now > test_ts
