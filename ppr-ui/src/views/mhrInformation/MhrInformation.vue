@@ -16,7 +16,7 @@
           <v-col cols="9">
             <v-row no-gutters id="mhr-information-header" class="pt-3 pb-3 soft-corners-top">
               <v-col cols="auto">
-                <h1>Manufactured Home Information</h1>
+                <h1>{{isReviewMode ? 'Review and Confirm' : 'Manufactured Home Information'}}</h1>
                 <p class="mt-7">
                   This is the current information for this registration as of
                   <span class="font-weight-bold">{{ asOfDateTime }}</span>.
@@ -32,22 +32,31 @@
 
               <!-- MHR Information Review Section -->
               <template v-if="isReviewMode">
-                <HomeOwnersTable
-                  class="px-7"
-                  isMhrTransfer
-                  isReadonlyTable
-                  :homeOwners="reviewOwners"
-                  :currentHomeOwners="getMhrTransferCurrentHomeOwners"
-                />
+                <!-- TODO: Add some form of transferDetails review, either review flag in existing component or
+                new component. To be added in ticket 13905 -->
+                <section>
+                  <HomeOwnersTable
+                    class="px-7"
+                    isMhrTransfer
+                    isReadonlyTable
+                    :homeOwners="reviewOwners"
+                    :currentHomeOwners="getMhrTransferCurrentHomeOwners"
+                  />
+                </section>
+                <section id="transfer-certify-section" class="mt-10 py-4">
+                  <CertifyInformation
+                    :setShowErrors="validateAuthorizationError"
+                    @certifyValid="authorizationValid = $event"
+                  />
+                </section>
               </template>
 
               <!-- MHR Information Section -->
               <template v-else>
                 <HomeOwners isMhrTransfer class="mt-n2" />
+                <TransferDetails :validateTransferDetails="validateTransferDetails" />
               </template>
             </section>
-
-            <TransferDetails :validateTransferDetails="validateTransferDetails" />
           </v-col>
           <v-col class="pl-6 pt-5" cols="3">
             <aside>
@@ -89,7 +98,7 @@ import {
   submitMhrTransfer,
   updateMhrDraft
 } from '@/utils'
-import { StickyContainer } from '@/components/common'
+import { StickyContainer, CertifyInformation } from '@/components/common'
 import { useHomeOwners, useMhrInformation } from '@/composables'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
@@ -106,7 +115,8 @@ export default defineComponent({
     HomeOwners,
     TransferDetails,
     HomeOwnersTable,
-    StickyContainer
+    StickyContainer,
+    CertifyInformation
   },
   props: {
     appReady: {
@@ -150,6 +160,8 @@ export default defineComponent({
       isReviewMode: false,
       validate: false,
       validateTransferDetails: false,
+      authorizationValid: false,
+      validateAuthorizationError: false,
       feeType: FeeSummaryTypes.MHR_TRANSFER, // FUTURE STATE: To be dynamic, dependent on what changes have been made
       isAuthenticated: computed((): boolean => {
         return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
@@ -228,7 +240,13 @@ export default defineComponent({
     const goToReview = async (): Promise<void> => {
       localState.validate = true
       localState.validateTransferDetails = true
+      // If already in review mode, file the transfer
       if (localState.isReviewMode) {
+        // Check authorization checkbox
+        if (!localState.authorizationValid) {
+          localState.validateAuthorizationError = true
+          return
+        }
         localState.loading = true
         const apiData = await buildApiData()
         const mhrTransferFiling = await submitMhrTransfer(apiData, getMhrInformation.value.mhrNumber)
@@ -238,6 +256,7 @@ export default defineComponent({
           ? goToDash()
           : console.log(mhrTransferFiling?.error) // Handle Schema or Api errors here..
       }
+      // Otherwise if transfer is valid, enter review mode
       if (localState.isValidTransfer) {
         localState.isReviewMode = true
       }
