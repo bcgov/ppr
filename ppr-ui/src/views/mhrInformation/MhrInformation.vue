@@ -57,6 +57,14 @@
                 <TransferDetails :validateTransferDetails="validateTransferDetails" />
               </template>
             </section>
+
+            <CurrentUser
+              title="Submitting Party for this Change"
+              tooltipContent="The default Submitting Party is based on your BC Registries user account information.
+                This information can be updated within your account settings."
+              :currentUserInfo="currentUserInfo"
+            />
+
           </v-col>
           <v-col class="pl-6 pt-5" cols="3">
             <aside>
@@ -105,18 +113,23 @@ import { HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
 import TransferDetails from '@/components/mhrTransfers/TransferDetails.vue'
 import { HomeOwners } from '@/views'
 import { BaseDialog } from '@/components/dialogs'
+import { BaseAddress } from '@/composables/address'
 import { unsavedChangesDialog } from '@/resources/dialogOptions'
 import { cloneDeep } from 'lodash'
+import CurrentUser from '@/components/common/CurrentUser.vue'
+import { UserInfoIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 
 export default defineComponent({
   name: 'MhrInformation',
   components: {
+    BaseAddress,
     BaseDialog,
     HomeOwners,
     TransferDetails,
     HomeOwnersTable,
     StickyContainer,
-    CertifyInformation
+    CertifyInformation,
+    CurrentUser
   },
   props: {
     appReady: {
@@ -128,11 +141,20 @@ export default defineComponent({
       default: true
     }
   },
+  // eslint-disable-next-line
   setup (props, context) {
     const {
-      getMhrTransferHomeOwners, getMhrInformation, getMhrTransferCurrentHomeOwners, hasUnsavedChanges
+      getCurrentUser,
+      getMhrTransferHomeOwners,
+      getMhrInformation,
+      getMhrTransferCurrentHomeOwners,
+      hasUnsavedChanges
     } = useGetters<any>([
-      'getMhrTransferHomeOwners', 'getMhrInformation', 'getMhrTransferCurrentHomeOwners', 'hasUnsavedChanges'
+      'getCurrentUser',
+      'getMhrTransferHomeOwners',
+      'getMhrInformation',
+      'getMhrTransferCurrentHomeOwners',
+      'hasUnsavedChanges'
     ])
 
     const {
@@ -162,6 +184,7 @@ export default defineComponent({
       validateTransferDetails: false,
       authorizationValid: false,
       validateAuthorizationError: false,
+      currentUserInfo: getCurrentUser.value as UserInfoIF,
       feeType: FeeSummaryTypes.MHR_TRANSFER, // FUTURE STATE: To be dynamic, dependent on what changes have been made
       isAuthenticated: computed((): boolean => {
         return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
