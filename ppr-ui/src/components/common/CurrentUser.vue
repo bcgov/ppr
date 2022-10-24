@@ -1,5 +1,5 @@
 <template>
-  <div class="mhr-transfer-details">
+  <div id="current-user-info">
     <h4 class="header my-5">
       {{ title }}
       <v-tooltip
@@ -48,7 +48,7 @@
                 </span>
               </td>
               <td class="py-6">
-                <BaseAddress id="submitting-party-address" :schema="PartyAddressSchema" :value="userInfo.address" />
+                <BaseAddress id="submitting-party-address" :schema="PartyAddressSchema" :value="currentUserAddress" />
               </td>
               <td class="py-6">
                 {{ userInfo.emailAddress }}
@@ -68,7 +68,7 @@
 <script lang="ts">
 import { BaseAddress } from '@/composables/address'
 import { PartyAddressSchema } from '@/schemas'
-import { SubmittingPartyIF, UserInfoIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { AddressIF, SubmittingPartyIF, UserInfoIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { defineComponent, reactive, toRefs } from '@vue/composition-api'
 import { toDisplayPhone } from '@/utils'
 
@@ -86,6 +86,10 @@ export default defineComponent({
     },
     currentUserInfo: {
       type: Object as () => UserInfoIF,
+      required: true
+    },
+    currentUserAddress: {
+      type: Object as () => AddressIF,
       required: true
     }
   },
