@@ -82,7 +82,7 @@ import { useActions, useGetters } from 'vuex-composition-helpers'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { ActionTypes, RouteNames } from '@/enums'
 import {
-  createMhrTransferDraft,
+  createMhrTransferDraft, deleteMhrDraft,
   fetchMhRegistration,
   getMhrTransferDraft,
   pacificDate,
@@ -218,6 +218,7 @@ export default defineComponent({
       if (getMhrInformation.value.draftNumber) {
         // Retrieve owners from draft if it exists
         const { registration } = await getMhrTransferDraft(getMhrInformation.value.draftNumber)
+        setShowGroups(registration.addOwnerGroups.length > 1)
         setMhrTransferHomeOwnerGroups([...registration.addOwnerGroups])
       } else {
         // Set current owners if there is no draft
@@ -234,9 +235,12 @@ export default defineComponent({
         const mhrTransferFiling = await submitMhrTransfer(apiData, getMhrInformation.value.mhrNumber)
         localState.loading = false
         await setUnsavedChanges(false)
-        !mhrTransferFiling.error
-          ? goToDash()
-          : console.log(mhrTransferFiling?.error) // Handle Schema or Api errors here..
+
+        if (!mhrTransferFiling.error) {
+          // Delete the draft on successful submission
+          if (getMhrInformation.value.draftNumber) await deleteMhrDraft(getMhrInformation.value.draftNumber)
+          goToDash()
+        } else console.log(mhrTransferFiling?.error) // Handle Schema or Api errors here.
       }
       if (localState.isValidTransfer) {
         localState.isReviewMode = true

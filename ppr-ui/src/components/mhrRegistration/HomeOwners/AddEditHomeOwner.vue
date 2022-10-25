@@ -360,7 +360,7 @@ export default defineComponent({
         interest: '',
         interestNumerator: null,
         interestDenominator: null,
-        tenancySpecified: null
+        tenancySpecified: false // Default to satisfy schema
       } as FractionalOwnershipWithGroupIdIF)
     }
 
@@ -407,9 +407,6 @@ export default defineComponent({
       // @ts-ignore - function exists
       context.refs.addHomeOwnerForm.validate()
       if (localState.isHomeOwnerFormValid && localState.isAddressFormValid) {
-        if (!localState.ownerGroupId) {
-          setShowGroups(false)
-        }
         if (props.editHomeOwner) {
           editHomeOwner(
             localState.owner as MhrRegistrationHomeOwnerIF,

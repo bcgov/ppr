@@ -17,16 +17,31 @@
     />
     <div v-if="!isEditGroupMode" class="group-header-summary">
       <div>
-        <span class="pr-4 font-weight-bold group-id" :class="{ 'pl-8': !showEditActions }">Group {{ groupId }}</span>
-        |
-        <span class="px-4">Owners: {{ owners.length }} </span>
-        |
-        <span class="px-4" :class="{ 'ml-1': !showEditActions }">Group Tenancy Type: {{ group.type }}</span>
-        |
-        <span class="px-4"> Interest: {{ getOwnershipInterest() }} </span>
+        <v-chip
+          v-if="isMhrTransfer && isRemovedHomeOwnerGroup(group)"
+          class="badge-delete mr-4"
+          label x-small
+          color="#grey lighten-2"
+          text-color="$gray9"
+          data-test-id="owner-removed-badge"
+        >
+          <b>DELETED</b>
+        </v-chip>
+        <span :class="{'removed-owner-group': isRemovedHomeOwnerGroup(group)}">
+          <span class="pr-4 font-weight-bold group-id" :class="{ 'pl-8': !showEditActions }">Group {{ groupId }}</span>
+          |
+          <span class="px-4">Owners: {{ isRemovedHomeOwnerGroup(group) ? '0' : ownersCount }}</span>
+          |
+          <span class="px-4" :class="{ 'ml-1': !showEditActions }">
+          Group Tenancy Type: {{ isRemovedHomeOwnerGroup(group) ? 'N/A' : group.type }}
+        </span>
+          |
+          <span class="px-4"> Interest: {{ isRemovedHomeOwnerGroup(group) ? 'N/A' : getOwnershipInterest() }}</span>
+        </span>
       </div>
 
-      <div v-show="showEditActions">
+      <!-- Default Actions -->
+      <div v-show="showEditActions && !isMhrTransfer">
         <v-btn
           text
           color="primary"
@@ -53,6 +68,40 @@
               <v-list-item-subtitle class="pa-0" @click="showDeleteGroupDialog = true">
                 <v-icon small style="margin-bottom: 3px;">mdi-delete</v-icon>
                 <span class="ml-1 remove-btn-text">Delete Group</span>
+              </v-list-item-subtitle>
+            </v-list-item>
+          </v-list>
+        </v-menu>
+      </div>
+
+      <!-- Mhr Transfer Actions -->
+      <div v-show="showEditActions && isMhrTransfer && !isRemovedHomeOwnerGroup(group)">
+        <v-btn
+          text
+          color="primary"
+          class="pr-0"
+          :ripple="false"
+          :disabled="isGlobalEditingMode"
+          @click="showDeleteGroupDialog = true"
+        >
+          <v-icon small>mdi-delete</v-icon>
+          <span>Delete Group</span>
+          <v-divider class="ma-0 pl-3" vertical />
+        </v-btn>
+
+        <v-menu offset-y left nudge-bottom="0" class="delete-group-menu">
+          <template v-slot:activator="{ on }">
+            <v-btn text v-on="on" color="primary" class="pa-0" :disabled="isGlobalEditingMode">
+              <v-icon>mdi-menu-down</v-icon>
+            </v-btn>
+          </template>
+
+          <!-- More actions drop down list -->
+          <v-list class="actions-dropdown actions__more-actions">
+            <v-list-item class="my-n2">
+              <v-list-item-subtitle class="pa-0" @click="openGroupForEditing(groupId)">
+                <v-icon small style="margin-bottom: 3px;">mdi-pencil</v-icon>
+                <span class="ml-1 remove-btn-text">Edit Group Details</span>
               </v-list-item-subtitle>
             </v-list-item>
           </v-list>
@@ -98,7 +147,12 @@ import FractionalOwnership from './FractionalOwnership.vue'
 import { useGetters } from 'vuex-composition-helpers'
 import { find } from 'lodash'
 /* eslint-disable no-unused-vars */
-import { MhrRegistrationFractionalOwnershipIF } from '@/interfaces/mhr-registration-interfaces'
+import {
+  MhrRegistrationFractionalOwnershipIF,
+  MhrRegistrationHomeOwnerIF,
+  MhrHomeOwnerGroupIF
+} from '@/interfaces/mhr-registration-interfaces'
+import { ActionTypes } from '@/enums'
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
@@ -118,7 +172,7 @@ export default defineComponent({
       useGetters<any>(['getMhrRegistrationHomeOwnerGroups', 'getMhrTransferHomeOwnerGroups'])
 
     const {
-      isGlobalEditingMode, setGlobalEditingMode, deleteGroup, setGroupFractionalInterest
+      isGlobalEditingMode, setGlobalEditingMode, deleteGroup, setGroupFractionalInterest, markGroupForRemoval
     } = useHomeOwners(props.isMhrTransfer)
 
     const homeFractionalOwnershipForm = ref(null)
@@ -131,6 +185,9 @@ export default defineComponent({
         props.isMhrTransfer
           ? find(getMhrTransferHomeOwnerGroups.value, { groupId: props.groupId })
           : find(getMhrRegistrationHomeOwnerGroups.value, { groupId: props.groupId })
+      ),
+      ownersCount: computed((): number =>
+        props.owners.filter(owner => owner.action !== ActionTypes.REMOVED).length
       ),
       fractionalData: {} as MhrRegistrationFractionalOwnershipIF
     })
@@ -148,9 +205,13 @@ export default defineComponent({
     }
 
     const getOwnershipInterest = (): string => {
-      const { interest, interestNumerator, interestDenominator } = localState.group
+      const { interestNumerator, interestDenominator } = localState.group
 
-      return `${interest} ${interestNumerator}/${interestDenominator}`
+      return `${interestNumerator}/${interestDenominator}`
+    }
+
+    const isRemovedHomeOwnerGroup = (group: MhrHomeOwnerGroupIF): boolean => {
+      return group.action === ActionTypes.REMOVED
     }
 
     const done = (): void => {
@@ -180,7 +241,9 @@ export default defineComponent({
     // Close Delete Group dialog or proceed to deleting a Group
     const cancelOrProceed = (proceed: boolean, groupId: number): void => {
       if (proceed) {
-        deleteGroup(groupId)
+        props.isMhrTransfer
+          ? markGroupForRemoval(groupId)
+          : deleteGroup(groupId)
         localState.showDeleteGroupDialog = false
       } else {
         localState.showDeleteGroupDialog = false
@@ -195,6 +258,7 @@ export default defineComponent({
       cancel,
       cancelOrProceed,
       homeFractionalOwnershipForm,
+      isRemovedHomeOwnerGroup,
       ...toRefs(localState)
     }
   }
@@ -215,6 +279,9 @@ export default defineComponent({
   }
   .theme--light.v-text-field--filled.background-white > .v-input__control > .v-input__slot {
     background: white;
+  }
+  .removed-owner-group {
+    opacity: .4;
   }
 }
 </style>

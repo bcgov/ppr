@@ -1,5 +1,16 @@
 <template>
   <div id="mhr-home-owners-list">
+    <BaseDialog
+      :setDisplay="showDeleteAllGroupsDialog"
+      @proceed="cancelOrProceed($event)"
+      :setOptions="{
+        title: 'Delete All Owners/Groups',
+        text:
+          'Deleting al owners/groups will delete all previous owners and remove any newly added owners.',
+        acceptText: 'Delete All Owners/Groups',
+        cancelText: 'Cancel'
+      }"
+    />
     <section id="mhr-owners" class="mt-10">
       <template v-if="!isMhrTransfer">
         <h2>1. Owners</h2>
@@ -66,47 +77,92 @@
           <span class="ml-1">At least one owner</span>
         </div>
       </template>
-      <v-btn
-        outlined
-        color="primary"
-        :ripple="false"
-        :disabled="isGlobalEditingMode"
-        @click="showAddPersonSection = true"
-        data-test-id="add-person-btn"
-      >
-        <v-icon class="pr-1">mdi-account-plus</v-icon> Add a Person
-      </v-btn>
 
-      <span class="mx-2"></span>
-
-      <v-btn
-        outlined
-        color="primary"
-        :ripple="false"
-        :disabled="isGlobalEditingMode"
-        @click="showAddPersonOrganizationSection = true"
-        data-test-id="add-org-btn"
-      >
-        <v-icon class="pr-1">mdi-domain-plus</v-icon>
-        Add a Business or Organization
-      </v-btn>
-      <div class="my-6">
-        <div>
-          <span class="generic-label">Home Tenancy Type: </span>
-          <span data-test-id="home-owner-tenancy-type">{{ homeTenancyType }}</span>
-          <span v-show="showGroups">
-              <span v-show="ownershipAllocation.hasMinimumGroupsError" class="error-text fs-14 ml-3"
-              >Must include more than one group of owners
-              </span>
-          </span>
-        </div>
-        <div v-show="showGroups">
-          <span class="generic-label">Total Ownership Allocated:</span> {{ ownershipAllocation.totalAllocation }}
-          <span v-show="ownershipAllocation.hasTotalAllocationError" class="error-text fs-14 ml-3"
-            >Total ownership must equal 1/1</span
+      <!-- Add/Remove Owner Actions -->
+      <v-row no-gutters>
+        <v-col cols="12">
+          <v-btn
+            outlined
+            color="primary"
+            :ripple="false"
+            :disabled="isGlobalEditingMode"
+            @click="showAddPersonSection = true"
+            data-test-id="add-person-btn"
           >
-        </div>
-      </div>
+            <v-icon class="pr-1">mdi-account-plus</v-icon> Add a Person
+          </v-btn>
+
+          <span class="mx-2"></span>
+
+          <v-btn
+            outlined
+            color="primary"
+            :ripple="false"
+            :disabled="isGlobalEditingMode"
+            @click="showAddPersonOrganizationSection = true"
+            data-test-id="add-org-btn"
+          >
+            <v-icon class="pr-1">mdi-domain-plus</v-icon>
+            Add a Business or Organization
+          </v-btn>
+
+          <span class="mx-2"></span>
+
+          <v-btn
+            v-if="isMhrTransfer"
+            outlined
+            color="primary"
+            :ripple="false"
+            :disabled="isGlobalEditingMode"
+            class="float-right"
+            @click="removeAllOwnersHandler()"
+            data-test-id="remove-all-owners-btn"
+          >
+            <v-icon class="pr-1">mdi-delete</v-icon>
+            Delete All Owners/Groups
+          </v-btn>
+        </v-col>
+        <v-col cols="9" class="mb-n6 pa-0"></v-col> <!-- Column Spacer -->
+        <v-col cols="3" class="mb-n6 pa-0">
+          <v-fade-transition>
+            <span v-show="showRemovedAllOwnersMsg" class="error-text fs-12 ml-5">Nothing to delete</span>
+          </v-fade-transition>
+        </v-col>
+      </v-row>
+
+      <v-row class="my-6" no-gutters>
+        <v-col cols="12">
+          <span class="generic-label">Home Tenancy Type: </span>
+          <span data-test-id="home-owner-tenancy-type">{{ hasRemovedAllOwners ? 'N/A' : homeTenancyType }}</span>
+          <span v-show="showGroups && ownershipAllocation.hasMinimumGroupsError" class="error-text fs-14 ml-3">
+            Must include more than one group of owners
+          </span>
+          <span
+            v-if="isMhrTransfer && hasRemovedAllOwners"
+            class="float-right hide-show-owners fs-14"
+            @click="hideShowRemovedOwners()"
+          >
+            <v-icon v-if="hideRemovedOwners" class="hide-show-owners-icon pr-1" color="primary">mdi-eye</v-icon>
+            <v-icon v-else class="hide-show-owners-icon pr-1" color="primary">mdi-eye-off</v-icon>
+            {{ hideShowRemovedOwnersLabel }} Deleted Owners
+          </span>
+        </v-col>
+        <v-col v-show="showGroups && !hasRemovedAllOwners" cols="12">
+          <span class="generic-label">Total Ownership Allocated:</span> {{ ownershipAllocation.totalAllocation }}
+          <span v-show="ownershipAllocation.hasTotalAllocationError" class="error-text fs-14 ml-3">
+            Total ownership must equal 1/1
+          </span>
+          <span
+            v-if="isMhrTransfer && hasRemovedOwners"
+            class="float-right hide-show-owners fs-14"
+            @click="hideShowRemovedOwners()"
+          >
+            <v-icon v-if="hideRemovedOwners" class="hide-show-owners-icon pr-1" color="primary">mdi-eye</v-icon>
+            <v-icon v-else class="hide-show-owners-icon pr-1" color="primary">mdi-eye-off</v-icon>
+            {{ hideShowRemovedOwnersLabel }} Deleted Owners
+          </span>
+        </v-col>
+      </v-row>
     </section>
 
     <v-expand-transition>
@@ -127,42 +183,37 @@
     </v-expand-transition>
 
     <div>
-      <HomeOwnersTable
-        :homeOwners="getHomeOwners"
-        :currentHomeOwners="getMhrTransferCurrentHomeOwners"
-        :isAdding="disableAddHomeOwnerBtn"
-        :isMhrTransfer="isMhrTransfer"
-      />
+      <v-fade-transition>
+        <HomeOwnersTable
+          :homeOwners="hideRemovedOwners ? filteredHomeOwners : getHomeOwners"
+          :isAdding="disableAddHomeOwnerBtn"
+          :isMhrTransfer="isMhrTransfer"
+          :hideRemovedOwners="hideRemovedOwners"
+        />
+      </v-fade-transition>
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import { useActions, useGetters } from 'vuex-composition-helpers'
-import {
-  AddEditHomeOwner,
-  HomeOwnersTable
-} from '@/components/mhrRegistration/HomeOwners'
-
+import { AddEditHomeOwner, HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
+import { BaseDialog } from '@/components/dialogs'
 import { SimpleHelpToggle } from '@/components/common'
-import {
-  computed,
-  defineComponent,
-  reactive,
-  toRefs,
-  watch
-} from '@vue/composition-api'
+import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
 import { useHomeOwners } from '@/composables/mhrRegistration'
 /* eslint-disable no-unused-vars */
 import { MhrRegistrationTotalOwnershipAllocationIF } from '@/interfaces'
+import { ActionTypes } from '@/enums'
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
   name: 'HomeOwners',
   components: {
-    SimpleHelpToggle,
     AddEditHomeOwner,
-    HomeOwnersTable
+    BaseDialog,
+    HomeOwnersTable,
+    SimpleHelpToggle
   },
   props: {
     isMhrTransfer: {
@@ -186,12 +237,19 @@ export default defineComponent({
       getTotalOwnershipAllocationStatus,
       hasMinimumGroups,
       setShowGroups,
-      getTransferOrRegistrationHomeOwners
+      getTransferOrRegistrationHomeOwners,
+      getTransferOrRegistrationHomeOwnerGroups,
+      markGroupForRemoval,
+      hasRemovedAllHomeOwnerGroups
     } = useHomeOwners(props.isMhrTransfer)
 
     const localState = reactive({
       showAddPersonSection: false,
       showAddPersonOrganizationSection: false,
+      showDeleteAllGroupsDialog: false,
+      showRemovedAllOwnersMsg: false,
+      hideRemovedOwners: false,
+      filteredHomeOwners: [],
       disableAddHomeOwnerBtn: computed(
         () => localState.showAddPersonOrganizationSection || localState.showAddPersonSection
       ),
@@ -201,8 +259,49 @@ export default defineComponent({
       hasHomeOwners: computed(() => !!getTransferOrRegistrationHomeOwners().find(owner => owner.ownerId)),
       isValidGroups: computed(() => { return hasMinimumGroups() }),
       homeTenancyType: computed(() => { return getHomeTenancyType() }),
-      getHomeOwners: computed(() => { return getTransferOrRegistrationHomeOwners() })
+      getHomeOwners: computed(() => { return getTransferOrRegistrationHomeOwners() }),
+      hasRemovedOwners: computed(() => {
+        return localState.getHomeOwners.filter(ownerGroup => ownerGroup.action === ActionTypes.REMOVED).length > 0
+      }),
+      hasRemovedAllOwners: computed(() => { return hasRemovedAllHomeOwnerGroups(localState.getHomeOwners) }),
+      hideShowRemovedOwnersLabel: computed(() => { return localState.hideRemovedOwners ? 'Show' : 'Hide' })
     })
+
+    const hideShowRemovedOwners = (): void => {
+      localState.hideRemovedOwners = !localState.hideRemovedOwners
+      if (localState.hideRemovedOwners) filterDisplayedHomeOwners()
+    }
+
+    const removeAllOwnersHandler = (): void => {
+      if (localState.hasRemovedAllOwners) {
+        localState.showRemovedAllOwnersMsg = true
+        setTimeout(() => { localState.showRemovedAllOwnersMsg = false }, 3000)
+      } else localState.showDeleteAllGroupsDialog = true
+    }
+
+    // Close delete all groups dialog or proceed to deleting all groups
+    const cancelOrProceed = (proceed: boolean): void => {
+      if (proceed) {
+        markGroupForRemoval(null, true)
+        localState.showDeleteAllGroupsDialog = false
+      } else {
+        localState.showDeleteAllGroupsDialog = false
+      }
+    }
+
+    const filterDisplayedHomeOwners = (): void => {
+      localState.filteredHomeOwners = []
+      getTransferOrRegistrationHomeOwnerGroups().forEach(ownerGroup => {
+        if (ownerGroup.action !== ActionTypes.REMOVED) {
+          const owners = ownerGroup.owners
+            .map(owner => {
+              if (owner.action === ActionTypes.REMOVED) return { groupId: ownerGroup.groupId }
+              else return { ...owner, groupId: ownerGroup.groupId }
+            })
+          localState.filteredHomeOwners.push(...owners)
+        }
+      })
+    }
 
     // Enable editing mode whenever adding Person or Business
     // This would disable all Edit buttons
@@ -220,6 +319,13 @@ export default defineComponent({
       }
     )
 
+    watch(
+      () => localState.getHomeOwners,
+      () => {
+        if (localState.hideRemovedOwners) filterDisplayedHomeOwners()
+      }
+    )
+
     return {
       getMhrRegistrationHomeOwners,
       getMhrTransferCurrentHomeOwners,
@@ -228,6 +334,9 @@ export default defineComponent({
       showGroups,
       setShowGroups, // expose this for easier unit testing
       setGlobalEditingMode,
+      cancelOrProceed,
+      removeAllOwnersHandler,
+      hideShowRemovedOwners,
       ...toRefs(localState)
     }
   },
@@ -239,6 +348,16 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+
+.hide-show-owners {
+  color: $primary-blue;
+  &:hover {
+    cursor: pointer;
+  }
+  .hide-show-owners-icon {
+    font-size: 20px;
+  }
+}
 
 .reg-owners-check::v-deep {
   i {

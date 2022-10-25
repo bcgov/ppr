@@ -1,4 +1,5 @@
 import {
+  MhrHomeOwnerGroupIF,
   MhrRegistrationFractionalOwnershipIF,
   MhrRegistrationHomeOwnerGroupIF,
   MhrRegistrationHomeOwnerIF,
@@ -106,8 +107,10 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
    */
   const getTotalOwnershipAllocationStatus = (): MhrRegistrationTotalOwnershipAllocationIF => {
     // Sum up all 'interestNumerator' values in different Home Owner groups with a help of sumBy() function from lodash
-    const totalFractionalNominator = sumBy(getTransferOrRegistrationHomeOwnerGroups(), 'interestNumerator')
-    const fractionalDenominator = getTransferOrRegistrationHomeOwnerGroups()[0]?.interestDenominator || null
+    const totalFractionalNominator = sumBy(getTransferOrRegistrationHomeOwnerGroups()
+      .filter(ownerGroup => ownerGroup.action !== ActionTypes.REMOVED), 'interestNumerator')
+    const fractionalDenominator = getTransferOrRegistrationHomeOwnerGroups()
+      .filter(ownerGroup => ownerGroup.action !== ActionTypes.REMOVED)[0]?.interestDenominator || null
 
     return {
       totalAllocation: totalFractionalNominator + '/' + fractionalDenominator,
@@ -255,6 +258,46 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
       : setMhrRegistrationHomeOwnerGroups(homeOwnerGroups)
   }
 
+  const markGroupForRemoval = (groupId: number = null, removeAll: boolean = false): void => {
+    const homeOwners = getMhrTransferHomeOwnerGroups.value.reduce((homeOwners, group) => {
+      if (group.groupId === groupId || removeAll) {
+        const removedGroup = {
+          ...group,
+          action: ActionTypes.REMOVED,
+          owners: group.owners.filter(owner => owner.action !== ActionTypes.ADDED)
+            .map(owner => {
+              return { ...owner, action: ActionTypes.REMOVED }
+            })
+        }
+        homeOwners.push(removedGroup)
+      } else homeOwners.push(group)
+
+      return homeOwners
+    }, [])
+
+    setMhrTransferHomeOwnerGroups(homeOwners)
+  }
+
+  const undoGroupRemoval = (groupId: number = null): void => {
+    const homeOwners = getMhrTransferHomeOwnerGroups.value.reduce((homeOwners, group) => {
+      if (group.groupId === groupId) {
+        const unmarkedGroup = {
+          ...group,
+          action: null
+        }
+        homeOwners.push(unmarkedGroup)
+      } else homeOwners.push(group)
+
+      return homeOwners
+    }, [])
+
+    setMhrTransferHomeOwnerGroups(homeOwners)
+  }
+
+  const hasRemovedAllHomeOwnerGroups = (homeOwners: MhrHomeOwnerGroupIF[]): boolean => {
+    return homeOwners.filter(group => group.action !== ActionTypes.REMOVED).length === 0
+  }
+
   const setGroupFractionalInterest = (groupId: number, fractionalData: MhrRegistrationFractionalOwnershipIF): void => {
     const homeOwnerGroups = getTransferOrRegistrationHomeOwnerGroups()
 
@@ -377,6 +420,9 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
     hasMinimumGroups,
     getGroupTenancyType,
     getTransferOrRegistrationHomeOwners,
-    getTransferOrRegistrationHomeOwnerGroups
+    getTransferOrRegistrationHomeOwnerGroups,
+    markGroupForRemoval,
+    undoGroupRemoval,
+    hasRemovedAllHomeOwnerGroups
   }
 }
