@@ -62,6 +62,8 @@ SEARCH_RESULT_LARGE_DATAFILE = 'tests/unit/reports/data/search-detail-bus-debtor
 SEARCH_RESULT_LARGE_PDFFILE = 'tests/unit/reports/data/search-detail-bus-debtor-large-example.pdf'
 SEARCH_RESULT_75_DATAFILE = 'tests/unit/reports/data/search-detail-75-example.json'
 SEARCH_RESULT_75_PDFFILE = 'tests/unit/reports/data/search-detail-75-example.pdf'
+SEARCH_COVER_DATAFILE = 'tests/unit/reports/data/search-cover-example.json'
+SEARCH_COVER_PDFFILE = 'tests/unit/reports/data/search-cover-example.pdf'
 REPORT_VERSION_V2 = '2'
 
 
@@ -245,6 +247,19 @@ def test_search_result_75(session, client, jwt):
         assert headers
         # verify
         check_response(content, status, SEARCH_RESULT_75_PDFFILE)
+
+
+def test_search_cover(session, client, jwt):
+    """Assert that setup for a large search result cover summary report is as expected."""
+    # setup
+    if is_report_v2():
+        json_data = get_json_from_file(SEARCH_COVER_DATAFILE)
+        report = Report(json_data, 'PS12345', ReportTypes.SEARCH_COVER_REPORT, 'Account Name')
+        # test
+        content, status, headers = report.get_pdf()
+        assert headers
+        # verify
+        check_response(content, status, SEARCH_COVER_PDFFILE)
 
 
 def get_json_from_file(data_file: str):

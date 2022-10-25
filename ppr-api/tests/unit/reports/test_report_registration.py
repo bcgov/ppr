@@ -20,10 +20,11 @@ from http import HTTPStatus
 import json
 
 import pytest
+from flask import current_app
 
 from ppr_api.models import Party, Registration
-from ppr_api.reports import Report, ReportTypes, get_verification_mail, get_report_api_payload
-from ppr_api.resources.financing_statements import get_mail_verification_data
+from ppr_api.reports import Report, ReportTypes, get_report_api_payload
+from ppr_api.resources.financing_utils import get_mail_verification_data
 from ppr_api.services.payment.client import SBCPaymentClient
 
 
@@ -63,6 +64,7 @@ TEST_REPORT_DATA = [
 def test_registration_config(client, jwt, type, json_data_file):
     """Assert that the setup for all registration report types is as expected."""
     # setup
+    current_app.config.update(REPORT_VERSION='V1')
     text_data = None
     with open(json_data_file, 'r') as data_file:
         text_data = data_file.read()
@@ -82,7 +84,7 @@ def test_registration_config(client, jwt, type, json_data_file):
     report_data = request_data['templateVars']
     assert report_data['meta_title']
     assert report_data['meta_account_id']
-    assert report_data['environment']
+    assert 'environment' in report_data
     if type != ReportTypes.COVER_PAGE_REPORT.value:
         assert report_data['createDateTime'].endswith('Pacific time')
         assert report_data['registeringParty']['address']['country'] == 'Canada'
@@ -90,26 +92,6 @@ def test_registration_config(client, jwt, type, json_data_file):
         assert report_data['cover']['line1']
         assert report_data['cover']['line2']
         assert report_data['cover']['line4']
-
-
-# TODO: This is being removed from the API, but leaving the code here for a sprint.
-# def test_verification_mail(client, jwt):
-#     """Assert that merging a cover page with a verification statement works as expected."""
-#     # setup
-#     text_data = None
-#     with open(DISCHARGE_DATAFILE_COVER, 'r') as data_file:
-#         text_data = data_file.read()
-#         data_file.close()
-#     # print(text_data)
-#     report_data = json.loads(text_data)
-#     token = SBCPaymentClient.get_sa_token()
-#     pdf_output, status, headers = get_verification_mail(report_data, 'PS12345', token, 'UNIT TEST ACCOUNT', 99999999)
-#     # test
-#     assert pdf_output
-#     assert status == HTTPStatus.OK
-#     with open(VERIFICATION_MAIL_PDFFILE, "wb") as pdf_file:
-#         pdf_file.write(pdf_output)
-#         pdf_file.close()
 
 
 def test_verification_report_data(session):

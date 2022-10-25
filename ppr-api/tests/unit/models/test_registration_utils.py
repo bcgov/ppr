@@ -19,6 +19,7 @@ Test-Suite to ensure that the Registration Model is working as expected.
 # from flask import current_app
 
 import pytest
+from flask import current_app
 
 from ppr_api.models import Registration, registration_utils as registration_utils, utils as model_utils
 from ppr_api.models.registration_utils import AccountRegistrationParams
@@ -300,6 +301,7 @@ def test_find_all_by_account_id_filter(session, reg_num, reg_type, client_ref, r
         assert statement['registeringParty']
         assert statement['securedParties']
         assert 'vehicleCount' in statement
+        # current_app.logger.info('base reg_num=' + statement.get('registrationNumber'))
         if statement['registrationNumber'] == ('TEST0016'):
             assert statement['registeringName'] == ''
             assert statement['clientReferenceId'] == ''
@@ -315,6 +317,7 @@ def test_find_all_by_account_id_filter(session, reg_num, reg_type, client_ref, r
             assert len(statement['changes']) > 0
         if 'changes' in statement:
             for change in statement['changes']:
+                # current_app.logger.info('reg_num=' + change.get('registrationNumber'))
                 assert change['registrationNumber']
                 assert change['baseRegistrationNumber']
                 assert change['registrationType']
@@ -326,14 +329,13 @@ def test_find_all_by_account_id_filter(session, reg_num, reg_type, client_ref, r
                 if change['baseRegistrationNumber'] not in ('TEST0019', 'TEST0021'):
                     assert change['registeringName']
                     assert change['clientReferenceId']
-                if change['baseRegistrationNumber'] in ('TEST0019', 'TEST0021'):
-                    assert not change['path']
-                elif change.get('registrationNumber', '') == 'TEST00R5' or \
-                        change.get('registrationNumber', '') == 'TEST00D4' or \
-                        change.get('registrationNumber', '') == 'TEST0007':
-                    assert not change['path']
-                else:
-                    assert change['path']
+                assert 'path' in change
+                #if change['baseRegistrationNumber'] in ('TEST0019', 'TEST0021'):
+                #    assert not change['path']
+                #elif change.get('registrationNumber', '') in ('TEST00D4', 'TEST00R5', 'TEST0007'):
+                #    assert not change['path']
+                #else:
+                #    assert change['path']
 
 
 @pytest.mark.parametrize('reg_num,client_ref,start_ts,end_ts', TEST_FILTER_API_DATA)
@@ -390,11 +392,10 @@ def test_find_all_by_account_id_api_filter(session, reg_num, client_ref, start_t
                 if change['baseRegistrationNumber'] not in ('TEST0019', 'TEST0021'):
                     assert change['registeringName']
                     assert change['clientReferenceId']
-                if change['baseRegistrationNumber'] in ('TEST0019', 'TEST0021'):
-                    assert not change['path']
-                elif change.get('registrationNumber', '') == 'TEST00R5' or \
-                        change.get('registrationNumber', '') == 'TEST00D4' or \
-                        change.get('registrationNumber', '') == 'TEST0007':
-                    assert not change['path']
-                else:
-                    assert change['path']
+                assert 'path' in change
+                # if change['baseRegistrationNumber'] in ('TEST0019', 'TEST0021'):
+                #    assert not change['path']
+                # elif change.get('registrationNumber', '') == 'TEST00D4':
+                #    assert not change['path']
+                # else:
+                #    assert change['path']

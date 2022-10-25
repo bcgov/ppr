@@ -51,6 +51,57 @@ REPORT_FILES = {
 }
 REG_PAGE_PREFIX = 'Number: '
 
+# Map from API search type to report description
+TO_SEARCH_DESCRIPTION = {
+    'AIRCRAFT_DOT': 'Aircraft DOT',
+    'BUSINESS_DEBTOR': 'Business Debtor',
+    'INDIVIDUAL_DEBTOR': 'Individual Debtor',
+    'MHR_NUMBER': 'Manufactured Home Registration Number',
+    'REGISTRATION_NUMBER': 'Registration Number',
+    'SERIAL_NUMBER': 'Serial Number'
+}
+# Map from API vehicle type to report description
+TO_VEHICLE_TYPE_DESCRIPTION = {
+    'AC': 'Aircraft (AC)',
+    'AF': 'Aircraft Airframe (AF)',
+    'AP': 'Airplane (AP)',
+    'BO': 'Boat (BO)',
+    'EV': 'Electric Motor Vehhicle (EV)',
+    'MV': 'Motor Vehicle (MV)',
+    'MH': 'Manufactured or Mobile Home (MH)',
+    'OB': 'Outboard Boat Motor (OB)',
+    'TR': 'Trailer (TR)'
+}
+# Map from API change/amendment registration change type to report description
+TO_CHANGE_TYPE_DESCRIPTION = {
+    'AC': 'Collateral Addition',
+    'AA': 'Collateral Addition',
+    'AM': 'Amendment',
+    'CO': 'Court Order',
+    'DR': 'Debtor Release',
+    'AR': 'Debtor Release',
+    'DT': 'Debtor Transfer',
+    'AD': 'Debtor Transfer',
+    'PD': 'Partial Discharge',
+    'AP': 'Partial Discharge',
+    'ST': 'Secured Party Transfer',
+    'AS': 'Secured Party Transfer',
+    'SU': 'Collateral Substitution',
+    'AU': 'Collateral Substitution',
+    'RC': 'Registry Correction'
+}
+# Map post go-live amendment descriptions
+TO_AMEND_TYPE_DESCRIPTION = {
+    'AA': 'Amendment - Collateral Added',
+    'AM': 'Amendment',
+    'CO': 'Amendment - Court Order',
+    'AR': 'Amendment - Debtors Deleted',
+    'AD': 'Amendment - Debtors Amended',
+    'AP': 'Amendment - Collateral Deleted',
+    'AS': 'Amendment - Secured Parties Amended',
+    'AU': 'Amendment - Collateral Amended'
+}
+
 
 class ReportTypes(BaseEnum):
     """Render an Enum of the MHR PDF report types."""
@@ -60,8 +111,58 @@ class ReportTypes(BaseEnum):
     FINANCING_STATEMENT_REPORT = 'financingStatement'
     VERIFICATION_STATEMENT_MAIL_REPORT = 'financingStatementMail'
     # Gotenberg
+    SEARCH_COVER_REPORT = 'searchCover'
     SEARCH_TOC_REPORT = 'searchTOC'
     SEARCH_BODY_REPORT = 'searchBody'
+
+
+class ReportMeta:  # pylint: disable=too-few-public-methods
+    """Helper class to maintain the report meta information."""
+
+    reports = {
+        ReportTypes.COVER_PAGE_REPORT: {
+            'reportDescription': 'CoverPage',
+            'fileName': 'coverV2',
+            'metaTitle': 'Personal Property Registry',
+            'metaSubtitle': 'BC Registries and Online Services',
+            'metaSubject': ''
+        },
+        ReportTypes.SEARCH_DETAIL_REPORT: {
+            'reportDescription': 'SearchResult',
+            'fileName': 'searchResultV2',
+            'metaTitle': 'Personal Property Registry Search Result',
+            'metaSubtitle': 'BC Registries and Online Services',
+            'metaSubject': ''
+        },
+        ReportTypes.FINANCING_STATEMENT_REPORT: {
+            'reportDescription': 'FinancingStatement',
+            'fileName': 'financingStatementV2',
+            'metaTitle': 'Personal Property Registry Financing Statement',
+            'metaSubtitle': '',
+            'metaSubject': 'Base Registration Number: {self._get_report_id()}'
+        },
+        ReportTypes.SEARCH_TOC_REPORT: {
+            'reportDescription': 'SearchResult',
+            'fileName': 'searchResultTOCV2',
+            'metaTitle': 'Personal Property Registry Search Result',
+            'metaSubtitle': 'BC Registries and Online Services',
+            'metaSubject': ''
+        },
+        ReportTypes.SEARCH_BODY_REPORT: {
+            'reportDescription': 'SearchResult',
+            'fileName': 'searchResultBodyV2',
+            'metaTitle': 'Personal Property Registry Search Result',
+            'metaSubtitle': 'BC Registries and Online Services',
+            'metaSubject': ''
+        },
+        ReportTypes.SEARCH_COVER_REPORT: {
+            'reportDescription': 'SearchResult',
+            'fileName': 'searchCoverV2',
+            'metaTitle': 'Personal Property Registry Search Result',
+            'metaSubtitle': 'BC Registries and Online Services',
+            'metaSubject': ''
+        }
+    }
 
 
 class Config:  # pylint: disable=too-few-public-methods
@@ -325,6 +426,9 @@ def get_html_from_data(request_data) -> str:
 def update_toc_page_numbers(json_data, reg_pdf_data):
     """Try and update toc page numbers from the registration pdf."""
     if json_data['totalResultsSize'] > 0:
+        page_offset: int = 0
+        if 'pageNumOffset' in json_data:
+            page_offset = json_data.get('pageNumOffset')
         bodypdf = PyPDF2.PdfReader(io.BytesIO(reg_pdf_data))
         pagecount = len(bodypdf.pages)
         json_data['totalPageCount'] = pagecount
@@ -343,9 +447,12 @@ def update_toc_page_numbers(json_data, reg_pdf_data):
                     if text.find(reg_text) > 0:
                         # current_app.logger.info(f'{reg_text} found page {i}')
                         page_index = i + 1
-                        select['pageNumber'] = (i + 1)
+                        select['pageNumber'] = (i + 1 + page_offset)
                         break
         current_app.logger.info('Collecting page numbers completed.')
+        if 'pageNumOffset' in json_data:
+            json_data['pageNumOffset'] = page_offset + pagecount
+            current_app.logger.info('Updated page numbers offset=' + str(json_data['pageNumOffset']))
     return json_data
 
 
@@ -412,3 +519,63 @@ def set_cover(report_data):  # pylint: disable=too-many-branches, too-many-state
             cover_info['line3'] = line3.strip()
         cover_info['line4'] = line4.strip()
     return cover_info
+
+
+def get_subreport_selected(selected, details):
+    """Get search subreport selected from report details data."""
+    subreport_selected = []
+    index = 0
+    # Reg number sort order is identical in selected and details.
+    # Multiple selected may exist for one regstration (detail).
+    select_length = len(selected)
+    # current_app.logger.info(f'Select length: {select_length}, details length: {len(details)}')
+    for detail in details:
+        while index <= (select_length - 1) and \
+                selected[index]['baseRegistrationNumber'] == detail['financingStatement']['baseRegistrationNumber']:
+            subreport_selected.append(selected[index])
+            index += 1
+    return subreport_selected
+
+
+def get_report_summary(selected, subreport_count: int, detail_length: int, page_num: int) -> dict:
+    """Get search subreport summary information."""
+    last_index = len(selected) - 1
+    summary = {
+        'index': subreport_count,
+        'registrationCount': detail_length,
+        'exactCount': get_exact_count(selected),
+        'startPage': page_num if page_num > 0 else 1,
+        'startDate': selected[0].get('createDateTime'),
+        'endDate': selected[last_index].get('createDateTime')
+    }
+    return summary
+
+
+def get_exact_count(selected) -> int:
+    """Get search report exact match count from selected."""
+    exact_count = 0
+    for reg in selected:
+        if reg.get('matchType') == 'EXACT':
+            exact_count += 1
+    return exact_count
+
+
+def merge_pdfs(report_files):
+    """Merge pdf content in memory."""
+    current_app.logger.debug('merge_pdfs starting')
+    merger = PyPDF2.PdfMerger()
+    merger.append(io.BytesIO(report_files['cover.pdf']))
+    rep_count = len(report_files) - 1
+    count = 0
+    report_size = len(report_files['cover.pdf'])
+    while count < rep_count:
+        count += 1
+        key = f'pdf{count}.pdf'
+        report_size += len(report_files[key])
+        current_app.logger.debug(f'merge_pdfs running report size={report_size}')
+        merger.append(io.BytesIO(report_files[key]))
+    writer_buffer = io.BytesIO()
+    merger.write(writer_buffer)
+    merger.close()
+    current_app.logger.debug(f'merge_pdfs final report size={report_size}')
+    return writer_buffer.getvalue()
