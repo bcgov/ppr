@@ -7,16 +7,17 @@ import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
 
 // local components
 import { HomeOwners, MhrInformation } from '@/views'
-import { ButtonsStacked, StickyContainer } from '@/components/common'
+import { CurrentUser, StickyContainer } from '@/components/common'
 import mockRouter from './MockRouter'
 import { HomeTenancyTypes, RouteNames } from '@/enums'
 import { HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
 import { getTestId } from './utils'
-import { mockedAddedPerson, mockedRemovedPerson, mockedOrganization, mockedPerson, mockMhrTransferCurrentHomeOwner } from './test-data'
-import { MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF } from '@/interfaces'
+import { mockedAddedPerson, mockedRemovedPerson, mockedOrganization, mockedPerson, mockMhrTransferCurrentHomeOwner, mockedDefaultUserSettingsResponse, mockedUserInfo, mockedRegisteringParty1 } from './test-data'
+import { CertifyIF, MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF, UserInfoIF } from '@/interfaces'
 import { nextTick } from '@vue/composition-api'
 import { TransferDetails } from '@/components/mhrTransfers'
 import { CertifyInformation } from '@/components/common'
+import { toDisplayPhone } from '@/utils'
 
 Vue.use(Vuetify)
 
@@ -95,6 +96,13 @@ describe('Mhr Information', () => {
   sessionStorage.setItem('AUTH_API_URL', 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/')
 
   beforeEach(async () => {
+    await store.dispatch('setUserInfo', mockedUserInfo)
+    await store.dispatch('setCertifyInformation', {
+      valid: false,
+      certified: false,
+      legalName: '',
+      registeringParty: mockedRegisteringParty1
+    } as CertifyIF)
     wrapper = createComponent()
   })
 
@@ -306,5 +314,35 @@ describe('Mhr Information', () => {
     expect(authorizationComponent.find('#certify-summary').exists()).toBeTruthy()
     expect(authorizationComponent.find('#certify-information').exists()).toBeTruthy()
     expect(authorizationComponent.find('#checkbox-certified').exists()).toBeTruthy()
+    expect(authorizationComponent.text()).toContain(mockedRegisteringParty1.address.city)
+    expect(authorizationComponent.text()).toContain(mockedRegisteringParty1.address.street)
+    expect(authorizationComponent.text()).toContain(mockedRegisteringParty1.address.postalCode)
+  })
+
+  it('should render Submitting Party component on the Review screen', async () => {
+    setupCurrentHomeOwners()
+    wrapper.vm.$data.dataLoaded = true
+    await Vue.nextTick()
+
+    expect(wrapper.find('#current-user-info').exists()).toBeFalsy()
+
+    wrapper.find('#btn-stacked-submit').trigger('click')
+    await Vue.nextTick()
+
+    expect(wrapper.find('#current-user-info').exists()).toBeTruthy()
+    expect(wrapper.find(getTestId('submitting-party-tooltip')).exists()).toBeTruthy()
+
+    const userInfoTable = wrapper.findComponent(CurrentUser).find(getTestId('user-info-table'))
+    expect(userInfoTable.exists()).toBeTruthy()
+
+    const userInfoText = userInfoTable.text()
+    expect(userInfoText).toContain(mockedUserInfo.firstname)
+    expect(userInfoText).toContain(mockedUserInfo.lastname)
+    expect(userInfoText).toContain(toDisplayPhone(mockedUserInfo.contacts[0].phone))
+    expect(userInfoText).toContain(mockedUserInfo.contacts[0].email)
+    expect(userInfoText).toContain('Ext ' + mockedUserInfo.contacts[0].phoneExtension)
+    expect(userInfoText).toContain(mockedRegisteringParty1.address.city)
+    expect(userInfoText).toContain(mockedRegisteringParty1.address.street)
+    expect(userInfoText).toContain(mockedRegisteringParty1.address.postalCode)
   })
 })

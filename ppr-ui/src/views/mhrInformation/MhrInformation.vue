@@ -189,7 +189,9 @@ export default defineComponent({
       authorizationValid: false,
       validateAuthorizationError: false,
       currentUserInfo: getCurrentUser.value as UserInfoIF,
-      currentUserAddress: getCertifyInformation.value.registeringParty.address as AddressIF,
+      currentUserAddress: computed((): AddressIF => {
+        return getCertifyInformation.value.registeringParty?.address
+      }),
       feeType: FeeSummaryTypes.MHR_TRANSFER, // FUTURE STATE: To be dynamic, dependent on what changes have been made
       isAuthenticated: computed((): boolean => {
         return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))

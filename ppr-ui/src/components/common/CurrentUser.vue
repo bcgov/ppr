@@ -19,7 +19,7 @@
       </v-tooltip>
     </h4>
     <v-card flat class="rounded">
-      <v-simple-table>
+      <v-simple-table data-test-id="user-info-table">
         <template v-slot:default>
           <thead>
             <tr>
@@ -69,7 +69,7 @@
 import { BaseAddress } from '@/composables/address'
 import { PartyAddressSchema } from '@/schemas'
 import { AddressIF, SubmittingPartyIF, UserInfoIF } from '@/interfaces' // eslint-disable-line no-unused-vars
-import { defineComponent, reactive, toRefs } from '@vue/composition-api'
+import { computed, defineComponent, reactive, toRefs } from '@vue/composition-api'
 import { toDisplayPhone } from '@/utils'
 
 export default defineComponent({
@@ -97,15 +97,19 @@ export default defineComponent({
     const user = props.currentUserInfo as UserInfoIF
 
     const localState = reactive({
-      userInfo: {
-        personName: {
-          first: user.firstname,
-          last: user.lastname
-        },
-        emailAddress: user.contacts[0].email,
-        phoneNumber: user.contacts[0].phone.replace(/[^0-9.]+/g, ''),
-        phoneExtension: user.contacts[0].phoneExtension
-      } as SubmittingPartyIF
+      userInfo: computed(
+        (): SubmittingPartyIF => {
+          return {
+            personName: {
+              first: user.firstname,
+              last: user.lastname
+            },
+            emailAddress: user.contacts[0].email,
+            phoneNumber: user.contacts[0].phone.replace(/[^0-9.]+/g, ''),
+            phoneExtension: user.contacts[0].phoneExtension
+          }
+        }
+      )
     })
 
     return { PartyAddressSchema, toDisplayPhone, ...toRefs(localState) }
