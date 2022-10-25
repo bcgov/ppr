@@ -18,7 +18,7 @@ import json
 from http import HTTPStatus
 
 import requests
-from flask import request, current_app, jsonify
+from flask import request, current_app, jsonify, Response, stream_with_context
 from flask_restx import Namespace, Resource, cors
 from registry_schemas import utils as schema_utils
 
@@ -52,6 +52,8 @@ CALLBACK_MESSAGES = {
 CALLBACK_PARAM = 'callbackURL'
 REPORT_URL = '/ppr/api/v1/search-results/{search_id}'
 USE_CURRENT_PARAM = 'useCurrent'
+STREAMING_THRESHOLD = 31 * 1024 * 1024
+HTTP_OK = '200'
 
 
 @cors_preflight('GET,POST,OPTIONS')
@@ -151,7 +153,7 @@ class SearchResultsResource(Resource):
     @staticmethod
     @cors.crossdomain(origin='*')
     @jwt.requires_auth
-    def get(search_id):
+    def get(search_id):  # pylint: disable=too-many-branches, too-many-locals
         """Get search detail information for a previous search."""
         try:
             if search_id is None:
@@ -172,7 +174,6 @@ class SearchResultsResource(Resource):
             # with no exact matches and no results selected - nil, which is valid.
             if search_detail.search_select is None and search_detail.search.total_results_size > 0:
                 return resource_utils.bad_request_response(GET_DETAILS_ERROR)
-            current_app.logger.info('1')
             response_data = search_detail.json
             if resource_utils.is_pdf(request):
                 # If the request is for an async large report and report not available, return an error.
@@ -187,7 +188,22 @@ class SearchResultsResource(Resource):
                     doc_name = search_detail.doc_storage_url
                     current_app.logger.info(f'Fetching search report {doc_name} from doc storage.')
                     raw_data = GoogleStorageService.get_document(doc_name)
-                    return raw_data, HTTPStatus.OK, {'Content-Type': 'application/pdf'}
+                    size = len(raw_data)
+                    if size < STREAMING_THRESHOLD:
+                        return raw_data, HTTPStatus.OK, {'Content-Type': 'application/pdf'}
+                    current_app.logger.info(f'streaming response report size={size}')
+
+                    def stream(begin, end, raw_data):
+                        offset = max(0, begin)
+                        while offset < end:
+                            end_chunk = offset + (10 * 1024)
+                            buf = raw_data[offset:end_chunk]
+                            offset += len(buf)
+                            yield buf
+                    resp = Response(stream_with_context(stream(0, size, raw_data)))
+                    resp.headers['Content-Type'] = 'application/pdf'
+                    resp.status = HTTP_OK
+                    return resp
 
                 # If get to here report not yet generated: create, store, return it.
                 current_app.logger.info(f'Generating search report for {search_id}.')
@@ -259,6 +275,7 @@ class PatchSearchResultsResource(Resource):
             # Generate the report with an API call
             current_app.logger.info(f'Generating search detail report for {search_id}.')
             raw_data, status_code, headers = get_search_report(search_id)
+            current_app.logger.info(f'Search detail report {search_id} response status={status_code}.')
             if not raw_data or not status_code:
                 return callback_error(resource_utils.CallbackExceptionCodes.REPORT_DATA_ERR,
                                       search_id,

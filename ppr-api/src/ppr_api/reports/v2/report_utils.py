@@ -558,3 +558,24 @@ def get_exact_count(selected) -> int:
         if reg.get('matchType') == 'EXACT':
             exact_count += 1
     return exact_count
+
+
+def merge_pdfs(report_files):
+    """Merge pdf content in memory."""
+    current_app.logger.debug('merge_pdfs starting')
+    merger = PyPDF2.PdfMerger()
+    merger.append(io.BytesIO(report_files['cover.pdf']))
+    rep_count = len(report_files) - 1
+    count = 0
+    report_size = len(report_files['cover.pdf'])
+    while count < rep_count:
+        count += 1
+        key = f'pdf{count}.pdf'
+        report_size += len(report_files[key])
+        current_app.logger.debug(f'merge_pdfs running report size={report_size}')
+        merger.append(io.BytesIO(report_files[key]))
+    writer_buffer = io.BytesIO()
+    merger.write(writer_buffer)
+    merger.close()
+    current_app.logger.debug(f'merge_pdfs final report size={report_size}')
+    return writer_buffer.getvalue()

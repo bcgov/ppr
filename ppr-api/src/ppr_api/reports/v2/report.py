@@ -183,19 +183,24 @@ class Report:  # pylint: disable=too-few-public-methods
             return content, status_code, headers
         report_files['cover.pdf'] = content
         # Merge subreports
-        url = current_app.config.get('REPORT_SVC_URL') + MERGE_URI
-        headers = {}
-        token = GoogleStorageTokenService.get_report_api_token()
-        if token:
-            headers['Authorization'] = 'Bearer {}'.format(token)
-        response = requests.post(url=url, headers=headers, files=report_files)
-        current_app.logger.debug(f'Merge search reports response status: {response.status_code}.')
-        if response.status_code != HTTPStatus.OK:
-            content = ResourceErrorCodes.REPORT_ERR + ': ' + response.content.decode('ascii')
-            current_app.logger.error('Account {0} merge response status: {1} error: {2}.'
-                                     .format(self._account_id, response.status_code, content))
-            return jsonify(message=content), response.status_code, None
-        return response.content, response.status_code, {'Content-Type': 'application/pdf'}
+        return report_utils.merge_pdfs(report_files), status_code, {'Content-Type': 'application/pdf'}
+        # url = current_app.config.get('REPORT_SVC_URL') + MERGE_URI
+        # headers = {}
+        # token = GoogleStorageTokenService.get_report_api_token()
+        # if token:
+        #    headers['Authorization'] = 'Bearer {}'.format(token)
+        # # response = requests.post(url=url, headers=headers, files=report_files)
+        # req = requests.post(url=url, headers=headers, files=report_files, stream=True)
+        # response = Response(req.iter_content(chunk_size=10*1024), content_type=req.headers['Content-Type'])
+        # current_app.logger.debug(f'Merge search reports response status: {response.status_code}.')
+        # if response.status_code != HTTPStatus.OK:
+        #    # content = ResourceErrorCodes.REPORT_ERR + ': ' + response.content.decode('ascii')
+        #    content = ResourceErrorCodes.REPORT_ERR + ': ' + response.get_data(True)
+        #    current_app.logger.error('Account {0} merge response status: {1} error: {2}.'
+        #                             .format(self._account_id, response.status_code, content))
+        #    return jsonify(message=content), response.status_code, None
+        # # return response.content, response.status_code, {'Content-Type': 'application/pdf'}
+        # return response.get_data(), response.status_code, {'Content-Type': 'application/pdf'}
 
     def get_registration_mail_pdf(self):
         """Render a mail registration report with cover letter."""
