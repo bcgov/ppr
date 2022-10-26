@@ -1,4 +1,4 @@
-import { ActionTypes, HomeTenancyTypes } from '@/enums'
+import {ActionTypes, HomeTenancyTypes} from '@/enums'
 import {
   AddressIF,
   MhrRegistrationFractionalOwnershipIF,
@@ -80,6 +80,26 @@ export const mockedOrganization: MhrRegistrationHomeOwnerIF = {
   phoneNumber: '(999) 888-7766',
   phoneExtension: '4321',
   address: mockedAddressAlt
+}
+
+export const mockedAddedOrganization: MhrRegistrationHomeOwnerIF = {
+  ownerId: 20,
+  organizationName: 'Smart Track',
+  suffix: 'Inc.',
+  phoneNumber: '(999) 888-7766',
+  phoneExtension: '4321',
+  address: mockedAddressAlt,
+  action: ActionTypes.ADDED
+}
+
+export const mockedRemovedOrganization: MhrRegistrationHomeOwnerIF = {
+  ownerId: 20,
+  organizationName: 'Smart Track',
+  suffix: 'Inc.',
+  phoneNumber: '(999) 888-7766',
+  phoneExtension: '4321',
+  address: mockedAddressAlt,
+  action: ActionTypes.REMOVED
 }
 
 export const mockedFractionalOwnership: MhrRegistrationFractionalOwnershipIF = {
