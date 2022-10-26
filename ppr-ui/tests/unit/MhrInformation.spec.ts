@@ -12,8 +12,16 @@ import mockRouter from './MockRouter'
 import { HomeTenancyTypes, RouteNames } from '@/enums'
 import { HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
 import { getTestId } from './utils'
-import { mockedAddedPerson, mockedRemovedPerson, mockedOrganization, mockedPerson, mockMhrTransferCurrentHomeOwner, mockedDefaultUserSettingsResponse, mockedUserInfo, mockedRegisteringParty1 } from './test-data'
-import { CertifyIF, MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF, UserInfoIF } from '@/interfaces'
+import {
+  mockedAddedPerson,
+  mockedRemovedPerson,
+  mockedOrganization,
+  mockedPerson,
+  mockMhrTransferCurrentHomeOwner,
+  mockedRegisteringParty1,
+  mockedAccountInfo
+} from './test-data'
+import { CertifyIF, MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF } from '@/interfaces'
 import { nextTick } from '@vue/composition-api'
 import { TransferDetails } from '@/components/mhrTransfers'
 import { CertifyInformation } from '@/components/common'
@@ -96,7 +104,6 @@ describe('Mhr Information', () => {
   sessionStorage.setItem('AUTH_API_URL', 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/')
 
   beforeEach(async () => {
-    await store.dispatch('setUserInfo', mockedUserInfo)
     await store.dispatch('setCertifyInformation', {
       valid: false,
       certified: false,
@@ -268,7 +275,7 @@ describe('Mhr Information', () => {
     expect(wrapper.vm.$data.getMhrTransferHomeOwners.length).toBe(1)
 
     expect(wrapper.findComponent(MhrInformation).exists()).toBe(true)
-    
+
     const mhrTransferDetailsComponent = wrapper.findComponent(MhrInformation).findComponent(TransferDetails)
     expect(mhrTransferDetailsComponent.exists()).toBeTruthy()
 
@@ -319,30 +326,32 @@ describe('Mhr Information', () => {
     expect(authorizationComponent.text()).toContain(mockedRegisteringParty1.address.postalCode)
   })
 
-  it.skip('should render Submitting Party component on the Review screen', async () => {
+  it('should render Submitting Party component on the Review screen', async () => {
     setupCurrentHomeOwners()
     wrapper.vm.$data.dataLoaded = true
     await Vue.nextTick()
 
-    expect(wrapper.find('#current-user-info').exists()).toBeFalsy()
+    expect(wrapper.find('#account-info').exists()).toBeFalsy()
+
+    // set Account Info in local state
+    wrapper.vm.$data.accountInfo = mockedAccountInfo
 
     wrapper.find('#btn-stacked-submit').trigger('click')
     await Vue.nextTick()
 
-    expect(wrapper.find('#current-user-info').exists()).toBeTruthy()
+    expect(wrapper.find('#account-info').exists()).toBeTruthy()
     expect(wrapper.find(getTestId('submitting-party-tooltip')).exists()).toBeTruthy()
 
-    const userInfoTable = wrapper.findComponent(AccountInfo).find(getTestId('user-info-table'))
-    expect(userInfoTable.exists()).toBeTruthy()
+    const accountInfoTable = wrapper.findComponent(AccountInfo).find(getTestId('account-info-table'))
+    expect(accountInfoTable.exists()).toBeTruthy()
 
-    const userInfoText = userInfoTable.text()
-    expect(userInfoText).toContain(mockedUserInfo.firstname)
-    expect(userInfoText).toContain(mockedUserInfo.lastname)
-    expect(userInfoText).toContain(toDisplayPhone(mockedUserInfo.contacts[0].phone))
-    expect(userInfoText).toContain(mockedUserInfo.contacts[0].email)
-    expect(userInfoText).toContain('Ext ' + mockedUserInfo.contacts[0].phoneExtension)
-    expect(userInfoText).toContain(mockedRegisteringParty1.address.city)
-    expect(userInfoText).toContain(mockedRegisteringParty1.address.street)
-    expect(userInfoText).toContain(mockedRegisteringParty1.address.postalCode)
+    const accountInfoText = accountInfoTable.text()
+    expect(accountInfoText).toContain(mockedAccountInfo.name)
+    expect(accountInfoText).toContain(toDisplayPhone(mockedAccountInfo.accountAdmin.phone))
+    expect(accountInfoText).toContain(mockedAccountInfo.accountAdmin.email)
+    expect(accountInfoText).toContain('Ext ' + mockedAccountInfo.accountAdmin.phoneExtension)
+    expect(accountInfoText).toContain(mockedAccountInfo.mailingAddress.city)
+    expect(accountInfoText).toContain(mockedAccountInfo.mailingAddress.street)
+    expect(accountInfoText).toContain(mockedAccountInfo.mailingAddress.postalCode)
   })
 })

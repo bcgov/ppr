@@ -1,6 +1,6 @@
 <template>
-  <div id="current-user-info">
-    <h4 class="header my-5">
+  <div id="account-info">
+    <h4 class="header mb-5">
       {{ title }}
       <v-tooltip
         if="tooltipContent"
@@ -19,7 +19,7 @@
       </v-tooltip>
     </h4>
     <v-card flat class="rounded">
-      <v-simple-table v-if="accountInfo" data-test-id="user-info-table">
+      <v-simple-table v-if="accountInfo" data-test-id="account-info-table">
         <template v-slot:default>
           <thead>
             <tr>
@@ -39,7 +39,7 @@
           </thead>
           <tbody>
             <tr class="table-info">
-              <td class="current-user-name pl-6 py-6">
+              <td class="account-name pl-6 py-6">
                 <v-icon>
                   {{ accountInfo.isBusinessAccount ? 'mdi-domain' : 'mdi-account' }}
                 </v-icon>
@@ -106,7 +106,7 @@ export default defineComponent({
 
 .table-info {
   vertical-align: top;
-  .current-user-name,
+  .account-name,
   i {
     color: $gray9 !important;
   }
