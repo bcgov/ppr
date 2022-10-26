@@ -6,6 +6,8 @@ import { ActionTypes, ApiHomeTenancyTypes, HomeTenancyTypes } from '@/enums'
 // Validation flag for Transfer Details
 const transferDetailsValid = ref(false)
 
+const refNumValid = ref(true)
+
 export const useMhrInformation = () => {
   const {
     getMhrTransferCurrentHomeOwners,
@@ -30,6 +32,10 @@ export const useMhrInformation = () => {
 
   const setTransferDetailsValid = (isValid: boolean) => {
     transferDetailsValid.value = isValid
+  }
+
+  const setRefNumValid = (isValid: boolean) => {
+    refNumValid.value = isValid
   }
 
   const initMhrTransfer = (): MhrTransferIF => {
@@ -100,7 +106,9 @@ export const useMhrInformation = () => {
 
   return {
     isTransferDetailsValid: readonly(transferDetailsValid),
+    isRefNumValid: readonly(refNumValid),
     setTransferDetailsValid,
+    setRefNumValid,
     initMhrTransfer,
     buildApiData
   }
