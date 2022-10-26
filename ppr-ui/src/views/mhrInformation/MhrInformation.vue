@@ -252,8 +252,6 @@ export default defineComponent({
         const apiData = await buildApiData()
         const mhrTransferFiling = await submitMhrTransfer(apiData, getMhrInformation.value.mhrNumber)
         localState.loading = false
-        await setUnsavedChanges(false)
-
         if (!mhrTransferFiling.error) {
           // Delete the draft on successful submission
           if (getMhrInformation.value.draftNumber) await deleteMhrDraft(getMhrInformation.value.draftNumber)
@@ -283,6 +281,7 @@ export default defineComponent({
     const goToDash = (): void => {
       if (hasUnsavedChanges.value === true) localState.showCancelDialog = true
       else {
+        setUnsavedChanges(false)
         context.root.$router.push({
           name: RouteNames.DASHBOARD
         })
