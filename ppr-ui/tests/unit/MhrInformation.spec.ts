@@ -7,7 +7,7 @@ import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
 
 // local components
 import { HomeOwners, MhrInformation } from '@/views'
-import { ButtonsStacked, StickyContainer } from '@/components/common'
+import { ButtonsStacked, StickyContainer, CertifyInformation } from '@/components/common'
 import mockRouter from './MockRouter'
 import { HomeTenancyTypes, RouteNames } from '@/enums'
 import { HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
@@ -16,7 +16,6 @@ import { mockedAddedPerson, mockedRemovedPerson, mockedOrganization, mockedPerso
 import { MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF } from '@/interfaces'
 import { nextTick } from '@vue/composition-api'
 import { TransferDetails } from '@/components/mhrTransfers'
-import { CertifyInformation } from '@/components/common'
 
 Vue.use(Vuetify)
 
@@ -260,7 +259,7 @@ describe('Mhr Information', () => {
     expect(wrapper.vm.$data.getMhrTransferHomeOwners.length).toBe(1)
 
     expect(wrapper.findComponent(MhrInformation).exists()).toBe(true)
-    
+
     const mhrTransferDetailsComponent = wrapper.findComponent(MhrInformation).findComponent(TransferDetails)
     expect(mhrTransferDetailsComponent.exists()).toBeTruthy()
 

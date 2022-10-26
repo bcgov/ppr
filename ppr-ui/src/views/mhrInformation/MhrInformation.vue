@@ -251,7 +251,6 @@ export default defineComponent({
         const apiData = await buildApiData()
         const mhrTransferFiling = await submitMhrTransfer(apiData, getMhrInformation.value.mhrNumber)
         localState.loading = false
-        await setUnsavedChanges(false)
         !mhrTransferFiling.error
           ? goToDash()
           : console.log(mhrTransferFiling?.error) // Handle Schema or Api errors here..
@@ -279,6 +278,7 @@ export default defineComponent({
     const goToDash = (): void => {
       if (hasUnsavedChanges.value === true) localState.showCancelDialog = true
       else {
+        setUnsavedChanges(false)
         context.root.$router.push({
           name: RouteNames.DASHBOARD
         })
