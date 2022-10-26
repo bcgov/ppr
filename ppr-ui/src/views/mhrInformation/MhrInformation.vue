@@ -337,4 +337,7 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+.submitting-party {
+  margin-top: 55px;
+}
 </style>
