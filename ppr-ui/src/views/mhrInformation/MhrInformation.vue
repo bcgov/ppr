@@ -43,13 +43,12 @@
                     :currentHomeOwners="getMhrTransferCurrentHomeOwners"
                   />
                 </section>
-                <section id="transfer-submitting-party">
-                  <CurrentUser
+                <section id="transfer-submitting-party" class="submitting-party">
+                  <AccountInfo
                     title="Submitting Party for this Change"
-                    tooltipContent="The default Submitting Party is based on your BC Registries user account information.
-                      This information can be updated within your account settings."
-                    :currentUserInfo="currentUserInfo"
-                    :currentUserAddress="currentUserAddress"
+                    tooltipContent="The default Submitting Party is based on your BC Registries
+                       user account information. This information can be updated within your account settings."
+                    :accountInfo="accountInfo"
                   />
                 </section>
                 <section id="transfer-certify-section" class="mt-10 py-4">
@@ -103,6 +102,7 @@ import { ActionTypes, RouteNames } from '@/enums'
 import {
   createMhrTransferDraft,
   fetchMhRegistration,
+  getAccountInfoFromAuth,
   getMhrTransferDraft,
   pacificDate,
   submitMhrTransfer,
@@ -118,8 +118,8 @@ import { BaseDialog } from '@/components/dialogs'
 import { BaseAddress } from '@/composables/address'
 import { unsavedChangesDialog } from '@/resources/dialogOptions'
 import { cloneDeep } from 'lodash'
-import CurrentUser from '@/components/common/CurrentUser.vue'
-import { AddressIF, UserInfoIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import AccountInfo from '@/components/common/AccountInfo.vue'
+import { AccountInfoIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 
 export default defineComponent({
   name: 'MhrInformation',
@@ -131,7 +131,7 @@ export default defineComponent({
     HomeOwnersTable,
     StickyContainer,
     CertifyInformation,
-    CurrentUser
+    AccountInfo
   },
   props: {
     appReady: {
@@ -146,15 +146,11 @@ export default defineComponent({
   // eslint-disable-next-line
   setup (props, context) {
     const {
-      getCurrentUser,
-      getCertifyInformation,
       getMhrTransferHomeOwners,
       getMhrInformation,
       getMhrTransferCurrentHomeOwners,
       hasUnsavedChanges
     } = useGetters<any>([
-      'getCurrentUser',
-      'getCertifyInformation',
       'getMhrTransferHomeOwners',
       'getMhrInformation',
       'getMhrTransferCurrentHomeOwners',
@@ -188,10 +184,7 @@ export default defineComponent({
       validateTransferDetails: false,
       authorizationValid: false,
       validateAuthorizationError: false,
-      currentUserInfo: getCurrentUser.value as UserInfoIF,
-      currentUserAddress: computed((): AddressIF => {
-        return getCertifyInformation.value.registeringParty?.address
-      }),
+      accountInfo: {} as AccountInfoIF,
       feeType: FeeSummaryTypes.MHR_TRANSFER, // FUTURE STATE: To be dynamic, dependent on what changes have been made
       isAuthenticated: computed((): boolean => {
         return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
@@ -233,6 +226,7 @@ export default defineComponent({
       setEmptyMhrTransfer(initMhrTransfer())
       // Set baseline MHR Information to state
       await parseMhrInformation()
+      localState.accountInfo = await getSubmittingPartyInformation()
       localState.loading = false
 
       localState.dataLoaded = true
@@ -242,6 +236,11 @@ export default defineComponent({
     // Future state to parse all relevant MHR Information
     const parseMhrInformation = async (): Promise<void> => {
       await parseCurrentOwnerGroups()
+    }
+
+    // Get Account Info from Auth to be used in Submitting Party section in Review screen
+    const getSubmittingPartyInformation = async (): Promise<AccountInfoIF> => {
+      return getAccountInfoFromAuth()
     }
 
     const parseCurrentOwnerGroups = async (): Promise<void> => {

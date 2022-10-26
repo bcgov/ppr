@@ -41,21 +41,27 @@
             <tr class="table-info">
               <td class="current-user-name pl-6 py-6">
                 <v-icon>
-                  mdi-account
+                  {{ accountInfo.isBusinessAccount ? 'mdi-domain' : 'mdi-account' }}
                 </v-icon>
                 <span class="pt-1 font-weight-bold">
-                  {{ userInfo.personName.first }} {{ userInfo.personName.last }}
+                  {{ accountInfo.name }}
                 </span>
               </td>
               <td class="py-6">
-                <BaseAddress id="submitting-party-address" :schema="PartyAddressSchema" :value="currentUserAddress" />
+                <BaseAddress
+                  id="submitting-party-address"
+                  :schema="PartyAddressSchema"
+                  :value="accountInfo.mailingAddress"
+                />
               </td>
               <td class="py-6">
-                {{ userInfo.emailAddress }}
+                {{ accountInfo.accountAdmin.email }}
               </td>
               <td class="py-6">
-                {{ toDisplayPhone(userInfo.phoneNumber) }}
-                <span v-if="userInfo.phoneExtension"> Ext {{ userInfo.phoneExtension }} </span>
+                {{ toDisplayPhone(accountInfo.accountAdmin.phone) }}
+                <span v-if="accountInfo.accountAdmin.phoneExtension">
+                  Ext {{ accountInfo.accountAdmin.phoneExtension }}
+                </span>
               </td>
             </tr>
           </tbody>
@@ -68,12 +74,12 @@
 <script lang="ts">
 import { BaseAddress } from '@/composables/address'
 import { PartyAddressSchema } from '@/schemas'
-import { AddressIF, SubmittingPartyIF, UserInfoIF } from '@/interfaces' // eslint-disable-line no-unused-vars
-import { computed, defineComponent, reactive, toRefs } from '@vue/composition-api'
+import { defineComponent } from '@vue/composition-api'
 import { toDisplayPhone } from '@/utils'
+import { AccountInfoIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 
 export default defineComponent({
-  name: 'CurrentUser',
+  name: 'AccountInfo',
   components: { BaseAddress },
   props: {
     title: {
@@ -84,35 +90,13 @@ export default defineComponent({
       type: String,
       default: null
     },
-    currentUserInfo: {
-      type: Object as () => UserInfoIF,
-      required: true
-    },
-    currentUserAddress: {
-      type: Object as () => AddressIF,
+    accountInfo: {
+      type: Object as () => AccountInfoIF,
       required: true
     }
   },
-  setup (props) {
-    const user = props.currentUserInfo as UserInfoIF
-
-    const localState = reactive({
-      userInfo: computed(
-        (): SubmittingPartyIF => {
-          return {
-            personName: {
-              first: user.firstname,
-              last: user.lastname
-            },
-            emailAddress: user.contacts[0].email,
-            phoneNumber: user.contacts[0].phone.replace(/[^0-9.]+/g, ''),
-            phoneExtension: user.contacts[0].phoneExtension
-          }
-        }
-      )
-    })
-
-    return { PartyAddressSchema, toDisplayPhone, ...toRefs(localState) }
+  setup() {
+    return { PartyAddressSchema, toDisplayPhone }
   }
 })
 </script>
