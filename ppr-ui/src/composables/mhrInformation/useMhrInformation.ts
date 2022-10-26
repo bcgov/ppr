@@ -48,17 +48,19 @@ export const useMhrInformation = () => {
     const ownerGroups = []
 
     getMhrTransferHomeOwnerGroups.value.forEach(ownerGroup => {
-      ownerGroups.push({
-        ...ownerGroup,
-        owners: isDraft ? ownerGroup.owners : ownerGroup.owners.filter(owner => owner.action !== ActionTypes.REMOVED),
-        groupId: ownerGroup.groupId + 1, // Increment from baseline groupID to create a new group for API
-        type: ApiHomeTenancyTypes[
-          Object.keys(HomeTenancyTypes).find(key => HomeTenancyTypes[key] as string === ownerGroup.type)
-        ]
-      })
+      if (ownerGroup.action !== ActionTypes.REMOVED) {
+        ownerGroups.push({
+          ...ownerGroup,
+          owners: isDraft ? ownerGroup.owners : ownerGroup.owners.filter(owner => owner.action !== ActionTypes.REMOVED),
+          groupId: ownerGroup.groupId + 1, // Increment from baseline groupID to create a new group for API
+          type: ApiHomeTenancyTypes[
+            Object.keys(HomeTenancyTypes).find(key => HomeTenancyTypes[key] as string === ownerGroup.type)
+          ]
+        })
+      }
     })
 
-    return ownerGroups
+    return ownerGroups.filter(ownerGroup => ownerGroup.action !== ActionTypes.REMOVED)
   }
 
   const parseRemovedOwnerGroups = async () => {

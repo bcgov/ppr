@@ -12,6 +12,14 @@
       disable-sort
       disable-pagination
     >
+      <template v-slot:header v-if="isMhrTransfer && hasRemovedAllHomeOwnerGroups(homeOwners) && !hideRemovedOwners">
+        <tr class="fs-14 text-center no-owners-head-row" data-test-id="no-data-msg">
+          <td class="pa-6" :colspan="homeOwnersTableHeaders.length">
+            No owners added yet.
+          </td>
+        </tr>
+      </template>
+
       <template v-slot:group.header="{ group, items }" class="group-header-slot">
         <td :colspan="4" class="py-1">
           <TableGroupHeader
@@ -169,7 +177,7 @@
             </template>
           </td>
         </tr>
-        <tr v-else-if="!isMhrTransfer">
+        <tr v-else>
           <td :colspan="4" class="py-1">
             <div
               v-if="showGroups"
@@ -201,7 +209,7 @@ import { toDisplayPhone } from '@/utils'
 import { AddEditHomeOwner } from '@/components/mhrRegistration/HomeOwners'
 import TableGroupHeader from '@/components/mhrRegistration/HomeOwners/TableGroupHeader.vue'
 /* eslint-disable no-unused-vars */
-import { MhrRegistrationHomeOwnerIF } from '@/interfaces'
+import { MhrHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF } from '@/interfaces'
 import { ActionTypes } from '@/enums'
 /* eslint-enable no-unused-vars */
 import { useActions } from 'vuex-composition-helpers'
@@ -210,10 +218,10 @@ export default defineComponent({
   name: 'HomeOwnersTable',
   props: {
     homeOwners: { default: () => [] as MhrRegistrationHomeOwnerIF[] },
-    currentHomeOwners: { default: () => [] as MhrRegistrationHomeOwnerIF[] },
     isAdding: { default: false },
     isReadonlyTable: { type: Boolean, default: false },
-    isMhrTransfer: { type: Boolean, default: false }
+    isMhrTransfer: { type: Boolean, default: false },
+    hideRemovedOwners: { type: Boolean, default: false }
   },
   components: {
     BaseAddress,
@@ -231,7 +239,9 @@ export default defineComponent({
       setGlobalEditingMode,
       hasEmptyGroup,
       hasMinimumGroups,
-      editHomeOwner
+      editHomeOwner,
+      undoGroupRemoval,
+      hasRemovedAllHomeOwnerGroups
     } = useHomeOwners(props.isMhrTransfer)
 
     const { setUnsavedChanges } = useActions<any>(['setUnsavedChanges'])
@@ -258,11 +268,12 @@ export default defineComponent({
       )
     }
 
-    const undoRemoval = (item): void => {
-      editHomeOwner(
+    const undoRemoval = async (item): Promise<void> => {
+      await editHomeOwner(
         { ...item, action: null },
         item.groupId
       )
+      await undoGroupRemoval(item.groupId)
     }
 
     const openForEditing = (index: number) => {
@@ -312,6 +323,7 @@ export default defineComponent({
       isRemovedHomeOwner,
       markForRemoval,
       undoRemoval,
+      hasRemovedAllHomeOwnerGroups,
       ...toRefs(localState)
     }
   }
@@ -325,6 +337,10 @@ export default defineComponent({
   tr.v-row-group__header,
   tbody tr.v-row-group__header:hover {
     background-color: #e2e8ee;
+  }
+
+  .no-owners-head-row {
+    color: $gray7;
   }
 
   .owner-name,
