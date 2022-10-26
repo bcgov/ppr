@@ -27,14 +27,17 @@ from mhr_api.models.db2 import utils as legacy_utils
 from mhr_api.services.authz import MANUFACTURER_GROUP, QUALIFIED_USER_GROUP, GOV_ACCOUNT_ROLE
 
 from .db import db
+from .mhr_document import MhrDocument
 from .mhr_draft import MhrDraft
 from .mhr_location import MhrLocation
+from .mhr_note import MhrNote
 from .mhr_party import MhrParty
 from .type_tables import MhrDocumentType, MhrRegistrationType, MhrRegistrationTypes, MhrRegistrationStatusTypes
 
 
 QUERY_PKEYS = """
 select nextval('mhr_registration_id_seq') AS reg_id,
+       nextval('mhr_document_id_seq') AS doc_id,
        get_mhr_number() AS mhr_number,
        get_mhr_doc_reg_number() AS doc_reg_id,
        get_mhr_draft_number() AS draft_num,
@@ -42,17 +45,20 @@ select nextval('mhr_registration_id_seq') AS reg_id,
 """
 QUERY_PKEYS_NO_DRAFT = """
 select nextval('mhr_registration_id_seq') AS reg_id,
+       nextval('mhr_document_id_seq') AS doc_id,
        get_mhr_number() AS mhr_number,
        get_mhr_doc_reg_number() AS doc_reg_id
 """
 CHANGE_QUERY_PKEYS = """
 select nextval('mhr_registration_id_seq') AS reg_id,
+       nextval('mhr_document_id_seq') AS doc_id,
        get_mhr_doc_reg_number() AS doc_reg_id,
        get_mhr_draft_number() AS draft_num,
        nextval('mhr_draft_id_seq') AS draft_id
 """
 CHANGE_QUERY_PKEYS_NO_DRAFT = """
 select nextval('mhr_registration_id_seq') AS reg_id,
+       nextval('mhr_document_id_seq') AS doc_id,
        get_mhr_doc_reg_number() AS doc_reg_id
 """
 FROM_LEGACY_DOC_TYPE = {
@@ -60,6 +66,16 @@ FROM_LEGACY_DOC_TYPE = {
     '102': 'REG_102',
     '103': 'REG_103',
     '103E': 'REG_103E'
+}
+REG_TO_DOC_TYPE = {
+    'DECAL_REPLACE': 'REG_102',
+    'EXEMPTION_NON_RES': 'EXNR',
+    'EXEMPTION_RES': 'EXRS',
+    'MHREG': 'REG_101',
+    'PERMIT': 'REG_103',
+    'PERMIT_EXTENSION': 'REG_103E',
+    'TRAND': 'DEAT',
+    'TRANS': 'TRAN'
 }
 FROM_LEGACY_REGISTRATION_TYPE = {
     '101': 'MHREG',
@@ -105,9 +121,13 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
     draft = db.relationship('MhrDraft', foreign_keys=[draft_id], uselist=False)
     parties = db.relationship('MhrParty', order_by='asc(MhrParty.id)', back_populates='registration')
     locations = db.relationship('MhrLocation', order_by='asc(MhrLocation.id)', back_populates='registration')
+    documents = db.relationship('MhrDocument', order_by='asc(MhrDocument.id)', back_populates='registration')
+    notes = db.relationship('MhrNote', order_by='asc(MhrNote.id)', back_populates='registration')
+    owner_groups = db.relationship('MhrOwnerGroup', order_by='asc(MhrOwnerGroup.id)', back_populates='registration')
 
     draft_number: str = None
     doc_reg_number: str = None
+    doc_pkey: int = None
     manuhome: Db2Manuhome = None
     mail_version: bool = False
     reg_json: dict = None
@@ -229,6 +249,15 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
             elif self.registration_type in (MhrRegistrationTypes.TRAND, MhrRegistrationTypes.TRANS):
                 self.manuhome = Db2Manuhome.create_from_transfer(self, self.reg_json)
                 self.manuhome.save_transfer()
+            elif self.registration_type in (MhrRegistrationTypes.EXEMPTION_RES, MhrRegistrationTypes.EXEMPTION_NON_RES):
+                self.manuhome = Db2Manuhome.create_from_exemption(self, self.reg_json)
+                self.manuhome.save_exemption()
+
+    def save_exemption(self):
+        """Set the state of the original MH registration to exempt."""
+        # Save draft first
+        self.status_type = MhrRegistrationStatusTypes.EXEMPT
+        db.session.commit()
 
     def get_registration_type(self):
         """Lookup registration type record if it has not already been fetched."""
@@ -310,7 +339,9 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                                                                       mhr_number=formatted_mhr),
                     status_code=HTTPStatus.UNAUTHORIZED
                 )
-        # Authorized, exists. If legacy transition load legacy data.
+        if registration and registration.documents:
+            registration.doc_id = registration.documents[0].id
+        # Authorized. If legacy transition load legacy data.
         if model_utils.is_legacy():
             if not registration:
                 registration: MhrRegistration = MhrRegistration()
@@ -350,7 +381,9 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                                                                       mhr_number=formatted_mhr),
                     status_code=HTTPStatus.UNAUTHORIZED
                 )
-        # Authorized, exists. If legacy transition load legacy data.
+        if registration and registration.documents:
+            registration.doc_id = registration.documents[0].id
+        # Authorized. If legacy transition load legacy data.
         if model_utils.is_legacy():
             if not registration:
                 registration: MhrRegistration = MhrRegistration()
@@ -443,6 +476,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         registration.mhr_number = base_reg.mhr_number
         registration.doc_reg_number = reg_vals.doc_reg_number
         registration.doc_id = reg_vals.doc_id
+        registration.doc_pkey = reg_vals.doc_pkey
         registration.registration_ts = model_utils.now_ts()
         if json_data.get('deathOfOwner'):
             registration.registration_type = MhrRegistrationTypes.TRAND
@@ -464,10 +498,69 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         if 'clientReferenceId' in json_data:
             registration.client_reference_id = json_data['clientReferenceId']
         registration.parties = MhrParty.create_from_registration_json(json_data, registration.id)
+        registration.documents = [MhrDocument.create_from_json(registration,
+                                                               json_data,
+                                                               REG_TO_DOC_TYPE[registration.registration_type])]
+        registration.documents[0].registration_id = base_reg.id
         if registration.doc_id and not json_data.get('documentId'):
             json_data['documentId'] = registration.doc_id
         elif not registration.doc_id and json_data.get('documentId'):
             registration.doc_id = json_data.get('documentId')
+        if base_reg:
+            registration.manuhome = base_reg.manuhome
+        return registration
+
+    @staticmethod
+    def create_exemption_from_json(base_reg,
+                                   json_data,
+                                   account_id: str = None,
+                                   user_id: str = None,
+                                   user_group: str = None):
+        """Create exemption registration objects from dict/json."""
+        # Create or update draft.
+        draft = MhrRegistration.find_draft(json_data)
+        reg_vals: MhrRegistration = MhrRegistration.get_change_generated_values(draft, user_group)
+        registration: MhrRegistration = MhrRegistration()
+        registration.id = reg_vals.id  # pylint: disable=invalid-name; allow name of id.
+        registration.mhr_number = base_reg.mhr_number
+        registration.doc_reg_number = reg_vals.doc_reg_number
+        registration.doc_id = reg_vals.doc_id
+        registration.doc_pkey = reg_vals.doc_pkey
+        registration.registration_ts = model_utils.now_ts()
+        if json_data.get('nonResidential'):
+            registration.registration_type = MhrRegistrationTypes.EXEMPTION_NON_RES
+        else:
+            registration.registration_type = MhrRegistrationTypes.EXEMPTION_RES
+        registration.status_type = MhrRegistrationStatusTypes.ACTIVE
+        registration.account_id = account_id
+        registration.user_id = user_id
+        registration.reg_json = json_data
+        if not draft:
+            registration.draft_number = reg_vals.draft_number
+            registration.draft_id = reg_vals.draft_id
+            draft = MhrDraft.create_from_registration(registration, json_data)
+        else:
+            draft.draft = json_data
+            registration.draft_id = draft.id
+        registration.draft = draft
+        if 'clientReferenceId' in json_data:
+            registration.client_reference_id = json_data['clientReferenceId']
+        registration.parties = MhrParty.create_from_registration_json(json_data, registration.id)
+        if registration.doc_id and not json_data.get('documentId'):
+            json_data['documentId'] = registration.doc_id
+        elif not registration.doc_id and json_data.get('documentId'):
+            registration.doc_id = json_data.get('documentId')
+        doc: MhrDocument = MhrDocument.create_from_json(registration,
+                                                        json_data,
+                                                        REG_TO_DOC_TYPE[registration.registration_type])
+        doc.registration_id = base_reg.id
+        registration.documents = [doc]
+        if json_data.get('note'):
+            if base_reg and base_reg.manuhome and base_reg.manuhome.reg_notes:
+                json_data['note']['noteId'] = len(base_reg.manuhome.reg_notes) + 1
+            else:
+                json_data['note']['noteId'] = 1
+            registration.notes = [MhrNote.create_from_json(json_data.get('note'), base_reg.id, doc.id, registration.id)]
         if base_reg:
             registration.manuhome = base_reg.manuhome
         return registration
@@ -506,11 +599,12 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         result = db.session.execute(query)
         row = result.first()
         registration.id = int(row[0])
-        registration.mhr_number = str(row[1])
-        registration.doc_reg_number = str(row[2])
+        registration.doc_pkey = int(row[1])
+        registration.mhr_number = str(row[2])
+        registration.doc_reg_number = str(row[3])
         if not draft:
-            registration.draft_number = str(row[3])
-            registration.draft_id = int(row[4])
+            registration.draft_number = str(row[4])
+            registration.draft_id = int(row[5])
         return registration
 
     @staticmethod
@@ -533,13 +627,14 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         result = db.session.execute(query)
         row = result.first()
         registration.id = int(row[0])
-        registration.doc_reg_number = str(row[1])
+        registration.doc_pkey = int(row[1])
+        registration.doc_reg_number = str(row[2])
         if not draft:
-            registration.draft_number = str(row[2])
-            registration.draft_id = int(row[3])
+            registration.draft_number = str(row[3])
+            registration.draft_id = int(row[4])
         if user_group and user_group in (QUALIFIED_USER_GROUP, MANUFACTURER_GROUP, GOV_ACCOUNT_ROLE):
             if draft:
-                registration.doc_id = str(row[2])
+                registration.doc_id = str(row[3])
             else:
-                registration.doc_id = str(row[4])
+                registration.doc_id = str(row[5])
         return registration

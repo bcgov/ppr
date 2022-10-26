@@ -17,10 +17,19 @@ from flask import current_app
 
 from mhr_api.exceptions import DatabaseException
 from mhr_api.models import db, utils as model_utils, Db2Document
+from mhr_api.utils.base import BaseEnum
 
 
 class Db2Mhomnote(db.Model):
     """This class manages all of the legacy DB2 MHR note information."""
+
+    class StatusTypes(BaseEnum):
+        """Render an Enum of the legacy note status types."""
+
+        ACTIVE = 'A'
+        CANCELLED = 'C'
+        EXPIRED = 'E'
+        CORRECTED = 'F'
 
     __bind_key__ = 'db2'
     __tablename__ = 'mhomnote'
@@ -98,24 +107,38 @@ class Db2Mhomnote(db.Model):
                     note.document = Db2Document.find_by_doc_id(note.reg_document_id)
         return notes
 
+    @classmethod
+    def find_by_document_id(cls, document_id: str):
+        """Return the all notes matching the manuhome id."""
+        notes = None
+        if document_id:
+            try:
+                notes = cls.query.filter(Db2Mhomnote.reg_document_id == document_id).all()
+            except Exception as db_exception:   # noqa: B902; return nicer error
+                current_app.logger.error('Db2Mhomnote.find_by_document_id exception: ' + str(db_exception))
+                raise DatabaseException(db_exception)
+        if notes:
+            for note in notes:
+                note.strip()
+        return notes
+
     @property
     def json(self):
         """Return a dict of this object, with keys in JSON format."""
         note = {
-            'noteId': self.note_id,
-            'noteNumber': self.note_number,
-            'status': self.status,
-            'registrationDocumentId': self.reg_document_id,
-            'canDocumentId': self.can_document_id,
             'documentType': self.document_type,
-            'destroyed': self.destroyed,
-            'phoneNumber': self.phone_number,
-            'name': self.name,
-            'legacyAddress': self.legacy_address,
-            'remarks': self.remarks
+            'documentId': self.reg_document_id,
+            'remarks': self.remarks,
+            'destroyed': False
         }
         if self.expiry_date and self.expiry_date.isoformat() != '0001-01-01':
             note['expiryDate'] = model_utils.format_local_date(self.expiry_date)
+        if self.destroyed and self.destroyed == 'Y':
+            note['destroyed'] = True
+        if self.document_type not in (Db2Document.DocumentTypes.RES_EXEMPTION,
+                                      Db2Document.DocumentTypes.NON_RES_EXEMPTION):
+            note['contactName'] = self.name
+            note['contactAddress'] = model_utils.get_address_from_db2(self.legacy_address, '')
         return note
 
     @property
@@ -128,12 +151,12 @@ class Db2Mhomnote(db.Model):
             'contactName': self.name,
             'contactAddress': model_utils.get_address_from_db2(self.legacy_address, '')
         }
+        if self.expiry_date and self.expiry_date.isoformat() != '0001-01-01':
+            note['expiryDate'] = model_utils.format_local_date(self.expiry_date)
         if self.document and self.document.registration_ts:
             current_app.logger.debug(f'Db2Mhomnote setting createDateTime for doc id {self.reg_document_id}.')
             note['createDateTime'] = model_utils.format_local_ts(self.document.registration_ts)
             # current_app.logger.debug('Db2Mhomnote.registration_ts createDateTime set.')
-        if self.expiry_date and self.expiry_date.isoformat() != '0001-01-01':
-            note['expiryDate'] = model_utils.format_local_date(self.expiry_date)
         return note
 
     @staticmethod
@@ -159,4 +182,35 @@ class Db2Mhomnote(db.Model):
         """Create a note object from a json note schema object: map json to db."""
         note = Db2Mhomnote.create_from_dict(json_data)
 
+        return note
+
+    @staticmethod
+    def create_from_registration(json_data, document: Db2Document, manhomid: int):
+        """Create a new registration note object."""
+        note = Db2Mhomnote(manuhome_id=manhomid,
+                           note_id=json_data.get('noteId', 1),
+                           note_number=0,
+                           status=Db2Mhomnote.StatusTypes.ACTIVE,
+                           reg_document_id=document.id,
+                           document_type=json_data.get('documentType', document.document_type),
+                           destroyed='N',
+                           phone_number=document.phone_number,
+                           name=document.name,
+                           legacy_address=document.legacy_address,
+                           remarks=json_data.get('remarks', ''),
+                           can_document_id='')
+
+        if json_data.get('contactName'):
+            note.name = str(json_data.get('contactName'))[0: 40]
+        if json_data.get('contactAddress'):
+            note.legacy_address = model_utils.to_db2_address(json_data.get('contactAddress'))
+        if json_data.get('status'):
+            note.status = json_data.get('status')
+        if json_data.get('destroyed'):
+            note.destroyed = 'Y'
+        if json_data.get('expiryDate', None):
+            date_val: str = str(json_data.get('expiryDate'))[0:10]
+            note.expiry_date = model_utils.date_from_iso_format(date_val)
+        else:
+            note.expiry_date = model_utils.date_from_iso_format('0001-01-01')
         return note

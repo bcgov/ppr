@@ -18,7 +18,7 @@ Validation includes verifying the data combination for various registrations/fil
 from flask import current_app
 
 from mhr_api.models import MhrRegistration, Db2Owngroup
-from mhr_api.models.type_tables import MhrRegistrationStatusTypes
+from mhr_api.models.type_tables import MhrRegistrationStatusTypes, MhrDocumentTypes
 from mhr_api.models.db2.owngroup import NEW_TENANCY_LEGACY
 from mhr_api.models.utils import is_legacy
 from mhr_api.utils import valid_charset
@@ -45,6 +45,7 @@ GROUP_NUMERATOR_MISSING = 'The owner group interest numerator is required and mu
 GROUP_DENOMINATOR_MISSING = 'The owner group interest denominator is required and must be an integer greater than 0. '
 GROUP_INTEREST_MISMATCH = 'The owner group interest numerator sum does not equal the interest common denominator. '
 VALIDATOR_ERROR = 'Error performing extra validation. '
+NOTE_DOC_TYPE_INVALID = 'The note document type is invalid for the registration type. '
 
 
 def validate_registration(json_data, is_staff: bool = False):
@@ -88,6 +89,24 @@ def validate_transfer(registration: MhrRegistration, json_data, is_staff: bool =
                 error_msg += TRANSFER_DATE_REQUIRED
     except Exception as validation_exception:   # noqa: B902; eat all errors
         current_app.logger.error('validate_transfer exception: ' + str(validation_exception))
+        error_msg += VALIDATOR_ERROR
+    return error_msg
+
+
+def validate_exemption(registration: MhrRegistration, json_data, is_staff: bool = False):
+    """Perform all exemption data validation checks not covered by schema validation."""
+    error_msg = ''
+    try:
+        if is_staff:
+            error_msg += validate_doc_id(json_data)
+        error_msg += validate_submitting_party(json_data)
+        error_msg += validate_registration_state(registration)
+        if json_data.get('note'):
+            if json_data['note'].get('documentType') and \
+                    json_data['note'].get('documentType') not in (MhrDocumentTypes.EXRS, MhrDocumentTypes.EXNR):
+                error_msg += NOTE_DOC_TYPE_INVALID
+    except Exception as validation_exception:   # noqa: B902; eat all errors
+        current_app.logger.error('validate_exemption exception: ' + str(validation_exception))
         error_msg += VALIDATOR_ERROR
     return error_msg
 

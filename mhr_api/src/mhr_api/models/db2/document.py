@@ -32,6 +32,11 @@ class Db2Document(db.Model):
         MHREG_TRIM = '101'
         TRAND = 'DEAT'
         TRANS = 'TRAN'
+        NON_RES_EXEMPTION = 'EXNR'
+        RES_EXEMPTION = 'EXRS'
+        PERMIT = '103 '
+        PERMIT_TRIM = '103'
+        PERMIT_EXTENSION = '103E'
 
     __bind_key__ = 'db2'
     __tablename__ = 'document'
