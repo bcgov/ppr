@@ -498,14 +498,14 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         if 'clientReferenceId' in json_data:
             registration.client_reference_id = json_data['clientReferenceId']
         registration.parties = MhrParty.create_from_registration_json(json_data, registration.id)
-        registration.documents = [MhrDocument.create_from_json(registration,
-                                                               json_data,
-                                                               REG_TO_DOC_TYPE[registration.registration_type])]
-        registration.documents[0].registration_id = base_reg.id
         if registration.doc_id and not json_data.get('documentId'):
             json_data['documentId'] = registration.doc_id
         elif not registration.doc_id and json_data.get('documentId'):
             registration.doc_id = json_data.get('documentId')
+        registration.documents = [MhrDocument.create_from_json(registration,
+                                                               json_data,
+                                                               REG_TO_DOC_TYPE[registration.registration_type])]
+        registration.documents[0].registration_id = base_reg.id
         if base_reg:
             registration.manuhome = base_reg.manuhome
         return registration
