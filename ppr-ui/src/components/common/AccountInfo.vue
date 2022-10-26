@@ -19,7 +19,7 @@
       </v-tooltip>
     </h4>
     <v-card flat class="rounded">
-      <v-simple-table data-test-id="user-info-table">
+      <v-simple-table v-if="accountInfo" data-test-id="user-info-table">
         <template v-slot:default>
           <thead>
             <tr>
@@ -95,7 +95,7 @@ export default defineComponent({
       required: true
     }
   },
-  setup() {
+  setup () {
     return { PartyAddressSchema, toDisplayPhone }
   }
 })

@@ -184,7 +184,7 @@ export default defineComponent({
       validateTransferDetails: false,
       authorizationValid: false,
       validateAuthorizationError: false,
-      accountInfo: {} as AccountInfoIF,
+      accountInfo: null,
       feeType: FeeSummaryTypes.MHR_TRANSFER, // FUTURE STATE: To be dynamic, dependent on what changes have been made
       isAuthenticated: computed((): boolean => {
         return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
