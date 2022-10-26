@@ -10,6 +10,7 @@ import {
   AccountProductSubscriptionIF, AddressIF, PartyIF, SearchPartyIF, UserProductSubscriptionIF
 } from '@/interfaces'
 import { partyCodeSearch } from '@/utils'
+import { AccountInfoIF } from '@/interfaces/account-interfaces/account-info-interface'
 
 /** Gets Keycloak JWT and parses it. */
 function getJWT (): any {
@@ -62,6 +63,64 @@ export async function getStaffegisteringParty (isBcOnline: boolean): Promise<Par
     return party
   }
   throw new Error('Auth API error getting Registering Party: status code = ' + StatusCodes.NOT_FOUND.toString())
+}
+
+// Get Account Info from from auth api /api/v1/orgs/{org_id}
+export async function getAccountInfoFromAuth (): Promise<AccountInfoIF> {
+  const url = sessionStorage.getItem('AUTH_API_URL')
+  const currentAccount = sessionStorage.getItem(SessionStorageKeys.CurrentAccount)
+  const accountId = JSON.parse(currentAccount).id
+
+  const config = { baseURL: url, headers: { Accept: 'application/json' } }
+
+  const accountInfo = await axios
+    .get(`orgs/${accountId}`, config)
+    .then(response => {
+      const data = response?.data
+      if (!data) {
+        throw new Error('Unable to obtain Registering Party from Account Information.')
+      }
+      return {
+        id: data.id,
+        isBusinessAccount: data.isBusinessAccount,
+        name: data.businessName || data.name,
+        mailingAddress: data.mailingAddress as AddressIF
+      }
+    })
+    .catch(error => {
+      throw new Error(
+        'Auth API error getting Account Info: status code = ' + error?.response?.status?.toString() ||
+          StatusCodes.NOT_FOUND.toString()
+      )
+    })
+
+  const accountAdminInfo = await axios
+    .get(`orgs/${accountId}/members?membershipTypeCode=ADMIN&status=ACTIVE`, config)
+    .then(response => {
+      const data = response?.data
+      if (!data) {
+        throw new Error('Unable to get Admin details from Account Information.')
+      }
+      const adminInfo = data.members[0].user
+      return {
+        firstName: adminInfo.firstname,
+        lastName: adminInfo.lastname,
+        email: adminInfo.contacts[0].email,
+        phone: adminInfo.contacts[0].phone,
+        phoneExtension: adminInfo.contacts[0].phoneExtension
+      }
+    })
+    .catch(error => {
+      throw new Error(
+        'Auth API error getting Account Admin details: status code = ' + error?.response?.status?.toString() ||
+          StatusCodes.NOT_FOUND.toString()
+      )
+    })
+
+  return {
+    ...accountInfo,
+    accountAdmin: accountAdminInfo
+  } as AccountInfoIF
 }
 
 // Get registering party from auth api /api/v1/orgs/{org_id}
