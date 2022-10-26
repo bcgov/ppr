@@ -80,20 +80,11 @@ export async function getAccountInfoFromAuth (): Promise<AccountInfoIF> {
       if (!data) {
         throw new Error('Unable to obtain Registering Party from Account Information.')
       }
-      const address: AddressIF = {
-        street: data?.mailingAddress?.street || '',
-        streetAdditional: data?.mailingAddress?.streetAdditional,
-        city: data?.mailingAddress?.city || '',
-        region: data?.mailingAddress?.region || '',
-        postalCode: data?.mailingAddress?.postalCode || '',
-        country: data?.mailingAddress?.country || ''
-      }
-
       return {
         id: data.id,
         isBusinessAccount: data.isBusinessAccount,
         name: data.businessName || data.name,
-        mailingAddress: address
+        mailingAddress: data.mailingAddress as AddressIF
       }
     })
     .catch(error => {
