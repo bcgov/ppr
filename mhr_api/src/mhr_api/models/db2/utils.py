@@ -105,7 +105,7 @@ SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRI
            AND og2.manhomid = mh.manhomid
            AND og2.owngrpid = o2.owngrpid
            AND og2.regdocid = d.documtid) as owner_names,
-       TRIM(d.bcolacct),
+       TRIM(d.affirmby),
        d.documtid as document_id
   FROM manuhome mh, document d
  WHERE mh.mhregnum IN (?)
