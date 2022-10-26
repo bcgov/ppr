@@ -290,7 +290,7 @@ describe('Mhr Information', () => {
     expect(mhrTransferDetailsComponent.vm.$data.consideration).toBe('$123.00')
   })
 
-  it.skip('should render Authorization component on review', async () => {
+  it('should render Authorization component on review', async () => {
     setupCurrentHomeOwners()
     wrapper.vm.$data.dataLoaded = true
     await Vue.nextTick()
@@ -319,7 +319,7 @@ describe('Mhr Information', () => {
     expect(authorizationComponent.text()).toContain(mockedRegisteringParty1.address.postalCode)
   })
 
-  it('should render Submitting Party component on the Review screen', async () => {
+  it.skip('should render Submitting Party component on the Review screen', async () => {
     setupCurrentHomeOwners()
     wrapper.vm.$data.dataLoaded = true
     await Vue.nextTick()
