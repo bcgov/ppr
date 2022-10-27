@@ -197,18 +197,27 @@ export default defineComponent({
       getMhrTransferHomeOwners,
       getMhrInformation,
       getMhrTransferCurrentHomeOwners,
+      getMhrTransferAttentionReference,
       hasUnsavedChanges
     } = useGetters<any>([
       'getMhrTransferHomeOwners',
       'getMhrInformation',
       'getMhrTransferCurrentHomeOwners',
+      'getMhrTransferAttentionReference',
+      'hasUnsavedChanges'
       'hasUnsavedChanges'
     ])
 
     const {
-      setMhrTransferHomeOwnerGroups, setMhrTransferCurrentHomeOwnerGroups, setUnsavedChanges
+      setMhrTransferHomeOwnerGroups,
+      setMhrTransferCurrentHomeOwnerGroups,
+      setMhrTransferAttentionReference,
+      setUnsavedChanges
     } = useActions<any>([
-      'setMhrTransferHomeOwnerGroups', 'setMhrTransferCurrentHomeOwnerGroups', 'setUnsavedChanges'
+      'setMhrTransferHomeOwnerGroups',
+      'setMhrTransferCurrentHomeOwnerGroups',
+      'setMhrTransferAttentionReference',
+      'setUnsavedChanges'
     ])
 
     const { setEmptyMhrTransfer } = useActions<any>(['setEmptyMhrTransfer'])
@@ -262,7 +271,7 @@ export default defineComponent({
       reviewOwners: computed(() => {
         return getMhrTransferHomeOwners.value.filter(owner => owner.action !== ActionTypes.REMOVED)
       }),
-      attentionReferenceNum: '',
+      attentionReference: getMhrTransferAttentionReference.value,
       options: unsavedChangesDialog,
       showCancelDialog: false
     })

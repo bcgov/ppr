@@ -17,6 +17,7 @@ export const useMhrInformation = () => {
     getMhrTransferConsideration,
     getMhrTransferDate,
     getMhrTransferOwnLand,
+    getMhrTransferAttentionReference,
     getMhrTransferHomeOwnerGroups
   } = useGetters<any>([
     'getMhrTransferCurrentHomeOwners',
@@ -27,6 +28,7 @@ export const useMhrInformation = () => {
     'getMhrTransferConsideration',
     'getMhrTransferDate',
     'getMhrTransferOwnLand',
+    'getMhrTransferAttentionReference',
     'getMhrTransferHomeOwnerGroups'
   ])
 
@@ -91,6 +93,7 @@ export const useMhrInformation = () => {
       consideration: getMhrTransferConsideration.value,
       transferDate: getMhrTransferDate.value,
       ownLand: getMhrTransferOwnLand.value,
+      attentionReference: getMhrTransferAttentionReference.value,
       documentDescription: 'SALE OR GIFT',
       submittingParty: {
         personName: {

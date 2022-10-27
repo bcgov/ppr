@@ -15,3 +15,7 @@ export const mutateMhrTransferDate = (state: StateIF, transferDate: string) => {
 export const mutateMhrTransferOwnLand = (state: StateIF, isOwnLand: boolean) => {
   state.stateModel.mhrTransfer.ownLand = isOwnLand
 }
+
+export const mutateMhrTransferAttentionReference = (state: StateIF, attentionReference: string) => {
+  state.stateModel.mhrTransfer.attentionReference = attentionReference
+}

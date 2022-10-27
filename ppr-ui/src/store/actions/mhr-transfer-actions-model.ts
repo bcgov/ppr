@@ -15,3 +15,7 @@ export const setMhrTransferDate: ActionIF = ({ commit }, transferDate: string): 
 export const setMhrTransferOwnLand: ActionIF = ({ commit }, isOwnLand: boolean): void => {
   commit('mutateMhrTransferOwnLand', isOwnLand)
 }
+
+export const setMhrTransferAttentionReference: ActionIF = ({ commit }, attentionReference: string): void => {
+  commit('mutateMhrTransferAttentionReference', attentionReference)
+}

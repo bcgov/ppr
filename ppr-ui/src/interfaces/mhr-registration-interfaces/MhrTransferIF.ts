@@ -16,6 +16,7 @@ export interface MhrTransferIF {
   ownerGroups: MhrRegistrationHomeOwnerGroupIF[]
   currentOwnerGroups?: MhrRegistrationHomeOwnerGroupIF[]
   submittingParty: PartyIF
+  attentionReference: string
   error?: ErrorIF
 }
 
@@ -29,6 +30,7 @@ export interface MhrTransferApiIF {
   transferDate: string
   ownLand: boolean
   submittingParty: SubmittingPartyIF
+  attentionReference: string
   deleteOwnerGroups?: Array<MhrHomeOwnerGroupIF>
   addOwnerGroups: Array<MhrHomeOwnerGroupIF>
   createDateTime?: string

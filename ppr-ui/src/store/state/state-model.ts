@@ -278,6 +278,7 @@ export const stateModel: StateModelIF = {
     declaredValue: null,
     consideration: '',
     transferDate: '',
+    attentionReference: '',
     ownLand: false
   }
 }
