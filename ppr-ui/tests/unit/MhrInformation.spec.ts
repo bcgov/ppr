@@ -23,7 +23,7 @@ import {
 } from './test-data'
 import { CertifyIF, MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF } from '@/interfaces'
 import { nextTick } from '@vue/composition-api'
-import { TransferDetails } from '@/components/mhrTransfers'
+import { TransferDetails, TransferDetailsReview } from '@/components/mhrTransfers'
 import { CertifyInformation } from '@/components/common'
 import { toDisplayPhone } from '@/utils'
 
@@ -393,5 +393,44 @@ describe('Mhr Information', () => {
     expect(accountInfoText).toContain(mockedAccountInfo.mailingAddress.city)
     expect(accountInfoText).toContain(mockedAccountInfo.mailingAddress.street)
     expect(accountInfoText).toContain(mockedAccountInfo.mailingAddress.postalCode)
+  })
+
+  it('should render TransferDetailsReview on Review screen', async () => {
+    setupCurrentHomeOwners()
+    wrapper.vm.$data.dataLoaded = true
+    await Vue.nextTick()
+
+    // set some test values for transfer details fields
+    const mhrTransferDetailsComponent = wrapper.findComponent(MhrInformation).findComponent(TransferDetails)
+    mhrTransferDetailsComponent.find(getTestId('declared-value')).setValue(123456)
+    mhrTransferDetailsComponent.find(getTestId('declared-value')).trigger('blur')
+    await Vue.nextTick()
+    mhrTransferDetailsComponent.find(getTestId('lease-own-checkbox')).setChecked()
+    await Vue.nextTick()
+
+    expect(wrapper.findComponent(TransferDetailsReview).exists()).toBeFalsy()
+
+    // go to Review screen
+    wrapper.find('#btn-stacked-submit').trigger('click')
+    await Vue.nextTick()
+    await Vue.nextTick()
+
+    // renders TranseferDetailsReview
+    expect(wrapper.findComponent(TransferDetailsReview).exists()).toBeTruthy()
+    const mhrTransferDetailsReviewComponent = wrapper.findComponent(TransferDetailsReview)
+
+    // displaying correct declared value
+    expect(mhrTransferDetailsReviewComponent.find('#declared-value-display')).toBeTruthy()
+    const currentDeclaredValue = mhrTransferDetailsReviewComponent.find('#declared-value-display')
+    expect(currentDeclaredValue.text()).toBe('$123456.00')
+
+    // autofilled consideration and displaying correct consideration value
+    expect(mhrTransferDetailsReviewComponent.find('#consideration-display')).toBeTruthy()
+    const currentConsideration = mhrTransferDetailsReviewComponent.find('#consideration-display')
+    expect(currentConsideration.text()).toBe('$123456.00')
+
+    // displaying lease land row when checked
+    expect(mhrTransferDetailsReviewComponent.find('#lease-land-display').exists()).toBeTruthy()
+
   })
 })

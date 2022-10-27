@@ -30,6 +30,16 @@ export const useMhrInformation = () => {
     'getMhrTransferHomeOwnerGroups'
   ])
 
+  const getTransferDetails = () => {
+    var transferDetails = {
+      declaredValue: getMhrTransferDeclaredValue.value,
+      consideration: getMhrTransferConsideration.value,
+      transferDate: getMhrTransferDate.value,
+      transferOwnLand: getMhrTransferOwnLand.value
+    }
+    return transferDetails
+  }
+
   const setTransferDetailsValid = (isValid: boolean) => {
     transferDetailsValid.value = isValid
   }
@@ -110,6 +120,7 @@ export const useMhrInformation = () => {
     setTransferDetailsValid,
     setRefNumValid,
     initMhrTransfer,
-    buildApiData
+    buildApiData,
+    getTransferDetails
   }
 }

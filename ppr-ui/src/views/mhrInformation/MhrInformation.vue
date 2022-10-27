@@ -43,6 +43,9 @@
                     :currentHomeOwners="getMhrTransferCurrentHomeOwners"
                   />
                 </section>
+                <section>
+                  <TransferDetailsReview class="py-6 pt-4 px-8"/>
+                </section>
                 <section id="transfer-submitting-party" class="submitting-party">
                   <AccountInfo
                     title="Submitting Party for this Change"
@@ -151,6 +154,7 @@ import { useHomeOwners, useInputRules, useMhrInformation } from '@/composables'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
 import TransferDetails from '@/components/mhrTransfers/TransferDetails.vue'
+import TransferDetailsReview from '@/components/mhrTransfers/TransferDetailsReview.vue'
 import { HomeOwners } from '@/views'
 import { BaseDialog } from '@/components/dialogs'
 import { BaseAddress } from '@/composables/address'
@@ -166,6 +170,7 @@ export default defineComponent({
     BaseDialog,
     HomeOwners,
     TransferDetails,
+    TransferDetailsReview,
     HomeOwnersTable,
     StickyContainer,
     CertifyInformation,
