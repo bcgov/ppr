@@ -184,23 +184,6 @@ class Report:  # pylint: disable=too-few-public-methods
         report_files['cover.pdf'] = content
         # Merge subreports
         return report_utils.merge_pdfs(report_files), status_code, {'Content-Type': 'application/pdf'}
-        # url = current_app.config.get('REPORT_SVC_URL') + MERGE_URI
-        # headers = {}
-        # token = GoogleStorageTokenService.get_report_api_token()
-        # if token:
-        #    headers['Authorization'] = 'Bearer {}'.format(token)
-        # # response = requests.post(url=url, headers=headers, files=report_files)
-        # req = requests.post(url=url, headers=headers, files=report_files, stream=True)
-        # response = Response(req.iter_content(chunk_size=10*1024), content_type=req.headers['Content-Type'])
-        # current_app.logger.debug(f'Merge search reports response status: {response.status_code}.')
-        # if response.status_code != HTTPStatus.OK:
-        #    # content = ResourceErrorCodes.REPORT_ERR + ': ' + response.content.decode('ascii')
-        #    content = ResourceErrorCodes.REPORT_ERR + ': ' + response.get_data(True)
-        #    current_app.logger.error('Account {0} merge response status: {1} error: {2}.'
-        #                             .format(self._account_id, response.status_code, content))
-        #    return jsonify(message=content), response.status_code, None
-        # # return response.content, response.status_code, {'Content-Type': 'application/pdf'}
-        # return response.get_data(), response.status_code, {'Content-Type': 'application/pdf'}
 
     def get_registration_mail_pdf(self):
         """Render a mail registration report with cover letter."""
@@ -888,11 +871,11 @@ class Report:  # pylint: disable=too-few-public-methods
         if self._get_environment() != '':
             self._report_data['footer_content'] = 'TEST DATA | ' + self._report_data['footer_content']
         if self._report_key == ReportTypes.SEARCH_DETAIL_REPORT and self._report_data.get('subreport'):
-            if len(self._report_data['footer_content']) > 58:
-                self._report_data['footer_content'] = self._report_data['footer_content'][0:58]
+            if len(self._report_data['footer_content']) > 75:
+                self._report_data['footer_content'] = self._report_data['footer_content'][0:75]
             self._report_data['footer_content'] += ' | Sub-report ' + self._report_data.get('subreport')
-        elif len(self._report_data['footer_content']) > 78:
-            self._report_data['footer_content'] = self._report_data['footer_content'][0:78]
+        elif len(self._report_data['footer_content']) > 99:
+            self._report_data['footer_content'] = self._report_data['footer_content'][0:99]
 
     @staticmethod
     def _get_environment():
