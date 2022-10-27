@@ -88,7 +88,9 @@
     {% if change.deleteDebtors is defined %}
         {% for party in change.deleteDebtors %}
             {% if party.edit is not defined %}
-                <tr><td colspan="2"><div class="separator-table-row mt-3 mb-3"></div></td></tr>            
+                {% if change.addDebtors is defined %}
+                    <tr><td colspan="2"><div class="separator-table-row mt-3 mb-3"></div></td></tr>
+                {% endif %}
                 <tr class="no-page-break">
                     <td class="col-40">
                         <div class="section-sub-title">
