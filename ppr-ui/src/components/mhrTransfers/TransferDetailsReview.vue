@@ -19,12 +19,9 @@
     </v-row>
     <v-row>
       <v-col cols="3">
-        <label class="generic-label"
-          >Bill of Sale Date of <br />
-          Execution</label
-        >
+        <label class="generic-label">Bill of Sale Date of<br/>Execution</label>
       </v-col>
-      <v-col cols="9" class="gray7">{{ transferDate }}</v-col>
+      <v-col cols="9" class="gray7">{{ convertDate(transferDate, false, false) }}</v-col>
     </v-row>
     <v-row v-if="isOwnLand" id="lease-land-display">
       <v-col cols="3">
@@ -45,7 +42,7 @@
 import { defineComponent, reactive, toRefs } from '@vue/composition-api'
 import { useMhrInformation } from '@/composables'
 import TransferDetails from '@/components/mhrTransfers/TransferDetails.vue'
-import moment from 'moment'
+import { convertDate } from '@/utils'
 
 export default defineComponent({
   name: 'TransferDetailsReview',
@@ -61,20 +58,20 @@ export default defineComponent({
   setup (props) {
     const { getTransferDetails } = useMhrInformation()
 
-    const formatDate = (inputDate: string) => {
-      return moment(inputDate).format('MMMM D, YYYY')
-    }
+    // const formatDate = (inputDate: string) => {
+    //   return moment(inputDate).format('MMMM D, YYYY')
+    // }
 
     const localState = reactive({
       declaredValue: getTransferDetails().declaredValue,
       consideration: getTransferDetails().consideration,
-      transferDate: formatDate(getTransferDetails().transferDate),
+      transferDate: getTransferDetails().transferDate,
       isOwnLand: getTransferDetails().transferOwnLand
     })
 
     return {
       getTransferDetails,
-      formatDate,
+      convertDate,
       ...toRefs(localState)
     }
   }

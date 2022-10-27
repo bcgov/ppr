@@ -420,12 +420,12 @@ describe('Mhr Information', () => {
     const mhrTransferDetailsReviewComponent = wrapper.findComponent(TransferDetailsReview)
 
     // displaying correct declared value
-    expect(mhrTransferDetailsReviewComponent.find('#declared-value-display')).toBeTruthy()
+    expect(mhrTransferDetailsReviewComponent.find('#declared-value-display').exists()).toBeTruthy()
     const currentDeclaredValue = mhrTransferDetailsReviewComponent.find('#declared-value-display')
     expect(currentDeclaredValue.text()).toBe('$123456.00')
 
     // autofilled consideration and displaying correct consideration value
-    expect(mhrTransferDetailsReviewComponent.find('#consideration-display')).toBeTruthy()
+    expect(mhrTransferDetailsReviewComponent.find('#consideration-display').exists()).toBeTruthy()
     const currentConsideration = mhrTransferDetailsReviewComponent.find('#consideration-display')
     expect(currentConsideration.text()).toBe('$123456.00')
 
