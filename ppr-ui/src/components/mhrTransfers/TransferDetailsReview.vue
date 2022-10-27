@@ -58,10 +58,6 @@ export default defineComponent({
   setup (props) {
     const { getTransferDetails } = useMhrInformation()
 
-    // const formatDate = (inputDate: string) => {
-    //   return moment(inputDate).format('MMMM D, YYYY')
-    // }
-
     const localState = reactive({
       declaredValue: getTransferDetails().declaredValue,
       consideration: getTransferDetails().consideration,
