@@ -29,18 +29,28 @@
 
               <!-- MHR Information Review Section -->
               <template v-if="isReviewMode">
-                <TransferDetailsReview/>
+                <HomeOwnersTable
+                  isMhrTransfer
+                  isReadonlyTable
+                  class="mt-n2 pl-32"
+                  :homeOwners="reviewOwners"
+                  :currentHomeOwners="getMhrTransferCurrentHomeOwners"
+                  ref="ownersTable"
+                />
+                <TransferDetailsReview class="py-6 pt-4 px-8"/>
+
                 <section id="transfer-certify-section" class="mt-10 py-4">
                   <CertifyInformation
                     :setShowErrors="validateAuthorizationError"
                     @certifyValid="authorizationValid = $event"
                   />
                 </section>
+
               </template>
 
               <!-- MHR Information Section -->
               <template v-else>
-                <HomeOwners isMhrTransfer class="mt-n2" />
+                <HomeOwners isMhrTransfer class="mt-n2"/>
                 <TransferDetails :validateTransferDetails="validateTransferDetails" />
               </template>
             </section>
@@ -278,4 +288,7 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+.pl-32 {
+  padding-left: 32px !important;
+}
 </style>
