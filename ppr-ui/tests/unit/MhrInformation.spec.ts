@@ -297,6 +297,46 @@ describe('Mhr Information', () => {
     expect(mhrTransferDetailsComponent.vm.$data.consideration).toBe('$123.00')
   })
 
+  it('should render Attention or Reference Number section on Review screen', async () => {
+    setupCurrentHomeOwners()
+    wrapper.vm.$data.dataLoaded = true
+    await Vue.nextTick()
+
+    expect(wrapper.find('#transfer-ref-num-section').exists()).toBeFalsy()
+
+    // go to Review screen
+    wrapper.find('#btn-stacked-submit').trigger('click')
+    await Vue.nextTick()
+
+    expect(wrapper.find('#transfer-ref-num-section').exists()).toBeTruthy()
+    expect(wrapper.find(getTestId('attn-ref-number-card')).classes('border-error-left')).toBeFalsy()
+
+    expect(wrapper.find(getTestId('attn-ref-number-field')).exists()).toBeTruthy()
+
+    // trigger error in Attn Ref Num field (40+ chars)
+    wrapper.find(getTestId('attn-ref-number-field')).setValue('5'.repeat(45))
+    expect(wrapper.vm.$data.attentionReferenceNum).toBe('5'.repeat(45))
+    await Vue.nextTick()
+    await Vue.nextTick()
+
+    expect(wrapper.find(getTestId('attn-ref-number-card')).classes('border-error-left')).toBeTruthy()
+    expect(
+      wrapper
+        .find(getTestId('attn-ref-number-card'))
+        .find('.v-input')
+        .classes('error--text')
+    ).toBeTruthy()
+    expect(
+      wrapper
+        .find(getTestId('attn-ref-number-card'))
+        .find('.v-text-field__details .v-messages__message')
+        .exists()
+    ).toBeTruthy()
+
+    // reset Attention Reference Number validation (to not affect other tests)
+    wrapper.vm.$data.isRefNumValid = true
+  })
+
   it('should render Authorization component on review', async () => {
     setupCurrentHomeOwners()
     wrapper.vm.$data.dataLoaded = true

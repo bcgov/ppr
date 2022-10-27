@@ -16,7 +16,7 @@
           <v-col cols="9">
             <v-row no-gutters id="mhr-information-header" class="pt-3 pb-3 soft-corners-top">
               <v-col cols="auto">
-                <h1>{{isReviewMode ? 'Review and Confirm' : 'Manufactured Home Information'}}</h1>
+                <h1>{{ isReviewMode ? 'Review and Confirm' : 'Manufactured Home Information' }}</h1>
                 <p class="mt-7">
                   This is the current information for this registration as of
                   <span class="font-weight-bold">{{ asOfDateTime }}</span>.
@@ -51,6 +51,44 @@
                     :accountInfo="accountInfo"
                   />
                 </section>
+
+                <section id="transfer-ref-num-section" class="mt-10 py-4">
+                  <h2>1. Attention or Reference Number</h2>
+                  <p class="mt-2">
+                    Add an optional Attention or Reference Number information for this transaction. If entered, it will
+                    appear on the Transfer Verification document.
+                  </p>
+                  <v-card
+                    flat
+                    rounded
+                    id="attention-or-reference-number-card"
+                    class="mt-8 pa-8 pr-6 pb-3"
+                    :class="{ 'border-error-left': !isRefNumValid }"
+                    data-test-id="attn-ref-number-card"
+                  >
+                    <v-form ref="reference-number-form" v-model="refNumValid">
+                      <v-row no-gutters class="pt-3">
+                        <v-col cols="3">
+                          <label class="generic-label" :class="{ 'error-text': !isRefNumValid }">
+                            Attention or Reference Number
+                          </label>
+                        </v-col>
+                        <v-col cols="9" class="px-1">
+                          <v-text-field
+                            filled
+                            id="attention-or-reference-number"
+                            class="pr-2"
+                            label="Attention or Reference Number (Optional)"
+                            v-model="attentionReferenceNum"
+                            :rules="maxLength(40)"
+                            data-test-id="attn-ref-number-field"
+                          />
+                        </v-col>
+                      </v-row>
+                    </v-form>
+                  </v-card>
+                </section>
+
                 <section id="transfer-certify-section" class="mt-10 py-4">
                   <CertifyInformation
                     :setShowErrors="validateAuthorizationError"
@@ -65,7 +103,6 @@
                 <TransferDetails :validateTransferDetails="validateTransferDetails" />
               </template>
             </section>
-
           </v-col>
           <v-col class="pl-6 pt-5" cols="3">
             <aside>
@@ -95,12 +132,13 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, reactive, toRefs } from '@vue/composition-api'
+import { computed, defineComponent, onMounted, reactive, toRefs, watch } from '@vue/composition-api'
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { ActionTypes, RouteNames } from '@/enums'
 import {
-  createMhrTransferDraft, deleteMhrDraft,
+  createMhrTransferDraft,
+  deleteMhrDraft,
   fetchMhRegistration,
   getAccountInfoFromAuth,
   getMhrTransferDraft,
@@ -109,7 +147,7 @@ import {
   updateMhrDraft
 } from '@/utils'
 import { StickyContainer, CertifyInformation } from '@/components/common'
-import { useHomeOwners, useMhrInformation } from '@/composables'
+import { useHomeOwners, useInputRules, useMhrInformation } from '@/composables'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
 import TransferDetails from '@/components/mhrTransfers/TransferDetails.vue'
@@ -167,6 +205,8 @@ export default defineComponent({
 
     const {
       isTransferDetailsValid,
+      isRefNumValid,
+      setRefNumValid,
       initMhrTransfer,
       buildApiData
     } = useMhrInformation()
@@ -176,12 +216,15 @@ export default defineComponent({
       setShowGroups
     } = useHomeOwners(props.isMhrTransfer)
 
+    const { maxLength } = useInputRules()
+
     const localState = reactive({
       dataLoaded: false,
       loading: false,
       isReviewMode: false,
       validate: false,
       validateTransferDetails: false,
+      refNumValid: false,
       authorizationValid: false,
       validateAuthorizationError: false,
       accountInfo: null,
@@ -196,7 +239,7 @@ export default defineComponent({
         return localState.isReviewMode ? 'Back' : ''
       }),
       isValidTransfer: computed((): boolean => {
-        return !isGlobalEditingMode.value && isTransferDetailsValid.value && true // Get Owner Count here > 1 etc
+        return !isGlobalEditingMode.value && isTransferDetailsValid.value && isRefNumValid.value && true // Get Owner Count here > 1 etc
       }),
       transferErrorMsg: computed((): string => {
         return localState.validate && !localState.isValidTransfer ? '< Please make any required changes' : ''
@@ -207,9 +250,9 @@ export default defineComponent({
       reviewOwners: computed(() => {
         return getMhrTransferHomeOwners.value.filter(owner => owner.action !== ActionTypes.REMOVED)
       }),
+      attentionReferenceNum: '',
       options: unsavedChangesDialog,
       showCancelDialog: false
-
     })
 
     onMounted(async (): Promise<void> => {
@@ -326,12 +369,21 @@ export default defineComponent({
       }
     }
 
+    watch(
+      () => localState.refNumValid,
+      (isFormValid: boolean) => {
+        setRefNumValid(isFormValid)
+      }
+    )
+
     return {
       goToReview,
       onSave,
       goToDash,
       getMhrTransferHomeOwners,
       getMhrTransferCurrentHomeOwners,
+      maxLength,
+      isRefNumValid,
       ...toRefs(localState),
       handleDialogResp
     }
