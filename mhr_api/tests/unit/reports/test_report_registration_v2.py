@@ -42,6 +42,9 @@ TRANSFER_TEST_JT_DATAFILE = 'tests/unit/reports/data/trans-test-example-jt.json'
 TRANSFER_TEST_JT_PDFFILE = 'tests/unit/reports/data/trans-test-example-jt.pdf'
 TRANSFER_TEST_TC_DATAFILE = 'tests/unit/reports/data/trans-test-example-tc.json'
 TRANSFER_TEST_TC_PDFFILE = 'tests/unit/reports/data/trans-test-example-tc.pdf'
+
+EXEMPTION_TEST_RES_DATAFILE = 'tests/unit/reports/data/exempt-res-test-example.json'
+EXEMPTION_TEST_RES_PDFFILE = 'tests/unit/reports/data/exempt-res-test-example.pdf'
 REPORT_VERSION_V2 = '2'
 
 
@@ -160,6 +163,19 @@ def test_mail_registration(session, client, jwt):
         assert headers
         # verify
         check_response(content, status, REGISTRATON_MAIL_PDFFILE)
+
+
+def test_exemption_res(session, client, jwt):
+    """Assert that generation of a test report is as expected."""
+    # setup
+    if is_report_v2():
+        json_data = get_json_from_file(EXEMPTION_TEST_RES_DATAFILE)
+        report = Report(json_data, 'PS12345', ReportTypes.MHR_EXEMPTION, 'Account Name')
+        # test
+        content, status, headers = report.get_pdf()
+        assert headers
+        # verify
+        check_response(content, status, EXEMPTION_TEST_RES_PDFFILE)
 
 
 def get_json_from_file(data_file: str):

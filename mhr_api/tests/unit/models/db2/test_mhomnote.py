@@ -21,8 +21,7 @@ import pytest
 
 from flask import current_app
 
-from mhr_api.models import Db2Mhomnote
-
+from mhr_api.models import Db2Mhomnote, utils as model_utils
 
 # testdata pattern is ({exists}, {manuhome_id}, {doc_id}, {doc_type}, {expiry}, {count})
 TEST_DATA = [
@@ -30,7 +29,8 @@ TEST_DATA = [
     (True, 7, '90011251', '103', '2012-02-24', 2),
     (False, 0, None, None, None, 0)
 ]
-
+LEGACY_ADDRESS = '222 SUMMER STREET                                                               VICTORIA' + \
+                 '                                BC CA                            V8W 2V8'
 
 @pytest.mark.parametrize('exists,manuhome_id,doc_id,doc_type,expiry,count', TEST_DATA)
 def test_find_by_manuhome_id(session, exists, manuhome_id, doc_id, doc_type, expiry, count):
@@ -107,20 +107,15 @@ def test_note_json(session):
                        destroyed='N',
                        phone_number='6041234567',
                        name='contact _name',
-                       legacy_address='legacy address',
+                       legacy_address=LEGACY_ADDRESS,
                        remarks='remarks')
 
     test_json = {
-        'noteId': note.note_id,
-        'noteNumber': note.note_number,
-        'status': note.status,
-        'registrationDocumentId': note.reg_document_id,
-        'canDocumentId': note.can_document_id,
         'documentType': note.document_type,
-        'destroyed': note.destroyed,
-        'phoneNumber': note.phone_number,
-        'name': note.name,
-        'legacyAddress': note.legacy_address,
-        'remarks': note.remarks
+        'documentId': note.reg_document_id,
+        'remarks': note.remarks,
+        'destroyed': False,
+        'contactName': note.name,
+        'contactAddress': model_utils.get_address_from_db2(note.legacy_address, '')
     }
     assert note.json == test_json

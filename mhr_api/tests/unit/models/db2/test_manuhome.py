@@ -21,10 +21,10 @@ from http import HTTPStatus
 
 from flask import current_app
 import pytest
-from registry_schemas.example_data.mhr import REGISTRATION, LOCATION, TRANSFER
+from registry_schemas.example_data.mhr import REGISTRATION, LOCATION, TRANSFER, EXEMPTION
 
 from mhr_api.exceptions import BusinessException
-from mhr_api.models import Db2Document, Db2Manuhome, Db2Owngroup, MhrRegistration
+from mhr_api.models import Db2Document, Db2Manuhome, Db2Mhomnote, Db2Owngroup, MhrRegistration
 from mhr_api.services.authz import MANUFACTURER_GROUP, QUALIFIED_USER_GROUP, GOV_ACCOUNT_ROLE
 
 
@@ -40,6 +40,12 @@ TEST_MHR_NUM_DATA = [
 ]
 # testdata pattern is ({mhr_num}, {group_id}, {doc_id_prefix}, {account_id})
 TEST_DATA_TRANSFER = [
+    ('150062', GOV_ACCOUNT_ROLE, '9', '2523'),
+    ('150062', MANUFACTURER_GROUP, '8', '2523'),
+    ('150062', QUALIFIED_USER_GROUP, '1', '2523')
+]
+# testdata pattern is ({mhr_num}, {group_id}, {doc_id_prefix}, {account_id})
+TEST_DATA_EXEMPTION = [
     ('150062', GOV_ACCOUNT_ROLE, '9', '2523'),
     ('150062', MANUFACTURER_GROUP, '8', '2523'),
     ('150062', QUALIFIED_USER_GROUP, '1', '2523')
@@ -315,6 +321,54 @@ def test_create_transfer_from_json(session, mhr_num, user_group, doc_id_prefix, 
     assert doc.transfer_execution_date
     assert doc.transfer_execution_date.year == 2022
     assert doc.transfer_execution_date.month == 10
+
+
+@pytest.mark.parametrize('mhr_num,user_group,doc_id_prefix,account_id', TEST_DATA_EXEMPTION)
+def test_create_exemption_from_json(session, mhr_num, user_group, doc_id_prefix, account_id):
+    """Assert that an MHR tranfer is created from MHR exemption json correctly."""
+    json_data = copy.deepcopy(EXEMPTION)
+    del json_data['documentId']
+    del json_data['documentRegistrationNumber']
+    del json_data['documentDescription']
+    del json_data['createDateTime']
+    del json_data['payment']
+    json_data['mhrNumber'] = mhr_num
+    json_data['nonResidential'] = False
+    json_data['note']['remarks'] = 'remarks'
+    json_data['note']['expiryDate'] = '2022-10-07T18:43:45+00:00'
+    base_reg: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account_id)
+    assert base_reg
+    assert base_reg.manuhome
+    assert base_reg.manuhome.reg_documents
+    # current_app.logger.info(json_data)
+    registration: MhrRegistration = MhrRegistration.create_exemption_from_json(base_reg,
+                                                                               json_data,
+                                                                               'PS12345',
+                                                                               'userid',
+                                                                               user_group)
+    assert registration.doc_id
+    assert json_data.get('documentId')
+    assert str(json_data.get('documentId')).startswith(doc_id_prefix)
+    manuhome: Db2Manuhome = Db2Manuhome.create_from_exemption(registration, json_data)
+    assert manuhome.mh_status == Db2Manuhome.StatusTypes.EXEMPT
+    assert len(manuhome.reg_documents) > 1
+    index: int = len(manuhome.reg_documents) - 1
+    doc: Db2Document = manuhome.reg_documents[index]
+    assert doc.id == registration.doc_id
+    assert doc.document_type == Db2Document.DocumentTypes.RES_EXEMPTION
+    assert doc.document_reg_id == registration.doc_reg_number
+    assert doc.attention_reference
+    assert doc.client_reference_id
+    assert doc.registration_ts
+    assert manuhome.reg_notes
+    note: Db2Mhomnote = manuhome.reg_notes[0]
+    assert note.document_type == doc.document_type
+    assert note.reg_document_id == doc.id
+    assert note.destroyed == 'N'
+    assert note.remarks == 'remarks'
+    assert note.expiry_date
+    assert note.expiry_date.year == 2022
+    assert note.expiry_date.month == 10
 
 
 def test_save_new(session):

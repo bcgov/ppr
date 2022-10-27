@@ -247,6 +247,11 @@ def validate_transfer(registration, json_data, is_staff: bool = False):
     return registration_validator.validate_transfer(registration, json_data, is_staff)
 
 
+def validate_exemption(registration, json_data, is_staff: bool = False):
+    """Perform non-schema extra validation on an exemption registration."""
+    return registration_validator.validate_exemption(registration, json_data, is_staff)
+
+
 def valid_api_key(request) -> bool:
     """Verify the callback request api key is valid."""
     key = get_apikey(request)

@@ -17,11 +17,11 @@ import copy
 from flask import current_app
 import pytest
 from registry_schemas import utils as schema_utils
-from registry_schemas.example_data.mhr import REGISTRATION, TRANSFER
+from registry_schemas.example_data.mhr import REGISTRATION, TRANSFER, EXEMPTION
 
 from mhr_api.utils import registration_validator as validator
 from mhr_api.models import MhrRegistration
-from mhr_api.models.type_tables import MhrRegistrationStatusTypes, MhrTenancyTypes
+from mhr_api.models.type_tables import MhrRegistrationStatusTypes, MhrTenancyTypes, MhrDocumentTypes
 from mhr_api.models.utils import is_legacy
 
 
@@ -311,6 +311,16 @@ TEST_TRANSFER_DATA = [
     (DESC_INVALID_GROUP_TYPE, False, False, None, validator.DELETE_GROUP_TYPE_INVALID,
      MhrRegistrationStatusTypes.ACTIVE)
 ]
+# testdata pattern is ({description}, {valid}, {staff}, {doc_id}, {message content}, {status})
+TEST_EXEMPTION_DATA = [
+    (DESC_VALID, True, True, DOC_ID_VALID, None, MhrRegistrationStatusTypes.ACTIVE),
+    ('Valid no doc id not staff', True, False, None, None, None),
+    (DESC_MISSING_DOC_ID, False, True, None, validator.DOC_ID_REQUIRED, None),
+    (DESC_DOC_ID_EXISTS, False, True, DOC_ID_EXISTS, validator.DOC_ID_EXISTS, None),
+    ('Invalid EXEMPT', False, False, None, validator.STATE_NOT_ALLOWED, MhrRegistrationStatusTypes.EXEMPT),
+    ('Invalid HISTORICAL', False, False, None, validator.STATE_NOT_ALLOWED, MhrRegistrationStatusTypes.HISTORICAL),
+    ('Invalid note doc type', False, False, None, validator.NOTE_DOC_TYPE_INVALID, MhrRegistrationStatusTypes.ACTIVE)
+]
 # testdata pattern is ({description}, {valid}, {staff}, {tran_dt}, {dec_val}, {consideration}, {message content})
 TEST_TRANSFER_DATA_EXTRA = [
     ('Valid staff exists', True, True, True, True, True, None),
@@ -516,6 +526,36 @@ def test_validate_transfer_group_interest(session, desc, valid, numerator, denom
     error_msg = validator.validate_transfer(registration, json_data, False)
     if errors:
         current_app.logger.debug(errors)
+    if valid:
+        assert valid_format and error_msg == ''
+    else:
+        assert error_msg != ''
+        if message_content:
+            assert error_msg.find(message_content) != -1
+
+
+@pytest.mark.parametrize('desc,valid,staff,doc_id,message_content,status', TEST_EXEMPTION_DATA)
+def test_validate_exemption(session, desc, valid, staff, doc_id, message_content, status):
+    """Assert that MH exemption validation works as expected."""
+    # setup
+    json_data = copy.deepcopy(EXEMPTION)
+    if staff and doc_id:
+        json_data['documentId'] = doc_id
+    elif json_data.get('documentId'):
+        del json_data['documentId']
+    if desc == 'Invalid note doc type':
+        json_data['note']['documentType'] = MhrDocumentTypes.CAUC
+    del json_data['submittingParty']['phoneExtension']
+    current_app.logger.info(json_data)
+    valid_format, errors = schema_utils.validate(json_data, 'exemption', 'mhr')
+    # Additional validation not covered by the schema.
+    registration: MhrRegistration = MhrRegistration.find_by_mhr_number('045349', 'PS12345')
+    if status:
+        registration.status_type = status
+    error_msg = validator.validate_exemption(registration, json_data, staff)
+    if errors:
+        for err in errors:
+            current_app.logger.debug(err.message)
     if valid:
         assert valid_format and error_msg == ''
     else:
