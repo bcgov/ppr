@@ -9,21 +9,21 @@
       <v-col cols="3">
         <label class="generic-label">Declared Value of Home</label>
       </v-col>
-      <v-col cols="9" class="gray7" id="declared-value-display">${{ declaredValue }}.00</v-col>
+      <v-col cols="9" class="gray7" id="declared-value-display">${{ getMhrTransferDeclaredValue }}.00</v-col>
     </v-row>
     <v-row>
       <v-col cols="3">
         <label class="generic-label">Consideration</label>
       </v-col>
-      <v-col cols="9" class="gray7" id="consideration-display">{{ consideration }}</v-col>
+      <v-col cols="9" class="gray7" id="consideration-display">{{ getMhrTransferConsideration }}</v-col>
     </v-row>
     <v-row>
       <v-col cols="3">
         <label class="generic-label">Bill of Sale Date of<br/>Execution</label>
       </v-col>
-      <v-col cols="9" class="gray7">{{ convertDate(transferDate, false, false) }}</v-col>
+      <v-col cols="9" class="gray7">{{ convertDate(getMhrTransferDate, false, false) }}</v-col>
     </v-row>
-    <v-row v-if="isOwnLand" id="lease-land-display">
+    <v-row v-if="getMhrTransferOwnLand" id="lease-land-display">
       <v-col cols="3">
         <label class="generic-label"
           >Lease or Land<br />
@@ -39,10 +39,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs } from '@vue/composition-api'
-import { useMhrInformation } from '@/composables'
+import { defineComponent } from '@vue/composition-api'
 import TransferDetails from '@/components/mhrTransfers/TransferDetails.vue'
 import { convertDate } from '@/utils'
+import { useGetters } from 'vuex-composition-helpers'
 
 export default defineComponent({
   name: 'TransferDetailsReview',
@@ -56,19 +56,24 @@ export default defineComponent({
     }
   },
   setup (props) {
-    const { getTransferDetails } = useMhrInformation()
-
-    const localState = reactive({
-      declaredValue: getTransferDetails().declaredValue,
-      consideration: getTransferDetails().consideration,
-      transferDate: getTransferDetails().transferDate,
-      isOwnLand: getTransferDetails().transferOwnLand
-    })
+    const {
+      getMhrTransferDeclaredValue,
+      getMhrTransferConsideration,
+      getMhrTransferDate,
+      getMhrTransferOwnLand
+    } = useGetters<any>([
+      'getMhrTransferDeclaredValue',
+      'getMhrTransferConsideration',
+      'getMhrTransferDate',
+      'getMhrTransferOwnLand'
+    ])
 
     return {
-      getTransferDetails,
-      convertDate,
-      ...toRefs(localState)
+      getMhrTransferDeclaredValue,
+      getMhrTransferConsideration,
+      getMhrTransferDate,
+      getMhrTransferOwnLand,
+      convertDate
     }
   }
 })
