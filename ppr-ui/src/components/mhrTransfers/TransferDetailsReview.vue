@@ -25,9 +25,7 @@
     </v-row>
     <v-row v-if="getMhrTransferOwnLand" id="lease-land-display">
       <v-col cols="3">
-        <label class="generic-label"
-          >Lease or Land<br />
-          Ownership</label
+        <label class="generic-label">Lease or Land Ownership</label
         >
       </v-col>
       <v-col cols="9" class="gray7"
