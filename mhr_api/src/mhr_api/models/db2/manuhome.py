@@ -115,6 +115,24 @@ class Db2Manuhome(db.Model):
             current_app.logger.error('Db2Manuhome.save_transfer exception: ' + str(db_exception))
             raise DatabaseException(db_exception)
 
+    def save_exemption(self):
+        """Save the object with exemption changes to the database immediately."""
+        try:
+            db.session.add(self)
+            if self.reg_documents:
+                index: int = len(self.reg_documents) - 1
+                doc: Db2Document = self.reg_documents[index]
+                doc.save()
+                if self.reg_notes:
+                    index: int = len(self.reg_notes) - 1
+                    note: Db2Mhomnote = self.reg_notes[index]
+                    if note.reg_document_id == doc.id:
+                        note.save()
+            db.session.commit()
+        except Exception as db_exception:   # noqa: B902; return nicer error
+            current_app.logger.error('Db2Manuhome.save_exemption exception: ' + str(db_exception))
+            raise DatabaseException(db_exception)
+
     @classmethod
     def find_by_id(cls, id: int):
         """Return the mh matching the id."""
@@ -180,6 +198,10 @@ class Db2Manuhome(db.Model):
                     manuhome.reg_owner_groups.append(group)
                 elif group.reg_document_id == document_id:
                     manuhome.reg_owner_groups.append(group)
+        elif doc.document_type in (Db2Document.DocumentTypes.RES_EXEMPTION,
+                                   Db2Document.DocumentTypes.NON_RES_EXEMPTION):
+            current_app.logger.debug('Db2Manuhome.find_by_document_id Db2Mhomnote query.')
+            manuhome.reg_notes = Db2Mhomnote.find_by_document_id(document_id)
         return manuhome
 
     @classmethod
@@ -284,6 +306,11 @@ class Db2Manuhome(db.Model):
             man_home['affirmByName'] = doc_json.get('affirmByName')
             if doc_json.get('transferDate'):
                 man_home['transferDate'] = doc_json.get('transferDate')
+        elif doc.document_type in (Db2Document.DocumentTypes.RES_EXEMPTION,
+                                   Db2Document.DocumentTypes.NON_RES_EXEMPTION) and self.reg_notes:
+            for note in self.reg_notes:
+                if note.reg_document_id == doc_id:
+                    man_home['note'] = note.json
         else:
             if self.reg_owner_groups:
                 groups = []
@@ -538,10 +565,11 @@ class Db2Manuhome(db.Model):
         if not registration.manuhome:
             current_app.logger.info(f'registration id={registration.id} no manuhome: nothing to save.')
             return
-        manuhome = registration.manuhome
+        manuhome: Db2Manuhome = registration.manuhome
         now_local = model_utils.today_local()
         manuhome.update_date = now_local.date()
         manuhome.update_time = now_local.time()
+        manuhome.update_count = manuhome.update_count + 1
         doc_type = Db2Document.DocumentTypes.TRANS
         if reg_json.get('deathOfOwner'):
             doc_type = Db2Document.DocumentTypes.TRAND
@@ -573,4 +601,30 @@ class Db2Manuhome(db.Model):
                 manuhome.reg_owner_groups.append(group)
             Db2Manuhome.adjust_group_interest(manuhome.reg_owner_groups, False)
         registration.id = reg_id
+        return manuhome
+
+    @staticmethod
+    def create_from_exemption(registration, reg_json):
+        """Create a new exemption registration: update manuhome, create document, create note."""
+        if not registration.manuhome:
+            current_app.logger.info(f'registration id={registration.id} no manuhome: nothing to save.')
+            return
+        manuhome: Db2Manuhome = registration.manuhome
+        now_local = model_utils.today_local()
+        manuhome.update_date = now_local.date()
+        manuhome.update_time = now_local.time()
+        manuhome.update_count = manuhome.update_count + 1
+        manuhome.mh_status = Db2Manuhome.StatusTypes.EXEMPT
+        doc_type = Db2Document.DocumentTypes.RES_EXEMPTION
+        if reg_json.get('nonResidential'):
+            doc_type = Db2Document.DocumentTypes.NON_RES_EXEMPTION
+        # Create document
+        doc: Db2Document = Db2Document.create_from_registration(registration,
+                                                                reg_json,
+                                                                doc_type,
+                                                                now_local)
+        manuhome.reg_documents.append(doc)
+        # Add note.
+        if reg_json.get('note'):
+            manuhome.reg_notes.append(Db2Mhomnote.create_from_registration(reg_json.get('note'), doc, manuhome.id))
         return manuhome

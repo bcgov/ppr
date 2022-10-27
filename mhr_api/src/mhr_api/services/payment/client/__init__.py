@@ -37,7 +37,9 @@ TRANSACTION_TO_FILING_TYPE = {
     'SEARCH_STAFF_COMBO': 'CSRCS',
     'CERTIFIED': 'MHRCD',
     'REGISTRATION': 'INREG',
-    'TRANSFER': 'NTTRF'
+    'TRANSFER': 'NTTRF',
+    'EXEMPTION_RES': 'EXEMP',
+    'EXEMPTION_NON_RES': 'EXEMN'
 }
 
 # Mapping from normal filing type to staff version of filing type

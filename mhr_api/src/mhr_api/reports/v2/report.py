@@ -311,7 +311,9 @@ class Report:  # pylint: disable=too-few-public-methods
         else:
             self._set_addresses()
             self._set_date_times()
-            if self._report_key not in (ReportTypes.MHR_REGISTRATION, ReportTypes.MHR_TRANSFER):
+            if self._report_key not in (ReportTypes.MHR_REGISTRATION,
+                                        ReportTypes.MHR_TRANSFER,
+                                        ReportTypes.MHR_EXEMPTION):
                 self._set_notes()
             if self._report_key == ReportTypes.SEARCH_DETAIL_REPORT:
                 self._set_selected()
@@ -319,7 +321,7 @@ class Report:  # pylint: disable=too-few-public-methods
             elif self._report_key == ReportTypes.SEARCH_BODY_REPORT:
                 # Add PPR search template setup here:
                 self._set_ppr_search()
-            if self._report_key != ReportTypes.MHR_TRANSFER:
+            if self._report_key not in (ReportTypes.MHR_TRANSFER, ReportTypes.MHR_EXEMPTION):
                 self._set_location()
                 current_app.logger.info('5')
                 self._set_description()
@@ -385,7 +387,7 @@ class Report:  # pylint: disable=too-few-public-methods
         if self._report_key in (ReportTypes.SEARCH_DETAIL_REPORT, ReportTypes.SEARCH_BODY_REPORT) and \
                 self._report_data['totalResultsSize'] > 0:
             self._set_search_addresses()
-        elif self._report_key in (ReportTypes.MHR_REGISTRATION, ReportTypes.MHR_TRANSFER):
+        elif self._report_key in (ReportTypes.MHR_REGISTRATION, ReportTypes.MHR_TRANSFER, ReportTypes.MHR_EXEMPTION):
             self._set_registration_addresses()
 
     def _set_search_addresses(self):
@@ -465,7 +467,7 @@ class Report:  # pylint: disable=too-few-public-methods
                         Report._to_report_datetime(reg['description']['engineerDate'], False)
             else:
                 reg['description']['engineerDate'] = ''
-        elif self._report_key == ReportTypes.MHR_TRANSFER:
+        elif self._report_key in (ReportTypes.MHR_TRANSFER, ReportTypes.MHR_EXEMPTION):
             reg = self._report_data
             reg['createDateTime'] = Report._to_report_datetime(reg['createDateTime'])
 
@@ -528,7 +530,8 @@ class Report:  # pylint: disable=too-few-public-methods
                 self._report_data['footer_content'] = f'MHR Number Search - "{criteria}"'
             else:
                 self._report_data['footer_content'] = f'MHR {search_desc} Search - "{criteria}"'
-        elif self._report_key in (ReportTypes.MHR_REGISTRATION, ReportTypes.MHR_COVER, ReportTypes.MHR_TRANSFER):
+        elif self._report_key in (ReportTypes.MHR_REGISTRATION, ReportTypes.MHR_COVER,
+                                  ReportTypes.MHR_TRANSFER, ReportTypes.MHR_EXEMPTION):
             reg_num = self._report_data.get('mhrNumber', '')
             self._report_data['footer_content'] = f'Manufactured Home Registration #{reg_num}'
             self._report_data['meta_subject'] = f'Manufactured Home Registration Number: {reg_num}'
@@ -617,4 +620,11 @@ class ReportMeta:  # pylint: disable=too-few-public-methods
             'metaSubtitle': 'MANUFACTURED HOME ACT',
             'metaSubject': ''
         },
+        ReportTypes.MHR_EXEMPTION: {
+            'reportDescription': 'MHRExemption',
+            'fileName': 'exemptionV2',
+            'metaTitle': 'EXEMPTION VERIFICATION',
+            'metaSubtitle': 'MANUFACTURED HOME ACT',
+            'metaSubject': ''
+        }
     }

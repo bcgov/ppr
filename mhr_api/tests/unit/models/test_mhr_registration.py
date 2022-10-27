@@ -22,12 +22,12 @@ from http import HTTPStatus
 from flask import current_app
 
 import pytest
-from registry_schemas.example_data.mhr import REGISTRATION, TRANSFER
+from registry_schemas.example_data.mhr import REGISTRATION, TRANSFER, EXEMPTION
 
 from mhr_api.exceptions import BusinessException
-from mhr_api.models import MhrRegistration, MhrDraft, utils as model_utils
+from mhr_api.models import MhrRegistration, MhrDraft, MhrDocument, MhrNote, utils as model_utils
 from mhr_api.models.type_tables import MhrLocationTypes, MhrPartyTypes, MhrOwnerStatusTypes, MhrStatusTypes
-from mhr_api.models.type_tables import MhrRegistrationTypes, MhrRegistrationStatusTypes
+from mhr_api.models.type_tables import MhrRegistrationTypes, MhrRegistrationStatusTypes, MhrDocumentTypes
 from mhr_api.services.authz import MANUFACTURER_GROUP, QUALIFIED_USER_GROUP, GOV_ACCOUNT_ROLE
 
 
@@ -53,7 +53,6 @@ TEST_ID_DATA = [
 ]
 # testdata pattern is ({mhr_number}, {has_results}, {account_id})
 TEST_MHR_NUM_DATA = [
-    ('UT-001', False, 'PS12345'),
     ('UX-XXX', False, 'PS12345'),
     ('150062', True, '2523')
 ]
@@ -70,6 +69,16 @@ TEST_DATA_TRANSFER = [
 ]
 # testdata pattern is ({mhr_num}, {group_id}, {account_id})
 TEST_DATA_TRANSFER_SAVE = [
+    ('150062', QUALIFIED_USER_GROUP, '2523')
+]
+# testdata pattern is ({mhr_num}, {group_id}, {doc_id_prefix}, {account_id})
+TEST_DATA_EXEMPTION = [
+    ('150062', GOV_ACCOUNT_ROLE, '9', '2523'),
+    ('150062', MANUFACTURER_GROUP, '8', '2523'),
+    ('150062', QUALIFIED_USER_GROUP, '1', '2523')
+]
+# testdata pattern is ({mhr_num}, {group_id}, {account_id})
+TEST_DATA_EXEMPTION_SAVE = [
     ('150062', QUALIFIED_USER_GROUP, '2523')
 ]
 # testdata pattern is ({http_status}, {document_id}, {mhr_num}, {doc_type}, {legacy}, {owner_count})
@@ -360,3 +369,97 @@ def test_save_transfer(session, mhr_num, user_group, account_id):
     assert reg_new
     draft_new = MhrDraft.find_by_draft_number(registration.draft.draft_number, True)
     assert draft_new
+
+
+@pytest.mark.parametrize('mhr_num,user_group,account_id', TEST_DATA_EXEMPTION_SAVE)
+def test_save_exemption(session, mhr_num, user_group, account_id):
+    """Assert that an MHR exemption is created from MHR exemption json correctly."""
+    json_data = copy.deepcopy(EXEMPTION)
+    del json_data['documentId']
+    del json_data['documentRegistrationNumber']
+    del json_data['documentDescription']
+    del json_data['createDateTime']
+    del json_data['payment']
+    json_data['mhrNumber'] = mhr_num
+    json_data['nonResidential'] = False
+    base_reg: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account_id)
+    assert base_reg
+    assert base_reg.manuhome
+    # current_app.logger.info(json_data)
+    registration: MhrRegistration = MhrRegistration.create_exemption_from_json(base_reg,
+                                                                               json_data,
+                                                                               account_id,
+                                                                               'userid',
+                                                                               user_group)
+    registration.save()
+    base_reg.save_exemption()
+    reg_new = MhrRegistration.find_by_mhr_number(registration.mhr_number,
+                                                 account_id,
+                                                 False,
+                                                 MhrRegistrationTypes.EXEMPTION_RES)
+    assert reg_new
+    draft_new = MhrDraft.find_by_draft_number(registration.draft.draft_number, True)
+    assert draft_new
+
+
+@pytest.mark.parametrize('mhr_num,user_group,doc_id_prefix,account_id', TEST_DATA_EXEMPTION)
+def test_create_exemption_from_json(session, mhr_num, user_group, doc_id_prefix, account_id):
+    """Assert that an MHR exemption is created from json correctly."""
+    json_data = copy.deepcopy(EXEMPTION)
+    del json_data['documentId']
+    del json_data['documentRegistrationNumber']
+    del json_data['documentDescription']
+    del json_data['createDateTime']
+    del json_data['payment']
+    json_data['mhrNumber'] = mhr_num
+    json_data['nonResidential'] = False
+    json_data['note']['remarks'] = 'remarks'
+    json_data['note']['expiryDate'] = '2022-10-07T18:43:45+00:00'
+    base_reg: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account_id)
+    assert base_reg
+    assert base_reg.manuhome
+    assert base_reg.manuhome.reg_documents
+    # current_app.logger.info(json_data)
+    registration: MhrRegistration = MhrRegistration.create_exemption_from_json(base_reg,
+                                                                               json_data,
+                                                                               account_id,
+                                                                               'userid',
+                                                                               user_group)
+    assert registration.id > 0
+    assert registration.doc_id
+    assert json_data.get('documentId')
+    assert str(json_data.get('documentId')).startswith(doc_id_prefix)
+    assert registration.mhr_number == mhr_num
+    assert registration.registration_ts
+    assert registration.status_type == MhrRegistrationStatusTypes.ACTIVE
+    assert registration.registration_type == MhrRegistrationTypes.EXEMPTION_RES
+    assert registration.account_id == account_id
+    assert registration.client_reference_id    
+    assert registration.draft
+    assert registration.draft.id > 0
+    assert registration.draft_id == registration.draft.id
+    assert registration.draft.draft_number
+    assert registration.draft.registration_type == registration.registration_type
+    assert registration.draft.create_ts == registration.registration_ts
+    assert registration.draft.account_id == registration.account_id
+    assert registration.parties
+    sub_party = registration.parties[0]
+    assert sub_party.registration_id == registration.id
+    assert sub_party.party_type == MhrPartyTypes.SUBMITTING
+    if model_utils.is_legacy():
+        assert registration.manuhome
+    assert registration.documents
+    doc: MhrDocument = registration.documents[0]
+    assert doc.id > 0
+    assert doc.document_id == registration.doc_id
+    assert doc.document_type == MhrDocumentTypes.EXRS
+    assert doc.document_registration_number == registration.doc_reg_number
+    assert registration.notes
+    note: MhrNote = registration.notes[0]
+    assert note.document_type == doc.document_type
+    assert note.document_id == doc.id
+    assert note.destroyed == 'N'
+    assert note.remarks == 'remarks'
+    assert note.expiry_date
+    assert note.expiry_date.year == 2022
+    assert note.expiry_date.month == 10

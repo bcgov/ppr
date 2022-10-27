@@ -8,6 +8,68 @@
 	},
 	"item": [
 		{
+			"name": "exemptions",
+			"item": [
+				{
+					"name": "Create MH Residential Exemption",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"accept": true
+						}
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"description": "Prism only local mock server header.",
+								"key": "Prefer",
+								"type": "text",
+								"value": "example=/api/v1/searches/post"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"clientReferenceId\": \"UT-EXEMPTION-001\",\n  \"attentionReference\": \"15671-003 SHELLEY\",\n  \"submittingParty\": {\n    \"personName\": {\n      \"first\": \"JOHN\",\n      \"middle\": \"B\",\n      \"last\": \"SMITH\"\n    },\n    \"address\": {\n      \"street\": \"222 SUMMER STREET\",\n      \"city\": \"VICTORIA\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V8W 2V8\"\n    },\n    \"emailAddress\": \"jbsmith@gmail.com\",\n    \"phoneNumber\": \"2504930122\"\n  },\n  \"nonResidential\": false,\n  \"note\": {\n    \"documentType\": \"EXRS\",\n    \"remarks\": \"HOME IS TO BE USED AS A STORAGE SHED\"\n  }\n}\n"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/exemptions/150267",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"exemptions",
+								"150267"
+							]
+						},
+						"description": "Search step 1 submit a query example: search by a Financing Statement registration number which returns no results."
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "drafts",
 			"item": [
 				{
