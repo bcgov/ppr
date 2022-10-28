@@ -12,20 +12,19 @@
       disable-sort
       disable-pagination
     >
-      <template v-slot:header v-if="isMhrTransfer && hasRemovedAllHomeOwnerGroups(homeOwners) && !hideRemovedOwners">
-        <tr class="fs-14 text-center no-owners-head-row" data-test-id="no-data-msg">
-          <td class="pa-6" :colspan="homeOwnersTableHeaders.length">
-            No owners added yet.
-          </td>
-        </tr>
-      </template>
 
       <template v-slot:group.header="{ group, items }" class="group-header-slot">
-        <td :colspan="4" class="py-1">
+        <td
+          v-if="!(disableGroupHeader(group) && (hideRemovedOwners || isReadonlyTable))"
+          :colspan="4"
+          class="py-1"
+          :class="{'spacer-header': disableGroupHeader(group)}"
+        >
           <TableGroupHeader
             :groupId="group"
             :owners="hasActualOwners(items) ? items : []"
             :showEditActions="showEditActions"
+            :disableGroupHeader="disableGroupHeader(group)"
             :isMhrTransfer="isMhrTransfer"
           />
         </td>
@@ -48,7 +47,7 @@
 
         <tr
           v-else-if="row.item.ownerId"
-          :key="row.item.ownerId + homeOwners.indexOf(row.item)"
+          :key="row.item.ownerId"
           class="owner-info"
           :data-test-id="`owner-info-${row.item.ownerId}`"
         >
@@ -177,7 +176,7 @@
             </template>
           </td>
         </tr>
-        <tr v-else>
+        <tr v-else-if="!hideRemovedOwners">
           <td :colspan="4" class="py-1">
             <div
               v-if="showGroups"
@@ -209,7 +208,7 @@ import { toDisplayPhone } from '@/utils'
 import { AddEditHomeOwner } from '@/components/mhrRegistration/HomeOwners'
 import TableGroupHeader from '@/components/mhrRegistration/HomeOwners/TableGroupHeader.vue'
 /* eslint-disable no-unused-vars */
-import { MhrHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF } from '@/interfaces'
+import {MhrHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF} from '@/interfaces'
 import { ActionTypes } from '@/enums'
 /* eslint-enable no-unused-vars */
 import { useActions } from 'vuex-composition-helpers'
@@ -217,7 +216,7 @@ import { useActions } from 'vuex-composition-helpers'
 export default defineComponent({
   name: 'HomeOwnersTable',
   props: {
-    homeOwners: { default: () => [] as MhrRegistrationHomeOwnerIF[] },
+    homeOwners: { default: () => [] },
     isAdding: { default: false },
     isReadonlyTable: { type: Boolean, default: false },
     isMhrTransfer: { type: Boolean, default: false },
@@ -241,7 +240,9 @@ export default defineComponent({
       hasMinimumGroups,
       editHomeOwner,
       undoGroupRemoval,
-      hasRemovedAllHomeOwnerGroups
+      hasRemovedAllHomeOwners,
+      getTransferOrRegistrationHomeOwners,
+      getTransferOrRegistrationHomeOwnerGroups
     } = useHomeOwners(props.isMhrTransfer)
 
     const { setUnsavedChanges } = useActions<any>(['setUnsavedChanges'])
@@ -252,7 +253,10 @@ export default defineComponent({
       isAddingMode: computed((): boolean => props.isAdding),
       showTableError: computed((): boolean => showGroups.value && (hasMinimumGroups() || hasEmptyGroup.value)),
       showEditActions: computed((): boolean => !props.isReadonlyTable),
-      homeOwnersTableHeaders: props.isReadonlyTable ? homeOwnersTableHeadersReview : homeOwnersTableHeaders
+      homeOwnersTableHeaders: props.isReadonlyTable ? homeOwnersTableHeadersReview : homeOwnersTableHeaders,
+      addedGroupCount: computed((): number => {
+        return getTransferOrRegistrationHomeOwnerGroups().filter(group => group.action === ActionTypes.ADDED).length
+      })
     })
 
     const remove = (item): void => {
@@ -295,8 +299,19 @@ export default defineComponent({
       return item.action === ActionTypes.ADDED
     }
 
+    const isAddedHomeOwnerGroup = (groupId: number): boolean => {
+      return getTransferOrRegistrationHomeOwnerGroups()
+        .find(group => group.groupId === groupId)?.action === ActionTypes.ADDED
+    }
+
     const isRemovedHomeOwner = (item: MhrRegistrationHomeOwnerIF): boolean => {
       return item.action === ActionTypes.REMOVED
+    }
+
+    const disableGroupHeader = (groupId: number): boolean => {
+      return hasRemovedAllHomeOwners(props.homeOwners) &&
+        isAddedHomeOwnerGroup(groupId) &&
+        localState.addedGroupCount <= 1
     }
 
     watch(
@@ -323,7 +338,11 @@ export default defineComponent({
       isRemovedHomeOwner,
       markForRemoval,
       undoRemoval,
-      hasRemovedAllHomeOwnerGroups,
+      hasRemovedAllHomeOwners,
+      isAddedHomeOwnerGroup,
+      disableGroupHeader,
+      getTransferOrRegistrationHomeOwners,
+      getTransferOrRegistrationHomeOwnerGroups,
       ...toRefs(localState)
     }
   }
@@ -334,6 +353,11 @@ export default defineComponent({
 @import '@/assets/styles/theme.scss';
 
 .home-owners-table ::v-deep {
+  .spacer-header {
+    border-color: $gray1 !important;
+    background-color: $gray1 !important;
+  }
+
   tr.v-row-group__header,
   tbody tr.v-row-group__header:hover {
     background-color: #e2e8ee;
