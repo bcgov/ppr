@@ -23,7 +23,9 @@
                 </p>
               </v-col>
             </v-row>
-
+            <header id="yellow-message-bar" class="message-bar" v-if="isReviewMode">
+              <label><b>Important:</b> This information must match the information on the bill of sale</label>
+            </header>
             <section v-if="dataLoaded" class="py-4">
               <header class="review-header mt-1">
                 <v-icon class="ml-1" color="darkBlue">mdi-home</v-icon>
@@ -395,5 +397,15 @@ export default defineComponent({
 @import '@/assets/styles/theme.scss';
 .submitting-party {
   margin-top: 55px;
+}
+
+.message-bar{
+  font-size: 14px;
+  padding: 1.25rem;
+  background-color: $BCgovGold0;
+  border: 1px solid $BCgovGold5;
+  color: $gray7;
+  margin-top: 10px;
+  margin-bottom: 20px;
 }
 </style>

@@ -394,4 +394,27 @@ describe('Mhr Information', () => {
     expect(accountInfoText).toContain(mockedAccountInfo.mailingAddress.street)
     expect(accountInfoText).toContain(mockedAccountInfo.mailingAddress.postalCode)
   })
+
+  it('should render yellow message bar on the Review screen', async () => {
+    setupCurrentHomeOwners()
+    wrapper.vm.$data.dataLoaded = true
+    await Vue.nextTick()
+
+    // doesn't exist on manufactured home page
+    expect(wrapper.find('#yellow-message-bar').exists()).toBeFalsy()
+
+    // trigger review
+    wrapper.find('#btn-stacked-submit').trigger('click')
+    await Vue.nextTick()
+
+    // exists on review page
+    expect(wrapper.find('#yellow-message-bar').exists()).toBeTruthy()
+
+    //trigger back button
+    wrapper.find('#btn-stacked-back').trigger('click')
+    await Vue.nextTick()
+
+    // message is removed once out of review screen
+    expect(wrapper.find('#yellow-message-bar').exists()).toBeFalsy()
+  })
 })
