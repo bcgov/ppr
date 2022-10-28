@@ -17,9 +17,12 @@
             <v-row no-gutters id="mhr-information-header" class="pt-3 pb-3 soft-corners-top">
               <v-col cols="auto">
                 <h1>{{ isReviewMode ? 'Review and Confirm' : 'Manufactured Home Information' }}</h1>
-                <p class="mt-7">
+                <p class="mt-7" v-if="!isReviewMode">
                   This is the current information for this registration as of
                   <span class="font-weight-bold">{{ asOfDateTime }}</span>.
+                </p>
+                <p class="mt-7" v-else>
+                  Review your changes and complete the additional information before registering.
                 </p>
               </v-col>
             </v-row>
