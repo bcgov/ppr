@@ -189,7 +189,7 @@ import {
   setupFinancingStatementDraft,
   updateUserSettings,
   deleteMhRegistrationSummary,
-  deleteMhrDraft
+  deleteMhrDraft, mhrRegistrationHistory
 } from '@/utils'
 import {
   amendConfirmationDialog,
@@ -535,19 +535,7 @@ export default defineComponent({
       if (addReg.error) {
         myRegAddErrSetDialog(addReg.error)
       } else {
-      // set new item (watcher will add it etc.)
-        let parentRegNum = ''
-        if (regNum !== addReg.mhrNumber) {
-        // not a base registration so add parent reg num
-          parentRegNum = addReg.mhrNumber
-        }
-        const newRegItem: RegTableNewItemI = {
-          addedReg: regNum.toUpperCase(),
-          addedRegParent: parentRegNum,
-          addedRegSummary: addReg,
-          prevDraft: ''
-        }
-        setRegTableNewItem(newRegItem)
+        await fetchMhRegistrations()
       }
       localState.loading = false
     }
