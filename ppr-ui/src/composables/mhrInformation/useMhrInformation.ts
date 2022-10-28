@@ -6,6 +6,7 @@ import { ActionTypes, ApiHomeTenancyTypes, HomeTenancyTypes } from '@/enums'
 // Validation flag for Transfer Details
 const transferDetailsValid = ref(false)
 
+// Validation flags for Review Confirm screen
 const refNumValid = ref(true)
 
 export const useMhrInformation = () => {
@@ -48,7 +49,8 @@ export const useMhrInformation = () => {
       declaredValue: null,
       consideration: '',
       transferDate: '',
-      ownLand: false
+      ownLand: false,
+      attentionReference: ''
     }
   }
 
