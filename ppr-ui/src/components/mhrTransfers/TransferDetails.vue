@@ -124,12 +124,14 @@ export default defineComponent({
       setMhrTransferDeclaredValue,
       setMhrTransferConsideration,
       setMhrTransferDate,
-      setMhrTransferOwnLand
+      setMhrTransferOwnLand,
+      setUnsavedChanges
     } = useActions([
       'setMhrTransferDeclaredValue',
       'setMhrTransferConsideration',
       'setMhrTransferDate',
-      'setMhrTransferOwnLand'
+      'setMhrTransferOwnLand',
+      'setUnsavedChanges'
     ])
 
     const { setTransferDetailsValid } = useMhrInformation()
@@ -169,6 +171,7 @@ export default defineComponent({
       () => localState.declaredValue,
       async (val: string) => {
         await setMhrTransferDeclaredValue(parseInt(val) ? parseInt(val) : null)
+        setUnsavedChanges(true)
       }
     )
 
@@ -176,6 +179,7 @@ export default defineComponent({
       () => localState.consideration,
       (val: string) => {
         setMhrTransferConsideration(val)
+        setUnsavedChanges(true)
       }
     )
 
@@ -183,6 +187,7 @@ export default defineComponent({
       () => localState.transferDate,
       (val: string) => {
         setMhrTransferDate(val)
+        setUnsavedChanges(true)
       }
     )
 
@@ -190,6 +195,7 @@ export default defineComponent({
       () => localState.isOwnLand,
       (val: boolean) => {
         setMhrTransferOwnLand(val)
+        setUnsavedChanges(true)
       }
     )
 

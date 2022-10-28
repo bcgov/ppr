@@ -48,6 +48,9 @@
                     :currentHomeOwners="getMhrTransferCurrentHomeOwners"
                   />
                 </section>
+                <section>
+                  <TransferDetailsReview class="py-6 pt-4 px-8"/>
+                </section>
                 <section id="transfer-submitting-party" class="submitting-party">
                   <AccountInfo
                     title="Submitting Party for this Change"
@@ -156,6 +159,7 @@ import { useHomeOwners, useInputRules, useMhrInformation } from '@/composables'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
 import TransferDetails from '@/components/mhrTransfers/TransferDetails.vue'
+import TransferDetailsReview from '@/components/mhrTransfers/TransferDetailsReview.vue'
 import { HomeOwners } from '@/views'
 import { BaseDialog } from '@/components/dialogs'
 import { BaseAddress } from '@/composables/address'
@@ -171,6 +175,7 @@ export default defineComponent({
     BaseDialog,
     HomeOwners,
     TransferDetails,
+    TransferDetailsReview,
     HomeOwnersTable,
     StickyContainer,
     CertifyInformation,
@@ -213,7 +218,8 @@ export default defineComponent({
       isRefNumValid,
       setRefNumValid,
       initMhrTransfer,
-      buildApiData
+      buildApiData,
+      parseDraftRemovedOwnerGroups
     } = useMhrInformation()
 
     const {
@@ -244,7 +250,8 @@ export default defineComponent({
         return localState.isReviewMode ? 'Back' : ''
       }),
       isValidTransfer: computed((): boolean => {
-        return !isGlobalEditingMode.value && isTransferDetailsValid.value && isRefNumValid.value && true // Get Owner Count here > 1 etc
+        // Get Owner Count here > 1 etc
+        return !isGlobalEditingMode.value && isTransferDetailsValid.value && isRefNumValid.value && true
       }),
       transferErrorMsg: computed((): string => {
         return localState.validate && !localState.isValidTransfer ? '< Please make any required changes' : ''
@@ -307,8 +314,12 @@ export default defineComponent({
       if (getMhrInformation.value.draftNumber) {
         // Retrieve owners from draft if it exists
         const { registration } = await getMhrTransferDraft(getMhrInformation.value.draftNumber)
-        setShowGroups(registration.addOwnerGroups.length > 1)
-        setMhrTransferHomeOwnerGroups([...registration.addOwnerGroups])
+
+        setShowGroups(registration.addOwnerGroups.length > 1 || registration.deleteOwnerGroups.length > 1)
+        setMhrTransferHomeOwnerGroups([
+          ...parseDraftRemovedOwnerGroups(registration.deleteOwnerGroups),
+          ...registration.addOwnerGroups
+        ])
       } else {
         // Set current owners if there is no draft
         setMhrTransferHomeOwnerGroups(currentOwnerGroups)
@@ -329,8 +340,6 @@ export default defineComponent({
         const apiData = await buildApiData()
         const mhrTransferFiling = await submitMhrTransfer(apiData, getMhrInformation.value.mhrNumber)
         localState.loading = false
-        await setUnsavedChanges(false)
-
         if (!mhrTransferFiling.error) {
           // Delete the draft on successful submission
           if (getMhrInformation.value.draftNumber) await deleteMhrDraft(getMhrInformation.value.draftNumber)
@@ -360,6 +369,7 @@ export default defineComponent({
     const goToDash = (): void => {
       if (hasUnsavedChanges.value === true) localState.showCancelDialog = true
       else {
+        setUnsavedChanges(false)
         context.root.$router.push({
           name: RouteNames.DASHBOARD
         })

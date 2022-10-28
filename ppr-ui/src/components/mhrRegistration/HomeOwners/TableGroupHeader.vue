@@ -1,5 +1,5 @@
 <template>
-  <div :id="'mhr-home-edit-owners-group-' + groupId" class="group-header">
+  <div v-if="!disableGroupHeader" :id="'mhr-home-edit-owners-group-' + groupId" class="group-header">
     <BaseDialog
       :setDisplay="showDeleteGroupDialog"
       @proceed="cancelOrProceed($event, groupId)"
@@ -161,7 +161,8 @@ export default defineComponent({
     groupId: { default: 1 },
     owners: { default: [] },
     showEditActions: { type: Boolean, default: true },
-    isMhrTransfer: { type: Boolean, default: false }
+    isMhrTransfer: { type: Boolean, default: false },
+    disableGroupHeader: { type: Boolean, default: false }
   },
   components: {
     BaseDialog,
@@ -241,9 +242,10 @@ export default defineComponent({
     // Close Delete Group dialog or proceed to deleting a Group
     const cancelOrProceed = (proceed: boolean, groupId: number): void => {
       if (proceed) {
-        props.isMhrTransfer
-          ? markGroupForRemoval(groupId)
-          : deleteGroup(groupId)
+        if (props.isMhrTransfer && localState.group?.action !== ActionTypes.ADDED) {
+          markGroupForRemoval(groupId)
+        } else deleteGroup(groupId)
+
         localState.showDeleteGroupDialog = false
       } else {
         localState.showDeleteGroupDialog = false

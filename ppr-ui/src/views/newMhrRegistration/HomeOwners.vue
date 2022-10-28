@@ -133,7 +133,7 @@
       <v-row class="my-6" no-gutters>
         <v-col cols="12">
           <span class="generic-label">Home Tenancy Type: </span>
-          <span data-test-id="home-owner-tenancy-type">{{ hasRemovedAllOwners ? 'N/A' : homeTenancyType }}</span>
+          <span data-test-id="home-owner-tenancy-type">{{ homeTenancyType }}</span>
           <span v-show="showGroups && ownershipAllocation.hasMinimumGroupsError" class="error-text fs-14 ml-3">
             Must include more than one group of owners
           </span>
@@ -240,7 +240,7 @@ export default defineComponent({
       getTransferOrRegistrationHomeOwners,
       getTransferOrRegistrationHomeOwnerGroups,
       markGroupForRemoval,
-      hasRemovedAllHomeOwnerGroups
+      hasRemovedAllHomeOwners
     } = useHomeOwners(props.isMhrTransfer)
 
     const localState = reactive({
@@ -263,7 +263,7 @@ export default defineComponent({
       hasRemovedOwners: computed(() => {
         return localState.getHomeOwners.filter(ownerGroup => ownerGroup.action === ActionTypes.REMOVED).length > 0
       }),
-      hasRemovedAllOwners: computed(() => { return hasRemovedAllHomeOwnerGroups(localState.getHomeOwners) }),
+      hasRemovedAllOwners: computed(() => { return hasRemovedAllHomeOwners(localState.getHomeOwners) }),
       hideShowRemovedOwnersLabel: computed(() => { return localState.hideRemovedOwners ? 'Show' : 'Hide' })
     })
 

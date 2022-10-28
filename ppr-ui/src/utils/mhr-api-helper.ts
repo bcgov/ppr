@@ -112,7 +112,7 @@ export async function getMHRegistrationSummary (
     .get(`other-registrations/${registrationNum}`, getDefaultConfig())
     .then(response => {
       const data = response?.data as MhRegistrationSummaryIF
-      console.log(data)
+
       if (!data) throw new Error('Invalid API response')
       if (!refreshing && data.inUserList) {
         data.error = {
@@ -169,7 +169,7 @@ export async function addMHRegistrationSummary (registrationNum: string): Promis
   const config = { baseURL: url, headers: { Accept: 'application/json', 'Account-Id': currentAccountId } }
 
   return axios
-    .post(`other-registrations/registrations/${registrationNum}`, {}, config)
+    .post(`other-registrations/${registrationNum}`, {}, config)
     .then(response => {
       const data = response?.data as MhRegistrationSummaryIF
       if (!data) {

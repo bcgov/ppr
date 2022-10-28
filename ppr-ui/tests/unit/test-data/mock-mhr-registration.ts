@@ -1,4 +1,4 @@
-import {ActionTypes, HomeTenancyTypes} from '@/enums'
+import { ActionTypes, HomeTenancyTypes } from '@/enums'
 import {
   AddressIF,
   MhrRegistrationFractionalOwnershipIF,

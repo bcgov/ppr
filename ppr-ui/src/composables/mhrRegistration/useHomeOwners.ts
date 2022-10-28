@@ -69,10 +69,15 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
   }
 
   const getHomeTenancyType = (): HomeTenancyTypes => {
+    // Groups
+    const groups = getTransferOrRegistrationHomeOwnerGroups().filter(owner => owner.action !== ActionTypes.REMOVED)
+    const commonCondition = isMhrTransfer ? groups.length > 1 : showGroups.value
+
+    // Owners
     const owners = getTransferOrRegistrationHomeOwners().filter(owner => owner.action !== ActionTypes.REMOVED)
     const numOfOwners = owners.length
 
-    if (showGroups.value) {
+    if (commonCondition) {
       // At leas one group showing with one or more owners
       return HomeTenancyTypes.COMMON
     } else if (numOfOwners === 1 && owners[0]?.address) {
@@ -173,21 +178,28 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
     } else {
       homeOwnerGroups = [...getMhrRegistrationHomeOwnerGroups.value]
     }
+    // For Mhr Transfers with Removed Groups, assign a sequential groupId
+    const transferDefaultId = homeOwnerGroups.filter(group => group.action === ActionTypes.REMOVED).length + 1
+    const fallBackId = isMhrTransfer ? transferDefaultId : DEFAULT_GROUP_ID
 
     // Try to find a group to add the owner
     const groupToUpdate =
       homeOwnerGroups.find(
-        (group: MhrRegistrationHomeOwnerGroupIF) => group.groupId === (groupId || DEFAULT_GROUP_ID)
+        (group: MhrRegistrationHomeOwnerGroupIF) => group.groupId === (groupId || fallBackId)
       ) || ({} as MhrRegistrationHomeOwnerGroupIF)
 
-    if (groupToUpdate.owners) {
+    if (groupToUpdate.owners && groupToUpdate.action !== ActionTypes.REMOVED) {
       groupToUpdate.owners.push(owner)
     } else {
       // No groups exist, need to create a new one
       const newGroup = {
-        groupId: groupId || DEFAULT_GROUP_ID,
+        groupId: groupId || fallBackId,
         owners: [owner] as MhrRegistrationHomeOwnerIF[]
       } as MhrRegistrationHomeOwnerGroupIF
+
+      // Apply an ADDED action for new groups in Transfers
+      if (isMhrTransfer) newGroup.action = ActionTypes.ADDED
+
       homeOwnerGroups.push(newGroup)
     }
 
@@ -259,7 +271,13 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
   }
 
   const markGroupForRemoval = (groupId: number = null, removeAll: boolean = false): void => {
-    const homeOwners = getMhrTransferHomeOwnerGroups.value.reduce((homeOwners, group) => {
+    // Filter all ADDED groups when removing all groups
+    const ownerGroups = removeAll
+      ? getMhrTransferHomeOwnerGroups.value.filter(group => group.action !== ActionTypes.ADDED)
+      : getMhrTransferHomeOwnerGroups.value
+
+    // Apply Removed action to all owners being marked for removal (single or all)
+    const homeOwners = ownerGroups.reduce((homeOwners, group) => {
       if (group.groupId === groupId || removeAll) {
         const removedGroup = {
           ...group,
@@ -294,8 +312,8 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
     setMhrTransferHomeOwnerGroups(homeOwners)
   }
 
-  const hasRemovedAllHomeOwnerGroups = (homeOwners: MhrHomeOwnerGroupIF[]): boolean => {
-    return homeOwners.filter(group => group.action !== ActionTypes.REMOVED).length === 0
+  const hasRemovedAllHomeOwners = (homeOwners: MhrHomeOwnerGroupIF[]): boolean => {
+    return homeOwners.every(group => group.action === ActionTypes.REMOVED || group.action === ActionTypes.ADDED)
   }
 
   const setGroupFractionalInterest = (groupId: number, fractionalData: MhrRegistrationFractionalOwnershipIF): void => {
@@ -423,6 +441,6 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
     getTransferOrRegistrationHomeOwnerGroups,
     markGroupForRemoval,
     undoGroupRemoval,
-    hasRemovedAllHomeOwnerGroups
+    hasRemovedAllHomeOwners
   }
 }
