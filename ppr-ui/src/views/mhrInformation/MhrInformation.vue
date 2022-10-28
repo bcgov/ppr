@@ -208,7 +208,8 @@ export default defineComponent({
       isRefNumValid,
       setRefNumValid,
       initMhrTransfer,
-      buildApiData
+      buildApiData,
+      parseDraftRemovedOwnerGroups
     } = useMhrInformation()
 
     const {
@@ -239,7 +240,8 @@ export default defineComponent({
         return localState.isReviewMode ? 'Back' : ''
       }),
       isValidTransfer: computed((): boolean => {
-        return !isGlobalEditingMode.value && isTransferDetailsValid.value && isRefNumValid.value && true // Get Owner Count here > 1 etc
+        // Get Owner Count here > 1 etc
+        return !isGlobalEditingMode.value && isTransferDetailsValid.value && isRefNumValid.value && true
       }),
       transferErrorMsg: computed((): string => {
         return localState.validate && !localState.isValidTransfer ? '< Please make any required changes' : ''
@@ -302,8 +304,12 @@ export default defineComponent({
       if (getMhrInformation.value.draftNumber) {
         // Retrieve owners from draft if it exists
         const { registration } = await getMhrTransferDraft(getMhrInformation.value.draftNumber)
-        setShowGroups(registration.addOwnerGroups.length > 1)
-        setMhrTransferHomeOwnerGroups([...registration.addOwnerGroups])
+
+        setShowGroups(registration.addOwnerGroups.length > 1 || registration.deleteOwnerGroups.length > 1)
+        setMhrTransferHomeOwnerGroups([
+          ...parseDraftRemovedOwnerGroups(registration.deleteOwnerGroups),
+          ...registration.addOwnerGroups
+        ])
       } else {
         // Set current owners if there is no draft
         setMhrTransferHomeOwnerGroups(currentOwnerGroups)

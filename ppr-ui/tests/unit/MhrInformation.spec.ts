@@ -189,8 +189,8 @@ describe('Mhr Information', () => {
         .text()
     ).toBe(HomeTenancyTypes.SOLE)
 
-    // Add a second Owner
-    homeOwnerGroup.push({ groupId: 1, owners: [mockedOrganization] })
+    // Add a second Owner to the existing group
+    homeOwnerGroup[0].owners.push(mockedOrganization)
 
     await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerGroup)
     await Vue.nextTick()
@@ -204,7 +204,7 @@ describe('Mhr Information', () => {
     ).toBe(HomeTenancyTypes.JOINT)
 
     // Enable Groups
-    wrapper.findComponent(HomeOwners).vm.$data.setShowGroups(true)
+    homeOwnerGroup.push({ groupId: 2, owners: [mockedPerson] })
     await Vue.nextTick()
 
     expect(

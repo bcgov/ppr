@@ -301,7 +301,8 @@ export default defineComponent({
       editHomeOwner,
       showGroups,
       setShowGroups,
-      setGroupFractionalInterest
+      setGroupFractionalInterest,
+      getTransferOrRegistrationHomeOwners
     } = useHomeOwners(props.isMhrTransfer)
 
     const addressSchema = PartyAddressSchema
@@ -313,7 +314,7 @@ export default defineComponent({
       props.isMhrTransfer ? getMhrTransferHomeOwnerGroups.value : getMhrRegistrationHomeOwnerGroups.value
 
     const defaultHomeOwner: MhrRegistrationHomeOwnerIF = {
-      ownerId: props.editHomeOwner?.ownerId || (DEFAULT_OWNER_ID++),
+      ownerId: props.editHomeOwner?.ownerId || getTransferOrRegistrationHomeOwners().length + 1 || (DEFAULT_OWNER_ID++),
       phoneNumber: props.editHomeOwner?.phoneNumber || '',
       phoneExtension: props.editHomeOwner?.phoneExtension || null,
       suffix: props.editHomeOwner?.suffix || '',
@@ -363,8 +364,6 @@ export default defineComponent({
         tenancySpecified: false // Default to satisfy schema
       } as FractionalOwnershipWithGroupIdIF)
     }
-
-    const oldOwner = props.editHomeOwner
 
     const localState = reactive({
       getSidebarTitle: computed((): string => {
@@ -440,7 +439,7 @@ export default defineComponent({
           delete localState.group.tenancySpecified
         }
 
-        if (props.isMhrTransfer) setUnsavedChanges(oldOwner !== localState.owner)
+        if (props.isMhrTransfer) setUnsavedChanges(props.editHomeOwner !== localState.owner)
 
         cancel()
       } else {
