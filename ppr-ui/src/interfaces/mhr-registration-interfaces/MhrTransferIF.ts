@@ -35,6 +35,7 @@ export interface MhrTransferApiIF {
   deathOfOwner?: boolean
   payment?: PaymentIF
   error?: ErrorIF
+  baseRegistrationNumber?: string
 }
 
 export interface MhrDraftTransferApiIF {

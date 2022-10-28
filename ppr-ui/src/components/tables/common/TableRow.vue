@@ -66,7 +66,7 @@
         <label style="cursor: pointer;">
           <span v-if="!isExpanded">View </span>
           <span v-else>Hide </span>
-          Amendments
+          {{ isPpr ? 'Amendments' : 'History' }}
         </label>
       </v-btn>
     </td>
@@ -85,12 +85,12 @@
       <div v-if="!isChild || isDraft(item)">
         {{ getStatusDescription(item.statusType) }}
         <p v-if="!isChild && item.hasDraft" class="ma-0">
-          <i>* Draft Amendment</i>
+          <i>{{ isPpr ? '* Draft Amendment' : '* Draft Changes' }}</i>
         </p>
       </div>
     </td>
     <td
-      v-if="inSelectedHeaders('registeringName')"
+      v-if="inSelectedHeaders('registeringName') && isPpr"
       :class="isChild || item.expanded ? $style['border-left']: ''"
     >
       <span v-if="item.registeringName">{{ getRegisteringName(item.registeringName) }}</span>
@@ -103,7 +103,7 @@
       {{ item.registeringParty || item.submittingParty || '' }}
     </td>
     <td
-      v-if="inSelectedHeaders('ownerNames')"
+      v-if="inSelectedHeaders('ownerNames') && isPpr"
       :class="isChild || item.expanded ? $style['border-left']: ''"
     >
       {{ item.ownerNames }}
@@ -115,7 +115,7 @@
       {{ item.securedParties || '' }}
     </td>
     <td
-      v-if="inSelectedHeaders('clientReferenceId')"
+      v-if="inSelectedHeaders('clientReferenceId') && isPpr"
       :class="isChild || item.expanded ? $style['border-left']: ''"
     >
       {{ item.clientReferenceId }}

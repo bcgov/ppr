@@ -1,5 +1,7 @@
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import {
+  DraftResultIF,
+  MhRegistrationSummaryIF,
   MhrRegistrationDescriptionIF,
   MhrRegistrationHomeLocationIF,
   MhrRegistrationHomeOwnerGroupIF,
@@ -198,7 +200,31 @@ export const useNewMhrRegistration = () => {
   const fetchMhRegistrations = async (): Promise<void> => {
     const draftFilings = await getMhrDrafts()
     const myMhrHistory = await mhrRegistrationHistory()
-    setMhrTableHistory([...draftFilings, ...myMhrHistory])
+    // add drafts
+    const filteredMhrHistory = myMhrHistory.filter(t => t.registrationDescription === 'REGISTER NEW UNIT')
+    filteredMhrHistory.forEach(transfer => {
+      transfer.baseRegistrationNumber = transfer.mhrNumber
+      var mhrDrafts = draftFilings.filter(s => s.mhrNumber === transfer.mhrNumber)
+      if (mhrDrafts?.length > 0) {
+        transfer.hasDraft = true
+        transfer.changes = []
+        mhrDrafts.forEach(draft => {
+          const newDraft: MhRegistrationSummaryIF = {
+            mhrNumber: transfer.mhrNumber,
+            baseRegistrationNumber: transfer.mhrNumber,
+            submittingParty: draft.submittingParty,
+            clientReferenceId: transfer.clientReferenceId,
+            createDateTime: draft.createDateTime,
+            error: draft.error,
+            registrationDescription: draft.documentDescription,
+            hasDraft: true
+          }
+          transfer.changes.push(newDraft)
+        })
+      }
+    })
+
+    setMhrTableHistory([...filteredMhrHistory])
   }
 
   /**
