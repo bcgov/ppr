@@ -208,7 +208,7 @@ import { toDisplayPhone } from '@/utils'
 import { AddEditHomeOwner } from '@/components/mhrRegistration/HomeOwners'
 import TableGroupHeader from '@/components/mhrRegistration/HomeOwners/TableGroupHeader.vue'
 /* eslint-disable no-unused-vars */
-import {MhrHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF} from '@/interfaces'
+import { MhrRegistrationHomeOwnerIF } from '@/interfaces'
 import { ActionTypes } from '@/enums'
 /* eslint-enable no-unused-vars */
 import { useActions } from 'vuex-composition-helpers'

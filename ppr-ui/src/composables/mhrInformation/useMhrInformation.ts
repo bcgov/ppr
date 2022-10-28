@@ -1,4 +1,4 @@
-import {MhrHomeOwnerGroupIF, MhrTransferApiIF, MhrTransferIF} from '@/interfaces'
+import { MhrHomeOwnerGroupIF, MhrTransferApiIF, MhrTransferIF } from '@/interfaces'
 import { useGetters } from 'vuex-composition-helpers'
 import { readonly, ref } from '@vue/composition-api'
 import { ActionTypes, ApiHomeTenancyTypes, HomeTenancyTypes } from '@/enums'
