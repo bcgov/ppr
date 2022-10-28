@@ -90,12 +90,12 @@ SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRI
            AND og2.manhomid = mh.manhomid
            AND og2.owngrpid = o2.owngrpid
            AND og2.status IN ('3', '4')) as owner_names,
-       TRIM(d.bcolacct),
-       d.documtid as document_id
+       TRIM(d.affirmby),
+       d.documtid as document_id,
+       d.docuregi as doc_reg_number
   FROM manuhome mh, document d
  WHERE mh.mhregnum = :query_mhr_number
    AND mh.mhregnum = d.mhregnum
-   AND mh.regdocid = d.documtid
 """
 QUERY_ACCOUNT_REGISTRATIONS = """
 SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRIM(d.docutype),
@@ -106,7 +106,8 @@ SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRI
            AND og2.owngrpid = o2.owngrpid
            AND og2.regdocid = d.documtid) as owner_names,
        TRIM(d.affirmby),
-       d.documtid as document_id
+       d.documtid as document_id,
+       d.docuregi as doc_reg_number
   FROM manuhome mh, document d
  WHERE mh.mhregnum IN (?)
    AND mh.mhregnum = d.mhregnum
@@ -137,20 +138,20 @@ def find_by_id(registration_id: int):
 
 
 def find_summary_by_mhr_number(account_id: str, mhr_number: str, staff: bool):
-    """Return the MHR registration summary information matching the registration number."""
-    registration = None
+    """Return the MHR registration summary parent-child information matching the registration number."""
+    registrations = []
     try:
         query = text(QUERY_ACCOUNT_ADD_REGISTRATION)
         result = db.get_engine(current_app, 'db2').execute(query, {'query_mhr_number': mhr_number})
         rows = result.fetchall()
         if rows is not None:
             for row in rows:
-                registration = __build_summary(row, True)
+                registrations.append(__build_summary(row, True))
     except Exception as db_exception:   # noqa: B902; return nicer error
         current_app.logger.error('DB2 find_summary_by_mhr_number exception: ' + str(db_exception))
         raise DatabaseException(db_exception)
 
-    if registration:
+    if registrations:
         try:
             query = text(QUERY_MHR_NUMBER_LEGACY)
             result = db.session.execute(query, {'query_value': account_id, 'query_value2': mhr_number})
@@ -160,16 +161,24 @@ def find_summary_by_mhr_number(account_id: str, mhr_number: str, staff: bool):
             reg_account_id = str(row[2])
             current_app.logger.debug(f'reg_count={reg_count}, extra_count={extra_count}, staff={staff}')
             # Set inUserList to true if MHR number already added to account extra registrations.
-            if reg_count > 0 or extra_count > 0:
-                registration['inUserList'] = True
+            doc_types = MhrDocumentType.find_all()
+            for registration in registrations:
+                if reg_count > 0 or extra_count > 0:
+                    registration['inUserList'] = True
+                __update_summary_info(registration, registrations, None, doc_types, staff, account_id)
             # Path to download report only available for staff and registrations created by the account.
             if reg_count > 0 and (staff or account_id == reg_account_id):
-                registration['path'] = REGISTRATION_PATH + mhr_number
+                for reg in registrations:
+                    if reg['documentType'] in (Db2Document.DocumentTypes.CONV, Db2Document.DocumentTypes.MHREG_TRIM):
+                        reg['path'] = REGISTRATION_PATH + mhr_number
+                    else:
+                        reg['path'] = DOCUMENT_PATH + reg.get('documentId')
+            registrations = __collapse_results(registrations)
+            return registrations[0]
         except Exception as db_exception:   # noqa: B902; return nicer error
             current_app.logger.error('find_summary_by_mhr_number mhr extra check exception: ' + str(db_exception))
             raise DatabaseException(db_exception)
-
-    return registration
+    return registrations
 
 
 def find_all_by_account_id(account_id: str, staff: bool, collapse: bool = False):
@@ -372,7 +381,8 @@ def __build_summary(row, add_in_user_list: bool = True):
         'ownerNames': owner_names,
         'path': '',
         'documentId': str(row[8]),
-        'documentType': str(row[5]),
+        'documentRegistrationNumber': str(row[9]),
+        'documentType': str(row[5])
     }
     if add_in_user_list:
         summary['inUserList'] = False
