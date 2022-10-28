@@ -189,7 +189,7 @@ import {
   setupFinancingStatementDraft,
   updateUserSettings,
   deleteMhRegistrationSummary,
-  deleteMhrDraft, mhrRegistrationHistory
+  deleteMhrDraft
 } from '@/utils'
 import {
   amendConfirmationDialog,
