@@ -1,0 +1,167 @@
+{
+  "details": [
+    {
+      "attentionReference": "", 
+      "clientReferenceId": "", 
+      "createDateTime": "1998-03-17T13:35:38-07:53", 
+      "declaredValue": 0, 
+      "description": {
+        "baseInformation": {
+          "make": "TRADITIONAL T2657-06", 
+          "model": "", 
+          "year": "1998"
+        }, 
+        "csaNumber": "462634", 
+        "csaStandard": "Z240", 
+        "engineerName": "", 
+        "manufacturer": "TRIPLE E HOMES (1996) LTD.", 
+        "otherRemarks": "", 
+        "rebuiltRemarks": "", 
+        "sectionCount": 2, 
+        "sections": [
+          {
+            "lengthFeet": 54, 
+            "lengthInches": 0, 
+            "serialNumber": "7705", 
+            "widthFeet": 26, 
+            "widthInches": 0
+          }
+        ]
+      }, 
+      "documentId": "41057195", 
+      "location": {
+        "additionalDescription": "IR #7 TAKLA LAKE INDIAN RESERVE         RESERVE #608", 
+        "address": {
+          "city": "TAKLA LANDING", 
+          "country": "CA", 
+          "postalCode": "", 
+          "region": "BC", 
+          "street": "LOT 32"
+        }, 
+        "block": "", 
+        "dealerName": "", 
+        "districtLot": "", 
+        "exceptionPlan": "", 
+        "landDistrict": "CASSIAR", 
+        "leaveProvince": false, 
+        "lot": "", 
+        "meridian": "", 
+        "pad": "", 
+        "parcel": "", 
+        "parkName": "", 
+        "partOf": "", 
+        "pidNumber": "", 
+        "plan": "", 
+        "range": "", 
+        "section": "", 
+        "status": "ACTIVE", 
+        "taxCertificate": false, 
+        "township": ""
+      }, 
+      "mhrNumber": "083715", 
+      "notes": [
+        {
+          "contactAddress": {
+            "city": "V2N5S5", 
+            "country": "CA", 
+            "postalCode": "", 
+            "region": "BC", 
+            "street": "5387 CONTINENTAL WAY", 
+            "streetAdditional": "PRINCE GEORGE BC"
+          }, 
+          "contactName": "LINDA BOWLER", 
+          "createDateTime": "1998-12-14T10:37:49-07:53", 
+          "documentDescription": "TRANSPORT PERMIT", 
+          "documentId": "90001699", 
+          "documentType": "103", 
+          "expiryDate": "1999-01-13T09:00:00-07:53", 
+          "remarks": ""
+        }, 
+        {
+          "contactAddress": {
+            "city": "CANADA                        T1J 4K6", 
+            "country": "CA", 
+            "postalCode": "", 
+            "region": "BC", 
+            "street": "P.O. BOX 2140", 
+            "streetAdditional": "LETHBRIDGE , AB"
+          }, 
+          "contactName": "TRIPLE E HOMES (1996) LTD.", 
+          "createDateTime": "1998-04-02T08:28:41-07:53", 
+          "documentDescription": "TRANSPORT PERMIT", 
+          "documentId": "44194371", 
+          "documentType": "103", 
+          "expiryDate": "1998-05-05T09:00:00-07:53", 
+          "remarks": ""
+        }
+      ], 
+      "ownerGroups": [
+        {
+          "groupId": 3, 
+          "interest": "", 
+          "interestDenominator": 0, 
+          "interestNumerator": 0, 
+          "owners": [
+            {
+              "address": {
+                "city": "LOT 32, TAKLA LANDING", 
+                "country": "CA", 
+                "postalCode": "", 
+                "region": "BC", 
+                "street": "INDIAN RESERVE #7", 
+                "streetAdditional": "TAKLA LAKE INDIAN RESERVE #608"
+              }, 
+              "individualName": {
+                "first": "DEBORAH", 
+                "last": "ABRAHAM", 
+                "middle": "MAY"
+              }, 
+              "ownerId": 1, 
+              "phoneNumber": "250", 
+              "type": "SOLE"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "SOLE"
+        }
+      ], 
+      "status": "R"
+    }
+  ], 
+  "getReportURL": "/ppr/api/v1/search-results/8808", 
+  "payment": {
+    "invoiceId": "23131", 
+    "receipt": "/api/v1/payment-requests/23131/receipts"
+  }, 
+  "searchDateTime": "2022-10-28T00:13:01+00:00", 
+  "searchQuery": {
+    "clientReferenceId": "MM-UT-0007", 
+    "criteria": {
+      "value": "083715"
+    }, 
+    "type": "MHR_NUMBER"
+  }, 
+  "selected": [
+    {
+      "baseInformation": {
+        "make": "TRADITIONAL T2657-06", 
+        "model": "", 
+        "year": 1998
+      }, 
+      "createDateTime": "1998-03-17T13:35:38-07:53", 
+      "homeLocation": "TAKLA LANDING", 
+      "mhId": 85103, 
+      "mhrNumber": "083715", 
+      "ownerName": {
+        "first": "DEBORAH", 
+        "last": "ABRAHAM", 
+        "middle": "MAY"
+      }, 
+      "ownerStatus": "ACTIVE", 
+      "serialNumber": "7705", 
+      "status": "ACTIVE"
+    }
+  ], 
+  "totalResultsSize": 1
+}

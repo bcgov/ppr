@@ -1,0 +1,166 @@
+{
+  "details": [
+    {
+      "attentionReference": "", 
+      "clientReferenceId": "", 
+      "createDateTime": "1998-06-12T11:18:03-07:53", 
+      "declaredValue": 0, 
+      "description": {
+        "baseInformation": {
+          "make": "AVONLEA 660", 
+          "model": "", 
+          "year": "1998"
+        }, 
+        "csaNumber": "432195", 
+        "csaStandard": "", 
+        "engineerName": "", 
+        "manufacturer": "SRI HOMES", 
+        "otherRemarks": "", 
+        "rebuiltRemarks": "", 
+        "sectionCount": 1, 
+        "sections": [
+          {
+            "lengthFeet": 54, 
+            "lengthInches": 0, 
+            "serialNumber": "SHL16549814649", 
+            "widthFeet": 16, 
+            "widthInches": 0
+          }
+        ]
+      }, 
+      "documentId": "40659233", 
+      "location": {
+        "additionalDescription": "", 
+        "address": {
+          "city": "NORTH PINE", 
+          "country": "CA", 
+          "postalCode": "", 
+          "region": "BC", 
+          "street": " ROAD 250"
+        }, 
+        "block": "", 
+        "dealerName": "", 
+        "districtLot": "", 
+        "exceptionPlan": "PGP37726", 
+        "landDistrict": "PEACE RIVER", 
+        "leaveProvince": false, 
+        "lot": "19", 
+        "meridian": "W6M", 
+        "pad": "", 
+        "parcel": "", 
+        "parkName": "", 
+        "partOf": "", 
+        "pidNumber": "013684094", 
+        "plan": "3986", 
+        "range": "19", 
+        "section": "", 
+        "status": "ACTIVE", 
+        "taxCertificate": false, 
+        "township": "85"
+      }, 
+      "mhrNumber": "084139", 
+      "notes": [
+        {
+          "contactAddress": {
+            "city": "BALDONNEL, BC V0C 1C0", 
+            "country": "CA", 
+            "postalCode": "", 
+            "region": "BC", 
+            "street": "BOX 22"
+          }, 
+          "contactName": "MADELINE ROSS", 
+          "createDateTime": "1998-06-12T11:18:44-07:53", 
+          "documentDescription": "TRANSPORT PERMIT", 
+          "documentId": "40659224", 
+          "documentType": "103", 
+          "expiryDate": "1998-07-15T09:00:00-07:53", 
+          "remarks": ""
+        }
+      ], 
+      "ownerGroups": [
+        {
+          "groupId": 4, 
+          "interest": "", 
+          "interestDenominator": 0, 
+          "interestNumerator": 0, 
+          "owners": [
+            {
+              "address": {
+                "city": "FORT ST. JOHN", 
+                "country": "CA", 
+                "postalCode": "V1J 6W7", 
+                "region": "BC", 
+                "street": "BOX 294, 9831 - 98A AVENUE"
+              }, 
+              "individualName": {
+                "first": "JAMES", 
+                "last": "LOVELL", 
+                "middle": "EDWARD"
+              }, 
+              "ownerId": 1, 
+              "phoneNumber": "2507871140", 
+              "type": "JOINT"
+            }, 
+            {
+              "address": {
+                "city": "FORT ST. JOHN", 
+                "country": "CA", 
+                "postalCode": "V1J 6W7", 
+                "region": "BC", 
+                "street": "BOX 294, 9831 - 98A AVENUE"
+              }, 
+              "individualName": {
+                "first": "MARIA", 
+                "last": "MCDOWELL", 
+                "middle": "LAURETA"
+              }, 
+              "ownerId": 2, 
+              "phoneNumber": "2507871140", 
+              "suffix": "CLAUDETTE", 
+              "type": "JOINT"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "JOINT"
+        }
+      ], 
+      "status": "R"
+    }
+  ], 
+  "getReportURL": "/ppr/api/v1/search-results/8807", 
+  "payment": {
+    "invoiceId": "23130", 
+    "receipt": "/api/v1/payment-requests/23130/receipts"
+  }, 
+  "searchDateTime": "2022-10-28T00:08:07+00:00", 
+  "searchQuery": {
+    "clientReferenceId": "MM-UT-0007", 
+    "criteria": {
+      "value": "084139"
+    }, 
+    "type": "MHR_NUMBER"
+  }, 
+  "selected": [
+    {
+      "baseInformation": {
+        "make": "AVONLEA 660", 
+        "model": "", 
+        "year": 1998
+      }, 
+      "createDateTime": "1998-06-12T11:18:03-07:53", 
+      "homeLocation": "NORTH PINE", 
+      "mhId": 85538, 
+      "mhrNumber": "084139", 
+      "ownerName": {
+        "first": "JAMES", 
+        "last": "LOVELL", 
+        "middle": "EDWARD"
+      }, 
+      "ownerStatus": "ACTIVE", 
+      "serialNumber": "SHL16549814649", 
+      "status": "ACTIVE"
+    }
+  ], 
+  "totalResultsSize": 1
+}

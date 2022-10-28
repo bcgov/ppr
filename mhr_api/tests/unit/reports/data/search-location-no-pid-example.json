@@ -1,0 +1,182 @@
+{
+  "details": [
+    {
+      "attentionReference": "03173", 
+      "clientReferenceId": "", 
+      "createDateTime": "1998-07-21T08:48:45-07:53", 
+      "declaredValue": 0, 
+      "description": {
+        "baseInformation": {
+          "make": "WINFIELD/LANGDALE", 
+          "model": "", 
+          "year": "1998"
+        }, 
+        "csaNumber": "432625", 
+        "csaStandard": "", 
+        "engineerName": "", 
+        "manufacturer": "SRI HOMES INC. (WINFIELD)", 
+        "otherRemarks": "", 
+        "rebuiltRemarks": "", 
+        "sectionCount": 1, 
+        "sections": [
+          {
+            "lengthFeet": 66, 
+            "lengthInches": 0, 
+            "serialNumber": "WIN14669803173", 
+            "widthFeet": 14, 
+            "widthInches": 0
+          }
+        ]
+      }, 
+      "documentId": "41427679", 
+      "location": {
+        "additionalDescription": "OUND. OF SAID LOT & EXTEND. FROM PT. OF BISECTION OF EASTERLY BOUND.OF SAID LOT", 
+        "address": {
+          "city": "SOOKE", 
+          "country": "CA", 
+          "postalCode": "", 
+          "region": "BC", 
+          "street": "3049 ROBINSON ROAD"
+        }, 
+        "block": "", 
+        "dealerName": "", 
+        "districtLot": "", 
+        "exceptionPlan": "PART LOT 1,S-15, OTTER DIST. P-8525 LYINGTO S OF BOUNDARY PARALL. TO NORTHERLY B", 
+        "landDistrict": "42", 
+        "leaveProvince": false, 
+        "lot": "1", 
+        "meridian": "", 
+        "pad": "", 
+        "parcel": "", 
+        "parkName": "", 
+        "partOf": "", 
+        "pidNumber": "", 
+        "plan": "8525", 
+        "range": "", 
+        "section": "15", 
+        "status": "ACTIVE", 
+        "taxCertificate": true, 
+        "taxCertificateDate": "2004-12-31T09:00:00-07:53", 
+        "township": ""
+      }, 
+      "mhrNumber": "084311", 
+      "notes": [
+        {
+          "contactAddress": {
+            "city": "COURTENAY", 
+            "country": "CA", 
+            "postalCode": "", 
+            "region": "BC", 
+            "street": "2500 CLIFFE AVENUE"
+          }, 
+          "contactName": "SMART, JILL", 
+          "createDateTime": "2004-06-17T11:58:31-07:53", 
+          "documentDescription": "TRANSPORT PERMIT", 
+          "documentId": "90006685", 
+          "documentType": "103", 
+          "expiryDate": "2004-07-17T09:00:00-07:53", 
+          "remarks": ""
+        }, 
+        {
+          "contactAddress": {
+            "city": "V9N 8X8", 
+            "country": "CA", 
+            "postalCode": "", 
+            "region": "BC", 
+            "street": "126A ARDEN RD", 
+            "streetAdditional": "COURTENAY BC"
+          }, 
+          "contactName": "JILL ARLENE SMART", 
+          "createDateTime": "2002-08-12T11:58:52-07:53", 
+          "documentDescription": "TRANSPORT PERMIT", 
+          "documentId": "90005205", 
+          "documentType": "103", 
+          "expiryDate": "2002-09-11T09:00:00-07:53", 
+          "remarks": ""
+        }, 
+        {
+          "contactAddress": {
+            "city": "CANADA                        V4V 1S5", 
+            "country": "CA", 
+            "postalCode": "", 
+            "region": "BC", 
+            "street": "9500 JIM BAILEY ROAD", 
+            "streetAdditional": "KELOWNA , BC"
+          }, 
+          "contactName": "SRI HOMES INC.", 
+          "createDateTime": "1998-07-21T13:52:52-07:53", 
+          "documentDescription": "TRANSPORT PERMIT", 
+          "documentId": "40669810", 
+          "documentType": "103", 
+          "expiryDate": "1998-08-23T09:00:00-07:53", 
+          "remarks": ""
+        }
+      ], 
+      "ownerGroups": [
+        {
+          "groupId": 4, 
+          "interest": "", 
+          "interestDenominator": 0, 
+          "interestNumerator": 0, 
+          "owners": [
+            {
+              "address": {
+                "city": "SOOKE", 
+                "country": "CA", 
+                "postalCode": "V0S 1N0", 
+                "region": "BC", 
+                "street": "6251 SOULE ROAD"
+              }, 
+              "individualName": {
+                "first": "GRAHAM", 
+                "last": "DAVIES", 
+                "middle": "PAUL"
+              }, 
+              "ownerId": 1, 
+              "type": "SOLE"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "SOLE"
+        }
+      ], 
+      "status": "R"
+    }
+  ], 
+  "getReportURL": "/ppr/api/v1/search-results/8809", 
+  "payment": {
+    "invoiceId": "23133", 
+    "receipt": "/api/v1/payment-requests/23133/receipts"
+  }, 
+  "searchDateTime": "2022-10-28T00:20:01+00:00", 
+  "searchQuery": {
+    "clientReferenceId": "MM-UT-0007", 
+    "criteria": {
+      "value": "084311"
+    }, 
+    "type": "MHR_NUMBER"
+  }, 
+  "selected": [
+    {
+      "baseInformation": {
+        "make": "WINFIELD/LANGDALE", 
+        "model": "", 
+        "year": 1998
+      }, 
+      "createDateTime": "1998-07-21T08:48:45-07:53", 
+      "homeLocation": "SOOKE", 
+      "mhId": 85714, 
+      "mhrNumber": "084311", 
+      "ownerName": {
+        "first": "GRAHAM", 
+        "last": "DAVIES", 
+        "middle": "PAUL"
+      }, 
+      "ownerStatus": "ACTIVE", 
+      "serialNumber": "WIN14669803173", 
+      "status": "ACTIVE"
+    }
+  ], 
+  "totalResultsSize": 1
+}

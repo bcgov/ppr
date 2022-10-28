@@ -1,0 +1,176 @@
+{
+  "details": [
+    {
+      "attentionReference": "", 
+      "clientReferenceId": "03A000886AB", 
+      "createDateTime": "2013-02-14T10:36:45-07:53", 
+      "declaredValue": 0, 
+      "description": {
+        "baseInformation": {
+          "make": "LEXINGTON DW #24848", 
+          "model": "", 
+          "year": "2013"
+        }, 
+        "csaNumber": "MS-1753", 
+        "csaStandard": "Z240", 
+        "engineerName": "", 
+        "manufacturer": "MODULINE INDUSTRIES - PENTICTON", 
+        "otherRemarks": "", 
+        "rebuiltRemarks": "", 
+        "sectionCount": 2, 
+        "sections": [
+          {
+            "lengthFeet": 48, 
+            "lengthInches": 0, 
+            "serialNumber": "03A000886A", 
+            "widthFeet": 12, 
+            "widthInches": 0
+          }, 
+          {
+            "lengthFeet": 48, 
+            "lengthInches": 0, 
+            "serialNumber": "03A000886B", 
+            "widthFeet": 12, 
+            "widthInches": 0
+          }
+        ]
+      }, 
+      "documentId": "80029412", 
+      "location": {
+        "additionalDescription": "", 
+        "address": {
+          "city": "SURREY", 
+          "country": "CA", 
+          "postalCode": "", 
+          "region": "BC", 
+          "street": "7790 KING GEORGE BLVD"
+        }, 
+        "block": "", 
+        "dealerName": "", 
+        "districtLot": "", 
+        "exceptionPlan": "", 
+        "landDistrict": "", 
+        "leaveProvince": false, 
+        "lot": "", 
+        "meridian": "", 
+        "pad": "24", 
+        "parcel": "", 
+        "parkName": "CRISPEN BAY MOBILE HOME PARK", 
+        "partOf": "", 
+        "pidNumber": "", 
+        "plan": "", 
+        "range": "", 
+        "section": "", 
+        "status": "ACTIVE", 
+        "taxCertificate": false, 
+        "township": ""
+      }, 
+      "mhrNumber": "098504", 
+      "notes": [
+        {
+          "contactAddress": {
+            "city": "PENTICTON, BC V2A 5X5", 
+            "country": "CA", 
+            "postalCode": "", 
+            "region": "BC", 
+            "street": "1175 RAILWAY STREET"
+          }, 
+          "contactName": "CHAMPION CANADA INTERNATIONAL ULC", 
+          "createDateTime": "2013-03-26T16:03:40-07:53", 
+          "documentDescription": "TRANSPORT PERMIT", 
+          "documentId": "80029590", 
+          "documentType": "103", 
+          "expiryDate": "2013-04-25T09:00:00-07:53", 
+          "remarks": ""
+        }
+      ], 
+      "ownerGroups": [
+        {
+          "groupId": 4, 
+          "interest": "UNDIVIDED 1/2", 
+          "interestDenominator": 2, 
+          "interestNumerator": 1, 
+          "owners": [
+            {
+              "address": {
+                "city": "SURREY", 
+                "country": "CA", 
+                "postalCode": "V3T 5R3", 
+                "region": "BC", 
+                "street": "#203 - 10366 - 136A STREET"
+              }, 
+              "organizationName": "E. SANDS & ASSOCIATES INC.", 
+              "ownerId": 1, 
+              "phoneNumber": "604", 
+              "suffix": "TRUSTEE OF THE ESTATE OF FRED FINK, A BANKRUPT", 
+              "type": "COMMON"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "COMMON"
+        }, 
+        {
+          "groupId": 5, 
+          "interest": "UNDIVIDED 1/2", 
+          "interestDenominator": 2, 
+          "interestNumerator": 1, 
+          "owners": [
+            {
+              "address": {
+                "city": "SURREY", 
+                "country": "CA", 
+                "postalCode": "V8W 5Y4", 
+                "region": "BC", 
+                "street": "#24 - 7790 KING GEORGE BOULEVARD"
+              }, 
+              "individualName": {
+                "first": "SUSAN", 
+                "last": "FINK", 
+                "middle": "CHARLENE"
+              }, 
+              "ownerId": 2, 
+              "phoneNumber": "604", 
+              "type": "COMMON"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "COMMON"
+        }
+      ], 
+      "status": "R"
+    }
+  ], 
+  "getReportURL": "/ppr/api/v1/search-results/8804", 
+  "payment": {
+    "invoiceId": "23120", 
+    "receipt": "/api/v1/payment-requests/23120/receipts"
+  }, 
+  "searchDateTime": "2022-10-27T21:39:28+00:00", 
+  "searchQuery": {
+    "clientReferenceId": "MM-UT-MR0011", 
+    "criteria": {
+      "value": "098504"
+    }, 
+    "type": "MHR_NUMBER"
+  }, 
+  "selected": [
+    {
+      "baseInformation": {
+        "make": "LEXINGTON DW #24848", 
+        "model": "", 
+        "year": 2013
+      }, 
+      "createDateTime": "2013-02-14T10:36:45-07:53", 
+      "homeLocation": "SURREY", 
+      "mhId": 100040, 
+      "mhrNumber": "098504", 
+      "organizationName": "E. SANDS & ASSOCIATES INC.", 
+      "ownerStatus": "ACTIVE", 
+      "serialNumber": "03A000886A", 
+      "status": "ACTIVE"
+    }
+  ], 
+  "totalResultsSize": 1
+}

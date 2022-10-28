@@ -29,6 +29,9 @@
                             {% if party.individualName.middle is defined %}&nbsp;{{ party.individualName.middle }}{% endif %}
                         {% endif %}
                     </div>
+                    {% if party.suffix is defined and party.suffix != '' %}
+                        <div class="pt-2">{{ party.suffix }}</div>
+                    {% endif %} 
                 </td>
                 <td class="col-33">
                     <div class="section-sub-title">Address</div>

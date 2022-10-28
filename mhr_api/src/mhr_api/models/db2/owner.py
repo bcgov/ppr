@@ -166,6 +166,8 @@ class Db2Owner(db.Model):
             owner['status'] = 'EXEMPT'
         else:
             owner['status'] = 'PREVIOUS'
+        if self.suffix:
+            owner['suffix'] = self.suffix
         return owner
 
     @property

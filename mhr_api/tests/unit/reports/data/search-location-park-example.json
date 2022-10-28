@@ -1,0 +1,200 @@
+{
+  "details": [
+    {
+      "attentionReference": "", 
+      "clientReferenceId": "", 
+      "createDateTime": "1998-02-27T11:45:15-07:53", 
+      "declaredValue": 0, 
+      "description": {
+        "baseInformation": {
+          "make": "1998 WINTERSUN 14301", 
+          "model": "", 
+          "year": "1998"
+        }, 
+        "csaNumber": "432242", 
+        "csaStandard": "", 
+        "engineerName": "", 
+        "manufacturer": "MODULINE INDUSTRIES (CANADA) LTD.", 
+        "otherRemarks": "", 
+        "rebuiltRemarks": "", 
+        "sectionCount": 1, 
+        "sections": [
+          {
+            "lengthFeet": 66, 
+            "lengthInches": 0, 
+            "serialNumber": "0318318", 
+            "widthFeet": 14, 
+            "widthInches": 0
+          }
+        ]
+      }, 
+      "documentId": "41105954", 
+      "location": {
+        "additionalDescription": "", 
+        "address": {
+          "city": "QUESNEL", 
+          "country": "CA", 
+          "postalCode": "", 
+          "region": "BC", 
+          "street": "654 NORTH FRASER DR"
+        }, 
+        "block": "", 
+        "dealerName": "", 
+        "districtLot": "", 
+        "exceptionPlan": "", 
+        "landDistrict": "", 
+        "leaveProvince": false, 
+        "lot": "", 
+        "meridian": "", 
+        "pad": "37", 
+        "parcel": "", 
+        "parkName": "RIVERWALK MANUFACTURED HOME PARK", 
+        "partOf": "", 
+        "pidNumber": "", 
+        "plan": "", 
+        "range": "", 
+        "section": "", 
+        "status": "ACTIVE", 
+        "taxCertificate": true, 
+        "taxCertificateDate": "2013-12-31T09:00:00-07:53", 
+        "township": ""
+      }, 
+      "mhrNumber": "083645", 
+      "notes": [
+        {
+          "contactAddress": {
+            "city": "V2J 3J9", 
+            "country": "CA", 
+            "postalCode": "", 
+            "region": "BC", 
+            "street": "PO BOX 4673", 
+            "streetAdditional": "QUESNEL                                 BC"
+          }, 
+          "contactName": "PETER DAVID CARTER", 
+          "createDateTime": "2013-10-24T11:25:35-07:53", 
+          "documentDescription": "TRANSPORT PERMIT", 
+          "documentId": "90011866", 
+          "documentType": "103", 
+          "expiryDate": "2013-11-23T09:00:00-07:53", 
+          "remarks": ""
+        }, 
+        {
+          "contactAddress": {
+            "city": "QUESNEL BC V2J 6Y1", 
+            "country": "CA", 
+            "postalCode": "", 
+            "region": "BC", 
+            "street": "4-2202 BASALT RD"
+          }, 
+          "contactName": "JACKIE CARTER", 
+          "createDateTime": "2010-05-14T15:35:56-07:53", 
+          "documentDescription": "TRANSPORT PERMIT", 
+          "documentId": "90010605", 
+          "documentType": "103", 
+          "expiryDate": "2010-06-13T09:00:00-07:53", 
+          "remarks": ""
+        }, 
+        {
+          "contactAddress": {
+            "city": "CANADA                        V2L 2Z1", 
+            "country": "CA", 
+            "postalCode": "", 
+            "region": "BC", 
+            "street": "2033 - 1ST AVENUE", 
+            "streetAdditional": "PRINCE GEORGE , BC"
+          }, 
+          "contactName": "WAYNE'S MOBILE HOMES", 
+          "createDateTime": "1998-05-25T16:26:10-07:53", 
+          "documentDescription": "TRANSPORT PERMIT", 
+          "documentId": "40655656", 
+          "documentType": "103", 
+          "expiryDate": "1998-06-27T09:00:00-07:53", 
+          "remarks": ""
+        }, 
+        {
+          "contactAddress": {
+            "city": "CANADA                        V2A 6K3", 
+            "country": "CA", 
+            "postalCode": "", 
+            "region": "BC", 
+            "street": "BOX 190", 
+            "streetAdditional": "1175 RAILWAY AVENUE                     PENTICTON , BC"
+          }, 
+          "contactName": "MODULINE", 
+          "createDateTime": "1998-03-11T15:21:53-07:53", 
+          "documentDescription": "TRANSPORT PERMIT", 
+          "documentId": "44191187", 
+          "documentType": "103", 
+          "expiryDate": "1998-04-13T09:00:00-07:53", 
+          "remarks": ""
+        }
+      ], 
+      "ownerGroups": [
+        {
+          "groupId": 4, 
+          "interest": "", 
+          "interestDenominator": 0, 
+          "interestNumerator": 0, 
+          "owners": [
+            {
+              "address": {
+                "city": "QUESNEL", 
+                "country": "CA", 
+                "postalCode": "V2J 1Z6", 
+                "region": "BC", 
+                "street": "#37 - 654 NORTH FRASER DRIVE"
+              }, 
+              "individualName": {
+                "first": "JOYCE", 
+                "last": "MARIASH", 
+                "middle": "LYNN"
+              }, 
+              "ownerId": 1, 
+              "phoneNumber": "2509918578", 
+              "type": "SOLE"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "SOLE"
+        }
+      ], 
+      "status": "R"
+    }
+  ], 
+  "getReportURL": "/ppr/api/v1/search-results/8806", 
+  "payment": {
+    "invoiceId": "23129", 
+    "receipt": "/api/v1/payment-requests/23129/receipts"
+  }, 
+  "searchDateTime": "2022-10-28T00:01:09+00:00", 
+  "searchQuery": {
+    "clientReferenceId": "MM-UT-0007", 
+    "criteria": {
+      "value": "083645"
+    }, 
+    "type": "MHR_NUMBER"
+  }, 
+  "selected": [
+    {
+      "baseInformation": {
+        "make": "1998 WINTERSUN 14301", 
+        "model": "", 
+        "year": 1998
+      }, 
+      "createDateTime": "1998-02-27T11:45:15-07:53", 
+      "homeLocation": "QUESNEL", 
+      "mhId": 85036, 
+      "mhrNumber": "083645", 
+      "ownerName": {
+        "first": "JOYCE", 
+        "last": "MARIASH", 
+        "middle": "LYNN"
+      }, 
+      "ownerStatus": "ACTIVE", 
+      "serialNumber": "0318318", 
+      "status": "ACTIVE"
+    }
+  ], 
+  "totalResultsSize": 1
+}
