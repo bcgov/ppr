@@ -231,6 +231,14 @@ class Db2Location(db.Model):
             'dealerName': self.dealer_name,
             'additionalDescription': self.additional_description
         }
+        if self.leave_bc == 'Y':
+            location['leaveProvince'] = True
+        if self.tax_certificate == 'Y':
+            location['taxCertificate'] = True
+        if self.tax_certificate_date:
+            tax_date = model_utils.format_local_date(self.tax_certificate_date)
+            if tax_date:
+                location['taxCertificateDate'] = tax_date
         return location
 
     @property
@@ -274,9 +282,9 @@ class Db2Location(db.Model):
         if self.tax_certificate == 'Y':
             location['taxCertificate'] = True
         if self.tax_certificate_date:
-            location['taxCertificateDate'] = model_utils.format_local_date(self.tax_certificate_date)
-        if location.get('taxCertificateDate', '') == '0001-01-01':
-            del location['taxCertificateDate']
+            tax_date = model_utils.format_local_date(self.tax_certificate_date)
+            if tax_date:
+                location['taxCertificateDate'] = tax_date
         return location
 
     @staticmethod

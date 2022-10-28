@@ -43,7 +43,113 @@ SEARCH_RESULT_COMBO_HDC_PDFFILE = 'tests/unit/reports/data/search-detail-combo-d
 SEARCH_RESULT_COMBO_HEX_PDFFILE = 'tests/unit/reports/data/search-detail-combo-expired-example.pdf'
 SEARCH_RESULT_NIL_DATAFILE = 'tests/unit/reports/data/search-detail-no-results-example.json'
 SEARCH_RESULT_NIL_PDFFILE = 'tests/unit/reports/data/search-detail-no-results-example.pdf'
+SEARCH_RESULT_TEST_DATAFILE = 'tests/unit/reports/data/search-test-example.json'
+SEARCH_RESULT_TEST_PDFFILE = 'tests/unit/reports/data/search-test-example.pdf'
+SEARCH_RESULT_EXECUTOR_DATAFILE = 'tests/unit/reports/data/search-detail-executor-example.json'
+SEARCH_RESULT_EXECUTOR_PDFFILE = 'tests/unit/reports/data/search-detail-executor-example.pdf'
+SEARCH_LOC_DEALER_DATAFILE = 'tests/unit/reports/data/search-location-dealer-example.json'
+SEARCH_LOC_DEALER_PDFFILE = 'tests/unit/reports/data/search-location-dealer-example.pdf'
+SEARCH_LOC_PARK_DATAFILE = 'tests/unit/reports/data/search-location-park-example.json'
+SEARCH_LOC_PARK_PDFFILE = 'tests/unit/reports/data/search-location-park-example.pdf'
+SEARCH_LOC_PID_DATAFILE = 'tests/unit/reports/data/search-location-pid-example.json'
+SEARCH_LOC_PID_PDFFILE = 'tests/unit/reports/data/search-location-pid-example.pdf'
+SEARCH_LOC_RESERVE_DATAFILE = 'tests/unit/reports/data/search-location-reserve-example.json'
+SEARCH_LOC_RESERVE_PDFFILE = 'tests/unit/reports/data/search-location-reserve-example.pdf'
+SEARCH_LOC_NOPID_DATAFILE = 'tests/unit/reports/data/search-location-no-pid-example.json'
+SEARCH_LOC_NOPID_PDFFILE = 'tests/unit/reports/data/search-location-no-pid-example.pdf'
+
 REPORT_VERSION_V2 = '2'
+
+
+def test_search_loc_dealer_test(session, client, jwt):
+    """Assert that setup for a test result report is as expected."""
+    # setup
+    if is_report_v2():
+        json_data = get_json_from_file(SEARCH_LOC_DEALER_DATAFILE)
+        report = Report(json_data, 'PS12345', ReportTypes.SEARCH_DETAIL_REPORT, 'Account Name')
+        # test
+        content, status, headers = report.get_pdf()
+        assert headers
+        # verify
+        check_response(content, status, SEARCH_LOC_DEALER_PDFFILE)
+
+
+def test_search_loc_park_test(session, client, jwt):
+    """Assert that setup for a test result report is as expected."""
+    # setup
+    if is_report_v2():
+        json_data = get_json_from_file(SEARCH_LOC_PARK_DATAFILE)
+        report = Report(json_data, 'PS12345', ReportTypes.SEARCH_DETAIL_REPORT, 'Account Name')
+        # test
+        content, status, headers = report.get_pdf()
+        assert headers
+        # verify
+        check_response(content, status, SEARCH_LOC_PARK_PDFFILE)
+
+
+def test_search_loc_pid_test(session, client, jwt):
+    """Assert that setup for a test result report is as expected."""
+    # setup
+    if is_report_v2():
+        json_data = get_json_from_file(SEARCH_LOC_PID_DATAFILE)
+        report = Report(json_data, 'PS12345', ReportTypes.SEARCH_DETAIL_REPORT, 'Account Name')
+        # test
+        content, status, headers = report.get_pdf()
+        assert headers
+        # verify
+        check_response(content, status, SEARCH_LOC_PID_PDFFILE)
+
+
+def test_search_loc_reserve_test(session, client, jwt):
+    """Assert that setup for a test result report is as expected."""
+    # setup
+    if is_report_v2():
+        json_data = get_json_from_file(SEARCH_LOC_RESERVE_DATAFILE)
+        report = Report(json_data, 'PS12345', ReportTypes.SEARCH_DETAIL_REPORT, 'Account Name')
+        # test
+        content, status, headers = report.get_pdf()
+        assert headers
+        # verify
+        check_response(content, status, SEARCH_LOC_RESERVE_PDFFILE)
+
+
+def test_search_loc_nopid_test(session, client, jwt):
+    """Assert that setup for a test result report is as expected."""
+    # setup
+    if is_report_v2():
+        json_data = get_json_from_file(SEARCH_LOC_NOPID_DATAFILE)
+        report = Report(json_data, 'PS12345', ReportTypes.SEARCH_DETAIL_REPORT, 'Account Name')
+        # test
+        content, status, headers = report.get_pdf()
+        assert headers
+        # verify
+        check_response(content, status, SEARCH_LOC_NOPID_PDFFILE)
+
+
+def test_search_result_test(session, client, jwt):
+    """Assert that setup for a test result report is as expected."""
+    # setup
+    if is_report_v2():
+        json_data = get_json_from_file(SEARCH_RESULT_TEST_DATAFILE)
+        report = Report(json_data, 'PS12345', ReportTypes.SEARCH_DETAIL_REPORT, 'Account Name')
+        # test
+        content, status, headers = report.get_pdf()
+        assert headers
+        # verify
+        check_response(content, status, SEARCH_RESULT_TEST_PDFFILE)
+
+
+def test_search_result_executor(session, client, jwt):
+    """Assert that setup for a test result report is as expected."""
+    # setup
+    if is_report_v2():
+        json_data = get_json_from_file(SEARCH_RESULT_EXECUTOR_DATAFILE)
+        report = Report(json_data, 'PS12345', ReportTypes.SEARCH_DETAIL_REPORT, 'Account Name')
+        # test
+        content, status, headers = report.get_pdf()
+        assert headers
+        # verify
+        check_response(content, status, SEARCH_RESULT_EXECUTOR_PDFFILE)
 
 
 def test_search_result_mhr(session, client, jwt):
@@ -150,7 +256,7 @@ def test_search_result_combo_expired(session, client, jwt):
 
 
 def test_search_result_nil(session, client, jwt):
-    """Assert that setup for an nil result report is as expected."""
+    """Assert that setup for a nil result report is as expected."""
     # setup
     if is_report_v2():
         json_data = get_json_from_file(SEARCH_RESULT_NIL_DATAFILE)

@@ -2,39 +2,167 @@
 <div class="no-page-break">
     <div class="separator mt-5"></div>
     <div class="section-title mt-3">Registered Location</div>
-    <table class="section-data section-data-table mt-4" role="presentation">
-        <tr class="no-page-break">
-            <td class="col-33">
-                {% if detail.location.parkName is defined and detail.location.parkName != '' %}
-                   <div class="section-sub-title">{{ detail.location.parkName }}</div>
-                {% endif %}
-                {% if detail.location.dealerName is defined and detail.location.dealerName != '' %}
+
+    <table class="section-data section-data-table-new mt-4" role="presentation">
+        {% if detail.location.dealerName is defined and detail.location.dealerName != '' %}
+            <tr class="no-page-break">
+                <td class="col-33">
                     <div class="section-sub-title">Dealer/Manufacturer</div>
                     <div class="pt-2">{{  detail.location.dealerName }}</div>
-                {% endif %}
-            </td>
-            <td class="col-33">
-                <div class="section-sub-title">Address</div>
-                <div class="pt-2">{{ detail.location.address.street }}</div>
-                <div>{{ detail.location.address.streetAdditional }}</div>
-                <div>{{ detail.location.address.city }} 
-                     {{ detail.location.address.region }}</div>
-                <div>
-                    {% if detail.location.address.postalCode is defined and detail.location.address.postalCode != '' %}
-                        {{ detail.location.address.postalCode }}&nbsp;&nbsp; 
-                    {% endif %}
-                    {{ detail.location.address.country }}
-                </div>
-            </td>
-            <td class="col-33">
-                {% if detail.location.pad is defined and detail.location.pad != '' %}
-                    <div class="section-sub-title">Pad Number</div>
-                    <div class="pt-2">
-                        {{ detail.location.pad }}
+                </td>
+                <td class="col-33">
+                    <div class="section-sub-title">Address</div>
+                    <div class="pt-2">{{ detail.location.address.street }}</div>
+                    <div>{{ detail.location.address.streetAdditional }}</div>
+                    <div>{{ detail.location.address.city }} 
+                        {{ detail.location.address.region }}</div>
+                    <div>
+                        {% if detail.location.address.postalCode is defined and detail.location.address.postalCode != '' %}
+                            {{ detail.location.address.postalCode }}&nbsp;&nbsp; 
+                        {% endif %}
+                        {{ detail.location.address.country }}
                     </div>
+                </td>
+                <td class="col-33">&nbsp;</td>
+            </tr>
+        {% elif detail.location.parkName is defined and detail.location.parkName != '' %}
+            <tr class="no-page-break">
+                <td class="col-33">
+                    <div class="section-sub-title">Park Name</div>
+                    <div class="pt-2">{{ detail.location.parkName }}</div>
+                </td>
+                <td class="col-33">
+                    <div class="section-sub-title">Address</div>
+                    <div class="pt-2">{{ detail.location.address.street }}</div>
+                    <div>{{ detail.location.address.streetAdditional }}</div>
+                    <div>{{ detail.location.address.city }} 
+                        {{ detail.location.address.region }}</div>
+                    <div>
+                        {% if detail.location.address.postalCode is defined and detail.location.address.postalCode != '' %}
+                            {{ detail.location.address.postalCode }}&nbsp;&nbsp; 
+                        {% endif %}
+                        {{ detail.location.address.country }}
+                    </div>
+                </td>
+                <td class="col-33">
+                    <div class="section-sub-title">Pad</div>
+                    {% if detail.location.pad is defined and detail.location.pad != '' %}
+                        <div class="pt-2">{{ detail.location.pad }}</div>
+                    {% else %} 
+                        <div class="pt-2">N/A</div>
+                    {% endif %} 
+                </td>
+            </tr>
+        {% else %} 
+            <tr class="no-page-break">
+                <td class="col-33">
+                    <div class="section-sub-title">Location Type</div>
+                    <div class="pt-2">N/A
+{#
+                        {% if detail.location.locationType is defined and detail.location.locationType == 'RESERVE' %}
+                            INDIAN RESERVE
+                        {% elif detail.location.locationType is defined and detail.location.locationType == 'STRATA' %}
+                            STRATA
+                        {% elif detail.location.locationType is defined and detail.location.locationType == 'OTHER' %}
+                            OTHER
+                        {% else %}
+                            N/A 
+                        {% endif %}
+#}
+                    </div>
+                </td>
+                <td class="col-33">
+                    <div class="section-sub-title">Address</div>
+                    <div class="pt-2">{{ detail.location.address.street }}</div>
+                    <div>{{ detail.location.address.streetAdditional }}</div>
+                    <div>{{ detail.location.address.city }} 
+                        {{ detail.location.address.region }}</div>
+                    <div>
+                        {% if detail.location.address.postalCode is defined and detail.location.address.postalCode != '' %}
+                            {{ detail.location.address.postalCode }}&nbsp;&nbsp; 
+                        {% endif %}
+                        {{ detail.location.address.country }}
+                    </div>
+                </td>
+                <td class="col-33">
+                    {% if detail.location.pidNumber is defined and (detail.location.pidNumber != '' or detail.location.hasLTSAInfo) %}
+                        <div class="section-sub-title">Parcel ID Number</div>
+                        {% if detail.location.pidNumber is defined and detail.location.pidNumber != '' %}
+                            <div class="pt-2">{{ detail.location.pidNumber }}</div>
+                        {% else %}
+                            <div class="pt-2">N/A</div>
+                        {% endif %} 
+                    {% endif %} 
+                </td>
+            </tr>
+        {% endif %}
+    
+        {% if detail.location.legalDescription is defined and detail.location.legalDescription != '' %}
+        <tr class="no-page-break">
+            <td class="pt-3 pb-2">
+                <div class="section-sub-title">Legal Land Description</div>
+            </td>
+        </tr>
+        <tr class="no-page-break">
+            <td colspan="3">
+                {% if detail.location.locationType is defined and detail.location.locationType == 'STRATA' %}STRATA {% endif %}
+                {{ detail.location.legalDescription }}
+            </td>
+        </tr>
+        {% elif detail.location.hasLTSAInfo or (detail.location.additionalDescription is defined and detail.location.additionalDescription != '') %}
+        <tr class="no-page-break">
+            <td class="pt-3 pb-2">
+                <div class="section-sub-title">Legal Land Description</div>
+            </td>
+        </tr>
+        <tr class="no-page-break">
+            <td class="col-33">
+                {% if detail.location.lot is defined and detail.location.lot != '' %}
+                    <div>LOT: {{ detail.location.lot }}</div>
+                {% endif %} 
+                {% if detail.location.landDistrict is defined and detail.location.landDistrict != '' %}
+                    <div>LAND DISTRICT: {{ detail.location.landDistrict }}</div>
+                {% endif %} 
+                {% if detail.location.plan is defined and detail.location.plan != '' %}
+                    <div>PLAN: {{ detail.location.plan }}</div>
+                {% endif %} 
+                {% if detail.location.districtLot is defined and detail.location.districtLot != '' %}
+                    <div>DISTRICT LOT: {{ detail.location.districtLot }}</div>
+                {% endif %} 
+                {% if detail.location.partOf is defined and detail.location.partOf != '' %}
+                    <div>PART OF: {{ detail.location.partOf }}</div>
+                {% endif %} 
+                {% if detail.location.section is defined and detail.location.section != '' %}
+                    <div>SECTION: {{ detail.location.section }}</div>
+                {% endif %} 
+                {% if detail.location.township is defined and detail.location.township != '' %}
+                    <div>TOWNSHIP: {{ detail.location.township }}</div>
+                {% endif %} 
+                {% if detail.location.range is defined and detail.location.range != '' %}
+                    <div>RANGE: {{ detail.location.range }}</div>
+                {% endif %} 
+                {% if detail.location.meridian is defined and detail.location.meridian != '' %}
+                    <div>MERIDIAN: {{ detail.location.meridian }}</div>
+                {% endif %} 
+                {% if detail.location.parcel is defined and detail.location.parcel != '' %}
+                    <div>PARCEL: {{ detail.location.parcel }}</div>
+                {% endif %} 
+                {% if detail.location.block is defined and detail.location.block != '' %}
+                    <div>BLOCK: {{ detail.location.block }}</div>
                 {% endif %} 
             </td>
-         </tr>
-    </table>
+            <td colspan="2">
+                {% if detail.location.exceptionPlan is defined and detail.location.exceptionPlan != '' %}
+                    <div>EXCEPT PLAN:</div>
+                    <div class="pb-2">{{ detail.location.exceptionPlan }}</div>
+                {% endif %} 
+                {% if detail.location.additionalDescription is defined and detail.location.additionalDescription != '' %}
+                    <div>ADDITIONAL DESCRIPTION:</div>
+                    <div>{{ detail.location.additionalDescription }}</div>
+                {% endif %} 
+            </td>
+        </tr>
+        {% endif %}
+    </table>    
 </div>
 {% endif %}

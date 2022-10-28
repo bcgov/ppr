@@ -1,0 +1,122 @@
+{
+  "details": [
+    {
+      "attentionReference": "WIN1467-98-03180", 
+      "clientReferenceId": "", 
+      "createDateTime": "1998-07-21T09:04:39-07:53", 
+      "declaredValue": 0, 
+      "description": {
+        "baseInformation": {
+          "make": "WINFIELD/GOLDEN", 
+          "model": "", 
+          "year": "1998"
+        }, 
+        "csaNumber": "432629", 
+        "csaStandard": "", 
+        "engineerName": "", 
+        "manufacturer": "SRI HOMES INC. (WINFIELD)", 
+        "otherRemarks": "", 
+        "rebuiltRemarks": "", 
+        "sectionCount": 1, 
+        "sections": [
+          {
+            "lengthFeet": 67, 
+            "lengthInches": 0, 
+            "serialNumber": "WIN14679803180", 
+            "widthFeet": 14, 
+            "widthInches": 0
+          }
+        ]
+      }, 
+      "documentId": "43991378", 
+      "location": {
+        "additionalDescription": "", 
+        "address": {
+          "city": "KELOWNA", 
+          "country": "CA", 
+          "postalCode": "", 
+          "region": "BC", 
+          "street": "9500 JIM BAILEY ROAD"
+        }, 
+        "block": "", 
+        "dealerName": "SRI HOMES INC. (WINFIELD)", 
+        "districtLot": "", 
+        "exceptionPlan": "", 
+        "landDistrict": "", 
+        "leaveProvince": false, 
+        "lot": "", 
+        "meridian": "", 
+        "pad": "", 
+        "parcel": "", 
+        "parkName": "", 
+        "partOf": "", 
+        "pidNumber": "", 
+        "plan": "", 
+        "range": "", 
+        "section": "", 
+        "status": "ACTIVE", 
+        "taxCertificate": false, 
+        "township": ""
+      }, 
+      "mhrNumber": "084325", 
+      "ownerGroups": [
+        {
+          "groupId": 1, 
+          "interest": "", 
+          "interestDenominator": 0, 
+          "interestNumerator": 0, 
+          "owners": [
+            {
+              "address": {
+                "city": "KELOWNA", 
+                "country": "CA", 
+                "postalCode": "V4V 1S5", 
+                "region": "BC", 
+                "street": "485 BEAVER LAKE ROAD"
+              }, 
+              "organizationName": "SRI HOMES INC.", 
+              "ownerId": 1, 
+              "phoneNumber": "250", 
+              "type": "SOLE"
+            }
+          ], 
+          "status": "ACTIVE", 
+          "tenancySpecified": true, 
+          "type": "SOLE"
+        }
+      ], 
+      "status": "R"
+    }
+  ], 
+  "getReportURL": "/ppr/api/v1/search-results/8805", 
+  "payment": {
+    "invoiceId": "23128", 
+    "receipt": "/api/v1/payment-requests/23128/receipts"
+  }, 
+  "searchDateTime": "2022-10-27T23:55:51+00:00", 
+  "searchQuery": {
+    "clientReferenceId": "MM-UT-0007", 
+    "criteria": {
+      "value": "084325"
+    }, 
+    "type": "MHR_NUMBER"
+  }, 
+  "selected": [
+    {
+      "baseInformation": {
+        "make": "WINFIELD/GOLDEN", 
+        "model": "", 
+        "year": 1998
+      }, 
+      "createDateTime": "1998-07-21T09:04:39-07:53", 
+      "homeLocation": "KELOWNA", 
+      "mhId": 85722, 
+      "mhrNumber": "084325", 
+      "organizationName": "SRI HOMES INC.", 
+      "ownerStatus": "ACTIVE", 
+      "serialNumber": "WIN14679803180", 
+      "status": "ACTIVE"
+    }
+  ], 
+  "totalResultsSize": 1
+}

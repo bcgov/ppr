@@ -323,9 +323,7 @@ class Report:  # pylint: disable=too-few-public-methods
                 self._set_ppr_search()
             if self._report_key not in (ReportTypes.MHR_TRANSFER, ReportTypes.MHR_EXEMPTION):
                 self._set_location()
-                current_app.logger.info('5')
                 self._set_description()
-                current_app.logger.info('6')
         return self._report_data
 
     def _set_ppr_search(self):  # pylint: disable=too-many-branches, too-many-statements
@@ -368,6 +366,19 @@ class Report:  # pylint: disable=too-few-public-methods
             if location.get('pidNumber'):
                 pid = location.get('pidNumber')
                 location['pidNumber'] = pid[0:3] + '-' + pid[3:6] + '-' + pid[6:]
+        elif self._report_key in (ReportTypes.SEARCH_DETAIL_REPORT, ReportTypes.SEARCH_BODY_REPORT):
+            for detail in self._report_data['details']:
+                location = detail.get('location')
+                if location.get('lot') or location.get('parcel') or location.get('block') or \
+                        location.get('districtLot') or location.get('partOf') or location.get('section') or \
+                        location.get('township') or location.get('range') or location.get('meridian') or \
+                        location.get('landDistrict') or location.get('plan'):
+                    location['hasLTSAInfo'] = True
+                else:
+                    location['hasLTSAInfo'] = False
+                if location.get('pidNumber'):
+                    pid = location.get('pidNumber')
+                    location['pidNumber'] = pid[0:3] + '-' + pid[3:6] + '-' + pid[6:]
 
     def _set_search_notes(self):
         """Add search note document type description and dates."""
