@@ -36,7 +36,7 @@
               </header>
 
               <!-- MHR Information Review Section -->
-              <template v-if="isReviewMode">
+              <template v-if="isReviewMode" data-test-id="review-mode">
                 <!-- TODO: Add some form of transferDetails review, either review flag in existing component or
                 new component. To be added in ticket 13905 -->
                 <section>
@@ -97,7 +97,7 @@
                   </v-card>
                 </section>
 
-                <section class="transfer-confirm">
+                <section id="transfer-confirm-section" class="transfer-confirm">
                   <h2>2. Confirm</h2>
                   <p class="mt-2">
                     The following information must be completed and confirmed before submitting this registration.
@@ -156,6 +156,7 @@
                             :hide-details="true"
                             id="checkbox-certified"
                             v-model="confirmCompletion"
+                            data-test-id="confirm-completion-checkbox"
                           >
                             <template v-slot:label>
                               <span :class="{ 'invalid-color': confirmCompletionError }">

@@ -7,7 +7,7 @@ import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
 
 // local components
 import { HomeOwners, MhrInformation } from '@/views'
-import { AccountInfo, StickyContainer } from '@/components/common'
+import { AccountInfo, StickyContainer, CertifyInformation } from '@/components/common'
 import mockRouter from './MockRouter'
 import { HomeTenancyTypes, RouteNames } from '@/enums'
 import { HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
@@ -24,7 +24,7 @@ import {
 import { CertifyIF, MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF } from '@/interfaces'
 import { nextTick } from '@vue/composition-api'
 import { TransferDetails, TransferDetailsReview } from '@/components/mhrTransfers'
-import { CertifyInformation } from '@/components/common'
+
 import { toDisplayPhone } from '@/utils'
 
 Vue.use(Vuetify)
@@ -92,6 +92,14 @@ async function setupCurrentMultipleHomeOwnersGroups (): Promise<void> {
   // TODO: Remove after API updates to include the ID for Owners
   const homeOwnerWithIdsArray = addIDsForOwners(currentHomeOwnersGroups)
   await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerWithIdsArray)
+}
+
+async function enterTransferDetailsFields(): Promise<void> {
+  await store.dispatch('setMhrTransferDeclaredValue', 1000)
+  await store.dispatch('setMhrTransferConsideration', '$1000.00')
+  await store.dispatch('setMhrTransferDate', '2011-11-11')
+  await store.dispatch('setMhrTransferOwnLand', true)
+  await store.dispatch('setTransferDetailsValid', true)
 }
 
 describe('Mhr Information', () => {
@@ -396,10 +404,6 @@ describe('Mhr Information', () => {
   })
 
   it('should render TransferDetailsReview on Review screen', async () => {
-    setupCurrentHomeOwners()
-    wrapper.vm.$data.dataLoaded = true
-    await Vue.nextTick()
-
     // set some test values for transfer details fields
     const mhrTransferDetailsComponent = wrapper.findComponent(MhrInformation).findComponent(TransferDetails)
     mhrTransferDetailsComponent.find(getTestId('declared-value')).setValue(123456)
@@ -433,7 +437,7 @@ describe('Mhr Information', () => {
     expect(mhrTransferDetailsReviewComponent.find('#lease-land-display').exists()).toBeTruthy()
   })
 
-    it('should render yellow message bar on the Review screen', async () => {
+  it('should render yellow message bar on the Review screen', async () => {
     setupCurrentHomeOwners()
     wrapper.vm.$data.dataLoaded = true
     await Vue.nextTick()
@@ -454,5 +458,23 @@ describe('Mhr Information', () => {
 
     // message is removed once out of review screen
     expect(wrapper.find('#yellow-message-bar').exists()).toBeFalsy()
+  })
+
+  it.skip('should render Confirm Completion component on the Review screen', async () => {
+    setupCurrentHomeOwners()
+    wrapper.vm.$data.dataLoaded = true
+    await Vue.nextTick()
+
+    expect(wrapper.find('#transfer-confirm-section').exists()).toBeFalsy()
+
+    wrapper.find('#btn-stacked-submit').trigger('click')
+    await Vue.nextTick()
+
+    expect(wrapper.find('#transfer-confirm-section').exists()).toBeTruthy()
+
+    const confirmCompletionCard = wrapper.find(getTestId('confirm-completion-card'))
+    expect(confirmCompletionCard.exists()).toBeTruthy()
+    expect(confirmCompletionCard.classes('border-error-left')).toBeFalsy()
+    expect(confirmCompletionCard.find(getTestId('confirm-completion-checkbox')).exists()).toBeTruthy()
   })
 })
