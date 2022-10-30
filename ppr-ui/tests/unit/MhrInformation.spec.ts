@@ -94,8 +94,9 @@ async function setupCurrentMultipleHomeOwnersGroups (): Promise<void> {
   await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerWithIdsArray)
 }
 
-async function enterTransferDetailsFields(): Promise<void> {
-  await store.dispatch('setMhrTransferDeclaredValue', 1000)
+// For future use when Transfer Details will be required to go to Review
+async function enterTransferDetailsFields (): Promise<void> {
+  await store.dispatch('setMhrTransferDeclaredValue', '1000')
   await store.dispatch('setMhrTransferConsideration', '$1000.00')
   await store.dispatch('setMhrTransferDate', '2011-11-11')
   await store.dispatch('setMhrTransferOwnLand', true)
@@ -111,11 +112,13 @@ describe('Mhr Information', () => {
   sessionStorage.setItem('CURRENT_ACCOUNT', JSON.stringify(currentAccount))
   sessionStorage.setItem('AUTH_API_URL', 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/')
 
+  const LEGAL_NAME = 'TEST NAME'
+
   beforeEach(async () => {
     await store.dispatch('setCertifyInformation', {
       valid: false,
       certified: false,
-      legalName: '',
+      legalName: LEGAL_NAME,
       registeringParty: mockedRegisteringParty1
     } as CertifyIF)
     wrapper = createComponent()
@@ -323,7 +326,7 @@ describe('Mhr Information', () => {
 
     // trigger error in Attn Ref Num field (40+ chars)
     wrapper.find(getTestId('attn-ref-number-field')).setValue('5'.repeat(45))
-    expect(wrapper.vm.$data.attentionReferenceNum).toBe('5'.repeat(45))
+    expect(wrapper.vm.$data.attentionReference).toBe('5'.repeat(45))
     await Vue.nextTick()
     await Vue.nextTick()
 
@@ -362,7 +365,12 @@ describe('Mhr Information', () => {
     await Vue.nextTick()
 
     // Check if Authorization renders in review mode
-    expect(wrapper.findComponent(MhrInformation).findComponent(CertifyInformation).exists()).toBe(true)
+    expect(
+      wrapper
+        .findComponent(MhrInformation)
+        .findComponent(CertifyInformation)
+        .exists()
+    ).toBe(true)
 
     // Check for component's attributes
     const authorizationComponent = wrapper.findComponent(MhrInformation).findComponent(CertifyInformation)
@@ -404,6 +412,10 @@ describe('Mhr Information', () => {
   })
 
   it('should render TransferDetailsReview on Review screen', async () => {
+    setupCurrentHomeOwners()
+    wrapper.vm.$data.dataLoaded = true
+    await Vue.nextTick()
+
     // set some test values for transfer details fields
     const mhrTransferDetailsComponent = wrapper.findComponent(MhrInformation).findComponent(TransferDetails)
     mhrTransferDetailsComponent.find(getTestId('declared-value')).setValue(123456)
@@ -419,7 +431,7 @@ describe('Mhr Information', () => {
     await Vue.nextTick()
     await Vue.nextTick()
 
-    // renders TranseferDetailsReview
+    // renders TransferDetailsReview
     expect(wrapper.findComponent(TransferDetailsReview).exists()).toBeTruthy()
     const mhrTransferDetailsReviewComponent = wrapper.findComponent(TransferDetailsReview)
 
@@ -452,7 +464,7 @@ describe('Mhr Information', () => {
     // exists on review page
     expect(wrapper.find('#yellow-message-bar').exists()).toBeTruthy()
 
-    //trigger back button
+    // trigger back button
     wrapper.find('#btn-stacked-back').trigger('click')
     await Vue.nextTick()
 
@@ -460,7 +472,7 @@ describe('Mhr Information', () => {
     expect(wrapper.find('#yellow-message-bar').exists()).toBeFalsy()
   })
 
-  it.skip('should render Confirm Completion component on the Review screen', async () => {
+  it('should render Confirm Completion component on the Review screen', async () => {
     setupCurrentHomeOwners()
     wrapper.vm.$data.dataLoaded = true
     await Vue.nextTick()
@@ -476,5 +488,6 @@ describe('Mhr Information', () => {
     expect(confirmCompletionCard.exists()).toBeTruthy()
     expect(confirmCompletionCard.classes('border-error-left')).toBeFalsy()
     expect(confirmCompletionCard.find(getTestId('confirm-completion-checkbox')).exists()).toBeTruthy()
+    expect(confirmCompletionCard.find('.confirm-checkbox').text()).toContain(LEGAL_NAME)
   })
 })

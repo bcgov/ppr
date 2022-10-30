@@ -98,77 +98,10 @@
                 </section>
 
                 <section id="transfer-confirm-section" class="transfer-confirm">
-                  <h2>2. Confirm</h2>
-                  <p class="mt-2">
-                    The following information must be completed and confirmed before submitting this registration.
-                  </p>
-                  <v-card
-                    flat
-                    rounded
-                    id="confirm-completion-card"
-                    class="mt-8 pa-8 pr-6 pb-3"
-                    :class="{ 'border-error-left': confirmCompletionError }"
-                    data-test-id="confirm-completion-card"
-                  >
-                    <v-form ref="confirmCompletionForm">
-                      <v-row>
-                        <v-col cols="3">
-                          <label
-                            class="generic-label"
-                            for="declared-value"
-                            :class="{ 'error-text': confirmCompletionError }"
-                          >
-                            Confirm Completion
-                          </label>
-                        </v-col>
-                        <v-col cols="9" class="confirm-completion-req">
-                          <ol>
-                            <li class="pl-3 pb-3 mb-7">
-                              Bill of sale has been signed by either all owners or by someone with the authority to act
-                              on behalf of the registered owners.
-                              <p class="confirm-completion-note">
-                                <span>Note: </span> If the bill of sale has been signed by someone acting on behalf of
-                                the registered owners, the person submitting this transfer is a lawyer or notary, and
-                                the power by which the signatory was authorized was power of attorney, representation
-                                agreement, committee, receiver, or writ of seizure and sale.
-                              </p>
-                            </li>
-                            <li class="pl-3 pb-3 mb-7">
-                              Search of the Corporate Register has been completed if one or more of the current or
-                              future owners is an incorporated company, society or cooperative association.
-                              <p class="confirm-completion-note">
-                                <span>Note: </span> For current registered owners the incorporated business must have
-                                been active on the Corporate Register at the time the bill of sale was signed. Future
-                                owners must be in active status at the time of registration.
-                              </p>
-                            </li>
-                            <li class="pl-3 pb-3 mb-0">
-                              Personal Property Registry lien search has been completed and there are no liens on the
-                              home that stop the transfer.
-                              <p class="confirm-completion-note">
-                                <span>Note: </span> Liens that stop the transfer include Family Maintenance Enforcement
-                                Act, Family Relations Act, BC Second Mortgage, Land Tax Deferment Act.
-                              </p>
-                            </li>
-                          </ol>
-                          <v-checkbox
-                            class="pa-7 ma-0 confirm-checkbox"
-                            :hide-details="true"
-                            id="checkbox-certified"
-                            v-model="confirmCompletion"
-                            data-test-id="confirm-completion-checkbox"
-                          >
-                            <template v-slot:label>
-                              <span :class="{ 'invalid-color': confirmCompletionError }">
-                                I, <strong>{{ getCertifyInformation.legalName }}</strong
-                                >, confirm that all of the requirements listed above have been completed.
-                              </span>
-                            </template>
-                          </v-checkbox>
-                        </v-col>
-                      </v-row>
-                    </v-form>
-                  </v-card>
+                  <ConfirmCompletion
+                    :legalName="getCertifyInformation.legalName"
+                    @confirmCompletion="isCompletionConfirmed = $event"
+                  />
                 </section>
 
                 <section id="transfer-certify-section" class="mt-10 py-4">
@@ -232,8 +165,7 @@ import { StickyContainer, CertifyInformation } from '@/components/common'
 import { useHomeOwners, useInputRules, useMhrInformation } from '@/composables'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
-import TransferDetails from '@/components/mhrTransfers/TransferDetails.vue'
-import TransferDetailsReview from '@/components/mhrTransfers/TransferDetailsReview.vue'
+import { TransferDetails, TransferDetailsReview, ConfirmCompletion } from '@/components/mhrTransfers'
 import { HomeOwners } from '@/views'
 import { BaseDialog } from '@/components/dialogs'
 import { BaseAddress } from '@/composables/address'
@@ -253,7 +185,8 @@ export default defineComponent({
     HomeOwnersTable,
     StickyContainer,
     CertifyInformation,
-    AccountInfo
+    AccountInfo,
+    ConfirmCompletion
   },
   props: {
     appReady: {
@@ -335,7 +268,7 @@ export default defineComponent({
       }),
       isValidTransfer: computed((): boolean => {
         // Get Owner Count here > 1 etc
-        return !isGlobalEditingMode.value && isTransferDetailsValid.value && isRefNumValid.value && true
+        return !isGlobalEditingMode.value && isTransferDetailsValid.value && true
       }),
       transferErrorMsg: computed((): string => {
         return localState.validate && !localState.isValidTransfer ? '< Please make any required changes' : ''
@@ -347,8 +280,7 @@ export default defineComponent({
         return getMhrTransferHomeOwners.value.filter(owner => owner.action !== ActionTypes.REMOVED)
       }),
       attentionReference: getMhrTransferAttentionReference.value,
-      confirmCompletion: false,
-      confirmCompletionError: null,
+      isCompletionConfirmed: false,
       options: unsavedChangesDialog,
       showCancelDialog: false
     })
@@ -418,11 +350,10 @@ export default defineComponent({
       // If already in review mode, file the transfer
       if (localState.isReviewMode) {
         // Trigger error state for required fields (if not checked)
-        localState.confirmCompletionError = !localState.confirmCompletion
         localState.validateAuthorizationError = !localState.authorizationValid
 
         // Check if any required fields has errors
-        if (localState.validateAuthorizationError || localState.confirmCompletionError) {
+        if (localState.validateAuthorizationError || !localState.isCompletionConfirmed) {
           return
         }
         localState.loading = true
@@ -488,13 +419,6 @@ export default defineComponent({
     )
 
     watch(
-      () => localState.confirmCompletion,
-      (isValid: boolean) => {
-        localState.confirmCompletionError = !isValid
-      }
-    )
-
-    watch(
       () => localState.authorizationValid,
       (isValid: boolean) => {
         localState.validateAuthorizationError = !isValid
@@ -531,39 +455,5 @@ export default defineComponent({
   color: $gray7;
   margin-top: 10px;
   margin-bottom: 20px;
-}
-
-.transfer-confirm {
-  .confirm-completion-req {
-    ol {
-      padding-left: 50px;
-    }
-    ol li:not(:last-child) {
-      border-bottom: 1px solid $gray3;
-      ::marker {
-        font-weight: bold;
-      }
-    }
-  }
-  .confirm-completion-note {
-    margin-top: 20px;
-    font-size: 14px;
-    line-height: 22px;
-    color: $gray7;
-    span {
-      font-weight: bold;
-    }
-  }
-
-  .confirm-checkbox::v-deep {
-    background-color: $gray1;
-    font-size: 16px;
-    line-height: 24px;
-    vertical-align: top;
-
-    .v-input__control .v-input__slot {
-      align-items: flex-start;
-    }
-  }
 }
 </style>
