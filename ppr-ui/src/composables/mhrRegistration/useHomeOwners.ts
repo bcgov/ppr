@@ -137,6 +137,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
     let numOfAdditionalGroupsInDropdown = 0
 
     const homeOwnerGroups = getTransferOrRegistrationHomeOwnerGroups()
+    const removedOwners = homeOwnerGroups.filter(group => group.action === ActionTypes.REMOVED)
 
     if (isAddingHomeOwner) {
       numOfAdditionalGroupsInDropdown = 1
@@ -146,11 +147,14 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
     }
 
     if (showGroups.value) {
-      return Array(homeOwnerGroups.length + numOfAdditionalGroupsInDropdown)
+      const dropDownItems = Array(homeOwnerGroups.length + numOfAdditionalGroupsInDropdown)
         .fill({})
         .map((v, i) => {
           return { text: 'Group ' + (i + 1), value: (i + 1) }
         })
+
+      // Only return groups that have NOT been REMOVED
+      return dropDownItems.filter(item => !removedOwners.find(group => group.groupId === item.value))
     } else {
       return [
         {
@@ -179,7 +183,8 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
       homeOwnerGroups = [...getMhrRegistrationHomeOwnerGroups.value]
     }
     // For Mhr Transfers with Removed Groups, assign a sequential groupId
-    const transferDefaultId = homeOwnerGroups.filter(group => group.action === ActionTypes.REMOVED).length + 1
+    const transferDefaultId = homeOwnerGroups.find(group => group.action !== ActionTypes.REMOVED)?.groupId ||
+      homeOwnerGroups.filter(group => group.action === ActionTypes.REMOVED).length + 1
     const fallBackId = isMhrTransfer ? transferDefaultId : DEFAULT_GROUP_ID
 
     // Try to find a group to add the owner
