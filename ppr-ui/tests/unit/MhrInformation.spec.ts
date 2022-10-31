@@ -490,4 +490,20 @@ describe('Mhr Information', () => {
     expect(confirmCompletionCard.find(getTestId('confirm-completion-checkbox')).exists()).toBeTruthy()
     expect(confirmCompletionCard.find('.confirm-checkbox').text()).toContain(LEGAL_NAME)
   })
+
+  it('should render read only home owners on the Review screen', async () => {
+    setupCurrentHomeOwners()
+    wrapper.vm.$data.dataLoaded = true
+    await Vue.nextTick()
+
+    expect(wrapper.find('#owners-review').exists()).toBeFalsy()
+
+    wrapper.find('#btn-stacked-submit').trigger('click')
+    await Vue.nextTick()
+
+    const homeOwnerReadOnly = wrapper.find('#owners-review')
+    expect(homeOwnerReadOnly.exists()).toBeTruthy()
+
+  })
+
 })
