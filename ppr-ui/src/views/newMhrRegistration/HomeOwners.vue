@@ -181,8 +181,10 @@
           </v-col>
         </v-row>
         <v-row class="my-6 px-7" no-gutters>
-          <v-col cols="12">
-            <span class="generic-label">Home Tenancy Type: </span>
+          <v-col cols="3">
+            <span class="generic-label">Home Tenancy Type</span>
+          </v-col>
+          <v-col cols="9">
             <span data-test-id="home-owner-tenancy-type">{{ homeTenancyType }}</span>
           </v-col>
         </v-row>
