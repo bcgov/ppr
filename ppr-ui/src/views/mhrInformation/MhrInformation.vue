@@ -36,7 +36,7 @@
               </header>
 
               <!-- MHR Information Review Section -->
-              <template v-if="isReviewMode">
+              <template v-if="isReviewMode" data-test-id="review-mode">
                 <!-- TODO: Add some form of transferDetails review, either review flag in existing component or
                 new component. To be added in ticket 13905 -->
                 <section>
@@ -87,7 +87,7 @@
                             id="attention-or-reference-number"
                             class="pr-2"
                             label="Attention or Reference Number (Optional)"
-                            v-model="attentionReferenceNum"
+                            v-model="attentionReference"
                             :rules="maxLength(40)"
                             data-test-id="attn-ref-number-field"
                           />
@@ -95,6 +95,13 @@
                       </v-row>
                     </v-form>
                   </v-card>
+                </section>
+
+                <section id="transfer-confirm-section" class="transfer-confirm">
+                  <ConfirmCompletion
+                    :legalName="getCertifyInformation.legalName"
+                    @confirmCompletion="isCompletionConfirmed = $event"
+                  />
                 </section>
 
                 <section id="transfer-certify-section" class="mt-10 py-4">
@@ -158,8 +165,7 @@ import { StickyContainer, CertifyInformation } from '@/components/common'
 import { useHomeOwners, useInputRules, useMhrInformation } from '@/composables'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
-import TransferDetails from '@/components/mhrTransfers/TransferDetails.vue'
-import TransferDetailsReview from '@/components/mhrTransfers/TransferDetailsReview.vue'
+import { TransferDetails, TransferDetailsReview, ConfirmCompletion } from '@/components/mhrTransfers'
 import { HomeOwners } from '@/views'
 import { BaseDialog } from '@/components/dialogs'
 import { BaseAddress } from '@/composables/address'
@@ -179,7 +185,8 @@ export default defineComponent({
     HomeOwnersTable,
     StickyContainer,
     CertifyInformation,
-    AccountInfo
+    AccountInfo,
+    ConfirmCompletion
   },
   props: {
     appReady: {
@@ -197,18 +204,28 @@ export default defineComponent({
       getMhrTransferHomeOwners,
       getMhrInformation,
       getMhrTransferCurrentHomeOwners,
+      getCertifyInformation,
+      getMhrTransferAttentionReference,
       hasUnsavedChanges
     } = useGetters<any>([
       'getMhrTransferHomeOwners',
       'getMhrInformation',
       'getMhrTransferCurrentHomeOwners',
+      'getCertifyInformation',
+      'getMhrTransferAttentionReference',
       'hasUnsavedChanges'
     ])
 
     const {
-      setMhrTransferHomeOwnerGroups, setMhrTransferCurrentHomeOwnerGroups, setUnsavedChanges
+      setMhrTransferHomeOwnerGroups,
+      setMhrTransferCurrentHomeOwnerGroups,
+      setMhrTransferAttentionReference,
+      setUnsavedChanges
     } = useActions<any>([
-      'setMhrTransferHomeOwnerGroups', 'setMhrTransferCurrentHomeOwnerGroups', 'setUnsavedChanges'
+      'setMhrTransferHomeOwnerGroups',
+      'setMhrTransferCurrentHomeOwnerGroups',
+      'setMhrTransferAttentionReference',
+      'setUnsavedChanges'
     ])
 
     const { setEmptyMhrTransfer } = useActions<any>(['setEmptyMhrTransfer'])
@@ -251,7 +268,7 @@ export default defineComponent({
       }),
       isValidTransfer: computed((): boolean => {
         // Get Owner Count here > 1 etc
-        return !isGlobalEditingMode.value && isTransferDetailsValid.value && isRefNumValid.value && true
+        return !isGlobalEditingMode.value && isTransferDetailsValid.value && true
       }),
       transferErrorMsg: computed((): string => {
         return localState.validate && !localState.isValidTransfer ? '< Please make any required changes' : ''
@@ -262,7 +279,8 @@ export default defineComponent({
       reviewOwners: computed(() => {
         return getMhrTransferHomeOwners.value.filter(owner => owner.action !== ActionTypes.REMOVED)
       }),
-      attentionReferenceNum: '',
+      attentionReference: getMhrTransferAttentionReference.value,
+      isCompletionConfirmed: false,
       options: unsavedChangesDialog,
       showCancelDialog: false
     })
@@ -331,9 +349,11 @@ export default defineComponent({
       localState.validateTransferDetails = true
       // If already in review mode, file the transfer
       if (localState.isReviewMode) {
-        // Check authorization checkbox
-        if (!localState.authorizationValid) {
-          localState.validateAuthorizationError = true
+        // Trigger error state for required fields (if not checked)
+        localState.validateAuthorizationError = !localState.authorizationValid
+
+        // Check if any required fields has errors
+        if (localState.validateAuthorizationError || !localState.isCompletionConfirmed) {
           return
         }
         localState.loading = true
@@ -385,9 +405,23 @@ export default defineComponent({
     }
 
     watch(
+      () => localState.attentionReference,
+      (val: string) => {
+        setMhrTransferAttentionReference(val)
+      }
+    )
+
+    watch(
       () => localState.refNumValid,
       (isFormValid: boolean) => {
         setRefNumValid(isFormValid)
+      }
+    )
+
+    watch(
+      () => localState.authorizationValid,
+      (isValid: boolean) => {
+        localState.validateAuthorizationError = !isValid
       }
     )
 
@@ -397,6 +431,7 @@ export default defineComponent({
       goToDash,
       getMhrTransferHomeOwners,
       getMhrTransferCurrentHomeOwners,
+      getCertifyInformation,
       maxLength,
       isRefNumValid,
       ...toRefs(localState),
@@ -412,7 +447,7 @@ export default defineComponent({
   margin-top: 55px;
 }
 
-.message-bar{
+.message-bar {
   font-size: 14px;
   padding: 1.25rem;
   background-color: $BCgovGold0;

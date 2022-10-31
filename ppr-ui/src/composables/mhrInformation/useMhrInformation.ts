@@ -6,6 +6,7 @@ import { ActionTypes, ApiHomeTenancyTypes, HomeTenancyTypes } from '@/enums'
 // Validation flag for Transfer Details
 const transferDetailsValid = ref(false)
 
+// Validation flags for Review Confirm screen
 const refNumValid = ref(true)
 
 export const useMhrInformation = () => {
@@ -17,6 +18,7 @@ export const useMhrInformation = () => {
     getMhrTransferConsideration,
     getMhrTransferDate,
     getMhrTransferOwnLand,
+    getMhrTransferAttentionReference,
     getMhrTransferHomeOwnerGroups
   } = useGetters<any>([
     'getMhrTransferCurrentHomeOwners',
@@ -27,6 +29,7 @@ export const useMhrInformation = () => {
     'getMhrTransferConsideration',
     'getMhrTransferDate',
     'getMhrTransferOwnLand',
+    'getMhrTransferAttentionReference',
     'getMhrTransferHomeOwnerGroups'
   ])
 
@@ -46,7 +49,8 @@ export const useMhrInformation = () => {
       declaredValue: null,
       consideration: '',
       transferDate: '',
-      ownLand: false
+      ownLand: false,
+      attentionReference: ''
     }
   }
 
@@ -91,6 +95,7 @@ export const useMhrInformation = () => {
       consideration: getMhrTransferConsideration.value,
       transferDate: getMhrTransferDate.value,
       ownLand: getMhrTransferOwnLand.value,
+      attentionReference: getMhrTransferAttentionReference.value,
       documentDescription: 'SALE OR GIFT',
       submittingParty: {
         personName: {
