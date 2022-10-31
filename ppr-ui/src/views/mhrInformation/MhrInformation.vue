@@ -38,9 +38,7 @@
 
               <!-- MHR Information Review Section -->
               <template v-if="isReviewMode" data-test-id="review-mode">
-                <!-- TODO: Add some form of transferDetails review, either review flag in existing component or
-                new component. To be added in ticket 13905 -->
-                <section>
+                <section id="owners-review">
                   <HomeOwners
                     isMhrTransfer
                     isReadonlyTable

@@ -165,7 +165,7 @@
       </v-row>
 
       <!-- Read Only Template -->
-      <v-card  v-else class="review-table">
+      <v-card v-else class="review-table" id="read-only-owners">
         <v-row class="my-6 px-7 pt-10" no-gutters>
           <v-col cols="12">
             <span class="generic-label">Home Owners </span>
