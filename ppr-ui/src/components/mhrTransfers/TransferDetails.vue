@@ -106,7 +106,7 @@
 import { DatePicker } from '@bcrs-shared-components/date-picker'
 import { useInputRules, useMhrInformation } from '@/composables'
 import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
-import { useActions } from 'vuex-composition-helpers'
+import { useActions, useGetters } from 'vuex-composition-helpers'
 
 export default defineComponent({
   name: 'TransferDetails',
@@ -119,6 +119,18 @@ export default defineComponent({
   },
   setup (props, context) {
     const { customRules, required, isNumber, maxLength } = useInputRules()
+
+    const {
+      getMhrTransferDeclaredValue,
+      getMhrTransferConsideration,
+      getMhrTransferDate,
+      getMhrTransferOwnLand
+    } = useGetters<any>([
+      'getMhrTransferDeclaredValue',
+      'getMhrTransferConsideration',
+      'getMhrTransferDate',
+      'getMhrTransferOwnLand'
+    ])
 
     const {
       setMhrTransferDeclaredValue,
@@ -159,10 +171,10 @@ export default defineComponent({
 
     const localState = reactive({
       transferDetailsValid: false,
-      declaredValue: null,
-      consideration: null,
-      transferDate: null,
-      isOwnLand: false,
+      declaredValue: getMhrTransferDeclaredValue.value,
+      consideration: getMhrTransferConsideration.value,
+      transferDate: getMhrTransferDate.value,
+      isOwnLand: getMhrTransferOwnLand.value,
       enableWarningMsg: false,
       showFormError: computed(() => props.validateTransferDetails && !localState.transferDetailsValid)
     })
