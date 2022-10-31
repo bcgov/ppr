@@ -43,6 +43,7 @@ export interface MhrDraftTransferApiIF {
   type: string
   registration: MhrTransferApiIF
   error?: ErrorIF
+  baseRegistrationNumber?: string
 }
 
 export interface MhrDraftTransferResponseIF {

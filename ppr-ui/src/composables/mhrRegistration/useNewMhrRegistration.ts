@@ -4,10 +4,12 @@ import {
   MhrRegistrationHomeLocationIF,
   MhrRegistrationHomeOwnerGroupIF,
   MhrRegistrationIF,
-  NewMhrRegistrationApiIF
+  NewMhrRegistrationApiIF,
+  MhRegistrationSummaryIF,
+  MhrDraftTransferApiIF
 } from '@/interfaces'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
-import { HomeTenancyTypes } from '@/enums'
+import { APIStatusTypes, HomeTenancyTypes } from '@/enums'
 import { getMhrDrafts, mhrRegistrationHistory } from '@/utils'
 
 export const useNewMhrRegistration = () => {
@@ -198,9 +200,44 @@ export const useNewMhrRegistration = () => {
   const fetchMhRegistrations = async (): Promise<void> => {
     const draftFilings = await getMhrDrafts()
     const myMhrHistory = await mhrRegistrationHistory()
-    setMhrTableHistory([...draftFilings, ...myMhrHistory])
+    const filteredMhrHistory = addHistoryDraftsToMhr(myMhrHistory, draftFilings)
+    setMhrTableHistory([...filteredMhrHistory])
   }
 
+  function addHistoryDraftsToMhr (mhrHistory: MhRegistrationSummaryIF[], mhrDrafts: MhrDraftTransferApiIF[]):
+    MhRegistrationSummaryIF[] {
+    const sorter = require('lodash')
+    const sortedDraftFilings = sorter.orderBy(mhrDrafts, ['createDateTime'], ['desc'])
+    // add drafts to Registrations..
+    const filteredMhrHistory = sorter
+      .orderBy(mhrHistory.filter(t => t.registrationDescription === 'REGISTER NEW UNIT'), ['createdDateTime'], ['desc'])
+    filteredMhrHistory.forEach(transfer => {
+      transfer.baseRegistrationNumber = transfer.mhrNumber
+      var mhrDrafts = sortedDraftFilings.filter(s => s.mhrNumber === transfer.mhrNumber)
+      if (mhrDrafts?.length > 0) {
+        transfer.hasDraft = true
+        transfer.changes = []
+        mhrDrafts.forEach(draft => {
+          const newDraft: MhRegistrationSummaryIF = {
+            mhrNumber: transfer.mhrNumber,
+            baseRegistrationNumber: transfer.mhrNumber,
+            submittingParty: draft.submittingParty,
+            clientReferenceId: transfer.clientReferenceId,
+            createDateTime: draft.createDateTime,
+            error: draft.error,
+            registrationDescription: draft.registrationDescription,
+            hasDraft: true,
+            ownerNames: '',
+            path: draft.path,
+            statusType: APIStatusTypes.DRAFT,
+            username: ''
+          }
+          transfer.changes.push(newDraft)
+        })
+      }
+    })
+    return filteredMhrHistory
+  }
   /**
    * @function cleanEmpty
    *

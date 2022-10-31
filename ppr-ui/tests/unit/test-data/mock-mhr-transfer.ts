@@ -1,4 +1,4 @@
-import { AddressIF, MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF } from "@/interfaces";
+import { AddressIF, MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF } from '@/interfaces'
 
 export const mockMhrTransferCurrentHomeOwner = {
   groupId: 1,
