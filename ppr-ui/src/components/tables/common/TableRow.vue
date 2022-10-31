@@ -597,7 +597,8 @@ export default defineComponent({
 
     const isDraft = (item: any): boolean => {
       // RegistrationSummaryIF | DraftResultIF | MhrDraftTransferApiIF
-      return props.isPpr ? item.type !== undefined : (item.statusType === APIStatusTypes.DRAFT || item.statusType === undefined)
+      return props.isPpr
+        ? item.type !== undefined : (item.statusType === APIStatusTypes.DRAFT || item.statusType === undefined)
     }
 
     const isExpired = (item: RegistrationSummaryIF): boolean => {

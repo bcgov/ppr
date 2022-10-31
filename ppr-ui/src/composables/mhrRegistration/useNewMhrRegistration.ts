@@ -209,7 +209,8 @@ export const useNewMhrRegistration = () => {
     const sorter = require('lodash')
     const sortedDraftFilings = sorter.orderBy(mhrDrafts, ['createDateTime'], ['desc'])
     // add drafts to Registrations..
-    const filteredMhrHistory = sorter.orderBy(mhrHistory.filter(t => t.registrationDescription === 'REGISTER NEW UNIT'), ['createdDateTime'], ['desc'])
+    const filteredMhrHistory = sorter
+      .orderBy(mhrHistory.filter(t => t.registrationDescription === 'REGISTER NEW UNIT'), ['createdDateTime'], ['desc'])
     filteredMhrHistory.forEach(transfer => {
       transfer.baseRegistrationNumber = transfer.mhrNumber
       var mhrDrafts = sortedDraftFilings.filter(s => s.mhrNumber === transfer.mhrNumber)

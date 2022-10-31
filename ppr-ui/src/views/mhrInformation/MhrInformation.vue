@@ -239,7 +239,10 @@ export default defineComponent({
         return localState.isReviewMode ? 'Back' : ''
       }),
       isValidTransfer: computed((): boolean => {
-        return !isGlobalEditingMode.value && isTransferDetailsValid.value && isRefNumValid.value && true // Get Owner Count here > 1 etc
+        return !isGlobalEditingMode.value &&
+          isTransferDetailsValid.value &&
+          isRefNumValid.value &&
+          true // Get Owner Count here > 1 etc
       }),
       transferErrorMsg: computed((): string => {
         return localState.validate && !localState.isValidTransfer ? '< Please make any required changes' : ''
