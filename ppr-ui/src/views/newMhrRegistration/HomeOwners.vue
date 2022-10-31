@@ -190,6 +190,7 @@
         </v-row>
         <HomeOwnersTable
           class="px-7"
+          showChips
           :homeOwners="hideRemovedOwners ? filteredHomeOwners : getHomeOwners"
           :isAdding="disableAddHomeOwnerBtn"
           :isMhrTransfer="isMhrTransfer"
