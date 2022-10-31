@@ -12,6 +12,16 @@
       disable-sort
       disable-pagination
     >
+      <template
+        v-slot:header
+        v-if="isMhrTransfer && hasRemovedAllHomeOwners(homeOwners) && addedOwnerCount === 0"
+      >
+        <tr class="fs-14 text-center no-owners-head-row" data-test-id="no-data-msg">
+          <td class="pa-6" :colspan="homeOwnersTableHeaders.length">
+            No owners added yet.
+          </td>
+        </tr>
+      </template>
 
       <template v-slot:group.header="{ group, items }" class="group-header-slot">
         <td
@@ -239,6 +249,7 @@ export default defineComponent({
       hasEmptyGroup,
       hasMinimumGroups,
       editHomeOwner,
+      getGroupForOwner,
       undoGroupRemoval,
       hasRemovedAllHomeOwners,
       getTransferOrRegistrationHomeOwners,
@@ -254,6 +265,9 @@ export default defineComponent({
       showTableError: computed((): boolean => showGroups.value && (hasMinimumGroups() || hasEmptyGroup.value)),
       showEditActions: computed((): boolean => !props.isReadonlyTable),
       homeOwnersTableHeaders: props.isReadonlyTable ? homeOwnersTableHeadersReview : homeOwnersTableHeaders,
+      addedOwnerCount: computed((): number => {
+        return getTransferOrRegistrationHomeOwners().filter(owner => owner.action === ActionTypes.ADDED).length
+      }),
       addedGroupCount: computed((): number => {
         return getTransferOrRegistrationHomeOwnerGroups().filter(group => group.action === ActionTypes.ADDED).length
       })
@@ -262,7 +276,14 @@ export default defineComponent({
     const remove = (item): void => {
       localState.currentlyEditingHomeOwnerId = -1
       setUnsavedChanges(true)
+
+      const group = getGroupForOwner(item.groupId)
       removeOwner(item)
+
+      // Remove the Group if it was Added, and we are removing the last Owner
+      if (group.owners.length === 0 && group.action === ActionTypes.ADDED) {
+        deleteGroup(item.groupId)
+      }
     }
 
     const markForRemoval = (item: MhrRegistrationHomeOwnerIF): void => {
