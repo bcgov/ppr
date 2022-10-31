@@ -281,7 +281,7 @@ export default defineComponent({
       removeOwner(item)
 
       // Remove the Group if it was Added, and we are removing the last Owner
-      if (group.owners.length === 0 && group.action === ActionTypes.ADDED) {
+      if (group?.owners.length === 0 && group?.action === ActionTypes.ADDED) {
         deleteGroup(item.groupId)
       }
     }
