@@ -83,7 +83,6 @@ export default defineComponent({
     }
   },
   emits: ['confirmCompletion'],
-
   setup (props, { emit }) {
     const localState = reactive({
       confirmCompletionError: false,
