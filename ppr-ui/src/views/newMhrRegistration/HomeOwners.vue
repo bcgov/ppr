@@ -79,7 +79,7 @@
       </template>
 
       <!-- Add/Remove Owner Actions -->
-      <v-row no-gutters>
+      <v-row no-gutters v-if="!isReadonlyTable">
         <v-col cols="12">
           <v-btn
             outlined
@@ -130,7 +130,7 @@
         </v-col>
       </v-row>
 
-      <v-row class="my-6" no-gutters>
+      <v-row v-if="!isReadonlyTable" class="my-6" no-gutters>
         <v-col cols="12">
           <span class="generic-label">Home Tenancy Type: </span>
           <span data-test-id="home-owner-tenancy-type">{{ homeTenancyType }}</span>
@@ -163,6 +163,38 @@
           </span>
         </v-col>
       </v-row>
+
+      <!-- Read Only Template -->
+      <v-card  v-else class="review-table">
+        <v-row class="my-6 px-7 pt-10" no-gutters>
+          <v-col cols="12">
+            <span class="generic-label">Home Owners </span>
+            <span
+              v-if="isMhrTransfer && hasRemovedOwners"
+              class="float-right hide-show-owners fs-14"
+              @click="hideShowRemovedOwners()"
+            >
+              <v-icon v-if="hideRemovedOwners" class="hide-show-owners-icon pr-1" color="primary">mdi-eye</v-icon>
+              <v-icon v-else class="hide-show-owners-icon pr-1" color="primary">mdi-eye-off</v-icon>
+              {{ hideShowRemovedOwnersLabel }} Deleted Owners
+            </span>
+          </v-col>
+        </v-row>
+        <v-row class="my-6 px-7" no-gutters>
+          <v-col cols="12">
+            <span class="generic-label">Home Tenancy Type: </span>
+            <span data-test-id="home-owner-tenancy-type">{{ homeTenancyType }}</span>
+          </v-col>
+        </v-row>
+        <HomeOwnersTable
+          class="px-7"
+          :homeOwners="hideRemovedOwners ? filteredHomeOwners : getHomeOwners"
+          :isAdding="disableAddHomeOwnerBtn"
+          :isMhrTransfer="isMhrTransfer"
+          :isReadonlyTable="isReadonlyTable"
+          :hideRemovedOwners="hideRemovedOwners"
+        />
+      </v-card>
     </section>
 
     <v-expand-transition>
@@ -182,7 +214,7 @@
       />
     </v-expand-transition>
 
-    <div>
+    <div v-if="!isReadonlyTable">
       <v-fade-transition>
         <HomeOwnersTable
           :homeOwners="hideRemovedOwners ? filteredHomeOwners : getHomeOwners"
@@ -200,7 +232,7 @@ import { useActions, useGetters } from 'vuex-composition-helpers'
 import { AddEditHomeOwner, HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
 import { BaseDialog } from '@/components/dialogs'
 import { SimpleHelpToggle } from '@/components/common'
-import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
+import { computed, defineComponent, onMounted, reactive, toRefs, watch } from '@vue/composition-api'
 import { useHomeOwners } from '@/composables/mhrRegistration'
 /* eslint-disable no-unused-vars */
 import { MhrRegistrationTotalOwnershipAllocationIF } from '@/interfaces'
@@ -217,6 +249,10 @@ export default defineComponent({
   },
   props: {
     isMhrTransfer: {
+      type: Boolean,
+      default: false
+    },
+    isReadonlyTable: {
       type: Boolean,
       default: false
     }
@@ -326,6 +362,13 @@ export default defineComponent({
       }
     )
 
+    onMounted(() => {
+      // when mounted in review mode, deleted owners hidden as per default
+      if (props.isReadonlyTable) {
+        hideShowRemovedOwners()
+      }
+    })
+
     return {
       getMhrRegistrationHomeOwners,
       getMhrTransferCurrentHomeOwners,
@@ -366,5 +409,10 @@ export default defineComponent({
   span {
     vertical-align: text-bottom;
   }
+}
+
+.review-table{
+  margin-top: -40px !important;
+  padding-top: 0px !important;
 }
 </style>
