@@ -7,7 +7,7 @@ import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
 
 // local components
 import { HomeOwners, MhrInformation } from '@/views'
-import { AccountInfo, StickyContainer } from '@/components/common'
+import { AccountInfo, StickyContainer, CertifyInformation } from '@/components/common'
 import mockRouter from './MockRouter'
 import { HomeTenancyTypes, RouteNames } from '@/enums'
 import { HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
@@ -24,7 +24,7 @@ import {
 import { CertifyIF, MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF } from '@/interfaces'
 import { nextTick } from '@vue/composition-api'
 import { TransferDetails } from '@/components/mhrTransfers'
-import { CertifyInformation } from '@/components/common'
+
 import { toDisplayPhone } from '@/utils'
 
 Vue.use(Vuetify)

@@ -71,7 +71,7 @@
       </v-btn>
     </td>
     <td v-if="inSelectedHeaders('createDateTime')" :class="isChild || item.expanded ? $style['border-left']: ''">
-      <span v-if="!isDraft(item)">
+      <span v-if="!isDraft(item) || !isPpr">
         {{ getFormattedDate(item.createDateTime) }}
       </span>
       <span v-else>
@@ -82,7 +82,7 @@
       v-if="inSelectedHeaders('statusType')"
       :class="isChild || item.expanded ? $style['border-left']: ''"
     >
-      <div v-if="!isChild || isDraft(item)">
+      <div v-if="!isChild || isDraft(item) || !isPpr">
         {{ getStatusDescription(item.statusType) }}
         <p v-if="!isChild && item.hasDraft" class="ma-0">
           <i>{{ isPpr ? '* Draft Amendment' : '* Draft Changes' }}</i>
@@ -597,7 +597,7 @@ export default defineComponent({
 
     const isDraft = (item: any): boolean => {
       // RegistrationSummaryIF | DraftResultIF | MhrDraftTransferApiIF
-      return props.isPpr ? item.type !== undefined : item.statusType === undefined
+      return props.isPpr ? item.type !== undefined : (item.statusType === APIStatusTypes.DRAFT || item.statusType === undefined)
     }
 
     const isExpired = (item: RegistrationSummaryIF): boolean => {

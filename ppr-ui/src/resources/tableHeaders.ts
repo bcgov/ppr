@@ -468,31 +468,10 @@ export const mhRegistrationTableHeaders: Array<BaseHeaderIF> = [
     display: true
   },
   {
-    class: 'min-column-sm',
-    sortable: false,
-    text: 'Username',
-    value: 'registeringName',
-    display: true
-  },
-  {
     class: 'min-column-mds',
     sortable: false,
     text: 'Submitting Party',
     value: 'registeringParty',
-    display: true
-  },
-  {
-    class: 'min-column-mds',
-    sortable: false,
-    text: 'Owners',
-    value: 'ownerNames',
-    display: true
-  },
-  {
-    class: 'min-column-mds',
-    sortable: false,
-    text: 'Folio/Reference Number',
-    value: 'clientReferenceId',
     display: true
   },
   {
