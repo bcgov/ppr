@@ -65,7 +65,7 @@ import { RegistrationFlowType, RouteNames, StatementTypes } from '@/enums'
 import { getFeatureFlag, submitMhrRegistration } from '@/utils'
 import { Stepper, StickyContainer } from '@/components/common'
 import ButtonFooter from '@/components/common/ButtonFooter.vue'
-import { useMhrValidations, useNewMhrRegistration } from '@/composables'
+import { useHomeOwners, useMhrValidations, useNewMhrRegistration } from '@/composables'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 /* eslint-disable no-unused-vars */
 import { RegistrationTypeIF } from '@/interfaces'
@@ -122,6 +122,10 @@ export default defineComponent({
       buildApiData,
       parseStaffPayment
     } = useNewMhrRegistration()
+
+    const {
+      setShowGroups
+    } = useHomeOwners()
 
     const localState = reactive({
       dataLoaded: false,
@@ -207,6 +211,7 @@ export default defineComponent({
         localState.submitting = false
         if (!mhrSubmission.error && mhrSubmission?.mhrNumber) {
           resetAllValidations()
+          setShowGroups(false)
           await context.root.$router.push({ name: RouteNames.DASHBOARD })
         } else {
           console.log(mhrSubmission?.error) // Handle Schema or Api errors here..
