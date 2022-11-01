@@ -490,4 +490,39 @@ describe('Mhr Information', () => {
     expect(confirmCompletionCard.find(getTestId('confirm-completion-checkbox')).exists()).toBeTruthy()
     expect(confirmCompletionCard.find('.confirm-checkbox').text()).toContain(LEGAL_NAME)
   })
+
+  it('should render read only home owners on the Review screen', async () => {
+    setupCurrentHomeOwners()
+    wrapper.vm.$data.dataLoaded = true
+    await Vue.nextTick()
+
+    // TODO: check that removed owners are not displayed in review
+    const owners = [mockedRemovedPerson] as MhrRegistrationHomeOwnerIF[] // same IF for Transfer and Registration
+    const homeOwnerGroup = [
+      mockMhrTransferCurrentHomeOwner,
+      { groupId: 1, owners: owners }
+    ] as MhrRegistrationHomeOwnerGroupIF[]
+
+    await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerGroup)
+    expect(wrapper.findComponent(HomeOwners).findComponent(HomeOwnersTable).exists()).toBeTruthy()
+    const ownersTable = wrapper.findComponent(HomeOwners).findComponent(HomeOwnersTable)
+
+    // check owners are in table
+    expect(ownersTable.props().homeOwners.length).toBe(2)
+    
+    // review table doesnt exist yet
+    expect(wrapper.find('#owners-review').exists()).toBeFalsy()
+
+    wrapper.find('#btn-stacked-submit').trigger('click')
+    await Vue.nextTick()
+
+    //review table renders
+    const homeOwnerReadOnly = wrapper.find('#owners-review')
+    expect(homeOwnerReadOnly.exists()).toBeTruthy()
+
+    // values remain in table
+    expect(wrapper.findComponent(HomeOwners).props().isReadonlyTable).toBeTruthy()
+    expect(ownersTable.props().homeOwners.length).toBe(2)
+  })
+
 })

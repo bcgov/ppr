@@ -83,7 +83,7 @@
             </div>
 
             <!-- Hide Chips for Review Mode -->
-            <template v-if="!isReadonlyTable">
+            <template v-if="!isReadonlyTable || showChips">
               <v-chip
                 v-if="isMhrTransfer && isAddedHomeOwner(row.item)"
                 class="badge-added ml-8 mt-2"
@@ -230,7 +230,8 @@ export default defineComponent({
     isAdding: { default: false },
     isReadonlyTable: { type: Boolean, default: false },
     isMhrTransfer: { type: Boolean, default: false },
-    hideRemovedOwners: { type: Boolean, default: false }
+    hideRemovedOwners: { type: Boolean, default: false },
+    showChips: { type: Boolean, default: false }
   },
   components: {
     BaseAddress,

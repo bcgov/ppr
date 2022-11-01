@@ -27,21 +27,19 @@
               </v-col>
             </v-row>
             <header id="yellow-message-bar" class="message-bar" v-if="isReviewMode">
-              <label><b>Important:</b> This information must match the information on the bill of sale</label>
+              <label><b>Important:</b> This information must match the information on the bill of sale.</label>
             </header>
             <section v-if="dataLoaded" class="py-4">
               <header class="review-header mt-1">
                 <v-icon class="ml-1" color="darkBlue">mdi-home</v-icon>
-                <label class="font-weight-bold pl-2">Home Owners</label>
+                <label class="font-weight-bold pl-2">{{ isReviewMode ?
+                'Ownership Transfer or Change - Sale or Beneficiary' : 'Home Owners' }}</label>
               </header>
 
               <!-- MHR Information Review Section -->
               <template v-if="isReviewMode" data-test-id="review-mode">
-                <!-- TODO: Add some form of transferDetails review, either review flag in existing component or
-                new component. To be added in ticket 13905 -->
-                <section>
-                  <HomeOwnersTable
-                    class="px-7"
+                <section id="owners-review">
+                  <HomeOwners
                     isMhrTransfer
                     isReadonlyTable
                     :homeOwners="reviewOwners"
