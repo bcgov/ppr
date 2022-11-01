@@ -98,6 +98,7 @@
                 <section id="transfer-confirm-section" class="transfer-confirm">
                   <ConfirmCompletion
                     :legalName="getCertifyInformation.legalName"
+                    :setShowErrors="validateConfirmCompletion"
                     @confirmCompletion="isCompletionConfirmed = $event"
                   />
                 </section>
@@ -252,6 +253,7 @@ export default defineComponent({
       validateTransferDetails: false,
       refNumValid: false,
       authorizationValid: false,
+      validateConfirmCompletion: false,
       validateAuthorizationError: false,
       accountInfo: null,
       feeType: FeeSummaryTypes.MHR_TRANSFER, // FUTURE STATE: To be dynamic, dependent on what changes have been made
@@ -346,9 +348,10 @@ export default defineComponent({
       if (localState.isReviewMode) {
         // Trigger error state for required fields (if not checked)
         localState.validateAuthorizationError = !localState.authorizationValid
+        localState.validateConfirmCompletion = !localState.isCompletionConfirmed
 
         // Check if any required fields has errors
-        if (localState.validateAuthorizationError || !localState.isCompletionConfirmed) {
+        if (localState.validateAuthorizationError || localState.validateConfirmCompletion) {
           return
         }
         localState.loading = true
