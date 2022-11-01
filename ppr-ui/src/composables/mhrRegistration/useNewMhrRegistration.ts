@@ -11,7 +11,7 @@ import {
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 import { APIStatusTypes, HomeTenancyTypes } from '@/enums'
 import { getMhrDrafts, mhrRegistrationHistory } from '@/utils'
-
+import { orderBy } from 'lodash'
 export const useNewMhrRegistration = () => {
   const {
     getMhrRegistrationHomeDescription,
@@ -206,11 +206,10 @@ export const useNewMhrRegistration = () => {
 
   function addHistoryDraftsToMhr (mhrHistory: MhRegistrationSummaryIF[], mhrDrafts: MhrDraftTransferApiIF[]):
     MhRegistrationSummaryIF[] {
-    const sorter = require('lodash')
-    const sortedDraftFilings = sorter.orderBy(mhrDrafts, ['createDateTime'], ['desc'])
+    const sortedDraftFilings = orderBy(mhrDrafts, ['createDateTime'], ['desc'])
     // add drafts to Registrations..
-    const filteredMhrHistory = sorter
-      .orderBy(mhrHistory.filter(t => t.registrationDescription === 'REGISTER NEW UNIT'), ['createdDateTime'], ['desc'])
+    var reg = mhrHistory.filter(t => t.registrationDescription === 'REGISTER NEW UNIT')
+    const filteredMhrHistory = orderBy(reg, ['createDateTime'], ['desc'])
     filteredMhrHistory.forEach(transfer => {
       transfer.baseRegistrationNumber = transfer.mhrNumber
       var mhrDrafts = sortedDraftFilings.filter(s => s.mhrNumber === transfer.mhrNumber)
