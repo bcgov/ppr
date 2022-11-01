@@ -174,8 +174,9 @@
               class="float-right hide-show-owners fs-14"
               @click="hideShowRemovedOwners()"
             >
-              <v-icon v-if="hideRemovedOwners" class="hide-show-owners-icon pr-1" color="primary">mdi-eye</v-icon>
-              <v-icon v-else class="hide-show-owners-icon pr-1" color="primary">mdi-eye-off</v-icon>
+            <v-icon class="hide-show-owners-icon pr-1" color="primary">
+              {{ hideRemovedOwners ? 'mdi-eye' : 'mdi-eye-off' }}
+            </v-icon>
               {{ hideShowRemovedOwnersLabel }} Deleted Owners
             </span>
           </v-col>
@@ -235,7 +236,7 @@ import { useActions, useGetters } from 'vuex-composition-helpers'
 import { AddEditHomeOwner, HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
 import { BaseDialog } from '@/components/dialogs'
 import { SimpleHelpToggle } from '@/components/common'
-import { computed, defineComponent, onMounted, reactive, toRefs, watch } from '@vue/composition-api'
+import { computed, defineComponent, onBeforeMount, reactive, toRefs, watch } from '@vue/composition-api'
 import { useHomeOwners } from '@/composables/mhrRegistration'
 /* eslint-disable no-unused-vars */
 import { MhrRegistrationTotalOwnershipAllocationIF } from '@/interfaces'
@@ -368,8 +369,8 @@ export default defineComponent({
       }
     )
 
-    onMounted(() => {
-      // when mounted in review mode, deleted owners hidden as per default
+    onBeforeMount(() => {
+      // before mounted in review mode, deleted owners hidden as per default
       if (props.isReadonlyTable) {
         hideShowRemovedOwners()
       }
