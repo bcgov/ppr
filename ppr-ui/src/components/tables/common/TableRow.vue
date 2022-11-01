@@ -106,7 +106,7 @@
       v-if="inSelectedHeaders('ownerNames') && isPpr"
       :class="isChild || item.expanded ? $style['border-left']: ''"
     >
-      {{ item.ownerNames && isPpr}}
+      {{ item.ownerNames}}
     </td>
     <td
       v-if="inSelectedHeaders('securedParties') && isPpr"
