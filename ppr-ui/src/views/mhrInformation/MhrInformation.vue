@@ -135,6 +135,7 @@
                   @back="isReviewMode = false"
                   @save="onSave()"
                   @submit="goToReview()"
+                  data-test-id="fee-summary"
                 />
               </affix>
             </aside>
@@ -266,12 +267,18 @@ export default defineComponent({
       showBackBtn: computed((): string => {
         return localState.isReviewMode ? 'Back' : ''
       }),
-      isValidTransfer: computed((): boolean => {
+      isValidTransfer: computed((): boolean => { // is valid on first step
         // Get Owner Count here > 1 etc
         return !isGlobalEditingMode.value && isTransferDetailsValid.value && true
       }),
+      isValidTransferReview: computed((): boolean => { // is valid on review step
+        return localState.isReviewMode && isRefNumValid.value && localState.isCompletionConfirmed && !localState.validateAuthorizationError
+      }),
       transferErrorMsg: computed((): string => {
-        return localState.validate && !localState.isValidTransfer ? '< Please make any required changes' : ''
+        const isValidReview = localState.isReviewMode ? !localState.isValidTransferReview : !localState.isValidTransfer
+        return localState.validate && isValidReview && localState.isReviewMode
+          ? '< Please make any required changes'
+          : ''
       }),
       reviewConfirmText: computed((): string => {
         return localState.isReviewMode ? 'Register Changes and Pay' : 'Review and Confirm'
@@ -341,6 +348,12 @@ export default defineComponent({
       }
     }
 
+    const scrollToFirstError = async () => {
+      setTimeout(() => {
+        document.getElementsByClassName('border-error-left')[0].scrollIntoView({ behavior: 'smooth' })
+      }, 10)
+    }
+
     const goToReview = async (): Promise<void> => {
       localState.validate = true
       localState.validateTransferDetails = true
@@ -352,6 +365,7 @@ export default defineComponent({
 
         // Check if any required fields has errors
         if (localState.validateAuthorizationError || localState.validateConfirmCompletion) {
+          await scrollToFirstError()
           return
         }
         localState.loading = true
@@ -367,6 +381,7 @@ export default defineComponent({
       // Otherwise if transfer is valid, enter review mode
       if (localState.isValidTransfer) {
         localState.isReviewMode = true
+        localState.validate = false
       }
     }
 
@@ -433,6 +448,7 @@ export default defineComponent({
       getCertifyInformation,
       maxLength,
       isRefNumValid,
+      isTransferDetailsValid,
       ...toRefs(localState),
       handleDialogResp
     }
