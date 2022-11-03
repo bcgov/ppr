@@ -211,6 +211,7 @@
 <script lang="ts">
 import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
 import { homeOwnersTableHeaders, homeOwnersTableHeadersReview } from '@/resources/tableHeaders'
+import { useMhrValidations } from '@/composables'
 import { BaseAddress } from '@/composables/address'
 import { useHomeOwners } from '@/composables/mhrRegistration'
 import { PartyAddressSchema } from '@/schemas'
@@ -221,7 +222,7 @@ import TableGroupHeader from '@/components/mhrRegistration/HomeOwners/TableGroup
 import { MhrRegistrationHomeOwnerIF } from '@/interfaces'
 import { ActionTypes, RouteNames } from '@/enums'
 /* eslint-enable no-unused-vars */
-import { useActions } from 'vuex-composition-helpers'
+import { useActions, useGetters } from 'vuex-composition-helpers'
 
 export default defineComponent({
   name: 'HomeOwnersTable',
@@ -259,13 +260,18 @@ export default defineComponent({
 
     const { setUnsavedChanges } = useActions<any>(['setUnsavedChanges'])
 
+    const { getMhrRegistrationValidationModel } = useGetters<any>(['getMhrRegistrationValidationModel'])
+
+    const { getValidation, MhrSectVal, MhrCompVal } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
+
     const localState = reactive({
       currentlyEditingHomeOwnerId: -1,
       reviewed: false,
       isEditingMode: computed((): boolean => localState.currentlyEditingHomeOwnerId >= 0),
       isAddingMode: computed((): boolean => props.isAdding),
       showTableError: computed((): boolean => showGroups.value && (hasMinimumGroups() || hasEmptyGroup.value)),
-      reviewedNoOwners: computed((): boolean => !hasActualOwners(props.homeOwners) && localState.reviewed),
+      reviewedNoOwners: computed((): boolean => !hasActualOwners(props.homeOwners) &&
+      getValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_STEPS)),
       showEditActions: computed((): boolean => !props.isReadonlyTable),
       homeOwnersTableHeaders: props.isReadonlyTable ? homeOwnersTableHeadersReview : homeOwnersTableHeaders,
       addedOwnerCount: computed((): number => {
@@ -344,10 +350,6 @@ export default defineComponent({
         setGlobalEditingMode(localState.isEditingMode)
       }
     )
-
-    watch(() => context.root.$route.name, (route: string) => {
-      if (route === RouteNames.MHR_REVIEW_CONFIRM) localState.reviewed = true
-    })
 
     return {
       ActionTypes,

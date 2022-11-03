@@ -1,6 +1,5 @@
 import Vue from 'vue'
 import Vuetify from 'vuetify'
-import VueRouter from 'vue-router'
 import { getVuexStore } from '@/store'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 
@@ -13,11 +12,10 @@ import {
   FractionalOwnership
 } from '@/components/mhrRegistration/HomeOwners'
 import { SimpleHelpToggle } from '@/components/common'
-import mockRouter from './MockRouter'
 import { mockedPerson, mockedOrganization } from './test-data'
 import { getTestId } from './utils'
 import { MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF } from '@/interfaces'
-import { HomeTenancyTypes, RouteNames } from '@/enums'
+import { HomeTenancyTypes } from '@/enums'
 
 Vue.use(Vuetify)
 
@@ -27,16 +25,12 @@ const store = getVuexStore()
 function createComponent (): Wrapper<any> {
   const localVue = createLocalVue()
   localVue.use(Vuetify)
-  localVue.use(VueRouter)
-  const router = mockRouter.mock()
-  router.push({ name: RouteNames.MHR_REVIEW_CONFIRM })
 
   document.body.setAttribute('data-app', 'true')
   return mount(HomeOwners, {
     localVue,
     propsData: {},
     store,
-    router,
     vuetify
   })
 }
