@@ -1,5 +1,5 @@
 <template>
-  <v-card flat class="py-6 px-8 mb-20 rounded">
+  <v-card flat class="py-6 px-8 mb-5 rounded">
     <v-row id="mhr-home-add-person">
       <v-col cols="3">
         <label class="generic-label"> {{ getSidebarTitle }} </label>
@@ -500,8 +500,5 @@ export default defineComponent({
     color: $gray7;
     line-height: 24px;
   }
-}
-.mb-20{
-  margin-bottom: 20px !important;
 }
 </style>
