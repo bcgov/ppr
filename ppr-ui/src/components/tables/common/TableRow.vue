@@ -90,7 +90,7 @@
       </div>
     </td>
     <td
-      v-if="inSelectedHeaders('registeringName') && isPpr"
+      v-if="inSelectedHeaders('registeringName')"
       :class="isChild || item.expanded ? $style['border-left']: ''"
     >
       <span v-if="item.registeringName">{{ getRegisteringName(item.registeringName) }}</span>
@@ -103,7 +103,7 @@
       {{ item.registeringParty || item.submittingParty || '' }}
     </td>
     <td
-      v-if="inSelectedHeaders('ownerNames') && isPpr"
+      v-if="inSelectedHeaders('ownerNames')"
       :class="isChild || item.expanded ? $style['border-left']: ''"
     >
       {{ item.ownerNames}}
@@ -115,7 +115,7 @@
       {{ item.securedParties || '' }}
     </td>
     <td
-      v-if="inSelectedHeaders('clientReferenceId') && isPpr"
+      v-if="inSelectedHeaders('clientReferenceId')"
       :class="isChild || item.expanded ? $style['border-left']: ''"
     >
       {{ item.clientReferenceId }}
