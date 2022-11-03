@@ -4,12 +4,14 @@ import {
   MhrRegistrationHomeLocationIF,
   MhrRegistrationHomeOwnerGroupIF,
   MhrRegistrationIF,
-  NewMhrRegistrationApiIF
+  NewMhrRegistrationApiIF,
+  MhRegistrationSummaryIF,
+  MhrDraftTransferApiIF
 } from '@/interfaces'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
-import { HomeTenancyTypes } from '@/enums'
+import { APIMhrDescriptionTypes, APIStatusTypes, HomeTenancyTypes } from '@/enums'
 import { getMhrDrafts, mhrRegistrationHistory } from '@/utils'
-
+import { orderBy } from 'lodash'
 export const useNewMhrRegistration = () => {
   const {
     getMhrRegistrationHomeDescription,
@@ -198,9 +200,46 @@ export const useNewMhrRegistration = () => {
   const fetchMhRegistrations = async (): Promise<void> => {
     const draftFilings = await getMhrDrafts()
     const myMhrHistory = await mhrRegistrationHistory()
-    setMhrTableHistory([...draftFilings, ...myMhrHistory])
+    const filteredMhrHistory = addHistoryDraftsToMhr(myMhrHistory, draftFilings)
+    setMhrTableHistory([...filteredMhrHistory])
   }
 
+  function addHistoryDraftsToMhr (mhrHistory: MhRegistrationSummaryIF[], mhrDrafts: MhrDraftTransferApiIF[]):
+    MhRegistrationSummaryIF[] {
+    const sortedDraftFilings = orderBy(mhrDrafts, ['createDateTime'], ['desc'])
+
+    const registerNewUnit = mhrHistory.filter(registrations =>
+      registrations.registrationDescription === APIMhrDescriptionTypes.REGISTER_NEW_UNIT)
+    const sortedMhrHistory = orderBy(registerNewUnit, ['createDateTime'], ['desc'])
+
+    // add drafts to Registrations.
+    sortedMhrHistory.forEach(transfer => {
+      transfer.baseRegistrationNumber = transfer.mhrNumber
+      var mhrDrafts = sortedDraftFilings.filter(sortedDrafts => sortedDrafts.mhrNumber === transfer.mhrNumber)
+      if (mhrDrafts?.length > 0) {
+        transfer.hasDraft = true
+        transfer.changes = []
+        mhrDrafts.forEach(draft => {
+          const newDraft: MhRegistrationSummaryIF = {
+            mhrNumber: transfer.mhrNumber,
+            baseRegistrationNumber: transfer.mhrNumber,
+            submittingParty: draft.submittingParty,
+            clientReferenceId: transfer.clientReferenceId,
+            createDateTime: draft.createDateTime,
+            error: draft.error,
+            registrationDescription: draft.registrationDescription,
+            hasDraft: true,
+            ownerNames: '',
+            path: draft.path,
+            statusType: APIStatusTypes.DRAFT,
+            username: ''
+          }
+          transfer.changes.push(newDraft)
+        })
+      }
+    })
+    return sortedMhrHistory
+  }
   /**
    * @function cleanEmpty
    *

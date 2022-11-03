@@ -140,6 +140,7 @@ describe('Dashboard component', () => {
     expect(wrapper.findComponent(SearchHistory).exists()).toBe(true)
     expect(wrapper.findComponent(RegistrationBar).exists()).toBe(true)
     expect(wrapper.findComponent(RegistrationTable).exists()).toBe(true)
+    expect(wrapper.findComponent(Dashboard).exists()).toBe(true)
     // fee settings set correctly based on store
     expect(wrapper.vm.$store.state.stateModel.userInfo.feeSettings).toBeNull()
     expect(wrapper.findComponent(SearchBar).vm.$props.isNonBillable).toBe(false)

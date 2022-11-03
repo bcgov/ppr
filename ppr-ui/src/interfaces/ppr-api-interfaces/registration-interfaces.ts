@@ -97,6 +97,9 @@ export interface MhRegistrationSummaryIF {
   statusType: string
   submittingParty: string
   username: string
+  baseRegistrationNumber?: string
+  changes?: MhRegistrationSummaryIF []
+  hasDraft?: boolean
 }
 
 // Discharge Registration interface. Base registration number, debtor name, and registering party are required.
