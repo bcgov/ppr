@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Vuetify from 'vuetify'
+import VueRouter from 'vue-router'
 import { getVuexStore } from '@/store'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 
@@ -20,8 +21,9 @@ import {
   mockedRemovedPerson, mockedRemovedOrganization
 } from './test-data'
 import { getTestId } from './utils'
+import mockRouter from './MockRouter'
 import { MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF } from '@/interfaces'
-import { HomeTenancyTypes } from '@/enums'
+import { HomeTenancyTypes, RouteNames } from '@/enums'
 
 Vue.use(Vuetify)
 
@@ -31,6 +33,10 @@ const store = getVuexStore()
 function createComponent (): Wrapper<any> {
   const localVue = createLocalVue()
   localVue.use(Vuetify)
+  localVue.use(VueRouter)
+  const router = mockRouter.mock()
+  router.push({ name: RouteNames.MHR_REVIEW_CONFIRM })
+
   document.body.setAttribute('data-app', 'true')
   return mount(HomeOwners, {
     localVue,
@@ -38,6 +44,7 @@ function createComponent (): Wrapper<any> {
       isMhrTransfer: true
     },
     store,
+    router,
     vuetify
   })
 }
