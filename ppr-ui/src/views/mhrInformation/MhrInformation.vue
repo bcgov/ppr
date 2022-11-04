@@ -95,7 +95,7 @@
                   </v-card>
                 </section>
 
-                <section id="transfer-confirm-section" class="transfer-confirm">
+                <section id="transfer-confirm-section" class="mt-10 transfer-confirm">
                   <ConfirmCompletion
                     :legalName="getCertifyInformation.legalName"
                     :setShowErrors="validateConfirmCompletion"
@@ -105,6 +105,7 @@
 
                 <section id="transfer-certify-section" class="mt-10 py-4">
                   <CertifyInformation
+                    :sectionNumber=3
                     :setShowErrors="validateAuthorizationError"
                     @certifyValid="authorizationValid = $event"
                   />
@@ -436,6 +437,13 @@ export default defineComponent({
       () => localState.authorizationValid,
       (isValid: boolean) => {
         localState.validateAuthorizationError = !isValid
+      }
+    )
+
+    watch(
+      () => localState.isCompletionConfirmed,
+      (isValid: boolean) => {
+        localState.validateConfirmCompletion = !isValid
       }
     )
 

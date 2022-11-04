@@ -522,7 +522,7 @@ describe('Mhr Information', () => {
     expect(ownersTable.props().homeOwners.length).toBe(2)
   })
 
-  it('should validate and show errors on Review screen', async () => {
+  it('should validate and show components errors on Review screen', async () => {
     setupCurrentHomeOwners()
     wrapper.vm.$data.dataLoaded = true
     await Vue.nextTick()
@@ -535,7 +535,16 @@ describe('Mhr Information', () => {
 
     expect(wrapper.find('#mhr-information-header').text()).toContain('Review and Confirm')
     expect(feeSummaryContainer.find('.err-msg').exists()).toBeFalsy()
-    expect(wrapper.classes('border-error-left')).toBeFalsy()
-    // wrapper.find(getTestId('attn-ref-number-field')).setValue('5'.repeat(45))
+    expect(wrapper.findAll('.border-error-left').length).toBe(0)
+    wrapper.find(getTestId('attn-ref-number-field')).setValue('5'.repeat(45))
+    await Vue.nextTick()
+
+    wrapper.find('#btn-stacked-submit').trigger('click')
+    await Vue.nextTick()
+    await Vue.nextTick()
+
+    // should show 3 errors for Ref Num, Confirm and Auth components
+    expect(feeSummaryContainer.find('.err-msg').exists()).toBeTruthy()
+    expect(wrapper.findAll('.border-error-left').length).toBe(3)
   })
 })

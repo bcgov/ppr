@@ -24,7 +24,7 @@
     <!-- Authorization -->
     <section id="mh-certify-section" class="mt-10 pt-4">
       <CertifyInformation
-        isMhr
+        :sectionNumber=1
         :setShowErrors="validateAuthorization"
         @certifyValid="authorizationValid = $event"
       />
@@ -98,7 +98,6 @@ export default defineComponent({
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
     const localState = reactive({
-      isMhr: true,
       authorizationValid: false,
       isValidatingApp: computed( (): boolean => {
         return getValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_APP)

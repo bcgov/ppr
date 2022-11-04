@@ -12,10 +12,10 @@
       :class="{ 'border-error-left': showErrorComponent }"
       data-test-id="confirm-completion-card"
     >
-      <v-form ref="confirmCompletionForm" v-model="isConfirmCompletionFormValid">
+      <v-form ref="confirmCompletionForm">
         <v-row>
           <v-col cols="3">
-            <label class="generic-label" for="declared-value" :class="{ 'error-text': showErrorComponent && !isConfirmCompletionFormValid }">
+            <label class="generic-label" for="declared-value" :class="{ 'error-text': showErrorComponent }">
               Confirm Completion
             </label>
           </v-col>
