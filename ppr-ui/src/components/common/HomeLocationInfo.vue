@@ -187,7 +187,7 @@ export default defineComponent({
         parcel: '',
         block: '',
         exceptPlan: ''
-      },
+      } as MhrLocationInfoIF,
       applyRequired: computed((): boolean => {
         const info = localState.locationInfo
         return !info.lot && !info.parcel && !info.block && !info.districtLot && !info.landDistrict && !info.plan
