@@ -239,6 +239,7 @@ export default defineComponent({
 
     const {
       isGlobalEditingMode,
+      setGlobalEditingMode,
       setShowGroups
     } = useHomeOwners(props.isMhrTransfer)
 
@@ -388,6 +389,7 @@ export default defineComponent({
       if (hasUnsavedChanges.value === true) localState.showCancelDialog = true
       else {
         setUnsavedChanges(false)
+        setGlobalEditingMode(false)
         context.root.$router.push({
           name: RouteNames.DASHBOARD
         })
