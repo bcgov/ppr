@@ -1,5 +1,5 @@
 <template>
-  <v-card flat rounded :class="{ 'border-error-left': showTableError }">
+  <v-card flat rounded :class="{ 'border-error-left': showTableError || reviewedNoOwners}">
     <v-data-table
       id="mh-home-owners-table"
       class="home-owners-table"
@@ -211,6 +211,7 @@
 <script lang="ts">
 import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
 import { homeOwnersTableHeaders, homeOwnersTableHeadersReview } from '@/resources/tableHeaders'
+import { useMhrValidations } from '@/composables'
 import { BaseAddress } from '@/composables/address'
 import { useHomeOwners } from '@/composables/mhrRegistration'
 import { PartyAddressSchema } from '@/schemas'
@@ -219,9 +220,9 @@ import { AddEditHomeOwner } from '@/components/mhrRegistration/HomeOwners'
 import TableGroupHeader from '@/components/mhrRegistration/HomeOwners/TableGroupHeader.vue'
 /* eslint-disable no-unused-vars */
 import { MhrRegistrationHomeOwnerIF } from '@/interfaces'
-import { ActionTypes } from '@/enums'
+import { ActionTypes, RouteNames } from '@/enums'
 /* eslint-enable no-unused-vars */
-import { useActions } from 'vuex-composition-helpers'
+import { useActions, useGetters } from 'vuex-composition-helpers'
 
 export default defineComponent({
   name: 'HomeOwnersTable',
@@ -238,7 +239,7 @@ export default defineComponent({
     AddEditHomeOwner,
     TableGroupHeader
   },
-  setup (props) {
+  setup (props, context) {
     const addressSchema = PartyAddressSchema
 
     const {
@@ -259,11 +260,18 @@ export default defineComponent({
 
     const { setUnsavedChanges } = useActions<any>(['setUnsavedChanges'])
 
+    const { getMhrRegistrationValidationModel } = useGetters<any>(['getMhrRegistrationValidationModel'])
+
+    const { getValidation, MhrSectVal, MhrCompVal } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
+
     const localState = reactive({
       currentlyEditingHomeOwnerId: -1,
+      reviewed: false,
       isEditingMode: computed((): boolean => localState.currentlyEditingHomeOwnerId >= 0),
       isAddingMode: computed((): boolean => props.isAdding),
       showTableError: computed((): boolean => showGroups.value && (hasMinimumGroups() || hasEmptyGroup.value)),
+      reviewedNoOwners: computed((): boolean => !hasActualOwners(props.homeOwners) &&
+      getValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_STEPS)),
       showEditActions: computed((): boolean => !props.isReadonlyTable),
       homeOwnersTableHeaders: props.isReadonlyTable ? homeOwnersTableHeadersReview : homeOwnersTableHeaders,
       addedOwnerCount: computed((): number => {

@@ -20,8 +20,8 @@ import {
   mockedRemovedPerson, mockedRemovedOrganization
 } from './test-data'
 import { getTestId } from './utils'
-import { MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF } from '@/interfaces'
-import { HomeTenancyTypes } from '@/enums'
+import { MhrRegistrationHomeOwnerGroupIF } from '@/interfaces'
+
 
 Vue.use(Vuetify)
 
@@ -31,6 +31,7 @@ const store = getVuexStore()
 function createComponent (): Wrapper<any> {
   const localVue = createLocalVue()
   localVue.use(Vuetify)
+
   document.body.setAttribute('data-app', 'true')
   return mount(HomeOwners, {
     localVue,

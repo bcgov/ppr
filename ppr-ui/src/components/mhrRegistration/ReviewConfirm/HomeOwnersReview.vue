@@ -6,22 +6,25 @@
     </header>
 
     <div :class="{ 'border-error-left': !getStepValidation(MhrSectVal.HOME_OWNERS_VALID) }">
-      <div v-show="!getStepValidation(MhrSectVal.HOME_OWNERS_VALID)" class="px-6 py-8">
-        <v-icon color="error">mdi-information-outline</v-icon>
-        <span class="error-text mx-1">This step is unfinished.</span>
-        <router-link :to="{ path: `/${RouteNames.MHR_REGISTRATION}/${RouteNames.HOME_OWNERS}` }"
-          >Return to this step to complete it.
-        </router-link>
-      </div>
-      <section class="px-6 my-2" v-if="hasHomeOwners || (hasGroups && showGroups)">
+      <section v-show="!getStepValidation(MhrSectVal.HOME_OWNERS_VALID)"
+        :class="hasHomeOwners ? 'pt-30px px-6' : 'px-6 py-8'">
+        <span>
+          <v-icon color="error">mdi-information-outline</v-icon>
+          <span class="error-text mx-1">This step is unfinished.</span>
+          <router-link :to="{ path: `/${RouteNames.MHR_REGISTRATION}/${RouteNames.HOME_OWNERS}` }"
+          >Return to this step to complete it.</router-link>
+        </span>
+      </section>
+
+      <section class="px-6 my-2" v-if="hasHomeOwners">
         <article class="border-btm py-5">
           <v-row no-gutters data-test-id="home-tenancy-type">
             <v-col cols="3"><span class="generic-label">Home Tenancy Type </span></v-col>
-            <v-col class="pl-2">{{ getHomeTenancyType() || 'N/A' }}</v-col>
+            <v-col class="pl-2  gray7">{{ getHomeTenancyType() }}</v-col>
           </v-row>
           <v-row no-gutters class="pt-2" v-if="showGroups" data-test-id="total-ownership">
-            <v-col cols="3"><span class="generic-label">Total Ownership <br>Allocated </span></v-col>
-            <v-col class="pl-2">{{ getTotalOwnershipAllocationStatus().totalAllocation || 'N/A' }}</v-col>
+            <v-col cols="3"><span class="generic-label">Total Ownership Allocated </span></v-col>
+            <v-col class="pl-2 gray7">{{ getTotalOwnershipAllocationStatus().totalAllocation }}</v-col>
           </v-row>
         </article>
 
@@ -90,4 +93,7 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+.gray7 {
+  color: $gray7;
+}
 </style>
