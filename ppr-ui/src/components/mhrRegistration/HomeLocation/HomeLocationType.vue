@@ -101,6 +101,14 @@
                     active-class="selected-radio"
                     :value="HomeLocationTypes.OTHER_RESERVE"
                   />
+                  <!-- Home Location Info Form -->
+<!--                  <v-expand-transition>-->
+<!--                    <HomeLocationInfo-->
+<!--                      class="ml-8 mb-4"-->
+<!--                      v-if="otherTypeOption === HomeLocationTypes.OTHER_RESERVE"-->
+<!--                    />-->
+<!--                  </v-expand-transition>-->
+
                   <v-radio
                     id="strata-option"
                     class="home-type-radio"
@@ -117,6 +125,13 @@
                       @setPid="pidNumber = $event"
                       @verifyingPid="isVerifyingPid = $event"
                     />
+
+                    <!-- Home Location Info Form -->
+<!--                    <HomeLocationInfo-->
+<!--                      class="ml-8 mb-4"-->
+<!--                      v-if="otherTypeOption === HomeLocationTypes.OTHER_STRATA"-->
+<!--                    />-->
+
                   </v-expand-transition>
 
                   <v-radio
@@ -135,6 +150,13 @@
                       @setPid="pidNumber = $event"
                       @verifyingPid="isVerifyingPid = $event"
                     />
+
+                    <!-- Home Location Info Form -->
+<!--                    <HomeLocationInfo-->
+<!--                      class="ml-8 mb-4"-->
+<!--                      v-if="otherTypeOption === HomeLocationTypes.OTHER_TYPE"-->
+<!--                    />-->
+
                   </v-expand-transition>
                 </v-radio-group>
               </v-expand-transition>
@@ -151,13 +173,14 @@
 import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import { HomeLocationTypes } from '@/enums'
-import { PidNumber } from '@/components/common'
+import { HomeLocationInfo, PidNumber } from '@/components/common'
 import { useInputRules, useMhrValidations } from '@/composables'
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
   name: 'HomeLocationType',
   components: {
+    HomeLocationInfo,
     PidNumber
   },
   props: {

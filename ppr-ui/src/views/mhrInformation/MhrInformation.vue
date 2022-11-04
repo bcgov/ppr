@@ -233,12 +233,12 @@ export default defineComponent({
       isRefNumValid,
       setRefNumValid,
       initMhrTransfer,
-      buildApiData,
-      parseDraftRemovedOwnerGroups
+      buildApiData
     } = useMhrInformation()
 
     const {
       isGlobalEditingMode,
+      setGlobalEditingMode,
       setShowGroups
     } = useHomeOwners(props.isMhrTransfer)
 
@@ -332,10 +332,7 @@ export default defineComponent({
         const { registration } = await getMhrTransferDraft(getMhrInformation.value.draftNumber)
 
         setShowGroups(registration.addOwnerGroups.length > 1 || registration.deleteOwnerGroups.length > 1)
-        setMhrTransferHomeOwnerGroups([
-          ...parseDraftRemovedOwnerGroups(registration.deleteOwnerGroups),
-          ...registration.addOwnerGroups
-        ])
+        setMhrTransferHomeOwnerGroups([...registration.addOwnerGroups])
       } else {
         // Set current owners if there is no draft
         setMhrTransferHomeOwnerGroups(currentOwnerGroups)
@@ -388,6 +385,7 @@ export default defineComponent({
       if (hasUnsavedChanges.value === true) localState.showCancelDialog = true
       else {
         setUnsavedChanges(false)
+        setGlobalEditingMode(false)
         context.root.$router.push({
           name: RouteNames.DASHBOARD
         })
