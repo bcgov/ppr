@@ -58,7 +58,7 @@ export const useMhrInformation = () => {
     const ownerGroups = []
 
     getMhrTransferHomeOwnerGroups.value.forEach(ownerGroup => {
-      if (ownerGroup.action !== ActionTypes.REMOVED) {
+      if (ownerGroup.action !== ActionTypes.REMOVED || isDraft) {
         ownerGroups.push({
           ...ownerGroup,
           owners: isDraft ? ownerGroup.owners : ownerGroup.owners.filter(owner => owner.action !== ActionTypes.REMOVED),
@@ -70,22 +70,11 @@ export const useMhrInformation = () => {
       }
     })
 
-    return ownerGroups.filter(ownerGroup => ownerGroup.action !== ActionTypes.REMOVED)
+    return isDraft ? ownerGroups : ownerGroups.filter(ownerGroup => ownerGroup.action !== ActionTypes.REMOVED)
   }
 
   const parseRemovedOwnerGroups = () => {
     return getMhrTransferCurrentHomeOwners.value
-  }
-
-  const parseDraftRemovedOwnerGroups = (removedGroups: MhrHomeOwnerGroupIF[]): MhrHomeOwnerGroupIF[] => {
-    return removedGroups.map(group => ({
-      ...group,
-      action: ActionTypes.REMOVED,
-      owners: group.owners.map(owner => ({
-        ...owner,
-        action: ActionTypes.REMOVED
-      }))
-    }))
   }
 
   const buildApiData = async (isDraft: boolean = false): Promise<MhrTransferApiIF> => {
@@ -126,7 +115,6 @@ export const useMhrInformation = () => {
     setTransferDetailsValid,
     setRefNumValid,
     initMhrTransfer,
-    buildApiData,
-    parseDraftRemovedOwnerGroups
+    buildApiData
   }
 }
