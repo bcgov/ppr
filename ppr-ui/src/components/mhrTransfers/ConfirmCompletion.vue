@@ -9,13 +9,13 @@
       rounded
       id="confirm-completion-card"
       class="mt-8 pa-8 pr-6 pb-3"
-      :class="{ 'border-error-left': confirmCompletionError }"
+      :class="{ 'border-error-left': showErrorComponent }"
       data-test-id="confirm-completion-card"
     >
       <v-form ref="confirmCompletionForm">
         <v-row>
           <v-col cols="3">
-            <label class="generic-label" for="declared-value" :class="{ 'error-text': confirmCompletionError }">
+            <label class="generic-label" for="declared-value" :class="{ 'error-text': showErrorComponent }">
               Confirm Completion
             </label>
           </v-col>
@@ -57,7 +57,7 @@
               data-test-id="confirm-completion-checkbox"
             >
               <template v-slot:label data-test-id="confirm-checkbox-label">
-                <span :class="{ 'invalid-color': confirmCompletionError }">
+                <span :class="{ 'invalid-color': showErrorComponent }">
                   I, <strong>{{ legalName }}</strong
                   >, confirm that all of the requirements listed above have been completed.
                 </span>
@@ -71,7 +71,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
+import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
 
 export default defineComponent({
   name: 'ConfirmCompletion',
@@ -80,19 +80,24 @@ export default defineComponent({
     legalName: {
       type: String,
       required: true
+    },
+    setShowErrors: {
+      type: Boolean,
+      default: false
     }
   },
   emits: ['confirmCompletion'],
   setup (props, { emit }) {
     const localState = reactive({
-      confirmCompletionError: false,
+      showErrorComponent: computed((): boolean => {
+        return (props.setShowErrors && !localState.confirmCompletion)
+      }),
       confirmCompletion: false
     })
 
     watch(
       () => localState.confirmCompletion,
       (val: boolean) => {
-        localState.confirmCompletionError = !localState.confirmCompletion
         emit('confirmCompletion', val)
       }
     )

@@ -95,15 +95,17 @@
                   </v-card>
                 </section>
 
-                <section id="transfer-confirm-section" class="transfer-confirm">
+                <section id="transfer-confirm-section" class="mt-10 transfer-confirm">
                   <ConfirmCompletion
                     :legalName="getCertifyInformation.legalName"
+                    :setShowErrors="validateConfirmCompletion"
                     @confirmCompletion="isCompletionConfirmed = $event"
                   />
                 </section>
 
                 <section id="transfer-certify-section" class="mt-10 py-4">
                   <CertifyInformation
+                    :sectionNumber=3
                     :setShowErrors="validateAuthorizationError"
                     @certifyValid="authorizationValid = $event"
                   />
@@ -134,6 +136,7 @@
                   @back="isReviewMode = false"
                   @save="onSave()"
                   @submit="goToReview()"
+                  data-test-id="fee-summary"
                 />
               </affix>
             </aside>
@@ -252,6 +255,7 @@ export default defineComponent({
       validateTransferDetails: false,
       refNumValid: false,
       authorizationValid: false,
+      validateConfirmCompletion: false,
       validateAuthorizationError: false,
       accountInfo: null,
       feeType: FeeSummaryTypes.MHR_TRANSFER, // FUTURE STATE: To be dynamic, dependent on what changes have been made
@@ -264,12 +268,18 @@ export default defineComponent({
       showBackBtn: computed((): string => {
         return localState.isReviewMode ? 'Back' : ''
       }),
-      isValidTransfer: computed((): boolean => {
+      isValidTransfer: computed((): boolean => { // is valid on first step
         // Get Owner Count here > 1 etc
         return !isGlobalEditingMode.value && isTransferDetailsValid.value && true
       }),
+      isValidTransferReview: computed((): boolean => { // is valid on review step
+        return localState.isReviewMode && isRefNumValid.value && localState.isCompletionConfirmed && !localState.validateAuthorizationError
+      }),
       transferErrorMsg: computed((): string => {
-        return localState.validate && !localState.isValidTransfer ? '< Please make any required changes' : ''
+        const isValidReview = localState.isReviewMode ? !localState.isValidTransferReview : !localState.isValidTransfer
+        return localState.validate && isValidReview && localState.isReviewMode
+          ? '< Please make any required changes'
+          : ''
       }),
       reviewConfirmText: computed((): string => {
         return localState.isReviewMode ? 'Register Changes and Pay' : 'Review and Confirm'
@@ -339,6 +349,12 @@ export default defineComponent({
       }
     }
 
+    const scrollToFirstError = async () => {
+      setTimeout(() => {
+        document.getElementsByClassName('border-error-left')[0].scrollIntoView({ behavior: 'smooth' })
+      }, 10)
+    }
+
     const goToReview = async (): Promise<void> => {
       localState.validate = true
       localState.validateTransferDetails = true
@@ -346,9 +362,11 @@ export default defineComponent({
       if (localState.isReviewMode) {
         // Trigger error state for required fields (if not checked)
         localState.validateAuthorizationError = !localState.authorizationValid
+        localState.validateConfirmCompletion = !localState.isCompletionConfirmed
 
         // Check if any required fields has errors
-        if (localState.validateAuthorizationError || !localState.isCompletionConfirmed) {
+        if (localState.validateAuthorizationError || localState.validateConfirmCompletion) {
+          await scrollToFirstError()
           return
         }
         localState.loading = true
@@ -364,6 +382,7 @@ export default defineComponent({
       // Otherwise if transfer is valid, enter review mode
       if (localState.isValidTransfer) {
         localState.isReviewMode = true
+        localState.validate = false
       }
     }
 
@@ -421,6 +440,13 @@ export default defineComponent({
       }
     )
 
+    watch(
+      () => localState.isCompletionConfirmed,
+      (isValid: boolean) => {
+        localState.validateConfirmCompletion = !isValid
+      }
+    )
+
     return {
       goToReview,
       onSave,
@@ -430,6 +456,7 @@ export default defineComponent({
       getCertifyInformation,
       maxLength,
       isRefNumValid,
+      isTransferDetailsValid,
       ...toRefs(localState),
       handleDialogResp
     }
