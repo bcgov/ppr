@@ -115,7 +115,7 @@
               <!-- MHR Information Section -->
               <template v-else>
                 <HomeOwners isMhrTransfer class="mt-n2" />
-                <TransferDetails :validateTransferDetails="validateTransferDetails" />
+                <TransferDetails v-if="hasUnsavedChanges" :validateTransferDetails="validateTransferDetails" />
               </template>
             </section>
           </v-col>
@@ -448,6 +448,7 @@ export default defineComponent({
     )
 
     return {
+      hasUnsavedChanges,
       goToReview,
       onSave,
       goToDash,

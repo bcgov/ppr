@@ -285,6 +285,18 @@ describe('Mhr Information', () => {
     expect(wrapper.vm.$data.getMhrTransferCurrentHomeOwners.length).toBe(1)
     expect(wrapper.vm.$data.getMhrTransferHomeOwners.length).toBe(1)
 
+    expect(wrapper.findComponent(MhrInformation).findComponent(TransferDetails).exists()).toBeFalsy()
+    expect(wrapper.findComponent(MhrInformation).findComponent(HomeOwnersTable).exists()).toBeTruthy()
+
+    // Add some owners so Transfer Details will display
+    const owners = [mockedAddedPerson, mockedRemovedPerson] as MhrRegistrationHomeOwnerIF[] // same IF for Transfer and Registration
+    const homeOwnerGroup = [
+      mockMhrTransferCurrentHomeOwner,
+      { groupId: 1, owners: owners }
+    ] as MhrRegistrationHomeOwnerGroupIF[]
+
+    await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerGroup)
+
     expect(wrapper.findComponent(MhrInformation).exists()).toBe(true)
 
     const mhrTransferDetailsComponent = wrapper.findComponent(MhrInformation).findComponent(TransferDetails)
@@ -415,6 +427,21 @@ describe('Mhr Information', () => {
     setupCurrentHomeOwners()
     wrapper.vm.$data.dataLoaded = true
     await Vue.nextTick()
+
+    // Should hide transfer details if no changes made
+    expect(wrapper.findComponent(MhrInformation).findComponent(TransferDetails).exists()).toBeFalsy()
+
+     // Add some owners so Transfer Details will display
+     const owners = [mockedAddedPerson, mockedRemovedPerson] as MhrRegistrationHomeOwnerIF[] // same IF for Transfer and Registration
+     const homeOwnerGroup = [
+       mockMhrTransferCurrentHomeOwner,
+       { groupId: 1, owners: owners }
+     ] as MhrRegistrationHomeOwnerGroupIF[]
+ 
+     await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerGroup)
+
+    // Should show transfer details once changes made
+    expect(wrapper.findComponent(MhrInformation).findComponent(TransferDetails).exists()).toBeTruthy()
 
     // set some test values for transfer details fields
     const mhrTransferDetailsComponent = wrapper.findComponent(MhrInformation).findComponent(TransferDetails)
