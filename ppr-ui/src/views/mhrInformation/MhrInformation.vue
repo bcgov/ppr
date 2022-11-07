@@ -47,6 +47,7 @@
                   />
                 </section>
                 <section>
+                  <v-divider class="mx-7 ma-0"></v-divider>
                   <TransferDetailsReview class="py-6 pt-4 px-8"/>
                 </section>
                 <section id="transfer-submitting-party" class="submitting-party">
