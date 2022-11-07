@@ -1,7 +1,7 @@
-import { MhrHomeOwnerGroupIF, MhrTransferApiIF, MhrTransferIF } from '@/interfaces'
+import { MhrTransferApiIF, MhrTransferIF, SubmittingPartyIF } from '@/interfaces'
 import { useGetters } from 'vuex-composition-helpers'
 import { readonly, ref } from '@vue/composition-api'
-import { ActionTypes, ApiHomeTenancyTypes, HomeTenancyTypes } from '@/enums'
+import { ActionTypes, ApiHomeTenancyTypes, HomeTenancyTypes, UIRegistrationTypes } from '@/enums'
 
 // Validation flag for Transfer Details
 const transferDetailsValid = ref(false)
@@ -18,6 +18,7 @@ export const useMhrInformation = () => {
     getMhrTransferConsideration,
     getMhrTransferDate,
     getMhrTransferOwnLand,
+    getMhrTransferSubmittingParty,
     getMhrTransferAttentionReference,
     getMhrTransferHomeOwnerGroups
   } = useGetters<any>([
@@ -29,6 +30,7 @@ export const useMhrInformation = () => {
     'getMhrTransferConsideration',
     'getMhrTransferDate',
     'getMhrTransferOwnLand',
+    'getMhrTransferSubmittingParty',
     'getMhrTransferAttentionReference',
     'getMhrTransferHomeOwnerGroups'
   ])
@@ -45,7 +47,10 @@ export const useMhrInformation = () => {
     return {
       mhrNumber: '',
       ownerGroups: [],
-      submittingParty: {},
+      submittingParty: {
+        emailAddress: '',
+        phoneNumber: ''
+      },
       declaredValue: null,
       consideration: '',
       transferDate: '',
@@ -63,9 +68,10 @@ export const useMhrInformation = () => {
           ...ownerGroup,
           owners: isDraft ? ownerGroup.owners : ownerGroup.owners.filter(owner => owner.action !== ActionTypes.REMOVED),
           groupId: ownerGroup.groupId + 1, // Increment from baseline groupID to create a new group for API
-          type: ApiHomeTenancyTypes[
-            Object.keys(HomeTenancyTypes).find(key => HomeTenancyTypes[key] as string === ownerGroup.type)
-          ]
+          type:
+            ApiHomeTenancyTypes[
+              Object.keys(HomeTenancyTypes).find(key => (HomeTenancyTypes[key] as string) === ownerGroup.type)
+            ]
         })
       }
     })
@@ -85,22 +91,23 @@ export const useMhrInformation = () => {
       transferDate: getMhrTransferDate.value,
       ownLand: getMhrTransferOwnLand.value,
       attentionReference: getMhrTransferAttentionReference.value,
-      documentDescription: 'SALE OR GIFT',
+      documentDescription: UIRegistrationTypes.TRANSFER_OF_SALE,
       submittingParty: {
+        // Need to confirm if this needs to be a Business Name instead
+        // because in UI, Submitting Party is a business not a person
+        // but the API spec requires firstName, lastName
         personName: {
           first: getCurrentUser.value.firstname,
           last: getCurrentUser.value.lastname
         },
-        address: {
-          street: '222 SUMMER STREET',
-          city: 'VICTORIA',
-          region: 'BC',
-          country: 'CA',
-          postalCode: 'V8W 2V8'
-        },
-        emailAddress: getCurrentUser.value.contacts[0].email,
-        phoneNumber: getCurrentUser.value.contacts[0].phone.replace(/[^0-9.]+/g, '') // Remove special chars
-      },
+        address: getMhrTransferSubmittingParty.value.address,
+        emailAddress: getMhrTransferSubmittingParty.value.emailAddress,
+        phoneNumber: getMhrTransferSubmittingParty.value.phoneNumber,
+        phoneExtension: getMhrTransferSubmittingParty.value.phoneExtension
+        // Cleanup below after confirming that Submitting Party info is Account's Admin info
+        // emailAddress: getCurrentUser.value.contacts[0].email,
+        // phoneNumber: getCurrentUser.value.contacts[0].phone.replace(/[^0-9.]+/g, '') // Remove special chars
+      } as SubmittingPartyIF,
       addOwnerGroups: await parseOwnerGroups(isDraft),
       deleteOwnerGroups: await parseRemovedOwnerGroups(),
       deathOfOwner: false

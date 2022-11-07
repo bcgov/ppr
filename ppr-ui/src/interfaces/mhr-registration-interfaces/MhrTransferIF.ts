@@ -1,9 +1,9 @@
 import {
   MhrRegistrationHomeOwnerGroupIF,
-  PartyIF,
   MhrHomeOwnerGroupIF,
   PaymentIF,
-  SubmittingPartyIF, ErrorIF
+  SubmittingPartyIF,
+  ErrorIF
 } from '@/interfaces'
 import { APIMhrTypes } from '@/enums'
 
@@ -15,7 +15,7 @@ export interface MhrTransferIF {
   ownLand: boolean
   ownerGroups: MhrRegistrationHomeOwnerGroupIF[]
   currentOwnerGroups?: MhrRegistrationHomeOwnerGroupIF[]
-  submittingParty: PartyIF
+  submittingParty: SubmittingPartyIF
   attentionReference: string
   error?: ErrorIF
 }

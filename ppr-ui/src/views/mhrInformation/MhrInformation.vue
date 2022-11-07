@@ -32,8 +32,9 @@
             <section v-if="dataLoaded" class="py-4">
               <header class="review-header mt-1">
                 <v-icon class="ml-1" color="darkBlue">mdi-home</v-icon>
-                <label class="font-weight-bold pl-2">{{ isReviewMode ?
-                'Ownership Transfer or Change - Sale or Beneficiary' : 'Home Owners' }}</label>
+                <label class="font-weight-bold pl-2">
+                  {{ isReviewMode ? 'Ownership Transfer or Change - Sale or Beneficiary' : 'Home Owners' }}
+                </label>
               </header>
 
               <!-- MHR Information Review Section -->
@@ -47,7 +48,7 @@
                   />
                 </section>
                 <section>
-                  <TransferDetailsReview class="py-6 pt-4 px-8"/>
+                  <TransferDetailsReview class="py-6 pt-4 px-8" />
                 </section>
                 <section id="transfer-submitting-party" class="submitting-party">
                   <AccountInfo
@@ -173,7 +174,7 @@ import { BaseAddress } from '@/composables/address'
 import { unsavedChangesDialog } from '@/resources/dialogOptions'
 import { cloneDeep } from 'lodash'
 import AccountInfo from '@/components/common/AccountInfo.vue'
-import { AccountInfoIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { AccountInfoIF, SubmittingPartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 
 export default defineComponent({
   name: 'MhrInformation',
@@ -220,11 +221,13 @@ export default defineComponent({
     const {
       setMhrTransferHomeOwnerGroups,
       setMhrTransferCurrentHomeOwnerGroups,
+      setMhrTransferSubmittingParty,
       setMhrTransferAttentionReference,
       setUnsavedChanges
     } = useActions<any>([
       'setMhrTransferHomeOwnerGroups',
       'setMhrTransferCurrentHomeOwnerGroups',
+      'setMhrTransferSubmittingParty',
       'setMhrTransferAttentionReference',
       'setUnsavedChanges'
     ])
@@ -273,7 +276,12 @@ export default defineComponent({
         return !isGlobalEditingMode.value && isTransferDetailsValid.value && true
       }),
       isValidTransferReview: computed((): boolean => { // is valid on review step
-        return localState.isReviewMode && isRefNumValid.value && localState.isCompletionConfirmed && !localState.validateAuthorizationError
+        return (
+          localState.isReviewMode &&
+          isRefNumValid.value &&
+          localState.isCompletionConfirmed &&
+          !localState.validateAuthorizationError
+        )
       }),
       transferErrorMsg: computed((): string => {
         const isValidReview = localState.isReviewMode ? !localState.isValidTransferReview : !localState.isValidTransfer
@@ -305,9 +313,9 @@ export default defineComponent({
 
       localState.loading = true
       setEmptyMhrTransfer(initMhrTransfer())
+      localState.accountInfo = await getSubmittingPartyInformation()
       // Set baseline MHR Information to state
       await parseMhrInformation()
-      localState.accountInfo = await getSubmittingPartyInformation()
       localState.loading = false
 
       localState.dataLoaded = true
@@ -317,6 +325,7 @@ export default defineComponent({
     // Future state to parse all relevant MHR Information
     const parseMhrInformation = async (): Promise<void> => {
       await parseCurrentOwnerGroups()
+      parseSubmittingPartyInfo()
     }
 
     // Get Account Info from Auth to be used in Submitting Party section in Review screen
@@ -347,6 +356,17 @@ export default defineComponent({
         // Set current owners if there is no draft
         setMhrTransferHomeOwnerGroups(currentOwnerGroups)
       }
+    }
+
+    const parseSubmittingPartyInfo = (): void => {
+      const submittingParty = {
+        businessName: localState.accountInfo.name,
+        address: localState.accountInfo.mailingAddress,
+        emailAddress: localState.accountInfo.accountAdmin.email,
+        phoneNumber: localState.accountInfo.accountAdmin.phone,
+        phoneExtension: localState.accountInfo.accountAdmin.phoneExtension
+      } as SubmittingPartyIF
+      setMhrTransferSubmittingParty(submittingParty)
     }
 
     const scrollToFirstError = async () => {
