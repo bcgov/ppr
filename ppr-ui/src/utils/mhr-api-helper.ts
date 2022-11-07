@@ -304,9 +304,10 @@ export async function submitMhrRegistration (payloadData, queryParamData) {
   }
 }
 
-export async function mhrRegistrationHistory () {
+export async function mhrRegistrationHistory (withCollapse: boolean = false) {
   try {
-    const result = await axios.get('registrations', getDefaultConfig())
+    const path = withCollapse ? 'registrations?collapse=true' : 'registrations'
+    const result = await axios.get(path, getDefaultConfig())
     if (!result?.data) {
       throw new Error('Invalid API response')
     }

@@ -100,6 +100,7 @@ export interface MhRegistrationSummaryIF {
   baseRegistrationNumber?: string
   changes?: MhRegistrationSummaryIF []
   hasDraft?: boolean
+  documentId?: string
 }
 
 // Discharge Registration interface. Base registration number, debtor name, and registering party are required.

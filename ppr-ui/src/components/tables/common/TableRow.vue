@@ -34,11 +34,11 @@
           <div v-if="isChild || (isDraft(item) && item.baseRegistrationNumber)" :class="isChild ? 'pl-9' : ''">
             <p class="ma-0">{{ item.registrationNumber }}</p>
             <p class="ma-0" style="font-size: 0.75rem !important;">
-              <b>Base Registration: {{ item.baseRegistrationNumber }}</b>
+              <b>{{ (isPpr ? 'Base Registration: ' : 'MHR Number: ') + item.baseRegistrationNumber}}</b>
             </p>
           </div>
           <p v-else class="ma-0">
-            <b>{{ item.baseRegistrationNumber || item.mhrNumber }}</b>
+            <b>{{ item.baseRegistrationNumber }}</b>
           </p>
         </v-col>
       </v-row>
@@ -83,7 +83,8 @@
       :class="isChild || item.expanded ? $style['border-left']: ''"
     >
       <div v-if="!isChild || isDraft(item) || !isPpr">
-        {{ getStatusDescription(item.statusType) }}
+        {{  isMhrTransfer(item) ?
+        'Completed' : getStatusDescription(item.statusType) }}
         <p v-if="!isChild && item.hasDraft" class="ma-0">
           <i>{{ isPpr ? '* Draft Amendment' : '* Draft Changes' }}</i>
         </p>
@@ -339,7 +340,7 @@
       </v-row>
 
       <!-- MHR DRAFT ACTIONS -->
-      <v-row v-else-if="!isPpr && isDraft(item)" class="actions" no-gutters>
+      <v-row v-else-if="!isPpr && (!isChild || isDraft(item))" class="actions" no-gutters>
         <v-col class="edit-action pa-0" cols="auto">
           <v-btn
             color="primary"
@@ -549,6 +550,11 @@ export default defineComponent({
       })
     }
 
+    const isMhrTransfer = (item: any): boolean => {
+      return item.statusType === APIStatusTypes.MHR_ACTIVE &&
+      item.registrationDescription === APIMhrDescriptionTypes.SALE_OR_GIFT
+    }
+
     const removeMhrDraft = (item: MhRegistrationSummaryIF): void => {
       emit('action', { action: TableActions.DELETE, regNum: item.draftNumber })
     }
@@ -729,6 +735,7 @@ export default defineComponent({
       openMhr,
       isEnabledMhr,
       removeMhrDraft,
+      isMhrTransfer,
       ...toRefs(localState)
     }
   }
