@@ -6,8 +6,13 @@
     </v-overlay>
 
     <base-dialog
-      :setOptions="options"
+      :setOptions="cancelOptions"
       :setDisplay="showCancelDialog"
+      @proceed="handleDialogResp($event)"
+    />
+    <base-dialog
+      :setOptions="saveOptions"
+      :setDisplay="showSaveDialog"
       @proceed="handleDialogResp($event)"
     />
     <div class="view-container px-15 py-0">
@@ -171,7 +176,7 @@ import { TransferDetails, TransferDetailsReview, ConfirmCompletion } from '@/com
 import { HomeOwners } from '@/views'
 import { BaseDialog } from '@/components/dialogs'
 import { BaseAddress } from '@/composables/address'
-import { unsavedChangesDialog } from '@/resources/dialogOptions'
+import { unsavedChangesDialog, registrationSaveDraftError } from '@/resources/dialogOptions'
 import { cloneDeep } from 'lodash'
 import AccountInfo from '@/components/common/AccountInfo.vue'
 import { AccountInfoIF } from '@/interfaces' // eslint-disable-line no-unused-vars
@@ -290,8 +295,10 @@ export default defineComponent({
       }),
       attentionReference: getMhrTransferAttentionReference.value,
       isCompletionConfirmed: false,
-      options: unsavedChangesDialog,
-      showCancelDialog: false
+      cancelOptions: unsavedChangesDialog,
+      saveOptions: registrationSaveDraftError,
+      showCancelDialog: false,
+      showSaveDialog: false
     })
 
     onMounted(async (): Promise<void> => {
@@ -395,10 +402,13 @@ export default defineComponent({
         ? await updateMhrDraft(getMhrInformation.value.draftNumber, apiData)
         : await createMhrTransferDraft(apiData)
       localState.loading = false
-      setUnsavedChanges(false)
-      !mhrTransferDraft.error
-        ? goToDash()
-        : console.log(mhrTransferDraft?.error) // Handle Schema or Api errors here..
+      if (!mhrTransferDraft.error) {
+        setUnsavedChanges(false)
+        goToDash()
+      } else {
+        localState.showSaveDialog = true
+        console.log(mhrTransferDraft?.error)
+      }
     }
 
     const goToDash = (): void => {
@@ -413,11 +423,14 @@ export default defineComponent({
     }
 
     const handleDialogResp = (val: boolean): void => {
-      localState.showCancelDialog = false
       if (!val) {
         setUnsavedChanges(false)
-        goToDash()
+        if (localState.showCancelDialog) {
+          goToDash()
+        }
       }
+      localState.showCancelDialog = false
+      localState.showSaveDialog = false
     }
 
     watch(
