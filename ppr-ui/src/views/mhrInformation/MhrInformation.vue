@@ -212,14 +212,12 @@ export default defineComponent({
       getMhrInformation,
       getMhrTransferCurrentHomeOwners,
       getCertifyInformation,
-      getMhrTransferAttentionReference,
       hasUnsavedChanges
     } = useGetters<any>([
       'getMhrTransferHomeOwners',
       'getMhrInformation',
       'getMhrTransferCurrentHomeOwners',
       'getCertifyInformation',
-      'getMhrTransferAttentionReference',
       'hasUnsavedChanges'
     ])
 
@@ -296,7 +294,7 @@ export default defineComponent({
       reviewOwners: computed(() => {
         return getMhrTransferHomeOwners.value.filter(owner => owner.action !== ActionTypes.REMOVED)
       }),
-      attentionReference: getMhrTransferAttentionReference.value,
+      attentionReference: '',
       isCompletionConfirmed: false,
       cancelOptions: unsavedChangesDialog,
       saveOptions: registrationSaveDraftError,
