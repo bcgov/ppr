@@ -509,14 +509,14 @@ describe('Mhr Information', () => {
 
     // check owners are in table
     expect(ownersTable.props().homeOwners.length).toBe(2)
-
+    
     // review table doesnt exist yet
     expect(wrapper.find('#owners-review').exists()).toBeFalsy()
 
     wrapper.find('#btn-stacked-submit').trigger('click')
     await Vue.nextTick()
 
-    // review table renders
+    //review table renders
     const homeOwnerReadOnly = wrapper.find('#owners-review')
     expect(homeOwnerReadOnly.exists()).toBeTruthy()
 

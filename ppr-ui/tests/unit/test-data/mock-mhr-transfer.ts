@@ -1,4 +1,4 @@
-import { MhrDraftTransferApiIF } from './../../../src/interfaces/mhr-registration-interfaces/MhrTransferIF';
+import { MhrDraftTransferApiIF } from './../../../src/interfaces/mhr-registration-interfaces/MhrTransferIF'
 import { AddressIF, MhRegistrationSummaryIF, MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF } from '@/interfaces'
 
 export const mockMhrTransferCurrentHomeOwner = {
@@ -26,6 +26,20 @@ export const mockMhrTransferCurrentHomeOwner = {
 } as MhrRegistrationHomeOwnerGroupIF
 
 export const mockMhrTransferDraft = {
+  inUserList: true, // whether the registration is in their table or not
+  error: null,
+  clientReferenceId: '',
+  createDateTime: '',
+  draftNumber: '',
+  mhrNumber: '253333',
+  ownerNames: 'testo1, testo2',
+  path: '',
+  registrationDescription: 'REGISTER NEW UNIT',
+  statusType: 'Draft',
+  submittingParty: 'submitting party',
+  username: 'user 1',
+  baseRegistrationNumber: '253333',
+  changes: [{
     inUserList: true, // whether the registration is in their table or not
     error: null,
     clientReferenceId: '',
@@ -39,22 +53,8 @@ export const mockMhrTransferDraft = {
     submittingParty: 'submitting party',
     username: 'user 1',
     baseRegistrationNumber: '253333',
-    changes: [{
-      inUserList: true, // whether the registration is in their table or not
-      error: null,
-      clientReferenceId: '',
-      createDateTime: '',
-      draftNumber: '',
-      mhrNumber: '253333',
-      ownerNames: 'testo1, testo2',
-      path: '',
-      registrationDescription: 'REGISTER NEW UNIT',
-      statusType: 'Draft',
-      submittingParty: 'submitting party',
-      username: 'user 1',
-      baseRegistrationNumber: '253333',
-      changes: null,
-      hasDraft: true,
-    } as MhRegistrationSummaryIF],
-    hasDraft: true,
+    changes: null,
+    hasDraft: true
+  } as MhRegistrationSummaryIF],
+  hasDraft: true
 } as MhRegistrationSummaryIF

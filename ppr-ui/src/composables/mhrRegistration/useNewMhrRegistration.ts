@@ -9,7 +9,7 @@ import {
   MhrDraftTransferApiIF
 } from '@/interfaces'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
-import { APIMhrDescriptionTypes, APIStatusTypes, HomeTenancyTypes } from '@/enums'
+import { APIStatusTypes, HomeTenancyTypes } from '@/enums'
 import { getMhrDrafts, mhrRegistrationHistory } from '@/utils'
 import { orderBy } from 'lodash'
 export const useNewMhrRegistration = () => {
@@ -199,7 +199,7 @@ export const useNewMhrRegistration = () => {
 
   const fetchMhRegistrations = async (): Promise<void> => {
     const draftFilings = await getMhrDrafts()
-    const myMhrHistory = await mhrRegistrationHistory()
+    const myMhrHistory = await mhrRegistrationHistory(true)
     const filteredMhrHistory = addHistoryDraftsToMhr(myMhrHistory, draftFilings)
     setMhrTableHistory([...filteredMhrHistory])
   }
@@ -208,21 +208,34 @@ export const useNewMhrRegistration = () => {
     MhRegistrationSummaryIF[] {
     const sortedDraftFilings = orderBy(mhrDrafts, ['createDateTime'], ['desc'])
 
-    const registerNewUnit = mhrHistory.filter(registrations =>
-      registrations.registrationDescription === APIMhrDescriptionTypes.REGISTER_NEW_UNIT)
-    const sortedMhrHistory = orderBy(registerNewUnit, ['createDateTime'], ['desc'])
+    const sortedMhrHistory = orderBy(mhrHistory, ['createDateTime'], ['desc'])
 
     // add drafts to Registrations.
     sortedMhrHistory.forEach(transfer => {
       transfer.baseRegistrationNumber = transfer.mhrNumber
+      //
+      // Prepare existing changes
+      //
+      const existingChanges = []
+      if (transfer.changes) {
+        transfer.changes.forEach(transferchanges => {
+          const newDraft: MhRegistrationSummaryIF = transferchanges
+          newDraft.baseRegistrationNumber = transferchanges.mhrNumber
+          newDraft.documentId = transferchanges.documentId
+          existingChanges.push(newDraft)
+        })
+        transfer.changes = existingChanges
+      }
+
       var mhrDrafts = sortedDraftFilings.filter(sortedDrafts => sortedDrafts.mhrNumber === transfer.mhrNumber)
       if (mhrDrafts?.length > 0) {
         transfer.hasDraft = true
-        transfer.changes = []
+        if (!transfer.changes) transfer.changes = []
         mhrDrafts.forEach(draft => {
           const newDraft: MhRegistrationSummaryIF = {
             mhrNumber: transfer.mhrNumber,
             baseRegistrationNumber: transfer.mhrNumber,
+            draftNumber: draft.draftNumber,
             submittingParty: draft.submittingParty,
             clientReferenceId: transfer.clientReferenceId,
             createDateTime: draft.createDateTime,
@@ -232,7 +245,8 @@ export const useNewMhrRegistration = () => {
             ownerNames: '',
             path: draft.path,
             statusType: APIStatusTypes.DRAFT,
-            username: ''
+            username: '',
+            documentId: draft.draftNumber
           }
           transfer.changes.push(newDraft)
         })
