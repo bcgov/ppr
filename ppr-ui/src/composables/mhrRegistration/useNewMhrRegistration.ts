@@ -204,7 +204,7 @@ export const useNewMhrRegistration = () => {
     const myMhrHistory = await mhrRegistrationHistory(isRoleQualifiedSupplier.value)
     if (isRoleQualifiedSupplier.value) {
       const filteredMhrHistory = addHistoryDraftsToMhr(myMhrHistory, draftFilings)
-      setMhrTableHistory([...filteredMhrHistory])
+      setMhrTableHistory(filteredMhrHistory)
     } else setMhrTableHistory([...draftFilings, ...myMhrHistory])
   }
 
