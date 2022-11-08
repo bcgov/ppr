@@ -47,6 +47,7 @@
                   />
                 </section>
                 <section>
+                  <v-divider class="mx-7 ma-0"></v-divider>
                   <TransferDetailsReview class="py-6 pt-4 px-8"/>
                 </section>
                 <section id="transfer-submitting-party" class="submitting-party">
@@ -115,7 +116,7 @@
               <!-- MHR Information Section -->
               <template v-else>
                 <HomeOwners isMhrTransfer class="mt-n2" />
-                <TransferDetails :validateTransferDetails="validateTransferDetails" />
+                <TransferDetails v-if="hasUnsavedChanges" :validateTransferDetails="validateTransferDetails" />
               </template>
             </section>
           </v-col>
@@ -448,6 +449,7 @@ export default defineComponent({
     )
 
     return {
+      hasUnsavedChanges,
       goToReview,
       onSave,
       goToDash,

@@ -351,6 +351,11 @@ export default defineComponent({
       }
     )
 
+    // When a change is made to homeOwners, check if any actions have changed, if so set flag
+    watch(() => props.homeOwners, () => {
+      setUnsavedChanges(props.homeOwners.some(owner => !!owner.action))
+    })
+
     return {
       ActionTypes,
       addressSchema,
