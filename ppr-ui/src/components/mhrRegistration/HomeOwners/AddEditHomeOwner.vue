@@ -83,17 +83,19 @@
                   id="org-name"
                   label="Full Legal Name of Business or Organization"
                   v-model="owner.organizationName"
+                  @keyup="validateNameField()"
                   :rules="orgNameRules"
+                  persistent-hint
+                  :hide-details="hideDetails"
                 />
-                <!--
-                  TODO: Finish this auto-complete
-                  <auto-complete
+                <auto-complete
                   :searchValue="autoCompleteSearchValue"
                   :setAutoCompleteIsActive="autoCompleteIsActive"
-                  v-click-outside="setCloseAutoComplete"
+                  v-click-outside="autoCompleteIsActive = false"
                   @search-value="setSearchValue"
+                  @hide-details="setHideDetails"
                 >
-                </auto-complete> -->
+                </auto-complete>
               </v-col>
             </v-row>
           </div>
@@ -403,7 +405,9 @@ export default defineComponent({
         isNumber(null, null, null, 'Enter numbers only'),
         invalidSpaces(),
         maxLength(5, true)
-      )
+      ),
+      autoCompleteIsActive: true,
+      autoCompleteSearchValue: ''
     })
 
     const done = (): void => {
