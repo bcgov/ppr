@@ -38,7 +38,7 @@
             </p>
           </div>
           <p v-else class="ma-0">
-            <b>{{ item.baseRegistrationNumber }}</b>
+            <b>{{ item.baseRegistrationNumber || item.mhrNumber }}</b>
           </p>
         </v-col>
       </v-row>
@@ -340,7 +340,7 @@
       </v-row>
 
       <!-- MHR DRAFT ACTIONS -->
-      <v-row v-else-if="!isPpr && (!isChild || isDraft(item))" class="actions" no-gutters>
+      <v-row v-else-if="!isPpr && isDraft(item)" class="actions" no-gutters>
         <v-col class="edit-action pa-0" cols="auto">
           <v-btn
             color="primary"

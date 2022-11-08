@@ -279,7 +279,10 @@ export default defineComponent({
         return !isGlobalEditingMode.value && isTransferDetailsValid.value && true
       }),
       isValidTransferReview: computed((): boolean => { // is valid on review step
-        return localState.isReviewMode && isRefNumValid.value && localState.isCompletionConfirmed && !localState.validateAuthorizationError
+        return localState.isReviewMode &&
+        isRefNumValid.value &&
+        localState.isCompletionConfirmed &&
+        !localState.validateAuthorizationError
       }),
       transferErrorMsg: computed((): string => {
         const isValidReview = localState.isReviewMode ? !localState.isValidTransferReview : !localState.isValidTransfer
