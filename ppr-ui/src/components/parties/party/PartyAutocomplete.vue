@@ -14,18 +14,27 @@
             <v-list-item
               v-for="(result, i) in autoCompleteResults"
               :key="i"
-              :class="['pt-0', 'pb-0', 'pl-1', $style['auto-complete-item'], $style[wasSelected(result)]]"
+              :ripple="!isExistingSecuredParty(result.code)"
+              :class="[
+                'pt-0', 'pb-0', 'pl-1',
+                $style[!isExistingSecuredParty(result.code) ? 'auto-complete-item' : 'auto-complete-added-item'],
+                $style[wasSelected(result)]
+              ]"
+              :active-class="{'added-color' : isExistingSecuredParty(result.code)}"
               @mouseover="mouseOver = true"
               @mouseleave="mouseOver = false"
             >
               <v-list-item-content
-                :class="[$style['auto-complete-item'], 'pt-2', 'pb-2']"
-                @click="addResult(result, i)"
+                :disabled="isExistingSecuredParty(result.code)"
+                :class="[
+                  $style[isExistingSecuredParty(result.code) ? 'auto-complete-added-item' : ''], 'pt-2', 'pb-2'
+                ]"
+                @click="!isExistingSecuredParty(result.code) ? addResult(result, i) : ''"
               >
                 <v-list-item-subtitle>
                   <v-row :class="[
                     $style['auto-complete-row'],
-                    $style[mouseOver? '' : wasSelected(result)]
+                    $style[mouseOver ? '' : wasSelected(result)]
                     ]
                   ">
                     <v-col cols="2" :class="$style['title-size']">
@@ -45,6 +54,7 @@
                 </v-list-item-subtitle>
               </v-list-item-content>
               <v-list-item-action
+                :disabled="isExistingSecuredParty(result.code)"
                 v-if="!isMhrPartySearch"
                 :class="[$style['auto-complete-action'], 'mt-n1']"
               >
@@ -217,9 +227,20 @@ export default defineComponent({
   color: $primary-blue !important;
   background-color: $gray1 !important;
 }
-
 .auto-complete-item:hover .auto-complete-row{
   color: $primary-blue !important;
+}
+
+.added-color {
+  color : $gray7 !important;
+}
+
+.auto-complete-added-item:hover {
+  background-color: $gray1 !important;
+}
+
+.auto-complete-added-item:hover .auto-complete-row{
+  color: $gray7 !important;
 }
 
 .auto-complete-item[aria-selected='true'] {

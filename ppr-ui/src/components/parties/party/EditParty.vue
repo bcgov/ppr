@@ -2,6 +2,7 @@
   <div id="edit-party" class="white pa-6" :class="{ 'border-error-left': showErrorBar }">
     <secured-party-dialog
       attach="#app"
+      :isDuplicate="foundDuplicate"
       :defaultDialog="toggleDialog"
       :defaultParty="currentSecuredParty"
       :defaultResults="dialogResults"
@@ -290,7 +291,8 @@ export default defineComponent({
       updateAddress,
       ActionTypes,
       setRegisteringParty,
-      addressSchema
+      addressSchema,
+      hasMatchingSecuredParty
     } = useSecuredParty(props, context)
 
     const {
@@ -310,6 +312,7 @@ export default defineComponent({
     const localState = reactive({
       autoCompleteIsActive: true,
       autoCompleteSearchValue: '',
+      foundDuplicate: false,
       searchValue: '',
       hideDetails: false,
       toggleDialog: false,
@@ -347,6 +350,13 @@ export default defineComponent({
 
     const onSubmitForm = async () => {
       currentSecuredParty.value.address = formatAddress(currentSecuredParty.value.address)
+      // check for duplicate
+      if (hasMatchingSecuredParty(currentSecuredParty.value)) {
+        // trigger duplicate secured party dialog
+        localState.foundDuplicate = true
+        showDialog()
+        return
+      }
       if (
         validateSecuredPartyForm(
           partyBusiness.value,

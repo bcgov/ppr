@@ -95,6 +95,22 @@ export const useSecuredParty = (props, context) => {
     return idx !== -1
   }
 
+  const hasMatchingSecuredParty = (addedParty: PartyIF): boolean => {
+    // store state without newly added party
+    const parties = cloneDeep(getAddSecuredPartiesAndDebtors.value.securedParties)
+    if (localState.partyBusiness === 'I') {
+      return parties.some(party =>
+        JSON.stringify(party.personName) === JSON.stringify(addedParty.personName) &&
+        JSON.stringify(party.address) === JSON.stringify(addedParty.address)
+      )
+    } else {
+      return parties.some(party =>
+        party.businessName === addedParty.businessName &&
+        JSON.stringify(party.address) === JSON.stringify(addedParty.address)
+      )
+    }
+  }
+
   const removeSecuredParty = (): void => {
     context.emit('removeSecuredParty', props.activeIndex)
     resetFormAndData(true)
@@ -170,6 +186,7 @@ export const useSecuredParty = (props, context) => {
     RegistrationFlowType,
     ActionTypes,
     setRegisteringParty,
+    hasMatchingSecuredParty,
     ...toRefs(localState)
   }
 }

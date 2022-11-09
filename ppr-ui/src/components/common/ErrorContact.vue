@@ -11,7 +11,7 @@
     </v-row>
   </v-container>
 </template>
-<script>
+<script lang="ts">
 // external
 import {
   defineComponent
@@ -30,12 +30,12 @@ export default defineComponent({
       {
         icon: 'mdi-phone',
         label: 'Victoria Office:',
-        value: '250-387-7878',
-        href: 'tel:+1-250-387-7878'
+        value: '250-952-0568',
+        href: 'tel:+1-250-952-0568'
       },
       {
         icon: 'mdi-email',
-        label: 'BC Registries Email:',
+        label: 'Email:',
         value: 'BCRegistries@gov.bc.ca',
         href: 'mailto:BCRegistries@gov.bc.ca'
       }
