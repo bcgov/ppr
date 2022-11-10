@@ -368,7 +368,7 @@ export default defineComponent({
   margin-left: 330px;
   width: 75px;
 }
-.padLeft {
+.pad-left {
   margin-left: 225px;
   width: 400px;
 }
