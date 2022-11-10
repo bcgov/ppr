@@ -247,7 +247,7 @@ export default defineComponent({
     }
     const submitNext = () => {
       // Undetected Duplicate Secured Party API check to be implemented here.
-      // Use secured party dialog with isDuplicate prop to display error if found.
+      // Use secured party dialog with isDuplicate and isReview props to display error if found.
       if (
         localState.statementType.toUpperCase() ===
           StatementTypes.FINANCING_STATEMENT &&

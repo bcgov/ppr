@@ -6,7 +6,7 @@
     attach="#app"
     content-class="secured-party-dialog"
   >
-    <v-card id="secured-party-dialog" class="pl-4 pr-1 pt-7 mt-7">
+    <v-card id="secured-party-dialog" :class="!duplicate && !review ? 'pl-4 pr-1 pt-7 mt-7' : 'pl-1 pr-1 pt-7 mt-7'">
       <v-row no-gutters>
         <v-col cols="11">
           <v-row no-gutters>
@@ -40,6 +40,10 @@
           existing {{ partyWord }} Party listed below or use your information to create
           a new {{ partyWord }} Party?
         </p>
+        <p v-else-if="!review" class="text-md-center px-6 pt-3" :class="$style['intro']">
+          Registrations cannot list a Secured Party with the same name and address more than once. This registration
+          already contains this Secured Party:
+        </p>
         <p v-else class="text-md-center px-6 pt-3" :class="$style['intro']">
           Duplicate Secured Parties have been detected in this registration.<br>
           Registrations cannot list a Secured Party with the same name and address more than once.<br>
@@ -52,7 +56,7 @@
         </div>
 
         <v-container class="currentParty">
-          <v-row :class="[$style['companyRow'], { 'primaryRow': showSelected }]">
+          <v-row :class="[$style[duplicate ? 'companyRowDuplicate' : 'companyRow'], { 'primaryRow': showSelected }]">
             <v-col cols="auto" :class="$style['iconColumn']">
               <v-icon :class="$style['companyIcon']">
                 {{party.businessName ? 'mdi-domain' : 'mdi-account'}}
@@ -127,7 +131,7 @@
             >
           </v-row>
         </v-container>
-        <div v-else >
+        <div v-else-if="review" >
           <p class="text-md-center px-6 pt-3" :class="$style['intro']">
             Cancelling and re-starting you registration may resolve this issue.<br>
             If you do not wish to proceed, contact BC registries staff:
@@ -136,13 +140,20 @@
         </div>
       </div>
       <v-card-actions class="pt-6 pb-8">
-        <v-btn
+        <v-btn v-if="!duplicate && !review"
           :class="$style['dialogButton']"
           id="dialog-cancel-button"
           color="primary"
           outlined
           @click="exit()"
           >Exit</v-btn
+        >
+        <v-btn v-else
+          :class="$style['dialogButton']"
+          class="primary dialog-btn"
+          color="primary"
+          @click="exit()"
+          >OK</v-btn
         >
       </v-card-actions>
     </v-card>
@@ -180,6 +191,10 @@ export default defineComponent({
       type: Boolean,
       default: false
     },
+    isReview: {
+      type: Boolean,
+      default: false
+    },
     defaultIsRegisteringParty: Boolean
   },
   setup (props, context) {
@@ -187,6 +202,9 @@ export default defineComponent({
       showSelected: true,
       duplicate: computed((): boolean => {
         return props.isDuplicate
+      }),
+      review: computed((): boolean => {
+        return props.isReview
       }),
       party: computed((): PartyIF => {
         return props.defaultParty
@@ -270,6 +288,16 @@ export default defineComponent({
 }
 .companyText {
   font-weight: 700;
+}
+.companyRowDuplicate {
+  background-color: #f1f1f1;
+  border-radius: 4px 4px 4px 4px;
+  margin-bottom: 10px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  margin-right: 10px;
+  margin-left: 10px;
+  border: 1px solid white;
 }
 
 .companyRow {
