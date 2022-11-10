@@ -373,21 +373,20 @@ export default defineComponent({
           currentSecuredParty.value.personName.last = ''
         }
 
-        if (props.activeIndex === -1) {
-          if ((currentSecuredParty.value.businessName) && (partyBusiness.value === 'B')) {
-            // go to the service and see if there are similar secured parties
-            const response: [SearchPartyIF] = await partyCodeSearch(
-              currentSecuredParty.value.businessName, false
-            )
-            // check if any results
-            if (response?.length > 0) {
-              // show secured party selection popup
-              showDialog()
-              localState.dialogResults = response?.slice(0, 50)
-              return
-            }
+        if ((currentSecuredParty.value.businessName) && (partyBusiness.value === 'B')) {
+          // go to the service and see if there are similar secured parties
+          const response: [SearchPartyIF] = await partyCodeSearch(
+            currentSecuredParty.value.businessName, false
+          )
+          // check if any results
+          if (response?.length > 0) {
+            // show secured party selection popup
+            showDialog()
+            localState.dialogResults = response?.slice(0, 50)
+            return
           }
         }
+
         if (localState.isRegisteringParty) {
           setRegisteringParty(currentSecuredParty.value)
           context.emit('resetEvent')
