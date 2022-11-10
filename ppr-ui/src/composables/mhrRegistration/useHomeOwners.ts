@@ -73,11 +73,14 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
     const groups = getTransferOrRegistrationHomeOwnerGroups().filter(owner => owner.action !== ActionTypes.REMOVED)
     const commonCondition = isMhrTransfer ? groups.length > 1 : showGroups.value
 
+    // Special case where a defined Group is orphaned using remove functionality, we want to preserve the Group Type.
+    const isSingleInvalidGroup = !!groups[0]?.interestNumerator && !!groups[0]?.interestDenominator
+
     // Owners
     const owners = getTransferOrRegistrationHomeOwners().filter(owner => owner.action !== ActionTypes.REMOVED)
     const numOfOwners = owners.length
 
-    if (commonCondition) {
+    if (commonCondition || isSingleInvalidGroup) {
       // At leas one group showing with one or more owners
       return HomeTenancyTypes.COMMON
     } else if (numOfOwners === 1 && owners[0]?.address) {
@@ -111,16 +114,16 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
    * and an allocation error status if exists
    */
   const getTotalOwnershipAllocationStatus = (): MhrRegistrationTotalOwnershipAllocationIF => {
+    const groups = getTransferOrRegistrationHomeOwnerGroups().filter(group => group.action !== ActionTypes.REMOVED)
+
     // Sum up all 'interestNumerator' values in different Home Owner groups with a help of sumBy() function from lodash
-    const totalFractionalNominator = sumBy(getTransferOrRegistrationHomeOwnerGroups()
-      .filter(ownerGroup => ownerGroup.action !== ActionTypes.REMOVED), 'interestNumerator')
-    const fractionalDenominator = getTransferOrRegistrationHomeOwnerGroups()
-      .filter(ownerGroup => ownerGroup.action !== ActionTypes.REMOVED)[0]?.interestDenominator || null
+    const totalFractionalNominator = sumBy(groups, 'interestNumerator')
+    const fractionalDenominator = groups[0]?.interestDenominator || null
 
     return {
       totalAllocation: totalFractionalNominator + '/' + fractionalDenominator,
       hasTotalAllocationError: totalFractionalNominator !== fractionalDenominator,
-      hasMinimumGroupsError: getTransferOrRegistrationHomeOwnerGroups().length < 2
+      hasMinimumGroupsError: groups.length < 2
     }
   }
 
