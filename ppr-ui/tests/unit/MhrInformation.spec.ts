@@ -190,7 +190,7 @@ describe('Mhr Information', () => {
     wrapper.vm.$data.dataLoaded = true
     await Vue.nextTick()
 
-    const homeOwnerGroup = [{ groupId: 1, owners: [mockedPerson] }]
+    const homeOwnerGroup = [{ groupId: 1, interestNumerator: null, interestDenominator: null, owners: [mockedPerson] }]
 
     expect(wrapper.findComponent(HomeOwners).vm.$data.getHomeOwners.length).toBe(1)
     expect(
@@ -215,7 +215,7 @@ describe('Mhr Information', () => {
     ).toBe(HomeTenancyTypes.JOINT)
 
     // Enable Groups
-    homeOwnerGroup.push({ groupId: 2, owners: [mockedPerson] })
+    homeOwnerGroup.push({ groupId: 2, interestNumerator: 1, interestDenominator: 4, owners: [mockedPerson] })
     await Vue.nextTick()
 
     expect(
@@ -437,7 +437,7 @@ describe('Mhr Information', () => {
        mockMhrTransferCurrentHomeOwner,
        { groupId: 1, owners: owners }
      ] as MhrRegistrationHomeOwnerGroupIF[]
- 
+
      await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerGroup)
 
     // Should show transfer details once changes made
@@ -536,7 +536,7 @@ describe('Mhr Information', () => {
 
     // check owners are in table
     expect(ownersTable.props().homeOwners.length).toBe(2)
-    
+
     // review table doesnt exist yet
     expect(wrapper.find('#owners-review').exists()).toBeFalsy()
 
