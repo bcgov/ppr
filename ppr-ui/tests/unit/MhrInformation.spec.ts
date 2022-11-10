@@ -164,7 +164,8 @@ describe('Mhr Information', () => {
 
     expect(mhrInformationComponent.findComponent(HomeOwnersTable).exists()).toBeTruthy()
 
-    const owners = [mockedAddedPerson, mockedRemovedPerson] as MhrRegistrationHomeOwnerIF[] // same IF for Transfer and Registration
+    // same IF for Transfer and Registration
+    const owners = [mockedAddedPerson, mockedRemovedPerson] as MhrRegistrationHomeOwnerIF[]
     const homeOwnerGroup = [
       mockMhrTransferCurrentHomeOwner,
       { groupId: 1, owners: owners }
@@ -186,11 +187,16 @@ describe('Mhr Information', () => {
   })
 
   it('should show correct Home Tenancy Type for MHR Transfers', async () => {
-    setupCurrentHomeOwners()
+    await store.dispatch('setMhrTransferHomeOwnerGroups', [{
+      ...mockMhrTransferCurrentHomeOwner,
+      interestNumerator: null,
+      interestDenominator: null
+    }])
+
     wrapper.vm.$data.dataLoaded = true
     await Vue.nextTick()
 
-    const homeOwnerGroup = [{ groupId: 1, interestNumerator: null, interestDenominator: null, owners: [mockedPerson] }]
+    const homeOwnerGroup = [{ groupId: 1, owners: [mockedPerson] }]
 
     expect(wrapper.findComponent(HomeOwners).vm.$data.getHomeOwners.length).toBe(1)
     expect(
@@ -215,7 +221,7 @@ describe('Mhr Information', () => {
     ).toBe(HomeTenancyTypes.JOINT)
 
     // Enable Groups
-    homeOwnerGroup.push({ groupId: 2, interestNumerator: 1, interestDenominator: 4, owners: [mockedPerson] })
+    homeOwnerGroup.push({ groupId: 2, owners: [mockedPerson] })
     await Vue.nextTick()
 
     expect(

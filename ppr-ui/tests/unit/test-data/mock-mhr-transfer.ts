@@ -1,5 +1,9 @@
-import { MhrDraftTransferApiIF } from './../../../src/interfaces/mhr-registration-interfaces/MhrTransferIF'
-import { AddressIF, MhRegistrationSummaryIF, MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF } from '@/interfaces'
+import {
+  AddressIF,
+  MhRegistrationSummaryIF,
+  MhrRegistrationHomeOwnerGroupIF,
+  MhrRegistrationHomeOwnerIF
+} from '@/interfaces'
 
 export const mockMhrTransferCurrentHomeOwner = {
   groupId: 1,
