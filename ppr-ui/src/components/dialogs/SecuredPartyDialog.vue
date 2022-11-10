@@ -56,7 +56,8 @@
         </div>
 
         <v-container class="currentParty">
-          <v-row :class="[$style[duplicate ? 'companyRowDuplicate' : 'companyRow'], { 'primaryRow': showSelected }]">
+          <v-row :class="[$style[duplicate ? 'companyRowDuplicate' : 'companyRow'],
+            { 'primaryRow': showSelected && !duplicate }]">
             <v-col cols="auto" :class="$style['iconColumn']">
               <v-icon :class="$style['companyIcon']">
                 {{party.businessName ? 'mdi-domain' : 'mdi-account'}}

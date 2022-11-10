@@ -100,13 +100,13 @@ export const useSecuredParty = (props, context) => {
     const parties = cloneDeep(getAddSecuredPartiesAndDebtors.value.securedParties)
     if (localState.partyBusiness === 'I') {
       return parties.some(party =>
-        JSON.stringify(party.personName) === JSON.stringify(addedParty.personName) &&
-        JSON.stringify(party.address) === JSON.stringify(addedParty.address)
+        isEqual(party.personName, addedParty.personName) &&
+        isEqual(party.address, addedParty.address)
       )
     } else {
       return parties.some(party =>
         party.businessName === addedParty.businessName &&
-        JSON.stringify(party.address) === JSON.stringify(addedParty.address)
+        isEqual(party.address, addedParty.address)
       )
     }
   }
