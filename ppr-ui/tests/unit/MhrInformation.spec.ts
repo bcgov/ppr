@@ -164,7 +164,8 @@ describe('Mhr Information', () => {
 
     expect(mhrInformationComponent.findComponent(HomeOwnersTable).exists()).toBeTruthy()
 
-    const owners = [mockedAddedPerson, mockedRemovedPerson] as MhrRegistrationHomeOwnerIF[] // same IF for Transfer and Registration
+    // same IF for Transfer and Registration
+    const owners = [mockedAddedPerson, mockedRemovedPerson] as MhrRegistrationHomeOwnerIF[]
     const homeOwnerGroup = [
       mockMhrTransferCurrentHomeOwner,
       { groupId: 1, owners: owners }
@@ -186,7 +187,12 @@ describe('Mhr Information', () => {
   })
 
   it('should show correct Home Tenancy Type for MHR Transfers', async () => {
-    setupCurrentHomeOwners()
+    await store.dispatch('setMhrTransferHomeOwnerGroups', [{
+      ...mockMhrTransferCurrentHomeOwner,
+      interestNumerator: null,
+      interestDenominator: null
+    }])
+
     wrapper.vm.$data.dataLoaded = true
     await Vue.nextTick()
 
@@ -437,7 +443,7 @@ describe('Mhr Information', () => {
        mockMhrTransferCurrentHomeOwner,
        { groupId: 1, owners: owners }
      ] as MhrRegistrationHomeOwnerGroupIF[]
- 
+
      await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerGroup)
 
     // Should show transfer details once changes made
@@ -536,7 +542,7 @@ describe('Mhr Information', () => {
 
     // check owners are in table
     expect(ownersTable.props().homeOwners.length).toBe(2)
-    
+
     // review table doesnt exist yet
     expect(wrapper.find('#owners-review').exists()).toBeFalsy()
 

@@ -134,11 +134,14 @@
         <v-col cols="12">
           <span class="generic-label">Home Tenancy Type: </span>
           <span data-test-id="home-owner-tenancy-type">{{ homeTenancyType }}</span>
-          <span v-show="showGroups && ownershipAllocation.hasMinimumGroupsError" class="error-text fs-14 ml-3">
+          <span
+            v-show="showGroups && ownershipAllocation.hasMinimumGroupsError && showTotalOwnership"
+            class="error-text fs-14 ml-3"
+          >
             Must include more than one group of owners
           </span>
           <span
-            v-if="isMhrTransfer && hasRemovedOwners && (!showGroups || hasRemovedAllOwners) && !hasMultipleAddedGroups"
+            v-if="showHideOwnersBtn"
             class="float-right hide-show-owners fs-14"
             @click="hideShowRemovedOwners()"
           >
@@ -147,7 +150,10 @@
             {{ hideShowRemovedOwnersLabel }} Deleted Owners
           </span>
         </v-col>
-        <v-col v-show="showGroups && (!hasRemovedAllOwners || hasMultipleAddedGroups)" cols="12">
+        <v-col
+          v-show="showTotalOwnership"
+          cols="12"
+        >
           <span class="generic-label">Total Ownership Allocated:</span> {{ ownershipAllocation.totalAllocation }}
           <span v-show="ownershipAllocation.hasTotalAllocationError" class="error-text fs-14 ml-3">
             Total ownership must equal 1/1
@@ -296,6 +302,10 @@ export default defineComponent({
       ownershipAllocation: computed(
         () => getTotalOwnershipAllocationStatus() as MhrRegistrationTotalOwnershipAllocationIF
       ),
+      showTotalOwnership: computed(() => {
+        return showGroups.value &&
+          (!localState.hasRemovedAllOwners || localState.hasMultipleAddedGroups || localState.hasSingleInvalidGroup)
+      }),
       hasHomeOwners: computed(() => !!getTransferOrRegistrationHomeOwners().find(owner => owner.ownerId)),
       isValidGroups: computed(() => { return hasMinimumGroups() }),
       homeTenancyType: computed(() => { return getHomeTenancyType() }),
@@ -306,7 +316,18 @@ export default defineComponent({
       hasRemovedAllOwners: computed(() => { return hasRemovedAllHomeOwners(localState.getHomeOwners) }),
       hideShowRemovedOwnersLabel: computed(() => { return localState.hideRemovedOwners ? 'Show' : 'Hide' }),
       hasMultipleAddedGroups: computed(() => {
-        return localState.getHomeOwners.filter(group => group.action === ActionTypes.ADDED).length > 1
+        return getTransferOrRegistrationHomeOwnerGroups().filter(group => group.action === ActionTypes.ADDED).length > 1
+      }),
+      hasSingleInvalidGroup: computed(() => {
+        const group = getTransferOrRegistrationHomeOwnerGroups().filter(group => group.action !== ActionTypes.REMOVED)
+        return !!group[0]?.interestNumerator && !!group[0]?.interestDenominator
+      }),
+      showHideOwnersBtn: computed(() => {
+        return props.isMhrTransfer &&
+          localState.hasRemovedOwners &&
+          (!showGroups || localState.hasRemovedAllOwners) &&
+          !localState.hasMultipleAddedGroups &&
+          !localState.hasSingleInvalidGroup
       })
     })
 

@@ -386,6 +386,7 @@ export default defineComponent({
         const mhrTransferFiling = await submitMhrTransfer(apiData, getMhrInformation.value.mhrNumber)
         localState.loading = false
         if (!mhrTransferFiling.error) {
+          setUnsavedChanges(false)
           // Delete the draft on successful submission
           if (getMhrInformation.value.draftNumber) await deleteMhrDraft(getMhrInformation.value.draftNumber)
           goToDash()
