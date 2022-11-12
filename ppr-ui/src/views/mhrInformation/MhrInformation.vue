@@ -1,6 +1,5 @@
 <template>
   <v-container class="view-container pa-0" fluid>
-
     <v-overlay v-model="loading">
       <v-progress-circular color="primary" size="50" indeterminate />
     </v-overlay>
@@ -37,8 +36,9 @@
             <section v-if="dataLoaded" class="py-4">
               <header class="review-header mt-1">
                 <v-icon class="ml-1" color="darkBlue">mdi-home</v-icon>
-                <label class="font-weight-bold pl-2">{{ isReviewMode ?
-                'Ownership Transfer or Change - Sale or Beneficiary' : 'Home Owners' }}</label>
+                <label class="font-weight-bold pl-2">
+                  {{ isReviewMode ? 'Ownership Transfer or Change - Sale or Beneficiary' : 'Home Owners' }}
+                </label>
               </header>
 
               <!-- MHR Information Review Section -->
@@ -53,7 +53,7 @@
                 </section>
                 <section>
                   <v-divider class="mx-7 ma-0"></v-divider>
-                  <TransferDetailsReview class="py-6 pt-4 px-8"/>
+                  <TransferDetailsReview class="py-6 pt-4 px-8" />
                 </section>
                 <section id="transfer-submitting-party" class="submitting-party">
                   <AccountInfo
@@ -121,7 +121,7 @@
               <!-- MHR Information Section -->
               <template v-else>
                 <HomeOwners isMhrTransfer class="mt-n2" />
-                <TransferDetails v-if="hasUnsavedChanges" :validateTransferDetails="validateTransferDetails" />
+                <TransferDetails v-if="hasUnsavedChanges" ref="transferDetailsComponent" />
               </template>
             </section>
           </v-col>
@@ -154,7 +154,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, reactive, toRefs, watch } from '@vue/composition-api'
+import { computed, defineComponent, onMounted, reactive, ref, toRefs, watch } from '@vue/composition-api'
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { ActionTypes, RouteNames } from '@/enums'
@@ -236,7 +236,6 @@ export default defineComponent({
     const { setEmptyMhrTransfer } = useActions<any>(['setEmptyMhrTransfer'])
 
     const {
-      isTransferDetailsValid,
       isRefNumValid,
       setRefNumValid,
       initMhrTransfer,
@@ -251,12 +250,14 @@ export default defineComponent({
 
     const { maxLength } = useInputRules()
 
+    const transferDetailsComponent = ref(null)
+
     const localState = reactive({
       dataLoaded: false,
       loading: false,
       isReviewMode: false,
       validate: false,
-      validateTransferDetails: false,
+      isTransferDetailsFormValid: false,
       refNumValid: false,
       authorizationValid: false,
       validateConfirmCompletion: false,
@@ -272,11 +273,13 @@ export default defineComponent({
       showBackBtn: computed((): string => {
         return localState.isReviewMode ? 'Back' : ''
       }),
-      isValidTransfer: computed((): boolean => { // is valid on first step
-        // Get Owner Count here > 1 etc
-        return !isGlobalEditingMode.value && isTransferDetailsValid.value && true
+      isValidTransfer: computed((): boolean => {
+        // is valid on first step
+        // TODO: Add Home Owner validation check here
+        return !isGlobalEditingMode.value && localState.isTransferDetailsFormValid && true
       }),
-      isValidTransferReview: computed((): boolean => { // is valid on review step
+      isValidTransferReview: computed((): boolean => {
+        // is valid on review step
         return (
           localState.isReviewMode &&
           isRefNumValid.value &&
@@ -369,7 +372,7 @@ export default defineComponent({
 
     const goToReview = async (): Promise<void> => {
       localState.validate = true
-      localState.validateTransferDetails = true
+
       // If already in review mode, file the transfer
       if (localState.isReviewMode) {
         // Trigger error state for required fields (if not checked)
@@ -392,10 +395,20 @@ export default defineComponent({
           goToDash()
         } else console.log(mhrTransferFiling?.error) // Handle Schema or Api errors here.
       }
-      // Otherwise if transfer is valid, enter review mode
+
+      const transferDetailsComponent = context.refs.transferDetailsComponent as any
+
+      // Check if TransferDetails exists on the screen
+      if (transferDetailsComponent) {
+        localState.isTransferDetailsFormValid = await transferDetailsComponent.validateDetailsForm()
+      }
+
+      // If transfer is valid, enter review mode
       if (localState.isValidTransfer) {
         localState.isReviewMode = true
         localState.validate = false
+      } else {
+        await scrollToFirstError()
       }
     }
 
@@ -476,8 +489,8 @@ export default defineComponent({
       getCertifyInformation,
       maxLength,
       isRefNumValid,
-      isTransferDetailsValid,
       ...toRefs(localState),
+      transferDetailsComponent,
       handleDialogResp
     }
   }

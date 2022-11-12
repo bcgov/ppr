@@ -8,10 +8,14 @@
     </p>
 
     <v-card flat class="py-6 px-8 rounded" :class="{ 'border-error-left': showFormError }">
-      <v-form ref="transferDetailsForm" v-model="transferDetailsValid">
+      <v-form ref="transferDetailsForm" v-model="isFromValid">
         <v-row>
           <v-col cols="3">
-            <label class="generic-label" for="declared-value" :class="{ 'error-text': showFormError }">
+            <label
+              class="generic-label"
+              for="declared-value"
+              :class="{ 'error-text': validateTransferDetails && hasError(declaredValueRef) }"
+            >
               Declared Value of Home
             </label>
           </v-col>
@@ -20,6 +24,7 @@
             <v-text-field
               id="declared-value"
               class="declared-value"
+              :class="enableWarningMsg ? 'red-error' : 'warning-msg'"
               ref="declaredValueRef"
               v-model="declaredValue"
               filled
@@ -31,7 +36,7 @@
               "
               label="Amount in Canadian Dollars"
               @blur="
-                updateCompensation($event.target.value), $refs.declaredValueRef.validate(), (enableWarningMsg = true)
+                updateConsideration($event.target.value), $refs.declaredValueRef.validate(), (enableWarningMsg = true)
               "
               @focus="enableWarningMsg = false"
               data-test-id="declared-value"
@@ -41,7 +46,11 @@
         </v-row>
         <v-row>
           <v-col cols="3">
-            <label class="generic-label" for="consideration" :class="{ 'error-text': showFormError }">
+            <label
+              class="generic-label"
+              for="consideration"
+              :class="{ 'error-text': validateTransferDetails && hasError(considerationRef) }"
+            >
               Consideration
             </label>
           </v-col>
@@ -59,7 +68,11 @@
         </v-row>
         <v-row>
           <v-col cols="3">
-            <label class="generic-label" for="transfer-date" :class="{ 'error-text': showFormError }">
+            <label
+              class="generic-label"
+              for="transfer-date"
+              :class="{ 'error-text': validateTransferDetails && !transferDate }"
+            >
               Bill of Sale Date of Execution
             </label>
           </v-col>
@@ -73,8 +86,8 @@
               :initialValue="transferDate"
               :key="Math.random()"
               @emitDate="transferDate = $event"
-              @emitCancel="transferDate = ''"
-              @emitClear="transferDate = ''"
+              @emitCancel="transferDate = null"
+              @emitClear="transferDate = null"
               data-test-id="transfer-date"
             />
           </v-col>
@@ -104,19 +117,14 @@
 
 <script lang="ts">
 import { DatePicker } from '@bcrs-shared-components/date-picker'
-import { useInputRules, useMhrInformation } from '@/composables'
-import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
+import { useInputRules } from '@/composables'
+import { computed, defineComponent, reactive, ref, toRefs, watch } from '@vue/composition-api'
 import { useActions, useGetters } from 'vuex-composition-helpers'
+import { FormIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 
 export default defineComponent({
   name: 'TransferDetails',
   components: { DatePicker },
-  props: {
-    validateTransferDetails: {
-      type: Boolean,
-      default: false
-    }
-  },
   setup (props, context) {
     const { customRules, required, isNumber, maxLength } = useInputRules()
 
@@ -146,23 +154,18 @@ export default defineComponent({
       'setUnsavedChanges'
     ])
 
-    const { setTransferDetailsValid } = useMhrInformation()
+    const declaredValueRef = ref(null)
+    const considerationRef = ref(null)
 
     const declaredValueRules = computed(
-      (): Array<Function> =>
-        customRules(
-          maxLength(7, true),
-          isNumber(),
-          props.validateTransferDetails ? required('Enter declared value of home') : []
-        )
+      (): Array<Function> => customRules(maxLength(7, true), isNumber(), required('Enter declared value of home'))
     )
 
     const considerationRules = computed(
-      (): Array<Function> =>
-        customRules(maxLength(80), props.validateTransferDetails ? required('Enter consideration') : [])
+      (): Array<Function> => customRules(maxLength(80), required('Enter consideration'))
     )
 
-    const updateCompensation = (declaredValue: string) => {
+    const updateConsideration = (declaredValue: string) => {
       // copy Declared Value into Consideration field - the initial time only
       if (!localState.consideration && localState.declaredValue && parseInt(declaredValue)) {
         localState.consideration = `$${declaredValue}.00`
@@ -170,14 +173,27 @@ export default defineComponent({
     }
 
     const localState = reactive({
-      transferDetailsValid: false,
-      declaredValue: getMhrTransferDeclaredValue.value,
+      validateTransferDetails: false, // triggered once Review & Confirm clicked
+      isFromValid: false, // TransferDetails form without Transfer Date Picker
+      isTransferDetailsFormValid: computed((): boolean => localState.isFromValid && !!localState.transferDate),
+      declaredValue: getMhrTransferDeclaredValue.value?.toString(),
       consideration: getMhrTransferConsideration.value,
       transferDate: getMhrTransferDate.value,
       isOwnLand: getMhrTransferOwnLand.value,
       enableWarningMsg: false,
-      showFormError: computed(() => props.validateTransferDetails && !localState.transferDetailsValid)
+      showFormError: computed(() => localState.validateTransferDetails && !localState.isTransferDetailsFormValid)
     })
+
+    const hasError = (ref: any): boolean => {
+      return ref?.hasError
+    }
+
+    // This validate function is called from parent MhrInformation component
+    const validateDetailsForm = async (): Promise<boolean> => {
+      localState.validateTransferDetails = true
+      await (context.refs.transferDetailsForm as FormIF).validate()
+      return localState.isTransferDetailsFormValid
+    }
 
     watch(
       () => localState.declaredValue,
@@ -211,25 +227,14 @@ export default defineComponent({
       }
     )
 
-    watch(
-      () => localState.transferDetailsValid,
-      (isFormValid: boolean) => {
-        setTransferDetailsValid(isFormValid)
-      }
-    )
-
-    watch(
-      () => props.validateTransferDetails,
-      () => {
-        // @ts-ignore - function exists
-        context.refs.transferDetailsForm.validate()
-      }
-    )
-
     return {
+      hasError,
+      declaredValueRef,
+      considerationRef,
       declaredValueRules,
       considerationRules,
-      updateCompensation,
+      updateConsideration,
+      validateDetailsForm,
       ...toRefs(localState)
     }
   }
@@ -252,8 +257,11 @@ export default defineComponent({
     display: flex;
 
     .declared-value {
-      .v-messages__message {
+      .warning-msg > .v-messages__message {
         color: $gray7;
+      }
+      .red-error > .v-messages__message {
+        color: red;
       }
     }
   }
