@@ -401,8 +401,8 @@ export default defineComponent({
 
       context.emit('isValidTransferOwners',
         hasMinimumGroups() &&
-          localState.isValidAllocation &&
-          !localState.hasGroupsWithNoOwners
+        localState.isValidAllocation &&
+        !localState.hasGroupsWithNoOwners
       )
     }, { deep: true })
 
