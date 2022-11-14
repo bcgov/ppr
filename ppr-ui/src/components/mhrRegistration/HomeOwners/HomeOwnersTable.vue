@@ -288,7 +288,7 @@ export default defineComponent({
       showTableError: computed((): boolean => {
         return showGroups.value &&
           (
-            props.validateTransfer &&
+            (props.validateTransfer || !props.isMhrTransfer) &&
             (
               !hasMinimumGroups() ||
               hasEmptyGroup.value ||
