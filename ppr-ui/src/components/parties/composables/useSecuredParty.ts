@@ -2,7 +2,7 @@ import { reactive, toRefs, computed } from '@vue/composition-api'
 import { PartyIF, AddressIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { useGetters, useActions } from 'vuex-composition-helpers'
 import { PartyAddressSchema } from '@/schemas'
-import { ActionTypes, APIRegistrationTypes, RegistrationFlowType } from '@/enums'
+import { ActionTypes, APIRegistrationTypes, RegistrationFlowType, SecuredPartyTypes } from '@/enums'
 import { checkAddress, formatAddress } from '@/composables/address/factories/address-factory'
 import { cloneDeep, isEqual } from 'lodash'
 import { useParty } from '@/composables/useParty'
@@ -34,7 +34,7 @@ export const useSecuredParty = (props, context) => {
       address: initAddress
     } as PartyIF,
     currentIsBusiness: null,
-    partyBusiness: null,
+    partyType: SecuredPartyTypes.NONE,
     registrationFlowType: getRegistrationFlowType.value,
     originalSecuredParty: null
   })
@@ -48,10 +48,10 @@ export const useSecuredParty = (props, context) => {
       localState.currentSecuredParty = JSON.parse(JSON.stringify(registeringParty))
       localState.currentSecuredParty.address = checkAddress(localState.currentSecuredParty.address, PartyAddressSchema)
       localState.currentIsBusiness = false
-      localState.partyBusiness = 'I'
+      localState.partyType = SecuredPartyTypes.INDIVIDUAL
       if (localState.currentSecuredParty.businessName) {
         localState.currentIsBusiness = true
-        localState.partyBusiness = 'B'
+        localState.partyType = SecuredPartyTypes.BUSINESS
         localState.currentSecuredParty.personName = Object.assign({}, initPerson)
       }
     } else if (props.activeIndex >= 0) {
@@ -59,14 +59,14 @@ export const useSecuredParty = (props, context) => {
       localState.currentSecuredParty = JSON.parse(JSON.stringify(securedParties[props.activeIndex]))
       localState.currentSecuredParty.address = checkAddress(localState.currentSecuredParty.address, PartyAddressSchema)
       localState.currentIsBusiness = false
-      localState.partyBusiness = 'I'
+      localState.partyType = SecuredPartyTypes.INDIVIDUAL
       if (localState.currentSecuredParty.businessName) {
         localState.currentIsBusiness = true
-        localState.partyBusiness = 'B'
+        localState.partyType = SecuredPartyTypes.BUSINESS
         localState.currentSecuredParty.personName = Object.assign({}, initPerson)
       }
     } else {
-      localState.partyBusiness = null
+      localState.partyType = SecuredPartyTypes.NONE
       const blankSecuredParty = {
         businessName: '',
         personName: Object.assign({}, initPerson),
@@ -93,6 +93,22 @@ export const useSecuredParty = (props, context) => {
       party.code === partyCode
     )
     return idx !== -1
+  }
+
+  const hasMatchingSecuredParty = (addedParty: PartyIF): boolean => {
+    // store state without newly added party
+    const parties = cloneDeep(getAddSecuredPartiesAndDebtors.value.securedParties)
+    if (localState.partyType === SecuredPartyTypes.INDIVIDUAL) {
+      return parties.some(party =>
+        isEqual(party.personName, addedParty.personName) &&
+        isEqual(party.address, addedParty.address)
+      )
+    } else {
+      return parties.some(party =>
+        party.businessName === addedParty.businessName &&
+        isEqual(party.address, addedParty.address)
+      )
+    }
   }
 
   const removeSecuredParty = (): void => {
@@ -170,6 +186,7 @@ export const useSecuredParty = (props, context) => {
     RegistrationFlowType,
     ActionTypes,
     setRegisteringParty,
+    hasMatchingSecuredParty,
     ...toRefs(localState)
   }
 }

@@ -23,6 +23,7 @@ export * from './homeCertificationOptions'
 export * from './homeLocationTypes'
 export * from './homeTenancyTypes'
 export * from './submittingPartyTypes'
+export * from './securedPartyTypes'
 export * from './business-statuses'
 export * from './business-types'
 

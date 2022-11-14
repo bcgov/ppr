@@ -2,6 +2,7 @@
   <div id="edit-party" class="white pa-6" :class="{ 'border-error-left': showErrorBar }">
     <secured-party-dialog
       attach="#app"
+      :isDuplicate="foundDuplicate"
       :defaultDialog="toggleDialog"
       :defaultParty="currentSecuredParty"
       :defaultResults="dialogResults"
@@ -36,7 +37,7 @@
             <v-row class="pb-6" no-gutters>
               <v-col cols="12">
                 <v-radio-group
-                  v-model="partyBusiness"
+                  v-model="partyType"
                   class="mt-0"
                   row
                   hide-details="true"
@@ -47,7 +48,7 @@
                       $style['party-radio-individual'],
                     ]"
                     label="Individual Person"
-                    value="I"
+                    :value=SecuredPartyTypes.INDIVIDUAL
                     id="party-individual"
                   >
                   </v-radio>
@@ -55,7 +56,7 @@
                   <v-radio
                     :class="['business-radio', $style['party-radio-business']]"
                     label="Business"
-                    value="B"
+                    :value=SecuredPartyTypes.BUSINESS
                     id="party-business"
                   >
                   </v-radio>
@@ -63,9 +64,9 @@
               </v-col>
             </v-row>
             <v-divider class="pb-4" />
-            <v-row no-gutters v-if="isPartyType">
+            <v-row no-gutters v-if="partyType !== SecuredPartyTypes.NONE">
               <v-col cols="12">
-                <v-row v-if="partyBusiness === 'B'" no-gutters class="pb-4">
+                <v-row v-if="partyType === SecuredPartyTypes.BUSINESS" no-gutters class="pb-4">
                   <v-col>
                     <label class="generic-label">Business Name</label>
                   </v-col>
@@ -75,7 +76,7 @@
                     <label class="generic-label">Person's Name</label>
                   </v-col>
                 </v-row>
-                <v-row v-if="partyBusiness === 'B'" no-gutters>
+                <v-row v-if="partyType === SecuredPartyTypes.BUSINESS" no-gutters>
                   <v-col>
                     <v-text-field
                       filled
@@ -204,7 +205,7 @@
                     id="done-btn-party"
                     class="ml-auto"
                     color="primary"
-                    :disabled="!isPartyType"
+                    :disabled="partyType === SecuredPartyTypes.NONE"
                     @click="onSubmitForm()"
                   >
                     Done
@@ -243,6 +244,7 @@ import {
 import { SecuredPartyDialog } from '@/components/dialogs'
 import { AutoComplete } from '@/components/search'
 import { BaseAddress } from '@/composables/address'
+import { SecuredPartyTypes } from '@/enums'
 // local helpers / types / etc.
 import { useSecuredParty } from '@/components/parties/composables/useSecuredParty'
 import { useSecuredPartyValidation } from '@/components/parties/composables/useSecuredPartyValidation'
@@ -280,7 +282,7 @@ export default defineComponent({
     const {
       currentSecuredParty,
       currentIsBusiness,
-      partyBusiness,
+      partyType,
       getSecuredParty,
       resetFormAndData,
       removeSecuredParty,
@@ -290,7 +292,8 @@ export default defineComponent({
       updateAddress,
       ActionTypes,
       setRegisteringParty,
-      addressSchema
+      addressSchema,
+      hasMatchingSecuredParty
     } = useSecuredParty(props, context)
 
     const {
@@ -310,16 +313,11 @@ export default defineComponent({
     const localState = reactive({
       autoCompleteIsActive: true,
       autoCompleteSearchValue: '',
+      foundDuplicate: false,
       searchValue: '',
       hideDetails: false,
       toggleDialog: false,
       dialogResults: [],
-      isPartyType: computed((): boolean => {
-        if (!partyBusiness.value) {
-          return false
-        }
-        return true
-      }),
       showAllAddressErrors: false,
       currentIndex: computed((): number => {
         return props.activeIndex
@@ -347,14 +345,21 @@ export default defineComponent({
 
     const onSubmitForm = async () => {
       currentSecuredParty.value.address = formatAddress(currentSecuredParty.value.address)
+      // check for duplicate
+      if (hasMatchingSecuredParty(currentSecuredParty.value)) {
+        // trigger duplicate secured party dialog
+        localState.foundDuplicate = true
+        showDialog()
+        return
+      }
       if (
         validateSecuredPartyForm(
-          partyBusiness.value,
+          partyType.value,
           currentSecuredParty,
           localState.isRegisteringParty
         ) === true
       ) {
-        if (partyBusiness.value === 'I') {
+        if (partyType.value === SecuredPartyTypes.INDIVIDUAL) {
           currentSecuredParty.value.businessName = ''
           // localState.searchValue = ''
         } else {
@@ -363,21 +368,20 @@ export default defineComponent({
           currentSecuredParty.value.personName.last = ''
         }
 
-        if (props.activeIndex === -1) {
-          if ((currentSecuredParty.value.businessName) && (partyBusiness.value === 'B')) {
-            // go to the service and see if there are similar secured parties
-            const response: [SearchPartyIF] = await partyCodeSearch(
-              currentSecuredParty.value.businessName, false
-            )
-            // check if any results
-            if (response?.length > 0) {
-              // show secured party selection popup
-              showDialog()
-              localState.dialogResults = response?.slice(0, 50)
-              return
-            }
+        if (currentSecuredParty.value.businessName && partyType.value === SecuredPartyTypes.BUSINESS) {
+          // go to the service and see if there are similar secured parties
+          const response: [SearchPartyIF] = await partyCodeSearch(
+            currentSecuredParty.value.businessName, false
+          )
+          // check if any results
+          if (response?.length > 0) {
+            // show secured party selection popup
+            showDialog()
+            localState.dialogResults = response?.slice(0, 50)
+            return
           }
         }
+
         if (localState.isRegisteringParty) {
           setRegisteringParty(currentSecuredParty.value)
           context.emit('resetEvent')
@@ -437,7 +441,8 @@ export default defineComponent({
     return {
       currentSecuredParty,
       currentIsBusiness,
-      partyBusiness,
+      partyType,
+      SecuredPartyTypes,
       resetFormAndData,
       removeSecuredParty,
       onSubmitForm,
