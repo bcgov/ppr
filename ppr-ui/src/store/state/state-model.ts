@@ -131,6 +131,7 @@ export const stateModel: StateModelIF = {
   isStaffClientPayment: false,
   staffPayment: null,
   unsavedChanges: false,
+  currentRegistrationsTab: 0,
   userInfo: {
     contacts: [],
     feeSettings: null,

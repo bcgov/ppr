@@ -254,6 +254,7 @@ export const useNewMhrRegistration = () => {
           }
           transfer.changes.push(newDraft)
         })
+        transfer.changes = orderBy(transfer.changes, ['createDateTime'], ['desc'])
       }
     })
     return sortedMhrHistory

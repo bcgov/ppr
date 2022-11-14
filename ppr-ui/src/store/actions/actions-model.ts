@@ -291,6 +291,10 @@ export const setUnsavedChanges: ActionIF = ({ commit }, unsavedChanges: Boolean)
   commit('mutateUnsavedChanges', unsavedChanges)
 }
 
+export const setCurrentRegistrationsTab: ActionIF = ({ commit }, currentRegistrationsTab: Number): void => {
+  commit('mutateCurrentRegistrationsTab', currentRegistrationsTab)
+}
+
 // MHR Registration
 export const setEmptyMhr: ActionIF = ({ commit }, emptyMhr: MhrRegistrationIF): void => {
   commit('mutateEmptyMhr', emptyMhr)

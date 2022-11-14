@@ -74,6 +74,7 @@ export interface StateModelIF {
   isStaffClientPayment: boolean
   staffPayment: StaffPaymentIF
   unsavedChanges: Boolean // used for cancel flows
+  currentRegistrationsTab: Number
   userInfo: UserInfoIF
   mhrInformation: MhRegistrationSummaryIF
   mhrRegistration: MhrRegistrationIF
