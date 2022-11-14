@@ -492,7 +492,7 @@ export default defineComponent({
     watch(
       () => hasUnsavedChanges.value,
       (val: boolean) => {
-        if (val === false && context.refs.transferDetailsComponent) {
+        if (!val && context.refs.transferDetailsComponent) {
           (context.refs.transferDetailsComponent as any).clearTransferDetailsData()
         }
         localState.showTransferDetails = val
