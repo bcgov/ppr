@@ -2,6 +2,7 @@ import { ref } from '@vue/composition-api'
 import { createDefaultValidationResult } from '@lemoncode/fonk'
 import { formValidation } from './securedPartyFormValidator'
 import { useValidation } from '@/utils/validators/use-validation'
+import { SecuredPartyTypes } from '@/enums'
 const {
   validateName
 } = useValidation()
@@ -24,8 +25,8 @@ export const useSecuredPartyValidation = () => {
     })
   }
 
-  const validateSecuredPartyForm = (partyBusiness, currentParty, isRegisteringParty): boolean => {
-    const currentIsBusiness = partyBusiness === 'B'
+  const validateSecuredPartyForm = (partyType, currentParty, isRegisteringParty): boolean => {
+    const currentIsBusiness = partyType === SecuredPartyTypes.BUSINESS
     validateName(currentIsBusiness, currentParty.value, errors)
     if (isRegisteringParty) {
       if (currentParty.value.emailAddress.length === 0) {
