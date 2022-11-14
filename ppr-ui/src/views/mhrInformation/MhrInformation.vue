@@ -377,7 +377,7 @@ export default defineComponent({
         localState.validateConfirmCompletion = !localState.isCompletionConfirmed
 
         // Check if any required fields has errors
-        if (localState.validateAuthorizationError || localState.validateConfirmCompletion) {
+        if (!localState.isValidTransferReview) {
           await scrollToFirstError()
           return
         }
