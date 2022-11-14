@@ -120,12 +120,18 @@
 
               <!-- MHR Information Section -->
               <template v-else>
-                <HomeOwners isMhrTransfer class="mt-n2" />
+                <HomeOwners
+                  isMhrTransfer
+                  class="mt-n2"
+                  :class="{ 'mb-10': !hasUnsavedChanges }"
+                  :validateTransfer="validate"
+                  @isValidTransferOwners="isValidTransferOwners = $event"
+                />
                 <TransferDetails v-if="hasUnsavedChanges" ref="transferDetailsComponent" />
               </template>
             </section>
           </v-col>
-          <v-col class="pl-6 pt-5" cols="3">
+          <v-col class="pl-6 pt-5" cols="3" v-if="hasUnsavedChanges">
             <aside>
               <affix relative-element-selector=".col-9" :offset="{ top: 90, bottom: -100 }">
                 <sticky-container
@@ -263,6 +269,7 @@ export default defineComponent({
       validateConfirmCompletion: false,
       validateAuthorizationError: false,
       accountInfo: null,
+      isValidTransferOwners: false,
       feeType: FeeSummaryTypes.MHR_TRANSFER, // FUTURE STATE: To be dynamic, dependent on what changes have been made
       isAuthenticated: computed((): boolean => {
         return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
@@ -275,8 +282,9 @@ export default defineComponent({
       }),
       isValidTransfer: computed((): boolean => {
         // is valid on first step
-        // TODO: Add Home Owner validation check here
-        return !isGlobalEditingMode.value && localState.isTransferDetailsFormValid && true
+        return !isGlobalEditingMode.value &&
+          localState.isValidTransferOwners &&
+          localState.isTransferDetailsFormValid
       }),
       isValidTransferReview: computed((): boolean => {
         // is valid on review step
@@ -322,11 +330,11 @@ export default defineComponent({
       setEmptyMhrTransfer(initMhrTransfer())
       // Set baseline MHR Information to state
       await parseMhrInformation()
+      await setUnsavedChanges(false) // Force no unsaved changes after loading current owners
       localState.accountInfo = await getSubmittingPartyInformation()
       localState.loading = false
 
       localState.dataLoaded = true
-      await setUnsavedChanges(false)
     })
 
     // Future state to parse all relevant MHR Information
@@ -366,6 +374,7 @@ export default defineComponent({
 
     const scrollToFirstError = async () => {
       setTimeout(() => {
+        document.getElementsByClassName('border-error-left').length > 0 &&
         document.getElementsByClassName('border-error-left')[0].scrollIntoView({ behavior: 'smooth' })
       }, 10)
     }

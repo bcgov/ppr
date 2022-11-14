@@ -157,6 +157,11 @@ describe('Mhr Information', () => {
   })
 
   it('renders and displays the correct sub components', async () => {
+    // Verify it does render before changes
+    expect(wrapper.findComponent(StickyContainer).exists()).toBe(false)
+
+    await triggerUnsavedChange()
+
     // Sticky container w/ Fee Summary
     expect(wrapper.findComponent(StickyContainer).exists()).toBe(true)
   })
@@ -342,6 +347,10 @@ describe('Mhr Information', () => {
 
     expect(wrapper.find('#transfer-ref-num-section').exists()).toBeFalsy()
 
+    // Set Wrapper Validations
+    wrapper.vm.isValidTransferOwners = true
+    wrapper.vm.isTransferDetailsFormValid = true
+
     // go to Review screen
     await triggerUnsavedChange()
     await enterTransferDetailsFields(wrapper.findComponent(TransferDetails))
@@ -388,6 +397,10 @@ describe('Mhr Information', () => {
     expect(wrapper.vm.$data.getMhrTransferHomeOwners.length).toBe(1)
     expect(wrapper.findComponent(MhrInformation).exists()).toBe(true)
 
+    // Set Wrapper Validations
+    wrapper.vm.isValidTransferOwners = true
+    wrapper.vm.isTransferDetailsFormValid = true
+
     // Enter review mode
     await triggerUnsavedChange()
     await enterTransferDetailsFields(wrapper.findComponent(TransferDetails))
@@ -422,6 +435,10 @@ describe('Mhr Information', () => {
 
     // set Account Info in local state
     wrapper.vm.$data.accountInfo = mockedAccountInfo
+
+    // Set Wrapper Validations
+    wrapper.vm.isValidTransferOwners = true
+    wrapper.vm.isTransferDetailsFormValid = true
 
     await triggerUnsavedChange()
     await enterTransferDetailsFields(wrapper.findComponent(TransferDetails))
@@ -509,6 +526,10 @@ describe('Mhr Information', () => {
     // doesn't exist on manufactured home page
     expect(wrapper.find('#yellow-message-bar').exists()).toBeFalsy()
 
+    // Set Wrapper Validations
+    wrapper.vm.isValidTransferOwners = true
+    wrapper.vm.isTransferDetailsFormValid = true
+
     // trigger review
     await triggerUnsavedChange()
     await enterTransferDetailsFields(wrapper.findComponent(TransferDetails))
@@ -533,6 +554,10 @@ describe('Mhr Information', () => {
     await Vue.nextTick()
 
     expect(wrapper.find('#transfer-confirm-section').exists()).toBeFalsy()
+
+    // Set Wrapper Validations
+    wrapper.vm.isValidTransferOwners = true
+    wrapper.vm.isTransferDetailsFormValid = true
 
     await triggerUnsavedChange()
     await enterTransferDetailsFields(wrapper.findComponent(TransferDetails))
@@ -571,6 +596,10 @@ describe('Mhr Information', () => {
     // review table doesn't exist yet
     expect(wrapper.find('#owners-review').exists()).toBeFalsy()
 
+    // Set Wrapper Validations
+    wrapper.vm.isValidTransferOwners = true
+    wrapper.vm.isTransferDetailsFormValid = true
+
     await triggerUnsavedChange()
     await enterTransferDetailsFields(wrapper.findComponent(TransferDetails))
 
@@ -590,11 +619,15 @@ describe('Mhr Information', () => {
     setupCurrentHomeOwners()
     wrapper.vm.$data.dataLoaded = true
     await Vue.nextTick()
+    await triggerUnsavedChange()
 
     const feeSummaryContainer = wrapper.find(getTestId('fee-summary'))
     expect(feeSummaryContainer.find('.err-msg').exists()).toBeFalsy()
 
-    await triggerUnsavedChange()
+    // Set Wrapper Validations
+    wrapper.vm.isValidTransferOwners = true
+    wrapper.vm.isTransferDetailsFormValid = true
+
     await enterTransferDetailsFields(wrapper.findComponent(TransferDetails))
 
     await wrapper.find('#btn-stacked-submit').trigger('click')
