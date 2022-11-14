@@ -474,7 +474,8 @@ export default defineComponent({
     const isNewRegItem = (item: RegistrationSummaryIF | DraftResultIF): boolean => {
       const draftItem = item as DraftResultIF
       const regItem = item as RegistrationSummaryIF
-      if (regItem.registrationNumber && regItem.registrationNumber === localState.newReg?.addedReg) {
+      const registrationNumber = regItem.registrationNumber || regItem.mhrNumber
+      if (registrationNumber && registrationNumber === localState.newReg?.addedReg) {
         // reg num is not blank and equals newly added reg num
         return true
       } else if (draftItem.documentId && draftItem.documentId === localState.newReg?.addedReg) {
@@ -486,10 +487,11 @@ export default defineComponent({
 
     const isNewRegParentItem = (item: RegistrationSummaryIF): boolean => {
       if (item.expand === undefined && item.changes !== undefined) item.expand = false
+      const registrationNumber = item.registrationNumber || item.mhrNumber
       return (
         !!localState.newReg?.addedRegParent &&
         localState.newReg.addedRegParent !== '' &&
-        localState.newReg.addedRegParent === item.registrationNumber
+        localState.newReg.addedRegParent === registrationNumber
       )
     }
 
