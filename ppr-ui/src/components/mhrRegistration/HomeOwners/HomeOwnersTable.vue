@@ -14,7 +14,7 @@
     >
       <template
         v-slot:header
-        v-if="isMhrTransfer && hasRemovedAllHomeOwners(homeOwners) && addedOwnerCount === 0"
+        v-if="isMhrTransfer && hasRemovedAllHomeOwners(homeOwners) && addedOwnerCount === 0 && !hideRemovedOwners"
       >
         <tr class="fs-14 text-center no-owners-head-row" data-test-id="no-data-msg">
           <td class="pa-6" :colspan="homeOwnersTableHeaders.length">
@@ -338,9 +338,15 @@ export default defineComponent({
       return item.action === ActionTypes.REMOVED
     }
 
+    const hasNoGroupInterest = (groupId: number): boolean => {
+      const group = getTransferOrRegistrationHomeOwnerGroups().find(group => group.groupId === groupId)
+      return !group.interestNumerator && !group.interestDenominator
+    }
+
     const disableGroupHeader = (groupId: number): boolean => {
       return hasRemovedAllHomeOwners(props.homeOwners) &&
         isAddedHomeOwnerGroup(groupId) &&
+        hasNoGroupInterest(groupId) &&
         localState.addedGroupCount <= 1
     }
 
