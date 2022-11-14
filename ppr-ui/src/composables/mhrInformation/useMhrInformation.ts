@@ -1,10 +1,7 @@
-import { MhrHomeOwnerGroupIF, MhrTransferApiIF, MhrTransferIF } from '@/interfaces'
+import { MhrTransferApiIF, MhrTransferIF } from '@/interfaces'
 import { useGetters } from 'vuex-composition-helpers'
 import { readonly, ref } from '@vue/composition-api'
 import { ActionTypes, ApiHomeTenancyTypes, HomeTenancyTypes } from '@/enums'
-
-// Validation flag for Transfer Details
-const transferDetailsValid = ref(false)
 
 // Validation flags for Review Confirm screen
 const refNumValid = ref(true)
@@ -32,10 +29,6 @@ export const useMhrInformation = () => {
     'getMhrTransferAttentionReference',
     'getMhrTransferHomeOwnerGroups'
   ])
-
-  const setTransferDetailsValid = (isValid: boolean) => {
-    transferDetailsValid.value = isValid
-  }
 
   const setRefNumValid = (isValid: boolean) => {
     refNumValid.value = isValid
@@ -110,9 +103,7 @@ export const useMhrInformation = () => {
   }
 
   return {
-    isTransferDetailsValid: readonly(transferDetailsValid),
     isRefNumValid: readonly(refNumValid),
-    setTransferDetailsValid,
     setRefNumValid,
     initMhrTransfer,
     buildApiData

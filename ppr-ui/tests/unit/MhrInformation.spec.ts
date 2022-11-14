@@ -8,6 +8,7 @@ import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
 // local components
 import { HomeOwners, MhrInformation } from '@/views'
 import { AccountInfo, StickyContainer, CertifyInformation } from '@/components/common'
+import { DatePicker } from '@bcrs-shared-components/date-picker'
 import mockRouter from './MockRouter'
 import { HomeTenancyTypes, RouteNames } from '@/enums'
 import { HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
@@ -59,6 +60,9 @@ function createComponent (): Wrapper<any> {
   })
 }
 
+const TRANSFER_DECLARED_VALUE = '123'
+const TRANSFER_CONSIDERATION = `$${TRANSFER_DECLARED_VALUE}.00`
+
 // TODO: Remove after API updates to include the ID for Owners
 function addIDsForOwners (ownersGroups): Array<any> {
   // Create an ID to each individual owner for UI Tracking
@@ -94,13 +98,18 @@ async function setupCurrentMultipleHomeOwnersGroups (): Promise<void> {
   await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerWithIdsArray)
 }
 
+async function triggerUnsavedChange (): Promise<void> {
+  // set unsaved changes to make Transfer Details visible
+  await store.dispatch('setUnsavedChanges', true)
+  await Vue.nextTick()
+}
+
 // For future use when Transfer Details will be required to go to Review
-async function enterTransferDetailsFields (): Promise<void> {
-  await store.dispatch('setMhrTransferDeclaredValue', '1000')
-  await store.dispatch('setMhrTransferConsideration', '$1000.00')
-  await store.dispatch('setMhrTransferDate', '2011-11-11')
-  await store.dispatch('setMhrTransferOwnLand', true)
-  await store.dispatch('setTransferDetailsValid', true)
+async function enterTransferDetailsFields (transferDetailsWrapper: Wrapper<any, Element>): Promise<void> {
+  transferDetailsWrapper.find(getTestId('declared-value')).setValue(TRANSFER_DECLARED_VALUE)
+  transferDetailsWrapper.find(getTestId('declared-value')).trigger('blur')
+  transferDetailsWrapper.findComponent(DatePicker).vm.$emit('emitDate', { date: '2020-10-10' })
+  await Vue.nextTick()
 }
 
 describe('Mhr Information', () => {
@@ -164,7 +173,8 @@ describe('Mhr Information', () => {
 
     expect(mhrInformationComponent.findComponent(HomeOwnersTable).exists()).toBeTruthy()
 
-    const owners = [mockedAddedPerson, mockedRemovedPerson] as MhrRegistrationHomeOwnerIF[] // same IF for Transfer and Registration
+    // same IF for Transfer and Registration
+    const owners = [mockedAddedPerson, mockedRemovedPerson] as MhrRegistrationHomeOwnerIF[]
     const homeOwnerGroup = [
       mockMhrTransferCurrentHomeOwner,
       { groupId: 1, owners: owners }
@@ -186,7 +196,12 @@ describe('Mhr Information', () => {
   })
 
   it('should show correct Home Tenancy Type for MHR Transfers', async () => {
-    setupCurrentHomeOwners()
+    await store.dispatch('setMhrTransferHomeOwnerGroups', [{
+      ...mockMhrTransferCurrentHomeOwner,
+      interestNumerator: null,
+      interestDenominator: null
+    }])
+
     wrapper.vm.$data.dataLoaded = true
     await Vue.nextTick()
 
@@ -328,7 +343,10 @@ describe('Mhr Information', () => {
     expect(wrapper.find('#transfer-ref-num-section').exists()).toBeFalsy()
 
     // go to Review screen
-    wrapper.find('#btn-stacked-submit').trigger('click')
+    await triggerUnsavedChange()
+    await enterTransferDetailsFields(wrapper.findComponent(TransferDetails))
+
+    await wrapper.find('#btn-stacked-submit').trigger('click')
     await Vue.nextTick()
 
     expect(wrapper.find('#transfer-ref-num-section').exists()).toBeTruthy()
@@ -371,9 +389,10 @@ describe('Mhr Information', () => {
     expect(wrapper.findComponent(MhrInformation).exists()).toBe(true)
 
     // Enter review mode
-    expect(wrapper.find('#btn-stacked-submit').exists()).toBe(true)
-    const submitButton = wrapper.find('#btn-stacked-submit')
-    submitButton.trigger('click')
+    await triggerUnsavedChange()
+    await enterTransferDetailsFields(wrapper.findComponent(TransferDetails))
+
+    await wrapper.find('#btn-stacked-submit').trigger('click')
     await Vue.nextTick()
 
     // Check if Authorization renders in review mode
@@ -404,7 +423,10 @@ describe('Mhr Information', () => {
     // set Account Info in local state
     wrapper.vm.$data.accountInfo = mockedAccountInfo
 
-    wrapper.find('#btn-stacked-submit').trigger('click')
+    await triggerUnsavedChange()
+    await enterTransferDetailsFields(wrapper.findComponent(TransferDetails))
+
+    await wrapper.find('#btn-stacked-submit').trigger('click')
     await Vue.nextTick()
 
     expect(wrapper.find('#account-info').exists()).toBeTruthy()
@@ -431,21 +453,21 @@ describe('Mhr Information', () => {
     // Should hide transfer details if no changes made
     expect(wrapper.findComponent(MhrInformation).findComponent(TransferDetails).exists()).toBeFalsy()
 
-     // Add some owners so Transfer Details will display
-     const owners = [mockedAddedPerson, mockedRemovedPerson] as MhrRegistrationHomeOwnerIF[] // same IF for Transfer and Registration
-     const homeOwnerGroup = [
-       mockMhrTransferCurrentHomeOwner,
-       { groupId: 1, owners: owners }
-     ] as MhrRegistrationHomeOwnerGroupIF[]
- 
-     await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerGroup)
+    // Add some owners so Transfer Details will display
+    const owners = [mockedAddedPerson, mockedRemovedPerson] as MhrRegistrationHomeOwnerIF[]
+    const homeOwnerGroup = [
+      mockMhrTransferCurrentHomeOwner,
+      { groupId: 1, owners: owners }
+    ] as MhrRegistrationHomeOwnerGroupIF[]
+
+    await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerGroup)
 
     // Should show transfer details once changes made
     expect(wrapper.findComponent(MhrInformation).findComponent(TransferDetails).exists()).toBeTruthy()
 
     // set some test values for transfer details fields
     const mhrTransferDetailsComponent = wrapper.findComponent(MhrInformation).findComponent(TransferDetails)
-    mhrTransferDetailsComponent.find(getTestId('declared-value')).setValue(123456)
+    mhrTransferDetailsComponent.find(getTestId('declared-value')).setValue(TRANSFER_DECLARED_VALUE)
     mhrTransferDetailsComponent.find(getTestId('declared-value')).trigger('blur')
     await Vue.nextTick()
     mhrTransferDetailsComponent.find(getTestId('lease-own-checkbox')).setChecked()
@@ -454,7 +476,10 @@ describe('Mhr Information', () => {
     expect(wrapper.findComponent(TransferDetailsReview).exists()).toBeFalsy()
 
     // go to Review screen
-    wrapper.find('#btn-stacked-submit').trigger('click')
+    await triggerUnsavedChange()
+    await enterTransferDetailsFields(wrapper.findComponent(TransferDetails))
+
+    await wrapper.find('#btn-stacked-submit').trigger('click')
     await Vue.nextTick()
     await Vue.nextTick()
 
@@ -465,12 +490,12 @@ describe('Mhr Information', () => {
     // displaying correct declared value
     expect(mhrTransferDetailsReviewComponent.find('#declared-value-display').exists()).toBeTruthy()
     const currentDeclaredValue = mhrTransferDetailsReviewComponent.find('#declared-value-display')
-    expect(currentDeclaredValue.text()).toBe('$123456.00')
+    expect(currentDeclaredValue.text()).toBe(`$${TRANSFER_DECLARED_VALUE}.00`)
 
     // autofilled consideration and displaying correct consideration value
     expect(mhrTransferDetailsReviewComponent.find('#consideration-display').exists()).toBeTruthy()
     const currentConsideration = mhrTransferDetailsReviewComponent.find('#consideration-display')
-    expect(currentConsideration.text()).toBe('$123456.00')
+    expect(currentConsideration.text()).toBe(TRANSFER_CONSIDERATION)
 
     // displaying lease land row when checked
     expect(mhrTransferDetailsReviewComponent.find('#lease-land-display').exists()).toBeTruthy()
@@ -485,7 +510,10 @@ describe('Mhr Information', () => {
     expect(wrapper.find('#yellow-message-bar').exists()).toBeFalsy()
 
     // trigger review
-    wrapper.find('#btn-stacked-submit').trigger('click')
+    await triggerUnsavedChange()
+    await enterTransferDetailsFields(wrapper.findComponent(TransferDetails))
+
+    await wrapper.find('#btn-stacked-submit').trigger('click')
     await Vue.nextTick()
 
     // exists on review page
@@ -506,7 +534,10 @@ describe('Mhr Information', () => {
 
     expect(wrapper.find('#transfer-confirm-section').exists()).toBeFalsy()
 
-    wrapper.find('#btn-stacked-submit').trigger('click')
+    await triggerUnsavedChange()
+    await enterTransferDetailsFields(wrapper.findComponent(TransferDetails))
+
+    await wrapper.find('#btn-stacked-submit').trigger('click')
     await Vue.nextTick()
 
     expect(wrapper.find('#transfer-confirm-section').exists()).toBeTruthy()
@@ -536,14 +567,17 @@ describe('Mhr Information', () => {
 
     // check owners are in table
     expect(ownersTable.props().homeOwners.length).toBe(2)
-    
-    // review table doesnt exist yet
+
+    // review table doesn't exist yet
     expect(wrapper.find('#owners-review').exists()).toBeFalsy()
 
-    wrapper.find('#btn-stacked-submit').trigger('click')
+    await triggerUnsavedChange()
+    await enterTransferDetailsFields(wrapper.findComponent(TransferDetails))
+
+    await wrapper.find('#btn-stacked-submit').trigger('click')
     await Vue.nextTick()
 
-    //review table renders
+    // review table renders
     const homeOwnerReadOnly = wrapper.find('#owners-review')
     expect(homeOwnerReadOnly.exists()).toBeTruthy()
 
@@ -560,7 +594,10 @@ describe('Mhr Information', () => {
     const feeSummaryContainer = wrapper.find(getTestId('fee-summary'))
     expect(feeSummaryContainer.find('.err-msg').exists()).toBeFalsy()
 
-    wrapper.find('#btn-stacked-submit').trigger('click')
+    await triggerUnsavedChange()
+    await enterTransferDetailsFields(wrapper.findComponent(TransferDetails))
+
+    await wrapper.find('#btn-stacked-submit').trigger('click')
     await Vue.nextTick()
 
     expect(wrapper.find('#mhr-information-header').text()).toContain('Review and Confirm')

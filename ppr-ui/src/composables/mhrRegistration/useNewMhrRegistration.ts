@@ -20,7 +20,8 @@ export const useNewMhrRegistration = () => {
     getMhrAttentionReferenceNum,
     getMhrRegistrationLocation,
     getMhrRegistrationHomeOwnerGroups,
-    getStaffPayment
+    getStaffPayment,
+    isRoleQualifiedSupplier
   } = useGetters<any>([
     'getMhrRegistrationHomeDescription',
     'getMhrRegistrationSubmittingParty',
@@ -29,7 +30,8 @@ export const useNewMhrRegistration = () => {
     'getMhrRegistrationLocation',
     'getMhrRegistrationHomeOwnerGroups',
     'getCertifyInformation',
-    'getStaffPayment'
+    'getStaffPayment',
+    'isRoleQualifiedSupplier'
   ])
   const { setMhrTableHistory } = useActions<any>(['setMhrTableHistory'])
 
@@ -199,9 +201,11 @@ export const useNewMhrRegistration = () => {
 
   const fetchMhRegistrations = async (): Promise<void> => {
     const draftFilings = await getMhrDrafts()
-    const myMhrHistory = await mhrRegistrationHistory(true)
-    const filteredMhrHistory = addHistoryDraftsToMhr(myMhrHistory, draftFilings)
-    setMhrTableHistory([...filteredMhrHistory])
+    const myMhrHistory = await mhrRegistrationHistory(isRoleQualifiedSupplier.value)
+    if (isRoleQualifiedSupplier.value) {
+      const filteredMhrHistory = addHistoryDraftsToMhr(myMhrHistory, draftFilings)
+      setMhrTableHistory(filteredMhrHistory)
+    } else setMhrTableHistory([...draftFilings, ...myMhrHistory])
   }
 
   function addHistoryDraftsToMhr (mhrHistory: MhRegistrationSummaryIF[], mhrDrafts: MhrDraftTransferApiIF[]):
