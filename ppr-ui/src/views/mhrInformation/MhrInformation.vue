@@ -127,7 +127,7 @@
                   :validateTransfer="validate"
                   @isValidTransferOwners="isValidTransferOwners = $event"
                 />
-                <TransferDetails v-if="hasUnsavedChanges" ref="transferDetailsComponent" />
+                <TransferDetails v-if="showTransferDetails" ref="transferDetailsComponent" />
               </template>
             </section>
           </v-col>
@@ -264,6 +264,7 @@ export default defineComponent({
       isReviewMode: false,
       validate: false,
       isTransferDetailsFormValid: false,
+      showTransferDetails: false,
       refNumValid: false,
       authorizationValid: false,
       validateConfirmCompletion: false,
@@ -485,6 +486,16 @@ export default defineComponent({
       () => localState.isCompletionConfirmed,
       (isValid: boolean) => {
         localState.validateConfirmCompletion = !isValid
+      }
+    )
+
+    watch(
+      () => hasUnsavedChanges.value,
+      (val: boolean) => {
+        if (val === false && context.refs.transferDetailsComponent) {
+          (context.refs.transferDetailsComponent as any).clearTransferDetailsData()
+        }
+        localState.showTransferDetails = val
       }
     )
 
