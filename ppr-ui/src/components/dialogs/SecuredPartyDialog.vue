@@ -6,7 +6,7 @@
     attach="#app"
     content-class="secured-party-dialog"
   >
-    <v-card id="secured-party-dialog" :class="!isDuplicate && !isReview ? 'pl-4 pr-1 pt-7 mt-7' : 'pl-1 pr-1 pt-7 mt-7'">
+    <v-card id="secured-party-dialog" class="pr-1 pt-7 mt-7" :class="!isDuplicate && !isReview ? 'pl-4 ' : 'pl-1'">
       <v-row no-gutters>
         <v-col cols="11">
           <v-row no-gutters>
