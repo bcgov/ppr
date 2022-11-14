@@ -200,6 +200,18 @@
             </div>
           </td>
         </tr>
+
+        <!-- Display error for groups that removed all owners -->
+        <tr v-if="isGroupWithNoOwners(row.item.groupId)">
+          <td :colspan="4" class="py-1">
+            <div
+              class="error-text my-6 text-center"
+              :data-test-id="`no-owners-msg-group-${homeOwners.indexOf(row.item)}`"
+            >
+              Group must contain at least one owner
+            </div>
+          </td>
+        </tr>
       </template>
       <template v-slot:no-data>
         <div class="pa-4 text-center" data-test-id="no-data-msg">No owners added yet.</div>
@@ -220,19 +232,21 @@ import { AddEditHomeOwner } from '@/components/mhrRegistration/HomeOwners'
 import TableGroupHeader from '@/components/mhrRegistration/HomeOwners/TableGroupHeader.vue'
 /* eslint-disable no-unused-vars */
 import { MhrRegistrationHomeOwnerIF } from '@/interfaces'
-import { ActionTypes, RouteNames } from '@/enums'
+import { ActionTypes, HomeTenancyTypes } from '@/enums'
 /* eslint-enable no-unused-vars */
 import { useActions, useGetters } from 'vuex-composition-helpers'
 
 export default defineComponent({
   name: 'HomeOwnersTable',
+  emits: ['isValidTransferOwners'],
   props: {
     homeOwners: { default: () => [] },
     isAdding: { default: false },
     isReadonlyTable: { type: Boolean, default: false },
     isMhrTransfer: { type: Boolean, default: false },
     hideRemovedOwners: { type: Boolean, default: false },
-    showChips: { type: Boolean, default: false }
+    showChips: { type: Boolean, default: false },
+    validateTransfer: { type: Boolean, default: false }
   },
   components: {
     BaseAddress,
@@ -253,7 +267,9 @@ export default defineComponent({
       editHomeOwner,
       getGroupForOwner,
       undoGroupRemoval,
+      getHomeTenancyType,
       hasRemovedAllHomeOwners,
+      getTotalOwnershipAllocationStatus,
       getTransferOrRegistrationHomeOwners,
       getTransferOrRegistrationHomeOwnerGroups
     } = useHomeOwners(props.isMhrTransfer)
@@ -269,7 +285,18 @@ export default defineComponent({
       reviewed: false,
       isEditingMode: computed((): boolean => localState.currentlyEditingHomeOwnerId >= 0),
       isAddingMode: computed((): boolean => props.isAdding),
-      showTableError: computed((): boolean => showGroups.value && (hasMinimumGroups() || hasEmptyGroup.value)),
+      showTableError: computed((): boolean => {
+        return showGroups.value &&
+          (
+            props.validateTransfer &&
+            (
+              !hasMinimumGroups() ||
+              hasEmptyGroup.value ||
+              !localState.isValidAllocation ||
+              localState.hasGroupsWithNoOwners
+            )
+          )
+      }),
       reviewedNoOwners: computed((): boolean => !hasActualOwners(props.homeOwners) &&
       getValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_STEPS)),
       showEditActions: computed((): boolean => !props.isReadonlyTable),
@@ -279,6 +306,14 @@ export default defineComponent({
       }),
       addedGroupCount: computed((): number => {
         return getTransferOrRegistrationHomeOwnerGroups().filter(group => group.action === ActionTypes.ADDED).length
+      }),
+      hasGroupsWithNoOwners: computed((): boolean => {
+        const groups = getTransferOrRegistrationHomeOwnerGroups().filter(group => group.action !== ActionTypes.REMOVED)
+        return groups.some(group => group.owners.filter(owner => owner.action !== ActionTypes.REMOVED).length === 0)
+      }),
+      isValidAllocation: computed((): boolean => {
+        return [HomeTenancyTypes.SOLE, HomeTenancyTypes.JOINT].includes(getHomeTenancyType()) ||
+        !getTotalOwnershipAllocationStatus().hasTotalAllocationError
       })
     })
 
@@ -350,17 +385,26 @@ export default defineComponent({
         localState.addedGroupCount <= 1
     }
 
-    watch(
-      () => localState.currentlyEditingHomeOwnerId,
-      () => {
-        setGlobalEditingMode(localState.isEditingMode)
-      }
-    )
+    const isGroupWithNoOwners = (groupId: number): boolean => {
+      const group = getTransferOrRegistrationHomeOwnerGroups().find(group => group.groupId === groupId)
+      return group.action !== ActionTypes.REMOVED && group.interestNumerator && group.interestDenominator &&
+        group.owners.filter(owner => owner.action !== ActionTypes.REMOVED).length === 0
+    }
+
+    watch(() => localState.currentlyEditingHomeOwnerId, () => {
+      setGlobalEditingMode(localState.isEditingMode)
+    })
 
     // When a change is made to homeOwners, check if any actions have changed, if so set flag
     watch(() => props.homeOwners, () => {
       setUnsavedChanges(props.homeOwners.some(owner => !!owner.action))
-    })
+
+      context.emit('isValidTransferOwners',
+        hasMinimumGroups() &&
+          localState.isValidAllocation &&
+          !localState.hasGroupsWithNoOwners
+      )
+    }, { deep: true })
 
     return {
       ActionTypes,
@@ -382,6 +426,7 @@ export default defineComponent({
       hasRemovedAllHomeOwners,
       isAddedHomeOwnerGroup,
       disableGroupHeader,
+      isGroupWithNoOwners,
       getTransferOrRegistrationHomeOwners,
       getTransferOrRegistrationHomeOwnerGroups,
       ...toRefs(localState)

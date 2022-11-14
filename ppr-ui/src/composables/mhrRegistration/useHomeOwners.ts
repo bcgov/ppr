@@ -128,7 +128,9 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
   }
 
   const hasMinimumGroups = (): boolean => {
-    return !getTransferOrRegistrationHomeOwnerGroups() || getTransferOrRegistrationHomeOwnerGroups().length < 2
+    const groups = getTransferOrRegistrationHomeOwnerGroups().filter(group => group.action !== ActionTypes.REMOVED)
+    const hasNoGroups = [HomeTenancyTypes.SOLE, HomeTenancyTypes.JOINT].includes(getHomeTenancyType())
+    return hasNoGroups || !groups || groups.length >= 2
   }
   // WORKING WITH GROUPS
 
