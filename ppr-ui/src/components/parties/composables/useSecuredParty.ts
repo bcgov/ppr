@@ -5,6 +5,7 @@ import { PartyAddressSchema } from '@/schemas'
 import { ActionTypes, APIRegistrationTypes, RegistrationFlowType, SecuredPartyTypes } from '@/enums'
 import { checkAddress, formatAddress } from '@/composables/address/factories/address-factory'
 import { cloneDeep, isEqual } from 'lodash'
+import clean from 'lodash-clean'
 import { useParty } from '@/composables/useParty'
 
 const initPerson = { first: '', middle: '', last: '' }
@@ -95,15 +96,6 @@ export const useSecuredParty = (props, context) => {
     return idx !== -1
   }
 
-  const removeEmptyAttributes = (address: AddressIF): AddressIF => {
-    // removes any undefined/empty attributes from party clone so it can be compared to autocomplete objects
-    const keys = Object.keys(address)
-    keys.forEach(key => {
-      if (!address[key]) delete address[key]
-    })
-    return address
-  }
-
   const hasMatchingSecuredParty = (addedParty: PartyIF): boolean => {
     // store state without newly added party
     const parties = cloneDeep(getAddSecuredPartiesAndDebtors.value.securedParties)
@@ -115,7 +107,7 @@ export const useSecuredParty = (props, context) => {
     } else {
       return parties.some(party =>
         party.businessName === addedParty.businessName &&
-        isEqual(removeEmptyAttributes(party.address), removeEmptyAttributes(addedParty.address))
+        isEqual(clean(party.address), clean(addedParty.address))
       )
     }
   }
@@ -189,7 +181,6 @@ export const useSecuredParty = (props, context) => {
     resetFormAndData,
     removeSecuredParty,
     addressSchema,
-    removeEmptyAttributes,
     updateAddress,
     addSecuredParty,
     isExistingSecuredParty,
