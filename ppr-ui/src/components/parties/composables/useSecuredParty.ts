@@ -4,7 +4,7 @@ import { useGetters, useActions } from 'vuex-composition-helpers'
 import { PartyAddressSchema } from '@/schemas'
 import { ActionTypes, APIRegistrationTypes, RegistrationFlowType, SecuredPartyTypes } from '@/enums'
 import { checkAddress, formatAddress } from '@/composables/address/factories/address-factory'
-import { cloneDeep, isEqual } from 'lodash'
+import { cloneDeep, isEqual, omitBy, isNil, _ } from 'lodash'
 import { useParty } from '@/composables/useParty'
 
 const initPerson = { first: '', middle: '', last: '' }
@@ -97,11 +97,8 @@ export const useSecuredParty = (props, context) => {
 
   const removeEmptyAttributes = (address: AddressIF): AddressIF => {
     // removes any undefined/empty attributes from party clone so it can be compared to autocomplete objects
-    const keys = Object.keys(address)
-    keys.forEach(key => {
-      if (!address[key]) delete address[key]
-    })
-    return address
+    console.log(omitBy(address, v => v == null))
+    return omitBy(address, isNil)
   }
 
   const hasMatchingSecuredParty = (addedParty: PartyIF): boolean => {
@@ -115,7 +112,7 @@ export const useSecuredParty = (props, context) => {
     } else {
       return parties.some(party =>
         party.businessName === addedParty.businessName &&
-        isEqual(party.address, removeEmptyAttributes(addedParty.address))
+        isEqual(removeEmptyAttributes(party.address), removeEmptyAttributes(addedParty.address))
       )
     }
   }
