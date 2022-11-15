@@ -62,6 +62,7 @@ function createComponent (): Wrapper<any> {
 
 const TRANSFER_DECLARED_VALUE = '123'
 const TRANSFER_CONSIDERATION = `$${TRANSFER_DECLARED_VALUE}.00`
+const TRANSFER_DATE = '2020-10-10'
 
 // TODO: Remove after API updates to include the ID for Owners
 function addIDsForOwners (ownersGroups): Array<any> {
@@ -108,7 +109,7 @@ async function triggerUnsavedChange (): Promise<void> {
 async function enterTransferDetailsFields (transferDetailsWrapper: Wrapper<any, Element>): Promise<void> {
   transferDetailsWrapper.find(getTestId('declared-value')).setValue(TRANSFER_DECLARED_VALUE)
   transferDetailsWrapper.find(getTestId('declared-value')).trigger('blur')
-  transferDetailsWrapper.findComponent(DatePicker).vm.$emit('emitDate', { date: '2020-10-10' })
+  transferDetailsWrapper.findComponent(DatePicker).vm.$emit('emitDate', TRANSFER_DATE)
   await Vue.nextTick()
 }
 
@@ -646,5 +647,36 @@ describe('Mhr Information', () => {
     // should show 3 errors for Ref Num, Confirm and Auth components
     expect(feeSummaryContainer.find('.err-msg').exists()).toBeTruthy()
     expect(wrapper.findAll('.border-error-left').length).toBe(3)
+  })
+
+  it('should clear Transfer Details fields on Undo click', async () => {
+    setupCurrentHomeOwners()
+    wrapper.vm.$data.dataLoaded = true
+    await Vue.nextTick()
+
+    expect(wrapper.find(TransferDetails).exists()).toBeFalsy()
+
+    await triggerUnsavedChange()
+
+    const transferDetailsWrapper = wrapper.find(TransferDetails)
+    expect(transferDetailsWrapper.exists()).toBeTruthy()
+    await enterTransferDetailsFields(wrapper.findComponent(TransferDetails))
+
+    expect(transferDetailsWrapper.vm.$data.declaredValue).toBe(TRANSFER_DECLARED_VALUE)
+    expect(transferDetailsWrapper.vm.$data.consideration).toBe(TRANSFER_CONSIDERATION)
+    expect(transferDetailsWrapper.vm.$data.transferDate).toContain(TRANSFER_DATE)
+
+    // simulate 'Undo'
+    await store.dispatch('setUnsavedChanges', false)
+    await Vue.nextTick()
+
+    expect(transferDetailsWrapper.exists()).toBeFalsy()
+
+    // Open up Transfer Details again and check that fields are cleared
+    await triggerUnsavedChange()
+
+    expect(wrapper.find(TransferDetails).vm.$data.declaredValue).toBe('')
+    expect(wrapper.find(TransferDetails).vm.$data.consideration).toBe('')
+    expect(wrapper.find(TransferDetails).vm.$data.transferDate).toBe(null)
   })
 })

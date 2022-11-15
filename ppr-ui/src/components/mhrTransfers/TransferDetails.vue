@@ -195,6 +195,14 @@ export default defineComponent({
       return localState.isTransferDetailsFormValid
     }
 
+    // Clear the data when hiding Transfer Details (e.g. in Undo)
+    const clearTransferDetailsData = () => {
+      setMhrTransferDeclaredValue('')
+      setMhrTransferConsideration('')
+      setMhrTransferDate(null)
+      setMhrTransferOwnLand(false)
+    }
+
     watch(
       () => localState.declaredValue,
       async (val: string) => {
@@ -235,6 +243,7 @@ export default defineComponent({
       considerationRules,
       updateConsideration,
       validateDetailsForm,
+      clearTransferDetailsData,
       ...toRefs(localState)
     }
   }
