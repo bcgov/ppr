@@ -71,7 +71,7 @@
       </v-btn>
     </td>
     <td v-if="inSelectedHeaders('createDateTime')" :class="isChild || item.expanded ? $style['border-left']: ''">
-      <span v-if="!isDraft(item) || !isPpr">
+      <span v-if="!isDraft(item)">
         {{ getFormattedDate(item.createDateTime) }}
       </span>
       <span v-else>
