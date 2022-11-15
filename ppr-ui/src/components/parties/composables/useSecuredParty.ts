@@ -4,8 +4,7 @@ import { useGetters, useActions } from 'vuex-composition-helpers'
 import { PartyAddressSchema } from '@/schemas'
 import { ActionTypes, APIRegistrationTypes, RegistrationFlowType, SecuredPartyTypes } from '@/enums'
 import { checkAddress, formatAddress } from '@/composables/address/factories/address-factory'
-import { cloneDeep, isEqual } from 'lodash'
-import clean from 'lodash-clean'
+import { cloneDeep, isEqual, compact } from 'lodash'
 import { useParty } from '@/composables/useParty'
 
 const initPerson = { first: '', middle: '', last: '' }
@@ -107,7 +106,7 @@ export const useSecuredParty = (props, context) => {
     } else {
       return parties.some(party =>
         party.businessName === addedParty.businessName &&
-        isEqual(clean(party.address), clean(addedParty.address))
+        isEqual(compact(party.address), compact(addedParty.address))
       )
     }
   }
