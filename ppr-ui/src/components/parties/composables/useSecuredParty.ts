@@ -95,6 +95,15 @@ export const useSecuredParty = (props, context) => {
     return idx !== -1
   }
 
+  const removeEmptyAttributes = (address: AddressIF): AddressIF => {
+    // removes any undefined/empty attributes from party clone so it can be compared to autocomplete objects
+    const keys = Object.keys(address)
+    keys.forEach(key => {
+      if (!address[key]) delete address[key]
+    })
+    return address
+  }
+
   const hasMatchingSecuredParty = (addedParty: PartyIF): boolean => {
     // store state without newly added party
     const parties = cloneDeep(getAddSecuredPartiesAndDebtors.value.securedParties)
@@ -106,7 +115,7 @@ export const useSecuredParty = (props, context) => {
     } else {
       return parties.some(party =>
         party.businessName === addedParty.businessName &&
-        isEqual(party.address, addedParty.address)
+        isEqual(party.address, removeEmptyAttributes(addedParty.address))
       )
     }
   }
@@ -180,6 +189,7 @@ export const useSecuredParty = (props, context) => {
     resetFormAndData,
     removeSecuredParty,
     addressSchema,
+    removeEmptyAttributes,
     updateAddress,
     addSecuredParty,
     isExistingSecuredParty,
