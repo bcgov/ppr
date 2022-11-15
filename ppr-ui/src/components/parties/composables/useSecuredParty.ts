@@ -180,7 +180,6 @@ export const useSecuredParty = (props, context) => {
     resetFormAndData,
     removeSecuredParty,
     addressSchema,
-    removeEmptyAttributes,
     updateAddress,
     addSecuredParty,
     isExistingSecuredParty,
