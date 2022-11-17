@@ -185,7 +185,7 @@ import { BaseAddress } from '@/composables/address'
 import { unsavedChangesDialog, registrationSaveDraftError } from '@/resources/dialogOptions'
 import { cloneDeep } from 'lodash'
 import AccountInfo from '@/components/common/AccountInfo.vue'
-import { AccountInfoIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { AccountInfoIF, MhrTransferApiIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 
 export default defineComponent({
   name: 'MhrInformation',
@@ -245,7 +245,8 @@ export default defineComponent({
       isRefNumValid,
       setRefNumValid,
       initMhrTransfer,
-      buildApiData
+      buildApiData,
+      parseDraftTransferDetails
     } = useMhrInformation()
 
     const {
@@ -329,26 +330,25 @@ export default defineComponent({
 
       localState.loading = true
       setEmptyMhrTransfer(initMhrTransfer())
+
       // Set baseline MHR Information to state
       await parseMhrInformation()
-      await setUnsavedChanges(false) // Force no unsaved changes after loading current owners
+
+      // When not a draft Transfer, force no unsaved changes after loading current owners
+      !getMhrInformation.value.draftNumber && await setUnsavedChanges(false)
+
       localState.accountInfo = await getSubmittingPartyInformation()
       localState.loading = false
 
       localState.dataLoaded = true
     })
 
-    // Future state to parse all relevant MHR Information
-    const parseMhrInformation = async (): Promise<void> => {
-      await parseCurrentOwnerGroups()
-    }
-
     // Get Account Info from Auth to be used in Submitting Party section in Review screen
     const getSubmittingPartyInformation = async (): Promise<AccountInfoIF> => {
       return getAccountInfoFromAuth()
     }
 
-    const parseCurrentOwnerGroups = async (): Promise<void> => {
+    const parseMhrInformation = async (): Promise<void> => {
       const { data } = await fetchMhRegistration(getMhrInformation.value.mhrNumber)
       const currentOwnerGroups = data?.ownerGroups || [] // Safety check. Should always have ownerGroups
 
@@ -364,6 +364,9 @@ export default defineComponent({
       if (getMhrInformation.value.draftNumber) {
         // Retrieve owners from draft if it exists
         const { registration } = await getMhrTransferDraft(getMhrInformation.value.draftNumber)
+
+        // Set draft Transfer details to store
+        parseDraftTransferDetails(registration as MhrTransferApiIF)
 
         setShowGroups(registration.addOwnerGroups.length > 1 || registration.deleteOwnerGroups.length > 1)
         setMhrTransferHomeOwnerGroups([...registration.addOwnerGroups])
