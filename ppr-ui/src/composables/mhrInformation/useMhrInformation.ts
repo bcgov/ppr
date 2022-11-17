@@ -1,5 +1,5 @@
 import { MhrTransferApiIF, MhrTransferIF } from '@/interfaces'
-import { useGetters } from 'vuex-composition-helpers'
+import { useActions, useGetters } from 'vuex-composition-helpers'
 import { readonly, ref } from '@vue/composition-api'
 import { ActionTypes, ApiHomeTenancyTypes, HomeTenancyTypes } from '@/enums'
 
@@ -30,6 +30,18 @@ export const useMhrInformation = () => {
     'getMhrTransferHomeOwnerGroups'
   ])
 
+  const {
+    setMhrTransferDeclaredValue,
+    setMhrTransferConsideration,
+    setMhrTransferDate,
+    setMhrTransferOwnLand
+  } = useActions([
+    'setMhrTransferDeclaredValue',
+    'setMhrTransferConsideration',
+    'setMhrTransferDate',
+    'setMhrTransferOwnLand'
+  ])
+
   const setRefNumValid = (isValid: boolean) => {
     refNumValid.value = isValid
   }
@@ -45,6 +57,13 @@ export const useMhrInformation = () => {
       ownLand: false,
       attentionReference: ''
     }
+  }
+
+  const parseDraftTransferDetails = (draft: MhrTransferApiIF): void => {
+    setMhrTransferDeclaredValue(draft.declaredValue || '')
+    setMhrTransferConsideration(draft.consideration || '')
+    setMhrTransferDate(draft.transferDate || null)
+    setMhrTransferOwnLand(draft.ownLand || null)
   }
 
   const parseOwnerGroups = (isDraft: boolean = false): any => {
@@ -106,6 +125,7 @@ export const useMhrInformation = () => {
     isRefNumValid: readonly(refNumValid),
     setRefNumValid,
     initMhrTransfer,
-    buildApiData
+    buildApiData,
+    parseDraftTransferDetails
   }
 }
