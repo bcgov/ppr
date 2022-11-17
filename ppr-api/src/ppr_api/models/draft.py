@@ -315,7 +315,7 @@ class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
                 query += model_utils.QUERY_ACCOUNT_DRAFTS_CLIENT_REF_CLAUSE
         if params.registering_name:
             if new_feature_enabled:
-                query += model_utils.QUERY_ACCOUNT_DRAFTS_REG_NAME_CLAUSE_NEW    
+                query += model_utils.QUERY_ACCOUNT_DRAFTS_REG_NAME_CLAUSE_NEW
             else:
                 query += model_utils.QUERY_ACCOUNT_DRAFTS_REG_NAME_CLAUSE
         if params.start_date_time and params.end_date_time:

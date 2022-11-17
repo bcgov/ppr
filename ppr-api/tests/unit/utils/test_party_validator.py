@@ -49,6 +49,17 @@ FINANCING_VALID = {
             'partyId': 1321095
         },
         {
+            'businessName': 'BANK OF BRITISH COLUMBIA',
+            'address': {
+                'street': '1234 BEACON AVENUE',
+                'city': 'SIDNEY',
+                'region': 'BC',
+                'country': 'CA',
+                'postalCode': 'V7R 1R7'
+            },
+            'partyId': 1321096
+        },
+        {
             'code': '200000000'
         }
     ],
@@ -186,6 +197,17 @@ AMENDMENT_VALID = {
       'businessName': 'BANK OF BRITISH COLUMBIA',
       'address': {
           'street': '3721 BEACON AVENUE',
+          'city': 'SIDNEY',
+          'region': 'BC',
+          'country': 'CA',
+          'postalCode': 'V7R 1R7'
+      }
+    },
+    {
+      'code': '200000000',
+      'businessName': 'BANK OF BRITISH COLUMBIA',
+      'address': {
+          'street': '1234 BEACON AVENUE',
           'city': 'SIDNEY',
           'region': 'BC',
           'country': 'CA',
@@ -361,6 +383,183 @@ AMENDMENT_INVALID_NAMES = {
     }
   ]
 }
+
+FINANCING_DUPLICATE_PARTIES_BUSINESS = {
+  'securedParties': [
+    {
+      'code': '200000000',
+      'businessName': 'BANK OF BRITISH COLUMBIA',
+      'address': {
+          'street': '3721 BEACON AVENUE',
+          'city': 'SIDNEY',
+          'region': 'BC',
+          'country': 'CA',
+          'postalCode': 'V7R 1R7'
+      }
+    },
+    {
+      'code': '200000000',
+      'businessName': 'BANK OF BRITISH COLUMBIA',
+      'address': {
+          'street': '3721 BEACON AVENUE',
+          'city': 'SIDNEY',
+          'region': 'BC',
+          'country': 'CA',
+          'postalCode': 'V7R 1R7'
+      }
+    },
+    {
+      'code': '200000000',
+      'personName': {
+        'first': 'firstName',
+        'middle': 'secondName',
+        'last': 'lastName'
+    },
+      'address': {
+          'street': '3721 BEACON AVENUE',
+          'city': 'SIDNEY',
+          'region': 'BC',
+          'country': 'CA',
+          'postalCode': 'V7R 1R7'
+      }
+    }
+  ]
+}
+
+FINANCING_DUPLICATE_PARTIES_PERSON = {
+  'securedParties': [
+    {
+      'code': '200000000',
+      'businessName': 'BANK OF BRITISH COLUMBIA',
+      'address': {
+          'street': '3721 BEACON AVENUE',
+          'city': 'SIDNEY',
+          'region': 'BC',
+          'country': 'CA',
+          'postalCode': 'V7R 1R7'
+      }
+    },
+    {
+      'code': '200000000',
+      'personName': {
+        'first': 'firstName',
+        'middle': 'secondName',
+        'last': 'lastName'
+    },
+      'address': {
+          'street': '3721 BEACON AVENUE',
+          'city': 'SIDNEY',
+          'region': 'BC',
+          'country': 'CA',
+          'postalCode': 'V7R 1R7'
+      }
+    },
+    {
+      'code': '200000000',
+      'personName': {
+        'first': 'firstName',
+        'middle': 'secondName',
+        'last': 'lastName'
+    },
+      'address': {
+          'street': '3721 BEACON AVENUE',
+          'city': 'SIDNEY',
+          'region': 'BC',
+          'country': 'CA',
+          'postalCode': 'V7R 1R7'
+      }
+    },
+  ]
+}
+
+AMENDMENT_DUPLICATE_PARTIES_BUSINESS = {
+  'addSecuredParties': [
+    {
+      'code': '200000000',
+      'businessName': 'BANK OF BRITISH COLUMBIA',
+      'address': {
+          'street': '3721 BEACON AVENUE',
+          'city': 'SIDNEY',
+          'region': 'BC',
+          'country': 'CA',
+          'postalCode': 'V7R 1R7'
+      }
+    },
+    {
+      'code': '200000000',
+      'businessName': 'BANK OF BRITISH COLUMBIA',
+      'address': {
+          'street': '3721 BEACON AVENUE',
+          'city': 'SIDNEY',
+          'region': 'BC',
+          'country': 'CA',
+          'postalCode': 'V7R 1R7'
+      }
+    },
+    {
+      'code': '200000000',
+      'personName': {
+        'first': 'firstName',
+        'middle': 'secondName',
+        'last': 'lastName'
+    },
+      'address': {
+          'street': '3721 BEACON AVENUE',
+          'city': 'SIDNEY',
+          'region': 'BC',
+          'country': 'CA',
+          'postalCode': 'V7R 1R7'
+      }
+    }
+  ]
+}
+
+AMENDMENT_DUPLICATE_PARTIES_PERSON = {
+  'addSecuredParties': [
+    {
+      'code': '200000000',
+      'businessName': 'BANK OF BRITISH COLUMBIA',
+      'address': {
+          'street': '3721 BEACON AVENUE',
+          'city': 'SIDNEY',
+          'region': 'BC',
+          'country': 'CA',
+          'postalCode': 'V7R 1R7'
+      }
+    },
+    {
+      'code': '200000000',
+      'personName': {
+        'first': 'firstName',
+        'middle': 'secondName',
+        'last': 'lastName'
+    },
+      'address': {
+          'street': '3721 BEACON AVENUE',
+          'city': 'SIDNEY',
+          'region': 'BC',
+          'country': 'CA',
+          'postalCode': 'V7R 1R7'
+      }
+    },
+    {
+      'code': '200000000',
+      'personName': {
+        'first': 'firstName',
+        'middle': 'secondName',
+        'last': 'lastName'
+    },
+      'address': {
+          'street': '3721 BEACON AVENUE',
+          'city': 'SIDNEY',
+          'region': 'BC',
+          'country': 'CA',
+          'postalCode': 'V7R 1R7'
+      }
+    }
+  ]
+}
+
 FINANCING_INVALID_NAMES = {
     'type': 'SA',
     'registeringParty': {
@@ -467,6 +666,14 @@ TEST_PARTIES_AM_NAME_DATA = [
      validator.CHARACTER_SET_UNSUPPORTED.format('LN répertoire'))
 ]
 # testdata pattern is ({description}, {amendment statement data}, {valid}, {message contents})
+TEST_PARTIES_AM_DUPLICATES = [
+    ('Valid parties', AMENDMENT_VALID, True, None),
+    ('Duplicate party business', AMENDMENT_DUPLICATE_PARTIES_BUSINESS, False,
+     validator.DUPLICATE_SECURED_PARTY_BUSINESS),
+    ('Duplicate party person', AMENDMENT_DUPLICATE_PARTIES_PERSON, False,
+     validator.DUPLICATE_SECURED_PARTY_PERSON)
+]
+# testdata pattern is ({description}, {amendment statement data}, {valid}, {message contents})
 TEST_PARTIES_FS_NAME_DATA = [
     ('Valid names', FINANCING_VALID, True, None),
     ('Invalid registering party name', FINANCING_INVALID_NAMES, False,
@@ -479,6 +686,14 @@ TEST_PARTIES_FS_NAME_DATA = [
      validator.CHARACTER_SET_UNSUPPORTED.format('MN répertoire')),
     ('Invalid secured party last name', FINANCING_INVALID_NAMES, False,
      validator.CHARACTER_SET_UNSUPPORTED.format('LN répertoire'))
+]
+# testdata pattern is ({description}, {amendment statement data}, {valid}, {message contents})
+TEST_PARTIES_FS_DUPLICATES = [
+    ('Valid parties', FINANCING_VALID, True, None),
+    ('Duplicate party business', FINANCING_DUPLICATE_PARTIES_BUSINESS, False,
+     validator.DUPLICATE_SECURED_PARTY_BUSINESS),
+    ('Duplicate party person', FINANCING_DUPLICATE_PARTIES_PERSON, False,
+     validator.DUPLICATE_SECURED_PARTY_PERSON)
 ]
 
 
@@ -560,6 +775,17 @@ def test_validate_registration_parties(session, desc, json_data, valid, message_
         assert error_msg.find(message_content) != -1
 
 
+@pytest.mark.parametrize('desc,json_data,valid,message_content', TEST_PARTIES_AM_DUPLICATES)
+def test_validate_registration_party_duplicates(session, desc, json_data, valid, message_content):
+    """Assert that registration statement party name validation works as expected."""
+    error_msg = validator.validate_registration_parties(json_data)
+    if valid:
+        assert error_msg == ''
+    elif message_content:
+        assert error_msg != ''
+        assert error_msg.find(message_content) != -1
+
+
 def test_actual_party_ids(session):
     """Assert that delete party id validation works as expected on an existing financing statement."""
     json_data = copy.deepcopy(AMENDMENT_VALID)
@@ -582,6 +808,17 @@ def test_actual_party_ids(session):
 
 @pytest.mark.parametrize('desc,json_data,valid,message_content', TEST_PARTIES_AM_NAME_DATA)
 def test_validate_am_party_names(session, desc, json_data, valid, message_content):
+    """Assert that registration statement party name validation works as expected."""
+    error_msg = validator.validate_party_names(json_data)
+    if valid:
+        assert error_msg == ''
+    elif message_content:
+        assert error_msg != ''
+        assert error_msg.find(message_content) != -1
+
+
+@pytest.mark.parametrize('desc,json_data,valid,message_content', TEST_PARTIES_AM_DUPLICATES)
+def test_validate_am_party_duplicates(session, desc, json_data, valid, message_content):
     """Assert that registration statement party name validation works as expected."""
     error_msg = validator.validate_party_names(json_data)
     if valid:
