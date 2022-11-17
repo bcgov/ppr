@@ -93,18 +93,12 @@ def validate_party_names(json_data):
     if 'securedParties' in json_data:
         for party in json_data['securedParties']:
             error_msg += validate_party_name(party)
-
-        duplicate_error_msg = validate_party_duplicates(json_data['securedParties'])
-        if duplicate_error_msg:
-            error_msg += duplicate_error_msg
+            error_msg += validate_party_duplicates(json_data['securedParties'])
 
     if 'addSecuredParties' in json_data:
         for party in json_data['addSecuredParties']:
             error_msg += validate_party_name(party)
-
-        duplicate_error_msg = validate_party_duplicates(json_data['addSecuredParties'])
-        if duplicate_error_msg:
-            error_msg += duplicate_error_msg
+            error_msg += validate_party_duplicates(json_data['addSecuredParties'])
 
     if 'debtors' in json_data:
         for party in json_data['debtors']:
