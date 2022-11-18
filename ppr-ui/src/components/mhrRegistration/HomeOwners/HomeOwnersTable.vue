@@ -404,7 +404,7 @@ export default defineComponent({
         localState.isValidAllocation &&
         !localState.hasGroupsWithNoOwners
       )
-    }, { deep: true })
+    }, { immediate: true, deep: true })
 
     return {
       ActionTypes,

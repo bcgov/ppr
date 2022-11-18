@@ -127,11 +127,15 @@
                   :validateTransfer="validate"
                   @isValidTransferOwners="isValidTransferOwners = $event"
                 />
-                <TransferDetails v-if="showTransferDetails" ref="transferDetailsComponent" />
+                <TransferDetails
+                  v-if="hasUnsavedChanges"
+                  ref="transferDetailsComponent"
+                  @isValid="isTransferDetailsFormValid = $event"
+                />
               </template>
             </section>
           </v-col>
-          <v-col class="pl-6 pt-5" cols="3" v-if="hasUnsavedChanges">
+          <v-col class="pl-6 pt-5" cols="3" v-if="hasUnsavedChanges || isReviewMode">
             <aside>
               <affix relative-element-selector=".col-9" :offset="{ top: 90, bottom: -100 }">
                 <sticky-container
@@ -267,7 +271,6 @@ export default defineComponent({
       isReviewMode: false,
       validate: false,
       isTransferDetailsFormValid: false,
-      showTransferDetails: false,
       refNumValid: false,
       authorizationValid: false,
       validateConfirmCompletion: false,
@@ -409,12 +412,8 @@ export default defineComponent({
         } else console.log(mhrTransferFiling?.error) // Handle Schema or Api errors here.
       }
 
-      const transferDetailsComponent = context.refs.transferDetailsComponent as any
-
-      // Check if TransferDetails exists on the screen
-      if (transferDetailsComponent) {
-        localState.isTransferDetailsFormValid = await transferDetailsComponent.validateDetailsForm()
-      }
+      // @ts-ignore - function exists
+      await context.refs.transferDetailsComponent.validateDetailsForm()
 
       // If transfer is valid, enter review mode
       if (localState.isValidTransfer) {
@@ -508,7 +507,6 @@ export default defineComponent({
         if (!val && context.refs.transferDetailsComponent) {
           (context.refs.transferDetailsComponent as any).clearTransferDetailsData()
         }
-        localState.showTransferDetails = val
       }
     )
 

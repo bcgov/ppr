@@ -20,12 +20,22 @@
         <v-chip
           v-if="isMhrTransfer && isRemovedHomeOwnerGroup(group)"
           class="badge-delete mr-4"
+          :class="{ 'ml-2': !showEditActions }"
           label x-small
           color="#grey lighten-2"
-          text-color="$gray9"
           data-test-id="owner-removed-badge"
         >
           <b>DELETED</b>
+        </v-chip>
+        <v-chip
+          v-else-if="isMhrTransfer && isAddedHomeOwnerGroup(group)"
+          class="badge-added mr-4"
+          :class="{ 'ml-2': !showEditActions }"
+          label x-small
+          color="primary"
+          data-test-id="owner-added-badge"
+        >
+          <b>ADDED</b>
         </v-chip>
         <span :class="{'removed-owner-group': isRemovedHomeOwnerGroup(group)}">
           <span class="pr-4 font-weight-bold group-id" :class="{ 'pl-8': !showEditActions }">Group {{ groupId }}</span>
@@ -215,6 +225,10 @@ export default defineComponent({
       return group.action === ActionTypes.REMOVED
     }
 
+    const isAddedHomeOwnerGroup = (group: MhrHomeOwnerGroupIF): boolean => {
+      return group.action === ActionTypes.ADDED
+    }
+
     const done = (): void => {
       // @ts-ignore - function exists
       context.refs.homeFractionalOwnershipForm.validate()
@@ -261,6 +275,7 @@ export default defineComponent({
       cancelOrProceed,
       homeFractionalOwnershipForm,
       isRemovedHomeOwnerGroup,
+      isAddedHomeOwnerGroup,
       ...toRefs(localState)
     }
   }

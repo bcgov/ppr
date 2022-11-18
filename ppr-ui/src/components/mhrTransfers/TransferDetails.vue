@@ -8,7 +8,7 @@
     </p>
 
     <v-card flat class="py-6 px-8 rounded" :class="{ 'border-error-left': showFormError }">
-      <v-form ref="transferDetailsForm" v-model="isFromValid">
+      <v-form ref="transferDetailsForm" v-model="isFormValid">
         <v-row>
           <v-col cols="3">
             <label
@@ -124,6 +124,7 @@ import { FormIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 
 export default defineComponent({
   name: 'TransferDetails',
+  emits: ['isValid'],
   components: { DatePicker },
   setup (props, context) {
     const { customRules, required, isNumber, maxLength } = useInputRules()
@@ -174,8 +175,8 @@ export default defineComponent({
 
     const localState = reactive({
       validateTransferDetails: false, // triggered once Review & Confirm clicked
-      isFromValid: false, // TransferDetails form without Transfer Date Picker
-      isTransferDetailsFormValid: computed((): boolean => localState.isFromValid && !!localState.transferDate),
+      isFormValid: false, // TransferDetails form without Transfer Date Picker
+      isTransferDetailsFormValid: computed((): boolean => localState.isFormValid && !!localState.transferDate),
       declaredValue: getMhrTransferDeclaredValue.value?.toString(),
       consideration: getMhrTransferConsideration.value,
       transferDate: getMhrTransferDate.value,
@@ -189,10 +190,9 @@ export default defineComponent({
     }
 
     // This validate function is called from parent MhrInformation component
-    const validateDetailsForm = async (): Promise<boolean> => {
-      localState.validateTransferDetails = true
-      await (context.refs.transferDetailsForm as FormIF).validate()
-      return localState.isTransferDetailsFormValid
+    const validateDetailsForm = (): void => {
+      localState.validateTransferDetails = true;
+      (context.refs.transferDetailsForm as FormIF).validate()
     }
 
     // Clear the data when hiding Transfer Details (e.g. in Undo)
@@ -232,6 +232,13 @@ export default defineComponent({
       (val: boolean) => {
         setMhrTransferOwnLand(val)
         setUnsavedChanges(true)
+      }
+    )
+
+    watch(
+      () => localState.isTransferDetailsFormValid,
+      (val: boolean) => {
+        context.emit('isValid', val)
       }
     )
 
