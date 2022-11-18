@@ -22,7 +22,6 @@ import {
 import { getTestId } from './utils'
 import { MhrRegistrationHomeOwnerGroupIF } from '@/interfaces'
 
-
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})

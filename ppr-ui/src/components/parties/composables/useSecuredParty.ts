@@ -4,8 +4,9 @@ import { useGetters, useActions } from 'vuex-composition-helpers'
 import { PartyAddressSchema } from '@/schemas'
 import { ActionTypes, APIRegistrationTypes, RegistrationFlowType, SecuredPartyTypes } from '@/enums'
 import { checkAddress, formatAddress } from '@/composables/address/factories/address-factory'
-import { cloneDeep, isEqual, compact } from 'lodash'
+import { cloneDeep, isEqual, omitBy, overSome, isNaN, isNil, isEmpty } from 'lodash'
 import { useParty } from '@/composables/useParty'
+import { addRegistrationSummary } from '@/utils'
 
 const initPerson = { first: '', middle: '', last: '' }
 const initAddress = {
@@ -96,19 +97,34 @@ export const useSecuredParty = (props, context) => {
   }
 
   const hasMatchingSecuredParty = (addedParty: PartyIF): boolean => {
-    // store state without newly added party
+    // store state without newly added party.
     const parties = cloneDeep(getAddSecuredPartiesAndDebtors.value.securedParties)
     if (localState.partyType === SecuredPartyTypes.INDIVIDUAL) {
       return parties.some(party =>
-        isEqual(party.personName, addedParty.personName) &&
-        isEqual(party.address, addedParty.address)
+        isObjectEqual(party.personName, addedParty.personName) &&
+        isObjectEqual(party.address, addedParty.address)
       )
     } else {
       return parties.some(party =>
-        party.businessName === addedParty.businessName &&
-        isEqual(compact(party.address), compact(addedParty.address))
+        party.businessName?.toUpperCase() === addedParty.businessName?.toUpperCase() &&
+        isObjectEqual(party.address, addedParty.address)
       )
     }
+  }
+
+  const isObjectEqual = (object1: any, object2: any): boolean => {
+    const workObject1 = Object.create(object1)
+    const workObject2 = Object.create(object2)
+    const addressEqual = isEqual(normalizeObject(workObject1), normalizeObject(workObject2))
+    return addressEqual
+  }
+
+  const normalizeObject = (convertObject: any): any => {
+    convertObject = omitBy(convertObject, overSome([isNil, isNaN, isEmpty]))
+    Object.entries(convertObject).forEach(([key, value]) => {
+      if (typeof value === 'string') convertObject[key] = value?.toUpperCase().replaceAll(' ', '').trim()
+    })
+    return convertObject
   }
 
   const removeSecuredParty = (): void => {
@@ -187,6 +203,7 @@ export const useSecuredParty = (props, context) => {
     ActionTypes,
     setRegisteringParty,
     hasMatchingSecuredParty,
+    isObjectEqual,
     ...toRefs(localState)
   }
 }

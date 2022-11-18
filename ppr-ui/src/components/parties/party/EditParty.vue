@@ -293,7 +293,8 @@ export default defineComponent({
       ActionTypes,
       setRegisteringParty,
       addressSchema,
-      hasMatchingSecuredParty
+      hasMatchingSecuredParty,
+      isObjectEqual
     } = useSecuredParty(props, context)
 
     const {
@@ -375,6 +376,10 @@ export default defineComponent({
           )
           // check if any results
           if (response?.length > 0) {
+            localState.foundDuplicate = response.some(party =>
+              party.businessName?.toUpperCase() === currentSecuredParty.value.businessName?.toUpperCase() &&
+              isObjectEqual(party.address, currentSecuredParty.value.address)
+            )
             // show secured party selection popup
             showDialog()
             localState.dialogResults = response?.slice(0, 50)
