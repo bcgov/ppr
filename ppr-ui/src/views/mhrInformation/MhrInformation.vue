@@ -127,7 +127,10 @@
                   :validateTransfer="validate"
                   @isValidTransferOwners="isValidTransferOwners = $event"
                 />
-                <TransferDetails v-if="showTransferDetails" ref="transferDetailsComponent" />
+                <TransferDetails
+                  v-if="showTransferDetails" ref="transferDetailsComponent"
+                  @isValid="isTransferDetailsFormValid = $event"
+                />
               </template>
             </section>
           </v-col>
@@ -384,6 +387,9 @@ export default defineComponent({
     const goToReview = async (): Promise<void> => {
       localState.validate = true
 
+      // @ts-ignore - function exists
+      await context.refs.transferDetailsComponent.validateDetailsForm()
+
       // If already in review mode, file the transfer
       if (localState.isReviewMode) {
         // Trigger error state for required fields (if not checked)
@@ -405,13 +411,6 @@ export default defineComponent({
           if (getMhrInformation.value.draftNumber) await deleteMhrDraft(getMhrInformation.value.draftNumber)
           goToDash()
         } else console.log(mhrTransferFiling?.error) // Handle Schema or Api errors here.
-      }
-
-      const transferDetailsComponent = context.refs.transferDetailsComponent as any
-
-      // Check if TransferDetails exists on the screen
-      if (transferDetailsComponent) {
-        localState.isTransferDetailsFormValid = await transferDetailsComponent.validateDetailsForm()
       }
 
       // If transfer is valid, enter review mode
