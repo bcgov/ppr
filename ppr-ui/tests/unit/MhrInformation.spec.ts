@@ -62,6 +62,7 @@ function createComponent (): Wrapper<any> {
 
 const TRANSFER_DECLARED_VALUE = '123'
 const TRANSFER_CONSIDERATION = `$${TRANSFER_DECLARED_VALUE}.00`
+const TRANSFER_DATE = '2020-10-10'
 
 // TODO: Remove after API updates to include the ID for Owners
 function addIDsForOwners (ownersGroups): Array<any> {
@@ -108,7 +109,7 @@ async function triggerUnsavedChange (): Promise<void> {
 async function enterTransferDetailsFields (transferDetailsWrapper: Wrapper<any, Element>): Promise<void> {
   transferDetailsWrapper.find(getTestId('declared-value')).setValue(TRANSFER_DECLARED_VALUE)
   transferDetailsWrapper.find(getTestId('declared-value')).trigger('blur')
-  transferDetailsWrapper.findComponent(DatePicker).vm.$emit('emitDate', { date: '2020-10-10' })
+  transferDetailsWrapper.findComponent(DatePicker).vm.$emit('emitDate', TRANSFER_DATE)
   await Vue.nextTick()
 }
 
@@ -157,6 +158,11 @@ describe('Mhr Information', () => {
   })
 
   it('renders and displays the correct sub components', async () => {
+    // Verify it does render before changes
+    expect(wrapper.findComponent(StickyContainer).exists()).toBe(false)
+
+    await triggerUnsavedChange()
+
     // Sticky container w/ Fee Summary
     expect(wrapper.findComponent(StickyContainer).exists()).toBe(true)
   })
@@ -342,6 +348,10 @@ describe('Mhr Information', () => {
 
     expect(wrapper.find('#transfer-ref-num-section').exists()).toBeFalsy()
 
+    // Set Wrapper Validations
+    wrapper.vm.isValidTransferOwners = true
+    wrapper.vm.isTransferDetailsFormValid = true
+
     // go to Review screen
     await triggerUnsavedChange()
     await enterTransferDetailsFields(wrapper.findComponent(TransferDetails))
@@ -388,6 +398,10 @@ describe('Mhr Information', () => {
     expect(wrapper.vm.$data.getMhrTransferHomeOwners.length).toBe(1)
     expect(wrapper.findComponent(MhrInformation).exists()).toBe(true)
 
+    // Set Wrapper Validations
+    wrapper.vm.isValidTransferOwners = true
+    wrapper.vm.isTransferDetailsFormValid = true
+
     // Enter review mode
     await triggerUnsavedChange()
     await enterTransferDetailsFields(wrapper.findComponent(TransferDetails))
@@ -422,6 +436,10 @@ describe('Mhr Information', () => {
 
     // set Account Info in local state
     wrapper.vm.$data.accountInfo = mockedAccountInfo
+
+    // Set Wrapper Validations
+    wrapper.vm.isValidTransferOwners = true
+    wrapper.vm.isTransferDetailsFormValid = true
 
     await triggerUnsavedChange()
     await enterTransferDetailsFields(wrapper.findComponent(TransferDetails))
@@ -509,6 +527,10 @@ describe('Mhr Information', () => {
     // doesn't exist on manufactured home page
     expect(wrapper.find('#yellow-message-bar').exists()).toBeFalsy()
 
+    // Set Wrapper Validations
+    wrapper.vm.isValidTransferOwners = true
+    wrapper.vm.isTransferDetailsFormValid = true
+
     // trigger review
     await triggerUnsavedChange()
     await enterTransferDetailsFields(wrapper.findComponent(TransferDetails))
@@ -533,6 +555,10 @@ describe('Mhr Information', () => {
     await Vue.nextTick()
 
     expect(wrapper.find('#transfer-confirm-section').exists()).toBeFalsy()
+
+    // Set Wrapper Validations
+    wrapper.vm.isValidTransferOwners = true
+    wrapper.vm.isTransferDetailsFormValid = true
 
     await triggerUnsavedChange()
     await enterTransferDetailsFields(wrapper.findComponent(TransferDetails))
@@ -571,6 +597,10 @@ describe('Mhr Information', () => {
     // review table doesn't exist yet
     expect(wrapper.find('#owners-review').exists()).toBeFalsy()
 
+    // Set Wrapper Validations
+    wrapper.vm.isValidTransferOwners = true
+    wrapper.vm.isTransferDetailsFormValid = true
+
     await triggerUnsavedChange()
     await enterTransferDetailsFields(wrapper.findComponent(TransferDetails))
 
@@ -590,11 +620,15 @@ describe('Mhr Information', () => {
     setupCurrentHomeOwners()
     wrapper.vm.$data.dataLoaded = true
     await Vue.nextTick()
+    await triggerUnsavedChange()
 
     const feeSummaryContainer = wrapper.find(getTestId('fee-summary'))
     expect(feeSummaryContainer.find('.err-msg').exists()).toBeFalsy()
 
-    await triggerUnsavedChange()
+    // Set Wrapper Validations
+    wrapper.vm.isValidTransferOwners = true
+    wrapper.vm.isTransferDetailsFormValid = true
+
     await enterTransferDetailsFields(wrapper.findComponent(TransferDetails))
 
     await wrapper.find('#btn-stacked-submit').trigger('click')
@@ -613,5 +647,36 @@ describe('Mhr Information', () => {
     // should show 3 errors for Ref Num, Confirm and Auth components
     expect(feeSummaryContainer.find('.err-msg').exists()).toBeTruthy()
     expect(wrapper.findAll('.border-error-left').length).toBe(3)
+  })
+
+  it('should clear Transfer Details fields on Undo click', async () => {
+    setupCurrentHomeOwners()
+    wrapper.vm.$data.dataLoaded = true
+    await Vue.nextTick()
+
+    expect(wrapper.find(TransferDetails).exists()).toBeFalsy()
+
+    await triggerUnsavedChange()
+
+    const transferDetailsWrapper = wrapper.find(TransferDetails)
+    expect(transferDetailsWrapper.exists()).toBeTruthy()
+    await enterTransferDetailsFields(wrapper.findComponent(TransferDetails))
+
+    expect(transferDetailsWrapper.vm.$data.declaredValue).toBe(TRANSFER_DECLARED_VALUE)
+    expect(transferDetailsWrapper.vm.$data.consideration).toBe(TRANSFER_CONSIDERATION)
+    expect(transferDetailsWrapper.vm.$data.transferDate).toContain(TRANSFER_DATE)
+
+    // simulate 'Undo'
+    await store.dispatch('setUnsavedChanges', false)
+    await Vue.nextTick()
+
+    expect(transferDetailsWrapper.exists()).toBeFalsy()
+
+    // Open up Transfer Details again and check that fields are cleared
+    await triggerUnsavedChange()
+
+    expect(wrapper.find(TransferDetails).vm.$data.declaredValue).toBe('')
+    expect(wrapper.find(TransferDetails).vm.$data.consideration).toBe('')
+    expect(wrapper.find(TransferDetails).vm.$data.transferDate).toBe(null)
   })
 })

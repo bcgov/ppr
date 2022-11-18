@@ -120,12 +120,18 @@
 
               <!-- MHR Information Section -->
               <template v-else>
-                <HomeOwners isMhrTransfer class="mt-n2" />
-                <TransferDetails v-if="hasUnsavedChanges" ref="transferDetailsComponent" />
+                <HomeOwners
+                  isMhrTransfer
+                  class="mt-n2"
+                  :class="{ 'mb-10': !hasUnsavedChanges }"
+                  :validateTransfer="validate"
+                  @isValidTransferOwners="isValidTransferOwners = $event"
+                />
+                <TransferDetails v-if="showTransferDetails" ref="transferDetailsComponent" />
               </template>
             </section>
           </v-col>
-          <v-col class="pl-6 pt-5" cols="3">
+          <v-col class="pl-6 pt-5" cols="3" v-if="hasUnsavedChanges">
             <aside>
               <affix relative-element-selector=".col-9" :offset="{ top: 90, bottom: -100 }">
                 <sticky-container
@@ -241,7 +247,8 @@ export default defineComponent({
       isRefNumValid,
       setRefNumValid,
       initMhrTransfer,
-      buildApiData
+      buildApiData,
+      parseDraftTransferDetails
     } = useMhrInformation()
 
     const {
@@ -260,11 +267,13 @@ export default defineComponent({
       isReviewMode: false,
       validate: false,
       isTransferDetailsFormValid: false,
+      showTransferDetails: false,
       refNumValid: false,
       authorizationValid: false,
       validateConfirmCompletion: false,
       validateAuthorizationError: false,
       accountInfo: null,
+      isValidTransferOwners: false,
       feeType: FeeSummaryTypes.MHR_TRANSFER, // FUTURE STATE: To be dynamic, dependent on what changes have been made
       isAuthenticated: computed((): boolean => {
         return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
@@ -277,8 +286,9 @@ export default defineComponent({
       }),
       isValidTransfer: computed((): boolean => {
         // is valid on first step
-        // TODO: Add Home Owner validation check here
-        return !isGlobalEditingMode.value && localState.isTransferDetailsFormValid && true
+        return !isGlobalEditingMode.value &&
+          localState.isValidTransferOwners &&
+          localState.isTransferDetailsFormValid
       }),
       isValidTransferReview: computed((): boolean => {
         // is valid on review step
@@ -291,9 +301,7 @@ export default defineComponent({
       }),
       transferErrorMsg: computed((): string => {
         const isValidReview = localState.isReviewMode ? !localState.isValidTransferReview : !localState.isValidTransfer
-        const errorMsg = localState.isReviewMode
-          ? '< Please complete required information'
-          : '< Please make any required changes'
+        const errorMsg = '< Please complete required information'
         return localState.validate && isValidReview ? errorMsg : ''
       }),
       reviewConfirmText: computed((): string => {
@@ -322,26 +330,25 @@ export default defineComponent({
 
       localState.loading = true
       setEmptyMhrTransfer(initMhrTransfer())
+
       // Set baseline MHR Information to state
       await parseMhrInformation()
+
+      // When not a draft Transfer, force no unsaved changes after loading current owners
+      !getMhrInformation.value.draftNumber && await setUnsavedChanges(false)
+
       localState.accountInfo = await getSubmittingPartyInformation()
       localState.loading = false
 
       localState.dataLoaded = true
-      await setUnsavedChanges(false)
     })
-
-    // Future state to parse all relevant MHR Information
-    const parseMhrInformation = async (): Promise<void> => {
-      await parseCurrentOwnerGroups()
-    }
 
     // Get Account Info from Auth to be used in Submitting Party section in Review screen
     const getSubmittingPartyInformation = async (): Promise<AccountInfoIF> => {
       return getAccountInfoFromAuth()
     }
 
-    const parseCurrentOwnerGroups = async (): Promise<void> => {
+    const parseMhrInformation = async (): Promise<void> => {
       const { data } = await fetchMhRegistration(getMhrInformation.value.mhrNumber)
       const currentOwnerGroups = data?.ownerGroups || [] // Safety check. Should always have ownerGroups
 
@@ -358,6 +365,9 @@ export default defineComponent({
         // Retrieve owners from draft if it exists
         const { registration } = await getMhrTransferDraft(getMhrInformation.value.draftNumber)
 
+        // Set draft Transfer details to store
+        parseDraftTransferDetails(registration as MhrTransferApiIF)
+
         setShowGroups(registration.addOwnerGroups.length > 1 || registration.deleteOwnerGroups.length > 1)
         setMhrTransferHomeOwnerGroups([...registration.addOwnerGroups])
       } else {
@@ -368,6 +378,7 @@ export default defineComponent({
 
     const scrollToFirstError = async () => {
       setTimeout(() => {
+        document.getElementsByClassName('border-error-left').length > 0 &&
         document.getElementsByClassName('border-error-left')[0].scrollIntoView({ behavior: 'smooth' })
       }, 10)
     }
@@ -488,6 +499,16 @@ export default defineComponent({
       () => localState.isCompletionConfirmed,
       (isValid: boolean) => {
         localState.validateConfirmCompletion = !isValid
+      }
+    )
+
+    watch(
+      () => hasUnsavedChanges.value,
+      (val: boolean) => {
+        if (!val && context.refs.transferDetailsComponent) {
+          (context.refs.transferDetailsComponent as any).clearTransferDetailsData()
+        }
+        localState.showTransferDetails = val
       }
     )
 

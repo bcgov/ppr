@@ -231,6 +231,8 @@
           :isAdding="disableAddHomeOwnerBtn"
           :isMhrTransfer="isMhrTransfer"
           :hideRemovedOwners="hideRemovedOwners"
+          :validateTransfer="validateTransfer"
+          @isValidTransferOwners="isValidTransferOwners($event)"
         />
       </v-fade-transition>
     </div>
@@ -238,7 +240,7 @@
 </template>
 
 <script lang="ts">
-import { useActions, useGetters } from 'vuex-composition-helpers'
+import { useGetters } from 'vuex-composition-helpers'
 import { AddEditHomeOwner, HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
 import { BaseDialog } from '@/components/dialogs'
 import { SimpleHelpToggle } from '@/components/common'
@@ -246,11 +248,12 @@ import { computed, defineComponent, onBeforeMount, reactive, toRefs, watch } fro
 import { useHomeOwners } from '@/composables/mhrRegistration'
 /* eslint-disable no-unused-vars */
 import { MhrRegistrationTotalOwnershipAllocationIF } from '@/interfaces'
-import { ActionTypes } from '@/enums'
+import { ActionTypes, HomeTenancyTypes } from '@/enums'
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
   name: 'HomeOwners',
+  emits: ['isValidTransferOwners'],
   components: {
     AddEditHomeOwner,
     BaseDialog,
@@ -265,15 +268,17 @@ export default defineComponent({
     isReadonlyTable: {
       type: Boolean,
       default: false
+    },
+    validateTransfer: {
+      type: Boolean,
+      default: false
     }
   },
-  setup (props) {
+  setup (props, context) {
     const { getMhrRegistrationHomeOwners, getMhrTransferCurrentHomeOwners } =
       useGetters<any>([
         'getMhrRegistrationHomeOwners', 'getMhrTransferCurrentHomeOwners'
       ])
-
-    const { setUnsavedChanges } = useActions<any>(['setUnsavedChanges'])
 
     const {
       getHomeTenancyType,
@@ -367,19 +372,16 @@ export default defineComponent({
       })
     }
 
+    const isValidTransferOwners = (isValid: boolean): void => {
+      context.emit('isValidTransferOwners', isValid)
+    }
+
     // Enable editing mode whenever adding Person or Business
     // This would disable all Edit buttons
     watch(
       () => localState.disableAddHomeOwnerBtn,
       (isAdding: Boolean) => {
         setGlobalEditingMode(isAdding)
-      }
-    )
-
-    watch(
-      () => localState.showAddPersonSection,
-      () => {
-        if (isGlobalEditingMode.value === true) setUnsavedChanges(true)
       }
     )
 
@@ -408,6 +410,7 @@ export default defineComponent({
       cancelOrProceed,
       removeAllOwnersHandler,
       hideShowRemovedOwners,
+      isValidTransferOwners,
       ...toRefs(localState)
     }
   },

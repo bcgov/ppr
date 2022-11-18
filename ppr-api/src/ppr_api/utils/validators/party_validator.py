@@ -35,6 +35,8 @@ INVALID_REGION_SECURED = 'Secured Party region {} is invalid. '
 INVALID_COUNTRY_DEBTOR = 'Debtor country {} is invalid. '
 INVALID_REGION_DEBTOR = 'Debtor region {} is invalid. '
 CHARACTER_SET_UNSUPPORTED = 'The character set is not supported for name {}. '
+DUPLICATE_SECURED_PARTY_BUSINESS = 'Duplicate Secured Party Business. '
+DUPLICATE_SECURED_PARTY_PERSON = 'Duplicate Secured Party Person. '
 
 
 def validate_financing_parties(json_data):
@@ -91,10 +93,12 @@ def validate_party_names(json_data):
     if 'securedParties' in json_data:
         for party in json_data['securedParties']:
             error_msg += validate_party_name(party)
+            error_msg += validate_party_duplicates(json_data['securedParties'])
 
     if 'addSecuredParties' in json_data:
         for party in json_data['addSecuredParties']:
             error_msg += validate_party_name(party)
+            error_msg += validate_party_duplicates(json_data['addSecuredParties'])
 
     if 'debtors' in json_data:
         for party in json_data['debtors']:
@@ -242,3 +246,40 @@ def find_party_by_id(party_id: int, party_type: str, parties):
                 party = eval_party
 
     return party
+
+
+def validate_party_duplicates(party_json):
+    """Verify no party name/address duplicates when creating or adding secured parties."""
+    error_msg = ''
+
+    for party in party_json:
+        business_name = party.get('businessName', None)
+        person_name = party.get('personName', None)
+
+        if business_name:
+            matches = [i for i,
+                       x in enumerate(party_json)
+                       if x.get('businessName', None) and x['businessName'].upper() == business_name.upper()]
+
+            if len(matches) >= 2:
+                address_a = dict((k.upper(), v.upper()) for k, v in party_json[matches[0]]['address'].items())
+                address_b = dict((k.upper(), v.upper()) for k, v in party_json[matches[1]]['address'].items())
+
+                if address_a == address_b:
+                    error_msg = DUPLICATE_SECURED_PARTY_BUSINESS
+
+        if person_name:
+            person_name = dict((k.upper(), v.upper()) for k, v in person_name.items())
+            matches = [i for i,
+                       x in enumerate(party_json)
+                       if x.get('personName', None) and
+                       dict((k.upper(), v.upper()) for k, v in x['personName'].items()) == person_name]
+
+            if len(matches) >= 2:
+                address_a = dict((k.upper(), v.upper()) for k, v in party_json[matches[0]]['address'].items())
+                address_b = dict((k.upper(), v.upper()) for k, v in party_json[matches[1]]['address'].items())
+
+                if address_a == address_b:
+                    error_msg = DUPLICATE_SECURED_PARTY_PERSON
+
+    return error_msg
