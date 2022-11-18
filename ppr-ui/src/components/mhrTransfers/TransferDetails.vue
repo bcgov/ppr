@@ -8,7 +8,7 @@
     </p>
 
     <v-card flat class="py-6 px-8 rounded" :class="{ 'border-error-left': showFormError }">
-      <v-form ref="transferDetailsForm" v-model="isValid">
+      <v-form ref="transferDetailsForm" v-model="isFormValid">
         <v-row>
           <v-col cols="3">
             <label
@@ -175,8 +175,8 @@ export default defineComponent({
 
     const localState = reactive({
       validateTransferDetails: false, // triggered once Review & Confirm clicked
-      isValid: false, // TransferDetails form without Transfer Date Picker
-      isTransferDetailsFormValid: computed((): boolean => localState.isValid && !!localState.transferDate),
+      isFormValid: false, // TransferDetails form without Transfer Date Picker
+      isTransferDetailsFormValid: computed((): boolean => localState.isFormValid && !!localState.transferDate),
       declaredValue: getMhrTransferDeclaredValue.value?.toString(),
       consideration: getMhrTransferConsideration.value,
       transferDate: getMhrTransferDate.value,
@@ -236,7 +236,7 @@ export default defineComponent({
     )
 
     watch(
-      () => localState.isValid,
+      () => localState.isTransferDetailsFormValid,
       (val: boolean) => {
         context.emit('isValid', val)
       }

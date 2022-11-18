@@ -104,7 +104,7 @@ export default defineComponent({
       removeGroupDropdownValidation: false,
       groupItems: computed(() => getGroupDropdownItems(props.isAddingHomeOwner, props.groupId)),
       groupRules: computed(() => {
-        return showGroups.value && localState.removeGroupDropdownValidation
+        return showGroups.value && localState.groupItems.length >= 2
           ? required('Select a group for this owner')
           : []
       }),
