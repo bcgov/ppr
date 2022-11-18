@@ -408,8 +408,7 @@ export default defineComponent({
           if (getMhrInformation.value.draftNumber) await deleteMhrDraft(getMhrInformation.value.draftNumber)
           goToDash()
         } else console.log(mhrTransferFiling?.error) // Handle Schema or Api errors here.
-        // @ts-ignore - function exists
-      } else await context.refs.transferDetailsComponent.validateDetailsForm()
+      }
 
       // @ts-ignore - function exists
       await context.refs.transferDetailsComponent.validateDetailsForm()
