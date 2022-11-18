@@ -128,7 +128,8 @@
                   @isValidTransferOwners="isValidTransferOwners = $event"
                 />
                 <TransferDetails
-                  v-if="showTransferDetails" ref="transferDetailsComponent"
+                  v-if="showTransferDetails"
+                  ref="transferDetailsComponent"
                   @isValid="isTransferDetailsFormValid = $event"
                 />
               </template>
