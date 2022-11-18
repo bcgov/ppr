@@ -356,6 +356,10 @@ export const mutateUnsavedChanges = (state: StateIF, unsavedChanges: Boolean) =>
   state.stateModel.unsavedChanges = unsavedChanges
 }
 
+export const mutateCurrentRegistrationsTab = (state: StateIF, currentRegistrationsTab: Number) => {
+  state.stateModel.currentRegistrationsTab = currentRegistrationsTab
+}
+
 // MHR Registration
 export const mutateEmptyMhr = (state: StateIF, emptyMhr: MhrRegistrationIF) => {
   state.stateModel.mhrRegistration = emptyMhr

@@ -88,7 +88,7 @@ import { ProductCode, RouteNames } from '@/enums'
 import {
   ActionBindingIF, // eslint-disable-line no-unused-vars
   ErrorIF, // eslint-disable-line no-unused-vars
-  ManufacturedHomeSearchResponseIF, // eslint-disable-line no-unused-vars
+  ManufacturedHomeSearchResponseIF, RegTableNewItemI, // eslint-disable-line no-unused-vars
   SearchResponseIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
 
@@ -124,6 +124,7 @@ export default class Dashboard extends Vue {
   @Getter isNonBillable!: boolean
   @Getter isRoleQualifiedSupplier!: boolean
   @Getter getUserProductSubscriptionsCodes: Array<ProductCode>
+  @Getter getRegTableNewItem: RegTableNewItemI
 
   @Action resetNewRegistration: ActionBindingIF
   @Action setSearchDebtorName: ActionBindingIF
@@ -133,6 +134,7 @@ export default class Dashboard extends Vue {
   @Action setManufacturedHomeSearchResults: ActionBindingIF
   @Action setSearchedType: ActionBindingIF
   @Action setSearchedValue: ActionBindingIF
+  @Action setRegTableNewItem: ActionBindingIF
 
   @Prop({ default: false })
   private appLoadingData: boolean
@@ -190,6 +192,15 @@ export default class Dashboard extends Vue {
     if (this.isRoleStaff || this.isRoleStaffBcol || this.isRoleStaffReg) {
       return this.hasMhrRole && getFeatureFlag('mhr-ui-enabled')
     } else {
+      if (this.getRegTableNewItem.addedReg) {
+        this.snackBarEvent('Registration was successfully added to your table.')
+        setTimeout(() => {
+          const emptyItem: RegTableNewItemI = {
+            addedReg: '', addedRegParent: '', addedRegSummary: null, prevDraft: ''
+          }
+          this.setRegTableNewItem(emptyItem)
+        }, 4000)
+      }
       return this.getUserProductSubscriptionsCodes.includes(ProductCode.MHR) && getFeatureFlag('mhr-ui-enabled')
     }
   }

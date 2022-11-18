@@ -6,6 +6,7 @@
     height="64"
     hide-slider centered grow
     v-model="tabNumber"
+    @change="onTabChange"
   >
     <v-tab
       tabindex="0"
@@ -51,9 +52,9 @@
 <script lang="ts">
 // Components
 /* eslint-disable no-unused-vars */
-import { computed, defineComponent, onMounted, reactive, toRefs } from '@vue/composition-api'
+import { computed, defineComponent, onMounted, reactive, set, toRefs } from '@vue/composition-api'
 import { RegistrationsWrapper } from '@/components/common'
-import { useGetters } from 'vuex-composition-helpers'
+import { useActions, useGetters } from 'vuex-composition-helpers'
 import { useNewMhrRegistration } from '@/composables'
 /* eslint-enable no-unused-vars */
 
@@ -74,15 +75,19 @@ export default defineComponent({
   },
   setup (props, context) {
     const {
-      getMhRegTableBaseRegs, getRegTableTotalRowCount
-    } = useGetters<any>(['getMhRegTableBaseRegs', 'getRegTableTotalRowCount'])
+      getMhRegTableBaseRegs, getRegTableTotalRowCount, getCurrentRegistrationsTab
+    } = useGetters<any>(['getMhRegTableBaseRegs', 'getRegTableTotalRowCount', 'getCurrentRegistrationsTab'])
+
+    const {
+      setCurrentRegistrationsTab
+    } = useActions<any>(['setCurrentRegistrationsTab'])
 
     const {
       fetchMhRegistrations
     } = useNewMhrRegistration()
 
     const localState = reactive({
-      tabNumber: null,
+      tabNumber: getCurrentRegistrationsTab.value,
       isPprTab: computed((): boolean => {
         return localState.tabNumber === 0
       }),
@@ -95,6 +100,10 @@ export default defineComponent({
       context.emit('snackBarMsg', msg)
     }
 
+    const onTabChange = (clickedTab): void => {
+      setCurrentRegistrationsTab(clickedTab)
+    }
+
     onMounted(async () => {
       await fetchMhRegistrations()
     })
@@ -103,6 +112,8 @@ export default defineComponent({
       snackBarEvent,
       getMhRegTableBaseRegs,
       getRegTableTotalRowCount,
+      getCurrentRegistrationsTab,
+      onTabChange,
       ...toRefs(localState)
     }
   }

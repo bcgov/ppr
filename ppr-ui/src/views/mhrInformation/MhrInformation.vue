@@ -185,7 +185,7 @@ import { BaseAddress } from '@/composables/address'
 import { unsavedChangesDialog, registrationSaveDraftError } from '@/resources/dialogOptions'
 import { cloneDeep } from 'lodash'
 import AccountInfo from '@/components/common/AccountInfo.vue'
-import { AccountInfoIF, MhrTransferApiIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { AccountInfoIF, MhrTransferApiIF, RegTableNewItemI } from '@/interfaces' // eslint-disable-line no-unused-vars
 
 export default defineComponent({
   name: 'MhrInformation',
@@ -231,12 +231,14 @@ export default defineComponent({
       setMhrTransferHomeOwnerGroups,
       setMhrTransferCurrentHomeOwnerGroups,
       setMhrTransferAttentionReference,
-      setUnsavedChanges
+      setUnsavedChanges,
+      setRegTableNewItem
     } = useActions<any>([
       'setMhrTransferHomeOwnerGroups',
       'setMhrTransferCurrentHomeOwnerGroups',
       'setMhrTransferAttentionReference',
-      'setUnsavedChanges'
+      'setUnsavedChanges',
+      'setRegTableNewItem'
     ])
 
     const { setEmptyMhrTransfer } = useActions<any>(['setEmptyMhrTransfer'])
@@ -430,6 +432,16 @@ export default defineComponent({
       const mhrTransferDraft = getMhrInformation.value.draftNumber
         ? await updateMhrDraft(getMhrInformation.value.draftNumber, apiData)
         : await createMhrTransferDraft(apiData)
+      if (!getMhrInformation.value.draftNumber) {
+        const mhrDraft = mhrTransferDraft as MhrTransferApiIF
+        const newItem: RegTableNewItemI = {
+          addedReg: String(mhrDraft.draftNumber),
+          addedRegParent: apiData.mhrNumber,
+          addedRegSummary: null,
+          prevDraft: String(getMhrInformation.value.changes[0].documentId) || ''
+        }
+        setRegTableNewItem(newItem)
+      }
       localState.loading = false
       if (!mhrTransferDraft.error) {
         setUnsavedChanges(false)
