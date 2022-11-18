@@ -54,7 +54,7 @@ class DraftResource(Resource):
             # Verify request JWT and account ID
             if not authorized(account_id, jwt):
                 return resource_utils.unauthorized_error_response(account_id)
-            
+
             # Set feature flag value
             username = 'anonymous'
             user = User.find_by_jwt_token(g.jwt_oidc_token_info, account_id)
