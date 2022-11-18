@@ -128,14 +128,14 @@
                   @isValidTransferOwners="isValidTransferOwners = $event"
                 />
                 <TransferDetails
-                  v-if="showTransferDetails"
+                  v-if="hasUnsavedChanges"
                   ref="transferDetailsComponent"
                   @isValid="isTransferDetailsFormValid = $event"
                 />
               </template>
             </section>
           </v-col>
-          <v-col class="pl-6 pt-5" cols="3" v-if="hasUnsavedChanges">
+          <v-col class="pl-6 pt-5" cols="3" v-if="hasUnsavedChanges || isReviewMode">
             <aside>
               <affix relative-element-selector=".col-9" :offset="{ top: 90, bottom: -100 }">
                 <sticky-container
@@ -269,7 +269,6 @@ export default defineComponent({
       isReviewMode: false,
       validate: false,
       isTransferDetailsFormValid: false,
-      showTransferDetails: false,
       refNumValid: false,
       authorizationValid: false,
       validateConfirmCompletion: false,
@@ -388,9 +387,6 @@ export default defineComponent({
     const goToReview = async (): Promise<void> => {
       localState.validate = true
 
-      // @ts-ignore - function exists
-      await context.refs.transferDetailsComponent.validateDetailsForm()
-
       // If already in review mode, file the transfer
       if (localState.isReviewMode) {
         // Trigger error state for required fields (if not checked)
@@ -412,7 +408,11 @@ export default defineComponent({
           if (getMhrInformation.value.draftNumber) await deleteMhrDraft(getMhrInformation.value.draftNumber)
           goToDash()
         } else console.log(mhrTransferFiling?.error) // Handle Schema or Api errors here.
-      }
+        // @ts-ignore - function exists
+      } else await context.refs.transferDetailsComponent.validateDetailsForm()
+
+      // @ts-ignore - function exists
+      await context.refs.transferDetailsComponent.validateDetailsForm()
 
       // If transfer is valid, enter review mode
       if (localState.isValidTransfer) {
@@ -496,7 +496,6 @@ export default defineComponent({
         if (!val && context.refs.transferDetailsComponent) {
           (context.refs.transferDetailsComponent as any).clearTransferDetailsData()
         }
-        localState.showTransferDetails = val
       }
     )
 

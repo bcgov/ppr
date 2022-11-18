@@ -23,7 +23,6 @@
           :class="{ 'ml-2': !showEditActions }"
           label x-small
           color="#grey lighten-2"
-          text-color="$gray9"
           data-test-id="owner-removed-badge"
         >
           <b>DELETED</b>
@@ -34,7 +33,6 @@
           :class="{ 'ml-2': !showEditActions }"
           label x-small
           color="primary"
-          text-color="$gray9"
           data-test-id="owner-added-badge"
         >
           <b>ADDED</b>
