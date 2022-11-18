@@ -299,9 +299,7 @@ export default defineComponent({
       }),
       transferErrorMsg: computed((): string => {
         const isValidReview = localState.isReviewMode ? !localState.isValidTransferReview : !localState.isValidTransfer
-        const errorMsg = localState.isReviewMode
-          ? '< Please complete required information'
-          : '< Please make any required changes'
+        const errorMsg = '< Please complete required information'
         return localState.validate && isValidReview ? errorMsg : ''
       }),
       reviewConfirmText: computed((): string => {
