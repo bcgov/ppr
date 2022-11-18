@@ -4,10 +4,9 @@ import { useGetters, useActions } from 'vuex-composition-helpers'
 import { PartyAddressSchema } from '@/schemas'
 import { ActionTypes, APIRegistrationTypes, RegistrationFlowType, SecuredPartyTypes } from '@/enums'
 import { checkAddress, formatAddress } from '@/composables/address/factories/address-factory'
-import { cloneDeep, isEqual, omitBy, overSome, isNaN, isNil, isEmpty } from 'lodash'
+import { cloneDeep, isEqual } from 'lodash'
 import { useParty } from '@/composables/useParty'
-import { addRegistrationSummary } from '@/utils'
-
+import { normalizeObject } from '@/utils/validation-helper'
 const initPerson = { first: '', middle: '', last: '' }
 const initAddress = {
   street: '',
@@ -117,14 +116,6 @@ export const useSecuredParty = (props, context) => {
     const workObject2 = Object.create(object2)
     const addressEqual = isEqual(normalizeObject(workObject1), normalizeObject(workObject2))
     return addressEqual
-  }
-
-  const normalizeObject = (convertObject: any): any => {
-    convertObject = omitBy(convertObject, overSome([isNil, isNaN, isEmpty]))
-    Object.entries(convertObject).forEach(([key, value]) => {
-      if (typeof value === 'string') convertObject[key] = value?.toUpperCase().replaceAll(' ', '').trim()
-    })
-    return convertObject
   }
 
   const removeSecuredParty = (): void => {
