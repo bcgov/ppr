@@ -23,14 +23,15 @@
       </v-col>
       <v-col cols="9" class="gray7">{{ convertDate(getMhrTransferDate, false, false) }}</v-col>
     </v-row>
-    <v-row v-if="getMhrTransferOwnLand" id="lease-land-display">
+    <v-row id="lease-land-display">
       <v-col cols="3">
-        <label class="generic-label">Lease or Land Ownership</label
-        >
+        <label class="generic-label">Lease or Land <br>Ownership</label>
       </v-col>
-      <v-col cols="9" class="gray7"
-        >The manufactured home is located on land the new homeowners own, or on which they have a registered lease of 3
-        years or more.
+      <v-col cols="9" class="gray7">
+        <span v-if="getMhrTransferOwnLand">The manufactured home is located on land that the new homeowners own, or on
+          which they have a registered lease of 3 years or more.</span>
+        <span v-else>The manufactured home is <strong>not</strong> located on land that the new homeowners own, or on
+          which they have a registered lease of 3 years or more.</span>
       </v-col>
     </v-row>
   </v-card>

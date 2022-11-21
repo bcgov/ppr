@@ -4,7 +4,7 @@
       1. Transfer Details
     </h4>
     <p class="mt-2 mb-7">
-      Enter details of the transfer of ownership due to sale.
+      Enter details of the transfer or change of ownership.
     </p>
 
     <v-card flat class="py-6 px-8 rounded" :class="{ 'border-error-left': showFormError }">
