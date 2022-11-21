@@ -1,5 +1,5 @@
 <template>
-  <v-card flat rounded :class="{ 'border-error-left': showTableError || reviewedNoOwners}">
+  <v-card flat rounded :class="{ 'border-error-left': showTableError}">
     <v-data-table
       id="mh-home-owners-table"
       class="home-owners-table"
@@ -48,6 +48,7 @@
                 :editHomeOwner="row.item"
                 :isHomeOwnerPerson="!row.item.organizationName"
                 :isMhrTransfer="isMhrTransfer"
+                :showTableError="validateTransfer && (isAddingMode || isEditingMode)"
                 @cancel="currentlyEditingHomeOwnerId = -1"
                 @remove="remove(row.item)"
               />
@@ -286,19 +287,16 @@ export default defineComponent({
       isEditingMode: computed((): boolean => localState.currentlyEditingHomeOwnerId >= 0),
       isAddingMode: computed((): boolean => props.isAdding),
       showTableError: computed((): boolean => {
-        return showGroups.value &&
-          (
-            (props.validateTransfer || !props.isMhrTransfer) &&
+        return (props.validateTransfer || localState.reviewedOwners) &&
             (
               !hasMinimumGroups() ||
               hasEmptyGroup.value ||
               !localState.isValidAllocation ||
               localState.hasGroupsWithNoOwners
             )
-          )
       }),
-      reviewedNoOwners: computed((): boolean => !hasActualOwners(props.homeOwners) &&
-      getValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_STEPS)),
+      reviewedOwners: computed((): boolean =>
+        getValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_STEPS)),
       showEditActions: computed((): boolean => !props.isReadonlyTable),
       homeOwnersTableHeaders: props.isReadonlyTable ? homeOwnersTableHeadersReview : homeOwnersTableHeaders,
       addedOwnerCount: computed((): number => {

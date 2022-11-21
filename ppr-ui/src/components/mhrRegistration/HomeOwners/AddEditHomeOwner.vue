@@ -1,8 +1,8 @@
 <template>
-  <v-card flat class="py-6 px-8 mb-5 rounded">
+  <v-card flat class="py-6 px-8 mb-5 rounded" :class="{ 'border-error-left': showTableError}">
     <v-row id="mhr-home-add-person">
       <v-col cols="3">
-        <label class="generic-label"> {{ getSidebarTitle }} </label>
+        <label class="generic-label" :class="{ 'error-text' : showTableError}"> {{ getSidebarTitle }} </label>
       </v-col>
       <v-col cols="9">
         <v-form
@@ -281,6 +281,10 @@ export default defineComponent({
       default: false
     },
     isMhrTransfer: {
+      type: Boolean,
+      default: false
+    },
+    showTableError: {
       type: Boolean,
       default: false
     }

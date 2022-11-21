@@ -212,6 +212,7 @@
         v-if="showAddPersonSection"
         :isHomeOwnerPerson="true"
         :isMhrTransfer="isMhrTransfer"
+        :showTableError="validateTransfer && isGlobalEditingMode"
         @cancel="showAddPersonSection = false"
       />
     </v-expand-transition>
@@ -220,6 +221,7 @@
       <AddEditHomeOwner
         v-if="showAddPersonOrganizationSection"
         :isMhrTransfer="isMhrTransfer"
+        :showTableError="validateTransfer && isGlobalEditingMode"
         @cancel="showAddPersonOrganizationSection = false"
       />
     </v-expand-transition>
