@@ -120,7 +120,7 @@
               </div>
             </v-col>
             <v-col cols="2" class="pt-5"
-              ><v-btn
+              ><v-btn v-if="!isExistingSecuredParty(result.code)"
                 class="ml-auto float-right"
                 color="primary"
                 :class="$style['partyButton']"
@@ -128,6 +128,9 @@
               >
                 Select
               </v-btn>
+              <span class="auto-complete-added" v-else>
+                <v-icon :class="[$style['icon-bump'], 'auto-complete-added']">mdi-check</v-icon>Added
+              </span>
             </v-col>
           </v-row>
         </v-container>
@@ -193,6 +196,10 @@ export default defineComponent({
       type: Boolean,
       default: false
     },
+    activeIndex: {
+      type: Number,
+      default: -1
+    },
     defaultIsRegisteringParty: Boolean
   },
   setup (props, context) {
@@ -223,7 +230,7 @@ export default defineComponent({
 
     const countryProvincesHelpers = useCountriesProvinces()
 
-    const { addSecuredParty, setRegisteringParty } = useSecuredParty(props, context)
+    const { addSecuredParty, setRegisteringParty, isExistingSecuredParty } = useSecuredParty(props, context)
 
     const selectParty = (idx: number) => {
       const selectedResult = localState.results[idx]
@@ -237,7 +244,7 @@ export default defineComponent({
         newParty.action = ActionTypes.EDITED
         setRegisteringParty(newParty)
       } else {
-        addSecuredParty(newParty)
+        addSecuredParty(newParty, props.activeIndex)
       }
       context.emit('emitResetClose')
     }
@@ -247,7 +254,7 @@ export default defineComponent({
         localState.party.action = ActionTypes.EDITED
         setRegisteringParty(localState.party)
       } else {
-        addSecuredParty(localState.party)
+        addSecuredParty(localState.party, props.activeIndex)
       }
       context.emit('emitResetClose')
     }
@@ -265,6 +272,7 @@ export default defineComponent({
       createParty,
       exit,
       onHover,
+      isExistingSecuredParty,
       ...countryProvincesHelpers,
       ...toRefs(localState)
     }

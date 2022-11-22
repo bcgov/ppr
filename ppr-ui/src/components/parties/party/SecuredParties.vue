@@ -340,6 +340,7 @@
                       :activeIndex="activeIndex"
                       :invalidSection="invalidSection"
                       :setShowErrorBar="showErrorBar"
+                      :isEditMode="true"
                       @removeSecuredParty="removeParty"
                       @resetEvent="resetData"
                     />

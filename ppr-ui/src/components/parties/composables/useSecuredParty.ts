@@ -6,7 +6,7 @@ import { ActionTypes, APIRegistrationTypes, RegistrationFlowType, SecuredPartyTy
 import { checkAddress, formatAddress } from '@/composables/address/factories/address-factory'
 import { cloneDeep, isEqual } from 'lodash'
 import { useParty } from '@/composables/useParty'
-import { normalizeObject } from '@/utils/validation-helper'
+import { isObjectEqual } from '@/utils/validation-helper'
 const initPerson = { first: '', middle: '', last: '' }
 const initAddress = {
   street: '',
@@ -95,9 +95,10 @@ export const useSecuredParty = (props, context) => {
     return idx !== -1
   }
 
-  const hasMatchingSecuredParty = (addedParty: PartyIF): boolean => {
+  const hasMatchingSecuredParty = (addedParty: PartyIF, isEditMode: boolean): boolean => {
     // store state without newly added party.
     const parties = cloneDeep(getAddSecuredPartiesAndDebtors.value.securedParties)
+    if (isEditMode) parties.splice(props.activeIndex, 1)
     if (localState.partyType === SecuredPartyTypes.INDIVIDUAL) {
       return parties.some(party =>
         isObjectEqual(party.personName, addedParty.personName) &&
@@ -109,13 +110,6 @@ export const useSecuredParty = (props, context) => {
         isObjectEqual(party.address, addedParty.address)
       )
     }
-  }
-
-  const isObjectEqual = (object1: any, object2: any): boolean => {
-    const workObject1 = Object.create(object1)
-    const workObject2 = Object.create(object2)
-    const addressEqual = isEqual(normalizeObject(workObject1), normalizeObject(workObject2))
-    return addressEqual
   }
 
   const removeSecuredParty = (): void => {
@@ -164,11 +158,18 @@ export const useSecuredParty = (props, context) => {
     setAddSecuredPartiesAndDebtors(parties)
   }
 
-  const addSecuredParty = (newParty: PartyIF) => {
-    let parties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
-    let newList: PartyIF[] = parties.securedParties // eslint-disable-line
-    newParty.action = ActionTypes.ADDED
-    newList.push(newParty)
+  const addSecuredParty = (newParty: PartyIF, activeIndex: number = -1) => {
+    const parties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
+    const newList: PartyIF[] = parties.securedParties
+    if (activeIndex > -1) {
+      newParty.action = ActionTypes.ADDED
+      newList.splice(props.activeIndex, 1, newParty)
+    } else {
+      // Add
+      // eslint-disable-line
+      newParty.action = ActionTypes.ADDED
+      newList.push(newParty)
+    }
     parties.securedParties = newList
     parties.valid = isPartiesValid(parties, getRegistrationType.value.registrationTypeAPI)
     setAddSecuredPartiesAndDebtors(parties)

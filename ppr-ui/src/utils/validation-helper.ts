@@ -342,3 +342,13 @@ export function normalizeObject (convertObject: any): any {
   })
   return convertObject
 }
+
+export function isObjectEqual (object1: any, object2: any): boolean {
+  //
+  // Does an equality between 2 objects
+  //
+  const workObject1 = Object.create(object1)
+  const workObject2 = Object.create(object2)
+  const objectEqual = isEqual(normalizeObject(workObject1), normalizeObject(workObject2))
+  return objectEqual
+}
