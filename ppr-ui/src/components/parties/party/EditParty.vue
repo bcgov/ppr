@@ -7,6 +7,7 @@
       :defaultParty="currentSecuredParty"
       :defaultResults="dialogResults"
       :defaultIsRegisteringParty="isRegisteringParty"
+      :activeIndex="currentIndex"
       @emitResetClose="closeAndReset"
       @emitClose="toggleDialog = false"
     />
@@ -275,6 +276,10 @@ export default defineComponent({
     setShowErrorBar: {
       type: Boolean,
       default: false
+    },
+    isEditMode: {
+      type: Boolean,
+      default: false
     }
   },
   emits: ['addEditParty', 'resetEvent'],
@@ -346,7 +351,7 @@ export default defineComponent({
     const onSubmitForm = async () => {
       currentSecuredParty.value.address = formatAddress(currentSecuredParty.value.address)
       // check for duplicate
-      if (hasMatchingSecuredParty(currentSecuredParty.value)) {
+      if (hasMatchingSecuredParty(currentSecuredParty.value, props.isEditMode)) {
         // trigger duplicate secured party dialog
         localState.foundDuplicate = true
         showDialog()

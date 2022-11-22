@@ -4,9 +4,9 @@ import { useGetters, useActions } from 'vuex-composition-helpers'
 import { PartyAddressSchema } from '@/schemas'
 import { ActionTypes, APIRegistrationTypes, RegistrationFlowType, SecuredPartyTypes } from '@/enums'
 import { checkAddress, formatAddress } from '@/composables/address/factories/address-factory'
-import { cloneDeep, isEqual, compact } from 'lodash'
+import { cloneDeep, isEqual } from 'lodash'
 import { useParty } from '@/composables/useParty'
-
+import { isObjectEqual } from '@/utils/validation-helper'
 const initPerson = { first: '', middle: '', last: '' }
 const initAddress = {
   street: '',
@@ -95,18 +95,19 @@ export const useSecuredParty = (props, context) => {
     return idx !== -1
   }
 
-  const hasMatchingSecuredParty = (addedParty: PartyIF): boolean => {
-    // store state without newly added party
+  const hasMatchingSecuredParty = (addedParty: PartyIF, isEditMode: boolean): boolean => {
+    // store state without newly added party.
     const parties = cloneDeep(getAddSecuredPartiesAndDebtors.value.securedParties)
+    if (isEditMode) parties.splice(props.activeIndex, 1)
     if (localState.partyType === SecuredPartyTypes.INDIVIDUAL) {
       return parties.some(party =>
-        isEqual(party.personName, addedParty.personName) &&
-        isEqual(party.address, addedParty.address)
+        isObjectEqual(party.personName, addedParty.personName) &&
+        isObjectEqual(party.address, addedParty.address)
       )
     } else {
       return parties.some(party =>
-        party.businessName === addedParty.businessName &&
-        isEqual(compact(party.address), compact(addedParty.address))
+        party.businessName?.toUpperCase() === addedParty.businessName?.toUpperCase() &&
+        isObjectEqual(party.address, addedParty.address)
       )
     }
   }
@@ -157,11 +158,18 @@ export const useSecuredParty = (props, context) => {
     setAddSecuredPartiesAndDebtors(parties)
   }
 
-  const addSecuredParty = (newParty: PartyIF) => {
-    let parties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
-    let newList: PartyIF[] = parties.securedParties // eslint-disable-line
-    newParty.action = ActionTypes.ADDED
-    newList.push(newParty)
+  const addSecuredParty = (newParty: PartyIF, activeIndex: number = -1) => {
+    const parties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
+    const newList: PartyIF[] = parties.securedParties
+    if (activeIndex > -1) {
+      newParty.action = ActionTypes.ADDED
+      newList.splice(props.activeIndex, 1, newParty)
+    } else {
+      // Add
+      // eslint-disable-line
+      newParty.action = ActionTypes.ADDED
+      newList.push(newParty)
+    }
     parties.securedParties = newList
     parties.valid = isPartiesValid(parties, getRegistrationType.value.registrationTypeAPI)
     setAddSecuredPartiesAndDebtors(parties)
@@ -187,6 +195,7 @@ export const useSecuredParty = (props, context) => {
     ActionTypes,
     setRegisteringParty,
     hasMatchingSecuredParty,
+    isObjectEqual,
     ...toRefs(localState)
   }
 }

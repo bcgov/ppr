@@ -4,6 +4,7 @@ import {
   SearchTypeIF,
   SearchValidationIF
 } from '@/interfaces'
+import { cloneDeep, isEqual, omitBy, overSome, isNaN, isNil, isEmpty } from 'lodash'
 import { search } from './ppr-api-helper'
 
 // subset of the localState that includes what the validator needs
@@ -318,4 +319,36 @@ export function isSecuredPartyRestrictedList (regType: string): boolean {
     return true
   }
   return false
+}
+
+export function normalizeObject (convertObject: any): any {
+  /*
+  This function will take an simple object and normalize all string properties.
+  Future enhancement is to add the ability to normalize complex objects.
+  This can still be accomplished though by normalizing simple object within an object.. eg.. party.address
+
+  Input: Any simple object
+  Output: normalized object
+
+  Sample usage:
+
+  const normalizedObject = normalizeObjed(unNormalizedSimpleObject)
+
+  */
+  convertObject = omitBy(convertObject, overSome([isNil, isNaN, isEmpty])) // lodash function to remove empty properties
+  // this logic normalizes all string properties(values) are converted to uppercased and spaces are removed.
+  Object.entries(convertObject).forEach(([key, value]) => {
+    if (typeof value === 'string') convertObject[key] = value?.toUpperCase().replaceAll(' ', '').trim()
+  })
+  return convertObject
+}
+
+export function isObjectEqual (object1: any, object2: any): boolean {
+  //
+  // Does an equality between 2 objects
+  //
+  const workObject1 = Object.create(object1)
+  const workObject2 = Object.create(object2)
+  const objectEqual = isEqual(normalizeObject(workObject1), normalizeObject(workObject2))
+  return objectEqual
 }
