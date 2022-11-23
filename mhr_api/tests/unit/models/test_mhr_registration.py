@@ -32,11 +32,12 @@ from mhr_api.services.authz import MANUFACTURER_GROUP, QUALIFIED_USER_GROUP, GOV
 
 
 REG_DESCRIPTION = 'REGISTER NEW UNIT'
+CONV_DESCRIPTION = '** CONVERTED **'
 # testdata pattern is ({account_id}, {mhr_num}, {exists}, {reg_description}, {in_list})
 TEST_SUMMARY_REG_DATA = [
-    ('PS12345', '077741', True, REG_DESCRIPTION, False),
+    ('PS12345', '077741', True, CONV_DESCRIPTION, False),
     ('PS12345', 'TESTXX', False, None, False),
-    ('PS12345', '045349', True, REG_DESCRIPTION, True),
+    ('PS12345', '045349', True, CONV_DESCRIPTION, True),
     ('2523', '150062', True, REG_DESCRIPTION, True)
 ]
 # testdata pattern is ({account_id}, {has_results})

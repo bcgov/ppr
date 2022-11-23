@@ -130,10 +130,10 @@ REGISTRATION_PATH = '/mhr/api/v1/registrations/'
 DOCUMENT_PATH = '/mhr/api/v1/documents/'
 
 
-def find_by_id(registration_id: int):
+def find_by_id(registration_id: int, search: bool = False):
     """Return the legacy registration matching the id."""
     if registration_id:
-        return Db2Manuhome.find_by_id(registration_id)
+        return Db2Manuhome.find_by_id(registration_id, search)
     return None
 
 

@@ -158,6 +158,8 @@ class Db2Owner(db.Model):
             owner['individualName'] = model_utils.get_ind_name_from_db2(self.name)
         else:
             owner['organizationName'] = self.name
+        if self.phone_number:
+            owner['phoneNumber'] = self.phone_number
         owner['address'] = model_utils.get_address_from_db2(self.legacy_address, self.postal_code)
         owner['type'] = self.type
         if self.status == '3':

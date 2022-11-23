@@ -267,13 +267,13 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                             one_or_none()
 
     @classmethod
-    def find_by_id(cls, registration_id: int, legacy: bool = False):
+    def find_by_id(cls, registration_id: int, legacy: bool = False, search: bool = False):
         """Return the registration matching the id."""
         registration = None
         if registration_id:
             if legacy:
                 registration = MhrRegistration()
-                registration.manuhome = legacy_utils.find_by_id(registration_id)
+                registration.manuhome = legacy_utils.find_by_id(registration_id, search)
             else:
                 registration = cls.query.get(registration_id)
         return registration

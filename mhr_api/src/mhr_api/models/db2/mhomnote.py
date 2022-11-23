@@ -139,6 +139,8 @@ class Db2Mhomnote(db.Model):
                                       Db2Document.DocumentTypes.NON_RES_EXEMPTION):
             note['contactName'] = self.name
             note['contactAddress'] = model_utils.get_address_from_db2(self.legacy_address, '')
+            if self.phone_number:
+                note['contactPhoneNumber'] = self.phone_number
         return note
 
     @property
@@ -151,6 +153,8 @@ class Db2Mhomnote(db.Model):
             'contactName': self.name,
             'contactAddress': model_utils.get_address_from_db2(self.legacy_address, '')
         }
+        if self.phone_number:
+            note['contactPhoneNumber'] = self.phone_number
         if self.expiry_date and self.expiry_date.isoformat() != '0001-01-01':
             note['expiryDate'] = model_utils.format_local_date(self.expiry_date)
         if self.document and self.document.registration_ts:
@@ -204,6 +208,8 @@ class Db2Mhomnote(db.Model):
             note.name = str(json_data.get('contactName'))[0: 40]
         if json_data.get('contactAddress'):
             note.legacy_address = model_utils.to_db2_address(json_data.get('contactAddress'))
+        if json_data.get('contactPhoneNumber'):
+            note.phone_number = str(json_data.get('contactPhoneNumber'))[0: 10]
         if json_data.get('status'):
             note.status = json_data.get('status')
         if json_data.get('destroyed'):
