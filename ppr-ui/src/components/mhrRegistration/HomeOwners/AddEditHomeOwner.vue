@@ -78,40 +78,34 @@
             </v-row>
             <v-row>
               <v-col>
-                <v-autocomplete
-                  id="org-name"
-                  append-icon=""
+                <v-text-field
                   filled
-                  :loading="loading === true"
-                  :items="selectedBusiness || searchInput ? businessSearchResults : []"
-                  item-text="name"
-                  item-value="identifier"
-                  :search-input.sync="searchInput"
+                  id="org-name"
+                  ref="orgNameSearchField"
                   label="Full Legal Name of Business or Organization"
-                  :menu-props="{ maxHeight: '325px', disableKeys: false }"
-                  v-model="selectedBusiness"
-                  return-object
-                  no-filter
-                  no-data-text="Ensure you have entered the correct, full legal name of the organization before entering the phone number and mailing address."
-                  class="mb-5"
-                  :class="{ 'hide-results': hideResults }"
-                  :hide-no-data="loading === true"
-                  tab-index="10"
-                  >
-                  <template v-slot:selection="{ item }">
-                    <span v-text="item.name"></span>
+                  v-model="searchValue"
+                  persistent-hint
+                >
+                  <template v-slot:append>
+                    <v-progress-circular
+                      v-if="loadingSearchResults"
+                      indeterminate
+                      color="primary"
+                      class="mx-3"
+                      :size="25"
+                      :width="3"
+                    />
                   </template>
-                  <template v-slot:item="{ item }">
-                    <template>
-                      <v-list-item-content :tabindex="businessSearchResults.indexOf(item)+10">
-                        <v-row class="auto-complete-row" :class="{ 'disabled': isSPGP(item.legalType) }">
-                          <v-col cols="3">{{ item.identifier }}</v-col>
-                          <v-col cols="8">{{ item.name }}</v-col>
-                        </v-row>
-                      </v-list-item-content>
-                    </template>
-                  </template>
-                </v-autocomplete>
+                </v-text-field>
+
+                <BusinessSearchAutocomplete
+                  :searchValue="autoCompleteSearchValue"
+                  :setAutoCompleteIsActive="autoCompleteIsActive"
+                  v-click-outside="setCloseAutoComplete"
+                  @search-value="setSearchValue"
+                  @searching="loadingSearchResults = $event"
+                  :showDropdown="$refs.orgNameSearchField && $refs.orgNameSearchField.isFocused"
+                />
               </v-col>
             </v-row>
           </div>
@@ -263,14 +257,12 @@ import {
   MhrRegistrationHomeOwnerGroupIF,
   MhrRegistrationHomeOwnerIF
 } from '@/interfaces/mhr-registration-interfaces'
-import { SearchResponseI, SearchResultI } from '@/interfaces'
 /* eslint-enable no-unused-vars */
-import { useSearch } from '@/composables/useSearch'
 import { SimpleHelpToggle } from '@/components/common'
 import HomeOwnerGroups from './HomeOwnerGroups.vue'
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import { find } from 'lodash'
-import { BusinessTypes } from '@/enums'
+import { BusinessSearchAutocomplete } from '@/components/mhrTransfers'
 
 interface FractionalOwnershipWithGroupIdIF extends MhrRegistrationFractionalOwnershipIF {
   groupId: number
@@ -285,7 +277,8 @@ export default defineComponent({
     AutoComplete,
     BaseAddress,
     SimpleHelpToggle,
-    HomeOwnerGroups
+    HomeOwnerGroups,
+    BusinessSearchAutocomplete
   },
   directives: {
     mask: VueMaskDirective
@@ -330,8 +323,6 @@ export default defineComponent({
 
     const addressSchema = PartyAddressSchema
     const addHomeOwnerForm = ref(null)
-
-    const { searchBusiness } = useSearch()
 
     const getTransferOrRegistrationHomeOwnerGroups = () =>
       props.isMhrTransfer ? getMhrTransferHomeOwnerGroups.value : getMhrRegistrationHomeOwnerGroups.value
@@ -389,11 +380,6 @@ export default defineComponent({
     }
 
     const localState = reactive({
-      loading: false,
-      businessSearchResults: [] as SearchResultI[],
-      searchInput: props.editHomeOwner?.organizationName || null as string,
-      selectedBusiness: null,
-      hideResults: false,
       getSidebarTitle: computed((): string => {
         if (props.isHomeOwnerPerson) {
           return props.editHomeOwner == null ? 'Add a Person' : 'Edit Person'
@@ -427,7 +413,11 @@ export default defineComponent({
         isNumber(null, null, null, 'Enter numbers only'),
         invalidSpaces(),
         maxLength(5, true)
-      )
+      ),
+      loadingSearchResults: false,
+      autoCompleteIsActive: true,
+      autoCompleteSearchValue: '',
+      searchValue: props.editHomeOwner?.organizationName
     })
 
     const done = (): void => {
@@ -483,45 +473,6 @@ export default defineComponent({
       context.emit('cancel')
     }
 
-    // Future State business lookup?
-    watch(
-      () => localState.searchInput,
-      async (val: string) => {
-        console.log(val)
-        console.log(props.editHomeOwner?.organizationName)
-        if (val?.length >= 3) {
-          localState.loading = true
-          const result: SearchResponseI = await searchBusiness(val)
-          if (!result.error) {
-            console.log(result.searchResults)
-            localState.businessSearchResults = result.searchResults.results
-          } else {
-            console.log(result.error)
-          }
-
-          if (result.searchResults.results.length === 0) {
-            // localState.businessSearchResults.push({
-            //   bn: '',
-            //   identifier: '',
-            //   legalType: '',
-            //   name: localState.searchInput,
-            //   score: 309,
-            //   status: 'ACTIVE'
-            // })
-            // localState.businessSearchResults = []
-            localState.hideResults = true
-          }
-        }
-        localState.loading = false
-      }
-    )
-    watch(
-      () => localState.selectedBusiness,
-      (val: SearchResultI) => {
-        localState.owner.organizationName = val.name
-      }
-    )
-
     /** Handle Phone changes and write to store. **/
     watch(
       () => localState.displayPhone,
@@ -530,13 +481,30 @@ export default defineComponent({
       }
     )
 
-    const selectResult = (selection: SearchResultI) => {
-      localState.selectedBusiness = selection
+    const setSearchValue = (searchValueTyped: string) => {
+      localState.autoCompleteIsActive = false
+      localState.searchValue = searchValueTyped
+      localState.owner.organizationName = searchValueTyped
     }
 
-    const isSPGP = (businessType: string) => {
-      return businessType === BusinessTypes.GENERAL_PARTNERSHIP || BusinessTypes.SOLE_PROPRIETOR
+    const setCloseAutoComplete = () => {
+      localState.autoCompleteIsActive = false
     }
+
+    watch(
+      () => localState.searchValue,
+      (val: string) => {
+        if (val?.length >= 3) {
+          localState.autoCompleteSearchValue = val
+          // show autocomplete results when there is a searchValue
+          localState.autoCompleteIsActive = val !== ''
+        } else {
+          localState.autoCompleteSearchValue = val
+          localState.autoCompleteIsActive = false
+        }
+        localState.owner.organizationName = val
+      }
+    )
 
     return {
       done,
@@ -546,8 +514,8 @@ export default defineComponent({
       maxLength,
       minLength,
       addressSchema,
-      selectResult,
-      isSPGP,
+      setSearchValue,
+      setCloseAutoComplete,
       ...toRefs(localState)
     }
   }
