@@ -9,6 +9,7 @@
               :key="i"
               class="pt-0 pb-0 pl-3 auto-complete-item"
               :class="{ disabled: isSPGP(result.legalType) }"
+              :disabled="isSPGP(result.legalType)"
             >
               <v-list-item-content class="px-3">
                 <v-list-item-subtitle>
