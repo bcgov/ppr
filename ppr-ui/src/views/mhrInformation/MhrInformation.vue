@@ -408,6 +408,13 @@ export default defineComponent({
           setUnsavedChanges(false)
           // Delete the draft on successful submission
           if (getMhrInformation.value.draftNumber) await deleteMhrDraft(getMhrInformation.value.draftNumber)
+          const newItem: RegTableNewItemI = {
+            addedReg: String(getMhrInformation.value.mhrNumber),
+            addedRegParent: '',
+            addedRegSummary: null,
+            prevDraft: String(getMhrInformation.value.changes[0].documentId) || ''
+          }
+          setRegTableNewItem(newItem)
           goToDash()
         } else console.log(mhrTransferFiling?.error) // Handle Schema or Api errors here.
       }
