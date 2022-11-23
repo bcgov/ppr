@@ -134,7 +134,7 @@ class Db2Manuhome(db.Model):
             raise DatabaseException(db_exception)
 
     @classmethod
-    def find_by_id(cls, id: int):
+    def find_by_id(cls, id: int, search: bool = False):
         """Return the mh matching the id."""
         manuhome = None
         if id and id > 0:
@@ -146,11 +146,14 @@ class Db2Manuhome(db.Model):
                 raise DatabaseException(db_exception)
         if manuhome:
             current_app.logger.debug('Db2Manuhome.find_by_id Db2Document query.')
-            documents = []
-            doc = Db2Document.find_by_id(manuhome.reg_document_id)
-            if doc:
-                documents.append(doc)
-            manuhome.reg_documents = documents
+            if not search:
+                documents = []
+                doc = Db2Document.find_by_id(manuhome.reg_document_id)
+                if doc:
+                    documents.append(doc)
+                manuhome.reg_documents = documents
+            else:
+                manuhome.reg_documents = Db2Document.find_by_mhr_number(manuhome.mhr_number)
             current_app.logger.debug('Db2Manuhome.find_by_id Db2Owngroup query.')
             manuhome.reg_owner_groups = Db2Owngroup.find_all_by_manuhome_id(manuhome.id)
             # manuhome.reg_owners = Db2Owner.find_by_manuhome_id_registration(manuhome.id)

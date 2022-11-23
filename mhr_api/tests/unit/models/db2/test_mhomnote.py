@@ -116,6 +116,7 @@ def test_note_json(session):
         'remarks': note.remarks,
         'destroyed': False,
         'contactName': note.name,
-        'contactAddress': model_utils.get_address_from_db2(note.legacy_address, '')
+        'contactAddress': model_utils.get_address_from_db2(note.legacy_address, ''),
+        'contactPhoneNumber': note.phone_number
     }
     assert note.json == test_json

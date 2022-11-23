@@ -392,6 +392,9 @@ class Report:  # pylint: disable=too-few-public-methods
                             note['expiryDate'] = ''
                         elif note.get('expiryDate'):
                             note['expiryDate'] = Report._to_report_datetime(note['expiryDate'], False)
+                        if note.get('contactPhoneNumber'):
+                            phone = note.get('contactPhoneNumber')
+                            note['contactPhoneNumber'] = phone[0:3] + '-' + phone[3:6] + '-' + phone[6:]
 
     def _set_addresses(self):
         """Replace address country code with description."""

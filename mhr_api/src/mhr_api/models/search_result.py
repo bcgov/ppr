@@ -142,7 +142,7 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
                     # Load registration details here.
                     mh_id = select.get('mhId', None)
                     current_app.logger.debug(f'find_by_id for mhr num {mhr_num} start id={mh_id}')
-                    record = MhrRegistration.find_by_id(mh_id, use_legacy_db)
+                    record = MhrRegistration.find_by_id(mh_id, use_legacy_db, True)
                     current_app.logger.debug(f'find_by_id for mhr num {mhr_num} end')
                     result = record.registration_json
                     if select.get('includeLienInfo', False):

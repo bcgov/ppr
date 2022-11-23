@@ -794,6 +794,8 @@ def to_db2_address(address_json):
 
 def get_address_from_db2(legacy_address: str, postal_code: str = ''):
     """Get an address json from a DB2 legacy address."""
+    if not legacy_address or legacy_address.strip() == '':
+        return {}
     if len(legacy_address) == 160:
         return get_new_address_from_db2(legacy_address, postal_code)
     if len(legacy_address) > 120:
@@ -823,12 +825,12 @@ def get_address_from_db2(legacy_address: str, postal_code: str = ''):
                 break
         city = city.strip()
     if not province:
-        province = 'BC'
+        province = PROVINCE_BC
     address = {
         'city': city,
         'street': street,
         'region': province,
-        'country': 'CA',
+        'country': COUNTRY_CA,
         'postalCode': postal_code
     }
     if street2:
@@ -866,12 +868,12 @@ def get_long_address_from_db2(legacy_address: str, postal_code: str = ''):
             street2 = legacy_address[39:78].strip()
         # current_app.logger.debug(f'4. street2={street2}, city={city}')
     if not province:
-        province = 'BC'
+        province = PROVINCE_BC
     address = {
         'city': city,
         'street': street,
         'region': province,
-        'country': 'CA',
+        'country': COUNTRY_CA,
         'postalCode': postal_code
     }
     if street2:
