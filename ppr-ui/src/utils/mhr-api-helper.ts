@@ -216,6 +216,7 @@ export async function addMHRegistrationSummary (registrationNum: string): Promis
 export async function submitSelectedMhr (
   searchId: string,
   selected: Array<ManufacturedHomeSearchResultIF>,
+  folioOrReferenceNumber: string = null,
   staffPayment: StaffPaymentIF = null,
   isCertified: boolean = false
 ): Promise<number> {
@@ -244,6 +245,11 @@ export async function submitSelectedMhr (
       extraParams += '&'
     }
     extraParams += 'callbackURL=PPR_UI'
+  }
+
+  if (folioOrReferenceNumber) {
+    extraParams += extraParams ? '&' : '?'
+    extraParams += 'clientReferenceId=' + folioOrReferenceNumber
   }
 
   return axios

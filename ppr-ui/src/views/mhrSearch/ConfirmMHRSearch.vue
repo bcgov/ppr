@@ -144,6 +144,7 @@ export default class ConfirmMHRSearch extends Vue {
   @Getter getStaffPayment!: StaffPaymentIF
   @Getter getManufacturedHomeSearchResults!: ManufacturedHomeSearchResponseIF
   @Getter getSelectedManufacturedHomes!: ManufacturedHomeSearchResultIF[]
+  @Getter getFolioOrReferenceNumber!: string
 
   @Action setUnsavedChanges: ActionBindingIF
   @Action setStaffPayment!: ActionBindingIF
@@ -251,13 +252,15 @@ export default class ConfirmMHRSearch extends Vue {
       apiResponse = await submitSelectedMhr(
         this.getManufacturedHomeSearchResults.searchId,
         this.getSelectedManufacturedHomes,
+        this.getFolioOrReferenceNumber,
         this.getStaffPayment,
         this.isSearchCertified
       )
     } else {
       apiResponse = await submitSelectedMhr(
         this.getManufacturedHomeSearchResults.searchId,
-        this.getSelectedManufacturedHomes
+        this.getSelectedManufacturedHomes,
+        this.getFolioOrReferenceNumber
       )
     }
     this.submitting = false
