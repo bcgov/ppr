@@ -154,8 +154,11 @@
           v-show="showTotalOwnership"
           cols="12"
         >
-          <span class="generic-label">Total Ownership Allocated:</span> {{ ownershipAllocation.totalAllocation }}
-          <span v-show="ownershipAllocation.hasTotalAllocationError" class="error-text fs-14 ml-3">
+          <span class="generic-label">Total Ownership Allocated:</span> {{ ownershipTotalAllocation }}
+          <span v-if="hasUndefinedGroups" class="error-text fs-14 ml-3">
+            No ownership allocated
+          </span>
+          <span v-else-if="ownershipAllocation.hasTotalAllocationError" class="error-text fs-14 ml-3">
             Total ownership must equal 1/1
           </span>
           <span
@@ -250,7 +253,7 @@ import { computed, defineComponent, onBeforeMount, reactive, toRefs, watch } fro
 import { useHomeOwners } from '@/composables/mhrRegistration'
 /* eslint-disable no-unused-vars */
 import { MhrRegistrationTotalOwnershipAllocationIF } from '@/interfaces'
-import { ActionTypes, HomeTenancyTypes } from '@/enums'
+import { ActionTypes } from '@/enums'
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
@@ -293,7 +296,8 @@ export default defineComponent({
       getTransferOrRegistrationHomeOwners,
       getTransferOrRegistrationHomeOwnerGroups,
       markGroupForRemoval,
-      hasRemovedAllHomeOwners
+      hasRemovedAllHomeOwners,
+      hasUndefinedGroupInterest
     } = useHomeOwners(props.isMhrTransfer)
 
     const localState = reactive({
@@ -306,9 +310,12 @@ export default defineComponent({
       disableAddHomeOwnerBtn: computed(
         () => localState.showAddPersonOrganizationSection || localState.showAddPersonSection
       ),
-      ownershipAllocation: computed(
-        () => getTotalOwnershipAllocationStatus() as MhrRegistrationTotalOwnershipAllocationIF
-      ),
+      ownershipAllocation: computed((): MhrRegistrationTotalOwnershipAllocationIF => {
+        return getTotalOwnershipAllocationStatus()
+      }),
+      ownershipTotalAllocation: computed((): string => {
+        return localState.hasUndefinedGroups ? 'N/A' : localState.ownershipAllocation.totalAllocation
+      }),
       showTotalOwnership: computed(() => {
         return showGroups.value &&
           (!localState.hasRemovedAllOwners || localState.hasMultipleAddedGroups || localState.hasSingleInvalidGroup)
@@ -335,6 +342,11 @@ export default defineComponent({
           (!showGroups || localState.hasRemovedAllOwners) &&
           !localState.hasMultipleAddedGroups &&
           !localState.hasSingleInvalidGroup
+      }),
+      hasUndefinedGroups: computed((): boolean => {
+        return hasUndefinedGroupInterest(getTransferOrRegistrationHomeOwnerGroups()) &&
+          getTransferOrRegistrationHomeOwnerGroups().filter(group =>
+            group.action !== ActionTypes.REMOVED && !!group.interestNumerator && !!group.interestNumerator).length === 0
       })
     })
 

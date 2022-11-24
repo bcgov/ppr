@@ -14,7 +14,7 @@
     >
       <template
         v-slot:header
-        v-if="isMhrTransfer && hasRemovedAllHomeOwners(homeOwners) && addedOwnerCount === 0 && !hideRemovedOwners"
+        v-if="isMhrTransfer && !hasActualOwners(homeOwners) && homeOwners.length > 0"
       >
         <tr class="fs-14 text-center no-owners-head-row" data-test-id="no-data-msg">
           <td class="pa-6" :colspan="homeOwnersTableHeaders.length">
@@ -187,6 +187,7 @@
             </template>
           </td>
         </tr>
+        <!-- For MHR scenarios where users can entirely remove added owners -->
         <tr v-else-if="!hideRemovedOwners">
           <td :colspan="4" class="py-1">
             <div
@@ -194,22 +195,22 @@
               class="error-text my-6 text-center"
               :data-test-id="`no-owners-msg-group-${homeOwners.indexOf(row.item)}`"
             >
-              Group must contain at least one owner
+              Group must contain at least one owner.
             </div>
             <div v-else class="my-6 text-center" data-test-id="no-owners-mgs">
-              No owners added yet
+              No owners added yet.
             </div>
           </td>
         </tr>
 
-        <!-- Display error for groups that removed all owners -->
-        <tr v-if="isGroupWithNoOwners(row.item.groupId)">
+        <!-- Transfer scenario: Display error for groups that 'removed' all owners but they still exist in the table -->
+        <tr v-if="isGroupWithNoOwners(row.item)">
           <td :colspan="4" class="py-1">
             <div
               class="error-text my-6 text-center"
               :data-test-id="`no-owners-msg-group-${homeOwners.indexOf(row.item)}`"
             >
-              Group must contain at least one owner
+              Group must contain at least one owner.
             </div>
           </td>
         </tr>
@@ -267,9 +268,11 @@ export default defineComponent({
       hasMinimumGroups,
       editHomeOwner,
       getGroupForOwner,
+      getGroupById,
       undoGroupRemoval,
       getHomeTenancyType,
       hasRemovedAllHomeOwners,
+      hasUndefinedGroupInterest,
       getTotalOwnershipAllocationStatus,
       getTransferOrRegistrationHomeOwners,
       getTransferOrRegistrationHomeOwnerGroups
@@ -292,7 +295,8 @@ export default defineComponent({
               !hasMinimumGroups() ||
               hasEmptyGroup.value ||
               !localState.isValidAllocation ||
-              localState.hasGroupsWithNoOwners
+              localState.hasGroupsWithNoOwners ||
+              (!localState.isUngroupedTenancy && hasUndefinedGroupInterest(getTransferOrRegistrationHomeOwnerGroups()))
             )
       }),
       reviewedOwners: computed((): boolean =>
@@ -310,8 +314,10 @@ export default defineComponent({
         return groups.some(group => group.owners.filter(owner => owner.action !== ActionTypes.REMOVED).length === 0)
       }),
       isValidAllocation: computed((): boolean => {
-        return [HomeTenancyTypes.SOLE, HomeTenancyTypes.JOINT].includes(getHomeTenancyType()) ||
-        !getTotalOwnershipAllocationStatus().hasTotalAllocationError
+        return localState.isUngroupedTenancy || !getTotalOwnershipAllocationStatus().hasTotalAllocationError
+      }),
+      isUngroupedTenancy: computed((): boolean => {
+        return [HomeTenancyTypes.SOLE, HomeTenancyTypes.JOINT].includes(getHomeTenancyType())
       })
     })
 
@@ -355,7 +361,8 @@ export default defineComponent({
     // check for at least one owner with an id
     // This util function will help to show Owners: 0 in the table header
     const hasActualOwners = (owners: MhrRegistrationHomeOwnerIF[]): boolean => {
-      return owners.length > 0 && owners[0]?.ownerId !== undefined
+      const activeOwners = owners.filter(owner => owner.action !== ActionTypes.REMOVED)
+      return activeOwners.length > 0 && activeOwners.some(owner => owner.ownerId !== undefined)
     }
 
     const isAddedHomeOwner = (item: MhrRegistrationHomeOwnerIF): boolean => {
@@ -363,8 +370,7 @@ export default defineComponent({
     }
 
     const isAddedHomeOwnerGroup = (groupId: number): boolean => {
-      return getTransferOrRegistrationHomeOwnerGroups()
-        .find(group => group.groupId === groupId)?.action === ActionTypes.ADDED
+      return getGroupById(groupId)?.action === ActionTypes.ADDED
     }
 
     const isRemovedHomeOwner = (item: MhrRegistrationHomeOwnerIF): boolean => {
@@ -372,7 +378,7 @@ export default defineComponent({
     }
 
     const hasNoGroupInterest = (groupId: number): boolean => {
-      const group = getTransferOrRegistrationHomeOwnerGroups().find(group => group.groupId === groupId)
+      const group = getGroupById(groupId)
       return !group.interestNumerator && !group.interestDenominator
     }
 
@@ -383,10 +389,13 @@ export default defineComponent({
         localState.addedGroupCount <= 1
     }
 
-    const isGroupWithNoOwners = (groupId: number): boolean => {
-      const group = getTransferOrRegistrationHomeOwnerGroups().find(group => group.groupId === groupId)
-      return group.action !== ActionTypes.REMOVED && group.interestNumerator && group.interestDenominator &&
-        group.owners.filter(owner => owner.action !== ActionTypes.REMOVED).length === 0
+    const isGroupWithNoOwners = (owner: MhrRegistrationHomeOwnerIF): boolean => {
+      const group = getGroupById(owner.groupId)
+      const hasNoOwners = group.action !== ActionTypes.REMOVED && group.interestNumerator &&
+        group.interestDenominator && group.owners.filter(owner => owner.action !== ActionTypes.REMOVED).length === 0
+      const isLastOwnerInGroup = (group.owners.length - 1) === group.owners.findIndex(i => i.ownerId === owner.ownerId)
+
+      return hasNoOwners && isLastOwnerInGroup
     }
 
     watch(() => localState.currentlyEditingHomeOwnerId, () => {
@@ -394,8 +403,8 @@ export default defineComponent({
     })
 
     // When a change is made to homeOwners, check if any actions have changed, if so set flag
-    watch(() => props.homeOwners, () => {
-      setUnsavedChanges(props.homeOwners.some(owner => !!owner.action))
+    watch(() => props.homeOwners, (val) => {
+      setUnsavedChanges(val.some(owner => !!owner.action || !owner.ownerId))
 
       context.emit('isValidTransferOwners',
         hasMinimumGroups() &&

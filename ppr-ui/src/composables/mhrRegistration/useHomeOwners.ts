@@ -7,7 +7,7 @@ import {
 } from '@/interfaces'
 import '@/utils/use-composition-api'
 
-import { readonly, ref, toRefs, watch } from '@vue/composition-api'
+import { isRaw, readonly, ref, toRefs, watch } from '@vue/composition-api'
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import { ActionTypes, HomeTenancyTypes } from '@/enums'
 import { MhrCompVal, MhrSectVal } from '@/composables/mhrRegistration/enums'
@@ -52,6 +52,9 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
 
   const getTransferOrRegistrationHomeOwnerGroups = (): MhrRegistrationHomeOwnerGroupIF[] =>
     isMhrTransfer ? getMhrTransferHomeOwnerGroups.value : getMhrRegistrationHomeOwnerGroups.value
+
+  const getGroupById = (groupId: number): MhrRegistrationHomeOwnerGroupIF =>
+    getTransferOrRegistrationHomeOwnerGroups().find(group => group.groupId === groupId)
 
   const setTransferOrRegistrationHomeOwnerGroups = (homeOwnerGroups: MhrRegistrationHomeOwnerGroupIF[]) =>
     isMhrTransfer ? setMhrTransferHomeOwnerGroups(homeOwnerGroups) : setMhrRegistrationHomeOwnerGroups(homeOwnerGroups)
@@ -118,7 +121,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
 
     // Sum up all 'interestNumerator' values in different Home Owner groups with a help of sumBy() function from lodash
     const totalFractionalNominator = sumBy(groups, 'interestNumerator')
-    const fractionalDenominator = groups[0]?.interestDenominator || null
+    const fractionalDenominator = groups.find(group => !!group.interestDenominator)?.interestDenominator || null
 
     return {
       totalAllocation: totalFractionalNominator + '/' + fractionalDenominator,
@@ -306,24 +309,49 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
     setMhrTransferHomeOwnerGroups(homeOwners)
   }
 
-  const undoGroupRemoval = (groupId: number = null): void => {
-    const homeOwners = getMhrTransferHomeOwnerGroups.value.reduce((homeOwners, group) => {
+  const undoGroupRemoval = (groupId: number = null, undoAllOwners: boolean = false): void => {
+    let homeOwnerGroups = getMhrTransferHomeOwnerGroups.value
+    // Set flag when there is undefined group interests
+    const hasUndefinedGroups = hasUndefinedGroupInterest(homeOwnerGroups)
+
+    homeOwnerGroups = homeOwnerGroups.reduce((homeOwners, group) => {
       if (group.groupId === groupId) {
+        if (undoAllOwners) {
+          const owners = group.owners.map(owner => { return { ...owner, action: null } })
+          group = { ...group, owners: owners }
+        }
+
+        // Reset interest values when undefined groups exist and group removals are undone
+        if (hasUndefinedGroups) {
+          group = {
+            ...group,
+            interest: '',
+            interestNumerator: null,
+            interestDenominator: null,
+            tenancySpecified: false
+          }
+        }
+
         const unmarkedGroup = {
           ...group,
           action: null
         }
+
         homeOwners.push(unmarkedGroup)
       } else homeOwners.push(group)
 
       return homeOwners
     }, [])
 
-    setMhrTransferHomeOwnerGroups(homeOwners)
+    setMhrTransferHomeOwnerGroups(homeOwnerGroups)
   }
 
   const hasRemovedAllHomeOwners = (homeOwners: MhrHomeOwnerGroupIF[]): boolean => {
     return homeOwners.every(group => group.action === ActionTypes.REMOVED || group.action === ActionTypes.ADDED)
+  }
+
+  const hasUndefinedGroupInterest = (homeOwnerGroups: MhrHomeOwnerGroupIF[]): boolean => {
+    return homeOwnerGroups.some(group => !group.interestNumerator || !group.interestDenominator)
   }
 
   const setGroupFractionalInterest = (groupId: number, fractionalData: MhrRegistrationFractionalOwnershipIF): void => {
@@ -346,7 +374,9 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
     } else {
       const groupToUpdate = find(homeOwnerGroups, { groupId: groupId }) as MhrRegistrationHomeOwnerGroupIF
       Object.assign(groupToUpdate, { ...fractionalData })
-      setTransferOrRegistrationHomeOwnerGroups(homeOwnerGroups)
+      const updatedOwnerGroups = [...homeOwnerGroups]
+
+      setTransferOrRegistrationHomeOwnerGroups(updatedOwnerGroups)
     }
   }
 
@@ -441,6 +471,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
     removeOwner,
     getGroupDropdownItems,
     getGroupForOwner,
+    getGroupById,
     setShowGroups,
     setGlobalEditingMode,
     deleteGroup,
@@ -451,6 +482,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
     getTransferOrRegistrationHomeOwnerGroups,
     markGroupForRemoval,
     undoGroupRemoval,
-    hasRemovedAllHomeOwners
+    hasRemovedAllHomeOwners,
+    hasUndefinedGroupInterest
   }
 }
