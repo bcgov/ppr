@@ -81,19 +81,31 @@
                 <v-text-field
                   filled
                   id="org-name"
+                  ref="orgNameSearchField"
                   label="Full Legal Name of Business or Organization"
-                  v-model="owner.organizationName"
-                  :rules="orgNameRules"
-                />
-                <!--
-                  TODO: Finish this auto-complete
-                  <auto-complete
+                  v-model="searchValue"
+                  persistent-hint
+                >
+                  <template v-slot:append>
+                    <v-progress-circular
+                      v-if="loadingSearchResults"
+                      indeterminate
+                      color="primary"
+                      class="mx-3"
+                      :size="25"
+                      :width="3"
+                    />
+                  </template>
+                </v-text-field>
+
+                <BusinessSearchAutocomplete
                   :searchValue="autoCompleteSearchValue"
                   :setAutoCompleteIsActive="autoCompleteIsActive"
                   v-click-outside="setCloseAutoComplete"
                   @search-value="setSearchValue"
-                >
-                </auto-complete> -->
+                  @searching="loadingSearchResults = $event"
+                  :showDropdown="$refs.orgNameSearchField && $refs.orgNameSearchField.isFocused"
+                />
               </v-col>
             </v-row>
           </div>
@@ -245,13 +257,12 @@ import {
   MhrRegistrationHomeOwnerGroupIF,
   MhrRegistrationHomeOwnerIF
 } from '@/interfaces/mhr-registration-interfaces'
-import { SearchResponseI } from '@/interfaces'
 /* eslint-enable no-unused-vars */
-import { useSearch } from '@/composables/useSearch'
 import { SimpleHelpToggle } from '@/components/common'
 import HomeOwnerGroups from './HomeOwnerGroups.vue'
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import { find } from 'lodash'
+import { BusinessSearchAutocomplete } from '@/components/mhrTransfers'
 
 interface FractionalOwnershipWithGroupIdIF extends MhrRegistrationFractionalOwnershipIF {
   groupId: number
@@ -266,7 +277,8 @@ export default defineComponent({
     AutoComplete,
     BaseAddress,
     SimpleHelpToggle,
-    HomeOwnerGroups
+    HomeOwnerGroups,
+    BusinessSearchAutocomplete
   },
   directives: {
     mask: VueMaskDirective
@@ -311,8 +323,6 @@ export default defineComponent({
 
     const addressSchema = PartyAddressSchema
     const addHomeOwnerForm = ref(null)
-
-    const { searchBusiness } = useSearch()
 
     const getTransferOrRegistrationHomeOwnerGroups = () =>
       props.isMhrTransfer ? getMhrTransferHomeOwnerGroups.value : getMhrRegistrationHomeOwnerGroups.value
@@ -403,7 +413,11 @@ export default defineComponent({
         isNumber(null, null, null, 'Enter numbers only'),
         invalidSpaces(),
         maxLength(5, true)
-      )
+      ),
+      loadingSearchResults: false,
+      autoCompleteIsActive: true,
+      autoCompleteSearchValue: '',
+      searchValue: props.editHomeOwner?.organizationName
     })
 
     const done = (): void => {
@@ -459,26 +473,36 @@ export default defineComponent({
       context.emit('cancel')
     }
 
-    // Future State business lookup?
-    watch(
-      () => localState.owner.organizationName,
-      async (val: string) => {
-        if (val.length >= 3) {
-          const result: SearchResponseI = await searchBusiness(val)
-          if (!result.error) {
-            console.log(result.searchResults)
-          } else {
-            console.log(result.error)
-          }
-        }
-      }
-    )
-
     /** Handle Phone changes and write to store. **/
     watch(
       () => localState.displayPhone,
       () => {
         localState.owner.phoneNumber = fromDisplayPhone(localState.displayPhone)
+      }
+    )
+
+    const setSearchValue = (searchValueTyped: string) => {
+      localState.autoCompleteIsActive = false
+      localState.searchValue = searchValueTyped
+      localState.owner.organizationName = searchValueTyped
+    }
+
+    const setCloseAutoComplete = () => {
+      localState.autoCompleteIsActive = false
+    }
+
+    watch(
+      () => localState.searchValue,
+      (val: string) => {
+        if (val?.length >= 3) {
+          localState.autoCompleteSearchValue = val
+          // show autocomplete results when there is a searchValue
+          localState.autoCompleteIsActive = val !== ''
+        } else {
+          localState.autoCompleteSearchValue = val
+          localState.autoCompleteIsActive = false
+        }
+        localState.owner.organizationName = val
       }
     )
 
@@ -490,6 +514,8 @@ export default defineComponent({
       maxLength,
       minLength,
       addressSchema,
+      setSearchValue,
+      setCloseAutoComplete,
       ...toRefs(localState)
     }
   }
@@ -503,6 +529,12 @@ export default defineComponent({
   p {
     color: $gray7;
     line-height: 24px;
+  }
+}
+
+#org-name ::v-deep .hide-results {
+  .v-autocomplete__content.v-menu__content {
+    display: none !important;
   }
 }
 </style>

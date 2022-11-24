@@ -4,7 +4,7 @@ import { axios } from '@/utils'
 import { SearchResponseI } from '@/interfaces'
 import { StatusCodes } from 'http-status-codes'
 
-const SEARCH_RESULT_SIZE = 100
+const SEARCH_RESULT_SIZE = 1000
 
 export const useSearch = () => {
   const isMHRSearchType = (type: string): boolean => {
