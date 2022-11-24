@@ -98,7 +98,7 @@
         <v-container v-if="!isDuplicate">
           <v-row
             class="searchResponse"
-            :class="$style[isExistingSecuredParty(result.code) ? 'companyRowNoHover' : 'companyRow']"
+            :class="$style[isExistingSecuredParty(result.code) ? 'company-row-no-hover' : 'companyRow']"
             v-for="(result, i) in results"
             :key="i"
             @mouseover="onHover"
@@ -311,7 +311,7 @@ export default defineComponent({
   border: 1px solid white;
 }
 
-.companyRowNoHover {
+.company-row-no-hover {
   background-color: #f1f1f1;
   border-radius: 4px 4px 4px 4px;
   margin-bottom: 10px;
