@@ -98,7 +98,7 @@
         <v-container v-if="!isDuplicate">
           <v-row
             class="searchResponse"
-            :class="$style['companyRow']"
+            :class="$style[isExistingSecuredParty(result.code) ? 'companyRowNoHover' : 'companyRow']"
             v-for="(result, i) in results"
             :key="i"
             @mouseover="onHover"
@@ -139,7 +139,7 @@
             Cancelling and re-starting you registration may resolve this issue.<br>
             If you do not wish to proceed, contact BC registries staff:
           </p>
-          <error-contact :class="$style['padLeft']"/>
+          <error-contact :class="$style['pad-left']"/>
         </div>
       </div>
       <v-card-actions class="pt-6 pb-8">
@@ -311,6 +311,17 @@ export default defineComponent({
   border: 1px solid white;
 }
 
+.companyRowNoHover {
+  background-color: #f1f1f1;
+  border-radius: 4px 4px 4px 4px;
+  margin-bottom: 10px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  margin-right: 10px;
+  margin-left: 10px;
+  border: 1px solid white;
+}
+
 .companyRow:hover {
   border: 1px solid $primary-blue;
 }
@@ -326,7 +337,10 @@ export default defineComponent({
 .intro {
   color: $gray7;
 }
-
+.pad-left {
+  margin-left: 225px;
+  width: 400px;
+}
 @media (min-height: 800px) {
   .partyWindow {
     max-height: 420px;
@@ -371,5 +385,9 @@ export default defineComponent({
 .pad-left {
   margin-left: 225px;
   width: 400px;
+}
+
+.pad-zero {
+  padding: 0px !important;
 }
 </style>
