@@ -248,7 +248,7 @@ export async function submitSelectedMhr (
   }
 
   if (folioOrReferenceNumber) {
-    extraParams ? extraParams += '&' : extraParams += '?'
+    extraParams += extraParams ? '&' : '?'
     extraParams += 'clientReferenceId=' + folioOrReferenceNumber
   }
 
