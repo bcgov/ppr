@@ -349,6 +349,7 @@ export default defineComponent({
     }
 
     const onSubmitForm = async () => {
+      localState.foundDuplicate = false
       currentSecuredParty.value.address = formatAddress(currentSecuredParty.value.address)
       // check for duplicate
       if (hasMatchingSecuredParty(currentSecuredParty.value, props.isEditMode)) {
