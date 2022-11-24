@@ -43,10 +43,12 @@
           <span class="px-4">Owners: {{ isRemovedHomeOwnerGroup(group) ? '0' : ownersCount }}</span>
           |
           <span class="px-4" :class="{ 'ml-1': !showEditActions }">
-          Group Tenancy Type: {{ isRemovedHomeOwnerGroup(group) ? 'N/A' : group.type }}
-        </span>
+            Group Tenancy Type: {{ isRemovedHomeOwnerGroup(group) ? 'N/A' : getHomeTenancyType() }}
+          </span>
           |
-          <span class="px-4"> Interest: {{ isRemovedHomeOwnerGroup(group) ? 'N/A' : getOwnershipInterest() }}</span>
+          <span class="px-4" :class="{ 'error-text': hasUndefinedInterest && !isRemovedHomeOwnerGroup(group) }">
+            Interest: {{ isRemovedHomeOwnerGroup(group) ? 'N/A' : getOwnershipInterest() }}
+          </span>
         </span>
       </div>
 
@@ -85,7 +87,7 @@
       </div>
 
       <!-- Mhr Transfer Actions -->
-      <div v-show="showEditActions && isMhrTransfer && !isRemovedHomeOwnerGroup(group)">
+      <div v-if="showEditActions && isMhrTransfer && !isRemovedHomeOwnerGroup(group)" class="mr-n4">
         <v-btn
           text
           color="primary"
@@ -117,7 +119,23 @@
           </v-list>
         </v-menu>
       </div>
+
+      <!-- Undo removal action -->
+      <div v-else-if="showEditActions && isMhrTransfer">
+        <v-btn
+          text color="primary"
+          class="pr-0"
+          :ripple="false"
+          @click="undoGroupRemoval(groupId, true)"
+          data-test-id="group-header-undo-btn"
+        >
+          <v-icon small>mdi-undo</v-icon>
+          <span>Undo</span>
+        </v-btn>
+      </div>
     </div>
+
+    <!-- Group Edit -->
     <div v-else>
       <v-row>
         <v-col cols="3">
@@ -154,14 +172,9 @@ import { BaseDialog } from '@/components/dialogs'
 import { useHomeOwners } from '@/composables/mhrRegistration'
 import { computed, defineComponent, reactive, ref, toRefs, watch } from '@vue/composition-api'
 import FractionalOwnership from './FractionalOwnership.vue'
-import { useGetters } from 'vuex-composition-helpers'
 import { find } from 'lodash'
 /* eslint-disable no-unused-vars */
-import {
-  MhrRegistrationFractionalOwnershipIF,
-  MhrRegistrationHomeOwnerIF,
-  MhrHomeOwnerGroupIF
-} from '@/interfaces/mhr-registration-interfaces'
+import { MhrRegistrationFractionalOwnershipIF, MhrHomeOwnerGroupIF } from '@/interfaces/mhr-registration-interfaces'
 import { ActionTypes } from '@/enums'
 /* eslint-enable no-unused-vars */
 
@@ -179,11 +192,16 @@ export default defineComponent({
     FractionalOwnership
   },
   setup (props, context) {
-    const { getMhrRegistrationHomeOwnerGroups, getMhrTransferHomeOwnerGroups } =
-      useGetters<any>(['getMhrRegistrationHomeOwnerGroups', 'getMhrTransferHomeOwnerGroups'])
-
     const {
-      isGlobalEditingMode, setGlobalEditingMode, deleteGroup, setGroupFractionalInterest, markGroupForRemoval
+      isGlobalEditingMode,
+      setGlobalEditingMode,
+      deleteGroup,
+      setGroupFractionalInterest,
+      markGroupForRemoval,
+      undoGroupRemoval,
+      hasUndefinedGroupInterest,
+      getTransferOrRegistrationHomeOwnerGroups,
+      getHomeTenancyType
     } = useHomeOwners(props.isMhrTransfer)
 
     const homeFractionalOwnershipForm = ref(null)
@@ -192,15 +210,17 @@ export default defineComponent({
       isEditGroupMode: false,
       showDeleteGroupDialog: false,
       isHomeFractionalOwnershipValid: false,
-      group: computed((): any =>
-        props.isMhrTransfer
-          ? find(getMhrTransferHomeOwnerGroups.value, { groupId: props.groupId })
-          : find(getMhrRegistrationHomeOwnerGroups.value, { groupId: props.groupId })
-      ),
+      fractionalData: {} as MhrRegistrationFractionalOwnershipIF,
+      group: computed((): MhrHomeOwnerGroupIF => {
+        return find(getTransferOrRegistrationHomeOwnerGroups(), { groupId: props.groupId })
+      }),
       ownersCount: computed((): number =>
         props.owners.filter(owner => owner.action !== ActionTypes.REMOVED).length
       ),
-      fractionalData: {} as MhrRegistrationFractionalOwnershipIF
+      hasUndefinedInterest: computed((): boolean => {
+        return hasUndefinedGroupInterest(getTransferOrRegistrationHomeOwnerGroups()) &&
+          !localState.group.interestNumerator && !localState.group.interestDenominator
+      })
     })
 
     const openGroupForEditing = (): void => {
@@ -216,9 +236,10 @@ export default defineComponent({
     }
 
     const getOwnershipInterest = (): string => {
-      const { interestNumerator, interestDenominator } = localState.group
+      const { interest, interestNumerator, interestDenominator } = localState.group
+      if (!interestNumerator || !interestDenominator) return 'N/A'
 
-      return `${interestNumerator}/${interestDenominator}`
+      return `${interest} ${interestNumerator}/${interestDenominator}`
     }
 
     const isRemovedHomeOwnerGroup = (group: MhrHomeOwnerGroupIF): boolean => {
@@ -241,9 +262,6 @@ export default defineComponent({
 
     const cancel = (): void => {
       localState.isEditGroupMode = false
-      localState.group = props.isMhrTransfer
-        ? find(getMhrTransferHomeOwnerGroups.value, { groupId: props.groupId })
-        : find(getMhrRegistrationHomeOwnerGroups.value, { groupId: props.groupId })
     }
 
     watch(
@@ -276,6 +294,8 @@ export default defineComponent({
       homeFractionalOwnershipForm,
       isRemovedHomeOwnerGroup,
       isAddedHomeOwnerGroup,
+      undoGroupRemoval,
+      getHomeTenancyType,
       ...toRefs(localState)
     }
   }

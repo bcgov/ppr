@@ -96,6 +96,7 @@ export default defineComponent({
     const {
       showGroups,
       getGroupDropdownItems,
+      hasUndefinedGroupInterest,
       getTransferOrRegistrationHomeOwnerGroups
     } = useHomeOwners(props.isMhrTransfer)
 
@@ -104,7 +105,9 @@ export default defineComponent({
       removeGroupDropdownValidation: false,
       groupItems: computed(() => getGroupDropdownItems(props.isAddingHomeOwner, props.groupId)),
       groupRules: computed(() => {
-        return showGroups.value && localState.groupItems.length >= 2
+        return (showGroups.value && localState.groupItems.length >= 2 &&
+        !hasUndefinedGroupInterest(getTransferOrRegistrationHomeOwnerGroups())) || // Default state
+        localState.groupItems.length >= 3 // Safety check, to catch undefined groups after marking groups for removal
           ? required('Select a group for this owner')
           : []
       }),

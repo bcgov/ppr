@@ -413,7 +413,7 @@ export default defineComponent({
       }
 
       // @ts-ignore - function exists
-      await context.refs.transferDetailsComponent.validateDetailsForm()
+      await context.refs.transferDetailsComponent?.validateDetailsForm()
 
       // If transfer is valid, enter review mode
       if (localState.isValidTransfer) {
@@ -437,7 +437,7 @@ export default defineComponent({
           addedReg: String(mhrDraft.draftNumber),
           addedRegParent: apiData.mhrNumber,
           addedRegSummary: null,
-          prevDraft: String(getMhrInformation.value.changes[0].documentId) || ''
+          prevDraft: (getMhrInformation.value.changes && String(getMhrInformation.value.changes[0].documentId)) || ''
         }
         setRegTableNewItem(newItem)
       }
