@@ -73,7 +73,7 @@
               @keypress.enter="findRegistration(myRegAdd)"
             />
             <p v-if="myRegAddInvalid" class="validation-msg mx-3 my-1">
-              Registration numbers contain {{ isMhr ? '6' : '7' }} characters
+              Registration numbers contain {{ isMhr ? '6' : '7' }} digits
             </p>
           </v-col>
         </v-row>
@@ -309,7 +309,7 @@ export default defineComponent({
     })
 
     const tooltipTxtRegSrch: string = 'Retrieve existing registrations you would like to ' +
-      'renew, discharge or amend that are not already in your registrations table.'
+      'make changes to that are not already in your registrations table.'
 
     const onAppReady = async (val: boolean): Promise<void> => {
       localState.loading = true
