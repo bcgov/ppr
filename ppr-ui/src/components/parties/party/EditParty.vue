@@ -351,20 +351,8 @@ export default defineComponent({
     const onSubmitForm = async () => {
       localState.foundDuplicate = false
       currentSecuredParty.value.address = formatAddress(currentSecuredParty.value.address)
-      // check for duplicate
-      if (hasMatchingSecuredParty(currentSecuredParty.value, props.isEditMode)) {
-        // trigger duplicate secured party dialog
-        localState.foundDuplicate = true
-        showDialog()
-        return
-      }
-      if (
-        validateSecuredPartyForm(
-          partyType.value,
-          currentSecuredParty,
-          localState.isRegisteringParty
-        ) === true
-      ) {
+
+      if (validateSecuredPartyForm(partyType.value, currentSecuredParty, localState.isRegisteringParty)) {
         if (partyType.value === SecuredPartyTypes.INDIVIDUAL) {
           currentSecuredParty.value.businessName = ''
           // localState.searchValue = ''
@@ -373,7 +361,13 @@ export default defineComponent({
           currentSecuredParty.value.personName.middle = ''
           currentSecuredParty.value.personName.last = ''
         }
-
+        // check for duplicate
+        if (hasMatchingSecuredParty(currentSecuredParty.value, props.isEditMode)) {
+          // trigger duplicate secured party dialog
+          localState.foundDuplicate = true
+          showDialog()
+          return
+        }
         if (currentSecuredParty.value.businessName && partyType.value === SecuredPartyTypes.BUSINESS) {
           // go to the service and see if there are similar secured parties
           const response: [SearchPartyIF] = await partyCodeSearch(
