@@ -95,7 +95,7 @@ export const useMhrInformation = () => {
       declaredValue: getMhrTransferDeclaredValue.value,
       consideration: getMhrTransferConsideration.value,
       transferDate: getMhrTransferDate.value,
-      ownLand: getMhrTransferOwnLand.value,
+      ownLand: getMhrTransferOwnLand.value === null ? false : getMhrTransferOwnLand.value,
       attentionReference: getMhrTransferAttentionReference.value,
       documentDescription: 'SALE OR GIFT',
       submittingParty: {

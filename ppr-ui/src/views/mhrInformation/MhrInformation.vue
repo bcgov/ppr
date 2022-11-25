@@ -412,7 +412,7 @@ export default defineComponent({
             addedReg: String(getMhrInformation.value.mhrNumber),
             addedRegParent: '',
             addedRegSummary: null,
-            prevDraft: String(getMhrInformation.value.changes[0].documentId) || ''
+            prevDraft: String(getMhrInformation.value.documentId) || ''
           }
           setRegTableNewItem(newItem)
           goToDash()
