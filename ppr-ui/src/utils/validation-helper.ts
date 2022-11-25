@@ -343,13 +343,10 @@ export function normalizeObject (convertObject: any): any {
   return convertObject
 }
 
-export function isObjectEqual (object1: any, object2: any): boolean {
+export function isObjectEqual (object1: any = null, object2: any = null): boolean {
   //
   // Does an equality between 2 objects
   //
-  if (object1 === undefined) object1 = null
-  if (object2 === undefined) object2 = null
-  // these ifs as Object.create() needs null or defined object
   const workObject1 = Object.create(object1)
   const workObject2 = Object.create(object2)
   const objectEqual = isEqual(normalizeObject(workObject1), normalizeObject(workObject2))
