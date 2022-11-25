@@ -343,7 +343,7 @@ export function normalizeObject (convertObject: any): any {
   return convertObject
 }
 
-export function isObjectEqual (object1: any, object2: any): boolean {
+export function isObjectEqual (object1: any = null, object2: any = null): boolean {
   //
   // Does an equality between 2 objects
   //
