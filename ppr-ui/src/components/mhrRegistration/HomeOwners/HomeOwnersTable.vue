@@ -445,10 +445,6 @@ export default defineComponent({
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
 
-//#home-owner-table-card {
-//  min-width: 900px;
-//}
-
 .home-owners-table ::v-deep {
   .spacer-header {
     border-color: $gray1 !important;
