@@ -20,7 +20,7 @@
         <v-chip
           v-if="isMhrTransfer && isRemovedHomeOwnerGroup(group)"
           class="badge-delete mr-4"
-          :class="{ 'ml-2': !showEditActions }"
+          :class="{ 'ml-8 mr-n4': !showEditActions }"
           label x-small
           color="#grey lighten-2"
           data-test-id="owner-removed-badge"
@@ -30,7 +30,7 @@
         <v-chip
           v-else-if="isMhrTransfer && isAddedHomeOwnerGroup(group)"
           class="badge-added mr-4"
-          :class="{ 'ml-2': !showEditActions }"
+          :class="{ 'ml-8 mr-n2': !showEditActions }"
           label x-small
           color="primary"
           data-test-id="owner-added-badge"
@@ -53,7 +53,7 @@
       </div>
 
       <!-- Default Actions -->
-      <div v-show="showEditActions && !isMhrTransfer">
+      <div v-show="showEditActions && !isMhrTransfer" class="mr-n4">
         <v-btn
           text
           color="primary"
@@ -214,9 +214,9 @@ export default defineComponent({
       group: computed((): MhrHomeOwnerGroupIF => {
         return find(getTransferOrRegistrationHomeOwnerGroups(), { groupId: props.groupId })
       }),
-      ownersCount: computed((): number =>
-        props.owners.filter(owner => owner.action !== ActionTypes.REMOVED).length
-      ),
+      ownersCount: computed((): number => {
+        return props.owners.filter(owner => owner.action !== ActionTypes.REMOVED && !!owner.ownerId).length
+      }),
       hasUndefinedInterest: computed((): boolean => {
         return hasUndefinedGroupInterest(getTransferOrRegistrationHomeOwnerGroups()) &&
           !localState.group.interestNumerator && !localState.group.interestDenominator

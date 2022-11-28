@@ -893,7 +893,7 @@ export const homeOwnersTableHeaders: Array<BaseHeaderIF> = [
     width: '10rem'
   },
   {
-    class: 'actions',
+    class: 'actions column-md',
     sortable: false,
     text: '',
     value: 'actions'

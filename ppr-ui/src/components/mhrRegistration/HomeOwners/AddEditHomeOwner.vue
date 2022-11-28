@@ -186,7 +186,7 @@
           />
           <hr class="mt-3 mb-10" />
           <HomeOwnerGroups
-            :groupId="ownersGroupId"
+            :groupId="isDefinedGroup ? ownersGroupId : null"
             :isAddingHomeOwner="isAddingHomeOwner"
             @setOwnerGroupId="ownerGroupId = $event"
             :fractionalData="groupFractionalData"
@@ -394,7 +394,8 @@ export default defineComponent({
       showGroups: showGroups,
       isPerson: props.isHomeOwnerPerson,
       isAddingHomeOwner: props.editHomeOwner == null,
-      groupFractionalData: computed(() => find(allFractionalData, { groupId: localState.ownerGroupId || 1 })),
+      groupFractionalData: computed((): FractionalOwnershipWithGroupIdIF =>
+        find(allFractionalData, { groupId: localState.ownerGroupId || 1 })),
       isHomeOwnerFormValid: false,
       isAddressFormValid: false,
       triggerAddressErrors: false,
@@ -417,7 +418,11 @@ export default defineComponent({
       loadingSearchResults: false,
       autoCompleteIsActive: true,
       autoCompleteSearchValue: '',
-      searchValue: props.editHomeOwner?.organizationName
+      searchValue: props.editHomeOwner?.organizationName,
+      isDefinedGroup: computed((): boolean => {
+        return !!localState.groupFractionalData.interestNumerator &&
+          !!localState.groupFractionalData.interestDenominator
+      })
     })
 
     const done = (): void => {

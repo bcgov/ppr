@@ -95,15 +95,20 @@ export default defineComponent({
           `${props.fractionalData.interest} ${props.fractionalData.interestNumerator}/${props.fractionalData.interestDenominator}`
       ),
       fractionalAmountRules: computed(() => {
-        const rules = customRules(
+        let rules = customRules(
           required('Enter amount owned by this group'),
           isNumber(null, null, null, null), // check for numbers only
           isNumber(null, 6, null, null) // check for length (maxLength can't be used because field is numeric)
         )
         // additional validation when interest total has some value - UX feedback
         if (localState.fractionalInfo.interestDenominator) {
-          rules.push(
-            ...greaterThan(Number(localState.fractionalInfo.interestDenominator), 'Must be lesser than total available')
+          rules = customRules(
+            required('Enter amount owned by this group'),
+            isNumber(null, null, null, null), // check for numbers only
+            isNumber(null, 6, null, null), // check for length (maxLength can't be used because field is numeric)
+            greaterThan(Number(localState.fractionalInfo.interestDenominator - 1),
+              'Must be lesser than total available'
+            )
           )
         }
         return rules

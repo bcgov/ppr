@@ -7,7 +7,7 @@ import {
 } from '@/interfaces'
 import '@/utils/use-composition-api'
 
-import { isRaw, readonly, ref, toRefs, watch } from '@vue/composition-api'
+import { readonly, ref, toRefs, watch } from '@vue/composition-api'
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import { ActionTypes, HomeTenancyTypes } from '@/enums'
 import { MhrCompVal, MhrSectVal } from '@/composables/mhrRegistration/enums'
@@ -370,7 +370,9 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
       )
       const groupToUpdate = find(updatedGroups, { groupId: groupId }) as MhrRegistrationHomeOwnerGroupIF
       Object.assign(groupToUpdate, { ...updatedFractionalData })
-      setTransferOrRegistrationHomeOwnerGroups(updatedGroups)
+      const updatedOwnerGroups = [...updatedGroups]
+
+      setTransferOrRegistrationHomeOwnerGroups(updatedOwnerGroups)
     } else {
       const groupToUpdate = find(homeOwnerGroups, { groupId: groupId }) as MhrRegistrationHomeOwnerGroupIF
       Object.assign(groupToUpdate, { ...fractionalData })
@@ -397,12 +399,6 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
     // Starts with 1 so it can be multiplied by all denominators
     let LCM = 1
 
-    // Calculate Lowest Common Multiplier for all group that already exists
-    // by multiplying all total interests
-    currentHomeOwnerGroups.every((group: MhrRegistrationHomeOwnerGroupIF) => {
-      LCM = LCM * Number(group.interestDenominator)
-    })
-
     // Since new fractional data is not included in any groups yet,
     // it needs to be calculated as well for LCM,
     // but only if new fractional total is not LCM already
@@ -414,7 +410,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
     // Update all fractional amounts for groups that already exist
     const updatedGroups = currentHomeOwnerGroups.map(group => {
       const newNumerator = (LCM / group.interestDenominator) * group.interestNumerator
-      group.interestNumerator = newNumerator
+      group.interestNumerator = Math.round(newNumerator)
       group.interestDenominator = LCM
       return group
     })

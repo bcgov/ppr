@@ -1,5 +1,5 @@
 <template>
-  <v-card flat rounded :class="{ 'border-error-left': showTableError}">
+  <v-card id="home-owner-table-card" flat rounded :class="{ 'border-error-left': showTableError}">
     <v-data-table
       id="mh-home-owners-table"
       class="home-owners-table"
@@ -123,7 +123,7 @@
           <td v-if="showEditActions" class="row-actions text-right">
 
             <!-- New Owner Actions -->
-            <template v-if="!isMhrTransfer || isAddedHomeOwner(row.item)">
+            <div v-if="!isMhrTransfer || isAddedHomeOwner(row.item)" class="mr-n4">
               <v-btn
                 text
                 color="primary"
@@ -158,7 +158,7 @@
                   </v-list-item>
                 </v-list>
               </v-menu>
-            </template>
+            </div>
 
             <!-- Existing Owner Actions -->
             <template v-else>
@@ -444,6 +444,10 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+
+//#home-owner-table-card {
+//  min-width: 900px;
+//}
 
 .home-owners-table ::v-deep {
   .spacer-header {
