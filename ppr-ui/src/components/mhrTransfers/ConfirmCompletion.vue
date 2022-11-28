@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="transfer-confirm">
     <h2>2. Confirm</h2>
     <p class="mt-2">
       The following information must be completed and confirmed before submitting this registration.
@@ -22,8 +22,8 @@
           <v-col cols="9" class="confirm-completion-req">
             <ol>
               <li class="pl-3 pb-3 mb-7">
-                <strong>Bill of sale</strong> has been signed by either all owners or by someone with the authority to
-                act on behalf of the registered owners.
+                <p><strong>Bill of sale</strong> has been signed by either all owners or by someone with the authority
+                  to act on behalf of the registered owners.</p>
                 <p class="confirm-completion-note">
                   <span>Note: </span> If the bill of sale has been signed by someone acting on behalf of the registered
                   owners, the person submitting this transfer is a lawyer or notary, and the power by which the
@@ -111,7 +111,10 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-.transfer-confirm {
+#transfer-confirm {
+  p {
+    color: $gray7;
+  }
   .confirm-completion-req {
     ol {
       padding-left: 50px;

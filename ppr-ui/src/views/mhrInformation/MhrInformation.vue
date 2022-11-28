@@ -137,7 +137,7 @@
           </v-col>
           <v-col class="pl-6 pt-5" cols="3" v-if="hasUnsavedChanges || isReviewMode">
             <aside>
-              <affix relative-element-selector=".col-9" :offset="{ top: 90, bottom: -100 }">
+              <affix class="sticky-container" relative-element-selector=".col-9" :offset="{ top: 90, bottom: -100 }">
                 <sticky-container
                   :setShowButtons="true"
                   :setBackBtn="showBackBtn"
@@ -530,6 +530,10 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+.sticky-container {
+  z-index: 7!important;
+}
+
 .submitting-party {
   margin-top: 55px;
 }

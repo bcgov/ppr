@@ -33,7 +33,7 @@
         <v-col>
           <div class="generic-label mb-3">Group {{ ownerGroupId }} Details:</div>
         </v-col>
-        <v-col v-show="groupState.isReadonly" class="align-right pt-0">
+        <v-col v-show="groupState.isReadonly && isDefinedGroup" class="align-right pt-0">
           <v-btn
             v-if="groupState.hasEditButton"
             id="edit-fractional-ownership"
@@ -50,7 +50,7 @@
       <FractionalOwnership
         :groupId="ownerGroupId"
         :fractionalData="fractionalData"
-        :isReadOnly="groupState.isReadonly"
+        :isReadOnly="groupState.isReadonly && isDefinedGroup"
       />
     </div>
   </div>
@@ -129,7 +129,11 @@ export default defineComponent({
       groupState: computed(
         () => find(localState.allGroupsState, { groupId: localState.ownerGroupId }) as ReadonlyOwnerGroupStateIF
       ),
-      showEditFractionalOwnershipBtn: true
+      showEditFractionalOwnershipBtn: true,
+      isDefinedGroup: computed((): boolean => {
+        return !!localState.groupFractionalData?.interestNumerator &&
+          !!localState.groupFractionalData?.interestDenominator
+      })
     })
 
     const setOwnerGroupId = (groupId: number): void => {
