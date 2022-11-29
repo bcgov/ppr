@@ -65,6 +65,7 @@ def pay_and_save_registration(req: request, request_json, account_id: str, trans
     registration: MhrRegistration = MhrRegistration.create_new_from_json(request_json,
                                                                          account_id,
                                                                          token.get('username', None))
+    request_json['affirmByName'] = get_affirmby(token)
     invoice_id = None
     pay_ref = None
     if not is_reg_staff_account(account_id):
@@ -81,7 +82,7 @@ def pay_and_save_registration(req: request, request_json, account_id: str, trans
     invoice_id = pay_ref['invoiceId']
     registration.pay_invoice_id = int(invoice_id)
     registration.pay_path = pay_ref['receipt']
-    # Try to save the financing statement: failure throws an exception.
+    # Try to save the registration: failure throws an exception.
     try:
         registration.save()
     except Exception as db_exception:   # noqa: B902; handle all db related errors.
@@ -113,7 +114,7 @@ def pay_and_save_transfer(req: request,  # pylint: disable=too-many-arguments
                                                                               account_id,
                                                                               token.get('username', None),
                                                                               user_group)
-    request_json['affirmByName'] = get_transfer_affirmby(token)
+    request_json['affirmByName'] = get_affirmby(token)
     invoice_id = None
     pay_ref = None
     if not is_reg_staff_account(account_id):
@@ -132,9 +133,11 @@ def pay_and_save_transfer(req: request,  # pylint: disable=too-many-arguments
     invoice_id = pay_ref['invoiceId']
     registration.pay_invoice_id = int(invoice_id)
     registration.pay_path = pay_ref['receipt']
-    # Try to save the financing statement: failure throws an exception.
+    # Try to save the registration: failure throws an exception.
     try:
         registration.save()
+        if current_reg.id and current_reg.id > 0 and current_reg.owner_groups:
+            current_reg.save_transfer(request_json, registration.id)
     except Exception as db_exception:   # noqa: B902; handle all db related errors.
         current_app.logger.error(SAVE_ERROR_MESSAGE.format(account_id, 'registration', str(db_exception)))
         if account_id and invoice_id is not None:
@@ -164,7 +167,7 @@ def pay_and_save_exemption(req: request,  # pylint: disable=too-many-arguments
                                                                                account_id,
                                                                                token.get('username', None),
                                                                                user_group)
-    request_json['affirmByName'] = get_transfer_affirmby(token)
+    request_json['affirmByName'] = get_affirmby(token)
     invoice_id = None
     pay_ref = None
     if not is_reg_staff_account(account_id):
@@ -183,7 +186,7 @@ def pay_and_save_exemption(req: request,  # pylint: disable=too-many-arguments
     invoice_id = pay_ref['invoiceId']
     registration.pay_invoice_id = int(invoice_id)
     registration.pay_path = pay_ref['receipt']
-    # Try to save the financing statement: failure throws an exception.
+    # Try to save the registration: failure throws an exception.
     try:
         registration.save()
         current_reg.save_exemption()
@@ -371,8 +374,8 @@ def get_registration_report(registration: MhrRegistration,  # pylint: disable=to
         return resource_utils.db_exception_response(db_exception, None, 'Generate MHR registration report state.')
 
 
-def get_transfer_affirmby(token) -> str:
-    """Get the transfer registration affirm by name from the user token."""
+def get_affirmby(token) -> str:
+    """Get the registration legacy affirm by name (user name) from the user token."""
     firstname = token.get('given_name', None)
     if not firstname:
         firstname = token.get('firstname', '')

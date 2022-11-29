@@ -27,12 +27,16 @@ from mhr_api.models.db2 import utils as legacy_utils
 from mhr_api.services.authz import MANUFACTURER_GROUP, QUALIFIED_USER_GROUP, GOV_ACCOUNT_ROLE
 
 from .db import db
+from .mhr_description import MhrDescription
 from .mhr_document import MhrDocument
 from .mhr_draft import MhrDraft
 from .mhr_location import MhrLocation
 from .mhr_note import MhrNote
+from .mhr_owner_group import MhrOwnerGroup
 from .mhr_party import MhrParty
+from .mhr_section import MhrSection
 from .type_tables import MhrDocumentType, MhrRegistrationType, MhrRegistrationTypes, MhrRegistrationStatusTypes
+from .type_tables import MhrOwnerStatusTypes, MhrPartyTypes, MhrTenancyTypes
 
 
 QUERY_PKEYS = """
@@ -124,6 +128,8 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
     documents = db.relationship('MhrDocument', order_by='asc(MhrDocument.id)', back_populates='registration')
     notes = db.relationship('MhrNote', order_by='asc(MhrNote.id)', back_populates='registration')
     owner_groups = db.relationship('MhrOwnerGroup', order_by='asc(MhrOwnerGroup.id)', back_populates='registration')
+    descriptions = db.relationship('MhrDescription', order_by='asc(MhrDescription.id)', back_populates='registration')
+    sections = db.relationship('MhrSection', order_by='asc(MhrSection.id)', back_populates='registration')
 
     draft_number: str = None
     doc_reg_number: str = None
@@ -232,12 +238,6 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
 
     def save(self):
         """Render a registration to the local cache."""
-        # Save draft first
-        draft = self.draft
-        db.session.add(draft)
-        db.session.commit()
-
-        self.draft_id = draft.id
         db.session.add(self)
         db.session.commit()
         # Now save legacy data.
@@ -258,6 +258,10 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         # Save draft first
         self.status_type = MhrRegistrationStatusTypes.EXEMPT
         db.session.commit()
+
+    def save_transfer(self, json_data, new_reg_id):
+        """Update the original MH removed owner groups."""
+        self.create_changed_groups(json_data, new_reg_id)
 
     def get_registration_type(self):
         """Lookup registration type record if it has not already been fetched."""
@@ -438,6 +442,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         registration.id = reg_vals.id  # pylint: disable=invalid-name; allow name of id.
         registration.mhr_number = reg_vals.mhr_number
         registration.doc_reg_number = reg_vals.doc_reg_number
+        registration.doc_pkey = reg_vals.doc_pkey
         registration.registration_ts = model_utils.now_ts()
         registration.registration_type = MhrRegistrationTypes.MHREG
         registration.status_type = MhrRegistrationStatusTypes.ACTIVE
@@ -457,8 +462,18 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         if 'clientReferenceId' in json_data:
             registration.client_reference_id = json_data['clientReferenceId']
 
+        registration.create_new_groups(json_data)
+        # Other parties
         registration.parties = MhrParty.create_from_registration_json(json_data, registration.id)
         registration.locations = [MhrLocation.create_from_json(json_data['location'], registration.id)]
+        doc: MhrDocument = MhrDocument.create_from_json(registration,
+                                                        json_data,
+                                                        REG_TO_DOC_TYPE[registration.registration_type])
+        doc.registration_id = registration.id
+        registration.documents = [doc]
+        description: MhrDescription = MhrDescription.create_from_json(json_data.get('description'), registration.id)
+        registration.descriptions = [description]
+        registration.sections = MhrRegistration.get_sections(json_data, registration.id)
         return registration
 
     @staticmethod
@@ -497,6 +512,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
 
         if 'clientReferenceId' in json_data:
             registration.client_reference_id = json_data['clientReferenceId']
+        # Other parties
         registration.parties = MhrParty.create_from_registration_json(json_data, registration.id)
         if registration.doc_id and not json_data.get('documentId'):
             json_data['documentId'] = registration.doc_id
@@ -564,6 +580,77 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         if base_reg:
             registration.manuhome = base_reg.manuhome
         return registration
+
+    def adjust_group_interest(self, new: bool):
+        """For tenants in common groups adjust group interest to a common denominator."""
+        tc_count: int = 0
+        common_denominator: int = 0
+        for group in self.owner_groups:
+            if group.tenancy_type == MhrTenancyTypes.COMMON and \
+                    group.status_type == MhrOwnerStatusTypes.ACTIVE:
+                tc_count += 1
+                if common_denominator == 0:
+                    common_denominator = group.interest_denominator
+                elif group.interest_denominator > common_denominator:
+                    common_denominator = group.interest_denominator
+        if tc_count > 0:
+            for group in self.owner_groups:
+                if new or (group.modified and group.status_type == MhrOwnerStatusTypes.ACTIVE):
+                    num = group.interest_numerator
+                    den = group.interest_denominator
+                    if num > 0 and den > 0:
+                        if den != common_denominator:
+                            group.interest_denominator = common_denominator
+                            group.interest_numerator = (common_denominator/den * num)
+
+    def create_new_groups(self, json_data):
+        """Create owner groups and owners for a new MH registration."""
+        self.owner_groups = []
+        sequence: int = 0
+        for group_json in json_data.get('ownerGroups'):
+            sequence += 1
+            group: MhrOwnerGroup = MhrOwnerGroup.create_from_json(group_json, self.id)
+            group.group_id = sequence
+            # Add owners
+            for owner_json in group_json.get('owners'):
+                party_type = MhrPartyTypes.OWNER_BUS
+                if owner_json.get('individualName'):
+                    party_type = MhrPartyTypes.OWNER_IND
+                group.owners.append(MhrParty.create_from_json(owner_json, party_type, self.id))
+            self.owner_groups.append(group)
+        # Update interest common denominator
+        self.adjust_group_interest(True)
+
+    def create_changed_groups(self, json_data, new_reg_id):
+        """Create owner groups and owners for a new MH registration."""
+        if json_data.get('deleteOwnerGroups'):
+            for group in json_data.get('deleteOwnerGroups'):
+                for existing in self.owner_groups:
+                    if existing.group_id == group.get('groupId'):
+                        current_app.logger.info(f'Existing group id={existing.group_id}, status={existing.status_type}')
+                        existing.status_type = MhrOwnerStatusTypes.PREVIOUS
+                        # existing.change_registration_id = self.id
+                        existing.modified = True
+                        current_app.logger.info(f'Found owner group to remove id={existing.id} base reg id={self.id}')
+                        for owner in existing.owners:
+                            owner.status_type = MhrOwnerStatusTypes.PREVIOUS
+        # Update owner groups: group ID increments with each change.
+        group_id: int = len(self.owner_groups) + 1
+        if json_data.get('addOwnerGroups'):
+            for group_json in json_data.get('addOwnerGroups'):
+                current_app.logger.info(f'Creating owner group id={group_id}')
+                new_group: MhrOwnerGroup = MhrOwnerGroup.create_from_change_json(group_json, self.id, new_reg_id,
+                                                                                 group_id)
+                group_id += 1
+                # Add owners
+                for owner_json in group_json.get('owners'):
+                    party_type = MhrPartyTypes.OWNER_BUS
+                    if owner_json.get('individualName'):
+                        party_type = MhrPartyTypes.OWNER_IND
+                    new_group.owners.append(MhrParty.create_from_json(owner_json, party_type, self.id, new_reg_id))
+                current_app.logger.info(f'Creating owner group id={group_id} reg id={new_group.registration_id}')
+                self.owner_groups.append(new_group)
+            self.adjust_group_interest(False)
 
     @staticmethod
     def find_draft(json_data, registration_type: str = None):
@@ -638,3 +725,13 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
             else:
                 registration.doc_id = str(row[5])
         return registration
+
+    @staticmethod
+    def get_sections(json_data, registration_id: int):
+        """Build sections from the json_data.)."""
+        sections = []
+        if not json_data.get('description') or 'sections' not in json_data.get('description'):
+            return sections
+        for section in json_data['description']['sections']:
+            sections.append(MhrSection.create_from_json(section, registration_id))
+        return sections

@@ -17,6 +17,7 @@ from flask import current_app
 from sqlalchemy.dialects.postgresql import ENUM as PG_ENUM
 
 from mhr_api.exceptions import DatabaseException
+from mhr_api.models import utils as model_utils
 
 from .db import db
 from .type_tables import MhrTenancyTypes, MhrOwnerStatusTypes
@@ -46,8 +47,9 @@ class MhrOwnerGroup(db.Model):  # pylint: disable=too-many-instance-attributes
     # Relationships - MhrRegistration
     registration = db.relationship('MhrRegistration', foreign_keys=[registration_id],
                                    back_populates='owner_groups', cascade='all, delete', uselist=False)
-    # owners = db.relationship('MhrParty', foreign_keys=[id],
-    #                               back_populates='owner_groups', cascade='all, delete', uselist=False)
+    owners = db.relationship('MhrParty', order_by='asc(MhrParty.id)', back_populates='owner_group')
+
+    modified: bool = False
 
     @property
     def json(self) -> dict:
@@ -107,25 +109,46 @@ class MhrOwnerGroup(db.Model):  # pylint: disable=too-many-instance-attributes
         return groups
 
     @staticmethod
-    def create_from_json(reg_json, registration_id: int, change_registration_id: int = None):
-        """Create a new note object from a registration."""
+    def create_from_json(reg_json, registration_id: int):
+        """Create a new owner group object from a new MH registration."""
         group: MhrOwnerGroup = MhrOwnerGroup(registration_id=registration_id,
                                              group_id=reg_json.get('groupId'),
                                              status_type=MhrOwnerStatusTypes.ACTIVE,
                                              tenancy_type=reg_json.get('type'),
-                                             tenancy_specified='Y')
-        if not change_registration_id:
-            group.change_registration_id = registration_id
-        else:
-            group.change_registration_id = change_registration_id
+                                             tenancy_specified='N')
+        group.change_registration_id = registration_id
         if reg_json.get('status'):
             group.status_type = reg_json['status']
-        if reg_json.get('interest'):
-            group.interest = reg_json['interest']
-            if reg_json.get('interestNumerator'):
-                group.interest_numerator = reg_json['interestNumerator']
-            if reg_json.get('interestDenominator'):
-                group.interest_denominator = reg_json['interestDenominator']
-        if not reg_json.get('tenancySpecified', True):
-            group.tenancy_specified = 'N'
+        if group.tenancy_type != MhrTenancyTypes.SOLE:
+            group.interest = reg_json.get('interest', None)
+            group.interest_numerator = reg_json.get('interestNumerator', 0)
+            group.interest_denominator = reg_json.get('interestDenominator', 0)
+        if group.tenancy_type == MhrTenancyTypes.COMMON and not group.interest:
+            group.interest = model_utils.OWNER_INTEREST_UNDIVIDED
+        if reg_json.get('tenancySpecified'):
+            group.tenancy_specified = 'Y'
+        group.owners = []
+        return group
+
+    @staticmethod
+    def create_from_change_json(reg_json, registration_id: int, change_registration_id: int, group_id: int):
+        """Create a new owner group object from a change registration."""
+        group: MhrOwnerGroup = MhrOwnerGroup(registration_id=registration_id,
+                                             change_registration_id=change_registration_id,
+                                             group_id=group_id,
+                                             status_type=MhrOwnerStatusTypes.ACTIVE,
+                                             tenancy_type=reg_json.get('type'),
+                                             tenancy_specified='N')
+        if reg_json.get('status'):
+            group.status_type = reg_json['status']
+        if group.tenancy_type != MhrTenancyTypes.SOLE:
+            group.interest = reg_json.get('interest', None)
+            group.interest_numerator = reg_json.get('interestNumerator', 0)
+            group.interest_denominator = reg_json.get('interestDenominator', 0)
+        if group.tenancy_type == MhrTenancyTypes.COMMON and not group.interest:
+            group.interest = model_utils.OWNER_INTEREST_UNDIVIDED
+        if reg_json.get('tenancySpecified'):
+            group.tenancy_specified = 'Y'
+        group.owners = []
+        group.modified = True
         return group

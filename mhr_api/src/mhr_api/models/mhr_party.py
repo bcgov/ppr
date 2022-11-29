@@ -51,8 +51,8 @@ class MhrParty(db.Model):  # pylint: disable=too-many-instance-attributes
                            db.ForeignKey('mhr_party_types.party_type'), nullable=False)
     status_type = db.Column('status_type', PG_ENUM(MhrOwnerStatusTypes),
                             db.ForeignKey('mhr_owner_status_types.status_type'), nullable=False)
-    owner_group_id = db.Column('owner_group_id', db.Integer, nullable=True)
-    # owner_group_id = db.Column('owner_group_id', db.Integer, db.ForeignKey('mhr_owner_groups.id'), nullable=True)
+    # owner_group_id = db.Column('owner_group_id', db.Integer, nullable=True)
+    owner_group_id = db.Column('owner_group_id', db.Integer, db.ForeignKey('mhr_owner_groups.id'), nullable=True)
 
     # Relationships - Address
     address = db.relationship('Address', foreign_keys=[address_id], uselist=False,
@@ -60,6 +60,9 @@ class MhrParty(db.Model):  # pylint: disable=too-many-instance-attributes
     # Relationships - MhrRegistration
     registration = db.relationship('MhrRegistration', foreign_keys=[registration_id],
                                    back_populates='parties', cascade='all, delete', uselist=False)
+    # Relationships - MhrOwnerGroup
+    owner_group = db.relationship('MhrOwnerGroup', foreign_keys=[owner_group_id],
+                                  back_populates='owners', cascade='all, delete', uselist=False)
     # Relationships - PartyType Don't need for now.
     # party_types = db.relationship('MhrPartyType', foreign_keys=[party_type],
     #                               back_populates='party', cascade='all, delete', uselist=False)
@@ -125,7 +128,7 @@ class MhrParty(db.Model):  # pylint: disable=too-many-instance-attributes
         return parties
 
     @staticmethod
-    def create_from_json(json_data, party_type: str, registration_id: int = None):
+    def create_from_json(json_data, party_type: str, registration_id: int = None, change_registration_id: int = None):
         """Create a party object from a json schema object: map json to db."""
         # current_app.logger.info(json_data)
         party: MhrParty = MhrParty()
@@ -134,6 +137,17 @@ class MhrParty(db.Model):  # pylint: disable=too-many-instance-attributes
         if 'businessName' in json_data:
             party.business_name = json_data['businessName'].strip().upper()
             party.compressed_name = model_utils.get_compressed_key(party.business_name)
+        elif 'organizationName' in json_data:
+            party.business_name = json_data['organizationName'].strip().upper()
+            party.compressed_name = model_utils.get_compressed_key(party.business_name)
+        elif json_data.get('individualName'):
+            party.last_name = json_data['individualName']['last'].strip().upper()
+            party.first_name = json_data['individualName']['first'].strip().upper()
+            name = party.last_name + ' ' + party.first_name
+            if 'middle' in json_data['individualName']:
+                party.middle_name = json_data['individualName']['middle'].strip().upper()
+                name += ' ' + party.middle_name
+            party.compressed_name = model_utils.get_compressed_key(name)
         else:
             party.last_name = json_data['personName']['last'].strip().upper()
             party.first_name = json_data['personName']['first'].strip().upper()
@@ -154,8 +168,10 @@ class MhrParty(db.Model):  # pylint: disable=too-many-instance-attributes
 
         if registration_id:
             party.registration_id = registration_id
-            party.change_registration_id = registration_id
-
+            if not change_registration_id:
+                party.change_registration_id = registration_id
+        if change_registration_id:
+            party.change_registration_id = change_registration_id
         return party
 
     @staticmethod
