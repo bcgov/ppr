@@ -420,8 +420,8 @@ export default defineComponent({
       autoCompleteSearchValue: '',
       searchValue: props.editHomeOwner?.organizationName,
       isDefinedGroup: computed((): boolean => {
-        return !!localState.groupFractionalData.interestNumerator &&
-          !!localState.groupFractionalData.interestDenominator
+        return !!localState.groupFractionalData?.interestNumerator &&
+          !!localState.groupFractionalData?.interestDenominator
       })
     })
 
