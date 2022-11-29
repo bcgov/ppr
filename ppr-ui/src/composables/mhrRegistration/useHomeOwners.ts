@@ -117,7 +117,8 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
    * and an allocation error status if exists
    */
   const getTotalOwnershipAllocationStatus = (): MhrRegistrationTotalOwnershipAllocationIF => {
-    const groups = getTransferOrRegistrationHomeOwnerGroups().filter(group => group.action !== ActionTypes.REMOVED)
+    const groups = getTransferOrRegistrationHomeOwnerGroups()
+      .filter(group => group.action !== ActionTypes.REMOVED && !!group.interestNumerator && !!group.interestDenominator)
 
     // Sum up all 'interestNumerator' values in different Home Owner groups with a help of sumBy() function from lodash
     const totalFractionalNominator = sumBy(groups, 'interestNumerator')

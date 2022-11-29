@@ -219,7 +219,7 @@ export default defineComponent({
       }),
       hasUndefinedInterest: computed((): boolean => {
         return hasUndefinedGroupInterest(getTransferOrRegistrationHomeOwnerGroups()) &&
-          !localState.group.interestNumerator && !localState.group.interestDenominator
+          !(localState.group.interestNumerator && localState.group.interestDenominator)
       })
     })
 
