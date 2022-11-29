@@ -115,7 +115,7 @@ class MhrOwnerGroup(db.Model):  # pylint: disable=too-many-instance-attributes
                                              group_id=reg_json.get('groupId'),
                                              status_type=MhrOwnerStatusTypes.ACTIVE,
                                              tenancy_type=reg_json.get('type'),
-                                             tenancy_specified='N')
+                                             tenancy_specified='Y')
         group.change_registration_id = registration_id
         if reg_json.get('status'):
             group.status_type = reg_json['status']
@@ -125,8 +125,8 @@ class MhrOwnerGroup(db.Model):  # pylint: disable=too-many-instance-attributes
             group.interest_denominator = reg_json.get('interestDenominator', 0)
         if group.tenancy_type == MhrTenancyTypes.COMMON and not group.interest:
             group.interest = model_utils.OWNER_INTEREST_UNDIVIDED
-        if reg_json.get('tenancySpecified'):
-            group.tenancy_specified = 'Y'
+        if not reg_json.get('tenancySpecified'):
+            group.tenancy_specified = 'N'
         group.owners = []
         return group
 
@@ -138,7 +138,7 @@ class MhrOwnerGroup(db.Model):  # pylint: disable=too-many-instance-attributes
                                              group_id=group_id,
                                              status_type=MhrOwnerStatusTypes.ACTIVE,
                                              tenancy_type=reg_json.get('type'),
-                                             tenancy_specified='N')
+                                             tenancy_specified='Y')
         if reg_json.get('status'):
             group.status_type = reg_json['status']
         if group.tenancy_type != MhrTenancyTypes.SOLE:
@@ -147,8 +147,8 @@ class MhrOwnerGroup(db.Model):  # pylint: disable=too-many-instance-attributes
             group.interest_denominator = reg_json.get('interestDenominator', 0)
         if group.tenancy_type == MhrTenancyTypes.COMMON and not group.interest:
             group.interest = model_utils.OWNER_INTEREST_UNDIVIDED
-        if reg_json.get('tenancySpecified'):
-            group.tenancy_specified = 'Y'
+        if not reg_json.get('tenancySpecified'):
+            group.tenancy_specified = 'N'
         group.owners = []
         group.modified = True
         return group
