@@ -32,8 +32,8 @@
                 </p>
               </li>
               <li class="pl-3 pb-3 mb-7">
-                <strong>Search of the Corporate Register</strong> has been completed if one or more of the current or
-                future owners is an incorporated company, society or cooperative association.
+                <p><strong>Search of the Corporate Register</strong> has been completed if one or more of the current or
+                future owners is an incorporated company, society or cooperative association.</p>
                 <p class="confirm-completion-note">
                   <span>Note: </span> For current registered owners the incorporated business must have been active on
                   the Corporate Register at the time the bill of sale was signed. Future owners must be in active status
@@ -41,8 +41,8 @@
                 </p>
               </li>
               <li class="pl-3 pb-3 mb-0">
-                <strong>Personal Property Registry lien search</strong> has been completed and there are no liens on the
-                home that stop the transfer.
+                <p><strong>Personal Property Registry lien search</strong> has been completed and there are no liens
+                on the home that stop the transfer.</p>
                 <p class="confirm-completion-note">
                   <span>Note: </span> Liens that stop the transfer include Family Maintenance Enforcement Act, Family
                   Relations Act, BC Second Mortgage, Land Tax Deferment Act.
