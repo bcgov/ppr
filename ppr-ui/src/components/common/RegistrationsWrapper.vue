@@ -906,6 +906,9 @@ export default defineComponent({
             setRegTableTotalRowCount(getRegTableTotalRowCount.value + 1)
           }
         } else {
+          // Safety check: Prevent duplicate Registrations in UI
+          if (baseRegs.some(reg => reg.registrationNumber === newRegSummary.registrationNumber)) return
+
           // new base reg
           baseRegs.unshift(newRegSummary)
           setRegTableBaseRegs([...baseRegs])
