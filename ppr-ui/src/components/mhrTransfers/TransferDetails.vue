@@ -180,7 +180,7 @@ export default defineComponent({
       declaredValue: getMhrTransferDeclaredValue.value?.toString(),
       consideration: getMhrTransferConsideration.value,
       transferDate: getMhrTransferDate.value,
-      isOwnLand: getMhrTransferOwnLand.value,
+      isOwnLand: getMhrTransferOwnLand.value || false,
       enableWarningMsg: false,
       showFormError: computed(() => localState.validateTransferDetails && !localState.isTransferDetailsFormValid)
     })
