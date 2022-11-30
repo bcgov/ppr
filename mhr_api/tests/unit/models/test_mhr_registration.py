@@ -28,11 +28,115 @@ from mhr_api.exceptions import BusinessException
 from mhr_api.models import MhrRegistration, MhrDraft, MhrDocument, MhrNote, utils as model_utils
 from mhr_api.models.type_tables import MhrLocationTypes, MhrPartyTypes, MhrOwnerStatusTypes, MhrStatusTypes
 from mhr_api.models.type_tables import MhrRegistrationTypes, MhrRegistrationStatusTypes, MhrDocumentTypes
+from mhr_api.models.type_tables import MhrTenancyTypes
 from mhr_api.services.authz import MANUFACTURER_GROUP, QUALIFIED_USER_GROUP, GOV_ACCOUNT_ROLE
 
 
 REG_DESCRIPTION = 'REGISTER NEW UNIT'
 CONV_DESCRIPTION = '** CONVERTED **'
+SOLE_OWNER_GROUP = [
+    {
+        'groupId': 1,
+        'owners': [
+            {
+            'businessName': 'TEST BUS.',
+            'address': {
+                'street': '3122B LYNNLARK PLACE',
+                'city': 'VICTORIA',
+                'region': 'BC',
+                'postalCode': 'V8S 4I6',
+                'country': 'CA'
+            },
+            'phoneNumber': '6041234567'
+            }
+        ],
+        'type': 'SOLE'
+    }
+]
+JOINT_OWNER_GROUP = [
+    {
+        'groupId': 1,
+        'owners': [
+            {
+            'individualName': {
+                'first': 'James',
+                'last': 'Smith'
+            },
+            'address': {
+                'street': '3122B LYNNLARK PLACE',
+                'city': 'VICTORIA',
+                'region': 'BC',
+                'postalCode': 'V8S 4I6',
+                'country': 'CA'
+            },
+            'phoneNumber': '6041234567'
+            }, {
+            'individualName': {
+                'first': 'Jane',
+                'last': 'Smith'
+            },
+            'address': {
+                'street': '3122B LYNNLARK PLACE',
+                'city': 'VICTORIA',
+                'region': 'BC',
+                'postalCode': 'V8S 4I6',
+                'country': 'CA'
+            },
+            'phoneNumber': '6041234567'
+            }
+        ],
+        'type': 'JOINT'
+    }
+]
+COMMON_OWNER_GROUP = [
+    {
+    'groupId': 1,
+    'owners': [
+        {
+        'individualName': {
+            'first': 'MARY-ANNE',
+            'last': 'BICKNELL'
+        },
+        'address': {
+            'street': '3122B LYNNLARK PLACE',
+            'city': 'VICTORIA',
+            'region': 'BC',
+            'postalCode': 'V8S 4I6',
+            'country': 'CA'
+        },
+        'phoneNumber': '6041234567'
+        }
+    ],
+    'type': 'COMMON',
+    'interest': 'UNDIVIDED 1/2',
+    'interestNumerator': 1,
+    'interestDenominator': 2,
+    'tenancySpecified': True
+    }, {
+    'groupId': 2,
+    'owners': [
+        {
+        'individualName': {
+            'first': 'JOHN',
+            'last': 'CONNOLLY'
+        },
+        'address': {
+            'street': '665 238TH STREET',
+            'city': 'LANGLEY',
+            'region': 'BC',
+            'postalCode': 'V3A 6H4',
+            'country': 'CA'
+        },
+        'phoneNumber': '6044620279'
+        }
+    ],
+    'type': 'COMMON',
+    'interest': 'UNDIVIDED 1/2',
+    'interestNumerator': 5,
+    'interestDenominator': 10,
+    'tenancySpecified': True
+    }
+]
 # testdata pattern is ({account_id}, {mhr_num}, {exists}, {reg_description}, {in_list})
 TEST_SUMMARY_REG_DATA = [
     ('PS12345', '077741', True, CONV_DESCRIPTION, False),
@@ -87,7 +191,12 @@ TEST_DATA_DOC_ID = [
     (HTTPStatus.OK, '10104535', '102265', 'TRAN', True, 2),
     (HTTPStatus.NOT_FOUND, 'XXX04535', None, None, False, 0)
 ]
-
+# testdata pattern is ({type}, {group_count}, {owner_count}, {denominator}, {data})
+TEST_DATA_NEW_GROUP = [
+    ('SOLE', 1, 1, None, SOLE_OWNER_GROUP),
+    ('JOINT', 1, 2, None, JOINT_OWNER_GROUP),
+    ('COMMON', 2, 2, 10, COMMON_OWNER_GROUP)
+]
 
 @pytest.mark.parametrize('account_id,mhr_num,exists,reg_desc,in_list', TEST_SUMMARY_REG_DATA)
 def test_find_summary_by_mhr_number(session, account_id, mhr_num, exists, reg_desc, in_list):
@@ -145,6 +254,12 @@ def test_find_by_id(session, reg_id, has_results, legacy):
             assert registration.registration_ts
             assert registration.locations
             assert len(registration.locations) == 1
+            assert registration.descriptions
+            assert len(registration.descriptions) >= 1
+            assert registration.sections
+            assert len(registration.sections) >= 1
+            assert registration.documents
+            assert len(registration.documents) >= 1
         else:
             assert registration.manuhome
             report_json = registration.registration_json
@@ -276,6 +391,32 @@ def test_create_new_from_json(session):
     assert location.change_registration_id > 0
     assert location.location_type in MhrLocationTypes
     assert location.status_type in MhrStatusTypes
+    assert registration.descriptions
+    description = registration.descriptions[0]
+    assert description.registration_id > 0
+    assert description.change_registration_id > 0
+    assert description.status_type in MhrStatusTypes
+    assert registration.sections
+    section = registration.sections[0]
+    assert section.registration_id > 0
+    assert section.change_registration_id > 0
+    assert section.status_type in MhrStatusTypes
+    doc: MhrDocument = registration.documents[0]
+    assert doc.id > 0
+    assert doc.document_id == registration.doc_id
+    assert doc.document_type == MhrDocumentTypes.REG_101
+    assert doc.document_registration_number == registration.doc_reg_number
+    assert registration.owner_groups
+    assert len(registration.owner_groups) == 2
+    for group in registration.owner_groups:
+        assert group.group_id
+        assert group.registration_id == registration.id
+        assert group.change_registration_id == registration.id
+        assert group.tenancy_type == MhrTenancyTypes.COMMON
+        assert group.status_type == MhrOwnerStatusTypes.ACTIVE
+        assert group.owners
+        assert len(group.owners) == 1
+
     mh_json = registration.new_registration_json
     assert mh_json
 
@@ -464,3 +605,35 @@ def test_create_exemption_from_json(session, mhr_num, user_group, doc_id_prefix,
     assert note.expiry_date
     assert note.expiry_date.year == 2022
     assert note.expiry_date.month == 10
+
+
+# testdata pattern is ({type}, {group_count}, {owner_count}, {denominator}, {data})
+@pytest.mark.parametrize('type,group_count,owner_count,denominator,data', TEST_DATA_NEW_GROUP)
+def test_create_new_groups(session, type, group_count, owner_count, denominator, data):
+    """Assert that an new MH registration groups are created from json correctly."""
+    json_data = copy.deepcopy(REGISTRATION)
+    json_data['ownerGroups'] = data
+    reg: MhrRegistration = MhrRegistration(id=1000)
+    reg.create_new_groups(json_data)
+    assert reg.owner_groups
+    assert len(reg.owner_groups) == group_count
+    own_count = 0
+    group_id: int = 0
+    for group in reg.owner_groups:
+        group_id += 1
+        assert group.group_id == group_id
+        assert group.registration_id == 1000
+        assert group.change_registration_id == 1000
+        assert group.tenancy_type == type
+        assert group.status_type == MhrOwnerStatusTypes.ACTIVE
+        assert group.owners
+        own_count += len(group.owners)
+        if denominator:
+            assert group.interest
+            assert group.interest_numerator == 5
+            assert group.interest_denominator == 10
+        else:
+            assert not group.interest
+            assert not group.interest_numerator
+            assert not group.interest_denominator
+    assert own_count == owner_count

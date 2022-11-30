@@ -119,11 +119,11 @@ def test_group_json(session):
 def test_create_from_json(session):
     """Assert that the new MHR group is created from MH registration json data correctly."""
     json_data = copy.deepcopy(OWNER_GROUP)
-    group: MhrOwnerGroup = MhrOwnerGroup.create_from_json(json_data, 1000, 3000)
+    group: MhrOwnerGroup = MhrOwnerGroup.create_from_json(json_data, 1000)
     assert group
     assert group.group_id == 1
     assert group.registration_id == 1000
-    assert group.change_registration_id == 3000
+    assert group.change_registration_id == 1000
     assert group.tenancy_specified == 'Y'
     assert group.tenancy_type == MhrTenancyTypes.COMMON
     assert group.status_type == MhrOwnerStatusTypes.ACTIVE
