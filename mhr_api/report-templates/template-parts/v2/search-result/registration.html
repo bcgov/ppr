@@ -12,11 +12,11 @@
 
   <table class="business-details-table-grey" role="presentation">
     <tr>
-      <td>Registration Type:</td>
+      <td>Document Type:</td>
       <td>Manufactured Home Act</td>
     </tr>
     <tr>
-      <td>Registration Date and Time:</td>
+      <td>Document Registration Date and Time:</td>
       <td>
         {% if detail.createDateTime is defined and detail.createDateTime != '' %}
           {{detail.createDateTime}} 
@@ -26,16 +26,14 @@
       </td>
     </tr>
       <tr>
-      <td>Current Status:</td>
+      <td>Registration Status:</td>
       <td>
-        {% if detail.status == 'C' %}
-          Cancelled
-        {% elif detail.status == 'D' %}
-          Deleted
-        {% elif detail.status == 'E' %}
-          Expired
+        {% if detail.status in ('C', 'HISTORICAL') %}
+          Historical
+        {% elif detail.status in ('E', 'EXEMPT') %}
+          Exempt
         {% else %}
-          Registered
+          Active
         {% endif %}
       </td>
     </tr>

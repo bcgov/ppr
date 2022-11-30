@@ -26,7 +26,7 @@
       {% endif %}
     <table class="business-details-table-grey mt-0" role="presentation">
       <tr>
-        <td>Registration Type:</td>
+        <td>Document Type:</td>
         <td>
           {% if documentDescription is defined and documentDescription != '' %}
             {{documentDescription|title}} 
@@ -36,7 +36,7 @@
           </td>
       </tr>
       <tr>
-        <td>Registration Date and Time:</td>
+        <td>Document Registration Date and Time:</td>
         <td>
           {% if createDateTime is defined and createDateTime != '' %}
             {{createDateTime}} 
@@ -46,14 +46,14 @@
         </td>
       </tr>
         <tr>
-        <td>Current Status:</td>
+        <td>Registration Status:</td>
         <td>
           {% if status == 'HISTORICAL' %}
-            Cancelled
+            Historical
           {% elif status == 'EXEMPT' %}
-            Exempted
+            Exempt
           {% else %}
-            Registered
+            Active
           {% endif %}
         </td>
       </tr>
