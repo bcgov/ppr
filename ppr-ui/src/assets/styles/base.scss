@@ -339,7 +339,7 @@ span.invalid-color {
 .summary-header {
   color: $gray9;
   display: flex;
-  background-color: #e2e8ee;
+  background-color: $app-lt-blue;
 }
 
 .summary-text {
@@ -703,7 +703,7 @@ tr.registration-row.draft-registration-row.added-reg-effect td.actions-cell,
 
 .review-header {
   display: flex; // to align icons
-  background-color: $BCgovBlue5O;
+  background-color: $app-lt-blue;
   padding: 1.25rem;
   color: $gray9;
 }
