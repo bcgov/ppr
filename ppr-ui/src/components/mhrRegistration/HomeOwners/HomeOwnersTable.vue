@@ -453,7 +453,7 @@ export default defineComponent({
 
   tr.v-row-group__header,
   tbody tr.v-row-group__header:hover {
-    background-color: #e2e8ee;
+    background-color: $app-lt-blue;
   }
 
   .no-owners-head-row {
@@ -483,7 +483,7 @@ export default defineComponent({
     }
     tbody > tr.v-row-group__header,
     tbody > tr.v-row-group__header:hover {
-      background: #e2e8ee !important;
+      background: $app-lt-blue !important;
     }
 
     .no-owners-error {

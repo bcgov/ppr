@@ -177,7 +177,7 @@
 
       <!-- Read Only Template -->
       <v-card v-else class="review-table" flat id="read-only-owners">
-        <v-row class="my-6 px-7 pt-10" no-gutters>
+        <v-row class="mt-6 px-7 pt-8" no-gutters>
           <v-col cols="12">
             <span class="generic-label">Home Owners </span>
             <span
@@ -192,7 +192,7 @@
             </span>
           </v-col>
         </v-row>
-        <v-row class="my-6 px-7" no-gutters>
+        <v-row class="my-4 px-7" no-gutters>
           <v-col cols="3">
             <span class="generic-label">Home Tenancy Type</span>
           </v-col>

@@ -82,6 +82,7 @@ async function start () {
           light: {
             primary: '#1669bb', // same as $$primary-blue
             darkBlue: '#38598a',
+            lightBlue: '#E2E8EE', // same as $app-lt-blue
             error: '#d3272c',
             success: '#1a9031'
           }
