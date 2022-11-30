@@ -53,7 +53,7 @@ def get_other_registration(mhr_number: str):
 
         # Try to fetch summary registration by mhr number
         registration = MhrRegistration.find_summary_by_mhr_number(account_id, mhr_number, is_staff(jwt))
-        if registration is None:
+        if not registration:
             return resource_utils.not_found_error_response('Manufactured Home registration', mhr_number)
         return registration, HTTPStatus.OK
 
@@ -84,7 +84,7 @@ def post_other_registration(mhr_number: str):
             return resource_utils.unauthorized_error_response(account_id)
         # Try to fetch summary registration by mhr number
         registration = MhrRegistration.find_summary_by_mhr_number(account_id, mhr_number)
-        if registration is None:
+        if not registration:
             return resource_utils.not_found_error_response('Manufactured Home registration', mhr_number)
 
         # Check if duplicate.
