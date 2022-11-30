@@ -84,6 +84,7 @@
                   ref="orgNameSearchField"
                   label="Full Legal Name of Business or Organization"
                   v-model="searchValue"
+                  :rules="orgNameRules"
                   persistent-hint
                 >
                   <template v-slot:append>

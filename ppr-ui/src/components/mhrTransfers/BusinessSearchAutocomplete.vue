@@ -19,16 +19,16 @@
               </div>
 
               <v-list-item
-                class="pt-0 pb-0 pl-3 auto-complete-item"
+                class="auto-complete-item"
                 :disabled="isBusinessTypeSPGP(result.legalType)"
                 :class="{ disabled: isBusinessTypeSPGP(result.legalType) }"
               >
-                <v-list-item-content class="px-3 py-1">
+                <v-list-item-content class="py-2">
                   <v-list-item-subtitle>
                     <v-row class="auto-complete-row">
-                      <v-col cols="3">{{ result.identifier }}</v-col>
-                      <v-col cols="7" class="org-name pl-0">{{ result.name }}</v-col>
-                      <v-col cols="2" v-if="!isBusinessTypeSPGP(result.legalType)" class="selectable px-0">
+                      <v-col cols="2">{{ result.identifier }}</v-col>
+                      <v-col cols="8" class="org-name">{{ result.name }}</v-col>
+                      <v-col cols="2" v-if="!isBusinessTypeSPGP(result.legalType)" class="selectable">
                         Select
                       </v-col>
                     </v-row>
@@ -38,27 +38,19 @@
             </div>
           </v-list-item-group>
         </v-list>
-        <v-list v-else-if="!isSearchResultSelected && showDropdown && !searching && autoCompleteResults.length === 0">
-          <v-list-item class="auto-complete-item ">
-            <v-list-item-content class="px-2 pt-1 pb-0">
-              <v-list-item-subtitle>
-                <v-row class="auto-complete-row">
-                  <v-col id="no-party-matches">
-                    <p>
-                      <strong>
-                        No matches found.
-                      </strong>
-                    </p>
-                    <p>
-                      Ensure you have entered the correct, full legal name of the organization before entering the phone
-                      number and mailing address.
-                    </p>
-                  </v-col>
-                </v-row>
-              </v-list-item-subtitle>
-            </v-list-item-content>
-          </v-list-item>
-        </v-list>
+        <div
+          v-else-if="!isSearchResultSelected && showDropdown && !searching && autoCompleteResults.length === 0"
+          id="no-party-matches"
+          class="pa-5"
+        >
+          <p>
+            <strong>
+              No matches found.
+            </strong>
+          </p>
+            Ensure you have entered the correct, full legal name of the organization before entering the phone number
+            and mailing address.
+        </div>
       </v-col>
     </v-row>
   </v-card>
@@ -106,8 +98,8 @@ export default defineComponent({
       localState.searching = false
     }
 
-    const isBusinessTypeSPGP = (businessType: string): boolean => {
-      return businessType === (BusinessTypes.GENERAL_PARTNERSHIP || BusinessTypes.SOLE_PROPRIETOR)
+    const isBusinessTypeSPGP = (businessType: BusinessTypes): boolean => {
+      return [BusinessTypes.GENERAL_PARTNERSHIP, BusinessTypes.SOLE_PROPRIETOR].includes(businessType)
     }
 
     watch(
@@ -164,7 +156,6 @@ export default defineComponent({
 }
 
 .auto-complete-row {
-  width: 35rem;
   color: $gray7 !important;
   font-size: 16px;
 
@@ -207,13 +198,14 @@ export default defineComponent({
 .info-tooltip {
   position: relative;
   float: right;
-  top: 20px;
-  right: 30px;
+  top: 15px;
+  right: 40px;
+  width: 0px;
 }
 
 .selectable {
   color: $primary-blue !important;
-  text-align: center;
+  text-align: right;
   font-size: 14px;
 }
 
