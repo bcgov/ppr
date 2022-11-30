@@ -343,7 +343,7 @@ class Db2Manuhome(db.Model):
         """Return a search dict of this object, with keys in JSON format."""
         man_home = {
             'mhrNumber': self.mhr_number,
-            'status': self.mh_status
+            'status': LEGACY_STATUS_DESCRIPTION.get(self.mh_status)
         }
         declared_value: int = 0
         declared_ts: str = None
