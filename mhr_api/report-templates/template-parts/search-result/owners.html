@@ -30,7 +30,7 @@
                         {% endif %}
                     </div>
                     {% if party.suffix is defined and party.suffix != '' %}
-                        <div class="pt-2">{{ party.suffix }}</div>
+                        <div class="pt-2">{{ party.suffix|upper }}</div>
                     {% endif %} 
                 </td>
                 <td class="col-33">
@@ -44,6 +44,11 @@
                         {% endif %}
                         {{ party.address.country}}
                     </div>
+                    {% if party.address.deliveryInstructions is defined and party.address.deliveryInstructions != '' %}
+                        <div>
+                            {{ party.address.deliveryInstructions }}
+                        </div>
+                    {% endif %}
                 </td>
                 <td class="col-33">
                     <div class="section-sub-title">Tenancy Type</div>

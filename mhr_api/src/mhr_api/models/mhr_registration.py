@@ -261,7 +261,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
 
     def save_transfer(self, json_data, new_reg_id):
         """Update the original MH removed owner groups."""
-        self.create_changed_groups(json_data, new_reg_id)
+        self.remove_groups(json_data, new_reg_id)
 
     def get_registration_type(self):
         """Lookup registration type record if it has not already been fetched."""
@@ -512,6 +512,8 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
 
         if 'clientReferenceId' in json_data:
             registration.client_reference_id = json_data['clientReferenceId']
+        if base_reg.owner_groups:
+            registration.add_new_groups(json_data, len(base_reg.owner_groups))
         # Other parties
         registration.parties = MhrParty.create_from_registration_json(json_data, registration.id)
         if registration.doc_id and not json_data.get('documentId'):
@@ -621,25 +623,15 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         # Update interest common denominator
         self.adjust_group_interest(True)
 
-    def create_changed_groups(self, json_data, new_reg_id):
-        """Create owner groups and owners for a new MH registration."""
-        if json_data.get('deleteOwnerGroups'):
-            for group in json_data.get('deleteOwnerGroups'):
-                for existing in self.owner_groups:
-                    if existing.group_id == group.get('groupId'):
-                        current_app.logger.info(f'Existing group id={existing.group_id}, status={existing.status_type}')
-                        existing.status_type = MhrOwnerStatusTypes.PREVIOUS
-                        # existing.change_registration_id = self.id
-                        existing.modified = True
-                        current_app.logger.info(f'Found owner group to remove id={existing.id} base reg id={self.id}')
-                        for owner in existing.owners:
-                            owner.status_type = MhrOwnerStatusTypes.PREVIOUS
+    def add_new_groups(self, json_data, existing_count: int):
+        """Create owner groups and owners for a change (transfer) registration."""
+        self.owner_groups = []
         # Update owner groups: group ID increments with each change.
-        group_id: int = len(self.owner_groups) + 1
+        group_id: int = existing_count + 1
         if json_data.get('addOwnerGroups'):
             for group_json in json_data.get('addOwnerGroups'):
                 current_app.logger.info(f'Creating owner group id={group_id}')
-                new_group: MhrOwnerGroup = MhrOwnerGroup.create_from_change_json(group_json, self.id, new_reg_id,
+                new_group: MhrOwnerGroup = MhrOwnerGroup.create_from_change_json(group_json, self.id, self.id,
                                                                                  group_id)
                 group_id += 1
                 # Add owners
@@ -647,10 +639,25 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                     party_type = MhrPartyTypes.OWNER_BUS
                     if owner_json.get('individualName'):
                         party_type = MhrPartyTypes.OWNER_IND
-                    new_group.owners.append(MhrParty.create_from_json(owner_json, party_type, self.id, new_reg_id))
+                    new_group.owners.append(MhrParty.create_from_json(owner_json, party_type, self.id))
                 current_app.logger.info(f'Creating owner group id={group_id} reg id={new_group.registration_id}')
                 self.owner_groups.append(new_group)
             self.adjust_group_interest(False)
+
+    def remove_groups(self, json_data, new_reg_id):
+        """Set change registration id for removed owner groups and owners for a transfer registration."""
+        if json_data.get('deleteOwnerGroups'):
+            for group in json_data.get('deleteOwnerGroups'):
+                for existing in self.owner_groups:
+                    if existing.group_id == group.get('groupId'):
+                        current_app.logger.info(f'Existing group id={existing.group_id}, status={existing.status_type}')
+                        existing.status_type = MhrOwnerStatusTypes.PREVIOUS
+                        existing.change_registration_id = new_reg_id
+                        existing.modified = True
+                        current_app.logger.info(f'Found owner group to remove id={existing.id} base reg id={self.id}')
+                        for owner in existing.owners:
+                            owner.status_type = MhrOwnerStatusTypes.PREVIOUS
+                            owner.change_registration_id = new_reg_id
 
     @staticmethod
     def find_draft(json_data, registration_type: str = None):

@@ -1,6 +1,26 @@
 <div class="section-title mt-3">
     {% if registrationType in ('TRANS', 'TRAND') %}New{% endif %} Registered Owner(s) Information
 </div>
+{% if registrationType in ('TRANS', 'TRAND') %}
+    <div class="no-page-break mt-3">
+        <span class="section-sub-title">Home Tenancy Type:</span>
+        {% if addOwnerGroups is defined %}
+            <span class="section-data">
+                {% if addOwnerGroups[0].type == 'SOLE' %}
+                    Sole Owner
+                {% elif addOwnerGroups[0].type == 'JOINT' %}
+                    Joint Tenants
+                {% else %}
+                    Tenants in Common
+                {% endif %}
+            </span>
+        {% endif %}
+    </div>
+    {% if addOwnerGroups[0].type == 'COMMON' %}
+        <div class="separator-section mt-3"></div>
+    {% endif %}
+{% endif %}
+
 {% if ownerGroups is defined %}
     {% if ownerGroups|length > 1 %}
     <div class="no-page-break mt-3">
@@ -32,7 +52,7 @@
                         {% endif %}
                     </div>
                     {% if party.suffix is defined and party.suffix != '' %}
-                    <div class="pt-2">{{ party.suffix }}</div>
+                    <div class="pt-2">{{ party.suffix|upper }}</div>
                     {% endif %} 
                 </td>
                 <td class="col-33">
@@ -46,6 +66,11 @@
                         {% endif %}
                         {{ party.address.country}}
                     </div>
+                    {% if party.address.deliveryInstructions is defined and party.address.deliveryInstructions != '' %}
+                        <div>
+                            {{ party.address.deliveryInstructions }}
+                        </div>
+                    {% endif %}
                 </td>
                 <td class="col-33">
                     <div class="section-sub-title">Tenancy Type</div>
@@ -93,7 +118,7 @@
                     {% endif %}
                 </div>
                 {% if party.suffix is defined and party.suffix != '' %}
-                <div class="pt-2">{{ party.suffix }}</div>
+                <div class="pt-2">{{ party.suffix|upper }}</div>
                 {% endif %} 
             </td>
             <td class="col-33">
@@ -107,24 +132,31 @@
                     {% endif %}
                     {{ party.address.country}}
                 </div>
+                {% if party.address.deliveryInstructions is defined and party.address.deliveryInstructions != '' %}
+                    <div>
+                        {{ party.address.deliveryInstructions }}
+                    </div>
+                {% endif %}
             </td>
             <td class="col-33">
-                <div class="section-sub-title">Tenancy Type</div>
-                <div class="pt-2">
-                    {% if group.type == 'SOLE' %}
-                        Sole Owner
-                    {% elif group.type == 'JOINT' %}
-                        Joint Tenants
-                    {% else %}
-                        Tenants in Common
-                    {% endif %}
-                </div>
+                {% if registrationType not in ('TRANS', 'TRAND') %}
+                    <div class="section-sub-title">Tenancy Type</div>
+                    <div class="pt-2">
+                        {% if group.type == 'SOLE' %}
+                            Sole Owner
+                        {% elif group.type == 'JOINT' %}
+                            Joint Tenants
+                        {% else %}
+                            Tenants in Common
+                        {% endif %}
+                    </div>
+                {% endif %}
             </td>
         </tr>
-        {% if not loop.last %}
-            <tr><td colspan="3"><div class="mt-4"></div></td></tr>            
-        {% endif %}
     {% endfor %}
     </table> 
+    {% if not loop.last %}
+        <div class="separator-section mt-4 mb-1"></div>
+    {% endif %}
     {% endfor %}
  {% endif %}
