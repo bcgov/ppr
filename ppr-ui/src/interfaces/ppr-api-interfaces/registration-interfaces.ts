@@ -101,6 +101,7 @@ export interface MhRegistrationSummaryIF {
   changes?: MhRegistrationSummaryIF []
   hasDraft?: boolean
   documentId?: string
+  documentRegistrationNumber?: string
   expand?: boolean, // used in UI table to toggle expansion.
   expireDays?: number, // Number of days until expiry
 }
