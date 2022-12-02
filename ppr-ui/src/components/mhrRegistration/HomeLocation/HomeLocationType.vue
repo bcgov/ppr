@@ -67,7 +67,7 @@
                   <v-text-field
                     filled
                     class="ml-8"
-                    label="Pad (Optional)"
+                    label="Pad"
                     v-model="homeParkPad"
                     :rules="homeParkPadRules"
                   />
@@ -230,7 +230,7 @@ export default defineComponent({
       }),
       homeParkPadRules: computed(() => {
         return localState.locationTypeOption as any === HomeLocationTypes.HOME_PARK
-          ? maxLength(6)
+          ? customRules(required('Enter a pad'), maxLength(6))
           : []
       }),
       isLocationTypeValid: computed((): boolean => {
