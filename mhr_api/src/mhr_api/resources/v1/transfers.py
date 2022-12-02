@@ -78,7 +78,8 @@ def post_transfers(mhr_number: str):  # pylint: disable=too-many-return-statemen
         # Return report if request header Accept MIME type is application/pdf.
         if resource_utils.is_pdf(request):
             current_app.logger.info('Report not yet available: returning JSON.')
-        reg_utils.enqueue_registration_report(registration, response_json, ReportTypes.MHR_TRANSFER)
+        # Report data include all active owners.
+        setup_report(registration, response_json, current_reg)
         return jsonify(response_json), HTTPStatus.CREATED
 
     except DatabaseException as db_exception:
@@ -90,3 +91,28 @@ def post_transfers(mhr_number: str):  # pylint: disable=too-many-return-statemen
         return resource_utils.business_exception_response(exception)
     except Exception as default_exception:   # noqa: B902; return nicer default error
         return resource_utils.default_exception_response(default_exception)
+
+
+def setup_report(registration: MhrRegistration, response_json, current_reg: MhrRegistration):
+    """Include all active owners in the transfer report request data and add it to the queue."""
+    add_groups = response_json.get('addOwnerGroups')
+    current_reg.current_view = True
+    current_json = current_reg.new_registration_json
+    new_groups = []
+    for group in current_json.get('ownerGroups'):
+        deleted: bool = False
+        for delete_group in response_json.get('deleteOwnerGroups'):
+            if delete_group.get('groupId') == group.get('groupId'):
+                deleted = True
+        if not deleted:
+            new_groups.append(group)
+    for add_group in add_groups:
+        added: bool = False
+        for new_group in new_groups:
+            if add_group.get('groupId') == new_group.get('groupId'):
+                added = True
+        if not added:
+            new_groups.append(add_group)
+    response_json['addOwnerGroups'] = new_groups
+    reg_utils.enqueue_registration_report(registration, response_json, ReportTypes.MHR_TRANSFER)
+    response_json['addOwnerGroups'] = add_groups
