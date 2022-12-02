@@ -67,7 +67,7 @@
                         {{ party.address.country}}
                     </div>
                     {% if party.address.deliveryInstructions is defined and party.address.deliveryInstructions != '' %}
-                        <div>
+                        <div class="italic pt-2">
                             {{ party.address.deliveryInstructions }}
                         </div>
                     {% endif %}
@@ -133,7 +133,7 @@
                     {{ party.address.country}}
                 </div>
                 {% if party.address.deliveryInstructions is defined and party.address.deliveryInstructions != '' %}
-                    <div>
+                    <div class="italic pt-2">
                         {{ party.address.deliveryInstructions }}
                     </div>
                 {% endif %}
@@ -153,6 +153,9 @@
                 {% endif %}
             </td>
         </tr>
+        {% if not loop.last %}
+            <tr><td colspan="3"><div class="mt-4"></div></td></tr>            
+        {% endif %}
     {% endfor %}
     </table> 
     {% if not loop.last %}
