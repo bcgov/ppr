@@ -7,7 +7,7 @@
     />
 
     <v-col cols="12">
-      <p class="font-weight-bold">PID Number</p>
+      <p class="font-weight-bold pb-3">PID Number</p>
     </v-col>
     <v-col cols="12" sm="3">
       <v-text-field
@@ -18,6 +18,7 @@
         hint="Parcel identifier must contain 9 digits"
         :readonly="enablePidLoader"
         :error-messages="invalidPidMsg"
+        :disabled="disable"
         v-model="pidOne"
         @paste="parsePaste($event)"
       />
@@ -32,6 +33,7 @@
         filled
         maxlength="3"
         :readonly="enablePidLoader"
+        :disabled="disable"
         v-model="pidTwo"
         @paste="parsePaste($event)"
       />
@@ -46,6 +48,7 @@
         filled
         maxlength="3"
         :readonly="enablePidLoader"
+        :disabled="disable"
         v-model="pidThree"
         @paste="parsePaste($event)"
       />
@@ -60,6 +63,17 @@
         :size="25"
         :width="3"
       />
+
+      <v-btn
+        v-else-if="isCompletePid && isValidPid && !showNotFoundDialog"
+        text
+        plain="true"
+        color="primary"
+        :ripple="false"
+        @click="clearPid()"
+      >
+        Cancel <v-icon>mdi-close</v-icon>
+      </v-btn>
     </v-col>
   </v-row>
 </template>
@@ -69,18 +83,21 @@
 import vue from 'vue'
 import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
 import { useInputRules } from '@/composables'
-import { ltsaSummary } from '@/utils/ltsa-api-helper'
+import { ltsaDetails } from '@/utils/ltsa-api-helper'
 import { BaseDialog } from '@/components/dialogs'
 import { pidNotFoundDialog } from '@/resources/dialogOptions'
-import { TitleSummariesIF } from '@/interfaces/ltsa-api-interfaces'
+import { LtsaDetailsIF, PidInfoIF } from '@/interfaces/ltsa-api-interfaces'
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
   name: 'PidNumber',
+  emits: ['setPid'],
   components: {
     BaseDialog
   },
-  props: {},
+  props: {
+    disable: { type: Boolean, default: false }
+  },
   setup (props, context) {
     // Composable(s)
     const {
@@ -94,10 +111,17 @@ export default defineComponent({
       enablePidLoader: false,
       dialogOptions: pidNotFoundDialog,
       showNotFoundDialog: false,
-      pidNumber: computed(() => {
+      legalDescription: '',
+      isCompletePid: computed((): boolean => {
+        return localState.pidNumber.length === 9
+      }),
+      pidNumber: computed((): string => {
         return `${localState.pidOne}${localState.pidTwo}${localState.pidThree}`
       }),
-      isValidPid: computed(() => {
+      requestParcelIdentified: computed((): string => {
+        return `${localState.pidOne}-${localState.pidTwo}-${localState.pidThree}`
+      }),
+      isValidPid: computed((): boolean => {
         return (
           (localState.pidOne ? /^\d+$/g.test(localState.pidOne) : true) &&
           (localState.pidTwo ? /^\d+$/g.test(localState.pidTwo) : true) &&
@@ -129,18 +153,23 @@ export default defineComponent({
 
     const validatePid = async (): Promise<boolean> => {
       localState.enablePidLoader = true
-      const { titleSummaries } = await ltsaSummary(localState.pidNumber) as TitleSummariesIF
+      const { legalDescription } = await ltsaDetails(localState.requestParcelIdentified) as LtsaDetailsIF
+      localState.legalDescription = legalDescription || ''
       localState.enablePidLoader = false
-      return titleSummaries?.length > 0
+      return !!legalDescription
     }
 
     const clearPid = (): void => {
       localState.pidOne = ''
       localState.pidTwo = ''
       localState.pidThree = ''
+      localState.legalDescription = ''
       emitPid()
     }
-    const emitPid = (): void => { context.emit('setPid', localState.pidNumber) }
+    const emitPid = (): void => {
+      context.emit('setPid',
+        { pidNumber: localState.pidNumber, legalDescription: localState.legalDescription } as PidInfoIF)
+    }
 
     watch(() => localState.pidOne, () => {
       // @ts-ignore - function exists
@@ -160,7 +189,7 @@ export default defineComponent({
       context.emit('verifyingPid', localState.enablePidLoader)
     })
     watch(() => localState.pidNumber, async () => {
-      if (localState.isValidPid && localState.pidNumber.length === 9) {
+      if (localState.isValidPid && localState.isCompletePid) {
         await validatePid() ? emitPid() : localState.showNotFoundDialog = true
       }
     })
@@ -169,6 +198,7 @@ export default defineComponent({
       parsePaste,
       isNumber,
       dialogRetry,
+      clearPid,
       ...toRefs(localState)
     }
   }
@@ -199,6 +229,10 @@ export default defineComponent({
   }
   .v-progress-circular {
     margin: 2rem;
+  }
+  .v-icon.mdi-close {
+    padding-left: 2px;
+    font-size: 20px;
   }
 }
 </style>

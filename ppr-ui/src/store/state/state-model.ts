@@ -199,7 +199,18 @@ export const stateModel: StateModelIF = {
       dealerName: '',
       additionalDescription: '',
       locationType: null,
-      otherType: null
+      otherType: null,
+      legalDescription: '',
+      parcel: '',
+      block: '',
+      districtLot: '',
+      partOf: '',
+      section: '',
+      township: '',
+      range: '',
+      meridian: '',
+      landDistrict: '',
+      plan: ''
     },
     description: {
       manufacturer: '',

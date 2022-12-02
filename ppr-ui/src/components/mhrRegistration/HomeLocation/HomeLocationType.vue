@@ -119,18 +119,26 @@
 
                   <!-- Pid Number Input -->
                   <v-expand-transition>
-                    <PidNumber
-                      v-if="otherTypeOption === HomeLocationTypes.OTHER_STRATA"
-                      class="ml-8 mb-4"
-                      @setPid="pidNumber = $event"
-                      @verifyingPid="isVerifyingPid = $event"
-                    />
 
-                    <!-- Home Location Info Form -->
-<!--                    <HomeLocationInfo-->
-<!--                      class="ml-8 mb-4"-->
-<!--                      v-if="otherTypeOption === HomeLocationTypes.OTHER_STRATA"-->
-<!--                    />-->
+                    <div v-if="otherTypeOption === HomeLocationTypes.OTHER_STRATA" class="ml-8">
+
+                      <PidNumber
+                        class="mb-4"
+                        :disable="showLocationInfo"
+                        @setPid="handlePidInfo($event)"
+                        @verifyingPid="isVerifyingPid = $event"
+                      />
+
+                      <HomeLocationDescription
+                        isStrata
+                        :validate="validate"
+                        :legalDescription="legalDescription"
+                        @setIsValidLocationInfo="isValidLocationInfo = $event"
+                        @setShowLocationInfo="showLocationInfo = $event"
+                        @setLocationInfo="locationInfo = $event"
+                        @setAdditionalDescription="additionalDescription = $event"
+                      />
+                    </div>
 
                   </v-expand-transition>
 
@@ -144,19 +152,24 @@
 
                   <!-- Pid Number Input -->
                   <v-expand-transition>
-                    <PidNumber
-                      v-if="otherTypeOption === HomeLocationTypes.OTHER_TYPE"
-                      class="ml-8"
-                      @setPid="pidNumber = $event"
-                      @verifyingPid="isVerifyingPid = $event"
-                    />
 
-                    <!-- Home Location Info Form -->
-<!--                    <HomeLocationInfo-->
-<!--                      class="ml-8 mb-4"-->
-<!--                      v-if="otherTypeOption === HomeLocationTypes.OTHER_TYPE"-->
-<!--                    />-->
+                    <div v-if="otherTypeOption === HomeLocationTypes.OTHER_TYPE" class="ml-8">
+                      <PidNumber
+                        class="mb-4"
+                        :disable="showLocationInfo"
+                        @setPid="handlePidInfo($event)"
+                        @verifyingPid="isVerifyingPid = $event"
+                      />
 
+                      <HomeLocationDescription
+                        :validate="validate"
+                        :legalDescription="legalDescription"
+                        @setIsValidLocationInfo="isValidLocationInfo = $event"
+                        @setShowLocationInfo="showLocationInfo = $event"
+                        @setLocationInfo="locationInfo = $event"
+                        @setAdditionalDescription="additionalDescription = $event"
+                      />
+                    </div>
                   </v-expand-transition>
                 </v-radio-group>
               </v-expand-transition>
@@ -174,12 +187,16 @@ import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composi
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import { HomeLocationTypes } from '@/enums'
 import { HomeLocationInfo, PidNumber } from '@/components/common'
+import HomeLocationDescription from './HomeLocationDescription.vue'
 import { useInputRules, useMhrValidations } from '@/composables'
+import { MhrLocationInfoIF } from '@/interfaces'
+import { PidInfoIF } from '@/interfaces/ltsa-api-interfaces'
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
   name: 'HomeLocationType',
   components: {
+    HomeLocationDescription,
     HomeLocationInfo,
     PidNumber
   },
@@ -212,12 +229,17 @@ export default defineComponent({
       isValidLot: false,
       isValidHomePark: false,
       isVerifyingPid: false,
+      isValidLocationInfo: false,
       locationTypeOption: HomeLocationTypes,
       otherTypeOption: HomeLocationTypes,
       dealerManufacturerLot: '',
       homeParkName: '',
       homeParkPad: '',
       pidNumber: '',
+      showLocationInfo: false,
+      locationInfo: {},
+      legalDescription: '',
+      additionalDescription: '',
       dealerManufacturerLotRules: computed(() => {
         return localState.locationTypeOption as any === HomeLocationTypes.LOT
           ? customRules(required('Enter a dealer or manufacturer name'), maxLength(60))
@@ -248,13 +270,19 @@ export default defineComponent({
                 return true // Future state includes new fields TBD
               case HomeLocationTypes.OTHER_STRATA:
               case HomeLocationTypes.OTHER_TYPE:
-                return localState.pidNumber !== '' // Future state includes new fields TBD
+                return (localState.showLocationInfo && localState.isValidLocationInfo) ||
+                  (!!localState.pidNumber && !!localState.legalDescription && localState.isValidLocationInfo)
               default:
                 return false
             }
         }
       })
     })
+
+    const handlePidInfo = (pidInfo: PidInfoIF): void => {
+      localState.pidNumber = pidInfo.pidNumber
+      localState.legalDescription = pidInfo.legalDescription
+    }
 
     const validateForms = (): void => {
       if (props.validate) {
@@ -277,6 +305,15 @@ export default defineComponent({
     })
     watch(() => localState.pidNumber, () => {
       setMhrLocation({ key: 'pidNumber', value: localState.pidNumber })
+      setMhrLocation({ key: 'legalDescription', value: localState.legalDescription })
+    })
+    watch(() => localState.locationInfo, (val: MhrLocationInfoIF) => {
+      for (const [key, value] of Object.entries(val)) {
+        setMhrLocation({ key: key, value: value })
+      }
+    })
+    watch(() => localState.additionalDescription, () => {
+      setMhrLocation({ key: 'additionalDescription', value: localState.additionalDescription })
     })
     watch(() => localState.locationTypeOption, () => {
       setMhrLocation({ key: 'locationType', value: localState.locationTypeOption })
@@ -295,16 +332,23 @@ export default defineComponent({
       localState.pidNumber = ''
       localState.otherTypeOption = null
       localState.dealerManufacturerLot = ''
+      localState.toggleInfoForm = false
       validateForms()
     })
     watch(() => localState.otherTypeOption, () => {
       localState.pidNumber = ''
+      localState.legalDescription = ''
+      localState.locationInfo = {}
+      localState.additionalDescription = ''
+      localState.showLocationInfo = false
+      localState.toggleInfoForm = false
     })
     watch(() => localState.validate, () => {
       validateForms()
     })
 
     return {
+      handlePidInfo,
       HomeLocationTypes,
       customRules,
       required,
@@ -317,4 +361,13 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+::v-deep {
+  .v-text-field > .v-input__control > .v-input__slot {
+    background-color: $gray1;
+  }
+  .v-icon.mdi-close {
+    padding-left: 2px;
+    font-size: 20px;
+  }
+}
 </style>
