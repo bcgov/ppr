@@ -4,7 +4,7 @@ import { axios } from '@/utils'
 import { SearchResponseI } from '@/interfaces'
 import { StatusCodes } from 'http-status-codes'
 
-const SEARCH_RESULT_SIZE = 1000
+const SEARCH_RESULT_SIZE = 100
 
 export const useSearch = () => {
   const isMHRSearchType = (type: string): boolean => {
@@ -40,7 +40,7 @@ export const useSearch = () => {
   const searchBusiness = async (searchValue: string): Promise<SearchResponseI> => {
     if (!searchValue) return
     // basic params
-    const params = { query: `value:${searchValue}`, start: 0, rows: SEARCH_RESULT_SIZE }
+    const params = { query: `value:${searchValue}`, categories: 'status:active', start: 0, rows: SEARCH_RESULT_SIZE }
     // add search-api config stuff
     const config = getSearchConfig(params)
     return axios.get<SearchResponseI>('businesses/search/facets', config)
