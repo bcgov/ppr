@@ -43,17 +43,7 @@
             </div>
           </v-list-item-group>
         </v-list>
-        <div
-          v-else-if="
-            !isSearchResultSelected &&
-              autoCompleteIsActive &&
-              !searching &&
-              autoCompleteResults &&
-              autoCompleteResults.length === 0
-          "
-          id="no-party-matches"
-          class="pa-5"
-        >
+        <div v-else-if="hasNoMatches" id="no-party-matches" class="pa-5">
           <p>
             <strong>
               No matches found.
@@ -96,7 +86,15 @@ export default defineComponent({
       autoCompleteSelected: null,
       showAutoComplete: computed((): boolean => props.searchValue.length >= 3),
       searching: false,
-      isSearchResultSelected: false
+      isSearchResultSelected: false,
+      hasNoMatches: computed(
+        (): boolean =>
+          !localState.isSearchResultSelected &&
+          localState.autoCompleteIsActive &&
+          !localState.searching &&
+          localState.autoCompleteResults &&
+          localState.autoCompleteResults.length === 0
+      )
     })
 
     const updateAutoCompleteResults = async (searchValue: string) => {
