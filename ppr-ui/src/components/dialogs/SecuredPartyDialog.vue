@@ -119,8 +119,8 @@
                 {{ partyWord }} Party Code: {{ result.code }}
               </div>
             </v-col>
-            <v-col cols="2" class="pt-5"
-              ><v-btn v-if="!isExistingSecuredParty(result.code)"
+            <v-col v-if="!isExistingSecuredParty(result.code)" cols="2" class="pt-5">
+              <v-btn
                 class="ml-auto float-right"
                 color="primary"
                 :class="$style['partyButton']"
@@ -128,8 +128,10 @@
               >
                 Select
               </v-btn>
-              <span class="auto-complete-added" v-else>
-                <v-icon :class="[$style['icon-bump'], 'auto-complete-added']">mdi-check</v-icon>Added
+            </v-col>
+            <v-col v-else cols="2">
+              <span :class="$style['added-text']" class="auto-complete-added float-right">
+                <v-icon class="auto-complete-added">mdi-check</v-icon>Added
               </span>
             </v-col>
           </v-row>
@@ -285,6 +287,10 @@ export default defineComponent({
 .addressText {
   font-size: 0.875rem;
   color: $gray7;
+}
+
+.added-text {
+  font-size: 0.875rem !important;
 }
 .companyText {
   font-weight: 700;
