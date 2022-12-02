@@ -6,8 +6,9 @@
     </header>
 
     <div :class="{ 'border-error-left': !getStepValidation(MhrSectVal.LOCATION_VALID)}">
-      <section :class="{ 'pb-8': !(!!getMhrRegistrationLocation.locationType) && !hasAddress }" class="mx-6 pt-8"
-      v-if="!getStepValidation(MhrSectVal.LOCATION_VALID)">
+      <section v-if="!getStepValidation(MhrSectVal.LOCATION_VALID)"
+        :class="{ 'pb-8': !(!!getMhrRegistrationLocation.locationType) && !hasAddress }" class="mx-6 pt-8"
+      >
         <span>
           <v-icon color="error">mdi-information-outline</v-icon>
           <span class="error-text mx-1">This step is unfinished.</span>
@@ -17,8 +18,9 @@
         </span>
       </section>
 
-      <section class="py-6" id="review-home-location-section"
-      v-if="(!!getMhrRegistrationLocation.locationType || hasAddress)">
+      <section v-if="(!!getMhrRegistrationLocation.locationType || hasAddress)"
+        class="py-6" id="review-home-location-section"
+      >
         <v-row no-gutters class="px-6">
           <v-col cols="3" class="pt-1">
             <h3>Location Type</h3>
@@ -125,9 +127,9 @@ export default defineComponent({
           .includes(getMhrRegistrationLocation.value.otherType)
       }),
       hasAddress: computed((): boolean => {
-        return getMhrRegistrationLocation.value.address.street ||
-        getMhrRegistrationLocation.value.address.streetAdditional ||
-        getMhrRegistrationLocation.value.address.city
+        return getMhrRegistrationLocation.value.address?.street ||
+        getMhrRegistrationLocation.value.address?.streetAdditional ||
+        getMhrRegistrationLocation.value.address?.city
       }),
       displayPid: computed((): string => {
         return getMhrRegistrationLocation.value.pidNumber.replace(/(\d{3})(\d{3})(\d{3})/, '$1-$2-$3')
