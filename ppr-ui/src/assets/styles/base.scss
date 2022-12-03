@@ -342,6 +342,11 @@ span.invalid-color {
   background-color: $app-lt-blue;
 }
 
+.info-text {
+  color: $gray7;
+  margin-bottom: 0 !important;
+}
+
 .summary-text {
   font-size: 1rem;
   color: $gray7;
@@ -379,7 +384,7 @@ span.invalid-color {
 }
 
 .generic-link {
-  color: #1669bb;
+  color: $app-blue;
   text-decoration: underline;
 }
 

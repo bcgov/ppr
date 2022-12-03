@@ -449,7 +449,7 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-span  {
+span:not(.generic-label)  {
   color: $gray7
 }
 

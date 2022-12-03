@@ -7,9 +7,9 @@
           <v-text-field
             filled
             id="lot"
-            label="Lot"
+            :label="isStrata ? 'Strata Lot' : 'Lot'"
             v-model="locationInfo.lot"
-            :rules="locationInputRules(10, 'Enter a lot number')"
+            :rules="locationInputRules(10, 'Enter a lot number', 'lot')"
             persistent-hint
           />
         </v-col>
@@ -22,7 +22,7 @@
             id="land-district"
             label="Land District"
             v-model="locationInfo.landDistrict"
-            :rules="locationInputRules(20, 'Enter a land district')"
+            :rules="locationInputRules(20, 'Enter a land district', 'land-district')"
             persistent-hint
           />
         </v-col>
@@ -33,9 +33,9 @@
           <v-text-field
             filled
             id="plan"
-            label="Plan"
+            :label="isStrata ? 'Strata Plan' : 'Plan'"
             v-model="locationInfo.plan"
-            :rules="locationInputRules(12, 'Enter a plan number')"
+            :rules="locationInputRules(12, 'Enter a plan number', 'plan')"
             persistent-hint
           />
         </v-col>
@@ -48,7 +48,7 @@
             id="district-lot"
             label="District Lot"
             v-model="locationInfo.districtLot"
-            :rules="locationInputRules(17, 'Enter a district lot')"
+            :rules="locationInputRules(17, 'Enter a district lot', 'district-lot')"
             persistent-hint
           />
         </v-col>
@@ -154,7 +154,7 @@
 
 <script lang="ts">
 /* eslint-disable no-unused-vars */
-import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
+import { computed, defineComponent, onMounted, reactive, toRefs, watch } from '@vue/composition-api'
 import { MhrLocationInfoIF } from '@/interfaces'
 import { useInputRules } from '@/composables/useInputRules'
 /* eslint-disable no-unused-vars */
@@ -163,7 +163,8 @@ export default defineComponent({
   name: 'HomeLocationInfo',
   emits: ['updateLocationInfo', 'updateLocationValid'],
   props: {
-    validate: { type: Boolean, default: false }
+    validate: { type: Boolean, default: false },
+    isStrata: { type: Boolean, default: false }
   },
   setup (props, context) {
     const {
@@ -187,24 +188,36 @@ export default defineComponent({
         parcel: '',
         block: '',
         exceptPlan: ''
-      } as MhrLocationInfoIF,
-      applyRequired: computed((): boolean => {
-        const info = localState.locationInfo
-        return !info.lot && !info.parcel && !info.block && !info.districtLot && !info.landDistrict && !info.plan
-      })
+      } as MhrLocationInfoIF
     })
 
-    const locationInputRules = (length: number, requiredMsg: string) => {
+    onMounted(() => {
+      if (props.validate) validateLocationInfo()
+    })
+
+    const locationInputRules = (length: number, requiredMsg: string, fieldId: string = null) => {
+      const strataRequirements = ['lot', 'land-district', 'plan']
+      const otherLocationRequirements =
+        (localState.locationInfo.districtLot || localState.locationInfo.landDistrict) &&
+        (!localState.locationInfo.lot && !localState.locationInfo.plan)
+          ? ['land-district', 'district-lot']
+          : strataRequirements
+      const isRequired = props.isStrata ? strataRequirements : otherLocationRequirements
+
       return customRules(
         maxLength(length),
-        localState.applyRequired ? required(requiredMsg) : []
+        isRequired.includes(fieldId) ? required(requiredMsg) : []
       )
     }
 
-    /** Prompt local validations on validate event. **/
-    watch(() => props.validate, (validate) => {
+    const validateLocationInfo = (): void => {
       // @ts-ignore - function exists
-      if (validate) context.refs.homeLocationInfoRef.validate()
+      context.refs.homeLocationInfoRef.validate()
+    }
+
+    /** Prompt local validations on validate event. **/
+    watch(() => props.validate, (val) => {
+      if (val) validateLocationInfo()
     })
 
     /** Emit local model to parent when it changes. **/
