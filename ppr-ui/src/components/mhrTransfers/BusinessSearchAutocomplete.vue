@@ -1,5 +1,10 @@
 <template>
-  <v-card v-if="showAutoComplete" id="business-search-autocomplete" class="auto-complete-card" elevation="5">
+  <v-card
+    v-if="showAutoComplete && !searching"
+    id="business-search-autocomplete"
+    class="auto-complete-card"
+    elevation="5"
+  >
     <v-row no-gutters justify="center">
       <v-col no-gutters cols="12">
         <v-list v-if="autoCompleteResults && autoCompleteResults.length > 0" class="pt-0 results-list">
@@ -38,18 +43,14 @@
             </div>
           </v-list-item-group>
         </v-list>
-        <div
-          v-else-if="!isSearchResultSelected && showDropdown && !searching && autoCompleteResults.length === 0"
-          id="no-party-matches"
-          class="pa-5"
-        >
+        <div v-else-if="hasNoMatches" id="no-party-matches" class="pa-5">
           <p>
             <strong>
               No matches found.
             </strong>
           </p>
-            Ensure you have entered the correct, full legal name of the organization before entering the phone number
-            and mailing address.
+          Ensure you have entered the correct, full legal name of the organization before entering the phone number and
+          mailing address.
         </div>
       </v-col>
     </v-row>
@@ -81,11 +82,19 @@ export default defineComponent({
 
     const localState = reactive({
       autoCompleteIsActive: props.setAutoCompleteIsActive,
-      autoCompleteResults: [],
+      autoCompleteResults: null,
       autoCompleteSelected: null,
       showAutoComplete: computed((): boolean => props.searchValue.length >= 3),
       searching: false,
-      isSearchResultSelected: false
+      isSearchResultSelected: false,
+      hasNoMatches: computed(
+        (): boolean =>
+          !localState.isSearchResultSelected &&
+          localState.autoCompleteIsActive &&
+          !localState.searching &&
+          localState.autoCompleteResults &&
+          localState.autoCompleteResults.length === 0
+      )
     })
 
     const updateAutoCompleteResults = async (searchValue: string) => {
@@ -116,7 +125,7 @@ export default defineComponent({
     watch(
       () => localState.autoCompleteIsActive,
       (val: boolean) => {
-        if (!val) localState.autoCompleteResults = []
+        if (!val) localState.autoCompleteResults = null
       }
     )
     watch(
@@ -188,7 +197,6 @@ export default defineComponent({
 
 .auto-complete-item[aria-selected='true'] {
   color: $primary-blue !important;
-  background-color: $blueSelected !important;
 }
 
 .auto-complete-item:focus {
