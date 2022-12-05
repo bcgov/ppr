@@ -1,6 +1,6 @@
 <template>
   <v-card
-    v-if="showAutoComplete && !searching"
+    v-if="searchValue.length >= 3 && !searching"
     id="business-search-autocomplete"
     class="auto-complete-card"
     elevation="5"
@@ -66,7 +66,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
+import { defineComponent, reactive, toRefs, watch, computed } from '@vue/composition-api'
 import { SearchResponseI } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { useSearch } from '@/composables/useSearch'
 import { BusinessTypes } from '@/enums/business-types'
