@@ -8,6 +8,11 @@
     <v-row no-gutters justify="center">
       <v-col no-gutters cols="12">
         <v-list v-if="autoCompleteResults && autoCompleteResults.length > 0" class="pt-0 results-list">
+          <v-list-item disabled>
+            <v-row class="auto-complete-sticky-row">
+              <v-col cols="24">Active B.C. Businesses</v-col>
+            </v-row>
+          </v-list-item>
           <v-list-item-group v-model="autoCompleteSelected">
             <div v-for="(result, i) in autoCompleteResults" :key="i">
               <div class="info-tooltip" v-if="isBusinessTypeSPGP(result.legalType)">
@@ -44,9 +49,12 @@
           </v-list-item-group>
         </v-list>
         <div v-else-if="hasNoMatches" id="no-party-matches" class="pa-5">
+          <p class="auto-complete-sticky-row">
+            Active B.C. Businesses
+          </p>
           <p>
             <strong>
-              No matches found.
+              No active B.C. businesses found.
             </strong>
           </p>
           Ensure you have entered the correct, full legal name of the organization before entering the phone number and
@@ -58,7 +66,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
+import { defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
 import { SearchResponseI } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { useSearch } from '@/composables/useSearch'
 import { BusinessTypes } from '@/enums/business-types'
@@ -84,7 +92,6 @@ export default defineComponent({
       autoCompleteIsActive: props.setAutoCompleteIsActive,
       autoCompleteResults: null,
       autoCompleteSelected: null,
-      showAutoComplete: computed((): boolean => props.searchValue.length >= 3),
       searching: false,
       isSearchResultSelected: false,
       hasNoMatches: computed(
@@ -164,6 +171,10 @@ export default defineComponent({
   min-height: 0;
 }
 
+.auto-complete-sticky-row{
+  color: #465057 !important;
+  font-size: 14px;
+}
 .auto-complete-row {
   color: $gray7 !important;
   font-size: 16px;

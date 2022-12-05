@@ -240,6 +240,12 @@ export default defineComponent({
       locationInfo: {},
       legalDescription: '',
       additionalDescription: '',
+      isLotOption: computed((): boolean => {
+        return localState.locationTypeOption === HomeLocationTypes.LOT
+      }),
+      isHomeParkOption: computed((): boolean => {
+        return localState.locationTypeOption === HomeLocationTypes.HOME_PARK
+      }),
       dealerManufacturerLotRules: computed(() => {
         return localState.locationTypeOption as any === HomeLocationTypes.LOT
           ? customRules(required('Enter a dealer or manufacturer name'), maxLength(60))
@@ -284,12 +290,12 @@ export default defineComponent({
       localState.legalDescription = pidInfo.legalDescription
     }
 
-    const validateForms = (): void => {
+    const validateForms = async () => {
       if (props.validate) {
         // @ts-ignore - function exists
-        if (props.validate) context.refs.lotForm.validate()
+        if (localState.isLotOption) await context.refs.lotForm?.validate()
         // @ts-ignore - function exists
-        if (props.validate) context.refs.homeParkForm.validate()
+        if (localState.isHomeParkOption) await context.refs.homeParkForm?.validate()
       }
     }
 
@@ -323,6 +329,9 @@ export default defineComponent({
     })
     watch(() => localState.isLocationTypeValid, (val: boolean) => {
       setValidation(MhrSectVal.LOCATION_VALID, MhrCompVal.LOCATION_TYPE_VALID, val)
+    })
+    watch(() => props.validate, async (val: boolean) => {
+      await validateForms()
     })
 
     /** Clear/reset forms when select option changes. **/

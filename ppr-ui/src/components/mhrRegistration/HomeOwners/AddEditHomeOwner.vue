@@ -54,11 +54,8 @@
             <v-row>
               <v-col>
                 <p>
-                  You can look-up a B.C. business by entering the name of the
-                  business or the incorporation number (including Societies and
-                  extra-provincial companies registered in B.C.). If the name of
-                  the organization does not appear in the look-up, enter the
-                  full legal name of the
+                  You can find the full legal name of an active B.C. business by entering the name or incorporation
+                  number of the business, or you can type the full legal name of other types of
                   <v-tooltip
                     top
                     content-class="top-tooltip pa-5"
@@ -69,7 +66,7 @@
                       <span
                         v-bind="attrs"
                         v-on="on"
-                      ><u>organization.</u></span>
+                      ><u> organizations.</u></span>
                     </template>
                     Organizations, other than active B.C. businesses, that can be listed as owners
                     include the following:<br><br>
@@ -81,7 +78,7 @@
                 </p>
 
                 <simple-help-toggle
-                  toggleButtonTitle="Help with Sole Proprietorships and Partnerships"
+                  toggleButtonTitle="Help with Business and Organization Owners"
                 >
                   <h3 class="text-center mb-2">
                     Business and Organization Owners
@@ -155,6 +152,8 @@
                   v-model="searchValue"
                   :rules="orgNameRules"
                   persistent-hint
+                  :clearable="showClear"
+                  @click:clear="showClear = false"
                 >
                   <template v-slot:append>
                     <v-progress-circular
@@ -486,6 +485,7 @@ export default defineComponent({
         maxLength(5, true)
       ),
       loadingSearchResults: false,
+      showClear: false,
       autoCompleteIsActive: true,
       autoCompleteSearchValue: '',
       searchValue: props.editHomeOwner?.organizationName,
@@ -560,6 +560,7 @@ export default defineComponent({
       localState.autoCompleteIsActive = false
       localState.searchValue = searchValueTyped
       localState.owner.organizationName = searchValueTyped
+      localState.showClear = true
     }
 
     const setCloseAutoComplete = () => {
