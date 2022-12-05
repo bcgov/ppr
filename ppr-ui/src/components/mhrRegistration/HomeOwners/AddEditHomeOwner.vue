@@ -54,8 +54,8 @@
             <v-row>
               <v-col>
                 <p>
-                  You can find the full legal name of an active B.C. business by entering the name or incorporation
-                  number of the business, or you can type the full legal name of other types of
+                  You can find the full legal name of an active B.C. business by entering the name
+                   or incorporation number of the business, or you can type the full legal name of other types of
                   <v-tooltip
                     top
                     content-class="top-tooltip pa-5"
@@ -105,8 +105,8 @@
                   </h3>
                   <p>
                     Registered owners of a manufactured home <b>cannot</b> be a sole proprietorship, partnership,
-                    or limited partnership. The owners of the proprietorship or partnership must be added as a person
-                    or as an organization.
+                    or limited partnership. The owners of the proprietorship or partnership must be added as a
+                    person or as an organization.
                   </p>
                   <hr class="mt-3 mb-5"/>
                   <h3 class="text-center mb-2">
@@ -114,13 +114,13 @@
                   </h3>
                   <p><b>New owners:</b> Must be active at the time of registration.</p>
                   <p>
-                    If you are adding a B.C. based business as a new owner, the business
-                    <b>must be active on the B.C Corporate Register at the time of the registration.</b>
+                    If you are adding a B.C. based business as a new owner, the business <b>must be active on the
+                    B.C Corporate Register at the time of the registration.</b>
                   </p><br>
                   <p><b>Existing owners:</b> Must be active at the time the bill of sale was signed.</p>
                   <p>
-                    If you are including a business that is already an owner of the home, the business
-                    <b>must have been active on the B.C Corporate Register at the time the bill of sale was signed</b>
+                    If you are including a business that is already an owner of the home, the business <b>must have
+                    been active on the B.C Corporate Register at the time the bill of sale was signed</b>
                   </p>
                   <hr class="mt-3 mb-5" />
                   <h3 class="text-center mb-2">
@@ -131,9 +131,9 @@
                     select the business from the look-up list.
                   </p>
                   <p>
-                    If you enter the name of a B.C. based business and the name does not appear in the business look-up,
-                    the business is not active in the B.C. Corporate Register. In this case, please contact the
-                    Manufactured Home Registry.
+                    If you enter the name of a B.C. based business and the name does not appear in the business
+                    look-up, the business is not active in the B.C. Corporate Register. In this case, please contact
+                    the Manufactured Home Registry.
                   </p>
                   <p>
                     If you enter the name of another type of organization, the name will not appear in the look-up.

@@ -240,12 +240,6 @@ export default defineComponent({
       locationInfo: {},
       legalDescription: '',
       additionalDescription: '',
-      isLotOption: computed((): boolean => {
-        return localState.locationTypeOption === HomeLocationTypes.LOT
-      }),
-      isHomeParkOption: computed((): boolean => {
-        return localState.locationTypeOption === HomeLocationTypes.HOME_PARK
-      }),
       dealerManufacturerLotRules: computed(() => {
         return localState.locationTypeOption as any === HomeLocationTypes.LOT
           ? customRules(required('Enter a dealer or manufacturer name'), maxLength(60))
@@ -293,9 +287,9 @@ export default defineComponent({
     const validateForms = async () => {
       if (props.validate) {
         // @ts-ignore - function exists
-        if (localState.isLotOption) await context.refs.lotForm?.validate()
+        await context.refs.lotForm?.validate()
         // @ts-ignore - function exists
-        if (localState.isHomeParkOption) await context.refs.homeParkForm?.validate()
+        await context.refs.homeParkForm?.validate()
       }
     }
 
