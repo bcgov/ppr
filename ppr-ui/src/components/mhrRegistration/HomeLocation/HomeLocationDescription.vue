@@ -10,7 +10,7 @@
       </template>
 
       <!-- Manual Legal Land Description -->
-      <template v-else-if="!showLocationInfo">
+      <template v-else-if="!showLocationInfo && !isReserve">
         <v-col cols="12" sm="12" md="3" class="mt-1 mb-3">
           <p class="fs-14 info-text">Don't have a pid Number?</p>
         </v-col>
@@ -22,12 +22,12 @@
       </template>
 
       <!-- Home Location Info Form -->
-      <v-col v-if="showLocationInfo" cols="12">
+      <v-col v-if="showLocationInfo || isReserve" cols="12">
         <v-row no-gutters>
           <v-col cols="9" class="m-auto pb-0 py-2">
             <p class="generic-label">Legal Land Description</p>
           </v-col>
-          <v-col class="text-right">
+          <v-col class="text-right" v-if="!isReserve">
             <v-btn
               text
               plain="true"
@@ -41,7 +41,10 @@
           </v-col>
           <v-col cols="12">
             <p class="info-text">Enter as much of legal land description you have.</p>
-            <p v-if="isStrata" class="info-text pt-2" :class="{ 'error-text': validate && !isValidLocationInfo }">
+            <p v-if="isReserve" class="info-text pt-2" :class="{ 'error-text': validate && !isValidLocationInfo }">
+              <strong>Band Name, Reserve Number</strong> are required.
+            </p>
+            <p v-else-if="isStrata" class="info-text pt-2" :class="{ 'error-text': validate && !isValidLocationInfo }">
               <strong>Strata Lot, Land District</strong> and
               <strong>Strata Plan</strong> are required.
             </p>
@@ -58,15 +61,17 @@
         </v-row>
 
         <HomeLocationInfo
+          :isReserve="isReserve"
           :isStrata="isStrata"
           :validate="validate"
           @updateLocationInfo="locationInfo = $event"
+          @updateLocationDescription="additionalDescription = $event"
           @updateLocationInfoValid="isValidLocationInfo = $event"
         />
       </v-col>
 
       <!-- Additional Location Info -->
-      <v-col>
+      <v-col v-if="!isReserve">
         <p class="font-weight-bold">Additional Description</p>
         <v-textarea
           filled
@@ -99,6 +104,7 @@ export default defineComponent({
   props: {
     validate: { type: Boolean, default: false },
     legalDescription: { type: String, default: '' },
+    isReserve: { type: Boolean, default: false },
     isStrata: { type: Boolean, default: false }
   },
   setup (props, context) {
@@ -112,21 +118,21 @@ export default defineComponent({
       isHomeLocationDescriptionValid: false,
       isValidDescription: computed((): boolean => {
         return localState.isHomeLocationDescriptionValid &&
-          (!localState.showLocationInfo || localState.isValidLocationInfo)
+          ((!localState.showLocationInfo && !props.isReserve) || localState.isValidLocationInfo)
       })
     })
 
-    watch(() => localState.isValidDescription, (val: boolean) => {
-      context.emit('setIsValidLocationInfo', val)
+    watch(() => localState.isValidDescription, (isValid: boolean) => {
+      context.emit('setIsValidLocationInfo', isValid)
     })
-    watch(() => localState.showLocationInfo, (val: boolean) => {
-      context.emit('setShowLocationInfo', val)
+    watch(() => localState.showLocationInfo, (showLocationInfo: boolean) => {
+      context.emit('setShowLocationInfo', showLocationInfo)
     })
-    watch(() => localState.locationInfo, (val: MhrLocationInfoIF) => {
-      context.emit('setLocationInfo', val)
+    watch(() => localState.locationInfo, (locationInfo: MhrLocationInfoIF) => {
+      context.emit('setLocationInfo', locationInfo)
     })
-    watch(() => localState.additionalDescription, (val: string) => {
-      context.emit('setAdditionalDescription', val)
+    watch(() => localState.additionalDescription, (description: string) => {
+      context.emit('setAdditionalDescription', description)
     })
 
     return {

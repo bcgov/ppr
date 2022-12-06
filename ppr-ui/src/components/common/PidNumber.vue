@@ -193,6 +193,9 @@ export default defineComponent({
         await validatePid() ? emitPid() : localState.showNotFoundDialog = true
       }
     })
+    watch(() => props.disable, (val: boolean) => {
+      if (val) clearPid()
+    })
 
     return {
       parsePaste,

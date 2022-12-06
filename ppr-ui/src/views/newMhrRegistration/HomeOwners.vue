@@ -454,7 +454,7 @@ span:not(.generic-label)  {
 }
 
 .hide-show-owners {
-  color: $primary-blue;
+  color: $primary-blue !important;
   &:hover {
     cursor: pointer;
   }

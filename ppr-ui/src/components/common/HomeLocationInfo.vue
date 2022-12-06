@@ -2,6 +2,42 @@
   <v-card flat rounded id="home-location-info">
     <v-form ref="homeLocationInfoRef" v-model="homeLocationInfoValid">
 
+      <template v-if="isReserve">
+        <v-row no-gutters class="pt-5">
+          <v-col cols="8" class="pr-1">
+            <v-text-field
+              filled
+              id="band-name"
+              label="Band Name"
+              v-model="locationInfo.bandName"
+              :rules="locationInputRules(null, 'Enter a Band Name', 'band-name')"
+            />
+          </v-col>
+          <v-col cols="4" class="pl-2">
+            <v-text-field
+              filled
+              id="reserve-number"
+              label="Reserve Number"
+              v-model="locationInfo.reserveNumber"
+              :rules="locationInputRules(null,  'Enter a Reserve Number', 'reserve-number')"
+            />
+          </v-col>
+          <v-col>
+            <v-text-field
+              filled
+              id="reserve-additional-description"
+              label="Additional Description"
+              v-model="additionalDescription"
+              hint="Example: PIN number"
+              :error="isReserveLengthErr"
+              :errorMessages="isReserveLengthErr ? reserveLengthErrMsg : ''"
+              persistent-hint
+            />
+          </v-col>
+        </v-row>
+        <v-divider class="mt-3 mb-5 mx-0"/>
+      </template>
+
       <v-row no-gutters class="pt-4">
         <v-col>
           <v-text-field
@@ -161,9 +197,10 @@ import { useInputRules } from '@/composables/useInputRules'
 
 export default defineComponent({
   name: 'HomeLocationInfo',
-  emits: ['updateLocationInfo', 'updateLocationValid'],
+  emits: ['updateLocationInfo', 'updateLocationDescription', 'updateLocationValid'],
   props: {
     validate: { type: Boolean, default: false },
+    isReserve: { type: Boolean, default: false },
     isStrata: { type: Boolean, default: false }
   },
   setup (props, context) {
@@ -176,6 +213,8 @@ export default defineComponent({
     const localState = reactive({
       homeLocationInfoValid: false,
       locationInfo: {
+        bandName: '',
+        reserveNumber: '',
         lot: '',
         landDistrict: '',
         plan: '',
@@ -188,25 +227,39 @@ export default defineComponent({
         parcel: '',
         block: '',
         exceptPlan: ''
-      } as MhrLocationInfoIF
+      } as MhrLocationInfoIF,
+      additionalDescription: '',
+      reserveLengthErrMsg: 'Band Name, Reserve Number and Details combined cannot exceed 80 characters',
+      isReserveLengthErr: computed((): boolean => {
+        return (
+          localState.locationInfo?.bandName + localState.locationInfo?.reserveNumber + localState.additionalDescription
+        ).length > 80
+      })
     })
 
     onMounted(() => {
       if (props.validate) validateLocationInfo()
     })
 
-    const locationInputRules = (length: number, requiredMsg: string, fieldId: string = null) => {
-      const strataRequirements = ['lot', 'land-district', 'plan']
-      const otherLocationRequirements =
-        (localState.locationInfo.districtLot || localState.locationInfo.landDistrict) &&
-        (!localState.locationInfo.lot && !localState.locationInfo.plan)
-          ? ['land-district', 'district-lot']
-          : strataRequirements
-      const isRequired = props.isStrata ? strataRequirements : otherLocationRequirements
+    const locationInputRules = (length: number = null, requiredMsg: string, fieldId: string = null) => {
+      let requiredFields
+      switch (true) {
+        case props.isStrata:
+          requiredFields = ['lot', 'land-district', 'plan']
+          break
+        case props.isReserve:
+          requiredFields = ['band-name', 'reserve-number']
+          break
+        default:
+          requiredFields = (localState.locationInfo.districtLot || localState.locationInfo.landDistrict) &&
+            (!localState.locationInfo.lot && !localState.locationInfo.plan)
+            ? ['land-district', 'district-lot']
+            : ['lot', 'land-district', 'plan']
+      }
 
       return customRules(
-        maxLength(length),
-        isRequired.includes(fieldId) ? required(requiredMsg) : []
+        length ? maxLength(length) : [],
+        requiredFields.includes(fieldId) ? required(requiredMsg) : []
       )
     }
 
@@ -224,6 +277,11 @@ export default defineComponent({
     watch(() => localState.locationInfo, (locationInfo: MhrLocationInfoIF) => {
       context.emit('updateLocationInfo', locationInfo)
     }, { deep: true })
+
+    /** Emit validation state to parent when it changes. **/
+    watch(() => localState.additionalDescription, (description: string) => {
+      context.emit('updateLocationDescription', description)
+    })
 
     /** Emit validation state to parent when it changes. **/
     watch(() => localState.homeLocationInfoValid, (isValid: boolean) => {
