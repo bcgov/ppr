@@ -24,6 +24,7 @@ from mhr_api.utils.auth import jwt
 from mhr_api.exceptions import BusinessException, DatabaseException
 from mhr_api.services.authz import authorized, authorized_role, is_staff, is_all_staff_account, REGISTER_MH
 from mhr_api.models import MhrRegistration
+from mhr_api.models.registration_utils import AccountRegistrationParams
 from mhr_api.reports.v2.report_utils import ReportTypes
 from mhr_api.resources import utils as resource_utils, registration_utils as reg_utils
 from mhr_api.services.payment import TransactionTypes
@@ -60,7 +61,12 @@ def get_account_registrations():
             collapse_param = True
         elif isinstance(collapse_param, str):
             collapse_param = False
-        statement_list = MhrRegistration.find_all_by_account_id(account_id, is_staff(jwt), collapse_param)
+
+        params: AccountRegistrationParams = AccountRegistrationParams(account_id=account_id,
+                                                                      collapse=collapse_param,
+                                                                      sbc_staff=is_staff(jwt))
+        params = resource_utils.get_account_registration_params(request, params)
+        statement_list = MhrRegistration.find_all_by_account_id(params)
         return jsonify(statement_list), HTTPStatus.OK
 
     except DatabaseException as db_exception:

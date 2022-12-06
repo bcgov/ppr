@@ -85,7 +85,7 @@ class MhrParty(db.Model):  # pylint: disable=too-many-instance-attributes
             }
             if self.middle_name:
                 person_name['middle'] = self.middle_name
-            party['individualName'] = person_name
+            party['personName'] = person_name
 
         if self.address:
             cp_address = self.address.json

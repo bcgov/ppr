@@ -24,6 +24,7 @@ from mhr_api.exceptions import BusinessException, DatabaseException, ResourceErr
 from mhr_api.models import utils as model_utils, Db2Manuhome
 from mhr_api.models.mhr_extra_registration import MhrExtraRegistration
 from mhr_api.models.db2 import utils as legacy_utils
+from mhr_api.models.registration_utils import AccountRegistrationParams
 from mhr_api.services.authz import MANUFACTURER_GROUP, QUALIFIED_USER_GROUP, GOV_ACCOUNT_ROLE
 
 from .db import db
@@ -292,11 +293,11 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         raise DatabaseException('MhrRegistration.find_summary_by_mhr_number PosgreSQL not yet implemented.')
 
     @classmethod
-    def find_all_by_account_id(cls, account_id: str, staff: bool = False, collapse: bool = False):
+    def find_all_by_account_id(cls, params: AccountRegistrationParams):
         """Return a summary list of recent MHR registrations belonging to an account."""
-        current_app.logger.debug(f'Account_id={account_id}')
+        current_app.logger.debug(f'Account_id={params.account_id}')
         if model_utils.is_legacy():
-            return legacy_utils.find_all_by_account_id(account_id, staff, collapse)
+            return legacy_utils.find_all_by_account_id(params)
 
         raise DatabaseException('MhrRegistration.find_all_by_account_id PosgreSQL not yet implemented.')
 

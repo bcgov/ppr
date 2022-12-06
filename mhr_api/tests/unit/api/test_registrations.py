@@ -23,8 +23,8 @@ import pytest
 from flask import current_app
 from registry_schemas.example_data.mhr import REGISTRATION
 
-from mhr_api.models import MhrRegistration
-from mhr_api.services.authz import COLIN_ROLE, MHR_ROLE, STAFF_ROLE, BCOL_HELP
+from mhr_api.models import MhrRegistration, registration_utils as reg_utils
+from mhr_api.services.authz import COLIN_ROLE, MHR_ROLE, STAFF_ROLE, BCOL_HELP, ASSETS_HELP
 from tests.unit.services.utils import create_header, create_header_account
 
 
@@ -53,10 +53,24 @@ TEST_GET_REGISTRATION = [
     ('Invalid role', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, '2523', '150062'),
     ('Valid Request', [MHR_ROLE], HTTPStatus.OK, '2523', '150062'),
     ('Valid Request reg staff', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, STAFF_ROLE, '150062'),
-    ('Valid Request bcol helpdesk', [MHR_ROLE, BCOL_HELP], HTTPStatus.OK, BCOL_HELP, '150062'),
+    ('Valid Request bcol helpdesk', [MHR_ROLE, BCOL_HELP], HTTPStatus.OK, ASSETS_HELP, '150062'),
     ('Valid Request other account', [MHR_ROLE], HTTPStatus.OK, 'PS12345', '150062'),
     ('Invalid MHR Number', [MHR_ROLE], HTTPStatus.NOT_FOUND, '2523', 'TESTXXXX'),
     ('Invalid request Staff no account', [MHR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, None, '150062')
+]
+# testdata pattern is ({desc}, {roles}, {status}, {sort_criteria}, {sort_direction})
+TEST_GET_ACCOUNT_DATA_SORT2 = [
+    ('Sort mhr number', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, reg_utils.MHR_NUMBER_PARAM, None)
+]
+TEST_GET_ACCOUNT_DATA_SORT = [
+    ('Sort mhr number', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, reg_utils.MHR_NUMBER_PARAM, None),
+    ('Sort reg type asc', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, reg_utils.REG_TYPE_PARAM, reg_utils.SORT_ASCENDING),
+    ('Sort reg status desc', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, reg_utils.STATUS_PARAM, reg_utils.SORT_DESCENDING),
+    ('Sort reg ts asc', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, reg_utils.REG_TS_PARAM, reg_utils.SORT_ASCENDING),
+    ('Sort client ref', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, reg_utils.CLIENT_REF_PARAM, None),
+    ('Sort user name', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, reg_utils.USER_NAME_PARAM, None),
+    ('Sort submitting name', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, reg_utils.SUBMITTING_NAME_PARAM, None),
+    ('Sort owner name', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, reg_utils.OWNER_NAME_PARAM, None)
 ]
 
 
@@ -141,3 +155,31 @@ def test_get_registration(session, client, jwt, desc, roles, status, account_id,
         assert response.status_code in (status, HTTPStatus.UNAUTHORIZED)
     else:
         assert response.status_code == status
+
+
+@pytest.mark.parametrize('desc,roles,status,sort_criteria,sort_direction', TEST_GET_ACCOUNT_DATA_SORT)
+def test_get_account_registrations_sort(session, client, jwt, desc, roles, status, sort_criteria, sort_direction):
+    """Assert that a get account registrations summary list endpoint with sorting works as expected."""
+    headers = None
+    # setup
+    headers = create_header_account(jwt, roles)
+    params = f'?sortCriteriaName={sort_criteria}'
+    if sort_direction:
+        params += f'&sortDirection={sort_direction}'
+    # test
+    current_app.logger.debug('params=' + params)
+    rv = client.get('/api/v1/registrations' + params,
+                    headers=headers)
+    # check
+    assert rv.status_code == status
+    assert rv.json
+    for registration in rv.json:
+        assert registration['mhrNumber']
+        assert registration['registrationDescription']
+        assert registration['statusType'] is not None
+        assert registration['createDateTime'] is not None
+        assert registration['username'] is not None
+        assert registration['submittingParty'] is not None
+        assert registration['clientReferenceId'] is not None
+        assert registration['ownerNames'] is not None
+        assert registration['path'] is not None

@@ -17,7 +17,8 @@ from flask import current_app
 from sqlalchemy.sql import text
 
 from mhr_api.exceptions import DatabaseException
-from mhr_api.models import Db2Manuhome, Db2Document, utils as model_utils
+from mhr_api.models import Db2Manuhome, Db2Document, utils as model_utils, registration_utils as reg_utils
+from mhr_api.models.registration_utils import AccountRegistrationParams
 from mhr_api.models.type_tables import MhrDocumentType, MhrRegistrationTypes
 from mhr_api.models.db import db
 
@@ -89,7 +90,7 @@ SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRI
          WHERE o2.manhomid = mh.manhomid
            AND og2.manhomid = mh.manhomid
            AND og2.owngrpid = o2.owngrpid
-           AND og2.status IN ('3', '4')) as owner_names,
+           AND og2.status IN ('3')) as owner_names,
        TRIM(d.affirmby),
        d.documtid as document_id,
        d.docuregi as doc_reg_number
@@ -111,8 +112,66 @@ SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRI
   FROM manuhome mh, document d
  WHERE mh.mhregnum IN (?)
    AND mh.mhregnum = d.mhregnum
-ORDER BY mh.updateda DESC, mh.updateti DESC, d.regidate DESC
+ ORDER BY mh.updateda DESC, mh.updateti DESC, d.regidate DESC
 """
+QUERY_ACCOUNT_REGISTRATIONS_SORT = """
+SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRIM(d.docutype),
+       (SELECT XMLSERIALIZE(XMLAGG ( XMLELEMENT ( NAME "owner", o2.ownrtype || TRIM(o2.ownrname))) AS CLOB)
+          FROM owner o2, owngroup og2
+         WHERE o2.manhomid = mh.manhomid
+           AND og2.manhomid = mh.manhomid
+           AND og2.owngrpid = o2.owngrpid
+           AND og2.regdocid = d.documtid) as owner_names,
+       TRIM(d.affirmby),
+       d.documtid as document_id,
+       d.docuregi as doc_reg_number,
+       (SELECT TRIM(o2.ownrname)
+          FROM owner o2, owngroup og2
+         WHERE o2.manhomid = mh.manhomid
+           AND og2.manhomid = mh.manhomid
+           AND og2.owngrpid = o2.owngrpid
+           AND og2.regdocid = d.documtid
+           FETCH FIRST 1 ROWS ONLY) as owner_name_sort
+  FROM manuhome mh, document d
+ WHERE mh.mhregnum IN (?)
+   AND mh.mhregnum = d.mhregnum
+"""
+REG_ORDER_BY_DATE = ' ORDER BY mh.updateda DESC, mh.updateti DESC, d.regidate DESC'
+REG_ORDER_BY_MHR_NUMBER = ' ORDER BY mh.mhregnum'
+REG_ORDER_BY_REG_TYPE = ' ORDER BY TRIM(d.docutype)'
+REG_ORDER_BY_STATUS = ' ORDER BY mh.mhstatus'
+REG_ORDER_BY_SUBMITTING_NAME = ' ORDER BY TRIM(d.name)'
+REG_ORDER_BY_CLIENT_REF = ' ORDER BY TRIM(d.olbcfoli)'
+REG_ORDER_BY_USERNAME = ' ORDER BY TRIM(d.affirmby)'
+REG_ORDER_BY_OWNER_NAME = ' ORDER BY owner_name_sort'
+REG_ORDER_BY_EXPIRY_DAYS = ' ORDER BY mh.mhregnum'
+REG_FILTER_REG_TYPE = " AND TRIM(d.docutype) = '?'"
+REG_FILTER_STATUS = " AND mh.mhstatus = '?'"
+REG_FILTER_SUBMITTING_NAME = " AND TRIM(d.name) LIKE '?%'"
+REG_FILTER_CLIENT_REF = " AND TRIM(d.olbcfoli) LIKE '?%'"
+REG_FILTER_USERNAME = " AND TRIM(d.affirmby) LIKE '?%'"
+
+SORT_DESCENDING = ' DESC'
+SORT_ASCENDING = ' ASC'
+
+QUERY_ACCOUNT_FILTER_BY = {
+    reg_utils.STATUS_PARAM: REG_FILTER_STATUS,
+    reg_utils.REG_TYPE_PARAM: REG_FILTER_REG_TYPE,
+    reg_utils.SUBMITTING_NAME_PARAM: REG_FILTER_SUBMITTING_NAME,
+    reg_utils.CLIENT_REF_PARAM: REG_FILTER_CLIENT_REF,
+    reg_utils.USER_NAME_PARAM: REG_FILTER_USERNAME
+}
+QUERY_ACCOUNT_ORDER_BY = {
+    reg_utils.REG_TS_PARAM: REG_ORDER_BY_DATE,
+    reg_utils.MHR_NUMBER_PARAM: REG_ORDER_BY_MHR_NUMBER,
+    reg_utils.STATUS_PARAM: REG_ORDER_BY_STATUS,
+    reg_utils.REG_TYPE_PARAM: REG_ORDER_BY_REG_TYPE,
+    reg_utils.SUBMITTING_NAME_PARAM: REG_ORDER_BY_SUBMITTING_NAME,
+    reg_utils.CLIENT_REF_PARAM: REG_ORDER_BY_CLIENT_REF,
+    reg_utils.OWNER_NAME_PARAM: REG_ORDER_BY_OWNER_NAME,
+    reg_utils.EXPIRY_DAYS_PARAM: REG_ORDER_BY_EXPIRY_DAYS,
+    reg_utils.USER_NAME_PARAM: REG_ORDER_BY_USERNAME
+}
 REGISTRATION_DESC_NEW = 'REGISTER NEW UNIT'
 LEGACY_STATUS_DESCRIPTION = {
     'R': 'ACTIVE',
@@ -181,13 +240,13 @@ def find_summary_by_mhr_number(account_id: str, mhr_number: str, staff: bool):
     return registrations
 
 
-def find_all_by_account_id(account_id: str, staff: bool, collapse: bool = False):
+def find_all_by_account_id(params: AccountRegistrationParams):
     """Return a summary list of recent MHR registrations belonging to an account."""
     results = []
     # 1. get account and extra registrations from the Posgres table, then query DB2 by set of mhr numbers.
-    mhr_list = __get_mhr_list(account_id)
+    mhr_list = __get_mhr_list(params.account_id)
     # 2 Get summary list of new application registrations.
-    reg_summary_list = __get_reg_summary_list(account_id)
+    reg_summary_list = __get_reg_summary_list(params.account_id)
     doc_types = MhrDocumentType.find_all()
     if mhr_list:
         # 3. Get the summary info from DB2.
@@ -200,19 +259,19 @@ def find_all_by_account_id(account_id: str, staff: bool, collapse: bool = False)
                 if count > 1:
                     mhr_numbers += ','
                 mhr_numbers += f"'{mhr_number}'"
-            query_text = QUERY_ACCOUNT_REGISTRATIONS.replace('?', mhr_numbers)
-            current_app.logger.info('Executing query for mhr numbers=' + mhr_numbers)
-            query = text(query_text)
+            query = text(build_account_query(params, mhr_numbers))
+            # query_text = QUERY_ACCOUNT_REGISTRATIONS.replace('?', mhr_numbers)
+            # query = text(query_text)
             result = db.get_engine(current_app, 'db2').execute(query)
             rows = result.fetchall()
             if rows is not None:
                 for row in rows:
                     results.append(__build_summary(row, False))
             for result in results:
-                __update_summary_info(result, results, reg_summary_list, doc_types, staff, account_id)
-                if not collapse:
+                __update_summary_info(result, results, reg_summary_list, doc_types, params.sbc_staff, params.account_id)
+                if not params.collapse:
                     del result['documentType']  # Not in the schema.
-            if results and collapse:
+            if results and params.collapse:
                 results = __collapse_results(results)
         except Exception as db_exception:   # noqa: B902; return nicer error
             current_app.logger.error('DB2 find_all_by_account_id exception: ' + str(db_exception))
@@ -249,6 +308,51 @@ def find_by_document_id(document_id: str):
     return Db2Manuhome.find_by_document_id(document_id)
 
 
+def build_account_query(params: AccountRegistrationParams, mhr_numbers: str) -> str:
+    """Build the account registration summary query."""
+    query_text: str = QUERY_ACCOUNT_REGISTRATIONS
+    if not params.has_filter() and not params.has_sort():
+        query_text = query_text.replace('?', mhr_numbers)
+        current_app.logger.info('Executing query for mhr numbers=' + mhr_numbers)
+    else:
+        query_text = QUERY_ACCOUNT_REGISTRATIONS_SORT
+        order_clause: str = ''
+        if params.has_filter():
+            query_text = build_account_query_filter(query_text, params, mhr_numbers)
+        else:
+            query_text = query_text.replace('?', mhr_numbers)
+        if params.has_sort():
+            order_clause = QUERY_ACCOUNT_ORDER_BY.get(params.sort_criteria)
+        if params.sort_criteria == reg_utils.REG_TS_PARAM:
+            if params.sort_direction and params.sort_direction == reg_utils.SORT_ASCENDING:
+                order_clause = order_clause.replace(SORT_DESCENDING, SORT_ASCENDING)
+        elif params.sort_direction and params.sort_direction == reg_utils.SORT_ASCENDING:
+            order_clause += SORT_ASCENDING
+        else:
+            order_clause += SORT_DESCENDING
+        query_text += order_clause
+    # current_app.logger.info(query_text)
+    return query_text
+
+
+def build_account_query_filter(query_text: str, params: AccountRegistrationParams, mhr_numbers: str) -> str:
+    """Build the account registration summary query filter clause."""
+    filter_clause: str = ''
+    filter_type, filter_value = params.get_filter_values()
+    if filter_type and filter_value:
+        if filter_type == reg_utils.MHR_NUMBER_PARAM:
+            query_text = query_text.replace('?', f"'{filter_value}'")
+        else:
+            query_text = query_text.replace('?', mhr_numbers)
+            if filter_type != reg_utils.REG_TS_PARAM:
+                filter_clause = QUERY_ACCOUNT_FILTER_BY.get(filter_type)
+                if filter_clause:
+                    filter_clause = filter_clause.replace('?', filter_value)
+            if filter_clause:
+                query_text += filter_clause
+    return query_text
+
+
 def __get_mhr_list(account_id: str) -> dict:
     """Build a list of mhr numbers associated with the account."""
     mhr_list = []
@@ -257,7 +361,7 @@ def __get_mhr_list(account_id: str) -> dict:
         result = db.session.execute(query, {'query_value': account_id})
         rows = result.fetchall()
     except Exception as db_exception:   # noqa: B902; return nicer error
-        current_app.logger.error('__get_mhr_list db exception: ' + str(db_exception))
+        current_app.logger.error('get_mhr_list db exception: ' + str(db_exception))
         raise DatabaseException(db_exception)
     if rows is not None:
         for row in rows:
