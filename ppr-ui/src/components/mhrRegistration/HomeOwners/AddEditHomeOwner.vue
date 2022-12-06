@@ -473,7 +473,7 @@ export default defineComponent({
       firsNameRules: customRules(required('Enter a first name'), maxLength(15)),
       lastNameRules: customRules(required('Enter a last name'), maxLength(25)),
       orgNameRules: customRules(
-        required('Enter an organization name'),
+        required('Enter a business or organization name'),
         maxLength(70)
       ),
       phoneNumberRules: customRules(
