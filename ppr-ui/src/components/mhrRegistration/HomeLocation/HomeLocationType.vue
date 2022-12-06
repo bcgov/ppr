@@ -284,12 +284,12 @@ export default defineComponent({
       localState.legalDescription = pidInfo.legalDescription
     }
 
-    const validateForms = (): void => {
+    const validateForms = async () => {
       if (props.validate) {
         // @ts-ignore - function exists
-        if (props.validate) context.refs.lotForm.validate()
+        await context.refs.lotForm?.validate()
         // @ts-ignore - function exists
-        if (props.validate) context.refs.homeParkForm.validate()
+        await context.refs.homeParkForm?.validate()
       }
     }
 
@@ -323,6 +323,9 @@ export default defineComponent({
     })
     watch(() => localState.isLocationTypeValid, (val: boolean) => {
       setValidation(MhrSectVal.LOCATION_VALID, MhrCompVal.LOCATION_TYPE_VALID, val)
+    })
+    watch(() => props.validate, async (val: boolean) => {
+      await validateForms()
     })
 
     /** Clear/reset forms when select option changes. **/
