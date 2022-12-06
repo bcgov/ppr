@@ -26,6 +26,7 @@ from registry_schemas.example_data.mhr import REGISTRATION, TRANSFER, EXEMPTION
 
 from mhr_api.exceptions import BusinessException
 from mhr_api.models import MhrRegistration, MhrDraft, MhrDocument, MhrNote, utils as model_utils
+from mhr_api.models.registration_utils import AccountRegistrationParams
 from mhr_api.models.type_tables import MhrLocationTypes, MhrPartyTypes, MhrOwnerStatusTypes, MhrStatusTypes
 from mhr_api.models.type_tables import MhrRegistrationTypes, MhrRegistrationStatusTypes, MhrDocumentTypes
 from mhr_api.models.type_tables import MhrTenancyTypes
@@ -222,7 +223,11 @@ def test_find_summary_by_mhr_number(session, account_id, mhr_num, exists, reg_de
 @pytest.mark.parametrize('account_id, has_results', TEST_ACCOUNT_REG_DATA)
 def test_find_account_registrations(session, account_id, has_results):
     """Assert that finding account summary MHR registration information works as expected."""
-    reg_list = MhrRegistration.find_all_by_account_id(account_id)
+    params: AccountRegistrationParams = AccountRegistrationParams(account_id=account_id,
+                                                                  collapse=True,
+                                                                  sbc_staff=False)
+
+    reg_list = MhrRegistration.find_all_by_account_id(params)
     if has_results:
         for registration in reg_list:
             assert registration['mhrNumber']
