@@ -101,13 +101,23 @@
                     active-class="selected-radio"
                     :value="HomeLocationTypes.OTHER_RESERVE"
                   />
-                  <!-- Home Location Info Form -->
-<!--                  <v-expand-transition>-->
-<!--                    <HomeLocationInfo-->
-<!--                      class="ml-8 mb-4"-->
-<!--                      v-if="otherTypeOption === HomeLocationTypes.OTHER_RESERVE"-->
-<!--                    />-->
-<!--                  </v-expand-transition>-->
+                  <!-- Other Reserve  -->
+                  <v-expand-transition>
+
+                    <div v-if="otherTypeOption === HomeLocationTypes.OTHER_RESERVE" class="ml-8">
+
+                      <HomeLocationDescription
+                        isReserve
+                        :validate="validate"
+                        :legalDescription="legalDescription"
+                        @setIsValidLocationInfo="isValidLocationInfo = $event"
+                        @setShowLocationInfo="showLocationInfo = $event"
+                        @setLocationInfo="locationInfo = $event"
+                        @setAdditionalDescription="additionalDescription = $event"
+                      />
+                    </div>
+
+                  </v-expand-transition>
 
                   <v-radio
                     id="strata-option"
@@ -117,7 +127,7 @@
                     :value="HomeLocationTypes.OTHER_STRATA"
                   />
 
-                  <!-- Pid Number Input -->
+                  <!-- Other Strata  -->
                   <v-expand-transition>
 
                     <div v-if="otherTypeOption === HomeLocationTypes.OTHER_STRATA" class="ml-8">
@@ -150,7 +160,7 @@
                     :value="HomeLocationTypes.OTHER_TYPE"
                   />
 
-                  <!-- Pid Number Input -->
+                  <!-- Other Type -->
                   <v-expand-transition>
 
                     <div v-if="otherTypeOption === HomeLocationTypes.OTHER_TYPE" class="ml-8">
@@ -267,7 +277,7 @@ export default defineComponent({
           case HomeLocationTypes.OTHER_LAND:
             switch (localState.otherTypeOption as any) {
               case HomeLocationTypes.OTHER_RESERVE:
-                return true // Future state includes new fields TBD
+                return localState.isValidLocationInfo
               case HomeLocationTypes.OTHER_STRATA:
               case HomeLocationTypes.OTHER_TYPE:
                 return (localState.showLocationInfo && localState.isValidLocationInfo) ||
