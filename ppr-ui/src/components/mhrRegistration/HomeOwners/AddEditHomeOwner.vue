@@ -86,21 +86,21 @@
                   <p>
                     Businesses and organizations that <b>can</b> own a manufactured home include the following:
                   </p>
-                  <h3 class="mb-2 gray">
+                  <h3 class="mb-2 gray7">
                     B.C. Based Businesses
                   </h3>
                   <li>B.C. corporations</li>
                   <li>B.C. societies</li>
                   <li>B.C. cooperatives</li>
                   <li>Extra-provincial companies registered in B.C. (corporations, societies and cooperatives)</li><br>
-                  <h3 class="mb-2 gray">
+                  <h3 class="mb-2 gray7">
                     Other Businesses and Organizations
                   </h3>
                   <li>Indian bands</li>
                   <li>Public bodies</li>
                   <li>Businesses and organizations not registered in B.C.</li><br>
                   <p>Businesses and organizations that <b>cannot</b> own a manufactured home:</p>
-                  <h3 class="mb-2 gray">
+                  <h3 class="mb-2 gray7">
                     Sole Proprietorships / Partnerships
                   </h3>
                   <p>
@@ -615,9 +615,6 @@ u {
 }
 
 #addHomeOwnerForm {
-  .gray {
-    color: $gray7 !important;
-  }
   p {
     color: $gray7;
     line-height: 24px;

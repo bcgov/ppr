@@ -80,9 +80,6 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-.gray7 {
-  color: $gray7;
-}
 .pb-22px {
   padding-bottom: 22px !important;
 }
