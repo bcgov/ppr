@@ -25,6 +25,45 @@ from mhr_api.models import MhrParty
 from mhr_api.models.type_tables import MhrPartyTypes, MhrOwnerStatusTypes
 
 
+OWNER_IND = {
+    'individualName': {
+        'first': 'JANE',
+        'middle': 'M',
+        'last': 'SMITH'
+    },
+    'address': {
+    'street': '3122B LYNNLARK PLACE',
+    'city': 'VICTORIA',
+    'region': 'BC',
+    'postalCode': ' ',
+    'country': 'CA'
+    },
+    'emailAddress': 'bsmith@abc-search.com',
+    'phoneNumber': '6041234567',
+    'phoneExtension': '546'
+}
+SUBMITTING_IND = {
+    'personName': {
+        'first': 'JANE',
+        'middle': 'M',
+        'last': 'SMITH'
+    },
+    'address': {
+      'street': '222 SUMMER STREET',
+      'city': 'VICTORIA',
+      'region': 'BC',
+      'country': 'CA',
+      'postalCode': 'V8W 2V8'
+    },
+    'emailAddress': 'bsmith@abc-search.com',
+    'phoneNumber': '6041234567',
+    'phoneExtension': '546'
+}
+# testdata pattern is ({middle}, {email}, {phone}, {phoneExtension}, {data})
+TEST_IND_DATA = [
+    (None, None, None, None, OWNER_IND),
+    (None, None, None, None, SUBMITTING_IND)
+]
 # testdata pattern is ({id}, {has_results})
 TEST_ID_DATA = [
     (200000000, True),
@@ -143,3 +182,33 @@ def test_create_from_registration_json(session):
             assert not party.first_name
             assert not party.middle_name
             assert not party.last_name
+
+
+@pytest.mark.parametrize('middle, email, phone, phone_extension, data', TEST_IND_DATA)
+def test_create_ind_from_json(session, middle, email, phone, phone_extension, data):
+    json_data = copy.deepcopy(data)
+    if json_data.get('personName'):
+        json_data['personName']['middle'] = middle
+    elif json_data.get('individualName'):
+        json_data['individualName']['middle'] = middle
+    json_data['emailAddress'] = email
+    json_data['phoneNumber'] = phone
+    json_data['phoneExtension'] = phone_extension
+    party: MhrParty = MhrParty.create_from_json(json_data, MhrPartyTypes.SUBMITTING, 1000)
+    assert party
+    if middle:
+        assert party.middle_name
+    else:
+        assert not party.middle_name
+    if email:
+        assert party.email_id
+    else:
+        assert not party.email_id
+    if phone:
+        assert party.phone_number
+    else:
+        assert not party.phone_number
+    if phone_extension:
+        assert party.phone_extension
+    else:
+        assert not party.phone_extension
