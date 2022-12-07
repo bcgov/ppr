@@ -49,15 +49,23 @@ TEST_QUERY_ORDER_DATA = [
     ('2523', reg_utils.EXPIRY_DAYS_PARAM, reg_utils.SORT_DESCENDING, "'098487'", db2_utils.REG_ORDER_BY_EXPIRY_DAYS)
 ]
 
-# testdata pattern is ({account_id}, {filter_name}, {filter_value}, {mhr_numbers}, {expected_clause})
+# testdata pattern is ({account_id}, {collapse}, {filter_name}, {filter_value}, {mhr_numbers}, {expected_clause})
 TEST_QUERY_FILTER_DATA = [
-    ('2523', reg_utils.MHR_NUMBER_PARAM, '098487', "'098487'", 'mh.mhregnum IN (?)'),
-    ('2523', reg_utils.REG_TYPE_PARAM, 'SALE / GIFT TRANSFER', "'098487'", db2_utils.REG_FILTER_REG_TYPE),
-    ('2523', reg_utils.SUBMITTING_NAME_PARAM, 'LINDA', "'098487'", db2_utils.REG_FILTER_SUBMITTING_NAME),
-    ('2523', reg_utils.CLIENT_REF_PARAM, 'A000873', "'098487'", db2_utils.REG_FILTER_CLIENT_REF),
-    ('2523', reg_utils.REG_TS_PARAM, '2021-10-14T09:53:57-07:53', "'098487'", db2_utils.REG_FILTER_DATE),
-    ('2523', reg_utils.STATUS_PARAM, 'EXEMPT', "'098487'", db2_utils.REG_FILTER_STATUS),
-    ('2523', reg_utils.USER_NAME_PARAM, 'BCREG2', "'098487'", db2_utils.REG_FILTER_USERNAME)
+    ('2523', False, reg_utils.MHR_NUMBER_PARAM, '098487', "'098487'", 'mh.mhregnum IN (?)'),
+    ('2523', False, reg_utils.REG_TYPE_PARAM, 'SALE / GIFT TRANSFER', "'098487'", db2_utils.REG_FILTER_REG_TYPE),
+    ('2523', False, reg_utils.SUBMITTING_NAME_PARAM, 'LINDA', "'098487'", db2_utils.REG_FILTER_SUBMITTING_NAME),
+    ('2523', False, reg_utils.CLIENT_REF_PARAM, 'A000873', "'098487'", db2_utils.REG_FILTER_CLIENT_REF),
+    ('2523', False, reg_utils.REG_TS_PARAM, '2021-10-14T09:53:57-07:53', "'098487'", db2_utils.REG_FILTER_DATE),
+    ('2523', False, reg_utils.STATUS_PARAM, 'EXEMPT', "'098487'", db2_utils.REG_FILTER_STATUS),
+    ('2523', False, reg_utils.USER_NAME_PARAM, 'BCREG2', "'098487'", db2_utils.REG_FILTER_USERNAME),
+    ('2523', True, reg_utils.MHR_NUMBER_PARAM, '098487', "'098487'", 'mh.mhregnum IN (?)'),
+    ('2523', True, reg_utils.REG_TYPE_PARAM, 'SALE / GIFT TRANSFER', "'098487'",
+     db2_utils.REG_FILTER_REG_TYPE_COLLAPSE),
+    ('2523', True, reg_utils.SUBMITTING_NAME_PARAM, 'LINDA', "'098487'", db2_utils.REG_FILTER_SUBMITTING_NAME_COLLAPSE),
+    ('2523', True, reg_utils.CLIENT_REF_PARAM, 'A000873', "'098487'", db2_utils.REG_FILTER_CLIENT_REF_COLLAPSE),
+    ('2523', True, reg_utils.REG_TS_PARAM, '2021-10-14T09:53:57-07:53', "'098487'", db2_utils.REG_FILTER_DATE_COLLAPSE),
+    ('2523', True, reg_utils.STATUS_PARAM, 'EXEMPT', "'098487'", db2_utils.REG_FILTER_STATUS),
+    ('2523', True, reg_utils.USER_NAME_PARAM, 'BCREG2', "'098487'", db2_utils.REG_FILTER_USERNAME_COLLAPSE)
 ]
 
 
@@ -134,11 +142,12 @@ def test_find_account_sort_order(session, account_id, sort_criteria, sort_order,
         assert not registration.get('inUserList')
 
 
-@pytest.mark.parametrize('account_id,filter_name,filter_value,mhr_numbers,expected_clause', TEST_QUERY_FILTER_DATA)
-def test_account_reg_filter(session, account_id, filter_name, filter_value, mhr_numbers, expected_clause):
+@pytest.mark.parametrize('account_id,collapse,filter_name,filter_value,mhr_numbers,expected_clause',
+                         TEST_QUERY_FILTER_DATA)
+def test_account_reg_filter(session, account_id, collapse, filter_name, filter_value, mhr_numbers, expected_clause):
     """Assert that account registration query filter clause is as expected."""
     params: AccountRegistrationParams = AccountRegistrationParams(account_id=account_id,
-                                                                  collapse=False,
+                                                                  collapse=collapse,
                                                                   sbc_staff=False)
     filter_clause: str = expected_clause
     if filter_name == reg_utils.REG_TS_PARAM:
@@ -149,7 +158,7 @@ def test_account_reg_filter(session, account_id, filter_name, filter_value, mhr_
         filter_clause = filter_clause.replace('?', 'E')
     elif filter_name == reg_utils.REG_TYPE_PARAM:
         params.filter_registration_type = filter_value
-        filter_clause = filter_clause.replace('?', "'TRAN'")
+        filter_clause = filter_clause.replace('?', 'TRAN')
     elif filter_name == reg_utils.MHR_NUMBER_PARAM:
         params.filter_mhr_number = filter_value
         filter_clause = filter_clause.replace('?', f"'{filter_value}'")
@@ -170,11 +179,12 @@ def test_account_reg_filter(session, account_id, filter_name, filter_value, mhr_
     assert filter_query.find(filter_clause) > 0
 
 
-@pytest.mark.parametrize('account_id,filter_name,filter_value,mhr_numbers,expected_clause', TEST_QUERY_FILTER_DATA)
-def test_find_account_filter(session, account_id, filter_name, filter_value, mhr_numbers, expected_clause):
+@pytest.mark.parametrize('account_id,collapse,filter_name,filter_value,mhr_numbers,expected_clause',
+                         TEST_QUERY_FILTER_DATA)
+def test_find_account_filter(session, account_id, collapse, filter_name, filter_value, mhr_numbers, expected_clause):
     """Assert that account registration query with an order by clause is as expected."""
     params: AccountRegistrationParams = AccountRegistrationParams(account_id=account_id,
-                                                                  collapse=False,
+                                                                  collapse=collapse,
                                                                   sbc_staff=False)
     if filter_name == reg_utils.REG_TS_PARAM:
         params.filter_registration_date = filter_value
