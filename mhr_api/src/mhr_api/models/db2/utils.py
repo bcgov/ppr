@@ -127,7 +127,7 @@ SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRI
   FROM manuhome mh, document d
  WHERE mh.mhregnum IN (?)
    AND mh.mhregnum = d.mhregnum
- ORDER BY mh.updateda DESC, mh.updateti DESC, d.regidate DESC
+ ORDER BY d.regidate DESC
 """
 QUERY_ACCOUNT_REGISTRATIONS_SORT = """
 SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRIM(d.docutype),
@@ -151,7 +151,7 @@ SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRI
  WHERE mh.mhregnum IN (?)
    AND mh.mhregnum = d.mhregnum
 """
-REG_ORDER_BY_DATE = ' ORDER BY mh.updateda DESC, mh.updateti DESC, d.regidate DESC'
+REG_ORDER_BY_DATE = ' ORDER BY d.regidate DESC'
 REG_ORDER_BY_MHR_NUMBER = ' ORDER BY mh.mhregnum'
 REG_ORDER_BY_REG_TYPE = ' ORDER BY TRIM(d.docutype)'
 REG_ORDER_BY_STATUS = ' ORDER BY mh.mhstatus'
@@ -170,7 +170,7 @@ REG_FILTER_DATE = " AND TO_CHAR(d.regidate, 'YYYY-MM-DD') = '?'"
 SORT_DESCENDING = ' DESC'
 SORT_ASCENDING = ' ASC'
 DEFAULT_REG_TYPE_FILTER = "'101 '"
-DEFAULT_SORT_ORDER = ' ORDER BY mh.updateda DESC, mh.updateti DESC, d.regidate DESC'
+DEFAULT_SORT_ORDER = ' ORDER BY d.regidate DESC'
 QUERY_ACCOUNT_FILTER_BY = {
     reg_utils.STATUS_PARAM: REG_FILTER_STATUS,
     reg_utils.REG_TYPE_PARAM: REG_FILTER_REG_TYPE,
