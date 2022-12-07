@@ -410,10 +410,10 @@ export default defineComponent({
           // Delete the draft on successful submission
           if (getMhrInformation.value.draftNumber) await deleteMhrDraft(getMhrInformation.value.draftNumber)
           const newItem: RegTableNewItemI = {
-            addedReg: getMhrInformation.value.mhrNumber,
-            addedRegParent: '',
+            addedReg: mhrTransferFiling.documentId,
+            addedRegParent: getMhrInformation.value.mhrNumber,
             addedRegSummary: null,
-            prevDraft: getMhrInformation.value.documentId || ''
+            prevDraft: mhrTransferFiling.documentId || ''
           }
           setRegTableNewItem(newItem)
           goToDash()
