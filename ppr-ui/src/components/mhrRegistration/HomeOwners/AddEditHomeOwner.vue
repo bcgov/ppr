@@ -96,9 +96,9 @@
                   <h3 class="mb-2">
                     Other Businesses and Organizations
                   </h3>
-                  <li>Indian Bands</li>
-                  <li>Public Bodies</li>
-                  <li>Businesses and Organizations not registered in B.C.</li><br>
+                  <li>Indian bands</li>
+                  <li>Public bodies</li>
+                  <li>Businesses and organizations not registered in B.C.</li><br>
                   <p>Businesses and organizations that <b>cannot</b> own a manufactured home:</p>
                   <h3 class="mb-2">
                     Sole Proprietorships / Partnerships
@@ -108,7 +108,7 @@
                     or limited partnership. The owners of the proprietorship or partnership must be added as a
                     person or as an organization.
                   </p>
-                  <hr class="mt-3 mb-5"/>
+                  <hr class="mb-5 mt-6 solid"/>
                   <h3 class="text-center mb-2">
                     When B.C. Based Businesses Must be in Active Status
                   </h3>
@@ -120,9 +120,9 @@
                   <p><b>Existing owners:</b> Must be active at the time the bill of sale was signed.</p>
                   <p>
                     If you are including a business that is already an owner of the home, the business <b>must have
-                    been active on the B.C Corporate Register at the time the bill of sale was signed</b>
+                    been active on the B.C Corporate Register at the time the bill of sale was signed.</b>
                   </p>
-                  <hr class="mt-3 mb-5" />
+                  <hr class="mb-5 mt-6 solid" />
                   <h3 class="text-center mb-2">
                     My Business Isn't Listed
                   </h3>
@@ -600,6 +600,18 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+::v-deep .theme--light.v-icon.mdi-close {
+  color: $primary-blue !important;
+}
+
+h3 {
+  color: $gray7 !important;
+}
+
+.solid {
+  border: 0;
+  border-top: 0.25px solid $gray4 !important;
+}
 
 u {
     border-bottom: 1px dotted #000;
@@ -614,6 +626,10 @@ u {
   li {
     color: $gray7;
     line-height: 24px;
+  }
+  li::marker {
+    font-size: 0.75rem;
+    color: $gray7 !important;
   }
 }
 
