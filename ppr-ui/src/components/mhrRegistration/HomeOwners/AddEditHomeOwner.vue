@@ -604,10 +604,6 @@ export default defineComponent({
   color: $primary-blue !important;
 }
 
-h3 {
-  color: $gray7 !important;
-}
-
 .solid {
   border: 0;
   border-top: 0.25px solid $gray4 !important;
