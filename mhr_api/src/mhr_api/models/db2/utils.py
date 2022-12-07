@@ -29,6 +29,21 @@ FROM_LEGACY_DOC_TYPE = {
     '103': 'REG_103',
     '103E': 'REG_103E'
 }
+TO_LEGACY_DOC_TYPE = {
+    'MHREG': '101 ',
+    'CONV': 'CONV',
+    'TRANS': 'TRAN',
+    'TRAND': 'DEAT',
+    'EXEMPTION_RES': 'EXRS',
+    'EXEMPTION_NON_RES': 'EXNR',
+    'PERMIT': '103 ',
+    'DECAL_REPLACE': '102 ',
+    'PERMIT_EXTENSION': '103E',
+    'REG_101': '101 ',
+    'REG_102': '102 ',
+    'REG_103': '103 ',
+    'REG_103E': '103E'
+}
 
 QUERY_ACCOUNT_MHR_LEGACY = """
 SELECT DISTINCT mer.mhr_number, 'N' AS account_reg
@@ -112,7 +127,7 @@ SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRI
   FROM manuhome mh, document d
  WHERE mh.mhregnum IN (?)
    AND mh.mhregnum = d.mhregnum
- ORDER BY mh.updateda DESC, mh.updateti DESC, d.regidate DESC
+ ORDER BY d.regidate DESC
 """
 QUERY_ACCOUNT_REGISTRATIONS_SORT = """
 SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRIM(d.docutype),
@@ -136,7 +151,7 @@ SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRI
  WHERE mh.mhregnum IN (?)
    AND mh.mhregnum = d.mhregnum
 """
-REG_ORDER_BY_DATE = ' ORDER BY mh.updateda DESC, mh.updateti DESC, d.regidate DESC'
+REG_ORDER_BY_DATE = ' ORDER BY d.regidate DESC'
 REG_ORDER_BY_MHR_NUMBER = ' ORDER BY mh.mhregnum'
 REG_ORDER_BY_REG_TYPE = ' ORDER BY TRIM(d.docutype)'
 REG_ORDER_BY_STATUS = ' ORDER BY mh.mhstatus'
@@ -145,21 +160,66 @@ REG_ORDER_BY_CLIENT_REF = ' ORDER BY TRIM(d.olbcfoli)'
 REG_ORDER_BY_USERNAME = ' ORDER BY TRIM(d.affirmby)'
 REG_ORDER_BY_OWNER_NAME = ' ORDER BY owner_name_sort'
 REG_ORDER_BY_EXPIRY_DAYS = ' ORDER BY mh.mhregnum'
-REG_FILTER_REG_TYPE = " AND TRIM(d.docutype) = '?'"
+REG_FILTER_REG_TYPE = " AND d.docutype = '?'"
+REG_FILTER_REG_TYPE_COLLAPSE = """
+ AND (d.docutype = '?' OR (d.documtid = mh.regdocid AND EXISTS (SELECT d2.documtid
+                                                                  FROM document d2
+                                                                 WHERE d2.mhregnum = mh.mhregnum
+                                                                   AND d2.docutype = '?')))
+"""
 REG_FILTER_STATUS = " AND mh.mhstatus = '?'"
 REG_FILTER_SUBMITTING_NAME = " AND TRIM(d.name) LIKE '?%'"
+REG_FILTER_SUBMITTING_NAME_COLLAPSE = """
+ AND (TRIM(d.name) LIKE '?%' OR
+      (d.documtid = mh.regdocid AND EXISTS (SELECT d2.documtid
+                                              FROM document d2
+                                             WHERE d2.mhregnum = mh.mhregnum
+                                               AND TRIM(d2.name) LIKE '?%')))
+"""
 REG_FILTER_CLIENT_REF = " AND TRIM(d.olbcfoli) LIKE '?%'"
+REG_FILTER_CLIENT_REF_COLLAPSE = """
+ AND (TRIM(d.olbcfoli) LIKE '?%' OR
+      (d.documtid = mh.regdocid AND EXISTS (SELECT d2.documtid
+                                              FROM document d2
+                                             WHERE d2.mhregnum = mh.mhregnum
+                                               AND TRIM(d2.olbcfoli) LIKE '?%')))
+"""
 REG_FILTER_USERNAME = " AND TRIM(d.affirmby) LIKE '?%'"
+REG_FILTER_USERNAME_COLLAPSE = """
+ AND (TRIM(d.affirmby) LIKE '?%' OR
+      (d.documtid = mh.regdocid AND EXISTS (SELECT d2.documtid
+                                              FROM document d2
+                                             WHERE d2.mhregnum = mh.mhregnum
+                                               AND TRIM(d2.affirmby) LIKE '?%')))
+"""
+REG_FILTER_DATE = " AND TO_CHAR(d.regidate, 'YYYY-MM-DD') = '?'"
+REG_FILTER_DATE_COLLAPSE = """
+ AND (TO_CHAR(d.regidate, 'YYYY-MM-DD') = '?' OR
+      (d.documtid = mh.regdocid AND EXISTS (SELECT d2.documtid
+                                              FROM document d2
+                                             WHERE d2.mhregnum = mh.mhregnum
+                                               AND TO_CHAR(d2.regidate, 'YYYY-MM-DD') = '?')))
+"""
 
 SORT_DESCENDING = ' DESC'
 SORT_ASCENDING = ' ASC'
-
+DEFAULT_REG_TYPE_FILTER = "'101 '"
+DEFAULT_SORT_ORDER = ' ORDER BY d.regidate DESC'
 QUERY_ACCOUNT_FILTER_BY = {
     reg_utils.STATUS_PARAM: REG_FILTER_STATUS,
     reg_utils.REG_TYPE_PARAM: REG_FILTER_REG_TYPE,
     reg_utils.SUBMITTING_NAME_PARAM: REG_FILTER_SUBMITTING_NAME,
     reg_utils.CLIENT_REF_PARAM: REG_FILTER_CLIENT_REF,
-    reg_utils.USER_NAME_PARAM: REG_FILTER_USERNAME
+    reg_utils.USER_NAME_PARAM: REG_FILTER_USERNAME,
+    reg_utils.REG_TS_PARAM: REG_FILTER_DATE
+}
+QUERY_ACCOUNT_FILTER_BY_COLLAPSE = {
+    reg_utils.STATUS_PARAM: REG_FILTER_STATUS,
+    reg_utils.REG_TYPE_PARAM: REG_FILTER_REG_TYPE_COLLAPSE,
+    reg_utils.SUBMITTING_NAME_PARAM: REG_FILTER_SUBMITTING_NAME_COLLAPSE,
+    reg_utils.CLIENT_REF_PARAM: REG_FILTER_CLIENT_REF_COLLAPSE,
+    reg_utils.USER_NAME_PARAM: REG_FILTER_USERNAME_COLLAPSE,
+    reg_utils.REG_TS_PARAM: REG_FILTER_DATE_COLLAPSE
 }
 QUERY_ACCOUNT_ORDER_BY = {
     reg_utils.REG_TS_PARAM: REG_ORDER_BY_DATE,
@@ -178,6 +238,11 @@ LEGACY_STATUS_DESCRIPTION = {
     'E': 'EXEMPT',
     'D': 'DRAFT',
     'C': 'HISTORICAL'
+}
+TO_LEGACY_STATUS = {
+    'ACTIVE': 'R',
+    'EXEMPT': 'E',
+    'HISTORICAL': 'C'
 }
 LEGACY_REGISTRATION_DESCRIPTION = {
     '101': REGISTRATION_DESC_NEW,
@@ -259,7 +324,7 @@ def find_all_by_account_id(params: AccountRegistrationParams):
                 if count > 1:
                     mhr_numbers += ','
                 mhr_numbers += f"'{mhr_number}'"
-            query = text(build_account_query(params, mhr_numbers))
+            query = text(build_account_query(params, mhr_numbers, doc_types))
             # query_text = QUERY_ACCOUNT_REGISTRATIONS.replace('?', mhr_numbers)
             # query = text(query_text)
             result = db.get_engine(current_app, 'db2').execute(query)
@@ -308,7 +373,7 @@ def find_by_document_id(document_id: str):
     return Db2Manuhome.find_by_document_id(document_id)
 
 
-def build_account_query(params: AccountRegistrationParams, mhr_numbers: str) -> str:
+def build_account_query(params: AccountRegistrationParams, mhr_numbers: str, doc_types) -> str:
     """Build the account registration summary query."""
     query_text: str = QUERY_ACCOUNT_REGISTRATIONS
     if not params.has_filter() and not params.has_sort():
@@ -318,24 +383,26 @@ def build_account_query(params: AccountRegistrationParams, mhr_numbers: str) -> 
         query_text = QUERY_ACCOUNT_REGISTRATIONS_SORT
         order_clause: str = ''
         if params.has_filter():
-            query_text = build_account_query_filter(query_text, params, mhr_numbers)
+            query_text = build_account_query_filter(query_text, params, mhr_numbers, doc_types)
         else:
             query_text = query_text.replace('?', mhr_numbers)
         if params.has_sort():
             order_clause = QUERY_ACCOUNT_ORDER_BY.get(params.sort_criteria)
-        if params.sort_criteria == reg_utils.REG_TS_PARAM:
-            if params.sort_direction and params.sort_direction == reg_utils.SORT_ASCENDING:
-                order_clause = order_clause.replace(SORT_DESCENDING, SORT_ASCENDING)
-        elif params.sort_direction and params.sort_direction == reg_utils.SORT_ASCENDING:
-            order_clause += SORT_ASCENDING
-        else:
-            order_clause += SORT_DESCENDING
-        query_text += order_clause
+            if params.sort_criteria == reg_utils.REG_TS_PARAM:
+                if params.sort_direction and params.sort_direction == reg_utils.SORT_ASCENDING:
+                    order_clause = order_clause.replace(SORT_DESCENDING, SORT_ASCENDING)
+            elif params.sort_direction and params.sort_direction == reg_utils.SORT_ASCENDING:
+                order_clause += SORT_ASCENDING
+            else:
+                order_clause += SORT_DESCENDING
+            query_text += order_clause
+        else:  # Default sort order if filter but no sorting specified.
+            query_text += DEFAULT_SORT_ORDER
     # current_app.logger.info(query_text)
     return query_text
 
 
-def build_account_query_filter(query_text: str, params: AccountRegistrationParams, mhr_numbers: str) -> str:
+def build_account_query_filter(query_text: str, params: AccountRegistrationParams, mhr_numbers: str, doc_types) -> str:
     """Build the account registration summary query filter clause."""
     filter_clause: str = ''
     filter_type, filter_value = params.get_filter_values()
@@ -344,13 +411,36 @@ def build_account_query_filter(query_text: str, params: AccountRegistrationParam
             query_text = query_text.replace('?', f"'{filter_value}'")
         else:
             query_text = query_text.replace('?', mhr_numbers)
-            if filter_type != reg_utils.REG_TS_PARAM:
+            # Filter may exclude parent MH registrations, so use a different query to include base registrations.
+            filter_clause = QUERY_ACCOUNT_FILTER_BY_COLLAPSE.get(filter_type)
+            if not params.collapse:
                 filter_clause = QUERY_ACCOUNT_FILTER_BY.get(filter_type)
-                if filter_clause:
-                    filter_clause = filter_clause.replace('?', filter_value)
             if filter_clause:
+                if filter_type == reg_utils.REG_TS_PARAM:
+                    filter_clause = filter_clause.replace('?', filter_value[0:10])
+                elif filter_type == reg_utils.REG_TYPE_PARAM:
+                    filter_clause = __get_reg_type_filter(filter_value, params.collapse, doc_types)
+                elif filter_type == reg_utils.STATUS_PARAM:
+                    filter_clause = filter_clause.replace('?', TO_LEGACY_STATUS.get(filter_value, 'R'))
+                else:
+                    filter_clause = filter_clause.replace('?', filter_value)
                 query_text += filter_clause
     return query_text
+
+
+def __get_reg_type_filter(filter_value: str, collapse: bool, doc_types) -> dict:
+    """Get the legacy document type from the filter value."""
+    new_doc_type: str = 'REG_101'
+    for doc_rec in doc_types:
+        if filter_value == doc_rec.document_type_desc:
+            new_doc_type = doc_rec.document_type
+            break
+    doc_type: str = TO_LEGACY_DOC_TYPE.get(new_doc_type, new_doc_type)
+    if len(doc_type) == 3:
+        doc_type += ' '
+    if collapse:
+        return REG_FILTER_REG_TYPE_COLLAPSE.replace('?', doc_type)
+    return REG_FILTER_REG_TYPE.replace('?', doc_type)
 
 
 def __get_mhr_list(account_id: str) -> dict:
