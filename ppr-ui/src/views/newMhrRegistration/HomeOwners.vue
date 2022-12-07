@@ -322,7 +322,11 @@ export default defineComponent({
       }),
       showTotalOwnership: computed(() => {
         return showGroups.value &&
-          (!localState.hasRemovedAllOwners || localState.hasMultipleAddedGroups || localState.hasSingleInvalidGroup)
+          (
+            !hasRemovedAllHomeOwners(localState.getHomeOwners.filter(owner => owner.action !== ActionTypes.ADDED)) ||
+            localState.hasMultipleAddedGroups ||
+            localState.hasSingleInvalidGroup
+          )
       }),
       hasHomeOwners: computed(() => !!getTransferOrRegistrationHomeOwners().find(owner => owner.ownerId)),
       hasReviewedOwners: computed((): boolean =>

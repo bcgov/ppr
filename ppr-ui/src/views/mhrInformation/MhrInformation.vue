@@ -539,7 +539,7 @@ export default defineComponent({
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
 .sticky-container {
-  z-index: 7!important;
+  z-index: 4!important;
 }
 
 .submitting-party {

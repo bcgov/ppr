@@ -107,7 +107,7 @@ export default defineComponent({
             isNumber(null, null, null, null), // check for numbers only
             isNumber(null, 6, null, null), // check for length (maxLength can't be used because field is numeric)
             greaterThan(Number(localState.fractionalInfo.interestDenominator - 1),
-              'Must be lesser than total available'
+              'Must be less than total available'
             )
           )
         }
