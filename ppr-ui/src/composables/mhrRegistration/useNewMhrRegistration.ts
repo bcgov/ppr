@@ -237,6 +237,7 @@ export const useNewMhrRegistration = () => {
           const newDraft: MhRegistrationSummaryIF = transferchanges
           newDraft.baseRegistrationNumber = transferchanges.mhrNumber
           newDraft.documentId = transferchanges.documentId
+          newDraft.draftNumber = transferchanges.documentRegistrationNumber
           existingChanges.push(newDraft)
         })
         transfer.changes = existingChanges
