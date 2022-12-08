@@ -68,9 +68,11 @@
               <v-col cols="3" class="pt-1">
                 <h3>Legal Land Description</h3>
               </v-col>
-              <v-col v-if="getMhrRegistrationLocation.bandName || getMhrRegistrationLocation.reserveNumber"
-                cols="9" class="pt-1"
-                >
+              <v-col
+                v-if="getMhrRegistrationLocation.bandName || getMhrRegistrationLocation.reserveNumber"
+                cols="9"
+                class="pt-1"
+              >
                 <p>Band Name: {{ getMhrRegistrationLocation.bandName || '(Not Entered)' }}</p>
                 <p>Reserve Number: {{ getMhrRegistrationLocation.reserveNumber || '(Not Entered)' }}</p>
                 <p v-if="getMhrRegistrationLocation.additionalDescription" class="pb-4">
@@ -125,10 +127,12 @@
               <v-col cols="3" class="pt-1">
                 <h3>Legal Land Description</h3>
               </v-col>
-              <v-col cols="9" class="pt-1" v-if="getMhrRegistrationLocation.lot &&
-                getMhrRegistrationLocation.landDistrict &&
-                getMhrRegistrationLocation.plan"
-                >
+              <v-col
+                cols="9" class="pt-1"
+                v-if="getMhrRegistrationLocation.lot &&
+                      getMhrRegistrationLocation.landDistrict &&
+                      getMhrRegistrationLocation.plan"
+              >
                 <p>{{ displayStrata ? 'Strata ' : '' }}Lot: {{ getMhrRegistrationLocation.lot }}</p>
                 <p>Block: {{ getMhrRegistrationLocation.block || '(Not Entered)'}}</p>
                 <p>{{ displayStrata ? 'Strata ' : '' }}Plan: {{ getMhrRegistrationLocation.plan }}</p>

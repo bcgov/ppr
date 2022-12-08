@@ -133,20 +133,9 @@ export const useNewMhrRegistration = () => {
   }
 
   const resetLocationInfoFields = (location: MhrLocationInfoIF): MhrLocationInfoIF => {
-    location.bandName = ''
-    location.reserveNumber = ''
-    location.lot = ''
-    location.landDistrict = ''
-    location.plan = ''
-    location.districtLot = ''
-    location.partOf = ''
-    location.section = ''
-    location.township = ''
-    location.range = ''
-    location.meridian = ''
-    location.parcel = ''
-    location.block = ''
-    location.exceptPlan = ''
+    Object.entries(location).forEach(([key]) => {
+      location[key] = ''
+    })
     return location
   }
 
