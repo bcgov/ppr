@@ -34,6 +34,7 @@ export const mockedSearchResponse: mockedSearchResponse = {
       },
       clientReferenceId: '1234K'
     },
+    isPdfRequested: false,
     results: mockedSearchResults[UISearchTypes.SERIAL_NUMBER]
   },
   [UISearchTypes.INDIVIDUAL_DEBTOR]: {
@@ -54,6 +55,7 @@ export const mockedSearchResponse: mockedSearchResponse = {
       },
       clientReferenceId: '123'
     },
+    isPdfRequested: false,
     results: mockedSearchResults[UISearchTypes.INDIVIDUAL_DEBTOR]
   },
   [UISearchTypes.BUSINESS_DEBTOR]: {
@@ -73,6 +75,7 @@ export const mockedSearchResponse: mockedSearchResponse = {
       },
       clientReferenceId: '1233333332221'
     },
+    isPdfRequested: false,
     results: mockedSearchResults[UISearchTypes.BUSINESS_DEBTOR]
   },
   [UISearchTypes.MHR_NUMBER]: {
@@ -90,6 +93,7 @@ export const mockedSearchResponse: mockedSearchResponse = {
       },
       clientReferenceId: ''
     },
+    isPdfRequested: false,
     results: mockedSearchResults[UISearchTypes.MHR_NUMBER]
   },
   [UISearchTypes.AIRCRAFT]: {
@@ -107,6 +111,7 @@ export const mockedSearchResponse: mockedSearchResponse = {
       },
       clientReferenceId: 'abcd-123-rrr'
     },
+    isPdfRequested: false,
     results: mockedSearchResults[UISearchTypes.AIRCRAFT]
   },
   [UISearchTypes.REGISTRATION_NUMBER]: {
@@ -124,6 +129,7 @@ export const mockedSearchResponse: mockedSearchResponse = {
       },
       clientReferenceId: '1q'
     },
+    isPdfRequested: false,
     results: mockedSearchResults[UISearchTypes.REGISTRATION_NUMBER]
   }
 }

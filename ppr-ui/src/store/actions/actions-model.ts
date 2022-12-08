@@ -169,10 +169,10 @@ export const setSearchDebtorName: ActionIF = ({ commit }, debtorName: Individual
 export const setSearchHistory: ActionIF = ({ commit }, searchHistory: Array<SearchResponseIF>): void => {
   // need to set .loadingPDF so that the loader circle triggers when set
   //  - if it starts as undefined it wont trigger on change
-  (searchHistory || []).forEach(item => {
-    item.loadingPDF = false
-    item.isPdfRequested = false
-  })
+  for (let i = 0; i < searchHistory?.length || 0; i++) {
+    searchHistory[i].loadingPDF = false
+    searchHistory[i].isPdfRequested = false
+  }
   commit('mutateSearchHistory', searchHistory)
 }
 
