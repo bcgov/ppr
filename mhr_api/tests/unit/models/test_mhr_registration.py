@@ -241,6 +241,8 @@ def test_find_account_registrations(session, account_id, has_results):
             assert registration['path'] is not None
             assert registration['documentId'] is not None
             assert not registration.get('inUserList')
+            if registration['registrationDescription'] == REG_DESCRIPTION:
+                assert 'lienRegistrationType' in registration
     else:
         assert not reg_list
 
