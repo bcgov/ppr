@@ -310,8 +310,8 @@ export async function submitMhrRegistration (payloadData, queryParamData) {
   }
 }
 /**
- * Method to return Mhr registrations.  
- * 
+ * Method to return Mhr registrations.
+ *
  * @param withCollapse // Used to indicate whether api should return registrations collapsed
  * @returns MhRegistrationSummaryIF
  */
