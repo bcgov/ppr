@@ -72,21 +72,27 @@ TOKEN1 = {
     'given_name': 'given_name',
     'family_name': 'family_name',
     'iss': 'issuer',
-    'sub': 'subject'
+    'sub': 'subject',
+    'idp_userid': 'idp_userid',
+    'loginSource': 'source'
 }
 TOKEN2 = {
     'username': 'username',
     'firstname': 'given_name',
     'lastname': 'family_name',
     'iss': 'issuer',
-    'sub': 'subject'
+    'sub': 'subject',
+    'idp_userid': 'idp_userid',
+    'loginSource': 'source'
 }
 TEST_TOKEN = {
     'username': 'username_TEST1',
     'firstname': 'given_name_TEST1',
     'lastname': 'family_name_TEST1',
     'iss': 'issuer_TEST1',
-    'sub': 'subject_TEST1'
+    'sub': 'subject_TEST1',
+    'idp_userid': 'idp_userid_TEST1',
+    'loginSource': 'source_TEST1'
 }
 
 TEST_VALID_DATA = [
@@ -137,13 +143,17 @@ def test_jwt_properties(session, client, jwt, token):
         firstname=firstname,
         lastname=lastname,
         iss=token['iss'],
-        sub=token['sub']
+        sub=token['sub'],
+        idp_userid=token['idp_userid'],
+        login_source=token['loginSource']
     )
     assert user.username == 'username'
     assert user.iss == 'issuer'
     assert user.sub == 'subject'
     assert user.firstname == 'given_name'
     assert user.lastname == 'family_name'
+    assert user.idp_userid == 'idp_userid'
+    assert user.login_source == 'login_source'
 
 
 def test_find_by_id(session, client, jwt):
@@ -160,7 +170,8 @@ def test_find_by_id(session, client, jwt):
     assert user.sub == 'subject_TEST1'
     assert user.firstname == 'given_name_TEST1'
     assert user.lastname == 'family_name_TEST1'
-
+    assert user.idp_userid == 'idp_userid_TEST1'
+    assert user.login_source == 'source_TEST1'
 
 def test_find_by_jwt_token(session, client, jwt):
     """Assert that user find by jwt token is working as expected."""
@@ -176,7 +187,8 @@ def test_find_by_jwt_token(session, client, jwt):
     assert user.sub == 'subject_TEST1'
     assert user.firstname == 'given_name_TEST1'
     assert user.lastname == 'family_name_TEST1'
-
+    assert user.idp_userid == 'idp_userid_TEST1'
+    assert user.login_source == 'source_TEST1'
 
 def test_find_by_username(session, client, jwt):
     """Assert that user find by username is working as expected."""
@@ -192,7 +204,8 @@ def test_find_by_username(session, client, jwt):
     assert user.sub == 'subject_TEST1'
     assert user.firstname == 'given_name_TEST1'
     assert user.lastname == 'family_name_TEST1'
-
+    assert user.idp_userid == 'idp_userid_TEST1'
+    assert user.login_source == 'source_TEST1'
 
 def test_find_by_subject(session, client, jwt):
     """Assert that user find by subject is working as expected."""
@@ -208,7 +221,8 @@ def test_find_by_subject(session, client, jwt):
     assert user.sub == 'subject_TEST1'
     assert user.firstname == 'given_name_TEST1'
     assert user.lastname == 'family_name_TEST1'
-
+    assert user.idp_userid == 'idp_userid_TEST1'
+    assert user.login_source == 'source_TEST1'
 
 def test_get_or_create(session, client, jwt):
     """Assert that get or create user is working as expected."""
@@ -221,7 +235,8 @@ def test_get_or_create(session, client, jwt):
     assert user.sub == 'subject_TEST1'
     assert user.firstname == 'given_name_TEST1'
     assert user.lastname == 'family_name_TEST1'
-
+    assert user.idp_userid == 'idp_userid_TEST1'
+    assert user.login_source == 'source_TEST1'
 
 def test_create_user_profile(session, client, jwt):
     """Assert that creating a user profile is working as expected."""

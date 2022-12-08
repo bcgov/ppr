@@ -50,10 +50,10 @@ def test_flags_bool_value(test_name, flag_name, expected):
 @integration_ldarkly
 @pytest.mark.parametrize('test_name,flag_user,expected_bool,expected_val', [
     ('valid-user',
-     User(username='bcregistries.devops@daxiom.ca', firstname='bcregistries', lastname='test', sub='bcregistries-test', iss='iss'),
+     User(username='bcregistries.devops@daxiom.ca', firstname='bcregistries', lastname='test', sub='bcregistries-test', iss='iss', idp_userid='123', login_source='IDIR'),
      True, 10),
     ('invalid-user',
-     (User(username='bcregistries', firstname='x', lastname='y', sub='bcregistries', iss='iss')),
+     (User(username='bcregistries', firstname='x', lastname='y', sub='bcregistries', iss='iss', idp_userid='789', login_source='IDIR')),
      False, -1),
 ])
 def test_flag_unique_user(test_name, flag_user, expected_bool, expected_val):
