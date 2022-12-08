@@ -309,7 +309,12 @@ export async function submitMhrRegistration (payloadData, queryParamData) {
     }
   }
 }
-
+/**
+ * Method to return Mhr registrations.
+ *
+ * @param withCollapse // Used to indicate whether api should return registrations collapsed
+ * @returns MhRegistrationSummaryIF
+ */
 export async function mhrRegistrationHistory (withCollapse: boolean = false) {
   try {
     const path = withCollapse ? 'registrations?collapse=true' : 'registrations'

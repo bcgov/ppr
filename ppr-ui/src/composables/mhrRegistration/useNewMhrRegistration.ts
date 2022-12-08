@@ -212,11 +212,9 @@ export const useNewMhrRegistration = () => {
 
   const fetchMhRegistrations = async (): Promise<void> => {
     const draftFilings = await getMhrDrafts()
-    const myMhrHistory = await mhrRegistrationHistory(isRoleQualifiedSupplier.value)
-    if (isRoleQualifiedSupplier.value) {
-      const filteredMhrHistory = addHistoryDraftsToMhr(myMhrHistory, draftFilings)
-      setMhrTableHistory(filteredMhrHistory)
-    } else setMhrTableHistory([...draftFilings, ...myMhrHistory])
+    const myMhrHistory = await mhrRegistrationHistory(true)
+    const filteredMhrHistory = addHistoryDraftsToMhr(myMhrHistory, draftFilings)
+    setMhrTableHistory(filteredMhrHistory)
   }
 
   function addHistoryDraftsToMhr (mhrHistory: MhRegistrationSummaryIF[], mhrDrafts: MhrDraftTransferApiIF[]):
