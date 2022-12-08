@@ -399,7 +399,7 @@ export default defineComponent({
     const defaultHomeOwner: MhrRegistrationHomeOwnerIF = {
       ownerId: props.editHomeOwner?.ownerId || getTransferOrRegistrationHomeOwners().length + 1 || (DEFAULT_OWNER_ID++),
       phoneNumber: props.editHomeOwner?.phoneNumber || '',
-      phoneExtension: props.editHomeOwner?.phoneExtension || null,
+      phoneExtension: props.editHomeOwner?.phoneExtension || '',
       suffix: props.editHomeOwner?.suffix || '',
       address: {
         street: props.editHomeOwner?.address.street || '',

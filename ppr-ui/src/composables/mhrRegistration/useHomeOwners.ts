@@ -348,7 +348,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
   }
 
   const hasRemovedAllHomeOwners = (homeOwners: MhrHomeOwnerGroupIF[]): boolean => {
-    return homeOwners.every(group => group.action === ActionTypes.REMOVED || group.action === ActionTypes.ADDED)
+    return homeOwners.every(group => group.action === ActionTypes.REMOVED)
   }
 
   const hasUndefinedGroupInterest = (homeOwnerGroups: MhrHomeOwnerGroupIF[]): boolean => {
