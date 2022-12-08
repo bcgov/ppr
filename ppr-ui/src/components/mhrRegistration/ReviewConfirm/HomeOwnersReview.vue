@@ -93,7 +93,4 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-.gray7 {
-  color: $gray7;
-}
 </style>

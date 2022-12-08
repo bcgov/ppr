@@ -57,8 +57,10 @@
               No active B.C. businesses found.
             </strong>
           </p>
-          Ensure you have entered the correct, full legal name of the organization before entering the phone number and
-          mailing address.
+          <p>
+            Ensure you have entered the correct, full legal name of the organization before entering the phone number
+            and mailing address.
+          </p>
         </div>
       </v-col>
     </v-row>
@@ -169,6 +171,10 @@ export default defineComponent({
 @import '@/assets/styles/theme.scss';
 .auto-complete-item {
   min-height: 0;
+}
+
+strong, p {
+  color: $gray7 !important;
 }
 
 .auto-complete-sticky-row{
