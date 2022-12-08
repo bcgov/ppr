@@ -115,6 +115,8 @@ def test_get_account_registrations(session, client, jwt, desc, roles, status, ha
             assert registration['clientReferenceId'] is not None
             assert registration['ownerNames'] is not None
             assert registration['path'] is not None
+            if registration['registrationDescription'] == 'REGISTER NEW UNIT':
+                assert 'lienRegistrationType' in registration
 
 
 @pytest.mark.parametrize('desc,has_submitting,roles,status,has_account', TEST_CREATE_DATA)

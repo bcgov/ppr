@@ -46,12 +46,18 @@ TO_LEGACY_DOC_TYPE = {
 }
 
 QUERY_ACCOUNT_MHR_LEGACY = """
-SELECT DISTINCT mer.mhr_number, 'N' AS account_reg
+SELECT DISTINCT mer.mhr_number, 'N' AS account_reg,
+                (SELECT mlc.registration_type
+                   FROM mhr_lien_check_vw mlc
+                  WHERE mlc.mhr_number = mer.mhr_number) AS lien_registration_type
  FROM mhr_extra_registrations mer
 WHERE account_id = :query_value
   AND (removed_ind IS NULL OR removed_ind != 'Y')
 UNION (
-SELECT DISTINCT mr.mhr_number, 'Y' AS account_reg
+SELECT DISTINCT mr.mhr_number, 'Y' AS account_reg,
+                (SELECT mlc.registration_type
+                   FROM mhr_lien_check_vw mlc
+                  WHERE mlc.mhr_number = mr.mhr_number) AS lien_registration_type
   FROM mhr_registrations mr
 WHERE account_id = :query_value
   AND mr.registration_type = 'MHREG'
@@ -91,7 +97,10 @@ SELECT (SELECT COUNT(mr.id)
            FROM mhr_registrations mr
           WHERE mr.account_id = :query_value
             AND mr.mhr_number = :query_value2
-            AND mr.registration_type IN ('MHREG'))
+            AND mr.registration_type IN ('MHREG')),
+      (SELECT mlc.registration_type
+         FROM mhr_lien_check_vw mlc
+        WHERE mlc.mhr_number = :query_value2)
 """
 DOC_ID_COUNT_QUERY = """
 SELECT COUNT(documtid)
@@ -270,7 +279,7 @@ def find_summary_by_mhr_number(account_id: str, mhr_number: str, staff: bool):
         rows = result.fetchall()
         if rows is not None:
             for row in rows:
-                registrations.append(__build_summary(row, True))
+                registrations.append(__build_summary(row, True, None))
     except Exception as db_exception:   # noqa: B902; return nicer error
         current_app.logger.error('DB2 find_summary_by_mhr_number exception: ' + str(db_exception))
         raise DatabaseException(db_exception)
@@ -283,6 +292,7 @@ def find_summary_by_mhr_number(account_id: str, mhr_number: str, staff: bool):
             reg_count = int(row[0])
             extra_count = int(row[1])
             reg_account_id = str(row[2])
+            lien_registration_type: str = str(row[3]) if row[3] else ''
             current_app.logger.debug(f'reg_count={reg_count}, extra_count={extra_count}, staff={staff}')
             # Set inUserList to true if MHR number already added to account extra registrations.
             doc_types = MhrDocumentType.find_all()
@@ -290,6 +300,9 @@ def find_summary_by_mhr_number(account_id: str, mhr_number: str, staff: bool):
                 if reg_count > 0 or extra_count > 0:
                     registration['inUserList'] = True
                 __update_summary_info(registration, registrations, None, doc_types, staff, account_id)
+                if registration['documentType'] in \
+                        (Db2Document.DocumentTypes.CONV, Db2Document.DocumentTypes.MHREG_TRIM):
+                    registration['lienRegistrationType'] = lien_registration_type
             # Path to download report only available for staff and registrations created by the account.
             if reg_count > 0 and (staff or account_id == reg_account_id):
                 for reg in registrations:
@@ -325,13 +338,11 @@ def find_all_by_account_id(params: AccountRegistrationParams):
                     mhr_numbers += ','
                 mhr_numbers += f"'{mhr_number}'"
             query = text(build_account_query(params, mhr_numbers, doc_types))
-            # query_text = QUERY_ACCOUNT_REGISTRATIONS.replace('?', mhr_numbers)
-            # query = text(query_text)
             result = db.get_engine(current_app, 'db2').execute(query)
             rows = result.fetchall()
             if rows is not None:
                 for row in rows:
-                    results.append(__build_summary(row, False))
+                    results.append(__build_summary(row, False, mhr_list))
             for result in results:
                 __update_summary_info(result, results, reg_summary_list, doc_types, params.sbc_staff, params.account_id)
                 if not params.collapse:
@@ -457,7 +468,8 @@ def __get_mhr_list(account_id: str) -> dict:
         for row in rows:
             reg = {
                 'mhr_number': str(row[0]),
-                'account_reg': str(row[1])
+                'account_reg': str(row[1]),
+                'lien_registration_type': str(row[2]) if row[2] else ''
             }
             mhr_list.append(reg)
     return mhr_list
@@ -546,7 +558,7 @@ def __update_summary_info(result, results, reg_summary_list, doc_types, staff, a
                     result['path'] = DOCUMENT_PATH + result.get('documentId')
 
 
-def __build_summary(row, add_in_user_list: bool = True):
+def __build_summary(row, add_in_user_list: bool = True, mhr_list=None):
     """Build registration summary from query result."""
     mhr_number = str(row[0])
     # current_app.logger.info(f'summary mhr#={mhr_number}')
@@ -580,6 +592,8 @@ def __build_summary(row, add_in_user_list: bool = True):
     }
     if add_in_user_list:
         summary['inUserList'] = False
+    if mhr_list and summary['documentType'] in (Db2Document.DocumentTypes.CONV, Db2Document.DocumentTypes.MHREG_TRIM):
+        summary['lienRegistrationType'] = __get_lien_registration_type(mhr_number, mhr_list)
     return summary
 
 
@@ -612,3 +626,13 @@ def __get_summary_name(db2_name: str):
     if middle:
         return first + ' ' + middle + ' ' + last
     return first + ' ' + last
+
+
+def __get_lien_registration_type(mhr_number: str, mhr_list) -> str:
+    """Get the PPR registration type for the mhr number if an outstanding lien exists."""
+    if not mhr_number or not mhr_list:
+        return ''
+    for reg in mhr_list:
+        if mhr_number == reg.get('mhr_number'):
+            return reg.get('lien_registration_type')
+    return ''
