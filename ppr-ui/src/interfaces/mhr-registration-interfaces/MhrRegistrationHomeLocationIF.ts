@@ -29,4 +29,7 @@ export interface MhrRegistrationHomeLocationIF {
   meridian: string
   landDistrict: string
   plan: string
+  bandName: string
+  reserveNumber: string
+  exceptPlan: string
 }

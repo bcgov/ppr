@@ -703,6 +703,10 @@ export const getMhrRegistrationLocation = (state: StateIF): MhrRegistrationHomeL
   return state.stateModel.mhrRegistration.location
 }
 
+export const getIsManualLocation = (state: StateIF): boolean => {
+  return state.stateModel.mhrRegistration.isManualLocationInfo
+}
+
 export const getMhrRegistrationHomeOwnerGroups = (state: StateIF): MhrRegistrationHomeOwnerGroupIF[] => {
   return state.stateModel.mhrRegistration.ownerGroups
 }

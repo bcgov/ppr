@@ -34,7 +34,7 @@
               color="primary"
               class="mr-n4"
               :ripple="false"
-              @click="showLocationInfo = false"
+              @click="handleCancel()"
             >
               Cancel <v-icon>mdi-close</v-icon>
             </v-btn>
@@ -91,7 +91,8 @@
 /* eslint-disable no-unused-vars */
 import { defineComponent, computed, reactive, toRefs, watch } from '@vue/composition-api'
 import { HomeLocationInfo } from '@/components/common'
-import { useInputRules } from '@/composables'
+import { useActions } from 'vuex-composition-helpers'
+import { useInputRules, useNewMhrRegistration } from '@/composables'
 import { MhrLocationInfoIF } from '@/interfaces'
 /* eslint-enable no-unused-vars */
 
@@ -108,12 +109,19 @@ export default defineComponent({
     isStrata: { type: Boolean, default: false }
   },
   setup (props, context) {
+    const {
+      setIsManualLocation
+    } = useActions<any>([
+      'setIsManualLocation'
+    ])
+
     const { maxLength } = useInputRules()
+    const { resetLocationInfoFields } = useNewMhrRegistration()
 
     const localState = reactive({
       isValidLocationInfo: false,
       showLocationInfo: false,
-      locationInfo: null,
+      locationInfo: {},
       additionalDescription: '',
       isHomeLocationDescriptionValid: false,
       isValidDescription: computed((): boolean => {
@@ -122,21 +130,29 @@ export default defineComponent({
       })
     })
 
+    const handleCancel = (): void => {
+      // reset locationInfo values and hide manual form
+      localState.locationInfo = resetLocationInfoFields(localState.locationInfo)
+      localState.showLocationInfo = false
+    }
+
     watch(() => localState.isValidDescription, (isValid: boolean) => {
       context.emit('setIsValidLocationInfo', isValid)
     })
     watch(() => localState.showLocationInfo, (showLocationInfo: boolean) => {
+      setIsManualLocation(showLocationInfo)
       context.emit('setShowLocationInfo', showLocationInfo)
     })
     watch(() => localState.locationInfo, (locationInfo: MhrLocationInfoIF) => {
       context.emit('setLocationInfo', locationInfo)
-    })
+    }, { deep: true })
     watch(() => localState.additionalDescription, (description: string) => {
       context.emit('setAdditionalDescription', description)
     })
 
     return {
       maxLength,
+      handleCancel,
       ...toRefs(localState)
     }
   }

@@ -4,6 +4,7 @@ import {
   MhrRegistrationHomeLocationIF,
   MhrRegistrationHomeOwnerGroupIF,
   MhrRegistrationIF,
+  MhrLocationInfoIF,
   NewMhrRegistrationApiIF,
   MhRegistrationSummaryIF,
   MhrDraftTransferApiIF
@@ -60,6 +61,7 @@ export const useNewMhrRegistration = () => {
       },
       ownerGroups: [],
       attentionReferenceNum: '',
+      isManualLocationInfo: false,
       location: {
         parkName: '',
         pad: '',
@@ -88,7 +90,10 @@ export const useNewMhrRegistration = () => {
         range: '',
         meridian: '',
         landDistrict: '',
-        plan: ''
+        plan: '',
+        bandName: '',
+        reserveNumber: '',
+        exceptPlan: ''
       },
       description: {
         manufacturer: '',
@@ -125,6 +130,24 @@ export const useNewMhrRegistration = () => {
         }
       ]
     }
+  }
+
+  const resetLocationInfoFields = (location: MhrLocationInfoIF): MhrLocationInfoIF => {
+    location.bandName = ''
+    location.reserveNumber = ''
+    location.lot = ''
+    location.landDistrict = ''
+    location.plan = ''
+    location.districtLot = ''
+    location.partOf = ''
+    location.section = ''
+    location.township = ''
+    location.range = ''
+    location.meridian = ''
+    location.parcel = ''
+    location.block = ''
+    location.exceptPlan = ''
+    return location
   }
 
   const parseSubmittingParty = () => {
@@ -295,6 +318,7 @@ export const useNewMhrRegistration = () => {
 
   return {
     initNewMhr,
+    resetLocationInfoFields,
     buildApiData,
     parseStaffPayment,
     fetchMhRegistrations,
