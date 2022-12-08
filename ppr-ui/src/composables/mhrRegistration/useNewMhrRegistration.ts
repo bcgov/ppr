@@ -211,9 +211,8 @@ export const useNewMhrRegistration = () => {
   }
 
   const fetchMhRegistrations = async (): Promise<void> => {
-    const isSummary = true // Used to indicate whether api should return registrations collapsed
     const draftFilings = await getMhrDrafts()
-    const myMhrHistory = await mhrRegistrationHistory(isSummary)
+    const myMhrHistory = await mhrRegistrationHistory(true)
     const filteredMhrHistory = addHistoryDraftsToMhr(myMhrHistory, draftFilings)
     setMhrTableHistory(filteredMhrHistory)
   }
