@@ -15,8 +15,12 @@
 # pylint: disable=too-few-public-methods
 
 """This module holds methods to support registration model updates - mostly account registration summary."""
-# from flask import current_app
+from flask import current_app
+from sqlalchemy.sql import text
+
+from mhr_api.exceptions import DatabaseException
 from mhr_api.models import utils as model_utils
+from mhr_api.models.db import db
 
 
 # Account registration request parameters to support sorting and filtering.
@@ -37,6 +41,12 @@ USER_NAME_PARAM = 'username'
 EXPIRY_DAYS_PARAM = 'expiryDays'
 SORT_ASCENDING = 'ascending'
 SORT_DESCENDING = 'descending'
+
+QUERY_PPR_LIEN_COUNT = """
+SELECT COUNT(base_registration_num)
+  FROM mhr_lien_check_vw
+ WHERE mhr_number = :query_value
+"""
 
 
 class AccountRegistrationParams():
@@ -113,3 +123,16 @@ class AccountRegistrationParams():
         if page_offset <= 1:
             return 0
         return (page_offset - 1) * self.get_page_size()
+
+
+def get_ppr_lien_count(mhr_number: str) -> int:
+    """Execute a query to count existing PPR liens on the MH (must not exist check)."""
+    try:
+        query = text(QUERY_PPR_LIEN_COUNT)
+        result = db.session.execute(query, {'query_value': mhr_number})
+        row = result.first()
+        lien_count = int(row[0])
+        return lien_count
+    except Exception as db_exception:   # noqa: B902; return nicer error
+        current_app.logger.error('get_ppr_lien_count exception: ' + str(db_exception))
+        raise DatabaseException(db_exception)

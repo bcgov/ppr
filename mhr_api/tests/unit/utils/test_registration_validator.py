@@ -358,6 +358,10 @@ TEST_TRANSFER_DATA_GROUP_INTEREST = [
     ('Invalid numerator < 1', False, 1, 4, validator.GROUP_INTEREST_MISMATCH),
     ('Invalid numerator sum high', False, 3, 4, validator.GROUP_INTEREST_MISMATCH)
 ]
+# testdata pattern is ({description}, {mhr_number}, {message content})
+TEST_DATA_LIEN_COUNT = [
+    ('Valid request', '100000', ''),
+]
 
 
 @pytest.mark.parametrize('desc,valid,staff,doc_id,message_content', TEST_REG_DATA)
@@ -546,7 +550,7 @@ def test_validate_exemption(session, desc, valid, staff, doc_id, message_content
     if desc == 'Invalid note doc type':
         json_data['note']['documentType'] = MhrDocumentTypes.CAUC
     del json_data['submittingParty']['phoneExtension']
-    current_app.logger.info(json_data)
+    # current_app.logger.info(json_data)
     valid_format, errors = schema_utils.validate(json_data, 'exemption', 'mhr')
     # Additional validation not covered by the schema.
     registration: MhrRegistration = MhrRegistration.find_by_mhr_number('045349', 'PS12345')
@@ -694,3 +698,10 @@ def get_valid_registration(type):
                 group['interestNumerator'] = 1
                 group['interestDenominator'] = 2
     return json_data
+
+
+@pytest.mark.parametrize('desc, mhr_number, message_content', TEST_DATA_LIEN_COUNT)
+def test_validate_ppr_lien(session, desc, mhr_number, message_content):
+    """Assert that the PPR lien check validation works as expected."""
+    error_msg = validator.validate_ppr_lien(mhr_number)
+    assert error_msg == message_content

@@ -102,8 +102,11 @@
     </tr>
     <tr class="no-page-break">
         <td colspan="3">
-            {% if location.locationType is defined and location.locationType == 'STRATA' %}STRATA {% endif %}
-            {{ location.legalDescription }}
+            {# {% if location.locationType is defined and location.locationType == 'STRATA' %}STRATA {% endif %} #}
+            <div>{{ location.legalDescription }}</div>
+            {% if location.additionalDescription is defined and location.additionalDescription != '' %}
+                <div>{{ location.additionalDescription }}</div>
+            {% endif %} 
         </td>
     </tr>
     {% elif location.hasLTSAInfo or (location.additionalDescription is defined and location.additionalDescription != '') %}
@@ -115,13 +118,13 @@
     <tr class="no-page-break">
         <td class="col-33">
             {% if location.lot is defined and location.lot != '' %}
-                <div>LOT: {{ location.lot }}</div>
+                <div>{% if location.locationType is defined and location.locationType == 'STRATA' %}STRATA {% endif %} LOT: {{ location.lot }}</div>
             {% endif %} 
             {% if location.landDistrict is defined and location.landDistrict != '' %}
                 <div>LAND DISTRICT: {{ location.landDistrict }}</div>
             {% endif %} 
             {% if location.plan is defined and location.plan != '' %}
-                <div>PLAN: {{ location.plan }}</div>
+                <div>{% if location.locationType is defined and location.locationType == 'STRATA' %}STRATA {% endif %} PLAN: {{ location.plan }}</div>
             {% endif %} 
             {% if location.districtLot is defined and location.districtLot != '' %}
                 <div>DISTRICT LOT: {{ location.districtLot }}</div>
