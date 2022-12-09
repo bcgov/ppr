@@ -14,7 +14,7 @@
       :setDisplay="showSaveDialog"
       @proceed="handleDialogResp($event)"
     />
-    <div class="view-container px-15 py-0">
+    <div class="view-container px-15 pt-0 pb-5">
       <div class="container pa-0 pt-4">
         <v-row no-gutters>
           <v-col cols="9">
@@ -34,8 +34,9 @@
               <label><b>Important:</b> This information must match the information on the bill of sale.</label>
             </header>
             <section v-if="dataLoaded" class="py-4">
-              <header class="review-header mt-1">
-                <v-icon class="ml-1" color="darkBlue">mdi-home</v-icon>
+              <header class="review-header mt-1 rounded-top">
+                <v-icon v-if="isReviewMode" class="ml-2" color="darkBlue">mdi-file-document-multiple</v-icon>
+                <img v-else class="ml-1" src="@/assets/svgs/homeownersicon_reviewscreen.svg" />
                 <label class="font-weight-bold pl-2">
                   {{ isReviewMode ? 'Ownership Transfer or Change - Sale or Beneficiary' : 'Home Owners' }}
                 </label>
@@ -109,7 +110,7 @@
                   />
                 </section>
 
-                <section id="transfer-certify-section" class="mt-10 py-4">
+                <section id="transfer-certify-section" class="mt-10 pt-4 pb-10">
                   <CertifyInformation
                     :sectionNumber=3
                     :setShowErrors="validateAuthorizationError"
@@ -137,7 +138,7 @@
           </v-col>
           <v-col class="pl-6 pt-5" cols="3" v-if="hasUnsavedChanges || isReviewMode">
             <aside>
-              <affix relative-element-selector=".col-9" :offset="{ top: 90, bottom: -100 }">
+              <affix class="sticky-container" relative-element-selector=".col-9" :offset="{ top: 90, bottom: -100 }">
                 <sticky-container
                   :setShowButtons="true"
                   :setBackBtn="showBackBtn"
@@ -408,6 +409,13 @@ export default defineComponent({
           setUnsavedChanges(false)
           // Delete the draft on successful submission
           if (getMhrInformation.value.draftNumber) await deleteMhrDraft(getMhrInformation.value.draftNumber)
+          const newItem: RegTableNewItemI = {
+            addedReg: mhrTransferFiling.documentId,
+            addedRegParent: getMhrInformation.value.mhrNumber,
+            addedRegSummary: null,
+            prevDraft: mhrTransferFiling.documentId || ''
+          }
+          setRegTableNewItem(newItem)
           goToDash()
         } else console.log(mhrTransferFiling?.error) // Handle Schema or Api errors here.
       }
@@ -434,10 +442,10 @@ export default defineComponent({
       if (!getMhrInformation.value.draftNumber) {
         const mhrDraft = mhrTransferDraft as MhrTransferApiIF
         const newItem: RegTableNewItemI = {
-          addedReg: String(mhrDraft.draftNumber),
+          addedReg: mhrDraft.draftNumber,
           addedRegParent: apiData.mhrNumber,
           addedRegSummary: null,
-          prevDraft: (getMhrInformation.value.changes && String(getMhrInformation.value.changes[0].documentId)) || ''
+          prevDraft: (getMhrInformation.value.changes && getMhrInformation.value.changes[0].documentId) || ''
         }
         setRegTableNewItem(newItem)
       }
@@ -530,6 +538,10 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+.sticky-container {
+  z-index: 4!important;
+}
+
 .submitting-party {
   margin-top: 55px;
 }

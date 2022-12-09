@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="transfer-confirm">
     <h2>2. Confirm</h2>
     <p class="mt-2">
       The following information must be completed and confirmed before submitting this registration.
@@ -22,8 +22,8 @@
           <v-col cols="9" class="confirm-completion-req">
             <ol>
               <li class="pl-3 pb-3 mb-7">
-                <strong>Bill of sale</strong> has been signed by either all owners or by someone with the authority to
-                act on behalf of the registered owners.
+                <p><strong>Bill of sale</strong> has been signed by either all owners or by someone with the authority
+                  to act on behalf of the registered owners.</p>
                 <p class="confirm-completion-note">
                   <span>Note: </span> If the bill of sale has been signed by someone acting on behalf of the registered
                   owners, the person submitting this transfer is a lawyer or notary, and the power by which the
@@ -32,8 +32,8 @@
                 </p>
               </li>
               <li class="pl-3 pb-3 mb-7">
-                <strong>Search of the Corporate Register</strong> has been completed if one or more of the current or
-                future owners is an incorporated company, society or cooperative association.
+                <p><strong>Search of the Corporate Register</strong> has been completed if one or more of the current or
+                future owners is an incorporated company, society or cooperative association.</p>
                 <p class="confirm-completion-note">
                   <span>Note: </span> For current registered owners the incorporated business must have been active on
                   the Corporate Register at the time the bill of sale was signed. Future owners must be in active status
@@ -41,8 +41,8 @@
                 </p>
               </li>
               <li class="pl-3 pb-3 mb-0">
-                <strong>Personal Property Registry lien search</strong> has been completed and there are no liens on the
-                home that stop the transfer.
+                <p><strong>Personal Property Registry lien search</strong> has been completed and there are no liens
+                on the home that stop the transfer.</p>
                 <p class="confirm-completion-note">
                   <span>Note: </span> Liens that stop the transfer include Family Maintenance Enforcement Act, Family
                   Relations Act, BC Second Mortgage, Land Tax Deferment Act.
@@ -111,7 +111,10 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-.transfer-confirm {
+#transfer-confirm {
+  p {
+    color: $gray7;
+  }
   .confirm-completion-req {
     ol {
       padding-left: 50px;

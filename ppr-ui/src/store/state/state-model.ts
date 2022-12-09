@@ -181,6 +181,7 @@ export const stateModel: StateModelIF = {
       phoneExtension: ''
     },
     ownerGroups: [],
+    isManualLocationInfo: false,
     attentionReferenceNum: '',
     location: {
       parkName: '',
@@ -199,7 +200,21 @@ export const stateModel: StateModelIF = {
       dealerName: '',
       additionalDescription: '',
       locationType: null,
-      otherType: null
+      otherType: null,
+      legalDescription: '',
+      parcel: '',
+      block: '',
+      districtLot: '',
+      partOf: '',
+      section: '',
+      township: '',
+      range: '',
+      meridian: '',
+      landDistrict: '',
+      plan: '',
+      bandName: '',
+      reserveNumber: '',
+      exceptPlan: ''
     },
     description: {
       manufacturer: '',

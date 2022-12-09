@@ -6,7 +6,9 @@
     </header>
 
     <div :class="{ 'border-error-left': !getStepValidation(MhrSectVal.LOCATION_VALID)}">
-      <section class="mx-6 pt-8" v-if="!getStepValidation(MhrSectVal.LOCATION_VALID)">
+      <section v-if="!getStepValidation(MhrSectVal.LOCATION_VALID)"
+        :class="{ 'pb-8': !(!!getMhrRegistrationLocation.locationType) && !hasAddress }" class="mx-6 pt-8"
+      >
         <span>
           <v-icon color="error">mdi-information-outline</v-icon>
           <span class="error-text mx-1">This step is unfinished.</span>
@@ -16,7 +18,9 @@
         </span>
       </section>
 
-      <section class="py-6" id="review-home-location-section">
+      <section v-if="(!!getMhrRegistrationLocation.locationType || hasAddress)"
+        class="py-6" id="review-home-location-section"
+      >
         <v-row no-gutters class="px-6">
           <v-col cols="3" class="pt-1">
             <h3>Location Type</h3>
@@ -53,32 +57,118 @@
                 <h3>Pad</h3>
               </v-col>
               <v-col cols="9" class="pt-1">
-                <p>{{ getMhrRegistrationLocation.pad || 'N/A' }}</p>
+                <p>{{ getMhrRegistrationLocation.pad || '(Not Entered)' }}</p>
               </v-col>
             </v-row>
           </template>
 
-          <!-- Other PID Type -->
-          <template v-if="includesPid">
+          <!-- Reserve -->
+          <template v-if="getMhrRegistrationLocation.otherType === HomeLocationTypes.OTHER_RESERVE">
             <v-row no-gutters class="px-6 pt-1">
               <v-col cols="3" class="pt-1">
-                <h3>PID Number</h3>
+                <h3>Legal Land Description</h3>
+              </v-col>
+              <v-col
+                v-if="getMhrRegistrationLocation.bandName || getMhrRegistrationLocation.reserveNumber"
+                cols="9"
+                class="pt-1"
+              >
+                <p>Band Name: {{ getMhrRegistrationLocation.bandName || '(Not Entered)' }}</p>
+                <p>Reserve Number: {{ getMhrRegistrationLocation.reserveNumber || '(Not Entered)' }}</p>
+                <p v-if="getMhrRegistrationLocation.additionalDescription" class="pb-4">
+                  Additional Description: {{ getMhrRegistrationLocation.additionalDescription }}
+                </p>
+                <p v-if="getMhrRegistrationLocation.lot">
+                  Lot: {{ getMhrRegistrationLocation.lot }}
+                </p>
+                <p v-if="getMhrRegistrationLocation.block">
+                  Block: {{ getMhrRegistrationLocation.block }}
+                </p>
+                <p v-if="getMhrRegistrationLocation.plan">
+                  Plan: {{ getMhrRegistrationLocation.plan }}
+                </p>
+                <p v-if="getMhrRegistrationLocation.districtLot">
+                  District Lot: {{ getMhrRegistrationLocation.districtLot }}
+                </p>
+                <p v-if="getMhrRegistrationLocation.landDistrict">
+                  Land District: {{ getMhrRegistrationLocation.landDistrict }}
+                </p>
+              </v-col>
+              <v-col v-else>
+                <p>(Not Entered)</p>
+              </v-col>
+            </v-row>
+          </template>
+
+          <!-- PID -->
+          <template v-if="includesPid">
+            <!-- PID Entered-->
+            <template v-if="!getIsManualLocation">
+              <v-row no-gutters class="px-6 pt-1">
+                <v-col cols="3" class="pt-1">
+                  <h3>PID Number</h3>
+                </v-col>
+                <v-col cols="9" class="pt-1">
+                  <p>{{ displayPid || '(Not Entered)' }}</p>
+                </v-col>
+              </v-row>
+              <v-row no-gutters v-if="getMhrRegistrationLocation.legalDescription" class="px-6 pt-1">
+                <v-col cols="3" class="pt-1">
+                  <h3>Legal Land Description</h3>
+                </v-col>
+                <v-col cols="9" class="pt-1">
+                  <p>{{ getMhrRegistrationLocation.legalDescription }}</p>
+                </v-col>
+              </v-row>
+            </template>
+
+            <!-- No PID -->
+            <v-row no-gutters v-else class="px-6 pt-1">
+              <v-col cols="3" class="pt-1">
+                <h3>Legal Land Description</h3>
+              </v-col>
+              <v-col
+                cols="9" class="pt-1"
+                v-if="getMhrRegistrationLocation.lot &&
+                      getMhrRegistrationLocation.landDistrict &&
+                      getMhrRegistrationLocation.plan"
+              >
+                <p>{{ displayStrata ? 'Strata ' : '' }}Lot: {{ getMhrRegistrationLocation.lot }}</p>
+                <p>Block: {{ getMhrRegistrationLocation.block || '(Not Entered)'}}</p>
+                <p>{{ displayStrata ? 'Strata ' : '' }}Plan: {{ getMhrRegistrationLocation.plan }}</p>
+                <p v-if="getMhrRegistrationLocation.districtLot">
+                  District Lot: {{ getMhrRegistrationLocation.districtLot }}
+                </p>
+                <p v-if="getMhrRegistrationLocation.landDistrict">
+                  Land District: {{ getMhrRegistrationLocation.landDistrict }}
+                </p>
+                <p v-if="getMhrRegistrationLocation.exceptPlan" class="py-4">
+                  Except Plan: {{ getMhrRegistrationLocation.exceptPlan }}
+                </p>
+              </v-col>
+              <v-col cols="9" class="pt-1" v-else>
+                <p>(Not Entered)</p>
+              </v-col>
+            </v-row>
+
+            <!-- Additional Details -->
+            <v-row no-gutters class="px-6 pt-1">
+              <v-col cols="3" class="pt-1">
+                <h3>Additional Description</h3>
               </v-col>
               <v-col cols="9" class="pt-1">
-                <p>{{ displayPid || '(Not Entered)' }}</p>
+                <p>{{ getMhrRegistrationLocation.additionalDescription || '(Not Entered)' }}</p>
               </v-col>
             </v-row>
           </template>
 
           <!-- Civic Address -->
-          <v-row no-gutters class="px-6 pt-2">
+          <v-row no-gutters class="px-6 pt-1" >
             <v-col cols="3" class="pt-1">
               <h3>Civic Address</h3>
             </v-col>
             <v-col cols="9" class="pt-1">
-              <p v-if="getMhrRegistrationLocation.address.street ||
-                        getMhrRegistrationLocation.address.streetAdditional ||
-                        getMhrRegistrationLocation.address.city">
+              <p v-if="hasAddress">
                 {{ getMhrRegistrationLocation.address.street }}<br/>
                 <span v-if="!!getMhrRegistrationLocation.address.streetAdditional">
                   {{getMhrRegistrationLocation.address.streetAdditional}}<br/>
@@ -108,10 +198,12 @@ export default defineComponent({
   setup () {
     const {
       getMhrRegistrationLocation,
-      getMhrRegistrationValidationModel
+      getMhrRegistrationValidationModel,
+      getIsManualLocation
     } = useGetters<any>([
       'getMhrRegistrationLocation',
-      'getMhrRegistrationValidationModel'
+      'getMhrRegistrationValidationModel',
+      'getIsManualLocation'
     ])
 
     const {
@@ -124,8 +216,16 @@ export default defineComponent({
         return [HomeLocationTypes.OTHER_STRATA, HomeLocationTypes.OTHER_TYPE]
           .includes(getMhrRegistrationLocation.value.otherType)
       }),
+      hasAddress: computed((): boolean => {
+        return getMhrRegistrationLocation.value.address?.street ||
+        getMhrRegistrationLocation.value.address?.streetAdditional ||
+        getMhrRegistrationLocation.value.address?.city
+      }),
       displayPid: computed((): string => {
         return getMhrRegistrationLocation.value.pidNumber.replace(/(\d{3})(\d{3})(\d{3})/, '$1-$2-$3')
+      }),
+      displayStrata: computed((): boolean => {
+        return getMhrRegistrationLocation.value.otherType === HomeLocationTypes.OTHER_STRATA
       }),
       locationType: computed((): string => {
         switch (getMhrRegistrationLocation.value.locationType) {
@@ -156,6 +256,7 @@ export default defineComponent({
       MhrSectVal,
       getStepValidation,
       getMhrRegistrationLocation,
+      getIsManualLocation,
       ...toRefs(localState)
     }
   }

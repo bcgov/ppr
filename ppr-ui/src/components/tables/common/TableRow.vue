@@ -32,9 +32,12 @@
           <p v-if="isDraft(item)" :class="{ 'ma-0': true, 'pl-9': isChild }">Pending</p>
           <!-- child drafts will sometimes show outside their base reg during the sort -->
           <div v-if="isChild || (isDraft(item) && item.baseRegistrationNumber)" :class="isChild ? 'pl-9' : ''">
-            <p class="ma-0">{{ item.registrationNumber }}</p>
+            <p v-if="isPpr" class="ma-0">{{ item.registrationNumber }}</p>
+            <p v-else-if="!isPpr && !isDraft(item)" style="font-size: 0.875rem;" class="ma-0">
+              {{ item.documentRegistrationNumber}}
+            </p>
             <p class="ma-0" style="font-size: 0.75rem !important;">
-              <b>{{ (isPpr ? 'Base Registration: ' : 'MHR Number: ') + item.baseRegistrationNumber}}</b>
+              <b>{{ (isPpr ? 'Base Registration: ' : 'MHR Number: ')}}<br>{{ item.baseRegistrationNumber }}</b>
             </p>
           </div>
           <p v-else class="ma-0">

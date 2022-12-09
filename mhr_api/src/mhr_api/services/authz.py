@@ -32,6 +32,7 @@ PUBLIC_USER = 'public_user'
 USER_ORGS_PATH = 'users/orgs'
 GOV_ACCOUNT_ROLE = 'gov_account_user'
 BCOL_HELP = 'mhr_helpdesk'
+ASSETS_HELP = 'helpdesk'  # Share single account id for search, registration history.
 # MH keycloak roles for registrations/filings
 REGISTER_MH = 'mhr_register'
 REQUEST_TRANSPORT_PERMIT = 'mhr_transport'
@@ -274,7 +275,7 @@ def is_gov_account(jwt: JwtManager) -> bool:
 
 def is_all_staff_account(account_id: str) -> bool:
     """Return True if the account id is any staff role."""
-    return account_id is not None and account_id in (STAFF_ROLE, BCOL_HELP)
+    return account_id is not None and account_id in (STAFF_ROLE, ASSETS_HELP)
 
 
 def get_group(jwt: JwtManager) -> str:  # pylint: disable=too-many-return-statements

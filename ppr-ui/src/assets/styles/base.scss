@@ -274,6 +274,10 @@ ul.list {
   color: $gray6;
 }
 
+.gray7 {
+  color: $gray7 !important; 
+}
+
 .genErr {
   font-size: 0.9rem;
 }
@@ -339,7 +343,12 @@ span.invalid-color {
 .summary-header {
   color: $gray9;
   display: flex;
-  background-color: #e2e8ee;
+  background-color: $app-lt-blue;
+}
+
+.info-text {
+  color: $gray7;
+  margin-bottom: 0 !important;
 }
 
 .summary-text {
@@ -379,7 +388,7 @@ span.invalid-color {
 }
 
 .generic-link {
-  color: #1669bb;
+  color: $app-blue;
   text-decoration: underline;
 }
 
@@ -703,7 +712,7 @@ tr.registration-row.draft-registration-row.added-reg-effect td.actions-cell,
 
 .review-header {
   display: flex; // to align icons
-  background-color: $BCgovBlue5O;
+  background-color: $app-lt-blue;
   padding: 1.25rem;
   color: $gray9;
 }

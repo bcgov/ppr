@@ -169,7 +169,10 @@ export const setSearchDebtorName: ActionIF = ({ commit }, debtorName: Individual
 export const setSearchHistory: ActionIF = ({ commit }, searchHistory: Array<SearchResponseIF>): void => {
   // need to set .loadingPDF so that the loader circle triggers when set
   //  - if it starts as undefined it wont trigger on change
-  for (let i = 0; i < searchHistory?.length || 0; i++) { searchHistory[i].loadingPDF = false }
+  for (let i = 0; i < searchHistory?.length || 0; i++) {
+    searchHistory[i].loadingPDF = false
+    searchHistory[i].isPdfRequested = false
+  }
   commit('mutateSearchHistory', searchHistory)
 }
 
@@ -328,6 +331,10 @@ export const setMhrAttentionReferenceNum: ActionIF = ({ commit }, value): void =
 export const setMhrLocation: ActionIF = ({ commit }, { key, value }): void => {
   commit('mutateMhrLocation', { key, value })
   commit('mutateUnsavedChanges', true)
+}
+
+export const setIsManualLocation: ActionIF = ({ commit }, isManual: boolean): void => {
+  commit('mutateIsManualLocation', isManual)
 }
 
 export const setCivicAddress: ActionIF = ({ commit }, { key, value }): void => {

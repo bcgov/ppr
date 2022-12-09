@@ -4,6 +4,7 @@ import {
   MhrRegistrationHomeLocationIF,
   MhrRegistrationHomeOwnerGroupIF,
   MhrRegistrationIF,
+  MhrLocationInfoIF,
   NewMhrRegistrationApiIF,
   MhRegistrationSummaryIF,
   MhrDraftTransferApiIF
@@ -60,6 +61,7 @@ export const useNewMhrRegistration = () => {
       },
       ownerGroups: [],
       attentionReferenceNum: '',
+      isManualLocationInfo: false,
       location: {
         parkName: '',
         pad: '',
@@ -77,7 +79,21 @@ export const useNewMhrRegistration = () => {
         dealerName: '',
         additionalDescription: '',
         locationType: null,
-        otherType: null
+        otherType: null,
+        legalDescription: '',
+        parcel: '',
+        block: '',
+        districtLot: '',
+        partOf: '',
+        section: '',
+        township: '',
+        range: '',
+        meridian: '',
+        landDistrict: '',
+        plan: '',
+        bandName: '',
+        reserveNumber: '',
+        exceptPlan: ''
       },
       description: {
         manufacturer: '',
@@ -114,6 +130,13 @@ export const useNewMhrRegistration = () => {
         }
       ]
     }
+  }
+
+  const resetLocationInfoFields = (location: MhrLocationInfoIF): MhrLocationInfoIF => {
+    Object.entries(location).forEach(([key]) => {
+      location[key] = ''
+    })
+    return location
   }
 
   const parseSubmittingParty = () => {
@@ -201,11 +224,9 @@ export const useNewMhrRegistration = () => {
 
   const fetchMhRegistrations = async (): Promise<void> => {
     const draftFilings = await getMhrDrafts()
-    const myMhrHistory = await mhrRegistrationHistory(isRoleQualifiedSupplier.value)
-    if (isRoleQualifiedSupplier.value) {
-      const filteredMhrHistory = addHistoryDraftsToMhr(myMhrHistory, draftFilings)
-      setMhrTableHistory(filteredMhrHistory)
-    } else setMhrTableHistory([...draftFilings, ...myMhrHistory])
+    const myMhrHistory = await mhrRegistrationHistory(true)
+    const filteredMhrHistory = addHistoryDraftsToMhr(myMhrHistory, draftFilings)
+    setMhrTableHistory(filteredMhrHistory)
   }
 
   function addHistoryDraftsToMhr (mhrHistory: MhRegistrationSummaryIF[], mhrDrafts: MhrDraftTransferApiIF[]):
@@ -226,6 +247,7 @@ export const useNewMhrRegistration = () => {
           const newDraft: MhRegistrationSummaryIF = transferchanges
           newDraft.baseRegistrationNumber = transferchanges.mhrNumber
           newDraft.documentId = transferchanges.documentId
+          newDraft.draftNumber = transferchanges.documentRegistrationNumber
           existingChanges.push(newDraft)
         })
         transfer.changes = existingChanges
@@ -283,6 +305,7 @@ export const useNewMhrRegistration = () => {
 
   return {
     initNewMhr,
+    resetLocationInfoFields,
     buildApiData,
     parseStaffPayment,
     fetchMhRegistrations,

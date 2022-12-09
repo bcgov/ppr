@@ -117,16 +117,13 @@ describe('Test result table with results', () => {
       expect(rows.at(i + 1).text()).toContain(totalResultsSize)
       expect(rows.at(i + 1).text()).toContain(exactResultsSize)
       expect(rows.at(i + 1).text()).toContain(selectedResultsSize)
-      // PDF only shows for selected result size < 76
-      if (selectedResultsSize < 76) {
-        if (!wrapper.vm.isPDFAvailable(mockedSearchHistory.searches[i])) {
-          expect(rows.at(i + 1).text()).not.toContain('PDF')
-        } else {
-          expect(rows.at(i + 1).text()).toContain('PDF')
-          wrapper.find(`#pdf-btn-${searchId}`).trigger('click')
-          await Vue.nextTick()
-          expect(downloadMock).toHaveBeenCalledWith(mockedSearchHistory.searches[i])
-        }
+      // PDF icon should show up for small and large results #13980
+      expect(rows.at(i + 1).text()).toContain('PDF')
+      if (wrapper.vm.isPDFAvailable(mockedSearchHistory.searches[i])) {
+        expect(rows.at(i + 1).text()).toContain('PDF')
+        wrapper.find(`#pdf-btn-${searchId}`).trigger('click')
+        await Vue.nextTick()
+        expect(downloadMock).toHaveBeenCalledWith(mockedSearchHistory.searches[i])
       }
     }
   })
@@ -151,7 +148,7 @@ describe('Test result table with results', () => {
     wrapper.destroy()
   })
 
-  it('renders and displays correct elements with results', async () => {
+  it('renders and displays correct elements with results for MHR Search History', async () => {
     expect(wrapper.findComponent(SearchHistory).exists()).toBe(true)
     expect(wrapper.vm.historyLength).toBe(mockedMHRSearchHistory.searches.length)
     expect(wrapper.vm.searchHistory).toStrictEqual(mockedMHRSearchHistory.searches)
@@ -184,16 +181,12 @@ describe('Test result table with results', () => {
       expect(rows.at(i + 1).text()).toContain(wrapper.vm.displayDate(searchDate))
       expect(rows.at(i + 1).text()).toContain(totalResultsSize)
       expect(rows.at(i + 1).text()).toContain(selectedResultsSize)
-      // PDF only shows for selected result size < 76
-      if (selectedResultsSize < 76) {
-        if (!wrapper.vm.isPDFAvailable(mockedMHRSearchHistory.searches[i])) {
-          expect(rows.at(i + 1).text()).not.toContain('PDF')
-        } else {
-          expect(rows.at(i + 1).text()).toContain('PDF')
-          wrapper.find(`#pdf-btn-${searchId}`).trigger('click')
-          await Vue.nextTick()
-          expect(downloadMock).toHaveBeenCalledWith(mockedMHRSearchHistory.searches[i])
-        }
+      // PDF icon should show up for small and large results #13980
+      expect(rows.at(i + 1).text()).toContain('PDF')
+      if (wrapper.vm.isPDFAvailable(mockedMHRSearchHistory.searches[i])) {
+        wrapper.find(`#pdf-btn-${searchId}`).trigger('click')
+        await Vue.nextTick()
+        expect(downloadMock).toHaveBeenCalledWith(mockedMHRSearchHistory.searches[i])
       }
     }
   })

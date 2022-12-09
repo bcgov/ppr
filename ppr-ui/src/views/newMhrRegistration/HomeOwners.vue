@@ -6,7 +6,7 @@
       :setOptions="{
         title: 'Delete All Owners/Groups',
         text:
-          'Deleting al owners/groups will delete all previous owners and remove any newly added owners.',
+          'Deleting all owners/groups will delete all previous owners and remove any newly added owners.',
         acceptText: 'Delete All Owners/Groups',
         cancelText: 'Cancel'
       }"
@@ -135,13 +135,13 @@
           <span class="generic-label">Home Tenancy Type: </span>
           <span data-test-id="home-owner-tenancy-type">{{ homeTenancyType }}</span>
           <span
-            v-show="showGroups && ownershipAllocation.hasMinimumGroupsError && showTotalOwnership"
+            v-show="showTenancyTypeError"
             class="error-text fs-14 ml-3"
           >
             Must include more than one group of owners
           </span>
           <span
-            v-if="showHideOwnersBtn"
+            v-if="hasRemovedOwners && !showTotalOwnership"
             class="float-right hide-show-owners fs-14"
             @click="hideShowRemovedOwners()"
           >
@@ -155,12 +155,14 @@
           cols="12"
         >
           <span class="generic-label">Total Ownership Allocated:</span> {{ ownershipTotalAllocation }}
-          <span v-if="hasUndefinedGroups" class="error-text fs-14 ml-3">
-            No ownership allocated
-          </span>
-          <span v-else-if="ownershipAllocation.hasTotalAllocationError" class="error-text fs-14 ml-3">
-            Total ownership must equal 1/1
-          </span>
+          <template v-if="showAllocationErrors">
+            <span v-if="hasUndefinedGroups" class="error-text fs-14 ml-3">
+              No ownership allocated
+            </span>
+            <span v-else-if="ownershipAllocation.hasTotalAllocationError" class="error-text fs-14 ml-3">
+              Total ownership must equal 1/1
+            </span>
+          </template>
           <span
             v-if="isMhrTransfer && hasRemovedOwners"
             class="float-right hide-show-owners fs-14"
@@ -175,7 +177,7 @@
 
       <!-- Read Only Template -->
       <v-card v-else class="review-table" flat id="read-only-owners">
-        <v-row class="my-6 px-7 pt-10" no-gutters>
+        <v-row class="mt-6 px-7 pt-8" no-gutters>
           <v-col cols="12">
             <span class="generic-label">Home Owners </span>
             <span
@@ -190,7 +192,7 @@
             </span>
           </v-col>
         </v-row>
-        <v-row class="my-6 px-7" no-gutters>
+        <v-row class="my-4 px-7" no-gutters>
           <v-col cols="3">
             <span class="generic-label">Home Tenancy Type</span>
           </v-col>
@@ -250,7 +252,7 @@ import { AddEditHomeOwner, HomeOwnersTable } from '@/components/mhrRegistration/
 import { BaseDialog } from '@/components/dialogs'
 import { SimpleHelpToggle } from '@/components/common'
 import { computed, defineComponent, onBeforeMount, reactive, toRefs, watch } from '@vue/composition-api'
-import { useHomeOwners } from '@/composables/mhrRegistration'
+import { useHomeOwners, useMhrValidations } from '@/composables/mhrRegistration'
 /* eslint-disable no-unused-vars */
 import { MhrRegistrationTotalOwnershipAllocationIF } from '@/interfaces'
 import { ActionTypes } from '@/enums'
@@ -280,10 +282,12 @@ export default defineComponent({
     }
   },
   setup (props, context) {
-    const { getMhrRegistrationHomeOwners, getMhrTransferCurrentHomeOwners } =
+    const { getMhrRegistrationHomeOwners, getMhrTransferCurrentHomeOwners, getMhrRegistrationValidationModel } =
       useGetters<any>([
-        'getMhrRegistrationHomeOwners', 'getMhrTransferCurrentHomeOwners'
+        'getMhrRegistrationHomeOwners', 'getMhrTransferCurrentHomeOwners', 'getMhrRegistrationValidationModel'
       ])
+
+    const { getValidation, MhrSectVal, MhrCompVal } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
     const {
       getHomeTenancyType,
@@ -318,9 +322,15 @@ export default defineComponent({
       }),
       showTotalOwnership: computed(() => {
         return showGroups.value &&
-          (!localState.hasRemovedAllOwners || localState.hasMultipleAddedGroups || localState.hasSingleInvalidGroup)
+          (
+            !hasRemovedAllHomeOwners(localState.getHomeOwners.filter(owner => owner.action !== ActionTypes.ADDED)) ||
+            localState.hasMultipleAddedGroups ||
+            localState.hasSingleInvalidGroup
+          )
       }),
       hasHomeOwners: computed(() => !!getTransferOrRegistrationHomeOwners().find(owner => owner.ownerId)),
+      hasReviewedOwners: computed((): boolean =>
+        getValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_STEPS)),
       isValidGroups: computed(() => { return hasMinimumGroups() }),
       homeTenancyType: computed(() => { return getHomeTenancyType() }),
       getHomeOwners: computed(() => { return getTransferOrRegistrationHomeOwners() }),
@@ -347,6 +357,13 @@ export default defineComponent({
         return hasUndefinedGroupInterest(getTransferOrRegistrationHomeOwnerGroups()) &&
           getTransferOrRegistrationHomeOwnerGroups().filter(group =>
             group.action !== ActionTypes.REMOVED && !!group.interestNumerator && !!group.interestNumerator).length === 0
+      }),
+      showTenancyTypeError: computed((): boolean => {
+        return (localState.hasReviewedOwners || props.validateTransfer) &&
+          (showGroups && localState.ownershipAllocation.hasMinimumGroupsError && localState.showTotalOwnership)
+      }),
+      showAllocationErrors: computed((): boolean => {
+        return localState.hasReviewedOwners || props.validateTransfer
       })
     })
 
@@ -436,9 +453,12 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+span:not(.generic-label)  {
+  color: $gray7
+}
 
 .hide-show-owners {
-  color: $primary-blue;
+  color: $primary-blue !important;
   &:hover {
     cursor: pointer;
   }
@@ -458,6 +478,6 @@ export default defineComponent({
 
 .review-table{
   margin-top: -40px !important;
-  padding-top: 0px !important;
+  padding-top: 0 !important;
 }
 </style>

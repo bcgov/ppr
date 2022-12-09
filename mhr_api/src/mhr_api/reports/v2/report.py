@@ -311,6 +311,7 @@ class Report:  # pylint: disable=too-few-public-methods
         else:
             self._set_addresses()
             self._set_date_times()
+            self._set_owner_groups()
             if self._report_key not in (ReportTypes.MHR_REGISTRATION,
                                         ReportTypes.MHR_TRANSFER,
                                         ReportTypes.MHR_EXEMPTION):
@@ -351,6 +352,25 @@ class Report:  # pylint: disable=too-few-public-methods
                 description['rebuiltRemarks'] = markupsafe.Markup(description['rebuiltRemarks'])
             if description and description.get('otherRemarks'):
                 description['rebuiltRemarks'] = markupsafe.Markup(description['otherRemarks'])
+
+    def _set_owner_groups(self):
+        """Set up report owner group information."""
+        group_id: int = 1
+        if self._report_key == ReportTypes.MHR_TRANSFER:
+            if self._report_data.get('addOwnerGroups'):
+                for group in self._report_data.get('addOwnerGroups'):
+                    group['groupId'] = group_id
+                    group_id += 1
+        elif self._report_key == ReportTypes.MHR_REGISTRATION:
+            for group in self._report_data.get('ownerGroups'):
+                group['groupId'] = group_id
+                group_id += 1
+        elif self._report_key in (ReportTypes.SEARCH_DETAIL_REPORT, ReportTypes.SEARCH_BODY_REPORT):
+            for detail in self._report_data['details']:
+                group_id = 1
+                for group in detail.get('ownerGroups'):
+                    group['groupId'] = group_id
+                    group_id += 1
 
     def _set_location(self):
         """Set up report location information."""

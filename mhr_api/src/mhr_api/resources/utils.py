@@ -15,10 +15,11 @@
 from enum import Enum
 from http import HTTPStatus
 
-from flask import jsonify, current_app
+from flask import jsonify, current_app, request
 
 from mhr_api.exceptions import ResourceErrorCodes
-# from mhr_api.models import utils as model_utils
+from mhr_api.models import utils as model_utils, registration_utils as reg_utils
+from mhr_api.models.registration_utils import AccountRegistrationParams
 from mhr_api.services.authz import user_orgs, is_reg_staff_account, is_sbc_office_account, is_bcol_help
 from mhr_api.services.payment.exceptions import SBCPaymentException
 from mhr_api.utils import registration_validator
@@ -252,12 +253,61 @@ def validate_exemption(registration, json_data, is_staff: bool = False):
     return registration_validator.validate_exemption(registration, json_data, is_staff)
 
 
-def valid_api_key(request) -> bool:
+def valid_api_key(req) -> bool:
     """Verify the callback request api key is valid."""
-    key = get_apikey(request)
+    key = get_apikey(req)
     if not key:
         return False
     apikey = current_app.config.get('SUBSCRIPTION_API_KEY')
     if not apikey:
         return True
     return key == apikey
+
+
+def get_account_registration_params(req: request, params: AccountRegistrationParams) -> AccountRegistrationParams:
+    """Extract account registration query parameters from the request."""
+    params.from_ui = req.args.get(FROM_UI_PARAM, False)
+    params.page_number = int(req.args.get(reg_utils.PAGE_NUM_PARAM, -1))
+    params.sort_direction = req.args.get(reg_utils.SORT_DIRECTION_PARAM, reg_utils.SORT_DESCENDING)
+    params.sort_criteria = req.args.get(reg_utils.SORT_CRITERIA_PARAM, None)
+    params.filter_mhr_number = req.args.get(reg_utils.MHR_NUMBER_PARAM, None)
+    params.filter_registration_type = req.args.get(reg_utils.REG_TYPE_PARAM, None)
+    params.filter_status_type = req.args.get(reg_utils.STATUS_PARAM, None)
+    params.filter_client_reference_id = req.args.get(reg_utils.CLIENT_REF_PARAM, None)
+    params.filter_submitting_name = req.args.get(reg_utils.SUBMITTING_NAME_PARAM, None)
+    params.filter_username = req.args.get(reg_utils.USER_NAME_PARAM, None)
+    params.filter_registration_date = req.args.get(reg_utils.REG_TS_PARAM, None)
+    # start_ts = req.args.get(reg_utils.START_TS_PARAM, None)
+    # end_ts = req.args.get(reg_utils.END_TS_PARAM, None)
+    # if start_ts and end_ts:
+    #    params.start_date_time = start_ts
+    #    params.end_date_time = end_ts
+    if params.sort_direction:
+        params.sort_direction = params.sort_direction.lower()
+        if params.sort_direction == 'asc':
+            params.sort_direction = reg_utils.SORT_ASCENDING
+        elif params.sort_direction == 'desc':
+            params.sort_direction = reg_utils.SORT_DESCENDING
+    if params.filter_mhr_number:
+        params.filter_mhr_number = model_utils.format_mhr_number(params.filter_mhr_number)
+        params.filter_mhr_number = remove_quotes(params.filter_mhr_number)
+    if params.filter_submitting_name:
+        params.filter_submitting_name = params.filter_submitting_name.strip().upper()
+        params.filter_submitting_name = remove_quotes(params.filter_submitting_name)
+    if params.filter_username:
+        params.filter_username = params.filter_username.strip().upper()
+        params.filter_username = remove_quotes(params.filter_username)
+    if params.filter_client_reference_id:
+        params.filter_client_reference_id = params.filter_client_reference_id.strip()
+        params.filter_client_reference_id = remove_quotes(params.filter_client_reference_id)
+    if params.filter_registration_date:
+        params.filter_registration_date = remove_quotes(params.filter_registration_date)
+    return params
+
+
+def remove_quotes(text: str) -> str:
+    """Remove single and double quotation marks from request parameters."""
+    if text:
+        text = text.replace("'", '')
+        text = text.replace('"', '')
+    return text

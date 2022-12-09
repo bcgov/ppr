@@ -1,5 +1,5 @@
 <template>
-  <v-card flat rounded :class="{ 'border-error-left': showTableError}">
+  <v-card id="home-owner-table-card" flat rounded :class="{ 'border-error-left': showTableError}">
     <v-data-table
       id="mh-home-owners-table"
       class="home-owners-table"
@@ -41,6 +41,19 @@
       </template>
 
       <template v-slot:item="row" v-if="homeOwners.length">
+
+        <!-- Transfer scenario: Display error for groups that 'removed' all owners but they still exist in the table -->
+        <tr v-if="isGroupWithNoOwners(row.item, row.index)">
+          <td :colspan="4" class="py-1">
+            <div
+              class="error-text my-6 text-center"
+              :data-test-id="`no-owners-msg-group-${homeOwners.indexOf(row.item)}`"
+            >
+              Group must contain at least one owner.
+            </div>
+          </td>
+        </tr>
+
         <tr v-if="isCurrentlyEditing(homeOwners.indexOf(row.item))">
           <td class="pa-0" :colspan="homeOwnersTableHeaders.length">
             <v-expand-transition>
@@ -123,11 +136,11 @@
           <td v-if="showEditActions" class="row-actions text-right">
 
             <!-- New Owner Actions -->
-            <template v-if="!isMhrTransfer || isAddedHomeOwner(row.item)">
+            <div v-if="!isMhrTransfer || isAddedHomeOwner(row.item)" class="mr-n4">
               <v-btn
                 text
                 color="primary"
-                class="pr-0"
+                class="mr-n4"
                 :ripple="false"
                 :disabled="isAddingMode || isEditingMode || isGlobalEditingMode"
                 @click="openForEditing(homeOwners.indexOf(row.item))"
@@ -158,13 +171,13 @@
                   </v-list-item>
                 </v-list>
               </v-menu>
-            </template>
+            </div>
 
             <!-- Existing Owner Actions -->
             <template v-else>
               <v-btn
                 v-if="!isRemovedHomeOwner(row.item)"
-                text color="primary" class="pr-0"
+                text color="primary" class="mr-n4"
                 :ripple="false"
                 :disabled="isAddingMode || isEditingMode || isGlobalEditingMode"
                 @click="markForRemoval(row.item)"
@@ -175,7 +188,7 @@
               </v-btn>
               <v-btn
                 v-if="isRemovedHomeOwner(row.item)"
-                text color="primary" class="pr-0"
+                text color="primary" class="mr-n4"
                 :ripple="false"
                 :disabled="isAddingMode || isEditingMode || isGlobalEditingMode"
                 @click="undoRemoval(row.item)"
@@ -202,19 +215,8 @@
             </div>
           </td>
         </tr>
-
-        <!-- Transfer scenario: Display error for groups that 'removed' all owners but they still exist in the table -->
-        <tr v-if="isGroupWithNoOwners(row.item)">
-          <td :colspan="4" class="py-1">
-            <div
-              class="error-text my-6 text-center"
-              :data-test-id="`no-owners-msg-group-${homeOwners.indexOf(row.item)}`"
-            >
-              Group must contain at least one owner.
-            </div>
-          </td>
-        </tr>
       </template>
+
       <template v-slot:no-data>
         <div class="pa-4 text-center" data-test-id="no-data-msg">No owners added yet.</div>
       </template>
@@ -383,19 +385,20 @@ export default defineComponent({
     }
 
     const disableGroupHeader = (groupId: number): boolean => {
-      return hasRemovedAllHomeOwners(props.homeOwners) &&
+      const currentOwners = props.homeOwners.filter(owner => owner.action !== ActionTypes.ADDED)
+
+      return hasRemovedAllHomeOwners(currentOwners) &&
         isAddedHomeOwnerGroup(groupId) &&
         hasNoGroupInterest(groupId) &&
         localState.addedGroupCount <= 1
     }
 
-    const isGroupWithNoOwners = (owner: MhrRegistrationHomeOwnerIF): boolean => {
+    const isGroupWithNoOwners = (owner: MhrRegistrationHomeOwnerIF, index: number): boolean => {
       const group = getGroupById(owner.groupId)
       const hasNoOwners = group.action !== ActionTypes.REMOVED && group.interestNumerator &&
         group.interestDenominator && group.owners.filter(owner => owner.action !== ActionTypes.REMOVED).length === 0
-      const isLastOwnerInGroup = (group.owners.length - 1) === group.owners.findIndex(i => i.ownerId === owner.ownerId)
 
-      return hasNoOwners && isLastOwnerInGroup
+      return hasNoOwners && index === 0
     }
 
     watch(() => localState.currentlyEditingHomeOwnerId, () => {
@@ -453,7 +456,7 @@ export default defineComponent({
 
   tr.v-row-group__header,
   tbody tr.v-row-group__header:hover {
-    background-color: #e2e8ee;
+    background-color: $app-lt-blue;
   }
 
   .no-owners-head-row {
@@ -483,7 +486,7 @@ export default defineComponent({
     }
     tbody > tr.v-row-group__header,
     tbody > tr.v-row-group__header:hover {
-      background: #e2e8ee !important;
+      background: $app-lt-blue !important;
     }
 
     .no-owners-error {
