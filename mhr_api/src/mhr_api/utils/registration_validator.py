@@ -17,7 +17,7 @@ Validation includes verifying the data combination for various registrations/fil
 """
 from flask import current_app
 
-from mhr_api.models import MhrRegistration, Db2Owngroup
+from mhr_api.models import MhrRegistration, Db2Owngroup, registration_utils as reg_utils
 from mhr_api.models.type_tables import MhrRegistrationStatusTypes, MhrDocumentTypes
 from mhr_api.models.db2.owngroup import NEW_TENANCY_LEGACY
 from mhr_api.models.utils import is_legacy
@@ -46,6 +46,8 @@ GROUP_DENOMINATOR_MISSING = 'The owner group interest denominator is required an
 GROUP_INTEREST_MISMATCH = 'The owner group interest numerator sum does not equal the interest common denominator. '
 VALIDATOR_ERROR = 'Error performing extra validation. '
 NOTE_DOC_TYPE_INVALID = 'The note document type is invalid for the registration type. '
+PPR_LIEN_EXISTS = 'This registration is not allowed to complete as an outstanding Personal Property Registry lien ' + \
+    'exists on the manufactured home. '
 
 
 def validate_registration(json_data, is_staff: bool = False):
@@ -71,6 +73,8 @@ def validate_transfer(registration: MhrRegistration, json_data, is_staff: bool =
     try:
         if is_staff:
             error_msg += validate_doc_id(json_data)
+        if registration:
+            error_msg += validate_ppr_lien(registration.mhr_number)
         error_msg += validate_submitting_party(json_data)
         error_msg += validate_owner_groups(json_data.get('addOwnerGroups'),
                                            False,
@@ -99,6 +103,8 @@ def validate_exemption(registration: MhrRegistration, json_data, is_staff: bool 
     try:
         if is_staff:
             error_msg += validate_doc_id(json_data)
+        if registration:
+            error_msg += validate_ppr_lien(registration.mhr_number)
         error_msg += validate_submitting_party(json_data)
         error_msg += validate_registration_state(registration)
         if json_data.get('note'):
@@ -333,3 +339,14 @@ def validate_text(value: str, desc: str = ''):
     if value and not valid_charset(value):
         return CHARACTER_SET_UNSUPPORTED.format(desc=desc, value=value)
     return ''
+
+
+def validate_ppr_lien(mhr_number: str):
+    """Validate that there are no PPR liens for a change registration."""
+    current_app.logger.debug(f'Validating mhr_number={mhr_number}.')
+    error_msg = ''
+    if mhr_number:
+        lien_count: int = reg_utils.get_ppr_lien_count(mhr_number)
+        if lien_count > 0:
+            return PPR_LIEN_EXISTS
+    return error_msg
