@@ -14,7 +14,7 @@
                   :class="[$style['dashboard-title'], 'pl-6', 'pt-3', 'pb-3', 'soft-corners-top']">
             <v-col cols="auto">
               <b v-if="hasPPR && hasMHR">
-                Manufactured Home and Personal Property Registry Search</b>
+                Manufactured Home and Personal Property Registries Search</b>
               <b v-else-if="hasPPR">Personal Property Search</b>
               <b v-else-if="hasMHR">Manufactured Home Search</b>
             </v-col>
