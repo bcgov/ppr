@@ -294,11 +294,11 @@ describe('Breadcrumb component tests', () => {
     await assertBreadcrumbItemForRole(wrapper, STAFF_PPR, 'Staff Personal Property Registry')
     await assertBreadcrumbItemForRole(wrapper, STAFF_MHR, 'Staff Personal Property Registry')
     defaultFlagSet['mhr-ui-enabled'] = true
-    await assertBreadcrumbItemForRole(wrapper, STAFF_PPR, 'Staff Asset Registries')
-    await assertBreadcrumbItemForRole(wrapper, STAFF_MHR, 'Staff Asset Registries')
+    await assertBreadcrumbItemForRole(wrapper, STAFF_PPR, 'Staff Manufactured Home and Personal Property Registries')
+    await assertBreadcrumbItemForRole(wrapper, STAFF_MHR, 'Staff Manufactured Home and Personal Property Registries')
     await assertBreadcrumbItemForRole(wrapper, CLIENT_MHR, 'My Manufactured Home Registry', [ProductCode.MHR])
-    await assertBreadcrumbItemForRole(wrapper, STAFF_PPR_MHR, 'Staff Asset Registries', [])
-    await assertBreadcrumbItemForRole(wrapper, CLIENT_PPR_MHR, 'My Asset Registries', [
+    await assertBreadcrumbItemForRole(wrapper, STAFF_PPR_MHR, 'Staff Manufactured Home and Personal Property Registries', [])
+    await assertBreadcrumbItemForRole(wrapper, CLIENT_PPR_MHR, 'My Manufactured Home and Personal Property Registries', [
       ProductCode.MHR,
       ProductCode.PPR
     ])
