@@ -102,11 +102,18 @@
     </tr>
     <tr class="no-page-break">
         <td colspan="3">
-            {# {% if location.locationType is defined and location.locationType == 'STRATA' %}STRATA {% endif %} #}
             <div>{{ location.legalDescription }}</div>
-            {% if location.additionalDescription is defined and location.additionalDescription != '' %}
-                <div>{{ location.additionalDescription }}</div>
-            {% endif %} 
+            <div>
+                {% if location.bandName is defined and location.bandName != '' %}
+                    {{location.bandName}}&nbsp;
+                {% endif %}
+                {% if location.reserveNumber is defined and location.reserveNumber != '' %}
+                    {{location.reserveNumber}}&nbsp;
+                {% endif %}
+                {% if location.additionalDescription is defined and location.additionalDescription != '' %}
+                    {{ location.additionalDescription }}
+                {% endif %} 
+            </div>
         </td>
     </tr>
     {% elif location.hasLTSAInfo or (location.additionalDescription is defined and location.additionalDescription != '') %}
@@ -152,13 +159,23 @@
             {% endif %} 
         </td>
         <td colspan="2">
-            {% if location.exceptionPlan is defined and location.exceptionPlan != '' %}
+            {% if (location.exceptionPlan is defined and location.exceptionPlan != '')  or (location.bandName is defined and location.bandName != '') or (location.reserveNumber is defined and location.reserveNumber != '') %}
                 <div>EXCEPT PLAN:</div>
                 <div class="pb-2">{{ location.exceptionPlan }}</div>
             {% endif %} 
             {% if location.additionalDescription is defined and location.additionalDescription != '' %}
                 <div>ADDITIONAL DESCRIPTION:</div>
-                <div>{{ location.additionalDescription }}</div>
+                <div>
+                    {% if location.bandName is defined and location.bandName != '' %}
+                        {{location.bandName}}&nbsp;
+                    {% endif %}
+                    {% if location.reserveNumber is defined and location.reserveNumber != '' %}
+                        {{location.reserveNumber}}&nbsp;
+                    {% endif %}
+                    {% if location.additionalDescription is defined and location.additionalDescription != '' %}
+                        {{ location.additionalDescription }}
+                    {% endif %} 
+                </div>
             {% endif %} 
         </td>
     </tr>
