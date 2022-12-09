@@ -389,6 +389,10 @@ export const mutateMhrLocation = (state: StateIF, { key, value }) => {
   state.stateModel.mhrRegistration.location[key] = value
 }
 
+export const mutateIsManualLocation = (state: StateIF, value) => {
+  state.stateModel.mhrRegistration.isManualLocationInfo = value
+}
+
 export const mutateCivicAddress = (state: StateIF, { key, value }) => {
   state.stateModel.mhrRegistration.location.address[key] = value
 }

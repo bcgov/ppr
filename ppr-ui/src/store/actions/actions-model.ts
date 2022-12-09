@@ -333,6 +333,10 @@ export const setMhrLocation: ActionIF = ({ commit }, { key, value }): void => {
   commit('mutateUnsavedChanges', true)
 }
 
+export const setIsManualLocation: ActionIF = ({ commit }, isManual: boolean): void => {
+  commit('mutateIsManualLocation', isManual)
+}
+
 export const setCivicAddress: ActionIF = ({ commit }, { key, value }): void => {
   commit('mutateCivicAddress', { key, value })
   commit('mutateUnsavedChanges', true)
