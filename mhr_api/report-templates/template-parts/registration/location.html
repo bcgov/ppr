@@ -159,11 +159,11 @@
             {% endif %} 
         </td>
         <td colspan="2">
-            {% if (location.exceptionPlan is defined and location.exceptionPlan != '')  or (location.bandName is defined and location.bandName != '') or (location.reserveNumber is defined and location.reserveNumber != '') %}
+            {% if location.exceptionPlan is defined and location.exceptionPlan != '' %}
                 <div>EXCEPT PLAN:</div>
                 <div class="pb-2">{{ location.exceptionPlan }}</div>
             {% endif %} 
-            {% if location.additionalDescription is defined and location.additionalDescription != '' %}
+            {% if (location.additionalDescription is defined and location.additionalDescription != '')  or (location.bandName is defined and location.bandName != '') or (location.reserveNumber is defined and location.reserveNumber != '') %}
                 <div>ADDITIONAL DESCRIPTION:</div>
                 <div>
                     {% if location.bandName is defined and location.bandName != '' %}
