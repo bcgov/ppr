@@ -482,6 +482,9 @@ class Report:  # pylint: disable=too-few-public-methods
                                    Report._to_report_datetime(detail['description']['engineerDate'], False)
                     else:
                         detail['description']['engineerDate'] = ''
+                    if detail.get('location') and detail['location'].get('taxExpiryDate'):
+                        detail['location']['taxExpiryDate'] =  \
+                                Report._to_report_datetime(detail['location']['taxExpiryDate'], False)
         elif self._report_key == ReportTypes.MHR_REGISTRATION:
             reg = self._report_data
             reg['createDateTime'] = Report._to_report_datetime(reg['createDateTime'])
@@ -501,6 +504,8 @@ class Report:  # pylint: disable=too-few-public-methods
                         Report._to_report_datetime(reg['description']['engineerDate'], False)
             else:
                 reg['description']['engineerDate'] = ''
+            if reg.get('location') and reg['location'].get('taxExpiryDate'):
+                reg['location']['taxExpiryDate'] = Report._to_report_datetime(reg['location']['taxExpiryDate'], False)
         elif self._report_key in (ReportTypes.MHR_TRANSFER, ReportTypes.MHR_EXEMPTION):
             reg = self._report_data
             reg['createDateTime'] = Report._to_report_datetime(reg['createDateTime'])
