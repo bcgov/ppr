@@ -727,8 +727,7 @@ export default defineComponent({
     }
 
     const getMhrDescription = (description: APIMhrDescriptionTypes): string => {
-      // Disabled until requirements/verbiage are determined
-      // if (description === APIMhrDescriptionTypes.CONVERTED) return 'REGISTRATION CONVERSION'
+      if (description === APIMhrDescriptionTypes.CONVERTED) return 'Converted'
       return description
     }
 
