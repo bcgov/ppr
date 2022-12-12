@@ -38,6 +38,7 @@
             :label="countryLabel"
             :rules="[...schemaLocal.country]"
             v-model="addressLocal.country"
+            validate-on-blur
           />
           <!-- special field to select AddressComplete country, separate from our model field -->
           <input type="hidden" :id="countryId" :value="country" />
@@ -184,16 +185,17 @@ export default defineComponent({
   },
   emits: ['valid'],
   setup (props, { emit }) {
+    const localSchema = { ...props.schema }
     const {
       addressLocal,
       country,
       schemaLocal,
       isSchemaRequired,
       labels
-    } = useAddress(toRefs(props).value, props.schema)
+    } = useAddress(toRefs(props).value, localSchema)
 
-    const origPostalCodeRules = schemaLocal.value.postalCode
-    const origRegionRules = schemaLocal.value.region
+    const origPostalCodeRules = localSchema.postalCode
+    const origRegionRules = localSchema.region
 
     const { addressForm, resetValidation, validate } = useBaseValidations()
 
@@ -206,14 +208,14 @@ export default defineComponent({
       if (!props.editing) return
 
       if (val === 'CA') {
-        schemaLocal.value.postalCode = origPostalCodeRules.concat([baseRules.postalCode])
-        schemaLocal.value.region = origRegionRules
+        localSchema.postalCode = origPostalCodeRules.concat([baseRules.postalCode])
+        localSchema.region = origRegionRules
       } else if (val === 'US') {
-        schemaLocal.value.postalCode = origPostalCodeRules.concat([baseRules.zipCode])
-        schemaLocal.value.region = origRegionRules
+        localSchema.postalCode = origPostalCodeRules.concat([baseRules.zipCode])
+        localSchema.region = origRegionRules
       } else {
-        schemaLocal.value.postalCode = origPostalCodeRules.concat([baseRules.maxLength(15)])
-        schemaLocal.value.region = [baseRules.maxLength(2), ...spaceRules]
+        localSchema.postalCode = origPostalCodeRules.concat([baseRules.maxLength(15)])
+        localSchema.region = [baseRules.maxLength(2), ...spaceRules]
       }
       // reset other address fields (check is for loading an existing address)
       if (oldVal) {
