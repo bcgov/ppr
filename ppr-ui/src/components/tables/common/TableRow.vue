@@ -54,7 +54,7 @@
             label x-small
             color="darkGray"
             text-color="white"
-            data-test-id="owner-removed-badge"
+            data-test-id="lien-badge"
           >
             <b>LIEN</b>
           </v-chip>
