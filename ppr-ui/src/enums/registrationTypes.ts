@@ -167,7 +167,8 @@ export enum UIRegistrationClassTypes {
 
 export enum APIMhrDescriptionTypes {
   REGISTER_NEW_UNIT = 'REGISTER NEW UNIT',
-  SALE_OR_GIFT = 'SALE OR GIFT'
+  SALE_OR_GIFT = 'SALE OR GIFT',
+  CONVERTED = '** CONVERTED **'
 }
 
 export enum APIMhrTypes {

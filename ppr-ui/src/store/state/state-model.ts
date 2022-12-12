@@ -156,7 +156,8 @@ export const stateModel: StateModelIF = {
     statusType: '',
     submittingParty: '',
     username: '',
-    documentId: ''
+    documentId: '',
+    lienRegistrationType: ''
   },
   mhrRegistration: {
     documentId: '',

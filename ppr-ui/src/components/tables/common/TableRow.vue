@@ -45,6 +45,21 @@
           </p>
         </v-col>
       </v-row>
+      <v-row no-gutters>
+        <v-col cols="2"></v-col>
+        <v-col>
+          <v-chip
+            v-if="!isPpr && !isChild && hasLien(item)"
+            class="badge-lien px-3 ml-1"
+            label x-small
+            color="darkGray"
+            text-color="white"
+            data-test-id="lien-badge"
+          >
+            <b>LIEN</b>
+          </v-chip>
+        </v-col>
+      </v-row>
     </td>
     <td
       v-if="inSelectedHeaders('registrationType')"
@@ -54,7 +69,7 @@
         {{ getRegistrationType(item.registrationType) }}
         <span v-if="isPpr && !isChild"> - Base Registration</span>
       </div>
-      <div v-else class="pr-2">{{ item.registrationDescription }}</div>
+      <div v-else class="pr-2">{{ getMhrDescription(item.registrationDescription) }}</div>
       <v-btn
         v-if="item.changes"
         :class="[$style['btn-txt'], 'pa-0']"
@@ -543,7 +558,8 @@ export default defineComponent({
 
     const isEnabledMhr = (item: MhRegistrationSummaryIF) => {
       return item.statusType === APIStatusTypes.MHR_ACTIVE && isRoleQualifiedSupplier.value &&
-        item.registrationDescription === APIMhrDescriptionTypes.REGISTER_NEW_UNIT
+        (item.registrationDescription === APIMhrDescriptionTypes.REGISTER_NEW_UNIT ||
+          item.registrationDescription === APIMhrDescriptionTypes.CONVERTED)
     }
 
     const openMhr = (item: MhRegistrationSummaryIF): void => {
@@ -705,6 +721,16 @@ export default defineComponent({
       emit('toggleExpand', val)
     }
 
+    const hasLien = (item: any): boolean => {
+      // Future state might require type handling
+      return !!item.lienRegistrationType
+    }
+
+    const getMhrDescription = (description: APIMhrDescriptionTypes): string => {
+      if (description === APIMhrDescriptionTypes.CONVERTED) return 'Converted'
+      return description
+    }
+
     watch(() => props.setItem, (val) => {
     }, { deep: true, immediate: true })
 
@@ -739,6 +765,8 @@ export default defineComponent({
       isEnabledMhr,
       removeMhrDraft,
       isMhrTransfer,
+      hasLien,
+      getMhrDescription,
       ...toRefs(localState)
     }
   }
