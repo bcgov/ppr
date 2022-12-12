@@ -30,6 +30,26 @@
                 </p>
               </v-col>
             </v-row>
+
+            <!-- Lien Information -->
+            <v-row v-if="hasLien" no-gutters>
+              <v-col>
+                <v-btn
+                  outlined
+                  color="primary"
+                  class="mt-2 px-6"
+                  :ripple="false"
+                  data-test-id="lien-search-btn"
+                  @click="quickMhrSearch(getMhrInformation.mhrNumber)"
+                >
+                  <v-icon class="pr-1">mdi-magnify</v-icon>
+                  Conduct a Combined MHR and PPR Search for MHR Number
+                  <strong>{{ getMhrInformation.mhrNumber }}</strong>
+                </v-btn>
+                <v-divider class="mx-0 my-8" />
+              </v-col>
+            </v-row>
+
             <header id="yellow-message-bar" class="message-bar" v-if="isReviewMode">
               <label><b>Important:</b> This information must match the information on the bill of sale.</label>
             </header>
@@ -168,13 +188,20 @@
 import { computed, defineComponent, onMounted, reactive, ref, toRefs, watch } from '@vue/composition-api'
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
-import { ActionTypes, RouteNames } from '@/enums'
+import {
+  ActionTypes,
+  APIMHRMapSearchTypes,
+  APISearchTypes,
+  RouteNames,
+  UIMHRSearchTypes
+} from '@/enums'
 import {
   createMhrTransferDraft,
   deleteMhrDraft,
   fetchMhRegistration,
   getAccountInfoFromAuth,
   getMhrTransferDraft,
+  mhrSearch,
   pacificDate,
   submitMhrTransfer,
   updateMhrDraft
@@ -190,7 +217,9 @@ import { BaseAddress } from '@/composables/address'
 import { unsavedChangesDialog, registrationSaveDraftError } from '@/resources/dialogOptions'
 import { cloneDeep } from 'lodash'
 import AccountInfo from '@/components/common/AccountInfo.vue'
-import { AccountInfoIF, MhrTransferApiIF, RegTableNewItemI } from '@/interfaces' // eslint-disable-line no-unused-vars
+import {
+  AccountInfoIF, MhrSearchCriteriaIF, MhrTransferApiIF, RegTableNewItemI // eslint-disable-line no-unused-vars
+} from '@/interfaces'
 
 export default defineComponent({
   name: 'MhrInformation',
@@ -223,13 +252,15 @@ export default defineComponent({
       getMhrInformation,
       getMhrTransferCurrentHomeOwners,
       getCertifyInformation,
-      hasUnsavedChanges
+      hasUnsavedChanges,
+      hasLien
     } = useGetters<any>([
       'getMhrTransferHomeOwners',
       'getMhrInformation',
       'getMhrTransferCurrentHomeOwners',
       'getCertifyInformation',
-      'hasUnsavedChanges'
+      'hasUnsavedChanges',
+      'hasLien'
     ])
 
     const {
@@ -237,13 +268,17 @@ export default defineComponent({
       setMhrTransferCurrentHomeOwnerGroups,
       setMhrTransferAttentionReference,
       setUnsavedChanges,
-      setRegTableNewItem
+      setRegTableNewItem,
+      setSearchedType,
+      setManufacturedHomeSearchResults
     } = useActions<any>([
       'setMhrTransferHomeOwnerGroups',
       'setMhrTransferCurrentHomeOwnerGroups',
       'setMhrTransferAttentionReference',
       'setUnsavedChanges',
-      'setRegTableNewItem'
+      'setRegTableNewItem',
+      'setSearchedType',
+      'setManufacturedHomeSearchResults'
     ])
 
     const { setEmptyMhrTransfer } = useActions<any>(['setEmptyMhrTransfer'])
@@ -481,6 +516,33 @@ export default defineComponent({
       localState.showSaveDialog = false
     }
 
+    const quickMhrSearch = async (mhrNumber: string): Promise<void> => {
+      localState.loading = true
+
+      // Search for current Manufactured Home Registration Number
+      const results = await mhrSearch({
+        type: APISearchTypes.MHR_NUMBER,
+        criteria: { value: mhrNumber },
+        clientReferenceId: ''
+      }, '')
+
+      localState.loading = false
+      if (results) {
+        // If successful, set search type and results to store in order to navigate to Search Selection List
+        await setSearchedType({
+          searchTypeUI: UIMHRSearchTypes.MHRMHR_NUMBER,
+          searchTypeAPI: APIMHRMapSearchTypes.MHRMHR_NUMBER
+        })
+        await setManufacturedHomeSearchResults(results)
+
+        await context.root.$router.replace({
+          name: RouteNames.MHRSEARCH
+        })
+      } else {
+        console.error('Error: MHR_NUMBER expected, but not found.')
+      }
+    }
+
     watch(
       () => localState.attentionReference,
       (val: string) => {
@@ -528,9 +590,12 @@ export default defineComponent({
       getCertifyInformation,
       maxLength,
       isRefNumValid,
-      ...toRefs(localState),
       transferDetailsComponent,
-      handleDialogResp
+      getMhrInformation,
+      quickMhrSearch,
+      handleDialogResp,
+      hasLien,
+      ...toRefs(localState)
     }
   }
 })

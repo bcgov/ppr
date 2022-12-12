@@ -746,3 +746,8 @@ export const getMhrTransferCurrentHomeOwners = (state: StateIF): MhrRegistration
 export const getMhrTransferHomeOwnerGroups = (state: StateIF): MhrRegistrationHomeOwnerGroupIF[] => {
   return state.stateModel.mhrTransfer.ownerGroups
 }
+
+export const hasLien = (state: StateIF): boolean => {
+  // Current state is to verify the property exists. Future state may be more granular dependent on type.
+  return !!state.stateModel.mhrInformation.lienRegistrationType
+}
