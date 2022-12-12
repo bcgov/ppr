@@ -21,7 +21,7 @@ from registry_schemas.example_data.mhr import REGISTRATION, TRANSFER, EXEMPTION
 
 from mhr_api.utils import registration_validator as validator
 from mhr_api.models import MhrRegistration
-from mhr_api.models.type_tables import MhrRegistrationStatusTypes, MhrTenancyTypes, MhrDocumentTypes
+from mhr_api.models.type_tables import MhrRegistrationStatusTypes, MhrTenancyTypes, MhrDocumentTypes, MhrLocationTypes
 from mhr_api.models.utils import is_legacy
 
 
@@ -290,12 +290,13 @@ TEST_PARTY_DATA = [
     ('Trans invalid middle name', None, 'first', INVALID_TEXT_CHARSET, 'last', INVALID_CHARSET_MESSAGE, TRANSFER),
     ('Trans invalid last name', None, 'first', 'middle', INVALID_TEXT_CHARSET, INVALID_CHARSET_MESSAGE, TRANSFER)
 ]
-# testdata pattern is ({description}, {park_name}, {dealer}, {additional}, {except_plan}, {message content})
+# testdata pattern is ({description}, {park_name}, {dealer}, {additional}, {except_plan}, {band_name}, {message content})
 TEST_LOCATION_DATA = [
-    ('Invalid park name', INVALID_TEXT_CHARSET, None, None, None, INVALID_CHARSET_MESSAGE),
-    ('Invalid dealer name', None, INVALID_TEXT_CHARSET, None, None, INVALID_CHARSET_MESSAGE),
-    ('Invalid additional description', None, None, INVALID_TEXT_CHARSET, None, INVALID_CHARSET_MESSAGE),
-    ('Invalid exception plan', None, None, None, INVALID_TEXT_CHARSET, INVALID_CHARSET_MESSAGE)
+    ('Invalid park name', INVALID_TEXT_CHARSET, None, None, None, None, INVALID_CHARSET_MESSAGE),
+    ('Invalid dealer name', None, INVALID_TEXT_CHARSET, None, None, None, INVALID_CHARSET_MESSAGE),
+    ('Invalid additional description', None, None, INVALID_TEXT_CHARSET, None, None, INVALID_CHARSET_MESSAGE),
+    ('Invalid exception plan', None, None, None, INVALID_TEXT_CHARSET, None, INVALID_CHARSET_MESSAGE),
+    ('Invalid band name', None, None, None, None, INVALID_TEXT_CHARSET, INVALID_CHARSET_MESSAGE)
 ]
 # testdata pattern is ({description}, {valid}, {staff}, {doc_id}, {message content}, {status})
 TEST_TRANSFER_DATA = [
@@ -360,7 +361,15 @@ TEST_TRANSFER_DATA_GROUP_INTEREST = [
 ]
 # testdata pattern is ({description}, {mhr_number}, {message content})
 TEST_DATA_LIEN_COUNT = [
-    ('Valid request', '100000', ''),
+    ('Valid request', '100000', '')
+]
+# testdata pattern is ({description}, {valid}, {band name}, {reserve_number}, {message content})
+TEST_DATA_LOCATION_RESERVE = [
+    ('Valid request', True, 'band name', 'test_num', None),
+    ('Missing band name', False, '', 'test_num', validator.BAND_NAME_REQUIRED),
+    ('Missing band name', False, None, 'test_num', validator.BAND_NAME_REQUIRED),
+    ('Missing reserve number', False, 'band name', '', validator.RESERVE_NUMBER_REQUIRED),
+    ('Missing reserve number', False, 'band name', None, validator.RESERVE_NUMBER_REQUIRED)
 ]
 
 
@@ -623,8 +632,8 @@ def test_validate_owner(session, desc, bus_name, first, middle, last, message_co
         assert error_msg.find(message_content) != -1
 
 
-@pytest.mark.parametrize('desc,park_name,dealer,additional,except_plan,message_content', TEST_LOCATION_DATA)
-def test_validate_reg_location(session, desc, park_name, dealer, additional, except_plan, message_content):
+@pytest.mark.parametrize('desc,park_name,dealer,additional,except_plan,band_name,message_content', TEST_LOCATION_DATA)
+def test_validate_reg_location(session, desc, park_name, dealer, additional, except_plan, band_name, message_content):
     """Assert that location invalid character set validation works as expected."""
     # setup
     json_data = get_valid_registration(MhrTenancyTypes.SOLE)
@@ -637,6 +646,8 @@ def test_validate_reg_location(session, desc, park_name, dealer, additional, exc
         location['additionalDescription'] = additional
     elif except_plan:
         location['exceptionPlan'] = except_plan
+    elif band_name:
+        location['bandName'] = band_name
     error_msg = validator.validate_registration(json_data, False)
     assert error_msg != ''
     if message_content:
@@ -705,3 +716,20 @@ def test_validate_ppr_lien(session, desc, mhr_number, message_content):
     """Assert that the PPR lien check validation works as expected."""
     error_msg = validator.validate_ppr_lien(mhr_number)
     assert error_msg == message_content
+
+
+@pytest.mark.parametrize('desc,valid,band_name,reserve_num,message_content', TEST_DATA_LOCATION_RESERVE)
+def test_validate_location_reserve(session, desc, valid, band_name, reserve_num, message_content):
+    """Assert that location RESERVE location type validation works as expected."""
+    # setup
+    json_data = get_valid_registration(MhrTenancyTypes.SOLE)
+    location = json_data.get('location')
+    location['locationType'] = MhrLocationTypes.RESERVE
+    if band_name:
+        location['bandName'] = band_name
+    if reserve_num:
+        location['reserveName'] = reserve_num
+    error_msg = validator.validate_registration(json_data, False)
+    assert error_msg != ''
+    if message_content:
+        assert error_msg.find(message_content) != -1

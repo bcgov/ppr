@@ -18,7 +18,7 @@ Validation includes verifying the data combination for various registrations/fil
 from flask import current_app
 
 from mhr_api.models import MhrRegistration, Db2Owngroup, registration_utils as reg_utils
-from mhr_api.models.type_tables import MhrRegistrationStatusTypes, MhrDocumentTypes
+from mhr_api.models.type_tables import MhrRegistrationStatusTypes, MhrDocumentTypes, MhrLocationTypes
 from mhr_api.models.db2.owngroup import NEW_TENANCY_LEGACY
 from mhr_api.models.utils import is_legacy
 from mhr_api.utils import valid_charset
@@ -48,6 +48,8 @@ VALIDATOR_ERROR = 'Error performing extra validation. '
 NOTE_DOC_TYPE_INVALID = 'The note document type is invalid for the registration type. '
 PPR_LIEN_EXISTS = 'This registration is not allowed to complete as an outstanding Personal Property Registry lien ' + \
     'exists on the manufactured home. '
+BAND_NAME_REQUIRED = 'The location Indian Reserve band name is required for this registration. '
+RESERVE_NUMBER_REQUIRED = 'The location Indian Reserve number is required for this registration. '
 
 
 def validate_registration(json_data, is_staff: bool = False):
@@ -323,6 +325,12 @@ def validate_location(json_data):
     error_msg += validate_text(location.get('dealerName'), desc + ' dealer name')
     error_msg += validate_text(location.get('additionalDescription'), desc + ' additional description')
     error_msg += validate_text(location.get('exceptionPlan'), desc + ' exception plan')
+    error_msg += validate_text(location.get('bandName'), desc + ' band name')
+    if location.get('locationType') and location['locationType'] == MhrLocationTypes.RESERVE:
+        if not location.get('bandName'):
+            error_msg += BAND_NAME_REQUIRED
+        if not location.get('reserveNumber'):
+            error_msg += RESERVE_NUMBER_REQUIRED
     return error_msg
 
 

@@ -30,9 +30,16 @@ TEST_ID_DATA = [
     (200000000, True),
     (300000000, False)
 ]
+# testdata pattern is ({location_type})
+TEST_CREATE_DATA = [
+    (MhrLocationTypes.MH_PARK),
+    (MhrLocationTypes.RESERVE)
+]
 LTSA_DESCRIPTION = 'LOT 1 DISTRICT LOT 16 QUEEN CHARLOTTE DISTRICT PLAN PRP14213'
+BAND_NAME = 'TEST BAND NAME'
+RESERVE_NUMBER = 'TEST NUM'
 TEST_LOCATION = MhrLocation(id=1,
-    location_type=MhrLocationTypes.OTHER,
+    location_type=MhrLocationTypes.RESERVE,
     status_type=MhrStatusTypes.ACTIVE,
     ltsa_description=LTSA_DESCRIPTION,
     park_name='LAZY WHEEL MOBILE HOME PARK',
@@ -54,7 +61,9 @@ TEST_LOCATION = MhrLocation(id=1,
     exception_plan='except',
     dealer_name='dealer',
     additional_description='additional',
-    address_id=1)
+    address_id=1,
+    band_name='band name',
+    reserve_number='reserve num')
 
 
 @pytest.mark.parametrize('id, has_results', TEST_ID_DATA)
@@ -144,25 +153,36 @@ def test_location_json(session):
         'taxCertificate': True,
         'exceptionPlan': location.exception_plan,
         'dealerName': location.dealer_name,
-        'additionalDescription': location.additional_description
+        'additionalDescription': location.additional_description,
+        'bandName': location.band_name,
+        'reserveNumber': location.reserve_number
     }
     assert location.json == location_json
 
 
-def test_create_from_json(session):
+@pytest.mark.parametrize('location_type', TEST_CREATE_DATA)
+def test_create_from_json(session, location_type):
     """Assert that the new MHR location is created from json data correctly."""
     json_data = copy.deepcopy(REGISTRATION)
     loc_json = json_data.get('location')
-    loc_json['locationType'] = MhrLocationTypes.MH_PARK
+    loc_json['locationType'] = location_type
     loc_json['legalDescription'] = LTSA_DESCRIPTION
+    loc_json['bandName'] = 'band name'
+    loc_json['reserveNumber'] = 'test num'
     location: MhrLocation = MhrLocation.create_from_json(loc_json, 1000)
     assert location
     assert location.registration_id == 1000
     assert location.change_registration_id == 1000
-    assert location.location_type == MhrLocationTypes.MH_PARK
+    assert location.location_type == location_type
     assert location.status_type == MhrStatusTypes.ACTIVE
     assert location.ltsa_description == LTSA_DESCRIPTION
-    assert location.park_name
-    assert location.park_pad
     assert location.address
     assert location.dealer_name
+    if location_type == MhrLocationTypes.MH_PARK:
+        assert location.park_name
+        assert location.park_pad
+        assert not location.band_name
+        assert not location.reserve_number
+    elif location_type == MhrLocationTypes.RESERVE:
+        assert location.band_name
+        assert location.reserve_number
