@@ -432,7 +432,8 @@ export default defineComponent({
   },
   emits: ['action', 'error', 'freezeScroll', 'toggleExpand'],
   setup (props, { emit }) {
-    const { isRoleQualifiedSupplier } = useGetters<any>(['isRoleQualifiedSupplier'])
+    const { isRoleQualifiedSupplier, isRoleStaff, isRoleStaffSbc, isRoleStaffBcol, isRoleStaffReg
+    } = useGetters<any>(['isRoleQualifiedSupplier', 'isRoleStaff', 'isRoleStaffSbc', 'isRoleStaffBcol', 'isRoleStaffReg'])
     const {
       getFormattedDate,
       getRegistrationType,
@@ -558,8 +559,13 @@ export default defineComponent({
 
     const isEnabledMhr = (item: MhRegistrationSummaryIF) => {
       return item.statusType === APIStatusTypes.MHR_ACTIVE && isRoleQualifiedSupplier.value &&
+<<<<<<< Updated upstream
         (item.registrationDescription === APIMhrDescriptionTypes.REGISTER_NEW_UNIT ||
           item.registrationDescription === APIMhrDescriptionTypes.CONVERTED)
+=======
+      !isRoleStaff.value && !isRoleStaffSbc.value && !isRoleStaffBcol.value && !isRoleStaffReg.value &&
+      item.registrationDescription === APIMhrDescriptionTypes.REGISTER_NEW_UNIT
+>>>>>>> Stashed changes
     }
 
     const openMhr = (item: MhRegistrationSummaryIF): void => {
