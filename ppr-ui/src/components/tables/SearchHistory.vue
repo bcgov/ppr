@@ -280,7 +280,8 @@ export default defineComponent({
         pdf = await searchMhrPDF(item.searchId)
       }
       if (pdf.error) {
-        if (isPprSearch(item)) emit('error', pdf.error)
+        // do not emit any error so dialog is not shown - #13980
+        // if (isPprSearch(item)) emit('error', pdf.error)
         item.loadingPDF = false
         return false
       } else {
