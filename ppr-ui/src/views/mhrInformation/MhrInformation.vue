@@ -634,7 +634,7 @@ export default defineComponent({
 }
 
 #important-message {
-  background-color: $importantError !important;
+  background-color: $backgroundError !important;
   border-color: $error;
 
   p {
