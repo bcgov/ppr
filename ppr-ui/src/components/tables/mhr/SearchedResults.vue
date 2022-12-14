@@ -402,7 +402,7 @@ export default defineComponent({
       localState.searchType = getSearchedType.value?.searchTypeUI || ''
       localState.results = localState.activeResults
       localState.results = localState.results?.map(result => {
-        // includeLienInfo needs to be initialized or something weird will happen
+        // includeLienInfo needs to be initialized because it doesn't exist in the DB/results response
         return result.includeLienInfo !== true ? { ...result, includeLienInfo: false } : result
       })
 
