@@ -38,6 +38,64 @@ DOC_ID_VALID = '63166035'
 DOC_ID_INVALID_CHECKSUM = '63166034'
 INVALID_TEXT_CHARSET = 'TEST \U0001d5c4\U0001d5c6/\U0001d5c1 INVALID'
 INVALID_CHARSET_MESSAGE = 'The character set is not supported'
+SO_VALID = [
+    {
+        'groupId': 2,
+        'owners': [
+            {
+            'individualName': {
+                'first': 'James',
+                'last': 'Smith'
+            },
+            'address': {
+                'street': '3122B LYNNLARK PLACE',
+                'city': 'VICTORIA',
+                'region': 'BC',
+                'postalCode': ' ',
+                'country': 'CA'
+            },
+            'phoneNumber': '6041234567'
+            }
+        ],
+        'type': 'SOLE'
+    }
+]
+JT_VALID = [
+    {
+        'groupId': 2,
+        'owners': [
+            {
+            'individualName': {
+                'first': 'James',
+                'last': 'Smith'
+            },
+            'address': {
+                'street': '3122B LYNNLARK PLACE',
+                'city': 'VICTORIA',
+                'region': 'BC',
+                'postalCode': ' ',
+                'country': 'CA'
+            },
+            'phoneNumber': '6041234567'
+            },
+            {
+            'individualName': {
+                'first': 'John',
+                'last': 'Smith'
+            },
+            'address': {
+                'street': '3122B LYNNLARK PLACE',
+                'city': 'VICTORIA',
+                'region': 'BC',
+                'postalCode': ' ',
+                'country': 'CA'
+            },
+            'phoneNumber': '6041234567'
+            }
+        ],
+        'type': 'JOINT'
+    }
+]
 SO_OWNER_MULTIPLE = [
     {
         'groupId': 2,
@@ -114,6 +172,70 @@ SO_GROUP_MULTIPLE = [
             }
         ],
         'type': 'SOLE'
+    }
+]
+JT_OWNER_SINGLE = [
+    {
+        'groupId': 2,
+        'owners': [
+            {
+            'individualName': {
+                'first': 'James',
+                'last': 'Smith'
+            },
+            'address': {
+                'street': '3122B LYNNLARK PLACE',
+                'city': 'VICTORIA',
+                'region': 'BC',
+                'postalCode': ' ',
+                'country': 'CA'
+            },
+            'phoneNumber': '6041234567'
+            }
+        ],
+        'type': 'JOINT'
+    }
+]
+JT_GROUP_MULTIPLE = [
+    {
+        'groupId': 2,
+        'owners': [
+            {
+            'individualName': {
+                'first': 'James',
+                'last': 'Smith'
+            },
+            'address': {
+                'street': '3122B LYNNLARK PLACE',
+                'city': 'VICTORIA',
+                'region': 'BC',
+                'postalCode': ' ',
+                'country': 'CA'
+            },
+            'phoneNumber': '6041234567'
+            }
+        ],
+        'type': 'JOINT'
+    },
+    {
+        'groupId': 3,
+        'owners': [
+            {
+            'individualName': {
+                'first': 'James',
+                'last': 'Smith'
+            },
+            'address': {
+                'street': '3122B LYNNLARK PLACE',
+                'city': 'VICTORIA',
+                'region': 'BC',
+                'postalCode': ' ',
+                'country': 'CA'
+            },
+            'phoneNumber': '6041234567'
+            }
+        ],
+        'type': 'JOINT'
     }
 ]
 TC_GROUPS_VALID = [
@@ -332,18 +454,29 @@ TEST_TRANSFER_DATA_EXTRA = [
     ('Invalid non-staff missing consideration', False, False, True, True, False, validator.CONSIDERATION_REQUIRED)
 ]
 # testdata pattern is ({description}, {valid}, {add_group}, {message content})
-TEST_TRANSFER_DATA_SO = [
+TEST_TRANSFER_DATA_GROUP = [
     ('Valid', True, None, None),
+    ('Invalid add TC no owner', False, TC_GROUP_TRANSFER_ADD, validator.OWNERS_COMMON_INVALID),
+    ('Invalid add JT 1 owner', False, JT_OWNER_SINGLE, validator.OWNERS_JOINT_INVALID),
+    ('Invalid add JT 2 groups', False, JT_GROUP_MULTIPLE, validator.GROUP_JOINT_INVALID),
     ('Invalid add SO 2 groups', False, SO_GROUP_MULTIPLE, validator.ADD_SOLE_OWNER_INVALID),
     ('Invalid add SO 2 owners', False, SO_OWNER_MULTIPLE, validator.ADD_SOLE_OWNER_INVALID)
 ]
-# testdata pattern is ({description}, {valid}, {numerator}, {denominator}, {message content})
-TEST_REG_DATA_COMMON = [
-    ('Invalid only 1 group', False, 2, 2, validator.GROUP_COMMON_INVALID),
-    ('Invalid numerator missing', False, None, 2, validator.GROUP_NUMERATOR_MISSING),
-    ('Invalid numerator < 1', False, 0, 2, validator.GROUP_NUMERATOR_MISSING),
-    ('Invalid denominator missing', False, 1, None, validator.GROUP_DENOMINATOR_MISSING),
-    ('Invalid denominator < 1', False, 1, 0, validator.GROUP_DENOMINATOR_MISSING)
+# testdata pattern is ({description}, {valid}, {numerator}, {denominator}, {groups}, {message content})
+TEST_REG_DATA_GROUP = [
+    ('Valid TC', True, 1, 2, TC_GROUPS_VALID, None),
+    ('Valid SO', True, None, None, SO_VALID, None),
+    ('Valid JT', True, None, None, JT_VALID, None),
+    ('Invalid TC no owner', False, 1, 2, TC_GROUPS_VALID, validator.OWNERS_COMMON_INVALID),
+    ('Invalid TC only 1 group', False, 2, 2, TC_GROUPS_VALID, validator.GROUP_COMMON_INVALID),
+    ('Invalid TC numerator missing', False, None, 2, TC_GROUPS_VALID, validator.GROUP_NUMERATOR_MISSING),
+    ('Invalid TC numerator < 1', False, 0, 2, TC_GROUPS_VALID, validator.GROUP_NUMERATOR_MISSING),
+    ('Invalid TC denominator missing', False, 1, None, TC_GROUPS_VALID, validator.GROUP_DENOMINATOR_MISSING),
+    ('Invalid TC denominator < 1', False, 1, 0, TC_GROUPS_VALID, validator.GROUP_DENOMINATOR_MISSING),
+    ('Invalid JT 1 owner', False, None, None, JT_OWNER_SINGLE, validator.OWNERS_JOINT_INVALID),
+    ('Invalid JT 2 groups', False, None, None, JT_GROUP_MULTIPLE, validator.GROUP_JOINT_INVALID),
+    ('Invalid SO 2 groups', False, None, None, SO_GROUP_MULTIPLE, validator.ADD_SOLE_OWNER_INVALID),
+    ('Invalid SO 2 owners', False, None, None, SO_OWNER_MULTIPLE, validator.ADD_SOLE_OWNER_INVALID)
 ]
 # testdata pattern is ({description}, {valid}, {interest_data}, {common_denominator}, {message content})
 TEST_DATA_GROUP_INTEREST = [
@@ -399,16 +532,19 @@ def test_validate_registration(session, desc, valid, staff, doc_id, message_cont
             assert error_msg.find(message_content) != -1
 
 
-@pytest.mark.parametrize('desc,valid,numerator,denominator,message_content', TEST_REG_DATA_COMMON)
-def test_validate_registration_common(session, desc, valid, numerator, denominator, message_content):
-    """Assert that new MH registration validation works as expected."""
+@pytest.mark.parametrize('desc,valid,numerator,denominator, groups, message_content', TEST_REG_DATA_GROUP)
+def test_validate_registration_group(session, desc, valid, numerator, denominator, groups, message_content):
+    """Assert that new MH registration owner group validation works as expected."""
     # setup
-    json_data = get_valid_registration(MhrTenancyTypes.COMMON)
+    json_data = copy.deepcopy(REGISTRATION)
+    json_data['ownerGroups'] = groups
     if json_data.get('documentId'):
         del json_data['documentId']
-    if desc == 'Invalid only 1 group':
+    if desc == 'Invalid TC only 1 group':
         del json_data['ownerGroups'][1]
-    else:
+    elif desc == 'Invalid TC no owner':
+        json_data['ownerGroups'][0]['owners'] = []
+    elif groups[0].get('type') == MhrTenancyTypes.COMMON:
         for group in json_data.get('ownerGroups'):
             if not numerator:
                 if 'interestNumerator' in group:
@@ -502,15 +638,17 @@ def test_validate_transfer_details(session, desc, valid, staff, trans_dt, dec_va
             assert error_msg.find(message_content) != -1
 
 
-@pytest.mark.parametrize('desc,valid,add_group,message_content', TEST_TRANSFER_DATA_SO)
-def test_validate_transfer_so(session, desc, valid, add_group, message_content):
-    """Assert that MH transfer validation of SO groups works as expected."""
+@pytest.mark.parametrize('desc,valid,add_group,message_content', TEST_TRANSFER_DATA_GROUP)
+def test_validate_transfer_group(session, desc, valid, add_group, message_content):
+    """Assert that MH transfer validation of owner groups works as expected."""
     # setup
     json_data = copy.deepcopy(TRANSFER)
     json_data['deleteOwnerGroups'][0]['groupId'] = 2
     json_data['deleteOwnerGroups'][0]['type'] = 'JOINT'
     if add_group:
-        json_data['addOwnerGroups'] = add_group    
+        json_data['addOwnerGroups'] = copy.deepcopy(add_group)
+        if desc == 'Invalid add TC no owner':
+            json_data['addOwnerGroups'][0]['owners'] = []
     valid_format, errors = schema_utils.validate(json_data, 'transfer', 'mhr')
     # Additional validation not covered by the schema.
     registration: MhrRegistration = MhrRegistration.find_by_mhr_number('045349', 'PS12345')
@@ -698,10 +836,10 @@ def test_validate_group_interest(session, desc, valid, interest_data, common_den
             assert error_msg.find(message_content) != -1
 
 
-def get_valid_registration(type):
+def get_valid_registration(o_type):
     """Build a valid registration"""
     json_data = copy.deepcopy(REGISTRATION)
-    if type == MhrTenancyTypes.COMMON:
+    if o_type == MhrTenancyTypes.COMMON:
         json_data['ownerGroups'] = TC_GROUPS_VALID
     else:
         for group in json_data.get('ownerGroups'):
