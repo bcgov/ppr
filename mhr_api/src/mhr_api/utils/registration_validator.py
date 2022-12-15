@@ -50,6 +50,8 @@ PPR_LIEN_EXISTS = 'This registration is not allowed to complete as an outstandin
     'exists on the manufactured home. '
 BAND_NAME_REQUIRED = 'The location Indian Reserve band name is required for this registration. '
 RESERVE_NUMBER_REQUIRED = 'The location Indian Reserve number is required for this registration. '
+OWNERS_JOINT_INVALID = 'The owner group must contain at least 2 owners. '
+OWNERS_COMMON_INVALID = 'Each group must contain at least 1 owner. '
 
 
 def validate_registration(json_data, is_staff: bool = False):
@@ -291,26 +293,50 @@ def validate_owner_groups(groups, new: bool, registration: MhrRegistration = Non
     if not groups:
         return error_msg
     so_count: int = 0
-    tc_count: int = 0
-    common_denominator: int = 0
+    jt_owner_count_invalid: bool = False
+    tenancy_type: str = NEW_TENANCY_LEGACY.get(groups[0].get('type', ''), '') if groups else ''
+    if tenancy_type == Db2Owngroup.TenancyTypes.COMMON:
+        return validate_owner_groups_common(groups, new, registration, delete_groups)
+    if tenancy_type == Db2Owngroup.TenancyTypes.JOINT and groups and len(groups) > 1:
+        error_msg += GROUP_JOINT_INVALID
     for group in groups:
-        if NEW_TENANCY_LEGACY.get(group.get('type', ''), '') == Db2Owngroup.TenancyTypes.COMMON:
-            tc_count += 1
-            if common_denominator == 0:
-                common_denominator = group.get('interestDenominator', 0)
-            elif group.get('interestDenominator', 0) > common_denominator:
-                common_denominator = group.get('interestDenominator', 0)
+        if tenancy_type == Db2Owngroup.TenancyTypes.JOINT and (not group.get('owners') or len(group.get('owners')) < 2):
+            jt_owner_count_invalid = True
         error_msg += validate_owner_group(group)
         for owner in group.get('owners'):
-            if NEW_TENANCY_LEGACY.get(group.get('type', ''), '') == Db2Owngroup.TenancyTypes.SOLE:
+            if tenancy_type == Db2Owngroup.TenancyTypes.SOLE:
                 so_count += 1
             error_msg += validate_owner(owner)
     if so_count > 1 or (so_count == 1 and len(groups) > 1):
         error_msg += ADD_SOLE_OWNER_INVALID
-    elif tc_count > 0 and new and len(groups) == 1:
+    elif jt_owner_count_invalid:
+        error_msg += OWNERS_JOINT_INVALID
+    return error_msg
+
+
+def validate_owner_groups_common(groups, new: bool, registration: MhrRegistration = None, delete_groups=None):
+    """Verify tenants in common owner groups are valid."""
+    error_msg = ''
+    tc_count: int = 0
+    tc_owner_count_invalid: bool = False
+    common_denominator: int = 0
+    for group in groups:
+        tc_count += 1
+        if common_denominator == 0:
+            common_denominator = group.get('interestDenominator', 0)
+        elif group.get('interestDenominator', 0) > common_denominator:
+            common_denominator = group.get('interestDenominator', 0)
+        if not group.get('owners'):
+            tc_owner_count_invalid = True
+        error_msg += validate_owner_group(group)
+        for owner in group.get('owners'):
+            error_msg += validate_owner(owner)
+    if tc_count > 0 and new and len(groups) == 1:
         error_msg += GROUP_COMMON_INVALID
     elif tc_count > 0:
         error_msg += validate_group_interest(groups, common_denominator, registration, delete_groups)
+    if tc_owner_count_invalid:
+        error_msg += OWNERS_COMMON_INVALID
     return error_msg
 
 

@@ -322,8 +322,8 @@ class Db2Location(db.Model):
                                additional_description=new_info.get('additionalDescription', ''))
 
         if new_info.get('taxExpiryDate', None):
-            location.tax_certificate_date = model_utils.date_from_iso_format(new_info.get('taxExpiryDate'))
-
+            tax_date: str = new_info.get('taxExpiryDate')
+            location.tax_certificate_date = model_utils.date_from_iso_format(tax_date[0:10])
         return location
 
     @staticmethod
@@ -385,7 +385,8 @@ class Db2Location(db.Model):
         if new_info.get('taxCertificate'):
             location.tax_certificate = 'Y'
         if new_info.get('taxExpiryDate', None):
-            location.tax_certificate_date = model_utils.date_from_iso_format(new_info.get('taxExpiryDate'))
+            tax_date: str = new_info.get('taxExpiryDate')
+            location.tax_certificate_date = model_utils.date_from_iso_format(tax_date[0:10])
         else:
             location.tax_certificate_date = model_utils.date_from_iso_format('0001-01-01')
         return location

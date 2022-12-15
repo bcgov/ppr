@@ -1,34 +1,38 @@
 <div class="section-title mt-3">
     {% if registrationType in ('TRANS', 'TRAND') %}New{% endif %} Registered Owner(s) Information
 </div>
-{% if registrationType in ('TRANS', 'TRAND') %}
-    <div class="no-page-break mt-3">
-        <span class="section-sub-title">Home Tenancy Type:</span>
-        {% if addOwnerGroups is defined %}
-            <span class="section-data">
-                {% if addOwnerGroups[0].type == 'SOLE' %}
-                    Sole Owner
-                {% elif addOwnerGroups[0].type == 'JOINT' %}
-                    Joint Tenants
-                {% else %}
-                    Tenants in Common
-                {% endif %}
-            </span>
+<div class="no-page-break mt-3">
+    <span class="section-sub-title">Home Tenancy Type:</span>
+    <span class="section-data">
+        {% if addOwnerGroups is defined and addOwnerGroups[0].type == 'SOLE' %}
+            Sole Owner
+        {% elif addOwnerGroups is defined and addOwnerGroups[0].type == 'JOINT' %}
+            Joint Tenants
+        {% elif addOwnerGroups is defined %}
+            Tenants in Common
+        {% elif ownerGroups is defined and ownerGroups[0].type == 'SOLE' %}
+            Sole Owner
+        {% elif ownerGroups is defined and ownerGroups[0].type == 'JOINT' %}
+            Joint Tenants
+        {% elif ownerGroups is defined %}
+            Tenants in Common
         {% endif %}
-    </div>
-    {% if addOwnerGroups[0].type == 'COMMON' %}
-        <div class="separator-section mt-3"></div>
-    {% endif %}
+    </span>
+</div>
+{% if addOwnerGroups is defined and addOwnerGroups[0].type == 'COMMON' %}
+    <div class="separator-section mt-3"></div>
+{% elif ownerGroups is defined and ownerGroups[0].type == 'COMMON' %}
+    <div class="separator-section mt-3"></div>
 {% endif %}
 
 {% if ownerGroups is defined %}
-    {% if ownerGroups|length > 1 %}
+    {# % if ownerGroups|length > 1 %}
     <div class="no-page-break mt-3">
         <span class="section-sub-title">Home Tenancy Type:</span>
         <span class="section-data">Tenants in Common</span>
     </div>
     <div class="separator-section mt-3"></div>
-    {% endif %}
+    {% endif % #}
     {% for group in ownerGroups %}
         {% if ownerGroups|length > 1 %}
         <div class="mt-3">
@@ -72,18 +76,7 @@
                         </div>
                     {% endif %}
                 </td>
-                <td class="col-33">
-                    <div class="section-sub-title">Tenancy Type</div>
-                    <div class="pt-2">
-                        {% if group.type == 'SOLE' %}
-                            Sole Owner
-                        {% elif group.type == 'JOINT' %}
-                            Joint Tenants
-                        {% else %}
-                            Tenants in Common
-                        {% endif %}
-                    </div>
-                </td>
+                <td class="col-33"></td>
             </tr>
             {% if not loop.last %}
                 <tr><td colspan="3"><div class="mt-4"></div></td></tr>            
@@ -138,20 +131,7 @@
                     </div>
                 {% endif %}
             </td>
-            <td class="col-33">
-                {% if registrationType not in ('TRANS', 'TRAND') %}
-                    <div class="section-sub-title">Tenancy Type</div>
-                    <div class="pt-2">
-                        {% if group.type == 'SOLE' %}
-                            Sole Owner
-                        {% elif group.type == 'JOINT' %}
-                            Joint Tenants
-                        {% else %}
-                            Tenants in Common
-                        {% endif %}
-                    </div>
-                {% endif %}
-            </td>
+            <td class="col-33"></td>
         </tr>
         {% if not loop.last %}
             <tr><td colspan="3"><div class="mt-4"></div></td></tr>            
