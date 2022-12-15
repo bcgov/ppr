@@ -73,8 +73,8 @@ TOKEN1 = {
     'family_name': 'family_name',
     'iss': 'issuer',
     'sub': 'subject',
-    'idp_userid': 'idp_userid',
-    'loginSource': 'source'
+    'idp_userid': '123',
+    'loginSource': 'IDIR'
 }
 TOKEN2 = {
     'username': 'username',
@@ -82,8 +82,8 @@ TOKEN2 = {
     'lastname': 'family_name',
     'iss': 'issuer',
     'sub': 'subject',
-    'idp_userid': 'idp_userid',
-    'loginSource': 'source'
+    'idp_userid': '123',
+    'loginSource': 'IDIR'
 }
 TEST_TOKEN = {
     'username': 'username_TEST1',
@@ -152,8 +152,8 @@ def test_jwt_properties(session, client, jwt, token):
     assert user.sub == 'subject'
     assert user.firstname == 'given_name'
     assert user.lastname == 'family_name'
-    assert user.idp_userid == 'idp_userid'
-    assert user.login_source == 'login_source'
+    assert user.idp_userid == '123'
+    assert user.login_source == 'IDIR'
 
 
 def test_find_by_id(session, client, jwt):
