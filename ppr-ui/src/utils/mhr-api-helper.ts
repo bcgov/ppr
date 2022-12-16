@@ -574,8 +574,3 @@ export async function deleteMhrDraft (draftID: string): Promise<ErrorIF> {
       return { statusCode: response?.status as StatusCodes }
     })
 }
-
-// UX util function to delay any actions for defined number of milliseconds
-export function delayActions (milliseconds: number): Promise<any> {
-  return new Promise(resolve => setTimeout(resolve, milliseconds))
-}
