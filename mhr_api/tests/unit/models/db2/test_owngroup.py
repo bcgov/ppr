@@ -128,15 +128,15 @@ def test_owngroup_json(session):
     owngroup = Db2Owngroup(manuhome_id=1,
                            group_id=1,
                            copy_id=0,
-                           status=5,
+                           status='5',
                            sequence_number=1,
                            reg_document_id='REG22911',
                            can_document_id='42400339',
-                           tenancy_type='SO',
+                           tenancy_type='TC',
                            lessee='',
                            lessor='',
-                           interest='interest',
-                           interest_numerator=0,
+                           interest='UNDIVIDED 1/2',
+                           interest_numerator=1,
                            tenancy_specified='Y')
 
     test_json = {
@@ -144,16 +144,45 @@ def test_owngroup_json(session):
         'groupId': owngroup.group_id,
         'copyId': owngroup.copy_id,
         'sequenceNumber': owngroup.sequence_number,
-        'status': owngroup.status,
+        'status': 'PREVIOUS',
         'pendingFlag': owngroup.pending_flag,
         'registrationDocumentId': owngroup.reg_document_id,
         'canDocumentId': owngroup.can_document_id,
-        'tenancyType': owngroup.tenancy_type,
+        'type': 'COMMON',
         'lessee': owngroup.lessee,
         'lessor': owngroup.lessor,
-        'interest': owngroup.interest,
+        'interest': 'UNDIVIDED',
         'interestNumerator': owngroup.interest_numerator,
-        'interestDenominator': 0,
-        'tenancySpecified': owngroup.tenancy_specified
+        'interestDenominator': 2,
+        'tenancySpecified': True
     }
     assert owngroup.json == test_json
+
+
+def test_owngroup_reg_json(session):
+    """Assert that the owngroup renders to a registration json format correctly."""
+    owngroup = Db2Owngroup(manuhome_id=1,
+                           group_id=1,
+                           copy_id=0,
+                           status='3',
+                           sequence_number=1,
+                           reg_document_id='REG22911',
+                           can_document_id='42400339',
+                           tenancy_type='TC',
+                           lessee='',
+                           lessor='',
+                           interest='UNDIVIDED 1/2',
+                           interest_numerator=1,
+                           tenancy_specified='Y')
+
+    test_json = {
+        'groupId': owngroup.group_id,
+        'type': 'COMMON',
+        'status': 'ACTIVE',
+        'interest': 'UNDIVIDED',
+        'interestNumerator': owngroup.interest_numerator,
+        'interestDenominator': 2,
+        'tenancySpecified': True,
+        'owners': []
+    }
+    assert owngroup.registration_json == test_json
