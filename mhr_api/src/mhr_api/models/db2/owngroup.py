@@ -200,8 +200,8 @@ class Db2Owngroup(db.Model):
             interest_json = interest_json.replace(fraction, '')
             if self.interest != interest_json:
                 owngroup['interest'] = interest_json.strip()
-            if self.tenancy_specified == 'N':
-                owngroup['tenancySpecified'] = False
+        if self.tenancy_specified == 'N':
+            owngroup['tenancySpecified'] = False
         return owngroup
 
     @property
