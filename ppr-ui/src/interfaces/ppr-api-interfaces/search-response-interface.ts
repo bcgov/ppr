@@ -14,7 +14,6 @@ export interface SearchResponseIF {
   error?: ErrorIF,
   inProgress?: boolean,
   loadingPDF?: boolean,
-  isPdfRequested?: boolean, // UX flag for large searches (to display PDF icon on first load)
   userId?: string,
   username?: string
 }
