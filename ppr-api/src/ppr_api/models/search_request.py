@@ -399,7 +399,7 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
                     # Signal UI report pending if async report is not yet available.
                     if callback_url is not None and callback_url.lower() != 'none' and\
                             (doc_storage_url is None or doc_storage_url.lower() == 'none'):
-                        search_id = REPORT_STATUS_PENDING
+                        search_id += '_' + REPORT_STATUS_PENDING
                     search = {
                         'searchId': search_id,
                         'searchDateTime': model_utils.format_ts(search_ts),
