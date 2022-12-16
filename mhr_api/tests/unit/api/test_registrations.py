@@ -72,6 +72,18 @@ TEST_GET_ACCOUNT_DATA_SORT = [
     ('Sort submitting name', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, reg_utils.SUBMITTING_NAME_PARAM, None),
     ('Sort owner name', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, reg_utils.OWNER_NAME_PARAM, None)
 ]
+# testdata pattern is ({desc}, {roles}, {status}, {filter_name}, {filter_value})
+TEST_GET_ACCOUNT_DATA_FILTER = [
+    ('Filter mhr number', '2523', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, reg_utils.MHR_NUMBER_PARAM, '098487'),
+    ('Filter reg type', '2523', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, reg_utils.REG_TYPE_PARAM, 'REGISTER NEW UNIT'),
+    ('Filter reg status', '2523', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, reg_utils.STATUS_PARAM, 'ACTIVE'),
+    ('Filter reg date', '2523', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, reg_utils.REG_TS_PARAM,
+     '2021-10-14T09:53:57-07:53'),
+    ('Filter client ref', '2523', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, reg_utils.CLIENT_REF_PARAM, 'A000873'),
+    ('Filter user name', '2523', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, reg_utils.USER_NAME_PARAM, 'BCREG2'),
+    ('Filter submitting name', '2523', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, reg_utils.SUBMITTING_NAME_PARAM,
+     'CHAMPION')
+]
 
 
 @pytest.mark.parametrize('desc,roles,status,has_account,results_size', TEST_GET_ACCOUNT_DATA)
@@ -103,6 +115,8 @@ def test_get_account_registrations(session, client, jwt, desc, roles, status, ha
             assert registration['clientReferenceId'] is not None
             assert registration['ownerNames'] is not None
             assert registration['path'] is not None
+            if registration['registrationDescription'] == 'REGISTER NEW UNIT':
+                assert 'lienRegistrationType' in registration
 
 
 @pytest.mark.parametrize('desc,has_submitting,roles,status,has_account', TEST_CREATE_DATA)
@@ -168,6 +182,31 @@ def test_get_account_registrations_sort(session, client, jwt, desc, roles, statu
         params += f'&sortDirection={sort_direction}'
     # test
     current_app.logger.debug('params=' + params)
+    rv = client.get('/api/v1/registrations' + params,
+                    headers=headers)
+    # check
+    assert rv.status_code == status
+    assert rv.json
+    for registration in rv.json:
+        assert registration['mhrNumber']
+        assert registration['registrationDescription']
+        assert registration['statusType'] is not None
+        assert registration['createDateTime'] is not None
+        assert registration['username'] is not None
+        assert registration['submittingParty'] is not None
+        assert registration['clientReferenceId'] is not None
+        assert registration['ownerNames'] is not None
+        assert registration['path'] is not None
+
+
+@pytest.mark.parametrize('desc,account_id,roles,status,filter_name,filter_value', TEST_GET_ACCOUNT_DATA_FILTER)
+def test_get_account_registrations_filter(session, client, jwt, desc, account_id, roles, status, filter_name,
+                                          filter_value):
+    """Assert that a get account registrations summary list endpoint with filtering works as expected."""
+    # setup
+    headers = create_header_account(jwt, roles, 'test-user', account_id)
+    params = f'?{filter_name}={filter_value}'
+    # test
     rv = client.get('/api/v1/registrations' + params,
                     headers=headers)
     # check

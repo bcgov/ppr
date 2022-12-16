@@ -134,17 +134,17 @@ class MhrParty(db.Model):  # pylint: disable=too-many-instance-attributes
         party: MhrParty = MhrParty()
         party.party_type = party_type
         party.status_type = MhrOwnerStatusTypes.ACTIVE
-        if 'businessName' in json_data:
+        if json_data.get('businessName'):
             party.business_name = json_data['businessName'].strip().upper()
             party.compressed_name = model_utils.get_compressed_key(party.business_name)
-        elif 'organizationName' in json_data:
+        elif json_data.get('organizationName'):
             party.business_name = json_data['organizationName'].strip().upper()
             party.compressed_name = model_utils.get_compressed_key(party.business_name)
         elif json_data.get('individualName'):
             party.last_name = json_data['individualName']['last'].strip().upper()
             party.first_name = json_data['individualName']['first'].strip().upper()
             name = party.last_name + ' ' + party.first_name
-            if 'middle' in json_data['individualName']:
+            if json_data['individualName'].get('middle'):
                 party.middle_name = json_data['individualName']['middle'].strip().upper()
                 name += ' ' + party.middle_name
             party.compressed_name = model_utils.get_compressed_key(name)
@@ -152,16 +152,16 @@ class MhrParty(db.Model):  # pylint: disable=too-many-instance-attributes
             party.last_name = json_data['personName']['last'].strip().upper()
             party.first_name = json_data['personName']['first'].strip().upper()
             name = party.last_name + ' ' + party.first_name
-            if 'middle' in json_data['personName']:
+            if json_data['personName'].get('middle'):
                 party.middle_name = json_data['personName']['middle'].strip().upper()
                 name += ' ' + party.middle_name
             party.compressed_name = model_utils.get_compressed_key(name)
 
-        if 'emailAddress' in json_data:
+        if json_data.get('emailAddress'):
             party.email_id = json_data['emailAddress'].strip()
-        if 'phoneNumber' in json_data:
+        if json_data.get('phoneNumber'):
             party.phone_number = json_data['phoneNumber'].strip()
-        if 'phoneExtension' in json_data:
+        if json_data.get('phoneExtension'):
             party.phone_extension = json_data['phoneExtension'].strip()
 
         party.address = Address.create_from_json(json_data['address'])

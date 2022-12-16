@@ -102,8 +102,18 @@
     </tr>
     <tr class="no-page-break">
         <td colspan="3">
-            {% if location.locationType is defined and location.locationType == 'STRATA' %}STRATA {% endif %}
-            {{ location.legalDescription }}
+            <div>{{ location.legalDescription }}</div>
+            <div>
+                {% if location.bandName is defined and location.bandName != '' %}
+                    {{location.bandName}}&nbsp;
+                {% endif %}
+                {% if location.reserveNumber is defined and location.reserveNumber != '' %}
+                    {{location.reserveNumber}}&nbsp;
+                {% endif %}
+                {% if location.additionalDescription is defined and location.additionalDescription != '' %}
+                    {{ location.additionalDescription }}
+                {% endif %} 
+            </div>
         </td>
     </tr>
     {% elif location.hasLTSAInfo or (location.additionalDescription is defined and location.additionalDescription != '') %}
@@ -115,13 +125,13 @@
     <tr class="no-page-break">
         <td class="col-33">
             {% if location.lot is defined and location.lot != '' %}
-                <div>LOT: {{ location.lot }}</div>
+                <div>{% if location.locationType is defined and location.locationType == 'STRATA' %}STRATA {% endif %} LOT: {{ location.lot }}</div>
             {% endif %} 
             {% if location.landDistrict is defined and location.landDistrict != '' %}
                 <div>LAND DISTRICT: {{ location.landDistrict }}</div>
             {% endif %} 
             {% if location.plan is defined and location.plan != '' %}
-                <div>PLAN: {{ location.plan }}</div>
+                <div>{% if location.locationType is defined and location.locationType == 'STRATA' %}STRATA {% endif %} PLAN: {{ location.plan }}</div>
             {% endif %} 
             {% if location.districtLot is defined and location.districtLot != '' %}
                 <div>DISTRICT LOT: {{ location.districtLot }}</div>
@@ -153,9 +163,19 @@
                 <div>EXCEPT PLAN:</div>
                 <div class="pb-2">{{ location.exceptionPlan }}</div>
             {% endif %} 
-            {% if location.additionalDescription is defined and location.additionalDescription != '' %}
+            {% if (location.additionalDescription is defined and location.additionalDescription != '')  or (location.bandName is defined and location.bandName != '') or (location.reserveNumber is defined and location.reserveNumber != '') %}
                 <div>ADDITIONAL DESCRIPTION:</div>
-                <div>{{ location.additionalDescription }}</div>
+                <div>
+                    {% if location.bandName is defined and location.bandName != '' %}
+                        {{location.bandName}}&nbsp;
+                    {% endif %}
+                    {% if location.reserveNumber is defined and location.reserveNumber != '' %}
+                        {{location.reserveNumber}}&nbsp;
+                    {% endif %}
+                    {% if location.additionalDescription is defined and location.additionalDescription != '' %}
+                        {{ location.additionalDescription }}
+                    {% endif %} 
+                </div>
             {% endif %} 
         </td>
     </tr>

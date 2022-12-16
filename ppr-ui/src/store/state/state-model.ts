@@ -156,7 +156,8 @@ export const stateModel: StateModelIF = {
     statusType: '',
     submittingParty: '',
     username: '',
-    documentId: ''
+    documentId: '',
+    lienRegistrationType: ''
   },
   mhrRegistration: {
     documentId: '',
@@ -181,6 +182,7 @@ export const stateModel: StateModelIF = {
       phoneExtension: ''
     },
     ownerGroups: [],
+    isManualLocationInfo: false,
     attentionReferenceNum: '',
     location: {
       parkName: '',
@@ -210,7 +212,10 @@ export const stateModel: StateModelIF = {
       range: '',
       meridian: '',
       landDistrict: '',
-      plan: ''
+      plan: '',
+      bandName: '',
+      reserveNumber: '',
+      exceptPlan: ''
     },
     description: {
       manufacturer: '',

@@ -64,6 +64,27 @@
   [[search-result/details.html]]
   [[search-result/sections.html]]
   [[search-result/notes.html]]
+
+  <div class="no-page-break">
+    <div class="separator mt-5"></div>
+    <div class="section-title mt-3">Rebuilt Status</div>
+    {% if detail.description is defined and detail.description.rebuiltRemarks is defined and detail.description.rebuiltRemarks != '' %}
+      <div class="section-data pt-3">{{detail.description.rebuiltRemarks|safe}}</div>
+    {% else %}
+      <div class="section-data pt-3">N/A</div>
+    {% endif %}
+  </div>
+
+  <div class="no-page-break">
+    <div class="separator mt-5"></div>
+    <div class="section-title mt-3">Other Information</div>
+    {% if detail.description is defined and detail.description.otherRemarks is defined and detail.description.otherRemarks != '' %}
+      <div class="section-data pt-3">{{detail.description.otherRemarks|safe}}</div>
+    {% else %}
+      <div class="section-data pt-3">N/A</div>
+    {% endif %}
+  </div>
+
 </div>
 
 {% if detail.pprRegistrations is defined %}

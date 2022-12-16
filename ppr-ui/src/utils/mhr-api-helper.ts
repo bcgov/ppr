@@ -309,7 +309,12 @@ export async function submitMhrRegistration (payloadData, queryParamData) {
     }
   }
 }
-
+/**
+ * Method to return Mhr registrations.
+ *
+ * @param withCollapse // Used to indicate whether api should return registrations collapsed
+ * @returns MhRegistrationSummaryIF
+ */
 export async function mhrRegistrationHistory (withCollapse: boolean = false) {
   try {
     const path = withCollapse ? 'registrations?collapse=true' : 'registrations'
@@ -568,4 +573,9 @@ export async function deleteMhrDraft (draftID: string): Promise<ErrorIF> {
     .then(response => {
       return { statusCode: response?.status as StatusCodes }
     })
+}
+
+// UX util function to delay any actions for defined number of milliseconds
+export function delayActions (milliseconds: number): Promise<any> {
+  return new Promise(resolve => setTimeout(resolve, milliseconds))
 }

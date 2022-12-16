@@ -51,6 +51,8 @@ class MhrLocation(db.Model):  # pylint: disable=too-many-instance-attributes
     meridian = db.Column('meridian', db.String(10), nullable=True)
     land_district = db.Column('land_district', db.String(30), nullable=True)
     plan = db.Column('plan', db.String(20), nullable=True)
+    band_name = db.Column('band_name', db.String(150), nullable=True)
+    reserve_number = db.Column('reserve_number', db.String(20), nullable=True)
 
     # parent keys
     address_id = db.Column('address_id', db.Integer, db.ForeignKey('addresses.id'), nullable=True, index=True)
@@ -70,7 +72,7 @@ class MhrLocation(db.Model):  # pylint: disable=too-many-instance-attributes
                                    back_populates='locations', cascade='all, delete', uselist=False)
 
     @property
-    def json(self) -> dict:  # pylint: disable=too-many-branches
+    def json(self) -> dict:  # pylint: disable=too-many-branches, too-many-statements
         """Return the location as a json object."""
         location = {
             'locationId': self.id,
@@ -118,13 +120,18 @@ class MhrLocation(db.Model):  # pylint: disable=too-many-instance-attributes
         else:
             location['taxCertificate'] = False
         if self.tax_certification_date:
-            location['taxCertificateDate'] = model_utils.format_ts(self.tax_certification_date)
+            location['taxExpiryDate'] = model_utils.format_ts(self.tax_certification_date)
         if self.exception_plan:
             location['exceptionPlan'] = self.exception_plan
         if self.dealer_name:
             location['dealerName'] = self.dealer_name
         if self.additional_description:
             location['additionalDescription'] = self.additional_description
+        if self.location_type == MhrLocationTypes.RESERVE:
+            if self.band_name:
+                location['bandName'] = self.band_name
+            if self.reserve_number:
+                location['reserveNumber'] = self.reserve_number
         return location
 
     @classmethod
@@ -168,40 +175,45 @@ class MhrLocation(db.Model):  # pylint: disable=too-many-instance-attributes
         if registration_id:
             location.registration_id = registration_id
             location.change_registration_id = registration_id
-        if 'legalDescription' in json_data:
+        if json_data.get('legalDescription'):
             location.ltsa_description = json_data['legalDescription'].strip()
-        if 'parkName' in json_data:
+        if json_data.get('parkName'):
             location.park_name = json_data['parkName'].strip()
-        if 'pad' in json_data:
+        if json_data.get('pad'):
             location.park_pad = json_data['pad'].strip()
-        if 'pidNumber' in json_data:
+        if json_data.get('pidNumber'):
             location.pid_number = json_data['pidNumber'].strip()
-        if 'parcel' in json_data:
+        if json_data.get('parcel'):
             location.parcel = json_data['parcel'].strip()
-        if 'block' in json_data:
+        if json_data.get('block'):
             location.block = json_data['block'].strip()
-        if 'districtLot' in json_data:
+        if json_data.get('districtLot'):
             location.district_lot = json_data['districtLot'].strip()
-        if 'partOf' in json_data:
+        if json_data.get('partOf'):
             location.part_of = json_data['partOf'].strip()
-        if 'section' in json_data:
+        if json_data.get('section'):
             location.section = json_data['section'].strip()
-        if 'township' in json_data:
+        if json_data.get('township'):
             location.township = json_data['township'].strip()
-        if 'range' in json_data:
+        if json_data.get('range'):
             location.range = json_data['range'].strip()
-        if 'meridian' in json_data:
+        if json_data.get('meridian'):
             location.meridian = json_data['meridian'].strip()
-        if 'landDistrict' in json_data:
+        if json_data.get('landDistrict'):
             location.land_district = json_data['landDistrict'].strip()
-        if 'plan' in json_data:
+        if json_data.get('plan'):
             location.plan = json_data['plan'].strip()
-        if 'exceptionPlan' in json_data:
+        if json_data.get('exceptionPlan'):
             location.exception_plan = json_data['exceptionPlan'].strip()
-        if 'dealerName' in json_data:
+        if json_data.get('dealerName'):
             location.dealer_name = json_data['dealerName'].strip()
-        if 'additionalDescription' in json_data:
+        if json_data.get('additionalDescription'):
             location.additional_description = json_data['additionalDescription'].strip()
+        if location.location_type == MhrLocationTypes.RESERVE:
+            if json_data.get('bandName'):
+                location.band_name = json_data['bandName'].strip().upper()
+            if json_data.get('reserveNumber'):
+                location.reserve_number = json_data['reserveNumber'].strip()
         if json_data.get('leaveProvince'):
             location.leave_province = 'Y'
         else:
@@ -211,7 +223,7 @@ class MhrLocation(db.Model):  # pylint: disable=too-many-instance-attributes
         else:
             location.tax_certification = 'N'
 
-        if json_data.get('taxCertificateDate', None):
-            location.tax_certification_date = model_utils.ts_from_iso_format(json_data.get('taxCertificateDate'))
+        if json_data.get('taxExpiryDate', None):
+            location.tax_certification_date = model_utils.ts_from_iso_format(json_data.get('taxExpiryDate'))
 
         return location

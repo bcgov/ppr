@@ -30,6 +30,37 @@
                 </p>
               </v-col>
             </v-row>
+
+            <!-- Lien Information -->
+            <v-row v-if="hasLien && !isReviewMode" id="lien-information" no-gutters>
+              <v-card outlined id="important-message" class="rounded-0 mt-2 pt-5 px-5">
+                <v-icon color="error" class="float-left mr-2 mt-n1">mdi-alert</v-icon>
+                <p class="d-block pl-8">
+                  <strong>Important:</strong> There is a lien against this manufactured home preventing transfer. This
+                  registration cannot be transferred until all liens filed in the Personal Property Registry (PPR)
+                  against the manufactured home have been discharged or a written consent from each secured party named
+                  in such lien(s) is provided. You can view liens against the manufactured home in the PPR by conducting
+                  a combined Manufactured Home Registry and PPR search.
+                </p>
+              </v-card>
+
+              <v-col class="mt-3">
+                <v-btn
+                  outlined
+                  color="primary"
+                  class="mt-2 px-6"
+                  :ripple="false"
+                  data-test-id="lien-search-btn"
+                  @click="quickMhrSearch(getMhrInformation.mhrNumber)"
+                >
+                  <v-icon class="pr-1">mdi-magnify</v-icon>
+                  Conduct a Combined MHR and PPR Search for MHR Number
+                  <strong>{{ getMhrInformation.mhrNumber }}</strong>
+                </v-btn>
+                <v-divider class="mx-0 mt-10 mb-6" />
+              </v-col>
+            </v-row>
+
             <header id="yellow-message-bar" class="message-bar" v-if="isReviewMode">
               <label><b>Important:</b> This information must match the information on the bill of sale.</label>
             </header>
@@ -168,13 +199,20 @@
 import { computed, defineComponent, onMounted, reactive, ref, toRefs, watch } from '@vue/composition-api'
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
-import { ActionTypes, RouteNames } from '@/enums'
+import {
+  ActionTypes,
+  APIMHRMapSearchTypes,
+  APISearchTypes,
+  RouteNames,
+  UIMHRSearchTypes
+} from '@/enums'
 import {
   createMhrTransferDraft,
   deleteMhrDraft,
   fetchMhRegistration,
   getAccountInfoFromAuth,
   getMhrTransferDraft,
+  mhrSearch,
   pacificDate,
   submitMhrTransfer,
   updateMhrDraft
@@ -190,7 +228,9 @@ import { BaseAddress } from '@/composables/address'
 import { unsavedChangesDialog, registrationSaveDraftError } from '@/resources/dialogOptions'
 import { cloneDeep } from 'lodash'
 import AccountInfo from '@/components/common/AccountInfo.vue'
-import { AccountInfoIF, MhrTransferApiIF, RegTableNewItemI } from '@/interfaces' // eslint-disable-line no-unused-vars
+import {
+  AccountInfoIF, MhrSearchCriteriaIF, MhrTransferApiIF, RegTableNewItemI // eslint-disable-line no-unused-vars
+} from '@/interfaces'
 
 export default defineComponent({
   name: 'MhrInformation',
@@ -223,13 +263,15 @@ export default defineComponent({
       getMhrInformation,
       getMhrTransferCurrentHomeOwners,
       getCertifyInformation,
-      hasUnsavedChanges
+      hasUnsavedChanges,
+      hasLien
     } = useGetters<any>([
       'getMhrTransferHomeOwners',
       'getMhrInformation',
       'getMhrTransferCurrentHomeOwners',
       'getCertifyInformation',
-      'hasUnsavedChanges'
+      'hasUnsavedChanges',
+      'hasLien'
     ])
 
     const {
@@ -237,13 +279,17 @@ export default defineComponent({
       setMhrTransferCurrentHomeOwnerGroups,
       setMhrTransferAttentionReference,
       setUnsavedChanges,
-      setRegTableNewItem
+      setRegTableNewItem,
+      setSearchedType,
+      setManufacturedHomeSearchResults
     } = useActions<any>([
       'setMhrTransferHomeOwnerGroups',
       'setMhrTransferCurrentHomeOwnerGroups',
       'setMhrTransferAttentionReference',
       'setUnsavedChanges',
-      'setRegTableNewItem'
+      'setRegTableNewItem',
+      'setSearchedType',
+      'setManufacturedHomeSearchResults'
     ])
 
     const { setEmptyMhrTransfer } = useActions<any>(['setEmptyMhrTransfer'])
@@ -292,7 +338,8 @@ export default defineComponent({
         // is valid on first step
         return !isGlobalEditingMode.value &&
           localState.isValidTransferOwners &&
-          localState.isTransferDetailsFormValid
+          localState.isTransferDetailsFormValid &&
+          !hasLien.value
       }),
       isValidTransferReview: computed((): boolean => {
         // is valid on review step
@@ -304,6 +351,8 @@ export default defineComponent({
         )
       }),
       transferErrorMsg: computed((): string => {
+        if (hasLien.value && localState.validate) return '< Lien on this home is preventing transfer'
+
         const isValidReview = localState.isReviewMode ? !localState.isValidTransferReview : !localState.isValidTransfer
         const errorMsg = '< Please complete required information'
         return localState.validate && isValidReview ? errorMsg : ''
@@ -380,15 +429,23 @@ export default defineComponent({
       }
     }
 
-    const scrollToFirstError = async () => {
+    const scrollToFirstError = async (scrollToTop: boolean = false): Promise<void> => {
       setTimeout(() => {
-        document.getElementsByClassName('border-error-left').length > 0 &&
+        scrollToTop
+          ? document.getElementById('mhr-information-header').scrollIntoView({ behavior: 'smooth' })
+          : document.getElementsByClassName('border-error-left').length > 0 &&
         document.getElementsByClassName('border-error-left')[0].scrollIntoView({ behavior: 'smooth' })
       }, 10)
     }
 
     const goToReview = async (): Promise<void> => {
       localState.validate = true
+
+      // Prevent proceeding when Lien present
+      if (hasLien.value) {
+        await scrollToFirstError(true)
+        return
+      }
 
       // If already in review mode, file the transfer
       if (localState.isReviewMode) {
@@ -455,7 +512,7 @@ export default defineComponent({
         goToDash()
       } else {
         localState.showSaveDialog = true
-        console.log(mhrTransferDraft?.error)
+        console.error(mhrTransferDraft?.error)
       }
     }
 
@@ -479,6 +536,37 @@ export default defineComponent({
       }
       localState.showCancelDialog = false
       localState.showSaveDialog = false
+    }
+
+    const quickMhrSearch = async (mhrNumber: string): Promise<void> => {
+      localState.loading = true
+
+      // Search for current Manufactured Home Registration Number
+      const results = await mhrSearch({
+        type: APISearchTypes.MHR_NUMBER,
+        criteria: { value: mhrNumber },
+        clientReferenceId: ''
+      }, '')
+
+      localState.loading = false
+      if (results) {
+        // Set search type to satisfy UI requirements
+        await setSearchedType({
+          searchTypeUI: UIMHRSearchTypes.MHRMHR_NUMBER,
+          searchTypeAPI: APIMHRMapSearchTypes.MHRMHR_NUMBER
+        })
+
+        // There is only 1 result for a mhr number search
+        // Include lien info by default
+        results.results[0].includeLienInfo = true
+
+        await setManufacturedHomeSearchResults(results)
+        await context.root.$router.replace({
+          name: RouteNames.MHRSEARCH
+        })
+      } else {
+        console.error('Error: MHR_NUMBER expected, but not found.')
+      }
     }
 
     watch(
@@ -528,9 +616,12 @@ export default defineComponent({
       getCertifyInformation,
       maxLength,
       isRefNumValid,
-      ...toRefs(localState),
       transferDetailsComponent,
-      handleDialogResp
+      getMhrInformation,
+      quickMhrSearch,
+      handleDialogResp,
+      hasLien,
+      ...toRefs(localState)
     }
   }
 })
@@ -539,7 +630,19 @@ export default defineComponent({
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
 .sticky-container {
-  z-index: 7!important;
+  z-index: 4!important;
+}
+
+#important-message {
+  background-color: $backgroundError !important;
+  border-color: $error;
+
+  p {
+    line-height: 22px;
+    font-size: $px-14;
+    letter-spacing: 0.01rem;
+    color: $gray7;
+  }
 }
 
 .submitting-party {

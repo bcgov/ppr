@@ -39,6 +39,8 @@ class User(db.Model):
     lastname = db.Column(db.String(1000), nullable=True)
     email = db.Column(db.String(1024), nullable=True)
     iss = db.Column(db.String(1024), nullable=True)
+    idp_userid = db.Column(db.String(256), index=True)
+    login_source = db.Column(db.String(200), nullable=True)
 
     # Relationships - UserProfile
     user_profile = db.relationship('UserProfile', back_populates='user', uselist=False)
@@ -74,8 +76,7 @@ class User(db.Model):
     def find_by_jwt_token(cls, token: dict, account_id: str = None):
         """Return a User if they exist and match the provided JWT."""
         current_app.logger.debug(f'Running query to look up user profile for account {account_id}.')
-        # return cls.query.filter_by(sub=token['sub']).one_or_none()
-        return db.session.query(User).filter(User.sub == token['sub']).one_or_none()
+        return db.session.query(User).filter(User.idp_userid == token['idp_userid']).one_or_none()
 
     @classmethod
     def create_from_jwt_token(cls, token: dict, account_id: str = None):
@@ -100,7 +101,9 @@ class User(db.Model):
                 lastname=lastname,
                 iss=token['iss'],
                 sub=token['sub'],
-                account_id=account_id
+                account_id=account_id,
+                idp_userid=token['idp_userid'],
+                login_source=token['loginSource']
             )
             user.creation_date = model_utils.now_ts()
             current_app.logger.debug('Creating user from JWT:{}; User:{}'.format(token, user))

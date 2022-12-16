@@ -276,6 +276,7 @@ def get_account_registration_params(req: request, params: AccountRegistrationPar
     params.filter_client_reference_id = req.args.get(reg_utils.CLIENT_REF_PARAM, None)
     params.filter_submitting_name = req.args.get(reg_utils.SUBMITTING_NAME_PARAM, None)
     params.filter_username = req.args.get(reg_utils.USER_NAME_PARAM, None)
+    params.filter_registration_date = req.args.get(reg_utils.REG_TS_PARAM, None)
     # start_ts = req.args.get(reg_utils.START_TS_PARAM, None)
     # end_ts = req.args.get(reg_utils.END_TS_PARAM, None)
     # if start_ts and end_ts:
@@ -289,10 +290,24 @@ def get_account_registration_params(req: request, params: AccountRegistrationPar
             params.sort_direction = reg_utils.SORT_DESCENDING
     if params.filter_mhr_number:
         params.filter_mhr_number = model_utils.format_mhr_number(params.filter_mhr_number)
+        params.filter_mhr_number = remove_quotes(params.filter_mhr_number)
     if params.filter_submitting_name:
         params.filter_submitting_name = params.filter_submitting_name.strip().upper()
+        params.filter_submitting_name = remove_quotes(params.filter_submitting_name)
     if params.filter_username:
         params.filter_username = params.filter_username.strip().upper()
+        params.filter_username = remove_quotes(params.filter_username)
     if params.filter_client_reference_id:
         params.filter_client_reference_id = params.filter_client_reference_id.strip()
+        params.filter_client_reference_id = remove_quotes(params.filter_client_reference_id)
+    if params.filter_registration_date:
+        params.filter_registration_date = remove_quotes(params.filter_registration_date)
     return params
+
+
+def remove_quotes(text: str) -> str:
+    """Remove single and double quotation marks from request parameters."""
+    if text:
+        text = text.replace("'", '')
+        text = text.replace('"', '')
+    return text

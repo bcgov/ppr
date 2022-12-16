@@ -198,7 +198,7 @@ import { useActions, useGetters } from 'vuex-composition-helpers'
 import { HomeLocationTypes } from '@/enums'
 import { HomeLocationInfo, PidNumber } from '@/components/common'
 import HomeLocationDescription from './HomeLocationDescription.vue'
-import { useInputRules, useMhrValidations } from '@/composables'
+import { useInputRules, useMhrValidations, useNewMhrRegistration } from '@/composables'
 import { MhrLocationInfoIF } from '@/interfaces'
 import { PidInfoIF } from '@/interfaces/ltsa-api-interfaces'
 /* eslint-enable no-unused-vars */
@@ -223,11 +223,14 @@ export default defineComponent({
       'getMhrRegistrationValidationModel'
     ])
     const {
-      setMhrLocation
+      setMhrLocation,
+      setIsManualLocation
     } = useActions<any>([
-      'setMhrLocation'
+      'setMhrLocation',
+      'setIsManualLocation'
     ])
 
+    const { resetLocationInfoFields } = useNewMhrRegistration()
     const { customRules, maxLength, required } = useInputRules()
     const {
       MhrCompVal,
@@ -321,7 +324,7 @@ export default defineComponent({
       for (const [key, value] of Object.entries(val)) {
         setMhrLocation({ key: key, value: value })
       }
-    })
+    }, { deep: true })
     watch(() => localState.additionalDescription, () => {
       setMhrLocation({ key: 'additionalDescription', value: localState.additionalDescription })
     })
@@ -346,15 +349,18 @@ export default defineComponent({
       localState.otherTypeOption = null
       localState.dealerManufacturerLot = ''
       localState.toggleInfoForm = false
+      setIsManualLocation(false)
+      localState.locationInfo = resetLocationInfoFields(localState.locationInfo)
       validateForms()
     })
     watch(() => localState.otherTypeOption, () => {
       localState.pidNumber = ''
       localState.legalDescription = ''
-      localState.locationInfo = {}
       localState.additionalDescription = ''
       localState.showLocationInfo = false
       localState.toggleInfoForm = false
+      setIsManualLocation(false)
+      localState.locationInfo = resetLocationInfoFields(localState.locationInfo)
     })
     watch(() => localState.validate, () => {
       validateForms()

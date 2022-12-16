@@ -16,6 +16,7 @@ from flask import current_app
 
 from mhr_api.exceptions import DatabaseException
 from mhr_api.models import db, utils as model_utils
+from mhr_api.models.type_tables import MhrLocationTypes
 from mhr_api.utils.base import BaseEnum
 
 
@@ -193,7 +194,7 @@ class Db2Location(db.Model):
             'additionalDescription': self.additional_description
         }
         if self.tax_certificate_date:
-            location['taxCertificateDate'] = model_utils.format_local_date(self.tax_certificate_date)
+            location['taxExpiryDate'] = model_utils.format_local_date(self.tax_certificate_date)
         return location
 
     @property
@@ -238,7 +239,7 @@ class Db2Location(db.Model):
         if self.tax_certificate_date:
             tax_date = model_utils.format_local_date(self.tax_certificate_date)
             if tax_date:
-                location['taxCertificateDate'] = tax_date
+                location['taxExpiryDate'] = tax_date
         return location
 
     @property
@@ -284,7 +285,7 @@ class Db2Location(db.Model):
         if self.tax_certificate_date:
             tax_date = model_utils.format_local_date(self.tax_certificate_date)
             if tax_date:
-                location['taxCertificateDate'] = tax_date
+                location['taxExpiryDate'] = tax_date
         return location
 
     @staticmethod
@@ -320,9 +321,9 @@ class Db2Location(db.Model):
                                dealer_name=new_info.get('dealerName', ''),
                                additional_description=new_info.get('additionalDescription', ''))
 
-        if new_info.get('taxCertificateDate', None):
-            location.tax_certificate_date = model_utils.date_from_iso_format(new_info.get('taxCertificateDate'))
-
+        if new_info.get('taxExpiryDate', None):
+            tax_date: str = new_info.get('taxExpiryDate')
+            location.tax_certificate_date = model_utils.date_from_iso_format(tax_date[0:10])
         return location
 
     @staticmethod
@@ -338,6 +339,16 @@ class Db2Location(db.Model):
         else:  # Adjust; db table column length is 6.
             street_num = street[0:6]
             street_name = street[6:]
+        additional_desc = ''
+        if new_info.get('locationType') and new_info.get('locationType') == MhrLocationTypes.RESERVE:
+            if new_info.get('bandName'):
+                additional_desc += str(new_info.get('bandName')).strip().upper() + ' '
+            if new_info.get('reserveNumber'):
+                additional_desc += str(new_info.get('reserveNumber')).strip() + ' '
+        if new_info.get('additionalDescription'):
+            additional_desc += new_info.get('additionalDescription')
+        if additional_desc:
+            additional_desc = additional_desc[0:80]
         location = Db2Location(manuhome_id=registration.id,
                                location_id=1,
                                status=Db2Location.StatusTypes.ACTIVE,
@@ -366,15 +377,16 @@ class Db2Location(db.Model):
                                plan=new_info.get('plan', ''),
                                except_plan=new_info.get('exceptionPlan', ''),
                                dealer_name=new_info.get('dealerName', ''),
-                               additional_description=new_info.get('additionalDescription', ''),
+                               additional_description=additional_desc,
                                leave_bc='N',
                                tax_certificate='N')
         if new_info.get('leaveProvince'):
             location.leave_bc = 'Y'
         if new_info.get('taxCertificate'):
             location.tax_certificate = 'Y'
-        if new_info.get('taxCertificateDate', None):
-            location.tax_certificate_date = model_utils.date_from_iso_format(new_info.get('taxCertificateDate'))
+        if new_info.get('taxExpiryDate', None):
+            tax_date: str = new_info.get('taxExpiryDate')
+            location.tax_certificate_date = model_utils.date_from_iso_format(tax_date[0:10])
         else:
             location.tax_certificate_date = model_utils.date_from_iso_format('0001-01-01')
         return location

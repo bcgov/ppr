@@ -171,7 +171,7 @@ describe('Dashboard component', () => {
 
     defaultFlagSet['mhr-ui-enabled'] = true
     await store.dispatch('setAuthRoles', [AuthRoles.STAFF, AuthRoles.MHR, AuthRoles.PPR])
-    await expect(header.at(0).text()).toContain('Manufactured Home and Personal Property Registry Search')
+    await expect(header.at(0).text()).toContain('Manufactured Home and Personal Property Registries Search')
   })
 
   it('displays default search history header', () => {
