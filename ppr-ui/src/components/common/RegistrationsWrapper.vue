@@ -535,7 +535,19 @@ export default defineComponent({
       if (addReg.error) {
         myRegAddErrSetDialog(addReg.error)
       } else {
+        let parentRegNum = ''
+        if (regNum.toUpperCase() !== addReg.mhrNumber.toUpperCase()) {
+        // not a base registration so add parent reg num
+          parentRegNum = addReg.mhrNumber.toUpperCase()
+        }
         await fetchMhRegistrations()
+        const newRegItem: RegTableNewItemI = {
+          addedReg: regNum,
+          addedRegParent: parentRegNum,
+          addedRegSummary: addReg,
+          prevDraft: ''
+        }
+        setRegTableNewItem(newRegItem)
       }
       localState.loading = false
     }
