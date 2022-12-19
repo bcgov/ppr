@@ -68,7 +68,7 @@ import ButtonFooter from '@/components/common/ButtonFooter.vue'
 import { useHomeOwners, useMhrValidations, useNewMhrRegistration } from '@/composables'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 /* eslint-disable no-unused-vars */
-import { RegistrationTypeIF } from '@/interfaces'
+import { RegistrationTypeIF, RegTableNewItemI } from '@/interfaces'
 import { RegistrationLengthI } from '@/composables/fees/interfaces'
 import BaseDialog from '@/components/dialogs/BaseDialog.vue'
 import { registrationCompleteError } from '@/resources/dialogOptions'
@@ -105,7 +105,15 @@ export default defineComponent({
       'getMhrRegistrationValidationModel'
     ])
 
-    const { setEmptyMhr } = useActions<any>(['setEmptyMhr'])
+    const {
+      setEmptyMhr,
+      setUnsavedChanges,
+      setRegTableNewItem
+    } = useActions<any>([
+      'setEmptyMhr',
+      'setUnsavedChanges',
+      'setRegTableNewItem'
+    ])
 
     const {
       MhrCompVal,
@@ -212,6 +220,14 @@ export default defineComponent({
         if (!mhrSubmission.error && mhrSubmission?.mhrNumber) {
           resetAllValidations()
           setShowGroups(false)
+          const newRegItem: RegTableNewItemI = {
+            addedReg: mhrSubmission.documentRegistrationNumber,
+            addedRegParent: '',
+            addedRegSummary: mhrSubmission,
+            prevDraft: mhrSubmission.documentId
+          }
+          setRegTableNewItem(newRegItem)
+          setUnsavedChanges(false)
           await context.root.$router.push({ name: RouteNames.DASHBOARD })
         } else {
           console.log(mhrSubmission?.error) // Handle Schema or Api errors here..
