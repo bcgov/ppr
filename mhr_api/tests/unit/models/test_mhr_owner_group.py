@@ -127,6 +127,6 @@ def test_create_from_json(session):
     assert group.tenancy_specified == 'Y'
     assert group.tenancy_type == MhrTenancyTypes.COMMON
     assert group.status_type == MhrOwnerStatusTypes.ACTIVE
-    assert group.interest == 'UNDIVIDED 4/5'
+    assert group.interest == 'UNDIVIDED'
     assert group.interest_numerator == 4
     assert group.interest_denominator == 5

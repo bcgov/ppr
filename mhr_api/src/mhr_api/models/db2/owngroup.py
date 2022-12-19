@@ -15,7 +15,7 @@
 from flask import current_app
 
 from mhr_api.exceptions import DatabaseException
-from mhr_api.models import db
+from mhr_api.models import db, utils as model_utils
 from mhr_api.models.db2.owner import Db2Owner
 from mhr_api.utils.base import BaseEnum
 
@@ -181,18 +181,27 @@ class Db2Owngroup(db.Model):
             'groupId': self.group_id,
             'copyId': self.copy_id,
             'sequenceNumber': self.sequence_number,
-            'status': self.status,
+            'status': LEGACY_STATUS_NEW.get(self.status),
             'pendingFlag': self.pending_flag,
             'registrationDocumentId': self.reg_document_id,
             'canDocumentId': self.can_document_id,
-            'tenancyType': self.tenancy_type,
+            'type': LEGACY_TENANCY_NEW.get(self.tenancy_type),
             'lessee': self.lessee,
             'lessor': self.lessor,
             'interest': self.interest,
             'interestNumerator': self.get_interest_fraction(True),
             'interestDenominator': self.get_interest_fraction(False),
-            'tenancySpecified': self.tenancy_specified
+            'tenancySpecified': True
         }
+        # Remove fraction from interest description for UI.
+        if self.tenancy_type == self.TenancyTypes.COMMON and self.interest:
+            fraction: str = str(owngroup.get('interestNumerator')) + '/' + str(owngroup.get('interestDenominator'))
+            interest_json: str = owngroup.get('interest')
+            interest_json = interest_json.replace(fraction, '')
+            if self.interest != interest_json:
+                owngroup['interest'] = interest_json.strip()
+        if self.tenancy_specified == 'N':
+            owngroup['tenancySpecified'] = False
         return owngroup
 
     @property
@@ -208,6 +217,13 @@ class Db2Owngroup(db.Model):
             'interestDenominator': self.get_interest_fraction(False),
             'tenancySpecified': True
         }
+        # Remove fraction from interest description for UI.
+        if self.tenancy_type == self.TenancyTypes.COMMON and self.interest:
+            fraction: str = str(group.get('interestNumerator')) + '/' + str(group.get('interestDenominator'))
+            interest_json: str = group.get('interest')
+            interest_json = interest_json.replace(fraction, '')
+            if self.interest != interest_json:
+                group['interest'] = interest_json.strip()
         if self.tenancy_specified == 'N':
             group['tenancySpecified'] = False
         owners = []
@@ -261,7 +277,14 @@ class Db2Owngroup(db.Model):
         """Create a new owner group object from a new MH registration."""
         # current_app.logger.info('group group id=' + str(group_id))
         # current_app.logger.info(new_info)
-        tenancy = new_info.get('type', Db2Owngroup.TenancyTypes.SOLE)
+        tenancy: str = new_info.get('type', Db2Owngroup.TenancyTypes.SOLE)
+        tenancy_type: str = NEW_TENANCY_LEGACY.get(tenancy)
+        interest: str = new_info.get('interest', '')
+        if tenancy_type == Db2Owngroup.TenancyTypes.COMMON:
+            if not interest:  # This should never happen.
+                interest = model_utils.OWNER_INTEREST_UNDIVIDED
+            elif interest and len(interest) <= 10 and not interest.startswith(model_utils.OWNER_INTEREST_UNDIVIDED):
+                interest = model_utils.OWNER_INTEREST_UNDIVIDED + ' ' + interest
         owngroup = Db2Owngroup(manuhome_id=registration.id,
                                group_id=group_id,
                                copy_id=0,
@@ -270,10 +293,10 @@ class Db2Owngroup(db.Model):
                                pending_flag='',
                                reg_document_id=new_info.get('documentId', ''),
                                can_document_id='',
-                               tenancy_type=NEW_TENANCY_LEGACY.get(tenancy),
+                               tenancy_type=tenancy_type,
                                lessee=new_info.get('lessee', ''),
                                lessor=new_info.get('lessor', ''),
-                               interest=new_info.get('interest', ''),
+                               interest=interest,
                                interest_numerator=new_info.get('interestNumerator', 0),
                                tenancy_specified=new_info.get('tenancySpecified', 'Y'))
         owngroup.interest_denominator = new_info.get('interestDenominator', 0)
