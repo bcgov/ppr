@@ -221,7 +221,7 @@ export default defineComponent({
           resetAllValidations()
           setShowGroups(false)
           const newRegItem: RegTableNewItemI = {
-            addedReg: mhrSubmission.documentRegistrationNumber,
+            addedReg: mhrSubmission.mhrNumber,
             addedRegParent: '',
             addedRegSummary: mhrSubmission,
             prevDraft: mhrSubmission.documentId
