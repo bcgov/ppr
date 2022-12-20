@@ -16,8 +16,8 @@
 from flask import current_app
 
 from mhr_api.exceptions import DatabaseException
-from mhr_api.models import utils as model_utils
-from mhr_api.models import db
+from mhr_api.models import db, utils as model_utils
+from mhr_api.models.db2 import address_utils
 from mhr_api.utils.base import BaseEnum
 
 
@@ -227,7 +227,7 @@ class Db2Document(db.Model):
         """Build submitting party JSON from the document information."""
         party = {
             'businessName': self.name,
-            'address': model_utils.get_address_from_db2(self.legacy_address)
+            'address': address_utils.get_address_from_db2(self.legacy_address)
         }
         if self.phone_number:
             party['phoneNumber'] = self.phone_number
@@ -314,7 +314,7 @@ class Db2Document(db.Model):
             else:
                 ind_name: str = model_utils.to_db2_ind_name(submitting.get('personName'))
                 doc.name = ind_name[0:39]
-            doc.legacy_address = model_utils.to_db2_address(submitting.get('address'))
+            doc.legacy_address = address_utils.to_db2_address(submitting.get('address'))
         else:
             doc.phone_number = ''
             doc.name = ''

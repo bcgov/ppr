@@ -21,7 +21,9 @@ import pytest
 
 from flask import current_app
 
-from mhr_api.models import Db2Mhomnote, utils as model_utils
+from mhr_api.models import Db2Mhomnote
+from mhr_api.models.db2 import address_utils
+
 
 # testdata pattern is ({exists}, {manuhome_id}, {doc_id}, {doc_type}, {expiry}, {count})
 TEST_DATA = [
@@ -116,7 +118,7 @@ def test_note_json(session):
         'remarks': note.remarks,
         'destroyed': False,
         'contactName': note.name,
-        'contactAddress': model_utils.get_address_from_db2(note.legacy_address, ''),
+        'contactAddress': address_utils.get_address_from_db2(note.legacy_address),
         'contactPhoneNumber': note.phone_number
     }
     assert note.json == test_json

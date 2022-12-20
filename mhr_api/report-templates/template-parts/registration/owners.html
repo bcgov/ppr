@@ -26,19 +26,16 @@
 {% endif %}
 
 {% if ownerGroups is defined %}
-    {# % if ownerGroups|length > 1 %}
-    <div class="no-page-break mt-3">
-        <span class="section-sub-title">Home Tenancy Type:</span>
-        <span class="section-data">Tenants in Common</span>
-    </div>
-    <div class="separator-section mt-3"></div>
-    {% endif % #}
     {% for group in ownerGroups %}
-        {% if ownerGroups|length > 1 %}
+        {% if ownerGroups|length > 1 and group.type == 'COMMON' %}
         <div class="mt-3">
             <span class="section-sub-title">Group {{ group.groupId }}:&nbsp;</span>
             {% if group.interest is defined and group.interest != '' %}
-                <span class="section-data">Interest {{ group.interest|lower }}</span>
+                <span class="section-data">Interest {{ group.interest|lower }}
+                    {% if group.interestNumerator is defined and group.interestDenominator is defined %}
+                        {{ group.interestNumerator }}/{{ group.interestDenominator }}
+                    {% endif %}
+                </span>
             {% endif %}
         </div>
         {% endif %}
@@ -93,7 +90,11 @@
         <div class="mt-3">
             <span class="section-sub-title">Group {{ group.groupId }}:&nbsp;</span>
             {% if group.interest is defined and group.interest != '' %}
-                <span class="section-data">Interest {{ group.interest|lower }}</span>
+                <span class="section-data">Interest {{ group.interest|lower }}
+                    {% if group.interestNumerator is defined and group.interestDenominator is defined %}
+                        {{ group.interestNumerator }}/{{ group.interestDenominator }}
+                    {% endif %}
+                </span>
             {% endif %}
         </div>
         {% endif %}

@@ -21,7 +21,8 @@ import pytest
 
 from flask import current_app
 
-from mhr_api.models import Db2Manufact, utils as model_utils
+from mhr_api.models import Db2Manufact
+from mhr_api.models.db2 import address_utils
 
 
 # testdata pattern is ({exists}, {id}, {park_name}, {pad}, {street_num}, {street}, {city}. {count})
@@ -155,7 +156,7 @@ def test_manufact_json(session):
         'submittingParty': {
             'businessName': manufacturer.submitting_party_name,
             'phoneNumber': manufacturer.submitting_party_phone,
-            'address': model_utils.get_address_from_db2_manufact(manufacturer.submitting_party_address)
+            'address': address_utils.get_address_from_db2_manufact(manufacturer.submitting_party_address)
         },
         'owner': {
             'businessName': manufacturer.owner_name,
