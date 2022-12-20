@@ -71,6 +71,8 @@ export const useMhrInformation = () => {
 
     getMhrTransferHomeOwnerGroups.value.forEach(ownerGroup => {
       if (ownerGroup.action !== ActionTypes.REMOVED || isDraft) {
+        ownerGroup.interestDenominator = ownerGroup.interestDenominator || 0
+        ownerGroup.interestNumerator = ownerGroup.interestNumerator || 0
         ownerGroups.push({
           ...ownerGroup,
           owners: isDraft ? ownerGroup.owners : ownerGroup.owners.filter(owner => owner.action !== ActionTypes.REMOVED),
