@@ -19,6 +19,7 @@ from sqlalchemy.sql import text
 
 from mhr_api.exceptions import DatabaseException
 from mhr_api.models import db, utils as model_utils
+from mhr_api.models.db2 import address_utils
 
 
 OWNERS_QUERY = """
@@ -160,7 +161,7 @@ class Db2Owner(db.Model):
             owner['organizationName'] = self.name
         if self.phone_number:
             owner['phoneNumber'] = self.phone_number
-        owner['address'] = model_utils.get_address_from_db2(self.legacy_address, self.postal_code)
+        owner['address'] = address_utils.get_address_from_db2_owner(self.legacy_address, self.postal_code)
         owner['type'] = self.type
         if self.status == '3':
             owner['status'] = 'ACTIVE'
@@ -185,7 +186,7 @@ class Db2Owner(db.Model):
             owner['organizationName'] = self.name
         if self.phone_number:
             owner['phoneNumber'] = self.phone_number
-        owner['address'] = model_utils.get_address_from_db2(self.legacy_address, self.postal_code)
+        owner['address'] = address_utils.get_address_from_db2_owner(self.legacy_address, self.postal_code)
         if self.suffix:
             owner['suffix'] = self.suffix
         return owner
@@ -233,5 +234,5 @@ class Db2Owner(db.Model):
                          name=name[0:69],
                          compressed_name=compressed_name,
                          suffix=new_info.get('suffix', ''),
-                         legacy_address=model_utils.to_db2_address(address))
+                         legacy_address=address_utils.to_db2_address(address))
         return owner

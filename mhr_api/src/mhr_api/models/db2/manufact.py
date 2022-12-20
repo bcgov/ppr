@@ -15,7 +15,8 @@
 from flask import current_app
 
 from mhr_api.exceptions import DatabaseException
-from mhr_api.models import db, utils as model_utils
+from mhr_api.models import db
+from mhr_api.models.db2 import address_utils
 
 
 class Db2Manufact(db.Model):
@@ -107,7 +108,7 @@ class Db2Manufact(db.Model):
             'submittingParty': {
                 'businessName': self.submitting_party_name,
                 'phoneNumber': self.submitting_party_phone,
-                'address': model_utils.get_address_from_db2_manufact(self.submitting_party_address)
+                'address': address_utils.get_address_from_db2_manufact(self.submitting_party_address)
             },
             'owner': {
                 'businessName': self.owner_name,
@@ -116,7 +117,7 @@ class Db2Manufact(db.Model):
                     'street': self.street_number + ' ' + self.street_name,
                     'city': self.town_city,
                     'region': self.province,
-                    'country': model_utils.get_country_from_province(self.province),
+                    'country': address_utils.get_country_from_region(self.province),
                     'postalCode': self.owner_postal_code
                 }
             },
