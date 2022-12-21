@@ -275,9 +275,19 @@ class SBCPaymentClient(BaseClient):
             data = SBCPaymentClient.create_payment_search_data(selections, mhr_id, client_reference_id, False)
             for filing_type in data['filingInfo']['filingTypes']:
                 filing_type['waiveFees'] = True
+            if transaction_info.get('certified'):
+                extra_fee = copy.deepcopy(PAYMENT_FILING_TYPE_TEMPLATE)
+                extra_fee['filingTypeCode'] = TRANSACTION_TO_FILING_TYPE[TransactionTypes.CERTIFIED.value]
+                extra_fee['waiveFees'] = True
+                data['filingInfo']['filingTypes'].append(extra_fee)
             return data
 
         data = SBCPaymentClient.create_payment_search_data(selections, mhr_id, client_reference_id, True)
+        # conditionally set up the certified copy fee
+        if transaction_info.get('certified'):
+            extra_fee = copy.deepcopy(PAYMENT_FILING_TYPE_TEMPLATE)
+            extra_fee['filingTypeCode'] = TRANSACTION_TO_FILING_TYPE[TransactionTypes.CERTIFIED.value]
+            data['filingInfo']['filingTypes'].append(extra_fee)
         # set up FAS payment
         if 'routingSlipNumber' in transaction_info:
             account_info = {

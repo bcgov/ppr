@@ -152,8 +152,9 @@ SELECT_4_IND = {
 
 # testdata pattern is ({description}, {search data}, {select data})
 TEST_VALID_DATA = [
-    ('MHR Number Match', MHR_NUMBER_JSON, SET_SELECT_MM),
-    ('MHR Number No Match', MHR_NUMBER_NIL_JSON, SET_SELECT_NIL)
+    ('MHR Number Match not certified', MHR_NUMBER_JSON, SET_SELECT_MM, False),
+    ('MHR Number Match certified', MHR_NUMBER_JSON, SET_SELECT_MM, True),
+    ('MHR Number No Match', MHR_NUMBER_NIL_JSON, SET_SELECT_NIL, False)
 ]
 
 # testdata pattern is ({description}, {JSON data}, {search id})
@@ -197,12 +198,12 @@ TEST_SELECT_SORT_DATA_IND = [
 ]
 
 
-@pytest.mark.parametrize('desc,search_data,select_data', TEST_VALID_DATA)
-def test_search_valid_db2(session, desc, search_data, select_data):
+@pytest.mark.parametrize('desc,search_data,select_data,certified', TEST_VALID_DATA)
+def test_search_valid(session, desc, search_data, select_data,certified):
     """Assert that search detail results on registration matches returns the expected result."""
     # test
     search_query = SearchRequest.create_from_json(search_data, 'PS12345')
-    search_query.search_db2()
+    search_query.search()
     # current_app.logger.info(search_query.json)
     search_detail = SearchResult.create_from_search_query(search_query)
     search_detail.save()
@@ -212,17 +213,21 @@ def test_search_valid_db2(session, desc, search_data, select_data):
     assert not search_detail.search_select
 
     search_detail2 = SearchResult.validate_search_select(select_data, search_detail.search_id)
-    search_detail2.update_selection(select_data)
+    search_detail2.update_selection(select_data, 'account name', None, certified)
 
     # check
     # current_app.logger.debug(search_detail2.search_select)
     if select_data:
       assert search_detail2.search_select
     result = search_detail2.json
-    current_app.logger.debug(result)
+    # current_app.logger.debug(result)
 
     assert result['searchDateTime']
     assert result['searchQuery']
+    if certified:
+        assert result.get('certified')
+    else:
+        assert not result.get('certified')
     if select_data:
       assert result['details']
       assert result['totalResultsSize'] == 1
