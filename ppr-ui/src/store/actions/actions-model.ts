@@ -171,7 +171,9 @@ export const setSearchHistory: ActionIF = ({ commit }, searchHistory: Array<Sear
   //  - if it starts as undefined it wont trigger on change
   for (let i = 0; i < searchHistory?.length || 0; i++) {
     searchHistory[i].loadingPDF = false
-    searchHistory[i].isPdfRequested = false
+    // parse the response from API to check if searchId has Pending suffix (for large reports)
+    searchHistory[i].isPending = searchHistory[i].searchId.endsWith('PENDING')
+    searchHistory[i].searchId = searchHistory[i].searchId.split('_')[0]
   }
   commit('mutateSearchHistory', searchHistory)
 }
