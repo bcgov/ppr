@@ -334,7 +334,6 @@ export default defineComponent({
           // set to pending if submit was not finished
           if (item.inProgress) {
             item.loadingPDF = false
-            // item.searchId = 'PENDING'
             item.isPending = true
           }
         }, 5000)
