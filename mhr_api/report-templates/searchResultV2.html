@@ -30,32 +30,69 @@
       </div>
     {% endif %}
 
-      <table class="business-details-table" role="presentation">
+    {% if certified %}
+      <table class="certified-details-table" role="presentation">
         <tr>
-          <td class="lbl-business-detail">Search Date and Time:</td>
-          <td colspan="2">{{searchDateTime}}</td>
-        </tr>
-        <tr>
-          <td class="lbl-business-detail">Account Name:</td>
-          <td colspan="2">
+          <td class="lbl-business-detail">
+            <div>Search Date and Time:</div>
+            <div>Account Name:</div>
+            <div>Folio Number:</div>
+          </td>
+          <td>
+            <div>{{searchDateTime}}</div>
+            <div>
               {% if meta_account_name is defined %}
                 {{meta_account_name}}
               {% else %}
                 Not available.
               {% endif %}
-          </td>
-        </tr>
-        <tr>
-          <td class="lbl-business-detail">Folio Number:</td>
-          <td colspan="2">
+            </div>
+            <div>
               {% if searchQuery.clientReferenceId is defined and searchQuery.clientReferenceId != "" %}
                 {{searchQuery.clientReferenceId}}
               {% else %}
                 N/A
               {% endif %}
+            </div>              
           </td>
-        </tr>
+          <td class="registar-certify-section">
+            <div class="certified-copy-text">CERTIFIED COPY</div>
+            <div class="doc-description">of a document filed with the</div>
+            <div class="doc-description">Province of British Columbia</div>
+            <div class="registrar-title">Registrar of Manufactured Homes</div>
+            [[registrarSignature.html]]
+            <div class="registrar-name">T.K. SPARKS</div>
+          </td>
+        </tr>      
       </table>
+    {% else %}
+      <table class="business-details-table" role="presentation">
+          <tr>
+            <td class="lbl-business-detail">Search Date and Time:</td>
+            <td colspan="2">{{searchDateTime}}</td>
+          </tr>
+          <tr>
+            <td class="lbl-business-detail">Account Name:</td>
+            <td colspan="2">
+                {% if meta_account_name is defined %}
+                  {{meta_account_name}}
+                {% else %}
+                  Not available.
+                {% endif %}
+            </td>
+          </tr>
+          <tr>
+            <td class="lbl-business-detail">Folio Number:</td>
+            <td colspan="2">
+                {% if searchQuery.clientReferenceId is defined and searchQuery.clientReferenceId != "" %}
+                  {{searchQuery.clientReferenceId}}
+                {% else %}
+                  N/A
+                {% endif %}
+            </td>
+          </tr>
+      </table>
+    {% endif %}
     </div>
 
     <table class="header-table-toc mt-6" role="presentation">

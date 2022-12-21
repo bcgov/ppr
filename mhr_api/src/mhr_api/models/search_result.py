@@ -81,15 +81,20 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
             current_app.logger.error('DB search_result save exception: ' + str(db_exception))
             raise DatabaseException(db_exception)
 
-    def update_selection(self, search_select, account_name: str = None, callback_url: str = None):
+    def update_selection(self,
+                         search_select,
+                         account_name: str = None,
+                         callback_url: str = None,
+                         certified: bool = False):
         """Update the set of search details from the search query selection.
 
         Remove any original matches that are not in the current search query selection.
         """
-        # Build default summary information
+        # Build default summary information. Add certified for report setup.
         detail_response = {
             'searchDateTime': model_utils.format_ts(self.search.search_ts),
-            'searchQuery': self.search.search_criteria
+            'searchQuery': self.search.search_criteria,
+            'certified': certified
         }
         client_ref: str = '' if not self.search.client_reference_id else self.search.client_reference_id
         detail_response['searchQuery']['clientReferenceId'] = client_ref
