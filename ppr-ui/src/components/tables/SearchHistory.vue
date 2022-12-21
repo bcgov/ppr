@@ -288,6 +288,11 @@ export default defineComponent({
         }
         item.loadingPDF = false
         return false
+      } else if (pdf && item.isPending) {
+        // prevent automatic downloads of pending PDFs
+        item.loadingPDF = false
+        item.isPending = false
+        return true
       } else {
         /* solution from https://github.com/axios/axios/issues/1392 */
 
