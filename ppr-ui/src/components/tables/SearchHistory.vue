@@ -169,7 +169,7 @@ import { useGetters } from 'vuex-composition-helpers'
 // local
 import { SearchCriteriaIF, SearchResponseIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { MHRSearchTypes, searchHistoryTableHeaders, searchHistoryTableHeadersStaff, SearchTypes } from '@/resources'
-import { convertDate, searchPDF, submitSelected, successfulPPRResponses, searchMhrPDF } from '@/utils'
+import { convertDate, searchPDF, submitSelected, successfulPPRResponses, searchMhrPDF, delayActions } from '@/utils'
 import { ErrorContact } from '../common'
 import { useSearch } from '@/composables/useSearch'
 import { cloneDeep } from 'lodash' // eslint-disable-line
@@ -217,12 +217,7 @@ export default defineComponent({
       }),
       searchHistory: computed(
         (): Array<SearchResponseIF> => {
-          let searchHistory = null
-          searchHistory = getSearchHistory.value
-          if (!searchHistory) {
-            return []
-          }
-          return searchHistory
+          return getSearchHistory.value || []
         }
       ),
       isSearchHistory: computed((): boolean => {
@@ -368,8 +363,9 @@ export default defineComponent({
       if (!isPDFAvailable(item)) {
         return 'This document PDF is no longer available.'
       }
-      return '<p class="ma-0">This document PDF is still being generated. Reload this page to ' +
-        'see if your PDF is ready to download.</p>' +
+      return '<p class="ma-0">This document PDF is still being generated. Click the ' +
+        '<i class="v-icon notranslate mdi mdi-information-outline" style="font-size:18px; margin-bottom:4px;"></i> ' +
+        'icon to see if your PDF is ready to download. </p>' +
         '<p class="ma-0 mt-2">Note: Large documents may take up to 20 minutes to generate.</p>'
     }
     const isPDFAvailable = (item: SearchResponseIF): Boolean => {

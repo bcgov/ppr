@@ -169,7 +169,12 @@ export const setSearchDebtorName: ActionIF = ({ commit }, debtorName: Individual
 export const setSearchHistory: ActionIF = ({ commit }, searchHistory: Array<SearchResponseIF>): void => {
   // need to set .loadingPDF so that the loader circle triggers when set
   //  - if it starts as undefined it wont trigger on change
-  for (let i = 0; i < searchHistory?.length || 0; i++) { searchHistory[i].loadingPDF = false }
+  for (let i = 0; i < searchHistory?.length || 0; i++) {
+    searchHistory[i].loadingPDF = false
+    // parse the response from API to check if searchId has Pending suffix (for large reports)
+    searchHistory[i].isPending = searchHistory[i].searchId.endsWith('PENDING')
+    searchHistory[i].searchId = searchHistory[i].searchId.split('_')[0]
+  }
   commit('mutateSearchHistory', searchHistory)
 }
 
