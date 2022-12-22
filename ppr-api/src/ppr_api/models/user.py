@@ -76,8 +76,9 @@ class User(db.Model):
     def find_by_jwt_token(cls, token: dict, account_id: str = None):
         """Return a User if they exist and match the provided JWT."""
         current_app.logger.debug(f'Running query to look up user profile for account {account_id}.')
-        return db.session.query(User).filter(User.idp_userid == token['idp_userid'] or
-                                             User.sub == token['sub']).first()
+        # return db.session.query(User).filter(User.idp_userid == token['idp_userid']).one_or_none()
+        return db.session.query(User).filter((User.idp_userid == token['idp_userid']) |
+                                             (User.sub == token['sub'])).one_or_none()
 
     @classmethod
     def create_from_jwt_token(cls, token: dict, account_id: str = None):
