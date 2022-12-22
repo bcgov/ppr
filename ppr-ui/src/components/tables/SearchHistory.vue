@@ -75,7 +75,7 @@
                 <td>
                   <v-btn
                     v-if="!item.isPending &&
-                    !item.inProgress && isPDFAvailable(item) && isMhrReportReady(item)"
+                    !item.inProgress && isPDFAvailable(item)"
                     :id="`pdf-btn-${item.searchId}`"
                     class="pdf-btn px-0 mt-n3"
                     depressed
@@ -279,12 +279,12 @@ export default defineComponent({
         pdf = await searchMhrPDF(item.searchId)
       }
       if (pdf.error) {
-        if (pdf.error.statusCode === 500) {
+        if (pdf.error.statusCode === 400 && pdf.error.category === ErrorCategories.REPORT_GENERATION) {
+          // log to console if pdf report is still pending
+          console.log('PDF Report is not ready yet.')
+        } else {
           // emit and show modal for a server error
           emit('error', pdf.error)
-        } else if (pdf.error.statusCode === 400 && pdf.error.category === ErrorCategories.REPORT_GENERATION) {
-          // log to console if pdf report is still pending
-          console.log('PDF Report is not ready yet')
         }
         item.loadingPDF = false
         return false
@@ -391,16 +391,7 @@ export default defineComponent({
     const isPprSearch = (item: SearchResponseIF): boolean => {
       return item.exactResultsSize >= 0
     }
-    const isMhrReportReady = (item: SearchResponseIF): boolean => {
-      if (isPprSearch(item)) return true
-      else {
-        // Give the api 30s buffer to finish report generation
-        const now = new Date()
-        const searchDatetime = new Date(item.searchDateTime)
-        const diffTime = now.getTime() - searchDatetime.getTime()
-        return diffTime > 30000
-      }
-    }
+
     const refreshRow = async (item): Promise<void> => {
       const pdf = await downloadPDF(item)
       if (pdf) {
@@ -417,7 +408,6 @@ export default defineComponent({
       downloadPDF,
       generateReport,
       getTooltipTxtPdf,
-      isMhrReportReady,
       isPDFAvailable,
       isPprSearch,
       isSearchOwner,
