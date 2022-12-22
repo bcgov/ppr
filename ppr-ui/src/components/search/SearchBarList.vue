@@ -188,7 +188,7 @@ export default defineComponent({
 @import "@/assets/styles/theme.scss";
 .copy-normal {
   color: $gray7 !important;
-  padding-left: 20px;
+  padding-left: 49px;
 }
 .search-list-header {
   color: $gray9 !important;

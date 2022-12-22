@@ -18,7 +18,7 @@ export const SearchTypes: Array<SearchTypeIF> = [
     searchTypeAPI: BlankSearchTypes.BLANK1,
     textLabel: 'Personal Property Registry Search',
     hints: null,
-    icon: 'mdi-car',
+    icon: 'mdi-account-details',
     color: 'primary'
   },
   {
@@ -108,7 +108,7 @@ export const MHRSearchTypes: Array<SearchTypeIF> = [
     textLabel: 'Manufactured Home Registration Search',
     hints: null,
     icon: 'mdi-home',
-    color: 'success'
+    color: 'primary'
   },
   {
     // divider in dropdown list
