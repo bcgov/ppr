@@ -7,7 +7,8 @@ import {
   MhrLocationInfoIF,
   NewMhrRegistrationApiIF,
   MhRegistrationSummaryIF,
-  MhrDraftTransferApiIF
+  MhrDraftTransferApiIF,
+  RegistrationSortIF
 } from '@/interfaces'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 import { APIStatusTypes, HomeTenancyTypes } from '@/enums'
@@ -226,9 +227,9 @@ export const useNewMhrRegistration = () => {
     return data
   }
 
-  const fetchMhRegistrations = async (): Promise<void> => {
+  const fetchMhRegistrations = async (sortOptions: RegistrationSortIF = null): Promise<void> => {
     const draftFilings = await getMhrDrafts()
-    const myMhrHistory = await mhrRegistrationHistory(true)
+    const myMhrHistory = await mhrRegistrationHistory(true, sortOptions)
     const filteredMhrHistory = addHistoryDraftsToMhr(myMhrHistory, draftFilings)
     setMhrTableHistory(filteredMhrHistory)
   }

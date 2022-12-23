@@ -10,7 +10,7 @@ import {
   MhRegistrationSummaryIF,
   ErrorIF,
   MhrTransferApiIF,
-  MhrDraftTransferApiIF, DraftIF
+  MhrDraftTransferApiIF, DraftIF, RegistrationSortIF
 } from '@/interfaces'
 import { APIMhrTypes, ErrorCategories, ErrorCodes } from '@/enums'
 import { useSearch } from '@/composables/useSearch'
@@ -315,9 +315,15 @@ export async function submitMhrRegistration (payloadData, queryParamData) {
  * @param withCollapse // Used to indicate whether api should return registrations collapsed
  * @returns MhRegistrationSummaryIF
  */
-export async function mhrRegistrationHistory (withCollapse: boolean = false) {
+export async function mhrRegistrationHistory (withCollapse: boolean = false, sortOptions: RegistrationSortIF = null) {
   try {
-    const path = withCollapse ? 'registrations?collapse=true' : 'registrations'
+    var path = withCollapse ? 'registrations?collapse=true' : 'registrations'
+    if (sortOptions) {
+      path = addSortParams(
+        path,
+        sortOptions)
+    }
+
     const result = await axios.get(path, getDefaultConfig())
     if (!result?.data) {
       throw new Error('Invalid API response')
@@ -578,4 +584,61 @@ export async function deleteMhrDraft (draftID: string): Promise<ErrorIF> {
 // UX util function to delay any actions for defined number of milliseconds
 export function delayActions (milliseconds: number): Promise<any> {
   return new Promise(resolve => setTimeout(resolve, milliseconds))
+}
+
+const UIFilterToApiFilter = {
+  endDate: 'createDateTime',
+  folNum: 'clientReferenceId',
+  regBy: 'registeringName',
+  regNum: 'mhrNumber',
+  regType: 'registrationType',
+  startDate: 'createDateTime',
+  status: 'statusType'
+}
+
+// add sorting params for registration history/draft api calls
+function addSortParams (url: string, sortOptions: RegistrationSortIF): string {
+  const sortKeys = Object.keys(sortOptions)
+  // add all set filters as params to the call
+  for (const i in sortKeys) {
+    // convert to api expected value (too tied in with header logic to change earlier)
+    if (sortOptions[sortKeys[i]] === 'createDateTime') {
+      // sortKeys[i] === orderBy (only case this will happen)
+      sortOptions[sortKeys[i]] = 'startDateTime'
+    }
+    // add timestamp onto datetime param values
+    if (sortOptions[sortKeys[i]] && ['createDateTime'].includes(UIFilterToApiFilter[sortKeys[i]])) {
+      // ensure its not already converted
+      if (sortOptions[sortKeys[i]].length < 11) {
+        sortOptions[sortKeys[i]] = sortOptions[sortKeys[i]]
+        // convert to local date object
+        const d = new Date(`${sortOptions[sortKeys[i]]}T00:00:00`)
+        // get the offset from utc in hours
+        let offset = `${d.getTimezoneOffset() / 60}`
+        let tzDiff = '-'
+        if (offset[0] === '-') {
+          // flip tzDiff and remove negative from offset
+          tzDiff = '+'
+          offset = offset.substring(1, offset.length)
+        }
+        // check if offset has minutes
+        const minsIndex = offset.indexOf('.')
+        if (minsIndex !== -1) {
+          // remove the minutes from the offset (not perfect but better than an error)
+          offset = offset.substring(0, minsIndex)
+        }
+        // add zero to offset if necessary
+        if (offset.length < 2) offset = `0${offset}`
+        // add desired timestamp
+        let time = '00:00:00'
+        if (UIFilterToApiFilter[sortKeys[i]] === 'endDateTime') time = '23:59:59'
+        // combine date, timestamp and tz info
+        sortOptions[sortKeys[i]] = `${d.toISOString().substring(0, 10)}T${time}${tzDiff}${offset}:00`
+      }
+    }
+    if (sortOptions[sortKeys[i]]) {
+      url += `&${UIFilterToApiFilter[sortKeys[i]]}=${sortOptions[sortKeys[i]]}`
+    }
+  }
+  return url
 }

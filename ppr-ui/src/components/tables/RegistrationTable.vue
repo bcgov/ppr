@@ -53,10 +53,10 @@
                   </span>
                 </v-col>
               </v-row>
-              <v-row v-if="isPpr" class="my-reg-filter pl-3 pt-2" no-gutters>
+              <v-row class="my-reg-filter pl-3 pt-2" no-gutters>
                 <v-col>
                   <v-text-field
-                    v-if="header.value === 'registrationNumber'"
+                    v-if="header.value === 'registrationNumber' || header.value === 'mhrNumber'"
                     filled
                     single-line
                     hide-details="true"
@@ -78,6 +78,28 @@
                     <v-select
                       v-else
                       :items="registrationTypes"
+                      single-line
+                      item-text="registrationTypeUI"
+                      item-value="registrationTypeAPI"
+                      class="table-registration-types"
+                      filled
+                      dense
+                      clearable
+                      label="Registration Type"
+                      v-model="registrationType"
+                      id="txt-type"
+                      :menu-props="{ bottom: true, offsetY: true }"
+                    >
+                      <template slot="item" slot-scope="data">
+                        <span class="list-item">
+                          {{ data.item.registrationTypeUI }}
+                        </span>
+                      </template>
+                    </v-select>
+                  </div>
+                  <div v-if="header.value === 'registrationDescription'">
+                    <v-select
+                      :items="mhrRegistrationTypes"
                       single-line
                       item-text="registrationTypeUI"
                       item-value="registrationTypeAPI"
@@ -270,7 +292,7 @@ import {
   TableActions
 } from '@/enums'
 import { useRegistration } from '@/composables/useRegistration'
-import { RegistrationTypesStandard, StatusTypes } from '@/resources'
+import { MHRegistrationTypes, RegistrationTypesStandard, StatusTypes } from '@/resources'
 
 export default defineComponent({
   components: {
@@ -381,6 +403,7 @@ export default defineComponent({
       loadingPDF: '',
       overrideWidth: false,
       registrationTypes: [...RegistrationTypesStandard].slice(1),
+      mhrRegistrationTypes: [...MHRegistrationTypes].slice(1),
       showDatePicker: false,
       statusTypes: [...StatusTypes],
       hasRPPR: computed(() => {
