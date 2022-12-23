@@ -139,8 +139,21 @@
                     />
                   </div>
                   <v-select
-                    v-if="header.value === 'statusType'"
+                    v-if="props.isPpr && header.value === 'statusType'"
                     :items="statusTypes"
+                    hide-details
+                    single-line
+                    filled
+                    dense
+                    item-class="list-item"
+                    label="Status"
+                    :menu-props="{ bottom: true, offsetY: true }"
+                    v-model="status"
+                    clearable
+                  />
+                  <v-select
+                    v-else-if="!props.isPpr && header.value === 'statusType'"
+                    :items="mhStatusTypes"
                     hide-details
                     single-line
                     filled
@@ -292,7 +305,7 @@ import {
   TableActions
 } from '@/enums'
 import { useRegistration } from '@/composables/useRegistration'
-import { MHRegistrationTypes, RegistrationTypesStandard, StatusTypes } from '@/resources'
+import { MHRegistrationTypes, RegistrationTypesStandard, StatusTypes, mhStatusTypes } from '@/resources'
 
 export default defineComponent({
   components: {
@@ -406,6 +419,7 @@ export default defineComponent({
       mhrRegistrationTypes: [...MHRegistrationTypes].slice(1),
       showDatePicker: false,
       statusTypes: [...StatusTypes],
+      mhStatusTypes: [...mhStatusTypes],
       hasRPPR: computed(() => {
         const productSubscriptions =
           getAccountProductSubscriptions.value as AccountProductSubscriptionIF

@@ -12,3 +12,10 @@ export enum UIStatusTypes {
   EXPIRED = 'Expired',
   DISCHARGED = 'Discharged'
 }
+
+export enum mhUIStatusTypes {
+  DRAFT = 'Draft',
+  ACTIVE = 'Active',
+  EXEMPT = 'Exempt',
+  HISTORICAL = 'Historical'
+}
