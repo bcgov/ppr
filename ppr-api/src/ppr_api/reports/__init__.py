@@ -57,8 +57,9 @@ def get_callback_pdf(report_data, account_id, report_type, token, account_name):
 def get_report_api_payload(report_data, account_id, report_type, account_name):
     """Get the report api payload data without calling the service."""
     try:
-        if current_app.config.get('REPORT_VERSION', REPORT_VERSION_V2) == REPORT_VERSION_V2:
-            return ReportV2(report_data, account_id, report_type, account_name).get_payload_data()
+        # Used by separate surface mail (BCMail+) service. Coordinate update with that service.
+        # if current_app.config.get('REPORT_VERSION', REPORT_VERSION_V2) == REPORT_VERSION_V2:
+        #    return ReportV2(report_data, account_id, report_type, account_name).get_payload_data()
         return Report(report_data, account_id, report_type, account_name).get_payload_data()
     except Exception as err:   # noqa: B902; return nicer default error
         current_app.logger.error(f'Get report payload data failed for account {account_id}, type {report_type}: ' +

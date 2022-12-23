@@ -28,6 +28,7 @@ from ppr_api.exceptions import BusinessException, DatabaseException
 from ppr_api.services.authz import authorized
 from ppr_api.services.queue_service import GoogleQueueService
 from ppr_api.models import EventTracking, SearchResult, SearchRequest, utils as model_utils
+from ppr_api.models.search_request import REPORT_STATUS_PENDING
 from ppr_api.resources import utils as resource_utils
 from ppr_api.reports import ReportTypes, get_pdf
 from ppr_api.callback.reports.report_service import get_search_report
@@ -165,7 +166,9 @@ class SearchResultsResource(Resource):
             # Verify request JWT and account ID
             if not authorized(account_id, jwt):
                 return resource_utils.unauthorized_error_response(account_id)
-            # Try to fetch search detail by search id.
+            # Try to fetch search detail by search id. Remove _PENDING if it is in the id.
+            if search_id.find(('_' + REPORT_STATUS_PENDING)) != -1:
+                search_id = search_id.replace(('_' + REPORT_STATUS_PENDING), '')
             current_app.logger.info(f'Fetching search detail for {search_id}.')
             search_detail: SearchResult = SearchResult.find_by_search_id(search_id, True)
             if not search_detail:

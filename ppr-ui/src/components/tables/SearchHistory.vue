@@ -74,7 +74,7 @@
                 </td>
                 <td>
                   <v-btn
-                    v-if="item.searchId !== 'PENDING' &&
+                    v-if="!item.isPending &&
                     !item.inProgress && isPDFAvailable(item) && isMhrReportReady(item)"
                     :id="`pdf-btn-${item.searchId}`"
                     class="pdf-btn px-0 mt-n3"
@@ -95,19 +95,13 @@
                   >
                     <template v-slot:activator="{ on, attrs }">
                       <v-btn
+                        icon
                         v-if="!item.inProgress"
-                        :icon="item.isPdfRequested"
-                        :depressed="!item.isPdfRequested"
-                        :color="item.isPdfRequested ? 'primary' : ''"
-                        :class="{ 'pdf-btn px-0 mt-n3' : !item.isPdfRequested }"
+                        color="primary"
                         :loading="item.loadingPDF"
                         @click="refreshRow(item)"
                       >
-                        <div v-if="!item.isPdfRequested" style="display: flex">
-                          <img src="@/assets/svgs/pdf-icon-blue.svg" />
-                          <span class="pl-1">PDF</span>
-                        </div>
-                        <v-icon v-else color="primary" v-bind="attrs" v-on="on">
+                        <v-icon color="primary" v-bind="attrs" v-on="on">
                           mdi-information-outline
                         </v-icon>
                       </v-btn>
@@ -180,6 +174,7 @@ import { ErrorContact } from '../common'
 import { useSearch } from '@/composables/useSearch'
 import { cloneDeep } from 'lodash' // eslint-disable-line
 import _ from 'lodash' // eslint-disable-line
+import { ErrorCategories } from '@/enums'
 
 export default defineComponent({
   components: {
@@ -274,16 +269,30 @@ export default defineComponent({
     const downloadPDF = async (item: SearchResponseIF): Promise<boolean> => {
       item.loadingPDF = true
       let pdf:any = null
+      if (item.isPending) {
+        item.loadingPDF = true
+        await delayActions(5000)
+      }
       if (isPprSearch(item)) {
         pdf = await searchPDF(item.searchId)
       } else {
         pdf = await searchMhrPDF(item.searchId)
       }
       if (pdf.error) {
-        // do not emit any error so dialog is not shown - #13980
-        // if (isPprSearch(item)) emit('error', pdf.error)
+        if (pdf.error.statusCode === 500) {
+          // emit and show modal for a server error
+          emit('error', pdf.error)
+        } else if (pdf.error.statusCode === 400 && pdf.error.category === ErrorCategories.REPORT_GENERATION) {
+          // log to console if pdf report is still pending
+          console.log('PDF Report is not ready yet')
+        }
         item.loadingPDF = false
         return false
+      } else if (pdf && item.isPending) {
+        // prevent automatic downloads of pending PDFs
+        item.loadingPDF = false
+        item.isPending = false
+        return true
       } else {
         /* solution from https://github.com/axios/axios/issues/1392 */
 
@@ -314,6 +323,7 @@ export default defineComponent({
         }
       }
       item.loadingPDF = false
+      item.isPending = false
       return true
     }
     const generateReport = _.throttle(async (item: SearchResponseIF): Promise<void> => {
@@ -329,17 +339,19 @@ export default defineComponent({
           // set to pending if submit was not finished
           if (item.inProgress) {
             item.loadingPDF = false
-            item.searchId = 'PENDING'
+            item.isPending = true
           }
         }, 5000)
         const statusCode = await submitSelected(searchId, [], callBack, true)
         // FUTURE: add error handling, for now just ignore so they can try again
         if (successfulPPRResponses.includes(statusCode)) {
-          if (item.selectedResultsSize >= 75) item.searchId = 'PENDING'
-          else item.searchId = searchId
+          if (item.selectedResultsSize >= 75) {
+            item.isPending = true
+          } else item.searchId = searchId
           item.inProgress = false
         }
         item.loadingPDF = false
+        item.isPending = false
       }, 1000)
     }, 250, { trailing: false })
     const getTooltipTxtPdf = (item: SearchResponseIF): string => {
@@ -390,13 +402,6 @@ export default defineComponent({
       }
     }
     const refreshRow = async (item): Promise<void> => {
-      // once PDF icon is clicked, reset the flag to Info icon
-      item.isPdfRequested = true
-      // for large searches that are still pending, delay any actions for better user experience
-      if (item.searchId === 'PENDING') {
-        item.loadingPDF = true
-        await delayActions(5000)
-      }
       const pdf = await downloadPDF(item)
       if (pdf) {
         // Update unique key value of table row to refresh singular component

@@ -132,16 +132,18 @@ TEST_PAYMENT_DETAILS_DATA = [
     ('Serial number', 'MS', SERIAL_NUMBER_JSON, SELECTED_JSON, 'MHR Search', '4551')
 ]
 
-# testdata pattern is ({role}, {routingSlip}, {bcolNumber}, {datNUmber}, {priority}, {status})
+# testdata pattern is ({role}, {routingSlip}, {bcolNumber}, {datNUmber}, {priority}, {status}, {certified})
 TEST_STAFF_SEARCH_DATA = [
-    (STAFF_ROLE, None, None, None, False, HTTPStatus.OK),
-    (STAFF_ROLE, '12345', None, None, True, HTTPStatus.OK),
-    (STAFF_ROLE, None, '654321', '111111', False, HTTPStatus.OK),
-    (STAFF_ROLE, '12345', '654321', '111111', False, HTTPStatus.BAD_REQUEST),
-    (BCOL_HELP, None, None, None, False, HTTPStatus.OK),
-    (GOV_ACCOUNT_ROLE, '12345', None, None, False, HTTPStatus.OK),
-    (GOV_ACCOUNT_ROLE, None, '654321', '111111', False, HTTPStatus.OK),
-    (GOV_ACCOUNT_ROLE, None, None, None, False, HTTPStatus.OK)
+    (STAFF_ROLE, None, None, None, False, HTTPStatus.OK, False),
+    (STAFF_ROLE, None, None, None, False, HTTPStatus.OK, True),
+    (STAFF_ROLE, '12345', None, None, True, HTTPStatus.OK, False),
+    (STAFF_ROLE, '12345', None, None, True, HTTPStatus.OK, True),
+    (STAFF_ROLE, None, '654321', '111111', False, HTTPStatus.OK, False),
+    (STAFF_ROLE, '12345', '654321', '111111', False, HTTPStatus.BAD_REQUEST, False),
+    (BCOL_HELP, None, None, None, False, HTTPStatus.OK, False),
+    (GOV_ACCOUNT_ROLE, '12345', None, None, False, HTTPStatus.OK, False),
+    (GOV_ACCOUNT_ROLE, None, '654321', '111111', False, HTTPStatus.OK, False),
+    (GOV_ACCOUNT_ROLE, None, None, None, False, HTTPStatus.OK, False)
 ]
 # testdata pattern is ({description}, {JSON data}, {mhr_num}, {client_ref_id}, {match_count})
 TEST_PPR_SEARCH_DATA = [
@@ -180,8 +182,8 @@ def test_post_selected(session, client, jwt, desc, json_data, search_id, roles, 
         assert rv.status_code == status
 
 
-@pytest.mark.parametrize('role,routing_slip,bcol_number,dat_number,priority,status', TEST_STAFF_SEARCH_DATA)
-def test_staff_search(session, client, jwt, role, routing_slip, bcol_number, dat_number, priority, status):
+@pytest.mark.parametrize('role,routing_slip,bcol_number,dat_number,priority,status,certified', TEST_STAFF_SEARCH_DATA)
+def test_staff_search(session, client, jwt, role, routing_slip, bcol_number, dat_number, priority, status, certified):
     """Assert that staff search requests returns the correct status."""
     # setup
     current_app.config.update(PAYMENT_SVC_URL=MOCK_PAY_URL)
@@ -197,9 +199,19 @@ def test_staff_search(session, client, jwt, role, routing_slip, bcol_number, dat
     if dat_number:
         if len(params) > 0:
             params += '&datNumber=' + str(dat_number)
+        else:
+            params += '?datNumber=' + str(dat_number)
     if priority:
-        params += '&priority=true'
-    print('params=' + params)
+        if len(params) > 0:
+            params += '&priority=true'
+        else:
+            params += '?priority=true'
+    if certified:
+        if len(params) > 0:
+            params += '&certified=true'
+        else:
+            params += '?certified=true'
+    # print('params=' + params)
     roles = [MHR_ROLE]
     account_id = role
     if role == GOV_ACCOUNT_ROLE:

@@ -17,6 +17,7 @@ from flask import current_app
 
 from mhr_api.exceptions import DatabaseException
 from mhr_api.models import db, utils as model_utils, Db2Document
+from mhr_api.models.db2 import address_utils
 from mhr_api.utils.base import BaseEnum
 
 
@@ -138,7 +139,7 @@ class Db2Mhomnote(db.Model):
         if self.document_type not in (Db2Document.DocumentTypes.RES_EXEMPTION,
                                       Db2Document.DocumentTypes.NON_RES_EXEMPTION):
             note['contactName'] = self.name
-            note['contactAddress'] = model_utils.get_address_from_db2(self.legacy_address, '')
+            note['contactAddress'] = address_utils.get_address_from_db2(self.legacy_address)
             if self.phone_number:
                 note['contactPhoneNumber'] = self.phone_number
         return note
@@ -151,7 +152,7 @@ class Db2Mhomnote(db.Model):
             'documentId': self.reg_document_id,
             'remarks': self.remarks,
             'contactName': self.name,
-            'contactAddress': model_utils.get_address_from_db2(self.legacy_address, '')
+            'contactAddress': address_utils.get_address_from_db2(self.legacy_address)
         }
         if self.phone_number:
             note['contactPhoneNumber'] = self.phone_number
@@ -207,7 +208,7 @@ class Db2Mhomnote(db.Model):
         if json_data.get('contactName'):
             note.name = str(json_data.get('contactName'))[0: 40]
         if json_data.get('contactAddress'):
-            note.legacy_address = model_utils.to_db2_address(json_data.get('contactAddress'))
+            note.legacy_address = address_utils.to_db2_address(json_data.get('contactAddress'))
         if json_data.get('contactPhoneNumber'):
             note.phone_number = str(json_data.get('contactPhoneNumber'))[0: 10]
         if json_data.get('status'):
