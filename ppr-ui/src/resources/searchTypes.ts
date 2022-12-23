@@ -105,7 +105,7 @@ export const MHRSearchTypes: Array<SearchTypeIF> = [
     group: 2,
     searchTypeUI: null,
     searchTypeAPI: BlankSearchTypes.BLANK3,
-    textLabel: 'Manufactured Home Registration Search',
+    textLabel: 'Manufactured Home Registry Search',
     hints: null,
     icon: 'mdi-home',
     color: 'primary'

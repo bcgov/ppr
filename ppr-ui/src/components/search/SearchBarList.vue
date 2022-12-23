@@ -13,6 +13,7 @@
           return-object
           v-model="selectedSearchType"
           @focus="updateSelections()"
+          attach=""
         >
         <template v-slot:item="{ item }">
         <template v-if="item.class === 'search-list-header'">
@@ -22,7 +23,7 @@
               style="width: 45rem; pointer-events: all;"
               @click="toggleGroup(item.group)"
             >
-              <v-col class="py-0" align-self="center" cols="11">
+              <v-col class="py-0" align-self="center">
                 <span class="search-list-header"><v-icon class="menu-icon" :color="item.color">{{item.icon}}</v-icon>
                 {{ item.textLabel }}</span>
               </v-col>
@@ -193,5 +194,12 @@ export default defineComponent({
 .search-list-header {
   color: $gray9 !important;
   font-weight:bold;
+}
+
+::v-deep .v-menu__content {
+  min-width: 417px !important;
+  max-height: none;
+  background-color: red;
+  width: 80%;
 }
 </style>
