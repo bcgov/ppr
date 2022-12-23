@@ -167,8 +167,27 @@ def test_create_from_json(session, location_type):
     loc_json = json_data.get('location')
     loc_json['locationType'] = location_type
     loc_json['legalDescription'] = LTSA_DESCRIPTION
-    loc_json['bandName'] = 'band name'
+    loc_json['bandName'] = 'BAND NAME'
     loc_json['reserveNumber'] = 'test num'
+    loc_json['parkName'] = TEST_LOCATION.park_name
+    loc_json['pad'] = TEST_LOCATION.park_pad
+    loc_json['pidNumber'] = TEST_LOCATION.pid_number
+    loc_json['lot'] = TEST_LOCATION.lot
+    loc_json['parcel'] = TEST_LOCATION.parcel
+    loc_json['block'] = TEST_LOCATION.block
+    loc_json['districtLot'] = TEST_LOCATION.district_lot
+    loc_json['partOf'] = TEST_LOCATION.part_of
+    loc_json['section'] = TEST_LOCATION.section
+    loc_json['township'] = TEST_LOCATION.township
+    loc_json['range'] = TEST_LOCATION.range
+    loc_json['meridian'] = TEST_LOCATION.meridian
+    loc_json['landDistrict'] = TEST_LOCATION.land_district
+    loc_json['plan'] = TEST_LOCATION.plan
+    loc_json['exceptionPlan'] = TEST_LOCATION.exception_plan
+    loc_json['dealerName'] = TEST_LOCATION.dealer_name
+    loc_json['additionalDescription'] = TEST_LOCATION.additional_description
+    loc_json['leaveProvince'] = True
+    loc_json['taxCertificate'] = True
     location: MhrLocation = MhrLocation.create_from_json(loc_json, 1000)
     assert location
     assert location.registration_id == 1000
@@ -177,12 +196,30 @@ def test_create_from_json(session, location_type):
     assert location.status_type == MhrStatusTypes.ACTIVE
     assert location.ltsa_description == LTSA_DESCRIPTION
     assert location.address
-    assert location.dealer_name
+    assert location.park_name == TEST_LOCATION.park_name
+    assert location.park_pad == TEST_LOCATION.park_pad
+    assert location.pid_number == TEST_LOCATION.pid_number
+    assert location.lot == TEST_LOCATION.lot
+    assert location.parcel == TEST_LOCATION.parcel
+    assert location.block == TEST_LOCATION.block
+    assert location.district_lot == TEST_LOCATION.district_lot
+    assert location.part_of == TEST_LOCATION.part_of
+    assert location.section == TEST_LOCATION.section
+    assert location.township == TEST_LOCATION.township
+    assert location.range == TEST_LOCATION.range
+    assert location.meridian == TEST_LOCATION.meridian
+    assert location.land_district == TEST_LOCATION.land_district
+    assert location.plan == TEST_LOCATION.plan
+    assert location.exception_plan == TEST_LOCATION.exception_plan
+    assert location.dealer_name == TEST_LOCATION.dealer_name
+    assert location.additional_description == TEST_LOCATION.additional_description
+    assert location.leave_province == 'Y'
+    assert location.tax_certification == 'Y'
     if location_type == MhrLocationTypes.MH_PARK:
         assert location.park_name
         assert location.park_pad
         assert not location.band_name
         assert not location.reserve_number
     elif location_type == MhrLocationTypes.RESERVE:
-        assert location.band_name
-        assert location.reserve_number
+        assert location.band_name == 'BAND NAME'
+        assert location.reserve_number == 'test num'
