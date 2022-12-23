@@ -285,12 +285,21 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
 
     @classmethod
     def find_summary_by_mhr_number(cls, account_id: str, mhr_number: str, staff: bool = False):
-        """Return the MHR registration summary information matching the registration number."""
+        """Return the MHR registration summary information matching the MH registration number."""
         formatted_mhr = model_utils.format_mhr_number(mhr_number)
         current_app.logger.debug(f'Account_id={account_id}, mhr_number={formatted_mhr}')
         if model_utils.is_legacy():
             return legacy_utils.find_summary_by_mhr_number(account_id, formatted_mhr, staff)
         raise DatabaseException('MhrRegistration.find_summary_by_mhr_number PosgreSQL not yet implemented.')
+
+    @classmethod
+    def find_summary_by_doc_reg_number(cls, account_id: str, doc_reg_number: str, staff: bool = False):
+        """Return the MHR registration summary information matching the document registration number."""
+        formatted_reg_num = model_utils.format_doc_reg_number(doc_reg_number)
+        current_app.logger.debug(f'Account_id={account_id}, doc_reg_number={formatted_reg_num}')
+        if model_utils.is_legacy():
+            return legacy_utils.find_summary_by_doc_reg_number(account_id, formatted_reg_num, staff)
+        raise DatabaseException('MhrRegistration.find_summary_by_doc_reg_number PosgreSQL not yet implemented.')
 
     @classmethod
     def find_all_by_account_id(cls, params: AccountRegistrationParams):

@@ -122,6 +122,22 @@ SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRI
  WHERE mh.mhregnum = :query_mhr_number
    AND mh.mhregnum = d.mhregnum
 """
+QUERY_ACCOUNT_ADD_REGISTRATION_DOC = """
+SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRIM(d.docutype),
+       (SELECT XMLSERIALIZE(XMLAGG ( XMLELEMENT ( NAME "owner", o2.ownrtype || TRIM(o2.ownrname))) AS CLOB)
+          FROM owner o2, owngroup og2
+         WHERE o2.manhomid = mh.manhomid
+           AND og2.manhomid = mh.manhomid
+           AND og2.owngrpid = o2.owngrpid
+           AND og2.status IN ('3')) as owner_names,
+       TRIM(d.affirmby),
+       d.documtid as document_id,
+       d.docuregi as doc_reg_number
+  FROM manuhome mh, document d, document d2
+ WHERE d2.docuregi = :query_value
+   AND d2.mhregnum = mh.mhregnum
+   AND mh.mhregnum = d.mhregnum
+"""
 QUERY_ACCOUNT_REGISTRATIONS = """
 SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRIM(d.docutype),
        (SELECT XMLSERIALIZE(XMLAGG ( XMLELEMENT ( NAME "owner", o2.ownrtype || TRIM(o2.ownrname))) AS CLOB)
@@ -285,6 +301,57 @@ def find_summary_by_mhr_number(account_id: str, mhr_number: str, staff: bool):
         raise DatabaseException(db_exception)
 
     if registrations:
+        try:
+            query = text(QUERY_MHR_NUMBER_LEGACY)
+            result = db.session.execute(query, {'query_value': account_id, 'query_value2': mhr_number})
+            row = result.first()
+            reg_count = int(row[0])
+            extra_count = int(row[1])
+            reg_account_id = str(row[2])
+            lien_registration_type: str = str(row[3]) if row[3] else ''
+            current_app.logger.debug(f'reg_count={reg_count}, extra_count={extra_count}, staff={staff}')
+            # Set inUserList to true if MHR number already added to account extra registrations.
+            doc_types = MhrDocumentType.find_all()
+            for registration in registrations:
+                if reg_count > 0 or extra_count > 0:
+                    registration['inUserList'] = True
+                __update_summary_info(registration, registrations, None, doc_types, staff, account_id)
+                if registration['documentType'] in \
+                        (Db2Document.DocumentTypes.CONV, Db2Document.DocumentTypes.MHREG_TRIM):
+                    registration['lienRegistrationType'] = lien_registration_type
+            # Path to download report only available for staff and registrations created by the account.
+            if reg_count > 0 and (staff or account_id == reg_account_id):
+                for reg in registrations:
+                    if reg['documentType'] in (Db2Document.DocumentTypes.CONV, Db2Document.DocumentTypes.MHREG_TRIM):
+                        reg['path'] = REGISTRATION_PATH + mhr_number
+                    else:
+                        reg['path'] = DOCUMENT_PATH + reg.get('documentId')
+            registrations = __collapse_results(registrations)
+            return registrations[0]
+        except Exception as db_exception:   # noqa: B902; return nicer error
+            current_app.logger.error('find_summary_by_mhr_number mhr extra check exception: ' + str(db_exception))
+            raise DatabaseException(db_exception)
+    return registrations
+
+
+def find_summary_by_doc_reg_number(account_id: str, doc_reg_number: str, staff: bool):
+    """Return the MHR registration summary parent-child information matching the document registration number."""
+    registrations = []
+    mhr_number: str = None
+    try:
+        query = text(QUERY_ACCOUNT_ADD_REGISTRATION_DOC)
+        result = db.get_engine(current_app, 'db2').execute(query, {'query_value': doc_reg_number})
+        rows = result.fetchall()
+        if rows is not None:
+            for row in rows:
+                if not mhr_number:
+                    mhr_number = str(row[0])
+                registrations.append(__build_summary(row, True, None))
+    except Exception as db_exception:   # noqa: B902; return nicer error
+        current_app.logger.error('DB2 find_summary_by_mhr_number exception: ' + str(db_exception))
+        raise DatabaseException(db_exception)
+
+    if registrations and mhr_number:
         try:
             query = text(QUERY_MHR_NUMBER_LEGACY)
             result = db.session.execute(query, {'query_value': account_id, 'query_value2': mhr_number})

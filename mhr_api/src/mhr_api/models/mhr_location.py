@@ -187,6 +187,8 @@ class MhrLocation(db.Model):  # pylint: disable=too-many-instance-attributes
             location.parcel = json_data['parcel'].strip()
         if json_data.get('block'):
             location.block = json_data['block'].strip()
+        if json_data.get('lot'):
+            location.lot = json_data['lot'].strip()
         if json_data.get('districtLot'):
             location.district_lot = json_data['districtLot'].strip()
         if json_data.get('partOf'):

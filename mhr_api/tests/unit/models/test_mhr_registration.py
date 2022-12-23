@@ -145,6 +145,18 @@ TEST_SUMMARY_REG_DATA = [
     ('PS12345', '045349', True, CONV_DESCRIPTION, True),
     ('2523', '150062', True, REG_DESCRIPTION, True)
 ]
+# testdata pattern is ({account_id}, {doc_reg_num}, {mhr_number}, {result_count}, {reg_desc}, {in_list})
+TEST_SUMMARY_DOC_REG_DATA = [
+    ('PS12345', '077741', '077741', 3, CONV_DESCRIPTION, False),
+    ('PS12345', 'TESTXX', None, 0, None, False),
+    ('PS12345', '00045349', '045349', 3, CONV_DESCRIPTION, True),
+    ('PS12345', '009301', '009301', 1, CONV_DESCRIPTION, False),
+    ('ppr_staff', '196123', '087219', 5, REG_DESCRIPTION, False),
+    ('ppr_staff', '221961', '087219', 5, REG_DESCRIPTION, False)
+]
+TEST_SUMMARY_DOC_REG_DATA2 = [
+    ('PS12345', '077741', '077741', 3, CONV_DESCRIPTION, False)
+]
 # testdata pattern is ({account_id}, {has_results})
 TEST_ACCOUNT_REG_DATA = [
     ('PS12345', True),
@@ -199,6 +211,7 @@ TEST_DATA_NEW_GROUP = [
     ('COMMON', 2, 2, 10, COMMON_OWNER_GROUP)
 ]
 
+
 @pytest.mark.parametrize('account_id,mhr_num,exists,reg_desc,in_list', TEST_SUMMARY_REG_DATA)
 def test_find_summary_by_mhr_number(session, account_id, mhr_num, exists, reg_desc, in_list):
     """Assert that finding summary MHR registration information works as expected."""
@@ -216,6 +229,32 @@ def test_find_summary_by_mhr_number(session, account_id, mhr_num, exists, reg_de
         assert registration['path'] is not None
         assert registration['documentId'] is not None
         assert registration['inUserList'] == in_list
+    else:
+        assert not registration
+
+
+@pytest.mark.parametrize('account_id,doc_reg_num,mhr_num,result_count,reg_desc,in_list', TEST_SUMMARY_DOC_REG_DATA)
+def test_find_summary_by_doc_reg_number(session, account_id, doc_reg_num, mhr_num, result_count, reg_desc, in_list):
+    """Assert that finding summary MHR registration information by a document registration number works as expected."""
+    registration = MhrRegistration.find_summary_by_doc_reg_number(account_id, doc_reg_num)
+    if result_count > 0:
+        current_app.logger.info(registration)
+        assert registration['mhrNumber'] == mhr_num
+        assert registration['registrationDescription'] == reg_desc
+        assert registration['statusType'] is not None
+        assert registration['createDateTime'] is not None
+        assert registration['username'] is not None
+        assert registration['submittingParty'] is not None
+        assert registration['clientReferenceId'] is not None
+        assert registration['ownerNames'] is not None
+        assert registration['path'] is not None
+        assert registration['documentId'] is not None
+        assert registration['inUserList'] == in_list
+        if result_count == 1:
+            assert not registration.get('changes')
+        else:
+            assert registration.get('changes')
+            assert len(registration['changes']) >= (result_count - 1)
     else:
         assert not registration
 

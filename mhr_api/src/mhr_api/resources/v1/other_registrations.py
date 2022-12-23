@@ -31,17 +31,21 @@ from mhr_api.resources import utils as resource_utils
 bp = Blueprint('OTHER_REGISTRATIONS1',  # pylint: disable=invalid-name
                __name__, url_prefix='/api/v1/other-registrations')
 
+ID_TYPE_PARAM = 'identifierType'
+MHR_NUM_PARAM = 'mhrNumber'  # Default if no request parameter.
+DOC_REG_NUM_PARAM = 'documentRegistrationNumber'
 
-@bp.route('/<string:mhr_number>', methods=['GET', 'OPTIONS'])
+
+@bp.route('/<string:identifier>', methods=['GET', 'OPTIONS'])
 @cross_origin(origin='*')
 @jwt.requires_auth
-def get_other_registration(mhr_number: str):
+def get_other_registration(identifier: str):
     """Get summary information for a registration created by another account."""
     try:
-        if mhr_number is None:
+        if identifier is None:
             return resource_utils.path_param_error_response('MHR Number')
 
-        current_app.logger.debug(f'get_other_registration mhr_number={mhr_number}.')
+        current_app.logger.debug(f'get_other_registration identifier={identifier}.')
         # Quick check: must have an account ID.
         account_id = resource_utils.get_account_id(request)
         if account_id is None:
@@ -50,16 +54,22 @@ def get_other_registration(mhr_number: str):
         # Verify request JWT and account ID
         if not authorized(account_id, jwt):
             return resource_utils.unauthorized_error_response(account_id)
-
-        # Try to fetch summary registration by mhr number
-        registration = MhrRegistration.find_summary_by_mhr_number(account_id, mhr_number, is_staff(jwt))
+        # Use request parameter to determine if look up is by mhr (default) or doc reg number.
+        registration = None
+        id_type = request.args.get(ID_TYPE_PARAM)
+        if id_type and id_type == DOC_REG_NUM_PARAM:
+            # Try to fetch summary registration by document registration number
+            registration = MhrRegistration.find_summary_by_doc_reg_number(account_id, identifier, is_staff(jwt))
+        else:
+            # Try to fetch summary registration by mhr number
+            registration = MhrRegistration.find_summary_by_mhr_number(account_id, identifier, is_staff(jwt))
         if not registration:
-            return resource_utils.not_found_error_response('Manufactured Home registration', mhr_number)
+            return resource_utils.not_found_error_response('Manufactured Home registration', identifier)
         return registration, HTTPStatus.OK
 
     except DatabaseException as db_exception:
         return resource_utils.db_exception_response(db_exception, account_id,
-                                                    'GET Registration Summary id=' + mhr_number)
+                                                    'GET Registration Summary id=' + identifier)
     except Exception as default_exception:   # noqa: B902; return nicer default error
         return resource_utils.default_exception_response(default_exception)
 
@@ -127,7 +137,7 @@ def delete_other_registration(mhr_number: str):
             return resource_utils.unauthorized_error_response(account_id)
         # Try to find extra registration.
         extra_registration = MhrExtraRegistration.find_by_mhr_number(mhr_number, account_id)
-        if extra_registration is None:
+        if not extra_registration:
             return resource_utils.not_found_error_response('user account registration', mhr_number)
         # Remove another account's financing statement registration.
         if extra_registration and not extra_registration.removed_ind:

@@ -312,6 +312,8 @@ def ts_from_date_iso_format(date_iso: str):
 
 def date_from_iso_format(date_iso: str):
     """Create a date object from a date string in the ISO format."""
+    if len(date_iso) > 10:
+        return date.fromisoformat(date_iso[0:10])
     return date.fromisoformat(date_iso)
 
 
@@ -716,8 +718,14 @@ def to_db2_ind_name(name_json):
 
 
 def format_mhr_number(mhr_number: str):
-    """Trim and pad with zeroes search query mhr number query."""
+    """Trim and pad with zeroes mhr number to use in search queries."""
     formatted = mhr_number.strip().rjust(6, '0')
+    return formatted
+
+
+def format_doc_reg_number(doc_reg_number: str):
+    """Trim and pad with zeroes document registration number to use in queries."""
+    formatted = doc_reg_number.strip().rjust(8, '0')
     return formatted
 
 

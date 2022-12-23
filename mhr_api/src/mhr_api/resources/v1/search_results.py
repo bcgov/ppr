@@ -23,11 +23,9 @@ from registry_schemas import utils as schema_utils
 
 from mhr_api.exceptions import BusinessException, DatabaseException
 from mhr_api.models import EventTracking, SearchRequest, SearchResult
+from mhr_api.models.search_request import REPORT_STATUS_PENDING
 from mhr_api.resources import utils as resource_utils
 from mhr_api.services.authz import authorized, is_bcol_help, is_gov_account, is_staff_account
-# from mhr_api.reports import ReportTypes, get_pdf
-# from mhr_api.callback.reports.report_service import get_search_report
-# from mhr_api.callback.utils.exceptions import ReportException, ReportDataException, StorageException
 from mhr_api.services.document_storage.storage_service import GoogleStorageService
 from mhr_api.services.payment.exceptions import SBCPaymentException
 from mhr_api.services.payment.payment import Payment
@@ -207,7 +205,9 @@ def get_search_results(search_id: str):
         if not authorized(account_id, jwt):
             return resource_utils.unauthorized_error_response(account_id)
 
-        # Try to fetch search detail by search id.
+        # Try to fetch search detail by search id. Remove _PENDING if it is in the id.
+        if search_id.find(('_' + REPORT_STATUS_PENDING)) != -1:
+            search_id = search_id.replace(('_' + REPORT_STATUS_PENDING), '')
         current_app.logger.info(f'Fetching search detail for {search_id}.')
         search_detail = SearchResult.find_by_search_id(search_id, True)
         if not search_detail:
