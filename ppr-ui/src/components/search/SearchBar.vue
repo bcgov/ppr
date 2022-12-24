@@ -45,7 +45,7 @@
         />
 
       </v-col>
-      <v-col v-if="!isIndividual" cols="7" class="pl-3">
+      <v-col v-if="!isIndividual" cols="7" class="pl-6">
         <v-tooltip content-class="bottom-tooltip"
                    bottom
                    :open-on-hover="false"
@@ -124,10 +124,10 @@
         </v-row>
       </v-col>
       <v-col class="pl-3 pt-2" style="width: 250px;">
-        <v-row no-gutters>
+        <v-row no-gutters class="justify-end">
           <v-btn
             :id="$style['search-btn']"
-            class="search-bar-btn primary mr-2"
+            class="search-bar-btn primary mr-4"
             :loading="searching"
             @click="searchCheck()"
           >

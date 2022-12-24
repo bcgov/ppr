@@ -197,7 +197,7 @@ export default defineComponent({
 }
 
 ::v-deep .v-menu__content {
-  min-width: 417px !important;
+  min-width: 427px !important;
   max-height: none;
   background-color: red;
   width: 80%;
