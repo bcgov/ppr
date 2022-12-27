@@ -193,7 +193,7 @@ export default defineComponent({
 </script>
 <style lang="scss" scoped>
 @import "@/assets/styles/theme.scss";
-.copy-normal {
+.theme--light.v-list-item.copy-normal {
   color: $gray7 !important;
   padding-left: 49px;
 }
