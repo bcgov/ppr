@@ -5,7 +5,7 @@
           ref="searchSelect"
           :error-messages="categoryMessage ? categoryMessage : ''"
           filled
-          :items="displayItems"
+          :items="(displayItems.filter(item => displayGroup[item.group] || item.class === 'search-list-header'))"
           item-disabled="selectDisabled"
           item-text="searchTypeUI"
           item-value="searchTypeAPI"
@@ -17,7 +17,7 @@
         >
         <template v-slot:item="{ item }">
         <template v-if="item.class === 'search-list-header'">
-          <v-list-item-content style="padding: 9px 0;">
+          <v-list-item-content style="padding: 9px 0;" class="list-header">
             <v-row
               :id="`srch-type-drop-${item.group}`"
               style="width: 45rem; pointer-events: all;"
@@ -39,7 +39,6 @@
         <template v-else class="search-list">
           <v-list-item
             :id="`list-${item.searchTypeAPI.toLowerCase().replaceAll('_','-')}`"
-            v-if="displayGroup[item.group]"
             class="copy-normal"
             @click="selectSearchType(item)"
           >
@@ -127,12 +126,20 @@ export default defineComponent({
       displayItems: [],
       displayGroup: {
         1: true,
-        2: true
+        2: false
       },
       showMenu: false
     })
     const toggleGroup = (group: number) => {
-      localState.displayGroup[group] = !localState.displayGroup[group]
+      console.log('toggle')
+      const initial = localState.displayGroup[group]
+      // collapse both groups as only one group can be expanded at once
+      localState.displayGroup = {
+        1: false,
+        2: false
+      }
+      // expand desired group
+      localState.displayGroup[group] = !initial
       let newDisplayItems = [] as Array<SearchTypeIF>
       if (!localState.displayGroup[group]) {
         // remove elements from display
@@ -198,8 +205,14 @@ export default defineComponent({
 
 ::v-deep .v-menu__content {
   min-width: 427px !important;
-  max-height: none;
+  max-height: none !important;
   background-color: red;
   width: 80%;
+
+ .v-list .v-select-list .list-header:nth-child(1) {
+      border-top: 1px solid black;
+      border-width: 90%;
+    }
 }
+
 </style>

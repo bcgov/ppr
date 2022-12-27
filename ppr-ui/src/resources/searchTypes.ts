@@ -53,16 +53,6 @@ export const SearchTypes: Array<SearchTypeIF> = [
     group: 1
   },
   {
-    // divider in dropdown list
-    divider: true,
-    selectDisabled: true,
-    searchTypeUI: null,
-    searchTypeAPI: BlankSearchTypes.BLANK2,
-    textLabel: null,
-    hints: null,
-    group: 1
-  },
-  {
     divider: false,
     selectDisabled: false,
     searchTypeUI: UISearchTypes.MHR_NUMBER,
@@ -109,16 +99,6 @@ export const MHRSearchTypes: Array<SearchTypeIF> = [
     hints: null,
     icon: 'mdi-home',
     color: 'primary'
-  },
-  {
-    // divider in dropdown list
-    divider: true,
-    selectDisabled: true,
-    searchTypeUI: null,
-    searchTypeAPI: BlankSearchTypes.BLANK4,
-    textLabel: null,
-    hints: null,
-    group: 2
   },
   {
     divider: false,
