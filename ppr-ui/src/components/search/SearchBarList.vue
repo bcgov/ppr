@@ -17,7 +17,7 @@
         >
         <template v-slot:item="{ item }">
         <template v-if="item.class === 'search-list-header'">
-          <v-list-item-content style="padding: 9px 0;" class="list-header">
+          <v-list-item-content style="padding: 9px 0;" :class="{ 'top-border' : item.icon === 'mdi-home' }">
             <v-row
               :id="`srch-type-drop-${item.group}`"
               style="width: 45rem; pointer-events: all;"
@@ -131,7 +131,6 @@ export default defineComponent({
       showMenu: false
     })
     const toggleGroup = (group: number) => {
-      console.log('toggle')
       const initial = localState.displayGroup[group]
       // collapse both groups as only one group can be expanded at once
       localState.displayGroup = {
@@ -209,10 +208,9 @@ export default defineComponent({
   background-color: red;
   width: 80%;
 
- .v-list .v-select-list .list-header:nth-child(1) {
-      border-top: 1px solid black;
-      border-width: 90%;
-    }
+  .top-border {
+    border-top: 1px solid #E1E1E1;
+  }
 }
 
 </style>
