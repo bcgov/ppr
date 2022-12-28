@@ -91,7 +91,7 @@ describe('Serial number results', () => {
 
   beforeEach(async () => {
     await store.dispatch('setManufacturedHomeSearchResults', testResults)
-    await store.dispatch('setSearchedType', MHRSearchTypes[5])
+    await store.dispatch('setSearchedType', MHRSearchTypes[4])
     wrapper = createComponent()
   })
   afterEach(() => {
@@ -140,7 +140,7 @@ describe('Serial number results in Review Mode', () => {
   beforeEach(async () => {
     await store.dispatch('setManufacturedHomeSearchResults', testResults)
     await store.dispatch('setSelectedManufacturedHomes', selectedResults)
-    await store.dispatch('setSearchedType', MHRSearchTypes[5])
+    await store.dispatch('setSearchedType', MHRSearchTypes[4])
 
     wrapper = createComponent({ isReviewMode: true })
   })
@@ -176,7 +176,7 @@ describe('Owner name debtor results', () => {
   beforeEach(async () => {
     await store.dispatch('setManufacturedHomeSearchResults', testResults)
     await store.dispatch('setSelectedManufacturedHomes', [])
-    await store.dispatch('setSearchedType', MHRSearchTypes[3])
+    await store.dispatch('setSearchedType', MHRSearchTypes[2])
 
     wrapper = createComponent()
   })
@@ -226,7 +226,7 @@ describe('Owner name name in Review Mode', () => {
   beforeEach(async () => {
     await store.dispatch('setManufacturedHomeSearchResults', testResults)
     await store.dispatch('setSelectedManufacturedHomes', selectedResults)
-    await store.dispatch('setSearchedType', MHRSearchTypes[3])
+    await store.dispatch('setSearchedType', MHRSearchTypes[2])
 
     wrapper = createComponent({ isReviewMode: true })
   })
@@ -262,7 +262,7 @@ describe('Business organization results', () => {
   beforeEach(async () => {
     await store.dispatch('setManufacturedHomeSearchResults', testResults)
     await store.dispatch('setSelectedManufacturedHomes', [])
-    await store.dispatch('setSearchedType', MHRSearchTypes[4])
+    await store.dispatch('setSearchedType', MHRSearchTypes[3])
 
     wrapper = createComponent()
   })
@@ -308,7 +308,7 @@ describe('Business organization results in Review Mode', () => {
   beforeEach(async () => {
     await store.dispatch('setManufacturedHomeSearchResults', testResults)
     await store.dispatch('setSelectedManufacturedHomes', selectedResults)
-    await store.dispatch('setSearchedType', MHRSearchTypes[4])
+    await store.dispatch('setSearchedType', MHRSearchTypes[3])
 
     wrapper = createComponent({ isReviewMode: true })
   })
@@ -343,7 +343,7 @@ describe('Manufactured home results', () => {
   beforeEach(async () => {
     await store.dispatch('setManufacturedHomeSearchResults', testResults)
     await store.dispatch('setSelectedManufacturedHomes', [])
-    await store.dispatch('setSearchedType', MHRSearchTypes[2])
+    await store.dispatch('setSearchedType', MHRSearchTypes[1])
 
     wrapper = createComponent()
   })
@@ -392,7 +392,7 @@ describe('Manufactured home results in Review Mode', () => {
   beforeEach(async () => {
     await store.dispatch('setManufacturedHomeSearchResults', testResults)
     await store.dispatch('setSelectedManufacturedHomes', selectedResults)
-    await store.dispatch('setSearchedType', MHRSearchTypes[2])
+    await store.dispatch('setSearchedType', MHRSearchTypes[1])
 
     wrapper = createComponent({ isReviewMode: true })
   })
