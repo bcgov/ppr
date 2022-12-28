@@ -68,14 +68,14 @@ describe('SearchBar component basic tests', () => {
     await store.dispatch('setAuthRoles', ['mhr', 'ppr'])
     wrapper.vm.updateSelections()
     await flushPromises
-    expect(wrapper.vm.$data.displayItems.length).toBe(14)
+    expect(wrapper.vm.$data.displayItems.length).toBe(12)
   })
 
   it('shows only ppr options', async () => {
     await store.dispatch('setAuthRoles', ['ppr'])
     wrapper.vm.updateSelections()
     await flushPromises
-    expect(wrapper.vm.$data.displayItems.length).toBe(7)
+    expect(wrapper.vm.$data.displayItems.length).toBe(6)
   })
 
   it('sends selected event', async () => {

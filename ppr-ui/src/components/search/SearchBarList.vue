@@ -5,7 +5,7 @@
           ref="searchSelect"
           :error-messages="categoryMessage ? categoryMessage : ''"
           filled
-          :items="displayItems"
+          :items="(displayItems.filter(item => displayGroup[item.group] || item.class === 'search-list-header'))"
           item-disabled="selectDisabled"
           item-text="searchTypeUI"
           item-value="searchTypeAPI"
@@ -13,16 +13,17 @@
           return-object
           v-model="selectedSearchType"
           @focus="updateSelections()"
+          attach=""
         >
         <template v-slot:item="{ item }">
         <template v-if="item.class === 'search-list-header'">
-          <v-list-item-content style="padding: 9px 0;">
+          <v-list-item-content style="padding: 9px 0;" :class="{ 'top-border' : item.icon === 'mdi-home' }">
             <v-row
               :id="`srch-type-drop-${item.group}`"
               style="width: 45rem; pointer-events: all;"
               @click="toggleGroup(item.group)"
             >
-              <v-col class="py-0" align-self="center" cols="11">
+              <v-col class="py-0" align-self="center">
                 <span class="search-list-header"><v-icon class="menu-icon" :color="item.color">{{item.icon}}</v-icon>
                 {{ item.textLabel }}</span>
               </v-col>
@@ -38,7 +39,6 @@
         <template v-else class="search-list">
           <v-list-item
             :id="`list-${item.searchTypeAPI.toLowerCase().replaceAll('_','-')}`"
-            v-if="displayGroup[item.group]"
             class="copy-normal"
             @click="selectSearchType(item)"
           >
@@ -126,12 +126,19 @@ export default defineComponent({
       displayItems: [],
       displayGroup: {
         1: true,
-        2: true
+        2: false
       },
       showMenu: false
     })
     const toggleGroup = (group: number) => {
-      localState.displayGroup[group] = !localState.displayGroup[group]
+      const initial = localState.displayGroup[group]
+      // collapse both groups as only one group can be expanded at once
+      localState.displayGroup = {
+        1: false,
+        2: false
+      }
+      // expand desired group
+      localState.displayGroup[group] = !initial
       let newDisplayItems = [] as Array<SearchTypeIF>
       if (!localState.displayGroup[group]) {
         // remove elements from display
@@ -186,12 +193,24 @@ export default defineComponent({
 </script>
 <style lang="scss" scoped>
 @import "@/assets/styles/theme.scss";
-.copy-normal {
+.theme--light.v-list-item.copy-normal {
   color: $gray7 !important;
-  padding-left: 20px;
+  padding-left: 49px;
 }
 .search-list-header {
   color: $gray9 !important;
   font-weight:bold;
 }
+
+::v-deep .v-menu__content {
+  min-width: 427px !important;
+  max-height: none !important;
+  background-color: red;
+  width: 80%;
+
+  .top-border {
+    border-top: 1px solid #E1E1E1;
+  }
+}
+
 </style>

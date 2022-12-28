@@ -460,7 +460,7 @@ describe('MHR search', () => {
   sessionStorage.setItem('MHR_API_URL', 'mock-url')
   let sandbox
   const resp: SearchResponseIF = mockedSearchResponse[UISearchTypes.MHR_NUMBER]
-  const select: SearchTypeIF = SearchTypes[5]
+  const select: SearchTypeIF = SearchTypes[4]
 
   beforeEach(async () => {
     sandbox = sinon.createSandbox()
@@ -509,7 +509,7 @@ describe('Mhr Owner name search', () => {
   sessionStorage.setItem('MHR_API_URL', 'mock-url')
   let sandbox
   const resp: ManufacturedHomeSearchResponseIF = mockedMHRSearchResponse[UIMHRSearchTypes.MHROWNER_NAME]
-  const select: SearchTypeIF = MHRSearchTypes[3]
+  const select: SearchTypeIF = MHRSearchTypes[2]
 
   beforeEach(async () => {
     sandbox = sinon.createSandbox()
@@ -636,7 +636,7 @@ describe('Aircraft search', () => {
   sessionStorage.setItem('PPR_API_URL', 'mock-url')
   let sandbox
   const resp: SearchResponseIF = mockedSearchResponse[UISearchTypes.AIRCRAFT]
-  const select: SearchTypeIF = SearchTypes[6]
+  const select: SearchTypeIF = SearchTypes[5]
 
   beforeEach(async () => {
     sandbox = sinon.createSandbox()
@@ -685,7 +685,7 @@ describe('Registration number search', () => {
   sessionStorage.setItem('PPR_API_URL', 'mock-url')
   let sandbox
   const resp: SearchResponseIF = mockedSearchResponse[UISearchTypes.REGISTRATION_NUMBER]
-  const select: SearchTypeIF = SearchTypes[7]
+  const select: SearchTypeIF = SearchTypes[6]
 
   beforeEach(async () => {
     sandbox = sinon.createSandbox()

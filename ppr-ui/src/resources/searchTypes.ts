@@ -18,7 +18,7 @@ export const SearchTypes: Array<SearchTypeIF> = [
     searchTypeAPI: BlankSearchTypes.BLANK1,
     textLabel: 'Personal Property Registry Search',
     hints: null,
-    icon: 'mdi-car',
+    icon: 'mdi-account-details',
     color: 'primary'
   },
   {
@@ -50,16 +50,6 @@ export const SearchTypes: Array<SearchTypeIF> = [
     hints: {
       searchValue: 'Business names must contain between 2 and 150 characters'
     },
-    group: 1
-  },
-  {
-    // divider in dropdown list
-    divider: true,
-    selectDisabled: true,
-    searchTypeUI: null,
-    searchTypeAPI: BlankSearchTypes.BLANK2,
-    textLabel: null,
-    hints: null,
     group: 1
   },
   {
@@ -105,20 +95,10 @@ export const MHRSearchTypes: Array<SearchTypeIF> = [
     group: 2,
     searchTypeUI: null,
     searchTypeAPI: BlankSearchTypes.BLANK3,
-    textLabel: 'Manufactured Home Registration Search',
+    textLabel: 'Manufactured Home Registry Search',
     hints: null,
     icon: 'mdi-home',
-    color: 'success'
-  },
-  {
-    // divider in dropdown list
-    divider: true,
-    selectDisabled: true,
-    searchTypeUI: null,
-    searchTypeAPI: BlankSearchTypes.BLANK4,
-    textLabel: null,
-    hints: null,
-    group: 2
+    color: 'primary'
   },
   {
     divider: false,
