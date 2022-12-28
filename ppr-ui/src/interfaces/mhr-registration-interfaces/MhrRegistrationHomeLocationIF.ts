@@ -31,5 +31,5 @@ export interface MhrRegistrationHomeLocationIF {
   plan: string
   bandName: string
   reserveNumber: string
-  exceptPlan: string
+  exceptionPlan: string
 }

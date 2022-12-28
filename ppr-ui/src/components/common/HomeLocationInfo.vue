@@ -175,10 +175,10 @@
         <v-col cols="12">
           <v-textarea
             filled
-            id="exceptPlan"
+            id="exceptionPlan"
             label="Except Plan"
             height="100"
-            v-model="locationInfo.exceptPlan"
+            v-model="locationInfo.exceptionPlan"
             :rules="maxLength(80)"
             persistent-hint
           />
@@ -226,7 +226,7 @@ export default defineComponent({
         meridian: '',
         parcel: '',
         block: '',
-        exceptPlan: ''
+        exceptionPlan: ''
       } as MhrLocationInfoIF,
       additionalDescription: '',
       reserveLengthErrMsg: 'Band Name, Reserve Number and Details combined cannot exceed 80 characters',

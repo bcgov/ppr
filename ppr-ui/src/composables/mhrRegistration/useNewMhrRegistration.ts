@@ -93,7 +93,7 @@ export const useNewMhrRegistration = () => {
         plan: '',
         bandName: '',
         reserveNumber: '',
-        exceptPlan: ''
+        exceptionPlan: ''
       },
       description: {
         manufacturer: '',

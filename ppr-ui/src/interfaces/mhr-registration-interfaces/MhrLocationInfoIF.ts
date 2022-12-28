@@ -13,5 +13,5 @@ export interface MhrLocationInfoIF {
   meridian?: string
   parcel?: string
   block?: string
-  exceptPlan?: string
+  exceptionPlan?: string
 }

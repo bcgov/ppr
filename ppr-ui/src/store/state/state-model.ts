@@ -215,7 +215,7 @@ export const stateModel: StateModelIF = {
       plan: '',
       bandName: '',
       reserveNumber: '',
-      exceptPlan: ''
+      exceptionPlan: ''
     },
     description: {
       manufacturer: '',
