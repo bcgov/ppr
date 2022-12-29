@@ -93,7 +93,7 @@ export const useNewMhrRegistration = () => {
         plan: '',
         bandName: '',
         reserveNumber: '',
-        exceptPlan: ''
+        exceptionPlan: ''
       },
       description: {
         manufacturer: '',
@@ -186,6 +186,10 @@ export const useNewMhrRegistration = () => {
 
     // Work around require to satisfy schema validations. Currently, not collected by UI.
     location.address.postalCode = 'A1A 1A1'
+
+    // otherType is not required by API and locationType should have otherType's value (#14751)
+    location.locationType = location.otherType
+    delete location.otherType
 
     return location
   }

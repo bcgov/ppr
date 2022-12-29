@@ -142,8 +142,8 @@
                 <p v-if="getMhrRegistrationLocation.landDistrict">
                   Land District: {{ getMhrRegistrationLocation.landDistrict }}
                 </p>
-                <p v-if="getMhrRegistrationLocation.exceptPlan" class="py-4">
-                  Except Plan: {{ getMhrRegistrationLocation.exceptPlan }}
+                <p v-if="getMhrRegistrationLocation.exceptionPlan" class="py-4">
+                  Except Plan: {{ getMhrRegistrationLocation.exceptionPlan }}
                 </p>
               </v-col>
               <v-col cols="9" class="pt-1" v-else>
