@@ -24,7 +24,11 @@
             </td>
             <td>
                 {% if not result.duplicate %}
-                    <a href="#{{result.baseRegistrationNumber}}">{{result.baseRegistrationNumber}}</a>
+                    {% if subreport is not defined %}
+                        <a href="#{{result.baseRegistrationNumber}}">{{result.baseRegistrationNumber}}</a>
+                    {% else %}
+                        {{result.baseRegistrationNumber}}
+                    {% endif %}
                 {% endif %}
             </td>
             <td>
@@ -51,7 +55,11 @@
             {% endif %}
             <td class="right-align">
                 {% if not result.duplicate %}
-                    <a href="#{{result.baseRegistrationNumber}}">{{result.pageNumber}}</a>
+                    {% if subreport is not defined %}
+                        <a href="#{{result.baseRegistrationNumber}}">{{result.pageNumber}}</a>
+                    {% else %}
+                        {{result.pageNumber}}
+                    {% endif %}
                 {% endif %}
             </td>
          </tr>
@@ -105,7 +113,11 @@
                 </td>
                 <td>
                     {% if not result.duplicate %}
-                        <a href="#{{result.baseRegistrationNumber}}">{{result.baseRegistrationNumber}}</a>
+                        {% if subreport is not defined %}
+                            <a href="#{{result.baseRegistrationNumber}}">{{result.baseRegistrationNumber}}</a>
+                        {% else %}
+                            {{result.baseRegistrationNumber}}
+                        {% endif %}
                     {% endif %}
                 </td>
                 <td>
@@ -125,7 +137,11 @@
                 </td>
                 <td class="right-align">
                     {% if not result.duplicate %}
-                        <a href="#{{result.baseRegistrationNumber}}">{{result.pageNumber}}</a>
+                        {% if subreport is not defined %}
+                            <a href="#{{result.baseRegistrationNumber}}">{{result.pageNumber}}</a>
+                        {% else %}
+                            {{result.pageNumber}}
+                        {% endif %}
                     {% endif %}
                 </td>
                 </tr>

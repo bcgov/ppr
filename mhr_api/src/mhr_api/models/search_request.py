@@ -413,13 +413,14 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
                     search_id = str(mapping['id'])
                     # Set to pending if async report is not yet available.
                     callback_url = str(mapping['callback_url'])
+                    search_ts = mapping['search_ts']
                     doc_storage_url = str(mapping['doc_storage_url'])
                     if callback_url is not None and callback_url.lower() != 'none' and \
                             (doc_storage_url is None or doc_storage_url.lower() == 'none'):
                         search_id += '_' + REPORT_STATUS_PENDING
                     search = {
                         'searchId': search_id,
-                        'searchDateTime': model_utils.format_ts(mapping['search_ts']),
+                        'searchDateTime': model_utils.format_ts(search_ts),
                         'searchQuery': mapping['api_criteria'],
                         'totalResultsSize': int(mapping['total_results_size']),
                         'returnedResultsSize': int(mapping['returned_results_size']),
@@ -431,7 +432,12 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
                         search['inProgress'] = not mapping['api_result'] and \
                             mapping['api_result'] != [] and search['totalResultsSize'] > 0
                         search['userId'] = str(mapping['user_id'])
-
+                        if not search.get('inProgress') and \
+                                ((doc_storage_url and doc_storage_url.lower() != 'none') or \
+                                  model_utils.report_retry_elapsed(search_ts)):
+                            search['reportAvailable'] = True
+                        else:
+                            search['reportAvailable'] = False
         return history_list
 
     @staticmethod

@@ -223,19 +223,6 @@ def test_search_result_nil(session, client, jwt):
         check_response(content, status, SEARCH_RESULT_NIL_PDFFILE)
 
 
-def test_search_result_large(session, client, jwt):
-    """Assert that setup for a search result report with > 1000 registrations is as expected."""
-    # setup
-    if is_report_v2():
-        json_data = get_json_from_file(SEARCH_RESULT_LARGE_DATAFILE)
-        report = Report(json_data, 'PS12345', ReportTypes.SEARCH_DETAIL_REPORT, 'Account Name')
-        # test
-        content, status, headers = report.get_pdf()
-        assert headers
-        # verify
-        check_response(content, status, SEARCH_RESULT_LARGE_PDFFILE)
-
-
 def test_search_result_75(session, client, jwt):
     """Assert that setup for a search result report with 75 registrations is as expected."""
     # setup

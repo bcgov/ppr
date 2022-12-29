@@ -35,6 +35,8 @@ DELETE FROM client_codes
   WHERE id BETWEEN 99990001 AND 99990004;
 DELETE FROM addresses
   WHERE id BETWEEN 99990001 AND 99990004;
+DELETE FROM user_profiles
+  WHERE id >= 200000000;
 DELETE FROM users
   WHERE id >= 200000000;
 DELETE FROM user_extra_registrations
@@ -43,10 +45,4 @@ DELETE FROM account_bcol_ids
   WHERE id >= 200000000;
 DELETE FROM event_tracking
   WHERE id >= 200000000;
-DELETE FROM test_search_results
-  WHERE id >= 200000000
-DELETE FROM test_searches
-  WHERE id >= 200000000
-DELETE FROM test_search_batches
-  WHERE id >= 200000000
 -- Delete test data end

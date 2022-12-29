@@ -141,8 +141,6 @@ TEST_STAFF_SEARCH_DATA = [
     (STAFF_ROLE, None, '654321', '111111', False, HTTPStatus.OK, False),
     (STAFF_ROLE, '12345', '654321', '111111', False, HTTPStatus.BAD_REQUEST, False),
     (BCOL_HELP, None, None, None, False, HTTPStatus.OK, False),
-    (GOV_ACCOUNT_ROLE, '12345', None, None, False, HTTPStatus.OK, False),
-    (GOV_ACCOUNT_ROLE, None, '654321', '111111', False, HTTPStatus.OK, False),
     (GOV_ACCOUNT_ROLE, None, None, None, False, HTTPStatus.OK, False)
 ]
 # testdata pattern is ({description}, {JSON data}, {mhr_num}, {client_ref_id}, {match_count})
@@ -212,10 +210,9 @@ def test_staff_search(session, client, jwt, role, routing_slip, bcol_number, dat
         else:
             params += '?certified=true'
     # print('params=' + params)
-    roles = [MHR_ROLE]
+    roles = [MHR_ROLE, role]
     account_id = role
     if role == GOV_ACCOUNT_ROLE:
-        roles.append(GOV_ACCOUNT_ROLE)
         account_id = '1234'
     headers=create_header_account(jwt, roles, 'test-user', account_id)
     rv = client.post('/api/v1/searches',

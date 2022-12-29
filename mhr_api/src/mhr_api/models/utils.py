@@ -733,7 +733,7 @@ def report_retry_elapsed(last_ts: _datetime):
     """Check that a sufficient delay has elapsed since the last report request."""
     now = now_ts()
     test_ts = (last_ts + timedelta(minutes=15)).replace(tzinfo=timezone.utc)
-    current_app.logger.info('Comparing now ' + now.isoformat() + ' with last ts ' + test_ts.isoformat())
+    # current_app.logger.info('Comparing now ' + now.isoformat() + ' with last ts ' + test_ts.isoformat())
     return now > test_ts
 
 
