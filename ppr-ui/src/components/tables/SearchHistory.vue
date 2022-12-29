@@ -24,8 +24,8 @@
                 <td>
                   <v-row no-gutters>
                     <v-col cols="2">
-                      <v-icon v-if="isPprSearch(item)" class="pr-2" color="primary">mdi-car</v-icon>
-                      <v-icon v-else class="pr-2" color="success">mdi-home</v-icon>
+                      <v-icon v-if="isPprSearch(item)" class="pr-2" color="#212529">mdi-account-details</v-icon>
+                      <v-icon v-else class="pr-2" color="#212529">mdi-home</v-icon>
                     </v-col>
                     <v-col>
                       {{ displaySearchValue(item.searchQuery) }}

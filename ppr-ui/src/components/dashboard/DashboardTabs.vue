@@ -14,7 +14,7 @@
       :ripple="false"
       :class="{ 'mt-1': isMhrTab }"
     >
-      <v-icon class="mr-2" :class="{'whiteIcon': isMhrTab}">mdi-car</v-icon>
+      <v-icon class="mr-2" :class="{'whiteIcon': isMhrTab}">mdi-account-details</v-icon>
       <b>Personal Property Registrations </b><span class="pl-1">({{ getRegTableTotalRowCount }})</span>
     </v-tab>
     <v-tab
