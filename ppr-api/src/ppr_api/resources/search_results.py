@@ -224,6 +224,7 @@ class SearchResultsResource(Resource):
                     search_detail.save()
                     return raw_data, HTTPStatus.OK, {'Content-Type': 'application/pdf'}
 
+            response_data['reportAvailable'] = search_detail.doc_storage_url is not None
             return jsonify(response_data), HTTPStatus.OK
         except DatabaseException as db_exception:
             return resource_utils.db_exception_response(db_exception, account_id, 'GET search details id=' + search_id)

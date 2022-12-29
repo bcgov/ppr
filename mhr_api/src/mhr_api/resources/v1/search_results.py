@@ -25,7 +25,7 @@ from mhr_api.exceptions import BusinessException, DatabaseException
 from mhr_api.models import EventTracking, SearchRequest, SearchResult
 from mhr_api.models.search_request import REPORT_STATUS_PENDING
 from mhr_api.resources import utils as resource_utils
-from mhr_api.services.authz import authorized, is_bcol_help, is_gov_account, is_staff_account
+from mhr_api.services.authz import authorized, is_bcol_help, is_sbc_office_account, is_staff_account
 from mhr_api.services.document_storage.storage_service import GoogleStorageService
 from mhr_api.services.payment.exceptions import SBCPaymentException
 from mhr_api.services.payment.payment import Payment
@@ -139,7 +139,7 @@ def post_search_results(search_id: str):  # pylint: disable=too-many-branches, t
             pay_ref = payment.create_payment_search(request_json,
                                                     str(query.id),
                                                     query.client_reference_id,
-                                                    is_gov_account(jwt))
+                                                    is_sbc_office_account(jwt.get_token_auth_header(), account_id))
         invoice_id = pay_ref['invoiceId']
         query.pay_invoice_id = int(invoice_id)
         query.pay_path = pay_ref['receipt']
@@ -221,7 +221,6 @@ def get_search_results(search_id: str):
         # If the request is for a report, fetch binary data from doc storage.
         if resource_utils.is_pdf(request):
             if search_detail.doc_storage_url is None:
-                # If report api call failed, try again here if > 20 minutes has elapsed.
                 error_msg = f'Search report not yet available for {search_id}.'
                 current_app.logger.info(error_msg)
                 return resource_utils.bad_request_response(error_msg)
@@ -231,6 +230,7 @@ def get_search_results(search_id: str):
             return raw_data, HTTPStatus.OK, {'Content-Type': 'application/pdf'}
 
         response_data = search_detail.json
+        response_data['reportAvailable'] = search_detail.doc_storage_url is not None
         return jsonify(response_data), HTTPStatus.OK
 
     except DatabaseException as db_exception:

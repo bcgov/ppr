@@ -420,7 +420,12 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
                         search['inProgress'] = not mapping['api_result'] and \
                             mapping['api_result'] != [] and search['totalResultsSize'] > 0
                         search['userId'] = str(mapping['user_id'])
-
+                        if not search.get('inProgress') and \
+                                ((doc_storage_url and doc_storage_url.lower() != 'none') or \
+                                  model_utils.report_retry_elapsed(search_ts)):
+                            search['reportAvailable'] = True
+                        else:
+                            search['reportAvailable'] = False
         return history_list
 
     @staticmethod

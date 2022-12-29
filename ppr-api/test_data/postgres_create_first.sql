@@ -1,7 +1,11 @@
 -- Intended to run after test_reset.sql. Put any statements that should run first here if sequence matters.
 
-INSERT INTO users(id, creation_date, username, sub, account_id, firstname, lastname, email, iss)
-  VALUES(200000000, current_timestamp, 'TESTUSER', 'subject', 'PS12345', 'TEST', 'USER', null, 'issuer')
+INSERT INTO users(id, creation_date, username, sub, account_id, firstname, lastname, email, iss, idp_userid, login_source)
+  VALUES(200000000, current_timestamp, 'TESTUSER', 'subject', 'PS12345', 'TEST', 'USER', null, 'issuer', '123', 'IDIR')
+;
+INSERT INTO user_profiles(id, payment_confirmation, search_selection_confirmation, default_drop_downs, default_table_filters,
+                          registrations_table, misc_preferences)
+  VALUES (200000000, 'Y', 'Y', 'Y', 'Y', null, null)
 ;
 
 -- Client Party Addresses

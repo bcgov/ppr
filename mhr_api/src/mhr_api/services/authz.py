@@ -45,6 +45,7 @@ QUALIFIED_USER_GROUP = 'mhr_qualified_user'
 MANUFACTURER_GROUP = 'mhr_manufacturer'
 GENERAL_USER_GROUP = 'mhr_general_user'
 SEARCH_USER_GROUP = 'mhr_search_user'
+SBC_STAFF_ACCOUNT = 'SBC_STAFF'
 
 
 def authorized(identifier: str, jwt: JwtManager) -> bool:
@@ -255,12 +256,11 @@ def is_sbc_office_account(token: str, account_id: str) -> bool:
     """Return True if the account id is an sbc office account id."""
     try:
         org_info = account_org(token, account_id)
-        if org_info and 'branchName' in org_info:
-            return 'Service BC' in org_info['branchName']
-        return None
+        if org_info and org_info.get('orgType') and org_info['orgType'] == SBC_STAFF_ACCOUNT:
+            return True
     except Exception as err:  # pylint: disable=broad-except # noqa F841;
-        current_app.logger.error('is_sbc_office_account failed: ' + repr(err))
-        return None
+        current_app.logger.error('is_sbc_office_account failed: ' + str(err))
+    return False
 
 
 def is_gov_account(jwt: JwtManager) -> bool:

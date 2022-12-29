@@ -19,7 +19,7 @@ Test-Suite to ensure that the client for the auth-api service is working as expe
 import pytest
 from flask import current_app
 
-from ppr_api.services import authz
+from mhr_api.services import authz
 from tests.unit.services.utils import helper_create_jwt
 
 
@@ -47,37 +47,13 @@ TEST_STAFF_DATA = [
 ]
 
 
-def test_user_orgs_mock(client, session, jwt):
-    """Assert that a auth-api user orgs request works as expected with the mock service endpoint."""
-    # setup
-    current_app.config.update(AUTH_SVC_URL=MOCK_URL_NO_KEY)
-    # print('env auth-api url=' + current_app.config.get('AUTH_SVC_URL'))
-    token = helper_create_jwt(jwt, [authz.PPR_ROLE])
-
-    # test
-    org_data = authz.user_orgs(token)
-    print(org_data)
-
-    # check
-    assert org_data
-    assert 'orgs' in org_data
-    assert len(org_data['orgs']) == 1
-    org = org_data['orgs'][0]
-    assert org['orgStatus'] == 'ACTIVE'
-    assert org['statusCode'] == 'ACTIVE'
-    assert org['orgType'] == 'PREMIUM'
-    assert org['id']
-    assert org['name']
-
-
 @pytest.mark.parametrize('desc,account_id,valid', TEST_SBC_DATA)
 def test_sbc_office_account(session, jwt, desc, account_id, valid):
     """Assert that sbc office account check returns the expected result."""
     # setup
     current_app.config.update(AUTH_SVC_URL=MOCK_URL_NO_KEY)
-    # requests_mock.get(f'{MOCK_URL}orgs/{account_id}', json={'branchName': branch_name})
     token = helper_create_jwt(jwt, [authz.GOV_ACCOUNT_ROLE])
-    result = authz.is_sbc_office_account(token, account_id) or False
+    result = authz.is_sbc_office_account(token, account_id)
     # check
     assert result == valid
 
