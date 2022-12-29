@@ -11,9 +11,10 @@ import {
   RegistrationSortIF
 } from '@/interfaces'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
-import { APIStatusTypes, HomeTenancyTypes } from '@/enums'
+import { APIStatusTypes, HomeTenancyTypes, mhUIStatusTypes } from '@/enums'
 import { getMhrDrafts, mhrRegistrationHistory } from '@/utils'
 import { orderBy } from 'lodash'
+import { mhStatusTypes } from '@/resources/statusTypes'
 export const useNewMhrRegistration = () => {
   const {
     getMhrRegistrationHomeDescription,
@@ -230,16 +231,20 @@ export const useNewMhrRegistration = () => {
   const fetchMhRegistrations = async (sortOptions: RegistrationSortIF = null): Promise<void> => {
     const draftFilings = await getMhrDrafts()
     const myMhrHistory = await mhrRegistrationHistory(true, sortOptions)
-    const filteredMhrHistory = addHistoryDraftsToMhr(myMhrHistory, draftFilings)
+    const filteredMhrHistory = addHistoryDraftsToMhr(myMhrHistory, draftFilings, sortOptions)
     setMhrTableHistory(filteredMhrHistory)
   }
 
-  function addHistoryDraftsToMhr (mhrHistory: MhRegistrationSummaryIF[], mhrDrafts: MhrDraftTransferApiIF[]):
+  function addHistoryDraftsToMhr (
+    mhrHistory: MhRegistrationSummaryIF[],
+    mhrDrafts: MhrDraftTransferApiIF[],
+    sortOptions: RegistrationSortIF = null):
     MhRegistrationSummaryIF[] {
     const sortedDraftFilings = orderBy(mhrDrafts, ['createDateTime'], ['desc'])
 
     const sortedMhrHistory = orderBy(mhrHistory, ['createDateTime'], ['desc'])
 
+    var mhrTableData = [] // u
     // add drafts to Registrations.
     sortedMhrHistory.forEach(transfer => {
       transfer.baseRegistrationNumber = transfer.mhrNumber
@@ -272,19 +277,24 @@ export const useNewMhrRegistration = () => {
             createDateTime: draft.createDateTime,
             error: draft.error,
             registrationDescription: draft.registrationDescription,
-            hasDraft: true,
+            hasDraft: sortOptions?.status === APIStatusTypes.DRAFT,
             ownerNames: '',
             path: draft.path,
             statusType: APIStatusTypes.DRAFT,
             username: '',
             documentId: draft.draftNumber
           }
-          transfer.changes.push(newDraft)
+          if (sortOptions?.status === mhUIStatusTypes.DRAFT) {
+            mhrTableData.push(newDraft)
+          } else {
+            transfer.changes.push(newDraft)
+          }
         })
         transfer.changes = orderBy(transfer.changes, ['createDateTime'], ['desc'])
       }
     })
-    return sortedMhrHistory
+    if (sortOptions?.status !== mhUIStatusTypes.DRAFT) mhrTableData = sortedMhrHistory
+    return mhrTableData
   }
   /**
    * @function cleanEmpty

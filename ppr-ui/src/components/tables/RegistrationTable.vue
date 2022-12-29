@@ -139,7 +139,7 @@
                     />
                   </div>
                   <v-select
-                    v-if="props.isPpr && header.value === 'statusType'"
+                    v-if="isPpr && header.value === 'statusType'"
                     :items="statusTypes"
                     hide-details
                     single-line
@@ -152,7 +152,7 @@
                     clearable
                   />
                   <v-select
-                    v-else-if="!props.isPpr && header.value === 'statusType'"
+                    v-else-if="header.value === 'statusType'"
                     :items="mhStatusTypes"
                     hide-details
                     single-line

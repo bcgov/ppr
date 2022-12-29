@@ -589,7 +589,7 @@ export function delayActions (milliseconds: number): Promise<any> {
 const UIFilterToApiFilter = {
   endDate: 'createDateTime',
   folNum: 'clientReferenceId',
-  regBy: 'registeringName',
+  regBy: 'username',
   regNum: 'mhrNumber',
   regType: 'registrationType',
   startDate: 'createDateTime',
