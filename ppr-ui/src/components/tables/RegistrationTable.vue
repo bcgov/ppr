@@ -175,6 +175,16 @@
                     dense
                   />
                   <v-text-field
+                    v-if="!isPpr && header.value === 'registeringParty'"
+                    filled
+                    single-line
+                    hide-details="true"
+                    v-model="registeringParty"
+                    type="text"
+                    label="Submitting Party"
+                    dense
+                  />
+                  <v-text-field
                     v-if="header.value === 'clientReferenceId'"
                     filled
                     single-line

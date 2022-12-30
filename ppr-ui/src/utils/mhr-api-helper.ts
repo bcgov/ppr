@@ -593,7 +593,8 @@ const UIFilterToApiFilter = {
   regNum: 'mhrNumber',
   regType: 'registrationType',
   startDate: 'createDateTime',
-  status: 'statusType'
+  status: 'statusType',
+  regParty: 'submittingName'
 }
 
 // add sorting params for registration history/draft api calls
