@@ -127,7 +127,7 @@ export const MHRSearchTypes: Array<SearchTypeIF> = [
     selectDisabled: false,
     searchTypeUI: UIMHRSearchTypes.MHRORGANIZATION_NAME,
     searchTypeAPI: APIMHRMapSearchTypes.MHRORGANIZATION_NAME,
-    textLabel: '',
+    textLabel: 'Enter an organization name',
     hints: {
       searchValue: 'Organization names must contain between 2 and 70 characters'
     },
