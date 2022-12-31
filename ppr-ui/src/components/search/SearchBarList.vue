@@ -9,7 +9,7 @@
           item-disabled="selectDisabled"
           item-text="searchTypeUI"
           item-value="searchTypeAPI"
-          :label="selectedSearchType ? '' : searchTypeLabel"
+          :label="searchTypeLabel"
           return-object
           v-model="selectedSearchType"
           @focus="updateSelections()"
@@ -89,10 +89,17 @@ export default defineComponent({
         return props.defaultCategoryMessage
       }),
       searchTypeLabel: computed((): string => {
-        if (localState.selectedSearchType?.searchTypeUI) {
+        if (!localState.selectedSearchType) {
+          return 'Select a search category'
+        }
+        // display searchTypeUI label when both groups are collapsed
+        if (Object.values(localState.displayGroup).every(group => group === false)) {
           return localState.selectedSearchType.searchTypeUI
         }
-        return 'Select a search category'
+        // display searchTypeUI label even if other group is expanded
+        if (!localState.displayGroup[localState.selectedSearchType.group]) {
+          return localState.selectedSearchType.searchTypeUI
+        }
       }),
       origItems: computed((): Array<SearchTypeIF> => {
         const allSearchTypes = []
