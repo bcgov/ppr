@@ -10,7 +10,7 @@
         <v-list v-if="autoCompleteResults && autoCompleteResults.length > 0" class="pt-0 results-list">
           <v-list-item disabled>
             <v-row class="auto-complete-sticky-row">
-              <v-col cols="24">Active B.C. Businesses</v-col>
+              <v-col cols="24">Active B.C. Businesses:</v-col>
             </v-row>
           </v-list-item>
           <v-list-item-group v-model="autoCompleteSelected">
@@ -50,7 +50,7 @@
         </v-list>
         <div v-else-if="hasNoMatches" id="no-party-matches" class="pa-5">
           <p class="auto-complete-sticky-row">
-            Active B.C. Businesses
+            Active B.C. Businesses:
           </p>
           <p>
             <strong>
@@ -72,6 +72,7 @@ import { defineComponent, reactive, toRefs, watch, computed } from '@vue/composi
 import { SearchResponseI } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { useSearch } from '@/composables/useSearch'
 import { BusinessTypes } from '@/enums/business-types'
+import { debounce } from 'lodash'
 
 export default defineComponent({
   name: 'BusinessSearchAutocomplete',
@@ -145,12 +146,12 @@ export default defineComponent({
     )
     watch(
       () => props.searchValue,
-      (val: string) => {
+      debounce((val: string) => {
         if (localState.autoCompleteIsActive) {
           updateAutoCompleteResults(val)
           localState.isSearchResultSelected = false
         }
-      }
+      }, 1000) // add a one second delay before triggering the search, as per UXA
     )
     watch(
       () => localState.searching,
