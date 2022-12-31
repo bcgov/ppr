@@ -61,6 +61,7 @@
                     content-class="top-tooltip pa-5"
                     transition="fade-transition"
                     data-test-id="suffix-tooltip"
+                    allow-overflow
                   >
                     <template v-slot:activator="{ on, attrs }">
                       <span
