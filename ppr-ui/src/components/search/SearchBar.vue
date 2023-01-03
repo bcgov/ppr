@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid no-gutters class="white pa-6">
+  <v-container fluid no-gutters class="white" :class="[$style['search-bar-container']]">
     <confirmation-dialog
       :setDisplay="confirmationDialog"
       :setOptions="dialogOptions"
@@ -14,7 +14,7 @@
       :setShowCertifiedCheckbox="true"
       @proceed="onStaffPaymentChanges($event)"
     />
-    <v-row no-gutters class="pt-2">
+    <v-row no-gutters :class="[$style['pt-10px']]">
       <v-col :class="[$style['search-info'], 'select-search-text','pt-4']">
         Select a search category and then enter a criteria to search.
         <span v-if="shouldShowFeeHint">
@@ -31,8 +31,8 @@
       <v-col align-self="end" cols="1" class="pl-3"/>
     </v-row>
     <v-row v-if="typeOfSearch">
-      <v-col>
-        <div v-html="typeOfSearch" class="font-weight-bold"></div>
+      <v-col class="pt-0">
+        <div v-html="typeOfSearch" class="font-weight-bold gray9"></div>
       </v-col>
     </v-row>
     <v-row no-gutters class="pt-1">
@@ -154,7 +154,7 @@
           </v-menu>
         </v-row>
         <v-row v-if="shouldShowFeeHint" no-gutters>
-          <span :id="$style['search-btn-info']" class="pl-1 pt-2 fee-text">
+          <span :id="$style['search-btn-info']" class="pl-2 pt-2 fee-text">
             ${{ fee }} fee
           </span>
         </v-row>
@@ -663,5 +663,13 @@ export default defineComponent({
 .folio-info {
   color: $gray7;
   font-size: 0.875rem;
+}
+
+.pt-10px {
+  padding-top: 6px;
+}
+
+.search-bar-container {
+  padding: 24px 30px 22px 24px;
 }
 </style>

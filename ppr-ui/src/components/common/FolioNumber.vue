@@ -68,6 +68,10 @@ export default defineComponent({
 #folio-box {
   width: 250px;
   margin-left: 54px;
+
+  .v-text-field__details {
+    margin-bottom: 0px;
+  }
 }
 
 </style>
