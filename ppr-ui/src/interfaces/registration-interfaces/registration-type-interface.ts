@@ -1,4 +1,4 @@
-import { APIMhrDescriptionTypes, APIRegistrationTypes, UIRegistrationTypes } from '@/enums'
+import { APIMhrDescriptionTypes, APIRegistrationTypes, UIMhrDescriptionTypes, UIRegistrationTypes } from '@/enums'
 
 // Search type interface
 export interface RegistrationTypeIF {
@@ -16,7 +16,7 @@ export interface MhRegistrationTypeIF {
   disabled: boolean
   divider: boolean
   group: number
-  registrationTypeUI: APIMhrDescriptionTypes,
+  registrationTypeUI: UIMhrDescriptionTypes,
   registrationTypeAPI: APIMhrDescriptionTypes,
   text: string
 }
