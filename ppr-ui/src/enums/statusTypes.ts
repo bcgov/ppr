@@ -19,3 +19,10 @@ export enum mhUIStatusTypes {
   EXEMPT = 'Exempt',
   HISTORICAL = 'Historical'
 }
+
+export enum mhApiStatusTypes {
+  DRAFT = 'DRAFT',
+  ACTIVE = 'ACTIVE',
+  EXEMPT = 'EXEMPT',
+  HISTORICAL = 'HISTORICAL'
+}

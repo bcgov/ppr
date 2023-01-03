@@ -1,4 +1,4 @@
-import { APIStatusTypes, UIStatusTypes, mhUIStatusTypes } from '@/enums'
+import { APIStatusTypes, UIStatusTypes, mhUIStatusTypes, mhApiStatusTypes } from '@/enums'
 
 export const StatusTypes = [
   {
@@ -22,20 +22,19 @@ export const StatusTypes = [
 
 export const mhStatusTypes = [
   {
-    value: mhUIStatusTypes.DRAFT,
+    value: mhApiStatusTypes.DRAFT,
     text: mhUIStatusTypes.DRAFT
   },
   {
-    value: mhUIStatusTypes.ACTIVE,
-    mhrValue: mhUIStatusTypes.ACTIVE,
+    value: mhApiStatusTypes.ACTIVE,
     text: mhUIStatusTypes.ACTIVE
   },
   {
-    value: mhUIStatusTypes.EXEMPT,
+    value: mhApiStatusTypes.EXEMPT,
     text: mhUIStatusTypes.EXEMPT
   },
   {
-    value: mhUIStatusTypes.HISTORICAL,
+    value: mhApiStatusTypes.HISTORICAL,
     text: mhUIStatusTypes.HISTORICAL
   }
 ]

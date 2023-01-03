@@ -74,7 +74,7 @@ describe('Test registration table with results', () => {
     mockedRegistration3
   ]
 
-  const mhrRegistrationHistory: MhRegistrationSummaryIF[] = [
+  const mhrRegistrationHistoryTest: MhRegistrationSummaryIF[] = [
     mockMhrTransferDraft
   ]
 
@@ -231,8 +231,8 @@ describe('Test registration table with results', () => {
   })
 
   it('filters mhr table data properly', async () => {
-    await wrapper.setProps({ setRegistrationHistory: mhrRegistrationHistory })
-    expect(wrapper.vm.$props.setRegistrationHistory).toEqual(mhrRegistrationHistory)
+    await wrapper.setProps({ setRegistrationHistory: mhrRegistrationHistoryTest })
+    expect(wrapper.vm.$props.setRegistrationHistory).toEqual(mhrRegistrationHistoryTest)
     expect(wrapper.findAllComponents(TableRow).length).toBe(1)
     // clear filters button only shows when a filter is active
     expect(wrapper.findAll('.v-btn.registration-action').length).toBe(0)
