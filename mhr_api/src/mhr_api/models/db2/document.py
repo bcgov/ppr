@@ -306,25 +306,25 @@ class Db2Document(db.Model):
         if reg_json.get('submittingParty'):
             submitting = reg_json.get('submittingParty')
             if submitting.get('phoneNumber'):
-                doc.phone_number = str(submitting.get('phoneNumber'))[0:9]
+                doc.phone_number = str(submitting.get('phoneNumber'))[0:10]
             else:
                 doc.phone_number = ''
             if submitting.get('businessName'):
-                doc.name = str(submitting.get('businessName'))[0:39]
+                doc.name = str(submitting.get('businessName'))[0:40]
             else:
                 ind_name: str = model_utils.to_db2_ind_name(submitting.get('personName'))
-                doc.name = ind_name[0:39]
+                doc.name = ind_name[0:40]
             doc.legacy_address = address_utils.to_db2_address(submitting.get('address'))
         else:
             doc.phone_number = ''
             doc.name = ''
             doc.legacy_address = ''
         if reg_json.get('attentionReference'):
-            doc.attention_reference = str(reg_json['attentionReference'])[0:39]
+            doc.attention_reference = str(reg_json['attentionReference'])[0:40]
         else:
             doc.attention_reference = ''
         if registration.client_reference_id:
-            doc.client_reference_id = registration.client_reference_id[0:29]
+            doc.client_reference_id = registration.client_reference_id[0:30]
         else:
             doc.client_reference_id = ''
         if doc_type in (Db2Document.DocumentTypes.TRANS, Db2Document.DocumentTypes.TRAND):

@@ -121,6 +121,23 @@ def validate_exemption(registration: MhrRegistration, json_data, is_staff: bool 
     return error_msg
 
 
+def validate_permit(registration: MhrRegistration, json_data, is_staff: bool = False):
+    """Perform all transport permit data validation checks not covered by schema validation."""
+    error_msg = ''
+    try:
+        if is_staff:
+            error_msg += validate_doc_id(json_data)
+        if registration:
+            error_msg += validate_ppr_lien(registration.mhr_number)
+        error_msg += validate_submitting_party(json_data)
+        error_msg += validate_registration_state(registration)
+
+    except Exception as validation_exception:   # noqa: B902; eat all errors
+        current_app.logger.error('validate_transfer exception: ' + str(validation_exception))
+        error_msg += VALIDATOR_ERROR
+    return error_msg
+
+
 def validate_doc_id(json_data, check_exists: bool = True):
     """Validate the registration document id."""
     doc_id = json_data.get('documentId')

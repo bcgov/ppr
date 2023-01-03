@@ -1,0 +1,98 @@
+[[macros.html]]
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>{{ meta_title }}</title>
+    <meta charset="UTF-8">
+    <meta name="author" content="BC Registries and Online Services">
+      {% if environment == '' %}
+        [[v2/stylePageRegistration.html]]
+      {% else %}
+        [[v2/stylePageRegistrationDraft.html]]
+      {% endif %}
+      [[v2/style.html]]
+  </head>
+  <body>
+  <div class="business-details-container mtn-2">
+    <table class="registration-details-table-grey mt-0" role="presentation">
+      <tr>
+        <td>Document ID:</td>
+        <td>{{documentId}} </td>
+      </tr>
+      <tr>
+        <td>Document Type:</td>
+        <td>
+          {% if documentDescription is defined and documentDescription != '' %}
+            {{documentDescription|title}} 
+          {% else %}
+            Register New Unit
+          {% endif %}                  
+          </td>
+      </tr>
+      <tr>
+        <td>Document Registration Number:</td>
+        <td>{{documentRegistrationNumber}} </td>
+      </tr>
+      <tr>
+        <td>Document Registration Date and Time:</td>
+        <td>
+          {% if createDateTime is defined and createDateTime != '' %}
+            {{createDateTime}} 
+          {% else %}
+            N/A
+          {% endif %}
+        </td>
+      </tr>
+        <tr>
+        <td>Attention/Reference Number:</td>
+        <td>
+          {% if attentionReference is defined and attentionReference != '' %}
+            {{attentionReference}} 
+          {% else %}
+            N/A
+          {% endif %}
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="container pt-4">
+    [[registration/location.html]]
+
+    {% if note is defined %}
+      <div class="no-page-break">
+        <div class="separator-header mt-6"></div>
+        <div class="section-title-centre mt-2">UNIT NOTE</div>
+        <div class="separator-header mt-0"></div>
+      </div>
+      <table class="no-page-break section-data details-table mt-4" role="presentation">
+        <tr>
+            <td class="section-sub-title">Expired Date:</td>
+            <td>{% if note.expiryDate is defined and note.expiryDate != '' %} 
+                    {{note.expiryDate}}
+                {% else %}
+                    N/A
+                {% endif %}
+            </td>
+        </tr>
+        <tr>
+            <td class="section-sub-title">Remarks:</td>
+            <td>
+              {% if note.remarks is defined and note.remarks != '' %} 
+                  {{note.remarks}}
+              {% else %}
+                  N/A
+              {% endif %}
+            </td>
+        </tr>
+      </table>
+
+    {% endif %}
+
+    [[registration/submittingParty.html]]
+  </div>
+  <p class="last-page"></p>
+  </body>
+</html>
+

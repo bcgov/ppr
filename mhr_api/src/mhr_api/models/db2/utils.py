@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """This module holds common statement registration data."""
-
 from flask import current_app
 from sqlalchemy.sql import text
 

@@ -45,7 +45,23 @@ TRANSFER_TEST_TC_PDFFILE = 'tests/unit/reports/data/trans-test-example-tc.pdf'
 
 EXEMPTION_TEST_RES_DATAFILE = 'tests/unit/reports/data/exempt-res-test-example.json'
 EXEMPTION_TEST_RES_PDFFILE = 'tests/unit/reports/data/exempt-res-test-example.pdf'
+
+PERMIT_TEST_DATAFILE = 'tests/unit/reports/data/permit-test-example.json'
+PERMIT_TEST_PDFFILE = 'tests/unit/reports/data/permit-test-example.pdf'
 REPORT_VERSION_V2 = '2'
+
+
+def test_transport_permit(session, client, jwt):
+    """Assert that generation of a test report is as expected."""
+    # setup
+    if is_report_v2():
+        json_data = get_json_from_file(PERMIT_TEST_DATAFILE)
+        report = Report(json_data, 'PS12345', ReportTypes.MHR_TRANSPORT_PERMIT, 'Account Name')
+        # test
+        content, status, headers = report.get_pdf()
+        assert headers
+        # verify
+        check_response(content, status, PERMIT_TEST_PDFFILE)
 
 
 def test_transfer_trans_so(session, client, jwt):

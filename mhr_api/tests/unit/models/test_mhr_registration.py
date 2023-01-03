@@ -22,7 +22,7 @@ from http import HTTPStatus
 from flask import current_app
 
 import pytest
-from registry_schemas.example_data.mhr import REGISTRATION, TRANSFER, EXEMPTION
+from registry_schemas.example_data.mhr import REGISTRATION, TRANSFER, EXEMPTION, PERMIT
 
 from mhr_api.exceptions import BusinessException
 from mhr_api.models import MhrRegistration, MhrDraft, MhrDocument, MhrNote, utils as model_utils
@@ -197,6 +197,16 @@ TEST_DATA_EXEMPTION = [
 ]
 # testdata pattern is ({mhr_num}, {group_id}, {account_id})
 TEST_DATA_EXEMPTION_SAVE = [
+    ('150062', QUALIFIED_USER_GROUP, '2523')
+]
+# testdata pattern is ({mhr_num}, {group_id}, {doc_id_prefix}, {account_id})
+TEST_DATA_PERMIT = [
+    ('150062', GOV_ACCOUNT_ROLE, '9', '2523'),
+    ('150062', MANUFACTURER_GROUP, '8', '2523'),
+    ('150062', QUALIFIED_USER_GROUP, '1', '2523')
+]
+# testdata pattern is ({mhr_num}, {group_id}, {account_id})
+TEST_DATA_PERMIT_SAVE = [
     ('150062', QUALIFIED_USER_GROUP, '2523')
 ]
 # testdata pattern is ({http_status}, {document_id}, {mhr_num}, {doc_type}, {legacy}, {owner_count})
@@ -653,7 +663,62 @@ def test_create_exemption_from_json(session, mhr_num, user_group, doc_id_prefix,
     assert note.expiry_date.month == 10
 
 
-# testdata pattern is ({type}, {group_count}, {owner_count}, {denominator}, {data})
+@pytest.mark.parametrize('mhr_num,user_group,doc_id_prefix,account_id', TEST_DATA_EXEMPTION)
+def test_create_permit_from_json(session, mhr_num, user_group, doc_id_prefix, account_id):
+    """Assert that an MHR tranfer is created from MHR exemption json correctly."""
+    json_data = copy.deepcopy(PERMIT)
+    del json_data['documentId']
+    del json_data['documentRegistrationNumber']
+    del json_data['documentDescription']
+    del json_data['createDateTime']
+    del json_data['payment']
+    del json_data['note']
+    del json_data['registrationType']
+    json_data['mhrNumber'] = mhr_num
+    base_reg: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account_id)
+    assert base_reg
+    assert base_reg.manuhome
+    assert base_reg.manuhome.reg_documents
+    # current_app.logger.info(json_data)
+    registration: MhrRegistration = MhrRegistration.create_permit_from_json(base_reg,
+                                                                            json_data,
+                                                                            'PS12345',
+                                                                            'userid',
+                                                                            user_group)
+    assert registration.draft
+    assert registration.draft.id > 0
+    assert registration.draft_id == registration.draft.id
+    assert registration.draft.draft_number
+    assert registration.draft.registration_type == registration.registration_type
+    assert registration.draft.create_ts == registration.registration_ts
+    assert registration.draft.account_id == registration.account_id
+    assert registration.parties
+    sub_party = registration.parties[0]
+    assert sub_party.registration_id == registration.id
+    assert sub_party.party_type == MhrPartyTypes.SUBMITTING
+    if model_utils.is_legacy():
+        assert registration.manuhome
+    assert registration.documents
+    doc: MhrDocument = registration.documents[0]
+    assert doc.id > 0
+    assert doc.document_id == registration.doc_id
+    assert doc.document_type == MhrDocumentTypes.REG_103
+    assert doc.document_registration_number == registration.doc_reg_number
+    assert registration.notes
+    note: MhrNote = registration.notes[0]
+    assert note.document_type == doc.document_type
+    assert note.document_id == doc.id
+    assert note.destroyed == 'N'
+    assert note.remarks
+    assert note.expiry_date
+    assert registration.locations
+    location = registration.locations[0]
+    assert location.registration_id == registration.id
+    assert location.change_registration_id == registration.id
+    assert location.location_type in MhrLocationTypes
+    assert location.status_type == MhrStatusTypes.ACTIVE
+
+
 @pytest.mark.parametrize('type,group_count,owner_count,denominator,data', TEST_DATA_NEW_GROUP)
 def test_create_new_groups(session, type, group_count, owner_count, denominator, data):
     """Assert that an new MH registration groups are created from json correctly."""
