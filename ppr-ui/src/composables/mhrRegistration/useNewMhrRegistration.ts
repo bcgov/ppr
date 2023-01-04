@@ -14,7 +14,7 @@ import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 import { APIStatusTypes, HomeTenancyTypes, mhUIStatusTypes } from '@/enums'
 import { getMhrDrafts, mhrRegistrationHistory } from '@/utils'
 import { orderBy } from 'lodash'
-import { mhStatusTypes } from '@/resources/statusTypes'
+import { MhStatusTypes } from '@/resources/statusTypes'
 export const useNewMhrRegistration = () => {
   const {
     getMhrRegistrationHomeDescription,
@@ -244,7 +244,7 @@ export const useNewMhrRegistration = () => {
 
     const sortedMhrHistory = orderBy(mhrHistory, ['createDateTime'], ['desc'])
 
-    var mhrTableData = [] // u
+    var mhrTableData = []
     // add drafts to Registrations.
     sortedMhrHistory.forEach(transfer => {
       transfer.baseRegistrationNumber = transfer.mhrNumber

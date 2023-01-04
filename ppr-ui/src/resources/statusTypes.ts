@@ -20,7 +20,7 @@ export const StatusTypes = [
   }
 ]
 
-export const mhStatusTypes = [
+export const MhStatusTypes = [
   {
     value: mhApiStatusTypes.DRAFT,
     text: mhUIStatusTypes.DRAFT

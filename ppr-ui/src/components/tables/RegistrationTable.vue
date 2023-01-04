@@ -315,7 +315,7 @@ import {
   TableActions
 } from '@/enums'
 import { useRegistration } from '@/composables/useRegistration'
-import { MHRegistrationTypes, RegistrationTypesStandard, StatusTypes, mhStatusTypes } from '@/resources'
+import { MHRegistrationTypes, RegistrationTypesStandard, StatusTypes, MhStatusTypes } from '@/resources'
 
 export default defineComponent({
   components: {
@@ -429,7 +429,7 @@ export default defineComponent({
       mhrRegistrationTypes: [...MHRegistrationTypes].slice(1),
       showDatePicker: false,
       statusTypes: [...StatusTypes],
-      mhStatusTypes: [...mhStatusTypes],
+      mhStatusTypes: [...MhStatusTypes],
       hasRPPR: computed(() => {
         const productSubscriptions =
           getAccountProductSubscriptions.value as AccountProductSubscriptionIF
