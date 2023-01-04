@@ -7,7 +7,8 @@ export interface UserSettingsIF {
   [SettingOptions.SELECT_CONFIRMATION_DIALOG]: boolean // default true
   defaultDropDowns: boolean // default true
   defaultTableFilters: boolean // default true
-  [SettingOptions.REGISTRATION_TABLE]?: { columns: BaseHeaderIF[] } // api will save whatever json the UI posts
+  // api will save whatever json the UI posts
+  [SettingOptions.REGISTRATION_TABLE]?: { columns: BaseHeaderIF[], mhrColumns: BaseHeaderIF[] }
   miscellaneousPreferences?: any // api will save whatever json the UI posts
   error?: ErrorIF
 }
