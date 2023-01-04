@@ -4,7 +4,6 @@ import {
   MhrRegistrationHomeLocationIF
 } from '@/interfaces'
 export interface MhrRegistrationIF {
-  mhrAddEditOwnerError: boolean,
   documentId: string
   clientReferenceId: string
   declaredValue: string

@@ -203,11 +203,6 @@ export const isMhrRegistration = (state: StateIF): boolean => {
     APIRegistrationTypes.MANUFACTURED_HOME_REGISTRATION
 }
 
-/** Is true when a registration has been reviewed. Can be manipulated for dependencies on Review section */
-export const getMhrAddEditOwnerError = (state: StateIF): boolean => {
-  return state.stateModel.mhrRegistration.mhrAddEditOwnerError
-}
-
 /** The selected registration flow type object. */
 export const getRegistrationFlowType = (state: StateIF): RegistrationFlowType => {
   return state.stateModel.registration.registrationFlowType

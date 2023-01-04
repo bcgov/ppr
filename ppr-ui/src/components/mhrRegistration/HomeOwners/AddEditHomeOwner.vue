@@ -379,21 +379,23 @@ export default defineComponent({
     const {
       getMhrRegistrationHomeOwnerGroups,
       getMhrTransferHomeOwnerGroups,
-      getMhrRegistrationValidationModel,
-      getMhrAddEditOwnerError
+      getMhrRegistrationValidationModel
     } = useGetters<any>([
       'getMhrRegistrationHomeOwnerGroups',
       'getMhrTransferHomeOwnerGroups',
-      'getMhrRegistrationValidationModel',
-      'getMhrAddEditOwnerError'
+      'getMhrRegistrationValidationModel'
     ])
 
-    const { MhrSectVal, getStepValidation } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
+    const {
+      MhrSectVal,
+      getStepValidation,
+      setValidation,
+      MhrCompVal
+    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
     const {
-      setUnsavedChanges,
-      setMhrAddEditOwnerError
-    } = useActions<any>(['setUnsavedChanges', 'setMhrAddEditOwnerError'])
+      setUnsavedChanges
+    } = useActions<any>(['setUnsavedChanges'])
 
     const { required, customRules, maxLength, minLength, isPhone, isNumber, invalidSpaces } = useInputRules()
 
@@ -477,7 +479,7 @@ export default defineComponent({
       ownersGroupId: computed(() => (showGroups.value ? localState.group?.groupId : null)),
       owner: { ...defaultHomeOwner },
       showReviewedError: computed(() =>
-        (!getStepValidation(MhrSectVal.HOME_OWNERS_VALID) && getMhrAddEditOwnerError.value)),
+        (!getStepValidation(MhrSectVal.HOME_OWNERS_VALID) && !getStepValidation(MhrSectVal.ADD_EDIT_OWNERS_VALID))),
       ownerGroupId: props.editHomeOwner?.groupId,
       showGroups: showGroups,
       isPerson: props.isHomeOwnerPerson,
@@ -517,7 +519,7 @@ export default defineComponent({
     const done = (): void => {
       // @ts-ignore - function exists
       context.refs.addHomeOwnerForm.validate()
-      setMhrAddEditOwnerError(false)
+      setValidation(MhrSectVal.ADD_EDIT_OWNERS_VALID, MhrCompVal.OWNERS_VALID, true)
       if (localState.isHomeOwnerFormValid && localState.isAddressFormValid) {
         if (props.editHomeOwner) {
           editHomeOwner(
@@ -565,7 +567,7 @@ export default defineComponent({
     }
     const cancel = (): void => {
       localState.ownerGroupId = props.editHomeOwner?.groupId
-      setMhrAddEditOwnerError(false)
+      setValidation(MhrSectVal.ADD_EDIT_OWNERS_VALID, MhrCompVal.OWNERS_VALID, true)
       context.emit('cancel')
     }
 

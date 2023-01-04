@@ -87,7 +87,7 @@ export default defineComponent({
       'isRoleStaffReg', 'getMhrRegistrationValidationModel'
     ])
 
-    const { setStaffPayment, setMhrAddEditOwnerError } = useActions<any>(['setStaffPayment', 'setMhrAddEditOwnerError'])
+    const { setStaffPayment } = useActions<any>(['setStaffPayment'])
 
     const {
       MhrCompVal,
@@ -97,6 +97,7 @@ export default defineComponent({
       getValidation,
       getStepValidation
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
+    
     const{
       isGlobalEditingMode
     } = useHomeOwners()
@@ -224,7 +225,9 @@ export default defineComponent({
               getStepValidation(MhrSectVal.LOCATION_VALID)
             ])
           // Only set reviewed if add/edit form was open when review reached
-          if (isGlobalEditingMode.value) setMhrAddEditOwnerError(true)
+          if (isGlobalEditingMode.value) {
+            setValidation(MhrSectVal.ADD_EDIT_OWNERS_VALID, MhrCompVal.OWNERS_VALID, false)
+          }
           setValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_STEPS, true)
           break
       }

@@ -160,7 +160,6 @@ export const stateModel: StateModelIF = {
     lienRegistrationType: ''
   },
   mhrRegistration: {
-    mhrAddEditOwnerError: false,
     documentId: '',
     clientReferenceId: '',
     declaredValue: '',
@@ -269,6 +268,9 @@ export const stateModel: StateModelIF = {
     },
     homeOwnersValid: {
       ownersValid: false
+    },
+    addEditOwnersValid: {
+      ownersValid: true
     },
     locationValid: {
       locationTypeValid: false,
