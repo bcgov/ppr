@@ -10,11 +10,12 @@ import {
   MhRegistrationSummaryIF,
   ErrorIF,
   MhrTransferApiIF,
-  MhrDraftTransferApiIF, DraftIF
+  MhrDraftTransferApiIF, DraftIF, RegistrationSortIF
 } from '@/interfaces'
 import { APIMhrTypes, ErrorCategories, ErrorCodes } from '@/enums'
 import { useSearch } from '@/composables/useSearch'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
+import { addTimestampToDate } from '@/utils'
 const { mapMhrSearchType } = useSearch()
 
 // Create default request base URL and headers.
@@ -315,9 +316,15 @@ export async function submitMhrRegistration (payloadData, queryParamData) {
  * @param withCollapse // Used to indicate whether api should return registrations collapsed
  * @returns MhRegistrationSummaryIF
  */
-export async function mhrRegistrationHistory (withCollapse: boolean = false) {
+export async function mhrRegistrationHistory (withCollapse: boolean = false, sortOptions: RegistrationSortIF = null) {
   try {
-    const path = withCollapse ? 'registrations?collapse=true' : 'registrations'
+    var path = withCollapse ? 'registrations?collapse=true' : 'registrations'
+    if (sortOptions) {
+      path = addSortParams(
+        path,
+        sortOptions)
+    }
+
     const result = await axios.get(path, getDefaultConfig())
     if (!result?.data) {
       throw new Error('Invalid API response')
@@ -578,4 +585,38 @@ export async function deleteMhrDraft (draftID: string): Promise<ErrorIF> {
 // UX util function to delay any actions for defined number of milliseconds
 export function delayActions (milliseconds: number): Promise<any> {
   return new Promise(resolve => setTimeout(resolve, milliseconds))
+}
+
+const UIFilterToApiFilter = {
+  endDate: 'createDateTime',
+  folNum: 'clientReferenceId',
+  regBy: 'username',
+  regNum: 'mhrNumber',
+  regType: 'registrationType',
+  startDate: 'createDateTime',
+  status: 'statusType',
+  regParty: 'submittingName'
+}
+
+// add sorting params for registration history/draft api calls
+function addSortParams (url: string, sortOptions: RegistrationSortIF): string {
+  const sortKeys = Object.keys(sortOptions)
+  // add all set filters as params to the call
+  for (const i in sortKeys) {
+    // convert to api expected value (too tied in with header logic to change earlier)
+    if (sortOptions[sortKeys[i]] === 'createDateTime') {
+      // sortKeys[i] === orderBy (only case this will happen)
+      sortOptions[sortKeys[i]] = 'startDateTime'
+    }
+
+    // add timestamp onto datetime param values
+    if (sortOptions[sortKeys[i]] && ['createDateTime'].includes(UIFilterToApiFilter[sortKeys[i]])) {
+      sortOptions[sortKeys[i]] =
+      addTimestampToDate(sortOptions[sortKeys[i]], sortOptions[sortKeys[i]] === 'endDateTime')
+    }
+    if (sortOptions[sortKeys[i]]) {
+      url += `&${UIFilterToApiFilter[sortKeys[i]]}=${sortOptions[sortKeys[i]]}`
+    }
+  }
+  return url
 }

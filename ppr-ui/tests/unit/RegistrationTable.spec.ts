@@ -12,7 +12,7 @@ import { TableRow } from '@/components/tables/common'
 import { RegistrationBarTypeAheadList } from '@/components/registration'
 // local types/helpers/etc.
 import { AccountProductCodes, AccountProductMemberships, TableActions } from '@/enums'
-import { DraftResultIF, RegistrationSummaryIF, RegTableDataI, RegTableNewItemI } from '@/interfaces'
+import { DraftResultIF, MhrDraftTransferApiIF, MhRegistrationSummaryIF, RegistrationSummaryIF, RegTableDataI, RegTableNewItemI } from '@/interfaces'
 import { registrationTableHeaders } from '@/resources'
 // unit test data/helpers
 import {
@@ -22,7 +22,8 @@ import {
   mockedDraftAmend,
   mockedRegistration3,
   mockedRegistration1Collapsed,
-  mockedRegistration2Collapsed
+  mockedRegistration2Collapsed,
+  mockMhrTransferDraft
 } from './test-data'
 import { getLastEvent, setupIntersectionObserverMock } from './utils'
 
@@ -71,6 +72,10 @@ describe('Test registration table with results', () => {
     mockedRegistration1Collapsed,
     mockedRegistration2Collapsed,
     mockedRegistration3
+  ]
+
+  const mhrRegistrationHistoryTest: MhRegistrationSummaryIF[] = [
+    mockMhrTransferDraft
   ]
 
   beforeEach(async () => {
@@ -223,6 +228,59 @@ describe('Test registration table with results', () => {
       }, 3000)
       expect(wrapper.findAll('.v-btn.registration-action').length).toBe(0)
     }, 3000)
+  })
+
+  it('filters mhr table data properly', async () => {
+    await wrapper.setProps({ setRegistrationHistory: mhrRegistrationHistoryTest })
+    expect(wrapper.vm.$props.setRegistrationHistory).toEqual(mhrRegistrationHistoryTest)
+    expect(wrapper.findAllComponents(TableRow).length).toBe(1)
+    // clear filters button only shows when a filter is active
+    expect(wrapper.findAll('.v-btn.registration-action').length).toBe(0)
+    // filter reg number parent only match
+    const parentRegNumMatch = '21'
+    wrapper.vm.registrationNumber = parentRegNumMatch
+    await flushPromises()
+    // clear filters btn shows
+    expect(wrapper.findAll('.v-btn.registration-action').length).toBe(1)
+    // wait - sort will wait at least 1 second for debounce
+    setTimeout(async () => {
+      // emitted the new sort
+      expect(getLastEvent(wrapper, 'sort')).toEqual({
+        endDate: null,
+        folNum: '12',
+        orderBy: '',
+        orderVal: '',
+        regBy: 'Business',
+        regNum: '23',
+        regParty: 'ABC',
+        regType: 'REGISTER NEW UNIT',
+        secParty: '',
+        startDate: null,
+        status: 'Active'
+      })
+      // clear filters btn clears the filter
+      await wrapper.find('.v-btn.registration-action').trigger('click')
+      expect(wrapper.vm.registrationNumber).toBe('')
+      expect(wrapper.vm.folNum).toBe('')
+      expect(wrapper.vm.Status).toBe('')
+      // need to wait 1 secs due to debounce
+      setTimeout(() => {
+        expect(getLastEvent(wrapper, 'sort')).toEqual({
+          endDate: null,
+          folNum: '',
+          orderBy: '',
+          orderVal: '',
+          regBy: '',
+          regNum: '',
+          regParty: '',
+          regType: '',
+          secParty: '',
+          startDate: null,
+          status: ''
+        })
+      }, 1000)
+      expect(wrapper.findAll('.v-btn.registration-action').length).toBe(0)
+    }, 1000)
   })
 
   it('renders and displays the typeahead dropdown', async () => {

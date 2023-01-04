@@ -9,5 +9,5 @@ export interface RegistrationSortIF {
   regType: string,
   secParty: string,
   startDate: Date,
-  status: string,
+  status: string
 }

@@ -53,10 +53,10 @@
                   </span>
                 </v-col>
               </v-row>
-              <v-row v-if="isPpr" class="my-reg-filter pl-3 pt-2" no-gutters>
+              <v-row class="my-reg-filter pl-3 pt-2" no-gutters>
                 <v-col>
                   <v-text-field
-                    v-if="header.value === 'registrationNumber'"
+                    v-if="header.value === 'registrationNumber' || header.value === 'mhrNumber'"
                     filled
                     single-line
                     hide-details="true"
@@ -97,6 +97,28 @@
                       </template>
                     </v-select>
                   </div>
+                  <div v-if="header.value === 'registrationDescription'">
+                    <v-select
+                      :items="mhrRegistrationTypes"
+                      single-line
+                      item-text="registrationTypeUI"
+                      item-value="registrationTypeAPI"
+                      class="table-registration-types"
+                      filled
+                      dense
+                      clearable
+                      label="Registration Type"
+                      v-model="registrationType"
+                      id="txt-type"
+                      :menu-props="{ bottom: true, offsetY: true }"
+                    >
+                      <template slot="item" slot-scope="data">
+                        <span class="list-item">
+                          {{ data.item.registrationTypeUI }}
+                        </span>
+                      </template>
+                    </v-select>
+                  </div>
                   <div
                     v-if="header.value === 'createDateTime'"
                     @click="showDatePicker = true"
@@ -117,8 +139,21 @@
                     />
                   </div>
                   <v-select
-                    v-if="header.value === 'statusType'"
+                    v-if="isPpr && header.value === 'statusType'"
                     :items="statusTypes"
+                    hide-details
+                    single-line
+                    filled
+                    dense
+                    item-class="list-item"
+                    label="Status"
+                    :menu-props="{ bottom: true, offsetY: true }"
+                    v-model="status"
+                    clearable
+                  />
+                  <v-select
+                    v-else-if="header.value === 'statusType'"
+                    :items="mhStatusTypes"
                     hide-details
                     single-line
                     filled
@@ -137,6 +172,16 @@
                     v-model="registeredBy"
                     type="text"
                     label="Registered By"
+                    dense
+                  />
+                  <v-text-field
+                    v-if="!isPpr && header.value === 'registeringParty'"
+                    filled
+                    single-line
+                    hide-details="true"
+                    v-model="registeringParty"
+                    type="text"
+                    label="Submitting Party"
                     dense
                   />
                   <v-text-field
@@ -270,7 +315,7 @@ import {
   TableActions
 } from '@/enums'
 import { useRegistration } from '@/composables/useRegistration'
-import { RegistrationTypesStandard, StatusTypes } from '@/resources'
+import { MHRegistrationTypes, RegistrationTypesStandard, StatusTypes, MhStatusTypes } from '@/resources'
 
 export default defineComponent({
   components: {
@@ -381,8 +426,10 @@ export default defineComponent({
       loadingPDF: '',
       overrideWidth: false,
       registrationTypes: [...RegistrationTypesStandard].slice(1),
+      mhrRegistrationTypes: [...MHRegistrationTypes].slice(1),
       showDatePicker: false,
       statusTypes: [...StatusTypes],
+      mhStatusTypes: MhStatusTypes,
       hasRPPR: computed(() => {
         const productSubscriptions =
           getAccountProductSubscriptions.value as AccountProductSubscriptionIF

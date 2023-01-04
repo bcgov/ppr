@@ -797,28 +797,34 @@ export default defineComponent({
       setRegTableSortHasMorePages(true)
       setRegTableSortOptions(args.sortOptions)
       setRegTableSortPage(1)
+
       const sorting = args.sorting
       let sortedDrafts = { drafts: [] as DraftResultIF[], error: null }
-      // all drafts return from the api no matter the status value so prevent it here
-      if (!args.sortOptions.status || args.sortOptions.status === APIStatusTypes.DRAFT) {
-        sortedDrafts = await draftHistory(cloneDeep(args.sortOptions))
-      }
-      const sortedRegs = await registrationHistory(cloneDeep(args.sortOptions), 1)
-      // prioritize reg history error
-      const error = sortedRegs.error || sortedDrafts.error
-      if (error) {
-        emitError(error)
-      } else {
-        if (sortedRegs.registrations?.length < 1) setRegTableSortHasMorePages(false)
-        // parent drafts from sorted list
-        const draftsCollapsed = myRegHistoryDraftCollapse(
-          cloneDeep(sortedDrafts.drafts), cloneDeep(sortedRegs.registrations), sorting)
-        // add child drafts from original list to sorted base registrations
-        const updatedRegs = myRegHistoryDraftCollapse(
-          cloneDeep(getRegTableDraftsChildReg.value), cloneDeep(sortedRegs.registrations), sorting)
-        // only add parent drafts to draft results
-        setRegTableDraftsBaseReg(draftsCollapsed.drafts)
-        setRegTableBaseRegs(updatedRegs.registrations)
+      if (props.isPpr) {
+        // Filtering Ppr Registrations
+        // all drafts return from the api no matter the status value so prevent it here
+        if (!args.sortOptions.status || args.sortOptions.status === APIStatusTypes.DRAFT) {
+          sortedDrafts = await draftHistory(cloneDeep(args.sortOptions))
+        }
+        const sortedRegs = await registrationHistory(cloneDeep(args.sortOptions), 1)
+        // prioritize reg history error
+        const error = sortedRegs.error || sortedDrafts.error
+        if (error) {
+          emitError(error)
+        } else {
+          if (sortedRegs.registrations?.length < 1) setRegTableSortHasMorePages(false)
+          // parent drafts from sorted list
+          const draftsCollapsed = myRegHistoryDraftCollapse(
+            cloneDeep(sortedDrafts.drafts), cloneDeep(sortedRegs.registrations), sorting)
+          // add child drafts from original list to sorted base registrations
+          const updatedRegs = myRegHistoryDraftCollapse(
+            cloneDeep(getRegTableDraftsChildReg.value), cloneDeep(sortedRegs.registrations), sorting)
+          // only add parent drafts to draft results
+          setRegTableDraftsBaseReg(draftsCollapsed.drafts)
+          setRegTableBaseRegs(updatedRegs.registrations)
+        }
+      } else if (props.isMhr) {
+        await fetchMhRegistrations(cloneDeep(args.sortOptions))
       }
       localState.myRegDataLoading = false
     }

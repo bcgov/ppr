@@ -1,5 +1,5 @@
-import { APIRegistrationTypes, UIRegistrationTypes } from '@/enums'
-import { RegistrationTypeIF } from '@/interfaces'
+import { APIMhrDescriptionTypes, APIRegistrationTypes, UIMhrDescriptionTypes, UIRegistrationTypes } from '@/enums'
+import { MhRegistrationTypeIF, RegistrationTypeIF } from '@/interfaces'
 
 export const RegistrationTypesMiscellaneousCC: Array<RegistrationTypeIF> = [
   {
@@ -315,6 +315,44 @@ export const MhrRegistrationType: RegistrationTypeIF = {
   text:
     `${UIRegistrationTypes.MANUFACTURED_HOME_REGISTRATION} (${APIRegistrationTypes.MANUFACTURED_HOME_REGISTRATION})`
 }
+export const MHRegistrationTypes: Array<MhRegistrationTypeIF> = [
+  {
+    class: 'registration-list-header',
+    disabled: true,
+    divider: false,
+    group: 3,
+    registrationTypeUI: null,
+    registrationTypeAPI: null,
+    text: 'Standard Registrations'
+  },
+  {
+    class: 'registration-list-item',
+    disabled: false,
+    divider: false,
+    group: 3,
+    registrationTypeUI: UIMhrDescriptionTypes.REGISTER_NEW_UNIT,
+    registrationTypeAPI: APIMhrDescriptionTypes.REGISTER_NEW_UNIT,
+    text: `${UIMhrDescriptionTypes.REGISTER_NEW_UNIT} (${APIMhrDescriptionTypes.REGISTER_NEW_UNIT})`
+  },
+  {
+    class: 'registration-list-item',
+    disabled: false,
+    divider: false,
+    group: 3,
+    registrationTypeUI: UIMhrDescriptionTypes.SALE_OR_GIFT,
+    registrationTypeAPI: APIMhrDescriptionTypes.SALE_OR_GIFT,
+    text: `${UIMhrDescriptionTypes.SALE_OR_GIFT} (${APIMhrDescriptionTypes.SALE_OR_GIFT})`
+  },
+  {
+    class: 'registration-list-item',
+    disabled: false,
+    divider: false,
+    group: 3,
+    registrationTypeUI: UIMhrDescriptionTypes.CONVERTED,
+    registrationTypeAPI: APIMhrDescriptionTypes.CONVERTED,
+    text: `${UIMhrDescriptionTypes.CONVERTED} (${APIMhrDescriptionTypes.CONVERTED})`
+  }
+]
 
 export const LegacyRegistrationTypes: Array<RegistrationTypeIF> = [
   {
