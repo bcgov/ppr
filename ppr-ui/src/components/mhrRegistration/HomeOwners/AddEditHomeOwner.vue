@@ -519,8 +519,8 @@ export default defineComponent({
     const done = (): void => {
       // @ts-ignore - function exists
       context.refs.addHomeOwnerForm.validate()
-      setValidation(MhrSectVal.ADD_EDIT_OWNERS_VALID, MhrCompVal.OWNERS_VALID, true)
       if (localState.isHomeOwnerFormValid && localState.isAddressFormValid) {
+        setValidation(MhrSectVal.ADD_EDIT_OWNERS_VALID, MhrCompVal.OWNERS_VALID, true)
         if (props.editHomeOwner) {
           editHomeOwner(
             localState.owner as MhrRegistrationHomeOwnerIF,
