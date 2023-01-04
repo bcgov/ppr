@@ -11,7 +11,7 @@ import {
   RegistrationSortIF
 } from '@/interfaces'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
-import { APIStatusTypes, HomeTenancyTypes, mhUIStatusTypes } from '@/enums'
+import { APIStatusTypes, HomeTenancyTypes, mhApiStatusTypes, mhUIStatusTypes } from '@/enums'
 import { getMhrDrafts, mhrRegistrationHistory } from '@/utils'
 import { orderBy } from 'lodash'
 import { MhStatusTypes } from '@/resources/statusTypes'
@@ -284,7 +284,7 @@ export const useNewMhrRegistration = () => {
             username: '',
             documentId: draft.draftNumber
           }
-          if (sortOptions?.status === mhUIStatusTypes.DRAFT) {
+          if (sortOptions?.status === mhApiStatusTypes.DRAFT) {
             mhrTableData.push(newDraft)
           } else {
             transfer.changes.push(newDraft)
@@ -293,7 +293,7 @@ export const useNewMhrRegistration = () => {
         transfer.changes = orderBy(transfer.changes, ['createDateTime'], ['desc'])
       }
     })
-    if (sortOptions?.status !== mhUIStatusTypes.DRAFT) mhrTableData = sortedMhrHistory
+    if (sortOptions?.status !== mhApiStatusTypes.DRAFT) mhrTableData = sortedMhrHistory
     return mhrTableData
   }
   /**

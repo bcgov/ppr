@@ -278,9 +278,9 @@ describe('Test registration table with results', () => {
           startDate: null,
           status: ''
         })
-      }, 3000)
+      }, 1000)
       expect(wrapper.findAll('.v-btn.registration-action').length).toBe(0)
-    }, 3000)
+    }, 1000)
   })
 
   it('renders and displays the typeahead dropdown', async () => {

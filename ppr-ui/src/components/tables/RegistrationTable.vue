@@ -429,7 +429,7 @@ export default defineComponent({
       mhrRegistrationTypes: [...MHRegistrationTypes].slice(1),
       showDatePicker: false,
       statusTypes: [...StatusTypes],
-      mhStatusTypes: [...MhStatusTypes],
+      mhStatusTypes: MhStatusTypes,
       hasRPPR: computed(() => {
         const productSubscriptions =
           getAccountProductSubscriptions.value as AccountProductSubscriptionIF
