@@ -160,6 +160,7 @@ export const stateModel: StateModelIF = {
     lienRegistrationType: ''
   },
   mhrRegistration: {
+    mhrAddEditOwnerError: false,
     documentId: '',
     clientReferenceId: '',
     declaredValue: '',

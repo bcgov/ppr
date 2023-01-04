@@ -67,6 +67,7 @@ import { useActions, useGetters } from 'vuex-composition-helpers'
 /* eslint-disable no-unused-vars */
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 import { StaffPaymentOptions } from '@bcrs-shared-components/enums'
+import { useHomeOwners } from '@/composables/mhrRegistration'
 /* eslint-enable no-unused-vars */
 
 /* eslint-disable */
@@ -86,7 +87,7 @@ export default defineComponent({
       'isRoleStaffReg', 'getMhrRegistrationValidationModel'
     ])
 
-    const { setStaffPayment } = useActions<any>(['setStaffPayment'])
+    const { setStaffPayment, setMhrAddEditOwnerError } = useActions<any>(['setStaffPayment', 'setMhrAddEditOwnerError'])
 
     const {
       MhrCompVal,
@@ -96,6 +97,9 @@ export default defineComponent({
       getValidation,
       getStepValidation
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
+    const{
+      isGlobalEditingMode
+    } = useHomeOwners()
 
     const localState = reactive({
       authorizationValid: false,
@@ -219,6 +223,8 @@ export default defineComponent({
               getStepValidation(MhrSectVal.HOME_OWNERS_VALID),
               getStepValidation(MhrSectVal.LOCATION_VALID)
             ])
+          // Only set reviewed if add/edit form was open when review reached
+          if (isGlobalEditingMode.value) setMhrAddEditOwnerError(true)
           setValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_STEPS, true)
           break
       }

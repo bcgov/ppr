@@ -381,6 +381,10 @@ export const mutateMhrRegistrationDocumentId = (state: StateIF, value: string) =
   state.stateModel.mhrRegistration.documentId = value
 }
 
+export const mutateMhrAddEditOwnerError = (state: StateIF, value: boolean) => {
+  state.stateModel.mhrRegistration.mhrAddEditOwnerError = value
+}
+
 export const mutateMhrAttentionReferenceNum = (state: StateIF, value) => {
   state.stateModel.mhrRegistration.attentionReferenceNum = value
 }

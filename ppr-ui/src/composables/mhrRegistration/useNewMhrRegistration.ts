@@ -40,6 +40,7 @@ export const useNewMhrRegistration = () => {
 
   const initNewMhr = (): MhrRegistrationIF => {
     return {
+      mhrAddEditOwnerError: false,
       documentId: '',
       clientReferenceId: '',
       declaredValue: '',

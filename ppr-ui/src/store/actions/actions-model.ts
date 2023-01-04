@@ -335,6 +335,10 @@ export const setMhrLocation: ActionIF = ({ commit }, { key, value }): void => {
   commit('mutateUnsavedChanges', true)
 }
 
+export const setMhrAddEditOwnerError: ActionIF = ({ commit }, isReviewed: boolean): void => {
+  commit('mutateMhrAddEditOwnerError', isReviewed)
+}
+
 export const setIsManualLocation: ActionIF = ({ commit }, isManual: boolean): void => {
   commit('mutateIsManualLocation', isManual)
 }
