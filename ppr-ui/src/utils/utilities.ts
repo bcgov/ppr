@@ -8,7 +8,7 @@ export function isSigningOut (): boolean {
   return path.includes('/signout')
 }
 
-export function AddTimestampToDate (dateToConvert: string, isEndDate: boolean): string {
+export function addTimestampToDate (dateToConvert: string, isEndDate: boolean): string {
   if (dateToConvert.length < 11) {
     // convert to local date object
     const d = new Date(`${dateToConvert}T00:00:00`)

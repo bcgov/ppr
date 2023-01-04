@@ -15,7 +15,7 @@ import {
 import { APIMhrTypes, ErrorCategories, ErrorCodes } from '@/enums'
 import { useSearch } from '@/composables/useSearch'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
-import { AddTimestampToDate } from '@/utils'
+import { addTimestampToDate } from '@/utils'
 const { mapMhrSearchType } = useSearch()
 
 // Create default request base URL and headers.
@@ -612,7 +612,7 @@ function addSortParams (url: string, sortOptions: RegistrationSortIF): string {
     // add timestamp onto datetime param values
     if (sortOptions[sortKeys[i]] && ['createDateTime'].includes(UIFilterToApiFilter[sortKeys[i]])) {
       sortOptions[sortKeys[i]] =
-      AddTimestampToDate(sortOptions[sortKeys[i]], sortOptions[sortKeys[i]] === 'endDateTime')
+      addTimestampToDate(sortOptions[sortKeys[i]], sortOptions[sortKeys[i]] === 'endDateTime')
     }
     if (sortOptions[sortKeys[i]]) {
       url += `&${UIFilterToApiFilter[sortKeys[i]]}=${sortOptions[sortKeys[i]]}`
