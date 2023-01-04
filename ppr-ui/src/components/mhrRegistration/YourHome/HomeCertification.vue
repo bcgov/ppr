@@ -47,6 +47,7 @@
                 <v-select
                   filled
                   :items="csaStandardOptions"
+                  clearable
                   id="csa-standard"
                   class="pt-4 pr-2"
                   label="CSA Standard (Optional)"
@@ -257,6 +258,9 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+::v-deep .theme--light.v-icon.mdi-close {
+  color: $primary-blue !important;
+}
 .csa-radio {
   width: 47%;
   margin-right: 20px !important;
