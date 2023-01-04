@@ -94,7 +94,7 @@
             <span v-if="isPpr">({{ getRegTableTotalRowCount }})</span>
             <span v-if="isMhr">({{ getMhRegTableBaseRegs.length }})</span>
           </v-col>
-          <v-col v-if="isPpr">
+          <v-col>
             <v-row justify="end" no-gutters>
               <v-col class="pl-4 py-1" cols="auto">
                 <v-select
@@ -167,8 +167,8 @@ import {
   DialogOptionsIF,
   DraftResultIF,
   ErrorIF,
-  RegistrationSortIF,
   MhRegistrationSummaryIF,
+  RegistrationSortIF,
   RegistrationSummaryIF,
   RegistrationTypeIF,
   RegTableNewItemI,
@@ -177,33 +177,33 @@ import {
 } from '@/interfaces'
 import { APIStatusTypes, ErrorCategories, RouteNames, SettingOptions, TableActions } from '@/enums'
 import {
-  addRegistrationSummary,
   addMHRegistrationSummary,
+  addRegistrationSummary,
   convertDate,
   deleteDraft,
+  deleteMhrDraft,
+  deleteMhRegistrationSummary,
   deleteRegistrationSummary,
   draftHistory,
   getMHRegistrationSummary,
   getRegistrationSummary,
   registrationHistory,
   setupFinancingStatementDraft,
-  updateUserSettings,
-  deleteMhRegistrationSummary,
-  deleteMhrDraft
+  updateUserSettings
 } from '@/utils'
 import {
   amendConfirmationDialog,
   dischargeConfirmationDialog,
+  mhRegistrationFoundDialog,
+  mhrTableRemoveDialog,
   registrationAddErrorDialog,
   registrationAlreadyAddedDialog,
   registrationFoundDialog,
-  mhRegistrationFoundDialog,
   registrationNotFoundDialog,
   registrationRestrictedDialog,
   renewConfirmationDialog,
   tableDeleteDialog,
-  tableRemoveDialog,
-  mhrTableRemoveDialog
+  tableRemoveDialog
 } from '@/resources/dialogOptions'
 import { StatusCodes } from 'http-status-codes'
 import { cloneDeep } from 'lodash'
@@ -285,9 +285,13 @@ export default defineComponent({
       myRegActionDialog: dischargeConfirmationDialog as DialogOptionsIF,
       myRegDataLoading: false,
       myRegDataAdding: false,
+      pprColumnSettings: [],
+      mhrColumnSettings: [],
       myRegHeaders: props.isPpr ? [...registrationTableHeaders] : [...mhRegistrationTableHeaders],
-      myRegHeadersSelected: [...registrationTableHeaders],
-      myRegHeadersSelectable: [...registrationTableHeaders].slice(0, -1), // remove actions
+      myRegHeadersSelected: props.isPpr ? [...registrationTableHeaders] : [...mhRegistrationTableHeaders],
+      myRegHeadersSelectable: props.isPpr
+        ? [...registrationTableHeaders].slice(0, -1) // remove actions
+        : [...mhRegistrationTableHeaders].slice(0, -1), // remove actions
       myRegistrations: computed(() => {
         if (props.isPpr && !!getRegTableDraftsBaseReg.value && !!getRegTableBaseRegs.value) {
           return [...getRegTableDraftsBaseReg.value, ...getRegTableBaseRegs.value]
@@ -347,10 +351,12 @@ export default defineComponent({
         }
       }
       // update columns selected with user settings
-      if (props.isPpr && getUserSettings.value?.[SettingOptions.REGISTRATION_TABLE]?.columns) {
-        localState.myRegHeadersSelected = getUserSettings.value[SettingOptions.REGISTRATION_TABLE].columns
+      localState.pprColumnSettings = getUserSettings.value[SettingOptions.REGISTRATION_TABLE]?.columns || []
+      localState.mhrColumnSettings = getUserSettings.value[SettingOptions.REGISTRATION_TABLE]?.mhrColumns || []
+      if (props.isPpr) {
+        localState.myRegHeadersSelected = localState.pprColumnSettings
       } else if (props.isMhr) {
-        localState.myRegHeadersSelected = [...mhRegistrationTableHeaders]
+        localState.myRegHeadersSelected = localState.mhrColumnSettings
       } else {
         // set default headers
         const headers = []
@@ -947,24 +953,29 @@ export default defineComponent({
 
     const updateMyRegHeaders = async (val: BaseHeaderIF[]): Promise<void> => {
       const headers = []
-      for (let i = 0; i < registrationTableHeaders.length; i++) {
-        if (registrationTableHeaders[i].value === 'actions') headers.push(registrationTableHeaders[i])
-        else if (val.find(header => header.value === registrationTableHeaders[i].value)) {
-          headers.push(registrationTableHeaders[i])
+      const baseHeaders = props.isPpr ? registrationTableHeaders : mhRegistrationTableHeaders
+      const columnSettings = props.isPpr
+        ? { columns: val, mhrColumns: localState.mhrColumnSettings }
+        : { columns: localState.pprColumnSettings, mhrColumns: val }
+
+      for (let i = 0; i < baseHeaders.length; i++) {
+        if (baseHeaders[i].value === 'actions') headers.push(baseHeaders[i])
+        else if (val.find(header => header.value === baseHeaders[i].value)) {
+          headers.push(baseHeaders[i])
         }
       }
       localState.myRegHeaders = headers
       // update settings
       let settings: UserSettingsIF = await updateUserSettings(
         SettingOptions.REGISTRATION_TABLE,
-        { columns: val }
+        columnSettings
       )
       if (settings?.error) {
       // FUTURE: notify failure to save? - just log and continue for now
         console.error('Failed to save selected columns to user settings.')
         // save new settings to session (they won't be included in an error response)
         settings = getUserSettings.value
-        settings[SettingOptions.REGISTRATION_TABLE] = { columns: val }
+        settings[SettingOptions.REGISTRATION_TABLE] = columnSettings
       }
       setUserSettings(settings)
     }
@@ -981,7 +992,7 @@ export default defineComponent({
     })
 
     watch(() => localState.myRegHeadersSelected, (val: BaseHeaderIF[]) => {
-      props.isPpr && updateMyRegHeaders(val)
+      updateMyRegHeaders(val)
     })
 
     return {

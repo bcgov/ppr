@@ -9,7 +9,7 @@
     }"
   >
     <td
-      v-if="inSelectedHeaders('registrationNumber')"
+      v-if="inSelectedHeaders('registrationNumber') || inSelectedHeaders('mhrNumber')"
       :class="isChild || isExpanded ? $style['border-left']: ''"
     >
       <v-row no-gutters>
@@ -62,7 +62,7 @@
       </v-row>
     </td>
     <td
-      v-if="inSelectedHeaders('registrationType')"
+      v-if="inSelectedHeaders('registrationType') || inSelectedHeaders('registrationDescription')"
       :class="isChild || item.expanded ? $style['border-left']: ''"
     >
       <div v-if="!!item.registrationType">
@@ -614,7 +614,7 @@ export default defineComponent({
     }
 
     const inSelectedHeaders = (search: string) => {
-      return props.isPpr ? localState.headers.find((header) => { return header.value === search }) : true
+      return localState.headers.find(header => { return header.value === search })
     }
 
     const isActive = (item: RegistrationSummaryIF): boolean => {
