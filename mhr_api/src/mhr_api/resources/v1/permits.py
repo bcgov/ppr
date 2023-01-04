@@ -53,9 +53,9 @@ def post_permits(mhr_number: str):  # pylint: disable=too-many-return-statements
             return resource_utils.unauthorized_error_response(account_id)
 
         # Not found or not allowed to access throw exceptions.
-        current_reg: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_number,
-                                                                          account_id,
-                                                                          is_all_staff_account(account_id))
+        current_reg: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_number,
+                                                                              account_id,
+                                                                              is_all_staff_account(account_id))
 
         # Validate request against the schema.
         current_app.logger.debug(f'Extra validation on transport permit json for {mhr_number}')

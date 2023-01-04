@@ -56,9 +56,9 @@ def post_transfers(mhr_number: str):  # pylint: disable=too-many-return-statemen
             return resource_utils.unauthorized_error_response(account_id)
 
         # Not found or not allowed to access throw exceptions.
-        current_reg: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_number,
-                                                                          account_id,
-                                                                          is_all_staff_account(account_id))
+        current_reg: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_number,
+                                                                              account_id,
+                                                                              is_all_staff_account(account_id))
 
         # Validate request against the schema.
         valid_format, errors = schema_utils.validate(request_json, 'transfer', 'mhr')

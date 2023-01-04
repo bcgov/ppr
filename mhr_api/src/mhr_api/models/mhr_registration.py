@@ -24,7 +24,7 @@ from mhr_api.exceptions import BusinessException, DatabaseException, ResourceErr
 from mhr_api.models import utils as model_utils, Db2Manuhome
 from mhr_api.models.mhr_extra_registration import MhrExtraRegistration
 from mhr_api.models.db2 import utils as legacy_utils
-from mhr_api.models.registration_utils import AccountRegistrationParams
+from mhr_api.models.registration_utils import AccountRegistrationParams, get_owner_group_count
 from mhr_api.services.authz import MANUFACTURER_GROUP, QUALIFIED_USER_GROUP, GOV_ACCOUNT_ROLE, \
                                    GENERAL_USER_GROUP, BCOL_HELP
 
@@ -140,6 +140,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
     mail_version: bool = False
     reg_json: dict = None
     current_view: bool = False
+    change_registrations = []
 
     @property
     def json(self) -> dict:
@@ -276,7 +277,15 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
 
     def save_permit(self, new_reg_id):
         """Update the existing location state to historical."""
-        self.set_historical_location(new_reg_id)
+        if self.locations and self.locations[0].status_type == MhrStatusTypes.ACTIVE:
+            self.locations[0].status_type = MhrStatusTypes.HISTORICAL
+            self.locations[0].change_registration_id = new_reg_id
+        elif self.change_registrations:
+            for reg in self.change_registrations:  # Updating a change registration location.
+                for existing in reg.locations:
+                    if existing.status_type == MhrStatusTypes.ACTIVE and existing.registration_id != new_reg_id:
+                        existing.status_type = MhrStatusTypes.HISTORICAL
+                        existing.change_registration_id = new_reg_id
 
     def get_registration_type(self):
         """Lookup registration type record if it has not already been fetched."""
@@ -376,6 +385,23 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
             registration.manuhome = legacy_utils.find_by_mhr_number(formatted_mhr)
             registration.mhr_number = registration.manuhome.mhr_number
         return registration
+
+    @classmethod
+    def find_all_by_mhr_number(cls, mhr_number: str, account_id: str, staff: bool = False):
+        """Return the base registration matching the MHR number with the associated change registrations."""
+        current_app.logger.debug(f'Account={account_id}, mhr_number={mhr_number}')
+        base_reg: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_number, account_id, staff)
+        if not base_reg:
+            return base_reg
+        formatted_mhr = model_utils.format_mhr_number(mhr_number)
+        reg_type = MhrRegistrationTypes.MHREG
+        try:
+            base_reg.change_registrations = cls.query.filter(MhrRegistration.mhr_number == formatted_mhr,
+                                                             MhrRegistration.registration_type != reg_type).all()
+        except Exception as db_exception:   # noqa: B902; return nicer error
+            current_app.logger.error('DB find_all_by_mhr_number exception: ' + str(db_exception))
+            raise DatabaseException(db_exception)
+        return base_reg
 
     @classmethod
     def find_original_by_mhr_number(cls, mhr_number: str, account_id: str, staff: bool = False):
@@ -537,7 +563,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         if 'clientReferenceId' in json_data:
             registration.client_reference_id = json_data['clientReferenceId']
         if base_reg.owner_groups:
-            registration.add_new_groups(json_data, len(base_reg.owner_groups))
+            registration.add_new_groups(json_data, get_owner_group_count(base_reg))
         # Other parties
         registration.parties = MhrParty.create_from_registration_json(json_data, registration.id)
         if registration.doc_id and not json_data.get('documentId'):
@@ -738,26 +764,26 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
 
     def remove_groups(self, json_data, new_reg_id):
         """Set change registration id for removed owner groups and owners for a transfer registration."""
-        if json_data.get('deleteOwnerGroups'):
-            for group in json_data.get('deleteOwnerGroups'):
-                for existing in self.owner_groups:
+        for group in json_data.get('deleteOwnerGroups'):
+            for existing in self.owner_groups:  # Updating a base registration owner group.
+                if existing.group_id == group.get('groupId'):
+                    existing.status_type = MhrOwnerStatusTypes.PREVIOUS
+                    existing.change_registration_id = new_reg_id
+                    existing.modified = True
+                    current_app.logger.info(f'Removing base owner group id={existing.id}, reg id={self.id}')
+                    for owner in existing.owners:
+                        owner.status_type = MhrOwnerStatusTypes.PREVIOUS
+                        owner.change_registration_id = new_reg_id
+            for reg in self.change_registrations:  # Updating a change registration (previous transfer) group.
+                for existing in reg.owner_groups:
                     if existing.group_id == group.get('groupId'):
-                        current_app.logger.info(f'Existing group id={existing.group_id}, status={existing.status_type}')
                         existing.status_type = MhrOwnerStatusTypes.PREVIOUS
                         existing.change_registration_id = new_reg_id
                         existing.modified = True
-                        current_app.logger.info(f'Found owner group to remove id={existing.id} base reg id={self.id}')
+                        current_app.logger.info(f'Removing base owner group id={existing.id}, reg id={self.id}')
                         for owner in existing.owners:
                             owner.status_type = MhrOwnerStatusTypes.PREVIOUS
                             owner.change_registration_id = new_reg_id
-
-    def set_historical_location(self, new_reg_id):
-        """Set change registration id and state for existing location when updating."""
-        # current_app.logger.info(f'Updating existing location status for new reg id={new_reg_id}')
-        for existing in self.locations:
-            if existing.status_type == MhrStatusTypes.ACTIVE and existing.registration_id != new_reg_id:
-                existing.status_type = MhrStatusTypes.HISTORICAL
-                existing.change_registration_id = new_reg_id
 
     @staticmethod
     def find_draft(json_data, registration_type: str = None):
