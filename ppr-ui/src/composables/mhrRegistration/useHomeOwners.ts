@@ -442,7 +442,13 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
   )
 
   // Set Validations for Home Owners
-  watch([hasEmptyGroup, showGroups, getMhrRegistrationHomeOwners, getMhrRegistrationHomeOwnerGroups, isGlobalEditingMode], () => {
+  watch([
+    hasEmptyGroup,
+    showGroups,
+    getMhrRegistrationHomeOwners,
+    getMhrRegistrationHomeOwnerGroups,
+    isGlobalEditingMode],
+  () => {
     let isHomeOwnersStepValid = true
     if (showGroups.value) {
       // groups must not be empty or have any fractional errors and add/edit form must be closed
@@ -453,7 +459,8 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
         !isGlobalEditingMode.value
     } else {
       // must have at least one owner with proper id and add/edit form must be closed
-      isHomeOwnersStepValid = !!getMhrRegistrationHomeOwners.value.find(owner => owner.ownerId) && !isGlobalEditingMode.value
+      isHomeOwnersStepValid = !!getMhrRegistrationHomeOwners.value.find(owner => owner.ownerId) &&
+                              !isGlobalEditingMode.value
     }
     setValidation(MhrSectVal.HOME_OWNERS_VALID, MhrCompVal.OWNERS_VALID, isHomeOwnersStepValid)
   })

@@ -2,7 +2,11 @@
   <v-card flat class="py-6 px-8 mb-5 rounded" :class="{ 'border-error-left': showTableError || showReviewedError}">
     <v-row id="mhr-home-add-person">
       <v-col cols="3">
-        <label class="generic-label" :class="{ 'error-text' : showTableError || showReviewedError}"> {{ getSidebarTitle }} </label>
+        <label class="generic-label"
+        :class="{ 'error-text' : showTableError || showReviewedError}"
+        >
+          {{ getSidebarTitle }}
+        </label>
       </v-col>
       <v-col cols="9">
         <v-form
@@ -372,7 +376,12 @@ export default defineComponent({
     }
   },
   setup (props, context) {
-    const { getMhrRegistrationHomeOwnerGroups, getMhrTransferHomeOwnerGroups, getMhrRegistrationValidationModel, getMhrAddEditOwnerError } = useGetters<any>([
+    const {
+      getMhrRegistrationHomeOwnerGroups,
+      getMhrTransferHomeOwnerGroups,
+      getMhrRegistrationValidationModel,
+      getMhrAddEditOwnerError
+    } = useGetters<any>([
       'getMhrRegistrationHomeOwnerGroups',
       'getMhrTransferHomeOwnerGroups',
       'getMhrRegistrationValidationModel',
@@ -381,7 +390,10 @@ export default defineComponent({
 
     const { MhrSectVal, getStepValidation } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
-    const { setUnsavedChanges, setMhrAddEditOwnerError } = useActions<any>(['setUnsavedChanges', 'setMhrAddEditOwnerError'])
+    const {
+      setUnsavedChanges,
+      setMhrAddEditOwnerError
+    } = useActions<any>(['setUnsavedChanges', 'setMhrAddEditOwnerError'])
 
     const { required, customRules, maxLength, minLength, isPhone, isNumber, invalidSpaces } = useInputRules()
 
@@ -464,7 +476,8 @@ export default defineComponent({
       group: getGroupForOwner(props.editHomeOwner?.ownerId) as MhrRegistrationHomeOwnerGroupIF,
       ownersGroupId: computed(() => (showGroups.value ? localState.group?.groupId : null)),
       owner: { ...defaultHomeOwner },
-      showReviewedError: computed(() => (!getStepValidation(MhrSectVal.HOME_OWNERS_VALID) && getMhrAddEditOwnerError.value)),
+      showReviewedError: computed(() =>
+        (!getStepValidation(MhrSectVal.HOME_OWNERS_VALID) && getMhrAddEditOwnerError.value)),
       ownerGroupId: props.editHomeOwner?.groupId,
       showGroups: showGroups,
       isPerson: props.isHomeOwnerPerson,
