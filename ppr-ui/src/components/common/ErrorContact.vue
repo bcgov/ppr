@@ -30,8 +30,8 @@ export default defineComponent({
       {
         icon: 'mdi-phone',
         label: 'Victoria Office:',
-        value: '250-952-0568',
-        href: 'tel:+1-250-952-0568'
+        value: '250-387-7848',
+        href: 'tel:+1-250-387-7848'
       },
       {
         icon: 'mdi-email',
