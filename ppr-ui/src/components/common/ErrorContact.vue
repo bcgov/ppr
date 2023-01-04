@@ -28,6 +28,12 @@ export default defineComponent({
         href: 'tel:+1-877-526-1526'
       },
       {
+        icon: 'mdi-phone',
+        label: 'Victoria Office:',
+        value: '250-387-7848',
+        href: 'tel:+1-250-387-7848'
+      },
+      {
         icon: 'mdi-email',
         label: 'Email:',
         value: 'BCRegistries@gov.bc.ca',
