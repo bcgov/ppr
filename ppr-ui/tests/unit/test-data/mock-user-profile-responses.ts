@@ -1,6 +1,6 @@
 import { SettingOptions } from '@/enums'
 import { UserSettingsIF } from '@/interfaces'
-import { registrationTableHeaders } from '@/resources'
+import {mhRegistrationTableHeaders, registrationTableHeaders} from '@/resources'
 
 export const mockedDefaultUserSettingsResponse: UserSettingsIF = {
   [SettingOptions.PAYMENT_CONFIRMATION_DIALOG]: true,
@@ -36,7 +36,8 @@ export const mockedUpdateRegTableUserSettingsResponse: UserSettingsIF = {
   defaultDropDowns: true,
   defaultTableFilters: true,
   [SettingOptions.REGISTRATION_TABLE]: {
-    columns: registrationTableHeaders
+    columns: registrationTableHeaders,
+    mhrColumns: mhRegistrationTableHeaders
   }
 }
 
