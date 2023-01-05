@@ -219,6 +219,7 @@ import {
 } from '@/utils'
 import { StickyContainer, CertifyInformation } from '@/components/common'
 import { useHomeOwners, useInputRules, useMhrInformation } from '@/composables'
+import { useMhrValidations } from '@/composables/mhrRegistration'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
 import { TransferDetails, TransferDetailsReview, ConfirmCompletion } from '@/components/mhrTransfers'
@@ -264,14 +265,16 @@ export default defineComponent({
       getMhrTransferCurrentHomeOwners,
       getCertifyInformation,
       hasUnsavedChanges,
-      hasLien
+      hasLien,
+      getMhrRegistrationValidationModel
     } = useGetters<any>([
       'getMhrTransferHomeOwners',
       'getMhrInformation',
       'getMhrTransferCurrentHomeOwners',
       'getCertifyInformation',
       'hasUnsavedChanges',
-      'hasLien'
+      'hasLien',
+      'getMhrRegistrationValidationModel'
     ])
 
     const {
@@ -301,6 +304,12 @@ export default defineComponent({
       buildApiData,
       parseDraftTransferDetails
     } = useMhrInformation()
+
+    const {
+      MhrSectVal,
+      setValidation,
+      MhrCompVal
+    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
     const {
       isGlobalEditingMode,
@@ -482,9 +491,11 @@ export default defineComponent({
 
       // If transfer is valid, enter review mode
       if (localState.isValidTransfer) {
+        setValidation(MhrSectVal.ADD_EDIT_OWNERS_VALID, MhrCompVal.OWNERS_VALID, true)
         localState.isReviewMode = true
         localState.validate = false
       } else {
+        setValidation(MhrSectVal.ADD_EDIT_OWNERS_VALID, MhrCompVal.OWNERS_VALID, isGlobalEditingMode.value)
         await scrollToFirstError()
       }
     }
@@ -620,6 +631,7 @@ export default defineComponent({
       getMhrInformation,
       quickMhrSearch,
       handleDialogResp,
+      MhrSectVal,
       hasLien,
       ...toRefs(localState)
     }
