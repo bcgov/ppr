@@ -432,6 +432,22 @@ def expiry_dt_add_years(current_expiry, add_years: int):
     return current_expiry
 
 
+def valid_tax_cert_date(registration_ts: _datetime, tax_cert_ts: _datetime) -> bool:
+    """Tax cerfificate expiry date must be at least 30 days > registration date."""
+    if registration_ts and tax_cert_ts:
+        reg_date = date(registration_ts.year, registration_ts.month, registration_ts.day) + datedelta(days=30)
+        test_date = date(tax_cert_ts.year, tax_cert_ts.month, tax_cert_ts.day)
+        return test_date >= reg_date
+    return False
+
+
+def date_offset(base_date, offset_days: int = 1, add: bool = False):
+    """Create a date representing the date adjusted by offset number of days."""
+    if add:
+        return base_date + datedelta(days=offset_days)
+    return base_date - datedelta(days=offset_days)
+
+
 def get_doc_storage_name(registration):
     """Get a document storage name from the registration in the format YYYY/MM/DD/reg_class-reg_id-reg_num.pdf."""
     name = registration.registration_ts.isoformat()[:10]

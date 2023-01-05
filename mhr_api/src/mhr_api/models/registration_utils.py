@@ -136,3 +136,12 @@ def get_ppr_lien_count(mhr_number: str) -> int:
     except Exception as db_exception:   # noqa: B902; return nicer error
         current_app.logger.error('get_ppr_lien_count exception: ' + str(db_exception))
         raise DatabaseException(db_exception)
+
+
+def get_owner_group_count(base_reg) -> int:
+    """Derive the next owner group sequence number from the number of existing groups."""
+    count: int = len(base_reg.owner_groups)
+    for reg in base_reg.change_registrations:
+        if reg.owner_groups:
+            count += len(reg.owner_groups)
+    return count

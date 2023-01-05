@@ -327,9 +327,9 @@ class Db2Location(db.Model):
         return location
 
     @staticmethod
-    def create_from_registration(registration, reg_json):
+    def create_from_registration(registration, reg_json, update: bool = False):
         """Create a new location object from a new MH registration."""
-        new_info = reg_json['location']
+        new_info = reg_json.get('location') if not update else reg_json.get('newLocation')
         address = new_info['address']
         street = str(address['street'])
         street_info = street.split(' ')

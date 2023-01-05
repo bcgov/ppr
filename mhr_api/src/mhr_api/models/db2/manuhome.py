@@ -73,6 +73,7 @@ class Db2Manuhome(db.Model):
     reg_documents = []
     reg_owners = []
     reg_location = None
+    new_location = None
     reg_descript = None
     reg_notes = []
     reg_owner_groups = []
@@ -131,6 +132,27 @@ class Db2Manuhome(db.Model):
             db.session.commit()
         except Exception as db_exception:   # noqa: B902; return nicer error
             current_app.logger.error('Db2Manuhome.save_exemption exception: ' + str(db_exception))
+            raise DatabaseException(db_exception)
+
+    def save_permit(self):
+        """Save the object with transport permit changes to the database immediately."""
+        try:
+            db.session.add(self)
+            if self.reg_documents:
+                index: int = len(self.reg_documents) - 1
+                doc: Db2Document = self.reg_documents[index]
+                doc.save()
+                if self.reg_notes:
+                    index: int = len(self.reg_notes) - 1
+                    note: Db2Mhomnote = self.reg_notes[index]
+                    if note.reg_document_id == doc.id:
+                        note.save()
+            if self.new_location:
+                self.reg_location.save()
+                self.new_location.save()
+            db.session.commit()
+        except Exception as db_exception:   # noqa: B902; return nicer error
+            current_app.logger.error('Db2Manuhome.save_permit exception: ' + str(db_exception))
             raise DatabaseException(db_exception)
 
     @classmethod
@@ -194,6 +216,7 @@ class Db2Manuhome(db.Model):
         if doc.document_type in (Db2Document.DocumentTypes.TRAND,
                                  Db2Document.DocumentTypes.TRANS):
             current_app.logger.debug('Db2Manuhome.find_by_document_id Db2Owngroup query.')
+            # manuhome.reg_owner_groups = Db2Owngroup.find_all_by_manuhome_id(manuhome.id)
             all_groups = Db2Owngroup.find_all_by_manuhome_id(manuhome.id)
             manuhome.reg_owner_groups = []
             for group in all_groups:
@@ -292,7 +315,7 @@ class Db2Manuhome(db.Model):
         }
         if doc_json.get('attentionReference'):
             man_home['attentionReference'] = doc_json.get('attentionReference')
-
+        current_app.logger.info(f'json document_type=${doc.document_type}$')
         if doc.document_type in (Db2Document.DocumentTypes.TRANS, Db2Document.DocumentTypes.TRAND):
             add_groups = []
             delete_groups = []
@@ -310,10 +333,19 @@ class Db2Manuhome(db.Model):
             if doc_json.get('transferDate'):
                 man_home['transferDate'] = doc_json.get('transferDate')
         elif doc.document_type in (Db2Document.DocumentTypes.RES_EXEMPTION,
-                                   Db2Document.DocumentTypes.NON_RES_EXEMPTION) and self.reg_notes:
+                                   Db2Document.DocumentTypes.NON_RES_EXEMPTION):
             for note in self.reg_notes:
                 if note.reg_document_id == doc_id:
                     man_home['note'] = note.json
+        elif doc.document_type in (Db2Document.DocumentTypes.PERMIT, Db2Document.DocumentTypes.PERMIT_TRIM,
+                                   Db2Document.DocumentTypes.PERMIT_EXTENSION):
+            for note in self.reg_notes:
+                if note.reg_document_id == doc_id:
+                    man_home['note'] = note.json
+            if self.new_location:
+                man_home['newLocation'] = self.new_location.registration_json
+            elif self.reg_location:
+                man_home['newLocation'] = self.reg_location.registration_json
         else:
             if self.reg_owner_groups:
                 groups = []
@@ -540,7 +572,7 @@ class Db2Manuhome(db.Model):
                                                                                reg_json,
                                                                                Db2Document.DocumentTypes.MHREG,
                                                                                now_local))
-        manuhome.reg_location = Db2Location.create_from_registration(registration, reg_json)
+        manuhome.reg_location = Db2Location.create_from_registration(registration, reg_json, False)
         # Adjust location address info.
         address = reg_json['location']['address']
         extra: str = ''
@@ -630,4 +662,35 @@ class Db2Manuhome(db.Model):
         # Add note.
         if reg_json.get('note'):
             manuhome.reg_notes.append(Db2Mhomnote.create_from_registration(reg_json.get('note'), doc, manuhome.id))
+        return manuhome
+
+    @staticmethod
+    def create_from_permit(registration, reg_json):
+        """Create a new transport permit registration: update manuhome, create document, note, update location."""
+        if not registration.manuhome:
+            current_app.logger.info(f'registration id={registration.id} no manuhome: nothing to save.')
+            return
+        manuhome: Db2Manuhome = registration.manuhome
+        now_local = model_utils.today_local()
+        manuhome.update_date = now_local.date()
+        manuhome.update_time = now_local.time()
+        manuhome.update_count = manuhome.update_count + 1
+        doc_type = Db2Document.DocumentTypes.PERMIT
+        # Create document
+        doc: Db2Document = Db2Document.create_from_registration(registration,
+                                                                reg_json,
+                                                                doc_type,
+                                                                now_local)
+        manuhome.reg_documents.append(doc)
+        # Create note, which holds permit expiry date.
+        note: Db2Mhomnote = Db2Mhomnote.create_from_registration(reg_json.get('note'), doc, manuhome.id)
+        note.expiry_date = model_utils.date_offset(manuhome.update_date, 30, True)
+        note.remarks = 'Set permit expiry date.'
+        manuhome.reg_notes.append(note)
+        # Update location:
+        manuhome.new_location = Db2Location.create_from_registration(registration, reg_json, True)
+        manuhome.new_location.manuhome_id = manuhome.id
+        manuhome.new_location.location_id = (manuhome.reg_location.location_id + 1)
+        manuhome.reg_location.status = Db2Location.StatusTypes.HISTORICAL
+        manuhome.reg_location.can_document_id = doc.id
         return manuhome

@@ -1,0 +1,85 @@
+{
+  "mhrNumber": "150270",
+  "status": "ACTIVE",
+  "documentId": "80888101",
+  "documentRegistrationNumber": "00500796",
+  "createDateTime": "2023-01-03T14:56:43-07:53",
+  "clientReferenceId": "UT-PERMIT-001",
+  "submittingParty": {
+    "businessName": "ABC SEARCHING COMPANY",
+    "address": {
+      "street": "222 SUMMER STREET",
+      "city": "VICTORIA",
+      "region": "BC",
+      "country": "CA",
+      "postalCode": "V8W 2V8"
+    },
+    "emailAddress": "bsmith@abc-search.com"
+  },
+  "attentionReference": "UT-PERMIT-001",
+  "note": {
+    "documentType": "103 ",
+    "documentId": "80888101",
+    "remarks": "Set permit expiry date.",
+    "destroyed": false,
+    "expiryDate": "2023-02-02T09:00:00-07:53",
+    "contactName": "ABC SEARCHING COMPANY",
+    "contactAddress": {
+      "city": "VICTORIA",
+      "street": "222 SUMMER STREET",
+      "region": "BC",
+      "country": "CA",
+      "postalCode": "V8W 2V8"
+    },
+    "contactPhoneNumber": "          "
+  },
+  "newLocation": {
+    "locationId": 92,
+    "status": "ACTIVE",
+    "locationType": "MH_PARK",
+    "address": {
+      "street": "8300 GALLAGHER LK FRONTAGE RD",
+      "city": "OLIVER",
+      "region": "BC",
+      "country": "CA"
+    },
+    "parkName": "GALLAGHER LAKE VILLAGE PARK",
+    "pad": "103",
+    "leaveProvince": false,
+    "taxCertificate": true,
+    "taxExpiryDate": "2023-02-21T08:01:00+00:00"
+  },
+  "registrationType": "PERMIT",
+  "documentDescription": "TRANSPORT PERMIT",
+  "payment": {
+    "invoiceId": "25044",
+    "receipt": "/api/v1/payment-requests/25044/receipts"
+  },
+  "owner": {
+    "address": {
+      "city": "CHEMAINUS",
+      "country": "CA",
+      "postalCode": "V0R 1K5",
+      "region": "BC",
+      "street": "8228A CHEMAINUS ROAD "
+    },
+    "individualName": {
+      "first": "TRICIA",
+      "last": "THOMAS"
+    }
+  },
+  "existingLocation": {
+    "locationType": "MH_PARK",
+    "parkName": "MOUNTAIN VIEW ESTATES",
+    "pad": "25",
+    "address": {
+      "street": "1030 RICARDO ROAD",
+      "city": "KAMLOOPS",
+      "region": "BC",
+      "country": "CA",
+      "postalCode": " "
+    },
+    "leaveProvince": false,
+    "taxCertificate": false
+  }
+}

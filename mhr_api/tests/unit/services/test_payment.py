@@ -140,6 +140,8 @@ TEST_PAYMENT_DATA = [
     ('MHR Registration no client id', TransactionTypes.REGISTRATION, '1234', None, 1),
     ('MHR Registration no trans id', TransactionTypes.REGISTRATION, None, 'UT-00001', 1),
     ('MHR Transfer', TransactionTypes.TRANSFER, '1234', 'UT-00001', 1),
+    ('MHR Transport Permit', TransactionTypes.TRANSPORT_PERMIT, '1234', 'UT-00001', 1),
+    ('MHR Transport Permit Extension', TransactionTypes.TRANSPORT_PERMIT_EXT, '1234', 'UT-00001', 1)
 ]
 # testdata pattern is ({type}, {trans_id}, {client_id}, {routingSlip}, {bcolNum}, {datNum}, {waiveFees}, {priority})
 TEST_PAYMENT_DATA_STAFF = [

@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Test Suite to ensure the model utility functions are working as expected."""
+from datetime import timedelta as _timedelta
+
 import pytest
 
 from flask import current_app
@@ -21,18 +23,6 @@ from mhr_api.models import utils as model_utils
 
 DB2_IND_NAME_MIDDLE = 'DANYLUK                  LEONARD        MICHAEL                       '
 DB2_IND_NAME = 'KING                     MARDI                                        '
-DB2_ADDRESS_PCODE = '2400 OAKDALE WAY                        ' + \
-                    'UNIT# 129                               ' + \
-                    'KAMLOOPS                                ' + \
-                    'BC CA                            V8R 16W'
-DB2_ADDRESS_NO_PCODE = '2400 OAKDALE WAY                        ' + \
-                    'UNIT# 129                               ' + \
-                    'KAMLOOPS                                ' + \
-                    '                                   BC CA'
-DB2_ADDRESS_NO_ADD = '2400 OAKDALE WAY                        ' + \
-                    '                                        ' + \
-                    'KAMLOOPS                                ' + \
-                    'BC CA                            V8R 16W'
 
 # testdata pattern is ({last}, {first}, {middle}, {db2_name})
 TEST_DATA_LEGACY_NAME = [
@@ -77,6 +67,17 @@ TEST_DATA_SERIAL_KEY = [
     ('12345', '003039'),
     ('999999', '0F423F')
 ]
+# testdata pattern is ({valid}, {registration_ts}, {tax_cert_ts})
+TEST_DATA_TAX_CERT_DATE = [
+    (True, '2022-09-01T07:01:00+00:00', '2023-09-01T07:01:00+00:00'),
+    (True, '2022-09-01T07:01:00+00:00', '2022-12-01T07:01:00+00:00'),
+    (True, '2022-09-01T07:01:00+00:00', '2022-10-02T07:01:00+00:00'),
+    (True, '2022-09-01T07:01:00+00:00', '2022-10-01T07:01:00+00:00'),
+    (False, '2022-09-01T07:01:00+00:00', '2022-09-30T07:01:00+00:00'),
+    (False, '2022-09-01T07:01:00+00:00', '2022-09-01T07:01:00+00:00'),
+    (False, '2022-09-01T07:01:00+00:00', '2021-09-01T07:01:00+00:00'),
+    (False, '2022-09-01T07:01:00+00:00', None)
+]
 
 
 @pytest.mark.parametrize('last, first, middle, db2_name', TEST_DATA_LEGACY_NAME)
@@ -113,3 +114,15 @@ def test_search_key_serial(session, serial_num, hex_value):
     # current_app.logger.info(f'Key={value}')
     assert len(value) == 6
     assert value == hex_value
+
+
+@pytest.mark.parametrize('valid,registration_ts,tax_cert_ts', TEST_DATA_TAX_CERT_DATE)
+def test_tax_cert_date(session, valid, registration_ts, tax_cert_ts):
+    """Assert that validating a tax certificate date from  a registraton ts works as expected."""
+    reg_ts = model_utils.ts_from_iso_format(registration_ts)
+    tax_test_ts = model_utils.ts_from_iso_format(tax_cert_ts) if tax_cert_ts else None
+    is_valid: bool = model_utils.valid_tax_cert_date(reg_ts, tax_test_ts)
+    if valid:
+        assert is_valid
+    else:
+        assert not is_valid

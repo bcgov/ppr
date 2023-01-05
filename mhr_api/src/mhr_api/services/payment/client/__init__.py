@@ -39,7 +39,9 @@ TRANSACTION_TO_FILING_TYPE = {
     'REGISTRATION': 'INREG',
     'TRANSFER': 'NTTRF',
     'EXEMPTION_RES': 'EXEMP',
-    'EXEMPTION_NON_RES': 'EXEMN'
+    'EXEMPTION_NON_RES': 'EXEMN',
+    'TRANSPORT_PERMIT': 'TRAPP',
+    'TRANSPORT_PERMIT_EXT': 'TRAPP'
 }
 
 # Mapping from normal filing type to staff version of filing type
