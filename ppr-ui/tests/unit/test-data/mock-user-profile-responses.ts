@@ -1,6 +1,6 @@
 import { SettingOptions } from '@/enums'
 import { UserSettingsIF } from '@/interfaces'
-import {mhRegistrationTableHeaders, registrationTableHeaders} from '@/resources'
+import { mhRegistrationTableHeaders, registrationTableHeaders } from '@/resources'
 
 export const mockedDefaultUserSettingsResponse: UserSettingsIF = {
   [SettingOptions.PAYMENT_CONFIRMATION_DIALOG]: true,

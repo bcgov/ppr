@@ -5,7 +5,7 @@ import { StatusCodes } from 'http-status-codes'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 
 // Interfaces, Enums
-import { AccountProductCodes, AccountProductMemberships, AccountProductRoles } from '@/enums'
+import { AccountProductCodes, AccountProductMemberships, AccountProductRoles, AccountTypes } from '@/enums'
 import {
   AccountProductSubscriptionIF, AddressIF, PartyIF, SearchPartyIF, UserProductSubscriptionIF
 } from '@/interfaces'
@@ -181,8 +181,7 @@ export async function getSbcFromAuth (): Promise<boolean> {
         if (!data) {
           return false
         }
-        const branchName = data?.branchName
-        if (branchName?.includes('Service BC')) {
+        if (data.orgType === AccountTypes.SBC_STAFF) {
           return true
         }
         return false
