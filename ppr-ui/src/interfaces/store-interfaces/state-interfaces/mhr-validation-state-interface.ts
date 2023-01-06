@@ -14,6 +14,9 @@ export interface MhrValidationStateIF {
   homeOwnersValid: {
     ownersValid: boolean
   },
+  addEditOwnersValid: {
+    ownersValid: boolean
+  },
   locationValid: {
     locationTypeValid: boolean
     civicAddressValid: boolean

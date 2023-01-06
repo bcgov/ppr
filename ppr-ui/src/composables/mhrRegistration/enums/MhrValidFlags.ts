@@ -2,6 +2,7 @@ export enum MhrSectVal {
   YOUR_HOME_VALID = 'yourHomeValid',
   SUBMITTING_PARTY_VALID = 'submittingPartyValid',
   HOME_OWNERS_VALID = 'homeOwnersValid',
+  ADD_EDIT_OWNERS_VALID = 'addEditOwnersValid',
   LOCATION_VALID = 'locationValid',
   REVIEW_CONFIRM_VALID = 'reviewConfirmValid'
 }

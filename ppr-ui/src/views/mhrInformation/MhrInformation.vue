@@ -577,6 +577,13 @@ export default defineComponent({
     )
 
     watch(
+      () => localState.isValidTransfer,
+      () => {
+        if (localState.isValidTransfer) localState.validate = false
+      }
+    )
+
+    watch(
       () => localState.refNumValid,
       (isFormValid: boolean) => {
         setRefNumValid(isFormValid)

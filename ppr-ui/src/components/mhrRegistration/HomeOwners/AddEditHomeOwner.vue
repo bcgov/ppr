@@ -1,8 +1,12 @@
 <template>
-  <v-card flat class="py-6 px-8 mb-5 rounded" :class="{ 'border-error-left': showTableError}">
+  <v-card flat class="py-6 px-8 mb-5 rounded" :class="{ 'border-error-left': showTableError || showReviewedError}">
     <v-row id="mhr-home-add-person">
       <v-col cols="3">
-        <label class="generic-label" :class="{ 'error-text' : showTableError}"> {{ getSidebarTitle }} </label>
+        <label class="generic-label"
+        :class="{ 'error-text' : showTableError || showReviewedError}"
+        >
+          {{ getSidebarTitle }}
+        </label>
       </v-col>
       <v-col cols="9">
         <v-form
@@ -314,7 +318,7 @@ import {
   watch
 } from '@vue/composition-api'
 import { useInputRules } from '@/composables/useInputRules'
-import { useHomeOwners } from '@/composables/mhrRegistration'
+import { useHomeOwners, useMhrValidations } from '@/composables/mhrRegistration'
 import { AutoComplete } from '@/components/search'
 import { BaseAddress } from '@/composables/address'
 import { PartyAddressSchema } from '@/schemas'
@@ -372,12 +376,26 @@ export default defineComponent({
     }
   },
   setup (props, context) {
-    const { getMhrRegistrationHomeOwnerGroups, getMhrTransferHomeOwnerGroups } = useGetters<any>([
+    const {
+      getMhrRegistrationHomeOwnerGroups,
+      getMhrTransferHomeOwnerGroups,
+      getMhrRegistrationValidationModel
+    } = useGetters<any>([
       'getMhrRegistrationHomeOwnerGroups',
-      'getMhrTransferHomeOwnerGroups'
+      'getMhrTransferHomeOwnerGroups',
+      'getMhrRegistrationValidationModel'
     ])
 
-    const { setUnsavedChanges } = useActions<any>(['setUnsavedChanges'])
+    const {
+      MhrSectVal,
+      getStepValidation,
+      setValidation,
+      MhrCompVal
+    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
+
+    const {
+      setUnsavedChanges
+    } = useActions<any>(['setUnsavedChanges'])
 
     const { required, customRules, maxLength, minLength, isPhone, isNumber, invalidSpaces } = useInputRules()
 
@@ -460,6 +478,8 @@ export default defineComponent({
       group: getGroupForOwner(props.editHomeOwner?.ownerId) as MhrRegistrationHomeOwnerGroupIF,
       ownersGroupId: computed(() => (showGroups.value ? localState.group?.groupId : null)),
       owner: { ...defaultHomeOwner },
+      showReviewedError: computed(() =>
+        (!getStepValidation(MhrSectVal.HOME_OWNERS_VALID) && !getStepValidation(MhrSectVal.ADD_EDIT_OWNERS_VALID))),
       ownerGroupId: props.editHomeOwner?.groupId,
       showGroups: showGroups,
       isPerson: props.isHomeOwnerPerson,
@@ -500,6 +520,7 @@ export default defineComponent({
       // @ts-ignore - function exists
       context.refs.addHomeOwnerForm.validate()
       if (localState.isHomeOwnerFormValid && localState.isAddressFormValid) {
+        setValidation(MhrSectVal.ADD_EDIT_OWNERS_VALID, MhrCompVal.OWNERS_VALID, true)
         if (props.editHomeOwner) {
           editHomeOwner(
             localState.owner as MhrRegistrationHomeOwnerIF,
@@ -546,6 +567,7 @@ export default defineComponent({
     }
     const cancel = (): void => {
       localState.ownerGroupId = props.editHomeOwner?.groupId
+      setValidation(MhrSectVal.ADD_EDIT_OWNERS_VALID, MhrCompVal.OWNERS_VALID, true)
       context.emit('cancel')
     }
 
@@ -593,6 +615,8 @@ export default defineComponent({
       addressSchema,
       setSearchValue,
       setCloseAutoComplete,
+      getStepValidation,
+      MhrSectVal,
       ...toRefs(localState)
     }
   }
