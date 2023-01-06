@@ -5,8 +5,7 @@ import { baseRules, spaceRules } from '@/composables/address/factories/validatio
 // NB: This should match the subject JSON schema.
 export const CivicAddressSchema = {
   street: [
-    baseRules[ValidationRule.REQUIRED],
-    baseRules[ValidationRule.MAX_LENGTH](50),
+    baseRules[ValidationRule.MAX_LENGTH](31),
     ...spaceRules
   ],
   streetAdditional: [
@@ -15,13 +14,14 @@ export const CivicAddressSchema = {
   ],
   city: [
     baseRules[ValidationRule.REQUIRED],
-    baseRules[ValidationRule.MAX_LENGTH](40),
+    baseRules[ValidationRule.MAX_LENGTH](20),
     ...spaceRules
   ],
   country: [
   ],
   region: [
     baseRules[ValidationRule.REQUIRED],
+    baseRules[ValidationRule.BC],
     ...spaceRules
   ],
   /* NOTE: Canada/US postal code and zip code regex rules

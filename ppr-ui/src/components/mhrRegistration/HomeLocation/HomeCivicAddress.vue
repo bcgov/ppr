@@ -1,6 +1,6 @@
 <template>
-  <v-card flat rounded id="mhr-home-civic-address" class="mt-8 pa-8">
-    <v-row no-gutters class="pt-1">
+  <v-card flat rounded id="mhr-home-civic-address" class="mt-8 px-8 pt-8 pb-2">
+    <v-row no-gutters class="py-2">
       <v-col cols="12" sm="2">
         <label class="generic-label" :class="{'error-text': validate}">Civic Address</label>
       </v-col>
@@ -12,26 +12,15 @@
               :id="streetId"
               class="street-address"
               filled
-              label="Street Address"
+              label="Street Address (Number and Name)"
               :name="Math.random()"
+              hint="Required if location has a street address"
               persistent-hint
               ref="street"
               v-model="addressLocal.street"
-              :rules="[...addressSchema.street]"
               @keypress.once="enableAddressComplete()"
               @click="enableAddressComplete()"
-            />
-          </div>
-          <div class="form__row">
-            <v-textarea
-              id="streetAdditional"
-              auto-grow
-              filled
-              class="street-address-additional"
-              label="Additional Street Address (Optional)"
-              :name="Math.random()"
-              rows="1"
-              v-model="addressLocal.streetAdditional"
+              :rules="[...CivicAddressSchema.street]"
             />
           </div>
           <div class="form__row two-column">
@@ -45,21 +34,23 @@
                   ref="city"
                   :name="Math.random()"
                   v-model="addressLocal.city"
-                  :rules="[...addressSchema.city]"
+                  :rules="[...CivicAddressSchema.city]"
                 />
               </v-col>
               <v-col>
-                <v-text-field
+                <v-select
                   id="region"
                   label="Province"
                   class="item address-region"
+                  autocomplete="off"
                   filled
-                  disabled
                   hint="Address must be in B.C."
                   persistent-hint
-                  :name="Math.random()"
+                  :items="provinceOptions"
+                  item-text="name"
+                  item-value="value"
                   v-model="addressLocal.region"
-                  :rules="[...addressSchema.region]"
+                  :rules="[...CivicAddressSchema.region]"
                 />
               </v-col>
             </v-row>
@@ -72,13 +63,14 @@
 
 <script lang="ts">
 /* eslint-disable no-unused-vars */
-import { defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
+import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
 import { CivicAddressSchema } from '@/schemas/civic-address'
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import { useMhrValidations } from '@/composables'
 import {
   useAddress,
-  useAddressComplete
+  useAddressComplete,
+  useCountriesProvinces
 } from '@/composables/address/factories'
 import { AddressIF } from '@/interfaces'
 import { setExtra } from '@sentry/minimal'
@@ -91,7 +83,6 @@ export default defineComponent({
       type: Object as () => AddressIF,
       default: () => ({
         street: '',
-        streetAdditional: '',
         city: '',
         region: 'British Columbia',
         postalCode: '',
@@ -122,7 +113,7 @@ export default defineComponent({
       setValidation
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
-    const addressSchema = CivicAddressSchema
+    const countryProvincesHelpers = useCountriesProvinces()
 
     const {
       addressLocal,
@@ -130,21 +121,26 @@ export default defineComponent({
       schemaLocal,
       isSchemaRequired,
       labels
-    } = useAddress(toRefs(props).value, addressSchema)
+    } = useAddress(toRefs(props).value, CivicAddressSchema)
 
     const { enableAddressComplete, uniqueIds } = useAddressComplete(addressLocal)
 
     const localState = reactive({
       isValidCivicAddress: false,
-      addressLocal
+      provinceOptions: computed((): Array<Object> => {
+        return countryProvincesHelpers.getCountryRegions('CA', true).map((region: any) => {
+          return {
+            name: region.name,
+            value: region.short
+          }
+        })
+      })
     })
 
     const validateForm = (context): void => {
       if (props.validate) {
         // @ts-ignore - function exists
-        if (addressLocal.value.street && addressLocal.value.city) {
-          localState.isValidCivicAddress = context.refs.street.validate() ? context.refs.city.validate() : false
-        }
+        context.refs.addressForm.validate()
       }
     }
 
@@ -154,11 +150,6 @@ export default defineComponent({
       await setCivicAddress({ key: 'street', value: addressLocal.value.street })
     })
 
-    watch(() => addressLocal.value.streetAdditional, async () => {
-      // Set civic address data to store
-      await setCivicAddress({ key: 'streetAdditional', value: addressLocal.value.streetAdditional })
-    })
-
     watch(() => addressLocal.value.city, async () => {
       // Set civic address data to store
       await setCivicAddress({ key: 'city', value: addressLocal.value.city })
@@ -166,7 +157,7 @@ export default defineComponent({
 
     watch(() => addressLocal.value.region, async () => {
       // Set civic address data to store
-      await setCivicAddress({ key: 'region', value: 'BC' })
+      await setCivicAddress({ key: 'region', value: addressLocal.value.region })
     })
 
     watch(() => localState.isValidCivicAddress, async (val: boolean) => {
@@ -175,12 +166,11 @@ export default defineComponent({
 
     watch(() => props.validate, async () => {
       // @ts-ignore - function exists
-      addressLocal.value.region = 'British Columbia'
       validateForm(context)
     })
     /** Clear/reset forms when select option changes. **/
     return {
-      addressSchema,
+      CivicAddressSchema,
       addressLocal,
       country,
       schemaLocal,
@@ -196,18 +186,15 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-.address-region {::v-deep .v-input__slot{
-  border-bottom: thin dashed;
-  color: #212529;
-}}
-.address-region {::v-deep input{
-  color: #212529 !important;
-  font-size: 16px;
-}}
 .address-region {::v-deep .v-label{
   color: #495057;
 }}
-.address-region {::v-deep .v-text-field__details{
-  color: #495057;
-}}
+::v-deep {
+  .theme--light.v-select .v-select__selection--comma {
+    color: $gray9;
+  }
+  .v-text-field.v-text-field--enclosed .v-text-field__details {
+    margin-bottom: 0;
+  }
+}
 </style>

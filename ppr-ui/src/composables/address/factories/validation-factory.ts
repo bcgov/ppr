@@ -17,7 +17,7 @@ export function useBaseValidations () {
 
 /* Rules used in most schemas */
 export const baseRules = {
-  [ValidationRule.BC]: (v: string) => v === 'BC' || 'Address must be in BC',
+  [ValidationRule.BC]: (v: string) => v === 'BC' || v === 'British Columbia' || 'Address must be in BC',
   [ValidationRule.CANADA]: (v: string) => v === 'CA' || 'Address must be in Canada',
   [ValidationRule.MAX_LENGTH]: (max: number) => {
     return (v: string) => v?.length <= max || `Maximum length is ${max}`
