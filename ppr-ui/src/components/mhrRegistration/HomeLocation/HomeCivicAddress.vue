@@ -51,8 +51,7 @@
                   item-value="value"
                   v-model="addressLocal.region"
                   :rules="[...CivicAddressSchema.region]"
-                >
-                </v-select>
+                />
               </v-col>
             </v-row>
           </div>
