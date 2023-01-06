@@ -1,4 +1,5 @@
 export enum AccountTypes {
   PREMIUM = 'PREMIUM',
-  BASIC = 'BASIC'
+  BASIC = 'BASIC',
+  SBC_STAFF = 'SBC_STAFF'
 }
