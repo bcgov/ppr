@@ -132,7 +132,7 @@ export default defineComponent({
       }),
       displayItems: [],
       displayGroup: {
-        1: true,
+        1: false,
         2: false
       },
       showMenu: false
@@ -200,7 +200,7 @@ export default defineComponent({
 </script>
 <style lang="scss" scoped>
 @import "@/assets/styles/theme.scss";
-.theme--light.v-list-item.copy-normal {
+::v-deep .theme--light.v-list-item.copy-normal {
   color: $gray7 !important;
   padding-left: 49px;
 }

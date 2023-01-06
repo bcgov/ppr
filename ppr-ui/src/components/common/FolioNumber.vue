@@ -65,9 +65,12 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-#folio-box {
+#folio-box::v-deep {
   width: 250px;
-  margin-left: 54px;
+  float: right;
+  .v-input.v-text-field .v-text-field__details {
+    margin-bottom: 0px;
+  }
 }
 
 </style>
