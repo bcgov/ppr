@@ -61,7 +61,7 @@ def post_permits(mhr_number: str):  # pylint: disable=too-many-return-statements
         current_app.logger.debug(f'Extra validation on transport permit json for {mhr_number}')
         valid_format, errors = schema_utils.validate(request_json, 'permit', 'mhr')
         # Additional validation not covered by the schema.
-        extra_validation_msg = resource_utils.validate_permit(current_reg, request_json, is_staff(jwt))
+        extra_validation_msg = resource_utils.validate_permit(current_reg, request_json, is_staff(jwt), get_group(jwt))
         if not valid_format or extra_validation_msg != '':
             return resource_utils.validation_error_response(errors, reg_utils.VAL_ERROR, extra_validation_msg)
         # Set up the registration, pay, and save the data.

@@ -175,6 +175,13 @@ SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRI
  WHERE mh.mhregnum IN (?)
    AND mh.mhregnum = d.mhregnum
 """
+PERMIT_COUNT_QUERY = """
+SELECT COUNT(documtid)
+  FROM document
+ WHERE mhregnum = :query_value1
+   AND docutype = '103 '
+   AND trim(name) = :query_value2
+"""
 REG_ORDER_BY_DATE = ' ORDER BY d.regidate DESC'
 REG_ORDER_BY_MHR_NUMBER = ' ORDER BY mh.mhregnum'
 REG_ORDER_BY_REG_TYPE = ' ORDER BY TRIM(d.docutype)'
@@ -421,7 +428,7 @@ def find_all_by_account_id(params: AccountRegistrationParams):
     return results
 
 
-def get_doc_id_count(doc_id: str):
+def get_doc_id_count(doc_id: str) -> int:
     """Execute a query to count existing document id (must not exist check)."""
     try:
         query = text(DOC_ID_COUNT_QUERY)
@@ -432,6 +439,22 @@ def get_doc_id_count(doc_id: str):
         return exist_count
     except Exception as db_exception:   # noqa: B902; return nicer error
         current_app.logger.error('DB2 get_doc_id_count exception: ' + str(db_exception))
+        raise DatabaseException(db_exception)
+
+
+def get_db2_permit_count(mhr_number: str, name: str) -> int:
+    """Execute a query to count existing transport permit registrations on a home."""
+    try:
+        query = text(PERMIT_COUNT_QUERY)
+        query_name = name[0:40]
+        result = db.get_engine(current_app, 'db2').execute(query,
+                                                           {'query_value1': mhr_number, 'query_value2': query_name})
+        row = result.first()
+        exist_count = int(row[0])
+        current_app.logger.debug(f'Existing transport permit count={exist_count}.')
+        return exist_count
+    except Exception as db_exception:   # noqa: B902; return nicer error
+        current_app.logger.error('DB2 get_permit_count exception: ' + str(db_exception))
         raise DatabaseException(db_exception)
 
 

@@ -685,7 +685,6 @@ class Db2Manuhome(db.Model):
         # Create note, which holds permit expiry date.
         note: Db2Mhomnote = Db2Mhomnote.create_from_registration(reg_json.get('note'), doc, manuhome.id)
         note.expiry_date = model_utils.date_offset(manuhome.update_date, 30, True)
-        note.remarks = 'Set permit expiry date.'
         manuhome.reg_notes.append(note)
         # Update location:
         manuhome.new_location = Db2Location.create_from_registration(registration, reg_json, True)

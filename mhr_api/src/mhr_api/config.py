@@ -184,6 +184,8 @@ class _Config():  # pylint: disable=too-few-public-methods
     GCP_PS_REGISTRATION_REPORT_TOPIC = os.getenv('GCP_PS_REGISTRATION_REPORT_TOPIC')
 
     SUBSCRIPTION_API_KEY = os.getenv('SUBSCRIPTION_API_KEY')
+    GATEWAY_API_KEY = os.getenv('GATEWAY_API_KEY')
+    GATEWAY_LTSA_URL = os.getenv('GATEWAY_LTSA_URL')
 
 
 class DevConfig(_Config):  # pylint: disable=too-few-public-methods

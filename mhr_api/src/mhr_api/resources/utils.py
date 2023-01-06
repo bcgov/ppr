@@ -253,9 +253,9 @@ def validate_exemption(registration, json_data, is_staff: bool = False):
     return registration_validator.validate_exemption(registration, json_data, is_staff)
 
 
-def validate_permit(registration, json_data, is_staff: bool = False):
+def validate_permit(registration, json_data, is_staff: bool = False, group_name: str = None):
     """Perform non-schema extra validation on a transport permit registration."""
-    return registration_validator.validate_permit(registration, json_data, is_staff)
+    return registration_validator.validate_permit(registration, json_data, is_staff, group_name)
 
 
 def valid_api_key(req) -> bool:
