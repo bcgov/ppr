@@ -29,11 +29,7 @@
             />
           </v-col>
         </v-row>
-        <div v-if="typeOfSearch">
-          <div class="pt-0 pb-1">
-            <div v-html="typeOfSearch" class="font-weight-bold search-title"></div>
-          </div>
-        </div>
+        <div v-if="typeOfSearch" v-html="typeOfSearch" class="font-weight-bold search-title pt-0 pb-1"></div>
         <v-row>
           <v-col class="pb-0" cols="4">
             <search-bar-list
