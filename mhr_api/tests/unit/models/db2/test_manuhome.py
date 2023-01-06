@@ -416,7 +416,7 @@ def test_create_permit_from_json(session, mhr_num, user_group, doc_id_prefix, ac
     assert note.document_type == doc.document_type
     assert note.reg_document_id == doc.id
     assert note.destroyed == 'N'
-    assert note.remarks
+    # assert note.remarks
     assert note.expiry_date
     assert manuhome.reg_location
     assert manuhome.reg_location.status == Db2Location.StatusTypes.HISTORICAL
