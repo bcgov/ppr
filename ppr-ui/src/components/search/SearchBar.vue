@@ -29,11 +29,11 @@
             />
           </v-col>
         </v-row>
-        <v-row v-if="typeOfSearch">
-          <v-col class="pt-0 pb-1">
-            <div v-html="typeOfSearch" class="font-weight-bold gray9"></div>
-          </v-col>
-        </v-row>
+        <div v-if="typeOfSearch">
+          <div class="pt-0 pb-1">
+            <div v-html="typeOfSearch" class="font-weight-bold search-title"></div>
+          </div>
+        </div>
         <v-row>
           <v-col class="pb-0" cols="4">
             <search-bar-list
@@ -80,7 +80,7 @@
             >
             </auto-complete>
           </v-col>
-          <v-col v-else class="pl-3 col-xl">
+          <v-col v-else class="pl-3 col-xl pb-0">
             <v-row no-gutters>
               <v-col cols="4">
                 <v-text-field
@@ -125,20 +125,20 @@
             </v-row>
           </v-col>
         </v-row>
-
-        <v-row v-if="typeOfSearch" class="fs-14 mt-1 mb-3">
-          <v-col>
-            <v-icon size="14" color="495057">mdi-information-outline</v-icon>
-            <span v-if="shouldShowFeeHint">
-              Each Personal Property Registry search will incur a fee of ${{ fee }}, including searches that return
-              no results.
-            </span>
-            <span v-else>
-              You will have the option to include a Personal Property Registry lien / encumbrance search as part of your
-              Manufactured Home Registry search.
-            </span>
-          </v-col>
-        </v-row>
+        <div
+          v-if="selectedSearchType && (shouldShowFeeHint || isMHRSearchType(selectedSearchType.searchTypeAPI))"
+          class="ppr-mhr-info mt-5 mb-7"
+        >
+          <v-icon size="20" color="495057">mdi-information-outline</v-icon>
+          <span v-if="shouldShowFeeHint" data-test-id="ppr-search-info">
+            Each Personal Property Registry search will incur a fee of ${{ fee }}, including searches that return
+            no results.
+          </span>
+          <span v-else-if="isMHRSearchType(selectedSearchType.searchTypeAPI)" data-test-id="mhr-search-info">
+            You will have the option to include a Personal Property Registry lien / encumbrance search as part of your
+            Manufactured Home Registry search.
+          </span>
+        </div>
       </v-col>
       <v-col class="col-auto py-0">
         <v-row :style="typeOfSearch ? 'height: 115px' : 'height: 85px'" />
@@ -610,6 +610,7 @@ export default defineComponent({
 
     return {
       ...toRefs(localState),
+      isMHRSearchType,
       getSearchApiParams,
       onStaffPaymentChanges,
       searchAction,
@@ -656,7 +657,12 @@ export default defineComponent({
 }
 .search-title {
   color: $gray9;
-  font-size: 1rem;
+  font-weight: bold;
+}
+
+.ppr-mhr-info {
+  font-size: 14px;
+  line-height: 1em;
 }
 .fee-info {
   border-bottom: 1px dotted $gray9;

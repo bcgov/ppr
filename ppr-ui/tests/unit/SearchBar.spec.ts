@@ -171,13 +171,15 @@ describe('Serial number search', () => {
   it('searches when fields are filled', async () => {
     await store.dispatch('setAuthRoles', ['ppr'])
     expect(wrapper.find('.fee-text').exists()).toBeTruthy()
-    const searchText = wrapper.find('.select-search-text').text()
+    const searchText = wrapper.find('.search-info').text()
     expect(searchText).toContain('Select a search category and then enter a criteria to search')
-    expect(searchText).toContain('$8.50')
+    expect(searchText).not.toContain('$8.50')
+    expect(wrapper.find(getTestId('ppr-search-info')).exists()).toBeFalsy()
     wrapper.vm.returnSearchSelection(select)
     await Vue.nextTick()
     wrapper.vm.$data.selectedSearchType = select
     await Vue.nextTick()
+    expect(wrapper.find(getTestId('ppr-search-info')).exists()).toBeTruthy()
     wrapper.vm.$data.searchValue = 'F100'
     wrapper.find(searchButtonSelector).trigger('click')
     await Vue.nextTick()
@@ -196,7 +198,7 @@ describe('Serial number search', () => {
 
   it('hides and shows things for staff', async () => {
     await store.dispatch('setAuthRoles', ['staff', 'ppr_staff'])
-    const searchText = wrapper.find('.select-search-text').text()
+    const searchText = wrapper.find('.search-info').text()
     expect(searchText).toContain('Select a search category and then enter a criteria to search')
     await store.dispatch('setStaffPayment', {
       option: 1,
@@ -210,6 +212,8 @@ describe('Serial number search', () => {
     wrapper.vm.returnSearchSelection(select)
     wrapper.vm.$data.selectedSearchType = select
     await Vue.nextTick()
+    expect(wrapper.find(getTestId('ppr-search-info')).exists()).toBeFalsy()
+    expect(wrapper.find(getTestId('mhr-search-info')).exists()).toBeFalsy()
     wrapper.vm.$data.searchValue = 'F100'
     wrapper.find(searchButtonSelector).trigger('click')
     await Vue.nextTick()
@@ -536,7 +540,7 @@ describe('Mhr Owner name search', () => {
     wrapper.vm.returnSearchSelection(select)
     wrapper.vm.$data.selectedSearchType = select
     await Vue.nextTick()
-    const searchText = wrapper.find('.select-search-text').text()
+    const searchText = wrapper.find('.search-info').text()
     expect(searchText).not.toContain('Each search will incur a fee')
     wrapper.vm.$data.searchValueFirst = 'test first'
     wrapper.vm.$data.searchValueSecond = 'test middle'
