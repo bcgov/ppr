@@ -62,7 +62,7 @@
                   :hint="searchHint"
                   :hide-details="hideDetails"
                   persistent-hint
-                  :placeholder="selectedSearchType ? selectedSearchType.textLabel : 'Select a category first'"
+                  :label="selectedSearchType ? selectedSearchType.textLabel : 'Select a category first'"
                   v-model="searchValue"
                   @keypress.enter="searchCheck()"
                 />
@@ -91,7 +91,7 @@
                   filled
                   :hint="searchHintFirst"
                   persistent-hint
-                  :placeholder="optionFirst"
+                  :label="optionFirst"
                   v-model="searchValueFirst"
                   @keypress.enter="searchCheck()"
                 />
@@ -104,7 +104,7 @@
                   filled
                   :hint="searchHintSecond"
                   persistent-hint
-                  placeholder="Middle Name (Optional)"
+                  label="Middle Name (Optional)"
                   v-model="searchValueSecond"
                   @keypress.enter="searchCheck()"
                 />
@@ -117,7 +117,7 @@
                   filled
                   :hint="searchHintLast"
                   persistent-hint
-                  placeholder="Last Name"
+                  label="Last Name"
                   v-model="searchValueLast"
                   @keypress.enter="searchCheck()"
                 />
