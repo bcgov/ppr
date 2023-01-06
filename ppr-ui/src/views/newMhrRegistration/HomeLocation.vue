@@ -15,7 +15,8 @@
     <section id="mhr-home-civic-address-wrapper" class="mt-10">
       <h2>Civic Address of the Home</h2>
       <p class="mt-2">
-        Enter the Street Address (Number and Name) and City for the location of the home. Must be located in B.C.
+        Enter the Street Address (Number and Name) and City of the location of the home. Street Address must be entered
+        if there is one. The home must be located in B.C.
       </p>
 
       <HomeCivicAddress

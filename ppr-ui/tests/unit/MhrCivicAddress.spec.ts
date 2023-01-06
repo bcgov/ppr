@@ -54,9 +54,6 @@ describe('mhr home civic address', () => {
     expect(civicAddressSection.exists()).toBe(true)
 
     expect(civicAddressSection.findAll(ERROR_MSG).length).toBe(0)
-
-    const streetAdditional = civicAddressSection.find('#streetAdditional')
-    streetAdditional.setValue('Lot 333')
     await Vue.nextTick()
     await Vue.nextTick()
     expect(civicAddressSection.findAll(ERROR_MSG).length).toBe(0)

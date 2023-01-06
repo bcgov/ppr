@@ -351,8 +351,14 @@ export default defineComponent({
         }
       }
       // update columns selected with user settings
-      localState.pprColumnSettings = getUserSettings.value[SettingOptions.REGISTRATION_TABLE]?.columns || []
-      localState.mhrColumnSettings = getUserSettings.value[SettingOptions.REGISTRATION_TABLE]?.mhrColumns || []
+      localState.pprColumnSettings = getUserSettings.value[SettingOptions.REGISTRATION_TABLE]?.columns?.length >= 1
+        ? getUserSettings.value[SettingOptions.REGISTRATION_TABLE]?.columns
+        : [...registrationTableHeaders] // Default to all selections for initialization
+
+      localState.mhrColumnSettings = getUserSettings.value[SettingOptions.REGISTRATION_TABLE]?.mhrColumns?.length >= 1
+        ? getUserSettings.value[SettingOptions.REGISTRATION_TABLE]?.mhrColumns
+        : [...mhRegistrationTableHeaders] // Default to all selections for initialization
+
       if (props.isPpr) {
         localState.myRegHeadersSelected = localState.pprColumnSettings
       } else if (props.isMhr) {

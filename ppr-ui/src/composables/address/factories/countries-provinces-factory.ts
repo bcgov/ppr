@@ -45,13 +45,14 @@ export function useCountriesProvinces () {
   /**
    * Helper function to return a country's list of provinces.
    * @param code The short code of the country.
+   * @param overrideDefault A flag to bypass manual defaults.
    * @returns An array of province objects, sorted alphabetically.
    */
-  const getCountryRegions = (code: string): Array<object> => {
+  const getCountryRegions = (code: string, overrideDefault: boolean = false): Array<object> => {
     if (!code) return []
     if (window['countryRegionsCache'][code]) return window['countryRegionsCache'][code]
     let regions = []
-    if (code === 'CA') {
+    if (code === 'CA' && !overrideDefault) {
       regions.push({ name: 'British Columbia', short: 'BC' })
       // name is set this way to ensure the divider is there in the search when BC is not the only option
       regions.push({ code: '0', name: 'Br.it.is.h.Co.l.u.m.b.ia', divider: true })
