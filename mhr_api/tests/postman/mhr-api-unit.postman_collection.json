@@ -1015,7 +1015,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/v1/registrations/150062",
+							"raw": "{{base_url}}/api/v1/registrations/102876",
 							"host": [
 								"{{base_url}}"
 							],
@@ -1023,7 +1023,7 @@
 								"api",
 								"v1",
 								"registrations",
-								"150062"
+								"102876"
 							]
 						},
 						"description": "Retrieve the recent history of search requests for the account."
@@ -1412,6 +1412,57 @@
 			]
 		},
 		{
+			"name": "transport permits",
+			"item": [
+				{
+					"name": "Create MH Transport Permit",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"documentId\": \"80888105\",\n  \"clientReferenceId\": \"UT-PERMIT-001\",\n  \"attentionReference\": \"UT-PERMIT-001\",\n  \"submittingParty\": {\n    \"businessName\": \"ABC SEARCHING COMPANY\",\n    \"address\": {\n      \"street\": \"222 SUMMER STREET\",\n      \"city\": \"VICTORIA\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V8W 2V8\"\n    },\n    \"emailAddress\": \"bsmith@abc-search.com\"\n  },\n  \"owner\": {\n    \"address\": {\n        \"city\": \"MONTE LAKE\",\n        \"country\": \"CA\",\n        \"postalCode\": \"V0E 2B0\",\n        \"region\": \"BC\",\n        \"street\": \"#11-3871 HWY 97\",\n        \"streetAdditional\": \"BOX 64\"\n    },\n    \"individualName\": {\n        \"first\": \"CATHERINE\",\n        \"last\": \"DOUCETTE\",\n        \"middle\": \"TERESA\"\n    },\n    \"phoneNumber\": \"2503752222\"\n  },\n  \"existingLocation\": {\n    \"locationType\": \"MH_PARK\",\n    \"address\": {\n        \"city\": \"MONTE LAKE\",\n        \"country\": \"CA\",\n        \"postalCode\": \"\",\n        \"region\": \"BC\",\n        \"street\": \"3871 HIGHWAY 97\"\n    },\n    \"leaveProvince\": false,\n    \"taxCertificate\": false,\n    \"pad\": \"354\",\n    \"parkName\": \"PEMBROOKE HERITAGE ESTATES\"\n  },\n  \"newLocation\": {\n    \"locationType\": \"STRATA\",\n    \"address\": {\n      \"street\": \"7612 LUDLOM RD.\",\n      \"city\": \"DEKA LAKE\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"\"\n    },\n    \"leaveProvince\": false,\n    \"taxCertificate\": true,\n    \"taxExpiryDate\": \"2024-01-31T08:00:00+00:00\"\n  },\n  \"landStatusConfirmation\": true\n}\n"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/permits/102876",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"permits",
+								"102876"
+							]
+						},
+						"description": "Search step 1 submit a query example: search by a Financing Statement registration number which returns no results."
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "documents",
 			"item": [
 				{
@@ -1529,7 +1580,7 @@
 		},
 		{
 			"key": "base_url_local",
-			"value": "http://localhost:5000",
+			"value": "http://127.0.0.1:5000",
 			"type": "string"
 		}
 	]
