@@ -229,7 +229,7 @@ import { unsavedChangesDialog, registrationSaveDraftError } from '@/resources/di
 import { cloneDeep } from 'lodash'
 import AccountInfo from '@/components/common/AccountInfo.vue'
 import {
-  AccountInfoIF, MhrSearchCriteriaIF, MhrTransferApiIF, RegTableNewItemI // eslint-disable-line no-unused-vars
+  AccountInfoIF, SubmittingPartyIF, MhrTransferApiIF, RegTableNewItemI // eslint-disable-line no-unused-vars
 } from '@/interfaces'
 
 export default defineComponent({
@@ -277,6 +277,7 @@ export default defineComponent({
     const {
       setMhrTransferHomeOwnerGroups,
       setMhrTransferCurrentHomeOwnerGroups,
+      setMhrTransferSubmittingParty,
       setMhrTransferAttentionReference,
       setUnsavedChanges,
       setRegTableNewItem,
@@ -285,6 +286,7 @@ export default defineComponent({
     } = useActions<any>([
       'setMhrTransferHomeOwnerGroups',
       'setMhrTransferCurrentHomeOwnerGroups',
+      'setMhrTransferSubmittingParty',
       'setMhrTransferAttentionReference',
       'setUnsavedChanges',
       'setRegTableNewItem',
@@ -391,6 +393,7 @@ export default defineComponent({
       !getMhrInformation.value.draftNumber && await setUnsavedChanges(false)
 
       localState.accountInfo = await getSubmittingPartyInformation()
+      parseSubmittingPartyInfo()
       localState.loading = false
 
       localState.dataLoaded = true
@@ -427,6 +430,17 @@ export default defineComponent({
         // Set current owners if there is no draft
         setMhrTransferHomeOwnerGroups(currentOwnerGroups)
       }
+    }
+
+    const parseSubmittingPartyInfo = (): void => {
+      const submittingParty = {
+        businessName: localState.accountInfo.name,
+        address: localState.accountInfo.mailingAddress,
+        emailAddress: localState.accountInfo.accountAdmin.email,
+        phoneNumber: localState.accountInfo.accountAdmin.phone,
+        phoneExtension: localState.accountInfo.accountAdmin.phoneExtension
+      } as SubmittingPartyIF
+      setMhrTransferSubmittingParty(submittingParty)
     }
 
     const scrollToFirstError = async (scrollToTop: boolean = false): Promise<void> => {

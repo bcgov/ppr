@@ -1,4 +1,4 @@
-import { ActionIF } from '@/interfaces/store-interfaces/action-interface'
+import { ActionIF, SubmittingPartyIF } from '@/interfaces'
 
 export const setMhrTransferDeclaredValue: ActionIF = ({ commit }, declaredValue: number): void => {
   commit('mutateMhrTransferDeclaredValue', declaredValue)
@@ -14,6 +14,10 @@ export const setMhrTransferDate: ActionIF = ({ commit }, transferDate: string): 
 
 export const setMhrTransferOwnLand: ActionIF = ({ commit }, isOwnLand: boolean): void => {
   commit('mutateMhrTransferOwnLand', isOwnLand)
+}
+
+export const setMhrTransferSubmittingParty: ActionIF = ({ commit }, submittingPartyInfo: SubmittingPartyIF): void => {
+  commit('mutateMhrTransferSubmittingParty', submittingPartyInfo)
 }
 
 export const setMhrTransferAttentionReference: ActionIF = ({ commit }, attentionReference: string): void => {

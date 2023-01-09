@@ -295,7 +295,10 @@ export const stateModel: StateModelIF = {
     mhrNumber: '',
     ownerGroups: [],
     currentOwnerGroups: [],
-    submittingParty: {},
+    submittingParty: {
+      emailAddress: '',
+      phoneNumber: ''
+    },
     declaredValue: null,
     consideration: '',
     transferDate: '',

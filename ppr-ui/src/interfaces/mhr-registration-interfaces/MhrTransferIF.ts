@@ -15,7 +15,7 @@ export interface MhrTransferIF {
   ownLand: boolean
   ownerGroups: MhrRegistrationHomeOwnerGroupIF[]
   currentOwnerGroups?: MhrRegistrationHomeOwnerGroupIF[]
-  submittingParty: PartyIF
+  submittingParty: SubmittingPartyIF
   attentionReference: string
   error?: ErrorIF
 }
