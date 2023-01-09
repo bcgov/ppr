@@ -1,7 +1,7 @@
 import { MhrTransferApiIF, MhrTransferIF } from '@/interfaces'
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import { readonly, ref } from '@vue/composition-api'
-import { ActionTypes, ApiHomeTenancyTypes, HomeTenancyTypes } from '@/enums'
+import { ActionTypes, ApiHomeTenancyTypes, HomeTenancyTypes, UIRegistrationTypes } from '@/enums'
 
 // Validation flags for Review Confirm screen
 const refNumValid = ref(true)
@@ -9,23 +9,23 @@ const refNumValid = ref(true)
 export const useMhrInformation = () => {
   const {
     getMhrTransferCurrentHomeOwners,
-    getCurrentUser,
     getMhrInformation,
     getMhrTransferDeclaredValue,
     getMhrTransferConsideration,
     getMhrTransferDate,
     getMhrTransferOwnLand,
+    getMhrTransferSubmittingParty,
     getMhrTransferAttentionReference,
     getMhrTransferHomeOwnerGroups
   } = useGetters<any>([
     'getMhrTransferCurrentHomeOwners',
-    'getCurrentUser',
     'getMhrInformation',
     'getMhrTransferHomeOwners',
     'getMhrTransferDeclaredValue',
     'getMhrTransferConsideration',
     'getMhrTransferDate',
     'getMhrTransferOwnLand',
+    'getMhrTransferSubmittingParty',
     'getMhrTransferAttentionReference',
     'getMhrTransferHomeOwnerGroups'
   ])
@@ -50,7 +50,10 @@ export const useMhrInformation = () => {
     return {
       mhrNumber: '',
       ownerGroups: [],
-      submittingParty: {},
+      submittingParty: {
+        emailAddress: '',
+        phoneNumber: ''
+      },
       declaredValue: null,
       consideration: '',
       transferDate: '',
@@ -99,21 +102,12 @@ export const useMhrInformation = () => {
       transferDate: getMhrTransferDate.value,
       ownLand: getMhrTransferOwnLand.value || false,
       attentionReference: getMhrTransferAttentionReference.value,
-      documentDescription: 'SALE OR GIFT',
+      documentDescription: UIRegistrationTypes.TRANSFER_OF_SALE,
       submittingParty: {
-        personName: {
-          first: getCurrentUser.value.firstname,
-          last: getCurrentUser.value.lastname
-        },
-        address: {
-          street: '222 SUMMER STREET',
-          city: 'VICTORIA',
-          region: 'BC',
-          country: 'CA',
-          postalCode: 'V8W 2V8'
-        },
-        emailAddress: getCurrentUser.value.contacts[0].email,
-        phoneNumber: getCurrentUser.value.contacts[0].phone.replace(/[^0-9.]+/g, '') // Remove special chars
+        address: getMhrTransferSubmittingParty.value.address,
+        emailAddress: getMhrTransferSubmittingParty.value.emailAddress,
+        phoneNumber: getMhrTransferSubmittingParty.value.phoneNumber,
+        phoneExtension: getMhrTransferSubmittingParty.value.phoneExtension
       },
       addOwnerGroups: await parseOwnerGroups(isDraft),
       deleteOwnerGroups: await parseRemovedOwnerGroups(),
