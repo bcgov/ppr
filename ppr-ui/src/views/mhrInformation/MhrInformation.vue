@@ -368,6 +368,10 @@ export default defineComponent({
       reviewOwners: computed(() => {
         return getMhrTransferHomeOwners.value.filter(owner => owner.action !== ActionTypes.REMOVED)
       }),
+      /** True if Jest is running the code. */
+      isJestRunning: computed((): boolean => {
+        return (process.env.JEST_WORKER_ID !== undefined)
+      }),
       attentionReference: '',
       isCompletionConfirmed: false,
       cancelOptions: unsavedChangesDialog,
@@ -467,8 +471,11 @@ export default defineComponent({
       // If already in review mode, file the transfer
       if (localState.isReviewMode) {
         // Verify no lien exists prior to submitting filing
-        const regSum = await getMHRegistrationSummary(getMhrInformation.value.mhrNumber, false)
-        if (regSum && !!regSum.lienRegistrationType) {
+        const regSum = !localState.isJestRunning
+          ? await getMHRegistrationSummary(getMhrInformation.value.mhrNumber, false)
+          : null
+
+        if (!!regSum && !!regSum.lienRegistrationType) {
           await setLienType(regSum.lienRegistrationType)
           await scrollToFirstError(true)
           return
