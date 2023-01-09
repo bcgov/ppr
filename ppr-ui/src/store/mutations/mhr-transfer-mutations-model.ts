@@ -1,4 +1,4 @@
-import { StateIF } from '@/interfaces'
+import { StateIF, SubmittingPartyIF } from '@/interfaces'
 
 export const mutateMhrTransferDeclaredValue = (state: StateIF, declaredValue: number) => {
   state.stateModel.mhrTransfer.declaredValue = declaredValue
@@ -14,6 +14,10 @@ export const mutateMhrTransferDate = (state: StateIF, transferDate: string) => {
 
 export const mutateMhrTransferOwnLand = (state: StateIF, isOwnLand: boolean) => {
   state.stateModel.mhrTransfer.ownLand = isOwnLand
+}
+
+export const mutateMhrTransferSubmittingParty = (state: StateIF, submittingPartyInfo: SubmittingPartyIF) => {
+  state.stateModel.mhrTransfer.submittingParty = submittingPartyInfo
 }
 
 export const mutateMhrTransferAttentionReference = (state: StateIF, attentionReference: string) => {

@@ -14,11 +14,12 @@ export interface PartyIF {
   birthDate?: string // Debtor only UTC ISO 8601 datetime format YYYY-MM-DDThh:mm:ssTZD.
   emailAddress?: string // Optional future for everyone currently only client code?.
   partyId?: number // System generated used for amendment/change registrations.
-  address?: AddressIF // Reguired for debtors or if no party code.
+  address?: AddressIF // Required for debtors or if no party code.
   action?: ActionTypes // Optional action type for amendments
 }
 
 export interface SubmittingPartyIF {
+  code?: string, // if supplied, name (person or business), address, and email address do not need to be supplied
   businessName?: string
   personName?: {
     first: string
