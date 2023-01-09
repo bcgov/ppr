@@ -361,6 +361,10 @@ export const setMhrInformation: ActionIF = ({ commit }, mhrInfo: MhRegistrationS
   commit('mutateMhrInformation', mhrInfo)
 }
 
+export const setLienType: ActionIF = ({ commit }, lienType: string): void => {
+  commit('mutateLienType', lienType)
+}
+
 // MHR Transfer
 export const setEmptyMhrTransfer: ActionIF = ({ commit }, emptyMhrTransfer: MhrTransferIF): void => {
   commit('mutateEmptyMhrTransfer', emptyMhrTransfer)

@@ -413,6 +413,10 @@ export const mutateMhrInformation = (state: StateIF, mhrInfo: MhRegistrationSumm
   state.stateModel.mhrInformation = mhrInfo
 }
 
+export const mutateLienType = (state: StateIF, lienType: string) => {
+  state.stateModel.mhrInformation.lienRegistrationType = lienType
+}
+
 // MHR Transfer
 export const mutateEmptyMhrTransfer = (state: StateIF, emptyMhrTransfer: MhrTransferIF) => {
   state.stateModel.mhrTransfer = emptyMhrTransfer

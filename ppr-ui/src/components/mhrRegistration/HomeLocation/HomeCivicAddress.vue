@@ -84,7 +84,7 @@ export default defineComponent({
       default: () => ({
         street: '',
         city: '',
-        region: 'British Columbia',
+        region: 'BC',
         postalCode: '',
         country: '',
         deliveryInstructions: ''
