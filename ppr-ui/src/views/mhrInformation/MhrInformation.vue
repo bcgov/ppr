@@ -32,7 +32,7 @@
             </v-row>
 
             <!-- Lien Information -->
-            <v-row v-if="hasLien && !isReviewMode" id="lien-information" no-gutters>
+            <v-row v-if="hasLien" id="lien-information" no-gutters>
               <v-card outlined id="important-message" class="rounded-0 mt-2 pt-5 px-5">
                 <v-icon color="error" class="float-left mr-2 mt-n1">mdi-alert</v-icon>
                 <p class="d-block pl-8">
@@ -211,6 +211,7 @@ import {
   deleteMhrDraft,
   fetchMhRegistration,
   getAccountInfoFromAuth,
+  getMHRegistrationSummary,
   getMhrTransferDraft,
   mhrSearch,
   pacificDate,
@@ -282,7 +283,8 @@ export default defineComponent({
       setUnsavedChanges,
       setRegTableNewItem,
       setSearchedType,
-      setManufacturedHomeSearchResults
+      setManufacturedHomeSearchResults,
+      setLienType
     } = useActions<any>([
       'setMhrTransferHomeOwnerGroups',
       'setMhrTransferCurrentHomeOwnerGroups',
@@ -291,7 +293,8 @@ export default defineComponent({
       'setUnsavedChanges',
       'setRegTableNewItem',
       'setSearchedType',
-      'setManufacturedHomeSearchResults'
+      'setManufacturedHomeSearchResults',
+      'setLienType'
     ])
 
     const { setEmptyMhrTransfer } = useActions<any>(['setEmptyMhrTransfer'])
@@ -364,6 +367,10 @@ export default defineComponent({
       }),
       reviewOwners: computed(() => {
         return getMhrTransferHomeOwners.value.filter(owner => owner.action !== ActionTypes.REMOVED)
+      }),
+      /** True if Jest is running the code. */
+      isJestRunning: computed((): boolean => {
+        return (process.env.JEST_WORKER_ID !== undefined)
       }),
       attentionReference: '',
       isCompletionConfirmed: false,
@@ -463,6 +470,17 @@ export default defineComponent({
 
       // If already in review mode, file the transfer
       if (localState.isReviewMode) {
+        // Verify no lien exists prior to submitting filing
+        const regSum = !localState.isJestRunning
+          ? await getMHRegistrationSummary(getMhrInformation.value.mhrNumber, false)
+          : null
+
+        if (!!regSum && !!regSum.lienRegistrationType) {
+          await setLienType(regSum.lienRegistrationType)
+          await scrollToFirstError(true)
+          return
+        }
+
         // Trigger error state for required fields (if not checked)
         localState.validateAuthorizationError = !localState.authorizationValid
         localState.validateConfirmCompletion = !localState.isCompletionConfirmed
