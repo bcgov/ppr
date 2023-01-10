@@ -353,7 +353,7 @@ class Report:  # pylint: disable=too-few-public-methods
             if description and description.get('rebuiltRemarks'):
                 description['rebuiltRemarks'] = markupsafe.Markup(description['rebuiltRemarks'])
             if description and description.get('otherRemarks'):
-                description['rebuiltRemarks'] = markupsafe.Markup(description['otherRemarks'])
+                description['otherRemarks'] = markupsafe.Markup(description['otherRemarks'])
 
     def _set_owner_groups(self):
         """Set up report owner group information."""

@@ -65,7 +65,8 @@ MANUFACTURER_DEALER_INVALID = 'The existing location must be a dealer or manufac
 MANUFACTURER_PERMIT_INVALID = 'A manufacturer can only submit a transport permit once for a home. '
 LOCATION_TAX_DATE_INVALID = 'Location tax certificate date is invalid. '
 LOCATION_TAX_CERT_REQUIRED = 'Location tax certificate and tax certificate expiry date is required. '
-LOCATION_PID_INVALID = 'Location PID verification failed: either the PID is invalid or the LTSA service is unavailable. '
+LOCATION_PID_INVALID = 'Location PID verification failed: either the PID is invalid or the LTSA service is ' + \
+                       'unavailable. '
 
 
 def validate_registration(json_data, staff: bool = False):

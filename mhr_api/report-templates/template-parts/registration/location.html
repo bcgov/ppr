@@ -127,11 +127,11 @@
             {% if location.lot is defined and location.lot != '' %}
                 <div>{% if location.locationType is defined and location.locationType == 'STRATA' %}STRATA {% endif %} LOT: {{ location.lot }}</div>
             {% endif %} 
-            {% if location.landDistrict is defined and location.landDistrict != '' %}
-                <div>LAND DISTRICT: {{ location.landDistrict }}</div>
+            {% if location.parcel is defined and location.parcel != '' %}
+                <div>PARCEL: {{ location.parcel }}</div>
             {% endif %} 
-            {% if location.plan is defined and location.plan != '' %}
-                <div>{% if location.locationType is defined and location.locationType == 'STRATA' %}STRATA {% endif %} PLAN: {{ location.plan }}</div>
+            {% if location.block is defined and location.block != '' %}
+                <div>BLOCK: {{ location.block }}</div>
             {% endif %} 
             {% if location.districtLot is defined and location.districtLot != '' %}
                 <div>DISTRICT LOT: {{ location.districtLot }}</div>
@@ -151,11 +151,11 @@
             {% if location.meridian is defined and location.meridian != '' %}
                 <div>MERIDIAN: {{ location.meridian }}</div>
             {% endif %} 
-            {% if location.parcel is defined and location.parcel != '' %}
-                <div>PARCEL: {{ location.parcel }}</div>
+            {% if location.landDistrict is defined and location.landDistrict != '' %}
+                <div>LAND DISTRICT: {{ location.landDistrict }}</div>
             {% endif %} 
-            {% if location.block is defined and location.block != '' %}
-                <div>BLOCK: {{ location.block }}</div>
+            {% if location.plan is defined and location.plan != '' %}
+                <div>{% if location.locationType is defined and location.locationType == 'STRATA' %}STRATA {% endif %} PLAN: {{ location.plan }}</div>
             {% endif %} 
         </td>
         <td colspan="2">
