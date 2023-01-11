@@ -595,7 +595,7 @@ const UIFilterToApiFilter = {
   regType: 'registrationType',
   startDate: 'createDateTime',
   status: 'statusType',
-  regParty: 'submittingName'
+  regParty: 'username'
 }
 
 // add sorting params for registration history/draft api calls
