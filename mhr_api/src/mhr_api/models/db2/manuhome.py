@@ -515,12 +515,14 @@ class Db2Manuhome(db.Model):
 
     @staticmethod
     def adjust_group_interest(groups, new: bool):
-        """For TC groups adjust group interest value."""
+        """For TC and optionally JT groups adjust group interest value."""
         tc_count: int = 0
         common_denominator: int = 0
         for group in groups:
-            if group.tenancy_type == Db2Owngroup.TenancyTypes.COMMON and \
-                    group.status == Db2Owngroup.StatusTypes.ACTIVE:
+            if group.tenancy_type != Db2Owngroup.TenancyTypes.SOLE and \
+                    group.status == Db2Owngroup.StatusTypes.ACTIVE and \
+                    group.interest_numerator and group.interest_denominator and \
+                    group.interest_numerator > 0 and group.interest_denominator > 0:
                 tc_count += 1
                 if common_denominator == 0:
                     common_denominator = group.interest_denominator

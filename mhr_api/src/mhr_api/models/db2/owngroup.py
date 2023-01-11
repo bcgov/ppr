@@ -280,7 +280,9 @@ class Db2Owngroup(db.Model):
         tenancy: str = new_info.get('type', Db2Owngroup.TenancyTypes.SOLE)
         tenancy_type: str = NEW_TENANCY_LEGACY.get(tenancy)
         interest: str = new_info.get('interest', '')
-        if tenancy_type == Db2Owngroup.TenancyTypes.COMMON:
+        if tenancy_type == Db2Owngroup.TenancyTypes.COMMON or \
+                (tenancy_type == Db2Owngroup.TenancyTypes.JOINT and new_info.get('interestDenominator') and
+                 new_info.get('interestDenominator') > 0):
             if not interest:  # This should never happen.
                 interest = model_utils.OWNER_INTEREST_UNDIVIDED
             elif interest and len(interest) <= 10 and not interest.startswith(model_utils.OWNER_INTEREST_UNDIVIDED):
