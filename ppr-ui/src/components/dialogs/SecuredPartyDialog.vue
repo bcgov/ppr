@@ -70,7 +70,7 @@
               </div>
               <div :class="$style['addressText']">
                 {{ party.address.street }},
-                {{ party.address.streetAdditional ? party.address.streetAdditional+"," : ""}}
+                {{ party.address.streetAdditional ? `${party.address.streetAdditional},` : ""}}
                 {{ party.address.city }}
                 {{ party.address.region }},
                 {{ party.address.postalCode }},
