@@ -3,7 +3,7 @@
     <v-row no-gutters>
       <!-- Auto Populated Legal Land Description -->
       <template v-if="legalDescription">
-        <v-col cols="12" class="mb-3">
+        <v-col cols="12" class="mb-5">
           <p class="generic-label mb-0">Legal Land Description</p>
           <p class="info-text mt-2">{{ legalDescription }}</p>
         </v-col>
@@ -48,7 +48,7 @@
               <strong>Strata Lot, Land District</strong> and
               <strong>Strata Plan</strong> are required.
             </p>
-            <p v-else class="info-text pt-2 py-1" :class="{ 'error-text': validate && !isValidLocationInfo }">
+            <p v-else class="info-text pt-2 py-1" :class="{ 'error-text': validate && !isValidOtherType }">
               <span>At least one of the following combinations is required:</span><br>
               <span class="ml-4">
                 1) <strong>Lot, Land District</strong> and <strong>Plan</strong> or<br>
@@ -121,12 +121,18 @@ export default defineComponent({
     const localState = reactive({
       isValidLocationInfo: false,
       showLocationInfo: false,
-      locationInfo: {},
+      locationInfo: {} as MhrLocationInfoIF,
       additionalDescription: '',
       isHomeLocationDescriptionValid: false,
       isValidDescription: computed((): boolean => {
         return localState.isHomeLocationDescriptionValid &&
           ((!localState.showLocationInfo && !props.isReserve) || localState.isValidLocationInfo)
+      }),
+      isValidOtherType: computed((): boolean => {
+        return (
+          (!!localState.locationInfo.lot && !!localState.locationInfo.landDistrict && !!localState.locationInfo.plan) ||
+          (!!localState.locationInfo.landDistrict && !!localState.locationInfo.districtLot)
+        )
       })
     })
 

@@ -234,6 +234,12 @@ export default defineComponent({
         return (
           localState.locationInfo?.bandName + localState.locationInfo?.reserveNumber + localState.additionalDescription
         ).length > 80
+      }),
+      isValidOtherType: computed((): boolean => {
+        return localState.homeLocationInfoValid && (
+          (!!localState.locationInfo.lot && !!localState.locationInfo.landDistrict && !!localState.locationInfo.plan) ||
+          (!!localState.locationInfo.landDistrict && !!localState.locationInfo.districtLot)
+        )
       })
     })
 
@@ -251,10 +257,7 @@ export default defineComponent({
           requiredFields = ['band-name', 'reserve-number']
           break
         default:
-          requiredFields = (localState.locationInfo.districtLot || localState.locationInfo.landDistrict) &&
-            (!localState.locationInfo.lot && !localState.locationInfo.plan)
-            ? ['land-district', 'district-lot']
-            : ['lot', 'land-district', 'plan']
+          requiredFields = []
       }
 
       return customRules(
@@ -268,6 +271,12 @@ export default defineComponent({
       context.refs.homeLocationInfoRef.validate()
     }
 
+    const emitOtherTypeValid = (): void => {
+      if (!props.isStrata && !props.isReserve) {
+        context.emit('updateLocationInfoValid', localState.isValidOtherType)
+      }
+    }
+
     /** Prompt local validations on validate event. **/
     watch(() => props.validate, (val) => {
       if (val) validateLocationInfo()
@@ -276,6 +285,7 @@ export default defineComponent({
     /** Emit local model to parent when it changes. **/
     watch(() => localState.locationInfo, (locationInfo: MhrLocationInfoIF) => {
       context.emit('updateLocationInfo', locationInfo)
+      emitOtherTypeValid()
     }, { deep: true })
 
     /** Emit validation state to parent when it changes. **/
@@ -286,6 +296,7 @@ export default defineComponent({
     /** Emit validation state to parent when it changes. **/
     watch(() => localState.homeLocationInfoValid, (isValid: boolean) => {
       context.emit('updateLocationInfoValid', isValid)
+      emitOtherTypeValid()
     })
 
     return {
