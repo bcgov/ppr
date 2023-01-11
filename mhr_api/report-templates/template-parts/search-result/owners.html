@@ -6,18 +6,18 @@
         <span class="section-data">
             {% if detail.ownerGroups[0].type == 'SOLE' %}
                 Sole Owner
-            {% elif detail.ownerGroups[0].type == 'JOINT' %}
+            {% elif detail.ownerGroups|length == 1 %}
                 Joint Tenants
             {% else %}
                 Tenants in Common
             {% endif %}
         </span>
     </div>
-    {% if detail.ownerGroups[0].type == 'COMMON' %}
+    {% if detail.ownerGroups|length > 1 %}
         <div class="separator-section mt-3"></div>
     {% endif %}
     {% for group in detail.ownerGroups %}
-        {% if group.type == 'COMMON' %}
+        {% if detail.ownerGroups|length > 1 %}
         <div class="mt-3">
             <span class="section-sub-title">Group {{ group.groupId }}:&nbsp;</span>
             {% if group.interest is defined and group.interest != '' %}

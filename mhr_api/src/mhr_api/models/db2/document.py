@@ -301,7 +301,7 @@ class Db2Document(db.Model):
         doc.consideration_value = reg_json.get('consideration', '')
         doc.affirm_by_name = ''
         if reg_json.get('affirmByName'):
-            doc.affirm_by_name = str(reg_json.get('affirmByName'))[0:40]
+            doc.affirm_by_name = str(reg_json.get('affirmByName')).upper()[0:40]
         doc.liens_with_consent = ''
         if reg_json.get('submittingParty'):
             submitting = reg_json.get('submittingParty')

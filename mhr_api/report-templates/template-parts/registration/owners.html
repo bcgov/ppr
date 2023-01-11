@@ -6,28 +6,30 @@
     <span class="section-data">
         {% if addOwnerGroups is defined and addOwnerGroups[0].type == 'SOLE' %}
             Sole Owner
-        {% elif addOwnerGroups is defined and addOwnerGroups[0].type == 'JOINT' %}
+        {% elif addOwnerGroups is defined and addOwnerGroups[0].type == 'JOINT' and
+                (addOwnerGroups[0].interestDenominator is not defined or addOwnerGroups[0].interestDenominator == '') %}
             Joint Tenants
         {% elif addOwnerGroups is defined %}
             Tenants in Common
         {% elif ownerGroups is defined and ownerGroups[0].type == 'SOLE' %}
             Sole Owner
-        {% elif ownerGroups is defined and ownerGroups[0].type == 'JOINT' %}
+        {% elif ownerGroups is defined and ownerGroups|length == 1 %}
             Joint Tenants
         {% elif ownerGroups is defined %}
             Tenants in Common
         {% endif %}
     </span>
 </div>
-{% if addOwnerGroups is defined and addOwnerGroups[0].type == 'COMMON' %}
+{% if addOwnerGroups is defined and (addOwnerGroups[0].type == 'COMMON' or 
+      (addOwnerGroups[0].interestDenominator is defined and addOwnerGroups[0].interestDenominator != '')) %}
     <div class="separator-section mt-3"></div>
-{% elif ownerGroups is defined and ownerGroups[0].type == 'COMMON' %}
+{% elif ownerGroups is defined and ownerGroups|length > 1 %}
     <div class="separator-section mt-3"></div>
 {% endif %}
 
 {% if ownerGroups is defined %}
     {% for group in ownerGroups %}
-        {% if ownerGroups|length > 1 and group.type == 'COMMON' %}
+        {% if ownerGroups|length > 1 %}
         <div class="mt-3">
             <span class="section-sub-title">Group {{ group.groupId }}:&nbsp;</span>
             {% if group.interest is defined and group.interest != '' %}
@@ -86,7 +88,7 @@
     {% endfor %}
 {% elif addOwnerGroups is defined %}
     {% for group in addOwnerGroups %}
-        {% if group.type == 'COMMON' %}
+        {% if group.type == 'COMMON' or (group.interestNumerator is defined and group.interestDenominator is defined) %}
         <div class="mt-3">
             <span class="section-sub-title">Group {{ group.groupId }}:&nbsp;</span>
             {% if group.interest is defined and group.interest != '' %}

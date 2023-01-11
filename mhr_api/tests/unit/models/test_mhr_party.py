@@ -134,6 +134,7 @@ def test_party_json(session):
     party_json = {
         'partyId': party.id,
         'status': party.status_type,
+        'partyType': party.party_type,
         'businessName': party.business_name,
         'emailAddress': party.email_id,
         'phoneNumber': party.phone_number,

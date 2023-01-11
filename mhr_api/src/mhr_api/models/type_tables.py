@@ -244,6 +244,9 @@ class MhrPartyTypes(BaseEnum):
     OWNER_BUS = 'OWNER_BUS'
     OWNER_IND = 'OWNER_IND'
     SUBMITTING = 'SUBMITTING'
+    EXECUTOR = 'EXECUTOR'
+    ADMINISTRATOR = 'ADMINISTRATOR'
+    TRUSTEE = 'TRUSTEE'
 
 
 class MhrRegistrationStatusTypes(BaseEnum):
