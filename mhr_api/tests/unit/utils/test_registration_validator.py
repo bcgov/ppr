@@ -278,10 +278,23 @@ TC_GROUPS_VALID = [
                 'country': 'CA'
             },
             'phoneNumber': '6041234567'
+            }, {
+            'individualName': {
+                'first': 'Jane',
+                'last': 'Smith'
+            },
+            'address': {
+                'street': '3122B LYNNLARK PLACE',
+                'city': 'VICTORIA',
+                'region': 'BC',
+                'postalCode': ' ',
+                'country': 'CA'
+            },
+            'phoneNumber': '6041234567'
             }
         ],
-        'type': 'COMMON',
-        'interest': 'UNDIVIDED 1/2',
+        'type': 'JOINT',
+        'interest': 'UNDIVIDED',
         'interestNumerator': 1,
         'interestDenominator': 2
     }
@@ -301,10 +314,22 @@ TC_GROUP_VALID = {
             'country': 'CA'
         },
         'phoneNumber': '6041234567'
+        }, {
+        'individualName': {
+            'first': 'Jane',
+            'last': 'Smith'
+        },
+        'address': {
+            'street': '3122B LYNNLARK PLACE',
+            'city': 'VICTORIA',
+            'region': 'BC',
+            'postalCode': ' ',
+            'country': 'CA'
+        }
         }
     ],
-    'type': 'COMMON',
-    'interest': 'UNDIVIDED 1/2',
+    'type': 'JOINT',
+    'interest': 'UNDIVIDED',
     'interestNumerator': 1,
     'interestDenominator': 2
 }
@@ -350,10 +375,23 @@ TC_GROUP_TRANSFER_ADD = [
                 'country': 'CA'
             },
             'phoneNumber': '6041234567'
+            }, {
+            'individualName': {
+                'first': 'Jane',
+                'last': 'Smith'
+            },
+            'address': {
+                'street': '3122B LYNNLARK PLACE',
+                'city': 'VICTORIA',
+                'region': 'BC',
+                'postalCode': ' ',
+                'country': 'CA'
+            },
+            'phoneNumber': '6041234567'
             }
         ],
-        'type': 'COMMON',
-        'interest': 'UNDIVIDED 1/2',
+        'type': 'JOINT',
+        'interest': 'UNDIVIDED',
         'interestNumerator': 1,
         'interestDenominator': 2
     }
@@ -453,14 +491,17 @@ TEST_TRANSFER_DATA_EXTRA = [
     ('Invalid non-staff missing declared value', False, False, True, False, True, validator.DECLARED_VALUE_REQUIRED),
     ('Invalid non-staff missing consideration', False, False, True, True, False, validator.CONSIDERATION_REQUIRED)
 ]
-# testdata pattern is ({description}, {valid}, {add_group}, {message content})
+# testdata pattern is ({description}, {valid}, {numerator}, {denominator}, {add_group}, {message content})
 TEST_TRANSFER_DATA_GROUP = [
-    ('Valid', True, None, None),
-    ('Invalid add TC no owner', False, TC_GROUP_TRANSFER_ADD, validator.OWNERS_COMMON_INVALID),
-    ('Invalid add JT 1 owner', False, JT_OWNER_SINGLE, validator.OWNERS_JOINT_INVALID),
-    ('Invalid add JT 2 groups', False, JT_GROUP_MULTIPLE, validator.GROUP_JOINT_INVALID),
-    ('Invalid add SO 2 groups', False, SO_GROUP_MULTIPLE, validator.ADD_SOLE_OWNER_INVALID),
-    ('Invalid add SO 2 owners', False, SO_OWNER_MULTIPLE, validator.ADD_SOLE_OWNER_INVALID)
+    ('Valid', True, 1, 2, None, None),
+    ('Invalid add TC no owner', False, None, None, TC_GROUP_TRANSFER_ADD, validator.OWNERS_COMMON_INVALID),
+    ('Invalid add JT 1 owner', False, None, None, JT_OWNER_SINGLE, validator.OWNERS_JOINT_INVALID),
+    ('Invalid TC numerator missing', False, None, 2, TC_GROUPS_VALID, validator.GROUP_NUMERATOR_MISSING),
+    ('Invalid TC numerator < 1', False, 0, 2, TC_GROUPS_VALID, validator.GROUP_NUMERATOR_MISSING),
+    ('Invalid TC denominator missing', False, 1, None, TC_GROUPS_VALID, validator.GROUP_DENOMINATOR_MISSING),
+    ('Invalid TC denominator < 1', False, 1, 0, TC_GROUPS_VALID, validator.GROUP_DENOMINATOR_MISSING),
+    ('Invalid add SO 2 groups', False, None, None, SO_GROUP_MULTIPLE, validator.ADD_SOLE_OWNER_INVALID),
+    ('Invalid add SO 2 owners', False, None, None, SO_OWNER_MULTIPLE, validator.ADD_SOLE_OWNER_INVALID)
 ]
 # testdata pattern is ({description}, {valid}, {numerator}, {denominator}, {groups}, {message content})
 TEST_REG_DATA_GROUP = [
@@ -474,7 +515,6 @@ TEST_REG_DATA_GROUP = [
     ('Invalid TC denominator missing', False, 1, None, TC_GROUPS_VALID, validator.GROUP_DENOMINATOR_MISSING),
     ('Invalid TC denominator < 1', False, 1, 0, TC_GROUPS_VALID, validator.GROUP_DENOMINATOR_MISSING),
     ('Invalid JT 1 owner', False, None, None, JT_OWNER_SINGLE, validator.OWNERS_JOINT_INVALID),
-    ('Invalid JT 2 groups', False, None, None, JT_GROUP_MULTIPLE, validator.GROUP_JOINT_INVALID),
     ('Invalid SO 2 groups', False, None, None, SO_GROUP_MULTIPLE, validator.ADD_SOLE_OWNER_INVALID),
     ('Invalid SO 2 owners', False, None, None, SO_OWNER_MULTIPLE, validator.ADD_SOLE_OWNER_INVALID)
 ]
@@ -638,8 +678,8 @@ def test_validate_transfer_details(session, desc, valid, staff, trans_dt, dec_va
             assert error_msg.find(message_content) != -1
 
 
-@pytest.mark.parametrize('desc,valid,add_group,message_content', TEST_TRANSFER_DATA_GROUP)
-def test_validate_transfer_group(session, desc, valid, add_group, message_content):
+@pytest.mark.parametrize('desc,valid,numerator,denominator,add_group,message_content', TEST_TRANSFER_DATA_GROUP)
+def test_validate_transfer_group(session, desc, valid, numerator, denominator, add_group, message_content):
     """Assert that MH transfer validation of owner groups works as expected."""
     # setup
     json_data = copy.deepcopy(TRANSFER)
@@ -649,6 +689,18 @@ def test_validate_transfer_group(session, desc, valid, add_group, message_conten
         json_data['addOwnerGroups'] = copy.deepcopy(add_group)
         if desc == 'Invalid add TC no owner':
             json_data['addOwnerGroups'][0]['owners'] = []
+        else:
+            for group in json_data.get('addOwnerGroups'):
+                if not numerator:
+                    if 'interestNumerator' in group:
+                        del group['interestNumerator']
+                    else:
+                        group['interestNumerator'] = numerator
+                if not denominator:
+                    if 'interestDenominator' in group:
+                        del group['interestDenominator']
+                    else:
+                        group['interestDenominator'] = denominator
     valid_format, errors = schema_utils.validate(json_data, 'transfer', 'mhr')
     # Additional validation not covered by the schema.
     registration: MhrRegistration = MhrRegistration.find_by_mhr_number('045349', 'PS12345')

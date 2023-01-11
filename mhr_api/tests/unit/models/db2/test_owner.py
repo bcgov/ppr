@@ -22,6 +22,7 @@ import pytest
 from flask import current_app
 
 from mhr_api.models import Db2Owner, Db2Owngroup
+from mhr_api.models.type_tables import MhrPartyTypes
 
 
 # testdata pattern is ({exists}, {manuhome_id}, {owner_id}, {type})
@@ -29,6 +30,15 @@ TEST_DATA = [
     (True, 1, 1, 'I'),
     (True, 104076, 1, 'B'),
     (False, 0, 0, None)
+]
+# testdata pattern is ({owner_type}, {name}, {suffix}, {party_type})
+TEST_DATA_PARTY_TYPE = [
+   ('I', 'HAMM                     DAVID          MICHAEL', '', MhrPartyTypes.OWNER_IND),
+   ('B', 'TEST', '', MhrPartyTypes.OWNER_BUS),
+   ('B', 'TEST', 'EXECUTOR TEST', MhrPartyTypes.EXECUTOR),
+   ('B', 'TEST', 'EXECUTRIX TEST', MhrPartyTypes.EXECUTOR),
+   ('B', 'TEST', 'TRUSTEE TEST', MhrPartyTypes.TRUSTEE),
+   ('B', 'TEST', 'ADMINISTRATOR TEST', MhrPartyTypes.ADMINISTRATOR)
 ]
 
 
@@ -69,6 +79,22 @@ def test_find_by_manuhome_id(session, exists, manuhome_id, owner_id, type):
                 assert reg_json.get('status') in ('ACTIVE', 'EXEMPT', 'PREVIOUS')
     else:
         assert not owners
+
+
+@pytest.mark.parametrize('owner_type,name,suffix,party_type', TEST_DATA_PARTY_TYPE)
+def test_party_type(session, owner_type, name, suffix, party_type):
+    owner: Db2Owner = Db2Owner(name=name,
+                               owner_type=owner_type,
+                               suffix=suffix,
+                               status='3',
+                               postal_code='',
+                               phone_number='',
+                               legacy_address='')
+    assert owner.get_party_type() == party_type
+    owner_json = owner.registration_json
+    assert owner_json.get('partyType') == party_type
+    owner_json = owner.new_registration_json
+    assert owner_json.get('partyType') == party_type
 
 
 def test_owner_json(session):

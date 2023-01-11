@@ -20,6 +20,7 @@ from sqlalchemy.sql import text
 from mhr_api.exceptions import DatabaseException
 from mhr_api.models import db, utils as model_utils
 from mhr_api.models.db2 import address_utils
+from mhr_api.models.type_tables import MhrPartyTypes
 
 
 OWNERS_QUERY = """
@@ -31,6 +32,9 @@ select o.manhomid, o.owngrpid, o.ownerid, o.ownseqno, o.verified, o.ownrfone, o.
    and o.owngrpid = og.owngrpid
    and og.status in ('3', '4')
 """
+EXECUTOR_SUFFIX = 'EXEC'
+TRUSTEE_SUFFIX = 'TRUST'
+ADMIN_SUFFIX = 'ADMIN'
 
 
 class Db2Owner(db.Model):
@@ -171,6 +175,7 @@ class Db2Owner(db.Model):
             owner['status'] = 'PREVIOUS'
         if self.suffix:
             owner['suffix'] = self.suffix
+        owner['partyType'] = self.get_party_type()
         return owner
 
     @property
@@ -189,7 +194,23 @@ class Db2Owner(db.Model):
         owner['address'] = address_utils.get_address_from_db2_owner(self.legacy_address, self.postal_code)
         if self.suffix:
             owner['suffix'] = self.suffix
+        owner['partyType'] = self.get_party_type()
         return owner
+
+    def get_party_type(self) -> str:
+        """Derive the party type from the owner type and suffix value."""
+        party_type: str = MhrPartyTypes.OWNER_BUS
+        if self.owner_type == Db2Owner.OwnerTypes.INDIVIDUAL:
+            party_type = MhrPartyTypes.OWNER_IND
+        if self.suffix:
+            suffix: str = str(self.suffix)
+            if suffix.find(EXECUTOR_SUFFIX) != -1:
+                party_type = MhrPartyTypes.EXECUTOR
+            elif suffix.find(TRUSTEE_SUFFIX) != -1:
+                party_type = MhrPartyTypes.TRUSTEE
+            elif suffix.find(ADMIN_SUFFIX) != -1:
+                party_type = MhrPartyTypes.ADMINISTRATOR
+        return party_type
 
     @staticmethod
     def create_from_dict(new_info: dict):

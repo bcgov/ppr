@@ -123,17 +123,15 @@ class MhrOwnerGroup(db.Model):  # pylint: disable=too-many-instance-attributes
             group.interest = reg_json.get('interest', None)
             group.interest_numerator = reg_json.get('interestNumerator', 0)
             group.interest_denominator = reg_json.get('interestDenominator', 0)
-        if group.tenancy_type == MhrTenancyTypes.COMMON:
+        if group.interest_numerator and group.interest_denominator:  # JOINT may have group interest; COMMON always.
             if not group.interest:
                 group.interest = model_utils.OWNER_INTEREST_UNDIVIDED
-            elif group.interest_numerator and group.interest_denominator:
+            else:  # Tidy up interest description
                 ratio: str = f'{group.interest_numerator}/{group.interest_denominator}'
                 if group.interest.find(ratio) > -1:
                     group.interest = group.interest.replace(ratio, '').strip()
                 if not group.interest:
                     group.interest = model_utils.OWNER_INTEREST_UNDIVIDED
-        if not reg_json.get('tenancySpecified'):
-            group.tenancy_specified = 'N'
         group.owners = []
         return group
 
@@ -152,17 +150,18 @@ class MhrOwnerGroup(db.Model):  # pylint: disable=too-many-instance-attributes
             group.interest = reg_json.get('interest', None)
             group.interest_numerator = reg_json.get('interestNumerator', 0)
             group.interest_denominator = reg_json.get('interestDenominator', 0)
-        if group.tenancy_type == MhrTenancyTypes.COMMON:
+        if group.interest_numerator and group.interest_denominator:  # JOINT may have group interest; COMMON always.
             if not group.interest:
                 group.interest = model_utils.OWNER_INTEREST_UNDIVIDED
-            elif group.interest_numerator and group.interest_denominator:
+            else:  # Tidy up interest description
                 ratio: str = f'{group.interest_numerator}/{group.interest_denominator}'
                 if group.interest.find(ratio) > -1:
                     group.interest = group.interest.replace(ratio, '').strip()
                 if not group.interest:
                     group.interest = model_utils.OWNER_INTEREST_UNDIVIDED
-        if not reg_json.get('tenancySpecified'):
-            group.tenancy_specified = 'N'
+        # TBD: only applies to JOINT tenancy type with 2 or more executors:
+        # if not reg_json.get('tenancySpecified'):
+        #    group.tenancy_specified = 'N'
         group.owners = []
         group.modified = True
         return group

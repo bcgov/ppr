@@ -194,7 +194,7 @@ class Db2Owngroup(db.Model):
             'tenancySpecified': True
         }
         # Remove fraction from interest description for UI.
-        if self.tenancy_type == self.TenancyTypes.COMMON and self.interest:
+        if self.tenancy_type in (self.TenancyTypes.COMMON, self.TenancyTypes.JOINT) and self.interest:
             fraction: str = str(owngroup.get('interestNumerator')) + '/' + str(owngroup.get('interestDenominator'))
             interest_json: str = owngroup.get('interest')
             interest_json = interest_json.replace(fraction, '')
@@ -218,7 +218,7 @@ class Db2Owngroup(db.Model):
             'tenancySpecified': True
         }
         # Remove fraction from interest description for UI.
-        if self.tenancy_type == self.TenancyTypes.COMMON and self.interest:
+        if self.tenancy_type in (self.TenancyTypes.COMMON, self.TenancyTypes.JOINT) and self.interest:
             fraction: str = str(group.get('interestNumerator')) + '/' + str(group.get('interestDenominator'))
             interest_json: str = group.get('interest')
             interest_json = interest_json.replace(fraction, '')
@@ -238,7 +238,7 @@ class Db2Owngroup(db.Model):
     def get_interest_fraction(self, numerator: bool = False) -> int:
         """For tenants in common try to get the numerator or denominator from the interest."""
         value: int = 0
-        if not self.interest or self.tenancy_type != self.TenancyTypes.COMMON:
+        if not self.interest or self.tenancy_type == self.TenancyTypes.SOLE:
             return value
         tokens = str(self.interest).split()
         for token in tokens:
@@ -280,7 +280,9 @@ class Db2Owngroup(db.Model):
         tenancy: str = new_info.get('type', Db2Owngroup.TenancyTypes.SOLE)
         tenancy_type: str = NEW_TENANCY_LEGACY.get(tenancy)
         interest: str = new_info.get('interest', '')
-        if tenancy_type == Db2Owngroup.TenancyTypes.COMMON:
+        if tenancy_type == Db2Owngroup.TenancyTypes.COMMON or \
+                (tenancy_type == Db2Owngroup.TenancyTypes.JOINT and new_info.get('interestDenominator') and
+                 new_info.get('interestDenominator') > 0):
             if not interest:  # This should never happen.
                 interest = model_utils.OWNER_INTEREST_UNDIVIDED
             elif interest and len(interest) <= 10 and not interest.startswith(model_utils.OWNER_INTEREST_UNDIVIDED):
@@ -301,8 +303,9 @@ class Db2Owngroup(db.Model):
                                tenancy_specified=new_info.get('tenancySpecified', 'Y'))
         owngroup.interest_denominator = new_info.get('interestDenominator', 0)
         owngroup.owners = []
-        if new_info.get('tenancySpecified'):
-            owngroup.tenancy_specified = 'Y'
+        # TBD: only applies to JOINT tenancy type with 2 or more executors:
+        # if not new_info.get('tenancySpecified'):
+        #    owngroup.tenancy_specified = 'N'
         for i, owner in enumerate(new_info.get('owners')):
             new_owner = Db2Owner.create_from_registration(registration, owner, group_id, (i + 1))
             # current_app.logger.info('adding new owner i=' + str(i))

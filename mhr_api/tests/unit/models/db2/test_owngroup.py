@@ -36,6 +36,11 @@ TEST_DATA_INTEREST = [
     ('UNDIVIDED 1/2 INT.', 1, 2),
     ('A 55/100 INTEREST', 55, 100)
 ]
+# testdata pattern is ({tenancy_type}, {legacy_type})
+TEST_DATA_JSON = [
+    ('COMMON', 'TC'),
+    ('JOINT', 'JT')
+]
 
 
 @pytest.mark.parametrize('exists,manuhome_id,group_id,reg_doc_id,type', TEST_DATA)
@@ -123,7 +128,8 @@ def test_get_interest_fraction(interest, numerator, denominator):
     assert den_value == denominator
 
 
-def test_owngroup_json(session):
+@pytest.mark.parametrize('tenancy_type, legacy_tenancy_type', TEST_DATA_JSON)
+def test_owngroup_json(session, tenancy_type, legacy_tenancy_type):
     """Assert that the owngroup renders to a json format correctly."""
     owngroup = Db2Owngroup(manuhome_id=1,
                            group_id=1,
@@ -132,7 +138,7 @@ def test_owngroup_json(session):
                            sequence_number=1,
                            reg_document_id='REG22911',
                            can_document_id='42400339',
-                           tenancy_type='TC',
+                           tenancy_type=legacy_tenancy_type,
                            lessee='',
                            lessor='',
                            interest='UNDIVIDED 1/2',
@@ -148,7 +154,7 @@ def test_owngroup_json(session):
         'pendingFlag': owngroup.pending_flag,
         'registrationDocumentId': owngroup.reg_document_id,
         'canDocumentId': owngroup.can_document_id,
-        'type': 'COMMON',
+        'type': tenancy_type,
         'lessee': owngroup.lessee,
         'lessor': owngroup.lessor,
         'interest': 'UNDIVIDED',
@@ -159,7 +165,8 @@ def test_owngroup_json(session):
     assert owngroup.json == test_json
 
 
-def test_owngroup_reg_json(session):
+@pytest.mark.parametrize('tenancy_type, legacy_tenancy_type', TEST_DATA_JSON)
+def test_owngroup_reg_json(session, tenancy_type, legacy_tenancy_type):
     """Assert that the owngroup renders to a registration json format correctly."""
     owngroup = Db2Owngroup(manuhome_id=1,
                            group_id=1,
@@ -168,7 +175,7 @@ def test_owngroup_reg_json(session):
                            sequence_number=1,
                            reg_document_id='REG22911',
                            can_document_id='42400339',
-                           tenancy_type='TC',
+                           tenancy_type=legacy_tenancy_type,
                            lessee='',
                            lessor='',
                            interest='UNDIVIDED 1/2',
@@ -177,7 +184,7 @@ def test_owngroup_reg_json(session):
 
     test_json = {
         'groupId': owngroup.group_id,
-        'type': 'COMMON',
+        'type': tenancy_type,
         'status': 'ACTIVE',
         'interest': 'UNDIVIDED',
         'interestNumerator': owngroup.interest_numerator,

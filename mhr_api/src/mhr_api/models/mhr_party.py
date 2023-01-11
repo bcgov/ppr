@@ -75,6 +75,7 @@ class MhrParty(db.Model):  # pylint: disable=too-many-instance-attributes
         if self.party_type != MhrPartyTypes.SUBMITTING:
             party['partyId'] = self.id
             party['status'] = self.status_type
+            party['partyType'] = self.party_type
 
         if self.business_name:
             party['businessName'] = self.business_name
