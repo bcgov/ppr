@@ -18,7 +18,8 @@ export interface MhrRegistrationHomeLocationIF {
   additionalDescription: string
   legalDescription: string
   locationType: HomeLocationTypes // For local mapping only
-  otherType: HomeLocationTypes // For local mapping only
+  otherType?: HomeLocationTypes // For local mapping only
+  lot: string
   parcel: string
   block: string
   districtLot: string

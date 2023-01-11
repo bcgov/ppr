@@ -203,6 +203,7 @@ export const stateModel: StateModelIF = {
       locationType: null,
       otherType: null,
       legalDescription: '',
+      lot: '',
       parcel: '',
       block: '',
       districtLot: '',

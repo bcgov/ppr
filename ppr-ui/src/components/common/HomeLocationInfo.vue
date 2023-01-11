@@ -10,7 +10,7 @@
               id="band-name"
               label="Band Name"
               v-model="locationInfo.bandName"
-              :rules="locationInputRules(null, 'Enter a Band Name', 'band-name')"
+              :rules="locationInputRules(null, 'Enter a band name', 'band-name')"
             />
           </v-col>
           <v-col cols="4" class="pl-2">
@@ -19,7 +19,7 @@
               id="reserve-number"
               label="Reserve Number"
               v-model="locationInfo.reserveNumber"
-              :rules="locationInputRules(null,  'Enter a Reserve Number', 'reserve-number')"
+              :rules="locationInputRules(null,  'Enter a reserve number', 'reserve-number')"
             />
           </v-col>
           <v-col>

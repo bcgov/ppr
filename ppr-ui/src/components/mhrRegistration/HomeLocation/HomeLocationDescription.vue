@@ -12,7 +12,7 @@
       <!-- Manual Legal Land Description -->
       <template v-else-if="!showLocationInfo && !isReserve">
         <v-col cols="12" sm="12" md="3" class="mt-1 mb-3">
-          <p class="fs-14 info-text">Don't have a pid Number?</p>
+          <p class="fs-14 info-text">Don't have a PID Number?</p>
         </v-col>
         <v-col cols="12" sm="12" md="9" class="mt-1 mb-3">
           <p class="ml-0 fs-14 generic-link" @click="showLocationInfo = !showLocationInfo">
@@ -40,9 +40,9 @@
             </v-btn>
           </v-col>
           <v-col cols="12">
-            <p class="info-text">Enter as much of legal land description you have.</p>
+            <p class="info-text">Enter as much of the legal land description you have.</p>
             <p v-if="isReserve" class="info-text pt-2" :class="{ 'error-text': validate && !isValidLocationInfo }">
-              <strong>Band Name, Reserve Number</strong> are required.
+              <strong>Band Name and Reserve Number</strong> are required.
             </p>
             <p v-else-if="isStrata" class="info-text pt-2" :class="{ 'error-text': validate && !isValidLocationInfo }">
               <strong>Strata Lot, Land District</strong> and

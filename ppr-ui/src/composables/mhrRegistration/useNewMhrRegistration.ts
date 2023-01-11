@@ -83,6 +83,7 @@ export const useNewMhrRegistration = () => {
         locationType: null,
         otherType: null,
         legalDescription: '',
+        lot: '',
         parcel: '',
         block: '',
         districtLot: '',
@@ -191,9 +192,9 @@ export const useNewMhrRegistration = () => {
 
     // otherType is not required by API and locationType should have otherType's value (#14751)
     location.locationType = location.otherType
-    delete location.otherType
+    const { otherType, ...parsedLocation } = location
 
-    return location
+    return parsedLocation
   }
 
   // Staff Payment will be submitted as request parameters
