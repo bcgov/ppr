@@ -69,8 +69,11 @@
                 party.personName.first+" "+party.personName.middle+" "+party.personName.last}}
               </div>
               <div :class="$style['addressText']">
-                {{ party.address.street }}, {{ party.address.city }}
-                {{ party.address.region }} , {{ party.address.postalCode }},
+                {{ party.address.street }},
+                {{ party.address.streetAdditional ? `${party.address.streetAdditional},` : ""}}
+                {{ party.address.city }}
+                {{ party.address.region }},
+                {{ party.address.postalCode }},
                 {{ getCountryName(party.address.country) }}
               </div>
               <div>
