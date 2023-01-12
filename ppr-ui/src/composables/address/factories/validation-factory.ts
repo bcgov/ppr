@@ -20,10 +20,10 @@ export const baseRules = {
   [ValidationRule.BC]: (v: string) => v === 'BC' || v === 'British Columbia' || 'Address must be in BC',
   [ValidationRule.CANADA]: (v: string) => v === 'CA' || 'Address must be in Canada',
   [ValidationRule.MAX_LENGTH]: (max: number) => {
-    return (v: string) => v?.length <= max || `Maximum length is ${max}`
+    return (v: string) => v?.length <= max || `Maximum ${max} characters`
   },
   [ValidationRule.MIN_LENGTH]: (min: number) => {
-    return (v: string) => v?.length >= min || `Minimum length is ${min}`
+    return (v: string) => v?.length >= min || `Minimum ${min} characters`
   },
   [ValidationRule.POSTAL_CODE]: (v: string) => (
     /^\s*[ABCEGHJ-NPRSTVXY]\d[ABCEGHJ-NPRSTV-Z][\s-]?\d[ABCEGHJ-NPRSTV-Z]\d\s*$/i.test(v) ||
