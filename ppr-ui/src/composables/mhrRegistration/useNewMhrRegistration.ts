@@ -191,10 +191,13 @@ export const useNewMhrRegistration = () => {
     location.address.postalCode = 'A1A 1A1'
 
     // otherType is not required by API and locationType should have otherType's value (#14751)
-    location.locationType = location.otherType
-    const { otherType, ...parsedLocation } = location
+    if (location.otherType) {
+      location.locationType = location.otherType
+      const { otherType, ...parsedLocation } = location
+      return parsedLocation
+    }
 
-    return parsedLocation
+    return location
   }
 
   // Staff Payment will be submitted as request parameters
