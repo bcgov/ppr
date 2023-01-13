@@ -26,7 +26,6 @@
       </v-col>
       <v-col cols="6">
         <v-date-picker
-          :readonly="disableEndDate"
           color="primary"
           :min="startDate ? startDate : null"
           :max="today"
@@ -72,8 +71,7 @@ export default defineComponent({
   name: 'DatePicker',
   props: {
     setEndDate: { type: String },
-    setStartDate: { type: String },
-    setDisableEndDate: { type: Boolean, default: false }
+    setStartDate: { type: String }
   },
   emits: ['submit'],
   setup (props, { emit }) {
@@ -88,8 +86,7 @@ export default defineComponent({
       today: computed(() => {
         const todayDate = new Date()
         return todayDate.toLocaleDateString('en-CA')
-      }),
-      disableEndDate: props.setDisableEndDate
+      })
     })
     const emitDateRange = (): void => {
       if (
@@ -117,7 +114,7 @@ export default defineComponent({
       emitDateRange()
     }
     const submitDateRange = (): void => {
-      if (!localState.startDate || (!localState.endDate && !localState.disableEndDate)) {
+      if (!localState.startDate || !localState.endDate) {
         localState.datePickerErr = true
         return
       }
