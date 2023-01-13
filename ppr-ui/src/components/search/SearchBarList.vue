@@ -2,6 +2,7 @@
   <v-select
           id="search-select"
           class="search-bar-type-select"
+          :class="{ 'wide-menu' : !isPPROnly }"
           ref="searchSelect"
           :error-messages="categoryMessage ? categoryMessage : ''"
           filled
@@ -13,6 +14,7 @@
           return-object
           v-model="selectedSearchType"
           @focus="updateSelections()"
+          :menu-props="isPPROnly ? { bottom: true, offsetY: true } : {}"
           attach=""
         >
         <template v-slot:item="{ item }">
@@ -40,6 +42,7 @@
           <v-list-item
             :id="`list-${item.searchTypeAPI.toLowerCase().replaceAll('_','-')}`"
             class="copy-normal"
+            :class="{ 'select-menu-padding' : !isPPROnly }"
             @click="selectSearchType(item)"
           >
             <v-list-item-title>
@@ -117,7 +120,7 @@ export default defineComponent({
         if (hasPprRole.value) {
           allSearchTypes.push.apply(allSearchTypes, SearchTypes)
           // we can pop the title off if there is only one search type
-          if (!hasMhrRole.value) {
+          if (!hasMhrRole.value || !getFeatureFlag('mhr-ui-enabled')) {
             allSearchTypes.shift()
           }
         }
@@ -130,9 +133,10 @@ export default defineComponent({
         }
         return allSearchTypes
       }),
+      isPPROnly: computed((): boolean => hasPprRole.value && !(hasMhrRole.value && getFeatureFlag('mhr-ui-enabled'))),
       displayItems: [],
       displayGroup: {
-        1: false,
+        1: !(hasMhrRole.value && hasPprRole.value),
         2: false
       },
       showMenu: false
@@ -202,6 +206,9 @@ export default defineComponent({
 @import "@/assets/styles/theme.scss";
 ::v-deep .theme--light.v-list-item.copy-normal {
   color: $gray7 !important;
+}
+
+.select-menu-padding {
   padding-left: 49px;
 }
 .search-list-header {
@@ -209,8 +216,11 @@ export default defineComponent({
   font-weight:bold;
 }
 
-::v-deep .v-menu__content {
+.wide-menu > ::v-deep .v-menu__content {
   min-width: 427px !important;
+}
+
+::v-deep .v-menu__content {
   max-height: none !important;
   background-color: red;
   width: 80%;

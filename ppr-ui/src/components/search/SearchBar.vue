@@ -124,7 +124,7 @@
         <v-row>
           <v-col class="py-0">
             <div
-              v-if="selectedSearchType && (shouldShowFeeHint || isMHRSearchType(selectedSearchType.searchTypeAPI))"
+              v-if="shouldShowFeeHint || (selectedSearchType && isMHRSearchType(selectedSearchType.searchTypeAPI))"
               class="ppr-mhr-info mt-5 mb-7"
             >
               <v-icon size="20">mdi-information-outline</v-icon>
@@ -305,9 +305,13 @@ export default defineComponent({
       categoryMessage: computed((): string => {
         return localState.validations?.category?.message || ''
       }),
+      isPPROnly: computed((): boolean => hasPprRole.value && !(hasMhrRole.value && getFeatureFlag('mhr-ui-enabled'))),
       shouldShowFeeHint: computed((): boolean => {
-        return (!(isRoleStaffBcol.value || isRoleStaffReg.value) &&
-          (isPPRSearchType(localState.selectedSearchType?.searchTypeAPI))) || (hasPprRole.value && !hasMhrRole.value)
+        return (
+          localState.isPPROnly ||
+          (!(isRoleStaffBcol.value || isRoleStaffReg.value) &&
+            isPPRSearchType(localState.selectedSearchType?.searchTypeAPI))
+        )
       }),
       dialogOptions: computed((): DialogOptionsIF => {
         const options = { ...paymentConfirmaionDialog }
