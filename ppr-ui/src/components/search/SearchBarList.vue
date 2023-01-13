@@ -136,7 +136,7 @@ export default defineComponent({
       isPPROnly: computed((): boolean => hasPprRole.value && !(hasMhrRole.value && getFeatureFlag('mhr-ui-enabled'))),
       displayItems: [],
       displayGroup: {
-        1: !(hasMhrRole.value && hasPprRole.value),
+        1: !(hasPprRole.value && (hasMhrRole.value && getFeatureFlag('mhr-ui-enabled'))),
         2: false
       },
       showMenu: false
