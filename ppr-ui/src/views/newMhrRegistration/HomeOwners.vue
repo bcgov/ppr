@@ -364,9 +364,6 @@ export default defineComponent({
       showTenancyTypeError: computed((): boolean => {
         return (localState.hasReviewedOwners || props.validateTransfer) &&
           (showGroups && localState.ownershipAllocation.hasMinimumGroupsError && localState.showTotalOwnership)
-      }),
-      showAllocationErrors: computed((): boolean => {
-        return localState.hasReviewedOwners || props.validateTransfer
       })
     })
 
