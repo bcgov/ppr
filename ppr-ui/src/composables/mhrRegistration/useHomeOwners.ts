@@ -117,16 +117,24 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
    * and an allocation error status if exists
    */
   const getTotalOwnershipAllocationStatus = (): MhrRegistrationTotalOwnershipAllocationIF => {
+    let errorMsg, totalAllocationMsg
     const groups = getTransferOrRegistrationHomeOwnerGroups()
       .filter(group => group.action !== ActionTypes.REMOVED && !!group.interestNumerator && !!group.interestDenominator)
+    const denominator = calcLcm(groups.map(group => group.interestDenominator))
+    const nominators = groups.map(group => (group.interestNumerator / group.interestDenominator) * denominator)
+    const totalNominator = nominators.reduce((a, b) => a + b, 0)
 
-    // Sum up all 'interestNumerator' values in different Home Owner groups with a help of sumBy() function from lodash
-    const totalFractionalNominator = sumBy(groups, 'interestNumerator')
-    const fractionalDenominator = groups.find(group => !!group.interestDenominator)?.interestDenominator || null
+    // Determine allocation or error messaging
+    if (totalNominator === denominator) totalAllocationMsg = 'Fully Allocated'
+    else {
+      totalAllocationMsg = simplifyFraction(totalNominator, denominator)
+      errorMsg = `Total ownership interest is ${totalNominator > denominator ? 'over' : 'under'} allocated`
+    }
 
     return {
-      totalAllocation: totalFractionalNominator + '/' + fractionalDenominator,
-      hasTotalAllocationError: totalFractionalNominator !== fractionalDenominator,
+      totalAllocation: totalAllocationMsg,
+      hasTotalAllocationError: totalNominator !== denominator,
+      allocationErrorMsg: errorMsg,
       hasMinimumGroupsError: groups.length < 2
     }
   }
@@ -357,73 +365,36 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
 
   const setGroupFractionalInterest = (groupId: number, fractionalData: MhrRegistrationFractionalOwnershipIF): void => {
     const homeOwnerGroups = getTransferOrRegistrationHomeOwnerGroups()
+    const groupToUpdate = find(homeOwnerGroups, { groupId: groupId }) as MhrRegistrationHomeOwnerGroupIF
+    Object.assign(groupToUpdate, { ...fractionalData })
+    const updatedOwnerGroups = [...homeOwnerGroups]
 
-    const allGroupsTotals = homeOwnerGroups.map(group => group.interestDenominator)
-
-    // check if dominator is already the same for all Groups
-    const isAlreadyLCM = allGroupsTotals.includes(fractionalData.interestDenominator)
-
-    if (homeOwnerGroups.length > 1 && !isAlreadyLCM) {
-      // Calculate common fractions for Groups
-      const { updatedGroups, updatedFractionalData } = updateGroupsWithCommonFractionalInterest(
-        homeOwnerGroups,
-        fractionalData
-      )
-      const groupToUpdate = find(updatedGroups, { groupId: groupId }) as MhrRegistrationHomeOwnerGroupIF
-      Object.assign(groupToUpdate, { ...updatedFractionalData })
-      const updatedOwnerGroups = [...updatedGroups]
-
-      setTransferOrRegistrationHomeOwnerGroups(updatedOwnerGroups)
-    } else {
-      const groupToUpdate = find(homeOwnerGroups, { groupId: groupId }) as MhrRegistrationHomeOwnerGroupIF
-      Object.assign(groupToUpdate, { ...fractionalData })
-      const updatedOwnerGroups = [...homeOwnerGroups]
-
-      setTransferOrRegistrationHomeOwnerGroups(updatedOwnerGroups)
-    }
+    setTransferOrRegistrationHomeOwnerGroups(updatedOwnerGroups)
   }
 
   /**
-   * Utility method to calculate and update groups with lowest common denominator.
-   * Used when multiple Home Owner Groups have different fractional interest totals.
-   * To calculate lowest common denominator: multiply all denominators together and then
-   * calculate numerator based on that number
-   * @param currentHomeOwnerGroups - existing groups to be updated
-   * @param currentFractionalData - fractional data of the group that is about to be updated
-   * @returns object consisting of: existing groups with new factorial values and updated factorial data
+   * Utility method to calculate least common multiple.
+   * @param numbers - an array of numbers to compute the lcm from.
+   * @returns number - the least common multiple of the given numbers.
    */
-  const updateGroupsWithCommonFractionalInterest = (
-    currentHomeOwnerGroups: Array<any>,
-    currentFractionalData
-  ): { updatedGroups: MhrRegistrationHomeOwnerGroupIF[]; updatedFractionalData } => {
-    // Lowest Common Multiplier aka Common Denominator
-    // Starts with 1 so it can be multiplied by all denominators
-    let LCM = 1
+  const calcLcm = (numbers: Array<number>): number => {
+    const gcd = (a, b) => a ? gcd(b % a, a) : b
+    const lcm = (a, b) => a * b / gcd(a, b)
+    return numbers.length ? numbers.reduce(lcm) : null
+  }
 
-    // Since new fractional data is not included in any groups yet,
-    // it needs to be calculated as well for LCM,
-    // but only if new fractional total is not LCM already
-    // e.g. 1/25, new factorial 1/5 - no need to find a new LCM, as it is 25 already
-    if (LCM % currentFractionalData.interestDenominator !== 0) {
-      LCM = LCM * currentFractionalData.interestDenominator
+  /**
+   * Utility method to simplify a fraction to its lowest terms.
+   * @param numerator - the amount of parts taken of the denominator.
+   * @param denominator - the total parts of the fraction.
+   * @returns string - the lowest simplified terms of the fraction.
+   */
+  const simplifyFraction = (numerator, denominator): string => {
+    const gcd = (a, b): number => {
+      return b ? gcd(b, a % b) : a
     }
 
-    // Update all fractional amounts for groups that already exist
-    const updatedGroups = currentHomeOwnerGroups.map(group => {
-      const newNumerator = (LCM / group.interestDenominator) * group.interestNumerator
-      group.interestNumerator = Math.round(newNumerator)
-      group.interestDenominator = LCM
-      return group
-    })
-
-    const updatedFractionalData = currentFractionalData
-
-    // Update current fractional data with new values
-    updatedFractionalData.interestNumerator =
-      (LCM / currentFractionalData.interestDenominator) * currentFractionalData.interestNumerator
-    updatedFractionalData.interestDenominator = LCM
-
-    return { updatedGroups, updatedFractionalData }
+    return `${numerator / gcd(numerator, denominator)}/${denominator / gcd(numerator, denominator)}`
   }
 
   // Do not show groups in the owner's table when there are no groups (e.g. after Group deletion)
