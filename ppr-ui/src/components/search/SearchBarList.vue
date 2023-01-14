@@ -77,11 +77,11 @@ export default defineComponent({
     const {
       isRoleStaffReg,
       hasPprRole,
-      hasMhrRole
+      hasMhrRoleEnabled
     } = useGetters<any>([
       'isRoleStaffReg',
       'hasPprRole',
-      'hasMhrRole'
+      'hasMhrRoleEnabled'
     ])
     const searchSelect = ref(null)
     const localState = reactive({
@@ -120,11 +120,11 @@ export default defineComponent({
         if (hasPprRole.value) {
           allSearchTypes.push.apply(allSearchTypes, SearchTypes)
           // we can pop the title off if there is only one search type
-          if (!hasMhrRole.value || !getFeatureFlag('mhr-ui-enabled')) {
+          if (!hasMhrRoleEnabled.value) {
             allSearchTypes.shift()
           }
         }
-        if (hasMhrRole.value && getFeatureFlag('mhr-ui-enabled')) {
+        if (hasMhrRoleEnabled.value) {
           allSearchTypes.push.apply(allSearchTypes, MHRSearchTypes)
           // we can pop the title off if there is only one search type
           if (!hasPprRole.value) {
@@ -133,10 +133,10 @@ export default defineComponent({
         }
         return allSearchTypes
       }),
-      isPPROnly: computed((): boolean => hasPprRole.value && !(hasMhrRole.value && getFeatureFlag('mhr-ui-enabled'))),
+      isPPROnly: computed((): boolean => hasPprRole.value && !hasMhrRoleEnabled.value),
       displayItems: [],
       displayGroup: {
-        1: !(hasPprRole.value && (hasMhrRole.value && getFeatureFlag('mhr-ui-enabled'))),
+        1: !(hasPprRole.value && hasMhrRoleEnabled.value),
         2: false
       },
       showMenu: false
