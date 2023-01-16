@@ -121,20 +121,24 @@
             </v-row>
           </v-col>
         </v-row>
-        <div
-          v-if="selectedSearchType && (shouldShowFeeHint || isMHRSearchType(selectedSearchType.searchTypeAPI))"
-          class="ppr-mhr-info mt-5 mb-7"
-        >
-          <v-icon size="20" color="495057">mdi-information-outline</v-icon>
-          <span v-if="shouldShowFeeHint" data-test-id="ppr-search-info">
-            Each Personal Property Registry search will incur a fee of ${{ fee }}, including searches that return
-            no results.
-          </span>
-          <span v-else-if="isMHRSearchType(selectedSearchType.searchTypeAPI)" data-test-id="mhr-search-info">
-            You will have the option to include a Personal Property Registry lien / encumbrance search as part of your
-            Manufactured Home Registry search.
-          </span>
-        </div>
+        <v-row>
+          <v-col class="py-0">
+            <div
+              v-if="shouldShowFeeHint || (selectedSearchType && isMHRSearchType(selectedSearchType.searchTypeAPI))"
+              class="ppr-mhr-info mt-5 mb-7"
+            >
+              <v-icon size="20">mdi-information-outline</v-icon>
+              <span v-if="shouldShowFeeHint" data-test-id="ppr-search-info">
+                Each Personal Property Registry search will incur a fee of ${{ fee }}, including searches that return
+                no results.
+              </span>
+              <span v-else-if="isMHRSearchType(selectedSearchType.searchTypeAPI)" data-test-id="mhr-search-info">
+                You will have the option to include a Personal Property Registry lien / encumbrance search
+                as part of your Manufactured Home Registry search.
+              </span>
+            </div>
+          </v-col>
+        </v-row>
       </v-col>
       <v-col class="col-auto py-0">
         <v-row :style="typeOfSearch ? 'height: 115px' : 'height: 85px'" />
@@ -266,6 +270,7 @@ export default defineComponent({
       isRoleStaffSbc,
       isSearchCertified,
       getStaffPayment,
+      hasMhrRoleEnabled,
       hasPprRole,
       hasMhrRole
     } = useGetters<any>([
@@ -277,6 +282,7 @@ export default defineComponent({
       'isRoleStaffSbc',
       'isSearchCertified',
       'getStaffPayment',
+      'hasMhrRoleEnabled',
       'hasPprRole',
       'hasMhrRole'
     ])
@@ -301,9 +307,13 @@ export default defineComponent({
       categoryMessage: computed((): string => {
         return localState.validations?.category?.message || ''
       }),
+      isPPROnly: computed((): boolean => hasPprRole.value && !hasMhrRoleEnabled.value),
       shouldShowFeeHint: computed((): boolean => {
-        return (!(isRoleStaffBcol.value || isRoleStaffReg.value) &&
-          (isPPRSearchType(localState.selectedSearchType?.searchTypeAPI))) || (hasPprRole.value && !hasMhrRole.value)
+        return (
+          localState.isPPROnly ||
+          (!(isRoleStaffBcol.value || isRoleStaffReg.value) &&
+            isPPRSearchType(localState.selectedSearchType?.searchTypeAPI))
+        )
       }),
       dialogOptions: computed((): DialogOptionsIF => {
         const options = { ...paymentConfirmaionDialog }
@@ -659,6 +669,10 @@ export default defineComponent({
 .ppr-mhr-info {
   font-size: 14px;
   line-height: 1em;
+
+  i {
+    color: $gray7;
+  }
 }
 .fee-info {
   border-bottom: 1px dotted $gray9;

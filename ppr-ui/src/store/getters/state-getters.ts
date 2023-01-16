@@ -41,6 +41,7 @@ import { HomeLocation, HomeOwners, MhrReviewConfirm, SubmittingParty, YourHome }
 import { useMhrValidations } from '@/composables'
 import { toRefs } from '@vue/composition-api'
 import { MhrSectVal } from '@/composables/mhrRegistration/enums'
+import { getFeatureFlag } from '@/utils'
 
 /** Convenient when there is a need to access several properties. */
 export const getStateModel = (state: StateIF): StateModelIF => {
@@ -282,6 +283,10 @@ export const hasPprRole = (state: StateIF): boolean => {
 
 export const hasMhrRole = (state: StateIF): boolean => {
   return state.stateModel.authorization?.authRoles.includes('mhr')
+}
+
+export const hasMhrRoleEnabled = (state: StateIF): boolean => {
+  return state.stateModel.authorization?.authRoles.includes('mhr') && getFeatureFlag('mhr-ui-enabled')
 }
 
 /** The current user's service fee (applicable for non billable users). */

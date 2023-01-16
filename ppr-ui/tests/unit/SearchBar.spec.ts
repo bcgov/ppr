@@ -174,7 +174,8 @@ describe('Serial number search', () => {
     const searchText = wrapper.find('.search-info').text()
     expect(searchText).toContain('Select a search category and then enter a criteria to search')
     expect(searchText).not.toContain('$8.50')
-    expect(wrapper.find(getTestId('ppr-search-info')).exists()).toBeFalsy()
+    // PPR info should be displayed for PPR only roles
+    expect(wrapper.find(getTestId('ppr-search-info')).exists()).toBeTruthy()
     wrapper.vm.returnSearchSelection(select)
     await Vue.nextTick()
     wrapper.vm.$data.selectedSearchType = select
