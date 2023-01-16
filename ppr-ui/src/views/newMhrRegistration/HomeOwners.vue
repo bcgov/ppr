@@ -154,15 +154,18 @@
           v-show="showTotalOwnership"
           cols="12"
         >
+          <!-- Ownership Allocation Information -->
           <span class="generic-label">Total Ownership Allocated:</span> {{ ownershipTotalAllocation }}
-          <template v-if="showAllocationErrors">
-            <span v-if="hasUndefinedGroups" class="error-text fs-14 ml-3">
+          <span v-if="hasUndefinedGroups" class="error-text fs-14 ml-2">
               No ownership allocated
             </span>
-            <span v-else-if="ownershipAllocation.hasTotalAllocationError" class="error-text fs-14 ml-3">
-              Total ownership must equal 1/1
+          <span v-else-if="ownershipAllocation.hasTotalAllocationError" class="error-text fs-14 ml-2">
+              {{ ownershipAllocation.allocationErrorMsg }}
             </span>
-          </template>
+          <!-- Success when allocation is whole -->
+          <span v-else><v-icon color="success" class="mt-n2">mdi-check</v-icon></span>
+
+          <!-- Toggle removed owners -->
           <span
             v-if="isMhrTransfer && hasRemovedOwners"
             class="float-right hide-show-owners fs-14"
@@ -361,9 +364,6 @@ export default defineComponent({
       showTenancyTypeError: computed((): boolean => {
         return (localState.hasReviewedOwners || props.validateTransfer) &&
           (showGroups && localState.ownershipAllocation.hasMinimumGroupsError && localState.showTotalOwnership)
-      }),
-      showAllocationErrors: computed((): boolean => {
-        return localState.hasReviewedOwners || props.validateTransfer
       })
     })
 

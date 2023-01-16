@@ -104,10 +104,13 @@ export const useMhrInformation = () => {
       attentionReference: getMhrTransferAttentionReference.value,
       documentDescription: UIRegistrationTypes.TRANSFER_OF_SALE,
       submittingParty: {
+        businessName: getMhrTransferSubmittingParty.value.businessName,
         address: getMhrTransferSubmittingParty.value.address,
         emailAddress: getMhrTransferSubmittingParty.value.emailAddress,
-        phoneNumber: getMhrTransferSubmittingParty.value.phoneNumber,
-        phoneExtension: getMhrTransferSubmittingParty.value.phoneExtension
+        phoneNumber: getMhrTransferSubmittingParty.value.phoneNumber.replace(/[^A-Z0-9]/ig, ''),
+        ...(getMhrTransferSubmittingParty.value.phoneExtension && {
+          phoneExtension: getMhrTransferSubmittingParty.value.phoneExtension
+        })
       },
       addOwnerGroups: await parseOwnerGroups(isDraft),
       deleteOwnerGroups: await parseRemovedOwnerGroups(),
