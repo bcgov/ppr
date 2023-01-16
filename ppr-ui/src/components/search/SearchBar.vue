@@ -270,6 +270,7 @@ export default defineComponent({
       isRoleStaffSbc,
       isSearchCertified,
       getStaffPayment,
+      hasMhrRoleEnabled,
       hasPprRole,
       hasMhrRole
     } = useGetters<any>([
@@ -281,6 +282,7 @@ export default defineComponent({
       'isRoleStaffSbc',
       'isSearchCertified',
       'getStaffPayment',
+      'hasMhrRoleEnabled',
       'hasPprRole',
       'hasMhrRole'
     ])
@@ -305,7 +307,7 @@ export default defineComponent({
       categoryMessage: computed((): string => {
         return localState.validations?.category?.message || ''
       }),
-      isPPROnly: computed((): boolean => hasPprRole.value && !(hasMhrRole.value && getFeatureFlag('mhr-ui-enabled'))),
+      isPPROnly: computed((): boolean => hasPprRole.value && !hasMhrRoleEnabled.value),
       shouldShowFeeHint: computed((): boolean => {
         return (
           localState.isPPROnly ||
