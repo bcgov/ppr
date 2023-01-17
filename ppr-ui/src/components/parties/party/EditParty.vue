@@ -253,6 +253,7 @@ import { formatAddress } from '@/composables/address/factories'
 import { SearchPartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { partyCodeSearch } from '@/utils'
 import { useValidation } from '@/utils/validators/use-validation'
+import { isEqual } from 'lodash'
 
 export default defineComponent({
   components: {
@@ -298,7 +299,8 @@ export default defineComponent({
       ActionTypes,
       setRegisteringParty,
       addressSchema,
-      hasMatchingSecuredParty
+      hasMatchingSecuredParty,
+      originalSecuredParty
     } = useSecuredParty(props, context)
 
     const {
@@ -369,16 +371,18 @@ export default defineComponent({
           return
         }
         if (currentSecuredParty.value.businessName && partyType.value === SecuredPartyTypes.BUSINESS) {
-          // go to the service and see if there are similar secured parties
-          const response: [SearchPartyIF] = await partyCodeSearch(
-            currentSecuredParty.value.businessName, false
-          )
-          // check if any results
-          if (response?.length > 0) {
-            // show secured party selection popup
-            showDialog()
-            localState.dialogResults = response?.slice(0, 50)
-            return
+          if (!isEqual(currentSecuredParty, originalSecuredParty)) {
+            // go to the service and see if there are similar secured parties
+            const response: [SearchPartyIF] = await partyCodeSearch(
+              currentSecuredParty.value.businessName, false
+            )
+            // check if any results
+            if (response?.length > 0) {
+              // show secured party selection popup
+              showDialog()
+              localState.dialogResults = response?.slice(0, 50)
+              return
+            }
           }
         }
 
