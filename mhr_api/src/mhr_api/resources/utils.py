@@ -281,7 +281,8 @@ def get_account_registration_params(req: request, params: AccountRegistrationPar
     params.filter_client_reference_id = req.args.get(reg_utils.CLIENT_REF_PARAM, None)
     params.filter_submitting_name = req.args.get(reg_utils.SUBMITTING_NAME_PARAM, None)
     params.filter_username = req.args.get(reg_utils.USER_NAME_PARAM, None)
-    params.filter_registration_date = req.args.get(reg_utils.REG_TS_PARAM, None)
+    params.filter_reg_start_date = req.args.get(reg_utils.START_TS_PARAM, None)
+    params.filter_reg_end_date = req.args.get(reg_utils.END_TS_PARAM, None)
     # start_ts = req.args.get(reg_utils.START_TS_PARAM, None)
     # end_ts = req.args.get(reg_utils.END_TS_PARAM, None)
     # if start_ts and end_ts:
@@ -303,10 +304,12 @@ def get_account_registration_params(req: request, params: AccountRegistrationPar
         params.filter_username = params.filter_username.strip().upper()
         params.filter_username = remove_quotes(params.filter_username)
     if params.filter_client_reference_id:
-        params.filter_client_reference_id = params.filter_client_reference_id.strip()
+        params.filter_client_reference_id = params.filter_client_reference_id.strip().upper()
         params.filter_client_reference_id = remove_quotes(params.filter_client_reference_id)
-    if params.filter_registration_date:
-        params.filter_registration_date = remove_quotes(params.filter_registration_date)
+    if params.filter_reg_start_date:
+        params.filter_reg_start_date = remove_quotes(params.filter_reg_start_date)
+    if params.filter_reg_end_date:
+        params.filter_reg_end_date = remove_quotes(params.filter_reg_end_date)
     return params
 
 

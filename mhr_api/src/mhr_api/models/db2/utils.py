@@ -199,17 +199,17 @@ REG_FILTER_REG_TYPE_COLLAPSE = """
                                                                    AND d2.docutype = '?')))
 """
 REG_FILTER_STATUS = " AND mh.mhstatus = '?'"
-REG_FILTER_SUBMITTING_NAME = " AND TRIM(d.name) LIKE '?%'"
+REG_FILTER_SUBMITTING_NAME = " AND TRIM(d.name) LIKE '%?%'"
 REG_FILTER_SUBMITTING_NAME_COLLAPSE = """
- AND (TRIM(d.name) LIKE '?%' OR
+ AND (TRIM(d.name) LIKE '%?%' OR
       (d.documtid = mh.regdocid AND EXISTS (SELECT d2.documtid
                                               FROM document d2
                                              WHERE d2.mhregnum = mh.mhregnum
-                                               AND TRIM(d2.name) LIKE '?%')))
+                                               AND TRIM(d2.name) LIKE '%?%')))
 """
-REG_FILTER_CLIENT_REF = " AND TRIM(d.olbcfoli) LIKE '?%'"
+REG_FILTER_CLIENT_REF = " AND UPPER(TRIM(d.olbcfoli)) LIKE '%?%'"
 REG_FILTER_CLIENT_REF_COLLAPSE = """
- AND (TRIM(d.olbcfoli) LIKE '?%' OR
+ AND (UPPER(TRIM(d.olbcfoli)) LIKE '%?%' OR
       (d.documtid = mh.regdocid AND EXISTS (SELECT d2.documtid
                                               FROM document d2
                                              WHERE d2.mhregnum = mh.mhregnum
@@ -223,13 +223,14 @@ REG_FILTER_USERNAME_COLLAPSE = """
                                              WHERE d2.mhregnum = mh.mhregnum
                                                AND TRIM(d2.affirmby) LIKE '?%')))
 """
-REG_FILTER_DATE = " AND TO_CHAR(d.regidate, 'YYYY-MM-DD') = '?'"
+# REG_FILTER_DATE = " AND TO_CHAR(d.regidate, 'YYYY-MM-DD') = '?'"
+REG_FILTER_DATE = ' AND d.regidate BETWEEN :query_start AND :query_end'
 REG_FILTER_DATE_COLLAPSE = """
- AND (TO_CHAR(d.regidate, 'YYYY-MM-DD') = '?' OR
+ AND (d.regidate BETWEEN :query_start AND :query_end OR
       (d.documtid = mh.regdocid AND EXISTS (SELECT d2.documtid
                                               FROM document d2
                                              WHERE d2.mhregnum = mh.mhregnum
-                                               AND TO_CHAR(d2.regidate, 'YYYY-MM-DD') = '?')))
+                                               AND d2.regidate BETWEEN :query_start AND :query_end)))
 """
 
 SORT_DESCENDING = ' DESC'
@@ -242,7 +243,7 @@ QUERY_ACCOUNT_FILTER_BY = {
     reg_utils.SUBMITTING_NAME_PARAM: REG_FILTER_SUBMITTING_NAME,
     reg_utils.CLIENT_REF_PARAM: REG_FILTER_CLIENT_REF,
     reg_utils.USER_NAME_PARAM: REG_FILTER_USERNAME,
-    reg_utils.REG_TS_PARAM: REG_FILTER_DATE
+    reg_utils.START_TS_PARAM: REG_FILTER_DATE
 }
 QUERY_ACCOUNT_FILTER_BY_COLLAPSE = {
     reg_utils.STATUS_PARAM: REG_FILTER_STATUS,
@@ -250,7 +251,7 @@ QUERY_ACCOUNT_FILTER_BY_COLLAPSE = {
     reg_utils.SUBMITTING_NAME_PARAM: REG_FILTER_SUBMITTING_NAME_COLLAPSE,
     reg_utils.CLIENT_REF_PARAM: REG_FILTER_CLIENT_REF_COLLAPSE,
     reg_utils.USER_NAME_PARAM: REG_FILTER_USERNAME_COLLAPSE,
-    reg_utils.REG_TS_PARAM: REG_FILTER_DATE_COLLAPSE
+    reg_utils.START_TS_PARAM: REG_FILTER_DATE_COLLAPSE
 }
 QUERY_ACCOUNT_ORDER_BY = {
     reg_utils.REG_TS_PARAM: REG_ORDER_BY_DATE,
@@ -402,6 +403,7 @@ def find_all_by_account_id(params: AccountRegistrationParams):
     if mhr_list:
         # 3. Get the summary info from DB2.
         try:
+            result = None
             mhr_numbers: str = ''
             count = 0
             for mhr in mhr_list:
@@ -411,7 +413,13 @@ def find_all_by_account_id(params: AccountRegistrationParams):
                     mhr_numbers += ','
                 mhr_numbers += f"'{mhr_number}'"
             query = text(build_account_query(params, mhr_numbers, doc_types))
-            result = db.get_engine(current_app, 'db2').execute(query)
+            if params.has_filter() and params.filter_reg_start_date and params.filter_reg_end_date:
+                start_date = model_utils.date_from_iso_format(params.filter_reg_start_date)
+                end_date = model_utils.date_from_iso_format(params.filter_reg_end_date)
+                result = db.get_engine(current_app, 'db2').execute(query,
+                                                                   {'query_start': start_date, 'query_end': end_date})
+            else:
+                result = db.get_engine(current_app, 'db2').execute(query)
             rows = result.fetchall()
             if rows is not None:
                 for row in rows:
@@ -516,13 +524,11 @@ def build_account_query_filter(query_text: str, params: AccountRegistrationParam
             if not params.collapse:
                 filter_clause = QUERY_ACCOUNT_FILTER_BY.get(filter_type)
             if filter_clause:
-                if filter_type == reg_utils.REG_TS_PARAM:
-                    filter_clause = filter_clause.replace('?', filter_value[0:10])
-                elif filter_type == reg_utils.REG_TYPE_PARAM:
+                if filter_type == reg_utils.REG_TYPE_PARAM:
                     filter_clause = __get_reg_type_filter(filter_value, params.collapse, doc_types)
                 elif filter_type == reg_utils.STATUS_PARAM:
                     filter_clause = filter_clause.replace('?', TO_LEGACY_STATUS.get(filter_value, 'R'))
-                else:
+                elif filter_type != reg_utils.START_TS_PARAM:
                     filter_clause = filter_clause.replace('?', filter_value)
                 query_text += filter_clause
     return query_text

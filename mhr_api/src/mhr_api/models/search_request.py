@@ -199,7 +199,7 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         return result_json
 
     @classmethod
-    def __build_search_result_serial(cls, row):
+    def __build_search_result_serial(cls, row, search_key: str):
         """Build a single search summary json from a DB row for a serial number search."""
         mh_status = str(row[1])
         status = LEGACY_TO_REGISTRATION_STATUS[mh_status]
@@ -208,12 +208,12 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         # current_app.logger.info('Timestamp mapped')
         value: str = str(row[7])
         year = int(value) if value.isnumeric() else 0
+        serial_num: str = str(row[6]).strip()
         result_json = {
             'mhrNumber': str(row[0]),
             'status': status,
             'createDateTime': model_utils.format_local_ts(timestamp),
             'homeLocation': str(row[5]).strip(),
-            'serialNumber': str(row[6]).strip(),
             'baseInformation': {
                 'year': year,
                 'make': str(row[8]).strip(),
@@ -231,13 +231,20 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         else:
             result_json['ownerName'] = model_utils.get_ind_name_from_db2(owner_name)
         result_json['ownerStatus'] = LEGACY_TO_OWNER_STATUS[owner_status]
-        serial_index = int(row[10])
-        if serial_index == 2:
-            result_json['serialNumber'] = str(row[11]).strip()
-        elif serial_index == 3:
-            result_json['serialNumber'] = str(row[12]).strip()
-        elif serial_index == 4:
-            result_json['serialNumber'] = str(row[13]).strip()
+        key: str = db2_search_utils.get_search_serial_number_key(serial_num)
+        if key != search_key:  # Match is on one of the other serial numbers.
+            serial_num = str(row[10])
+            if serial_num:
+                key = db2_search_utils.get_search_serial_number_key(serial_num.strip())
+        if key != search_key:
+            serial_num = str(row[11])
+            if serial_num:
+                key = db2_search_utils.get_search_serial_number_key(serial_num.strip())
+        if key != search_key:
+            serial_num = str(row[12])
+            if serial_num:
+                key = db2_search_utils.get_search_serial_number_key(serial_num.strip())
+        result_json['serialNumber'] = serial_num
         return result_json
 
     def search_by_mhr_number_db2(self):
@@ -319,10 +326,9 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
 
         if rows is not None:
             results_json = []
+            search_key: str = db2_search_utils.get_search_serial_number_key(self.request_json['criteria']['value'])
             for row in rows:
-                # result = SearchRequest.__build_search_result(row)
-                # current_app.logger.debug(result)
-                results_json.append(SearchRequest.__build_search_result_serial(row))
+                results_json.append(SearchRequest.__build_search_result_serial(row, search_key))
             self.returned_results_size = len(results_json)
             self.total_results_size = self.returned_results_size
             self.search_response = results_json

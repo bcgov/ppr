@@ -536,7 +536,7 @@ class Db2Manuhome(db.Model):
                     if num > 0 and den > 0:
                         if den != common_denominator:
                             group.interest_denominator = common_denominator
-                            group.interest_numerator = (common_denominator/den * num)
+                            group.interest_numerator = int((common_denominator/den * num))
                     if group.interest.upper().startswith(model_utils.OWNER_INTEREST_UNDIVIDED):
                         group.interest = model_utils.OWNER_INTEREST_UNDIVIDED + ' '
                     else:
