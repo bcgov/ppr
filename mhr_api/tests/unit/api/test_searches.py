@@ -57,7 +57,7 @@ OWNER_NAME_JSON = {
 SERIAL_NUMBER_JSON = {
     'type': 'SERIAL_NUMBER',
     'criteria': {
-        'value': '4551'
+        'value': '9493'
     },
     'clientReferenceId': 'T-SQ-MS-1'
 }

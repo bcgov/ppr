@@ -77,12 +77,21 @@ TEST_GET_ACCOUNT_DATA_FILTER = [
     ('Filter mhr number', '2523', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, reg_utils.MHR_NUMBER_PARAM, '098487'),
     ('Filter reg type', '2523', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, reg_utils.REG_TYPE_PARAM, 'REGISTER NEW UNIT'),
     ('Filter reg status', '2523', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, reg_utils.STATUS_PARAM, 'ACTIVE'),
-    ('Filter reg date', '2523', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, reg_utils.REG_TS_PARAM,
-     '2021-10-14T09:53:57-07:53'),
-    ('Filter client ref', '2523', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, reg_utils.CLIENT_REF_PARAM, 'A000873'),
+    ('Filter client ref', '2523', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, reg_utils.CLIENT_REF_PARAM, 'a000873'),
     ('Filter user name', '2523', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, reg_utils.USER_NAME_PARAM, 'BCREG2'),
-    ('Filter submitting name', '2523', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, reg_utils.SUBMITTING_NAME_PARAM,
-     'CHAMPION')
+    ('Filter submitting bus name', '2523', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, reg_utils.SUBMITTING_NAME_PARAM,
+     'champion'),
+    ('Filter submitting last name', '2523', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, reg_utils.SUBMITTING_NAME_PARAM,
+     'iverson'),
+    ('Filter submitting first name', '2523', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, reg_utils.SUBMITTING_NAME_PARAM,
+     'donna')
+]
+# testdata pattern is ({desc}, {roles}, {status}, {collapse}, {filter_start}, {filter_end})
+TEST_GET_ACCOUNT_DATA_FILTER_DATE = [
+    ('Filter reg date range', '2523', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, False,
+     '2021-10-14T09:53:57-07:53', '2021-10-17T09:53:57-07:53'),
+    ('Filter reg date range', '2523', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, True,
+     '2021-10-14T09:53:57-07:53', '2021-10-17T09:53:57-07:53')
 ]
 
 
@@ -206,6 +215,36 @@ def test_get_account_registrations_filter(session, client, jwt, desc, account_id
     # setup
     headers = create_header_account(jwt, roles, 'test-user', account_id)
     params = f'?{filter_name}={filter_value}'
+    # test
+    rv = client.get('/api/v1/registrations' + params,
+                    headers=headers)
+    # check
+    assert rv.status_code == status
+    assert rv.json
+    for registration in rv.json:
+        assert registration['mhrNumber']
+        assert registration['registrationDescription']
+        assert registration['statusType'] is not None
+        assert registration['createDateTime'] is not None
+        assert registration['username'] is not None
+        assert registration['submittingParty'] is not None
+        assert registration['clientReferenceId'] is not None
+        assert registration['ownerNames'] is not None
+        assert registration['path'] is not None
+
+
+@pytest.mark.parametrize('desc,account_id,roles,status,collapse,filter_start,filter_end',
+                         TEST_GET_ACCOUNT_DATA_FILTER_DATE)
+def test_get_account_registrations_filter_date(session, client, jwt, desc, account_id, roles, status, collapse,
+                                               filter_start, filter_end):
+    """Assert that a get account registrations summary list endpoint with filtering works as expected."""
+    # setup
+    headers = create_header_account(jwt, roles, 'test-user', account_id)
+    start_ts: str = reg_utils.START_TS_PARAM
+    end_ts: str = reg_utils.END_TS_PARAM
+    params = f'?{start_ts}={filter_start}&{end_ts}={filter_end}'
+    if collapse:
+        params += '&collapse=true'
     # test
     rv = client.get('/api/v1/registrations' + params,
                     headers=headers)

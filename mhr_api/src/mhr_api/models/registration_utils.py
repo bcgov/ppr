@@ -62,8 +62,8 @@ class AccountRegistrationParams():
     filter_mhr_number: str = None
     filter_registration_type: str = None
     filter_registration_date: str = None
-    # start_date_time: str = None
-    # end_date_time: str = None
+    filter_reg_start_date: str = None
+    filter_reg_end_date: str = None
     filter_status_type: str = None
     filter_client_reference_id: str = None
     filter_submitting_name: str = None
@@ -90,7 +90,7 @@ class AccountRegistrationParams():
     def has_filter(self) -> bool:
         """Check if filter criteria provided."""
         return self.filter_client_reference_id or self.filter_mhr_number or self.filter_registration_type or \
-            self.filter_registration_date or self.filter_status_type or self.filter_submitting_name or \
+            self.filter_reg_start_date or self.filter_status_type or self.filter_submitting_name or \
             self.filter_username
 
     def get_filter_values(self):  # pylint: disable=too-many-return-statements
@@ -99,8 +99,8 @@ class AccountRegistrationParams():
             return MHR_NUMBER_PARAM, self.filter_mhr_number
         if self.filter_registration_type:
             return REG_TYPE_PARAM, self.filter_registration_type
-        if self.filter_registration_date:
-            return REG_TS_PARAM, self.filter_registration_date
+        if self.filter_reg_start_date:
+            return START_TS_PARAM, self.filter_reg_start_date
         if self.filter_status_type:
             return STATUS_PARAM, self.filter_status_type
         if self.filter_client_reference_id:

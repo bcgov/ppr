@@ -20,6 +20,7 @@ Search constants and helper functions.
 # Disable E122: allow query strings to be more human readable.
 # Disable E131: allow query strings to be more human readable.
 
+import re
 from sqlalchemy.sql import text
 
 from mhr_api.exceptions import DatabaseException
@@ -72,16 +73,22 @@ SELECT DISTINCT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate,
            AND og.status IN ('3', '4')
            FETCH FIRST 1 ROWS ONLY) AS owner_info,
        l.towncity, de.sernumb1, de.yearmade,
-       de.makemodl, mh.manhomid, c.cmpserid, de.sernumb2, de.sernumb3, de.sernumb4
-  FROM manuhome mh, document d, location l, descript de, cmpserno c
+       de.makemodl, mh.manhomid, TRIM(de.sernumb2), TRIM(de.sernumb3), TRIM(de.sernumb4)
+  FROM manuhome mh, document d, location l, descript de
  WHERE mh.mhregnum = d.mhregnum
    AND mh.regdocid = d.documtid
    AND mh.manhomid = l.manhomid
    AND l.status = 'A'
    AND mh.manhomid = de.manhomid
    AND de.status = 'A'
-   AND mh.manhomid = c.manhomid
-   AND HEX(c.serialno) = :query_value
+   AND (RIGHT(('000000' || TRANSLATE(TRIM(de.sernumb1), '08600064100100000050000042', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')),
+              6) = :query_value OR
+        RIGHT(('000000' || TRANSLATE(TRIM(de.sernumb2), '08600064100100000050000042', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')),
+              6) = :query_value OR
+        RIGHT(('000000' || TRANSLATE(TRIM(de.sernumb3), '08600064100100000050000042', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')),
+              6) = :query_value OR
+        RIGHT(('000000' || TRANSLATE(TRIM(de.sernumb4), '08600064100100000050000042', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')),
+              6) = :query_value)
 ORDER BY de.sernumb1 ASC, mh.mhstatus ASC, mh.mhregnum DESC
 """
 
@@ -168,14 +175,34 @@ def search_by_owner_name(current_app, db, request_json):
         raise DatabaseException(db_exception)
 
 def search_by_serial_number(current_app, db, request_json):
-     """Execute a DB2 search by serial number query."""
-     serial_num:str = request_json['criteria']['value']
-     serial_key = model_utils.get_serial_number_key_hex(serial_num)  # serial_num.upper().strip()
-     current_app.logger.debug(f'DB2 search_by_serial_number search value={serial_num}, key={serial_key}.')
-     try:
-          query = text(SERIAL_NUM_QUERY)
-          result = db.get_engine(current_app, 'db2').execute(query, {'query_value': serial_key})
-          return result
-     except Exception as db_exception:   # noqa: B902; return nicer error
+    """Execute a DB2 search by serial number query."""
+    serial_num:str = request_json['criteria']['value']
+    serial_key = get_search_serial_number_key(serial_num)
+    current_app.logger.debug(f'DB2 search_by_serial_number search value={serial_num}, key={serial_key}.')
+    try:
+        query = text(SERIAL_NUM_QUERY)
+        result = db.get_engine(current_app, 'db2').execute(query, {'query_value': serial_key})
+        return result
+    except Exception as db_exception:   # noqa: B902; return nicer error
         current_app.logger.error('DB2 search_by_serial_number exception: ' + str(db_exception))
         raise DatabaseException(db_exception)
+
+def get_search_serial_number_key(serial_num: str) -> str:
+    """Get the search serial number key for the MH serial number."""
+    if not serial_num:
+        return ''
+    key: str = '000000' + serial_num.strip().upper()
+    # Replace alphas with the corresponding integers:
+    # 08600064100100000050000042  where A=0, B=8, C=6…Z=2
+    key = key.replace('B', '8')
+    key = key.replace('C', '6')
+    key = key.replace('G', '6')
+    key = key.replace('H', '4')
+    key = key.replace('I', '1')
+    key = key.replace('L', '1')
+    key = key.replace('S', '5')
+    key = key.replace('Y', '4')
+    key = key.replace('Z', '2')
+    key = re.sub('[A-Z]', '0', key)
+    start_pos: int = len(key) - 6
+    return key[start_pos:]

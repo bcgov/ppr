@@ -116,7 +116,7 @@ MI_NONE_JSON = {
 SERIAL_NUMBER_JSON = {
     'type': 'SERIAL_NUMBER',
     'criteria': {
-        'value': '123ABC'  # XF1048
+        'value': '9493'
     },
     'clientReferenceId': 'T-SQ-MS-1'
 }
@@ -167,9 +167,14 @@ TEST_MHR_NUMBER_DATA = [
     ('1232', '001232'),
     ('01232', '001232')
 ]
-# testdata pattern is ({search_value}, {count}, {mhr_num}, {serial1}, {serial2}, {serial3}, {serial4})
+# testdata pattern is ({search_value}, {count}, {mhr_num1}, {result_val1}, {mhr_num2}, {result_val2})
 TEST_SERIAL_NUMBER_DATA = [
-    ('123ABC', 8, '089036', '123A', '123B', '123C', '123D')
+    ('999999', 0, None, None, None, None),
+    ('D1644', 6, '010469', 'D1644', '100570', '03A001644'),
+    ('S60009493', 2, '103147', 'S60009493', '017874', '9493'),
+    ('WIN24440204003A', 2, '088121', 'WIN24440204003A', '033168', '3E4003A'),
+    ('003000ZA002773B', 1, '102878', '003000ZA002773B', None, None),
+    ('PHH310OR1812828CRCM', 1, '102909', 'PHH310OR1812828CRCM', None, None)
 ]
 # testdata pattern is ({last_name}, {first_name}, count)
 TEST_OWNER_IND_DATA = [
@@ -286,8 +291,8 @@ def test_search_mhr_number(session, mhr_number, expected_number):
     assert result['results'][0]['mhrNumber'] == expected_number
 
 
-@pytest.mark.parametrize('search_value,count,mhr_num,serial1,serial2,serial3,serial4', TEST_SERIAL_NUMBER_DATA)
-def test_search_serial(session, search_value, count, mhr_num, serial1, serial2, serial3, serial4):
+@pytest.mark.parametrize('search_value,count,mhr1,result1,mhr2,result2', TEST_SERIAL_NUMBER_DATA)
+def test_search_serial(session, search_value, count, mhr1, result1, mhr2, result2):
     """Assert that a valid search returns the expected serial number search result."""
     test_data = copy.deepcopy(SERIAL_NUMBER_JSON)
     test_data['criteria']['value'] = search_value
@@ -296,22 +301,20 @@ def test_search_serial(session, search_value, count, mhr_num, serial1, serial2, 
     query.search()
     assert not query.updated_selection
     result = query.json
-    current_app.logger.debug('Results size:' + str(result['totalResultsSize']))
+    # current_app.logger.debug('Results size:' + str(result['totalResultsSize']))
     assert query.id
-    assert len(result['results']) >= count
-    match_count = 0
-    for match in result['results']:
-        if match['mhrNumber'] == mhr_num:
-            match_count += 1
-            if match_count == 1:
-                assert match['serialNumber'] == serial1
-            elif match_count == 2:
-                assert match['serialNumber'] == serial2
-            elif match_count == 3:
-                assert match['serialNumber'] == serial3
-            elif match_count == 4:
-                assert match['serialNumber'] == serial4
-    assert match_count == 4
+    if count < 1:
+        assert not result.get('results')
+    else:
+        assert len(result['results']) >= count
+        match_count = 0
+        for match in result['results']:
+            if match['mhrNumber'] == mhr1:
+                match_count += 1
+                assert match['serialNumber'] == result1
+            elif mhr2 and match['mhrNumber'] == mhr1:
+                assert match['serialNumber'] == result2
+        assert match_count > 0
 
 
 @pytest.mark.parametrize('last_name,first_name,count', TEST_OWNER_IND_DATA)

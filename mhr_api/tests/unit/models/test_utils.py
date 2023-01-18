@@ -19,7 +19,7 @@ import pytest
 from flask import current_app
 
 from mhr_api.models import utils as model_utils
-
+from mhr_api.models.db2.search_utils import get_search_serial_number_key
 
 DB2_IND_NAME_MIDDLE = 'DANYLUK                  LEONARD        MICHAEL                       '
 DB2_IND_NAME = 'KING                     MARDI                                        '
@@ -55,17 +55,17 @@ TEST_DATA_OWNER_KEY = [
     ('MCCAUGHAN-MORRISON       MARGARET       MORRISON ', 'MCCAUGHANMORRISONMARGARETMORRI'),
     ('SCHWARTZENBERGER         RAYMOND        AMBROSE   ', 'SCHWARTZENBERGERRAYMONDAMBROSE')
 ]
-# testdata pattern is ({serial_num}, {hex_value})
+# testdata pattern is ({serial_num}, {key_value})
 TEST_DATA_SERIAL_KEY = [
-    ('WIN14569401627', '0620DB'),
-    ('A4492', '00118C'),
-    ('3E3947', '04A34B'),
-    ('6436252B10FK', '03DB8A'),
-    ('I1724B', '002DCC'),
-    ('2427', '00097B'),
-    ('123', '00007B'),
-    ('12345', '003039'),
-    ('999999', '0F423F')
+    ('313000Z009206AB', '920608'),
+    ('WIN24440204003A', '040030'),
+    ('KW2191U', '021910'),
+    ('6436252B10FK', '281000'),
+    ('D1644', '001644'),
+    ('2427', '002427'),
+    ('123', '000123'),
+    ('12345', '012345'),
+    ('BC123452', '123452')
 ]
 # testdata pattern is ({valid}, {registration_ts}, {tax_cert_ts})
 TEST_DATA_TAX_CERT_DATE = [
@@ -107,13 +107,13 @@ def test_search_key_owner(name, key_value):
     assert value == key_value
 
 
-@pytest.mark.parametrize('serial_num, hex_value', TEST_DATA_SERIAL_KEY)
-def test_search_key_serial(session, serial_num, hex_value):
+@pytest.mark.parametrize('serial_num, key_value', TEST_DATA_SERIAL_KEY)
+def test_search_key_serial(session, serial_num, key_value):
     """Assert that computing a serial number search key works as expected."""
-    value = model_utils.get_serial_number_key_hex(serial_num)
+    value = get_search_serial_number_key(serial_num)
     # current_app.logger.info(f'Key={value}')
     assert len(value) == 6
-    assert value == hex_value
+    assert value == key_value
 
 
 @pytest.mark.parametrize('valid,registration_ts,tax_cert_ts', TEST_DATA_TAX_CERT_DATE)

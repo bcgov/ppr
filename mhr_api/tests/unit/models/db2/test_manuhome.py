@@ -28,6 +28,24 @@ from mhr_api.models import Db2Document, Db2Manuhome, Db2Mhomnote, Db2Owngroup, M
 from mhr_api.services.authz import MANUFACTURER_GROUP, QUALIFIED_USER_GROUP, GOV_ACCOUNT_ROLE
 
 
+COMMON_GROUP_1 = Db2Owngroup(interest='UNDIVIDED',
+                             interest_numerator=1,
+                             interest_denominator=4,
+                             group_id=1,
+                             tenancy_type='TC',
+                             status='3')
+COMMON_GROUP_2 = Db2Owngroup(interest='UNDIVIDED',
+                             interest_numerator=2,
+                             interest_denominator=8,
+                             group_id=2,
+                             tenancy_type='TC',
+                             status='3')
+COMMON_GROUP_3 = Db2Owngroup(interest='UNDIVIDED',
+                             interest_numerator=2,
+                             interest_denominator=4,
+                             group_id=3,
+                             tenancy_type='TC',
+                             status='3')
 # testdata pattern is ({exists}, {id}, {mhr_num}, {status}, {doc_id})
 TEST_DATA = [
     (True, 1, '022911', 'E', 'REG22911'),
@@ -67,6 +85,10 @@ TEST_DATA_GROUP_INTEREST = [
     ('UNDIVIDED', 1, 2, 'UNDIVIDED 1/2'),
     ('Undivided', 1, 2, 'UNDIVIDED 1/2'),
     ('Junk', 1, 2, '1/2')
+]
+# testdata pattern is ({group1}, {group2}, {group3}, {interest1}, {interest2}, {interest3})
+TEST_DATA_GROUP_INTEREST2 = [
+    (COMMON_GROUP_1, COMMON_GROUP_2, COMMON_GROUP_3, 'UNDIVIDED 2/8', 'UNDIVIDED 2/8', 'UNDIVIDED 4/8')
 ]
 
 
@@ -230,6 +252,25 @@ def test_adjust_group_interest_new(session, interest, numerator, denominator, ne
     groups.append(group)
     Db2Manuhome.adjust_group_interest(groups, True)
     assert groups[0].interest == new_interest
+
+
+@pytest.mark.parametrize('group1,group2,group3,interest1,interest2,interest3', TEST_DATA_GROUP_INTEREST2)
+def test_adjust_group_interest_2(session, group1, group2, group3, interest1, interest2, interest3):
+    groups = []
+    if group1:
+        groups.append(group1)
+    if group2:
+        groups.append(group2)
+    if group3:
+        groups.append(group3)
+    Db2Manuhome.adjust_group_interest(groups, True)
+    for group in groups:
+        if group.group_id == 1:
+            assert group.interest == interest1
+        elif group.group_id == 2:
+            assert group.interest == interest2
+        elif group.group_id == 3:
+            assert group.interest == interest3
 
 
 def test_notes_sort_order(session):
