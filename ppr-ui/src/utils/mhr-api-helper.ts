@@ -588,14 +588,14 @@ export function delayActions (milliseconds: number): Promise<any> {
 }
 
 const UIFilterToApiFilter = {
-  endDate: 'createDateTime',
+  endDate: 'endDateTime',
   folNum: 'clientReferenceId',
   regBy: 'username',
   regNum: 'mhrNumber',
   regType: 'registrationType',
-  startDate: 'createDateTime',
+  startDate: 'startDateTime',
   status: 'statusType',
-  regParty: 'username'
+  regParty: 'submittingName'
 }
 
 // add sorting params for registration history/draft api calls
@@ -610,7 +610,7 @@ function addSortParams (url: string, sortOptions: RegistrationSortIF): string {
     }
 
     // add timestamp onto datetime param values
-    if (sortOptions[sortKeys[i]] && ['createDateTime'].includes(UIFilterToApiFilter[sortKeys[i]])) {
+    if (sortOptions[sortKeys[i]] && ['startDateTime', 'endDateTime'].includes(UIFilterToApiFilter[sortKeys[i]])) {
       sortOptions[sortKeys[i]] =
       addTimestampToDate(sortOptions[sortKeys[i]], sortOptions[sortKeys[i]] === 'endDateTime')
     }
