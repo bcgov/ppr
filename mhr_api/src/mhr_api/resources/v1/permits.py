@@ -59,6 +59,10 @@ def post_permits(mhr_number: str):  # pylint: disable=too-many-return-statements
 
         # Validate request against the schema.
         current_app.logger.debug(f'Extra validation on transport permit json for {mhr_number}')
+        # Location may have no street - replace with blank to pass validation
+        if request_json.get('newLocation') and request_json['newLocation'].get('address') and \
+                not request_json['newLocation']['address'].get('street'):
+            request_json['newLocation']['address']['street'] = ' '
         valid_format, errors = schema_utils.validate(request_json, 'permit', 'mhr')
         # Additional validation not covered by the schema.
         extra_validation_msg = resource_utils.validate_permit(current_reg, request_json, is_staff(jwt), get_group(jwt))

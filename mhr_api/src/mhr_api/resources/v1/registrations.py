@@ -93,6 +93,10 @@ def post_registrations():  # pylint: disable=too-many-return-statements
             return resource_utils.unauthorized_error_response(account_id)
         request_json = request.get_json(silent=True)
         # Validate request against the schema.
+        # Location may have no street - replace with blank to pass validation
+        if request_json.get('location') and request_json['location'].get('address') and \
+                not request_json['location']['address'].get('street'):
+            request_json['location']['address']['street'] = ' '
         valid_format, errors = schema_utils.validate(request_json, 'registration', 'mhr')
         # Additional validation not covered by the schema.
         extra_validation_msg = resource_utils.validate_registration(request_json, is_staff(jwt))
