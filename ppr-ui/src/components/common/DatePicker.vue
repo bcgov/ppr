@@ -10,7 +10,7 @@
       </v-col>
       <v-col
         class="picker-title pl-4"
-        :class="{ 'picker-err': endDate === null && datePickerErr && !disableEndDate }"
+        :class="{ 'picker-err': endDate === null && datePickerErr }"
         cols="6"
       >
         Select End Date:
