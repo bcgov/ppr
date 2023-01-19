@@ -1,0 +1,405 @@
+{
+  "certified": null,
+  "details": [
+    {
+      "attentionReference": "",
+      "clientReferenceId": "03A001122",
+      "createDateTime": "2014-03-04T09:35:45-07:53",
+      "declaredDateTime": "2020-01-20T15:20:13-07:53",
+      "declaredValue": 190000,
+      "description": {
+        "baseInformation": {
+          "make": "2014 JELDWYN #14662",
+          "model": "",
+          "year": "2014"
+        },
+        "csaNumber": "MB-2722",
+        "csaStandard": "Z240",
+        "engineerName": "",
+        "manufacturer": "MODULINE INDUSTRIES - PENTICTON",
+        "otherRemarks": "",
+        "rebuiltRemarks": "",
+        "sectionCount": 1,
+        "sections": [
+          {
+            "lengthFeet": 66,
+            "lengthInches": 0,
+            "serialNumber": "03A001122",
+            "widthFeet": 14,
+            "widthInches": 0
+          }
+        ]
+      },
+      "documentId": "80031172",
+      "location": {
+        "additionalDescription": "",
+        "address": {
+          "city": "SURREY",
+          "country": "CA",
+          "postalCode": "",
+          "region": "BC",
+          "street": "8220 KING GEORGE BLVD."
+        },
+        "block": "",
+        "dealerName": "",
+        "districtLot": "",
+        "exceptionPlan": "",
+        "landDistrict": "",
+        "leaveProvince": false,
+        "lot": "",
+        "meridian": "",
+        "pad": "48",
+        "parcel": "",
+        "parkName": "CRESTWAY BAYS",
+        "partOf": "",
+        "pidNumber": "",
+        "plan": "",
+        "range": "",
+        "section": "",
+        "status": "ACTIVE",
+        "taxCertificate": false,
+        "township": ""
+      },
+      "mhrNumber": "099249",
+      "notes": [
+        {
+          "contactAddress": {
+            "city": "VANCOUVER", 
+            "country": "CA", 
+            "postalCode": "V6Z 2H2", 
+            "region": "BC", 
+            "street": "C/O JENKINS MARZBAN LOGAN LLP", 
+            "streetAdditional": "900-808 NELSON ST"
+          }, 
+          "contactName": "KRISTINA JANIS SALIN", 
+          "contactPhoneNumber": "6046816564", 
+          "createDateTime": "2022-03-18T09:11:00-07:53", 
+          "documentDescription": "CONTINUE CAUTION", 
+          "documentId": "63114635", 
+          "documentType": "CAUC", 
+          "expiryDate": "2025-03-24T09:00:00-07:53", 
+          "remarks": "ACTION COMMENCED 2020FEB27, AN INTEREST IS CLAIMED THROUGH VANCOUVER  REGISTRY NO. E200481", 
+          "status": "A"
+        }, {
+          "contactAddress": {
+            "city": "CRANBROOK", 
+            "country": "CA", 
+            "postalCode": "V1C 2K4", 
+            "region": "BC", 
+            "street": "C/O RONALD S. MILES", 
+            "streetAdditional": "MZA LAW 45-8TH AVE SOUTH"
+          }, 
+          "contactName": "MALORIE MEAKIN", 
+          "createDateTime": "2022-03-04T16:05:00-07:53", 
+          "documentDescription": "CAUTION", 
+          "documentId": "63114760", 
+          "documentType": "CAU", 
+          "expiryDate": "2023-06-30T09:00:00-07:53", 
+          "remarks": "NOTICE OF ACTION COMMENCED MARCH 1 2022 WITH CRANBROOK COURT REGISTRY COURT FILE NO. 3011.", 
+          "status": "C"
+        }, {
+          "contactAddress": {
+            "city": "VANCOUVER", 
+            "country": "CA", 
+            "postalCode": "V6T 2C2", 
+            "region": "BC", 
+            "street": "5612 YALTA PLACE"
+          }, 
+          "contactName": "CHRISTOPHER DEAN GUDERYAN", 
+          "contactPhoneNumber": "2505407761", 
+          "createDateTime": "2021-10-29T16:26:00-07:53", 
+          "documentDescription": "CONTINUE CAUTION", 
+          "documentId": "63056537", 
+          "documentType": "CAUC", 
+          "expiryDate": "2021-11-15T09:00:00-07:53", 
+          "remarks": "", 
+          "status": "E"
+        }, {
+          "contactAddress": {
+            "city": "VANCOUVER", 
+            "country": "CA", 
+            "postalCode": "V6T 2C2", 
+            "region": "BC", 
+            "street": "5612 YALTA PLACE"
+          }, 
+          "contactName": "CHRISTOPHER DEAN GUDERYAN", 
+          "createDateTime": "2021-10-22T15:34:00-07:53", 
+          "documentDescription": "EXTEND CAUTION", 
+          "documentId": "63056323", 
+          "documentType": "CAUE", 
+          "expiryDate": "2023-06-30T09:00:00-07:53", 
+          "remarks": "CAUTION EXTENSION FOR 7 DAYS UNTIL COURT ORDER IS SIGNED AND SUBMITTEDDOCUMENT REGISTRATION # 451621 UNTIL OCTOBER 31 2021 WITH LIBERTY TO  APPLY FOR A FURTHER CONTINUATION.                                     SUPREME COURT OF BC VANCOUVER REGISTRY NO# S210218                    COURT FILE # VLC-S-S-210218", 
+          "status": "E"
+        }, {
+          "contactAddress": {
+            "city": "PRINCE GEORGE", 
+            "country": "CA", 
+            "postalCode": "V2L 3L4", 
+            "region": "BC", 
+            "street": "1396 5TH AVENUE, SUITE 201"
+          }, 
+          "contactName": "ANDREW KEMP C/O LLOYD PERCIVAL MURRAY", 
+          "contactPhoneNumber": "2505645544", 
+          "createDateTime": "2021-04-01T17:00:00-07:53", 
+          "documentDescription": "EXTEND CAUTION", 
+          "documentId": "62875618", 
+          "documentType": "CAUE", 
+          "expiryDate": "2021-04-16T09:00:00-07:53", 
+          "remarks": "", 
+          "status": "C"
+        }, {
+          "contactAddress": {
+            "city": "PRINCE GEORGE", 
+            "country": "CA", 
+            "postalCode": "V2L 3L4", 
+            "region": "BC", 
+            "street": "1396 5TH AVENUE, SUITE 201"
+          }, 
+          "contactName": "ANDREW KEMP C/O LLOYD PERCIVAL MURRAY", 
+          "contactPhoneNumber": "2505645544", 
+          "createDateTime": "2020-12-03T09:20:00-07:53", 
+          "documentDescription": "CAUTION", 
+          "documentId": "62859743", 
+          "documentType": "CAU", 
+          "expiryDate": "2021-03-03T09:00:00-07:53", 
+          "remarks": "", 
+          "status": "C"
+        }, {
+          "contactAddress": {
+            "city": "PENTICTON",
+            "country": "CA",
+            "postalCode": "V2A 5X5",
+            "region": "BC",
+            "street": "1175 RAILWAY STREET"
+          },
+          "contactName": "CHAMPION CANADA INTERNATIONAL ULC",
+          "contactPhoneNumber": "2504930122",
+          "createDateTime": "2014-04-03T15:44:26-07:53",
+          "documentDescription": "TRANSPORT PERMIT",
+          "documentId": "80031322",
+          "documentType": "103",
+          "expiryDate": "2014-05-03T09:00:00-07:53",
+          "remarks": ""
+        }, {
+          "contactAddress": {
+            "city": "SURREY", 
+            "country": "CA", 
+            "postalCode": "V3R 8X8", 
+            "region": "BC", 
+            "street": "C/O KATE PELZER", 
+            "streetAdditional": "#300 - 10090 - 152ND STREET"
+          }, 
+          "contactName": "1027110 B.C. LTD.", 
+          "contactPhoneNumber": "604", 
+          "createDateTime": "2017-08-03T08:16:34-07:53", 
+          "documentDescription": "NON-RESIDENTIAL EXEMPTION", 
+          "documentId": "62159054", 
+          "documentType": "EXNR", 
+          "expiryDate": "2013-10-13T09:00:00-07:53", 
+          "remarks": "BUNKHOUSE", 
+          "status": "C"
+        }, {
+          "contactAddress": {
+            "city": "ROSSLAND", 
+            "country": "CA", 
+            "postalCode": "V0G 1Y0", 
+            "region": "BC", 
+            "street": "THE CORPORATION OF THE CITY OF ROSSLAND", 
+            "streetAdditional": "BOX 1179"
+          }, 
+          "contactName": "KATHY SMITH", 
+          "contactPhoneNumber": "2503627396", 
+          "createDateTime": "2005-11-07T09:06:00-07:53", 
+          "documentDescription": "TAX SALE NOTICE", 
+          "documentId": "50395240", 
+          "documentType": "TAXN", 
+          "remarks": "A NOTICE PURSUANT TO SECTION 403 OF THE MUNICIPAL ACT WAS FILED", 
+          "status": "A"
+         }, {
+          "contactName": "", 
+          "createDateTime": "2000-09-25T09:13:00-07:53", 
+          "documentDescription": "REGISTRARS FREEZE", 
+          "documentId": "41438426", 
+          "documentType": "FZE", 
+          "remarks": "CORRESPONDENCE EXISTS FOR THIS HOME IN THE CONFIDENTIAL FILE. PLEASE  REVIEW THIS MATERIAL BEFORE PROCESSING ANY TRANSACTIONS ON THIS HOME.", 
+          "status": "C"
+        }, {
+          "contactAddress": {
+            "city": "NANAIMO", 
+            "country": "CA", 
+            "postalCode": "V9R 5J6", 
+            "region": "BC", 
+            "street": "455 WALLACE STREET"
+          }, 
+          "contactName": "COLLECTOR, CITY OF NANAIMO", 
+          "contactPhoneNumber": "2507544251", 
+          "createDateTime": "1999-10-04T17:13:00-07:53", 
+          "documentDescription": "TAX SALE NOTICE", 
+          "documentId": "40956395", 
+          "documentType": "TAXN", 
+          "remarks": "", 
+          "status": "C"
+        }, {
+          "contactAddress": {
+            "city": "KELOWNA", 
+            "country": "CA", 
+            "postalCode": "V4V 1S5", 
+            "region": "BC", 
+            "street": "9500 JIM BAILEY ROAD"
+          }, 
+          "contactName": "SRI HOMES INC (WINFIELD)", 
+          "contactPhoneNumber": "604", 
+          "createDateTime": "1996-02-02T15:44:50-07:53", 
+          "documentDescription": "EXTEND TRAN PERMIT", 
+          "documentId": "42477667", 
+          "documentType": "103E", 
+          "expiryDate": "1996-02-19T09:00:00-07:53", 
+          "remarks": "", 
+          "status": "A"
+        }, {
+          "contactAddress": {
+            "city": "PRINCE GEORGE", 
+            "country": "CA", 
+            "postalCode": "V2L 3G7", 
+            "region": "BC", 
+            "street": "1717 3RD AVENUE UNIT 213"
+          }, 
+          "contactName": "KAREN J. WIGHT", 
+          "createDateTime": "1996-01-11T14:34:00-07:53", 
+          "documentDescription": "CONTINUE CAUTION", 
+          "documentId": "42472573", 
+          "documentType": "CAUC", 
+          "remarks": "", 
+          "status": "C"
+        }
+      ],
+      "ownerGroups": [
+        {
+          "groupId": 4,
+          "interest": "UNDIVIDED",
+          "interestDenominator": 100,
+          "interestNumerator": 99,
+          "owners": [
+            {
+              "address": {
+                "city": "SURREY",
+                "country": "CA",
+                "postalCode": "V3W 6E1",
+                "region": "BC",
+                "street": "#48 - 8220 KING GEORGE BOULEVARD"
+              },
+              "individualName": {
+                "first": "TERESA",
+                "last": "RANDLE",
+                "middle": "LOUISE"
+              },
+              "ownerId": 1,
+              "phoneNumber": "7789945022",
+              "type": "COMMON"
+            }
+          ],
+          "status": "ACTIVE",
+          "tenancySpecified": true,
+          "type": "COMMON"
+        },
+        {
+          "groupId": 5,
+          "interest": "UNDIVIDED",
+          "interestDenominator": 100,
+          "interestNumerator": 1,
+          "owners": [
+            {
+              "address": {
+                "city": "SURREY",
+                "country": "CA",
+                "postalCode": "V3W 6E1",
+                "region": "BC",
+                "street": "#48 - 8220 KING GEORGE BOULEVARD"
+              },
+              "individualName": {
+                "first": "TERESA",
+                "last": "RANDLE",
+                "middle": "LOUISE"
+              },
+              "ownerId": 2,
+              "phoneNumber": "7789945022",
+              "type": "JOINT"
+            },
+            {
+              "address": {
+                "city": "DUNCAN",
+                "country": "CA",
+                "postalCode": "V9L 2H1",
+                "region": "BC",
+                "street": "6138 GRIEVE ROAD"
+              },
+              "individualName": {
+                "first": "EVELYN",
+                "last": "LEMIRE",
+                "middle": "RUTH"
+              },
+              "ownerId": 3,
+              "phoneNumber": "7789945022",
+              "type": "JOINT"
+            },
+            {
+              "address": {
+                "city": "DUNCAN",
+                "country": "CA",
+                "postalCode": "V9L 2H1",
+                "region": "BC",
+                "street": "6138 GRIEVE ROAD"
+              },
+              "individualName": {
+                "first": "ROBERT",
+                "last": "LEMIRE",
+                "middle": "RENE"
+              },
+              "ownerId": 4,
+              "phoneNumber": "7789945022",
+              "suffix": "JOSEPH",
+              "type": "JOINT"
+            }
+          ],
+          "status": "ACTIVE",
+          "tenancySpecified": true,
+          "type": "JOINT"
+        }
+      ],
+      "status": "ACTIVE"
+    }
+  ],
+  "getReportURL": "/ppr/api/v1/search-results/12119",
+  "payment": {
+    "invoiceId": "25179",
+    "receipt": "/api/v1/payment-requests/25179/receipts"
+  },
+  "searchDateTime": "2023-01-09T20:47:21+00:00",
+  "searchQuery": {
+    "clientReferenceId": "MM-UT-MR0003",
+    "criteria": {"value": "099249"},
+    "type": "MHR_NUMBER"
+  },
+  "selected": [
+    {
+      "baseInformation": {
+        "make": "2014 JELDWYN #14662",
+        "model": "",
+        "year": 2014
+      },
+      "createDateTime": "2014-03-04T09:35:45-07:53",
+      "homeLocation": "SURREY",
+      "mhId": 100787,
+      "mhrNumber": "099249",
+      "ownerName": {
+        "first": "TERESA",
+        "last": "RANDLE",
+        "middle": "LOUISE"
+      },
+      "ownerStatus": "ACTIVE",
+      "serialNumber": "03A001122",
+      "status": "ACTIVE"
+    }
+  ],
+  "totalResultsSize": 1
+}

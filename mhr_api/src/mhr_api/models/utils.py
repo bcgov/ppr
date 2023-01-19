@@ -756,3 +756,14 @@ def report_retry_elapsed(last_ts: _datetime):
 def is_legacy() -> bool:
     """Check that the api is using the legacy DB2 database."""
     return current_app.config.get('USE_LEGACY_DB', True)
+
+
+def date_elapsed(date_iso: str):
+    """Check if a date converted from a date string is in the past."""
+    if not date_iso or len(date_iso) < 10:
+        return False
+    test_date = date.fromisoformat(date_iso[0:10])
+    now = now_ts()
+    today_date = date(now.year, now.month, now.day)
+    # current_app.logger.info('Comparing now ' + today_date.isoformat() + ' with expiry ' + test_date.isoformat())
+    return today_date > test_date

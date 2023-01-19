@@ -109,7 +109,7 @@ COMMON_OWNER_GROUP = [
         }
     ],
     'type': 'COMMON',
-    'interest': 'UNDIVIDED 1/2',
+    'interest': 'UNDIVIDED',
     'interestNumerator': 1,
     'interestDenominator': 2,
     'tenancySpecified': True
@@ -132,7 +132,7 @@ COMMON_OWNER_GROUP = [
         }
     ],
     'type': 'COMMON',
-    'interest': 'UNDIVIDED 1/2',
+    'interest': 'UNDIVIDED',
     'interestNumerator': 5,
     'interestDenominator': 10,
     'tenancySpecified': True
@@ -741,8 +741,12 @@ def test_create_new_groups(session, type, group_count, owner_count, denominator,
         own_count += len(group.owners)
         if denominator:
             assert group.interest
-            assert group.interest_numerator == 5
-            assert group.interest_denominator == 10
+            if group.group_id == 1:
+                assert group.interest_numerator == 1
+                assert group.interest_denominator == 2
+            else:
+                assert group.interest_numerator == 5
+                assert group.interest_denominator == 10
         else:
             assert not group.interest
             assert not group.interest_numerator

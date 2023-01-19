@@ -81,11 +81,12 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
             current_app.logger.error('DB search_result save exception: ' + str(db_exception))
             raise DatabaseException(db_exception)
 
-    def update_selection(self,
+    def update_selection(self,  # pylint: disable=too-many-arguments
                          search_select,
                          account_name: str = None,
                          callback_url: str = None,
-                         certified: bool = False):
+                         certified: bool = False,
+                         staff: bool = False):
         """Update the set of search details from the search query selection.
 
         Remove any original matches that are not in the current search query selection.
@@ -112,7 +113,7 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
             return
 
         self.set_search_selection(search_select)
-        detail_response['details'] = self.build_details()
+        detail_response['details'] = self.build_details(staff)
         # current_app.logger.debug('saving updates')
         # Update summary information and save.
         select_count = len(detail_response['details'])
@@ -131,7 +132,7 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
                 self.callback_url = current_app.config.get('UI_SEARCH_CALLBACK_URL')
         self.save()
 
-    def build_details(self):
+    def build_details(self, staff: bool = False):
         """Generate the search selection details."""
         new_results = []
         use_legacy_db: bool = current_app.config.get('USE_LEGACY_DB', True)
@@ -149,6 +150,7 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
                     current_app.logger.debug(f'find_by_id for mhr num {mhr_num} start id={mh_id}')
                     record = MhrRegistration.find_by_id(mh_id, use_legacy_db, True)
                     current_app.logger.debug(f'find_by_id for mhr num {mhr_num} end')
+                    record.staff = staff
                     result = record.registration_json
                     if select.get('includeLienInfo', False):
                         current_app.logger.info(f'Searching PPR for MHR num {mhr_num}.')

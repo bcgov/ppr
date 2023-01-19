@@ -184,7 +184,7 @@ class Db2Manuhome(db.Model):
             current_app.logger.debug('Db2Manuhome.find_by_id Db2Location query.')
             manuhome.reg_location = Db2Location.find_by_manuhome_id_active(manuhome.id)
             current_app.logger.debug('Db2Manuhome.find_by_id Db2Mhomnote query.')
-            manuhome.reg_notes = Db2Mhomnote.find_by_manuhome_id_active(manuhome.id)
+            manuhome.reg_notes = Db2Mhomnote.find_by_manuhome_id(manuhome.id)
             current_app.logger.debug('Db2Manuhome.find_by_id completed.')
         return manuhome
 
@@ -517,26 +517,26 @@ class Db2Manuhome(db.Model):
     def adjust_group_interest(groups, new: bool):
         """For TC and optionally JT groups adjust group interest value."""
         tc_count: int = 0
-        common_denominator: int = 0
+        # common_denominator: int = 0
         for group in groups:
             if group.tenancy_type != Db2Owngroup.TenancyTypes.SOLE and \
                     group.status == Db2Owngroup.StatusTypes.ACTIVE and \
                     group.interest_numerator and group.interest_denominator and \
                     group.interest_numerator > 0 and group.interest_denominator > 0:
                 tc_count += 1
-                if common_denominator == 0:
-                    common_denominator = group.interest_denominator
-                elif group.interest_denominator > common_denominator:
-                    common_denominator = group.interest_denominator
+        #        if common_denominator == 0:
+        #            common_denominator = group.interest_denominator
+        #        elif group.interest_denominator > common_denominator:
+        #            common_denominator = group.interest_denominator
         if tc_count > 0:
             for group in groups:
                 if new or (group.modified and group.status == Db2Owngroup.StatusTypes.ACTIVE):
-                    num = group.interest_numerator
-                    den = group.interest_denominator
-                    if num > 0 and den > 0:
-                        if den != common_denominator:
-                            group.interest_denominator = common_denominator
-                            group.interest_numerator = int((common_denominator/den * num))
+                    # num = group.interest_numerator
+                    # den = group.interest_denominator
+                    # if num > 0 and den > 0:
+                    #    if den != common_denominator:
+                    #        group.interest_denominator = common_denominator
+                    #        group.interest_numerator = int((common_denominator/den * num))
                     if group.interest.upper().startswith(model_utils.OWNER_INTEREST_UNDIVIDED):
                         group.interest = model_utils.OWNER_INTEREST_UNDIVIDED + ' '
                     else:

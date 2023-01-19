@@ -25,6 +25,8 @@ from mhr_api.reports.v2.report import Report
 from mhr_api.reports.v2.report_utils import ReportTypes
 
 
+SEARCH_RESULT_NOTES_DATAFILE = 'tests/unit/reports/data/search-detail-notes-example.json'
+SEARCH_RESULT_NOTES_PDFFILE = 'tests/unit/reports/data/search-detail-notes-example.pdf'
 SEARCH_RESULT_MHR_DATAFILE = 'tests/unit/reports/data/search-detail-mhr-example.json'
 SEARCH_RESULT_SERIAL_DATAFILE = 'tests/unit/reports/data/search-detail-serial-example.json'
 SEARCH_RESULT_OWNER_DATAFILE = 'tests/unit/reports/data/search-detail-owner-example.json'
@@ -295,3 +297,16 @@ def check_response(content, status_code, filename: str = None):
 
 def is_report_v2() -> bool:
     return  current_app.config.get('REPORT_VERSION', '') == REPORT_VERSION_V2
+
+
+def test_search_result_notes(session, client, jwt):
+    """Assert that setup for an search result report with unit notes is as expected."""
+    # setup
+    if is_report_v2():
+        json_data = get_json_from_file(SEARCH_RESULT_NOTES_DATAFILE)
+        report = Report(json_data, 'PS12345', ReportTypes.SEARCH_DETAIL_REPORT, 'Account Name')
+        # test
+        content, status, headers = report.get_pdf()
+        assert headers
+        # verify
+        check_response(content, status, SEARCH_RESULT_NOTES_PDFFILE)

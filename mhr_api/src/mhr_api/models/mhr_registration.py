@@ -141,6 +141,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
     reg_json: dict = None
     current_view: bool = False
     change_registrations = []
+    staff: bool = False
 
     @property
     def json(self) -> dict:
@@ -190,11 +191,27 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         """Return the search version of the registration as a json object."""
         if self.manuhome:
             reg_json = self.manuhome.registration_json
-            # Inject note document type descriptions here.
+            # Inject note document type descriptions here. Apply all unit note business rules here.
             if reg_json and reg_json.get('notes'):
                 for note in reg_json.get('notes'):
                     doc_desc = ''
                     doc_type = note.get('documentType', '')
+                    current_app.logger.debug('updating doc type=' + doc_type)
+                    if not self.staff and doc_type == 'FZE':  # Only staff can see remarks.
+                        note['remarks'] = ''
+                    elif doc_type == 'TAXN' and note.get('status') != 'A':  # Conditionally display remarks.
+                        note['remarks'] = ''
+                    # No remarks if expiry elapsed.
+                    elif doc_type in ('CAU', 'CAUC', 'CAUE') and note.get('expiryDate') and \
+                            model_utils.date_elapsed(note.get('expiryDate')):
+                        note['remarks'] = ''
+                    if doc_type == 'FZE':  # Do not display contact info.
+                        if note.get('contactName'):
+                            del note['contactName']
+                        if note.get('contactAddress'):
+                            del note['contactAddress']
+                        if note.get('contactPhoneNumber'):
+                            del note['contactPhoneNumber']
                     if FROM_LEGACY_DOC_TYPE.get(doc_type):
                         doc_type = FROM_LEGACY_DOC_TYPE.get(doc_type)
                     doc_type_info: MhrDocumentType = MhrDocumentType.find_by_doc_type(doc_type)
@@ -739,7 +756,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                 group.owners.append(MhrParty.create_from_json(owner_json, party_type, self.id))
             self.owner_groups.append(group)
         # Update interest common denominator
-        self.adjust_group_interest(True)
+        # self.adjust_group_interest(True)
 
     def add_new_groups(self, json_data, existing_count: int):
         """Create owner groups and owners for a change (transfer) registration."""
@@ -760,7 +777,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                     new_group.owners.append(MhrParty.create_from_json(owner_json, party_type, self.id))
                 current_app.logger.info(f'Creating owner group id={group_id} reg id={new_group.registration_id}')
                 self.owner_groups.append(new_group)
-            self.adjust_group_interest(False)
+            # self.adjust_group_interest(False)
 
     def remove_groups(self, json_data, new_reg_id):
         """Set change registration id for removed owner groups and owners for a transfer registration."""
