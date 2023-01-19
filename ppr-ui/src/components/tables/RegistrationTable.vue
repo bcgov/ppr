@@ -3,7 +3,7 @@
     <date-picker
       v-show="showDatePicker"
       ref="datePicker"
-      :setEndDate=null
+      :setEndDate="submittedEndDate"
       :setStartDate="submittedStartDate"
       :setDisableEndDate="!isPpr"
       @submit="updateDateRange($event)"

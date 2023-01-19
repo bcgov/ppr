@@ -70,8 +70,8 @@ import {
 export default defineComponent({
   name: 'DatePicker',
   props: {
-    setEndDate: { type: String },
-    setStartDate: { type: String }
+    setEndDate: { type: Date },
+    setStartDate: { type: Date }
   },
   emits: ['submit'],
   setup (props, { emit }) {
