@@ -40,7 +40,7 @@
             </v-btn>
           </v-col>
           <v-col cols="12">
-            <p class="info-text">Enter as much of the legal land description you have.</p>
+            <p class="info-text">Enter as much of the legal land description as you have.</p>
             <p v-if="isReserve" class="info-text pt-2" :class="{ 'error-text': validate && !isValidLocationInfo }">
               <strong>Band Name and Reserve Number</strong> are required.
             </p>

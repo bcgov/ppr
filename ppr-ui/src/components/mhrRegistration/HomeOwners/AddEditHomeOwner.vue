@@ -446,7 +446,7 @@ export default defineComponent({
       return {
         groupId: group.groupId || 1,
         type: group?.type || '',
-        interest: group?.interest || '',
+        interest: group?.interest || 'Undivided',
         interestNumerator: group?.interestNumerator || null,
         interestDenominator: group?.interestDenominator || null,
         tenancySpecified: group?.tenancySpecified || false
@@ -457,13 +457,19 @@ export default defineComponent({
       find(getTransferOrRegistrationHomeOwnerGroups(), { groupId: props.editHomeOwner?.groupId })?.owners.length > 1
 
     if (allFractionalData.length === 0 || props.editHomeOwner == null || hasMultipleOwnersInGroup) {
+      // Default LCM to be used if all denominators are the identical. UX feature for MHR's only
+      const defaultLcm = allFractionalData
+        .every(group => group.interestDenominator === allFractionalData[0]?.interestDenominator) && !props.isMhrTransfer
+        ? allFractionalData[0]?.interestDenominator
+        : null
+
       allFractionalData.push({
         groupId: (allFractionalData.length + 1),
         type: 'N/A',
-        interest: '',
+        interest: 'Undivided',
         interestNumerator: null,
-        interestDenominator: null,
-        tenancySpecified: false // Default to satisfy schema
+        interestDenominator: defaultLcm,
+        tenancySpecified: false
       } as FractionalOwnershipWithGroupIdIF)
     }
 
