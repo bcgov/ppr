@@ -51,6 +51,7 @@
           @registration-incomplete="registrationIncomplete()"
           @error="emitError()"
           @submit="submit()"
+          @cancelProceed="resetAllValidations()"
         />
       </v-col>
     </v-row>
@@ -251,6 +252,7 @@ export default defineComponent({
       isRouteName,
       registrationIncomplete,
       submit,
+      resetAllValidations,
       ...toRefs(localState)
     }
   }

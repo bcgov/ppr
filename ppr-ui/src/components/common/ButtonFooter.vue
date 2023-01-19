@@ -209,7 +209,10 @@ export default defineComponent({
     }
     const handleDialogResp = (val: boolean) => {
       localState.showCancelDialog = false
-      if (!val) goToDashboard()
+      if (!val) {
+        emit('cancelProceed')
+        goToDashboard()
+      }
     }
     /** Save the draft version from data stored in the state model. */
     const saveDraft = async (): Promise<Boolean> => {
