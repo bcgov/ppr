@@ -235,7 +235,12 @@ export default defineComponent({
 
     const countryProvincesHelpers = useCountriesProvinces()
 
-    const { addSecuredParty, setRegisteringParty, isExistingSecuredParty } = useSecuredParty(props, context)
+    const {
+      setRegisteringParty,
+      isExistingSecuredParty,
+      addEditSecuredParty,
+      currentSecuredParty
+    } = useSecuredParty(props, context)
 
     const selectParty = (idx: number) => {
       const selectedResult = localState.results[idx]
@@ -249,7 +254,8 @@ export default defineComponent({
         newParty.action = ActionTypes.EDITED
         setRegisteringParty(newParty)
       } else {
-        addSecuredParty(newParty, props.activeIndex)
+        currentSecuredParty.value = newParty
+        addEditSecuredParty()
       }
       context.emit('emitResetClose')
     }
@@ -259,7 +265,8 @@ export default defineComponent({
         localState.party.action = ActionTypes.EDITED
         setRegisteringParty(localState.party)
       } else {
-        addSecuredParty(localState.party, props.activeIndex)
+        currentSecuredParty.value = localState.party
+        addEditSecuredParty()
       }
       context.emit('emitResetClose')
     }

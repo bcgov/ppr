@@ -174,7 +174,8 @@
                   >
                   <v-list-item
                     v-if="(registrationFlowType === RegistrationFlowType.AMENDMENT
-                      && row.item.action === ActionTypes.REMOVED && !isSecuredPartyRestrictedList(registrationType))
+                      && (row.item.action === ActionTypes.REMOVED || row.item.action === ActionTypes.EDITED) &&
+                      !isSecuredPartyRestrictedList(registrationType))
                       || (isSecuredPartyRestrictedList(registrationType) && row.item.action === ActionTypes.ADDED
                       && registrationFlowType === RegistrationFlowType.AMENDMENT)"
                       class="v-remove"
