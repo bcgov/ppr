@@ -213,17 +213,16 @@ REG_FILTER_CLIENT_REF_COLLAPSE = """
       (d.documtid = mh.regdocid AND EXISTS (SELECT d2.documtid
                                               FROM document d2
                                              WHERE d2.mhregnum = mh.mhregnum
-                                               AND TRIM(d2.olbcfoli) LIKE '?%')))
+                                               AND TRIM(d2.olbcfoli) LIKE '%?%')))
 """
-REG_FILTER_USERNAME = " AND TRIM(d.affirmby) LIKE '?%'"
+REG_FILTER_USERNAME = " AND TRIM(d.affirmby) LIKE '%?%'"
 REG_FILTER_USERNAME_COLLAPSE = """
- AND (TRIM(d.affirmby) LIKE '?%' OR
+ AND (TRIM(d.affirmby) LIKE '%?%' OR
       (d.documtid = mh.regdocid AND EXISTS (SELECT d2.documtid
                                               FROM document d2
                                              WHERE d2.mhregnum = mh.mhregnum
-                                               AND TRIM(d2.affirmby) LIKE '?%')))
+                                               AND TRIM(d2.affirmby) LIKE '%?%')))
 """
-# REG_FILTER_DATE = " AND TO_CHAR(d.regidate, 'YYYY-MM-DD') = '?'"
 REG_FILTER_DATE = ' AND d.regidate BETWEEN :query_start AND :query_end'
 REG_FILTER_DATE_COLLAPSE = """
  AND (d.regidate BETWEEN :query_start AND :query_end OR
