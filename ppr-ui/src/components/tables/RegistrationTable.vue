@@ -5,6 +5,7 @@
       ref="datePicker"
       :setEndDate="submittedEndDate"
       :setStartDate="submittedStartDate"
+      :setDisableEndDate="!isPpr"
       @submit="updateDateRange($event)"
     />
 
@@ -645,7 +646,7 @@ export default defineComponent({
         emit('sort', {
           sortOptions: {
             endDate: endDate,
-            folNum: folNum,
+            folNum: props.isPpr ? folNum : folNum.toUpperCase(),
             orderBy: orderBy,
             orderVal: orderVal,
             regBy: regBy,
