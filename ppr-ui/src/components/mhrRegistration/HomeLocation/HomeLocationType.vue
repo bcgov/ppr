@@ -137,6 +137,7 @@
                         :disable="showLocationInfo"
                         @setPid="handlePidInfo($event)"
                         @verifyingPid="isVerifyingPid = $event"
+                        :required="otherTypeOption === HomeLocationTypes.OTHER_STRATA && validate"
                       />
 
                       <HomeLocationDescription
@@ -169,6 +170,7 @@
                         :disable="showLocationInfo"
                         @setPid="handlePidInfo($event)"
                         @verifyingPid="isVerifyingPid = $event"
+                        :required="otherTypeOption === HomeLocationTypes.OTHER_TYPE && validate"
                       />
 
                       <HomeLocationDescription

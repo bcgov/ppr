@@ -96,7 +96,8 @@ export default defineComponent({
     BaseDialog
   },
   props: {
-    disable: { type: Boolean, default: false }
+    disable: { type: Boolean, default: false },
+    required: { type: Boolean, default: false }
   },
   setup (props, context) {
     // Composable(s)
@@ -121,15 +122,17 @@ export default defineComponent({
       requestParcelIdentified: computed((): string => {
         return `${localState.pidOne}-${localState.pidTwo}-${localState.pidThree}`
       }),
+      isRequired: computed((): boolean => props.required && !localState.isCompletePid),
       isValidPid: computed((): boolean => {
         return (
+          !localState.isRequired &&
           (localState.pidOne ? /^\d+$/g.test(localState.pidOne) : true) &&
           (localState.pidTwo ? /^\d+$/g.test(localState.pidTwo) : true) &&
           (localState.pidThree ? /^\d+$/g.test(localState.pidThree) : true)
         )
       }),
       invalidPidMsg: computed(() => {
-        return localState.isValidPid ? [] : ['Enter a valid PID']
+        return localState.isValidPid ? [] : ['Enter a valid 9 digit PID']
       })
     })
 
@@ -165,6 +168,11 @@ export default defineComponent({
       localState.pidThree = ''
       localState.legalDescription = ''
       emitPid()
+      // Wait for pidThree watcher to complete and got to first field
+      setTimeout(() => {
+        // @ts-ignore - function exists
+        context.refs.pidOneRef.focus()
+      }, 10)
     }
     const emitPid = (): void => {
       context.emit('setPid',
