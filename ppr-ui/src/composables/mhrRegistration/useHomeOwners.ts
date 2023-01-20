@@ -12,7 +12,7 @@ import { useActions, useGetters } from 'vuex-composition-helpers'
 import { ActionTypes, HomeTenancyTypes } from '@/enums'
 import { MhrCompVal, MhrSectVal } from '@/composables/mhrRegistration/enums'
 import { useMhrValidations } from '@/composables'
-import { find, findIndex, remove, set, sumBy } from 'lodash'
+import { find, findIndex, remove, set } from 'lodash'
 
 const DEFAULT_GROUP_ID = 1
 

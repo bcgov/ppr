@@ -12,6 +12,12 @@ export const useInputRules = () => {
     ]
   }
 
+  const isLettersOnly = (customMsg: string = null): Array<Function> => {
+    return [
+      v => (v ? /^[a-zA-Z_ ]*$/g.test(v) : true) || `Enter letters only. ${customMsg}`
+    ]
+  }
+
   const isStringOrNumber = (): Array<Function> => {
     return [
       v => (v ? /^[a-zA-Z0-9_ ]*$/g.test(v) : true) || 'Invalid characters'
@@ -104,6 +110,7 @@ export const useInputRules = () => {
     isEmail,
     isEmpty,
     invalidSpaces,
+    isLettersOnly,
     isStringOrNumber,
     required,
     isNumber,

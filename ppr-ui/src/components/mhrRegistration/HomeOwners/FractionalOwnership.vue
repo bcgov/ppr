@@ -6,8 +6,12 @@
     </div>
     <div v-else>
       <p class="mt-3 mb-6">
-        Enter the interest type and fraction of the total ownership owned by Group 1. For example, if there are four
-        owner groups, this group could have 1/4 ownership.
+        Enter the interest type and fraction of the total ownership owned by [Group {{groupId}}].
+        <br>For example, if there are four owner groups, this group could have 1/4 ownership.
+      </p>
+      <p class="mt-3 mb-6">
+        <strong>Note:</strong> It is recommended that all groups use the same denominator for Total Available
+        (preferably using the lowest common denominator).
       </p>
       <v-text-field
         :id="`interest-type-group-${groupId}`"
@@ -15,6 +19,7 @@
         filled
         class="background-white"
         v-model="fractionalData.interest"
+        :rules="isLettersOnly('Do not include the fraction in the Interest Type field.')"
         :data-test-id="`interest-type-field-group-${groupId}`"
       />
       <div class="owner-fractions">
@@ -79,16 +84,21 @@ export default defineComponent({
     isReadOnly: { type: Boolean, default: false },
     fractionalData: {
       type: Object,
-      default: null,
+      default: {
+        type: '',
+        interest: 'Undivided',
+        interestNumerator: null,
+        interestDenominator: null,
+        tenancySpecified: null
+      },
       required: true
     }
   },
   setup (props) {
-    const { customRules, required, isNumber, greaterThan, lessThan } = useInputRules()
+    const { customRules, required, isNumber, greaterThan, lessThan, isLettersOnly } = useInputRules()
 
     const localState = reactive({
       id: props.editHomeOwner?.ownerId || (DEFAULT_OWNER_ID++).toString(),
-      fractionalInfo: props.fractionalData,
       fractionalInterest: computed(
         () =>
           // eslint-disable-next-line max-len
@@ -101,12 +111,12 @@ export default defineComponent({
           isNumber(null, 6, null, null) // check for length (maxLength can't be used because field is numeric)
         )
         // additional validation when interest total has some value - UX feedback
-        if (localState.fractionalInfo.interestDenominator) {
+        if (props.fractionalData.interestDenominator) {
           rules = customRules(
             required('Enter amount owned by this group'),
             isNumber(null, null, null, null), // check for numbers only
             isNumber(null, 6, null, null), // check for length (maxLength can't be used because field is numeric)
-            greaterThan(Number(localState.fractionalInfo.interestDenominator - 1),
+            greaterThan(Number(props.fractionalData.interestDenominator - 1),
               'Must be less than total available'
             )
           )
@@ -118,12 +128,13 @@ export default defineComponent({
           required('Enter total available'),
           isNumber(null, null, null, null), // check for numbers only
           isNumber(null, 6, null, null), // check for length (maxLength can't be used because field is numeric)
-          lessThan(Number(localState.fractionalInfo.interestNumerator), 'Must be greater than amount owned by group')
+          lessThan(Number(props.fractionalData.interestNumerator), 'Must be greater than amount owned by group')
         )
       )
     })
 
     return {
+      isLettersOnly,
       ...toRefs(localState)
     }
   }
