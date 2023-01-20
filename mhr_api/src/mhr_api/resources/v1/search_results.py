@@ -153,7 +153,12 @@ def post_search_results(search_id: str):  # pylint: disable=too-many-branches, t
             # Save the search query selection and details that match the selection.
             account_name = resource_utils.get_account_name(jwt.get_token_auth_header(), account_id)
             current_app.logger.debug('SearchResult.update_selection start')
-            search_detail.update_selection(request_json, account_name, callback_url, certified)
+            # Add user access group for conditional report content.
+            search_detail.update_selection(request_json,
+                                           account_name,
+                                           callback_url,
+                                           certified,
+                                           is_staff_account(account_id, jwt))
             query.save()
             current_app.logger.debug('SearchResult.update_selection end')
         except Exception as db_exception:   # noqa: B902; handle all db related errors.

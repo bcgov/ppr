@@ -88,7 +88,7 @@ TEST_DATA_GROUP_INTEREST = [
 ]
 # testdata pattern is ({group1}, {group2}, {group3}, {interest1}, {interest2}, {interest3})
 TEST_DATA_GROUP_INTEREST2 = [
-    (COMMON_GROUP_1, COMMON_GROUP_2, COMMON_GROUP_3, 'UNDIVIDED 2/8', 'UNDIVIDED 2/8', 'UNDIVIDED 4/8')
+    (COMMON_GROUP_1, COMMON_GROUP_2, COMMON_GROUP_3, 'UNDIVIDED 1/4', 'UNDIVIDED 2/8', 'UNDIVIDED 2/4')
 ]
 
 

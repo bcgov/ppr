@@ -127,7 +127,7 @@ class Db2Mhomnote(db.Model):
     def json(self):
         """Return a dict of this object, with keys in JSON format."""
         note = {
-            'documentType': self.document_type,
+            'documentType': self.document_type.strip(),
             'documentId': self.reg_document_id,
             'remarks': self.remarks,
             'destroyed': False
@@ -148,8 +148,9 @@ class Db2Mhomnote(db.Model):
     def registration_json(self):
         """Return a search registration dict of this object, with keys in JSON format."""
         note = {
-            'documentType': self.document_type,
+            'documentType': self.document_type.strip(),
             'documentId': self.reg_document_id,
+            'status': self.status,
             'remarks': self.remarks,
             'contactName': self.name,
             'contactAddress': address_utils.get_address_from_db2(self.legacy_address)
