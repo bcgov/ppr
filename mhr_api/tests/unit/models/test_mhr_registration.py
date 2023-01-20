@@ -185,6 +185,13 @@ TEST_DATA_TRANSFER = [
     ('150062', MANUFACTURER_GROUP, '8', '2523'),
     ('150062', QUALIFIED_USER_GROUP, '1', '2523')
 ]
+# testdata pattern is ({mhr_num}, {group_id}, {account_id}, {party_type})
+TEST_DATA_TRANSFER_DEATH = [
+    ('150062', QUALIFIED_USER_GROUP, '2523', MhrPartyTypes.EXECUTOR),
+    ('150062', QUALIFIED_USER_GROUP, '2523', MhrPartyTypes.ADMINISTRATOR),
+    ('150062', QUALIFIED_USER_GROUP, '2523', MhrPartyTypes.TRUSTEE),
+    ('150062', QUALIFIED_USER_GROUP, '2523', MhrPartyTypes.TRUST)
+]
 # testdata pattern is ({mhr_num}, {group_id}, {account_id})
 TEST_DATA_TRANSFER_SAVE = [
     ('150062', QUALIFIED_USER_GROUP, '2523')
@@ -537,6 +544,53 @@ def test_create_transfer_from_json(session, mhr_num, user_group, doc_id_prefix, 
     sub_party = registration.parties[0]
     assert sub_party.registration_id == registration.id
     assert sub_party.party_type == MhrPartyTypes.SUBMITTING
+    if model_utils.is_legacy():
+        assert registration.manuhome
+
+
+@pytest.mark.parametrize('mhr_num,user_group,account_id,party_type', TEST_DATA_TRANSFER_DEATH)
+def test_create_transfer_death_from_json(session, mhr_num, user_group, account_id, party_type):
+    """Assert that an MHR tranfer due to death is created from MHR transfer json correctly."""
+    json_data = copy.deepcopy(TRANSFER)
+    del json_data['documentId']
+    del json_data['documentDescription']
+    del json_data['createDateTime']
+    del json_data['payment']
+    json_data['deathOfOwner'] = True
+    json_data['mhrNumber'] = mhr_num
+    for group in json_data.get('addOwnerGroups'):
+        for owner in group.get('owners'):
+            owner['partyType'] = party_type
+    base_reg: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account_id)
+    assert base_reg
+    assert base_reg.manuhome
+    # current_app.logger.info(json_data)
+    registration: MhrRegistration = MhrRegistration.create_transfer_from_json(base_reg,
+                                                                              json_data,
+                                                                              account_id,
+                                                                              'userid',
+                                                                              user_group)
+    assert registration.id > 0
+    assert registration.doc_id
+    assert json_data.get('documentId')
+    assert registration.mhr_number == mhr_num
+    assert registration.registration_ts
+    assert registration.status_type == MhrRegistrationStatusTypes.ACTIVE
+    assert registration.registration_type == MhrRegistrationTypes.TRAND
+    assert registration.account_id == account_id
+    assert registration.client_reference_id    
+    assert registration.draft
+    assert registration.draft.id > 0
+    assert registration.draft_id == registration.draft.id
+    assert registration.draft.draft_number
+    assert registration.draft.registration_type == registration.registration_type
+    assert registration.draft.create_ts == registration.registration_ts
+    assert registration.draft.account_id == registration.account_id
+    assert registration.parties
+    for group in registration.owner_groups:
+        if group.modified:
+            for owner in group.owners:
+                assert party.party_type == party_type
     if model_utils.is_legacy():
         assert registration.manuhome
 

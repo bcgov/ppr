@@ -19,7 +19,7 @@ from flask import current_app
 
 from mhr_api.models import MhrRegistration, Db2Owngroup, Db2Owner, registration_utils as reg_utils
 from mhr_api.models.type_tables import MhrRegistrationStatusTypes, MhrDocumentTypes, MhrLocationTypes, MhrStatusTypes
-from mhr_api.models.type_tables import MhrOwnerStatusTypes, MhrTenancyTypes
+from mhr_api.models.type_tables import MhrOwnerStatusTypes, MhrTenancyTypes, MhrPartyTypes
 from mhr_api.models.db2.owngroup import NEW_TENANCY_LEGACY
 from mhr_api.models.db2.utils import get_db2_permit_count
 from mhr_api.models.utils import is_legacy, to_db2_ind_name, now_ts, ts_from_iso_format, valid_tax_cert_date
@@ -66,6 +66,10 @@ LOCATION_TAX_DATE_INVALID = 'Location tax certificate date is invalid. '
 LOCATION_TAX_CERT_REQUIRED = 'Location tax certificate and tax certificate expiry date is required. '
 LOCATION_PID_INVALID = 'Location PID verification failed: either the PID is invalid or the LTSA service is ' + \
                        'unavailable. '
+PARTY_TYPE_INVALID = 'Death of owner requires an executor, trustee, administrator owner party type. '
+GROUP_PARTY_TYPE_INVALID = 'Death of owner all owner party types within the group must be identical. '
+OWNER_DESCRIPTION_REQUIRED = 'Death of owner description of owner party type is required. '
+TRANSFER_PARTY_TYPE_INVALID = 'Owner party type of administrator, executor, trustee not allowed for this registration. '
 
 
 def validate_registration(json_data, staff: bool = False):
@@ -98,6 +102,7 @@ def validate_transfer(registration: MhrRegistration, json_data, staff: bool = Fa
                                            False,
                                            registration,
                                            json_data.get('deleteOwnerGroups'))
+        error_msg += validate_owner_party_type(json_data, json_data.get('addOwnerGroups'), False)
         error_msg += validate_registration_state(registration)
         if is_legacy() and registration and registration.manuhome and json_data.get('deleteOwnerGroups'):
             error_msg += validate_delete_owners_legacy(registration, json_data)
@@ -617,4 +622,34 @@ def validate_pid(pid: str):
     lookup_result = ltsa.pid_lookup(pid)
     if not lookup_result:
         error_msg = LOCATION_PID_INVALID
+    return error_msg
+
+
+def validate_owner_party_type(json_data, groups, new: bool):
+    """Verify owner groups are valid."""
+    error_msg = ''
+    owner_death: bool = json_data.get('deathOfOwner', False)
+    if not groups:
+        return error_msg
+    for group in groups:
+        if group.get('owners'):
+            valid_type: bool = True
+            first_type: str = None
+            if group['owners'][0].get('partyType'):
+                first_type = group['owners'][0].get('partyType')
+            for owner in group['owners']:
+                party_type = owner.get('partyType', None)
+                if not new and owner_death:
+                    if not party_type or party_type not in (MhrPartyTypes.ADMINISTRATOR, MhrPartyTypes.EXECUTOR,
+                                                            MhrPartyTypes.TRUST, MhrPartyTypes.TRUSTEE):
+                        error_msg += PARTY_TYPE_INVALID
+                    if not first_type or party_type != first_type:
+                        valid_type = False
+                    if not owner.get('description'):
+                        error_msg += OWNER_DESCRIPTION_REQUIRED
+                elif not new and not owner_death and party_type in (MhrPartyTypes.ADMINISTRATOR, MhrPartyTypes.EXECUTOR,
+                                                                    MhrPartyTypes.TRUST, MhrPartyTypes.TRUSTEE):
+                    error_msg += TRANSFER_PARTY_TYPE_INVALID
+            if not valid_type and len(group['owners']) > 1:
+                error_msg += GROUP_PARTY_TYPE_INVALID
     return error_msg

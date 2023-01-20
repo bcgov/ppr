@@ -750,9 +750,11 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
             group.group_id = sequence
             # Add owners
             for owner_json in group_json.get('owners'):
-                party_type = MhrPartyTypes.OWNER_BUS
-                if owner_json.get('individualName'):
+                party_type = owner_json.get('partyType', None)
+                if not party_type and owner_json.get('individualName'):
                     party_type = MhrPartyTypes.OWNER_IND
+                elif not party_type:
+                    party_type = MhrPartyTypes.OWNER_BUS
                 group.owners.append(MhrParty.create_from_json(owner_json, party_type, self.id))
             self.owner_groups.append(group)
         # Update interest common denominator
@@ -771,9 +773,11 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                 group_id += 1
                 # Add owners
                 for owner_json in group_json.get('owners'):
-                    party_type = MhrPartyTypes.OWNER_BUS
-                    if owner_json.get('individualName'):
+                    party_type = owner_json.get('partyType', None)
+                    if not party_type and owner_json.get('individualName'):
                         party_type = MhrPartyTypes.OWNER_IND
+                    elif not party_type:
+                        party_type = MhrPartyTypes.OWNER_BUS
                     new_group.owners.append(MhrParty.create_from_json(owner_json, party_type, self.id))
                 current_app.logger.info(f'Creating owner group id={group_id} reg id={new_group.registration_id}')
                 self.owner_groups.append(new_group)

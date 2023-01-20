@@ -41,6 +41,8 @@ class MhrParty(db.Model):  # pylint: disable=too-many-instance-attributes
     email_id = db.Column('email_address', db.String(250), nullable=True)
     phone_number = db.Column('phone_number', db.String(20), nullable=True)
     phone_extension = db.Column('phone_extension', db.String(10), nullable=True)
+    suffix = db.Column('suffix', db.String(100), nullable=True)
+    description = db.Column('description', db.String(150), nullable=True)
 
     # parent keys
     address_id = db.Column('address_id', db.Integer, db.ForeignKey('addresses.id'), nullable=True, index=True)
@@ -97,6 +99,10 @@ class MhrParty(db.Model):  # pylint: disable=too-many-instance-attributes
             party['phoneNumber'] = self.phone_number
         if self.phone_extension:
             party['phoneExtension'] = self.phone_extension
+        if self.description:
+            party['description'] = self.description
+        if self.suffix:
+            party['suffix'] = self.suffix
         return party
 
     @classmethod

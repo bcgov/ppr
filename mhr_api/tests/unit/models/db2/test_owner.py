@@ -16,15 +16,29 @@
 
 Test-Suite to ensure that the legacy DB2 Owner Model is working as expected.
 """
+import copy
 
 import pytest
 
 from flask import current_app
 
-from mhr_api.models import Db2Owner, Db2Owngroup
+from mhr_api.models import Db2Owner, Db2Owngroup, MhrRegistration
 from mhr_api.models.type_tables import MhrPartyTypes
 
 
+OWNER_ORG = {
+    'organizationName': 'ORG NAME HERE.',
+    'address': {
+    'street': '3122B LYNNLARK PLACE',
+    'city': 'VICTORIA',
+    'region': 'BC',
+    'postalCode': ' ',
+    'country': 'CA'
+    },
+    'emailAddress': 'bsmith@abc-search.com',
+    'phoneNumber': '6041234567',
+    'phoneExtension': '546'
+}
 # testdata pattern is ({exists}, {manuhome_id}, {owner_id}, {type})
 TEST_DATA = [
     (True, 1, 1, 'I'),
@@ -38,9 +52,16 @@ TEST_DATA_PARTY_TYPE = [
    ('B', 'TEST', 'EXECUTOR TEST', MhrPartyTypes.EXECUTOR),
    ('B', 'TEST', 'EXECUTRIX TEST', MhrPartyTypes.EXECUTOR),
    ('B', 'TEST', 'TRUSTEE TEST', MhrPartyTypes.TRUSTEE),
+   ('B', 'TEST', 'TRUST TEST', MhrPartyTypes.TRUST),
    ('B', 'TEST', 'ADMINISTRATOR TEST', MhrPartyTypes.ADMINISTRATOR)
 ]
-
+# testdata pattern is ({party_type}, {description}, {suffix})
+TEST_DATA_PARTY_TYPE_CREATE = [
+   (MhrPartyTypes.ADMINISTRATOR, 'Administrator of estate of John Smith', 'ADMINISTRATOR OF ESTATE OF JOHN SMITH'),
+   (MhrPartyTypes.EXECUTOR, 'estate of John Smith', 'EXECUTOR ESTATE OF JOHN SMITH'),
+   (MhrPartyTypes.TRUSTEE, 'Trustee of estate of John Smith', 'TRUSTEE OF ESTATE OF JOHN SMITH'),
+   (MhrPartyTypes.TRUST, 'estate of John Smith', 'TRUST ESTATE OF JOHN SMITH')
+]
 
 @pytest.mark.parametrize('exists,manuhome_id,owner_id,type', TEST_DATA)
 def test_find_by_manuhome_id(session, exists, manuhome_id, owner_id, type):
@@ -95,6 +116,17 @@ def test_party_type(session, owner_type, name, suffix, party_type):
     assert owner_json.get('partyType') == party_type
     owner_json = owner.new_registration_json
     assert owner_json.get('partyType') == party_type
+
+
+@pytest.mark.parametrize('party_type,description,suffix', TEST_DATA_PARTY_TYPE_CREATE)
+def test_party_type_create(session, party_type, description, suffix):
+    json_data = copy.deepcopy(OWNER_ORG)
+    json_data['partyType'] = party_type
+    json_data['description'] = description
+    reg: MhrRegistration = MhrRegistration(id=1)
+    owner: Db2Owner = Db2Owner.create_from_registration(reg, json_data, 1, 1)
+    assert owner.get_party_type() == party_type
+    assert owner.suffix == suffix
 
 
 def test_owner_json(session):
