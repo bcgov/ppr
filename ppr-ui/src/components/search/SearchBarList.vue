@@ -54,7 +54,7 @@
   </v-select>
 </template>
 <script lang="ts">
-import { defineComponent, reactive, toRefs, computed, ref } from '@vue/composition-api'
+import { defineComponent, reactive, toRefs, computed, ref, watch } from '@vue/composition-api'
 import { useGetters } from 'vuex-composition-helpers'
 import { MHRSearchTypes, SearchTypes } from '@/resources'
 import { UISearchTypes, APISearchTypes } from '@/enums'
@@ -136,10 +136,13 @@ export default defineComponent({
       isPPROnly: computed((): boolean => hasPprRole.value && !hasMhrRoleEnabled.value),
       displayItems: [],
       displayGroup: {
-        1: !(hasPprRole.value && hasMhrRoleEnabled.value),
+        1: true, // default, fallback state for safety
         2: false
       },
       showMenu: false
+    })
+    watch(() => [hasPprRole.value, hasMhrRoleEnabled.value], () => {
+      localState.displayGroup[1] = !(hasPprRole.value && hasMhrRoleEnabled.value)
     })
     const toggleGroup = (group: number) => {
       const initial = localState.displayGroup[group]
@@ -208,7 +211,7 @@ export default defineComponent({
   color: $gray7 !important;
 }
 
-.select-menu-padding {
+::v-deep .select-menu-padding {
   padding-left: 49px;
 }
 .search-list-header {
