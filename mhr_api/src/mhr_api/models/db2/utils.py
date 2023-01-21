@@ -413,10 +413,10 @@ def find_all_by_account_id(params: AccountRegistrationParams):
                 mhr_numbers += f"'{mhr_number}'"
             query = text(build_account_query(params, mhr_numbers, doc_types))
             if params.has_filter() and params.filter_reg_start_date and params.filter_reg_end_date:
-                start_date = model_utils.date_from_iso_format(params.filter_reg_start_date)
-                end_date = model_utils.date_from_iso_format(params.filter_reg_end_date)
+                start_ts = model_utils.search_ts_local(params.filter_reg_start_date, True)
+                end_ts = model_utils.search_ts_local(params.filter_reg_end_date, False)
                 result = db.get_engine(current_app, 'db2').execute(query,
-                                                                   {'query_start': start_date, 'query_end': end_date})
+                                                                   {'query_start': start_ts, 'query_end': end_ts})
             else:
                 result = db.get_engine(current_app, 'db2').execute(query)
             rows = result.fetchall()
