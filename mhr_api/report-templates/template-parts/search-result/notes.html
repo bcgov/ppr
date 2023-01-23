@@ -75,11 +75,6 @@
                             {% endif %}
                         </td>
                     </tr>
-                    {% if note.documentType == 'CAUC' and (note.expiryDate is not defined or note.expiryDate == '') %}
-                    <tr>
-                        <td class="section-sub-title pt-2" colspan="2">Continued until further order of the court.</td>
-                    </tr>
-                    {% endif %}
             </table>
             </div>
         {% endif %}    

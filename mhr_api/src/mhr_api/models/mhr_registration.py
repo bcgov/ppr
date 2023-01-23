@@ -199,6 +199,10 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                     current_app.logger.debug('updating doc type=' + doc_type)
                     if not self.staff and doc_type == 'FZE':  # Only staff can see remarks.
                         note['remarks'] = ''
+                    elif not self.staff and doc_type == 'REGC' and note.get('remarks') and \
+                            note['remarks'] != 'MANUFACTURED HOME REGISTRATION CANCELLED':
+                        # Only staff can see remarks if not default.
+                        note['remarks'] = 'MANUFACTURED HOME REGISTRATION CANCELLED'
                     elif doc_type == 'TAXN' and note.get('status') != 'A':  # Conditionally display remarks.
                         note['remarks'] = ''
                     # No remarks if expiry elapsed.
