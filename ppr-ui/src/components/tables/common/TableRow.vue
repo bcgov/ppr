@@ -82,7 +82,8 @@
           <v-icon color="primary" small v-bind="attrs" v-on="on">mdi-information-outline</v-icon>
         </template>
         <div class="pt-2 pb-2">
-          {{ convertedTooltipText }}
+          The records for this registration were converted from paper to digital format on November 14, 1995, and may
+          not contain the full history of transactions prior to the conversion date.
         </div>
       </v-tooltip>
       </div>
@@ -512,9 +513,6 @@ export default defineComponent({
 
     })
 
-    const convertedTooltipText: string = 'The records for this registration were converted from paper to digital ' +
-      'format on November 14, 1995, and may not contain the full history of transactions prior to the conversion date.'
-
     const deleteDraft = (item: DraftResultIF): void => {
       emit('action', {
         action: TableActions.DELETE,
@@ -775,7 +773,6 @@ export default defineComponent({
     return {
       freezeScrolling,
       APIMhrDescriptionTypes,
-      convertedTooltipText,
       getFormattedDate,
       getRegistrationType,
       getStatusDescription,
