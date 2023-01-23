@@ -42,6 +42,19 @@ OWNER_IND = {
     'phoneNumber': '6041234567',
     'phoneExtension': '546'
 }
+OWNER_ORG = {
+    'organizationName': 'ORG NAME HERE.',
+    'address': {
+    'street': '3122B LYNNLARK PLACE',
+    'city': 'VICTORIA',
+    'region': 'BC',
+    'postalCode': ' ',
+    'country': 'CA'
+    },
+    'emailAddress': 'bsmith@abc-search.com',
+    'phoneNumber': '6041234567',
+    'phoneExtension': '546'
+}
 SUBMITTING_IND = {
     'personName': {
         'first': 'JANE',
@@ -68,6 +81,19 @@ TEST_IND_DATA = [
 TEST_ID_DATA = [
     (200000000, True),
     (300000000, False)
+]
+# testdata pattern is ({data}, {party_type}, {expected})
+TEST_PARTY_TYPE_DATA = [
+    (OWNER_IND, None, MhrPartyTypes.OWNER_IND),
+    (OWNER_ORG, None, MhrPartyTypes.OWNER_BUS),
+    (OWNER_IND, MhrPartyTypes.ADMINISTRATOR, MhrPartyTypes.ADMINISTRATOR),
+    (OWNER_ORG, MhrPartyTypes.ADMINISTRATOR, MhrPartyTypes.ADMINISTRATOR),
+    (OWNER_IND, MhrPartyTypes.EXECUTOR, MhrPartyTypes.EXECUTOR),
+    (OWNER_ORG, MhrPartyTypes.EXECUTOR, MhrPartyTypes.EXECUTOR),
+    (OWNER_IND, MhrPartyTypes.TRUSTEE, MhrPartyTypes.TRUSTEE),
+    (OWNER_ORG, MhrPartyTypes.TRUSTEE, MhrPartyTypes.TRUSTEE),
+    (OWNER_IND, MhrPartyTypes.TRUST, MhrPartyTypes.TRUST),
+    (OWNER_ORG, MhrPartyTypes.TRUST, MhrPartyTypes.TRUST)
 ]
 
 
@@ -213,3 +239,19 @@ def test_create_ind_from_json(session, middle, email, phone, phone_extension, da
         assert party.phone_extension
     else:
         assert not party.phone_extension
+
+
+@pytest.mark.parametrize('data, party_type, expected', TEST_PARTY_TYPE_DATA)
+def test_party_type_from_json(session, data, party_type, expected):
+    json_data = copy.deepcopy(data)
+    if party_type:
+        json_data['partyType'] = party_type
+        p_type = party_type
+    elif json_data.get('individualName'):
+        p_type = MhrPartyTypes.OWNER_IND
+    else:
+        p_type = MhrPartyTypes.OWNER_BUS
+    party: MhrParty = MhrParty.create_from_json(json_data, p_type, 1000)
+    assert party
+    assert party.party_type == expected
+

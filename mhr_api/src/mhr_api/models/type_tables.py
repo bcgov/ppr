@@ -247,6 +247,7 @@ class MhrPartyTypes(BaseEnum):
     EXECUTOR = 'EXECUTOR'
     ADMINISTRATOR = 'ADMINISTRATOR'
     TRUSTEE = 'TRUSTEE'
+    TRUST = 'TRUST'
 
 
 class MhrRegistrationStatusTypes(BaseEnum):

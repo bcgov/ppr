@@ -24,6 +24,7 @@ from flask import current_app
 from registry_schemas.example_data.mhr import TRANSFER
 
 from mhr_api.models import MhrRegistration
+from mhr_api.models.type_tables import MhrPartyTypes
 from mhr_api.services.authz import MHR_ROLE, STAFF_ROLE, COLIN_ROLE, \
                                    TRANSFER_DEATH_JT, TRANSFER_SALE_BENEFICIARY
 from tests.unit.services.utils import create_header, create_header_account
@@ -42,7 +43,9 @@ TEST_CREATE_DATA = [
      HTTPStatus.BAD_REQUEST, None),
     ('Invalid role product', '098666', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, 'PS12345'),
     ('Invalid non-transfer role', '098666', [MHR_ROLE], HTTPStatus.UNAUTHORIZED, 'PS12345'),
+    ('Invalid transfer death role', '098666', [MHR_ROLE, TRANSFER_SALE_BENEFICIARY], HTTPStatus.UNAUTHORIZED, 'PS12345'),
     ('Valid staff', '098666', [MHR_ROLE, STAFF_ROLE, TRANSFER_SALE_BENEFICIARY], HTTPStatus.CREATED, 'PS12345'),
+    ('Valid staff death', '098666', [MHR_ROLE, STAFF_ROLE, TRANSFER_SALE_BENEFICIARY], HTTPStatus.CREATED, 'PS12345'),
     ('Valid non-staff legacy', '098666', [MHR_ROLE, TRANSFER_DEATH_JT, TRANSFER_SALE_BENEFICIARY],
      HTTPStatus.CREATED, 'PS12345'),
     ('Valid non-staff new', '150081', [MHR_ROLE, TRANSFER_DEATH_JT, TRANSFER_SALE_BENEFICIARY],
@@ -72,6 +75,15 @@ def test_create(session, client, jwt, desc, mhr_num, roles, status, account):
         del json_data['submittingParty']
     elif desc == 'Invalid non-staff missing declared value':
         del json_data['declaredValue']
+    elif desc == 'Invalid transfer death role':
+        json_data['deathOfOwner'] = True
+    elif desc == 'Valid staff death':
+        json_data['deathOfOwner'] = True
+        for group in json_data.get('addOwnerGroups'):
+            for owner in group.get('owners'):
+                owner['partyType'] = MhrPartyTypes.EXECUTOR
+                owner['description'] = MhrPartyTypes.EXECUTOR + ' of the estate of John Smith'
+
     if account:
         headers = create_header_account(jwt, roles, 'UT-TEST', account)
     else:

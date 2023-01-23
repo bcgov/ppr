@@ -767,3 +767,13 @@ def date_elapsed(date_iso: str):
     today_date = date(now.year, now.month, now.day)
     # current_app.logger.info('Comparing now ' + today_date.isoformat() + ' with expiry ' + test_date.isoformat())
     return today_date > test_date
+
+
+def search_ts_local(date_iso: str, start: bool = True):
+    """Get a search timestamp in local time zone as start or end of day."""
+    date_part = date.fromisoformat(date_iso[0:10])
+    if start:
+        day_time = time(0, 0, 0, tzinfo=LOCAL_TZ)
+        return _datetime.combine(date_part, day_time)
+    day_time = time(23, 59, 59, tzinfo=LOCAL_TZ)
+    return _datetime.combine(date_part, day_time)

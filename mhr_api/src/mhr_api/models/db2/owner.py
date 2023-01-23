@@ -33,7 +33,8 @@ select o.manhomid, o.owngrpid, o.ownerid, o.ownseqno, o.verified, o.ownrfone, o.
    and og.status in ('3', '4')
 """
 EXECUTOR_SUFFIX = 'EXEC'
-TRUSTEE_SUFFIX = 'TRUST'
+TRUST_SUFFIX = 'TRUST'
+TRUSTEE_SUFFIX = 'TRUSTEE'
 ADMIN_SUFFIX = 'ADMIN'
 
 
@@ -208,6 +209,8 @@ class Db2Owner(db.Model):
                 party_type = MhrPartyTypes.EXECUTOR
             elif suffix.find(TRUSTEE_SUFFIX) != -1:
                 party_type = MhrPartyTypes.TRUSTEE
+            elif suffix.find(TRUST_SUFFIX) != -1:
+                party_type = MhrPartyTypes.TRUST
             elif suffix.find(ADMIN_SUFFIX) != -1:
                 party_type = MhrPartyTypes.ADMINISTRATOR
         return party_type
@@ -244,6 +247,15 @@ class Db2Owner(db.Model):
             name = model_utils.to_db2_ind_name(new_info.get('individualName', ''))
             owner_type = Db2Owner.OwnerTypes.INDIVIDUAL.value
         compressed_name = model_utils.get_compressed_key(name)
+        suffix: str = new_info.get('suffix', '')
+        if suffix:
+            suffix = suffix.strip().upper()
+        if new_info.get('partyType') and new_info.get('description'):
+            suffix = str(new_info.get('description')).strip().upper()
+            if suffix.find(new_info.get('partyType')) < 0:
+                suffix = new_info.get('partyType') + ' ' + suffix
+        if len(suffix) > 70:
+            suffix = suffix[0:70]
         owner = Db2Owner(manuhome_id=registration.id,
                          group_id=group_id,
                          owner_id=owner_id,
@@ -252,8 +264,8 @@ class Db2Owner(db.Model):
                          verified_flag='',
                          phone_number=str(new_info.get('phoneNumber', ''))[0:10],
                          postal_code=address.get('postalCode', ''),
-                         name=name[0:69],
+                         name=name[0:70],
                          compressed_name=compressed_name,
-                         suffix=new_info.get('suffix', ''),
+                         suffix=suffix,
                          legacy_address=address_utils.to_db2_address(address))
         return owner

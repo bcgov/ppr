@@ -213,17 +213,16 @@ REG_FILTER_CLIENT_REF_COLLAPSE = """
       (d.documtid = mh.regdocid AND EXISTS (SELECT d2.documtid
                                               FROM document d2
                                              WHERE d2.mhregnum = mh.mhregnum
-                                               AND TRIM(d2.olbcfoli) LIKE '?%')))
+                                               AND TRIM(d2.olbcfoli) LIKE '%?%')))
 """
-REG_FILTER_USERNAME = " AND TRIM(d.affirmby) LIKE '?%'"
+REG_FILTER_USERNAME = " AND TRIM(d.affirmby) LIKE '%?%'"
 REG_FILTER_USERNAME_COLLAPSE = """
- AND (TRIM(d.affirmby) LIKE '?%' OR
+ AND (TRIM(d.affirmby) LIKE '%?%' OR
       (d.documtid = mh.regdocid AND EXISTS (SELECT d2.documtid
                                               FROM document d2
                                              WHERE d2.mhregnum = mh.mhregnum
-                                               AND TRIM(d2.affirmby) LIKE '?%')))
+                                               AND TRIM(d2.affirmby) LIKE '%?%')))
 """
-# REG_FILTER_DATE = " AND TO_CHAR(d.regidate, 'YYYY-MM-DD') = '?'"
 REG_FILTER_DATE = ' AND d.regidate BETWEEN :query_start AND :query_end'
 REG_FILTER_DATE_COLLAPSE = """
  AND (d.regidate BETWEEN :query_start AND :query_end OR
@@ -414,10 +413,10 @@ def find_all_by_account_id(params: AccountRegistrationParams):
                 mhr_numbers += f"'{mhr_number}'"
             query = text(build_account_query(params, mhr_numbers, doc_types))
             if params.has_filter() and params.filter_reg_start_date and params.filter_reg_end_date:
-                start_date = model_utils.date_from_iso_format(params.filter_reg_start_date)
-                end_date = model_utils.date_from_iso_format(params.filter_reg_end_date)
+                start_ts = model_utils.search_ts_local(params.filter_reg_start_date, True)
+                end_ts = model_utils.search_ts_local(params.filter_reg_end_date, False)
                 result = db.get_engine(current_app, 'db2').execute(query,
-                                                                   {'query_start': start_date, 'query_end': end_date})
+                                                                   {'query_start': start_ts, 'query_end': end_ts})
             else:
                 result = db.get_engine(current_app, 'db2').execute(query)
             rows = result.fetchall()

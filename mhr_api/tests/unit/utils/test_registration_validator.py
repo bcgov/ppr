@@ -22,6 +22,7 @@ from registry_schemas.example_data.mhr import REGISTRATION, TRANSFER, EXEMPTION
 from mhr_api.utils import registration_validator as validator
 from mhr_api.models import MhrRegistration
 from mhr_api.models.type_tables import MhrRegistrationStatusTypes, MhrTenancyTypes, MhrDocumentTypes, MhrLocationTypes
+from mhr_api.models.type_tables import MhrPartyTypes
 from mhr_api.models.utils import is_legacy
 
 
@@ -503,6 +504,20 @@ TEST_TRANSFER_DATA_GROUP = [
     ('Invalid add SO 2 groups', False, None, None, SO_GROUP_MULTIPLE, validator.ADD_SOLE_OWNER_INVALID),
     ('Invalid add SO 2 owners', False, None, None, SO_OWNER_MULTIPLE, validator.ADD_SOLE_OWNER_INVALID)
 ]
+# testdata pattern is ({description}, {valid}, {party_type1}, {party_type2}, {text}, {add_group}, {message content})
+TEST_TRANSFER_DEATH_DATA = [
+    ('Valid', True,  MhrPartyTypes.TRUSTEE, MhrPartyTypes.TRUSTEE, 'description', TC_GROUP_TRANSFER_ADD, None),
+    ('Invalid no party type', False, None, MhrPartyTypes.TRUSTEE, 'description', TC_GROUP_TRANSFER_ADD,
+     validator.PARTY_TYPE_INVALID),
+    ('No death invalid party type', False, None, MhrPartyTypes.EXECUTOR, 'description',
+     TC_GROUP_TRANSFER_ADD, validator.TRANSFER_PARTY_TYPE_INVALID),
+    ('Invalid party type', False, MhrPartyTypes.OWNER_BUS, MhrPartyTypes.OWNER_BUS, 'description',
+     TC_GROUP_TRANSFER_ADD, validator.PARTY_TYPE_INVALID),
+    ('Invalid party combo', False, MhrPartyTypes.TRUST, MhrPartyTypes.TRUSTEE, 'description',
+     TC_GROUP_TRANSFER_ADD, validator.GROUP_PARTY_TYPE_INVALID),
+    ('Invalid no description', False, MhrPartyTypes.TRUSTEE, MhrPartyTypes.TRUSTEE, None, TC_GROUP_TRANSFER_ADD,
+     validator.OWNER_DESCRIPTION_REQUIRED)
+]
 # testdata pattern is ({description}, {valid}, {numerator}, {denominator}, {groups}, {message content})
 TEST_REG_DATA_GROUP = [
     ('Valid TC', True, 1, 2, TC_GROUPS_VALID, None),
@@ -701,6 +716,38 @@ def test_validate_transfer_group(session, desc, valid, numerator, denominator, a
                         del group['interestDenominator']
                     else:
                         group['interestDenominator'] = denominator
+    valid_format, errors = schema_utils.validate(json_data, 'transfer', 'mhr')
+    # Additional validation not covered by the schema.
+    registration: MhrRegistration = MhrRegistration.find_by_mhr_number('045349', 'PS12345')
+    error_msg = validator.validate_transfer(registration, json_data, False)
+    if errors:
+        current_app.logger.debug(errors)
+    if valid:
+        assert valid_format and error_msg == ''
+    else:
+        assert error_msg != ''
+        if message_content:
+            assert error_msg.find(message_content) != -1
+
+
+@pytest.mark.parametrize('desc,valid,party_type1,party_type2,text,add_group,message_content', TEST_TRANSFER_DEATH_DATA)
+def test_validate_transfer_death(session, desc, valid, party_type1, party_type2, text, add_group, message_content):
+    """Assert that MH transfer due to death validation of owner groups works as expected."""
+    # setup
+    json_data = copy.deepcopy(TRANSFER)
+    json_data['deleteOwnerGroups'][0]['groupId'] = 2
+    json_data['deleteOwnerGroups'][0]['type'] = 'JOINT'
+    if desc != 'No death invalid party type':
+        json_data['deathOfOwner'] = True
+    json_data['addOwnerGroups'] = copy.deepcopy(add_group)
+    owners = json_data['addOwnerGroups'][0]['owners']
+    if text:
+        owners[0]['description'] = text
+        owners[1]['description'] = text
+    if party_type1:
+        owners[0]['partyType'] = party_type1
+    if party_type2:
+        owners[1]['partyType'] = party_type2
     valid_format, errors = schema_utils.validate(json_data, 'transfer', 'mhr')
     # Additional validation not covered by the schema.
     registration: MhrRegistration = MhrRegistration.find_by_mhr_number('045349', 'PS12345')
