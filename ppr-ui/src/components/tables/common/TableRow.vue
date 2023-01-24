@@ -69,7 +69,24 @@
         {{ getRegistrationType(item.registrationType) }}
         <span v-if="isPpr && !isChild"> - Base Registration</span>
       </div>
-      <div v-else class="pr-2">{{ getMhrDescription(item.registrationDescription) }}</div>
+      <div v-else class="pr-2">{{ getMhrDescription(item.registrationDescription) }}
+        <v-tooltip
+        v-if="item.registrationDescription === APIMhrDescriptionTypes.CONVERTED"
+        class="pa-2"
+        content-class="top-tooltip"
+        nudge-right="2"
+        top
+        transition="fade-transition"
+      >
+        <template v-slot:activator="{ on, attrs }">
+          <v-icon color="primary" small v-bind="attrs" v-on="on">mdi-information-outline</v-icon>
+        </template>
+        <div class="pt-2 pb-2">
+          The records for this registration were converted from paper to digital format on November 14, 1995, and may
+          not contain the full history of transactions prior to the conversion date.
+        </div>
+      </v-tooltip>
+      </div>
       <v-btn
         v-if="item.changes"
         :class="[$style['btn-txt'], 'pa-0']"
@@ -755,6 +772,7 @@ export default defineComponent({
 
     return {
       freezeScrolling,
+      APIMhrDescriptionTypes,
       getFormattedDate,
       getRegistrationType,
       getStatusDescription,
