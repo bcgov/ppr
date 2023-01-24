@@ -95,8 +95,10 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
         detail_response = {
             'searchDateTime': model_utils.format_ts(self.search.search_ts),
             'searchQuery': self.search.search_criteria,
-            'certified': certified
+            'certified': False
         }
+        if certified:
+            detail_response['certified'] = True
         client_ref: str = '' if not self.search.client_reference_id else self.search.client_reference_id
         detail_response['searchQuery']['clientReferenceId'] = client_ref
         if self.search.pay_invoice_id and self.search.pay_path:

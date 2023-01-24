@@ -192,19 +192,28 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         if self.manuhome:
             reg_json = self.manuhome.registration_json
             # Inject note document type descriptions here. Apply all unit note business rules here.
+            # Exclude STAT, 103, 103E, and CAU, CAUC, CAUE if expiry date has elapsed.
             if reg_json and reg_json.get('notes'):
+                updated_notes = []
                 for note in reg_json.get('notes'):
+                    include: bool = True
                     doc_desc = ''
                     doc_type = note.get('documentType', '')
                     current_app.logger.debug('updating doc type=' + doc_type)
+                    if doc_type in ('103', '103E', 'STAT'):  # Always exclude
+                        include = False
                     if not self.staff and doc_type == 'FZE':  # Only staff can see remarks.
                         note['remarks'] = ''
+                    elif not self.staff and doc_type == 'REGC' and note.get('remarks') and \
+                            note['remarks'] != 'MANUFACTURED HOME REGISTRATION CANCELLED':
+                        # Only staff can see remarks if not default.
+                        note['remarks'] = 'MANUFACTURED HOME REGISTRATION CANCELLED'
                     elif doc_type == 'TAXN' and note.get('status') != 'A':  # Conditionally display remarks.
                         note['remarks'] = ''
-                    # No remarks if expiry elapsed.
+                    # Exlude if expiry elapsed.
                     elif doc_type in ('CAU', 'CAUC', 'CAUE') and note.get('expiryDate') and \
                             model_utils.date_elapsed(note.get('expiryDate')):
-                        note['remarks'] = ''
+                        include = False
                     if doc_type == 'FZE':  # Do not display contact info.
                         if note.get('contactName'):
                             del note['contactName']
@@ -212,12 +221,15 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                             del note['contactAddress']
                         if note.get('contactPhoneNumber'):
                             del note['contactPhoneNumber']
-                    if FROM_LEGACY_DOC_TYPE.get(doc_type):
-                        doc_type = FROM_LEGACY_DOC_TYPE.get(doc_type)
-                    doc_type_info: MhrDocumentType = MhrDocumentType.find_by_doc_type(doc_type)
-                    if doc_type_info:
-                        doc_desc = doc_type_info.document_type_desc
-                    note['documentDescription'] = doc_desc
+                    if include:
+                        if FROM_LEGACY_DOC_TYPE.get(doc_type):
+                            doc_type = FROM_LEGACY_DOC_TYPE.get(doc_type)
+                        doc_type_info: MhrDocumentType = MhrDocumentType.find_by_doc_type(doc_type)
+                        if doc_type_info:
+                            doc_desc = doc_type_info.document_type_desc
+                        note['documentDescription'] = doc_desc
+                        updated_notes.append(note)
+                reg_json['notes'] = updated_notes
             return reg_json
         return self.json
 

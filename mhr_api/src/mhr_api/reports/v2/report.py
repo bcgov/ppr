@@ -309,6 +309,8 @@ class Report:  # pylint: disable=too-few-public-methods
             self._report_data['cover'] = report_utils.set_cover(self._report_data)
             self._report_data['createDateTime'] = Report._to_report_datetime(self._report_data['createDateTime'])
         else:
+            if self._report_key == ReportTypes.SEARCH_DETAIL_REPORT:
+                self._set_search_additional_message()
             self._set_date_times()
             self._set_addresses()
             self._set_owner_groups()
@@ -417,6 +419,35 @@ class Report:  # pylint: disable=too-few-public-methods
                         if note.get('contactPhoneNumber'):
                             phone = note.get('contactPhoneNumber')
                             note['contactPhoneNumber'] = phone[0:3] + '-' + phone[3:6] + '-' + phone[6:]
+
+    def _set_search_additional_message(self):
+        """Conditionally add a message to the search report data."""
+        if self._report_data and self._report_data['details']:
+            for detail in self._report_data['details']:
+                messages = []
+                if detail.get('location'):
+                    if detail['location'].get('leaveProvince') and detail['status'] == 'EXEMPT':
+                        messages.append({'messageType': 'OUT_PROV'})
+                if detail.get('description') and detail['description'].get('sections'):
+                    sections = detail['description'].get('sections')
+                    for section in sections:
+                        if section.get('widthFeet', 0) > 16 or \
+                                (section.get('widthFeet', 0) == 16 and section.get('widthInches', 0) > 0):
+                            messages.append({'messageType': 'WIDTH'})
+                            break
+                if detail.get('notes'):
+                    for note in detail['notes']:
+                        if detail['status'] == 'HISTORICAL' and note.get('documentType', '') == 'REGC':
+                            messages.append({'messageType': 'REGC'})
+                        elif note.get('documentType', '') in ('EXRS', 'EXNR') and note.get('createDateTime'):
+                            message = {
+                                'messageType': note.get('documentType'),
+                                'messageId': note.get('documentId', ''),
+                                'messageDate': Report._to_report_datetime(note['createDateTime'], False)
+                            }
+                            messages.append(message)
+                if messages:
+                    detail['messages'] = messages
 
     def _set_addresses(self):
         """Replace address country code with description."""
