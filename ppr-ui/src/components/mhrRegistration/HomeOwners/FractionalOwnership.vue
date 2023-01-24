@@ -6,7 +6,7 @@
     </div>
     <div v-else>
       <p class="mt-3 mb-6">
-        Enter the interest type and fraction of the total ownership owned by [Group {{groupId}}].
+        Enter the interest type and fraction of the total ownership owned by Group {{groupId}}.
         <br>For example, if there are four owner groups, this group could have 1/4 ownership.
       </p>
       <p class="mt-3 mb-6">
