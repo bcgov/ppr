@@ -106,23 +106,6 @@
             "street": "5612 YALTA PLACE"
           }, 
           "contactName": "CHRISTOPHER DEAN GUDERYAN", 
-          "contactPhoneNumber": "2505407761", 
-          "createDateTime": "2021-10-29T16:26:00-07:53", 
-          "documentDescription": "CONTINUE CAUTION", 
-          "documentId": "63056537", 
-          "documentType": "CAUC", 
-          "expiryDate": "2021-11-15T09:00:00-07:53", 
-          "remarks": "", 
-          "status": "E"
-        }, {
-          "contactAddress": {
-            "city": "VANCOUVER", 
-            "country": "CA", 
-            "postalCode": "V6T 2C2", 
-            "region": "BC", 
-            "street": "5612 YALTA PLACE"
-          }, 
-          "contactName": "CHRISTOPHER DEAN GUDERYAN", 
           "createDateTime": "2021-10-22T15:34:00-07:53", 
           "documentDescription": "EXTEND CAUTION", 
           "documentId": "63056323", 
@@ -130,56 +113,6 @@
           "expiryDate": "2023-06-30T09:00:00-07:53", 
           "remarks": "CAUTION EXTENSION FOR 7 DAYS UNTIL COURT ORDER IS SIGNED AND SUBMITTEDDOCUMENT REGISTRATION # 451621 UNTIL OCTOBER 31 2021 WITH LIBERTY TO  APPLY FOR A FURTHER CONTINUATION.                                     SUPREME COURT OF BC VANCOUVER REGISTRY NO# S210218                    COURT FILE # VLC-S-S-210218", 
           "status": "E"
-        }, {
-          "contactAddress": {
-            "city": "PRINCE GEORGE", 
-            "country": "CA", 
-            "postalCode": "V2L 3L4", 
-            "region": "BC", 
-            "street": "1396 5TH AVENUE, SUITE 201"
-          }, 
-          "contactName": "ANDREW KEMP C/O LLOYD PERCIVAL MURRAY", 
-          "contactPhoneNumber": "2505645544", 
-          "createDateTime": "2021-04-01T17:00:00-07:53", 
-          "documentDescription": "EXTEND CAUTION", 
-          "documentId": "62875618", 
-          "documentType": "CAUE", 
-          "expiryDate": "2021-04-16T09:00:00-07:53", 
-          "remarks": "", 
-          "status": "C"
-        }, {
-          "contactAddress": {
-            "city": "PRINCE GEORGE", 
-            "country": "CA", 
-            "postalCode": "V2L 3L4", 
-            "region": "BC", 
-            "street": "1396 5TH AVENUE, SUITE 201"
-          }, 
-          "contactName": "ANDREW KEMP C/O LLOYD PERCIVAL MURRAY", 
-          "contactPhoneNumber": "2505645544", 
-          "createDateTime": "2020-12-03T09:20:00-07:53", 
-          "documentDescription": "CAUTION", 
-          "documentId": "62859743", 
-          "documentType": "CAU", 
-          "expiryDate": "2021-03-03T09:00:00-07:53", 
-          "remarks": "", 
-          "status": "C"
-        }, {
-          "contactAddress": {
-            "city": "PENTICTON",
-            "country": "CA",
-            "postalCode": "V2A 5X5",
-            "region": "BC",
-            "street": "1175 RAILWAY STREET"
-          },
-          "contactName": "CHAMPION CANADA INTERNATIONAL ULC",
-          "contactPhoneNumber": "2504930122",
-          "createDateTime": "2014-04-03T15:44:26-07:53",
-          "documentDescription": "TRANSPORT PERMIT",
-          "documentId": "80031322",
-          "documentType": "103",
-          "expiryDate": "2014-05-03T09:00:00-07:53",
-          "remarks": ""
         }, {
           "contactAddress": {
             "city": "SURREY", 
@@ -241,20 +174,19 @@
           "status": "C"
         }, {
           "contactAddress": {
-            "city": "KELOWNA", 
+            "city": "VICTORIA", 
             "country": "CA", 
-            "postalCode": "V4V 1S5", 
+            "postalCode": "V8W 3E6", 
             "region": "BC", 
-            "street": "9500 JIM BAILEY ROAD"
+            "street": "940 BLANSHARD STREET"
           }, 
-          "contactName": "SRI HOMES INC (WINFIELD)", 
+          "contactName": "REGISTRAR OF MANUFACTURED HOMES.", 
           "contactPhoneNumber": "604", 
-          "createDateTime": "1996-02-02T15:44:50-07:53", 
-          "documentDescription": "EXTEND TRAN PERMIT", 
-          "documentId": "42477667", 
-          "documentType": "103E", 
-          "expiryDate": "1996-02-19T09:00:00-07:53", 
-          "remarks": "", 
+          "createDateTime": "1997-04-03T13:21:58-07:53", 
+          "documentDescription": "REGISTRARS CORRECTION", 
+          "documentId": "42413815", 
+          "documentType": "REGC", 
+          "remarks": "MANUFACTURED HOME REGISTRATION CANCELLED                              THIS HOME WAS REGISTERED TWICE UNDER NUMBERS 78831 AND 78855. PLEASE  REFER TO FILE 78855 FOR FURTHER DETAILS ON THIS HOME.", 
           "status": "A"
         }, {
           "contactAddress": {
