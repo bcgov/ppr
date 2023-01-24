@@ -87,7 +87,7 @@
                   filled
                   :hint="searchHintFirst"
                   persistent-hint
-                  :label="optionFirst"
+                  label="First Name"
                   v-model="searchValueFirst"
                   @keypress.enter="searchCheck()"
                 />
@@ -374,9 +374,6 @@ export default defineComponent({
       }),
       searchMessage: computed((): string => {
         return localState.validations?.searchValue?.message || ''
-      }),
-      optionFirst: computed((): string => {
-        return isRoleStaffReg.value ? 'First Name (Optional)' : 'First Name'
       }),
       typeOfSearch: computed((): string => {
         // only show the type of search if authorized to both types
