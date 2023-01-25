@@ -457,7 +457,7 @@ export default class App extends Mixins(AuthMixin) {
       }
       this.setUserInfo(userInfo)
 
-      const accountId = this.getAccountModel.currentAccount?.id || this.getAccountId
+      const accountId = this.getAccountModel?.currentAccount?.id || this.getAccountId
 
       if (accountId) {
         const subscribedProducts = await fetchAccountProducts(accountId)
