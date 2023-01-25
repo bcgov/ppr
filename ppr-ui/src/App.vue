@@ -101,7 +101,7 @@ import {
 } from '@/enums'
 import {
   AccountProductSubscriptionIF, ActionBindingIF, DialogOptionsIF, // eslint-disable-line
-  ErrorIF, RegistrationTypeIF, UserInfoIF, UserSettingsIF // eslint-disable-line
+  AccountModelIF, ErrorIF, RegistrationTypeIF, UserInfoIF, UserSettingsIF // eslint-disable-line
 } from '@/interfaces'
 
 @Component({
@@ -120,6 +120,7 @@ export default class App extends Mixins(AuthMixin) {
   // Global getters
   @Getter getRegistrationFlowType: RegistrationFlowType
   @Getter getRegistrationType: RegistrationTypeIF
+  @Getter getAccountModel: AccountModelIF
   @Getter getRegistrationOther: string
   @Getter getUserEmail!: string
   @Getter getUserFirstName!: string
@@ -412,20 +413,6 @@ export default class App extends Mixins(AuthMixin) {
           throw new Error('No access to Assets')
         }
         this.setAuthRoles(authRoles)
-
-        if (this.getAccountId) {
-          const subscribedProducts = await fetchAccountProducts(this.getAccountId)
-          if (subscribedProducts) {
-            this.setUserProductSubscriptions(subscribedProducts)
-
-            const activeProductCodes = subscribedProducts
-              .filter(product => product.subscriptionStatus === ProductStatus.ACTIVE)
-              .map(product => product.code)
-            this.setUserProductSubscriptionsCodes(activeProductCodes)
-          } else {
-            throw new Error('Unable to get Products for the User')
-          }
-        }
       } else {
         throw new Error('Invalid auth roles')
       }
@@ -469,6 +456,23 @@ export default class App extends Mixins(AuthMixin) {
         }
       }
       this.setUserInfo(userInfo)
+
+      const accountId = this.getAccountModel.currentAccount?.id || this.getAccountId
+
+      if (accountId) {
+        const subscribedProducts = await fetchAccountProducts(accountId)
+        if (subscribedProducts) {
+          this.setUserProductSubscriptions(subscribedProducts)
+
+          const activeProductCodes = subscribedProducts
+            .filter(product => product.subscriptionStatus === ProductStatus.ACTIVE)
+            .map(product => product.code)
+          this.setUserProductSubscriptionsCodes(activeProductCodes)
+          console.log('Fetched products: ', activeProductCodes)
+        } else {
+          throw new Error('Unable to get Products for the User')
+        }
+      }
     } else {
       message = 'Unable to get user info.'
     }
