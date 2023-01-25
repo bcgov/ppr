@@ -105,9 +105,10 @@ export const useMhrInformation = () => {
       documentDescription: UIRegistrationTypes.TRANSFER_OF_SALE,
       submittingParty: {
         businessName: getMhrTransferSubmittingParty.value.businessName,
+        personName: getMhrTransferSubmittingParty.value.personName,
         address: getMhrTransferSubmittingParty.value.address,
         emailAddress: getMhrTransferSubmittingParty.value.emailAddress,
-        phoneNumber: getMhrTransferSubmittingParty.value.phoneNumber.replace(/[^A-Z0-9]/ig, ''),
+        phoneNumber: getMhrTransferSubmittingParty.value.phoneNumber?.replace(/[^A-Z0-9]/ig, ''),
         ...(getMhrTransferSubmittingParty.value.phoneExtension && {
           phoneExtension: getMhrTransferSubmittingParty.value.phoneExtension
         })

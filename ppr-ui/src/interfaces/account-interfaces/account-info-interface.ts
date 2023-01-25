@@ -8,7 +8,7 @@ export interface AccountInfoIF {
   accountAdmin: AccountAdminInfoIF
 }
 
-interface AccountAdminInfoIF {
+export interface AccountAdminInfoIF {
   firstName: string
   lastName: string
   email: string
