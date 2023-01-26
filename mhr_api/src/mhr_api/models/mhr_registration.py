@@ -202,7 +202,9 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                     current_app.logger.debug('updating doc type=' + doc_type)
                     if doc_type in ('103', '103E', 'STAT'):  # Always exclude
                         include = False
-                    if not self.staff and doc_type in ('FZE', '102', 'NCON'):  # Only staff can see remarks.
+                    elif not self.staff and doc_type in ('102', 'NCON'):  # Always exclude for non-staff
+                        include = False
+                    elif not self.staff and doc_type == 'FZE':  # Only staff can see remarks.
                         note['remarks'] = ''
                     elif not self.staff and doc_type == 'REGC' and note.get('remarks') and \
                             note['remarks'] != 'MANUFACTURED HOME REGISTRATION CANCELLED':
