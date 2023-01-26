@@ -132,7 +132,6 @@ export default class App extends Mixins(AuthMixin) {
   @Getter isRoleStaff!: boolean
   @Getter isRoleStaffBcol!: boolean
   @Getter isRoleStaffReg!: boolean
-  @Getter getAccountId!: number
 
   // Global setter
   @Action setAuthRoles: ActionBindingIF
@@ -457,7 +456,7 @@ export default class App extends Mixins(AuthMixin) {
       }
       this.setUserInfo(userInfo)
 
-      const accountId = this.getAccountModel?.currentAccount?.id || this.getAccountId
+      const accountId = this.getAccountModel?.currentAccount?.id
 
       if (accountId) {
         const subscribedProducts = await fetchAccountProducts(accountId)
