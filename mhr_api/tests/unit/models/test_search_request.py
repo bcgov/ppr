@@ -137,6 +137,112 @@ MS_NONE_JSON = {
     },
     'clientReferenceId': 'T-SQ-MS-4'
 }
+UPDATE_RESULTS_ORG_BASE = [
+    {
+        'mhrNumber': '003456',
+        'organizationName': 'TEST LTD.',
+        'activeCount': 1,
+        'exemptCount': 0,
+        'historicalCount': 0
+    }
+]
+UPDATE_ORG_RESULT_1 = {
+    'mhrNumber': '003456',
+    'organizationName': 'TEST LTD.',
+    'activeCount': 0,
+    'exemptCount': 1,
+    'historicalCount': 0
+}
+UPDATE_ORG_RESULT_2 = {
+    'mhrNumber': '003456',
+    'organizationName': 'TEST LTD.',
+    'activeCount': 0,
+    'exemptCount': 0,
+    'historicalCount': 1
+}
+UPDATE_ORG_RESULT_3 = {
+    'mhrNumber': '003457',
+    'organizationName': 'TEST LTD.',
+    'activeCount': 1,
+    'exemptCount': 0,
+    'historicalCount': 0
+}
+UPDATE_ORG_RESULT_4 = {
+    'mhrNumber': '003458',
+    'organizationName': 'TEST LTD.',
+    'activeCount': 0,
+    'exemptCount': 1,
+    'historicalCount': 0
+}
+ORG_NAME_JSON_COLLAPSE = {
+    'type': 'ORGANIZATION_NAME',
+    'criteria': {
+        'value': 'RANCOURT HOLDINGS LTD.'
+    },
+    'clientReferenceId': 'T-SQ-MO-2'
+}
+OWNER_NAME_JSON_COLLAPSE = {
+    'type': 'OWNER_NAME',
+    'criteria': {
+        'ownerName': {
+            'first': 'GAYLEEN',
+            'last': 'ALEXANDER'
+        }
+    },
+    'clientReferenceId': 'T-SQ-MI-3'
+}
+UPDATE_RESULTS_OWNER_BASE = [
+    {
+        'mhrNumber': '003456',
+        'ownerName': {
+            'first': 'JOHN',
+            'last': 'SMITH'
+        },
+        'activeCount': 1,
+        'exemptCount': 0,
+        'historicalCount': 0
+    }
+]
+UPDATE_OWNER_RESULT_1 = {
+    'mhrNumber': '003456',
+    'ownerName': {
+        'first': 'JOHN',
+        'last': 'SMITH'
+    },
+    'activeCount': 0,
+    'exemptCount': 1,
+    'historicalCount': 0
+}
+UPDATE_OWNER_RESULT_2 = {
+    'mhrNumber': '003456',
+    'ownerName': {
+        'first': 'JOHN',
+        'last': 'SMITH'
+    },
+    'activeCount': 0,
+    'exemptCount': 0,
+    'historicalCount': 1
+}
+UPDATE_OWNER_RESULT_3 = {
+    'mhrNumber': '003457',
+    'ownerName': {
+        'first': 'JOHN',
+        'last': 'SMITH'
+    },
+    'activeCount': 1,
+    'exemptCount': 0,
+    'historicalCount': 0
+}
+UPDATE_OWNER_RESULT_4 = {
+    'mhrNumber': '003458',
+    'ownerName': {
+        'first': 'JOHN',
+        'last': 'SMITH'
+    },
+    'activeCount': 0,
+    'exemptCount': 1,
+    'historicalCount': 0
+}
 
 # testdata pattern is ({search type}, {JSON data})
 TEST_VALID_DATA = [
@@ -179,7 +285,28 @@ TEST_SERIAL_NUMBER_DATA = [
 # testdata pattern is ({last_name}, {first_name}, count)
 TEST_OWNER_IND_DATA = [
     ('Hamm', 'David', 2),
-    ('Hamm', '', 250)
+    ('Hamm', '', 245)
+]
+# testdata pattern is ({result1}, {result2}, {result_count}, {active_count}, {exempt_count}, {historical_count})
+TEST_UPDATE_DATA_ORG = [
+    (UPDATE_ORG_RESULT_1, None, 1, 1, 1, 0),
+    (UPDATE_ORG_RESULT_2, None, 1, 1, 0, 1),
+    (UPDATE_ORG_RESULT_1, UPDATE_ORG_RESULT_2, 1, 1, 1, 1),
+    (UPDATE_ORG_RESULT_1, UPDATE_ORG_RESULT_3, 2, 1, 1, 0),
+    (UPDATE_ORG_RESULT_3, UPDATE_ORG_RESULT_4, 3, 1, 0, 0)
+]
+# testdata pattern is ({result1}, {result2}, {result_count}, {active_count}, {exempt_count}, {historical_count})
+TEST_UPDATE_DATA_OWNER = [
+    (UPDATE_OWNER_RESULT_1, None, 1, 1, 1, 0),
+    (UPDATE_OWNER_RESULT_2, None, 1, 1, 0, 1),
+    (UPDATE_OWNER_RESULT_1, UPDATE_OWNER_RESULT_2, 1, 1, 1, 1),
+    (UPDATE_OWNER_RESULT_1, UPDATE_OWNER_RESULT_3, 2, 1, 1, 0),
+    (UPDATE_OWNER_RESULT_3, UPDATE_OWNER_RESULT_4, 3, 1, 0, 0)
+]
+# testdata pattern is ({mhr_num}, {search_data}, {active_count}, {exempt_count}, {historical_count})
+TEST_COLLAPSE_DATA = [
+    ('091688', ORG_NAME_JSON_COLLAPSE, 1, 0, 2),
+    ('005520', OWNER_NAME_JSON_COLLAPSE, 1, 0, 5)
 ]
 
 
@@ -220,6 +347,9 @@ def test_search_valid(session, search_type, json_data):
         assert match['mhrNumber']
         if match['mhrNumber'] != '089036':  # bogus incomplete data
             assert match['status']
+            assert match.get('activeCount') >= 0
+            assert match.get('exemptCount') >= 0
+            assert match.get('historicalCount') >= 0
             assert match['createDateTime']
             assert match['homeLocation']
             assert match['serialNumber']
@@ -334,3 +464,54 @@ def test_search_owner_ind(session, last_name, first_name, count):
     assert len(result.get('results')) >= count
     for match in result.get('results'):
         assert str(match['ownerName'].get('last')).startswith(last)
+
+
+@pytest.mark.parametrize('result1,result2,result_count,active_count,exempt_count,historical_count',
+                         TEST_UPDATE_DATA_ORG)
+def test_update_result_org(session, result1, result2, result_count, active_count, exempt_count, historical_count):
+    """Assert that a search consolidating/collapsing results works as expected."""
+    results = copy.deepcopy(UPDATE_RESULTS_ORG_BASE)
+    if result1:
+        SearchRequest.update_result_matches(results, result1, SearchRequest.SearchTypes.ORGANIZATION_NAME)
+    if result2:
+        SearchRequest.update_result_matches(results, result2, SearchRequest.SearchTypes.ORGANIZATION_NAME)
+    assert len(results) == result_count
+    match = results[0]
+    assert match.get('activeCount') == active_count
+    assert match.get('exemptCount') == exempt_count
+    assert match.get('historicalCount') == historical_count
+
+
+@pytest.mark.parametrize('result1,result2,result_count,active_count,exempt_count,historical_count',
+                         TEST_UPDATE_DATA_OWNER)
+def test_update_result_owner(session, result1, result2, result_count, active_count, exempt_count, historical_count):
+    """Assert that a search consolidating/collapsing results works as expected."""
+    results = copy.deepcopy(UPDATE_RESULTS_OWNER_BASE)
+    if result1:
+        SearchRequest.update_result_matches(results, result1, SearchRequest.SearchTypes.OWNER_NAME)
+    if result2:
+        SearchRequest.update_result_matches(results, result2, SearchRequest.SearchTypes.OWNER_NAME)
+    assert len(results) == result_count
+    match = results[0]
+    assert match.get('activeCount') == active_count
+    assert match.get('exemptCount') == exempt_count
+    assert match.get('historicalCount') == historical_count
+
+
+@pytest.mark.parametrize('mhr_num,json_data,active_count,exempt_count,historical_count', TEST_COLLAPSE_DATA)
+def test_search_collapse(session, mhr_num, json_data, active_count, exempt_count, historical_count):
+    """Assert that a search returns the expected result with multiple matches within an MH registration."""
+    test_data = copy.deepcopy(json_data)
+    test_data['type'] = model_utils.TO_DB_SEARCH_TYPE[json_data['type']]
+    # current_app.logger.info('type=' + str(json_data['type']))
+    query: SearchRequest = SearchRequest.create_from_json(json_data, 'PS12345', 'UNIT_TEST')
+    query.search()
+    assert not query.updated_selection
+    result = query.json
+    # current_app.logger.debug('Results size:' + str(result['totalResultsSize']))
+    assert len(result['results']) >= 1
+    for match in result['results']:
+        if match['mhrNumber'] == mhr_num:
+            assert match.get('activeCount') == active_count
+            assert match.get('exemptCount') == exempt_count
+            assert match.get('historicalCount') == historical_count

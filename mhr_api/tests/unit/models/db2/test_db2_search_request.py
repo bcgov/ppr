@@ -200,6 +200,9 @@ def test_search_valid(session, search_type, json_data):
     for match in result['results']:
         assert match['mhrNumber']
         assert match['status']
+        assert match.get('activeCount') >= 0
+        assert match.get('exemptCount') >= 0
+        assert match.get('historicalCount') >= 0
         assert match['createDateTime']
         assert match['homeLocation']
         assert match['serialNumber']

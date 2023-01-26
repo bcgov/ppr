@@ -15,6 +15,7 @@
 
 # pylint: disable=too-many-return-statements
 from http import HTTPStatus
+import json
 
 import requests
 from flask import Blueprint, current_app, jsonify, request
@@ -22,14 +23,16 @@ from flask_cors import cross_origin
 from registry_schemas import utils as schema_utils
 
 from mhr_api.exceptions import BusinessException, DatabaseException
-from mhr_api.models import EventTracking, SearchRequest, SearchResult
+from mhr_api.models import EventTracking, SearchRequest, SearchResult, utils as model_utils
 from mhr_api.models.search_request import REPORT_STATUS_PENDING
 from mhr_api.resources import utils as resource_utils
+from mhr_api.resources.v1.search_report_callback import get_search_report
 from mhr_api.services.authz import authorized, is_bcol_help, is_sbc_office_account, is_staff_account
 from mhr_api.services.document_storage.storage_service import GoogleStorageService
 from mhr_api.services.payment.exceptions import SBCPaymentException
 from mhr_api.services.payment.payment import Payment
 from mhr_api.services.queue_service import GoogleQueueService
+from mhr_api.services.utils.exceptions import ReportException, ReportDataException, StorageException
 from mhr_api.utils.auth import jwt
 
 
@@ -195,7 +198,7 @@ def post_search_results(search_id: str):  # pylint: disable=too-many-branches, t
 @bp.route('/<string:search_id>', methods=['GET', 'OPTIONS'])
 @cross_origin(origin='*')
 @jwt.requires_auth
-def get_search_results(search_id: str):
+def get_search_results(search_id: str):  # pylint: disable=too-many-branches
     """Get search detail information for a previous search."""
     try:
         if search_id is None:
@@ -223,12 +226,16 @@ def get_search_results(search_id: str):
         if search_detail.search_select is None and search_detail.search.total_results_size > 0:
             return resource_utils.bad_request_response(GET_DETAILS_ERROR)
 
-        # If the request is for a report, fetch binary data from doc storage.
         if resource_utils.is_pdf(request):
             if search_detail.doc_storage_url is None:
-                error_msg = f'Search report not yet available for {search_id}.'
-                current_app.logger.info(error_msg)
-                return resource_utils.bad_request_response(error_msg)
+                # Retry if more than 15 minutes has elapsed since the request was queued and no report.
+                if not model_utils.report_retry_elapsed(search_detail.search.search_ts):
+                    error_msg = f'Search report not yet available for {search_id}.'
+                    current_app.logger.info(error_msg)
+                    return resource_utils.bad_request_response(error_msg)
+                return generate_search_report(search_detail, search_id)
+
+            # If the request is for a report, fetch binary data from doc storage.
             doc_name = search_detail.doc_storage_url
             current_app.logger.info(f'Fetching search report {doc_name} from doc storage.')
             raw_data = GoogleStorageService.get_document(doc_name)
@@ -238,6 +245,21 @@ def get_search_results(search_id: str):
         response_data['reportAvailable'] = search_detail.doc_storage_url is not None
         return jsonify(response_data), HTTPStatus.OK
 
+    except ReportException as report_err:
+        return report_error(resource_utils.CallbackExceptionCodes.REPORT_ERR,
+                            search_id,
+                            HTTPStatus.INTERNAL_SERVER_ERROR,
+                            str(report_err))
+    except ReportDataException as report_data_err:
+        return report_error(resource_utils.CallbackExceptionCodes.REPORT_DATA_ERR,
+                            search_id,
+                            HTTPStatus.INTERNAL_SERVER_ERROR,
+                            str(report_data_err))
+    except StorageException as storage_err:
+        return report_error(resource_utils.CallbackExceptionCodes.STORAGE_ERR,
+                            search_id,
+                            HTTPStatus.INTERNAL_SERVER_ERROR,
+                            str(storage_err))
     except DatabaseException as db_exception:
         return resource_utils.db_exception_response(db_exception, account_id, 'GET search details id=' + search_id)
     except BusinessException as exception:
@@ -329,3 +351,44 @@ def enqueue_search_report(search_id: str):
                              EventTracking.EventTrackingTypes.SEARCH_REPORT,
                              int(HTTPStatus.INTERNAL_SERVER_ERROR),
                              'Enqueue search report event failed: ' + str(err))
+
+
+def generate_search_report(search_detail: SearchResult, search_id: str):
+    """Attempt to regenerat search report request to the queue."""
+    # Generate the report with an API call here
+    current_app.logger.info(f'Generating search detail report for {search_id}.')
+    raw_data, status_code, headers = get_search_report(search_id)
+    if not raw_data or not status_code:
+        return report_error(resource_utils.CallbackExceptionCodes.REPORT_DATA_ERR,
+                            search_id,
+                            HTTPStatus.INTERNAL_SERVER_ERROR,
+                            'No data or status code.')
+    current_app.logger.debug('report api call status=' + str(status_code) + ' headers=' + json.dumps(headers))
+    if status_code not in (HTTPStatus.OK, HTTPStatus.CREATED):
+        message = f'Status code={status_code}. Response: ' + raw_data.get_data(as_text=True)
+        return report_error(resource_utils.CallbackExceptionCodes.REPORT_ERR,
+                            search_id,
+                            HTTPStatus.INTERNAL_SERVER_ERROR,
+                            message)
+
+    doc_name = model_utils.get_search_doc_storage_name(search_detail.search)
+    current_app.logger.info(f'Saving report output to doc storage: name={doc_name}.')
+    response = GoogleStorageService.save_document(doc_name, raw_data)
+    current_app.logger.info('Save document storage response: ' + str(response))
+    search_detail.doc_storage_url = doc_name
+    search_detail.save()
+
+    # Track success event.
+    EventTracking.create(search_id, EventTracking.EventTrackingTypes.SEARCH_REPORT, int(HTTPStatus.OK))
+    return raw_data, status_code, {'Content-Type': 'application/pdf'}
+
+
+def report_error(code: str, search_id: str, status_code, message: str = None):
+    """Return to the event listener callback error response based on the code."""
+    error = CALLBACK_MESSAGES[code].format(search_id=search_id)
+    if message:
+        error += ' ' + message
+    current_app.logger.error(error)
+    # Track event here.
+    EventTracking.create(search_id, EventTracking.EventTrackingTypes.SEARCH_REPORT, status_code, message)
+    return resource_utils.error_response(status_code, error)

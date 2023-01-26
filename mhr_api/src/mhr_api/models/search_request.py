@@ -35,18 +35,6 @@ from .db import db
 REPORT_STATUS_PENDING = 'PENDING'
 CHARACTER_SET_UNSUPPORTED = 'The search name {} charcter set is not supported.\n'
 
-LEGACY_TO_OWNER_STATUS = {
-    '3': 'ACTIVE',
-    '4': 'EXEMPT',
-    '5': 'PREVIOUS'
-}
-LEGACY_TO_REGISTRATION_STATUS = {
-    'R': 'ACTIVE',
-    'E': 'EXEMPT',
-    'C': 'HISTORICAL'
-}
-LEGACY_REGISTRATION_ACTIVE = 'R'
-
 
 class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
     """This class maintains search query (search step 1) information."""
@@ -130,123 +118,6 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         self.updated_selection = search_json
         self.save()
 
-    @classmethod
-    def __build_search_result(cls, row):
-        """Build a single search summary json from a DB row."""
-        mh_status = str(row[1])
-        status = LEGACY_TO_REGISTRATION_STATUS[mh_status]
-        # current_app.logger.info('Mapping timestamp')
-        timestamp = row[3]
-        # current_app.logger.info('Timestamp mapped')
-        value: str = str(row[8])
-        year = int(value) if value.isnumeric() else 0
-        result_json = {
-            'mhrNumber': str(row[0]),
-            'status': status,
-            'createDateTime': model_utils.format_local_ts(timestamp),
-            'homeLocation': str(row[6]).strip(),
-            'serialNumber': str(row[7]).strip(),
-            'baseInformation': {
-                'year': year,
-                'make': str(row[9]).strip(),
-                'model': ''
-            },
-            'mhId': int(row[10])
-        }
-        # current_app.logger.info(result_json)
-        owner_type = str(row[4])
-        owner_name = str(row[5]).strip()
-        if owner_type != 'I':
-            result_json['organizationName'] = owner_name
-        else:
-            result_json['ownerName'] = model_utils.get_ind_name_from_db2(owner_name)
-        result_json['ownerStatus'] = LEGACY_TO_OWNER_STATUS[str(row[11])]
-        return result_json
-
-    @classmethod
-    def __build_search_result_mhr(cls, row):
-        """Build a single search summary json from a DB row for an mhr number search."""
-        mh_status = str(row[1])
-        status = LEGACY_TO_REGISTRATION_STATUS[mh_status]
-        # current_app.logger.info('Mapping timestamp')
-        timestamp = row[3]
-        # current_app.logger.info('Timestamp mapped')
-        value: str = str(row[6])
-        year = int(value) if value.isnumeric() else 0
-        result_json = {
-            'mhrNumber': str(row[0]),
-            'status': status,
-            'createDateTime': model_utils.format_local_ts(timestamp),
-            'homeLocation': str(row[4]).strip(),
-            'serialNumber': str(row[5]).strip(),
-            'baseInformation': {
-                'year': year,
-                'make': str(row[7]).strip(),
-                'model': ''
-            },
-            'mhId': int(row[8])
-        }
-        owner_info = str(row[9])
-        owner_type = owner_info[0:1]
-        owner_status = owner_info[1:2]
-        owner_name = owner_info[2:].strip()
-        if owner_type != 'I':
-            result_json['organizationName'] = owner_name
-        else:
-            result_json['ownerName'] = model_utils.get_ind_name_from_db2(owner_name)
-        result_json['ownerStatus'] = LEGACY_TO_OWNER_STATUS[owner_status]
-        # current_app.logger.info(result_json)
-        return result_json
-
-    @classmethod
-    def __build_search_result_serial(cls, row, search_key: str):
-        """Build a single search summary json from a DB row for a serial number search."""
-        mh_status = str(row[1])
-        status = LEGACY_TO_REGISTRATION_STATUS[mh_status]
-        # current_app.logger.info('Mapping timestamp')
-        timestamp = row[3]
-        # current_app.logger.info('Timestamp mapped')
-        value: str = str(row[7])
-        year = int(value) if value.isnumeric() else 0
-        serial_num: str = str(row[6]).strip()
-        result_json = {
-            'mhrNumber': str(row[0]),
-            'status': status,
-            'createDateTime': model_utils.format_local_ts(timestamp),
-            'homeLocation': str(row[5]).strip(),
-            'baseInformation': {
-                'year': year,
-                'make': str(row[8]).strip(),
-                'model': ''
-            },
-            'mhId': int(row[9])
-        }
-        # current_app.logger.info(result_json)
-        owner_info = str(row[4])
-        owner_type = owner_info[0:1]
-        owner_status = owner_info[1:2]
-        owner_name = owner_info[2:].strip()
-        if owner_type != 'I':
-            result_json['organizationName'] = owner_name
-        else:
-            result_json['ownerName'] = model_utils.get_ind_name_from_db2(owner_name)
-        result_json['ownerStatus'] = LEGACY_TO_OWNER_STATUS[owner_status]
-        key: str = db2_search_utils.get_search_serial_number_key(serial_num)
-        if key != search_key:  # Match is on one of the other serial numbers.
-            serial_num = str(row[10])
-            if serial_num:
-                key = db2_search_utils.get_search_serial_number_key(serial_num.strip())
-        if key != search_key:
-            serial_num = str(row[11])
-            if serial_num:
-                key = db2_search_utils.get_search_serial_number_key(serial_num.strip())
-        if key != search_key:
-            serial_num = str(row[12])
-            if serial_num:
-                key = db2_search_utils.get_search_serial_number_key(serial_num.strip())
-        result_json['serialNumber'] = serial_num
-        return result_json
-
     def search_by_mhr_number_db2(self):
         """Execute a search by mhr number query."""
         result = db2_search_utils.search_by_mhr_number(current_app, db, self.request_json)
@@ -259,7 +130,7 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
 
         result_json = []
         if row is not None:
-            result_json.append(SearchRequest.__build_search_result_mhr(row))
+            result_json.append(db2_search_utils.build_search_result_mhr(row))
             self.returned_results_size = 1
             self.total_results_size = 1
             self.search_response = result_json
@@ -280,7 +151,8 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         if rows is not None:
             results_json = []
             for row in rows:
-                results_json.append(SearchRequest.__build_search_result(row))
+                match = db2_search_utils.build_search_result_owner(row)
+                SearchRequest.update_result_matches(results_json, match, SearchRequest.SearchTypes.ORGANIZATION_NAME)
             self.returned_results_size = len(results_json)
             self.total_results_size = self.returned_results_size
             self.search_response = results_json
@@ -302,11 +174,12 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         if rows is not None:
             results_json = []
             for row in rows:
-                match = SearchRequest.__build_search_result(row)
+                match = db2_search_utils.build_search_result_owner(row)
+                # current_app.logger.debug(match)
                 # Check when searching only by last name that the result name is not too short:
                 # a consequence of compressed key name searching.
                 if str(match['ownerName'].get('last')).startswith(last):
-                    results_json.append(match)
+                    SearchRequest.update_result_matches(results_json, match, SearchRequest.SearchTypes.OWNER_NAME)
             self.returned_results_size = len(results_json)
             self.total_results_size = self.returned_results_size
             self.search_response = results_json
@@ -328,7 +201,7 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
             results_json = []
             search_key: str = db2_search_utils.get_search_serial_number_key(self.request_json['criteria']['value'])
             for row in rows:
-                results_json.append(SearchRequest.__build_search_result_serial(row, search_key))
+                results_json.append(db2_search_utils.build_search_result_serial(row, search_key))
             self.returned_results_size = len(results_json)
             self.total_results_size = self.returned_results_size
             self.search_response = results_json
@@ -385,6 +258,28 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         else:
             self.search_by_owner_name_db2()
         self.save()
+
+    @classmethod
+    def update_result_matches(cls, results, result, search_type: str) -> bool:
+        """If identical mhr number and result criteria exists update the count instead of adding a result."""
+        updated: bool = False
+        for existing in results:
+            if existing.get('mhrNumber') == result.get('mhrNumber'):
+                if search_type == cls.SearchTypes.ORGANIZATION_NAME and \
+                        existing.get('organizationName') == result.get('organizationName'):
+                    updated = True
+                elif search_type == cls.SearchTypes.OWNER_NAME and existing.get('ownerName') == result.get('ownerName'):
+                    updated = True
+                if updated:
+                    if result.get('activeCount') == 1:
+                        existing['activeCount'] = (existing['activeCount'] + 1)
+                    elif result.get('exemptCount') == 1:
+                        existing['exemptCount'] = (existing['exemptCount'] + 1)
+                    elif result.get('historicalCount') == 1:
+                        existing['historicalCount'] = (existing['historicalCount'] + 1)
+        if not updated:
+            results.append(result)
+        return updated
 
     @classmethod
     def find_by_id(cls, search_id: int):

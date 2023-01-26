@@ -319,13 +319,18 @@ def test_search_sort_serial(session, client, jwt, mhr1, mhr2, mhr3, mhr4):
     sorted_data = search_result.search_select
 
     # check
-    assert len(sorted_data) == 4
+    assert len(sorted_data) == 3
     assert sorted_data[0]['mhrNumber'] == '022911'
     assert sorted_data[1]['mhrNumber'] == '002200'
-    assert sorted_data[1]['serialNumber'] == '2427'
-    assert sorted_data[2]['mhrNumber'] == '002200'
-    assert sorted_data[2]['serialNumber'] == '9427'
-    assert sorted_data[3]['mhrNumber'] == '001999'
+    assert sorted_data[1]['serialNumber'] == '9427'
+    assert sorted_data[2]['mhrNumber'] == '001999'
+    assert sorted_data[1].get('extraMatches')
+    assert not sorted_data[0].get('extraMatches')
+    assert not sorted_data[2].get('extraMatches')
+    extra = sorted_data[1].get('extraMatches')
+    assert len(extra) == 1
+    assert extra[0].get('mhrNumber') == '002200'
+    assert extra[0].get('serialNumber') == '2427'
 
 
 @pytest.mark.parametrize('mhr1,mhr2,mhr3,mhr4', TEST_SELECT_SORT_DATA_ORG)
@@ -348,13 +353,18 @@ def test_search_sort_org(session, client, jwt, mhr1, mhr2, mhr3, mhr4):
     sorted_data = search_result.search_select
 
     # check
-    assert len(sorted_data) == 4
+    assert len(sorted_data) == 3
     assert sorted_data[0]['mhrNumber'] == '022911'
     assert sorted_data[1]['mhrNumber'] == '002200'
     assert sorted_data[1]['organizationName'] == 'CRYSTAL POND DESIGN LIMITED'
-    assert sorted_data[2]['mhrNumber'] == '002200'
-    assert sorted_data[2]['organizationName'] == 'CRYSTAL RIVER COURT LTD.'
-    assert sorted_data[3]['mhrNumber'] == '001999'
+    assert sorted_data[2]['mhrNumber'] == '001999'
+    assert sorted_data[1].get('extraMatches')
+    assert not sorted_data[0].get('extraMatches')
+    assert not sorted_data[2].get('extraMatches')
+    extra = sorted_data[1].get('extraMatches')
+    assert len(extra) == 1
+    assert extra[0].get('mhrNumber') == '002200'
+    assert extra[0].get('organizationName') == 'CRYSTAL RIVER COURT LTD.'
 
 
 @pytest.mark.parametrize('mhr1,mhr2,mhr3,mhr4', TEST_SELECT_SORT_DATA_IND)
@@ -377,10 +387,15 @@ def test_search_sort_ind(session, client, jwt, mhr1, mhr2, mhr3, mhr4):
     sorted_data = search_result.search_select
 
     # check
-    assert len(sorted_data) == 4
+    assert len(sorted_data) == 3
     assert sorted_data[0]['mhrNumber'] == '022911'
     assert sorted_data[1]['mhrNumber'] == '002200'
     assert sorted_data[1]['ownerName']['first'] == 'JANE'
-    assert sorted_data[2]['mhrNumber'] == '002200'
-    assert sorted_data[2]['ownerName']['first'] == 'JOHN'
-    assert sorted_data[3]['mhrNumber'] == '001999'
+    assert sorted_data[2]['mhrNumber'] == '001999'
+    assert sorted_data[1].get('extraMatches')
+    assert not sorted_data[0].get('extraMatches')
+    assert not sorted_data[2].get('extraMatches')
+    extra = sorted_data[1].get('extraMatches')
+    assert len(extra) == 1
+    assert extra[0].get('mhrNumber') == '002200'
+    assert extra[0].get('ownerName')['first'] == 'JOHN'

@@ -93,7 +93,7 @@ ORDER BY de.sernumb1 ASC, mh.mhstatus ASC, mh.mhregnum DESC
 """
 
 OWNER_NAME_QUERY = """
-SELECT DISTINCT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate, o.ownrtype, o.ownrname, l.towncity, de.sernumb1,
+SELECT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate, o.ownrtype, o.ownrname, l.towncity, de.sernumb1,
        de.yearmade, de.makemodl, mh.manhomid, og.status, og.owngrpid
   FROM manuhome mh, document d, owner o, location l, descript de, owngroup og
  WHERE mh.mhregnum = d.mhregnum
@@ -112,7 +112,7 @@ ORDER BY o.ownrname ASC, og.status ASC, mh.mhstatus ASC, mh.mhregnum DESC
 """
 
 ORG_NAME_QUERY = """
-SELECT DISTINCT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate, o.ownrtype, o.ownrname, l.towncity, de.sernumb1,
+SELECT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate, o.ownrtype, o.ownrname, l.towncity, de.sernumb1,
        de.yearmade, de.makemodl, mh.manhomid, og.status, og.owngrpid
   FROM manuhome mh, document d, owner o, location l, descript de, owngroup og
  WHERE mh.mhregnum = d.mhregnum
@@ -129,6 +129,18 @@ SELECT DISTINCT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate, o.ownrtype, o
    AND og.status IN ('3', '4', '5')
 ORDER BY o.ownrname ASC, og.status ASC, mh.mhstatus ASC, mh.mhregnum DESC
 """
+
+LEGACY_TO_OWNER_STATUS = {
+    '3': 'ACTIVE',
+    '4': 'EXEMPT',
+    '5': 'PREVIOUS'
+}
+LEGACY_TO_REGISTRATION_STATUS = {
+    'R': 'ACTIVE',
+    'E': 'EXEMPT',
+    'C': 'HISTORICAL'
+}
+LEGACY_REGISTRATION_ACTIVE = 'R'
 
 
 def search_by_mhr_number(current_app, db, request_json):
@@ -206,3 +218,139 @@ def get_search_serial_number_key(serial_num: str) -> str:
     key = re.sub('[A-Z]', '0', key)
     start_pos: int = len(key) - 6
     return key[start_pos:]
+
+def build_search_result_owner(row):
+    """Build a single search by owner summary json from a DB row."""
+    mh_status = str(row[1])
+    status = LEGACY_TO_REGISTRATION_STATUS[mh_status]
+    # current_app.logger.info('Mapping timestamp')
+    timestamp = row[3]
+    # current_app.logger.info('Timestamp mapped')
+    value: str = str(row[8])
+    year = int(value) if value.isnumeric() else 0
+    result_json = {
+        'mhrNumber': str(row[0]),
+        'status': status,
+        'createDateTime': model_utils.format_local_ts(timestamp),
+        'homeLocation': str(row[6]).strip(),
+        'serialNumber': str(row[7]).strip(),
+        'baseInformation': {
+            'year': year,
+            'make': str(row[9]).strip(),
+            'model': ''
+        },
+        'activeCount': 0,
+        'exemptCount': 0,
+        'historicalCount': 0,
+        'mhId': int(row[10])
+    }
+    # current_app.logger.info(result_json)
+    owner_type = str(row[4])
+    owner_name = str(row[5]).strip()
+    if owner_type != 'I':
+        result_json['organizationName'] = owner_name
+    else:
+        result_json['ownerName'] = model_utils.get_ind_name_from_db2(owner_name)
+    owner_status: str = str(row[11])
+    result_json['ownerStatus'] = LEGACY_TO_OWNER_STATUS[owner_status]
+    if owner_status == '3':
+        result_json['activeCount'] = 1
+    elif owner_status == '4':
+        result_json['exemptCount'] = 1
+    elif owner_status == '5':
+        result_json['historicalCount'] = 1
+    return result_json
+
+def build_search_result_mhr(row):
+    """Build a single search summary json from a DB row for a mhr number search."""
+    mh_status = str(row[1])
+    status = LEGACY_TO_REGISTRATION_STATUS[mh_status]
+    # current_app.logger.info('Mapping timestamp')
+    timestamp = row[3]
+    # current_app.logger.info('Timestamp mapped')
+    value: str = str(row[6])
+    year = int(value) if value.isnumeric() else 0
+    result_json = {
+        'mhrNumber': str(row[0]),
+        'status': status,
+        'createDateTime': model_utils.format_local_ts(timestamp),
+        'homeLocation': str(row[4]).strip(),
+        'serialNumber': str(row[5]).strip(),
+        'baseInformation': {
+            'year': year,
+            'make': str(row[7]).strip(),
+            'model': ''
+        },
+        'activeCount': 0,
+        'exemptCount': 0,
+        'historicalCount': 0,
+        'mhId': int(row[8])
+    }
+    owner_info = str(row[9])
+    owner_type = owner_info[0:1]
+    owner_status = owner_info[1:2]
+    owner_name = owner_info[2:].strip()
+    if owner_type != 'I':
+         result_json['organizationName'] = owner_name
+    else:
+         result_json['ownerName'] = model_utils.get_ind_name_from_db2(owner_name)
+    result_json['ownerStatus'] = LEGACY_TO_OWNER_STATUS[owner_status]
+    if owner_status == '3':
+        result_json['activeCount'] = 1
+    elif owner_status == '4':
+        result_json['exemptCount'] = 1
+    elif owner_status == '5':
+        result_json['historicalCount'] = 1
+    # current_app.logger.info(result_json)
+    return result_json
+
+def build_search_result_serial(row, search_key: str):
+    """Build a single search summary json from a DB row for a serial number search."""
+    mh_status = str(row[1])
+    status = LEGACY_TO_REGISTRATION_STATUS[mh_status]
+    # current_app.logger.info('Mapping timestamp')
+    timestamp = row[3]
+    # current_app.logger.info('Timestamp mapped')
+    value: str = str(row[7])
+    year = int(value) if value.isnumeric() else 0
+    serial_num: str = str(row[6]).strip()
+    result_json = {
+        'mhrNumber': str(row[0]),
+        'status': status,
+        'createDateTime': model_utils.format_local_ts(timestamp),
+        'homeLocation': str(row[5]).strip(),
+        'baseInformation': {
+            'year': year,
+            'make': str(row[8]).strip(),
+            'model': ''
+        },
+        'activeCount': 1,
+        'exemptCount': 0,
+        'historicalCount': 0,
+        'mhId': int(row[9])
+    }
+    # current_app.logger.info(result_json)
+    owner_info = str(row[4])
+    owner_type = owner_info[0:1]
+    owner_status = owner_info[1:2]
+    owner_name = owner_info[2:].strip()
+    if owner_type != 'I':
+        result_json['organizationName'] = owner_name
+    else:
+        result_json['ownerName'] = model_utils.get_ind_name_from_db2(owner_name)
+    result_json['ownerStatus'] = LEGACY_TO_OWNER_STATUS[owner_status]
+    key: str = get_search_serial_number_key(serial_num)
+    if key != search_key:  # Match is on one of the other serial numbers.
+        serial_num = str(row[10])
+        if serial_num:
+            key = get_search_serial_number_key(serial_num.strip())
+    if key != search_key:
+        serial_num = str(row[11])
+        if serial_num:
+            key = get_search_serial_number_key(serial_num.strip())
+    if key != search_key:
+        serial_num = str(row[12])
+        if serial_num:
+            key = get_search_serial_number_key(serial_num.strip())
+    result_json['serialNumber'] = serial_num
+    return result_json
