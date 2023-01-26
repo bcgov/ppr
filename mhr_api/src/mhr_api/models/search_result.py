@@ -200,28 +200,6 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
         else:
             self.search_select = final_selection
 
-    def set_search_selection_last(self, update_select):
-        """Sort the selection for the report TOC."""
-        original_results = self.search.search_response
-        final_selection = []
-        for result in original_results:
-            for match in update_select:
-                if result['mhrNumber'] == match['mhrNumber']:
-                    if match.get('includeLienInfo', False):
-                        result['includeLienInfo'] = match.get('includeLienInfo')
-                    final_selection.append(result)
-                    break
-
-        # Now sort by search type.
-        if self.search.search_type == SearchRequest.SearchTypes.OWNER_NAME:
-            self.search_select = SearchResult.__sort_owner_ind(final_selection)
-        if self.search.search_type == SearchRequest.SearchTypes.ORGANIZATION_NAME:
-            self.search_select = SearchResult.__sort_owner_org(final_selection)
-        if self.search.search_type == SearchRequest.SearchTypes.SERIAL_NUM:
-            self.search_select = SearchResult.__sort_serial_num(final_selection)
-        else:
-            self.search_select = final_selection
-
     @classmethod
     def __sort_serial_num(cls, update_select):
         """Sort selected serial numbers."""
