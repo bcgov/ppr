@@ -161,7 +161,46 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
                     new_results.append(result)
         return new_results
 
-    def set_search_selection(self, update_select):
+    def set_search_selection(self, update_select):  # pylint: disable=too-many-branches
+        """Sort the selection for the report TOC."""
+        original_results = self.search.search_response
+        reg_list = [s['mhrNumber'] for s in update_select]
+        # Remove duplicates
+        reg_list = list(dict.fromkeys(reg_list))
+        # Update lien info flag
+        for result in original_results:
+            for match in update_select:
+                if result['mhrNumber'] == match['mhrNumber']:
+                    if match.get('includeLienInfo', False):
+                        result['includeLienInfo'] = match.get('includeLienInfo')
+
+        final_selection = []
+        for reg_num in reg_list:
+            # current_app.logger.info(f'reg_num={reg_num}')
+            result = None
+            for original in original_results:
+                if original['mhrNumber'] == reg_num:
+                    if not result:
+                        result = original
+                        result['extraMatches'] = []
+                    else:  # Combine matches
+                        result['extraMatches'].append(original)
+            if result:
+                if not result.get('extraMatches'):
+                    del result['extraMatches']
+                final_selection.append(result)
+
+        # Now sort by search type.
+        if self.search.search_type == SearchRequest.SearchTypes.OWNER_NAME:
+            self.search_select = SearchResult.__sort_owner_ind(final_selection)
+        if self.search.search_type == SearchRequest.SearchTypes.ORGANIZATION_NAME:
+            self.search_select = SearchResult.__sort_owner_org(final_selection)
+        if self.search.search_type == SearchRequest.SearchTypes.SERIAL_NUM:
+            self.search_select = SearchResult.__sort_serial_num(final_selection)
+        else:
+            self.search_select = final_selection
+
+    def set_search_selection_last(self, update_select):
         """Sort the selection for the report TOC."""
         original_results = self.search.search_response
         final_selection = []
