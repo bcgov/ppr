@@ -167,7 +167,7 @@ describe('Dashboard component', () => {
   it('displays the search header', async () => {
     const header = wrapper.findAll(searchHeader)
     expect(header.length).toBe(1)
-    expect(header.at(0).text()).toContain('Personal Property Search')
+    expect(header.at(0).text()).toContain('Personal Property Registry Search')
 
     defaultFlagSet['mhr-ui-enabled'] = true
     await store.dispatch('setAuthRoles', [AuthRoles.STAFF, AuthRoles.MHR, AuthRoles.PPR])
