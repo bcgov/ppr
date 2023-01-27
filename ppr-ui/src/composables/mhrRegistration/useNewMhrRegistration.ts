@@ -236,7 +236,7 @@ export const useNewMhrRegistration = () => {
     const draftFilings = await getMhrDrafts()
     const myMhrHistory = await mhrRegistrationHistory(true, sortOptions)
     const filteredMhrHistory = addHistoryDraftsToMhr(myMhrHistory, draftFilings, sortOptions)
-    setMhrTableHistory(filteredMhrHistory)
+    setMhrTableHistory(myMhrHistory)
   }
 
   function addHistoryDraftsToMhr (

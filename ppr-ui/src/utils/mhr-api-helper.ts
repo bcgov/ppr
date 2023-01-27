@@ -590,6 +590,8 @@ export function delayActions (milliseconds: number): Promise<any> {
 const UIFilterToApiFilter = {
   endDate: 'endDateTime',
   folNum: 'clientReferenceId',
+  orderBy: 'sortCriteriaName',
+  orderVal: 'sortDirection',
   regBy: 'username',
   regNum: 'mhrNumber',
   regType: 'registrationType',
@@ -603,12 +605,6 @@ function addSortParams (url: string, sortOptions: RegistrationSortIF): string {
   const sortKeys = Object.keys(sortOptions)
   // add all set filters as params to the call
   for (const i in sortKeys) {
-    // convert to api expected value (too tied in with header logic to change earlier)
-    if (sortOptions[sortKeys[i]] === 'createDateTime') {
-      // sortKeys[i] === orderBy (only case this will happen)
-      sortOptions[sortKeys[i]] = 'startDateTime'
-    }
-
     // add timestamp onto datetime param values
     if (sortOptions[sortKeys[i]] && ['startDateTime', 'endDateTime'].includes(UIFilterToApiFilter[sortKeys[i]])) {
       sortOptions[sortKeys[i]] =

@@ -441,56 +441,56 @@ export const registrationTableHeaders: Array<BaseHeaderIF> = [
 export const mhRegistrationTableHeaders: Array<BaseHeaderIF> = [
   {
     class: 'min-column-md',
-    sortable: false,
+    sortable: true,
     text: 'Registration Number',
     value: 'mhrNumber',
     display: true
   },
   {
     class: 'min-column-md',
-    sortable: false,
+    sortable: true,
     text: 'Registration Type',
-    value: 'registrationDescription',
+    value: 'registrationType',
     display: true
   },
   {
     class: 'min-column-md',
-    sortable: false,
+    sortable: true,
     text: 'Date (Pacific Time)',
     value: 'createDateTime',
     display: true
   },
   {
     class: 'min-column-sm',
-    sortable: false,
+    sortable: true,
     text: 'Status',
     value: 'statusType',
     display: true
   },
   {
     class: 'min-column-sm',
-    sortable: false,
+    sortable: true,
     text: 'Username',
     value: 'registeringName',
     display: true
   },
   {
     class: 'min-column-mds',
-    sortable: false,
+    sortable: true,
     text: 'Submitting Party',
     value: 'registeringParty',
     display: true
   },
   {
     class: 'min-column-mds',
-    sortable: false,
+    sortable: true,
     text: 'Owners',
     value: 'ownerNames',
     display: true
   },
   {
     class: 'min-column-mds',
-    sortable: false,
+    sortable: true,
     text: 'Folio/Reference Number',
     value: 'clientReferenceId',
     display: true

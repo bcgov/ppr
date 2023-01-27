@@ -68,7 +68,7 @@
                   />
                   <div v-if="header.value === 'registrationType'">
                     <registration-bar-type-ahead-list
-                      v-if="hasRPPR"
+                      v-if="hasRPPR && !isMhr"
                       id="reg-type-select"
                       :defaultLabel="'Registration Type'"
                       :defaultDense="true"
@@ -78,7 +78,7 @@
                     />
                     <v-select
                       v-else
-                      :items="registrationTypes"
+                      :items="isPpr ? registrationTypes : mhrRegistrationTypes"
                       single-line
                       item-text="registrationTypeUI"
                       item-value="registrationTypeAPI"
@@ -98,7 +98,7 @@
                       </template>
                     </v-select>
                   </div>
-                  <div v-if="header.value === 'registrationDescription'">
+                  <!-- <div v-if="header.value === 'registrationDescription'">
                     <v-select
                       :items="mhrRegistrationTypes"
                       single-line
@@ -119,7 +119,7 @@
                         </span>
                       </template>
                     </v-select>
-                  </div>
+                  </div> -->
                   <div
                     v-if="header.value === 'createDateTime'"
                     @click="showDatePicker = true"
