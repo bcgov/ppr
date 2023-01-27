@@ -199,9 +199,9 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
 
         if rows is not None:
             results_json = []
-            search_key: str = db2_search_utils.get_search_serial_number_key(self.request_json['criteria']['value'])
             for row in rows:
-                results_json.append(db2_search_utils.build_search_result_serial(row, search_key))
+                match = db2_search_utils.build_search_result_serial(row)
+                SearchRequest.update_result_matches(results_json, match, SearchRequest.SearchTypes.SERIAL_NUM)
             self.returned_results_size = len(results_json)
             self.total_results_size = self.returned_results_size
             self.search_response = results_json
@@ -270,12 +270,14 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
                     updated = True
                 elif search_type == cls.SearchTypes.OWNER_NAME and existing.get('ownerName') == result.get('ownerName'):
                     updated = True
+                elif search_type == cls.SearchTypes.SERIAL_NUM and existing.get('serialNumber') == result.get('serialNumber'):
+                    updated = True
                 if updated:
                     if result.get('activeCount') == 1:
                         existing['activeCount'] = (existing['activeCount'] + 1)
-                    elif result.get('exemptCount') == 1:
+                    elif search_type != cls.SearchTypes.SERIAL_NUM and result.get('exemptCount') == 1:
                         existing['exemptCount'] = (existing['exemptCount'] + 1)
-                    elif result.get('historicalCount') == 1:
+                    elif search_type != cls.SearchTypes.SERIAL_NUM and result.get('historicalCount') == 1:
                         existing['historicalCount'] = (existing['historicalCount'] + 1)
         if not updated:
             results.append(result)

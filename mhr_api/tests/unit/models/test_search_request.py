@@ -191,6 +191,13 @@ OWNER_NAME_JSON_COLLAPSE = {
     },
     'clientReferenceId': 'T-SQ-MI-3'
 }
+SERIAL_NUMBER_JSON_COLLAPSE = {
+    'type': 'SERIAL_NUMBER',
+    'criteria': {
+        'value': '000060'
+    },
+    'clientReferenceId': 'T-SQ-MS-3'
+}
 UPDATE_RESULTS_OWNER_BASE = [
     {
         'mhrNumber': '003456',
@@ -243,6 +250,44 @@ UPDATE_OWNER_RESULT_4 = {
     'exemptCount': 1,
     'historicalCount': 0
 }
+UPDATE_RESULTS_SERIAL_BASE = [
+    {
+        'mhrNumber': '003456',
+        'serialNumber': '313000A008326ABC',
+        'activeCount': 1,
+        'exemptCount': 0,
+        'historicalCount': 0
+    }
+]
+UPDATE_SERIAL_RESULT_1 = {
+    'mhrNumber': '003456',
+    'serialNumber': '313000A008326ABC',
+    'activeCount': 1,
+    'exemptCount': 0,
+    'historicalCount': 0
+}
+UPDATE_SERIAL_RESULT_2 = {
+    'mhrNumber': '003456',
+    'serialNumber': '313000A008326ABC',
+    'activeCount': 1,
+    'exemptCount': 0,
+    'historicalCount': 0
+}
+UPDATE_SERIAL_RESULT_3 = {
+    'mhrNumber': '003457',
+    'serialNumber': '313000A008326ABC',
+    'activeCount': 1,
+    'exemptCount': 0,
+    'historicalCount': 0
+}
+UPDATE_SERIAL_RESULT_4 = {
+    'mhrNumber': '003458',
+    'serialNumber': '313000A008326ABC',
+    'activeCount': 1,
+    'exemptCount': 0,
+    'historicalCount': 0
+}
+
 
 # testdata pattern is ({search type}, {JSON data})
 TEST_VALID_DATA = [
@@ -303,10 +348,19 @@ TEST_UPDATE_DATA_OWNER = [
     (UPDATE_OWNER_RESULT_1, UPDATE_OWNER_RESULT_3, 2, 1, 1, 0),
     (UPDATE_OWNER_RESULT_3, UPDATE_OWNER_RESULT_4, 3, 1, 0, 0)
 ]
+# testdata pattern is ({result1}, {result2}, {result_count}, {active_count}, {exempt_count}, {historical_count})
+TEST_UPDATE_DATA_SERIAL = [
+    (None, None, 1, 1, 0, 0),
+    (UPDATE_SERIAL_RESULT_1, None, 1, 2, 0, 0),
+    (UPDATE_SERIAL_RESULT_1, UPDATE_SERIAL_RESULT_2, 1, 3, 0, 0),
+    (UPDATE_SERIAL_RESULT_1, UPDATE_SERIAL_RESULT_3, 2, 2, 0, 0),
+    (UPDATE_SERIAL_RESULT_3, UPDATE_SERIAL_RESULT_4, 3, 1, 0, 0)
+]
 # testdata pattern is ({mhr_num}, {search_data}, {active_count}, {exempt_count}, {historical_count})
 TEST_COLLAPSE_DATA = [
     ('091688', ORG_NAME_JSON_COLLAPSE, 1, 0, 2),
-    ('005520', OWNER_NAME_JSON_COLLAPSE, 1, 0, 5)
+    ('005520', OWNER_NAME_JSON_COLLAPSE, 1, 0, 5),
+    ('099327', SERIAL_NUMBER_JSON_COLLAPSE, 3, 0, 0)
 ]
 
 
@@ -491,6 +545,22 @@ def test_update_result_owner(session, result1, result2, result_count, active_cou
         SearchRequest.update_result_matches(results, result1, SearchRequest.SearchTypes.OWNER_NAME)
     if result2:
         SearchRequest.update_result_matches(results, result2, SearchRequest.SearchTypes.OWNER_NAME)
+    assert len(results) == result_count
+    match = results[0]
+    assert match.get('activeCount') == active_count
+    assert match.get('exemptCount') == exempt_count
+    assert match.get('historicalCount') == historical_count
+
+
+@pytest.mark.parametrize('result1,result2,result_count,active_count,exempt_count,historical_count',
+                         TEST_UPDATE_DATA_SERIAL)
+def test_update_result_serial(session, result1, result2, result_count, active_count, exempt_count, historical_count):
+    """Assert that a search consolidating/collapsing results works as expected."""
+    results = copy.deepcopy(UPDATE_RESULTS_SERIAL_BASE)
+    if result1:
+        SearchRequest.update_result_matches(results, result1, SearchRequest.SearchTypes.SERIAL_NUM)
+    if result2:
+        SearchRequest.update_result_matches(results, result2, SearchRequest.SearchTypes.SERIAL_NUM)
     assert len(results) == result_count
     match = results[0]
     assert match.get('activeCount') == active_count
