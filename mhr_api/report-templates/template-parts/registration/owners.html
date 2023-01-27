@@ -33,7 +33,7 @@
         <div class="mt-3">
             <span class="section-sub-title">Group {{ group.groupId }}:&nbsp;</span>
             {% if group.interest is defined and group.interest != '' %}
-                <span class="section-data">Interest {{ group.interest|lower }}
+                <span class="section-data">Interest {{ group.interest|capitalize }}
                     {% if group.interestNumerator is defined and group.interestDenominator is defined %}
                         {{ group.interestNumerator }}/{{ group.interestDenominator }}
                     {% endif %}
@@ -88,11 +88,12 @@
     {% endfor %}
 {% elif addOwnerGroups is defined %}
     {% for group in addOwnerGroups %}
-        {% if group.type == 'COMMON' or (group.interestNumerator is defined and group.interestDenominator is defined) %}
+        {% if group.type == 'COMMON' or (group.interestNumerator is defined and group.interestDenominator is defined and
+              group.interestNumerator > 0 and group.interestDenominator > 0) %}
         <div class="mt-3">
             <span class="section-sub-title">Group {{ group.groupId }}:&nbsp;</span>
             {% if group.interest is defined and group.interest != '' %}
-                <span class="section-data">Interest {{ group.interest|lower }}
+                <span class="section-data">Interest {{ group.interest|capitalize }}
                     {% if group.interestNumerator is defined and group.interestDenominator is defined %}
                         {{ group.interestNumerator }}/{{ group.interestDenominator }}
                     {% endif %}

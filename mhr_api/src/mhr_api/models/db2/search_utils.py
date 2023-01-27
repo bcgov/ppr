@@ -64,7 +64,7 @@ SELECT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate, l.towncity, de.sernumb
 #          FROM owner o2
 #        WHERE o2.manhomid = mh.manhomid) as owner_names, 
 SERIAL_NUM_QUERY = """
-SELECT DISTINCT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate,
+SELECT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate,
        (SELECT o.ownrtype || og.status || o.ownrname
           FROM owner o, owngroup og
          WHERE mh.manhomid = o.manhomid
@@ -72,8 +72,8 @@ SELECT DISTINCT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate,
            AND o.owngrpid = og.owngrpid
            AND og.status IN ('3', '4')
            FETCH FIRST 1 ROWS ONLY) AS owner_info,
-       l.towncity, de.sernumb1, de.yearmade,
-       de.makemodl, mh.manhomid, TRIM(de.sernumb2), TRIM(de.sernumb3), TRIM(de.sernumb4)
+       l.towncity, TRIM(de.sernumb1) AS serial_num, de.yearmade,
+       de.makemodl, mh.manhomid
   FROM manuhome mh, document d, location l, descript de
  WHERE mh.mhregnum = d.mhregnum
    AND mh.regdocid = d.documtid
@@ -81,15 +81,70 @@ SELECT DISTINCT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate,
    AND l.status = 'A'
    AND mh.manhomid = de.manhomid
    AND de.status = 'A'
-   AND (RIGHT(('000000' || TRANSLATE(TRIM(de.sernumb1), '08600064100100000050000042', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')),
-              6) = :query_value OR
-        RIGHT(('000000' || TRANSLATE(TRIM(de.sernumb2), '08600064100100000050000042', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')),
-              6) = :query_value OR
-        RIGHT(('000000' || TRANSLATE(TRIM(de.sernumb3), '08600064100100000050000042', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')),
-              6) = :query_value OR
-        RIGHT(('000000' || TRANSLATE(TRIM(de.sernumb4), '08600064100100000050000042', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')),
-              6) = :query_value)
-ORDER BY de.sernumb1 ASC, mh.mhstatus ASC, mh.mhregnum DESC
+   AND RIGHT(('000000' || TRANSLATE(TRIM(de.sernumb1), '08600064100100000050000042', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')),
+             6) = :query_value
+ UNION ALL (
+SELECT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate,
+       (SELECT o.ownrtype || og.status || o.ownrname
+          FROM owner o, owngroup og
+         WHERE mh.manhomid = o.manhomid
+           AND mh.manhomid = og.manhomid
+           AND o.owngrpid = og.owngrpid
+           AND og.status IN ('3', '4')
+           FETCH FIRST 1 ROWS ONLY) AS owner_info,
+       l.towncity, TRIM(de.sernumb2) AS serial_num, de.yearmade,
+       de.makemodl, mh.manhomid
+  FROM manuhome mh, document d, location l, descript de
+ WHERE mh.mhregnum = d.mhregnum
+   AND mh.regdocid = d.documtid
+   AND mh.manhomid = l.manhomid
+   AND l.status = 'A'
+   AND mh.manhomid = de.manhomid
+   AND de.status = 'A'
+   AND RIGHT(('000000' || TRANSLATE(TRIM(de.sernumb2), '08600064100100000050000042', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')),
+             6) = :query_value
+) UNION ALL (
+SELECT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate,
+       (SELECT o.ownrtype || og.status || o.ownrname
+          FROM owner o, owngroup og
+         WHERE mh.manhomid = o.manhomid
+           AND mh.manhomid = og.manhomid
+           AND o.owngrpid = og.owngrpid
+           AND og.status IN ('3', '4')
+           FETCH FIRST 1 ROWS ONLY) AS owner_info,
+       l.towncity, TRIM(de.sernumb3) AS serial_num, de.yearmade,
+       de.makemodl, mh.manhomid
+  FROM manuhome mh, document d, location l, descript de
+ WHERE mh.mhregnum = d.mhregnum
+   AND mh.regdocid = d.documtid
+   AND mh.manhomid = l.manhomid
+   AND l.status = 'A'
+   AND mh.manhomid = de.manhomid
+   AND de.status = 'A'
+   AND RIGHT(('000000' || TRANSLATE(TRIM(de.sernumb3), '08600064100100000050000042', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')),
+              6) = :query_value
+) UNION ALL (
+SELECT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate,
+       (SELECT o.ownrtype || og.status || o.ownrname
+          FROM owner o, owngroup og
+         WHERE mh.manhomid = o.manhomid
+           AND mh.manhomid = og.manhomid
+           AND o.owngrpid = og.owngrpid
+           AND og.status IN ('3', '4')
+           FETCH FIRST 1 ROWS ONLY) AS owner_info,
+       l.towncity, TRIM(de.sernumb4) AS serial_num, de.yearmade,
+       de.makemodl, mh.manhomid
+  FROM manuhome mh, document d, location l, descript de
+ WHERE mh.mhregnum = d.mhregnum
+   AND mh.regdocid = d.documtid
+   AND mh.manhomid = l.manhomid
+   AND l.status = 'A'
+   AND mh.manhomid = de.manhomid
+   AND de.status = 'A'
+   AND RIGHT(('000000' || TRANSLATE(TRIM(de.sernumb4), '08600064100100000050000042', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')),
+             6) = :query_value
+)
+ORDER BY serial_num ASC, mhstatus ASC, mhregnum DESC
 """
 
 OWNER_NAME_QUERY = """
@@ -304,7 +359,7 @@ def build_search_result_mhr(row):
     # current_app.logger.info(result_json)
     return result_json
 
-def build_search_result_serial(row, search_key: str):
+def build_search_result_serial(row):
     """Build a single search summary json from a DB row for a serial number search."""
     mh_status = str(row[1])
     status = LEGACY_TO_REGISTRATION_STATUS[mh_status]
@@ -313,7 +368,6 @@ def build_search_result_serial(row, search_key: str):
     # current_app.logger.info('Timestamp mapped')
     value: str = str(row[7])
     year = int(value) if value.isnumeric() else 0
-    serial_num: str = str(row[6]).strip()
     result_json = {
         'mhrNumber': str(row[0]),
         'status': status,
@@ -324,6 +378,7 @@ def build_search_result_serial(row, search_key: str):
             'make': str(row[8]).strip(),
             'model': ''
         },
+        'serialNumber': str(row[6]).strip(),
         'activeCount': 1,
         'exemptCount': 0,
         'historicalCount': 0,
@@ -339,18 +394,4 @@ def build_search_result_serial(row, search_key: str):
     else:
         result_json['ownerName'] = model_utils.get_ind_name_from_db2(owner_name)
     result_json['ownerStatus'] = LEGACY_TO_OWNER_STATUS[owner_status]
-    key: str = get_search_serial_number_key(serial_num)
-    if key != search_key:  # Match is on one of the other serial numbers.
-        serial_num = str(row[10])
-        if serial_num:
-            key = get_search_serial_number_key(serial_num.strip())
-    if key != search_key:
-        serial_num = str(row[11])
-        if serial_num:
-            key = get_search_serial_number_key(serial_num.strip())
-    if key != search_key:
-        serial_num = str(row[12])
-        if serial_num:
-            key = get_search_serial_number_key(serial_num.strip())
-    result_json['serialNumber'] = serial_num
     return result_json
