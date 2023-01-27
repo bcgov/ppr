@@ -7,26 +7,6 @@
           <span class="tombstone-header">
             <b>{{ header }}</b>
           </span>
-          <v-tooltip top content-class="top-tooltip pa-5" nudge-left="30" transition="fade-transition">
-            <template  v-slot:activator="{ on, attrs }">
-              <a
-              :href="'https://www2.gov.bc.ca/gov/content/employment-business/business/managing-a-business/'
-                +'permits-licences/news-updates/modernization-updates/modernization-resources#ppr'"
-              class="text-decoration-none"
-              target="_blank"
-              rel="noopener noreferrer">
-                <div v-bind="attrs" v-on="on">
-                  <v-row no-gutters class="align-center">
-                    <v-icon left color="primary">mdi-help-circle-outline</v-icon>
-                    <span class="primary--text">Help</span>
-                    <v-icon right color="primary" small>mdi-open-in-new</v-icon>
-                  </v-row>
-                </div>
-              </a>
-            </template>
-            Learn about the Personal Property Registry and how to use the application through step-by-step guides,
-            online videos, and downloadable quick guides.
-          </v-tooltip>
         </v-row>
         <v-row id="tombstone-user-info" class="tombstone-sub-header" no-gutters>
           <v-col cols="7">
@@ -45,7 +25,25 @@
           </v-col>
           <v-col cols="5">
             <v-row no-gutters justify="end">
-              <span class="font-weight-bold pr-2">Registry Time:</span>{{ date }}
+              <v-tooltip top content-class="top-tooltip pa-5" nudge-left="30" transition="fade-transition">
+                <template  v-slot:activator="{ on, attrs }">
+                  <a :href="'https://www2.gov.bc.ca/gov/content/employment-business/business/managing-a-business/'
+                           +'permits-licences/news-updates/modernization-updates/modernization-resources#ppr'"
+                    class="text-decoration-none"
+                    target="_blank"
+                    rel="noopener noreferrer">
+                    <div v-bind="attrs" v-on="on">
+                      <v-row no-gutters class="align-center">
+                        <v-icon left color="primary">mdi-help-circle-outline</v-icon>
+                        <span class="primary--text">Help</span>
+                        <v-icon right color="primary" small>mdi-open-in-new</v-icon>
+                      </v-row>
+                    </div>
+                  </a>
+                </template>
+                Learn about the Personal Property Registry and how to use the application through step-by-step guides,
+                online videos, and downloadable quick guides.
+              </v-tooltip>
             </v-row>
           </v-col>
         </v-row>
