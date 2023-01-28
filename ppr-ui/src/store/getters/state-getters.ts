@@ -34,7 +34,9 @@ import {
   VehicleCollateralIF,
   MhrRegistrationHomeOwnerGroupIF,
   MhRegistrationSummaryIF,
-  UserInfoIF
+  UserInfoIF,
+  AccountModelIF,
+  AccountIF
 } from '@/interfaces'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 import { HomeLocation, HomeOwners, MhrReviewConfirm, SubmittingParty, YourHome } from '@/views'
@@ -42,6 +44,10 @@ import { useMhrValidations } from '@/composables'
 import { toRefs } from '@vue/composition-api'
 import { MhrSectVal } from '@/composables/mhrRegistration/enums'
 import { getFeatureFlag } from '@/utils'
+
+export const getAccountModel = (state: AccountIF): AccountModelIF => {
+  return state.account
+}
 
 /** Convenient when there is a need to access several properties. */
 export const getStateModel = (state: StateIF): StateModelIF => {
