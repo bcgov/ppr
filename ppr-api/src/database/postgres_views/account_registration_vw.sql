@@ -32,7 +32,7 @@ SELECT r.registration_number, r.registration_ts, r.registration_type, r.registra
        (SELECT CASE WHEN r.user_id IS NULL THEN ''
                     ELSE (SELECT u.firstname || ' ' || u.lastname
                             FROM users u
-                           WHERE u.username = r.user_id) END) AS registering_name,
+                           WHERE u.username = r.user_id FETCH FIRST 1 ROWS ONLY) END) AS registering_name,
        r.account_id AS orig_account_id,
        r2.account_id AS base_account_id,
        (SELECT COUNT(vr.id)
@@ -89,7 +89,7 @@ SELECT r.registration_number, r.registration_ts, r.registration_type, r.registra
        (SELECT CASE WHEN r.user_id IS NULL THEN ''
                     ELSE (SELECT u.firstname || ' ' || u.lastname
                             FROM users u
-                           WHERE u.username = r.user_id) END) AS registering_name,
+                           WHERE u.username = r.user_id FETCH FIRST 1 ROWS ONLY) END) AS registering_name,
        r.account_id AS orig_account_id,
        r2.account_id AS base_account_id,
        (SELECT COUNT(vr.id)

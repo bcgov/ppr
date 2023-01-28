@@ -227,7 +227,7 @@ SELECT r.id, r.registration_number, r.registration_ts, r.registration_type, r.re
        (SELECT CASE WHEN r.user_id IS NULL THEN ''
                     ELSE (SELECT u.firstname || ' ' || u.lastname
                             FROM users u
-                           WHERE u.username = r.user_id) END) AS registering_name
+                           WHERE u.username = r.user_id FETCH FIRST 1 ROWS ONLY) END) AS registering_name
   FROM registrations r, registration_types rt, financing_statements fs
  WHERE r.registration_type = rt.registration_type
    AND fs.id = r.financing_id
@@ -276,7 +276,7 @@ SELECT r.registration_number, r.registration_ts, r.registration_type, r.registra
        (SELECT CASE WHEN r.user_id IS NULL THEN ''
                     ELSE (SELECT u.firstname || ' ' || u.lastname
                             FROM users u
-                           WHERE u.username = r.user_id) END) AS registering_name,
+                           WHERE u.username = r.user_id FETCH FIRST 1 ROWS ONLY) END) AS registering_name,
       (SELECT COUNT(id)
          FROM user_extra_registrations uer
         WHERE uer.registration_number = r.registration_number
@@ -328,7 +328,7 @@ SELECT r.registration_number, r.registration_ts, r.registration_type, r.registra
        (SELECT CASE WHEN r.user_id IS NULL THEN ''
                     ELSE (SELECT u.firstname || ' ' || u.lastname
                             FROM users u
-                           WHERE u.username = r.user_id) END) AS registering_name,
+                           WHERE u.username = r.user_id FETCH FIRST 1 ROWS ONLY) END) AS registering_name,
        0 AS removed_count
   FROM registrations r, registration_types rt, financing_statements fs, q
  WHERE r.registration_type = rt.registration_type
@@ -377,7 +377,7 @@ SELECT r.registration_number, r.registration_ts, r.registration_type, r.registra
        (SELECT CASE WHEN r.user_id IS NULL THEN ''
                     ELSE (SELECT u.firstname || ' ' || u.lastname
                             FROM users u
-                           WHERE u.username = r.user_id) END) AS registering_name,
+                           WHERE u.username = r.user_id FETCH FIRST 1 ROWS ONLY) END) AS registering_name,
        r.account_id,
        (SELECT COUNT(uer.id)
           FROM user_extra_registrations uer
@@ -472,7 +472,8 @@ SELECT d.document_number, d.create_ts, d.registration_type, d.registration_type_
        (SELECT CASE WHEN d.user_id IS NULL THEN ''
                     ELSE (SELECT u.firstname || ' ' || u.lastname
                             FROM users u
-                           WHERE u.username = d.user_id) END) AS registering_name, d.account_id
+                           WHERE u.username = d.user_id FETCH FIRST 1 ROWS ONLY) END) AS registering_name,
+       d.account_id
   FROM drafts d, registration_types rt
  WHERE d.account_id = :query_account
    AND d.registration_type = rt.registration_type

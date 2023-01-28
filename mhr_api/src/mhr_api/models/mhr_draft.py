@@ -45,7 +45,7 @@ SELECT d.draft_number, d.create_ts, d.registration_type, rt.registration_type_de
        (SELECT CASE WHEN d.user_id IS NULL THEN ''
                     ELSE (SELECT u.firstname || ' ' || u.lastname
                             FROM users u
-                           WHERE u.username = d.user_id) END) AS registering_name,
+                           WHERE u.username = d.user_id FETCH FIRST 1 ROWS ONLY) END) AS registering_name,
        d.mhr_number
   FROM mhr_drafts d, mhr_registration_types rt
  WHERE d.account_id = :query_account

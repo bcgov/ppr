@@ -66,7 +66,8 @@ QUERY_ACCOUNT_REGISTRATIONS_SUMMARY = """
 SELECT mr.id, mr.registration_ts, mr.account_id, mr.registration_type, mr.mhr_number, mr.document_id,
        mrr.create_ts as doc_ts, mrr.doc_storage_url, mrt.registration_type_desc,
        (SELECT CASE WHEN mr.user_id IS NULL THEN ''
-          ELSE (SELECT u.firstname || ' ' || u.lastname FROM users u WHERE u.username = mr.user_id)
+          ELSE (SELECT u.firstname || ' ' || u.lastname FROM users u WHERE u.username = mr.user_id
+                FETCH FIRST 1 ROWS ONLY)
            END) AS username
   FROM mhr_registrations mr, mhr_registration_reports mrr, mhr_registration_types mrt
  WHERE mr.mhr_number IN (SELECT DISTINCT mer.mhr_number

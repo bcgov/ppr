@@ -37,7 +37,8 @@ SELECT sc.id, sc.search_ts, sc.api_criteria, sc.total_results_size, sc.returned_
        sr.callback_url, sr.doc_storage_url,
        json_array_length(sr.api_result) as selected_match_count,
        (SELECT CASE WHEN sc.user_id IS NULL THEN ''
-         ELSE (SELECT u.firstname || ' ' || u.lastname FROM users u WHERE u.username = sc.user_id)
+         ELSE (SELECT u.firstname || ' ' || u.lastname FROM users u WHERE u.username = sc.user_id
+               FETCH FIRST 1 ROWS ONLY)
          END) AS username
 FROM search_requests sc, search_results sr
 WHERE sc.id = sr.search_id
@@ -53,7 +54,8 @@ SELECT sc.id, sc.search_ts, sc.api_criteria, sc.total_results_size, sc.returned_
        sr.callback_url, sr.doc_storage_url,
        json_array_length(sr.api_result) as selected_match_count,
        (SELECT CASE WHEN sc.user_id IS NULL THEN ''
-         ELSE (SELECT u.firstname || ' ' || u.lastname FROM users u WHERE u.username = sc.user_id)
+         ELSE (SELECT u.firstname || ' ' || u.lastname FROM users u WHERE u.username = sc.user_id
+               FETCH FIRST 1 ROWS ONLY)
          END) AS username
 FROM search_requests sc, search_results sr
 WHERE sc.id = sr.search_id
@@ -68,7 +70,8 @@ SELECT sc.id, sc.search_ts, sc.api_criteria, sc.total_results_size, sc.returned_
        sr.callback_url, sr.doc_storage_url, sr.api_result,
        json_array_length(sr.api_result) as selected_match_count,
        (SELECT CASE WHEN sc.user_id IS NULL THEN ''
-         ELSE (SELECT u.firstname || ' ' || u.lastname FROM users u WHERE u.username = sc.user_id)
+         ELSE (SELECT u.firstname || ' ' || u.lastname FROM users u WHERE u.username = sc.user_id
+               FETCH FIRST 1 ROWS ONLY)
          END) AS username
 FROM search_requests sc, search_results sr
 WHERE sc.id = sr.search_id
@@ -84,7 +87,8 @@ SELECT sc.id, sc.search_ts, sc.api_criteria, sc.total_results_size, sc.returned_
        sr.callback_url, sr.doc_storage_url, sr.api_result,
        json_array_length(sr.api_result) as selected_match_count,
        (SELECT CASE WHEN sc.user_id IS NULL THEN ''
-         ELSE (SELECT u.firstname || ' ' || u.lastname FROM users u WHERE u.username = sc.user_id)
+         ELSE (SELECT u.firstname || ' ' || u.lastname FROM users u WHERE u.username = sc.user_id
+               FETCH FIRST 1 ROWS ONLY)
          END) AS username
 FROM search_requests sc, search_results sr
 WHERE sc.id = sr.search_id
