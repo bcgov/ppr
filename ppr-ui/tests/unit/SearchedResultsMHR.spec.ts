@@ -109,25 +109,29 @@ describe('Serial number results', () => {
     // Verify base mode features
     expect(wrapper.find('#search-summary-info').exists()).toBe(true)
     expect(wrapper.find('#home-results-count').text()).toBe('Matches Found: 5')
-    expect(wrapper.find('#selected-results-count').text()).toBe('Matches Selected: 0')
+    expect(wrapper.find('#selected-results-count').text()).toBe('Matches selected: 0')
+    expect(wrapper.find('#selected-lien-count').text()).toBe('PPR Lien Searches Selected: 0')
     expect(wrapper.find('#review-confirm-btn').exists()).toBe(true)
     expect(wrapper.find('#select-all-checkbox').exists()).toBe(true)
     expect(wrapper.find('#select-all-lien-checkbox').exists()).toBe(true)
   })
 
   it('displays results in the table', async () => {
-    const datatable = wrapper.findAll(resultsTable)
-    expect(datatable.length).toBe(1)
+    expect(wrapper.findAll(resultsTable).length).toBe(1)
     const rows = wrapper.findAll('tr')
     expect(rows.length).toBe(testResults.results.length + 1)
 
-    for (let i; i < testResults.results; i++) {
+    for (let i = 0; i < testResults.results.length; i++) {
       expect(rows.at(i + 1).text()).toContain(testResults.results[i].mhrNumber)
       expect(rows.at(i + 1).text()).toContain(testResults.results[i].serialNumber)
       expect(rows.at(i + 1).text()).toContain(testResults.results[i].baseInformation.year)
       expect(rows.at(i + 1).text()).toContain(testResults.results[i].baseInformation.make)
       expect(rows.at(i + 1).text()).toContain(testResults.results[i].baseInformation.model)
     }
+
+    // Row with consolidated serial numbers (serial numbers that are identical in search results table)
+    const consolidatedRow = 3 // row where activeCount is grater than 1
+    expect(rows.at(consolidatedRow).text()).toContain(`(${testResults.results[consolidatedRow - 1].activeCount})`)
   })
 })
 
@@ -194,7 +198,8 @@ describe('Owner name debtor results', () => {
     // Verify base mode features
     expect(wrapper.find('#search-summary-info').exists()).toBe(true)
     expect(wrapper.find('#home-results-count').text()).toBe('Matches Found: 5')
-    expect(wrapper.find('#selected-results-count').text()).toBe('Matches Selected: 0')
+    expect(wrapper.find('#selected-results-count').text()).toBe('Matches selected: 0')
+    expect(wrapper.find('#selected-lien-count').text()).toBe('PPR Lien Searches Selected: 0')
     expect(wrapper.find('#review-confirm-btn').exists()).toBe(true)
     expect(wrapper.find('#select-all-checkbox').exists()).toBe(true)
     expect(wrapper.find('#select-all-lien-checkbox').exists()).toBe(true)
@@ -206,7 +211,7 @@ describe('Owner name debtor results', () => {
     const rows = wrapper.findAll('tr')
     expect(rows.length).toBe(testResults.results.length + 1)
 
-    for (let i; i < testResults.results; i++) {
+    for (let i = 0; i < testResults.results.length; i++) {
       expect(rows.at(i + 1).text()).toContain(testResults.results[i].mhrNumber)
       expect(rows.at(i + 1).text()).toContain(testResults.results[i].serialNumber)
       expect(rows.at(i + 1).text()).toContain(testResults.results[i].baseInformation.year)
@@ -279,7 +284,8 @@ describe('Business organization results', () => {
     // Verify base mode features
     expect(wrapper.find('#search-summary-info').exists()).toBe(true)
     expect(wrapper.find('#home-results-count').text()).toBe('Matches Found: 5')
-    expect(wrapper.find('#selected-results-count').text()).toBe('Matches Selected: 0')
+    expect(wrapper.find('#selected-results-count').text()).toBe('Matches selected: 0')
+    expect(wrapper.find('#selected-lien-count').text()).toBe('PPR Lien Searches Selected: 0')
     expect(wrapper.find('#review-confirm-btn').exists()).toBe(true)
     expect(wrapper.find('#select-all-checkbox').exists()).toBe(true)
     expect(wrapper.find('#select-all-lien-checkbox').exists()).toBe(true)
@@ -291,7 +297,7 @@ describe('Business organization results', () => {
     const rows = wrapper.findAll('tr')
     expect(rows.length).toBe(testResults.results.length + 1)
 
-    for (let i; i < testResults.results; i++) {
+    for (let i = 0; i < testResults.results.length; i++) {
       expect(rows.at(i + 1).text()).toContain(testResults.results[i].mhrNumber)
     }
   })
@@ -358,7 +364,8 @@ describe('Manufactured home results', () => {
     // Verify base mode features
     expect(wrapper.find('#search-summary-info').exists()).toBe(true)
     expect(wrapper.find('#home-results-count').text()).toBe('Matches Found: 5')
-    expect(wrapper.find('#selected-results-count').text()).toBe('Matches Selected: 0')
+    expect(wrapper.find('#selected-results-count').text()).toBe('Matches selected: 0')
+    expect(wrapper.find('#selected-lien-count').text()).toBe('PPR Lien Searches Selected: 0')
     expect(wrapper.find('#review-confirm-btn').exists()).toBe(true)
     expect(wrapper.find('#select-all-checkbox').exists()).toBe(true)
     expect(wrapper.find('#select-all-lien-checkbox').exists()).toBe(true)
@@ -370,7 +377,7 @@ describe('Manufactured home results', () => {
     const rows = wrapper.findAll('tr')
     expect(rows.length).toBe(testResults.results.length + 1)
 
-    for (let i; i < testResults.results; i++) {
+    for (let i = 0; i < testResults.results.length; i++) {
       expect(rows.at(i + 1).text()).toContain(testResults.results[i].mhrNumber)
       expect(rows.at(i + 1).text()).toContain(testResults.results[i].serialNumber)
       expect(rows.at(i + 1).text()).toContain(testResults.results[i].baseInformation.year)
