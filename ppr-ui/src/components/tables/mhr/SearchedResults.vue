@@ -4,18 +4,19 @@
     <article id="search-meta-info" class="px-4 pt-8">
       <v-row no-gutters>
         <span class="search-sub-title">{{ searchType }} - <b>"{{ searchValue }}"</b></span>
-        <span class="search-info"> as of {{ searchTime }}</span>
       </v-row>
       <v-row v-if="searched && !isReviewMode" id="search-summary-info" class="result-info pt-6">
         <v-col id="home-results-count" cols="auto">
-          <span class="divider pr-3"><b>{{ totalResultsLength }}</b> homes found</span>
-        </v-col>
-        <v-col id="active-results-count" cols="auto" class="pl-0">
-          <span class="divider pr-3"><b>{{ activeMatchesLength }}</b> active homes</span>
+          <span class="divider pr-3">Matches Found: <b>{{ totalResultsLength }}</b></span>
         </v-col>
         <v-col cols="auto" class="pl-0">
-          <span id="selected-results-count">
-            <b>{{ selectedMatchesLength }}</b> homes selected + <b>{{ selectedLiensLength }}</b> lien search
+          <span id="selected-results-count" class="divider pr-3">
+            Matches Selected: <b>{{ selectedMatchesLength }}</b>
+          </span>
+        </v-col>
+        <v-col cols="auto" class="pl-0">
+          <span>
+            PPR Lien Searches Selected: <b>{{ selectedLiensLength }}</b>
           </span>
         </v-col>
         <v-col class="mt-n3 mr-6">
@@ -40,7 +41,13 @@
       </v-row>
       <v-row v-else class="result-info">
         <v-col id="review-results-count" cols="auto">
-          <span><b>{{ selectedMatchesLength }}</b> Manufactured Homes</span>
+          <span>Matches Selected: <b>{{ selectedMatchesLength }}</b></span>
+        </v-col>
+        <v-col id="review-registrations-count" cols="auto">
+          <span>Registrations:  <b>{{ getUniqueRegistrationCount() }}</b></span>
+        </v-col>
+        <v-col id="review-registrations-count" cols="auto">
+          <span>PPR Lien Searches Selected: <b>{{ selectedLiensLength }}</b></span>
         </v-col>
       </v-row>
     </article>
@@ -124,7 +131,7 @@
               :class="item.selected && !$props.isReviewMode ? 'selected' : ''"
             >
               <v-col cols="2">
-                <v-checkbox v-model="item.selected" @click="onSelectionCheckboxClick(item)"/>
+                <v-checkbox v-model="item.selected" :ripple="false" @click="onSelectionCheckboxClick(item)"/>
               </v-col>
               <v-col class="owner-name-text" @click="item.selected = !item.selected; onSelectionCheckboxClick(item)">
                 {{ getOwnerName(item) }}
@@ -145,13 +152,13 @@
                 {{ item.mhrNumber }}
               </v-col>
             </v-row>
-            <span v-else>{{ item.mhrNumber }}</span>
+            <span v-else-if="item.firstRow">{{ item.mhrNumber }}</span>
           </template>
           <template v-slot:[`item.ownerStatus`]="{ item }">
-            {{ getOwnerStatus(item.ownerStatus) }}
+            {{ getOwnerStatusText(item) }}
           </template>
           <template v-if="isReviewMode" v-slot:[`item.yearMakeModel`]="{ item }">
-            {{ item.baseInformation.year }} {{ item.baseInformation.make }} {{ item.baseInformation.model }}
+            <span v-if="item.firstRow">{{ item.baseInformation.year }} {{ item.baseInformation.make }} {{ item.baseInformation.model }}</span>
           </template>
           <template v-else v-slot:[`item.year`]="{ item }">
             {{ item.baseInformation.year || '-' }}
@@ -163,7 +170,7 @@
             {{ item.baseInformation.model || '-' }}
           </template>
           <template v-slot:[`item.homeLocation`]="{ item }">
-            {{ item.homeLocation }}
+            <span v-if="item.firstRow">{{ item.homeLocation }}</span>
           </template>
           <template v-slot:[`item.serialNumber`]="{ item }">
             <v-row
@@ -178,7 +185,7 @@
                 {{ item.serialNumber }}
               </v-col>
             </v-row>
-            <span v-else>{{ item.serialNumber }}</span>
+            <span v-else-if="item.firstRow">{{ item.serialNumber }}</span>
           </template>
           <template v-slot:[`item.edit`]="{ item }">
             <v-tooltip
@@ -189,6 +196,7 @@
               <template v-slot:activator="{ on, attrs }">
                 <span  v-bind="attrs" v-on="on">
                   <v-checkbox
+                    v-if="item.firstRow"
                     :label="`${!isReviewMode ? 'Include lien' : 'Lien'} information`"
                     v-model="item.includeLienInfo"
                     :disabled="!item.selected"
@@ -232,7 +240,7 @@ import { BaseHeaderIF, ManufacturedHomeSearchResultIF } from '@/interfaces' // e
 import { FolioNumber } from '@/components/common'
 import { pacificDate } from '@/utils'
 import { RouteNames, UIMHRSearchTypes, UIMHRSearchTypeValues } from '@/enums'
-import { cloneDeep } from 'lodash'
+import { cloneDeep, orderBy } from 'lodash'
 
 export default defineComponent({
   components: {
@@ -370,7 +378,30 @@ export default defineComponent({
     }
 
     const getItemClass = (item: ManufacturedHomeSearchResultIF): string => {
-      return item.selected && !props.isReviewMode ? 'selected' : ''
+      // check if item is first in list of similar owners
+      if (localState.results.indexOf(item) < localState.results.length - 1 && item.firstRow &&
+          !localState.results[localState.results.indexOf(item) + 1].firstRow && props.isReviewMode) {
+        console.log('first row', localState.results.indexOf(item))
+        return 'first-row'
+      }
+      if (props.isReviewMode && !item.firstRow) {
+        console.log('setting class')
+        return 'collapsed-owner'
+      } else {
+        return item.selected && !props.isReviewMode ? 'selected' : ''
+      }
+    }
+
+    const getUniqueRegistrationCount = (): number => {
+      var includedRegs = []
+      var regCount = 0
+      localState.results.forEach(result => {
+        if (!includedRegs.includes(result.mhrNumber)) {
+          includedRegs.push(result.mhrNumber)
+          regCount++
+        }
+      })
+      return regCount
     }
 
     const onSelectionCheckboxClick = (item: ManufacturedHomeSearchResultIF): void => {
@@ -383,10 +414,35 @@ export default defineComponent({
     }
 
     const getOwnerStatus = (ownerStatus: string): string => {
-      if (ownerStatus) {
+      if (ownerStatus === 'PREVIOUS') {
         if (ownerStatus === 'PREVIOUS') return 'HISTORICAL'
         else return ownerStatus
       } else return ''
+    }
+
+    const getOwnerStatusText = (item: ManufacturedHomeSearchResultIF): string => {
+      var returnText = ''
+      if (item.activeCount > 0) {
+        returnText += 'ACTIVE'
+        if (item.activeCount > 1) returnText += ' (' + item.activeCount + ')'
+        hasMultipleStatus(item) ? returnText += ',\n' : returnText += '\n'
+      }
+      if (item.exemptCount > 0) {
+        returnText += 'EXEMPT'
+        if (item.exemptCount > 1) returnText += ' (' + item.exemptCount + ')'
+        hasMultipleStatus(item) ? returnText += ',\n' : returnText += '\n'
+      }
+      if (item.historicalCount > 0) {
+        returnText += 'HISTORICAL'
+        if (item.historicalCount > 1) returnText += ' (' + item.historicalCount + ')'
+      }
+      return returnText
+    }
+
+    const hasMultipleStatus = (item: ManufacturedHomeSearchResultIF): boolean => {
+      return (item.activeCount > 0 && item.exemptCount > 0) ||
+             (item.activeCount > 0 && item.historicalCount > 0) ||
+             (item.exemptCount > 0 && item.historicalCount > 0)
     }
 
     const updateFolioOrReference = (folioOrReference: string): void => {
@@ -396,7 +452,6 @@ export default defineComponent({
     onMounted(async () => {
       const resp = getManufacturedHomeSearchResults.value
       if (!resp) await router.push({ name: RouteNames.DASHBOARD })
-
       localState.searchValue = resp?.searchQuery.criteria.value || getOwnerName(resp?.searchQuery.criteria)
       localState.searched = true
       localState.searchType = getSearchedType.value?.searchTypeUI || ''
@@ -405,6 +460,28 @@ export default defineComponent({
         // includeLienInfo needs to be initialized because it doesn't exist in the DB/results response
         return result.includeLienInfo !== true ? { ...result, includeLienInfo: false } : result
       })
+
+      // sort search results and label first row true/false on review for each result
+      const sortedResults = orderBy(localState.results, ['mhrNumber', 'ownerName.lastName', 'ownerName.middleName', 'ownerName.firsName'], ['asc', 'asc', 'asc', 'asc'])
+      if (props.isReviewMode) {
+        var prevMHRNum = sortedResults[0].mhrNumber
+        var firstRun = true
+        sortedResults[0].firstRow = true
+        sortedResults.forEach(result => {
+          if (prevMHRNum !== result.mhrNumber || firstRun) {
+            firstRun = false
+            result.firstRow = true
+          } else {
+            result.firstRow = false
+          }
+          prevMHRNum = result.mhrNumber
+        })
+      } else {
+        sortedResults.forEach(result => {
+          result.firstRow = true
+        })
+      }
+      localState.results = sortedResults
 
       localState.totalResultsLength = resp.totalResultsSize
       if (localState.searchType === UIMHRSearchTypes.MHRMHR_NUMBER && localState.totalResultsLength === 1) {
@@ -456,6 +533,9 @@ export default defineComponent({
       reviewAndConfirm,
       getOwnerName,
       getOwnerStatus,
+      getOwnerStatusText,
+      getUniqueRegistrationCount,
+      hasMultipleStatus,
       updateFolioOrReference,
       getItemClass,
       onSelectionCheckboxClick,
@@ -545,7 +625,6 @@ th {
       align-items: baseline;
     }
     tr {
-      height: 54px;
       td:not(.group-header) {
         display: table-cell;
         vertical-align: baseline;
@@ -559,14 +638,29 @@ th {
     .selected {
       background-color: $blueSelected !important;
     }
-    tr:hover:not(.selected) {
+    tr:hover:not(.selected, .collapsed-owner, .first-row) {
       // $gray1 at 75%
       background-color: #f1f3f5BF !important;
+    }
+    .collapsed-owner * {
+      padding-top: 0 !important;
+      padding-bottom: 0 !important;
+      margin-bottom: 0;
+      margin-top:0 ;
+      border: none !important;
+    }
+    .first-row * {
+      align-items: flex-end;
+      padding-bottom: 0 !important;
+      margin-bottom: -5px;
+      border-bottom: none !important;
     }
   }
   .v-data-table > .v-data-table__wrapper > table > tbody > tr > td,
   .v-data-table > .v-data-table__wrapper > table > thead > tr > th {
     padding: 0 12px !important;
+    border-top: thin solid rgba(0, 0, 0, 0.12);
+    border-bottom: thin solid rgba(0, 0, 0, 0.12);
   }
 }
 </style>

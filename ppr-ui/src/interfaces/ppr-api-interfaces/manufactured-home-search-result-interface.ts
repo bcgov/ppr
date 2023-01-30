@@ -4,6 +4,7 @@ import { IndividualNameIF } from '@/interfaces'
 export interface ManufacturedHomeSearchResultIF {
   id: number
   ownerName: IndividualNameIF
+  similarOwners?: Array<IndividualNameIF>
   organizationName?: string
   status: string // ACTIVE or EXEMPT or HISTORIC
   mhrNumber: string
@@ -17,4 +18,8 @@ export interface ManufacturedHomeSearchResultIF {
   selected?: boolean // Optional
   includeLienInfo?: boolean // Optional
   ownerStatus?: string
+  activeCount?: number
+  exemptCount?: number
+  historicalCount?: number
+  firstRow?: boolean
 }

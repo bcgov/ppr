@@ -421,7 +421,10 @@ export const mockedMHRSearchResults: mockMHRSearchResults = {
         model: 'Trailer'
       },
       homeLocation: 'Victoria',
-      includeLienInfo: false
+      includeLienInfo: false,
+      activeCount: 0,
+      exemptCount: 0,
+      historicalCount: 0
     },
     {
       id: 2,
@@ -438,7 +441,10 @@ export const mockedMHRSearchResults: mockMHRSearchResults = {
         model: 'Trailer'
       },
       homeLocation: 'Victoria',
-      includeLienInfo: false
+      includeLienInfo: false,
+      activeCount: 0,
+      exemptCount: 0,
+      historicalCount: 0
     },
     {
       id: 3,
@@ -455,7 +461,10 @@ export const mockedMHRSearchResults: mockMHRSearchResults = {
         model: 'Trailer'
       },
       homeLocation: 'Victoria',
-      includeLienInfo: false
+      includeLienInfo: false,
+      activeCount: 0,
+      exemptCount: 0,
+      historicalCount: 0
     },
     {
       id: 4,
@@ -472,7 +481,10 @@ export const mockedMHRSearchResults: mockMHRSearchResults = {
         model: 'Trailer'
       },
       homeLocation: 'Victoria',
-      includeLienInfo: false
+      includeLienInfo: false,
+      activeCount: 0,
+      exemptCount: 0,
+      historicalCount: 0
     },
     {
       id: 5,
@@ -489,7 +501,10 @@ export const mockedMHRSearchResults: mockMHRSearchResults = {
         model: 'Trailer'
       },
       homeLocation: 'Victoria',
-      includeLienInfo: false
+      includeLienInfo: false,
+      activeCount: 0,
+      exemptCount: 0,
+      historicalCount: 0
     }
   ],
   [UIMHRSearchTypes.MHROWNER_NAME]: [
@@ -508,7 +523,10 @@ export const mockedMHRSearchResults: mockMHRSearchResults = {
         model: 'Trailer'
       },
       homeLocation: 'Victoria',
-      includeLienInfo: false
+      includeLienInfo: false,
+      activeCount: 0,
+      exemptCount: 0,
+      historicalCount: 0
     },
     {
       id: 2,
@@ -525,7 +543,10 @@ export const mockedMHRSearchResults: mockMHRSearchResults = {
         model: 'Trailer'
       },
       homeLocation: 'Victoria',
-      includeLienInfo: false
+      includeLienInfo: false,
+      activeCount: 0,
+      exemptCount: 0,
+      historicalCount: 0
     },
     {
       id: 3,
@@ -542,7 +563,10 @@ export const mockedMHRSearchResults: mockMHRSearchResults = {
         model: 'Trailer'
       },
       homeLocation: 'Victoria',
-      includeLienInfo: false
+      includeLienInfo: false,
+      activeCount: 0,
+      exemptCount: 0,
+      historicalCount: 0
     },
     {
       id: 4,
@@ -559,7 +583,10 @@ export const mockedMHRSearchResults: mockMHRSearchResults = {
         model: 'Trailer'
       },
       homeLocation: 'Victoria',
-      includeLienInfo: false
+      includeLienInfo: false,
+      activeCount: 0,
+      exemptCount: 0,
+      historicalCount: 0
     }
   ],
   [UIMHRSearchTypes.MHRORGANIZATION_NAME]: [
@@ -578,7 +605,10 @@ export const mockedMHRSearchResults: mockMHRSearchResults = {
         model: 'Trailer'
       },
       homeLocation: 'Victoria',
-      includeLienInfo: false
+      includeLienInfo: false,
+      activeCount: 0,
+      exemptCount: 0,
+      historicalCount: 0
     },
     {
       id: 2,
@@ -595,7 +625,10 @@ export const mockedMHRSearchResults: mockMHRSearchResults = {
         model: 'Trailer'
       },
       homeLocation: 'Victoria',
-      includeLienInfo: false
+      includeLienInfo: false,
+      activeCount: 0,
+      exemptCount: 0,
+      historicalCount: 0
     },
     {
       id: 3,
@@ -612,7 +645,10 @@ export const mockedMHRSearchResults: mockMHRSearchResults = {
         model: 'Trailer'
       },
       homeLocation: 'Victoria',
-      includeLienInfo: false
+      includeLienInfo: false,
+      activeCount: 0,
+      exemptCount: 0,
+      historicalCount: 0
     },
     {
       id: 4,
@@ -629,7 +665,10 @@ export const mockedMHRSearchResults: mockMHRSearchResults = {
         model: 'Trailer'
       },
       homeLocation: 'Victoria',
-      includeLienInfo: false
+      includeLienInfo: false,
+      activeCount: 0,
+      exemptCount: 0,
+      historicalCount: 0
     }
   ],
   [UIMHRSearchTypes.MHRSERIAL_NUMBER]: [
@@ -648,7 +687,10 @@ export const mockedMHRSearchResults: mockMHRSearchResults = {
         model: 'Trailer'
       },
       homeLocation: 'Victoria',
-      includeLienInfo: false
+      includeLienInfo: false,
+      activeCount: 0,
+      exemptCount: 0,
+      historicalCount: 0
     },
     {
       id: 2,
@@ -665,7 +707,10 @@ export const mockedMHRSearchResults: mockMHRSearchResults = {
         model: 'Trailer'
       },
       homeLocation: 'Victoria',
-      includeLienInfo: false
+      includeLienInfo: false,
+      activeCount: 0,
+      exemptCount: 0,
+      historicalCount: 0
     },
     {
       id: 3,
@@ -682,7 +727,10 @@ export const mockedMHRSearchResults: mockMHRSearchResults = {
         model: 'Trailer'
       },
       homeLocation: 'Victoria',
-      includeLienInfo: false
+      includeLienInfo: false,
+      activeCount: 0,
+      exemptCount: 0,
+      historicalCount: 0
     },
     {
       id: 4,
@@ -699,7 +747,10 @@ export const mockedMHRSearchResults: mockMHRSearchResults = {
         model: 'Trailer'
       },
       homeLocation: 'Victoria',
-      includeLienInfo: false
+      includeLienInfo: false,
+      activeCount: 0,
+      exemptCount: 0,
+      historicalCount: 0
     }
   ]
 }
@@ -721,7 +772,10 @@ export const mockedMHRSearchResultsSorted: mockMHRSearchResults = {
         model: 'Trailer'
       },
       homeLocation: 'Victoria',
-      includeLienInfo: false
+      includeLienInfo: false,
+      activeCount: 0,
+      exemptCount: 0,
+      historicalCount: 0
     },
     {
       id: 2,
@@ -738,7 +792,10 @@ export const mockedMHRSearchResultsSorted: mockMHRSearchResults = {
         model: 'Trailer'
       },
       homeLocation: 'Victoria',
-      includeLienInfo: false
+      includeLienInfo: false,
+      activeCount: 0,
+      exemptCount: 0,
+      historicalCount: 0
     },
     {
       id: 3,
@@ -755,7 +812,10 @@ export const mockedMHRSearchResultsSorted: mockMHRSearchResults = {
         model: 'Trailer'
       },
       homeLocation: 'Victoria',
-      includeLienInfo: false
+      includeLienInfo: false,
+      activeCount: 0,
+      exemptCount: 0,
+      historicalCount: 0
     },
     {
       id: 5,
@@ -772,7 +832,10 @@ export const mockedMHRSearchResultsSorted: mockMHRSearchResults = {
         model: 'Trailer'
       },
       homeLocation: 'Victoria',
-      includeLienInfo: false
+      includeLienInfo: false,
+      activeCount: 0,
+      exemptCount: 0,
+      historicalCount: 0
     },
     {
       id: 4,
@@ -789,7 +852,10 @@ export const mockedMHRSearchResultsSorted: mockMHRSearchResults = {
         model: 'Trailer'
       },
       homeLocation: 'Victoria',
-      includeLienInfo: false
+      includeLienInfo: false,
+      activeCount: 0,
+      exemptCount: 0,
+      historicalCount: 0
     }
   ]
 }
@@ -812,7 +878,10 @@ export const mockedMHRSearchSelections: mockMHRSearchResults = {
       },
       homeLocation: 'Victoria',
       selected: true,
-      includeLienInfo: true
+      includeLienInfo: true,
+      activeCount: 0,
+      exemptCount: 0,
+      historicalCount: 0
     },
     {
       id: 2,
@@ -830,7 +899,10 @@ export const mockedMHRSearchSelections: mockMHRSearchResults = {
       },
       homeLocation: 'Victoria',
       selected: true,
-      includeLienInfo: false
+      includeLienInfo: false,
+      activeCount: 0,
+      exemptCount: 0,
+      historicalCount: 0
     },
     {
       id: 3,
@@ -848,7 +920,10 @@ export const mockedMHRSearchSelections: mockMHRSearchResults = {
       },
       homeLocation: 'Victoria',
       selected: true,
-      includeLienInfo: false
+      includeLienInfo: false,
+      activeCount: 0,
+      exemptCount: 0,
+      historicalCount: 0
     }
   ],
   [UIMHRSearchTypes.MHROWNER_NAME]: [
@@ -868,7 +943,10 @@ export const mockedMHRSearchSelections: mockMHRSearchResults = {
       },
       homeLocation: 'Victoria',
       selected: true,
-      includeLienInfo: false
+      includeLienInfo: false,
+      activeCount: 0,
+      exemptCount: 0,
+      historicalCount: 0
     }
   ],
   [UIMHRSearchTypes.MHRORGANIZATION_NAME]: [
@@ -888,7 +966,10 @@ export const mockedMHRSearchSelections: mockMHRSearchResults = {
       },
       homeLocation: 'Victoria',
       selected: true,
-      includeLienInfo: false
+      includeLienInfo: false,
+      activeCount: 0,
+      exemptCount: 0,
+      historicalCount: 0
     },
     {
       id: 2,
@@ -906,7 +987,10 @@ export const mockedMHRSearchSelections: mockMHRSearchResults = {
       },
       homeLocation: 'Victoria',
       selected: true,
-      includeLienInfo: true
+      includeLienInfo: true,
+      activeCount: 0,
+      exemptCount: 0,
+      historicalCount: 0
     }
   ],
   [UIMHRSearchTypes.MHRSERIAL_NUMBER]: [
@@ -926,7 +1010,10 @@ export const mockedMHRSearchSelections: mockMHRSearchResults = {
       },
       homeLocation: 'Victoria',
       selected: true,
-      includeLienInfo: false
+      includeLienInfo: false,
+      activeCount: 0,
+      exemptCount: 0,
+      historicalCount: 0
     },
     {
       id: 2,
@@ -944,7 +1031,10 @@ export const mockedMHRSearchSelections: mockMHRSearchResults = {
       },
       homeLocation: 'Victoria',
       selected: true,
-      includeLienInfo: true
+      includeLienInfo: true,
+      activeCount: 0,
+      exemptCount: 0,
+      historicalCount: 0
     }
   ]
 }
