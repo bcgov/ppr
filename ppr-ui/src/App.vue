@@ -360,8 +360,7 @@ export default class App extends Mixins(AuthMixin) {
       }
     }
 
-    // Final check for client accounts without access
-    // Ensure
+    // Safety check for client account products
     if (!this.isRoleStaff && !this.isRoleStaffReg && !this.isRoleStaffBcol && !this.hasPprEnabled &&
       !this.hasMhrEnabled) {
       this.handleError({
