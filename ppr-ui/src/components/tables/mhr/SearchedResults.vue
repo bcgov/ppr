@@ -7,15 +7,17 @@
       </v-row>
       <v-row v-if="searched && !isReviewMode" id="search-summary-info" class="result-info pt-6">
         <v-col id="home-results-count" cols="auto">
-          <span class="divider pr-3">Matches Found: <b>{{ totalResultsLength }}</b></span>
+          <span class="divider pr-3">
+            Matches Found: <b>{{ totalResultsLength }}</b>
+          </span>
         </v-col>
-        <v-col cols="auto" class="pl-0">
-          <span id="selected-results-count" class="divider pr-3">
-            Matches Selected: <b>{{ selectedMatchesLength }}</b>
+        <v-col id="selected-results-count" cols="auto" class="pl-0">
+          <span class="divider pr-3">
+            Matches selected: <b>{{ selectedMatchesLength }}</b>
           </span>
         </v-col>
         <v-col cols="auto" class="pl-0">
-          <span>
+          <span id="selected-lien-count">
             PPR Lien Searches Selected: <b>{{ selectedLiensLength }}</b>
           </span>
         </v-col>
@@ -201,7 +203,7 @@
                 <v-checkbox v-model="item.selected" @click="onSelectionCheckboxClick(item)"/>
               </v-col>
               <v-col class="serial-number-text" @click="item.selected = !item.selected; onSelectionCheckboxClick(item)">
-                {{ item.serialNumber }}
+                {{ item.serialNumber }} <span v-if="item.activeCount > 1">({{ item.activeCount }})</span>
               </v-col>
             </v-row>
             <span v-else>{{ item.serialNumber }}</span>
@@ -256,7 +258,6 @@ import {
 } from '@/resources'
 import { BaseHeaderIF, ManufacturedHomeSearchResultIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { FolioNumber } from '@/components/common'
-import { pacificDate } from '@/utils'
 import { RouteNames, UIMHRSearchTypes, UIMHRSearchTypeValues } from '@/enums'
 import { cloneDeep, uniqBy, orderBy } from 'lodash'
 
@@ -291,7 +292,6 @@ export default defineComponent({
     const localState = reactive({
       searched: false,
       searchValue: '',
-      searchTime: '',
       searchType: null as UIMHRSearchTypes,
       selectAll: false,
       selectAllLien: false,
@@ -322,9 +322,6 @@ export default defineComponent({
           case UIMHRSearchTypes.MHRMHR_NUMBER:
             return `item.${UIMHRSearchTypeValues.MHRMHR_NUMBER}`
         }
-      }),
-      activeMatchesLength: computed((): number => {
-        return localState.results?.filter(item => item.status === 'ACTIVE').length
       }),
       selectedMatchesLength: computed((): number => {
         return localState.results?.filter(item => item.selected === true).length
@@ -499,8 +496,6 @@ export default defineComponent({
         // Select search result if an MHR Number Search and search results equals 1.
         localState.results = localState.results.map(result => ({ ...result, selected: true }))
       }
-      const date = new Date(resp.searchDateTime)
-      localState.searchTime = pacificDate(date)
     })
 
     watch(() => localState.results, (): void => {

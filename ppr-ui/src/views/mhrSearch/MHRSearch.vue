@@ -4,8 +4,10 @@
       <v-progress-circular color="primary" size="50" indeterminate />
     </v-overlay>
     <v-container class="container">
-      <v-icon :class="[$style['home'], 'mr-2']" size="30">mdi-home</v-icon>
-      <b :class="$style['search-title']">Selection List</b>
+      <div style="display: flex;">
+        <v-icon color="#212529" size="32" class="pr-1">mdi-home</v-icon>
+        <b :class="$style['search-title']">Selection List</b>
+      </div>
       <p v-if="!getManufacturedHomeSearchResults" :class="[$style['search-info'], 'ma-0']" style="padding-top: 26px;">
         Your search results will display below.
       </p>
