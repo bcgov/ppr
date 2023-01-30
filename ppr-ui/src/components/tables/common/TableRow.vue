@@ -79,7 +79,9 @@
         transition="fade-transition"
       >
         <template v-slot:activator="{ on, attrs }">
-          <v-icon color="primary" small v-bind="attrs" v-on="on">mdi-information-outline</v-icon>
+          <v-icon style="vertical-align: baseline" color="primary" small v-bind="attrs" v-on="on">
+            mdi-information-outline
+          </v-icon>
         </template>
         <div class="pt-2 pb-2">
           The records for this registration were converted from paper to digital format on November 14, 1995, and may
