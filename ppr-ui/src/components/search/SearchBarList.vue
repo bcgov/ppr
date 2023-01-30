@@ -2,7 +2,7 @@
   <v-select
           id="search-select"
           class="search-bar-type-select"
-          :class="{ 'wide-menu' : !isPPROnly }"
+          :class="{ 'wide-menu' : !isSingleSearchOption }"
           ref="searchSelect"
           :error-messages="categoryMessage ? categoryMessage : ''"
           filled
@@ -14,50 +14,50 @@
           return-object
           v-model="selectedSearchType"
           @focus="updateSelections()"
-          :menu-props="isPPROnly ? { bottom: true, offsetY: true } : {}"
+          :menu-props="isSingleSearchOption ? { bottom: true, offsetY: true } : {}"
           attach=""
         >
         <template v-slot:item="{ item }">
-        <template v-if="item.class === 'search-list-header'">
-          <v-list-item-content style="padding: 9px 0;" :class="{ 'top-border' : item.icon === 'mdi-home' }">
-            <v-row
-              :id="`srch-type-drop-${item.group}`"
-              style="width: 45rem; pointer-events: all;"
-              @click="toggleGroup(item.group)"
+          <template v-if="item.class === 'search-list-header'">
+            <v-list-item-content style="padding: 9px 0;" :class="{ 'top-border' : item.icon === 'mdi-home' }">
+              <v-row
+                :id="`srch-type-drop-${item.group}`"
+                style="width: 45rem; pointer-events: all;"
+                @click="toggleGroup(item.group)"
+              >
+                <v-col class="py-0" align-self="center">
+                  <span class="search-list-header"><v-icon class="menu-icon" :color="item.color">{{item.icon}}</v-icon>
+                  {{ item.textLabel }}</span>
+                </v-col>
+                <v-col class="py-0" align-self="center" cols="auto">
+                  <v-btn icon small style="pointer-events: all;">
+                    <v-icon v-if="displayGroup[item.group]" class="expand-icon" color="primary">mdi-chevron-up</v-icon>
+                    <v-icon v-else class="expand-icon" color="primary">mdi-chevron-down</v-icon>
+                  </v-btn>
+                </v-col>
+              </v-row>
+            </v-list-item-content>
+          </template>
+          <template v-else class="search-list">
+            <v-list-item
+              :id="`list-${item.searchTypeAPI.toLowerCase().replaceAll('_','-')}`"
+              class="copy-normal"
+              :class="{ 'select-menu-padding' : !isSingleSearchOption }"
+              @click="selectSearchType(item)"
             >
-              <v-col class="py-0" align-self="center">
-                <span class="search-list-header"><v-icon class="menu-icon" :color="item.color">{{item.icon}}</v-icon>
-                {{ item.textLabel }}</span>
-              </v-col>
-              <v-col class="py-0" align-self="center" cols="auto">
-                <v-btn icon small style="pointer-events: all;">
-                  <v-icon v-if="displayGroup[item.group]" class="expand-icon" color="primary">mdi-chevron-up</v-icon>
-                  <v-icon v-else class="expand-icon" color="primary">mdi-chevron-down</v-icon>
-                </v-btn>
-              </v-col>
-            </v-row>
-          </v-list-item-content>
+              <v-list-item-title>
+                {{ item.searchTypeUI }}
+              </v-list-item-title>
+            </v-list-item>
+          </template>
         </template>
-        <template v-else class="search-list">
-          <v-list-item
-            :id="`list-${item.searchTypeAPI.toLowerCase().replaceAll('_','-')}`"
-            class="copy-normal"
-            :class="{ 'select-menu-padding' : !isPPROnly }"
-            @click="selectSearchType(item)"
-          >
-            <v-list-item-title>
-              {{ item.searchTypeUI }}
-            </v-list-item-title>
-          </v-list-item>
-        </template>
-      </template>
   </v-select>
 </template>
 <script lang="ts">
-import { defineComponent, reactive, toRefs, computed, ref, watch } from '@vue/composition-api'
+import { computed, defineComponent, reactive, ref, toRefs } from '@vue/composition-api'
 import { useGetters } from 'vuex-composition-helpers'
 import { MHRSearchTypes, SearchTypes } from '@/resources'
-import { UISearchTypes, APISearchTypes } from '@/enums'
+import { APISearchTypes, UISearchTypes } from '@/enums'
 import { SearchTypeIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { getFeatureFlag } from '@/utils'
 
@@ -76,12 +76,15 @@ export default defineComponent({
   setup (props, { emit }) {
     const {
       isRoleStaffReg,
-      hasPprRole,
-      hasMhrRoleEnabled
+      isRoleStaff,
+      hasPprEnabled,
+      hasMhrEnabled
     } = useGetters<any>([
       'isRoleStaffReg',
-      'hasPprRole',
-      'hasMhrRoleEnabled'
+      'isRoleStaff',
+      'hasPprEnabled',
+      'hasMhrEnabled',
+      'getUserProductSubscriptionsCodes'
     ])
     const searchSelect = ref(null)
     const localState = reactive({
@@ -106,44 +109,45 @@ export default defineComponent({
       }),
       origItems: computed((): Array<SearchTypeIF> => {
         const allSearchTypes = []
+
+        // Staff Only Options
         if (isRoleStaffReg.value) {
           if (getFeatureFlag('mhr-ui-enabled')) {
-            allSearchTypes.push.apply(allSearchTypes, SearchTypes)
-            allSearchTypes.push.apply(allSearchTypes, MHRSearchTypes)
+            allSearchTypes.push(...SearchTypes, ...MHRSearchTypes)
             return allSearchTypes
           } else {
-            allSearchTypes.push.apply(allSearchTypes, SearchTypes)
-            allSearchTypes.shift()
-            return allSearchTypes
+            allSearchTypes.push(...SearchTypes)
+            return allSearchTypes.slice(1)
           }
         }
-        if (hasPprRole.value) {
-          allSearchTypes.push.apply(allSearchTypes, SearchTypes)
-          // we can pop the title off if there is only one search type
-          if (!hasMhrRoleEnabled.value) {
-            allSearchTypes.shift()
-          }
+
+        // Client Only Blocks
+        if (hasPprEnabled.value && hasMhrEnabled.value) {
+          allSearchTypes.push(...SearchTypes, ...MHRSearchTypes)
+          return allSearchTypes
         }
-        if (hasMhrRoleEnabled.value) {
-          allSearchTypes.push.apply(allSearchTypes, MHRSearchTypes)
-          // we can pop the title off if there is only one search type
-          if (!hasPprRole.value) {
-            allSearchTypes.shift()
-          }
+
+        if (hasPprEnabled.value) {
+          allSearchTypes.push(...SearchTypes)
+          return allSearchTypes.slice(1)
         }
-        return allSearchTypes
+
+        if (hasMhrEnabled.value) {
+          allSearchTypes.push(...MHRSearchTypes)
+          return allSearchTypes.slice(1)
+        }
       }),
-      isPPROnly: computed((): boolean => hasPprRole.value && !hasMhrRoleEnabled.value),
+      isSingleSearchOption: computed((): boolean => {
+        return (hasPprEnabled.value && !hasMhrEnabled.value) || (!hasPprEnabled.value && hasMhrEnabled.value)
+      }),
       displayItems: [],
       displayGroup: {
-        1: true, // default, fallback state for safety
-        2: false
+        1: hasPprEnabled.value && !hasMhrEnabled.value && !isRoleStaff.value,
+        2: !hasPprEnabled.value && hasMhrEnabled.value && !isRoleStaff.value
       },
       showMenu: false
     })
-    watch(() => [hasPprRole.value, hasMhrRoleEnabled.value], () => {
-      localState.displayGroup[1] = !(hasPprRole.value && hasMhrRoleEnabled.value)
-    })
+
     const toggleGroup = (group: number) => {
       const initial = localState.displayGroup[group]
       // collapse both groups as only one group can be expanded at once

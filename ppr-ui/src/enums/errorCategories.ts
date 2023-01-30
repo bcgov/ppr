@@ -10,6 +10,7 @@ export enum ErrorCategories {
   FEE_INFO = 'fee-info',
   HISTORY_REGISTRATIONS = 'history-registrations',
   HISTORY_SEARCHES = 'history-searches',
+  PRODUCT_ACCESS = 'product-access',
   REGISTRATION_CREATE = 'registration-create',
   REGISTRATION_DELETE = 'registration-delete',
   REGISTRATION_LOAD = 'registration-load',

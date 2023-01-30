@@ -195,7 +195,6 @@ import { useActions, useGetters } from 'vuex-composition-helpers'
 import _ from 'lodash'
 
 import {
-  getFeatureFlag,
   mhrSearch,
   search,
   staffSearch,
@@ -270,9 +269,8 @@ export default defineComponent({
       isRoleStaffSbc,
       isSearchCertified,
       getStaffPayment,
-      hasMhrRoleEnabled,
-      hasPprRole,
-      hasMhrRole
+      hasPprEnabled,
+      hasMhrEnabled
     } = useGetters<any>([
       'getUserSettings',
       'isSearching',
@@ -282,9 +280,8 @@ export default defineComponent({
       'isRoleStaffSbc',
       'isSearchCertified',
       'getStaffPayment',
-      'hasMhrRoleEnabled',
-      'hasPprRole',
-      'hasMhrRole'
+      'hasPprEnabled',
+      'hasMhrEnabled'
     ])
     const { isMHRSearchType, isPPRSearchType, mapMhrSearchType } = useSearch()
     const localState = reactive({
@@ -307,10 +304,9 @@ export default defineComponent({
       categoryMessage: computed((): string => {
         return localState.validations?.category?.message || ''
       }),
-      isPPROnly: computed((): boolean => hasPprRole.value && !hasMhrRoleEnabled.value),
       shouldShowFeeHint: computed((): boolean => {
         return (
-          localState.isPPROnly ||
+          (hasPprEnabled.value && !hasMhrEnabled.value) ||
           (!(isRoleStaffBcol.value || isRoleStaffReg.value) &&
             isPPRSearchType(localState.selectedSearchType?.searchTypeAPI))
         )
@@ -381,8 +377,7 @@ export default defineComponent({
       }),
       typeOfSearch: computed((): string => {
         // only show the type of search if authorized to both types
-        if (((hasPprRole.value && hasMhrRole.value) || isRoleStaffReg.value) &&
-          getFeatureFlag('mhr-ui-enabled')) {
+        if (((hasPprEnabled.value && hasMhrEnabled.value) || isRoleStaff.value || localState.isStaffBcolReg)) {
           if (localState.selectedSearchType) {
             if (isPPRSearchType(localState.selectedSearchType.searchTypeAPI)) {
               return '<i aria-hidden="true" class="v-icon notranslate menu-icon mdi ' + SearchTypes[0].icon +

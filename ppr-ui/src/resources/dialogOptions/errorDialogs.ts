@@ -9,6 +9,15 @@ export const authError: DialogOptionsIF = {
   'Please contact us for more information.'
 }
 
+export const authAssetsError: DialogOptionsIF = {
+  acceptText: 'OK',
+  cancelText: '',
+  hasContactInfo: true,
+  title: 'Unauthorized access to Assets',
+  text: 'This account does not have access to the Personal Property Registry or Manufactured Home Registry. ' +
+    'Please contact us for more information.'
+}
+
 export const draftDeleteError: DialogOptionsIF = {
   acceptText: 'OK',
   cancelText: '',
