@@ -110,12 +110,18 @@
       <tr class="mt-2">
           <td>
             {% if totalResultsSize > 0 %}
+              Matches in Report: {{ matchResultsSize }}
+            {% else %}
+              0 Matches
+            {% endif %}  
+          </td>
+          <td>
+            {% if totalResultsSize > 0 %}
               Registrations in Report: {{ totalResultsSize }}
             {% else %}
               0 Registrations
             {% endif %}  
           </td>
-          <td></td>
           <td>Total Search Report Pages:
             {% if totalResultsSize > 0 %}
               {{ totalPageCount }}

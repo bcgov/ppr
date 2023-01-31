@@ -3,12 +3,13 @@
     <table class="selected-mhr-table mt-4" role="presentation">
         <tr class="selected-mhr-table-header no-page-break">
             <td class="bottom-align"></td>
-            <td class="bottom-align">MHR Number</td>
+            <td class="bottom-align">Registration Number</td>
+            <td class="bottom-align">Registration Status</td>
             <td class="bottom-align">Owner Name</td>
-            <td class="bottom-align">Status</td>
+            <td class="bottom-align">Owner<br/>Status</td>
             <td class="bottom-align">Year</td>
             <td class="bottom-align">Make/Model</td>
-            <td class="bottom-align">Location</td>
+            <td class="bottom-align">Home<br/>Location</td>
             <td class="bottom-align">Page</td>
         </tr>
         <tr class="solid-row-separator no-page-break">
@@ -25,11 +26,46 @@
                     <a href="#{{result.mhrNumber}}">{{result.mhrNumber}}</a>
                 </td>
                 <td class="top-align">
+                    {{result.status}}
+                </td>
+                 <td class="top-align">
                     {{result.ownerName.last}}, {{result.ownerName.first}}
                     {% if result.ownerName.middle %} {{result.ownerName.middle}}{% endif %}
+                    {% if result.extraMatches is defined %}
+                        {% for extra in result.extraMatches %}
+                            <div class="pt-4">
+                                {{extra.ownerName.last}}, {{extra.ownerName.first}}
+                                {% if extra.ownerName.middle %} {{extra.ownerName.middle}}{% endif %}            
+                            </div>
+                        {% endfor %} 
+                    {% endif %}
+
                 </td>    
                 <td class="top-align">
-                    {{result.status}}
+                    {% if result.ownerStatus == 'PREVIOUS' %}HISTORICAL{% else %}{{result.ownerStatus}}{% endif %}
+                    {% if result.ownerStatus == 'ACTIVE' %}
+                        {% if result.activeCount is defined and result.activeCount > 1 %} ({{result.activeCount}}){% endif %}
+                        {% if result.exemptCount is defined and result.exemptCount > 0 %}<br/>EXEMPT 
+                            {% if result.exemptCount > 1 %} ({{result.exemptCount}}){% endif %}
+                        {% endif %}
+                        {% if result.historicalCount is defined and result.historicalCount > 0 %}<br/>HISTORICAL 
+                            {% if result.historicalCount > 1 %} ({{result.historicalCount}}){% endif %}
+                        {% endif %}
+                    {% elif result.ownerStatus == 'EXEMPT' %}
+                        {% if result.exemptCount is defined and result.exemptCount > 1 %} ({{result.exemptCount}}){% endif %}
+                        {% if result.historicalCount is defined and result.historicalCount > 0 %}<br/>HISTORICAL 
+                            {% if result.historicalCount > 1 %} ({{result.historicalCount}}){% endif %}
+                        {% endif %}
+                    {% elif result.ownerStatus == 'PREVIOUS' %}
+                        {% if result.historicalCount is defined and result.historicalCount > 1 %} ({{result.historicalCount}}){% endif %}
+                    {% endif %} 
+
+                    {% for extra in result.extraMatches %}
+                        {% if extra.ownerName.middle %}<div class="pt-8">{% else %}<div class="pt-4">{% endif %}                        
+                            {% if extra.ownerStatus == 'PREVIOUS' %}HISTORICAL{% else %}{{extra.ownerStatus}}{% endif %}
+                        </div>
+                    {% endfor %} 
+           
                 </td>
                 <td class="top-align">{{result.baseInformation.year}}</td>
                 <td class="top-align">{{result.baseInformation.make}} 
@@ -51,14 +87,15 @@
     <table class="selected-mhr-table mt-4" role="presentation">
         <tr class="selected-mhr-table-header no-page-break">
             <td class="bottom-align"></td>
-            <td class="bottom-align">MHR Number</td>
+            <td class="bottom-align">Registration Number</td>
+            <td class="bottom-align">Registration Status</td>
             <td class="bottom-align">
-                {% if selected[0].organizationName is defined %}Organization{% else %}Owner{% endif %} Name
+                {% if selected[0].organizationName is defined %}Organization{% else %}Owner<br/>{% endif %} Name
             </td>
-            <td class="bottom-align">Status</td>
+            <td class="bottom-align">{% if selected[0].organizationName is defined %}Organization{% else %}Owner<br/>{% endif %} Status</td>
             <td class="bottom-align">Year</td>
             <td class="bottom-align">Make/Model</td>
-            <td class="bottom-align">Location</td>
+            <td class="bottom-align">Home<br/>Location</td>
             <td class="bottom-align">Page</td>
         </tr>
         <tr class="solid-row-separator no-page-break">
@@ -75,6 +112,9 @@
                     <a href="#{{result.mhrNumber}}">{{result.mhrNumber}}</a>
                 </td>
                 <td class="top-align">
+                    {{result.status}}
+                </td>
+                <td class="top-align">
                     {% if result.organizationName is defined %}
                         {{result.organizationName}}
                     {% else %}
@@ -83,7 +123,7 @@
                     {% endif %}
                 </td>
                 <td class="top-align">
-                    {{result.status}}
+                    {% if result.ownerStatus == 'PREVIOUS' %}HISTORICAL{% else %}{{result.ownerStatus}}{% endif %}
                 </td>
                 <td class="top-align">{{result.baseInformation.year}}</td>
                 <td class="top-align">{{result.baseInformation.make}} 
@@ -102,15 +142,15 @@
         {% endfor %}
     </table>  
     {% elif searchQuery.type == 'SERIAL_NUMBER' %}
-    <table class="selected-mhr-table mt-4" role="presentation">
+    <table class="selected-mhr-table-serial mt-4" role="presentation">
         <tr class="selected-mhr-table-header no-page-break">
             <td></td>
-            <td class="bottom-align">MHR Number</td>
+            <td class="bottom-align">Registration Number</td>
             <td class="bottom-align">Serial Number</td>
-            <td class="bottom-align">Status</td>
+            <td class="bottom-align">Registration Status</td>
             <td class="bottom-align">Year</td>
             <td class="bottom-align">Make/Model</td>
-            <td class="bottom-align">Location</td>
+            <td class="bottom-align">Home<br/>Location</td>
             <td class="bottom-align">Page</td>
         </tr>
         <tr class="solid-row-separator no-page-break">
@@ -128,6 +168,12 @@
                 </td>
                 <td class="top-align">
                     {{result.serialNumber}}
+                    {% if result.activeCount is defined and result.activeCount > 1 %} ({{result.activeCount}}){% endif %}
+                    {% if result.extraMatches is defined %}
+                        {% for extra in result.extraMatches %}
+                            <br/>{{extra.serialNumber}}
+                        {% endfor %} 
+                    {% endif %}
                 </td>    
                 <td class="top-align">
                     {{result.status}}
@@ -152,12 +198,13 @@
     <table class="selected-mhr-table mt-4" role="presentation">
         <tr class="selected-mhr-table-header no-page-break">
             <td class="bottom-align"></td>
-            <td class="bottom-align">MHR Number</td>
-            <td class="bottom-align">Organization Name</td>
-            <td class="bottom-align">Status</td>
+            <td class="bottom-align">Registration Number</td>
+            <td class="bottom-align">Registration Status</td>
+            <td class="bottom-align">Organization<br/>Name</td>
+            <td class="bottom-align">Organization Status</td>
             <td class="bottom-align">Year</td>
             <td class="bottom-align">Make/Model</td>
-            <td class="bottom-align">Location</td>
+            <td class="bottom-align">Home<br/>Location</td>
             <td class="bottom-align">Page</td>
         </tr>
         <tr class="solid-row-separator no-page-break">
@@ -174,10 +221,41 @@
                     <a href="#{{result.mhrNumber}}">{{result.mhrNumber}}</a>
                 </td>
                 <td class="top-align">
+                    {{result.status}}
+                </td>
+                 <td class="top-align">
                     {{result.organizationName}}
+                    {% if result.extraMatches is defined %}
+                        {% for extra in result.extraMatches %}
+                            <div class="pt-4">{{extra.organizationName}}</div>
+                        {% endfor %} 
+                    {% endif %}
                 </td>    
                 <td class="top-align">
-                    {{result.status}}
+                    {% if result.ownerStatus == 'PREVIOUS' %}HISTORICAL{% else %}{{result.ownerStatus}}{% endif %}
+                    {% if result.ownerStatus == 'ACTIVE' %}
+                        {% if result.activeCount is defined and result.activeCount > 1 %} ({{result.activeCount}}){% endif %}
+                        {% if result.exemptCount is defined and result.exemptCount > 0 %}<br/>EXEMPT 
+                            {% if result.exemptCount > 1 %} ({{result.exemptCount}}){% endif %}
+                        {% endif %}
+                        {% if result.historicalCount is defined and result.historicalCount > 0 %}<br/>HISTORICAL 
+                            {% if result.historicalCount > 1 %} ({{result.historicalCount}}){% endif %}
+                        {% endif %}
+                    {% elif result.ownerStatus == 'EXEMPT' %}
+                        {% if result.exemptCount is defined and result.exemptCount > 1 %} ({{result.exemptCount}}){% endif %}
+                        {% if result.historicalCount is defined and result.historicalCount > 0 %}<br/>HISTORICAL 
+                            {% if result.historicalCount > 1 %} ({{result.historicalCount}}){% endif %}
+                        {% endif %}
+                    {% elif result.ownerStatus == 'PREVIOUS' %}
+                        {% if result.historicalCount is defined and result.historicalCount > 1 %} ({{result.historicalCount}}){% endif %}
+                    {% endif %}
+
+                    {% for extra in result.extraMatches %}
+                        <div class="pt-4">                        
+                            {% if extra.ownerStatus == 'PREVIOUS' %}HISTORICAL{% else %}{{extra.ownerStatus}}{% endif %}
+                        </div>
+                    {% endfor %} 
+
                 </td>
                 <td class="top-align">{{result.baseInformation.year}}</td>
                 <td class="top-align">{{result.baseInformation.make}} 
@@ -196,4 +274,16 @@
         {% endfor %}
     </table>  
     {% endif %}
+
+    {% if hasHistorical %}
+        <div class="section-data pt-5">
+            <span class="bold">Note: </span>
+            {% if searchQuery.type == 'OWNER_NAME' %}
+                Historical owner names will not appear in the current registration.
+            {% else %}
+                Historical organization names will not appear in the current registration.
+            {% endif %}
+        </div>
+    {% endif %}
+
 </div>

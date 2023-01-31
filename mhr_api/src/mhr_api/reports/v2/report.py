@@ -554,12 +554,22 @@ class Report:  # pylint: disable=too-few-public-methods
     def _set_selected(self):
         """Replace selection serial type code with description. Remove unselected items."""
         if 'selected' in self._report_data:
+            match_size: int = len(self._report_data['selected'])
+            has_historical: bool = False
             for index, result in enumerate(self._report_data['selected'], start=0):
                 result['createDateTime'] = Report._to_report_datetime(result['createDateTime'], False)
                 result['index'] = (index + 1)
-                if result.get('status'):
-                    result['status'] = str(result['status']).capitalize()
+                if result.get('extraMatches'):
+                    match_size += len(result.get('extraMatches'))
+                count: int = result.get('activeCount', 0) + result.get('exemptCount', 0) + \
+                    result.get('historicalCount', 0) - 1
+                if count > 0:
+                    match_size += count
+                if result.get('historicalCount', 0) > 0:
+                    has_historical = True
             self._report_data['totalResultsSize'] = len(self._report_data['selected'])
+            self._report_data['matchResultsSize'] = match_size
+            self._report_data['hasHistorical'] = has_historical
 
     @staticmethod
     def _format_address(address):
