@@ -170,6 +170,8 @@ describe('Serial number search', () => {
 
   it('searches when fields are filled', async () => {
     await store.dispatch('setAuthRoles', ['ppr'])
+    await store.dispatch('setUserProductSubscriptionsCodes', ['PPR'])
+
     expect(wrapper.find('.fee-text').exists()).toBeTruthy()
     const searchText = wrapper.find('.search-info').text()
     expect(searchText).toContain('Select a search category and then enter a criteria to search')
@@ -199,6 +201,8 @@ describe('Serial number search', () => {
 
   it('hides and shows things for staff', async () => {
     await store.dispatch('setAuthRoles', ['staff', 'ppr_staff'])
+    await store.dispatch('setUserProductSubscriptionsCodes', [''])
+
     const searchText = wrapper.find('.search-info').text()
     expect(searchText).toContain('Select a search category and then enter a criteria to search')
     await store.dispatch('setStaffPayment', {

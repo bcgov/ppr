@@ -66,6 +66,8 @@ describe('SearchBar component basic tests', () => {
   it('shows all of the options', async () => {
     defaultFlagSet['mhr-ui-enabled'] = true
     await store.dispatch('setAuthRoles', ['mhr', 'ppr'])
+    await store.dispatch('setUserProductSubscriptionsCodes', ['PPR', 'MHR'])
+
     wrapper.vm.updateSelections()
     await flushPromises
     expect(wrapper.vm.$data.displayItems.length).toBe(12)
@@ -73,9 +75,20 @@ describe('SearchBar component basic tests', () => {
 
   it('shows only ppr options', async () => {
     await store.dispatch('setAuthRoles', ['ppr'])
+    await store.dispatch('setUserProductSubscriptionsCodes', ['PPR'])
+
     wrapper.vm.updateSelections()
     await flushPromises
     expect(wrapper.vm.$data.displayItems.length).toBe(6)
+  })
+
+  it('shows only mhr options', async () => {
+    await store.dispatch('setAuthRoles', ['mhr'])
+    await store.dispatch('setUserProductSubscriptionsCodes', ['MHR'])
+
+    wrapper.vm.updateSelections()
+    await flushPromises
+    expect(wrapper.vm.$data.displayItems.length).toBe(4)
   })
 
   it('sends selected event', async () => {

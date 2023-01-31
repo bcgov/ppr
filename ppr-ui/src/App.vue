@@ -78,7 +78,7 @@ import * as Views from '@/views'
 // local Mixins, utils, etc
 import { AuthMixin } from '@/mixins'
 import {
-  authError, draftDeleteError, historyRegError, loginError, openDocError, paymentErrorReg,
+  authPprError, authAssetsError, draftDeleteError, historyRegError, loginError, openDocError, paymentErrorReg,
   paymentErrorSearch, registrationCompleteError, registrationDeleteError, registrationLoadError,
   registrationOpenDraftError, registrationSaveDraftError, searchResultsError
 } from '@/resources/dialogOptions'
@@ -132,6 +132,8 @@ export default class App extends Mixins(AuthMixin) {
   @Getter isRoleStaff!: boolean
   @Getter isRoleStaffBcol!: boolean
   @Getter isRoleStaffReg!: boolean
+  @Getter hasPprEnabled!: boolean
+  @Getter hasMhrEnabled!: boolean
 
   // Global setter
   @Action setAuthRoles: ActionBindingIF
@@ -358,6 +360,17 @@ export default class App extends Mixins(AuthMixin) {
       }
     }
 
+    // Safety check for client account products
+    if (!this.isRoleStaff && !this.isRoleStaffReg && !this.isRoleStaffBcol && !this.hasPprEnabled &&
+      !this.hasMhrEnabled) {
+      this.handleError({
+        category: ErrorCategories.PRODUCT_ACCESS,
+        message: '',
+        statusCode: StatusCodes.UNAUTHORIZED
+      })
+      return
+    }
+
     // finally, let router views know they can load their data
     this.appReady = true
   }
@@ -467,7 +480,6 @@ export default class App extends Mixins(AuthMixin) {
             .filter(product => product.subscriptionStatus === ProductStatus.ACTIVE)
             .map(product => product.code)
           this.setUserProductSubscriptionsCodes(activeProductCodes)
-          console.log('Fetched products: ', activeProductCodes)
         } else {
           throw new Error('Unable to get Products for the User')
         }
@@ -525,7 +537,7 @@ export default class App extends Mixins(AuthMixin) {
   private handleError (error: ErrorIF): void {
     switch (error.category) {
       case ErrorCategories.ACCOUNT_ACCESS:
-        this.errorOptions = authError
+        this.errorOptions = authPprError
         this.errorDisplay = true
         break
       case ErrorCategories.ACCOUNT_SETTINGS:
@@ -546,6 +558,10 @@ export default class App extends Mixins(AuthMixin) {
         break
       case ErrorCategories.HISTORY_SEARCHES:
         // handled inline
+        break
+      case ErrorCategories.PRODUCT_ACCESS:
+        this.errorOptions = authAssetsError
+        this.errorDisplay = true
         break
       case ErrorCategories.REGISTRATION_CREATE:
         this.handleErrorRegCreate(error)
@@ -686,8 +702,10 @@ export default class App extends Mixins(AuthMixin) {
 
   private proceedAfterError (proceed: boolean): void {
     this.errorDisplay = false
-    // still need to fill this out more
-    if (this.errorOptions === loginError || this.errorOptions === authError) {
+    // Navigate to Registries dashboard in the event of a login or access error.
+    if (
+      this.errorOptions === loginError || this.errorOptions === authPprError || this.errorOptions === authAssetsError
+    ) {
       navigate(this.registryUrl)
     }
     // for now just refresh app

@@ -1,6 +1,8 @@
 // Enums and Interfaces
 import { AccountTypes, APIRegistrationTypes, ProductCode, RegistrationFlowType, RouteNames } from '@/enums'
 import {
+  AccountIF,
+  AccountModelIF,
   AccountProductSubscriptionIF,
   AddCollateralIF,
   AddPartiesIF,
@@ -16,8 +18,10 @@ import {
   LengthTrustIF,
   ManufacturedHomeSearchResponseIF,
   ManufacturedHomeSearchResultIF,
+  MhRegistrationSummaryIF,
   MhrRegistrationDescriptionIF,
   MhrRegistrationHomeLocationIF,
+  MhrRegistrationHomeOwnerGroupIF,
   MhrRegistrationHomeOwnerIF,
   MhrValidationStateIF,
   RegistrationSortIF,
@@ -29,14 +33,10 @@ import {
   SearchTypeIF,
   StateIF,
   StateModelIF,
+  UserInfoIF,
   UserProductSubscriptionIF,
   UserSettingsIF,
-  VehicleCollateralIF,
-  MhrRegistrationHomeOwnerGroupIF,
-  MhRegistrationSummaryIF,
-  UserInfoIF,
-  AccountModelIF,
-  AccountIF
+  VehicleCollateralIF
 } from '@/interfaces'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 import { HomeLocation, HomeOwners, MhrReviewConfirm, SubmittingParty, YourHome } from '@/views'
@@ -291,8 +291,12 @@ export const hasMhrRole = (state: StateIF): boolean => {
   return state.stateModel.authorization?.authRoles.includes('mhr')
 }
 
-export const hasMhrRoleEnabled = (state: StateIF): boolean => {
-  return state.stateModel.authorization?.authRoles.includes('mhr') && getFeatureFlag('mhr-ui-enabled')
+export const hasPprEnabled = (state: StateIF): boolean => {
+  return getUserProductSubscriptionsCodes(state).includes(ProductCode.PPR)
+}
+
+export const hasMhrEnabled = (state: StateIF): boolean => {
+  return getUserProductSubscriptionsCodes(state).includes(ProductCode.MHR) && getFeatureFlag('mhr-ui-enabled')
 }
 
 /** The current user's service fee (applicable for non billable users). */

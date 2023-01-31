@@ -6,7 +6,7 @@
     </v-overlay>
 
     <base-snackbar :setMessage="snackbarMsg" :toggleSnackbar="toggleSnackbar" />
-    <div class="container pa-0">
+    <div v-if="appReady" class="container pa-0">
       <v-row no-gutters>
         <v-col>
           <v-row no-gutters
@@ -16,7 +16,7 @@
               <b v-if="hasPPR && hasMHR">
                 Manufactured Home and Personal Property Registries Search</b>
               <b v-else-if="hasPPR">Personal Property Registry Search</b>
-              <b v-else-if="hasMHR">Manufactured Home Search</b>
+              <b v-else-if="hasMHR">Manufactured Home Registry Search</b>
             </v-col>
           </v-row>
           <v-row no-gutters>
@@ -67,7 +67,7 @@
           />
 
           <RegistrationsWrapper
-            v-else
+            v-else-if="hasPPR"
             isPpr
             :appLoadingData="appLoadingData"
             :appReady="appReady"
@@ -125,6 +125,7 @@ export default class Dashboard extends Vue {
   @Getter isRoleQualifiedSupplier!: boolean
   @Getter getUserProductSubscriptionsCodes: Array<ProductCode>
   @Getter getRegTableNewItem: RegTableNewItemI
+  @Getter hasMhrEnabled!: boolean
 
   @Action resetNewRegistration: ActionBindingIF
   @Action setSearchDebtorName: ActionBindingIF
@@ -201,7 +202,7 @@ export default class Dashboard extends Vue {
           this.setRegTableNewItem(emptyItem)
         }, 4000)
       }
-      return this.getUserProductSubscriptionsCodes.includes(ProductCode.MHR) && getFeatureFlag('mhr-ui-enabled')
+      return this.hasMhrEnabled
     }
   }
 
