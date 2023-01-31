@@ -51,6 +51,7 @@ SELECT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate, l.towncity, de.sernumb
            FETCH FIRST 1 ROWS ONLY) AS owner_info
   FROM manuhome mh, document d, location l, descript de
  WHERE mh.mhregnum = :query_value
+   AND mh.mhstatus != 'D'
    AND mh.mhregnum = d.mhregnum
    AND mh.regdocid = d.documtid
    AND mh.manhomid = l.manhomid
@@ -76,6 +77,7 @@ SELECT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate,
        de.makemodl, mh.manhomid
   FROM manuhome mh, document d, location l, descript de
  WHERE mh.mhregnum = d.mhregnum
+   AND mh.mhstatus != 'D'
    AND mh.regdocid = d.documtid
    AND mh.manhomid = l.manhomid
    AND l.status = 'A'
@@ -96,6 +98,7 @@ SELECT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate,
        de.makemodl, mh.manhomid
   FROM manuhome mh, document d, location l, descript de
  WHERE mh.mhregnum = d.mhregnum
+   AND mh.mhstatus != 'D'
    AND mh.regdocid = d.documtid
    AND mh.manhomid = l.manhomid
    AND l.status = 'A'
@@ -116,6 +119,7 @@ SELECT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate,
        de.makemodl, mh.manhomid
   FROM manuhome mh, document d, location l, descript de
  WHERE mh.mhregnum = d.mhregnum
+   AND mh.mhstatus != 'D'
    AND mh.regdocid = d.documtid
    AND mh.manhomid = l.manhomid
    AND l.status = 'A'
@@ -136,6 +140,7 @@ SELECT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate,
        de.makemodl, mh.manhomid
   FROM manuhome mh, document d, location l, descript de
  WHERE mh.mhregnum = d.mhregnum
+   AND mh.mhstatus != 'D'
    AND mh.regdocid = d.documtid
    AND mh.manhomid = l.manhomid
    AND l.status = 'A'
@@ -152,6 +157,7 @@ SELECT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate, o.ownrtype, o.ownrname
        de.yearmade, de.makemodl, mh.manhomid, og.status, og.owngrpid
   FROM manuhome mh, document d, owner o, location l, descript de, owngroup og
  WHERE mh.mhregnum = d.mhregnum
+   AND mh.mhstatus != 'D'
    AND mh.regdocid = d.documtid
    AND mh.manhomid = l.manhomid
    AND l.status = 'A'
@@ -171,6 +177,7 @@ SELECT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate, o.ownrtype, o.ownrname
        de.yearmade, de.makemodl, mh.manhomid, og.status, og.owngrpid
   FROM manuhome mh, document d, owner o, location l, descript de, owngroup og
  WHERE mh.mhregnum = d.mhregnum
+   AND mh.mhstatus != 'D'
    AND mh.regdocid = d.documtid
    AND mh.manhomid = l.manhomid
    AND l.status = 'A'
