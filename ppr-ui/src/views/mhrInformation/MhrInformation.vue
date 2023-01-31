@@ -412,7 +412,7 @@ export default defineComponent({
 
     // Get Account Info from Auth to be used in Submitting Party section in Review screen
     const getAccountInformation = async (): Promise<AccountInfoIF> => {
-      return isRoleQualifiedSupplier.value === true ? getAccountInfoFromAuth() : {} as AccountInfoIF
+      return isRoleQualifiedSupplier.value ? getAccountInfoFromAuth() : {} as AccountInfoIF
     }
 
     const parseMhrInformation = async (): Promise<void> => {
@@ -445,7 +445,8 @@ export default defineComponent({
     }
 
     const parseSubmittingPartyInfo = (): void => {
-      var submittingParty = {} as SubmittingPartyIF
+      let submittingParty = {} as SubmittingPartyIF
+
       if (isRoleQualifiedSupplier.value) {
         submittingParty.businessName = localState.accountInfo?.name
         submittingParty.address = localState.accountInfo?.mailingAddress
@@ -454,17 +455,19 @@ export default defineComponent({
         submittingParty.phoneExtension = localState.accountInfo?.accountAdmin?.phoneExtension
       } else {
         submittingParty = getMhrTransferSubmittingParty.value
-        const localAccountInfo = {} as AccountInfoIF
-        localAccountInfo.name = getMhrTransferSubmittingParty.value.businessName
-        localAccountInfo.mailingAddress = getMhrTransferSubmittingParty.value.address
-        localAccountInfo.accountAdmin = {
-          firstName: getMhrTransferSubmittingParty.value.personName.firstName,
-          lastName: getMhrTransferSubmittingParty.value.personName.LastName,
+        localState.accountInfo.name = getMhrTransferSubmittingParty.value.businessName
+        localState.accountInfo.mailingAddress = getMhrTransferSubmittingParty.value.address
+        if (getMhrTransferSubmittingParty.value.businessName) {
+          localState.accountInfo.isBusinessAccount = true
+          localState.accountInfo.name = getMhrTransferSubmittingParty.value.businessName
+        }
+        localState.accountInfo.accountAdmin = {
+          firstName: getMhrTransferSubmittingParty.value.personName?.firstName,
+          lastName: getMhrTransferSubmittingParty.value.personName?.LastName,
           email: getMhrTransferSubmittingParty.value.emailAddress,
           phone: getMhrTransferSubmittingParty.value.phoneNumber,
           phoneExtension: getMhrTransferSubmittingParty.value.phoneExtension
         }
-        localState.accountInfo = localAccountInfo
       }
       setMhrTransferSubmittingParty(submittingParty)
     }
