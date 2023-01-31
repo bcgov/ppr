@@ -78,7 +78,7 @@ import * as Views from '@/views'
 // local Mixins, utils, etc
 import { AuthMixin } from '@/mixins'
 import {
-  authError, authAssetsError, draftDeleteError, historyRegError, loginError, openDocError, paymentErrorReg,
+  authPprError, authAssetsError, draftDeleteError, historyRegError, loginError, openDocError, paymentErrorReg,
   paymentErrorSearch, registrationCompleteError, registrationDeleteError, registrationLoadError,
   registrationOpenDraftError, registrationSaveDraftError, searchResultsError
 } from '@/resources/dialogOptions'
@@ -537,7 +537,7 @@ export default class App extends Mixins(AuthMixin) {
   private handleError (error: ErrorIF): void {
     switch (error.category) {
       case ErrorCategories.ACCOUNT_ACCESS:
-        this.errorOptions = authError
+        this.errorOptions = authPprError
         this.errorDisplay = true
         break
       case ErrorCategories.ACCOUNT_SETTINGS:
@@ -702,8 +702,10 @@ export default class App extends Mixins(AuthMixin) {
 
   private proceedAfterError (proceed: boolean): void {
     this.errorDisplay = false
-    // still need to fill this out more
-    if (this.errorOptions === loginError || this.errorOptions === authError || this.errorOptions === authAssetsError) {
+    // Navigate to Registries dashboard in the event of a login or access error.
+    if (
+      this.errorOptions === loginError || this.errorOptions === authPprError || this.errorOptions === authAssetsError
+    ) {
       navigate(this.registryUrl)
     }
     // for now just refresh app

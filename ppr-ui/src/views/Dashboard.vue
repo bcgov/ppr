@@ -16,7 +16,7 @@
               <b v-if="hasPPR && hasMHR">
                 Manufactured Home and Personal Property Registries Search</b>
               <b v-else-if="hasPPR">Personal Property Registry Search</b>
-              <b v-else-if="hasMHR">Manufactured Home Search</b>
+              <b v-else-if="hasMHR">Manufactured Home Registry Search</b>
             </v-col>
           </v-row>
           <v-row no-gutters>

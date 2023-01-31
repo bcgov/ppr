@@ -1,6 +1,6 @@
 import { DialogOptionsIF } from '@/interfaces'
 
-export const authError: DialogOptionsIF = {
+export const authPprError: DialogOptionsIF = {
   acceptText: 'OK',
   cancelText: '',
   hasContactInfo: true,
