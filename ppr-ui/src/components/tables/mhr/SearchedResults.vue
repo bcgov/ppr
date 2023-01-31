@@ -44,7 +44,7 @@
           <span>Matches Selected: <b>{{ selectedMatchesLength }}</b></span>
         </v-col>
         <v-col id="review-registrations-count" cols="auto">
-          <span>Registrations:  <b>{{ getUniqueRegistrationCount() }}</b></span>
+          <span>Registrations:  <b>{{ uniqueRegistrationLength }}</b></span>
         </v-col>
         <v-col id="review-registrations-count" cols="auto">
           <span>PPR Lien Searches Selected: <b>{{ selectedLiensLength }}</b></span>
@@ -134,7 +134,7 @@
                 <v-checkbox v-model="item.selected" :ripple="false" @click="onSelectionCheckboxClick(item)"/>
               </v-col>
               <v-col class="owner-name-text" @click="item.selected = !item.selected; onSelectionCheckboxClick(item)">
-                {{ getOwnerName(item) }}
+                {{ getOwnerName(item) }} {{ isReviewMode ? getOwnerCount(item) : '' }}
               </v-col>
             </v-row>
             <span v-else>{{ getOwnerName(item) }}</span>
@@ -282,6 +282,7 @@ export default defineComponent({
         'the same registration. That registration will only be shown once in the report.',
       results: [],
       totalResultsLength: 0,
+      hasSimilarOwners: false,
       headerSearchTypeSlot: computed((): string => {
         switch (getSearchedType.value?.searchTypeUI) {
           case UIMHRSearchTypes.MHROWNER_NAME:
@@ -337,6 +338,15 @@ export default defineComponent({
       areAllSelected: computed((): boolean => {
         return localState.results?.every(result => result && result.selected === true)
       }),
+      uniqueRegistrationLength: computed((): number => {
+        var includedRegs = []
+        localState.results.forEach(result => {
+          if (!includedRegs.includes(result.mhrNumber)) {
+            includedRegs.push(result.mhrNumber)
+          }
+        })
+        return includedRegs.length
+      }),
       activeResults: computed((): any => {
         const selectedResults = cloneDeep(getSelectedManufacturedHomes).value
         const baseResults = cloneDeep(getManufacturedHomeSearchResults.value?.results)
@@ -377,6 +387,10 @@ export default defineComponent({
       } else return '-'
     }
 
+    const getOwnerCount = (item: ManufacturedHomeSearchResultIF): string => {
+      const count = item.activeCount + item.exemptCount + item.historicalCount
+      if (count > 1) return `(${count})`
+    }
     const getItemClass = (item: ManufacturedHomeSearchResultIF): string => {
       // check if item is first in list of similar owners
       if (localState.results.indexOf(item) < localState.results.length - 1 && item.firstRow &&
@@ -390,18 +404,6 @@ export default defineComponent({
       } else {
         return item.selected && !props.isReviewMode ? 'selected' : ''
       }
-    }
-
-    const getUniqueRegistrationCount = (): number => {
-      var includedRegs = []
-      var regCount = 0
-      localState.results.forEach(result => {
-        if (!includedRegs.includes(result.mhrNumber)) {
-          includedRegs.push(result.mhrNumber)
-          regCount++
-        }
-      })
-      return regCount
     }
 
     const onSelectionCheckboxClick = (item: ManufacturedHomeSearchResultIF): void => {
@@ -420,6 +422,7 @@ export default defineComponent({
       } else return ''
     }
 
+    // return adaptive text for owner status count(s)
     const getOwnerStatusText = (item: ManufacturedHomeSearchResultIF): string => {
       var returnText = ''
       if (item.activeCount > 0) {
@@ -464,6 +467,7 @@ export default defineComponent({
       // sort search results and label first row true/false on review for each result
       const sortedResults = orderBy(localState.results, ['mhrNumber', 'ownerName.lastName', 'ownerName.middleName', 'ownerName.firsName'], ['asc', 'asc', 'asc', 'asc'])
       if (props.isReviewMode) {
+        localState.hasSimilarOwners = localState.selectedMatchesLength > localState.uniqueRegistrationLength
         var prevMHRNum = sortedResults[0].mhrNumber
         var firstRun = true
         sortedResults[0].firstRow = true
@@ -533,8 +537,8 @@ export default defineComponent({
       reviewAndConfirm,
       getOwnerName,
       getOwnerStatus,
+      getOwnerCount,
       getOwnerStatusText,
-      getUniqueRegistrationCount,
       hasMultipleStatus,
       updateFolioOrReference,
       getItemClass,
@@ -638,7 +642,7 @@ th {
     .selected {
       background-color: $blueSelected !important;
     }
-    tr:hover:not(.selected, .collapsed-owner, .first-row) {
+    tr:hover:not(.selected) {
       // $gray1 at 75%
       background-color: #f1f3f5BF !important;
     }
@@ -659,8 +663,6 @@ th {
   .v-data-table > .v-data-table__wrapper > table > tbody > tr > td,
   .v-data-table > .v-data-table__wrapper > table > thead > tr > th {
     padding: 0 12px !important;
-    border-top: thin solid rgba(0, 0, 0, 0.12);
-    border-bottom: thin solid rgba(0, 0, 0, 0.12);
   }
 }
 </style>

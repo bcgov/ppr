@@ -195,7 +195,11 @@ export default class ConfirmMHRSearch extends Vue {
 
   private get feeQuantity (): number {
     // Return selected quantity that is not a combination search
-    return this.getSelectedManufacturedHomes.filter(result => result.selected && !result.includeLienInfo).length
+    const uniqueRegNums = []
+    this.getSelectedManufacturedHomes.forEach(result => {
+      if (!uniqueRegNums.includes(result.mhrNumber)) uniqueRegNums.push(result.mhrNumber)
+    })
+    return uniqueRegNums.length
   }
 
   private get staffPaymentData (): any {
