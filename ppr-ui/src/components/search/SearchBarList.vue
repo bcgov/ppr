@@ -142,8 +142,8 @@ export default defineComponent({
       }),
       displayItems: [],
       displayGroup: {
-        1: hasPprEnabled.value && !hasMhrEnabled.value && !isRoleStaff.value,
-        2: !hasPprEnabled.value && hasMhrEnabled.value && !isRoleStaff.value
+        1: !isRoleStaff.value ? (hasPprEnabled.value && !hasMhrEnabled.value) : !hasMhrEnabled.value,
+        2: !isRoleStaff.value && (!hasPprEnabled.value && hasMhrEnabled.value)
       },
       showMenu: false
     })
