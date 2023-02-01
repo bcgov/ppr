@@ -540,7 +540,7 @@ export const mhSearchNameHeaders: Array<BaseHeaderIF> = [
   {
     class: 'column-mds',
     sortable: false,
-    text: 'Registration Status',
+    text: 'Current Registration Status',
     value: 'status'
   },
   {

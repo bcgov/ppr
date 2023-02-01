@@ -108,9 +108,8 @@ describe('Serial number results', () => {
 
     // Verify base mode features
     expect(wrapper.find('#search-summary-info').exists()).toBe(true)
-    expect(wrapper.find('#home-results-count').text()).toBe('5 homes found')
-    expect(wrapper.find('#active-results-count').text()).toBe('2 active homes')
-    expect(wrapper.find('#selected-results-count').text()).toBe('0 homes selected + 0 lien search')
+    expect(wrapper.find('#home-results-count').text()).toBe('Matches Found: 5')
+    expect(wrapper.find('#selected-results-count').text()).toBe('Matches Selected: 0')
     expect(wrapper.find('#review-confirm-btn').exists()).toBe(true)
     expect(wrapper.find('#select-all-checkbox').exists()).toBe(true)
     expect(wrapper.find('#select-all-lien-checkbox').exists()).toBe(true)
@@ -155,7 +154,7 @@ describe('Serial number results in Review Mode', () => {
 
     // Verify base mode features
     expect(wrapper.find('#search-summary-info').exists()).toBe(false)
-    expect(wrapper.find('#review-results-count').text()).toBe('2 Manufactured Homes')
+    expect(wrapper.find('#review-results-count').text()).toBe('Matches Selected: 2')
     expect(wrapper.find('#review-confirm-btn').exists()).toBe(false)
     expect(wrapper.find('#select-all-checkbox').exists()).toBe(false)
     expect(wrapper.find('#select-all-lien-checkbox').exists()).toBe(false)
@@ -194,9 +193,8 @@ describe('Owner name debtor results', () => {
 
     // Verify base mode features
     expect(wrapper.find('#search-summary-info').exists()).toBe(true)
-    expect(wrapper.find('#home-results-count').text()).toBe('5 homes found')
-    expect(wrapper.find('#active-results-count').text()).toBe('2 active homes')
-    expect(wrapper.find('#selected-results-count').text()).toBe('0 homes selected + 0 lien search')
+    expect(wrapper.find('#home-results-count').text()).toBe('Matches Found: 5')
+    expect(wrapper.find('#selected-results-count').text()).toBe('Matches Selected: 0')
     expect(wrapper.find('#review-confirm-btn').exists()).toBe(true)
     expect(wrapper.find('#select-all-checkbox').exists()).toBe(true)
     expect(wrapper.find('#select-all-lien-checkbox').exists()).toBe(true)
@@ -241,7 +239,7 @@ describe('Owner name name in Review Mode', () => {
 
     // Verify base mode features
     expect(wrapper.find('#search-summary-info').exists()).toBe(false)
-    expect(wrapper.find('#review-results-count').text()).toBe('1 Manufactured Homes')
+    expect(wrapper.find('#review-results-count').text()).toBe('Matches Selected: 1')
     expect(wrapper.find('#review-confirm-btn').exists()).toBe(false)
     expect(wrapper.find('#select-all-checkbox').exists()).toBe(false)
     expect(wrapper.find('#select-all-lien-checkbox').exists()).toBe(false)
@@ -280,9 +278,8 @@ describe('Business organization results', () => {
 
     // Verify base mode features
     expect(wrapper.find('#search-summary-info').exists()).toBe(true)
-    expect(wrapper.find('#home-results-count').text()).toBe('5 homes found')
-    expect(wrapper.find('#active-results-count').text()).toBe('2 active homes')
-    expect(wrapper.find('#selected-results-count').text()).toBe('0 homes selected + 0 lien search')
+    expect(wrapper.find('#home-results-count').text()).toBe('Matches Found: 5')
+    expect(wrapper.find('#selected-results-count').text()).toBe('Matches Selected: 0')
     expect(wrapper.find('#review-confirm-btn').exists()).toBe(true)
     expect(wrapper.find('#select-all-checkbox').exists()).toBe(true)
     expect(wrapper.find('#select-all-lien-checkbox').exists()).toBe(true)
@@ -323,7 +320,7 @@ describe('Business organization results in Review Mode', () => {
 
     // Verify base mode features
     expect(wrapper.find('#search-summary-info').exists()).toBe(false)
-    expect(wrapper.find('#review-results-count').text()).toBe('2 Manufactured Homes')
+    expect(wrapper.find('#review-results-count').text()).toBe('Matches Selected: 2')
     expect(wrapper.find('#review-confirm-btn').exists()).toBe(false)
     expect(wrapper.find('#select-all-checkbox').exists()).toBe(false)
     expect(wrapper.find('#select-all-lien-checkbox').exists()).toBe(false)
@@ -360,9 +357,8 @@ describe('Manufactured home results', () => {
 
     // Verify base mode features
     expect(wrapper.find('#search-summary-info').exists()).toBe(true)
-    expect(wrapper.find('#home-results-count').text()).toBe('5 homes found')
-    expect(wrapper.find('#active-results-count').text()).toBe('2 active homes')
-    expect(wrapper.find('#selected-results-count').text()).toBe('0 homes selected + 0 lien search')
+    expect(wrapper.find('#home-results-count').text()).toBe('Matches Found: 5')
+    expect(wrapper.find('#selected-results-count').text()).toBe('Matches Selected: 0')
     expect(wrapper.find('#review-confirm-btn').exists()).toBe(true)
     expect(wrapper.find('#select-all-checkbox').exists()).toBe(true)
     expect(wrapper.find('#select-all-lien-checkbox').exists()).toBe(true)
@@ -407,7 +403,7 @@ describe('Manufactured home results in Review Mode', () => {
 
     // Verify base mode features
     expect(wrapper.find('#search-summary-info').exists()).toBe(false)
-    expect(wrapper.find('#review-results-count').text()).toBe('3 Manufactured Homes')
+    expect(wrapper.find('#review-results-count').text()).toBe('Matches Selected: 3')
     expect(wrapper.find('#review-confirm-btn').exists()).toBe(false)
     expect(wrapper.find('#select-all-checkbox').exists()).toBe(false)
     expect(wrapper.find('#select-all-lien-checkbox').exists()).toBe(false)

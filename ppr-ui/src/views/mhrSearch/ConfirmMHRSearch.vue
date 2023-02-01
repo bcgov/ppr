@@ -20,8 +20,9 @@
           <h1>Review Selection(s)</h1>
           <div class="mt-6">
             <p class="ma-0">
-              Review the details of the manufactured home before paying. Your search result will be available in your
-              Searches list.
+              Review the details of the manufactured home registration(s) before paying. Your search result will be
+              available in your Searches list for up to 14 days. <b>Note:</b> Search fees are charged per unique
+              manufactured home registration number.
             </p>
           </div>
 
