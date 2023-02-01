@@ -606,11 +606,9 @@ function addSortParams (url: string, sortOptions: RegistrationSortIF): string {
   // add all set filters as params to the call
   for (const i in sortKeys) {
     if (sortOptions[sortKeys[i]] === 'registeringParty') {
-      // sortKeys[i] === orderBy (only case this will happen)
       sortOptions[sortKeys[i]] = 'submittingName'
     }
     if (sortOptions[sortKeys[i]] === 'ownerNames') {
-      // sortKeys[i] === orderBy (only case this will happen)
       sortOptions[sortKeys[i]] = 'ownerName'
     }
     // add timestamp onto datetime param values

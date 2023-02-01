@@ -98,28 +98,6 @@
                       </template>
                     </v-select>
                   </div>
-                  <!-- <div v-if="header.value === 'registrationDescription'">
-                    <v-select
-                      :items="mhrRegistrationTypes"
-                      single-line
-                      item-text="registrationTypeUI"
-                      item-value="registrationTypeAPI"
-                      class="table-registration-types"
-                      filled
-                      dense
-                      clearable
-                      label="Registration Type"
-                      v-model="registrationType"
-                      id="txt-type"
-                      :menu-props="{ bottom: true, offsetY: true }"
-                    >
-                      <template slot="item" slot-scope="data">
-                        <span class="list-item">
-                          {{ data.item.registrationTypeUI }}
-                        </span>
-                      </template>
-                    </v-select>
-                  </div> -->
                   <div
                     v-if="header.value === 'createDateTime'"
                     @click="showDatePicker = true"
