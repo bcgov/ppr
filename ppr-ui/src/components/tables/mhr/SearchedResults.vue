@@ -43,13 +43,9 @@
       </v-row>
       <v-row v-else class="result-info">
         <v-col id="review-results-count" cols="auto">
-          <span>Matches Selected: <b>{{ selectedMatchesLength }}</b></span>
-        </v-col>
-        <v-col id="review-registrations-count" cols="auto">
-          <span>Registrations:  <b>{{ uniqueResults.length }}</b></span>
-        </v-col>
-        <v-col id="review-registrations-count" cols="auto">
-          <span>PPR Lien Searches Selected: <b>{{ selectedLiensLength }}</b></span>
+          <span class="divider pr-3">Matches selected: <b>{{ selectedMatchesLength }}</b></span>
+          <span class="divider px-3">Registrations: <b>{{ results.length }}</b></span>
+          <span class="pl-3">PPR Lien Searches Selected: <b>{{ selectedLiensLength }}</b></span>
         </v-col>
       </v-row>
     </article>
@@ -203,7 +199,7 @@
                 <v-checkbox v-model="item.selected" @click="onSelectionCheckboxClick(item)"/>
               </v-col>
               <v-col class="serial-number-text" @click="item.selected = !item.selected; onSelectionCheckboxClick(item)">
-                {{ item.serialNumber }} <span v-if="item.activeCount > 1">({{ item.activeCount }})</span>
+                  {{ item.serialNumber }} <span v-if="item.activeCount > 1">({{ item.activeCount }})</span>
               </v-col>
             </v-row>
             <span v-else>{{ item.serialNumber }}</span>
@@ -373,9 +369,15 @@ export default defineComponent({
         })
 
         // Get an array of unique MHR Numbers with corresponding Owner Names
+        // localState.uniqueResults =
+        //   uniqBy(selectedResults, UIMHRSearchTypeValues.MHRMHR_NUMBER)
+        //     .map(el => el.ownerName)
+
+        // Get an array of unique MHR Numbers with corresponding Serial Numbers
         localState.uniqueResults =
           uniqBy(selectedResults, UIMHRSearchTypeValues.MHRMHR_NUMBER)
-            .map(el => el.ownerName)
+            .map(el => el.serialNumber)
+
         return props.isReviewMode
           ? selectedResults
           : activeResults
@@ -411,12 +413,18 @@ export default defineComponent({
     }
     const getItemClass = (item: ManufacturedHomeSearchResultIF): string => {
       let rowClass = ''
+
       if (props.isReviewMode && localState.hasCollapsedResults) {
         rowClass =
         localState.uniqueResults?.indexOf(item.ownerName) === -1
           ? 'duplicate-reg-num'
           : 'unique-reg-num'
       }
+
+      // const rowClass =
+      //   localState.uniqueResults?.indexOf(item.serialNumber) === -1
+      //     ? 'duplicate-reg-num'
+      //     : 'unique-reg-num'
       return item.selected && !props.isReviewMode ? 'selected' : rowClass
     }
 
@@ -593,12 +601,12 @@ th {
 .owner-name-text, .serial-number-text::v-deep {
   cursor: pointer;
   .v-input {
-    margin-top: 0;
+    // margin-top: 0;
     .v-input__slot {
-      margin: 0;
+      // margin: 0;
     }
     .v-messages {
-      display: none;
+      // display: none;
     }
   }
 }
@@ -663,7 +671,7 @@ th {
     .selected {
       background-color: $blueSelected !important;
     }
-    tr:hover:not(.selected, .unique-reg-num, .duplicate-reg-num) {
+    tr:hover:not(.selected, .first-row, .collapsed-owner, .no-hover) {
       // $gray1 at 75%
       background-color: #f1f3f5BF !important;
     }
@@ -705,6 +713,38 @@ th {
   #mh-search-results-table.review-mode .unique-reg-num:first-child {
     .text-start {
       border-top: none;
+    }
+  }
+
+  #mh-search-results-table.review-mode .unique-reg-num {
+    .text-start {
+      border-bottom: none;
+      // border-top: thin solid rgba(0, 0, 0, 0.12);
+
+      .col-2 {
+        padding-bottom: 0;
+      }
+      .v-messages {
+        display: none;
+      }
+    }
+  }
+  #mh-search-results-table.review-mode .unique-reg-num:first-child {
+    .text-start {
+      border-top: none;
+    }
+  }
+  .review-mode .duplicate-reg-num {
+    td:not(:first-child) {
+      visibility: hidden;
+    }
+    border-top: none;
+
+    .text-start * {
+      padding-top: 0;
+      padding-bottom: 0;
+      margin-top: 0;
+      margin-bottom: 0;
     }
   }
 }
