@@ -408,10 +408,13 @@ export default defineComponent({
       if (count > 1) return `(${count})`
     }
     const getItemClass = (item: ManufacturedHomeSearchResultIF): string => {
-      const rowClass =
+      var rowClass = ''
+      if (props.isReviewMode && localState.uniqueResults < localState.results) {
+        rowClass =
         localState.uniqueResults?.indexOf(item.ownerName) === -1
           ? 'duplicate-reg-num'
           : 'unique-reg-num'
+      }
       return item.selected && !props.isReviewMode ? 'selected' : rowClass
     }
 
@@ -649,7 +652,7 @@ th {
     .selected {
       background-color: $blueSelected !important;
     }
-    tr:hover:not(.selected, .unique-reg-num) {
+    tr:hover:not(.selected, .unique-reg-num, .duplicate-reg-num) {
       // $gray1 at 75%
       background-color: #f1f3f5BF !important;
     }
