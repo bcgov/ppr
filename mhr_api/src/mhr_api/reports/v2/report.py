@@ -561,10 +561,6 @@ class Report:  # pylint: disable=too-few-public-methods
                 result['index'] = (index + 1)
                 if result.get('extraMatches'):
                     match_size += len(result.get('extraMatches'))
-                count: int = result.get('activeCount', 0) + result.get('exemptCount', 0) + \
-                    result.get('historicalCount', 0) - 1
-                if count > 0:
-                    match_size += count
                 if result.get('historicalCount', 0) > 0:
                     has_historical = True
             self._report_data['totalResultsSize'] = len(self._report_data['selected'])
