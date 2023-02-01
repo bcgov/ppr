@@ -21,5 +21,4 @@ export interface ManufacturedHomeSearchResultIF {
   activeCount?: number
   exemptCount?: number
   historicalCount?: number
-  firstRow?: boolean
 }
