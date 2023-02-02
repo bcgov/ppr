@@ -265,14 +265,18 @@ export default defineComponent({
       getMhrTransferCurrentHomeOwners,
       getCertifyInformation,
       hasUnsavedChanges,
-      hasLien
+      hasLien,
+      isRoleQualifiedSupplier,
+      getMhrTransferSubmittingParty
     } = useGetters<any>([
       'getMhrTransferHomeOwners',
       'getMhrInformation',
       'getMhrTransferCurrentHomeOwners',
       'getCertifyInformation',
       'hasUnsavedChanges',
-      'hasLien'
+      'hasLien',
+      'isRoleQualifiedSupplier',
+      'getMhrTransferSubmittingParty'
     ])
 
     const {
@@ -399,7 +403,7 @@ export default defineComponent({
       // When not a draft Transfer, force no unsaved changes after loading current owners
       !getMhrInformation.value.draftNumber && await setUnsavedChanges(false)
 
-      localState.accountInfo = await getSubmittingPartyInformation()
+      localState.accountInfo = await getAccountInformation()
       parseSubmittingPartyInfo()
       localState.loading = false
 
@@ -407,8 +411,8 @@ export default defineComponent({
     })
 
     // Get Account Info from Auth to be used in Submitting Party section in Review screen
-    const getSubmittingPartyInformation = async (): Promise<AccountInfoIF> => {
-      return getAccountInfoFromAuth()
+    const getAccountInformation = async (): Promise<AccountInfoIF> => {
+      return isRoleQualifiedSupplier.value ? getAccountInfoFromAuth() : {} as AccountInfoIF
     }
 
     const parseMhrInformation = async (): Promise<void> => {
@@ -417,7 +421,8 @@ export default defineComponent({
 
       // Store a snapshot of the existing OwnerGroups for baseline of current state
       await setMhrTransferCurrentHomeOwnerGroups(cloneDeep(data.ownerGroups))
-
+      // Store existing submitting party to be used if user is BC Registry Staff
+      setMhrTransferSubmittingParty(data.submittingParty)
       currentOwnerGroups.forEach((ownerGroup, index) => {
         ownerGroup.groupId = index + 1
       })
@@ -440,13 +445,30 @@ export default defineComponent({
     }
 
     const parseSubmittingPartyInfo = (): void => {
-      const submittingParty = {
-        businessName: localState.accountInfo.name,
-        address: localState.accountInfo.mailingAddress,
-        emailAddress: localState.accountInfo.accountAdmin.email,
-        phoneNumber: localState.accountInfo.accountAdmin.phone,
-        phoneExtension: localState.accountInfo.accountAdmin.phoneExtension
-      } as SubmittingPartyIF
+      let submittingParty = {} as SubmittingPartyIF
+
+      if (isRoleQualifiedSupplier.value) {
+        submittingParty.businessName = localState.accountInfo?.name
+        submittingParty.address = localState.accountInfo?.mailingAddress
+        submittingParty.emailAddress = localState.accountInfo?.accountAdmin?.email
+        submittingParty.phoneNumber = localState.accountInfo?.accountAdmin?.phone
+        submittingParty.phoneExtension = localState.accountInfo?.accountAdmin?.phoneExtension
+      } else {
+        submittingParty = getMhrTransferSubmittingParty.value
+        localState.accountInfo.name = getMhrTransferSubmittingParty.value.businessName
+        localState.accountInfo.mailingAddress = getMhrTransferSubmittingParty.value.address
+        if (getMhrTransferSubmittingParty.value.businessName) {
+          localState.accountInfo.isBusinessAccount = true
+          localState.accountInfo.name = getMhrTransferSubmittingParty.value.businessName
+        }
+        localState.accountInfo.accountAdmin = {
+          firstName: getMhrTransferSubmittingParty.value.personName?.firstName,
+          lastName: getMhrTransferSubmittingParty.value.personName?.LastName,
+          email: getMhrTransferSubmittingParty.value.emailAddress,
+          phone: getMhrTransferSubmittingParty.value.phoneNumber,
+          phoneExtension: getMhrTransferSubmittingParty.value.phoneExtension
+        }
+      }
       setMhrTransferSubmittingParty(submittingParty)
     }
 
@@ -660,6 +682,7 @@ export default defineComponent({
       quickMhrSearch,
       handleDialogResp,
       hasLien,
+      getMhrTransferSubmittingParty,
       ...toRefs(localState)
     }
   }

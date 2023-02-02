@@ -506,11 +506,9 @@ export default defineComponent({
         return props.setItem
       }),
       enableOpenEdit: computed(() => {
-        return isRoleQualifiedSupplier.value &&
-          !isRoleStaff.value &&
+        return (isRoleQualifiedSupplier.value || isRoleStaffReg.value || isRoleStaff.value) &&
           !isRoleStaffSbc.value &&
-          !isRoleStaffBcol.value &&
-          !isRoleStaffReg.value
+          !isRoleStaffBcol.value
       })
 
     })
