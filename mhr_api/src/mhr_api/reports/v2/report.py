@@ -20,6 +20,7 @@ from flask import current_app, jsonify
 
 from mhr_api.exceptions import ResourceErrorCodes
 from mhr_api.models import utils as model_utils
+from mhr_api.models.type_tables import MhrTenancyTypes
 from mhr_api.reports import ppr_report_utils
 from mhr_api.reports.v2 import report_utils
 from mhr_api.reports.v2.report_utils import ReportTypes
@@ -362,19 +363,31 @@ class Report:  # pylint: disable=too-few-public-methods
         group_id: int = 1
         if self._report_key == ReportTypes.MHR_TRANSFER:
             if self._report_data.get('addOwnerGroups'):
+                has_na: bool = False
                 for group in self._report_data.get('addOwnerGroups'):
+                    if group.get('type', '') == MhrTenancyTypes.NA:
+                        has_na = True
                     group['groupId'] = group_id
                     group_id += 1
+                self._report_data['hasNA'] = has_na
         elif self._report_key == ReportTypes.MHR_REGISTRATION:
+            has_na: bool = False
             for group in self._report_data.get('ownerGroups'):
                 group['groupId'] = group_id
                 group_id += 1
+                if group.get('type', '') == MhrTenancyTypes.NA:
+                    has_na = True
+            self._report_data['hasNA'] = has_na
         elif self._report_key in (ReportTypes.SEARCH_DETAIL_REPORT, ReportTypes.SEARCH_BODY_REPORT):
             for detail in self._report_data['details']:
                 group_id = 1
+                has_na: bool = False
                 for group in detail.get('ownerGroups'):
                     group['groupId'] = group_id
                     group_id += 1
+                    if group.get('type', '') == MhrTenancyTypes.NA:
+                        has_na = True
+                self._report_data['hasNA'] = has_na
 
     def _set_location(self):
         """Set up report location information."""

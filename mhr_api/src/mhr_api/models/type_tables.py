@@ -285,6 +285,7 @@ class MhrTenancyTypes(BaseEnum):
 
     COMMON = 'COMMON'
     JOINT = 'JOINT'
+    NA = 'NA'
     SOLE = 'SOLE'
 
 

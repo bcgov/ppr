@@ -16,6 +16,7 @@ from flask import current_app
 
 from mhr_api.exceptions import DatabaseException
 from mhr_api.models import db, utils as model_utils
+from mhr_api.models.type_tables import MhrTenancyTypes
 from mhr_api.models.db2.owner import Db2Owner
 from mhr_api.utils.base import BaseEnum
 
@@ -34,6 +35,7 @@ NEW_TENANCY_LEGACY = {
     'JOINT': 'JT',
     'COMMON': 'TC',
     'SOLE': 'SO',
+    'NA': 'TC',
     'JT': 'JT',
     'TC': 'TC',
     'SO': 'SO'
@@ -281,6 +283,8 @@ class Db2Owngroup(db.Model):
         # current_app.logger.info(new_info)
         tenancy: str = new_info.get('type', Db2Owngroup.TenancyTypes.SOLE)
         tenancy_type: str = NEW_TENANCY_LEGACY.get(tenancy)
+        if tenancy == MhrTenancyTypes.NA and len(new_info.get('owners')) > 1:
+            tenancy_type = Db2Owngroup.TenancyTypes.JOINT
         interest: str = new_info.get('interest', '')
         if tenancy_type == Db2Owngroup.TenancyTypes.COMMON or \
                 (tenancy_type == Db2Owngroup.TenancyTypes.JOINT and new_info.get('interestDenominator') and

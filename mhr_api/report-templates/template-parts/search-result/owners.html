@@ -4,7 +4,9 @@
     <div class="no-page-break mt-3">
         <span class="section-sub-title">Home Tenancy Type:</span>
         <span class="section-data">
-            {% if detail.ownerGroups[0].type == 'SOLE' %}
+            {% if hasNA is defined and hasNA %}
+                N/A
+            {% elif detail.ownerGroups[0].type == 'SOLE' %}
                 Sole Owner
             {% elif detail.ownerGroups|length == 1 %}
                 Joint Tenants

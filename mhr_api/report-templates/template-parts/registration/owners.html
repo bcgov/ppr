@@ -4,7 +4,9 @@
 <div class="no-page-break mt-3">
     <span class="section-sub-title">Home Tenancy Type:</span>
     <span class="section-data">
-        {% if addOwnerGroups is defined and addOwnerGroups[0].type == 'SOLE' %}
+        {% if hasNA is defined and hasNA %}
+            N/A
+        {% elif addOwnerGroups is defined and addOwnerGroups[0].type == 'SOLE' %}
             Sole Owner
         {% elif addOwnerGroups is defined and addOwnerGroups[0].type == 'JOINT' and
                 (addOwnerGroups[0].interestDenominator is not defined or addOwnerGroups[0].interestDenominator == '') %}

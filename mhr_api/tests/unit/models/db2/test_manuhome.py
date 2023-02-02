@@ -25,6 +25,7 @@ from registry_schemas.example_data.mhr import REGISTRATION, LOCATION, TRANSFER, 
 
 from mhr_api.exceptions import BusinessException
 from mhr_api.models import Db2Document, Db2Manuhome, Db2Mhomnote, Db2Owngroup, MhrRegistration, Db2Location
+from mhr_api.models.type_tables import MhrPartyTypes, MhrTenancyTypes
 from mhr_api.services.authz import MANUFACTURER_GROUP, QUALIFIED_USER_GROUP, GOV_ACCOUNT_ROLE
 
 
@@ -90,6 +91,29 @@ TEST_DATA_GROUP_INTEREST = [
 TEST_DATA_GROUP_INTEREST2 = [
     (COMMON_GROUP_1, COMMON_GROUP_2, COMMON_GROUP_3, 'UNDIVIDED 1/4', 'UNDIVIDED 2/8', 'UNDIVIDED 2/4')
 ]
+# testdata pattern is ({tenancy_type}, {group_id}, {mhr_num}, {party_type})
+TEST_DATA_GROUP_TYPE = [
+    (MhrTenancyTypes.SOLE, 3, '017270', MhrPartyTypes.OWNER_IND),
+    (MhrTenancyTypes.JOINT, 3, '016148', MhrPartyTypes.OWNER_BUS),
+    (MhrTenancyTypes.COMMON, 2, '080282', MhrPartyTypes.OWNER_BUS),
+    (MhrTenancyTypes.NA, 8, '004764', MhrPartyTypes.EXECUTOR),
+    (MhrTenancyTypes.NA, 6, '051414', MhrPartyTypes.ADMINISTRATOR),
+    (MhrTenancyTypes.NA, 4, '098504', MhrPartyTypes.TRUSTEE)
+]
+
+
+@pytest.mark.parametrize('tenancy_type,group_id,mhr_num,party_type', TEST_DATA_GROUP_TYPE)
+def test_group_type(session, tenancy_type, group_id, mhr_num, party_type):
+    """Assert that find manufauctured home by mhr_number contains all expected elements."""
+    manuhome: Db2Manuhome = Db2Manuhome.find_by_mhr_number(mhr_num)
+    assert manuhome
+    json_data = manuhome.registration_json
+    for group in json_data.get('ownerGroups'):
+        if group.get('groupId') == group_id:
+            assert group['type'] == tenancy_type
+            if party_type and group.get('owners'):
+                for owner in group.get('owners'):
+                    assert owner.get('partyType') == party_type
 
 
 @pytest.mark.parametrize('exists,id,mhr_num,status,doc_id', TEST_DATA)

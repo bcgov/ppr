@@ -397,6 +397,28 @@ TC_GROUP_TRANSFER_ADD = [
         'interestDenominator': 2
     }
 ]
+TC_GROUP_TRANSFER_DELETE_2 = [
+    {
+        'groupId': 3,
+        'owners': [
+            {
+            'organizationName': 'BRANDON CONSTRUCTION MANAGEMENT LTD.',
+            'address': {
+                'street': '3122B LYNNLARK PLACE',
+                'city': 'VICTORIA',
+                'region': 'BC',
+                'postalCode': ' ',
+                'country': 'CA'
+            },
+            'phoneNumber': '6041234567'
+            }
+        ],
+        'type': 'COMMON',
+        'interest': 'UNDIVIDED',
+        'interestNumerator': 4,
+        'interestDenominator': 10
+    }
+]
 INTEREST_VALID_1 = [
     { 'numerator': 1, 'denominator': 2 }, { 'numerator': 1, 'denominator': 2 }
 ]
@@ -517,6 +539,14 @@ TEST_TRANSFER_DEATH_DATA = [
      TC_GROUP_TRANSFER_ADD, validator.GROUP_PARTY_TYPE_INVALID),
     ('Invalid no description', False, MhrPartyTypes.TRUSTEE, MhrPartyTypes.TRUSTEE, None, TC_GROUP_TRANSFER_ADD,
      validator.OWNER_DESCRIPTION_REQUIRED)
+]
+# testdata pattern is ({description}, {valid}, {mhr_num}, {tenancy_type}, {add_group}, {message content})
+TEST_TRANSFER_DEATH_NA_DATA = [
+    ('Invalid single active', False, '045349', MhrTenancyTypes.NA, TC_GROUP_TRANSFER_ADD,
+     validator.TENANCY_TYPE_NA_INVALID),
+    ('Invalid tenancy type - party type', False, '080282', MhrTenancyTypes.JOINT, TC_GROUP_TRANSFER_ADD,
+     validator.TENANCY_PARTY_TYPE_INVALID),
+    ('Valid', True, '080282', MhrTenancyTypes.NA, TC_GROUP_TRANSFER_ADD, None)
 ]
 # testdata pattern is ({description}, {valid}, {numerator}, {denominator}, {groups}, {message content})
 TEST_REG_DATA_GROUP = [
@@ -751,6 +781,39 @@ def test_validate_transfer_death(session, desc, valid, party_type1, party_type2,
     valid_format, errors = schema_utils.validate(json_data, 'transfer', 'mhr')
     # Additional validation not covered by the schema.
     registration: MhrRegistration = MhrRegistration.find_by_mhr_number('045349', 'PS12345')
+    error_msg = validator.validate_transfer(registration, json_data, False)
+    if errors:
+        current_app.logger.debug(errors)
+    if valid:
+        assert valid_format and error_msg == ''
+    else:
+        assert error_msg != ''
+        if message_content:
+            assert error_msg.find(message_content) != -1
+
+
+@pytest.mark.parametrize('desc,valid,mhr_num,tenancy_type,add_group,message_content', TEST_TRANSFER_DEATH_NA_DATA)
+def test_validate_transfer_death_na(session, desc, valid, mhr_num, tenancy_type, add_group, message_content):
+    """Assert that MH transfer due to death validation of owner groups works as expected."""
+    # setup
+    json_data = copy.deepcopy(TRANSFER)
+    json_data['deleteOwnerGroups'][0]['groupId'] = 2
+    json_data['deleteOwnerGroups'][0]['type'] = 'JOINT'
+    json_data['deathOfOwner'] = True
+    json_data['addOwnerGroups'] = copy.deepcopy(add_group)
+    json_data['addOwnerGroups'][0]['type'] = tenancy_type
+    if desc == 'Valid':
+        json_data['deleteOwnerGroups'] = TC_GROUP_TRANSFER_DELETE_2
+        json_data['addOwnerGroups'][0]['interestNumerator'] = json_data['deleteOwnerGroups'][0]['interestNumerator']
+        json_data['addOwnerGroups'][0]['interestDenominator'] = json_data['deleteOwnerGroups'][0]['interestDenominator']
+    owners = json_data['addOwnerGroups'][0]['owners']
+    owners[0]['description'] = 'EXECUTOR OF SOMEONE'
+    owners[0]['partyType'] = MhrPartyTypes.EXECUTOR
+    owners[1]['description'] = 'EXECUTOR OF SOMEONE'
+    owners[1]['partyType'] = MhrPartyTypes.EXECUTOR
+    valid_format, errors = schema_utils.validate(json_data, 'transfer', 'mhr')
+    # Additional validation not covered by the schema.
+    registration: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, '2523')
     error_msg = validator.validate_transfer(registration, json_data, False)
     if errors:
         current_app.logger.debug(errors)

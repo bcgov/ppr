@@ -70,6 +70,8 @@ PARTY_TYPE_INVALID = 'Death of owner requires an executor, trustee, administrato
 GROUP_PARTY_TYPE_INVALID = 'Death of owner all owner party types within the group must be identical. '
 OWNER_DESCRIPTION_REQUIRED = 'Death of owner description of owner party type is required. '
 TRANSFER_PARTY_TYPE_INVALID = 'Owner party type of administrator, executor, trustee not allowed for this registration. '
+TENANCY_PARTY_TYPE_INVALID = 'Multiple owner group tenancy type must be NA for executors, trustees, or administrators. '
+TENANCY_TYPE_NA_INVALID = 'Tenancy type NA is only allowed when there are multiple active owner groups. '
 
 
 def validate_registration(json_data, staff: bool = False):
@@ -97,12 +99,13 @@ def validate_transfer(registration: MhrRegistration, json_data, staff: bool = Fa
             error_msg += validate_doc_id(json_data)
         if registration:
             error_msg += validate_ppr_lien(registration.mhr_number)
+        active_group_count: int = get_active_group_count(json_data, registration)
         error_msg += validate_submitting_party(json_data)
         error_msg += validate_owner_groups(json_data.get('addOwnerGroups'),
                                            False,
                                            registration,
                                            json_data.get('deleteOwnerGroups'))
-        error_msg += validate_owner_party_type(json_data, json_data.get('addOwnerGroups'), False)
+        error_msg += validate_owner_party_type(json_data, json_data.get('addOwnerGroups'), False, active_group_count)
         error_msg += validate_registration_state(registration)
         if is_legacy() and registration and registration.manuhome and json_data.get('deleteOwnerGroups'):
             error_msg += validate_delete_owners_legacy(registration, json_data)
@@ -625,13 +628,16 @@ def validate_pid(pid: str):
     return error_msg
 
 
-def validate_owner_party_type(json_data, groups, new: bool):
+def validate_owner_party_type(json_data,  # pylint: disable=too-many-branches
+                              groups, new: bool,
+                              active_group_count: int):
     """Verify owner groups are valid."""
     error_msg = ''
     owner_death: bool = json_data.get('deathOfOwner', False)
     if not groups:
         return error_msg
     for group in groups:
+        party_count: int = 0
         if group.get('owners'):
             valid_type: bool = True
             first_type: str = None
@@ -639,6 +645,9 @@ def validate_owner_party_type(json_data, groups, new: bool):
                 first_type = group['owners'][0].get('partyType')
             for owner in group['owners']:
                 party_type = owner.get('partyType', None)
+                if party_type and party_type in (MhrPartyTypes.ADMINISTRATOR, MhrPartyTypes.EXECUTOR,
+                                                 MhrPartyTypes.TRUSTEE):
+                    party_count += 1
                 if not new and owner_death:
                     if not party_type or party_type not in (MhrPartyTypes.ADMINISTRATOR, MhrPartyTypes.EXECUTOR,
                                                             MhrPartyTypes.TRUST, MhrPartyTypes.TRUSTEE):
@@ -652,4 +661,25 @@ def validate_owner_party_type(json_data, groups, new: bool):
                     error_msg += TRANSFER_PARTY_TYPE_INVALID
             if not valid_type and len(group['owners']) > 1:
                 error_msg += GROUP_PARTY_TYPE_INVALID
+        if active_group_count < 2 and group.get('type', '') == MhrTenancyTypes.NA:
+            error_msg += TENANCY_TYPE_NA_INVALID
+        elif active_group_count > 1 and party_count > 0 and group.get('type', '') != MhrTenancyTypes.NA:
+            error_msg += TENANCY_PARTY_TYPE_INVALID
     return error_msg
+
+
+def get_active_group_count(json_data, registration: MhrRegistration) -> int:
+    """Count number of active owner groups."""
+    group_count: int = 0
+    if json_data.get('ownerGroups'):
+        group_count += len(json_data.get('ownerGroups'))
+    else:
+        if json_data.get('addOwnerGroups'):
+            group_count += len(json_data.get('addOwnerGroups'))
+        if json_data.get('deleteOwnerGroups'):
+            group_count -= len(json_data.get('addOwnerGroups'))
+        if registration and is_legacy() and registration.manuhome:
+            for existing in registration.manuhome.reg_owner_groups:
+                if existing.status in (Db2Owngroup.StatusTypes.ACTIVE, Db2Owngroup.StatusTypes.EXEMPT):
+                    group_count += 1
+    return group_count
