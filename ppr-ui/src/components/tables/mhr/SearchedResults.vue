@@ -215,7 +215,7 @@
                   <v-checkbox
                     :label="`${!isReviewMode ? 'Include lien' : 'Lien'} information`"
                     v-model="item.includeLienInfo"
-                    :disabled="!item.selected"
+                    :disabled="noSelectedOwner(item)"
                   />
                 </span>
               </template>
@@ -460,6 +460,13 @@ export default defineComponent({
              (item.exemptCount > 0 && item.historicalCount > 0)
     }
 
+    const noSelectedOwner = (item: ManufacturedHomeSearchResultIF): boolean => {
+      var filteredResults = localState.results?.filter(result => result.mhrNumber === item.mhrNumber)
+      filteredResults = filteredResults.filter(result => result.selected === true)
+      console.log(filteredResults)
+      return filteredResults.length < 1
+    }
+
     const updateFolioOrReference = (folioOrReference: string): void => {
       setFolioOrReferenceNumber(folioOrReference)
     }
@@ -530,6 +537,7 @@ export default defineComponent({
       reviewAndConfirm,
       getOwnerName,
       getOwnerStatus,
+      noSelectedOwner,
       getOwnerCount,
       hasSimilarOwners,
       getOwnerStatusText,
