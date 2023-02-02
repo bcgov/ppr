@@ -138,12 +138,15 @@ export default defineComponent({
         }
       }),
       isSingleSearchOption: computed((): boolean => {
-        return (hasPprEnabled.value && !hasMhrEnabled.value) || (!hasPprEnabled.value && hasMhrEnabled.value)
+        return ((hasPprEnabled.value && !hasMhrEnabled.value) || (!hasPprEnabled.value && hasMhrEnabled.value)) &&
+          !(isRoleStaff.value || isRoleStaffReg.value)
       }),
       displayItems: [],
       displayGroup: {
-        1: !isRoleStaff.value ? (hasPprEnabled.value && !hasMhrEnabled.value) : !hasMhrEnabled.value,
-        2: !isRoleStaff.value && (!hasPprEnabled.value && hasMhrEnabled.value)
+        1: !(isRoleStaff.value || isRoleStaffReg.value)
+          ? (hasPprEnabled.value && !hasMhrEnabled.value)
+          : !hasMhrEnabled.value,
+        2: !(isRoleStaff.value || isRoleStaffReg.value) && (!hasPprEnabled.value && hasMhrEnabled.value)
       },
       showMenu: false
     })
