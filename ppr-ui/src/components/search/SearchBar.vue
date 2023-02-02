@@ -123,16 +123,13 @@
         </v-row>
         <v-row>
           <v-col class="py-0">
-            <div
-              v-if="shouldShowFeeHint || (selectedSearchType && isMHRSearchType(selectedSearchType.searchTypeAPI))"
-              class="ppr-mhr-info mt-5 mb-7"
-            >
+            <div v-if="showPprFeeHint || showMhrHint" class="ppr-mhr-info mt-5 mb-7">
               <v-icon size="20">mdi-information-outline</v-icon>
-              <span v-if="shouldShowFeeHint" data-test-id="ppr-search-info">
+              <span v-if="showPprFeeHint" data-test-id="ppr-search-info">
                 Each Personal Property Registry search will incur a fee of ${{ fee }}, including searches that return
                 no results.
               </span>
-              <span v-else-if="isMHRSearchType(selectedSearchType.searchTypeAPI)" data-test-id="mhr-search-info">
+              <span v-else-if="showMhrHint" data-test-id="mhr-search-info">
                 You will have the option to include a Personal Property Registry lien / encumbrance search
                 as part of your Manufactured Home Registry search.
               </span>
@@ -179,7 +176,7 @@
             </v-menu>
           </v-col>
         </v-row>
-        <v-row v-if="shouldShowFeeHint" no-gutters>
+        <v-row v-if="showPprFeeHint" no-gutters>
           <v-col>
             <span id="search-btn-info" class="fee-text"> ${{ fee }} fee </span>
           </v-col>
@@ -304,12 +301,13 @@ export default defineComponent({
       categoryMessage: computed((): string => {
         return localState.validations?.category?.message || ''
       }),
-      shouldShowFeeHint: computed((): boolean => {
-        return (
-          (hasPprEnabled.value && !hasMhrEnabled.value) ||
-          (!(isRoleStaffBcol.value || isRoleStaffReg.value) &&
-            isPPRSearchType(localState.selectedSearchType?.searchTypeAPI))
-        )
+      showPprFeeHint: computed((): boolean => {
+        return !(isRoleStaffBcol.value || isRoleStaffReg.value) && ((hasPprEnabled.value && !hasMhrEnabled.value) ||
+          isPPRSearchType(localState.selectedSearchType?.searchTypeAPI))
+      }),
+      showMhrHint: computed((): boolean => {
+        return !(isRoleStaffBcol.value || isRoleStaffReg.value) && ((hasMhrEnabled.value && !hasPprEnabled.value) ||
+          isMHRSearchType(localState.selectedSearchType?.searchTypeAPI))
       }),
       dialogOptions: computed((): DialogOptionsIF => {
         const options = { ...paymentConfirmaionDialog }
@@ -649,11 +647,11 @@ export default defineComponent({
   width: 3rem;
 }
 #search-btn-info {
-  color: $gray8;
+  color: $gray7;
   font-size: 0.725rem;
 }
 .search-info {
-  color: $gray8;
+  color: $gray7;
   font-size: 1rem;
   line-height: 3.5em;
 }
