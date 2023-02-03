@@ -30,7 +30,7 @@ from mhr_api.models.registration_utils import AccountRegistrationParams
 from mhr_api.models.type_tables import MhrLocationTypes, MhrPartyTypes, MhrOwnerStatusTypes, MhrStatusTypes
 from mhr_api.models.type_tables import MhrRegistrationTypes, MhrRegistrationStatusTypes, MhrDocumentTypes
 from mhr_api.models.type_tables import MhrTenancyTypes
-from mhr_api.services.authz import MANUFACTURER_GROUP, QUALIFIED_USER_GROUP, GOV_ACCOUNT_ROLE
+from mhr_api.services.authz import MANUFACTURER_GROUP, QUALIFIED_USER_GROUP, GOV_ACCOUNT_ROLE, STAFF_ROLE
 
 
 REG_DESCRIPTION = 'REGISTER NEW UNIT'
@@ -40,7 +40,7 @@ SOLE_OWNER_GROUP = [
         'groupId': 1,
         'owners': [
             {
-            'businessName': 'TEST BUS.',
+            'organizationName': 'TEST BUS.',
             'address': {
                 'street': '3122B LYNNLARK PLACE',
                 'city': 'VICTORIA',
@@ -181,16 +181,18 @@ TEST_DOC_ID_DATA = [
 ]
 # testdata pattern is ({mhr_num}, {group_id}, {doc_id_prefix}, {account_id})
 TEST_DATA_TRANSFER = [
+    ('150062', STAFF_ROLE, '9', '2523'),
     ('150062', GOV_ACCOUNT_ROLE, '9', '2523'),
     ('150062', MANUFACTURER_GROUP, '8', '2523'),
     ('150062', QUALIFIED_USER_GROUP, '1', '2523')
 ]
-# testdata pattern is ({mhr_num}, {group_id}, {account_id}, {party_type})
+# testdata pattern is ({mhr_num}, {group_id}, {account_id}, {party_type}, {tenancy_type})
 TEST_DATA_TRANSFER_DEATH = [
-    ('150062', QUALIFIED_USER_GROUP, '2523', MhrPartyTypes.EXECUTOR),
-    ('150062', QUALIFIED_USER_GROUP, '2523', MhrPartyTypes.ADMINISTRATOR),
-    ('150062', QUALIFIED_USER_GROUP, '2523', MhrPartyTypes.TRUSTEE),
-    ('150062', QUALIFIED_USER_GROUP, '2523', MhrPartyTypes.TRUST)
+    ('150062', QUALIFIED_USER_GROUP, '2523', MhrPartyTypes.EXECUTOR, None),
+    ('150062', QUALIFIED_USER_GROUP, '2523', MhrPartyTypes.ADMINISTRATOR, None),
+    ('150062', QUALIFIED_USER_GROUP, '2523', MhrPartyTypes.TRUSTEE, None),
+    ('150062', QUALIFIED_USER_GROUP, '2523', MhrPartyTypes.TRUST, None),
+    ('004764', QUALIFIED_USER_GROUP, '2523', MhrPartyTypes.EXECUTOR, MhrTenancyTypes.NA)
 ]
 # testdata pattern is ({mhr_num}, {group_id}, {account_id})
 TEST_DATA_TRANSFER_SAVE = [
@@ -198,6 +200,7 @@ TEST_DATA_TRANSFER_SAVE = [
 ]
 # testdata pattern is ({mhr_num}, {group_id}, {doc_id_prefix}, {account_id})
 TEST_DATA_EXEMPTION = [
+    ('150062', STAFF_ROLE, '9', '2523'),
     ('150062', GOV_ACCOUNT_ROLE, '9', '2523'),
     ('150062', MANUFACTURER_GROUP, '8', '2523'),
     ('150062', QUALIFIED_USER_GROUP, '1', '2523')
@@ -208,6 +211,7 @@ TEST_DATA_EXEMPTION_SAVE = [
 ]
 # testdata pattern is ({mhr_num}, {group_id}, {doc_id_prefix}, {account_id})
 TEST_DATA_PERMIT = [
+    ('150062', STAFF_ROLE, '9', '2523'),
     ('150062', GOV_ACCOUNT_ROLE, '9', '2523'),
     ('150062', MANUFACTURER_GROUP, '8', '2523'),
     ('150062', QUALIFIED_USER_GROUP, '1', '2523')
@@ -226,6 +230,15 @@ TEST_DATA_NEW_GROUP = [
     ('SOLE', 1, 1, None, SOLE_OWNER_GROUP),
     ('JOINT', 1, 2, None, JOINT_OWNER_GROUP),
     ('COMMON', 2, 2, 10, COMMON_OWNER_GROUP)
+]
+# testdata pattern is ({tenancy_type}, {group_id}, {mhr_num}, {party_type}, {account_id})
+TEST_DATA_GROUP_TYPE = [
+    (MhrTenancyTypes.SOLE, 3, '017270', MhrPartyTypes.OWNER_IND, '2523'),
+    (MhrTenancyTypes.JOINT, 3, '016148', MhrPartyTypes.OWNER_BUS, '2523'),
+    (MhrTenancyTypes.COMMON, 2, '080282', MhrPartyTypes.OWNER_BUS, '2523'),
+    (MhrTenancyTypes.NA, 8, '004764', MhrPartyTypes.EXECUTOR, '2523'),
+    (MhrTenancyTypes.NA, 6, '051414', MhrPartyTypes.ADMINISTRATOR, '2523'),
+    (MhrTenancyTypes.NA, 4, '098504', MhrPartyTypes.TRUSTEE, '2523')
 ]
 
 
@@ -548,8 +561,8 @@ def test_create_transfer_from_json(session, mhr_num, user_group, doc_id_prefix, 
         assert registration.manuhome
 
 
-@pytest.mark.parametrize('mhr_num,user_group,account_id,party_type', TEST_DATA_TRANSFER_DEATH)
-def test_create_transfer_death_from_json(session, mhr_num, user_group, account_id, party_type):
+@pytest.mark.parametrize('mhr_num,user_group,account_id,party_type,tenancy_type', TEST_DATA_TRANSFER_DEATH)
+def test_create_transfer_death_from_json(session, mhr_num, user_group, account_id, party_type, tenancy_type):
     """Assert that an MHR tranfer due to death is created from MHR transfer json correctly."""
     json_data = copy.deepcopy(TRANSFER)
     del json_data['documentId']
@@ -559,6 +572,8 @@ def test_create_transfer_death_from_json(session, mhr_num, user_group, account_i
     json_data['deathOfOwner'] = True
     json_data['mhrNumber'] = mhr_num
     for group in json_data.get('addOwnerGroups'):
+        if tenancy_type:
+            group['type'] = tenancy_type
         for owner in group.get('owners'):
             owner['partyType'] = party_type
     base_reg: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account_id)
@@ -589,8 +604,10 @@ def test_create_transfer_death_from_json(session, mhr_num, user_group, account_i
     assert registration.parties
     for group in registration.owner_groups:
         if group.modified:
+            if tenancy_type:
+                assert group.tenancy_type == tenancy_type
             for owner in group.owners:
-                assert party.party_type == party_type
+                assert owner.party_type == party_type
     if model_utils.is_legacy():
         assert registration.manuhome
 
@@ -806,3 +823,17 @@ def test_create_new_groups(session, type, group_count, owner_count, denominator,
             assert not group.interest_numerator
             assert not group.interest_denominator
     assert own_count == owner_count
+
+
+@pytest.mark.parametrize('tenancy_type,group_id,mhr_num,party_type,account_id', TEST_DATA_GROUP_TYPE)
+def test_group_type(session, tenancy_type, group_id, mhr_num, party_type, account_id):
+    """Assert that find manufauctured home by mhr_number contains all expected elements."""
+    registration: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account_id)
+    assert registration
+    json_data = registration.registration_json
+    for group in json_data.get('ownerGroups'):
+        if group.get('groupId') == group_id:
+            assert group['type'] == tenancy_type
+            if party_type and group.get('owners'):
+                for owner in group.get('owners'):
+                    assert owner.get('partyType') == party_type

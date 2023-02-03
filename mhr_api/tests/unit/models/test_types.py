@@ -47,11 +47,12 @@ def test_mhr_tenancy_type(session):
     """Assert that MhrTenancyType.find_all() contains all expected elements."""
     results = type_tables.MhrTenancyType.find_all()
     assert results
-    assert len(results) == 3
+    assert len(results) == 4
     for result in results:
         assert result.tenancy_type in type_tables.MhrTenancyTypes
         assert result.tenancy_type_desc
-        assert result.legacy_tenancy_type
+        if result.tenancy_type != type_tables.MhrTenancyTypes.NA:
+            assert result.legacy_tenancy_type
 
 
 def test_mhr_registration_type(session):

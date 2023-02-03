@@ -19,6 +19,7 @@ from flask import current_app
 
 from mhr_api.exceptions import BusinessException, DatabaseException, ResourceErrorCodes
 from mhr_api.models import utils as model_utils
+from mhr_api.models.type_tables import MhrTenancyTypes, MhrPartyTypes
 from mhr_api.models import db
 
 from .descript import Db2Descript
@@ -319,12 +320,15 @@ class Db2Manuhome(db.Model):
         if doc.document_type in (Db2Document.DocumentTypes.TRANS, Db2Document.DocumentTypes.TRAND):
             add_groups = []
             delete_groups = []
+            existing_count: int = 0
             for group in self.reg_owner_groups:
                 if group.can_document_id == doc_id:
                     delete_groups.append(group.registration_json)
                 elif group.reg_document_id == doc_id:
                     add_groups.append(group.registration_json)
-            man_home['addOwnerGroups'] = add_groups
+                elif group.status not in (Db2Owngroup.StatusTypes.PREVIOUS, Db2Owngroup.StatusTypes.DRAFT):
+                    existing_count += 1
+            man_home['addOwnerGroups'] = Db2Manuhome.__update_group_type(add_groups, existing_count)
             man_home['deleteOwnerGroups'] = delete_groups
             man_home['declaredValue'] = doc_json.get('declaredValue')
             man_home['consideration'] = doc_json.get('consideration')
@@ -356,7 +360,7 @@ class Db2Manuhome(db.Model):
                         owner_id += 1
                         owner['ownerId'] = owner_id
                     groups.append(group_json)
-                man_home['ownerGroups'] = groups
+                man_home['ownerGroups'] = Db2Manuhome.__update_group_type(groups, 0)
             if self.reg_location:
                 man_home['location'] = self.reg_location.registration_json
             if self.reg_descript:
@@ -403,13 +407,13 @@ class Db2Manuhome(db.Model):
             groups = []
             owner_id = 0  # Added to help UI.
             for group in self.reg_owner_groups:
-                if group.status != Db2Owngroup.StatusTypes.PREVIOUS:
+                if group.status not in (Db2Owngroup.StatusTypes.PREVIOUS, Db2Owngroup.StatusTypes.DRAFT):
                     group_json = group.registration_json
                     for owner in group_json.get('owners'):
                         owner_id += 1
                         owner['ownerId'] = owner_id
                     groups.append(group_json)
-            man_home['ownerGroups'] = groups
+            man_home['ownerGroups'] = Db2Manuhome.__update_group_type(groups, 0)
         if self.reg_location:
             man_home['location'] = self.reg_location.registration_json
         if self.reg_descript:
@@ -468,12 +472,26 @@ class Db2Manuhome(db.Model):
                         owner_id += 1
                         owner['ownerId'] = owner_id
                     groups.append(group_json)
-            man_home['ownerGroups'] = groups
+            man_home['ownerGroups'] = Db2Manuhome.__update_group_type(groups, 0)
         if self.reg_location:
             man_home['location'] = self.reg_location.new_registration_json
         if self.reg_descript:
             man_home['description'] = self.reg_descript.registration_json
         return man_home
+
+    @classmethod
+    def __update_group_type(cls, groups, existing_count: int = 0):
+        """Set type if multiple active owner groups and a trustee, admin, executor exists."""
+        if not groups or (len(groups) + existing_count) == 1:
+            return groups
+        for group in groups:
+            for owner in group.get('owners'):
+                if owner.get('partyType') and owner['partyType'] in (MhrPartyTypes.ADMINISTRATOR,
+                                                                     MhrPartyTypes.EXECUTOR,
+                                                                     MhrPartyTypes.TRUSTEE):
+                    group['type'] = MhrTenancyTypes.NA
+                    break
+        return groups
 
     @classmethod
     def __sort_notes(cls, notes):

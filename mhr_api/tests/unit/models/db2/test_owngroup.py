@@ -16,12 +16,63 @@
 
 Test-Suite to ensure that the legacy DB2 Owngroup Model is working as expected.
 """
+import copy
 
 import pytest
 
-from mhr_api.models import Db2Owngroup
+from mhr_api.models import Db2Owngroup, MhrRegistration
 
 
+SOLE_OWNER_GROUP = {
+    'groupId': 1,
+    'owners': [
+        {
+        'organizationName': 'TEST BUS.',
+        'address': {
+            'street': '3122B LYNNLARK PLACE',
+            'city': 'VICTORIA',
+            'region': 'BC',
+            'postalCode': 'V8S 4I6',
+            'country': 'CA'
+        },
+        'phoneNumber': '6041234567'
+        }
+    ],
+    'type': 'SOLE'
+}
+JOINT_OWNER_GROUP = {
+    'groupId': 1,
+    'owners': [
+        {
+        'individualName': {
+            'first': 'James',
+            'last': 'Smith'
+        },
+        'address': {
+            'street': '3122B LYNNLARK PLACE',
+            'city': 'VICTORIA',
+            'region': 'BC',
+            'postalCode': 'V8S 4I6',
+            'country': 'CA'
+        },
+        'phoneNumber': '6041234567'
+        }, {
+        'individualName': {
+            'first': 'Jane',
+            'last': 'Smith'
+        },
+        'address': {
+            'street': '3122B LYNNLARK PLACE',
+            'city': 'VICTORIA',
+            'region': 'BC',
+            'postalCode': 'V8S 4I6',
+            'country': 'CA'
+        },
+        'phoneNumber': '6041234567'
+        }
+    ],
+    'type': 'JOINT'
+}
 # testdata pattern is ({exists}, {manuhome_id}, {group_id}, {reg_doc_id}, {type})
 TEST_DATA = [
     (True, 101917, 1, '60164729', 'SO'),
@@ -40,6 +91,14 @@ TEST_DATA_INTEREST = [
 TEST_DATA_JSON = [
     ('COMMON', 'TC'),
     ('JOINT', 'JT')
+]
+# testdata pattern is ({type}, {legacy_type}, {data})
+TEST_DATA_GROUP_TYPE = [
+    ('SOLE', 'SO', SOLE_OWNER_GROUP),
+    ('JOINT', 'JT', JOINT_OWNER_GROUP),
+    ('COMMON', 'TC', SOLE_OWNER_GROUP),
+    ('NA', 'TC', SOLE_OWNER_GROUP),
+    ('NA', 'JT', JOINT_OWNER_GROUP)
 ]
 
 
@@ -193,3 +252,14 @@ def test_owngroup_reg_json(session, tenancy_type, legacy_tenancy_type):
         'owners': []
     }
     assert owngroup.registration_json == test_json
+
+
+# testdata pattern is ({type}, {legacy_type}, {data})
+@pytest.mark.parametrize('tenancy_type, legacy_tenancy_type, data', TEST_DATA_GROUP_TYPE)
+def test_create_type(session, tenancy_type, legacy_tenancy_type, data):
+    """Assert that the owngroup type maps from new to legacy correctly."""
+    registration: MhrRegistration = MhrRegistration(id=1)
+    group_data = copy.deepcopy(data)
+    group_data['type'] = tenancy_type
+    group: Db2Owngroup = Db2Owngroup.create_from_registration(registration, group_data, 2)
+    assert group.tenancy_type == legacy_tenancy_type

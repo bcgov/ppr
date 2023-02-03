@@ -25,8 +25,7 @@ from mhr_api.models import utils as model_utils, Db2Manuhome
 from mhr_api.models.mhr_extra_registration import MhrExtraRegistration
 from mhr_api.models.db2 import utils as legacy_utils
 from mhr_api.models.registration_utils import AccountRegistrationParams, get_owner_group_count
-from mhr_api.services.authz import MANUFACTURER_GROUP, QUALIFIED_USER_GROUP, GOV_ACCOUNT_ROLE, \
-                                   GENERAL_USER_GROUP, BCOL_HELP
+from mhr_api.services.authz import MANUFACTURER_GROUP, QUALIFIED_USER_GROUP, GENERAL_USER_GROUP, BCOL_HELP
 
 from .db import db
 from .mhr_description import MhrDescription
@@ -597,10 +596,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
             registration.add_new_groups(json_data, get_owner_group_count(base_reg))
         # Other parties
         registration.parties = MhrParty.create_from_registration_json(json_data, registration.id)
-        if registration.doc_id and not json_data.get('documentId'):
-            json_data['documentId'] = registration.doc_id
-        elif not registration.doc_id and json_data.get('documentId'):
-            registration.doc_id = json_data.get('documentId')
+        json_data['documentId'] = registration.doc_id
         registration.documents = [MhrDocument.create_from_json(registration,
                                                                json_data,
                                                                REG_TO_DOC_TYPE[registration.registration_type])]
@@ -645,10 +641,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         if 'clientReferenceId' in json_data:
             registration.client_reference_id = json_data['clientReferenceId']
         registration.parties = MhrParty.create_from_registration_json(json_data, registration.id)
-        if registration.doc_id and not json_data.get('documentId'):
-            json_data['documentId'] = registration.doc_id
-        elif not registration.doc_id and json_data.get('documentId'):
-            registration.doc_id = json_data.get('documentId')
+        json_data['documentId'] = registration.doc_id
         doc: MhrDocument = MhrDocument.create_from_json(registration,
                                                         json_data,
                                                         REG_TO_DOC_TYPE[registration.registration_type])
@@ -699,10 +692,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
             registration.client_reference_id = json_data['clientReferenceId']
         # Other parties
         registration.parties = MhrParty.create_from_registration_json(json_data, registration.id)
-        if registration.doc_id and not json_data.get('documentId'):
-            json_data['documentId'] = registration.doc_id
-        elif not registration.doc_id and json_data.get('documentId'):
-            registration.doc_id = json_data.get('documentId')
+        json_data['documentId'] = registration.doc_id
         doc: MhrDocument = MhrDocument.create_from_json(registration,
                                                         json_data,
                                                         REG_TO_DOC_TYPE[registration.registration_type])
@@ -877,7 +867,8 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
             query += DOC_ID_QUALIFIED_CLAUSE
         elif user_group and user_group == MANUFACTURER_GROUP:
             query += DOC_ID_MANUFACTURER_CLAUSE
-        elif user_group and user_group == GOV_ACCOUNT_ROLE:
+        # elif user_group and user_group == GOV_ACCOUNT_ROLE:
+        else:
             query += DOC_ID_GOV_AGENT_CLAUSE
         result = db.session.execute(query)
         row = result.first()
@@ -887,12 +878,12 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         if not draft:
             registration.draft_number = str(row[3])
             registration.draft_id = int(row[4])
-        if user_group and user_group in (QUALIFIED_USER_GROUP, MANUFACTURER_GROUP, GOV_ACCOUNT_ROLE,
-                                         GENERAL_USER_GROUP, BCOL_HELP):
-            if draft:
-                registration.doc_id = str(row[3])
-            else:
-                registration.doc_id = str(row[5])
+        # if user_group and user_group in (QUALIFIED_USER_GROUP, MANUFACTURER_GROUP, GOV_ACCOUNT_ROLE,
+        #                                 GENERAL_USER_GROUP, BCOL_HELP):
+        if draft:
+            registration.doc_id = str(row[3])
+        else:
+            registration.doc_id = str(row[5])
         return registration
 
     @staticmethod
