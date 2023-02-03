@@ -154,7 +154,7 @@
               </v-col>
             </v-row>
             <v-tooltip
-              v-else-if="hasSimilarOwners(item) && isReviewMode"
+              v-else-if="hasMultipleSelections(item) && isReviewMode"
               top
               content-class="top-tooltip"
               transition="fade-transition"
@@ -256,7 +256,7 @@ import { BaseHeaderIF, ManufacturedHomeSearchResultIF } from '@/interfaces' // e
 import { FolioNumber } from '@/components/common'
 import { pacificDate } from '@/utils'
 import { RouteNames, UIMHRSearchTypes, UIMHRSearchTypeValues } from '@/enums'
-import { cloneDeep, orderBy, uniqBy } from 'lodash'
+import { cloneDeep, uniqBy, orderBy } from 'lodash'
 
 export default defineComponent({
   components: {
@@ -297,7 +297,7 @@ export default defineComponent({
       tooltipTxtSrchMtchs: 'One or more of the selected matches appear in ' +
         'the same registration. That registration will only be shown once in the report.',
       results: [],
-      uniqueResults: null,
+      uniqueResults: [],
       totalResultsLength: 0,
       headerSearchTypeSlot: computed((): string => {
         switch (getSearchedType.value?.searchTypeUI) {
@@ -354,6 +354,9 @@ export default defineComponent({
       areAllSelected: computed((): boolean => {
         return localState.results?.every(result => result && result.selected === true)
       }),
+      hasCollapsedResults: computed((): boolean => {
+        return localState.uniqueResults?.length < localState.results.length
+      }),
       activeResults: computed((): any => {
         const selectedResults = cloneDeep(getSelectedManufacturedHomes).value
         const baseResults = cloneDeep(getManufacturedHomeSearchResults.value?.results)
@@ -387,7 +390,7 @@ export default defineComponent({
       router.push({ name: RouteNames.MHRSEARCH_CONFIRM })
     }
 
-    const hasSimilarOwners = (item: ManufacturedHomeSearchResultIF): boolean => {
+    const hasMultipleSelections = (item: ManufacturedHomeSearchResultIF): boolean => {
       const similarCount = localState.results?.filter(result => result.mhrNumber === item.mhrNumber).length
       return similarCount > 1
     }
@@ -408,8 +411,8 @@ export default defineComponent({
       if (count > 1) return `(${count})`
     }
     const getItemClass = (item: ManufacturedHomeSearchResultIF): string => {
-      var rowClass = ''
-      if (props.isReviewMode && localState.uniqueResults < localState.results) {
+      let rowClass = ''
+      if (props.isReviewMode && localState.hasCollapsedResults) {
         rowClass =
         localState.uniqueResults?.indexOf(item.ownerName) === -1
           ? 'duplicate-reg-num'
@@ -436,20 +439,20 @@ export default defineComponent({
 
     // return adaptive text for owner status count(s)
     const getOwnerStatusText = (item: ManufacturedHomeSearchResultIF): string => {
-      var returnText = ''
+      let returnText = ''
       if (item.activeCount > 0) {
         returnText += 'ACTIVE'
-        if (item.activeCount > 1) returnText += ' (' + item.activeCount + ')'
+        if (item.activeCount > 1) returnText += ` (${item.activeCount})`
         hasMultipleStatus(item) ? returnText += ',\n' : returnText += '\n'
       }
       if (item.exemptCount > 0) {
         returnText += 'EXEMPT'
-        if (item.exemptCount > 1) returnText += ' (' + item.exemptCount + ')'
+        if (item.exemptCount > 1) returnText += ` (${item.exemptCount})`
         hasMultipleStatus(item) ? returnText += ',\n' : returnText += '\n'
       }
       if (item.historicalCount > 0) {
         returnText += 'HISTORICAL'
-        if (item.historicalCount > 1) returnText += ' (' + item.historicalCount + ')'
+        if (item.historicalCount > 1) returnText += ` (${item.historicalCount})`
       }
       return returnText
     }
@@ -462,8 +465,7 @@ export default defineComponent({
 
     const noSelectedOwner = (item: ManufacturedHomeSearchResultIF): boolean => {
       var filteredResults = localState.results?.filter(result => result.mhrNumber === item.mhrNumber)
-      filteredResults = filteredResults.filter(result => result.selected === true)
-      console.log(filteredResults)
+      filteredResults = filteredResults.filter(result => result.selected)
       return filteredResults.length < 1
     }
 
@@ -482,10 +484,11 @@ export default defineComponent({
         // includeLienInfo needs to be initialized because it doesn't exist in the DB/results response
         return result.includeLienInfo !== true ? { ...result, includeLienInfo: false } : result
       })
-
-      // sort search results
-      const sortedResults = orderBy(localState.results, ['mhrNumber', 'ownerName.lastName', 'ownerName.middleName', 'ownerName.firsName'], ['asc', 'asc', 'asc', 'asc'])
-      localState.results = sortedResults
+      // sort search results by mhrNumber for grouping purposes, only when table is in review and has collapsed results
+      if (props.isReviewMode && localState.hasCollapsedResults) {
+        const sortedResults = orderBy(localState.results, ['ownerName.lastName', 'ownerName.middleName', 'ownerName.firsName', 'mhrNumber'], ['asc', 'asc', 'asc', 'asc'])
+        localState.results = sortedResults
+      }
 
       localState.totalResultsLength = resp.totalResultsSize
       if (localState.searchType === UIMHRSearchTypes.MHRMHR_NUMBER && localState.totalResultsLength === 1) {
@@ -539,7 +542,7 @@ export default defineComponent({
       getOwnerStatus,
       noSelectedOwner,
       getOwnerCount,
-      hasSimilarOwners,
+      hasMultipleSelections,
       getOwnerStatusText,
       hasMultipleStatus,
       updateFolioOrReference,
@@ -651,6 +654,7 @@ th {
         vertical-align: baseline;
         overflow: hidden;
         white-space: normal;
+        padding: 0 12px !important;
         height:1rem;
       }
       td:not(:last-child) {

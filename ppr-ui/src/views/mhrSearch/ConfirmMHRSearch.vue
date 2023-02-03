@@ -109,7 +109,7 @@ import {
 import { BaseDialog } from '@/components/dialogs'
 import { StaffPayment as StaffPaymentComponent } from '@bcrs-shared-components/staff-payment'
 // local helpers/enums/interfaces/resources
-import { RouteNames } from '@/enums'
+import { RouteNames, UIMHRSearchTypeValues } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { StaffPaymentOptions } from '@bcrs-shared-components/enums'
 import {
@@ -124,6 +124,7 @@ import { getFeatureFlag, submitSelectedMhr } from '@/utils'
 import { SearchedResultMhr } from '@/components/tables'
 import { AdditionalSearchFeeIF } from '@/composables/fees/interfaces'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
+import { uniqBy } from 'lodash'
 /* eslint-enable no-unused-vars */
 
 @Component({
@@ -196,11 +197,10 @@ export default class ConfirmMHRSearch extends Vue {
 
   private get feeQuantity (): number {
     // Return selected quantity that is not a combination search
-    const uniqueRegNums = []
-    this.getSelectedManufacturedHomes.forEach(result => {
-      if (!uniqueRegNums.includes(result.mhrNumber)) uniqueRegNums.push(result.mhrNumber)
-    })
-    return uniqueRegNums.length
+    const filteredResults =
+      this.getSelectedManufacturedHomes.filter(result => result.selected && !result.includeLienInfo)
+    const uniqueRegNumRegistrations = uniqBy(filteredResults, UIMHRSearchTypeValues.MHRMHR_NUMBER)
+    return uniqueRegNumRegistrations.length
   }
 
   private get staffPaymentData (): any {

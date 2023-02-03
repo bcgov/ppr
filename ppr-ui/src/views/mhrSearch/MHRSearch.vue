@@ -4,7 +4,7 @@
       <v-progress-circular color="primary" size="50" indeterminate />
     </v-overlay>
     <v-container class="container">
-      <v-icon class="mr-2" size="30" style="vertical-align: baseline; color: #212529;">mdi-home</v-icon>
+      <v-icon :class="[$style['home'], 'mr-2']" size="30">mdi-home</v-icon>
       <b :class="$style['search-title']">Selection List</b>
       <p v-if="!getManufacturedHomeSearchResults" :class="[$style['search-info'], 'ma-0']" style="padding-top: 26px;">
         Your search results will display below.
@@ -177,6 +177,10 @@ export default class MHRSearch extends Vue {
   color: $gray7;
   font-size: 1rem;
   line-height: 1.5rem;
+}
+.home {
+  vertical-align: baseline !important;
+  color: #212529 !important;
 }
 
 </style>
