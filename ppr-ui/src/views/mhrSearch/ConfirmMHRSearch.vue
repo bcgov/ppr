@@ -20,8 +20,9 @@
           <h1>Review Selection(s)</h1>
           <div class="mt-6">
             <p class="ma-0">
-              Review the details of the manufactured home before paying. Your search result will be available in your
-              Searches list.
+              Review the details of the manufactured home registration(s) before paying. Your search result will be
+              available in your Searches list for up to 14 days. <b>Note:</b> Search fees are charged per unique
+              manufactured home registration number.
             </p>
           </div>
 
@@ -108,7 +109,7 @@ import {
 import { BaseDialog } from '@/components/dialogs'
 import { StaffPayment as StaffPaymentComponent } from '@bcrs-shared-components/staff-payment'
 // local helpers/enums/interfaces/resources
-import { RouteNames } from '@/enums'
+import { RouteNames, UIMHRSearchTypeValues } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { StaffPaymentOptions } from '@bcrs-shared-components/enums'
 import {
@@ -123,6 +124,7 @@ import { getFeatureFlag, submitSelectedMhr } from '@/utils'
 import { SearchedResultMhr } from '@/components/tables'
 import { AdditionalSearchFeeIF } from '@/composables/fees/interfaces'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
+import { uniqBy } from 'lodash'
 /* eslint-enable no-unused-vars */
 
 @Component({
@@ -195,7 +197,10 @@ export default class ConfirmMHRSearch extends Vue {
 
   private get feeQuantity (): number {
     // Return selected quantity that is not a combination search
-    return this.getSelectedManufacturedHomes.filter(result => result.selected && !result.includeLienInfo).length
+    const filteredResults =
+      this.getSelectedManufacturedHomes.filter(result => result.selected && !result.includeLienInfo)
+    const uniqueRegNumRegistrations = uniqBy(filteredResults, UIMHRSearchTypeValues.MHRMHR_NUMBER)
+    return uniqueRegNumRegistrations.length
   }
 
   private get staffPaymentData (): any {

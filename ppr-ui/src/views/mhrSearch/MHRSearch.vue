@@ -4,6 +4,7 @@
       <v-progress-circular color="primary" size="50" indeterminate />
     </v-overlay>
     <v-container class="container">
+      <v-icon :class="[$style['home'], 'mr-2']" size="30">mdi-home</v-icon>
       <b :class="$style['search-title']">Selection List</b>
       <p v-if="!getManufacturedHomeSearchResults" :class="[$style['search-info'], 'ma-0']" style="padding-top: 26px;">
         Your search results will display below.
@@ -12,9 +13,10 @@
         <v-row no-gutters class="mt-6">
           <v-col class="pr-6" :class="$style['search-info']">
             <span v-if="totalResultsLength !== 0" id="results-info">
-              Select the manufactured home to download the full details of the home. Selecting the home will debit your
-              search fee. The downloaded report will contain the full record of the registration for the home and will
-              be automatically saved to your dashboard for up to 14 days.
+              Select manufactured home registrations to download a search result report containing the full details of
+              the registration(s). Lien information contained in the Personal Property Registry can be included for an
+              additional fee per manufactured home registration. You will be able to review your selection prior to
+              payment.
             </span>
             <span v-else id="no-results-info">
               No Registrations were found.
@@ -175,6 +177,10 @@ export default class MHRSearch extends Vue {
   color: $gray7;
   font-size: 1rem;
   line-height: 1.5rem;
+}
+.home {
+  vertical-align: baseline !important;
+  color: #212529 !important;
 }
 
 </style>

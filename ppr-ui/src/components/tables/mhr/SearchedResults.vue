@@ -4,18 +4,19 @@
     <article id="search-meta-info" class="px-4 pt-8">
       <v-row no-gutters>
         <span class="search-sub-title">{{ searchType }} - <b>"{{ searchValue }}"</b></span>
-        <span class="search-info"> as of {{ searchTime }}</span>
       </v-row>
       <v-row v-if="searched && !isReviewMode" id="search-summary-info" class="result-info pt-6">
         <v-col id="home-results-count" cols="auto">
-          <span class="divider pr-3"><b>{{ totalResultsLength }}</b> homes found</span>
-        </v-col>
-        <v-col id="active-results-count" cols="auto" class="pl-0">
-          <span class="divider pr-3"><b>{{ activeMatchesLength }}</b> active homes</span>
+          <span class="divider pr-3">Matches Found: <b>{{ totalResultsLength }}</b></span>
         </v-col>
         <v-col cols="auto" class="pl-0">
-          <span id="selected-results-count">
-            <b>{{ selectedMatchesLength }}</b> homes selected + <b>{{ selectedLiensLength }}</b> lien search
+          <span id="selected-results-count" class="divider pr-3">
+            Matches Selected: <b>{{ selectedMatchesLength }}</b>
+          </span>
+        </v-col>
+        <v-col cols="auto" class="pl-0">
+          <span>
+            PPR Lien Searches Selected: <b>{{ selectedLiensLength }}</b>
           </span>
         </v-col>
         <v-col class="mt-n3 mr-6">
@@ -40,7 +41,13 @@
       </v-row>
       <v-row v-else class="result-info">
         <v-col id="review-results-count" cols="auto">
-          <span><b>{{ selectedMatchesLength }}</b> Manufactured Homes</span>
+          <span>Matches Selected: <b>{{ selectedMatchesLength }}</b></span>
+        </v-col>
+        <v-col id="review-registrations-count" cols="auto">
+          <span>Registrations:  <b>{{ uniqueResults.length }}</b></span>
+        </v-col>
+        <v-col id="review-registrations-count" cols="auto">
+          <span>PPR Lien Searches Selected: <b>{{ selectedLiensLength }}</b></span>
         </v-col>
       </v-row>
     </article>
@@ -52,6 +59,7 @@
           v-if="results"
           id="mh-search-results-table"
           class="results-table"
+          :class="{ 'review-mode' : isReviewMode }"
           disable-sort
           fixed
           fixed-header
@@ -124,10 +132,10 @@
               :class="item.selected && !$props.isReviewMode ? 'selected' : ''"
             >
               <v-col cols="2">
-                <v-checkbox v-model="item.selected" @click="onSelectionCheckboxClick(item)"/>
+                <v-checkbox v-model="item.selected" :ripple="false" @click="onSelectionCheckboxClick(item)"/>
               </v-col>
               <v-col class="owner-name-text" @click="item.selected = !item.selected; onSelectionCheckboxClick(item)">
-                {{ getOwnerName(item) }}
+                {{ getOwnerName(item) }} {{ isReviewMode ? getOwnerCount(item) : '' }}
               </v-col>
             </v-row>
             <span v-else>{{ getOwnerName(item) }}</span>
@@ -145,13 +153,31 @@
                 {{ item.mhrNumber }}
               </v-col>
             </v-row>
+            <v-tooltip
+              v-else-if="hasMultipleSelections(item) && isReviewMode"
+              top
+              content-class="top-tooltip"
+              transition="fade-transition"
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <span  v-bind="attrs" v-on="on">
+                  <b><u>{{ item.mhrNumber }}</u></b>
+                </span>
+              </template>
+              <div class="pt-2 pb-2">
+                Multiple selections in the same registration are displayed together.
+              </div>
+            </v-tooltip>
+            <span v-else-if="isReviewMode"><b>{{ item.mhrNumber }}</b></span>
             <span v-else>{{ item.mhrNumber }}</span>
           </template>
           <template v-slot:[`item.ownerStatus`]="{ item }">
-            {{ getOwnerStatus(item.ownerStatus) }}
+            {{ getOwnerStatusText(item) }}
           </template>
           <template v-if="isReviewMode" v-slot:[`item.yearMakeModel`]="{ item }">
-            {{ item.baseInformation.year }} {{ item.baseInformation.make }} {{ item.baseInformation.model }}
+            <span>
+              {{ item.baseInformation.year }} {{ item.baseInformation.make }} {{ item.baseInformation.model }}
+            </span>
           </template>
           <template v-else v-slot:[`item.year`]="{ item }">
             {{ item.baseInformation.year || '-' }}
@@ -163,7 +189,7 @@
             {{ item.baseInformation.model || '-' }}
           </template>
           <template v-slot:[`item.homeLocation`]="{ item }">
-            {{ item.homeLocation }}
+            <span>{{ item.homeLocation }}</span>
           </template>
           <template v-slot:[`item.serialNumber`]="{ item }">
             <v-row
@@ -191,7 +217,7 @@
                   <v-checkbox
                     :label="`${!isReviewMode ? 'Include lien' : 'Lien'} information`"
                     v-model="item.includeLienInfo"
-                    :disabled="!item.selected"
+                    :disabled="noSelectedOwner(item)"
                   />
                 </span>
               </template>
@@ -232,7 +258,7 @@ import { BaseHeaderIF, ManufacturedHomeSearchResultIF } from '@/interfaces' // e
 import { FolioNumber } from '@/components/common'
 import { pacificDate } from '@/utils'
 import { RouteNames, UIMHRSearchTypes, UIMHRSearchTypeValues } from '@/enums'
-import { cloneDeep } from 'lodash'
+import { cloneDeep, uniqBy, orderBy } from 'lodash'
 
 export default defineComponent({
   components: {
@@ -273,6 +299,7 @@ export default defineComponent({
       tooltipTxtSrchMtchs: 'One or more of the selected matches appear in ' +
         'the same registration. That registration will only be shown once in the report.',
       results: [],
+      uniqueResults: [],
       totalResultsLength: 0,
       headerSearchTypeSlot: computed((): string => {
         switch (getSearchedType.value?.searchTypeUI) {
@@ -329,6 +356,9 @@ export default defineComponent({
       areAllSelected: computed((): boolean => {
         return localState.results?.every(result => result && result.selected === true)
       }),
+      hasCollapsedResults: computed((): boolean => {
+        return localState.uniqueResults?.length < localState.results.length
+      }),
       activeResults: computed((): any => {
         const selectedResults = cloneDeep(getSelectedManufacturedHomes).value
         const baseResults = cloneDeep(getManufacturedHomeSearchResults.value?.results)
@@ -345,6 +375,10 @@ export default defineComponent({
           }
         })
 
+        // Get an array of unique MHR Numbers with corresponding Owner Names
+        localState.uniqueResults =
+          uniqBy(selectedResults, UIMHRSearchTypeValues.MHRMHR_NUMBER)
+            .map(el => el.ownerName)
         return props.isReviewMode
           ? selectedResults
           : activeResults
@@ -358,6 +392,11 @@ export default defineComponent({
       router.push({ name: RouteNames.MHRSEARCH_CONFIRM })
     }
 
+    const hasMultipleSelections = (item: ManufacturedHomeSearchResultIF): boolean => {
+      const similarCount = localState.results?.filter(result => result.mhrNumber === item.mhrNumber).length
+      return similarCount > 1
+    }
+
     const getOwnerName = (item: ManufacturedHomeSearchResultIF): string => {
       if (item?.ownerName) {
         return `
@@ -369,8 +408,19 @@ export default defineComponent({
       } else return '-'
     }
 
+    const getOwnerCount = (item: ManufacturedHomeSearchResultIF): string => {
+      const count = item.activeCount + item.exemptCount + item.historicalCount
+      if (count > 1) return `(${count})`
+    }
     const getItemClass = (item: ManufacturedHomeSearchResultIF): string => {
-      return item.selected && !props.isReviewMode ? 'selected' : ''
+      let rowClass = ''
+      if (props.isReviewMode && localState.hasCollapsedResults) {
+        rowClass =
+        localState.uniqueResults?.indexOf(item.ownerName) === -1
+          ? 'duplicate-reg-num'
+          : 'unique-reg-num'
+      }
+      return item.selected && !props.isReviewMode ? 'selected' : rowClass
     }
 
     const onSelectionCheckboxClick = (item: ManufacturedHomeSearchResultIF): void => {
@@ -383,10 +433,42 @@ export default defineComponent({
     }
 
     const getOwnerStatus = (ownerStatus: string): string => {
-      if (ownerStatus) {
+      if (ownerStatus === 'PREVIOUS') {
         if (ownerStatus === 'PREVIOUS') return 'HISTORICAL'
         else return ownerStatus
       } else return ''
+    }
+
+    // return adaptive text for owner status count(s)
+    const getOwnerStatusText = (item: ManufacturedHomeSearchResultIF): string => {
+      let returnText = ''
+      if (item.activeCount > 0) {
+        returnText += 'ACTIVE'
+        if (item.activeCount > 1) returnText += ` (${item.activeCount})`
+        hasMultipleStatus(item) ? returnText += ',\n' : returnText += '\n'
+      }
+      if (item.exemptCount > 0) {
+        returnText += 'EXEMPT'
+        if (item.exemptCount > 1) returnText += ` (${item.exemptCount})`
+        hasMultipleStatus(item) ? returnText += ',\n' : returnText += '\n'
+      }
+      if (item.historicalCount > 0) {
+        returnText += 'HISTORICAL'
+        if (item.historicalCount > 1) returnText += ` (${item.historicalCount})`
+      }
+      return returnText
+    }
+
+    const hasMultipleStatus = (item: ManufacturedHomeSearchResultIF): boolean => {
+      return (item.activeCount > 0 && item.exemptCount > 0) ||
+             (item.activeCount > 0 && item.historicalCount > 0) ||
+             (item.exemptCount > 0 && item.historicalCount > 0)
+    }
+
+    const noSelectedOwner = (item: ManufacturedHomeSearchResultIF): boolean => {
+      var filteredResults = localState.results?.filter(result => result.mhrNumber === item.mhrNumber)
+      filteredResults = filteredResults.filter(result => result.selected)
+      return filteredResults.length < 1
     }
 
     const updateFolioOrReference = (folioOrReference: string): void => {
@@ -396,7 +478,6 @@ export default defineComponent({
     onMounted(async () => {
       const resp = getManufacturedHomeSearchResults.value
       if (!resp) await router.push({ name: RouteNames.DASHBOARD })
-
       localState.searchValue = resp?.searchQuery.criteria.value || getOwnerName(resp?.searchQuery.criteria)
       localState.searched = true
       localState.searchType = getSearchedType.value?.searchTypeUI || ''
@@ -405,6 +486,13 @@ export default defineComponent({
         // includeLienInfo needs to be initialized because it doesn't exist in the DB/results response
         return result.includeLienInfo !== true ? { ...result, includeLienInfo: false } : result
       })
+      // sort search results by mhrNumber for grouping purposes, only when table is in review and has collapsed results
+      if (props.isReviewMode && localState.hasCollapsedResults) {
+        const sortedResults = orderBy(localState.results,
+          ['ownerName.lastName', 'ownerName.middleName', 'ownerName.firstName', 'mhrNumber'],
+          ['asc', 'asc', 'asc', 'asc'])
+        localState.results = sortedResults
+      }
 
       localState.totalResultsLength = resp.totalResultsSize
       if (localState.searchType === UIMHRSearchTypes.MHRMHR_NUMBER && localState.totalResultsLength === 1) {
@@ -456,6 +544,11 @@ export default defineComponent({
       reviewAndConfirm,
       getOwnerName,
       getOwnerStatus,
+      noSelectedOwner,
+      getOwnerCount,
+      hasMultipleSelections,
+      getOwnerStatusText,
+      hasMultipleStatus,
       updateFolioOrReference,
       getItemClass,
       onSelectionCheckboxClick,
@@ -469,6 +562,10 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+u {
+  text-decoration-line: underline;
+  text-decoration-style: dotted;
+}
 button {
   font-weight: normal !important;
 }
@@ -483,7 +580,6 @@ th {
 .checkbox-info {
   font-size: 0.725rem !important;
   font-weight: bold;
-  text-align: center;
 }
 .divider {
   border-right: 1px solid $gray3;
@@ -499,8 +595,17 @@ th {
 .main-results-div {
   width: 100%;
 }
-.owner-name-text, .serial-number-text {
+.owner-name-text, .serial-number-text::v-deep {
   cursor: pointer;
+  .v-input {
+    margin-top: 0;
+    .v-input__slot {
+      margin: 0;
+    }
+    .v-messages {
+      display: none;
+    }
+  }
 }
 .no-results-info {
   color: $gray7 !important;
@@ -520,8 +625,10 @@ th {
     font-size: 0.875rem !important;
     font-weight: bold;
   }
-  .v-input__control .v-input--selection-controls__input i { //checkbox border color
+  .v-input__control .v-input--selection-controls__input i:not(.header-checkbox) { //checkbox border color
     color: $primary-blue !important;
+    display: block !important;
+    vertical-align: middle !important;
   }
   // disabled checkbox border color
   .v-input--selection-controls.v-input--is-disabled:not(.v-input--indeterminate) .v-icon {
@@ -536,6 +643,7 @@ th {
   }
   .results-table .v-input--checkbox .v-input__slot .v-label {
     font-size: 0.875rem !important;
+    vertical-align: middle;
   }
   .results-table .v-data-table__wrapper {
     max-height: 550px;
@@ -545,12 +653,13 @@ th {
       align-items: baseline;
     }
     tr {
-      height: 54px;
       td:not(.group-header) {
         display: table-cell;
         vertical-align: baseline;
         overflow: hidden;
         white-space: normal;
+        padding: 0 12px !important;
+        height:1rem;
       }
       td:not(:last-child) {
         word-break: break-word;
@@ -559,14 +668,49 @@ th {
     .selected {
       background-color: $blueSelected !important;
     }
-    tr:hover:not(.selected) {
+    tr:hover:not(.selected, .unique-reg-num, .duplicate-reg-num) {
       // $gray1 at 75%
       background-color: #f1f3f5BF !important;
     }
   }
-  .v-data-table > .v-data-table__wrapper > table > tbody > tr > td,
+  .v-data-table > .v-data-table__wrapper > table > tbody > th,
   .v-data-table > .v-data-table__wrapper > table > thead > tr > th {
-    padding: 0 12px !important;
+    padding:12px !important;
+    vertical-align: bottom;
+  }
+
+  #mh-search-results-table.review-mode .unique-reg-num {
+    .text-start {
+      border-bottom: none;
+      border-top: thin solid rgba(0, 0, 0, 0.12);
+      .col-2 {
+        padding-bottom: 0 !important;
+      }
+      .v-messages {
+        display: none;
+      }
+    }
+  }
+  #mh-search-results-table.review-mode .duplicate-reg-num {
+    td:not(:first-child) {
+      display: none;
+    }
+    .text-start * {
+      padding-top: 0;
+      padding-bottom: 0;
+      margin-top: 0;
+      margin-bottom: 0;
+      height:min-content !important;
+      vertical-align: middle;
+    }
+    :first-child{
+      border: none !important;
+    }
+  }
+  #mh-search-results-table.review-mode .unique-reg-num:first-child {
+    .text-start {
+      border-top: none;
+    }
   }
 }
 </style>
