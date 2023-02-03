@@ -271,9 +271,11 @@ export default class App extends Mixins(AuthMixin) {
         }
       }
 
-      // if we are already authenticated then go right to init
+      // When we are authenticated, allow time for session storage propagation from auth, then initialize application
       // (since we won't get the event from Signin component)
-      if (this.isAuthenticated) this.onProfileReady(true)
+      if (this.isAuthenticated) {
+        setTimeout(() => { this.onProfileReady(true) }, this.isJestRunning ? 0 : 1000)
+      }
     }
   }
 
