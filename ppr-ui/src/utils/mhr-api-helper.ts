@@ -605,12 +605,9 @@ function addSortParams (url: string, sortOptions: RegistrationSortIF): string {
   const sortKeys = Object.keys(sortOptions)
   // add all set filters as params to the call
   for (const i in sortKeys) {
-    if (sortOptions[sortKeys[i]] === 'registeringParty') {
-      sortOptions[sortKeys[i]] = 'submittingName'
-    }
-    if (sortOptions[sortKeys[i]] === 'ownerNames') {
-      sortOptions[sortKeys[i]] = 'ownerName'
-    }
+    if (sortOptions[sortKeys[i]] === 'registeringParty') sortOptions[sortKeys[i]] = 'submittingName'
+    if (sortOptions[sortKeys[i]] === 'ownerNames') sortOptions[sortKeys[i]] = 'ownerName'
+    if (sortOptions[sortKeys[i]] === 'registrationDescription') sortOptions[sortKeys[i]] = 'registrationType'
     // add timestamp onto datetime param values
     if (sortOptions[sortKeys[i]] && ['startDateTime', 'endDateTime'].includes(UIFilterToApiFilter[sortKeys[i]])) {
       sortOptions[sortKeys[i]] =

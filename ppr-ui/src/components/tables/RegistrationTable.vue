@@ -68,7 +68,7 @@
                   />
                   <div v-if="header.value === 'registrationType'">
                     <registration-bar-type-ahead-list
-                      v-if="hasRPPR && !isMhr"
+                      v-if="hasRPPR"
                       id="reg-type-select"
                       :defaultLabel="'Registration Type'"
                       :defaultDense="true"
@@ -78,7 +78,29 @@
                     />
                     <v-select
                       v-else
-                      :items="isPpr ? registrationTypes : mhrRegistrationTypes"
+                      :items="registrationTypes"
+                      single-line
+                      item-text="registrationTypeUI"
+                      item-value="registrationTypeAPI"
+                      class="table-registration-types"
+                      filled
+                      dense
+                      clearable
+                      label="Registration Type"
+                      v-model="registrationType"
+                      id="txt-type"
+                      :menu-props="{ bottom: true, offsetY: true }"
+                    >
+                      <template slot="item" slot-scope="data">
+                        <span class="list-item">
+                          {{ data.item.registrationTypeUI }}
+                        </span>
+                      </template>
+                    </v-select>
+                  </div>
+                  <div v-if="header.value === 'registrationDescription'">
+                    <v-select
+                      :items="mhrRegistrationTypes"
                       single-line
                       item-text="registrationTypeUI"
                       item-value="registrationTypeAPI"

@@ -450,7 +450,7 @@ export const mhRegistrationTableHeaders: Array<BaseHeaderIF> = [
     class: 'min-column-md',
     sortable: true,
     text: 'Registration Type',
-    value: 'registrationType',
+    value: 'registrationDescription',
     display: true
   },
   {
