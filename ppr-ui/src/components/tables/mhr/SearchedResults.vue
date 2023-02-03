@@ -124,33 +124,31 @@
           </template>
 
           <template v-slot:[`item.ownerName`]="{ item }">
-            <v-row
+            <div
               v-if="isOwnerOrOrgSearch"
-              class="align-baseline"
               :class="item.selected && !$props.isReviewMode ? 'selected' : ''"
             >
-              <v-col cols="2">
-                <v-checkbox v-model="item.selected" :ripple="false" @click="onSelectionCheckboxClick(item)"/>
-              </v-col>
-              <v-col class="owner-name-text" @click="item.selected = !item.selected; onSelectionCheckboxClick(item)">
-                {{ getOwnerName(item) }} {{ isReviewMode ? getOwnerCount(item) : '' }}
-              </v-col>
-            </v-row>
+              <v-checkbox
+                v-model="item.selected"
+                @click="onSelectionCheckboxClick(item)"
+                :label="isReviewMode ? getOwnerName(item) + ' ' + getOwnerCount(item) : getOwnerName(item) "
+                hide-details
+              />
+            </div>
             <span v-else>{{ getOwnerName(item) }}</span>
           </template>
           <template v-slot:[`item.mhrNumber`]="{ item }">
-            <v-row
+            <div
               v-if="searchType === UIMHRSearchTypes.MHRMHR_NUMBER"
-              class="align-baseline"
               :class="item.selected && !$props.isReviewMode ? 'selected' : ''"
             >
-              <v-col cols="2">
-                <v-checkbox v-model="item.selected" @click="onSelectionCheckboxClick(item)"/>
-              </v-col>
-              <v-col class="owner-name-text" @click="item.selected = !item.selected; onSelectionCheckboxClick(item)">
-                {{ item.mhrNumber }}
-              </v-col>
-            </v-row>
+              <v-checkbox
+                v-model="item.selected"
+                @click="onSelectionCheckboxClick(item)"
+                :label="item.mhrNumber"
+                hide-details
+              />
+            </div>
             <v-tooltip
               v-else-if="hasMultipleSelections(item.mhrNumber) && isReviewMode"
               top
@@ -198,7 +196,9 @@
                 v-model="item.selected"
                 @click="onSelectionCheckboxClick(item)"
                 :ripple="false"
-                :label="item.activeCount > 1 ? `${item.serialNumber} (${item.activeCount})` : `${item.serialNumber}`"/>
+                :label="item.activeCount > 1 ? `${item.serialNumber} (${item.activeCount})` : `${item.serialNumber}`"
+                hide-details
+              />
             </div>
             <div v-else>{{ item.serialNumber }}</div>
           </template>
@@ -215,6 +215,7 @@
                     v-model="item.includeLienInfo"
                     :disabled="isReviewMode ? hasMhrNumberSelected(item.mhrNumber) : !item.selected"
                     :ripple="false"
+                    hide-details
                   />
                 </span>
               </template>
@@ -609,18 +610,6 @@ th {
 .main-results-div {
   width: 100%;
 }
-.owner-name-text::v-deep {
-  cursor: pointer;
-  .v-input {
-    // margin-top: 0;
-    .v-input__slot {
-      // margin: 0;
-    }
-    .v-messages {
-      // display: none;
-    }
-  }
-}
 .no-results-info {
   color: $gray7 !important;
   font-size: 1rem;
@@ -661,6 +650,10 @@ th {
   }
   .results-table .v-data-table__wrapper {
     max-height: 550px;
+    table th {
+      padding-left: 12px;
+      padding-right: 12px;
+    }
   }
   .results-table .v-data-table__wrapper table tbody {
     .v-input--selection-controls .v-radio {
@@ -669,8 +662,7 @@ th {
     tr {
       height: 24px;
       td:not(.group-header) {
-        padding-top: 20px;
-        padding-bottom: 20px;
+        padding: 20px 12px;
         vertical-align: top;
         overflow: hidden;
         white-space: normal;
@@ -701,14 +693,6 @@ th {
     tr.unique-reg-num:hover,
     tr.duplicate-reg-num:hover {
       background-color: transparent !important;
-    }
-  }
-
-  #mh-search-results-table.review-mode {
-    .unique-reg-num, .duplicate-reg-num {
-      .v-messages {
-        display: none;
-      }
     }
   }
 
