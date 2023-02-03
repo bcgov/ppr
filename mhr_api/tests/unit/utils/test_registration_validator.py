@@ -483,10 +483,8 @@ TEST_LOCATION_DATA = [
 ]
 # testdata pattern is ({description}, {valid}, {staff}, {doc_id}, {message content}, {status})
 TEST_TRANSFER_DATA = [
-    (DESC_VALID, True, True, DOC_ID_VALID, None, MhrRegistrationStatusTypes.ACTIVE),
+    (DESC_VALID, True, True, None, None, MhrRegistrationStatusTypes.ACTIVE),
     ('Valid no doc id not staff', True, False, None, None, None),
-    (DESC_MISSING_DOC_ID, False, True, None, validator.DOC_ID_REQUIRED, None),
-    (DESC_DOC_ID_EXISTS, False, True, DOC_ID_EXISTS, validator.DOC_ID_EXISTS, None),
     ('Invalid EXEMPT', False, False, None, validator.STATE_NOT_ALLOWED, MhrRegistrationStatusTypes.EXEMPT),
     ('Invalid HISTORICAL', False, False, None, validator.STATE_NOT_ALLOWED, MhrRegistrationStatusTypes.HISTORICAL),
     (DESC_INVALID_GROUP_ID, False, False, None, validator.DELETE_GROUP_ID_INVALID, MhrRegistrationStatusTypes.ACTIVE),
@@ -497,10 +495,8 @@ TEST_TRANSFER_DATA = [
 ]
 # testdata pattern is ({description}, {valid}, {staff}, {doc_id}, {message content}, {status})
 TEST_EXEMPTION_DATA = [
-    (DESC_VALID, True, True, DOC_ID_VALID, None, MhrRegistrationStatusTypes.ACTIVE),
+    (DESC_VALID, True, True, None, None, MhrRegistrationStatusTypes.ACTIVE),
     ('Valid no doc id not staff', True, False, None, None, None),
-    (DESC_MISSING_DOC_ID, False, True, None, validator.DOC_ID_REQUIRED, None),
-    (DESC_DOC_ID_EXISTS, False, True, DOC_ID_EXISTS, validator.DOC_ID_EXISTS, None),
     ('Invalid EXEMPT', False, False, None, validator.STATE_NOT_ALLOWED, MhrRegistrationStatusTypes.EXEMPT),
     ('Invalid HISTORICAL', False, False, None, validator.STATE_NOT_ALLOWED, MhrRegistrationStatusTypes.HISTORICAL),
     ('Invalid note doc type', False, False, None, validator.NOTE_DOC_TYPE_INVALID, MhrRegistrationStatusTypes.ACTIVE)
@@ -524,7 +520,8 @@ TEST_TRANSFER_DATA_GROUP = [
     ('Invalid TC denominator missing', False, 1, None, TC_GROUPS_VALID, validator.GROUP_DENOMINATOR_MISSING),
     ('Invalid TC denominator < 1', False, 1, 0, TC_GROUPS_VALID, validator.GROUP_DENOMINATOR_MISSING),
     ('Invalid add SO 2 groups', False, None, None, SO_GROUP_MULTIPLE, validator.ADD_SOLE_OWNER_INVALID),
-    ('Invalid add SO 2 owners', False, None, None, SO_OWNER_MULTIPLE, validator.ADD_SOLE_OWNER_INVALID)
+    ('Invalid add SO 2 owners', False, None, None, SO_OWNER_MULTIPLE, validator.ADD_SOLE_OWNER_INVALID),
+    ('Invalid add TC > 1 owner', False, None, None, TC_GROUP_TRANSFER_ADD, validator.OWNERS_COMMON_INVALID)
 ]
 # testdata pattern is ({description}, {valid}, {party_type1}, {party_type2}, {text}, {add_group}, {message content})
 TEST_TRANSFER_DEATH_DATA = [
@@ -734,6 +731,8 @@ def test_validate_transfer_group(session, desc, valid, numerator, denominator, a
         json_data['addOwnerGroups'] = copy.deepcopy(add_group)
         if desc == 'Invalid add TC no owner':
             json_data['addOwnerGroups'][0]['owners'] = []
+        elif desc == 'Invalid add TC > 1 owner':
+            json_data['addOwnerGroups'][0]['type'] = 'COMMON'
         else:
             for group in json_data.get('addOwnerGroups'):
                 if not numerator:

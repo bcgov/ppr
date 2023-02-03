@@ -283,10 +283,8 @@ TEST_LOCATION_DATA = [
     ('Invalid band name', None, None, None, None, INVALID_TEXT_CHARSET, INVALID_CHARSET_MESSAGE)
 ]
 TEST_PERMIT_DATA = [
-    (DESC_VALID, True, True, DOC_ID_VALID, None, MhrRegistrationStatusTypes.ACTIVE, STAFF_ROLE),
+    (DESC_VALID, True, True, None, None, MhrRegistrationStatusTypes.ACTIVE, STAFF_ROLE),
     ('Valid no doc id not staff', True, False, None, None, None, REQUEST_TRANSPORT_PERMIT),
-    (DESC_MISSING_DOC_ID, False, True, None, validator.DOC_ID_REQUIRED, None, STAFF_ROLE),
-    (DESC_DOC_ID_EXISTS, False, True, DOC_ID_EXISTS, validator.DOC_ID_EXISTS, None, STAFF_ROLE),
     ('Invalid EXEMPT', False, False, None, validator.STATE_NOT_ALLOWED, MhrRegistrationStatusTypes.EXEMPT,
      REQUEST_TRANSPORT_PERMIT),
     ('Invalid HISTORICAL', False, False, None, validator.STATE_NOT_ALLOWED, MhrRegistrationStatusTypes.HISTORICAL,

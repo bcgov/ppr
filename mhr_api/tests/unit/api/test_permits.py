@@ -92,7 +92,6 @@ PERMIT = {
   },
   'landStatusConfirmation': True
 }
-DOC_ID_VALID = '63166035'
 MOCK_AUTH_URL = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/'
 MOCK_PAY_URL = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/pay/api/v1/'
 
@@ -129,8 +128,6 @@ def test_create(session, client, jwt, desc, mhr_num, roles, status, account):
         headers = create_header_account(jwt, roles, 'UT-TEST', account)
     else:
         headers = create_header(jwt, roles)
-    if status == HTTPStatus.CREATED and STAFF_ROLE in roles:
-        json_data['documentId'] = DOC_ID_VALID
     # test
     response = client.post('/api/v1/permits/' + mhr_num,
                            json=json_data,

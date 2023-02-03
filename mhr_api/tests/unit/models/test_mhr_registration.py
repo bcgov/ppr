@@ -30,7 +30,7 @@ from mhr_api.models.registration_utils import AccountRegistrationParams
 from mhr_api.models.type_tables import MhrLocationTypes, MhrPartyTypes, MhrOwnerStatusTypes, MhrStatusTypes
 from mhr_api.models.type_tables import MhrRegistrationTypes, MhrRegistrationStatusTypes, MhrDocumentTypes
 from mhr_api.models.type_tables import MhrTenancyTypes
-from mhr_api.services.authz import MANUFACTURER_GROUP, QUALIFIED_USER_GROUP, GOV_ACCOUNT_ROLE
+from mhr_api.services.authz import MANUFACTURER_GROUP, QUALIFIED_USER_GROUP, GOV_ACCOUNT_ROLE, STAFF_ROLE
 
 
 REG_DESCRIPTION = 'REGISTER NEW UNIT'
@@ -181,6 +181,7 @@ TEST_DOC_ID_DATA = [
 ]
 # testdata pattern is ({mhr_num}, {group_id}, {doc_id_prefix}, {account_id})
 TEST_DATA_TRANSFER = [
+    ('150062', STAFF_ROLE, '9', '2523'),
     ('150062', GOV_ACCOUNT_ROLE, '9', '2523'),
     ('150062', MANUFACTURER_GROUP, '8', '2523'),
     ('150062', QUALIFIED_USER_GROUP, '1', '2523')
@@ -199,6 +200,7 @@ TEST_DATA_TRANSFER_SAVE = [
 ]
 # testdata pattern is ({mhr_num}, {group_id}, {doc_id_prefix}, {account_id})
 TEST_DATA_EXEMPTION = [
+    ('150062', STAFF_ROLE, '9', '2523'),
     ('150062', GOV_ACCOUNT_ROLE, '9', '2523'),
     ('150062', MANUFACTURER_GROUP, '8', '2523'),
     ('150062', QUALIFIED_USER_GROUP, '1', '2523')
@@ -209,6 +211,7 @@ TEST_DATA_EXEMPTION_SAVE = [
 ]
 # testdata pattern is ({mhr_num}, {group_id}, {doc_id_prefix}, {account_id})
 TEST_DATA_PERMIT = [
+    ('150062', STAFF_ROLE, '9', '2523'),
     ('150062', GOV_ACCOUNT_ROLE, '9', '2523'),
     ('150062', MANUFACTURER_GROUP, '8', '2523'),
     ('150062', QUALIFIED_USER_GROUP, '1', '2523')
