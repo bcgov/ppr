@@ -4,16 +4,16 @@
       <v-progress-circular color="primary" size="50" indeterminate />
     </v-overlay>
     <v-container class="container">
-      <div style="display: flex;">
-        <v-icon color="#212529" size="32" class="pr-1">mdi-home</v-icon>
-        <b :class="$style['search-title']">Selection List</b>
+      <div class="selection-list-title">
+        <v-icon size="32" class="pr-1">mdi-home</v-icon>
+        Selection List
       </div>
-      <p v-if="!getManufacturedHomeSearchResults" :class="[$style['search-info'], 'ma-0']" style="padding-top: 26px;">
+      <p v-if="!getManufacturedHomeSearchResults" class="search-info ma-0">
         Your search results will display below.
       </p>
       <div v-else no-gutters>
         <v-row no-gutters class="mt-6">
-          <v-col class="pr-6" :class="$style['search-info']">
+          <v-col class="search-info pr-6">
             <span v-if="totalResultsLength !== 0" id="results-info">
               Select manufactured home registrations to download a search result report containing the full details of
               the registration(s). Lien information contained in the Personal Property Registry can be included for an
@@ -48,7 +48,6 @@ import {
 } from '@/components/dialogs'
 import { SearchedResultMhr } from '@/components/tables'
 import { SearchBar } from '@/components/search'
-// local helpers/enums/interfaces/resources
 import { RouteNames } from '@/enums'
 import {
   ActionBindingIF, ErrorIF, IndividualNameIF, ManufacturedHomeSearchResponseIF, // eslint-disable-line no-unused-vars
@@ -97,7 +96,7 @@ export default class MHRSearch extends Vue {
     return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
   }
 
-  private get totalResultsLength (): number {
+  get totalResultsLength (): number {
     const searchResult = this.getManufacturedHomeSearchResults
     if (searchResult) {
       return searchResult.totalResultsSize
@@ -168,17 +167,24 @@ export default class MHRSearch extends Vue {
 }
 </script>
 
-<style lang="scss" module>
+<style lang="scss" scope>
 @import '@/assets/styles/theme.scss';
-.search-title {
+.selection-list-title {
+  display: flex;
   color: $gray9;
   font-size: 2rem;
   line-height: 2rem;
+  font-weight: bold;
+
+  .v-icon {
+    color: $gray9;
+  }
 }
 .search-info {
   color: $gray7;
   font-size: 1rem;
   line-height: 1.5rem;
+  padding-top: 26px;
 }
 .home {
   vertical-align: baseline !important;
