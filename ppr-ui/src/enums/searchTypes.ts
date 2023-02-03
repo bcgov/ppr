@@ -41,6 +41,13 @@ export enum UIMHRSearchTypeValues {
   MHRSERIAL_NUMBER = 'serialNumber'
 }
 
+export const UIMHRSearchTypeMap = {
+  [UIMHRSearchTypes.MHRMHR_NUMBER]: UIMHRSearchTypeValues.MHRMHR_NUMBER,
+  [UIMHRSearchTypes.MHROWNER_NAME]: UIMHRSearchTypeValues.MHROWNER_NAME,
+  [UIMHRSearchTypes.MHRORGANIZATION_NAME]: UIMHRSearchTypeValues.MHRORGANIZATION_NAME,
+  [UIMHRSearchTypes.MHRSERIAL_NUMBER]: UIMHRSearchTypeValues.MHRSERIAL_NUMBER
+}
+
 // for blank or header options in the drop down
 export enum BlankSearchTypes {
   BLANK1 = '1',

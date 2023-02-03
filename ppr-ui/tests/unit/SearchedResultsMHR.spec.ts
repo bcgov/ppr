@@ -158,7 +158,9 @@ describe('Serial number results in Review Mode', () => {
 
     // Verify base mode features
     expect(wrapper.find('#search-summary-info').exists()).toBe(false)
-    expect(wrapper.find('#review-results-count').text()).toBe('Matches Selected: 2')
+    expect(wrapper.find('#review-results-count').text()).toContain('Matches selected: 2')
+    expect(wrapper.find('#review-results-count').text()).toContain('Registrations: 1')
+    expect(wrapper.find('#review-results-count').text()).toContain('PPR Lien Searches Selected: 1')
     expect(wrapper.find('#review-confirm-btn').exists()).toBe(false)
     expect(wrapper.find('#select-all-checkbox').exists()).toBe(false)
     expect(wrapper.find('#select-all-lien-checkbox').exists()).toBe(false)
@@ -244,7 +246,9 @@ describe('Owner name name in Review Mode', () => {
 
     // Verify base mode features
     expect(wrapper.find('#search-summary-info').exists()).toBe(false)
-    expect(wrapper.find('#review-results-count').text()).toBe('Matches Selected: 1')
+    expect(wrapper.find('#review-results-count').text()).toContain('Matches selected: 1')
+    expect(wrapper.find('#review-results-count').text()).toContain('Registrations: 1')
+    expect(wrapper.find('#review-results-count').text()).toContain('PPR Lien Searches Selected: 0')
     expect(wrapper.find('#review-confirm-btn').exists()).toBe(false)
     expect(wrapper.find('#select-all-checkbox').exists()).toBe(false)
     expect(wrapper.find('#select-all-lien-checkbox').exists()).toBe(false)
@@ -326,7 +330,9 @@ describe('Business organization results in Review Mode', () => {
 
     // Verify base mode features
     expect(wrapper.find('#search-summary-info').exists()).toBe(false)
-    expect(wrapper.find('#review-results-count').text()).toBe('Matches Selected: 2')
+    expect(wrapper.find('#review-results-count').text()).toContain('Matches selected: 2')
+    expect(wrapper.find('#review-results-count').text()).toContain('Registrations: 1')
+    expect(wrapper.find('#review-results-count').text()).toContain('PPR Lien Searches Selected: 1')
     expect(wrapper.find('#review-confirm-btn').exists()).toBe(false)
     expect(wrapper.find('#select-all-checkbox').exists()).toBe(false)
     expect(wrapper.find('#select-all-lien-checkbox').exists()).toBe(false)
@@ -410,7 +416,9 @@ describe('Manufactured home results in Review Mode', () => {
 
     // Verify base mode features
     expect(wrapper.find('#search-summary-info').exists()).toBe(false)
-    expect(wrapper.find('#review-results-count').text()).toBe('Matches Selected: 3')
+    expect(wrapper.find('#review-results-count').text()).toContain('Matches selected: 3')
+    expect(wrapper.find('#review-results-count').text()).toContain('Registrations: 1')
+    expect(wrapper.find('#review-results-count').text()).toContain('PPR Lien Searches Selected: 1')
     expect(wrapper.find('#review-confirm-btn').exists()).toBe(false)
     expect(wrapper.find('#select-all-checkbox').exists()).toBe(false)
     expect(wrapper.find('#select-all-lien-checkbox').exists()).toBe(false)

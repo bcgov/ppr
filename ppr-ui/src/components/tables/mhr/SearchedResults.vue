@@ -44,7 +44,7 @@
       <v-row v-else class="result-info">
         <v-col id="review-results-count" cols="auto">
           <span class="divider pr-3">Matches selected: <b>{{ selectedMatchesLength }}</b></span>
-          <span class="divider px-3">Registrations: <b>{{ results.length }}</b></span>
+          <span class="divider px-3">Registrations: <b>{{ uniqueResults.length }}</b></span>
           <span class="pl-3">PPR Lien Searches Selected: <b>{{ selectedLiensLength }}</b></span>
         </v-col>
       </v-row>
@@ -152,14 +152,14 @@
               </v-col>
             </v-row>
             <v-tooltip
-              v-else-if="hasMultipleSelections(item) && isReviewMode"
+              v-else-if="hasMultipleSelections(item.mhrNumber) && isReviewMode"
               top
               content-class="top-tooltip"
               transition="fade-transition"
             >
               <template v-slot:activator="{ on, attrs }">
-                <span  v-bind="attrs" v-on="on">
-                  <b><u>{{ item.mhrNumber }}</u></b>
+                <span  v-bind="attrs" v-on="on" class="mhr-number">
+                  <u>{{ item.mhrNumber }}</u>
                 </span>
               </template>
               <div class="pt-2 pb-2">
@@ -190,19 +190,17 @@
             <span>{{ item.homeLocation }}</span>
           </template>
           <template v-slot:[`item.serialNumber`]="{ item }">
-            <v-row
+            <div
               v-if="searchType === UIMHRSearchTypes.MHRSERIAL_NUMBER"
-              class="align-baseline"
               :class="item.selected && !$props.isReviewMode ? 'selected' : ''"
             >
-              <v-col cols="2">
-                <v-checkbox v-model="item.selected" @click="onSelectionCheckboxClick(item)"/>
-              </v-col>
-              <v-col class="serial-number-text" @click="item.selected = !item.selected; onSelectionCheckboxClick(item)">
-                  {{ item.serialNumber }} <span v-if="item.activeCount > 1">({{ item.activeCount }})</span>
-              </v-col>
-            </v-row>
-            <span v-else>{{ item.serialNumber }}</span>
+              <v-checkbox
+                v-model="item.selected"
+                @click="onSelectionCheckboxClick(item)"
+                :ripple="false"
+                :label="item.activeCount > 1 ? `${item.serialNumber} (${item.activeCount})` : `${item.serialNumber}`"/>
+            </div>
+            <div v-else>{{ item.serialNumber }}</div>
           </template>
           <template v-slot:[`item.edit`]="{ item }">
             <v-tooltip
@@ -215,7 +213,8 @@
                   <v-checkbox
                     :label="`${!isReviewMode ? 'Include lien' : 'Lien'} information`"
                     v-model="item.includeLienInfo"
-                    :disabled="noSelectedOwner(item)"
+                    :disabled="isReviewMode ? hasMhrNumberSelected(item.mhrNumber) : !item.selected"
+                    :ripple="false"
                   />
                 </span>
               </template>
@@ -254,8 +253,8 @@ import {
 } from '@/resources'
 import { BaseHeaderIF, ManufacturedHomeSearchResultIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { FolioNumber } from '@/components/common'
-import { RouteNames, UIMHRSearchTypes, UIMHRSearchTypeValues } from '@/enums'
-import { cloneDeep, uniqBy, orderBy } from 'lodash'
+import { RouteNames, UIMHRSearchTypeMap, UIMHRSearchTypes, UIMHRSearchTypeValues } from '@/enums'
+import { cloneDeep, uniqBy, filter, sortBy, orderBy } from 'lodash'
 
 export default defineComponent({
   components: {
@@ -391,9 +390,14 @@ export default defineComponent({
       router.push({ name: RouteNames.MHRSEARCH_CONFIRM })
     }
 
-    const hasMultipleSelections = (item: ManufacturedHomeSearchResultIF): boolean => {
-      const similarCount = localState.results?.filter(result => result.mhrNumber === item.mhrNumber).length
-      return similarCount > 1
+    // check if MHR number belongs to multiple results
+    const hasMultipleSelections = (mhrNumber: string): boolean => {
+      return filter(localState.results, { mhrNumber: mhrNumber }).length > 1
+    }
+
+    // check if MHR number belongs to multiple selected results
+    const hasMhrNumberSelected = (mhrNumber: string): boolean => {
+      return filter(localState.results, { mhrNumber: mhrNumber, selected: true }).length < 1
     }
 
     const getOwnerName = (item: ManufacturedHomeSearchResultIF): string => {
@@ -499,6 +503,12 @@ export default defineComponent({
         localState.results = sortedResults
       }
 
+      // sort the results on the Review screen (all results will be sorted, not only unique)
+      if (props.isReviewMode) {
+        // sort based on the search type
+        localState.results = sortBy(localState.results, [UIMHRSearchTypeMap[localState.searchType]])
+      }
+
       localState.totalResultsLength = resp.totalResultsSize
       if (localState.searchType === UIMHRSearchTypes.MHRMHR_NUMBER && localState.totalResultsLength === 1) {
         // Select search result if an MHR Number Search and search results equals 1.
@@ -545,11 +555,12 @@ export default defineComponent({
     return {
       UIMHRSearchTypes,
       reviewAndConfirm,
+      hasMultipleSelections,
+      hasMhrNumberSelected,
       getOwnerName,
       getOwnerStatus,
       noSelectedOwner,
       getOwnerCount,
-      hasMultipleSelections,
       getOwnerStatusText,
       hasMultipleStatus,
       updateFolioOrReference,
@@ -598,7 +609,7 @@ th {
 .main-results-div {
   width: 100%;
 }
-.owner-name-text, .serial-number-text::v-deep {
+.owner-name-text::v-deep {
   cursor: pointer;
   .v-input {
     // margin-top: 0;
@@ -652,13 +663,15 @@ th {
     max-height: 550px;
   }
   .results-table .v-data-table__wrapper table tbody {
-    .v-input--selection-controls .v-input__slot, .v-input--selection-controls .v-radio {
+    .v-input--selection-controls .v-radio {
       align-items: baseline;
     }
     tr {
+      height: 24px;
       td:not(.group-header) {
-        display: table-cell;
-        vertical-align: baseline;
+        padding-top: 20px;
+        padding-bottom: 20px;
+        vertical-align: top;
         overflow: hidden;
         white-space: normal;
         padding: 0 12px !important;
@@ -667,65 +680,49 @@ th {
       td:not(:last-child) {
         word-break: break-word;
       }
+
+      .v-input {
+        margin-top: 0px;
+        padding-top: 0px;
+        .v-input__slot {
+          align-items: normal;
+        }
+      }
     }
     .selected {
       background-color: $blueSelected !important;
     }
-    tr:hover:not(.selected, .first-row, .collapsed-owner, .no-hover) {
-      // $gray1 at 75%
+    tr:hover:not(.selected) {
       background-color: #f1f3f5BF !important;
     }
   }
-  .v-data-table > .v-data-table__wrapper > table > tbody > th,
-  .v-data-table > .v-data-table__wrapper > table > thead > tr > th {
-    padding:12px !important;
-    vertical-align: bottom;
+
+  #mh-search-results-table.review-mode.results-table .v-data-table__wrapper table tbody {
+    tr.unique-reg-num:hover,
+    tr.duplicate-reg-num:hover {
+      background-color: transparent !important;
+    }
+  }
+
+  #mh-search-results-table.review-mode {
+    .unique-reg-num, .duplicate-reg-num {
+      .v-messages {
+        display: none;
+      }
+    }
   }
 
   #mh-search-results-table.review-mode .unique-reg-num {
     .text-start {
       border-bottom: none;
       border-top: thin solid rgba(0, 0, 0, 0.12);
-      .col-2 {
-        padding-bottom: 0 !important;
-      }
-      .v-messages {
-        display: none;
-      }
-    }
-  }
-  #mh-search-results-table.review-mode .duplicate-reg-num {
-    td:not(:first-child) {
-      display: none;
-    }
-    .text-start * {
-      padding-top: 0;
-      padding-bottom: 0;
-      margin-top: 0;
-      margin-bottom: 0;
-      height:min-content !important;
-      vertical-align: middle;
-    }
-    :first-child{
-      border: none !important;
-    }
-  }
-  #mh-search-results-table.review-mode .unique-reg-num:first-child {
-    .text-start {
-      border-top: none;
-    }
-  }
-
-  #mh-search-results-table.review-mode .unique-reg-num {
-    .text-start {
-      border-bottom: none;
-      // border-top: thin solid rgba(0, 0, 0, 0.12);
 
       .col-2 {
         padding-bottom: 0;
       }
-      .v-messages {
-        display: none;
+
+      .v-input__slot {
+        margin-bottom: 0;
       }
     }
   }
@@ -734,17 +731,37 @@ th {
       border-top: none;
     }
   }
-  .review-mode .duplicate-reg-num {
-    td:not(:first-child) {
-      visibility: hidden;
-    }
-    border-top: none;
+  #mh-search-results-table.review-mode {
 
-    .text-start * {
-      padding-top: 0;
-      padding-bottom: 0;
-      margin-top: 0;
-      margin-bottom: 0;
+    .mhr-number {
+      font-weight: bold;
+
+      u {
+        border-bottom: 1px dotted #000;
+        text-decoration: none;
+      }
+    }
+    .duplicate-reg-num {
+      td:not(:first-child) {
+        display: none;
+      }
+      td:first-child {
+        border: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+      }
+      td {
+        height: 40px;
+      }
+
+      border-top: none;
+
+      .text-start * {
+        padding-top: 0;
+        padding-bottom: 0;
+        margin-top: 0;
+        margin-bottom: 0;
+      }
     }
   }
 }
