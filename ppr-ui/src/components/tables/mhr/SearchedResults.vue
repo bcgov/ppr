@@ -175,7 +175,9 @@
             {{ getOwnerStatusText(item) }}
           </template>
           <template v-if="isReviewMode" v-slot:[`item.yearMakeModel`]="{ item }">
-            <span>{{ item.baseInformation.year }} {{ item.baseInformation.make }} {{ item.baseInformation.model }}</span>
+            <span>
+              {{ item.baseInformation.year }} {{ item.baseInformation.make }} {{ item.baseInformation.model }}
+            </span>
           </template>
           <template v-else v-slot:[`item.year`]="{ item }">
             {{ item.baseInformation.year || '-' }}
@@ -486,7 +488,9 @@ export default defineComponent({
       })
       // sort search results by mhrNumber for grouping purposes, only when table is in review and has collapsed results
       if (props.isReviewMode && localState.hasCollapsedResults) {
-        const sortedResults = orderBy(localState.results, ['ownerName.lastName', 'ownerName.middleName', 'ownerName.firsName', 'mhrNumber'], ['asc', 'asc', 'asc', 'asc'])
+        const sortedResults = orderBy(localState.results,
+          ['ownerName.lastName', 'ownerName.middleName', 'ownerName.firstName', 'mhrNumber'],
+          ['asc', 'asc', 'asc', 'asc'])
         localState.results = sortedResults
       }
 
