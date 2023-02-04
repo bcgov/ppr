@@ -255,7 +255,7 @@ import {
 import { BaseHeaderIF, ManufacturedHomeSearchResultIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { FolioNumber } from '@/components/common'
 import { RouteNames, UIMHRSearchTypeMap, UIMHRSearchTypes, UIMHRSearchTypeValues } from '@/enums'
-import { cloneDeep, uniqBy, filter, sortBy, orderBy } from 'lodash'
+import { cloneDeep, uniqBy, filter, orderBy, sortBy } from 'lodash'
 
 export default defineComponent({
   components: {
@@ -368,15 +368,10 @@ export default defineComponent({
           }
         })
 
-        // Get an array of unique MHR Numbers with corresponding Owner Names
-        // localState.uniqueResults =
-        //   uniqBy(selectedResults, UIMHRSearchTypeValues.MHRMHR_NUMBER)
-        //     .map(el => el.ownerName)
-
-        // Get an array of unique MHR Numbers with corresponding Serial Numbers
+        // Get unique MHR Numbers with corresponding search type (Owner Name, Serial Num, etc.)
         localState.uniqueResults =
           uniqBy(selectedResults, UIMHRSearchTypeValues.MHRMHR_NUMBER)
-            .map(el => el.serialNumber)
+            .map(result => result[UIMHRSearchTypeMap[localState.searchType]])
 
         return props.isReviewMode
           ? selectedResults
@@ -414,22 +409,16 @@ export default defineComponent({
 
     const getOwnerCount = (item: ManufacturedHomeSearchResultIF): string => {
       const count = item.activeCount + item.exemptCount + item.historicalCount
-      if (count > 1) return `(${count})`
+      return count > 1 ? `(${count})` : ''
     }
     const getItemClass = (item: ManufacturedHomeSearchResultIF): string => {
       let rowClass = ''
-
-      if (props.isReviewMode && localState.hasCollapsedResults) {
+      if (props.isReviewMode) {
         rowClass =
-        localState.uniqueResults?.indexOf(item.ownerName) === -1
+        localState.uniqueResults?.indexOf(item[UIMHRSearchTypeMap[localState.searchType]]) === -1
           ? 'duplicate-reg-num'
           : 'unique-reg-num'
       }
-
-      // const rowClass =
-      //   localState.uniqueResults?.indexOf(item.serialNumber) === -1
-      //     ? 'duplicate-reg-num'
-      //     : 'unique-reg-num'
       return item.selected && !props.isReviewMode ? 'selected' : rowClass
     }
 
@@ -496,18 +485,17 @@ export default defineComponent({
         // includeLienInfo needs to be initialized because it doesn't exist in the DB/results response
         return result.includeLienInfo !== true ? { ...result, includeLienInfo: false } : result
       })
-      // sort search results by mhrNumber for grouping purposes, only when table is in review and has collapsed results
-      if (props.isReviewMode && localState.hasCollapsedResults) {
-        const sortedResults = orderBy(localState.results,
-          ['ownerName.lastName', 'ownerName.middleName', 'ownerName.firstName', 'mhrNumber'],
-          ['asc', 'asc', 'asc', 'asc'])
-        localState.results = sortedResults
-      }
-
-      // sort the results on the Review screen (all results will be sorted, not only unique)
+      // sort the results on the Review screen
       if (props.isReviewMode) {
+        let sortedResults
         // sort based on the search type
-        localState.results = sortBy(localState.results, [UIMHRSearchTypeMap[localState.searchType]])
+        if (localState.searchType === UIMHRSearchTypes.MHROWNER_NAME) {
+          sortedResults = orderBy(localState.results,
+            ['ownerName.lastName', 'ownerName.middleName', 'ownerName.firstName', 'mhrNumber'])
+        } else {
+          sortedResults = sortBy(localState.results, [UIMHRSearchTypeMap[localState.searchType]])
+        }
+        localState.results = sortedResults
       }
 
       localState.totalResultsLength = resp.totalResultsSize
@@ -666,8 +654,6 @@ th {
         vertical-align: top;
         overflow: hidden;
         white-space: normal;
-        padding: 0 12px !important;
-        height:1rem;
       }
       td:not(:last-child) {
         word-break: break-word;

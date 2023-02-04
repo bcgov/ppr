@@ -681,7 +681,6 @@ export const mockedMHRSearchResults: mockMHRSearchResults = {
       status: 'ACTIVE',
       mhrNumber: '1234567',
       serialNumber: 'ABC987',
-      activeCount: 1,
       baseInformation: {
         year: 2000,
         make: 'Honda',
@@ -689,7 +688,7 @@ export const mockedMHRSearchResults: mockMHRSearchResults = {
       },
       homeLocation: 'Victoria',
       includeLienInfo: false,
-      activeCount: 0,
+      activeCount: 1,
       exemptCount: 0,
       historicalCount: 0
     },
@@ -702,7 +701,6 @@ export const mockedMHRSearchResults: mockMHRSearchResults = {
       status: 'ACTIVE',
       mhrNumber: '1234567',
       serialNumber: 'ABC987',
-      activeCount: 1,
       baseInformation: {
         year: 2000,
         make: 'Honda',
@@ -710,7 +708,7 @@ export const mockedMHRSearchResults: mockMHRSearchResults = {
       },
       homeLocation: 'Victoria',
       includeLienInfo: false,
-      activeCount: 0,
+      activeCount: 1,
       exemptCount: 0,
       historicalCount: 0
     },
@@ -723,7 +721,6 @@ export const mockedMHRSearchResults: mockMHRSearchResults = {
       status: 'EXEMPT',
       mhrNumber: '1234567',
       serialNumber: 'ABC987',
-      activeCount: 3,
       baseInformation: {
         year: 2000,
         make: 'Honda',
@@ -731,7 +728,7 @@ export const mockedMHRSearchResults: mockMHRSearchResults = {
       },
       homeLocation: 'Victoria',
       includeLienInfo: false,
-      activeCount: 0,
+      activeCount: 3,
       exemptCount: 0,
       historicalCount: 0
     },
@@ -744,7 +741,6 @@ export const mockedMHRSearchResults: mockMHRSearchResults = {
       status: 'EXEMPT',
       mhrNumber: '1234567',
       serialNumber: 'ABC987',
-      activeCount: 1,
       baseInformation: {
         year: 2000,
         make: 'Honda',
@@ -752,7 +748,7 @@ export const mockedMHRSearchResults: mockMHRSearchResults = {
       },
       homeLocation: 'Victoria',
       includeLienInfo: false,
-      activeCount: 0,
+      activeCount: 1,
       exemptCount: 0,
       historicalCount: 0
     }
