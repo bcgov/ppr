@@ -123,7 +123,7 @@ class Payment:
         """
         try:
             api_instance = SBCPaymentClient(self.jwt,
-                                            self.account_id,
+                                            transaction_info.get('accountId'),
                                             self.api_key,
                                             self.details)
             if self.api_url:
@@ -147,7 +147,7 @@ class Payment:
         """
         try:
             api_instance = SBCPaymentClient(self.jwt,
-                                            self.account_id,
+                                            transaction_info.get('accountId'),
                                             self.api_key,
                                             self.details)
             if self.api_url:

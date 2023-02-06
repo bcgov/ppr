@@ -100,6 +100,11 @@ def get_account_id(req):
     return req.headers.get('Account-Id')
 
 
+def get_staff_account_id(req):
+    """Get reg staff account ID from request headers."""
+    return req.headers.get('Staff-Account-Id')
+
+
 def is_pdf(req):
     """Check if request headers Accept is application/pdf."""
     accept = req.headers.get('Accept')
@@ -381,7 +386,8 @@ def build_staff_registration_payment(req: request, pay_trans_type: str, fee_quan
     payment_info = {
         'transactionType': pay_trans_type,
         'feeQuantity': fee_quantity,
-        'waiveFees': False
+        'waiveFees': False,
+        'accountId': get_staff_account_id(req)
     }
 
     routing_slip = req.args.get(ROUTING_SLIP_PARAM)

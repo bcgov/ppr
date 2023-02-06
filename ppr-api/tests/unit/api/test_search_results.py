@@ -75,11 +75,13 @@ def test_search_detail_valid_200(session, client, jwt):
         },
         'clientReferenceId': 'T-API-SQ-DB-2'
     }
+    headers = create_header_account(jwt, [PPR_ROLE], 'test-user', STAFF_ROLE)
+    headers['Staff-Account-Id'] = '3040'
 
     # test
     rv1 = client.post('/api/v1/searches',
                       json=json_data,
-                      headers=create_header_account(jwt, [PPR_ROLE], 'test-user', STAFF_ROLE),
+                      headers=headers,
                       content_type='application/json')
     search_id = rv1.json['searchId']
     json_data = []
@@ -151,11 +153,13 @@ def test_search_detail_staff_missing_account_400(session, client, jwt):
         },
         'clientReferenceId': 'T-API-SD-RN-1'
     }
+    headers = create_header_account(jwt, [PPR_ROLE], 'test-user', STAFF_ROLE)
+    headers['Staff-Account-Id'] = '3040'
 
     # test
     rv1 = client.post('/api/v1/searches',
                       json=json_data,
-                      headers=create_header_account(jwt, [PPR_ROLE], 'test-user', STAFF_ROLE),
+                      headers=headers,
                       content_type='application/json')
     assert rv1.status_code == HTTPStatus.CREATED
 
@@ -200,11 +204,13 @@ def test_search_detail_no_duplicates_200(session, client, jwt):
         },
         'clientReferenceId': 'T-API-SQ-DB-3'
     }
+    headers = create_header_account(jwt, [PPR_ROLE], 'test-user', STAFF_ROLE)
+    headers['Staff-Account-Id'] = '3040'
 
     # test
     rv1 = client.post('/api/v1/searches',
                       json=json_data,
-                      headers=create_header_account(jwt, [PPR_ROLE], 'test-user', STAFF_ROLE),
+                      headers=headers,
                       content_type='application/json')
     search_id = rv1.json['searchId']
     json_data = []

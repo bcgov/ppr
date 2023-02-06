@@ -262,6 +262,7 @@ def test_payment_staff_search_mock(session, client, jwt, selection, routing_slip
     payment = Payment(jwt=token, account_id='PS12345', details=PAY_DETAILS_SEARCH)
     payment.api_url = MOCK_URL_NO_KEY
     transaction_info = {
+        'accountId': '3040'
     }
     if routing_slip:
         transaction_info['routingSlipNumber'] = routing_slip
@@ -396,7 +397,8 @@ def test_create_payment_data_staff(client, jwt, type, trans_id, client_id, routi
     """Assert that the staff payment payment-request body is as expected for a pay transaction type."""
     transaction_info = {
         'transactionType': type,
-        'quantity': 1
+        'quantity': 1,
+        'accountId': '3040'
     }
     if routing_slip:
         transaction_info['routingSlipNumber'] = routing_slip
@@ -456,7 +458,8 @@ def test_client_registration_staff_mock(session, client, jwt, type, trans_id, cl
     pay_client.api_url = MOCK_URL_NO_KEY
     transaction_info = {
         'transactionType': type,
-        'quantity': 1
+        'quantity': 1,
+        'accountId': '3040'
     }
     if routing_slip:
         transaction_info['routingSlipNumber'] = routing_slip
@@ -492,7 +495,8 @@ def test_pay_registration_staff_mock(session, client, jwt, type, trans_id, clien
     payment.api_url = MOCK_URL_NO_KEY
     transaction_info = {
         'transactionType': type,
-        'quantity': 1
+        'quantity': 1,
+        'accountId': '3040'
     }
     if routing_slip:
         transaction_info['routingSlipNumber'] = routing_slip

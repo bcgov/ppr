@@ -261,7 +261,8 @@ def build_staff_payment(req: request, trans_type: str, quantity: int = 1, transa
     payment_info = {
         'transactionType': trans_type,
         'quantity': quantity,
-        'waiveFees': True
+        'waiveFees': True,
+        'accountId': resource_utils.get_staff_account_id(req)
     }
     if transaction_id:
         payment_info['transactionId'] = transaction_id

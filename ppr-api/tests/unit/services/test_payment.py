@@ -84,7 +84,8 @@ TEST_PAY_STAFF_REGISTRATION = [
 def test_payment_data_staff_search(client, jwt, pay_trans_type, routing_slip, bcol_number, dat_number, waive_fees):
     """Assert that the staff payment payment-request body is as expected for a pay transaction type."""
     transaction_info = {
-        'transactionType': pay_trans_type
+        'transactionType': pay_trans_type,
+        'accountId': '3040'
     }
     if pay_trans_type in (TransactionTypes.SEARCH_STAFF_CERTIFIED_NO_FEE.value,
                           TransactionTypes.SEARCH_STAFF_NO_FEE.value):
@@ -130,7 +131,8 @@ def test_payment_staff_search_mock(client, jwt, pay_trans_type, routing_slip, bc
     payment = Payment(jwt=token, account_id='PS12345', details=PAY_DETAILS_SEARCH)
     payment.api_url = MOCK_URL_NO_KEY
     transaction_info = {
-        'transactionType': pay_trans_type
+        'transactionType': pay_trans_type,
+        'accountId': '3040'
     }
     if pay_trans_type in (TransactionTypes.SEARCH_STAFF_CERTIFIED_NO_FEE.value,
                           TransactionTypes.SEARCH_STAFF_NO_FEE.value):
@@ -157,7 +159,8 @@ def test_payment_data_staff_registration(client, jwt, pay_trans_type, routing_sl
     """Assert that the staff payment payment-request body is as expected for a pay transaction type."""
     transaction_info = {
         'transactionType': pay_trans_type,
-        'feeQuantity': 1
+        'feeQuantity': 1,
+        'accountId': '3040'
     }
     if waive_fees:
         transaction_info['waiveFees'] = True
@@ -199,7 +202,8 @@ def test_payment_staff_registration_mock(client, jwt, pay_trans_type, routing_sl
     payment.api_url = MOCK_URL_NO_KEY
     transaction_info = {
         'transactionType': pay_trans_type,
-        'feeQuantity': 1
+        'feeQuantity': 1,
+        'accountId': '3040'
     }
     if waive_fees:
         transaction_info['waiveFees'] = True

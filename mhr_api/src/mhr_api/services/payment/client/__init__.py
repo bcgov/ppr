@@ -186,7 +186,7 @@ class BaseClient:
                 headers['Account-Id'] = self.account_id
             if self.api_key:
                 headers['x-apikey'] = self.api_key
-
+            current_app.logger.debug(f'Submitting pay-api request for Account-Id={self.account_id}')
             # current_app.logger.debug(json.dumps(headers))
             url = self.api_url + relative_path
             # current_app.logger.debug(method.value + ' url=' + url)
@@ -459,7 +459,7 @@ class SBCPaymentClient(BaseClient):
             del data['details']
         current_app.logger.debug('staff search create payment payload for account: ' + self.account_id)
         current_app.logger.debug(json.dumps(data))
-        invoice_data = self.call_api(HttpVerbs.POST, PATH_PAYMENT, data, include_account=False)
+        invoice_data = self.call_api(HttpVerbs.POST, PATH_PAYMENT, data, include_account=True)
         return SBCPaymentClient.build_pay_reference(invoice_data, self.api_url)
 
     def create_payment_staff(self, transaction_info, client_reference_id=None):
@@ -473,7 +473,7 @@ class SBCPaymentClient(BaseClient):
             del data['details']
         current_app.logger.debug('staff registration create payment payload: ')
         current_app.logger.debug(json.dumps(data))
-        invoice_data = self.call_api(HttpVerbs.POST, PATH_PAYMENT, data, include_account=False)
+        invoice_data = self.call_api(HttpVerbs.POST, PATH_PAYMENT, data, include_account=True)
         return SBCPaymentClient.build_pay_reference(invoice_data, self.api_url)
 
     def cancel_payment(self, invoice_id):
