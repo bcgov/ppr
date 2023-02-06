@@ -246,11 +246,9 @@ export const useNewMhrRegistration = () => {
     MhRegistrationSummaryIF[] {
     const sortedDraftFilings = orderBy(mhrDrafts, ['createDateTime'], ['desc'])
 
-    const sortedMhrHistory = orderBy(mhrHistory, ['createDateTime'], ['desc'])
-
     var mhrTableData = []
     // add drafts to Registrations.
-    sortedMhrHistory.forEach(transfer => {
+    mhrHistory.forEach(transfer => {
       transfer.baseRegistrationNumber = transfer.mhrNumber
       //
       // Prepare existing changes
@@ -297,7 +295,7 @@ export const useNewMhrRegistration = () => {
         transfer.changes = orderBy(transfer.changes, ['createDateTime'], ['desc'])
       }
     })
-    if (sortOptions?.status !== mhApiStatusTypes.DRAFT) mhrTableData = sortedMhrHistory
+    if (sortOptions?.status !== mhApiStatusTypes.DRAFT) mhrTableData = mhrHistory
     return mhrTableData
   }
   /**
