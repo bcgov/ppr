@@ -45,7 +45,7 @@
         <v-col id="review-results-count" cols="auto">
           <span class="divider pr-3">Matches selected: <b>{{ selectedMatchesLength }}</b></span>
           <span class="divider px-3">Registrations: <b>{{ uniqueResults.length }}</b></span>
-          <span class="pl-3">PPR Lien Searches Selected: <b>{{ selectedLiensLength }}</b></span>
+          <span class="pl-3">PPR Lien Searches Selected: <b>{{ uniqueResultsLienSelected.length }}</b></span>
         </v-col>
       </v-row>
     </article>
@@ -295,7 +295,11 @@ export default defineComponent({
       tooltipTxtSrchMtchs: 'One or more of the selected matches appear in ' +
         'the same registration. That registration will only be shown once in the report.',
       results: [],
-      uniqueResults: [],
+      uniqueResults: [] as Array<string>,
+      uniqueResultsLienSelected: computed((): ManufacturedHomeSearchResultIF[] =>
+        uniqBy(localState.results, UIMHRSearchTypeValues.MHRMHR_NUMBER)
+          .filter(item => item.selected && item.includeLienInfo)
+      ),
       totalResultsLength: 0,
       headerSearchTypeSlot: computed((): string => {
         switch (getSearchedType.value?.searchTypeUI) {
@@ -415,7 +419,7 @@ export default defineComponent({
       let rowClass = ''
       if (props.isReviewMode) {
         rowClass =
-        localState.uniqueResults?.indexOf(item[UIMHRSearchTypeMap[localState.searchType]]) === -1
+        localState.uniqueResults?.indexOf(item[UIMHRSearchTypeMap[localState.searchType] as string]) === -1
           ? 'duplicate-reg-num'
           : 'unique-reg-num'
       }
@@ -423,11 +427,26 @@ export default defineComponent({
     }
 
     const onSelectionCheckboxClick = (item: ManufacturedHomeSearchResultIF): void => {
-      if (!item.selected) {
-        item.includeLienInfo = false
-      }
-      if (item.selected && localState.selectAllLien) {
-        item.includeLienInfo = true
+      if (props.isReviewMode) {
+        // for review-only mode, clicking on a search result checkbox
+        // will set same selected state for all of the results within same group (results with unique mhrNumber)
+        const selectedState = item.selected as boolean
+        // filter unique results based on mhrNumber
+        filter(localState.results, { mhrNumber: item.mhrNumber })
+          .forEach((result: ManufacturedHomeSearchResultIF) => {
+            // set selected for each result
+            result.selected = selectedState
+            if (!result.selected) {
+              result.includeLienInfo = false
+            }
+          })
+      } else {
+        if (!item.selected) {
+          item.includeLienInfo = false
+        }
+        if (item.selected && localState.selectAllLien) {
+          item.includeLienInfo = true
+        }
       }
     }
 
@@ -528,11 +547,7 @@ export default defineComponent({
     }
 
     const onSelectAllLienClick = (): void => {
-      for (const result of localState.results) {
-        if (result.selected) {
-          result.includeLienInfo = localState.selectAllLien
-        }
-      }
+      filter(localState.results, 'selected').forEach(result => { result.includeLienInfo = localState.selectAllLien })
     }
 
     watch(() => localState.selectedLiensLength, (): void => {

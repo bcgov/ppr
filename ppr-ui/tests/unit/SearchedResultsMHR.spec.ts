@@ -4,6 +4,7 @@ import Vuetify from 'vuetify'
 import { getVuexStore } from '@/store'
 import CompositionApi, { nextTick } from '@vue/composition-api'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
+import { uniqBy } from 'lodash'
 
 // Components
 import { SearchedResultMhr } from '@/components/tables'
@@ -18,8 +19,8 @@ import {
   mhSearchSerialNumberHeaders,
   mhSearchSerialNumberHeadersReview
 } from '@/resources'
-import { ManufacturedHomeSearchResponseIF } from '@/interfaces'
-import { APIMHRSearchTypes, UIMHRSearchTypes } from '@/enums'
+import { ManufacturedHomeSearchResponseIF, ManufacturedHomeSearchResultIF } from '@/interfaces'
+import { APIMHRSearchTypes, UIMHRSearchTypes, UIMHRSearchTypeValues } from '@/enums'
 import { mockedMHRSearchResponse, mockedMHRSearchResultsSorted, mockedMHRSearchSelections } from './test-data'
 
 // Vue.use(CompositionApi)
@@ -49,7 +50,7 @@ const noResultsDiv = '#search-no-results-info'
  *
  * @returns a Wrapper<SearchedResultMhr> object with the given parameters.
  */
-function createComponent (propsData: any = null): Wrapper<any> {
+function createComponent(propsData: any = null): Wrapper<any> {
   const localVue = createLocalVue()
   localVue.use(CompositionApi)
   localVue.use(Vuetify)
@@ -61,6 +62,15 @@ function createComponent (propsData: any = null): Wrapper<any> {
     propsData: { ...propsData }
   })
 }
+
+function getUniqueSelectedPPRLienSearches(
+  searchResults: ManufacturedHomeSearchResultIF[]
+): ManufacturedHomeSearchResultIF[] {
+  return uniqBy(searchResults, UIMHRSearchTypeValues.MHRMHR_NUMBER).filter(
+    item => item.selected && item.includeLienInfo
+  )
+}
+
 describe('Test result table with no results', () => {
   let wrapper: Wrapper<any>
 
@@ -160,7 +170,8 @@ describe('Serial number results in Review Mode', () => {
     expect(wrapper.find('#search-summary-info').exists()).toBe(false)
     expect(wrapper.find('#review-results-count').text()).toContain('Matches selected: 2')
     expect(wrapper.find('#review-results-count').text()).toContain('Registrations: 1')
-    expect(wrapper.find('#review-results-count').text()).toContain('PPR Lien Searches Selected: 1')
+    const pprLiensLength = getUniqueSelectedPPRLienSearches(selectedResults).length
+    expect(wrapper.find('#review-results-count').text()).toContain('PPR Lien Searches Selected: ' + pprLiensLength)
     expect(wrapper.find('#review-confirm-btn').exists()).toBe(false)
     expect(wrapper.find('#select-all-checkbox').exists()).toBe(false)
     expect(wrapper.find('#select-all-lien-checkbox').exists()).toBe(false)
@@ -201,7 +212,8 @@ describe('Owner name debtor results', () => {
     expect(wrapper.find('#search-summary-info').exists()).toBe(true)
     expect(wrapper.find('#home-results-count').text()).toBe('Matches Found: 5')
     expect(wrapper.find('#selected-results-count').text()).toBe('Matches selected: 0')
-    expect(wrapper.find('#selected-lien-count').text()).toBe('PPR Lien Searches Selected: 0')
+    const pprLiensLength = getUniqueSelectedPPRLienSearches(testResults.results).length
+    expect(wrapper.find('#selected-lien-count').text()).toBe('PPR Lien Searches Selected: ' + pprLiensLength)
     expect(wrapper.find('#review-confirm-btn').exists()).toBe(true)
     expect(wrapper.find('#select-all-checkbox').exists()).toBe(true)
     expect(wrapper.find('#select-all-lien-checkbox').exists()).toBe(true)
@@ -248,7 +260,8 @@ describe('Owner name name in Review Mode', () => {
     expect(wrapper.find('#search-summary-info').exists()).toBe(false)
     expect(wrapper.find('#review-results-count').text()).toContain('Matches selected: 1')
     expect(wrapper.find('#review-results-count').text()).toContain('Registrations: 1')
-    expect(wrapper.find('#review-results-count').text()).toContain('PPR Lien Searches Selected: 0')
+    const pprLiensLength = getUniqueSelectedPPRLienSearches(selectedResults).length
+    expect(wrapper.find('#review-results-count').text()).toContain('PPR Lien Searches Selected: ' + pprLiensLength)
     expect(wrapper.find('#review-confirm-btn').exists()).toBe(false)
     expect(wrapper.find('#select-all-checkbox').exists()).toBe(false)
     expect(wrapper.find('#select-all-lien-checkbox').exists()).toBe(false)
@@ -289,7 +302,8 @@ describe('Business organization results', () => {
     expect(wrapper.find('#search-summary-info').exists()).toBe(true)
     expect(wrapper.find('#home-results-count').text()).toBe('Matches Found: 5')
     expect(wrapper.find('#selected-results-count').text()).toBe('Matches selected: 0')
-    expect(wrapper.find('#selected-lien-count').text()).toBe('PPR Lien Searches Selected: 0')
+    const pprLiensLength = getUniqueSelectedPPRLienSearches(testResults.results).length
+    expect(wrapper.find('#selected-lien-count').text()).toBe('PPR Lien Searches Selected: ' + pprLiensLength)
     expect(wrapper.find('#review-confirm-btn').exists()).toBe(true)
     expect(wrapper.find('#select-all-checkbox').exists()).toBe(true)
     expect(wrapper.find('#select-all-lien-checkbox').exists()).toBe(true)
@@ -332,7 +346,8 @@ describe('Business organization results in Review Mode', () => {
     expect(wrapper.find('#search-summary-info').exists()).toBe(false)
     expect(wrapper.find('#review-results-count').text()).toContain('Matches selected: 2')
     expect(wrapper.find('#review-results-count').text()).toContain('Registrations: 1')
-    expect(wrapper.find('#review-results-count').text()).toContain('PPR Lien Searches Selected: 1')
+    const pprLiensLength = getUniqueSelectedPPRLienSearches(selectedResults).length
+    expect(wrapper.find('#review-results-count').text()).toContain('PPR Lien Searches Selected: ' + pprLiensLength)
     expect(wrapper.find('#review-confirm-btn').exists()).toBe(false)
     expect(wrapper.find('#select-all-checkbox').exists()).toBe(false)
     expect(wrapper.find('#select-all-lien-checkbox').exists()).toBe(false)
@@ -371,7 +386,8 @@ describe('Manufactured home results', () => {
     expect(wrapper.find('#search-summary-info').exists()).toBe(true)
     expect(wrapper.find('#home-results-count').text()).toBe('Matches Found: 5')
     expect(wrapper.find('#selected-results-count').text()).toBe('Matches selected: 0')
-    expect(wrapper.find('#selected-lien-count').text()).toBe('PPR Lien Searches Selected: 0')
+    const pprLiensLength = getUniqueSelectedPPRLienSearches(testResults.results).length
+    expect(wrapper.find('#selected-lien-count').text()).toBe('PPR Lien Searches Selected: ' + pprLiensLength)
     expect(wrapper.find('#review-confirm-btn').exists()).toBe(true)
     expect(wrapper.find('#select-all-checkbox').exists()).toBe(true)
     expect(wrapper.find('#select-all-lien-checkbox').exists()).toBe(true)
@@ -418,7 +434,8 @@ describe('Manufactured home results in Review Mode', () => {
     expect(wrapper.find('#search-summary-info').exists()).toBe(false)
     expect(wrapper.find('#review-results-count').text()).toContain('Matches selected: 3')
     expect(wrapper.find('#review-results-count').text()).toContain('Registrations: 1')
-    expect(wrapper.find('#review-results-count').text()).toContain('PPR Lien Searches Selected: 1')
+    const pprLiensLength = getUniqueSelectedPPRLienSearches(selectedResults).length
+    expect(wrapper.find('#review-results-count').text()).toContain('PPR Lien Searches Selected: ' + pprLiensLength)
     expect(wrapper.find('#review-confirm-btn').exists()).toBe(false)
     expect(wrapper.find('#select-all-checkbox').exists()).toBe(false)
     expect(wrapper.find('#select-all-lien-checkbox').exists()).toBe(false)
