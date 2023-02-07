@@ -644,7 +644,7 @@ def __update_summary_info(result, results, reg_summary_list, doc_types, staff, a
                 break
     else:
         result['registrationDescription'] = summary_result.get('reg_description')
-        result['username'] = summary_result.get('username')
+        # result['username'] = summary_result.get('username')  # Sorting by username does not work with this.
         if staff or account_id == summary_result.get('account_id'):
             if summary_result.get('report_url') or model_utils.report_retry_elapsed(summary_result.get('report_ts')):
                 if summary_result.get('registration_type') == MhrRegistrationTypes.MHREG:
