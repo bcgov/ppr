@@ -39,3 +39,12 @@ export function fromDisplayPhone (phoneNumber: string): string {
     return match[1] + match[2] + match[3]
   } else return phoneNumber
 }
+
+/**
+ * Formats a string word to title case for display.
+ * @param value the string word to format
+ * @returns a title case string word
+ */
+export function toTitleCase (value: string): string {
+  return value[0].toUpperCase() + value.slice(1).toLowerCase()
+}

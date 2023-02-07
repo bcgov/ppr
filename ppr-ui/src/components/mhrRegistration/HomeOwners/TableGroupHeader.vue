@@ -176,6 +176,7 @@ import { find } from 'lodash'
 /* eslint-disable no-unused-vars */
 import { MhrRegistrationFractionalOwnershipIF, MhrHomeOwnerGroupIF } from '@/interfaces/mhr-registration-interfaces'
 import { ActionTypes } from '@/enums'
+import { toTitleCase } from '@/utils'
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
@@ -239,7 +240,7 @@ export default defineComponent({
       const { interest, interestNumerator, interestDenominator } = localState.group
       if (!interestNumerator || !interestDenominator) return 'N/A'
 
-      return `${interest} ${interestNumerator}/${interestDenominator}`
+      return `${toTitleCase(interest)} ${interestNumerator}/${interestDenominator}`
     }
 
     const isRemovedHomeOwnerGroup = (group: MhrHomeOwnerGroupIF): boolean => {
