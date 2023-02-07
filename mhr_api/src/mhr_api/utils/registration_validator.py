@@ -70,8 +70,8 @@ PARTY_TYPE_INVALID = 'Death of owner requires an executor, trustee, administrato
 GROUP_PARTY_TYPE_INVALID = 'Death of owner all owner party types within the group must be identical. '
 OWNER_DESCRIPTION_REQUIRED = 'Death of owner description of owner party type is required. '
 TRANSFER_PARTY_TYPE_INVALID = 'Owner party type of administrator, executor, trustee not allowed for this registration. '
-TENANCY_PARTY_TYPE_INVALID = 'Multiple owner group tenancy type must be NA for executors, trustees, or administrators. '
-TENANCY_TYPE_NA_INVALID = 'Tenancy type NA is only allowed when there are multiple active owner groups. '
+TENANCY_PARTY_TYPE_INVALID = 'Owner group tenancy type must be NA for executors, trustees, or administrators. '
+TENANCY_TYPE_NA_INVALID = 'Tenancy type NA is not allowed when there is 1 active owner group with 1 owner. '
 
 
 def validate_registration(json_data, staff: bool = False):
@@ -640,7 +640,9 @@ def validate_owner_party_type(json_data,  # pylint: disable=too-many-branches
         return error_msg
     for group in groups:
         party_count: int = 0
+        owner_count: int = 0
         if group.get('owners'):
+            owner_count = len(group.get('owners'))
             valid_type: bool = True
             first_type: str = None
             if group['owners'][0].get('partyType'):
@@ -663,10 +665,13 @@ def validate_owner_party_type(json_data,  # pylint: disable=too-many-branches
                     error_msg += TRANSFER_PARTY_TYPE_INVALID
             if not valid_type and len(group['owners']) > 1:
                 error_msg += GROUP_PARTY_TYPE_INVALID
-        if active_group_count < 2 and group.get('type', '') == MhrTenancyTypes.NA:
-            error_msg += TENANCY_TYPE_NA_INVALID
+        if active_group_count < 2 and group.get('type', '') == MhrTenancyTypes.NA and owner_count == 1:
+            error_msg += TENANCY_TYPE_NA_INVALID  # SOLE owner cannot be NA
         elif active_group_count > 1 and party_count > 0 and group.get('type', '') != MhrTenancyTypes.NA:
-            error_msg += TENANCY_PARTY_TYPE_INVALID
+            error_msg += TENANCY_PARTY_TYPE_INVALID  # COMMON scenario
+        elif active_group_count == 1 and owner_count > 1 and party_count > 0 and \
+                group.get('type', '') != MhrTenancyTypes.NA:
+            error_msg += TENANCY_PARTY_TYPE_INVALID  # JOINT scenario
     return error_msg
 
 

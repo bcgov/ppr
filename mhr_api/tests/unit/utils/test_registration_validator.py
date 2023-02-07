@@ -539,8 +539,9 @@ TEST_TRANSFER_DEATH_DATA = [
 ]
 # testdata pattern is ({description}, {valid}, {mhr_num}, {tenancy_type}, {add_group}, {message content})
 TEST_TRANSFER_DEATH_NA_DATA = [
-    ('Invalid single active', False, '045349', MhrTenancyTypes.NA, TC_GROUP_TRANSFER_ADD,
-     validator.TENANCY_TYPE_NA_INVALID),
+    ('Valid JOINT active', True, '045349', MhrTenancyTypes.NA, TC_GROUP_TRANSFER_ADD, None),
+    ('Invalid JOINT tenancy-party type', False, '045349', MhrTenancyTypes.JOINT, TC_GROUP_TRANSFER_ADD,
+     validator.TENANCY_PARTY_TYPE_INVALID),
     ('Invalid tenancy type - party type', False, '080282', MhrTenancyTypes.JOINT, TC_GROUP_TRANSFER_ADD,
      validator.TENANCY_PARTY_TYPE_INVALID),
     ('Valid', True, '080282', MhrTenancyTypes.NA, TC_GROUP_TRANSFER_ADD, None)
@@ -769,6 +770,7 @@ def test_validate_transfer_death(session, desc, valid, party_type1, party_type2,
     if desc != 'No death invalid party type':
         json_data['deathOfOwner'] = True
     json_data['addOwnerGroups'] = copy.deepcopy(add_group)
+    json_data['addOwnerGroups'][0]['type'] = 'NA'
     owners = json_data['addOwnerGroups'][0]['owners']
     if text:
         owners[0]['description'] = text

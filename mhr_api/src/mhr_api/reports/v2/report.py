@@ -365,7 +365,8 @@ class Report:  # pylint: disable=too-few-public-methods
             if self._report_data.get('addOwnerGroups'):
                 has_na: bool = False
                 for group in self._report_data.get('addOwnerGroups'):
-                    if group.get('type', '') == MhrTenancyTypes.NA:
+                    if group.get('type', '') == MhrTenancyTypes.NA and not group.get('interestNumerator') and \
+                            not group.get('interestDenominator'):
                         has_na = True
                     group['groupId'] = group_id
                     group_id += 1
@@ -375,7 +376,8 @@ class Report:  # pylint: disable=too-few-public-methods
             for group in self._report_data.get('ownerGroups'):
                 group['groupId'] = group_id
                 group_id += 1
-                if group.get('type', '') == MhrTenancyTypes.NA:
+                if group.get('type', '') == MhrTenancyTypes.NA and not group.get('interestNumerator') and \
+                        not group.get('interestDenominator'):
                     has_na = True
             self._report_data['hasNA'] = has_na
         elif self._report_key in (ReportTypes.SEARCH_DETAIL_REPORT, ReportTypes.SEARCH_BODY_REPORT):
@@ -385,7 +387,8 @@ class Report:  # pylint: disable=too-few-public-methods
                 for group in detail.get('ownerGroups'):
                     group['groupId'] = group_id
                     group_id += 1
-                    if group.get('type', '') == MhrTenancyTypes.NA:
+                    if group.get('type', '') == MhrTenancyTypes.NA and not group.get('interestNumerator') and \
+                            not group.get('interestDenominator'):
                         has_na = True
                 self._report_data['hasNA'] = has_na
 

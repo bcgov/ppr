@@ -482,7 +482,7 @@ class Db2Manuhome(db.Model):
     @classmethod
     def __update_group_type(cls, groups, existing_count: int = 0):
         """Set type if multiple active owner groups and a trustee, admin, executor exists."""
-        if not groups or (len(groups) + existing_count) == 1:
+        if not groups or (len(groups) + existing_count) == 1 and groups[0].get('type') == MhrTenancyTypes.SOLE:
             return groups
         for group in groups:
             for owner in group.get('owners'):
