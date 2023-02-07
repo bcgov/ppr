@@ -85,6 +85,11 @@ def get_account_id(req):
     return req.headers.get('Account-Id')
 
 
+def get_staff_account_id(req):
+    """Get reg staff account ID from request headers."""
+    return req.headers.get('Staff-Account-Id')
+
+
 def is_pdf(req):
     """Check if request headers Accept is application/pdf."""
     accept = req.headers.get('Accept')

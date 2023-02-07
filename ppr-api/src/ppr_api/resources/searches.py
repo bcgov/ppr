@@ -238,7 +238,8 @@ def staff_search(req: request, request_json, account_id: str):
 def build_staff_payment(req: request, account_id: str):
     """Extract payment information from request parameters."""
     payment_info = {
-        'transactionType': TransactionTypes.SEARCH_STAFF_NO_FEE.value
+        'transactionType': TransactionTypes.SEARCH_STAFF_NO_FEE.value,
+        'accountId': resource_utils.get_staff_account_id(req)
     }
     if is_bcol_help(account_id):
         return payment_info

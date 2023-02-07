@@ -215,6 +215,7 @@ def test_staff_search(session, client, jwt, role, routing_slip, bcol_number, dat
     if role == GOV_ACCOUNT_ROLE:
         account_id = '1234'
     headers=create_header_account(jwt, roles, 'test-user', account_id)
+    headers['Staff-Account-Id'] = '3040'
     rv = client.post('/api/v1/searches',
                     json=MHR_NUMBER_JSON,
                     headers=headers,

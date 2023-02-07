@@ -301,7 +301,8 @@ def get_payment_details(search_detail: SearchResult, request_json):
 def build_staff_payment(req: request, account_id: str):
     """Extract staff payment information from request parameters."""
     payment_info = {
-        'waiveFees': True
+        'waiveFees': True,
+        'accountId': resource_utils.get_staff_account_id(req)
     }
     if is_bcol_help(account_id):
         return payment_info

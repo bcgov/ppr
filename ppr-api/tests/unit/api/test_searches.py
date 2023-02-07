@@ -126,9 +126,11 @@ def test_search_valid(session, client, jwt, search_type, json_data):
 def test_staff_search_certified(session, client, jwt, search_type, json_data):
     """Assert that valid staff certified search criteria returns a 201 status."""
     current_app.config.update(PAYMENT_SVC_URL=MOCK_PAY_URL)
+    headers = create_header_account(jwt, [PPR_ROLE], 'test-user', STAFF_ROLE)
+    headers['Staff-Account-Id'] = '3040'
     rv = client.post('/api/v1/searches?certified=true',
                      json=json_data,
-                     headers=create_header_account(jwt, [PPR_ROLE], 'test-user', STAFF_ROLE),
+                     headers=headers,
                      content_type='application/json')
     # check
     assert rv.status_code == HTTPStatus.CREATED
@@ -163,8 +165,10 @@ def test_staff_search(session, client, jwt, role, routing_slip, bcol_number, dat
     roles = [PPR_ROLE, role]
     if role == BCOL_HELP:
         headers = create_header_account(jwt, roles, 'test-user', BCOL_HELP)
+        headers['Staff-Account-Id'] = '3040'
     elif role == STAFF_ROLE:
         headers = create_header_account(jwt, roles, 'test-user', STAFF_ROLE)
+        headers['Staff-Account-Id'] = '3040'
     elif role == GOV_ACCOUNT_ROLE:
         headers = create_header_account(jwt, roles, 'test-user', '1234')
     else:
