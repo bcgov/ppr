@@ -83,7 +83,8 @@ def validate_registration(json_data, staff: bool = False):
             if not json_data.get('ownerGroups'):
                 error_msg += OWNER_GROUPS_REQUIRED
         error_msg += validate_submitting_party(json_data)
-        error_msg += validate_owner_groups(json_data.get('ownerGroups'), True)
+        owner_count: int = len(json_data.get('ownerGroups')) if json_data.get('ownerGroups') else 0
+        error_msg += validate_owner_groups(json_data.get('ownerGroups'), True, None, None, owner_count)
         error_msg += validate_location(json_data)
     except Exception as validation_exception:   # noqa: B902; eat all errors
         current_app.logger.error('validate_registration exception: ' + str(validation_exception))
@@ -103,7 +104,8 @@ def validate_transfer(registration: MhrRegistration, json_data, staff: bool = Fa
         error_msg += validate_owner_groups(json_data.get('addOwnerGroups'),
                                            False,
                                            registration,
-                                           json_data.get('deleteOwnerGroups'))
+                                           json_data.get('deleteOwnerGroups'),
+                                           active_group_count)
         error_msg += validate_owner_party_type(json_data, json_data.get('addOwnerGroups'), False, active_group_count)
         error_msg += validate_registration_state(registration)
         if is_legacy() and registration and registration.manuhome and json_data.get('deleteOwnerGroups'):
@@ -302,7 +304,7 @@ def validate_owner_group(group, int_required: bool = False):
         return error_msg
     orig_type: str = group.get('type', '')
     tenancy_type: str = NEW_TENANCY_LEGACY.get(orig_type, '')
-    if tenancy_type == Db2Owngroup.TenancyTypes.COMMON or int_required:
+    if tenancy_type == (Db2Owngroup.TenancyTypes.COMMON and orig_type != MhrTenancyTypes.NA) or int_required:
         if not group.get('interestNumerator') or group.get('interestNumerator', 0) < 1:
             error_msg += GROUP_NUMERATOR_MISSING
         if not group.get('interestDenominator') or group.get('interestDenominator', 0) < 1:
@@ -380,24 +382,29 @@ def interest_required(groups, registration: MhrRegistration = None, delete_group
     return group_count > 1
 
 
-def common_tenancy(groups, new: bool) -> bool:
+def common_tenancy(groups, new: bool, active_count: int = 0) -> bool:
     """Determine if the owner groups is a tenants in common scenario."""
     if new and groups and len(groups) == 1:
         return False
     for group in groups:
-        tenancy_type: str = NEW_TENANCY_LEGACY.get(group.get('type', ''), '') if groups else ''
-        if tenancy_type != Db2Owngroup.TenancyTypes.SOLE:
+        group_type = group.get('type', '')
+        tenancy_type: str = NEW_TENANCY_LEGACY.get(group_type, '') if groups else ''
+        if tenancy_type != Db2Owngroup.TenancyTypes.SOLE and active_count > 1:
             return True
     return False
 
 
-def validate_owner_groups(groups, new: bool, registration: MhrRegistration = None, delete_groups=None):
+def validate_owner_groups(groups,
+                          new: bool,
+                          registration: MhrRegistration = None,
+                          delete_groups=None,
+                          active_count: int = 0):
     """Verify owner groups are valid."""
     error_msg = ''
     if not groups:
         return error_msg
     so_count: int = 0
-    if common_tenancy(groups, new):
+    if common_tenancy(groups, new, active_count):
         return validate_owner_groups_common(groups, registration, delete_groups)
     for group in groups:
         tenancy_type: str = NEW_TENANCY_LEGACY.get(group.get('type', ''), '') if groups else ''
@@ -684,7 +691,7 @@ def get_active_group_count(json_data, registration: MhrRegistration) -> int:
         if json_data.get('addOwnerGroups'):
             group_count += len(json_data.get('addOwnerGroups'))
         if json_data.get('deleteOwnerGroups'):
-            group_count -= len(json_data.get('addOwnerGroups'))
+            group_count -= len(json_data.get('deleteOwnerGroups'))
         if registration and is_legacy() and registration.manuhome:
             for existing in registration.manuhome.reg_owner_groups:
                 if existing.status in (Db2Owngroup.StatusTypes.ACTIVE, Db2Owngroup.StatusTypes.EXEMPT):

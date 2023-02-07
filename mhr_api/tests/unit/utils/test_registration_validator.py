@@ -397,6 +397,66 @@ TC_GROUP_TRANSFER_ADD = [
         'interestDenominator': 2
     }
 ]
+TC_GROUP_TRANSFER_ADD2 = [
+    {
+        'groupId': 5,
+        'owners': [
+            {
+            'individualName': {
+                'first': 'James',
+                'last': 'Smith'
+            },
+            'address': {
+                'street': '3122B LYNNLARK PLACE',
+                'city': 'VICTORIA',
+                'region': 'BC',
+                'postalCode': ' ',
+                'country': 'CA'
+            },
+            'phoneNumber': '6041234567'
+            }, {
+            'individualName': {
+                'first': 'Jane',
+                'last': 'Smith'
+            },
+            'address': {
+                'street': '3122B LYNNLARK PLACE',
+                'city': 'VICTORIA',
+                'region': 'BC',
+                'postalCode': ' ',
+                'country': 'CA'
+            },
+            'phoneNumber': '6041234567'
+            }
+        ],
+        'type': 'JOINT',
+        'interest': 'UNDIVIDED',
+        'interestNumerator': 1,
+        'interestDenominator': 2
+    }, {
+        'groupId': 6,
+        'owners': [
+            {
+            'individualName': {
+                'first': 'James',
+                'last': 'Smith'
+            },
+            'address': {
+                'street': '3122B LYNNLARK PLACE',
+                'city': 'VICTORIA',
+                'region': 'BC',
+                'postalCode': ' ',
+                'country': 'CA'
+            },
+            'phoneNumber': '6041234567'
+            }
+        ],
+        'type': 'COMMON',
+        'interest': 'UNDIVIDED',
+        'interestNumerator': 1,
+        'interestDenominator': 2
+    }
+]
 TC_GROUP_TRANSFER_DELETE_2 = [
     {
         'groupId': 3,
@@ -513,7 +573,7 @@ TEST_TRANSFER_DATA_EXTRA = [
 # testdata pattern is ({description}, {valid}, {numerator}, {denominator}, {add_group}, {message content})
 TEST_TRANSFER_DATA_GROUP = [
     ('Valid', True, 1, 2, None, None),
-    ('Invalid add TC no owner', False, None, None, TC_GROUP_TRANSFER_ADD, validator.OWNERS_COMMON_INVALID),
+    ('Invalid add TC no owner', False, None, None, TC_GROUP_TRANSFER_ADD2, validator.OWNERS_COMMON_INVALID),
     ('Invalid add JT 1 owner', False, None, None, JT_OWNER_SINGLE, validator.OWNERS_JOINT_INVALID),
     ('Invalid TC numerator missing', False, None, 2, TC_GROUPS_VALID, validator.GROUP_NUMERATOR_MISSING),
     ('Invalid TC numerator < 1', False, 0, 2, TC_GROUPS_VALID, validator.GROUP_NUMERATOR_MISSING),
@@ -620,7 +680,7 @@ def test_validate_registration_group(session, desc, valid, numerator, denominato
     """Assert that new MH registration owner group validation works as expected."""
     # setup
     json_data = copy.deepcopy(REGISTRATION)
-    json_data['ownerGroups'] = groups
+    json_data['ownerGroups'] = copy.deepcopy(groups)
     if json_data.get('documentId'):
         del json_data['documentId']
     if desc == 'Invalid TC only 1 group':
