@@ -15,11 +15,11 @@
       </p>
       <v-text-field
         :id="`interest-type-group-${groupId}`"
-        label="Interest Type (Optional)"
+        label="Interest Type"
         filled
         class="background-white"
-        v-model="fractionalData.interest"
-        :rules="isLettersOnly('Do not include the fraction in the Interest Type field.')"
+        v-model="interestText"
+        disabled
         :data-test-id="`interest-type-field-group-${groupId}`"
       />
       <div class="owner-fractions">
@@ -66,6 +66,7 @@ import { MhrRegistrationHomeOwnerIF } from '@/interfaces'
 
 import { computed, defineComponent, reactive, toRefs } from '@vue/composition-api'
 import { useInputRules } from '@/composables/useInputRules'
+import { toTitleCase } from '@/utils'
 
 let DEFAULT_OWNER_ID = 1
 
@@ -99,6 +100,9 @@ export default defineComponent({
 
     const localState = reactive({
       id: props.editHomeOwner?.ownerId || (DEFAULT_OWNER_ID++).toString(),
+      interestText: computed(() =>
+        toTitleCase(props.fractionalData.interest)
+      ),
       fractionalInterest: computed(
         () =>
           // eslint-disable-next-line max-len
@@ -163,6 +167,10 @@ export default defineComponent({
       top: 3px;
       position: relative;
     }
+  }
+
+  .theme--light.v-text-field--filled.v-input--is-disabled > .v-input__control > .v-input__slot {
+    border-bottom: 1px dotted;
   }
 }
 

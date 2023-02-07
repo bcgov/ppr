@@ -7,6 +7,7 @@ import {
 
 export const mockMhrTransferCurrentHomeOwner = {
   groupId: 1,
+  interest: 'Undivided',
   interestNumerator: 1,
   interestDenominator: 1,
   owners: [
