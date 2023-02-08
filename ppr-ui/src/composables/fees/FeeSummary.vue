@@ -83,6 +83,19 @@
           </div>
         </li>
         <li
+          v-if="hasCertifyFee"
+          id="certify-fee"
+          :class="[$style['fee-container'], $style['fee-list__item'], 'pb-4', 'pr-4', 'py-4']"
+          key="CertifyFee"
+        >
+          <div :class="$style['fee-list__item-name']">
+            Certified search
+          </div>
+          <div :class="$style['fee-list__item-value']">
+            $ 25.00
+          </div>
+        </li>
+        <li
           v-if="hasProcessingFee"
           id="processing-fee-summary"
           :class="[$style['fee-container'], $style['fee-list__item'], 'pb-4', 'pr-4', 'py-4']"
@@ -178,15 +191,18 @@ export default defineComponent({
   },
   setup (props) {
     const {
-      getLengthTrust, isRoleStaff, getStaffPayment
+      getLengthTrust, isRoleStaff, getStaffPayment, isSearchCertified
     } = useGetters<any>([
-      'getLengthTrust', 'isRoleStaff', 'getStaffPayment'
+      'getLengthTrust', 'isRoleStaff', 'getStaffPayment', 'isSearchCertified'
     ])
     const localState = reactive({
       feeType: props.setFeeType,
       registrationType: props.setRegistrationType,
       hasPriorityFee: computed((): Boolean => {
         return getStaffPayment.value?.isPriority
+      }),
+      hasCertifyFee: computed((): Boolean => {
+        return isSearchCertified.value
       }),
       registrationLength: computed((): RegistrationLengthI => {
         return props.setRegistrationLength
@@ -266,6 +282,9 @@ export default defineComponent({
           }
           if (getStaffPayment.value?.isPriority) {
             extraFee = extraFee + 100
+          }
+          if (localState.hasCertifyFee) {
+            extraFee += 25
           }
           return (
             (localState.feeSummary.feeAmount *

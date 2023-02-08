@@ -64,6 +64,17 @@
                 @update:staffPaymentData="onStaffPaymentDataUpdate($event)"
                 @valid="staffPaymentValid = $event"
               />
+              <v-row no-gutters>
+                <v-spacer></v-spacer>
+                <v-col cols="12" :sm="9">
+                  <v-checkbox
+                    class="mt-2"
+                    id="certify-checkbox"
+                    label="Make this a Certified Search ($25.00)"
+                    @change="setSearchCertified($event)"
+                  />
+                </v-col>
+              </v-row>
             </v-card>
           </section>
 
@@ -150,6 +161,7 @@ export default class ConfirmMHRSearch extends Vue {
 
   @Action setUnsavedChanges: ActionBindingIF
   @Action setStaffPayment!: ActionBindingIF
+  @Action setSearchCertified!: ActionBindingIF
 
   /** Whether App is ready. */
   @Prop({ default: false })
