@@ -255,7 +255,7 @@ import {
 import { BaseHeaderIF, ManufacturedHomeSearchResultIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { FolioNumber } from '@/components/common'
 import { RouteNames, UIMHRSearchTypeMap, UIMHRSearchTypes, UIMHRSearchTypeValues } from '@/enums'
-import { cloneDeep, uniqBy, filter, orderBy, sortBy } from 'lodash'
+import { cloneDeep, uniqBy, filter, sortBy, groupBy } from 'lodash'
 
 export default defineComponent({
   components: {
@@ -295,7 +295,8 @@ export default defineComponent({
       tooltipTxtSrchMtchs: 'One or more of the selected matches appear in ' +
         'the same registration. That registration will only be shown once in the report.',
       results: [],
-      uniqueResults: [] as Array<string>,
+      groupedResults: [] as Object as { string: ManufacturedHomeSearchResultIF[] }, // results grouped by Mhr Number
+      uniqueResults: [] as ManufacturedHomeSearchResultIF[],
       uniqueResultsLienSelected: computed((): ManufacturedHomeSearchResultIF[] =>
         uniqBy(localState.results, UIMHRSearchTypeValues.MHRMHR_NUMBER)
           .filter(item => item.selected && item.includeLienInfo)
@@ -353,9 +354,6 @@ export default defineComponent({
       areAllSelected: computed((): boolean => {
         return localState.results?.every(result => result && result.selected === true)
       }),
-      hasCollapsedResults: computed((): boolean => {
-        return localState.uniqueResults?.length < localState.results.length
-      }),
       activeResults: computed((): any => {
         const selectedResults = cloneDeep(getSelectedManufacturedHomes).value
         const baseResults = cloneDeep(getManufacturedHomeSearchResults.value?.results)
@@ -371,11 +369,8 @@ export default defineComponent({
             })
           }
         })
-
         // Get unique MHR Numbers with corresponding search type (Owner Name, Serial Num, etc.)
-        localState.uniqueResults =
-          uniqBy(selectedResults, UIMHRSearchTypeValues.MHRMHR_NUMBER)
-            .map(result => result[UIMHRSearchTypeMap[localState.searchType]])
+        localState.uniqueResults = uniqBy(selectedResults, UIMHRSearchTypeValues.MHRMHR_NUMBER)
 
         return props.isReviewMode
           ? selectedResults
@@ -418,10 +413,13 @@ export default defineComponent({
     const getItemClass = (item: ManufacturedHomeSearchResultIF): string => {
       let rowClass = ''
       if (props.isReviewMode) {
-        rowClass =
-        localState.uniqueResults?.indexOf(item[UIMHRSearchTypeMap[localState.searchType] as string]) === -1
-          ? 'duplicate-reg-num'
-          : 'unique-reg-num'
+        const searchType = UIMHRSearchTypeMap[localState.searchType] // serialNumber, ownerName, etc.
+        // get an array of search results based on its 'searchType'
+        // check index of item, if its 0 then it's a unique entry, otherwise the rest are duplicates
+        rowClass = localState.groupedResults[item.mhrNumber]
+          .findIndex(group => group[searchType] === item[searchType]) === 0
+          ? 'unique-reg-num' // only the first ManufacturedHomeSearchResultIF from the group will be unique
+          : 'duplicate-reg-num'
       }
       return item.selected && !props.isReviewMode ? 'selected' : rowClass
     }
@@ -506,14 +504,8 @@ export default defineComponent({
       })
       // sort the results on the Review screen
       if (props.isReviewMode) {
-        let sortedResults
-        // sort based on the search type
-        if (localState.searchType === UIMHRSearchTypes.MHROWNER_NAME) {
-          sortedResults = orderBy(localState.results,
-            ['ownerName.lastName', 'ownerName.middleName', 'ownerName.firstName', 'mhrNumber'])
-        } else {
-          sortedResults = sortBy(localState.results, [UIMHRSearchTypeMap[localState.searchType]])
-        }
+        const sortedResults = sortBy(localState.results, UIMHRSearchTypeValues.MHRMHR_NUMBER)
+        localState.groupedResults = groupBy(sortedResults, UIMHRSearchTypeValues.MHRMHR_NUMBER)
         localState.results = sortedResults
       }
 
@@ -634,7 +626,6 @@ th {
   .v-input__control .v-input--selection-controls__input i:not(.header-checkbox) { //checkbox border color
     color: $primary-blue !important;
     display: block !important;
-    vertical-align: middle !important;
   }
   // disabled checkbox border color
   .v-input--selection-controls.v-input--is-disabled:not(.v-input--indeterminate) .v-icon {
@@ -733,7 +724,7 @@ th {
       td:first-child {
         border: 0;
         padding-top: 0;
-        padding-bottom: 0;
+        padding-bottom: 20px;
       }
       td {
         height: 40px;
