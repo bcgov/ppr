@@ -21,10 +21,14 @@
             <v-row no-gutters id="mhr-information-header" class="pt-3 pb-3 soft-corners-top">
               <v-col cols="auto">
                 <h1>{{ isReviewMode ? 'Review and Confirm' : 'Manufactured Home Information' }}</h1>
-                <p class="mt-7" v-if="!isReviewMode">
-                  This is the current information for this registration as of
-                  <span class="font-weight-bold">{{ asOfDateTime }}</span>.
-                </p>
+                <template v-if="!isReviewMode">
+                  <p class="mt-7">
+                    This is the current information for this registration as of
+                    <span class="font-weight-bold">{{ asOfDateTime }}</span>.
+                  </p>
+                  <p class="mt-n2">Ensure ALL of the information below is correct before making any changes to this
+                    registration. Necessary fees will be applied as updates are made.</p>
+                </template>
                 <p class="mt-7" v-else>
                   Review your changes and complete the additional information before registering.
                 </p>
@@ -64,17 +68,18 @@
             <header id="yellow-message-bar" class="message-bar" v-if="isReviewMode">
               <label><b>Important:</b> This information must match the information on the bill of sale.</label>
             </header>
+
+            <!-- Mhr Information Body -->
             <section v-if="dataLoaded" class="py-4">
-              <header class="review-header mt-1 rounded-top">
-                <v-icon v-if="isReviewMode" class="ml-2" color="darkBlue">mdi-file-document-multiple</v-icon>
-                <img v-else class="ml-1" src="@/assets/svgs/homeownersicon_reviewscreen.svg" />
-                <label class="font-weight-bold pl-2">
-                  {{ isReviewMode ? 'Ownership Transfer or Change - Sale or Beneficiary' : 'Home Owners' }}
-                </label>
-              </header>
 
               <!-- MHR Information Review Section -->
               <template v-if="isReviewMode" data-test-id="review-mode">
+                <!-- Review Header -->
+                <header class="review-header mt-1 rounded-top">
+                  <v-icon class="ml-2" color="darkBlue">mdi-file-document-multiple</v-icon>
+                  <label class="font-weight-bold pl-2">Ownership Transfer or Change - Sale or Beneficiary</label>
+                </header>
+
                 <section id="owners-review">
                   <HomeOwners
                     isMhrTransfer
@@ -152,6 +157,15 @@
 
               <!-- MHR Information Section -->
               <template v-else>
+                <!-- Home Location Review -->
+                <HomeLocationReview isTransferReview />
+
+                <!-- Home Owners Header -->
+                <header class="review-header mt-9 rounded-top">
+                  <img class="ml-1" src="@/assets/svgs/homeownersicon_reviewscreen.svg" />
+                  <label class="font-weight-bold pl-2">Home Owners</label>
+                </header>
+
                 <HomeOwners
                   isMhrTransfer
                   class="mt-n2"
@@ -202,7 +216,7 @@ import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import {
   ActionTypes,
   APIMHRMapSearchTypes,
-  APISearchTypes,
+  APISearchTypes, HomeLocationTypes,
   RouteNames,
   UIMHRSearchTypes
 } from '@/enums'
@@ -229,9 +243,18 @@ import { BaseAddress } from '@/composables/address'
 import { unsavedChangesDialog, registrationSaveDraftError } from '@/resources/dialogOptions'
 import { cloneDeep } from 'lodash'
 import AccountInfo from '@/components/common/AccountInfo.vue'
+/* eslint-disable no-unused-vars */
 import {
-  AccountInfoIF, SubmittingPartyIF, MhrTransferApiIF, RegTableNewItemI // eslint-disable-line no-unused-vars
+  AccountInfoIF,
+  SubmittingPartyIF,
+  MhrTransferApiIF,
+  RegTableNewItemI,
+  MhrHomeOwnerGroupIF,
+  MhrLocationInfoIF,
+  MhrRegistrationHomeLocationIF
 } from '@/interfaces'
+/* eslint-enable no-unused-vars */
+import { HomeLocationReview } from '@/components/mhrRegistration/ReviewConfirm'
 
 export default defineComponent({
   name: 'MhrInformation',
@@ -241,6 +264,7 @@ export default defineComponent({
     HomeOwners,
     TransferDetails,
     TransferDetailsReview,
+    HomeLocationReview,
     HomeOwnersTable,
     StickyContainer,
     CertifyInformation,
@@ -288,7 +312,9 @@ export default defineComponent({
       setRegTableNewItem,
       setSearchedType,
       setManufacturedHomeSearchResults,
-      setLienType
+      setLienType,
+      setMhrLocation,
+      setIsManualLocation
     } = useActions<any>([
       'setMhrTransferHomeOwnerGroups',
       'setMhrTransferCurrentHomeOwnerGroups',
@@ -298,7 +324,9 @@ export default defineComponent({
       'setRegTableNewItem',
       'setSearchedType',
       'setManufacturedHomeSearchResults',
-      'setLienType'
+      'setLienType',
+      'setMhrLocation',
+      'setIsManualLocation'
     ])
 
     const { setEmptyMhrTransfer } = useActions<any>(['setEmptyMhrTransfer'])
@@ -417,15 +445,25 @@ export default defineComponent({
 
     const parseMhrInformation = async (): Promise<void> => {
       const { data } = await fetchMhRegistration(getMhrInformation.value.mhrNumber)
-      const currentOwnerGroups = data?.ownerGroups || [] // Safety check. Should always have ownerGroups
 
-      // Store a snapshot of the existing OwnerGroups for baseline of current state
-      await setMhrTransferCurrentHomeOwnerGroups(cloneDeep(data.ownerGroups))
+      // Store existing MHR Home Location info
+      const currentLocationInfo = data?.location || {} // Safety check. Should always have location
+      await parseMhrLocationInfo(currentLocationInfo)
+
       // Store existing submitting party to be used if user is BC Registry Staff
       setMhrTransferSubmittingParty(data.submittingParty)
-      currentOwnerGroups.forEach((ownerGroup, index) => {
-        ownerGroup.groupId = index + 1
-      })
+
+      const currentOwnerGroups = data?.ownerGroups || [] // Safety check. Should always have ownerGroups
+      await parseMhrHomeOwners(currentOwnerGroups)
+    }
+
+    const parseMhrHomeOwners = async (ownerGroups: Array<MhrHomeOwnerGroupIF>): Promise<void> => {
+      const currentOwnerGroups = ownerGroups || [] // Safety check. Should always have ownerGroups
+
+      // Store a snapshot of the existing OwnerGroups for baseline of current state
+      await setMhrTransferCurrentHomeOwnerGroups(cloneDeep(ownerGroups))
+
+      currentOwnerGroups.forEach((ownerGroup, index) => { ownerGroup.groupId = index + 1 })
       setShowGroups(currentOwnerGroups.length > 1)
 
       // Set owners to store
@@ -441,6 +479,20 @@ export default defineComponent({
       } else {
         // Set current owners if there is no draft
         setMhrTransferHomeOwnerGroups(currentOwnerGroups)
+      }
+    }
+
+    const parseMhrLocationInfo = async (locationData: MhrRegistrationHomeLocationIF): Promise<void> => {
+      for (const [key, value] of Object.entries(locationData)) {
+        setMhrLocation({ key: key, value: value })
+      }
+
+      // Map and Apply an OTHER type when applicable
+      if ([HomeLocationTypes.OTHER_RESERVE, HomeLocationTypes.OTHER_STRATA, HomeLocationTypes.OTHER_TYPE]
+        .includes(locationData.locationType)) {
+        setIsManualLocation(!locationData.pidNumber)
+        setMhrLocation({ key: 'locationType', value: HomeLocationTypes.OTHER_LAND })
+        setMhrLocation({ key: 'otherType', value: locationData.locationType })
       }
     }
 
