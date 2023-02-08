@@ -216,7 +216,8 @@ import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import {
   ActionTypes,
   APIMHRMapSearchTypes,
-  APISearchTypes, HomeLocationTypes,
+  APISearchTypes,
+  HomeLocationTypes,
   RouteNames,
   UIMHRSearchTypes
 } from '@/enums'
@@ -237,6 +238,7 @@ import { useHomeOwners, useInputRules, useMhrInformation } from '@/composables'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
 import { TransferDetails, TransferDetailsReview, ConfirmCompletion } from '@/components/mhrTransfers'
+import { HomeLocationReview } from '@/components/mhrRegistration/ReviewConfirm'
 import { HomeOwners } from '@/views'
 import { BaseDialog } from '@/components/dialogs'
 import { BaseAddress } from '@/composables/address'
@@ -250,11 +252,9 @@ import {
   MhrTransferApiIF,
   RegTableNewItemI,
   MhrHomeOwnerGroupIF,
-  MhrLocationInfoIF,
   MhrRegistrationHomeLocationIF
 } from '@/interfaces'
 /* eslint-enable no-unused-vars */
-import { HomeLocationReview } from '@/components/mhrRegistration/ReviewConfirm'
 
 export default defineComponent({
   name: 'MhrInformation',
