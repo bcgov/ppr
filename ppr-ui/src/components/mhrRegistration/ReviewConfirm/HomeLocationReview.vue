@@ -5,8 +5,8 @@
       <label class="font-weight-bold pl-2">Location of Home</label>
     </header>
 
-    <div :class="{ 'border-error-left': !getStepValidation(MhrSectVal.LOCATION_VALID)}">
-      <section v-if="!getStepValidation(MhrSectVal.LOCATION_VALID)"
+    <div :class="{ 'border-error-left': !getStepValidation(MhrSectVal.LOCATION_VALID) && !isTransferReview }">
+      <section v-if="!getStepValidation(MhrSectVal.LOCATION_VALID) && !isTransferReview"
         :class="{ 'pb-8': !(!!getMhrRegistrationLocation.locationType) && !hasAddress }" class="mx-6 pt-8"
       >
         <span>
@@ -237,7 +237,12 @@ import { useMhrValidations } from '@/composables'
 export default defineComponent({
   name: 'HomeLocationReview',
   components: {},
-  props: {},
+  props: {
+    isTransferReview: {
+      type: Boolean,
+      default: false
+    }
+  },
   setup () {
     const {
       getMhrRegistrationLocation,
