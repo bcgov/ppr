@@ -714,4 +714,66 @@ describe('FeeSummary component tests', () => {
     expect(wrapper.find('#priority-fee').text()).toContain('Priority Fee')
     expect(wrapper.find('#priority-fee').text()).toContain('$ 100.00')
   })
+
+  it('renders certify search fee for a MHR Search as Staff on behalf of a client', async () => {
+    const state = wrapper.vm.$store.state.stateModel as StateModelIF
+    state.authorization.authRoles = ['staff']
+    state.search.searchCertified = true
+    expect(wrapper.findComponent(FeeSummary).exists()).toBe(true)
+    await wrapper.setProps({
+      setFeeType: FeeSummaryTypes.MHSEARCH,
+      setFeeQuantity: 1,
+      setRegistrationLength: null,
+      setRegistrationType: null,
+      setStaffReg: true,
+      setStaffClientPayment: true
+    })
+    await store.dispatch('setStaffPayment')
+    expect(wrapper.vm.$data.feeType).toBe(FeeSummaryTypes.MHSEARCH)
+    expect(wrapper.vm.$data.registrationType).toBe(null)
+    expect(wrapper.vm.$data.feeLabel).toBe('Manufactured Home search')
+    expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(10)
+    expect(wrapper.vm.$data.feeSummary.quantity).toBe(1)
+    expect(wrapper.find('#processing-fee-summary').text()).toContain('No Fee')
+    expect(wrapper.vm.$data.totalFees).toBe(10)
+    expect(wrapper.vm.$data.totalAmount).toBe(35)
+    expect(wrapper.vm.$data.isComplete).toBe(true)
+    expect(wrapper.vm.$data.hintFee).toBe('')
+    expect(wrapper.find('#priority-fee').exists()).toBe(false)
+    expect(wrapper.find('#certify-fee').exists()).toBe(true)
+    expect(wrapper.find('#certify-fee').text()).toContain('Certified search')
+    expect(wrapper.find('#certify-fee').text()).toContain('$ 25.00')
+  })
+
+  it('renders certify search and priority fee for a MHR Search as Staff on behalf of a client', async () => {
+    const state = wrapper.vm.$store.state.stateModel as StateModelIF
+    state.authorization.authRoles = ['staff']
+    state.search.searchCertified = true
+    expect(wrapper.findComponent(FeeSummary).exists()).toBe(true)
+    await wrapper.setProps({
+      setFeeType: FeeSummaryTypes.MHSEARCH,
+      setFeeQuantity: 1,
+      setRegistrationLength: null,
+      setRegistrationType: null,
+      setStaffReg: true,
+      setStaffClientPayment: true
+    })
+    await store.dispatch('setStaffPayment', { isPriority: true })
+    expect(wrapper.vm.$data.feeType).toBe(FeeSummaryTypes.MHSEARCH)
+    expect(wrapper.vm.$data.registrationType).toBe(null)
+    expect(wrapper.vm.$data.feeLabel).toBe('Manufactured Home search')
+    expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(10)
+    expect(wrapper.vm.$data.feeSummary.quantity).toBe(1)
+    expect(wrapper.find('#processing-fee-summary').text()).toContain('No Fee')
+    expect(wrapper.vm.$data.totalFees).toBe(10)
+    expect(wrapper.vm.$data.totalAmount).toBe(135)
+    expect(wrapper.vm.$data.isComplete).toBe(true)
+    expect(wrapper.vm.$data.hintFee).toBe('')
+    expect(wrapper.find('#priority-fee').exists()).toBe(true)
+    expect(wrapper.find('#priority-fee').text()).toContain('Priority Fee')
+    expect(wrapper.find('#priority-fee').text()).toContain('$ 100.00')
+    expect(wrapper.find('#certify-fee').exists()).toBe(true)
+    expect(wrapper.find('#certify-fee').text()).toContain('Certified search')
+    expect(wrapper.find('#certify-fee').text()).toContain('$ 25.00')
+  })
 })
