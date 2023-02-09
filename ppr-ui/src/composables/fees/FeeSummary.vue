@@ -198,15 +198,9 @@ export default defineComponent({
     const localState = reactive({
       feeType: props.setFeeType,
       registrationType: props.setRegistrationType,
-      hasPriorityFee: computed((): Boolean => {
-        return getStaffPayment.value?.isPriority
-      }),
-      hasCertifyFee: computed((): Boolean => {
-        return isSearchCertified.value
-      }),
-      registrationLength: computed((): RegistrationLengthI => {
-        return props.setRegistrationLength
-      }),
+      hasPriorityFee: computed((): Boolean => getStaffPayment.value?.isPriority),
+      hasCertifyFee: computed((): Boolean => isSearchCertified.value),
+      registrationLength: computed((): RegistrationLengthI => props.setRegistrationLength),
       isValid: computed((): boolean => {
         return getLengthTrust.value.valid ||
           [FeeSummaryTypes.MHSEARCH, FeeSummaryTypes.NEW_MHR, FeeSummaryTypes.MHR_TRANSFER].includes(localState.feeType)
