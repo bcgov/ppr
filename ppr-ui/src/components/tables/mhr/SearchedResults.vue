@@ -7,15 +7,17 @@
       </v-row>
       <v-row v-if="searched && !isReviewMode" id="search-summary-info" class="result-info pt-6">
         <v-col id="home-results-count" cols="auto">
-          <span class="divider pr-3">Matches Found: <b>{{ totalResultsLength }}</b></span>
+          <span class="divider pr-3">
+            Matches Found: <b>{{ totalResultsLength }}</b>
+          </span>
         </v-col>
-        <v-col cols="auto" class="pl-0">
-          <span id="selected-results-count" class="divider pr-3">
-            Matches Selected: <b>{{ selectedMatchesLength }}</b>
+        <v-col id="selected-results-count" cols="auto" class="pl-0">
+          <span class="divider pr-3">
+            Matches selected: <b>{{ selectedMatchesLength }}</b>
           </span>
         </v-col>
         <v-col cols="auto" class="pl-0">
-          <span>
+          <span id="selected-lien-count">
             PPR Lien Searches Selected: <b>{{ selectedLiensLength }}</b>
           </span>
         </v-col>
@@ -41,13 +43,9 @@
       </v-row>
       <v-row v-else class="result-info">
         <v-col id="review-results-count" cols="auto">
-          <span>Matches Selected: <b>{{ selectedMatchesLength }}</b></span>
-        </v-col>
-        <v-col id="review-registrations-count" cols="auto">
-          <span>Registrations:  <b>{{ uniqueResults.length }}</b></span>
-        </v-col>
-        <v-col id="review-registrations-count" cols="auto">
-          <span>PPR Lien Searches Selected: <b>{{ selectedLiensLength }}</b></span>
+          <span class="divider pr-3">Matches selected: <b>{{ selectedMatchesLength }}</b></span>
+          <span class="divider px-3">Registrations: <b>{{ uniqueResults.length }}</b></span>
+          <span class="pl-3">PPR Lien Searches Selected: <b>{{ uniqueResultsLienSelected.length }}</b></span>
         </v-col>
       </v-row>
     </article>
@@ -126,42 +124,40 @@
           </template>
 
           <template v-slot:[`item.ownerName`]="{ item }">
-            <v-row
+            <div
               v-if="isOwnerOrOrgSearch"
-              class="align-baseline"
               :class="item.selected && !$props.isReviewMode ? 'selected' : ''"
             >
-              <v-col cols="2">
-                <v-checkbox v-model="item.selected" :ripple="false" @click="onSelectionCheckboxClick(item)"/>
-              </v-col>
-              <v-col class="owner-name-text" @click="item.selected = !item.selected; onSelectionCheckboxClick(item)">
-                {{ getOwnerName(item) }} {{ isReviewMode ? getOwnerCount(item) : '' }}
-              </v-col>
-            </v-row>
+              <v-checkbox
+                v-model="item.selected"
+                @click="onSelectionCheckboxClick(item)"
+                :label="isReviewMode ? getOwnerName(item) + ' ' + getOwnerCount(item) : getOwnerName(item) "
+                hide-details
+              />
+            </div>
             <span v-else>{{ getOwnerName(item) }}</span>
           </template>
           <template v-slot:[`item.mhrNumber`]="{ item }">
-            <v-row
+            <div
               v-if="searchType === UIMHRSearchTypes.MHRMHR_NUMBER"
-              class="align-baseline"
               :class="item.selected && !$props.isReviewMode ? 'selected' : ''"
             >
-              <v-col cols="2">
-                <v-checkbox v-model="item.selected" @click="onSelectionCheckboxClick(item)"/>
-              </v-col>
-              <v-col class="owner-name-text" @click="item.selected = !item.selected; onSelectionCheckboxClick(item)">
-                {{ item.mhrNumber }}
-              </v-col>
-            </v-row>
+              <v-checkbox
+                v-model="item.selected"
+                @click="onSelectionCheckboxClick(item)"
+                :label="item.mhrNumber"
+                hide-details
+              />
+            </div>
             <v-tooltip
-              v-else-if="hasMultipleSelections(item) && isReviewMode"
+              v-else-if="hasMultipleSelections(item.mhrNumber) && isReviewMode"
               top
               content-class="top-tooltip"
               transition="fade-transition"
             >
               <template v-slot:activator="{ on, attrs }">
-                <span  v-bind="attrs" v-on="on">
-                  <b><u>{{ item.mhrNumber }}</u></b>
+                <span  v-bind="attrs" v-on="on" class="mhr-number">
+                  <u>{{ item.mhrNumber }}</u>
                 </span>
               </template>
               <div class="pt-2 pb-2">
@@ -192,19 +188,19 @@
             <span>{{ item.homeLocation }}</span>
           </template>
           <template v-slot:[`item.serialNumber`]="{ item }">
-            <v-row
+            <div
               v-if="searchType === UIMHRSearchTypes.MHRSERIAL_NUMBER"
-              class="align-baseline"
               :class="item.selected && !$props.isReviewMode ? 'selected' : ''"
             >
-              <v-col cols="2">
-                <v-checkbox v-model="item.selected" @click="onSelectionCheckboxClick(item)"/>
-              </v-col>
-              <v-col class="serial-number-text" @click="item.selected = !item.selected; onSelectionCheckboxClick(item)">
-                {{ item.serialNumber }}
-              </v-col>
-            </v-row>
-            <span v-else>{{ item.serialNumber }}</span>
+              <v-checkbox
+                v-model="item.selected"
+                @click="onSelectionCheckboxClick(item)"
+                :ripple="false"
+                :label="item.activeCount > 1 ? `${item.serialNumber} (${item.activeCount})` : `${item.serialNumber}`"
+                hide-details
+              />
+            </div>
+            <div v-else>{{ item.serialNumber }}</div>
           </template>
           <template v-slot:[`item.edit`]="{ item }">
             <v-tooltip
@@ -217,7 +213,9 @@
                   <v-checkbox
                     :label="`${!isReviewMode ? 'Include lien' : 'Lien'} information`"
                     v-model="item.includeLienInfo"
-                    :disabled="noSelectedOwner(item)"
+                    :disabled="isReviewMode ? hasMhrNumberSelected(item.mhrNumber) : !item.selected"
+                    :ripple="false"
+                    hide-details
                   />
                 </span>
               </template>
@@ -256,9 +254,8 @@ import {
 } from '@/resources'
 import { BaseHeaderIF, ManufacturedHomeSearchResultIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { FolioNumber } from '@/components/common'
-import { pacificDate } from '@/utils'
-import { RouteNames, UIMHRSearchTypes, UIMHRSearchTypeValues } from '@/enums'
-import { cloneDeep, uniqBy, orderBy } from 'lodash'
+import { RouteNames, UIMHRSearchTypeMap, UIMHRSearchTypes, UIMHRSearchTypeValues } from '@/enums'
+import { cloneDeep, uniqBy, filter, sortBy, groupBy } from 'lodash'
 
 export default defineComponent({
   components: {
@@ -291,7 +288,6 @@ export default defineComponent({
     const localState = reactive({
       searched: false,
       searchValue: '',
-      searchTime: '',
       searchType: null as UIMHRSearchTypes,
       selectAll: false,
       selectAllLien: false,
@@ -299,7 +295,12 @@ export default defineComponent({
       tooltipTxtSrchMtchs: 'One or more of the selected matches appear in ' +
         'the same registration. That registration will only be shown once in the report.',
       results: [],
-      uniqueResults: [],
+      groupedResults: [] as Object as { string: ManufacturedHomeSearchResultIF[] }, // results grouped by Mhr Number
+      uniqueResults: [] as ManufacturedHomeSearchResultIF[],
+      uniqueResultsLienSelected: computed((): ManufacturedHomeSearchResultIF[] =>
+        uniqBy(localState.results, UIMHRSearchTypeValues.MHRMHR_NUMBER)
+          .filter(item => item.selected && item.includeLienInfo)
+      ),
       totalResultsLength: 0,
       headerSearchTypeSlot: computed((): string => {
         switch (getSearchedType.value?.searchTypeUI) {
@@ -322,9 +323,6 @@ export default defineComponent({
           case UIMHRSearchTypes.MHRMHR_NUMBER:
             return `item.${UIMHRSearchTypeValues.MHRMHR_NUMBER}`
         }
-      }),
-      activeMatchesLength: computed((): number => {
-        return localState.results?.filter(item => item.status === 'ACTIVE').length
       }),
       selectedMatchesLength: computed((): number => {
         return localState.results?.filter(item => item.selected === true).length
@@ -356,9 +354,6 @@ export default defineComponent({
       areAllSelected: computed((): boolean => {
         return localState.results?.every(result => result && result.selected === true)
       }),
-      hasCollapsedResults: computed((): boolean => {
-        return localState.uniqueResults?.length < localState.results.length
-      }),
       activeResults: computed((): any => {
         const selectedResults = cloneDeep(getSelectedManufacturedHomes).value
         const baseResults = cloneDeep(getManufacturedHomeSearchResults.value?.results)
@@ -374,11 +369,9 @@ export default defineComponent({
             })
           }
         })
+        // Get unique MHR Numbers with corresponding search type (Owner Name, Serial Num, etc.)
+        localState.uniqueResults = uniqBy(selectedResults, UIMHRSearchTypeValues.MHRMHR_NUMBER)
 
-        // Get an array of unique MHR Numbers with corresponding Owner Names
-        localState.uniqueResults =
-          uniqBy(selectedResults, UIMHRSearchTypeValues.MHRMHR_NUMBER)
-            .map(el => el.ownerName)
         return props.isReviewMode
           ? selectedResults
           : activeResults
@@ -392,9 +385,14 @@ export default defineComponent({
       router.push({ name: RouteNames.MHRSEARCH_CONFIRM })
     }
 
-    const hasMultipleSelections = (item: ManufacturedHomeSearchResultIF): boolean => {
-      const similarCount = localState.results?.filter(result => result.mhrNumber === item.mhrNumber).length
-      return similarCount > 1
+    // check if MHR number belongs to multiple results
+    const hasMultipleSelections = (mhrNumber: string): boolean => {
+      return filter(localState.results, { mhrNumber: mhrNumber }).length > 1
+    }
+
+    // check if MHR number belongs to multiple selected results
+    const hasMhrNumberSelected = (mhrNumber: string): boolean => {
+      return filter(localState.results, { mhrNumber: mhrNumber, selected: true }).length < 1
     }
 
     const getOwnerName = (item: ManufacturedHomeSearchResultIF): string => {
@@ -410,25 +408,43 @@ export default defineComponent({
 
     const getOwnerCount = (item: ManufacturedHomeSearchResultIF): string => {
       const count = item.activeCount + item.exemptCount + item.historicalCount
-      if (count > 1) return `(${count})`
+      return count > 1 ? `(${count})` : ''
     }
     const getItemClass = (item: ManufacturedHomeSearchResultIF): string => {
       let rowClass = ''
-      if (props.isReviewMode && localState.hasCollapsedResults) {
-        rowClass =
-        localState.uniqueResults?.indexOf(item.ownerName) === -1
-          ? 'duplicate-reg-num'
-          : 'unique-reg-num'
+      if (props.isReviewMode) {
+        const searchType = UIMHRSearchTypeMap[localState.searchType] // serialNumber, ownerName, etc.
+        // get an array of search results based on its 'searchType'
+        // check index of item, if its 0 then it's a unique entry, otherwise the rest are duplicates
+        rowClass = localState.groupedResults[item.mhrNumber]
+          .findIndex(group => group[searchType] === item[searchType]) === 0
+          ? 'unique-reg-num' // only the first ManufacturedHomeSearchResultIF from the group will be unique
+          : 'duplicate-reg-num'
       }
       return item.selected && !props.isReviewMode ? 'selected' : rowClass
     }
 
     const onSelectionCheckboxClick = (item: ManufacturedHomeSearchResultIF): void => {
-      if (!item.selected) {
-        item.includeLienInfo = false
-      }
-      if (item.selected && localState.selectAllLien) {
-        item.includeLienInfo = true
+      if (props.isReviewMode) {
+        // for review-only mode, clicking on a search result checkbox
+        // will set same selected state for all of the results within same group (results with unique mhrNumber)
+        const selectedState = item.selected as boolean
+        // filter unique results based on mhrNumber
+        filter(localState.results, { mhrNumber: item.mhrNumber })
+          .forEach((result: ManufacturedHomeSearchResultIF) => {
+            // set selected for each result
+            result.selected = selectedState
+            if (!result.selected) {
+              result.includeLienInfo = false
+            }
+          })
+      } else {
+        if (!item.selected) {
+          item.includeLienInfo = false
+        }
+        if (item.selected && localState.selectAllLien) {
+          item.includeLienInfo = true
+        }
       }
     }
 
@@ -486,11 +502,10 @@ export default defineComponent({
         // includeLienInfo needs to be initialized because it doesn't exist in the DB/results response
         return result.includeLienInfo !== true ? { ...result, includeLienInfo: false } : result
       })
-      // sort search results by mhrNumber for grouping purposes, only when table is in review and has collapsed results
-      if (props.isReviewMode && localState.hasCollapsedResults) {
-        const sortedResults = orderBy(localState.results,
-          ['ownerName.lastName', 'ownerName.middleName', 'ownerName.firstName', 'mhrNumber'],
-          ['asc', 'asc', 'asc', 'asc'])
+      // sort the results on the Review screen
+      if (props.isReviewMode) {
+        const sortedResults = sortBy(localState.results, UIMHRSearchTypeValues.MHRMHR_NUMBER)
+        localState.groupedResults = groupBy(sortedResults, UIMHRSearchTypeValues.MHRMHR_NUMBER)
         localState.results = sortedResults
       }
 
@@ -499,8 +514,6 @@ export default defineComponent({
         // Select search result if an MHR Number Search and search results equals 1.
         localState.results = localState.results.map(result => ({ ...result, selected: true }))
       }
-      const date = new Date(resp.searchDateTime)
-      localState.searchTime = pacificDate(date)
     })
 
     watch(() => localState.results, (): void => {
@@ -526,11 +539,7 @@ export default defineComponent({
     }
 
     const onSelectAllLienClick = (): void => {
-      for (const result of localState.results) {
-        if (result.selected) {
-          result.includeLienInfo = localState.selectAllLien
-        }
-      }
+      filter(localState.results, 'selected').forEach(result => { result.includeLienInfo = localState.selectAllLien })
     }
 
     watch(() => localState.selectedLiensLength, (): void => {
@@ -542,11 +551,12 @@ export default defineComponent({
     return {
       UIMHRSearchTypes,
       reviewAndConfirm,
+      hasMultipleSelections,
+      hasMhrNumberSelected,
       getOwnerName,
       getOwnerStatus,
       noSelectedOwner,
       getOwnerCount,
-      hasMultipleSelections,
       getOwnerStatusText,
       hasMultipleStatus,
       updateFolioOrReference,
@@ -595,18 +605,6 @@ th {
 .main-results-div {
   width: 100%;
 }
-.owner-name-text, .serial-number-text::v-deep {
-  cursor: pointer;
-  .v-input {
-    margin-top: 0;
-    .v-input__slot {
-      margin: 0;
-    }
-    .v-messages {
-      display: none;
-    }
-  }
-}
 .no-results-info {
   color: $gray7 !important;
   font-size: 1rem;
@@ -628,7 +626,6 @@ th {
   .v-input__control .v-input--selection-controls__input i:not(.header-checkbox) { //checkbox border color
     color: $primary-blue !important;
     display: block !important;
-    vertical-align: middle !important;
   }
   // disabled checkbox border color
   .v-input--selection-controls.v-input--is-disabled:not(.v-input--indeterminate) .v-icon {
@@ -647,69 +644,100 @@ th {
   }
   .results-table .v-data-table__wrapper {
     max-height: 550px;
+    table th {
+      padding-left: 12px;
+      padding-right: 12px;
+    }
   }
   .results-table .v-data-table__wrapper table tbody {
-    .v-input--selection-controls .v-input__slot, .v-input--selection-controls .v-radio {
+    .v-input--selection-controls .v-radio {
       align-items: baseline;
     }
     tr {
+      height: 24px;
       td:not(.group-header) {
-        display: table-cell;
-        vertical-align: baseline;
+        padding: 20px 12px;
+        vertical-align: top;
         overflow: hidden;
         white-space: normal;
-        padding: 0 12px !important;
-        height:1rem;
       }
       td:not(:last-child) {
         word-break: break-word;
+      }
+
+      .v-input {
+        margin-top: 0px;
+        padding-top: 0px;
+        .v-input__slot {
+          align-items: normal;
+        }
       }
     }
     .selected {
       background-color: $blueSelected !important;
     }
-    tr:hover:not(.selected, .unique-reg-num, .duplicate-reg-num) {
-      // $gray1 at 75%
+    tr:hover:not(.selected) {
       background-color: #f1f3f5BF !important;
     }
   }
-  .v-data-table > .v-data-table__wrapper > table > tbody > th,
-  .v-data-table > .v-data-table__wrapper > table > thead > tr > th {
-    padding:12px !important;
-    vertical-align: bottom;
+
+  #mh-search-results-table.review-mode.results-table .v-data-table__wrapper table tbody {
+    tr.unique-reg-num:hover,
+    tr.duplicate-reg-num:hover {
+      background-color: transparent !important;
+    }
   }
 
   #mh-search-results-table.review-mode .unique-reg-num {
     .text-start {
       border-bottom: none;
       border-top: thin solid rgba(0, 0, 0, 0.12);
+
       .col-2 {
-        padding-bottom: 0 !important;
+        padding-bottom: 0;
       }
-      .v-messages {
-        display: none;
+
+      .v-input__slot {
+        margin-bottom: 0;
       }
-    }
-  }
-  #mh-search-results-table.review-mode .duplicate-reg-num {
-    td:not(:first-child) {
-      display: none;
-    }
-    .text-start * {
-      padding-top: 0;
-      padding-bottom: 0;
-      margin-top: 0;
-      margin-bottom: 0;
-      height:min-content !important;
-      vertical-align: middle;
-    }
-    :first-child{
-      border: none !important;
     }
   }
   #mh-search-results-table.review-mode .unique-reg-num:first-child {
     .text-start {
       border-top: none;
+    }
+  }
+  #mh-search-results-table.review-mode {
+
+    .mhr-number {
+      font-weight: bold;
+
+      u {
+        border-bottom: 1px dotted #000;
+        text-decoration: none;
+      }
+    }
+    .duplicate-reg-num {
+      td:not(:first-child) {
+        display: none;
+      }
+      td:first-child {
+        border: 0;
+        padding-top: 0;
+        padding-bottom: 20px;
+      }
+      td {
+        height: 40px;
+      }
+
+      border-top: none;
+
+      .text-start * {
+        padding-top: 0;
+        padding-bottom: 0;
+        margin-top: 0;
+        margin-bottom: 0;
+      }
     }
   }
 }

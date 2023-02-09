@@ -595,7 +595,7 @@ export const mhSearchSerialNumberHeaders: Array<BaseHeaderIF> = [
   {
     class: 'column-mds',
     sortable: false,
-    text: 'Registration Status',
+    text: 'Current Registration Status',
     value: 'status'
   },
   {
@@ -650,7 +650,7 @@ export const mhSearchMhrNumberHeaders: Array<BaseHeaderIF> = [
   {
     class: 'column-mds',
     sortable: false,
-    text: 'Registration Status',
+    text: 'Current Registration Status',
     value: 'status'
   },
   {

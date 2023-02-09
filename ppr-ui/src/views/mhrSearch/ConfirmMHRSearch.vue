@@ -20,9 +20,9 @@
           <h1>Review Selection(s)</h1>
           <div class="mt-6">
             <p class="ma-0">
-              Review the details of the manufactured home registration(s) before paying. Your search result will be
-              available in your Searches list for up to 14 days. <b>Note:</b> Search fees are charged per unique
-              manufactured home registration number.
+              Review the selected manufactured home registration(s) before paying. Your search result will be available
+              in your Searches list for up to 14 days. <b>Note : Search fees are charged per unique manufactured home
+              registration number.</b>
             </p>
           </div>
 
@@ -186,7 +186,9 @@ export default class ConfirmMHRSearch extends Vue {
   }
 
   private get combinedSearchFees (): AdditionalSearchFeeIF {
-    const searchQuantity = this.getSelectedManufacturedHomes?.filter(item => item.includeLienInfo === true).length
+    const searchQuantity = uniqBy(this.getSelectedManufacturedHomes, UIMHRSearchTypeValues.MHRMHR_NUMBER)
+      .filter(item => item.includeLienInfo === true)
+      .length
     return searchQuantity > 0
       ? {
         feeType: FeeSummaryTypes.MHR_COMBINED_SEARCH,
@@ -197,10 +199,9 @@ export default class ConfirmMHRSearch extends Vue {
 
   private get feeQuantity (): number {
     // Return selected quantity that is not a combination search
-    const filteredResults =
-      this.getSelectedManufacturedHomes.filter(result => result.selected && !result.includeLienInfo)
-    const uniqueRegNumRegistrations = uniqBy(filteredResults, UIMHRSearchTypeValues.MHRMHR_NUMBER)
-    return uniqueRegNumRegistrations.length
+    return uniqBy(this.getSelectedManufacturedHomes, UIMHRSearchTypeValues.MHRMHR_NUMBER)
+      .filter(result => result.selected && !result.includeLienInfo)
+      .length
   }
 
   private get staffPaymentData (): any {

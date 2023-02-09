@@ -688,7 +688,7 @@ export const mockedMHRSearchResults: mockMHRSearchResults = {
       },
       homeLocation: 'Victoria',
       includeLienInfo: false,
-      activeCount: 0,
+      activeCount: 1,
       exemptCount: 0,
       historicalCount: 0
     },
@@ -708,7 +708,7 @@ export const mockedMHRSearchResults: mockMHRSearchResults = {
       },
       homeLocation: 'Victoria',
       includeLienInfo: false,
-      activeCount: 0,
+      activeCount: 1,
       exemptCount: 0,
       historicalCount: 0
     },
@@ -728,7 +728,7 @@ export const mockedMHRSearchResults: mockMHRSearchResults = {
       },
       homeLocation: 'Victoria',
       includeLienInfo: false,
-      activeCount: 0,
+      activeCount: 3,
       exemptCount: 0,
       historicalCount: 0
     },
@@ -748,7 +748,7 @@ export const mockedMHRSearchResults: mockMHRSearchResults = {
       },
       homeLocation: 'Victoria',
       includeLienInfo: false,
-      activeCount: 0,
+      activeCount: 1,
       exemptCount: 0,
       historicalCount: 0
     }
