@@ -139,7 +139,7 @@
               ref="submittingPartyAddress"
               id="submitting-party-address"
               :schema="PartyAddressSchema"
-              :value="submittingParty.address"
+              :value="getMhrRegistrationSubmittingParty.address"
               :triggerErrors="validate"
               @valid="updateValidity($event)"
             />
@@ -160,7 +160,6 @@ import { SubmittingPartyTypes } from '@/enums'
 import { PartyAddressSchema } from '@/schemas'
 import { cloneDeep } from 'lodash'
 import { VueMaskDirective } from 'v-mask'
-import { mutateOriginalLengthTrust } from '@/store/mutations'
 import { fromDisplayPhone, toDisplayPhone } from '@/utils'
 
 /* eslint-enable no-unused-vars */
@@ -216,26 +215,7 @@ export default defineComponent({
       submittingPartyType: '',
       submittingPartyValid: false,
       addressValid: false,
-      submittingParty: {
-        personName: {
-          first: '',
-          last: '',
-          middle: ''
-        },
-        businessName: '',
-        emailAddress: '',
-        phoneNumber: '',
-        phoneExtension: '',
-        address: {
-          street: '',
-          streetAdditional: '',
-          city: '',
-          region: '',
-          country: '',
-          postalCode: '',
-          deliveryInstructions: ''
-        }
-      },
+      submittingParty: getMhrRegistrationSubmittingParty,
       isBusinessLookup: false,
       isPersonOption: computed((): boolean => {
         return localState.submittingPartyType === SubmittingPartyTypes.PERSON

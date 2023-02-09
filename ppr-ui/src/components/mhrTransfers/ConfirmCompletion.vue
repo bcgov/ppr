@@ -1,6 +1,6 @@
 <template>
   <div id="transfer-confirm">
-    <h2>2. Confirm</h2>
+    <h2>3. Confirm</h2>
     <p class="mt-2">
       The following information must be completed and confirmed before submitting this registration.
     </p>

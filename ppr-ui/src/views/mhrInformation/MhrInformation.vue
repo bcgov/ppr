@@ -97,7 +97,7 @@
                 </section>
 
                 <section id="transfer-ref-num-section" class="mt-10 py-4">
-                  <h2>1. Attention or Reference Number</h2>
+                  <h2>2. Attention or Reference Number</h2>
                   <p class="mt-2">
                     Add an optional Attention or Reference Number information for this transaction. If entered, it will
                     appear on the Transfer Verification document.
@@ -143,7 +143,7 @@
 
                 <section id="transfer-certify-section" class="mt-10 pt-4 pb-10">
                   <CertifyInformation
-                    :sectionNumber=3
+                    :sectionNumber=4
                     :setShowErrors="validateAuthorizationError"
                     @certifyValid="authorizationValid = $event"
                   />
