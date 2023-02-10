@@ -6,8 +6,9 @@
     </div>
     <div v-else>
       <p class="mt-3 mb-6">
-        Enter the interest type and fraction of the total ownership owned by Group {{groupId}}.
+        Enter the fraction of the total ownership owned by Group {{groupId}}.
         <br>For example, if there are four owner groups, this group could have 1/4 ownership.
+        The Interest Type is automatically set to "Undivided" for each group of owners.
       </p>
       <p class="mt-3 mb-6">
         <strong>Note:</strong> It is recommended that all groups use the same denominator for Total Available
@@ -21,6 +22,8 @@
         v-model="interestText"
         disabled
         :data-test-id="`interest-type-field-group-${groupId}`"
+        @mousedown.prevent
+        @mousemove.prevent
       />
       <div class="owner-fractions">
         <v-text-field
@@ -146,6 +149,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+@import '@/assets/styles/theme.scss';
 
 #mhr-home-ownership ::v-deep {
   p {
@@ -171,6 +175,10 @@ export default defineComponent({
 
   .theme--light.v-text-field--filled.v-input--is-disabled > .v-input__control > .v-input__slot {
     border-bottom: 1px dotted;
+  }
+
+  .theme--light.v-label--is-disabled {
+    color: $gray7!important;
   }
 }
 

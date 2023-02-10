@@ -18,7 +18,7 @@
       <div class="container pa-0 pt-4">
         <v-row no-gutters>
           <v-col cols="9">
-            <v-row no-gutters id="mhr-information-header" class="pt-3 pb-3 soft-corners-top">
+            <v-row no-gutters id="mhr-information-header" class="pt-3 soft-corners-top">
               <v-col cols="auto">
                 <h1>{{ isReviewMode ? 'Review and Confirm' : 'Manufactured Home Information' }}</h1>
                 <template v-if="!isReviewMode">
@@ -157,11 +157,19 @@
 
               <!-- MHR Information Section -->
               <template v-else>
+
+                <!-- Home Details Review -->
+                <div class="mt-n2">
+                  <YourHomeReview isTransferReview />
+                </div>
+
                 <!-- Home Location Review -->
-                <HomeLocationReview isTransferReview />
+                <div class="pt-4">
+                  <HomeLocationReview isTransferReview />
+                </div>
 
                 <!-- Home Owners Header -->
-                <header class="review-header mt-9 rounded-top">
+                <header class="review-header mt-10 rounded-top">
                   <img class="ml-1" src="@/assets/svgs/homeownersicon_reviewscreen.svg" />
                   <label class="font-weight-bold pl-2">Home Owners</label>
                 </header>
@@ -173,6 +181,7 @@
                   :validateTransfer="validate"
                   @isValidTransferOwners="isValidTransferOwners = $event"
                 />
+
                 <TransferDetails
                   v-if="hasUnsavedChanges"
                   ref="transferDetailsComponent"
@@ -217,6 +226,7 @@ import {
   ActionTypes,
   APIMHRMapSearchTypes,
   APISearchTypes,
+  HomeCertificationOptions,
   HomeLocationTypes,
   RouteNames,
   UIMHRSearchTypes
@@ -233,26 +243,27 @@ import {
   submitMhrTransfer,
   updateMhrDraft
 } from '@/utils'
-import { StickyContainer, CertifyInformation } from '@/components/common'
+import { CertifyInformation, StickyContainer } from '@/components/common'
 import { useHomeOwners, useInputRules, useMhrInformation } from '@/composables'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
-import { TransferDetails, TransferDetailsReview, ConfirmCompletion } from '@/components/mhrTransfers'
-import { HomeLocationReview } from '@/components/mhrRegistration/ReviewConfirm'
+import { ConfirmCompletion, TransferDetails, TransferDetailsReview } from '@/components/mhrTransfers'
+import { HomeLocationReview, YourHomeReview } from '@/components/mhrRegistration/ReviewConfirm'
 import { HomeOwners } from '@/views'
 import { BaseDialog } from '@/components/dialogs'
 import { BaseAddress } from '@/composables/address'
-import { unsavedChangesDialog, registrationSaveDraftError } from '@/resources/dialogOptions'
+import { registrationSaveDraftError, unsavedChangesDialog } from '@/resources/dialogOptions'
 import { cloneDeep } from 'lodash'
 import AccountInfo from '@/components/common/AccountInfo.vue'
 /* eslint-disable no-unused-vars */
 import {
   AccountInfoIF,
-  SubmittingPartyIF,
+  MhrHomeOwnerGroupIF,
+  MhrRegistrationDescriptionIF,
+  MhrRegistrationHomeLocationIF,
   MhrTransferApiIF,
   RegTableNewItemI,
-  MhrHomeOwnerGroupIF,
-  MhrRegistrationHomeLocationIF
+  SubmittingPartyIF
 } from '@/interfaces'
 /* eslint-enable no-unused-vars */
 
@@ -269,7 +280,8 @@ export default defineComponent({
     StickyContainer,
     CertifyInformation,
     AccountInfo,
-    ConfirmCompletion
+    ConfirmCompletion,
+    YourHomeReview
   },
   props: {
     appReady: {
@@ -314,7 +326,8 @@ export default defineComponent({
       setManufacturedHomeSearchResults,
       setLienType,
       setMhrLocation,
-      setIsManualLocation
+      setIsManualLocation,
+      setMhrHomeDescription
     } = useActions<any>([
       'setMhrTransferHomeOwnerGroups',
       'setMhrTransferCurrentHomeOwnerGroups',
@@ -326,7 +339,8 @@ export default defineComponent({
       'setManufacturedHomeSearchResults',
       'setLienType',
       'setMhrLocation',
-      'setIsManualLocation'
+      'setIsManualLocation',
+      'setMhrHomeDescription'
     ])
 
     const { setEmptyMhrTransfer } = useActions<any>(['setEmptyMhrTransfer'])
@@ -446,6 +460,9 @@ export default defineComponent({
     const parseMhrInformation = async (): Promise<void> => {
       const { data } = await fetchMhRegistration(getMhrInformation.value.mhrNumber)
 
+      const homeDetails = data?.description || {} // Safety check. Should always have description
+      await parseMhrHomeDetails(homeDetails)
+
       // Store existing MHR Home Location info
       const currentLocationInfo = data?.location || {} // Safety check. Should always have location
       await parseMhrLocationInfo(currentLocationInfo)
@@ -455,6 +472,17 @@ export default defineComponent({
 
       const currentOwnerGroups = data?.ownerGroups || [] // Safety check. Should always have ownerGroups
       await parseMhrHomeOwners(currentOwnerGroups)
+    }
+
+    const parseMhrHomeDetails = async (homeDetails: MhrRegistrationDescriptionIF): Promise<void> => {
+      for (const [key, value] of Object.entries(homeDetails)) {
+        setMhrHomeDescription({ key: key, value: value })
+      }
+
+      setMhrHomeDescription({
+        key: 'certificationOption',
+        value: homeDetails.csaNumber ? HomeCertificationOptions.CSA : HomeCertificationOptions.ENGINEER_INSPECTION
+      })
     }
 
     const parseMhrHomeOwners = async (ownerGroups: Array<MhrHomeOwnerGroupIF>): Promise<void> => {
