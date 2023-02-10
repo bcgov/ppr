@@ -123,7 +123,7 @@ class ReportMeta:  # pylint: disable=too-few-public-methods
         ReportTypes.COVER_PAGE_REPORT: {
             'reportDescription': 'CoverPage',
             'fileName': 'coverV2',
-            'metaTitle': 'Personal Property Registry',
+            'metaTitle': 'Personal Property Registry Financing Statement',
             'metaSubtitle': 'BC Registries and Online Services',
             'metaSubject': ''
         },

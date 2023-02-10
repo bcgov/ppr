@@ -70,7 +70,7 @@ TEST_FILTER_API_DATA = [
     ('TEST0', 'TEST-SA-00', None, None),
     ('TEST0', None, '2021-09-02T16:00:00+00:00', '2022-01-28T16:00:00+00:00')
 ]
-
+ 
 
 @pytest.mark.parametrize('desc,account_id,result_count,valid', TEST_REG_COUNT_DATA)
 def test_get_account_reg_count(session, desc, account_id, result_count, valid):
@@ -308,7 +308,7 @@ def test_find_all_by_account_id_filter(session, reg_num, reg_type, client_ref, r
         elif statement['registrationNumber'] not in ('TEST0019', 'TEST0021'):
             assert statement['registeringName']
             assert statement['clientReferenceId']
-        if statement['registrationNumber'] in ('TEST0001', 'TEST0019', 'TEST0021'):
+        if statement['registrationNumber'] in ('TEST0019', 'TEST0021'):
             assert not statement['path']
         else:
             assert statement['path']
@@ -372,7 +372,7 @@ def test_find_all_by_account_id_api_filter(session, reg_num, client_ref, start_t
         elif statement['registrationNumber'] not in ('TEST0019', 'TEST0021'):
             assert statement['registeringName']
             assert statement['clientReferenceId']
-        if statement['registrationNumber'] in ('TEST0001', 'TEST0019', 'TEST0021'):
+        if statement['registrationNumber'] in ('TEST0019', 'TEST0021'):
             assert not statement['path']
         else:
             assert statement['path']

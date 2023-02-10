@@ -190,6 +190,8 @@ class _Config():  # pylint: disable=too-few-public-methods
     GCP_CS_BUCKET_ID_VERIFICATION = os.getenv('GCP_CS_BUCKET_ID_VERIFICATION', 'ppr_verification_report_dev')
     # Storage of registration verification reports
     GCP_CS_BUCKET_ID_REGISTRATION = os.getenv('GCP_CS_BUCKET_ID_REGISTRATION', 'ppr_registration_report_dev')
+    # Storage of mail verification reports
+    GCP_CS_BUCKET_ID_MAIL = os.getenv('GCP_CS_BUCKET_ID_MAIL', 'ppr_mail_report_dev')
 
     # Search results data size threshold for real time reports.
     MAX_SIZE_SEARCH_RT: int = int(os.getenv('MAX_SIZE_SEARCH_RT', '650000'))

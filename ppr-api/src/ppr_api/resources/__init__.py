@@ -23,6 +23,7 @@ That are used to expose operational health information about the service, and me
 from flask import Blueprint
 from flask_restx import Api
 
+from .callbacks import API as CALLBACK_API
 from .drafts import API as DRAFT_API
 from .financing_statements import API as STATEMENT_API
 from .meta import API as META_API
@@ -67,6 +68,7 @@ API = Api(API_BLUEPRINT,
           authorizations=AUTHORIZATIONS)
 
 API.add_namespace(META_API, path='/meta')
+API.add_namespace(CALLBACK_API, path='/callbacks')
 API.add_namespace(DRAFT_API, path='/drafts')
 API.add_namespace(CLIENT_PARTY_API, path='/party-codes')
 API.add_namespace(SEARCH_API, path='/searches')

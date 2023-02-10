@@ -36,6 +36,7 @@ class DocumentTypes(str, Enum):
     SEARCH_RESULTS = 'SEARCH_RESULTS'
     VERIFICATION_MAIL = 'VERIFICATION_MAIL'
     REGISTRATION = 'REGISTRATION'
+    MAIL_DEFAULT = 'MAIL_DEFAULT'
 
 
 class StorageService(ABC):  # pylint: disable=too-few-public-methods
@@ -62,6 +63,7 @@ class GoogleStorageService(StorageService):  # pylint: disable=too-few-public-me
     GCP_BUCKET_ID = str(os.getenv('GCP_CS_BUCKET_ID'))
     GCP_BUCKET_ID_VERIFICATION = str(os.getenv('GCP_CS_BUCKET_ID_VERIFICATION'))
     GCP_BUCKET_ID_REGISTRATION = str(os.getenv('GCP_CS_BUCKET_ID_REGISTRATION'))
+    GCP_BUCKET_ID_MAIL = str(os.getenv('GCP_CS_BUCKET_ID_MAIL'))
     GCP_URL = str(os.getenv('GCP_CS_URL', 'https://storage.googleapis.com'))
     DOC_URL = GCP_URL + '/storage/v1/b/{bucket_id}/o/{name}'
     GET_DOC_URL = DOC_URL + '?alt=media'
@@ -118,10 +120,12 @@ class GoogleStorageService(StorageService):  # pylint: disable=too-few-public-me
         """Map the document type to a bucket ID. The default is GCP_BUCKET_ID."""
         if not doc_type or doc_type == DocumentTypes.SEARCH_RESULTS:
             return cls.GCP_BUCKET_ID
-        if doc_type == DocumentTypes.VERIFICATION_MAIL:
-            return cls.GCP_BUCKET_ID_VERIFICATION
         if doc_type == DocumentTypes.REGISTRATION:
             return cls.GCP_BUCKET_ID_REGISTRATION
+        if doc_type == DocumentTypes.MAIL_DEFAULT:
+            return cls.GCP_BUCKET_ID_MAIL
+        if doc_type == DocumentTypes.VERIFICATION_MAIL:
+            return cls.GCP_BUCKET_ID_VERIFICATION
         return cls.GCP_BUCKET_ID
 
     @classmethod
