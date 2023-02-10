@@ -43,7 +43,7 @@
       </v-row>
       <v-row v-else class="result-info">
         <v-col id="review-results-count" cols="auto">
-          <span class="divider pr-3">Matches selected: <b>{{ selectedMatchesLength }}</b></span>
+          <span class="divider pr-3">Matches Selected: <b>{{ selectedMatchesLength }}</b></span>
           <span class="divider px-3">Registrations: <b>{{ uniqueResults.length }}</b></span>
           <span class="pl-3">PPR Lien Searches Selected: <b>{{ uniqueResultsLienSelected.length }}</b></span>
         </v-col>
