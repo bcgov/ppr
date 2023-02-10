@@ -101,12 +101,8 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
   const getGroupTenancyType = (group: MhrRegistrationHomeOwnerGroupIF): HomeTenancyTypes => {
     const numOfOwnersInGroup = group.owners.filter(owner => owner.action !== ActionTypes.REMOVED).length
 
-    if (group.interestNumerator) {
-      return HomeTenancyTypes.COMMON
-    } else if (numOfOwnersInGroup > 1) {
+    if (numOfOwnersInGroup > 1) {
       return HomeTenancyTypes.JOINT
-    } else if (numOfOwnersInGroup === 1) {
-      return HomeTenancyTypes.SOLE
     } else {
       return HomeTenancyTypes.NA
     }
@@ -334,7 +330,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
         if (hasUndefinedGroups) {
           group = {
             ...group,
-            interest: '',
+            interest: 'Undivided',
             interestNumerator: null,
             interestDenominator: null,
             tenancySpecified: false

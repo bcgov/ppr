@@ -43,7 +43,7 @@
           <span class="px-4">Owners: {{ isRemovedHomeOwnerGroup(group) ? '0' : ownersCount }}</span>
           |
           <span class="px-4" :class="{ 'ml-1': !showEditActions }">
-            Group Tenancy Type: {{ isRemovedHomeOwnerGroup(group) ? 'N/A' : getHomeTenancyType() }}
+            Group Tenancy Type: {{ isRemovedHomeOwnerGroup(group) ? 'N/A' : getGroupTenancyType(group) }}
           </span>
           |
           <span class="px-4" :class="{ 'error-text': hasUndefinedInterest && !isRemovedHomeOwnerGroup(group) }">
@@ -202,7 +202,8 @@ export default defineComponent({
       undoGroupRemoval,
       hasUndefinedGroupInterest,
       getTransferOrRegistrationHomeOwnerGroups,
-      getHomeTenancyType
+      getHomeTenancyType,
+      getGroupTenancyType
     } = useHomeOwners(props.isMhrTransfer)
 
     const homeFractionalOwnershipForm = ref(null)
@@ -227,7 +228,7 @@ export default defineComponent({
     const openGroupForEditing = (): void => {
       localState.fractionalData = {
         type: localState.group?.type || '',
-        interest: localState.group?.interest || '',
+        interest: localState.group?.interest || 'Undivided',
         interestNumerator: localState.group?.interestNumerator || null,
         interestDenominator: localState.group?.interestDenominator || null,
         tenancySpecified: localState.group?.tenancySpecified || false
@@ -297,6 +298,7 @@ export default defineComponent({
       isAddedHomeOwnerGroup,
       undoGroupRemoval,
       getHomeTenancyType,
+      getGroupTenancyType,
       ...toRefs(localState)
     }
   }
