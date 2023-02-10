@@ -13,7 +13,7 @@
         </v-col>
         <v-col id="selected-results-count" cols="auto" class="pl-0">
           <span class="divider pr-3">
-            Matches selected: <b>{{ selectedMatchesLength }}</b>
+            Matches Selected: <b>{{ selectedMatchesLength }}</b>
           </span>
         </v-col>
         <v-col cols="auto" class="pl-0">
@@ -43,7 +43,7 @@
       </v-row>
       <v-row v-else class="result-info">
         <v-col id="review-results-count" cols="auto">
-          <span class="divider pr-3">Matches selected: <b>{{ selectedMatchesLength }}</b></span>
+          <span class="divider pr-3">Matches Selected: <b>{{ selectedMatchesLength }}</b></span>
           <span class="divider px-3">Registrations: <b>{{ uniqueResults.length }}</b></span>
           <span class="pl-3">PPR Lien Searches Selected: <b>{{ uniqueResultsLienSelected.length }}</b></span>
         </v-col>
@@ -115,11 +115,11 @@
             <v-checkbox
               id="select-all-lien-checkbox"
               class="header-checkbox ma-0 pa-0"
-              hide-details
               label="Include lien information for all selections"
               v-model="selectAllLien"
               :disabled="selectedMatchesLength === 0"
               @click="onSelectAllLienClick()"
+              hide-details
             />
           </template>
 
@@ -132,6 +132,7 @@
                 v-model="item.selected"
                 @click="onSelectionCheckboxClick(item)"
                 :label="isReviewMode ? getOwnerName(item) + ' ' + getOwnerCount(item) : getOwnerName(item) "
+                :ripple="false"
                 hide-details
               />
             </div>
@@ -146,6 +147,7 @@
                 v-model="item.selected"
                 @click="onSelectionCheckboxClick(item)"
                 :label="item.mhrNumber"
+                :ripple="false"
                 hide-details
               />
             </div>
@@ -195,8 +197,8 @@
               <v-checkbox
                 v-model="item.selected"
                 @click="onSelectionCheckboxClick(item)"
-                :ripple="false"
                 :label="item.activeCount > 1 ? `${item.serialNumber} (${item.activeCount})` : `${item.serialNumber}`"
+                :ripple="false"
                 hide-details
               />
             </div>
@@ -211,8 +213,8 @@
               <template v-slot:activator="{ on, attrs }">
                 <span  v-bind="attrs" v-on="on">
                   <v-checkbox
-                    :label="`${!isReviewMode ? 'Include lien' : 'Lien'} information`"
                     v-model="item.includeLienInfo"
+                    :label="`${!isReviewMode ? 'Include lien' : 'Lien'} information`"
                     :disabled="isReviewMode ? hasMhrNumberSelected(item.mhrNumber) : !item.selected"
                     :ripple="false"
                     hide-details
@@ -604,6 +606,10 @@ th {
 }
 .main-results-div {
   width: 100%;
+
+  .search-sub-title {
+    color: $gray7;
+  }
 }
 .no-results-info {
   color: $gray7 !important;
@@ -647,6 +653,7 @@ th {
     table th {
       padding-left: 12px;
       padding-right: 12px;
+      padding-bottom: 15px;
     }
   }
   .results-table .v-data-table__wrapper table tbody {
@@ -708,6 +715,10 @@ th {
     }
   }
   #mh-search-results-table.review-mode {
+
+    table th {
+      vertical-align: bottom;
+    }
 
     .mhr-number {
       font-weight: bold;
