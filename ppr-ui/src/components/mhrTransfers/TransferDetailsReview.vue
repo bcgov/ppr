@@ -34,22 +34,6 @@
           which they have a registered lease of 3 years or more.</span>
       </v-col>
     </v-row>
-    <div id="mhr-submitting-party">
-      <section id="mhr-add-submitting-party" class="mt-10">
-        <h2>1. Submitting Party for this Change</h2>
-        <p class="mt-2">
-          Provide the name and contact information for the person or business submitting this registration. You can add
-          the submitting party information manually, or, if the submitting party has a Personal Property Registry party
-          code, you can look up the party code or name.
-        </p>
-
-        <!-- Parties Look Up -->
-        <PartySearch isMhrPartySearch />
-
-        <!-- Mhr Submitting Party Form -->
-        <MhrSubmittingParty :validate="validateSubmitter" :class="{ 'border-error-left': validateSubmitter }" />
-      </section>
-    </div>
   </v-card>
 </template>
 
@@ -58,15 +42,11 @@ import { defineComponent } from '@vue/composition-api'
 import TransferDetails from '@/components/mhrTransfers/TransferDetails.vue'
 import { convertDate } from '@/utils'
 import { useGetters } from 'vuex-composition-helpers'
-import { MhrSubmittingParty } from '@/components/mhrRegistration/SubmittingParty'
-import { PartySearch } from '@/components/parties/party'
 
 export default defineComponent({
   name: 'TransferDetailsReview',
   components: {
-    TransferDetails,
-    MhrSubmittingParty,
-    PartySearch
+    TransferDetails
   },
   props: {
     isMhrTransfer: {
