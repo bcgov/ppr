@@ -44,7 +44,7 @@
       <v-row v-else class="result-info">
         <v-col id="review-results-count" cols="auto">
           <span class="divider pr-3">Matches Selected: <b>{{ selectedMatchesLength }}</b></span>
-          <span class="divider px-3">Registrations: <b>{{ uniqueResults.length }}</b></span>
+          <span class="divider px-3">Registrations: <b>{{ uniqueResultsSelected.length }}</b></span>
           <span class="pl-3">PPR Lien Searches Selected: <b>{{ uniqueResultsLienSelected.length }}</b></span>
         </v-col>
       </v-row>
@@ -299,6 +299,9 @@ export default defineComponent({
       results: [],
       groupedResults: [] as Object as { string: ManufacturedHomeSearchResultIF[] }, // results grouped by Mhr Number
       uniqueResults: [] as ManufacturedHomeSearchResultIF[],
+      uniqueResultsSelected: computed((): ManufacturedHomeSearchResultIF[] =>
+        uniqBy(localState.activeResults, UIMHRSearchTypeValues.MHRMHR_NUMBER).filter(item => item.selected)
+      ),
       uniqueResultsLienSelected: computed((): ManufacturedHomeSearchResultIF[] =>
         uniqBy(localState.results, UIMHRSearchTypeValues.MHRMHR_NUMBER)
           .filter(item => item.selected && item.includeLienInfo)
