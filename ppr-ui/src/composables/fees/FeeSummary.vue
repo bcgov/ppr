@@ -96,7 +96,7 @@
           </div>
         </li>
         <li
-          v-if="hasProcessingFee"
+          v-if="hasProcessingFee && isPPRFee"
           id="processing-fee-summary"
           :class="[$style['fee-container'], $style['fee-list__item'], 'pb-4', 'pr-4', 'py-4']"
           :key="feeSummary.processingFee"
@@ -115,7 +115,7 @@
           </div>
         </li>
         <li
-          v-else
+          v-else-if="isPPRFee"
           :class="[$style['fee-container'], $style['fee-list__item'], 'pb-4', 'pr-4', 'py-4']"
           :key="feeSummary.serviceFee"
         >
@@ -129,6 +129,29 @@
             No Fee
           </div>
           <div v-else :class="$style['fee-list__item-value']">
+            ${{ feeSummary.serviceFee.toFixed(2) }}
+          </div>
+        </li>
+        <li
+          v-else-if="hasProcessingFee && feeSummary.processingFee > 0"
+          id="processing-fee-summary"
+          :class="[$style['fee-container'], $style['fee-list__item'], 'pb-4', 'pr-4', 'py-4']"
+        >
+          <div :class="$style['fee-list__item-name']">
+            Staff Processing Fee
+          </div>
+          <div :class="$style['fee-list__item-value']">
+            ${{ feeSummary.processingFee.toFixed(2) }}
+          </div>
+        </li>
+        <li
+          v-else-if="feeSummary && feeSummary.serviceFee > 0"
+          :class="[$style['fee-container'], $style['fee-list__item'], 'pb-4', 'pr-4', 'py-4']"
+        >
+          <div :class="$style['fee-list__item-name']">
+            Service Fee
+          </div>
+          <div :class="$style['fee-list__item-value']">
             ${{ feeSummary.serviceFee.toFixed(2) }}
           </div>
         </li>
@@ -204,6 +227,14 @@ export default defineComponent({
       isValid: computed((): boolean => {
         return getLengthTrust.value.valid ||
           [FeeSummaryTypes.MHSEARCH, FeeSummaryTypes.NEW_MHR, FeeSummaryTypes.MHR_TRANSFER].includes(localState.feeType)
+      }),
+      isPPRFee: computed((): boolean => {
+        return [
+          FeeSummaryTypes.AMEND,
+          FeeSummaryTypes.DISCHARGE,
+          FeeSummaryTypes.NEW,
+          FeeSummaryTypes.RENEW
+        ].includes(localState.feeType)
       }),
       feeLabel: computed((): string => {
         return mapFeeTypeToDisplayName(localState.feeType)
