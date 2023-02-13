@@ -2,11 +2,11 @@
   <v-card flat id="mhr-registration-summary" class="mt-6">
     <header class="review-header">
       <v-icon class="ml-1" color="darkBlue">mdi-home</v-icon>
-      <label class="font-weight-bold pl-2">Your Home</label>
+      <label class="font-weight-bold pl-2">{{ isTransferReview ? 'Description of Home' : 'Your Home' }}</label>
     </header>
 
-    <div :class="{'border-error-left': !getStepValidation(MhrSectVal.YOUR_HOME_VALID)}">
-      <section class="mx-6 pt-8" v-if="!getStepValidation(MhrSectVal.YOUR_HOME_VALID)">
+    <div :class="{'border-error-left': !getStepValidation(MhrSectVal.YOUR_HOME_VALID)} && !isTransferReview">
+      <section class="mx-6 pt-8" v-if="!getStepValidation(MhrSectVal.YOUR_HOME_VALID) && !isTransferReview">
         <span>
           <v-icon color="error">mdi-information-outline</v-icon>
           <span class="error-text mx-1">This step is unfinished.</span>
@@ -126,33 +126,35 @@
         </section>
       </template>
 
-      <div class="px-4">
-        <v-divider />
-      </div>
+      <template v-if="!isTransferReview">
+        <div class="px-4">
+          <v-divider />
+        </div>
 
-      <!-- Rebuilt Status Review -->
-      <v-row no-gutters class="pa-6">
-        <v-col cols="3">
-          <h3>Rebuilt Status</h3>
-        </v-col>
-        <v-col cols="9">
-          <p v-html="formatAsHtml(getMhrRegistrationHomeDescription.rebuiltRemarks) || '(Not Entered)'"></p>
-        </v-col>
-      </v-row>
+        <!-- Rebuilt Status Review -->
+        <v-row no-gutters class="pa-6">
+          <v-col cols="3">
+            <h3>Rebuilt Status</h3>
+          </v-col>
+          <v-col cols="9">
+            <p v-html="formatAsHtml(getMhrRegistrationHomeDescription.rebuiltRemarks) || '(Not Entered)'"></p>
+          </v-col>
+        </v-row>
 
-      <div class="px-4">
-        <v-divider />
-      </div>
+        <div class="px-4">
+          <v-divider />
+        </div>
 
-      <!-- Other Information Review -->
-      <v-row no-gutters class="pa-6">
-        <v-col cols="3">
-          <h3>Other Information</h3>
-        </v-col>
-        <v-col cols="9">
-          <p v-html="formatAsHtml(getMhrRegistrationOtherInfo) || '(Not Entered)'"></p>
-        </v-col>
-      </v-row>
+        <!-- Other Information Review -->
+        <v-row no-gutters class="pa-6">
+          <v-col cols="3">
+            <h3>Other Information</h3>
+          </v-col>
+          <v-col cols="9">
+            <p v-html="formatAsHtml(getMhrRegistrationOtherInfo) || '(Not Entered)'"></p>
+          </v-col>
+        </v-row>
+      </template>
     </div>
   </v-card>
 </template>
@@ -170,7 +172,12 @@ export default defineComponent({
   components: {
     HomeSections
   },
-  props: {},
+  props: {
+    isTransferReview: {
+      type: Boolean,
+      default: false
+    }
+  },
   setup () {
     const {
       getMhrRegistrationHomeDescription,

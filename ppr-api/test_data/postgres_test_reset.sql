@@ -1,6 +1,8 @@
 -- Delete all test data created with the scripts in this directory.
 DELETE FROM verification_reports
   WHERE id >= 200000000;
+DELETE FROM mail_reports
+  WHERE id >= 200000000;
 DELETE FROM search_results
   WHERE search_id >= 200000000;
 DELETE FROM search_requests
