@@ -18,7 +18,7 @@ from http import HTTPStatus
 from flask import jsonify, current_app, request
 
 from ppr_api.exceptions import BusinessException, DatabaseException, ResourceErrorCodes
-from ppr_api.models import EventTracking, Party, Registration, utils as model_utils, VerificationReport
+from ppr_api.models import EventTracking, Party, Registration, utils as model_utils, VerificationReport, MailReport
 from ppr_api.models.registration import AccountRegistrationParams, CrownChargeTypes, MiscellaneousTypes, PPSATypes
 from ppr_api.services.authz import user_orgs, is_reg_staff_account, is_sbc_office_account, is_bcol_help
 from ppr_api.services.payment import TransactionTypes
@@ -577,6 +577,24 @@ def queue_secured_party_verification(registration: Registration):
                 msg = f'Queue secured party verification stmt skipped for id={registration_id}, partyId={party.id}.'
                 current_app.logger.info(msg)
             else:
+                # Setup mail report.
+                statement_type = model_utils.REG_CLASS_TO_STATEMENT_TYPE[registration.registration_type_cl]
+                reg_num_key = 'dischargeRegistrationNumber'
+                if statement_type == model_utils.DRAFT_TYPE_AMENDMENT:
+                    reg_num_key = 'amendmentRegistrationNumber'
+                report_data = registration.verification_json(reg_num_key)
+                cover_data = party.json
+                cover_data['statementType'] = statement_type
+                cover_data['partyType'] = party.party_type
+                cover_data['createDateTime'] = report_data['createDateTime']
+                cover_data['registrationNumber'] = registration.registration_num
+                report_data['cover'] = cover_data
+                mail_report: MailReport = MailReport(create_ts=registration.registration_ts,
+                                                     registration_id=registration_id,
+                                                     party_id=party.id,
+                                                     report_data=report_data)
+                mail_report.save()
+                current_app.logger.debug(f'queueing reg_id={registration_id} party id={party.id}')
                 enqueue_verification_report(registration_id, party.id)
     except Exception as err:  # noqa: B902; do not alter app processing
         msg = f'Queue secured party verification stmt failed for id={registration_id}: ' + str(err)

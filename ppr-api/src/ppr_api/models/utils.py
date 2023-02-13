@@ -568,6 +568,7 @@ ERR_SEARCH_COMPLETE = '{code}: search select results failed: results already pro
 ERR_SEARCH_NOT_FOUND = '{code}: search select results failed: invalid search ID {search_id}.'
 
 SEARCH_RESULTS_DOC_NAME = 'search-results-report-{search_id}.pdf'
+MAIL_DOC_NAME = 'PPRVER.{rep_date}.{registration_id}.{party_id}.PDF'
 GO_LIVE_DATE = date.fromisoformat('2022-01-25')
 
 
@@ -776,6 +777,15 @@ def get_search_doc_storage_name(search_request):
     """Get a search document storage name in the format YYYY/MM/DD/search-results-report-search_id.pdf."""
     name = search_request.search_ts.isoformat()[:10]
     name = name.replace('-', '/') + '/' + SEARCH_RESULTS_DOC_NAME.format(search_id=search_request.id)
+    return name
+
+
+def get_mail_doc_storage_name(registration_ts, registration_id, party_id):
+    """Get a document storage name in the format YYYY/MM/DD/PUBVER.YYYYMMDD.reg_id.party_id.PDF."""
+    iso_date: str = registration_ts.isoformat()[:10]
+    name = iso_date.replace('-', '/') + '/'
+    rep_date: str = iso_date.replace('-', '')
+    name += MAIL_DOC_NAME.format(rep_date=rep_date, registration_id=registration_id, party_id=party_id)
     return name
 
 

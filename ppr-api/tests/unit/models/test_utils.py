@@ -453,3 +453,13 @@ def test_search_doc_storage_name(session):
     test_name = test_name.replace('-', '/') + '/search-results-report-2000.pdf'
     name = model_utils.get_search_doc_storage_name(search)
     assert test_name == name
+
+
+def test_mail_doc_storage_name(session):
+    """Assert that building a mail storage document name works as expected."""
+    reg_ts = model_utils.now_ts()
+    test_date = reg_ts.isoformat()[:10]
+    test_name = test_date.replace('-', '/') + '/PPRVER.' + test_date.replace('-', '') + '.1000.2000.PDF'
+    search: SearchRequest = SearchRequest(id=2000, search_ts=model_utils.now_ts())
+    name = model_utils.get_mail_doc_storage_name(reg_ts, 1000, 2000)
+    assert test_name == name
