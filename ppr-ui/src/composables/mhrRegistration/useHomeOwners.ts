@@ -88,7 +88,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
       return HomeTenancyTypes.COMMON
     } else if (numOfOwners === 1 && owners[0]?.address) {
       // One owner without groups showing
-      // Added second condition, because when an owner exists as a Sole Ownership, editing and clicking Done,
+      // Added second condition, because when an owner exists as a Sole Owner, editing and clicking Done,
       // will change status to Tenants in Common unless above logic is in place..
       return HomeTenancyTypes.SOLE
     } else if (numOfOwners > 1) {

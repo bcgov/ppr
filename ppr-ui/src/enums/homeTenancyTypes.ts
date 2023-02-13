@@ -1,6 +1,6 @@
 export enum HomeTenancyTypes {
   JOINT = 'Joint Tenants',
-  SOLE = 'Sole Ownership',
+  SOLE = 'Sole Owner',
   COMMON = 'Tenants In Common',
   NA = 'N/A'
 }
