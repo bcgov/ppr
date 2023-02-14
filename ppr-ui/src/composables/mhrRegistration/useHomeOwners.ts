@@ -167,6 +167,9 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
         return { text: 'Group ' + groupNumber, value: (i + 1) }
       })
 
+    // Remove first group option when there is existing SO/JT
+    if (!showGroups.value && homeOwnerGroups.length) dropDownItems.shift()
+
     // Only return groups that have NOT been REMOVED
     return dropDownItems.filter(item => {
       return !removedOwners.find(group => group.groupId === item.value)

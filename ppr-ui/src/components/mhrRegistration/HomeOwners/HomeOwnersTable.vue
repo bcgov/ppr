@@ -35,7 +35,7 @@
             :groupNumber="getGroupNumberById(group)"
             :owners="hasActualOwners(items) ? items : []"
             :showEditActions="showEditActions"
-            :disableGroupHeader="false"
+            :disableGroupHeader="disableGroupHeader(group)"
             :isMhrTransfer="isMhrTransfer"
           />
         </td>

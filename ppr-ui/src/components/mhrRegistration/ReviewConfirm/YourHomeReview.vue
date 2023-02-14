@@ -126,35 +126,33 @@
         </section>
       </template>
 
-      <template v-if="!isTransferReview">
-        <div class="px-4">
-          <v-divider />
-        </div>
+      <div class="px-4">
+        <v-divider />
+      </div>
 
-        <!-- Rebuilt Status Review -->
-        <v-row no-gutters class="pa-6">
-          <v-col cols="3">
-            <h3>Rebuilt Status</h3>
-          </v-col>
-          <v-col cols="9">
-            <p v-html="formatAsHtml(getMhrRegistrationHomeDescription.rebuiltRemarks) || '(Not Entered)'"></p>
-          </v-col>
-        </v-row>
+      <!-- Rebuilt Status Review -->
+      <v-row no-gutters class="pa-6">
+        <v-col cols="3">
+          <h3>Rebuilt Status</h3>
+        </v-col>
+        <v-col cols="9">
+          <p v-html="formatAsHtml(getMhrRegistrationHomeDescription.rebuiltRemarks) || '(Not Entered)'"></p>
+        </v-col>
+      </v-row>
 
-        <div class="px-4">
-          <v-divider />
-        </div>
+      <div class="px-4">
+        <v-divider />
+      </div>
 
-        <!-- Other Information Review -->
-        <v-row no-gutters class="pa-6">
-          <v-col cols="3">
-            <h3>Other Information</h3>
-          </v-col>
-          <v-col cols="9">
-            <p v-html="formatAsHtml(getMhrRegistrationOtherInfo) || '(Not Entered)'"></p>
-          </v-col>
-        </v-row>
-      </template>
+      <!-- Other Information Review -->
+      <v-row no-gutters class="pa-6">
+        <v-col cols="3">
+          <h3>Other Information</h3>
+        </v-col>
+        <v-col cols="9">
+          <p v-html="formatAsHtml(getMhrRegistrationOtherInfo) || '(Not Entered)'"></p>
+        </v-col>
+      </v-row>
     </div>
   </v-card>
 </template>
