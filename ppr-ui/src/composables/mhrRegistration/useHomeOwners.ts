@@ -151,6 +151,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
 
     const homeOwnerGroups = getTransferOrRegistrationHomeOwnerGroups()
     const removedOwners = homeOwnerGroups.filter(group => group.action === ActionTypes.REMOVED)
+    const activeOwners = homeOwnerGroups.filter(group => group.action !== ActionTypes.REMOVED)
 
     if (isAddingHomeOwner) {
       numOfAdditionalGroupsInDropdown = 1
@@ -159,23 +160,17 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
         find(homeOwnerGroups, { groupId: groupId })?.owners.length > 1 ? 1 : 0
     }
 
-    if (showGroups.value) {
-      const dropDownItems = Array(homeOwnerGroups.length + numOfAdditionalGroupsInDropdown)
-        .fill({})
-        .map((v, i) => {
-          return { text: 'Group ' + (i + 1), value: (i + 1) }
-        })
+    const dropDownItems = Array(homeOwnerGroups.length + numOfAdditionalGroupsInDropdown)
+      .fill({})
+      .map((v, i) => {
+        const groupNumber = (activeOwners.findIndex(group => group.groupId === i + 1) + 1) || activeOwners.length + 1
+        return { text: 'Group ' + groupNumber, value: (i + 1) }
+      })
 
-      // Only return groups that have NOT been REMOVED
-      return dropDownItems.filter(item => !removedOwners.find(group => group.groupId === item.value))
-    } else {
-      return [
-        {
-          text: 'Group 1',
-          value: DEFAULT_GROUP_ID
-        }
-      ]
-    }
+    // Only return groups that have NOT been REMOVED
+    return dropDownItems.filter(item => {
+      return !removedOwners.find(group => group.groupId === item.value)
+    })
   }
 
   const getGroupForOwner = (ownerId: number): MhrRegistrationHomeOwnerGroupIF => {
@@ -226,7 +221,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
       : setMhrRegistrationHomeOwnerGroups(homeOwnerGroups)
   }
 
-  const editHomeOwner = (updatedOwner: MhrRegistrationHomeOwnerIF, newGroupId: number) => {
+  const editHomeOwner = (updatedOwner: MhrRegistrationHomeOwnerIF, groupId: number) => {
     const homeOwnerGroups = isMhrTransfer
       ? [...getMhrTransferHomeOwnerGroups.value]
       : [...getMhrRegistrationHomeOwnerGroups.value]
@@ -236,10 +231,14 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
       group => group.groupId === groupIdOfOwner
     ) as MhrRegistrationHomeOwnerGroupIF
 
-    if (groupToUpdate.groupId === newGroupId) {
+    if (groupToUpdate.groupId === groupId) {
       // need to update owner in the same group
       const i = findIndex(groupToUpdate.owners, { ownerId: updatedOwner.ownerId })
       set(groupToUpdate, `owners[${i}]`, updatedOwner)
+
+      if (groupToUpdate.owners.every(owner => owner.action === ActionTypes.REMOVED)) {
+        set(groupToUpdate, 'action', ActionTypes.REMOVED)
+      }
 
       isMhrTransfer
         ? setMhrTransferHomeOwnerGroups(homeOwnerGroups)
@@ -247,7 +246,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
     } else {
       // need to move the owner to new group
       remove(groupToUpdate.owners, owner => owner.ownerId === updatedOwner.ownerId)
-      addOwnerToTheGroup(updatedOwner, newGroupId)
+      addOwnerToTheGroup(updatedOwner, groupId)
     }
   }
 
