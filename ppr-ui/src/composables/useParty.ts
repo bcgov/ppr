@@ -21,11 +21,7 @@ export const useParty = () => {
 
   const getFormattedBirthdate = (party: PartyIF): string => {
     if (party.birthDate) {
-      let date = new Date(party.birthDate)
-      // prod hotfix to check if browser does not support locales
-      if (!(date instanceof Date && !isNaN(date.valueOf()))) {
-        date = new Date(party.birthDate.substring(0, party.birthDate.indexOf('T')))
-      }
+      const date = new Date(party.birthDate)
       return (
         date.toLocaleString('default', { month: 'long' }) +
         ' ' +

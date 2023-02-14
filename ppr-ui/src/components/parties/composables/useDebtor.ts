@@ -105,9 +105,11 @@ export const useDebtor = (props, context) => {
         parseInt(localState.day)
       )
       if (dateOfBirth instanceof Date && !isNaN(dateOfBirth.valueOf())) {
-        // eslint-disable-line
-        localState.currentDebtor.birthDate = dateOfBirth.toLocaleDateString(
-          'en-CA', { timeZone: 'America/Vancouver' }).substring(0, 10) + 'T00:00:00-08:00'
+        const localYear = dateOfBirth.toLocaleDateString('en-CA', { year: 'numeric' })
+        const localMonth = dateOfBirth.toLocaleDateString('en-CA', { month: '2-digit' })
+        const localDay = dateOfBirth.toLocaleDateString('en-CA', { day: '2-digit' })
+
+        localState.currentDebtor.birthDate = [localYear, localMonth, localDay].join('-') + 'T00:00:00-08:00'
       } else {
         localState.currentDebtor.birthDate = null
         if (localState.originalDebtor && !localState.originalDebtor.birthDate) {
