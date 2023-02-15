@@ -120,7 +120,7 @@
             :errorMsg="surrenderDateMessage || ''"
             :initialValue="surrenderDate"
             :key="datePickerKey"
-            :minDate="dateToYyyyMmDd(minSurrenderDate)"
+            :minDate="localTodayDate(minSurrenderDate)"
             :persistentHint="true"
             @emitDate="surrenderDate = $event"
             @emitCancel="surrenderDate = ''"
@@ -147,7 +147,7 @@ import { useGetters, useActions } from 'vuex-composition-helpers'
 import { DatePicker } from '@bcrs-shared-components/date-picker'
 // local
 import { LengthTrustIF } from '@/interfaces' // eslint-disable-line no-unused-vars
-import { convertDate, formatExpiryDate } from '@/utils'
+import { convertDate, formatExpiryDate, localTodayDate } from '@/utils'
 import { APIRegistrationTypes } from '@/enums'
 
 export default defineComponent({
@@ -265,17 +265,6 @@ export default defineComponent({
       })
     })
 
-    const dateToYyyyMmDd = (date: Date): string => {
-      const dateStr = date.toLocaleDateString('en-CA', {
-        timeZone: 'America/Vancouver',
-        month: 'numeric', // 12
-        day: 'numeric', // 31
-        year: 'numeric' // 2020
-      })
-
-      return dateStr
-    }
-
     const validLienAmount = (val: string): boolean => {
       if (!val || val === '') {
         return false
@@ -336,7 +325,7 @@ export default defineComponent({
 
     return {
       APIRegistrationTypes,
-      dateToYyyyMmDd,
+      localTodayDate,
       registrationType,
       modal,
       ...toRefs(localState)
