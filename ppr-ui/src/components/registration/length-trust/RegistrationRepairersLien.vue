@@ -265,17 +265,6 @@ export default defineComponent({
       })
     })
 
-    // const dateToYyyyMmDd = (date: Date): string => {
-    //   const dateStr = date.toLocaleDateString('en-CA', {
-    //     timeZone: 'America/Vancouver',
-    //     month: 'numeric', // 12
-    //     day: 'numeric', // 31
-    //     year: 'numeric' // 2020
-    //   })
-
-    //   return dateStr
-    // }
-
     const validLienAmount = (val: string): boolean => {
       if (!val || val === '') {
         return false
