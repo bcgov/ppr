@@ -70,7 +70,7 @@
                   <v-checkbox
                     class="mt-2"
                     id="certify-checkbox"
-                    label="Make this a Certified Search ($25.00)"
+                    label="Make this a Certified search (add $25.00)"
                     @change="setSearchCertified($event)"
                   />
                 </v-col>
