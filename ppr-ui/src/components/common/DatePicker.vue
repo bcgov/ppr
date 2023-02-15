@@ -59,6 +59,7 @@
 </template>
 
 <script lang="ts">
+import { localTodayDate } from '@/utils/date-helper'
 import {
   computed,
   defineComponent,
@@ -83,10 +84,7 @@ export default defineComponent({
         const todayDate = new Date()
         return todayDate.toISOString().substring(0, 8)
       }),
-      today: computed(() => {
-        const todayDate = new Date()
-        return todayDate.toLocaleDateString('en-CA')
-      })
+      today: computed(() => localTodayDate())
     })
     const emitDateRange = (): void => {
       if (

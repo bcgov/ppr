@@ -158,3 +158,10 @@ export function dateToPacificDate (date: Date, longMonth = false, showWeekday = 
 
   return dateStr
 }
+
+export function localTodayDate (date: Date = new Date()): string {
+  const localYear = date.toLocaleDateString('en-CA', { year: 'numeric' })
+  const localMonth = date.toLocaleDateString('en-CA', { month: '2-digit' })
+  const localDay = date.toLocaleDateString('en-CA', { day: '2-digit' })
+  return [localYear, localMonth, localDay].join('-')
+}

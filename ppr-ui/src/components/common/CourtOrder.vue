@@ -189,7 +189,7 @@ import { DatePicker } from '@bcrs-shared-components/date-picker'
 // local
 import { APIRegistrationTypes } from '@/enums'
 import { CourtOrderIF } from '@/interfaces' // eslint-disable-line no-unused-vars
-import { convertDate } from '@/utils'
+import { convertDate, localTodayDate } from '@/utils'
 import { useCourtOrderValidation } from './composables'
 
 export default defineComponent({
@@ -269,14 +269,14 @@ export default defineComponent({
       minCourtDate: computed((): string => {
         if (registrationType === APIRegistrationTypes.REPAIRERS_LIEN) {
           const minDate = new Date(getRegistrationCreationDate.value)
-          return minDate.toLocaleDateString('en-CA', { timeZone: 'America/Vancouver' })
+          return localTodayDate(minDate)
         } else {
           return '0'
         }
       }),
       maxCourtDate: computed((): string => {
-        const maxDate = new Date()
-        return maxDate.toLocaleDateString('en-CA', { timeZone: 'America/Vancouver' })
+        const maxDate = localTodayDate()
+        return maxDate
       }),
       fileNumberMessage: computed((): string => {
         if (localState.fileNumber.length > 20) {
@@ -394,7 +394,7 @@ export default defineComponent({
         if (localState.courtOrderInfo.orderDate?.length > 10) {
           // convert back to local iso date string
           const orderDate = new Date(localState.courtOrderInfo.orderDate)
-          localState.orderDate = orderDate.toLocaleDateString('en-CA', { timeZone: 'America/Vancouver' })
+          localState.orderDate = localTodayDate(orderDate)
         } else {
           localState.orderDate = localState.courtOrderInfo.orderDate
         }
