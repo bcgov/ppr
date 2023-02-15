@@ -105,9 +105,11 @@ export const useDebtor = (props, context) => {
         parseInt(localState.day)
       )
       if (dateOfBirth instanceof Date && !isNaN(dateOfBirth.valueOf())) {
-        // eslint-disable-line
-        localState.currentDebtor.birthDate = dateOfBirth.toLocaleDateString(
-          'en-CA', { timeZone: 'America/Vancouver' }).substring(0, 10) + 'T00:00:00-08:00'
+        const localYear = dateOfBirth.toLocaleDateString('en-CA', { year: 'numeric' })
+        const localMonth = dateOfBirth.toLocaleDateString('en-CA', { month: '2-digit' })
+        const localDay = dateOfBirth.toLocaleDateString('en-CA', { day: '2-digit' })
+
+        localState.currentDebtor.birthDate = [localYear, localMonth, localDay].join('-') + 'T00:00:00-08:00'
       } else {
         localState.currentDebtor.birthDate = null
         if (localState.originalDebtor && !localState.originalDebtor.birthDate) {
@@ -122,8 +124,12 @@ export const useDebtor = (props, context) => {
     // format the original birthdate the exact same before the compare
     if (localState.originalDebtor.birthDate && localState.originalDebtor.birthDate.length > 10) {
       const originalDateOfBirth = new Date(localState.originalDebtor.birthDate)
-      localState.originalDebtor.birthDate = originalDateOfBirth.toLocaleDateString(
-        'en-CA', { timeZone: 'America/Vancouver' }).substring(0, 10) + 'T00:00:00-08:00'
+
+      const localYear = originalDateOfBirth.toLocaleDateString('en-CA', { year: 'numeric' })
+      const localMonth = originalDateOfBirth.toLocaleDateString('en-CA', { month: '2-digit' })
+      const localDay = originalDateOfBirth.toLocaleDateString('en-CA', { day: '2-digit' })
+
+      localState.originalDebtor.birthDate = [localYear, localMonth, localDay].join('-') + 'T00:00:00-08:00'
     }
     // if they didn't change anything, just exit
     if ((localState.registrationFlowType === RegistrationFlowType.AMENDMENT) &&
