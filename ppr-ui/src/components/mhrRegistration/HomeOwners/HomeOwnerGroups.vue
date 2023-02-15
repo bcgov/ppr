@@ -11,7 +11,7 @@
         Leave this empty if you have <b>only one owner</b>, or <b>one group of owners</b> (sole
         ownership or joint tenancy).
       </li>
-    </ul>{{groupItems}}
+    </ul>
     <v-select
       id="home-owner-groups"
       ref="groupDropdown"
@@ -26,7 +26,7 @@
       @click:clear="removeGroupDropdownValidation === true && groupDropdown.blur()"
       :menu-props="{ bottom: true, offsetY: true }"
       data-test-id="owner-group-select"
-    />
+    ></v-select>
 
     <div v-if="showFractionalOwnership">
       <v-row>

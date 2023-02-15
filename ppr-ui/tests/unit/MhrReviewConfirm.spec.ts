@@ -159,6 +159,6 @@ describe('Mhr Review Confirm registration', () => {
     expect(homeOwnersTable.text()).toContain(mockedPerson.phoneNumber)
     expect(homeOwnersTable.text()).toContain(mockedPerson.phoneExtension)
     expect(homeOwnersTable.text()).toContain(mockedPerson.address.city)
-    expect(homeOwnersTable.text()).toContain(HomeTenancyTypes.COMMON)
+    expect(homeOwnersTable.text()).toContain(HomeTenancyTypes.NA)
   })
 })

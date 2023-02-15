@@ -103,6 +103,8 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
 
     if (numOfOwnersInGroup > 1) {
       return HomeTenancyTypes.JOINT
+    } else if (getHomeTenancyType() === HomeTenancyTypes.SOLE) {
+      return HomeTenancyTypes.SOLE
     } else {
       return HomeTenancyTypes.NA
     }
@@ -169,6 +171,9 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
 
     // Remove first group option when there is existing SO/JT
     if (!showGroups.value && homeOwnerGroups.length) dropDownItems.shift()
+
+    // Handle Edit Defaults
+    if (!dropDownItems.length) return [{ text: 'Group 1', value: DEFAULT_GROUP_ID }]
 
     // Only return groups that have NOT been REMOVED
     return dropDownItems.filter(item => {
