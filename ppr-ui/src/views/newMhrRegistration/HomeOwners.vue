@@ -23,7 +23,7 @@
 
         <SimpleHelpToggle toggleButtonTitle="Help with Owners" class="my-6">
           <h3 class="text-center mb-2">Help with Owners</h3>
-          <h4>Sole Ownership</h4>
+          <h4>Sole Owner</h4>
           <p>
             This applies when the home is owned by a single individual or
             organization.

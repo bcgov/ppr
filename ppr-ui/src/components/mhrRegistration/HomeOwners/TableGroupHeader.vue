@@ -37,19 +37,28 @@
         >
           <b>ADDED</b>
         </v-chip>
-        <span :class="{'removed-owner-group': isRemovedHomeOwnerGroup(group)}">
-          <span class="pr-4 font-weight-bold group-id" :class="{ 'pl-8': !showEditActions }">Group {{ groupId }}</span>
+        <span
+          v-if="!(isMhrTransfer && isRemovedHomeOwnerGroup(group))"
+          :class="{'removed-owner-group': isRemovedHomeOwnerGroup(group)}"
+        >
+          <span class="pr-4 font-weight-bold group-id" :class="{ 'pl-8': !showEditActions }">
+            Group {{ groupNumber }}
+          </span>
           |
           <span class="px-4">Owners: {{ isRemovedHomeOwnerGroup(group) ? '0' : ownersCount }}</span>
           |
           <span class="px-4" :class="{ 'ml-1': !showEditActions }">
-            Group Tenancy Type: {{ isRemovedHomeOwnerGroup(group) ? 'N/A' : getHomeTenancyType() }}
+            Group Tenancy Type: {{ isRemovedHomeOwnerGroup(group) ? 'N/A' : getGroupTenancyType(group) }}
           </span>
           |
           <span class="px-4" :class="{ 'error-text': hasUndefinedInterest && !isRemovedHomeOwnerGroup(group) }">
             Interest: {{ isRemovedHomeOwnerGroup(group) ? 'N/A' : getOwnershipInterest() }}
           </span>
         </span>
+        <span
+          v-else
+          class="font-weight-bold removed-owner-group"
+          :class="{ 'ml-3' : !showEditActions }">Previous Owners</span>
       </div>
 
       <!-- Default Actions -->
@@ -183,6 +192,7 @@ export default defineComponent({
   name: 'TableGroupHeader',
   props: {
     groupId: { default: 1 },
+    groupNumber: { default: 1 },
     owners: { default: [] },
     showEditActions: { type: Boolean, default: true },
     isMhrTransfer: { type: Boolean, default: false },
@@ -202,7 +212,8 @@ export default defineComponent({
       undoGroupRemoval,
       hasUndefinedGroupInterest,
       getTransferOrRegistrationHomeOwnerGroups,
-      getHomeTenancyType
+      getHomeTenancyType,
+      getGroupTenancyType
     } = useHomeOwners(props.isMhrTransfer)
 
     const homeFractionalOwnershipForm = ref(null)
@@ -227,7 +238,7 @@ export default defineComponent({
     const openGroupForEditing = (): void => {
       localState.fractionalData = {
         type: localState.group?.type || '',
-        interest: localState.group?.interest || '',
+        interest: localState.group?.interest || 'Undivided',
         interestNumerator: localState.group?.interestNumerator || null,
         interestDenominator: localState.group?.interestDenominator || null,
         tenancySpecified: localState.group?.tenancySpecified || false
@@ -297,6 +308,7 @@ export default defineComponent({
       isAddedHomeOwnerGroup,
       undoGroupRemoval,
       getHomeTenancyType,
+      getGroupTenancyType,
       ...toRefs(localState)
     }
   }
@@ -320,6 +332,7 @@ export default defineComponent({
   }
   .removed-owner-group {
     opacity: .4;
+    color: $gray9 !important;
   }
 }
 </style>

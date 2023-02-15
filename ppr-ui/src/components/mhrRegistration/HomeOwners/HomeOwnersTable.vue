@@ -32,6 +32,7 @@
         >
           <TableGroupHeader
             :groupId="group"
+            :groupNumber="getGroupNumberById(group)"
             :owners="hasActualOwners(items) ? items : []"
             :showEditActions="showEditActions"
             :disableGroupHeader="disableGroupHeader(group)"
@@ -401,6 +402,12 @@ export default defineComponent({
       return hasNoOwners && index === 0
     }
 
+    const getGroupNumberById = (groupId: number): number => {
+      const activeOwnerGroups = getTransferOrRegistrationHomeOwnerGroups()
+        .filter(group => group.action !== ActionTypes.REMOVED)
+      return (activeOwnerGroups.findIndex(group => group.groupId === groupId)) + 1
+    }
+
     watch(() => localState.currentlyEditingHomeOwnerId, () => {
       setGlobalEditingMode(localState.isEditingMode)
     })
@@ -437,6 +444,7 @@ export default defineComponent({
       isAddedHomeOwnerGroup,
       disableGroupHeader,
       isGroupWithNoOwners,
+      getGroupNumberById,
       getTransferOrRegistrationHomeOwners,
       getTransferOrRegistrationHomeOwnerGroups,
       ...toRefs(localState)

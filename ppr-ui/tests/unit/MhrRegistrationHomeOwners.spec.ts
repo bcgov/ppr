@@ -301,11 +301,12 @@ describe('Home Owners', () => {
 
     const homeOwnerGroup = [
       {
-        groupId: 2,
+        groupId: 1,
         owners: [mockedOrganization],
         interest: 'Undivided',
         interestNumerator: 123,
-        interestDenominator: 432
+        interestDenominator: 432,
+        type: 'SOLE'
       }
     ] as MhrRegistrationHomeOwnerGroupIF[]
 
@@ -336,7 +337,8 @@ describe('Home Owners', () => {
     await clickDoneAddOwner()
 
     const ownersTable = wrapper.findComponent(HomeOwners).findComponent(HomeOwnersTable)
-    expect(ownersTable.text()).not.toContain('Group 1')
+    expect(ownersTable.text()).toContain('Group 1')
+    expect(ownersTable.text()).toContain('N/A')
     expect(ownersTable.text()).toContain(mockedOrganization.organizationName)
     expect(ownersTable.text()).toContain(mockedOrganization.phoneNumber)
   })
@@ -344,11 +346,12 @@ describe('Home Owners', () => {
   it('should keep the Group shown after clearing dropdown but then clicking Cancel', async () => {
     const homeOwnerGroup = [
       {
-        groupId: 123,
+        groupId: 1,
         owners: [mockedPerson],
         interest: 'Undivided',
         interestNumerator: 111,
-        interestDenominator: 777
+        interestDenominator: 777,
+        type: 'SOLE'
       }
     ] as MhrRegistrationHomeOwnerGroupIF[]
 
@@ -375,17 +378,17 @@ describe('Home Owners', () => {
     await clickCancelAddOwner()
 
     const ownersTable = wrapper.findComponent(HomeOwners).findComponent(HomeOwnersTable)
-    expect(ownersTable.text()).toContain('Group 123')
+    expect(ownersTable.text()).toContain('Group 1')
     expect(ownersTable.text()).toContain(mockedPerson.individualName.first)
     expect(ownersTable.text()).toContain(mockedPerson.individualName.last)
     expect(ownersTable.text()).toContain(mockedPerson.phoneNumber)
-    ownersTable.findComponent(TableGroupHeader).vm.$data.cancelOrProceed(true, '123')
+    ownersTable.findComponent(TableGroupHeader).vm.$data.cancelOrProceed(true, '1')
   })
 
   it('should show correct error messages when deleting Owners from the Home Owners table', async () => {
     // Should show 'Group must contain at least one owner' when there are no Owners in a Group
     // Should show 'No owners added yet' when there are no Owners and no Groups
-    const GROUP_ID = 12
+    const GROUP_ID = 1
 
     const homeOwnerGroup = [
       {
