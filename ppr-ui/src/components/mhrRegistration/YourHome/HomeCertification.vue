@@ -105,8 +105,7 @@ import { SharedDatePicker } from '@/components/common'
 import { HomeCertificationOptions } from '@/enums'
 import { useInputRules, useMhrValidations } from '@/composables'
 import { useActions, useGetters } from 'vuex-composition-helpers'
-import { createUtcDate, dateToYyyyMmDd } from '@/utils'
-import { localTodayDate } from '@/utils/date-helper'
+import { createUtcDate, localTodayDate } from '@/utils/date-helper'
 
 export default defineComponent({
   name: 'HomeCertification',
@@ -185,7 +184,7 @@ export default defineComponent({
       minDate: computed(() => {
         // Determined by YEAR value in Manufacturers, Make, Model Section
         const utcDate = createUtcDate(getMhrRegistrationHomeDescription.value?.baseInformation.year, 0, 1)
-        return dateToYyyyMmDd(utcDate)
+        return localTodayDate(utcDate)
       })
     })
 
