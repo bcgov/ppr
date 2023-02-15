@@ -106,6 +106,7 @@ import { HomeCertificationOptions } from '@/enums'
 import { useInputRules, useMhrValidations } from '@/composables'
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import { createUtcDate, dateToYyyyMmDd } from '@/utils'
+import { localTodayDate } from '@/utils/date-helper'
 
 export default defineComponent({
   name: 'HomeCertification',
@@ -180,10 +181,7 @@ export default defineComponent({
         return (localState.isCsaOption && localState.isCsaValid) ||
           (localState.isEngineerOption && localState.isEngineerValid && !!localState.engineerDate)
       }),
-      today: computed(() => {
-        const todayDate = new Date()
-        return todayDate.toLocaleDateString('en-CA')
-      }),
+      today: computed(() => localTodayDate()),
       minDate: computed(() => {
         // Determined by YEAR value in Manufacturers, Make, Model Section
         const utcDate = createUtcDate(getMhrRegistrationHomeDescription.value?.baseInformation.year, 0, 1)
