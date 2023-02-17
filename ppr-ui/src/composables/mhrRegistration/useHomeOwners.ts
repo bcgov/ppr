@@ -376,6 +376,19 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
   }
 
   /**
+   * Return the group number as it correlates to its current place in the active owners.
+   * Will return the groupId when editing or a new groupId when creating a new group.
+   * @param groupId The groups identifier
+   */
+  const getGroupNumberById = (groupId: number): number => {
+    const activeOwnerGroups = getTransferOrRegistrationHomeOwnerGroups()
+      .filter(group => group.action !== ActionTypes.REMOVED)
+
+    return (activeOwnerGroups.findIndex(group => group.groupId === groupId)) + 1 ||
+      (!!groupId && !activeOwnerGroups.length) ? groupId : activeOwnerGroups.length + 1
+  }
+
+  /**
    * Utility method to calculate least common multiple.
    * @param numbers - an array of numbers to compute the lcm from.
    * @returns number - the least common multiple of the given numbers.
@@ -451,6 +464,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
     getGroupDropdownItems,
     getGroupForOwner,
     getGroupById,
+    getGroupNumberById,
     setShowGroups,
     setGlobalEditingMode,
     deleteGroup,

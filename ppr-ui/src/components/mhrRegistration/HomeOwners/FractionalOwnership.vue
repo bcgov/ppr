@@ -6,7 +6,7 @@
     </div>
     <div v-else>
       <p class="mt-3 mb-6">
-        Enter the fraction of the total ownership owned by Group {{groupId}}.
+        Enter the fraction of the total ownership owned by Group {{ getGroupNumberById(groupId) }}.
         <br>For example, if there are four owner groups, this group could have 1/4 ownership.
         The Interest Type is automatically set to "Undivided" for each group of owners.
       </p>
@@ -65,15 +65,10 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable no-unused-vars */
-import { MhrRegistrationHomeOwnerIF } from '@/interfaces'
-/* eslint-enable no-unused-vars */
-
 import { computed, defineComponent, reactive, toRefs } from '@vue/composition-api'
 import { useInputRules } from '@/composables/useInputRules'
 import { toTitleCase } from '@/utils'
-
-let DEFAULT_OWNER_ID = 1
+import { useHomeOwners } from '@/composables'
 
 export default defineComponent({
   name: 'FractionalOwnership',
@@ -82,11 +77,6 @@ export default defineComponent({
       type: Number,
       required: true
     },
-    editHomeOwner: {
-      type: Object as () => MhrRegistrationHomeOwnerIF,
-      default: null
-    },
-    showEditBtn: { type: Boolean, default: true },
     isReadOnly: { type: Boolean, default: false },
     fractionalData: {
       type: Object,
@@ -98,13 +88,14 @@ export default defineComponent({
         tenancySpecified: null
       },
       required: true
-    }
+    },
+    isMhrTransfer: { type: Boolean, default: false }
   },
   setup (props) {
     const { customRules, required, isNumber, greaterThan, lessThan, isLettersOnly } = useInputRules()
+    const { getGroupNumberById } = useHomeOwners(props.isMhrTransfer)
 
     const localState = reactive({
-      id: props.editHomeOwner?.ownerId || (DEFAULT_OWNER_ID++).toString(),
       interestText: computed(() =>
         toTitleCase(props.fractionalData.interest)
       ),
@@ -144,6 +135,7 @@ export default defineComponent({
 
     return {
       isLettersOnly,
+      getGroupNumberById,
       ...toRefs(localState)
     }
   }
