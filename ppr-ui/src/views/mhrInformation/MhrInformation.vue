@@ -92,7 +92,24 @@
                   <v-divider class="mx-7 ma-0"></v-divider>
                   <TransferDetailsReview class="py-6 pt-4 px-8" />
                 </section>
-                <section id="transfer-submitting-party" class="submitting-party">
+                <section v-if="isRoleStaffReg" id="staff-transfer-submitting-party" class="submitting-party">
+                  <h2>1. Submitting Party for this Change</h2>
+                  <p class="mt-2 mb-6">
+                    Provide the name and contact information for the person or business submitting this registration.
+                    You can add the submitting party information manually, or, if the submitting party has a Personal
+                    Property Registry party code, you can look up the party code or name.
+                  </p>
+
+                  <PartySearch isMhrPartySearch />
+
+                  <MhrSubmittingParty
+                    :validate="validateSubmittingParty"
+                    :class="{ 'border-error-left': validateSubmittingParty }"
+                    @isValid="isSubmittingPartyValid = $event"
+                    :content="{ mailAddressInfo: 'Registry documents, if any, will be mailed to this address.' }"
+                  />
+                </section>
+                <section v-else id="transfer-submitting-party" class="submitting-party">
                   <AccountInfo
                     title="Submitting Party for this Change"
                     tooltipContent="The default Submitting Party is based on your BC Registries
@@ -102,7 +119,7 @@
                 </section>
 
                 <section id="transfer-ref-num-section" class="mt-10 py-4">
-                  <h2>1. Attention or Reference Number</h2>
+                  <h2>{{ isRoleStaffReg ? '2.' : '1.'}} Attention or Reference Number</h2>
                   <p class="mt-2">
                     Add an optional Attention or Reference Number information for this transaction. If entered, it will
                     appear on the Transfer Verification document.
@@ -140,6 +157,7 @@
 
                 <section id="transfer-confirm-section" class="mt-10 transfer-confirm">
                   <ConfirmCompletion
+                    :sectionNumber="isRoleStaffReg ? 3 : 2"
                     :legalName="getCertifyInformation.legalName"
                     :setShowErrors="validateConfirmCompletion"
                     @confirmCompletion="isCompletionConfirmed = $event"
@@ -148,7 +166,7 @@
 
                 <section id="transfer-certify-section" class="mt-10 pt-4 pb-10">
                   <CertifyInformation
-                    :sectionNumber=3
+                    :sectionNumber="isRoleStaffReg ? 4 : 3"
                     :setShowErrors="validateAuthorizationError"
                     @certifyValid="authorizationValid = $event"
                   />
@@ -247,6 +265,8 @@ import { CertifyInformation, StickyContainer } from '@/components/common'
 import { useHomeOwners, useInputRules, useMhrInformation } from '@/composables'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
+import { PartySearch } from '@/components/parties/party'
+import { MhrSubmittingParty } from '@/components/mhrRegistration/SubmittingParty'
 import { ConfirmCompletion, TransferDetails, TransferDetailsReview } from '@/components/mhrTransfers'
 import { HomeLocationReview, YourHomeReview } from '@/components/mhrRegistration/ReviewConfirm'
 import { HomeOwners } from '@/views'
@@ -273,6 +293,8 @@ export default defineComponent({
     BaseAddress,
     BaseDialog,
     HomeOwners,
+    PartySearch,
+    MhrSubmittingParty,
     TransferDetails,
     TransferDetailsReview,
     HomeLocationReview,
@@ -302,6 +324,7 @@ export default defineComponent({
       getCertifyInformation,
       hasUnsavedChanges,
       hasLien,
+      isRoleStaffReg,
       isRoleQualifiedSupplier,
       getMhrTransferSubmittingParty
     } = useGetters<any>([
@@ -311,6 +334,7 @@ export default defineComponent({
       'getCertifyInformation',
       'hasUnsavedChanges',
       'hasLien',
+      'isRoleStaffReg',
       'isRoleQualifiedSupplier',
       'getMhrTransferSubmittingParty'
     ])
@@ -371,6 +395,8 @@ export default defineComponent({
       isTransferDetailsFormValid: false,
       refNumValid: false,
       authorizationValid: false,
+      isSubmittingPartyValid: false,
+      validateSubmittingParty: computed((): boolean => localState.validate && !localState.isSubmittingPartyValid),
       validateConfirmCompletion: false,
       validateAuthorizationError: false,
       accountInfo: null,
@@ -387,10 +413,12 @@ export default defineComponent({
       }),
       isValidTransfer: computed((): boolean => {
         // is valid on first step
-        return !isGlobalEditingMode.value &&
+        return (
+          !isGlobalEditingMode.value &&
           localState.isValidTransferOwners &&
           localState.isTransferDetailsFormValid &&
           !hasLien.value
+        )
       }),
       isValidTransferReview: computed((): boolean => {
         // is valid on review step
@@ -416,7 +444,7 @@ export default defineComponent({
       }),
       /** True if Jest is running the code. */
       isJestRunning: computed((): boolean => {
-        return (process.env.JEST_WORKER_ID !== undefined)
+        return process.env.JEST_WORKER_ID !== undefined
       }),
       attentionReference: '',
       isCompletionConfirmed: false,
@@ -443,7 +471,7 @@ export default defineComponent({
       await parseMhrInformation()
 
       // When not a draft Transfer, force no unsaved changes after loading current owners
-      !getMhrInformation.value.draftNumber && await setUnsavedChanges(false)
+      !getMhrInformation.value.draftNumber && (await setUnsavedChanges(false))
 
       localState.accountInfo = await getAccountInformation()
       parseSubmittingPartyInfo()
@@ -557,7 +585,7 @@ export default defineComponent({
         scrollToTop
           ? document.getElementById('mhr-information-header').scrollIntoView({ behavior: 'smooth' })
           : document.getElementsByClassName('border-error-left').length > 0 &&
-        document.getElementsByClassName('border-error-left')[0].scrollIntoView({ behavior: 'smooth' })
+            document.getElementsByClassName('border-error-left')[0].scrollIntoView({ behavior: 'smooth' })
       }, 10)
     }
 
@@ -762,6 +790,7 @@ export default defineComponent({
       quickMhrSearch,
       handleDialogResp,
       hasLien,
+      isRoleStaffReg,
       getMhrTransferSubmittingParty,
       ...toRefs(localState)
     }
@@ -772,7 +801,7 @@ export default defineComponent({
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
 .sticky-container {
-  z-index: 4!important;
+  z-index: 4 !important;
 }
 
 #important-message {

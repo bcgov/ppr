@@ -131,7 +131,12 @@
           <!-- Mailing Address -->
           <article class="pt-4 pr-1">
             <label class="generic-label" for="submitting-party-address">Mailing Address</label>
-            <p class="py-1">Verification of Service registration document and decals will be mailed to this address.</p>
+            <p v-if="content.mailAddressInfo" class="py-1">
+              {{ content.mailAddressInfo }}
+            </p>
+            <p v-else class="py-1">
+              Verification of Service registration document and decals will be mailed to this address.
+            </p>
 
             <base-address
               editing
@@ -160,13 +165,14 @@ import { SubmittingPartyTypes } from '@/enums'
 import { PartyAddressSchema } from '@/schemas'
 import { cloneDeep } from 'lodash'
 import { VueMaskDirective } from 'v-mask'
-import { mutateOriginalLengthTrust } from '@/store/mutations'
 import { fromDisplayPhone, toDisplayPhone } from '@/utils'
+import { ContentIF } from '@/interfaces'
 
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
   name: 'MhrSubmittingParty',
+  emits: ['isValid'],
   components: {
     BaseAddress
   },
@@ -174,7 +180,8 @@ export default defineComponent({
     validate: {
       type: Boolean,
       default: false
-    }
+    },
+    content: Object as () => ContentIF
   },
   directives: {
     mask: VueMaskDirective
@@ -346,6 +353,7 @@ export default defineComponent({
     })
 
     watch(() => localState.isSubmitterValid, (val: boolean) => {
+      context.emit('isValid', val)
       setValidation(MhrSectVal.SUBMITTING_PARTY_VALID, MhrCompVal.SUBMITTER_VALID, val)
     })
 
