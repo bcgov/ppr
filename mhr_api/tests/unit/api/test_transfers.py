@@ -24,7 +24,7 @@ from flask import current_app
 from registry_schemas.example_data.mhr import TRANSFER
 
 from mhr_api.models import MhrRegistration
-from mhr_api.models.type_tables import MhrPartyTypes
+from mhr_api.models.type_tables import MhrPartyTypes, MhrRegistrationTypes
 from mhr_api.services.authz import MHR_ROLE, STAFF_ROLE, COLIN_ROLE, \
                                    TRANSFER_DEATH_JT, TRANSFER_SALE_BENEFICIARY
 from tests.unit.services.utils import create_header, create_header_account
@@ -75,9 +75,9 @@ def test_create(session, client, jwt, desc, mhr_num, roles, status, account):
     elif desc == 'Invalid non-staff missing declared value':
         del json_data['declaredValue']
     elif desc == 'Invalid transfer death role':
-        json_data['deathOfOwner'] = True
+        json_data['registrationType'] = MhrRegistrationTypes.TRANS
     elif desc == 'Valid staff death':
-        json_data['deathOfOwner'] = True
+        json_data['registrationType'] = MhrRegistrationTypes.TRAND
         for group in json_data.get('addOwnerGroups'):
             for owner in group.get('owners'):
                 owner['partyType'] = MhrPartyTypes.EXECUTOR

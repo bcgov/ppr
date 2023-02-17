@@ -21,6 +21,7 @@ from sqlalchemy.sql import text
 from mhr_api.exceptions import DatabaseException
 from mhr_api.models import utils as model_utils
 from mhr_api.models.db import db
+from mhr_api.models.type_tables import MhrRegistrationTypes
 
 
 # Account registration request parameters to support sorting and filtering.
@@ -145,3 +146,11 @@ def get_owner_group_count(base_reg) -> int:
         if reg.owner_groups:
             count += len(reg.owner_groups)
     return count
+
+
+def is_transfer_due_to_death(reg_type: str) -> bool:
+    """Return if the registration type is a type of Transfer Due to Death."""
+    return reg_type in (MhrRegistrationTypes.TRANS_ADMIN,
+                        MhrRegistrationTypes.TRANS_AFFIDAVIT,
+                        MhrRegistrationTypes.TRANS_WILL,
+                        MhrRegistrationTypes.TRAND)

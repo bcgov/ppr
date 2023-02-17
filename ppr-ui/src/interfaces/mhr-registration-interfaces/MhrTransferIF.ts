@@ -34,7 +34,6 @@ export interface MhrTransferApiIF {
   deleteOwnerGroups?: Array<MhrHomeOwnerGroupIF>
   addOwnerGroups: Array<MhrHomeOwnerGroupIF>
   createDateTime?: string
-  deathOfOwner?: boolean
   payment?: PaymentIF
   error?: ErrorIF
   draftNumber?: string

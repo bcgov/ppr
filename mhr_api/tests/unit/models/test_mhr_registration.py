@@ -569,7 +569,7 @@ def test_create_transfer_death_from_json(session, mhr_num, user_group, account_i
     del json_data['documentDescription']
     del json_data['createDateTime']
     del json_data['payment']
-    json_data['deathOfOwner'] = True
+    json_data['registrationType'] = MhrRegistrationTypes.TRAND
     json_data['mhrNumber'] = mhr_num
     for group in json_data.get('addOwnerGroups'):
         if tenancy_type:

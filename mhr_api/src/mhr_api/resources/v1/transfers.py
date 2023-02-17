@@ -25,6 +25,7 @@ from mhr_api.exceptions import BusinessException, DatabaseException
 from mhr_api.services.authz import authorized_role, is_staff, is_all_staff_account, get_group
 from mhr_api.services.authz import TRANSFER_SALE_BENEFICIARY, TRANSFER_DEATH_JT
 from mhr_api.models import MhrRegistration
+from mhr_api.models import registration_utils as model_reg_utils
 from mhr_api.reports.v2.report_utils import ReportTypes
 from mhr_api.resources import utils as resource_utils, registration_utils as reg_utils
 from mhr_api.services.payment import TransactionTypes
@@ -48,10 +49,12 @@ def post_transfers(mhr_number: str):  # pylint: disable=too-many-return-statemen
             return resource_utils.account_required_response()
         # Verify request JWT role
         request_json = request.get_json(silent=True)
-        if not request_json.get('deathOfOwner') and not authorized_role(jwt, TRANSFER_SALE_BENEFICIARY):
+        if not model_reg_utils.is_transfer_due_to_death(request_json.get('registrationType')) and \
+                not authorized_role(jwt, TRANSFER_SALE_BENEFICIARY):
             current_app.logger.error('User not staff or missing required role: ' + TRANSFER_SALE_BENEFICIARY)
             return resource_utils.unauthorized_error_response(account_id)
-        if request_json.get('deathOfOwner') and not authorized_role(jwt, TRANSFER_DEATH_JT):
+        if model_reg_utils.is_transfer_due_to_death(request_json.get('registrationType')) and \
+                not authorized_role(jwt, TRANSFER_DEATH_JT):
             current_app.logger.error('User not staff or missing required role: ' + TRANSFER_DEATH_JT)
             return resource_utils.unauthorized_error_response(account_id)
 

@@ -93,7 +93,6 @@ DRAFT_TRANSFER = {
         'status': 'ACTIVE'
       }
     ],
-    'deathOfOwner': False
   }
 }
 # testdata pattern is ({account_id}, {has_results}, {draft_num}, {mhr_num}, {reg_type})

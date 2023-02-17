@@ -642,7 +642,7 @@ def validate_owner_party_type(json_data,  # pylint: disable=too-many-branches
                               active_group_count: int):
     """Verify owner groups are valid."""
     error_msg = ''
-    owner_death: bool = json_data.get('deathOfOwner', False)
+    owner_death: bool = reg_utils.is_transfer_due_to_death(json_data.get('registrationType'))
     if not groups:
         return error_msg
     for group in groups:
@@ -660,6 +660,7 @@ def validate_owner_party_type(json_data,  # pylint: disable=too-many-branches
                                                  MhrPartyTypes.TRUSTEE):
                     party_count += 1
                 if not new and owner_death:
+                    # PartyType and description of owner partyType required for TDTD
                     if not party_type or party_type not in (MhrPartyTypes.ADMINISTRATOR, MhrPartyTypes.EXECUTOR,
                                                             MhrPartyTypes.TRUST, MhrPartyTypes.TRUSTEE):
                         error_msg += PARTY_TYPE_INVALID
