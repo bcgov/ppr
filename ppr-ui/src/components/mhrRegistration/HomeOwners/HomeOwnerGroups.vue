@@ -51,6 +51,7 @@
         :groupId="ownerGroupId"
         :fractionalData="fractionalData"
         :isReadOnly="groupState.isReadonly && isDefinedGroup"
+        :isMhrTransfer="isMhrTransfer"
       />
     </div>
   </div>

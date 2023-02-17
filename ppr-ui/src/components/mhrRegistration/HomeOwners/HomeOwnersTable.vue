@@ -274,6 +274,7 @@ export default defineComponent({
       getGroupById,
       undoGroupRemoval,
       getHomeTenancyType,
+      getGroupNumberById,
       hasRemovedAllHomeOwners,
       hasUndefinedGroupInterest,
       getTotalOwnershipAllocationStatus,
@@ -400,12 +401,6 @@ export default defineComponent({
         group.interestDenominator && group.owners.filter(owner => owner.action !== ActionTypes.REMOVED).length === 0
 
       return hasNoOwners && index === 0
-    }
-
-    const getGroupNumberById = (groupId: number): number => {
-      const activeOwnerGroups = getTransferOrRegistrationHomeOwnerGroups()
-        .filter(group => group.action !== ActionTypes.REMOVED)
-      return (activeOwnerGroups.findIndex(group => group.groupId === groupId)) + 1
     }
 
     watch(() => localState.currentlyEditingHomeOwnerId, () => {
