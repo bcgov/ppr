@@ -92,7 +92,6 @@ DRAFT_TRANSFER = {
         'status': 'ACTIVE'
       }
     ],
-    'deathOfOwner': False
   }
 }
 

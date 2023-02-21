@@ -19,7 +19,7 @@ from flask import current_app
 
 from mhr_api.exceptions import BusinessException, DatabaseException, ResourceErrorCodes
 from mhr_api.models import utils as model_utils
-from mhr_api.models.type_tables import MhrTenancyTypes, MhrPartyTypes
+from mhr_api.models.type_tables import MhrTenancyTypes, MhrPartyTypes, MhrRegistrationTypes
 from mhr_api.models import db
 
 from .descript import Db2Descript
@@ -215,7 +215,10 @@ class Db2Manuhome(db.Model):
         manuhome.reg_documents = [doc]
         # Document type specific from now on.
         if doc.document_type in (Db2Document.DocumentTypes.TRAND,
-                                 Db2Document.DocumentTypes.TRANS):
+                                 Db2Document.DocumentTypes.TRANS,
+                                 Db2Document.DocumentTypes.TRANS_ADMIN,
+                                 Db2Document.DocumentTypes.TRANS_AFFIDAVIT,
+                                 Db2Document.DocumentTypes.TRANS_WILL):
             current_app.logger.debug('Db2Manuhome.find_by_document_id Db2Owngroup query.')
             # manuhome.reg_owner_groups = Db2Owngroup.find_all_by_manuhome_id(manuhome.id)
             all_groups = Db2Owngroup.find_all_by_manuhome_id(manuhome.id)
@@ -317,7 +320,11 @@ class Db2Manuhome(db.Model):
         if doc_json.get('attentionReference'):
             man_home['attentionReference'] = doc_json.get('attentionReference')
         current_app.logger.info(f'json document_type=${doc.document_type}$')
-        if doc.document_type in (Db2Document.DocumentTypes.TRANS, Db2Document.DocumentTypes.TRAND):
+        if doc.document_type in (Db2Document.DocumentTypes.TRANS,
+                                 Db2Document.DocumentTypes.TRAND,
+                                 Db2Document.DocumentTypes.TRANS_ADMIN,
+                                 Db2Document.DocumentTypes.TRANS_AFFIDAVIT,
+                                 Db2Document.DocumentTypes.TRANS_WILL):
             add_groups = []
             delete_groups = []
             existing_count: int = 0
@@ -625,9 +632,18 @@ class Db2Manuhome(db.Model):
         manuhome.update_date = now_local.date()
         manuhome.update_time = now_local.time()
         manuhome.update_count = manuhome.update_count + 1
-        doc_type = Db2Document.DocumentTypes.TRANS
-        if reg_json.get('deathOfOwner'):
+        # Get doc_type from registrationType
+        reg_type = reg_json.get('registrationType')
+        if reg_type == MhrRegistrationTypes.TRANS_ADMIN:
+            doc_type = Db2Document.DocumentTypes.TRANS_ADMIN
+        elif reg_type == MhrRegistrationTypes.TRANS_AFFIDAVIT:
+            doc_type = Db2Document.DocumentTypes.TRANS_AFFIDAVIT
+        elif reg_type == MhrRegistrationTypes.TRANS_WILL:
+            doc_type = Db2Document.DocumentTypes.TRANS_WILL
+        elif reg_type == MhrRegistrationTypes.TRAND:
             doc_type = Db2Document.DocumentTypes.TRAND
+        else:
+            doc_type = Db2Document.DocumentTypes.TRANS
         # Create document
         manuhome.reg_documents.append(Db2Document.create_from_registration(registration,
                                                                            reg_json,

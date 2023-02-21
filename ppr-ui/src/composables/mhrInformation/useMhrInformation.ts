@@ -114,8 +114,7 @@ export const useMhrInformation = () => {
         })
       },
       addOwnerGroups: await parseOwnerGroups(isDraft),
-      deleteOwnerGroups: await parseRemovedOwnerGroups(),
-      deathOfOwner: false
+      deleteOwnerGroups: await parseRemovedOwnerGroups()
     }
 
     return data

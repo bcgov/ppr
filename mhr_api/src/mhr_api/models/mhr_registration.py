@@ -80,12 +80,18 @@ REG_TO_DOC_TYPE = {
     'PERMIT': 'REG_103',
     'PERMIT_EXTENSION': 'REG_103E',
     'TRAND': 'DEAT',
-    'TRANS': 'TRAN'
+    'TRANS': 'TRAN',
+    'TRANS_AFFIDAVIT': 'AFFE',
+    'TRANS_ADMIN': 'LETA',
+    'TRANS_WILL': 'WILL'
 }
 FROM_LEGACY_REGISTRATION_TYPE = {
     '101': 'MHREG',
     'TRAN': 'TRANS',
     'DEAT': 'TRAND',
+    'AFFE': 'TRANS_AFFIDAVIT',
+    'LETA': 'TRANS_ADMIN',
+    'WILL': 'TRANS_WILL',
     '102': 'DECAL_REPLACE',
     '103': 'PERMIT',
     '103E': 'PERMIT_EXTENSION',
@@ -285,7 +291,11 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                 manuhome: Db2Manuhome = Db2Manuhome.create_from_registration(self, self.reg_json)
                 manuhome.save()
                 self.manuhome = manuhome
-            elif self.registration_type in (MhrRegistrationTypes.TRAND, MhrRegistrationTypes.TRANS):
+            elif self.registration_type in (MhrRegistrationTypes.TRAND,
+                                            MhrRegistrationTypes.TRANS,
+                                            MhrRegistrationTypes.TRANS_ADMIN,
+                                            MhrRegistrationTypes.TRANS_AFFIDAVIT,
+                                            MhrRegistrationTypes.TRANS_WILL):
                 self.manuhome = Db2Manuhome.create_from_transfer(self, self.reg_json)
                 self.manuhome.save_transfer()
             elif self.registration_type in (MhrRegistrationTypes.EXEMPTION_RES, MhrRegistrationTypes.EXEMPTION_NON_RES):
@@ -573,8 +583,8 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         registration.doc_id = reg_vals.doc_id
         registration.doc_pkey = reg_vals.doc_pkey
         registration.registration_ts = model_utils.now_ts()
-        if json_data.get('deathOfOwner'):
-            registration.registration_type = MhrRegistrationTypes.TRAND
+        if json_data.get('registrationType'):
+            registration.registration_type = json_data.get('registrationType')
         else:
             registration.registration_type = MhrRegistrationTypes.TRANS
         registration.status_type = MhrRegistrationStatusTypes.ACTIVE

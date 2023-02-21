@@ -32,6 +32,9 @@ class Db2Document(db.Model):
         MHREG_TRIM = '101'
         TRAND = 'DEAT'
         TRANS = 'TRAN'
+        TRANS_AFFIDAVIT = 'AFFE'
+        TRANS_ADMIN = 'LETA'
+        TRANS_WILL = 'WILL'
         NON_RES_EXEMPTION = 'EXNR'
         RES_EXEMPTION = 'EXRS'
         PERMIT = '103 '
@@ -327,7 +330,11 @@ class Db2Document(db.Model):
             doc.client_reference_id = registration.client_reference_id[0:30]
         else:
             doc.client_reference_id = ''
-        if doc_type in (Db2Document.DocumentTypes.TRANS, Db2Document.DocumentTypes.TRAND):
+        if doc_type in (Db2Document.DocumentTypes.TRANS,
+                        Db2Document.DocumentTypes.TRAND,
+                        Db2Document.DocumentTypes.TRANS_ADMIN,
+                        Db2Document.DocumentTypes.TRANS_AFFIDAVIT,
+                        Db2Document.DocumentTypes.TRANS_WILL):
             if reg_json.get('transferDate'):
                 doc.transfer_execution_date = model_utils.date_from_iso_format(str(reg_json['transferDate'])[0:10])
             else:

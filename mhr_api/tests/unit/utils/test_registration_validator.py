@@ -21,7 +21,7 @@ from registry_schemas.example_data.mhr import REGISTRATION, TRANSFER, EXEMPTION
 
 from mhr_api.utils import registration_validator as validator
 from mhr_api.models import MhrRegistration
-from mhr_api.models.type_tables import MhrRegistrationStatusTypes, MhrTenancyTypes, MhrDocumentTypes, MhrLocationTypes
+from mhr_api.models.type_tables import MhrRegistrationStatusTypes, MhrTenancyTypes, MhrDocumentTypes, MhrLocationTypes, MhrRegistrationTypes
 from mhr_api.models.type_tables import MhrPartyTypes
 from mhr_api.models.utils import is_legacy
 
@@ -828,7 +828,7 @@ def test_validate_transfer_death(session, desc, valid, party_type1, party_type2,
     json_data['deleteOwnerGroups'][0]['groupId'] = 2
     json_data['deleteOwnerGroups'][0]['type'] = 'JOINT'
     if desc != 'No death invalid party type':
-        json_data['deathOfOwner'] = True
+        json_data['registrationType'] = MhrRegistrationTypes.TRAND
     json_data['addOwnerGroups'] = copy.deepcopy(add_group)
     json_data['addOwnerGroups'][0]['type'] = 'NA'
     owners = json_data['addOwnerGroups'][0]['owners']
@@ -852,6 +852,101 @@ def test_validate_transfer_death(session, desc, valid, party_type1, party_type2,
         if message_content:
             assert error_msg.find(message_content) != -1
 
+@pytest.mark.parametrize('desc,valid,party_type1,party_type2,text,add_group,message_content', TEST_TRANSFER_DEATH_DATA)
+def test_validate_transfer_admin(session, desc, valid, party_type1, party_type2, text, add_group, message_content):
+    """Assert that MH transfer due to death validation of owner groups works as expected."""
+    # setup
+    json_data = copy.deepcopy(TRANSFER)
+    json_data['deleteOwnerGroups'][0]['groupId'] = 2
+    json_data['deleteOwnerGroups'][0]['type'] = 'JOINT'
+    if desc != 'No death invalid party type':
+        json_data['registrationType'] = MhrRegistrationTypes.TRANS_AFFIDAVIT
+    json_data['addOwnerGroups'] = copy.deepcopy(add_group)
+    json_data['addOwnerGroups'][0]['type'] = 'NA'
+    owners = json_data['addOwnerGroups'][0]['owners']
+    if text:
+        owners[0]['description'] = text
+        owners[1]['description'] = text
+    if party_type1:
+        owners[0]['partyType'] = party_type1
+    if party_type2:
+        owners[1]['partyType'] = party_type2
+    valid_format, errors = schema_utils.validate(json_data, 'transfer', 'mhr')
+    # Additional validation not covered by the schema.
+    registration: MhrRegistration = MhrRegistration.find_by_mhr_number('045349', 'PS12345')
+    error_msg = validator.validate_transfer(registration, json_data, False)
+    if errors:
+        current_app.logger.debug(errors)
+    if valid:
+        assert valid_format and error_msg == ''
+    else:
+        assert error_msg != ''
+        if message_content:
+            assert error_msg.find(message_content) != -1
+    
+@pytest.mark.parametrize('desc,valid,party_type1,party_type2,text,add_group,message_content', TEST_TRANSFER_DEATH_DATA)
+def test_validate_transfer_affidavit(session, desc, valid, party_type1, party_type2, text, add_group, message_content):
+    """Assert that MH transfer due to death validation of owner groups works as expected."""
+    # setup
+    json_data = copy.deepcopy(TRANSFER)
+    json_data['deleteOwnerGroups'][0]['groupId'] = 2
+    json_data['deleteOwnerGroups'][0]['type'] = 'JOINT'
+    if desc != 'No death invalid party type':
+        json_data['registrationType'] = MhrRegistrationTypes.TRANS_AFFIDAVIT
+    json_data['addOwnerGroups'] = copy.deepcopy(add_group)
+    json_data['addOwnerGroups'][0]['type'] = 'NA'
+    owners = json_data['addOwnerGroups'][0]['owners']
+    if text:
+        owners[0]['description'] = text
+        owners[1]['description'] = text
+    if party_type1:
+        owners[0]['partyType'] = party_type1
+    if party_type2:
+        owners[1]['partyType'] = party_type2
+    valid_format, errors = schema_utils.validate(json_data, 'transfer', 'mhr')
+    # Additional validation not covered by the schema.
+    registration: MhrRegistration = MhrRegistration.find_by_mhr_number('045349', 'PS12345')
+    error_msg = validator.validate_transfer(registration, json_data, False)
+    if errors:
+        current_app.logger.debug(errors)
+    if valid:
+        assert valid_format and error_msg == ''
+    else:
+        assert error_msg != ''
+        if message_content:
+            assert error_msg.find(message_content) != -1
+
+@pytest.mark.parametrize('desc,valid,party_type1,party_type2,text,add_group,message_content', TEST_TRANSFER_DEATH_DATA)
+def test_validate_transfer_will(session, desc, valid, party_type1, party_type2, text, add_group, message_content):
+    """Assert that MH transfer due to death validation of owner groups works as expected."""
+    # setup
+    json_data = copy.deepcopy(TRANSFER)
+    json_data['deleteOwnerGroups'][0]['groupId'] = 2
+    json_data['deleteOwnerGroups'][0]['type'] = 'JOINT'
+    if desc != 'No death invalid party type':
+        json_data['registrationType'] = MhrRegistrationTypes.TRANS_WILL
+    json_data['addOwnerGroups'] = copy.deepcopy(add_group)
+    json_data['addOwnerGroups'][0]['type'] = 'NA'
+    owners = json_data['addOwnerGroups'][0]['owners']
+    if text:
+        owners[0]['description'] = text
+        owners[1]['description'] = text
+    if party_type1:
+        owners[0]['partyType'] = party_type1
+    if party_type2:
+        owners[1]['partyType'] = party_type2
+    valid_format, errors = schema_utils.validate(json_data, 'transfer', 'mhr')
+    # Additional validation not covered by the schema.
+    registration: MhrRegistration = MhrRegistration.find_by_mhr_number('045349', 'PS12345')
+    error_msg = validator.validate_transfer(registration, json_data, False)
+    if errors:
+        current_app.logger.debug(errors)
+    if valid:
+        assert valid_format and error_msg == ''
+    else:
+        assert error_msg != ''
+        if message_content:
+            assert error_msg.find(message_content) != -1
 
 @pytest.mark.parametrize('desc,valid,mhr_num,tenancy_type,add_group,message_content', TEST_TRANSFER_DEATH_NA_DATA)
 def test_validate_transfer_death_na(session, desc, valid, mhr_num, tenancy_type, add_group, message_content):
@@ -860,7 +955,7 @@ def test_validate_transfer_death_na(session, desc, valid, mhr_num, tenancy_type,
     json_data = copy.deepcopy(TRANSFER)
     json_data['deleteOwnerGroups'][0]['groupId'] = 2
     json_data['deleteOwnerGroups'][0]['type'] = 'JOINT'
-    json_data['deathOfOwner'] = True
+    json_data['registrationType'] = MhrRegistrationTypes.TRAND
     json_data['addOwnerGroups'] = copy.deepcopy(add_group)
     json_data['addOwnerGroups'][0]['type'] = tenancy_type
     if desc == 'Valid':
