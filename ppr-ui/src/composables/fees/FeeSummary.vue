@@ -136,6 +136,7 @@
           v-else-if="hasProcessingFee && feeSummary.processingFee > 0"
           id="processing-fee-summary"
           :class="[$style['fee-container'], $style['fee-list__item'], 'pb-4', 'pr-4', 'py-4']"
+          key="MHRProcessingFeeKey"
         >
           <div :class="$style['fee-list__item-name']">
             Staff Processing Fee
@@ -147,6 +148,7 @@
         <li
           v-else-if="feeSummary && feeSummary.serviceFee > 0"
           :class="[$style['fee-container'], $style['fee-list__item'], 'pb-4', 'pr-4', 'py-4']"
+          key="MHRServiceFeeKey"
         >
           <div :class="$style['fee-list__item-name']">
             Service Fee
