@@ -16,6 +16,10 @@ export const setMhrTransferOwnLand: ActionIF = ({ commit }, isOwnLand: boolean):
   commit('mutateMhrTransferOwnLand', isOwnLand)
 }
 
+export const setMhrTransferSubmittingPartyKey: ActionIF = ({ commit }, { key, value }): void => {
+  commit('mutateMhrTransferSubmittingPartyKey', { key, value })
+}
+
 export const setMhrTransferSubmittingParty: ActionIF = ({ commit }, submittingPartyInfo: SubmittingPartyIF): void => {
   commit('mutateMhrTransferSubmittingParty', submittingPartyInfo)
 }

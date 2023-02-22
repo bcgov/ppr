@@ -33,6 +33,7 @@ import {
   SearchTypeIF,
   StateIF,
   StateModelIF,
+  SubmittingPartyIF,
   UserInfoIF,
   UserProductSubscriptionIF,
   UserSettingsIF,
@@ -689,7 +690,7 @@ export const getMhrRegistrationHomeDescription = (state: StateIF): MhrRegistrati
   return state.stateModel.mhrRegistration.description
 }
 
-export const getMhrRegistrationSubmittingParty = (state: StateIF): any => {
+export const getMhrRegistrationSubmittingParty = (state: StateIF): SubmittingPartyIF => {
   return state.stateModel.mhrRegistration.submittingParty
 }
 export const getMhrRegistrationHomeOwners = (state: StateIF): MhrRegistrationHomeOwnerIF[] => {

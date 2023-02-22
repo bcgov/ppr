@@ -29,7 +29,8 @@ import {
   MhrRegistrationHomeOwnerGroupIF,
   MhrTransferIF,
   MhrRegistrationIF,
-  MhRegistrationSummaryIF
+  MhRegistrationSummaryIF,
+  SubmittingPartyIF
 } from '@/interfaces'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 import { set } from 'lodash'
@@ -375,6 +376,10 @@ export const mutateMhrBaseInformation = (state: StateIF, { key, value }) => {
 
 export const mutateMhrSubmittingParty = (state: StateIF, { key, value }) => {
   set(state.stateModel.mhrRegistration.submittingParty, key, value)
+}
+
+export const mutateMhrRegistrationSubmittingParty = (state: StateIF, submittingParty: SubmittingPartyIF) => {
+  state.stateModel.mhrRegistration.submittingParty = submittingParty
 }
 
 export const mutateMhrRegistrationDocumentId = (state: StateIF, value: string) => {

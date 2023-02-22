@@ -1,4 +1,5 @@
 import { StateIF, SubmittingPartyIF } from '@/interfaces'
+import { set } from 'lodash'
 
 export const mutateMhrTransferDeclaredValue = (state: StateIF, declaredValue: number) => {
   state.stateModel.mhrTransfer.declaredValue = declaredValue
@@ -14,6 +15,10 @@ export const mutateMhrTransferDate = (state: StateIF, transferDate: string) => {
 
 export const mutateMhrTransferOwnLand = (state: StateIF, isOwnLand: boolean) => {
   state.stateModel.mhrTransfer.ownLand = isOwnLand
+}
+
+export const mutateMhrTransferSubmittingPartyKey = (state: StateIF, { key, value }) => {
+  set(state.stateModel.mhrTransfer.submittingParty, key, value)
 }
 
 export const mutateMhrTransferSubmittingParty = (state: StateIF, submittingPartyInfo: SubmittingPartyIF) => {
