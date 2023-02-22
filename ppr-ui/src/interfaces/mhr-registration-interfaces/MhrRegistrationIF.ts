@@ -1,30 +1,14 @@
 import {
   MhrRegistrationDescriptionIF,
   MhrRegistrationHomeOwnerGroupIF,
-  MhrRegistrationHomeLocationIF
+  MhrRegistrationHomeLocationIF,
+  SubmittingPartyIF
 } from '@/interfaces'
 export interface MhrRegistrationIF {
   documentId: string
   clientReferenceId: string
   declaredValue: string
-  submittingParty: {
-    personName: {
-      first: string
-      last: string
-      middle: string
-    }
-    businessName: string
-    address: {
-      street: string
-      city: string
-      region: string
-      country: string
-      postalCode: string
-    }
-    emailAddress: string
-    phoneNumber: string
-    phoneExtension: string
-  }
+  submittingParty: SubmittingPartyIF
   ownerGroups: MhrRegistrationHomeOwnerGroupIF[]
   attentionReferenceNum: string
   isManualLocationInfo: boolean

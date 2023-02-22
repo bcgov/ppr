@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid no-gutters class="white px-0 py-6">
+  <v-container fluid no-gutters class="white px-0 py-6" id="ppr-party-code">
     <v-row class="px-6" align="center">
       <v-col cols="6">
         <v-text-field
@@ -29,12 +29,13 @@
     </v-row>
     <v-row no-gutters>
       <v-col cols="12">
-        <party-autocomplete
+        <PartyAutocomplete
           :autoCompleteItems="autoCompleteResults"
           :defaultClickToAdd="false"
           :setAutoCompleteActive="setAutoCompleteActive"
           :setIsRegisteringParty="isRegisteringParty"
           :isMhrPartySearch="isMhrPartySearch"
+          :isMhrTransfer="isMhrTransfer"
           @selectItem="selectItem"
         />
       </v-col>
@@ -97,6 +98,10 @@ export default defineComponent({
       default: false
     },
     isMhrPartySearch: {
+      type: Boolean,
+      default: false
+    },
+    isMhrTransfer: {
       type: Boolean,
       default: false
     }

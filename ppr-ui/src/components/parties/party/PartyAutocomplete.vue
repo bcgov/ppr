@@ -101,6 +101,7 @@ import { SearchPartyIF, PartyIF } from '@/interfaces' // eslint-disable-line no-
 import { useActions } from 'vuex-composition-helpers'
 
 export default defineComponent({
+  name: 'PartyAutocomplete',
   props: {
     autoCompleteItems: {
       type: Array,
@@ -117,13 +118,23 @@ export default defineComponent({
     isMhrPartySearch: {
       type: Boolean,
       default: false
+    },
+    isMhrTransfer: {
+      type: Boolean,
+      default: false
     }
   },
   setup (props, context) {
     const {
-      setMhrSubmittingParty
+      setMhrSubmittingParty,
+      setMhrTransferSubmittingParty,
+      setMhrTransferSubmittingPartyKey,
+      setMhrRegistrationSubmittingParty
     } = useActions<any>([
-      'setMhrSubmittingParty'
+      'setMhrSubmittingParty',
+      'setMhrTransferSubmittingParty',
+      'setMhrTransferSubmittingPartyKey',
+      'setMhrRegistrationSubmittingParty'
     ])
     const { addSecuredParty, setRegisteringParty, isExistingSecuredParty } = useSecuredParty(props, context)
     const countryProvincesHelpers = useCountriesProvinces()
@@ -166,11 +177,14 @@ export default defineComponent({
         setRegisteringParty(newParty)
       } else if (props.isMhrPartySearch) {
         localState.selectedCode = newParty.code
-        // pre-set country code to prevent clearing of base-address component fields (bug 13637)
-        setMhrSubmittingParty({ key: 'address.country', value: newParty.address.country })
-        // Set submitting party data to store
-        for (const [key, value] of Object.entries(newParty)) {
-          setMhrSubmittingParty({ key, value })
+        if (props.isMhrTransfer) {
+          // pre-set country code to prevent clearing of base-address component fields
+          setMhrTransferSubmittingPartyKey({ key: 'address.country', value: newParty.address.country })
+          setMhrTransferSubmittingParty(newParty)
+        } else {
+          // pre-set country code to prevent clearing of base-address component fields (bug 13637)
+          setMhrSubmittingParty({ key: 'address.country', value: newParty.address.country })
+          setMhrRegistrationSubmittingParty(newParty)
         }
       } else {
         addSecuredParty(newParty)

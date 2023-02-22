@@ -1,4 +1,24 @@
-import { ActionIF, SubmittingPartyIF } from '@/interfaces'
+import { ActionIF, MhrRegistrationHomeOwnerGroupIF, MhrTransferIF, SubmittingPartyIF } from '@/interfaces'
+
+export const setEmptyMhrTransfer: ActionIF = ({ commit }, emptyMhrTransfer: MhrTransferIF): void => {
+  commit('mutateEmptyMhrTransfer', emptyMhrTransfer)
+}
+
+export const setMhrTransferHomeOwnerGroups: ActionIF = (
+  { commit },
+  groups: MhrRegistrationHomeOwnerGroupIF[]
+): void => {
+  commit('mutateMhrTransferHomeOwnerGroups', groups)
+  commit('mutateUnsavedChanges', true)
+}
+
+// Set a snapshot of the MH Registration home owner groups
+export const setMhrTransferCurrentHomeOwnerGroups: ActionIF = (
+  { commit },
+  groups: MhrRegistrationHomeOwnerGroupIF[]
+): void => {
+  commit('mutateMhrTransferCurrentHomeOwnerGroups', groups)
+}
 
 export const setMhrTransferDeclaredValue: ActionIF = ({ commit }, declaredValue: number): void => {
   commit('mutateMhrTransferDeclaredValue', declaredValue)
@@ -14,6 +34,10 @@ export const setMhrTransferDate: ActionIF = ({ commit }, transferDate: string): 
 
 export const setMhrTransferOwnLand: ActionIF = ({ commit }, isOwnLand: boolean): void => {
   commit('mutateMhrTransferOwnLand', isOwnLand)
+}
+
+export const setMhrTransferSubmittingPartyKey: ActionIF = ({ commit }, { key, value }): void => {
+  commit('mutateMhrTransferSubmittingPartyKey', { key, value })
 }
 
 export const setMhrTransferSubmittingParty: ActionIF = ({ commit }, submittingPartyInfo: SubmittingPartyIF): void => {
