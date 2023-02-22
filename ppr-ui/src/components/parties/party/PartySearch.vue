@@ -29,12 +29,13 @@
     </v-row>
     <v-row no-gutters>
       <v-col cols="12">
-        <party-autocomplete
+        <PartyAutocomplete
           :autoCompleteItems="autoCompleteResults"
           :defaultClickToAdd="false"
           :setAutoCompleteActive="setAutoCompleteActive"
           :setIsRegisteringParty="isRegisteringParty"
           :isMhrPartySearch="isMhrPartySearch"
+          :isMhrTransfer="isMhrTransfer"
           @selectItem="selectItem"
         />
       </v-col>
@@ -97,6 +98,10 @@ export default defineComponent({
       default: false
     },
     isMhrPartySearch: {
+      type: Boolean,
+      default: false
+    },
+    isMhrTransfer: {
       type: Boolean,
       default: false
     }

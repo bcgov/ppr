@@ -100,13 +100,14 @@
                     Property Registry party code, you can look up the party code or name.
                   </p>
 
-                  <PartySearch isMhrPartySearch />
+                  <PartySearch isMhrPartySearch isMhrTransfer />
 
                   <MhrSubmittingParty
                     :validate="validateSubmittingParty"
                     :class="{ 'border-error-left': validateSubmittingParty }"
                     @isValid="isSubmittingPartyValid = $event"
                     :content="{ mailAddressInfo: 'Registry documents, if any, will be mailed to this address.' }"
+                    isMhrTransfer
                   />
                 </section>
                 <section v-else id="transfer-submitting-party" class="submitting-party">
@@ -473,17 +474,16 @@ export default defineComponent({
       // When not a draft Transfer, force no unsaved changes after loading current owners
       !getMhrInformation.value.draftNumber && (await setUnsavedChanges(false))
 
-      localState.accountInfo = await getAccountInformation()
-      parseSubmittingPartyInfo()
+      if (isRoleQualifiedSupplier.value && !isRoleStaffReg.value) {
+        // Get Account Info from Auth to be used in Submitting Party section in Review screen
+        localState.accountInfo = await getAccountInfoFromAuth() as AccountInfoIF
+        parseSubmittingPartyInfoForQualifiedSupplier()
+      }
+
       localState.loading = false
 
       localState.dataLoaded = true
     })
-
-    // Get Account Info from Auth to be used in Submitting Party section in Review screen
-    const getAccountInformation = async (): Promise<AccountInfoIF> => {
-      return isRoleQualifiedSupplier.value ? getAccountInfoFromAuth() : {} as AccountInfoIF
-    }
 
     const parseMhrInformation = async (): Promise<void> => {
       const { data } = await fetchMhRegistration(getMhrInformation.value.mhrNumber)
@@ -496,7 +496,8 @@ export default defineComponent({
       await parseMhrLocationInfo(currentLocationInfo)
 
       // Store existing submitting party to be used if user is BC Registry Staff
-      setMhrTransferSubmittingParty(data.submittingParty)
+      // setMhrTransferSubmittingParty(data.submittingParty)
+      // console.log('Mhr Info: ', data)
 
       const currentOwnerGroups = data?.ownerGroups || [] // Safety check. Should always have ownerGroups
       await parseMhrHomeOwners(currentOwnerGroups)
@@ -552,31 +553,15 @@ export default defineComponent({
       }
     }
 
-    const parseSubmittingPartyInfo = (): void => {
-      let submittingParty = {} as SubmittingPartyIF
+    const parseSubmittingPartyInfoForQualifiedSupplier = (): void => {
+      const submittingParty = {
+        businessName: localState.accountInfo.name,
+        address: localState.accountInfo.mailingAddress,
+        emailAddress: localState.accountInfo.accountAdmin.email,
+        phoneNumber: localState.accountInfo.accountAdmin.phone,
+        phoneExtension: localState.accountInfo.accountAdmin.phoneExtension
+      } as SubmittingPartyIF
 
-      if (isRoleQualifiedSupplier.value) {
-        submittingParty.businessName = localState.accountInfo?.name
-        submittingParty.address = localState.accountInfo?.mailingAddress
-        submittingParty.emailAddress = localState.accountInfo?.accountAdmin?.email
-        submittingParty.phoneNumber = localState.accountInfo?.accountAdmin?.phone
-        submittingParty.phoneExtension = localState.accountInfo?.accountAdmin?.phoneExtension
-      } else {
-        submittingParty = getMhrTransferSubmittingParty.value
-        localState.accountInfo.name = getMhrTransferSubmittingParty.value.businessName
-        localState.accountInfo.mailingAddress = getMhrTransferSubmittingParty.value.address
-        if (getMhrTransferSubmittingParty.value.businessName) {
-          localState.accountInfo.isBusinessAccount = true
-          localState.accountInfo.name = getMhrTransferSubmittingParty.value.businessName
-        }
-        localState.accountInfo.accountAdmin = {
-          firstName: getMhrTransferSubmittingParty.value.personName?.firstName,
-          lastName: getMhrTransferSubmittingParty.value.personName?.LastName,
-          email: getMhrTransferSubmittingParty.value.emailAddress,
-          phone: getMhrTransferSubmittingParty.value.phoneNumber,
-          phoneExtension: getMhrTransferSubmittingParty.value.phoneExtension
-        }
-      }
       setMhrTransferSubmittingParty(submittingParty)
     }
 
@@ -792,6 +777,7 @@ export default defineComponent({
       hasLien,
       isRoleStaffReg,
       getMhrTransferSubmittingParty,
+      setMhrTransferSubmittingParty,
       ...toRefs(localState)
     }
   }
