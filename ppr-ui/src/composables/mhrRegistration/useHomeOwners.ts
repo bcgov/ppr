@@ -244,10 +244,6 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
       const i = findIndex(groupToUpdate.owners, { ownerId: updatedOwner.ownerId })
       set(groupToUpdate, `owners[${i}]`, updatedOwner)
 
-      // if (groupToUpdate.owners.every(owner => owner.action === ActionTypes.REMOVED)) {
-      //   set(groupToUpdate, 'action', ActionTypes.REMOVED)
-      // }
-
       isMhrTransfer
         ? setMhrTransferHomeOwnerGroups(homeOwnerGroups)
         : setMhrRegistrationHomeOwnerGroups(homeOwnerGroups)
@@ -380,15 +376,6 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
    * Will return the groupId when editing or a new groupId when creating a new group.
    * @param groupId The groups identifier
    */
-  // const getGroupNumberById = (groupId: number): number => {
-  //   const activeOwnerGroups = getTransferOrRegistrationHomeOwnerGroups()
-  //     .filter(group => group.action !== ActionTypes.REMOVED)
-  //   console.log(activeOwnerGroups)
-  //
-  //   return (activeOwnerGroups.findIndex(group => group.groupId === groupId)) + 1 ||
-  //     (!!groupId && !activeOwnerGroups.length) ? groupId : activeOwnerGroups.length + 1
-  // }
-
   const getGroupNumberById = (groupId: number): number => {
     const activeOwnerGroups = getTransferOrRegistrationHomeOwnerGroups()
       .filter(group => group.action !== ActionTypes.REMOVED)

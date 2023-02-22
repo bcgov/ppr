@@ -130,9 +130,6 @@ export default defineComponent({
           isNumber(null, 6, null, null), // check for length (maxLength can't be used because field is numeric)
           lessThan(Number(props.fractionalData.interestNumerator), 'Must be greater than amount owned by group')
         )
-      ),
-      hasDefinedInterest: computed(
-        () => !!props.fractionalData.interestNumerator && !!props.fractionalData.interestDenominator
       )
     })
 
