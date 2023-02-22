@@ -495,10 +495,6 @@ export default defineComponent({
       const currentLocationInfo = data?.location || {} // Safety check. Should always have location
       await parseMhrLocationInfo(currentLocationInfo)
 
-      // Store existing submitting party to be used if user is BC Registry Staff
-      // setMhrTransferSubmittingParty(data.submittingParty)
-      // console.log('Mhr Info: ', data)
-
       const currentOwnerGroups = data?.ownerGroups || [] // Safety check. Should always have ownerGroups
       await parseMhrHomeOwners(currentOwnerGroups)
     }
