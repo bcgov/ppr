@@ -14,7 +14,7 @@
     >
       <template
         v-slot:header
-        v-if="isMhrTransfer && !hasActualOwners(homeOwners) && homeOwners.length > 0"
+        v-if="isMhrTransfer && !hasActualOwners(homeOwners) && homeOwners.length > 0 && !showGroups"
       >
         <tr class="fs-14 text-center no-owners-head-row" data-test-id="no-data-msg">
           <td class="pa-6" :colspan="homeOwnersTableHeaders.length">
@@ -202,16 +202,9 @@
           </td>
         </tr>
         <!-- For MHR scenarios where users can entirely remove added owners -->
-        <tr v-else-if="!hideRemovedOwners">
+        <tr v-else-if="!hideRemovedOwners && !showGroups">
           <td :colspan="4" class="py-1">
-            <div
-              v-if="showGroups"
-              class="error-text my-6 text-center"
-              :data-test-id="`no-owners-msg-group-${homeOwners.indexOf(row.item)}`"
-            >
-              Group must contain at least one owner.
-            </div>
-            <div v-else class="my-6 text-center" data-test-id="no-owners-mgs">
+            <div class="my-6 text-center" data-test-id="no-owners-mgs">
               No owners added yet.
             </div>
           </td>

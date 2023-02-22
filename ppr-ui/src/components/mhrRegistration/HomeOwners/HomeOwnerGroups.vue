@@ -31,7 +31,7 @@
     <div v-if="showFractionalOwnership">
       <v-row>
         <v-col>
-          <div class="generic-label mb-3">Group {{ ownerGroupId }} Details:</div>
+          <div class="generic-label mb-3">Group {{ getGroupNumberById(ownerGroupId) }} Details:</div>
         </v-col>
         <v-col v-show="groupState.isReadonly && isDefinedGroup" class="align-right pt-0">
           <v-btn
@@ -98,7 +98,8 @@ export default defineComponent({
       showGroups,
       getGroupDropdownItems,
       hasUndefinedGroupInterest,
-      getTransferOrRegistrationHomeOwnerGroups
+      getTransferOrRegistrationHomeOwnerGroups,
+      getGroupNumberById
     } = useHomeOwners(props.isMhrTransfer)
 
     const localState = reactive({
@@ -152,6 +153,7 @@ export default defineComponent({
       openEditFractionalOwnership,
       setOwnerGroupId,
       groupDropdown,
+      getGroupNumberById,
       ...toRefs(localState)
     }
   }

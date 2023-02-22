@@ -156,7 +156,9 @@
           <v-form class="my-5" ref="homeFractionalOwnershipForm" v-model="isHomeFractionalOwnershipValid">
             <FractionalOwnership
               :groupId="groupId"
-              :fractionalData="fractionalData"/>
+              :fractionalData="fractionalData"
+              :isMhrTransfer="isMhrTransfer"
+            />
           </v-form>
         </v-col>
       </v-row>
