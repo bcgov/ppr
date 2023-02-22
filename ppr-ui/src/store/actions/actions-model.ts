@@ -26,7 +26,6 @@ import {
   ManufacturedHomeSearchResultIF,
   UserProductSubscriptionIF,
   MhrRegistrationHomeOwnerGroupIF,
-  MhrTransferIF,
   MhrRegistrationIF,
   MhRegistrationSummaryIF,
   SubmittingPartyIF
@@ -369,25 +368,4 @@ export const setMhrInformation: ActionIF = ({ commit }, mhrInfo: MhRegistrationS
 
 export const setLienType: ActionIF = ({ commit }, lienType: string): void => {
   commit('mutateLienType', lienType)
-}
-
-// MHR Transfer
-export const setEmptyMhrTransfer: ActionIF = ({ commit }, emptyMhrTransfer: MhrTransferIF): void => {
-  commit('mutateEmptyMhrTransfer', emptyMhrTransfer)
-}
-
-export const setMhrTransferHomeOwnerGroups: ActionIF = (
-  { commit },
-  groups: MhrRegistrationHomeOwnerGroupIF[]
-): void => {
-  commit('mutateMhrTransferHomeOwnerGroups', groups)
-  commit('mutateUnsavedChanges', true)
-}
-
-// Set a snapshot of the MH Registration home owner groups
-export const setMhrTransferCurrentHomeOwnerGroups: ActionIF = (
-  { commit },
-  groups: MhrRegistrationHomeOwnerGroupIF[]
-): void => {
-  commit('mutateMhrTransferCurrentHomeOwnerGroups', groups)
 }

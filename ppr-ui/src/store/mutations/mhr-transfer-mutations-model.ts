@@ -1,6 +1,26 @@
-import { StateIF, SubmittingPartyIF } from '@/interfaces'
+import { MhrRegistrationHomeOwnerGroupIF, MhrTransferIF, StateIF, SubmittingPartyIF } from '@/interfaces'
 import { set } from 'lodash'
 
+export const mutateEmptyMhrTransfer = (state: StateIF, emptyMhrTransfer: MhrTransferIF) => {
+  state.stateModel.mhrTransfer = emptyMhrTransfer
+}
+
+// Home Owners
+export const mutateMhrTransferHomeOwnerGroups = (
+  state: StateIF,
+  groups: Array<MhrRegistrationHomeOwnerGroupIF>
+) => {
+  state.stateModel.mhrTransfer.ownerGroups = groups
+}
+
+export const mutateMhrTransferCurrentHomeOwnerGroups = (
+  state: StateIF,
+  groups: Array<MhrRegistrationHomeOwnerGroupIF>
+) => {
+  state.stateModel.mhrTransfer.currentOwnerGroups = groups
+}
+
+// Ownership Transfer
 export const mutateMhrTransferDeclaredValue = (state: StateIF, declaredValue: number) => {
   state.stateModel.mhrTransfer.declaredValue = declaredValue
 }
