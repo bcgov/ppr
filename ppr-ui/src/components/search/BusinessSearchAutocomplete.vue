@@ -86,6 +86,10 @@ export default defineComponent({
     },
     showDropdown: {
       type: Boolean
+    },
+    isPPR: {
+      type: Boolean,
+      default: false
     }
   },
   setup (props, { emit }) {
@@ -118,7 +122,8 @@ export default defineComponent({
     }
 
     const isBusinessTypeSPGP = (businessType: BusinessTypes): boolean => {
-      return [BusinessTypes.GENERAL_PARTNERSHIP, BusinessTypes.SOLE_PROPRIETOR].includes(businessType)
+      // include all business types for PPR business searches
+      return [BusinessTypes.GENERAL_PARTNERSHIP, BusinessTypes.SOLE_PROPRIETOR].includes(businessType) && !props.isPPR
     }
 
     watch(

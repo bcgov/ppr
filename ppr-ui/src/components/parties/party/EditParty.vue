@@ -82,24 +82,35 @@
                     <v-text-field
                       filled
                       id="txt-name-party"
-                      label="Business Legal Name"
-                      @keyup="validateNameField()"
+                      ref="partyNameSearchField"
+                      label="Find or enter the Full Legal Name of the Business"
                       v-model="searchValue"
-                      :error-messages="
-                        errors.businessName.message
-                          ? errors.businessName.message
-                          : ''
-                      "
+                      :rules="partyNameRules"
                       persistent-hint
-                    />
-                    <auto-complete
+                      :clearable="showClear"
+                      @click:clear="showClear = false"
+                    >
+                      <template v-slot:append>
+                        <v-progress-circular
+                          v-if="loadingSearchResults"
+                          indeterminate
+                          color="primary"
+                          class="mx-3"
+                          :size="25"
+                          :width="3"
+                        />
+                      </template>
+                    </v-text-field>
+
+                    <BusinessSearchAutocomplete
                       :searchValue="autoCompleteSearchValue"
                       :setAutoCompleteIsActive="autoCompleteIsActive"
                       v-click-outside="setCloseAutoComplete"
                       @search-value="setSearchValue"
-                      @hide-details="setHideDetails"
-                    >
-                    </auto-complete>
+                      @searching="loadingSearchResults = $event"
+                      :showDropdown="$refs.partyNameSearchField && $refs.partyNameSearchField.isFocused"
+                      isPPR
+                    />
                   </v-col>
                 </v-row>
                 <v-row v-else no-gutters>
@@ -243,7 +254,7 @@ import {
 } from '@vue/composition-api'
 // local components
 import { SecuredPartyDialog } from '@/components/dialogs'
-import { AutoComplete } from '@/components/search'
+import { BusinessSearchAutocomplete } from '@/components/search'
 import { BaseAddress } from '@/composables/address'
 import { SecuredPartyTypes } from '@/enums'
 // local helpers / types / etc.
@@ -253,13 +264,15 @@ import { formatAddress } from '@/composables/address/factories'
 import { SearchPartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { partyCodeSearch } from '@/utils'
 import { useValidation } from '@/utils/validators/use-validation'
+import { useInputRules } from '@/composables/useInputRules'
 import { isEqual } from 'lodash'
 
 export default defineComponent({
+  name: 'EditParty',
   components: {
     BaseAddress,
-    AutoComplete,
-    SecuredPartyDialog
+    SecuredPartyDialog,
+    BusinessSearchAutocomplete
   },
   props: {
     activeIndex: {
@@ -317,12 +330,15 @@ export default defineComponent({
       validateBusinessName
     } = useValidation()
 
+    const { required, customRules, maxLength } = useInputRules()
+
     const localState = reactive({
       autoCompleteIsActive: true,
       autoCompleteSearchValue: '',
       foundDuplicate: false,
       searchValue: '',
-      hideDetails: false,
+      loadingSearchResults: false,
+      showClear: false,
       toggleDialog: false,
       dialogResults: [],
       showAllAddressErrors: false,
@@ -334,7 +350,11 @@ export default defineComponent({
       }),
       showErrorBar: computed((): boolean => {
         return props.setShowErrorBar
-      })
+      }),
+      partyNameRules: customRules(
+        required('Enter a business name'),
+        maxLength(70)
+      )
     })
 
     const showDialog = () => {
@@ -357,7 +377,6 @@ export default defineComponent({
       if (validateSecuredPartyForm(partyType.value, currentSecuredParty, localState.isRegisteringParty)) {
         if (partyType.value === SecuredPartyTypes.INDIVIDUAL) {
           currentSecuredParty.value.businessName = ''
-          // localState.searchValue = ''
         } else {
           currentSecuredParty.value.personName.first = ''
           currentSecuredParty.value.personName.middle = ''
@@ -419,10 +438,6 @@ export default defineComponent({
       currentSecuredParty.value.businessName = searchValueTyped
     }
 
-    const setHideDetails = (hideDetails: boolean) => {
-      localState.hideDetails = hideDetails
-    }
-
     const setCloseAutoComplete = () => {
       localState.autoCompleteIsActive = false
     }
@@ -430,9 +445,14 @@ export default defineComponent({
     watch(
       () => localState.searchValue,
       (val: string) => {
-        localState.autoCompleteSearchValue = val
-        // show autocomplete results when there is a searchValue
-        localState.autoCompleteIsActive = val !== ''
+        if (val?.length >= 3) {
+          localState.autoCompleteSearchValue = val
+          // only open if debtor name changed
+          localState.autoCompleteIsActive = val !== ''
+        } else {
+          localState.autoCompleteSearchValue = val
+          localState.autoCompleteIsActive = false
+        }
         currentSecuredParty.value.businessName = val
       }
     )
@@ -456,7 +476,6 @@ export default defineComponent({
       updateValidity,
       validateNameField,
       setSearchValue,
-      setHideDetails,
       setCloseAutoComplete,
       errors,
       closeAndReset,

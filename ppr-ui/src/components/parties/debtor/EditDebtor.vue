@@ -40,25 +40,35 @@
                 <v-text-field
                   filled
                   id="txt-name-debtor"
-                  label="Business Legal Name"
+                  ref="debtorNameSearchField"
+                  label="Find or enter the Full Legal Name of the Business"
                   v-model="searchValue"
-                  @keyup="validateNameField()"
-                  :error-messages="
-                    errors.businessName.message
-                      ? errors.businessName.message
-                      : ''
-                  "
+                  :rules="debtorNameRules"
                   persistent-hint
-                  :hide-details="hideDetails"
-                />
-                <auto-complete
+                  :clearable="showClear"
+                  @click:clear="showClear = false"
+                >
+                  <template v-slot:append>
+                    <v-progress-circular
+                      v-if="loadingSearchResults"
+                      indeterminate
+                      color="primary"
+                      class="mx-3"
+                      :size="25"
+                      :width="3"
+                    />
+                  </template>
+                </v-text-field>
+
+                <BusinessSearchAutocomplete
                   :searchValue="autoCompleteSearchValue"
                   :setAutoCompleteIsActive="autoCompleteIsActive"
                   v-click-outside="setCloseAutoComplete"
                   @search-value="setSearchValue"
-                  @hide-details="setHideDetails"
-                >
-                </auto-complete>
+                  @searching="loadingSearchResults = $event"
+                  :showDropdown="$refs.debtorNameSearchField && $refs.debtorNameSearchField.isFocused"
+                  isPPR
+                />
               </v-col>
             </v-row>
             <v-row v-else no-gutters>
@@ -249,18 +259,20 @@ import {
   toRefs
 } from '@vue/composition-api'
 // local components
-import { AutoComplete } from '@/components/search'
+import { BusinessSearchAutocomplete } from '@/components/search'
 import { BaseAddress } from '@/composables/address'
 // local helpers / types / etc.
 import { useDebtor } from '@/components/parties/composables/useDebtor'
 import { useDebtorValidation } from '@/components/parties/composables/useDebtorValidation'
 import { formatAddress } from '@/composables/address/factories'
 import { useValidation } from '@/utils/validators/use-validation'
+import { useInputRules } from '@/composables/useInputRules'
 
 export default defineComponent({
+  name: 'EditDebtor',
   components: {
     BaseAddress,
-    AutoComplete
+    BusinessSearchAutocomplete
   },
   props: {
     activeIndex: {
@@ -315,11 +327,14 @@ export default defineComponent({
       validateBusinessName
     } = useValidation()
 
+    const { required, customRules, maxLength } = useInputRules()
+
     const localState = reactive({
       autoCompleteIsActive: true,
       autoCompleteSearchValue: '',
       searchValue: '',
-      hideDetails: false,
+      loadingSearchResults: false,
+      showClear: false,
       month: { value: 0, text: '' },
       showAllAddressErrors: false,
       currentIndex: computed((): number => {
@@ -327,7 +342,11 @@ export default defineComponent({
       }),
       showErrorBar: computed((): boolean => {
         return props.setShowErrorBar
-      })
+      }),
+      debtorNameRules: customRules(
+        required('Enter a business name'),
+        maxLength(70)
+      )
     })
 
     const onSubmitForm = async () => {
@@ -377,10 +396,7 @@ export default defineComponent({
       localState.autoCompleteIsActive = false
       localState.searchValue = searchValueTyped
       currentDebtor.value.businessName = searchValueTyped
-    }
-
-    const setHideDetails = (hideDetails: boolean) => {
-      localState.hideDetails = hideDetails
+      localState.showClear = true
     }
 
     const setCloseAutoComplete = () => {
@@ -396,24 +412,22 @@ export default defineComponent({
     watch(
       () => localState.searchValue,
       (val: string) => {
-        localState.autoCompleteSearchValue = val
-        // only open if debtor name changed
-        if (currentDebtor.value.businessName !== val) {
-          // show autocomplete results when there is a searchValue
+        if (val?.length >= 3) {
+          localState.autoCompleteSearchValue = val
+          // only open if debtor name changed
           localState.autoCompleteIsActive = val !== ''
-          currentDebtor.value.businessName = val
+        } else {
+          localState.autoCompleteSearchValue = val
+          localState.autoCompleteIsActive = false
         }
+        currentDebtor.value.businessName = val
       }
     )
 
     watch(
       () => localState.month,
       currentValue => {
-        if (currentValue) {
-          monthValue.value = currentValue.value
-        } else {
-          monthValue.value = 0
-        }
+        monthValue.value = currentValue?.value || 0
       }
     )
 
@@ -428,7 +442,6 @@ export default defineComponent({
       onSubmitForm,
       validateBirthdateIfAlreadyValidated,
       setSearchValue,
-      setHideDetails,
       setCloseAutoComplete,
       addressSchema,
       updateValidity,
