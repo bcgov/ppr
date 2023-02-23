@@ -113,7 +113,7 @@ export default defineComponent({
 
     const updateAutoCompleteResults = async (searchValue: string) => {
       localState.searching = true
-      const response: SearchResponseI = await searchBusiness(searchValue)
+      const response: SearchResponseI = await searchBusiness(searchValue, props.isPPR)
       // check if results are still relevant before updating list
       if (searchValue === props.searchValue && response?.searchResults.results) {
         localState.autoCompleteResults = response?.searchResults.results
