@@ -43,7 +43,11 @@
                   ref="debtorNameSearchField"
                   label="Find or enter the Full Legal Name of the Business"
                   v-model="searchValue"
-                  :rules="debtorNameRules"
+                  :error-messages="
+                    errors.businessName.message
+                      ? errors.businessName.message
+                      : ''
+                  "
                   persistent-hint
                   :clearable="showClear"
                   @click:clear="showClear = false"
@@ -266,7 +270,6 @@ import { useDebtor } from '@/components/parties/composables/useDebtor'
 import { useDebtorValidation } from '@/components/parties/composables/useDebtorValidation'
 import { formatAddress } from '@/composables/address/factories'
 import { useValidation } from '@/utils/validators/use-validation'
-import { useInputRules } from '@/composables/useInputRules'
 
 export default defineComponent({
   name: 'EditDebtor',
@@ -327,8 +330,6 @@ export default defineComponent({
       validateBusinessName
     } = useValidation()
 
-    const { required, customRules, maxLength } = useInputRules()
-
     const localState = reactive({
       autoCompleteIsActive: true,
       autoCompleteSearchValue: '',
@@ -342,11 +343,7 @@ export default defineComponent({
       }),
       showErrorBar: computed((): boolean => {
         return props.setShowErrorBar
-      }),
-      debtorNameRules: customRules(
-        required('Enter a business name'),
-        maxLength(70)
-      )
+      })
     })
 
     const onSubmitForm = async () => {

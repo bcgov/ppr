@@ -85,7 +85,11 @@
                       ref="partyNameSearchField"
                       label="Find or enter the Full Legal Name of the Business"
                       v-model="searchValue"
-                      :rules="partyNameRules"
+                      :error-messages="
+                        errors.businessName.message
+                          ? errors.businessName.message
+                          : ''
+                      "
                       persistent-hint
                       :clearable="showClear"
                       @click:clear="showClear = false"
@@ -264,7 +268,6 @@ import { formatAddress } from '@/composables/address/factories'
 import { SearchPartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { partyCodeSearch } from '@/utils'
 import { useValidation } from '@/utils/validators/use-validation'
-import { useInputRules } from '@/composables/useInputRules'
 import { isEqual } from 'lodash'
 
 export default defineComponent({
@@ -330,8 +333,6 @@ export default defineComponent({
       validateBusinessName
     } = useValidation()
 
-    const { required, customRules, maxLength } = useInputRules()
-
     const localState = reactive({
       autoCompleteIsActive: true,
       autoCompleteSearchValue: '',
@@ -350,11 +351,7 @@ export default defineComponent({
       }),
       showErrorBar: computed((): boolean => {
         return props.setShowErrorBar
-      }),
-      partyNameRules: customRules(
-        required('Enter a business name'),
-        maxLength(70)
-      )
+      })
     })
 
     const showDialog = () => {

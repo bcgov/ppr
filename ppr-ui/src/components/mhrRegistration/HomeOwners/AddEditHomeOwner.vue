@@ -319,7 +319,7 @@ import {
 } from '@vue/composition-api'
 import { useInputRules } from '@/composables/useInputRules'
 import { useHomeOwners, useMhrValidations } from '@/composables/mhrRegistration'
-import { AutoComplete, BusinessSearchAutocomplete } from '@/components/search'
+import { BusinessSearchAutocomplete } from '@/components/search'
 import { BaseAddress } from '@/composables/address'
 import { PartyAddressSchema } from '@/schemas'
 import { focusOnFirstError, fromDisplayPhone } from '@/utils'
@@ -347,7 +347,6 @@ export default defineComponent({
   name: 'AddEditHomeOwner',
   emits: ['remove', 'cancel'],
   components: {
-    AutoComplete,
     BaseAddress,
     SimpleHelpToggle,
     HomeOwnerGroups,
