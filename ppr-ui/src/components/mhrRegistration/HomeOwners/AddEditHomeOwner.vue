@@ -319,7 +319,7 @@ import {
 } from '@vue/composition-api'
 import { useInputRules } from '@/composables/useInputRules'
 import { useHomeOwners, useMhrValidations } from '@/composables/mhrRegistration'
-import { AutoComplete } from '@/components/search'
+import { BusinessSearchAutocomplete } from '@/components/search'
 import { BaseAddress } from '@/composables/address'
 import { PartyAddressSchema } from '@/schemas'
 import { focusOnFirstError, fromDisplayPhone } from '@/utils'
@@ -336,7 +336,6 @@ import { SimpleHelpToggle } from '@/components/common'
 import HomeOwnerGroups from './HomeOwnerGroups.vue'
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import { find } from 'lodash'
-import { BusinessSearchAutocomplete } from '@/components/mhrTransfers'
 
 interface FractionalOwnershipWithGroupIdIF extends MhrRegistrationFractionalOwnershipIF {
   groupId: number
@@ -348,7 +347,6 @@ export default defineComponent({
   name: 'AddEditHomeOwner',
   emits: ['remove', 'cancel'],
   components: {
-    AutoComplete,
     BaseAddress,
     SimpleHelpToggle,
     HomeOwnerGroups,
