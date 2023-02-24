@@ -59,4 +59,4 @@ sentry-sdk==1.5.3
 six==1.16.0
 strict-rfc3339==0.7
 urllib3==1.26.8
-git+https://github.com/bcgov/registry-schemas.git@1.7.1#egg=registry_schemas
+git+https://github.com/bcgov/registry-schemas.git@1.7.2#egg=registry_schemas

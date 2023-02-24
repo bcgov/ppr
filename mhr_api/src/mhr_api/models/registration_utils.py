@@ -150,7 +150,14 @@ def get_owner_group_count(base_reg) -> int:
 
 def is_transfer_due_to_death(reg_type: str) -> bool:
     """Return if the registration type is a type of Transfer Due to Death."""
-    return reg_type in (MhrRegistrationTypes.TRANS_ADMIN,
-                        MhrRegistrationTypes.TRANS_AFFIDAVIT,
-                        MhrRegistrationTypes.TRANS_WILL,
-                        MhrRegistrationTypes.TRAND)
+    return reg_type and reg_type in (MhrRegistrationTypes.TRANS_ADMIN,
+                                     MhrRegistrationTypes.TRANS_AFFIDAVIT,
+                                     MhrRegistrationTypes.TRANS_WILL,
+                                     MhrRegistrationTypes.TRAND)
+
+
+def is_transfer_due_to_death_staff(reg_type: str) -> bool:
+    """Return if the registration type is a type of Transfer Due to Death."""
+    return reg_type and reg_type in (MhrRegistrationTypes.TRANS_ADMIN,
+                                     MhrRegistrationTypes.TRANS_AFFIDAVIT,
+                                     MhrRegistrationTypes.TRANS_WILL)
