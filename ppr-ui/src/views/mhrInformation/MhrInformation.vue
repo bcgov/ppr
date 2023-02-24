@@ -764,7 +764,8 @@ export default defineComponent({
         }
         localState.loading = true
         const apiData = await buildApiData()
-        const mhrTransferFiling = await submitMhrTransfer(apiData, getMhrInformation.value.mhrNumber)
+        const mhrTransferFiling =
+          await submitMhrTransfer(apiData, getMhrInformation.value.mhrNumber, localState.staffPayment)
         localState.loading = false
         if (!mhrTransferFiling.error) {
           setUnsavedChanges(false)
