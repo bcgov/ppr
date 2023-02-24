@@ -295,27 +295,6 @@ import { StaffPayment } from '@bcrs-shared-components/staff-payment'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 import { StaffPaymentOptions } from '@bcrs-shared-components/enums'
 /* eslint-disable no-unused-vars */
-import {
-  ActionTypes,
-  APIMHRMapSearchTypes,
-  APISearchTypes,
-  HomeCertificationOptions,
-  HomeLocationTypes,
-  RouteNames,
-  UIMHRSearchTypes
-} from '@/enums'
-import {
-  createMhrTransferDraft,
-  deleteMhrDraft,
-  fetchMhRegistration,
-  getAccountInfoFromAuth,
-  getMHRegistrationSummary,
-  getMhrTransferDraft,
-  mhrSearch,
-  pacificDate,
-  submitMhrTransfer,
-  updateMhrDraft
-} from '@/utils'
 import { CertifyInformation, StickyContainer } from '@/components/common'
 import { useHomeOwners, useInputRules, useMhrInformation } from '@/composables'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
