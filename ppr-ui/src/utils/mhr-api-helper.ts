@@ -407,9 +407,10 @@ export async function validateDocumentID (documentId: string) {
   }
 }
 
-export async function submitMhrTransfer (payloadData, mhrNumber) {
+export async function submitMhrTransfer (payloadData, mhrNumber, staffPayment) {
+  const paymentParams = `?${mhrStaffPaymentParameters(staffPayment)}`
   try {
-    const result = await axios.post(`transfers/${mhrNumber}`, payloadData, getDefaultConfig())
+    const result = await axios.post(`transfers/${mhrNumber}${paymentParams}`, payloadData, getDefaultConfig())
     if (!result?.data) {
       throw new Error('Invalid API response')
     }
