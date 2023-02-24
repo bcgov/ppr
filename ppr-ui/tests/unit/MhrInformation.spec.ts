@@ -519,8 +519,8 @@ describe('Mhr Information', () => {
     await Vue.nextTick()
     await Vue.nextTick()
 
-    // should show 3 errors for Submitting Party, Confirm and Auth components
-    expect(wrapper.findAll('.border-error-left').length).toBe(3)
+    // should show 4 errors for Submitting Party, Confirm, Auth and Pay components
+    expect(wrapper.findAll('.border-error-left').length).toBe(4)
     // reset staff role
     await store.dispatch('setAuthRoles', [AuthRoles.MHR])
   })

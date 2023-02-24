@@ -165,12 +165,29 @@
                   />
                 </section>
 
-                <section id="transfer-certify-section" class="mt-10 pt-4 pb-10">
+                <section id="transfer-certify-section" class="mt-10 pt-4">
                   <CertifyInformation
                     :sectionNumber="isRoleStaffReg ? 4 : 3"
                     :setShowErrors="validateAuthorizationError"
                     @certifyValid="authorizationValid = $event"
                   />
+                </section>
+                <section id="transfer-payment-section" class="mt-10 pt-4 pb-10" v-if="isRoleStaffReg">
+                  <h2>
+                    5. Staff Payment
+                  </h2>
+                  <v-card flat class="mt-6 pa-6" :class="{ 'border-error-left': validateStaffPayment }">
+                    <StaffPayment
+                      id="staff-payment"
+                      :displaySideLabel="true"
+                      :displayPriorityCheckbox="true"
+                      :staffPaymentData="staffPayment"
+                      :invalidSection="validateStaffPayment"
+                      :validate="validate"
+                      @update:staffPaymentData="onStaffPaymentDataUpdate($event)"
+                      @valid="staffPaymentValid = $event"
+                    />
+                  </v-card>
                 </section>
               </template>
 
@@ -273,6 +290,32 @@
 import { computed, defineComponent, onMounted, reactive, ref, toRefs, watch } from '@vue/composition-api'
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
+/* eslint-disable no-unused-vars */
+import { StaffPayment } from '@bcrs-shared-components/staff-payment'
+import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
+import { StaffPaymentOptions } from '@bcrs-shared-components/enums'
+/* eslint-disable no-unused-vars */
+import {
+  ActionTypes,
+  APIMHRMapSearchTypes,
+  APISearchTypes,
+  HomeCertificationOptions,
+  HomeLocationTypes,
+  RouteNames,
+  UIMHRSearchTypes
+} from '@/enums'
+import {
+  createMhrTransferDraft,
+  deleteMhrDraft,
+  fetchMhRegistration,
+  getAccountInfoFromAuth,
+  getMHRegistrationSummary,
+  getMhrTransferDraft,
+  mhrSearch,
+  pacificDate,
+  submitMhrTransfer,
+  updateMhrDraft
+} from '@/utils'
 import { CertifyInformation, StickyContainer } from '@/components/common'
 import { useHomeOwners, useInputRules, useMhrInformation } from '@/composables'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
@@ -340,7 +383,8 @@ export default defineComponent({
     CertifyInformation,
     AccountInfo,
     ConfirmCompletion,
-    YourHomeReview
+    YourHomeReview,
+    StaffPayment
   },
   props: {
     appReady: {
@@ -410,7 +454,7 @@ export default defineComponent({
       'setMhrTransferDeclaredValue'
     ])
 
-    const { setEmptyMhrTransfer } = useActions<any>(['setEmptyMhrTransfer'])
+    const { setEmptyMhrTransfer, setStaffPayment } = useActions<any>(['setEmptyMhrTransfer', 'setStaffPayment'])
 
     const {
       isRefNumValid,
@@ -439,6 +483,7 @@ export default defineComponent({
       isTransferDetailsFormValid: false,
       refNumValid: false,
       authorizationValid: false,
+      staffPaymentValid: false,
       isSubmittingPartyValid: false,
       validateConfirmCompletion: false,
       validateAuthorizationError: false,
@@ -446,6 +491,14 @@ export default defineComponent({
       isValidTransferType: false,
       isValidTransferOwners: false,
       feeType: FeeSummaryTypes.MHR_TRANSFER, // FUTURE STATE: To be dynamic, dependent on what changes have been made
+      staffPayment: {
+        option: StaffPaymentOptions.NONE,
+        routingSlipNumber: '',
+        bcolAccountNumber: '',
+        datNumber: '',
+        folioNumber: '',
+        isPriority: false
+      },
       showTransferType: false,
       attentionReference: '',
       isCompletionConfirmed: false,
@@ -482,13 +535,17 @@ export default defineComponent({
           !hasLien.value
         )
       }),
+      validateStaffPayment: computed(() => {
+        return localState.validate && !localState.staffPaymentValid
+      }),
       isValidTransferReview: computed((): boolean => {
         // is valid on review step
         return (
           localState.isReviewMode &&
           isRefNumValid.value &&
           localState.isCompletionConfirmed &&
-          !localState.validateAuthorizationError
+          !localState.validateAuthorizationError &&
+          !localState.validateStaffPayment
         )
       }),
       transferErrorMsg: computed((): string => {
@@ -539,6 +596,55 @@ export default defineComponent({
 
       localState.dataLoaded = true
     })
+
+    const onStaffPaymentDataUpdate = (val: StaffPaymentIF) => {
+      let staffPaymentData: StaffPaymentIF = {
+        ...val
+      }
+
+      switch (staffPaymentData.option) {
+        case StaffPaymentOptions.FAS:
+          staffPaymentData = {
+            option: StaffPaymentOptions.FAS,
+            routingSlipNumber: staffPaymentData.routingSlipNumber,
+            isPriority: staffPaymentData.isPriority,
+            bcolAccountNumber: '',
+            datNumber: '',
+            folioNumber: ''
+          }
+          localState.staffPaymentValid = false
+          break
+
+        case StaffPaymentOptions.BCOL:
+          staffPaymentData = {
+            option: StaffPaymentOptions.BCOL,
+            bcolAccountNumber: staffPaymentData.bcolAccountNumber,
+            datNumber: staffPaymentData.datNumber,
+            folioNumber: staffPaymentData.folioNumber,
+            isPriority: staffPaymentData.isPriority,
+            routingSlipNumber: ''
+          }
+          localState.staffPaymentValid = false
+          break
+
+        case StaffPaymentOptions.NO_FEE:
+          staffPaymentData = {
+            option: StaffPaymentOptions.NO_FEE,
+            routingSlipNumber: '',
+            isPriority: false,
+            bcolAccountNumber: '',
+            datNumber: '',
+            folioNumber: ''
+          }
+          localState.staffPaymentValid = true
+          break
+        case StaffPaymentOptions.NONE: // should never happen
+          break
+      }
+
+      localState.staffPayment = staffPaymentData
+      setStaffPayment(staffPaymentData)
+    }
 
     const parseMhrInformation = async (): Promise<void> => {
       const { data } = await fetchMhRegistration(getMhrInformation.value.mhrNumber)
@@ -853,6 +959,7 @@ export default defineComponent({
       getUiTransferType,
       handleDeclaredValueChange,
       toggleTypeSelector,
+      onStaffPaymentDataUpdate,
       ...toRefs(localState)
     }
   }
