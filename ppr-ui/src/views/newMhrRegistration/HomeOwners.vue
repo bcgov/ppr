@@ -79,7 +79,7 @@
       </template>
 
       <!-- Add/Remove Owner Actions -->
-      <v-row no-gutters v-if="!isReadonlyTable">
+      <v-row no-gutters v-if="!isReadonlyTable && enableActions">
         <v-col cols="12">
           <v-btn
             outlined
@@ -242,6 +242,7 @@
           :isMhrTransfer="isMhrTransfer"
           :hideRemovedOwners="hideRemovedOwners"
           :validateTransfer="validateTransfer"
+          :enableActions="enableActions"
           @isValidTransferOwners="isValidTransferOwners($event)"
         />
       </v-fade-transition>
@@ -282,6 +283,10 @@ export default defineComponent({
     validateTransfer: {
       type: Boolean,
       default: false
+    },
+    enableActions: {
+      type: Boolean,
+      default: true
     }
   },
   setup (props, context) {

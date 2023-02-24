@@ -244,6 +244,11 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
       const i = findIndex(groupToUpdate.owners, { ownerId: updatedOwner.ownerId })
       set(groupToUpdate, `owners[${i}]`, updatedOwner)
 
+      if (!groupToUpdate.interestNumerator && !groupToUpdate.interestDenominator &&
+        groupToUpdate.owners.every(owner => owner.action === ActionTypes.REMOVED)) {
+        set(groupToUpdate, 'action', ActionTypes.REMOVED)
+      }
+
       isMhrTransfer
         ? setMhrTransferHomeOwnerGroups(homeOwnerGroups)
         : setMhrRegistrationHomeOwnerGroups(homeOwnerGroups)
@@ -327,17 +332,6 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
         if (undoAllOwners) {
           const owners = group.owners.map(owner => { return { ...owner, action: null } })
           group = { ...group, owners: owners }
-        }
-
-        // Reset interest values when undefined groups exist and group removals are undone
-        if (hasUndefinedGroups) {
-          group = {
-            ...group,
-            interest: 'Undivided',
-            interestNumerator: null,
-            interestDenominator: null,
-            tenancySpecified: false
-          }
         }
 
         const unmarkedGroup = {

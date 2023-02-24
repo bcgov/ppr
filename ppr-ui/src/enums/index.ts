@@ -26,6 +26,7 @@ export * from './submittingPartyTypes'
 export * from './securedPartyTypes'
 export * from './business-statuses'
 export * from './business-types'
+export * from './transferTypes'
 
 // external enums
 export { CorpTypeCd } from '@bcrs-shared-components/corp-type-module'

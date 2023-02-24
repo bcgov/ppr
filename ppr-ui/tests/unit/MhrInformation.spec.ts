@@ -24,9 +24,10 @@ import {
 } from './test-data'
 import { CertifyIF, MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF } from '@/interfaces'
 import { nextTick } from '@vue/composition-api'
-import { TransferDetails, TransferDetailsReview } from '@/components/mhrTransfers'
+import { TransferDetails, TransferDetailsReview, TransferType } from '@/components/mhrTransfers'
 
 import { toDisplayPhone } from '@/utils'
+import {TransferTypes} from "@/resources";
 
 Vue.use(Vuetify)
 
@@ -107,9 +108,14 @@ async function triggerUnsavedChange (): Promise<void> {
 
 // For future use when Transfer Details will be required to go to Review
 async function enterTransferDetailsFields (transferDetailsWrapper: Wrapper<any, Element>): Promise<void> {
-  transferDetailsWrapper.find(getTestId('declared-value')).setValue(TRANSFER_DECLARED_VALUE)
-  transferDetailsWrapper.find(getTestId('declared-value')).trigger('blur')
+  transferDetailsWrapper.find(getTestId('consideration')).trigger('mousedown')
   transferDetailsWrapper.findComponent(DatePicker).vm.$emit('emitDate', TRANSFER_DATE)
+  await Vue.nextTick()
+}
+
+async function enterTransferTypeFields (transferTypeWrapper: Wrapper<any, Element>): Promise<void> {
+  transferTypeWrapper.find(getTestId('declared-value')).setValue(TRANSFER_DECLARED_VALUE)
+  transferTypeWrapper.find(getTestId('declared-value')).trigger('blur')
   await Vue.nextTick()
 }
 
@@ -150,6 +156,8 @@ describe('Mhr Information', () => {
     expect(wrapper.findComponent(MhrInformation).exists()).toBe(true)
     expect(wrapper.find('#mhr-information-header').text()).toContain('Manufactured Home Information')
 
+    expect(wrapper.findComponent(TransferType).exists()).toBe(false)
+
     expect(wrapper.findComponent(HomeOwners).exists()).toBeTruthy()
     const homeOwnersTable = wrapper.findComponent(HomeOwnersTable)
     expect(homeOwnersTable.exists()).toBeTruthy()
@@ -158,13 +166,22 @@ describe('Mhr Information', () => {
   })
 
   it('renders and displays the correct sub components', async () => {
+    wrapper.vm.$data.dataLoaded = true
+    await Vue.nextTick()
+
     // Verify it does render before changes
     expect(wrapper.findComponent(StickyContainer).exists()).toBe(false)
+    expect(wrapper.findComponent(TransferType).exists()).toBe(false)
+    expect(wrapper.findComponent(TransferDetails).exists()).toBe(false)
+    expect(wrapper.props().isMhrTransfer).toBe(true)
 
-    await triggerUnsavedChange()
+    await wrapper.find('#home-owners-change-btn').trigger('click')
+    await Vue.nextTick()
 
-    // Sticky container w/ Fee Summary
+    // Sticky container w/ Fee Summary, Transfer type and Transfer Details components
     expect(wrapper.findComponent(StickyContainer).exists()).toBe(true)
+    expect(wrapper.findComponent(TransferType).exists()).toBe(true)
+    expect(wrapper.findComponent(TransferDetails).exists()).toBe(true)
   })
 
   it('should render Added badge after Owner is added to the table', async () => {
@@ -310,7 +327,8 @@ describe('Mhr Information', () => {
     expect(wrapper.findComponent(MhrInformation).findComponent(HomeOwnersTable).exists()).toBeTruthy()
 
     // Add some owners so Transfer Details will display
-    const owners = [mockedAddedPerson, mockedRemovedPerson] as MhrRegistrationHomeOwnerIF[] // same IF for Transfer and Registration
+    // same IF for Transfer and Registration
+    const owners = [mockedAddedPerson, mockedRemovedPerson] as MhrRegistrationHomeOwnerIF[]
     const homeOwnerGroup = [
       mockMhrTransferCurrentHomeOwner,
       { groupId: 1, owners: owners }
@@ -323,18 +341,20 @@ describe('Mhr Information', () => {
     const mhrTransferDetailsComponent = wrapper.findComponent(MhrInformation).findComponent(TransferDetails)
     expect(mhrTransferDetailsComponent.exists()).toBeTruthy()
 
+    await wrapper.find('#home-owners-change-btn').trigger('click')
+    await Vue.nextTick()
+
+    const mhrTransferTypeComponent = wrapper.findComponent(MhrInformation).findComponent(TransferType)
+    expect(mhrTransferTypeComponent.exists()).toBeTruthy()
+    await enterTransferTypeFields(mhrTransferTypeComponent)
+    await Vue.nextTick()
+
     // Check for component's fields
-    expect(mhrTransferDetailsComponent.find(getTestId('declared-value')).exists()).toBeTruthy()
+    // expect(mhrTransferDetailsComponent.find(getTestId('declared-value')).exists()).toBeFalsy()
     expect(mhrTransferDetailsComponent.find(getTestId('consideration')).exists()).toBeTruthy()
     expect(mhrTransferDetailsComponent.find(getTestId('transfer-date')).exists()).toBeTruthy()
     expect(mhrTransferDetailsComponent.find(getTestId('lease-own-checkbox')).exists()).toBeTruthy()
-
-    mhrTransferDetailsComponent.find(getTestId('declared-value')).setValue(123)
-    mhrTransferDetailsComponent.find(getTestId('declared-value')).trigger('blur')
-    await Vue.nextTick()
-
-    // Check that error/warning is shown for Declared Value less than 500
-    expect(mhrTransferDetailsComponent.find('.v-messages__message').isVisible()).toBeTruthy()
+    mhrTransferDetailsComponent.find(getTestId('consideration')).trigger('mousedown')
     await Vue.nextTick()
 
     // Check that Consideration displayed Declared Value on blur
@@ -349,6 +369,7 @@ describe('Mhr Information', () => {
     expect(wrapper.find('#transfer-ref-num-section').exists()).toBeFalsy()
 
     // Set Wrapper Validations
+    wrapper.vm.isValidTransferType = true
     wrapper.vm.isValidTransferOwners = true
     wrapper.vm.isTransferDetailsFormValid = true
 
@@ -399,6 +420,7 @@ describe('Mhr Information', () => {
     expect(wrapper.findComponent(MhrInformation).exists()).toBe(true)
 
     // Set Wrapper Validations
+    wrapper.vm.isValidTransferType = true
     wrapper.vm.isValidTransferOwners = true
     wrapper.vm.isTransferDetailsFormValid = true
 
@@ -438,6 +460,7 @@ describe('Mhr Information', () => {
     wrapper.vm.$data.accountInfo = mockedAccountInfo
 
     // Set Wrapper Validations
+    wrapper.vm.isValidTransferType = true
     wrapper.vm.isValidTransferOwners = true
     wrapper.vm.isTransferDetailsFormValid = true
 
@@ -473,6 +496,7 @@ describe('Mhr Information', () => {
     await Vue.nextTick()
 
     // Set Wrapper Validations
+    wrapper.vm.isValidTransferType = true
     wrapper.vm.isValidTransferOwners = true
     wrapper.vm.isTransferDetailsFormValid = true
 
@@ -523,13 +547,22 @@ describe('Mhr Information', () => {
 
     // set some test values for transfer details fields
     const mhrTransferDetailsComponent = wrapper.findComponent(MhrInformation).findComponent(TransferDetails)
-    mhrTransferDetailsComponent.find(getTestId('declared-value')).setValue(TRANSFER_DECLARED_VALUE)
-    mhrTransferDetailsComponent.find(getTestId('declared-value')).trigger('blur')
-    await Vue.nextTick()
     mhrTransferDetailsComponent.find(getTestId('lease-own-checkbox')).setChecked()
+
+    await wrapper.find('#home-owners-change-btn').trigger('click')
+    await Vue.nextTick()
+
+    const mhrTransferTypeComponent = wrapper.findComponent(MhrInformation).findComponent(TransferType)
+    expect(mhrTransferTypeComponent.exists()).toBeTruthy()
+    await enterTransferTypeFields(mhrTransferTypeComponent)
     await Vue.nextTick()
 
     expect(wrapper.findComponent(TransferDetailsReview).exists()).toBeFalsy()
+
+    // Set Wrapper Validations
+    wrapper.vm.isValidTransferType = true
+    wrapper.vm.isValidTransferOwners = true
+    wrapper.vm.isTransferDetailsFormValid = true
 
     // go to Review screen
     await triggerUnsavedChange()
@@ -539,7 +572,7 @@ describe('Mhr Information', () => {
     await Vue.nextTick()
     await Vue.nextTick()
 
-    // renders TransferDetailsReview
+    // renders TransferDetailsReviewc
     expect(wrapper.findComponent(TransferDetailsReview).exists()).toBeTruthy()
     const mhrTransferDetailsReviewComponent = wrapper.findComponent(TransferDetailsReview)
 
@@ -566,6 +599,7 @@ describe('Mhr Information', () => {
     expect(wrapper.find('#yellow-message-bar').exists()).toBeFalsy()
 
     // Set Wrapper Validations
+    wrapper.vm.isValidTransferType = true
     wrapper.vm.isValidTransferOwners = true
     wrapper.vm.isTransferDetailsFormValid = true
 
@@ -595,6 +629,7 @@ describe('Mhr Information', () => {
     expect(wrapper.find('#transfer-confirm-section').exists()).toBeFalsy()
 
     // Set Wrapper Validations
+    wrapper.vm.isValidTransferType = true
     wrapper.vm.isValidTransferOwners = true
     wrapper.vm.isTransferDetailsFormValid = true
 
@@ -636,6 +671,7 @@ describe('Mhr Information', () => {
     expect(wrapper.find('#owners-review').exists()).toBeFalsy()
 
     // Set Wrapper Validations
+    wrapper.vm.isValidTransferType = true
     wrapper.vm.isValidTransferOwners = true
     wrapper.vm.isTransferDetailsFormValid = true
 
@@ -664,6 +700,7 @@ describe('Mhr Information', () => {
     expect(feeSummaryContainer.find('.err-msg').exists()).toBeFalsy()
 
     // Set Wrapper Validations
+    wrapper.vm.isValidTransferType = true
     wrapper.vm.isValidTransferOwners = true
     wrapper.vm.isTransferDetailsFormValid = true
 
@@ -700,7 +737,15 @@ describe('Mhr Information', () => {
     expect(transferDetailsWrapper.exists()).toBeTruthy()
     await enterTransferDetailsFields(wrapper.findComponent(TransferDetails))
 
-    expect(transferDetailsWrapper.vm.$data.declaredValue).toBe(TRANSFER_DECLARED_VALUE)
+    await wrapper.find('#home-owners-change-btn').trigger('click')
+    await Vue.nextTick()
+
+    const mhrTransferTypeComponent = wrapper.findComponent(MhrInformation).findComponent(TransferType)
+    expect(mhrTransferTypeComponent.exists()).toBeTruthy()
+    await enterTransferTypeFields(mhrTransferTypeComponent)
+    await Vue.nextTick()
+
+    transferDetailsWrapper.find(getTestId('consideration')).trigger('mousedown')
     expect(transferDetailsWrapper.vm.$data.consideration).toBe(TRANSFER_CONSIDERATION)
     expect(transferDetailsWrapper.vm.$data.transferDate).toContain(TRANSFER_DATE)
 
@@ -713,7 +758,6 @@ describe('Mhr Information', () => {
     // Open up Transfer Details again and check that fields are cleared
     await triggerUnsavedChange()
 
-    expect(wrapper.find(TransferDetails).vm.$data.declaredValue).toBe('')
     expect(wrapper.find(TransferDetails).vm.$data.consideration).toBe('')
     expect(wrapper.find(TransferDetails).vm.$data.transferDate).toBe(null)
   })

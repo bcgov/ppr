@@ -1,5 +1,12 @@
-import { MhrRegistrationHomeOwnerGroupIF, MhrTransferIF, StateIF, SubmittingPartyIF } from '@/interfaces'
+import {
+  MhrRegistrationHomeOwnerGroupIF,
+  MhrTransferIF,
+  StateIF,
+  SubmittingPartyIF,
+  TransferTypeSelectIF
+} from '@/interfaces'
 import { set } from 'lodash'
+import { ApiTransferTypes } from '@/enums/transferTypes'
 
 export const mutateEmptyMhrTransfer = (state: StateIF, emptyMhrTransfer: MhrTransferIF) => {
   state.stateModel.mhrTransfer = emptyMhrTransfer
@@ -21,6 +28,10 @@ export const mutateMhrTransferCurrentHomeOwnerGroups = (
 }
 
 // Ownership Transfer
+export const mutateMhrTransferType = (state: StateIF, transferType: TransferTypeSelectIF) => {
+  state.stateModel.mhrTransfer.transferType = transferType
+}
+
 export const mutateMhrTransferDeclaredValue = (state: StateIF, declaredValue: number) => {
   state.stateModel.mhrTransfer.declaredValue = declaredValue
 }

@@ -1,4 +1,11 @@
-import { MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF, StateIF, SubmittingPartyIF } from '@/interfaces'
+import {
+  MhrRegistrationHomeOwnerGroupIF,
+  MhrRegistrationHomeOwnerIF,
+  StateIF,
+  SubmittingPartyIF,
+  TransferTypeSelectIF
+} from '@/interfaces'
+import { ApiTransferTypes } from '@/enums'
 
 // Home Owners
 export const getMhrTransferHomeOwners = (state: StateIF): MhrRegistrationHomeOwnerIF[] => {
@@ -29,6 +36,10 @@ export const getMhrTransferHomeOwnerGroups = (state: StateIF): MhrRegistrationHo
 }
 
 // Ownership Transfers
+export const getMhrTransferType = (state: StateIF): TransferTypeSelectIF => {
+  return state.stateModel.mhrTransfer.transferType
+}
+
 export const getMhrTransferDeclaredValue = (state: StateIF): number => {
   return state.stateModel.mhrTransfer.declaredValue
 }

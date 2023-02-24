@@ -1,7 +1,14 @@
 import { MhrTransferApiIF, MhrTransferIF } from '@/interfaces'
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import { readonly, ref } from '@vue/composition-api'
-import { ActionTypes, ApiHomeTenancyTypes, HomeTenancyTypes, UIRegistrationTypes } from '@/enums'
+import {
+  ActionTypes,
+  ApiHomeTenancyTypes,
+  ApiTransferTypes,
+  HomeTenancyTypes,
+  UIRegistrationTypes,
+  UITransferTypes
+} from '@/enums'
 
 // Validation flags for Review Confirm screen
 const refNumValid = ref(true)
@@ -16,7 +23,8 @@ export const useMhrInformation = () => {
     getMhrTransferOwnLand,
     getMhrTransferSubmittingParty,
     getMhrTransferAttentionReference,
-    getMhrTransferHomeOwnerGroups
+    getMhrTransferHomeOwnerGroups,
+    getMhrTransferType
   } = useGetters<any>([
     'getMhrTransferCurrentHomeOwners',
     'getMhrInformation',
@@ -27,7 +35,8 @@ export const useMhrInformation = () => {
     'getMhrTransferOwnLand',
     'getMhrTransferSubmittingParty',
     'getMhrTransferAttentionReference',
-    'getMhrTransferHomeOwnerGroups'
+    'getMhrTransferHomeOwnerGroups',
+    'getMhrTransferType'
   ])
 
   const {
@@ -46,6 +55,12 @@ export const useMhrInformation = () => {
     refNumValid.value = isValid
   }
 
+  const getUiTransferType = (apiTransferType: ApiTransferTypes): UITransferTypes => {
+    return UITransferTypes[
+      Object.keys(ApiTransferTypes).find(key => ApiTransferTypes[key] as string === apiTransferType)
+    ]
+  }
+
   const initMhrTransfer = (): MhrTransferIF => {
     return {
       mhrNumber: '',
@@ -54,6 +69,7 @@ export const useMhrInformation = () => {
         emailAddress: '',
         phoneNumber: ''
       },
+      transferType: null,
       declaredValue: null,
       consideration: '',
       transferDate: '',
@@ -103,6 +119,7 @@ export const useMhrInformation = () => {
       ownLand: getMhrTransferOwnLand.value || false,
       attentionReference: getMhrTransferAttentionReference.value,
       documentDescription: UIRegistrationTypes.TRANSFER_OF_SALE,
+      registrationType: getMhrTransferType.value.transferType,
       submittingParty: {
         businessName: getMhrTransferSubmittingParty.value.businessName,
         personName: getMhrTransferSubmittingParty.value.personName,
@@ -123,6 +140,7 @@ export const useMhrInformation = () => {
   return {
     isRefNumValid: readonly(refNumValid),
     setRefNumValid,
+    getUiTransferType,
     initMhrTransfer,
     buildApiData,
     parseDraftTransferDetails

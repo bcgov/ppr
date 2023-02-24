@@ -13,41 +13,6 @@
           <v-col cols="3">
             <label
               class="generic-label"
-              for="declared-value"
-              :class="{ 'error-text': validateTransferDetails && hasError(declaredValueRef) }"
-            >
-              Declared Value of Home
-            </label>
-          </v-col>
-          <v-col cols="9" class="declared-value-container">
-            <span class="mt-4 mr-3">$</span>
-            <v-text-field
-              id="declared-value"
-              class="declared-value"
-              :class="enableWarningMsg ? 'red-error' : 'warning-msg'"
-              ref="declaredValueRef"
-              v-model="declaredValue"
-              filled
-              :rules="declaredValueRules"
-              :messages="
-                enableWarningMsg && declaredValue && declaredValue < 500
-                  ? 'The declared value entered appears to be low. Confirm this is the correct market value.'
-                  : null
-              "
-              label="Amount in Canadian Dollars"
-              @blur="
-                updateConsideration($event.target.value), $refs.declaredValueRef.validate(), (enableWarningMsg = true)
-              "
-              @focus="enableWarningMsg = false"
-              data-test-id="declared-value"
-            />
-            <span class="mt-4 ml-3">.00</span>
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col cols="3">
-            <label
-              class="generic-label"
               for="consideration"
               :class="{ 'error-text': validateTransferDetails && hasError(considerationRef) }"
             >
@@ -63,6 +28,7 @@
               :rules="considerationRules"
               label="Amount in Canadian Dollars or Description"
               data-test-id="consideration"
+              @mousedown="updateConsideration()"
             />
           </v-col>
         </v-row>
@@ -127,7 +93,7 @@ export default defineComponent({
   emits: ['isValid'],
   components: { DatePicker },
   setup (props, context) {
-    const { customRules, required, isNumber, maxLength } = useInputRules()
+    const { customRules, required, maxLength } = useInputRules()
 
     const {
       getMhrTransferDeclaredValue,
@@ -142,34 +108,27 @@ export default defineComponent({
     ])
 
     const {
-      setMhrTransferDeclaredValue,
       setMhrTransferConsideration,
       setMhrTransferDate,
       setMhrTransferOwnLand,
       setUnsavedChanges
     } = useActions([
-      'setMhrTransferDeclaredValue',
       'setMhrTransferConsideration',
       'setMhrTransferDate',
       'setMhrTransferOwnLand',
       'setUnsavedChanges'
     ])
 
-    const declaredValueRef = ref(null)
     const considerationRef = ref(null)
-
-    const declaredValueRules = computed(
-      (): Array<Function> => customRules(maxLength(7, true), isNumber(), required('Enter declared value of home'))
-    )
 
     const considerationRules = computed(
       (): Array<Function> => customRules(maxLength(80), required('Enter consideration'))
     )
 
-    const updateConsideration = (declaredValue: string) => {
+    const updateConsideration = () => {
       // copy Declared Value into Consideration field - the initial time only
-      if (!localState.consideration && localState.declaredValue && parseInt(declaredValue)) {
-        localState.consideration = `$${declaredValue}.00`
+      if (!localState.consideration && getMhrTransferDeclaredValue.value) {
+        localState.consideration = `$${getMhrTransferDeclaredValue.value}.00`
       }
     }
 
@@ -177,7 +136,6 @@ export default defineComponent({
       validateTransferDetails: false, // triggered once Review & Confirm clicked
       isFormValid: false, // TransferDetails form without Transfer Date Picker
       isTransferDetailsFormValid: computed((): boolean => localState.isFormValid && !!localState.transferDate),
-      declaredValue: getMhrTransferDeclaredValue.value?.toString(),
       consideration: getMhrTransferConsideration.value,
       transferDate: getMhrTransferDate.value,
       isOwnLand: getMhrTransferOwnLand.value || false,
@@ -197,19 +155,10 @@ export default defineComponent({
 
     // Clear the data when hiding Transfer Details (e.g. in Undo)
     const clearTransferDetailsData = () => {
-      setMhrTransferDeclaredValue('')
       setMhrTransferConsideration('')
       setMhrTransferDate(null)
       setMhrTransferOwnLand(false)
     }
-
-    watch(
-      () => localState.declaredValue,
-      async (val: string) => {
-        await setMhrTransferDeclaredValue(parseInt(val) ? parseInt(val) : null)
-        setUnsavedChanges(true)
-      }
-    )
 
     watch(
       () => localState.consideration,
@@ -244,9 +193,7 @@ export default defineComponent({
 
     return {
       hasError,
-      declaredValueRef,
       considerationRef,
-      declaredValueRules,
       considerationRules,
       updateConsideration,
       validateDetailsForm,
@@ -268,18 +215,6 @@ export default defineComponent({
 
   hr {
     border-top: 1px solid $gray3;
-  }
-  .declared-value-container {
-    display: flex;
-
-    .declared-value {
-      .warning-msg > .v-messages__message {
-        color: $gray7;
-      }
-      .red-error > .v-messages__message {
-        color: red;
-      }
-    }
   }
 
   .lease-own-checkbox {

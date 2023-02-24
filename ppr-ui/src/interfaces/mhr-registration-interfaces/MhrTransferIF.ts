@@ -1,14 +1,16 @@
 import {
   MhrRegistrationHomeOwnerGroupIF,
-  PartyIF,
   MhrHomeOwnerGroupIF,
   PaymentIF,
-  SubmittingPartyIF, ErrorIF
+  SubmittingPartyIF,
+  ErrorIF,
+  TransferTypeSelectIF
 } from '@/interfaces'
-import { APIMhrTypes } from '@/enums'
+import { APIMhrTypes, ApiTransferTypes } from '@/enums'
 
 export interface MhrTransferIF {
   mhrNumber: string
+  transferType: TransferTypeSelectIF
   declaredValue: number
   consideration: string
   transferDate: string
@@ -29,6 +31,7 @@ export interface MhrTransferApiIF {
   consideration: string
   transferDate: string
   ownLand: boolean
+  registrationType: ApiTransferTypes
   submittingParty: SubmittingPartyIF
   attentionReference: string
   deleteOwnerGroups?: Array<MhrHomeOwnerGroupIF>
