@@ -1,4 +1,11 @@
-import { ActionIF, MhrRegistrationHomeOwnerGroupIF, MhrTransferIF, SubmittingPartyIF } from '@/interfaces'
+import {
+  ActionIF,
+  MhrRegistrationHomeOwnerGroupIF,
+  MhrTransferIF,
+  SubmittingPartyIF,
+  TransferTypeSelectIF
+} from '@/interfaces'
+import { ApiTransferTypes } from '@/enums/transferTypes'
 
 export const setEmptyMhrTransfer: ActionIF = ({ commit }, emptyMhrTransfer: MhrTransferIF): void => {
   commit('mutateEmptyMhrTransfer', emptyMhrTransfer)
@@ -18,6 +25,10 @@ export const setMhrTransferCurrentHomeOwnerGroups: ActionIF = (
   groups: MhrRegistrationHomeOwnerGroupIF[]
 ): void => {
   commit('mutateMhrTransferCurrentHomeOwnerGroups', groups)
+}
+
+export const setMhrTransferType: ActionIF = ({ commit }, transferType: TransferTypeSelectIF): void => {
+  commit('mutateMhrTransferType', transferType)
 }
 
 export const setMhrTransferDeclaredValue: ActionIF = ({ commit }, declaredValue: number): void => {

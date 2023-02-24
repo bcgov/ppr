@@ -34,7 +34,7 @@
             :groupId="group"
             :groupNumber="getGroupNumberById(group)"
             :owners="hasActualOwners(items) ? items : []"
-            :showEditActions="showEditActions"
+            :showEditActions="showEditActions && enableActions"
             :disableGroupHeader="disableGroupHeader(group)"
             :isMhrTransfer="isMhrTransfer"
           />
@@ -137,7 +137,7 @@
           <td v-if="showEditActions" class="row-actions text-right">
 
             <!-- New Owner Actions -->
-            <div v-if="!isMhrTransfer || isAddedHomeOwner(row.item)" class="mr-n4">
+            <div v-if="(!isMhrTransfer || isAddedHomeOwner(row.item)) && enableActions" class="mr-n4">
               <v-btn
                 text
                 color="primary"
@@ -175,7 +175,7 @@
             </div>
 
             <!-- Existing Owner Actions -->
-            <template v-else>
+            <template v-else-if="enableActions">
               <v-btn
                 v-if="!isRemovedHomeOwner(row.item)"
                 text color="primary" class="mr-n4"
@@ -244,7 +244,8 @@ export default defineComponent({
     isMhrTransfer: { type: Boolean, default: false },
     hideRemovedOwners: { type: Boolean, default: false },
     showChips: { type: Boolean, default: false },
-    validateTransfer: { type: Boolean, default: false }
+    validateTransfer: { type: Boolean, default: false },
+    enableActions: { type: Boolean, default: true }
   },
   components: {
     BaseAddress,

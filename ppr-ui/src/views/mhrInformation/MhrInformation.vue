@@ -77,7 +77,7 @@
                 <!-- Review Header -->
                 <header class="review-header mt-1 rounded-top">
                   <v-icon class="ml-2" color="darkBlue">mdi-file-document-multiple</v-icon>
-                  <label class="font-weight-bold pl-2">Ownership Transfer or Change - Sale or Beneficiary</label>
+                  <label class="font-weight-bold pl-2">Ownership Transfer or Change - {{ uiTransferType }}</label>
                 </header>
 
                 <section id="owners-review">
@@ -189,15 +189,47 @@
 
                 <!-- Home Owners Header -->
                 <header class="review-header mt-10 rounded-top">
-                  <img class="ml-1" src="@/assets/svgs/homeownersicon_reviewscreen.svg" />
-                  <label class="font-weight-bold pl-2">Home Owners</label>
+                  <v-row no-gutters align="center">
+                    <v-col cols="10">
+                      <img class="icon-img pb-1" src="@/assets/svgs/homeownersicon_reviewscreen.svg" />
+                      <span class="font-weight-bold pl-1">Home Owners</span>
+                    </v-col>
+                    <v-col v-if="isMhrTransfer" cols="2" class="text-right">
+                      <v-btn
+                        text id="home-owners-change-btn"
+                        class="pl-1"
+                        color="primary"
+                        :ripple="false"
+                        @click="toggleTypeSelector()"
+                      >
+                        <span v-if="!showTransferType">
+                          <v-icon color="primary" small>mdi-pencil</v-icon> Change
+                        </span>
+                        <span v-else>
+                          <v-icon color="primary" small>mdi-close</v-icon> Cancel Owner Change
+                        </span>
+                      </v-btn>
+                    </v-col>
+                  </v-row>
                 </header>
+
+                <!-- Transfer Type Component Slots Here -->
+                <v-expand-transition>
+                  <TransferType
+                    v-if="showTransferType"
+                    :validate="validate"
+                    @emitType="handleTransferTypeChange($event)"
+                    @emitDeclaredValue="handleDeclaredValueChange($event)"
+                    @emitValid="isValidTransferType = $event"
+                  />
+                </v-expand-transition>
 
                 <HomeOwners
                   isMhrTransfer
                   class="mt-n2"
                   :class="{ 'mb-10': !hasUnsavedChanges }"
                   :validateTransfer="validate"
+                  :enableActions="enableActions"
                   @isValidTransferOwners="isValidTransferOwners = $event"
                 />
 
@@ -241,34 +273,13 @@
 import { computed, defineComponent, onMounted, reactive, ref, toRefs, watch } from '@vue/composition-api'
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
-import {
-  ActionTypes,
-  APIMHRMapSearchTypes,
-  APISearchTypes,
-  HomeCertificationOptions,
-  HomeLocationTypes,
-  RouteNames,
-  UIMHRSearchTypes
-} from '@/enums'
-import {
-  createMhrTransferDraft,
-  deleteMhrDraft,
-  fetchMhRegistration,
-  getAccountInfoFromAuth,
-  getMHRegistrationSummary,
-  getMhrTransferDraft,
-  mhrSearch,
-  pacificDate,
-  submitMhrTransfer,
-  updateMhrDraft
-} from '@/utils'
 import { CertifyInformation, StickyContainer } from '@/components/common'
 import { useHomeOwners, useInputRules, useMhrInformation } from '@/composables'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
 import { PartySearch } from '@/components/parties/party'
 import { MhrSubmittingParty } from '@/components/mhrRegistration/SubmittingParty'
-import { ConfirmCompletion, TransferDetails, TransferDetailsReview } from '@/components/mhrTransfers'
+import { ConfirmCompletion, TransferDetails, TransferDetailsReview, TransferType } from '@/components/mhrTransfers'
 import { HomeLocationReview, YourHomeReview } from '@/components/mhrRegistration/ReviewConfirm'
 import { HomeOwners } from '@/views'
 import { BaseDialog } from '@/components/dialogs'
@@ -284,8 +295,32 @@ import {
   MhrRegistrationHomeLocationIF,
   MhrTransferApiIF,
   RegTableNewItemI,
-  SubmittingPartyIF
+  SubmittingPartyIF,
+  TransferTypeSelectIF
 } from '@/interfaces'
+import {
+  ActionTypes,
+  APIMHRMapSearchTypes,
+  APISearchTypes,
+  ApiTransferTypes,
+  HomeCertificationOptions,
+  HomeLocationTypes,
+  RouteNames,
+  UIMHRSearchTypes,
+  UiTransferTypes
+} from '@/enums'
+import {
+  createMhrTransferDraft,
+  deleteMhrDraft,
+  fetchMhRegistration,
+  getAccountInfoFromAuth,
+  getMHRegistrationSummary,
+  getMhrTransferDraft,
+  mhrSearch,
+  pacificDate,
+  submitMhrTransfer,
+  updateMhrDraft
+} from '@/utils'
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
@@ -296,6 +331,7 @@ export default defineComponent({
     HomeOwners,
     PartySearch,
     MhrSubmittingParty,
+    TransferType,
     TransferDetails,
     TransferDetailsReview,
     HomeLocationReview,
@@ -327,7 +363,8 @@ export default defineComponent({
       hasLien,
       isRoleStaffReg,
       isRoleQualifiedSupplier,
-      getMhrTransferSubmittingParty
+      getMhrTransferSubmittingParty,
+      getMhrTransferType
     } = useGetters<any>([
       'getMhrTransferHomeOwners',
       'getMhrInformation',
@@ -337,7 +374,8 @@ export default defineComponent({
       'hasLien',
       'isRoleStaffReg',
       'isRoleQualifiedSupplier',
-      'getMhrTransferSubmittingParty'
+      'getMhrTransferSubmittingParty',
+      'getMhrTransferType'
     ])
 
     const {
@@ -352,7 +390,9 @@ export default defineComponent({
       setLienType,
       setMhrLocation,
       setIsManualLocation,
-      setMhrHomeDescription
+      setMhrHomeDescription,
+      setMhrTransferType,
+      setMhrTransferDeclaredValue
     } = useActions<any>([
       'setMhrTransferHomeOwnerGroups',
       'setMhrTransferCurrentHomeOwnerGroups',
@@ -365,7 +405,9 @@ export default defineComponent({
       'setLienType',
       'setMhrLocation',
       'setIsManualLocation',
-      'setMhrHomeDescription'
+      'setMhrHomeDescription',
+      'setMhrTransferType',
+      'setMhrTransferDeclaredValue'
     ])
 
     const { setEmptyMhrTransfer } = useActions<any>(['setEmptyMhrTransfer'])
@@ -375,6 +417,7 @@ export default defineComponent({
       setRefNumValid,
       initMhrTransfer,
       buildApiData,
+      getUiTransferType,
       parseDraftTransferDetails
     } = useMhrInformation()
 
@@ -397,12 +440,29 @@ export default defineComponent({
       refNumValid: false,
       authorizationValid: false,
       isSubmittingPartyValid: false,
-      validateSubmittingParty: computed((): boolean => localState.validate && !localState.isSubmittingPartyValid),
       validateConfirmCompletion: false,
       validateAuthorizationError: false,
       accountInfo: null,
+      isValidTransferType: false,
       isValidTransferOwners: false,
       feeType: FeeSummaryTypes.MHR_TRANSFER, // FUTURE STATE: To be dynamic, dependent on what changes have been made
+      showTransferType: false,
+      attentionReference: '',
+      isCompletionConfirmed: false,
+      cancelOptions: unsavedChangesDialog,
+      saveOptions: registrationSaveDraftError,
+      showCancelDialog: false,
+      showSaveDialog: false,
+      validateSubmittingParty: computed((): boolean => {
+        return localState.validate && !localState.isSubmittingPartyValid
+      }),
+      uiTransferType: computed((): UiTransferTypes => {
+        return getUiTransferType(getMhrTransferType.value?.transferType)
+      }),
+      enableActions: computed((): boolean => {
+        // To add validations here, type dependent
+        return getMhrTransferType.value?.transferType === ApiTransferTypes.SALE_OR_GIFT
+      }),
       isAuthenticated: computed((): boolean => {
         return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
       }),
@@ -416,6 +476,7 @@ export default defineComponent({
         // is valid on first step
         return (
           !isGlobalEditingMode.value &&
+          localState.isValidTransferType &&
           localState.isValidTransferOwners &&
           localState.isTransferDetailsFormValid &&
           !hasLien.value
@@ -446,13 +507,7 @@ export default defineComponent({
       /** True if Jest is running the code. */
       isJestRunning: computed((): boolean => {
         return process.env.JEST_WORKER_ID !== undefined
-      }),
-      attentionReference: '',
-      isCompletionConfirmed: false,
-      cancelOptions: unsavedChangesDialog,
-      saveOptions: registrationSaveDraftError,
-      showCancelDialog: false,
-      showSaveDialog: false
+      })
     })
 
     onMounted(async (): Promise<void> => {
@@ -531,7 +586,7 @@ export default defineComponent({
         setMhrTransferHomeOwnerGroups([...registration.addOwnerGroups])
       } else {
         // Set current owners if there is no draft
-        setMhrTransferHomeOwnerGroups(currentOwnerGroups)
+        setMhrTransferHomeOwnerGroups(cloneDeep(currentOwnerGroups))
       }
     }
 
@@ -712,6 +767,26 @@ export default defineComponent({
       }
     }
 
+    const toggleTypeSelector = (): void => {
+      localState.showTransferType = !localState.showTransferType
+      setUnsavedChanges(true)
+    }
+
+    const handleTransferTypeChange = async (transferTypeSelect: TransferTypeSelectIF): Promise<void> => {
+      await setMhrTransferType(transferTypeSelect)
+      setUnsavedChanges(true)
+
+      // Reset state until support is built for other Transfer Types
+      if (transferTypeSelect.transferType !== ApiTransferTypes.SALE_OR_GIFT) {
+        await setMhrTransferHomeOwnerGroups(cloneDeep(getMhrTransferCurrentHomeOwners.value))
+      }
+    }
+
+    const handleDeclaredValueChange = async (declaredValue: number): Promise<void> => {
+      await setMhrTransferDeclaredValue(declaredValue)
+      setUnsavedChanges(true)
+    }
+
     watch(
       () => localState.attentionReference,
       (val: string) => {
@@ -774,6 +849,10 @@ export default defineComponent({
       isRoleStaffReg,
       getMhrTransferSubmittingParty,
       setMhrTransferSubmittingParty,
+      handleTransferTypeChange,
+      getUiTransferType,
+      handleDeclaredValueChange,
+      toggleTypeSelector,
       ...toRefs(localState)
     }
   }
@@ -810,5 +889,14 @@ export default defineComponent({
   color: $gray7;
   margin-top: 10px;
   margin-bottom: 20px;
+}
+
+::v-deep {
+  #home-owners-change-btn {
+    height: unset;
+  }
+  .icon-img {
+    vertical-align: middle;
+  }
 }
 </style>

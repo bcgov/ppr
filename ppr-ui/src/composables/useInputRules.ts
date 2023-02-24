@@ -2,7 +2,8 @@
 export const useInputRules = () => {
   const maxLength = (maxLength: number, isMaxLengthForDigits: boolean = false): Array<Function> => {
     return [
-      v => (v || '').length <= maxLength || `Maximum ${maxLength} ${isMaxLengthForDigits ? 'digits' : 'characters'}`
+      v => (v || '').toString().length <= maxLength ||
+        `Maximum ${maxLength} ${isMaxLengthForDigits ? 'digits' : 'characters'}`
     ]
   }
 

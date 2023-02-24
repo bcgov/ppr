@@ -300,6 +300,7 @@ export const stateModel: StateModelIF = {
       emailAddress: '',
       phoneNumber: ''
     },
+    transferType: null,
     declaredValue: null,
     consideration: '',
     transferDate: '',
