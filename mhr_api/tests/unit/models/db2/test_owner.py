@@ -135,6 +135,8 @@ def test_owner_json(session):
                      group_id=1,
                      owner_id=1,
                      sequence_number=1,
+                     status='3',
+                     type='SOLE',
                      owner_type='I',
                      verified_flag='N',
                      phone_number='6041234567',
@@ -144,16 +146,22 @@ def test_owner_json(session):
                      legacy_address='P.O. BOX 1905                           FORT NELSON, BC')
 
     test_json = {
-        'manuhomeId': owner.manuhome_id,
-        'groupId': owner.group_id,
-        'ownerId': owner.owner_id,
-        'sequenceNumber': owner.sequence_number,
-        'ownerType': owner.owner_type,
-        'verifiedFlag': owner.verified_flag,
+        'individualName' : {
+            'first': 'DAVID',
+            'last': 'HAMM',
+            'middle': 'MICHAEL'
+        },
         'phoneNumber': owner.phone_number,
-        'postalCode': owner.postal_code,
-        'name': owner.name,
+        'address': {
+            'city': 'FORT NELSON',
+            'country': 'CA',
+            'postalCode': 'V0C 1R0',
+            'region': 'BC',
+            'street': 'P.O. BOX 1905'
+        },
+        'type': owner.type,
+        'status': 'ACTIVE',
         'suffix': owner.suffix,
-        'legacyAddress': owner.legacy_address
+        'partyType': 'OWNER_IND'
     }
     assert owner.json == test_json

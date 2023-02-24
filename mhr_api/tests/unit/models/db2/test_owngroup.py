@@ -205,21 +205,14 @@ def test_owngroup_json(session, tenancy_type, legacy_tenancy_type):
                            tenancy_specified='Y')
 
     test_json = {
-        'manuhomeId': owngroup.manuhome_id,
         'groupId': owngroup.group_id,
-        'copyId': owngroup.copy_id,
-        'sequenceNumber': owngroup.sequence_number,
-        'status': 'PREVIOUS',
-        'pendingFlag': owngroup.pending_flag,
-        'registrationDocumentId': owngroup.reg_document_id,
-        'canDocumentId': owngroup.can_document_id,
         'type': tenancy_type,
-        'lessee': owngroup.lessee,
-        'lessor': owngroup.lessor,
+        'status': 'PREVIOUS',
         'interest': 'UNDIVIDED',
         'interestNumerator': owngroup.interest_numerator,
         'interestDenominator': 2,
-        'tenancySpecified': True
+        'tenancySpecified': True,
+        'owners': []
     }
     assert owngroup.json == test_json
 

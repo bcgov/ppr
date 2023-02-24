@@ -43,6 +43,8 @@ class MhrParty(db.Model):  # pylint: disable=too-many-instance-attributes
     phone_extension = db.Column('phone_extension', db.String(10), nullable=True)
     suffix = db.Column('suffix', db.String(100), nullable=True)
     description = db.Column('description', db.String(150), nullable=True)
+    death_cert_number = db.Column('death_cert_number', db.String(20), nullable=True)
+    death_ts = db.Column('death_ts', db.DateTime, nullable=True)
 
     # parent keys
     address_id = db.Column('address_id', db.Integer, db.ForeignKey('addresses.id'), nullable=True, index=True)
@@ -81,14 +83,17 @@ class MhrParty(db.Model):  # pylint: disable=too-many-instance-attributes
 
         if self.business_name:
             party['businessName'] = self.business_name
-        if self.last_name:
+        elif self.last_name:
             person_name = {
                 'first': self.first_name,
                 'last': self.last_name
             }
             if self.middle_name:
                 person_name['middle'] = self.middle_name
-            party['personName'] = person_name
+            if self.party_type == MhrPartyTypes.SUBMITTING:
+                party['personName'] = person_name
+            else:
+                party['individualName'] = person_name
 
         if self.address:
             cp_address = self.address.json

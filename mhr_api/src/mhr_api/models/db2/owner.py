@@ -137,20 +137,7 @@ class Db2Owner(db.Model):
     @property
     def json(self):
         """Return a dict of this object, with keys in JSON format."""
-        owner = {
-            'manuhomeId': self.manuhome_id,
-            'groupId': self.group_id,
-            'ownerId': self.owner_id,
-            'sequenceNumber': self.sequence_number,
-            'ownerType': self.owner_type,
-            'verifiedFlag': self.verified_flag,
-            'phoneNumber': self.phone_number,
-            'postalCode': self.postal_code,
-            'name': self.name,
-            'suffix': self.suffix,
-            'legacyAddress': self.legacy_address
-        }
-        return owner
+        return self.registration_json
 
     @property
     def registration_json(self):

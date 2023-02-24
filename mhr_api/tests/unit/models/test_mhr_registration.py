@@ -35,6 +35,193 @@ from mhr_api.services.authz import MANUFACTURER_GROUP, QUALIFIED_USER_GROUP, GOV
 
 REG_DESCRIPTION = 'REGISTER NEW UNIT'
 CONV_DESCRIPTION = 'RECORD CONVERSION'
+TRAND_DELETE_GROUPS = [
+    {
+        'groupId': 3,
+        'owners': [
+            {
+                'individualName': {
+                    'first': 'ROBERT',
+                    'middle': 'JOHN',
+                    'last': 'MOWAT'
+                },
+                'address': {
+                    'street': '3122B LYNNLARK PLACE',
+                    'city': 'VICTORIA',
+                    'region': 'BC',
+                    'postalCode': 'V8S 4I6',
+                    'country': 'CA'
+                },
+                'phoneNumber': '6041234567'
+            }, {
+                'individualName': {
+                    'first': 'KAREN',
+                    'middle': 'PATRICIA',
+                    'last': 'MOWAT'
+                },
+                'address': {
+                    'street': '3122B LYNNLARK PLACE',
+                    'city': 'VICTORIA',
+                    'region': 'BC',
+                    'postalCode': 'V8S 4I6',
+                    'country': 'CA'
+                },
+                'phoneNumber': '6041234567',
+                'deathCertificateNumber': '232432432',
+                'deathDateTime': '2021-02-21T18:56:00+00:00'
+            }
+        ],
+        'type': 'JOINT'
+    }
+]
+TRAND_ADD_GROUPS = [
+    {
+        'groupId': 4,
+        'owners': [
+            {
+            'individualName': {
+                'first': 'ROBERT',
+                'middle': 'JOHN',
+                'last': 'MOWAT'
+            },
+            'address': {
+                'street': '3122B LYNNLARK PLACE',
+                'city': 'VICTORIA',
+                'region': 'BC',
+                'postalCode': 'V8S 4I6',
+                'country': 'CA'
+            },
+            'phoneNumber': '6041234567'
+            }
+        ],
+        'type': 'SOLE'
+    }
+]
+EXEC_DELETE_GROUPS = [
+    {
+        'groupId': 1,
+        'owners': [
+            {
+                'individualName': {
+                    'first': 'SHARON',
+                    'last': 'HALL'
+                 },
+                'address': {
+                    'street': '3122B LYNNLARK PLACE',
+                    'city': 'VICTORIA',
+                    'region': 'BC',
+                    'postalCode': 'V8S 4I6',
+                    'country': 'CA'
+                },
+                'phoneNumber': '6041234567'
+            }, {
+                'individualName': {
+                    'first': 'DENNIS',
+                    'last': 'HALL'
+                },
+                'address': {
+                    'street': '3122B LYNNLARK PLACE',
+                    'city': 'VICTORIA',
+                    'region': 'BC',
+                    'postalCode': 'V8S 4I6',
+                    'country': 'CA'
+                },
+                'phoneNumber': '6041234567',
+                'deathCertificateNumber': '232432432',
+                'deathDateTime': '2021-02-21T18:56:00+00:00'
+            }
+        ],
+        'type': 'JOINT'
+    }
+]
+EXEC_ADD_GROUPS = [
+    {
+        'groupId': 2,
+        'owners': [
+            {
+                'individualName': {
+                    'first': 'SHARON',
+                    'last': 'HALL'
+                },
+                'address': {
+                    'street': '3122B LYNNLARK PLACE',
+                    'city': 'VICTORIA',
+                    'region': 'BC',
+                    'postalCode': 'V8S 4I6',
+                    'country': 'CA'
+                },
+                'phoneNumber': '6041234567',
+                'partyType': 'OWNER_IND'
+            }, {
+                'individualName': {
+                    'first': 'APPOINTED',
+                    'last': 'EXECUTOR'
+                },
+                'address': {
+                    'street': '3122B LYNNLARK PLACE',
+                    'city': 'VICTORIA',
+                    'region': 'BC',
+                    'postalCode': 'V8S 4I6',
+                    'country': 'CA'
+                },
+                'phoneNumber': '6041234567',
+                'partyType': 'EXECUTOR',
+                'description': 'EXECUTOR of the deceased.'
+            }
+        ],
+        'type': 'NA'
+    }
+]
+ADMIN_DELETE_GROUPS = [
+    {
+        'groupId': 4,
+        'owners': [
+            {
+                'individualName': {
+                    'first': 'RICHARD',
+                    'middle': 'GORDON',
+                    'last': 'LANGER'
+                },
+                'address': {
+                    'street': '3122B LYNNLARK PLACE',
+                    'city': 'VICTORIA',
+                    'region': 'BC',
+                    'postalCode': 'V8S 4I6',
+                    'country': 'CA'
+                },
+                'phoneNumber': '6041234567',
+                'partyType': 'OWNER_IND',
+                'deathCertificateNumber': '232432432',
+                'deathDateTime': '2021-02-21T18:56:00+00:00'
+            }
+        ],
+        'type': 'SOLE'
+    }
+]
+ADMIN_ADD_GROUPS = [
+    {
+        'groupId': 5,
+        'owners': [
+            {
+                'individualName': {
+                    'first': 'APPOINTED',
+                    'last': 'ADMINISTRATOR'
+                },
+                'address': {
+                    'street': '3122B LYNNLARK PLACE',
+                    'city': 'VICTORIA',
+                    'region': 'BC',
+                    'postalCode': 'V8S 4I6',
+                    'country': 'CA'
+                },
+                'phoneNumber': '6041234567',
+                'partyType': 'ADMINISTRATOR',
+                'description': 'ADMINISTRATOR of the deceased.'
+            }
+        ],
+        'type': 'SOLE'
+    }
+]
 SOLE_OWNER_GROUP = [
     {
         'groupId': 1,
@@ -186,13 +373,12 @@ TEST_DATA_TRANSFER = [
     ('150062', MANUFACTURER_GROUP, '8', '2523'),
     ('150062', QUALIFIED_USER_GROUP, '1', '2523')
 ]
-# testdata pattern is ({mhr_num}, {group_id}, {account_id}, {party_type}, {tenancy_type})
+# testdata pattern is ({mhr_num}, {group_id}, {account_id}, {delete_groups}, {add_groups}, {reg_type})
 TEST_DATA_TRANSFER_DEATH = [
-    ('150062', QUALIFIED_USER_GROUP, '2523', MhrPartyTypes.EXECUTOR, None),
-    ('150062', QUALIFIED_USER_GROUP, '2523', MhrPartyTypes.ADMINISTRATOR, None),
-    ('150062', QUALIFIED_USER_GROUP, '2523', MhrPartyTypes.TRUSTEE, None),
-    ('150062', QUALIFIED_USER_GROUP, '2523', MhrPartyTypes.TRUST, None),
-    ('004764', QUALIFIED_USER_GROUP, '2523', MhrPartyTypes.EXECUTOR, MhrTenancyTypes.NA)
+    ('001004', QUALIFIED_USER_GROUP, '2523', TRAND_DELETE_GROUPS, TRAND_ADD_GROUPS, MhrRegistrationTypes.TRAND),
+    ('001019', STAFF_ROLE, '2523', ADMIN_DELETE_GROUPS, ADMIN_ADD_GROUPS, MhrRegistrationTypes.TRANS_ADMIN),
+    ('001020', STAFF_ROLE, '2523', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS, MhrRegistrationTypes.TRANS_AFFIDAVIT),
+    ('001020', STAFF_ROLE, '2523', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS, MhrRegistrationTypes.TRANS_WILL)
 ]
 # testdata pattern is ({mhr_num}, {group_id}, {account_id})
 TEST_DATA_TRANSFER_SAVE = [
@@ -561,21 +747,20 @@ def test_create_transfer_from_json(session, mhr_num, user_group, doc_id_prefix, 
         assert registration.manuhome
 
 
-@pytest.mark.parametrize('mhr_num,user_group,account_id,party_type,tenancy_type', TEST_DATA_TRANSFER_DEATH)
-def test_create_transfer_death_from_json(session, mhr_num, user_group, account_id, party_type, tenancy_type):
+@pytest.mark.parametrize('mhr_num,user_group,account_id,del_groups,add_groups,reg_type', TEST_DATA_TRANSFER_DEATH)
+def test_create_transfer_death_from_json(session, mhr_num, user_group, account_id, del_groups, add_groups, reg_type):
     """Assert that an MHR tranfer due to death is created from MHR transfer json correctly."""
     json_data = copy.deepcopy(TRANSFER)
     del json_data['documentId']
     del json_data['documentDescription']
     del json_data['createDateTime']
     del json_data['payment']
-    json_data['registrationType'] = MhrRegistrationTypes.TRAND
+    json_data['registrationType'] = reg_type
     json_data['mhrNumber'] = mhr_num
-    for group in json_data.get('addOwnerGroups'):
-        if tenancy_type:
-            group['type'] = tenancy_type
-        for owner in group.get('owners'):
-            owner['partyType'] = party_type
+    json_data['deleteOwnerGroups'] = copy.deepcopy(del_groups)
+    json_data['addOwnerGroups'] = copy.deepcopy(add_groups)
+    if reg_type == MhrRegistrationTypes.TRANS_AFFIDAVIT:
+        json_data['declaredValue'] = 25000
     base_reg: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account_id)
     assert base_reg
     assert base_reg.manuhome
@@ -591,7 +776,7 @@ def test_create_transfer_death_from_json(session, mhr_num, user_group, account_i
     assert registration.mhr_number == mhr_num
     assert registration.registration_ts
     assert registration.status_type == MhrRegistrationStatusTypes.ACTIVE
-    assert registration.registration_type == MhrRegistrationTypes.TRAND
+    assert registration.registration_type == reg_type
     assert registration.account_id == account_id
     assert registration.client_reference_id    
     assert registration.draft
@@ -604,12 +789,54 @@ def test_create_transfer_death_from_json(session, mhr_num, user_group, account_i
     assert registration.parties
     for group in registration.owner_groups:
         if group.modified:
-            if tenancy_type:
-                assert group.tenancy_type == tenancy_type
             for owner in group.owners:
-                assert owner.party_type == party_type
+                if reg_type == MhrRegistrationTypes.TRAND:
+                    assert owner.party_type in (MhrPartyTypes.OWNER_IND, MhrPartyTypes.OWNER_BUS)
+                elif reg_type == MhrRegistrationTypes.TRANS_ADMIN:
+                    assert owner.party_type == MhrPartyTypes.ADMINISTRATOR
+                else:
+                    assert owner.party_type in (MhrPartyTypes.OWNER_IND,
+                                                MhrPartyTypes.OWNER_BUS,
+                                                MhrPartyTypes.EXECUTOR)
+            if reg_type in (MhrRegistrationTypes.TRANS_AFFIDAVIT, MhrRegistrationTypes.TRANS_WILL):
+                assert group.tenancy_type == MhrTenancyTypes.NA
     if model_utils.is_legacy():
         assert registration.manuhome
+
+
+@pytest.mark.parametrize('mhr_num,user_group,account_id,del_groups,add_groups,reg_type', TEST_DATA_TRANSFER_DEATH)
+def test_save_transfer_death(session, mhr_num, user_group, account_id, del_groups, add_groups, reg_type):
+    """Assert that an MHR transfer due to death save deleted owner group works correctly."""
+    json_data = copy.deepcopy(TRANSFER)
+    del json_data['documentId']
+    del json_data['documentDescription']
+    del json_data['createDateTime']
+    del json_data['payment']
+    json_data['registrationType'] = reg_type
+    json_data['mhrNumber'] = mhr_num
+    json_data['deleteOwnerGroups'] = copy.deepcopy(del_groups)
+    json_data['addOwnerGroups'] = copy.deepcopy(add_groups)
+    if reg_type == MhrRegistrationTypes.TRANS_AFFIDAVIT:
+        json_data['declaredValue'] = 25000
+    base_reg: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account_id)
+    assert base_reg
+    assert base_reg.manuhome
+    # current_app.logger.info(json_data)
+    registration: MhrRegistration = MhrRegistration.create_transfer_from_json(base_reg,
+                                                                              json_data,
+                                                                              account_id,
+                                                                              'userid',
+                                                                              user_group)
+    registration.save()
+    registration.save_transfer(json_data, 500000)
+    for group in json_data.get('deleteOwnerGroups'):
+        for existing in registration.owner_groups:
+            if existing.group_id == group.get('groupId'):
+                assert existing.status_type == MhrOwnerStatusTypes.PREVIOUS
+                for owner in existing.owners:
+                    assert owner.status_type == MhrOwnerStatusTypes.PREVIOUS
+                    assert owner.death_cert_number
+                    assert owner.death_ts
 
 
 @pytest.mark.parametrize('mhr_num,user_group,account_id', TEST_DATA_TRANSFER_SAVE)

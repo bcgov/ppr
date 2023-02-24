@@ -180,33 +180,7 @@ class Db2Owngroup(db.Model):
     @property
     def json(self):
         """Return a dict of this object, with keys in JSON format."""
-        owngroup = {
-            'manuhomeId': self.manuhome_id,
-            'groupId': self.group_id,
-            'copyId': self.copy_id,
-            'sequenceNumber': self.sequence_number,
-            'status': LEGACY_STATUS_NEW.get(self.status),
-            'pendingFlag': self.pending_flag,
-            'registrationDocumentId': self.reg_document_id,
-            'canDocumentId': self.can_document_id,
-            'type': LEGACY_TENANCY_NEW.get(self.tenancy_type),
-            'lessee': self.lessee,
-            'lessor': self.lessor,
-            'interest': self.interest,
-            'interestNumerator': self.get_interest_fraction(True),
-            'interestDenominator': self.get_interest_fraction(False),
-            'tenancySpecified': True
-        }
-        # Remove fraction from interest description for UI.
-        if self.tenancy_type in (self.TenancyTypes.COMMON, self.TenancyTypes.JOINT) and self.interest:
-            fraction: str = str(owngroup.get('interestNumerator')) + '/' + str(owngroup.get('interestDenominator'))
-            interest_json: str = owngroup.get('interest')
-            interest_json = interest_json.replace(fraction, '')
-            if self.interest != interest_json:
-                owngroup['interest'] = interest_json.strip()
-        if self.tenancy_specified == 'N':
-            owngroup['tenancySpecified'] = False
-        return owngroup
+        return self.registration_json
 
     @property
     def registration_json(self):

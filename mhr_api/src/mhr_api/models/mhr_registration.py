@@ -24,7 +24,7 @@ from mhr_api.exceptions import BusinessException, DatabaseException, ResourceErr
 from mhr_api.models import utils as model_utils, Db2Manuhome
 from mhr_api.models.mhr_extra_registration import MhrExtraRegistration
 from mhr_api.models.db2 import utils as legacy_utils
-from mhr_api.models.registration_utils import AccountRegistrationParams, get_owner_group_count
+from mhr_api.models.registration_utils import AccountRegistrationParams, get_owner_group_count, is_transfer_due_to_death
 from mhr_api.services.authz import MANUFACTURER_GROUP, QUALIFIED_USER_GROUP, GENERAL_USER_GROUP, BCOL_HELP
 
 from .db import db
@@ -799,7 +799,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
 
     def remove_groups(self, json_data, new_reg_id):
         """Set change registration id for removed owner groups and owners for a transfer registration."""
-        for group in json_data.get('deleteOwnerGroups'):
+        for group in json_data.get('deleteOwnerGroups'):  # pylint: disable=too-many-nested-blocks
             for existing in self.owner_groups:  # Updating a base registration owner group.
                 if existing.group_id == group.get('groupId'):
                     existing.status_type = MhrOwnerStatusTypes.PREVIOUS
@@ -809,6 +809,8 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                     for owner in existing.owners:
                         owner.status_type = MhrOwnerStatusTypes.PREVIOUS
                         owner.change_registration_id = new_reg_id
+                        if is_transfer_due_to_death(json_data.get('registrationType')):
+                            MhrRegistration.update_deceased(group.get('owners'), owner)
             for reg in self.change_registrations:  # Updating a change registration (previous transfer) group.
                 for existing in reg.owner_groups:
                     if existing.group_id == group.get('groupId'):
@@ -819,6 +821,28 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                         for owner in existing.owners:
                             owner.status_type = MhrOwnerStatusTypes.PREVIOUS
                             owner.change_registration_id = new_reg_id
+                            if is_transfer_due_to_death(json_data.get('registrationType')):
+                                MhrRegistration.update_deceased(group.get('owners'), owner)
+
+    @staticmethod
+    def update_deceased(owners_json, owner: MhrParty):
+        """Set deceased information for transfer due to death registrations."""
+        existing_json = owner.json
+        match_json = None
+        for owner_json in owners_json:
+            if owner_json.get('organizationName') and existing_json.get('organizationName') and \
+                    owner_json.get('organizationName') == existing_json.get('organizationName'):
+                match_json = owner_json
+                break
+            elif owner_json.get('individualName') and existing_json.get('individualName') and \
+                    owner_json.get('individualName') == existing_json.get('individualName'):
+                match_json = owner_json
+                break
+        if match_json:
+            if match_json.get('deathCertificateNumber'):
+                owner.death_cert_number = str(match_json.get('deathCertificateNumber')).strip()
+            if match_json.get('deathDateTime'):
+                owner.death_ts = model_utils.ts_from_iso_format(match_json.get('deathDateTime'))
 
     @staticmethod
     def find_draft(json_data, registration_type: str = None):
