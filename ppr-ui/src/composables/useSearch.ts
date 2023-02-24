@@ -37,20 +37,30 @@ export const useSearch = () => {
 
     return { baseURL: url, headers: { 'Account-Id': currentAccountId, 'x-apikey': apiKey }, params: params }
   }
-  const searchBusiness = async (searchValue: string): Promise<SearchResponseI> => {
+  /**
+   * Search for a Business Name using Registry Search API
+   * @param searchValue search term, which is required
+   * @param isPPR search for active and historical statuses is search is for PPR
+   * @returns array of search results
+   */
+  const searchBusiness = async (searchValue: string, isPPR: boolean = false): Promise<SearchResponseI> => {
     if (!searchValue) return
     // basic params
     const params = { query: `value:${searchValue}`, categories: 'status:active', start: 0, rows: SEARCH_RESULT_SIZE }
+    // include all statuses for PPR business searches by removing categories filter
+    isPPR && delete params.categories
     // add search-api config stuff
     const config = getSearchConfig(params)
-    return axios.get<SearchResponseI>('businesses/search/facets', config)
+    return axios
+      .get<SearchResponseI>('businesses/search/facets', config)
       .then(response => {
         const data: SearchResponseI = response?.data
         if (!data) {
           throw new Error('Invalid API response')
         }
         return data
-      }).catch(error => {
+      })
+      .catch(error => {
         return {
           searchResults: null,
           error: {

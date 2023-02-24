@@ -10,7 +10,7 @@ import { HomeOwners, MhrInformation } from '@/views'
 import { AccountInfo, StickyContainer, CertifyInformation } from '@/components/common'
 import { DatePicker } from '@bcrs-shared-components/date-picker'
 import mockRouter from './MockRouter'
-import { HomeTenancyTypes, RouteNames } from '@/enums'
+import { AuthRoles, HomeTenancyTypes, RouteNames } from '@/enums'
 import { HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
 import { getTestId } from './utils'
 import {
@@ -447,6 +447,9 @@ describe('Mhr Information', () => {
     await wrapper.find('#btn-stacked-submit').trigger('click')
     await Vue.nextTick()
 
+    // Submitting Party for Staff should not exist
+    expect(wrapper.find('#staff-transfer-submitting-party').exists()).toBeFalsy()
+
     expect(wrapper.find('#account-info').exists()).toBeTruthy()
     expect(wrapper.find(getTestId('submitting-party-tooltip')).exists()).toBeTruthy()
 
@@ -461,6 +464,41 @@ describe('Mhr Information', () => {
     expect(accountInfoText).toContain(mockedAccountInfo.mailingAddress.city)
     expect(accountInfoText).toContain(mockedAccountInfo.mailingAddress.street)
     expect(accountInfoText).toContain(mockedAccountInfo.mailingAddress.postalCode)
+  })
+
+  it('should render Party Search and Submitting Party component on the Review screen (Staff)', async () => {
+    await store.dispatch('setAuthRoles', [AuthRoles.PPR_STAFF])
+    setupCurrentHomeOwners()
+    wrapper.vm.$data.dataLoaded = true
+    await Vue.nextTick()
+
+    // Set Wrapper Validations
+    wrapper.vm.isValidTransferOwners = true
+    wrapper.vm.isTransferDetailsFormValid = true
+
+    await triggerUnsavedChange()
+    await enterTransferDetailsFields(wrapper.findComponent(TransferDetails))
+
+    await wrapper.find('#btn-stacked-submit').trigger('click')
+    await Vue.nextTick()
+
+    // Submitting Party for non-Staff should not exist
+    expect(wrapper.find('#transfer-submitting-party').exists()).toBeFalsy()
+
+    const staffSubmittingParty = wrapper.find('#staff-transfer-submitting-party')
+    expect(staffSubmittingParty.exists()).toBeTruthy()
+    expect(staffSubmittingParty.find('#ppr-party-code').exists()).toBeTruthy()
+    expect(staffSubmittingParty.find('#submitting-party').exists()).toBeTruthy()
+
+    // click submit to trigger errors
+    wrapper.find('#btn-stacked-submit').trigger('click')
+    await Vue.nextTick()
+    await Vue.nextTick()
+
+    // should show 3 errors for Submitting Party, Confirm and Auth components
+    expect(wrapper.findAll('.border-error-left').length).toBe(3)
+    // reset staff role
+    await store.dispatch('setAuthRoles', [AuthRoles.MHR])
   })
 
   it('should render TransferDetailsReview on Review screen', async () => {

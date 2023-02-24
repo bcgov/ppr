@@ -169,7 +169,7 @@ export default defineComponent({
             isNumber()
           )
       }),
-      validateSubmitter: computed(() => {
+      validateSubmitter: computed((): boolean => {
         return getSectionValidation(MhrSectVal.SUBMITTING_PARTY_VALID, MhrCompVal.SUBMITTER_VALID)
       }),
       validateDocId: computed(() => {

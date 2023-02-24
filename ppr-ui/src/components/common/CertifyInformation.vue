@@ -134,9 +134,11 @@ export default defineComponent({
       getUserLastName,
       isRoleStaff,
       isRoleStaffSbc,
-      isRoleStaffBcol
+      isRoleStaffBcol,
+      getUserEmail
     } = useGetters<any>([
-      'getCertifyInformation', 'getUserFirstName', 'getUserLastName', 'isRoleStaff', 'isRoleStaffSbc', 'isRoleStaffBcol'
+      'getCertifyInformation', 'getUserFirstName', 'getUserLastName', 'isRoleStaff', 'isRoleStaffSbc',
+      'isRoleStaffBcol', 'getUserEmail'
     ])
     const authorizedTableHeaders: Array<BaseHeaderIF> = [
       {
@@ -217,6 +219,7 @@ export default defineComponent({
         update = true
         if (getUserFirstName.value && getUserLastName.value) {
           certifyInfo.legalName = `${getUserFirstName.value} ${getUserLastName.value}`
+          if (certifyInfo.registeringParty) certifyInfo.registeringParty.emailAddress = getUserEmail.value
         } else {
           try {
             const token = sessionStorage.getItem(SessionStorageKeys.KeyCloakToken)

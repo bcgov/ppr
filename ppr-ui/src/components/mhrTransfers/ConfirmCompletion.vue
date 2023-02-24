@@ -1,6 +1,6 @@
 <template>
   <div id="transfer-confirm">
-    <h2>2. Confirm</h2>
+    <h2><span>{{ sectionNumber }}</span>. Confirm</h2>
     <p class="mt-2">
       The following information must be completed and confirmed before submitting this registration.
     </p>
@@ -77,6 +77,10 @@ export default defineComponent({
   name: 'ConfirmCompletion',
 
   props: {
+    sectionNumber: {
+      type: Number,
+      default: 2
+    },
     legalName: {
       type: String,
       required: true

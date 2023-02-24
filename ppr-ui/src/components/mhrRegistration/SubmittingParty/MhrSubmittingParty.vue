@@ -131,7 +131,12 @@
           <!-- Mailing Address -->
           <article class="pt-4 pr-1">
             <label class="generic-label" for="submitting-party-address">Mailing Address</label>
-            <p class="py-1">Verification of Service registration document and decals will be mailed to this address.</p>
+            <p v-if="content && content.mailAddressInfo" class="py-1">
+              {{ content.mailAddressInfo }}
+            </p>
+            <p v-else class="py-1">
+              Verification of Service registration document and decals will be mailed to this address.
+            </p>
 
             <base-address
               editing
@@ -160,18 +165,27 @@ import { SubmittingPartyTypes } from '@/enums'
 import { PartyAddressSchema } from '@/schemas'
 import { cloneDeep } from 'lodash'
 import { VueMaskDirective } from 'v-mask'
-import { mutateOriginalLengthTrust } from '@/store/mutations'
 import { fromDisplayPhone, toDisplayPhone } from '@/utils'
+import { ContentIF, SubmittingPartyIF } from '@/interfaces'
 
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
   name: 'MhrSubmittingParty',
+  emits: ['isValid'],
   components: {
     BaseAddress
   },
   props: {
     validate: {
+      type: Boolean,
+      default: false
+    },
+    content: {
+      type: Object as () => ContentIF,
+      default: () => {}
+    },
+    isMhrTransfer: {
       type: Boolean,
       default: false
     }
@@ -181,15 +195,19 @@ export default defineComponent({
   },
   setup (props, context) {
     const {
-      setMhrSubmittingParty
+      setMhrRegistrationSubmittingParty,
+      setMhrTransferSubmittingParty
     } = useActions<any>([
-      'setMhrSubmittingParty'
+      'setMhrRegistrationSubmittingParty',
+      'setMhrTransferSubmittingParty'
     ])
     const {
       getMhrRegistrationSubmittingParty,
+      getMhrTransferSubmittingParty,
       getMhrRegistrationValidationModel
     } = useGetters<any>([
       'getMhrRegistrationSubmittingParty',
+      'getMhrTransferSubmittingParty',
       'getMhrRegistrationValidationModel'
     ])
 
@@ -235,7 +253,7 @@ export default defineComponent({
           postalCode: '',
           deliveryInstructions: ''
         }
-      },
+      } as SubmittingPartyIF,
       isBusinessLookup: false,
       isPersonOption: computed((): boolean => {
         return localState.submittingPartyType === SubmittingPartyTypes.PERSON
@@ -290,33 +308,38 @@ export default defineComponent({
     }
 
     /** Apply store properties to local model. **/
-    watch(() => getMhrRegistrationSubmittingParty.value, () => {
-      if (localState.enableLookUp) {
-        // Copy submitting party to local model if data is retrieved through the look-up
-        localState.submittingParty = cloneDeep({
-          ...localState.submittingParty,
-          ...getMhrRegistrationSubmittingParty.value
-        })
-        localState.displayPhone = toDisplayPhone(localState.submittingParty.phoneNumber)
-        // Apply party type if data is retrieved through the look-up
-        localState.submittingParty.businessName
-          ? localState.submittingPartyType = SubmittingPartyTypes.BUSINESS
-          : localState.submittingPartyType = SubmittingPartyTypes.PERSON
+    watch(
+      [getMhrRegistrationSubmittingParty, getMhrTransferSubmittingParty],
+      () => {
+        if (localState.enableLookUp) {
+          const submittingParty = (props.isMhrTransfer
+            ? getMhrTransferSubmittingParty.value
+            : getMhrRegistrationSubmittingParty.value) as SubmittingPartyIF
+          // Copy submitting party to local model if data is retrieved through the look-up
+          localState.submittingParty = cloneDeep({
+            ...localState.submittingParty,
+            ...submittingParty
+          })
+          localState.displayPhone = toDisplayPhone(localState.submittingParty.phoneNumber)
+          // Apply party type if data is retrieved through the look-up
+          localState.submittingParty.businessName
+            ? localState.submittingPartyType = SubmittingPartyTypes.BUSINESS
+            : localState.submittingPartyType = SubmittingPartyTypes.PERSON
 
-        if (getMhrRegistrationSubmittingParty.value.businessName) {
-          localState.isBusinessLookup = true
+          if (submittingParty.businessName) {
+            localState.isBusinessLookup = true
+          }
         }
-      }
-    }, { deep: true, immediate: true })
+      }, { deep: true, immediate: true })
 
     /** Apply local model updates to store. **/
     watch(() => localState.submittingParty, async () => {
       // Disable look up during local model changes
       localState.enableLookUp = false
       // Set submitting party data to store
-      for (const [key, value] of Object.entries(localState.submittingParty)) {
-        await setMhrSubmittingParty({ key, value })
-      }
+      props.isMhrTransfer
+        ? await setMhrTransferSubmittingParty(localState.submittingParty)
+        : await setMhrRegistrationSubmittingParty(localState.submittingParty)
       // Enable lookup once local model is updated in store
       localState.enableLookUp = true
     }, { deep: true })
@@ -346,6 +369,7 @@ export default defineComponent({
     })
 
     watch(() => localState.isSubmitterValid, (val: boolean) => {
+      context.emit('isValid', val)
       setValidation(MhrSectVal.SUBMITTING_PARTY_VALID, MhrCompVal.SUBMITTER_VALID, val)
     })
 

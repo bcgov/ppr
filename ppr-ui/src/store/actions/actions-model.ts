@@ -26,9 +26,9 @@ import {
   ManufacturedHomeSearchResultIF,
   UserProductSubscriptionIF,
   MhrRegistrationHomeOwnerGroupIF,
-  MhrTransferIF,
   MhrRegistrationIF,
-  MhRegistrationSummaryIF
+  MhRegistrationSummaryIF,
+  SubmittingPartyIF
 } from '@/interfaces'
 import { ActionIF } from '@/interfaces/store-interfaces/action-interface'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
@@ -320,6 +320,11 @@ export const setMhrSubmittingParty: ActionIF = ({ commit }, { key, value }): voi
   commit('mutateUnsavedChanges', true)
 }
 
+export const setMhrRegistrationSubmittingParty: ActionIF = ({ commit }, submittingParty: SubmittingPartyIF): void => {
+  commit('mutateMhrRegistrationSubmittingParty', submittingParty)
+  commit('mutateUnsavedChanges', true)
+}
+
 export const setMhrRegistrationDocumentId: ActionIF = ({ commit }, value: string): void => {
   commit('mutateMhrRegistrationDocumentId', value)
   commit('mutateUnsavedChanges', true)
@@ -363,25 +368,4 @@ export const setMhrInformation: ActionIF = ({ commit }, mhrInfo: MhRegistrationS
 
 export const setLienType: ActionIF = ({ commit }, lienType: string): void => {
   commit('mutateLienType', lienType)
-}
-
-// MHR Transfer
-export const setEmptyMhrTransfer: ActionIF = ({ commit }, emptyMhrTransfer: MhrTransferIF): void => {
-  commit('mutateEmptyMhrTransfer', emptyMhrTransfer)
-}
-
-export const setMhrTransferHomeOwnerGroups: ActionIF = (
-  { commit },
-  groups: MhrRegistrationHomeOwnerGroupIF[]
-): void => {
-  commit('mutateMhrTransferHomeOwnerGroups', groups)
-  commit('mutateUnsavedChanges', true)
-}
-
-// Set a snapshot of the MH Registration home owner groups
-export const setMhrTransferCurrentHomeOwnerGroups: ActionIF = (
-  { commit },
-  groups: MhrRegistrationHomeOwnerGroupIF[]
-): void => {
-  commit('mutateMhrTransferCurrentHomeOwnerGroups', groups)
 }
