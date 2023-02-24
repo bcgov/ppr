@@ -1,5 +1,5 @@
 import { TransferTypeSelectIF } from '@/interfaces'
-import { ApiTransferTypes, UiTransferTypes } from '@/enums/transferTypes'
+import { ApiTransferTypes, UITransferTypes } from '@/enums/transferTypes'
 import { BlankSearchTypes } from '@/enums'
 
 export const TransferTypes: Array<TransferTypeSelectIF> = [
@@ -16,7 +16,7 @@ export const TransferTypes: Array<TransferTypeSelectIF> = [
     divider: false,
     selectDisabled: false,
     transferType: ApiTransferTypes.SALE_OR_GIFT,
-    textLabel: UiTransferTypes.SALE_OR_GIFT,
+    textLabel: UITransferTypes.SALE_OR_GIFT,
     group: 1,
     tooltip: {
       title: 'Supporting Documents Required',
@@ -36,7 +36,7 @@ export const TransferTypes: Array<TransferTypeSelectIF> = [
     divider: false,
     selectDisabled: false,
     transferType: ApiTransferTypes.SURVIVING_JOINT_TENANT,
-    textLabel: UiTransferTypes.SURVIVING_JOINT_TENANT,
+    textLabel: UITransferTypes.SURVIVING_JOINT_TENANT,
     group: 2,
     tooltip: {
       title: 'Supporting Documents Required',
@@ -47,7 +47,7 @@ export const TransferTypes: Array<TransferTypeSelectIF> = [
     divider: false,
     selectDisabled: false,
     transferType: ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL,
-    textLabel: UiTransferTypes.TO_EXECUTOR_PROBATE_WILL,
+    textLabel: UITransferTypes.TO_EXECUTOR_PROBATE_WILL,
     group: 2,
     tooltip: {
       title: 'Supporting Documents Required',
@@ -58,7 +58,7 @@ export const TransferTypes: Array<TransferTypeSelectIF> = [
     divider: false,
     selectDisabled: false,
     transferType: ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL,
-    textLabel: UiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL,
+    textLabel: UITransferTypes.TO_EXECUTOR_UNDER_25K_WILL,
     group: 2,
     tooltip: {
       title: 'Supporting Documents Required',
@@ -69,7 +69,7 @@ export const TransferTypes: Array<TransferTypeSelectIF> = [
     divider: false,
     selectDisabled: false,
     transferType: ApiTransferTypes.TO_ADMIN_PROBATE_NO_WILL,
-    textLabel: UiTransferTypes.TO_ADMIN_PROBATE_NO_WILL,
+    textLabel: UITransferTypes.TO_ADMIN_PROBATE_NO_WILL,
     group: 2,
     tooltip: {
       title: 'Supporting Documents Required',

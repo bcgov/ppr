@@ -6,7 +6,7 @@ export enum ApiTransferTypes {
   TO_EXECUTOR_PROBATE_WILL = 'TRANS_WILL'
 }
 
-export enum UiTransferTypes {
+export enum UITransferTypes {
   SALE_OR_GIFT = 'Transfer Due to Sale or Gift',
   SURVIVING_JOINT_TENANT = 'Transfer to Surviving Joint Tenant(s)',
   TO_EXECUTOR_UNDER_25K_WILL = 'Transfer to Executor - Estate under $25,000 with Will',

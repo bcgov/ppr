@@ -307,7 +307,7 @@ import {
   HomeLocationTypes,
   RouteNames,
   UIMHRSearchTypes,
-  UiTransferTypes
+  UITransferTypes
 } from '@/enums'
 import {
   createMhrTransferDraft,
@@ -456,7 +456,7 @@ export default defineComponent({
       validateSubmittingParty: computed((): boolean => {
         return localState.validate && !localState.isSubmittingPartyValid
       }),
-      uiTransferType: computed((): UiTransferTypes => {
+      uiTransferType: computed((): UITransferTypes => {
         return getUiTransferType(getMhrTransferType.value?.transferType)
       }),
       enableActions: computed((): boolean => {

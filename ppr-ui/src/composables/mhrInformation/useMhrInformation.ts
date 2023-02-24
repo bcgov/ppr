@@ -7,7 +7,7 @@ import {
   ApiTransferTypes,
   HomeTenancyTypes,
   UIRegistrationTypes,
-  UiTransferTypes
+  UITransferTypes
 } from '@/enums'
 
 // Validation flags for Review Confirm screen
@@ -55,8 +55,8 @@ export const useMhrInformation = () => {
     refNumValid.value = isValid
   }
 
-  const getUiTransferType = (apiTransferType: ApiTransferTypes): UiTransferTypes => {
-    return UiTransferTypes[
+  const getUiTransferType = (apiTransferType: ApiTransferTypes): UITransferTypes => {
+    return UITransferTypes[
       Object.keys(ApiTransferTypes).find(key => ApiTransferTypes[key] as string === apiTransferType)
     ]
   }

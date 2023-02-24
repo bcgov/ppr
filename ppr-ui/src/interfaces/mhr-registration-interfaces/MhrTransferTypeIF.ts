@@ -1,12 +1,12 @@
 // Search type interface
 import { HintIF } from '@/interfaces'
-import { ApiTransferTypes, UiTransferTypes } from '@/enums/transferTypes'
+import { ApiTransferTypes, UITransferTypes } from '@/enums/transferTypes'
 
 export interface TransferTypeSelectIF {
   divider: boolean
   selectDisabled: boolean
   transferType: ApiTransferTypes
-  textLabel: UiTransferTypes
+  textLabel: UITransferTypes
   group: number
   class?: string
   icon?: string
