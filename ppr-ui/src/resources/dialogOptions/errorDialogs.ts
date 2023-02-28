@@ -165,3 +165,18 @@ export const largeSearchReportDelay: DialogOptionsIF = {
   title: 'Large search result report may be delayed',
   text: ''
 }
+
+export const cancelOwnerChangeConfirm: DialogOptionsIF = {
+  acceptText: 'Cancel Owner Change',
+  cancelText: 'Keep Changes',
+  title: 'Cancel Transfer Due to Sale or Gift',
+  text: 'Cancelling the Transfer Due to Sale or Gift will undo any changes you have made and return you to the ' +
+    'original state.'
+}
+
+export const changeTransferType: DialogOptionsIF = {
+  acceptText: 'Change Transfer Type',
+  cancelText: 'Cancel',
+  title: 'Change Transfer Type',
+  text: 'Changing the Transfer Type will undo any changes you have made and return you to the original state.'
+}

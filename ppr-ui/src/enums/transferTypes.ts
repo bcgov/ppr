@@ -11,5 +11,5 @@ export enum UITransferTypes {
   SURVIVING_JOINT_TENANT = 'Transfer to Surviving Joint Tenant(s)',
   TO_EXECUTOR_UNDER_25K_WILL = 'Transfer to Executor - Estate under $25,000 with Will',
   TO_ADMIN_PROBATE_NO_WILL = 'Transfer to Administrator - Grant of Probate with no Will',
-  TO_EXECUTOR_PROBATE_WILL = 'Transfer to Executor = Grant of Probate with Will'
+  TO_EXECUTOR_PROBATE_WILL = 'Transfer to Executor - Grant of Probate with Will'
 }

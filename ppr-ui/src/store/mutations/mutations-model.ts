@@ -352,7 +352,7 @@ export const mutateRegistrationTableTotalRowCount = (state: StateIF, count: numb
   state.stateModel.registrationTable.totalRowCount = count
 }
 
-export const mutateUnsavedChanges = (state: StateIF, unsavedChanges: Boolean) => {
+export const mutateUnsavedChanges = (state: StateIF, unsavedChanges: boolean) => {
   state.stateModel.unsavedChanges = unsavedChanges
 }
 

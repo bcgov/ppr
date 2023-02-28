@@ -278,7 +278,8 @@ export default defineComponent({
 
     const { setUnsavedChanges } = useActions<any>(['setUnsavedChanges'])
 
-    const { getMhrRegistrationValidationModel } = useGetters<any>(['getMhrRegistrationValidationModel'])
+    const { getMhrRegistrationValidationModel, hasUnsavedChanges } =
+      useGetters<any>(['getMhrRegistrationValidationModel', 'hasUnsavedChanges'])
 
     const { getValidation, MhrSectVal, MhrCompVal } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
@@ -292,6 +293,7 @@ export default defineComponent({
             (
               !hasMinimumGroups() ||
               hasEmptyGroup.value ||
+              !hasUnsavedChanges.value ||
               !localState.isValidAllocation ||
               localState.hasGroupsWithNoOwners ||
               (!localState.isUngroupedTenancy && hasUndefinedGroupInterest(getTransferOrRegistrationHomeOwnerGroups()))

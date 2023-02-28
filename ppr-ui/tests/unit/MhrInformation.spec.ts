@@ -27,7 +27,6 @@ import { nextTick } from '@vue/composition-api'
 import { TransferDetails, TransferDetailsReview, TransferType } from '@/components/mhrTransfers'
 
 import { toDisplayPhone } from '@/utils'
-import {TransferTypes} from "@/resources";
 
 Vue.use(Vuetify)
 
@@ -181,6 +180,8 @@ describe('Mhr Information', () => {
     // Sticky container w/ Fee Summary, Transfer type and Transfer Details components
     expect(wrapper.findComponent(StickyContainer).exists()).toBe(true)
     expect(wrapper.findComponent(TransferType).exists()).toBe(true)
+    await store.dispatch('setUnsavedChanges', true)
+    await Vue.nextTick()
     expect(wrapper.findComponent(TransferDetails).exists()).toBe(true)
   })
 
@@ -364,6 +365,7 @@ describe('Mhr Information', () => {
   it('should render Attention or Reference Number section on Review screen', async () => {
     setupCurrentHomeOwners()
     wrapper.vm.$data.dataLoaded = true
+    wrapper.vm.$data.showMhrFeeSummary = true
     await Vue.nextTick()
 
     expect(wrapper.find('#transfer-ref-num-section').exists()).toBeFalsy()
@@ -412,6 +414,7 @@ describe('Mhr Information', () => {
   it('should render Authorization component on review', async () => {
     setupCurrentHomeOwners()
     wrapper.vm.$data.dataLoaded = true
+    wrapper.vm.$data.showMhrFeeSummary = true
     await Vue.nextTick()
 
     expect(wrapper.props().isMhrTransfer).toBe(true)
@@ -452,6 +455,7 @@ describe('Mhr Information', () => {
   it('should render Submitting Party component on the Review screen', async () => {
     setupCurrentHomeOwners()
     wrapper.vm.$data.dataLoaded = true
+    wrapper.vm.$data.showMhrFeeSummary = true
     await Vue.nextTick()
 
     expect(wrapper.find('#account-info').exists()).toBeFalsy()
@@ -493,6 +497,7 @@ describe('Mhr Information', () => {
     await store.dispatch('setAuthRoles', [AuthRoles.PPR_STAFF])
     setupCurrentHomeOwners()
     wrapper.vm.$data.dataLoaded = true
+    wrapper.vm.$data.showMhrFeeSummary = true
     await Vue.nextTick()
 
     // Set Wrapper Validations
@@ -593,6 +598,7 @@ describe('Mhr Information', () => {
   it('should render yellow message bar on the Review screen', async () => {
     setupCurrentHomeOwners()
     wrapper.vm.$data.dataLoaded = true
+    wrapper.vm.$data.showMhrFeeSummary = true
     await Vue.nextTick()
 
     // doesn't exist on manufactured home page
@@ -624,6 +630,7 @@ describe('Mhr Information', () => {
   it('should render Confirm Completion component on the Review screen', async () => {
     setupCurrentHomeOwners()
     wrapper.vm.$data.dataLoaded = true
+    wrapper.vm.$data.showMhrFeeSummary = true
     await Vue.nextTick()
 
     expect(wrapper.find('#transfer-confirm-section').exists()).toBeFalsy()
@@ -651,6 +658,7 @@ describe('Mhr Information', () => {
   it('should render read only home owners on the Review screen', async () => {
     setupCurrentHomeOwners()
     wrapper.vm.$data.dataLoaded = true
+    wrapper.vm.$data.showMhrFeeSummary = true
     await Vue.nextTick()
 
     // TODO: check that removed owners are not displayed in review
@@ -693,6 +701,7 @@ describe('Mhr Information', () => {
   it('should validate and show components errors on Review screen', async () => {
     setupCurrentHomeOwners()
     wrapper.vm.$data.dataLoaded = true
+    wrapper.vm.$data.showMhrFeeSummary = true
     await Vue.nextTick()
     await triggerUnsavedChange()
 

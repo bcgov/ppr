@@ -73,7 +73,7 @@ export interface StateModelIF {
   selectedManufacturedHomes: ManufacturedHomeSearchResultIF[]
   isStaffClientPayment: boolean
   staffPayment: StaffPaymentIF
-  unsavedChanges: Boolean // used for cancel flows
+  unsavedChanges: boolean // used for cancel flows
   currentRegistrationsTab: Number
   userInfo: UserInfoIF
   mhrInformation: MhRegistrationSummaryIF
