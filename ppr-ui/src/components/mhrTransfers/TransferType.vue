@@ -170,7 +170,7 @@ export default defineComponent({
       return ref?.hasError
     }
 
-    const selectTransferType = async (item: TransferTypeSelectIF): Promise<void> => {
+    const selectTransferType = (item: TransferTypeSelectIF): void => {
       context.emit('emitType', item)
       localState.selectedTransferType = cloneDeep(item)
 
@@ -183,18 +183,17 @@ export default defineComponent({
         localState.showTransferChangeDialog = true
       } else {
         localState.tempTransferType = cloneDeep(item)
-        await selectTransferType(item)
+        selectTransferType(item)
       }
     }
 
-    const handleTypeChangeDialogResp = async (val: boolean): Promise<void> => {
+    const handleTypeChangeDialogResp = (val: boolean): void => {
       if (!val) {
-        await selectTransferType(cloneDeep(localState.tempTransferType))
-        localState.showTransferChangeDialog = false
+        selectTransferType(cloneDeep(localState.tempTransferType))
       } else {
-        await selectTransferType(cloneDeep(localState.selectedTransferType))
-        localState.showTransferChangeDialog = false
+        selectTransferType(cloneDeep(localState.selectedTransferType))
       }
+      localState.showTransferChangeDialog = false
     }
 
     watch(() => props.validate, (validate: boolean) => {
