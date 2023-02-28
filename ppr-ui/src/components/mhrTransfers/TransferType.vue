@@ -1,5 +1,12 @@
 <template>
   <div class="mhr-transfer-type mt-8">
+
+    <BaseDialog
+      :setOptions="changeTransferType"
+      :setDisplay="showTransferChangeDialog"
+      @proceed="handleTypeChangeDialogResp($event)"
+    />
+
     <p class="gray7">
       To change the ownership of this home, first select the Transfer Type and enter the Declared Value of Home.
     </p>
@@ -27,10 +34,11 @@
               item-text="textLabel"
               item-value="transferType"
               label="Transfer Type"
-              v-model="selectedTransferType"
               data-test-id="transfer-type-selector"
+              v-model="selectedTransferType"
               :rules="required('Select transfer type')"
               :menu-props="{ bottom: true, offsetY: true }"
+              return-object
             >
               <template v-slot:item="{ item }">
 
@@ -47,15 +55,29 @@
 
                 <!-- Type Selections -->
                 <template v-else>
-                  <v-list-item
-                    :id="`list-${item.transferType}`"
-                    class="copy-normal"
-                    @click="selectTransferType(item)"
+                  <v-tooltip
+                    right
+                    content-class="right-tooltip pa-5"
+                    transition="fade-transition"
+                    data-test-id="suffix-tooltip"
+                    nudge-left="20"
+                    allow-overflow
                   >
-                    <v-list-item-title class="pl-5">
-                      {{ item.textLabel }}
-                    </v-list-item-title>
-                  </v-list-item>
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-list-item
+                        :id="`list-${item.transferType}`"
+                        class="copy-normal"
+                        @click="handleTypeChange(item)"
+                        v-bind="attrs" v-on="on"
+                      >
+                        <v-list-item-title class="pl-5">
+                          {{ item.textLabel }}
+                        </v-list-item-title>
+                      </v-list-item>
+                    </template>
+                    <span class="font-weight-bold">{{ item.tooltip.title }}:</span><br>
+                    <li v-for="(item, index) in item.tooltip.bullets" :key="index">{{ item }}</li>
+                  </v-tooltip>
                 </template>
               </template>
             </v-select>
@@ -85,6 +107,7 @@
                 filled
                 :rules="declaredValueRules"
                 label="Amount in Canadian Dollars"
+                validate-on-blur
                 data-test-id="declared-value"
               />
               <span class="mt-4">.00</span>
@@ -100,8 +123,11 @@
 <script lang="ts">
 import { useInputRules } from '@/composables'
 import { computed, defineComponent, reactive, ref, toRefs, watch } from '@vue/composition-api'
+import { BaseDialog } from '@/components/dialogs'
 import { TransferTypes } from '@/resources'
 import { useGetters } from 'vuex-composition-helpers'
+import { changeTransferType } from '@/resources/dialogOptions'
+import { cloneDeep } from 'lodash'
 // eslint-disable-next-line no-unused-vars
 import { FormIF, TransferTypeSelectIF } from '@/interfaces'
 
@@ -109,15 +135,18 @@ export default defineComponent({
   name: 'TransferType',
   emits: ['emitType', 'emitDeclaredValue', 'emitValid'],
   props: { validate: { type: Boolean, default: false } },
+  components: { BaseDialog },
   setup (props, context) {
     const { customRules, required, isNumber, maxLength } = useInputRules()
     const transferTypeSelectRef = ref(null)
     const declaredValueRef = ref(null)
 
     const {
+      hasUnsavedChanges,
       getMhrTransferType,
       getMhrTransferDeclaredValue
     } = useGetters<any>([
+      'hasUnsavedChanges',
       'getMhrTransferType',
       'getMhrTransferDeclaredValue'
     ])
@@ -126,6 +155,8 @@ export default defineComponent({
       isValid: false,
       declaredValue: getMhrTransferDeclaredValue.value,
       selectedTransferType: getMhrTransferType.value as TransferTypeSelectIF,
+      showTransferChangeDialog: false,
+      tempTransferType: null as TransferTypeSelectIF,
       declaredValueRules: computed((): Array<Function> => {
         return customRules(
           maxLength(7, true),
@@ -139,11 +170,31 @@ export default defineComponent({
       return ref?.hasError
     }
 
-    const selectTransferType = (val: TransferTypeSelectIF): void => {
-      context.emit('emitType', val)
-      localState.selectedTransferType = val
+    const selectTransferType = async (item: TransferTypeSelectIF): Promise<void> => {
+      context.emit('emitType', item)
+      localState.selectedTransferType = cloneDeep(item)
+
       // @ts-ignore - function exists
       context.refs.transferTypeSelectRef.blur()
+    }
+
+    const handleTypeChange = async (item: TransferTypeSelectIF): Promise<void> => {
+      if (hasUnsavedChanges.value || !!getMhrTransferDeclaredValue.value) {
+        localState.showTransferChangeDialog = true
+      } else {
+        localState.tempTransferType = cloneDeep(item)
+        await selectTransferType(item)
+      }
+    }
+
+    const handleTypeChangeDialogResp = async (val: boolean): Promise<void> => {
+      if (!val) {
+        await selectTransferType(cloneDeep(localState.tempTransferType))
+        localState.showTransferChangeDialog = false
+      } else {
+        await selectTransferType(cloneDeep(localState.selectedTransferType))
+        localState.showTransferChangeDialog = false
+      }
     }
 
     watch(() => props.validate, (validate: boolean) => {
@@ -158,6 +209,10 @@ export default defineComponent({
       return context.emit('emitDeclaredValue', val)
     })
 
+    watch(() => getMhrTransferDeclaredValue.value, async (val: number) => {
+      localState.declaredValue = val
+    })
+
     return {
       hasError,
       required,
@@ -165,6 +220,9 @@ export default defineComponent({
       transferTypeSelectRef,
       declaredValueRef,
       selectTransferType,
+      changeTransferType,
+      handleTypeChange,
+      handleTypeChangeDialogResp,
       ...toRefs(localState)
     }
   }

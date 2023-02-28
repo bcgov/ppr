@@ -20,7 +20,7 @@ export const TransferTypes: Array<TransferTypeSelectIF> = [
     group: 1,
     tooltip: {
       title: 'Supporting Documents Required',
-      bullets: ['Ownership Transfer or Change form', 'Bill of Sale']
+      bullets: ['Transfer form', 'Bill of sale', 'Transfer fee']
     }
   },
   {
@@ -40,7 +40,7 @@ export const TransferTypes: Array<TransferTypeSelectIF> = [
     group: 2,
     tooltip: {
       title: 'Supporting Documents Required',
-      bullets: ['Ownership Transfer or Change form', 'Bill of Sale']
+      bullets: ['Death Certificate', 'Transfer form', 'Transfer fee']
     }
   },
   {
@@ -51,7 +51,8 @@ export const TransferTypes: Array<TransferTypeSelectIF> = [
     group: 2,
     tooltip: {
       title: 'Supporting Documents Required',
-      bullets: ['Ownership Transfer or Change form', 'Bill of Sale']
+      bullets: ['Original court certified true copy of Grant of Probate with Will (annexed)',
+        'Transfer form', 'Transfer fee']
     }
   },
   {
@@ -62,7 +63,8 @@ export const TransferTypes: Array<TransferTypeSelectIF> = [
     group: 2,
     tooltip: {
       title: 'Supporting Documents Required',
-      bullets: ['Ownership Transfer or Change form', 'Bill of Sale']
+      bullets: ['Original signed Affidavit of Executor form', 'Death Certificate',
+        'Transfer form (deceased to Executor transfer)', 'Transfer fee']
     }
   },
   {
@@ -73,7 +75,8 @@ export const TransferTypes: Array<TransferTypeSelectIF> = [
     group: 2,
     tooltip: {
       title: 'Supporting Documents Required',
-      bullets: ['Ownership Transfer or Change form', 'Bill of Sale']
+      bullets: ['Original court certified true copy of Grant of Administration',
+        'Affidavit of Administration with List of Assets and Liabilities', 'Transfer form', 'Transfer fee']
     }
   }
 ]

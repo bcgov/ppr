@@ -4,16 +4,24 @@
       <v-progress-circular color="primary" size="50" indeterminate />
     </v-overlay>
 
-    <base-dialog
+    <BaseDialog
       :setOptions="cancelOptions"
       :setDisplay="showCancelDialog"
       @proceed="handleDialogResp($event)"
     />
-    <base-dialog
+
+    <BaseDialog
       :setOptions="saveOptions"
       :setDisplay="showSaveDialog"
       @proceed="handleDialogResp($event)"
     />
+
+    <BaseDialog
+      :setOptions="cancelOwnerChangeConfirm"
+      :setDisplay="showCancelChangeDialog"
+      @proceed="handleCancelDialogResp($event)"
+    />
+
     <div class="view-container px-15 pt-0 pb-5">
       <div class="container pa-0 pt-4">
         <v-row no-gutters>
@@ -258,7 +266,7 @@
               </template>
             </section>
           </v-col>
-          <v-col class="pl-6 pt-5" cols="3" v-if="hasUnsavedChanges || isReviewMode">
+          <v-col class="pl-6 pt-5" cols="3" v-if="showMhrFeeSummary || isReviewMode">
             <aside>
               <affix class="sticky-container" relative-element-selector=".col-9" :offset="{ top: 90, bottom: -100 }">
                 <sticky-container
@@ -287,7 +295,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, reactive, ref, toRefs, watch } from '@vue/composition-api'
+import { computed, defineComponent, nextTick, onMounted, reactive, ref, toRefs, watch } from '@vue/composition-api'
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 /* eslint-disable no-unused-vars */
@@ -306,7 +314,7 @@ import { HomeLocationReview, YourHomeReview } from '@/components/mhrRegistration
 import { HomeOwners } from '@/views'
 import { BaseDialog } from '@/components/dialogs'
 import { BaseAddress } from '@/composables/address'
-import { registrationSaveDraftError, unsavedChangesDialog } from '@/resources/dialogOptions'
+import { registrationSaveDraftError, unsavedChangesDialog, cancelOwnerChangeConfirm } from '@/resources/dialogOptions'
 import { cloneDeep } from 'lodash'
 import AccountInfo from '@/components/common/AccountInfo.vue'
 /* eslint-disable no-unused-vars */
@@ -387,7 +395,8 @@ export default defineComponent({
       isRoleStaffReg,
       isRoleQualifiedSupplier,
       getMhrTransferSubmittingParty,
-      getMhrTransferType
+      getMhrTransferType,
+      getMhrTransferDeclaredValue
     } = useGetters<any>([
       'getMhrTransferHomeOwners',
       'getMhrInformation',
@@ -398,7 +407,8 @@ export default defineComponent({
       'isRoleStaffReg',
       'isRoleQualifiedSupplier',
       'getMhrTransferSubmittingParty',
-      'getMhrTransferType'
+      'getMhrTransferType',
+      'getMhrTransferDeclaredValue'
     ])
 
     const {
@@ -459,6 +469,7 @@ export default defineComponent({
       loading: false,
       isReviewMode: false,
       validate: false,
+      showMhrFeeSummary: false,
       isTransferDetailsFormValid: false,
       refNumValid: false,
       authorizationValid: false,
@@ -485,6 +496,7 @@ export default defineComponent({
       saveOptions: registrationSaveDraftError,
       showCancelDialog: false,
       showSaveDialog: false,
+      showCancelChangeDialog: false,
       validateSubmittingParty: computed((): boolean => {
         return localState.validate && !localState.isSubmittingPartyValid
       }),
@@ -507,6 +519,7 @@ export default defineComponent({
       isValidTransfer: computed((): boolean => {
         // is valid on first step
         return (
+          hasUnsavedChanges.value &&
           !isGlobalEditingMode.value &&
           localState.isValidTransferType &&
           localState.isValidTransferOwners &&
@@ -515,7 +528,7 @@ export default defineComponent({
         )
       }),
       validateStaffPayment: computed(() => {
-        return localState.validate && !localState.staffPaymentValid
+        return isRoleStaffReg.value && localState.validate && !localState.staffPaymentValid
       }),
       isValidTransferReview: computed((): boolean => {
         // is valid on review step
@@ -636,7 +649,7 @@ export default defineComponent({
       await parseMhrLocationInfo(currentLocationInfo)
 
       const currentOwnerGroups = data?.ownerGroups || [] // Safety check. Should always have ownerGroups
-      await parseMhrHomeOwners(currentOwnerGroups)
+      await parseMhrHomeOwners(cloneDeep(currentOwnerGroups))
     }
 
     const parseMhrHomeDetails = async (homeDetails: MhrRegistrationDescriptionIF): Promise<void> => {
@@ -768,6 +781,10 @@ export default defineComponent({
       if (localState.isValidTransfer) {
         localState.isReviewMode = true
         localState.validate = false
+        await nextTick()
+
+        // Scroll to the top of review screen
+        await scrollToFirstError(true)
       } else {
         await scrollToFirstError()
       }
@@ -822,6 +839,17 @@ export default defineComponent({
       localState.showSaveDialog = false
     }
 
+    const handleCancelDialogResp = async (val: boolean): Promise<void> => {
+      if (!val) {
+        localState.showCancelChangeDialog = false
+        return
+      }
+
+      await resetMhrInformation()
+      localState.showTransferType = false
+      localState.showCancelChangeDialog = false
+    }
+
     const quickMhrSearch = async (mhrNumber: string): Promise<void> => {
       localState.loading = true
 
@@ -853,24 +881,39 @@ export default defineComponent({
       }
     }
 
+    const resetMhrInformation = async (): Promise<void> => {
+      // Set baseline MHR Information to state
+      await parseMhrInformation()
+      await handleTransferTypeChange(null)
+      await handleDeclaredValueChange(null)
+      localState.validate = false
+    }
+
     const toggleTypeSelector = (): void => {
+      // Confirm cancel change when changes have been made to transfer type or homeowners
+      if (localState.showTransferType &&
+        (hasUnsavedChanges.value || !!getMhrTransferDeclaredValue.value || !!getMhrTransferType.value)
+      ) {
+        localState.showCancelChangeDialog = true
+        return
+      }
+
       localState.showTransferType = !localState.showTransferType
-      setUnsavedChanges(true)
+      localState.showMhrFeeSummary = true
     }
 
     const handleTransferTypeChange = async (transferTypeSelect: TransferTypeSelectIF): Promise<void> => {
-      await setMhrTransferType(transferTypeSelect)
-      setUnsavedChanges(true)
-
       // Reset state until support is built for other Transfer Types
-      if (transferTypeSelect.transferType !== ApiTransferTypes.SALE_OR_GIFT) {
-        await setMhrTransferHomeOwnerGroups(cloneDeep(getMhrTransferCurrentHomeOwners.value))
+      if (transferTypeSelect?.transferType && transferTypeSelect.transferType !== ApiTransferTypes.SALE_OR_GIFT) {
+        await resetMhrInformation()
       }
+
+      localState.showTransferChangeDialog = true
+      await setMhrTransferType(transferTypeSelect)
     }
 
     const handleDeclaredValueChange = async (declaredValue: number): Promise<void> => {
       await setMhrTransferDeclaredValue(declaredValue)
-      setUnsavedChanges(true)
     }
 
     watch(
@@ -940,6 +983,8 @@ export default defineComponent({
       handleDeclaredValueChange,
       toggleTypeSelector,
       onStaffPaymentDataUpdate,
+      handleCancelDialogResp,
+      cancelOwnerChangeConfirm,
       ...toRefs(localState)
     }
   }

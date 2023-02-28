@@ -5,7 +5,6 @@ import {
   SubmittingPartyIF,
   TransferTypeSelectIF
 } from '@/interfaces'
-import { ApiTransferTypes } from '@/enums/transferTypes'
 
 export const setEmptyMhrTransfer: ActionIF = ({ commit }, emptyMhrTransfer: MhrTransferIF): void => {
   commit('mutateEmptyMhrTransfer', emptyMhrTransfer)

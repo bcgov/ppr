@@ -433,7 +433,7 @@ export const mockedDraftAmendmentCourtOrder: DraftIF = {
   amendmentStatement: mockedAmendmentCourtOrderInfo
 }
 
-export const mockedModelAmendmdmentAdd: StateModelIF = {
+export const mockedModelAmendmdmentAdd: any = {
   accountInformation: {
     accountType: '',
     id: null,
@@ -549,7 +549,7 @@ export const mockedModelAmendmdmentAdd: StateModelIF = {
   mhrTransfer: null
 }
 
-export const mockedModelAmendmdmentDelete: StateModelIF = {
+export const mockedModelAmendmdmentDelete: any = {
   accountInformation: {
     accountType: '',
     id: null,
@@ -665,7 +665,7 @@ export const mockedModelAmendmdmentDelete: StateModelIF = {
   mhrTransfer: null
 }
 
-export const mockedModelAmendmdmentEdit: StateModelIF = {
+export const mockedModelAmendmdmentEdit: any = {
   accountInformation: {
     accountType: '',
     id: null,
@@ -782,7 +782,7 @@ export const mockedModelAmendmdmentEdit: StateModelIF = {
   mhrTransfer: null
 }
 
-export const mockedModelAmendmdmentCourtOrder: StateModelIF = {
+export const mockedModelAmendmdmentCourtOrder: any = {
   accountInformation: {
     accountType: '',
     id: null,

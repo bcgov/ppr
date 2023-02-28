@@ -6,7 +6,6 @@ import {
   TransferTypeSelectIF
 } from '@/interfaces'
 import { set } from 'lodash'
-import { ApiTransferTypes } from '@/enums/transferTypes'
 
 export const mutateEmptyMhrTransfer = (state: StateIF, emptyMhrTransfer: MhrTransferIF) => {
   state.stateModel.mhrTransfer = emptyMhrTransfer

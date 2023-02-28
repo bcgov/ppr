@@ -176,6 +176,9 @@
             {{ hideShowRemovedOwnersLabel }} Deleted Owners
           </span>
         </v-col>
+        <v-col v-if="changesRequired" class="mt-3">
+          <span class="error-text fs-14">Change of ownership is required</span>
+        </v-col>
       </v-row>
 
       <!-- Read Only Template -->
@@ -260,6 +263,7 @@ import { useHomeOwners, useMhrValidations } from '@/composables/mhrRegistration'
 /* eslint-disable no-unused-vars */
 import { MhrRegistrationTotalOwnershipAllocationIF } from '@/interfaces'
 import { ActionTypes } from '@/enums'
+import { hasUnsavedChanges } from '@/store/getters'
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
@@ -290,10 +294,17 @@ export default defineComponent({
     }
   },
   setup (props, context) {
-    const { getMhrRegistrationHomeOwners, getMhrTransferCurrentHomeOwners, getMhrRegistrationValidationModel } =
-      useGetters<any>([
-        'getMhrRegistrationHomeOwners', 'getMhrTransferCurrentHomeOwners', 'getMhrRegistrationValidationModel'
-      ])
+    const {
+      getMhrRegistrationHomeOwners,
+      getMhrTransferCurrentHomeOwners,
+      getMhrRegistrationValidationModel,
+      hasUnsavedChanges
+    } = useGetters<any>([
+      'getMhrRegistrationHomeOwners',
+      'getMhrTransferCurrentHomeOwners',
+      'getMhrRegistrationValidationModel',
+      'hasUnsavedChanges'
+    ])
 
     const { getValidation, MhrSectVal, MhrCompVal } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
@@ -369,6 +380,9 @@ export default defineComponent({
       showTenancyTypeError: computed((): boolean => {
         return (localState.hasReviewedOwners || props.validateTransfer) &&
           (showGroups && localState.ownershipAllocation.hasMinimumGroupsError && localState.showTotalOwnership)
+      }),
+      changesRequired: computed((): boolean => {
+        return props.validateTransfer && !hasUnsavedChanges.value
       })
     })
 
@@ -447,6 +461,7 @@ export default defineComponent({
       removeAllOwnersHandler,
       hideShowRemovedOwners,
       isValidTransferOwners,
+      hasUnsavedChanges,
       ...toRefs(localState)
     }
   },
