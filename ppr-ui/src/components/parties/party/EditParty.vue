@@ -46,7 +46,7 @@
                   <v-radio
                     :class="[
                       'individual-radio',
-                      $style['party-radio-individual'],
+                      'party-radio-individual',
                     ]"
                     label="Individual Person"
                     :value=SecuredPartyTypes.INDIVIDUAL
@@ -55,7 +55,7 @@
                   </v-radio>
 
                   <v-radio
-                    :class="['business-radio', $style['party-radio-business']]"
+                    :class="['business-radio', 'party-radio-business']"
                     label="Business"
                     :value=SecuredPartyTypes.BUSINESS
                     id="party-business"
@@ -433,6 +433,7 @@ export default defineComponent({
       localState.autoCompleteIsActive = false
       localState.searchValue = searchValueTyped
       currentSecuredParty.value.businessName = searchValueTyped
+      localState.showClear = true
     }
 
     const setCloseAutoComplete = () => {
@@ -456,7 +457,7 @@ export default defineComponent({
 
     onMounted(() => {
       getSecuredParty(localState.isRegisteringParty)
-      setSearchValue(currentSecuredParty.value.businessName)
+      currentSecuredParty.value.businessName && setSearchValue(currentSecuredParty.value.businessName)
     })
 
     return {
@@ -485,8 +486,11 @@ export default defineComponent({
 })
 </script>
 
-<style lang="scss" module>
+<style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+::v-deep .theme--light.v-icon.mdi-close {
+  color: $primary-blue !important;
+}
 .party-radio-business {
   width: 50%;
   background-color: rgba(0, 0, 0, 0.06);

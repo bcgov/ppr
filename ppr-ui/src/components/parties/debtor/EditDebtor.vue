@@ -63,7 +63,7 @@
                     />
                   </template>
                 </v-text-field>
-
+                {{showClear}}
                 <BusinessSearchAutocomplete
                   :searchValue="autoCompleteSearchValue"
                   :setAutoCompleteIsActive="autoCompleteIsActive"
@@ -402,7 +402,7 @@ export default defineComponent({
 
     onMounted(() => {
       getDebtor()
-      setSearchValue(currentDebtor.value.businessName)
+      currentDebtor.value.businessName && setSearchValue(currentDebtor.value.businessName)
       localState.month = getMonthObject()
     })
 
@@ -454,6 +454,9 @@ export default defineComponent({
 })
 </script>
 
-<style lang="scss" module>
+<style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+::v-deep .theme--light.v-icon.mdi-close {
+  color: $primary-blue !important;
+}
 </style>
