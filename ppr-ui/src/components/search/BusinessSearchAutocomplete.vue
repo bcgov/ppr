@@ -10,7 +10,7 @@
         <v-list v-if="autoCompleteResults && autoCompleteResults.length > 0" class="pt-0 results-list">
           <v-list-item disabled>
             <v-row class="auto-complete-sticky-row">
-              <v-col cols="24">Active B.C. Businesses:</v-col>
+              <v-col cols="24"><span v-if="!isPPR">Active </span>B.C. Businesses:</v-col>
             </v-row>
           </v-list-item>
           <v-list-item-group v-model="autoCompleteSelected">
@@ -50,11 +50,11 @@
         </v-list>
         <div v-else-if="hasNoMatches" id="no-party-matches" class="pa-5">
           <p class="auto-complete-sticky-row">
-            Active B.C. Businesses:
+            <span v-if="!isPPR">Active </span>B.C. Businesses:
           </p>
           <p>
             <strong>
-              No active B.C. businesses found.
+              No <span v-if="!isPPR">active </span>B.C. businesses found.
             </strong>
           </p>
           <p>
