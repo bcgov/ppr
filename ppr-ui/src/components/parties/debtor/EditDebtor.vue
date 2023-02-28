@@ -63,7 +63,7 @@
                     />
                   </template>
                 </v-text-field>
-                {{showClear}}
+
                 <BusinessSearchAutocomplete
                   :searchValue="autoCompleteSearchValue"
                   :setAutoCompleteIsActive="autoCompleteIsActive"
