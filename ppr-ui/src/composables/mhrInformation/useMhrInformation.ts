@@ -125,7 +125,9 @@ export const useMhrInformation = () => {
         personName: getMhrTransferSubmittingParty.value.personName,
         address: getMhrTransferSubmittingParty.value.address,
         emailAddress: getMhrTransferSubmittingParty.value.emailAddress,
-        phoneNumber: getMhrTransferSubmittingParty.value.phoneNumber?.replace(/[^A-Z0-9]/ig, ''),
+        ...(getMhrTransferSubmittingParty.value.phoneNumber && {
+          phoneNumber: getMhrTransferSubmittingParty.value.phoneNumber?.replace(/[^A-Z0-9]/ig, '')
+        }),
         ...(getMhrTransferSubmittingParty.value.phoneExtension && {
           phoneExtension: getMhrTransferSubmittingParty.value.phoneExtension
         })

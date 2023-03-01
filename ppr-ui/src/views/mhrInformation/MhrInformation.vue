@@ -180,7 +180,7 @@
                     @certifyValid="authorizationValid = $event"
                   />
                 </section>
-                <section id="transfer-payment-section" class="mt-10 pt-4 pb-10" v-if="isRoleStaffReg">
+                <section id="staff-transfer-payment-section" class="mt-10 pt-4 pb-10" v-if="isRoleStaffReg">
                   <h2>
                     5. Staff Payment
                   </h2>
@@ -534,10 +534,11 @@ export default defineComponent({
         // is valid on review step
         return (
           localState.isReviewMode &&
+          (isRoleStaffReg.value ? localState.isSubmittingPartyValid : true) &&
           isRefNumValid.value &&
           localState.isCompletionConfirmed &&
           !localState.validateAuthorizationError &&
-          !localState.validateStaffPayment
+          (isRoleStaffReg.value ? !localState.validateStaffPayment : true)
         )
       }),
       transferErrorMsg: computed((): string => {
@@ -556,6 +557,33 @@ export default defineComponent({
       /** True if Jest is running the code. */
       isJestRunning: computed((): boolean => {
         return process.env.JEST_WORKER_ID !== undefined
+      }),
+      sectionValidationStates: computed((): Array<boolean> => {
+        return [
+          localState.isSubmittingPartyValid,
+          isRefNumValid.value,
+          localState.isCompletionConfirmed,
+          !localState.validateAuthorizationError,
+          !localState.validateStaffPayment
+        ]
+      }),
+      invalidSection: computed(() => {
+        const validationSections = [
+          'staff-transfer-submitting-party',
+          'transfer-ref-num-section',
+          'transfer-confirm-section',
+          'transfer-certify-section',
+          'staff-transfer-payment-section'
+        ]
+        const mappedSections = validationSections.map(function (key, val) {
+          return { section: key, value: localState.sectionValidationStates[val] }
+        })
+        if (!isRoleStaffReg.value) {
+          mappedSections.shift()
+          mappedSections.pop()
+        }
+        // Return the first invalid section
+        return document.getElementById(mappedSections.filter(item => item.value === false)[0]?.section)
       })
     })
 
@@ -719,7 +747,7 @@ export default defineComponent({
         scrollToTop
           ? document.getElementById('mhr-information-header').scrollIntoView({ behavior: 'smooth' })
           : document.getElementsByClassName('border-error-left').length > 0 &&
-            document.getElementsByClassName('border-error-left')[0].scrollIntoView({ behavior: 'smooth' })
+            localState.invalidSection.scrollIntoView({ behavior: 'smooth' })
       }, 10)
     }
 
