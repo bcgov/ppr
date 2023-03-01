@@ -336,7 +336,7 @@
                 :class="{ 'invalid-section': invalidSection }"
               >
                 <v-expand-transition>
-                  <div class="edit-Party-container pa-0 col-12">
+                  <v-card flat class="edit-Party-container">
                     <edit-party
                       :activeIndex="activeIndex"
                       :invalidSection="invalidSection"
@@ -345,7 +345,7 @@
                       @removeSecuredParty="removeParty"
                       @resetEvent="resetData"
                     />
-                  </div>
+                  </v-card>
                 </v-expand-transition>
               </td>
             </tr>
