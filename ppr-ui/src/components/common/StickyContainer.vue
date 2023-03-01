@@ -12,7 +12,7 @@
       :setStaffSBC="isStaffSBC"
       :additionalFees="setAdditionalFees"
       :setStaffClientPayment="isStaffClientPayment"
-      :setTransferType="setTransferType"
+      :transferType="transferType"
     />
     <buttons-stacked
       v-if="showButtons"
@@ -93,7 +93,7 @@ export default defineComponent({
     setRegistrationType: {
       type: String as () => UIRegistrationTypes
     },
-    setTransferType: {
+    transferType: {
       type: String as () => UITransferTypes
     },
     setAdditionalFees: {

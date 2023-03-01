@@ -220,7 +220,7 @@ export default defineComponent({
     setRegistrationType: {
       type: String as () => UIRegistrationTypes
     },
-    setTransferType: {
+    transferType: {
       type: String as () => UITransferTypes
     },
     setStaffReg: { default: false },
@@ -236,7 +236,6 @@ export default defineComponent({
     const localState = reactive({
       feeType: props.setFeeType,
       registrationType: props.setRegistrationType,
-      transferType: props.setTransferType,
       hasPriorityFee: computed((): Boolean => getStaffPayment.value?.isPriority),
       hasCertifyFee: computed((): Boolean => isSearchCertified.value),
       registrationLength: computed((): RegistrationLengthI => props.setRegistrationLength),
@@ -368,9 +367,6 @@ export default defineComponent({
     })
     watch(() => props.setRegistrationType, (val: UIRegistrationTypes) => {
       localState.registrationType = val
-    })
-    watch(() => props.setTransferType, (val: UITransferTypes) => {
-      localState.transferType = val
     })
 
     return {

@@ -279,7 +279,7 @@
                   :setShowFeeSummary="true"
                   :setFeeType="feeType"
                   :setErrMsg="transferErrorMsg"
-                  :setTransferType="uiTransferType"
+                  :transferType="uiTransferType"
                   @cancel="goToDash()"
                   @back="isReviewMode = false"
                   @save="onSave()"
