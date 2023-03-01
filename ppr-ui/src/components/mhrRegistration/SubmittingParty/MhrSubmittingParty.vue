@@ -135,7 +135,7 @@
               {{ content.mailAddressInfo }}
             </p>
             <p v-else class="py-1">
-              Verification of Service registration document and decals will be mailed to this address.
+              Registry documents and decal will be mailed to this address.
             </p>
 
             <base-address
@@ -231,7 +231,7 @@ export default defineComponent({
 
     const localState = reactive({
       enableLookUp: true,
-      submittingPartyType: '',
+      submittingPartyType: null as SubmittingPartyTypes,
       submittingPartyValid: false,
       addressValid: false,
       submittingParty: {
@@ -333,7 +333,7 @@ export default defineComponent({
       }, { deep: true, immediate: true })
 
     /** Apply local model updates to store. **/
-    watch(() => localState.submittingParty, async () => {
+    watch(() => [localState.submittingParty, localState.submittingPartyType], async () => {
       // Disable look up during local model changes
       localState.enableLookUp = false
       // Set submitting party data to store

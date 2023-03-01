@@ -180,7 +180,7 @@
                     @certifyValid="authorizationValid = $event"
                   />
                 </section>
-                <section id="transfer-payment-section" class="mt-10 pt-4 pb-10" v-if="isRoleStaffReg">
+                <section id="staff-transfer-payment-section" class="mt-10 pt-4 pb-10" v-if="isRoleStaffReg">
                   <h2>
                     5. Staff Payment
                   </h2>
@@ -534,6 +534,7 @@ export default defineComponent({
         // is valid on review step
         return (
           localState.isReviewMode &&
+          localState.isSubmittingPartyValid &&
           isRefNumValid.value &&
           localState.isCompletionConfirmed &&
           !localState.validateAuthorizationError &&
@@ -715,11 +716,37 @@ export default defineComponent({
     }
 
     const scrollToFirstError = async (scrollToTop: boolean = false): Promise<void> => {
+      const validationSections = [
+        'staff-transfer-submitting-party',
+        'transfer-ref-num-section',
+        'transfer-confirm-section',
+        'transfer-certify-section',
+        'staff-transfer-payment-section'
+      ]
+      const sectionValidationStates = [
+        localState.isSubmittingPartyValid,
+        isRefNumValid.value,
+        localState.isCompletionConfirmed,
+        !localState.validateAuthorizationError,
+        !localState.validateStaffPayment
+      ]
+      // Map the review sections to their true/false values
+      const mappedSections = validationSections.map(function (key, val) {
+        return { section: key, value: sectionValidationStates[val] }
+      })
+      // If not staff transfer flow, remove the sections that wont be present
+      if (!isRoleStaffReg.value) {
+        mappedSections.shift()
+        mappedSections.pop()
+      }
+      // Set the first invalid section
+      const invalidSection = document.getElementById(mappedSections.filter(item => item.value === false)[0].section)
+
       setTimeout(() => {
         scrollToTop
           ? document.getElementById('mhr-information-header').scrollIntoView({ behavior: 'smooth' })
           : document.getElementsByClassName('border-error-left').length > 0 &&
-            document.getElementsByClassName('border-error-left')[0].scrollIntoView({ behavior: 'smooth' })
+            invalidSection.scrollIntoView({ block: 'start', inline: 'nearest', behavior: 'smooth' })
       }, 10)
     }
 
