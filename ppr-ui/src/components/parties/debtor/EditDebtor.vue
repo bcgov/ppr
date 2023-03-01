@@ -51,6 +51,7 @@
                   persistent-hint
                   :clearable="showClear"
                   @click:clear="showClear = false"
+                  @keyup="validateNameField()"
                 >
                   <template v-slot:append>
                     <v-progress-circular
