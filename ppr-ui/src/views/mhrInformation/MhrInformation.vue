@@ -279,6 +279,7 @@
                   :setShowFeeSummary="true"
                   :setFeeType="feeType"
                   :setErrMsg="transferErrorMsg"
+                  :setTransferType="uiTransferType"
                   @cancel="goToDash()"
                   @back="isReviewMode = false"
                   @save="onSave()"
@@ -875,6 +876,7 @@ export default defineComponent({
 
       await resetMhrInformation()
       localState.showTransferType = false
+      localState.showMhrFeeSummary = false
       localState.showCancelChangeDialog = false
     }
 
@@ -927,7 +929,7 @@ export default defineComponent({
       }
 
       localState.showTransferType = !localState.showTransferType
-      localState.showMhrFeeSummary = true
+      localState.showMhrFeeSummary = localState.showTransferType
     }
 
     const handleTransferTypeChange = async (transferTypeSelect: TransferTypeSelectIF): Promise<void> => {

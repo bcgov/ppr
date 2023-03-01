@@ -12,6 +12,9 @@
         >
           <div :class="$style['fee-list__item-name']">
             {{ feeLabel }}
+            <div v-if="isMhrTransfer" :class="[$style['fee-list__hint'], 'pt-2']">
+              {{ transferType ? transferType : 'Select Transfer Type' }}
+            </div>
           </div>
           <div
             v-if="feeSummary.feeAmount === 0"
@@ -21,6 +24,9 @@
           </div>
           <div v-else-if="!isComplete" :class="$style['fee-list__item-value']">
             -
+          </div>
+          <div v-else-if="isMhrTransfer && !transferType" :class="$style['fee-list__item-value']">
+            $ -
           </div>
           <div v-else :class="$style['fee-list__item-value']">
             ${{ totalFees.toFixed(2) }}
@@ -164,7 +170,10 @@
       <div :class="$style['fee-total__currency']">CAD</div>
       <div :class="$style['fee-total__value']">
         <v-slide-y-reverse-transition name="slide" mode="out-in">
-          <div v-if="isComplete" class="float-right">
+          <div v-if="isMhrTransfer && !transferType" class="float-right">
+            <b>$ -</b>
+          </div>
+          <div v-else-if="isComplete || transferType" class="float-right">
             <b>${{ totalAmount.toFixed(2) }}</b>
           </div>
           <div v-else class="float-right"><b>-</b></div>
@@ -179,7 +188,8 @@
 import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
 import { useGetters } from 'vuex-composition-helpers'
 // local
-import { UIRegistrationTypes } from '@/enums'
+/* eslint-disable no-unused-vars */
+import { UIRegistrationTypes, UITransferTypes } from '@/enums'
 /* eslint-disable no-unused-vars */
 import { FeeSummaryTypes } from './enums'
 import { AdditionalSearchFeeIF, FeeSummaryI, RegistrationLengthI } from './interfaces'
@@ -210,6 +220,9 @@ export default defineComponent({
     setRegistrationType: {
       type: String as () => UIRegistrationTypes
     },
+    setTransferType: {
+      type: String as () => UITransferTypes
+    },
     setStaffReg: { default: false },
     setStaffSBC: { default: false },
     setStaffClientPayment: { default: false }
@@ -223,6 +236,7 @@ export default defineComponent({
     const localState = reactive({
       feeType: props.setFeeType,
       registrationType: props.setRegistrationType,
+      transferType: props.setTransferType,
       hasPriorityFee: computed((): Boolean => getStaffPayment.value?.isPriority),
       hasCertifyFee: computed((): Boolean => isSearchCertified.value),
       registrationLength: computed((): RegistrationLengthI => props.setRegistrationLength),
@@ -243,6 +257,9 @@ export default defineComponent({
       }),
       additionalFeeLabel: computed((): string => {
         return mapFeeTypeToDisplayName(props.additionalFees?.feeType)
+      }),
+      isMhrTransfer: computed((): boolean => {
+        return localState.feeType === FeeSummaryTypes.MHR_TRANSFER
       }),
       feeSummary: computed((): FeeSummaryI => {
         const feeSummary = getFeeSummary(
@@ -352,6 +369,9 @@ export default defineComponent({
     watch(() => props.setRegistrationType, (val: UIRegistrationTypes) => {
       localState.registrationType = val
     })
+    watch(() => props.setTransferType, (val: UITransferTypes) => {
+      localState.transferType = val
+    })
 
     return {
       UIRegistrationTypes,
@@ -378,7 +398,7 @@ header {
 
 .fee-list {
   li {
-    padding-left: 30px !important;
+    padding-left: 15px !important;
   }
 }
 
