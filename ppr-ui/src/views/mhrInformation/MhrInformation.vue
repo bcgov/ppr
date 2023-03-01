@@ -557,6 +557,15 @@ export default defineComponent({
       /** True if Jest is running the code. */
       isJestRunning: computed((): boolean => {
         return process.env.JEST_WORKER_ID !== undefined
+      }),
+      sectionValidationStates: computed((): Array<any> => {
+        return [
+          localState.isSubmittingPartyValid,
+          isRefNumValid.value,
+          localState.isCompletionConfirmed,
+          !localState.validateAuthorizationError,
+          !localState.validateStaffPayment
+        ]
       })
     })
 
@@ -589,6 +598,24 @@ export default defineComponent({
 
       localState.dataLoaded = true
     })
+
+    const mapTransferReviewValidations = () => {
+      const validationSections = [
+        'staff-transfer-submitting-party',
+        'transfer-ref-num-section',
+        'transfer-confirm-section',
+        'transfer-certify-section',
+        'staff-transfer-payment-section'
+      ]
+      const mappedSections = validationSections.map(function (key, val) {
+        return { section: key, value: localState.sectionValidationStates[val] }
+      })
+      if (!isRoleStaffReg.value) {
+        mappedSections.shift()
+        mappedSections.pop()
+      }
+      return mappedSections
+    }
 
     const onStaffPaymentDataUpdate = (val: StaffPaymentIF) => {
       let staffPaymentData: StaffPaymentIF = {
@@ -716,29 +743,7 @@ export default defineComponent({
     }
 
     const scrollToFirstError = async (scrollToTop: boolean = false): Promise<void> => {
-      const validationSections = [
-        'staff-transfer-submitting-party',
-        'transfer-ref-num-section',
-        'transfer-confirm-section',
-        'transfer-certify-section',
-        'staff-transfer-payment-section'
-      ]
-      const sectionValidationStates = [
-        localState.isSubmittingPartyValid,
-        isRefNumValid.value,
-        localState.isCompletionConfirmed,
-        !localState.validateAuthorizationError,
-        !localState.validateStaffPayment
-      ]
-      // Map the review sections to their true/false values
-      const mappedSections = validationSections.map(function (key, val) {
-        return { section: key, value: sectionValidationStates[val] }
-      })
-      // If not staff transfer flow, remove the sections that wont be present
-      if (!isRoleStaffReg.value) {
-        mappedSections.shift()
-        mappedSections.pop()
-      }
+      const mappedSections = mapTransferReviewValidations()
       // Set the first invalid section
       const invalidSection = document.getElementById(mappedSections.filter(item => item.value === false)[0].section)
 
@@ -1012,6 +1017,7 @@ export default defineComponent({
       onStaffPaymentDataUpdate,
       handleCancelDialogResp,
       cancelOwnerChangeConfirm,
+      mapTransferReviewValidations,
       ...toRefs(localState)
     }
   }
