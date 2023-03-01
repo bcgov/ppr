@@ -365,16 +365,16 @@ export default defineComponent({
     }
 
     const validateNameField = () => {
-      if (!errors.value.first.succeeded || currentDebtor.value.personName.first.length > 50) {
+      if (!errors.value.first.succeeded || currentDebtor.value.personName?.first.length > 50) {
         validateFirstName(currentDebtor.value, errors.value)
       }
-      if (!errors.value.last.succeeded || currentDebtor.value.personName.last.length > 50) {
+      if (!errors.value.last.succeeded || currentDebtor.value.personName?.last.length > 50) {
         validateLastName(currentDebtor.value, errors.value)
       }
-      if (!errors.value.middle.succeeded || currentDebtor.value.personName.middle.length > 50) {
+      if (!errors.value.middle.succeeded || currentDebtor.value.personName?.middle.length > 50) {
         validateMiddleName(currentDebtor.value, errors.value)
       }
-      if (!errors.value.businessName.succeeded || currentDebtor.value.businessName.length > 150) {
+      if (!errors.value.businessName?.succeeded || currentDebtor.value.businessName.length > 150) {
         validateBusinessName(currentDebtor.value, errors.value)
       }
     }
@@ -394,6 +394,7 @@ export default defineComponent({
       localState.searchValue = searchValueTyped
       currentDebtor.value.businessName = searchValueTyped
       localState.showClear = true
+      validateNameField()
     }
 
     const setCloseAutoComplete = () => {
@@ -409,15 +410,14 @@ export default defineComponent({
     watch(
       () => localState.searchValue,
       (val: string) => {
-        if (val?.length >= 3) {
-          localState.autoCompleteSearchValue = val
-          // only open if debtor name changed
+        localState.autoCompleteSearchValue = val
+
+        // only open if debtor name changed
+        if (currentDebtor.value.businessName !== val) {
+          // show autocomplete results when there is a searchValue
+          currentDebtor.value.businessName = val
           localState.autoCompleteIsActive = val !== ''
-        } else {
-          localState.autoCompleteSearchValue = val
-          localState.autoCompleteIsActive = false
         }
-        currentDebtor.value.businessName = val
       }
     )
 

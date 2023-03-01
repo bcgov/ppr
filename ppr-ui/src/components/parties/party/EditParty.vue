@@ -434,6 +434,7 @@ export default defineComponent({
       localState.searchValue = searchValueTyped
       currentSecuredParty.value.businessName = searchValueTyped
       localState.showClear = true
+      validateNameField()
     }
 
     const setCloseAutoComplete = () => {
@@ -443,14 +444,9 @@ export default defineComponent({
     watch(
       () => localState.searchValue,
       (val: string) => {
-        if (val?.length >= 3) {
-          localState.autoCompleteSearchValue = val
-          // only open if debtor name changed
-          localState.autoCompleteIsActive = val !== ''
-        } else {
-          localState.autoCompleteSearchValue = val
-          localState.autoCompleteIsActive = false
-        }
+        localState.autoCompleteSearchValue = val
+        // show autocomplete results when there is a searchValue
+        localState.autoCompleteIsActive = val !== ''
         currentSecuredParty.value.businessName = val
       }
     )
