@@ -873,11 +873,13 @@ export default defineComponent({
         localState.showCancelChangeDialog = false
         return
       }
-
-      await resetMhrInformation()
+      localState.showCancelChangeDialog = false
       localState.showTransferType = false
       localState.showMhrFeeSummary = false
-      localState.showCancelChangeDialog = false
+
+      localState.loading = true
+      await resetMhrInformation()
+      localState.loading = false
     }
 
     const quickMhrSearch = async (mhrNumber: string): Promise<void> => {

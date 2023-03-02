@@ -442,6 +442,16 @@ export default defineComponent({
       }
     )
 
+    watch(
+      () => props.enableActions,
+      (val: boolean) => {
+        if (!val) {
+          localState.showAddPersonSection = val
+          localState.showAddPersonOrganizationSection = val
+        }
+      }
+    )
+
     onBeforeMount(() => {
       // before mounted in review mode, deleted owners hidden as per default
       if (props.isReadonlyTable) {

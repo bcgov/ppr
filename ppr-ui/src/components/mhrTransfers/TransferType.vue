@@ -156,7 +156,7 @@ export default defineComponent({
       declaredValue: getMhrTransferDeclaredValue.value,
       selectedTransferType: getMhrTransferType.value as TransferTypeSelectIF,
       showTransferChangeDialog: false,
-      tempTransferType: null as TransferTypeSelectIF,
+      previousType: null as TransferTypeSelectIF,
       declaredValueRules: computed((): Array<Function> => {
         return customRules(
           maxLength(7, true),
@@ -179,17 +179,18 @@ export default defineComponent({
     }
 
     const handleTypeChange = async (item: TransferTypeSelectIF): Promise<void> => {
-      if (hasUnsavedChanges.value || !!getMhrTransferDeclaredValue.value) {
+      if (item.transferType !== localState.previousType?.transferType &&
+        (hasUnsavedChanges.value || !!getMhrTransferDeclaredValue.value)) {
         localState.showTransferChangeDialog = true
       } else {
-        localState.tempTransferType = cloneDeep(item)
+        localState.previousType = cloneDeep(item)
         selectTransferType(item)
       }
     }
 
     const handleTypeChangeDialogResp = (val: boolean): void => {
       if (!val) {
-        selectTransferType(cloneDeep(localState.tempTransferType))
+        selectTransferType(cloneDeep(localState.previousType))
       } else {
         selectTransferType(cloneDeep(localState.selectedTransferType))
       }
