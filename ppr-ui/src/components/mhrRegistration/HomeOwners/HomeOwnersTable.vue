@@ -414,6 +414,15 @@ export default defineComponent({
       )
     }, { immediate: true, deep: true })
 
+    watch(
+      () => props.enableActions,
+      (val: boolean) => {
+        if (!val) {
+          localState.currentlyEditingHomeOwnerId = -1
+        }
+      }
+    )
+
     return {
       ActionTypes,
       addressSchema,
