@@ -52,14 +52,6 @@
           @blur="$refs.interestNumerator.validate()"
         />
       </div>
-      <label class="generic-label" for="tenancy-type">Tenancy</label>
-      <v-checkbox :id="`tenancy-type-group-${groupId}`" v-model="fractionalData.tenancySpecified">
-        <template v-slot:label>
-          <p class="ma-0">
-            Tenancy not specified
-          </p>
-        </template>
-      </v-checkbox>
     </div>
   </div>
 </template>
@@ -84,8 +76,7 @@ export default defineComponent({
         type: '',
         interest: 'Undivided',
         interestNumerator: null,
-        interestDenominator: null,
-        tenancySpecified: null
+        interestDenominator: null
       },
       required: true
     },
