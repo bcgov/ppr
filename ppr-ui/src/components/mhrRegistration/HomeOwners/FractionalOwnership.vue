@@ -76,8 +76,7 @@ export default defineComponent({
         type: '',
         interest: 'Undivided',
         interestNumerator: null,
-        interestDenominator: null,
-        tenancySpecified: null
+        interestDenominator: null
       },
       required: true
     },

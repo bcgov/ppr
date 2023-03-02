@@ -242,8 +242,7 @@ export default defineComponent({
         type: localState.group?.type || '',
         interest: localState.group?.interest || 'Undivided',
         interestNumerator: localState.group?.interestNumerator || null,
-        interestDenominator: localState.group?.interestDenominator || null,
-        tenancySpecified: localState.group?.tenancySpecified || false
+        interestDenominator: localState.group?.interestDenominator || null
       } as MhrRegistrationFractionalOwnershipIF
 
       localState.isEditGroupMode = true

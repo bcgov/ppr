@@ -446,8 +446,7 @@ export default defineComponent({
         type: group?.type || '',
         interest: group?.interest || 'Undivided',
         interestNumerator: group?.interestNumerator || null,
-        interestDenominator: group?.interestDenominator || null,
-        tenancySpecified: group?.tenancySpecified || false
+        interestDenominator: group?.interestDenominator || null
       }
     }) as FractionalOwnershipWithGroupIdIF[]
 
@@ -466,8 +465,7 @@ export default defineComponent({
         type: 'N/A',
         interest: 'Undivided',
         interestNumerator: null,
-        interestDenominator: defaultLcm,
-        tenancySpecified: false
+        interestDenominator: defaultLcm
       } as FractionalOwnershipWithGroupIdIF)
     }
 
@@ -555,7 +553,6 @@ export default defineComponent({
           delete localState.group.interest
           delete localState.group.interestNumerator
           delete localState.group.interestDenominator
-          delete localState.group.tenancySpecified
         }
 
         if (props.isMhrTransfer) setUnsavedChanges(props.editHomeOwner !== localState.owner)
