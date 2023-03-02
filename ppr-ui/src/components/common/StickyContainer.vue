@@ -12,6 +12,7 @@
       :setStaffSBC="isStaffSBC"
       :additionalFees="setAdditionalFees"
       :setStaffClientPayment="isStaffClientPayment"
+      :transferType="transferType"
     />
     <buttons-stacked
       v-if="showButtons"
@@ -46,7 +47,7 @@ import { ButtonsStacked } from '@/components/common'
 import { FeeSummary } from '@/composables/fees'
 // local enums/interfaces/etc.
 /* eslint-disable no-unused-vars */
-import { UIRegistrationTypes } from '@/enums'
+import { UIRegistrationTypes, UITransferTypes } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import {
   AdditionalSearchFeeIF,
@@ -91,6 +92,9 @@ export default defineComponent({
     },
     setRegistrationType: {
       type: String as () => UIRegistrationTypes
+    },
+    transferType: {
+      type: String as () => UITransferTypes
     },
     setAdditionalFees: {
       default: null,
