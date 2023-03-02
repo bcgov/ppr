@@ -267,7 +267,7 @@
             :isMhrTransfer="isMhrTransfer"
           />
         </v-form>
-        <v-row>
+        <v-row class="py-6">
           <v-col>
             <div class="form__row form__btns">
               <v-btn

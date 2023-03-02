@@ -145,7 +145,7 @@
     </div>
 
     <!-- Group Edit -->
-    <div v-else>
+    <div v-else class="py-8">
       <v-row>
         <v-col cols="3">
           <label class="generic-label"> Edit Group </label>
@@ -153,7 +153,7 @@
         <v-col cols="9">
           <label class="generic-label"> Group {{ groupId }} Details: </label>
 
-          <v-form class="my-5" ref="homeFractionalOwnershipForm" v-model="isHomeFractionalOwnershipValid">
+          <v-form class="mt-5" ref="homeFractionalOwnershipForm" v-model="isHomeFractionalOwnershipValid">
             <FractionalOwnership
               :groupId="groupId"
               :fractionalData="fractionalData"
