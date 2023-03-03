@@ -16,6 +16,7 @@
 # pylint: disable=too-many-return-statements
 from http import HTTPStatus
 import json
+import copy
 
 import requests
 from flask import Blueprint, current_app, jsonify, request
@@ -152,6 +153,11 @@ def post_search_results(search_id: str):  # pylint: disable=too-many-branches, t
             client_ref = client_ref.strip()
             if client_ref and len(client_ref) < 51:
                 query.client_reference_id = client_ref
+                # Also update the original search criteria json as this is used in the account search history.
+                criteria = copy.deepcopy(query.search_criteria)
+                criteria['clientReferenceId'] = client_ref
+                query.search_criteria = criteria
+                current_app.logger.info(f'POST search results updating client ref to {client_ref}.')
         try:
             # Save the search query selection and details that match the selection.
             account_name = resource_utils.get_account_name(jwt.get_token_auth_header(), account_id)
