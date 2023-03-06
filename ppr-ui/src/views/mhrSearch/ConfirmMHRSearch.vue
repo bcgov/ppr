@@ -269,7 +269,7 @@ export default class ConfirmMHRSearch extends Vue {
     if (this.isRoleStaffReg) {
       apiResponse = await submitSelectedMhr(
         this.getManufacturedHomeSearchResults.searchId,
-        this.getSelectedManufacturedHomes,
+        uniqBy(this.getSelectedManufacturedHomes, UIMHRSearchTypeValues.MHRMHR_NUMBER),
         this.getFolioOrReferenceNumber,
         this.getStaffPayment,
         this.isSearchCertified
@@ -277,7 +277,7 @@ export default class ConfirmMHRSearch extends Vue {
     } else {
       apiResponse = await submitSelectedMhr(
         this.getManufacturedHomeSearchResults.searchId,
-        this.getSelectedManufacturedHomes,
+        uniqBy(this.getSelectedManufacturedHomes, UIMHRSearchTypeValues.MHRMHR_NUMBER),
         this.getFolioOrReferenceNumber
       )
     }
