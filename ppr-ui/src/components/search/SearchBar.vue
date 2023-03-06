@@ -38,7 +38,49 @@
               @selected="returnSearchSelection($event)"
             />
           </v-col>
-          <v-col v-if="!isIndividual" class="col-xl pb-0">
+
+          <!-- Business Name Lookup -->
+          <v-col v-if="isBusinessDebtor">{{loadingSearchResults}}
+            <v-text-field
+              filled
+              id="txt-name-debtor"
+              ref="debtorNameSearchField"
+              label="Find or enter the Full Legal Name of the Business"
+              v-model="searchValue"
+              persistent-hint
+              :hint="searchHint"
+              :hide-details="hideDetails"
+              :clearable="showClear"
+              :disabled="!selectedSearchType"
+              :error-messages="searchMessage ? searchMessage : ''"
+              @click:clear="showClear = false"
+            >
+              <template v-slot:append>
+                <v-progress-circular
+                  v-if="loadingSearchResults"
+                  indeterminate
+                  color="primary"
+                  class="mx-3"
+                  :size="25"
+                  :width="3"
+                />
+              </template>
+            </v-text-field>
+
+            <v-card flat>
+              <BusinessSearchAutocomplete
+                :searchValue="autoCompleteSearchValue"
+                :setAutoCompleteIsActive="autoCompleteIsActive"
+                v-click-outside="setCloseAutoComplete"
+                @search-value="setSearchValue"
+                @searching="loadingSearchResults = $event"
+                :showDropdown="$refs.debtorNameSearchField && $refs.debtorNameSearchField.isFocused"
+                isPPR
+              />
+            </v-card>
+          </v-col>
+
+          <v-col v-else-if="!isIndividual" class="col-xl pb-0">
             <v-tooltip
               content-class="bottom-tooltip"
               bottom
@@ -76,6 +118,7 @@
             >
             </auto-complete>
           </v-col>
+
           <v-col v-else class="pl-3 col-xl pb-0">
             <v-row no-gutters>
               <v-col cols="4">
@@ -191,14 +234,8 @@ import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composi
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import _ from 'lodash'
 
-import {
-  mhrSearch,
-  search,
-  staffSearch,
-  validateSearchAction,
-  validateSearchRealTime
-} from '@/utils'
-import { SearchTypes, MHRSearchTypes } from '@/resources'
+import { mhrSearch, search, staffSearch, validateSearchAction, validateSearchRealTime } from '@/utils'
+import { MHRSearchTypes, SearchTypes } from '@/resources'
 import { paymentConfirmaionDialog, staffPaymentDialog } from '@/resources/dialogOptions'
 /* eslint-disable no-unused-vars */
 import {
@@ -213,14 +250,16 @@ import {
 import { APIMHRMapSearchTypes, APISearchTypes, SettingOptions } from '@/enums'
 // won't render properly from @/components/search
 import AutoComplete from '@/components/search/AutoComplete.vue'
+import SearchBarList from '@/components/search/SearchBarList.vue'
+import BusinessSearchAutocomplete from '@/components/search/BusinessSearchAutocomplete.vue'
 import { FolioNumber } from '@/components/common'
 import { ConfirmationDialog, StaffPaymentDialog } from '@/components/dialogs'
-import SearchBarList from '@/components/search/SearchBarList.vue'
 import { useSearch } from '@/composables/useSearch'
 
 export default defineComponent({
   components: {
     AutoComplete,
+    BusinessSearchAutocomplete,
     ConfirmationDialog,
     StaffPaymentDialog,
     FolioNumber,
@@ -288,6 +327,8 @@ export default defineComponent({
       folioNumber: props.defaultFolioNumber,
       folioError: false,
       hideDetails: false,
+      loadingSearchResults: false,
+      showClear: false,
       searchValue: props.defaultSearchValue,
       searchValueFirst: props.defaultDebtor?.first,
       searchValueSecond: props.defaultDebtor?.second,
@@ -331,11 +372,11 @@ export default defineComponent({
         return '8.50'
       }),
       isIndividual: computed((): boolean => {
-        if ((localState.selectedSearchType?.searchTypeAPI === APISearchTypes.INDIVIDUAL_DEBTOR) ||
-           (localState.selectedSearchType?.searchTypeAPI === APIMHRMapSearchTypes.MHROWNER_NAME)) {
-          return true
-        }
-        return false
+        return (localState.selectedSearchType?.searchTypeAPI === APISearchTypes.INDIVIDUAL_DEBTOR) ||
+          (localState.selectedSearchType?.searchTypeAPI === APIMHRMapSearchTypes.MHROWNER_NAME)
+      }),
+      isBusinessDebtor: computed((): boolean => {
+        return localState.selectedSearchType?.searchTypeAPI === APISearchTypes.BUSINESS_DEBTOR
       }),
       wrapClass: computed(() => {
         // Add wrap css class only to MHR Home Owner search fields

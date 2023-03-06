@@ -10,7 +10,7 @@ import { axios as vonAxios } from '@/utils/axios-von'
 
 // Components
 import { ConfirmationDialog } from '@/components/dialogs'
-import { SearchBar } from '@/components/search'
+import { BusinessSearchAutocomplete, SearchBar } from '@/components/search'
 
 // Other
 import { MHRSearchTypes, SearchTypes } from '@/resources'
@@ -409,43 +409,16 @@ describe('Business debtor search', () => {
     expect(wrapper.vm.$store.state.stateModel.userInfo.settings.paymentConfirmationDialog).toBe(false)
     expect(getLastEvent(wrapper, searchData)).toEqual(resp)
   })
-  it('shows von api results while typing', async () => {
+  it('shows business dropdown after 3 characters', async () => {
     wrapper.vm.returnSearchSelection(select)
     wrapper.vm.$data.selectedSearchType = select
     await Vue.nextTick()
-    wrapper.vm.$data.searchValue = 't'
-    // takes 4 ticks before displayed
+    wrapper.vm.$data.searchValue = 'Abc'
     await Vue.nextTick()
-    await Vue.nextTick()
-    await Vue.nextTick()
-    await Vue.nextTick()
-    const autoCompleteNames = wrapper.findAll('.auto-complete-item')
-    // 6 in the response, but should only display up to 5
-    expect(autoCompleteNames.length).toBe(5)
-    expect(autoCompleteNames.at(0).text()).toEqual(mockedVonResponse.results[0].value)
-    expect(autoCompleteNames.at(1).text()).toEqual(mockedVonResponse.results[1].value)
-    expect(autoCompleteNames.at(2).text()).toEqual(mockedVonResponse.results[2].value)
-    expect(autoCompleteNames.at(3).text()).toEqual(mockedVonResponse.results[3].value)
-    expect(autoCompleteNames.at(4).text()).toEqual(mockedVonResponse.results[4].value)
-  })
-  it('updates the search value and removes the autocomplete list after a name is selected', async () => {
-    wrapper.vm.returnSearchSelection(select)
-    wrapper.vm.$data.selectedSearchType = select
-    await Vue.nextTick()
-    wrapper.vm.$data.searchValue = 'test'
-    // takes 4 ticks before displayed
-    await Vue.nextTick()
-    await Vue.nextTick()
-    await Vue.nextTick()
-    await Vue.nextTick()
-    const autoCompleteNames = wrapper.findAll('.auto-complete-item')
-    expect(autoCompleteNames.length).toBe(5)
-    const selectedText = autoCompleteNames.at(3).text()
-    autoCompleteNames.at(3).trigger('click')
-    await Vue.nextTick()
-    expect(wrapper.vm.$data.searchValue).toEqual(selectedText)
-    const autoCompleteNamesAfterClose = wrapper.findAll('.auto-complete-item')
-    expect(autoCompleteNamesAfterClose.length).toBe(0)
+
+    expect(wrapper.findComponent(BusinessSearchAutocomplete).exists()).toBe(true)
+    expect(wrapper.find('#business-search-autocomplete').exists()).toBe(true)
+    expect(wrapper.vm.$data.autoCompleteSearchValue).toBe('Abc')
   })
   it('special characters are being replaced', async () => {
     wrapper.vm.returnSearchSelection(select)
