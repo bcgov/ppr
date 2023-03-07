@@ -1,6 +1,6 @@
 <template>
   <v-card
-    v-if="searchValue.length >= 3 && !searching"
+    v-if="searchValue && searchValue.length >= 3 && !searching"
     id="business-search-autocomplete"
     class="auto-complete-card"
     elevation="5"
