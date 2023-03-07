@@ -6,10 +6,10 @@
       :setOptions="{
         title: 'Delete Group',
         text:
-          'Deleting a group also deletes all of the owners in the group and cannot be undone. ' +
+          'Deleting a group also deletes all of the owners in the group. ' +
           'All subsequent groups will be re-numbered.' +
           '<br><br>' +
-          'If you wish to keep the owners of this group move the ' +
+          'If there are any newly added owerns in the group that you wish to keep, move those ' +
           'owners to a different group prior to deletion.',
         acceptText: 'Delete Group',
         cancelText: 'Cancel'
@@ -58,7 +58,7 @@
         <span
           v-else
           class="font-weight-bold removed-owner-group"
-          :class="{ 'ml-3' : !showEditActions }">Previous Owners</span>
+          :class="{ 'ml-3' : !showEditActions }">Previous Owner Group</span>
       </div>
 
       <!-- Default Actions -->

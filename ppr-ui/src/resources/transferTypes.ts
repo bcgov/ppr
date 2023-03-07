@@ -9,7 +9,7 @@ export const TransferTypes: Array<TransferTypeSelectIF> = [
     divider: false,
     group: 1,
     transferType: BlankSearchTypes.BLANK1 as any,
-    textLabel: 'Transfer Header TBD' as any,
+    textLabel: 'Transfer' as any,
     color: 'primary'
   },
   {

@@ -352,6 +352,10 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
     return homeOwners.every(group => group.action === ActionTypes.REMOVED)
   }
 
+  const hasRemovedAllHomeOwnerGroups = (): boolean => {
+    return getTransferOrRegistrationHomeOwnerGroups().every(group => group.action === ActionTypes.REMOVED)
+  }
+
   const hasUndefinedGroupInterest = (homeOwnerGroups: MhrHomeOwnerGroupIF[]): boolean => {
     return homeOwnerGroups.some(group => !group.interestNumerator || !group.interestDenominator)
   }
@@ -465,6 +469,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
     markGroupForRemoval,
     undoGroupRemoval,
     hasRemovedAllHomeOwners,
+    hasRemovedAllHomeOwnerGroups,
     hasUndefinedGroupInterest
   }
 }
