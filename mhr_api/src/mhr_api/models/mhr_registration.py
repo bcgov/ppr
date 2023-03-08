@@ -237,6 +237,13 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                         note['documentDescription'] = doc_desc
                         updated_notes.append(note)
                 reg_json['notes'] = updated_notes
+            if reg_json and self.locations:
+                location: MhrLocation = self.locations[0]
+                for existing in self.locations:
+                    if existing.registration_id == self.id or existing.statusType == MhrStatusTypes.ACTIVE:
+                        location = existing
+                        current_app.logger.debug('Using PostreSQL location in registration.registration_json.')
+                reg_json['location'] = location.json
             return reg_json
         return self.json
 
@@ -339,11 +346,12 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         """Return the registration matching the id."""
         registration = None
         if registration_id:
+            registration = cls.query.get(registration_id)
             if legacy:
-                registration = MhrRegistration()
+                if not registration:
+                    current_app.logger.debug(f'No new registration found for id={registration_id}')
+                    registration = MhrRegistration()
                 registration.manuhome = legacy_utils.find_by_id(registration_id, search)
-            else:
-                registration = cls.query.get(registration_id)
         return registration
 
     @classmethod
