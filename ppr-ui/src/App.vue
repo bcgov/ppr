@@ -97,7 +97,7 @@ import { FeeCodes } from '@/composables/fees/enums'
 import {
   AccountProductCodes, AccountProductMemberships, AccountProductRoles, APIRegistrationTypes,
   ErrorCategories,
-  ErrorCodes, ProductStatus, RegistrationFlowType, RouteNames
+  ErrorCodes, ProductStatus, RegistrationFlowType, RouteNames, ProductCode
 } from '@/enums'
 import {
   AccountProductSubscriptionIF, ActionBindingIF, DialogOptionsIF, // eslint-disable-line
@@ -126,6 +126,7 @@ export default class App extends Mixins(AuthMixin) {
   @Getter getUserFirstName!: string
   @Getter getUserLastName!: string
   @Getter getUserRoles!: string
+  @Getter getUserProductSubscriptionsCodes: Array<ProductCode>
   @Getter getUserUsername!: string
   @Getter hasUnsavedChanges: Boolean
   @Getter isPremiumAccount!: boolean
@@ -310,6 +311,9 @@ export default class App extends Mixins(AuthMixin) {
 
       // initialize app
       await this.initApp()
+
+      // set browser title
+      this.setBrowserTitle()
     }
   }
 
@@ -495,6 +499,16 @@ export default class App extends Mixins(AuthMixin) {
       statusCode: statusCode
     }
     return resp
+  }
+
+  /** Gets user products and sets browser title accordingly. */
+  private setBrowserTitle (): void {
+    const userProducts = this.getUserProductSubscriptionsCodes
+    if (userProducts.includes(ProductCode.PPR) && userProducts.includes(ProductCode.MHR)) {
+      document.title = 'BC Asset Registries (MHR/PPR)'
+    } else if (userProducts.includes(ProductCode.MHR)) {
+      document.title = 'BC Manufactured Home Registry'
+    }
   }
 
   /** Gets account information (e.g. Premium account) and stores it. */
