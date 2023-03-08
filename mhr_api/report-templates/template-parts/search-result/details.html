@@ -5,7 +5,10 @@
         <table class="no-page-break section-data details-table mt-4" role="presentation">
             <tr>
                 <td class="section-sub-title">Year:</td>
-                <td>{{detail.description.baseInformation.year}}</td>
+                <td>
+                    {% if detail.description.baseInformation.circa is defined and detail.description.baseInformation.circa %}Circa {% endif %}
+                    {{detail.description.baseInformation.year}}
+                </td>
             </tr>
             <tr>
                 <td class="section-sub-title">Manufacturer:</td>
