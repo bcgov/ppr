@@ -293,7 +293,7 @@ export default defineComponent({
             (
               !hasMinimumGroups() ||
               hasEmptyGroup.value ||
-              !hasUnsavedChanges.value ||
+              (props.isMhrTransfer && !hasUnsavedChanges.value) ||
               !localState.isValidAllocation ||
               localState.hasGroupsWithNoOwners ||
               (!localState.isUngroupedTenancy && hasUndefinedGroupInterest(getTransferOrRegistrationHomeOwnerGroups()))
