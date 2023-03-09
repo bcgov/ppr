@@ -7,9 +7,7 @@ import { HomeOwners } from '@/views'
 import {
   AddEditHomeOwner,
   HomeOwnersTable,
-  HomeOwnerGroups,
-  TableGroupHeader,
-  FractionalOwnership
+  HomeOwnerGroups
 } from '@/components/mhrRegistration/HomeOwners'
 import { SimpleHelpToggle } from '@/components/common'
 import {
@@ -21,6 +19,7 @@ import {
 } from './test-data'
 import { getTestId } from './utils'
 import { MhrRegistrationHomeOwnerGroupIF } from '@/interfaces'
+import { ApiTransferTypes, UITransferTypes } from '@/enums'
 
 Vue.use(Vuetify)
 
@@ -50,6 +49,12 @@ describe('Home Owners', () => {
 
   beforeEach(async () => {
     wrapper = createComponent()
+
+    await store.dispatch('setMhrTransferType',
+      {
+        transferType: ApiTransferTypes.SALE_OR_GIFT,
+        textLabel: UITransferTypes.SALE_OR_GIFT
+      })
   })
   afterEach(() => {
     wrapper.destroy()
@@ -59,7 +64,7 @@ describe('Home Owners', () => {
 
   const openAddPerson = async () => {
     const homeOwnersSection = wrapper.findComponent(HomeOwners)
-    await homeOwnersSection.find(getTestId('add-person-btn')).trigger('click')
+    await homeOwnersSection.find(getTestId('add-person-btn'))?.trigger('click')
     await Vue.nextTick()
     expect(homeOwnersSection.findComponent(AddEditHomeOwner).exists()).toBeTruthy()
     expect(homeOwnersSection.findComponent(HomeOwnerGroups).exists()).toBeTruthy()
@@ -67,7 +72,7 @@ describe('Home Owners', () => {
 
   const openAddOrganization = async () => {
     const homeOwnersSection = wrapper.findComponent(HomeOwners)
-    await homeOwnersSection.find(getTestId('add-org-btn')).trigger('click')
+    await homeOwnersSection.find(getTestId('add-org-btn'))?.trigger('click')
     await Vue.nextTick()
     expect(homeOwnersSection.findComponent(AddEditHomeOwner).exists()).toBeTruthy()
     expect(homeOwnersSection.findComponent(HomeOwnerGroups).exists()).toBeTruthy()

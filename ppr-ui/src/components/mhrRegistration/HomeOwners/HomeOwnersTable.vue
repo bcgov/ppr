@@ -34,7 +34,7 @@
             :groupId="group"
             :groupNumber="getGroupNumberById(group)"
             :owners="hasActualOwners(items) ? items : []"
-            :showEditActions="showEditActions && enableActions"
+            :showEditActions="showEditActions && enableTransferOwnerGroupActions()"
             :disableGroupHeader="disableGroupHeader(group)"
             :isMhrTransfer="isMhrTransfer"
           />
@@ -137,7 +137,10 @@
           <td v-if="showEditActions" class="row-actions text-right">
 
             <!-- New Owner Actions -->
-            <div v-if="(!isMhrTransfer || isAddedHomeOwner(row.item)) && enableActions" class="mr-n4">
+            <div
+              v-if="(!isMhrTransfer || isAddedHomeOwner(row.item)) && enableHomeOwnerChanges()"
+              class="mr-n4"
+            >
               <v-btn
                 text
                 color="primary"
@@ -175,29 +178,58 @@
             </div>
 
             <!-- Existing Owner Actions -->
-            <template v-else-if="enableActions">
+            <template v-else-if="enableTransferOwnerActions(row.item)">
               <v-btn
                 v-if="!isRemovedHomeOwner(row.item)"
                 text color="primary" class="mr-n4"
                 :ripple="false"
-                :disabled="isAddingMode || isEditingMode || isGlobalEditingMode"
+                :disabled="isAddingMode || isEditingMode || isGlobalEditingMode || disableForDeceasedOwners(row.item)"
                 @click="markForRemoval(row.item)"
                 data-test-id="table-edit-btn"
               >
                 <v-icon small>mdi-delete</v-icon>
                 <span>Delete</span>
+                <v-divider v-if="enableTransferOwnerMenuActions(row.item)" class="ma-0 pl-3" vertical />
               </v-btn>
+
               <v-btn
                 v-if="isRemovedHomeOwner(row.item)"
                 text color="primary" class="mr-n4"
                 :ripple="false"
-                :disabled="isAddingMode || isEditingMode || isGlobalEditingMode"
+                :disabled="isAddingMode || isEditingMode || isGlobalEditingMode || disableForDeceasedOwners(row.item)"
                 @click="undoRemoval(row.item)"
                 data-test-id="table-edit-btn"
               >
                 <v-icon small>mdi-undo</v-icon>
                 <span>Undo</span>
+                <v-divider v-if="enableTransferOwnerMenuActions(row.item)" class="ma-0 pl-3" vertical />
               </v-btn>
+
+              <!-- Menu actions drop down menu -->
+              <template v-if="enableTransferOwnerMenuActions(row.item)">
+                <v-menu offset-y left nudge-bottom="0">
+                  <template v-slot:activator="{ on }">
+                    <v-btn
+                      text v-on="on"
+                      color="primary"
+                      class="px-0 mr-n3"
+                      :disabled="isAddingMode || isGlobalEditingMode || disableForDeceasedOwners(row.item)"
+                    >
+                      <v-icon>mdi-menu-down</v-icon>
+                    </v-btn>
+                  </template>
+
+                  <!-- More actions drop down list -->
+                  <v-list class="actions-dropdown actions__more-actions">
+                    <v-list-item class="my-n2">
+                      <v-list-item-subtitle class="pa-0" @click="openForEditing(homeOwners.indexOf(row.item))">
+                        <v-icon small class="mb-1">mdi-pencil</v-icon>
+                        <span class="ml-1 remove-btn-text">Change Details</span>
+                      </v-list-item-subtitle>
+                    </v-list-item>
+                  </v-list>
+                </v-menu>
+              </template>
             </template>
           </td>
         </tr>
@@ -221,9 +253,8 @@
 <script lang="ts">
 import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
 import { homeOwnersTableHeaders, homeOwnersTableHeadersReview } from '@/resources/tableHeaders'
-import { useMhrValidations } from '@/composables'
+import { useHomeOwners, useMhrValidations, useTransferOwners } from '@/composables'
 import { BaseAddress } from '@/composables/address'
-import { useHomeOwners } from '@/composables/mhrRegistration'
 import { PartyAddressSchema } from '@/schemas'
 import { toDisplayPhone } from '@/utils'
 import { AddEditHomeOwner } from '@/components/mhrRegistration/HomeOwners'
@@ -244,8 +275,7 @@ export default defineComponent({
     isMhrTransfer: { type: Boolean, default: false },
     hideRemovedOwners: { type: Boolean, default: false },
     showChips: { type: Boolean, default: false },
-    validateTransfer: { type: Boolean, default: false },
-    enableActions: { type: Boolean, default: true }
+    validateTransfer: { type: Boolean, default: false }
   },
   components: {
     BaseAddress,
@@ -275,6 +305,14 @@ export default defineComponent({
       getTransferOrRegistrationHomeOwners,
       getTransferOrRegistrationHomeOwnerGroups
     } = useHomeOwners(props.isMhrTransfer)
+
+    const {
+      enableHomeOwnerChanges,
+      enableTransferOwnerActions,
+      enableTransferOwnerGroupActions,
+      enableTransferOwnerMenuActions,
+      disableForDeceasedOwners
+    } = useTransferOwners(!props.isMhrTransfer)
 
     const { setUnsavedChanges } = useActions<any>(['setUnsavedChanges'])
 
@@ -408,7 +446,7 @@ export default defineComponent({
     }, { immediate: true, deep: true })
 
     watch(
-      () => props.enableActions,
+      () => enableTransferOwnerGroupActions(),
       (val: boolean) => {
         if (!val) {
           localState.currentlyEditingHomeOwnerId = -1
@@ -441,6 +479,11 @@ export default defineComponent({
       getGroupNumberById,
       getTransferOrRegistrationHomeOwners,
       getTransferOrRegistrationHomeOwnerGroups,
+      enableHomeOwnerChanges,
+      enableTransferOwnerActions,
+      enableTransferOwnerGroupActions,
+      enableTransferOwnerMenuActions,
+      disableForDeceasedOwners,
       ...toRefs(localState)
     }
   }

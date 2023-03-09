@@ -40,7 +40,7 @@
           </v-col>
 
           <!-- Business Name Lookup -->
-          <v-col v-if="isBusinessDebtor">{{loadingSearchResults}}
+          <v-col v-if="isBusinessDebtor">
             <v-text-field
               filled
               id="txt-name-debtor"
@@ -586,6 +586,7 @@ export default defineComponent({
     const setSearchValue = (searchValue: string) => {
       localState.autoCompleteIsActive = false
       localState.searchValue = searchValue
+      localState.showClear = true
       if (document.getElementById('search-bar-field')) {
         document.getElementById('search-bar-field').focus()
       }
@@ -670,6 +671,9 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+::v-deep .theme--light.v-icon.mdi-close {
+  color: $primary-blue !important;
+}
 
 .hint-no-wrap {
   white-space: nowrap;

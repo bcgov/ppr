@@ -5,7 +5,6 @@ import {
   SubmittingPartyIF,
   TransferTypeSelectIF
 } from '@/interfaces'
-import { ApiTransferTypes } from '@/enums'
 
 // Home Owners
 export const getMhrTransferHomeOwners = (state: StateIF): MhrRegistrationHomeOwnerIF[] => {
@@ -33,6 +32,10 @@ export const getMhrTransferCurrentHomeOwners = (state: StateIF): MhrRegistration
 
 export const getMhrTransferHomeOwnerGroups = (state: StateIF): MhrRegistrationHomeOwnerGroupIF[] => {
   return state.stateModel.mhrTransfer.ownerGroups
+}
+
+export const getMhrTransferCurrentHomeOwnerGroups = (state: StateIF): MhrRegistrationHomeOwnerGroupIF[] => {
+  return state.stateModel.mhrTransfer.currentOwnerGroups
 }
 
 // Ownership Transfers

@@ -219,7 +219,7 @@
                       <img class="icon-img pb-1" src="@/assets/svgs/homeownersicon_reviewscreen.svg" />
                       <span class="font-weight-bold pl-1">Home Owners</span>
                     </v-col>
-                    <v-col v-if="isMhrTransfer" cols="2" class="text-right">
+                    <v-col cols="2" class="text-right">
                       <v-btn
                         text id="home-owners-change-btn"
                         class="pl-1"
@@ -238,7 +238,7 @@
                   </v-row>
                 </header>
 
-                <!-- Transfer Type Component Slots Here -->
+                <!-- Transfer Type Component -->
                 <v-expand-transition>
                   <TransferType
                     v-if="showTransferType"
@@ -254,7 +254,6 @@
                   class="mt-n2"
                   :class="{ 'mb-10': !hasUnsavedChanges }"
                   :validateTransfer="validate"
-                  :enableActions="enableActions"
                   @isValidTransferOwners="isValidTransferOwners = $event"
                 />
 
@@ -299,11 +298,8 @@
 import { computed, defineComponent, nextTick, onMounted, reactive, ref, toRefs, watch } from '@vue/composition-api'
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
-/* eslint-disable no-unused-vars */
 import { StaffPayment } from '@bcrs-shared-components/staff-payment'
-import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 import { StaffPaymentOptions } from '@bcrs-shared-components/enums'
-/* eslint-disable no-unused-vars */
 import { CertifyInformation, StickyContainer } from '@/components/common'
 import { useHomeOwners, useInputRules, useMhrInformation } from '@/composables'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
@@ -316,26 +312,22 @@ import { HomeOwners } from '@/views'
 import { BaseDialog } from '@/components/dialogs'
 import { BaseAddress } from '@/composables/address'
 import { registrationSaveDraftError, unsavedChangesDialog, cancelOwnerChangeConfirm } from '@/resources/dialogOptions'
-import { cloneDeep } from 'lodash'
 import AccountInfo from '@/components/common/AccountInfo.vue'
 /* eslint-disable no-unused-vars */
 import {
   AccountInfoIF,
-  MhrHomeOwnerGroupIF,
-  MhrRegistrationDescriptionIF,
-  MhrRegistrationHomeLocationIF,
   MhrTransferApiIF,
   RegTableNewItemI,
   SubmittingPartyIF,
   TransferTypeSelectIF
 } from '@/interfaces'
 import {
+  StaffPaymentIF
+} from '@bcrs-shared-components/interfaces'
+import {
   ActionTypes,
   APIMHRMapSearchTypes,
   APISearchTypes,
-  ApiTransferTypes,
-  HomeCertificationOptions,
-  HomeLocationTypes,
   RouteNames,
   UIMHRSearchTypes,
   UITransferTypes
@@ -343,10 +335,8 @@ import {
 import {
   createMhrTransferDraft,
   deleteMhrDraft,
-  fetchMhRegistration,
   getAccountInfoFromAuth,
   getMHRegistrationSummary,
-  getMhrTransferDraft,
   mhrSearch,
   pacificDate,
   submitMhrTransfer,
@@ -378,10 +368,6 @@ export default defineComponent({
     appReady: {
       type: Boolean,
       default: false
-    },
-    isMhrTransfer: {
-      type: Boolean,
-      default: true
     }
   },
   // eslint-disable-next-line
@@ -413,8 +399,6 @@ export default defineComponent({
     ])
 
     const {
-      setMhrTransferHomeOwnerGroups,
-      setMhrTransferCurrentHomeOwnerGroups,
       setMhrTransferSubmittingParty,
       setMhrTransferAttentionReference,
       setUnsavedChanges,
@@ -422,14 +406,9 @@ export default defineComponent({
       setSearchedType,
       setManufacturedHomeSearchResults,
       setLienType,
-      setMhrLocation,
-      setIsManualLocation,
-      setMhrHomeDescription,
       setMhrTransferType,
       setMhrTransferDeclaredValue
     } = useActions<any>([
-      'setMhrTransferHomeOwnerGroups',
-      'setMhrTransferCurrentHomeOwnerGroups',
       'setMhrTransferSubmittingParty',
       'setMhrTransferAttentionReference',
       'setUnsavedChanges',
@@ -437,9 +416,6 @@ export default defineComponent({
       'setSearchedType',
       'setManufacturedHomeSearchResults',
       'setLienType',
-      'setMhrLocation',
-      'setIsManualLocation',
-      'setMhrHomeDescription',
       'setMhrTransferType',
       'setMhrTransferDeclaredValue'
     ])
@@ -452,14 +428,13 @@ export default defineComponent({
       initMhrTransfer,
       buildApiData,
       getUiTransferType,
-      parseDraftTransferDetails
+      parseMhrInformation
     } = useMhrInformation()
 
     const {
       isGlobalEditingMode,
-      setGlobalEditingMode,
-      setShowGroups
-    } = useHomeOwners(props.isMhrTransfer)
+      setGlobalEditingMode
+    } = useHomeOwners(true)
 
     const { maxLength } = useInputRules()
 
@@ -498,15 +473,15 @@ export default defineComponent({
       showCancelDialog: false,
       showSaveDialog: false,
       showCancelChangeDialog: false,
+      hasTransferChanges: computed((): boolean => {
+        return localState.showTransferType &&
+          (hasUnsavedChanges.value || !!getMhrTransferDeclaredValue.value || !!getMhrTransferType.value)
+      }),
       validateSubmittingParty: computed((): boolean => {
         return localState.validate && !localState.isSubmittingPartyValid
       }),
       uiTransferType: computed((): UITransferTypes => {
         return getUiTransferType(getMhrTransferType.value?.transferType)
-      }),
-      enableActions: computed((): boolean => {
-        // To add validations here, type dependent
-        return getMhrTransferType.value?.transferType === ApiTransferTypes.SALE_OR_GIFT
       }),
       isAuthenticated: computed((): boolean => {
         return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
@@ -667,70 +642,6 @@ export default defineComponent({
       setStaffPayment(staffPaymentData)
     }
 
-    const parseMhrInformation = async (): Promise<void> => {
-      const { data } = await fetchMhRegistration(getMhrInformation.value.mhrNumber)
-
-      const homeDetails = data?.description || {} // Safety check. Should always have description
-      await parseMhrHomeDetails(homeDetails)
-
-      // Store existing MHR Home Location info
-      const currentLocationInfo = data?.location || {} // Safety check. Should always have location
-      await parseMhrLocationInfo(currentLocationInfo)
-
-      const currentOwnerGroups = data?.ownerGroups || [] // Safety check. Should always have ownerGroups
-      await parseMhrHomeOwners(cloneDeep(currentOwnerGroups))
-    }
-
-    const parseMhrHomeDetails = async (homeDetails: MhrRegistrationDescriptionIF): Promise<void> => {
-      for (const [key, value] of Object.entries(homeDetails)) {
-        setMhrHomeDescription({ key: key, value: value })
-      }
-
-      setMhrHomeDescription({
-        key: 'certificationOption',
-        value: homeDetails.csaNumber ? HomeCertificationOptions.CSA : HomeCertificationOptions.ENGINEER_INSPECTION
-      })
-    }
-
-    const parseMhrHomeOwners = async (ownerGroups: Array<MhrHomeOwnerGroupIF>): Promise<void> => {
-      const currentOwnerGroups = ownerGroups || [] // Safety check. Should always have ownerGroups
-
-      // Store a snapshot of the existing OwnerGroups for baseline of current state
-      await setMhrTransferCurrentHomeOwnerGroups(cloneDeep(ownerGroups))
-
-      currentOwnerGroups.forEach((ownerGroup, index) => { ownerGroup.groupId = index + 1 })
-      setShowGroups(currentOwnerGroups.length > 1)
-
-      // Set owners to store
-      if (getMhrInformation.value.draftNumber) {
-        // Retrieve owners from draft if it exists
-        const { registration } = await getMhrTransferDraft(getMhrInformation.value.draftNumber)
-
-        // Set draft Transfer details to store
-        parseDraftTransferDetails(registration as MhrTransferApiIF)
-
-        setShowGroups(registration.addOwnerGroups.length > 1 || registration.deleteOwnerGroups.length > 1)
-        setMhrTransferHomeOwnerGroups([...registration.addOwnerGroups])
-      } else {
-        // Set current owners if there is no draft
-        setMhrTransferHomeOwnerGroups(cloneDeep(currentOwnerGroups))
-      }
-    }
-
-    const parseMhrLocationInfo = async (locationData: MhrRegistrationHomeLocationIF): Promise<void> => {
-      for (const [key, value] of Object.entries(locationData)) {
-        setMhrLocation({ key: key, value: value })
-      }
-
-      // Map and Apply an OTHER type when applicable
-      if ([HomeLocationTypes.OTHER_RESERVE, HomeLocationTypes.OTHER_STRATA, HomeLocationTypes.OTHER_TYPE]
-        .includes(locationData.locationType)) {
-        setIsManualLocation(!locationData.pidNumber)
-        setMhrLocation({ key: 'locationType', value: HomeLocationTypes.OTHER_LAND })
-        setMhrLocation({ key: 'otherType', value: locationData.locationType })
-      }
-    }
-
     const parseSubmittingPartyInfoForQualifiedSupplier = (): void => {
       const submittingParty = {
         businessName: localState.accountInfo.name,
@@ -748,7 +659,10 @@ export default defineComponent({
         scrollToTop
           ? document.getElementById('mhr-information-header').scrollIntoView({ behavior: 'smooth' })
           : document.getElementsByClassName('border-error-left').length > 0 &&
-            localState.invalidSection.scrollIntoView({ behavior: 'smooth' })
+            localState.isReviewMode
+            ? localState.invalidSection.scrollIntoView({ behavior: 'smooth' })
+            : document.getElementsByClassName('border-error-left')[0]
+              .scrollIntoView({ behavior: 'smooth' })
       }, 10)
     }
 
@@ -923,9 +837,7 @@ export default defineComponent({
 
     const toggleTypeSelector = (): void => {
       // Confirm cancel change when changes have been made to transfer type or homeowners
-      if (localState.showTransferType &&
-        (hasUnsavedChanges.value || !!getMhrTransferDeclaredValue.value || !!getMhrTransferType.value)
-      ) {
+      if (localState.hasTransferChanges) {
         localState.showCancelChangeDialog = true
         return
       }
@@ -936,9 +848,9 @@ export default defineComponent({
 
     const handleTransferTypeChange = async (transferTypeSelect: TransferTypeSelectIF): Promise<void> => {
       // Reset state until support is built for other Transfer Types
-      if (transferTypeSelect?.transferType && transferTypeSelect.transferType !== ApiTransferTypes.SALE_OR_GIFT) {
-        await resetMhrInformation()
-      }
+      if (localState.hasTransferChanges && transferTypeSelect?.transferType &&
+        (transferTypeSelect?.transferType !== getMhrTransferType.value?.transferType)
+      ) await resetMhrInformation()
 
       localState.showTransferChangeDialog = true
       await setMhrTransferType(transferTypeSelect)

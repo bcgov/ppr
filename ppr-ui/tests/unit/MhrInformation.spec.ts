@@ -148,7 +148,6 @@ describe('Mhr Information', () => {
     wrapper.vm.$data.dataLoaded = true
     await Vue.nextTick()
 
-    expect(wrapper.props().isMhrTransfer).toBe(true)
     expect(wrapper.vm.$data.getMhrTransferCurrentHomeOwners.length).toBe(1)
     expect(wrapper.vm.$data.getMhrTransferHomeOwners.length).toBe(1)
 
@@ -172,7 +171,6 @@ describe('Mhr Information', () => {
     expect(wrapper.findComponent(StickyContainer).exists()).toBe(false)
     expect(wrapper.findComponent(TransferType).exists()).toBe(false)
     expect(wrapper.findComponent(TransferDetails).exists()).toBe(false)
-    expect(wrapper.props().isMhrTransfer).toBe(true)
 
     await wrapper.find('#home-owners-change-btn').trigger('click')
     await Vue.nextTick()
@@ -320,7 +318,6 @@ describe('Mhr Information', () => {
     wrapper.vm.$data.dataLoaded = true
     await Vue.nextTick()
 
-    expect(wrapper.props().isMhrTransfer).toBe(true)
     expect(wrapper.vm.$data.getMhrTransferCurrentHomeOwners.length).toBe(1)
     expect(wrapper.vm.$data.getMhrTransferHomeOwners.length).toBe(1)
 
@@ -417,7 +414,6 @@ describe('Mhr Information', () => {
     wrapper.vm.$data.showMhrFeeSummary = true
     await Vue.nextTick()
 
-    expect(wrapper.props().isMhrTransfer).toBe(true)
     expect(wrapper.vm.$data.getMhrTransferCurrentHomeOwners.length).toBe(1)
     expect(wrapper.vm.$data.getMhrTransferHomeOwners.length).toBe(1)
     expect(wrapper.findComponent(MhrInformation).exists()).toBe(true)
