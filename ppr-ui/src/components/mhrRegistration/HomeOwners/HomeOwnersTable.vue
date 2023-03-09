@@ -255,7 +255,7 @@
           <td :colspan="homeOwnersTableHeaders.length" class="py-0">
             <v-expand-transition>
               <DeathCertificate
-              :homeOwner="row.item"
+              :deceasedOwner="row.item"
               />
             </v-expand-transition>
           </td>

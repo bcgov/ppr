@@ -28,26 +28,26 @@
           <v-col cols="3">
             <label
               class="generic-label"
-              for="death-certificate-date"
-              :class="{ 'error-text': validateDeathCertificate && !deathCertificateDate }"
+              for="date-of-death"
+              :class="{ 'error-text': validateDeathCertificate && !dateOfDeath }"
             >
               Date of Death
             </label>
           </v-col>
           <v-col cols="9">
             <date-picker
-              id="death-certificate-date"
+              id="date-of-death"
               clearable
-              ref="deathCertificateDateRef"
+              ref="dateOfDeathRef"
               title="Date of Death"
-              :errorMsg="validateDeathCertificate && !deathCertificateDate ? 'Enter date of death' : ''"
-              :initialValue="deathCertificateDate"
+              :errorMsg="validateDeathCertificate && !dateOfDeath ? 'Enter date of death' : ''"
+              :initialValue="dateOfDeath"
               :key="Math.random()"
               :maxDate="localTodayDate(maxDeathDate)"
-              @emitDate="deathCertificateDate = $event"
-              @emitCancel="deathCertificateDate = null"
-              @emitClear="deathCertificateDate = null"
-              data-test-id="death-certificate-date"
+              @emitDate="dateOfDeath = $event"
+              @emitCancel="dateOfDeath = null"
+              @emitClear="dateOfDeath = null"
+              data-test-id="date-of-death"
             />
           </v-col>
         </v-row>
@@ -81,7 +81,7 @@ import { localTodayDate } from '@/utils'
 export default defineComponent({
   name: 'DeathCertificate',
   props: {
-    homeOwner: {
+    deceasedOwner: {
       type: Object as () => MhrRegistrationHomeOwnerIF,
       default: null
     }
@@ -105,11 +105,11 @@ export default defineComponent({
     const localState = reactive({
       validateDeathCertificate: false, // NEW VALIDATOR REQUIRED
       isFormValid: false, // Death Certificate form without Death Date Picker
-      isDeathCertificateFormValid: computed((): boolean => localState.isFormValid && !!localState.deathCertificateDate),
+      isDeathCertificateFormValid: computed((): boolean => localState.isFormValid && !!localState.dateOfDeath),
       deathCertificate: null,
-      deathCertificateDate: null,
+      dateOfDeath: null,
       hasCertificate: false, // Will be used for validation on UI side only (original certificate checkbox)
-      deceasedOwner: props.homeOwner,
+      deceasedOwner: props.deceasedOwner,
       showFormError: computed(() => localState.validateDeathCertificate && !localState.isDeathCertificateFormValid),
       maxDeathDate: computed((): Date => {
         var dateOffset = 24 * 60 * 60 * 1000 // 1 day in milliseconds
@@ -138,7 +138,7 @@ export default defineComponent({
 
     // Update deceased owner deathDateTime when value changes
     watch(
-      () => localState.deathCertificateDate,
+      () => localState.dateOfDeath,
       (val: string) => {
         localState.deceasedOwner.deathDateTime = val
         setUnsavedChanges(true)
