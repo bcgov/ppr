@@ -76,7 +76,7 @@
           class="owner-info"
           :data-test-id="`owner-info-${row.item.ownerId}`"
         >
-          <td class="owner-name">
+          <td class="owner-name" :class="{'no-bottom-border' : isRemovedHomeOwner(row.item) && isTrand}">
             <div :class="{'removed-owner': isRemovedHomeOwner(row.item)}">
               <div v-if="row.item.individualName" class="owner-icon-name">
                 <v-icon class="mr-2">mdi-account</v-icon>
@@ -110,7 +110,7 @@
                 <b>ADDED</b>
               </v-chip>
               <v-chip
-                v-if="isMhrTransfer && isRemovedHomeOwner(row.item)"
+                v-if="isMhrTransfer && !isTrand && isRemovedHomeOwner(row.item)"
                 class="badge-delete ml-8 mt-2"
                 label x-small
                 color="#grey lighten-2"
@@ -119,23 +119,33 @@
               >
                 <b>DELETED</b>
               </v-chip>
+              <v-chip
+                v-if="isMhrTransfer && isTrand && isRemovedHomeOwner(row.item)"
+                class="badge-delete ml-8 mt-2"
+                label x-small
+                color="#grey lighten-2"
+                text-color="$gray9"
+                data-test-id="owner-deceased-badge"
+              >
+                <b>DECEASED</b>
+              </v-chip>
             </template>
           </td>
-          <td>
+          <td :class="{'no-bottom-border' : isRemovedHomeOwner(row.item) && isTrand}">
             <base-address
               :schema="addressSchema"
               :value="row.item.address"
               :class="{'removed-owner': isRemovedHomeOwner(row.item)}"
             />
           </td>
-          <td>
+          <td :class="{'no-bottom-border' : isRemovedHomeOwner(row.item) && isTrand}">
             <div :class="{'removed-owner': isRemovedHomeOwner(row.item)}">
               {{ toDisplayPhone(row.item.phoneNumber) }}
               <span v-if="row.item.phoneExtension"> Ext {{ row.item.phoneExtension }} </span>
             </div>
           </td>
-          <td v-if="showEditActions" class="row-actions text-right">
-
+          <td v-if="showEditActions" class="row-actions text-right"
+          :class="{'no-bottom-border' : isRemovedHomeOwner(row.item) && isTrand}">
             <!-- New Owner Actions -->
             <div
               v-if="(!isMhrTransfer || isAddedHomeOwner(row.item)) && enableHomeOwnerChanges()"
@@ -241,6 +251,15 @@
             </div>
           </td>
         </tr>
+        <tr v-if="isRemovedHomeOwner(row.item) && isTrand" class="death-certificate">
+          <td :colspan="homeOwnersTableHeaders.length">
+            <v-expand-transition>
+              <DeathCertificate
+              :homeOwner="row.item"
+              />
+            </v-expand-transition>
+          </td>
+        </tr>
       </template>
 
       <template v-slot:no-data>
@@ -258,10 +277,11 @@ import { BaseAddress } from '@/composables/address'
 import { PartyAddressSchema } from '@/schemas'
 import { toDisplayPhone } from '@/utils'
 import { AddEditHomeOwner } from '@/components/mhrRegistration/HomeOwners'
+import { DeathCertificate } from '@/components/mhrTransfers'
 import TableGroupHeader from '@/components/mhrRegistration/HomeOwners/TableGroupHeader.vue'
 /* eslint-disable no-unused-vars */
 import { MhrRegistrationHomeOwnerIF } from '@/interfaces'
-import { ActionTypes, HomeTenancyTypes } from '@/enums'
+import { ActionTypes, ApiTransferTypes, HomeTenancyTypes } from '@/enums'
 /* eslint-enable no-unused-vars */
 import { useActions, useGetters } from 'vuex-composition-helpers'
 
@@ -280,7 +300,8 @@ export default defineComponent({
   components: {
     BaseAddress,
     AddEditHomeOwner,
-    TableGroupHeader
+    TableGroupHeader,
+    DeathCertificate
   },
   setup (props, context) {
     const addressSchema = PartyAddressSchema
@@ -316,8 +337,8 @@ export default defineComponent({
 
     const { setUnsavedChanges } = useActions<any>(['setUnsavedChanges'])
 
-    const { getMhrRegistrationValidationModel, hasUnsavedChanges } =
-      useGetters<any>(['getMhrRegistrationValidationModel', 'hasUnsavedChanges'])
+    const { getMhrRegistrationValidationModel, hasUnsavedChanges, getMhrTransferType } =
+      useGetters<any>(['getMhrRegistrationValidationModel', 'hasUnsavedChanges', 'getMhrTransferType'])
 
     const { getValidation, MhrSectVal, MhrCompVal } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
@@ -341,6 +362,8 @@ export default defineComponent({
         getValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_STEPS)),
       showEditActions: computed((): boolean => !props.isReadonlyTable),
       homeOwnersTableHeaders: props.isReadonlyTable ? homeOwnersTableHeadersReview : homeOwnersTableHeaders,
+      transferType: computed(() => { return getMhrTransferType.value?.transferType }),
+      isTrand: computed(() => { return localState.transferType === ApiTransferTypes.SURVIVING_JOINT_TENANT }),
       addedOwnerCount: computed((): number => {
         return getTransferOrRegistrationHomeOwners().filter(owner => owner.action === ActionTypes.ADDED).length
       }),
@@ -497,6 +520,14 @@ export default defineComponent({
   .spacer-header {
     border-color: $gray1 !important;
     background-color: $gray1 !important;
+  }
+
+  .no-bottom-border {
+    border-bottom: none !important;
+  }
+
+  .death-certificate {
+    border-bottom: thin solid rgba(0, 0, 0, 0.12) !important;
   }
 
   tr.v-row-group__header,
