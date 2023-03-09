@@ -3,24 +3,24 @@
     <v-card flat class="pl-8 rounded" :class="{ 'border-error-left': showFormError }">
       <v-form ref="deathCertificateForm" v-model="isFormValid">
         <v-row>
-          <v-col cols="3">
+          <v-col cols="3" class="pr-6">
             <label
               class="generic-label"
               for="deathCertificate"
-              :class="{ 'error-text': validateTransferDetails && hasError(deathCertificateRef) }"
+              :class="{ 'error-text': validateDeathCertificate && hasError(deathCertificateRef) }"
             >
               Death Certificate Number
             </label>
           </v-col>
           <v-col cols="9">
             <v-text-field
-              id="deathCertificate"
+              id="death-certificate-number"
               v-model="deathCertificate"
               ref="deathCertificateRef"
               filled
               :rules="deathCertificateRules"
               label="Death Certificate Number"
-              data-test-id="deathCertificate"
+              data-test-id="death-certificate-number"
             />
           </v-col>
         </v-row>
@@ -28,10 +28,10 @@
           <v-col cols="3">
             <label
               class="generic-label"
-              for="transfer-date"
-              :class="{ 'error-text': validateTransferDetails && !deathCertificateDate }"
+              for="death-certificate-date"
+              :class="{ 'error-text': validateDeathCertificate && !deathCertificateDate }"
             >
-              Date of Death Certificate
+              Date of Death
             </label>
           </v-col>
           <v-col cols="9">
@@ -39,8 +39,8 @@
               id="death-certificate-date"
               clearable
               ref="deathCertificateDateRef"
-              title="Date of Death Certificate"
-              :errorMsg="validateTransferDetails && !deathCertificateDate ? 'Enter date of death certificate' : ''"
+              title="Date of Death"
+              :errorMsg="validateDeathCertificate && !deathCertificateDate ? 'Enter date of death' : ''"
               :initialValue="deathCertificateDate"
               :key="Math.random()"
               :maxDate="localTodayDate(maxDeathDate)"
@@ -55,7 +55,7 @@
           <v-spacer></v-spacer>
           <v-col cols="9">
             <v-checkbox
-              id="has-certificate"
+              id="has-certificate-checkbox"
               label="I have an original or certified copy of the death certificate, and confirm
               that it was issued from Canada or the United States, and the name on
               the death certificate matches the name displayed above exactly."
@@ -77,11 +77,9 @@ import { computed, defineComponent, reactive, ref, toRefs, watch } from '@vue/co
 import { useActions } from 'vuex-composition-helpers'
 import { FormIF, MhrRegistrationHomeOwnerIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { localTodayDate } from '@/utils'
-// import { useHomeOwners } from '@/composables/mhrRegistration'
 
 export default defineComponent({
   name: 'DeathCertificate',
-  emits: ['isValid'],
   props: {
     homeOwner: {
       type: Object as () => MhrRegistrationHomeOwnerIF,
@@ -112,7 +110,7 @@ export default defineComponent({
       deathCertificateDate: null,
       hasCertificate: false, // Will be used for validation on UI side only (original certificate checkbox)
       deceasedOwner: props.homeOwner,
-      showFormError: computed(() => localState.validateTransferDetails && !localState.isDeathCertificateFormValid),
+      showFormError: computed(() => localState.validateDeathCertificate && !localState.isDeathCertificateFormValid),
       maxDeathDate: computed((): Date => {
         var dateOffset = 24 * 60 * 60 * 1000 // 1 day in milliseconds
         var maxDate = new Date()
@@ -147,13 +145,6 @@ export default defineComponent({
       }
     )
 
-    watch(
-      () => localState.isDeathCertificateFormValid,
-      (val: boolean) => {
-        context.emit('isValid', val)
-      }
-    )
-
     return {
       hasError,
       deathCertificateRef,
@@ -171,14 +162,10 @@ export default defineComponent({
   height: 90px;
 }
 .mhr-death-certificate::v-deep {
-  margin: 43px 0;
+  margin-bottom: 43px;
 
   .generic-label {
     line-height: 24px;
-  }
-
-  hr {
-    border-top: 1px solid $gray3;
   }
 
   .has-certificate-checkbox {

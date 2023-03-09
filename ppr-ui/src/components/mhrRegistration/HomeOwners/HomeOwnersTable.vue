@@ -76,7 +76,7 @@
           class="owner-info"
           :data-test-id="`owner-info-${row.item.ownerId}`"
         >
-          <td class="owner-name" :class="{'no-bottom-border' : isRemovedHomeOwner(row.item) && isTrand}">
+          <td class="owner-name" :class="{'no-bottom-border' : isRemovedHomeOwner(row.item) && showDeathCertificate}">
             <div :class="{'removed-owner': isRemovedHomeOwner(row.item)}">
               <div v-if="row.item.individualName" class="owner-icon-name">
                 <v-icon class="mr-2">mdi-account</v-icon>
@@ -110,7 +110,7 @@
                 <b>ADDED</b>
               </v-chip>
               <v-chip
-                v-if="isMhrTransfer && !isTrand && isRemovedHomeOwner(row.item)"
+                v-if="isMhrTransfer && !showDeathCertificate && isRemovedHomeOwner(row.item)"
                 class="badge-delete ml-8 mt-2"
                 label x-small
                 color="#grey lighten-2"
@@ -120,7 +120,7 @@
                 <b>DELETED</b>
               </v-chip>
               <v-chip
-                v-if="isMhrTransfer && isTrand && isRemovedHomeOwner(row.item)"
+                v-if="isMhrTransfer && showDeathCertificate && isRemovedHomeOwner(row.item)"
                 class="badge-delete ml-8 mt-2"
                 label x-small
                 color="#grey lighten-2"
@@ -131,21 +131,21 @@
               </v-chip>
             </template>
           </td>
-          <td :class="{'no-bottom-border' : isRemovedHomeOwner(row.item) && isTrand}">
+          <td :class="{'no-bottom-border' : isRemovedHomeOwner(row.item) && showDeathCertificate}">
             <base-address
               :schema="addressSchema"
               :value="row.item.address"
               :class="{'removed-owner': isRemovedHomeOwner(row.item)}"
             />
           </td>
-          <td :class="{'no-bottom-border' : isRemovedHomeOwner(row.item) && isTrand}">
+          <td :class="{'no-bottom-border' : isRemovedHomeOwner(row.item) && showDeathCertificate}">
             <div :class="{'removed-owner': isRemovedHomeOwner(row.item)}">
               {{ toDisplayPhone(row.item.phoneNumber) }}
               <span v-if="row.item.phoneExtension"> Ext {{ row.item.phoneExtension }} </span>
             </div>
           </td>
           <td v-if="showEditActions" class="row-actions text-right"
-          :class="{'no-bottom-border' : isRemovedHomeOwner(row.item) && isTrand}">
+          :class="{'no-bottom-border' : isRemovedHomeOwner(row.item) && showDeathCertificate}">
             <!-- New Owner Actions -->
             <div
               v-if="(!isMhrTransfer || isAddedHomeOwner(row.item)) && enableHomeOwnerChanges()"
@@ -251,8 +251,8 @@
             </div>
           </td>
         </tr>
-        <tr v-if="isRemovedHomeOwner(row.item) && isTrand" class="death-certificate">
-          <td :colspan="homeOwnersTableHeaders.length">
+        <tr v-if="isRemovedHomeOwner(row.item) && showDeathCertificate" class="death-certificate">
+          <td :colspan="homeOwnersTableHeaders.length" class="py-0">
             <v-expand-transition>
               <DeathCertificate
               :homeOwner="row.item"
@@ -363,7 +363,11 @@ export default defineComponent({
       showEditActions: computed((): boolean => !props.isReadonlyTable),
       homeOwnersTableHeaders: props.isReadonlyTable ? homeOwnersTableHeadersReview : homeOwnersTableHeaders,
       transferType: computed(() => { return getMhrTransferType.value?.transferType }),
-      isTrand: computed(() => { return localState.transferType === ApiTransferTypes.SURVIVING_JOINT_TENANT }),
+      showDeathCertificate: computed(() => {
+        // Add other conditions for other transfer Types
+        return localState.transferType === ApiTransferTypes.SURVIVING_JOINT_TENANT ||
+               localState.transferType === ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL
+      }),
       addedOwnerCount: computed((): number => {
         return getTransferOrRegistrationHomeOwners().filter(owner => owner.action === ActionTypes.ADDED).length
       }),
@@ -460,7 +464,6 @@ export default defineComponent({
     // When a change is made to homeOwners, check if any actions have changed, if so set flag
     watch(() => props.homeOwners, (val) => {
       setUnsavedChanges(val.some(owner => !!owner.action || !owner.ownerId))
-
       context.emit('isValidTransferOwners',
         hasMinimumGroups() &&
         localState.isValidAllocation &&
