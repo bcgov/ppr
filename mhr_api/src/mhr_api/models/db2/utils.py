@@ -47,6 +47,25 @@ TO_LEGACY_DOC_TYPE = {
     'REG_103E': '103E'
 }
 
+UPDATE_PID_STATUS_SUCCESS = 'A'
+UPDATE_PID_STATUS_ERROR = 'E'
+UPDATE_LTSA_PID = """
+UPDATE location
+   SET bcaajuri = :status_value
+ WHERE pidnumb IN (?)
+"""
+QUERY_LTSA_PID = """
+SELECT DISTINCT l.pidnumb
+  FROM location l, manuhome m
+ WHERE m.mhstatus in ('R', 'E')
+   AND m.manhomid = l.manhomid
+   AND l.status = 'A'
+   AND TRIM(l.pidnumb) != ''
+   AND LENGTH(TRIM(l.pidnumb)) = 9
+   AND TRIM(bcaajuri) = ''
+   AND mhregnum not like '150%'
+FETCH FIRST 500 ROWS ONLY
+"""
 QUERY_ACCOUNT_MHR_LEGACY = """
 SELECT DISTINCT mer.mhr_number, 'N' AS account_reg,
                 (SELECT mlc.registration_type
@@ -734,3 +753,44 @@ def __get_lien_registration_type(mhr_number: str, mhr_list) -> str:
         if mhr_number == reg.get('mhr_number'):
             return reg.get('lien_registration_type')
     return ''
+
+
+def get_pid_list() -> dict:
+    """Build a list of pid numbers for active registrations with no existing legal description."""
+    pid_list = []
+    try:
+        query = text(QUERY_LTSA_PID)
+        result = db.get_engine(current_app, 'db2').execute(query)
+        rows = result.fetchall()
+    except Exception as db_exception:   # noqa: B902; return nicer error
+        current_app.logger.error('get_pid_list db exception: ' + str(db_exception))
+        raise DatabaseException(db_exception)
+    if rows is not None:
+        for row in rows:
+            pid = {
+                'pidNumber': str(row[0])
+            }
+            pid_list.append(pid)
+    return pid_list
+
+
+def update_pid_list(pid_list, status: str):
+    """Mark a pid numbers to be excluded in future queries by assigning a status."""
+    if not pid_list or not status:
+        return
+    try:
+        pid_numbers: str = ''
+        count = 0
+        for pid in pid_list:
+            pid_number = pid['pidNumber']
+            count += 1
+            if count > 1:
+                pid_numbers += ','
+            pid_numbers += f"'{pid_number}'"
+        query_text: str = UPDATE_LTSA_PID.replace('?', pid_numbers)
+        # current_app.logger.info('update query=' + query_text)
+        query = text(query_text)
+        db.get_engine(current_app, 'db2').execute(query, {'status_value': status})
+    except Exception as db_exception:   # noqa: B902; return nicer error
+        current_app.logger.error('update_pid_list db exception: ' + str(db_exception))
+        raise DatabaseException(db_exception)

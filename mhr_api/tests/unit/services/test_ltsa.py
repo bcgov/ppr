@@ -19,6 +19,7 @@ Test-Suite to ensure that the client for the auth-api service is working as expe
 import pytest
 from flask import current_app
 
+from mhr_api.models import LtsaDescription
 from mhr_api.services import ltsa
 
 
@@ -29,6 +30,12 @@ TEST_LOOKUP_DATA = [
     ('Invalid pid missing', None, False),
     ('Invalid pid',  '888-684-597', False)
 ]
+# testdata pattern is ({pid}, {update})
+TEST_SAVE_DATA = [
+    ('023270098', False),
+    ('008000000', True)
+]
+
 
 @pytest.mark.parametrize('desc,pid,valid', TEST_LOOKUP_DATA)
 def test_pid_lookup(session, jwt, desc, pid, valid):
@@ -41,3 +48,16 @@ def test_pid_lookup(session, jwt, desc, pid, valid):
         assert result
     else:
         assert not result or result.get('errorMessage')
+
+
+@pytest.mark.parametrize('pid,update', TEST_SAVE_DATA)
+def test_save_ltsa_description(session, jwt, pid, update):
+    """Assert that saving or updating a ltsa legal description by pid lookup works as expected."""
+    # setup
+    result: LtsaDescription = ltsa.save_description(pid, update)
+    # check
+    assert result
+    assert result.id
+    assert result.pid_number == pid
+    assert result.ltsa_description
+    assert result.update_ts

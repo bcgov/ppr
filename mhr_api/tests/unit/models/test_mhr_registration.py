@@ -341,9 +341,6 @@ TEST_SUMMARY_DOC_REG_DATA = [
     ('ppr_staff', '196123', '087219', 5, REG_DESCRIPTION, False),
     ('ppr_staff', '221961', '087219', 5, REG_DESCRIPTION, False)
 ]
-TEST_SUMMARY_DOC_REG_DATA2 = [
-    ('PS12345', '077741', '077741', 3, CONV_DESCRIPTION, False)
-]
 # testdata pattern is ({account_id}, {has_results})
 TEST_ACCOUNT_REG_DATA = [
     ('PS12345', True),
@@ -425,6 +422,11 @@ TEST_DATA_GROUP_TYPE = [
     (MhrTenancyTypes.NA, 8, '004764', MhrPartyTypes.EXECUTOR, '2523'),
     (MhrTenancyTypes.NA, 6, '051414', MhrPartyTypes.ADMINISTRATOR, '2523'),
     (MhrTenancyTypes.NA, 4, '098504', MhrPartyTypes.TRUSTEE, '2523')
+]
+# testdata pattern is ({mhr_num}, {account_id}, {has_pid})
+TEST_DATA_LTSA_PID = [
+    ('001020', '2523', False),
+    ('001019', '2523', True)
 ]
 
 
@@ -563,6 +565,20 @@ def test_find_by_mhr_number(session, mhr_number, has_results, account_id):
             MhrRegistration.find_by_mhr_number(mhr_number, 'PS12345')
         # check
         assert not_found_err
+
+
+@pytest.mark.parametrize('mhr_number, account_id, has_pid', TEST_DATA_LTSA_PID)
+def test_find_by_mhr_number_pid(session, mhr_number, account_id, has_pid):
+    """Assert that finding an MHR registration with a PID by a legacy MHR number works as expected."""
+    registration: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_number, account_id)
+    assert registration
+    assert registration.mhr_number == mhr_number
+    reg_json = registration.registration_json
+    assert reg_json.get('location')
+    if has_pid:
+        assert reg_json['location'].get('ltsaDescription')
+    else:
+        assert not reg_json['location'].get('ltsaDescription')
 
 
 @pytest.mark.parametrize('mhr_number, has_results, account_id', TEST_MHR_NUM_DATA)

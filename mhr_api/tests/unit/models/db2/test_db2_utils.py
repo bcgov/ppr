@@ -241,3 +241,18 @@ def test_find_account_filter(session, account_id, collapse, filter_name, filter_
         assert registration['path'] is not None
         assert registration['documentId'] is not None
         assert not registration.get('inUserList')
+
+
+def test_get_pid_list(session):
+    """Assert that the get pid list query for synchronizing LTSA descriptions is as expected."""
+    pid_list = db2_utils.get_pid_list()
+    assert pid_list
+    for pid in pid_list:
+        assert pid.get('pidNumber');
+
+
+def test_update_pid_list(session):
+    """Assert that pid list status update for synchronizing LTSA descriptions is as expected."""
+    pid_list = [{'pidNumber': '  1789805'}]
+    db2_utils.update_pid_list(pid_list, db2_utils.UPDATE_PID_STATUS_SUCCESS)
+    db2_utils.update_pid_list(pid_list, ' ')
