@@ -1,14 +1,23 @@
-import { MhrTransferApiIF, MhrTransferIF } from '@/interfaces'
+import {
+  MhrHomeOwnerGroupIF,
+  MhrRegistrationDescriptionIF,
+  MhrRegistrationHomeLocationIF,
+  MhrTransferApiIF,
+  MhrTransferIF
+} from '@/interfaces'
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import { readonly, ref } from '@vue/composition-api'
 import {
   ActionTypes,
   ApiHomeTenancyTypes,
-  ApiTransferTypes,
+  ApiTransferTypes, HomeCertificationOptions, HomeLocationTypes,
   HomeTenancyTypes,
   UIRegistrationTypes,
   UITransferTypes
 } from '@/enums'
+import { fetchMhRegistration, getMhrTransferDraft } from '@/utils'
+import { cloneDeep } from 'lodash'
+import { useHomeOwners } from '@/composables'
 
 // Validation flags for Review Confirm screen
 const refNumValid = ref(true)
@@ -40,26 +49,31 @@ export const useMhrInformation = () => {
   ])
 
   const {
+    setMhrTransferHomeOwnerGroups,
+    setMhrTransferCurrentHomeOwnerGroups,
+    setMhrLocation,
+    setIsManualLocation,
+    setMhrHomeDescription,
     setMhrTransferDeclaredValue,
-    setMhrTransferConsideration,
     setMhrTransferDate,
-    setMhrTransferOwnLand
-  } = useActions([
-    'setMhrTransferDeclaredValue',
-    'setMhrTransferConsideration',
+    setMhrTransferOwnLand,
+    setMhrTransferConsideration
+  } = useActions<any>([
+    'setMhrTransferHomeOwnerGroups',
+    'setMhrTransferCurrentHomeOwnerGroups',
+    'setMhrLocation',
+    'setIsManualLocation',
+    'setMhrHomeDescription',
     'setMhrTransferDate',
-    'setMhrTransferOwnLand'
+    'setMhrTransferOwnLand',
+    'setMhrTransferConsideration'
   ])
 
-  const setRefNumValid = (isValid: boolean) => {
-    refNumValid.value = isValid
-  }
+  const {
+    setShowGroups
+  } = useHomeOwners(true)
 
-  const getUiTransferType = (apiTransferType: ApiTransferTypes): UITransferTypes => {
-    return UITransferTypes[
-      Object.keys(ApiTransferTypes).find(key => ApiTransferTypes[key] as string === apiTransferType)
-    ]
-  }
+  /** New Filings / Initializing **/
 
   const initMhrTransfer = (): MhrTransferIF => {
     return {
@@ -78,12 +92,90 @@ export const useMhrInformation = () => {
     }
   }
 
+  const parseMhrInformation = async (): Promise<void> => {
+    const { data } = await fetchMhRegistration(getMhrInformation.value.mhrNumber)
+
+    const homeDetails = data?.description || {} // Safety check. Should always have description
+    await parseMhrHomeDetails(homeDetails)
+
+    // Store existing MHR Home Location info
+    const currentLocationInfo = data?.location || {} // Safety check. Should always have location
+    await parseMhrLocationInfo(currentLocationInfo)
+
+    const currentOwnerGroups = data?.ownerGroups || [] // Safety check. Should always have ownerGroups
+    await parseMhrHomeOwners(cloneDeep(currentOwnerGroups))
+  }
+
+  const parseMhrHomeDetails = async (homeDetails: MhrRegistrationDescriptionIF): Promise<void> => {
+    for (const [key, value] of Object.entries(homeDetails)) {
+      setMhrHomeDescription({ key: key, value: value })
+    }
+
+    setMhrHomeDescription({
+      key: 'certificationOption',
+      value: homeDetails.csaNumber ? HomeCertificationOptions.CSA : HomeCertificationOptions.ENGINEER_INSPECTION
+    })
+  }
+
+  const parseMhrHomeOwners = async (ownerGroups: Array<MhrHomeOwnerGroupIF>): Promise<void> => {
+    const currentOwnerGroups = ownerGroups || [] // Safety check. Should always have ownerGroups
+
+    // Store a snapshot of the existing OwnerGroups for baseline of current state
+    await setMhrTransferCurrentHomeOwnerGroups(cloneDeep(ownerGroups))
+
+    currentOwnerGroups.forEach((ownerGroup, index) => { ownerGroup.groupId = index + 1 })
+    setShowGroups(currentOwnerGroups.length > 1)
+
+    // Set owners to store
+    if (getMhrInformation.value.draftNumber) {
+      // Retrieve owners from draft if it exists
+      const { registration } = await getMhrTransferDraft(getMhrInformation.value.draftNumber)
+
+      // Set draft Transfer details to store
+      parseDraftTransferDetails(registration as MhrTransferApiIF)
+
+      setShowGroups(registration.addOwnerGroups.length > 1 || registration.deleteOwnerGroups.length > 1)
+      setMhrTransferHomeOwnerGroups([...registration.addOwnerGroups])
+    } else {
+      // Set current owners if there is no draft
+      setMhrTransferHomeOwnerGroups(cloneDeep(currentOwnerGroups))
+    }
+  }
+
+  const parseMhrLocationInfo = async (locationData: MhrRegistrationHomeLocationIF): Promise<void> => {
+    for (const [key, value] of Object.entries(locationData)) {
+      setMhrLocation({ key: key, value: value })
+    }
+
+    // Map and Apply an OTHER type when applicable
+    if ([HomeLocationTypes.OTHER_RESERVE, HomeLocationTypes.OTHER_STRATA, HomeLocationTypes.OTHER_TYPE]
+      .includes(locationData.locationType)) {
+      setIsManualLocation(!locationData.pidNumber)
+      setMhrLocation({ key: 'locationType', value: HomeLocationTypes.OTHER_LAND })
+      setMhrLocation({ key: 'otherType', value: locationData.locationType })
+    }
+  }
+
+  const setRefNumValid = (isValid: boolean) => {
+    refNumValid.value = isValid
+  }
+
+  const getUiTransferType = (apiTransferType: ApiTransferTypes): UITransferTypes => {
+    return UITransferTypes[
+      Object.keys(ApiTransferTypes).find(key => ApiTransferTypes[key] as string === apiTransferType)
+    ]
+  }
+
+  /** Draft Filings **/
+
   const parseDraftTransferDetails = (draft: MhrTransferApiIF): void => {
     setMhrTransferDeclaredValue(draft.declaredValue || '')
     setMhrTransferConsideration(draft.consideration || '')
     setMhrTransferDate(draft.transferDate || null)
     setMhrTransferOwnLand(draft.ownLand || null)
   }
+
+  /** Filing Submission Helpers **/
 
   const parseOwnerGroups = (isDraft: boolean = false): any => {
     const ownerGroups = []
@@ -145,6 +237,7 @@ export const useMhrInformation = () => {
     getUiTransferType,
     initMhrTransfer,
     buildApiData,
-    parseDraftTransferDetails
+    parseDraftTransferDetails,
+    parseMhrInformation
   }
 }

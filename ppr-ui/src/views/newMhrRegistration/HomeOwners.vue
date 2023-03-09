@@ -79,7 +79,7 @@
       </template>
 
       <!-- Add/Remove Owner Actions -->
-      <v-row no-gutters v-if="!isReadonlyTable && enableActions">
+      <v-row no-gutters v-if="!isReadonlyTable && enableAddHomeOwners()">
         <v-col cols="12">
           <v-btn
             outlined
@@ -245,7 +245,6 @@
           :isMhrTransfer="isMhrTransfer"
           :hideRemovedOwners="hideRemovedOwners"
           :validateTransfer="validateTransfer"
-          :enableActions="enableActions"
           @isValidTransferOwners="isValidTransferOwners($event)"
         />
       </v-fade-transition>
@@ -259,7 +258,7 @@ import { AddEditHomeOwner, HomeOwnersTable } from '@/components/mhrRegistration/
 import { BaseDialog } from '@/components/dialogs'
 import { SimpleHelpToggle } from '@/components/common'
 import { computed, defineComponent, onBeforeMount, reactive, toRefs, watch } from '@vue/composition-api'
-import { useHomeOwners, useMhrValidations } from '@/composables/mhrRegistration'
+import { useHomeOwners, useMhrValidations, useTransferOwners } from '@/composables'
 /* eslint-disable no-unused-vars */
 import { MhrRegistrationTotalOwnershipAllocationIF } from '@/interfaces'
 import { ActionTypes } from '@/enums'
@@ -287,10 +286,6 @@ export default defineComponent({
     validateTransfer: {
       type: Boolean,
       default: false
-    },
-    enableActions: {
-      type: Boolean,
-      default: true
     }
   },
   setup (props, context) {
@@ -306,7 +301,16 @@ export default defineComponent({
       'hasUnsavedChanges'
     ])
 
-    const { getValidation, MhrSectVal, MhrCompVal } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
+    const {
+      enableHomeOwnerChanges,
+      enableAddHomeOwners
+    } = useTransferOwners(!props.isMhrTransfer)
+
+    const {
+      getValidation,
+      MhrSectVal,
+      MhrCompVal
+    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
     const {
       getHomeTenancyType,
@@ -443,7 +447,7 @@ export default defineComponent({
     )
 
     watch(
-      () => props.enableActions,
+      () => enableHomeOwnerChanges(),
       (val: boolean) => {
         if (!val) {
           localState.showAddPersonSection = val
@@ -472,6 +476,8 @@ export default defineComponent({
       hideShowRemovedOwners,
       isValidTransferOwners,
       hasUnsavedChanges,
+      enableAddHomeOwners,
+      enableHomeOwnerChanges,
       ...toRefs(localState)
     }
   },

@@ -40,7 +40,8 @@ export const TransferTypes: Array<TransferTypeSelectIF> = [
     group: 2,
     tooltip: {
       title: 'Supporting Documents Required',
-      bullets: ['Death Certificate', 'Transfer form', 'Transfer fee']
+      bullets: ['Ownership Transfer or Change form',
+        'Original or certified copy of death certificate issued from Canada or the United States.']
     }
   },
   {

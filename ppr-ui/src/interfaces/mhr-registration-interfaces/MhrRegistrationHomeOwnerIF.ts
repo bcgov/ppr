@@ -1,5 +1,5 @@
 import { AddressIF } from '@/composables/address/interfaces'
-import { ActionTypes } from '@/enums'
+import {ActionTypes, ApiHomeTenancyTypes, HomeOwnerPartyTypes} from '@/enums'
 
 export interface MhrRegistrationHomeOwnerIF {
   ownerId?: number // optional property used for editing a home owner
@@ -15,5 +15,6 @@ export interface MhrRegistrationHomeOwnerIF {
   phoneNumber: string
   phoneExtension: string
   address: AddressIF
-  // type: string
+  partyType?: HomeOwnerPartyTypes
+  type?: ApiHomeTenancyTypes
 }
