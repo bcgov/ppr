@@ -576,9 +576,9 @@ def test_find_by_mhr_number_pid(session, mhr_number, account_id, has_pid):
     reg_json = registration.registration_json
     assert reg_json.get('location')
     if has_pid:
-        assert reg_json['location'].get('ltsaDescription')
+        assert reg_json['location'].get('legalDescription')
     else:
-        assert not reg_json['location'].get('ltsaDescription')
+        assert not reg_json['location'].get('legalDescription')
 
 
 @pytest.mark.parametrize('mhr_number, has_results, account_id', TEST_MHR_NUM_DATA)

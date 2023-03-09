@@ -185,7 +185,7 @@ def test_find_by_doc_id_pid(session, exists, manuhome_id, doc_id, has_pid):
             assert location.ltsa
             assert location.ltsa.ltsa_description
             loc_json = location.registration_json
-            assert loc_json.get('ltsaDescription')
+            assert loc_json.get('legalDescription')
         else:
             assert not location.ltsa
     else:
@@ -204,7 +204,7 @@ def test_find_by_manuhome_pid(session, exists, manuhome_id, doc_id, has_pid):
             assert location.ltsa
             assert location.ltsa.ltsa_description
             loc_json = location.registration_json
-            assert loc_json.get('ltsaDescription')
+            assert loc_json.get('legalDescription')
         else:
             assert not location.ltsa
     else:
