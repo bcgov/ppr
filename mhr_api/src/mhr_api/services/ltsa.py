@@ -18,6 +18,8 @@ import json
 import requests
 from flask import current_app
 
+from mhr_api.models import LtsaDescription
+
 
 ORDER_URI = 'titledirect/search/api/orders'
 ORDER_TEMPLATE = {
@@ -57,8 +59,8 @@ def pid_lookup(pid: str) -> dict:
             json=data,
             headers=headers
         )
-        if response:
-            current_app.logger.info('LTSA api response=' + response.text)
+        # if response:
+        #    current_app.logger.info('LTSA api response=' + response.text)
         if not response.ok:
             return None
         return json.loads(response.text)
@@ -67,3 +69,19 @@ def pid_lookup(pid: str) -> dict:
             ValueError,
             Exception) as err:
         current_app.logger.error(f'LTSA PID lookup connection failure using svc:{api_url}', err)
+
+
+def save_description(pid: str, update: bool = False) -> LtsaDescription:
+    """Save LTSA legal description after a successful parcel order lookup by PID."""
+    current_app.logger.debug(f'Looking up parcel info for pid={pid}')
+    description: LtsaDescription = None
+    ltsa_json = pid_lookup(pid)
+    if ltsa_json and ltsa_json.get('legalDescription'):
+        description = LtsaDescription.update(pid, ltsa_json.get('legalDescription'))
+        if update and not description:
+            current_app.logger.info(f'No existing LTSA description to update. Creating new for pid={pid}')
+        if not description:
+            description = LtsaDescription.create(pid, ltsa_json.get('legalDescription'))
+        description.save()
+        # current_app.logger.debug(f'LTSA description saved for pid={pid}')
+    return description

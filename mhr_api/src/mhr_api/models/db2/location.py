@@ -17,6 +17,7 @@ from flask import current_app
 from mhr_api.exceptions import DatabaseException
 from mhr_api.models import db, utils as model_utils
 from mhr_api.models.type_tables import MhrLocationTypes
+from mhr_api.models.ltsa_description import LtsaDescription
 from mhr_api.utils.base import BaseEnum
 
 
@@ -76,6 +77,7 @@ class Db2Location(db.Model):
     # parent keys
 
     # Relationships
+    ltsa: LtsaDescription = None
 
     def save(self):
         """Save the object to the database immediately."""
@@ -127,6 +129,7 @@ class Db2Location(db.Model):
         if locations:
             for location in locations:
                 location.strip()
+                location.get_ltsa_description()
         return locations
 
     @classmethod
@@ -142,6 +145,7 @@ class Db2Location(db.Model):
                 raise DatabaseException(db_exception)
         if location:
             location.strip()
+            location.get_ltsa_description()
         return location
 
     @classmethod
@@ -156,7 +160,13 @@ class Db2Location(db.Model):
                 raise DatabaseException(db_exception)
         if location:
             location.strip()
+            location.get_ltsa_description()
         return location
+
+    def get_ltsa_description(self):
+        """Try to get the ltsa legal description if a location pid exists."""
+        if self.pid_number and len(self.pid_number) >= 9:
+            self.ltsa = LtsaDescription.find_by_pid_number(self.pid_number)
 
     @property
     def json(self):
@@ -195,6 +205,8 @@ class Db2Location(db.Model):
         }
         if self.tax_certificate_date:
             location['taxExpiryDate'] = model_utils.format_local_date(self.tax_certificate_date)
+        if self.ltsa:
+            location['legalDescription'] = self.ltsa.ltsa_description
         return location
 
     @property
@@ -240,6 +252,8 @@ class Db2Location(db.Model):
             tax_date = model_utils.format_local_date(self.tax_certificate_date)
             if tax_date:
                 location['taxExpiryDate'] = tax_date
+        if self.ltsa:
+            location['legalDescription'] = self.ltsa.ltsa_description
         return location
 
     @property

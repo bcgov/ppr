@@ -57,8 +57,7 @@
             <tr class="no-page-break">
                 <td class="col-33">
                     <div class="section-sub-title">Location Type</div>
-                    <div class="pt-2">N/A
-{#
+                    <div class="pt-2">
                         {% if detail.location.locationType is defined and detail.location.locationType == 'RESERVE' %}
                             INDIAN RESERVE
                         {% elif detail.location.locationType is defined and detail.location.locationType == 'STRATA' %}
@@ -68,7 +67,6 @@
                         {% else %}
                             N/A 
                         {% endif %}
-#}
                     </div>
                 </td>
                 <td class="col-33">
@@ -105,8 +103,18 @@
         </tr>
         <tr class="no-page-break">
             <td colspan="3">
-                {% if detail.location.locationType is defined and detail.location.locationType == 'STRATA' %}STRATA {% endif %}
-                {{ detail.location.legalDescription }}
+                <div>{{ detail.location.legalDescription }}</div>
+                <div>
+                    {% if detail.location.bandName is defined and detail.location.bandName != '' %}
+                        {{detail.location.bandName}}&nbsp;
+                    {% endif %}
+                    {% if detail.location.reserveNumber is defined and detail.location.reserveNumber != '' %}
+                        {{detail.location.reserveNumber}}&nbsp;
+                    {% endif %}
+                    {% if detail.location.additionalDescription is defined and detail.location.additionalDescription != '' %}
+                        {{ detail.location.additionalDescription }}
+                    {% endif %} 
+                </div>    
             </td>
         </tr>
         {% elif detail.location.hasLTSAInfo or (detail.location.additionalDescription is defined and detail.location.additionalDescription != '') %}
@@ -118,7 +126,7 @@
         <tr class="no-page-break">
             <td class="col-33">
                 {% if detail.location.lot is defined and detail.location.lot != '' %}
-                    <div>LOT: {{ detail.location.lot }}</div>
+                    <div>{% if detail.location.locationType is defined and detail.location.locationType == 'STRATA' %}STRATA {% endif %} LOT: {{ detail.location.lot }}</div>
                 {% endif %} 
                 {% if detail.location.parcel is defined and detail.location.parcel != '' %}
                     <div>PARCEL: {{ detail.location.parcel }}</div>
@@ -148,7 +156,7 @@
                     <div>LAND DISTRICT: {{ detail.location.landDistrict }}</div>
                 {% endif %} 
                 {% if detail.location.plan is defined and detail.location.plan != '' %}
-                    <div>PLAN: {{ detail.location.plan }}</div>
+                    <div>{% if detail.location.locationType is defined and detail.location.locationType == 'STRATA' %}STRATA {% endif %} PLAN: {{ detail.location.plan }}</div>
                 {% endif %} 
             </td>
             <td colspan="2">

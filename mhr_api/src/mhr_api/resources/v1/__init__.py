@@ -20,6 +20,7 @@ from flask import Flask
 from .documents import bp as documents_bp
 from .drafts import bp as drafts_bp
 from .exemptions import bp as exemptions_bp
+from .ltsa_sync import bp as ltsa_sync_bp
 from .manufacturer import bp as manufacturers_bp
 from .meta import bp as meta_bp
 from .ops import bp as ops_bp
@@ -51,6 +52,7 @@ class V1Endpoint:
         self.app.register_blueprint(documents_bp)
         self.app.register_blueprint(drafts_bp)
         self.app.register_blueprint(exemptions_bp)
+        self.app.register_blueprint(ltsa_sync_bp)
         self.app.register_blueprint(manufacturers_bp)
         self.app.register_blueprint(meta_bp)
         self.app.register_blueprint(ops_bp)

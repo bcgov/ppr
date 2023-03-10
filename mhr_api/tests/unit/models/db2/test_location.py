@@ -71,6 +71,11 @@ TEST_DATA_DOC_ID = [
     (True, 1, 'REG22911'),
     (False, 0, None)
 ]
+# testdata pattern is ({exists}, {manhomid}, {doc_reg_id}, {has_pid})
+TEST_DATA_LTSA_PID = [
+    (True, 7284, 'REG01020', False),
+    (True, 7282, 'REG01019', True)
+]
 
 
 @pytest.mark.parametrize('exists,manuhome_id,park_name,pad,street_num,street,city,count', TEST_DATA)
@@ -164,6 +169,44 @@ def test_find_by_doc_id(session, exists, manuhome_id, doc_id):
         assert location
         assert location.reg_document_id == doc_id
         assert location.manuhome_id == manuhome_id
+    else:
+        assert not location
+
+
+@pytest.mark.parametrize('exists,manuhome_id,doc_id,has_pid', TEST_DATA_LTSA_PID)
+def test_find_by_doc_id_pid(session, exists, manuhome_id, doc_id, has_pid):
+    """Assert that find location by document id with a PID contains all expected elements."""
+    location: Db2Location = Db2Location.find_by_doc_id(doc_id)
+    if exists:
+        assert location
+        assert location.reg_document_id == doc_id
+        assert location.manuhome_id == manuhome_id
+        if has_pid:
+            assert location.ltsa
+            assert location.ltsa.ltsa_description
+            loc_json = location.registration_json
+            assert loc_json.get('legalDescription')
+        else:
+            assert not location.ltsa
+    else:
+        assert not location
+
+
+@pytest.mark.parametrize('exists,manuhome_id,doc_id,has_pid', TEST_DATA_LTSA_PID)
+def test_find_by_manuhome_pid(session, exists, manuhome_id, doc_id, has_pid):
+    """Assert that find location by manuhome id with a PID contains all expected elements."""
+    location: Db2Location = Db2Location.find_by_manuhome_id_active(manuhome_id)
+    if exists:
+        assert location
+        assert location.reg_document_id == doc_id
+        assert location.manuhome_id == manuhome_id
+        if has_pid:
+            assert location.ltsa
+            assert location.ltsa.ltsa_description
+            loc_json = location.registration_json
+            assert loc_json.get('legalDescription')
+        else:
+            assert not location.ltsa
     else:
         assert not location
 

@@ -32,6 +32,7 @@ from .db2.owngroup import Db2Owngroup
 from .event_tracking import EventTracking
 from .financing_statement import FinancingStatement
 from .general_collateral import GeneralCollateral
+from .ltsa_description import LtsaDescription
 from .mhr_description import MhrDescription
 from .mhr_document import MhrDocument
 from .mhr_draft import MhrDraft
@@ -74,7 +75,8 @@ __all__ = ('db',
            'AccountBcolId', 'Address', 'ClientCode', 'CountryType', 'CourtOrder',
            'Db2Cmpserno', 'Db2Descript', 'Db2Docdes', 'Db2Document', 'Db2Location', 'Db2Manufact', 'Db2Manuhome',
            'Db2Mhomnote', 'Db2Owner', 'Db2Owngroup',
-           'EventTracking', 'EventTrackingType', 'FinancingStatement', 'GeneralCollateral', 'MhrDraft', 'MhrDocument',
+           'EventTracking', 'EventTrackingType', 'FinancingStatement', 'GeneralCollateral',
+           'LtsaDescription', 'MhrDraft', 'MhrDocument',
            'MhrDescription', 'MhrExtraRegistration', 'MhrLocation', 'MhrNote', 'MhrParty', 'MhrRegistration',
            'MhrRegistrationReport', 'MhrDocumentType', 'MhrLocationType', 'MhrNoteStatusType', 'MhrOwnerGroup',
            'MhrOwnerStatusType', 'MhrPartyType',
