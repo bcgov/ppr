@@ -7,7 +7,6 @@ import {
   MhrTransferIF, SubmittingPartyIF
 } from '@/interfaces'
 import { useActions, useGetters } from 'vuex-composition-helpers'
-import { readonly, ref } from '@vue/composition-api'
 import {
   ActionTypes,
   ApiHomeTenancyTypes,
