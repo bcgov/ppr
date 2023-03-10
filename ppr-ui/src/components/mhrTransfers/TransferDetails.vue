@@ -8,13 +8,13 @@
     </p>
 
     <v-card flat class="py-6 px-8 rounded" :class="{ 'border-error-left': showFormError }">
-      <v-form ref="transferDetailsForm" v-model="isFormValid">
+      <v-form ref="transferDetailsForm" v-model="isValidForm">
         <v-row>
           <v-col cols="3">
             <label
               class="generic-label"
               for="consideration"
-              :class="{ 'error-text': validateTransferDetails && hasError(considerationRef) }"
+              :class="{ 'error-text': showFormError && hasError(considerationRef) }"
             >
               Consideration
             </label>
@@ -37,7 +37,7 @@
             <label
               class="generic-label"
               for="transfer-date"
-              :class="{ 'error-text': validateTransferDetails && !transferDate }"
+              :class="{ 'error-text': showFormError && !transferDate }"
             >
               Bill of Sale Date of Execution
             </label>
@@ -48,7 +48,7 @@
               clearable
               ref="transferDateRef"
               title="Date"
-              :errorMsg="validateTransferDetails && !transferDate ? 'Enter bill of sale date of execution' : ''"
+              :errorMsg="showFormError && !transferDate ? 'Enter bill of sale date of execution' : ''"
               :initialValue="transferDate"
               :key="Math.random()"
               @emitDate="transferDate = $event"
@@ -68,8 +68,7 @@
           <v-col cols="9">
             <v-checkbox
               id="lease-own"
-              label="The manufactured home is located on land that the new homeowners own,
-                or on which they have a registered lease of 3 years or more."
+              :label="landOrLeaseLabel"
               v-model="isOwnLand"
               class="mt-0 pt-0 lease-own-checkbox"
               data-test-id="lease-own-checkbox"
@@ -87,11 +86,13 @@ import { useInputRules } from '@/composables'
 import { computed, defineComponent, reactive, ref, toRefs, watch } from '@vue/composition-api'
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import { FormIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { ApiTransferTypes } from '@/enums'
 
 export default defineComponent({
   name: 'TransferDetails',
   emits: ['isValid'],
   components: { DatePicker },
+  props: { validate: { type: Boolean, default: false } },
   setup (props, context) {
     const { customRules, required, maxLength } = useInputRules()
 
@@ -99,12 +100,14 @@ export default defineComponent({
       getMhrTransferDeclaredValue,
       getMhrTransferConsideration,
       getMhrTransferDate,
-      getMhrTransferOwnLand
+      getMhrTransferOwnLand,
+      getMhrTransferType
     } = useGetters<any>([
       'getMhrTransferDeclaredValue',
       'getMhrTransferConsideration',
       'getMhrTransferDate',
-      'getMhrTransferOwnLand'
+      'getMhrTransferOwnLand',
+      'getMhrTransferType'
     ])
 
     const {
@@ -121,10 +124,6 @@ export default defineComponent({
 
     const considerationRef = ref(null)
 
-    const considerationRules = computed(
-      (): Array<Function> => customRules(maxLength(80), required('Enter consideration'))
-    )
-
     const updateConsideration = () => {
       // copy Declared Value into Consideration field - the initial time only
       if (!localState.consideration && getMhrTransferDeclaredValue.value) {
@@ -133,24 +132,25 @@ export default defineComponent({
     }
 
     const localState = reactive({
-      validateTransferDetails: false, // triggered once Review & Confirm clicked
-      isFormValid: false, // TransferDetails form without Transfer Date Picker
-      isTransferDetailsFormValid: computed((): boolean => localState.isFormValid && !!localState.transferDate),
+      isValidForm: false, // TransferDetails form without Transfer Date Picker
       consideration: getMhrTransferConsideration.value,
       transferDate: getMhrTransferDate.value,
       isOwnLand: getMhrTransferOwnLand.value || false,
       enableWarningMsg: false,
-      showFormError: computed(() => localState.validateTransferDetails && !localState.isTransferDetailsFormValid)
+      landOrLeaseLabel: computed(() => {
+        return `The manufactured home is located on land that the
+        ${getMhrTransferType.value?.transferType === ApiTransferTypes.SALE_OR_GIFT ? 'new' : ''}
+        homeowners own, or on which they have a registered lease of 3 years or more.`
+      }),
+      isValidTransferDetails: computed(() => localState.isValidForm && !!localState.transferDate),
+      showFormError: computed(() => props.validate && !localState.isValidTransferDetails),
+      considerationRules: computed((): Array<Function> => {
+        return customRules(required('Enter consideration'), maxLength(80))
+      })
     })
 
     const hasError = (ref: any): boolean => {
       return ref?.hasError
-    }
-
-    // This validate function is called from parent MhrInformation component
-    const validateDetailsForm = (): void => {
-      localState.validateTransferDetails = true;
-      (context.refs.transferDetailsForm as FormIF).validate()
     }
 
     // Clear the data when hiding Transfer Details (e.g. in Undo)
@@ -160,43 +160,33 @@ export default defineComponent({
       setMhrTransferOwnLand(false)
     }
 
-    watch(
-      () => localState.consideration,
-      (val: string) => {
-        setMhrTransferConsideration(val)
-        setUnsavedChanges(true)
-      }
-    )
+    watch(() => props.validate, (val: boolean) => {
+      (context.refs.transferDetailsForm as FormIF).validate()
+    })
 
-    watch(
-      () => localState.transferDate,
-      (val: string) => {
-        setMhrTransferDate(val)
-        setUnsavedChanges(true)
-      }
-    )
+    watch(() => localState.consideration, (val: string) => {
+      setMhrTransferConsideration(val)
+      setUnsavedChanges(true)
+    })
 
-    watch(
-      () => localState.isOwnLand,
-      (val: boolean) => {
-        setMhrTransferOwnLand(val)
-        setUnsavedChanges(true)
-      }
-    )
+    watch(() => localState.transferDate, (val: string) => {
+      setMhrTransferDate(val)
+      setUnsavedChanges(true)
+    })
 
-    watch(
-      () => localState.isTransferDetailsFormValid,
-      (val: boolean) => {
-        context.emit('isValid', val)
-      }
-    )
+    watch(() => localState.isOwnLand, (val: boolean) => {
+      setMhrTransferOwnLand(val)
+      setUnsavedChanges(true)
+    })
+
+    watch(() => localState.isValidTransferDetails, (val: boolean) => {
+      context.emit('isValid', val)
+    })
 
     return {
       hasError,
       considerationRef,
-      considerationRules,
       updateConsideration,
-      validateDetailsForm,
       clearTransferDetailsData,
       ...toRefs(localState)
     }

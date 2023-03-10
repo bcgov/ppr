@@ -96,10 +96,12 @@
                     :currentHomeOwners="getMhrTransferCurrentHomeOwners"
                   />
                 </section>
+
                 <section>
                   <v-divider class="mx-7 ma-0"></v-divider>
                   <TransferDetailsReview class="py-6 pt-4 px-8" />
                 </section>
+
                 <section v-if="isRoleStaffReg" id="staff-transfer-submitting-party" class="submitting-party">
                   <h2>1. Submitting Party for this Change</h2>
                   <p class="mt-2 mb-6">
@@ -113,11 +115,12 @@
                   <MhrSubmittingParty
                     :validate="validateSubmittingParty"
                     :class="{ 'border-error-left': validateSubmittingParty }"
-                    @isValid="isSubmittingPartyValid = $event"
+                    @isValid="setValidation('isSubmittingPartyValid', $event)"
                     :content="{ mailAddressInfo: 'Registry documents, if any, will be mailed to this address.' }"
                     isMhrTransfer
                   />
                 </section>
+
                 <section v-else id="transfer-submitting-party" class="submitting-party">
                   <AccountInfo
                     title="Submitting Party for this Change"
@@ -138,13 +141,16 @@
                     rounded
                     id="attention-or-reference-number-card"
                     class="mt-8 pa-8 pr-6 pb-3"
-                    :class="{ 'border-error-left': !isRefNumValid }"
+                    :class="{ 'border-error-left': !getValidation('isRefNumValid') }"
                     data-test-id="attn-ref-number-card"
                   >
                     <v-form ref="reference-number-form" v-model="refNumValid">
                       <v-row no-gutters class="pt-3">
                         <v-col cols="3">
-                          <label class="generic-label" :class="{ 'error-text': !isRefNumValid }">
+                          <label
+                            class="generic-label"
+                            :class="{ 'error-text': !getValidation('isRefNumValid') }"
+                          >
                             Attention or Reference Number
                           </label>
                         </v-col>
@@ -169,7 +175,7 @@
                     :sectionNumber="isRoleStaffReg ? 3 : 2"
                     :legalName="getCertifyInformation.legalName"
                     :setShowErrors="validateConfirmCompletion"
-                    @confirmCompletion="isCompletionConfirmed = $event"
+                    @confirmCompletion="setValidation('isCompletionConfirmed', $event)"
                   />
                 </section>
 
@@ -177,9 +183,10 @@
                   <CertifyInformation
                     :sectionNumber="isRoleStaffReg ? 4 : 3"
                     :setShowErrors="validateAuthorizationError"
-                    @certifyValid="authorizationValid = $event"
+                    @certifyValid="setValidation('isAuthorizationValid', $event)"
                   />
                 </section>
+
                 <section id="staff-transfer-payment-section" class="mt-10 pt-4 pb-10" v-if="isRoleStaffReg">
                   <h2>
                     5. Staff Payment
@@ -193,7 +200,7 @@
                       :invalidSection="validateStaffPayment"
                       :validate="validate"
                       @update:staffPaymentData="onStaffPaymentDataUpdate($event)"
-                      @valid="staffPaymentValid = $event"
+                      @valid="setValidation('isStaffPaymentValid', $event)"
                     />
                   </v-card>
                 </section>
@@ -245,7 +252,7 @@
                     :validate="validate"
                     @emitType="handleTransferTypeChange($event)"
                     @emitDeclaredValue="handleDeclaredValueChange($event)"
-                    @emitValid="isValidTransferType = $event"
+                    @emitValid="setValidation('isValidTransferType', $event)"
                   />
                 </v-expand-transition>
 
@@ -254,13 +261,14 @@
                   class="mt-n2"
                   :class="{ 'mb-10': !hasUnsavedChanges }"
                   :validateTransfer="validate"
-                  @isValidTransferOwners="isValidTransferOwners = $event"
+                  @isValidTransferOwners="setValidation('isValidTransferOwners', $event)"
                 />
 
                 <TransferDetails
                   v-if="hasUnsavedChanges"
                   ref="transferDetailsComponent"
-                  @isValid="isTransferDetailsFormValid = $event"
+                  :validate="validate"
+                  @isValid="setValidation('isTransferDetailsValid', $event)"
                 />
               </template>
             </section>
@@ -301,7 +309,7 @@ import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { StaffPayment } from '@bcrs-shared-components/staff-payment'
 import { StaffPaymentOptions } from '@bcrs-shared-components/enums'
 import { CertifyInformation, StickyContainer } from '@/components/common'
-import { useHomeOwners, useInputRules, useMhrInformation } from '@/composables'
+import { useHomeOwners, useInputRules, useMhrInformation, useMhrInfoValidation } from '@/composables'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
 import { PartySearch } from '@/components/parties/party'
@@ -318,7 +326,6 @@ import {
   AccountInfoIF,
   MhrTransferApiIF,
   RegTableNewItemI,
-  SubmittingPartyIF,
   TransferTypeSelectIF
 } from '@/interfaces'
 import {
@@ -370,7 +377,6 @@ export default defineComponent({
       default: false
     }
   },
-  // eslint-disable-next-line
   setup (props, context) {
     const {
       getMhrTransferHomeOwners,
@@ -381,9 +387,10 @@ export default defineComponent({
       hasLien,
       isRoleStaffReg,
       isRoleQualifiedSupplier,
-      getMhrTransferSubmittingParty,
       getMhrTransferType,
-      getMhrTransferDeclaredValue
+      getMhrTransferDeclaredValue,
+      getMhrInfoValidation,
+      getMhrTransferSubmittingParty
     } = useGetters<any>([
       'getMhrTransferHomeOwners',
       'getMhrInformation',
@@ -393,9 +400,10 @@ export default defineComponent({
       'hasLien',
       'isRoleStaffReg',
       'isRoleQualifiedSupplier',
-      'getMhrTransferSubmittingParty',
       'getMhrTransferType',
-      'getMhrTransferDeclaredValue'
+      'getMhrTransferDeclaredValue',
+      'getMhrInfoValidation',
+      'getMhrTransferSubmittingParty'
     ])
 
     const {
@@ -407,7 +415,9 @@ export default defineComponent({
       setManufacturedHomeSearchResults,
       setLienType,
       setMhrTransferType,
-      setMhrTransferDeclaredValue
+      setMhrTransferDeclaredValue,
+      setEmptyMhrTransfer,
+      setStaffPayment
     } = useActions<any>([
       'setMhrTransferSubmittingParty',
       'setMhrTransferAttentionReference',
@@ -417,27 +427,32 @@ export default defineComponent({
       'setManufacturedHomeSearchResults',
       'setLienType',
       'setMhrTransferType',
-      'setMhrTransferDeclaredValue'
+      'setMhrTransferDeclaredValue',
+      'setEmptyMhrTransfer',
+      'setStaffPayment'
     ])
 
-    const { setEmptyMhrTransfer, setStaffPayment } = useActions<any>(['setEmptyMhrTransfer', 'setStaffPayment'])
-
+    // Composable Instances
     const {
-      isRefNumValid,
-      setRefNumValid,
       initMhrTransfer,
       buildApiData,
       getUiTransferType,
-      parseMhrInformation
+      parseMhrInformation,
+      parseSubmittingPartyInfo
     } = useMhrInformation()
-
     const {
-      isGlobalEditingMode,
+      setValidation,
+      getValidation,
+      isValidTransfer,
+      isValidTransferReview,
+      scrollToFirstError
+    } = useMhrInfoValidation(getMhrInfoValidation.value)
+    const {
       setGlobalEditingMode
     } = useHomeOwners(true)
-
     const { maxLength } = useInputRules()
 
+    // Refs
     const transferDetailsComponent = ref(null)
 
     const localState = reactive({
@@ -446,16 +461,8 @@ export default defineComponent({
       isReviewMode: false,
       validate: false,
       showMhrFeeSummary: false,
-      isTransferDetailsFormValid: false,
       refNumValid: false,
-      authorizationValid: false,
-      staffPaymentValid: false,
-      isSubmittingPartyValid: false,
-      validateConfirmCompletion: false,
-      validateAuthorizationError: false,
       accountInfo: null,
-      isValidTransferType: false,
-      isValidTransferOwners: false,
       feeType: FeeSummaryTypes.MHR_TRANSFER, // FUTURE STATE: To be dynamic, dependent on what changes have been made
       staffPayment: {
         option: StaffPaymentOptions.NONE,
@@ -467,7 +474,6 @@ export default defineComponent({
       },
       showTransferType: false,
       attentionReference: '',
-      isCompletionConfirmed: false,
       cancelOptions: unsavedChangesDialog,
       saveOptions: registrationSaveDraftError,
       showCancelDialog: false,
@@ -476,9 +482,6 @@ export default defineComponent({
       hasTransferChanges: computed((): boolean => {
         return localState.showTransferType &&
           (hasUnsavedChanges.value || !!getMhrTransferDeclaredValue.value || !!getMhrTransferType.value)
-      }),
-      validateSubmittingParty: computed((): boolean => {
-        return localState.validate && !localState.isSubmittingPartyValid
       }),
       uiTransferType: computed((): UITransferTypes => {
         return getUiTransferType(getMhrTransferType.value?.transferType)
@@ -492,37 +495,23 @@ export default defineComponent({
       showBackBtn: computed((): string => {
         return localState.isReviewMode ? 'Back' : ''
       }),
-      isValidTransfer: computed((): boolean => {
-        // is valid on first step
-        return (
-          hasUnsavedChanges.value &&
-          !isGlobalEditingMode.value &&
-          localState.isValidTransferType &&
-          localState.isValidTransferOwners &&
-          localState.isTransferDetailsFormValid &&
-          !hasLien.value
-        )
+      validateSubmittingParty: computed((): boolean => {
+        return localState.validate && !getValidation('isSubmittingPartyValid')
+      }),
+      validateConfirmCompletion: computed((): boolean => {
+        return localState.validate && !getValidation('isCompletionConfirmed')
+      }),
+      validateAuthorizationError: computed((): boolean => {
+        return localState.validate && !getValidation('isAuthorizationValid')
       }),
       validateStaffPayment: computed(() => {
-        return isRoleStaffReg.value && localState.validate && !localState.staffPaymentValid
-      }),
-      isValidTransferReview: computed((): boolean => {
-        // is valid on review step
-        return (
-          localState.isReviewMode &&
-          (isRoleStaffReg.value ? localState.isSubmittingPartyValid : true) &&
-          isRefNumValid.value &&
-          localState.isCompletionConfirmed &&
-          !localState.validateAuthorizationError &&
-          (isRoleStaffReg.value ? !localState.validateStaffPayment : true)
-        )
+        return isRoleStaffReg.value && localState.validate && !getValidation('isStaffPaymentValid')
       }),
       transferErrorMsg: computed((): string => {
-        if (hasLien.value && localState.validate) return '< Lien on this home is preventing transfer'
+        if (localState.validate && hasLien.value) return '< Lien on this home is preventing transfer'
 
-        const isValidReview = localState.isReviewMode ? !localState.isValidTransferReview : !localState.isValidTransfer
-        const errorMsg = '< Please complete required information'
-        return localState.validate && isValidReview ? errorMsg : ''
+        const isValidReview = localState.isReviewMode ? isValidTransferReview.value : isValidTransfer.value
+        return localState.validate && !isValidReview ? '< Please complete required information' : ''
       }),
       reviewConfirmText: computed((): string => {
         return localState.isReviewMode ? 'Register Changes and Pay' : 'Review and Confirm'
@@ -533,33 +522,6 @@ export default defineComponent({
       /** True if Jest is running the code. */
       isJestRunning: computed((): boolean => {
         return process.env.JEST_WORKER_ID !== undefined
-      }),
-      sectionValidationStates: computed((): Array<boolean> => {
-        return [
-          localState.isSubmittingPartyValid,
-          isRefNumValid.value,
-          localState.isCompletionConfirmed,
-          !localState.validateAuthorizationError,
-          !localState.validateStaffPayment
-        ]
-      }),
-      invalidSection: computed(() => {
-        const validationSections = [
-          'staff-transfer-submitting-party',
-          'transfer-ref-num-section',
-          'transfer-confirm-section',
-          'transfer-certify-section',
-          'staff-transfer-payment-section'
-        ]
-        const mappedSections = validationSections.map(function (key, val) {
-          return { section: key, value: localState.sectionValidationStates[val] }
-        })
-        if (!isRoleStaffReg.value) {
-          mappedSections.shift()
-          mappedSections.pop()
-        }
-        // Return the first invalid section
-        return document.getElementById(mappedSections.filter(item => item.value === false)[0]?.section)
       })
     })
 
@@ -585,11 +547,9 @@ export default defineComponent({
       if (isRoleQualifiedSupplier.value && !isRoleStaffReg.value) {
         // Get Account Info from Auth to be used in Submitting Party section in Review screen
         localState.accountInfo = await getAccountInfoFromAuth() as AccountInfoIF
-        parseSubmittingPartyInfoForQualifiedSupplier()
+        parseSubmittingPartyInfo(localState.accountInfo)
       }
-
       localState.loading = false
-
       localState.dataLoaded = true
     })
 
@@ -608,7 +568,6 @@ export default defineComponent({
             datNumber: '',
             folioNumber: ''
           }
-          localState.staffPaymentValid = false
           break
 
         case StaffPaymentOptions.BCOL:
@@ -620,7 +579,6 @@ export default defineComponent({
             isPriority: staffPaymentData.isPriority,
             routingSlipNumber: ''
           }
-          localState.staffPaymentValid = false
           break
 
         case StaffPaymentOptions.NO_FEE:
@@ -632,7 +590,6 @@ export default defineComponent({
             datNumber: '',
             folioNumber: ''
           }
-          localState.staffPaymentValid = true
           break
         case StaffPaymentOptions.NONE: // should never happen
           break
@@ -642,32 +599,9 @@ export default defineComponent({
       setStaffPayment(staffPaymentData)
     }
 
-    const parseSubmittingPartyInfoForQualifiedSupplier = (): void => {
-      const submittingParty = {
-        businessName: localState.accountInfo.name,
-        address: localState.accountInfo.mailingAddress,
-        emailAddress: localState.accountInfo.accountAdmin.email,
-        phoneNumber: localState.accountInfo.accountAdmin.phone,
-        phoneExtension: localState.accountInfo.accountAdmin.phoneExtension
-      } as SubmittingPartyIF
-
-      setMhrTransferSubmittingParty(submittingParty)
-    }
-
-    const scrollToFirstError = async (scrollToTop: boolean = false): Promise<void> => {
-      setTimeout(() => {
-        scrollToTop
-          ? document.getElementById('mhr-information-header').scrollIntoView({ behavior: 'smooth' })
-          : document.getElementsByClassName('border-error-left').length > 0 &&
-            localState.isReviewMode
-            ? localState.invalidSection.scrollIntoView({ behavior: 'smooth' })
-            : document.getElementsByClassName('border-error-left')[0]
-              .scrollIntoView({ behavior: 'smooth' })
-      }, 10)
-    }
-
     const goToReview = async (): Promise<void> => {
       localState.validate = true
+      await nextTick()
 
       // Prevent proceeding when Lien present
       if (hasLien.value) {
@@ -681,27 +615,27 @@ export default defineComponent({
         const regSum = !localState.isJestRunning
           ? await getMHRegistrationSummary(getMhrInformation.value.mhrNumber, false)
           : null
-
         if (!!regSum && !!regSum.lienRegistrationType) {
           await setLienType(regSum.lienRegistrationType)
           await scrollToFirstError(true)
           return
         }
 
-        // Trigger error state for required fields (if not checked)
-        localState.validateAuthorizationError = !localState.authorizationValid
-        localState.validateConfirmCompletion = !localState.isCompletionConfirmed
-
         // Check if any required fields have errors
-        if (!localState.isValidTransferReview) {
-          await scrollToFirstError()
+        if (localState.isReviewMode && !isValidTransferReview.value) {
+          await scrollToFirstError(false)
           return
         }
+
+        // Complete Filing
         localState.loading = true
+        // Build filing to api specs
         const apiData = await buildApiData()
+        // Submit Transfer filing
         const mhrTransferFiling =
           await submitMhrTransfer(apiData, getMhrInformation.value.mhrNumber, localState.staffPayment)
         localState.loading = false
+
         if (!mhrTransferFiling.error) {
           setUnsavedChanges(false)
           // Delete the draft on successful submission
@@ -717,20 +651,15 @@ export default defineComponent({
         } else console.log(mhrTransferFiling?.error) // Handle Schema or Api errors here.
       }
 
-      // @ts-ignore - function exists
-      await context.refs.transferDetailsComponent?.validateDetailsForm()
-
       // If transfer is valid, enter review mode
-      if (localState.isValidTransfer) {
+      if (isValidTransfer.value) {
         localState.isReviewMode = true
         localState.validate = false
-        await nextTick()
-
-        // Scroll to the top of review screen
-        await scrollToFirstError(true)
-      } else {
-        await scrollToFirstError()
       }
+
+      // Scroll to the top of review screen
+      await nextTick()
+      await scrollToFirstError(isValidTransfer.value)
     }
 
     const onSave = async (): Promise<void> => {
@@ -859,52 +788,25 @@ export default defineComponent({
     const handleDeclaredValueChange = async (declaredValue: number): Promise<void> => {
       await setMhrTransferDeclaredValue(declaredValue)
     }
+    watch(() => localState.attentionReference, (val: string) => {
+      setMhrTransferAttentionReference(val)
+    })
+    watch(() => isValidTransfer.value, (val: boolean) => {
+      if (val) localState.validate = false
+    })
+    watch(() => localState.refNumValid, (isValid: boolean) => {
+      setValidation('isRefNumValid', isValid)
+    })
 
-    watch(
-      () => localState.attentionReference,
-      (val: string) => {
-        setMhrTransferAttentionReference(val)
+    watch(() => hasUnsavedChanges.value, (val: boolean) => {
+      if (!val && context.refs.transferDetailsComponent) {
+        (context.refs.transferDetailsComponent as any).clearTransferDetailsData()
       }
-    )
-
-    watch(
-      () => localState.isValidTransfer,
-      () => {
-        if (localState.isValidTransfer) localState.validate = false
-      }
-    )
-
-    watch(
-      () => localState.refNumValid,
-      (isFormValid: boolean) => {
-        setRefNumValid(isFormValid)
-      }
-    )
-
-    watch(
-      () => localState.authorizationValid,
-      (isValid: boolean) => {
-        localState.validateAuthorizationError = !isValid
-      }
-    )
-
-    watch(
-      () => localState.isCompletionConfirmed,
-      (isValid: boolean) => {
-        localState.validateConfirmCompletion = !isValid
-      }
-    )
-
-    watch(
-      () => hasUnsavedChanges.value,
-      (val: boolean) => {
-        if (!val && context.refs.transferDetailsComponent) {
-          (context.refs.transferDetailsComponent as any).clearTransferDetailsData()
-        }
-      }
-    )
+    })
 
     return {
+      setValidation,
+      getValidation,
       hasUnsavedChanges,
       goToReview,
       onSave,
@@ -913,14 +815,12 @@ export default defineComponent({
       getMhrTransferCurrentHomeOwners,
       getCertifyInformation,
       maxLength,
-      isRefNumValid,
       transferDetailsComponent,
       getMhrInformation,
       quickMhrSearch,
       handleDialogResp,
       hasLien,
       isRoleStaffReg,
-      getMhrTransferSubmittingParty,
       setMhrTransferSubmittingParty,
       handleTransferTypeChange,
       getUiTransferType,
@@ -929,6 +829,7 @@ export default defineComponent({
       onStaffPaymentDataUpdate,
       handleCancelDialogResp,
       cancelOwnerChangeConfirm,
+      getMhrTransferSubmittingParty,
       ...toRefs(localState)
     }
   }
@@ -939,6 +840,9 @@ export default defineComponent({
 @import '@/assets/styles/theme.scss';
 .sticky-container {
   z-index: 4 !important;
+}
+.section {
+  scroll-margin: 40px;
 }
 
 #important-message {

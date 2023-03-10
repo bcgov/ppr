@@ -111,6 +111,7 @@
 
 // borders
 .v-application .border-error-left {
+  scroll-margin: 300px;
   border-left: 3px solid $error !important;
 }
 

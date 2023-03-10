@@ -29,11 +29,13 @@ export interface MhrValidationStateIF {
   }
 }
 
-export interface MhrTransferValidationStateIF {
-  homeOwnersValid: {
-    ownersValid: boolean
-  },
-  reviewConfirmValid: {
-    validateApp: boolean
-  }
+export interface mhrInfoValidationState {
+  isValidTransferType: false,
+  isValidTransferOwners: false,
+  isTransferDetailsValid: false,
+  isSubmittingPartyValid: false,
+  isRefNumValid: false,
+  isCompletionConfirmed: false,
+  isAuthorizationValid: false,
+  isStaffPaymentValid: false
 }
