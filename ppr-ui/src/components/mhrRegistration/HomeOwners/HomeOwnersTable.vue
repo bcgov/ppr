@@ -110,24 +110,14 @@
                 <b>ADDED</b>
               </v-chip>
               <v-chip
-                v-if="isMhrTransfer && !showDeathCertificate && isRemovedHomeOwner(row.item)"
+                v-if="isMhrTransfer && isRemovedHomeOwner(row.item)"
                 class="badge-delete ml-8 mt-2"
                 label x-small
                 color="#grey lighten-2"
                 text-color="$gray9"
                 data-test-id="owner-removed-badge"
               >
-                <b>DELETED</b>
-              </v-chip>
-              <v-chip
-                v-if="isMhrTransfer && showDeathCertificate && isRemovedHomeOwner(row.item)"
-                class="badge-delete ml-8 mt-2"
-                label x-small
-                color="#grey lighten-2"
-                text-color="$gray9"
-                data-test-id="owner-deceased-badge"
-              >
-                <b>DECEASED</b>
+                <b>{{showDeathCertificate ? 'DECEASED' : 'DELETED'}}</b>
               </v-chip>
             </template>
           </td>
@@ -251,11 +241,11 @@
             </div>
           </td>
         </tr>
-        <tr v-if="isRemovedHomeOwner(row.item) && showDeathCertificate" class="death-certificate">
+        <tr v-if="isRemovedHomeOwner(row.item) && showDeathCertificate" class="death-certificate-row">
           <td :colspan="homeOwnersTableHeaders.length" class="py-0">
             <v-expand-transition>
               <DeathCertificate
-              :deceasedOwner="row.item"
+                :deceasedOwner="row.item"
               />
             </v-expand-transition>
           </td>
@@ -332,6 +322,7 @@ export default defineComponent({
       enableTransferOwnerActions,
       enableTransferOwnerGroupActions,
       enableTransferOwnerMenuActions,
+      showDeathCertificate,
       disableForDeceasedOwners
     } = useTransferOwners(!props.isMhrTransfer)
 
@@ -363,11 +354,6 @@ export default defineComponent({
       showEditActions: computed((): boolean => !props.isReadonlyTable),
       homeOwnersTableHeaders: props.isReadonlyTable ? homeOwnersTableHeadersReview : homeOwnersTableHeaders,
       transferType: computed(() => { return getMhrTransferType.value?.transferType }),
-      showDeathCertificate: computed(() => {
-        // Add other conditions for other transfer Types
-        return localState.transferType === ApiTransferTypes.SURVIVING_JOINT_TENANT ||
-               localState.transferType === ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL
-      }),
       addedOwnerCount: computed((): number => {
         return getTransferOrRegistrationHomeOwners().filter(owner => owner.action === ActionTypes.ADDED).length
       }),
@@ -509,6 +495,7 @@ export default defineComponent({
       enableTransferOwnerActions,
       enableTransferOwnerGroupActions,
       enableTransferOwnerMenuActions,
+      showDeathCertificate,
       disableForDeceasedOwners,
       ...toRefs(localState)
     }
@@ -529,7 +516,7 @@ export default defineComponent({
     border-bottom: none !important;
   }
 
-  .death-certificate {
+  .death-certificate-row {
     border-bottom: thin solid rgba(0, 0, 0, 0.12) !important;
   }
 

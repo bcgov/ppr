@@ -1,13 +1,13 @@
 <template>
-  <div class="mhr-death-certificate">
+  <div id="death-certificate" class="death-certificate">
     <v-card flat class="pl-8 rounded" :class="{ 'border-error-left': showFormError }">
       <v-form ref="deathCertificateForm" v-model="isFormValid">
         <v-row>
-          <v-col cols="3" class="pr-6">
+          <v-col cols="3">
             <label
               class="generic-label"
-              for="deathCertificate"
-              :class="{ 'error-text': validateDeathCertificate && hasError(deathCertificateRef) }"
+              for="deathCertificateNumber"
+              :class="{ 'error-text': validateDeathCertificate && hasError(deathCertificateNumberRef) }"
             >
               Death Certificate Number
             </label>
@@ -15,10 +15,10 @@
           <v-col cols="9">
             <v-text-field
               id="death-certificate-number"
-              v-model="deathCertificate"
-              ref="deathCertificateRef"
+              v-model="deathCertificateNumber"
+              ref="deathCertificateNumberRef"
               filled
-              :rules="deathCertificateRules"
+              :rules="deathCertificateNumberRules"
               label="Death Certificate Number"
               data-test-id="death-certificate-number"
             />
@@ -28,26 +28,26 @@
           <v-col cols="3">
             <label
               class="generic-label"
-              for="date-of-death"
-              :class="{ 'error-text': validateDeathCertificate && !dateOfDeath }"
+              for="death-date-time"
+              :class="{ 'error-text': validateDeathCertificate && !deathDateTime }"
             >
               Date of Death
             </label>
           </v-col>
           <v-col cols="9">
             <date-picker
-              id="date-of-death"
+              id="death-date-time"
               clearable
-              ref="dateOfDeathRef"
+              ref="deathDateTimeRef"
               title="Date of Death"
-              :errorMsg="validateDeathCertificate && !dateOfDeath ? 'Enter date of death' : ''"
-              :initialValue="dateOfDeath"
+              :errorMsg="validateDeathCertificate && !deathDateTime ? 'Enter date of death' : ''"
+              :initialValue="deathDateTime"
               :key="Math.random()"
               :maxDate="localTodayDate(maxDeathDate)"
-              @emitDate="dateOfDeath = $event"
-              @emitCancel="dateOfDeath = null"
-              @emitClear="dateOfDeath = null"
-              data-test-id="date-of-death"
+              @emitDate="deathDateTime = $event"
+              @emitCancel="deathDateTime = null"
+              @emitClear="deathDateTime = null"
+              data-test-id="death-date-time"
             />
           </v-col>
         </v-row>
@@ -72,7 +72,7 @@
 
 <script lang="ts">
 import { DatePicker } from '@bcrs-shared-components/date-picker'
-import { useInputRules } from '@/composables'
+import { useInputRules, useHomeOwners } from '@/composables'
 import { computed, defineComponent, reactive, ref, toRefs, watch } from '@vue/composition-api'
 import { useActions } from 'vuex-composition-helpers'
 import { FormIF, MhrRegistrationHomeOwnerIF } from '@/interfaces' // eslint-disable-line no-unused-vars
@@ -90,26 +90,27 @@ export default defineComponent({
   setup (props, context) {
     const { customRules, required, maxLength } = useInputRules()
 
+    const { editHomeOwner } = useHomeOwners(true)
+
     const {
       setUnsavedChanges
     } = useActions([
       'setUnsavedChanges'
     ])
 
-    const deathCertificateRef = ref(null)
+    const deathCertificateNumberRef = ref(null)
 
-    const deathCertificateRules = computed(
+    const deathCertificateNumberRules = computed(
       (): Array<Function> => customRules(maxLength(20), required('Enter Death Certificate Number'))
     )
 
     const localState = reactive({
       validateDeathCertificate: false, // NEW VALIDATOR REQUIRED
       isFormValid: false, // Death Certificate form without Death Date Picker
-      isDeathCertificateFormValid: computed((): boolean => localState.isFormValid && !!localState.dateOfDeath),
-      deathCertificate: null,
-      dateOfDeath: null,
+      isDeathCertificateFormValid: computed((): boolean => localState.isFormValid && !!localState.deathDateTime),
+      deathCertificateNumber: null,
+      deathDateTime: null,
       hasCertificate: false, // Will be used for validation on UI side only (original certificate checkbox)
-      deceasedOwner: props.deceasedOwner,
       showFormError: computed(() => localState.validateDeathCertificate && !localState.isDeathCertificateFormValid),
       maxDeathDate: computed((): Date => {
         var dateOffset = 24 * 60 * 60 * 1000 // 1 day in milliseconds
@@ -129,26 +130,32 @@ export default defineComponent({
 
     // Update deceased owner deathCertificateNumber when value changes
     watch(
-      () => localState.deathCertificate,
-      (val: number) => {
-        localState.deceasedOwner.deathCertificateNumber = val
+      () => localState.deathCertificateNumber,
+      (val: string) => {
+        editHomeOwner(
+          { ...props.deceasedOwner, deathCertificateNumber: val },
+          props.deceasedOwner.groupId
+        )
         setUnsavedChanges(true)
       }
     )
 
     // Update deceased owner deathDateTime when value changes
     watch(
-      () => localState.dateOfDeath,
+      () => localState.deathDateTime,
       (val: string) => {
-        localState.deceasedOwner.deathDateTime = val
+        editHomeOwner(
+          { ...props.deceasedOwner, deathDateTime: val },
+          props.deceasedOwner.groupId
+        )
         setUnsavedChanges(true)
       }
     )
 
     return {
       hasError,
-      deathCertificateRef,
-      deathCertificateRules,
+      deathCertificateNumberRef,
+      deathCertificateNumberRules,
       localTodayDate,
       ...toRefs(localState)
     }
@@ -161,7 +168,7 @@ export default defineComponent({
 .row {
   height: 90px;
 }
-.mhr-death-certificate::v-deep {
+.death-certificate::v-deep {
   margin-bottom: 43px;
 
   .generic-label {
