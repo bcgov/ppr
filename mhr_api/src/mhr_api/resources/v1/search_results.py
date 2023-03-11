@@ -151,7 +151,7 @@ def post_search_results(search_id: str):  # pylint: disable=too-many-branches, t
         if request.args.get(CLIENT_REF_PARAM):
             client_ref: str = request.args.get(CLIENT_REF_PARAM)
             client_ref = client_ref.strip()
-            if client_ref and len(client_ref) < 51:
+            if client_ref is not None and len(client_ref) < 51:  # Allow empty strings as clearing the value.
                 query.client_reference_id = client_ref
                 # Also update the original search criteria json as this is used in the account search history.
                 criteria = copy.deepcopy(query.search_criteria)
