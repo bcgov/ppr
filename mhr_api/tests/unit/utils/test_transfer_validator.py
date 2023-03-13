@@ -480,6 +480,104 @@ EXEC_ADD_GROUPS = [
         'type': 'NA'
     }
 ]
+WILL_DELETE_GROUPS1 = [
+    {
+        'groupId': 1,
+        'owners': [
+            {
+                'individualName': {
+                    'first': 'SHARON',
+                    'last': 'HALL'
+                 },
+                'address': {
+                    'street': '3122B LYNNLARK PLACE',
+                    'city': 'VICTORIA',
+                    'region': 'BC',
+                    'postalCode': 'V8S 4I6',
+                    'country': 'CA'
+                },
+                'phoneNumber': '6041234567',
+                'deathCertificateNumber': '232432432',
+                'deathDateTime': '2021-02-21T18:56:00+00:00'
+            }, {
+                'individualName': {
+                    'first': 'DENNIS',
+                    'last': 'HALL'
+                },
+                'address': {
+                    'street': '3122B LYNNLARK PLACE',
+                    'city': 'VICTORIA',
+                    'region': 'BC',
+                    'postalCode': 'V8S 4I6',
+                    'country': 'CA'
+                },
+                'phoneNumber': '6041234567',
+                'deathCertificateNumber': '232432432',
+                'deathDateTime': '2021-02-21T18:56:00+00:00'
+            }
+        ],
+        'type': 'JOINT'
+    }
+]
+WILL_DELETE_GROUPS2 = [
+    {
+        'groupId': 1,
+        'owners': [
+            {
+                'individualName': {
+                    'first': 'SHARON',
+                    'last': 'HALL'
+                 },
+                'address': {
+                    'street': '3122B LYNNLARK PLACE',
+                    'city': 'VICTORIA',
+                    'region': 'BC',
+                    'postalCode': 'V8S 4I6',
+                    'country': 'CA'
+                },
+                'phoneNumber': '6041234567'
+            }, {
+                'individualName': {
+                    'first': 'DENNIS',
+                    'last': 'HALL'
+                },
+                'address': {
+                    'street': '3122B LYNNLARK PLACE',
+                    'city': 'VICTORIA',
+                    'region': 'BC',
+                    'postalCode': 'V8S 4I6',
+                    'country': 'CA'
+                },
+                'phoneNumber': '6041234567'
+            }
+        ],
+        'type': 'JOINT'
+    }
+]
+WILL_ADD_GROUPS = [
+    {
+        'groupId': 2,
+        'owners': [
+            {
+                'individualName': {
+                    'first': 'APPOINTED',
+                    'last': 'EXECUTOR'
+                },
+                'address': {
+                    'street': '3122B LYNNLARK PLACE',
+                    'city': 'VICTORIA',
+                    'region': 'BC',
+                    'postalCode': 'V8S 4I6',
+                    'country': 'CA'
+                },
+                'phoneNumber': '6041234567',
+                'partyType': 'EXECUTOR',
+                'description': 'EXECUTOR of the deceased.'
+            }
+        ],
+        'type': 'SOLE'
+    }
+]
 ADMIN_DELETE_GROUPS = [
     {
         'groupId': 4,
@@ -685,13 +783,19 @@ TEST_TRANSFER_DATA_AFFIDAVIT = [
 ]
 # testdata pattern is ({description},{valid},{mhr_num},{account_id},{delete_groups},{add_groups},{message content},{staff})
 TEST_TRANSFER_DATA_WILL = [
-    ('Valid', True,  '001020', '2523', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS, None, True),
+    ('Valid', True,  '001020', '2523', EXEC_DELETE_GROUPS, WILL_ADD_GROUPS, None, True),
     ('Invalid non-staff', False,  '001020', '2523', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS,
      validator.REG_STAFF_ONLY, False),
+    ('Invalid add owner', False,  '001020', '2523', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS,
+     validator.TRAN_WILL_NEW_OWNER, True),
     ('Invalid party type', False,  '001020', '2523', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS,
-     validator.TRAN_EXEC_NEW_OWNER, True),
+     validator.TRAN_WILL_NEW_OWNER, True),
     ('Invalid executor missing', False,  '001020', '2523', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS,
-     validator.TRAN_EXEC_MISSING, True),
+     validator.TRAN_WILL_NEW_OWNER, True),
+    ('Invalid no probate', False,  '001020', '2523', WILL_DELETE_GROUPS1, WILL_ADD_GROUPS,
+     validator.TRAN_WILL_PROBATE, True),
+    ('Invalid no death info', False,  '001020', '2523', WILL_DELETE_GROUPS2, WILL_ADD_GROUPS,
+     validator.TRAN_WILL_DEATH_CERT, True),
     ('Invalid add 2 groups', False,  '001020', '2523', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS,
      validator.TRAN_DEATH_GROUP_COUNT, True),
     ('Invalid delete 2 groups', False,  '001020', '2523', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS,
@@ -960,6 +1064,7 @@ def test_validate_transfer_will(session, desc, valid, mhr_num, account_id, delet
     # Additional validation not covered by the schema.
     registration: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account_id)
     error_msg = validator.validate_transfer(registration, json_data, staff)
+    current_app.logger.info(error_msg)
     if errors:
         current_app.logger.debug(errors)
     if valid:
