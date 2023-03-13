@@ -15,6 +15,8 @@ export interface MhrRegistrationHomeOwnerIF {
   phoneNumber: string
   phoneExtension: string
   address: AddressIF
+  deathCertificateNumber?: string
+  deathDateTime?: string
   partyType?: HomeOwnerPartyTypes
   type?: ApiHomeTenancyTypes
 }

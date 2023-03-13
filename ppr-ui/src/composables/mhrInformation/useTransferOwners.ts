@@ -13,6 +13,11 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     'getMhrTransferCurrentHomeOwnerGroups'
   ])
 
+  /** Conditionally show DeathCertificate based on Transfer Type **/
+  const showDeathCertificate = (): boolean =>
+    getMhrTransferType.value?.transferType === ApiTransferTypes.SURVIVING_JOINT_TENANT ||
+    getMhrTransferType.value?.transferType === ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL
+
   /** Conditionally Enable HomeOwner Changes based on Transfer Type **/
   const enableHomeOwnerChanges = (): boolean => {
     // Manual override to force enable all actions (ie MhRegistrations)
@@ -115,6 +120,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     enableTransferOwnerActions,
     enableTransferOwnerMenuActions,
     enableAddHomeOwners,
+    showDeathCertificate,
     disableForDeceasedOwners
   }
 }

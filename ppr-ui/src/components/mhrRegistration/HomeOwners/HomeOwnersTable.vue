@@ -76,7 +76,7 @@
           class="owner-info"
           :data-test-id="`owner-info-${row.item.ownerId}`"
         >
-          <td class="owner-name">
+          <td class="owner-name" :class="{'no-bottom-border' : isRemovedHomeOwner(row.item) && showDeathCertificate}">
             <div :class="{'removed-owner': isRemovedHomeOwner(row.item)}">
               <div v-if="row.item.individualName" class="owner-icon-name">
                 <v-icon class="mr-2">mdi-account</v-icon>
@@ -117,25 +117,25 @@
                 text-color="$gray9"
                 data-test-id="owner-removed-badge"
               >
-                <b>DELETED</b>
+                <b>{{showDeathCertificate ? 'DECEASED' : 'DELETED'}}</b>
               </v-chip>
             </template>
           </td>
-          <td>
+          <td :class="{'no-bottom-border' : isRemovedHomeOwner(row.item) && showDeathCertificate}">
             <base-address
               :schema="addressSchema"
               :value="row.item.address"
               :class="{'removed-owner': isRemovedHomeOwner(row.item)}"
             />
           </td>
-          <td>
+          <td :class="{'no-bottom-border' : isRemovedHomeOwner(row.item) && showDeathCertificate}">
             <div :class="{'removed-owner': isRemovedHomeOwner(row.item)}">
               {{ toDisplayPhone(row.item.phoneNumber) }}
               <span v-if="row.item.phoneExtension"> Ext {{ row.item.phoneExtension }} </span>
             </div>
           </td>
-          <td v-if="showEditActions" class="row-actions text-right">
-
+          <td v-if="showEditActions" class="row-actions text-right"
+            :class="{'no-bottom-border' : isRemovedHomeOwner(row.item) && showDeathCertificate}">
             <!-- New Owner Actions -->
             <div
               v-if="(!isMhrTransfer || isAddedHomeOwner(row.item)) && enableHomeOwnerChanges()"
@@ -241,6 +241,15 @@
             </div>
           </td>
         </tr>
+        <tr v-if="isRemovedHomeOwner(row.item) && showDeathCertificate" class="death-certificate-row">
+          <td :colspan="homeOwnersTableHeaders.length" class="py-0">
+            <v-expand-transition>
+              <DeathCertificate
+                :deceasedOwner="row.item"
+              />
+            </v-expand-transition>
+          </td>
+        </tr>
       </template>
 
       <template v-slot:no-data>
@@ -258,10 +267,11 @@ import { BaseAddress } from '@/composables/address'
 import { PartyAddressSchema } from '@/schemas'
 import { toDisplayPhone } from '@/utils'
 import { AddEditHomeOwner } from '@/components/mhrRegistration/HomeOwners'
+import { DeathCertificate } from '@/components/mhrTransfers'
 import TableGroupHeader from '@/components/mhrRegistration/HomeOwners/TableGroupHeader.vue'
 /* eslint-disable no-unused-vars */
 import { MhrRegistrationHomeOwnerIF } from '@/interfaces'
-import { ActionTypes, HomeTenancyTypes } from '@/enums'
+import { ActionTypes, ApiTransferTypes, HomeTenancyTypes } from '@/enums'
 /* eslint-enable no-unused-vars */
 import { useActions, useGetters } from 'vuex-composition-helpers'
 
@@ -280,7 +290,8 @@ export default defineComponent({
   components: {
     BaseAddress,
     AddEditHomeOwner,
-    TableGroupHeader
+    TableGroupHeader,
+    DeathCertificate
   },
   setup (props, context) {
     const addressSchema = PartyAddressSchema
@@ -311,6 +322,7 @@ export default defineComponent({
       enableTransferOwnerActions,
       enableTransferOwnerGroupActions,
       enableTransferOwnerMenuActions,
+      showDeathCertificate,
       disableForDeceasedOwners
     } = useTransferOwners(!props.isMhrTransfer)
 
@@ -437,7 +449,6 @@ export default defineComponent({
     // When a change is made to homeOwners, check if any actions have changed, if so set flag
     watch(() => props.homeOwners, (val) => {
       setUnsavedChanges(val.some(owner => !!owner.action || !owner.ownerId))
-
       context.emit('isValidTransferOwners',
         hasMinimumGroups() &&
         localState.isValidAllocation &&
@@ -483,6 +494,7 @@ export default defineComponent({
       enableTransferOwnerActions,
       enableTransferOwnerGroupActions,
       enableTransferOwnerMenuActions,
+      showDeathCertificate,
       disableForDeceasedOwners,
       ...toRefs(localState)
     }
@@ -497,6 +509,14 @@ export default defineComponent({
   .spacer-header {
     border-color: $gray1 !important;
     background-color: $gray1 !important;
+  }
+
+  .no-bottom-border {
+    border-bottom: none !important;
+  }
+
+  .death-certificate-row {
+    border-bottom: thin solid rgba(0, 0, 0, 0.12) !important;
   }
 
   tr.v-row-group__header,
