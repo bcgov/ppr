@@ -1,12 +1,12 @@
 import {
+  AccountInfoIF,
   MhrHomeOwnerGroupIF,
   MhrRegistrationDescriptionIF,
   MhrRegistrationHomeLocationIF,
   MhrTransferApiIF,
-  MhrTransferIF
+  MhrTransferIF, SubmittingPartyIF
 } from '@/interfaces'
 import { useActions, useGetters } from 'vuex-composition-helpers'
-import { readonly, ref } from '@vue/composition-api'
 import {
   ActionTypes,
   ApiHomeTenancyTypes,
@@ -18,9 +18,6 @@ import {
 import { fetchMhRegistration, getMhrTransferDraft } from '@/utils'
 import { cloneDeep } from 'lodash'
 import { useHomeOwners } from '@/composables'
-
-// Validation flags for Review Confirm screen
-const refNumValid = ref(true)
 
 export const useMhrInformation = () => {
   const {
@@ -57,7 +54,8 @@ export const useMhrInformation = () => {
     setMhrTransferDeclaredValue,
     setMhrTransferDate,
     setMhrTransferOwnLand,
-    setMhrTransferConsideration
+    setMhrTransferConsideration,
+    setMhrTransferSubmittingParty
   } = useActions<any>([
     'setMhrTransferHomeOwnerGroups',
     'setMhrTransferCurrentHomeOwnerGroups',
@@ -66,7 +64,8 @@ export const useMhrInformation = () => {
     'setMhrHomeDescription',
     'setMhrTransferDate',
     'setMhrTransferOwnLand',
-    'setMhrTransferConsideration'
+    'setMhrTransferConsideration',
+    'setMhrTransferSubmittingParty'
   ])
 
   const {
@@ -142,6 +141,19 @@ export const useMhrInformation = () => {
     }
   }
 
+  const parseSubmittingPartyInfo = (accountInfo: AccountInfoIF): void => {
+    const submittingParty = {
+      businessName: accountInfo.name,
+      address: accountInfo.mailingAddress,
+      emailAddress: accountInfo.accountAdmin.email,
+      email: accountInfo.accountAdmin.email,
+      phoneNumber: accountInfo.accountAdmin.phone,
+      phoneExtension: accountInfo.accountAdmin.phoneExtension
+    } as SubmittingPartyIF
+
+    setMhrTransferSubmittingParty(submittingParty)
+  }
+
   const parseMhrLocationInfo = async (locationData: MhrRegistrationHomeLocationIF): Promise<void> => {
     for (const [key, value] of Object.entries(locationData)) {
       setMhrLocation({ key: key, value: value })
@@ -154,10 +166,6 @@ export const useMhrInformation = () => {
       setMhrLocation({ key: 'locationType', value: HomeLocationTypes.OTHER_LAND })
       setMhrLocation({ key: 'otherType', value: locationData.locationType })
     }
-  }
-
-  const setRefNumValid = (isValid: boolean) => {
-    refNumValid.value = isValid
   }
 
   const getUiTransferType = (apiTransferType: ApiTransferTypes): UITransferTypes => {
@@ -232,12 +240,11 @@ export const useMhrInformation = () => {
   }
 
   return {
-    isRefNumValid: readonly(refNumValid),
-    setRefNumValid,
     getUiTransferType,
     initMhrTransfer,
     buildApiData,
     parseDraftTransferDetails,
-    parseMhrInformation
+    parseMhrInformation,
+    parseSubmittingPartyInfo
   }
 }

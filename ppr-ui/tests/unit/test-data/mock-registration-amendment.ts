@@ -7,8 +7,7 @@ import {
   GeneralCollateralIF,
   PartyIF,
   VehicleCollateralIF,
-  StateModelIF,
-  AmendmentStatementIF, MhrTransferValidationStateIF, MhrTransferIF
+  AmendmentStatementIF
 } from '@/interfaces'
 import {
   mockedAddress1,

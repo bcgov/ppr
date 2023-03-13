@@ -43,6 +43,7 @@ export const stateModel: StateModelIF = {
       debtors: []
     }
   },
+  // PPR Registration Submission State
   registration: {
     amendmentDescription: '',
     collateral: {
@@ -88,6 +89,7 @@ export const stateModel: StateModelIF = {
       debtors: []
     }
   },
+  // PPR and MHR Registration Table State
   registrationTable: {
     baseRegs: [],
     baseMhRegs: [],
@@ -116,6 +118,7 @@ export const stateModel: StateModelIF = {
     sortPage: 1,
     totalRowCount: 0
   },
+  // PPR and MHR Search Request State
   search: {
     searchDebtorName: null,
     searchHistory: null,
@@ -145,7 +148,7 @@ export const stateModel: StateModelIF = {
       selectConfirmationDialog: true
     }
   },
-  // MHR State
+  // Base MHR Information State
   mhrInformation: {
     clientReferenceId: '',
     createDateTime: '',
@@ -159,6 +162,7 @@ export const stateModel: StateModelIF = {
     documentId: '',
     lienRegistrationType: ''
   },
+  // Manufactured Home Registration State
   mhrRegistration: {
     documentId: '',
     clientReferenceId: '',
@@ -254,6 +258,7 @@ export const stateModel: StateModelIF = {
     ]
   },
   mhrSearchResultSelectAllLien: false,
+  // Manufactured Home Registration Validation Flags
   mhrValidationState: {
     yourHomeValid: {
       makeModelValid: false,
@@ -284,14 +289,7 @@ export const stateModel: StateModelIF = {
       validateApp: false
     }
   },
-  mhrTransferValidationState: {
-    homeOwnersValid: {
-      ownersValid: false
-    },
-    reviewConfirmValid: {
-      validateApp: false
-    }
-  },
+  // Transfer of Ownership State
   mhrTransfer: {
     mhrNumber: '',
     ownerGroups: [],
@@ -306,5 +304,16 @@ export const stateModel: StateModelIF = {
     transferDate: '',
     attentionReference: '',
     ownLand: false
+  },
+  // Manufactured Home Registration Information Validation Flags
+  mhrInfoValidationState: {
+    isValidTransferType: false,
+    isValidTransferOwners: false,
+    isTransferDetailsValid: false,
+    isSubmittingPartyValid: false,
+    isRefNumValid: false,
+    isCompletionConfirmed: false,
+    isAuthorizationValid: false,
+    isStaffPaymentValid: false
   }
 }

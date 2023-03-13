@@ -368,9 +368,9 @@ describe('Mhr Information', () => {
     expect(wrapper.find('#transfer-ref-num-section').exists()).toBeFalsy()
 
     // Set Wrapper Validations
-    wrapper.vm.isValidTransferType = true
-    wrapper.vm.isValidTransferOwners = true
-    wrapper.vm.isTransferDetailsFormValid = true
+    wrapper.vm.setValidation('isValidTransferType', true)
+    wrapper.vm.setValidation('isValidTransferOwners', true)
+    wrapper.vm.setValidation('isTransferDetailsValid', true)
 
     // go to Review screen
     await triggerUnsavedChange()
@@ -419,9 +419,9 @@ describe('Mhr Information', () => {
     expect(wrapper.findComponent(MhrInformation).exists()).toBe(true)
 
     // Set Wrapper Validations
-    wrapper.vm.isValidTransferType = true
-    wrapper.vm.isValidTransferOwners = true
-    wrapper.vm.isTransferDetailsFormValid = true
+    wrapper.vm.setValidation('isValidTransferType', true)
+    wrapper.vm.setValidation('isValidTransferOwners', true)
+    wrapper.vm.setValidation('isTransferDetailsValid', true)
 
     // Enter review mode
     await triggerUnsavedChange()
@@ -460,9 +460,9 @@ describe('Mhr Information', () => {
     wrapper.vm.$data.accountInfo = mockedAccountInfo
 
     // Set Wrapper Validations
-    wrapper.vm.isValidTransferType = true
-    wrapper.vm.isValidTransferOwners = true
-    wrapper.vm.isTransferDetailsFormValid = true
+    wrapper.vm.setValidation('isValidTransferType', true)
+    wrapper.vm.setValidation('isValidTransferOwners', true)
+    wrapper.vm.setValidation('isTransferDetailsValid', true)
 
     await triggerUnsavedChange()
     await enterTransferDetailsFields(wrapper.findComponent(TransferDetails))
@@ -497,9 +497,9 @@ describe('Mhr Information', () => {
     await Vue.nextTick()
 
     // Set Wrapper Validations
-    wrapper.vm.isValidTransferType = true
-    wrapper.vm.isValidTransferOwners = true
-    wrapper.vm.isTransferDetailsFormValid = true
+    wrapper.vm.setValidation('isValidTransferType', true)
+    wrapper.vm.setValidation('isValidTransferOwners', true)
+    wrapper.vm.setValidation('isTransferDetailsValid', true)
 
     await triggerUnsavedChange()
     await enterTransferDetailsFields(wrapper.findComponent(TransferDetails))
@@ -561,9 +561,9 @@ describe('Mhr Information', () => {
     expect(wrapper.findComponent(TransferDetailsReview).exists()).toBeFalsy()
 
     // Set Wrapper Validations
-    wrapper.vm.isValidTransferType = true
-    wrapper.vm.isValidTransferOwners = true
-    wrapper.vm.isTransferDetailsFormValid = true
+    wrapper.vm.setValidation('isValidTransferType', true)
+    wrapper.vm.setValidation('isValidTransferOwners', true)
+    wrapper.vm.setValidation('isTransferDetailsValid', true)
 
     // go to Review screen
     await triggerUnsavedChange()
@@ -601,9 +601,9 @@ describe('Mhr Information', () => {
     expect(wrapper.find('#yellow-message-bar').exists()).toBeFalsy()
 
     // Set Wrapper Validations
-    wrapper.vm.isValidTransferType = true
-    wrapper.vm.isValidTransferOwners = true
-    wrapper.vm.isTransferDetailsFormValid = true
+    wrapper.vm.setValidation('isValidTransferType', true)
+    wrapper.vm.setValidation('isValidTransferOwners', true)
+    wrapper.vm.setValidation('isTransferDetailsValid', true)
 
     // trigger review
     await triggerUnsavedChange()
@@ -632,9 +632,9 @@ describe('Mhr Information', () => {
     expect(wrapper.find('#transfer-confirm-section').exists()).toBeFalsy()
 
     // Set Wrapper Validations
-    wrapper.vm.isValidTransferType = true
-    wrapper.vm.isValidTransferOwners = true
-    wrapper.vm.isTransferDetailsFormValid = true
+    wrapper.vm.setValidation('isValidTransferType', true)
+    wrapper.vm.setValidation('isValidTransferOwners', true)
+    wrapper.vm.setValidation('isTransferDetailsValid', true)
 
     await triggerUnsavedChange()
     await enterTransferDetailsFields(wrapper.findComponent(TransferDetails))
@@ -675,9 +675,9 @@ describe('Mhr Information', () => {
     expect(wrapper.find('#owners-review').exists()).toBeFalsy()
 
     // Set Wrapper Validations
-    wrapper.vm.isValidTransferType = true
-    wrapper.vm.isValidTransferOwners = true
-    wrapper.vm.isTransferDetailsFormValid = true
+    wrapper.vm.setValidation('isValidTransferType', true)
+    wrapper.vm.setValidation('isValidTransferOwners', true)
+    wrapper.vm.setValidation('isTransferDetailsValid', true)
 
     await triggerUnsavedChange()
     await enterTransferDetailsFields(wrapper.findComponent(TransferDetails))
@@ -705,9 +705,9 @@ describe('Mhr Information', () => {
     expect(feeSummaryContainer.find('.err-msg').exists()).toBeFalsy()
 
     // Set Wrapper Validations
-    wrapper.vm.isValidTransferType = true
-    wrapper.vm.isValidTransferOwners = true
-    wrapper.vm.isTransferDetailsFormValid = true
+    wrapper.vm.setValidation('isValidTransferType', true)
+    wrapper.vm.setValidation('isValidTransferOwners', true)
+    wrapper.vm.setValidation('isTransferDetailsValid', true)
 
     await enterTransferDetailsFields(wrapper.findComponent(TransferDetails))
 

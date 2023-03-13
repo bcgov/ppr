@@ -1,10 +1,16 @@
 import {
+  mhrInfoValidationState,
   MhrRegistrationHomeOwnerGroupIF,
   MhrRegistrationHomeOwnerIF,
   StateIF,
   SubmittingPartyIF,
   TransferTypeSelectIF
 } from '@/interfaces'
+
+// Mhr Info Validation State
+export const getMhrInfoValidation = (state: StateIF): mhrInfoValidationState => {
+  return state.stateModel.mhrInfoValidationState
+}
 
 // Home Owners
 export const getMhrTransferHomeOwners = (state: StateIF): MhrRegistrationHomeOwnerIF[] => {
