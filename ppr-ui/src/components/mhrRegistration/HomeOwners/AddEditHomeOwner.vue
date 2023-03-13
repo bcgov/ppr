@@ -29,7 +29,7 @@
                 label="Owner"
                 active-class="selected-radio"
                 v-model="HomeOwnerPartyTypes.OWNER_IND"
-              />  <!-- TIE BOTH BUSINESS AND PERSON TO THE OWNER CHECKBOX -->
+              />
               <v-radio
                 id="executor-option"
                 class="executor-radio px-4"
