@@ -21,7 +21,6 @@ import { useHomeOwners } from '@/composables'
 
 export const useMhrInformation = () => {
   const {
-    getMhrTransferCurrentHomeOwners,
     getMhrInformation,
     getMhrTransferDeclaredValue,
     getMhrTransferConsideration,
@@ -30,9 +29,9 @@ export const useMhrInformation = () => {
     getMhrTransferSubmittingParty,
     getMhrTransferAttentionReference,
     getMhrTransferHomeOwnerGroups,
+    getMhrTransferCurrentHomeOwnerGroups,
     getMhrTransferType
   } = useGetters<any>([
-    'getMhrTransferCurrentHomeOwners',
     'getMhrInformation',
     'getMhrTransferHomeOwners',
     'getMhrTransferDeclaredValue',
@@ -42,6 +41,7 @@ export const useMhrInformation = () => {
     'getMhrTransferSubmittingParty',
     'getMhrTransferAttentionReference',
     'getMhrTransferHomeOwnerGroups',
+    'getMhrTransferCurrentHomeOwnerGroups',
     'getMhrTransferType'
   ])
 
@@ -206,10 +206,6 @@ export const useMhrInformation = () => {
     return isDraft ? ownerGroups : ownerGroups.filter(ownerGroup => ownerGroup.action !== ActionTypes.REMOVED)
   }
 
-  const parseRemovedOwnerGroups = () => {
-    return getMhrTransferCurrentHomeOwners.value
-  }
-
   const buildApiData = async (isDraft: boolean = false): Promise<MhrTransferApiIF> => {
     const data: MhrTransferApiIF = {
       mhrNumber: getMhrInformation.value.mhrNumber,
@@ -233,7 +229,7 @@ export const useMhrInformation = () => {
         })
       },
       addOwnerGroups: await parseOwnerGroups(isDraft),
-      deleteOwnerGroups: await parseRemovedOwnerGroups()
+      deleteOwnerGroups: getMhrTransferCurrentHomeOwnerGroups.value
     }
 
     return data

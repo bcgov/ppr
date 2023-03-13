@@ -9,6 +9,55 @@
         </label>
       </v-col>
       <v-col cols="9">
+        <!-- Owner Roles -->
+        <v-row no-gutters v-if="isTransferDueToDeath">
+          <v-col cols="12">
+            <label class="generic-label">
+              Role
+            </label>
+          </v-col>
+          <v-col class="pt-2 pb-9">
+            <v-radio-group
+              id="owner-role-options"
+              class="mt-0 pr-2" row
+              hide-details="true"
+              v-model="owner.partyType"
+            >
+              <v-radio
+                id="owner-option"
+                class="owner-radio pr-4"
+                label="Owner"
+                active-class="selected-radio"
+                v-model="HomeOwnerPartyTypes.OWNER_IND"
+              />  <!-- TIE BOTH BUSINESS AND PERSON TO THE OWNER CHECKBOX -->
+              <v-radio
+                id="executor-option"
+                class="executor-radio px-4"
+                label="Executor"
+                active-class="selected-radio"
+                :disabled="isTransferDueToDeath"
+                v-model="HomeOwnerPartyTypes.EXECUTOR"
+              />
+              <v-radio
+                id="trustee-option"
+                class="trustee-radio px-4"
+                label="Trustee"
+                active-class="selected-radio"
+                :disabled="isTransferDueToDeath"
+                v-model="HomeOwnerPartyTypes.TRUSTEE"
+              />
+              <v-radio
+                id="administrator-option"
+                class="administrator-radio pl-4"
+                label="Administrator"
+                active-class="selected-radio"
+                :disabled="isTransferDueToDeath"
+                v-model="HomeOwnerPartyTypes.ADMINISTRATOR"
+              />
+            </v-radio-group>
+          </v-col>
+        </v-row>
+
         <v-form
           id="addHomeOwnerForm"
           ref="addHomeOwnerForm"
@@ -18,6 +67,20 @@
             <label class="generic-label">
               Person's Name
             </label>
+            <v-tooltip
+              v-if="isTransferDueToDeath"
+              top
+              content-class="top-tooltip pa-5"
+              transition="fade-transition"
+              data-test-id="suffix-tooltip"
+            >
+              <template v-slot:activator="{ on }">
+                <v-icon class="mt-n1" color="primary" v-on="on">
+                  mdi-information-outline
+                </v-icon>
+              </template>
+              {{ disabledNameEditTooltip }}
+            </v-tooltip>
             <v-row>
               <v-col cols="4">
                 <v-text-field
@@ -25,6 +88,7 @@
                   v-model="owner.individualName.first"
                   filled
                   :rules="firsNameRules"
+                  :disabled="isTransferDueToDeath"
                   label="First Name"
                   data-test-id="first-name"
                 />
@@ -36,6 +100,7 @@
                   filled
                   label="Middle Name (Optional)"
                   :rules="maxLength(15)"
+                  :disabled="isTransferDueToDeath"
                   data-test-id="middle-name"
                 />
               </v-col>
@@ -45,6 +110,7 @@
                   v-model="owner.individualName.last"
                   filled
                   :rules="lastNameRules"
+                  :disabled="isTransferDueToDeath"
                   label="Last Name"
                   data-test-id="last-name"
                 />
@@ -64,7 +130,7 @@
                     top
                     content-class="top-tooltip pa-5"
                     transition="fade-transition"
-                    data-test-id="suffix-tooltip"
+                    data-test-id="organization-tooltip"
                     allow-overflow
                   >
                     <template v-slot:activator="{ on, attrs }">
@@ -155,9 +221,10 @@
                   ref="orgNameSearchField"
                   label="Find or enter the Full Legal Name of the Business or Organization"
                   v-model="searchValue"
-                  :rules="orgNameRules"
                   persistent-hint
+                  :rules="orgNameRules"
                   :clearable="showClear"
+                  :disabled="isTransferDueToDeath"
                   @click:clear="showClear = false"
                 >
                   <template v-slot:append>
@@ -185,7 +252,7 @@
           </div>
 
           <label class="generic-label">
-            Suffix
+            Additional Name Information
             <v-tooltip
               top
               content-class="top-tooltip pa-5"
@@ -197,10 +264,7 @@
                   mdi-information-outline
                 </v-icon>
               </template>
-              If necessary, type a suffix such as Junior or Senior, or a title
-              indicating a role, such as Executor of the will of the deceased.
-              This field can also be used to record further given names, if they
-              are provided.
+              {{ isTransferDueToDeath ? disabledNameEditTooltip : suffixTooltip }}
             </v-tooltip>
           </label>
           <v-row>
@@ -209,11 +273,12 @@
                 id="suffix"
                 v-model="owner.suffix"
                 filled
-                :rules="maxLength(70)"
-                label="Suffix (Optional)"
+                label="Additional Name Information (Optional)"
                 data-test-id="suffix"
-                hint="Example: Executor, Jr., Sr."
+                hint="Example: Additional legal names, Jr., Sr., Executor of the will of the deceased, etc. (Optional)"
                 persistent-hint
+                :rules="maxLength(70)"
+                :disabled="isTransferDueToDeath"
               />
             </v-col>
           </v-row>
@@ -258,16 +323,23 @@
             class="mt-2"
             hideAddressHint
           />
-          <hr class="mt-3 mb-10" />
-          <HomeOwnerGroups
-            :groupId="isDefinedGroup ? ownersGroupId : null"
-            :isAddingHomeOwner="isAddingHomeOwner"
-            @setOwnerGroupId="ownerGroupId = $event"
-            :fractionalData="groupFractionalData"
-            :isMhrTransfer="isMhrTransfer"
-          />
+
+          <!-- Group Add / Edit -->
+          <template v-if="!isTransferDueToDeath">
+            <hr class="mt-3 mb-10" />
+            <HomeOwnerGroups
+              :groupId="isDefinedGroup ? ownersGroupId : null"
+              :isAddingHomeOwner="isAddingHomeOwner"
+              @setOwnerGroupId="ownerGroupId = $event"
+              :fractionalData="groupFractionalData"
+              :isMhrTransfer="isMhrTransfer"
+            />
+          </template>
+          <template v-else>
+            <p class="fs-16 mt-3"><strong>Note:</strong> Group Details cannot be changed in this type of transfer.</p>
+          </template>
         </v-form>
-        <v-row class="py-6">
+        <v-row no-gutters class="pt-5">
           <v-col>
             <div class="form__row form__btns">
               <v-btn
@@ -278,7 +350,7 @@
                 :ripple="false"
                 @click="remove()"
               >
-                Remove
+                <span>{{ isCurrentOwner(owner) ? 'Delete' : 'Remove' }}</span>
               </v-btn>
               <v-btn
                 color="primary"
@@ -336,6 +408,8 @@ import { SimpleHelpToggle } from '@/components/common'
 import HomeOwnerGroups from './HomeOwnerGroups.vue'
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import { find } from 'lodash'
+import { useTransferOwners } from '@/composables'
+import { ActionTypes, HomeOwnerPartyTypes } from '@/enums'
 
 interface FractionalOwnershipWithGroupIdIF extends MhrRegistrationFractionalOwnershipIF {
   groupId: number
@@ -383,7 +457,11 @@ export default defineComponent({
       'getMhrTransferHomeOwnerGroups',
       'getMhrRegistrationValidationModel'
     ])
+    const {
+      setUnsavedChanges
+    } = useActions<any>(['setUnsavedChanges'])
 
+    // Composables
     const {
       MhrSectVal,
       getStepValidation,
@@ -392,10 +470,14 @@ export default defineComponent({
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
     const {
-      setUnsavedChanges
-    } = useActions<any>(['setUnsavedChanges'])
-
-    const { required, customRules, maxLength, minLength, isPhone, isNumber, invalidSpaces } = useInputRules()
+      required,
+      customRules,
+      maxLength,
+      minLength,
+      isPhone,
+      isNumber,
+      invalidSpaces
+    } = useInputRules()
 
     const {
       getGroupForOwner,
@@ -407,6 +489,12 @@ export default defineComponent({
       getTransferOrRegistrationHomeOwners
     } = useHomeOwners(props.isMhrTransfer)
 
+    const {
+      isCurrentOwner,
+      isTransferDueToDeath,
+      hasCurrentOwnerChanges
+    } = useTransferOwners()
+
     const addressSchema = PartyAddressSchema
     const addHomeOwnerForm = ref(null)
 
@@ -414,6 +502,7 @@ export default defineComponent({
       props.isMhrTransfer ? getMhrTransferHomeOwnerGroups.value : getMhrRegistrationHomeOwnerGroups.value
 
     const defaultHomeOwner: MhrRegistrationHomeOwnerIF = {
+      ...props.editHomeOwner,
       ownerId: props.editHomeOwner?.ownerId || getTransferOrRegistrationHomeOwners().length + 1 || (DEFAULT_OWNER_ID++),
       phoneNumber: props.editHomeOwner?.phoneNumber || '',
       phoneExtension: props.editHomeOwner?.phoneExtension || '',
@@ -471,11 +560,10 @@ export default defineComponent({
 
     const localState = reactive({
       getSidebarTitle: computed((): string => {
-        if (props.isHomeOwnerPerson) {
-          return props.editHomeOwner == null ? 'Add a Person' : 'Edit Person'
-        } else {
-          return props.editHomeOwner == null ? 'Add a Business or Organization' : 'Edit Business'
-        }
+        const addOrEdit = props.editHomeOwner === null ? 'Add a' : 'Edit'
+        const entity = props.isHomeOwnerPerson ? 'Person' : 'Business or Organization'
+
+        return isCurrentOwner(localState.owner) ? `Change ${entity} Details` : `${addOrEdit} ${entity}`
       }),
       group: getGroupForOwner(props.editHomeOwner?.ownerId) as MhrRegistrationHomeOwnerGroupIF,
       ownersGroupId: computed(() => (showGroups.value ? localState.group?.groupId : null)),
@@ -515,7 +603,13 @@ export default defineComponent({
       isDefinedGroup: computed((): boolean => {
         return !!localState.groupFractionalData?.interestNumerator &&
           !!localState.groupFractionalData?.interestDenominator
-      })
+      }),
+      suffixTooltip: `If necessary, type a suffix such as Junior or Senior, or a title indicating a role, such as
+        Executor of the will of the deceased. This field can also be used to record further given names, if they
+        are provided.`,
+      disabledNameEditTooltip: `Owner name’s cannot be changed here. Name change requests should be submitted
+        separately, with the appropriate supporting documents, prior to completing this transfer. See Help with
+        Ownership Transfer or Change for more information. `
     })
 
     const done = (): void => {
@@ -524,8 +618,14 @@ export default defineComponent({
       if (localState.isHomeOwnerFormValid && localState.isAddressFormValid) {
         setValidation(MhrSectVal.ADD_EDIT_OWNERS_VALID, MhrCompVal.OWNERS_VALID, true)
         if (props.editHomeOwner) {
+          hasCurrentOwnerChanges(localState.owner)
+          const updatedOwner = isCurrentOwner(localState.owner) ? {
+            ...localState.owner, action: hasCurrentOwnerChanges(localState.owner) ? ActionTypes.CHANGED : null
+          }
+            : localState.owner
+
           editHomeOwner(
-            localState.owner as MhrRegistrationHomeOwnerIF,
+            updatedOwner as MhrRegistrationHomeOwnerIF,
             localState.ownerGroupId || 1
           )
         } else {
@@ -618,6 +718,9 @@ export default defineComponent({
       setCloseAutoComplete,
       getStepValidation,
       MhrSectVal,
+      isCurrentOwner,
+      isTransferDueToDeath,
+      HomeOwnerPartyTypes,
       ...toRefs(localState)
     }
   }
@@ -658,6 +761,45 @@ u {
 #org-name ::v-deep .hide-results {
   .v-autocomplete__content.v-menu__content {
     display: none !important;
+  }
+}
+
+.selected-radio {
+  background-color: white;
+  ::v-deep .theme--light.v-label:not(.v-label--is-disabled), .theme--light.v-messages {
+    color: $gray9 !important;
+  }
+}
+
+::v-deep {
+  .theme--light.v-text-field--filled.v-input--is-disabled > .v-input__control > .v-input__slot {
+    border-bottom: 1px dotted;
+    cursor: default!important;
+  }
+  .theme--light.v-input--is-disabled input {
+    pointer-events: none!important;
+    user-select: none!important;
+    -webkit-user-select: none; /* webkit (safari, chrome) browsers */
+    -moz-user-select: none; /* mozilla browsers */
+    -ms-user-select: none; /* IE10+ */
+  }
+  .theme--light.v-label--is-disabled {
+    color: $gray7!important;
+  }
+  .v-text-field.v-input--is-disabled .v-input__control > .v-text-field__details > .v-messages {
+    color: $gray7!important;
+  }
+  .v-input--selection-controls .v-input__slot, .v-input--selection-controls .v-radio {
+    cursor: unset!important;
+  }
+  .theme--light.v-radio--is-disabled {
+    pointer-events: none!important;
+    user-select: none!important;
+
+    label {
+      color: $gray7;
+      opacity: .4;
+    }
   }
 }
 </style>

@@ -29,13 +29,15 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
     getMhrRegistrationHomeOwnerGroups,
     getMhrRegistrationValidationModel,
     getMhrTransferHomeOwnerGroups,
-    getMhrTransferHomeOwners
+    getMhrTransferHomeOwners,
+    getMhrTransferCurrentHomeOwnerGroups
   } = useGetters<any>([
     'getMhrRegistrationHomeOwners',
     'getMhrRegistrationHomeOwnerGroups',
     'getMhrRegistrationValidationModel',
     'getMhrTransferHomeOwnerGroups',
-    'getMhrTransferHomeOwners'
+    'getMhrTransferHomeOwners',
+    'getMhrTransferCurrentHomeOwnerGroups'
   ])
 
   const {

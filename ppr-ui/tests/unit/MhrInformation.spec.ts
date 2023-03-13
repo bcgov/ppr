@@ -27,6 +27,7 @@ import { nextTick } from '@vue/composition-api'
 import { TransferDetails, TransferDetailsReview, TransferType } from '@/components/mhrTransfers'
 
 import { toDisplayPhone } from '@/utils'
+import {getMhrTransferCurrentHomeOwnerGroups} from "@/store/getters";
 
 Vue.use(Vuetify)
 
@@ -148,7 +149,7 @@ describe('Mhr Information', () => {
     wrapper.vm.$data.dataLoaded = true
     await Vue.nextTick()
 
-    expect(wrapper.vm.$data.getMhrTransferCurrentHomeOwners.length).toBe(1)
+    expect(wrapper.vm.$data.getMhrTransferCurrentHomeOwnerGroups.length).toBe(1)
     expect(wrapper.vm.$data.getMhrTransferHomeOwners.length).toBe(1)
 
     expect(wrapper.findComponent(MhrInformation).exists()).toBe(true)
@@ -272,7 +273,7 @@ describe('Mhr Information', () => {
     wrapper.findComponent(HomeOwners).vm.$data.setShowGroups(true)
     await Vue.nextTick()
 
-    expect(wrapper.findComponent(HomeOwners).vm.$data.getMhrTransferCurrentHomeOwners.length).toBe(2)
+    expect(wrapper.findComponent(HomeOwners).vm.$data.getMhrTransferCurrentHomeOwnerGroups.length).toBe(2)
     expect(store.getters.getMhrTransferHomeOwnerGroups.length).toBe(2)
 
     const homeOwnersTable = wrapper.findComponent(HomeOwners).findComponent(HomeOwnersTable)
@@ -318,7 +319,7 @@ describe('Mhr Information', () => {
     wrapper.vm.$data.dataLoaded = true
     await Vue.nextTick()
 
-    expect(wrapper.vm.$data.getMhrTransferCurrentHomeOwners.length).toBe(1)
+    expect(wrapper.vm.$data.getMhrTransferCurrentHomeOwnerGroups.length).toBe(1)
     expect(wrapper.vm.$data.getMhrTransferHomeOwners.length).toBe(1)
 
     expect(wrapper.findComponent(MhrInformation).findComponent(TransferDetails).exists()).toBeFalsy()
@@ -414,7 +415,7 @@ describe('Mhr Information', () => {
     wrapper.vm.$data.showMhrFeeSummary = true
     await Vue.nextTick()
 
-    expect(wrapper.vm.$data.getMhrTransferCurrentHomeOwners.length).toBe(1)
+    expect(wrapper.vm.$data.getMhrTransferCurrentHomeOwnerGroups.length).toBe(1)
     expect(wrapper.vm.$data.getMhrTransferHomeOwners.length).toBe(1)
     expect(wrapper.findComponent(MhrInformation).exists()).toBe(true)
 
