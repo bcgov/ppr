@@ -135,7 +135,7 @@
             </div>
           </td>
           <td v-if="showEditActions" class="row-actions text-right"
-          :class="{'no-bottom-border' : isRemovedHomeOwner(row.item) && showDeathCertificate}">
+            :class="{'no-bottom-border' : isRemovedHomeOwner(row.item) && showDeathCertificate}">
             <!-- New Owner Actions -->
             <div
               v-if="(!isMhrTransfer || isAddedHomeOwner(row.item)) && enableHomeOwnerChanges()"
@@ -328,8 +328,8 @@ export default defineComponent({
 
     const { setUnsavedChanges } = useActions<any>(['setUnsavedChanges'])
 
-    const { getMhrRegistrationValidationModel, hasUnsavedChanges, getMhrTransferType } =
-      useGetters<any>(['getMhrRegistrationValidationModel', 'hasUnsavedChanges', 'getMhrTransferType'])
+    const { getMhrRegistrationValidationModel, hasUnsavedChanges } =
+      useGetters<any>(['getMhrRegistrationValidationModel', 'hasUnsavedChanges'])
 
     const { getValidation, MhrSectVal, MhrCompVal } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
@@ -353,7 +353,6 @@ export default defineComponent({
         getValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_STEPS)),
       showEditActions: computed((): boolean => !props.isReadonlyTable),
       homeOwnersTableHeaders: props.isReadonlyTable ? homeOwnersTableHeadersReview : homeOwnersTableHeaders,
-      transferType: computed(() => { return getMhrTransferType.value?.transferType }),
       addedOwnerCount: computed((): number => {
         return getTransferOrRegistrationHomeOwners().filter(owner => owner.action === ActionTypes.ADDED).length
       }),

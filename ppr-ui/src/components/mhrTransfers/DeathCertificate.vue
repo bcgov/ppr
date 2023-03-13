@@ -1,6 +1,10 @@
 <template>
-  <div id="death-certificate" class="death-certificate">
-    <v-card flat class="pl-8 rounded" :class="{ 'border-error-left': showFormError }">
+    <v-card
+      id="death-certificate"
+      flat
+      class="pl-8 rounded death-certificate"
+      :class="{ 'border-error-left': showFormError }"
+      >
       <v-form ref="deathCertificateForm" v-model="isFormValid">
         <v-row>
           <v-col cols="3">
@@ -67,7 +71,6 @@
         </v-row>
       </v-form>
     </v-card>
-  </div>
 </template>
 
 <script lang="ts">
