@@ -311,11 +311,15 @@ export default defineComponent({
           window.document.body.appendChild(a)
           a.setAttribute('style', 'display: none')
           a.href = url
-          // Format: [Date (in YYYY-MM-DD format)] BCPPR Search Result - [Search Criteria] Search ID
+          // Format (PPR): [Date (in YYYY-MM-DD format)] BCPPR Search Result - [Search Criteria] Search ID
           // Example: 2022-01-03 BCPPR BO Search Result - Telus Communications Inc. Search ID
+
+          // Format (MHR): [Date (in YYYY-MM-DD format)] BCMHR Search Result - [Search Criteria] Search ID
+          // Example: 2022-03-13 BCMHR Search Result - 001919 - 13492
+
           const today = new Date()
           const searchValue = displaySearchValue(item.searchQuery).replace(/ /g, '_').split('.').join('')
-          a.download = today.toISOString().slice(0, 10) + '_BCPPR_Search_Result_' +
+          a.download = today.toISOString().slice(0, 10) + `_BC${isPprSearch(item) ? 'PPR' : 'MHR'}_Search_Result_` +
             searchValue + '_' + item.searchId
           a.click()
           window.URL.revokeObjectURL(url)

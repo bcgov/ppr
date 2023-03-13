@@ -433,7 +433,8 @@ import {
   APIStatusTypes,
   DraftTypes,
   TableActions,
-  UIRegistrationClassTypes
+  UIRegistrationClassTypes,
+  UITransferTypes
 } from '@/enums'
 import { useRegistration } from '@/composables/useRegistration'
 import moment from 'moment'
@@ -560,17 +561,23 @@ export default defineComponent({
           window.document.body.appendChild(a)
           a.setAttribute('style', 'display: none')
           a.href = url
-          // Format: [Date (in YYYY-MM-DD format)] BCPPR [Two Letter Registration Type Code
+          // Format (PPR): [Date (in YYYY-MM-DD format)] BCPPR [Two Letter Registration Type Code
           // (only for Standard Registrations)] [Verification Statement Type] - [Registration Number]
           // Example: 2022-01-03 BCPPR SA Registration Verification - 100559B
+
+          // Format (MHR): [Date (in YYYY-MM-DD format)] BCMHR [Registration || Transfer] - [Registration Number]
+          // Example: 2023-03-13 BCMHR Registration - 150378
+
           const today = new Date()
+          let regTypeString = props.isPpr ? '_BCPPR_' : '_BCMHR_Registration_'
+          regTypeString = isMhrTransfer(item) ? '_BCMHR_Transfer_' : regTypeString
           const regClass = getRegistrationClass(item.registrationClass) || ''
           if (regClass === 'Registration Verification') {
-            a.download = today.toISOString().slice(0, 10) + '_BCPPR_' +
+            a.download = today.toISOString().slice(0, 10) + regTypeString +
               item.registrationType + '_' + regClass.replace(/ /g, '_') + '_' + item.registrationNumber
           } else {
-            a.download = today.toISOString().slice(0, 10) + '_BCPPR_' +
-              regClass.replace(/ /g, '_') + '_' + item.registrationNumber
+            a.download = today.toISOString().slice(0, 10) + regTypeString +
+              regClass.replace(/ /g, '_') + (item.registrationNumber || item.baseRegistrationNumber)
           }
           a.click()
           window.URL.revokeObjectURL(url)
@@ -607,7 +614,11 @@ export default defineComponent({
 
     const isMhrTransfer = (item: any): boolean => {
       return item.statusType === APIStatusTypes.MHR_ACTIVE &&
-      item.registrationDescription === APIMhrDescriptionTypes.SALE_OR_GIFT
+      (item.registrationDescription === UITransferTypes.SALE_OR_GIFT.toUpperCase() ||
+       item.registrationDescription === UITransferTypes.SURVIVING_JOINT_TENANT.toUpperCase() ||
+       item.registrationDescription === UITransferTypes.TO_ADMIN_PROBATE_NO_WILL.toUpperCase() ||
+       item.registrationDescription === UITransferTypes.TO_EXECUTOR_PROBATE_WILL.toUpperCase() ||
+       item.registrationDescription === UITransferTypes.TO_EXECUTOR_UNDER_25K_WILL.toUpperCase())
     }
 
     const removeMhrDraft = (item: MhRegistrationSummaryIF): void => {
