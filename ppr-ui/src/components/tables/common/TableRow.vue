@@ -569,14 +569,13 @@ export default defineComponent({
           // Example: 2023-03-13 BCMHR Registration - 150378
 
           const today = new Date()
-          let regTypeString = props.isPpr ? '_BCPPR_' : '_BCMHR_Registration_'
-          regTypeString = isMhrTransfer(item) ? '_BCMHR_Transfer_' : regTypeString
+          const regType = props.isPpr ? '_BCPPR_' : isMhrTransfer(item) ? '_BCMHR_Transfer_' : '_BCMHR_Registration_'
           const regClass = getRegistrationClass(item.registrationClass) || ''
           if (regClass === 'Registration Verification') {
-            a.download = today.toISOString().slice(0, 10) + regTypeString +
+            a.download = today.toISOString().slice(0, 10) + regType +
               item.registrationType + '_' + regClass.replace(/ /g, '_') + '_' + item.registrationNumber
           } else {
-            a.download = today.toISOString().slice(0, 10) + regTypeString +
+            a.download = today.toISOString().slice(0, 10) + regType +
               regClass.replace(/ /g, '_') + (item.registrationNumber || item.baseRegistrationNumber)
           }
           a.click()
