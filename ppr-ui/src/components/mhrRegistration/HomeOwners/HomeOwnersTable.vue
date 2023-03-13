@@ -241,7 +241,10 @@
             </div>
           </td>
         </tr>
-        <tr v-if="isRemovedHomeOwner(row.item) && showDeathCertificate" class="death-certificate-row">
+        <tr
+          v-if="isRemovedHomeOwner(row.item) && showDeathCertificate && !isReadonlyTable"
+          class="death-certificate-row"
+        >
           <td :colspan="homeOwnersTableHeaders.length" class="py-0">
             <v-expand-transition>
               <DeathCertificate
