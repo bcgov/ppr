@@ -93,7 +93,7 @@
                     isMhrTransfer
                     isReadonlyTable
                     :homeOwners="reviewOwners"
-                    :currentHomeOwners="getMhrTransferCurrentHomeOwners"
+                    :currentHomeOwners="getMhrTransferCurrentHomeOwnerGroups"
                   />
                 </section>
 
@@ -381,7 +381,7 @@ export default defineComponent({
     const {
       getMhrTransferHomeOwners,
       getMhrInformation,
-      getMhrTransferCurrentHomeOwners,
+      getMhrTransferCurrentHomeOwnerGroups,
       getCertifyInformation,
       hasUnsavedChanges,
       hasLien,
@@ -394,7 +394,7 @@ export default defineComponent({
     } = useGetters<any>([
       'getMhrTransferHomeOwners',
       'getMhrInformation',
-      'getMhrTransferCurrentHomeOwners',
+      'getMhrTransferCurrentHomeOwnerGroups',
       'getCertifyInformation',
       'hasUnsavedChanges',
       'hasLien',
@@ -812,7 +812,7 @@ export default defineComponent({
       onSave,
       goToDash,
       getMhrTransferHomeOwners,
-      getMhrTransferCurrentHomeOwners,
+      getMhrTransferCurrentHomeOwnerGroups,
       getCertifyInformation,
       maxLength,
       transferDetailsComponent,

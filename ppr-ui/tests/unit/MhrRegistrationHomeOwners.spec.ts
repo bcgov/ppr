@@ -179,6 +179,7 @@ describe('Home Owners', () => {
     expect(ownersTable.text()).not.toContain('Group 1')
 
     await ownersTable.find(getTestId('table-edit-btn')).trigger('click')
+    await Vue.nextTick()
 
     const addOwnerSection = wrapper.findComponent(HomeOwnersTable).findComponent(AddEditHomeOwner)
 

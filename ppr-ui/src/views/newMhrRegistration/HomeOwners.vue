@@ -262,7 +262,6 @@ import { useHomeOwners, useMhrValidations, useTransferOwners } from '@/composabl
 /* eslint-disable no-unused-vars */
 import { MhrRegistrationTotalOwnershipAllocationIF } from '@/interfaces'
 import { ActionTypes } from '@/enums'
-import { hasUnsavedChanges } from '@/store/getters'
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
@@ -291,12 +290,12 @@ export default defineComponent({
   setup (props, context) {
     const {
       getMhrRegistrationHomeOwners,
-      getMhrTransferCurrentHomeOwners,
+      getMhrTransferCurrentHomeOwnerGroups,
       getMhrRegistrationValidationModel,
       hasUnsavedChanges
     } = useGetters<any>([
       'getMhrRegistrationHomeOwners',
-      'getMhrTransferCurrentHomeOwners',
+      'getMhrTransferCurrentHomeOwnerGroups',
       'getMhrRegistrationValidationModel',
       'hasUnsavedChanges'
     ])
@@ -465,7 +464,7 @@ export default defineComponent({
 
     return {
       getMhrRegistrationHomeOwners,
-      getMhrTransferCurrentHomeOwners,
+      getMhrTransferCurrentHomeOwnerGroups,
       isGlobalEditingMode,
       getHomeTenancyType,
       showGroups,

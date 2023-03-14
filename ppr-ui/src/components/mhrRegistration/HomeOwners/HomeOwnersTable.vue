@@ -64,7 +64,7 @@
                 :isMhrTransfer="isMhrTransfer"
                 :showTableError="validateTransfer && (isAddingMode || isEditingMode)"
                 @cancel="currentlyEditingHomeOwnerId = -1"
-                @remove="remove(row.item)"
+                @remove="isCurrentOwner(row.item) ? markForRemoval(row.item) : remove(row.item)"
               />
             </v-expand-transition>
           </td>
@@ -72,7 +72,7 @@
 
         <tr
           v-else-if="row.item.ownerId"
-          :key="row.item.ownerId"
+          :key="`owner-row-key-${homeOwners.indexOf(row.item)}`"
           class="owner-info"
           :data-test-id="`owner-info-${row.item.ownerId}`"
         >
@@ -108,6 +108,16 @@
                 data-test-id="owner-added-badge"
               >
                 <b>ADDED</b>
+              </v-chip>
+              <v-chip
+                v-if="isMhrTransfer && isChangedOwner(row.item)"
+                class="badge-changed ml-8 mt-2"
+                color="primary"
+                label x-small
+                text-color="white"
+                data-test-id="owner-changed-badge"
+              >
+                <b>CHANGED</b>
               </v-chip>
               <v-chip
                 v-if="isMhrTransfer && isRemovedHomeOwner(row.item)"
@@ -180,12 +190,12 @@
             <!-- Existing Owner Actions -->
             <template v-else-if="enableTransferOwnerActions(row.item)">
               <v-btn
-                v-if="!isRemovedHomeOwner(row.item)"
+                v-if="!isRemovedHomeOwner(row.item) && !isChangedOwner(row.item)"
                 text color="primary" class="mr-n4"
                 :ripple="false"
-                :disabled="isAddingMode || isEditingMode || isGlobalEditingMode || disableForDeceasedOwners(row.item)"
+                :disabled="isAddingMode || isEditingMode || isGlobalEditingMode || isDisabledForSJTChanges(row.item)"
                 @click="markForRemoval(row.item)"
-                data-test-id="table-edit-btn"
+                data-test-id="table-delete-btn"
               >
                 <v-icon small>mdi-delete</v-icon>
                 <span>Delete</span>
@@ -193,27 +203,30 @@
               </v-btn>
 
               <v-btn
-                v-if="isRemovedHomeOwner(row.item)"
+                v-if="isRemovedHomeOwner(row.item) || isChangedOwner(row.item)"
                 text color="primary" class="mr-n4"
                 :ripple="false"
-                :disabled="isAddingMode || isEditingMode || isGlobalEditingMode || disableForDeceasedOwners(row.item)"
-                @click="undoRemoval(row.item)"
-                data-test-id="table-edit-btn"
+                :disabled="isAddingMode || isEditingMode || isGlobalEditingMode || isDisabledForSJTChanges(row.item)"
+                @click="undo(row.item)"
+                data-test-id="table-undo-btn"
               >
                 <v-icon small>mdi-undo</v-icon>
                 <span>Undo</span>
-                <v-divider v-if="enableTransferOwnerMenuActions(row.item)" class="ma-0 pl-3" vertical />
+                <v-divider
+                  v-if="enableTransferOwnerMenuActions(row.item) && !isRemovedHomeOwner(row.item)"
+                  class="ma-0 pl-3" vertical
+                />
               </v-btn>
 
               <!-- Menu actions drop down menu -->
-              <template v-if="enableTransferOwnerMenuActions(row.item)">
+              <template v-if="enableTransferOwnerMenuActions(row.item) && !isRemovedHomeOwner(row.item)">
                 <v-menu offset-y left nudge-bottom="0">
                   <template v-slot:activator="{ on }">
                     <v-btn
                       text v-on="on"
                       color="primary"
                       class="px-0 mr-n3"
-                      :disabled="isAddingMode || isGlobalEditingMode || disableForDeceasedOwners(row.item)"
+                      :disabled="isAddingMode || isGlobalEditingMode || isDisabledForSJTChanges(row.item)"
                     >
                       <v-icon>mdi-menu-down</v-icon>
                     </v-btn>
@@ -221,10 +234,19 @@
 
                   <!-- More actions drop down list -->
                   <v-list class="actions-dropdown actions__more-actions">
+                    <!-- Menu Edit Option -->
                     <v-list-item class="my-n2">
                       <v-list-item-subtitle class="pa-0" @click="openForEditing(homeOwners.indexOf(row.item))">
                         <v-icon small class="mb-1">mdi-pencil</v-icon>
                         <span class="ml-1 remove-btn-text">Change Details</span>
+                      </v-list-item-subtitle>
+                    </v-list-item>
+
+                    <!-- Menu Delete Option -->
+                    <v-list-item class="my-n2">
+                      <v-list-item-subtitle class="pa-0" @click="markForRemoval(row.item)">
+                        <v-icon small class="mb-1">mdi-delete</v-icon>
+                        <span class="ml-1 remove-btn-text">Delete</span>
                       </v-list-item-subtitle>
                     </v-list-item>
                   </v-list>
@@ -326,7 +348,9 @@ export default defineComponent({
       enableTransferOwnerGroupActions,
       enableTransferOwnerMenuActions,
       showDeathCertificate,
-      disableForDeceasedOwners
+      isDisabledForSJTChanges,
+      isCurrentOwner,
+      getCurrentOwnerStateById
     } = useTransferOwners(!props.isMhrTransfer)
 
     const { setUnsavedChanges } = useActions<any>(['setUnsavedChanges'])
@@ -381,15 +405,16 @@ export default defineComponent({
     }
 
     const markForRemoval = (item: MhrRegistrationHomeOwnerIF): void => {
+      localState.currentlyEditingHomeOwnerId = -1
       editHomeOwner(
         { ...item, action: ActionTypes.REMOVED },
         item.groupId
       )
     }
 
-    const undoRemoval = async (item): Promise<void> => {
+    const undo = async (item: MhrRegistrationHomeOwnerIF): Promise<void> => {
       await editHomeOwner(
-        { ...item, action: null },
+        { ...getCurrentOwnerStateById(item.ownerId), action: null },
         item.groupId
       )
       await undoGroupRemoval(item.groupId)
@@ -417,6 +442,10 @@ export default defineComponent({
 
     const isAddedHomeOwnerGroup = (groupId: number): boolean => {
       return getGroupById(groupId)?.action === ActionTypes.ADDED
+    }
+
+    const isChangedOwner = (item: MhrRegistrationHomeOwnerIF): boolean => {
+      return item.action === ActionTypes.CHANGED
     }
 
     const isRemovedHomeOwner = (item: MhrRegistrationHomeOwnerIF): boolean => {
@@ -462,9 +491,7 @@ export default defineComponent({
     watch(
       () => enableTransferOwnerGroupActions(),
       (val: boolean) => {
-        if (!val) {
-          localState.currentlyEditingHomeOwnerId = -1
-        }
+        localState.currentlyEditingHomeOwnerId = -1
       }
     )
 
@@ -482,9 +509,10 @@ export default defineComponent({
       isGlobalEditingMode,
       hasMinimumGroups,
       isAddedHomeOwner,
+      isChangedOwner,
       isRemovedHomeOwner,
       markForRemoval,
-      undoRemoval,
+      undo,
       hasRemovedAllHomeOwners,
       hasRemovedAllHomeOwnerGroups,
       isAddedHomeOwnerGroup,
@@ -498,7 +526,8 @@ export default defineComponent({
       enableTransferOwnerGroupActions,
       enableTransferOwnerMenuActions,
       showDeathCertificate,
-      disableForDeceasedOwners,
+      isDisabledForSJTChanges,
+      isCurrentOwner,
       ...toRefs(localState)
     }
   }
