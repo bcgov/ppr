@@ -149,9 +149,9 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
   /** Return true if the specified owner has been modified from current state **/
   const hasCurrentOwnerChanges = (owner: MhrRegistrationHomeOwnerIF): boolean => {
     const currentOwner = getCurrentOwnerStateById(owner.ownerId)
-    const isEqualAddress = isEqual(normalizeObject(currentOwner.address), normalizeObject(owner.address))
-    const isEqualPhone = normalizeObject(currentOwner).phoneNumber === normalizeObject(owner).phoneNumber &&
-      normalizeObject(currentOwner).phoneExtension === normalizeObject(owner).phoneExtension
+    const isEqualAddress = isEqual(normalizeObject(currentOwner?.address), normalizeObject(owner.address))
+    const isEqualPhone = normalizeObject(currentOwner)?.phoneNumber === normalizeObject(owner).phoneNumber &&
+      normalizeObject(currentOwner)?.phoneExtension === normalizeObject(owner).phoneExtension
 
     return currentOwner && (!isEqualAddress || !isEqualPhone)
   }
