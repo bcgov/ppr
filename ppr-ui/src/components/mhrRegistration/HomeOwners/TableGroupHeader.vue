@@ -136,6 +136,7 @@
           class="pr-0"
           :ripple="false"
           @click="undoGroupRemoval(groupId, true)"
+          :disabled="isGlobalEditingMode"
           data-test-id="group-header-undo-btn"
         >
           <v-icon small>mdi-undo</v-icon>
