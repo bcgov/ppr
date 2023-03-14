@@ -70,3 +70,11 @@ export const mhrTableRemoveDialog: DialogOptionsIF = {
     'table? If you remove this registration from your table, you can add it back later ' +
     'by retrieving the registration using the MHR Number.'
 }
+
+export const mhrDeceasedOwnerChanges: DialogOptionsIF = {
+  acceptText: 'Undo Changes and Delete Owner',
+  cancelText: 'Cancel',
+  title: 'Deceased owner\'s information cannot be changed',
+  text: `The phone number and mailing address of a deceased owner cannot be changed prior to deletion.
+    Deleting this owner will undo any changes you have made to their phone number or mailing address. `
+}

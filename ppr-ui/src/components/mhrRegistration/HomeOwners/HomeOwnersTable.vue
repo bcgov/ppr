@@ -1,5 +1,11 @@
 <template>
   <v-card id="home-owner-table-card" flat rounded :class="{ 'border-error-left': showTableError}">
+    <BaseDialog
+      :setOptions="mhrDeceasedOwnerChanges"
+      :setDisplay="showOwnerChangesDialog"
+      @proceed="handleOwnerChangesDialogResp($event)"
+    />
+
     <v-data-table
       id="mh-home-owners-table"
       class="home-owners-table"
@@ -64,7 +70,7 @@
                 :isMhrTransfer="isMhrTransfer"
                 :showTableError="validateTransfer && (isAddingMode || isEditingMode)"
                 @cancel="currentlyEditingHomeOwnerId = -1"
-                @remove="isCurrentOwner(row.item) ? markForRemoval(row.item) : remove(row.item)"
+                @remove="removeOwnerHandler(row.item)"
               />
             </v-expand-transition>
           </td>
@@ -243,8 +249,8 @@
                     </v-list-item>
 
                     <!-- Menu Delete Option -->
-                    <v-list-item class="my-n2">
-                      <v-list-item-subtitle class="pa-0" @click="markForRemoval(row.item)">
+                    <v-list-item class="my-n2" v-if="isChangedOwner(row.item)">
+                      <v-list-item-subtitle class="pa-0" @click="removeChangeOwnerHandler(row.item)">
                         <v-icon small class="mb-1">mdi-delete</v-icon>
                         <span class="ml-1 remove-btn-text">Delete</span>
                       </v-list-item-subtitle>
@@ -293,7 +299,9 @@ import { PartyAddressSchema } from '@/schemas'
 import { toDisplayPhone } from '@/utils'
 import { AddEditHomeOwner } from '@/components/mhrRegistration/HomeOwners'
 import { DeathCertificate } from '@/components/mhrTransfers'
+import { BaseDialog } from '@/components/dialogs'
 import TableGroupHeader from '@/components/mhrRegistration/HomeOwners/TableGroupHeader.vue'
+import { mhrDeceasedOwnerChanges } from '@/resources/dialogOptions'
 /* eslint-disable no-unused-vars */
 import { MhrRegistrationHomeOwnerIF } from '@/interfaces'
 import { ActionTypes, ApiTransferTypes, HomeTenancyTypes } from '@/enums'
@@ -314,6 +322,7 @@ export default defineComponent({
   },
   components: {
     BaseAddress,
+    BaseDialog,
     AddEditHomeOwner,
     TableGroupHeader,
     DeathCertificate
@@ -363,6 +372,8 @@ export default defineComponent({
     const localState = reactive({
       currentlyEditingHomeOwnerId: -1,
       reviewed: false,
+      showOwnerChangesDialog: false,
+      ownerToDecease: null as MhrRegistrationHomeOwnerIF,
       isEditingMode: computed((): boolean => localState.currentlyEditingHomeOwnerId >= 0),
       isAddingMode: computed((): boolean => props.isAdding),
       showTableError: computed((): boolean => {
@@ -474,6 +485,28 @@ export default defineComponent({
       return hasNoOwners && index === 0
     }
 
+    const removeOwnerHandler = (owner: MhrRegistrationHomeOwnerIF): void => {
+      isCurrentOwner(owner)
+        ? isChangedOwner(owner) ? removeChangeOwnerHandler(owner) : markForRemoval(owner)
+        : remove(owner)
+    }
+
+    const removeChangeOwnerHandler = (owner: MhrRegistrationHomeOwnerIF): void => {
+      localState.ownerToDecease = { ...getCurrentOwnerStateById(owner.ownerId), groupId: owner.groupId }
+      localState.showOwnerChangesDialog = true
+    }
+
+    const handleOwnerChangesDialogResp = async (val: boolean): Promise<void> => {
+      if (!val) {
+        localState.showOwnerChangesDialog = false
+        return
+      }
+
+      await markForRemoval(localState.ownerToDecease)
+      localState.showOwnerChangesDialog = false
+      localState.ownerToDecease = null
+    }
+
     watch(() => localState.currentlyEditingHomeOwnerId, () => {
       setGlobalEditingMode(localState.isEditingMode)
     })
@@ -528,6 +561,10 @@ export default defineComponent({
       showDeathCertificate,
       isDisabledForSJTChanges,
       isCurrentOwner,
+      mhrDeceasedOwnerChanges,
+      removeOwnerHandler,
+      removeChangeOwnerHandler,
+      handleOwnerChangesDialogResp,
       ...toRefs(localState)
     }
   }
