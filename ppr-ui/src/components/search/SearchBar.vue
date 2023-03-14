@@ -40,7 +40,7 @@
           </v-col>
 
           <!-- Business Name Lookup -->
-          <v-col v-if="isBusinessDebtor">
+          <v-col v-if="isBusinessDebtor" class="col-xl pb-0">
             <v-text-field
               filled
               id="txt-name-debtor"
@@ -749,5 +749,8 @@ export default defineComponent({
 
 .search-bar-container::v-deep {
   padding: 30px 30px 22px 24px;
+}
+::v-deep .auto-complete-card {
+  width: 100%!important;
 }
 </style>
