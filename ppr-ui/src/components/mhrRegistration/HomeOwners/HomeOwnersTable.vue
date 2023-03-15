@@ -98,7 +98,7 @@
                   {{ row.item.organizationName }}
                 </div>
               </div>
-              <div v-if="row.item.suffix" class="suffix">
+              <div v-if="row.item.suffix" class="font-light">
                 {{ row.item.suffix }}
               </div>
             </div>
@@ -281,6 +281,22 @@
             </v-expand-transition>
           </td>
         </tr>
+        <tr v-else-if="isRemovedHomeOwner(row.item) && showDeathCertificate && isReadonlyTable">
+          <td :colspan="homeOwnersTableHeaders.length" class="deceased-review-info">
+            <v-row no-gutters class="ml-8 mb-n3">
+              <v-col cols="12">
+                <p class="generic-label fs-14">Death Certificate Registration Number:
+                  <span class="font-light mx-1">{{row.item.deathCertificateNumber}}</span>
+                </p>
+              </v-col>
+              <v-col cols="12">
+                <p class="generic-label fs-14 mt-n4">Date of Death:
+                  <span class="font-light mx-1">{{yyyyMmDdToPacificDate(row.item.deathDateTime, true)}}</span>
+                </p>
+              </v-col>
+            </v-row>
+          </td>
+        </tr>
       </template>
 
       <template v-slot:no-data>
@@ -302,6 +318,7 @@ import { DeathCertificate } from '@/components/mhrTransfers'
 import { BaseDialog } from '@/components/dialogs'
 import TableGroupHeader from '@/components/mhrRegistration/HomeOwners/TableGroupHeader.vue'
 import { mhrDeceasedOwnerChanges } from '@/resources/dialogOptions'
+import { yyyyMmDdToPacificDate } from '@/utils/date-helper'
 /* eslint-disable no-unused-vars */
 import { MhrRegistrationHomeOwnerIF } from '@/interfaces'
 import { ActionTypes, ApiTransferTypes, HomeTenancyTypes } from '@/enums'
@@ -565,6 +582,7 @@ export default defineComponent({
       removeOwnerHandler,
       removeChangeOwnerHandler,
       handleOwnerChangesDialogResp,
+      yyyyMmDdToPacificDate,
       ...toRefs(localState)
     }
   }
@@ -650,11 +668,12 @@ export default defineComponent({
     padding: 0 12px;
   }
 
-  .suffix {
+  .font-light, {
     color: $gray7;
     font-size: 14px;
     line-height: 22px;
     margin-left: 32px;
+    font-weight: normal;
   }
   .theme--light.v-btn.v-btn--disabled {
     color: #1669bb !important;

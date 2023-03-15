@@ -82,11 +82,10 @@
 
 <script lang="ts">
 import { DatePicker } from '@bcrs-shared-components/date-picker'
-import { useInputRules } from '@/composables'
+import { useInputRules, useTransferOwners } from '@/composables'
 import { computed, defineComponent, reactive, ref, toRefs, watch } from '@vue/composition-api'
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import { FormIF } from '@/interfaces' // eslint-disable-line no-unused-vars
-import { ApiTransferTypes } from '@/enums'
 
 export default defineComponent({
   name: 'TransferDetails',
@@ -100,14 +99,12 @@ export default defineComponent({
       getMhrTransferDeclaredValue,
       getMhrTransferConsideration,
       getMhrTransferDate,
-      getMhrTransferOwnLand,
-      getMhrTransferType
+      getMhrTransferOwnLand
     } = useGetters<any>([
       'getMhrTransferDeclaredValue',
       'getMhrTransferConsideration',
       'getMhrTransferDate',
-      'getMhrTransferOwnLand',
-      'getMhrTransferType'
+      'getMhrTransferOwnLand'
     ])
 
     const {
@@ -121,6 +118,10 @@ export default defineComponent({
       'setMhrTransferOwnLand',
       'setUnsavedChanges'
     ])
+
+    const {
+      isTransferDueToDeath
+    } = useTransferOwners()
 
     const considerationRef = ref(null)
 
@@ -138,9 +139,8 @@ export default defineComponent({
       isOwnLand: getMhrTransferOwnLand.value || false,
       enableWarningMsg: false,
       landOrLeaseLabel: computed(() => {
-        return `The manufactured home is located on land that the
-        ${getMhrTransferType.value?.transferType === ApiTransferTypes.SALE_OR_GIFT ? 'new' : ''}
-        homeowners own, or on which they have a registered lease of 3 years or more.`
+        return `The manufactured home is located on land that the ${!isTransferDueToDeath.value ? 'new' : ''} homeowners
+         own, or on which they have a registered lease of 3 years or more.`
       }),
       isValidTransferDetails: computed(() => localState.isValidForm && !!localState.transferDate),
       showFormError: computed(() => props.validate && !localState.isValidTransferDetails),
