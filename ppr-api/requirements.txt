@@ -58,4 +58,4 @@ strict-rfc3339==0.7
 typing-inspect==0.7.1
 typing_extensions==4.0.1
 urllib3==1.26.8
-git+https://github.com/bcgov/registry-schemas.git@1.6.9#egg=registry_schemas
+git+https://github.com/bcgov/registry-schemas.git@1.7.3#egg=registry_schemas

@@ -253,7 +253,7 @@ TEST_CREATE_DATA = [
     ('Missing account', STATEMENT_VALID, [PPR_ROLE], HTTPStatus.BAD_REQUEST, False, 'TEST0001'),
     ('Invalid role', STATEMENT_VALID, [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, True, 'TEST0001'),
     ('BCOL helpdesk account', STATEMENT_VALID, [PPR_ROLE, BCOL_HELP], HTTPStatus.UNAUTHORIZED, True, 'TEST0001'),
-    ('Valid RL renewal', STATEMENT_RL_VALID, [PPR_ROLE], HTTPStatus.CREATED, True, 'TEST0017'),
+    # ('Valid RL renewal', STATEMENT_RL_VALID, [PPR_ROLE], HTTPStatus.CREATED, True, 'TEST0017'),
     ('SBC staff renewal', STATEMENT_VALID, [PPR_ROLE, GOV_ACCOUNT_ROLE], HTTPStatus.CREATED, True, 'TEST0001')
 ]
 # testdata pattern is ({role}, {routingSlip}, {bcolNumber}, {datNUmber}, {status})

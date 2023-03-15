@@ -20,10 +20,10 @@
   </head>
   <body>
     {% if cover is not defined %}
-  <div class="business-details-container mtn-2">
+      <div class="business-details-container mtn-2">
     {% else %}
-  <div class="business-details-container mtn-25">
-      {% endif %}
+      <div class="business-details-container mtn-25">
+    {% endif %}
     <table class="business-details-table-grey mt-0" role="presentation">
       <tr>
         <td>Base Registration Date and Time:</td>
@@ -103,6 +103,23 @@
         </td>
       </tr>
       {% endif %}
+
+      {% if transitionDescription is defined and transitionDescription != '' %}
+        <tr>
+          <td colspan="2" class="business-details-note-grey pt-2 pb-2">
+            {% if transitionDescription is defined and transitionDescription == 'COMPANY ACT DOCUMENT' %}
+              Note: This is a re-registration of a {{transitionDescription|title}} previously registered in the Companies Branch on 
+                {% if transitionDate is defined and transitionDate != '' %}{{transitionDate}}{% else %}N/A{% endif %},
+                Incorporation Number {% if transitionNumber is defined and transitionNumber != '' %}{{transitionNumber}}{% else %}N/A{% endif %}.
+            {% else %}
+              Note: This is a re-registration of a {{transitionDescription|title}} previously registered on 
+              {% if transitionDate is defined and transitionDate != '' %}{{transitionDate}}{% else %}N/A{% endif %},
+              Registration Number {% if transitionNumber is defined and transitionNumber != '' %}{{transitionNumber}}{% else %}N/A{% endif %}.
+          {% endif %}
+          </td>
+        </tr>
+      {% endif %}
+
     </table>
   </div>
 

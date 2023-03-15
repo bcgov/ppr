@@ -12,13 +12,42 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """This module holds data for legacy previous financing statement information only used in reports."""
-from __future__ import annotations
+
+from ppr_api.utils.base import BaseEnum
 
 from .db import db
 
 
+# Legacy registration types not allowed with new financing statements.
+DATE_MONTH = {
+    'JAN': '01',
+    'FEB': '02',
+    'MAR': '03',
+    'APR': '04',
+    'MAY': '05',
+    'JUN': '06',
+    'JUL': '07',
+    'AUG': '08',
+    'SEP': '09',
+    'OCT': '10',
+    'NOV': '11',
+    'DEC': '12'
+}
+
+
 class PreviousFinancingStatement(db.Model):  # pylint: disable=too-many-instance-attributes
     """This class manages all of the previous financing statement information (legacy only)."""
+
+    class PreviousRegistrationTypes(BaseEnum):
+        """Render an Enum of the previous financing statement registration types."""
+
+        ASSIGNMENT_OF_BOOK_ACCOUNTS = 'ASSIGNMENT OF BOOK ACCOUNTS'
+        BILL_OF_SALE_ABSOLUTE = 'BILL OF SALE ABSOLUTE'
+        CHATTEL_MORTGAGE = 'CHATTEL MORTGAGE'
+        COMPANY_ACT_DOCUMENT = 'COMPANY ACT DOCUMENT'
+        CONDITIONAL_SALE_AGREEMENT = 'CONDITIONAL SALE AGREEMENT'
+        FARM_CREDIT_CHATTEL_MORTGAGE = 'FARM CREDIT CHATTEL MORTGAGE'
+        MOBILE_HOME_ACT_DOCUMENT = 'MOBILE HOME ACT DOCUMENT'
 
     __tablename__ = 'previous_financing_statements'
 
@@ -50,19 +79,45 @@ class PreviousFinancingStatement(db.Model):  # pylint: disable=too-many-instance
     def json(self) -> dict:
         """Return the court_order as a json object."""
         previous_financing = {
-            'registrationType': self.registration_type
+            'transitionDescription': self.registration_type
         }
-        if self.mhr_number:
-            previous_financing['mhrNumber'] = self.mhr_number
-            previous_financing['mhrDate'] = self.mhr_date
-        if self.cr_number:
-            previous_financing['crNumber'] = self.cr_number
-            previous_financing['crDate'] = self.cr_date
-        if self.cb_number:
-            previous_financing['cbNumber'] = self.cb_number
-            previous_financing['cbDate'] = self.cb_date
-
+        if self.mhr_date or self.cr_date:
+            previous_financing['transitionDate'] = self.get_transition_date()
+        if self.mhr_number or self.cr_number:
+            previous_financing['transitionNumber'] = self.get_transition_number()
         return previous_financing
+
+    def get_transition_date(self):
+        """Return a previous registration date in an ISO timestamp format."""
+        date_iso: str = None
+        transition_date: str = self.cr_date if self.cr_date else self.mhr_date
+        if not transition_date:
+            return date_iso
+        if len(transition_date) == 10:
+            date_iso = transition_date
+        elif len(transition_date) == 6 or len(transition_date) == 7:
+            date_iso = '19' + transition_date[0:2] + '-'
+            if len(transition_date) == 7:
+                date_iso += DATE_MONTH[transition_date[2:5]] + '-' + transition_date[5:]
+            else:
+                date_iso += transition_date[2:4] + '-' + transition_date[4:]
+        if date_iso:
+            date_iso = date_iso.replace(' ', '0')
+            date_iso += 'T00:00:01-08:00'
+        return date_iso
+
+    def get_transition_number(self):
+        """Return a previous registration number in the expected format."""
+        if self.mhr_number:
+            return self.mhr_number
+        trans_num: str = self.cr_number
+        if trans_num and self.registration_type and \
+                self.registration_type == self.PreviousRegistrationTypes.COMPANY_ACT_DOCUMENT:
+            if trans_num.startswith('CA'):
+                trans_num = 'BC' + trans_num.replace('CA', '00')
+            else:
+                trans_num = 'BC' + trans_num
+        return trans_num
 
     @classmethod
     def find_by_id(cls, financing_id: int = None):
