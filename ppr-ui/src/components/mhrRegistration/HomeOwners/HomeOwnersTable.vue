@@ -82,7 +82,7 @@
           class="owner-info"
           :data-test-id="`owner-info-${row.item.ownerId}`"
         >
-          <td class="owner-name" :class="{'no-bottom-border' : isRemovedHomeOwner(row.item) && showDeathCertificate}">
+          <td class="owner-name" :class="{'no-bottom-border' : isRemovedHomeOwner(row.item) && showDeathCertificate()}">
             <div :class="{'removed-owner': isRemovedHomeOwner(row.item)}">
               <div v-if="row.item.individualName" class="owner-icon-name">
                 <v-icon class="mr-2">mdi-account</v-icon>
@@ -133,25 +133,25 @@
                 text-color="$gray9"
                 data-test-id="owner-removed-badge"
               >
-                <b>{{showDeathCertificate ? 'DECEASED' : 'DELETED'}}</b>
+                <b>{{showDeathCertificate() ? 'DECEASED' : 'DELETED'}}</b>
               </v-chip>
             </template>
           </td>
-          <td :class="{'no-bottom-border' : isRemovedHomeOwner(row.item) && showDeathCertificate}">
+          <td :class="{'no-bottom-border' : isRemovedHomeOwner(row.item) && showDeathCertificate()}">
             <base-address
               :schema="addressSchema"
               :value="row.item.address"
               :class="{'removed-owner': isRemovedHomeOwner(row.item)}"
             />
           </td>
-          <td :class="{'no-bottom-border' : isRemovedHomeOwner(row.item) && showDeathCertificate}">
+          <td :class="{'no-bottom-border' : isRemovedHomeOwner(row.item) && showDeathCertificate()}">
             <div :class="{'removed-owner': isRemovedHomeOwner(row.item)}">
               {{ toDisplayPhone(row.item.phoneNumber) }}
               <span v-if="row.item.phoneExtension"> Ext {{ row.item.phoneExtension }} </span>
             </div>
           </td>
           <td v-if="showEditActions" class="row-actions text-right"
-            :class="{'no-bottom-border' : isRemovedHomeOwner(row.item) && showDeathCertificate}">
+            :class="{'no-bottom-border' : isRemovedHomeOwner(row.item) && showDeathCertificate()}">
             <!-- New Owner Actions -->
             <div
               v-if="(!isMhrTransfer || isAddedHomeOwner(row.item)) && enableHomeOwnerChanges()"
@@ -270,7 +270,7 @@
           </td>
         </tr>
         <tr
-          v-if="isRemovedHomeOwner(row.item) && showDeathCertificate && !isReadonlyTable"
+          v-if="isRemovedHomeOwner(row.item) && showDeathCertificate() && !isReadonlyTable"
           class="death-certificate-row"
         >
           <td :colspan="homeOwnersTableHeaders.length" class="py-0">
