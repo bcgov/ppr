@@ -23,9 +23,6 @@
         disabled
         readonly
         :data-test-id="`interest-type-field-group-${groupId}`"
-        @mousedown.prevent
-        @mousemove.prevent
-        @dblclick.prevent
       />
       <div class="owner-fractions">
         <v-text-field
@@ -156,22 +153,6 @@ export default defineComponent({
       top: 3px;
       position: relative;
     }
-  }
-
-  .theme--light.v-text-field--filled.v-input--is-disabled > .v-input__control > .v-input__slot {
-    border-bottom: 1px dotted;
-    cursor: default!important;
-  }
-  .theme--light.v-input--is-disabled input {
-    pointer-events: none!important;
-    user-select: none!important;
-    -webkit-user-select: none; /* webkit (safari, chrome) browsers */
-    -moz-user-select: none; /* mozilla browsers */
-    -ms-user-select: none; /* IE10+ */
-  }
-
-  .theme--light.v-label--is-disabled {
-    color: $gray7!important;
   }
 }
 

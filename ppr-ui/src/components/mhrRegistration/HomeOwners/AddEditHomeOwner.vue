@@ -87,10 +87,11 @@
                   id="first-name"
                   v-model="owner.individualName.first"
                   filled
-                  :rules="firsNameRules"
-                  :disabled="isTransferDueToDeath"
                   label="First Name"
                   data-test-id="first-name"
+                  :rules="firsNameRules"
+                  :disabled="isTransferDueToDeath"
+                  :readonly="isTransferDueToDeath"
                 />
               </v-col>
               <v-col cols="4">
@@ -99,9 +100,10 @@
                   v-model="owner.individualName.middle"
                   filled
                   label="Middle Name (Optional)"
+                  data-test-id="middle-name"
                   :rules="maxLength(15)"
                   :disabled="isTransferDueToDeath"
-                  data-test-id="middle-name"
+                  :readonly="isTransferDueToDeath"
                 />
               </v-col>
               <v-col cols="4">
@@ -109,10 +111,11 @@
                   id="last-name"
                   v-model="owner.individualName.last"
                   filled
-                  :rules="lastNameRules"
-                  :disabled="isTransferDueToDeath"
                   label="Last Name"
                   data-test-id="last-name"
+                  :rules="lastNameRules"
+                  :disabled="isTransferDueToDeath"
+                  :readonly="isTransferDueToDeath"
                 />
               </v-col>
             </v-row>
@@ -225,6 +228,7 @@
                   :rules="orgNameRules"
                   :clearable="showClear"
                   :disabled="isTransferDueToDeath"
+                  :readonly="isTransferDueToDeath"
                   @click:clear="showClear = false"
                 >
                   <template v-slot:append>
@@ -254,6 +258,7 @@
           <label class="generic-label">
             Additional Name Information
             <v-tooltip
+              v-if="isTransferDueToDeath"
               top
               content-class="top-tooltip pa-5"
               transition="fade-transition"
@@ -264,7 +269,7 @@
                   mdi-information-outline
                 </v-icon>
               </template>
-              {{ isTransferDueToDeath ? disabledNameEditTooltip : suffixTooltip }}
+              {{ disabledNameEditTooltip }}
             </v-tooltip>
           </label>
           <v-row>
@@ -275,10 +280,11 @@
                 filled
                 label="Additional Name Information (Optional)"
                 data-test-id="suffix"
-                hint="Example: Additional legal names, Jr., Sr., Executor of the will of the deceased, etc. (Optional)"
+                hint="Example: Additional legal names, Jr., Sr., Executor of the will of the deceased, etc."
                 persistent-hint
                 :rules="maxLength(70)"
                 :disabled="isTransferDueToDeath"
+                :readonly="isTransferDueToDeath"
               />
             </v-col>
           </v-row>
@@ -604,9 +610,6 @@ export default defineComponent({
         return !!localState.groupFractionalData?.interestNumerator &&
           !!localState.groupFractionalData?.interestDenominator
       }),
-      suffixTooltip: `If necessary, type a suffix such as Junior or Senior, or a title indicating a role, such as
-        Executor of the will of the deceased. This field can also be used to record further given names, if they
-        are provided.`,
       disabledNameEditTooltip: `Owner name’s cannot be changed here. Name change requests should be submitted
         separately, with the appropriate supporting documents, prior to completing this transfer. See Help with
         Ownership Transfer or Change for more information. `
@@ -772,20 +775,6 @@ u {
 }
 
 ::v-deep {
-  .theme--light.v-text-field--filled.v-input--is-disabled > .v-input__control > .v-input__slot {
-    border-bottom: 1px dotted;
-    cursor: default!important;
-  }
-  .theme--light.v-input--is-disabled input {
-    pointer-events: none!important;
-    user-select: none!important;
-    -webkit-user-select: none; /* webkit (safari, chrome) browsers */
-    -moz-user-select: none; /* mozilla browsers */
-    -ms-user-select: none; /* IE10+ */
-  }
-  .theme--light.v-label--is-disabled {
-    color: $gray7!important;
-  }
   .v-text-field.v-input--is-disabled .v-input__control > .v-text-field__details > .v-messages {
     color: $gray7!important;
   }
