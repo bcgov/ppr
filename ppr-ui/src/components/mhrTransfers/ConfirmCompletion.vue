@@ -23,7 +23,9 @@
             <ol>
               <li class="pl-3 pb-3 mb-7">
                 <p><strong>Bill of sale</strong> has been signed by either all owners or by someone with the authority
-                  to act on behalf of the registered owners.</p>
+                  to act on behalf of the registered owners and witnessed by an independent third party. If this is a
+                  transfer to a beneficiary, you must have written consent from all beneficiaries that are not being
+                  added as an owner.</p>
                 <p class="confirm-completion-note">
                   <span>Note: </span> If the bill of sale has been signed by someone acting on behalf of the registered
                   owners, the person submitting this transfer is a lawyer or notary, and the power by which the
