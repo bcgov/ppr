@@ -183,7 +183,25 @@
 
       <!-- Read Only Template -->
       <v-card v-else class="review-table" flat id="read-only-owners">
-        <v-row class="mt-6 px-7 pt-8" no-gutters>
+
+        <!-- Transfer Type Review -->
+        <template v-if="isMhrTransfer">
+          <v-row id="transfer-type-review" class="mt-6 px-7 pt-8" no-gutters>
+            <v-col cols="3">
+              <label class="generic-label">Transfer Type</label>
+            </v-col>
+            <v-col cols="9" class="gray7" id="transfer-type-display">{{ getUiTransferType() }}</v-col>
+          </v-row>
+          <v-row class="my-4 px-7" no-gutters>
+            <v-col cols="3">
+              <label class="generic-label">Declared Value of Home</label>
+            </v-col>
+            <v-col cols="9" class="gray7" id="declared-value-display">${{ getMhrTransferDeclaredValue }}.00</v-col>
+          </v-row>
+          <v-divider class="my-6 mx-7" />
+        </template>
+
+        <v-row class="my-4 px-7" no-gutters>
           <v-col cols="12">
             <span class="generic-label">Home Owners </span>
             <span
@@ -258,7 +276,7 @@ import { AddEditHomeOwner, HomeOwnersTable } from '@/components/mhrRegistration/
 import { BaseDialog } from '@/components/dialogs'
 import { SimpleHelpToggle } from '@/components/common'
 import { computed, defineComponent, onBeforeMount, reactive, toRefs, watch } from '@vue/composition-api'
-import { useHomeOwners, useMhrValidations, useTransferOwners } from '@/composables'
+import { useHomeOwners, useMhrValidations, useMhrInformation, useTransferOwners } from '@/composables'
 /* eslint-disable no-unused-vars */
 import { MhrRegistrationTotalOwnershipAllocationIF } from '@/interfaces'
 import { ActionTypes } from '@/enums'
@@ -292,17 +310,24 @@ export default defineComponent({
       getMhrRegistrationHomeOwners,
       getMhrTransferCurrentHomeOwnerGroups,
       getMhrRegistrationValidationModel,
-      hasUnsavedChanges
+      hasUnsavedChanges,
+      getMhrTransferDeclaredValue
     } = useGetters<any>([
       'getMhrRegistrationHomeOwners',
       'getMhrTransferCurrentHomeOwnerGroups',
       'getMhrRegistrationValidationModel',
-      'hasUnsavedChanges'
+      'hasUnsavedChanges',
+      'getMhrTransferDeclaredValue'
     ])
 
     const {
+      getUiTransferType
+    } = useMhrInformation()
+
+    const {
       enableHomeOwnerChanges,
-      enableAddHomeOwners
+      enableAddHomeOwners,
+      isTransferDueToDeath
     } = useTransferOwners(!props.isMhrTransfer)
 
     const {
@@ -457,7 +482,8 @@ export default defineComponent({
 
     onBeforeMount(() => {
       // before mounted in review mode, deleted owners hidden as per default
-      if (props.isReadonlyTable) {
+      // Display Deceased owners by default for Transfer Due to Death scenarios
+      if (props.isReadonlyTable && !isTransferDueToDeath.value) {
         hideShowRemovedOwners()
       }
     })
@@ -475,8 +501,10 @@ export default defineComponent({
       hideShowRemovedOwners,
       isValidTransferOwners,
       hasUnsavedChanges,
+      getUiTransferType,
       enableAddHomeOwners,
       enableHomeOwnerChanges,
+      getMhrTransferDeclaredValue,
       ...toRefs(localState)
     }
   },

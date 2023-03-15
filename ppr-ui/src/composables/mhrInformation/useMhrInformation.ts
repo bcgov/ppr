@@ -1,10 +1,10 @@
 import {
-  AccountInfoIF,
+  AccountInfoIF, ErrorIF,
   MhrHomeOwnerGroupIF,
   MhrRegistrationDescriptionIF,
-  MhrRegistrationHomeLocationIF,
+  MhrRegistrationHomeLocationIF, MhrRegistrationHomeOwnerGroupIF,
   MhrTransferApiIF,
-  MhrTransferIF, SubmittingPartyIF
+  MhrTransferIF, SubmittingPartyIF, TransferTypeSelectIF
 } from '@/interfaces'
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import {
@@ -78,6 +78,7 @@ export const useMhrInformation = () => {
     return {
       mhrNumber: '',
       ownerGroups: [],
+      currentOwnerGroups: [],
       submittingParty: {
         emailAddress: '',
         phoneNumber: ''
@@ -168,10 +169,11 @@ export const useMhrInformation = () => {
     }
   }
 
-  const getUiTransferType = (apiTransferType: ApiTransferTypes): UITransferTypes => {
+  const getUiTransferType = (): UITransferTypes => {
     return UITransferTypes[
-      Object.keys(ApiTransferTypes).find(key => ApiTransferTypes[key] as string === apiTransferType)
-    ]
+      Object.keys(ApiTransferTypes).find(key =>
+        ApiTransferTypes[key] as string === getMhrTransferType.value?.transferType
+      )]
   }
 
   /** Draft Filings **/

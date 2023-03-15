@@ -85,7 +85,7 @@
                 <!-- Review Header -->
                 <header class="review-header mt-1 rounded-top">
                   <v-icon class="ml-2" color="darkBlue">mdi-file-document-multiple</v-icon>
-                  <label class="font-weight-bold pl-2">Ownership Transfer or Change - {{ uiTransferType }}</label>
+                  <label class="font-weight-bold pl-2">Ownership Transfer or Change - {{ getUiTransferType() }}</label>
                 </header>
 
                 <section id="owners-review">
@@ -116,7 +116,7 @@
                     :validate="validateSubmittingParty"
                     :class="{ 'border-error-left': validateSubmittingParty }"
                     @isValid="setValidation('isSubmittingPartyValid', $event)"
-                    :content="{ mailAddressInfo: 'Registry documents, if any, will be mailed to this address.' }"
+                    :content="{ mailAddressInfo: 'Registry documents and decal will be mailed to this address.' }"
                     isMhrTransfer
                   />
                 </section>
@@ -286,7 +286,7 @@
                   :setShowFeeSummary="true"
                   :setFeeType="feeType"
                   :setErrMsg="transferErrorMsg"
-                  :transferType="uiTransferType"
+                  :transferType="getUiTransferType()"
                   @cancel="goToDash()"
                   @back="isReviewMode = false"
                   @save="onSave()"
@@ -482,9 +482,6 @@ export default defineComponent({
       hasTransferChanges: computed((): boolean => {
         return localState.showTransferType &&
           (hasUnsavedChanges.value || !!getMhrTransferDeclaredValue.value || !!getMhrTransferType.value)
-      }),
-      uiTransferType: computed((): UITransferTypes => {
-        return getUiTransferType(getMhrTransferType.value?.transferType)
       }),
       isAuthenticated: computed((): boolean => {
         return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
@@ -694,6 +691,7 @@ export default defineComponent({
       else {
         setUnsavedChanges(false)
         setGlobalEditingMode(false)
+        setEmptyMhrTransfer(initMhrTransfer())
         context.root.$router.push({
           name: RouteNames.DASHBOARD
         })
