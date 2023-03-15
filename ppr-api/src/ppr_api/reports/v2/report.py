@@ -708,6 +708,8 @@ class Report:  # pylint: disable=too-few-public-methods
             statement['surrenderDate'] = Report._to_report_datetime(statement['surrenderDate'], False)
         if 'dischargedDateTime' in statement:
             statement['dischargedDateTime'] = Report._to_report_datetime(statement['dischargedDateTime'])
+        if statement.get('transitionDate'):
+            statement['transitionDate'] = Report._to_report_datetime(statement['transitionDate'], False)
         if 'courtOrderInformation' in statement and 'orderDate' in statement['courtOrderInformation']:
             order_date = Report._to_report_datetime(statement['courtOrderInformation']['orderDate'], False)
             statement['courtOrderInformation']['orderDate'] = order_date
@@ -718,7 +720,6 @@ class Report:  # pylint: disable=too-few-public-methods
             for collateral in statement['generalCollateral']:
                 if 'addedDateTime' in collateral:
                     collateral['addedDateTime'] = Report._to_report_datetime(collateral['addedDateTime'], True)
-
         if statement['type'] == 'RL' and 'lienAmount' in statement:
             lien_amount = str(statement['lienAmount'])
             if lien_amount.isnumeric():

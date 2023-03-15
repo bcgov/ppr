@@ -124,13 +124,8 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
                         f'CROWN CHARGE - OTHER - FILED PURSUANT TO {self.crown_charge_other.upper()}'
 
             statement['createDateTime'] = model_utils.format_ts(reg.registration_ts)
-
             if reg.client_reference_id:
                 statement['clientReferenceId'] = reg.client_reference_id
-
-#            if reg.document_number:
-#                statement['documentId'] = reg.document_number
-
             statement['registeringParty'] = self.party_json(Party.PartyTypes.REGISTERING_PARTY.value, registration_id)
             statement['securedParties'] = self.party_json(Party.PartyTypes.SECURED_PARTY.value, registration_id)
             statement['debtors'] = self.party_json(Party.PartyTypes.DEBTOR_COMPANY.value, registration_id)
@@ -180,9 +175,9 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
                 statement['lifeYears'] = 0
                 expiry = model_utils.expiry_dt_repairer_lien(registration.registration_ts)
                 statement['expiryDate'] = model_utils.format_ts(expiry)
-
         self.set_court_order_json(statement)
         self.set_payment_json(statement)
+        self.set_transition_json(statement)
         return self.set_changes_json(statement)
 
     def set_court_order_json(self, statement):
@@ -214,6 +209,17 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
                 'receipt': self.registration[0].pay_path
             }
             statement['payment'] = payment
+        return statement
+
+    def set_transition_json(self, statement):
+        """Add financing statement transition json if a previous financing statement exists."""
+        if self.previous_statement and self.previous_statement[0].registration_type:
+            previous_json = self.previous_statement[0].json
+            statement['transitionDescription'] = previous_json.get('transitionDescription')
+            if previous_json.get('transitionDate'):
+                statement['transitionDate'] = previous_json.get('transitionDate')
+            if previous_json.get('transitionNumber'):
+                statement['transitionNumber'] = previous_json.get('transitionNumber')
         return statement
 
     def party_json(self, party_type, registration_id):
