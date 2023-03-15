@@ -21,9 +21,10 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
   ])
 
   /** Conditionally show DeathCertificate based on Transfer Type **/
-  const showDeathCertificate = (): boolean =>
-    getMhrTransferType.value?.transferType === ApiTransferTypes.SURVIVING_JOINT_TENANT ||
-    getMhrTransferType.value?.transferType === ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL
+  const showDeathCertificate = (): boolean => {
+    return getMhrTransferType.value?.transferType === ApiTransferTypes.SURVIVING_JOINT_TENANT ||
+           getMhrTransferType.value?.transferType === ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL
+  }
 
   /** Conditionally Enable HomeOwner Changes based on Transfer Type **/
   const enableHomeOwnerChanges = (): boolean => {
