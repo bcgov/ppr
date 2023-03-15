@@ -13,7 +13,7 @@
               for="deathCertificateNumber"
               :class="{ 'error-text': validateDeathCertificate && hasError(deathCertificateNumberRef) }"
             >
-              Death Certificate Number
+              Death Certificate Registration Number
             </label>
           </v-col>
           <v-col cols="9">
@@ -23,7 +23,7 @@
               ref="deathCertificateNumberRef"
               filled
               :rules="deathCertificateNumberRules"
-              label="Death Certificate Number"
+              label="Death Certificate Registration Number"
               data-test-id="death-certificate-number"
             />
           </v-col>
@@ -104,15 +104,15 @@ export default defineComponent({
     const deathCertificateNumberRef = ref(null)
 
     const deathCertificateNumberRules = computed(
-      (): Array<Function> => customRules(maxLength(20), required('Enter Death Certificate Number'))
+      (): Array<Function> => customRules(maxLength(20), required('Enter Death Certificate Registration Number'))
     )
 
     const localState = reactive({
       validateDeathCertificate: false, // NEW VALIDATOR REQUIRED
       isFormValid: false, // Death Certificate form without Death Date Picker
       isDeathCertificateFormValid: computed((): boolean => localState.isFormValid && !!localState.deathDateTime),
-      deathCertificateNumber: null,
-      deathDateTime: null,
+      deathCertificateNumber: props.deceasedOwner?.deathCertificateNumber,
+      deathDateTime: props.deceasedOwner?.deathDateTime,
       hasCertificate: false, // Will be used for validation on UI side only (original certificate checkbox)
       showFormError: computed(() => localState.validateDeathCertificate && !localState.isDeathCertificateFormValid),
       maxDeathDate: computed((): Date => {
