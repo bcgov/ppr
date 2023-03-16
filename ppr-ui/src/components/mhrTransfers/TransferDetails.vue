@@ -9,56 +9,58 @@
 
     <v-card flat class="py-6 px-8 rounded" :class="{ 'border-error-left': showFormError }">
       <v-form ref="transferDetailsForm" v-model="isValidForm">
-        <v-row>
-          <v-col cols="3">
-            <label
-              class="generic-label"
-              for="consideration"
-              :class="{ 'error-text': showFormError && hasError(considerationRef) }"
-            >
-              Consideration
-            </label>
-          </v-col>
-          <v-col cols="9">
-            <v-text-field
-              id="consideration"
-              v-model="consideration"
-              ref="considerationRef"
-              filled
-              :rules="considerationRules"
-              label="Amount in Canadian Dollars or Description"
-              data-test-id="consideration"
-              @mousedown="updateConsideration()"
-            />
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col cols="3">
-            <label
-              class="generic-label"
-              for="transfer-date"
-              :class="{ 'error-text': showFormError && !transferDate }"
-            >
-              Bill of Sale Date of Execution
-            </label>
-          </v-col>
-          <v-col cols="9">
-            <date-picker
-              id="transfer-date"
-              clearable
-              ref="transferDateRef"
-              title="Date"
-              :errorMsg="showFormError && !transferDate ? 'Enter bill of sale date of execution' : ''"
-              :initialValue="transferDate"
-              :key="Math.random()"
-              @emitDate="transferDate = $event"
-              @emitCancel="transferDate = null"
-              @emitClear="transferDate = null"
-              data-test-id="transfer-date"
-            />
-          </v-col>
-        </v-row>
-        <v-divider class="mx-0 mt-2 mb-7" />
+        <template v-if="!isTransferDueToDeath">
+          <v-row>
+            <v-col cols="3">
+              <label
+                class="generic-label"
+                for="consideration"
+                :class="{ 'error-text': showFormError && hasError(considerationRef) }"
+              >
+                Consideration
+              </label>
+            </v-col>
+            <v-col cols="9">
+              <v-text-field
+                id="consideration"
+                v-model="consideration"
+                ref="considerationRef"
+                filled
+                :rules="considerationRules"
+                label="Amount in Canadian Dollars or Description"
+                data-test-id="consideration"
+                @mousedown="updateConsideration()"
+              />
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col cols="3">
+              <label
+                class="generic-label"
+                for="transfer-date"
+                :class="{ 'error-text': showFormError && !transferDate }"
+              >
+                Bill of Sale Date of Execution
+              </label>
+            </v-col>
+            <v-col cols="9">
+              <date-picker
+                id="transfer-date"
+                clearable
+                ref="transferDateRef"
+                title="Date"
+                :errorMsg="showFormError && !transferDate ? 'Enter bill of sale date of execution' : ''"
+                :initialValue="transferDate"
+                :key="Math.random()"
+                @emitDate="transferDate = $event"
+                @emitCancel="transferDate = null"
+                @emitClear="transferDate = null"
+                data-test-id="transfer-date"
+              />
+            </v-col>
+          </v-row>
+          <v-divider class="mx-0 mt-2 mb-7" />
+        </template>
         <v-row>
           <v-col cols="3">
             <label class="generic-label" for="lease-own">
@@ -186,6 +188,7 @@ export default defineComponent({
     return {
       hasError,
       considerationRef,
+      isTransferDueToDeath,
       updateConsideration,
       clearTransferDetailsData,
       ...toRefs(localState)

@@ -85,7 +85,7 @@
                 <!-- Review Header -->
                 <header class="review-header mt-1 rounded-top">
                   <v-icon class="ml-2" color="darkBlue">mdi-file-document-multiple</v-icon>
-                  <label class="font-weight-bold pl-2">Ownership Transfer or Change - {{ getUiTransferType() }}</label>
+                  <label class="font-weight-bold pl-2">Ownership Transfer or Change</label>
                 </header>
 
                 <section id="owners-review">
