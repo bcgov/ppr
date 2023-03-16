@@ -24,28 +24,30 @@ from flask import current_app
 from mhr_api.models.utils import is_legacy
 
 
-# testdata pattern is ({desc}, {status})
-# Add more when report available.
+# testdata pattern is ({desc}, {status}, {use_param})
 TEST_SYNC_DATA = [
-    ('Valid', HTTPStatus.OK),
-    ('Unauthorized', HTTPStatus.UNAUTHORIZED)
+    ('Valid request header', HTTPStatus.OK, False),
+    ('Valid request param', HTTPStatus.OK, True),
+    ('Unauthorized', HTTPStatus.UNAUTHORIZED, False)
 ]
 
 
-@pytest.mark.parametrize('desc,status', TEST_SYNC_DATA)
-def test_ltsa_sync(session, client, jwt, desc, status):
+@pytest.mark.parametrize('desc,status,use_param', TEST_SYNC_DATA)
+def test_ltsa_sync(session, client, jwt, desc, status, use_param):
     """Assert that a callback request returns the expected status."""
     # invert logic to execute otherwise the test could be making up to 500 ltsa calls.
     if not is_legacy():
         headers = None
+        path: str = '/api/v1/ltsa-sync'
         if status != HTTPStatus.UNAUTHORIZED:
             apikey = current_app.config.get('SUBSCRIPTION_API_KEY')
-            if apikey:
+            if apikey and use_param:
+                path += '?x-apikey=' + apikey
+            else:
                 headers = {
                     'x-apikey': apikey
                 }
-        rv = client.post('/api/v1/ltsa-sync',
-                        headers=headers)
+        rv = client.post(path, headers=headers)
         # check
         assert rv.status_code == status
         if status == HTTPStatus.OK:

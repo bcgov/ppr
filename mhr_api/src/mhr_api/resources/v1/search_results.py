@@ -123,6 +123,19 @@ def post_search_results(search_id: str):  # pylint: disable=too-many-branches, t
         pay_ref: None
         invoice_id = None
         certified: bool = False
+        # Conditionally update client reference id from request parameter.
+        # Do here to pass to an updated value to the pay api.
+        if request.args.get(CLIENT_REF_PARAM):
+            client_ref: str = request.args.get(CLIENT_REF_PARAM)
+            client_ref = client_ref.strip()
+            if client_ref is not None and len(client_ref) < 51:  # Allow empty strings as clearing the value.
+                query.client_reference_id = client_ref
+                # Also update the original search criteria json as this is used in the account search history.
+                criteria = copy.deepcopy(query.search_criteria)
+                criteria['clientReferenceId'] = client_ref
+                query.search_criteria = criteria
+                current_app.logger.info(f'POST search results updating client ref to {client_ref}.')
+
         # Staff has special payment rules and setup.
         if is_staff_account(account_id, jwt) or is_bcol_help(account_id, jwt):
             current_app.logger.info(f'Setting up reg staff search for {account_id}.')
@@ -147,17 +160,6 @@ def post_search_results(search_id: str):  # pylint: disable=too-many-branches, t
         invoice_id = pay_ref['invoiceId']
         query.pay_invoice_id = int(invoice_id)
         query.pay_path = pay_ref['receipt']
-        # Conditionally update client reference id from request parameter
-        if request.args.get(CLIENT_REF_PARAM):
-            client_ref: str = request.args.get(CLIENT_REF_PARAM)
-            client_ref = client_ref.strip()
-            if client_ref is not None and len(client_ref) < 51:  # Allow empty strings as clearing the value.
-                query.client_reference_id = client_ref
-                # Also update the original search criteria json as this is used in the account search history.
-                criteria = copy.deepcopy(query.search_criteria)
-                criteria['clientReferenceId'] = client_ref
-                query.search_criteria = criteria
-                current_app.logger.info(f'POST search results updating client ref to {client_ref}.')
         try:
             # Save the search query selection and details that match the selection.
             account_name = resource_utils.get_account_name(jwt.get_token_auth_header(), account_id)

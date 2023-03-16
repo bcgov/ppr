@@ -219,6 +219,68 @@ ADMIN_ADD_GROUPS = [
         'type': 'SOLE'
     }
 ]
+WILL_DELETE_GROUPS = [
+    {
+        'groupId': 1,
+        'owners': [
+            {
+                'individualName': {
+                    'first': 'SHARON',
+                    'last': 'HALL'
+                 },
+                'address': {
+                    'street': '3122B LYNNLARK PLACE',
+                    'city': 'VICTORIA',
+                    'region': 'BC',
+                    'postalCode': 'V8S 4I6',
+                    'country': 'CA'
+                },
+                'phoneNumber': '6041234567'
+            }, {
+                'individualName': {
+                    'first': 'DENNIS',
+                    'last': 'HALL'
+                },
+                'address': {
+                    'street': '3122B LYNNLARK PLACE',
+                    'city': 'VICTORIA',
+                    'region': 'BC',
+                    'postalCode': 'V8S 4I6',
+                    'country': 'CA'
+                },
+                'phoneNumber': '6041234567',
+                'deathCertificateNumber': '232432432',
+                'deathDateTime': '2021-02-21T18:56:00+00:00'
+            }
+        ],
+        'type': 'JOINT'
+    }
+]
+WILL_ADD_GROUPS = [
+    {
+        'groupId': 2,
+        'owners': [
+            {
+                'individualName': {
+                    'first': 'APPOINTED',
+                    'last': 'EXECUTOR'
+                },
+                'address': {
+                    'street': '3122B LYNNLARK PLACE',
+                    'city': 'VICTORIA',
+                    'region': 'BC',
+                    'postalCode': 'V8S 4I6',
+                    'country': 'CA'
+                },
+                'phoneNumber': '6041234567',
+                'partyType': 'EXECUTOR',
+                'description': 'EXECUTOR of the deceased.'
+            }
+        ],
+        'type': 'SOLE'
+    }
+]
+
 
 # testdata pattern is ({description}, {mhr_num}, {roles}, {status}, {account})
 TEST_CREATE_DATA = [
@@ -318,6 +380,9 @@ def test_create_transfer_death(session, client, jwt, desc, mhr_num, roles, statu
     elif reg_type == MhrRegistrationTypes.TRANS_ADMIN:
         json_data['deleteOwnerGroups'] = copy.deepcopy(ADMIN_DELETE_GROUPS)
         json_data['addOwnerGroups'] = copy.deepcopy(ADMIN_ADD_GROUPS)
+    elif reg_type == MhrRegistrationTypes.TRANS_WILL:
+        json_data['deleteOwnerGroups'] = copy.deepcopy(WILL_DELETE_GROUPS)
+        json_data['addOwnerGroups'] = copy.deepcopy(WILL_ADD_GROUPS)
     else:
         json_data['deleteOwnerGroups'] = copy.deepcopy(EXEC_DELETE_GROUPS)
         json_data['addOwnerGroups'] = copy.deepcopy(EXEC_ADD_GROUPS)
