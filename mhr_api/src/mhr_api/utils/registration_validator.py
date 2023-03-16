@@ -453,6 +453,8 @@ def validate_submitting_party(json_data):
         error_msg += validate_text(party.get('businessName'), desc + ' business name')
     elif party.get('personName'):
         error_msg += validate_individual_name(party.get('personName'), desc)
+    if party.get('address'):
+        error_msg += validate_address(party.get('address'), desc)
     return error_msg
 
 
@@ -466,6 +468,8 @@ def validate_owner(owner):
         error_msg += validate_text(owner.get('organizationName'), desc + ' organization name')
     elif owner.get('individualName'):
         error_msg += validate_individual_name(owner.get('individualName'), desc)
+    if owner.get('address'):
+        error_msg += validate_address(owner.get('address'), desc)
     return error_msg
 
 
@@ -639,6 +643,8 @@ def validate_location(json_data):
     elif location.get('locationType') and location['locationType'] == MhrLocationTypes.MH_PARK:
         if not location.get('parkName'):
             error_msg += LOCATION_PARK_NAME_REQUIRED
+    if location.get('address'):
+        error_msg += validate_address(location.get('address'), desc)
     return error_msg
 
 
@@ -647,6 +653,14 @@ def validate_individual_name(name_json, desc: str = ''):
     error_msg = validate_text(name_json.get('first'), desc + ' first')
     error_msg += validate_text(name_json.get('last'), desc + ' last')
     error_msg += validate_text(name_json.get('middle'), desc + ' middle')
+    return error_msg
+
+
+def validate_address(address_json, desc: str = ''):
+    """Verify address is valid."""
+    error_msg = validate_text(address_json.get('street'), desc + ' street')
+    error_msg += validate_text(address_json.get('streetAdditional'), desc + ' streetAdditional')
+    error_msg += validate_text(address_json.get('city'), desc + ' city')
     return error_msg
 
 

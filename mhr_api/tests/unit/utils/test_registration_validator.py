@@ -341,6 +341,9 @@ TEST_PARTY_DATA = [
     ('Reg invalid first name', None, INVALID_TEXT_CHARSET, 'middle', 'last', INVALID_CHARSET_MESSAGE, REGISTRATION),
     ('Reg invalid middle name', None, 'first', INVALID_TEXT_CHARSET, 'last', INVALID_CHARSET_MESSAGE, REGISTRATION),
     ('Reg invalid last name', None, 'first', 'middle', INVALID_TEXT_CHARSET, INVALID_CHARSET_MESSAGE, REGISTRATION),
+    ('Reg invalid street', None, 'first', 'middle', 'last', INVALID_CHARSET_MESSAGE, REGISTRATION),
+    ('Reg invalid streetAdditional', None, 'first', 'middle', 'last', INVALID_CHARSET_MESSAGE, REGISTRATION),
+    ('Reg invalid city', None, 'first', 'middle', 'last', INVALID_CHARSET_MESSAGE, REGISTRATION),
     ('Trans invalid org/bus name', INVALID_TEXT_CHARSET, None, None, None, INVALID_CHARSET_MESSAGE, TRANSFER),
     ('Trans invalid first name', None, INVALID_TEXT_CHARSET, 'middle', 'last', INVALID_CHARSET_MESSAGE, TRANSFER),
     ('Trans invalid middle name', None, 'first', INVALID_TEXT_CHARSET, 'last', INVALID_CHARSET_MESSAGE, TRANSFER),
@@ -507,6 +510,12 @@ def test_validate_submitting(session, desc, bus_name, first, middle, last, messa
             'middle': middle,
             'last': last
         }
+    if desc == 'Reg invalid street':
+        party['address']['street'] = INVALID_TEXT_CHARSET
+    elif desc == 'Reg invalid streetAdditional':
+        party['address']['streetAdditional'] = INVALID_TEXT_CHARSET
+    elif desc == 'Reg invalid city':
+        party['address']['city'] = INVALID_TEXT_CHARSET
     error_msg = ''
     if desc.startswith('Reg'):
         error_msg = validator.validate_registration(json_data, False)
@@ -537,6 +546,12 @@ def test_validate_owner(session, desc, bus_name, first, middle, last, message_co
             'middle': middle,
             'last': last
         }
+    if desc == 'Reg invalid street':
+        party['address']['street'] = INVALID_TEXT_CHARSET
+    elif desc == 'Reg invalid streetAdditional':
+        party['address']['streetAdditional'] = INVALID_TEXT_CHARSET
+    elif desc == 'Reg invalid city':
+        party['address']['city'] = INVALID_TEXT_CHARSET
     error_msg = ''
     if desc.startswith('Reg'):
         error_msg = validator.validate_registration(json_data, False)

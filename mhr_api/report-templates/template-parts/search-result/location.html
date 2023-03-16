@@ -76,9 +76,6 @@
                     <div>{{ detail.location.address.city }} 
                         {{ detail.location.address.region }}</div>
                     <div>
-                        {% if detail.location.address.postalCode is defined and detail.location.address.postalCode != '' %}
-                            {{ detail.location.address.postalCode }}&nbsp;&nbsp; 
-                        {% endif %}
                         {{ detail.location.address.country }}
                     </div>
                 </td>
