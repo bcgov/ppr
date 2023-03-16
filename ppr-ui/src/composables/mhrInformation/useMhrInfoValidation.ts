@@ -2,7 +2,7 @@ import { useGetters } from 'vuex-composition-helpers'
 // @ts-ignore
 import { mhrInfoValidationState, MhrRegistrationHomeOwnerIF, mhrInfoValidationStateIF } from '@/interfaces'
 import { computed } from '@vue/composition-api'
-import { useHomeOwners } from '@/composables'
+import { useHomeOwners, useTransferOwners } from '@/composables'
 
 export const useMhrInfoValidation = (validationState: mhrInfoValidationStateIF) => {
   const {
@@ -18,6 +18,9 @@ export const useMhrInfoValidation = (validationState: mhrInfoValidationStateIF) 
   const {
     isGlobalEditingMode
   } = useHomeOwners(true)
+  const {
+    isTransferDueToDeath
+  } = useTransferOwners()
 
   /** Set specified flag */
   const setValidation = (propertyKey: string, isValid: boolean): void => {
@@ -36,7 +39,7 @@ export const useMhrInfoValidation = (validationState: mhrInfoValidationStateIF) 
       !isGlobalEditingMode.value &&
       validationState.isValidTransferType &&
       validationState.isValidTransferOwners &&
-      validationState.isTransferDetailsValid &&
+      (isTransferDueToDeath.value || validationState.isTransferDetailsValid) &&
       !hasLien.value
     )
   })
