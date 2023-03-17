@@ -2,21 +2,21 @@
     <v-card
       id="death-certificate"
       flat
-      class="pl-8 rounded death-certificate"
+      class="rounded death-certificate"
       :class="{ 'border-error-left': showFormError }"
       >
       <v-form ref="deathCertificateForm" v-model="isFormValid">
         <v-row>
-          <v-col cols="3">
-            <label
-              class="generic-label"
+          <v-col cols="3" class="pr-0">
+            <div
+              class="generic-label pl-8"
               for="deathCertificateNumber"
               :class="{ 'error-text': validateDeathCertificate && hasError(deathCertificateNumberRef) }"
             >
               Death Certificate Registration Number
-            </label>
+          </div>
           </v-col>
-          <v-col cols="9">
+          <v-col cols="9" class="pl-2">
             <v-text-field
               id="death-certificate-number"
               v-model="deathCertificateNumber"
@@ -29,16 +29,16 @@
           </v-col>
         </v-row>
         <v-row>
-          <v-col cols="3">
-            <label
-              class="generic-label"
+          <v-col cols="3" class="pr-0">
+            <div
+              class="generic-label pl-8"
               for="death-date-time"
               :class="{ 'error-text': validateDeathCertificate && !deathDateTime }"
             >
               Date of Death
-            </label>
+          </div>
           </v-col>
-          <v-col cols="9">
+          <v-col cols="9" class="pl-2">
             <date-picker
               id="death-date-time"
               clearable
@@ -63,7 +63,7 @@
               label="I have an original or certified copy of the death certificate, and confirm
               that it was issued from Canada or the United States, and the name on
               the death certificate matches the name displayed above exactly."
-              v-model="hasCertificate"
+              v-model="hasDeathCertificate"
               class="mt-0 pt-0 has-certificate-checkbox"
               data-test-id="has-certificate-checkbox"
             />
@@ -113,7 +113,8 @@ export default defineComponent({
       isDeathCertificateFormValid: computed((): boolean => localState.isFormValid && !!localState.deathDateTime),
       deathCertificateNumber: props.deceasedOwner?.deathCertificateNumber,
       deathDateTime: props.deceasedOwner?.deathDateTime,
-      hasCertificate: false, // Will be used for validation on UI side only (original certificate checkbox)
+      // Will be used for validation on UI side only (original certificate checkbox)
+      hasDeathCertificate: props.deceasedOwner?.hasDeathCertificate,
       showFormError: computed(() => localState.validateDeathCertificate && !localState.isDeathCertificateFormValid),
       maxDeathDate: computed((): Date => {
         var dateOffset = 24 * 60 * 60 * 1000 // 1 day in milliseconds
@@ -149,6 +150,18 @@ export default defineComponent({
       (val: string) => {
         editHomeOwner(
           { ...props.deceasedOwner, deathDateTime: val },
+          props.deceasedOwner.groupId
+        )
+        setUnsavedChanges(true)
+      }
+    )
+
+    // Update deceased owner hasDeathCertificate when value changes
+    watch(
+      () => localState.hasDeathCertificate,
+      (val: boolean) => {
+        editHomeOwner(
+          { ...props.deceasedOwner, hasDeathCertificate: val },
           props.deceasedOwner.groupId
         )
         setUnsavedChanges(true)

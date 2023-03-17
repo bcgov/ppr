@@ -17,6 +17,7 @@ export interface MhrRegistrationHomeOwnerIF {
   address: AddressIF
   deathCertificateNumber?: string
   deathDateTime?: string
+  hasDeathCertificate?: boolean
   partyType?: HomeOwnerPartyTypes
   type?: ApiHomeTenancyTypes
 }
