@@ -21,7 +21,7 @@
           </v-col>
           <v-col cols="9" class="confirm-completion-req">
             <ol>
-              <li v-if="transferType==='TRANS'" class="pl-3 pb-3 mb-7">
+              <li v-if="transferType === ApiTransferTypes.SALE_OR_GIFT" class="pl-3 pb-3 mb-7">
                 <p><strong>Bill of sale</strong> has been signed by either all owners or by someone with the authority
                   to act on behalf of the registered owners and witnessed by an independent third party. If this is a
                   transfer to a beneficiary, you must have written consent from all beneficiaries that are not being
@@ -33,8 +33,8 @@
                   of seizure and sale.
                 </p>
               </li>
-              <li v-else-if="transferType==='TRAND'" class="pl-3 pb-3 mb-7">
-                <p><strong>Orignal or
+              <li v-else-if="transferType === ApiTransferTypes.SURVIVING_JOINT_TENANT" class="pl-3 pb-3 mb-7">
+                <p><strong>Original or
                   <v-tooltip
                     top
                     content-class="top-tooltip pa-5"
@@ -75,7 +75,7 @@
               <li class="pl-3 pb-3 mb-7">
                 <p><strong>Transfer or Change Ownership form</strong> has been recieved and retained</p>
               </li>
-              <li v-if="transferType==='TRANS'" class="pl-3 pb-3 mb-7">
+              <li v-if="transferType === ApiTransferTypes.SALE_OR_GIFT" class="pl-3 pb-3 mb-7">
                 <p><strong>Search of the Corporate Register</strong> has been completed if one or more of the current or
                 future owners is an incorporated company, society or cooperative association.</p>
                 <p class="confirm-completion-note">
@@ -117,6 +117,7 @@
 <script lang="ts">
 import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
 import { useGetters } from 'vuex-composition-helpers'
+import { ApiTransferTypes } from '@/enums'
 
 export default defineComponent({
   name: 'ConfirmCompletion',
@@ -158,6 +159,7 @@ export default defineComponent({
     )
 
     return {
+      ApiTransferTypes,
       ...toRefs(localState)
     }
   }
