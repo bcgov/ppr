@@ -1,11 +1,11 @@
 <template>
   <svg
-  width="29px"
-  height="25px"
-  viewBox="0 0 29 25"
-  version="1.1"
-  xmlns="http://www.w3.org/2000/svg"
-  xmlns:xlink="http://www.w3.org/1999/xlink"
+    width="29px"
+    height="25px"
+    viewBox="0 0 29 25"
+    version="1.1"
+    xmlns="http://www.w3.org/2000/svg"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
   >
     <title>home location</title>
     <g id="Final-MHR-Registration-MVP" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">

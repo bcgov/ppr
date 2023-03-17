@@ -131,7 +131,8 @@ svg { // only affects custom icon sizing
   }
 
   g {
-    fill:#fff; // fill for custom SVG icons
+    transition: 0.3s cubic-bezier(0.25, 0.8, 0.5, 1), visibility 0s;
+    fill: #fff; // fill for custom SVG icons
   }
 
   .step__icon {

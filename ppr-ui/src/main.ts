@@ -30,7 +30,7 @@ import App from './App.vue'
 // Helpers
 import { fetchConfig, initLdClient, isSigningIn, isSigningOut } from '@/utils'
 import KeycloakService from 'sbc-common-components/src/services/keycloak.services'
-import { HomeLocationIcon, HomeOwnersIcon } from './assets/svgs/Index'
+import { HomeLocationIcon, HomeOwnersIcon } from './assets/svgs/index'
 
 // get rid of "element implicitly has an 'any' type..."
 declare const window: any
