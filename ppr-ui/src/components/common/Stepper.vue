@@ -126,6 +126,10 @@ export default defineComponent({
     background-color: $primary-blue;
   }
 
+  g {
+    fill:#fff; // fill for custom SVG icons
+  }
+
   .step__icon {
     color: #fff;
     background: inherit;
@@ -133,6 +137,9 @@ export default defineComponent({
 }
 
 .selected-btn {
+  g {
+    fill:#fff; // fill for custom SVG icons
+  }
   background-color: $primary-blue !important;
 }
 

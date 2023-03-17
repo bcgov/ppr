@@ -1,7 +1,7 @@
 <template>
   <v-card flat id="home-location-summary" class="mt-6">
     <header class="review-header">
-      <v-icon class="ml-1" color="darkBlue">mdi-home</v-icon>
+      <img class="ml-1" color="darkBlue" src="@/assets/svgs/homelocationicon_reviewscreen.svg" />
       <label class="font-weight-bold pl-2">Location of Home</label>
     </header>
 
