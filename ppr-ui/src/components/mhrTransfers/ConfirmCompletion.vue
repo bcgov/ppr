@@ -21,7 +21,7 @@
           </v-col>
           <v-col cols="9" class="confirm-completion-req">
             <ol>
-              <li class="pl-3 pb-3 mb-7">
+              <li v-if="transferType==='TRANS'" class="pl-3 pb-3 mb-7">
                 <p><strong>Bill of sale</strong> has been signed by either all owners or by someone with the authority
                   to act on behalf of the registered owners and witnessed by an independent third party. If this is a
                   transfer to a beneficiary, you must have written consent from all beneficiaries that are not being
@@ -33,7 +33,49 @@
                   of seizure and sale.
                 </p>
               </li>
+              <li v-else-if="transferType==='TRAND'" class="pl-3 pb-3 mb-7">
+                <p><strong>Orignal or
+                  <v-tooltip
+                    top
+                    content-class="top-tooltip pa-5"
+                    transition="fade-transition"
+                    data-test-id="organization-tooltip"
+                    allow-overflow
+                  >
+                    <template v-slot:activator="{ on, attrs }">
+                      <span
+                        v-bind="attrs"
+                        v-on="on"
+                      ><u> certified copy</u></span>
+                    </template>
+                    Original or certified document from Vital Statistics. A statement of death or a cremation
+                    certificate from a funeral director is not acceptable.
+                  </v-tooltip>
+                  of Death Certificate</strong> that has been issued by Vital Statistics and has been recieved for each
+                  joint tenant owner being removed due to death. I confirm that it was
+                  <v-tooltip
+                    top
+                    content-class="top-tooltip pa-5"
+                    transition="fade-transition"
+                    data-test-id="organization-tooltip"
+                    allow-overflow
+                  >
+                    <template v-slot:activator="{ on, attrs }">
+                      <span
+                        v-bind="attrs"
+                        v-on="on"
+                      ><u> issued from Canada or the United States</u></span>
+                    </template>
+                    If the death certificate was issued outside of Canada or the US, the transfer will have to be sent
+                    to the Manufactured Home Registry
+                  </v-tooltip>
+                  , and the name on the death certificate matches the name displayed above exactly.
+                  </p>
+              </li>
               <li class="pl-3 pb-3 mb-7">
+                <p><strong>Transfer or Change Ownership form</strong> has been recieved and retained</p>
+              </li>
+              <li v-if="transferType==='TRANS'" class="pl-3 pb-3 mb-7">
                 <p><strong>Search of the Corporate Register</strong> has been completed if one or more of the current or
                 future owners is an incorporated company, society or cooperative association.</p>
                 <p class="confirm-completion-note">
@@ -74,6 +116,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
+import { useGetters } from 'vuex-composition-helpers'
 
 export default defineComponent({
   name: 'ConfirmCompletion',
@@ -94,11 +137,17 @@ export default defineComponent({
   },
   emits: ['confirmCompletion'],
   setup (props, { emit }) {
+    const {
+      getMhrTransferType
+    } = useGetters<any>([
+      'getMhrTransferType'
+    ])
     const localState = reactive({
       showErrorComponent: computed((): boolean => {
         return (props.setShowErrors && !localState.confirmCompletion)
       }),
-      confirmCompletion: false
+      confirmCompletion: false,
+      transferType: getMhrTransferType.value?.transferType
     })
 
     watch(
@@ -140,6 +189,11 @@ export default defineComponent({
     span {
       font-weight: bold;
     }
+  }
+
+  u {
+    border-bottom: 1px dotted #000;
+    text-decoration: none;
   }
 
   .confirm-checkbox::v-deep {
