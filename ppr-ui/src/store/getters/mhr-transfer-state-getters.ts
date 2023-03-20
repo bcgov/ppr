@@ -1,5 +1,5 @@
 import {
-  mhrInfoValidationState,
+  mhrInfoValidationStateIF,
   MhrRegistrationHomeOwnerGroupIF,
   MhrRegistrationHomeOwnerIF,
   StateIF,
@@ -8,7 +8,7 @@ import {
 } from '@/interfaces'
 
 // Mhr Info Validation State
-export const getMhrInfoValidation = (state: StateIF): mhrInfoValidationState => {
+export const getMhrInfoValidation = (state: StateIF): mhrInfoValidationStateIF => {
   return state.stateModel.mhrInfoValidationState
 }
 

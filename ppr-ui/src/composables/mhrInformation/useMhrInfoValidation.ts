@@ -1,8 +1,13 @@
 import { useGetters } from 'vuex-composition-helpers'
 // @ts-ignore
-import { mhrInfoValidationState, MhrRegistrationHomeOwnerIF, mhrInfoValidationStateIF } from '@/interfaces'
+import {
+  mhrInfoValidationStateIF,
+  MhrRegistrationHomeOwnerGroupIF,
+  MhrRegistrationHomeOwnerIF
+} from '@/interfaces'
 import { computed } from '@vue/composition-api'
 import { useHomeOwners, useTransferOwners } from '@/composables'
+import { ActionTypes } from '@/enums'
 
 export const useMhrInfoValidation = (validationState: mhrInfoValidationStateIF) => {
   const {
@@ -16,7 +21,8 @@ export const useMhrInfoValidation = (validationState: mhrInfoValidationStateIF) 
   ])
 
   const {
-    isGlobalEditingMode
+    isGlobalEditingMode,
+    getGroupById
   } = useHomeOwners(true)
   const {
     isTransferDueToDeath
@@ -28,8 +34,19 @@ export const useMhrInfoValidation = (validationState: mhrInfoValidationStateIF) 
   }
 
   /** Get specified flag */
-  const getValidation = (propertyKey: string): boolean => {
+  const getInfoValidation = (propertyKey: string): boolean => {
     return validationState[propertyKey]
+  }
+
+  /** Returns true when the specified owner is a valid deceased owner **/
+  const isValidDeceasedOwner = (owner: MhrRegistrationHomeOwnerIF): boolean => {
+    return (!isTransferDueToDeath.value || owner.action !== ActionTypes.REMOVED) || (owner.hasDeathCertificate &&
+      !!owner.deathCertificateNumber && !!owner.deathDateTime)
+  }
+
+  /**  Returns true when the specific group is a valid deceased owner group **/
+  const isValidDeceasedOwnerGroup = (groupId: number): any => {
+    return getGroupById(groupId)?.owners?.every(owner => isValidDeceasedOwner(owner))
   }
 
   /** Returns true when the Transfer is complete and valid **/
@@ -68,11 +85,20 @@ export const useMhrInfoValidation = (validationState: mhrInfoValidationStateIF) 
     }, 10)
   }
 
+  /** Reset the validation state to default **/
+  const resetValidationState = (): void => {
+    // eslint-disable-next-line no-return-assign
+    Object.keys(validationState).forEach(flag => validationState[flag] = false)
+  }
+
   return {
     setValidation,
-    getValidation,
+    getInfoValidation,
     isValidTransfer,
+    isValidDeceasedOwner,
+    isValidDeceasedOwnerGroup,
     isValidTransferReview,
-    scrollToFirstError
+    scrollToFirstError,
+    resetValidationState
   }
 }

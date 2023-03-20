@@ -1,10 +1,11 @@
 import {
-  AccountInfoIF, ErrorIF,
+  AccountInfoIF,
   MhrHomeOwnerGroupIF,
   MhrRegistrationDescriptionIF,
-  MhrRegistrationHomeLocationIF, MhrRegistrationHomeOwnerGroupIF,
+  MhrRegistrationHomeLocationIF,
   MhrTransferApiIF,
-  MhrTransferIF, SubmittingPartyIF, TransferTypeSelectIF
+  MhrTransferIF,
+  SubmittingPartyIF
 } from '@/interfaces'
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import {
@@ -15,9 +16,9 @@ import {
   UIRegistrationTypes,
   UITransferTypes
 } from '@/enums'
-import { fetchMhRegistration, getMhrTransferDraft } from '@/utils'
+import { fetchMhRegistration, getMhrTransferDraft, normalizeObject } from '@/utils'
 import { cloneDeep } from 'lodash'
-import { useHomeOwners } from '@/composables'
+import { useHomeOwners, useTransferOwners } from '@/composables'
 
 export const useMhrInformation = () => {
   const {
@@ -71,6 +72,10 @@ export const useMhrInformation = () => {
   const {
     setShowGroups
   } = useHomeOwners(true)
+  const {
+    getCurrentOwnerStateById,
+    getCurrentOwnerGroupIdByOwnerId
+  } = useTransferOwners()
 
   /** New Filings / Initializing **/
 
@@ -194,9 +199,14 @@ export const useMhrInformation = () => {
       if (ownerGroup.action !== ActionTypes.REMOVED || isDraft) {
         ownerGroup.interestDenominator = ownerGroup.interestDenominator || 0
         ownerGroup.interestNumerator = ownerGroup.interestNumerator || 0
+        const addedEditedOwners = ownerGroup.owners.filter(owner => owner.action !== ActionTypes.REMOVED)
+          .map(owner => {
+            return owner.individualName ? { ...owner, individualName: normalizeObject(owner.individualName) } : owner
+          })
+
         ownerGroups.push({
           ...ownerGroup,
-          owners: isDraft ? ownerGroup.owners : ownerGroup.owners.filter(owner => owner.action !== ActionTypes.REMOVED),
+          owners: isDraft ? ownerGroup.owners : addedEditedOwners,
           groupId: ownerGroup.groupId + 1, // Increment from baseline groupID to create a new group for API
           type: ApiHomeTenancyTypes[
             Object.keys(HomeTenancyTypes).find(key => HomeTenancyTypes[key] as string === ownerGroup.type)
@@ -206,6 +216,29 @@ export const useMhrInformation = () => {
     })
 
     return isDraft ? ownerGroups : ownerGroups.filter(ownerGroup => ownerGroup.action !== ActionTypes.REMOVED)
+  }
+
+  const parseDeletedOwnerGroups = (): any => {
+    // Return the current state for Sale or Gift
+    if (getMhrTransferType.value?.transferType === ApiTransferTypes.SALE_OR_GIFT) {
+      return getMhrTransferCurrentHomeOwnerGroups.value
+    }
+
+    const ownerGroups = []
+    getMhrTransferHomeOwnerGroups.value.forEach(ownerGroup => {
+      if (ownerGroup.owners.some(owner => owner.action === ActionTypes.REMOVED)) {
+        const deceasedOwners = ownerGroup.owners.filter(owner => owner.action === ActionTypes.REMOVED)
+
+        ownerGroups.push({
+          ...ownerGroup,
+          groupId: getCurrentOwnerGroupIdByOwnerId(deceasedOwners[0].ownerId),
+          owners: deceasedOwners,
+          type: ApiHomeTenancyTypes.JOINT // Can only remove Joint Tenants outside SoG Transfers (ie death scenarios)
+        })
+      }
+    })
+
+    return ownerGroups
   }
 
   const buildApiData = async (isDraft: boolean = false): Promise<MhrTransferApiIF> => {
@@ -231,7 +264,7 @@ export const useMhrInformation = () => {
         })
       },
       addOwnerGroups: await parseOwnerGroups(isDraft),
-      deleteOwnerGroups: getMhrTransferCurrentHomeOwnerGroups.value
+      deleteOwnerGroups: await parseDeletedOwnerGroups()
     }
 
     return data

@@ -414,7 +414,10 @@ export default defineComponent({
       })
     })
 
-    const hideShowRemovedOwners = (): void => {
+    const hideShowRemovedOwners = (forceShow: boolean = false): void => {
+      // Override Toggle to force show
+      if (forceShow) localState.hideRemovedOwners = true
+
       localState.hideRemovedOwners = !localState.hideRemovedOwners
       if (localState.hideRemovedOwners) filterDisplayedHomeOwners()
     }

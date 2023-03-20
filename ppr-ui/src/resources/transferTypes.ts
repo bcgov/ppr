@@ -2,7 +2,7 @@ import { TransferTypeSelectIF } from '@/interfaces'
 import { ApiTransferTypes, UITransferTypes } from '@/enums/transferTypes'
 import { BlankSearchTypes } from '@/enums'
 
-export const TransferTypes: Array<TransferTypeSelectIF> = [
+export const StaffTransferTypes: Array<TransferTypeSelectIF> = [
   {
     class: 'transfer-type-list-header',
     selectDisabled: true,
@@ -78,6 +78,29 @@ export const TransferTypes: Array<TransferTypeSelectIF> = [
       title: 'Supporting Documents Required',
       bullets: ['Original court certified true copy of Grant of Administration',
         'Affidavit of Administration with List of Assets and Liabilities', 'Transfer form', 'Transfer fee']
+    }
+  }
+]
+
+export const ClientTransferTypes: Array<TransferTypeSelectIF> = [
+  {
+    class: 'transfer-type-list-header',
+    selectDisabled: true,
+    divider: false,
+    group: 1,
+    transferType: BlankSearchTypes.BLANK1 as any,
+    textLabel: 'Transfer' as any,
+    color: 'primary'
+  },
+  {
+    divider: false,
+    selectDisabled: false,
+    transferType: ApiTransferTypes.SALE_OR_GIFT,
+    textLabel: UITransferTypes.SALE_OR_GIFT,
+    group: 1,
+    tooltip: {
+      title: 'Supporting Documents Required',
+      bullets: ['Transfer form', 'Bill of sale', 'Transfer fee']
     }
   }
 ]

@@ -29,7 +29,7 @@ export interface MhrValidationStateIF {
   }
 }
 
-export interface mhrInfoValidationState {
+export interface mhrInfoValidationStateIF {
   isValidTransferType: false,
   isValidTransferOwners: false,
   isTransferDetailsValid: false,
