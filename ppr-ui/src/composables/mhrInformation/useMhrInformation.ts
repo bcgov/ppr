@@ -16,7 +16,7 @@ import {
   UIRegistrationTypes,
   UITransferTypes
 } from '@/enums'
-import { fetchMhRegistration, getMhrTransferDraft } from '@/utils'
+import { fetchMhRegistration, getMhrTransferDraft, normalizeObject } from '@/utils'
 import { cloneDeep } from 'lodash'
 import { useHomeOwners, useTransferOwners } from '@/composables'
 
@@ -199,10 +199,12 @@ export const useMhrInformation = () => {
       if (ownerGroup.action !== ActionTypes.REMOVED || isDraft) {
         ownerGroup.interestDenominator = ownerGroup.interestDenominator || 0
         ownerGroup.interestNumerator = ownerGroup.interestNumerator || 0
+        const addedEditedOwners = ownerGroup.owners.filter(owner => owner.action !== ActionTypes.REMOVED)
+          .map(owner => { return { ...owner, individualName: normalizeObject(owner.individualName) } })
 
         ownerGroups.push({
           ...ownerGroup,
-          owners: isDraft ? ownerGroup.owners : ownerGroup.owners.filter(owner => owner.action !== ActionTypes.REMOVED),
+          owners: isDraft ? ownerGroup.owners : addedEditedOwners,
           groupId: ownerGroup.groupId + 1, // Increment from baseline groupID to create a new group for API
           type: ApiHomeTenancyTypes[
             Object.keys(HomeTenancyTypes).find(key => HomeTenancyTypes[key] as string === ownerGroup.type)
