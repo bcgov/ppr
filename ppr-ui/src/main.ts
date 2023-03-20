@@ -30,6 +30,7 @@ import App from './App.vue'
 // Helpers
 import { fetchConfig, initLdClient, isSigningIn, isSigningOut } from '@/utils'
 import KeycloakService from 'sbc-common-components/src/services/keycloak.services'
+import { HomeLocationIcon, HomeOwnersIcon } from './assets/svgs/index'
 
 // get rid of "element implicitly has an 'any' type..."
 declare const window: any
@@ -86,6 +87,16 @@ async function start () {
             error: '#d3272c',
             success: '#1a9031',
             darkGray: '#495057' // same as theme $gray7
+          }
+        }
+      },
+      icons: {
+        values: {
+          HomeLocationIcon: { // name of our custom icon
+            component: HomeLocationIcon // our custom component
+          },
+          HomeOwnersIcon: {
+            component: HomeOwnersIcon
           }
         }
       }

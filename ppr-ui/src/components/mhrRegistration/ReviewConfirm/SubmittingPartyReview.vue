@@ -48,7 +48,7 @@
                   </v-icon>
                 </v-col>
                 <v-col>
-                  <p class="side-header pt-1 font-weight-bold">
+                  <p class="submitting-name">
                     {{ getSubmittingPartyName() }}
                   </p>
                 </v-col>
@@ -202,8 +202,15 @@ export default defineComponent({
   font-size: 16px;
   color: $gray9;
 }
+.submitting-name {
+  font-weight: bold;
+  font-size: 14px;
+  color: $gray9;
+  padding-top: 1px;
+}
 
 .side-header-icon {
+  margin-top: -8px;
   color: $gray9;
 }
 

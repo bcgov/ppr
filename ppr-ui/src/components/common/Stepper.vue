@@ -98,6 +98,10 @@ export default defineComponent({
   border-radius: 4px;
   box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%), 0px 2px 2px 0px rgb(0 0 0 / 14%), 0px 1px 5px 0px rgb(0 0 0 / 12%);
 }
+svg { // only affects custom icon sizing
+  height: 29px !important;
+  width: 29px !important;
+}
 
 .v-btn:before {
   background-color: $BCgovInputBG !important;
@@ -126,6 +130,11 @@ export default defineComponent({
     background-color: $primary-blue;
   }
 
+  g {
+    transition: 0.3s cubic-bezier(0.25, 0.8, 0.5, 1), visibility 0s;
+    fill: #fff; // fill for custom SVG icons
+  }
+
   .step__icon {
     color: #fff;
     background: inherit;
@@ -133,6 +142,9 @@ export default defineComponent({
 }
 
 .selected-btn {
+  g {
+    fill:#fff; // fill for custom SVG icons
+  }
   background-color: $primary-blue !important;
 }
 

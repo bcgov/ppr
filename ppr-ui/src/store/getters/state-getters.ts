@@ -446,7 +446,7 @@ export const getMhrSteps = (state: any, getters: any): Array<any> => {
   {
     id: 'step-3-btn',
     step: 3,
-    icon: 'mdi-home', // TO BE UPDATED
+    icon: '$vuetify.icons.values.HomeOwnersIcon', // Vuetify custom SVG icon
     text: 'List Home <br />Owners',
     to: RouteNames.HOME_OWNERS,
     disabled: getters.isBusySaving,
@@ -457,7 +457,7 @@ export const getMhrSteps = (state: any, getters: any): Array<any> => {
   {
     id: 'step-4-btn',
     step: 4,
-    icon: 'mdi-home', // TO BE UPDATED
+    icon: '$vuetify.icons.values.HomeLocationIcon', // Vuetify custom SVG icon
     text: 'Location <br />of Home',
     to: RouteNames.HOME_LOCATION,
     disabled: getters.isBusySaving,
