@@ -200,7 +200,9 @@ export const useMhrInformation = () => {
         ownerGroup.interestDenominator = ownerGroup.interestDenominator || 0
         ownerGroup.interestNumerator = ownerGroup.interestNumerator || 0
         const addedEditedOwners = ownerGroup.owners.filter(owner => owner.action !== ActionTypes.REMOVED)
-          .map(owner => { return { ...owner, individualName: normalizeObject(owner.individualName) } })
+          .map(owner => {
+            return owner.individualName ? { ...owner, individualName: normalizeObject(owner.individualName) } : owner
+          })
 
         ownerGroups.push({
           ...ownerGroup,
