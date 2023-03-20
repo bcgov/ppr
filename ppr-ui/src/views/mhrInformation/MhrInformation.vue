@@ -259,6 +259,7 @@
                 <HomeOwners
                   isMhrTransfer
                   class="mt-n2"
+                  ref="homeOwnersComponentRef"
                   :class="{ 'mb-10': !hasUnsavedChanges }"
                   :validateTransfer="validate"
                   @isValidTransferOwners="setValidation('isValidTransferOwners', $event)"
@@ -457,6 +458,7 @@ export default defineComponent({
     } = useTransferOwners()
 
     // Refs
+    const homeOwnersComponentRef = ref(null)
     const transferDetailsComponent = ref(null)
 
     const localState = reactive({
@@ -658,8 +660,13 @@ export default defineComponent({
         localState.validate = false
       }
 
-      // Scroll to the top of review screen
+      // Force show removed/deceased homeOwners when invalid
+      if (!getInfoValidation('isValidTransferOwners')) {
+        (context.refs.homeOwnersComponentRef as any).hideShowRemovedOwners(true)
+      }
+
       await nextTick()
+      // Scroll to the top of review screen
       await scrollToFirstError(isValidTransfer.value)
     }
 
@@ -819,6 +826,7 @@ export default defineComponent({
       getMhrTransferCurrentHomeOwnerGroups,
       getCertifyInformation,
       maxLength,
+      homeOwnersComponentRef,
       transferDetailsComponent,
       getMhrInformation,
       quickMhrSearch,
