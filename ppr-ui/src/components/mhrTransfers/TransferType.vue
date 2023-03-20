@@ -29,14 +29,14 @@
               id="transfer-type-selector"
               ref="transferTypeSelectRef"
               filled
-              :items="TransferTypes"
+              :items="isRoleStaffReg ? StaffTransferTypes : ClientTransferTypes"
               item-disabled="selectDisabled"
               item-text="textLabel"
               item-value="transferType"
               label="Transfer Type"
               data-test-id="transfer-type-selector"
               v-model="selectedTransferType"
-              :rules="required('Select transfer type')"
+              :rules="transferTypeRules"
               :menu-props="{ bottom: true, offsetY: true }"
               return-object
             >
@@ -121,15 +121,16 @@
 </template>
 
 <script lang="ts">
-import { useInputRules } from '@/composables'
 import { computed, defineComponent, reactive, ref, toRefs, watch } from '@vue/composition-api'
 import { BaseDialog } from '@/components/dialogs'
-import { TransferTypes } from '@/resources'
+import { ClientTransferTypes, StaffTransferTypes } from '@/resources'
 import { useGetters } from 'vuex-composition-helpers'
 import { changeTransferType } from '@/resources/dialogOptions'
-import { cloneDeep } from 'lodash'
+import { useInputRules, useTransferOwners } from '@/composables'
 // eslint-disable-next-line no-unused-vars
 import { FormIF, TransferTypeSelectIF } from '@/interfaces'
+import { ApiTransferTypes } from '@/enums'
+import { cloneDeep } from 'lodash'
 
 export default defineComponent({
   name: 'TransferType',
@@ -142,14 +143,20 @@ export default defineComponent({
     const declaredValueRef = ref(null)
 
     const {
+      isRoleStaffReg,
       hasUnsavedChanges,
       getMhrTransferType,
       getMhrTransferDeclaredValue
     } = useGetters<any>([
+      'isRoleStaffReg',
       'hasUnsavedChanges',
       'getMhrTransferType',
       'getMhrTransferDeclaredValue'
     ])
+
+    const {
+      isJointTenancyStructure
+    } = useTransferOwners()
 
     const localState = reactive({
       isValid: false,
@@ -163,7 +170,8 @@ export default defineComponent({
           isNumber(),
           required('Enter declared value of home'))
       }),
-      showFormError: computed(() => props.validate && !localState.isValid)
+      showFormError: computed(() => props.validate && !localState.isValid),
+      transferTypeRules: []
     })
 
     const hasError = (ref: any): boolean => {
@@ -213,10 +221,34 @@ export default defineComponent({
       localState.declaredValue = val
     })
 
+    watch(() => localState.selectedTransferType, (val:TransferTypeSelectIF) => {
+      switch (val.transferType) {
+        case ApiTransferTypes.SALE_OR_GIFT:
+        case ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL:
+        case ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL:
+        case ApiTransferTypes.TO_ADMIN_PROBATE_NO_WILL:
+          localState.transferTypeRules = customRules(
+            required('Select transfer type')
+          )
+          break
+        case ApiTransferTypes.SURVIVING_JOINT_TENANT:
+          localState.transferTypeRules = customRules(
+            required('Select transfer type'),
+            [
+              () => isJointTenancyStructure.value ||
+              'An owner group with joint tenancy is required for this transfer type'
+            ]
+          )
+          break
+      }
+    })
+
     return {
       hasError,
       required,
-      TransferTypes,
+      isRoleStaffReg,
+      ClientTransferTypes,
+      StaffTransferTypes,
       transferTypeSelectRef,
       declaredValueRef,
       selectTransferType,

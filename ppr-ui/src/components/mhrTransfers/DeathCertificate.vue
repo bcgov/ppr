@@ -1,22 +1,16 @@
 <template>
-    <v-card
-      id="death-certificate"
-      flat
-      class="pl-8 rounded death-certificate"
-      :class="{ 'border-error-left': showFormError }"
-      >
+    <v-card id="death-certificate" flat class="rounded death-certificate">
       <v-form ref="deathCertificateForm" v-model="isFormValid">
         <v-row>
           <v-col cols="3">
-            <label
-              class="generic-label"
-              for="deathCertificateNumber"
-              :class="{ 'error-text': validateDeathCertificate && hasError(deathCertificateNumberRef) }"
+            <div
+              class="generic-label pl-8"
+              :class="{ 'error-text': validate && hasError(deathCertificateNumberRef) }"
             >
               Death Certificate Registration Number
-            </label>
+            </div>
           </v-col>
-          <v-col cols="9">
+          <v-col cols="9" class="pl-4">
             <v-text-field
               id="death-certificate-number"
               v-model="deathCertificateNumber"
@@ -30,21 +24,21 @@
         </v-row>
         <v-row>
           <v-col cols="3">
-            <label
-              class="generic-label"
+            <div
+              class="generic-label pl-8"
               for="death-date-time"
-              :class="{ 'error-text': validateDeathCertificate && !deathDateTime }"
+              :class="{ 'error-text': validate && !deathDateTime }"
             >
               Date of Death
-            </label>
+            </div>
           </v-col>
-          <v-col cols="9">
+          <v-col cols="9" class="pl-4">
             <date-picker
               id="death-date-time"
               clearable
               ref="deathDateTimeRef"
               title="Date of Death"
-              :errorMsg="validateDeathCertificate && !deathDateTime ? 'Enter date of death' : ''"
+              :errorMsg="validate && !deathDateTime ? 'Enter date of death' : ''"
               :initialValue="deathDateTime"
               :key="Math.random()"
               :maxDate="localTodayDate(maxDeathDate)"
@@ -57,14 +51,15 @@
         </v-row>
         <v-row>
           <v-spacer></v-spacer>
-          <v-col cols="9">
+          <v-col cols="9" class="pl-3">
             <v-checkbox
               id="has-certificate-checkbox"
               label="I have an original or certified copy of the death certificate, and confirm
               that it was issued from Canada or the United States, and the name on
               the death certificate matches the name displayed above exactly."
-              v-model="hasCertificate"
+              v-model="hasDeathCertificate"
               class="mt-0 pt-0 has-certificate-checkbox"
+              :error="validate && !hasDeathCertificate"
               data-test-id="has-certificate-checkbox"
             />
           </v-col>
@@ -76,17 +71,22 @@
 <script lang="ts">
 import { DatePicker } from '@bcrs-shared-components/date-picker'
 import { useInputRules, useHomeOwners } from '@/composables'
-import { computed, defineComponent, reactive, ref, toRefs, watch } from '@vue/composition-api'
+import { computed, defineComponent, nextTick, reactive, ref, toRefs, watch } from '@vue/composition-api'
 import { useActions } from 'vuex-composition-helpers'
 import { FormIF, MhrRegistrationHomeOwnerIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { localTodayDate } from '@/utils'
 
 export default defineComponent({
   name: 'DeathCertificate',
+  emits: ['isValid'],
   props: {
     deceasedOwner: {
       type: Object as () => MhrRegistrationHomeOwnerIF,
       default: null
+    },
+    validate: {
+      type: Boolean,
+      default: false
     }
   },
   components: { DatePicker },
@@ -100,26 +100,37 @@ export default defineComponent({
     } = useActions([
       'setUnsavedChanges'
     ])
-
+    const deathCertificateForm = ref(null)
     const deathCertificateNumberRef = ref(null)
-
     const deathCertificateNumberRules = computed(
-      (): Array<Function> => customRules(maxLength(20), required('Enter Death Certificate Registration Number'))
+      (): Array<Function> => customRules(
+        maxLength(20),
+        required('Enter Death Certificate Registration Number')
+      )
     )
 
     const localState = reactive({
-      validateDeathCertificate: false, // NEW VALIDATOR REQUIRED
       isFormValid: false, // Death Certificate form without Death Date Picker
-      isDeathCertificateFormValid: computed((): boolean => localState.isFormValid && !!localState.deathDateTime),
+      isDeathCertificateFormValid: computed((): boolean => {
+        return localState.isFormValid && !!localState.deathDateTime && localState.hasDeathCertificate
+      }),
       deathCertificateNumber: props.deceasedOwner?.deathCertificateNumber,
       deathDateTime: props.deceasedOwner?.deathDateTime,
-      hasCertificate: false, // Will be used for validation on UI side only (original certificate checkbox)
-      showFormError: computed(() => localState.validateDeathCertificate && !localState.isDeathCertificateFormValid),
+      hasDeathCertificate: props.deceasedOwner?.hasDeathCertificate,
+      showFormError: computed(() => {
+        return props.validate && !localState.isDeathCertificateFormValid
+      }),
       maxDeathDate: computed((): Date => {
         var dateOffset = 24 * 60 * 60 * 1000 // 1 day in milliseconds
         var maxDate = new Date()
         maxDate.setTime(maxDate.getTime() - dateOffset)
         return maxDate
+      }),
+      deathCertificateNumberRules: computed((): Array<Function> => {
+        return customRules(
+          maxLength(20),
+          required('Enter Death Certificate Registration Number')
+        )
       })
     })
 
@@ -127,36 +138,48 @@ export default defineComponent({
       return ref?.hasError
     }
 
-    // Need function to validate
+    // Validate form when prompted
+    watch(() => props.validate, (validate: boolean) => {
+      validate && (context.refs.deathCertificateForm as FormIF).validate()
+    })
 
-    // Need function to clear data on undo/cancel
+    watch(() => localState.isDeathCertificateFormValid, async (val: boolean) => {
+      context.emit('isValid', val)
+    }, { immediate: true })
 
     // Update deceased owner deathCertificateNumber when value changes
-    watch(
-      () => localState.deathCertificateNumber,
-      (val: string) => {
-        editHomeOwner(
-          { ...props.deceasedOwner, deathCertificateNumber: val },
-          props.deceasedOwner.groupId
-        )
-        setUnsavedChanges(true)
-      }
-    )
+    watch(() => localState.deathCertificateNumber, async (val: string) => {
+      await nextTick()
+      editHomeOwner(
+        { ...props.deceasedOwner, deathCertificateNumber: val },
+        props.deceasedOwner.groupId
+      )
+      setUnsavedChanges(true)
+    })
 
     // Update deceased owner deathDateTime when value changes
-    watch(
-      () => localState.deathDateTime,
-      (val: string) => {
-        editHomeOwner(
-          { ...props.deceasedOwner, deathDateTime: val },
-          props.deceasedOwner.groupId
-        )
-        setUnsavedChanges(true)
-      }
-    )
+    watch(() => localState.deathDateTime, async (val: string) => {
+      await nextTick()
+      editHomeOwner(
+        { ...props.deceasedOwner, deathDateTime: val },
+        props.deceasedOwner.groupId
+      )
+      setUnsavedChanges(true)
+    })
+
+    // Update deceased owner death certificate confirmation when value changes
+    watch(() => localState.hasDeathCertificate, async (val: boolean) => {
+      await nextTick()
+      editHomeOwner(
+        { ...props.deceasedOwner, hasDeathCertificate: val },
+        props.deceasedOwner.groupId
+      )
+      setUnsavedChanges(true)
+    })
 
     return {
       hasError,
+      deathCertificateForm,
       deathCertificateNumberRef,
       deathCertificateNumberRules,
       localTodayDate,

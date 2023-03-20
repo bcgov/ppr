@@ -23,7 +23,7 @@ import {
   MhrValidationStateIF,
   MhrTransferIF,
   MhRegistrationSummaryIF,
-  mhrInfoValidationState
+  mhrInfoValidationStateIF
 } from '@/interfaces'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 
@@ -81,5 +81,5 @@ export interface StateModelIF {
   mhrSearchResultSelectAllLien: boolean
   mhrValidationState?: MhrValidationStateIF
   mhrTransfer: MhrTransferIF
-  mhrInfoValidationState: mhrInfoValidationState
+  mhrInfoValidationState: mhrInfoValidationStateIF
 }

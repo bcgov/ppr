@@ -34,7 +34,9 @@
           v-if="!(disableGroupHeader(group) && (hideRemovedOwners || isReadonlyTable))"
           :colspan="4"
           class="py-1"
-          :class="{'spacer-header': disableGroupHeader(group)}"
+          :class="{'spacer-header': disableGroupHeader(group),
+            'border-error-left': showInvalidDeceasedOwnerGroupError(group)
+          }"
         >
           <TableGroupHeader
             :groupId="group"
@@ -82,7 +84,11 @@
           class="owner-info"
           :data-test-id="`owner-info-${row.item.ownerId}`"
         >
-          <td class="owner-name" :class="{'no-bottom-border' : isRemovedHomeOwner(row.item) && showDeathCertificate()}">
+          <td
+            class="owner-name"
+            :class="{'no-bottom-border' : isRemovedHomeOwner(row.item) && showDeathCertificate(),
+              'border-error-left': showInvalidDeceasedOwnerGroupError(row.item.groupId) }"
+          >
             <div :class="{'removed-owner': isRemovedHomeOwner(row.item)}">
               <div v-if="row.item.individualName" class="owner-icon-name">
                 <v-icon class="mr-2">mdi-account</v-icon>
@@ -273,17 +279,23 @@
           v-if="isRemovedHomeOwner(row.item) && showDeathCertificate() && !isReadonlyTable"
           class="death-certificate-row"
         >
-          <td :colspan="homeOwnersTableHeaders.length" class="py-0">
+          <td
+            :colspan="homeOwnersTableHeaders.length"
+            class="py-0"
+            :class="{ 'border-error-left': showInvalidDeceasedOwnerGroupError(row.item.groupId) }"
+          >
             <v-expand-transition>
               <DeathCertificate
                 :deceasedOwner="row.item"
+                :validate="validateTransfer"
+                @isValid="isValidDeathCertificate = $event"
               />
             </v-expand-transition>
           </td>
         </tr>
         <tr v-else-if="isRemovedHomeOwner(row.item) && showDeathCertificate && isReadonlyTable">
           <td :colspan="homeOwnersTableHeaders.length" class="deceased-review-info">
-            <v-row no-gutters class="ml-8 mb-n3">
+            <v-row no-gutters class="ml-8 my-n3">
               <v-col cols="12">
                 <p class="generic-label fs-14">Death Certificate Registration Number:
                   <span class="font-light mx-1">{{row.item.deathCertificateNumber}}</span>
@@ -309,7 +321,7 @@
 <script lang="ts">
 import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
 import { homeOwnersTableHeaders, homeOwnersTableHeadersReview } from '@/resources/tableHeaders'
-import { useHomeOwners, useMhrValidations, useTransferOwners } from '@/composables'
+import { useHomeOwners, useMhrInfoValidation, useMhrValidations, useTransferOwners } from '@/composables'
 import { BaseAddress } from '@/composables/address'
 import { PartyAddressSchema } from '@/schemas'
 import { toDisplayPhone } from '@/utils'
@@ -376,15 +388,17 @@ export default defineComponent({
       showDeathCertificate,
       isDisabledForSJTChanges,
       isCurrentOwner,
-      getCurrentOwnerStateById
+      getCurrentOwnerStateById,
+      isTransferDueToDeath
     } = useTransferOwners(!props.isMhrTransfer)
 
     const { setUnsavedChanges } = useActions<any>(['setUnsavedChanges'])
 
-    const { getMhrRegistrationValidationModel, hasUnsavedChanges } =
-      useGetters<any>(['getMhrRegistrationValidationModel', 'hasUnsavedChanges'])
+    const { getMhrRegistrationValidationModel, getMhrInfoValidation, hasUnsavedChanges } =
+      useGetters<any>(['getMhrRegistrationValidationModel', 'getMhrInfoValidation', 'hasUnsavedChanges'])
 
     const { getValidation, MhrSectVal, MhrCompVal } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
+    const { isValidDeceasedOwnerGroup } = useMhrInfoValidation(getMhrInfoValidation.value)
 
     const localState = reactive({
       currentlyEditingHomeOwnerId: -1,
@@ -393,6 +407,7 @@ export default defineComponent({
       ownerToDecease: null as MhrRegistrationHomeOwnerIF,
       isEditingMode: computed((): boolean => localState.currentlyEditingHomeOwnerId >= 0),
       isAddingMode: computed((): boolean => props.isAdding),
+      isValidDeathCertificate: false,
       showTableError: computed((): boolean => {
         return (props.validateTransfer || localState.reviewedOwners) &&
             (
@@ -425,6 +440,10 @@ export default defineComponent({
         return [HomeTenancyTypes.SOLE, HomeTenancyTypes.JOINT].includes(getHomeTenancyType())
       })
     })
+
+    const showInvalidDeceasedOwnerGroupError = (groupId): boolean => {
+      return props.validateTransfer && !isValidDeceasedOwnerGroup(groupId) && !localState.showTableError
+    }
 
     const remove = (item): void => {
       localState.currentlyEditingHomeOwnerId = -1
@@ -534,9 +553,10 @@ export default defineComponent({
       context.emit('isValidTransferOwners',
         hasMinimumGroups() &&
         localState.isValidAllocation &&
-        !localState.hasGroupsWithNoOwners
+        !localState.hasGroupsWithNoOwners &&
+        (!isTransferDueToDeath.value || localState.isValidDeathCertificate)
       )
-    }, { immediate: true, deep: true })
+    }, { deep: true })
 
     watch(
       () => enableTransferOwnerGroupActions(),
@@ -583,6 +603,7 @@ export default defineComponent({
       removeChangeOwnerHandler,
       handleOwnerChangesDialogResp,
       yyyyMmDdToPacificDate,
+      showInvalidDeceasedOwnerGroupError,
       ...toRefs(localState)
     }
   }

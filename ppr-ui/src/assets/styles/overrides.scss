@@ -685,6 +685,7 @@ input#reg-textfield.v-text-field.v-input--dense:not(.v-text-field--outlined),
 .theme--light.v-text-field--filled.v-input--is-disabled > .v-input__control > .v-input__slot {
   border-bottom: 1px dotted;
   cursor: default!important;
+  pointer-events: none!important;
 }
 .theme--light.v-input--is-disabled input {
   pointer-events: none!important;

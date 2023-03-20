@@ -20,6 +20,24 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     'getMhrTransferCurrentHomeOwnerGroups'
   ])
 
+  /** Returns true when the selected transfer type is a 'due to death' scenario **/
+  const isTransferDueToDeath = computed((): boolean => {
+    return [
+      ApiTransferTypes.SURVIVING_JOINT_TENANT,
+      ApiTransferTypes.TO_ADMIN_PROBATE_NO_WILL,
+      ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL,
+      ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL
+    ].includes(getMhrTransferType.value?.transferType)
+  })
+
+  /** Returns true when ownership structure is joint tenancy /w min 2  owners but not executors, trustees or admins. **/
+  const isJointTenancyStructure = computed((): boolean => {
+    return getMhrTransferCurrentHomeOwnerGroups.value.some(group => group.type === ApiHomeTenancyTypes.JOINT &&
+      group.owners.filter(owner => owner.partyType === HomeOwnerPartyTypes.OWNER_IND ||
+        owner.partyType === HomeOwnerPartyTypes.OWNER_BUS).length >= 2
+    )
+  })
+
   /** Conditionally show DeathCertificate based on Transfer Type **/
   const showDeathCertificate = (): boolean => {
     return getMhrTransferType.value?.transferType === ApiTransferTypes.SURVIVING_JOINT_TENANT ||
@@ -36,12 +54,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
         return true // Always enable for Sale or Gift
       case ApiTransferTypes.SURVIVING_JOINT_TENANT:
         // Check for joint tenancy (at least two owners who are not executors, trustees or admins)
-        return getMhrTransferCurrentHomeOwnerGroups.value.some(group =>
-          group.type === ApiHomeTenancyTypes.JOINT &&
-            group.owners.filter(owner =>
-              owner.partyType === HomeOwnerPartyTypes.OWNER_IND || owner.partyType === HomeOwnerPartyTypes.OWNER_BUS)
-              .length >= 2
-        )
+        return isJointTenancyStructure.value
       default:
         return false
     }
@@ -144,7 +157,21 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     getMhrTransferCurrentHomeOwnerGroups.value.forEach(group => group.owners.find(owner => {
       if (owner.ownerId === ownerId) currentOwner = owner
     }))
+
     return currentOwner
+  }
+
+  /**
+   * Return the base owners original groupId by owner id.
+   * @param ownerId The owner identifier
+   */
+  const getCurrentOwnerGroupIdByOwnerId = (ownerId: number): MhrRegistrationHomeOwnerIF => {
+    let currentOwnerGroupId
+    getMhrTransferCurrentHomeOwnerGroups.value.forEach(group => group.owners.find(owner => {
+      if (owner.ownerId === ownerId) currentOwnerGroupId = group.groupId
+    }))
+
+    return currentOwnerGroupId
   }
 
   /** Return true if the specified owner has been modified from current state **/
@@ -157,15 +184,6 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     return currentOwner && (!isEqualAddress || !isEqualPhone)
   }
 
-  const isTransferDueToDeath = computed((): boolean => {
-    return [
-      ApiTransferTypes.SURVIVING_JOINT_TENANT,
-      ApiTransferTypes.TO_ADMIN_PROBATE_NO_WILL,
-      ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL,
-      ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL
-    ].includes(getMhrTransferType.value?.transferType)
-  })
-
   return {
     enableHomeOwnerChanges,
     enableTransferOwnerGroupActions,
@@ -176,7 +194,9 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     isDisabledForSJTChanges,
     isCurrentOwner,
     isTransferDueToDeath,
+    isJointTenancyStructure,
     getCurrentOwnerStateById,
+    getCurrentOwnerGroupIdByOwnerId,
     hasCurrentOwnerChanges
   }
 }

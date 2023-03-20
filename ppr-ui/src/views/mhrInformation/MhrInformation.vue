@@ -141,7 +141,7 @@
                     rounded
                     id="attention-or-reference-number-card"
                     class="mt-8 pa-8 pr-6 pb-3"
-                    :class="{ 'border-error-left': !getValidation('isRefNumValid') }"
+                    :class="{ 'border-error-left': !getInfoValidation('isRefNumValid') }"
                     data-test-id="attn-ref-number-card"
                   >
                     <v-form ref="reference-number-form" v-model="refNumValid">
@@ -149,7 +149,7 @@
                         <v-col cols="3">
                           <label
                             class="generic-label"
-                            :class="{ 'error-text': !getValidation('isRefNumValid') }"
+                            :class="{ 'error-text': !getInfoValidation('isRefNumValid') }"
                           >
                             Attention or Reference Number
                           </label>
@@ -209,12 +209,12 @@
               <!-- MHR Information Section -->
               <template v-else>
 
-                <!-- Home Details Review -->
+                <!-- Home Details Information -->
                 <div class="mt-n2">
                   <YourHomeReview isTransferReview />
                 </div>
 
-                <!-- Home Location Review -->
+                <!-- Home Location Information -->
                 <div class="pt-4">
                   <HomeLocationReview isTransferReview />
                 </div>
@@ -267,7 +267,7 @@
                 <TransferDetails
                   v-if="hasUnsavedChanges"
                   ref="transferDetailsComponent"
-                  :validate="validate"
+                  :validate="!isTransferDueToDeath && validate"
                   @isValid="setValidation('isTransferDetailsValid', $event)"
                 />
               </template>
@@ -309,7 +309,7 @@ import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { StaffPayment } from '@bcrs-shared-components/staff-payment'
 import { StaffPaymentOptions } from '@bcrs-shared-components/enums'
 import { CertifyInformation, StickyContainer } from '@/components/common'
-import { useHomeOwners, useInputRules, useMhrInformation, useMhrInfoValidation } from '@/composables'
+import { useHomeOwners, useInputRules, useMhrInformation, useMhrInfoValidation, useTransferOwners } from '@/composables'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
 import { PartySearch } from '@/components/parties/party'
@@ -442,15 +442,19 @@ export default defineComponent({
     } = useMhrInformation()
     const {
       setValidation,
-      getValidation,
+      getInfoValidation,
       isValidTransfer,
       isValidTransferReview,
-      scrollToFirstError
+      scrollToFirstError,
+      resetValidationState
     } = useMhrInfoValidation(getMhrInfoValidation.value)
     const {
       setGlobalEditingMode
     } = useHomeOwners(true)
     const { maxLength } = useInputRules()
+    const {
+      isTransferDueToDeath
+    } = useTransferOwners()
 
     // Refs
     const transferDetailsComponent = ref(null)
@@ -493,16 +497,16 @@ export default defineComponent({
         return localState.isReviewMode ? 'Back' : ''
       }),
       validateSubmittingParty: computed((): boolean => {
-        return localState.validate && !getValidation('isSubmittingPartyValid')
+        return localState.validate && !getInfoValidation('isSubmittingPartyValid')
       }),
       validateConfirmCompletion: computed((): boolean => {
-        return localState.validate && !getValidation('isCompletionConfirmed')
+        return localState.validate && !getInfoValidation('isCompletionConfirmed')
       }),
       validateAuthorizationError: computed((): boolean => {
-        return localState.validate && !getValidation('isAuthorizationValid')
+        return localState.validate && !getInfoValidation('isAuthorizationValid')
       }),
       validateStaffPayment: computed(() => {
-        return isRoleStaffReg.value && localState.validate && !getValidation('isStaffPaymentValid')
+        return isRoleStaffReg.value && localState.validate && !getInfoValidation('isStaffPaymentValid')
       }),
       transferErrorMsg: computed((): string => {
         if (localState.validate && hasLien.value) return '< Lien on this home is preventing transfer'
@@ -692,6 +696,8 @@ export default defineComponent({
         setUnsavedChanges(false)
         setGlobalEditingMode(false)
         setEmptyMhrTransfer(initMhrTransfer())
+        resetValidationState()
+
         context.root.$router.push({
           name: RouteNames.DASHBOARD
         })
@@ -804,7 +810,7 @@ export default defineComponent({
 
     return {
       setValidation,
-      getValidation,
+      getInfoValidation,
       hasUnsavedChanges,
       goToReview,
       onSave,
@@ -819,6 +825,7 @@ export default defineComponent({
       handleDialogResp,
       hasLien,
       isRoleStaffReg,
+      isTransferDueToDeath,
       setMhrTransferSubmittingParty,
       handleTransferTypeChange,
       getUiTransferType,
