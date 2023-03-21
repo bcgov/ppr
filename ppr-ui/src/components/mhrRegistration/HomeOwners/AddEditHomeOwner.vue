@@ -551,7 +551,7 @@ export default defineComponent({
     if (allFractionalData.length === 0 || props.editHomeOwner == null || hasMultipleOwnersInGroup) {
       // Default LCM to be used if all denominators are the identical. UX feature for MHR's only
       const defaultLcm = allFractionalData
-        .every(group => group.interestDenominator === allFractionalData[0]?.interestDenominator) && !props.isMhrTransfer
+        .every(group => group.interestDenominator === allFractionalData[0]?.interestDenominator)
         ? allFractionalData[0]?.interestDenominator
         : null
 
