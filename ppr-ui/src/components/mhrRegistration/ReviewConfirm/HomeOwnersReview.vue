@@ -93,8 +93,4 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-.home-owners-icon {
-  width: 25px;
-  height: 21px;
-}
 </style>

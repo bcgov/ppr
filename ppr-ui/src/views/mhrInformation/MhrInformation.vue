@@ -890,8 +890,6 @@ export default defineComponent({
   }
   .home-owners-icon {
     vertical-align: middle;
-    width: 25px;
-    height: 21px;
   }
 }
 </style>

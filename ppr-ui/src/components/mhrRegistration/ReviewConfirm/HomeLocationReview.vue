@@ -334,9 +334,4 @@ export default defineComponent({
 .error-text {
   font-size: 16px;
 }
-
-.home-location-icon {
-  width: 25px;
-  height: 21px;
-}
 </style>
