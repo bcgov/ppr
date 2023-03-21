@@ -1,7 +1,7 @@
 <template>
   <v-card flat id="home-owners-summary" class="mt-6">
     <header class="review-header">
-      <img class="ml-1" src="@/assets/svgs/homeownersicon_reviewscreen.svg" />
+      <img class="ml-1 home-owners-icon" src="@/assets/svgs/homeownersicon_reviewscreen.svg" />
       <label class="font-weight-bold pl-2">Home Owners</label>
     </header>
 
@@ -93,4 +93,8 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+.home-owners-icon {
+  width: 25px;
+  height: 21px;
+}
 </style>
