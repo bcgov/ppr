@@ -74,7 +74,7 @@ export const registrationCompleteError: DialogOptionsIF = {
   cancelText: '',
   hasContactInfo: true,
   title: 'Unable to complete registration',
-  text: 'We are unable to complete your registration at this time. Please try to complete this registration later. ' +
+  text: 'We are unable to save and complete your registration at this time. Please try again later. ' +
     'If this issue persists, please contact us.'
 }
 

@@ -223,8 +223,8 @@
                 <header class="review-header mt-10 rounded-top">
                   <v-row no-gutters align="center">
                     <v-col cols="10">
-                      <img class="icon-img pb-1" src="@/assets/svgs/homeownersicon_reviewscreen.svg" />
-                      <span class="font-weight-bold pl-1">Home Owners</span>
+                      <img class="home-owners-icon mb-1 ml-1" src="@/assets/svgs/homeownersicon_reviewscreen.svg"/>
+                      <span class="font-weight-bold pl-2">Home Owners</span>
                     </v-col>
                     <v-col cols="2" class="text-right">
                       <v-btn
@@ -888,7 +888,7 @@ export default defineComponent({
   #home-owners-change-btn {
     height: unset;
   }
-  .icon-img {
+  .home-owners-icon {
     vertical-align: middle;
   }
 }

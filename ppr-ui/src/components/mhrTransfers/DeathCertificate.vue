@@ -10,7 +10,7 @@
               Death Certificate Registration Number
             </div>
           </v-col>
-          <v-col cols="9" class="pl-4">
+          <v-col cols="9" class="pl-2">
             <v-text-field
               id="death-certificate-number"
               v-model="deathCertificateNumber"
@@ -32,7 +32,7 @@
               Date of Death
             </div>
           </v-col>
-          <v-col cols="9" class="pl-4">
+          <v-col cols="9" class="pl-2">
             <date-picker
               id="death-date-time"
               clearable
@@ -51,7 +51,7 @@
         </v-row>
         <v-row>
           <v-spacer></v-spacer>
-          <v-col cols="9" class="pl-3">
+          <v-col cols="9" class="pl-1">
             <v-checkbox
               id="has-certificate-checkbox"
               label="I have an original or certified copy of the death certificate, and confirm

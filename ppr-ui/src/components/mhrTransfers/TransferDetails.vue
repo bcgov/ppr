@@ -67,7 +67,7 @@
               Land Lease or Ownership
             </label>
           </v-col>
-          <v-col cols="9">
+          <v-col cols="9" class="pl-1">
             <v-checkbox
               id="lease-own"
               :label="landOrLeaseLabel"
