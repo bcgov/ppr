@@ -72,7 +72,7 @@
                   , and the name on the death certificate matches the name displayed above exactly.
                   </p>
               </li>
-              <li class="pl-3 pb-3 mb-7">
+              <li v-if="isStaff" class="pl-3 pb-3 mb-7">
                 <p><strong>Transfer or Change Ownership form</strong> has been recieved and retained</p>
               </li>
               <li v-if="transferType === ApiTransferTypes.SALE_OR_GIFT" class="pl-3 pb-3 mb-7">
@@ -139,14 +139,17 @@ export default defineComponent({
   emits: ['confirmCompletion'],
   setup (props, { emit }) {
     const {
-      getMhrTransferType
+      getMhrTransferType,
+      isRoleStaff
     } = useGetters<any>([
-      'getMhrTransferType'
+      'getMhrTransferType',
+      'isRoleStaff'
     ])
     const localState = reactive({
       showErrorComponent: computed((): boolean => {
         return (props.setShowErrors && !localState.confirmCompletion)
       }),
+      isStaff: isRoleStaff.value,
       confirmCompletion: false,
       transferType: getMhrTransferType.value?.transferType
     })
