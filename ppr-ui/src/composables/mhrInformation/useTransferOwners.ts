@@ -191,7 +191,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       }
     })
 
-    // Create a new ownership group defaulted to REMOVED and unshift it to group 1
+    // Create a new ownership group defaulted to REMOVED
     const previousOwnersGroup: MhrRegistrationHomeOwnerGroupIF = {
       groupId: 1,
       interest: 'Undivided',

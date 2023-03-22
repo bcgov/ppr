@@ -73,7 +73,7 @@ export const useMhrInformation = () => {
     setShowGroups
   } = useHomeOwners(true)
   const {
-    getCurrentOwnerStateById,
+    isTransferDueToDeath,
     getCurrentOwnerGroupIdByOwnerId
   } = useTransferOwners()
 
@@ -218,6 +218,24 @@ export const useMhrInformation = () => {
     return isDraft ? ownerGroups : ownerGroups.filter(ownerGroup => ownerGroup.action !== ActionTypes.REMOVED)
   }
 
+  const parseDueToDeathOwnerGroups = (isDraft: boolean = false): any => {
+    const ownerGroups = []
+    getMhrTransferHomeOwnerGroups.value.forEach(ownerGroup => {
+      if (ownerGroup.owners.some(owner => owner.action === ActionTypes.REMOVED)) {
+        ownerGroups.push({
+          ...ownerGroup,
+          owners: ownerGroup.owners.filter(owner => owner.action !== ActionTypes.REMOVED).map(owner => {
+            return owner.individualName ? { ...owner, individualName: normalizeObject(owner.individualName) } : owner
+          }),
+          type: ApiHomeTenancyTypes[
+            Object.keys(HomeTenancyTypes).find(key => HomeTenancyTypes[key] as string === ownerGroup.type)
+          ]
+        })
+      }
+    })
+    return isDraft ? getMhrTransferHomeOwnerGroups.value : ownerGroups
+  }
+
   const parseDeletedOwnerGroups = (): any => {
     // Return the current state for Sale or Gift
     if (getMhrTransferType.value?.transferType === ApiTransferTypes.SALE_OR_GIFT) {
@@ -227,12 +245,12 @@ export const useMhrInformation = () => {
     const ownerGroups = []
     getMhrTransferHomeOwnerGroups.value.forEach(ownerGroup => {
       if (ownerGroup.owners.some(owner => owner.action === ActionTypes.REMOVED)) {
-        const deceasedOwners = ownerGroup.owners.filter(owner => owner.action === ActionTypes.REMOVED)
-
         ownerGroups.push({
           ...ownerGroup,
-          groupId: getCurrentOwnerGroupIdByOwnerId(deceasedOwners[0].ownerId),
-          owners: deceasedOwners,
+          groupId: getCurrentOwnerGroupIdByOwnerId(ownerGroup.owners[0].ownerId),
+          owners: ownerGroup.owners.map(owner => {
+            return owner.individualName ? { ...owner, individualName: normalizeObject(owner.individualName) } : owner
+          }),
           type: ApiHomeTenancyTypes.JOINT // Can only remove Joint Tenants outside SoG Transfers (ie death scenarios)
         })
       }
@@ -263,7 +281,9 @@ export const useMhrInformation = () => {
           phoneExtension: getMhrTransferSubmittingParty.value.phoneExtension
         })
       },
-      addOwnerGroups: await parseOwnerGroups(isDraft),
+      addOwnerGroups: isTransferDueToDeath.value
+        ? await parseDueToDeathOwnerGroups(isDraft)
+        : await parseOwnerGroups(isDraft),
       deleteOwnerGroups: await parseDeletedOwnerGroups()
     }
 
