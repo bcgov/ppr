@@ -123,9 +123,13 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
     const denominator = calcLcm(groups.map(group => group.interestDenominator))
     const nominators = groups.map(group => (group.interestNumerator / group.interestDenominator) * denominator)
     const totalNominator = nominators.reduce((a, b) => a + b, 0)
+    const hasTotalAllocationError = totalNominator !== denominator ||
+      hasUndefinedGroupInterest(
+        getTransferOrRegistrationHomeOwnerGroups().filter(group => group.action !== ActionTypes.REMOVED)
+      )
 
     // Determine allocation or error messaging
-    if (totalNominator === denominator) totalAllocationMsg = 'Fully Allocated'
+    if (!hasTotalAllocationError) totalAllocationMsg = 'Fully Allocated'
     else {
       totalAllocationMsg = simplifyFraction(totalNominator, denominator)
       errorMsg = `Total ownership interest is ${totalNominator > denominator ? 'over' : 'under'} allocated`
@@ -133,7 +137,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
 
     return {
       totalAllocation: totalAllocationMsg,
-      hasTotalAllocationError: totalNominator !== denominator,
+      hasTotalAllocationError,
       allocationErrorMsg: errorMsg,
       hasMinimumGroupsError: groups.length < 2
     }
@@ -326,9 +330,6 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
 
   const undoGroupRemoval = (groupId: number = null, undoAllOwners: boolean = false): void => {
     let homeOwnerGroups = getMhrTransferHomeOwnerGroups.value
-    // Set flag when there is undefined group interests
-    const hasUndefinedGroups = hasUndefinedGroupInterest(homeOwnerGroups)
-
     homeOwnerGroups = homeOwnerGroups.reduce((homeOwners, group) => {
       if (group.groupId === groupId) {
         if (undoAllOwners) {

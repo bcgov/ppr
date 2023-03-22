@@ -107,7 +107,6 @@
                 filled
                 :rules="declaredValueRules"
                 label="Amount in Canadian Dollars"
-                validate-on-blur
                 data-test-id="declared-value"
               />
               <span class="mt-4">.00</span>
@@ -171,7 +170,7 @@ export default defineComponent({
           required('Enter declared value of home'))
       }),
       showFormError: computed(() => props.validate && !localState.isValid),
-      transferTypeRules: []
+      transferTypeRules: required('Select transfer type')
     })
 
     const hasError = (ref: any): boolean => {
@@ -240,6 +239,8 @@ export default defineComponent({
             ]
           )
           break
+        default:
+          localState.transferTypeRules = required('Select transfer type')
       }
     })
 

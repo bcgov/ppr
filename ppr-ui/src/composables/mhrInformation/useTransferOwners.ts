@@ -1,9 +1,10 @@
-import { ActionTypes, ApiHomeTenancyTypes, ApiTransferTypes, HomeOwnerPartyTypes } from '@/enums'
-import { useGetters } from 'vuex-composition-helpers'
-import { MhrRegistrationHomeOwnerIF } from '@/interfaces'
-import { computed } from '@vue/composition-api'
+import { ActionTypes, ApiHomeTenancyTypes, ApiTransferTypes, HomeOwnerPartyTypes, HomeTenancyTypes } from '@/enums'
+import { useActions, useGetters } from 'vuex-composition-helpers'
+import { MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF } from '@/interfaces'
+import { computed, reactive } from '@vue/composition-api'
 import { isEqual } from 'lodash'
 import { normalizeObject } from '@/utils'
+import { useHomeOwners } from '@/composables'
 
 /**
  * Composable to handle Ownership functionality and permissions specific to the varying Transfer of Ownership filings.
@@ -19,6 +20,25 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     'getMhrTransferHomeOwnerGroups',
     'getMhrTransferCurrentHomeOwnerGroups'
   ])
+
+  const {
+    setMhrTransferHomeOwnerGroups
+  } = useActions<any>([
+    'setMhrTransferHomeOwnerGroups'
+  ])
+
+  const {
+    getGroupById
+  } = useHomeOwners(true)
+
+  /** Local State for custom computed properties. **/
+  const localState = reactive({
+    isSOorJT: computed((): boolean => {
+      return getMhrTransferCurrentHomeOwnerGroups.value.length === 1 &&
+        (getMhrTransferCurrentHomeOwnerGroups.value[0].type === ApiHomeTenancyTypes.SOLE ||
+        getMhrTransferCurrentHomeOwnerGroups.value[0].type === ApiHomeTenancyTypes.JOINT)
+    })
+  })
 
   /** Returns true when the selected transfer type is a 'due to death' scenario **/
   const isTransferDueToDeath = computed((): boolean => {
@@ -148,6 +168,46 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     )
   }
 
+  /** Return true when all CURRENT owners of a group have been removed and some owners added in a SO/JT structure. **/
+  const groupHasRemovedAllCurrentOwners = (groupId: number) => {
+    const owners = getGroupById(groupId).owners
+
+    return localState.isSOorJT && owners.some(owner => owner.action === ActionTypes.ADDED) &&
+      owners.every(owner => !!owner.action)
+  }
+
+  /** Remove current owners from existing ownership and move them to New Previous Owners group.  **/
+  const moveCurrentOwnersToPreviousOwners = async (groupId: number) => {
+    // Retrieve and mark for removal all current owners
+    const currentOwners = getGroupById(groupId)?.owners.filter(owner => owner.action !== ActionTypes.ADDED)
+      .map(owner => { return { ...owner, action: ActionTypes.REMOVED } })
+
+    // Get current ownership structure and modify group ids and remove current owners
+    const updatedGroups = getMhrTransferHomeOwnerGroups.value.map(group => {
+      return {
+        ...group,
+        groupId: group.groupId + 1,
+        owners: group.owners.filter(owner => owner.action !== ActionTypes.REMOVED)
+      }
+    })
+
+    // Create a new ownership group defaulted to REMOVED
+    const previousOwnersGroup: MhrRegistrationHomeOwnerGroupIF = {
+      groupId: 1,
+      interest: 'Undivided',
+      interestDenominator: null,
+      interestNumerator: null,
+      owners: currentOwners,
+      tenancySpecified: true,
+      type: HomeTenancyTypes.NA,
+      action: ActionTypes.REMOVED
+    }
+    updatedGroups.unshift(previousOwnersGroup)
+
+    // Set new ownership structure to store
+    await setMhrTransferHomeOwnerGroups(updatedGroups)
+  }
+
   /**
    * Return the base owners snapshot by id.
    * @param ownerId The owner identifier
@@ -196,7 +256,9 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     isTransferDueToDeath,
     isJointTenancyStructure,
     getCurrentOwnerStateById,
+    groupHasRemovedAllCurrentOwners,
     getCurrentOwnerGroupIdByOwnerId,
-    hasCurrentOwnerChanges
+    hasCurrentOwnerChanges,
+    moveCurrentOwnersToPreviousOwners
   }
 }
