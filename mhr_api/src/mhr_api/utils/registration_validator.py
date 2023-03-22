@@ -80,7 +80,7 @@ TRAN_DEATH_OWNER_INVALID = 'The owners must be individuals or businesses for thi
 TRAN_EXEC_OWNER_INVALID = 'The owners must be individuals, businesses, or executors for this registration. '
 TRAN_ADMIN_NEW_OWNER = 'The new owners must be administrators for this registration. '
 TRAN_DEATH_NEW_OWNER = 'The new owners must be individuals or businesses for this registration. '
-TRAN_EXEC_NEW_OWNER = 'The new owners must be individuals, businesses, or executors for this registration. '
+TRAN_EXEC_NEW_OWNER = 'The new owners must be executors for this registration. '
 TRAN_EXEC_MISSING = 'An executor is required with this registration. '
 TRAN_DEATH_ADD_OWNER = 'Owners cannot be added with this registration. '
 TRAN_DEATH_CERT_MISSING = 'A death certificate number is required with this registration. '
@@ -90,6 +90,7 @@ TRAN_AFFIDAVIT_DECLARED_VALUE = 'Declared value must be cannot be greater than 2
 TRAN_WILL_PROBATE = 'One (and only one) deceased owner must have a probate document (no death certificate). '
 TRAN_WILL_DEATH_CERT = 'Deceased owners without a probate document must have a death certificate. '
 TRAN_WILL_NEW_OWNER = 'The new owners must be executors for this registration. '
+TRAN_EXEC_DEATH_CERT = 'All deceased owners must have a death certificate. '
 
 
 def validate_registration(json_data, staff: bool = False):
@@ -310,9 +311,11 @@ def existing_owner_added(new_owners, owner) -> bool:
     if owner and new_owners:
         for owner_json in new_owners:
             if owner_json.get('individualName') and owner.get('individualName') and \
-                    owner_json.get('individualName') == owner.get('individualName'):
-                return True
-            if owner_json.get('organizationName') and owner.get('organizationName') and \
+                    owner_json['individualName'].get('last') == owner['individualName'].get('last') and \
+                    owner_json['individualName'].get('first') == owner['individualName'].get('first'):
+                if owner_json['individualName'].get('middle', '') == owner['individualName'].get('middle', ''):
+                    return True
+            elif owner_json.get('organizationName') and owner.get('organizationName') and \
                     owner_json.get('organizationName') == owner.get('organizationName'):
                 return True
     return False
@@ -333,14 +336,14 @@ def validate_transfer_death_existing_owners(reg_type: str, modified_group, tenan
             if reg_type == MhrRegistrationTypes.TRAND and \
                     owner_json.get('partyType') not in (MhrPartyTypes.OWNER_BUS, MhrPartyTypes.OWNER_IND):
                 error_msg += TRAN_DEATH_OWNER_INVALID
-            elif reg_type == MhrRegistrationTypes.TRANS_ADMIN and \
-                    owner_json.get('partyType') != MhrPartyTypes.ADMINISTRATOR:
-                error_msg += TRAN_ADMIN_OWNER_INVALID
-            elif reg_type in (MhrRegistrationTypes.TRANS_AFFIDAVIT, MhrRegistrationTypes.TRANS_WILL) and \
-                    owner_json.get('partyType') not in (MhrPartyTypes.OWNER_BUS,
-                                                        MhrPartyTypes.OWNER_IND,
-                                                        MhrPartyTypes.EXECUTOR):
-                error_msg += TRAN_EXEC_OWNER_INVALID
+            # elif reg_type == MhrRegistrationTypes.TRANS_ADMIN and \
+            #        owner_json.get('partyType') != MhrPartyTypes.ADMINISTRATOR:
+            #    error_msg += TRAN_ADMIN_OWNER_INVALID
+            # elif reg_type in (MhrRegistrationTypes.TRANS_AFFIDAVIT, MhrRegistrationTypes.TRANS_WILL) and \
+            #        owner_json.get('partyType') not in (MhrPartyTypes.OWNER_BUS,
+            #                                            MhrPartyTypes.OWNER_IND,
+            #                                            MhrPartyTypes.EXECUTOR):
+            #    error_msg += TRAN_EXEC_OWNER_INVALID
     return error_msg
 
 
@@ -349,9 +352,11 @@ def new_owner_exists(modified_group, owner) -> bool:
     if owner and modified_group and modified_group.get('owners'):
         for owner_json in modified_group.get('owners'):
             if owner_json.get('individualName') and owner.get('individualName') and \
-                    owner_json.get('individualName') == owner.get('individualName'):
-                return True
-            if owner_json.get('organizationName') and owner.get('organizationName') and \
+                    owner_json['individualName'].get('last') == owner['individualName'].get('last') and \
+                    owner_json['individualName'].get('first') == owner['individualName'].get('first'):
+                if owner_json['individualName'].get('middle', '') == owner['individualName'].get('middle', ''):
+                    return True
+            elif owner_json.get('organizationName') and owner.get('organizationName') and \
                     owner_json.get('organizationName') == owner.get('organizationName'):
                 return True
     return False
@@ -420,7 +425,7 @@ def validate_transfer_death(registration: MhrRegistration, json_data):  # pylint
                     error_msg += TRAN_DEATH_DATE_MISSING
                 elif not model_utils.date_elapsed(owner_json.get('deathDateTime')):
                     error_msg += TRAN_DEATH_DATE_INVALID
-            elif reg_type == MhrRegistrationTypes.TRANS_WILL:
+            elif reg_type in (MhrRegistrationTypes.TRANS_WILL, MhrRegistrationTypes.TRANS_AFFIDAVIT):
                 if not owner_json.get('deathCertificateNumber') and not owner_json.get('deathDateTime'):
                     probate_count += 1
                 elif owner_json.get('deathCertificateNumber') and owner_json.get('deathDateTime'):
@@ -436,6 +441,8 @@ def validate_transfer_death(registration: MhrRegistration, json_data):  # pylint
                 error_msg += TRAN_WILL_PROBATE
             if (death_count + 1) != len(delete_owners):
                 error_msg += TRAN_WILL_DEATH_CERT
+        elif reg_type == MhrRegistrationTypes.TRANS_AFFIDAVIT and death_count != len(delete_owners):
+            error_msg += TRAN_EXEC_DEATH_CERT
     if reg_type == MhrRegistrationTypes.TRANS_AFFIDAVIT and json_data.get('declaredValue') and \
             json_data.get('declaredValue') > 25000:
         error_msg += TRAN_AFFIDAVIT_DECLARED_VALUE

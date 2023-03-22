@@ -90,13 +90,15 @@
     {% for message in detail.messages %}
       <div class="no-page-break section-data pt-5">
         {% if message.messageType == 'OUT_PROV' %}
-          Upon leaving British Columbia, this home is Exempted from the <span class="italic">Manufactured Home Act</span>. The home is required to be re-registered under the same number if it re-enters the Province of British Columbia.
+          Upon leaving British Columbia, this home is Exempted from the Manufactured Home Act. The home is required to be re-registered under the same number if it re-enters the Province of British Columbia.
         {% elif message.messageType == 'REGC' %}
-          Registration of this home was cancelled under Section 11(1) of the <span class="italic">Manufactured Home Act</span> by the Registrar of Manufactured Homes.
+          Registration of this home was cancelled under Section 11(1) of the Manufactured Home Act by the Registrar of Manufactured Homes.
         {% elif message.messageType == 'WIDTH' %}
           SPECIAL TRANSPORT RESTRICTIONS APPLY TO THIS HOME DUE TO THE WIDTH. PLEASE CONTACT PROVINCIAL PERMIT CENTRE 1-800-559-9688 FOR FURTHER DETAILS.
         {% elif message.messageType in ('EXNR', 'EXRS') %}
-          Exempted pursuant to Section 21 of the <span class="italic">Manufactured Home Act</span> by an order of the Registrar dated {{message.messageDate}} on document registration number {{message.messageId}}.
+          Exempted pursuant to Section 21 of the Manufactured Home Act by an order of the Registrar dated {{message.messageDate}} on Document Registration Number {{message.messageId}}.
+        {% elif message.messageType == 'EXEMPT' %}
+          Exempted pursuant to Section 21 of the Manufactured Home Act by an order of the Registrar of the Manufactured Home Registry.
         {% endif %}
       </div>
     {% endfor %}

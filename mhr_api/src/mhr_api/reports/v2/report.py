@@ -441,6 +441,7 @@ class Report:  # pylint: disable=too-few-public-methods
         if self._report_data and self._report_data['details']:
             for detail in self._report_data['details']:
                 messages = []
+                has_exempt_note: bool = False
                 if detail.get('location'):
                     if detail['location'].get('leaveProvince') and detail['status'] == 'EXEMPT':
                         messages.append({'messageType': 'OUT_PROV'})
@@ -456,12 +457,16 @@ class Report:  # pylint: disable=too-few-public-methods
                         if detail['status'] == 'HISTORICAL' and note.get('documentType', '') == 'REGC':
                             messages.append({'messageType': 'REGC'})
                         elif note.get('documentType', '') in ('EXRS', 'EXNR') and note.get('createDateTime'):
+                            has_exempt_note = True
                             message = {
                                 'messageType': note.get('documentType'),
                                 'messageId': note.get('documentId', ''),
                                 'messageDate': Report._to_report_datetime(note['createDateTime'], False)
                             }
                             messages.append(message)
+                if not has_exempt_note and detail.get('status') == 'EXEMPT':
+                    message = {'messageType': 'EXEMPT'}
+                    messages.append(message)
                 if messages:
                     detail['messages'] = messages
 
