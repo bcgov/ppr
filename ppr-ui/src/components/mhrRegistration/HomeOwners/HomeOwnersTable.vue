@@ -293,7 +293,7 @@
             </v-expand-transition>
           </td>
         </tr>
-        <tr v-else-if="isRemovedHomeOwner(row.item) && showDeathCertificate && isReadonlyTable">
+        <tr v-else-if="isRemovedHomeOwner(row.item) && showDeathCertificate() && isReadonlyTable">
           <td :colspan="homeOwnersTableHeaders.length" class="deceased-review-info">
             <v-row no-gutters class="ml-8 my-n3">
               <v-col cols="12">
@@ -389,7 +389,9 @@ export default defineComponent({
       isDisabledForSJTChanges,
       isCurrentOwner,
       getCurrentOwnerStateById,
-      isTransferDueToDeath
+      isTransferDueToDeath,
+      groupHasRemovedAllCurrentOwners,
+      moveCurrentOwnersToPreviousOwners
     } = useTransferOwners(!props.isMhrTransfer)
 
     const { setUnsavedChanges } = useActions<any>(['setUnsavedChanges'])
@@ -457,6 +459,11 @@ export default defineComponent({
         { ...item, action: ActionTypes.REMOVED },
         item.groupId
       )
+
+      // When base ownership is SO/JT and all current owners have been removed: Move them to a previous owners group.
+      if (groupHasRemovedAllCurrentOwners(item.groupId) && showGroups.value) {
+        moveCurrentOwnersToPreviousOwners(item.groupId)
+      }
     }
 
     const undo = async (item: MhrRegistrationHomeOwnerIF): Promise<void> => {

@@ -92,6 +92,7 @@
                   :rules="firsNameRules"
                   :disabled="isTransferDueToDeath"
                   :readonly="isTransferDueToDeath"
+                  @mousedown.prevent
                 />
               </v-col>
               <v-col cols="4">
@@ -104,6 +105,7 @@
                   :rules="maxLength(15)"
                   :disabled="isTransferDueToDeath"
                   :readonly="isTransferDueToDeath"
+                  @mousedown.prevent
                 />
               </v-col>
               <v-col cols="4">
@@ -116,6 +118,7 @@
                   :rules="lastNameRules"
                   :disabled="isTransferDueToDeath"
                   :readonly="isTransferDueToDeath"
+                  @mousedown.prevent
                 />
               </v-col>
             </v-row>
@@ -285,6 +288,7 @@
                 :rules="maxLength(70)"
                 :disabled="isTransferDueToDeath"
                 :readonly="isTransferDueToDeath"
+                @mousedown.prevent
               />
             </v-col>
           </v-row>
