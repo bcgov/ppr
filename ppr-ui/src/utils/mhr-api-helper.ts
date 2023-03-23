@@ -290,12 +290,12 @@ export async function searchMhrPDF (searchId: string): Promise<any> {
     })
 }
 
-export async function submitMhrRegistration (payloadData, queryParamData) {
+export async function submitMhrRegistration (payloadData, staffPayment) {
   try {
-    // assuming the queryParamData (staff payment) is always available because of validation
-    const queryParamString = new URLSearchParams(queryParamData).toString()
+    // assuming the staffPayment is always available because of validation
+    const paymentParams = mhrStaffPaymentParameters(staffPayment)
 
-    const result = await axios.post(`registrations?${queryParamString}`, payloadData, getDefaultConfig())
+    const result = await axios.post(`registrations?${paymentParams}`, payloadData, getDefaultConfig())
     if (!result?.data) {
       throw new Error('Invalid API response')
     }

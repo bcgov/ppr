@@ -73,7 +73,7 @@
                   </p>
               </li>
               <li v-if="isRoleStaff" class="pl-3 pb-3 mb-7">
-                <p><strong>Transfer or Change Ownership form</strong> has been recieved and retained</p>
+                <p><strong>Transfer or Change Ownership form</strong> has been recieved and retained.</p>
               </li>
               <li v-if="transferType === ApiTransferTypes.SALE_OR_GIFT" class="pl-3 pb-3 mb-7">
                 <p><strong>Search of the Corporate Register</strong> has been completed if one or more of the current or
