@@ -221,6 +221,8 @@ export default defineComponent({
     })
 
     watch(() => localState.selectedTransferType, (val:TransferTypeSelectIF) => {
+      (context.refs.transferTypeForm as FormIF).resetValidation()
+
       switch (val.transferType) {
         case ApiTransferTypes.SALE_OR_GIFT:
         case ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL:
