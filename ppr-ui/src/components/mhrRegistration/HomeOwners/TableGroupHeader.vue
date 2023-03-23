@@ -58,7 +58,7 @@
         <span
           v-else
           class="font-weight-bold removed-owner-group"
-          :class="{ 'ml-3' : !showEditActions }">Previous Owner Group</span>
+          :class="{ 'ml-3' : !showEditActions }">{{ previousOwnersLabel }}</span>
       </div>
 
       <!-- Default Actions -->
@@ -181,7 +181,7 @@
 
 <script lang="ts">
 import { BaseDialog } from '@/components/dialogs'
-import { useHomeOwners } from '@/composables/mhrRegistration'
+import { useHomeOwners, useTransferOwners } from '@/composables'
 import { computed, defineComponent, reactive, ref, toRefs, watch } from '@vue/composition-api'
 import FractionalOwnership from './FractionalOwnership.vue'
 import { find } from 'lodash'
@@ -218,6 +218,7 @@ export default defineComponent({
       getHomeTenancyType,
       getGroupTenancyType
     } = useHomeOwners(props.isMhrTransfer)
+    const { isSOorJT } = useTransferOwners()
 
     const homeFractionalOwnershipForm = ref(null)
 
@@ -235,6 +236,9 @@ export default defineComponent({
       hasUndefinedInterest: computed((): boolean => {
         return hasUndefinedGroupInterest(getTransferOrRegistrationHomeOwnerGroups()) &&
           !(localState.group.interestNumerator && localState.group.interestDenominator)
+      }),
+      previousOwnersLabel: computed((): string => {
+        return isSOorJT.value ? 'Previous Owners' : 'Previous Owner Group'
       })
     })
 

@@ -26,7 +26,6 @@
           <v-col cols="3">
             <div
               class="generic-label pl-8"
-              for="death-date-time"
               :class="{ 'error-text': validate && !deathDateTime }"
             >
               Date of Death
@@ -139,9 +138,10 @@ export default defineComponent({
     }
 
     // Validate form when prompted
-    watch(() => props.validate, (validate: boolean) => {
+    watch(() => props.validate, async (validate: boolean) => {
+      await nextTick()
       validate && (context.refs.deathCertificateForm as FormIF).validate()
-    })
+    }, { immediate: true })
 
     watch(() => localState.isDeathCertificateFormValid, async (val: boolean) => {
       context.emit('isValid', val)

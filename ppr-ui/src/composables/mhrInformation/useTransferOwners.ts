@@ -1,7 +1,7 @@
 import { ActionTypes, ApiHomeTenancyTypes, ApiTransferTypes, HomeOwnerPartyTypes, HomeTenancyTypes } from '@/enums'
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import { MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF } from '@/interfaces'
-import { computed, reactive } from '@vue/composition-api'
+import { computed, reactive, toRefs } from '@vue/composition-api'
 import { isEqual } from 'lodash'
 import { normalizeObject } from '@/utils'
 import { useHomeOwners } from '@/composables'
@@ -259,6 +259,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     groupHasRemovedAllCurrentOwners,
     getCurrentOwnerGroupIdByOwnerId,
     hasCurrentOwnerChanges,
-    moveCurrentOwnersToPreviousOwners
+    moveCurrentOwnersToPreviousOwners,
+    ...toRefs(localState)
   }
 }
