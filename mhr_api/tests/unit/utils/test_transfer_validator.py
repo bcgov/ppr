@@ -405,6 +405,66 @@ TRAND_ADD_GROUPS = [
         'type': 'SOLE'
     }
 ]
+TRAND_DELETE_GROUPS2 = [
+    {
+        'groupId': 1,
+        'owners': [
+            {
+                'individualName': {
+                    'first': 'DENNIS',
+                    'last': 'HALL'
+                },
+                'address': {
+                    'street': 'SS 2, COMP. 2, SITE 19',
+                    'city': 'FORT ST. JOH',
+                    'region': 'BC',
+                    'postalCode': ' ',
+                    'country': 'CA'
+                },
+                'phoneNumber': '6041234567'
+            }, {
+                'individualName': {
+                    'first': 'SHARON',
+                    'last': 'HALL'
+                },
+                'address': {
+                    'street': 'SS 2, COMP. 2, SITE 19',
+                    'city': 'FORT ST. JOH',
+                    'region': 'BC',
+                    'postalCode': ' ',
+                    'country': 'CA'
+                },
+                'phoneNumber': '6041234567',
+                'deathCertificateNumber': '232432432',
+                'deathDateTime': '2021-02-21T18:56:00+00:00'
+            }
+        ],
+        'type': 'JOINT'
+    }
+]
+TRAND_ADD_GROUPS2 = [
+    {
+        'groupId': 4,
+        'owners': [
+            {
+                'individualName': {
+                    'first': 'DENNIS',
+                    'middle': '',
+                    'last': 'HALL'
+                },
+                'address': {
+                    'street': 'SS 2, COMP. 2, SITE 19',
+                    'city': 'FORT ST. JOH',
+                    'region': 'BC',
+                    'postalCode': ' ',
+                    'country': 'CA'
+                },
+                'phoneNumber': '6041234567'
+            }
+        ],
+        'type': 'SOLE'
+    }
+]
 EXEC_DELETE_GROUPS = [
     {
         'groupId': 1,
@@ -421,7 +481,9 @@ EXEC_DELETE_GROUPS = [
                     'postalCode': 'V8S 4I6',
                     'country': 'CA'
                 },
-                'phoneNumber': '6041234567'
+                'phoneNumber': '6041234567',
+                'deathCertificateNumber': '232432488',
+                'deathDateTime': '2023-03-14T18:56:00+00:00'
             }, {
                 'individualName': {
                     'first': 'DENNIS',
@@ -436,13 +498,37 @@ EXEC_DELETE_GROUPS = [
                 },
                 'phoneNumber': '6041234567',
                 'deathCertificateNumber': '232432432',
-                'deathDateTime': '2021-02-21T18:56:00+00:00'
+                'deathDateTime': '2023-03-14T18:56:00+00:00'
             }
         ],
         'type': 'JOINT'
     }
 ]
 EXEC_ADD_GROUPS = [
+    {
+        'groupId': 2,
+        'owners': [
+            {
+                'individualName': {
+                    'first': 'APPOINTED',
+                    'last': 'EXECUTOR'
+                },
+                'address': {
+                    'street': '3122B LYNNLARK PLACE',
+                    'city': 'VICTORIA',
+                    'region': 'BC',
+                    'postalCode': 'V8S 4I6',
+                    'country': 'CA'
+                },
+                'phoneNumber': '6041234567',
+                'partyType': 'EXECUTOR',
+                'description': 'EXECUTOR of the deceased.'
+            }
+        ],
+        'type': 'SOLE'
+    }
+]
+EXEC_ADD_GROUPS_INVALID = [
     {
         'groupId': 2,
         'owners': [
@@ -478,6 +564,43 @@ EXEC_ADD_GROUPS = [
             }
         ],
         'type': 'NA'
+    }
+]
+WILL_DELETE_GROUPS = [
+    {
+        'groupId': 1,
+        'owners': [
+            {
+                'individualName': {
+                    'first': 'SHARON',
+                    'last': 'HALL'
+                 },
+                'address': {
+                    'street': '3122B LYNNLARK PLACE',
+                    'city': 'VICTORIA',
+                    'region': 'BC',
+                    'postalCode': 'V8S 4I6',
+                    'country': 'CA'
+                },
+                'phoneNumber': '6041234567'
+            }, {
+                'individualName': {
+                    'first': 'DENNIS',
+                    'last': 'HALL'
+                },
+                'address': {
+                    'street': '3122B LYNNLARK PLACE',
+                    'city': 'VICTORIA',
+                    'region': 'BC',
+                    'postalCode': 'V8S 4I6',
+                    'country': 'CA'
+                },
+                'phoneNumber': '6041234567',
+                'deathCertificateNumber': '232432432',
+                'deathDateTime': '2021-02-21T18:56:00+00:00'
+            }
+        ],
+        'type': 'JOINT'
     }
 ]
 WILL_DELETE_GROUPS1 = [
@@ -552,30 +675,6 @@ WILL_DELETE_GROUPS2 = [
             }
         ],
         'type': 'JOINT'
-    }
-]
-WILL_ADD_GROUPS = [
-    {
-        'groupId': 2,
-        'owners': [
-            {
-                'individualName': {
-                    'first': 'APPOINTED',
-                    'last': 'EXECUTOR'
-                },
-                'address': {
-                    'street': '3122B LYNNLARK PLACE',
-                    'city': 'VICTORIA',
-                    'region': 'BC',
-                    'postalCode': 'V8S 4I6',
-                    'country': 'CA'
-                },
-                'phoneNumber': '6041234567',
-                'partyType': 'EXECUTOR',
-                'description': 'EXECUTOR of the deceased.'
-            }
-        ],
-        'type': 'SOLE'
     }
 ]
 ADMIN_DELETE_GROUPS = [
@@ -736,6 +835,7 @@ TEST_TRANSFER_DATA_GROUP = [
 # testdata pattern is ({description},{valid},{mhr_num},{account_id},{delete_groups},{add_groups},{message content})
 TEST_TRANSFER_DATA_TRAND = [
     ('Valid', True,  '001004', '2523', TRAND_DELETE_GROUPS, TRAND_ADD_GROUPS, None),
+    ('Valid with no/empty middle name', True,  '001020', '2523', TRAND_DELETE_GROUPS2, TRAND_ADD_GROUPS2, None),
     ('Invalid party type', False,  '001004', '2523', TRAND_DELETE_GROUPS, TRAND_ADD_GROUPS,
      validator.TRAN_DEATH_NEW_OWNER),
     ('Invalid add owner', False,  '001004', '2523', TRAND_DELETE_GROUPS, TRAND_ADD_GROUPS,
@@ -758,7 +858,10 @@ TEST_TRANSFER_DATA_ADMIN = [
     ('Valid', True,  '001019', '2523', ADMIN_DELETE_GROUPS, ADMIN_ADD_GROUPS, None, True),
     ('Invalid non-staff', False,  '001019', '2523', ADMIN_DELETE_GROUPS, ADMIN_ADD_GROUPS,
      validator.REG_STAFF_ONLY, False),
-    ('Invalid party type', False,  '001019', '2523', ADMIN_DELETE_GROUPS, ADMIN_ADD_GROUPS,
+    ('Valid party type EXECUTOR', True,  '001019', '2523', ADMIN_DELETE_GROUPS, ADMIN_ADD_GROUPS, None, True),
+    ('Valid party type TRUSTEE', True,  '001019', '2523', ADMIN_DELETE_GROUPS, ADMIN_ADD_GROUPS, None, True),
+    ('Valid party type ADMINISTRATOR', True,  '001019', '2523', ADMIN_DELETE_GROUPS, ADMIN_ADD_GROUPS, None, True),
+    ('Invalid party type add', False,  '001019', '2523', ADMIN_DELETE_GROUPS, ADMIN_ADD_GROUPS,
      validator.TRAN_ADMIN_NEW_OWNER, True),
     ('Invalid add 2 groups', False,  '001019', '2523', ADMIN_DELETE_GROUPS, ADMIN_ADD_GROUPS,
      validator.TRAN_DEATH_GROUP_COUNT, True),
@@ -770,12 +873,21 @@ TEST_TRANSFER_DATA_AFFIDAVIT = [
     ('Valid', True,  '001020', '2523', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS, None, True),
     ('Invalid non-staff', False,  '001020', '2523', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS,
      validator.REG_STAFF_ONLY, False),
-    ('Invalid party type', False,  '001020', '2523', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS,
+    ('Valid party type EXECUTOR', True,  '001020', '2523', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS, None, True),
+    ('Valid party type TRUSTEE', True,  '001020', '2523', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS, None, True),
+    ('Valid party type ADMINISTRATOR', True,  '001020', '2523', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS, None, True),
+    ('Invalid party type add', False,  '001020', '2523', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS,
      validator.TRAN_EXEC_NEW_OWNER, True),
     ('Invalid declared value', False,  '001020', '2523', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS,
      validator.TRAN_AFFIDAVIT_DECLARED_VALUE, True),
-    ('Invalid executor missing', False,  '001020', '2523', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS,
+    ('Invalid executor missing', False,  '001020', '2523', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS_INVALID,
      validator.TRAN_EXEC_MISSING, True),
+    ('Invalid no death info', False,  '001020', '2523', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS,
+     validator.TRAN_EXEC_DEATH_CERT, True),
+    ('Invalid no death number', False,  '001020', '2523', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS,
+     validator.TRAN_DEATH_CERT_MISSING, True),
+    ('Invalid no death date', False,  '001020', '2523', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS,
+     validator.TRAN_DEATH_DATE_MISSING, True),
     ('Invalid add 2 groups', False,  '001020', '2523', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS,
      validator.TRAN_DEATH_GROUP_COUNT, True),
     ('Invalid delete 2 groups', False,  '001020', '2523', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS,
@@ -783,22 +895,25 @@ TEST_TRANSFER_DATA_AFFIDAVIT = [
 ]
 # testdata pattern is ({description},{valid},{mhr_num},{account_id},{delete_groups},{add_groups},{message content},{staff})
 TEST_TRANSFER_DATA_WILL = [
-    ('Valid', True,  '001020', '2523', EXEC_DELETE_GROUPS, WILL_ADD_GROUPS, None, True),
-    ('Invalid non-staff', False,  '001020', '2523', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS,
+    ('Valid', True,  '001020', '2523', WILL_DELETE_GROUPS, EXEC_ADD_GROUPS, None, True),
+    ('Invalid non-staff', False,  '001020', '2523', WILL_DELETE_GROUPS, EXEC_ADD_GROUPS,
      validator.REG_STAFF_ONLY, False),
-    ('Invalid add owner', False,  '001020', '2523', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS,
+    ('Invalid add owner', False,  '001020', '2523', WILL_DELETE_GROUPS, EXEC_ADD_GROUPS,
      validator.TRAN_WILL_NEW_OWNER, True),
-    ('Invalid party type', False,  '001020', '2523', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS,
+    ('Valid party type EXECUTOR', True,  '001020', '2523', WILL_DELETE_GROUPS, EXEC_ADD_GROUPS, None, True),
+    ('Valid party type TRUSTEE', True,  '001020', '2523', WILL_DELETE_GROUPS, EXEC_ADD_GROUPS, None, True),
+    ('Valid party type ADMINISTRATOR', True,  '001020', '2523', WILL_DELETE_GROUPS, EXEC_ADD_GROUPS, None, True),
+    ('Invalid party type add', False,  '001020', '2523', WILL_DELETE_GROUPS, EXEC_ADD_GROUPS,
+     validator.TRAN_EXEC_NEW_OWNER, True),
+    ('Invalid executor missing', False,  '001020', '2523', WILL_DELETE_GROUPS, EXEC_ADD_GROUPS_INVALID,
      validator.TRAN_WILL_NEW_OWNER, True),
-    ('Invalid executor missing', False,  '001020', '2523', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS,
-     validator.TRAN_WILL_NEW_OWNER, True),
-    ('Invalid no probate', False,  '001020', '2523', WILL_DELETE_GROUPS1, WILL_ADD_GROUPS,
+    ('Invalid no probate', False,  '001020', '2523', WILL_DELETE_GROUPS1, EXEC_ADD_GROUPS,
      validator.TRAN_WILL_PROBATE, True),
-    ('Invalid no death info', False,  '001020', '2523', WILL_DELETE_GROUPS2, WILL_ADD_GROUPS,
+    ('Invalid no death info', False,  '001020', '2523', WILL_DELETE_GROUPS2, EXEC_ADD_GROUPS,
      validator.TRAN_WILL_DEATH_CERT, True),
-    ('Invalid add 2 groups', False,  '001020', '2523', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS,
+    ('Invalid add 2 groups', False,  '001020', '2523', WILL_DELETE_GROUPS, EXEC_ADD_GROUPS,
      validator.TRAN_DEATH_GROUP_COUNT, True),
-    ('Invalid delete 2 groups', False,  '001020', '2523', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS,
+    ('Invalid delete 2 groups', False,  '001020', '2523', WILL_DELETE_GROUPS, EXEC_ADD_GROUPS,
      validator.TRAN_DEATH_GROUP_COUNT, True)
 ]
 # testdata pattern is ({description}, {valid}, {mhr_num}, {tenancy_type}, {add_group}, {message content})
@@ -953,6 +1068,8 @@ def test_validate_transfer_trand(session, desc, valid, mhr_num, account_id, dele
     # Additional validation not covered by the schema.
     registration: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account_id)
     error_msg = validator.validate_transfer(registration, json_data, False)
+    # if valid and error_msg:
+    #    current_app.logger.debug('UNEXPECTED ERROR: ' + error_msg)
     if errors:
         current_app.logger.debug(errors)
     if valid:
@@ -973,7 +1090,13 @@ def test_validate_transfer_admin(session, desc, valid, mhr_num, account_id, dele
     json_data['registrationType'] = MhrRegistrationTypes.TRANS_ADMIN
     json_data['deleteOwnerGroups'] = copy.deepcopy(delete_groups)
     json_data['addOwnerGroups'] = copy.deepcopy(add_groups)
-    if desc == 'Invalid party type':
+    if desc == 'Valid party type EXECUTOR':
+        json_data['deleteOwnerGroups'][0]['owners'][0]['partyType'] = MhrPartyTypes.EXECUTOR
+    elif desc == 'Valid party type TRUSTEE':
+        json_data['deleteOwnerGroups'][0]['owners'][0]['partyType'] = MhrPartyTypes.TRUSTEE
+    elif desc == 'Valid party type ADMINISTRATOR':
+        json_data['deleteOwnerGroups'][0]['owners'][0]['partyType'] = MhrPartyTypes.ADMINISTRATOR
+    elif desc == 'Invalid party type add':
         json_data['addOwnerGroups'][0]['owners'][0]['partyType'] = MhrPartyTypes.TRUSTEE
     elif desc == 'Invalid add owner':
         json_data['addOwnerGroups'][0]['owners'].append(ADD_OWNER)
@@ -1008,7 +1131,13 @@ def test_validate_transfer_affidavit(session, desc, valid, mhr_num, account_id, 
     json_data['deleteOwnerGroups'] = copy.deepcopy(delete_groups)
     json_data['addOwnerGroups'] = copy.deepcopy(add_groups)
     json_data['declaredValue'] = 25000
-    if desc == 'Invalid party type':
+    if desc == 'Valid party type EXECUTOR':
+        json_data['deleteOwnerGroups'][0]['owners'][0]['partyType'] = MhrPartyTypes.EXECUTOR
+    elif desc == 'Valid party type TRUSTEE':
+        json_data['deleteOwnerGroups'][0]['owners'][0]['partyType'] = MhrPartyTypes.TRUSTEE
+    elif desc == 'Valid party type ADMINISTRATOR':
+        json_data['deleteOwnerGroups'][0]['owners'][0]['partyType'] = MhrPartyTypes.ADMINISTRATOR
+    elif desc == 'Invalid party type add':
         json_data['addOwnerGroups'][0]['owners'][0]['partyType'] = MhrPartyTypes.TRUSTEE
     elif desc == 'Invalid add owner':
         json_data['addOwnerGroups'][0]['owners'].append(ADD_OWNER)
@@ -1019,6 +1148,14 @@ def test_validate_transfer_affidavit(session, desc, valid, mhr_num, account_id, 
         json_data['addOwnerGroups'].append(ADD_GROUP)
     elif desc == 'Invalid delete 2 groups':
         json_data['deleteOwnerGroups'].append(ADD_GROUP)
+    elif desc == 'Invalid no death info':
+        del json_data['deleteOwnerGroups'][0]['owners'][0]['deathCertificateNumber']
+        del json_data['deleteOwnerGroups'][0]['owners'][0]['deathDateTime']
+    elif desc == 'Invalid no death number':
+        del json_data['deleteOwnerGroups'][0]['owners'][0]['deathCertificateNumber']
+    elif desc == 'Invalid no death date':
+        del json_data['deleteOwnerGroups'][0]['owners'][0]['deathDateTime']
+
     if desc == 'Invalid declared value':
         json_data['declaredValue'] = 25001
     else:
@@ -1048,7 +1185,13 @@ def test_validate_transfer_will(session, desc, valid, mhr_num, account_id, delet
     json_data['registrationType'] = MhrRegistrationTypes.TRANS_WILL
     json_data['deleteOwnerGroups'] = copy.deepcopy(delete_groups)
     json_data['addOwnerGroups'] = copy.deepcopy(add_groups)
-    if desc == 'Invalid party type':
+    if desc == 'Valid party type EXECUTOR':
+        json_data['deleteOwnerGroups'][0]['owners'][0]['partyType'] = MhrPartyTypes.EXECUTOR
+    elif desc == 'Valid party type TRUSTEE':
+        json_data['deleteOwnerGroups'][0]['owners'][0]['partyType'] = MhrPartyTypes.TRUSTEE
+    elif desc == 'Valid party type ADMINISTRATOR':
+        json_data['deleteOwnerGroups'][0]['owners'][0]['partyType'] = MhrPartyTypes.ADMINISTRATOR
+    elif desc == 'Invalid party type add':
         json_data['addOwnerGroups'][0]['owners'][0]['partyType'] = MhrPartyTypes.TRUSTEE
     elif desc == 'Invalid add owner':
         json_data['addOwnerGroups'][0]['owners'].append(ADD_OWNER)

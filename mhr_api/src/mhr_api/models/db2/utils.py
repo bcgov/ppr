@@ -694,7 +694,7 @@ def __build_summary(row, add_in_user_list: bool = True, mhr_list=None):
                     owner_names += name[1:] + '\n'
         # remove comma if exists at end of str
         if owner_names[-2] == ',':
-            owner_names = owner_names[:-2]      
+            owner_names = owner_names[:-2]
     summary = {
         'mhrNumber': mhr_number,
         'registrationDescription': LEGACY_REGISTRATION_DESCRIPTION.get(str(row[5]),
