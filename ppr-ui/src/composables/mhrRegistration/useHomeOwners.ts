@@ -157,11 +157,11 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
 
     let numOfAdditionalGroupsInDropdown = 0
 
-    const homeOwnerGroups = getTransferOrRegistrationHomeOwnerGroups()
+    const homeOwnerGroups = getTransferOrRegistrationHomeOwnerGroups() as MhrRegistrationHomeOwnerGroupIF[]
     const removedOwners = homeOwnerGroups.filter(group => group.action === ActionTypes.REMOVED)
     const activeOwners = homeOwnerGroups.filter(group => group.action !== ActionTypes.REMOVED)
 
-    if (isAddingHomeOwner) {
+    if (isAddingHomeOwner && (showGroups.value || isMhrTransfer)) {
       numOfAdditionalGroupsInDropdown = 1
     } else {
       numOfAdditionalGroupsInDropdown =
@@ -176,7 +176,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
       })
 
     // Remove first group option when there is existing SO/JT
-    if (!showGroups.value && homeOwnerGroups.length) dropDownItems.shift()
+    if (!showGroups.value && homeOwnerGroups.length && isMhrTransfer) dropDownItems.shift()
 
     // Handle Edit Defaults
     if (!dropDownItems.length) return [{ text: 'Group 1', value: DEFAULT_GROUP_ID }]
