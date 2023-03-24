@@ -38,7 +38,6 @@
             :label="countryLabel"
             :rules="[...schemaLocal.country]"
             v-model="addressLocal.country"
-            validate-on-blur
           />
           <!-- special field to select AddressComplete country, separate from our model field -->
           <input type="hidden" :id="countryId" :value="country" />
