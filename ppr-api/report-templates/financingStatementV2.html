@@ -107,15 +107,23 @@
       {% if transitionDescription is defined and transitionDescription != '' %}
         <tr>
           <td colspan="2" class="business-details-note-grey pt-2 pb-2">
-            {% if transitionDescription is defined and transitionDescription == 'COMPANY ACT DOCUMENT' %}
+            {% if transitionDescription == 'ASSIGNMENT OF BOOK ACCOUNTS' %}
+              Note: This is a re-registration of an {{transitionDescription|title}} previously registered in the Companies Branch on 
+              {% if transitionDate is defined and transitionDate != '' %}{{transitionDate}}{% else %}N/A{% endif %},
+              Incorporation Number {% if transitionNumber is defined and transitionNumber != '' %}{{transitionNumber}}{% else %}N/A{% endif %}.
+            {% elif transitionDescription in ('COMPANY ACT DOCUMENT', 'CONDITIONAL SALE AGREEMENT', 'BILL OF SALE ABSOLUTE') %}
               Note: This is a re-registration of a {{transitionDescription|title}} previously registered in the Companies Branch on 
-                {% if transitionDate is defined and transitionDate != '' %}{{transitionDate}}{% else %}N/A{% endif %},
-                Incorporation Number {% if transitionNumber is defined and transitionNumber != '' %}{{transitionNumber}}{% else %}N/A{% endif %}.
-            {% else %}
-              Note: This is a re-registration of a {{transitionDescription|title}} previously registered on 
+              {% if transitionDate is defined and transitionDate != '' %}{{transitionDate}}{% else %}N/A{% endif %},
+              Incorporation Number {% if transitionNumber is defined and transitionNumber != '' %}{{transitionNumber}}{% else %}N/A{% endif %}.
+            {% elif transitionDescription == 'FARM CREDIT CHATTEL MORTGAGE' %}
+              Note: This is a re-registration of a {{transitionDescription|title}} previously registered in the Central Registry on 
               {% if transitionDate is defined and transitionDate != '' %}{{transitionDate}}{% else %}N/A{% endif %},
               Registration Number {% if transitionNumber is defined and transitionNumber != '' %}{{transitionNumber}}{% else %}N/A{% endif %}.
-          {% endif %}
+            {% elif transitionDescription in ('MOBILE HOME ACT DOCUMENT', 'CHATTEL MORTGAGE') %}
+              Note: This is a re-registration of a {{transitionDescription|title}} previously registered in the Mobile Home Registry on 
+              {% if transitionDate is defined and transitionDate != '' %}{{transitionDate}}{% else %}N/A{% endif %},
+              Registration Number {% if transitionNumber is defined and transitionNumber != '' %}{{transitionNumber}}{% else %}N/A{% endif %}.
+            {% endif %}
           </td>
         </tr>
       {% endif %}

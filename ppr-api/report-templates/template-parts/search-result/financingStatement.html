@@ -64,19 +64,26 @@
     </tr>
     {% endif %}
 
-
     {% if detail.financingStatement.transitionDescription is defined and detail.financingStatement.transitionDescription != '' %}
     <tr>
       <td colspan="2" class="business-details-note-grey pt-2 pb-2">
-        {% if detail.financingStatement.transitionDescription is defined and detail.financingStatement.transitionDescription == 'COMPANY ACT DOCUMENT' %}
+        {% if detail.financingStatement.transitionDescription == 'ASSIGNMENT OF BOOK ACCOUNTS' %}
+          Note: This is a re-registration of an {{detail.financingStatement.transitionDescription|title}} previously registered in the Companies Branch on 
+          {% if detail.financingStatement.transitionDate is defined and detail.financingStatement.transitionDate != '' %}{{detail.financingStatement.transitionDate}}{% else %}N/A{% endif %},
+          Incorporation Number {% if detail.financingStatement.transitionNumber is defined and detail.financingStatement.transitionNumber != '' %}{{detail.financingStatement.transitionNumber}}{% else %}N/A{% endif %}.
+        {% elif detail.financingStatement.transitionDescription in ('COMPANY ACT DOCUMENT', 'CONDITIONAL SALE AGREEMENT', 'BILL OF SALE ABSOLUTE') %}
           Note: This is a re-registration of a {{detail.financingStatement.transitionDescription|title}} previously registered in the Companies Branch on 
-            {% if detail.financingStatement.transitionDate is defined and detail.financingStatement.transitionDate != '' %}{{detail.financingStatement.transitionDate}}{% else %}N/A{% endif %},
-            Incorporation Number {% if detail.financingStatement.transitionNumber is defined and detail.financingStatement.transitionNumber != '' %}{{detail.financingStatement.transitionNumber}}{% else %}N/A{% endif %}.
-        {% else %}
-          Note: This is a re-registration of a {{detail.financingStatement.transitionDescription|title}} previously registered on 
+          {% if detail.financingStatement.transitionDate is defined and detail.financingStatement.transitionDate != '' %}{{detail.financingStatement.transitionDate}}{% else %}N/A{% endif %},
+          Incorporation Number {% if detail.financingStatement.transitionNumber is defined and detail.financingStatement.transitionNumber != '' %}{{detail.financingStatement.transitionNumber}}{% else %}N/A{% endif %}.
+        {% elif detail.financingStatement.transitionDescription == 'FARM CREDIT CHATTEL MORTGAGE' %}
+          Note: This is a re-registration of a {{detail.financingStatement.transitionDescription|title}} previously registered in the Central Registry on 
           {% if detail.financingStatement.transitionDate is defined and detail.financingStatement.transitionDate != '' %}{{detail.financingStatement.transitionDate}}{% else %}N/A{% endif %},
           Registration Number {% if detail.financingStatement.transitionNumber is defined and detail.financingStatement.transitionNumber != '' %}{{detail.financingStatement.transitionNumber}}{% else %}N/A{% endif %}.
-      {% endif %}
+        {% elif detail.financingStatement.transitionDescription in ('MOBILE HOME ACT DOCUMENT', 'CHATTEL MORTGAGE') %}
+          Note: This is a re-registration of a {{detail.financingStatement.transitionDescription|title}} previously registered in the Mobile Home Registry on 
+          {% if detail.financingStatement.transitionDate is defined and detail.financingStatement.transitionDate != '' %}{{detail.financingStatement.transitionDate}}{% else %}N/A{% endif %},
+          Registration Number {% if detail.financingStatement.transitionNumber is defined and detail.financingStatement.transitionNumber != '' %}{{detail.financingStatement.transitionNumber}}{% else %}N/A{% endif %}.
+        {% endif %}
       </td>
     </tr>
   {% endif %}

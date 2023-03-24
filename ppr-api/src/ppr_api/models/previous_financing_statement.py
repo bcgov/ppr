@@ -81,16 +81,18 @@ class PreviousFinancingStatement(db.Model):  # pylint: disable=too-many-instance
         previous_financing = {
             'transitionDescription': self.registration_type
         }
-        if self.mhr_date or self.cr_date:
+        if self.cb_date or self.mhr_date or self.cr_date:
             previous_financing['transitionDate'] = self.get_transition_date()
-        if self.mhr_number or self.cr_number:
+        if self.cb_number or self.mhr_number or self.cr_number:
             previous_financing['transitionNumber'] = self.get_transition_number()
         return previous_financing
 
     def get_transition_date(self):
         """Return a previous registration date in an ISO timestamp format."""
         date_iso: str = None
-        transition_date: str = self.cr_date if self.cr_date else self.mhr_date
+        transition_date: str = self.cr_date if self.cr_date else self.cb_date
+        if not transition_date:
+            transition_date = self.mhr_date
         if not transition_date:
             return date_iso
         if len(transition_date) == 10:
@@ -107,17 +109,12 @@ class PreviousFinancingStatement(db.Model):  # pylint: disable=too-many-instance
         return date_iso
 
     def get_transition_number(self):
-        """Return a previous registration number in the expected format."""
-        if self.mhr_number:
-            return self.mhr_number
-        trans_num: str = self.cr_number
-        if trans_num and self.registration_type and \
-                self.registration_type == self.PreviousRegistrationTypes.COMPANY_ACT_DOCUMENT:
-            if trans_num.startswith('CA'):
-                trans_num = 'BC' + trans_num.replace('CA', '00')
-            else:
-                trans_num = 'BC' + trans_num
-        return trans_num
+        """Return a previous registration number in the original format."""
+        if self.cr_number:
+            return self.cr_number
+        if self.cb_number:
+            return self.cb_number
+        return self.mhr_number
 
     @classmethod
     def find_by_id(cls, financing_id: int = None):
