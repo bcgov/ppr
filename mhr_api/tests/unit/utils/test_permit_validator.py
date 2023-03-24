@@ -282,11 +282,16 @@ TEST_LOCATION_DATA = [
     ('Invalid exception plan', None, None, None, INVALID_TEXT_CHARSET, None, INVALID_CHARSET_MESSAGE),
     ('Invalid band name', None, None, None, None, INVALID_TEXT_CHARSET, INVALID_CHARSET_MESSAGE)
 ]
+# test data pattern is ({description}, {valid}, {staff}, {doc_id}, {message_content}, {status}, {group})
 TEST_PERMIT_DATA = [
     (DESC_VALID, True, True, None, None, MhrRegistrationStatusTypes.ACTIVE, STAFF_ROLE),
     ('Valid no doc id not staff', True, False, None, None, None, REQUEST_TRANSPORT_PERMIT),
-    ('Invalid EXEMPT', False, False, None, validator.STATE_NOT_ALLOWED, MhrRegistrationStatusTypes.EXEMPT,
+    ('Invalid FROZEN', False, False, None, validator.STATE_NOT_ALLOWED, MhrRegistrationStatusTypes.ACTIVE,
      REQUEST_TRANSPORT_PERMIT),
+    ('Invalid staff FROZEN', False, True, None, validator.STATE_FROZEN_AFFIDAVIT, MhrRegistrationStatusTypes.ACTIVE,
+     REQUEST_TRANSPORT_PERMIT),
+    ('Invalid EXEMPT', False, False, None, validator.STATE_NOT_ALLOWED, MhrRegistrationStatusTypes.EXEMPT,
+     STAFF_ROLE),
     ('Invalid HISTORICAL', False, False, None, validator.STATE_NOT_ALLOWED, MhrRegistrationStatusTypes.HISTORICAL,
      REQUEST_TRANSPORT_PERMIT)
 ]
@@ -332,15 +337,20 @@ TEST_DATA_PID = [
 def test_validate_permit(session, desc, valid, staff, doc_id, message_content, status, group):
     """Assert that basic MH transport permit validation works as expected."""
     # setup
+    mhr_num: str = '100413'
+    account_id: str = 'PS12345'
     json_data = get_valid_registration()
     if staff and doc_id:
         json_data['documentId'] = doc_id
     elif json_data.get('documentId'):
         del json_data['documentId']
+    if desc in ('Invalid FROZEN', 'Invalid staff FROZEN'):
+        mhr_num = '003936'
+        account_id = '2523'
     # current_app.logger.info(json_data)
     valid_format, errors = schema_utils.validate(json_data, 'permit', 'mhr')
     # Additional validation not covered by the schema.
-    registration: MhrRegistration = MhrRegistration.find_by_mhr_number('100413', 'PS12345')
+    registration: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account_id)
     if status:
         registration.status_type = status
     error_msg = validator.validate_permit(registration, json_data, staff, group)
