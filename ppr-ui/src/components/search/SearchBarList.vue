@@ -200,6 +200,9 @@ export default defineComponent({
     }
     const updateSelections = () => {
       localState.displayItems = localState.origItems
+      if (hasPprEnabled.value && hasMhrEnabled.value) {
+        localState.displayGroup = { 1: false, 2: false }
+      }
     }
 
     return {
