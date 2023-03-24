@@ -51,17 +51,38 @@
 </template>
 
 <script lang="ts">
-// external
-import { Component, Vue, Prop, Emit } from 'vue-property-decorator'
+import { defineComponent, reactive, toRefs } from '@vue/composition-api'
 
-@Component({})
-export default class ConfirmationDialog extends Vue {
-  @Prop() private attach: string
-  @Prop() private display: boolean
-  @Prop() private securedPartyName: string
+export default defineComponent({
+  name: 'ChangeSecuredPartyDialog',
+  emits: ['proceed'],
+  props: {
+    attach: {
+      type: String,
+      default: ''
+    },
+    display: {
+      type: Boolean,
+      default: false
+    },
+    securedPartyName: {
+      type: String,
+      default: ''
+    }
+  },
+  setup (props, context) {
+    const localState = reactive({})
 
-  @Emit() private proceed (val: boolean) {}
-}
+    const proceed = (val: boolean) => {
+      context.emit('proceed', val)
+    }
+
+    return {
+      proceed,
+      ...toRefs(localState)
+    }
+  }
+})
 </script>
 
 <style lang="scss" scoped>

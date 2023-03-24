@@ -96,12 +96,9 @@
 </template>
 
 <script lang="ts">
-// external
-import { Component, Emit, Prop, Vue, Watch } from 'vue-property-decorator'
-import { Action, Getter } from 'vuex-class'
-// bcregistry
+import { computed, defineComponent, onMounted, reactive, toRefs, watch } from '@vue/composition-api'
+import { useActions, useGetters } from 'vuex-composition-helpers'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
-// local components
 import {
   CautionBox,
   DischargeConfirmSummary,
@@ -111,28 +108,24 @@ import {
 } from '@/components/common'
 import { RegisteringPartyChange } from '@/components/parties/party'
 import { BaseDialog } from '@/components/dialogs'
-// local helpers/enums/interfaces/resources
-/* eslint-disable no-unused-vars */
-import { ActionTypes, APIRegistrationTypes, RouteNames, UIRegistrationTypes } from '@/enums'
-import { FeeSummaryTypes } from '@/composables/fees/enums'
-import { Throttle } from '@/decorators'
-import {
-  ActionBindingIF,
-  DischargeRegistrationIF,
-  ErrorIF,
-  AddPartiesIF,
-  RegistrationTypeIF,
-  StateModelIF,
-  DialogOptionsIF,
-  DebtorNameIF,
-  RegTableNewItemI
-} from '@/interfaces'
-/* eslint-enable no-unused-vars */
 import { AllRegistrationTypes } from '@/resources'
 import { notCompleteDialog } from '@/resources/dialogOptions'
 import { getFeatureFlag, getFinancingStatement, saveDischarge } from '@/utils'
+/* eslint-disable no-unused-vars */
+import { ActionTypes, APIRegistrationTypes, RouteNames, UIRegistrationTypes } from '@/enums'
+import { FeeSummaryTypes } from '@/composables/fees/enums'
+import {
+  DischargeRegistrationIF,
+  ErrorIF,
+  AddPartiesIF,
+  StateModelIF,
+  DialogOptionsIF,
+  RegTableNewItemI
+} from '@/interfaces'
+/* eslint-enable no-unused-vars */
 
-@Component({
+export default defineComponent({
+  name: 'ConfirmDischarge',
   components: {
     BaseDialog,
     CautionBox,
@@ -141,239 +134,265 @@ import { getFeatureFlag, getFinancingStatement, saveDischarge } from '@/utils'
     RegisteringPartyChange,
     CertifyInformation,
     StickyContainer
+  },
+  emits: ['error', 'haveData'],
+  props: {
+    appReady: {
+      type: Boolean,
+      default: false
+    },
+    isJestRunning: {
+      type: Boolean,
+      default: false
+    }
+  },
+  setup (props, context) {
+    const {
+      getStateModel,
+      isRoleStaffBcol,
+      getConfirmDebtorName,
+      getRegistrationType,
+      getAddSecuredPartiesAndDebtors
+    } = useGetters([
+      'getStateModel',
+      'isRoleStaffBcol',
+      'getConfirmDebtorName',
+      'getRegistrationType',
+      'getAddSecuredPartiesAndDebtors'
+    ])
+    const {
+      setRegTableNewItem,
+      setRegistrationType,
+      setRegistrationNumber,
+      setRegistrationExpiryDate,
+      setRegistrationCreationDate,
+      setAddSecuredPartiesAndDebtors
+    } = useActions([
+      'setRegTableNewItem',
+      'setRegistrationType',
+      'setRegistrationNumber',
+      'setRegistrationExpiryDate',
+      'setRegistrationCreationDate',
+      'setAddSecuredPartiesAndDebtors'
+    ])
+
+    const localState = reactive({
+      cautionTxt: 'The Registry will provide the verification statement to all Secured Parties named in this ' +
+        'registration.',
+      cautionTxtRP: 'The Registry will not provide the verification statement for this total discharge to the ' +
+        'Registering Party named above.',
+      collateralSummary: '',
+      dataLoaded: false,
+      dataLoadError: false,
+      feeType: FeeSummaryTypes.DISCHARGE,
+      financingStatementDate: null as Date,
+      options: notCompleteDialog as DialogOptionsIF,
+      showCancelDialog: false,
+      showErrors: false,
+      showRegMsg: false,
+      submitting: false,
+      tooltipTxt: 'The default Registering Party is based on your BC Registries user account information. This ' +
+        'information can be updated within your account settings. You can change to a different Registering Party by ' +
+        'using the Change button.',
+      validConfirm: false,
+      validFolio: true,
+      validCertify: false,
+      isAuthenticated: computed((): boolean => {
+        return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
+      }),
+      registrationNumber: computed((): string => {
+        return (context.root.$route.query['reg-num'] as string) || ''
+      }),
+      registrationTypeUI: computed((): UIRegistrationTypes => {
+        return getRegistrationType.value?.registrationTypeUI || null
+      }),
+      registrationType: computed((): APIRegistrationTypes => {
+        return getRegistrationType.value?.registrationTypeAPI || null
+      }),
+      stickyComponentErrMsg: computed((): string => {
+        if ((!localState.validConfirm || !localState.validFolio) && localState.showErrors) {
+          return '< Please complete required information'
+        }
+        return ''
+      })
+    })
+
+    onMounted(() => {
+      onAppReady(props.appReady)
+    })
+
+    const loadRegistration = async (): Promise<void> => {
+      if (!localState.registrationNumber || !getConfirmDebtorName.value) {
+        if (!localState.registrationNumber) {
+          console.error('No registration number given to discharge. Redirecting to dashboard...')
+        } else {
+          console.error('No debtor name confirmed for discharge. Redirecting to dashboard...')
+        }
+        context.root.$router.push({
+          name: RouteNames.DASHBOARD
+        })
+        return
+      }
+      localState.financingStatementDate = new Date()
+      const financingStatement = await getFinancingStatement(
+        true,
+        localState.registrationNumber
+      )
+      if (financingStatement.error) {
+        localState.dataLoadError = true
+        emitError(financingStatement.error)
+      } else {
+        // set collateral summary
+        if (
+          financingStatement.generalCollateral &&
+          !financingStatement.vehicleCollateral
+        ) {
+          localState.collateralSummary = 'General Collateral and 0 Vehicles'
+        } else if (financingStatement.generalCollateral) {
+          localState.collateralSummary = `General Collateral and ${financingStatement.vehicleCollateral.length} ` +
+            'Vehicles'
+        } else if (financingStatement.vehicleCollateral) {
+          localState.collateralSummary = `No General Collateral and ${financingStatement.vehicleCollateral.length} ` +
+            'Vehicles'
+        } else {
+          localState.collateralSummary += 'No Collateral'
+        }
+        if (financingStatement.vehicleCollateral?.length === 1) {
+          localState.collateralSummary = localState.collateralSummary
+            .replace('Vehicles', 'Vehicle')
+        }
+        // load data into the store
+        const registrationType = AllRegistrationTypes.find((reg, index) => {
+          if (reg.registrationTypeAPI === financingStatement.type) {
+            return true
+          }
+        })
+        const parties = {
+          valid: true,
+          registeringParty: null,
+          securedParties: financingStatement.securedParties,
+          debtors: financingStatement.debtors
+        } as AddPartiesIF
+        setRegistrationCreationDate(financingStatement.createDateTime)
+        setRegistrationExpiryDate(financingStatement.expiryDate)
+        setRegistrationNumber(financingStatement.baseRegistrationNumber)
+        setRegistrationType(registrationType)
+        setAddSecuredPartiesAndDebtors(parties)
+      }
+    }
+
+    const onAppReady = async (val: boolean): Promise<void> => {
+      // do not proceed if app is not ready
+      if (!val) return
+      // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
+      if (!localState.isAuthenticated || (!props.isJestRunning && !getFeatureFlag('ppr-ui-enabled'))) {
+        context.root.$router.push({
+          name: RouteNames.DASHBOARD
+        })
+        return
+      }
+
+      // get registration data from api and load into store
+      localState.submitting = true
+      await loadRegistration()
+      localState.submitting = false
+
+      // page is ready to view
+      emitHaveData(true)
+      localState.dataLoaded = true
+    }
+
+    const handleDialogResp = (val: boolean): void => {
+      localState.showCancelDialog = false
+      if (!val) {
+        setRegistrationNumber(null)
+        context.root.$router.push({ name: RouteNames.DASHBOARD })
+      }
+    }
+
+    const goToReviewRegistration = (): void => {
+      context.root.$router.push({
+        name: RouteNames.REVIEW_DISCHARGE,
+        query: { 'reg-num': localState.registrationNumber }
+      })
+      emitHaveData(false)
+    }
+
+    const setFolioValid = (valid: boolean): void => {
+      localState.validFolio = valid
+    }
+
+    const showDialog = (): void => {
+      localState.showCancelDialog = true
+    }
+
+    const submitDischarge = async (): Promise<void> => {
+      if ((!localState.validConfirm) || (!localState.validFolio) || (!localState.validCertify)) {
+        localState.showErrors = true
+        return
+      }
+
+      const stateModel: StateModelIF = getStateModel.value
+      localState.submitting = true
+      const apiResponse: DischargeRegistrationIF = await saveDischarge(stateModel)
+      localState.submitting = false
+      if (apiResponse === undefined || apiResponse?.error !== undefined) {
+        emitError(apiResponse?.error)
+      } else {
+        // set new added reg
+        const newItem: RegTableNewItemI = {
+          addedReg: apiResponse.dischargeRegistrationNumber,
+          addedRegParent: apiResponse.baseRegistrationNumber,
+          addedRegSummary: null,
+          prevDraft: ''
+        }
+        setRegTableNewItem(newItem)
+        // On success return to dashboard
+        goToDashboard()
+      }
+    }
+
+    const goToDashboard = (): void => {
+      context.root.$router.push({
+        name: RouteNames.DASHBOARD
+      })
+      emitHaveData(false)
+    }
+
+    const setShowWarning = (): void => {
+      const parties = getAddSecuredPartiesAndDebtors.value
+      localState.showRegMsg = parties.registeringParty?.action === ActionTypes.EDITED
+    }
+
+    /** Emits Have Data event. */
+    const emitHaveData = (haveData: Boolean = true): void => {
+      context.emit('haveData', haveData)
+    }
+
+    /** Emits error to app.vue for handling */
+    const emitError = (error: ErrorIF): void => {
+      context.emit('error', error)
+      console.error(error)
+    }
+
+    /** Called when App is ready and this component can load its data. */
+    watch(() => props.appReady, (val: boolean) => {
+      onAppReady(val)
+    })
+
+    return {
+      showDialog,
+      setFolioValid,
+      goToDashboard,
+      setShowWarning,
+      isRoleStaffBcol,
+      submitDischarge,
+      handleDialogResp,
+      goToReviewRegistration,
+      ...toRefs(localState)
+    }
   }
 })
-export default class ConfirmDischarge extends Vue {
-  @Getter getConfirmDebtorName: DebtorNameIF
-  @Getter getRegistrationType: RegistrationTypeIF
-  @Getter getAddSecuredPartiesAndDebtors: AddPartiesIF
-  @Getter getStateModel: StateModelIF
-  @Getter isRoleStaffBcol: boolean
-
-  @Action setAddSecuredPartiesAndDebtors: ActionBindingIF
-  @Action setRegistrationCreationDate: ActionBindingIF
-  @Action setRegistrationExpiryDate: ActionBindingIF
-  @Action setRegistrationNumber: ActionBindingIF
-  @Action setRegistrationType: ActionBindingIF
-  @Action setRegTableNewItem: ActionBindingIF
-  @Action setUnsavedChanges: ActionBindingIF
-
-  /** Whether App is ready. */
-  @Prop({ default: false })
-  private appReady: boolean
-
-  @Prop({ default: false })
-  private isJestRunning: boolean
-
-  private cautionTxt =
-    'The Registry will provide the verification statement to all Secured Parties named in this registration.'
-
-  private cautionTxtRP = 'The Registry will not provide ' +
-    'the verification statement for this total discharge to the Registering Party named above.'
-
-  private collateralSummary = '' // eslint-disable-line lines-between-class-members
-  private dataLoaded = false
-  private dataLoadError = false
-  private feeType = FeeSummaryTypes.DISCHARGE
-  private financingStatementDate: Date = null
-  private options: DialogOptionsIF = notCompleteDialog
-  private showCancelDialog = false
-  private showErrors = false
-  private showRegMsg = false
-  private submitting = false
-  private tooltipTxt = 'The default Registering Party is based on your BC ' +
-    'Registries user account information. This information can be updated within ' +
-    'your account settings. You can change to a different Registering Party by ' +
-    'using the Change button.'
-  private validConfirm = false // eslint-disable-line lines-between-class-members
-  private validFolio = true
-  private validCertify = false
-
-  private get isAuthenticated (): boolean {
-    return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
-  }
-
-  // the number of the registration being discharged
-  private get registrationNumber (): string {
-    return (this.$route.query['reg-num'] as string) || ''
-  }
-
-  private get registrationTypeUI (): UIRegistrationTypes {
-    return this.getRegistrationType?.registrationTypeUI || null
-  }
-
-  private get registrationType (): APIRegistrationTypes {
-    return this.getRegistrationType?.registrationTypeAPI || null
-  }
-
-  private get stickyComponentErrMsg (): string {
-    if ((!this.validConfirm || !this.validFolio) && this.showErrors) {
-      return '< Please complete required information'
-    }
-    return ''
-  }
-
-  private async loadRegistration (): Promise<void> {
-    if (!this.registrationNumber || !this.getConfirmDebtorName) {
-      if (!this.registrationNumber) {
-        console.error('No registration number given to discharge. Redirecting to dashboard...')
-      } else {
-        console.error('No debtor name confirmed for discharge. Redirecting to dashboard...')
-      }
-      this.$router.push({
-        name: RouteNames.DASHBOARD
-      })
-      return
-    }
-    this.financingStatementDate = new Date()
-    const financingStatement = await getFinancingStatement(
-      true,
-      this.registrationNumber
-    )
-    if (financingStatement.error) {
-      this.dataLoadError = true
-      this.emitError(financingStatement.error)
-    } else {
-      // set collateral summary
-      if (
-        financingStatement.generalCollateral &&
-        !financingStatement.vehicleCollateral
-      ) {
-        this.collateralSummary = 'General Collateral and 0 Vehicles'
-      } else if (financingStatement.generalCollateral) {
-        this.collateralSummary = `General Collateral and ${financingStatement.vehicleCollateral.length} Vehicles`
-      } else if (financingStatement.vehicleCollateral) {
-        this.collateralSummary = `No General Collateral and ${financingStatement.vehicleCollateral.length} Vehicles`
-      } else {
-        this.collateralSummary += 'No Collateral'
-      }
-      if (financingStatement.vehicleCollateral?.length === 1) {
-        this.collateralSummary = this.collateralSummary.replace('Vehicles', 'Vehicle')
-      }
-      // load data into the store
-      const registrationType = AllRegistrationTypes.find((reg, index) => {
-        if (reg.registrationTypeAPI === financingStatement.type) {
-          return true
-        }
-      })
-      const parties = {
-        valid: true,
-        registeringParty: null,
-        securedParties: financingStatement.securedParties,
-        debtors: financingStatement.debtors
-      } as AddPartiesIF
-      this.setRegistrationCreationDate(financingStatement.createDateTime)
-      this.setRegistrationExpiryDate(financingStatement.expiryDate)
-      this.setRegistrationNumber(financingStatement.baseRegistrationNumber)
-      this.setRegistrationType(registrationType)
-      this.setAddSecuredPartiesAndDebtors(parties)
-    }
-  }
-
-  mounted () {
-    this.onAppReady(this.appReady)
-  }
-
-  private handleDialogResp (val: boolean): void {
-    this.showCancelDialog = false
-    if (!val) {
-      this.setRegistrationNumber(null)
-      this.$router.push({ name: RouteNames.DASHBOARD })
-    }
-  }
-
-  private goToReviewRegistration (): void {
-    this.$router.push({
-      name: RouteNames.REVIEW_DISCHARGE,
-      query: { 'reg-num': this.registrationNumber }
-    })
-    this.emitHaveData(false)
-  }
-
-  private setFolioValid (valid: boolean): void {
-    this.validFolio = valid
-  }
-
-  private showDialog (): void {
-    this.showCancelDialog = true
-  }
-
-  @Throttle(2000)
-  private async submitDischarge (): Promise<void> {
-    if ((!this.validConfirm) || (!this.validFolio) || (!this.validCertify)) {
-      this.showErrors = true
-      return
-    }
-
-    const stateModel: StateModelIF = this.getStateModel
-    this.submitting = true
-    const apiResponse: DischargeRegistrationIF = await saveDischarge(stateModel)
-    this.submitting = false
-    if (apiResponse === undefined || apiResponse?.error !== undefined) {
-      this.emitError(apiResponse?.error)
-    } else {
-      // set new added reg
-      const newItem: RegTableNewItemI = {
-        addedReg: apiResponse.dischargeRegistrationNumber,
-        addedRegParent: apiResponse.baseRegistrationNumber,
-        addedRegSummary: null,
-        prevDraft: ''
-      }
-      this.setRegTableNewItem(newItem)
-      // On success return to dashboard
-      this.goToDashboard()
-    }
-  }
-
-  private goToDashboard (): void {
-    this.$router.push({
-      name: RouteNames.DASHBOARD
-    })
-    this.emitHaveData(false)
-  }
-
-  private setShowWarning (): void {
-    const parties = this.getAddSecuredPartiesAndDebtors
-    if (parties.registeringParty?.action === ActionTypes.EDITED) {
-      this.showRegMsg = true
-    } else {
-      this.showRegMsg = false
-    }
-  }
-
-  /** Emits Have Data event. */
-  @Emit('haveData')
-  private emitHaveData (haveData: Boolean = true): void {}
-
-  /** Emits error to app.vue for handling */
-  @Emit('error')
-  private emitError (error: ErrorIF): void {
-    console.error(error)
-  }
-
-  /** Called when App is ready and this component can load its data. */
-  @Watch('appReady')
-  private async onAppReady (val: boolean): Promise<void> {
-    // do not proceed if app is not ready
-    if (!val) return
-    // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
-    if (!this.isAuthenticated || (!this.isJestRunning && !getFeatureFlag('ppr-ui-enabled'))) {
-      this.$router.push({
-        name: RouteNames.DASHBOARD
-      })
-      return
-    }
-
-    // get registration data from api and load into store
-    this.submitting = true
-    await this.loadRegistration()
-    this.submitting = false
-
-    // page is ready to view
-    this.emitHaveData(true)
-    this.dataLoaded = true
-  }
-}
 </script>
 
 <style lang="scss" module>

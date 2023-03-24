@@ -3,10 +3,8 @@
 </template>
 
 <script lang="ts">
-// Libraries
-import { Component, Vue } from 'vue-property-decorator'
-
-// Components
+import { computed, defineComponent, reactive, toRefs } from '@vue/composition-api'
+// Common Component
 import SbcLogin from 'sbc-common-components/src/components/SbcLogin.vue'
 
 /**
@@ -14,16 +12,23 @@ import SbcLogin from 'sbc-common-components/src/components/SbcLogin.vue'
  * 1. When this component is first loaded (ie, we are not authenticated) then the
  *    SbcLogin component will redirect us to log in.
  */
-@Component({
+export default defineComponent({
+  name: 'Login',
   components: {
     SbcLogin
+  },
+  setup (props, context) {
+    const localState = reactive({
+      redirectUrl: computed(() => {
+        return (context.root.$route.query.redirect as string)
+      })
+    })
+
+    return {
+      ...toRefs(localState)
+    }
   }
 })
-export default class Login extends Vue {
-  get redirectUrl () {
-    return (this.$route.query.redirect as string)
-  }
-}
 </script>
 
 <style lang="scss" scoped>

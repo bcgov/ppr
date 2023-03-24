@@ -161,10 +161,7 @@
 </template>
 
 <script lang="ts">
-// external
-import { Component, Emit, Prop, Vue, Watch } from 'vue-property-decorator'
-import { Action, Getter } from 'vuex-class'
-// bcregistry
+import { computed, defineComponent, onMounted, reactive, toRefs, watch } from '@vue/composition-api'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local components
 import {
@@ -180,36 +177,6 @@ import { SecuredPartySummary, DebtorSummary } from '@/components/parties/summari
 import { RegisteringPartyChange } from '@/components/parties/party'
 import { AmendmentDescription, RegistrationLengthTrustAmendment } from '@/components/registration'
 import { VehicleCollateral } from '@/components/collateral/vehicleCollateral'
-
-// local helpers/enums/interfaces/resources
-/* eslint-disable no-unused-vars */
-import {
-  ActionTypes,
-  APIRegistrationTypes,
-  RouteNames,
-  UIRegistrationTypes
-} from '@/enums'
-import { Throttle } from '@/decorators'
-import {
-  ActionBindingIF,
-  AddCollateralIF,
-  AddPartiesIF,
-  AmendmentStatementIF,
-  CertifyIF,
-  CourtOrderIF,
-  ErrorIF,
-  RegistrationTypeIF,
-  StateModelIF,
-  LengthTrustIF,
-  DialogOptionsIF,
-  DebtorNameIF,
-  DraftIF,
-  FinancingStatementIF,
-  RegTableNewItemI
-} from '@/interfaces'
-import { RegistrationLengthI } from '@/composables/fees/interfaces'
-/* eslint-enable no-unused-vars */
-
 import { AllRegistrationTypes } from '@/resources'
 import { unsavedChangesDialog } from '@/resources/dialogOptions'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
@@ -219,8 +186,32 @@ import {
   saveAmendmentStatement,
   saveAmendmentStatementDraft
 } from '@/utils'
+import { useActions, useGetters } from 'vuex-composition-helpers'
+/* eslint-disable no-unused-vars */
+import {
+  ActionTypes,
+  APIRegistrationTypes,
+  RouteNames,
+  UIRegistrationTypes
+} from '@/enums'
+import {
+  AddCollateralIF,
+  AddPartiesIF,
+  AmendmentStatementIF,
+  CourtOrderIF,
+  ErrorIF,
+  StateModelIF,
+  LengthTrustIF,
+  DialogOptionsIF,
+  DraftIF,
+  FinancingStatementIF,
+  RegTableNewItemI
+} from '@/interfaces'
+import { RegistrationLengthI } from '@/composables/fees/interfaces'
+/* eslint-enable no-unused-vars */
 
-@Component({
+export default defineComponent({
+  name: 'ConfirmAmendment',
   components: {
     AmendmentDescription,
     BaseDialog,
@@ -236,464 +227,474 @@ import {
     CourtOrder,
     RegistrationLengthTrustAmendment,
     StickyContainer
-  }
-})
-export default class ConfirmAmendment extends Vue {
-  @Getter getAddCollateral: AddCollateralIF
-  @Getter getAddSecuredPartiesAndDebtors: AddPartiesIF
-  @Getter getAmendmentDescription: string
-  @Getter getCertifyInformation: CertifyIF
-  @Getter getConfirmDebtorName: DebtorNameIF
-  @Getter getCourtOrderInformation: CourtOrderIF
-  @Getter getLengthTrust: LengthTrustIF
-  @Getter getRegistrationNumber: string
-  @Getter getRegistrationType: RegistrationTypeIF
-  @Getter getStateModel: StateModelIF
-  @Getter hasUnsavedChanges: Boolean
-  @Getter isRoleStaffBcol: boolean
-  @Getter isRoleStaffReg: boolean
-  @Getter isRoleStaffSbc: boolean
-
-  @Action setAddSecuredPartiesAndDebtors: ActionBindingIF
-  @Action setFeeSummary: ActionBindingIF
-  @Action setRegistrationCreationDate: ActionBindingIF
-  @Action setRegistrationExpiryDate: ActionBindingIF
-  @Action setRegistrationNumber: ActionBindingIF
-  @Action setRegistrationType: ActionBindingIF
-  @Action setRegTableNewItem: ActionBindingIF
-  @Action setUnsavedChanges: ActionBindingIF
-
-  /** Whether App is ready. */
-  @Prop({ default: false })
-  private appReady: boolean
-
-  @Prop({ default: false })
-  private isJestRunning: boolean
-
-  @Prop({ default: false })
-  private saveDraftExit: boolean
-
-  private collateralSummary = '' // eslint-disable-line lines-between-class-members
-  private dataLoaded = false
-  private dataLoadError = false
-  private registeringOpen = false
-  private showRegMsg = false
-  private financingStatementDate: Date = null
-  private options: DialogOptionsIF = unsavedChangesDialog
-
-  private staffPaymentDialogDisplay = false
-
-  private staffPaymentDialogOptions: DialogOptionsIF = {
-    acceptText: 'Submit Amendment',
-    cancelText: 'Cancel',
-    title: 'Staff Payment',
-    label: '',
-    text: ''
-  }
-
-  private showCancelDialog = false
-  private showErrors = false
-
-  private cautionTxt =
-    'The Registry will provide the verification statement to all Secured Parties named in this registration.'
-
-  private cautionTxtRP = 'The Registry will not provide ' +
-    'the verification statement for this amendment to the Registering Party named above.'
-
-  private tooltipTxt = 'The default Registering Party is based on your BC ' +
-    'Registries user account information. This information can be updated within ' +
-    'your account settings. You can change to a different Registering Party by ' +
-    'using the Change button.'
-
-  private validFolio = true
-  private feeType = FeeSummaryTypes.AMEND
-
-  private submitting = false
-
-  private get isAuthenticated (): boolean {
-    return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
-  }
-
-  // the number of the registration being discharged
-  private get registrationNumber (): string {
-    return (this.$route.query['reg-num'] as string) || ''
-  }
-
-  private get registrationTypeUI (): UIRegistrationTypes {
-    return this.getRegistrationType?.registrationTypeUI || null
-  }
-
-  private get registrationType (): APIRegistrationTypes {
-    return this.getRegistrationType?.registrationTypeAPI || null
-  }
-
-  private get registrationLength (): RegistrationLengthI {
-    return {
-      lifeInfinite: this.getLengthTrust?.lifeInfinite || false,
-      lifeYears: this.getLengthTrust?.lifeYears || 0
+  },
+  emits: ['error', 'haveData'],
+  props: {
+    appReady: {
+      type: Boolean,
+      default: false
+    },
+    isJestRunning: {
+      type: Boolean,
+      default: false
+    },
+    saveDraftExit: {
+      type: Boolean,
+      default: false
     }
-  }
+  },
+  setup (props, context) {
+    const {
+      getStateModel,
+      getLengthTrust,
+      isRoleStaffBcol,
+      isRoleStaffReg,
+      isRoleStaffSbc,
+      getAddCollateral,
+      hasUnsavedChanges,
+      getRegistrationType,
+      getConfirmDebtorName,
+      getCertifyInformation,
+      getRegistrationNumber,
+      getAmendmentDescription,
+      getCourtOrderInformation,
+      getAddSecuredPartiesAndDebtors
+    } = useGetters<any>([
+      'getStateModel',
+      'getLengthTrust',
+      'isRoleStaffBcol',
+      'isRoleStaffReg',
+      'isRoleStaffSbc',
+      'getAddCollateral',
+      'hasUnsavedChanges',
+      'getRegistrationType',
+      'getConfirmDebtorName',
+      'getCertifyInformation',
+      'getRegistrationNumber',
+      'getAmendmentDescription',
+      'getCourtOrderInformation',
+      'getAddSecuredPartiesAndDebtors'
+    ])
+    const {
+      setUnsavedChanges,
+      setRegTableNewItem,
+      setRegistrationType,
+      setRegistrationNumber,
+      setRegistrationExpiryDate,
+      setRegistrationCreationDate,
+      setAddSecuredPartiesAndDebtors
+    } = useActions<any>([
+      'setUnsavedChanges',
+      'setRegTableNewItem',
+      'setRegistrationType',
+      'setRegistrationNumber',
+      'setRegistrationExpiryDate',
+      'setRegistrationCreationDate',
+      'setAddSecuredPartiesAndDebtors'
+    ])
+    const localState = reactive({
+      collateralSummary: '',
+      dataLoaded: false,
+      dataLoadError: false,
+      registeringOpen: false,
+      showRegMsg: false,
+      financingStatementDate: null as Date,
+      options: unsavedChangesDialog as DialogOptionsIF,
+      staffPaymentDialogDisplay: false,
+      staffPaymentDialogOptions: {
+        acceptText: 'Submit Amendment',
+        cancelText: 'Cancel',
+        title: 'Staff Payment',
+        label: '',
+        text: ''
+      } as DialogOptionsIF,
+      showCancelDialog: false,
+      showErrors: false,
+      cautionTxt: 'The Registry will provide the verification statement to all Secured Parties named in this ' +
+        'registration.',
+      cautionTxtRP: 'The Registry will not provide the verification statement for this amendment to the Registering ' +
+        'Party named above.',
+      tooltipTxt: 'The default Registering Party is based on your BC Registries user account information. This ' +
+        'information can be updated within your account settings. You can change to a different Registering Party by ' +
+        'using the Change button.',
+      validFolio: true,
+      feeType: FeeSummaryTypes.AMEND,
+      submitting: false,
+      isAuthenticated: computed((): boolean => {
+        return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
+      }),
+      registrationNumber: computed((): string => {
+        return (context.root.$route.query['reg-num'] as string) || ''
+      }),
+      registrationTypeUI: computed((): UIRegistrationTypes => {
+        return getRegistrationType.value?.registrationTypeUI || null
+      }),
+      registrationType: computed((): APIRegistrationTypes => {
+        return getRegistrationType.value?.registrationTypeAPI || null
+      }),
+      registrationLength: computed((): RegistrationLengthI => {
+        return {
+          lifeInfinite: getLengthTrust.value?.lifeInfinite || false,
+          lifeYears: getLengthTrust.value?.lifeYears || 0
+        }
+      }),
+      showDescription: computed((): boolean => {
+        return !!getAmendmentDescription.value
+      }),
+      currentRegNumber: computed((): string => {
+        return getRegistrationNumber.value || ''
+      }),
+      showCourtOrder: computed((): boolean => {
+        const courtOrder: CourtOrderIF = getCourtOrderInformation.value
+        return courtOrder &&
+          (
+            courtOrder?.courtName.length > 0 ||
+            courtOrder?.courtRegistry.length > 0 ||
+            courtOrder?.fileNumber.length > 0 ||
+            courtOrder?.orderDate.length > 0 ||
+            courtOrder?.effectOfOrder.length > 0
+          )
+      }),
+      showLengthTrustIndenture: computed((): boolean => {
+        const lengthTrust: LengthTrustIF = getLengthTrust.value
+        return !!lengthTrust.action
+      }),
+      showSecuredParties: computed((): boolean => {
+        const parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
+        for (let i = 0; i < parties.securedParties.length; i++) {
+          if (parties.securedParties[i].action) {
+            return true
+          }
+        }
+        return false
+      }),
 
-  private get showDescription (): boolean {
-    if (this.getAmendmentDescription) {
-      return true
-    }
-    return false
-  }
-
-  private get currentRegNumber (): string {
-    return this.getRegistrationNumber || ''
-  }
-
-  private get showCourtOrder (): boolean {
-    const courtOrder: CourtOrderIF = this.getCourtOrderInformation
-    if (courtOrder &&
-        (courtOrder?.courtName.length > 0 ||
-         courtOrder?.courtRegistry.length > 0 ||
-         courtOrder?.fileNumber.length > 0 ||
-         courtOrder?.orderDate.length > 0 ||
-         courtOrder?.effectOfOrder.length > 0)) {
-      return true
-    }
-    return false
-  }
-
-  private get showLengthTrustIndenture (): boolean {
-    const lengthTrust: LengthTrustIF = this.getLengthTrust
-    if (lengthTrust.action) {
-      return true
-    }
-    return false
-  }
-
-  private get showSecuredParties (): boolean {
-    const parties: AddPartiesIF = this.getAddSecuredPartiesAndDebtors
-    for (let i = 0; i < parties.securedParties.length; i++) {
-      if (parties.securedParties[i].action) {
-        return true
-      }
-    }
-    return false
-  }
-
-  private get showDebtors (): boolean {
-    const parties: AddPartiesIF = this.getAddSecuredPartiesAndDebtors
-    for (let i = 0; i < parties.debtors.length; i++) {
-      if (parties.debtors[i].action) {
-        return true
-      }
-    }
-    return false
-  }
-
-  private get showVehicleCollateral (): boolean {
-    const addCollateral:AddCollateralIF = this.getAddCollateral
-    if (!addCollateral.vehicleCollateral) {
-      return false
-    }
-    for (let i = 0; i < addCollateral.vehicleCollateral.length; i++) {
-      if (addCollateral.vehicleCollateral[i].action) {
-        return true
-      }
-    }
-    return false
-  }
-
-  private get showGeneralCollateral (): boolean {
-    const addCollateral:AddCollateralIF = this.getAddCollateral
-    if (!addCollateral.generalCollateral) {
-      return false
-    }
-    for (let i = 0; i < addCollateral.generalCollateral.length; i++) {
-      if (!addCollateral.generalCollateral[i].collateralId) {
-        return true
-      }
-    }
-    return false
-  }
-
-  private get collateralValid (): boolean {
-    const addCollateral:AddCollateralIF = this.getAddCollateral
-    return (addCollateral.valid || (!this.showGeneralCollateral && !this.showVehicleCollateral))
-  }
-
-  private get partiesValid (): boolean {
-    const parties: AddPartiesIF = this.getAddSecuredPartiesAndDebtors
-    return (parties.valid || (!this.showSecuredParties && !this.showDebtors))
-  }
-
-  private get courtOrderValid (): boolean {
-    const courtOrder: CourtOrderIF = this.getCourtOrderInformation
-    return (!courtOrder ||
-            (courtOrder.courtName.length === 0 &&
+      showDebtors: computed((): boolean => {
+        const parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
+        for (let i = 0; i < parties.debtors.length; i++) {
+          if (parties.debtors[i].action) {
+            return true
+          }
+        }
+        return false
+      }),
+      showVehicleCollateral: computed((): boolean => {
+        const addCollateral:AddCollateralIF = getAddCollateral.value
+        if (!addCollateral.vehicleCollateral) {
+          return false
+        }
+        for (let i = 0; i < addCollateral.vehicleCollateral.length; i++) {
+          if (addCollateral.vehicleCollateral[i].action) {
+            return true
+          }
+        }
+        return false
+      }),
+      showGeneralCollateral: computed((): boolean => {
+        const addCollateral:AddCollateralIF = getAddCollateral.value
+        if (!addCollateral.generalCollateral) {
+          return false
+        }
+        for (let i = 0; i < addCollateral.generalCollateral.length; i++) {
+          if (!addCollateral.generalCollateral[i].collateralId) {
+            return true
+          }
+        }
+        return false
+      }),
+      collateralValid: computed((): boolean => {
+        const addCollateral:AddCollateralIF = getAddCollateral.value
+        return (addCollateral.valid || (!localState.showGeneralCollateral && !localState.showVehicleCollateral))
+      }),
+      partiesValid: computed((): boolean => {
+        const parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
+        return (parties.valid || (!localState.showSecuredParties && !localState.showDebtors))
+      }),
+      courtOrderValid: computed((): boolean => {
+        const courtOrder: CourtOrderIF = getCourtOrderInformation.value
+        return (!courtOrder ||
+          (courtOrder.courtName.length === 0 &&
             courtOrder.courtRegistry.length === 0 &&
             courtOrder.fileNumber.length === 0 &&
             courtOrder.orderDate.length === 0 &&
             courtOrder.effectOfOrder.length === 0) ||
-            (courtOrder.courtName.length > 0 &&
+          (courtOrder.courtName.length > 0 &&
             courtOrder.courtRegistry.length > 0 &&
             courtOrder.fileNumber.length > 0 &&
             courtOrder.orderDate.length > 0 &&
             courtOrder.effectOfOrder.length > 0))
-  }
-
-  private get certifyInformationValid (): boolean {
-    return this.getCertifyInformation.valid
-  }
-
-  private get stickyComponentErrMsg (): string {
-    if ((!this.validFolio || !this.courtOrderValid) && this.showErrors) {
-      return '< Please complete required information'
-    }
-    if ((this.registeringOpen || !this.certifyInformationValid) && this.showErrors) {
-      return '< You have unfinished changes'
-    }
-    return ''
-  }
-
-  private cancel (): void {
-    if (this.hasUnsavedChanges) this.showCancelDialog = true
-    else this.goToDashboard()
-  }
-
-  private handleDialogResp (val: boolean): void {
-    this.showCancelDialog = false
-    if (!val) this.goToDashboard()
-  }
-
-  private async scrollToInvalid (): Promise<void> {
-    if (!this.validFolio) {
-      const component = document.getElementById('folio-summary')
-      await component.scrollIntoView({ behavior: 'smooth' })
-      return
-    }
-    if (this.registeringOpen) {
-      const component = document.getElementById('reg-party-change')
-      await component.scrollIntoView({ behavior: 'smooth' })
-      return
-    }
-    if (!this.courtOrderValid) {
-      const component = document.getElementById('court-order-component')
-      await component.scrollIntoView({ behavior: 'smooth' })
-      return
-    }
-    if (!this.certifyInformationValid) {
-      const component = document.getElementById('certify-information')
-      await component.scrollIntoView({ behavior: 'smooth' })
-    }
-  }
-
-  private async loadRegistration (): Promise<void> {
-    if (!this.registrationNumber || !this.getConfirmDebtorName) {
-      if (!this.registrationNumber) {
-        console.error('No registration number this amendment. Redirecting to dashboard...')
-      } else {
-        console.error('No debtor name confirmed for this amendment. Redirecting to dashboard...')
-      }
-      this.$router.push({
-        name: RouteNames.DASHBOARD
+      }),
+      certifyInformationValid: computed((): boolean => {
+        return getCertifyInformation.value.valid
+      }),
+      stickyComponentErrMsg: computed((): string => {
+        if ((!localState.validFolio || !localState.courtOrderValid) && localState.showErrors) {
+          return '< Please complete required information'
+        }
+        if ((localState.registeringOpen || !localState.certifyInformationValid) && localState.showErrors) {
+          return '< You have unfinished changes'
+        }
+        return ''
       })
-      return
-    }
-    if (this.currentRegNumber === this.registrationNumber) {
-      return
-    }
-
-    this.financingStatementDate = new Date()
-    this.submitting = true
-    const financingStatement = await getFinancingStatement(
-      true,
-      this.registrationNumber
-    )
-    if (financingStatement.error) {
-      this.dataLoadError = true
-      this.emitError(financingStatement.error)
-    } else {
-      await this.setStore(financingStatement)
-      // give time for setStore to finish
-      setTimeout(() => {
-        this.setUnsavedChanges(false)
-      }, 200)
-    }
-    this.submitting = false
-  }
-
-  private async setStore (financingStatement: FinancingStatementIF) {
-    // load data into the store
-    const registrationType = AllRegistrationTypes.find((reg, index) => {
-      if (reg.registrationTypeAPI === financingStatement.type) {
-        return true
-      }
     })
-    const parties = {
-      valid: true,
-      registeringParty: null, // will be taken from account info
-      securedParties: financingStatement.securedParties,
-      debtors: financingStatement.debtors
-    } as AddPartiesIF
-    this.setRegistrationCreationDate(financingStatement.createDateTime)
-    this.setRegistrationExpiryDate(financingStatement.expiryDate)
-    this.setRegistrationNumber(financingStatement.baseRegistrationNumber)
-    this.setRegistrationType(registrationType)
-    this.setAddSecuredPartiesAndDebtors(parties)
-  }
 
-  mounted () {
-    this.onAppReady(this.appReady)
-  }
-
-  private goToReviewAmendment (): void {
-    this.$router.push({
-      name: RouteNames.AMEND_REGISTRATION,
-      query: { 'reg-num': this.registrationNumber + '-confirm' }
+    onMounted(() => {
+      onAppReady(props.appReady)
     })
-    this.emitHaveData(false)
-  }
 
-  private setShowWarning (): void {
-    const parties = this.getAddSecuredPartiesAndDebtors
-    if (parties.registeringParty?.action === ActionTypes.EDITED) {
-      this.showRegMsg = true
-    } else {
-      this.showRegMsg = false
+    const cancel = (): void => {
+      if (hasUnsavedChanges.value) localState.showCancelDialog = true
+      else goToDashboard()
     }
-  }
 
-  @Throttle(2000)
-  private onStaffPaymentChanges (pay: boolean): void {
-    if (pay) {
-      this.submitAmendment()
+    const handleDialogResp = (val: boolean): void => {
+      localState.showCancelDialog = false
+      if (!val) goToDashboard()
     }
-    this.staffPaymentDialogDisplay = false
-  }
 
-  private setFolioValid (valid: boolean): void {
-    this.validFolio = valid
-    this.showErrors = false
-  }
-
-  private regOpenClose (open: boolean): void {
-    this.registeringOpen = open
-    this.showErrors = false
-    this.setShowWarning()
-  }
-
-  @Throttle(2000)
-  private async saveDraft (): Promise<void> {
-    const stateModel: StateModelIF = this.getStateModel
-    this.submitting = true
-    const draft: DraftIF = await saveAmendmentStatementDraft(stateModel)
-    this.submitting = false
-    if (draft.error) {
-      this.emitError(draft.error)
-    } else {
-      this.setUnsavedChanges(false)
-      const prevDraftId = stateModel.registration?.draft?.amendmentStatement?.documentId || ''
-      // set new added reg
-      const newItem: RegTableNewItemI = {
-        addedReg: draft.amendmentStatement.documentId,
-        addedRegParent: draft.amendmentStatement.baseRegistrationNumber,
-        addedRegSummary: null,
-        prevDraft: prevDraftId
+    const scrollToInvalid = async (): Promise<void> => {
+      if (!localState.validFolio) {
+        const component = document.getElementById('folio-summary')
+        await component.scrollIntoView({ behavior: 'smooth' })
+        return
       }
-      this.setRegTableNewItem(newItem)
-      this.$router.push({
-        name: RouteNames.DASHBOARD
-      })
-      this.emitHaveData(false)
+      if (localState.registeringOpen) {
+        const component = document.getElementById('reg-party-change')
+        await component.scrollIntoView({ behavior: 'smooth' })
+        return
+      }
+      if (!localState.courtOrderValid) {
+        const component = document.getElementById('court-order-component')
+        await component.scrollIntoView({ behavior: 'smooth' })
+        return
+      }
+      if (!localState.certifyInformationValid) {
+        const component = document.getElementById('certify-information')
+        await component.scrollIntoView({ behavior: 'smooth' })
+      }
     }
-  }
 
-  @Throttle(2000)
-  private submitButton (): void {
-    if (!this.validFolio || !this.certifyInformationValid || this.registeringOpen) {
-      this.showErrors = true
-      this.scrollToInvalid()
-      return
-    }
-    if ((this.isRoleStaffReg) || (this.isRoleStaffSbc)) {
-      this.staffPaymentDialogDisplay = true
-    } else {
-      this.submitAmendment()
-    }
-  }
+    const loadRegistration = async (): Promise<void> => {
+      if (!localState.registrationNumber || !getConfirmDebtorName.value) {
+        if (!localState.registrationNumber) {
+          console.error('No registration number this amendment. Redirecting to dashboard...')
+        } else {
+          console.error('No debtor name confirmed for this amendment. Redirecting to dashboard...')
+        }
+        context.root.$router.push({
+          name: RouteNames.DASHBOARD
+        })
+        return
+      }
 
-  private async submitAmendment (): Promise<void> {
-    // Incomplete validation check: all changes must be valid to submit registration.
-    if (this.collateralValid && this.partiesValid && this.courtOrderValid) {
-      const stateModel: StateModelIF = this.getStateModel
-      this.submitting = true
-      const apiResponse: AmendmentStatementIF = await saveAmendmentStatement(stateModel)
-      this.submitting = false
-      if (apiResponse === undefined || apiResponse?.error !== undefined) {
-        this.emitError(apiResponse?.error)
+      if (localState.currentRegNumber === localState.registrationNumber) {
+        return
+      }
+
+      localState.financingStatementDate = new Date()
+      localState.submitting = true
+      const financingStatement = await getFinancingStatement(
+        true,
+        localState.registrationNumber
+      )
+
+      if (financingStatement.error) {
+        localState.dataLoadError = true
+        emitError(financingStatement.error)
       } else {
+        await setStore(financingStatement)
+        // give time for setStore to finish
+        setTimeout(() => {
+          setUnsavedChanges(false)
+        }, 200)
+      }
+      localState.submitting = false
+    }
+
+    const setStore = async (financingStatement: FinancingStatementIF): Promise<void> => {
+      // load data into the store
+      const registrationType = AllRegistrationTypes.find((reg, index) => {
+        if (reg.registrationTypeAPI === financingStatement.type) {
+          return true
+        }
+      })
+      const parties = {
+        valid: true,
+        registeringParty: null, // will be taken from account info
+        securedParties: financingStatement.securedParties,
+        debtors: financingStatement.debtors
+      } as AddPartiesIF
+      setRegistrationCreationDate(financingStatement.createDateTime)
+      setRegistrationExpiryDate(financingStatement.expiryDate)
+      setRegistrationNumber(financingStatement.baseRegistrationNumber)
+      setRegistrationType(registrationType)
+      setAddSecuredPartiesAndDebtors(parties)
+    }
+
+    const goToReviewAmendment = (): void => {
+      context.root.$router.push({
+        name: RouteNames.AMEND_REGISTRATION,
+        query: { 'reg-num': localState.registrationNumber + '-confirm' }
+      })
+      emitHaveData(false)
+    }
+
+    const setShowWarning = (): void => {
+      const parties = getAddSecuredPartiesAndDebtors.value
+      localState.showRegMsg = parties.registeringParty?.action === ActionTypes.EDITED
+    }
+
+    const onStaffPaymentChanges = (pay: boolean): void => {
+      if (pay) {
+        submitAmendment()
+      }
+      localState.staffPaymentDialogDisplay = false
+    }
+
+    const setFolioValid = (valid: boolean): void => {
+      localState.validFolio = valid
+      localState.showErrors = false
+    }
+
+    const regOpenClose = (open: boolean): void => {
+      localState.registeringOpen = open
+      localState.showErrors = false
+      setShowWarning()
+    }
+
+    const saveDraft = async (): Promise<void> => {
+      const stateModel: StateModelIF = getStateModel.value
+      localState.submitting = true
+      const draft: DraftIF = await saveAmendmentStatementDraft(stateModel)
+      localState.submitting = false
+      if (draft.error) {
+        emitError(draft.error)
+      } else {
+        setUnsavedChanges(false)
         const prevDraftId = stateModel.registration?.draft?.amendmentStatement?.documentId || ''
         // set new added reg
         const newItem: RegTableNewItemI = {
-          addedReg: apiResponse.amendmentRegistrationNumber,
-          addedRegParent: apiResponse.baseRegistrationNumber,
+          addedReg: draft.amendmentStatement.documentId,
+          addedRegParent: draft.amendmentStatement.baseRegistrationNumber,
           addedRegSummary: null,
           prevDraft: prevDraftId
         }
-        this.setRegTableNewItem(newItem)
-        // On success return to dashboard
-        this.goToDashboard()
+        setRegTableNewItem(newItem)
+        context.root.$router.push({
+          name: RouteNames.DASHBOARD
+        })
+        emitHaveData(false)
       }
-    } else {
-      // emit registation incomplete error
-      const error: ErrorIF = {
-        statusCode: 400,
-        message: 'Registration incomplete: one or more changes is invalid.'
-      }
-      console.error(error)
-      alert(error.message)
     }
-  }
 
-  private goToDashboard (): void {
-    this.$router.push({
-      name: RouteNames.DASHBOARD
-    })
-    this.emitHaveData(false)
-  }
+    const submitButton = (): void => {
+      if (!localState.validFolio || !localState.certifyInformationValid || localState.registeringOpen) {
+        localState.showErrors = true
+        scrollToInvalid()
+        return
+      }
+      if ((isRoleStaffReg.value) || (isRoleStaffSbc.value)) {
+        localState.staffPaymentDialogDisplay = true
+      } else {
+        submitAmendment()
+      }
+    }
 
-  /** Emits Have Data event. */
-  @Emit('haveData')
-  private emitHaveData (haveData: Boolean = true): void {}
+    const submitAmendment = async (): Promise<void> => {
+      // Incomplete validation check: all changes must be valid to submit registration.
+      if (localState.collateralValid && localState.partiesValid && localState.courtOrderValid) {
+        const stateModel: StateModelIF = getStateModel.value
+        localState.submitting = true
+        const apiResponse: AmendmentStatementIF = await saveAmendmentStatement(stateModel)
+        localState.submitting = false
+        if (apiResponse === undefined || apiResponse?.error !== undefined) {
+          emitError(apiResponse?.error)
+        } else {
+          const prevDraftId = stateModel.registration?.draft?.amendmentStatement?.documentId || ''
+          // set new added reg
+          const newItem: RegTableNewItemI = {
+            addedReg: apiResponse.amendmentRegistrationNumber,
+            addedRegParent: apiResponse.baseRegistrationNumber,
+            addedRegSummary: null,
+            prevDraft: prevDraftId
+          }
+          setRegTableNewItem(newItem)
+          // On success return to dashboard
+          goToDashboard()
+        }
+      } else {
+        // emit registration incomplete error
+        const error: ErrorIF = {
+          statusCode: 400,
+          message: 'Registration incomplete: one or more changes is invalid.'
+        }
+        console.error(error)
+        alert(error.message)
+      }
+    }
 
-  /** Emits error to app.vue for handling */
-  @Emit('error')
-  private emitError (error: ErrorIF): void {
-    console.error(error)
-  }
-
-  /** Called when App is ready and this component can load its data. */
-  @Watch('appReady')
-  private async onAppReady (val: boolean): Promise<void> {
-    // do not proceed if app is not ready
-    if (!val) return
-    // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
-    if (!this.isAuthenticated || (!this.isJestRunning && !getFeatureFlag('ppr-ui-enabled'))) {
-      this.$router.push({
+    const goToDashboard = (): void => {
+      context.root.$router.push({
         name: RouteNames.DASHBOARD
       })
-      return
+      emitHaveData(false)
     }
 
-    // get registration data from api and load into store
-    await this.loadRegistration()
+    const onAppReady = async (val: boolean): Promise<void> => {
+      // do not proceed if app is not ready
+      if (!val) return
 
-    // page is ready to view
-    this.emitHaveData(true)
-    this.dataLoaded = true
-  }
+      // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
+      if (!localState.isAuthenticated || (!props.isJestRunning && !getFeatureFlag('ppr-ui-enabled'))) {
+        context.root.$router.push({
+          name: RouteNames.DASHBOARD
+        })
+        return
+      }
 
-  @Watch('saveDraftExit')
-  private saveDraftExitHandler (val: boolean): void {
-    this.saveDraft()
+      // get registration data from api and load into store
+      await loadRegistration()
+
+      // page is ready to view
+      emitHaveData(true)
+      localState.dataLoaded = true
+    }
+
+    /** Emits Have Data event. */
+    const emitHaveData = (haveData: Boolean = true): void => {
+      context.emit('haveData', haveData)
+    }
+
+    /** Emits error to app.vue for handling */
+    const emitError = (error: ErrorIF): void => {
+      context.emit('error', error)
+      console.error(error)
+    }
+
+    /** Called when App is ready and this component can load its data. */
+    watch(() => props.appReady, (val: boolean) => {
+      onAppReady(val)
+    })
+
+    watch(() => props.saveDraftExit, (val: boolean) => {
+      saveDraft()
+    })
+
+    return {
+      cancel,
+      saveDraft,
+      regOpenClose,
+      submitButton,
+      setFolioValid,
+      isRoleStaffBcol,
+      handleDialogResp,
+      scrollToInvalid,
+      goToReviewAmendment,
+      onStaffPaymentChanges,
+      ...toRefs(localState)
+    }
   }
-}
+})
 </script>
 
 <style lang="scss" scoped>
