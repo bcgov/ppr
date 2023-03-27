@@ -82,7 +82,7 @@ describe('RegistrationBar select basic drop down tests', () => {
   const defaultRegistration: RegistrationTypeIF = standardRegistrations[1]
 
   beforeEach(async () => {
-    await store.dispatch('setAccountProductSubscribtion', {
+    await store.dispatch('c', {
       [AccountProductCodes.RPPR]: {
         membership: AccountProductMemberships.MEMBER,
         roles: []
@@ -146,7 +146,7 @@ describe('RegistrationBar rppr subscribed autocomplete tests', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
-    await store.dispatch('setAccountProductSubscribtion', {
+    await store.dispatch('setAccountProductSubscription', {
       [AccountProductCodes.RPPR]: {
         membership: AccountProductMemberships.MEMBER,
         roles: ['edit']

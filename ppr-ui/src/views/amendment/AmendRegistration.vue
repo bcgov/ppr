@@ -167,7 +167,6 @@ import {
   ActionTypes
 } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
-import { Throttle } from '@/decorators'
 import {
   ErrorIF,
   AddPartiesIF,

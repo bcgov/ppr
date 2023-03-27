@@ -627,7 +627,6 @@ export default defineComponent({
       if (localState.isHomeOwnerFormValid && localState.isAddressFormValid) {
         setValidation(MhrSectVal.ADD_EDIT_OWNERS_VALID, MhrCompVal.OWNERS_VALID, true)
         if (props.editHomeOwner) {
-          hasCurrentOwnerChanges(localState.owner)
           const updatedOwner = isCurrentOwner(localState.owner) ? {
             ...localState.owner, action: hasCurrentOwnerChanges(localState.owner) ? ActionTypes.CHANGED : null
           }

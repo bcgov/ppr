@@ -46,6 +46,7 @@ import {
 import { getLastEvent, setupIntersectionObserverMock } from './utils'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { defaultFlagSet } from '@/utils'
+import {nextTick} from "@vue/composition-api";
 
 Vue.use(Vuetify)
 
@@ -175,7 +176,7 @@ describe('Dashboard component', () => {
   })
 
   it('displays default search history header', () => {
-    expect(wrapper.vm.getSearchHistory).toEqual({ searches: [] })
+    expect(store.getters.getSearchHistory).toEqual({ searches: [] })
     expect(wrapper.vm.searchHistoryLength).toBe(0)
     const header = wrapper.findAll(historyHeader)
     expect(header.length).toBe(1)
@@ -183,11 +184,11 @@ describe('Dashboard component', () => {
   })
 
   it('updates the search history header based on history data', async () => {
-    expect(wrapper.vm.getSearchHistoryLength).toBe(0)
-    wrapper.vm.setSearchHistory(mockedSearchHistory.searches)
+    expect(store.getters.getSearchHistoryLength).toBe(0)
+    await store.dispatch('setSearchHistory', mockedSearchHistory.searches)
     await flushPromises()
-    expect(wrapper.vm.getSearchHistory?.length).toBe(6)
-    expect(wrapper.vm.getSearchHistoryLength).toBe(6)
+    expect(store.getters.getSearchHistory?.length).toBe(6)
+    expect(store.getters.getSearchHistoryLength).toBe(6)
     expect(wrapper.vm.searchHistoryLength).toBe(6)
     const header = wrapper.findAll(historyHeader)
     expect(header.length).toBe(1)

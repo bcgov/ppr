@@ -41,11 +41,11 @@ export const resetRegTableData: ActionIF = ({ commit }): void => {
   commit('mutateRegistrationTableReset')
 }
 
-export const setAccountProductSubscribtion: ActionIF = (
+export const setAccountProductSubscription: ActionIF = (
   { commit },
   productSubscriptions: AccountProductSubscriptionIF
 ): void => {
-  commit('mutateAccountProductSubscribtion', productSubscriptions)
+  commit('mutateAccountProductSubscription', productSubscriptions)
 }
 
 export const setUserProductSubscriptions: ActionIF = ({ commit }, products: Array<UserProductSubscriptionIF>): void => {

@@ -80,18 +80,10 @@
 </template>
 
 <script lang="ts">
-// external
-import { Component, Emit, Prop, Vue, Watch } from 'vue-property-decorator'
-import { Action, Getter } from 'vuex-class'
+import { computed, defineComponent, onMounted, reactive, toRefs, watch } from '@vue/composition-api'
+import { useActions, useGetters } from 'vuex-composition-helpers'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { ProductCode, RouteNames } from '@/enums'
-import {
-  ActionBindingIF, // eslint-disable-line no-unused-vars
-  ErrorIF, // eslint-disable-line no-unused-vars
-  ManufacturedHomeSearchResponseIF, RegTableNewItemI, // eslint-disable-line no-unused-vars
-  SearchResponseIF // eslint-disable-line no-unused-vars
-} from '@/interfaces'
-
 import {
   getFeatureFlag,
   searchHistory,
@@ -102,187 +94,238 @@ import { SearchHistory } from '@/components/tables'
 import { SearchBar } from '@/components/search'
 import { useSearch } from '@/composables/useSearch'
 import { DashboardTabs } from '@/components/dashboard'
+import {
+  ErrorIF, // eslint-disable-line no-unused-vars
+  ManufacturedHomeSearchResponseIF, RegTableNewItemI, // eslint-disable-line no-unused-vars
+  SearchResponseIF // eslint-disable-line no-unused-vars
+} from '@/interfaces'
 
-@Component({
+export default defineComponent({
+  name: 'Dashboard',
   components: {
     BaseSnackbar,
     DashboardTabs,
     SearchBar,
     SearchHistory,
     RegistrationsWrapper
+  },
+  emits: ['error', 'haveData'],
+  props: {
+    appLoadingData: {
+      type: Boolean,
+      default: false
+    },
+    appReady: {
+      type: Boolean,
+      default: false
+    },
+    isJestRunning: {
+      type: Boolean,
+      default: false
+    },
+    registryUrl: {
+      type: String,
+      default: 'https://bcregistry.ca'
+    }
+  },
+  setup (props, context) {
+    const {
+      isRoleStaff,
+      hasMhrRole,
+      hasPprRole,
+      isNonBillable,
+      hasMhrEnabled,
+      isRoleStaffBcol,
+      isRoleStaffReg,
+      getSearchHistory,
+      getUserServiceFee,
+      getRegTableNewItem,
+      getSearchHistoryLength,
+      isRoleQualifiedSupplier,
+      getUserProductSubscriptionsCodes
+    } = useGetters([
+      'isRoleStaff',
+      'hasMhrRole',
+      'hasPprRole',
+      'isNonBillable',
+      'hasMhrEnabled',
+      'isRoleStaffBcol',
+      'isRoleStaffReg',
+      'getSearchHistory',
+      'getUserServiceFee',
+      'getRegTableNewItem',
+      'getSearchHistoryLength',
+      'isRoleQualifiedSupplier',
+      'getUserProductSubscriptionsCodes'
+    ])
+    const {
+      setSearchHistory,
+      setSearchResults,
+      setSearchedType,
+      setSearchedValue,
+      setRegTableNewItem,
+      setSearchDebtorName,
+      setRegistrationType,
+      resetNewRegistration,
+      setManufacturedHomeSearchResults
+    } = useActions([
+      'setSearchHistory',
+      'setSearchResults',
+      'setSearchedType',
+      'setSearchedValue',
+      'setRegTableNewItem',
+      'setSearchDebtorName',
+      'setRegistrationType',
+      'resetNewRegistration',
+      'setManufacturedHomeSearchResults'
+    ])
+
+    const localState = reactive({
+      loading: false,
+      isMHRSearchType: useSearch().isMHRSearchType,
+      snackbarMsg: '',
+      toggleSnackbar: false,
+      enableDashboardTabs: computed((): boolean => {
+        return getFeatureFlag('mhr-registration-enabled') &&
+          hasPprRole.value && hasMhrRole.value && (isRoleStaff.value || isRoleQualifiedSupplier.value)
+      }),
+      isAuthenticated: computed((): boolean => {
+        return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
+      }),
+      searchHistoryLength: computed((): number => {
+        return getSearchHistory.value?.length || 0
+      }),
+      hasPPR: computed((): boolean => {
+        // For Staff, we check roles, for Client we check Products
+        if (isRoleStaff.value || isRoleStaffBcol.value || isRoleStaffReg.value) {
+          return hasPprRole.value
+        } else {
+          return getUserProductSubscriptionsCodes.value.includes(ProductCode.PPR)
+        }
+      }),
+      hasMHR: computed((): boolean => {
+        // For Staff, we check roles, for Client we check Products
+        if (isRoleStaff.value || isRoleStaffBcol.value || isRoleStaffReg.value) {
+          return hasMhrRole.value && getFeatureFlag('mhr-ui-enabled')
+        } else {
+          if (getRegTableNewItem.value.addedReg) {
+            snackBarEvent('Registration was successfully added to your table.')
+            setTimeout(() => {
+              const emptyItem: RegTableNewItemI = {
+                addedReg: '', addedRegParent: '', addedRegSummary: null, prevDraft: ''
+              }
+              setRegTableNewItem(emptyItem)
+            }, 4000)
+          }
+          return hasMhrEnabled.value
+        }
+      })
+    })
+
+    onMounted(() => {
+      // clear search data in the store
+      setRegistrationType(null)
+      setSearchedType(null)
+      setSearchedValue('')
+      setSearchResults(null)
+      onAppReady(props.appReady)
+    })
+
+    /** Redirects browser to Business Registry home page. */
+    const redirectRegistryHome = (): void => {
+      navigate(props.registryUrl)
+    }
+
+    const retrieveSearchHistory = async (): Promise<void> => {
+      // get/set search history
+      const resp = await searchHistory()
+      if (!resp || resp?.error) {
+        setSearchHistory(null)
+      } else {
+        setSearchHistory(resp?.searches)
+      }
+    }
+
+    const saveResults = (results: SearchResponseIF|ManufacturedHomeSearchResponseIF) => {
+      if (results) {
+        if (localState.isMHRSearchType(results.searchQuery.type)) {
+          setManufacturedHomeSearchResults(results)
+          context.root.$router.replace({
+            name: RouteNames.MHRSEARCH
+          })
+        } else {
+          setSearchResults(results)
+          context.root.$router.replace({
+            name: RouteNames.SEARCH
+          })
+        }
+      }
+    }
+
+    const snackBarEvent = (msg: string): void => {
+      localState.snackbarMsg = msg
+      localState.toggleSnackbar = !localState.toggleSnackbar
+    }
+
+    /** Called when App is ready and this component can load its data. */
+    const onAppReady = async (val: boolean): Promise<void> => {
+      localState.loading = true
+      // do not proceed if app is not ready
+      if (!val) return
+
+      // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
+      if (!localState.isAuthenticated || (!props.isJestRunning && !getFeatureFlag('ppr-ui-enabled'))) {
+        window.alert('Personal Property Registry is under construction. Please check again later.')
+        redirectRegistryHome()
+        return
+      }
+      emitHaveData(false)
+      resetNewRegistration(null) // Clear store data from any previous registration.
+      await retrieveSearchHistory()
+
+      // tell App that we're finished loading
+      localState.loading = false
+      emitHaveData(true)
+    }
+
+    /** Emits error to app.vue for handling */
+    const emitError = (error: ErrorIF): void => {
+      context.emit('error', error)
+      console.error(error)
+    }
+
+    /** Emits Have Data event. */
+    const emitHaveData = (haveData: Boolean = true): void => {
+      context.emit('haveData', haveData)
+    }
+
+    watch(() => props.appReady, (val: boolean) => {
+      onAppReady(val)
+    })
+
+    watch(() => getSearchHistoryLength.value, (newVal: number, oldVal: number): void => {
+      // show snackbar if oldVal was not null
+      if (oldVal !== null) {
+        localState.snackbarMsg = 'Your search was successfully added to your table.'
+        localState.toggleSnackbar = !localState.toggleSnackbar
+      }
+    })
+
+    return {
+      emitError,
+      saveResults,
+      isNonBillable,
+      snackBarEvent,
+      setSearchedType,
+      setSearchedValue,
+      getUserServiceFee,
+      setSearchDebtorName,
+      redirectRegistryHome,
+      retrieveSearchHistory,
+      ...toRefs(localState)
+    }
   }
 })
-export default class Dashboard extends Vue {
-  @Getter getSearchHistory: Array<SearchResponseIF>
-  @Getter getSearchHistoryLength: number
-  @Getter getUserServiceFee!: number
-  @Getter isRoleStaff!: boolean
-  @Getter isRoleStaffBcol!: boolean
-  @Getter isRoleStaffReg!: boolean
-  @Getter hasMhrRole!: boolean
-  @Getter hasPprRole!: boolean
-  @Getter isNonBillable!: boolean
-  @Getter isRoleQualifiedSupplier!: boolean
-  @Getter getUserProductSubscriptionsCodes: Array<ProductCode>
-  @Getter getRegTableNewItem: RegTableNewItemI
-  @Getter hasMhrEnabled!: boolean
-
-  @Action resetNewRegistration: ActionBindingIF
-  @Action setSearchDebtorName: ActionBindingIF
-  @Action setRegistrationType: ActionBindingIF
-  @Action setSearchHistory: ActionBindingIF
-  @Action setSearchResults: ActionBindingIF
-  @Action setManufacturedHomeSearchResults: ActionBindingIF
-  @Action setSearchedType: ActionBindingIF
-  @Action setSearchedValue: ActionBindingIF
-  @Action setRegTableNewItem: ActionBindingIF
-
-  @Prop({ default: false })
-  private appLoadingData: boolean
-
-  /** Whether App is ready. */
-  @Prop({ default: false })
-  private appReady: boolean
-
-  @Prop({ default: false })
-  private isJestRunning: boolean
-
-  @Prop({ default: 'https://bcregistry.ca' })
-  private registryUrl: string
-
-  private loading = false
-  // my reg table action stuff
-  private isMHRSearchType = useSearch().isMHRSearchType
-
-  private snackbarMsg = ''
-  private toggleSnackbar = false
-
-  mounted () {
-    // clear search data in the store
-    this.setRegistrationType(null)
-    this.setSearchedType(null)
-    this.setSearchedValue('')
-    this.setSearchResults(null)
-    this.onAppReady(this.appReady)
-  }
-
-  private get enableDashboardTabs (): boolean {
-    return getFeatureFlag('mhr-registration-enabled') &&
-      this.hasPprRole && this.hasMhrRole && (this.isRoleStaff || this.isRoleQualifiedSupplier)
-  }
-
-  private get isAuthenticated (): boolean {
-    return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
-  }
-
-  private get searchHistoryLength (): number {
-    return this.getSearchHistory?.length || 0
-  }
-
-  private get hasPPR (): boolean {
-    // For Staff we check roles, for Client we check Products
-    if (this.isRoleStaff || this.isRoleStaffBcol || this.isRoleStaffReg) {
-      return this.hasPprRole
-    } else {
-      return this.getUserProductSubscriptionsCodes.includes(ProductCode.PPR)
-    }
-  }
-
-  private get hasMHR (): boolean {
-    // For Staff we check roles, for Client we check Products
-    if (this.isRoleStaff || this.isRoleStaffBcol || this.isRoleStaffReg) {
-      return this.hasMhrRole && getFeatureFlag('mhr-ui-enabled')
-    } else {
-      if (this.getRegTableNewItem.addedReg) {
-        this.snackBarEvent('Registration was successfully added to your table.')
-        setTimeout(() => {
-          const emptyItem: RegTableNewItemI = {
-            addedReg: '', addedRegParent: '', addedRegSummary: null, prevDraft: ''
-          }
-          this.setRegTableNewItem(emptyItem)
-        }, 4000)
-      }
-      return this.hasMhrEnabled
-    }
-  }
-
-  /** Redirects browser to Business Registry home page. */
-  private redirectRegistryHome (): void {
-    navigate(this.registryUrl)
-  }
-
-  private async retrieveSearchHistory (): Promise<void> {
-    // get/set search history
-    const resp = await searchHistory()
-    if (!resp || resp?.error) {
-      this.setSearchHistory(null)
-    } else {
-      this.setSearchHistory(resp?.searches)
-    }
-  }
-
-  private saveResults (results: SearchResponseIF|ManufacturedHomeSearchResponseIF) {
-    if (results) {
-      if (this.isMHRSearchType(results.searchQuery.type)) {
-        this.setManufacturedHomeSearchResults(results)
-        this.$router.replace({
-          name: RouteNames.MHRSEARCH
-        })
-      } else {
-        this.setSearchResults(results)
-        this.$router.replace({
-          name: RouteNames.SEARCH
-        })
-      }
-    }
-  }
-
-  private snackBarEvent (msg: string): void {
-    this.snackbarMsg = msg
-    this.toggleSnackbar = !this.toggleSnackbar
-  }
-
-  /** Called when App is ready and this component can load its data. */
-  @Watch('appReady')
-  private async onAppReady (val: boolean): Promise<void> {
-    this.loading = true
-    // do not proceed if app is not ready
-    if (!val) return
-
-    // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
-    if (!this.isAuthenticated || (!this.isJestRunning && !getFeatureFlag('ppr-ui-enabled'))) {
-      window.alert('Personal Property Registry is under construction. Please check again later.')
-      this.redirectRegistryHome()
-      return
-    }
-    this.emitHaveData(false)
-    this.resetNewRegistration(null) // Clear store data from any previous registration.
-    await this.retrieveSearchHistory()
-
-    // tell App that we're finished loading
-    this.loading = false
-    this.emitHaveData(true)
-  }
-
-  @Watch('getSearchHistoryLength')
-  private handleSearchHistoryUpdate (newVal: number, oldVal: number): void {
-    // show snackbar if oldVal was not null
-    if (oldVal !== null) {
-      this.snackbarMsg = 'Your search was successfully added to your table.'
-      this.toggleSnackbar = !this.toggleSnackbar
-    }
-  }
-
-  /** Emits error to app.vue for handling */
-  @Emit('error')
-  private emitError (error: ErrorIF): void {
-    console.error(error)
-  }
-
-  /** Emits Have Data event. */
-  @Emit('haveData')
-  private emitHaveData (haveData: Boolean = true): void { }
-}
 </script>
 
 <style lang="scss" module>

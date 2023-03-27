@@ -88,12 +88,9 @@
 </template>
 
 <script lang="ts">
-// external
-import { Component, Emit, Prop, Vue, Watch } from 'vue-property-decorator'
-import { Action, Getter } from 'vuex-class'
-// bcregistry
+import { computed, defineComponent, onMounted, reactive, toRefs, watch } from '@vue/composition-api'
+import { useActions, useGetters } from 'vuex-composition-helpers'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
-// local components
 import { StickyContainer, CourtOrder } from '@/components/common'
 import { BaseDialog } from '@/components/dialogs'
 import { RegistrationLengthTrust, RegistrationRepairersLien } from '@/components/registration'
@@ -103,32 +100,30 @@ import {
   RegisteringPartySummary,
   SecuredPartySummary
 } from '@/components/parties/summaries'
-// local helpers/enums/interfaces/resources
-import {
-  APIRegistrationTypes, // eslint-disable-line no-unused-vars
-  RouteNames, // eslint-disable-line no-unused-vars
-  RegistrationFlowType, // eslint-disable-line no-unused-vars
-  UIRegistrationTypes // eslint-disable-line no-unused-vars
-} from '@/enums'
-import {
-  ActionBindingIF, // eslint-disable-line no-unused-vars
-  ErrorIF, // eslint-disable-line no-unused-vars
-  AddPartiesIF, // eslint-disable-line no-unused-vars
-  CertifyIF, // eslint-disable-line no-unused-vars
-  RegistrationTypeIF, // eslint-disable-line no-unused-vars
-  AddCollateralIF, // eslint-disable-line no-unused-vars
-  LengthTrustIF, // eslint-disable-line no-unused-vars
-  DebtorNameIF, // eslint-disable-line no-unused-vars
-  CourtOrderIF, // eslint-disable-line no-unused-vars
-  DialogOptionsIF // eslint-disable-line no-unused-vars
-} from '@/interfaces'
-import { RegistrationLengthI } from '@/composables/fees/interfaces' // eslint-disable-line no-unused-vars
 import { AllRegistrationTypes } from '@/resources'
 import { notCompleteDialog } from '@/resources/dialogOptions'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { getFeatureFlag, getFinancingStatement, pacificDate } from '@/utils'
+/* eslint-disable no-unused-vars */
+import {
+  APIRegistrationTypes,
+  RouteNames,
+  RegistrationFlowType
+} from '@/enums'
+import {
+  ErrorIF,
+  AddPartiesIF,
+  CertifyIF,
+  AddCollateralIF,
+  LengthTrustIF,
+  CourtOrderIF,
+  DialogOptionsIF
+} from '@/interfaces'
+import { RegistrationLengthI } from '@/composables/fees/interfaces'
+/* eslint-enable no-unused-vars */
 
-@Component({
+export default defineComponent({
+  name: 'RenewRegistrations',
   components: {
     BaseDialog,
     RegistrationLengthTrust,
@@ -139,257 +134,286 @@ import { getFeatureFlag, getFinancingStatement, pacificDate } from '@/utils'
     SecuredPartySummary,
     CourtOrder,
     StickyContainer
-  }
-})
-export default class ReviewRegistration extends Vue {
-  @Getter getConfirmDebtorName: DebtorNameIF
-  @Getter getRegistrationType: RegistrationTypeIF
-  @Getter getLengthTrust: LengthTrustIF
-  @Getter getRegistrationFlowType: RegistrationFlowType
-  @Getter getRegistrationNumber: String
-
-  @Action setAddCollateral: ActionBindingIF
-  @Action setStaffPayment: ActionBindingIF
-  @Action setAddSecuredPartiesAndDebtors: ActionBindingIF
-  @Action setFeeSummary: ActionBindingIF
-  @Action setLengthTrust: ActionBindingIF
-  @Action setOriginalAddSecuredPartiesAndDebtors: ActionBindingIF
-  @Action setRegistrationCreationDate: ActionBindingIF
-  @Action setRegistrationExpiryDate: ActionBindingIF
-  @Action setRegistrationNumber: ActionBindingIF
-  @Action setRegistrationType: ActionBindingIF
-  @Action setRegistrationFlowType: ActionBindingIF
-  @Action setCourtOrderInformation: ActionBindingIF
-  @Action setCertifyInformation: ActionBindingIF
-  @Action setFolioOrReferenceNumber: ActionBindingIF
-  @Action setUnsavedChanges: ActionBindingIF
-
-  /** Whether App is ready. */
-  @Prop({ default: false })
-  private appReady: boolean
-
-  @Prop({ default: false })
-  private isJestRunning: boolean
-
-  private dataLoaded = false // eslint-disable-line lines-between-class-members
-  private dataLoadError = false
-  private financingStatementDate: Date = null
-  private feeType = FeeSummaryTypes.RENEW
-  private loading = false
-  private registrationValid = false
-  private options: DialogOptionsIF = notCompleteDialog
-  private showCancelDialog = false
-  private showInvalid = false
-  private errMsg = ''
-
-  private get asOfDateTime (): string {
-    // return formatted date
-    if (this.financingStatementDate) {
-      return `${pacificDate(this.financingStatementDate)}`
+  },
+  emits: ['error', 'haveData'],
+  props: {
+    appReady: {
+      type: Boolean,
+      default: false
+    },
+    isJestRunning: {
+      type: Boolean,
+      default: false
     }
-    return `${pacificDate(new Date())}`
-  }
-
-  private get isAuthenticated (): boolean {
-    return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
-  }
-
-  // the number of the registration being renewed
-  private get registrationNumber (): string {
-    return (this.$route.query['reg-num'] as string) || ''
-  }
-
-  private get registrationTypeUI (): UIRegistrationTypes {
-    return this.getRegistrationType?.registrationTypeUI || null
-  }
-
-  private get registrationType (): APIRegistrationTypes {
-    return this.getRegistrationType?.registrationTypeAPI || null
-  }
-
-  private get registrationLength (): RegistrationLengthI {
-    return {
-      lifeInfinite: this.getLengthTrust?.lifeInfinite || false,
-      lifeYears: this.getLengthTrust?.lifeYears || 0
-    }
-  }
-
-  private get registrationTypeRL (): string {
-    return APIRegistrationTypes.REPAIRERS_LIEN
-  }
-
-  private handleDialogResp (val: boolean): void {
-    this.showCancelDialog = false
-    if (!val) {
-      this.setRegistrationNumber(null)
-      this.$router.push({ name: RouteNames.DASHBOARD })
-    }
-  }
-
-  private async loadRegistration (): Promise<void> {
-    if (
-      !this.getRegistrationNumber ||
-      this.getRegistrationFlowType !== RegistrationFlowType.RENEWAL
-    ) {
-      if (!this.registrationNumber || !this.getConfirmDebtorName) {
-        if (!this.registrationNumber) {
-          console.error('No registration number given to discharge. Redirecting to dashboard...')
-        } else {
-          console.error('No debtor name confirmed for discharge. Redirecting to dashboard...')
+  },
+  setup (props, context) {
+    const {
+      getLengthTrust,
+      getRegistrationType,
+      getConfirmDebtorName,
+      getRegistrationNumber,
+      getRegistrationFlowType
+    } = useGetters([
+      'getLengthTrust',
+      'getRegistrationType',
+      'getConfirmDebtorName',
+      'getRegistrationNumber',
+      'getRegistrationFlowType'
+    ])
+    const {
+      setLengthTrust,
+      setAddCollateral,
+      setStaffPayment,
+      setRegistrationNumber,
+      setRegistrationType,
+      setRegistrationFlowType,
+      setCourtOrderInformation,
+      setCertifyInformation,
+      setFolioOrReferenceNumber,
+      setRegistrationExpiryDate,
+      setRegistrationCreationDate,
+      setAddSecuredPartiesAndDebtors,
+      setOriginalAddSecuredPartiesAndDebtors
+    } = useActions([
+      'setLengthTrust',
+      'setAddCollateral',
+      'setStaffPayment',
+      'setRegistrationNumber',
+      'setRegistrationType',
+      'setRegistrationFlowType',
+      'setCourtOrderInformation',
+      'setCertifyInformation',
+      'setFolioOrReferenceNumber',
+      'setRegistrationExpiryDate',
+      'setRegistrationCreationDate',
+      'setAddSecuredPartiesAndDebtors',
+      'setOriginalAddSecuredPartiesAndDebtors'
+    ])
+    const localState = reactive({
+      dataLoaded: false,
+      dataLoadError: false,
+      financingStatementDate: null as Date,
+      feeType: FeeSummaryTypes.RENEW,
+      loading: false,
+      registrationValid: false,
+      options: notCompleteDialog as DialogOptionsIF,
+      showCancelDialog: false,
+      showInvalid: false,
+      errMsg: '',
+      asOfDateTime: computed((): string => {
+        // return formatted date
+        if (localState.financingStatementDate) {
+          return `${pacificDate(localState.financingStatementDate)}`
         }
-        this.$router.push({
+        return `${pacificDate(new Date())}`
+      }),
+      isAuthenticated: computed((): boolean => {
+        return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
+      }),
+      registrationLength: computed((): RegistrationLengthI => {
+        return {
+          lifeInfinite: getLengthTrust.value?.lifeInfinite || false,
+          lifeYears: getLengthTrust.value?.lifeYears || 0
+        }
+      }),
+      registrationTypeUI: computed((): string => {
+        return getRegistrationType.value?.registrationTypeUI || null
+      }),
+      registrationType: computed((): APIRegistrationTypes => {
+        return getRegistrationType.value?.registrationTypeAPI || ''
+      }),
+      registrationNumber: computed((): string => {
+        return (context.root.$route.query['reg-num'] as string) || ''
+      }),
+      registrationTypeRL: computed(() => {
+        return APIRegistrationTypes.REPAIRERS_LIEN
+      })
+    })
+
+    onMounted(() => {
+      onAppReady(props.appReady)
+    })
+
+    const handleDialogResp = (val: boolean): void => {
+      localState.showCancelDialog = false
+      if (!val) {
+        setRegistrationNumber(null)
+        context.root.$router.push({ name: RouteNames.DASHBOARD })
+      }
+    }
+
+    const loadRegistration = async (): Promise<void> => {
+      if (
+        !getRegistrationNumber.value ||
+        getRegistrationFlowType.value !== RegistrationFlowType.RENEWAL
+      ) {
+        if (!localState.registrationNumber || !getConfirmDebtorName.value) {
+          if (!localState.registrationNumber) {
+            console.error('No registration number given to discharge. Redirecting to dashboard...')
+          } else {
+            console.error('No debtor name confirmed for discharge. Redirecting to dashboard...')
+          }
+          context.root.$router.push({
+            name: RouteNames.DASHBOARD
+          })
+          return
+        }
+        localState.financingStatementDate = new Date()
+        const financingStatement = await getFinancingStatement(true, localState.registrationNumber)
+        if (financingStatement.error) {
+          localState.dataLoadError = true
+          emitError(financingStatement.error)
+        } else {
+          // load data into the store
+          const registrationType = AllRegistrationTypes.find((reg, index) => {
+            if (reg.registrationTypeAPI === financingStatement.type) {
+              return true
+            }
+          })
+          const collateral = {
+            valid: true,
+            vehicleCollateral: financingStatement.vehicleCollateral,
+            generalCollateral: financingStatement.generalCollateral
+          } as AddCollateralIF
+          const lengthTrust = {
+            valid: false,
+            showInvalid: false,
+            trustIndenture: financingStatement.trustIndenture || false,
+            lifeInfinite: false,
+            lifeYears: null,
+            surrenderDate: financingStatement.surrenderDate || null,
+            lienAmount: financingStatement.lienAmount || null
+          } as LengthTrustIF
+          if (
+            registrationType.registrationTypeAPI ===
+            APIRegistrationTypes.REPAIRERS_LIEN
+          ) {
+            lengthTrust.lifeYears = 1
+            lengthTrust.valid = true
+          }
+          const parties = {
+            valid: true,
+            registeringParty: null, // will be taken from account info
+            securedParties: financingStatement.securedParties,
+            debtors: financingStatement.debtors
+          } as AddPartiesIF
+          const origParties = {
+            registeringParty: financingStatement.registeringParty, // will be used for summary
+            securedParties: financingStatement.securedParties,
+            debtors: financingStatement.debtors
+          } as AddPartiesIF
+          const courtOrder: CourtOrderIF = {
+            courtRegistry: '',
+            courtName: '',
+            fileNumber: '',
+            effectOfOrder: '',
+            orderDate: ''
+          }
+          const certifyInfo: CertifyIF = {
+            valid: false,
+            certified: false,
+            legalName: '',
+            registeringParty: null
+          }
+          setStaffPayment({
+            option: -1,
+            routingSlipNumber: '',
+            bcolAccountNumber: '',
+            datNumber: '',
+            folioNumber: '',
+            isPriority: false
+          })
+          setCourtOrderInformation(courtOrder)
+          setRegistrationCreationDate(financingStatement.createDateTime)
+          setRegistrationExpiryDate(financingStatement.expiryDate)
+          setRegistrationNumber(financingStatement.baseRegistrationNumber)
+          setRegistrationType(registrationType)
+          setAddCollateral(collateral)
+          setLengthTrust(lengthTrust)
+          setAddSecuredPartiesAndDebtors(parties)
+          setOriginalAddSecuredPartiesAndDebtors(origParties)
+          setRegistrationFlowType(RegistrationFlowType.RENEWAL)
+          setFolioOrReferenceNumber('')
+          setCertifyInformation(certifyInfo)
+        }
+      }
+    }
+
+    const setValid = (isValid): void => {
+      localState.registrationValid = isValid
+      if (isValid) {
+        localState.errMsg = ''
+      }
+    }
+
+    const confirmRenewal = (): void => {
+      localState.errMsg = ''
+      if (localState.registrationValid) {
+        context.root.$router.push({
+          name: RouteNames.CONFIRM_RENEWAL,
+          query: { 'reg-num': localState.registrationNumber }
+        })
+      } else {
+        localState.errMsg = '< You have unfinished changes'
+        localState.showInvalid = true
+        scrollToInvalid()
+      }
+    }
+
+    const scrollToInvalid = async (): Promise<void> => {
+      if (!localState.registrationValid) {
+        const component = document.getElementById('court-order')
+        if (component) {
+          await component.scrollIntoView({ behavior: 'smooth' })
+        }
+      }
+    }
+
+    /** Called when App is ready and this component can load its data. */
+    const onAppReady = async (val: boolean): Promise<void> => {
+      // do not proceed if app is not ready
+      if (!val) return
+      // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
+      if (!localState.isAuthenticated || (!props.isJestRunning && !getFeatureFlag('ppr-ui-enabled'))) {
+        context.root.$router.push({
           name: RouteNames.DASHBOARD
         })
         return
       }
-      this.financingStatementDate = new Date()
-      const financingStatement = await getFinancingStatement(true, this.registrationNumber)
-      if (financingStatement.error) {
-        this.dataLoadError = true
-        this.emitError(financingStatement.error)
-      } else {
-        // load data into the store
-        const registrationType = AllRegistrationTypes.find((reg, index) => {
-          if (reg.registrationTypeAPI === financingStatement.type) {
-            return true
-          }
-        })
-        const collateral = {
-          valid: true,
-          vehicleCollateral: financingStatement.vehicleCollateral,
-          generalCollateral: financingStatement.generalCollateral
-        } as AddCollateralIF
-        const lengthTrust = {
-          valid: false,
-          showInvalid: false,
-          trustIndenture: financingStatement.trustIndenture || false,
-          lifeInfinite: false,
-          lifeYears: null,
-          surrenderDate: financingStatement.surrenderDate || null,
-          lienAmount: financingStatement.lienAmount || null
-        } as LengthTrustIF
-        if (
-          registrationType.registrationTypeAPI ===
-          APIRegistrationTypes.REPAIRERS_LIEN
-        ) {
-          lengthTrust.lifeYears = 1
-          lengthTrust.valid = true
-        }
-        const parties = {
-          valid: true,
-          registeringParty: null, // will be taken from account info
-          securedParties: financingStatement.securedParties,
-          debtors: financingStatement.debtors
-        } as AddPartiesIF
-        const origParties = {
-          registeringParty: financingStatement.registeringParty, // will be used for summary
-          securedParties: financingStatement.securedParties,
-          debtors: financingStatement.debtors
-        } as AddPartiesIF
-        const courtOrder: CourtOrderIF = {
-          courtRegistry: '',
-          courtName: '',
-          fileNumber: '',
-          effectOfOrder: '',
-          orderDate: ''
-        }
-        const certifyInfo: CertifyIF = {
-          valid: false,
-          certified: false,
-          legalName: '',
-          registeringParty: null
-        }
-        this.setStaffPayment({
-          option: -1,
-          routingSlipNumber: '',
-          bcolAccountNumber: '',
-          datNumber: '',
-          folioNumber: '',
-          isPriority: false
-        })
-        this.setCourtOrderInformation(courtOrder)
-        this.setRegistrationCreationDate(financingStatement.createDateTime)
-        this.setRegistrationExpiryDate(financingStatement.expiryDate)
-        this.setRegistrationNumber(financingStatement.baseRegistrationNumber)
-        this.setRegistrationType(registrationType)
-        this.setAddCollateral(collateral)
-        this.setLengthTrust(lengthTrust)
-        this.setAddSecuredPartiesAndDebtors(parties)
-        this.setOriginalAddSecuredPartiesAndDebtors(origParties)
-        this.setRegistrationFlowType(RegistrationFlowType.RENEWAL)
-        this.setFolioOrReferenceNumber('')
-        this.setCertifyInformation(certifyInfo)
-      }
-    }
-  }
 
-  mounted () {
-    this.onAppReady(this.appReady)
-  }
+      // get registration data from api and load into store
+      localState.loading = true
+      await loadRegistration()
+      localState.loading = false
 
-  private setValid (isValid): void {
-    this.registrationValid = isValid
-    if (isValid) {
-      this.errMsg = ''
-    }
-  }
-
-  private confirmRenewal (): void {
-    this.errMsg = ''
-    if (this.registrationValid) {
-      this.$router.push({
-        name: RouteNames.CONFIRM_RENEWAL,
-        query: { 'reg-num': this.registrationNumber }
-      })
-    } else {
-      this.errMsg = '< You have unfinished changes'
-      this.showInvalid = true
-      this.scrollToInvalid()
-    }
-  }
-
-  private async scrollToInvalid (): Promise<void> {
-    if (!this.registrationValid) {
-      const component = document.getElementById('court-order')
-      if (component) {
-        await component.scrollIntoView({ behavior: 'smooth' })
-      }
-    }
-  }
-
-  /** Emits Have Data event. */
-  @Emit('haveData')
-  private emitHaveData (haveData: Boolean = true): void {}
-
-  /** Emits error to app.vue for handling */
-  @Emit('error')
-  private emitError (error: ErrorIF): void {
-    console.error(error)
-  }
-
-  /** Called when App is ready and this component can load its data. */
-  @Watch('appReady')
-  private async onAppReady (val: boolean): Promise<void> {
-    // do not proceed if app is not ready
-    if (!val) return
-    // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
-    if (!this.isAuthenticated || (!this.isJestRunning && !getFeatureFlag('ppr-ui-enabled'))) {
-      this.$router.push({
-        name: RouteNames.DASHBOARD
-      })
-      return
+      // page is ready to view
+      emitHaveData(true)
+      localState.dataLoaded = true
     }
 
-    // get registration data from api and load into store
-    this.loading = true
-    await this.loadRegistration()
-    this.loading = false
+    /** Emits error to app.vue for handling */
+    const emitError = (error: ErrorIF): void => {
+      context.emit('error', error)
+      console.error(error)
+    }
 
-    // page is ready to view
-    this.emitHaveData(true)
-    this.dataLoaded = true
+    /** Emits Have Data event. */
+    const emitHaveData = (haveData: Boolean = true): void => {
+      context.emit('haveData', haveData)
+    }
+
+    watch(() => props.appReady, (val: boolean) => {
+      onAppReady(val)
+    })
+
+    return {
+      setValid,
+      confirmRenewal,
+      handleDialogResp,
+      ...toRefs(localState)
+    }
   }
-}
+})
 </script>
 
 <style lang="scss" module>
