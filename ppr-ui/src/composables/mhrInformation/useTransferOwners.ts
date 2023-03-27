@@ -50,6 +50,13 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     ].includes(getMhrTransferType.value?.transferType)
   })
 
+  /** Returns true when Add/Edit Owner name fields should be disabled **/
+  const disableNameFields = computed((): boolean => {
+    return [
+      ApiTransferTypes.SURVIVING_JOINT_TENANT
+    ].includes(getMhrTransferType.value?.transferType)
+  })
+
   /** Returns true when ownership structure is joint tenancy /w min 2  owners but not executors, trustees or admins. **/
   const isJointTenancyStructure = computed((): boolean => {
     return getMhrTransferCurrentHomeOwnerGroups.value.some(group => group.type === ApiHomeTenancyTypes.JOINT &&
@@ -90,6 +97,8 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
         return true // Always enable for Sale or Gift
       case ApiTransferTypes.SURVIVING_JOINT_TENANT:
         return false // Disable for Surviving Joint Tenants
+      case ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL:
+        return true // Always enable for Executor Will
       default:
         return false
     }
@@ -254,6 +263,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     isDisabledForSJTChanges,
     isCurrentOwner,
     isTransferDueToDeath,
+    disableNameFields,
     isJointTenancyStructure,
     getCurrentOwnerStateById,
     groupHasRemovedAllCurrentOwners,

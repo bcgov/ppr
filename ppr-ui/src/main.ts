@@ -30,7 +30,7 @@ import App from './App.vue'
 // Helpers
 import { fetchConfig, initLdClient, isSigningIn, isSigningOut } from '@/utils'
 import KeycloakService from 'sbc-common-components/src/services/keycloak.services'
-import { HomeLocationIcon, HomeOwnersIcon } from './assets/svgs/index'
+import { ExecutorBusinessIcon, ExecutorPersonIcon, HomeLocationIcon, HomeOwnersIcon } from './assets/svgs/index'
 
 // get rid of "element implicitly has an 'any' type..."
 declare const window: any
@@ -92,8 +92,14 @@ async function start () {
       },
       icons: {
         values: {
-          HomeLocationIcon: { // name of our custom icon
-            component: HomeLocationIcon // our custom component
+          ExecutorBusinessIcon: { // name of our custom icon
+            component: ExecutorBusinessIcon // our custom component
+          },
+          ExecutorPersonIcon: {
+            component: ExecutorPersonIcon
+          },
+          HomeLocationIcon: {
+            component: HomeLocationIcon
           },
           HomeOwnersIcon: {
             component: HomeOwnersIcon
