@@ -461,10 +461,12 @@ export default defineComponent({
     const {
       getMhrRegistrationHomeOwnerGroups,
       getMhrTransferHomeOwnerGroups,
+      getMhrTransferHomeOwners,
       getMhrRegistrationValidationModel
     } = useGetters<any>([
       'getMhrRegistrationHomeOwnerGroups',
       'getMhrTransferHomeOwnerGroups',
+      'getMhrTransferHomeOwners',
       'getMhrRegistrationValidationModel'
     ])
     const {
@@ -495,8 +497,7 @@ export default defineComponent({
       editHomeOwner,
       showGroups,
       setShowGroups,
-      setGroupFractionalInterest,
-      getTransferOrRegistrationHomeOwners
+      setGroupFractionalInterest
     } = useHomeOwners(props.isMhrTransfer)
 
     const {
@@ -513,7 +514,8 @@ export default defineComponent({
 
     const defaultHomeOwner: MhrRegistrationHomeOwnerIF = {
       ...props.editHomeOwner,
-      ownerId: props.editHomeOwner?.ownerId || getTransferOrRegistrationHomeOwners().length + 1 || (DEFAULT_OWNER_ID++),
+      ownerId: props.editHomeOwner?.ownerId ||
+        (props.isMhrTransfer ? getMhrTransferHomeOwners.value.length + 1 : DEFAULT_OWNER_ID++),
       phoneNumber: props.editHomeOwner?.phoneNumber || '',
       phoneExtension: props.editHomeOwner?.phoneExtension || '',
       suffix: props.editHomeOwner?.suffix || '',
