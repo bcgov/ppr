@@ -308,6 +308,8 @@
                     hint="Example: Additional legal names, Jr., Sr., Executor of the will of the deceased, etc."
                     persistent-hint
                     :rules="maxLength(70)"
+                    :disabled="disableNameFields"
+                    :readonly="disableNameFields"
                     @mousedown.prevent
                   />
                 </template>
