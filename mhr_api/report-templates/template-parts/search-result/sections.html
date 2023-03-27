@@ -1,7 +1,7 @@
 <div class="no-page-break">
 {% if detail.description is defined and detail.description.sections is defined %}
    <div class="separator-section mt-5"></div>
-   <div class="section-data pt-3"><span class="sections-table-header">Number of Home Sections:</span> {{ detail.description.sections|length }}</div> 
+   <div class="section-data pt-3"><span class="sections-table-header">Number of Home Sections:</span> {{ detail.description.sectionCount }}</div> 
    <table class="sections-table mt-4" role="presentation">         
       <tr class="sections-table-header no-page-break mb-0">
          <td class="top-align">Section</td>
