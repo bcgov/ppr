@@ -50,7 +50,7 @@ const noResultsDiv = '#search-no-results-info'
  *
  * @returns a Wrapper<SearchedResultMhr> object with the given parameters.
  */
-function createComponent(propsData: any = null): Wrapper<any> {
+function createComponent (propsData: any = null): Wrapper<any> {
   const localVue = createLocalVue()
   localVue.use(CompositionApi)
   localVue.use(Vuetify)
@@ -63,7 +63,7 @@ function createComponent(propsData: any = null): Wrapper<any> {
   })
 }
 
-function getUniqueSelectedPPRLienSearches(
+function getUniqueSelectedPPRLienSearches (
   searchResults: ManufacturedHomeSearchResultIF[]
 ): ManufacturedHomeSearchResultIF[] {
   return uniqBy(searchResults, UIMHRSearchTypeValues.MHRMHR_NUMBER).filter(

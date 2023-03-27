@@ -20,16 +20,16 @@
         :show-login-menu="false"
       />
 
+    <!-- Alert banner -->
+    <v-alert
+      tile dense
+      type="warning"
+      v-if="bannerText">
+      <div v-html="bannerText" class="mb-0 text-center colour-dk-text"></div>
+    </v-alert>
+
     <div class="app-body">
       <main>
-        <sbc-system-banner
-          v-if="systemMessage != null"
-          v-bind:show="systemMessage != null"
-          v-bind:type="systemMessageType"
-          v-bind:message="systemMessage"
-          icon=" "
-          align="center"
-        ></sbc-system-banner>
         <breadcrumb :setCurrentPath="currentPath" :setCurrentPathName="currentPathName" v-if="haveData" />
         <tombstone :setCurrentPath="currentPath" v-if="haveData" />
         <v-container class="view-container pa-0 ma-0">
@@ -64,7 +64,6 @@ import KeycloakService from 'sbc-common-components/src/services/keycloak.service
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import SbcHeader from 'sbc-common-components/src/components/SbcHeader.vue'
 import SbcFooter from 'sbc-common-components/src/components/SbcFooter.vue'
-import SbcSystemBanner from 'sbc-common-components/src/components/SbcSystemBanner.vue'
 import SbcAuthenticationOptionsDialog from 'sbc-common-components/src/components/SbcAuthenticationOptionsDialog.vue'
 import * as Dialogs from '@/components/dialogs'
 import { Breadcrumb } from '@/components/common'
@@ -77,6 +76,7 @@ import {
 } from '@/resources/dialogOptions'
 import {
   getFees,
+  getFeatureFlag,
   getKeycloakRoles,
   getProductSubscription,
   getPPRUserSettings,
@@ -103,7 +103,6 @@ export default defineComponent({
     SbcHeader,
     SbcFooter,
     SbcAuthenticationOptionsDialog,
-    SbcSystemBanner,
     Tombstone,
     ...Dialogs,
     ...Views
