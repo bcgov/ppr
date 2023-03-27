@@ -35,7 +35,6 @@
                 top
                 content-class="top-tooltip pa-5"
                 transition="fade-transition"
-                data-test-id="suffix-tooltip"
               >
                 <template v-slot:activator="{ on }">
                   <v-radio
@@ -295,7 +294,6 @@
                 right
                 content-class="right-tooltip pa-5"
                 transition="fade-transition"
-                data-test-id="suffix-tooltip"
               >
                 <template v-slot:activator="{ on }">
                   <v-text-field
