@@ -17,7 +17,8 @@ Validation includes verifying the data combination for various registrations/fil
 """
 from flask import current_app
 
-from mhr_api.models import MhrRegistration, Db2Owngroup, Db2Owner, registration_utils as reg_utils, utils as model_utils
+from mhr_api.models import MhrRegistration, Db2Owngroup, Db2Owner, Db2Document
+from mhr_api.models import registration_utils as reg_utils, utils as model_utils
 from mhr_api.models.type_tables import MhrRegistrationStatusTypes, MhrDocumentTypes, MhrLocationTypes, MhrStatusTypes
 from mhr_api.models.type_tables import MhrOwnerStatusTypes, MhrTenancyTypes, MhrPartyTypes, MhrRegistrationTypes
 from mhr_api.models.db2.owngroup import NEW_TENANCY_LEGACY
@@ -29,6 +30,7 @@ from mhr_api.utils import valid_charset
 
 
 STATE_NOT_ALLOWED = 'The MH registration is not in a state where changes are allowed. '
+STATE_FROZEN_AFFIDAVIT = 'A transfer to a benificiary is pending after an AFFIDAVIT transfer. '
 OWNERS_NOT_ALLOWED = 'Owners not allowed with new registrations: use ownerGroups instead. '
 DOC_ID_REQUIRED = 'Document ID is required for staff registrations. '
 SUBMITTING_REQUIRED = 'Submitting Party is required for MH registrations. '
@@ -128,7 +130,8 @@ def validate_transfer(registration: MhrRegistration, json_data, staff: bool = Fa
                                            json_data.get('deleteOwnerGroups'),
                                            active_group_count)
         error_msg += validate_owner_party_type(json_data, json_data.get('addOwnerGroups'), False, active_group_count)
-        error_msg += validate_registration_state(registration)
+        reg_type: str = json_data.get('registrationType', MhrRegistrationTypes.TRANS)
+        error_msg += validate_registration_state(registration, staff, reg_type)
         if is_legacy() and registration and registration.manuhome and json_data.get('deleteOwnerGroups'):
             error_msg += validate_delete_owners_legacy(registration, json_data)
         if not staff:
@@ -155,7 +158,7 @@ def validate_exemption(registration: MhrRegistration, json_data, staff: bool = F
         if registration:
             error_msg += validate_ppr_lien(registration.mhr_number)
         error_msg += validate_submitting_party(json_data)
-        error_msg += validate_registration_state(registration)
+        error_msg += validate_registration_state(registration, staff, MhrRegistrationTypes.EXEMPTION_RES)
         if json_data.get('note'):
             if json_data['note'].get('documentType') and \
                     json_data['note'].get('documentType') not in (MhrDocumentTypes.EXRS, MhrDocumentTypes.EXNR):
@@ -178,7 +181,7 @@ def validate_permit(registration: MhrRegistration, json_data, staff: bool = Fals
         if registration:
             error_msg += validate_ppr_lien(registration.mhr_number)
         error_msg += validate_submitting_party(json_data)
-        error_msg += validate_registration_state(registration)
+        error_msg += validate_registration_state(registration, staff, MhrRegistrationTypes.PERMIT)
         error_msg += validate_location(json_data)
         if json_data.get('newLocation'):
             location = json_data.get('newLocation')
@@ -259,16 +262,24 @@ def checksum_valid(doc_id: str) -> bool:
     return (10 - mod_sum) == check_digit
 
 
-def validate_registration_state(registration: MhrRegistration):
+def validate_registration_state(registration: MhrRegistration, staff: bool, reg_type: str):
     """Validate registration state: changes are only allowed on active homes."""
     error_msg = ''
     if not registration:
         return error_msg
     if registration.status_type and registration.status_type != MhrRegistrationStatusTypes.ACTIVE:
         error_msg += STATE_NOT_ALLOWED
-    elif is_legacy() and registration.manuhome and \
-            registration.manuhome.mh_status != registration.manuhome.StatusTypes.REGISTERED:
-        error_msg += STATE_NOT_ALLOWED
+    elif is_legacy() and registration.manuhome:
+        if registration.manuhome.mh_status != registration.manuhome.StatusTypes.REGISTERED:
+            error_msg += STATE_NOT_ALLOWED
+        elif registration.manuhome.reg_documents:
+            last_doc: Db2Document = registration.manuhome.reg_documents[-1]
+            if not staff and last_doc.document_type == Db2Document.DocumentTypes.TRANS_AFFIDAVIT:
+                error_msg += STATE_NOT_ALLOWED
+            elif staff and last_doc.document_type == Db2Document.DocumentTypes.TRANS_AFFIDAVIT and \
+                    reg_type != MhrRegistrationTypes.TRANS:
+                error_msg += STATE_NOT_ALLOWED
+                error_msg += STATE_FROZEN_AFFIDAVIT
     return error_msg
 
 

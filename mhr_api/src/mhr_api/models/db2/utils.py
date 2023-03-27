@@ -139,7 +139,13 @@ SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRI
            AND og2.status IN ('3')) as owner_names,
        TRIM(d.affirmby),
        d.documtid as document_id,
-       d.docuregi as doc_reg_number
+       d.docuregi as doc_reg_number,
+       (SELECT d2.docutype
+          FROM document d2
+         WHERE d2.mhregnum = d.mhregnum
+           AND d2.regidate = (SELECT MAX(d3.regidate)
+                                FROM document d3
+                               WHERE d3.mhregnum = d.mhregnum)) AS last_doc_type
   FROM manuhome mh, document d
  WHERE mh.mhregnum = :query_mhr_number
    AND mh.mhregnum = d.mhregnum
@@ -154,7 +160,13 @@ SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRI
            AND og2.status IN ('3')) as owner_names,
        TRIM(d.affirmby),
        d.documtid as document_id,
-       d.docuregi as doc_reg_number
+       d.docuregi as doc_reg_number,
+       (SELECT d4.docutype
+          FROM document d4
+         WHERE d4.mhregnum = d.mhregnum
+           AND d4.regidate = (SELECT MAX(d3.regidate)
+                                FROM document d3
+                               WHERE d3.mhregnum = d.mhregnum)) AS last_doc_type
   FROM manuhome mh, document d, document d2
  WHERE d2.docuregi = :query_value
    AND d2.mhregnum = mh.mhregnum
@@ -170,7 +182,13 @@ SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRI
            AND og2.regdocid = d.documtid) as owner_names,
        TRIM(d.affirmby),
        d.documtid as document_id,
-       d.docuregi as doc_reg_number
+       d.docuregi as doc_reg_number,
+       (SELECT d2.docutype
+          FROM document d2
+         WHERE d2.mhregnum = d.mhregnum
+           AND d2.regidate = (SELECT MAX(d3.regidate)
+                                FROM document d3
+                               WHERE d3.mhregnum = d.mhregnum)) AS last_doc_type
   FROM manuhome mh, document d
  WHERE mh.mhregnum IN (?)
    AND mh.mhregnum = d.mhregnum
@@ -187,6 +205,12 @@ SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRI
        TRIM(d.affirmby),
        d.documtid as document_id,
        d.docuregi as doc_reg_number,
+       (SELECT d2.docutype
+          FROM document d2
+         WHERE d2.mhregnum = d.mhregnum
+           AND d2.regidate = (SELECT MAX(d3.regidate)
+                                FROM document d3
+                               WHERE d3.mhregnum = d.mhregnum)) AS last_doc_type,
        (SELECT TRIM(o2.ownrname)
           FROM owner o2, owngroup og2
          WHERE o2.manhomid = mh.manhomid
@@ -303,6 +327,8 @@ LEGACY_REGISTRATION_DESCRIPTION = {
     'CONV': REGISTRATION_DESC_NEW
 }
 DOCUMENT_TYPE_REG = '101'
+DOCUMENT_TYPE_AFFIDAVIT = 'AFFE'
+REG_STATUS_FROZEN = 'FROZEN'
 OWNER_TYPE_INDIVIDUAL = 'I'
 REGISTRATION_PATH = '/mhr/api/v1/registrations/'
 DOCUMENT_PATH = '/mhr/api/v1/documents/'
@@ -710,6 +736,9 @@ def __build_summary(row, add_in_user_list: bool = True, mhr_list=None):
         'documentRegistrationNumber': str(row[9]),
         'documentType': str(row[5])
     }
+    last_doc_type: str = str(row[10])
+    if last_doc_type == DOCUMENT_TYPE_AFFIDAVIT:
+        summary['statusType'] = REG_STATUS_FROZEN
     if add_in_user_list:
         summary['inUserList'] = False
     if mhr_list and summary['documentType'] in (Db2Document.DocumentTypes.CONV, Db2Document.DocumentTypes.MHREG_TRIM):

@@ -98,6 +98,10 @@ def test_find_account_registrations(session, account_id, has_results):
             assert not registration.get('inUserList')
             if registration['registrationDescription'] == 'REGISTER NEW UNIT':
                 assert 'lienRegistrationType' in registration
+            if registration.get('mhrNumber') == '003936':
+                assert registration.get('statusType') == 'FROZEN'
+            elif registration.get('mhrNumber') == '003304':
+                assert registration.get('statusType') != 'FROZEN'
     else:
         assert not reg_list
 

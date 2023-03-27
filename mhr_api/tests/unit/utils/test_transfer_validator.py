@@ -801,9 +801,11 @@ ADD_GROUP = {
 # testdata pattern is ({description}, {valid}, {staff}, {doc_id}, {message content}, {status})
 TEST_TRANSFER_DATA = [
     (DESC_VALID, True, True, None, None, MhrRegistrationStatusTypes.ACTIVE),
+    ('Valid staff FROZEN', True, True, None, None, MhrRegistrationStatusTypes.ACTIVE),
     ('Valid no doc id not staff', True, False, None, None, None),
     ('Invalid EXEMPT', False, False, None, validator.STATE_NOT_ALLOWED, MhrRegistrationStatusTypes.EXEMPT),
     ('Invalid HISTORICAL', False, False, None, validator.STATE_NOT_ALLOWED, MhrRegistrationStatusTypes.HISTORICAL),
+    ('Invalid FROZEN', False, False, None, validator.STATE_NOT_ALLOWED, MhrRegistrationStatusTypes.ACTIVE),
     (DESC_INVALID_GROUP_ID, False, False, None, validator.DELETE_GROUP_ID_INVALID, MhrRegistrationStatusTypes.ACTIVE),
     (DESC_NONEXISTENT_GROUP_ID, False, False, None, validator.DELETE_GROUP_ID_NONEXISTENT,
      MhrRegistrationStatusTypes.ACTIVE),
@@ -836,6 +838,10 @@ TEST_TRANSFER_DATA_GROUP = [
 TEST_TRANSFER_DATA_TRAND = [
     ('Valid', True,  '001004', '2523', TRAND_DELETE_GROUPS, TRAND_ADD_GROUPS, None),
     ('Valid with no/empty middle name', True,  '001020', '2523', TRAND_DELETE_GROUPS2, TRAND_ADD_GROUPS2, None),
+    ('Invalid FROZEN', False,  '003936', '2523', TRAND_DELETE_GROUPS, TRAND_ADD_GROUPS,
+     validator.STATE_NOT_ALLOWED),
+    ('Invalid staff FROZEN', False,  '003936', '2523', TRAND_DELETE_GROUPS, TRAND_ADD_GROUPS,
+     validator.STATE_FROZEN_AFFIDAVIT),
     ('Invalid party type', False,  '001004', '2523', TRAND_DELETE_GROUPS, TRAND_ADD_GROUPS,
      validator.TRAN_DEATH_NEW_OWNER),
     ('Invalid add owner', False,  '001004', '2523', TRAND_DELETE_GROUPS, TRAND_ADD_GROUPS,
@@ -936,6 +942,8 @@ def test_validate_transfer(session, desc, valid, staff, doc_id, message_content,
     """Assert that MH transfer validation works as expected."""
     # setup
     json_data = copy.deepcopy(TRANSFER)
+    mhr_num: str = '045349'
+    account_id: str = 'PS12345'
     if doc_id:
         json_data['documentId'] = doc_id
     elif json_data.get('documentId'):
@@ -947,9 +955,12 @@ def test_validate_transfer(session, desc, valid, staff, doc_id, message_content,
         json_data['deleteOwnerGroups'][0]['groupId'] = 10
     elif desc == DESC_NONEXISTENT_GROUP_ID:
         json_data['deleteOwnerGroups'][0]['type'] = 'SOLE'
+    elif desc in ('Invalid FROZEN', 'Valid staff FROZEN'):
+        mhr_num = '003936'
+        account_id = '2523'
     valid_format, errors = schema_utils.validate(json_data, 'transfer', 'mhr')
     # Additional validation not covered by the schema.
-    registration: MhrRegistration = MhrRegistration.find_by_mhr_number('045349', 'PS12345')
+    registration: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account_id)
     if status:
         registration.status_type = status
     error_msg = validator.validate_transfer(registration, json_data, staff)
@@ -1048,6 +1059,7 @@ def test_validate_transfer_trand(session, desc, valid, mhr_num, account_id, dele
     json_data['registrationType'] = MhrRegistrationTypes.TRAND
     json_data['deleteOwnerGroups'] = copy.deepcopy(delete_groups)
     json_data['addOwnerGroups'] = copy.deepcopy(add_groups)
+    staff: bool = False
     if desc == 'Invalid party type':
         json_data['addOwnerGroups'][0]['owners'][0]['partyType'] = MhrPartyTypes.TRUSTEE
     elif desc == 'Invalid add owner':
@@ -1063,11 +1075,12 @@ def test_validate_transfer_trand(session, desc, valid, mhr_num, account_id, dele
     elif desc == 'Invalid future death ts':
         future_ts = model_utils.now_ts_offset(1, True)
         json_data['deleteOwnerGroups'][0]['owners'][1]['deathDateTime'] = model_utils.format_ts(future_ts)
- 
+    elif desc == 'Invalid staff FROZEN':
+        staff = True
     valid_format, errors = schema_utils.validate(json_data, 'transfer', 'mhr')
     # Additional validation not covered by the schema.
     registration: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account_id)
-    error_msg = validator.validate_transfer(registration, json_data, False)
+    error_msg = validator.validate_transfer(registration, json_data, staff)
     # if valid and error_msg:
     #    current_app.logger.debug('UNEXPECTED ERROR: ' + error_msg)
     if errors:
