@@ -46,7 +46,6 @@ import {
 import { getLastEvent, setupIntersectionObserverMock } from './utils'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { defaultFlagSet } from '@/utils'
-import {nextTick} from "@vue/composition-api";
 
 Vue.use(Vuetify)
 
