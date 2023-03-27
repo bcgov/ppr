@@ -691,7 +691,7 @@ def __build_summary(row, add_in_user_list: bool = True, mhr_list=None):
                 if name[0:1] == OWNER_TYPE_INDIVIDUAL:
                     owner_names += __get_summary_name(name[1:]) + ',\n'
                 else:
-                    owner_names += name[1:] + '\n'
+                    owner_names += name[1:] + ',\n'
         # remove comma if exists at end of str
         if owner_names[-2] == ',':
             owner_names = owner_names[:-2]
