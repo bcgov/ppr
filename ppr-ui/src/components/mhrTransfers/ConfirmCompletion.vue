@@ -21,7 +21,7 @@
           </v-col>
           <v-col cols="9" class="confirm-completion-req">
             <ol>
-              <li v-if="transferType === ApiTransferTypes.SALE_OR_GIFT" class="pl-3 pb-3 mb-7">
+              <li v-if="!isTransferDueToDeath" class="pl-3 pb-3 mb-7">
                 <p><strong>Bill of sale</strong> has been signed by either all owners or by someone with the authority
                   to act on behalf of the registered owners and witnessed by an independent third party. If this is a
                   transfer to a beneficiary, you must have written consent from all beneficiaries that are not being
@@ -33,7 +33,7 @@
                   of seizure and sale.
                 </p>
               </li>
-              <li v-else-if="transferType === ApiTransferTypes.SURVIVING_JOINT_TENANT" class="pl-3 pb-3 mb-7">
+              <li v-else-if="isTransferDueToDeath" class="pl-3 pb-3 mb-7">
                 <p><strong>Original or
                   <v-tooltip
                     top
@@ -48,8 +48,11 @@
                         v-on="on"
                       ><u> certified copy</u></span>
                     </template>
-                    Original or certified document from Vital Statistics. A statement of death or a cremation
-                    certificate from a funeral director is not acceptable.
+                    Vital Statistics and associated Funeral Homes issue original death certificates on secure, banknote
+                    paper. Certified copies are obtained by presenting those original certificate(s) to a lawyer,
+                    notary or other commissioner for taking affidavits and having them confirm that it is a true copy
+                    of the original. A statement of death or a cremation certificate from a funeral director is not
+                    acceptable.
                   </v-tooltip>
                   of Death Certificate</strong> that has been issued by Vital Statistics and has been recieved for each
                   joint tenant owner being removed due to death. I confirm that it was
@@ -75,7 +78,10 @@
               <li v-if="isRoleStaff" class="pl-3 pb-3 mb-7">
                 <p><strong>Transfer or Change Ownership form</strong> has been recieved and retained.</p>
               </li>
-              <li v-if="transferType === ApiTransferTypes.SALE_OR_GIFT" class="pl-3 pb-3 mb-7">
+              <li v-if="transferType === ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL" class="pl-3 pb-3 mb-7">
+                <p><strong>Court certified true copy of the Probate with the will.</strong></p>
+              </li>
+              <li v-if="!isTransferDueToDeath" class="pl-3 pb-3 mb-7">
                 <p><strong>Search of the Corporate Register</strong> has been completed if one or more of the current or
                 future owners is an incorporated company, society or cooperative association.</p>
                 <p class="confirm-completion-note">
@@ -118,6 +124,7 @@
 import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
 import { useGetters } from 'vuex-composition-helpers'
 import { ApiTransferTypes } from '@/enums'
+import { useTransferOwners } from '@/composables'
 
 export default defineComponent({
   name: 'ConfirmCompletion',
@@ -145,6 +152,9 @@ export default defineComponent({
       'getMhrTransferType',
       'isRoleStaff'
     ])
+
+    const { isTransferDueToDeath } = useTransferOwners()
+
     const localState = reactive({
       showErrorComponent: computed((): boolean => {
         return (props.setShowErrors && !localState.confirmCompletion)
@@ -163,6 +173,7 @@ export default defineComponent({
     return {
       isRoleStaff,
       ApiTransferTypes,
+      isTransferDueToDeath,
       ...toRefs(localState)
     }
   }
