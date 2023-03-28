@@ -17,6 +17,5 @@ export { default as StickyContainer } from './StickyContainer.vue'
 export { default as SimpleHelpToggle } from './SimpleHelpToggle.vue'
 export { default as RegistrationsWrapper } from './RegistrationsWrapper.vue'
 export { default as AccountInfo } from './AccountInfo.vue'
-
-// Shared DatePicker Component
-export { DatePicker as SharedDatePicker } from '@bcrs-shared-components/date-picker'
+export { default as SharedDatePicker } from './SharedDatePicker.vue'
+export { default as SharedStaffPayment } from './SharedStaffPayment.vue'

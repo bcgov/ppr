@@ -111,7 +111,7 @@
           >
         </v-col>
         <v-col>
-          <date-picker
+          <SharedDatePicker
             clearable
             ref="datePickerRef"
             title="Date"
@@ -144,7 +144,7 @@ import {
 } from '@vue/composition-api'
 import { useGetters, useActions } from 'vuex-composition-helpers'
 // bcregistry
-import { DatePicker } from '@bcrs-shared-components/date-picker'
+import SharedDatePicker from '@/components/common/SharedDatePicker.vue'
 // local
 import { LengthTrustIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { convertDate, formatExpiryDate, localTodayDate } from '@/utils'
@@ -152,7 +152,7 @@ import { APIRegistrationTypes } from '@/enums'
 
 export default defineComponent({
   components: {
-    DatePicker
+    SharedDatePicker
   },
   props: {
     isRenewal: {

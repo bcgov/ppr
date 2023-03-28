@@ -60,106 +60,122 @@
 </template>
 
 <script lang="ts">
-// external
-import { Component, Emit, Prop, Vue, Watch } from 'vue-property-decorator'
-import { Getter } from 'vuex-class'
-// bcregistry
+import { computed, defineComponent, onMounted, reactive, toRefs, watch } from '@vue/composition-api'
+import { useGetters } from 'vuex-composition-helpers'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
-// local helpers/enums/interfaces/resources
 import { APIRegistrationTypes, RegistrationFlowType, RouteNames, StatementTypes } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
-import { ErrorIF, LengthTrustIF, RegistrationTypeIF } from '@/interfaces' // eslint-disable-line
-import { RegistrationLengthI } from '@/composables/fees/interfaces' // eslint-disable-line no-unused-vars
-import { getFeatureFlag } from '@/utils'
-// local components
 import { Stepper, StickyContainer } from '@/components/common'
 import ButtonFooter from '@/components/common/ButtonFooter.vue'
 import { Parties } from '@/components/parties'
+import { getFeatureFlag } from '@/utils'
+import { ErrorIF } from '@/interfaces' // eslint-disable-line
+import { RegistrationLengthI } from '@/composables/fees/interfaces' // eslint-disable-line no-unused-vars
 
-@Component({
+export default defineComponent({
+  name: 'AddParties',
   components: {
     ButtonFooter,
     Stepper,
     Parties,
     StickyContainer
+  },
+  emits: ['error', 'haveData'],
+  props: {
+    appReady: {
+      type: Boolean,
+      default: false
+    },
+    isJestRunning: {
+      type: Boolean,
+      default: false
+    }
+  },
+  setup (props, context) {
+    const {
+      getLengthTrust,
+      getRegistrationType,
+      getRegistrationOther,
+      getRegistrationFlowType
+    } = useGetters([
+      'getLengthTrust',
+      'getRegistrationType',
+      'getRegistrationOther',
+      'getRegistrationFlowType'
+    ])
+
+    const localState = reactive({
+      dataLoaded: false,
+      feeType: FeeSummaryTypes.NEW,
+      statementType: StatementTypes.FINANCING_STATEMENT,
+      stepName: RouteNames.ADD_SECUREDPARTIES_AND_DEBTORS,
+      isAuthenticated: computed((): boolean => {
+        return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
+      }),
+      registrationLength: computed((): RegistrationLengthI => {
+        return {
+          lifeInfinite: getLengthTrust.value?.lifeInfinite || false,
+          lifeYears: getLengthTrust.value?.lifeYears || 0
+        }
+      }),
+      registrationTypeUI: computed((): string => {
+        if (getRegistrationType.value?.registrationTypeAPI === APIRegistrationTypes.OTHER) {
+          return getRegistrationOther.value || ''
+        }
+        return getRegistrationType.value?.registrationTypeUI || ''
+      })
+    })
+
+    onMounted(() => {
+      onAppReady(props.appReady)
+    })
+
+    /** Called when App is ready and this component can load its data. */
+    const onAppReady = (val: boolean): void => {
+      // do not proceed if app is not ready
+      if (!val) return
+      // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
+      if (!localState.isAuthenticated || (!props.isJestRunning && !getFeatureFlag('ppr-ui-enabled'))) {
+        context.root.$router.push({
+          name: RouteNames.DASHBOARD
+        })
+        return
+      }
+
+      // redirect if store doesn't contain all needed data (happens on page reload, etc.)
+      if (!getRegistrationType.value || getRegistrationFlowType.value !== RegistrationFlowType.NEW) {
+        context.root.$router.push({
+          name: RouteNames.DASHBOARD
+        })
+        return
+      }
+
+      // page is ready to view
+      emitHaveData(true)
+      localState.dataLoaded = true
+    }
+
+    /** Emits error to app.vue for handling */
+    const emitError = (error: ErrorIF): void => {
+      context.emit('error', error)
+      console.error(error)
+    }
+
+    /** Emits Have Data event. */
+    const emitHaveData = (haveData: Boolean = true): void => {
+      context.emit('haveData', haveData)
+    }
+
+    watch(() => props.appReady, (val: boolean) => {
+      onAppReady(val)
+    })
+
+    return {
+      emitError,
+      ...toRefs(localState)
+    }
   }
 })
-export default class AddParties extends Vue {
-  @Getter getLengthTrust: LengthTrustIF
-  @Getter getRegistrationFlowType: RegistrationFlowType
-  @Getter getRegistrationType: RegistrationTypeIF
-  @Getter getRegistrationOther: string
-
-  /** Whether App is ready. */
-  @Prop({ default: false })
-  private appReady: boolean
-
-  @Prop({ default: false })
-  private isJestRunning: boolean
-
-  private dataLoaded = false
-  private feeType = FeeSummaryTypes.NEW
-  private statementType = StatementTypes.FINANCING_STATEMENT
-  private stepName = RouteNames.ADD_SECUREDPARTIES_AND_DEBTORS
-
-  private get isAuthenticated (): boolean {
-    return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
-  }
-
-  private get registrationLength (): RegistrationLengthI {
-    return {
-      lifeInfinite: this.getLengthTrust?.lifeInfinite || false,
-      lifeYears: this.getLengthTrust?.lifeYears || 0
-    }
-  }
-
-  private get registrationTypeUI (): string {
-    if (this.getRegistrationType?.registrationTypeAPI === APIRegistrationTypes.OTHER) {
-      return this.getRegistrationOther || ''
-    }
-    return this.getRegistrationType?.registrationTypeUI || ''
-  }
-
-  mounted () {
-    this.onAppReady(this.appReady)
-  }
-
-  /** Emits error to app.vue for handling */
-  @Emit('error')
-  private emitError (error: ErrorIF): void {
-    console.error(error)
-  }
-
-  /** Emits Have Data event. */
-  @Emit('haveData')
-  private emitHaveData (haveData: Boolean = true): void { }
-
-  /** Called when App is ready and this component can load its data. */
-  @Watch('appReady')
-  private async onAppReady (val: boolean): Promise<void> {
-    // do not proceed if app is not ready
-    if (!val) return
-    // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
-    if (!this.isAuthenticated || (!this.isJestRunning && !getFeatureFlag('ppr-ui-enabled'))) {
-      this.$router.push({
-        name: RouteNames.DASHBOARD
-      })
-      return
-    }
-
-    // redirect if store doesn't contain all needed data (happens on page reload, etc.)
-    if (!this.getRegistrationType || this.getRegistrationFlowType !== RegistrationFlowType.NEW) {
-      this.$router.push({
-        name: RouteNames.DASHBOARD
-      })
-      return
-    }
-
-    // page is ready to view
-    this.emitHaveData(true)
-    this.dataLoaded = true
-  }
-}
 </script>
 
 <style lang="scss" module>

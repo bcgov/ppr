@@ -1,6 +1,6 @@
 <template>
   <v-container fluid no-gutters id="secured-parties-component" class="pa-0">
-    <change-secured-party-dialog
+    <ChangeSecuredPartyDialog
       attach="#app"
       :display="showDialog"
       :securedPartyName="currentPartyName"

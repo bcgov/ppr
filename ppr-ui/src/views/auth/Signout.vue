@@ -3,24 +3,29 @@
 </template>
 
 <script lang="ts">
-// Libraries
-import { Component, Vue } from 'vue-property-decorator'
-
-// Components
+import { computed, defineComponent, reactive, toRefs } from '@vue/composition-api'
+// Common Component
 import SbcSignout from 'sbc-common-components/src/components/SbcSignout.vue'
 
-@Component({
+export default defineComponent({
+  name: 'Signout',
   components: {
     SbcSignout
+  },
+  setup () {
+    const localState = reactive({
+      logoutURL: computed(() => {
+        const url = `${sessionStorage.getItem('REGISTRY_URL')}?logout=true`
+        if (url) return url
+        return null
+      })
+    })
+
+    return {
+      ...toRefs(localState)
+    }
   }
 })
-export default class Signout extends Vue {
-  private get logoutURL (): string {
-    const url = `${sessionStorage.getItem('REGISTRY_URL')}?logout=true`
-    if (url) return url
-    return null
-  }
-}
 </script>
 
 <style lang="scss" scoped>

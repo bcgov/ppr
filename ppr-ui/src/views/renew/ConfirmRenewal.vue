@@ -97,12 +97,9 @@
 </template>
 
 <script lang="ts">
-// external
-import { Component, Emit, Prop, Vue, Watch } from 'vue-property-decorator'
-import { Action, Getter } from 'vuex-class'
-// bcregistry
+import { computed, defineComponent, onMounted, reactive, toRefs, watch } from '@vue/composition-api'
+import { useActions, useGetters } from 'vuex-composition-helpers'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
-// local components
 import {
   FolioNumberSummary,
   CertifyInformation,
@@ -113,31 +110,25 @@ import {
 import { BaseDialog, StaffPaymentDialog } from '@/components/dialogs'
 import { RegistrationLengthTrustSummary } from '@/components/registration'
 import { RegisteringPartyChange } from '@/components/parties/party'
-
-// local helpers/enums/interfaces/resources
+import { AllRegistrationTypes } from '@/resources'
+import { notCompleteDialog } from '@/resources/dialogOptions'
+import { getFeatureFlag, getFinancingStatement, saveRenewal } from '@/utils'
 /* eslint-disable no-unused-vars */
-import { ActionTypes, APIRegistrationTypes, RouteNames, UIRegistrationTypes } from '@/enums'
+import { ActionTypes, APIRegistrationTypes, RouteNames } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
-import { Throttle } from '@/decorators'
 import {
-  ActionBindingIF,
   RenewRegistrationIF,
   ErrorIF,
   AddPartiesIF,
-  RegistrationTypeIF,
   StateModelIF,
-  LengthTrustIF,
   DialogOptionsIF,
-  DebtorNameIF,
   RegTableNewItemI
 } from '@/interfaces'
 import { RegistrationLengthI } from '@/composables/fees/interfaces'
 /* eslint-enable no-unused-vars */
-import { AllRegistrationTypes } from '@/resources'
-import { notCompleteDialog } from '@/resources/dialogOptions'
-import { getFeatureFlag, getFinancingStatement, saveRenewal } from '@/utils'
 
-@Component({
+export default defineComponent({
+  name: 'ConfirmRenewal',
   components: {
     BaseDialog,
     StaffPaymentDialog,
@@ -148,276 +139,300 @@ import { getFeatureFlag, getFinancingStatement, saveRenewal } from '@/utils'
     CertifyInformation,
     CautionBox,
     StickyContainer
+  },
+  emits: ['error', 'haveData'],
+  props: {
+    appReady: {
+      type: Boolean,
+      default: false
+    },
+    isJestRunning: {
+      type: Boolean,
+      default: false
+    }
+  },
+  setup (props, context) {
+    const {
+      getStateModel,
+      getLengthTrust,
+      isRoleStaffBcol,
+      isRoleStaffReg,
+      isRoleStaffSbc,
+      getRegistrationType,
+      getConfirmDebtorName,
+      getAddSecuredPartiesAndDebtors
+    } = useGetters([
+      'getStateModel',
+      'getLengthTrust',
+      'isRoleStaffBcol',
+      'isRoleStaffReg',
+      'isRoleStaffSbc',
+      'getRegistrationType',
+      'getConfirmDebtorName',
+      'getAddSecuredPartiesAndDebtors'
+    ])
+    const {
+      setRegistrationType,
+      setRegTableNewItem,
+      setRegistrationNumber,
+      setRegistrationCreationDate,
+      setRegistrationExpiryDate,
+      setAddSecuredPartiesAndDebtors
+    } = useActions([
+      'setRegistrationType',
+      'setRegTableNewItem',
+      'setRegistrationNumber',
+      'setRegistrationCreationDate',
+      'setRegistrationExpiryDate',
+      'setAddSecuredPartiesAndDebtors'
+    ])
+
+    const localState = reactive({
+      collateralSummary: '', // eslint-disable-line lines-between-class-members
+      dataLoaded: false,
+      dataLoadError: false,
+      financingStatementDate: null as Date,
+      options: notCompleteDialog as DialogOptionsIF,
+      showCancelDialog: false,
+      submitting: false,
+      showRegMsg: false,
+      staffPaymentDialogDisplay: false,
+      staffPaymentDialogOptions: {
+        acceptText: 'Submit Renewal',
+        cancelText: 'Cancel',
+        title: 'Staff Payment',
+        label: '',
+        text: ''
+      } as DialogOptionsIF,
+      showErrors: false,
+      tooltipTxt: 'The default Registering Party is based on your BC ' +
+        'Registries user account information. This information can be updated within ' +
+        'your account settings. You can change to a different Registering Party by ' +
+        'using the Change button.',
+      cautionTxt: 'The Registry will not provide ' +
+        'the verification statement for this renewal to the Registering Party named above.',
+      validFolio: true,
+      validCertify: false,
+      feeType: FeeSummaryTypes.RENEW,
+      isAuthenticated: computed((): boolean => {
+        return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
+      }),
+      registrationLength: computed((): RegistrationLengthI => {
+        return {
+          lifeInfinite: getLengthTrust.value?.lifeInfinite || false,
+          lifeYears: getLengthTrust.value?.lifeYears || 0
+        }
+      }),
+      registrationTypeUI: computed((): string => {
+        return getRegistrationType.value?.registrationTypeUI || null
+      }),
+      registrationType: computed((): APIRegistrationTypes => {
+        return getRegistrationType.value?.registrationTypeAPI || ''
+      }),
+      registrationNumber: computed((): string => {
+        return (context.root.$route.query['reg-num'] as string) || ''
+      }),
+      stickyComponentErrMsg: computed((): string => {
+        if (!localState.validFolio && localState.showErrors) {
+          return '< Please complete required information'
+        }
+        return ''
+      }),
+      showCourtOrderInfo: computed((): boolean => {
+        return (getRegistrationType.value && localState.registrationType === APIRegistrationTypes.REPAIRERS_LIEN)
+      })
+    })
+
+    onMounted(() => {
+      onAppReady(props.appReady)
+    })
+
+    const handleDialogResp = (val: boolean): void => {
+      localState.showCancelDialog = false
+      if (!val) {
+        setRegistrationNumber(null)
+        context.root.$router.push({ name: RouteNames.DASHBOARD })
+      }
+    }
+
+    const goToReviewRenewal = (): void => {
+      context.root.$router.push({
+        name: RouteNames.RENEW_REGISTRATION,
+        query: { 'reg-num': localState.registrationNumber }
+      })
+      emitHaveData(false)
+    }
+
+    const loadRegistration = async (): Promise<void> => {
+      if (!localState.registrationNumber || !getConfirmDebtorName.value) {
+        if (!localState.registrationNumber) {
+          console.error('No registration number given to discharge. Redirecting to dashboard...')
+        } else {
+          console.error('No debtor name confirmed for discharge. Redirecting to dashboard...')
+        }
+        context.root.$router.push({
+          name: RouteNames.DASHBOARD
+        })
+        return
+      }
+      localState.financingStatementDate = new Date()
+      const financingStatement = await getFinancingStatement(
+        true,
+        localState.registrationNumber
+      )
+      if (financingStatement.error) {
+        localState.dataLoadError = true
+        emitError(financingStatement.error)
+      } else {
+        // set collateral summary
+        if (
+          financingStatement.generalCollateral &&
+          !financingStatement.vehicleCollateral
+        ) {
+          localState.collateralSummary = 'General Collateral and 0 Vehicles'
+        } else if (financingStatement.generalCollateral) {
+          localState.collateralSummary =
+            `General Collateral and ${financingStatement.vehicleCollateral.length} Vehicles`
+        } else if (financingStatement.vehicleCollateral) {
+          localState.collateralSummary =
+            `No General Collateral and ${financingStatement.vehicleCollateral.length} Vehicles`
+        } else {
+          localState.collateralSummary += 'No Collateral'
+        }
+        if (financingStatement.vehicleCollateral?.length === 1) {
+          localState.collateralSummary =
+            localState.collateralSummary.replace('Vehicles', 'Vehicle')
+        }
+        // load data into the store
+        const registrationType = AllRegistrationTypes.find((reg, index) => {
+          if (reg.registrationTypeAPI === financingStatement.type) {
+            return true
+          }
+        })
+        const parties = {
+          valid: true,
+          registeringParty: null,
+          securedParties: financingStatement.securedParties,
+          debtors: financingStatement.debtors
+        } as AddPartiesIF
+        setRegistrationCreationDate(financingStatement.createDateTime)
+        setRegistrationExpiryDate(financingStatement.expiryDate)
+        setRegistrationNumber(financingStatement.baseRegistrationNumber)
+        setRegistrationType(registrationType)
+        setAddSecuredPartiesAndDebtors(parties)
+      }
+    }
+
+    const setFolioValid = (valid: boolean): void => {
+      localState.validFolio = valid
+    }
+
+    const onStaffPaymentChanges = (pay: boolean): void => {
+      if (pay) {
+        submitRenewal()
+      }
+      localState.staffPaymentDialogDisplay = false
+    }
+
+    const submitButton = (): void => {
+      if ((!localState.validFolio) || (!localState.validCertify)) {
+        localState.showErrors = true
+        return
+      }
+      if ((isRoleStaffReg.value) || (isRoleStaffSbc.value)) {
+        localState.staffPaymentDialogDisplay = true
+      } else {
+        submitRenewal()
+      }
+    }
+
+    const submitRenewal = async (): Promise<void> => {
+      const stateModel: StateModelIF = getStateModel.value
+      localState.submitting = true
+      const apiResponse: RenewRegistrationIF = await saveRenewal(stateModel)
+      localState.submitting = false
+      if (apiResponse === undefined || apiResponse?.error !== undefined) {
+        console.error(apiResponse?.error)
+        emitError(apiResponse?.error)
+      } else {
+        // unset registration number
+        setRegistrationNumber(null)
+        // set new added reg
+        const newItem: RegTableNewItemI = {
+          addedReg: apiResponse.renewalRegistrationNumber,
+          addedRegParent: apiResponse.baseRegistrationNumber,
+          addedRegSummary: null,
+          prevDraft: ''
+        }
+        setRegTableNewItem(newItem)
+        // On success return to dashboard
+        goToDashboard()
+      }
+    }
+
+    const goToDashboard = (): void => {
+      // unset registration number
+      setRegistrationNumber(null)
+      context.root.$router.push({
+        name: RouteNames.DASHBOARD
+      })
+      emitHaveData(false)
+    }
+
+    const setShowWarning = (): void => {
+      const parties = getAddSecuredPartiesAndDebtors.value
+      localState.showRegMsg = parties.registeringParty?.action === ActionTypes.EDITED
+    }
+
+    /** Called when App is ready and this component can load its data. */
+    const onAppReady = async (val: boolean): Promise<void> => {
+      // do not proceed if app is not ready
+      if (!val) return
+      // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
+      if (!localState.isAuthenticated || (!props.isJestRunning && !getFeatureFlag('ppr-ui-enabled'))) {
+        context.root.$router.push({
+          name: RouteNames.DASHBOARD
+        })
+        return
+      }
+
+      // get registration data from api and load into store
+      localState.submitting = true
+      await loadRegistration()
+      localState.submitting = false
+
+      // page is ready to view
+      emitHaveData(true)
+      localState.dataLoaded = true
+    }
+
+    /** Emits error to app.vue for handling */
+    const emitError = (error: ErrorIF): void => {
+      context.emit('error', error)
+      console.error(error)
+    }
+
+    /** Emits Have Data event. */
+    const emitHaveData = (haveData: Boolean = true): void => {
+      context.emit('haveData', haveData)
+    }
+
+    watch(() => props.appReady, (val: boolean) => {
+      onAppReady(val)
+    })
+
+    return {
+      submitButton,
+      setFolioValid,
+      setShowWarning,
+      isRoleStaffBcol,
+      handleDialogResp,
+      goToReviewRenewal,
+      onStaffPaymentChanges,
+      ...toRefs(localState)
+    }
   }
 })
-export default class ConfirmDischarge extends Vue {
-  @Getter getConfirmDebtorName: DebtorNameIF
-  @Getter getRegistrationType: RegistrationTypeIF
-  @Getter getAddSecuredPartiesAndDebtors: AddPartiesIF
-  @Getter getStateModel: StateModelIF
-  @Getter getLengthTrust: LengthTrustIF
-  @Getter isRoleStaffBcol: boolean
-  @Getter isRoleStaffReg: boolean
-  @Getter isRoleStaffSbc: boolean
-
-  @Action setAddSecuredPartiesAndDebtors: ActionBindingIF
-  @Action setFeeSummary: ActionBindingIF
-  @Action setRegistrationCreationDate: ActionBindingIF
-  @Action setRegistrationExpiryDate: ActionBindingIF
-  @Action setRegistrationNumber: ActionBindingIF
-  @Action setRegistrationType: ActionBindingIF
-  @Action setRegTableNewItem: ActionBindingIF
-  @Action setUnsavedChanges: ActionBindingIF
-
-  /** Whether App is ready. */
-  @Prop({ default: false })
-  private appReady: boolean
-
-  @Prop({ default: false })
-  private isJestRunning: boolean
-
-  private collateralSummary = '' // eslint-disable-line lines-between-class-members
-  private dataLoaded = false
-  private dataLoadError = false
-  private financingStatementDate: Date = null
-  private options: DialogOptionsIF = notCompleteDialog
-  private showCancelDialog = false
-  private submitting = false
-  private showRegMsg = false
-
-  private staffPaymentDialogDisplay = false
-  private staffPaymentDialogOptions: DialogOptionsIF = {
-    acceptText: 'Submit Renewal',
-    cancelText: 'Cancel',
-    title: 'Staff Payment',
-    label: '',
-    text: ''
-  }
-
-  private showErrors = false
-  private tooltipTxt = 'The default Registering Party is based on your BC ' +
-    'Registries user account information. This information can be updated within ' +
-    'your account settings. You can change to a different Registering Party by ' +
-    'using the Change button.'
-
-  private cautionTxt = 'The Registry will not provide ' +
-    'the verification statement for this renewal to the Registering Party named above.'
-
-  private validFolio = true
-  private validCertify = false
-  private feeType = FeeSummaryTypes.RENEW
-
-  private get isAuthenticated (): boolean {
-    return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
-  }
-
-  // the number of the registration being discharged
-  private get registrationNumber (): string {
-    return (this.$route.query['reg-num'] as string) || ''
-  }
-
-  private get registrationTypeUI (): UIRegistrationTypes {
-    return this.getRegistrationType?.registrationTypeUI || null
-  }
-
-  private get registrationType (): APIRegistrationTypes {
-    return this.getRegistrationType?.registrationTypeAPI || null
-  }
-
-  private get registrationLength (): RegistrationLengthI {
-    return {
-      lifeInfinite: this.getLengthTrust?.lifeInfinite || false,
-      lifeYears: this.getLengthTrust?.lifeYears || 0
-    }
-  }
-
-  private get stickyComponentErrMsg (): string {
-    if (!this.validFolio && this.showErrors) {
-      return '< Please complete required information'
-    }
-    return ''
-  }
-
-  private get showCourtOrderInfo (): boolean {
-    return (this.getRegistrationType && this.registrationType === APIRegistrationTypes.REPAIRERS_LIEN)
-  }
-
-  private handleDialogResp (val: boolean): void {
-    this.showCancelDialog = false
-    if (!val) {
-      this.setRegistrationNumber(null)
-      this.$router.push({ name: RouteNames.DASHBOARD })
-    }
-  }
-
-  private async loadRegistration (): Promise<void> {
-    if (!this.registrationNumber || !this.getConfirmDebtorName) {
-      if (!this.registrationNumber) {
-        console.error('No registration number given to discharge. Redirecting to dashboard...')
-      } else {
-        console.error('No debtor name confirmed for discharge. Redirecting to dashboard...')
-      }
-      this.$router.push({
-        name: RouteNames.DASHBOARD
-      })
-      return
-    }
-    this.financingStatementDate = new Date()
-    const financingStatement = await getFinancingStatement(
-      true,
-      this.registrationNumber
-    )
-    if (financingStatement.error) {
-      this.dataLoadError = true
-      this.emitError(financingStatement.error)
-    } else {
-      // set collateral summary
-      if (
-        financingStatement.generalCollateral &&
-        !financingStatement.vehicleCollateral
-      ) {
-        this.collateralSummary = 'General Collateral and 0 Vehicles'
-      } else if (financingStatement.generalCollateral) {
-        this.collateralSummary = `General Collateral and ${financingStatement.vehicleCollateral.length} Vehicles`
-      } else if (financingStatement.vehicleCollateral) {
-        this.collateralSummary = `No General Collateral and ${financingStatement.vehicleCollateral.length} Vehicles`
-      } else {
-        this.collateralSummary += 'No Collateral'
-      }
-      if (financingStatement.vehicleCollateral?.length === 1) {
-        this.collateralSummary = this.collateralSummary.replace('Vehicles', 'Vehicle')
-      }
-      // load data into the store
-      const registrationType = AllRegistrationTypes.find((reg, index) => {
-        if (reg.registrationTypeAPI === financingStatement.type) {
-          return true
-        }
-      })
-      const parties = {
-        valid: true,
-        registeringParty: null,
-        securedParties: financingStatement.securedParties,
-        debtors: financingStatement.debtors
-      } as AddPartiesIF
-      this.setRegistrationCreationDate(financingStatement.createDateTime)
-      this.setRegistrationExpiryDate(financingStatement.expiryDate)
-      this.setRegistrationNumber(financingStatement.baseRegistrationNumber)
-      this.setRegistrationType(registrationType)
-      this.setAddSecuredPartiesAndDebtors(parties)
-    }
-  }
-
-  mounted () {
-    this.onAppReady(this.appReady)
-  }
-
-  private goToReviewRenewal (): void {
-    this.$router.push({
-      name: RouteNames.RENEW_REGISTRATION,
-      query: { 'reg-num': this.registrationNumber }
-    })
-    this.emitHaveData(false)
-  }
-
-  private setFolioValid (valid: boolean): void {
-    this.validFolio = valid
-  }
-
-  private onStaffPaymentChanges (pay: boolean): void {
-    if (pay) {
-      this.submitRenewal()
-    }
-    this.staffPaymentDialogDisplay = false
-  }
-
-  private submitButton (): void {
-    if ((!this.validFolio) || (!this.validCertify)) {
-      this.showErrors = true
-      return
-    }
-    if ((this.isRoleStaffReg) || (this.isRoleStaffSbc)) {
-      this.staffPaymentDialogDisplay = true
-    } else {
-      this.submitRenewal()
-    }
-  }
-
-  @Throttle(2000)
-  private async submitRenewal (): Promise<void> {
-    const stateModel: StateModelIF = this.getStateModel
-    this.submitting = true
-    const apiResponse: RenewRegistrationIF = await saveRenewal(stateModel)
-    this.submitting = false
-    if (apiResponse === undefined || apiResponse?.error !== undefined) {
-      console.error(apiResponse?.error)
-      this.emitError(apiResponse?.error)
-    } else {
-      // unset registration number
-      this.setRegistrationNumber(null)
-      // set new added reg
-      const newItem: RegTableNewItemI = {
-        addedReg: apiResponse.renewalRegistrationNumber,
-        addedRegParent: apiResponse.baseRegistrationNumber,
-        addedRegSummary: null,
-        prevDraft: ''
-      }
-      this.setRegTableNewItem(newItem)
-      // On success return to dashboard
-      this.goToDashboard()
-    }
-  }
-
-  private goToDashboard (): void {
-    // unset registration number
-    this.setRegistrationNumber(null)
-    this.$router.push({
-      name: RouteNames.DASHBOARD
-    })
-    this.emitHaveData(false)
-  }
-
-  private setShowWarning (): void {
-    const parties = this.getAddSecuredPartiesAndDebtors
-    if (parties.registeringParty?.action === ActionTypes.EDITED) {
-      this.showRegMsg = true
-    } else {
-      this.showRegMsg = false
-    }
-  }
-
-  /** Emits Have Data event. */
-  @Emit('haveData')
-  private emitHaveData (haveData: Boolean = true): void {}
-
-  /** Emits error to app.vue for handling */
-  @Emit('error')
-  private emitError (error: ErrorIF): void {
-    console.error(error)
-  }
-
-  /** Called when App is ready and this component can load its data. */
-  @Watch('appReady')
-  private async onAppReady (val: boolean): Promise<void> {
-    // do not proceed if app is not ready
-    if (!val) return
-    // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
-    if (!this.isAuthenticated || (!this.isJestRunning && !getFeatureFlag('ppr-ui-enabled'))) {
-      this.$router.push({
-        name: RouteNames.DASHBOARD
-      })
-      return
-    }
-
-    // get registration data from api and load into store
-    this.submitting = true
-    await this.loadRegistration()
-    this.submitting = false
-
-    // page is ready to view
-    this.emitHaveData(true)
-    this.dataLoaded = true
-  }
-}
 </script>
 
 <style lang="scss" module>

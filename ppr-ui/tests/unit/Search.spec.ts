@@ -63,12 +63,14 @@ describe('Search component', () => {
     expect(wrapper.findComponent(SearchedResultPpr).exists()).toBe(false)
   })
   it('renders the Results component and displays search data elements with filled result set.', async () => {
-    wrapper.vm.setSearchedType(SearchTypes[1])
-    wrapper.vm.setSearchResults(mockedSearchResponse[UISearchTypes.SERIAL_NUMBER])
+    await store.dispatch('setSearchedType', SearchTypes[1])
+    await store.dispatch('setSearchResults', mockedSearchResponse[UISearchTypes.SERIAL_NUMBER])
     await Vue.nextTick()
-    expect(wrapper.vm.getSearchResults).toStrictEqual(mockedSearchResponse[UISearchTypes.SERIAL_NUMBER])
-    expect(wrapper.vm.getSearchedType).toStrictEqual(SearchTypes[1])
+
+    expect(store.getters.getSearchResults).toStrictEqual(mockedSearchResponse[UISearchTypes.SERIAL_NUMBER])
+    expect(store.getters.getSearchedType).toStrictEqual(SearchTypes[1])
     await Vue.nextTick()
+
     expect(wrapper.vm.folioNumber).toBe(mockedSearchResponse[UISearchTypes.SERIAL_NUMBER].searchQuery.clientReferenceId)
     expect(wrapper.vm.searchType).toBe(SearchTypes[1].searchTypeUI)
     expect(wrapper.vm.searchValue).toBe(mockedSearchResponse[UISearchTypes.SERIAL_NUMBER].searchQuery.criteria.value)
@@ -93,11 +95,11 @@ describe('Search component', () => {
     response.totalResultsSize = 0
     response.selectedResultsSize = 0
     response.results = []
-    wrapper.vm.setSearchedType(SearchTypes[1])
-    wrapper.vm.setSearchResults(response)
+    await store.dispatch('setSearchedType', SearchTypes[1])
+    await store.dispatch('setSearchResults', response)
     await Vue.nextTick()
-    expect(wrapper.vm.getSearchResults).toStrictEqual(response)
-    expect(wrapper.vm.getSearchedType).toStrictEqual(SearchTypes[1])
+    expect(store.getters.getSearchResults).toStrictEqual(response)
+    expect(store.getters.getSearchedType).toStrictEqual(SearchTypes[1])
     await Vue.nextTick()
     expect(wrapper.vm.folioNumber).toBe(mockedSearchResponse[UISearchTypes.SERIAL_NUMBER].searchQuery.clientReferenceId)
     expect(wrapper.vm.searchType).toBe(SearchTypes[1].searchTypeUI)

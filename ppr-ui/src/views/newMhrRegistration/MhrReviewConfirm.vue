@@ -97,7 +97,7 @@ export default defineComponent({
       getValidation,
       getStepValidation
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
-    
+
     const{
       isGlobalEditingMode
     } = useHomeOwners()

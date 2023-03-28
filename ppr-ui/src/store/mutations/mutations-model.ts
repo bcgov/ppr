@@ -34,7 +34,7 @@ import {
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 import { set } from 'lodash'
 
-export const mutateAccountProductSubscribtion = (
+export const mutateAccountProductSubscription = (
   state: StateIF, productSubscriptions: AccountProductSubscriptionIF
 ) => {
   state.stateModel.accountProductSubscriptions = productSubscriptions

@@ -284,7 +284,7 @@ describe('Test registration table with results', () => {
   })
 
   it('renders and displays the typeahead dropdown', async () => {
-    await store.dispatch('setAccountProductSubscribtion', {
+    await store.dispatch('setAccountProductSubscription', {
       [AccountProductCodes.RPPR]: {
         membership: AccountProductMemberships.MEMBER,
         roles: ['edit']

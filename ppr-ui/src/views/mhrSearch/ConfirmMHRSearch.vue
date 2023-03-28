@@ -106,287 +106,299 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable no-unused-vars */
-// external
-import { Component, Emit, Prop, Vue, Watch } from 'vue-property-decorator'
-import { Action, Getter } from 'vuex-class'
-// bcregistry
+import { computed, defineComponent, nextTick, onMounted, reactive, toRefs, watch } from '@vue/composition-api'
+import { useActions, useGetters } from 'vuex-composition-helpers'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
-// local components
-import {
-  FolioNumberSummary,
-  StickyContainer
-} from '@/components/common'
+import { FolioNumberSummary, StickyContainer } from '@/components/common'
 import { BaseDialog } from '@/components/dialogs'
 import { StaffPayment as StaffPaymentComponent } from '@bcrs-shared-components/staff-payment'
-// local helpers/enums/interfaces/resources
 import { RouteNames, UIMHRSearchTypeValues } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { StaffPaymentOptions } from '@bcrs-shared-components/enums'
-import {
-  ActionBindingIF,
-  ErrorIF,
-  StateModelIF,
-  DialogOptionsIF,
-  ManufacturedHomeSearchResultIF, ManufacturedHomeSearchResponseIF
-} from '@/interfaces'
 import { notCompleteSearchDialog } from '@/resources/dialogOptions'
 import { getFeatureFlag, submitSelectedMhr } from '@/utils'
 import { SearchedResultMhr } from '@/components/tables'
+import { uniqBy } from 'lodash'
+/* eslint-disable no-unused-vars */
+import { ErrorIF, DialogOptionsIF } from '@/interfaces'
 import { AdditionalSearchFeeIF } from '@/composables/fees/interfaces'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
-import { uniqBy } from 'lodash'
 /* eslint-enable no-unused-vars */
 
-@Component({
+export default defineComponent({
+  name: 'ConfirmMHRSearch',
   components: {
     BaseDialog,
     FolioNumberSummary,
     StickyContainer,
     SearchedResultMhr,
     StaffPaymentComponent
-  }
-})
-export default class ConfirmMHRSearch extends Vue {
-  @Getter getStateModel: StateModelIF
-  @Getter isSearchCertified!: boolean
-  @Getter isRoleStaffBcol: boolean
-  @Getter isRoleStaffReg!: boolean
-  @Getter isRoleStaffSbc!: boolean
-  @Getter getIsStaffClientPayment!: boolean
-  @Getter getStaffPayment!: StaffPaymentIF
-  @Getter getManufacturedHomeSearchResults!: ManufacturedHomeSearchResponseIF
-  @Getter getSelectedManufacturedHomes!: ManufacturedHomeSearchResultIF[]
-  @Getter getFolioOrReferenceNumber!: string
-
-  @Action setUnsavedChanges: ActionBindingIF
-  @Action setStaffPayment!: ActionBindingIF
-  @Action setSearchCertified!: ActionBindingIF
-
-  /** Whether App is ready. */
-  @Prop({ default: false })
-  private appReady: boolean
-
-  @Prop({ default: false })
-  private isJestRunning: boolean
-
-  private dataLoaded = false
-  private dataLoadError = false
-  private feeType = FeeSummaryTypes.MHSEARCH
-  private options: DialogOptionsIF = notCompleteSearchDialog
-  private showCancelDialog = false
-  private showErrors = false
-  private submitting = false
-  private validFolio = true
-  private staffPaymentValid = false
-  private validating = false
-  private paymentOption = StaffPaymentOptions.NONE
-
-  private get isAuthenticated (): boolean {
-    return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
-  }
-
-  private get showErrorAlert (): boolean {
-    return (!this.validFolio || !this.staffPaymentValid) && this.showErrors
-  }
-
-  private get stickyComponentErrMsg (): string {
-    if (this.showErrorAlert) {
-      return '< Please complete required information'
+  },
+  emits: ['haveData'],
+  props: {
+    appReady: {
+      type: Boolean,
+      default: false
+    },
+    isJestRunning: {
+      type: Boolean,
+      default: false
     }
-    return ''
-  }
+  },
+  setup (props, context) {
+    const {
+      isRoleStaffReg,
+      isRoleStaffSbc,
+      getStaffPayment,
+      isSearchCertified,
+      getIsStaffClientPayment,
+      getFolioOrReferenceNumber,
+      getSelectedManufacturedHomes,
+      getManufacturedHomeSearchResults
+    } = useGetters([
+      'isRoleStaffReg',
+      'isRoleStaffSbc',
+      'getStaffPayment',
+      'isSearchCertified',
+      'getIsStaffClientPayment',
+      'getFolioOrReferenceNumber',
+      'getSelectedManufacturedHomes',
+      'getManufacturedHomeSearchResults'
+    ])
 
-  private get combinedSearchFees (): AdditionalSearchFeeIF {
-    const searchQuantity = uniqBy(this.getSelectedManufacturedHomes, UIMHRSearchTypeValues.MHRMHR_NUMBER)
-      .filter(item => item.includeLienInfo === true)
-      .length
-    return searchQuantity > 0
-      ? {
-        feeType: FeeSummaryTypes.MHR_COMBINED_SEARCH,
-        quantity: searchQuantity
-      }
-      : null
-  }
-
-  private get feeQuantity (): number {
-    // Return selected quantity that is not a combination search
-    return uniqBy(this.getSelectedManufacturedHomes, UIMHRSearchTypeValues.MHRMHR_NUMBER)
-      .filter(result => result.selected && !result.includeLienInfo)
-      .length
-  }
-
-  private get staffPaymentData (): any {
-    let pd = this.getStaffPayment
-    if (!pd) {
-      pd = {
-        option: StaffPaymentOptions.NONE,
-        routingSlipNumber: '',
-        bcolAccountNumber: '',
-        datNumber: '',
-        folioNumber: '',
-        isPriority: false
-      }
-    }
-    return pd
-  }
-
-  mounted () {
-    this.onAppReady(this.appReady)
-  }
-
-  private handleDialogResp (val: boolean): void {
-    this.showCancelDialog = false
-    if (!val) {
-      this.$router.push({ name: RouteNames.DASHBOARD })
-    }
-  }
-
-  private goToSearchResult (): void {
-    this.$router.push({
-      name: RouteNames.MHRSEARCH
+    const {
+      setStaffPayment,
+      setSearchCertified
+    } = useActions([
+      'setStaffPayment',
+      'setSearchCertified'
+    ])
+    const localState = reactive({
+      dataLoaded: false,
+      dataLoadError: false,
+      feeType: FeeSummaryTypes.MHSEARCH,
+      options: notCompleteSearchDialog as DialogOptionsIF,
+      showCancelDialog: false,
+      showErrors: false,
+      submitting: false,
+      validFolio: true,
+      staffPaymentValid: false,
+      validating: false,
+      paymentOption: StaffPaymentOptions.NONE,
+      isAuthenticated: computed((): boolean => {
+        return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
+      }),
+      showErrorAlert: computed((): boolean => {
+        return (!localState.validFolio || !localState.staffPaymentValid) && localState.showErrors
+      }),
+      stickyComponentErrMsg: computed((): string => {
+        if (localState.showErrorAlert) {
+          return '< Please complete required information'
+        }
+        return ''
+      }),
+      combinedSearchFees: computed((): AdditionalSearchFeeIF => {
+        const searchQuantity = uniqBy(getSelectedManufacturedHomes.value, UIMHRSearchTypeValues.MHRMHR_NUMBER)
+          .filter(item => item.includeLienInfo === true)
+          .length
+        return searchQuantity > 0
+          ? {
+            feeType: FeeSummaryTypes.MHR_COMBINED_SEARCH,
+            quantity: searchQuantity
+          }
+          : null
+      }),
+      feeQuantity: computed((): number => {
+        // Return selected quantity that is not a combination search
+        return uniqBy(getSelectedManufacturedHomes.value, UIMHRSearchTypeValues.MHRMHR_NUMBER)
+          .filter(result => result.selected && !result.includeLienInfo)
+          .length
+      }),
+      staffPaymentData: computed((): StaffPaymentIF => {
+        let pd = getStaffPayment.value
+        if (!pd) {
+          pd = {
+            option: StaffPaymentOptions.NONE,
+            routingSlipNumber: '',
+            bcolAccountNumber: '',
+            datNumber: '',
+            folioNumber: '',
+            isPriority: false
+          }
+        }
+        return pd
+      })
     })
-  }
 
-  private setFolioValid (valid: boolean): void {
-    this.validFolio = valid
-  }
-
-  private showDialog (): void {
-    this.showCancelDialog = true
-  }
-
-  private async submit (): Promise<void> {
-    this.validating = true
-    await Vue.nextTick()
-    if (!this.validFolio || ((this.getIsStaffClientPayment && !this.isRoleStaffSbc) && !this.staffPaymentValid)) {
-      this.showErrors = true
-      document.getElementById('staff-payment-dialog').scrollIntoView({ behavior: 'smooth' })
-      return
-    }
-    this.submitting = true
-    let apiResponse
-    if (this.isRoleStaffReg) {
-      apiResponse = await submitSelectedMhr(
-        this.getManufacturedHomeSearchResults.searchId,
-        uniqBy(this.getSelectedManufacturedHomes, UIMHRSearchTypeValues.MHRMHR_NUMBER),
-        this.getFolioOrReferenceNumber,
-        this.getStaffPayment,
-        this.isSearchCertified
-      )
-    } else {
-      apiResponse = await submitSelectedMhr(
-        this.getManufacturedHomeSearchResults.searchId,
-        uniqBy(this.getSelectedManufacturedHomes, UIMHRSearchTypeValues.MHRMHR_NUMBER),
-        this.getFolioOrReferenceNumber
-      )
-    }
-    this.submitting = false
-    if (apiResponse === undefined || apiResponse !== 200) {
-      // Expand Error Handling
-      console.error('Api Error: ' + apiResponse)
-    } else {
-      // On success return to dashboard
-      this.goToDashboard()
-    }
-  }
-
-  private goToDashboard (): void {
-    this.$router.push({
-      name: RouteNames.DASHBOARD
+    onMounted(() => {
+      onAppReady(props.appReady)
     })
-    this.emitHaveData(false)
-  }
 
-  /** Called when component's staff payment data has been updated. */
-  private onStaffPaymentDataUpdate (val: StaffPaymentIF) {
-    let staffPaymentData: StaffPaymentIF = {
-      ...val
+    const handleDialogResp = (val: boolean): void => {
+      localState.showCancelDialog = false
+      if (!val) goToDashboard()
     }
 
-    if (staffPaymentData.routingSlipNumber || staffPaymentData.bcolAccountNumber || staffPaymentData.datNumber) {
-      this.validating = true
-    } else {
-      if (staffPaymentData.option !== this.paymentOption) {
-        this.validating = false
-        this.paymentOption = staffPaymentData.option
-      }
-    }
-
-    // disable validation
-    switch (staffPaymentData.option) {
-      case StaffPaymentOptions.FAS:
-        staffPaymentData = {
-          option: StaffPaymentOptions.FAS,
-          routingSlipNumber: staffPaymentData.routingSlipNumber,
-          isPriority: staffPaymentData.isPriority,
-          bcolAccountNumber: '',
-          datNumber: '',
-          folioNumber: ''
-        }
-        break
-
-      case StaffPaymentOptions.BCOL:
-        staffPaymentData = {
-          option: StaffPaymentOptions.BCOL,
-          bcolAccountNumber: staffPaymentData.bcolAccountNumber,
-          datNumber: staffPaymentData.datNumber,
-          folioNumber: staffPaymentData.folioNumber,
-          isPriority: staffPaymentData.isPriority,
-          routingSlipNumber: ''
-        }
-        break
-
-      case StaffPaymentOptions.NO_FEE:
-        staffPaymentData = {
-          option: StaffPaymentOptions.NO_FEE,
-          routingSlipNumber: '',
-          isPriority: false,
-          bcolAccountNumber: '',
-          datNumber: '',
-          folioNumber: ''
-        }
-        break
-
-      case StaffPaymentOptions.NONE: // should never happen
-        break
-    }
-
-    this.setStaffPayment(staffPaymentData)
-  }
-
-  /** Emits Have Data event. */
-  @Emit('haveData')
-  private emitHaveData (haveData: Boolean = true): void {}
-
-  /** Emits error to app.vue for handling */
-  @Emit('error')
-  private emitError (error: ErrorIF): void {
-    console.error(error)
-  }
-
-  /** Called when App is ready and this component can load its data. */
-  @Watch('appReady')
-  private async onAppReady (val: boolean): Promise<void> {
-    // do not proceed if app is not ready
-    if (!val) return
-    // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
-    if (!this.isAuthenticated || (!this.isJestRunning && !getFeatureFlag('mhr-ui-enabled'))) {
-      this.$router.push({
+    const goToDashboard = (): void => {
+      context.root.$router.push({
         name: RouteNames.DASHBOARD
       })
-      return
+      emitHaveData(false)
     }
 
-    // get registration data from api and load into store
-    this.submitting = true
-    this.submitting = false
+    const goToSearchResult = (): void => {
+      context.root.$router.push({
+        name: RouteNames.MHRSEARCH
+      })
+    }
 
-    // page is ready to view
-    this.emitHaveData(true)
-    this.dataLoaded = true
+    const setFolioValid = (valid: boolean): void => {
+      localState.validFolio = valid
+    }
+
+    const showDialog = (): void => {
+      localState.showCancelDialog = true
+    }
+
+    const submit = async (): Promise<void> => {
+      localState.validating = true
+      await nextTick()
+      if (!localState.validFolio || (
+        (getIsStaffClientPayment.value && !isRoleStaffSbc.value) && !localState.staffPaymentValid)
+      ) {
+        localState.showErrors = true
+        document.getElementById('staff-payment-dialog').scrollIntoView({ behavior: 'smooth' })
+        return
+      }
+      localState.submitting = true
+      let apiResponse
+      if (isRoleStaffReg.value) {
+        apiResponse = await submitSelectedMhr(
+          getManufacturedHomeSearchResults.value.searchId,
+          uniqBy(getSelectedManufacturedHomes.value, UIMHRSearchTypeValues.MHRMHR_NUMBER),
+          getFolioOrReferenceNumber.value,
+          getStaffPayment.value,
+          isSearchCertified.value
+        )
+      } else {
+        apiResponse = await submitSelectedMhr(
+          getManufacturedHomeSearchResults.value.searchId,
+          uniqBy(getSelectedManufacturedHomes.value, UIMHRSearchTypeValues.MHRMHR_NUMBER),
+          getFolioOrReferenceNumber.value
+        )
+      }
+      localState.submitting = false
+      if (apiResponse === undefined || apiResponse !== 200) {
+        // Expand Error Handling
+        console.error('Api Error: ' + apiResponse)
+      } else {
+        // On success return to dashboard
+        goToDashboard()
+      }
+    }
+
+    /** Called when component's staff payment data has been updated. */
+    const onStaffPaymentDataUpdate = (val: StaffPaymentIF) => {
+      let staffPaymentData: StaffPaymentIF = {
+        ...val
+      }
+
+      if (staffPaymentData.routingSlipNumber || staffPaymentData.bcolAccountNumber || staffPaymentData.datNumber) {
+        localState.validating = true
+      } else {
+        if (staffPaymentData.option !== localState.paymentOption) {
+          localState.validating = false
+          localState.paymentOption = staffPaymentData.option
+        }
+      }
+
+      // disable validation
+      switch (staffPaymentData.option) {
+        case StaffPaymentOptions.FAS:
+          staffPaymentData = {
+            option: StaffPaymentOptions.FAS,
+            routingSlipNumber: staffPaymentData.routingSlipNumber,
+            isPriority: staffPaymentData.isPriority,
+            bcolAccountNumber: '',
+            datNumber: '',
+            folioNumber: ''
+          }
+          break
+
+        case StaffPaymentOptions.BCOL:
+          staffPaymentData = {
+            option: StaffPaymentOptions.BCOL,
+            bcolAccountNumber: staffPaymentData.bcolAccountNumber,
+            datNumber: staffPaymentData.datNumber,
+            folioNumber: staffPaymentData.folioNumber,
+            isPriority: staffPaymentData.isPriority,
+            routingSlipNumber: ''
+          }
+          break
+
+        case StaffPaymentOptions.NO_FEE:
+          staffPaymentData = {
+            option: StaffPaymentOptions.NO_FEE,
+            routingSlipNumber: '',
+            isPriority: false,
+            bcolAccountNumber: '',
+            datNumber: '',
+            folioNumber: ''
+          }
+          break
+
+        case StaffPaymentOptions.NONE: // should never happen
+          break
+      }
+
+      setStaffPayment(staffPaymentData)
+    }
+
+    /** Called when App is ready and this component can load its data. */
+    const onAppReady = (val: boolean): Promise<void> => {
+      // do not proceed if app is not ready
+      if (!val) return
+
+      // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
+      if (!localState.isAuthenticated || (!props.isJestRunning && !getFeatureFlag('mhr-ui-enabled'))) {
+        context.root.$router.push({
+          name: RouteNames.DASHBOARD
+        })
+        return
+      }
+
+      // get registration data from api and load into store
+      localState.submitting = true
+      localState.submitting = false
+
+      // page is ready to view
+      emitHaveData(true)
+      localState.dataLoaded = true
+    }
+
+    /** Emits Have Data event. */
+    const emitHaveData = (haveData: Boolean = true): void => {
+      context.emit('haveData', haveData)
+    }
+
+    watch(() => props.appReady, (val: boolean) => {
+      onAppReady(val)
+    })
+
+    return {
+      submit,
+      showDialog,
+      setFolioValid,
+      isRoleStaffSbc,
+      handleDialogResp,
+      goToSearchResult,
+      setSearchCertified,
+      getIsStaffClientPayment,
+      onStaffPaymentDataUpdate,
+      ...toRefs(localState)
+    }
   }
-}
+})
 </script>
 
 <style lang="scss" module>

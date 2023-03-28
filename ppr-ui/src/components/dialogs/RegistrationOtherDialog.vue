@@ -39,40 +39,63 @@
 </template>
 
 <script lang="ts">
-// external
-import { Component, Vue, Prop, Emit, Watch } from 'vue-property-decorator'
-import { Action } from 'vuex-class'
+import { defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
+import { useActions } from 'vuex-composition-helpers'
+// eslint-disable-next-line no-unused-vars
+import { DialogOptionsIF } from '@/interfaces'
 
-// local
-import { ActionBindingIF, DialogOptionsIF } from '@/interfaces' // eslint-disable-line
+export default defineComponent({
+  name: 'RegistrationOtherDialog',
+  emits: ['proceed'],
+  props: {
+    attach: {
+      type: String,
+      default: ''
+    },
+    display: {
+      type: Boolean,
+      default: false
+    },
+    options: {
+      type: Object as () => DialogOptionsIF,
+      default: null
+    }
+  },
+  setup (props, context) {
+    const {
+      setRegistrationTypeOtherDesc
+    } = useActions<any>([
+      'setRegistrationTypeOtherDesc'
+    ])
 
-@Component({})
-export default class RegistrationOtherDialog extends Vue {
-  @Action setRegistrationTypeOtherDesc: ActionBindingIF
+    const localState = reactive({
+      validationErrors: '',
+      userInput: ''
+    })
 
-  @Prop() private attach: string
-  @Prop() private display: boolean
-  @Prop() private options: DialogOptionsIF
+    const submit = (): void => {
+      if (localState.userInput) {
+        setRegistrationTypeOtherDesc(localState.userInput)
+        proceed(true)
+      } else {
+        localState.validationErrors = 'This field is required'
+      }
+    }
+    const proceed = (val: boolean) => {
+      context.emit('proceed', val)
+    }
 
-  private validationErrors = ''
-  private userInput = ''
+    watch(() => localState.userInput, (val: string) => {
+      if (!val) localState.validationErrors = 'This field is required'
+    })
 
-  private submit (): void {
-    if (this.userInput) {
-      this.setRegistrationTypeOtherDesc(this.userInput)
-      this.proceed(true)
-    } else {
-      this.validationErrors = 'This field is required'
+    return {
+      submit,
+      proceed,
+      ...toRefs(localState)
     }
   }
-
-  @Watch('userInput')
-  private validateInput (val: string): void {
-    if (!val) this.validationErrors = 'This field is required'
-  }
-
-  @Emit() private proceed (val: boolean) { }
-}
+})
 </script>
 
 <style lang="scss" scoped>

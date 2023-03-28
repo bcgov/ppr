@@ -132,7 +132,7 @@
         <v-row no-gutters style="padding: 0 30px;">
           <v-col cols="3" class="generic-label pt-6">Date of Order</v-col>
           <v-col cols="9" class="pt-4">
-            <date-picker
+            <SharedDatePicker
               id="court-date-text-field"
               nudge-right="40"
               ref="datePickerRef"
@@ -185,7 +185,7 @@ import {
 import { useGetters, useActions } from 'vuex-composition-helpers'
 import { isEqual } from 'lodash'
 // bcregistry
-import { DatePicker } from '@bcrs-shared-components/date-picker'
+import SharedDatePicker from '@/components/common/SharedDatePicker.vue'
 // local
 import { APIRegistrationTypes } from '@/enums'
 import { CourtOrderIF } from '@/interfaces' // eslint-disable-line no-unused-vars
@@ -194,7 +194,7 @@ import { useCourtOrderValidation } from './composables'
 
 export default defineComponent({
   components: {
-    DatePicker
+    SharedDatePicker
   },
   props: {
     setShowErrors: {

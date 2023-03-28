@@ -32,7 +32,7 @@
             </div>
           </v-col>
           <v-col cols="9" class="pl-2">
-            <date-picker
+            <SharedDatePicker
               id="death-date-time"
               clearable
               ref="deathDateTimeRef"
@@ -68,11 +68,11 @@
 </template>
 
 <script lang="ts">
-import { DatePicker } from '@bcrs-shared-components/date-picker'
 import { useInputRules, useHomeOwners } from '@/composables'
 import { computed, defineComponent, nextTick, reactive, ref, toRefs, watch } from '@vue/composition-api'
 import { useActions } from 'vuex-composition-helpers'
 import { FormIF, MhrRegistrationHomeOwnerIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { SharedDatePicker } from '@/components/common'
 import { localTodayDate } from '@/utils'
 
 export default defineComponent({
@@ -88,7 +88,7 @@ export default defineComponent({
       default: false
     }
   },
-  components: { DatePicker },
+  components: { SharedDatePicker },
   setup (props, context) {
     const { customRules, required, maxLength } = useInputRules()
 

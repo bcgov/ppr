@@ -56,27 +56,20 @@
 </template>
 
 <script lang="ts">
-// External
-import { Component, Watch, Mixins } from 'vue-property-decorator'
+import { computed, defineComponent, onBeforeMount, reactive, toRefs, watch } from '@vue/composition-api'
+import { useActions, useGetters } from 'vuex-composition-helpers'
 import { Route } from 'vue-router' // eslint-disable-line
-import { Action, Getter } from 'vuex-class'
 import { StatusCodes } from 'http-status-codes'
-
-// BC Registry
 import KeycloakService from 'sbc-common-components/src/services/keycloak.services'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import SbcHeader from 'sbc-common-components/src/components/SbcHeader.vue'
 import SbcFooter from 'sbc-common-components/src/components/SbcFooter.vue'
 import SbcSystemBanner from 'sbc-common-components/src/components/SbcSystemBanner.vue'
 import SbcAuthenticationOptionsDialog from 'sbc-common-components/src/components/SbcAuthenticationOptionsDialog.vue'
-
-// local Components
 import * as Dialogs from '@/components/dialogs'
 import { Breadcrumb } from '@/components/common'
 import { Tombstone } from '@/components/tombstone'
 import * as Views from '@/views'
-// local Mixins, utils, etc
-import { AuthMixin } from '@/mixins'
 import {
   authPprError, authAssetsError, draftDeleteError, historyRegError, loginError, openDocError, paymentErrorReg,
   paymentErrorSearch, registrationCompleteError, registrationDeleteError, registrationLoadError,
@@ -90,9 +83,8 @@ import {
   getSbcFromAuth,
   navigate,
   updateLdUser,
-  fetchAccountProducts
+  fetchAccountProducts, axios
 } from '@/utils'
-// local Enums, Constants, Interfaces
 import { FeeCodes } from '@/composables/fees/enums'
 import {
   AccountProductCodes, AccountProductMemberships, AccountProductRoles, APIRegistrationTypes,
@@ -100,11 +92,12 @@ import {
   ErrorCodes, ProductStatus, RegistrationFlowType, RouteNames, ProductCode
 } from '@/enums'
 import {
-  AccountProductSubscriptionIF, ActionBindingIF, DialogOptionsIF, // eslint-disable-line
-  AccountModelIF, ErrorIF, RegistrationTypeIF, UserInfoIF, UserSettingsIF // eslint-disable-line
+  AccountProductSubscriptionIF, DialogOptionsIF, // eslint-disable-line
+  ErrorIF, UserInfoIF, UserSettingsIF // eslint-disable-line
 } from '@/interfaces'
 
-@Component({
+export default defineComponent({
+  name: 'App',
   components: {
     Breadcrumb,
     SbcHeader,
@@ -114,620 +107,632 @@ import {
     Tombstone,
     ...Dialogs,
     ...Views
-  }
-})
-export default class App extends Mixins(AuthMixin) {
-  // Global getters
-  @Getter getRegistrationFlowType: RegistrationFlowType
-  @Getter getRegistrationType: RegistrationTypeIF
-  @Getter getAccountModel: AccountModelIF
-  @Getter getRegistrationOther: string
-  @Getter getUserEmail!: string
-  @Getter getUserFirstName!: string
-  @Getter getUserLastName!: string
-  @Getter getUserRoles!: string
-  @Getter getUserProductSubscriptionsCodes: Array<ProductCode>
-  @Getter getUserUsername!: string
-  @Getter hasUnsavedChanges: Boolean
-  @Getter isPremiumAccount!: boolean
-  @Getter isRoleStaff!: boolean
-  @Getter isRoleStaffBcol!: boolean
-  @Getter isRoleStaffReg!: boolean
-  @Getter hasPprEnabled!: boolean
-  @Getter hasMhrEnabled!: boolean
+  },
+  setup (props, context) {
+    const {
+      isRoleStaff,
+      isRoleStaffBcol,
+      isRoleStaffReg,
+      hasPprEnabled,
+      hasMhrEnabled,
+      getAccountModel,
+      getUserEmail,
+      getUserFirstName,
+      getUserLastName,
+      getUserRoles,
+      getUserUsername,
+      hasUnsavedChanges,
+      getRegistrationType,
+      getRegistrationOther,
+      getRegistrationFlowType,
+      getUserProductSubscriptionsCodes
+    } = useGetters([
+      'isRoleStaff',
+      'isRoleStaffBcol',
+      'isRoleStaffReg',
+      'hasPprEnabled',
+      'hasMhrEnabled',
+      'getAccountModel',
+      'getUserEmail',
+      'getUserFirstName',
+      'getUserLastName',
+      'getUserRoles',
+      'getUserUsername',
+      'hasUnsavedChanges',
+      'getRegistrationType',
+      'getRegistrationOther',
+      'getRegistrationFlowType',
+      'getUserProductSubscriptionsCodes'
+    ])
 
-  // Global setter
-  @Action setAuthRoles: ActionBindingIF
-  @Action setAccountProductSubscribtion!: ActionBindingIF
-  @Action setAccountInformation!: ActionBindingIF
-  @Action setKeycloakRoles!: ActionBindingIF
-  @Action setRegistrationNumber!: ActionBindingIF
-  @Action setUserInfo: ActionBindingIF
-  @Action setRoleSbc: ActionBindingIF
-  @Action setUserProductSubscriptions: ActionBindingIF
-  @Action setUserProductSubscriptionsCodes: ActionBindingIF
-
-  // Local Properties
-  private currentPath = ''
-  private currentPathName: RouteNames = null
-  private errorDisplay = false
-  private errorOptions: DialogOptionsIF = loginError
-  private saveDraftExitToggle = false
-  private payErrorDisplay = false
-  private payErrorOptions: DialogOptionsIF = null
-
-  // FUTURE: change profileReady/appReady/haveData to a state machine?
-
-  /** Whether the user profile is ready (ie, auth is loaded) and we can init the app. */
-  private profileReady: boolean = false
-
-  /** Whether the app is ready and the views can now load their data. */
-  private appReady: boolean = false
-
-  /** Whether the views have loaded their data and the spinner can be hidden. */
-  private haveData: boolean = false
-
-  /** Whether the app is in the process of logging out or not */
-  private loggedOut: boolean = false
-
-  /** Whether the token refresh service is initialized. */
-  private tokenService: boolean = false
-
-  /** The registry URL. */
-  private get registryUrl (): string {
-    // if REGISTRY_URL does not exist this will return 'undefined'. Needs to be null or str
-    const configRegistryUrl = sessionStorage.getItem('REGISTRY_URL')
-    if (configRegistryUrl) return configRegistryUrl
-    return null
-  }
-
-  private get systemMessage (): string {
-    // if SYSTEM_MESSAGE does not exist this will return 'undefined'. Needs to be null or str
-    const systemMessage = sessionStorage.getItem('SYSTEM_MESSAGE')
-    if (systemMessage) return systemMessage
-    return null
-  }
-
-  private get systemMessageType (): string {
-    // if SYSTEM_MESSAGE_TYPE does not exist this will return 'undefined'. Needs to be null or str
-    const systemMessageType = sessionStorage.getItem('SYSTEM_MESSAGE_TYPE')
-    if (systemMessageType) return systemMessageType
-    return null
-  }
-
-  /** True if Jest is running the code. */
-  private get isJestRunning (): boolean {
-    return (process.env.JEST_WORKER_ID !== undefined)
-  }
-
-  /** Whether user is authenticated. */
-  private get isAuthenticated (): boolean {
-    return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
-  }
-
-  /** The About text. */
-  private get aboutText (): string {
-    return process.env.ABOUT_TEXT
-  }
-
-  private get isProd (): boolean {
-    var env = sessionStorage.getItem('POD_NAMESPACE')
-    if (env != null && env.trim().length > 0) {
-      return Boolean(env.toLowerCase().endsWith('prod'))
-    }
-    return Boolean(false)
-  }
-
-  private get registrationTypeUI (): string {
-    if (this.getRegistrationType?.registrationTypeAPI === APIRegistrationTypes.OTHER) {
-      return this.getRegistrationOther || ''
-    }
-    return this.getRegistrationType?.registrationTypeUI || ''
-  }
-
-  /**
-   * Called when component is created.
-   * NB: User may not be authed yet.
-   */
-  private created (): void {
-    if (this.$route?.query?.logout) {
-      this.loggedOut = true
-      sessionStorage.removeItem(SessionStorageKeys.KeyCloakToken)
-      this.$router.push(`${window.location.origin}`)
-    } else {
-      this.loggedOut = false
-      // before unloading this page, if there are changes then prompt user
-      window.onbeforeunload = (event) => {
-        const changeRoutes = [
-          RouteNames.RENEW_REGISTRATION,
-          RouteNames.CONFIRM_RENEWAL,
-          RouteNames.REVIEW_DISCHARGE,
-          RouteNames.CONFIRM_DISCHARGE
-        ]
-        const newAmendRoutes = [
-          RouteNames.AMEND_REGISTRATION,
-          RouteNames.CONFIRM_AMENDMENT,
-          RouteNames.LENGTH_TRUST,
-          RouteNames.ADD_SECUREDPARTIES_AND_DEBTORS,
-          RouteNames.ADD_COLLATERAL,
-          RouteNames.REVIEW_CONFIRM
-        ]
-        const mhrRoutes = [
-          RouteNames.YOUR_HOME,
-          RouteNames.SUBMITTING_PARTY,
-          RouteNames.HOME_OWNERS,
-          RouteNames.HOME_LOCATION,
-          RouteNames.MHR_REVIEW_CONFIRM,
-          RouteNames.MHR_INFORMATION
-        ]
-
-        const routeName = this.$router.currentRoute.name as RouteNames
-        if ((changeRoutes.includes(routeName) || newAmendRoutes.includes(routeName) || mhrRoutes.includes(routeName)) &&
-          this.hasUnsavedChanges) {
-          // browser popup
-          event.preventDefault()
-          // NB: custom text is no longer supported in any major browsers due to security reasons.
-          // 'event.returnValue' is treated as a flag
-          event.returnValue = 'You have unsaved changes. Are you sure you want to leave?'
+    const {
+      setRoleSbc,
+      setUserInfo,
+      setAuthRoles,
+      setRegistrationNumber,
+      setAccountInformation,
+      setUserProductSubscriptions,
+      setAccountProductSubscription,
+      setUserProductSubscriptionsCodes
+    } = useActions([
+      'setRoleSbc',
+      'setUserInfo',
+      'setAuthRoles',
+      'setRegistrationNumber',
+      'setAccountInformation',
+      'setUserProductSubscriptions',
+      'setAccountProductSubscription',
+      'setUserProductSubscriptionsCodes'
+    ])
+    const localState = reactive({
+      currentPath: '',
+      currentPathName: null as RouteNames,
+      errorDisplay: false,
+      errorOptions: loginError as DialogOptionsIF,
+      saveDraftExitToggle: false,
+      payErrorDisplay: false,
+      payErrorOptions: null as DialogOptionsIF,
+      profileReady: false,
+      appReady: false,
+      haveData: false,
+      loggedOut: false,
+      tokenService: false,
+      registryUrl: computed((): string => {
+        // if REGISTRY_URL does not exist this will return 'undefined'. Needs to be null or str
+        const configRegistryUrl = sessionStorage.getItem('REGISTRY_URL')
+        if (configRegistryUrl) return configRegistryUrl
+        return null
+      }),
+      systemMessage: computed((): string => {
+        // if SYSTEM_MESSAGE does not exist this will return 'undefined'. Needs to be null or str
+        const systemMessage = sessionStorage.getItem('SYSTEM_MESSAGE')
+        if (systemMessage) return systemMessage
+        return null
+      }),
+      systemMessageType: computed((): string => {
+        // if SYSTEM_MESSAGE_TYPE does not exist this will return 'undefined'. Needs to be null or str
+        const systemMessageType = sessionStorage.getItem('SYSTEM_MESSAGE_TYPE')
+        if (systemMessageType) return systemMessageType
+        return null
+      }),
+      isJestRunning: computed((): boolean => {
+        return (process.env.JEST_WORKER_ID !== undefined)
+      }),
+      isAuthenticated: computed((): boolean => {
+        return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
+      }),
+      aboutText: computed((): string => {
+        return process.env.ABOUT_TEXT
+      }),
+      isProd: computed((): boolean => {
+        const env = sessionStorage.getItem('POD_NAMESPACE')
+        if (env != null && env.trim().length > 0) {
+          return Boolean(env.toLowerCase().endsWith('prod'))
         }
-      }
-
-      // When we are authenticated, allow time for session storage propagation from auth, then initialize application
-      // (since we won't get the event from Signin component)
-      if (this.isAuthenticated) {
-        setTimeout(() => { this.onProfileReady(true) }, this.isJestRunning ? 0 : 1000)
-      }
-    }
-  }
-
-  private payErrorDialogHandler () {
-    this.payErrorDisplay = false
-    if ([RegistrationFlowType.NEW, RegistrationFlowType.AMENDMENT].includes(this.getRegistrationFlowType)) {
-      this.saveDraftExitToggle = !this.saveDraftExitToggle
-    } else {
-      this.setRegistrationNumber(null)
-      this.$router.push({ name: RouteNames.DASHBOARD })
-    }
-  }
-
-  @Watch('$route', { immediate: true, deep: true })
-  onUrlChange (newVal: Route) {
-    this.currentPath = newVal.path
-    this.currentPathName = newVal.name as RouteNames
-  }
-
-  /** Called when profile is ready -- we can now init app. */
-  @Watch('profileReady')
-  private async onProfileReady (val: boolean): Promise<void> {
-    //
-    // do the one-time things here
-    //
-    if (val && !this.loggedOut) {
-      // start KC token service
-      await this.startTokenService()
-
-      // load account information
-      this.loadAccountInformation()
-
-      // initialize app
-      await this.initApp()
-
-      // set browser title
-      this.setBrowserTitle()
-    }
-  }
-
-  /** Initializes application. Also called for retry. */
-  private async initApp (): Promise<void> {
-    //
-    // do the repeatable things here
-    //
-
-    // reset errors in case of retry
-    this.resetFlags()
-
-    // ensure user is authorized for this profile
-    const authResp = await this.loadAuth()
-    if (authResp.statusCode !== StatusCodes.OK) {
-      console.error(authResp.message)
-      this.handleError(authResp)
-      // show stopper so return
-      return
-    }
-
-    // load user info
-    const userInfoResp = await this.loadUserInfo()
-    if (userInfoResp.statusCode !== StatusCodes.OK) {
-      console.error(userInfoResp.message)
-      this.handleError(userInfoResp)
-      // show stopper so return
-      return
-    }
-
-    try {
-      await this.loadAccountProductSubscriptions()
-    } catch (error) {
-      console.error('Auth product subscription error = ', error)
-      // not a show stopper so continue
-      // this.handleError({
-      //   message: String(error),
-      //   statusCode: StatusCodes.INTERNAL_SERVER_ERROR
-      //   // TODO: add error code for get subscriptions error
-      // })
-    }
-
-    // update Launch Darkly
-    if (!this.isJestRunning) {
-      try {
-        await this.updateLaunchDarkly()
-      } catch (error) {
-        // just log the error -- no need to halt app
-        console.error('Launch Darkly update error = ', error)
-      }
-    }
-
-    // Safety check for client account products
-    if (!this.isRoleStaff && !this.isRoleStaffReg && !this.isRoleStaffBcol && !this.hasPprEnabled &&
-      !this.hasMhrEnabled) {
-      this.handleError({
-        category: ErrorCategories.PRODUCT_ACCESS,
-        message: '',
-        statusCode: StatusCodes.UNAUTHORIZED
+        return Boolean(false)
+      }),
+      registrationTypeUI: computed((): string => {
+        if (getRegistrationType.value?.registrationTypeAPI === APIRegistrationTypes.OTHER) {
+          return getRegistrationOther.value || ''
+        }
+        return getRegistrationType.value?.registrationTypeUI || ''
       })
-      return
-    }
+    })
 
-    // finally, let router views know they can load their data
-    this.appReady = true
-  }
-
-  /** Starts token service that refreshes KC token periodically. */
-  private async startTokenService (): Promise<void> {
-    // only initialize once
-    // don't start during Jest tests as it messes up the test JWT
-    if (this.tokenService || this.isJestRunning) return
-
-    try {
-      console.info('Starting token refresh service...')
-      await KeycloakService.initializeToken()
-      this.tokenService = true
-    } catch (e) {
-      // this happens when the refresh token has expired
-      // 1. clear flags and keycloak data
-      this.tokenService = false
-      this.profileReady = false
-      sessionStorage.removeItem(SessionStorageKeys.KeyCloakToken)
-      sessionStorage.removeItem(SessionStorageKeys.KeyCloakRefreshToken)
-      sessionStorage.removeItem(SessionStorageKeys.KeyCloakIdToken)
-      sessionStorage.removeItem(SessionStorageKeys.CurrentAccount)
-      // 2. reload app to get new tokens
-      location.reload()
-    }
-  }
-
-  /** Resets all error flags/states. */
-  private resetFlags (): void {
-    this.appReady = false
-    this.haveData = false
-    this.errorDisplay = false
-    this.payErrorDisplay = false
-  }
-
-  /** Fetches authorizations and verifies and stores roles. */
-  private async loadAuth (): Promise<ErrorIF> {
-    // save roles from the keycloak token
-    let message = ''
-    let statusCode = StatusCodes.OK
-    try {
-      const authRoles = getKeycloakRoles()
-      if (authRoles && authRoles.length > 0) {
-        if (authRoles.includes('gov_account_user')) {
-          // if staff make call to check for sbc
-          const isSbc = await getSbcFromAuth()
-          this.setRoleSbc(isSbc)
-          isSbc && authRoles.push('sbc')
-        }
-        if (!authRoles.includes('ppr') && !authRoles.includes('mhr')) {
-          throw new Error('No access to Assets')
-        }
-        this.setAuthRoles(authRoles)
+    onBeforeMount((): void => {
+      if (context.root.$route?.query?.logout) {
+        localState.loggedOut = true
+        sessionStorage.removeItem(SessionStorageKeys.KeyCloakToken)
+        context.root.$router.push(`${window.location.origin}`)
       } else {
-        throw new Error('Invalid auth roles')
-      }
-    } catch (error) {
-      message = String(error)
-      statusCode = StatusCodes.UNAUTHORIZED
-    }
-    return {
-      category: ErrorCategories.ACCOUNT_ACCESS,
-      message: message,
-      statusCode: statusCode
-    }
-  }
+        localState.loggedOut = false
+        // before unloading this page, if there are changes then prompt user
+        window.onbeforeunload = (event) => {
+          const changeRoutes = [
+            RouteNames.RENEW_REGISTRATION,
+            RouteNames.CONFIRM_RENEWAL,
+            RouteNames.REVIEW_DISCHARGE,
+            RouteNames.CONFIRM_DISCHARGE
+          ]
+          const newAmendRoutes = [
+            RouteNames.AMEND_REGISTRATION,
+            RouteNames.CONFIRM_AMENDMENT,
+            RouteNames.LENGTH_TRUST,
+            RouteNames.ADD_SECUREDPARTIES_AND_DEBTORS,
+            RouteNames.ADD_COLLATERAL,
+            RouteNames.REVIEW_CONFIRM
+          ]
+          const mhrRoutes = [
+            RouteNames.YOUR_HOME,
+            RouteNames.SUBMITTING_PARTY,
+            RouteNames.HOME_OWNERS,
+            RouteNames.HOME_LOCATION,
+            RouteNames.MHR_REVIEW_CONFIRM,
+            RouteNames.MHR_INFORMATION
+          ]
 
-  /** Fetches current user info and stores it. */
-  private async loadUserInfo (): Promise<ErrorIF> {
-    // auth api user info
-    const response = await this.fetchCurrentUser()
-    let message = ''
-    let statusCode = response.status
-    const userInfo: UserInfoIF = response?.data
-    if (userInfo && statusCode === StatusCodes.OK) {
-      // set ppr api user settings
-      const settings: UserSettingsIF = await getPPRUserSettings()
-      userInfo.settings = settings
-      if (settings?.error) {
-        message = 'Unable to get user settings.'
-        statusCode = settings.error.statusCode
-      } else if (!this.isRoleStaff) {
-        // check if non-billable
-        userInfo.feeSettings = null
-        const fees = await getFees(FeeCodes.SEARCH)
-        if (fees.error) {
-          message = 'Unable to check if user is non billable.'
-          statusCode = fees.error.statusCode
-        } else if (fees?.filingFees === 0) {
-          userInfo.feeSettings = {
-            isNonBillable: true,
-            serviceFee: fees?.serviceFees || 1.50
+          const routeName = context.root.$router.currentRoute.name as RouteNames
+          if (
+            (changeRoutes.includes(routeName) || newAmendRoutes.includes(routeName) || mhrRoutes.includes(routeName)) &&
+            hasUnsavedChanges.value) {
+            // browser popup
+            event.preventDefault()
+            // NB: custom text is no longer supported in any major browsers due to security reasons.
+            // 'event.returnValue' is treated as a flag
+            event.returnValue = 'You have unsaved changes. Are you sure you want to leave?'
           }
         }
+
+        // When we are authenticated, allow time for session storage propagation from auth, then initialize application
+        // (since we won't get the event from Signin component)
+        if (localState.isAuthenticated) {
+          setTimeout(() => { onProfileReady(true) }, localState.isJestRunning ? 0 : 1000)
+        }
       }
-      this.setUserInfo(userInfo)
+    })
 
-      const accountId = this.getAccountModel?.currentAccount?.id
+    const payErrorDialogHandler = () => {
+      localState.payErrorDisplay = false
+      if ([RegistrationFlowType.NEW, RegistrationFlowType.AMENDMENT].includes(getRegistrationFlowType.value)) {
+        localState.saveDraftExitToggle = !localState.saveDraftExitToggle
+      } else {
+        setRegistrationNumber(null)
+        context.root.$router.push({ name: RouteNames.DASHBOARD })
+      }
+    }
 
-      if (accountId) {
-        const subscribedProducts = await fetchAccountProducts(accountId)
-        if (subscribedProducts) {
-          this.setUserProductSubscriptions(subscribedProducts)
+    /** Initializes application. Also called for retry. */
+    const initApp = async (): Promise<void> => {
+      // reset errors in case of retry
+      resetFlags()
 
-          const activeProductCodes = subscribedProducts
-            .filter(product => product.subscriptionStatus === ProductStatus.ACTIVE)
-            .map(product => product.code)
-          this.setUserProductSubscriptionsCodes(activeProductCodes)
+      // ensure user is authorized for this profile
+      const authResp = await loadAuth()
+      if (authResp.statusCode !== StatusCodes.OK) {
+        console.error(authResp.message)
+        handleError(authResp)
+        // show stopper so return
+        return
+      }
+
+      // load user info
+      const userInfoResp = await loadUserInfo()
+      if (userInfoResp.statusCode !== StatusCodes.OK) {
+        console.error(userInfoResp.message)
+        handleError(userInfoResp)
+        // show stopper so return
+        return
+      }
+
+      try {
+        await loadAccountProductSubscriptions()
+      } catch (error) {
+        console.error('Auth product subscription error = ', error)
+        // not a show stopper so continue
+        // this.handleError({
+        //   message: String(error),
+        //   statusCode: StatusCodes.INTERNAL_SERVER_ERROR
+        //   // TODO: add error code for get subscriptions error
+        // })
+      }
+
+      // update Launch Darkly
+      if (!localState.isJestRunning) {
+        try {
+          await updateLaunchDarkly()
+        } catch (error) {
+          // just log the error -- no need to halt app
+          console.error('Launch Darkly update error = ', error)
+        }
+      }
+
+      // Safety check for client account products
+      if (!isRoleStaff.value && !isRoleStaffReg.value && !isRoleStaffBcol.value && !hasPprEnabled.value &&
+        !hasMhrEnabled.value) {
+        handleError({
+          category: ErrorCategories.PRODUCT_ACCESS,
+          message: '',
+          statusCode: StatusCodes.UNAUTHORIZED
+        })
+        return
+      }
+
+      // finally, let router views know they can load their data
+      localState.appReady = true
+    }
+
+    /** Starts token service that refreshes KC token periodically. */
+    const startTokenService = async (): Promise<void> => {
+      // only initialize once
+      // don't start during Jest tests as it messes up the test JWT
+      if (localState.tokenService || localState.isJestRunning) return
+
+      try {
+        console.info('Starting token refresh service...')
+        await KeycloakService.initializeToken()
+        localState.tokenService = true
+      } catch (e) {
+        // this happens when the refresh token has expired
+        // 1. clear flags and keycloak data
+        localState.tokenService = false
+        localState.profileReady = false
+        sessionStorage.removeItem(SessionStorageKeys.KeyCloakToken)
+        sessionStorage.removeItem(SessionStorageKeys.KeyCloakRefreshToken)
+        sessionStorage.removeItem(SessionStorageKeys.KeyCloakIdToken)
+        sessionStorage.removeItem(SessionStorageKeys.CurrentAccount)
+        // 2. reload app to get new tokens
+        location.reload()
+      }
+    }
+
+    /** Resets all error flags/states. */
+    const resetFlags = (): void => {
+      localState.appReady = false
+      localState.haveData = false
+      localState.errorDisplay = false
+      localState.payErrorDisplay = false
+    }
+
+    /** Fetches authorizations and verifies and stores roles. */
+    const loadAuth = async (): Promise<ErrorIF> => {
+      // save roles from the keycloak token
+      let message = ''
+      let statusCode = StatusCodes.OK
+      try {
+        const authRoles = getKeycloakRoles()
+        if (authRoles && authRoles.length > 0) {
+          if (authRoles.includes('gov_account_user')) {
+            // if staff make call to check for sbc
+            const isSbc = await getSbcFromAuth()
+            setRoleSbc(isSbc)
+            isSbc && authRoles.push('sbc')
+          }
+          if (!authRoles.includes('ppr') && !authRoles.includes('mhr')) {
+            throw new Error('No access to Assets')
+          }
+          setAuthRoles(authRoles)
         } else {
-          throw new Error('Unable to get Products for the User')
+          throw new Error('Invalid auth roles')
         }
+      } catch (error) {
+        message = String(error)
+        statusCode = StatusCodes.UNAUTHORIZED
       }
-    } else {
-      message = 'Unable to get user info.'
-    }
-    const resp: ErrorIF = {
-      category: ErrorCategories.ACCOUNT_SETTINGS,
-      message: message,
-      statusCode: statusCode
-    }
-    return resp
-  }
 
-  /** Gets user products and sets browser title accordingly. */
-  private setBrowserTitle (): void {
-    const userProducts = this.getUserProductSubscriptionsCodes
-    if (userProducts.includes(ProductCode.PPR) && userProducts.includes(ProductCode.MHR)) {
-      document.title = 'BC Asset Registries (MHR/PPR)'
-    } else if (userProducts.includes(ProductCode.MHR)) {
-      document.title = 'BC Manufactured Home Registry'
+      return {
+        category: ErrorCategories.ACCOUNT_ACCESS,
+        message: message,
+        statusCode: statusCode
+      }
     }
-  }
 
-  /** Gets account information (e.g. Premium account) and stores it. */
-  private loadAccountInformation (): void {
-    const currentAccount = sessionStorage.getItem(SessionStorageKeys.CurrentAccount)
-    if (currentAccount) {
-      const accountInfo = JSON.parse(currentAccount)
-      this.setAccountInformation(accountInfo)
-    }
-  }
-
-  /** Gets product subscription autorizations (for now just RPPR) and stores it. */
-  private async loadAccountProductSubscriptions (): Promise<any> {
-    let rpprSubscription = {} as AccountProductSubscriptionIF
-    if (this.isRoleStaff) {
-      rpprSubscription = {
-        [AccountProductCodes.RPPR]: {
-          membership: AccountProductMemberships.MEMBER,
-          roles: [AccountProductRoles.PAY, AccountProductRoles.SEARCH]
+    /** Fetches current user info and stores it. */
+    const loadUserInfo = async (): Promise<ErrorIF> => {
+      // auth api user info
+      const response = await fetchCurrentUser()
+      let message = ''
+      let statusCode = response.status
+      const userInfo: UserInfoIF = response?.data
+      if (userInfo && statusCode === StatusCodes.OK) {
+        // set ppr api user settings
+        const settings: UserSettingsIF = await getPPRUserSettings()
+        userInfo.settings = settings
+        if (settings?.error) {
+          message = 'Unable to get user settings.'
+          statusCode = settings.error.statusCode
+        } else if (!isRoleStaff.value) {
+          // check if non-billable
+          userInfo.feeSettings = null
+          const fees = await getFees(FeeCodes.SEARCH)
+          if (fees.error) {
+            message = 'Unable to check if user is non billable.'
+            statusCode = fees.error.statusCode
+          } else if (fees?.filingFees === 0) {
+            userInfo.feeSettings = {
+              isNonBillable: true,
+              serviceFee: fees?.serviceFees || 1.50
+            }
+          }
         }
-      }
-      if (this.isRoleStaffBcol || this.isRoleStaffReg) {
-        rpprSubscription.RPPR.roles.push(AccountProductRoles.EDIT)
-      }
-    } else rpprSubscription = await getProductSubscription(AccountProductCodes.RPPR)
-    this.setAccountProductSubscribtion(rpprSubscription)
-  }
+        setUserInfo(userInfo)
 
-  /** Updates Launch Darkly with user info. */
-  private async updateLaunchDarkly (): Promise<any> {
-    // since username is unique, use it as the user key
-    const key: string = this.getUserUsername
-    const email: string = this.getUserEmail
-    const firstName: string = this.getUserFirstName
-    const lastName: string = this.getUserLastName
-    // remove leading { and trailing } and tokenize string
-    const custom: any = { roles: this.getUserRoles }
+        const accountId = getAccountModel.value?.currentAccount?.id
 
-    await updateLdUser(key, email, firstName, lastName, custom)
-  }
+        if (accountId) {
+          const subscribedProducts = await fetchAccountProducts(accountId)
+          if (subscribedProducts) {
+            setUserProductSubscriptions(subscribedProducts)
 
-  private handleError (error: ErrorIF): void {
-    switch (error.category) {
-      case ErrorCategories.ACCOUNT_ACCESS:
-        this.errorOptions = authPprError
-        this.errorDisplay = true
-        break
-      case ErrorCategories.ACCOUNT_SETTINGS:
-        this.errorOptions = loginError
-        this.errorDisplay = true
-        break
-      case ErrorCategories.DRAFT_DELETE:
-        this.errorOptions = draftDeleteError
-        this.errorDisplay = true
-        break
-      case ErrorCategories.DRAFT_LOAD:
-        this.errorOptions = registrationOpenDraftError
-        this.errorDisplay = true
-        break
-      case ErrorCategories.HISTORY_REGISTRATIONS:
-        this.errorOptions = historyRegError
-        this.errorDisplay = true
-        break
-      case ErrorCategories.HISTORY_SEARCHES:
-        // handled inline
-        break
-      case ErrorCategories.PRODUCT_ACCESS:
-        this.errorOptions = authAssetsError
-        this.errorDisplay = true
-        break
-      case ErrorCategories.REGISTRATION_CREATE:
-        this.handleErrorRegCreate(error)
-        break
-      case ErrorCategories.REGISTRATION_DELETE:
-        this.errorOptions = registrationDeleteError
-        this.errorDisplay = true
-        break
-      case ErrorCategories.REGISTRATION_LOAD:
-        this.errorOptions = registrationLoadError
-        this.errorDisplay = true
-        this.$router.push({ name: RouteNames.DASHBOARD })
-        break
-      case ErrorCategories.REGISTRATION_SAVE:
-        this.errorOptions = registrationSaveDraftError
-        this.errorDisplay = true
-        break
-      case ErrorCategories.REPORT_GENERATION:
-        this.errorOptions = openDocError
-        this.errorDisplay = true
-        break
-      case ErrorCategories.SEARCH:
-        this.handleErrorSearch(error)
-        break
-      case ErrorCategories.SEARCH_COMPLETE:
-        // handled in search comp
-        break
-      case ErrorCategories.SEARCH_UPDATE:
-        // handled in search comp
-        break
-      default:
-        console.error('Unhandled error: ', error)
-    }
-  }
-
-  private handleErrorRegCreate (error: ErrorIF) {
-    // prep for registration payment issues
-    let filing = this.registrationTypeUI
-    if (this.getRegistrationFlowType !== RegistrationFlowType.NEW) {
-      filing = this.getRegistrationFlowType?.toLowerCase() || 'registration'
-    }
-    this.payErrorOptions = { ...paymentErrorReg }
-    if (this.registrationTypeUI) {
-      this.payErrorOptions.text = this.payErrorOptions.text.replace('filing_type', filing)
-    }
-    // errors with a 'type' are payment issues, other errors handles in 'default' logic
-    switch (error.type) {
-      case (
-        ErrorCodes.BCOL_ACCOUNT_CLOSED ||
-        ErrorCodes.BCOL_USER_REVOKED ||
-        ErrorCodes.BCOL_ACCOUNT_REVOKED ||
-        ErrorCodes.BCOL_UNAVAILABLE
-      ):
-        // bcol expected errors
-        if ([RegistrationFlowType.NEW, RegistrationFlowType.AMENDMENT].includes(this.getRegistrationFlowType)) {
-          this.payErrorOptions.text += '<br/><br/>' + error.detail +
-            `<br/><br/>Your ${filing} will be saved as a draft and you can retry your payment ` +
-            'once the issue has been resolved.'
-        } else {
-          this.payErrorOptions.acceptText = 'Return to Dashboard'
-          this.payErrorOptions.text += '<br/><br/>' + error.detail +
-            'You can retry your payment once the issue has been resolved.'
+            const activeProductCodes = subscribedProducts
+              .filter(product => product.subscriptionStatus === ProductStatus.ACTIVE)
+              .map(product => product.code)
+            setUserProductSubscriptionsCodes(activeProductCodes)
+          } else {
+            throw new Error('Unable to get Products for the User')
+          }
         }
-        this.payErrorDisplay = true
-        break
-      case ErrorCodes.ACCOUNT_IN_PAD_CONFIRMATION_PERIOD:
-        // pad expected errors
-        this.payErrorOptions.text += '<br/><br/>' + error.detail +
-          '<br/><br/>If this error continues after the waiting period has completed, please contact us.'
-        this.payErrorOptions.hasContactInfo = true
-        this.payErrorDisplay = true
-        break
-      default:
-        if (error.type && error.type?.includes('BCOL') && error.detail) {
-          // generic catch all bcol
-          if ([RegistrationFlowType.NEW, RegistrationFlowType.AMENDMENT].includes(this.getRegistrationFlowType)) {
-            this.payErrorOptions.text += '<br/><br/>' + error.detail +
+      } else {
+        message = 'Unable to get user info.'
+      }
+      const resp: ErrorIF = {
+        category: ErrorCategories.ACCOUNT_SETTINGS,
+        message: message,
+        statusCode: statusCode
+      }
+      return resp
+    }
+
+    /**
+     * Fetches current user data.
+     * @returns a promise to return the user data
+     */
+    const fetchCurrentUser = (): Promise<any> => {
+      const authUrl = sessionStorage.getItem('AUTH_API_URL')
+      const config = { baseURL: authUrl }
+      return axios.get('users/@me', config)
+    }
+
+    /** Gets user products and sets browser title accordingly. */
+    const setBrowserTitle = (): void => {
+      const userProducts = getUserProductSubscriptionsCodes.value
+      if (userProducts.includes(ProductCode.PPR) && userProducts.includes(ProductCode.MHR)) {
+        document.title = 'BC Asset Registries (MHR/PPR)'
+      } else if (userProducts.includes(ProductCode.MHR)) {
+        document.title = 'BC Manufactured Home Registry'
+      }
+    }
+
+    /** Gets account information (e.g. Premium account) and stores it. */
+    const loadAccountInformation = (): void => {
+      const currentAccount = sessionStorage.getItem(SessionStorageKeys.CurrentAccount)
+      if (currentAccount) {
+        const accountInfo = JSON.parse(currentAccount)
+        setAccountInformation(accountInfo)
+      }
+    }
+
+    /** Gets product subscription autorizations (for now just RPPR) and stores it. */
+    const loadAccountProductSubscriptions = async (): Promise<any> => {
+      let rpprSubscription = {} as AccountProductSubscriptionIF
+      if (isRoleStaff.value) {
+        rpprSubscription = {
+          [AccountProductCodes.RPPR]: {
+            membership: AccountProductMemberships.MEMBER,
+            roles: [AccountProductRoles.PAY, AccountProductRoles.SEARCH]
+          }
+        }
+        if (isRoleStaffBcol.value || isRoleStaffReg.value) {
+          rpprSubscription.RPPR.roles.push(AccountProductRoles.EDIT)
+        }
+      } else rpprSubscription = await getProductSubscription(AccountProductCodes.RPPR)
+      setAccountProductSubscription(rpprSubscription)
+    }
+
+    /** Updates Launch Darkly with user info. */
+    const updateLaunchDarkly = async (): Promise<any> => {
+      // since username is unique, use it as the user key
+      const key: string = getUserUsername.value
+      const email: string = getUserEmail.value
+      const firstName: string = getUserFirstName.value
+      const lastName: string = getUserLastName.value
+      // remove leading { and trailing } and tokenize string
+      const custom: any = { roles: getUserRoles.value }
+
+      await updateLdUser(key, email, firstName, lastName, custom)
+    }
+
+    const handleError = (error: ErrorIF): void => {
+      switch (error.category) {
+        case ErrorCategories.ACCOUNT_ACCESS:
+          localState.errorOptions = authPprError
+          localState.errorDisplay = true
+          break
+        case ErrorCategories.ACCOUNT_SETTINGS:
+          localState.errorOptions = loginError
+          localState.errorDisplay = true
+          break
+        case ErrorCategories.DRAFT_DELETE:
+          localState.errorOptions = draftDeleteError
+          localState.errorDisplay = true
+          break
+        case ErrorCategories.DRAFT_LOAD:
+          localState.errorOptions = registrationOpenDraftError
+          localState.errorDisplay = true
+          break
+        case ErrorCategories.HISTORY_REGISTRATIONS:
+          localState.errorOptions = historyRegError
+          localState.errorDisplay = true
+          break
+        case ErrorCategories.HISTORY_SEARCHES:
+          // handled inline
+          break
+        case ErrorCategories.PRODUCT_ACCESS:
+          localState.errorOptions = authAssetsError
+          localState.errorDisplay = true
+          break
+        case ErrorCategories.REGISTRATION_CREATE:
+          handleErrorRegCreate(error)
+          break
+        case ErrorCategories.REGISTRATION_DELETE:
+          localState.errorOptions = registrationDeleteError
+          localState.errorDisplay = true
+          break
+        case ErrorCategories.REGISTRATION_LOAD:
+          localState.errorOptions = registrationLoadError
+          localState.errorDisplay = true
+          context.root.$router.push({ name: RouteNames.DASHBOARD })
+          break
+        case ErrorCategories.REGISTRATION_SAVE:
+          localState.errorOptions = registrationSaveDraftError
+          localState.errorDisplay = true
+          break
+        case ErrorCategories.REPORT_GENERATION:
+          localState.errorOptions = openDocError
+          localState.errorDisplay = true
+          break
+        case ErrorCategories.SEARCH:
+          handleErrorSearch(error)
+          break
+        case ErrorCategories.SEARCH_COMPLETE:
+          // handled in search comp
+          break
+        case ErrorCategories.SEARCH_UPDATE:
+          // handled in search comp
+          break
+        default:
+          console.error('Unhandled error: ', error)
+      }
+    }
+
+    const handleErrorRegCreate = (error: ErrorIF) => {
+      // prep for registration payment issues
+      let filing = localState.registrationTypeUI
+      if (getRegistrationFlowType.value !== RegistrationFlowType.NEW) {
+        filing = getRegistrationFlowType.value?.toLowerCase() || 'registration'
+      }
+      localState.payErrorOptions = { ...paymentErrorReg }
+      if (localState.registrationTypeUI) {
+        localState.payErrorOptions.text = localState.payErrorOptions.text.replace('filing_type', filing)
+      }
+      // errors with a 'type' are payment issues, other errors handles in 'default' logic
+      switch (error.type) {
+        case (
+          ErrorCodes.BCOL_ACCOUNT_CLOSED ||
+          ErrorCodes.BCOL_USER_REVOKED ||
+          ErrorCodes.BCOL_ACCOUNT_REVOKED ||
+          ErrorCodes.BCOL_UNAVAILABLE
+        ):
+          // bcol expected errors
+          if ([RegistrationFlowType.NEW, RegistrationFlowType.AMENDMENT].includes(getRegistrationFlowType.value)) {
+            localState.payErrorOptions.text += '<br/><br/>' + error.detail +
               `<br/><br/>Your ${filing} will be saved as a draft and you can retry your payment ` +
               'once the issue has been resolved.'
           } else {
-            this.payErrorOptions.acceptText = 'Return to Dashboard'
-            this.payErrorOptions.text += '<br/><br/>' + error.detail +
+            localState.payErrorOptions.acceptText = 'Return to Dashboard'
+            localState.payErrorOptions.text += '<br/><br/>' + error.detail +
               'You can retry your payment once the issue has been resolved.'
           }
-          this.payErrorDisplay = true
-        } else if (error.statusCode === StatusCodes.PAYMENT_REQUIRED) {
-          // generic cath all pay error
-          this.payErrorOptions.text = '<b>The payment could not be completed at this time</b>' +
-            '<br/><br/>If this issue persists, please contact us.'
-          this.payErrorOptions.hasContactInfo = true
-          this.payErrorDisplay = true
-        } else {
-          this.errorOptions = registrationCompleteError
-          this.errorDisplay = true
-        }
+          localState.payErrorDisplay = true
+          break
+        case ErrorCodes.ACCOUNT_IN_PAD_CONFIRMATION_PERIOD:
+          // pad expected errors
+          localState.payErrorOptions.text += '<br/><br/>' + error.detail +
+            '<br/><br/>If this error continues after the waiting period has completed, please contact us.'
+          localState.payErrorOptions.hasContactInfo = true
+          localState.payErrorDisplay = true
+          break
+        default:
+          if (error.type && error.type?.includes('BCOL') && error.detail) {
+            // generic catch all bcol
+            if ([RegistrationFlowType.NEW, RegistrationFlowType.AMENDMENT].includes(getRegistrationFlowType.value)) {
+              localState.payErrorOptions.text += '<br/><br/>' + error.detail +
+                `<br/><br/>Your ${filing} will be saved as a draft and you can retry your payment ` +
+                'once the issue has been resolved.'
+            } else {
+              localState.payErrorOptions.acceptText = 'Return to Dashboard'
+              localState.payErrorOptions.text += '<br/><br/>' + error.detail +
+                'You can retry your payment once the issue has been resolved.'
+            }
+            localState.payErrorDisplay = true
+          } else if (error.statusCode === StatusCodes.PAYMENT_REQUIRED) {
+            // generic cath all pay error
+            localState.payErrorOptions.text = '<b>The payment could not be completed at this time</b>' +
+              '<br/><br/>If this issue persists, please contact us.'
+            localState.payErrorOptions.hasContactInfo = true
+            localState.payErrorDisplay = true
+          } else {
+            localState.errorOptions = registrationCompleteError
+            localState.errorDisplay = true
+          }
+      }
     }
-  }
 
-  private handleErrorSearch (error: ErrorIF) {
-    switch (error.type) {
-      case (
-        ErrorCodes.BCOL_ACCOUNT_CLOSED ||
-        ErrorCodes.BCOL_USER_REVOKED ||
-        ErrorCodes.BCOL_ACCOUNT_REVOKED ||
-        ErrorCodes.BCOL_UNAVAILABLE
-      ):
-        this.payErrorOptions = { ...paymentErrorSearch }
-        this.payErrorOptions.text += '<br/><br/>' + error.detail
-        this.payErrorDisplay = true
-        break
-      case ErrorCodes.ACCOUNT_IN_PAD_CONFIRMATION_PERIOD:
-        this.payErrorOptions = { ...paymentErrorSearch }
-        this.payErrorOptions.text += '<br/><br/>' + error.detail +
-          '<br/><br/>If this error continues after the waiting period has completed, please contact us.'
-        this.payErrorOptions.hasContactInfo = true
-        this.payErrorDisplay = true
-        break
-      default:
-        if (error.type && error.type?.includes('BCOL') && error.detail) {
-          // bcol generic
-          this.payErrorOptions = { ...paymentErrorSearch }
-          this.payErrorOptions.text += '<br/><br/>' + error.detail
-          this.payErrorDisplay = true
-        } else if (error.statusCode === StatusCodes.PAYMENT_REQUIRED) {
-          // generic pay error
-          this.payErrorOptions = { ...paymentErrorSearch }
-          this.payErrorOptions.text = '<b>The payment could not be completed at this time</b>' +
-            '<br/><br/>If this issue persists, please contact us.'
-          this.payErrorOptions.hasContactInfo = true
-          this.payErrorDisplay = true
-        } else {
-          // generic search error
-          this.errorOptions = { ...searchResultsError }
-          this.errorDisplay = true
-        }
+    const handleErrorSearch = (error: ErrorIF) => {
+      switch (error.type) {
+        case (
+          ErrorCodes.BCOL_ACCOUNT_CLOSED ||
+          ErrorCodes.BCOL_USER_REVOKED ||
+          ErrorCodes.BCOL_ACCOUNT_REVOKED ||
+          ErrorCodes.BCOL_UNAVAILABLE
+        ):
+          localState.payErrorOptions = { ...paymentErrorSearch }
+          localState.payErrorOptions.text += '<br/><br/>' + error.detail
+          localState.payErrorDisplay = true
+          break
+        case ErrorCodes.ACCOUNT_IN_PAD_CONFIRMATION_PERIOD:
+          localState.payErrorOptions = { ...paymentErrorSearch }
+          localState.payErrorOptions.text += '<br/><br/>' + error.detail +
+            '<br/><br/>If this error continues after the waiting period has completed, please contact us.'
+          localState.payErrorOptions.hasContactInfo = true
+          localState.payErrorDisplay = true
+          break
+        default:
+          if (error.type && error.type?.includes('BCOL') && error.detail) {
+            // bcol generic
+            localState.payErrorOptions = { ...paymentErrorSearch }
+            localState.payErrorOptions.text += '<br/><br/>' + error.detail
+            localState.payErrorDisplay = true
+          } else if (error.statusCode === StatusCodes.PAYMENT_REQUIRED) {
+            // generic pay error
+            localState.payErrorOptions = { ...paymentErrorSearch }
+            localState.payErrorOptions.text = '<b>The payment could not be completed at this time</b>' +
+              '<br/><br/>If this issue persists, please contact us.'
+            localState.payErrorOptions.hasContactInfo = true
+            localState.payErrorDisplay = true
+          } else {
+            // generic search error
+            localState.errorOptions = { ...searchResultsError }
+            localState.errorDisplay = true
+          }
+      }
     }
-  }
 
-  private proceedAfterError (proceed: boolean): void {
-    this.errorDisplay = false
-    // Navigate to Registries dashboard in the event of a login or access error.
-    if (
-      this.errorOptions === loginError || this.errorOptions === authPprError || this.errorOptions === authAssetsError
-    ) {
-      navigate(this.registryUrl)
+    const proceedAfterError = (proceed: boolean): void => {
+      localState.errorDisplay = false
+      // Navigate to Registries dashboard in the event of a login or access error.
+      if (localState.errorOptions === loginError || localState.errorOptions === authPprError ||
+        localState.errorOptions === authAssetsError
+      ) {
+        navigate(localState.registryUrl)
+      }
+      // for now just refresh app
+      if (!proceed) initApp()
     }
-    // for now just refresh app
-    if (!proceed) this.initApp()
+
+    const onProfileReady = async (val: boolean): Promise<void> => {
+      if (val && !localState.loggedOut) {
+        // start KC token service
+        await startTokenService()
+
+        // load account information
+        loadAccountInformation()
+
+        // initialize app
+        await initApp()
+
+        // set browser title
+        setBrowserTitle()
+      }
+    }
+
+    watch(() => context.root.$route, (newVal: Route) => {
+      localState.currentPath = newVal.path
+      localState.currentPathName = newVal.name as RouteNames
+    }, { immediate: true, deep: true })
+
+    /** Called when profile is ready -- we can now init app. */
+    watch(() => localState.profileReady, async (val: boolean) => {
+      await onProfileReady(val)
+    })
+
+    return {
+      handleError,
+      proceedAfterError,
+      payErrorDialogHandler,
+      ...toRefs(localState)
+    }
   }
-}
+})
 </script>
 
 <style lang="scss" scoped>
