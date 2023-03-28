@@ -182,16 +182,10 @@ export default defineComponent({
         if (configRegistryUrl) return configRegistryUrl
         return null
       }),
-      systemMessage: computed((): string => {
-        // if SYSTEM_MESSAGE does not exist this will return 'undefined'. Needs to be null or str
-        const systemMessage = sessionStorage.getItem('SYSTEM_MESSAGE')
-        if (systemMessage) return systemMessage
-        return null
-      }),
-      systemMessageType: computed((): string => {
-        // if SYSTEM_MESSAGE_TYPE does not exist this will return 'undefined'. Needs to be null or str
-        const systemMessageType = sessionStorage.getItem('SYSTEM_MESSAGE_TYPE')
-        if (systemMessageType) return systemMessageType
+      bannerText: computed((): string => {
+        // if banner text does not exist this will return 'undefined'. Needs to be null or str
+        const bannerText = getFeatureFlag('banner-text')
+        if (bannerText) return bannerText
         return null
       }),
       isJestRunning: computed((): boolean => {
