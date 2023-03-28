@@ -38,7 +38,7 @@ export async function fetchConfig (): Promise<any> {
 
   const searchApiUrl: string = process.env.VUE_APP_REGISTRIES_SEARCH_API_URL +
     process.env.VUE_APP_REGISTRIES_SEARCH_API_VERSION + '/'
-  const searchApiKey: string = process.env.VUE_APP_REGISTRY_SEARCH_API_KEY
+  const searchApiKey: string = process.env.VUE_APP_REGISTRIES_SEARCH_API_KEY
   sessionStorage.setItem('REGISTRIES_SEARCH_API_URL', searchApiUrl)
   sessionStorage.setItem('REGISTRIES_SEARCH_API_KEY', searchApiKey)
 
