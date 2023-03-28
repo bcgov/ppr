@@ -91,7 +91,10 @@
           >
             <div :class="{'removed-owner': isRemovedHomeOwner(row.item)}">
               <div v-if="row.item.individualName" class="owner-icon-name">
-                <v-icon class="mr-2">mdi-account</v-icon>
+                <v-icon class="mr-2" :class="{'executor-icon': row.item.partyType === HomeOwnerPartyTypes.EXECUTOR}">
+                  {{ row.item.partyType === HomeOwnerPartyTypes.EXECUTOR ?
+                    '$vuetify.icons.values.ExecutorPersonIcon' : 'mdi-account' }}
+                </v-icon>
                 <div class="font-weight-bold">
                   {{ row.item.individualName.first }}
                   {{ row.item.individualName.middle }}
@@ -99,7 +102,10 @@
                 </div>
               </div>
               <div v-else class="owner-icon-name">
-                <v-icon class="mr-2">mdi-domain</v-icon>
+                <v-icon class="mr-2" :class="{'executor-icon': row.item.partyType === HomeOwnerPartyTypes.EXECUTOR}">
+                  {{ row.item.partyType === HomeOwnerPartyTypes.EXECUTOR ?
+                    '$vuetify.icons.values.ExecutorBusinessIcon' : 'mdi-domain' }}
+                </v-icon>
                 <div class="font-weight-bold">
                   {{ row.item.organizationName }}
                 </div>
@@ -333,7 +339,7 @@ import { mhrDeceasedOwnerChanges } from '@/resources/dialogOptions'
 import { yyyyMmDdToPacificDate } from '@/utils/date-helper'
 /* eslint-disable no-unused-vars */
 import { MhrRegistrationHomeOwnerIF } from '@/interfaces'
-import { ActionTypes, ApiTransferTypes, HomeTenancyTypes } from '@/enums'
+import { ActionTypes, ApiTransferTypes, HomeTenancyTypes, HomeOwnerPartyTypes } from '@/enums'
 /* eslint-enable no-unused-vars */
 import { useActions, useGetters } from 'vuex-composition-helpers'
 
@@ -611,6 +617,7 @@ export default defineComponent({
       handleOwnerChangesDialogResp,
       yyyyMmDdToPacificDate,
       showInvalidDeceasedOwnerGroupError,
+      HomeOwnerPartyTypes,
       ...toRefs(localState)
     }
   }
@@ -621,6 +628,11 @@ export default defineComponent({
 @import '@/assets/styles/theme.scss';
 
 .home-owners-table ::v-deep {
+  .executor-icon {
+    margin-top: -3px !important;
+    height: 22px !important;
+    width: 22px !important;
+  }
   .spacer-header {
     border-color: $gray1 !important;
     background-color: $gray1 !important;

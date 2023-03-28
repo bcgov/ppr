@@ -30,14 +30,27 @@
                 active-class="selected-radio"
                 v-model="HomeOwnerPartyTypes.OWNER_IND"
               />
-              <v-radio
-                id="executor-option"
-                class="executor-radio px-4"
-                label="Executor"
-                active-class="selected-radio"
-                :disabled="isTransferDueToDeath"
-                v-model="HomeOwnerPartyTypes.EXECUTOR"
-              />
+              <v-tooltip
+                v-if="isTransferDueToDeath"
+                top
+                content-class="top-tooltip pa-5"
+                transition="fade-transition"
+              >
+                <template v-slot:activator="{ on }">
+                  <v-radio
+                    v-on="on"
+                    id="executor-option"
+                    class="executor-radio px-4"
+                    active-class="selected-radio"
+                    :disabled="disableNameFields"
+                    v-model="HomeOwnerPartyTypes.EXECUTOR"
+                   >
+                    <template v-slot:label><div :class="{'underline' : !disableNameFields}">Executor</div></template>
+                  </v-radio>
+                </template>
+                  An Executor is the personal representative named in the will or appointed by court to carry out the
+                  requirements of a will. They are also referred to as trustee or liquidator (in Quebec).
+              </v-tooltip>
               <v-radio
                 id="trustee-option"
                 class="trustee-radio px-4"
@@ -68,7 +81,7 @@
               Person's Name
             </label>
             <v-tooltip
-              v-if="isTransferDueToDeath"
+              v-if="disableNameFields"
               top
               content-class="top-tooltip pa-5"
               transition="fade-transition"
@@ -90,8 +103,8 @@
                   label="First Name"
                   data-test-id="first-name"
                   :rules="firsNameRules"
-                  :disabled="isTransferDueToDeath"
-                  :readonly="isTransferDueToDeath"
+                  :disabled="disableNameFields"
+                  :readonly="disableNameFields"
                   @mousedown.prevent
                 />
               </v-col>
@@ -103,8 +116,8 @@
                   label="Middle Name (Optional)"
                   data-test-id="middle-name"
                   :rules="maxLength(15)"
-                  :disabled="isTransferDueToDeath"
-                  :readonly="isTransferDueToDeath"
+                  :disabled="disableNameFields"
+                  :readonly="disableNameFields"
                   @mousedown.prevent
                 />
               </v-col>
@@ -116,8 +129,8 @@
                   label="Last Name"
                   data-test-id="last-name"
                   :rules="lastNameRules"
-                  :disabled="isTransferDueToDeath"
-                  :readonly="isTransferDueToDeath"
+                  :disabled="disableNameFields"
+                  :readonly="disableNameFields"
                   @mousedown.prevent
                 />
               </v-col>
@@ -141,9 +154,10 @@
                   >
                     <template v-slot:activator="{ on, attrs }">
                       <span
+                        class="underline"
                         v-bind="attrs"
                         v-on="on"
-                      ><u> organizations.</u></span>
+                      > organizations.</span>
                     </template>
                     Organizations, other than active B.C. businesses, that can be listed as owners
                     include the following:<br><br>
@@ -230,8 +244,8 @@
                   persistent-hint
                   :rules="orgNameRules"
                   :clearable="showClear"
-                  :disabled="isTransferDueToDeath"
-                  :readonly="isTransferDueToDeath"
+                  :disabled="disableNameFields"
+                  :readonly="disableNameFields"
                   @click:clear="showClear = false"
                 >
                   <template v-slot:append>
@@ -261,7 +275,7 @@
           <label class="generic-label">
             Additional Name Information
             <v-tooltip
-              v-if="isTransferDueToDeath"
+              v-if="disableNameFields"
               top
               content-class="top-tooltip pa-5"
               transition="fade-transition"
@@ -277,19 +291,31 @@
           </label>
           <v-row>
             <v-col col="12">
-              <v-text-field
-                id="suffix"
-                v-model="owner.suffix"
-                filled
-                label="Additional Name Information (Optional)"
-                data-test-id="suffix"
-                hint="Example: Additional legal names, Jr., Sr., Executor of the will of the deceased, etc."
-                persistent-hint
-                :rules="maxLength(70)"
-                :disabled="isTransferDueToDeath"
-                :readonly="isTransferDueToDeath"
-                @mousedown.prevent
-              />
+              <v-tooltip
+                :disabled="owner.partyType !== HomeOwnerPartyTypes.EXECUTOR"
+                right
+                content-class="right-tooltip pa-5"
+                transition="fade-transition"
+              >
+                <template v-slot:activator="{ on }">
+                  <v-text-field
+                    v-on="on"
+                    id="suffix"
+                    v-model="owner.suffix"
+                    filled
+                    label="Additional Name Information (Optional)"
+                    data-test-id="suffix"
+                    hint="Example: Additional legal names, Jr., Sr., Executor of the will of the deceased, etc."
+                    persistent-hint
+                    :rules="maxLength(70)"
+                    :disabled="disableNameFields"
+                    :readonly="disableNameFields"
+                    @mousedown.prevent
+                  />
+                </template>
+                  Executor of the will is based on deceased owner with Grant of Probate
+                  with Will supporting document selected.
+              </v-tooltip>
             </v-col>
           </v-row>
 
@@ -503,7 +529,8 @@ export default defineComponent({
     const {
       isCurrentOwner,
       isTransferDueToDeath,
-      hasCurrentOwnerChanges
+      hasCurrentOwnerChanges,
+      disableNameFields
     } = useTransferOwners()
 
     const addressSchema = PartyAddressSchema
@@ -729,6 +756,7 @@ export default defineComponent({
       MhrSectVal,
       isCurrentOwner,
       isTransferDueToDeath,
+      disableNameFields,
       HomeOwnerPartyTypes,
       ...toRefs(localState)
     }
@@ -747,7 +775,7 @@ export default defineComponent({
   border-top: 0.25px solid $gray4 !important;
 }
 
-u {
+.underline {
     border-bottom: 1px dotted #000;
     text-decoration: none;
 }
