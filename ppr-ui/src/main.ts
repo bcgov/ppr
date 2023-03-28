@@ -28,7 +28,7 @@ import 'tiptap-vuetify/dist/main.css'
 import App from './App.vue'
 
 // Helpers
-import { fetchConfig, initLdClient, isSigningIn, isSigningOut } from '@/utils'
+import { getFeatureFlag, fetchConfig, initLdClient, isSigningIn, isSigningOut } from '@/utils'
 import KeycloakService from 'sbc-common-components/src/services/keycloak.services'
 import { ExecutorBusinessIcon, ExecutorPersonIcon, HomeLocationIcon, HomeOwnersIcon } from './assets/svgs/index'
 
@@ -56,18 +56,18 @@ async function start () {
   // must come first as inits below depend on config
   await fetchConfig()
 
-  if (window.sentryEnable === 'true') {
+  // initialize Launch Darkly
+  if (window.ldClientId) {
+    await initLdClient()
+  }
+
+  if (getFeatureFlag('sentry-enable')) {
     // initialize Sentry
     console.info('Initializing Sentry...') // eslint-disable-line no-console
     Sentry.init({
       dsn: window['sentryDsn'], // eslint-disable-line dot-notation
       integrations: [new Integrations.Vue({ Vue, attachProps: true })]
     })
-  }
-
-  // initialize Launch Darkly
-  if (window.ldClientId) {
-    await initLdClient()
   }
 
   // Initialize Keycloak / sync SSO
@@ -115,7 +115,13 @@ async function start () {
 
 async function syncSession () {
   console.info('Starting Keycloak service...') // eslint-disable-line no-console
-  await KeycloakService.setKeycloakConfigUrl(sessionStorage.getItem('KEYCLOAK_CONFIG_PATH'))
+  const keycloakConfig: any = {
+    url: `${window.keycloakAuthUrl}`,
+    realm: `${window.keycloakRealm}`,
+    clientId: `${window.keycloakClientId}`
+  }
+
+  await KeycloakService.setKeycloakConfigUrl(keycloakConfig)
 
   // Auto authenticate user only if they are not trying a login or logout
   if (!isSigningIn() && !isSigningOut()) {
