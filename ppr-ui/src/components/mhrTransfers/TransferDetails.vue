@@ -44,7 +44,7 @@
               </label>
             </v-col>
             <v-col cols="9">
-              <date-picker
+              <SharedDatePicker
                 id="transfer-date"
                 clearable
                 ref="transferDateRef"
@@ -83,16 +83,16 @@
 </template>
 
 <script lang="ts">
-import { DatePicker } from '@bcrs-shared-components/date-picker'
-import { useInputRules, useTransferOwners } from '@/composables'
 import { computed, defineComponent, reactive, ref, toRefs, watch } from '@vue/composition-api'
 import { useActions, useGetters } from 'vuex-composition-helpers'
+import { useInputRules, useTransferOwners } from '@/composables'
+import { SharedDatePicker } from '@/components/common'
 import { FormIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 
 export default defineComponent({
   name: 'TransferDetails',
   emits: ['isValid'],
-  components: { DatePicker },
+  components: { SharedDatePicker },
   props: { validate: { type: Boolean, default: false } },
   setup (props, context) {
     const { customRules, required, maxLength } = useInputRules()

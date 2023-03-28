@@ -7,8 +7,7 @@ import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
 
 // local components
 import { HomeOwners, MhrInformation } from '@/views'
-import { AccountInfo, StickyContainer, CertifyInformation } from '@/components/common'
-import { DatePicker } from '@bcrs-shared-components/date-picker'
+import { AccountInfo, StickyContainer, CertifyInformation, SharedDatePicker } from '@/components/common'
 import mockRouter from './MockRouter'
 import { AuthRoles, HomeTenancyTypes, RouteNames } from '@/enums'
 import { HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
@@ -27,7 +26,6 @@ import { nextTick } from '@vue/composition-api'
 import { TransferDetails, TransferDetailsReview, TransferType } from '@/components/mhrTransfers'
 
 import { toDisplayPhone } from '@/utils'
-import {getMhrTransferCurrentHomeOwnerGroups} from "@/store/getters";
 
 Vue.use(Vuetify)
 
@@ -109,7 +107,7 @@ async function triggerUnsavedChange (): Promise<void> {
 // For future use when Transfer Details will be required to go to Review
 async function enterTransferDetailsFields (transferDetailsWrapper: Wrapper<any, Element>): Promise<void> {
   transferDetailsWrapper.find(getTestId('consideration')).trigger('mousedown')
-  transferDetailsWrapper.findComponent(DatePicker).vm.$emit('emitDate', TRANSFER_DATE)
+  transferDetailsWrapper.findComponent(SharedDatePicker).vm.$emit('emitDate', TRANSFER_DATE)
   await Vue.nextTick()
 }
 
