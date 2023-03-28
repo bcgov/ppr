@@ -201,10 +201,6 @@ export default defineComponent({
       }
     }
 
-    const updateDateRange = (event) => {
-      console.log(event)
-    }
-
     /** Apply local models to store when they change. **/
     watch(() => localState.certificationOption, () => {
       setMhrHomeDescription({ key: 'certificationOption', value: localState.certificationOption })
@@ -248,7 +244,6 @@ export default defineComponent({
       }
     })
     return {
-      updateDateRange,
       HomeCertificationOptions,
       required,
       ...toRefs(localState)

@@ -144,7 +144,7 @@ import {
 } from '@vue/composition-api'
 import { useGetters, useActions } from 'vuex-composition-helpers'
 // bcregistry
-import { SharedDatePicker } from '@/components/common'
+import SharedDatePicker from '@/components/common/SharedDatePicker.vue'
 // local
 import { LengthTrustIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { convertDate, formatExpiryDate, localTodayDate } from '@/utils'

@@ -185,7 +185,7 @@ import {
 import { useGetters, useActions } from 'vuex-composition-helpers'
 import { isEqual } from 'lodash'
 // bcregistry
-import { SharedDatePicker } from '@/components/common/index'
+import SharedDatePicker from '@/components/common/SharedDatePicker.vue'
 // local
 import { APIRegistrationTypes } from '@/enums'
 import { CourtOrderIF } from '@/interfaces' // eslint-disable-line no-unused-vars
