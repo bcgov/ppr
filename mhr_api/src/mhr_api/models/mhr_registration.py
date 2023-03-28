@@ -150,7 +150,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
 
     @property
     def json(self) -> dict:
-        """Return the registration as a json object."""
+        """Return the current/composite view of the registration as a json object."""
         if self.manuhome:
             reg_json = self.manuhome.json
             doc_type = reg_json.get('documentType')
@@ -166,7 +166,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
             if self.parties:
                 submitting = self.parties[0]
                 reg_json['submittingParty'] = submitting.json
-            if self.locations:
+            if self.locations:  # For MHR registrations use MHR location data.
                 location: MhrLocation = self.locations[0]
                 for existing in self.locations:
                     if existing.registration_id == self.id:
@@ -176,6 +176,8 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                     reg_json['newLocation'] = location.json
                 else:
                     reg_json['location'] = location.json
+            if self.descriptions:  # For MHR registrations use MHR description data.
+                reg_json['description'] = self.__get_description(False)
             del reg_json['documentType']
             if self.pay_invoice_id and self.pay_invoice_id > 0:  # Legacy will have no payment info.
                 return self.__set_payment_json(reg_json)
@@ -240,10 +242,12 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
             if reg_json and self.locations:
                 location: MhrLocation = self.locations[0]
                 for existing in self.locations:
-                    if existing.registration_id == self.id or existing.statusType == MhrStatusTypes.ACTIVE:
+                    if existing.registration_id == self.id or existing.status_type == MhrStatusTypes.ACTIVE:
                         location = existing
                         current_app.logger.debug('Using PostreSQL location in registration.registration_json.')
                 reg_json['location'] = location.json
+            if reg_json and self.descriptions:
+                reg_json['description'] = self.__get_description(True)
             return reg_json
         return self.json
 
@@ -275,6 +279,8 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                 location = self.locations[0]
                 current_app.logger.debug('Using PostreSQL location in new_registration_json.')
                 reg_json['location'] = location.json
+            if self.descriptions:
+                reg_json['description'] = self.__get_description(False)
             return self.__set_payment_json(reg_json)
         return self.json
 
@@ -287,6 +293,27 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
             }
             registration['payment'] = payment
         return registration
+
+    def __get_description(self, current: bool) -> dict:
+        """Build the description JSON conditional on current."""
+        description_json = {}
+        if self.descriptions:
+            description = self.descriptions[0]
+            sections = []
+            if current or self.current_view:
+                for existing in self.descriptions:
+                    if existing.registration_id == self.id or existing.status_type == MhrStatusTypes.ACTIVE:
+                        description = existing
+                        current_app.logger.debug('Using PostreSQL description in description_json.')
+            if self.sections:
+                for section in self.sections:
+                    if (current or self.current_view) and section.status_type == MhrStatusTypes.ACTIVE:
+                        sections.append(section.json)
+                    elif section.registration_id == self.id:
+                        sections.append(section.json)
+            description_json = description.json
+            description_json['sections'] = sections
+        return description_json
 
     def save(self):
         """Render a registration to the local cache."""
