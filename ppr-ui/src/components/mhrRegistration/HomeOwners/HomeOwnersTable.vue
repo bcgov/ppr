@@ -91,7 +91,10 @@
           >
             <div :class="{'removed-owner': isRemovedHomeOwner(row.item)}">
               <div v-if="row.item.individualName" class="owner-icon-name">
-                <v-icon class="mr-2" :class="{'executor-icon': row.item.partyType === HomeOwnerPartyTypes.EXECUTOR}">
+                <v-icon
+                  class="mr-2"
+                  :class="{'person-executor-icon': row.item.partyType === HomeOwnerPartyTypes.EXECUTOR}"
+                >
                   {{ row.item.partyType === HomeOwnerPartyTypes.EXECUTOR ?
                     '$vuetify.icons.values.ExecutorPersonIcon' : 'mdi-account' }}
                 </v-icon>
@@ -102,7 +105,10 @@
                 </div>
               </div>
               <div v-else class="owner-icon-name">
-                <v-icon class="mr-2" :class="{'executor-icon': row.item.partyType === HomeOwnerPartyTypes.EXECUTOR}">
+                <v-icon
+                  class="mr-2"
+                  :class="{'business-executor-icon': row.item.partyType === HomeOwnerPartyTypes.EXECUTOR}"
+                >
                   {{ row.item.partyType === HomeOwnerPartyTypes.EXECUTOR ?
                     '$vuetify.icons.values.ExecutorBusinessIcon' : 'mdi-domain' }}
                 </v-icon>
@@ -628,10 +634,16 @@ export default defineComponent({
 @import '@/assets/styles/theme.scss';
 
 .home-owners-table ::v-deep {
-  .executor-icon {
+  .person-executor-icon {
     margin-top: -3px !important;
     height: 22px !important;
     width: 22px !important;
+  }
+  .business-executor-icon {
+    margin-top: -8px !important;
+    margin-left: -4px !important;
+    height: 29px !important;
+    width: 28px !important;
   }
   .spacer-header {
     border-color: $gray1 !important;
