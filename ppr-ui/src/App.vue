@@ -20,16 +20,16 @@
         :show-login-menu="false"
       />
 
-    <!-- Alert banner -->
-    <v-alert
-      tile dense
-      type="warning"
-      v-if="bannerText">
-      <div v-html="bannerText" class="mb-0 text-center colour-dk-text"></div>
-    </v-alert>
-
     <div class="app-body">
       <main>
+        <sbc-system-banner
+          v-if="bannerText != null"
+          v-bind:show="bannerText != null"
+          v-bind:type="warning"
+          v-bind:message="bannerText"
+          icon=" "
+          align="center"
+        ></sbc-system-banner>
         <breadcrumb :setCurrentPath="currentPath" :setCurrentPathName="currentPathName" v-if="haveData" />
         <tombstone :setCurrentPath="currentPath" v-if="haveData" />
         <v-container class="view-container pa-0 ma-0">
@@ -64,6 +64,7 @@ import KeycloakService from 'sbc-common-components/src/services/keycloak.service
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import SbcHeader from 'sbc-common-components/src/components/SbcHeader.vue'
 import SbcFooter from 'sbc-common-components/src/components/SbcFooter.vue'
+import SbcSystemBanner from 'sbc-common-components/src/components/SbcSystemBanner.vue'
 import SbcAuthenticationOptionsDialog from 'sbc-common-components/src/components/SbcAuthenticationOptionsDialog.vue'
 import * as Dialogs from '@/components/dialogs'
 import { Breadcrumb } from '@/components/common'
@@ -102,6 +103,7 @@ export default defineComponent({
     Breadcrumb,
     SbcHeader,
     SbcFooter,
+    SbcSystemBanner,
     SbcAuthenticationOptionsDialog,
     Tombstone,
     ...Dialogs,
@@ -185,7 +187,7 @@ export default defineComponent({
       bannerText: computed((): string => {
         // if banner text does not exist this will return 'undefined'. Needs to be null or str
         const bannerText = getFeatureFlag('banner-text')
-        if (bannerText) return bannerText
+        if (bannerText.trim().length > 0) return bannerText
         return null
       }),
       isJestRunning: computed((): boolean => {
@@ -745,6 +747,7 @@ export default defineComponent({
   background-color: #FCBA19 !important;
   color: #212529;
 }
+
 ::v-deep .v-alert .v-alert__wrapper {
   padding: 8px 10px 10px 10px !important;
 }
