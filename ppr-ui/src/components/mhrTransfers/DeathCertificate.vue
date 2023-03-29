@@ -4,7 +4,7 @@
         <v-row>
           <v-col cols="3">
             <div
-              class="generic-label pl-8"
+              class="generic-label"
               :class="{ 'error-text': validate && hasError(deathCertificateNumberRef) }"
             >
               Death Certificate Registration Number
@@ -25,7 +25,7 @@
         <v-row>
           <v-col cols="3">
             <div
-              class="generic-label pl-8"
+              class="generic-label"
               :class="{ 'error-text': validate && !deathDateTime }"
             >
               Date of Death

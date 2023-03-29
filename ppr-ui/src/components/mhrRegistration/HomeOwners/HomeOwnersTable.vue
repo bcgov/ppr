@@ -293,7 +293,7 @@
         >
           <td
             :colspan="homeOwnersTableHeaders.length"
-            class="py-0"
+            class="py-0 pl-8"
             :class="{ 'border-error-left': showInvalidDeceasedOwnerGroupError(row.item.groupId) }"
           >
             <v-expand-transition>
