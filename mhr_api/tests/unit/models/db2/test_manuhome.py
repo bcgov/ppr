@@ -186,6 +186,8 @@ def test_find_by_mhr_number(session, http_status, id, mhr_num, status, doc_id):
         assert report_json.get('location')
         assert report_json.get('description')
         assert report_json.get('notes')
+        for note in report_json.get('notes'):
+            assert note.get('documentRegistrationNumber')
     else:
         with pytest.raises(BusinessException) as request_err:
             Db2Manuhome.find_by_mhr_number(mhr_num)
@@ -267,6 +269,7 @@ def test_find_by_document_id(session, http_status, doc_id, mhr_num, doc_type):
 
 @pytest.mark.parametrize('interest,numerator,denominator,new_interest', TEST_DATA_GROUP_INTEREST)
 def test_adjust_group_interest_new(session, interest, numerator, denominator, new_interest):
+    """Assert that adjusting group interest is working as expected."""
     groups = []
     group: Db2Owngroup = Db2Owngroup(status=Db2Owngroup.StatusTypes.ACTIVE,
                                      tenancy_type=Db2Owngroup.TenancyTypes.COMMON,
@@ -280,6 +283,7 @@ def test_adjust_group_interest_new(session, interest, numerator, denominator, ne
 
 @pytest.mark.parametrize('group1,group2,group3,interest1,interest2,interest3', TEST_DATA_GROUP_INTEREST2)
 def test_adjust_group_interest_2(session, group1, group2, group3, interest1, interest2, interest3):
+    """Assert that adjusting group interest is working as expected."""
     groups = []
     if group1:
         groups.append(group1)
@@ -298,7 +302,7 @@ def test_adjust_group_interest_2(session, group1, group2, group3, interest1, int
 
 
 def test_notes_sort_order(session):
-    """Assert that manufauctured home notes sort order is as expected."""
+    """Assert that manufactured home notes sort order is as expected."""
     manuhome: Db2Manuhome = Db2Manuhome.find_by_mhr_number('053341')
     report_json = manuhome.registration_json
     assert len(report_json['notes']) == 2

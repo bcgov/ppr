@@ -460,7 +460,7 @@ class Report:  # pylint: disable=too-few-public-methods
                             has_exempt_note = True
                             message = {
                                 'messageType': note.get('documentType'),
-                                'messageId': note.get('documentId', ''),
+                                'messageId': note.get('documentRegistrationNumber', ''),
                                 'messageDate': Report._to_report_datetime(note['createDateTime'], False)
                             }
                             messages.append(message)

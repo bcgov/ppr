@@ -428,7 +428,9 @@ class Db2Manuhome(db.Model):
         if self.reg_notes:
             notes = []
             for note in self.reg_notes:
-                notes.append(note.registration_json)
+                note_json = note.registration_json
+                note_json['documentRegistrationNumber'] = self.__get_note_doc_reg_num(note.reg_document_id)
+                notes.append(note_json)
             # Now sort in descending timestamp order.
             man_home['notes'] = Db2Manuhome.__sort_notes(notes)
         return man_home
@@ -485,6 +487,15 @@ class Db2Manuhome(db.Model):
         if self.reg_descript:
             man_home['description'] = self.reg_descript.registration_json
         return man_home
+
+    def __get_note_doc_reg_num(self, doc_id: str) -> str:
+        """Get the document registration number matching the doc_id from document."""
+        reg_num: str = ''
+        if doc_id and self.reg_documents:
+            for doc in self.reg_documents:
+                if doc.id == doc_id:
+                    return doc.document_reg_id
+        return reg_num
 
     @classmethod
     def __update_group_type(cls, groups, existing_count: int = 0):

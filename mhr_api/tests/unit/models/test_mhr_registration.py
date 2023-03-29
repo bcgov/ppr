@@ -560,6 +560,19 @@ def test_find_by_mhr_number(session, mhr_number, has_results, account_id):
         assert registration.status_type in MhrRegistrationStatusTypes
         assert registration.registration_type in MhrRegistrationTypes
         assert registration.registration_ts
+        report_json = registration.registration_json
+        assert report_json['mhrNumber']
+        assert report_json['status']
+        assert report_json.get('createDateTime')
+        assert report_json.get('clientReferenceId') is not None
+        assert report_json.get('declaredValue') >= 0
+        assert report_json.get('ownerGroups')
+        assert report_json.get('location')
+        assert report_json.get('description')
+        if report_json.get('notes'):
+            for note in report_json.get('notes'):
+                assert note['documentDescription']
+                assert note['documentRegistrationNumber']
     else:
         with pytest.raises(BusinessException) as not_found_err:
             MhrRegistration.find_by_mhr_number(mhr_number, 'PS12345')
