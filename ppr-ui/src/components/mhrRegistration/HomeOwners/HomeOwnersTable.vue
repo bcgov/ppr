@@ -86,7 +86,7 @@
         >
           <td
             class="owner-name"
-            :class="{'no-bottom-border' : isRemovedHomeOwner(row.item) && showDeathCertificate(),
+            :class="{'no-bottom-border' : hideRowBottomBorder(row.item),
               'border-error-left': showInvalidDeceasedOwnerGroupError(row.item.groupId) }"
           >
             <div :class="{'removed-owner': isRemovedHomeOwner(row.item)}">
@@ -155,21 +155,21 @@
               </v-chip>
             </template>
           </td>
-          <td :class="{'no-bottom-border' : isRemovedHomeOwner(row.item) && showDeathCertificate()}">
+          <td :class="{'no-bottom-border' : hideRowBottomBorder(row.item)}">
             <base-address
               :schema="addressSchema"
               :value="row.item.address"
               :class="{'removed-owner': isRemovedHomeOwner(row.item)}"
             />
           </td>
-          <td :class="{'no-bottom-border' : isRemovedHomeOwner(row.item) && showDeathCertificate()}">
+          <td :class="{'no-bottom-border' : hideRowBottomBorder(row.item)}">
             <div :class="{'removed-owner': isRemovedHomeOwner(row.item)}">
               {{ toDisplayPhone(row.item.phoneNumber) }}
               <span v-if="row.item.phoneExtension"> Ext {{ row.item.phoneExtension }} </span>
             </div>
           </td>
           <td v-if="showEditActions" class="row-actions text-right"
-            :class="{'no-bottom-border' : isRemovedHomeOwner(row.item) && showDeathCertificate()}">
+            :class="{'no-bottom-border' : hideRowBottomBorder(row.item)}">
             <!-- New Owner Actions -->
             <div
               v-if="(!isMhrTransfer || isAddedHomeOwner(row.item)) && enableHomeOwnerChanges()"
@@ -217,7 +217,8 @@
                 v-if="!isRemovedHomeOwner(row.item) && !isChangedOwner(row.item)"
                 text color="primary" class="mr-n4"
                 :ripple="false"
-                :disabled="isAddingMode || isEditingMode || isGlobalEditingMode || isDisabledForSJTChanges(row.item)"
+                :disabled="isAddingMode || isEditingMode || isGlobalEditingMode ||
+                  isDisabledForSJTChanges(row.item) ||isDisabledForWillChanges(row.item)"
                 @click="markForRemoval(row.item)"
                 data-test-id="table-delete-btn"
               >
@@ -321,6 +322,56 @@
             </v-row>
           </td>
         </tr>
+        <tr v-else-if="isRemovedHomeOwner(row.item) && showSupportingDocuments() && !isReadonlyTable">
+          <td :colspan="homeOwnersTableHeaders.length" class="pl-14">
+            <v-expand-transition>
+              <div class="">
+                <p>
+                  Select the supporting document you have for this owner:
+                </p>
+                <v-radio-group
+                  id="supporting-docs-options"
+                  v-model="row.item.supportingDocument"
+                  class="supporting-docs-options"
+                  row
+                  hide-details="true"
+                >
+                  <v-radio
+                    id="probate-grant-option"
+                    class="csa-radio"
+                    label="Grant of Probate with Will"
+                    active-class="selected-radio"
+                    :value="SupportingDocumentsOptions.PROBATE_GRANT"
+                    :ripple="false"
+                  />
+                  <v-radio
+                    id="death-cert-option"
+                    class="engineer-radio"
+                    label="Death Certificate"
+                    active-class="selected-radio"
+                    :value="SupportingDocumentsOptions.DEATH_CERT"
+                    :ripple="false"
+                  />
+                </v-radio-group>
+              </div>
+            </v-expand-transition>
+            <div v-if="row.item.supportingDocument === SupportingDocumentsOptions.PROBATE_GRANT"
+              class="supporting-doc-probate">
+              <p>
+                <strong>Note:</strong> Ensure you have a court certified true copy of the
+                Grant of Probate with the will attached.
+              </p>
+            </div>
+            <div v-if="row.item.supportingDocument === SupportingDocumentsOptions.DEATH_CERT"
+              class="supporting-doc-cert">
+              <DeathCertificate
+                :deceasedOwner="row.item"
+                :validate="validateTransfer"
+                @isValid="isValidDeathCertificate = $event"
+              />
+            </div>
+          </td>
+        </tr>
       </template>
 
       <template v-slot:no-data>
@@ -345,7 +396,7 @@ import { mhrDeceasedOwnerChanges } from '@/resources/dialogOptions'
 import { yyyyMmDdToPacificDate } from '@/utils/date-helper'
 /* eslint-disable no-unused-vars */
 import { MhrRegistrationHomeOwnerIF } from '@/interfaces'
-import { ActionTypes, ApiTransferTypes, HomeTenancyTypes, HomeOwnerPartyTypes } from '@/enums'
+import { ActionTypes, HomeTenancyTypes, HomeOwnerPartyTypes, SupportingDocumentsOptions } from '@/enums'
 /* eslint-enable no-unused-vars */
 import { useActions, useGetters } from 'vuex-composition-helpers'
 
@@ -398,7 +449,9 @@ export default defineComponent({
       enableTransferOwnerGroupActions,
       enableTransferOwnerMenuActions,
       showDeathCertificate,
+      showSupportingDocuments,
       isDisabledForSJTChanges,
+      isDisabledForWillChanges,
       isCurrentOwner,
       getCurrentOwnerStateById,
       isTransferDueToDeath,
@@ -424,14 +477,14 @@ export default defineComponent({
       isValidDeathCertificate: false,
       showTableError: computed((): boolean => {
         return (props.validateTransfer || localState.reviewedOwners) &&
-            (
-              !hasMinimumGroups() ||
-              hasEmptyGroup.value ||
-              (props.isMhrTransfer && !hasUnsavedChanges.value) ||
-              !localState.isValidAllocation ||
-              localState.hasGroupsWithNoOwners ||
-              (!localState.isUngroupedTenancy && hasUndefinedGroupInterest(getTransferOrRegistrationHomeOwnerGroups()))
-            )
+          (
+            !hasMinimumGroups() ||
+            hasEmptyGroup.value ||
+            (props.isMhrTransfer && !hasUnsavedChanges.value) ||
+            !localState.isValidAllocation ||
+            localState.hasGroupsWithNoOwners ||
+            (!localState.isUngroupedTenancy && hasUndefinedGroupInterest(getTransferOrRegistrationHomeOwnerGroups()))
+          )
       }),
       reviewedOwners: computed((): boolean =>
         getValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_STEPS)),
@@ -452,6 +505,15 @@ export default defineComponent({
       }),
       isUngroupedTenancy: computed((): boolean => {
         return [HomeTenancyTypes.SOLE, HomeTenancyTypes.JOINT].includes(getHomeTenancyType())
+      }),
+      disableDelete: computed(() => {
+      }),
+      transWillSupportDoc: null as SupportingDocumentsOptions,
+      isProbateGrantOption: computed((): boolean => {
+        return localState.transWillSupportDoc === SupportingDocumentsOptions.PROBATE_GRANT
+      }),
+      isDeathCertOption: computed((): boolean => {
+        return localState.transWillSupportDoc === SupportingDocumentsOptions.DEATH_CERT
       })
     })
 
@@ -562,6 +624,11 @@ export default defineComponent({
       localState.ownerToDecease = null
     }
 
+    // Hide bottom border for the owner's row that requires additional input (Death Certificate etc.)
+    const hideRowBottomBorder = (rowItem: MhrRegistrationHomeOwnerIF): boolean => {
+      return isRemovedHomeOwner(rowItem) && (showDeathCertificate() || showSupportingDocuments())
+    }
+
     watch(() => localState.currentlyEditingHomeOwnerId, () => {
       setGlobalEditingMode(localState.isEditingMode)
     })
@@ -615,15 +682,19 @@ export default defineComponent({
       enableTransferOwnerGroupActions,
       enableTransferOwnerMenuActions,
       showDeathCertificate,
+      showSupportingDocuments,
       isDisabledForSJTChanges,
+      isDisabledForWillChanges,
       isCurrentOwner,
       mhrDeceasedOwnerChanges,
       removeOwnerHandler,
       removeChangeOwnerHandler,
       handleOwnerChangesDialogResp,
+      hideRowBottomBorder,
       yyyyMmDdToPacificDate,
       showInvalidDeceasedOwnerGroupError,
       HomeOwnerPartyTypes,
+      SupportingDocumentsOptions,
       ...toRefs(localState)
     }
   }
@@ -716,11 +787,42 @@ export default defineComponent({
     }
   }
 
+  .supporting-docs-options {
+    display: flex;
+
+    .v-radio {
+      flex: 1;
+      background-color: rgba(0, 0, 0, 0.06);
+      height: 60px;
+      padding: 10px;
+      margin-right: 20px;
+    }
+
+    .v-radio:last-of-type {
+      margin-right: 0;
+    }
+
+  }
+
+  .supporting-doc-probate,
+  .supporting-doc-cert {
+    border-top: 1px solid $gray3;
+    margin-top: 35px;
+    padding-top: 35px;
+  }
+
+  .supporting-doc-cert {
+    padding-top: 22px;
+    .death-certificate {
+      margin-bottom: 0;
+    }
+  }
+
   .v-data-table-header th {
     padding: 0 12px;
   }
 
-  .font-light, {
+  .font-light {
     color: $gray7;
     font-size: 14px;
     line-height: 22px;

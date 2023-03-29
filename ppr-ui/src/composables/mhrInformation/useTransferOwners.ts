@@ -71,6 +71,11 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
            getMhrTransferType.value?.transferType === ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL
   }
 
+  /** Conditionally show Grant of Probate with Will supporting options based on Transfer Type **/
+  const showSupportingDocuments = (): boolean => {
+    return getMhrTransferType.value?.transferType === ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL
+  }
+
   /** Conditionally Enable HomeOwner Changes based on Transfer Type **/
   const enableHomeOwnerChanges = (): boolean => {
     // Manual override to force enable all actions (ie MhRegistrations)
@@ -94,6 +99,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
 
     switch (getMhrTransferType.value?.transferType) {
       case ApiTransferTypes.SALE_OR_GIFT:
+      case ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL:
         return true // Always enable for Sale or Gift
       case ApiTransferTypes.SURVIVING_JOINT_TENANT:
         return false // Disable for Surviving Joint Tenants
@@ -112,6 +118,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     switch (getMhrTransferType.value?.transferType) {
       case ApiTransferTypes.SALE_OR_GIFT:
         return true // Always enable for Sale or Gift
+      case ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL:
       case ApiTransferTypes.SURVIVING_JOINT_TENANT:
         return false // Disable for Surviving Joint Tenants
       default:
@@ -126,6 +133,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
 
     switch (getMhrTransferType.value?.transferType) {
       case ApiTransferTypes.SALE_OR_GIFT:
+      case ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL:
         return true // Always enable for Sale or Gift
       case ApiTransferTypes.SURVIVING_JOINT_TENANT:
         // Check for joint tenancy (at least two owners who are not executors, trustees or admins)
@@ -179,6 +187,20 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       )
 
       return hasDeceasedOrChangedOwners && !isDeceasedOrChangedOwnerGroup
+    }
+    return false
+  }
+
+  // Disable Delete button for all Owners that are not in the Group of initially deleted owner (WILL transfer flow)
+  const isDisabledForWillChanges = (owner: MhrRegistrationHomeOwnerIF): boolean => {
+    if (getMhrTransferType.value?.transferType === ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL) {
+      const hasDeletedOwners = getMhrTransferHomeOwnerGroups.value.some(group =>
+        group.owners.some(owner => owner.action === ActionTypes.REMOVED))
+
+      const isDeletedOwnersInGroup = getMhrTransferHomeOwnerGroups.value.find(group =>
+        group.groupId === owner.groupId).owners.some(owner => owner.action === ActionTypes.REMOVED)
+
+      return hasDeletedOwners && !isDeletedOwnersInGroup
     }
     return false
   }
@@ -272,8 +294,11 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     enableTransferOwnerActions,
     enableTransferOwnerMenuActions,
     enableAddHomeOwners,
+    enableDeleteAllGroupsActions,
     showDeathCertificate,
+    showSupportingDocuments,
     isDisabledForSJTChanges,
+    isDisabledForWillChanges,
     isCurrentOwner,
     isTransferDueToDeath,
     disableNameFields,
