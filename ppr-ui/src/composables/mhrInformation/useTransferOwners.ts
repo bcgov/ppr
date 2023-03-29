@@ -151,6 +151,19 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     }
   }
 
+  /** Conditionally Enable HomeOwner Delete All Owners/Groups based on Transfer Type **/
+  const enableDeleteAllGroupsActions = (): boolean => {
+    // Manual override to force enable all actions (ie MhRegistrations)
+    if (enableAllActions) return true
+
+    switch (getMhrTransferType.value?.transferType) {
+      case ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL:
+        return false // Disable for Grant of Probate with Will
+      default:
+        return true
+    }
+  }
+
   /**
    * Return true if there is a deceased or modified owner outside the specified owners group
    * in Surviving Joint Tenants

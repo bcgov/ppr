@@ -109,7 +109,7 @@
           <span class="mx-2"></span>
 
           <v-btn
-            v-if="isMhrTransfer"
+            v-if="isMhrTransfer && enableDeleteAllGroupsActions()"
             outlined
             color="primary"
             :ripple="false"
@@ -327,6 +327,7 @@ export default defineComponent({
     const {
       enableHomeOwnerChanges,
       enableAddHomeOwners,
+      enableDeleteAllGroupsActions,
       isTransferDueToDeath
     } = useTransferOwners(!props.isMhrTransfer)
 
@@ -507,6 +508,7 @@ export default defineComponent({
       getUiTransferType,
       enableAddHomeOwners,
       enableHomeOwnerChanges,
+      enableDeleteAllGroupsActions,
       getMhrTransferDeclaredValue,
       ...toRefs(localState)
     }

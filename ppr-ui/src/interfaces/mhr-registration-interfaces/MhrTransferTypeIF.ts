@@ -1,5 +1,4 @@
 // Search type interface
-import { HintIF } from '@/interfaces'
 import { ApiTransferTypes, UITransferTypes } from '@/enums/transferTypes'
 
 export interface TransferTypeSelectIF {
