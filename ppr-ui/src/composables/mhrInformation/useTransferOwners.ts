@@ -100,11 +100,9 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     switch (getMhrTransferType.value?.transferType) {
       case ApiTransferTypes.SALE_OR_GIFT:
       case ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL:
-        return true // Always enable for Sale or Gift
+        return true // Always enable for Sale or Gift and Executor Will
       case ApiTransferTypes.SURVIVING_JOINT_TENANT:
         return false // Disable for Surviving Joint Tenants
-      case ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL:
-        return true // Always enable for Executor Will
       default:
         return false
     }
