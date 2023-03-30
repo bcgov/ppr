@@ -9,7 +9,7 @@ import '@/utils/use-composition-api'
 
 import { readonly, ref, toRefs, watch } from '@vue/composition-api'
 import { useActions, useGetters } from 'vuex-composition-helpers'
-import { ActionTypes, HomeTenancyTypes } from '@/enums'
+import { ActionTypes, HomeTenancyTypes, HomeOwnerPartyTypes } from '@/enums'
 import { MhrCompVal, MhrSectVal } from '@/composables/mhrRegistration/enums'
 import { useMhrValidations } from '@/composables'
 import { find, findIndex, remove, set } from 'lodash'
@@ -48,6 +48,12 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
     'setMhrTransferHomeOwnerGroups'
   ])
 
+  const executorTrusteeAdmin = [
+    HomeOwnerPartyTypes.EXECUTOR,
+    HomeOwnerPartyTypes.TRUSTEE,
+    HomeOwnerPartyTypes.ADMINISTRATOR
+  ]
+
   // Get Transfer or Registration Home Owners
   const getTransferOrRegistrationHomeOwners = (): MhrRegistrationHomeOwnerIF[] =>
     isMhrTransfer ? getMhrTransferHomeOwners.value : getMhrRegistrationHomeOwners.value
@@ -76,6 +82,12 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
   const getHomeTenancyType = (): HomeTenancyTypes => {
     // Groups
     const groups = getTransferOrRegistrationHomeOwnerGroups().filter(owner => owner.action !== ActionTypes.REMOVED)
+    // Variable to track if owners has a valid combination of Executor/Trustee/Admin (ETA) Owners
+    let hasETAError = false
+    groups.forEach(group => {
+      if (hasETAGroupError(group)) hasETAError = true
+    })
+
     const commonCondition = isMhrTransfer ? groups.length > 1 : showGroups.value
 
     // Special case where a defined Group is orphaned using remove functionality, we want to preserve the Group Type.
@@ -93,7 +105,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
       // Added second condition, because when an owner exists as a Sole Ownership, editing and clicking Done,
       // will change status to Tenants in Common unless above logic is in place..
       return HomeTenancyTypes.SOLE
-    } else if (numOfOwners > 1) {
+    } else if (numOfOwners > 1 && !hasETAError) {
       // More than one owner without groups showing
       return HomeTenancyTypes.JOINT
     }
@@ -103,7 +115,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
   const getGroupTenancyType = (group: MhrRegistrationHomeOwnerGroupIF): HomeTenancyTypes => {
     const numOfOwnersInGroup = group.owners.filter(owner => owner.action !== ActionTypes.REMOVED).length
 
-    if (numOfOwnersInGroup > 1) {
+    if (numOfOwnersInGroup > 1 && !hasETAGroupError(group)) {
       return HomeTenancyTypes.JOINT
     } else if (getHomeTenancyType() === HomeTenancyTypes.SOLE) {
       return HomeTenancyTypes.SOLE
@@ -112,6 +124,22 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
     }
   }
 
+  const hasETAGroupError = (group: MhrRegistrationHomeOwnerGroupIF): boolean => {
+    // Variable to track if group has a valid combination of Executor/Trustee/Admin (ETA) Owners
+    let hasETAGroupError = false
+    // If a group contains multiple ETA's within one group, set invalid
+    if (group.owners.filter(owner => executorTrusteeAdmin.includes(owner.partyType)).length > 1) {
+      console.log('Multiple ETA Error')
+      hasETAGroupError = true
+    }
+    // If group has a mix of ETA and living owner, set invalid
+    if (group.owners.some(owner => executorTrusteeAdmin.includes(owner.partyType)) &&
+        group.owners.some(owner => !executorTrusteeAdmin.includes(owner.partyType))) {
+      console.log('Mix ETA Error')
+      hasETAGroupError = true
+    }
+    return hasETAGroupError
+  }
   /**
    * Get Ownership Allocation status object to conveniently show total allocation
    * and an allocation error status if exists
@@ -473,6 +501,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
     undoGroupRemoval,
     hasRemovedAllHomeOwners,
     hasRemovedAllHomeOwnerGroups,
-    hasUndefinedGroupInterest
+    hasUndefinedGroupInterest,
+    hasETAGroupError
   }
 }
