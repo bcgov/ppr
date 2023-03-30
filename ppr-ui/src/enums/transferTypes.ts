@@ -15,6 +15,6 @@ export enum UITransferTypes {
 }
 
 export enum SupportingDocumentsOptions {
-  PROBATE_GRANT,
-  DEATH_CERT
+  PROBATE_GRANT = 'PROBATE_GRANT',
+  DEATH_CERT = 'DEATH_CERT'
 }
