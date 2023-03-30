@@ -34,7 +34,7 @@
       </p>
     </div>
     <div v-if="deletedOwner.supportingDocument === docOptions.optionTwo.value"
-      class="supporting-doc-tow">
+      class="supporting-doc-two">
       <slot name="deathCert"></slot>
     </div>
   </div>
