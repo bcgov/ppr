@@ -94,7 +94,7 @@ TRAND_ADD_GROUPS = [
         'type': 'SOLE'
     }
 ]
-EXEC_DELETE_GROUPS = [
+AFFIDAVIT_DELETE_GROUPS = [
     {
         'groupId': 1,
         'owners': [
@@ -110,6 +110,8 @@ EXEC_DELETE_GROUPS = [
                     'postalCode': 'V8S 4I6',
                     'country': 'CA'
                 },
+                'deathCertificateNumber': '232432434',
+                'deathDateTime': '2021-02-21T18:56:00+00:00',
                 'phoneNumber': '6041234567'
             }, {
                 'individualName': {
@@ -131,25 +133,11 @@ EXEC_DELETE_GROUPS = [
         'type': 'JOINT'
     }
 ]
-EXEC_ADD_GROUPS = [
+AFFIDAVIT_ADD_GROUPS = [
     {
         'groupId': 2,
         'owners': [
             {
-                'individualName': {
-                    'first': 'SHARON',
-                    'last': 'HALL'
-                },
-                'address': {
-                    'street': '3122B LYNNLARK PLACE',
-                    'city': 'VICTORIA',
-                    'region': 'BC',
-                    'postalCode': 'V8S 4I6',
-                    'country': 'CA'
-                },
-                'phoneNumber': '6041234567',
-                'partyType': 'OWNER_IND'
-            }, {
                 'individualName': {
                     'first': 'APPOINTED',
                     'last': 'EXECUTOR'
@@ -166,7 +154,7 @@ EXEC_ADD_GROUPS = [
                 'description': 'EXECUTOR of the deceased.'
             }
         ],
-        'type': 'NA'
+        'type': 'SOLE'
     }
 ]
 ADMIN_DELETE_GROUPS = [
@@ -384,8 +372,8 @@ def test_create_transfer_death(session, client, jwt, desc, mhr_num, roles, statu
         json_data['deleteOwnerGroups'] = copy.deepcopy(WILL_DELETE_GROUPS)
         json_data['addOwnerGroups'] = copy.deepcopy(WILL_ADD_GROUPS)
     else:
-        json_data['deleteOwnerGroups'] = copy.deepcopy(EXEC_DELETE_GROUPS)
-        json_data['addOwnerGroups'] = copy.deepcopy(EXEC_ADD_GROUPS)
+        json_data['deleteOwnerGroups'] = copy.deepcopy(AFFIDAVIT_DELETE_GROUPS)
+        json_data['addOwnerGroups'] = copy.deepcopy(AFFIDAVIT_ADD_GROUPS)
     if reg_type == MhrRegistrationTypes.TRANS_AFFIDAVIT:
         json_data['declaredValue'] = 25000
     if account:
@@ -399,4 +387,5 @@ def test_create_transfer_death(session, client, jwt, desc, mhr_num, roles, statu
                            content_type='application/json')
 
     # check
+    # current_app.logger.info(response.json)
     assert response.status_code == status

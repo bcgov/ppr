@@ -317,9 +317,11 @@ class Db2Manuhome(db.Model):
             'clientReferenceId': doc_json.get('clientReferenceId', ''),
             'submittingParty': doc_json.get('submittingParty')
         }
+        if doc.document_type == Db2Document.DocumentTypes.TRANS_AFFIDAVIT:
+            man_home['status'] = model_utils.STATUS_FROZEN
         if doc_json.get('attentionReference'):
             man_home['attentionReference'] = doc_json.get('attentionReference')
-        current_app.logger.info(f'json document_type=${doc.document_type}$')
+        # current_app.logger.info(f'json document_type=${doc.document_type}$')
         if doc.document_type in (Db2Document.DocumentTypes.TRANS,
                                  Db2Document.DocumentTypes.TRAND,
                                  Db2Document.DocumentTypes.TRANS_ADMIN,
@@ -461,6 +463,8 @@ class Db2Manuhome(db.Model):
                         doc.registration_ts > declared_ts:
                     declared_value = doc.declared_value
                     declared_ts = doc.registration_ts
+            if self.reg_documents[-1].document_type == Db2Document.DocumentTypes.TRANS_AFFIDAVIT:
+                man_home['status'] = model_utils.STATUS_FROZEN
         man_home['declaredValue'] = declared_value
         if declared_ts:
             man_home['declaredDateTime'] = model_utils.format_local_ts(declared_ts)

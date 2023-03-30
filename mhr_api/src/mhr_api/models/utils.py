@@ -200,6 +200,8 @@ ERR_DOCUMENT_NOT_FOUND_ID = '{code}: no registration found for document ID {docu
 ERR_SEARCH_TOO_OLD = '{code}: search get details search ID {search_id} timestamp too old: must be after {min_ts}.'
 ERR_SEARCH_COMPLETE = '{code}: search select results failed: results already provided for search ID {search_id}.'
 ERR_SEARCH_NOT_FOUND = '{code}: search select results failed: invalid search ID {search_id}.'
+ERR_SEARCH_INVALID = '{code}: search select results failed: all selected MHR numbers must exist in the search results.'
+ERR_SEARCH_INVALID_NIL = '{code}: search select results failed: NIL search submitting MHR numbers is invalid.'
 ERR_DRAFT_NOT_FOUND = '{code}: no Draft found for Draft Number {draft_number}.'
 ERR_DRAFT_USED = '{code}: Draft for Draft Number {draft_number} has been used.'
 ERR_REGISTRATION_ACCOUNT = '{code}: the account ID {account_id} does not match MHR number {mhr_number}.'
@@ -217,6 +219,7 @@ COUNTRY_US = 'US'
 PROVINCE_BC = 'BC'
 REGISTRATION_PATH = '/mhr/api/v1/registrations/'
 OWNER_INTEREST_UNDIVIDED = 'UNDIVIDED'
+STATUS_FROZEN = 'FROZEN'
 
 
 def get_max_registrations_size():
