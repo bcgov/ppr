@@ -530,6 +530,8 @@ export default defineComponent({
       isCurrentOwner,
       isTransferDueToDeath,
       hasCurrentOwnerChanges,
+      hasDeletedOwnersWithProbateGrant,
+      prefillOwnerAsExecutor,
       disableNameFields
     } = useTransferOwners()
 
@@ -566,6 +568,11 @@ export default defineComponent({
       }
     } else {
       defaultHomeOwner.organizationName = props.editHomeOwner?.organizationName || ''
+    }
+
+    // TRANS_WILL flow: Pre-fill only new Owner as Executor (not when editing existing owner)
+    if (hasDeletedOwnersWithProbateGrant() && !props.editHomeOwner) {
+      prefillOwnerAsExecutor(defaultHomeOwner)
     }
 
     const allFractionalData = (getTransferOrRegistrationHomeOwnerGroups() || [{}]).map(group => {
@@ -664,6 +671,13 @@ export default defineComponent({
             localState.ownerGroupId || 1
           )
         } else {
+          // In TRANS_WILL flow, if the owner is the executor, add to same group as deleted owner with Probate Grant
+          if (props.isMhrTransfer &&
+            hasDeletedOwnersWithProbateGrant() &&
+            localState.owner.partyType === HomeOwnerPartyTypes.EXECUTOR) {
+            localState.ownerGroupId = localState.owner.groupId
+          }
+
           addOwnerToTheGroup(
             localState.owner as MhrRegistrationHomeOwnerIF,
             localState.ownerGroupId
@@ -754,6 +768,8 @@ export default defineComponent({
       getStepValidation,
       MhrSectVal,
       isCurrentOwner,
+      hasDeletedOwnersWithProbateGrant,
+      prefillOwnerAsExecutor,
       isTransferDueToDeath,
       disableNameFields,
       HomeOwnerPartyTypes,

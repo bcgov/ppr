@@ -325,51 +325,19 @@
         <tr v-else-if="isRemovedHomeOwner(row.item) && showSupportingDocuments() && !isReadonlyTable">
           <td :colspan="homeOwnersTableHeaders.length" class="pl-14">
             <v-expand-transition>
-              <div class="">
-                <p>
-                  Select the supporting document you have for this owner:
-                </p>
-                <v-radio-group
-                  id="supporting-docs-options"
-                  v-model="row.item.supportingDocument"
-                  class="supporting-docs-options"
-                  row
-                  hide-details="true"
-                >
-                  <v-radio
-                    id="probate-grant-option"
-                    class="csa-radio"
-                    label="Grant of Probate with Will"
-                    active-class="selected-radio"
-                    :value="SupportingDocumentsOptions.PROBATE_GRANT"
-                    :ripple="false"
+              <SupportingDocuments
+                :deletedOwner="row.item"
+                :isSoleOwner="getGroupOwnersCount(row.item.groupId) === 1"
+              >
+                <template v-slot:deathCert>
+                  <DeathCertificate
+                    :deceasedOwner="row.item"
+                    :validate="validateTransfer"
+                    @isValid="isValidDeathCertificate = $event"
                   />
-                  <v-radio
-                    id="death-cert-option"
-                    class="engineer-radio"
-                    label="Death Certificate"
-                    active-class="selected-radio"
-                    :value="SupportingDocumentsOptions.DEATH_CERT"
-                    :ripple="false"
-                  />
-                </v-radio-group>
-              </div>
+                </template>
+              </SupportingDocuments>
             </v-expand-transition>
-            <div v-if="row.item.supportingDocument === SupportingDocumentsOptions.PROBATE_GRANT"
-              class="supporting-doc-probate">
-              <p>
-                <strong>Note:</strong> Ensure you have a court certified true copy of the
-                Grant of Probate with the will attached.
-              </p>
-            </div>
-            <div v-if="row.item.supportingDocument === SupportingDocumentsOptions.DEATH_CERT"
-              class="supporting-doc-cert">
-              <DeathCertificate
-                :deceasedOwner="row.item"
-                :validate="validateTransfer"
-                @isValid="isValidDeathCertificate = $event"
-              />
-            </div>
           </td>
         </tr>
       </template>
@@ -389,7 +357,7 @@ import { BaseAddress } from '@/composables/address'
 import { PartyAddressSchema } from '@/schemas'
 import { toDisplayPhone } from '@/utils'
 import { AddEditHomeOwner } from '@/components/mhrRegistration/HomeOwners'
-import { DeathCertificate } from '@/components/mhrTransfers'
+import { DeathCertificate, SupportingDocuments } from '@/components/mhrTransfers'
 import { BaseDialog } from '@/components/dialogs'
 import TableGroupHeader from '@/components/mhrRegistration/HomeOwners/TableGroupHeader.vue'
 import { mhrDeceasedOwnerChanges } from '@/resources/dialogOptions'
@@ -402,7 +370,7 @@ import { useActions, useGetters } from 'vuex-composition-helpers'
 
 export default defineComponent({
   name: 'HomeOwnersTable',
-  emits: ['isValidTransferOwners'],
+  emits: ['isValidTransferOwners', 'handleUndo'],
   props: {
     homeOwners: { default: () => [] },
     isAdding: { default: false },
@@ -417,6 +385,7 @@ export default defineComponent({
     BaseDialog,
     AddEditHomeOwner,
     TableGroupHeader,
+    SupportingDocuments,
     DeathCertificate
   },
   setup (props, context) {
@@ -546,6 +515,7 @@ export default defineComponent({
         item.groupId
       )
       await undoGroupRemoval(item.groupId)
+      context.emit('handleUndo', item)
     }
 
     const openForEditing = (index: number) => {
@@ -583,6 +553,11 @@ export default defineComponent({
     const hasNoGroupInterest = (groupId: number): boolean => {
       const group = getGroupById(groupId)
       return !group.interestNumerator && !group.interestDenominator
+    }
+
+    // Count number of Home Owner within a group
+    const getGroupOwnersCount = (groupId: number): number => {
+      return getGroupById(groupId).owners.length
     }
 
     const disableGroupHeader = (groupId: number): boolean => {
@@ -675,6 +650,7 @@ export default defineComponent({
       disableGroupHeader,
       isGroupWithNoOwners,
       getGroupNumberById,
+      getGroupOwnersCount,
       getTransferOrRegistrationHomeOwners,
       getTransferOrRegistrationHomeOwnerGroups,
       enableHomeOwnerChanges,
@@ -784,37 +760,6 @@ export default defineComponent({
     td {
       white-space: normal;
       vertical-align: top;
-    }
-  }
-
-  .supporting-docs-options {
-    display: flex;
-
-    .v-radio {
-      flex: 1;
-      background-color: rgba(0, 0, 0, 0.06);
-      height: 60px;
-      padding: 10px;
-      margin-right: 20px;
-    }
-
-    .v-radio:last-of-type {
-      margin-right: 0;
-    }
-
-  }
-
-  .supporting-doc-probate,
-  .supporting-doc-cert {
-    border-top: 1px solid $gray3;
-    margin-top: 35px;
-    padding-top: 35px;
-  }
-
-  .supporting-doc-cert {
-    padding-top: 22px;
-    .death-certificate {
-      margin-bottom: 0;
     }
   }
 
