@@ -151,7 +151,7 @@
                 text-color="$gray9"
                 data-test-id="owner-removed-badge"
               >
-                <b>{{showDeathCertificate() ? 'DECEASED' : 'DELETED'}}</b>
+                <b>{{showDeathCertificate() || isTransferToExecutorProbateWill ? 'DECEASED' : 'DELETED'}}</b>
               </v-chip>
             </template>
           </td>
@@ -424,6 +424,7 @@ export default defineComponent({
       isCurrentOwner,
       getCurrentOwnerStateById,
       isTransferDueToDeath,
+      isTransferToExecutorProbateWill,
       groupHasRemovedAllCurrentOwners,
       moveCurrentOwnersToPreviousOwners
     } = useTransferOwners(!props.isMhrTransfer)
@@ -475,8 +476,6 @@ export default defineComponent({
       }),
       isUngroupedTenancy: computed((): boolean => {
         return [HomeTenancyTypes.SOLE, HomeTenancyTypes.JOINT].includes(getHomeTenancyType())
-      }),
-      disableDelete: computed(() => {
       }),
       isProbateGrantOption: computed((): boolean => {
         return localState.transWillSupportDoc === SupportingDocumentsOptions.PROBATE_GRANT
@@ -661,6 +660,7 @@ export default defineComponent({
       showSupportingDocuments,
       isDisabledForSJTChanges,
       isDisabledForWillChanges,
+      isTransferToExecutorProbateWill,
       isCurrentOwner,
       mhrDeceasedOwnerChanges,
       removeOwnerHandler,

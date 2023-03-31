@@ -300,6 +300,10 @@ describe('Home Owners', () => {
     // delete the sole owner
     await homeOwnersTable.find(getTestId('table-delete-btn')).trigger('click')
 
+    const deceasedBadge = homeOwnersTable.find(getTestId('owner-removed-badge'))
+    expect(deceasedBadge.exists()).toBeTruthy()
+    expect(deceasedBadge.text()).toContain('DECEASED')
+
     const supportingDocumentsComponent = wrapper.findComponent(SupportingDocuments)
     expect(supportingDocumentsComponent.isVisible()).toBeTruthy()
 
