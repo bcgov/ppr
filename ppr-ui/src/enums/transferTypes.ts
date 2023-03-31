@@ -13,3 +13,8 @@ export enum UITransferTypes {
   TO_ADMIN_PROBATE_NO_WILL = 'Transfer to Administrator - Grant of Probate with no Will',
   TO_EXECUTOR_PROBATE_WILL = 'Transfer to Executor - Grant of Probate with Will'
 }
+
+export enum SupportingDocumentsOptions {
+  PROBATE_GRANT = 'PROBATE_GRANT',
+  DEATH_CERT = 'DEATH_CERT'
+}

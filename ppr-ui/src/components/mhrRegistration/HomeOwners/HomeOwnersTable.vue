@@ -86,7 +86,7 @@
         >
           <td
             class="owner-name"
-            :class="{'no-bottom-border' : isRemovedHomeOwner(row.item) && showDeathCertificate(),
+            :class="{'no-bottom-border' : hideRowBottomBorder(row.item),
               'border-error-left': showInvalidDeceasedOwnerGroupError(row.item.groupId) }"
           >
             <div :class="{'removed-owner': isRemovedHomeOwner(row.item)}">
@@ -151,25 +151,25 @@
                 text-color="$gray9"
                 data-test-id="owner-removed-badge"
               >
-                <b>{{showDeathCertificate() ? 'DECEASED' : 'DELETED'}}</b>
+                <b>{{showDeathCertificate() || isTransferToExecutorProbateWill ? 'DECEASED' : 'DELETED'}}</b>
               </v-chip>
             </template>
           </td>
-          <td :class="{'no-bottom-border' : isRemovedHomeOwner(row.item) && showDeathCertificate()}">
+          <td :class="{'no-bottom-border' : hideRowBottomBorder(row.item)}">
             <base-address
               :schema="addressSchema"
               :value="row.item.address"
               :class="{'removed-owner': isRemovedHomeOwner(row.item)}"
             />
           </td>
-          <td :class="{'no-bottom-border' : isRemovedHomeOwner(row.item) && showDeathCertificate()}">
+          <td :class="{'no-bottom-border' : hideRowBottomBorder(row.item)}">
             <div :class="{'removed-owner': isRemovedHomeOwner(row.item)}">
               {{ toDisplayPhone(row.item.phoneNumber) }}
               <span v-if="row.item.phoneExtension"> Ext {{ row.item.phoneExtension }} </span>
             </div>
           </td>
           <td v-if="showEditActions" class="row-actions text-right"
-            :class="{'no-bottom-border' : isRemovedHomeOwner(row.item) && showDeathCertificate()}">
+            :class="{'no-bottom-border' : hideRowBottomBorder(row.item)}">
             <!-- New Owner Actions -->
             <div
               v-if="(!isMhrTransfer || isAddedHomeOwner(row.item)) && enableHomeOwnerChanges()"
@@ -217,7 +217,8 @@
                 v-if="!isRemovedHomeOwner(row.item) && !isChangedOwner(row.item)"
                 text color="primary" class="mr-n4"
                 :ripple="false"
-                :disabled="isAddingMode || isEditingMode || isGlobalEditingMode || isDisabledForSJTChanges(row.item)"
+                :disabled="isAddingMode || isEditingMode || isGlobalEditingMode ||
+                  isDisabledForSJTChanges(row.item) ||isDisabledForWillChanges(row.item)"
                 @click="markForRemoval(row.item)"
                 data-test-id="table-delete-btn"
               >
@@ -293,7 +294,7 @@
         >
           <td
             :colspan="homeOwnersTableHeaders.length"
-            class="py-0"
+            class="py-0 pl-8"
             :class="{ 'border-error-left': showInvalidDeceasedOwnerGroupError(row.item.groupId) }"
           >
             <v-expand-transition>
@@ -321,6 +322,24 @@
             </v-row>
           </td>
         </tr>
+        <tr v-else-if="isRemovedHomeOwner(row.item) && showSupportingDocuments() && !isReadonlyTable">
+          <td :colspan="homeOwnersTableHeaders.length" class="pl-14">
+            <v-expand-transition>
+              <SupportingDocuments
+                :deletedOwner="row.item"
+                :isSecondOptionDisabled="getGroupOwnersCount(row.item.groupId) === 1"
+              >
+                <template v-slot:deathCert>
+                  <DeathCertificate
+                    :deceasedOwner="row.item"
+                    :validate="validateTransfer"
+                    @isValid="isValidDeathCertificate = $event"
+                  />
+                </template>
+              </SupportingDocuments>
+            </v-expand-transition>
+          </td>
+        </tr>
       </template>
 
       <template v-slot:no-data>
@@ -338,20 +357,20 @@ import { BaseAddress } from '@/composables/address'
 import { PartyAddressSchema } from '@/schemas'
 import { toDisplayPhone } from '@/utils'
 import { AddEditHomeOwner } from '@/components/mhrRegistration/HomeOwners'
-import { DeathCertificate } from '@/components/mhrTransfers'
+import { DeathCertificate, SupportingDocuments } from '@/components/mhrTransfers'
 import { BaseDialog } from '@/components/dialogs'
 import TableGroupHeader from '@/components/mhrRegistration/HomeOwners/TableGroupHeader.vue'
 import { mhrDeceasedOwnerChanges } from '@/resources/dialogOptions'
 import { yyyyMmDdToPacificDate } from '@/utils/date-helper'
 /* eslint-disable no-unused-vars */
 import { MhrRegistrationHomeOwnerIF } from '@/interfaces'
-import { ActionTypes, ApiTransferTypes, HomeTenancyTypes, HomeOwnerPartyTypes } from '@/enums'
+import { ActionTypes, HomeTenancyTypes, HomeOwnerPartyTypes, SupportingDocumentsOptions } from '@/enums'
 /* eslint-enable no-unused-vars */
 import { useActions, useGetters } from 'vuex-composition-helpers'
 
 export default defineComponent({
   name: 'HomeOwnersTable',
-  emits: ['isValidTransferOwners'],
+  emits: ['isValidTransferOwners', 'handleUndo'],
   props: {
     homeOwners: { default: () => [] },
     isAdding: { default: false },
@@ -366,6 +385,7 @@ export default defineComponent({
     BaseDialog,
     AddEditHomeOwner,
     TableGroupHeader,
+    SupportingDocuments,
     DeathCertificate
   },
   setup (props, context) {
@@ -398,10 +418,13 @@ export default defineComponent({
       enableTransferOwnerGroupActions,
       enableTransferOwnerMenuActions,
       showDeathCertificate,
+      showSupportingDocuments,
       isDisabledForSJTChanges,
+      isDisabledForWillChanges,
       isCurrentOwner,
       getCurrentOwnerStateById,
       isTransferDueToDeath,
+      isTransferToExecutorProbateWill,
       groupHasRemovedAllCurrentOwners,
       moveCurrentOwnersToPreviousOwners
     } = useTransferOwners(!props.isMhrTransfer)
@@ -419,19 +442,20 @@ export default defineComponent({
       reviewed: false,
       showOwnerChangesDialog: false,
       ownerToDecease: null as MhrRegistrationHomeOwnerIF,
+      transWillSupportDoc: null as SupportingDocumentsOptions,
       isEditingMode: computed((): boolean => localState.currentlyEditingHomeOwnerId >= 0),
       isAddingMode: computed((): boolean => props.isAdding),
       isValidDeathCertificate: false,
       showTableError: computed((): boolean => {
         return (props.validateTransfer || localState.reviewedOwners) &&
-            (
-              !hasMinimumGroups() ||
-              hasEmptyGroup.value ||
-              (props.isMhrTransfer && !hasUnsavedChanges.value) ||
-              !localState.isValidAllocation ||
-              localState.hasGroupsWithNoOwners ||
-              (!localState.isUngroupedTenancy && hasUndefinedGroupInterest(getTransferOrRegistrationHomeOwnerGroups()))
-            )
+          (
+            !hasMinimumGroups() ||
+            hasEmptyGroup.value ||
+            (props.isMhrTransfer && !hasUnsavedChanges.value) ||
+            !localState.isValidAllocation ||
+            localState.hasGroupsWithNoOwners ||
+            (!localState.isUngroupedTenancy && hasUndefinedGroupInterest(getTransferOrRegistrationHomeOwnerGroups()))
+          )
       }),
       reviewedOwners: computed((): boolean =>
         getValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_STEPS)),
@@ -452,6 +476,12 @@ export default defineComponent({
       }),
       isUngroupedTenancy: computed((): boolean => {
         return [HomeTenancyTypes.SOLE, HomeTenancyTypes.JOINT].includes(getHomeTenancyType())
+      }),
+      isProbateGrantOption: computed((): boolean => {
+        return localState.transWillSupportDoc === SupportingDocumentsOptions.PROBATE_GRANT
+      }),
+      isDeathCertOption: computed((): boolean => {
+        return localState.transWillSupportDoc === SupportingDocumentsOptions.DEATH_CERT
       })
     })
 
@@ -484,6 +514,7 @@ export default defineComponent({
         item.groupId
       )
       await undoGroupRemoval(item.groupId)
+      context.emit('handleUndo', item)
     }
 
     const openForEditing = (index: number) => {
@@ -523,6 +554,11 @@ export default defineComponent({
       return !group.interestNumerator && !group.interestDenominator
     }
 
+    // Count number of Home Owner within a group
+    const getGroupOwnersCount = (groupId: number): number => {
+      return getGroupById(groupId).owners.length
+    }
+
     const disableGroupHeader = (groupId: number): boolean => {
       const currentOwners = props.homeOwners.filter(owner => owner.action !== ActionTypes.ADDED)
 
@@ -560,6 +596,11 @@ export default defineComponent({
       await markForRemoval(localState.ownerToDecease)
       localState.showOwnerChangesDialog = false
       localState.ownerToDecease = null
+    }
+
+    // Hide bottom border for the owner's row that requires additional input (Death Certificate etc.)
+    const hideRowBottomBorder = (rowItem: MhrRegistrationHomeOwnerIF): boolean => {
+      return isRemovedHomeOwner(rowItem) && (showDeathCertificate() || showSupportingDocuments())
     }
 
     watch(() => localState.currentlyEditingHomeOwnerId, () => {
@@ -608,6 +649,7 @@ export default defineComponent({
       disableGroupHeader,
       isGroupWithNoOwners,
       getGroupNumberById,
+      getGroupOwnersCount,
       getTransferOrRegistrationHomeOwners,
       getTransferOrRegistrationHomeOwnerGroups,
       enableHomeOwnerChanges,
@@ -615,15 +657,20 @@ export default defineComponent({
       enableTransferOwnerGroupActions,
       enableTransferOwnerMenuActions,
       showDeathCertificate,
+      showSupportingDocuments,
       isDisabledForSJTChanges,
+      isDisabledForWillChanges,
+      isTransferToExecutorProbateWill,
       isCurrentOwner,
       mhrDeceasedOwnerChanges,
       removeOwnerHandler,
       removeChangeOwnerHandler,
       handleOwnerChangesDialogResp,
+      hideRowBottomBorder,
       yyyyMmDdToPacificDate,
       showInvalidDeceasedOwnerGroupError,
       HomeOwnerPartyTypes,
+      SupportingDocumentsOptions,
       ...toRefs(localState)
     }
   }
@@ -720,7 +767,7 @@ export default defineComponent({
     padding: 0 12px;
   }
 
-  .font-light, {
+  .font-light {
     color: $gray7;
     font-size: 14px;
     line-height: 22px;

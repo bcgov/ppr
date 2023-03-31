@@ -86,7 +86,7 @@
             color="primary"
             :ripple="false"
             :disabled="isGlobalEditingMode"
-            @click="showAddPersonSection = true"
+            @click="hasHomeOwnersTableErrors ? showError = true : (showAddPersonSection = true, showError = false)"
             data-test-id="add-person-btn"
           >
             <v-icon class="pr-1">mdi-account-plus</v-icon> Add a Person
@@ -99,7 +99,9 @@
             color="primary"
             :ripple="false"
             :disabled="isGlobalEditingMode"
-            @click="showAddPersonOrganizationSection = true"
+            @click="hasHomeOwnersTableErrors
+              ? showError = true
+              : (showAddPersonOrganizationSection = true, showError = false)"
             data-test-id="add-org-btn"
           >
             <v-icon class="pr-1">mdi-domain-plus</v-icon>
@@ -109,7 +111,7 @@
           <span class="mx-2"></span>
 
           <v-btn
-            v-if="isMhrTransfer"
+            v-if="isMhrTransfer && enableDeleteAllGroupsActions()"
             outlined
             color="primary"
             :ripple="false"
@@ -130,7 +132,18 @@
         </v-col>
       </v-row>
 
-      <v-row v-if="!isReadonlyTable" class="my-6" no-gutters>
+      <v-row>
+        <v-col
+          class="transfer-table-error"
+          data-test-id="transfer-table-error"
+        >
+          <div class="error-text fs-12" v-show="showError && hasHomeOwnersTableErrors">
+            You must delete a deceased owner using Grant of Probate with Will before adding an executor
+          </div>
+        </v-col>
+      </v-row>
+
+      <v-row v-if="!isReadonlyTable" class="mb-6" no-gutters>
         <v-col cols="12">
           <span class="generic-label">Home Tenancy Type: </span>
           <span data-test-id="home-owner-tenancy-type">{{ homeTenancyType }}</span>
@@ -264,6 +277,7 @@
           :hideRemovedOwners="hideRemovedOwners"
           :validateTransfer="validateTransfer"
           @isValidTransferOwners="isValidTransferOwners($event)"
+          @handleUndo="handleUndo"
         />
       </v-fade-transition>
     </div>
@@ -327,7 +341,10 @@ export default defineComponent({
     const {
       enableHomeOwnerChanges,
       enableAddHomeOwners,
-      isTransferDueToDeath
+      enableDeleteAllGroupsActions,
+      hasDeletedOwnersWithProbateGrant,
+      isTransferDueToDeath,
+      isTransferToExecutorProbateWill
     } = useTransferOwners(!props.isMhrTransfer)
 
     const {
@@ -361,6 +378,13 @@ export default defineComponent({
       disableAddHomeOwnerBtn: computed(
         () => localState.showAddPersonOrganizationSection || localState.showAddPersonSection
       ),
+      // capture different errors in the table to turn off Add Owner buttons and show error
+      hasHomeOwnersTableErrors: computed(
+        () => {
+          return isTransferToExecutorProbateWill.value ? !hasDeletedOwnersWithProbateGrant() : false
+        }
+      ),
+      showError: false,
       ownershipAllocation: computed((): MhrRegistrationTotalOwnershipAllocationIF => {
         return getTotalOwnershipAllocationStatus()
       }),
@@ -457,6 +481,11 @@ export default defineComponent({
       context.emit('isValidTransferOwners', isValid)
     }
 
+    const handleUndo = (): void => {
+      // reset all necessary flags/props
+      localState.showError = false
+    }
+
     // Enable editing mode whenever adding Person or Business
     // This would disable all Edit buttons
     watch(
@@ -507,7 +536,10 @@ export default defineComponent({
       getUiTransferType,
       enableAddHomeOwners,
       enableHomeOwnerChanges,
+      enableDeleteAllGroupsActions,
+      hasDeletedOwnersWithProbateGrant,
       getMhrTransferDeclaredValue,
+      handleUndo,
       ...toRefs(localState)
     }
   },
@@ -521,6 +553,10 @@ export default defineComponent({
 @import '@/assets/styles/theme.scss';
 span:not(.generic-label)  {
   color: $gray7
+}
+
+.transfer-table-error {
+  padding: 5px 12px 10px !important;
 }
 
 .hide-show-owners {
@@ -542,7 +578,7 @@ span:not(.generic-label)  {
   }
 }
 
-.review-table{
+.review-table {
   margin-top: -40px !important;
   padding-top: 0 !important;
 }

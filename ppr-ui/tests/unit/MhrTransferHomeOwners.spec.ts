@@ -4,22 +4,21 @@ import { getVuexStore } from '@/store'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 
 import { HomeOwners } from '@/views'
-import {
-  AddEditHomeOwner,
-  HomeOwnersTable,
-  HomeOwnerGroups
-} from '@/components/mhrRegistration/HomeOwners'
+import { AddEditHomeOwner, HomeOwnersTable, HomeOwnerGroups } from '@/components/mhrRegistration/HomeOwners'
 import { SimpleHelpToggle } from '@/components/common'
 import {
   mockedPerson,
   mockedOrganization,
   mockedAddedPerson,
   mockedAddedOrganization,
-  mockedRemovedPerson, mockedRemovedOrganization
+  mockedRemovedPerson,
+  mockedRemovedOrganization
 } from './test-data'
 import { getTestId } from './utils'
 import { MhrRegistrationHomeOwnerGroupIF } from '@/interfaces'
 import { ApiTransferTypes, UITransferTypes } from '@/enums'
+import { SupportingDocuments, TransferType } from '@/components/mhrTransfers'
+import { transferSupportingDocuments } from '@/resources'
 
 Vue.use(Vuetify)
 
@@ -50,11 +49,10 @@ describe('Home Owners', () => {
   beforeEach(async () => {
     wrapper = createComponent()
 
-    await store.dispatch('setMhrTransferType',
-      {
-        transferType: ApiTransferTypes.SALE_OR_GIFT,
-        textLabel: UITransferTypes.SALE_OR_GIFT
-      })
+    await store.dispatch('setMhrTransferType', {
+      transferType: ApiTransferTypes.SALE_OR_GIFT,
+      textLabel: UITransferTypes.SALE_OR_GIFT
+    })
   })
   afterEach(() => {
     wrapper.destroy()
@@ -100,6 +98,11 @@ describe('Home Owners', () => {
     setTimeout(async () => {
       expect(wrapper.findComponent(AddEditHomeOwner).exists()).toBeFalsy() // Hidden by default
     }, 500)
+  }
+
+  const selectTransferType = async (transferType: ApiTransferTypes) => {
+    await store.dispatch('setMhrTransferType', { transferType: transferType })
+    await Vue.nextTick()
   }
 
   // Tests
@@ -273,5 +276,65 @@ describe('Home Owners', () => {
     const removedBadges = ownersTable.findAll(getTestId('owner-removed-badge'))
     expect(removedBadges.at(0).exists()).toBe(true)
     expect(removedBadges.at(1).exists()).toBe(true)
+  })
+
+  it('TRANS WILL Flow: display Supporting Document component for deleted sole Owner and add Executor', async () => {
+    // setup transfer type to test
+    const TRANSFER_TYPE = ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL
+
+    const homeOwnerGroup = [{ groupId: 1, owners: [mockedPerson] }]
+    await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerGroup)
+
+    expect(wrapper.findComponent(AddEditHomeOwner).exists()).toBeFalsy()
+
+    const homeOwnersTable = wrapper.findComponent(HomeOwnersTable)
+    // Add Person button should not be visible
+    expect(homeOwnersTable.find(getTestId('add-person-btn')).exists()).toBeFalsy()
+
+    await selectTransferType(TRANSFER_TYPE)
+
+    // Add Person button and error should not exist
+    expect(homeOwnersTable.find(getTestId('add-person-btn')).exists()).toBeFalsy()
+    expect(homeOwnersTable.find(getTestId('transfer-table-error')).exists()).toBeFalsy()
+
+    // delete the sole owner
+    await homeOwnersTable.find(getTestId('table-delete-btn')).trigger('click')
+
+    const deceasedBadge = homeOwnersTable.find(getTestId('owner-removed-badge'))
+    expect(deceasedBadge.exists()).toBeTruthy()
+    expect(deceasedBadge.text()).toContain('DECEASED')
+
+    const supportingDocumentsComponent = wrapper.findComponent(SupportingDocuments)
+    expect(supportingDocumentsComponent.isVisible()).toBeTruthy()
+
+    expect(supportingDocumentsComponent.text()).toContain(transferSupportingDocuments[TRANSFER_TYPE].optionOne.text)
+    expect(supportingDocumentsComponent.text()).toContain(transferSupportingDocuments[TRANSFER_TYPE].optionTwo.text)
+
+    const radioButtonGrantOfProbate = <HTMLInputElement>(
+      supportingDocumentsComponent.find(getTestId('supporting-doc-option-one')).element
+    )
+    // check that Grant of Probate radio button option is selected by default
+    expect(radioButtonGrantOfProbate.checked).toBeTruthy()
+
+    const radioButtonDeathCert = <HTMLInputElement>(
+      supportingDocumentsComponent.find(getTestId('supporting-doc-option-two'))).element
+
+    // check disabled state of Death Certificate radio button
+    expect(radioButtonDeathCert.disabled).toBeTruthy()
+
+    await wrapper.findComponent(HomeOwners).find(getTestId('add-person-btn'))?.trigger('click')
+    await Vue.nextTick()
+
+    const addEditHomeOwner = wrapper.findComponent(AddEditHomeOwner)
+    expect(addEditHomeOwner.find('#executor-option').exists()).toBeTruthy()
+
+    // check that Executor radio button option is selected by default
+    const executorRadioButton = <HTMLInputElement>(addEditHomeOwner.find('#executor-option')).element
+    expect(executorRadioButton.checked).toBeTruthy()
+
+    // check that suffix field value is pre-populated with the name of deleted person
+    const suffix = <HTMLInputElement>(addEditHomeOwner.find(getTestId('suffix'))).element
+    const { first, middle, last } = mockedPerson.individualName
+    expect(suffix.value).toBe(`Executor of the will of ${first} ${middle} ${last}`)
   })
 })

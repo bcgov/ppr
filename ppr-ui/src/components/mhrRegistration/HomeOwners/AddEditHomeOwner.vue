@@ -28,6 +28,7 @@
                 class="owner-radio pr-4"
                 label="Owner"
                 active-class="selected-radio"
+                :disabled="isTransferToExecutorProbateWill"
                 v-model="HomeOwnerPartyTypes.OWNER_IND"
               />
               <v-tooltip
@@ -56,7 +57,7 @@
                 class="trustee-radio px-4"
                 label="Trustee"
                 active-class="selected-radio"
-                :disabled="isTransferDueToDeath"
+                :disabled="isTransferDueToDeath || isTransferToExecutorProbateWill"
                 v-model="HomeOwnerPartyTypes.TRUSTEE"
               />
               <v-radio
@@ -64,7 +65,7 @@
                 class="administrator-radio pl-4"
                 label="Administrator"
                 active-class="selected-radio"
-                :disabled="isTransferDueToDeath"
+                :disabled="isTransferDueToDeath || isTransferToExecutorProbateWill"
                 v-model="HomeOwnerPartyTypes.ADMINISTRATOR"
               />
             </v-radio-group>
@@ -303,7 +304,7 @@
                     id="suffix"
                     v-model="owner.suffix"
                     filled
-                    label="Additional Name Information (Optional)"
+                    :label="'Additional Name Information' + isTransferToExecutorProbateWill ? '' : ' (Optional)'"
                     data-test-id="suffix"
                     hint="Example: Additional legal names, Jr., Sr., Executor of the will of the deceased, etc."
                     persistent-hint
@@ -529,7 +530,10 @@ export default defineComponent({
     const {
       isCurrentOwner,
       isTransferDueToDeath,
+      isTransferToExecutorProbateWill,
       hasCurrentOwnerChanges,
+      hasDeletedOwnersWithProbateGrant,
+      prefillOwnerAsExecutor,
       disableNameFields
     } = useTransferOwners()
 
@@ -566,6 +570,11 @@ export default defineComponent({
       }
     } else {
       defaultHomeOwner.organizationName = props.editHomeOwner?.organizationName || ''
+    }
+
+    // TRANS_WILL flow: Pre-fill only new Owner as Executor (not when editing existing owner)
+    if (hasDeletedOwnersWithProbateGrant() && !props.editHomeOwner) {
+      prefillOwnerAsExecutor(defaultHomeOwner)
     }
 
     const allFractionalData = (getTransferOrRegistrationHomeOwnerGroups() || [{}]).map(group => {
@@ -664,6 +673,13 @@ export default defineComponent({
             localState.ownerGroupId || 1
           )
         } else {
+          // In TRANS_WILL flow, if the owner is the executor, add to same group as deleted owner with Probate Grant
+          if (props.isMhrTransfer &&
+            hasDeletedOwnersWithProbateGrant() &&
+            localState.owner.partyType === HomeOwnerPartyTypes.EXECUTOR) {
+            localState.ownerGroupId = localState.owner.groupId
+          }
+
           addOwnerToTheGroup(
             localState.owner as MhrRegistrationHomeOwnerIF,
             localState.ownerGroupId
@@ -754,7 +770,10 @@ export default defineComponent({
       getStepValidation,
       MhrSectVal,
       isCurrentOwner,
+      hasDeletedOwnersWithProbateGrant,
+      prefillOwnerAsExecutor,
       isTransferDueToDeath,
+      isTransferToExecutorProbateWill,
       disableNameFields,
       HomeOwnerPartyTypes,
       ...toRefs(localState)
