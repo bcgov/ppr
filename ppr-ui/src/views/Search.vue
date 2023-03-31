@@ -200,7 +200,7 @@ export default defineComponent({
       similarResultsLength: computed((): number => {
         const searchResult = getSearchResults.value
         let similarCount = 0
-        if (searchResult) {
+        if (searchResult?.results) {
           for (const result of searchResult.results) {
             if (result.matchType !== 'EXACT') {
               similarCount += 1
