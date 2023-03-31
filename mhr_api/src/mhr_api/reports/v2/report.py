@@ -448,8 +448,7 @@ class Report:  # pylint: disable=too-few-public-methods
                 if detail.get('description') and detail['description'].get('sections'):
                     sections = detail['description'].get('sections')
                     for section in sections:
-                        if section.get('widthFeet', 0) > 16 or \
-                                (section.get('widthFeet', 0) == 16 and section.get('widthInches', 0) > 0):
+                        if section.get('widthFeet', 0) >= 16:
                             messages.append({'messageType': 'WIDTH'})
                             break
                 if detail.get('notes'):
