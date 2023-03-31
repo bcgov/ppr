@@ -28,6 +28,7 @@
                 class="owner-radio pr-4"
                 label="Owner"
                 active-class="selected-radio"
+                :disabled="isTransferToExecutorProbateWill"
                 v-model="HomeOwnerPartyTypes.OWNER_IND"
               />
               <v-tooltip
@@ -56,7 +57,7 @@
                 class="trustee-radio px-4"
                 label="Trustee"
                 active-class="selected-radio"
-                :disabled="isTransferDueToDeath"
+                :disabled="isTransferDueToDeath || isTransferToExecutorProbateWill"
                 v-model="HomeOwnerPartyTypes.TRUSTEE"
               />
               <v-radio
@@ -64,7 +65,7 @@
                 class="administrator-radio pl-4"
                 label="Administrator"
                 active-class="selected-radio"
-                :disabled="isTransferDueToDeath"
+                :disabled="isTransferDueToDeath || isTransferToExecutorProbateWill"
                 v-model="HomeOwnerPartyTypes.ADMINISTRATOR"
               />
             </v-radio-group>
@@ -303,7 +304,7 @@
                     id="suffix"
                     v-model="owner.suffix"
                     filled
-                    label="Additional Name Information (Optional)"
+                    :label="'Additional Name Information' + isTransferToExecutorProbateWill ? '' : ' (Optional)'"
                     data-test-id="suffix"
                     hint="Example: Additional legal names, Jr., Sr., Executor of the will of the deceased, etc."
                     persistent-hint
@@ -529,6 +530,7 @@ export default defineComponent({
     const {
       isCurrentOwner,
       isTransferDueToDeath,
+      isTransferToExecutorProbateWill,
       hasCurrentOwnerChanges,
       hasDeletedOwnersWithProbateGrant,
       prefillOwnerAsExecutor,
@@ -771,6 +773,7 @@ export default defineComponent({
       hasDeletedOwnersWithProbateGrant,
       prefillOwnerAsExecutor,
       isTransferDueToDeath,
+      isTransferToExecutorProbateWill,
       disableNameFields,
       HomeOwnerPartyTypes,
       ...toRefs(localState)

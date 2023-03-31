@@ -17,6 +17,7 @@
         active-class="selected-radio"
         :value="docOptions.optionOne.value"
         :ripple="false"
+        data-test-id="supporting-doc-option-one"
       />
       <v-radio
         id="supporting-doc-option-two"
@@ -25,6 +26,7 @@
         :value="docOptions.optionTwo.value"
         :disabled="isSoleOwner"
         :ripple="false"
+        data-test-id="supporting-doc-option-two"
       />
     </v-radio-group>
     <div v-if="deletedOwner.supportingDocument === docOptions.optionOne.value"
