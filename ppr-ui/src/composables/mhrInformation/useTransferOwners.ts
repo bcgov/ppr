@@ -165,8 +165,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       case ApiTransferTypes.SALE_OR_GIFT:
         return false // Disable for Sale or Gift
       case ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL:
-        if (owner.action === ActionTypes.ADDED) return true
-        return false
+        return owner.action === ActionTypes.ADDED
       case ApiTransferTypes.SURVIVING_JOINT_TENANT:
         // Check for joint tenancy (at least two owners who are not executors, trustees or admins)
         return owner.type === ApiHomeTenancyTypes.JOINT

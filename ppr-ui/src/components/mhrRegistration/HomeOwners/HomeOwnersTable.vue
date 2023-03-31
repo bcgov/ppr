@@ -327,7 +327,7 @@
             <v-expand-transition>
               <SupportingDocuments
                 :deletedOwner="row.item"
-                :isSoleOwner="getGroupOwnersCount(row.item.groupId) === 1"
+                :isSecondOptionDisabled="getGroupOwnersCount(row.item.groupId) === 1"
               >
                 <template v-slot:deathCert>
                   <DeathCertificate
@@ -441,6 +441,7 @@ export default defineComponent({
       reviewed: false,
       showOwnerChangesDialog: false,
       ownerToDecease: null as MhrRegistrationHomeOwnerIF,
+      transWillSupportDoc: null as SupportingDocumentsOptions,
       isEditingMode: computed((): boolean => localState.currentlyEditingHomeOwnerId >= 0),
       isAddingMode: computed((): boolean => props.isAdding),
       isValidDeathCertificate: false,
@@ -477,7 +478,6 @@ export default defineComponent({
       }),
       disableDelete: computed(() => {
       }),
-      transWillSupportDoc: null as SupportingDocumentsOptions,
       isProbateGrantOption: computed((): boolean => {
         return localState.transWillSupportDoc === SupportingDocumentsOptions.PROBATE_GRANT
       }),

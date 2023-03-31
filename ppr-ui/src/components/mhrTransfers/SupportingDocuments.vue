@@ -24,7 +24,7 @@
         :label="docOptions.optionTwo.text"
         active-class="selected-radio"
         :value="docOptions.optionTwo.value"
-        :disabled="isSoleOwner"
+        :disabled="isSecondOptionDisabled"
         :ripple="false"
         data-test-id="supporting-doc-option-two"
       />
@@ -59,7 +59,7 @@ export default defineComponent({
       default: null
     },
     // Used to disable Death Cert when group has only one owner
-    isSoleOwner: {
+    isSecondOptionDisabled: {
       type: Boolean
     }
   },
@@ -92,7 +92,7 @@ export default defineComponent({
     })
 
     // When there is one owner in the group, pre-select first radio option
-    if (props.isSoleOwner) {
+    if (props.isSecondOptionDisabled) {
       props.deletedOwner.supportingDocument = localState.docOptions.optionOne.value
       updateDeletedOwner()
     }
