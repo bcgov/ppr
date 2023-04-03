@@ -354,8 +354,27 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
             # Search detail request already submitted.
             error_msg = model_utils.ERR_SEARCH_COMPLETE.format(code=ResourceErrorCodes.DUPLICATE_ERR,
                                                                search_id=search_id)
+        else:
+            # Check selection MHR numbers are all in the initial search matches.
+            original_results = search_result.search.search_response
+            if original_results:
+                for match in select_json:
+                    exists: bool = False
+                    for result in original_results:
+                        if match.get('mhrNumber') == result.get('mhrNumber'):
+                            exists = True
+                            break
+                    if not exists:
+                        error_msg = model_utils.ERR_SEARCH_INVALID.format(code=ResourceErrorCodes.VALIDATION_ERR)
+                        current_app.logger.info(f'Search {search_id} invalid mhr number in search selection: ' +
+                                                match.get('mhrNumber'))
+                        break
+            elif select_json:
+                current_app.logger.info(f'Search {search_id} invalid mhr numbers submitted with NIL search results.')
+                error_msg = model_utils.ERR_SEARCH_INVALID_NIL.format(code=ResourceErrorCodes.VALIDATION_ERR)
 
         if error_msg != '':
+            current_app.logger.info(error_msg)
             raise BusinessException(error=error_msg, status_code=status_code)
 
         return search_result

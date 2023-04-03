@@ -78,6 +78,12 @@ SET_SELECT_MM = [
      'baseInformation': {'year': 1968, 'make': 'GLENDALE', 'model': ''},
      'ownerName': {'first': 'PRITNAM', 'last': 'SANDHU'}}
 ]
+SET_SELECT_MM_INVALID = [
+    {'mhrNumber': '999911', 'status': 'EXEMPT', 'createDateTime': '1995-11-14T00:00:01+00:00',
+     'homeLocation': 'FORT NELSON', 'serialNumber': '2427',
+     'baseInformation': {'year': 1968, 'make': 'GLENDALE', 'model': ''},
+     'ownerName': {'first': 'PRITNAM', 'last': 'SANDHU'}}
+]
 SET_SELECT_MM_COMBO = [
     {'mhrNumber': '022911', 'status': 'EXEMPT', 'createDateTime': '1995-11-14T00:00:01+00:00',
      'homeLocation': 'FORT NELSON', 'includeLienInfo': True, 'serialNumber': '2427',
@@ -168,6 +174,11 @@ TEST_PPR_SEARCH_DATA = [
     ('Single match mhr number', SET_SELECT_MM_COMBO, '022000', 1),
     ('Double match mhr number', SET_SELECT_MM_COMBO, '220000', 2)
 ]
+# testdata pattern is ({description}, {search data}, {select data})
+TEST_INVALID_MHR_DATA = [
+    ('Original MHR mismatch', MHR_NUMBER_JSON, SET_SELECT_MM_INVALID),
+    ('Original no match with MHR', MHR_NUMBER_NIL_JSON, SET_SELECT_MM_INVALID)
+]
 
 # testdata pattern is ({mhr1}, {mhr2}, {mhr3}, {mhr4}, {search_type})
 TEST_SELECT_SORT_DATA = [
@@ -248,6 +259,23 @@ def test_search_invalid(session, desc, json_data, search_id):
     else:
         assert bad_request_err.value.status_code == HTTPStatus.BAD_REQUEST
     # print(bad_request_err.value.error)
+
+
+@pytest.mark.parametrize('desc,search_data,select_data', TEST_INVALID_MHR_DATA)
+def test_search_invalid_mhr(session, desc, search_data, select_data):
+    """Assert the search detail results validation works as expected on registration matches with invalid MHR's."""
+    # test
+    search_query = SearchRequest.create_from_json(search_data, 'PS12345')
+    search_query.search()
+    search_detail = SearchResult.create_from_search_query(search_query)
+    search_detail.save()
+
+    with pytest.raises(BusinessException) as bad_request_err:
+        SearchResult.validate_search_select(select_data, search_query.id)
+
+    # check
+    assert bad_request_err
+    assert bad_request_err.value.status_code == HTTPStatus.BAD_REQUEST
 
 
 @pytest.mark.parametrize('desc,json_data,mhr_num,match_count', TEST_PPR_SEARCH_DATA)

@@ -428,6 +428,11 @@ TEST_DATA_LTSA_PID = [
     ('001020', '2523', False),
     ('001019', '2523', True)
 ]
+# testdata pattern is ({mhr_num}, {account_id}, {status})
+TEST_DATA_STATUS = [
+    ('003936', '2523', 'FROZEN'),
+    ('003304', '2523', 'ACTIVE')
+]
 
 
 @pytest.mark.parametrize('account_id,mhr_num,exists,reg_desc,in_list', TEST_SUMMARY_REG_DATA)
@@ -592,6 +597,17 @@ def test_find_by_mhr_number_pid(session, mhr_number, account_id, has_pid):
         assert reg_json['location'].get('legalDescription')
     else:
         assert not reg_json['location'].get('legalDescription')
+
+
+@pytest.mark.parametrize('mhr_number, account_id, status', TEST_DATA_STATUS)
+def test_find_by_mhr_number_status(session, mhr_number, account_id, status):
+    """Assert that finding an MHR registration MHR number returns the expected status."""
+    registration: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_number, account_id)
+    assert registration
+    assert registration.mhr_number == mhr_number
+    registration.current_view = True
+    reg_json = registration.new_registration_json
+    assert reg_json.get('status') == status
 
 
 @pytest.mark.parametrize('mhr_number, has_results, account_id', TEST_MHR_NUM_DATA)
