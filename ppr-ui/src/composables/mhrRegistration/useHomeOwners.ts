@@ -82,11 +82,9 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
   const getHomeTenancyType = (): HomeTenancyTypes => {
     // Groups
     const groups = getTransferOrRegistrationHomeOwnerGroups().filter(owner => owner.action !== ActionTypes.REMOVED)
+
     // Variable to track if owners has a valid combination of Executor/Trustee/Admin (ETA) Owners
-    let hasETAError = false
-    groups.forEach(group => {
-      if (hasETAGroupError(group)) hasETAError = true
-    })
+    const hasETAError = groups.some(group => hasETAGroupError(group))
 
     const commonCondition = isMhrTransfer ? groups.length > 1 : showGroups.value
 
@@ -125,20 +123,15 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
   }
 
   const hasETAGroupError = (group: MhrRegistrationHomeOwnerGroupIF): boolean => {
-    // Variable to track if group has a valid combination of Executor/Trustee/Admin (ETA) Owners
-    let hasETAGroupError = false
-    // If a group contains multiple ETA's within one group, set invalid
+    // If a group contains multiple ETA's within one group, return invalid
     if (group.owners.filter(owner => executorTrusteeAdmin.includes(owner.partyType)).length > 1) {
-      console.log('Multiple ETA Error')
-      hasETAGroupError = true
-    }
-    // If group has a mix of ETA and living owner, set invalid
+      return true
+    } else
+    // If group has a mix of ETA and living owner, return invalid
     if (group.owners.some(owner => executorTrusteeAdmin.includes(owner.partyType)) &&
         group.owners.some(owner => !executorTrusteeAdmin.includes(owner.partyType))) {
-      console.log('Mix ETA Error')
-      hasETAGroupError = true
-    }
-    return hasETAGroupError
+      return true
+    } else return false
   }
   /**
    * Get Ownership Allocation status object to conveniently show total allocation
