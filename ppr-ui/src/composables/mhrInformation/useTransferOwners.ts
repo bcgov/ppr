@@ -102,8 +102,6 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       case ApiTransferTypes.SURVIVING_JOINT_TENANT:
         // Check for joint tenancy (at least two owners who are not executors, trustees or admins)
         return isJointTenancyStructure.value
-      case ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL:
-        return true
       default:
         return false
     }
@@ -149,12 +147,10 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     switch (getMhrTransferType.value?.transferType) {
       case ApiTransferTypes.SALE_OR_GIFT:
       case ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL:
-        return true // Always enable for Sale or Gift
+        return true // Always enable for Sale or Gift and Executor Will
       case ApiTransferTypes.SURVIVING_JOINT_TENANT:
         // Check for joint tenancy (at least two owners who are not executors, trustees or admins)
         return owner.type === ApiHomeTenancyTypes.JOINT
-      case ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL:
-        return true
       default:
         return false
     }
@@ -173,8 +169,6 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       case ApiTransferTypes.SURVIVING_JOINT_TENANT:
         // Check for joint tenancy (at least two owners who are not executors, trustees or admins)
         return owner.type === ApiHomeTenancyTypes.JOINT
-      case ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL:
-        return true
       default:
         return false
     }
