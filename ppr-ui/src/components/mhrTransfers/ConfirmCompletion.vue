@@ -8,7 +8,7 @@
       flat
       rounded
       id="confirm-completion-card"
-      class="mt-8 pt-5 pa-8 pr-6 pb-3"
+      class="mt-8 pt-5 pa-8 pr-6 pb-7"
       :class="{ 'border-error-left': showErrorComponent }"
       data-test-id="confirm-completion-card"
     >
@@ -78,7 +78,7 @@
               <li v-if="isRoleStaff" class="pl-3 pb-3 mb-7">
                 <p><strong>Transfer or Change Ownership form</strong> has been recieved and retained.</p>
               </li>
-              <li v-if="transferType === ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL" class="pl-3 pb-3 mb-7">
+              <li v-if="isTransferToExecutorProbateWill" class="pl-3 pb-3 mb-7">
                 <p><strong>Court certified true copy of the Probate with the will.</strong></p>
               </li>
               <li v-if="!isTransferDueToDeath" class="pl-3 pb-3 mb-7">
@@ -153,7 +153,7 @@ export default defineComponent({
       'isRoleStaff'
     ])
 
-    const { isTransferDueToDeath } = useTransferOwners()
+    const { isTransferDueToDeath, isTransferToExecutorProbateWill } = useTransferOwners()
 
     const localState = reactive({
       showErrorComponent: computed((): boolean => {
@@ -174,6 +174,7 @@ export default defineComponent({
       isRoleStaff,
       ApiTransferTypes,
       isTransferDueToDeath,
+      isTransferToExecutorProbateWill,
       ...toRefs(localState)
     }
   }
