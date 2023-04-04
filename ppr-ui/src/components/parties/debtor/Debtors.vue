@@ -56,7 +56,7 @@
     <v-row no-gutters class="pt-4">
       <v-col>
         <v-data-table
-          class="debtor-table"
+          class="debtor-table debtor-data-table"
           :class="{ 'invalid-message': showErrorDebtors && !getDebtorValidity() }"
           :headers="headers"
           :items="debtors"
@@ -65,7 +65,7 @@
           hide-default-footer
           no-data-text="No debtors added yet."
         >
-          <template v-slot:item="row" class="debtor-data-table">
+          <template v-slot:item="row">
             <tr
               v-if="!showEditDebtor[row.index]"
               :key="row.item.id"

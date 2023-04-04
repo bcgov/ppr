@@ -11,7 +11,7 @@
     <v-row no-gutters>
       <v-col>
         <v-data-table
-          class="party-summary-table"
+          class="party-summary-table party-data-table"
           :headers="headers"
           :items="items"
           disable-pagination
@@ -19,7 +19,7 @@
           hide-default-footer
           no-data-text=""
         >
-          <template v-slot:item="row" class="party-data-table">
+          <template v-slot:item="row">
             <tr :key="row.item.id" class="party-row"
             :class="{ 'disabled-text-not-first': row.item.action === ActionTypes.REMOVED}">
               <td class="list-item__title title-text" style="padding-left:30px">

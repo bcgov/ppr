@@ -12,7 +12,7 @@ import { TableRow } from '@/components/tables/common'
 import { RegistrationBarTypeAheadList } from '@/components/registration'
 // local types/helpers/etc.
 import { AccountProductCodes, AccountProductMemberships, TableActions } from '@/enums'
-import { DraftResultIF, MhrDraftTransferApiIF, MhRegistrationSummaryIF, RegistrationSummaryIF, RegTableDataI, RegTableNewItemI } from '@/interfaces'
+import { DraftResultIF, MhRegistrationSummaryIF, RegistrationSummaryIF, RegTableNewItemI } from '@/interfaces'
 import { registrationTableHeaders } from '@/resources'
 // unit test data/helpers
 import {

@@ -204,8 +204,6 @@ export default defineComponent({
       }),
       registrationType: computed((): APIRegistrationTypes => {
         return getRegistrationType.value?.registrationTypeAPI || ''
-      }),
-      123: computed(() => {
       })
     })
 

@@ -105,7 +105,7 @@ export default defineComponent({
   props: {
     autoCompleteItems: {
       type: Array,
-      default: []
+      default: () => []
     },
     setAutoCompleteActive: {
       type: Boolean,

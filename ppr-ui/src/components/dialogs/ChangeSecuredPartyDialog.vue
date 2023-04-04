@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="display" width="45rem" persistent :attach="attach">
+  <v-dialog v-model="displayDialog" width="45rem" persistent :attach="attach">
     <v-card>
       <v-row no-gutters class="pl-10 pt-7">
         <v-col cols="11">
@@ -51,7 +51,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs } from '@vue/composition-api'
+import { computed, defineComponent, reactive, toRefs } from '@vue/composition-api'
 
 export default defineComponent({
   name: 'ChangeSecuredPartyDialog',
@@ -71,7 +71,11 @@ export default defineComponent({
     }
   },
   setup (props, context) {
-    const localState = reactive({})
+    const localState = reactive({
+      displayDialog: computed(() => {
+        return props.display
+      })
+    })
 
     const proceed = (val: boolean) => {
       context.emit('proceed', val)

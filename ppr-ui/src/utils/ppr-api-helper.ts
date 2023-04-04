@@ -66,6 +66,7 @@ function addSortParams (url: string, sortOptions: RegistrationSortIF): string {
     if (sortOptions[sortKeys[i]] && ['startDateTime', 'endDateTime'].includes(UIFilterToApiFilter[sortKeys[i]])) {
       // ensure its not already converted
       if (sortOptions[sortKeys[i]].length < 11) {
+        // eslint-disable-next-line no-self-assign
         sortOptions[sortKeys[i]] = sortOptions[sortKeys[i]]
         // convert to local date object
         const d = new Date(`${sortOptions[sortKeys[i]]}T00:00:00`)

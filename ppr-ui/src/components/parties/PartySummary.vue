@@ -80,7 +80,6 @@ import {
 } from '@/components/parties/summaries'
 import { AddPartiesIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { useParty } from '@/composables/useParty'
-import { BaseAddress } from '@/composables/address'
 import { PartyAddressSchema } from '@/schemas'
 
 import {
@@ -91,7 +90,6 @@ import {
 
 export default defineComponent({
   components: {
-    BaseAddress,
     DebtorSummary,
     RegisteringPartySummary,
     SecuredPartySummary

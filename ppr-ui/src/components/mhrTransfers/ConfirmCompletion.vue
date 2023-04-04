@@ -100,8 +100,8 @@
               v-model="confirmCompletion"
               data-test-id="confirm-completion-checkbox"
             >
-              <template v-slot:label data-test-id="confirm-checkbox-label">
-                <span :class="{ 'invalid-color': showErrorComponent }">
+              <template v-slot:label>
+                <span data-test-id="confirm-checkbox-label" :class="{ 'invalid-color': showErrorComponent }">
                   I, <strong>{{ legalName }}</strong
                   >, confirm that all of the requirements listed above have been completed.
                 </span>

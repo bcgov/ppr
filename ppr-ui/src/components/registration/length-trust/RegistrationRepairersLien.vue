@@ -223,6 +223,7 @@ export default defineComponent({
           newExpDate.setDate(newExpDate.getDate() + 180)
           return formatExpiryDate(newExpDate)
         }
+        return ''
       }),
       lengthTrust: computed((): LengthTrustIF => {
         return getLengthTrust.value as LengthTrustIF || null
@@ -243,6 +244,8 @@ export default defineComponent({
       }),
       surrenderDateSummary: computed((): string => {
         if (props.isRenewal) {
+          // TODO: I'm not sure assigning a computed to a computed works as expected or at all. Revisit this asap.
+          // eslint-disable-next-line vue/no-side-effects-in-computed-properties
           getLengthTrust.value.surrenderDate = getRegistrationSurrenderDate.value
           return convertDate(
             new Date(getLengthTrust.value.surrenderDate),

@@ -38,10 +38,10 @@
               </v-row>
             </v-list-item-content>
           </template>
-          <template v-else class="search-list">
+          <template v-else>
             <v-list-item
               :id="`list-${item.searchTypeAPI.toLowerCase().replaceAll('_','-')}`"
-              class="copy-normal"
+              class="copy-normal search-list"
               :class="{ 'select-menu-padding' : !isSingleSearchOption }"
               @click="selectSearchType(item)"
             >
@@ -106,6 +106,7 @@ export default defineComponent({
         if (!localState.displayGroup[localState.selectedSearchType.group]) {
           return localState.selectedSearchType.searchTypeUI
         }
+        return ''
       }),
       origItems: computed((): Array<SearchTypeIF> => {
         const allSearchTypes = []
@@ -136,6 +137,7 @@ export default defineComponent({
           allSearchTypes.push(...MHRSearchTypes)
           return allSearchTypes.slice(1)
         }
+        return allSearchTypes
       }),
       isSingleSearchOption: computed((): boolean => {
         return ((hasPprEnabled.value && !hasMhrEnabled.value) || (!hasPprEnabled.value && hasMhrEnabled.value)) &&

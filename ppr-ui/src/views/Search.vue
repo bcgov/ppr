@@ -70,7 +70,6 @@ import {
   LargeSearchDelayDialog
 } from '@/components/dialogs'
 import { SearchedResultPpr } from '@/components/tables'
-import { SearchBar } from '@/components/search'
 import { MatchTypes, RouteNames, SettingOptions } from '@/enums'
 import {
   largeSearchReportError,
@@ -81,7 +80,7 @@ import {
   saveSelectionsError
 } from '@/resources/dialogOptions'
 import { getFeatureFlag, submitSelected, successfulPPRResponses, updateSelected, navigate, pacificDate } from '@/utils'
-import { ErrorIF, SearchResultIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { SearchResultIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 
 export default defineComponent({
   name: 'Search',
@@ -90,7 +89,6 @@ export default defineComponent({
     ConfirmationDialog,
     LargeSearchResultDialog,
     LargeSearchDelayDialog,
-    SearchBar,
     SearchedResultPpr
   },
   emits: ['haveData'],

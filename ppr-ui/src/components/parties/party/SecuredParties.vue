@@ -109,7 +109,7 @@
     <v-row no-gutters class="pt-2">
       <v-col>
         <v-data-table
-          class="party-table"
+          class="party-table party-data-table"
           :class="{ 'invalid-message': showErrorSecuredParties && !getSecuredPartyValidity() }"
           :headers="headers"
           :items="securedParties"
@@ -118,7 +118,7 @@
           hide-default-footer
           no-data-text="No Parties added yet."
         >
-          <template v-slot:item="row" class="party-data-table">
+          <template v-slot:item="row">
             <tr
               v-if="!showEditParty[row.index]"
               :key="row.item.id"
@@ -373,7 +373,7 @@ import { useGetters, useActions } from 'vuex-composition-helpers'
 import { cloneDeep, isEqual } from 'lodash'
 // local components
 import { ChangeSecuredPartyDialog } from '@/components/dialogs'
-import { EditParty, PartyAutocomplete, PartySearch } from '@/components/parties/party'
+import { EditParty, PartySearch } from '@/components/parties/party'
 import { BaseAddress } from '@/composables/address'
 // local helpers / types / etc.
 import { useCountriesProvinces } from '@/composables/address/factories'
@@ -389,7 +389,6 @@ export default defineComponent({
     EditParty,
     PartySearch,
     BaseAddress,
-    PartyAutocomplete,
     ChangeSecuredPartyDialog
   },
   props: {
@@ -718,7 +717,7 @@ export default defineComponent({
   padding-right: 2px;
 }
 .v-remove:hover {
-  background-color: white important;
+  background-color: white!important;
 }
 
 .party-search {

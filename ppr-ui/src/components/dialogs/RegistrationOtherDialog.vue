@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="display" width="45rem" persistent :attach="attach">
+  <v-dialog v-model="displayDialog" width="45rem" persistent :attach="attach">
     <v-card>
       <v-row no-gutters class="px-7 pt-7">
         <v-col cols="11">
@@ -39,7 +39,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
+import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
 import { useActions } from 'vuex-composition-helpers'
 // eslint-disable-next-line no-unused-vars
 import { DialogOptionsIF } from '@/interfaces'
@@ -69,6 +69,9 @@ export default defineComponent({
     ])
 
     const localState = reactive({
+      displayDialog: computed(() => {
+        return props.display
+      }),
       validationErrors: '',
       userInput: ''
     })

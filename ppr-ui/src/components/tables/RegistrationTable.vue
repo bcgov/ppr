@@ -237,8 +237,9 @@
           </tr>
         </thead>
       </template>
-      <template v-slot:item="{ expand, item, isExpanded }" class="registration-data-table">
+      <template v-slot:item="{ expand, item, isExpanded }">
         <table-row
+          class="registration-data-table"
           :ref="setRowRef(item)"
           :setAddRegEffect="['newRegItem', 'newAndFirstItem'].includes(setRowRef(item))"
           :setDisableActionShadow="overrideWidth"
@@ -252,9 +253,10 @@
           @toggleExpand="item.expand = !isExpanded, expand(!isExpanded)"
         />
       </template>
-      <template v-slot:expanded-item="{ item }" class="registration-data-table">
+      <template v-slot:expanded-item="{ item }">
         <table-row
           v-for="change in item.changes"
+          class="registration-data-table"
           :key="`change-${change.documentId || change.registrationNumber}`"
           :ref="setRowRef(change)"
           :isPpr="isPpr"

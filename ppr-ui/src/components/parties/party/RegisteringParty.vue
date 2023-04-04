@@ -4,14 +4,14 @@
       <v-row v-if="registeringParty" no-gutters class="pb-8 pt-2 rounded-top">
         <v-col>
           <v-data-table
-            class="registering-table"
+            class="registering-table party-data-table"
             :headers="partyHeaders"
             :items="registeringParty"
             disable-pagination
             disable-sort
             hide-default-footer
           >
-            <template v-slot:item="row" class="party-data-table">
+            <template v-slot:item="row">
               <tr :key="row.item.id" class="registering-row">
                 <td class="list-item__title title-text" style="padding-left:30px">
                   <v-row no-gutters>

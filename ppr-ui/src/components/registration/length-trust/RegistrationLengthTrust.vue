@@ -200,6 +200,7 @@ export default defineComponent({
           }
           return '-'
         }
+        return ''
       }),
       lengthTrust: computed((): LengthTrustIF => {
         return getLengthTrust.value as LengthTrustIF || null

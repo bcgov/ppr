@@ -29,11 +29,11 @@
         </tr>
       </template>
 
-      <template v-slot:group.header="{ group, items }" class="group-header-slot">
+      <template v-slot:group.header="{ group, items }">
         <td
           v-if="!(disableGroupHeader(group) && (hideRemovedOwners || isReadonlyTable))"
           :colspan="4"
-          class="py-1"
+          class="py-1 group-header-slot"
           :class="{'spacer-header': disableGroupHeader(group),
             'border-error-left': showInvalidDeceasedOwnerGroupError(group)
           }"

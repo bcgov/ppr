@@ -13,7 +13,7 @@
         class="pt-6 pb-0"
       >
         <v-data-table
-          class="collateral-table"
+          class="collateral-table vehicle-data-table"
           :headers="headers"
           :items="vehicleCollateral"
           disable-pagination
@@ -22,7 +22,7 @@
           calculate-widths
           no-data-text="No vehicle collateral"
         >
-          <template v-slot:item="row" class="vehicle-data-table">
+          <template v-slot:item="row">
             <tr :key="row.item.id" :class="rowClass(row.item.action)">
               <td class="summary-cell pl-0">
                 <div :class="{ 'disabled-text': row.item.action === ActionTypes.REMOVED}">
@@ -103,7 +103,7 @@
     <v-row no-gutters class="pt-4" v-if="(hasVehicleCollateral() || hasOptionalVehicleCollateral())">
       <v-col :class="{ 'box-shadow-left': showErrorBar && activeIndex >= 0 }">
         <v-data-table
-          class="collateral-table"
+          class="collateral-table vehicle-data-table"
           :class="{ 'invalid-message': showErrorComponent }"
           :headers="headers"
           :items="vehicleCollateral"
@@ -112,7 +112,7 @@
           hide-default-footer
           no-data-text="No vehicle collateral added yet."
         >
-          <template v-slot:item="row" class="vehicle-data-table">
+          <template v-slot:item="row">
             <tr
               v-if="!showEditVehicle[row.index]"
               :key="row.item.id"
