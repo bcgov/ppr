@@ -20,7 +20,7 @@ export default defineComponent({
   components: {
     SbcSignin
   },
-  emits: ['emitProfileReady'],
+  emits: ['profileReady'],
   props: {
     registryUrl: {
       type: String,
@@ -45,7 +45,7 @@ export default defineComponent({
       }
     }
     const emitProfileReady = (profileReady: boolean = true) => {
-      context.emit('emitProfileReady', profileReady)
+      context.emit('profileReady', profileReady)
     }
 
     return {
