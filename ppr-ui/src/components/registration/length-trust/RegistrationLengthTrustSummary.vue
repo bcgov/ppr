@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid no-gutters class="white pa-0">
+  <v-container fluid class="white pa-0 no-gutters">
     <v-card flat id="length-trust-summary">
       <h2 class="pt-2 pb-5 renewal-title" v-if="isRenewal">
           Renewal Length and <span v-if="showTrustIndenture">Trust Indenture</span>

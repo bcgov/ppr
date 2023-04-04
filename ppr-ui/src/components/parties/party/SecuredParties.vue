@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid no-gutters id="secured-parties-component" class="pa-0">
+  <v-container fluid id="secured-parties-component" class="pa-0 no-gutters">
     <ChangeSecuredPartyDialog
       attach="#app"
       :display="showDialog"

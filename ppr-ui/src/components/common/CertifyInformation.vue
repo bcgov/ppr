@@ -1,5 +1,5 @@
 <template>
-  <v-container flat class="pa-0" id="certify-summary">
+  <v-container class="pa-0 flat" id="certify-summary">
     <v-row no-gutters>
       <v-col class="generic-label"><h2><span>{{ sectionNumber }}</span>. Authorization</h2></v-col>
     </v-row>

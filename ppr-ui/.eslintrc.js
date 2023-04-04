@@ -7,8 +7,13 @@ module.exports = {
     'plugin:vue/essential',
     '@vue/standard',
     '@vue/typescript'
+    // ToDo: enable and fix Lint issues when capacity.
+    // 'plugin:vue/base',
+    // 'plugin:vuetify/base',
+    // 'plugin:vuetify/recommended'
   ],
   rules: {
+    'vue/multi-word-component-names': 'off',
     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
     'max-len': ['warn', { code: 120, ignoreRegExpLiterals: true }]

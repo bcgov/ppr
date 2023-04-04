@@ -1,5 +1,5 @@
 <template>
-  <v-container flat class="pa-0">
+  <v-container class="pa-0 flat">
     <v-container class="pa-0">
       <v-row v-if="registeringParty" no-gutters class="pb-8 pt-2 rounded-top">
         <v-col>

@@ -1,5 +1,5 @@
 <template>
-  <v-container flat class="pa-0">
+  <v-container class="pa-0 flat">
     <v-row v-if="options.header" class="summary-header rounded-top" no-gutters>
       <v-col cols="auto" class="pa-4">
         <v-icon v-if="options.iconImage" :color="options.iconColor">{{ options.iconImage }}</v-icon>

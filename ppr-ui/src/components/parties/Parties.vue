@@ -1,8 +1,8 @@
 <template>
-  <v-container fluid no-gutters class="pa-0" v-if="summaryView">
+  <v-container fluid class="pa-0 no-gutters" v-if="summaryView">
     <party-summary />
   </v-container>
-  <v-container fluid no-gutters v-else class="pa-0">
+  <v-container fluid v-else class="pa-0 no-gutters">
     <v-row no-gutters>
       <v-col cols="auto" class="generic-label"
         >Your registration must include the following:</v-col

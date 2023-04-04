@@ -3,8 +3,7 @@
     v-if="!summaryView"
     fluid
     id="length-trust-amendment"
-    no-gutters
-    class="white pb-6 pr-4 pl-8 rounded-bottom"
+    class="white pb-6 pr-4 pl-8 rounded-bottom no-gutters"
     :class="{ 'border-error-left': showErrorBar && editInProgress }"
   >
     <v-row no-gutters class="summary-header pa-2 mb-8 mt-n3 ml-n8 mr-n4 rounded-top">
@@ -73,7 +72,7 @@
       </v-row>
     </div>
   </v-container>
-  <v-container v-else class="white pa-0" fluid no-gutters>
+  <v-container v-else class="white pa-0 no-gutters" fluid>
     <v-row no-gutters class="py-8">
       <v-col cols="3" class="generic-label pl-3">
         Trust Indenture

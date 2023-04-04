@@ -1,11 +1,11 @@
 <template>
-  <v-container fluid :class="$style['breadcrumb-row']" class="view-container px-15 py-0">
+  <v-container fluid class="view-container breadcrumb-row px-15 py-0">
     <div class="container pa-0">
       <v-row no-gutters class="container" style="padding: 6px 0;">
         <v-col cols="auto">
           <v-row no-gutters>
             <v-col cols="auto">
-              <v-btn id="breadcrumb-back-btn" :class="$style['back-btn']" exact :href="buildHref(backUrl)" icon small>
+              <v-btn id="breadcrumb-back-btn" class="back-btn" exact icon small @click="navigate()">
                 <v-icon>mdi-arrow-left</v-icon>
               </v-btn>
             </v-col>
@@ -14,22 +14,23 @@
             </v-col>
           </v-row>
         </v-col>
+
         <v-col cols="auto" class="pl-3" style="padding-top: 6px;">
-          <v-breadcrumbs class="pa-0" :items="breadcrumbs">
-            <v-breadcrumbs-item
-              slot="item"
-              slot-scope="{ item }"
-              exact :href="buildHref(item.href)"
-              data-test-id='breadcrumb-item'
-            >
-              <span v-if="!item.disabled" :class="[$style['underlined'], $style['breadcrumb-text']]">
+          <v-breadcrumbs class="pa-0 breadcrumb-text" :items="breadcrumbs">
+            <template v-slot:item="{ item }">
+              <v-breadcrumbs-item
+                class="breadcrumb-text"
+                data-test-id='breadcrumb-item'
+                :disabled="item.disabled"
+                :to="item.to"
+                :href="item.href"
+              >
                 {{ handleStaff(item.text) }}
-              </span>
-              <span v-else :class="$style['breadcrumb-text']">{{ handleStaff(item.text) }}</span>
-            </v-breadcrumbs-item>
-            <v-breadcrumbs-divider class="px-1" slot="divider">
-              <v-icon color="white">mdi-chevron-right</v-icon>
-            </v-breadcrumbs-divider>
+              </v-breadcrumbs-item>
+            </template>
+            <template v-slot:divider>
+              <v-icon color="white" class="px-1">mdi-chevron-right</v-icon>
+            </template>
           </v-breadcrumbs>
         </v-col>
       </v-row>
@@ -62,7 +63,7 @@ export default defineComponent({
     setCurrentPath: String,
     setCurrentPathName: String
   },
-  setup (props) {
+  setup (props, context) {
     const {
       getRegistrationNumber,
       getRegistrationType,
@@ -75,14 +76,13 @@ export default defineComponent({
     const currentPath = toRefs(props).setCurrentPath
     const routeName = toRefs(props).setCurrentPathName as Ref<RouteNames>
     const localState = reactive({
-      isStaff: computed((): boolean => {
-        return isRoleStaff.value
-      }),
-      backUrl: computed((): string => {
+      backUrl: computed((): any => {
         const length = localState.breadcrumbs?.length || 0
         if (length > 1) {
-          return localState.breadcrumbs[length - 2].href || sessionStorage.getItem('REGISTRY_URL')
+          return localState.breadcrumbs[length - 1].to || localState.breadcrumbs[length - 2].href ||
+            sessionStorage.getItem('REGISTRY_URL')
         }
+        return ''
       }),
       breadcrumbs: computed((): Array<BreadcrumbIF> => {
         const roleBasedBreadcrumbTitle = breadcrumbsTitles[
@@ -98,7 +98,7 @@ export default defineComponent({
           tombstoneBreadcrumbSearchConfirm,
           tombstoneBreadcrumbMhrInformation
         ]
-        if (localState.isStaff) {
+        if (isRoleStaff.value) {
           for (const tombstoneBreadcrumb of allTombstoneBreadcrumbs) {
             tombstoneBreadcrumb[0].text = 'Staff Dashboard'
           }
@@ -146,7 +146,7 @@ export default defineComponent({
     })
 
     const handleStaff = (breadcrumbText): string => {
-      if (localState.isStaff) {
+      if (isRoleStaff.value) {
         breadcrumbText = breadcrumbText.replace('My', 'Staff')
       }
       return breadcrumbText
@@ -154,6 +154,16 @@ export default defineComponent({
 
     const buildHref = (href: string): string => {
       return `${href}${getParams()}`
+    }
+
+    const navigate = (): void => {
+      const breadcrumb = localState.breadcrumbs[localState.breadcrumbs.length - 2] as BreadcrumbIF
+
+      if (breadcrumb.to) {
+        context.root.$router.push(breadcrumb.to).catch(error => error)
+      } else if (breadcrumb.href) {
+        window.location.assign(buildHref(breadcrumb.href))
+      }
     }
 
     /** Returns URL param string with Account ID if present, else empty string. */
@@ -164,20 +174,20 @@ export default defineComponent({
 
     return {
       handleStaff,
-      buildHref,
+      navigate,
       ...toRefs(localState)
     }
   }
 })
 </script>
 
-<style lang="scss" module>
+<style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
 .back-btn {
   background-color: white;
   color: $primary-blue !important;
-  min-height: 32px !important;
-  min-width: 32px !important;
+  height: 32px !important;
+  width: 32px !important;
 }
 .breadcrumb-row {
   background-color: $BCgovBlue3-5;
@@ -187,8 +197,17 @@ export default defineComponent({
   color: white !important;
   font-size: 0.8125rem !important;
 }
-.underlined {
-  color: white !important;
-  text-decoration: underline;
+::v-deep {
+  .v-breadcrumbs__item {
+    color: white !important;
+  }
+
+  .v-breadcrumbs__item:not(.v-breadcrumbs__item--disabled){
+    text-decoration: underline !important;
+  }
+
+  .v-breadcrumbs__item--disabled {
+    opacity: unset;
+  }
 }
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <v-container flat class="pa-0" id="party-summary">
+  <v-container class="pa-0 flat" id="party-summary">
     <v-row no-gutters class="summary-header pa-2 rounded-top">
       <v-col cols="auto" class="pa-2">
         <v-icon color="darkBlue">mdi-account-multiple-plus</v-icon>

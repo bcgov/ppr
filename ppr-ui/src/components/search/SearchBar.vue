@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid no-gutters class="white search-bar-container">
+  <v-container fluid class="white search-bar-container no-gutters">
     <confirmation-dialog
       :setDisplay="confirmationDialog"
       :setOptions="dialogOptions"

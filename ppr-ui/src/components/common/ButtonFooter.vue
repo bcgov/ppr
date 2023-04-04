@@ -49,7 +49,7 @@
             Save
           </v-btn>
         </v-col>
-        <v-col cols="6" justify="end">
+        <v-col class="justify" cols="6">
           <v-btn
             id="reg-next-btn"
             color="primary"

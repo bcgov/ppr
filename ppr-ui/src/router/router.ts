@@ -64,7 +64,7 @@ export function getVueRouter () {
   })
 
   router.afterEach((to, from) => {
-    // Overrid the browser tab name
+    // Override the browser tab name
     Vue.nextTick(() => {
       if (to.meta.title) {
         document.title = to.meta.title

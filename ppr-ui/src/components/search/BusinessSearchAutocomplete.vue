@@ -6,7 +6,7 @@
     elevation="5"
   >
     <v-row no-gutters justify="center">
-      <v-col no-gutters cols="12">
+      <v-col class="no-gutters" cols="12">
         <v-list v-if="autoCompleteResults && autoCompleteResults.length > 0" class="pt-0 results-list">
           <v-list-item disabled>
             <v-row class="auto-complete-sticky-row">

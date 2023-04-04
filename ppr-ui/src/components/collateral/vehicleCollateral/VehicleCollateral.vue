@@ -59,9 +59,9 @@
       </v-col>
     </v-row>
   </v-container>
-  <v-container v-else
+  <v-container class="no-gutters" v-else
     :class="containerClass"
-    fluid no-gutters
+    fluid
   >
     <v-row
       no-gutters

@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid no-gutters class="pa-0" ref="tableHeaderRef" style="position: relative">
+  <v-container fluid class="pa-0 no-gutters" ref="tableHeaderRef" style="position: relative">
     <date-picker
       v-show="showDatePicker"
       ref="datePicker"

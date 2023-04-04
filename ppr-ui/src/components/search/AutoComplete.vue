@@ -1,7 +1,7 @@
 <template>
   <v-card v-if="showAutoComplete" :class="['mt-1', $style['auto-complete-card']]" elevation="5">
     <v-row no-gutters justify="center">
-      <v-col no-gutters cols="12">
+      <v-col class="no-gutters" cols="12">
         <v-list class="pt-0">
           <v-list-item-group v-model="autoCompleteSelected">
             <v-list-item v-for="(result, i) in autoCompleteResults"

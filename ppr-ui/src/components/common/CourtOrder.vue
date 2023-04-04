@@ -55,7 +55,7 @@
           <v-col cols="9" id="effect-display"><span style="white-space: pre-wrap">{{ effectOfOrder }}</span></v-col>
     </v-row>
   </v-container>
-  <v-container v-else fluid no-gutters class="pb-6  px-0 rounded">
+  <v-container v-else fluid class="pb-6  px-0 rounded no-gutters">
     <v-card
       id="court-order"
       class="rounded"

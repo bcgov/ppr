@@ -1,9 +1,8 @@
 <template>
   <v-container
     fluid
-    no-gutters
     id="length-trust-component"
-    class="white pb-6 pr-10 pl-8 rounded"
+    class="white pb-6 pr-10 pl-8 rounded no-gutters"
     :class="{ 'invalid-message': showInvalid }"
   >
   <v-row no-gutters v-if="renewalView" class="summary-header pa-2 mb-8 mt-n3 ml-n8 mr-n10">
