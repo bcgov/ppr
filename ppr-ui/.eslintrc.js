@@ -6,11 +6,10 @@ module.exports = {
   extends: [
     'plugin:vue/essential',
     '@vue/standard',
-    '@vue/typescript'
-    // ToDo: enable and fix Lint issues when capacity.
-    // 'plugin:vue/base',
-    // 'plugin:vuetify/base',
-    // 'plugin:vuetify/recommended'
+    '@vue/typescript',
+    'plugin:vue/base',
+    'plugin:vuetify/base',
+    'plugin:vuetify/recommended'
   ],
   rules: {
     'vue/multi-word-component-names': 'off',
