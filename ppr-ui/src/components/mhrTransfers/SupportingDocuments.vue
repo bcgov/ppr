@@ -16,16 +16,16 @@
         :label="docOptions.optionOne.text"
         active-class="selected-radio"
         :value="docOptions.optionOne.value"
-        :ripple="false"
         data-test-id="supporting-doc-option-one"
       />
       <v-radio
         id="supporting-doc-option-two"
         :label="docOptions.optionTwo.text"
         active-class="selected-radio"
+        :class="{ 'invalid-selection': isSecondOptionError }"
         :value="docOptions.optionTwo.value"
         :disabled="isSecondOptionDisabled"
-        :ripple="false"
+        :color="isSecondOptionError ? 'error' : 'primary'"
         data-test-id="supporting-doc-option-two"
       />
     </v-radio-group>
@@ -52,6 +52,7 @@ import { transferSupportingDocuments } from '@/resources/'
 
 export default defineComponent({
   name: 'SupportingDocument',
+  emits: ['handleDocOptionOneSelected'],
   props: {
     deletedOwner: {
       type: Object as () => MhrRegistrationHomeOwnerIF,
@@ -59,11 +60,17 @@ export default defineComponent({
     },
     // Used to disable Death Cert when group has only one owner
     isSecondOptionDisabled: {
-      type: Boolean
+      type: Boolean,
+      default: false
+    },
+    // Used to show error for Death Cert radio button
+    isSecondOptionError: {
+      type: Boolean,
+      default: false
     }
   },
   components: { },
-  setup (props) {
+  setup (props, { emit }) {
     const { editHomeOwner, isGlobalEditingMode } = useHomeOwners(true)
     const { getMhrTransferType } = useTransferOwners()
 
@@ -99,6 +106,10 @@ export default defineComponent({
 
     watch(() => localState.deletedOwnerState.supportingDocument, () => {
       updateDeletedOwner()
+      // Only one Grant of Probate document can be selected for the group
+      if (props.deletedOwner.supportingDocument === SupportingDocumentsOptions.PROBATE_GRANT) {
+        emit('handleDocOptionOneSelected')
+      }
     })
 
     return {
@@ -130,7 +141,15 @@ export default defineComponent({
     }
 
     .v-radio--is-disabled {
-      opacity: 40%;
+      opacity: 0.4;
+    }
+
+    .invalid-selection {
+      border: 1px solid $error;
+      background-color: white;
+      .error--text {
+        color: $error;
+      }
     }
 
   }

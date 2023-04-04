@@ -24,7 +24,7 @@
       >
         <tr class="fs-14 text-center no-owners-head-row" data-test-id="no-data-msg">
           <td class="pa-6" :colspan="homeOwnersTableHeaders.length">
-            No owners added yet.
+            {{ getHomeTenancyType}} No owners added yet.
           </td>
         </tr>
       </template>
@@ -58,7 +58,15 @@
               class="error-text my-6 text-center"
               :data-test-id="`no-owners-msg-group-${homeOwners.indexOf(row.item)}`"
             >
-              Group must contain at least one owner.
+              <span v-if="isTransferToExecutorProbateWill && !isAllGroupOwnersWithDeathCerts(row.item.groupId)">
+                Group must contain at least one executor.
+              </span>
+              <span v-else-if="isTransferToExecutorProbateWill && isAllGroupOwnersWithDeathCerts(row.item.groupId)">
+                One of the deceased owners must have a Grant of Probate with Will.
+              </span>
+              <span v-else>
+                Group must contain at least one owner.
+              </span>
             </div>
           </td>
         </tr>
@@ -300,12 +308,15 @@
               <SupportingDocuments
                 :deletedOwner="row.item"
                 :isSecondOptionDisabled="getGroupOwnersCount(row.item.groupId) === 1"
+                :isSecondOptionError="isAllGroupOwnersWithDeathCerts(row.item.groupId)"
+                @handleDocOptionOneSelected="resetGrantOfProbate(row.item.groupId, row.item.ownerId)"
               >
                 <template v-slot:deathCert>
                   <DeathCertificate
                     :deceasedOwner="row.item"
                     :validate="validateTransfer"
                     @isValid="isValidDeathCertificate = $event"
+                    :isDisabled="isGlobalEditingMode"
                   />
                 </template>
               </SupportingDocuments>
@@ -400,7 +411,8 @@ export default defineComponent({
       isTransferDueToDeath,
       isTransferToExecutorProbateWill,
       groupHasRemovedAllCurrentOwners,
-      moveCurrentOwnersToPreviousOwners
+      moveCurrentOwnersToPreviousOwners,
+      resetGrantOfProbate
     } = useTransferOwners(!props.isMhrTransfer)
 
     const { setUnsavedChanges } = useActions<any>(['setUnsavedChanges'])
@@ -451,12 +463,13 @@ export default defineComponent({
       isUngroupedTenancy: computed((): boolean => {
         return [HomeTenancyTypes.SOLE, HomeTenancyTypes.JOINT].includes(getHomeTenancyType())
       }),
-      isProbateGrantOption: computed((): boolean => {
-        return localState.transWillSupportDoc === SupportingDocumentsOptions.PROBATE_GRANT
-      }),
-      isDeathCertOption: computed((): boolean => {
-        return localState.transWillSupportDoc === SupportingDocumentsOptions.DEATH_CERT
-      })
+      // Trans Will Flow: check if all Owners within a group have Death Certificate as a supporting document
+      isAllGroupOwnersWithDeathCerts: (groupId): boolean => {
+        return props.homeOwners.filter(owner => owner.groupId === groupId).every(owner => {
+          return owner.action === ActionTypes.REMOVED &&
+            owner.supportingDocument === SupportingDocumentsOptions.DEATH_CERT
+        })
+      }
     })
 
     const showInvalidDeceasedOwnerGroupError = (groupId): boolean => {
@@ -653,6 +666,7 @@ export default defineComponent({
       showInvalidDeceasedOwnerGroupError,
       HomeOwnerPartyTypes,
       SupportingDocumentsOptions,
+      resetGrantOfProbate,
       ...toRefs(localState)
     }
   }

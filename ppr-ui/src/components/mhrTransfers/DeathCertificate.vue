@@ -19,6 +19,7 @@
               :rules="deathCertificateNumberRules"
               label="Death Certificate Registration Number"
               data-test-id="death-certificate-number"
+              :disabled="isDisabled"
             />
           </v-col>
         </v-row>
@@ -41,6 +42,7 @@
               :initialValue="deathDateTime"
               :key="Math.random()"
               :maxDate="localTodayDate(maxDeathDate)"
+              :disablePicker="isDisabled"
               @emitDate="deathDateTime = $event"
               @emitCancel="deathDateTime = null"
               @emitClear="deathDateTime = null"
@@ -60,6 +62,7 @@
               class="mt-0 pt-0 has-certificate-checkbox"
               :error="validate && !hasDeathCertificate"
               data-test-id="has-certificate-checkbox"
+              :disabled="isDisabled"
             />
           </v-col>
         </v-row>
@@ -84,6 +87,11 @@ export default defineComponent({
       default: null
     },
     validate: {
+      type: Boolean,
+      default: false
+    },
+    // used to disable the form when adding or editing an owner
+    isDisabled: {
       type: Boolean,
       default: false
     }

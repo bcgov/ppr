@@ -270,6 +270,19 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     } as MhrRegistrationHomeOwnerIF)
   }
 
+  // Set Death Certificate for owners in group
+  const resetGrantOfProbate = (groupId, excludedOwnerId) => {
+    // find owners that belong to groupId, are removed and have Grant of Probate as supporting document
+    getMhrTransferHomeOwnerGroups.value
+      .find(group => group.groupId === groupId).owners
+      .forEach((owner: MhrRegistrationHomeOwnerIF) => {
+        if (owner.action === ActionTypes.REMOVED && owner.ownerId !== excludedOwnerId &&
+        owner.supportingDocument === SupportingDocumentsOptions.PROBATE_GRANT) {
+          owner.supportingDocument = SupportingDocumentsOptions.DEATH_CERT
+        }
+      })
+  }
+
   /** Return true if the specified owner is part of the current/base ownership structure **/
   const isCurrentOwner = (owner: MhrRegistrationHomeOwnerIF): boolean => {
     return getMhrTransferCurrentHomeOwnerGroups.value.some(group =>
@@ -375,9 +388,13 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     showDeathCertificate,
     showSupportingDocuments,
     isDisabledForSJTChanges,
+
+    // Trans Will
     isDisabledForWillChanges,
     hasDeletedOwnersWithProbateGrant,
     prefillOwnerAsExecutor,
+    resetGrantOfProbate,
+
     isCurrentOwner,
     getMhrTransferType,
     isTransferDueToDeath,
