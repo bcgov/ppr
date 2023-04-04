@@ -677,35 +677,10 @@ WILL_DELETE_GROUPS2 = [
         'type': 'JOINT'
     }
 ]
-ADMIN_DELETE_GROUPS = [
-    {
-        'groupId': 4,
-        'owners': [
-            {
-                'individualName': {
-                    'first': 'RICHARD',
-                    'middle': 'GORDON',
-                    'last': 'LANGER'
-                },
-                'address': {
-                    'street': '3122B LYNNLARK PLACE',
-                    'city': 'VICTORIA',
-                    'region': 'BC',
-                    'postalCode': 'V8S 4I6',
-                    'country': 'CA'
-                },
-                'phoneNumber': '6041234567',
-                'partyType': 'OWNER_IND',
-                'deathCertificateNumber': '232432432',
-                'deathDateTime': '2021-02-21T18:56:00+00:00'
-            }
-        ],
-        'type': 'SOLE'
-    }
-]
+ADMIN_DELETE_GROUPS = WILL_DELETE_GROUPS
 ADMIN_ADD_GROUPS = [
     {
-        'groupId': 5,
+        'groupId': 2,
         'owners': [
             {
                 'individualName': {
@@ -861,17 +836,23 @@ TEST_TRANSFER_DATA_TRAND = [
 ]
 # testdata pattern is ({description},{valid},{mhr_num},{account_id},{delete_groups},{add_groups},{message content},{staff})
 TEST_TRANSFER_DATA_ADMIN = [
-    ('Valid', True,  '001019', '2523', ADMIN_DELETE_GROUPS, ADMIN_ADD_GROUPS, None, True),
-    ('Invalid non-staff', False,  '001019', '2523', ADMIN_DELETE_GROUPS, ADMIN_ADD_GROUPS,
+    ('Valid', True,  '001020', '2523', ADMIN_DELETE_GROUPS, ADMIN_ADD_GROUPS, None, True),
+    ('Invalid non-staff', False,  '001020', '2523', ADMIN_DELETE_GROUPS, ADMIN_ADD_GROUPS,
      validator.REG_STAFF_ONLY, False),
-    ('Valid party type EXECUTOR', True,  '001019', '2523', ADMIN_DELETE_GROUPS, ADMIN_ADD_GROUPS, None, True),
-    ('Valid party type TRUSTEE', True,  '001019', '2523', ADMIN_DELETE_GROUPS, ADMIN_ADD_GROUPS, None, True),
-    ('Valid party type ADMINISTRATOR', True,  '001019', '2523', ADMIN_DELETE_GROUPS, ADMIN_ADD_GROUPS, None, True),
-    ('Invalid party type add', False,  '001019', '2523', ADMIN_DELETE_GROUPS, ADMIN_ADD_GROUPS,
+    ('Valid party type EXECUTOR', True,  '001020', '2523', ADMIN_DELETE_GROUPS, ADMIN_ADD_GROUPS, None, True),
+    ('Valid party type TRUSTEE', True,  '001020', '2523', ADMIN_DELETE_GROUPS, ADMIN_ADD_GROUPS, None, True),
+    ('Valid party type ADMINISTRATOR', True,  '001020', '2523', ADMIN_DELETE_GROUPS, ADMIN_ADD_GROUPS, None, True),
+    ('Invalid party type add', False,  '001020', '2523', ADMIN_DELETE_GROUPS, ADMIN_ADD_GROUPS,
      validator.TRAN_ADMIN_NEW_OWNER, True),
-    ('Invalid add 2 groups', False,  '001019', '2523', ADMIN_DELETE_GROUPS, ADMIN_ADD_GROUPS,
+    ('Invalid administrator missing', False,  '001020', '2523', ADMIN_DELETE_GROUPS, ADMIN_ADD_GROUPS,
+     validator.TRAN_ADMIN_NEW_OWNER, True),
+    ('Invalid no grant', False,  '001020', '2523', ADMIN_DELETE_GROUPS, ADMIN_ADD_GROUPS,
+     validator.TRAN_ADMIN_GRANT, True),
+    ('Invalid no death info', False,  '001020', '2523', ADMIN_DELETE_GROUPS, ADMIN_ADD_GROUPS,
+     validator.TRAN_ADMIN_DEATH_CERT, True),
+    ('Invalid add 2 groups', False,  '001020', '2523', ADMIN_DELETE_GROUPS, ADMIN_ADD_GROUPS,
      validator.TRAN_DEATH_GROUP_COUNT, True),
-    ('Invalid delete 2 groups', False,  '001019', '2523', ADMIN_DELETE_GROUPS, ADMIN_ADD_GROUPS,
+    ('Invalid delete 2 groups', False,  '001020', '2523', ADMIN_DELETE_GROUPS, ADMIN_ADD_GROUPS,
      validator.TRAN_DEATH_GROUP_COUNT, True)
 ]
 # testdata pattern is ({description},{valid},{mhr_num},{account_id},{delete_groups},{add_groups},{message content},{staff})
@@ -883,11 +864,11 @@ TEST_TRANSFER_DATA_AFFIDAVIT = [
     ('Valid party type TRUSTEE', True,  '001020', '2523', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS, None, True),
     ('Valid party type ADMINISTRATOR', True,  '001020', '2523', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS, None, True),
     ('Invalid party type add', False,  '001020', '2523', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS,
-     validator.TRAN_EXEC_NEW_OWNER, True),
+     validator.TRAN_AFFIDAVIT_NEW_OWNER, True),
     ('Invalid declared value', False,  '001020', '2523', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS,
      validator.TRAN_AFFIDAVIT_DECLARED_VALUE, True),
     ('Invalid executor missing', False,  '001020', '2523', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS_INVALID,
-     validator.TRAN_EXEC_MISSING, True),
+     validator.TRAN_AFFIDAVIT_NEW_OWNER, True),
     ('Invalid no death info', False,  '001020', '2523', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS,
      validator.TRAN_EXEC_DEATH_CERT, True),
     ('Invalid no death number', False,  '001020', '2523', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS,
@@ -910,7 +891,7 @@ TEST_TRANSFER_DATA_WILL = [
     ('Valid party type TRUSTEE', True,  '001020', '2523', WILL_DELETE_GROUPS, EXEC_ADD_GROUPS, None, True),
     ('Valid party type ADMINISTRATOR', True,  '001020', '2523', WILL_DELETE_GROUPS, EXEC_ADD_GROUPS, None, True),
     ('Invalid party type add', False,  '001020', '2523', WILL_DELETE_GROUPS, EXEC_ADD_GROUPS,
-     validator.TRAN_EXEC_NEW_OWNER, True),
+     validator.TRAN_WILL_NEW_OWNER, True),
     ('Invalid executor missing', False,  '001020', '2523', WILL_DELETE_GROUPS, EXEC_ADD_GROUPS_INVALID,
      validator.TRAN_WILL_NEW_OWNER, True),
     ('Invalid no probate', False,  '001020', '2523', WILL_DELETE_GROUPS1, EXEC_ADD_GROUPS,
@@ -1111,6 +1092,15 @@ def test_validate_transfer_admin(session, desc, valid, mhr_num, account_id, dele
         json_data['deleteOwnerGroups'][0]['owners'][0]['partyType'] = MhrPartyTypes.ADMINISTRATOR
     elif desc == 'Invalid party type add':
         json_data['addOwnerGroups'][0]['owners'][0]['partyType'] = MhrPartyTypes.TRUSTEE
+    elif desc == 'Invalid administrator missing':
+        del json_data['addOwnerGroups'][0]['owners'][0]['partyType']
+        del json_data['addOwnerGroups'][0]['owners'][0]['description']
+    elif desc == 'Invalid no grant':
+        json_data['deleteOwnerGroups'][0]['owners'][0]['deathCertificateNumber'] = '232432433'
+        json_data['deleteOwnerGroups'][0]['owners'][0]['deathDateTime'] = '2021-02-21T18:56:00+00:00'
+    elif desc == 'Invalid no death info': 
+        del json_data['deleteOwnerGroups'][0]['owners'][1]['deathCertificateNumber']
+        del json_data['deleteOwnerGroups'][0]['owners'][1]['deathDateTime']
     elif desc == 'Invalid add owner':
         json_data['addOwnerGroups'][0]['owners'].append(ADD_OWNER)
     elif desc == 'Invalid add 2 groups':

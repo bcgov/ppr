@@ -157,56 +157,6 @@ AFFIDAVIT_ADD_GROUPS = [
         'type': 'SOLE'
     }
 ]
-ADMIN_DELETE_GROUPS = [
-    {
-        'groupId': 4,
-        'owners': [
-            {
-                'individualName': {
-                    'first': 'RICHARD',
-                    'middle': 'GORDON',
-                    'last': 'LANGER'
-                },
-                'address': {
-                    'street': '3122B LYNNLARK PLACE',
-                    'city': 'VICTORIA',
-                    'region': 'BC',
-                    'postalCode': 'V8S 4I6',
-                    'country': 'CA'
-                },
-                'phoneNumber': '6041234567',
-                'partyType': 'OWNER_IND',
-                'deathCertificateNumber': '232432432',
-                'deathDateTime': '2021-02-21T18:56:00+00:00'
-            }
-        ],
-        'type': 'SOLE'
-    }
-]
-ADMIN_ADD_GROUPS = [
-    {
-        'groupId': 5,
-        'owners': [
-            {
-                'individualName': {
-                    'first': 'APPOINTED',
-                    'last': 'ADMINISTRATOR'
-                },
-                'address': {
-                    'street': '3122B LYNNLARK PLACE',
-                    'city': 'VICTORIA',
-                    'region': 'BC',
-                    'postalCode': 'V8S 4I6',
-                    'country': 'CA'
-                },
-                'phoneNumber': '6041234567',
-                'partyType': 'ADMINISTRATOR',
-                'description': 'ADMINISTRATOR of the deceased.'
-            }
-        ],
-        'type': 'SOLE'
-    }
-]
 WILL_DELETE_GROUPS = [
     {
         'groupId': 1,
@@ -268,6 +218,31 @@ WILL_ADD_GROUPS = [
         'type': 'SOLE'
     }
 ]
+ADMIN_DELETE_GROUPS = WILL_DELETE_GROUPS
+ADMIN_ADD_GROUPS = [
+    {
+        'groupId': 2,
+        'owners': [
+            {
+                'individualName': {
+                    'first': 'APPOINTED',
+                    'last': 'ADMINISTRATOR'
+                },
+                'address': {
+                    'street': '3122B LYNNLARK PLACE',
+                    'city': 'VICTORIA',
+                    'region': 'BC',
+                    'postalCode': 'V8S 4I6',
+                    'country': 'CA'
+                },
+                'phoneNumber': '6041234567',
+                'partyType': 'ADMINISTRATOR',
+                'description': 'ADMINISTRATOR of the deceased.'
+            }
+        ],
+        'type': 'SOLE'
+    }
+]
 
 
 # testdata pattern is ({description}, {mhr_num}, {roles}, {status}, {account})
@@ -297,7 +272,7 @@ TEST_CREATE_TRANS_DEATH_DATA = [
      MhrRegistrationTypes.TRANS_AFFIDAVIT),
     ('Invalid TRANS_WILL non-staff', '001020', [MHR_ROLE, TRANSFER_DEATH_JT], HTTPStatus.BAD_REQUEST, '2523',
      MhrRegistrationTypes.TRANS_WILL),
-    ('Valid TRANS_ADMIN staff', '001019', [MHR_ROLE, STAFF_ROLE, TRANSFER_DEATH_JT], HTTPStatus.CREATED, '2523',
+    ('Valid TRANS_ADMIN staff', '001020', [MHR_ROLE, STAFF_ROLE, TRANSFER_DEATH_JT], HTTPStatus.CREATED, '2523',
      MhrRegistrationTypes.TRANS_ADMIN),
     ('Valid TRAND staff', '001004', [MHR_ROLE, STAFF_ROLE, TRANSFER_DEATH_JT], HTTPStatus.CREATED, '2523',
      MhrRegistrationTypes.TRAND),
