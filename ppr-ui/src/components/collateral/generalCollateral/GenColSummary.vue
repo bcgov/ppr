@@ -94,7 +94,7 @@
           <b>ADDED</b>
         </v-chip>
         <p class="pt-3 ma-0">
-          <span style="white-space: pre-wrap;" v-html="lastGeneralCollateral.descriptionAdd">"</span>
+          <span style="white-space: pre-wrap;" v-html="lastGeneralCollateral.descriptionAdd"></span>
         </p>
       </div>
     </div>

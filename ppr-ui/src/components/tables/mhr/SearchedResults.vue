@@ -316,6 +316,8 @@ export default defineComponent({
             return `header.${UIMHRSearchTypeValues.MHRSERIAL_NUMBER}`
           case UIMHRSearchTypes.MHRMHR_NUMBER:
             return `header.${UIMHRSearchTypeValues.MHRMHR_NUMBER}`
+          default:
+            return ''
         }
       }),
       itemSearchTypeSlot: computed((): string => {
@@ -327,6 +329,8 @@ export default defineComponent({
             return `item.${UIMHRSearchTypeValues.MHRSERIAL_NUMBER}`
           case UIMHRSearchTypes.MHRMHR_NUMBER:
             return `item.${UIMHRSearchTypeValues.MHRMHR_NUMBER}`
+          default:
+            return ''
         }
       }),
       selectedMatchesLength: computed((): number => {
@@ -345,6 +349,8 @@ export default defineComponent({
             return props.isReviewMode ? mhSearchMhrNumberHeadersReview : mhSearchMhrNumberHeaders
           case UIMHRSearchTypes.MHRSERIAL_NUMBER:
             return props.isReviewMode ? mhSearchSerialNumberHeadersReview : mhSearchSerialNumberHeaders
+          default:
+            return null
         }
       }),
       headerSlotLabel: computed((): string => {

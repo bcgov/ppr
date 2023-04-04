@@ -49,7 +49,7 @@
             Save
           </v-btn>
         </v-col>
-        <v-col cols="6" justify="end">
+        <v-col class="justify" cols="6">
           <v-btn
             id="reg-next-btn"
             color="primary"
@@ -205,6 +205,7 @@ export default defineComponent({
     const goToDashboard = () => {
       // clear all state set data
       resetNewRegistration(null)
+      // eslint-disable-next-line vue/no-mutating-props
       props.router.push({ name: RouteNames.DASHBOARD })
     }
     const handleDialogResp = (val: boolean) => {
@@ -244,6 +245,7 @@ export default defineComponent({
       }
     }
     const submitBack = () => {
+      // eslint-disable-next-line vue/no-mutating-props
       props.router.push({
         name: localState.buttonConfig.backRouteName
       })
@@ -277,6 +279,7 @@ export default defineComponent({
           emit('registration-incomplete', error)
         }
       } else {
+        // eslint-disable-next-line vue/no-mutating-props
         props.router.push({
           name: localState.buttonConfig.nextRouteName
         })
@@ -285,15 +288,10 @@ export default defineComponent({
 
     const checkValid = (): boolean => {
       const stateModel: StateModelIF = getStateModel.value
-      if (
-        stateModel.registration.lengthTrust.valid &&
+      return stateModel.registration.lengthTrust.valid &&
         stateModel.registration.parties.valid &&
         stateModel.registration.collateral.valid &&
         localState.isCertifyValid
-      ) {
-        return true
-      }
-      return false
     }
 
     const onStaffPaymentChanges = (pay: boolean): void => {
@@ -321,6 +319,7 @@ export default defineComponent({
             prevDraft: prevDraftId
           }
           setRegTableNewItem(newItem)
+          // eslint-disable-next-line vue/no-mutating-props
           props.router.push({
             name: localState.buttonConfig.nextRouteName
           })

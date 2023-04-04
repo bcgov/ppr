@@ -65,7 +65,6 @@ import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import SbcHeader from 'sbc-common-components/src/components/SbcHeader.vue'
 import SbcFooter from 'sbc-common-components/src/components/SbcFooter.vue'
 import SbcSystemBanner from 'sbc-common-components/src/components/SbcSystemBanner.vue'
-import SbcAuthenticationOptionsDialog from 'sbc-common-components/src/components/SbcAuthenticationOptionsDialog.vue'
 import * as Dialogs from '@/components/dialogs'
 import { Breadcrumb } from '@/components/common'
 import { Tombstone } from '@/components/tombstone'
@@ -104,7 +103,6 @@ export default defineComponent({
     SbcHeader,
     SbcFooter,
     SbcSystemBanner,
-    SbcAuthenticationOptionsDialog,
     Tombstone,
     ...Dialogs,
     ...Views
@@ -243,7 +241,9 @@ export default defineComponent({
             RouteNames.HOME_OWNERS,
             RouteNames.HOME_LOCATION,
             RouteNames.MHR_REVIEW_CONFIRM,
-            RouteNames.MHR_INFORMATION
+            RouteNames.MHR_INFORMATION,
+            RouteNames.MHRSEARCH,
+            RouteNames.MHRSEARCH_CONFIRM
           ]
 
           const routeName = context.root.$router.currentRoute.name as RouteNames

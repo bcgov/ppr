@@ -1,5 +1,5 @@
 <template>
-  <v-container flat class="pa-0" id="certify-summary">
+  <v-container class="pa-0 flat" id="certify-summary">
     <v-row no-gutters>
       <v-col class="generic-label"><h2><span>{{ sectionNumber }}</span>. Authorization</h2></v-col>
     </v-row>
@@ -11,7 +11,7 @@
     <v-row no-gutters class="mb-5 party-summary">
       <v-col>
         <v-data-table
-          class="party-summary-table"
+          class="party-summary-table party-data-table"
           :headers="authorizedHeaders"
           :items="registeringParty"
           disable-pagination
@@ -19,7 +19,7 @@
           hide-default-footer
           no-data-text=""
         >
-          <template v-slot:item="row" class="party-data-table">
+          <template v-slot:item="row">
             <tr :key="row.item.id" class="party-row">
               <td class="list-item__title title-text" style="padding-left:30px">
                 <v-row no-gutters>

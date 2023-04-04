@@ -198,7 +198,7 @@
 import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import { HomeLocationTypes } from '@/enums'
-import { HomeLocationInfo, PidNumber } from '@/components/common'
+import { PidNumber } from '@/components/common'
 import HomeLocationDescription from './HomeLocationDescription.vue'
 import { useInputRules, useMhrValidations, useNewMhrRegistration } from '@/composables'
 import { MhrLocationInfoIF } from '@/interfaces'
@@ -209,7 +209,6 @@ export default defineComponent({
   name: 'HomeLocationType',
   components: {
     HomeLocationDescription,
-    HomeLocationInfo,
     PidNumber
   },
   props: {
@@ -290,6 +289,8 @@ export default defineComponent({
               default:
                 return false
             }
+          default:
+            return false
         }
       })
     })

@@ -14,7 +14,7 @@
         @valid="valid = $event"
       />
       <v-row no-gutters class="pt-4" v-if="showCertifiedCheckbox">
-        <v-col class="pl-2">
+        <v-col>
           <v-checkbox
             class="mt-2"
             v-model="certify"
@@ -55,11 +55,13 @@ export default defineComponent({
   props: {
     setOptions: {
       type: Object as () => DialogOptionsIF,
-      default: {
-        acceptText: 'Submit',
-        cancelText: 'Cancel',
-        text: '',
-        title: 'Staff Payment'
+      default: () => {
+        return {
+          acceptText: 'Submit',
+          cancelText: 'Cancel',
+          text: '',
+          title: 'Staff Payment'
+        }
       }
     },
     setDisplay: {

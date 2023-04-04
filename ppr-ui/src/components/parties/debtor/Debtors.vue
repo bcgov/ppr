@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid no-gutters id="debtors-component" class="pa-0">
+  <v-container fluid id="debtors-component" class="pa-0 no-gutters">
     <v-row no-gutters>
       <v-col cols="auto"
         >Include Debtors as <b>either</b> an Individual or a Business. If the debtor is
@@ -56,7 +56,7 @@
     <v-row no-gutters class="pt-4">
       <v-col>
         <v-data-table
-          class="debtor-table"
+          class="debtor-table debtor-data-table"
           :class="{ 'invalid-message': showErrorDebtors && !getDebtorValidity() }"
           :headers="headers"
           :items="debtors"
@@ -65,7 +65,7 @@
           hide-default-footer
           no-data-text="No debtors added yet."
         >
-          <template v-slot:item="row" class="debtor-data-table">
+          <template v-slot:item="row">
             <tr
               v-if="!showEditDebtor[row.index]"
               :key="row.item.id"

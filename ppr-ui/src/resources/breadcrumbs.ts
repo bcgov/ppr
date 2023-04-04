@@ -1,4 +1,5 @@
 import { BreadcrumbIF } from '@/interfaces'
+import { RouteNames } from '@/enums'
 
 // breadcrumb data in tombstone
 export const tombstoneBreadcrumbDashboard: Array<BreadcrumbIF> = [
@@ -22,6 +23,7 @@ export const tombstoneBreadcrumbDischarge: Array<BreadcrumbIF> = [
   {
     disabled: false,
     href: sessionStorage.getItem('BASE_URL') + 'dashboard',
+    to: { name: RouteNames.DASHBOARD },
     text: 'My Personal Property Registry'
   },
   {
@@ -39,6 +41,7 @@ export const tombstoneBreadcrumbRenewal: Array<BreadcrumbIF> = [
   {
     disabled: false,
     href: sessionStorage.getItem('BASE_URL') + 'dashboard',
+    to: { name: RouteNames.DASHBOARD },
     text: 'My Personal Property Registry'
   },
   {
@@ -56,6 +59,7 @@ export const tombstoneBreadcrumbAmendment: Array<BreadcrumbIF> = [
   {
     disabled: false,
     href: sessionStorage.getItem('BASE_URL') + 'dashboard',
+    to: { name: RouteNames.DASHBOARD },
     text: 'My Personal Property Registry'
   },
   {
@@ -73,6 +77,7 @@ export const tombstoneBreadcrumbRegistration: Array<BreadcrumbIF> = [
   {
     disabled: false,
     href: sessionStorage.getItem('BASE_URL') + 'dashboard',
+    to: { name: RouteNames.DASHBOARD },
     text: 'My Personal Property Registry'
   },
   {
@@ -90,6 +95,7 @@ export const tombstoneBreadcrumbSearch: Array<BreadcrumbIF> = [
   {
     disabled: false,
     href: sessionStorage.getItem('BASE_URL') + 'dashboard',
+    to: { name: RouteNames.DASHBOARD },
     text: 'My Personal Property Registry'
   },
   {
@@ -107,11 +113,13 @@ export const tombstoneBreadcrumbSearchConfirm: Array<BreadcrumbIF> = [
   {
     disabled: false,
     href: sessionStorage.getItem('BASE_URL') + 'dashboard',
+    to: { name: RouteNames.DASHBOARD },
     text: 'My Personal Property Registry'
   },
   {
     disabled: false,
     href: sessionStorage.getItem('BASE_URL') + 'mhr/search',
+    to: { name: RouteNames.MHRSEARCH },
     text: 'Selection List'
   },
   {
@@ -128,7 +136,7 @@ export const tombstoneBreadcrumbMhrInformation: Array<BreadcrumbIF> = [
   },
   {
     disabled: false,
-    href: sessionStorage.getItem('BASE_URL') + 'dashboard',
+    to: { name: RouteNames.DASHBOARD },
     text: 'My Asset Registries'
   },
   {

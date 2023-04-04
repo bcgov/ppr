@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid no-gutters class="white search-bar-container">
+  <v-container fluid class="white search-bar-container no-gutters">
     <confirmation-dialog
       :setDisplay="confirmationDialog"
       :setOptions="dialogOptions"
@@ -89,11 +89,12 @@
               transition="fade-transition"
               :value="showSearchPopUp && searchPopUp"
             >
-              <template v-slot:activator="scope" & v-on="scope.on">
+              <template v-slot:activator="scope">
                 <v-text-field
                   id="search-bar-field"
                   class="search-bar-text-field"
                   autocomplete="off"
+                  v-on="scope.on"
                   :disabled="!selectedSearchType"
                   :error-messages="searchMessage ? searchMessage : ''"
                   filled
@@ -428,6 +429,7 @@ export default defineComponent({
             }
           }
         }
+        return ''
       }),
       searchMessageFirst: computed((): string => {
         return localState.validations?.searchValue?.messageFirst || ''

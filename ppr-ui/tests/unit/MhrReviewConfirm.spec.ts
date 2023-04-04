@@ -7,7 +7,9 @@ import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
 
 // Local Components
 import { MhrReviewConfirm } from '@/views'
-import { HomeLocationReview, HomeOwnersReview, SubmittingPartyReview, YourHomeReview } from '@/components/mhrRegistration/ReviewConfirm'
+import {
+  HomeLocationReview, HomeOwnersReview, SubmittingPartyReview, YourHomeReview
+} from '@/components/mhrRegistration/ReviewConfirm'
 import { CertifyInformation } from '@/components/common'
 import { HomeTenancyTypes, RouteNames } from '@/enums'
 import mockRouter from './MockRouter'
@@ -129,6 +131,7 @@ describe('Mhr Review Confirm registration', () => {
     wrapper = createComponent()
 
     const owners = [mockedPerson] as MhrRegistrationHomeOwnerIF[]
+    // eslint-disable-next-line max-len
     const homeOwnerGroup = [{ groupId: 1, owners: owners, ...mockedFractionalOwnership }] as MhrRegistrationHomeOwnerGroupIF[]
 
     await store.dispatch('setMhrRegistrationHomeOwnerGroups', homeOwnerGroup)
@@ -150,6 +153,7 @@ describe('Mhr Review Confirm registration', () => {
 
     const totalOwnership = HomeOwnerReview.find(getTestId('total-ownership'))
     expect(totalOwnership.exists()).toBeTruthy()
+    // eslint-disable-next-line max-len
     expect(totalOwnership.text()).toContain(`${mockedFractionalOwnership.interestNumerator}/${mockedFractionalOwnership.interestDenominator}`)
 
     const homeOwnersTable = HomeOwnerReview.find('.home-owners-table')

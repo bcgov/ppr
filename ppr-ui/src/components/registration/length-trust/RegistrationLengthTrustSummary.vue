@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid no-gutters class="white pa-0">
+  <v-container fluid class="white pa-0 no-gutters">
     <v-card flat id="length-trust-summary">
       <h2 class="pt-2 pb-5 renewal-title" v-if="isRenewal">
           Renewal Length and <span v-if="showTrustIndenture">Trust Indenture</span>
@@ -181,6 +181,7 @@ export default defineComponent({
           }
           return '-'
         }
+        return ''
       }),
       lengthSummary: computed((): string => {
         if (registrationType === APIRegistrationTypes.REPAIRERS_LIEN) {
@@ -224,6 +225,8 @@ export default defineComponent({
       }),
       surrenderDateSummary: computed((): string => {
         if (props.isRenewal) {
+          // TODO: I'm not sure assigning a computed to a computed works as expected or at all. Revisit this asap.
+          // eslint-disable-next-line vue/no-side-effects-in-computed-properties
           getLengthTrust.value.surrenderDate = getRegistrationSurrenderDate.value
           return convertDate(
             new Date(getLengthTrust.value.surrenderDate),

@@ -156,7 +156,7 @@
 <script lang="ts">
 // Components
 /* eslint-disable no-unused-vars */
-import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
+import { computed, defineComponent, onBeforeMount, reactive, toRefs, watch } from '@vue/composition-api'
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import { RegistrationBar } from '@/components/registration'
 import { RegistrationTable } from '@/components/tables'
@@ -315,10 +315,11 @@ export default defineComponent({
     const tooltipTxtRegSrch: string = 'Retrieve existing registrations you would like to ' +
       'make changes to that are not already in your registrations table.'
 
-    const onAppReady = async (val: boolean): Promise<void> => {
+    onBeforeMount(async (): Promise<void> => {
       localState.loading = true
       // do not proceed if app is not ready
-      if (!val) return
+      if (!props.appReady || props.isMhr) return
+
       resetNewRegistration(null) // Clear store data from any previous registration.
       // FUTURE: add loading for search history too
       localState.myRegDataLoading = true
@@ -375,7 +376,7 @@ export default defineComponent({
       }
       localState.myRegDataLoading = false
       localState.loading = false
-    }
+    })
 
     /** Set registration type in the store and route to the first registration step */
     const startNewRegistration = (selectedRegistration: RegistrationTypeIF): void => {
@@ -995,9 +996,6 @@ export default defineComponent({
     const emitError = (error): void => {
       context.emit('error', error)
     }
-    watch(() => props.appReady, (val: boolean) => {
-      onAppReady(val)
-    }, { immediate: true })
 
     watch(() => getRegTableNewItem.value, (val: RegTableNewItemI) => {
       handleRegTableNewItem(val)

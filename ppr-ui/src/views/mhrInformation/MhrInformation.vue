@@ -81,7 +81,7 @@
             <section v-if="dataLoaded" class="py-4">
 
               <!-- MHR Information Review Section -->
-              <template v-if="isReviewMode" data-test-id="review-mode">
+              <template v-if="isReviewMode">
                 <!-- Review Header -->
                 <header class="review-header mt-1 rounded-top">
                   <v-icon class="ml-2" color="darkBlue">mdi-file-document-multiple</v-icon>
@@ -312,14 +312,12 @@ import { StaffPaymentOptions } from '@bcrs-shared-components/enums'
 import { CertifyInformation, StickyContainer } from '@/components/common'
 import { useHomeOwners, useInputRules, useMhrInformation, useMhrInfoValidation, useTransferOwners } from '@/composables'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
-import { HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
 import { PartySearch } from '@/components/parties/party'
 import { MhrSubmittingParty } from '@/components/mhrRegistration/SubmittingParty'
 import { ConfirmCompletion, TransferDetails, TransferDetailsReview, TransferType } from '@/components/mhrTransfers'
 import { HomeLocationReview, YourHomeReview } from '@/components/mhrRegistration/ReviewConfirm'
 import { HomeOwners } from '@/views'
 import { BaseDialog } from '@/components/dialogs'
-import { BaseAddress } from '@/composables/address'
 import { registrationSaveDraftError, unsavedChangesDialog, cancelOwnerChangeConfirm } from '@/resources/dialogOptions'
 import AccountInfo from '@/components/common/AccountInfo.vue'
 /* eslint-disable no-unused-vars */
@@ -355,7 +353,6 @@ import {
 export default defineComponent({
   name: 'MhrInformation',
   components: {
-    BaseAddress,
     BaseDialog,
     HomeOwners,
     PartySearch,
@@ -364,7 +361,6 @@ export default defineComponent({
     TransferDetails,
     TransferDetailsReview,
     HomeLocationReview,
-    HomeOwnersTable,
     StickyContainer,
     CertifyInformation,
     AccountInfo,
@@ -662,7 +658,7 @@ export default defineComponent({
 
       // Force show removed/deceased homeOwners when invalid
       if (!getInfoValidation('isValidTransferOwners')) {
-        (context.refs.homeOwnersComponentRef as any).hideShowRemovedOwners(true)
+        (context.refs.homeOwnersComponentRef as any)?.hideShowRemovedOwners(true)
       }
 
       await nextTick()

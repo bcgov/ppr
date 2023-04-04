@@ -1,5 +1,5 @@
 <template>
-  <v-container flat class="pa-0 party-summary">
+  <v-container class="pa-0 party-summary flat">
     <base-party-summary
       :setHeaders="debtorHeaders"
       :setItems="debtors"

@@ -1,5 +1,5 @@
 <template>
-  <v-container id="step-buttons-container" :class="$style['step-buttons-container']" pb-0>
+  <v-container class="pb-0" id="step-buttons-container" :class="$style['step-buttons-container']">
     <template v-for="(step, index) in getSteps">
       <div
         :class="isCurrentStep(step) ? [$style['step__border__current'], $style['step']]: $style['step']"

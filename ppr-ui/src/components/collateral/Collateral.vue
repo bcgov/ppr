@@ -1,7 +1,7 @@
 <template>
-  <v-container fluid no-gutters
+  <v-container fluid
     id="collateral-component"
-    class="white pa-0 rounded-bottom"
+    class="white pa-0 rounded-bottom no-gutters"
     :class="!valid && registrationFlowType !== RegistrationFlowType.AMENDMENT ? '' : 'pb-10'"
     v-if="summaryView || registrationFlowType == RegistrationFlowType.AMENDMENT"
   >
@@ -44,7 +44,7 @@
       />
     </v-card>
   </v-container>
-  <v-container v-else id="collateral-edit" class="pa-0" fluid no-gutters>
+  <v-container v-else id="collateral-edit" class="pa-0 no-gutters" fluid>
     <v-row no-gutters>
       <v-col cols="auto" class="generic-label"
         >Your registration must include the following:</v-col

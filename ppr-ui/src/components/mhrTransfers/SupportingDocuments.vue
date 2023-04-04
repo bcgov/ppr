@@ -5,7 +5,7 @@
     </p>
     <v-radio-group
       id="supporting-docs-options"
-      v-model="deletedOwner.supportingDocument"
+      v-model="deletedOwnerState.supportingDocument"
       class="supporting-docs-options"
       row
       :disabled="isGlobalEditingMode"
@@ -48,7 +48,6 @@ import { ApiTransferTypes, SupportingDocumentsOptions } from '@/enums/transferTy
 import { MhrRegistrationHomeOwnerIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
 import { useActions } from 'vuex-composition-helpers'
-import { DeathCertificate } from '.'
 import { transferSupportingDocuments } from '@/resources/'
 
 export default defineComponent({
@@ -56,14 +55,14 @@ export default defineComponent({
   props: {
     deletedOwner: {
       type: Object as () => MhrRegistrationHomeOwnerIF,
-      default: null
+      required: true
     },
     // Used to disable Death Cert when group has only one owner
     isSecondOptionDisabled: {
       type: Boolean
     }
   },
-  components: { DeathCertificate },
+  components: { },
   setup (props) {
     const { editHomeOwner, isGlobalEditingMode } = useHomeOwners(true)
     const { getMhrTransferType } = useTransferOwners()
@@ -78,26 +77,27 @@ export default defineComponent({
     // Only death certificate is captured in the api
     const updateDeletedOwner = (): void => {
       editHomeOwner({
-        ...props.deletedOwner,
-        hasDeathCertificate: props.deletedOwner.supportingDocument === SupportingDocumentsOptions.DEATH_CERT
+        ...localState.deletedOwnerState,
+        hasDeathCertificate: localState.deletedOwnerState.supportingDocument === SupportingDocumentsOptions.DEATH_CERT
       },
-      props.deletedOwner.groupId
+      localState.deletedOwnerState.groupId
       )
       setUnsavedChanges(true)
     }
 
     const localState = reactive({
+      deletedOwnerState: props.deletedOwner,
       // Get relevant supporting documents options based on transfer type from the Resources
       docOptions: transferSupportingDocuments[getMhrTransferType.value.transferType]
     })
 
     // When there is one owner in the group, pre-select first radio option
     if (props.isSecondOptionDisabled) {
-      props.deletedOwner.supportingDocument = localState.docOptions.optionOne.value
+      localState.deletedOwnerState.supportingDocument = localState.docOptions.optionOne.value
       updateDeletedOwner()
     }
 
-    watch(() => props.deletedOwner.supportingDocument, () => {
+    watch(() => localState.deletedOwnerState.supportingDocument, () => {
       updateDeletedOwner()
     })
 

@@ -30,7 +30,7 @@
           label="Amount Owned by this Group"
           filled
           class="background-white"
-          v-model.number="fractionalData.interestNumerator"
+          v-model.number="fractionalDataState.interestNumerator"
           :rules="fractionalAmountRules"
           :data-test-id="`fraction-amount-field-group-${groupId}`"
           ref="interestNumerator"
@@ -42,7 +42,7 @@
           label="Total Available"
           filled
           class="background-white"
-          v-model.number="fractionalData.interestDenominator"
+          v-model.number="fractionalDataState.interestDenominator"
           :rules="totalAmountRules"
           :data-test-id="`total-fractions-field-group-${groupId}`"
           ref="interestDenominator"
@@ -69,11 +69,13 @@ export default defineComponent({
     isReadOnly: { type: Boolean, default: false },
     fractionalData: {
       type: Object,
-      default: {
-        type: '',
-        interest: 'Undivided',
-        interestNumerator: null,
-        interestDenominator: null
+      default: () => {
+        return {
+          type: '',
+          interest: 'Undivided',
+          interestNumerator: null,
+          interestDenominator: null
+        }
       },
       required: true
     },
@@ -84,13 +86,14 @@ export default defineComponent({
     const { getGroupNumberById } = useHomeOwners(props.isMhrTransfer)
 
     const localState = reactive({
+      fractionalDataState: props.fractionalData,
       interestText: computed(() =>
-        toTitleCase(props.fractionalData.interest)
+        toTitleCase(localState.fractionalDataState.interest)
       ),
       fractionalInterest: computed(
         () =>
           // eslint-disable-next-line max-len
-          `${props.fractionalData.interest} ${props.fractionalData.interestNumerator}/${props.fractionalData.interestDenominator}`
+          `${localState.fractionalDataState.interest} ${localState.fractionalDataState.interestNumerator}/${localState.fractionalDataState.interestDenominator}`
       ),
       fractionalAmountRules: computed(() => {
         let rules = customRules(
@@ -99,12 +102,12 @@ export default defineComponent({
           isNumber(null, 6, null, null) // check for length (maxLength can't be used because field is numeric)
         )
         // additional validation when interest total has some value - UX feedback
-        if (props.fractionalData.interestDenominator) {
+        if (localState.fractionalDataState.interestDenominator) {
           rules = customRules(
             required('Enter amount owned by this group'),
             isNumber(null, null, null, null), // check for numbers only
             isNumber(null, 6, null, null), // check for length (maxLength can't be used because field is numeric)
-            greaterThan(Number(props.fractionalData.interestDenominator - 1),
+            greaterThan(Number(localState.fractionalDataState.interestDenominator - 1),
               'Must be less than total available'
             )
           )
@@ -116,7 +119,10 @@ export default defineComponent({
           required('Enter total available'),
           isNumber(null, null, null, null), // check for numbers only
           isNumber(null, 6, null, null), // check for length (maxLength can't be used because field is numeric)
-          lessThan(Number(props.fractionalData.interestNumerator), 'Must be greater than amount owned by group')
+          lessThan(Number(
+            localState.fractionalDataState.interestNumerator),
+          'Must be greater than amount owned by group'
+          )
         )
       )
     })

@@ -45,8 +45,8 @@
             </v-row>
           </v-list-item-content>
         </template>
-        <template v-else class="registration-list">
-          <v-list-item-content class="py-3">
+        <template v-else>
+          <v-list-item-content class="py-3 registration-list">
             <span class="registration-list-item" v-html="`${parent.genFilteredText(item.text)}`"></span>
           </v-list-item-content>
         </template>

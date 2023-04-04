@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid no-gutters class="white pa-0" v-if="renewalView">
+  <v-container fluid class="white pa-0 no-gutters" v-if="renewalView">
     <v-card flat id="length-trust-summary">
       <v-row no-gutters class="summary-header pa-2">
         <v-col cols="auto" class="pa-2">
@@ -58,8 +58,7 @@
   </v-container>
   <v-container
     fluid
-    no-gutters
-    class="white pb-6 pr-10 pl-8 rounded"
+    class="white pb-6 pr-10 pl-8 rounded no-gutters"
     :class="{ 'invalid-message': lengthTrust.showInvalid }"
     v-else
   >
@@ -224,6 +223,7 @@ export default defineComponent({
           newExpDate.setDate(newExpDate.getDate() + 180)
           return formatExpiryDate(newExpDate)
         }
+        return ''
       }),
       lengthTrust: computed((): LengthTrustIF => {
         return getLengthTrust.value as LengthTrustIF || null
@@ -244,6 +244,8 @@ export default defineComponent({
       }),
       surrenderDateSummary: computed((): string => {
         if (props.isRenewal) {
+          // TODO: I'm not sure assigning a computed to a computed works as expected or at all. Revisit this asap.
+          // eslint-disable-next-line vue/no-side-effects-in-computed-properties
           getLengthTrust.value.surrenderDate = getRegistrationSurrenderDate.value
           return convertDate(
             new Date(getLengthTrust.value.surrenderDate),

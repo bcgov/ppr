@@ -1,5 +1,5 @@
 <template>
-  <v-container flat class="pa-0" id="folio-summary">
+  <v-container class="pa-0 flat" id="folio-summary">
     <v-form ref="form" v-model="isValid">
       <v-row no-gutters>
         <v-col class="generic-label"

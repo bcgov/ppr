@@ -291,7 +291,7 @@
             </v-tooltip>
           </label>
           <v-row>
-            <v-col col="12">
+            <v-col class="col">
               <v-tooltip
                 :disabled="owner.partyType !== HomeOwnerPartyTypes.EXECUTOR"
                 right

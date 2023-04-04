@@ -177,6 +177,7 @@ export default defineComponent({
         if (localState.showErrorBar) {
           return 'border-over'
         }
+        return ''
       }),
       showErrorBar: computed((): boolean => {
         return props.setShowErrorBar

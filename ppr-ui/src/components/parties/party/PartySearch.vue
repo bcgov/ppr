@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid no-gutters class="white px-0 py-6" id="ppr-party-code">
+  <v-container fluid class="white px-0 py-6 no-gutters" id="ppr-party-code">
     <v-row class="px-6" align="center">
       <v-col cols="6">
         <v-text-field

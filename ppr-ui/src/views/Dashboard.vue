@@ -139,7 +139,6 @@ export default defineComponent({
       isRoleStaffReg,
       getSearchHistory,
       getUserServiceFee,
-      getRegTableNewItem,
       getSearchHistoryLength,
       isRoleQualifiedSupplier,
       getUserProductSubscriptionsCodes
@@ -153,7 +152,6 @@ export default defineComponent({
       'isRoleStaffReg',
       'getSearchHistory',
       'getUserServiceFee',
-      'getRegTableNewItem',
       'getSearchHistoryLength',
       'isRoleQualifiedSupplier',
       'getUserProductSubscriptionsCodes'
@@ -163,7 +161,6 @@ export default defineComponent({
       setSearchResults,
       setSearchedType,
       setSearchedValue,
-      setRegTableNewItem,
       setSearchDebtorName,
       setRegistrationType,
       resetNewRegistration,
@@ -173,7 +170,6 @@ export default defineComponent({
       'setSearchResults',
       'setSearchedType',
       'setSearchedValue',
-      'setRegTableNewItem',
       'setSearchDebtorName',
       'setRegistrationType',
       'resetNewRegistration',
@@ -208,15 +204,6 @@ export default defineComponent({
         if (isRoleStaff.value || isRoleStaffBcol.value || isRoleStaffReg.value) {
           return hasMhrRole.value && getFeatureFlag('mhr-ui-enabled')
         } else {
-          if (getRegTableNewItem.value.addedReg) {
-            snackBarEvent('Registration was successfully added to your table.')
-            setTimeout(() => {
-              const emptyItem: RegTableNewItemI = {
-                addedReg: '', addedRegParent: '', addedRegSummary: null, prevDraft: ''
-              }
-              setRegTableNewItem(emptyItem)
-            }, 4000)
-          }
           return hasMhrEnabled.value
         }
       })

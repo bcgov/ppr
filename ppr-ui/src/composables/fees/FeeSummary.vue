@@ -337,16 +337,19 @@ export default defineComponent({
             extraFee
           )
         }
+        return null
       }),
       totalFees: computed((): number => {
         if (localState.isValid) {
           return localState.feeSummary.feeAmount * localState.feeSummary.quantity
         }
+        return null
       }),
       totalAdditionalFees: computed((): number => {
         if (localState.isValid) {
           return localState.additionalFeeSummary?.feeAmount * localState.additionalFeeSummary?.quantity
         }
+        return null
       })
     })
 

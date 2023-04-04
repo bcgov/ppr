@@ -1,5 +1,5 @@
 <template>
-  <v-container v-if="!summaryView" fluid no-gutters class="pb-6 px-0 rounded">
+  <v-container v-if="!summaryView" fluid class="pb-6 px-0 rounded no-gutters">
     <v-row no-gutters class="summary-header pa-2 rounded-top">
       <v-col cols="auto" class="pa-2">
         <v-icon color="darkBlue">mdi-message-text</v-icon>
@@ -40,7 +40,7 @@
       </v-row>
     </v-card>
   </v-container>
-  <v-container v-else class="white pa-0" fluid no-gutters>
+  <v-container v-else class="white pa-0 no-gutters" fluid>
     <v-row no-gutters class="py-8">
       <v-col class="generic-label pl-3">
         Details Description

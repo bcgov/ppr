@@ -24,6 +24,8 @@ import { getTestId } from './utils'
 // unit test resources
 import mockRouter from './MockRouter'
 import { defaultFlagSet, getRoleProductCode } from '@/utils'
+import { nextTick } from '@vue/composition-api'
+import flushPromises from 'flush-promises'
 
 Vue.use(Vuetify)
 
@@ -67,6 +69,8 @@ async function assertBreadcrumbItemForRole (
   await store.dispatch('setAuthRoles', roles)
   await store.dispatch('setRoleSbc', !roles.includes(AuthRoles.PUBLIC))
   await store.dispatch('setUserProductSubscriptionsCodes', subscribedProductsCodes)
+
+  wrapper = createComponent(RouteNames.DASHBOARD, dashboardRoute.path, dashboardRoute.name)
   const breadcrumbs = wrapper.findAll(getTestId('breadcrumb-item'))
   expect(breadcrumbs.length).toBe(tombstoneBreadcrumbDashboard.length)
   expect(breadcrumbs.at(1).text()).toContain(breadcrumbItemContent)
@@ -280,7 +284,9 @@ describe('Breadcrumb component tests', () => {
   })
 
   it('displays different breadcrumbs for different auth roles', async () => {
-    wrapper = createComponent(RouteNames.DASHBOARD, dashboardRoute.path, dashboardRoute.name)
+    await store.dispatch('setAuthRoles', [])
+    await store.dispatch('setRoleSbc', false)
+    await store.dispatch('setUserProductSubscriptionsCodes', [])
 
     const STAFF_PPR = [AuthRoles.STAFF, AuthRoles.PPR]
     const STAFF_MHR = [AuthRoles.STAFF, AuthRoles.MHR]
