@@ -9,7 +9,7 @@ import '@/utils/use-composition-api'
 
 import { readonly, ref, toRefs, watch } from '@vue/composition-api'
 import { useActions, useGetters } from 'vuex-composition-helpers'
-import { ActionTypes, HomeTenancyTypes } from '@/enums'
+import { ActionTypes, HomeTenancyTypes, HomeOwnerPartyTypes } from '@/enums'
 import { MhrCompVal, MhrSectVal } from '@/composables/mhrRegistration/enums'
 import { useMhrValidations } from '@/composables'
 import { find, findIndex, remove, set } from 'lodash'
@@ -76,6 +76,10 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
   const getHomeTenancyType = (): HomeTenancyTypes => {
     // Groups
     const groups = getTransferOrRegistrationHomeOwnerGroups().filter(owner => owner.action !== ActionTypes.REMOVED)
+
+    // Variable to track if owners has a valid combination of Executor/Trustee/Admin (ETA) Owners
+    const hasETA = groups.some(group => hasExecutorTrusteeAdmin(group))
+
     const commonCondition = isMhrTransfer ? groups.length > 1 : showGroups.value
 
     // Special case where a defined Group is orphaned using remove functionality, we want to preserve the Group Type.
@@ -93,7 +97,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
       // Added second condition, because when an owner exists as a Sole Ownership, editing and clicking Done,
       // will change status to Tenants in Common unless above logic is in place..
       return HomeTenancyTypes.SOLE
-    } else if (numOfOwners > 1) {
+    } else if (numOfOwners > 1 && !hasETA) {
       // More than one owner without groups showing
       return HomeTenancyTypes.JOINT
     }
@@ -102,14 +106,24 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
 
   const getGroupTenancyType = (group: MhrRegistrationHomeOwnerGroupIF): HomeTenancyTypes => {
     const numOfOwnersInGroup = group.owners.filter(owner => owner.action !== ActionTypes.REMOVED).length
+    const hasETA = hasExecutorTrusteeAdmin(group)
 
-    if (numOfOwnersInGroup > 1) {
+    if (numOfOwnersInGroup > 1 && !hasETA) {
       return HomeTenancyTypes.JOINT
     } else if (getHomeTenancyType() === HomeTenancyTypes.SOLE) {
       return HomeTenancyTypes.SOLE
     } else {
       return HomeTenancyTypes.NA
     }
+  }
+
+  const hasExecutorTrusteeAdmin = (group: MhrRegistrationHomeOwnerGroupIF): boolean => {
+    const executorTrusteeAdmin = [
+      HomeOwnerPartyTypes.EXECUTOR,
+      HomeOwnerPartyTypes.TRUSTEE,
+      HomeOwnerPartyTypes.ADMINISTRATOR
+    ]
+    return group.owners.some(owner => executorTrusteeAdmin.includes(owner.partyType))
   }
 
   /**
