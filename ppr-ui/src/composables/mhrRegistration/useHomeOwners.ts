@@ -48,12 +48,6 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
     'setMhrTransferHomeOwnerGroups'
   ])
 
-  const executorTrusteeAdmin = [
-    HomeOwnerPartyTypes.EXECUTOR,
-    HomeOwnerPartyTypes.TRUSTEE,
-    HomeOwnerPartyTypes.ADMINISTRATOR
-  ]
-
   // Get Transfer or Registration Home Owners
   const getTransferOrRegistrationHomeOwners = (): MhrRegistrationHomeOwnerIF[] =>
     isMhrTransfer ? getMhrTransferHomeOwners.value : getMhrRegistrationHomeOwners.value
@@ -84,7 +78,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
     const groups = getTransferOrRegistrationHomeOwnerGroups().filter(owner => owner.action !== ActionTypes.REMOVED)
 
     // Variable to track if owners has a valid combination of Executor/Trustee/Admin (ETA) Owners
-    const hasETAError = groups.some(group => hasETAGroupError(group))
+    const hasETA = groups.some(group => hasExecutorTrusteeAdmin(group))
 
     const commonCondition = isMhrTransfer ? groups.length > 1 : showGroups.value
 
@@ -103,7 +97,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
       // Added second condition, because when an owner exists as a Sole Ownership, editing and clicking Done,
       // will change status to Tenants in Common unless above logic is in place..
       return HomeTenancyTypes.SOLE
-    } else if (numOfOwners > 1 && !hasETAError) {
+    } else if (numOfOwners > 1 && !hasETA) {
       // More than one owner without groups showing
       return HomeTenancyTypes.JOINT
     }
@@ -112,8 +106,9 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
 
   const getGroupTenancyType = (group: MhrRegistrationHomeOwnerGroupIF): HomeTenancyTypes => {
     const numOfOwnersInGroup = group.owners.filter(owner => owner.action !== ActionTypes.REMOVED).length
+    const hasETA = hasExecutorTrusteeAdmin(group)
 
-    if (numOfOwnersInGroup > 1 && !hasETAGroupError(group)) {
+    if (numOfOwnersInGroup > 1 && !hasETA) {
       return HomeTenancyTypes.JOINT
     } else if (getHomeTenancyType() === HomeTenancyTypes.SOLE) {
       return HomeTenancyTypes.SOLE
@@ -122,17 +117,15 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
     }
   }
 
-  const hasETAGroupError = (group: MhrRegistrationHomeOwnerGroupIF): boolean => {
-    // If a group contains multiple ETA's within one group, return invalid
-    if (group.owners.filter(owner => executorTrusteeAdmin.includes(owner.partyType)).length > 1) {
-      return true
-    } else
-    // If group has a mix of ETA and living owner, return invalid
-    if (group.owners.some(owner => executorTrusteeAdmin.includes(owner.partyType)) &&
-        group.owners.some(owner => !executorTrusteeAdmin.includes(owner.partyType))) {
-      return true
-    } else return false
+  const hasExecutorTrusteeAdmin = (group: MhrRegistrationHomeOwnerGroupIF): boolean => {
+    const executorTrusteeAdmin = [
+      HomeOwnerPartyTypes.EXECUTOR,
+      HomeOwnerPartyTypes.TRUSTEE,
+      HomeOwnerPartyTypes.ADMINISTRATOR
+    ]
+    return group.owners.some(owner => executorTrusteeAdmin.includes(owner.partyType))
   }
+
   /**
    * Get Ownership Allocation status object to conveniently show total allocation
    * and an allocation error status if exists
@@ -494,7 +487,6 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
     undoGroupRemoval,
     hasRemovedAllHomeOwners,
     hasRemovedAllHomeOwnerGroups,
-    hasUndefinedGroupInterest,
-    hasETAGroupError
+    hasUndefinedGroupInterest
   }
 }
