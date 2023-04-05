@@ -9,7 +9,7 @@ import '@/utils/use-composition-api'
 
 import { readonly, ref, toRefs, watch } from '@vue/composition-api'
 import { useActions, useGetters } from 'vuex-composition-helpers'
-import { ActionTypes, HomeTenancyTypes, HomeOwnerPartyTypes } from '@/enums'
+import { ActionTypes, HomeTenancyTypes, HomeOwnerPartyTypes, ApiTransferTypes } from '@/enums'
 import { MhrCompVal, MhrSectVal } from '@/composables/mhrRegistration/enums'
 import { useMhrValidations } from '@/composables'
 import { find, findIndex, remove, set } from 'lodash'
@@ -30,14 +30,16 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
     getMhrRegistrationValidationModel,
     getMhrTransferHomeOwnerGroups,
     getMhrTransferHomeOwners,
-    getMhrTransferCurrentHomeOwnerGroups
+    getMhrTransferCurrentHomeOwnerGroups,
+    getMhrTransferType
   } = useGetters<any>([
     'getMhrRegistrationHomeOwners',
     'getMhrRegistrationHomeOwnerGroups',
     'getMhrRegistrationValidationModel',
     'getMhrTransferHomeOwnerGroups',
     'getMhrTransferHomeOwners',
-    'getMhrTransferCurrentHomeOwnerGroups'
+    'getMhrTransferCurrentHomeOwnerGroups',
+    'getMhrTransferType'
   ])
 
   const {
@@ -78,8 +80,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
     const groups = getTransferOrRegistrationHomeOwnerGroups().filter(owner => owner.action !== ActionTypes.REMOVED)
 
     // Variable to track if owners has a valid combination of Executor/Trustee/Admin (ETA) Owners
-    const hasETA = groups.some(group => hasExecutorTrusteeAdmin(group))
-
+    const hasETA = getTransferOrRegistrationHomeOwnerGroups().some(group => hasExecutorTrusteeAdmin(group))
     const commonCondition = isMhrTransfer ? groups.length > 1 : showGroups.value
 
     // Special case where a defined Group is orphaned using remove functionality, we want to preserve the Group Type.
@@ -219,8 +220,15 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
       homeOwnerGroups = [...getMhrRegistrationHomeOwnerGroups.value]
     }
     // For Mhr Transfers with Removed Groups, assign a sequential groupId
-    const transferDefaultId = homeOwnerGroups.find(group => group.action !== ActionTypes.REMOVED)?.groupId ||
+    // If WILL flow, add new executor to existing group instead of incrementing the group
+    let transferDefaultId = null
+    if (getMhrTransferType.value?.transferType !== ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL) {
+      transferDefaultId = homeOwnerGroups.find(group => group.action !== ActionTypes.REMOVED)?.groupId ||
       homeOwnerGroups.filter(group => group.action === ActionTypes.REMOVED).length + 1
+    } else {
+      transferDefaultId = groupId
+    }
+
     const fallBackId = isMhrTransfer ? transferDefaultId : DEFAULT_GROUP_ID
 
     // Try to find a group to add the owner
@@ -229,7 +237,10 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
         (group: MhrRegistrationHomeOwnerGroupIF) => group.groupId === (groupId || fallBackId)
       ) || ({} as MhrRegistrationHomeOwnerGroupIF)
 
-    if (groupToUpdate.owners && groupToUpdate.action !== ActionTypes.REMOVED) {
+    // Allow update to "REMOVED" group if WILL flow
+    if (groupToUpdate.owners &&
+        (groupToUpdate.action !== ActionTypes.REMOVED ||
+         getMhrTransferType.value?.transferType === ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL)) {
       groupToUpdate.owners.push(owner)
     } else {
       // No groups exist, need to create a new one
