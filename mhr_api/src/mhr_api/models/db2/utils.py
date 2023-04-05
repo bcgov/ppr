@@ -82,6 +82,11 @@ SELECT DISTINCT mr.mhr_number, 'Y' AS account_reg,
   FROM mhr_registrations mr
 WHERE account_id = :query_value
   AND mr.registration_type = 'MHREG'
+  AND NOT EXISTS (SELECT mer.mhr_number
+                    FROM mhr_extra_registrations mer
+                   WHERE mer.account_id = mr.account_id
+                     AND mer.mhr_number = mr.mhr_number
+                     AND mer.removed_ind = 'Y')
 )
 """
 QUERY_ACCOUNT_REGISTRATIONS_SUMMARY = """
