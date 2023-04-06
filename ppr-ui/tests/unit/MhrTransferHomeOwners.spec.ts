@@ -359,6 +359,23 @@ describe('Home Owners', () => {
         .text()
     ).toBe(HomeTenancyTypes.SOLE)
 
+    // add executor
+    homeOwnerGroup[0].owners.push(mockedExecutor)
+    await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerGroup)
+
+    // Tenancy type should be N/A due to mix of Executor and living owner
+    expect(wrapper.findComponent(HomeOwners).vm.$data.getHomeOwners.length).toBe(2)
+    expect(
+      wrapper
+        .findComponent(HomeOwners)
+        .find(getTestId('home-owner-tenancy-type'))
+        .text()
+    ).toBe(HomeTenancyTypes.NA)
+
+    // reset owners
+    homeOwnerGroup = [{ groupId: 1, owners: [mockedPerson] }]
+    await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerGroup)
+
     // delete original owner
     await homeOwnersTable.find(getTestId('table-delete-btn')).trigger('click')
 
