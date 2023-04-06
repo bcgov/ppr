@@ -82,6 +82,11 @@ SELECT DISTINCT mr.mhr_number, 'Y' AS account_reg,
   FROM mhr_registrations mr
 WHERE account_id = :query_value
   AND mr.registration_type = 'MHREG'
+  AND NOT EXISTS (SELECT mer.mhr_number
+                    FROM mhr_extra_registrations mer
+                   WHERE mer.account_id = mr.account_id
+                     AND mer.mhr_number = mr.mhr_number
+                     AND mer.removed_ind = 'Y')
 )
 """
 QUERY_ACCOUNT_REGISTRATIONS_SUMMARY = """
@@ -110,11 +115,17 @@ SELECT (SELECT COUNT(mr.id)
            FROM mhr_registrations mr
           WHERE mr.account_id = :query_value
             AND mr.mhr_number = :query_value2
-            AND mr.registration_type IN ('MHREG')) AS reg_count,
+            AND mr.registration_type IN ('MHREG')
+            AND NOT EXISTS (SELECT mer.mhr_number
+                              FROM mhr_extra_registrations mer
+                             WHERE mer.mhr_number = mr.mhr_number
+                               AND mer.account_id = mr.account_id
+                               AND mer.removed_ind = 'Y')) AS reg_count,
        (SELECT COUNT(mer.id)
            FROM mhr_extra_registrations mer
           WHERE mer.account_id = :query_value
-            AND mer.mhr_number = :query_value2) as extra_reg_count,
+            AND mer.mhr_number = :query_value2
+            AND mer.removed_ind != 'Y') as extra_reg_count,
        (SELECT  mr.account_id
            FROM mhr_registrations mr
           WHERE mr.account_id = :query_value

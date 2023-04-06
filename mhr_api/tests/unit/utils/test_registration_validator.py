@@ -357,6 +357,11 @@ TEST_LOCATION_DATA = [
     ('Invalid exception plan', None, None, None, INVALID_TEXT_CHARSET, None, INVALID_CHARSET_MESSAGE),
     ('Invalid band name', None, None, None, None, INVALID_TEXT_CHARSET, INVALID_CHARSET_MESSAGE)
 ]
+# testdata pattern is ({description}, {rebuilt}, {other}, {message content})
+TEST_DESCRIPTION_DATA = [
+    ('Invalid rebuilt remarks', INVALID_TEXT_CHARSET, None, INVALID_CHARSET_MESSAGE),
+    ('Invalid other remarks', None, INVALID_TEXT_CHARSET, INVALID_CHARSET_MESSAGE)
+]
 # testdata pattern is ({description}, {valid}, {staff}, {doc_id}, {message content}, {status})
 TEST_EXEMPTION_DATA = [
     (DESC_VALID, True, True, None, None, MhrRegistrationStatusTypes.ACTIVE),
@@ -551,7 +556,7 @@ def test_validate_owner(session, desc, bus_name, first, middle, last, message_co
     elif desc == 'Reg invalid streetAdditional':
         party['address']['streetAdditional'] = INVALID_TEXT_CHARSET
     elif desc == 'Reg invalid city':
-        party['address']['city'] = INVALID_TEXT_CHARSET
+        party['address']['city'] = 'Montréal'  # INVALID_TEXT_CHARSET
     error_msg = ''
     if desc.startswith('Reg'):
         error_msg = validator.validate_registration(json_data, False)
@@ -578,6 +583,22 @@ def test_validate_reg_location(session, desc, park_name, dealer, additional, exc
         location['exceptionPlan'] = except_plan
     elif band_name:
         location['bandName'] = band_name
+    error_msg = validator.validate_registration(json_data, False)
+    assert error_msg != ''
+    if message_content:
+        assert error_msg.find(message_content) != -1
+
+
+@pytest.mark.parametrize('desc,rebuilt,other,message_content', TEST_DESCRIPTION_DATA)
+def test_validate_reg_description(session, desc, rebuilt, other, message_content):
+    """Assert that description validation works as expected."""
+    # setup
+    json_data = get_valid_registration(MhrTenancyTypes.SOLE)
+    description = json_data.get('description')
+    if rebuilt:
+        description['rebuiltRemarks'] = rebuilt
+    elif other:
+        description['otherRemarks'] = other
     error_msg = validator.validate_registration(json_data, False)
     assert error_msg != ''
     if message_content:

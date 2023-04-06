@@ -93,16 +93,28 @@ def post_other_registration(mhr_number: str):
         if not authorized(account_id, jwt):
             return resource_utils.unauthorized_error_response(account_id)
         # Try to fetch summary registration by mhr number
-        registration = MhrRegistration.find_summary_by_mhr_number(account_id, mhr_number)
+        registration = MhrRegistration.find_summary_by_mhr_number(account_id, mhr_number, is_staff(jwt))
         if not registration:
             return resource_utils.not_found_error_response('Manufactured Home registration', mhr_number)
 
+        extra_existing: MhrExtraRegistration = MhrExtraRegistration.find_by_mhr_number(mhr_number, account_id)
+        # Check if registration was created by the account and removed. If so, restore it.
+        if extra_existing and extra_existing.removed_ind == MhrExtraRegistration.REMOVE_IND:
+            current_app.logger.info(f'Restoring MHR# {mhr_number} for account {account_id}')
+            MhrExtraRegistration.delete(mhr_number, account_id)
+            if 'inUserList' in registration:
+                del registration['inUserList']
+            return registration, HTTPStatus.CREATED
+
         # Check if duplicate.
-        extra_existing = MhrExtraRegistration.find_by_mhr_number(mhr_number, account_id)
         if extra_existing:
             message = resource_utils.DUPLICATE_REGISTRATION_ERROR.format(mhr_number)
             return resource_utils.duplicate_error_response(message)
+        if not extra_existing and registration.get('inUserList'):
+            message = resource_utils.DUPLICATE_REGISTRATION_ERROR.format(mhr_number)
+            return resource_utils.duplicate_error_response(message)
 
+        current_app.logger.info(f'Adding another account MHR# {mhr_number} for account {account_id}')
         extra_registration = MhrExtraRegistration(account_id=account_id, mhr_number=mhr_number)
         extra_registration.save()
 
@@ -121,7 +133,7 @@ def post_other_registration(mhr_number: str):
 @cross_origin(origin='*')
 @jwt.requires_auth
 def delete_other_registration(mhr_number: str):
-    """Remove a registration created by another account from the current account list."""
+    """Remove a registration from the current account registrations list."""
     try:
         if mhr_number is None:
             return resource_utils.path_param_error_response('MHR Number')
@@ -135,13 +147,24 @@ def delete_other_registration(mhr_number: str):
         # Verify request JWT and account ID
         if not authorized(account_id, jwt):
             return resource_utils.unauthorized_error_response(account_id)
+        # Try to find user registration
+        registration = MhrRegistration.find_summary_by_mhr_number(account_id, mhr_number, is_staff(jwt))
         # Try to find extra registration.
         extra_registration = MhrExtraRegistration.find_by_mhr_number(mhr_number, account_id)
-        if not extra_registration:
+        if not registration and not extra_registration:
             return resource_utils.not_found_error_response('user account registration', mhr_number)
-        # Remove another account's financing statement registration.
+        if registration and not registration.get('inUserList') and not extra_registration:
+            return resource_utils.not_found_error_response('user account registration', mhr_number)
+        # Remove another account's registration.
         if extra_registration and not extra_registration.removed_ind:
+            current_app.logger.info(f'Removing another account MHR# {mhr_number} for account {account_id}')
             MhrExtraRegistration.delete(mhr_number, account_id)
+        # Or mark user account's registration as removed.
+        elif not extra_registration:
+            current_app.logger.info(f'Marking MHR# {mhr_number} as removed for account {account_id}')
+            extra_registration = MhrExtraRegistration(account_id=account_id, mhr_number=mhr_number)
+            extra_registration.removed_ind = MhrExtraRegistration.REMOVE_IND
+            extra_registration.save()
         return '', HTTPStatus.NO_CONTENT
 
     except DatabaseException as db_exception:

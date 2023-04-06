@@ -108,6 +108,7 @@ def validate_registration(json_data, staff: bool = False):
         owner_count: int = len(json_data.get('ownerGroups')) if json_data.get('ownerGroups') else 0
         error_msg += validate_owner_groups(json_data.get('ownerGroups'), True, None, None, owner_count)
         error_msg += validate_location(json_data)
+        error_msg += validate_description(json_data)
     except Exception as validation_exception:   # noqa: B902; eat all errors
         current_app.logger.error('validate_registration exception: ' + str(validation_exception))
         error_msg += VALIDATOR_ERROR
@@ -648,6 +649,18 @@ def validate_location(json_data):
             error_msg += LOCATION_PARK_NAME_REQUIRED
     if location.get('address'):
         error_msg += validate_address(location.get('address'), desc)
+    return error_msg
+
+
+def validate_description(json_data):
+    """Verify description values are valid."""
+    error_msg = ''
+    if not json_data.get('description'):
+        return error_msg
+    description = json_data.get('description')
+    desc: str = 'description'
+    error_msg += validate_text(description.get('rebuiltRemarks'), desc + ' rebuilt remarks')
+    error_msg += validate_text(description.get('otherRemarks'), desc + ' other remarks')
     return error_msg
 
 
