@@ -7,6 +7,7 @@ import { HomeOwners } from '@/views'
 import { AddEditHomeOwner, HomeOwnersTable, HomeOwnerGroups } from '@/components/mhrRegistration/HomeOwners'
 import { SimpleHelpToggle } from '@/components/common'
 import {
+  mockedExecutor,
   mockedPerson,
   mockedOrganization,
   mockedAddedPerson,
@@ -16,7 +17,7 @@ import {
 } from './test-data'
 import { getTestId } from './utils'
 import { MhrRegistrationHomeOwnerGroupIF } from '@/interfaces'
-import { ApiTransferTypes, UITransferTypes } from '@/enums'
+import { ApiTransferTypes, UITransferTypes, HomeTenancyTypes } from '@/enums'
 import { SupportingDocuments, TransferType } from '@/components/mhrTransfers'
 import { transferSupportingDocuments } from '@/resources'
 
@@ -336,5 +337,64 @@ describe('Home Owners', () => {
     const suffix = <HTMLInputElement>(addEditHomeOwner.find(getTestId('suffix'))).element
     const { first, middle, last } = mockedPerson.individualName
     expect(suffix.value).toBe(`Executor of the will of ${first} ${middle} ${last}`)
+  })
+
+  it('TRANS WILL Flow: displays correct tenancy type in Executor scenarios', async () => {
+    // setup transfer type to test
+    const TRANSFER_TYPE = ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL
+
+    let homeOwnerGroup = [{ groupId: 1, owners: [mockedPerson] }]
+    await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerGroup)
+
+    const homeOwnersTable = wrapper.findComponent(HomeOwnersTable)
+
+    await selectTransferType(TRANSFER_TYPE)
+
+    // Tenancy type should be SOLE before changes made
+    expect(wrapper.findComponent(HomeOwners).vm.$data.getHomeOwners.length).toBe(1)
+    expect(
+      wrapper
+        .findComponent(HomeOwners)
+        .find(getTestId('home-owner-tenancy-type'))
+        .text()
+    ).toBe(HomeTenancyTypes.SOLE)
+
+    // delete original owner
+    await homeOwnersTable.find(getTestId('table-delete-btn')).trigger('click')
+
+    // Tenancy type should be N/A with no living owners
+    expect(wrapper.findComponent(HomeOwners).vm.$data.getHomeOwners.length).toBe(1)
+    expect(
+      wrapper
+        .findComponent(HomeOwners)
+        .find(getTestId('home-owner-tenancy-type'))
+        .text()
+    ).toBe(HomeTenancyTypes.NA)
+
+    // add executor
+    homeOwnerGroup[0].owners.push(mockedExecutor)
+    await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerGroup)
+
+    // Tenancy type should be SOLE
+    expect(wrapper.findComponent(HomeOwners).vm.$data.getHomeOwners.length).toBe(2)
+    expect(
+      wrapper
+        .findComponent(HomeOwners)
+        .find(getTestId('home-owner-tenancy-type'))
+        .text()
+    ).toBe(HomeTenancyTypes.SOLE)
+
+    // add another executor
+    homeOwnerGroup[0].owners.push(mockedExecutor)
+    await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerGroup)
+
+    // Tenancy type should be N/A due to multiple Executors
+    expect(wrapper.findComponent(HomeOwners).vm.$data.getHomeOwners.length).toBe(3)
+    expect(
+      wrapper
+        .findComponent(HomeOwners)
+        .find(getTestId('home-owner-tenancy-type'))
+        .text()
+    ).toBe(HomeTenancyTypes.NA)
   })
 })
