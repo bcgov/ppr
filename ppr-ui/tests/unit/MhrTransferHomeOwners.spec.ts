@@ -284,7 +284,7 @@ describe('Home Owners', () => {
     expect(removedBadges.at(1).exists()).toBe(true)
   })
 
-  it('should delete a home owner group', async () => {
+  it('should display a DELETED home owner group', async () => {
     const homeOwnerGroups = [
       {
         groupId: 1,
@@ -337,7 +337,7 @@ describe('Home Owners', () => {
       .findComponent(InfoChip).text()).toContain('REMOVED')
   })
 
-  it('should Changed a home owner group', async () => {
+  it('should display a CHANGED a home owner group', async () => {
     const homeOwnerGroups = [
       {
         groupId: 1,
