@@ -10,7 +10,7 @@
     "lint": "vue-cli-service lint",
     "lint:no-fix": "vue-cli-service lint --no-fix",
     "clear_jest": "jest --clearCache",
-    "test:unit": "vue-cli-service test:unit --testPathPattern  --coverage",
+    "test:unit": "vue-cli-service test:unit --testPathPattern --coverage",
     "test:debug": "node --inspect-brk node_modules/.bin/vue-cli-service test:unit --testPathPattern --no-cache --watch --runInBand"
   },
   "dependencies": {
