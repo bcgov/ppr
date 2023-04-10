@@ -16,27 +16,13 @@
       }"
     />
     <div v-if="!isEditGroupMode" class="group-header-summary">
+      <!-- Group Information -->
       <div>
-        <v-chip
-          v-if="isMhrTransfer && isRemovedHomeOwnerGroup(group)"
-          class="badge-delete mr-4"
-          :class="{ 'ml-8 mr-n4': !showEditActions }"
-          label x-small
-          color="#grey lighten-2"
-          data-test-id="owner-removed-badge"
-        >
-          <b>DELETED</b>
-        </v-chip>
-        <v-chip
-          v-else-if="isMhrTransfer && isAddedHomeOwnerGroup(group)"
-          class="badge-added mr-4"
-          :class="{ 'ml-8 mr-n2': !showEditActions }"
-          label x-small
-          color="primary"
-          data-test-id="owner-added-badge"
-        >
-          <b>ADDED</b>
-        </v-chip>
+        <!-- Show Information Chips for MHR Transfers -->
+        <template v-if="isMhrTransfer">
+          <InfoChip :action="group.action" :class="{ 'ml-8 mr-n2': !showEditActions }" />
+        </template>
+
         <span
           v-if="!(isMhrTransfer && isRemovedHomeOwnerGroup(group))"
           :class="{'removed-owner-group': isRemovedHomeOwnerGroup(group)}"
@@ -96,7 +82,10 @@
       </div>
 
       <!-- Mhr Transfer Actions -->
-      <div v-if="showEditActions && isMhrTransfer && !isRemovedHomeOwnerGroup(group)" class="mr-n4">
+      <div
+        v-if="showEditActions && isMhrTransfer && !isRemovedHomeOwnerGroup(group) && !isChangedOwnerGroup(group)"
+        class="mr-n4"
+      >
         <v-btn
           text
           color="primary"
@@ -104,6 +93,7 @@
           :ripple="false"
           :disabled="isGlobalEditingMode"
           @click="showDeleteGroupDialog = true"
+          data-test-id="group-delete-btn"
         >
           <v-icon small>mdi-delete</v-icon>
           <span>Delete Group</span>
@@ -129,13 +119,55 @@
         </v-menu>
       </div>
 
-      <!-- Undo removal action -->
+      <!-- Group Actions -->
       <div v-else-if="showEditActions && isMhrTransfer">
+        <!-- Additional actions for changed owner group -->
+        <template v-if="isChangedOwnerGroup(group)">
+          <v-btn
+            text color="primary"
+            class="pr-0"
+            :ripple="false"
+            @click="undoGroupChanges(groupId)"
+            :disabled="isGlobalEditingMode"
+            data-test-id="group-header-undo-btn"
+          >
+            <v-icon small>mdi-undo</v-icon>
+            <span>Undo</span>
+            <v-divider class="ma-0 pl-3" vertical />
+          </v-btn>
+
+          <v-menu offset-y left nudge-bottom="0" class="delete-group-menu">
+            <template v-slot:activator="{ on }">
+              <v-btn text v-on="on" color="primary" class="pa-0" :disabled="isGlobalEditingMode">
+                <v-icon>mdi-menu-down</v-icon>
+              </v-btn>
+            </template>
+
+            <!-- More actions drop down list -->
+            <v-list class="actions-dropdown actions__more-actions">
+              <v-list-item class="my-n2">
+                <v-list-item-subtitle class="pa-0" @click="openGroupForEditing(groupId)">
+                  <v-icon small style="margin-bottom: 3px;">mdi-pencil</v-icon>
+                  <span class="ml-1 remove-btn-text">Edit Group Details</span>
+                </v-list-item-subtitle>
+              </v-list-item>
+              <v-list-item class="my-n2">
+                <v-list-item-subtitle class="pa-0" @click="showDeleteGroupDialog = true">
+                  <v-icon small style="margin-bottom: 3px;">mdi-delete</v-icon>
+                  <span class="ml-1 remove-btn-text">Delete Group</span>
+                </v-list-item-subtitle>
+              </v-list-item>
+            </v-list>
+          </v-menu>
+        </template>
+
+        <!-- Undo removal actions-->
         <v-btn
+          v-else
           text color="primary"
           class="pr-0"
           :ripple="false"
-          @click="undoGroupRemoval(groupId, true)"
+          @click="undoGroupChanges(groupId, true)"
           :disabled="isGlobalEditingMode"
           data-test-id="group-header-undo-btn"
         >
@@ -181,6 +213,7 @@
 
 <script lang="ts">
 import { BaseDialog } from '@/components/dialogs'
+import { InfoChip } from '@/components/common'
 import { useHomeOwners, useTransferOwners } from '@/composables'
 import { computed, defineComponent, reactive, ref, toRefs, watch } from '@vue/composition-api'
 import FractionalOwnership from './FractionalOwnership.vue'
@@ -203,7 +236,8 @@ export default defineComponent({
   },
   components: {
     BaseDialog,
-    FractionalOwnership
+    FractionalOwnership,
+    InfoChip
   },
   setup (props, context) {
     const {
@@ -212,13 +246,19 @@ export default defineComponent({
       deleteGroup,
       setGroupFractionalInterest,
       markGroupForRemoval,
-      undoGroupRemoval,
+      undoGroupChanges,
       hasUndefinedGroupInterest,
       getTransferOrRegistrationHomeOwnerGroups,
       getHomeTenancyType,
       getGroupTenancyType
     } = useHomeOwners(props.isMhrTransfer)
-    const { isSOorJT } = useTransferOwners()
+    const {
+      isSOorJT,
+      hasCurrentGroupChanges,
+      isAddedHomeOwnerGroup,
+      isRemovedHomeOwnerGroup,
+      isChangedOwnerGroup
+    } = useTransferOwners()
 
     const homeFractionalOwnershipForm = ref(null)
 
@@ -260,21 +300,17 @@ export default defineComponent({
       return `${toTitleCase(interest)} ${interestNumerator}/${interestDenominator}`
     }
 
-    const isRemovedHomeOwnerGroup = (group: MhrHomeOwnerGroupIF): boolean => {
-      return group.action === ActionTypes.REMOVED
-    }
-
-    const isAddedHomeOwnerGroup = (group: MhrHomeOwnerGroupIF): boolean => {
-      return group.action === ActionTypes.ADDED
-    }
-
     const done = (): void => {
       // @ts-ignore - function exists
       context.refs.homeFractionalOwnershipForm.validate()
 
       if (localState.isHomeFractionalOwnershipValid) {
         localState.isEditGroupMode = false
-        setGroupFractionalInterest(props.groupId, localState.fractionalData)
+        setGroupFractionalInterest(
+          props.groupId,
+          localState.fractionalData,
+          hasCurrentGroupChanges(props.groupId, localState.fractionalData)
+        )
       }
     }
 
@@ -310,11 +346,12 @@ export default defineComponent({
       cancel,
       cancelOrProceed,
       homeFractionalOwnershipForm,
-      isRemovedHomeOwnerGroup,
-      isAddedHomeOwnerGroup,
-      undoGroupRemoval,
+      undoGroupChanges,
       getHomeTenancyType,
       getGroupTenancyType,
+      isChangedOwnerGroup,
+      isAddedHomeOwnerGroup,
+      isRemovedHomeOwnerGroup,
       ...toRefs(localState)
     }
   }
