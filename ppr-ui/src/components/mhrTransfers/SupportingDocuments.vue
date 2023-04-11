@@ -84,8 +84,7 @@ export default defineComponent({
     // Only death certificate is captured in the api
     const updateDeletedOwner = (): void => {
       editHomeOwner({
-        ...localState.deletedOwnerState,
-        hasDeathCertificate: localState.deletedOwnerState.supportingDocument === SupportingDocumentsOptions.DEATH_CERT
+        ...props.deletedOwner
       },
       localState.deletedOwnerState.groupId
       )
