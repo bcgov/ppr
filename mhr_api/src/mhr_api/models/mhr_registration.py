@@ -219,10 +219,10 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                         note['remarks'] = 'MANUFACTURED HOME REGISTRATION CANCELLED'
                     elif doc_type == 'TAXN' and note.get('status') != 'A':  # Conditionally display remarks.
                         note['remarks'] = ''
-                    # Exlude if expiry elapsed.
+                    # Exclude if expiry elapsed.
                     elif doc_type in ('CAU', 'CAUC', 'CAUE') and note.get('expiryDate') and \
                             model_utils.date_elapsed(note.get('expiryDate')):
-                        include = False
+                        include = MhrRegistration.__include_caution(reg_json.get('notes'), note.get('documentId'))
                     if doc_type == 'FZE':  # Do not display contact info.
                         if note.get('contactName'):
                             del note['contactName']
@@ -964,3 +964,16 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         for section in json_data['description']['sections']:
             sections.append(MhrSection.create_from_json(section, registration_id))
         return sections
+
+    @staticmethod
+    def __include_caution(notes, document_id: str) -> bool:
+        """Include expired caution note if subsequent continue or extend caution has not expired."""
+        latest_caution = None
+        for note in notes:
+            if not latest_caution and note.get('documentType', '') in ('CAUC', 'CAUE', 'CAU '):
+                latest_caution = note
+            if note.get('documentId') == document_id:
+                break
+            elif latest_caution and note.get('documentType', '') not in ('CAUC', 'CAUE', 'CAU '):
+                return False
+        return latest_caution and not model_utils.date_elapsed(latest_caution.get('expiryDate'))
