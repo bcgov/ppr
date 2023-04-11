@@ -222,11 +222,11 @@
                 <!-- Home Owners Header -->
                 <header class="review-header mt-10 rounded-top">
                   <v-row no-gutters align="center">
-                    <v-col cols="10">
+                    <v-col cols="9">
                       <img class="home-owners-icon mb-1 ml-1" src="@/assets/svgs/homeownersicon_reviewscreen.svg"/>
                       <span class="font-weight-bold pl-2">Home Owners</span>
                     </v-col>
-                    <v-col cols="2" class="text-right">
+                    <v-col cols="3" class="text-right">
                       <v-btn
                         text id="home-owners-change-btn"
                         class="pl-1"
@@ -882,7 +882,7 @@ export default defineComponent({
 
 ::v-deep {
   #home-owners-change-btn {
-    height: unset;
+    //height: unset;
   }
   .home-owners-icon {
     vertical-align: middle;

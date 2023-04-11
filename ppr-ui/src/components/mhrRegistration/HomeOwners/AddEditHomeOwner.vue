@@ -106,7 +106,6 @@
                   :rules="firsNameRules"
                   :disabled="disableNameFields"
                   :readonly="disableNameFields"
-                  @mousedown.prevent
                 />
               </v-col>
               <v-col cols="4">
@@ -119,7 +118,6 @@
                   :rules="maxLength(15)"
                   :disabled="disableNameFields"
                   :readonly="disableNameFields"
-                  @mousedown.prevent
                 />
               </v-col>
               <v-col cols="4">
@@ -132,7 +130,6 @@
                   :rules="lastNameRules"
                   :disabled="disableNameFields"
                   :readonly="disableNameFields"
-                  @mousedown.prevent
                 />
               </v-col>
             </v-row>
