@@ -238,7 +238,6 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
       transferDefaultId = homeOwnerGroups.find(group => group.action !== ActionTypes.REMOVED)?.groupId ||
       homeOwnerGroups.filter(group => group.action === ActionTypes.REMOVED).length + 1
     }
-
     const fallBackId = isMhrTransfer ? transferDefaultId : DEFAULT_GROUP_ID
 
     // Try to find a group to add the owner
