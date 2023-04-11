@@ -1,4 +1,4 @@
-import { ActionTypes, HomeTenancyTypes } from '@/enums'
+import { ActionTypes, HomeTenancyTypes, HomeOwnerPartyTypes } from '@/enums'
 import {
   AddressIF,
   MhrRegistrationFractionalOwnershipIF,
@@ -31,6 +31,35 @@ export const mockedEmptyGroup: MhrRegistrationHomeOwnerGroupIF = {
   owners: [],
   // TODO: Mhr-Submission - UPDATE after the correct type can be determined
   type: Object.keys(HomeTenancyTypes).find(key => HomeTenancyTypes[key] as string === HomeTenancyTypes.SOLE)
+}
+
+export const mockedExecutor: MhrRegistrationHomeOwnerIF = {
+  ownerId: 10,
+  individualName: {
+    first: 'John',
+    middle: 'A',
+    last: 'Smith'
+  },
+  suffix: 'Sr.',
+  phoneNumber: '(545) 333-2211',
+  phoneExtension: '1234',
+  partyType: HomeOwnerPartyTypes.EXECUTOR,
+  address: mockedAddress
+}
+
+export const mockedAddedExecutor: MhrRegistrationHomeOwnerIF = {
+  ownerId: 10,
+  individualName: {
+    first: 'John',
+    middle: 'A',
+    last: 'Smith'
+  },
+  suffix: 'Sr.',
+  phoneNumber: '(545) 333-2211',
+  phoneExtension: '1234',
+  partyType: HomeOwnerPartyTypes.EXECUTOR,
+  action: ActionTypes.ADDED,
+  address: mockedAddress
 }
 
 export const mockedPerson: MhrRegistrationHomeOwnerIF = {

@@ -70,7 +70,7 @@
                       ><u> issued from Canada or the United States</u></span>
                     </template>
                     If the death certificate was issued outside of Canada or the US, the transfer will have to be sent
-                    to the Manufactured Home Registry
+                    to the Manufactured Home Registry.
                   </v-tooltip>
                   , and the name on the death certificate matches the name displayed above exactly.
                   </p>
