@@ -24,11 +24,13 @@ import { useHomeOwners } from '@/composables'
  */
 export const useTransferOwners = (enableAllActions: boolean = false) => {
   const {
+    hasUnsavedChanges,
     getMhrTransferType,
     getMhrTransferHomeOwners,
     getMhrTransferHomeOwnerGroups,
     getMhrTransferCurrentHomeOwnerGroups
   } = useGetters<any>([
+    'hasUnsavedChanges',
     'getMhrTransferType',
     'getMhrTransferHomeOwners',
     'getMhrTransferHomeOwnerGroups',
@@ -80,6 +82,11 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
   /** Returns true when the selected transfer type is a 'TO_EXECUTOR_PROBATE_WILL' scenario **/
   const isTransferToExecutorProbateWill = computed((): boolean => {
     return getMhrTransferType.value?.transferType === ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL
+  })
+
+  /** Returns true when the selected transfer type is a 'SURVIVING_JOINT_TENANT' scenario **/
+  const isTransferToSurvivingJointTenant = computed((): boolean => {
+    return getMhrTransferType.value?.transferType === ApiTransferTypes.SURVIVING_JOINT_TENANT
   })
 
   /** Returns true when Add/Edit Owner name fields should be disabled **/
@@ -233,54 +240,103 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       const isDeletedOwnersInGroup = getMhrTransferHomeOwnerGroups.value.find(group =>
         group.groupId === owner.groupId).owners.some(owner => owner.action === ActionTypes.REMOVED)
 
-      return hasDeletedOwners && !isDeletedOwnersInGroup
+      const hasAddedExecutorInGroup = getMhrTransferHomeOwnerGroups.value
+        .find(group => group.groupId === owner.groupId).owners
+        .some(owner => owner.partyType === HomeOwnerPartyTypes.EXECUTOR)
+
+      return (hasDeletedOwners && !isDeletedOwnersInGroup) ||
+        // in case of Undo, still disable Delete button
+        ((hasUnsavedChanges.value && !hasDeletedOwners) && !hasAddedExecutorInGroup)
     }
     return false
   }
 
-  /**
-   * TRANS_WILL Flow
-   * Check if there's a deleted Owner with selected Grant of Probate as supporting document.
-   * @returns true there is such Owner, false otherwise
-   */
-  const hasDeletedOwnersWithProbateGrant = (): boolean => {
-    return getMhrTransferHomeOwnerGroups.value.some(group =>
-      group.owners.some(
-        (owner: MhrRegistrationHomeOwnerIF) => owner.supportingDocument === SupportingDocumentsOptions.PROBATE_GRANT
-      )
-    )
-  }
-
-  /**
-   * TRANS_WILL Flow
-   * Pre-fill Owner as Executor of deleted Owner (Grant of Probate selected)
-   */
-  const prefillOwnerAsExecutor = (owner: MhrRegistrationHomeOwnerIF): void => {
-    const allOwners = getMhrTransferHomeOwners.value
-    const deletedOwnerGroup = find(getMhrTransferHomeOwnerGroups.value, { owners: [{ action: ActionTypes.REMOVED }] })
-    const deletedOwner = find(deletedOwnerGroup.owners, { action: ActionTypes.REMOVED }) as MhrRegistrationHomeOwnerIF
-
-    Object.assign(owner, {
-      ownerId: allOwners.length + 1,
-      suffix: deletedOwner.individualName
-        ? 'Executor of the will of ' + Object.values(deletedOwner.individualName).join(' ')
-        : '',
-      partyType: HomeOwnerPartyTypes.EXECUTOR,
-      groupId: deletedOwnerGroup.groupId // new Owner will be added to the same group as deleted Owner
-    } as MhrRegistrationHomeOwnerIF)
-  }
-
-  // Set Death Certificate for owners in group
-  const resetGrantOfProbate = (groupId, excludedOwnerId) => {
-    // find owners that belong to groupId, are removed and have Grant of Probate as supporting document
-    getMhrTransferHomeOwnerGroups.value
-      .find(group => group.groupId === groupId).owners
-      .forEach((owner: MhrRegistrationHomeOwnerIF) => {
-        if (owner.action === ActionTypes.REMOVED && owner.ownerId !== excludedOwnerId &&
-        owner.supportingDocument === SupportingDocumentsOptions.PROBATE_GRANT) {
-          owner.supportingDocument = SupportingDocumentsOptions.DEATH_CERT
-        }
+  // Transfer Will flow and all the related conditions/logic
+  const TRANS_WILL: any = {
+    isValidTransfer: computed((): boolean => {
+      // check if there is a group that is valid for WILL transfer
+      return getMhrTransferHomeOwnerGroups.value.some(group => TRANS_WILL.isValidGroup(group))
+    }),
+    isValidGroup: (group: MhrRegistrationHomeOwnerGroupIF): boolean => {
+      const isValidAddedOwner = group.owners.every((owner: MhrRegistrationHomeOwnerIF) => {
+        return isCurrentOwner(owner) ? TRANS_WILL.hasValidSupportDocs(owner) : owner.action === ActionTypes.ADDED
       })
+      // Group has at least one Executor
+      const hasAddedExecutor = group.owners.some((owner: MhrRegistrationHomeOwnerIF) =>
+        owner.action === ActionTypes.ADDED && owner.partyType === HomeOwnerPartyTypes.EXECUTOR)
+      return isValidAddedOwner && hasAddedExecutor
+    },
+    // check if supportingDocument is either Death Certificate or Grant of Probate
+    hasValidSupportDocs: (owner: MhrRegistrationHomeOwnerIF): boolean => {
+      let hasValidDeathCertOrProbateGrant = false
+      if (owner.supportingDocument === SupportingDocumentsOptions.DEATH_CERT) {
+        hasValidDeathCertOrProbateGrant = owner.hasDeathCertificate &&
+          !!owner.deathCertificateNumber && !!owner.deathDateTime
+      } else {
+        hasValidDeathCertOrProbateGrant = owner.supportingDocument === SupportingDocumentsOptions.PROBATE_GRANT
+      }
+      return hasValidDeathCertOrProbateGrant && owner.action === ActionTypes.REMOVED
+    },
+    hasOnlyOneOwnerInGroup: (groupId): boolean => {
+      return getMhrTransferHomeOwnerGroups.value
+        .find(group => group.groupId === groupId).owners
+        .filter(owner => owner.action !== ActionTypes.ADDED)
+        .length === 1
+    },
+    hasExecutorsInGroup: (groupId): boolean => {
+      return getMhrTransferHomeOwnerGroups.value
+        .find(group => group.groupId === groupId).owners
+        .some(owner => owner.partyType === HomeOwnerPartyTypes.EXECUTOR)
+    },
+    hasAllCurrentOwnersRemoved: (groupId): boolean => {
+      return getMhrTransferHomeOwnerGroups.value
+        .find(group => group.groupId === groupId).owners
+        .every(owner => isCurrentOwner(owner)
+          ? TRANS_WILL.hasValidSupportDocs(owner)
+          : owner.action === ActionTypes.ADDED)
+    },
+    hasSomeOwnersRemoved: (groupId): boolean => {
+      return getMhrTransferHomeOwnerGroups.value
+        .find(group => group.groupId === groupId).owners
+        .some(owner => owner.action === ActionTypes.REMOVED)
+    },
+    hasOwnerWithDeathCertificate: (): boolean => {
+      return getMhrTransferHomeOwners.value.some(owner =>
+        owner.supportingDocument === SupportingDocumentsOptions.DEATH_CERT)
+    },
+    // Check if there's a deleted Owner with selected Grant of Probate as a supporting document.
+    hasDeletedOwnersWithProbateGrant: (): boolean => {
+      return getMhrTransferHomeOwnerGroups.value.some(group =>
+        group.owners.some(owner => owner.supportingDocument === SupportingDocumentsOptions.PROBATE_GRANT)
+      )
+    },
+    prefillOwnerAsExecutor: (owner: MhrRegistrationHomeOwnerIF): void => {
+      const allOwners = getMhrTransferHomeOwners.value
+      const deletedOwnerGroup = find(getMhrTransferHomeOwnerGroups.value, { owners: [{ action: ActionTypes.REMOVED }] })
+      const deletedOwner = find(deletedOwnerGroup.owners, { action: ActionTypes.REMOVED }) as MhrRegistrationHomeOwnerIF
+
+      Object.assign(owner, {
+        ...deletedOwner, // remove this
+        ownerId: allOwners.length + 1,
+        suffix: deletedOwner.individualName
+          ? 'Executor of the will of ' + Object.values(deletedOwner.individualName).join(' ')
+          : '',
+        partyType: HomeOwnerPartyTypes.EXECUTOR,
+        groupId: deletedOwnerGroup.groupId // new Owner will be added to the same group as deleted Owner
+      } as MhrRegistrationHomeOwnerIF)
+    },
+    // find owners that 1. belong to groupId, 2. that are also removed, 3. have Grant of Probate as supporting document
+    // switch their supporting document to Death Certificate if they have Grant of Probate selected
+    resetGrantOfProbate: (groupId, excludedOwnerId) => {
+      getMhrTransferHomeOwnerGroups.value
+        .find(group => group.groupId === groupId).owners
+        .forEach((owner: MhrRegistrationHomeOwnerIF) => {
+          if (owner.action === ActionTypes.REMOVED && owner.ownerId !== excludedOwnerId &&
+          owner.supportingDocument === SupportingDocumentsOptions.PROBATE_GRANT) {
+            owner.supportingDocument = SupportingDocumentsOptions.DEATH_CERT
+          }
+        })
+    }
   }
 
   /** Return true if the specified owner is part of the current/base ownership structure **/
@@ -388,16 +444,12 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     showDeathCertificate,
     showSupportingDocuments,
     isDisabledForSJTChanges,
-
-    // Trans Will
     isDisabledForWillChanges,
-    hasDeletedOwnersWithProbateGrant,
-    prefillOwnerAsExecutor,
-    resetGrantOfProbate,
-
+    TRANS_WILL, // Transfer Due to Death - Grant of Probate (with Will)
     isCurrentOwner,
     getMhrTransferType,
     isTransferDueToDeath,
+    isTransferToSurvivingJointTenant,
     isTransferToExecutorProbateWill,
     disableNameFields,
     isJointTenancyStructure,
