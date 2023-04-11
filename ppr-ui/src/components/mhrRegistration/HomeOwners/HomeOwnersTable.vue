@@ -471,7 +471,7 @@ export default defineComponent({
             (isTransferToExecutorProbateWill && !hasUnsavedChanges.value) ||
             (props.isMhrTransfer && !hasUnsavedChanges.value) ||
             !localState.isValidAllocation ||
-            localState.hasGroupsWithNoOwners ||
+            (!isTransferToExecutorProbateWill && localState.hasGroupsWithNoOwners) ||
             (!localState.isUngroupedTenancy && hasUndefinedGroupInterest(getTransferOrRegistrationHomeOwnerGroups()))
           )
       }),

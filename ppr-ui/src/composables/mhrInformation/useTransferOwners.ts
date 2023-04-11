@@ -316,7 +316,6 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       const deletedOwner = find(deletedOwnerGroup.owners, { action: ActionTypes.REMOVED }) as MhrRegistrationHomeOwnerIF
 
       Object.assign(owner, {
-        ...deletedOwner, // remove this
         ownerId: allOwners.length + 1,
         suffix: deletedOwner.individualName
           ? 'Executor of the will of ' + Object.values(deletedOwner.individualName).join(' ')
