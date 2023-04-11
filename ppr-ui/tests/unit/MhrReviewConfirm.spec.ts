@@ -107,8 +107,7 @@ describe('Mhr Review Confirm registration', () => {
     expect(HomeOwnerReview.exists()).toBeTruthy()
     expect(HomeOwnerReview.findComponent(HomeOwnersTable).exists()).toBeTruthy()
 
-    const unfinishedError = HomeOwnerReview.get('.error-text')
-    expect(unfinishedError.isVisible()).toBeFalsy()
+    expect(HomeOwnerReview.find('.error-text').isVisible()).toBeFalsy()
 
     const homeTenancyType = HomeOwnerReview.find(getTestId('home-tenancy-type'))
     expect(homeTenancyType.exists()).toBeTruthy()
