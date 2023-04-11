@@ -4,8 +4,13 @@ import { getVuexStore } from '@/store'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 
 import { HomeOwners } from '@/views'
-import { AddEditHomeOwner, HomeOwnersTable, HomeOwnerGroups } from '@/components/mhrRegistration/HomeOwners'
-import { SimpleHelpToggle } from '@/components/common'
+import {
+  AddEditHomeOwner,
+  HomeOwnersTable,
+  HomeOwnerGroups,
+  TableGroupHeader
+} from '@/components/mhrRegistration/HomeOwners'
+import { InfoChip, SimpleHelpToggle } from '@/components/common'
 import {
   mockedExecutor,
   mockedPerson,
@@ -225,7 +230,7 @@ describe('Home Owners', () => {
     expect(ownersTable.text()).not.toContain('Group 1')
 
     // there should be 'Added' badges shown for each of the Added Owners
-    const addedBadges = ownersTable.findAll(getTestId('owner-added-badge'))
+    const addedBadges = ownersTable.findAll(getTestId('ADDED-badge'))
     expect(addedBadges.at(0).exists()).toBe(true)
     expect(addedBadges.at(1).exists()).toBe(true)
   })
@@ -273,10 +278,102 @@ describe('Home Owners', () => {
     // there should be no grouping shown in the table because we didn't select a group during add
     expect(ownersTable.text()).not.toContain('Group 1')
 
-    // there should be 'Added' badges shown for each of the Added Owners
-    const removedBadges = ownersTable.findAll(getTestId('owner-removed-badge'))
+    // there should be 'DELETED' badges shown for each of the Deleted Owners
+    const removedBadges = ownersTable.findAll(getTestId('DELETED-badge'))
     expect(removedBadges.at(0).exists()).toBe(true)
     expect(removedBadges.at(1).exists()).toBe(true)
+  })
+
+  it('should display a DELETED home owner group', async () => {
+    const homeOwnerGroups = [
+      {
+        groupId: 1,
+        interest: 'Undivided',
+        interestNumerator: 2,
+        interestDenominator: 4,
+        owners: [mockedPerson]
+      },
+      {
+        groupId: 2,
+        interest: 'Undivided',
+        action: 'REMOVED',
+        interestNumerator: 2,
+        interestDenominator: 4,
+        owners: [mockedOrganization]
+      }
+    ]
+
+    // add a person
+    await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerGroups)
+
+    expect(wrapper.findComponent(AddEditHomeOwner).exists()).toBeFalsy()
+    // check current Owners and Groups
+    wrapper.findComponent(HomeOwners).vm.$data.setShowGroups(true)
+    await Vue.nextTick()
+
+    const ownersTable = wrapper.findComponent(HomeOwners).findComponent(HomeOwnersTable)
+
+    // renders all fields
+    expect(ownersTable.exists()).toBe(true)
+    expect(ownersTable.text()).toContain(mockedPerson.individualName.first)
+    expect(ownersTable.text()).toContain(mockedPerson.individualName.last)
+    expect(ownersTable.text()).toContain(mockedPerson.individualName.middle)
+    expect(ownersTable.text()).toContain(mockedPerson.suffix)
+    expect(ownersTable.text()).toContain(mockedPerson.address.street)
+    expect(ownersTable.text()).toContain(mockedPerson.address.streetAdditional)
+    expect(ownersTable.text()).toContain(mockedPerson.address.city)
+    expect(ownersTable.text()).toContain(mockedPerson.address.region)
+    expect(ownersTable.text()).toContain('Canada')
+    expect(ownersTable.text()).toContain(mockedPerson.address.postalCode)
+    expect(wrapper.findComponent(AddEditHomeOwner).exists()).toBeFalsy()
+
+    // Verify Headers
+    expect(ownersTable.findAllComponents(TableGroupHeader).length).toBe(2)
+    expect(ownersTable.text()).toContain('Group 1')
+    expect(ownersTable.text()).toContain('Group 2')
+
+    // there should be 'DELETED' badges shown for the Deleted Group
+    expect(ownersTable.findAllComponents(TableGroupHeader).at(1)
+      .findComponent(InfoChip).text()).toContain('REMOVED')
+  })
+
+  it('should display a CHANGED a home owner group', async () => {
+    const homeOwnerGroups = [
+      {
+        groupId: 1,
+        interest: 'Undivided',
+        interestNumerator: 2,
+        interestDenominator: 4,
+        owners: [mockedPerson]
+      },
+      {
+        groupId: 2,
+        interest: 'Undivided',
+        action: 'CHANGED',
+        interestNumerator: 3,
+        interestDenominator: 4,
+        owners: [mockedOrganization]
+      }
+    ]
+
+    // add a person
+    await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerGroups)
+
+    expect(wrapper.findComponent(AddEditHomeOwner).exists()).toBeFalsy()
+    // check current Owners and Groups
+    wrapper.findComponent(HomeOwners).vm.$data.setShowGroups(true)
+    await Vue.nextTick()
+
+    const ownersTable = wrapper.findComponent(HomeOwners).findComponent(HomeOwnersTable)
+
+    // Verify Headers
+    expect(ownersTable.findAllComponents(TableGroupHeader).length).toBe(2)
+    expect(ownersTable.text()).toContain('Group 1')
+    expect(ownersTable.text()).toContain('Group 2')
+
+    // there should be 'CHANGED' badges shown for the Changed Group
+    expect(ownersTable.findAllComponents(TableGroupHeader).at(1)
+      .findComponent(InfoChip).text()).toContain('CHANGED')
   })
 
   it('TRANS WILL Flow: display Supporting Document component for deleted sole Owner and add Executor', async () => {
@@ -301,7 +398,7 @@ describe('Home Owners', () => {
     // delete the sole owner
     await homeOwnersTable.find(getTestId('table-delete-btn')).trigger('click')
 
-    const deceasedBadge = homeOwnersTable.find(getTestId('owner-removed-badge'))
+    const deceasedBadge = homeOwnersTable.find(getTestId('DECEASED-badge'))
     expect(deceasedBadge.exists()).toBeTruthy()
     expect(deceasedBadge.text()).toContain('DECEASED')
 

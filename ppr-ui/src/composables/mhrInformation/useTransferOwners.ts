@@ -7,9 +7,14 @@ import {
   SupportingDocumentsOptions
 } from '@/enums'
 import { useActions, useGetters } from 'vuex-composition-helpers'
-import { MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF } from '@/interfaces'
+import {
+  MhrHomeOwnerGroupIF,
+  MhrRegistrationFractionalOwnershipIF,
+  MhrRegistrationHomeOwnerGroupIF,
+  MhrRegistrationHomeOwnerIF
+} from '@/interfaces'
 import { computed, reactive, toRefs } from '@vue/composition-api'
-import { isEqual, find, join } from 'lodash'
+import { isEqual, find } from 'lodash'
 import { normalizeObject } from '@/utils'
 import { useHomeOwners } from '@/composables'
 
@@ -37,7 +42,8 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
   ])
 
   const {
-    getGroupById
+    getGroupById,
+    getCurrentGroupById
   } = useHomeOwners(true)
 
   /** Local State for custom computed properties. **/
@@ -58,6 +64,18 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL
     ].includes(getMhrTransferType.value?.transferType)
   })
+
+  const isRemovedHomeOwnerGroup = (group: MhrHomeOwnerGroupIF): boolean => {
+    return group.action === ActionTypes.REMOVED
+  }
+
+  const isAddedHomeOwnerGroup = (group: MhrHomeOwnerGroupIF): boolean => {
+    return group.action === ActionTypes.ADDED
+  }
+
+  const isChangedOwnerGroup = (group: MhrHomeOwnerGroupIF): boolean => {
+    return group.action === ActionTypes.CHANGED
+  }
 
   /** Returns true when the selected transfer type is a 'TO_EXECUTOR_PROBATE_WILL' scenario **/
   const isTransferToExecutorProbateWill = computed((): boolean => {
@@ -335,7 +353,19 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     return currentOwner && (!isEqualAddress || !isEqualPhone)
   }
 
+  /** Return true if the specified group has been modified from current state **/
+  const hasCurrentGroupChanges = (groupId: number, fractionalData: MhrRegistrationFractionalOwnershipIF): boolean => {
+    const currentGroup = getCurrentGroupById(groupId)
+    const isEqualNumerator = isEqual(currentGroup?.interestNumerator, fractionalData.interestNumerator)
+    const isEqualDenominator = isEqual(currentGroup?.interestDenominator, fractionalData.interestDenominator)
+
+    return currentGroup && (!isEqualNumerator || !isEqualDenominator)
+  }
+
   return {
+    isAddedHomeOwnerGroup,
+    isRemovedHomeOwnerGroup,
+    isChangedOwnerGroup,
     enableHomeOwnerChanges,
     enableTransferOwnerGroupActions,
     enableTransferOwnerActions,
@@ -358,6 +388,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     groupHasRemovedAllCurrentOwners,
     getCurrentOwnerGroupIdByOwnerId,
     hasCurrentOwnerChanges,
+    hasCurrentGroupChanges,
     moveCurrentOwnersToPreviousOwners,
     ...toRefs(localState)
   }

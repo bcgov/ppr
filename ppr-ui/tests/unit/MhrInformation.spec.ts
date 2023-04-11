@@ -209,10 +209,10 @@ describe('Mhr Information', () => {
     expect(newlyAddedOwner.text()).toContain(mockedPerson.individualName.first)
     expect(newlyAddedOwner.text()).toContain(mockedPerson.individualName.last)
 
-    const addedBadge = newlyAddedOwner.find(getTestId('owner-added-badge'))
+    const addedBadge = newlyAddedOwner.find(getTestId('ADDED-badge'))
     expect(addedBadge.isVisible()).toBeTruthy()
 
-    const removedBadge = ownersTable.find(getTestId('owner-removed-badge'))
+    const removedBadge = ownersTable.find(getTestId('DELETED-badge'))
     expect(removedBadge.isVisible()).toBeTruthy()
   })
 

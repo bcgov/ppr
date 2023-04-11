@@ -57,8 +57,20 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
   const getTransferOrRegistrationHomeOwnerGroups = (): MhrRegistrationHomeOwnerGroupIF[] =>
     isMhrTransfer ? getMhrTransferHomeOwnerGroups.value : getMhrRegistrationHomeOwnerGroups.value
 
+  /**
+   * Return the owner group snapshot by id.
+   * @param groupId The group identifier
+   */
   const getGroupById = (groupId: number): MhrRegistrationHomeOwnerGroupIF =>
     getTransferOrRegistrationHomeOwnerGroups().find(group => group.groupId === groupId)
+
+  /**
+   * Return the CURRENT owner group snapshot by id.
+   * @param groupId The group identifier
+   */
+  const getCurrentGroupById = (groupId: number): MhrRegistrationHomeOwnerGroupIF => {
+    return getMhrTransferCurrentHomeOwnerGroups.value[groupId - 1]
+  }
 
   const setTransferOrRegistrationHomeOwnerGroups = (homeOwnerGroups: MhrRegistrationHomeOwnerGroupIF[]) =>
     isMhrTransfer ? setMhrTransferHomeOwnerGroups(homeOwnerGroups) : setMhrRegistrationHomeOwnerGroups(homeOwnerGroups)
@@ -351,10 +363,10 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
     setMhrTransferHomeOwnerGroups(homeOwners)
   }
 
-  const undoGroupRemoval = (groupId: number = null, undoAllOwners: boolean = false): void => {
-    let homeOwnerGroups = getMhrTransferHomeOwnerGroups.value
-    homeOwnerGroups = homeOwnerGroups.reduce((homeOwners, group) => {
+  const undoGroupChanges = (groupId: number = null, undoAllOwners: boolean = false): void => {
+    const homeOwnerGroups = getMhrTransferHomeOwnerGroups.value.reduce((homeOwners, group) => {
       if (group.groupId === groupId) {
+        // Restore owners as well
         if (undoAllOwners) {
           const owners = group.owners.map(owner => { return { ...owner, action: null } })
           group = { ...group, owners: owners }
@@ -362,6 +374,8 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
 
         const unmarkedGroup = {
           ...group,
+          interestNumerator: getCurrentGroupById(groupId).interestNumerator,
+          interestDenominator: getCurrentGroupById(groupId).interestDenominator,
           action: null
         }
 
@@ -386,14 +400,19 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
     return homeOwnerGroups.some(group => !group.interestNumerator || !group.interestDenominator)
   }
 
-  const setGroupFractionalInterest = (groupId: number, fractionalData: MhrRegistrationFractionalOwnershipIF): void => {
-    const homeOwnerGroups = getTransferOrRegistrationHomeOwnerGroups()
-    const groupToUpdate = find(homeOwnerGroups, { groupId: groupId }) as MhrRegistrationHomeOwnerGroupIF
-    Object.assign(groupToUpdate, { ...fractionalData })
-    const updatedOwnerGroups = [...homeOwnerGroups]
+  const setGroupFractionalInterest =
+    (groupId: number, fractionalData: MhrRegistrationFractionalOwnershipIF, hasChanges: boolean = false): void => {
+      const homeOwnerGroups = getTransferOrRegistrationHomeOwnerGroups()
+      const groupToUpdate = find(homeOwnerGroups, { groupId: groupId }) as MhrRegistrationHomeOwnerGroupIF
 
-    setTransferOrRegistrationHomeOwnerGroups(updatedOwnerGroups)
-  }
+      Object.assign(groupToUpdate, {
+        ...fractionalData,
+        ...(hasChanges && { action: ActionTypes.CHANGED })
+      })
+
+      const updatedOwnerGroups = [...homeOwnerGroups]
+      setTransferOrRegistrationHomeOwnerGroups(updatedOwnerGroups)
+    }
 
   /**
    * Return the group number as it correlates to its current place in the active owners.
@@ -484,6 +503,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
     getGroupForOwner,
     getGroupById,
     getGroupNumberById,
+    getCurrentGroupById,
     setShowGroups,
     setGlobalEditingMode,
     deleteGroup,
@@ -493,7 +513,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
     getTransferOrRegistrationHomeOwners,
     getTransferOrRegistrationHomeOwnerGroups,
     markGroupForRemoval,
-    undoGroupRemoval,
+    undoGroupChanges,
     hasRemovedAllHomeOwners,
     hasRemovedAllHomeOwnerGroups,
     hasUndefinedGroupInterest

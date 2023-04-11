@@ -122,38 +122,10 @@
             </div>
 
             <!-- Hide Chips for Review Mode -->
-            <template v-if="!isReadonlyTable || showChips">
-              <v-chip
-                v-if="isMhrTransfer && isAddedHomeOwner(row.item)"
-                class="badge-added ml-8 mt-2"
-                color="primary"
-                label x-small
-                text-color="white"
-                data-test-id="owner-added-badge"
-              >
-                <b>ADDED</b>
-              </v-chip>
-              <v-chip
-                v-if="isMhrTransfer && isChangedOwner(row.item)"
-                class="badge-changed ml-8 mt-2"
-                color="primary"
-                label x-small
-                text-color="white"
-                data-test-id="owner-changed-badge"
-              >
-                <b>CHANGED</b>
-              </v-chip>
-              <v-chip
-                v-if="isMhrTransfer && isRemovedHomeOwner(row.item)"
-                class="badge-delete ml-8 mt-2"
-                label x-small
-                color="#grey lighten-2"
-                text-color="$gray9"
-                data-test-id="owner-removed-badge"
-              >
-                <b>{{showDeathCertificate() || isTransferToExecutorProbateWill ? 'DECEASED' : 'DELETED'}}</b>
-              </v-chip>
+            <template v-if="isMhrTransfer && (!isReadonlyTable || showChips)">
+              <InfoChip class="ml-8 mt-2" :action="mapInfoChipAction(row.item)" />
             </template>
+
           </td>
           <td :class="{'no-bottom-border' : hideRowBottomBorder(row.item)}">
             <base-address
@@ -362,9 +334,10 @@ import { BaseDialog } from '@/components/dialogs'
 import TableGroupHeader from '@/components/mhrRegistration/HomeOwners/TableGroupHeader.vue'
 import { mhrDeceasedOwnerChanges } from '@/resources/dialogOptions'
 import { yyyyMmDdToPacificDate } from '@/utils/date-helper'
+import { InfoChip } from '@/components/common'
 /* eslint-disable no-unused-vars */
 import { MhrRegistrationHomeOwnerIF } from '@/interfaces'
-import { ActionTypes, HomeTenancyTypes, HomeOwnerPartyTypes, SupportingDocumentsOptions } from '@/enums'
+import { ActionTypes, HomeOwnerPartyTypes, HomeTenancyTypes, SupportingDocumentsOptions } from '@/enums'
 /* eslint-enable no-unused-vars */
 import { useActions, useGetters } from 'vuex-composition-helpers'
 
@@ -386,7 +359,8 @@ export default defineComponent({
     AddEditHomeOwner,
     TableGroupHeader,
     SupportingDocuments,
-    DeathCertificate
+    DeathCertificate,
+    InfoChip
   },
   setup (props, context) {
     const addressSchema = PartyAddressSchema
@@ -401,7 +375,7 @@ export default defineComponent({
       hasMinimumGroups,
       editHomeOwner,
       getGroupById,
-      undoGroupRemoval,
+      undoGroupChanges,
       getHomeTenancyType,
       getGroupNumberById,
       hasRemovedAllHomeOwners,
@@ -513,7 +487,8 @@ export default defineComponent({
         { ...getCurrentOwnerStateById(item.ownerId), action: null },
         item.groupId
       )
-      await undoGroupRemoval(item.groupId)
+      const isRemovedGroup = getGroupById(item.groupId).action === ActionTypes.REMOVED
+      isRemovedGroup && undoGroupChanges(item.groupId)
       context.emit('handleUndo', item)
     }
 
@@ -523,6 +498,12 @@ export default defineComponent({
 
     const isCurrentlyEditing = (index: number): boolean => {
       return index === localState.currentlyEditingHomeOwnerId
+    }
+
+    const mapInfoChipAction = (item: MhrRegistrationHomeOwnerIF): string => {
+      return item.action === ActionTypes.REMOVED && (showDeathCertificate() || isTransferToExecutorProbateWill.value)
+        ? 'DECEASED'
+        : item.action
     }
 
     // To render Group table header the owners array must not be empty
@@ -643,6 +624,7 @@ export default defineComponent({
       isRemovedHomeOwner,
       markForRemoval,
       undo,
+      mapInfoChipAction,
       hasRemovedAllHomeOwners,
       hasRemovedAllHomeOwnerGroups,
       isAddedHomeOwnerGroup,
