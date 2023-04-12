@@ -60,6 +60,8 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
   /** Returns true when the selected transfer type is a 'due to death' scenario **/
   const isTransferDueToDeath = computed((): boolean => {
     return [
+      // transfers types where Owner Groups cannot have the 'Deceased' owners
+      // therefore Will Transfer type is not applicable
       ApiTransferTypes.SURVIVING_JOINT_TENANT,
       ApiTransferTypes.TO_ADMIN_PROBATE_NO_WILL,
       ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL,
@@ -252,14 +254,14 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
   }
 
   // Transfer Will flow and all the related conditions/logic
-  const TRANS_WILL: any = {
+  const TransWill: any = {
     isValidTransfer: computed((): boolean => {
       // check if there is a group that is valid for WILL transfer
-      return getMhrTransferHomeOwnerGroups.value.some(group => TRANS_WILL.isValidGroup(group))
+      return getMhrTransferHomeOwnerGroups.value.some(group => TransWill.isValidGroup(group))
     }),
     isValidGroup: (group: MhrRegistrationHomeOwnerGroupIF): boolean => {
       const isValidAddedOwner = group.owners.every((owner: MhrRegistrationHomeOwnerIF) => {
-        return isCurrentOwner(owner) ? TRANS_WILL.hasValidSupportDocs(owner) : owner.action === ActionTypes.ADDED
+        return isCurrentOwner(owner) ? TransWill.hasValidSupportDocs(owner) : owner.action === ActionTypes.ADDED
       })
       // Group has at least one Executor
       const hasAddedExecutor = group.owners.some((owner: MhrRegistrationHomeOwnerIF) =>
@@ -292,7 +294,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       return getMhrTransferHomeOwnerGroups.value
         .find(group => group.groupId === groupId).owners
         .every(owner => isCurrentOwner(owner)
-          ? TRANS_WILL.hasValidSupportDocs(owner)
+          ? TransWill.hasValidSupportDocs(owner)
           : owner.action === ActionTypes.ADDED)
     },
     hasSomeOwnersRemoved: (groupId): boolean => {
@@ -313,16 +315,22 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     prefillOwnerAsExecutor: (owner: MhrRegistrationHomeOwnerIF): void => {
       const allOwners = getMhrTransferHomeOwners.value
       const deletedOwnerGroup = find(getMhrTransferHomeOwnerGroups.value, { owners: [{ action: ActionTypes.REMOVED }] })
-      const deletedOwner = find(deletedOwnerGroup.owners, { action: ActionTypes.REMOVED }) as MhrRegistrationHomeOwnerIF
+      const deletedOwner = find(deletedOwnerGroup.owners, { action: ActionTypes.REMOVED, supportingDocument: SupportingDocumentsOptions.PROBATE_GRANT }) as MhrRegistrationHomeOwnerIF
 
       Object.assign(owner, {
         ownerId: allOwners.length + 1,
         suffix: deletedOwner.individualName
           ? 'Executor of the will of ' + Object.values(deletedOwner.individualName).join(' ')
-          : '',
+          : 'Executor of the will of ' + owner.organizationName,
         partyType: HomeOwnerPartyTypes.EXECUTOR,
         groupId: deletedOwnerGroup.groupId // new Owner will be added to the same group as deleted Owner
       } as MhrRegistrationHomeOwnerIF)
+    },
+    updateExecutorSuffix: (): boolean => {
+      const deceasedOwners = getMhrTransferHomeOwners.value
+        .filter(owner => owner.action === ActionTypes.REMOVED && owner.supportingDocument === SupportingDocumentsOptions.PROBATE_GRANT)
+
+      return TransWill.addRemoveExecutorSuffix(deceasedOwners[0] || null)
     },
     // find owners that 1. belong to groupId, 2. that are also removed, 3. have Grant of Probate as supporting document
     // switch their supporting document to Death Certificate if they have Grant of Probate selected
@@ -335,7 +343,28 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
             owner.supportingDocument = SupportingDocumentsOptions.DEATH_CERT
           }
         })
+    },
+    addRemoveExecutorSuffix: (owner: MhrRegistrationHomeOwnerIF): boolean => {
+      let showSuffixError = false
+
+      const allExecutors = getMhrTransferHomeOwners.value
+        .filter(owner => owner.partyType === HomeOwnerPartyTypes.EXECUTOR && owner.action === ActionTypes.ADDED)
+
+      if (allExecutors.length === 1 && owner !== null) {
+        const suffix = owner.individualName
+          ? 'Executor of the will of ' + Object.values(owner.individualName).join(' ')
+          : 'Executor of the will of ' + owner.organizationName
+        allExecutors[0].suffix = suffix
+        showSuffixError = false
+      } else {
+        allExecutors.forEach((executor: MhrRegistrationHomeOwnerIF) => {
+          executor.suffix = 'Executor of the will of N/A'
+          showSuffixError = true
+        })
+      }
+      return showSuffixError
     }
+
   }
 
   /** Return true if the specified owner is part of the current/base ownership structure **/
@@ -444,7 +473,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     showSupportingDocuments,
     isDisabledForSJTChanges,
     isDisabledForWillChanges,
-    TRANS_WILL, // Transfer Due to Death - Grant of Probate (with Will)
+    TransWill, // Transfer Due to Death - Grant of Probate (with Will)
     isCurrentOwner,
     getMhrTransferType,
     isTransferDueToDeath,

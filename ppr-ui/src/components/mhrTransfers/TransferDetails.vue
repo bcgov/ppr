@@ -122,7 +122,8 @@ export default defineComponent({
     ])
 
     const {
-      isTransferDueToDeath
+      isTransferDueToDeath,
+      isTransferToExecutorProbateWill
     } = useTransferOwners()
 
     const considerationRef = ref(null)
@@ -141,7 +142,8 @@ export default defineComponent({
       isOwnLand: getMhrTransferOwnLand.value || false,
       enableWarningMsg: false,
       landOrLeaseLabel: computed(() => {
-        return `The manufactured home is located on land that the ${!isTransferDueToDeath.value ? 'new' : ''} homeowners
+        return `The manufactured home is located on land that the ${!isTransferDueToDeath.value ||
+            isTransferToExecutorProbateWill.value ? 'new' : ''} homeowners
          own, or on which they have a registered lease of 3 years or more.`
       }),
       isValidTransferDetails: computed(() => localState.isValidForm && !!localState.transferDate),

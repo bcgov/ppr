@@ -1,6 +1,6 @@
 <template>
   <div id="supporting-documents" class="pb-3">
-    <p class="fs-16">
+    <p class="fs-16" :class="{ 'error-text': showDocumentsSelectionError }">
       Select the supporting document you have for this owner:
     </p>
     <v-radio-group
@@ -58,6 +58,11 @@ export default defineComponent({
       type: Object as () => MhrRegistrationHomeOwnerIF,
       required: true
     },
+    // validate the supporting document selection
+    validate: {
+      type: Boolean,
+      default: false
+    },
     // Used to disable Death Cert when group has only one owner
     isSecondOptionDisabled: {
       type: Boolean,
@@ -94,6 +99,9 @@ export default defineComponent({
 
     const localState = reactive({
       deletedOwnerState: computed(() => props.deletedOwner),
+      showDocumentsSelectionError: computed(() => {
+        return props.validate && !localState.deletedOwnerState.supportingDocument
+      }),
       // Get relevant supporting documents options based on transfer type from the Resources
       docOptions: transferSupportingDocuments[getMhrTransferType.value.transferType]
     })
@@ -150,6 +158,10 @@ export default defineComponent({
       .error--text {
         color: $error;
       }
+    }
+
+    .selected-radio {
+      border: 1px solid $app-blue;
     }
 
   }

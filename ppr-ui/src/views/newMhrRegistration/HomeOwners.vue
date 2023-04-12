@@ -345,7 +345,7 @@ export default defineComponent({
       enableDeleteAllGroupsActions,
       isTransferDueToDeath,
       isTransferToExecutorProbateWill,
-      TRANS_WILL
+      TransWill
     } = useTransferOwners(!props.isMhrTransfer)
 
     const {
@@ -382,8 +382,8 @@ export default defineComponent({
       // capture different errors in the table to turn off Add Owner buttons and show error
       hasHomeOwnersTableErrors: computed(
         () => {
-          return (isTransferToExecutorProbateWill.value && hasUnsavedChanges.value)
-            ? !TRANS_WILL.hasDeletedOwnersWithProbateGrant() : false
+          return (isTransferToExecutorProbateWill.value)
+            ? !TransWill.hasDeletedOwnersWithProbateGrant() : false
         }
       ),
       showError: false,
