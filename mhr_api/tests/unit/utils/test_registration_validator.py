@@ -341,9 +341,9 @@ TEST_PARTY_DATA = [
     ('Reg invalid first name', None, INVALID_TEXT_CHARSET, 'middle', 'last', INVALID_CHARSET_MESSAGE, REGISTRATION),
     ('Reg invalid middle name', None, 'first', INVALID_TEXT_CHARSET, 'last', INVALID_CHARSET_MESSAGE, REGISTRATION),
     ('Reg invalid last name', None, 'first', 'middle', INVALID_TEXT_CHARSET, INVALID_CHARSET_MESSAGE, REGISTRATION),
-    ('Reg invalid street', None, 'first', 'middle', 'last', INVALID_CHARSET_MESSAGE, REGISTRATION),
-    ('Reg invalid streetAdditional', None, 'first', 'middle', 'last', INVALID_CHARSET_MESSAGE, REGISTRATION),
-    ('Reg invalid city', None, 'first', 'middle', 'last', INVALID_CHARSET_MESSAGE, REGISTRATION),
+    ('Reg street non utf-8', None, 'first', 'middle', 'last', None, REGISTRATION),
+    ('Reg streetAdditional non utf-8', None, 'first', 'middle', 'last', None, REGISTRATION),
+    ('Reg city non utf-8', None, 'first', 'middle', 'last', None, REGISTRATION),
     ('Trans invalid org/bus name', INVALID_TEXT_CHARSET, None, None, None, INVALID_CHARSET_MESSAGE, TRANSFER),
     ('Trans invalid first name', None, INVALID_TEXT_CHARSET, 'middle', 'last', INVALID_CHARSET_MESSAGE, TRANSFER),
     ('Trans invalid middle name', None, 'first', INVALID_TEXT_CHARSET, 'last', INVALID_CHARSET_MESSAGE, TRANSFER),
@@ -351,16 +351,16 @@ TEST_PARTY_DATA = [
 ]
 # testdata pattern is ({description}, {park_name}, {dealer}, {additional}, {except_plan}, {band_name}, {message content})
 TEST_LOCATION_DATA = [
-    ('Invalid park name', INVALID_TEXT_CHARSET, None, None, None, None, INVALID_CHARSET_MESSAGE),
-    ('Invalid dealer name', None, INVALID_TEXT_CHARSET, None, None, None, INVALID_CHARSET_MESSAGE),
-    ('Invalid additional description', None, None, INVALID_TEXT_CHARSET, None, None, INVALID_CHARSET_MESSAGE),
-    ('Invalid exception plan', None, None, None, INVALID_TEXT_CHARSET, None, INVALID_CHARSET_MESSAGE),
-    ('Invalid band name', None, None, None, None, INVALID_TEXT_CHARSET, INVALID_CHARSET_MESSAGE)
+    ('Non utf-8 park name', INVALID_TEXT_CHARSET, None, None, None, None, None),
+    ('Non utf-8 dealer name', None, INVALID_TEXT_CHARSET, None, None, None, None),
+    ('Non utf-8 additional description', None, None, INVALID_TEXT_CHARSET, None, None, None),
+    ('Non utf-8 exception plan', None, None, None, INVALID_TEXT_CHARSET, None, None),
+    ('Non utf-8 band name', None, None, None, None, INVALID_TEXT_CHARSET, None)
 ]
 # testdata pattern is ({description}, {rebuilt}, {other}, {message content})
 TEST_DESCRIPTION_DATA = [
-    ('Invalid rebuilt remarks', INVALID_TEXT_CHARSET, None, INVALID_CHARSET_MESSAGE),
-    ('Invalid other remarks', None, INVALID_TEXT_CHARSET, INVALID_CHARSET_MESSAGE)
+    ('Non utf-8 rebuilt remarks', INVALID_TEXT_CHARSET, None, None),
+    ('Non utf-8 other remarks', None, INVALID_TEXT_CHARSET, None)
 ]
 # testdata pattern is ({description}, {valid}, {staff}, {doc_id}, {message content}, {status})
 TEST_EXEMPTION_DATA = [
@@ -526,9 +526,10 @@ def test_validate_submitting(session, desc, bus_name, first, middle, last, messa
         error_msg = validator.validate_registration(json_data, False)
     else:
         error_msg = validator.validate_transfer(None, json_data, False)
-    assert error_msg != ''
     if message_content:
         assert error_msg.find(message_content) != -1
+    else:
+        assert not error_msg
 
 
 @pytest.mark.parametrize('desc,bus_name,first,middle,last,message_content,data', TEST_PARTY_DATA)
@@ -562,9 +563,10 @@ def test_validate_owner(session, desc, bus_name, first, middle, last, message_co
         error_msg = validator.validate_registration(json_data, False)
     else:
         error_msg = validator.validate_transfer(None, json_data, False)
-    assert error_msg != ''
     if message_content:
         assert error_msg.find(message_content) != -1
+    else:
+        assert not error_msg
 
 
 @pytest.mark.parametrize('desc,park_name,dealer,additional,except_plan,band_name,message_content', TEST_LOCATION_DATA)
@@ -584,9 +586,10 @@ def test_validate_reg_location(session, desc, park_name, dealer, additional, exc
     elif band_name:
         location['bandName'] = band_name
     error_msg = validator.validate_registration(json_data, False)
-    assert error_msg != ''
     if message_content:
         assert error_msg.find(message_content) != -1
+    else:
+        assert not error_msg
 
 
 @pytest.mark.parametrize('desc,rebuilt,other,message_content', TEST_DESCRIPTION_DATA)
@@ -600,9 +603,10 @@ def test_validate_reg_description(session, desc, rebuilt, other, message_content
     elif other:
         description['otherRemarks'] = other
     error_msg = validator.validate_registration(json_data, False)
-    assert error_msg != ''
     if message_content:
         assert error_msg.find(message_content) != -1
+    else:
+        assert not error_msg
 
 
 @pytest.mark.parametrize('desc,valid,street,city,message_content', TEST_LEGACY_REG_DATA)
