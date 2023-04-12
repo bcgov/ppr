@@ -163,7 +163,7 @@ describe('Home Owners', () => {
     expect(ownersTable.text()).not.toContain('Group 1')
 
     // there should be no 'Added' badge shown for the Current Owners
-    const addedBadge = ownersTable.find(getTestId('owner-added-badge'))
+    const addedBadge = ownersTable.find(getTestId('ADDED-badge'))
     expect(addedBadge.exists()).toBeFalsy()
 
     // add an organization
@@ -337,6 +337,8 @@ describe('Home Owners', () => {
     // there should be 'DELETED' badges shown for the Deleted Group
     expect(ownersTable.findAllComponents(TableGroupHeader).at(1)
       .findComponent(InfoChip).text()).toContain('REMOVED')
+
+    wrapper.findComponent(HomeOwners).vm.$data.setShowGroups(false)
   })
 
   it('should display a CHANGED a home owner group', async () => {
@@ -376,6 +378,8 @@ describe('Home Owners', () => {
     // there should be 'CHANGED' badges shown for the Changed Group
     expect(ownersTable.findAllComponents(TableGroupHeader).at(1)
       .findComponent(InfoChip).text()).toContain('CHANGED')
+
+    wrapper.findComponent(HomeOwners).vm.$data.setShowGroups(false)
   })
 
   it('TRANS SALE GIFT Flow: validations with sole Owner in one group', async () => {
@@ -396,7 +400,7 @@ describe('Home Owners', () => {
     await homeOwners.find(getTestId('table-delete-btn')).trigger('click')
     await Vue.nextTick()
 
-    const allDeletedBadges = homeOwners.findAll(getTestId('owner-removed-badge'))
+    const allDeletedBadges = homeOwners.findAll(getTestId('DELETED-badge'))
     expect(allDeletedBadges.length).toBe(1)
 
     expect(homeOwners.find(getTestId('invalid-group-msg')).exists()).toBeFalsy()
@@ -723,6 +727,8 @@ describe('Home Owners', () => {
     allSupportingDocuments.at(1).find(getTestId('supporting-doc-option-two')).trigger('click')
     await Vue.nextTick()
 
+    console.log(homeOwners.html());
+
     expect(homeOwners.findAllComponents(DeathCertificate).length).toBe(2)
 
     expect(homeOwners.find(getTestId('invalid-group-msg')).text())
@@ -752,7 +758,7 @@ describe('Home Owners', () => {
 
     // do few more other checks
     expect(homeOwners.find(getTestId('transfer-table-error')).exists()).toBeFalsy()
-    expect(homeOwners.findAll(getTestId('owner-removed-badge')).length).toBe(2)
-    expect(homeOwners.findAll(getTestId('owner-added-badge')).length).toBe(1)
+    expect(homeOwners.findAll(getTestId('DECEASED-badge')).length).toBe(2)
+    expect(homeOwners.findAll(getTestId('ADDED-badge')).length).toBe(1)
   })
 })

@@ -29,13 +29,13 @@
         data-test-id="supporting-doc-option-two"
       />
     </v-radio-group>
-    <div v-if="deletedOwner.supportingDocument === docOptions.optionOne.value"
+    <div v-if="deletedOwnerState.supportingDocument === docOptions.optionOne.value"
       class="supporting-doc-one">
       <p>
         <strong>Note:</strong> {{ docOptions.optionOne.note }}
       </p>
     </div>
-    <div v-if="deletedOwner.supportingDocument === docOptions.optionTwo.value"
+    <div v-if="deletedOwnerState.supportingDocument === docOptions.optionTwo.value"
       class="supporting-doc-two">
       <slot name="deathCert"></slot>
     </div>
@@ -46,7 +46,7 @@
 import { useHomeOwners, useTransferOwners } from '@/composables'
 import { ApiTransferTypes, SupportingDocumentsOptions } from '@/enums/transferTypes'
 import { MhrRegistrationHomeOwnerIF } from '@/interfaces' // eslint-disable-line no-unused-vars
-import { defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
+import { defineComponent, reactive, toRefs, watch, computed } from '@vue/composition-api'
 import { useActions } from 'vuex-composition-helpers'
 import { transferSupportingDocuments } from '@/resources/'
 
@@ -84,7 +84,8 @@ export default defineComponent({
     // Only death certificate is captured in the api
     const updateDeletedOwner = (): void => {
       editHomeOwner({
-        ...props.deletedOwner
+        ...localState.deletedOwnerState,
+        hasDeathCertificate: localState.deletedOwnerState.supportingDocument === SupportingDocumentsOptions.DEATH_CERT
       },
       localState.deletedOwnerState.groupId
       )
@@ -92,7 +93,7 @@ export default defineComponent({
     }
 
     const localState = reactive({
-      deletedOwnerState: props.deletedOwner,
+      deletedOwnerState: computed(() => props.deletedOwner),
       // Get relevant supporting documents options based on transfer type from the Resources
       docOptions: transferSupportingDocuments[getMhrTransferType.value.transferType]
     })
@@ -106,7 +107,7 @@ export default defineComponent({
     watch(() => localState.deletedOwnerState.supportingDocument, () => {
       updateDeletedOwner()
       // Only one Grant of Probate document can be selected for the group
-      if (props.deletedOwner.supportingDocument === SupportingDocumentsOptions.PROBATE_GRANT) {
+      if (localState.deletedOwnerState.supportingDocument === SupportingDocumentsOptions.PROBATE_GRANT) {
         emit('handleDocOptionOneSelected')
       }
     })
