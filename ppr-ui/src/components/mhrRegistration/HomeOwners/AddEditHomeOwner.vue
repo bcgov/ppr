@@ -34,6 +34,7 @@
               <v-tooltip
                 v-if="isTransferDueToDeath"
                 top
+                nudge-right="18"
                 content-class="top-tooltip pa-5"
                 transition="fade-transition"
               >
@@ -106,7 +107,6 @@
                   :rules="firsNameRules"
                   :disabled="disableNameFields"
                   :readonly="disableNameFields"
-                  @mousedown.prevent
                 />
               </v-col>
               <v-col cols="4">
@@ -119,7 +119,6 @@
                   :rules="maxLength(15)"
                   :disabled="disableNameFields"
                   :readonly="disableNameFields"
-                  @mousedown.prevent
                 />
               </v-col>
               <v-col cols="4">
@@ -132,7 +131,6 @@
                   :rules="lastNameRules"
                   :disabled="disableNameFields"
                   :readonly="disableNameFields"
-                  @mousedown.prevent
                 />
               </v-col>
             </v-row>
@@ -311,7 +309,6 @@
                     :rules="maxLength(70)"
                     :disabled="disableNameFields"
                     :readonly="disableNameFields"
-                    @mousedown.prevent
                   />
                 </template>
                   Executor of the will is based on deceased owner with Grant of Probate
@@ -532,9 +529,8 @@ export default defineComponent({
       isTransferDueToDeath,
       isTransferToExecutorProbateWill,
       hasCurrentOwnerChanges,
-      hasDeletedOwnersWithProbateGrant,
-      prefillOwnerAsExecutor,
-      disableNameFields
+      disableNameFields,
+      TransWill
     } = useTransferOwners()
 
     const addressSchema = PartyAddressSchema
@@ -572,9 +568,11 @@ export default defineComponent({
       defaultHomeOwner.organizationName = props.editHomeOwner?.organizationName || ''
     }
 
-    // TRANS_WILL flow: Pre-fill only new Owner as Executor (not when editing existing owner)
-    if (hasDeletedOwnersWithProbateGrant() && !props.editHomeOwner) {
-      prefillOwnerAsExecutor(defaultHomeOwner)
+    // TransWill flow: Pre-fill only new Owner as Executor (not when editing existing owner)
+    if (isTransferToExecutorProbateWill.value &&
+      TransWill.hasDeletedOwnersWithProbateGrant() &&
+      !props.editHomeOwner) {
+      TransWill.prefillOwnerAsExecutor(defaultHomeOwner)
     }
 
     const allFractionalData = (getTransferOrRegistrationHomeOwnerGroups() || [{}]).map(group => {
@@ -673,9 +671,9 @@ export default defineComponent({
             localState.ownerGroupId || 1
           )
         } else {
-          // In TRANS_WILL flow, if the owner is the executor, add to same group as deleted owner with Probate Grant
+          // In TransWill flow, if the owner is the executor, add to same group as deleted owner with Probate Grant
           if (props.isMhrTransfer &&
-            hasDeletedOwnersWithProbateGrant() &&
+            TransWill.hasDeletedOwnersWithProbateGrant() &&
             localState.owner.partyType === HomeOwnerPartyTypes.EXECUTOR) {
             localState.ownerGroupId = localState.owner.groupId
           }
@@ -770,8 +768,6 @@ export default defineComponent({
       getStepValidation,
       MhrSectVal,
       isCurrentOwner,
-      hasDeletedOwnersWithProbateGrant,
-      prefillOwnerAsExecutor,
       isTransferDueToDeath,
       isTransferToExecutorProbateWill,
       disableNameFields,
@@ -794,7 +790,7 @@ export default defineComponent({
 }
 
 .underline {
-    border-bottom: 1px dotted #000;
+    border-bottom: 1px dotted $gray7;
     text-decoration: none;
 }
 

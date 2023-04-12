@@ -1,3 +1,4 @@
+import { ApiHomeTenancyTypes, HomeOwnerPartyTypes } from '@/enums'
 import {
   AddressIF,
   MhRegistrationSummaryIF,
@@ -29,6 +30,67 @@ export const mockMhrTransferCurrentHomeOwner = {
   tenancySpecified: true,
   type: 'SOLE'
 } as MhrRegistrationHomeOwnerGroupIF
+
+export const mockMhrTransferCurrentHomeOwnerGroup: MhrRegistrationHomeOwnerGroupIF[] = [
+  {
+    groupId: 5,
+    interest: 'UNDIVIDED',
+    interestDenominator: 2,
+    interestNumerator: 1,
+    owners: [
+      {
+        address: {
+          city: 'V4V 4V4',
+          country: 'CA',
+          postalCode: 'v4v 4v4',
+          region: 'BC',
+          street: '123123',
+          streetAdditional: 'VICTORIA V4V 4V4 V4V 4V4 V4V 4V4'
+        },
+        individualName: { first: 'JAMES', last: 'TESTING' },
+        ownerId: 1,
+        partyType: HomeOwnerPartyTypes.OWNER_IND,
+        phoneNumber: '1123123123',
+        type: ApiHomeTenancyTypes.JOINT
+
+      } as MhrRegistrationHomeOwnerIF,
+      {
+        address: { city: 'VANCOUVER', country: 'CA', postalCode: 'V6B 2L2', region: 'BC', street: '555-455 ABBOTT ST' },
+        individualName: { first: 'NEW', last: 'PERSON' },
+        ownerId: 2,
+        partyType: 'OWNER_IND',
+        type: ApiHomeTenancyTypes.JOINT
+      } as MhrRegistrationHomeOwnerIF
+    ],
+    tenancySpecified: true,
+    type: 'JOINT'
+  },
+  {
+    groupId: 6,
+    interest: 'UNDIVIDED',
+    interestDenominator: 2,
+    interestNumerator: 1,
+    owners: [
+      {
+        address: {
+          city: 'V4V 4V4',
+          country: 'CA',
+          postalCode: 'v4v 4v4',
+          region: 'BC',
+          street: '123123',
+          streetAdditional: 'VICTORIA'
+        },
+        individualName: { first: 'JOE', last: 'TESTING' },
+        ownerId: 3,
+        partyType: HomeOwnerPartyTypes.OWNER_IND,
+        phoneNumber: '1123123123',
+        type: ApiHomeTenancyTypes.COMMON
+      } as MhrRegistrationHomeOwnerIF
+    ],
+    tenancySpecified: true,
+    type: 'COMMON'
+  }
+]
 
 export const mockMhrTransferDraft = {
   inUserList: true, // whether the registration is in their table or not

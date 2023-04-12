@@ -20,7 +20,8 @@
     >
       <template
         v-slot:header
-        v-if="isMhrTransfer && !hasActualOwners(homeOwners) && homeOwners.length > 0 && hasRemovedAllHomeOwnerGroups()"
+        v-if="isMhrTransfer && !hasActualOwners(homeOwners) && homeOwners.length > 0 &&
+          hasRemovedAllHomeOwnerGroups() && !isTransferToExecutorProbateWill"
       >
         <tr class="fs-14 text-center no-owners-head-row" data-test-id="no-data-msg">
           <td class="pa-6" :colspan="homeOwnersTableHeaders.length">
@@ -35,7 +36,7 @@
           :colspan="4"
           class="py-1 group-header-slot"
           :class="{'spacer-header': disableGroupHeader(group),
-            'border-error-left': showInvalidDeceasedOwnerGroupError(group)
+            'border-error-left': isInvalidOwnerGroup(group)
           }"
         >
           <TableGroupHeader
@@ -48,17 +49,42 @@
           />
         </td>
       </template>
-
       <template v-slot:item="row" v-if="homeOwners.length">
 
         <!-- Transfer scenario: Display error for groups that 'removed' all owners but they still exist in the table -->
-        <tr v-if="isGroupWithNoOwners(row.item, row.index)">
-          <td :colspan="4" class="py-1">
+        <tr v-if="isGroupWithNoOwners(row.item, row.index) ||
+          (isTransferToExecutorProbateWill && isTransferGroupValid(row.item.groupId, row.index))"
+        >
+          <td :colspan="4"
+            class="py-1"
+            :class="{ 'border-error-left': isInvalidOwnerGroup(row.item.groupId)}"
+            data-test-id="invalid-group-msg"
+          >
             <div
               class="error-text my-6 text-center"
               :data-test-id="`no-owners-msg-group-${homeOwners.indexOf(row.item)}`"
             >
-              Group must contain at least one owner.
+              <!-- Transfer Will error messages -->
+              <span v-if="isTransferToExecutorProbateWill">
+                <span v-if="!TransWill.hasExecutorsInGroup(row.item.groupId) &&
+                  getMhrTransferHomeOwnerGroups.length === 1">
+                    Must contain at least one executor.
+                </span>
+                <span v-else-if="!TransWill.hasExecutorsInGroup(row.item.groupId)">
+                  Group must contain at least one executor.
+                </span>
+                <span v-else-if="!TransWill.hasAllCurrentOwnersRemoved(row.item.groupId) &&
+                  !isAllGroupOwnersWithDeathCerts(row.item.groupId)">
+                  All owners must be deceased and an executor added.
+                </span>
+                <span v-else-if="isAllGroupOwnersWithDeathCerts(row.item.groupId)">
+                  One of the deceased owners must have a Grant of Probate with Will.
+                </span>
+              </span>
+              <!-- Other error messages -->
+              <span v-else>
+                Group must contain at least one owner.
+              </span>
             </div>
           </td>
         </tr>
@@ -87,7 +113,7 @@
           <td
             class="owner-name"
             :class="{'no-bottom-border' : hideRowBottomBorder(row.item),
-              'border-error-left': showInvalidDeceasedOwnerGroupError(row.item.groupId) }"
+              'border-error-left': isInvalidOwnerGroup(row.item.groupId) }"
           >
             <div :class="{'removed-owner': isRemovedHomeOwner(row.item)}">
               <div v-if="row.item.individualName" class="owner-icon-name">
@@ -116,7 +142,7 @@
                   {{ row.item.organizationName }}
                 </div>
               </div>
-              <div v-if="row.item.suffix" class="font-light">
+              <div v-if="row.item.suffix" class="font-light" :class="{ 'suffix-error': showSuffixError}">
                 {{ row.item.suffix }}
               </div>
             </div>
@@ -190,7 +216,7 @@
                 text color="primary" class="mr-n4"
                 :ripple="false"
                 :disabled="isAddingMode || isEditingMode || isGlobalEditingMode ||
-                  isDisabledForSJTChanges(row.item) ||isDisabledForWillChanges(row.item)"
+                  isDisabledForSJTChanges(row.item) || isDisabledForWillChanges(row.item)"
                 @click="markForRemoval(row.item)"
                 data-test-id="table-delete-btn"
               >
@@ -267,7 +293,7 @@
           <td
             :colspan="homeOwnersTableHeaders.length"
             class="py-0 pl-8"
-            :class="{ 'border-error-left': showInvalidDeceasedOwnerGroupError(row.item.groupId) }"
+            :class="{ 'border-error-left': isInvalidOwnerGroup(row.item.groupId) }"
           >
             <v-expand-transition>
               <DeathCertificate
@@ -295,17 +321,25 @@
           </td>
         </tr>
         <tr v-else-if="isRemovedHomeOwner(row.item) && showSupportingDocuments() && !isReadonlyTable">
-          <td :colspan="homeOwnersTableHeaders.length" class="pl-14">
+          <td
+            :colspan="homeOwnersTableHeaders.length"
+            class="pl-14"
+            :class="{ 'border-error-left': isInvalidOwnerGroup(row.item.groupId) }"
+          >
             <v-expand-transition>
               <SupportingDocuments
                 :deletedOwner="row.item"
-                :isSecondOptionDisabled="getGroupOwnersCount(row.item.groupId) === 1"
+                :validate="validateTransfer"
+                :isSecondOptionDisabled="TransWill.hasOnlyOneOwnerInGroup(row.item.groupId)"
+                :isSecondOptionError="isAllGroupOwnersWithDeathCerts(row.item.groupId)"
+                @handleDocOptionOneSelected="TransWill.resetGrantOfProbate(row.item.groupId, row.item.ownerId)"
               >
                 <template v-slot:deathCert>
                   <DeathCertificate
                     :deceasedOwner="row.item"
                     :validate="validateTransfer"
                     @isValid="isValidDeathCertificate = $event"
+                    :isDisabled="isGlobalEditingMode"
                   />
                 </template>
               </SupportingDocuments>
@@ -397,16 +431,26 @@ export default defineComponent({
       isDisabledForWillChanges,
       isCurrentOwner,
       getCurrentOwnerStateById,
-      isTransferDueToDeath,
+      isTransferToSurvivingJointTenant,
       isTransferToExecutorProbateWill,
       groupHasRemovedAllCurrentOwners,
-      moveCurrentOwnersToPreviousOwners
+      moveCurrentOwnersToPreviousOwners,
+      TransWill
     } = useTransferOwners(!props.isMhrTransfer)
 
     const { setUnsavedChanges } = useActions<any>(['setUnsavedChanges'])
 
-    const { getMhrRegistrationValidationModel, getMhrInfoValidation, hasUnsavedChanges } =
-      useGetters<any>(['getMhrRegistrationValidationModel', 'getMhrInfoValidation', 'hasUnsavedChanges'])
+    const {
+      getMhrRegistrationValidationModel,
+      getMhrInfoValidation,
+      hasUnsavedChanges,
+      getMhrTransferHomeOwnerGroups
+    } = useGetters<any>([
+      'getMhrRegistrationValidationModel',
+      'getMhrInfoValidation',
+      'hasUnsavedChanges',
+      'getMhrTransferHomeOwnerGroups'
+    ])
 
     const { getValidation, MhrSectVal, MhrCompVal } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
     const { isValidDeceasedOwnerGroup } = useMhrInfoValidation(getMhrInfoValidation.value)
@@ -415,6 +459,7 @@ export default defineComponent({
       currentlyEditingHomeOwnerId: -1,
       reviewed: false,
       showOwnerChangesDialog: false,
+      showSuffixError: false,
       ownerToDecease: null as MhrRegistrationHomeOwnerIF,
       transWillSupportDoc: null as SupportingDocumentsOptions,
       isEditingMode: computed((): boolean => localState.currentlyEditingHomeOwnerId >= 0),
@@ -425,9 +470,10 @@ export default defineComponent({
           (
             !hasMinimumGroups() ||
             hasEmptyGroup.value ||
+            (isTransferToExecutorProbateWill && !hasUnsavedChanges.value) ||
             (props.isMhrTransfer && !hasUnsavedChanges.value) ||
             !localState.isValidAllocation ||
-            localState.hasGroupsWithNoOwners ||
+            (!isTransferToExecutorProbateWill && localState.hasGroupsWithNoOwners) ||
             (!localState.isUngroupedTenancy && hasUndefinedGroupInterest(getTransferOrRegistrationHomeOwnerGroups()))
           )
       }),
@@ -451,15 +497,25 @@ export default defineComponent({
       isUngroupedTenancy: computed((): boolean => {
         return [HomeTenancyTypes.SOLE, HomeTenancyTypes.JOINT].includes(getHomeTenancyType())
       }),
-      isProbateGrantOption: computed((): boolean => {
-        return localState.transWillSupportDoc === SupportingDocumentsOptions.PROBATE_GRANT
-      }),
-      isDeathCertOption: computed((): boolean => {
-        return localState.transWillSupportDoc === SupportingDocumentsOptions.DEATH_CERT
-      })
+      // Trans Will Flow: check if all Owners within a group have Death Certificate as a supporting document
+      isAllGroupOwnersWithDeathCerts: (groupId): boolean => {
+        return props.homeOwners
+          .filter(owner => owner.groupId === groupId && owner.action !== ActionTypes.ADDED)
+          .every(owner => {
+            return owner.action === ActionTypes.REMOVED &&
+              owner.supportingDocument === SupportingDocumentsOptions.DEATH_CERT
+          })
+      }
     })
 
-    const showInvalidDeceasedOwnerGroupError = (groupId): boolean => {
+    // check if Owner Group that has deceased Owners is valid
+    const isInvalidOwnerGroup = (groupId): boolean => {
+      if (isTransferToExecutorProbateWill.value && props.validateTransfer) {
+        return (hasUnsavedChanges.value &&
+          (TransWill.hasSomeOwnersRemoved(groupId) || TransWill.hasExecutorsInGroup(groupId))) &&
+          !(TransWill.hasExecutorsInGroup(groupId) && TransWill.hasAllCurrentOwnersRemoved(groupId))
+      }
+
       return props.validateTransfer && !isValidDeceasedOwnerGroup(groupId) && !localState.showTableError
     }
 
@@ -535,11 +591,6 @@ export default defineComponent({
       return !group.interestNumerator && !group.interestDenominator
     }
 
-    // Count number of Home Owner within a group
-    const getGroupOwnersCount = (groupId: number): number => {
-      return getGroupById(groupId).owners.length
-    }
-
     const disableGroupHeader = (groupId: number): boolean => {
       const currentOwners = props.homeOwners.filter(owner => owner.action !== ActionTypes.ADDED)
 
@@ -555,6 +606,16 @@ export default defineComponent({
         group.interestDenominator && group.owners.filter(owner => owner.action !== ActionTypes.REMOVED).length === 0
 
       return hasNoOwners && index === 0
+    }
+
+    // validate group for Will Transfers
+    const isTransferGroupValid = (groupId: number, index) => {
+      return (
+        index === 0 &&
+        hasUnsavedChanges.value &&
+        (TransWill.hasSomeOwnersRemoved(groupId) || TransWill.hasExecutorsInGroup(groupId))
+      ) &&
+      !(TransWill.hasExecutorsInGroup(groupId) && TransWill.hasAllCurrentOwnersRemoved(groupId))
     }
 
     const removeOwnerHandler = (owner: MhrRegistrationHomeOwnerIF): void => {
@@ -591,11 +652,18 @@ export default defineComponent({
     // When a change is made to homeOwners, check if any actions have changed, if so set flag
     watch(() => props.homeOwners, (val) => {
       setUnsavedChanges(val.some(owner => !!owner.action || !owner.ownerId))
+
+      // update suffix for executor(s) in Will Transfers flow
+      if (isTransferToExecutorProbateWill.value) {
+        localState.showSuffixError = TransWill.updateExecutorSuffix()
+      }
+
       context.emit('isValidTransferOwners',
         hasMinimumGroups() &&
         localState.isValidAllocation &&
         !localState.hasGroupsWithNoOwners &&
-        (!isTransferDueToDeath.value || localState.isValidDeathCertificate)
+        (isTransferToSurvivingJointTenant.value ? localState.isValidDeathCertificate : true) &&
+        (isTransferToExecutorProbateWill.value ? TransWill.isValidTransfer.value : true)
       )
     }, { deep: true })
 
@@ -631,7 +699,7 @@ export default defineComponent({
       disableGroupHeader,
       isGroupWithNoOwners,
       getGroupNumberById,
-      getGroupOwnersCount,
+      getMhrTransferHomeOwnerGroups,
       getTransferOrRegistrationHomeOwners,
       getTransferOrRegistrationHomeOwnerGroups,
       enableHomeOwnerChanges,
@@ -650,9 +718,12 @@ export default defineComponent({
       handleOwnerChangesDialogResp,
       hideRowBottomBorder,
       yyyyMmDdToPacificDate,
-      showInvalidDeceasedOwnerGroupError,
+      isInvalidOwnerGroup,
       HomeOwnerPartyTypes,
       SupportingDocumentsOptions,
+      TransWill,
+      getMhrInfoValidation,
+      isTransferGroupValid,
       ...toRefs(localState)
     }
   }
@@ -699,6 +770,10 @@ export default defineComponent({
   .owner-name,
   .owner-name i {
     color: $gray9 !important;
+  }
+
+  .owner-name .suffix-error {
+    color: $error;
   }
 
   .removed-owner {

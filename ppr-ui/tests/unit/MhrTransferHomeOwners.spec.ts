@@ -10,7 +10,7 @@ import {
   HomeOwnerGroups,
   TableGroupHeader
 } from '@/components/mhrRegistration/HomeOwners'
-import { InfoChip, SimpleHelpToggle } from '@/components/common'
+import { InfoChip, SharedDatePicker, SimpleHelpToggle } from '@/components/common'
 import {
   mockedExecutor,
   mockedPerson,
@@ -18,12 +18,13 @@ import {
   mockedAddedPerson,
   mockedAddedOrganization,
   mockedRemovedPerson,
-  mockedRemovedOrganization
+  mockedRemovedOrganization,
+  mockMhrTransferCurrentHomeOwnerGroup
 } from './test-data'
 import { getTestId } from './utils'
-import { MhrRegistrationHomeOwnerGroupIF } from '@/interfaces'
-import { ApiTransferTypes, UITransferTypes, HomeTenancyTypes } from '@/enums'
-import { SupportingDocuments, TransferType } from '@/components/mhrTransfers'
+import { MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF, TransferTypeSelectIF } from '@/interfaces'
+import { ApiHomeTenancyTypes, ApiTransferTypes, HomeOwnerPartyTypes, HomeTenancyTypes, UITransferTypes } from '@/enums'
+import { DeathCertificate, SupportingDocuments } from '@/components/mhrTransfers'
 import { transferSupportingDocuments } from '@/resources'
 
 Vue.use(Vuetify)
@@ -39,6 +40,7 @@ function createComponent (): Wrapper<any> {
   return mount(HomeOwners, {
     localVue,
     propsData: {
+      appReady: true,
       isMhrTransfer: true
     },
     store,
@@ -107,7 +109,7 @@ describe('Home Owners', () => {
   }
 
   const selectTransferType = async (transferType: ApiTransferTypes) => {
-    await store.dispatch('setMhrTransferType', { transferType: transferType })
+    await store.dispatch('setMhrTransferType', { transferType: transferType } as TransferTypeSelectIF)
     await Vue.nextTick()
   }
 
@@ -161,7 +163,7 @@ describe('Home Owners', () => {
     expect(ownersTable.text()).not.toContain('Group 1')
 
     // there should be no 'Added' badge shown for the Current Owners
-    const addedBadge = ownersTable.find(getTestId('owner-added-badge'))
+    const addedBadge = ownersTable.find(getTestId('ADDED-badge'))
     expect(addedBadge.exists()).toBeFalsy()
 
     // add an organization
@@ -335,6 +337,8 @@ describe('Home Owners', () => {
     // there should be 'DELETED' badges shown for the Deleted Group
     expect(ownersTable.findAllComponents(TableGroupHeader).at(1)
       .findComponent(InfoChip).text()).toContain('REMOVED')
+
+    wrapper.findComponent(HomeOwners).vm.$data.setShowGroups(false)
   })
 
   it('should display a CHANGED a home owner group', async () => {
@@ -374,31 +378,87 @@ describe('Home Owners', () => {
     // there should be 'CHANGED' badges shown for the Changed Group
     expect(ownersTable.findAllComponents(TableGroupHeader).at(1)
       .findComponent(InfoChip).text()).toContain('CHANGED')
+
+    wrapper.findComponent(HomeOwners).vm.$data.setShowGroups(false)
+  })
+
+  it('TRANS SALE GIFT Flow: validations with sole Owner in one group', async () => {
+    // reset transfer type
+    await selectTransferType(null)
+
+    const TRANSFER_TYPE = ApiTransferTypes.SALE_OR_GIFT
+
+    const homeOwnerGroup: MhrRegistrationHomeOwnerGroupIF[] = [{ groupId: 1, owners: [mockedPerson], type: '' }]
+
+    await store.dispatch('setMhrTransferCurrentHomeOwnerGroups', homeOwnerGroup)
+    await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerGroup)
+
+    await selectTransferType(TRANSFER_TYPE)
+
+    const homeOwners = wrapper.findComponent(HomeOwners)
+    expect(homeOwners.find(getTestId('table-delete-btn')).exists()).toBeTruthy()
+    await homeOwners.find(getTestId('table-delete-btn')).trigger('click')
+    await Vue.nextTick()
+
+    const allDeletedBadges = homeOwners.findAll(getTestId('DELETED-badge'))
+    expect(allDeletedBadges.length).toBe(1)
+
+    expect(homeOwners.find(getTestId('invalid-group-msg')).exists()).toBeFalsy()
+    expect(homeOwners.find(getTestId('no-data-msg')).exists()).toBeTruthy()
+    expect(homeOwners.find(getTestId('no-data-msg')).text()).toContain('No owners added yet.')
+
+    const deletedOwner: MhrRegistrationHomeOwnerIF =
+      homeOwners.vm.$data.getMhrTransferHomeOwnerGroups[0].owners[0]
+
+    const addedOwner: MhrRegistrationHomeOwnerIF = {
+      ...mockedAddedPerson,
+      ownerId: 11,
+      groupId: 1
+    }
+
+    await store.dispatch('setMhrTransferHomeOwnerGroups',
+      [{ groupId: 1, owners: [deletedOwner, addedOwner] }] as MhrRegistrationHomeOwnerGroupIF[])
+
+    // check number of owners and that all errors are cleared
+    expect(homeOwners.vm.$data.getHomeOwners.length).toBe(2)
+    expect(homeOwners.text()).not.toContain('Group 1')
+    expect(homeOwners.find(getTestId('invalid-group-msg')).exists()).toBeFalsy()
+    expect(homeOwners.find(getTestId('no-data-msg')).exists()).toBeFalsy()
   })
 
   it('TRANS WILL Flow: display Supporting Document component for deleted sole Owner and add Executor', async () => {
+    // reset transfer type
+    await selectTransferType(null)
+
     // setup transfer type to test
     const TRANSFER_TYPE = ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL
 
-    const homeOwnerGroup = [{ groupId: 1, owners: [mockedPerson] }]
+    const homeOwnerGroup: MhrRegistrationHomeOwnerGroupIF[] = [{ groupId: 1, owners: [mockedPerson], type: '' }]
+
+    await store.dispatch('setMhrTransferCurrentHomeOwnerGroups', homeOwnerGroup)
     await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerGroup)
 
     expect(wrapper.findComponent(AddEditHomeOwner).exists()).toBeFalsy()
 
-    const homeOwnersTable = wrapper.findComponent(HomeOwnersTable)
+    const homeOwners = wrapper.findComponent(HomeOwners)
+
     // Add Person button should not be visible
-    expect(homeOwnersTable.find(getTestId('add-person-btn')).exists()).toBeFalsy()
+    expect(homeOwners.find(getTestId('add-person-btn')).exists()).toBeFalsy()
 
     await selectTransferType(TRANSFER_TYPE)
 
-    // Add Person button and error should not exist
-    expect(homeOwnersTable.find(getTestId('add-person-btn')).exists()).toBeFalsy()
-    expect(homeOwnersTable.find(getTestId('transfer-table-error')).exists()).toBeFalsy()
+    expect(homeOwners.find(getTestId('transfer-table-error')).exists()).toBeFalsy()
 
+    expect(homeOwners.vm.$data.getMhrTransferCurrentHomeOwnerGroups[0].owners.length ===
+      homeOwnerGroup.length).toBeTruthy()
+    expect(homeOwners.vm.$data.getHomeOwners[0].individualName.first ===
+      homeOwnerGroup[0].owners[0].individualName.first).toBeTruthy()
+
+    expect(homeOwners.find(getTestId('table-delete-btn')).exists()).toBeTruthy()
     // delete the sole owner
-    await homeOwnersTable.find(getTestId('table-delete-btn')).trigger('click')
+    await homeOwners.find(getTestId('table-delete-btn')).trigger('click')
 
-    const deceasedBadge = homeOwnersTable.find(getTestId('DECEASED-badge'))
+    const deceasedBadge = homeOwners.find(getTestId('DECEASED-badge'))
     expect(deceasedBadge.exists()).toBeTruthy()
     expect(deceasedBadge.text()).toContain('DECEASED')
 
@@ -510,5 +570,195 @@ describe('Home Owners', () => {
         .find(getTestId('home-owner-tenancy-type'))
         .text()
     ).toBe(HomeTenancyTypes.NA)
+  })
+
+  it('TRANS WILL Flow: validations with sole Owner in one group', async () => {
+    // reset transfer type
+    await selectTransferType(null)
+
+    const TRANSFER_TYPE = ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL
+    const homeOwnerGroup: MhrRegistrationHomeOwnerGroupIF[] = [{ groupId: 1, owners: [mockedPerson], type: '' }]
+
+    await store.dispatch('setMhrTransferCurrentHomeOwnerGroups', homeOwnerGroup)
+    await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerGroup)
+
+    await selectTransferType(TRANSFER_TYPE)
+
+    const homeOwnersTable = wrapper.findComponent(HomeOwners)
+
+    const invalidGroupMsg = homeOwnersTable.find(getTestId('invalid-group-msg'))
+    expect(invalidGroupMsg.exists()).toBeFalsy()
+
+    await homeOwnersTable.find(getTestId('table-delete-btn')).trigger('click')
+
+    // group error message should be displayed
+    expect(homeOwnersTable.find(getTestId('invalid-group-msg')).exists()).toBeTruthy()
+    expect(homeOwnersTable.find(getTestId('invalid-group-msg')).text()).toContain('Must contain at least one executor.')
+
+    const deletedOwner: MhrRegistrationHomeOwnerIF =
+      homeOwnersTable.vm.$data.getMhrTransferHomeOwnerGroups[0].owners[0]
+
+    const addedExecutor: MhrRegistrationHomeOwnerIF = {
+      ...mockedAddedPerson,
+      ownerId: 11,
+      groupId: 1,
+      partyType: HomeOwnerPartyTypes.EXECUTOR,
+      type: ApiHomeTenancyTypes.SOLE
+    }
+
+    // add an executor to the group
+    await store.dispatch('setMhrTransferHomeOwnerGroups',
+      [{ groupId: 1, owners: [deletedOwner, addedExecutor] }] as MhrRegistrationHomeOwnerGroupIF[])
+
+    // make sure current owner group is not altered
+    expect(homeOwnersTable.vm.$data.getMhrTransferCurrentHomeOwnerGroups[0].owners.length).toBe(1)
+
+    const homeOwners = homeOwnersTable.vm.$data.getHomeOwners
+    expect(homeOwners.length).toBe(2)
+
+    // make sure all owners are in the same group, that is not shown for Sole Owner tenancy type
+    expect(homeOwners.every((owner: MhrRegistrationHomeOwnerGroupIF) => owner.groupId === 1)).toBeTruthy()
+    expect(homeOwnersTable.text()).not.toContain('Group 1')
+
+    // group error message should not be displayed
+    expect(homeOwnersTable.find(getTestId('invalid-group-msg')).exists()).toBeFalsy()
+
+    // undo delete to trigger another error message
+    await homeOwnersTable.find(getTestId('table-undo-btn')).trigger('click')
+
+    expect(homeOwnersTable.find(getTestId('invalid-group-msg')).text())
+      .toContain('All owners must be deceased and an executor added.')
+
+    await homeOwnersTable.find(getTestId('table-delete-btn')).trigger('click')
+
+    // at the end no error message should be displayed
+    expect(homeOwnersTable.find(getTestId('invalid-group-msg')).exists()).toBeFalsy()
+  })
+
+  it('TRANS WILL Flow: validations with multiple Owners in multiple groups', async () => {
+    // reset transfer type
+    await selectTransferType(null)
+
+    const TRANSFER_TYPE = ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL
+    const homeOwnerGroup: MhrRegistrationHomeOwnerGroupIF[] = mockMhrTransferCurrentHomeOwnerGroup
+
+    await store.dispatch('setMhrTransferCurrentHomeOwnerGroups', homeOwnerGroup)
+    // reset group ids as this is how it is implemented in the app
+    await store.dispatch('setMhrTransferHomeOwnerGroups', [
+      { groupId: 1, ...homeOwnerGroup[0] },
+      { groupId: 2, ...homeOwnerGroup[1] }
+    ])
+
+    await selectTransferType(TRANSFER_TYPE)
+
+    const homeOwners = wrapper.findComponent(HomeOwners)
+    const allDeleteButtons = homeOwners.findAll(getTestId('table-delete-btn'))
+    expect(allDeleteButtons.length).toBe(3)
+    allDeleteButtons.at(0).trigger('click')
+    await Vue.nextTick()
+
+    expect(homeOwners.find(getTestId('invalid-group-msg')).exists()).toBeTruthy()
+    expect(homeOwners.find(getTestId('invalid-group-msg')).text())
+      .toContain('Group must contain at least one executor.')
+
+    await homeOwners.find(getTestId('add-person-btn')).trigger('click')
+    await Vue.nextTick()
+
+    // check error message under the Add a Person button
+    expect(homeOwners.find(getTestId('transfer-table-error')).exists()).toBeTruthy()
+    expect(homeOwners.find(getTestId('transfer-table-error')).text())
+      .toContain('You must delete a deceased owner using Grant of Probate with Will before adding an executor')
+
+    const supportingDocumentsComponent = wrapper.findComponent(SupportingDocuments)
+
+    expect(supportingDocumentsComponent.text()).not.toContain(transferSupportingDocuments[TRANSFER_TYPE].optionOne.note)
+
+    // click on Grant of Probate with Will radio button in SupportingDocuments component
+    await supportingDocumentsComponent.find(getTestId('supporting-doc-option-one')).trigger('click')
+
+    expect(supportingDocumentsComponent.text()).toContain(transferSupportingDocuments[TRANSFER_TYPE].optionOne.note)
+
+    // error message under the Add a Person button should not be displayed
+    expect(homeOwners.find(getTestId('transfer-table-error')).exists()).toBeFalsy()
+
+    const deletedOwnerGroup: MhrRegistrationHomeOwnerGroupIF = homeOwners.vm.$data.getMhrTransferHomeOwnerGroups[0]
+
+    const addedExecutor: MhrRegistrationHomeOwnerIF = {
+      ...mockedAddedPerson,
+      ownerId: 11,
+      groupId: 1,
+      partyType: HomeOwnerPartyTypes.EXECUTOR,
+      type: ApiHomeTenancyTypes.SOLE
+    }
+
+    const updatedGroup: MhrRegistrationHomeOwnerGroupIF[] = [
+      // add executor to the first group
+      { groupId: 1, owners: [...deletedOwnerGroup.owners, addedExecutor], type: deletedOwnerGroup.type },
+      // second group is not altered
+      { groupId: 2, ...homeOwnerGroup[1] }
+    ]
+
+    await store.dispatch('setMhrTransferHomeOwnerGroups', updatedGroup)
+
+    // make sure current owner group is not altered
+    expect(homeOwners.vm.$data.getMhrTransferCurrentHomeOwnerGroups[0].owners.length).toBe(2)
+    expect(homeOwners.vm.$data.getMhrTransferCurrentHomeOwnerGroups[1].owners.length).toBe(1)
+
+    expect(homeOwners.vm.$data.getMhrTransferHomeOwnerGroups[0].owners.length).toBe(3)
+    expect(homeOwners.vm.$data.getMhrTransferHomeOwnerGroups[1].owners.length).toBe(1)
+
+    // since we did not delete the second owner from the group one, the error message should be displayed
+    expect(homeOwners.find(getTestId('invalid-group-msg')).text())
+      .toContain('All owners must be deceased and an executor added.')
+
+    // delete the second owner from the first group
+    allDeleteButtons.at(1).trigger('click')
+    await Vue.nextTick()
+
+    // because two owners are deleted, we can see two SupportingDocuments components
+    const allSupportingDocuments = wrapper.findAllComponents(SupportingDocuments)
+    expect(allSupportingDocuments.length).toBe(2)
+
+    expect(homeOwners.findAllComponents(DeathCertificate).length).toBe(0)
+
+    // click on both Death Certificates radio buttons to trigger another error message
+    allSupportingDocuments.at(0).find(getTestId('supporting-doc-option-two')).trigger('click')
+    await Vue.nextTick()
+    allSupportingDocuments.at(1).find(getTestId('supporting-doc-option-two')).trigger('click')
+    await Vue.nextTick()
+
+    console.log(homeOwners.html());
+
+    expect(homeOwners.findAllComponents(DeathCertificate).length).toBe(2)
+
+    expect(homeOwners.find(getTestId('invalid-group-msg')).text())
+      .toContain('One of the deceased owners must have a Grant of Probate with Will.')
+
+    // click back on Grant of Probate with Will radio button for first owner
+    allSupportingDocuments.at(0).find(getTestId('supporting-doc-option-one')).trigger('click')
+    await Vue.nextTick()
+
+    expect(homeOwners.find(getTestId('invalid-group-msg')).text())
+      .toContain('All owners must be deceased and an executor added.')
+
+    expect(homeOwners.findAllComponents(DeathCertificate).length).toBe(1)
+
+    // input data in DeathCertificate component to remove the error message
+    const deathCertificateComponent = wrapper.findComponent(DeathCertificate)
+    deathCertificateComponent.find(getTestId('death-certificate-number')).setValue('1')
+    await Vue.nextTick()
+    deathCertificateComponent.findComponent(SharedDatePicker).vm.$emit('emitDate', '2020-10-10')
+    await Vue.nextTick()
+    deathCertificateComponent.find(getTestId('has-certificate-checkbox')).setChecked()
+    await Vue.nextTick()
+    await Vue.nextTick()
+
+    // after all owners are deleted, the error message should not be displayed
+    expect(homeOwners.find(getTestId('invalid-group-msg')).exists()).toBeFalsy()
+
+    // do few more other checks
+    expect(homeOwners.find(getTestId('transfer-table-error')).exists()).toBeFalsy()
+    expect(homeOwners.findAll(getTestId('DECEASED-badge')).length).toBe(2)
+    expect(homeOwners.findAll(getTestId('ADDED-badge')).length).toBe(1)
   })
 })

@@ -135,9 +135,8 @@
       <v-row>
         <v-col
           class="transfer-table-error"
-          data-test-id="transfer-table-error"
         >
-          <div class="error-text fs-12" v-show="showError && hasHomeOwnersTableErrors">
+          <div class="error-text fs-12" v-if="showError && hasHomeOwnersTableErrors" data-test-id="transfer-table-error">
             You must delete a deceased owner using Grant of Probate with Will before adding an executor
           </div>
         </v-col>
@@ -322,12 +321,14 @@ export default defineComponent({
   setup (props, context) {
     const {
       getMhrRegistrationHomeOwners,
+      getMhrTransferHomeOwnerGroups,
       getMhrTransferCurrentHomeOwnerGroups,
       getMhrRegistrationValidationModel,
       hasUnsavedChanges,
       getMhrTransferDeclaredValue
     } = useGetters<any>([
       'getMhrRegistrationHomeOwners',
+      'getMhrTransferHomeOwnerGroups',
       'getMhrTransferCurrentHomeOwnerGroups',
       'getMhrRegistrationValidationModel',
       'hasUnsavedChanges',
@@ -342,9 +343,9 @@ export default defineComponent({
       enableHomeOwnerChanges,
       enableAddHomeOwners,
       enableDeleteAllGroupsActions,
-      hasDeletedOwnersWithProbateGrant,
       isTransferDueToDeath,
-      isTransferToExecutorProbateWill
+      isTransferToExecutorProbateWill,
+      TransWill
     } = useTransferOwners(!props.isMhrTransfer)
 
     const {
@@ -381,7 +382,8 @@ export default defineComponent({
       // capture different errors in the table to turn off Add Owner buttons and show error
       hasHomeOwnersTableErrors: computed(
         () => {
-          return isTransferToExecutorProbateWill.value ? !hasDeletedOwnersWithProbateGrant() : false
+          return (isTransferToExecutorProbateWill.value)
+            ? !TransWill.hasDeletedOwnersWithProbateGrant() : false
         }
       ),
       showError: false,
@@ -523,6 +525,7 @@ export default defineComponent({
     return {
       getMhrRegistrationHomeOwners,
       getMhrTransferCurrentHomeOwnerGroups,
+      getMhrTransferHomeOwnerGroups, // expose this for easier unit testing
       isGlobalEditingMode,
       getHomeTenancyType,
       showGroups,
@@ -537,7 +540,6 @@ export default defineComponent({
       enableAddHomeOwners,
       enableHomeOwnerChanges,
       enableDeleteAllGroupsActions,
-      hasDeletedOwnersWithProbateGrant,
       getMhrTransferDeclaredValue,
       handleUndo,
       ...toRefs(localState)
