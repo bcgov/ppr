@@ -52,8 +52,9 @@ export const StaffTransferTypes: Array<TransferTypeSelectIF> = [
     group: 2,
     tooltip: {
       title: 'Supporting Documents Required',
-      bullets: ['Original court certified true copy of Grant of Probate with Will (annexed)',
-        'Transfer form', 'Transfer fee']
+      bullets: ['Ownership Transfer or Change form',
+        'Court certified true copy of the Grant of Probate with the will attached.',
+        'Original or certified copy of death certificate issued from Canada or the United States for deceased joint tenants, if any, except for the person who last died. ']
     }
   },
   {

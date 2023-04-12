@@ -713,7 +713,6 @@ export default defineComponent({
       isInvalidOwnerGroup,
       HomeOwnerPartyTypes,
       SupportingDocumentsOptions,
-      // hasTransferGroupError,
       TRANS_WILL,
       getMhrInfoValidation,
       isTransferGroupValid,

@@ -1,6 +1,6 @@
 <template>
   <div id="supporting-documents" class="pb-3">
-    <p>
+    <p class="fs-16">
       Select the supporting document you have for this owner:
     </p>
     <v-radio-group
@@ -31,7 +31,7 @@
     </v-radio-group>
     <div v-if="deletedOwnerState.supportingDocument === docOptions.optionOne.value"
       class="supporting-doc-one">
-      <p>
+      <p class="fs-16">
         <strong>Note:</strong> {{ docOptions.optionOne.note }}
       </p>
     </div>

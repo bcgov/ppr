@@ -34,6 +34,7 @@
               <v-tooltip
                 v-if="isTransferDueToDeath"
                 top
+                nudge-right="18"
                 content-class="top-tooltip pa-5"
                 transition="fade-transition"
               >
@@ -790,7 +791,7 @@ export default defineComponent({
 }
 
 .underline {
-    border-bottom: 1px dotted #000;
+    border-bottom: 1px dotted $gray7;
     text-decoration: none;
 }
 
