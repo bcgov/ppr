@@ -276,11 +276,11 @@ LOCATION_OTHER = {
 
 # testdata pattern is ({description}, {park_name}, {dealer}, {additional}, {except_plan}, {band_name}, {message content})
 TEST_LOCATION_DATA = [
-    ('Invalid park name', INVALID_TEXT_CHARSET, None, None, None, None, INVALID_CHARSET_MESSAGE),
-    ('Invalid dealer name', None, INVALID_TEXT_CHARSET, None, None, None, INVALID_CHARSET_MESSAGE),
-    ('Invalid additional description', None, None, INVALID_TEXT_CHARSET, None, None, INVALID_CHARSET_MESSAGE),
-    ('Invalid exception plan', None, None, None, INVALID_TEXT_CHARSET, None, INVALID_CHARSET_MESSAGE),
-    ('Invalid band name', None, None, None, None, INVALID_TEXT_CHARSET, INVALID_CHARSET_MESSAGE)
+    ('Non utf-8 park name', INVALID_TEXT_CHARSET, None, None, None, None, None),
+    ('Non utf-8 dealer name', None, INVALID_TEXT_CHARSET, None, None, None, None),
+    ('Non utf-8 additional description', None, None, INVALID_TEXT_CHARSET, None, None, None),
+    ('Non utf-8 exception plan', None, None, None, INVALID_TEXT_CHARSET, None, None),
+    ('Non utf-8 band name', None, None, None, None, INVALID_TEXT_CHARSET, None)
 ]
 # test data pattern is ({description}, {valid}, {staff}, {doc_id}, {message_content}, {status}, {group})
 TEST_PERMIT_DATA = [
@@ -417,9 +417,10 @@ def test_validate_location(session, desc, park_name, dealer, additional, except_
     elif band_name:
         location['bandName'] = band_name
     error_msg = validator.validate_location(json_data)
-    assert error_msg != ''
     if message_content:
         assert error_msg.find(message_content) != -1
+    else:
+        assert not error_msg
 
 
 @pytest.mark.parametrize('desc,pid,valid,message_content', TEST_DATA_PID)

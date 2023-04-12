@@ -86,7 +86,7 @@ WHERE account_id = :query_value
                     FROM mhr_extra_registrations mer
                    WHERE mer.account_id = mr.account_id
                      AND mer.mhr_number = mr.mhr_number
-                     AND mer.removed_ind = 'Y')
+                     AND (mer.removed_ind IS NULL OR mer.removed_ind != 'Y'))
 )
 """
 QUERY_ACCOUNT_REGISTRATIONS_SUMMARY = """
@@ -120,12 +120,12 @@ SELECT (SELECT COUNT(mr.id)
                               FROM mhr_extra_registrations mer
                              WHERE mer.mhr_number = mr.mhr_number
                                AND mer.account_id = mr.account_id
-                               AND mer.removed_ind = 'Y')) AS reg_count,
+                               AND (mer.removed_ind IS NULL OR mer.removed_ind != 'Y'))) AS reg_count,
        (SELECT COUNT(mer.id)
            FROM mhr_extra_registrations mer
           WHERE mer.account_id = :query_value
             AND mer.mhr_number = :query_value2
-            AND mer.removed_ind != 'Y') as extra_reg_count,
+            AND (mer.removed_ind IS NULL OR mer.removed_ind != 'Y')) as extra_reg_count,
        (SELECT  mr.account_id
            FROM mhr_registrations mr
           WHERE mr.account_id = :query_value
