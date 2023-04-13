@@ -21,7 +21,7 @@
           </v-col>
           <v-col cols="9" class="confirm-completion-req">
             <ol>
-              <li v-if="!isTransferDueToDeath" class="pl-3 pb-3 mb-7">
+              <li v-if="!isTransferDueToDeath" class="pl-3 pb-3 mb-7" data-test-id="bill-of-sale-section">
                 <p><strong>Bill of sale</strong> has been signed by either all owners or by someone with the authority
                   to act on behalf of the registered owners and witnessed by an independent third party. If this is a
                   transfer to a beneficiary, you must have written consent from all beneficiaries that are not being
@@ -33,7 +33,7 @@
                   of seizure and sale.
                 </p>
               </li>
-              <li v-else-if="isTransferDueToDeath" class="pl-3 pb-3 mb-7">
+              <li v-else-if="isTransferDueToDeath" class="pl-3 pb-3 mb-7" data-test-id="death-certificate-section">
                 <p><strong>Original or
                   <v-tooltip
                     top
@@ -75,13 +75,13 @@
                   , and the name on the death certificate matches the name displayed above exactly.
                   </p>
               </li>
-              <li v-if="isRoleStaff" class="pl-3 pb-3 mb-7">
+              <li v-if="isRoleStaff" class="pl-3 pb-3 mb-7" data-test-id="change-ownership-section">
                 <p><strong>Transfer or Change Ownership form</strong> has been recieved and retained.</p>
               </li>
-              <li v-if="isTransferToExecutorProbateWill" class="pl-3 pb-3 mb-7">
+              <li v-if="isTransferToExecutorProbateWill" class="pl-3 pb-3 mb-7" data-test-id="probate-will-section">
                 <p><strong>Court certified true copy of the Probate with the will.</strong></p>
               </li>
-              <li v-if="!isTransferDueToDeath" class="pl-3 pb-3 mb-7">
+              <li v-if="!isTransferDueToDeath" class="pl-3 pb-3 mb-7" data-test-id="confirm-search-section">
                 <p><strong>Search of the Corporate Register</strong> has been completed if one or more of the current or
                 future owners is an incorporated company, society or cooperative association.</p>
                 <p class="confirm-completion-note">
@@ -90,7 +90,7 @@
                   at the time of registration.
                 </p>
               </li>
-              <li class="pl-3 pb-3 mb-0">
+              <li class="pl-3 pb-3 mb-0" data-test-id="ppr-lien-section">
                 <p><strong>Personal Property Registry lien search</strong> has been completed and there are no liens
                 on the home that stop the transfer.</p>
                 <p class="confirm-completion-note">
