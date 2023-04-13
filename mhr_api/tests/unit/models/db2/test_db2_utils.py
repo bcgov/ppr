@@ -74,6 +74,23 @@ TEST_QUERY_FILTER_DATA_DATE = [
      db2_utils.REG_FILTER_DATE_COLLAPSE)
 ]
 
+# testdata pattern is ({account_id}, {collapse}, {start_value}, {end_value}, {second_filter_name},
+#                      {second_filter_value}, {mhr_numbers}, {expected_date_clause}, {expected_second_clause})
+TEST_QUERY_FILTER_DATA_MULTIPLE = [
+    ('2523', False, '2021-10-14T09:53:57-07:53', '2021-10-17T09:53:57-07:53', reg_utils.MHR_NUMBER_PARAM,
+     '098487', "'dgfhdgf'", db2_utils.REG_FILTER_DATE, 'mh.mhregnum IN (?)'),
+    ('2523', False, '2021-10-14T09:53:57-07:53', '2021-10-17T09:53:57-07:53', reg_utils.REG_TYPE_PARAM,
+     'TRANSFER DUE TO SALE OR GIFT', "'098487'", db2_utils.REG_FILTER_DATE, db2_utils.REG_FILTER_REG_TYPE),
+    ('2523', False, '2021-10-14T09:53:57-07:53', '2021-10-17T09:53:57-07:53', reg_utils.SUBMITTING_NAME_PARAM,
+     'LINDA', "'098487'", db2_utils.REG_FILTER_DATE, db2_utils.REG_FILTER_SUBMITTING_NAME),
+    ('2523', False, '2021-10-14T09:53:57-07:53', '2021-10-17T09:53:57-07:53', reg_utils.CLIENT_REF_PARAM,
+     'A000873', "'098487'", db2_utils.REG_FILTER_DATE, db2_utils.REG_FILTER_CLIENT_REF),
+    ('2523', False, '2021-10-14T09:53:57-07:53', '2021-10-17T09:53:57-07:53', reg_utils.STATUS_PARAM,
+     'EXEMPT', "'098487'", db2_utils.REG_FILTER_DATE, db2_utils.REG_FILTER_STATUS),
+    ('2523', False, '2021-10-14T09:53:57-07:53', '2021-10-17T09:53:57-07:53', reg_utils.USER_NAME_PARAM,
+     'BCREG2', "'098487'", db2_utils.REG_FILTER_DATE, db2_utils.REG_FILTER_USERNAME),
+]
+
 
 @pytest.mark.parametrize('account_id, has_results', TEST_ACCOUNT_REG_DATA)
 def test_find_account_registrations(session, account_id, has_results):
@@ -207,6 +224,48 @@ def test_account_reg_filter_date(session, account_id, collapse, start_value, end
     # current_app.logger.debug(filter_clause)
     # current_app.logger.debug(filter_query)
     assert filter_query.find(filter_clause) > 0
+
+
+@pytest.mark.parametrize('account_id,collapse,start_value,end_value,second_filter_name,second_filter_value,mhr_numbers,expected_date_clause,expected_second_clause',
+                         TEST_QUERY_FILTER_DATA_MULTIPLE)
+def test_account_reg_filter_multiple(session, account_id, collapse, start_value, end_value, second_filter_name,
+                                     second_filter_value, mhr_numbers, expected_date_clause, expected_second_clause):
+    """Assert that account registration query filter clause is as expected when multiple filters are applied."""
+    params: AccountRegistrationParams = AccountRegistrationParams(account_id=account_id,
+                                                                  collapse=collapse,
+                                                                  sbc_staff=False)
+    date_filter_clause: str = expected_date_clause
+    second_filter_clause: str = expected_second_clause
+    params.filter_reg_start_date = start_value
+    params.filter_reg_end_date = end_value
+    # Set second filter in params and update query
+    if second_filter_name == reg_utils.REG_TS_PARAM:
+        params.filter_registration_date = second_filter_value
+    elif second_filter_name == reg_utils.STATUS_PARAM:
+        params.filter_status_type = second_filter_value
+        second_filter_clause = second_filter_clause.replace('?', 'E')
+    elif second_filter_name == reg_utils.REG_TYPE_PARAM:
+        params.filter_registration_type = second_filter_value
+        second_filter_clause = second_filter_clause.replace('?', 'TRAN')
+    elif second_filter_name == reg_utils.MHR_NUMBER_PARAM:
+        params.filter_mhr_number = second_filter_value
+        second_filter_clause = second_filter_clause.replace('?', f"'{second_filter_value}'")
+    elif second_filter_name == reg_utils.CLIENT_REF_PARAM:
+        params.filter_client_reference_id = second_filter_value
+        second_filter_clause = second_filter_clause.replace('?', second_filter_value)
+    elif second_filter_name == reg_utils.SUBMITTING_NAME_PARAM:
+        second_filter_clause = second_filter_clause.replace('?', second_filter_value)
+        params.filter_submitting_name = second_filter_value
+    elif second_filter_name == reg_utils.USER_NAME_PARAM:
+        params.filter_username = second_filter_value
+        second_filter_clause = second_filter_clause.replace('?', second_filter_value)
+
+    base_query: str = db2_utils.QUERY_ACCOUNT_REGISTRATIONS_SORT
+    filter_query: str = db2_utils.build_account_query_filter(base_query, params, mhr_numbers,
+                                                             MhrDocumentType.find_all())
+
+    assert filter_query.find(date_filter_clause) > 0
+    assert filter_query.find(second_filter_clause) > 0
 
 
 @pytest.mark.parametrize('account_id,collapse,filter_name,filter_value,mhr_numbers,expected_clause',

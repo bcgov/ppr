@@ -569,27 +569,53 @@ def build_account_query(params: AccountRegistrationParams, mhr_numbers: str, doc
     return query_text
 
 
+def get_multiple_filters(params: AccountRegistrationParams) -> dict:
+    """Returns list of all applied filters as key/value dictionary"""
+    filters = []
+    if params.filter_mhr_number:
+        filters.append(('mhrNumber', params.filter_mhr_number))
+    if params.filter_registration_type:
+        filters.append(('registrationType', params.filter_registration_type))
+    if params.filter_reg_start_date:
+        filters.append(('startDateTime', params.filter_reg_start_date))
+    if params.filter_status_type:
+        filters.append(('statusType', params.filter_status_type))
+    if params.filter_client_reference_id:
+        filters.append(('clientReferenceId', params.filter_client_reference_id))
+    if params.filter_submitting_name:
+        filters.append(('submittingName', params.filter_submitting_name))
+    if params.filter_username:
+        filters.append(('username', params.filter_username))
+    if filters:
+        return filters
+    return None
+
+
 def build_account_query_filter(query_text: str, params: AccountRegistrationParams, mhr_numbers: str, doc_types) -> str:
     """Build the account registration summary query filter clause."""
     filter_clause: str = ''
-    filter_type, filter_value = params.get_filter_values()
-    if filter_type and filter_value:
-        if filter_type == reg_utils.MHR_NUMBER_PARAM:
-            query_text = query_text.replace('?', f"'{filter_value}'")
-        else:
-            query_text = query_text.replace('?', mhr_numbers)
-            # Filter may exclude parent MH registrations, so use a different query to include base registrations.
-            filter_clause = QUERY_ACCOUNT_FILTER_BY_COLLAPSE.get(filter_type)
-            if not params.collapse:
-                filter_clause = QUERY_ACCOUNT_FILTER_BY.get(filter_type)
-            if filter_clause:
-                if filter_type == reg_utils.REG_TYPE_PARAM:
-                    filter_clause = __get_reg_type_filter(filter_value, params.collapse, doc_types)
-                elif filter_type == reg_utils.STATUS_PARAM:
-                    filter_clause = filter_clause.replace('?', TO_LEGACY_STATUS.get(filter_value, 'R'))
-                elif filter_type != reg_utils.START_TS_PARAM:
-                    filter_clause = filter_clause.replace('?', filter_value)
-                query_text += filter_clause
+    # Get all selected filters and loop through, applying them
+    filters = get_multiple_filters(params)
+    for filter in filters:
+        filter_type = filter[0]
+        filter_value = filter[1]
+        if filter_type and filter_value:
+            if filter_type == reg_utils.MHR_NUMBER_PARAM:
+                query_text = query_text.replace('?', f"'{filter_value}'")
+            else:
+                query_text = query_text.replace('?', mhr_numbers)
+                # Filter may exclude parent MH registrations, so use a different query to include base registrations.
+                filter_clause = QUERY_ACCOUNT_FILTER_BY_COLLAPSE.get(filter_type)
+                if not params.collapse:
+                    filter_clause = QUERY_ACCOUNT_FILTER_BY.get(filter_type)
+                if filter_clause:
+                    if filter_type == reg_utils.REG_TYPE_PARAM:
+                        filter_clause = __get_reg_type_filter(filter_value, params.collapse, doc_types)
+                    elif filter_type == reg_utils.STATUS_PARAM:
+                        filter_clause = filter_clause.replace('?', TO_LEGACY_STATUS.get(filter_value, 'R'))
+                    elif filter_type != reg_utils.START_TS_PARAM:
+                        filter_clause = filter_clause.replace('?', filter_value)
+                    query_text += filter_clause
     return query_text
 
 
