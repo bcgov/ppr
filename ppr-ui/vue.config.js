@@ -28,7 +28,7 @@ module.exports = {
     'vuetify'
   ],
 
-  publicPath: `/${process.env.VUE_APP_PATH}`,
+  publicPath: `${process.env.VUE_APP_PATH}`,
 
   devServer: {
   },
