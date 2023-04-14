@@ -86,7 +86,7 @@ WHERE account_id = :query_value
                     FROM mhr_extra_registrations mer
                    WHERE mer.account_id = mr.account_id
                      AND mer.mhr_number = mr.mhr_number
-                     AND (mer.removed_ind IS NULL OR mer.removed_ind != 'Y'))
+                     AND (mer.removed_ind IS NOT NULL AND mer.removed_ind = 'Y'))
 )
 """
 QUERY_ACCOUNT_REGISTRATIONS_SUMMARY = """
@@ -120,7 +120,7 @@ SELECT (SELECT COUNT(mr.id)
                               FROM mhr_extra_registrations mer
                              WHERE mer.mhr_number = mr.mhr_number
                                AND mer.account_id = mr.account_id
-                               AND (mer.removed_ind IS NULL OR mer.removed_ind != 'Y'))) AS reg_count,
+                               AND (mer.removed_ind IS NOT NULL AND mer.removed_ind = 'Y'))) AS reg_count,
        (SELECT COUNT(mer.id)
            FROM mhr_extra_registrations mer
           WHERE mer.account_id = :query_value
@@ -570,7 +570,7 @@ def build_account_query(params: AccountRegistrationParams, mhr_numbers: str, doc
 
 
 def get_multiple_filters(params: AccountRegistrationParams) -> dict:
-    """Returns list of all applied filters as key/value dictionary"""
+    """Build the list of all applied filters as a key/value dictionary."""
     filters = []
     if params.filter_mhr_number:
         filters.append(('mhrNumber', params.filter_mhr_number))

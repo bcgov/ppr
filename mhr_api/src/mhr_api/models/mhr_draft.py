@@ -46,7 +46,13 @@ SELECT d.draft_number, d.create_ts, d.registration_type, rt.registration_type_de
                     ELSE (SELECT u.firstname || ' ' || u.lastname
                             FROM users u
                            WHERE u.username = d.user_id FETCH FIRST 1 ROWS ONLY) END) AS registering_name,
-       d.mhr_number
+       d.mhr_number,
+       CASE WHEN d.registration_type = 'MHREG' or d.mhr_number IS NULL THEN 0
+            ELSE (SELECT COUNT(r.id)
+                    FROM mhr_registrations r
+                   WHERE r.mhr_number = d.mhr_number
+                     AND r.registration_ts > d.create_ts)
+            END stale_count
   FROM mhr_drafts d, mhr_registration_types rt
  WHERE d.account_id = :query_account
    AND d.registration_type = rt.registration_type
@@ -55,7 +61,13 @@ SELECT d.draft_number, d.create_ts, d.registration_type, rt.registration_type_de
                      FROM mhr_extra_registrations mer
                     WHERE mer.mhr_number = d.mhr_number
                       AND mer.account_id = d.account_id
-                      AND mer.removed_ind = 'Y')
+                      AND mer.removed_ind IS NOT NULL AND mer.removed_ind = 'Y')
+"""
+QUERY_DRAFT_STALE_COUNT = """
+SELECT COUNT(r.id)
+  FROM mhr_registrations r
+ WHERE r.mhr_number = :query_value1
+   AND r.registration_ts > :query_value2
 """
 
 QUERY_ACCOUNT_DRAFTS = QUERY_ACCOUNT_DRAFTS_BASE + QUERY_ACCOUNT_DRAFTS_DEFAULT_ORDER + QUERY_ACCOUNT_DRAFTS_LIMIT
@@ -92,6 +104,8 @@ class MhrDraft(db.Model):
     # Relationships - Registration
     registration = db.relationship('MhrRegistration', back_populates='draft', uselist=False)
 
+    stale_count: int = 0
+
     @property
     def json(self) -> dict:
         """Return the draft as a json object."""
@@ -101,6 +115,8 @@ class MhrDraft(db.Model):
             'draftNumber': self.draft_number,
             'registration': self.draft
         }
+        if self.mhr_number:
+            draft['outOfDate'] = (self.stale_count > 0)
         if self.update_ts:
             draft['lastUpdateDateTime'] = model_utils.format_ts(self.update_ts)
         else:
@@ -137,6 +153,7 @@ class MhrDraft(db.Model):
         if not ref_id or ref_id == 'None':
             ref_id = ''
         mhr_num = str(row[8])
+        stale_count: int = int(row[9])
         if not mhr_num or mhr_num == 'None':
             mhr_num = ''
         draft_json = {
@@ -151,6 +168,8 @@ class MhrDraft(db.Model):
             'clientReferenceId': ref_id,
             'mhrNumber': mhr_num
         }
+        if draft_json.get('mhrNumber'):
+            draft_json['outOfDate'] = (stale_count > 0)
         return draft_json
 
     @classmethod
@@ -179,6 +198,10 @@ class MhrDraft(db.Model):
                 error=message,
                 status_code=HTTPStatus.BAD_REQUEST
             )
+        if draft.mhr_number:
+            current_app.logger.debug(f'Checking if draftId={draft.id} on mhr {draft.mhr_number} is out of date.')
+            draft.get_stale_count()
+            current_app.logger.debug(f'DraftId={draft.id} out of date count={draft.stale_count}.')
         return draft
 
     @classmethod
@@ -245,3 +268,15 @@ class MhrDraft(db.Model):
         if not draft.account_id:
             draft.account_id = 'NA'
         return draft
+
+    def get_stale_count(self):
+        """Determine if the draft is out of date."""
+        self.stale_count = 0
+        if self.mhr_number and self.create_ts:
+            try:
+                result = db.session.execute(QUERY_DRAFT_STALE_COUNT,
+                                            {'query_value1': self.mhr_number, 'query_value2': self.create_ts})
+                row = result.first()
+                self.stale_count = int(row[0])
+            except Exception as db_exception:   # noqa: B902; return nicer error
+                current_app.logger.error('DB get_stale_count exception: ' + str(db_exception))

@@ -99,12 +99,14 @@ DRAFT_TRANSFER = {
 TEST_ACCOUNT_DRAFT_DATA = [
     ('PS12345', True, 'T500000', None, MhrRegistrationTypes.MHREG),
     ('PS12345', True, 'UT0001', 'UT-001', MhrRegistrationTypes.TRANS),
+    ('ppr_staff', True, '101421', '100377', MhrRegistrationTypes.TRANS),
     ('999999', False, None, None, None)
 ]
 # testdata pattern is ({account_id}, {status}, {draft_num}, {mhr_num}, {reg_type})
 TEST_DRAFT_DATA = [
     ('PS12345', HTTPStatus.OK, 'T500000', None, MhrRegistrationTypes.MHREG),
     ('PS12345', HTTPStatus.OK, 'UT0001', 'UT-001', MhrRegistrationTypes.TRANS),
+    ('ppr_staff', HTTPStatus.OK, '101421', '100377', MhrRegistrationTypes.TRANS),
     ('999999', HTTPStatus.NOT_FOUND, None, None, None),
     ('PS12345', HTTPStatus.BAD_REQUEST, 'T500001', None, None)
 ]
@@ -144,6 +146,8 @@ def test_find_all_by_account_id(session, account_id, has_results, draft_num, mhr
             if draft['draftNumber'] == draft_num:
                 assert draft['registrationType'] == reg_type
                 found_draft = True
+            if draft.get('mhrNumber'):
+                assert 'outOfDate' in draft
         assert found_draft
         if mhr_num:
             assert found_mhr
@@ -167,6 +171,8 @@ def test_find_by_draft_number(session, account_id, status, draft_num, mhr_num, r
         assert draft.registration_type == reg_type
         if mhr_num:
             assert draft.mhr_number == mhr_num
+            draft_json = draft.json
+            assert 'outOfDate' in draft_json
     else:
         with pytest.raises(BusinessException) as error:
             MhrDraft.find_by_draft_number(draft_num, False)

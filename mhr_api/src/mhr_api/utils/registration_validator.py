@@ -17,7 +17,7 @@ Validation includes verifying the data combination for various registrations/fil
 """
 from flask import current_app
 
-from mhr_api.models import MhrRegistration, Db2Owngroup, Db2Owner, Db2Document
+from mhr_api.models import MhrRegistration, Db2Owngroup, Db2Owner, Db2Document, MhrDraft
 from mhr_api.models import registration_utils as reg_utils, utils as model_utils
 from mhr_api.models.type_tables import MhrRegistrationStatusTypes, MhrDocumentTypes, MhrLocationTypes, MhrStatusTypes
 from mhr_api.models.type_tables import MhrOwnerStatusTypes, MhrTenancyTypes, MhrPartyTypes, MhrRegistrationTypes
@@ -31,6 +31,7 @@ from mhr_api.utils import valid_charset
 
 STATE_NOT_ALLOWED = 'The MH registration is not in a state where changes are allowed. '
 STATE_FROZEN_AFFIDAVIT = 'A transfer to a benificiary is pending after an AFFIDAVIT transfer. '
+DRAFT_NOT_ALLOWED = 'The draft for this registration out of date: delete the draft and resubmit. '
 OWNERS_NOT_ALLOWED = 'Owners not allowed with new registrations: use ownerGroups instead. '
 DOC_ID_REQUIRED = 'Document ID is required for staff registrations. '
 SUBMITTING_REQUIRED = 'Submitting Party is required for MH registrations. '
@@ -133,6 +134,7 @@ def validate_transfer(registration: MhrRegistration, json_data, staff: bool = Fa
         error_msg += validate_owner_party_type(json_data, json_data.get('addOwnerGroups'), False, active_group_count)
         reg_type: str = json_data.get('registrationType', MhrRegistrationTypes.TRANS)
         error_msg += validate_registration_state(registration, staff, reg_type)
+        error_msg += validate_draft_state(json_data)
         if is_legacy() and registration and registration.manuhome and json_data.get('deleteOwnerGroups'):
             error_msg += validate_delete_owners_legacy(registration, json_data)
         if not staff:
@@ -160,6 +162,7 @@ def validate_exemption(registration: MhrRegistration, json_data, staff: bool = F
             error_msg += validate_ppr_lien(registration.mhr_number)
         error_msg += validate_submitting_party(json_data)
         error_msg += validate_registration_state(registration, staff, MhrRegistrationTypes.EXEMPTION_RES)
+        error_msg += validate_draft_state(json_data)
         if json_data.get('note'):
             if json_data['note'].get('documentType') and \
                     json_data['note'].get('documentType') not in (MhrDocumentTypes.EXRS, MhrDocumentTypes.EXNR):
@@ -183,6 +186,7 @@ def validate_permit(registration: MhrRegistration, json_data, staff: bool = Fals
             error_msg += validate_ppr_lien(registration.mhr_number)
         error_msg += validate_submitting_party(json_data)
         error_msg += validate_registration_state(registration, staff, MhrRegistrationTypes.PERMIT)
+        error_msg += validate_draft_state(json_data)
         error_msg += validate_location(json_data)
         if json_data.get('newLocation'):
             location = json_data.get('newLocation')
@@ -270,6 +274,11 @@ def validate_registration_state(registration: MhrRegistration, staff: bool, reg_
         return error_msg
     if registration.status_type and registration.status_type != MhrRegistrationStatusTypes.ACTIVE:
         error_msg += STATE_NOT_ALLOWED
+    elif registration.draft:  # Check if registration draft is out of date/stale.
+        draft: MhrDraft = registration.draft
+        draft.get_stale_count()
+        if draft.stale_count > 0:
+            error_msg += DRAFT_NOT_ALLOWED
     elif is_legacy() and registration.manuhome:
         if registration.manuhome.mh_status != registration.manuhome.StatusTypes.REGISTERED:
             error_msg += STATE_NOT_ALLOWED
@@ -281,6 +290,17 @@ def validate_registration_state(registration: MhrRegistration, staff: bool, reg_
                     reg_type != MhrRegistrationTypes.TRANS:
                 error_msg += STATE_NOT_ALLOWED
                 error_msg += STATE_FROZEN_AFFIDAVIT
+    return error_msg
+
+
+def validate_draft_state(json_data):
+    """Validate draft state: no change registration on the home after the draft was created."""
+    error_msg = ''
+    if not json_data.get('draftNumber'):
+        return error_msg
+    draft: MhrDraft = MhrDraft.find_by_draft_number(json_data.get('draftNumber'))
+    if draft and draft.stale_count > 0:
+        error_msg += DRAFT_NOT_ALLOWED
     return error_msg
 
 
