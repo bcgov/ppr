@@ -1,5 +1,10 @@
 import { ApiTransferTypes, SupportingDocumentsOptions } from '@/enums'
 
+export const transferSupportingDocumentTypes = {
+  [ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL]: SupportingDocumentsOptions.PROBATE_GRANT,
+  [ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL]: SupportingDocumentsOptions.AFFIDAVIT
+}
+
 export const transferSupportingDocuments = {
   [ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL]: {
     optionOne: {

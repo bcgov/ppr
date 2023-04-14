@@ -573,7 +573,7 @@ export default defineComponent({
 
     // TransWill flow: Pre-fill only new Owner as Executor (not when editing existing owner)
     if ((isTransferToExecutorProbateWill.value || isTransferToExecutorUnder25Will.value) &&
-      TransWill.hasDeletedOwnersWithProbateGrant() &&
+      TransWill.hasDeletedOwnersWithProbateGrantOrAffidavit() &&
       !props.editHomeOwner) {
       TransWill.prefillOwnerAsExecutor(defaultHomeOwner)
     }
@@ -676,7 +676,7 @@ export default defineComponent({
         } else {
           // In TransWill flow, if the owner is the executor, add to same group as deleted owner with Probate Grant
           if (props.isMhrTransfer &&
-            TransWill.hasDeletedOwnersWithProbateGrant() &&
+            TransWill.hasDeletedOwnersWithProbateGrantOrAffidavit() &&
             localState.owner.partyType === HomeOwnerPartyTypes.EXECUTOR) {
             localState.ownerGroupId = localState.owner.groupId
           }

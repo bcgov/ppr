@@ -17,6 +17,7 @@ import { computed, reactive, toRefs } from '@vue/composition-api'
 import { isEqual, find } from 'lodash'
 import { normalizeObject } from '@/utils'
 import { useHomeOwners } from '@/composables'
+import { transferSupportingDocumentTypes } from '@/resources/'
 
 /**
  * Composable to handle Ownership functionality and permissions specific to the varying Transfer of Ownership filings.
@@ -267,6 +268,10 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
 
   // Transfer Will flow and all the related conditions/logic
   const TransWill: any = {
+    // based on the current/active transfer type, get the corresponding supporting document
+    getSupportingDocForActiveTransfer: (): ApiTransferTypes => {
+      return transferSupportingDocumentTypes[getMhrTransferType.value?.transferType]
+    },
     isValidTransfer: computed((): boolean => {
       // check if there is a group that is valid for WILL transfer
       return getMhrTransferHomeOwnerGroups.value.some(group => TransWill.isValidGroup(group))
@@ -282,14 +287,14 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     },
     // check if supportingDocument is either Death Certificate or Grant of Probate
     hasValidSupportDocs: (owner: MhrRegistrationHomeOwnerIF): boolean => {
-      let hasValidDeathCertOrProbateGrant = false
+      let hasValidSupportingDoc = false
       if (owner.supportingDocument === SupportingDocumentsOptions.DEATH_CERT) {
-        hasValidDeathCertOrProbateGrant = owner.hasDeathCertificate &&
+        hasValidSupportingDoc = owner.hasDeathCertificate &&
           !!owner.deathCertificateNumber && !!owner.deathDateTime
       } else {
-        hasValidDeathCertOrProbateGrant = owner.supportingDocument === SupportingDocumentsOptions.PROBATE_GRANT
+        hasValidSupportingDoc = owner.supportingDocument === TransWill.getSupportingDocForActiveTransfer()
       }
-      return hasValidDeathCertOrProbateGrant && owner.action === ActionTypes.REMOVED
+      return hasValidSupportingDoc && owner.action === ActionTypes.REMOVED
     },
     hasOnlyOneOwnerInGroup: (groupId): boolean => {
       return getMhrTransferHomeOwnerGroups.value
@@ -318,18 +323,19 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       return getMhrTransferHomeOwners.value.some(owner =>
         owner.supportingDocument === SupportingDocumentsOptions.DEATH_CERT)
     },
-    // Check if there's a deleted Owner with selected Grant of Probate as a supporting document.
-    hasDeletedOwnersWithProbateGrant: (): boolean => {
+    // Check if there's a deleted Owner with selected Grant of Probate or Affidavit as a supporting document.
+    hasDeletedOwnersWithProbateGrantOrAffidavit: (): boolean => {
       return getMhrTransferHomeOwnerGroups.value.some(group =>
-        group.owners.some(owner => owner.supportingDocument === SupportingDocumentsOptions.PROBATE_GRANT)
-      )
+        group.owners.some(owner =>
+          owner.supportingDocument === TransWill.getSupportingDocForActiveTransfer()))
     },
     prefillOwnerAsExecutor: (owner: MhrRegistrationHomeOwnerIF): void => {
       const allOwners = getMhrTransferHomeOwners.value
       const deletedOwnerGroup = find(getMhrTransferHomeOwnerGroups.value, { owners: [{ action: ActionTypes.REMOVED }] })
+      const supportingDocOfTheTransferType = TransWill.getSupportingDocForActiveTransfer()
       const deletedOwner = find(deletedOwnerGroup.owners, {
         action: ActionTypes.REMOVED,
-        supportingDocument: SupportingDocumentsOptions.PROBATE_GRANT
+        supportingDocument: supportingDocOfTheTransferType
       }) as MhrRegistrationHomeOwnerIF
 
       Object.assign(owner, {
@@ -344,7 +350,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     updateExecutorSuffix: (): boolean => {
       const deceasedOwners = getMhrTransferHomeOwners.value
         .filter(owner => owner.action === ActionTypes.REMOVED &&
-          owner.supportingDocument === SupportingDocumentsOptions.PROBATE_GRANT)
+          owner.supportingDocument === TransWill.getSupportingDocForActiveTransfer())
 
       return TransWill.addRemoveExecutorSuffix(deceasedOwners[0] || null)
     },

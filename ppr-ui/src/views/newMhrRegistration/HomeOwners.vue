@@ -390,9 +390,8 @@ export default defineComponent({
       // capture different errors in the table to turn off Add Owner buttons and show error
       hasHomeOwnersTableErrors: computed(
         () => {
-          console.log(TransWill.hasDeletedOwnersWithProbateGrant())
           return (isTransferToExecutorProbateWill.value || isTransferToExecutorUnder25Will.value)
-            ? !TransWill.hasDeletedOwnersWithProbateGrant() : false
+            ? !TransWill.hasDeletedOwnersWithProbateGrantOrAffidavit() : false
         }
       ),
       showError: false,
