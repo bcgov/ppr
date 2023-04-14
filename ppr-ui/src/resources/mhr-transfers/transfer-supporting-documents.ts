@@ -11,5 +11,17 @@ export const transferSupportingDocuments = {
       text: 'Death Certificate',
       value: SupportingDocumentsOptions.DEATH_CERT
     }
+  },
+  [ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL]: {
+    optionOne: {
+      text: 'Affidavit of Executor with Death Certificate',
+      value: SupportingDocumentsOptions.AFFIDAVIT,
+      note: 'Ensure you have the original signed Affidavit of Executor form and a ' +
+        'court certified true copy of the will.'
+    },
+    optionTwo: {
+      text: 'Death Certificate',
+      value: SupportingDocumentsOptions.DEATH_CERT
+    }
   }
 }

@@ -12,6 +12,7 @@ export interface TransferTypeSelectIF {
   color?: string
   tooltip?: {
     title: string
-    bullets: Array<string>
+    bullets: Array<string>,
+    note?: string
   }
 }
