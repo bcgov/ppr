@@ -17,43 +17,38 @@
   <div class="business-details-container mtn-2">
     <table class="registration-details-table-grey mt-0" role="presentation">
       <tr>
-        <td>Document ID:</td>
-        <td>{{documentId}} </td>
-      </tr>
-      <tr>
-        <td>Document Type:</td>
-        <td>
-          {% if documentDescription is defined and documentDescription != '' %}
-            {{documentDescription|title}} 
-          {% else %}
-            Register New Unit
-          {% endif %}                  
-          </td>
+        <td>Registration Status:</td>
+        <td>{{status|title}}</td>
       </tr>
       <tr>
         <td>Document Registration Number:</td>
-        <td>{{documentRegistrationNumber}} </td>
+        <td>{{documentRegistrationNumber}}</td>
       </tr>
       <tr>
         <td>Document Registration Date and Time:</td>
+        <td>{{createDateTime}}</td>
+      </tr>
+      <tr>
+        <td>Folio Number:</td>
         <td>
-          {% if createDateTime is defined and createDateTime != '' %}
-            {{createDateTime}} 
+            {% if clientReferenceId is defined and clientReferenceId != '' %}
+              {{clientReferenceId}}
+            {% else %}
+              N/A
+            {% endif %}
+        </td>
+      </tr>      
+      <tr>
+        <td>Declared Value:</td>
+        <td>
+          {% if declaredValue is defined and declaredValue != '' %}
+            {{declaredValue}} 
+            {% if declaredDateTime is defined and declaredDateTime != '' %} as of {{declaredDateTime}}{% endif %}
           {% else %}
             N/A
           {% endif %}
         </td>
-      </tr>
-        <tr>
-        <td>Attention/Reference Number:</td>
-        <td>
-          {% if attentionReference is defined and attentionReference != '' %}
-            {{attentionReference}} 
-          {% else %}
-            N/A
-          {% endif %}
-        </td>
-      </tr>
+      </tr>        
     </table>
   </div>
 

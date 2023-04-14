@@ -542,13 +542,6 @@ class Report:  # pylint: disable=too-few-public-methods
         elif self._report_key == ReportTypes.MHR_REGISTRATION:
             reg = self._report_data
             reg['createDateTime'] = Report._to_report_datetime(reg['createDateTime'])
-            if reg.get('declaredDateTime'):
-                reg['declaredDateTime'] = Report._to_report_datetime(reg['declaredDateTime'], False)
-            declared_value = str(reg['declaredValue'])
-            if declared_value.isnumeric() and declared_value != '0':
-                reg['declaredValue'] = '$' + '{:0,.2f}'.format(float(declared_value))
-            else:
-                reg['declaredValue'] = ''
             if reg.get('description') and reg['description'].get('engineerDate'):
                 if reg['description']['engineerDate'] == '0001-01-01':
                     reg['description']['engineerDate'] = ''
@@ -563,6 +556,14 @@ class Report:  # pylint: disable=too-few-public-methods
                                   ReportTypes.MHR_TRANSPORT_PERMIT):
             reg = self._report_data
             reg['createDateTime'] = Report._to_report_datetime(reg['createDateTime'])
+            if reg.get('declaredValue'):
+                if reg.get('declaredDateTime'):
+                    reg['declaredDateTime'] = Report._to_report_datetime(reg['declaredDateTime'], False)
+                declared_value = str(reg['declaredValue'])
+                if declared_value.isnumeric() and declared_value != '0':
+                    reg['declaredValue'] = '$' + '{:0,.2f}'.format(float(declared_value))
+                else:
+                    reg['declaredValue'] = ''
             if reg.get('note') and reg['note'].get('expiryDate'):
                 reg['note']['expiryDate'] = Report._to_report_datetime(reg['note']['expiryDate'], False)
             if self._report_key == ReportTypes.MHR_TRANSPORT_PERMIT and reg.get('newLocation'):

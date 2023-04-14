@@ -248,7 +248,12 @@ def get_report_files(request_data: dict, report_type: str, mail: bool = False) -
                        ReportTypes.MHR_TRANSFER,
                        ReportTypes.MHR_TRANSPORT_PERMIT,
                        ReportTypes.MHR_EXEMPTION):
-        title_text = request_data['templateVars'].get('meta_title', '')
+        if report_type in (ReportTypes.SEARCH_BODY_REPORT,
+                           ReportTypes.SEARCH_DETAIL_REPORT,
+                           ReportTypes.SEARCH_TOC_REPORT):
+            title_text = request_data['templateVars'].get('meta_title', '')
+        else:
+            title_text = request_data['templateVars'].get('documentDescription', '')
         subtitle_text = request_data['templateVars'].get('meta_subtitle', '')
         footer_text = request_data['templateVars'].get('footer_content', '')
     if report_type in (ReportTypes.MHR_REGISTRATION, ReportTypes.MHR_COVER,
