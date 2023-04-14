@@ -52,7 +52,7 @@ export interface DraftIF {
   error?: ErrorIF
 }
 
-// Manufactured Home Registration Draft interface for POST and GET.
+// Registration Draft interface for POST and GET.
 export interface MhrDraftIF {
   // Part of Api Submission/spec
   type?: DraftTypes | APIMhrTypes

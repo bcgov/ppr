@@ -415,7 +415,8 @@ import InfoChip from '@/components/common/InfoChip.vue'
 import { BaseHeaderIF, DraftResultIF, MhRegistrationSummaryIF, RegistrationSummaryIF } from '@/interfaces'
 /* eslint-enable no-unused-vars */
 import {
-  APIMhrDescriptionTypes, APIMhrTypes,
+  APIMhrDescriptionTypes,
+  APIMhrTypes,
   APIRegistrationTypes,
   APIStatusTypes,
   DraftTypes,

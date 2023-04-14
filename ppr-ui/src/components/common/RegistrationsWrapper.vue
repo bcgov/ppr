@@ -173,7 +173,7 @@ import {
   DraftResultIF,
   ErrorIF,
   MhrDraftIF,
-  MhRegistrationSummaryIF, MhrRegistrationIF, MhrTransferApiIF,
+  MhRegistrationSummaryIF,
   RegistrationSortIF,
   RegistrationSummaryIF,
   RegistrationTypeIF,
@@ -654,7 +654,6 @@ export default defineComponent({
 
     const openMhrDraft = async (mhrInfo: MhrDraftIF): Promise<void> => {
       await setMhrDraftNumber(mhrInfo.draftNumber)
-
       await startNewRegistration(MhrRegistrationType, true)
     }
 
