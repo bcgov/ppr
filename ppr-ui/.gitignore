@@ -142,3 +142,5 @@ yarn-error.log*
 
 # IDE history
 .history
+.firebase
+.firebaserc

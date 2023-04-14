@@ -15,7 +15,7 @@ export default class DateMixin extends Mixins(CommonMixin) {
    * @returns a promise to return a Date object
    */
   async getServerDate (): Promise<Date> {
-    const input = `${window.location.origin}/${process.env.VUE_APP_PATH}/`
+    const input = `${window.location.origin}${process.env.VUE_APP_PATH}/`
     const init: RequestInit = { cache: 'no-store', method: 'HEAD' }
 
     // don't call fetch() during Jest tests

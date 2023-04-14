@@ -31,15 +31,6 @@ module.exports = {
   publicPath: `/${process.env.VUE_APP_PATH}`,
 
   devServer: {
-    proxy: {
-      // this is needed to prevent a CORS error when running locally (will need to update with url)
-      '/local-keycloak-config-url/*': {
-        target: 'https://ppr-ui-dev.apps.silver.devops.gov.bc.ca/ppr/config/kc/',
-        pathRewrite: {
-          '/local-keycloak-config-url': ''
-        }
-      }
-    }
   },
 
   assetsDir: 'assets'
