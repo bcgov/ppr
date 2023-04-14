@@ -208,7 +208,7 @@ export default defineComponent({
 
     const combinedMakeModelLengthRule = (localState): Array<Function> => {
       return [
-        () => (0 || localState.model.length) + (0 || localState.make.length) <= 65 ||
+        () => (0 || localState.model?.length) + (0 || localState.make?.length) <= 65 ||
           'Make and Model combined cannot exceed 65 characters'
       ]
     }

@@ -7,5 +7,6 @@ export enum TableActions {
   REMOVE = 'remove',
   RENEW = 'renew',
   REMOVE_TRANSFER_DRAFT = 'removeTransferDraft',
-  OPEN = 'open',
+  OPEN_MHR = 'openMhr',
+  EDIT_NEW_MHR = 'editMhr'
 }

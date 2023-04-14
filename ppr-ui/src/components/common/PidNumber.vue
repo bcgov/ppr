@@ -82,6 +82,7 @@
 /* eslint-disable no-unused-vars */
 import vue from 'vue'
 import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
+import { useGetters } from 'vuex-composition-helpers'
 import { useInputRules } from '@/composables'
 import { ltsaDetails } from '@/utils/ltsa-api-helper'
 import { BaseDialog } from '@/components/dialogs'
@@ -100,15 +101,21 @@ export default defineComponent({
     required: { type: Boolean, default: false }
   },
   setup (props, context) {
+    const {
+      getMhrRegistrationLocation
+    } = useGetters<any>([
+      'getMhrRegistrationLocation'
+    ])
+
     // Composable(s)
     const {
       isNumber
     } = useInputRules()
 
     const localState = reactive({
-      pidOne: '',
-      pidTwo: '',
-      pidThree: '',
+      pidOne: getMhrRegistrationLocation.value?.pidNumber.slice(0, 3) || '',
+      pidTwo: getMhrRegistrationLocation.value?.pidNumber.slice(3, 6) || '',
+      pidThree: getMhrRegistrationLocation.value?.pidNumber.slice(6, 9) || '',
       enablePidLoader: false,
       dialogOptions: pidNotFoundDialog,
       showNotFoundDialog: false,

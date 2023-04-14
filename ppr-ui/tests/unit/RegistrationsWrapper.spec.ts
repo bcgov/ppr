@@ -299,7 +299,7 @@ describe('Dashboard add registration tests', () => {
     wrapper = mount(RegistrationsWrapper, {
       localVue,
       store,
-      propsData: { appReady: true },
+      propsData: { appReady: true, isPpr: true },
       router,
       vuetify,
       stubs: {

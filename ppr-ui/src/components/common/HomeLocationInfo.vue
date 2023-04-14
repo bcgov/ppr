@@ -193,6 +193,7 @@
 import { computed, defineComponent, onMounted, reactive, toRefs, watch } from '@vue/composition-api'
 import { MhrLocationInfoIF } from '@/interfaces'
 import { useInputRules } from '@/composables/useInputRules'
+import { useGetters } from 'vuex-composition-helpers'
 /* eslint-disable no-unused-vars */
 
 export default defineComponent({
@@ -204,6 +205,11 @@ export default defineComponent({
     isStrata: { type: Boolean, default: false }
   },
   setup (props, context) {
+    const {
+      getMhrRegistrationLocation
+    } = useGetters<any>([
+      'getMhrRegistrationLocation'
+    ])
     const {
       customRules,
       maxLength,
@@ -228,7 +234,7 @@ export default defineComponent({
         block: '',
         exceptionPlan: ''
       } as MhrLocationInfoIF,
-      additionalDescription: '',
+      additionalDescription: getMhrRegistrationLocation.value?.additionalDescription || '',
       reserveLengthErrMsg: 'Band Name, Reserve Number and Details combined cannot exceed 80 characters',
       isReserveLengthErr: computed((): boolean => {
         return (
@@ -245,6 +251,8 @@ export default defineComponent({
 
     onMounted(() => {
       if (props.validate) validateLocationInfo()
+      // Map specific local properties to draft data if it exists
+      for (const key in localState.locationInfo) localState.locationInfo[key] = getMhrRegistrationLocation.value[key]
     })
 
     const locationInputRules = (length: number = null, requiredMsg: string, fieldId: string = null) => {

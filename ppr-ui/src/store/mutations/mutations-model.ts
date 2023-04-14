@@ -365,6 +365,10 @@ export const mutateEmptyMhr = (state: StateIF, emptyMhr: MhrRegistrationIF) => {
   state.stateModel.mhrRegistration = emptyMhr
 }
 
+export const mutateMhrDraftNumber = (state: StateIF, draftNumber: string) => {
+  state.stateModel.mhrRegistration.draftNumber = draftNumber
+}
+
 export const mutateMhrHomeDescription = (state: StateIF, { key, value }) => {
   state.stateModel.mhrRegistration.description[key] = value
 }

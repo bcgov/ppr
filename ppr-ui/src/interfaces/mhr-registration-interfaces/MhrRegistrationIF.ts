@@ -5,6 +5,7 @@ import {
   SubmittingPartyIF
 } from '@/interfaces'
 export interface MhrRegistrationIF {
+  draftNumber: string
   documentId: string
   clientReferenceId: string
   declaredValue: string
@@ -33,6 +34,7 @@ export interface MhrRegistrationIF {
 }
 
 export interface NewMhrRegistrationApiIF {
+  draftNumber?: string
   documentId: string
   clientReferenceId?: string
   declaredValue?: string

@@ -164,6 +164,7 @@ export const stateModel: StateModelIF = {
   },
   // Manufactured Home Registration State
   mhrRegistration: {
+    draftNumber: '',
     documentId: '',
     clientReferenceId: '',
     declaredValue: '',

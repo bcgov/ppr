@@ -13,7 +13,7 @@
             <span class="pr-2"> Register a Manufactured Home</span>
           </v-btn>
           <registration-bar-type-ahead-list
-            v-else-if="hasRPPR"
+            v-else-if="hasRPPR && !isMhr"
             :defaultLabel="labelText"
             :defaultDense="false"
             :defaultClearable="false"

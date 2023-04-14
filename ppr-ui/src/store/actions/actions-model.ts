@@ -305,6 +305,10 @@ export const setEmptyMhr: ActionIF = ({ commit }, emptyMhr: MhrRegistrationIF): 
   commit('mutateEmptyMhr', emptyMhr)
 }
 
+export const setMhrDraftNumber: ActionIF = ({ commit }, draftNumber: string): void => {
+  commit('mutateMhrDraftNumber', draftNumber)
+}
+
 export const setMhrHomeDescription: ActionIF = ({ commit }, { key, value }): void => {
   commit('mutateMhrHomeDescription', { key, value })
   commit('mutateUnsavedChanges', true)

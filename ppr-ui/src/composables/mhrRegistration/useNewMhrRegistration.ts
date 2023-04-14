@@ -7,14 +7,15 @@ import {
   MhrLocationInfoIF,
   NewMhrRegistrationApiIF,
   MhRegistrationSummaryIF,
-  MhrDraftTransferApiIF,
-  RegistrationSortIF
+  RegistrationSortIF,
+  MhrDraftIF
 } from '@/interfaces'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
-import { APIStatusTypes, HomeTenancyTypes, mhApiStatusTypes, mhUIStatusTypes } from '@/enums'
+import { APIMhrTypes, APIStatusTypes, HomeTenancyTypes, HomeLocationTypes, mhApiStatusTypes } from '@/enums'
 import { getMhrDrafts, mhrRegistrationHistory } from '@/utils'
 import { orderBy } from 'lodash'
-import { MhStatusTypes } from '@/resources/statusTypes'
+import { useHomeOwners } from '@/composables'
+
 export const useNewMhrRegistration = () => {
   const {
     getMhrRegistrationHomeDescription,
@@ -24,7 +25,7 @@ export const useNewMhrRegistration = () => {
     getMhrRegistrationLocation,
     getMhrRegistrationHomeOwnerGroups,
     getStaffPayment,
-    isRoleQualifiedSupplier
+    getMhrDraftNumber
   } = useGetters<any>([
     'getMhrRegistrationHomeDescription',
     'getMhrRegistrationSubmittingParty',
@@ -34,12 +35,34 @@ export const useNewMhrRegistration = () => {
     'getMhrRegistrationHomeOwnerGroups',
     'getCertifyInformation',
     'getStaffPayment',
-    'isRoleQualifiedSupplier'
+    'getMhrDraftNumber'
   ])
-  const { setMhrTableHistory } = useActions<any>(['setMhrTableHistory'])
+  const {
+    setMhrLocation,
+    setMhrTableHistory,
+    setMhrHomeDescription,
+    setMhrAttentionReferenceNum,
+    setMhrRegistrationDocumentId,
+    setMhrRegistrationSubmittingParty,
+    setMhrRegistrationHomeOwnerGroups
+  } = useActions<any>([
+    'setMhrLocation',
+    'setMhrTableHistory',
+    'setMhrHomeDescription',
+    'setMhrAttentionReferenceNum',
+    'setMhrRegistrationDocumentId',
+    'setMhrRegistrationSubmittingParty',
+    'setMhrRegistrationHomeOwnerGroups'
+  ])
+
+  const {
+    setShowGroups,
+    getHomeTenancyType
+  } = useHomeOwners()
 
   const initNewMhr = (): MhrRegistrationIF => {
     return {
+      draftNumber: '',
       documentId: '',
       clientReferenceId: '',
       declaredValue: '',
@@ -135,6 +158,39 @@ export const useNewMhrRegistration = () => {
     }
   }
 
+  /**
+   * Parse a draft MHR into State.
+   * @param draft The draft filing to parse.
+   */
+  const initDraftMhr = async (draft: MhrRegistrationIF): Promise<void> => {
+    // Set description
+    for (const [key, val] of Object.entries(draft.description)) {
+      setMhrHomeDescription({ key: key, value: val })
+    }
+    // Set Submitting Party
+    setMhrRegistrationSubmittingParty(draft.submittingParty)
+    // Set Document Id
+    setMhrRegistrationDocumentId(draft.documentId)
+    // Set attention
+    setMhrAttentionReferenceNum(draft.attentionReferenceNum)
+    // Set HomeOwners
+    setMhrRegistrationHomeOwnerGroups(draft.ownerGroups)
+    // Show groups for Tenants in Common
+    setShowGroups(getHomeTenancyType() === HomeTenancyTypes.COMMON)
+    // Set Home Location
+    for (const [key, val] of Object.entries(draft.location)) {
+      setMhrLocation({ key: key, value: val })
+
+      // Map radio button options for Other Land Types
+      if (
+        [HomeLocationTypes.OTHER_RESERVE, HomeLocationTypes.OTHER_STRATA, HomeLocationTypes.OTHER_TYPE].includes(val)
+      ) {
+        setMhrLocation({ key: 'otherType', value: val })
+        setMhrLocation({ key: 'locationType', value: HomeLocationTypes.OTHER_LAND })
+      }
+    }
+  }
+
   const resetLocationInfoFields = (location: MhrLocationInfoIF): MhrLocationInfoIF => {
     Object.entries(location).forEach(([key]) => {
       location[key] = ''
@@ -216,7 +272,7 @@ export const useNewMhrRegistration = () => {
     return staffPayment
   }
 
-  const buildApiData = () => {
+  const buildApiData = (): NewMhrRegistrationApiIF => {
     const data: NewMhrRegistrationApiIF = {
       documentId: getMhrRegistrationDocumentId.value,
       submittingParty: parseSubmittingParty(),
@@ -227,6 +283,10 @@ export const useNewMhrRegistration = () => {
 
     if (getMhrAttentionReferenceNum.value) {
       data.attentionReferenceNum = getMhrAttentionReferenceNum.value
+    }
+
+    if (getMhrDraftNumber.value) {
+      data.draftNumber = getMhrDraftNumber.value
     }
 
     return data
@@ -241,31 +301,34 @@ export const useNewMhrRegistration = () => {
 
   function addHistoryDraftsToMhr (
     mhrHistory: MhRegistrationSummaryIF[],
-    mhrDrafts: MhrDraftTransferApiIF[],
+    mhrDrafts: MhrDraftIF[],
     sortOptions: RegistrationSortIF = null):
     MhRegistrationSummaryIF[] {
+    let mhrTableData = []
+    // Collect MH Transfer and Registration Drafts
     const sortedDraftFilings = orderBy(mhrDrafts, ['createDateTime'], ['desc'])
+    const mhRegDrafts = mhrDrafts.filter(draft =>
+      !draft.mhrNumber && draft.registrationType === APIMhrTypes.MANUFACTURED_HOME_REGISTRATION
+    )
 
-    var mhrTableData = []
-    // add drafts to Registrations.
+    // add Transfer drafts to parent registrations.
     mhrHistory.forEach(transfer => {
       transfer.baseRegistrationNumber = transfer.mhrNumber
-      //
+
       // Prepare existing changes
-      //
       const existingChanges = []
       if (transfer.changes) {
-        transfer.changes.forEach(transferchanges => {
-          const newDraft: MhRegistrationSummaryIF = transferchanges
-          newDraft.baseRegistrationNumber = transferchanges.mhrNumber
-          newDraft.documentId = transferchanges.documentId
-          newDraft.draftNumber = transferchanges.documentRegistrationNumber
+        transfer.changes.forEach(transferChanges => {
+          const newDraft: MhRegistrationSummaryIF = transferChanges
+          newDraft.baseRegistrationNumber = transferChanges.mhrNumber
+          newDraft.documentId = transferChanges.documentId
+          newDraft.draftNumber = transferChanges.documentRegistrationNumber
           existingChanges.push(newDraft)
         })
         transfer.changes = existingChanges
       }
 
-      var mhrDrafts = sortedDraftFilings.filter(sortedDrafts => sortedDrafts.mhrNumber === transfer.mhrNumber)
+      const mhrDrafts = sortedDraftFilings.filter(sortedDrafts => sortedDrafts.mhrNumber === transfer.mhrNumber)
       if (mhrDrafts?.length > 0) {
         transfer.hasDraft = true
         if (!transfer.changes) transfer.changes = []
@@ -296,7 +359,7 @@ export const useNewMhrRegistration = () => {
       }
     })
     if (sortOptions?.status !== mhApiStatusTypes.DRAFT) mhrTableData = mhrHistory
-    return mhrTableData
+    return [...mhRegDrafts, ...mhrTableData]
   }
   /**
    * @function cleanEmpty
@@ -322,6 +385,7 @@ export const useNewMhrRegistration = () => {
 
   return {
     initNewMhr,
+    initDraftMhr,
     resetLocationInfoFields,
     buildApiData,
     parseStaffPayment,

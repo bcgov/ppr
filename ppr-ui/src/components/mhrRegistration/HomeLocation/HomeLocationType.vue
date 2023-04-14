@@ -219,8 +219,10 @@ export default defineComponent({
   },
   setup (props, context) {
     const {
+      getMhrRegistrationLocation,
       getMhrRegistrationValidationModel
     } = useGetters<any>([
+      'getMhrRegistrationLocation',
       'getMhrRegistrationValidationModel'
     ])
     const {
@@ -244,16 +246,16 @@ export default defineComponent({
       isValidHomePark: false,
       isVerifyingPid: false,
       isValidLocationInfo: false,
-      locationTypeOption: HomeLocationTypes,
-      otherTypeOption: HomeLocationTypes,
-      dealerManufacturerLot: '',
-      homeParkName: '',
-      homeParkPad: '',
-      pidNumber: '',
+      locationTypeOption: getMhrRegistrationLocation.value?.locationType || HomeLocationTypes,
+      otherTypeOption: getMhrRegistrationLocation.value?.otherType || HomeLocationTypes,
+      dealerManufacturerLot: getMhrRegistrationLocation.value?.dealerName || '',
+      homeParkName: getMhrRegistrationLocation.value?.parkName || '',
+      homeParkPad: getMhrRegistrationLocation.value?.pad || '',
+      pidNumber: getMhrRegistrationLocation.value?.pidNumber || '',
       showLocationInfo: false,
       locationInfo: {},
-      legalDescription: '',
-      additionalDescription: '',
+      legalDescription: getMhrRegistrationLocation.value?.legalDescription || '',
+      additionalDescription: getMhrRegistrationLocation.value?.additionalDescription || '',
       dealerManufacturerLotRules: computed(() => {
         return localState.locationTypeOption as any === HomeLocationTypes.LOT
           ? customRules(required('Enter a dealer or manufacturer name'), maxLength(60))

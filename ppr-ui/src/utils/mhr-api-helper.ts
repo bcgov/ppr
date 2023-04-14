@@ -10,7 +10,9 @@ import {
   MhRegistrationSummaryIF,
   ErrorIF,
   MhrTransferApiIF,
-  MhrDraftTransferApiIF, DraftIF, RegistrationSortIF
+  MhrDraftApiIF,
+  RegistrationSortIF,
+  MhrDraftIF
 } from '@/interfaces'
 import { APIMhrTypes, ErrorCategories, ErrorCodes } from '@/enums'
 import { useSearch } from '@/composables/useSearch'
@@ -493,26 +495,51 @@ export async function deleteMhRegistrationSummary (
 }
 
 // Draft Requests
+
 // Save a new draft.
-export async function createMhrTransferDraft (draft: MhrTransferApiIF): Promise<MhrTransferApiIF> {
-  const payload: MhrDraftTransferApiIF = {
-    type: APIMhrTypes.TRANSFER_OF_SALE,
+export async function createMhrDraft (type: APIMhrTypes, draft: any): Promise<MhrDraftIF> {
+  const payload = {
+    type: type,
     registration: draft
   }
 
   return axios
-    .post('drafts', payload, getDefaultConfig())
+    .post<MhrDraftIF>('drafts', payload, getDefaultConfig())
     .then(response => {
-      const data = response?.data
+      const data: MhrDraftIF = response?.data
       if (!data) {
         throw new Error('Invalid API response')
       }
       return data
     })
+    .catch(error => {
+      if (error?.response?.data) {
+        try {
+          error.response.data.rootCause = error.response.data.rootCause
+            .replace('detail:', '"detail":"')
+            .replace('type:', '"type":"')
+            .replace('message:', '"message":"')
+            .replace('status_code:', '"statusCode":"')
+            .replaceAll(',', '",')
+          error.response.data.rootCause = `{${error.response.data.rootCause}"}`
+          error.response.data.rootCause = JSON.parse(error.response.data.rootCause)
+        } catch (error) {
+          // continue
+        }
+      }
+      draft.error = {
+        category: ErrorCategories.REGISTRATION_SAVE,
+        statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
+        message: error?.response?.data?.message,
+        detail: error?.response?.data?.rootCause?.detail,
+        type: error?.response?.data?.rootCause?.type?.trim() as ErrorCodes
+      }
+      return draft
+    })
 }
 
 // Update an existing draft.
-export async function updateMhrDraft (draftId: string, draft: MhrTransferApiIF): Promise<MhrTransferApiIF> {
+export async function updateMhrDraft (draftId: string, type: APIMhrTypes, draft: any): Promise<MhrDraftIF> {
   if (!draftId) {
     draft.error = {
       category: ErrorCategories.REGISTRATION_SAVE,
@@ -521,15 +548,16 @@ export async function updateMhrDraft (draftId: string, draft: MhrTransferApiIF):
     }
     return draft
   }
-  const payload: MhrDraftTransferApiIF = {
-    type: APIMhrTypes.TRANSFER_OF_SALE,
+  const payload = {
+    type: APIMhrTypes,
+    draftNumber: draftId,
     registration: draft
   }
 
   return axios
-    .put<MhrTransferApiIF>('drafts/' + draftId, payload, getDefaultConfig())
+    .put<MhrDraftIF>('drafts/' + draftId, payload, getDefaultConfig())
     .then(response => {
-      const data: MhrTransferApiIF = response?.data
+      const data: MhrDraftIF = response?.data
       if (!data) {
         throw new Error('Invalid API response')
       }
@@ -538,11 +566,11 @@ export async function updateMhrDraft (draftId: string, draft: MhrTransferApiIF):
 }
 
 // Get all existing drafts
-export async function getMhrDrafts (): Promise<Array<MhrDraftTransferApiIF>> {
+export async function getMhrDrafts (): Promise<Array<MhrDraftIF>> {
   return axios
-    .get<Array<MhrDraftTransferApiIF>>('drafts', getDefaultConfig())
+    .get<Array<MhrDraftIF>>('drafts', getDefaultConfig())
     .then(response => {
-      const data: Array<MhrDraftTransferApiIF> = response?.data
+      const data: Array<MhrDraftIF> = response?.data
       if (!data) {
         throw new Error('Invalid API response')
       }
@@ -551,8 +579,8 @@ export async function getMhrDrafts (): Promise<Array<MhrDraftTransferApiIF>> {
 }
 
 // Get an existing draft by id.
-export async function getMhrTransferDraft (draftId: string): Promise<MhrDraftTransferApiIF> {
-  const draft = {} as MhrDraftTransferApiIF
+export async function getMhrDraft (draftId: string): Promise<MhrDraftApiIF> {
+  const draft = {} as MhrDraftApiIF
   if (!draftId) {
     draft.error = {
       category: ErrorCategories.DRAFT_LOAD,
@@ -562,9 +590,9 @@ export async function getMhrTransferDraft (draftId: string): Promise<MhrDraftTra
     return draft
   }
   return axios
-    .get<MhrDraftTransferApiIF>('drafts/' + draftId, getDefaultConfig())
+    .get<MhrDraftApiIF>('drafts/' + draftId, getDefaultConfig())
     .then(response => {
-      const data: MhrDraftTransferApiIF = response?.data
+      const data: MhrDraftApiIF = response?.data
       if (!data) {
         throw new Error('Invalid API response')
       }

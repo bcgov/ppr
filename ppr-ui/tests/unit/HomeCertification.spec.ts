@@ -2,12 +2,13 @@
 import Vue from 'vue'
 import Vuetify from 'vuetify'
 import { getVuexStore } from '@/store'
-import CompositionApi from '@vue/composition-api'
+import CompositionApi, { nextTick } from '@vue/composition-api'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 
 // Components
 import { HomeCertification } from '@/components/mhrRegistration'
 import { SharedDatePicker } from '@/components/common'
+import flushPromises from 'flush-promises'
 
 Vue.use(Vuetify)
 
@@ -37,6 +38,10 @@ describe('Home Certification', () => {
 
   beforeEach(async () => {
     wrapper = createComponent()
+    await store.dispatch('setMhrHomeDescription', { key: 'certificationOption', value: null })
+    wrapper.vm.$data.certificationOption = null
+    await nextTick()
+    await flushPromises()
   })
   afterEach(() => {
     wrapper.destroy()

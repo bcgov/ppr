@@ -140,7 +140,7 @@ export default defineComponent({
 
     watch(() => localState.hasMinimumHomeSections, (val: boolean) => {
       setValidation(MhrSectVal.YOUR_HOME_VALID, MhrCompVal.HOME_SECTION_VALID, val)
-    })
+    }, { immediate: true })
 
     watch(() => localState.showAddEditHomeSections, (val: boolean) => {
       setValidation(MhrSectVal.YOUR_HOME_VALID, MhrCompVal.HOME_SECTION_VALID,

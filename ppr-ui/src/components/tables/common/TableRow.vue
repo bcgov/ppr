@@ -34,7 +34,7 @@
           <div v-if="isChild || (isDraft(item) && item.baseRegistrationNumber)" :class="isChild ? 'pl-9' : ''">
             <p v-if="isPpr" class="ma-0">{{ item.registrationNumber }}</p>
             <p v-else-if="!isPpr && !isDraft(item)" style="font-size: 0.875rem;" class="ma-0">
-              {{ item.documentRegistrationNumber}}
+              {{ item.documentRegistrationNumber }}
             </p>
             <p class="ma-0" style="font-size: 0.75rem !important;">
               <b>{{ (isPpr ? 'Base Registration: ' : 'MHR Number: ')}}<br>{{ item.baseRegistrationNumber }}</b>
@@ -43,21 +43,7 @@
           <p v-else class="ma-0">
             <b>{{ item.baseRegistrationNumber || item.mhrNumber }}</b>
           </p>
-        </v-col>
-      </v-row>
-      <v-row no-gutters>
-        <v-col cols="2"></v-col>
-        <v-col>
-          <v-chip
-            v-if="!isPpr && !isChild && hasLien(item)"
-            class="badge-lien px-3 ml-1"
-            label x-small
-            color="darkGray"
-            text-color="white"
-            data-test-id="lien-badge"
-          >
-            <b>LIEN</b>
-          </v-chip>
+          <InfoChip v-if="!isPpr && !isChild && hasLien(item)" action="LIEN"></InfoChip>
         </v-col>
       </v-row>
     </td>
@@ -65,7 +51,7 @@
       v-if="inSelectedHeaders('registrationType') || inSelectedHeaders('registrationDescription')"
       :class="isChild || item.expanded ? $style['border-left']: ''"
     >
-      <div v-if="!!item.registrationType">
+      <div v-if="isPpr && !!item.registrationType">
         {{ getRegistrationType(item.registrationType) }}
         <span v-if="isPpr && !isChild"> - Base Registration</span>
       </div>
@@ -138,7 +124,7 @@
       v-if="inSelectedHeaders('registeringParty')"
       :class="isChild || item.expanded ? $style['border-left']: ''"
     >
-      {{ item.registeringParty || item.submittingParty || '' }}
+      {{ item.registeringParty || item.submittingParty }}
     </td>
     <td
       v-if="inSelectedHeaders('ownerNames')"
@@ -423,12 +409,13 @@
 import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
 import { getRegistrationSummary, mhRegistrationPDF, registrationPDF } from '@/utils'
 import { useGetters } from 'vuex-composition-helpers'
+import InfoChip from '@/components/common/InfoChip.vue'
 
 /* eslint-disable no-unused-vars */
 import { BaseHeaderIF, DraftResultIF, MhRegistrationSummaryIF, RegistrationSummaryIF } from '@/interfaces'
 /* eslint-enable no-unused-vars */
 import {
-  APIMhrDescriptionTypes,
+  APIMhrDescriptionTypes, APIMhrTypes,
   APIRegistrationTypes,
   APIStatusTypes,
   DraftTypes,
@@ -441,6 +428,7 @@ import moment from 'moment'
 
 export default defineComponent({
   name: 'TableRow',
+  components: { InfoChip },
   props: {
     isPpr: { type: Boolean, default: false },
     setAddRegEffect: { default: false },
@@ -606,7 +594,9 @@ export default defineComponent({
 
     const openMhr = (item: MhRegistrationSummaryIF): void => {
       emit('action', {
-        action: TableActions.OPEN,
+        action: item.registrationType === APIMhrTypes.MANUFACTURED_HOME_REGISTRATION
+          ? TableActions.EDIT_NEW_MHR
+          : TableActions.OPEN_MHR,
         mhrInfo: item
       })
     }
@@ -667,9 +657,10 @@ export default defineComponent({
     }
 
     const isDraft = (item: any): boolean => {
-      // RegistrationSummaryIF | DraftResultIF | MhrDraftTransferApiIF
+      // RegistrationSummaryIF | DraftResultIF | MhrDraftApiIF
       return props.isPpr
-        ? item.type !== undefined : (item.statusType === APIStatusTypes.DRAFT || item.statusType === undefined)
+        ? item.type !== undefined
+        : (item.statusType === APIStatusTypes.DRAFT || item.statusType === undefined || !item.mhrNumber)
     }
 
     const isExpired = (item: RegistrationSummaryIF): boolean => {
