@@ -311,8 +311,7 @@
                     :readonly="disableNameFields"
                   />
                 </template>
-                  Executor of the will is based on deceased owner with Grant of Probate
-                  with Will supporting document selected.
+                  {{ transfersContent.executorTooltip[getMhrTransferType.transferType] }}
               </v-tooltip>
             </v-col>
           </v-row>
@@ -444,6 +443,7 @@ import { useActions, useGetters } from 'vuex-composition-helpers'
 import { find } from 'lodash'
 import { useTransferOwners } from '@/composables'
 import { ActionTypes, HomeOwnerPartyTypes } from '@/enums'
+import { transfersContent } from '@/resources'
 
 interface FractionalOwnershipWithGroupIdIF extends MhrRegistrationFractionalOwnershipIF {
   groupId: number
@@ -486,12 +486,14 @@ export default defineComponent({
       getMhrRegistrationHomeOwnerGroups,
       getMhrTransferHomeOwnerGroups,
       getMhrTransferHomeOwners,
-      getMhrRegistrationValidationModel
+      getMhrRegistrationValidationModel,
+      getMhrTransferType
     } = useGetters<any>([
       'getMhrRegistrationHomeOwnerGroups',
       'getMhrTransferHomeOwnerGroups',
       'getMhrTransferHomeOwners',
-      'getMhrRegistrationValidationModel'
+      'getMhrRegistrationValidationModel',
+      'getMhrTransferType'
     ])
     const {
       setUnsavedChanges
@@ -528,6 +530,7 @@ export default defineComponent({
       isCurrentOwner,
       isTransferDueToDeath,
       isTransferToExecutorProbateWill,
+      isTransferToExecutorUnder25Will,
       hasCurrentOwnerChanges,
       disableNameFields,
       TransWill
@@ -569,7 +572,7 @@ export default defineComponent({
     }
 
     // TransWill flow: Pre-fill only new Owner as Executor (not when editing existing owner)
-    if (isTransferToExecutorProbateWill.value &&
+    if ((isTransferToExecutorProbateWill.value || isTransferToExecutorUnder25Will.value) &&
       TransWill.hasDeletedOwnersWithProbateGrant() &&
       !props.editHomeOwner) {
       TransWill.prefillOwnerAsExecutor(defaultHomeOwner)
@@ -772,6 +775,8 @@ export default defineComponent({
       isTransferToExecutorProbateWill,
       disableNameFields,
       HomeOwnerPartyTypes,
+      getMhrTransferType,
+      transfersContent,
       ...toRefs(localState)
     }
   }

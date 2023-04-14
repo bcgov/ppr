@@ -77,6 +77,11 @@
                     </template>
                     <span class="font-weight-bold">{{ item.tooltip.title }}:</span><br>
                     <li v-for="(item, index) in item.tooltip.bullets" :key="index">{{ item }}</li>
+                    <div v-if="item.tooltip.note">
+                      <br>
+                      <span class="font-weight-bold">Note:</span>
+                      {{ item.tooltip.note }}
+                    </div>
                   </v-tooltip>
                 </template>
               </template>
@@ -107,6 +112,8 @@
                 filled
                 :rules="declaredValueRules"
                 label="Amount in Canadian Dollars"
+                :hint="declaredHomeValueHint"
+                :persistent-hint="isDeclaredHitPersistent"
                 data-test-id="declared-value"
               />
               <span class="mt-4">.00</span>
@@ -122,7 +129,7 @@
 <script lang="ts">
 import { computed, defineComponent, reactive, ref, toRefs, watch } from '@vue/composition-api'
 import { BaseDialog } from '@/components/dialogs'
-import { ClientTransferTypes, StaffTransferTypes } from '@/resources'
+import { ClientTransferTypes, StaffTransferTypes, transfersContent, transfersErrors } from '@/resources'
 import { useGetters } from 'vuex-composition-helpers'
 import { changeTransferType } from '@/resources/dialogOptions'
 import { useInputRules, useTransferOwners } from '@/composables'
@@ -137,7 +144,7 @@ export default defineComponent({
   props: { validate: { type: Boolean, default: false } },
   components: { BaseDialog },
   setup (props, context) {
-    const { customRules, required, isNumber, maxLength } = useInputRules()
+    const { customRules, required, isNumber, maxLength, greaterThan } = useInputRules()
     const transferTypeSelectRef = ref(null)
     const declaredValueRef = ref(null)
 
@@ -167,9 +174,20 @@ export default defineComponent({
         return customRules(
           maxLength(7, true),
           isNumber(),
+          getMhrTransferType.value?.transferType === ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL
+            ? greaterThan(25000,
+              transfersErrors.declaredHomeValueMax[ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL])
+            : [],
           required('Enter declared value of home'))
       }),
       showFormError: computed(() => props.validate && !localState.isValid),
+      isDeclaredHitPersistent: computed(() =>
+        [ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL,
+          ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL].includes(getMhrTransferType.value?.transferType)
+      ),
+      declaredHomeValueHint: computed(() =>
+        transfersContent.declaredHomeValueHint[getMhrTransferType.value?.transferType]
+      ),
       transferTypeRules: required('Select transfer type')
     })
 
@@ -258,6 +276,7 @@ export default defineComponent({
       changeTransferType,
       handleTypeChange,
       handleTypeChangeDialogResp,
+      transfersContent,
       ...toRefs(localState)
     }
   }

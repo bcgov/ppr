@@ -21,7 +21,7 @@
       <template
         v-slot:header
         v-if="isMhrTransfer && !hasActualOwners(homeOwners) && homeOwners.length > 0 &&
-          hasRemovedAllHomeOwnerGroups() && !isTransferToExecutorProbateWill"
+          hasRemovedAllHomeOwnerGroups() && !isTransferToExecutorProbateWill && !isTransferToExecutorUnder25Will"
       >
         <tr class="fs-14 text-center no-owners-head-row" data-test-id="no-data-msg">
           <td class="pa-6" :colspan="homeOwnersTableHeaders.length">
@@ -52,8 +52,7 @@
       <template v-slot:item="row" v-if="homeOwners.length">
 
         <!-- Transfer scenario: Display error for groups that 'removed' all owners but they still exist in the table -->
-        <tr v-if="isGroupWithNoOwners(row.item, row.index) ||
-          (isTransferToExecutorProbateWill && isTransferGroupValid(row.item.groupId, row.index))"
+        <tr v-if="isGroupWithNoOwners(row.item, row.index) || isTransferGroupValid(row.item.groupId, row.index)"
         >
           <td :colspan="4"
             class="py-1"
@@ -65,7 +64,7 @@
               :data-test-id="`no-owners-msg-group-${homeOwners.indexOf(row.item)}`"
             >
               <!-- Transfer Will error messages -->
-              <span v-if="isTransferToExecutorProbateWill">
+              <span v-if="isTransferToExecutorProbateWill || isTransferToExecutorUnder25Will">
                 <span v-if="!TransWill.hasExecutorsInGroup(row.item.groupId) &&
                   getMhrTransferHomeOwnerGroups.length === 1">
                     Must contain at least one executor.
@@ -332,6 +331,7 @@
                 :validate="validateTransfer"
                 :isSecondOptionDisabled="TransWill.hasOnlyOneOwnerInGroup(row.item.groupId)"
                 :isSecondOptionError="isAllGroupOwnersWithDeathCerts(row.item.groupId)"
+                :hasDeathCertForFirstOption="isTransferToExecutorUnder25Will"
                 @handleDocOptionOneSelected="TransWill.resetGrantOfProbate(row.item.groupId, row.item.ownerId)"
               >
                 <template v-slot:deathCert>
@@ -433,6 +433,7 @@ export default defineComponent({
       getCurrentOwnerStateById,
       isTransferToSurvivingJointTenant,
       isTransferToExecutorProbateWill,
+      isTransferToExecutorUnder25Will,
       groupHasRemovedAllCurrentOwners,
       moveCurrentOwnersToPreviousOwners,
       TransWill
@@ -610,7 +611,8 @@ export default defineComponent({
 
     // validate group for Will Transfers
     const isTransferGroupValid = (groupId: number, index) => {
-      return (
+      return (isTransferToExecutorProbateWill.value || isTransferToExecutorUnder25Will.value) &&
+      (
         index === 0 &&
         hasUnsavedChanges.value &&
         (TransWill.hasSomeOwnersRemoved(groupId) || TransWill.hasExecutorsInGroup(groupId))
@@ -711,6 +713,7 @@ export default defineComponent({
       isDisabledForSJTChanges,
       isDisabledForWillChanges,
       isTransferToExecutorProbateWill,
+      isTransferToExecutorUnder25Will,
       isCurrentOwner,
       mhrDeceasedOwnerChanges,
       removeOwnerHandler,
