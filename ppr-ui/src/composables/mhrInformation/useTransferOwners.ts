@@ -17,6 +17,7 @@ import { computed, reactive, toRefs } from '@vue/composition-api'
 import { isEqual, find } from 'lodash'
 import { normalizeObject } from '@/utils'
 import { useHomeOwners } from '@/composables'
+import { transferSupportingDocumentTypes } from '@/resources/'
 
 /**
  * Composable to handle Ownership functionality and permissions specific to the varying Transfer of Ownership filings.
@@ -86,6 +87,11 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     return getMhrTransferType.value?.transferType === ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL
   })
 
+  /** Returns true when the selected transfer type is a 'TO_EXECUTOR_PROBATE_WILL' scenario **/
+  const isTransferToExecutorUnder25Will = computed((): boolean => {
+    return getMhrTransferType.value?.transferType === ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL
+  })
+
   /** Returns true when the selected transfer type is a 'SURVIVING_JOINT_TENANT' scenario **/
   const isTransferToSurvivingJointTenant = computed((): boolean => {
     return getMhrTransferType.value?.transferType === ApiTransferTypes.SURVIVING_JOINT_TENANT
@@ -108,13 +114,13 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
 
   /** Conditionally show DeathCertificate based on Transfer Type **/
   const showDeathCertificate = (): boolean => {
-    return getMhrTransferType.value?.transferType === ApiTransferTypes.SURVIVING_JOINT_TENANT ||
-           getMhrTransferType.value?.transferType === ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL
+    return getMhrTransferType.value?.transferType === ApiTransferTypes.SURVIVING_JOINT_TENANT
   }
 
   /** Conditionally show Grant of Probate with Will supporting options based on Transfer Type **/
   const showSupportingDocuments = (): boolean => {
-    return getMhrTransferType.value?.transferType === ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL
+    return getMhrTransferType.value?.transferType === ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL ||
+      getMhrTransferType.value?.transferType === ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL
   }
 
   /** Conditionally Enable HomeOwner Changes based on Transfer Type **/
@@ -125,6 +131,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     switch (getMhrTransferType.value?.transferType) {
       case ApiTransferTypes.SALE_OR_GIFT:
       case ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL:
+      case ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL:
         return true // Always enable for Sale or Gift
       case ApiTransferTypes.SURVIVING_JOINT_TENANT:
         // Check for joint tenancy (at least two owners who are not executors, trustees or admins)
@@ -142,7 +149,8 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     switch (getMhrTransferType.value?.transferType) {
       case ApiTransferTypes.SALE_OR_GIFT:
       case ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL:
-        return true // Always enable for Sale or Gift and Executor Will
+      case ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL:
+        return true
       case ApiTransferTypes.SURVIVING_JOINT_TENANT:
         return false // Disable for Surviving Joint Tenants
       default:
@@ -159,6 +167,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       case ApiTransferTypes.SALE_OR_GIFT:
         return true // Always enable for Sale or Gift
       case ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL:
+      case ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL:
       case ApiTransferTypes.SURVIVING_JOINT_TENANT:
         return false // Disable for Surviving Joint Tenants
       default:
@@ -174,6 +183,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     switch (getMhrTransferType.value?.transferType) {
       case ApiTransferTypes.SALE_OR_GIFT:
       case ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL:
+      case ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL:
         return true // Always enable for Sale or Gift and Executor Will
       case ApiTransferTypes.SURVIVING_JOINT_TENANT:
         // Check for joint tenancy (at least two owners who are not executors, trustees or admins)
@@ -192,6 +202,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       case ApiTransferTypes.SALE_OR_GIFT:
         return false // Disable for Sale or Gift
       case ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL:
+      case ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL:
         return owner.action === ActionTypes.ADDED
       case ApiTransferTypes.SURVIVING_JOINT_TENANT:
         // Check for joint tenancy (at least two owners who are not executors, trustees or admins)
@@ -208,6 +219,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
 
     switch (getMhrTransferType.value?.transferType) {
       case ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL:
+      case ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL:
         return false // Disable for Grant of Probate with Will
       default:
         return true
@@ -235,7 +247,8 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
 
   // Disable Delete button for all Owners that are not in the Group of initially deleted owner (WILL transfer flow)
   const isDisabledForWillChanges = (owner: MhrRegistrationHomeOwnerIF): boolean => {
-    if (getMhrTransferType.value?.transferType === ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL) {
+    if (getMhrTransferType.value?.transferType === ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL ||
+        getMhrTransferType.value?.transferType === ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL) {
       const hasDeletedOwners = getMhrTransferHomeOwnerGroups.value.some(group =>
         group.owners.some(owner => owner.action === ActionTypes.REMOVED))
 
@@ -255,6 +268,10 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
 
   // Transfer Will flow and all the related conditions/logic
   const TransWill: any = {
+    // based on the current/active transfer type, get the corresponding supporting document
+    getSupportingDocForActiveTransfer: (): ApiTransferTypes => {
+      return transferSupportingDocumentTypes[getMhrTransferType.value?.transferType]
+    },
     isValidTransfer: computed((): boolean => {
       // check if there is a group that is valid for WILL transfer
       return getMhrTransferHomeOwnerGroups.value.some(group => TransWill.isValidGroup(group))
@@ -270,14 +287,14 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     },
     // check if supportingDocument is either Death Certificate or Grant of Probate
     hasValidSupportDocs: (owner: MhrRegistrationHomeOwnerIF): boolean => {
-      let hasValidDeathCertOrProbateGrant = false
+      let hasValidSupportingDoc = false
       if (owner.supportingDocument === SupportingDocumentsOptions.DEATH_CERT) {
-        hasValidDeathCertOrProbateGrant = owner.hasDeathCertificate &&
+        hasValidSupportingDoc = owner.hasDeathCertificate &&
           !!owner.deathCertificateNumber && !!owner.deathDateTime
       } else {
-        hasValidDeathCertOrProbateGrant = owner.supportingDocument === SupportingDocumentsOptions.PROBATE_GRANT
+        hasValidSupportingDoc = owner.supportingDocument === TransWill.getSupportingDocForActiveTransfer()
       }
-      return hasValidDeathCertOrProbateGrant && owner.action === ActionTypes.REMOVED
+      return hasValidSupportingDoc && owner.action === ActionTypes.REMOVED
     },
     hasOnlyOneOwnerInGroup: (groupId): boolean => {
       return getMhrTransferHomeOwnerGroups.value
@@ -306,16 +323,20 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       return getMhrTransferHomeOwners.value.some(owner =>
         owner.supportingDocument === SupportingDocumentsOptions.DEATH_CERT)
     },
-    // Check if there's a deleted Owner with selected Grant of Probate as a supporting document.
-    hasDeletedOwnersWithProbateGrant: (): boolean => {
+    // Check if there's a deleted Owner with selected Grant of Probate or Affidavit as a supporting document.
+    hasDeletedOwnersWithProbateGrantOrAffidavit: (): boolean => {
       return getMhrTransferHomeOwnerGroups.value.some(group =>
-        group.owners.some(owner => owner.supportingDocument === SupportingDocumentsOptions.PROBATE_GRANT)
-      )
+        group.owners.some(owner =>
+          owner.supportingDocument === TransWill.getSupportingDocForActiveTransfer()))
     },
     prefillOwnerAsExecutor: (owner: MhrRegistrationHomeOwnerIF): void => {
       const allOwners = getMhrTransferHomeOwners.value
       const deletedOwnerGroup = find(getMhrTransferHomeOwnerGroups.value, { owners: [{ action: ActionTypes.REMOVED }] })
-      const deletedOwner = find(deletedOwnerGroup.owners, { action: ActionTypes.REMOVED, supportingDocument: SupportingDocumentsOptions.PROBATE_GRANT }) as MhrRegistrationHomeOwnerIF
+      const supportingDocOfTheTransferType = TransWill.getSupportingDocForActiveTransfer()
+      const deletedOwner = find(deletedOwnerGroup.owners, {
+        action: ActionTypes.REMOVED,
+        supportingDocument: supportingDocOfTheTransferType
+      }) as MhrRegistrationHomeOwnerIF
 
       Object.assign(owner, {
         ownerId: allOwners.length + 1,
@@ -328,7 +349,8 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     },
     updateExecutorSuffix: (): boolean => {
       const deceasedOwners = getMhrTransferHomeOwners.value
-        .filter(owner => owner.action === ActionTypes.REMOVED && owner.supportingDocument === SupportingDocumentsOptions.PROBATE_GRANT)
+        .filter(owner => owner.action === ActionTypes.REMOVED &&
+          owner.supportingDocument === TransWill.getSupportingDocForActiveTransfer())
 
       return TransWill.addRemoveExecutorSuffix(deceasedOwners[0] || null)
     },
@@ -479,6 +501,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     isTransferDueToDeath,
     isTransferToSurvivingJointTenant,
     isTransferToExecutorProbateWill,
+    isTransferToExecutorUnder25Will,
     disableNameFields,
     isJointTenancyStructure,
     getCurrentOwnerStateById,

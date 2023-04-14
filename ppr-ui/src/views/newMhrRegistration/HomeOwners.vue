@@ -136,8 +136,12 @@
         <v-col
           class="transfer-table-error"
         >
-          <div class="error-text fs-12" v-if="showError && hasHomeOwnersTableErrors" data-test-id="transfer-table-error">
-            You must delete a deceased owner using Grant of Probate with Will before adding an executor
+          <div
+            v-if="showError && hasHomeOwnersTableErrors"
+            class="error-text fs-12"
+            data-test-id="transfer-table-error"
+          >
+            {{ transfersErrors.noSupportingDocSelected[getMhrTransferType.transferType] }}
           </div>
         </v-col>
       </v-row>
@@ -294,6 +298,7 @@ import { useHomeOwners, useMhrValidations, useMhrInformation, useTransferOwners 
 import { MhrRegistrationTotalOwnershipAllocationIF } from '@/interfaces'
 import { ActionTypes } from '@/enums'
 /* eslint-enable no-unused-vars */
+import { transfersErrors } from '@/resources'
 
 export default defineComponent({
   name: 'HomeOwners',
@@ -325,6 +330,7 @@ export default defineComponent({
       getMhrTransferCurrentHomeOwnerGroups,
       getMhrRegistrationValidationModel,
       hasUnsavedChanges,
+      getMhrTransferType,
       getMhrTransferDeclaredValue
     } = useGetters<any>([
       'getMhrRegistrationHomeOwners',
@@ -332,6 +338,7 @@ export default defineComponent({
       'getMhrTransferCurrentHomeOwnerGroups',
       'getMhrRegistrationValidationModel',
       'hasUnsavedChanges',
+      'getMhrTransferType',
       'getMhrTransferDeclaredValue'
     ])
 
@@ -345,6 +352,7 @@ export default defineComponent({
       enableDeleteAllGroupsActions,
       isTransferDueToDeath,
       isTransferToExecutorProbateWill,
+      isTransferToExecutorUnder25Will,
       TransWill
     } = useTransferOwners(!props.isMhrTransfer)
 
@@ -382,8 +390,8 @@ export default defineComponent({
       // capture different errors in the table to turn off Add Owner buttons and show error
       hasHomeOwnersTableErrors: computed(
         () => {
-          return (isTransferToExecutorProbateWill.value)
-            ? !TransWill.hasDeletedOwnersWithProbateGrant() : false
+          return (isTransferToExecutorProbateWill.value || isTransferToExecutorUnder25Will.value)
+            ? !TransWill.hasDeletedOwnersWithProbateGrantOrAffidavit() : false
         }
       ),
       showError: false,
@@ -535,7 +543,11 @@ export default defineComponent({
       removeAllOwnersHandler,
       hideShowRemovedOwners,
       isValidTransferOwners,
+      isTransferToExecutorProbateWill,
+      isTransferToExecutorUnder25Will,
       hasUnsavedChanges,
+      getMhrTransferType,
+      transfersErrors,
       getUiTransferType,
       enableAddHomeOwners,
       enableHomeOwnerChanges,

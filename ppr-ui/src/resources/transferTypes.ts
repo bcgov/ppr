@@ -54,7 +54,8 @@ export const StaffTransferTypes: Array<TransferTypeSelectIF> = [
       title: 'Supporting Documents Required',
       bullets: ['Ownership Transfer or Change form',
         'Court certified true copy of the Grant of Probate with the will attached.',
-        'Original or certified copy of death certificate issued from Canada or the United States for deceased joint tenants, if any, except for the person who last died. ']
+        'Original or certified copy of death certificate issued from Canada or the United States ' +
+        'for deceased joint tenants, if any, except for the person who last died. ']
     }
   },
   {
@@ -65,8 +66,13 @@ export const StaffTransferTypes: Array<TransferTypeSelectIF> = [
     group: 2,
     tooltip: {
       title: 'Supporting Documents Required',
-      bullets: ['Original signed Affidavit of Executor form', 'Death Certificate',
-        'Transfer form (deceased to Executor transfer)', 'Transfer fee']
+      bullets: ['Ownership Transfer or Change form',
+        'Original signed Affidavit of Executor form',
+        'Certified true copy of will',
+        'Original or certified copy of death certificate issued from Canada or the United States.'
+      ],
+      note: 'Value of the estate must be no more than $25,000, ' +
+        'including the total value of the manufactured home.'
     }
   },
   {

@@ -34,6 +34,7 @@
       <p class="fs-16">
         <strong>Note:</strong> {{ docOptions.optionOne.note }}
       </p>
+      <slot name="deathCert" v-if="hasDeathCertForFirstOption"></slot>
     </div>
     <div v-if="deletedOwnerState.supportingDocument === docOptions.optionTwo.value"
       class="supporting-doc-two">
@@ -44,7 +45,7 @@
 
 <script lang="ts">
 import { useHomeOwners, useTransferOwners } from '@/composables'
-import { ApiTransferTypes, SupportingDocumentsOptions } from '@/enums/transferTypes'
+import { SupportingDocumentsOptions } from '@/enums/transferTypes'
 import { MhrRegistrationHomeOwnerIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { defineComponent, reactive, toRefs, watch, computed } from '@vue/composition-api'
 import { useActions } from 'vuex-composition-helpers'
@@ -70,6 +71,10 @@ export default defineComponent({
     },
     // Used to show error for Death Cert radio button
     isSecondOptionError: {
+      type: Boolean,
+      default: false
+    },
+    hasDeathCertForFirstOption: {
       type: Boolean,
       default: false
     }
@@ -115,15 +120,14 @@ export default defineComponent({
     watch(() => localState.deletedOwnerState.supportingDocument, () => {
       updateDeletedOwner()
       // Only one Grant of Probate document can be selected for the group
-      if (localState.deletedOwnerState.supportingDocument === SupportingDocumentsOptions.PROBATE_GRANT) {
+      if (localState.deletedOwnerState.supportingDocument === SupportingDocumentsOptions.PROBATE_GRANT ||
+        localState.deletedOwnerState.supportingDocument === SupportingDocumentsOptions.AFFIDAVIT) {
         emit('handleDocOptionOneSelected')
       }
     })
 
     return {
       SupportingDocumentsOptions,
-      transferSupportingDocuments,
-      ApiTransferTypes,
       isGlobalEditingMode,
       ...toRefs(localState)
     }
@@ -162,6 +166,7 @@ export default defineComponent({
 
     .selected-radio {
       border: 1px solid $app-blue;
+      background-color: white;
     }
 
   }
