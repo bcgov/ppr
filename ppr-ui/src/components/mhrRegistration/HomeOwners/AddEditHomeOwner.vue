@@ -295,6 +295,7 @@
                 right
                 content-class="right-tooltip pa-5"
                 transition="fade-transition"
+                nudge-top="12"
               >
                 <template v-slot:activator="{ on }">
                   <v-text-field
@@ -311,7 +312,7 @@
                     :readonly="disableNameFields"
                   />
                 </template>
-                  {{ transfersContent.executorTooltip[getMhrTransferType.transferType] }}
+                  {{ isMhrTransfer && transfersContent.executorTooltip[getMhrTransferType.transferType] }}
               </v-tooltip>
             </v-col>
           </v-row>
