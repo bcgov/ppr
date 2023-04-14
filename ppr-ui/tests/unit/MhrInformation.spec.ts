@@ -9,7 +9,7 @@ import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
 import { HomeOwners, MhrInformation } from '@/views'
 import { AccountInfo, StickyContainer, CertifyInformation, SharedDatePicker } from '@/components/common'
 import mockRouter from './MockRouter'
-import { AuthRoles, HomeTenancyTypes, RouteNames } from '@/enums'
+import { AuthRoles, HomeTenancyTypes, RouteNames, ApiTransferTypes, UITransferTypes } from '@/enums'
 import { HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
 import { getTestId } from './utils'
 import {
@@ -646,6 +646,139 @@ describe('Mhr Information', () => {
     expect(confirmCompletionCard.classes('border-error-left')).toBeFalsy()
     expect(confirmCompletionCard.find(getTestId('confirm-completion-checkbox')).exists()).toBeTruthy()
     expect(confirmCompletionCard.find('.confirm-checkbox').text()).toContain(LEGAL_NAME)
+  })
+
+  it('SALE OR GIFT Flow: display correct Confirm Completion sections', async () => {
+    setupCurrentHomeOwners()
+    wrapper.vm.$data.dataLoaded = true
+    wrapper.vm.$data.showMhrFeeSummary = true
+    await Vue.nextTick()
+
+    expect(wrapper.find('#transfer-confirm-section').exists()).toBeFalsy()
+
+    // Set Wrapper Validations
+    wrapper.vm.setValidation('isValidTransferType', true)
+    wrapper.vm.setValidation('isValidTransferOwners', true)
+    wrapper.vm.setValidation('isTransferDetailsValid', true)
+
+    await triggerUnsavedChange()
+    await enterTransferDetailsFields(wrapper.findComponent(TransferDetails))
+    await store.dispatch('setMhrTransferType', {
+      transferType: ApiTransferTypes.SALE_OR_GIFT,
+      textLabel: UITransferTypes.SALE_OR_GIFT
+    })
+    await wrapper.find('#btn-stacked-submit').trigger('click')
+    await Vue.nextTick()
+
+    expect(wrapper.find('#transfer-confirm-section').exists()).toBeTruthy()
+
+    const confirmCompletionCard = wrapper.find(getTestId('confirm-completion-card'))
+    expect(confirmCompletionCard.exists()).toBeTruthy()
+    expect(confirmCompletionCard.classes('border-error-left')).toBeFalsy()
+    expect(confirmCompletionCard.find(getTestId('confirm-completion-checkbox')).exists()).toBeTruthy()
+    expect(confirmCompletionCard.find('.confirm-checkbox').text()).toContain(LEGAL_NAME)
+
+    // Contains Sale or Gift Flow Sections
+    expect(confirmCompletionCard.find(getTestId('bill-of-sale-section')).exists()).toBeTruthy()
+    expect(confirmCompletionCard.find(getTestId('change-ownership-section')).exists()).toBeFalsy()
+    expect(confirmCompletionCard.find(getTestId('confirm-search-section')).exists()).toBeTruthy()
+    expect(confirmCompletionCard.find(getTestId('ppr-lien-section')).exists()).toBeTruthy()
+
+    // Doesn't contain any other flow sections
+    expect(confirmCompletionCard.find(getTestId('death-certificate-section')).exists()).toBeFalsy()
+
+    // Verify different section 2 is displayed for staff
+    await store.dispatch('setAuthRoles', [AuthRoles.STAFF])
+
+    expect(confirmCompletionCard.find(getTestId('bill-of-sale-section')).exists()).toBeTruthy()
+    expect(confirmCompletionCard.find(getTestId('change-ownership-section')).exists()).toBeTruthy()
+    expect(confirmCompletionCard.find(getTestId('confirm-search-section')).exists()).toBeTruthy()
+    expect(confirmCompletionCard.find(getTestId('ppr-lien-section')).exists()).toBeTruthy()
+
+    await store.dispatch('setAuthRoles', [AuthRoles.MHR])
+  })
+
+  it('SURVIVING JOINT TENANT Flow: display correct Confirm Completion sections', async () => {
+    setupCurrentHomeOwners()
+    wrapper.vm.$data.dataLoaded = true
+    wrapper.vm.$data.showMhrFeeSummary = true
+    await Vue.nextTick()
+    await store.dispatch('setAuthRoles', [AuthRoles.STAFF])
+
+    expect(wrapper.find('#transfer-confirm-section').exists()).toBeFalsy()
+
+    // Set Wrapper Validations
+    wrapper.vm.setValidation('isValidTransferType', true)
+    wrapper.vm.setValidation('isValidTransferOwners', true)
+    wrapper.vm.setValidation('isTransferDetailsValid', true)
+
+    await triggerUnsavedChange()
+    await enterTransferDetailsFields(wrapper.findComponent(TransferDetails))
+    await store.dispatch('setMhrTransferType', {
+      transferType: ApiTransferTypes.SURVIVING_JOINT_TENANT,
+      textLabel: UITransferTypes.SURVIVING_JOINT_TENANT
+    })
+    await wrapper.find('#btn-stacked-submit').trigger('click')
+    await Vue.nextTick()
+
+    expect(wrapper.find('#transfer-confirm-section').exists()).toBeTruthy()
+
+    const confirmCompletionCard = wrapper.find(getTestId('confirm-completion-card'))
+    expect(confirmCompletionCard.exists()).toBeTruthy()
+    expect(confirmCompletionCard.classes('border-error-left')).toBeFalsy()
+    expect(confirmCompletionCard.find(getTestId('confirm-completion-checkbox')).exists()).toBeTruthy()
+    expect(confirmCompletionCard.find('.confirm-checkbox').text()).toContain(LEGAL_NAME)
+
+    // Contains Surviving Joint Tenant Flow Sections
+    expect(confirmCompletionCard.find(getTestId('death-certificate-section')).exists()).toBeTruthy()
+    expect(confirmCompletionCard.find(getTestId('change-ownership-section')).exists()).toBeTruthy()
+    expect(confirmCompletionCard.find(getTestId('ppr-lien-section')).exists()).toBeTruthy()
+
+    // Doesn't contain any other flow sections
+    expect(confirmCompletionCard.find(getTestId('confirm-search-section')).exists()).toBeFalsy()
+    await store.dispatch('setAuthRoles', [AuthRoles.MHR])
+  })
+
+  it('TRANS WILL Flow: display correct Confirm Completion sections', async () => {
+    setupCurrentHomeOwners()
+    wrapper.vm.$data.dataLoaded = true
+    wrapper.vm.$data.showMhrFeeSummary = true
+    await Vue.nextTick()
+    await store.dispatch('setAuthRoles', [AuthRoles.STAFF])
+
+    expect(wrapper.find('#transfer-confirm-section').exists()).toBeFalsy()
+
+    // Set Wrapper Validations
+    wrapper.vm.setValidation('isValidTransferType', true)
+    wrapper.vm.setValidation('isValidTransferOwners', true)
+    wrapper.vm.setValidation('isTransferDetailsValid', true)
+
+    await triggerUnsavedChange()
+    await enterTransferDetailsFields(wrapper.findComponent(TransferDetails))
+    await store.dispatch('setMhrTransferType', {
+      transferType: ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL,
+      textLabel: UITransferTypes.TO_EXECUTOR_PROBATE_WILL
+    })
+    await wrapper.find('#btn-stacked-submit').trigger('click')
+    await Vue.nextTick()
+
+    expect(wrapper.find('#transfer-confirm-section').exists()).toBeTruthy()
+
+    const confirmCompletionCard = wrapper.find(getTestId('confirm-completion-card'))
+    expect(confirmCompletionCard.exists()).toBeTruthy()
+    expect(confirmCompletionCard.classes('border-error-left')).toBeFalsy()
+    expect(confirmCompletionCard.find(getTestId('confirm-completion-checkbox')).exists()).toBeTruthy()
+    expect(confirmCompletionCard.find('.confirm-checkbox').text()).toContain(LEGAL_NAME)
+
+    // Contains Executor Will Flow Sections
+    expect(confirmCompletionCard.find(getTestId('death-certificate-section')).exists()).toBeTruthy()
+    expect(confirmCompletionCard.find(getTestId('change-ownership-section')).exists()).toBeTruthy()
+    expect(confirmCompletionCard.find(getTestId('probate-will-section')).exists()).toBeTruthy()
+    expect(confirmCompletionCard.find(getTestId('ppr-lien-section')).exists()).toBeTruthy()
+
+    // Doesn't contain any other flow sections
+    expect(confirmCompletionCard.find(getTestId('confirm-search-section')).exists()).toBeFalsy()
+    await store.dispatch('setAuthRoles', [AuthRoles.MHR])
   })
 
   it('should render read only home owners on the Review screen', async () => {

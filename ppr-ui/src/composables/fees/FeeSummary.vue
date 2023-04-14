@@ -12,7 +12,7 @@
         >
           <div :class="$style['fee-list__item-name']">
             {{ feeLabel }}
-            <div v-if="isMhrTransfer" :class="[$style['fee-list__hint'], 'pt-2']">
+            <div id="transfer-type-text" v-if="isMhrTransfer" :class="[$style['fee-list__hint'], 'pt-2']">
               {{ transferType ? transferType : 'Select Transfer Type' }}
             </div>
           </div>

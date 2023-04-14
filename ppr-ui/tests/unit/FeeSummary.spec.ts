@@ -9,7 +9,7 @@ import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import { FeeSummary } from '@/composables/fees'
 import { FeeSummaryI, RegistrationLengthI } from '@/composables/fees/interfaces' // eslint-disable-line no-unused-vars
 import { FeeSummaryTypes } from '@/composables/fees/enums'
-import { UIRegistrationTypes } from '@/enums'
+import { ApiTransferTypes, UIRegistrationTypes, UITransferTypes } from '@/enums'
 import { StateModelIF } from '@/interfaces'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces' // eslint-disable-line no-unused-vars
 
@@ -775,5 +775,104 @@ describe('FeeSummary component tests', () => {
     expect(wrapper.find('#certify-fee').exists()).toBe(true)
     expect(wrapper.find('#certify-fee').text()).toContain('Certified search')
     expect(wrapper.find('#certify-fee').text()).toContain('$ 25.00')
+  })
+
+  it('renders fee for Staff Sale or Gift Transfer', async () => {
+    const state = wrapper.vm.$store.state.stateModel as StateModelIF
+    state.authorization.authRoles = ['staff']
+    state.search.searchCertified = false
+
+    await wrapper.setProps({
+      setFeeType: FeeSummaryTypes.MHR_TRANSFER,
+      setRegistrationLength: null,
+      setRegistrationType: null,
+      setStaffClientPayment: true
+    })
+
+    // Fee summary not updated until Transfer Type is selected
+    expect(wrapper.findComponent(FeeSummary).exists()).toBe(true)
+    expect(wrapper.vm.$data.feeLabel).toBe('Ownership Transfer or Change')
+    expect(wrapper.find('#transfer-type-text').text()).toContain('Select Transfer Type')
+
+    await wrapper.setProps({
+      transferType: UITransferTypes.SALE_OR_GIFT
+    })
+
+    expect(wrapper.vm.$data.feeType).toBe(FeeSummaryTypes.MHR_TRANSFER)
+    expect(wrapper.vm.$data.registrationType).toBe(null)
+    expect(wrapper.vm.$data.feeLabel).toBe('Ownership Transfer or Change')
+    expect(wrapper.find('#transfer-type-text').text()).toContain('Transfer Due to Sale or Gift')
+    expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(50)
+    expect(wrapper.vm.$data.feeSummary.quantity).toBe(1)
+    expect(wrapper.find('#processing-fee-summary').exists()).toBe(false)
+    expect(wrapper.vm.$data.totalFees).toBe(50)
+    expect(wrapper.vm.$data.totalAmount).toBe(50)
+    expect(wrapper.vm.$data.isComplete).toBe(true)
+  })
+
+  it('renders fee for SJT Transfer', async () => {
+    const state = wrapper.vm.$store.state.stateModel as StateModelIF
+    state.authorization.authRoles = ['staff']
+    state.search.searchCertified = false
+
+    await wrapper.setProps({
+      setFeeType: FeeSummaryTypes.MHR_TRANSFER,
+      setRegistrationLength: null,
+      setRegistrationType: null,
+      setStaffClientPayment: true
+    })
+
+    // Fee summary not updated until Transfer Type is selected
+    expect(wrapper.findComponent(FeeSummary).exists()).toBe(true)
+    expect(wrapper.vm.$data.feeLabel).toBe('Ownership Transfer or Change')
+    expect(wrapper.find('#transfer-type-text').text()).toContain('Select Transfer Type')
+
+    await wrapper.setProps({
+      transferType: UITransferTypes.SURVIVING_JOINT_TENANT
+    })
+
+    expect(wrapper.vm.$data.feeType).toBe(FeeSummaryTypes.MHR_TRANSFER)
+    expect(wrapper.vm.$data.registrationType).toBe(null)
+    expect(wrapper.vm.$data.feeLabel).toBe('Ownership Transfer or Change')
+    expect(wrapper.find('#transfer-type-text').text()).toContain('Transfer to Surviving Joint Tenant(s)')
+    expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(50)
+    expect(wrapper.vm.$data.feeSummary.quantity).toBe(1)
+    expect(wrapper.find('#processing-fee-summary').exists()).toBe(false)
+    expect(wrapper.vm.$data.totalFees).toBe(50)
+    expect(wrapper.vm.$data.totalAmount).toBe(50)
+    expect(wrapper.vm.$data.isComplete).toBe(true)
+  })
+
+  it('renders fee for TRANS WILL Transfer', async () => {
+    const state = wrapper.vm.$store.state.stateModel as StateModelIF
+    state.authorization.authRoles = ['staff']
+    state.search.searchCertified = false
+
+    await wrapper.setProps({
+      setFeeType: FeeSummaryTypes.MHR_TRANSFER,
+      setRegistrationLength: null,
+      setRegistrationType: null,
+      setStaffClientPayment: true
+    })
+
+    // Fee summary not updated until Transfer Type is selected
+    expect(wrapper.findComponent(FeeSummary).exists()).toBe(true)
+    expect(wrapper.vm.$data.feeLabel).toBe('Ownership Transfer or Change')
+    expect(wrapper.find('#transfer-type-text').text()).toContain('Select Transfer Type')
+
+    await wrapper.setProps({
+      transferType: UITransferTypes.TO_EXECUTOR_PROBATE_WILL
+    })
+
+    expect(wrapper.vm.$data.feeType).toBe(FeeSummaryTypes.MHR_TRANSFER)
+    expect(wrapper.vm.$data.registrationType).toBe(null)
+    expect(wrapper.vm.$data.feeLabel).toBe('Ownership Transfer or Change')
+    expect(wrapper.find('#transfer-type-text').text()).toContain('Transfer to Executor - Grant of Probate with Will')
+    expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(50)
+    expect(wrapper.vm.$data.feeSummary.quantity).toBe(1)
+    expect(wrapper.find('#processing-fee-summary').exists()).toBe(false)
+    expect(wrapper.vm.$data.totalFees).toBe(50)
+    expect(wrapper.vm.$data.totalAmount).toBe(50)
+    expect(wrapper.vm.$data.isComplete).toBe(true)
   })
 })
