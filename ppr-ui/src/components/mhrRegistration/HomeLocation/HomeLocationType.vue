@@ -241,21 +241,25 @@ export default defineComponent({
       setValidation
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
+    // Home location store properties
+    const { additionalDescription, dealerName, legalDescription, locationType, pad, pidNumber, parkName, otherType } =
+      getMhrRegistrationLocation.value
+
     const localState = reactive({
       isValidLot: false,
       isValidHomePark: false,
       isVerifyingPid: false,
       isValidLocationInfo: false,
-      locationTypeOption: getMhrRegistrationLocation.value?.locationType || HomeLocationTypes,
-      otherTypeOption: getMhrRegistrationLocation.value?.otherType || HomeLocationTypes,
-      dealerManufacturerLot: getMhrRegistrationLocation.value?.dealerName || '',
-      homeParkName: getMhrRegistrationLocation.value?.parkName || '',
-      homeParkPad: getMhrRegistrationLocation.value?.pad || '',
-      pidNumber: getMhrRegistrationLocation.value?.pidNumber || '',
+      locationTypeOption: locationType || HomeLocationTypes,
+      otherTypeOption: otherType || HomeLocationTypes,
+      dealerManufacturerLot: dealerName || '',
+      homeParkName: parkName || '',
+      homeParkPad: pad || '',
+      pidNumber: pidNumber || '',
       showLocationInfo: false,
       locationInfo: {},
-      legalDescription: getMhrRegistrationLocation.value?.legalDescription || '',
-      additionalDescription: getMhrRegistrationLocation.value?.additionalDescription || '',
+      legalDescription: legalDescription || '',
+      additionalDescription: additionalDescription || '',
       dealerManufacturerLotRules: computed(() => {
         return localState.locationTypeOption as any === HomeLocationTypes.LOT
           ? customRules(required('Enter a dealer or manufacturer name'), maxLength(60))
@@ -355,6 +359,7 @@ export default defineComponent({
       localState.dealerManufacturerLot = ''
       localState.toggleInfoForm = false
       setIsManualLocation(false)
+      localState.legalDescription = ''
       localState.locationInfo = resetLocationInfoFields(localState.locationInfo)
       validateForms()
     })
@@ -365,6 +370,7 @@ export default defineComponent({
       localState.showLocationInfo = false
       localState.toggleInfoForm = false
       setIsManualLocation(false)
+      localState.legalDescription = ''
       localState.locationInfo = resetLocationInfoFields(localState.locationInfo)
     })
     watch(() => localState.validate, () => {
