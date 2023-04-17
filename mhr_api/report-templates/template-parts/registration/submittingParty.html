@@ -27,7 +27,10 @@
                      {{ submittingParty.address.country }}</div>
             </td>
             <td class="col-33">
-                {% if registrationType in ('TRANS', 'TRAND')  %}
+                {% if meta_account_id == 'ppr_staff' %}
+                    <div class="section-sub-title">Affirmed By</div>
+                    <div class="pt-2">BC REGISTRIES STAFF</div>
+                {% elif registrationType in ('TRANS', 'TRAND')  %}
                     <div class="section-sub-title">Affirmed By</div>
                     <div class="pt-2">
                         {% if affirmByName is defined and affirmByName != '' %} 

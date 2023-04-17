@@ -88,7 +88,7 @@ def test_mhr_document_type(session):
     doc_result = type_tables.MhrDocumentType.find_by_doc_type(type_tables.MhrDocumentTypes.REG_101.value)
     assert doc_result
     assert doc_result.document_type == type_tables.MhrDocumentTypes.REG_101.value
-    assert doc_result.document_type_desc == 'REGISTER NEW UNIT'
+    assert doc_result.document_type_desc == 'MANUFACTURED HOME REGISTRATION'
     assert doc_result.legacy_fee_code == 'MHR400'
     doc_result = type_tables.MhrDocumentType.find_by_doc_type('XXX')
     assert not doc_result
