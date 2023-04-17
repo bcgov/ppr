@@ -416,7 +416,6 @@ import { BaseHeaderIF, DraftResultIF, MhRegistrationSummaryIF, RegistrationSumma
 /* eslint-enable no-unused-vars */
 import {
   APIMhrDescriptionTypes,
-  // eslint-disable-next-line no-unused-vars
   APIMhrTypes,
   APIRegistrationTypes,
   APIStatusTypes,
