@@ -69,14 +69,19 @@
                   getMhrTransferHomeOwnerGroups.length === 1">
                     Must contain at least one executor.
                 </span>
-                <span v-else-if="!TransWill.hasExecutorsInGroup(row.item.groupId)">
+                <span v-else-if="!TransWill.hasExecutorsInGroup(row.item.groupId) &&
+                  TransWill.hasAllCurrentOwnersRemoved(row.item.groupId)">
                   Group must contain at least one executor.
                 </span>
                 <span v-else-if="!TransWill.hasAllCurrentOwnersRemoved(row.item.groupId) &&
-                  !isAllGroupOwnersWithDeathCerts(row.item.groupId)">
+                  !TransWill.hasExecutorsInGroup(row.item.groupId)">
                   All owners must be deceased and an executor added.
                 </span>
-                <span v-else-if="isAllGroupOwnersWithDeathCerts(row.item.groupId)">
+                <span v-else-if="!TransWill.hasAllCurrentOwnersRemoved(row.item.groupId) &&
+                  TransWill.hasExecutorsInGroup(row.item.groupId)">
+                  All owners must be deceased.
+                </span>
+                <span v-else-if="TransWill.isAllGroupOwnersWithDeathCerts(row.item.groupId)">
                   One of the deceased owners must have a Grant of Probate with Will.
                 </span>
               </span>
@@ -141,7 +146,9 @@
                   {{ row.item.organizationName }}
                 </div>
               </div>
-              <div v-if="row.item.suffix" class="font-light" :class="{ 'suffix-error': showSuffixError}">
+              <div v-if="row.item.suffix"
+                class="font-light"
+                :class="{ 'suffix-error': showSuffixError && row.item.partyType === HomeOwnerPartyTypes.EXECUTOR}">
                 {{ row.item.suffix }}
               </div>
             </div>
@@ -330,7 +337,7 @@
                 :deletedOwner="row.item"
                 :validate="validateTransfer"
                 :isSecondOptionDisabled="TransWill.hasOnlyOneOwnerInGroup(row.item.groupId)"
-                :isSecondOptionError="isAllGroupOwnersWithDeathCerts(row.item.groupId)"
+                :isSecondOptionError="TransWill.isAllGroupOwnersWithDeathCerts(row.item.groupId)"
                 :hasDeathCertForFirstOption="isTransferToExecutorUnder25Will"
                 @handleDocOptionOneSelected="TransWill.resetGrantOfProbate(row.item.groupId, row.item.ownerId)"
               >
@@ -505,8 +512,7 @@ export default defineComponent({
           .every(owner => {
             return owner.action === ActionTypes.REMOVED &&
               owner.supportingDocument === SupportingDocumentsOptions.DEATH_CERT
-          })
-      }
+      })
     })
 
     // check if Owner Group that has deceased Owners is valid
