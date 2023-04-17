@@ -476,7 +476,8 @@ export default defineComponent({
     const filterDisplayedHomeOwners = (): void => {
       localState.filteredHomeOwners = []
       getTransferOrRegistrationHomeOwnerGroups().forEach(ownerGroup => {
-        if (ownerGroup.action !== ActionTypes.REMOVED) {
+        // isTransferToExecutorProbateWill condition here due to new owners being added to removed groups in WILL flow
+        if (ownerGroup.action !== ActionTypes.REMOVED || isTransferToExecutorProbateWill.value) {
           const owners = ownerGroup.owners
             .map(owner => {
               if (owner.action === ActionTypes.REMOVED) return { groupId: ownerGroup.groupId }

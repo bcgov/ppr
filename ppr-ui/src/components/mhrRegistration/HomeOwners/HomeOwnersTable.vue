@@ -310,18 +310,37 @@
             </v-expand-transition>
           </td>
         </tr>
-        <tr v-else-if="isRemovedHomeOwner(row.item) && showDeathCertificate() && isReadonlyTable">
+        <tr
+          v-else-if="isRemovedHomeOwner(row.item) &&
+                     (showDeathCertificate() || showSupportingDocuments()) &&
+                     isReadonlyTable"
+        >
           <td :colspan="homeOwnersTableHeaders.length" class="deceased-review-info">
             <v-row no-gutters class="ml-8 my-n3">
               <v-col cols="12">
-                <p class="generic-label fs-14">Death Certificate Registration Number:
-                  <span class="font-light mx-1">{{row.item.deathCertificateNumber}}</span>
-                </p>
-              </v-col>
-              <v-col cols="12">
-                <p class="generic-label fs-14 mt-n4">Date of Death:
-                  <span class="font-light mx-1">{{yyyyMmDdToPacificDate(row.item.deathDateTime, true)}}</span>
-                </p>
+                <div
+                  v-if="row.item.supportingDocument === SupportingDocumentsOptions.DEATH_CERT || showDeathCertificate()"
+                  data-test-id="death-cert-review-note"
+                >
+                  <p class="generic-label fs-14">
+                    Death Certificate Registration Number:
+                    <span class="font-light mx-1">{{row.item.deathCertificateNumber}}</span>
+                  </p>
+                  <p class="generic-label fs-14 mt-n4">Date of Death:
+                    <span class="font-light mx-1">{{yyyyMmDdToPacificDate(row.item.deathDateTime, true)}}</span>
+                  </p>
+                </div>
+                <div
+                  v-else-if="row.item.supportingDocument === SupportingDocumentsOptions.PROBATE_GRANT"
+                  data-test-id="grant-review-note"
+                >
+                  <p class="generic-label fs-14">
+                    Grant of Probate with Will<br>
+                    <span class="font-light ml-0">
+                      Note: Ensure you have a court certified true copy of the Grant of Probate with the will attached.
+                    </span>
+                  </p>
+                </div>
               </v-col>
             </v-row>
           </td>
