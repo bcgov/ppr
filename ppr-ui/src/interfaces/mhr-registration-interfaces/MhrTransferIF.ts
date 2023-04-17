@@ -4,7 +4,8 @@ import {
   PaymentIF,
   SubmittingPartyIF,
   ErrorIF,
-  TransferTypeSelectIF
+  TransferTypeSelectIF,
+  MhrRegistrationIF
 } from '@/interfaces'
 import { APIMhrTypes, ApiTransferTypes } from '@/enums'
 
@@ -44,7 +45,7 @@ export interface MhrTransferApiIF {
 
 export interface MhrDraftApiIF {
   type: string
-  registration: MhrTransferApiIF
+  registration: MhrTransferApiIF | MhrRegistrationIF
   error?: ErrorIF
   baseRegistrationNumber?: string
 }

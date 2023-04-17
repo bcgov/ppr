@@ -274,7 +274,7 @@
               </template>
             </section>
           </v-col>
-          <v-col class="pl-6 pt-5" cols="3" v-if="showMhrFeeSummary || isReviewMode">
+          <v-col class="pl-6 pt-5" cols="3" v-if="showTransferType || isReviewMode">
             <aside>
               <affix class="sticky-container" relative-element-selector=".col-9" :offset="{ top: 90, bottom: -100 }">
                 <sticky-container
@@ -335,13 +335,13 @@ import {
   APIMHRMapSearchTypes,
   APISearchTypes,
   RouteNames,
-  UIMHRSearchTypes,
-  UITransferTypes
+  UIMHRSearchTypes
 } from '@/enums'
 import {
   createMhrDraft,
   deleteMhrDraft,
   getAccountInfoFromAuth,
+  getMhrDraft,
   getMHRegistrationSummary,
   mhrSearch,
   pacificDate,
@@ -435,6 +435,7 @@ export default defineComponent({
       buildApiData,
       getUiTransferType,
       parseMhrInformation,
+      initDraftMhrInformation,
       parseSubmittingPartyInfo
     } = useMhrInformation()
     const {
@@ -462,7 +463,6 @@ export default defineComponent({
       loading: false,
       isReviewMode: false,
       validate: false,
-      showMhrFeeSummary: false,
       refNumValid: false,
       accountInfo: null,
       feeType: FeeSummaryTypes.MHR_TRANSFER, // FUTURE STATE: To be dynamic, dependent on what changes have been made
@@ -474,7 +474,7 @@ export default defineComponent({
         folioNumber: '',
         isPriority: false
       },
-      showTransferType: false,
+      showTransferType: !!getMhrInformation.value.draftNumber || false,
       attentionReference: '',
       cancelOptions: unsavedChangesDialog,
       saveOptions: registrationSaveDraftError,
@@ -540,8 +540,14 @@ export default defineComponent({
       // Set baseline MHR Information to state
       await parseMhrInformation()
 
-      // When not a draft Transfer, force no unsaved changes after loading current owners
-      !getMhrInformation.value.draftNumber && (await setUnsavedChanges(false))
+      if (getMhrInformation.value.draftNumber) {
+        // Retrieve draft if it exists
+        const { registration } = await getMhrDraft(getMhrInformation.value.draftNumber)
+        await initDraftMhrInformation(registration as MhrTransferApiIF)
+      } else {
+        // When not a draft Transfer, force no unsaved changes after loading current owners
+        await setUnsavedChanges(false)
+      }
 
       if (isRoleQualifiedSupplier.value && !isRoleStaffReg.value) {
         // Get Account Info from Auth to be used in Submitting Party section in Review screen
@@ -637,8 +643,6 @@ export default defineComponent({
 
         if (!mhrTransferFiling.error) {
           setUnsavedChanges(false)
-          // Delete the draft on successful submission
-          if (getMhrInformation.value.draftNumber) await deleteMhrDraft(getMhrInformation.value.draftNumber)
           const newItem: RegTableNewItemI = {
             addedReg: mhrTransferFiling.documentId,
             addedRegParent: getMhrInformation.value.mhrNumber,
@@ -725,8 +729,6 @@ export default defineComponent({
       }
       localState.showCancelChangeDialog = false
       localState.showTransferType = false
-      localState.showMhrFeeSummary = false
-
       localState.loading = true
       await resetMhrInformation()
       localState.loading = false
@@ -779,7 +781,6 @@ export default defineComponent({
       }
 
       localState.showTransferType = !localState.showTransferType
-      localState.showMhrFeeSummary = localState.showTransferType
     }
 
     const handleTransferTypeChange = async (transferTypeSelect: TransferTypeSelectIF): Promise<void> => {
