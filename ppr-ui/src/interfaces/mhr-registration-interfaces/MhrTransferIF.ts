@@ -4,7 +4,8 @@ import {
   PaymentIF,
   SubmittingPartyIF,
   ErrorIF,
-  TransferTypeSelectIF, MhrRegistrationIF
+  TransferTypeSelectIF,
+  MhrRegistrationIF
 } from '@/interfaces'
 import { APIMhrTypes, ApiTransferTypes } from '@/enums'
 

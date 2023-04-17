@@ -2,7 +2,7 @@ import {
   AccountInfoIF,
   MhrHomeOwnerGroupIF,
   MhrRegistrationDescriptionIF,
-  MhrRegistrationHomeLocationIF, MhrRegistrationIF,
+  MhrRegistrationHomeLocationIF,
   MhrTransferApiIF,
   MhrTransferIF,
   SubmittingPartyIF
@@ -16,7 +16,7 @@ import {
   UIRegistrationTypes,
   UITransferTypes
 } from '@/enums'
-import { fetchMhRegistration, getMhrDraft, normalizeObject } from '@/utils'
+import { fetchMhRegistration, normalizeObject } from '@/utils'
 import { cloneDeep } from 'lodash'
 import { useHomeOwners, useTransferOwners } from '@/composables'
 
