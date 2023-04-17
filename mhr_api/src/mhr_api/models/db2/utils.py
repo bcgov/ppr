@@ -46,7 +46,25 @@ TO_LEGACY_DOC_TYPE = {
     'REG_103': '103 ',
     'REG_103E': '103E'
 }
-
+TO_REGISTRATION_TYPE = {
+    '101': 'MHREG',
+    'CONV': 'MHREG_CONVERSION',
+    'TRAN': 'TRANS',
+    'DEAT': 'TRAND',
+    'AFFE': 'TRANS_AFFIDAVIT',
+    'LETA': 'TRANS_ADMIN',
+    'WILL': 'TRANS_WILL',
+    'EXRS': 'EXEXEMPTION_RESRS',
+    'EXNR': 'EXEMPTION_NON_RES',
+    '103': 'PERMIT',
+    '102': 'DECAL_REPLACE',
+    '103E': 'PERMIT_EXTENSION',
+    'REG_101': 'MHREG',
+    'REG_102': 'DECAL_REPLACE',
+    'REG_103': 'PERMIT',
+    'REG_103E': 'PERMIT_EXTENSION',
+    'DEFAULT': 'REG_STAFF_ADMIN'
+}
 UPDATE_PID_STATUS_SUCCESS = 'A'
 UPDATE_PID_STATUS_ERROR = 'E'
 UPDATE_LTSA_PID = """
@@ -321,7 +339,7 @@ QUERY_ACCOUNT_ORDER_BY = {
     reg_utils.EXPIRY_DAYS_PARAM: REG_ORDER_BY_EXPIRY_DAYS,
     reg_utils.USER_NAME_PARAM: REG_ORDER_BY_USERNAME
 }
-REGISTRATION_DESC_NEW = 'REGISTER NEW UNIT'
+REGISTRATION_DESC_NEW = 'MANUFACTURED HOME REGISTRATION'
 LEGACY_STATUS_DESCRIPTION = {
     'R': 'ACTIVE',
     'E': 'EXEMPT',
@@ -727,8 +745,13 @@ def __update_summary_info(result, results, reg_summary_list, doc_types, staff, a
             if doc_type == doc_rec.document_type:
                 result['registrationDescription'] = doc_rec.document_type_desc
                 break
+        if TO_REGISTRATION_TYPE.get(doc_type):
+            result['registrationType'] = TO_REGISTRATION_TYPE.get(doc_type)
+        else:
+            result['registrationType'] = TO_REGISTRATION_TYPE.get('DEFAULT')
     else:
         result['registrationDescription'] = summary_result.get('reg_description')
+        result['registrationType'] = summary_result.get('registration_type')
         # result['username'] = summary_result.get('username')  # Sorting by username does not work with this.
         if staff or account_id == summary_result.get('account_id'):
             if summary_result.get('report_url') or model_utils.report_retry_elapsed(summary_result.get('report_ts')):
