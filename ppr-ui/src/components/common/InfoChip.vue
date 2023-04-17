@@ -3,7 +3,8 @@
     v-if="action"
     class="info-chip-badge mr-4"
     label x-small
-    :color="['DELETED', 'DECEASED'].includes(action) ? '#grey lighten-2' : 'primary'"
+    :color="chipColors.bgColor"
+    :textColor="chipColors.textColor"
     :data-test-id="`${action}-badge`"
   >
     <b>{{ action }}</b>
@@ -11,7 +12,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs } from '@vue/composition-api'
+import { computed, defineComponent, reactive, toRefs } from '@vue/composition-api'
 
 export default defineComponent({
   name: 'InfoChip',
@@ -22,8 +23,25 @@ export default defineComponent({
       default: ''
     }
   },
-  setup () {
-    const localState = reactive({})
+  setup (props) {
+    interface colorConfig {
+      bgColor: string
+      textColor?: string
+    }
+
+    const localState = reactive({
+      chipColors: computed((): colorConfig => {
+        switch (props.action) {
+          case 'DELETED':
+          case 'DECEASED':
+            return { bgColor: '#grey lighten-2' }
+          case 'LIEN':
+            return { bgColor: 'darkGray', textColor: 'white' }
+          default:
+            return { bgColor: 'primary' }
+        }
+      })
+    })
 
     return {
       ...toRefs(localState)

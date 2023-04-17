@@ -1,14 +1,16 @@
 <template>
   <v-footer class="white pa-0">
+
     <v-overlay v-model="submitting">
       <v-progress-circular color="primary" size="50" indeterminate />
     </v-overlay>
-    <base-dialog
+
+    <BaseDialog
       :setOptions="options"
       :setDisplay="showCancelDialog"
       @proceed="handleDialogResp($event)"
     />
-    <staff-payment-dialog
+    <StaffPaymentDialog
       attach=""
       class="mt-10"
       :setDisplay="staffPaymentDialogDisplay"
@@ -16,6 +18,7 @@
       :setShowCertifiedCheckbox="false"
       @proceed="onStaffPaymentChanges($event)"
     />
+
     <v-container class="pt-8 pb-15">
       <v-row no-gutters>
         <v-col cols="6">
@@ -80,30 +83,20 @@
 <script lang="ts">
 // external
 import VueRouter from 'vue-router' // eslint-disable-line no-unused-vars
-import {
-  computed,
-  defineComponent,
-  reactive,
-  toRefs,
-  watch
-} from '@vue/composition-api'
-import { useGetters, useActions } from 'vuex-composition-helpers'
+import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
+import { useActions, useGetters } from 'vuex-composition-helpers'
 import _ from 'lodash'
 // local helpers/enums/interfaces/resources
-import { saveFinancingStatement, saveFinancingStatementDraft } from '@/utils'
-import { RouteNames, StatementTypes } from '@/enums'
+import { createMhrDraft, saveFinancingStatement, saveFinancingStatementDraft, updateMhrDraft } from '@/utils'
+import { APIMhrTypes, RouteNames, StatementTypes } from '@/enums'
 import { BaseDialog } from '@/components/dialogs'
 import StaffPaymentDialog from '@/components/dialogs/StaffPaymentDialog.vue'
-
 import {
-  ButtonConfigIF, // eslint-disable-line no-unused-vars
-  DraftIF, // eslint-disable-line no-unused-vars
-  ErrorIF, // eslint-disable-line no-unused-vars
-  FinancingStatementIF, // eslint-disable-line no-unused-vars
-  RegTableNewItemI, // eslint-disable-line no-unused-vars
-  StateModelIF // eslint-disable-line no-unused-vars
+  // eslint-disable-next-line no-unused-vars
+  ButtonConfigIF, DraftIF, ErrorIF, FinancingStatementIF, MhrDraftIF, RegTableNewItemI, StateModelIF
 } from '@/interfaces'
 import { unsavedChangesDialog } from '@/resources/dialogOptions'
+import { useNewMhrRegistration } from '@/composables'
 
 export default defineComponent({
   components: {
@@ -129,27 +122,37 @@ export default defineComponent({
     forceSave: {
       type: Boolean,
       default: false
+    },
+    isMhr: {
+      type: Boolean,
+      default: false
     }
   },
   setup (props, { emit }) {
     const {
-      getFinancingButtons,
+      getFooterButtonConfig,
       getStateModel,
       hasUnsavedChanges,
       isRoleStaffBcol,
       isRoleStaffReg,
-      isRoleStaffSbc
+      isRoleStaffSbc,
+      getMhrDraftNumber
     } = useGetters<any>([
-      'getFinancingButtons',
+      'getFooterButtonConfig',
       'getStateModel',
       'hasUnsavedChanges',
       'isRoleStaffBcol',
       'isRoleStaffReg',
-      'isRoleStaffSbc'
+      'isRoleStaffSbc',
+      'getMhrDraftNumber'
     ])
 
-    const { resetNewRegistration, setDraft, setRegTableNewItem, setUnsavedChanges } =
-      useActions<any>(['resetNewRegistration', 'setDraft', 'setRegTableNewItem', 'setUnsavedChanges'])
+    const {
+      resetNewRegistration, setDraft, setRegTableNewItem, setUnsavedChanges, setMhrDraftNumber
+    } = useActions<any>([
+      'resetNewRegistration', 'setDraft', 'setRegTableNewItem', 'setUnsavedChanges', 'setMhrDraftNumber'
+    ])
+    const { buildApiData } = useNewMhrRegistration()
 
     const localState = reactive({
       options: unsavedChangesDialog,
@@ -179,23 +182,20 @@ export default defineComponent({
       isStaffSbc: computed((): boolean => {
         return isRoleStaffSbc.value
       }),
-      buttonConfig: computed(
-        (): ButtonConfigIF => {
-          if (
-            localState.statementType.toUpperCase() ===
-            StatementTypes.FINANCING_STATEMENT
-          ) {
-            const stepConfig: Array<ButtonConfigIF> = getFinancingButtons.value
-            let config: ButtonConfigIF
-            for (const i in stepConfig) {
-              config = stepConfig[i]
-              if (config.stepName === props.currentStepName) {
-                return config
-              }
+      buttonConfig: computed((): ButtonConfigIF => {
+        if (localState.statementType.toUpperCase() === StatementTypes.FINANCING_STATEMENT) {
+          const stepConfig: Array<ButtonConfigIF> = getFooterButtonConfig.value
+          let config: ButtonConfigIF
+
+          for (const i in stepConfig) {
+            config = stepConfig[i]
+            if (config.stepName === props.currentStepName) {
+              return config
             }
           }
-          return null
         }
+        return null
+      }
       )
     })
     const cancel = () => {
@@ -217,9 +217,17 @@ export default defineComponent({
     }
     /** Save the draft version from data stored in the state model. */
     const saveDraft = async (): Promise<Boolean> => {
-      const stateModel: StateModelIF = getStateModel.value
-      const draft: DraftIF = await throttleSubmitStatementDraft(stateModel)
-      const prevDraftId = stateModel.registration?.draft?.financingStatement?.documentId || ''
+      let draft
+      let prevDraftId
+
+      if (props.isMhr) {
+        draft = await mhrDraftHandler()
+      } else {
+        const stateModel: StateModelIF = getStateModel.value
+        draft = await throttleSubmitStatementDraft(stateModel)
+        prevDraftId = stateModel.registration?.draft?.financingStatement?.documentId || ''
+      }
+
       if (draft.error) {
         // Emit error message.
         emit('error', draft.error)
@@ -227,8 +235,9 @@ export default defineComponent({
       } else {
         await setUnsavedChanges(false)
         await setDraft(draft)
+
         const newItem: RegTableNewItemI = {
-          addedReg: draft.financingStatement.documentId,
+          addedReg: draft.financingStatement?.documentId || draft.draftNumber,
           addedRegParent: '',
           addedRegSummary: null,
           prevDraft: prevDraftId
@@ -349,6 +358,17 @@ export default defineComponent({
       localState.submitting = false
       return statement
     }, 2000, { trailing: false })
+
+    const mhrDraftHandler = async (): Promise<MhrDraftIF> => {
+      const draft = getMhrDraftNumber.value
+        ? await updateMhrDraft(getMhrDraftNumber.value, APIMhrTypes.MANUFACTURED_HOME_REGISTRATION, buildApiData())
+        : await createMhrDraft(APIMhrTypes.MANUFACTURED_HOME_REGISTRATION, buildApiData())
+
+      // Set draftNumber to state to prevent duplicate drafts
+      if (draft) setMhrDraftNumber(draft.draftNumber)
+
+      return draft
+    }
 
     watch(() => props.forceSave, (val: boolean) => {
       // on change (T/F doesn't matter), save and go back to dash

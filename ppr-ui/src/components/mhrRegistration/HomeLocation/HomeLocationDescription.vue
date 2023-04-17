@@ -89,9 +89,9 @@
 
 <script lang="ts">
 /* eslint-disable no-unused-vars */
-import { defineComponent, computed, reactive, toRefs, watch } from '@vue/composition-api'
+import { defineComponent, computed, reactive, toRefs, watch, onMounted } from '@vue/composition-api'
 import { HomeLocationInfo } from '@/components/common'
-import { useActions } from 'vuex-composition-helpers'
+import { useActions, useGetters } from 'vuex-composition-helpers'
 import { useInputRules, useNewMhrRegistration } from '@/composables'
 import { MhrLocationInfoIF } from '@/interfaces'
 /* eslint-enable no-unused-vars */
@@ -110,6 +110,11 @@ export default defineComponent({
   },
   setup (props, context) {
     const {
+      getMhrRegistrationLocation
+    } = useGetters<any>([
+      'getMhrRegistrationLocation'
+    ])
+    const {
       setIsManualLocation
     } = useActions<any>([
       'setIsManualLocation'
@@ -122,7 +127,7 @@ export default defineComponent({
       isValidLocationInfo: false,
       showLocationInfo: false,
       locationInfo: {} as MhrLocationInfoIF,
-      additionalDescription: '',
+      additionalDescription: getMhrRegistrationLocation.value?.additionalDescription || '',
       isHomeLocationDescriptionValid: false,
       isValidDescription: computed((): boolean => {
         return localState.isHomeLocationDescriptionValid &&
@@ -134,6 +139,17 @@ export default defineComponent({
           (!!localState.locationInfo.landDistrict && !!localState.locationInfo.districtLot)
         )
       })
+    })
+
+    onMounted(() => {
+      // Show the locationInfo form if there is any common properties that have stored/draft data
+      // We have to be specific because registrationLocation contains other properties
+      const commonLocationProperties = [
+        'lot', 'landDistrict', 'plan', 'districtLot',
+        'partOf', 'section', 'township', 'range',
+        'meridian', 'parcel', 'block', 'exceptionPlan'
+      ]
+      localState.showLocationInfo = commonLocationProperties.some(key => !!getMhrRegistrationLocation.value[key])
     })
 
     const handleCancel = (): void => {

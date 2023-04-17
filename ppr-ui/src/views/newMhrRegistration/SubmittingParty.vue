@@ -123,8 +123,12 @@ export default defineComponent({
   props: {},
   setup (props, context) {
     const {
+      getMhrAttentionReferenceNum,
+      getMhrRegistrationDocumentId,
       getMhrRegistrationValidationModel
     } = useGetters<any>([
+      'getMhrAttentionReferenceNum',
+      'getMhrRegistrationDocumentId',
       'getMhrRegistrationValidationModel'
     ])
 
@@ -149,8 +153,8 @@ export default defineComponent({
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
     const localState = reactive({
-      attentionReferenceNum: '',
-      documentId: '',
+      attentionReferenceNum: getMhrAttentionReferenceNum.value || '',
+      documentId: getMhrRegistrationDocumentId.value || '',
       isDocumentIdValid: false,
       isRefNumValid: false,
       loadingDocId: false,
@@ -202,7 +206,7 @@ export default defineComponent({
 
       localState.loadingDocId = false
       setMhrRegistrationDocumentId(val)
-    }
+    }, { immediate: true }
     )
 
     watch(() => localState.validateDocId, async () => {

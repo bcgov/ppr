@@ -85,6 +85,7 @@
                   :maxDate="today"
                   :nudge-top="180"
                   :nudge-right="150"
+                  :initialValue="engineerDate"
                   :inputRules="required('Select a date of engineer\'s report')"
                   @emitDate="engineerDate = $event"
                   @emitCancel="engineerDate = ''"
@@ -148,12 +149,12 @@ export default defineComponent({
 
     const localState = reactive({
       homeCertificationValid: false,
-      certificationOption: null as HomeCertificationOptions,
-      csaNumber: '',
-      csaStandard: '',
+      certificationOption: getMhrRegistrationHomeDescription.value?.certificationOption || null,
+      csaNumber: getMhrRegistrationHomeDescription.value?.csaNumber || '',
+      csaStandard: getMhrRegistrationHomeDescription.value?.csaStandard || '',
       csaStandardOptions: ['A277', 'Z240'],
-      engineerName: '',
-      engineerDate: '',
+      engineerName: getMhrRegistrationHomeDescription.value?.engineerName || '',
+      engineerDate: getMhrRegistrationHomeDescription.value?.engineerDate || '',
       isCsaValid: false,
       isEngineerValid: false,
       isCsaOption: computed((): boolean => {

@@ -306,6 +306,7 @@ import {
   RegistrationTypeIF,
   BaseHeaderIF,
   DraftResultIF,
+  MhrDraftIF,
   RegistrationSortIF,
   ErrorIF,
   RegTableNewItemI,
@@ -521,20 +522,24 @@ export default defineComponent({
       return false
     }
 
-    const isNewRegItem = (item: RegistrationSummaryIF | DraftResultIF | MhRegistrationSummaryIF): boolean => {
-      const draftItem = item as DraftResultIF
-      const regItem = item as RegistrationSummaryIF
-      const mhRegItem = item as MhRegistrationSummaryIF
-      const registrationNumber = regItem.registrationNumber || mhRegItem.mhrNumber
-      if (registrationNumber && registrationNumber === localState.newReg?.addedReg) {
+    const isNewRegItem =
+      (item: RegistrationSummaryIF | DraftResultIF | MhrDraftIF | MhRegistrationSummaryIF): boolean => {
+        const draftItem = item as any // Either DraftResultIF or MhrDraftIF
+        const regItem = item as RegistrationSummaryIF
+        const mhRegItem = item as MhRegistrationSummaryIF
+        const registrationNumber = regItem.registrationNumber || mhRegItem.mhrNumber
+        if (registrationNumber && registrationNumber === localState.newReg?.addedReg) {
         // reg num is not blank and equals newly added reg num
-        return true
-      } else if (draftItem.documentId && draftItem.documentId === localState.newReg?.addedReg) {
+          return true
+        } else if (
+          (draftItem.documentId && draftItem.documentId === localState.newReg?.addedReg) ||
+          (draftItem.draftNumber && draftItem.draftNumber === localState.newReg?.addedReg)
+        ) {
         // doc id is not blank and equals newly added doc id
-        return true
+          return true
+        }
+        return false
       }
-      return false
-    }
 
     const isNewRegParentItem = (item: RegistrationSummaryIF | MhRegistrationSummaryIF): boolean => {
       const regItem = item as RegistrationSummaryIF

@@ -20,7 +20,7 @@
                 $style[!isExistingSecuredParty(result.code) ? 'auto-complete-item' : 'auto-complete-added-item'],
                 $style[wasSelected(result)]
               ]"
-              :active-class="{'added-color' : isExistingSecuredParty(result.code)}"
+              :active-class="isExistingSecuredParty(result.code) ? 'added-color' : ''"
               @mouseover="mouseOver = true"
               @mouseleave="mouseOver = false"
             >

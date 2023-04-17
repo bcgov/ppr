@@ -16,7 +16,7 @@ import {
   UIRegistrationTypes,
   UITransferTypes
 } from '@/enums'
-import { fetchMhRegistration, getMhrTransferDraft, normalizeObject } from '@/utils'
+import { fetchMhRegistration, getMhrDraft, normalizeObject } from '@/utils'
 import { cloneDeep } from 'lodash'
 import { useHomeOwners, useTransferOwners } from '@/composables'
 
@@ -134,10 +134,10 @@ export const useMhrInformation = () => {
     // Set owners to store
     if (getMhrInformation.value.draftNumber) {
       // Retrieve owners from draft if it exists
-      const { registration } = await getMhrTransferDraft(getMhrInformation.value.draftNumber)
+      const { registration } = await getMhrDraft(getMhrInformation.value.draftNumber)
 
       // Set draft Transfer details to store
-      parseDraftTransferDetails(registration as MhrTransferApiIF)
+      await parseDraftTransferDetails(registration as MhrTransferApiIF)
 
       setShowGroups(registration.addOwnerGroups.length > 1 || registration.deleteOwnerGroups.length > 1)
       setMhrTransferHomeOwnerGroups([...registration.addOwnerGroups])

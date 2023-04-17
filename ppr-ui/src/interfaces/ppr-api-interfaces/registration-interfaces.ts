@@ -1,5 +1,14 @@
-import { APIAmendmentTypes, APIRegistrationTypes, DraftTypes } from '@/enums'
-import { CourtOrderIF, DebtorNameIF, ErrorIF, GeneralCollateralIF, PartyIF, VehicleCollateralIF } from '@/interfaces'
+import {APIAmendmentTypes, APIMhrTypes, APIRegistrationTypes, DraftTypes} from '@/enums'
+import {
+  CourtOrderIF,
+  DebtorNameIF,
+  ErrorIF,
+  GeneralCollateralIF, MhrTransferApiIF,
+  NewMhrRegistrationApiIF,
+  PartyIF,
+  VehicleCollateralIF
+} from '@/interfaces'
+import mhrRegistration from '@/views/newMhrRegistration/MhrRegistration.vue';
 
 // Payment (pay-api) reference interface.
 export interface PaymentIF {
@@ -41,6 +50,25 @@ export interface DraftIF {
   createDateTime?: string // Included in a successful response. Generated on first draft save.
   lastUpdateDateTime?: string // Included in a successful response. Timestamp of last draft update.
   error?: ErrorIF
+}
+
+// Registration Draft interface for POST and GET.
+export interface MhrDraftIF {
+  // Part of Api Submission/spec
+  type?: DraftTypes | APIMhrTypes
+  registration?: NewMhrRegistrationApiIF
+  error?: ErrorIF
+  clientReferenceId?: string
+  // Part of Draft Api Response
+  mhrNumber?: string
+  registeringName?: string
+  registrationDescription?: string
+  submittingParty?: string
+  registrationType?: DraftTypes | APIMhrTypes
+  path?: string
+  createDateTime?: string
+  draftNumber?: string
+  lastUpdateDateTime?: string
 }
 
 export interface DraftResultIF {
@@ -93,6 +121,7 @@ export interface MhRegistrationSummaryIF {
   mhrNumber: string
   ownerNames: string
   path: string
+  registrationType?: DraftTypes | APIMhrTypes
   registrationDescription: string
   statusType: string
   submittingParty: string

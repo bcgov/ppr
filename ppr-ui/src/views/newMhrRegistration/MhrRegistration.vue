@@ -45,6 +45,7 @@
     <v-row no-gutters class="pt-10">
       <v-col cols="12">
         <button-footer
+          isMhr
           :currentStatementType="statementType"
           :currentStepName="$route.name"
           :router="$router"
@@ -63,13 +64,13 @@ import { computed, defineComponent, nextTick, onMounted, reactive, toRefs } from
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { RegistrationFlowType, RouteNames, StatementTypes } from '@/enums'
-import { getFeatureFlag, submitMhrRegistration } from '@/utils'
+import { getFeatureFlag, getMhrDraft, submitMhrRegistration } from '@/utils'
 import { Stepper, StickyContainer } from '@/components/common'
 import ButtonFooter from '@/components/common/ButtonFooter.vue'
 import { useHomeOwners, useMhrValidations, useNewMhrRegistration } from '@/composables'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 /* eslint-disable no-unused-vars */
-import { RegistrationTypeIF, RegTableNewItemI } from '@/interfaces'
+import { MhrRegistrationIF, RegistrationTypeIF, RegTableNewItemI } from '@/interfaces'
 import { RegistrationLengthI } from '@/composables/fees/interfaces'
 import BaseDialog from '@/components/dialogs/BaseDialog.vue'
 import { registrationCompleteError } from '@/resources/dialogOptions'
@@ -95,23 +96,23 @@ export default defineComponent({
   },
   setup (props, context) {
     const {
-      getRegistrationFlowType,
-      getRegistrationType,
       getSteps,
+      getMhrDraftNumber,
+      getRegistrationType,
+      getRegistrationFlowType,
       getMhrRegistrationValidationModel
     } = useGetters<any>([
-      'getRegistrationFlowType',
-      'getRegistrationType',
       'getSteps',
+      'getMhrDraftNumber',
+      'getRegistrationType',
+      'getRegistrationFlowType',
       'getMhrRegistrationValidationModel'
     ])
 
     const {
-      setEmptyMhr,
       setUnsavedChanges,
       setRegTableNewItem
     } = useActions<any>([
-      'setEmptyMhr',
       'setUnsavedChanges',
       'setRegTableNewItem'
     ])
@@ -127,7 +128,7 @@ export default defineComponent({
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
     const {
-      initNewMhr,
+      initDraftMhr,
       buildApiData,
       parseStaffPayment
     } = useNewMhrRegistration()
@@ -184,7 +185,7 @@ export default defineComponent({
       })
     }
 
-    onMounted((): void => {
+    onMounted(async (): Promise<void> => {
       // do not proceed if app is not ready
       // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
       if (!props.appReady || !localState.isAuthenticated ||
@@ -203,7 +204,11 @@ export default defineComponent({
       setValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_APP, false)
 
       // page is ready to view
-      setEmptyMhr(initNewMhr())
+      if (getMhrDraftNumber.value) {
+        const { registration } = await getMhrDraft(getMhrDraftNumber.value)
+        await initDraftMhr(registration as unknown as MhrRegistrationIF)
+      }
+
       context.emit('emitHaveData', true)
       localState.dataLoaded = true
     })

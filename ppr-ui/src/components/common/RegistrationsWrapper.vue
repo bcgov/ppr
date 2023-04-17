@@ -161,12 +161,18 @@ import { useActions, useGetters } from 'vuex-composition-helpers'
 import { RegistrationBar } from '@/components/registration'
 import { RegistrationTable } from '@/components/tables'
 import { BaseDialog, RegistrationConfirmation } from '@/components/dialogs'
-import { AllRegistrationTypes, mhRegistrationTableHeaders, registrationTableHeaders } from '@/resources'
+import {
+  AllRegistrationTypes,
+  mhRegistrationTableHeaders,
+  MhrRegistrationType,
+  registrationTableHeaders
+} from '@/resources'
 import {
   BaseHeaderIF,
   DialogOptionsIF,
   DraftResultIF,
   ErrorIF,
+  MhrDraftIF,
   MhRegistrationSummaryIF,
   RegistrationSortIF,
   RegistrationSummaryIF,
@@ -255,16 +261,17 @@ export default defineComponent({
       setAddCollateral, setAddSecuredPartiesAndDebtors, setUnsavedChanges, setRegTableDraftsBaseReg,
       setRegTableDraftsChildReg, setRegTableTotalRowCount, setRegTableBaseRegs, setRegTableSortPage,
       setRegTableSortHasMorePages, setRegTableSortOptions, setUserSettings, resetRegTableData, setMhrInformation,
-      setMhrTableHistory
+      setMhrTableHistory, setMhrDraftNumber, setEmptyMhr
     } = useActions<any>([
       'resetNewRegistration', 'setRegistrationType', 'setRegTableCollapsed', 'setRegTableNewItem', 'setLengthTrust',
       'setAddCollateral', 'setAddSecuredPartiesAndDebtors', 'setUnsavedChanges', 'setRegTableDraftsBaseReg',
       'setRegTableDraftsChildReg', 'setRegTableTotalRowCount', 'setRegTableBaseRegs', 'setRegTableSortPage',
       'setRegTableSortHasMorePages', 'setRegTableSortOptions', 'setUserSettings', 'resetRegTableData',
-      'setMhrInformation', 'setMhrTableHistory'
+      'setMhrInformation', 'setMhrTableHistory', 'setMhrDraftNumber', 'setEmptyMhr'
     ])
 
     const {
+      initNewMhr,
       fetchMhRegistrations
     } = useNewMhrRegistration()
 
@@ -318,7 +325,7 @@ export default defineComponent({
     onBeforeMount(async (): Promise<void> => {
       localState.loading = true
       // do not proceed if app is not ready
-      if (!props.appReady || props.isMhr) return
+      if (!props.appReady) return
 
       resetNewRegistration(null) // Clear store data from any previous registration.
       // FUTURE: add loading for search history too
@@ -326,7 +333,7 @@ export default defineComponent({
       if (getRegTableNewItem.value?.addedReg) {
       // new reg was added so don't reload the registrations + trigger new item handler
         await handleRegTableNewItem(getRegTableNewItem.value)
-      } else {
+      } else if (props.isPpr) {
       // load in registrations from scratch
         resetRegTableData(null)
         const myRegDrafts = await draftHistory(cloneDeep(getRegTableSortOptions.value))
@@ -379,13 +386,16 @@ export default defineComponent({
     })
 
     /** Set registration type in the store and route to the first registration step */
-    const startNewRegistration = (selectedRegistration: RegistrationTypeIF): void => {
+    const startNewRegistration = async (selectedRegistration: RegistrationTypeIF, isMhDraft = false): Promise<void> => {
+      // Clear store data for MHR
+      if (!isMhDraft) await setEmptyMhr(initNewMhr())
+
       resetNewRegistration(null) // Clear store data from the previous registration.
       setRegistrationType(selectedRegistration)
       setRegTableCollapsed(null)
 
       const route = isMhrRegistration.value ? RouteNames.YOUR_HOME : RouteNames.LENGTH_TRUST
-      context.root.$router.replace({ name: route })
+      await context.root.$router.replace({ name: route })
     }
 
     const findRegistration = async (regNum: string): Promise<void> => {
@@ -599,7 +609,10 @@ export default defineComponent({
         case TableActions.EDIT_NEW:
           editDraftNew(docId)
           break
-        case TableActions.OPEN:
+        case TableActions.EDIT_NEW_MHR:
+          openMhrDraft(mhrInfo)
+          break
+        case TableActions.OPEN_MHR:
           openMhr(mhrInfo)
           break
         default:
@@ -637,6 +650,11 @@ export default defineComponent({
         setRegTableCollapsed(null)
         await context.root.$router.replace({ name: RouteNames.LENGTH_TRUST })
       }
+    }
+
+    const openMhrDraft = async (mhrInfo: MhrDraftIF): Promise<void> => {
+      await setMhrDraftNumber(mhrInfo.draftNumber)
+      await startNewRegistration(MhrRegistrationType, true)
     }
 
     const openMhr = async (mhrSummary: MhRegistrationSummaryIF): Promise<void> => {
@@ -845,8 +863,8 @@ export default defineComponent({
     const handleRegTableNewItem = async (val: RegTableNewItemI) => {
       if (val.addedReg) {
         localState.myRegDataAdding = true
-        if (!val.addedRegSummary) {
-          // atttempt to get the summary info from the api
+        if (props.isPpr && !val.addedRegSummary) {
+          // attempt to get the summary info from the api
           if (val.addedReg[0] !== 'D') {
             // its a normal reg - get reg summary
             const regSummary = await getRegistrationSummary(val.addedReg, true)
@@ -887,7 +905,7 @@ export default defineComponent({
         // for masking the type of the new summary
         const newDraftSummary = val.addedRegSummary as DraftResultIF
         const newRegSummary = val.addedRegSummary as RegistrationSummaryIF
-        if (val.addedRegParent) {
+        if (val.addedRegParent && props.isPpr) {
           // new child reg. Find parent + update it with new summary
           const parentIndex = baseRegs.findIndex(reg => reg.baseRegistrationNumber === val.addedRegParent)
           if (parentIndex === -1) {
@@ -927,7 +945,7 @@ export default defineComponent({
             // update store
             setRegTableBaseRegs(cloneDeep(baseRegs))
           }
-        } else if (newDraftSummary.documentId) {
+        } else if (newDraftSummary?.documentId) {
           // new draft base reg
           const draftBaseRegs = getRegTableDraftsBaseReg.value
           draftBaseRegs.unshift(newDraftSummary)
@@ -936,7 +954,7 @@ export default defineComponent({
             // new draft so increase
             setRegTableTotalRowCount(getRegTableTotalRowCount.value + 1)
           }
-        } else {
+        } else if (props.isPpr) {
           // Safety check: Prevent duplicate Registrations in UI
           if (baseRegs.some(reg => reg.registrationNumber === newRegSummary.registrationNumber)) return
 
@@ -951,7 +969,7 @@ export default defineComponent({
         localState.myRegDataAdding = false
         // trigger snackbar
         context.emit('snackBarMsg', 'Registration was successfully added to your table.')
-        // set to empty strings after 5 seconds
+        // set to empty strings after 6 seconds
         setTimeout(() => {
           // only reset if it hasn't changed since
           if (val.addedReg === getRegTableNewItem.value.addedReg) {
@@ -960,7 +978,7 @@ export default defineComponent({
             }
             setRegTableNewItem(emptyItem)
           }
-        }, 4000)
+        }, 6000)
       }
     }
 

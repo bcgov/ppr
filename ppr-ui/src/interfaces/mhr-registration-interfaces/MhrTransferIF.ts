@@ -42,7 +42,7 @@ export interface MhrTransferApiIF {
   draftNumber?: string
 }
 
-export interface MhrDraftTransferApiIF {
+export interface MhrDraftApiIF {
   type: string
   registration: MhrTransferApiIF
   error?: ErrorIF

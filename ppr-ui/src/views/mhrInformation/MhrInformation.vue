@@ -339,7 +339,7 @@ import {
   UITransferTypes
 } from '@/enums'
 import {
-  createMhrTransferDraft,
+  createMhrDraft,
   deleteMhrDraft,
   getAccountInfoFromAuth,
   getMHRegistrationSummary,
@@ -671,12 +671,12 @@ export default defineComponent({
       const apiData = await buildApiData(true)
 
       const mhrTransferDraft = getMhrInformation.value.draftNumber
-        ? await updateMhrDraft(getMhrInformation.value.draftNumber, apiData)
-        : await createMhrTransferDraft(apiData)
+        ? await updateMhrDraft(getMhrInformation.value.draftNumber, getMhrTransferType.value.transferType, apiData)
+        : await createMhrDraft(getMhrTransferType.value.transferType, apiData)
+
       if (!getMhrInformation.value.draftNumber) {
-        const mhrDraft = mhrTransferDraft as MhrTransferApiIF
         const newItem: RegTableNewItemI = {
-          addedReg: mhrDraft.draftNumber,
+          addedReg: mhrTransferDraft.draftNumber,
           addedRegParent: apiData.mhrNumber,
           addedRegSummary: null,
           prevDraft: (getMhrInformation.value.changes && getMhrInformation.value.changes[0].documentId) || ''

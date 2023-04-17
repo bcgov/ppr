@@ -20,6 +20,7 @@
       </p>
 
       <HomeCivicAddress
+        :value="getMhrRegistrationLocation.address"
         :validate="validateCivicAddress"
         :class="{ 'border-error-left': validateCivicAddress }"
       />
@@ -42,8 +43,10 @@ export default defineComponent({
   props: {},
   setup () {
     const {
+      getMhrRegistrationLocation,
       getMhrRegistrationValidationModel
     } = useGetters<any>([
+      'getMhrRegistrationLocation',
       'getMhrRegistrationValidationModel'
     ])
 
@@ -72,6 +75,7 @@ export default defineComponent({
     }, { deep: true })
 
     return {
+      getMhrRegistrationLocation,
       ...toRefs(localState)
     }
   }
