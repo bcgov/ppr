@@ -31,7 +31,7 @@ from mhr_api.utils import valid_charset
 
 STATE_NOT_ALLOWED = 'The MH registration is not in a state where changes are allowed. '
 STATE_FROZEN_AFFIDAVIT = 'A transfer to a benificiary is pending after an AFFIDAVIT transfer. '
-DRAFT_NOT_ALLOWED = 'The draft for this registration out of date: delete the draft and resubmit. '
+DRAFT_NOT_ALLOWED = 'The draft for this registration is out of date: delete the draft and resubmit. '
 OWNERS_NOT_ALLOWED = 'Owners not allowed with new registrations: use ownerGroups instead. '
 DOC_ID_REQUIRED = 'Document ID is required for staff registrations. '
 SUBMITTING_REQUIRED = 'Submitting Party is required for MH registrations. '
@@ -274,11 +274,6 @@ def validate_registration_state(registration: MhrRegistration, staff: bool, reg_
         return error_msg
     if registration.status_type and registration.status_type != MhrRegistrationStatusTypes.ACTIVE:
         error_msg += STATE_NOT_ALLOWED
-    elif registration.draft:  # Check if registration draft is out of date/stale.
-        draft: MhrDraft = registration.draft
-        draft.get_stale_count()
-        if draft.stale_count > 0:
-            error_msg += DRAFT_NOT_ALLOWED
     elif is_legacy() and registration.manuhome:
         if registration.manuhome.mh_status != registration.manuhome.StatusTypes.REGISTERED:
             error_msg += STATE_NOT_ALLOWED
