@@ -416,6 +416,7 @@ import { BaseHeaderIF, DraftResultIF, MhRegistrationSummaryIF, RegistrationSumma
 /* eslint-enable no-unused-vars */
 import {
   APIMhrDescriptionTypes,
+  // eslint-disable-next-line no-unused-vars
   APIMhrTypes,
   APIRegistrationTypes,
   APIStatusTypes,
@@ -595,7 +596,7 @@ export default defineComponent({
 
     const openMhr = (item: MhRegistrationSummaryIF): void => {
       emit('action', {
-        action: item.registrationType === APIMhrTypes.MANUFACTURED_HOME_REGISTRATION
+        action: (item.registrationType === APIMhrTypes.MANUFACTURED_HOME_REGISTRATION && item.draftNumber)
           ? TableActions.EDIT_NEW_MHR
           : TableActions.OPEN_MHR,
         mhrInfo: item

@@ -361,7 +361,7 @@ describe('Mhr Information', () => {
   it('should render Attention or Reference Number section on Review screen', async () => {
     setupCurrentHomeOwners()
     wrapper.vm.$data.dataLoaded = true
-    wrapper.vm.$data.showMhrFeeSummary = true
+    wrapper.vm.$data.showTransferType = true
     await Vue.nextTick()
 
     expect(wrapper.find('#transfer-ref-num-section').exists()).toBeFalsy()
@@ -410,7 +410,7 @@ describe('Mhr Information', () => {
   it('should render Authorization component on review', async () => {
     setupCurrentHomeOwners()
     wrapper.vm.$data.dataLoaded = true
-    wrapper.vm.$data.showMhrFeeSummary = true
+    wrapper.vm.$data.showTransferType = true
     await Vue.nextTick()
 
     expect(wrapper.vm.$data.getMhrTransferCurrentHomeOwnerGroups.length).toBe(1)
@@ -450,7 +450,7 @@ describe('Mhr Information', () => {
   it('should render Submitting Party component on the Review screen', async () => {
     setupCurrentHomeOwners()
     wrapper.vm.$data.dataLoaded = true
-    wrapper.vm.$data.showMhrFeeSummary = true
+    wrapper.vm.$data.showTransferType = true
     await Vue.nextTick()
 
     expect(wrapper.find('#account-info').exists()).toBeFalsy()
@@ -492,7 +492,7 @@ describe('Mhr Information', () => {
     await store.dispatch('setAuthRoles', [AuthRoles.PPR_STAFF])
     setupCurrentHomeOwners()
     wrapper.vm.$data.dataLoaded = true
-    wrapper.vm.$data.showMhrFeeSummary = true
+    wrapper.vm.$data.showTransferType = true
     await Vue.nextTick()
 
     // Set Wrapper Validations
@@ -591,7 +591,7 @@ describe('Mhr Information', () => {
   it('should render yellow message bar on the Review screen', async () => {
     setupCurrentHomeOwners()
     wrapper.vm.$data.dataLoaded = true
-    wrapper.vm.$data.showMhrFeeSummary = true
+    wrapper.vm.$data.showTransferType = true
     await Vue.nextTick()
 
     // doesn't exist on manufactured home page
@@ -623,7 +623,7 @@ describe('Mhr Information', () => {
   it('should render Confirm Completion component on the Review screen', async () => {
     setupCurrentHomeOwners()
     wrapper.vm.$data.dataLoaded = true
-    wrapper.vm.$data.showMhrFeeSummary = true
+    wrapper.vm.$data.showTransferType = true
     await Vue.nextTick()
 
     expect(wrapper.find('#transfer-confirm-section').exists()).toBeFalsy()
@@ -651,7 +651,7 @@ describe('Mhr Information', () => {
   it('SALE OR GIFT Flow: display correct Confirm Completion sections', async () => {
     setupCurrentHomeOwners()
     wrapper.vm.$data.dataLoaded = true
-    wrapper.vm.$data.showMhrFeeSummary = true
+    wrapper.vm.$data.showTransferType = true
     await Vue.nextTick()
 
     expect(wrapper.find('#transfer-confirm-section').exists()).toBeFalsy()
@@ -701,7 +701,7 @@ describe('Mhr Information', () => {
   it('SURVIVING JOINT TENANT Flow: display correct Confirm Completion sections', async () => {
     setupCurrentHomeOwners()
     wrapper.vm.$data.dataLoaded = true
-    wrapper.vm.$data.showMhrFeeSummary = true
+    wrapper.vm.$data.showTransferType = true
     await Vue.nextTick()
     await store.dispatch('setAuthRoles', [AuthRoles.STAFF])
 
@@ -742,7 +742,7 @@ describe('Mhr Information', () => {
   it('TRANS WILL Flow: display correct Confirm Completion sections', async () => {
     setupCurrentHomeOwners()
     wrapper.vm.$data.dataLoaded = true
-    wrapper.vm.$data.showMhrFeeSummary = true
+    wrapper.vm.$data.showTransferType = true
     await Vue.nextTick()
     await store.dispatch('setAuthRoles', [AuthRoles.STAFF])
 
@@ -784,7 +784,7 @@ describe('Mhr Information', () => {
   it('should render read only home owners on the Review screen', async () => {
     setupCurrentHomeOwners()
     wrapper.vm.$data.dataLoaded = true
-    wrapper.vm.$data.showMhrFeeSummary = true
+    wrapper.vm.$data.showTransferType = true
     await Vue.nextTick()
 
     // TODO: check that removed owners are not displayed in review
@@ -827,7 +827,7 @@ describe('Mhr Information', () => {
   it('should validate and show components errors on Review screen', async () => {
     setupCurrentHomeOwners()
     wrapper.vm.$data.dataLoaded = true
-    wrapper.vm.$data.showMhrFeeSummary = true
+    wrapper.vm.$data.showTransferType = true
     await Vue.nextTick()
     await triggerUnsavedChange()
 

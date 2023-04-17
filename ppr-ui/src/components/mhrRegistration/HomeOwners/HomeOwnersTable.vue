@@ -667,7 +667,7 @@ export default defineComponent({
         (isTransferToSurvivingJointTenant.value ? localState.isValidDeathCertificate : true) &&
         (isTransferToExecutorProbateWill.value ? TransWill.isValidTransfer.value : true)
       )
-    }, { deep: true })
+    }, { immediate: true, deep: true })
 
     watch(
       () => enableTransferOwnerGroupActions(),

@@ -2,7 +2,7 @@ import {
   AccountInfoIF,
   MhrHomeOwnerGroupIF,
   MhrRegistrationDescriptionIF,
-  MhrRegistrationHomeLocationIF,
+  MhrRegistrationHomeLocationIF, MhrRegistrationIF,
   MhrTransferApiIF,
   MhrTransferIF,
   SubmittingPartyIF
@@ -53,6 +53,7 @@ export const useMhrInformation = () => {
     setIsManualLocation,
     setMhrHomeDescription,
     setMhrTransferDeclaredValue,
+    setMhrTransferType,
     setMhrTransferDate,
     setMhrTransferOwnLand,
     setMhrTransferConsideration,
@@ -63,8 +64,10 @@ export const useMhrInformation = () => {
     'setMhrLocation',
     'setIsManualLocation',
     'setMhrHomeDescription',
+    'setMhrTransferType',
     'setMhrTransferDate',
     'setMhrTransferOwnLand',
+    'setMhrTransferDeclaredValue',
     'setMhrTransferConsideration',
     'setMhrTransferSubmittingParty'
   ])
@@ -131,20 +134,7 @@ export const useMhrInformation = () => {
     currentOwnerGroups.forEach((ownerGroup, index) => { ownerGroup.groupId = index + 1 })
     setShowGroups(currentOwnerGroups.length > 1)
 
-    // Set owners to store
-    if (getMhrInformation.value.draftNumber) {
-      // Retrieve owners from draft if it exists
-      const { registration } = await getMhrDraft(getMhrInformation.value.draftNumber)
-
-      // Set draft Transfer details to store
-      await parseDraftTransferDetails(registration as MhrTransferApiIF)
-
-      setShowGroups(registration.addOwnerGroups.length > 1 || registration.deleteOwnerGroups.length > 1)
-      setMhrTransferHomeOwnerGroups([...registration.addOwnerGroups])
-    } else {
-      // Set current owners if there is no draft
-      setMhrTransferHomeOwnerGroups(cloneDeep(currentOwnerGroups))
-    }
+    setMhrTransferHomeOwnerGroups(cloneDeep(currentOwnerGroups))
   }
 
   const parseSubmittingPartyInfo = (accountInfo: AccountInfoIF): void => {
@@ -182,6 +172,21 @@ export const useMhrInformation = () => {
   }
 
   /** Draft Filings **/
+  /**
+   * Parse a draft MHR Information into State.
+   * @param draft The draft filing to parse.
+   */
+  const initDraftMhrInformation = async (draft: MhrTransferApiIF): Promise<void> => {
+    // Set draft transfer type
+    setMhrTransferType({ transferType: draft.registrationType })
+
+    // Set draft transfer details
+    parseDraftTransferDetails(draft)
+
+    // Set draft owner groups
+    setShowGroups(draft.addOwnerGroups.length > 1 || draft.deleteOwnerGroups.length > 1)
+    setMhrTransferHomeOwnerGroups([...draft.addOwnerGroups])
+  }
 
   const parseDraftTransferDetails = (draft: MhrTransferApiIF): void => {
     setMhrTransferDeclaredValue(draft.declaredValue || '')
@@ -207,7 +212,7 @@ export const useMhrInformation = () => {
         ownerGroups.push({
           ...ownerGroup,
           owners: isDraft ? ownerGroup.owners : addedEditedOwners,
-          groupId: ownerGroup.groupId + 1, // Increment from baseline groupID to create a new group for API
+          groupId: ownerGroup.groupId,
           type: ApiHomeTenancyTypes[
             Object.keys(HomeTenancyTypes).find(key => HomeTenancyTypes[key] as string === ownerGroup.type)
           ]
@@ -261,6 +266,7 @@ export const useMhrInformation = () => {
 
   const buildApiData = async (isDraft: boolean = false): Promise<MhrTransferApiIF> => {
     const data: MhrTransferApiIF = {
+      draftNumber: getMhrInformation.value.draftNumber,
       mhrNumber: getMhrInformation.value.mhrNumber,
       declaredValue: getMhrTransferDeclaredValue.value,
       consideration: getMhrTransferConsideration.value,
@@ -296,6 +302,7 @@ export const useMhrInformation = () => {
     buildApiData,
     parseDraftTransferDetails,
     parseMhrInformation,
+    initDraftMhrInformation,
     parseSubmittingPartyInfo
   }
 }
