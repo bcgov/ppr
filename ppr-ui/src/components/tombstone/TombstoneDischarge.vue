@@ -94,8 +94,7 @@ export default defineComponent({
         return 'No Expiry'
       }),
       statusType: computed((): string => {
-        if (getMhrInformation.value) return getMhrInformation.value.statusType
-        return 'N/A'
+        return getMhrInformation.value?.statusType || 'N/A'
       }),
       header: computed((): string => {
         const numberType = getRegistrationNumber.value ? 'Base' : 'Manufactured Home'
