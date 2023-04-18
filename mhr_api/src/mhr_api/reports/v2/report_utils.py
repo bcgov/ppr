@@ -13,6 +13,7 @@ import copy
 import io
 from pathlib import Path
 
+import pycountry
 from flask import current_app
 from jinja2 import Template
 import PyPDF2
@@ -24,9 +25,11 @@ HEADER_PATH = '/static/v2/header_replace.html'
 HEADER_COVER_PATH = '/static/v2/header_cover.html'
 HEADER_MAIL_PATH = '/static/v2/header_mail.html'
 HEADER_REG_PATH = '/static/v2/header_registration.html'
+HEADER_REG_COVER_PATH = '/static/v2/header_registration_cover.html'
 FOOTER_PATH = '/static/v2/footer.html'
 FOOTER_COVER_PATH = '/static/v2/footer_cover.html'
 FOOTER_MAIL_PATH = '/static/v2/footer_mail.html'
+FOOTER_REG_COVER_PATH = '/static/v2/footer_registration_cover.html'
 HEADER_TITLE_REPLACE = '{{TITLE}}'
 HEADER_SUBTITLE_REPLACE = '{{SUBTITLE}}'
 HEADER_SUBJECT_REPLACE = '{{SUBJECT}}'
@@ -54,7 +57,9 @@ class ReportTypes(BaseEnum):
     MHR_COVER = 'mhrCover'
     MHR_EXEMPTION = 'mhrExemption'
     MHR_REGISTRATION = 'mhrRegistration'
+    MHR_REGISTRATION_COVER = 'mhrRegistrationCover'
     MHR_REGISTRATION_MAIL = 'mhrRegistrationMail'
+    MHR_REGISTRATION_STAFF = 'mhrRegistrationStaff'
     MHR_TRANSFER = 'mhrTransfer'
     MHR_TRANSPORT_PERMIT = 'mhrTransportPermit'
     SEARCH_DETAIL_REPORT = 'searchDetail'
@@ -70,8 +75,10 @@ class Config:  # pylint: disable=too-few-public-methods
     HEADER_COVER_TEMPLATE: str = None
     HEADER_MAIL_TEMPLATE: str = None
     HEADER_REG_TEMPLATE: str = None
+    HEADER_REG_COVER_TEMPLATE: str = None
     FOOTER_TEMPLATE: str = None
     FOOTER_COVER_TEMPLATE: str = None
+    FOOTER_REG_COVER_TEMPLATE: str = None
     FOOTER_MAIL_TEMPLATE: str = None
 
     @classmethod
@@ -109,6 +116,18 @@ class Config:  # pylint: disable=too-few-public-methods
             except Exception as err:  # noqa: B902; just logging
                 current_app.logger.error(f'Error loading mail cover header template from path={file_path}: ' + str(err))
         return cls.HEADER_COVER_TEMPLATE
+
+    @classmethod
+    def get_cover_reg_header_template(cls) -> str:
+        """Fetch mail cover letter header template data from the file system."""
+        if not cls.HEADER_REG_COVER_TEMPLATE:
+            file_path = current_app.config.get('REPORT_TEMPLATE_PATH', '') + HEADER_REG_COVER_PATH
+            try:
+                cls.HEADER_REG_COVER_TEMPLATE = Path(file_path).read_text()
+                current_app.logger.info(f'Loaded reg cover header file from path {file_path}')
+            except Exception as err:  # noqa: B902; just logging
+                current_app.logger.error(f'Error loading reg cover header template from path={file_path}: ' + str(err))
+        return cls.HEADER_REG_COVER_TEMPLATE
 
     @classmethod
     def get_mail_header_template(cls) -> str:
@@ -158,6 +177,18 @@ class Config:  # pylint: disable=too-few-public-methods
                 current_app.logger.error(f'Error loading mail footer template from path={file_path}: ' + str(err))
         return cls.FOOTER_MAIL_TEMPLATE
 
+    @classmethod
+    def get_cover_reg_footer_template(cls) -> str:
+        """Fetch staff registration cover letter footer template data from the file system."""
+        if not cls.FOOTER_REG_COVER_TEMPLATE:
+            file_path = current_app.config.get('REPORT_TEMPLATE_PATH', '') + FOOTER_REG_COVER_PATH
+            try:
+                cls.FOOTER_REG_COVER_TEMPLATE = Path(file_path).read_text()
+                current_app.logger.info(f'Loaded staff registration cover footer file from path {file_path}')
+            except Exception as err:  # noqa: B902; just logging
+                current_app.logger.error(f'Error loading reg cover footer template from path={file_path}: ' + str(err))
+        return cls.FOOTER_REG_COVER_TEMPLATE
+
 
 def get_header_data(title: str, subtitle: str = '') -> str:
     """Get report header with the provided titles."""
@@ -196,6 +227,15 @@ def get_cover_header_data(title: str, subtitle: str, subject: str) -> str:
     return None
 
 
+def get_cover_reg_header_data(title: str, subtitle: str) -> str:
+    """Get a mail cover letter report header with the provided titles and subject."""
+    template = Config().get_cover_reg_header_template()
+    if template:
+        rep_template = template.replace(HEADER_TITLE_REPLACE, title).replace(HEADER_SUBTITLE_REPLACE, subtitle)
+        return rep_template
+    return None
+
+
 def get_footer_data(footer_text: str, mail: bool = False) -> str:
     """Get report footer with the provided text."""
     if mail:
@@ -222,9 +262,16 @@ def get_cover_footer_data(footer_text: str) -> str:
     return None
 
 
+def get_cover_reg_footer_data() -> str:
+    """Get staff registration cover letter report footer."""
+    template = Config().get_cover_reg_footer_template()
+    return template
+
+
 def get_report_meta_data(report_type: str = '') -> dict:
     """Get gotenberg report configuration data."""
     if not report_type or report_type not in (ReportTypes.MHR_REGISTRATION,
+                                              ReportTypes.MHR_REGISTRATION_COVER,
                                               ReportTypes.MHR_COVER,
                                               ReportTypes.MHR_TRANSFER,
                                               ReportTypes.MHR_TRANSPORT_PERMIT,
@@ -245,6 +292,7 @@ def get_report_files(request_data: dict, report_type: str, mail: bool = False) -
                        ReportTypes.SEARCH_TOC_REPORT,
                        ReportTypes.MHR_COVER,
                        ReportTypes.MHR_REGISTRATION,
+                       ReportTypes.MHR_REGISTRATION_COVER,
                        ReportTypes.MHR_TRANSFER,
                        ReportTypes.MHR_TRANSPORT_PERMIT,
                        ReportTypes.MHR_EXEMPTION):
@@ -256,17 +304,21 @@ def get_report_files(request_data: dict, report_type: str, mail: bool = False) -
             title_text = request_data['templateVars'].get('documentDescription', '')
         subtitle_text = request_data['templateVars'].get('meta_subtitle', '')
         footer_text = request_data['templateVars'].get('footer_content', '')
-    if report_type in (ReportTypes.MHR_REGISTRATION, ReportTypes.MHR_COVER,
+    if report_type in (ReportTypes.MHR_REGISTRATION, ReportTypes.MHR_COVER, ReportTypes.MHR_REGISTRATION_COVER,
                        ReportTypes.MHR_TRANSFER, ReportTypes.MHR_EXEMPTION, ReportTypes.MHR_TRANSPORT_PERMIT):
         subject_text = request_data['templateVars'].get('meta_subject', '')
         if report_type == ReportTypes.MHR_COVER:
             files['header.html'] = get_cover_header_data(title_text, subtitle_text, subject_text)
+        elif report_type == ReportTypes.MHR_REGISTRATION_COVER:
+            files['header.html'] = get_cover_reg_header_data(title_text, subtitle_text)
         else:
             files['header.html'] = get_reg_header_data(title_text, subtitle_text, subject_text, mail)
     else:
         files['header.html'] = get_header_data(title_text, subtitle_text)
     if report_type == ReportTypes.MHR_COVER:
         files['footer.html'] = get_cover_footer_data(footer_text)
+    elif report_type == ReportTypes.MHR_REGISTRATION_COVER:
+        files['footer.html'] = get_cover_reg_footer_data()
     else:
         files['footer.html'] = get_footer_data(footer_text, mail)
     return files
@@ -358,6 +410,80 @@ def set_cover(report_data):  # pylint: disable=too-many-branches, too-many-state
                 line4 = country
             else:
                 line4 = line4 + ' ' + country
+        cover_info['line1'] = line1.strip()
+        if line2:
+            cover_info['line2'] = line2.strip()
+        if line3:
+            cover_info['line3'] = line3.strip()
+        cover_info['line4'] = line4.strip()
+    return cover_info
+
+
+def set_registration_cover(report_data):  # pylint: disable=too-many-branches, too-many-statements
+    """Add cover page report data. Cover page envelope window lines up to a maximum of 5."""
+    cover_info = {}
+    if report_data.get('submittingParty'):
+        party = report_data.get('submittingParty')
+        name = ''
+        line1: str = ''
+        line2: str = ''
+        line3: str = ''
+        line4: str = ''
+        country_desc: str = ''
+        address = party['address']
+        country = address.get('country', '')
+        region = address.get('region', '')
+        if country and country == 'US':
+            country_desc = 'UNITED STATES OF AMERICA'
+        elif country and country != 'CA':
+            try:
+                country_desc = pycountry.countries.search_fuzzy(country)[0].name
+                country_desc = country_desc.upper()
+            except (AttributeError, TypeError):
+                country_desc = country
+        if 'businessName' in party:
+            name = party['businessName']
+        elif 'personName' in party:
+            name = party['personName']['first'] + ' ' + party['personName']['last']
+        if name:
+            line1 = name
+            if len(line1) > 40:
+                line1 = line1[0:40]
+        if country == 'CA':
+            postal_code: str = address.get('postalCode', '')
+            postal_code = postal_code.replace('-', ' ')
+            if len(postal_code) == 6:
+                line4 = region + '\n' + postal_code[0:3] + ' ' + postal_code[3:]
+            else:
+                line4 = region + '\n' + postal_code
+        else:
+            line4 = region + ' ' + address.get('postalCode', '')
+
+        if (len(address['city']) + len(line4)) < 40:
+            line4 = address['city'] + ' ' + line4
+        else:
+            line3 = address['city']
+        if 'street' in address:
+            street = address['street']
+            if not line2:
+                line2 = street
+                if len(street) > 40 and line3 == '':
+                    line3 = street[40:80]
+                    line2 = street[0:40]
+            else:
+                line3 = street
+        if not line3 and 'streetAdditional' in address:
+            line3 = address['streetAdditional']
+        if line2 and len(line2) > 40:
+            line2 = line2[0:40]
+        if line3 and len(line3) > 40:
+            line3 = line3[0:40]
+        if country_desc:
+            if not line3:
+                line3 = line4
+                line4 = country_desc
+            else:
+                cover_info['line5'] = country_desc
         cover_info['line1'] = line1.strip()
         if line2:
             cover_info['line2'] = line2.strip()

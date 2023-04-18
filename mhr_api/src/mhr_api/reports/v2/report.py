@@ -59,6 +59,8 @@ class Report:  # pylint: disable=too-few-public-methods
         if self._report_key == ReportTypes.SEARCH_DETAIL_REPORT:
             current_app.logger.debug('Search report generating TOC page numbers as a second report api call.')
             return self.get_search_pdf()
+        if self._report_key == ReportTypes.MHR_REGISTRATION_COVER:
+            return self.get_registration_cover_pdf()
         if self._report_key == ReportTypes.MHR_REGISTRATION_MAIL:
             return self.get_registration_mail_pdf()
         current_app.logger.debug('Account {0} report type {1} setting up report data.'
@@ -124,9 +126,31 @@ class Report:  # pylint: disable=too-few-public-methods
             return jsonify(message=content), response.status_code, None
         return response.content, response.status_code, {'Content-Type': 'application/pdf'}
 
+    def get_registration_cover_pdf(self):
+        """Render a registration cover letter report."""
+        current_app.logger.debug(f'Account {self._account_id} setting up reg cover report data.')
+        self._report_key = ReportTypes.MHR_REGISTRATION_COVER
+        data = self._setup_report_data()
+        url = current_app.config.get('REPORT_SVC_URL') + SINGLE_URI
+        meta_data = report_utils.get_report_meta_data(self._report_key)
+        files = report_utils.get_report_files(data, self._report_key, False)
+        headers = {}
+        token = GoogleAuthService.get_report_api_token()
+        if token:
+            headers['Authorization'] = 'Bearer {}'.format(token)
+        response_cover = requests.post(url=url, headers=headers, data=meta_data, files=files)
+        current_app.logger.debug('Account {0} report type {1} response status: {2}.'
+                                 .format(self._account_id, self._report_key, response_cover.status_code))
+        if response_cover.status_code != HTTPStatus.OK:
+            content = ResourceErrorCodes.REPORT_ERR + ': ' + response_cover.content.decode('ascii')
+            current_app.logger.error('Account {0} response status: {1} error: {2}.'
+                                     .format(self._account_id, response_cover.status_code, content))
+            return jsonify(message=content), response_cover.status_code, None
+        return response_cover.content, response_cover.status_code, {'Content-Type': 'application/pdf'}
+
     def get_registration_mail_pdf(self):
         """Render a mail registration report with cover letter."""
-        current_app.logger.debug('Account {0} setting up mail reg report data.'.format(self._account_id,))
+        current_app.logger.debug('Account {0} setting up mail reg report data.'.format(self._account_id))
         create_ts = self._report_data['createDateTime']
         # 1: Generate the cover page report.
         self._report_key = ReportTypes.MHR_COVER
@@ -308,6 +332,9 @@ class Report:  # pylint: disable=too-few-public-methods
             self._set_selected()
         elif self._report_key == ReportTypes.MHR_COVER:
             self._report_data['cover'] = report_utils.set_cover(self._report_data)
+            self._report_data['createDateTime'] = Report._to_report_datetime(self._report_data['createDateTime'])
+        elif self._report_key == ReportTypes.MHR_REGISTRATION_COVER:
+            self._report_data['regCover'] = report_utils.set_registration_cover(self._report_data)
             self._report_data['createDateTime'] = Report._to_report_datetime(self._report_data['createDateTime'])
         else:
             if self._report_key == ReportTypes.SEARCH_DETAIL_REPORT:
@@ -596,7 +623,7 @@ class Report:  # pylint: disable=too-few-public-methods
             if country == 'CA':
                 address['country'] = 'CANADA'
             elif country == 'US':
-                address['country'] = 'UNITED STATED OF AMERICA'
+                address['country'] = 'UNITED STATES OF AMERICA'
             else:
                 try:
                     country: str = pycountry.countries.search_fuzzy(country)[0].name
@@ -639,7 +666,7 @@ class Report:  # pylint: disable=too-few-public-methods
                 self._report_data['footer_content'] = f'MHR {search_desc} Search - "{criteria}"'
         elif self._report_key in (ReportTypes.MHR_REGISTRATION, ReportTypes.MHR_COVER,
                                   ReportTypes.MHR_TRANSFER, ReportTypes.MHR_EXEMPTION,
-                                  ReportTypes.MHR_TRANSPORT_PERMIT):
+                                  ReportTypes.MHR_TRANSPORT_PERMIT, ReportTypes.MHR_REGISTRATION_COVER):
             reg_num = self._report_data.get('mhrNumber', '')
             self._report_data['footer_content'] = f'Manufactured Home Registration #{reg_num}'
             self._report_data['meta_subject'] = f'Manufactured Home Registration Number: {reg_num}'
@@ -696,6 +723,13 @@ class ReportMeta:  # pylint: disable=too-few-public-methods
         ReportTypes.MHR_REGISTRATION: {
             'reportDescription': 'MHRRegistration',
             'fileName': 'registrationV2',
+            'metaTitle': 'VERIFICATION OF SERVICE',
+            'metaSubtitle': 'MANUFACTURED HOME ACT',
+            'metaSubject': ''
+        },
+        ReportTypes.MHR_REGISTRATION_COVER: {
+            'reportDescription': 'MHRRegistrationCover',
+            'fileName': 'registrationCoverV2',
             'metaTitle': 'VERIFICATION OF SERVICE',
             'metaSubtitle': 'MANUFACTURED HOME ACT',
             'metaSubject': ''
