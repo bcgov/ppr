@@ -65,17 +65,17 @@
             >
               <!-- Transfer Will error messages -->
               <span v-if="isTransferToExecutorProbateWill || isTransferToExecutorUnder25Will">
-                <span v-if="!TransWill.hasExecutorsInGroup(row.item.groupId) &&
+                <span v-if="!TransWill.hasAllCurrentOwnersRemoved(row.item.groupId) &&
+                  !TransWill.hasExecutorsInGroup(row.item.groupId)">
+                  All owners must be deceased and an executor added.
+                </span>
+                <span v-else-if="!TransWill.hasExecutorsInGroup(row.item.groupId) &&
                   getMhrTransferHomeOwnerGroups.length === 1">
                     Must contain at least one executor.
                 </span>
                 <span v-else-if="!TransWill.hasExecutorsInGroup(row.item.groupId) &&
                   TransWill.hasAllCurrentOwnersRemoved(row.item.groupId)">
                   Group must contain at least one executor.
-                </span>
-                <span v-else-if="!TransWill.hasAllCurrentOwnersRemoved(row.item.groupId) &&
-                  !TransWill.hasExecutorsInGroup(row.item.groupId)">
-                  All owners must be deceased and an executor added.
                 </span>
                 <span v-else-if="!TransWill.hasAllCurrentOwnersRemoved(row.item.groupId) &&
                   TransWill.hasExecutorsInGroup(row.item.groupId)">
@@ -474,14 +474,19 @@ export default defineComponent({
       isAddingMode: computed((): boolean => props.isAdding),
       isValidDeathCertificate: false,
       showTableError: computed((): boolean => {
+        // For Will Transfers, we only need to check for global changes and do not show table error in other cases
+        if (isTransferToExecutorProbateWill.value) {
+          return (props.validateTransfer || localState.reviewedOwners) &&
+            (props.isMhrTransfer && !hasUnsavedChanges.value)
+        }
+
         return (props.validateTransfer || localState.reviewedOwners) &&
           (
             !hasMinimumGroups() ||
             hasEmptyGroup.value ||
-            (isTransferToExecutorProbateWill && !hasUnsavedChanges.value) ||
             (props.isMhrTransfer && !hasUnsavedChanges.value) ||
             !localState.isValidAllocation ||
-            (!isTransferToExecutorProbateWill && localState.hasGroupsWithNoOwners) ||
+            localState.hasGroupsWithNoOwners ||
             (!localState.isUngroupedTenancy && hasUndefinedGroupInterest(getTransferOrRegistrationHomeOwnerGroups()))
           )
       }),
@@ -504,23 +509,21 @@ export default defineComponent({
       }),
       isUngroupedTenancy: computed((): boolean => {
         return [HomeTenancyTypes.SOLE, HomeTenancyTypes.JOINT].includes(getHomeTenancyType())
-      }),
-      // Trans Will Flow: check if all Owners within a group have Death Certificate as a supporting document
-      isAllGroupOwnersWithDeathCerts: (groupId): boolean => {
-        return props.homeOwners
-          .filter(owner => owner.groupId === groupId && owner.action !== ActionTypes.ADDED)
-          .every(owner => {
-            return owner.action === ActionTypes.REMOVED &&
-              owner.supportingDocument === SupportingDocumentsOptions.DEATH_CERT
       })
     })
 
     // check if Owner Group that has deceased Owners is valid
     const isInvalidOwnerGroup = (groupId): boolean => {
       if (isTransferToExecutorProbateWill.value && props.validateTransfer) {
-        return (hasUnsavedChanges.value &&
-          (TransWill.hasSomeOwnersRemoved(groupId) || TransWill.hasExecutorsInGroup(groupId))) &&
-          !(TransWill.hasExecutorsInGroup(groupId) && TransWill.hasAllCurrentOwnersRemoved(groupId))
+        const hasRemovedOwners = TransWill.hasSomeOwnersRemoved(groupId)
+        const hasExecutors = TransWill.hasExecutorsInGroup(groupId)
+        const hasRemovedAllOwners = TransWill.hasAllCurrentOwnersRemoved(groupId)
+        const hasValidDocs = TransWill.hasOwnersWithValidSupportDocs(groupId)
+
+        const isValid = hasUnsavedChanges.value &&
+          (hasRemovedOwners || hasExecutors) && !(hasExecutors && hasRemovedAllOwners)
+
+        return isValid || hasValidDocs
       }
 
       return props.validateTransfer && !isValidDeceasedOwnerGroup(groupId) && !localState.showTableError
@@ -623,7 +626,9 @@ export default defineComponent({
         hasUnsavedChanges.value &&
         (TransWill.hasSomeOwnersRemoved(groupId) || TransWill.hasExecutorsInGroup(groupId))
       ) &&
-      !(TransWill.hasExecutorsInGroup(groupId) && TransWill.hasAllCurrentOwnersRemoved(groupId))
+      !(TransWill.hasExecutorsInGroup(groupId) &&
+        TransWill.hasAllCurrentOwnersRemoved(groupId) &&
+        !TransWill.isAllGroupOwnersWithDeathCerts(groupId))
     }
 
     const removeOwnerHandler = (owner: MhrRegistrationHomeOwnerIF): void => {

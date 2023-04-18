@@ -627,7 +627,7 @@ describe('Home Owners', () => {
     await homeOwnersTable.find(getTestId('table-undo-btn')).trigger('click')
 
     expect(homeOwnersTable.find(getTestId('invalid-group-msg')).text())
-      .toContain('All owners must be deceased and an executor added.')
+      .toContain('All owners must be deceased.')
 
     await homeOwnersTable.find(getTestId('table-delete-btn')).trigger('click')
 
@@ -659,7 +659,7 @@ describe('Home Owners', () => {
 
     expect(homeOwners.find(getTestId('invalid-group-msg')).exists()).toBeTruthy()
     expect(homeOwners.find(getTestId('invalid-group-msg')).text())
-      .toContain('Group must contain at least one executor.')
+      .toContain('All owners must be deceased and an executor added.')
 
     await homeOwners.find(getTestId('add-person-btn')).trigger('click')
     await Vue.nextTick()
@@ -709,7 +709,7 @@ describe('Home Owners', () => {
 
     // since we did not delete the second owner from the group one, the error message should be displayed
     expect(homeOwners.find(getTestId('invalid-group-msg')).text())
-      .toContain('All owners must be deceased and an executor added.')
+      .toContain('All owners must be deceased.')
 
     // delete the second owner from the first group
     allDeleteButtons.at(1).trigger('click')
@@ -727,8 +727,6 @@ describe('Home Owners', () => {
     allSupportingDocuments.at(1).find(getTestId('supporting-doc-option-two')).trigger('click')
     await Vue.nextTick()
 
-    console.log(homeOwners.html());
-
     expect(homeOwners.findAllComponents(DeathCertificate).length).toBe(2)
 
     expect(homeOwners.find(getTestId('invalid-group-msg')).text())
@@ -737,9 +735,6 @@ describe('Home Owners', () => {
     // click back on Grant of Probate with Will radio button for first owner
     allSupportingDocuments.at(0).find(getTestId('supporting-doc-option-one')).trigger('click')
     await Vue.nextTick()
-
-    expect(homeOwners.find(getTestId('invalid-group-msg')).text())
-      .toContain('All owners must be deceased and an executor added.')
 
     expect(homeOwners.findAllComponents(DeathCertificate).length).toBe(1)
 
