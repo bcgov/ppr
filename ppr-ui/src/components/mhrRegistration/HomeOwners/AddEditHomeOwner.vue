@@ -28,7 +28,7 @@
                 class="owner-radio pr-4"
                 label="Owner"
                 active-class="selected-radio"
-                :disabled="isTransferToExecutorProbateWill"
+                :disabled="isTransferToExecutorProbateWill || isTransferToExecutorUnder25Will"
                 v-model="HomeOwnerPartyTypes.OWNER_IND"
               />
               <v-tooltip
@@ -303,11 +303,13 @@
                     id="suffix"
                     v-model="owner.suffix"
                     filled
-                    :label="'Additional Name Information' + isTransferToExecutorProbateWill ? '' : ' (Optional)'"
+                    :label="isTransferToExecutorProbateWill ?
+                      'Additional Name Information' : 'Additional Name Information (Optional)'"
                     data-test-id="suffix"
                     hint="Example: Additional legal names, Jr., Sr., Executor of the will of the deceased, etc."
                     persistent-hint
-                    :rules="maxLength(70)"
+                    :rules="isTransferToExecutorProbateWill ?
+                      customRules(required('This fields is required'), maxLength(70)) : maxLength(70)"
                     :disabled="disableNameFields"
                     :readonly="disableNameFields"
                   />
@@ -774,10 +776,13 @@ export default defineComponent({
       isCurrentOwner,
       isTransferDueToDeath,
       isTransferToExecutorProbateWill,
+      isTransferToExecutorUnder25Will,
       disableNameFields,
       HomeOwnerPartyTypes,
       getMhrTransferType,
       transfersContent,
+      customRules,
+      required,
       ...toRefs(localState)
     }
   }

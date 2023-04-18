@@ -169,6 +169,10 @@ export default defineComponent({
       background-color: white;
     }
 
+    .selected-radio.invalid-selection {
+      border: 1px solid $error;
+    }
+
   }
 
   .supporting-doc-one,

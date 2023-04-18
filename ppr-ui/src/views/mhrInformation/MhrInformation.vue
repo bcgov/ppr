@@ -883,7 +883,7 @@ export default defineComponent({
 
 ::v-deep {
   #home-owners-change-btn {
-    //height: unset;
+    height: 24px;
   }
   .home-owners-icon {
     vertical-align: middle;
