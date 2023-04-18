@@ -678,15 +678,14 @@ export default defineComponent({
         ? await updateMhrDraft(getMhrInformation.value.draftNumber, getMhrTransferType.value.transferType, apiData)
         : await createMhrDraft(getMhrTransferType.value.transferType, apiData)
 
-      if (!getMhrInformation.value.draftNumber) {
-        const newItem: RegTableNewItemI = {
-          addedReg: mhrTransferDraft.draftNumber,
-          addedRegParent: apiData.mhrNumber,
-          addedRegSummary: null,
-          prevDraft: (getMhrInformation.value.changes && getMhrInformation.value.changes[0].documentId) || ''
-        }
-        setRegTableNewItem(newItem)
+      const newItem: RegTableNewItemI = {
+        addedReg: mhrTransferDraft.draftNumber,
+        addedRegParent: apiData.mhrNumber,
+        addedRegSummary: null,
+        prevDraft: (getMhrInformation.value.changes && getMhrInformation.value.changes[0].documentId) || ''
       }
+      setRegTableNewItem(newItem)
+
       localState.loading = false
       if (!mhrTransferDraft.error) {
         setUnsavedChanges(false)
