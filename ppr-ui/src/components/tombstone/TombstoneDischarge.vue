@@ -5,7 +5,7 @@
         {{ header }}
       </v-col>
       <v-col class="ml-16 tombstone-info" style="padding-top: 0.375rem;">
-        <v-row justify="end" no-gutters>
+        <v-row v-if="!isMhrInformation" justify="end" no-gutters>
           <v-col :class="$style['info-label']" cols="6">
             <span class="float-right">{{ dateTimePrefix }} Registration Date and Time: </span>
           </v-col>
@@ -13,22 +13,35 @@
             {{ creationDate }}
           </v-col>
         </v-row>
-      </v-col>
-    </v-row>
-    <v-row class="tombstone-sub-header" no-gutters>
-      <v-col>
-        {{ registrationType }}
-      </v-col>
-      <v-col class="ml-16 tombstone-info" style="padding-top: 0.125rem;">
-        <v-row justify="end" no-gutters>
+        <v-row v-else justify="end" no-gutters>
           <v-col :class="$style['info-label']" cols="6">
-            <span class="float-right">Current Expiry Date and Time: </span>
+            <span class="float-right">Registration Status: </span>
           </v-col>
           <v-col class="pl-3" cols="6">
-            {{ expiryDate }}
+            {{ statusType }}
           </v-col>
         </v-row>
       </v-col>
+    </v-row>
+    <v-row v-if="!isMhrInformation" class="tombstone-sub-header" no-gutters>
+        <v-col>
+          {{ registrationType }}
+        </v-col>
+        <v-col class="ml-16 tombstone-info" style="padding-top: 0.125rem;">
+          <v-row justify="end" no-gutters>
+            <v-col :class="$style['info-label']" cols="6">
+              <span class="float-right">Current Expiry Date and Time: </span>
+            </v-col>
+            <v-col class="pl-3" cols="6">
+              {{ expiryDate }}
+            </v-col>
+          </v-row>
+        </v-col>
+    </v-row>
+    <v-row v-else>
+        <v-col>
+          <v-spacer></v-spacer>
+        </v-col>
     </v-row>
   </div>
 </template>
@@ -42,6 +55,11 @@ import { RegistrationTypeIF } from '@/interfaces' // eslint-disable-line
 
 export default defineComponent({
   name: 'TombstoneDischarge',
+  props: {
+    isMhrInformation: {
+      default: false
+    }
+  },
   setup () {
     const {
       getRegistrationCreationDate,
@@ -74,6 +92,10 @@ export default defineComponent({
             .toLocaleString('en-US', { timeZone: 'America/Vancouver' })))
         }
         return 'No Expiry'
+      }),
+      statusType: computed((): string => {
+        if (getMhrInformation.value) return getMhrInformation.value.statusType
+        return 'N/A'
       }),
       header: computed((): string => {
         const numberType = getRegistrationNumber.value ? 'Base' : 'Manufactured Home'
