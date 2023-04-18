@@ -28,7 +28,7 @@
                 class="owner-radio pr-4"
                 label="Owner"
                 active-class="selected-radio"
-                :disabled="isTransferToExecutorProbateWill"
+                :disabled="isTransferToExecutorProbateWill || isTransferToExecutorUnder25Will"
                 v-model="HomeOwnerPartyTypes.OWNER_IND"
               />
               <v-tooltip
@@ -776,6 +776,7 @@ export default defineComponent({
       isCurrentOwner,
       isTransferDueToDeath,
       isTransferToExecutorProbateWill,
+      isTransferToExecutorUnder25Will,
       disableNameFields,
       HomeOwnerPartyTypes,
       getMhrTransferType,
