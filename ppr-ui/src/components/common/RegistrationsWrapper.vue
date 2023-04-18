@@ -863,109 +863,114 @@ export default defineComponent({
     const handleRegTableNewItem = async (val: RegTableNewItemI) => {
       if (val.addedReg) {
         localState.myRegDataAdding = true
-        if (props.isPpr && !val.addedRegSummary) {
-          // attempt to get the summary info from the api
-          if (val.addedReg[0] !== 'D') {
-            // its a normal reg - get reg summary
-            const regSummary = await getRegistrationSummary(val.addedReg, true)
-            if (regSummary.error) {
-              emitError(regSummary.error) // dialog and will reload the dash after
-              localState.myRegDataAdding = false
-              return
-            }
-            val.addedRegSummary = regSummary
-          } else {
-            // its a draft - get draft summary
-            const drafts = await draftHistory(null)
-            if (drafts.error) {
-              emitError(drafts.error) // dialog and will reload the dash after
-              localState.myRegDataAdding = false
-              return
-            } else {
-              val.addedRegSummary = drafts.drafts.find(d => d.documentId === val.addedReg)
-              if (!val.addedRegSummary) {
-                emitError({
-                  category: ErrorCategories.HISTORY_REGISTRATIONS,
-                  statusCode: StatusCodes.NOT_FOUND,
-                  message: 'Error finding new draft summary.'
-                })
+
+        // PPR Handling
+        if (props.isPpr) {
+          if (!val.addedRegSummary) {
+            // attempt to get the summary info from the api
+            if (val.addedReg[0] !== 'D') {
+              // its a normal reg - get reg summary
+              const regSummary = await getRegistrationSummary(val.addedReg, true)
+              if (regSummary.error) {
+                emitError(regSummary.error) // dialog and will reload the dash after
                 localState.myRegDataAdding = false
                 return
               }
-            }
-          }
-        }
-
-        const baseRegs = getRegTableBaseRegs.value
-        if (val.prevDraft) {
-          // remove previous draft item from the store (child drafts also exist under parent - removed later)
-          setRegTableDraftsBaseReg(getRegTableDraftsBaseReg.value.filter(reg => reg.documentId !== val.prevDraft))
-          setRegTableDraftsChildReg(getRegTableDraftsChildReg.value.filter(reg => reg.documentId !== val.prevDraft))
-        }
-        // for masking the type of the new summary
-        const newDraftSummary = val.addedRegSummary as DraftResultIF
-        const newRegSummary = val.addedRegSummary as RegistrationSummaryIF
-        if (val.addedRegParent && props.isPpr) {
-          // new child reg. Find parent + update it with new summary
-          const parentIndex = baseRegs.findIndex(reg => reg.baseRegistrationNumber === val.addedRegParent)
-          if (parentIndex === -1) {
-            // reg was a child of a new base reg so we are adding the full base reg
-            newRegSummary.expand = true
-            baseRegs.unshift(newRegSummary)
-            setRegTableBaseRegs([...baseRegs])
-            setRegTableTotalRowCount(getRegTableTotalRowCount.value + 1)
-          } else {
-            if (val.prevDraft) {
-              // remove draft
-              const changes = baseRegs[parentIndex].changes as DraftResultIF[]
-              if (changes) baseRegs[parentIndex].changes = changes.filter(reg => reg.documentId !== val.prevDraft)
-              // update hasDraft value if removed draft was the only child draft
-              const draftIndex = changes.findIndex(
-                reg => reg.documentId !== val.prevDraft && reg.documentId !== undefined)
-              if (!draftIndex) baseRegs[parentIndex].hasDraft = false
-            }
-            if (newDraftSummary.documentId) {
-              // slot draft into parent changes
-              if (!baseRegs[parentIndex].changes) baseRegs[parentIndex].changes = []
-              baseRegs[parentIndex].changes.unshift(newDraftSummary)
+              val.addedRegSummary = regSummary
             } else {
-              // replace with new summary + then add drafts back on
-              const changes = baseRegs[parentIndex].changes as DraftResultIF[]
-              baseRegs[parentIndex] = newRegSummary
-              if (changes) {
-                const drafts = changes.filter(draft => !!draft.documentId)
-                for (let i = drafts.length; i > 0; i--) {
-                  baseRegs[parentIndex].changes.unshift(drafts[i - 1])
-                  baseRegs[parentIndex].hasDraft = true
+              // its a draft - get draft summary
+              const drafts = await draftHistory(null)
+              if (drafts.error) {
+                emitError(drafts.error) // dialog and will reload the dash after
+                localState.myRegDataAdding = false
+                return
+              } else {
+                val.addedRegSummary = drafts.drafts.find(d => d.documentId === val.addedReg)
+                if (!val.addedRegSummary) {
+                  emitError({
+                    category: ErrorCategories.HISTORY_REGISTRATIONS,
+                    statusCode: StatusCodes.NOT_FOUND,
+                    message: 'Error finding new draft summary.'
+                  })
+                  localState.myRegDataAdding = false
+                  return
                 }
               }
             }
-            // expand row
-            baseRegs[parentIndex].expand = true
-            // update store
-            setRegTableBaseRegs(cloneDeep(baseRegs))
           }
-        } else if (newDraftSummary?.documentId) {
-          // new draft base reg
-          const draftBaseRegs = getRegTableDraftsBaseReg.value
-          draftBaseRegs.unshift(newDraftSummary)
-          setRegTableDraftsBaseReg(draftBaseRegs)
-          if (!val.prevDraft) {
-            // new draft so increase
-            setRegTableTotalRowCount(getRegTableTotalRowCount.value + 1)
-          }
-        } else if (props.isPpr) {
-          // Safety check: Prevent duplicate Registrations in UI
-          if (baseRegs.some(reg => reg.registrationNumber === newRegSummary.registrationNumber)) return
 
-          // new base reg
-          baseRegs.unshift(newRegSummary)
-          setRegTableBaseRegs([...baseRegs])
-          if (!val.prevDraft) {
-            // not from a draft so increase
-            setRegTableTotalRowCount(getRegTableTotalRowCount.value + 1)
+          const baseRegs = getRegTableBaseRegs.value
+          if (val.prevDraft) {
+            // remove previous draft item from the store (child drafts also exist under parent - removed later)
+            setRegTableDraftsBaseReg(getRegTableDraftsBaseReg.value.filter(reg => reg.documentId !== val.prevDraft))
+            setRegTableDraftsChildReg(getRegTableDraftsChildReg.value.filter(reg => reg.documentId !== val.prevDraft))
+          }
+          // for masking the type of the new summary
+          const newDraftSummary = val.addedRegSummary as DraftResultIF
+          const newRegSummary = val.addedRegSummary as RegistrationSummaryIF
+          if (val.addedRegParent && props.isPpr) {
+            // new child reg. Find parent + update it with new summary
+            const parentIndex = baseRegs.findIndex(reg => reg.baseRegistrationNumber === val.addedRegParent)
+            if (parentIndex === -1) {
+              // reg was a child of a new base reg so we are adding the full base reg
+              newRegSummary.expand = true
+              baseRegs.unshift(newRegSummary)
+              setRegTableBaseRegs([...baseRegs])
+              setRegTableTotalRowCount(getRegTableTotalRowCount.value + 1)
+            } else {
+              if (val.prevDraft) {
+                // remove draft
+                const changes = baseRegs[parentIndex].changes as DraftResultIF[]
+                if (changes) baseRegs[parentIndex].changes = changes.filter(reg => reg.documentId !== val.prevDraft)
+                // update hasDraft value if removed draft was the only child draft
+                const draftIndex = changes.findIndex(
+                  reg => reg.documentId !== val.prevDraft && reg.documentId !== undefined)
+                if (!draftIndex) baseRegs[parentIndex].hasDraft = false
+              }
+              if (newDraftSummary.documentId) {
+                // slot draft into parent changes
+                if (!baseRegs[parentIndex].changes) baseRegs[parentIndex].changes = []
+                baseRegs[parentIndex].changes.unshift(newDraftSummary)
+              } else {
+                // replace with new summary + then add drafts back on
+                const changes = baseRegs[parentIndex].changes as DraftResultIF[]
+                baseRegs[parentIndex] = newRegSummary
+                if (changes) {
+                  const drafts = changes.filter(draft => !!draft.documentId)
+                  for (let i = drafts.length; i > 0; i--) {
+                    baseRegs[parentIndex].changes.unshift(drafts[i - 1])
+                    baseRegs[parentIndex].hasDraft = true
+                  }
+                }
+              }
+              // expand row
+              baseRegs[parentIndex].expand = true
+              // update store
+              setRegTableBaseRegs(cloneDeep(baseRegs))
+            }
+          } else if (newDraftSummary?.documentId) {
+            // new draft base reg
+            const draftBaseRegs = getRegTableDraftsBaseReg.value
+            draftBaseRegs.unshift(newDraftSummary)
+            setRegTableDraftsBaseReg(draftBaseRegs)
+            if (!val.prevDraft) {
+              // new draft so increase
+              setRegTableTotalRowCount(getRegTableTotalRowCount.value + 1)
+            }
+          } else {
+            // Safety check: Prevent duplicate Registrations in UI
+            if (baseRegs.some(reg => reg.registrationNumber === newRegSummary.registrationNumber)) return
+
+            // new base reg
+            baseRegs.unshift(newRegSummary)
+            setRegTableBaseRegs([...baseRegs])
+            if (!val.prevDraft) {
+              // not from a draft so increase
+              setRegTableTotalRowCount(getRegTableTotalRowCount.value + 1)
+            }
           }
         }
+
         localState.myRegDataAdding = false
         // trigger snackbar
         context.emit('snackBarMsg', 'Registration was successfully added to your table.')
