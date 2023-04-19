@@ -493,8 +493,8 @@ export default defineComponent({
       isAddingMode: computed((): boolean => props.isAdding),
       isValidDeathCertificate: false,
       showTableError: computed((): boolean => {
-        // For Will Transfers, we only need to check for global changes and do not show table error in other cases
-        if (isTransferToExecutorProbateWill.value) {
+        // For certain Transfers, we only need to check for global changes and do not show table error in other cases
+        if (isTransferToExecutorProbateWill.value || isTransferToExecutorUnder25Will.value) {
           return (props.validateTransfer || localState.reviewedOwners) &&
             (props.isMhrTransfer && !hasUnsavedChanges.value)
         }
@@ -533,7 +533,7 @@ export default defineComponent({
 
     // check if Owner Group that has deceased Owners is valid
     const isInvalidOwnerGroup = (groupId): boolean => {
-      if (isTransferToExecutorProbateWill.value && props.validateTransfer) {
+      if ((isTransferToExecutorProbateWill.value || isTransferToExecutorUnder25Will.value) && props.validateTransfer) {
         const hasRemovedOwners = TransWill.hasSomeOwnersRemoved(groupId)
         const hasExecutors = TransWill.hasExecutorsInGroup(groupId)
         const hasRemovedAllOwners = TransWill.hasAllCurrentOwnersRemoved(groupId)
@@ -586,7 +586,8 @@ export default defineComponent({
     }
 
     const mapInfoChipAction = (item: MhrRegistrationHomeOwnerIF): string => {
-      return item.action === ActionTypes.REMOVED && (showDeathCertificate() || isTransferToExecutorProbateWill.value)
+      return item.action === ActionTypes.REMOVED &&
+        (showDeathCertificate() || isTransferToExecutorProbateWill.value || isTransferToExecutorUnder25Will.value)
         ? 'DECEASED'
         : item.action
     }
@@ -685,8 +686,8 @@ export default defineComponent({
     watch(() => props.homeOwners, (val) => {
       setUnsavedChanges(val.some(owner => !!owner.action || !owner.ownerId))
 
-      // update suffix for executor(s) in Will Transfers flow
-      if (isTransferToExecutorProbateWill.value) {
+      // update suffix for executor(s) in certain Transfers flows
+      if (isTransferToExecutorProbateWill.value || isTransferToExecutorUnder25Will.value) {
         localState.showSuffixError = TransWill.updateExecutorSuffix()
       }
 
@@ -695,7 +696,8 @@ export default defineComponent({
         localState.isValidAllocation &&
         !localState.hasGroupsWithNoOwners &&
         (isTransferToSurvivingJointTenant.value ? localState.isValidDeathCertificate : true) &&
-        (isTransferToExecutorProbateWill.value ? TransWill.isValidTransfer.value : true)
+        ((isTransferToExecutorProbateWill.value || isTransferToExecutorUnder25Will.value)
+          ? TransWill.isValidTransfer.value : true)
       )
     }, { immediate: true, deep: true })
 
