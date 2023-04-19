@@ -378,7 +378,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
         .find(group => group.groupId === groupId).owners
         .forEach((owner: MhrRegistrationHomeOwnerIF) => {
           if (owner.action === ActionTypes.REMOVED && owner.ownerId !== excludedOwnerId &&
-          owner.supportingDocument === SupportingDocumentsOptions.PROBATE_GRANT) {
+          owner.supportingDocument === TransWill.getSupportingDocForActiveTransfer()) {
             owner.supportingDocument = SupportingDocumentsOptions.DEATH_CERT
           }
         })
