@@ -35,7 +35,7 @@
                   </v-col>
                 </v-row>
               </td>
-              <td>{{ row.item.businessName }}</td>
+              <td class="pl-1">{{ row.item.businessName }}</td>
               <td>
                 <base-address
                   :editing="false"
@@ -60,7 +60,7 @@
               <v-row no-gutters class="pa-0">
                 <v-col cols="12" class="summary-text">
                   <v-checkbox
-                      class="pa-0 ma-0"
+                      class="py-0 pr-0 pl-2 ma-0"
                       :hide-details="true"
                       id="checkbox-certified"
                       v-model="certified">
@@ -68,8 +68,8 @@
                         <div class="pt-3">
                         <span :class="showErrorComponent ? 'invalid-color': ''">
                           I, <span class="font-weight-bold" :class="showErrorComponent ? 'invalid-color': ''">
-                                {{ legalName }}
-                             </span>, have relevant knowledge of, and am authorized to submit, this registration.
+                          {{ legalName }}</span>, have relevant knowledge of, and am authorized to submit,
+                          this registration.
                         </span>
                         </div>
                       </template>
@@ -148,7 +148,7 @@ export default defineComponent({
         value: 'name'
       },
       {
-        class: 'column-md py-4',
+        class: 'column-md pl-1 py-4',
         sortable: false,
         text: 'Account Name',
         value: 'legalName'
