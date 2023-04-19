@@ -424,15 +424,14 @@ def set_registration_cover(report_data):  # pylint: disable=too-many-branches, t
     cover_info = {}
     if report_data.get('submittingParty'):
         party = report_data.get('submittingParty')
+        address = party['address']
         name = ''
         line1: str = ''
         line2: str = ''
         line3: str = ''
-        line4: str = ''
+        line4: str = address.get('region', '')
         country_desc: str = ''
-        address = party['address']
         country = address.get('country', '')
-        region = address.get('region', '')
         if country and country == 'US':
             country_desc = 'UNITED STATES OF AMERICA'
         elif country and country != 'CA':
@@ -449,15 +448,13 @@ def set_registration_cover(report_data):  # pylint: disable=too-many-branches, t
             line1 = name
             if len(line1) > 40:
                 line1 = line1[0:40]
-        if country == 'CA':
-            postal_code: str = address.get('postalCode', '')
+        postal_code: str = address.get('postalCode', '')
+        if country == 'CA' and postal_code:
             postal_code = postal_code.replace('-', ' ')
             if len(postal_code) == 6:
-                line4 = region + '\n' + postal_code[0:3] + ' ' + postal_code[3:]
-            else:
-                line4 = region + '\n' + postal_code
-        else:
-            line4 = region + ' ' + address.get('postalCode', '')
+                postal_code = postal_code[0:3] + ' ' + postal_code[3:]
+        if postal_code:
+            line4 += '\n' + postal_code
 
         if (len(address['city']) + len(line4)) < 40:
             line4 = address['city'] + ' ' + line4

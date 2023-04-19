@@ -1,121 +1,128 @@
 {
-  "attentionReference": "", 
-  "clientReferenceId": "", 
-  "createDateTime": "2022-09-15T15:12:58-07:53", 
-  "declaredValue": 0, 
+  "attentionReference": "UT-TESTING",
+  "clientReferenceId": "UT-MHREG-JOINT-01",
+  "createDateTime": "2023-04-14T13:53:51-07:53",
+  "declaredValue": 0,
   "description": {
     "baseInformation": {
-      "make": "WATSON IND. (ALTA) DUCHESS", 
-      "model": "", 
-      "year": "2019"
-    }, 
-    "csaNumber": "1001231", 
-    "csaStandard": "Z240", 
-    "engineerName": "", 
-    "manufacturer": "STARLINE", 
-    "otherRemarks": "Other details of the home.", 
-    "rebuiltRemarks": "Rebuilt status of the home.", 
-    "sectionCount": 1, 
+      "circa": false,
+      "make": "WATSON IND. (ALTA)",
+      "model": "DUCHESS",
+      "year": 2018
+    },
+    "csaNumber": "786356",
+    "csaStandard": "Z240",
+    "manufacturer": "STARLINE",
+    "otherRemarks": "BC SAFETY AUTHORITY #339556, PERMIT# EL-721296-2018",
+    "rebuiltRemarks": "REBUILT AS A DOUBLE WIDE, MAKE/MODEL CUSTOM, YEAR 1995",
+    "sectionCount": 1,
     "sections": [
       {
-        "lengthFeet": 75, 
-        "lengthInches": 10, 
-        "serialNumber": "67567009", 
-        "widthFeet": 60, 
-        "widthInches": 8
+        "lengthFeet": 52,
+        "serialNumber": "52D70556",
+        "widthFeet": 12
       }
-    ]
-  }, 
-  "documentDescription": "REGISTER NEW UNIT", 
-  "documentId": "80049421", 
-  "documentRegistrationNumber": "00269803", 
+    ],
+    "status": "ACTIVE"
+  },
+  "documentDescription": "MANUFACTURED HOME REGISTRATION",
+  "documentId": "80888125",
+  "documentRegistrationNumber": "00502207",
   "location": {
-    "additionalDescription": "", 
+    "locationId": 104,
+    "status": "ACTIVE",
+    "locationType": "RESERVE",
     "address": {
-      "city": "Victoria", 
-      "country": "CA", 
-      "postalCode": "", 
-      "region": "BC", 
-      "street": "200-940 Blanshard St"
-    }, 
-    "block": "", 
-    "dealerName": "", 
-    "districtLot": "", 
-    "exceptionPlan": "", 
-    "landDistrict": "", 
-    "leaveProvince": false, 
-    "lot": "", 
-    "meridian": "", 
-    "pad": "", 
-    "parcel": "", 
-    "parkName": "", 
-    "partOf": "", 
-    "pidNumber": "011625490", 
-    "plan": "", 
-    "range": "", 
-    "section": "", 
-    "status": "ACTIVE", 
-    "taxCertificate": false, 
-    "township": ""
-  }, 
-  "mhrNumber": "150133", 
+      "street": "423-8068 120A ST",
+      "city": "SURREY",
+      "region": "BC",
+      "country": "CA",
+      "postalCode": "A1A 1A1"
+    },
+    "lot": "42",
+    "parcel": "84782734",
+    "block": "X",
+    "districtLot": "32",
+    "partOf": "4",
+    "section": "2",
+    "township": "52",
+    "range": "5",
+    "meridian": "9",
+    "landDistrict": "472837",
+    "plan": "S763472",
+    "leaveProvince": false,
+    "taxCertificate": false,
+    "exceptionPlan": "Except plan of the Indian Reserve.",
+    "dealerName": "NOR-TEC DESIGN GROUP LTD.",
+    "additionalDescription": "Additional Description of the Indian Reserve.",
+    "bandName": "TS'KW'AYLAXW FIRST NATION",
+    "reserveNumber": "148"
+  },
+  "mhrNumber": "150444",
   "ownerGroups": [
     {
-      "groupId": 1, 
-      "interest": "", 
-      "interestNumerator": 0, 
+      "groupId": 1,
+      "interest": "",
+      "interestDenominator": 0,
+      "interestNumerator": 0,
       "owners": [
         {
           "address": {
-            "city": "VICTORIA", 
-            "country": "CA", 
-            "postalCode": "V9A 0C5", 
-            "region": "BC", 
-            "street": "3-331 ROBERT ST"
-          }, 
-          "organizationName": "ABC CORP.", 
-          "phoneNumber": "123123231", 
-          "type": "SOLE"
-        }, 
+            "city": "KELOWNA",
+            "country": "CA",
+            "postalCode": "V1Y 2Z6",
+            "region": "BC",
+            "street": "24-2055 ETHEL ST"
+          },
+          "individualName": {
+            "first": "DAVE",
+            "last": "LARRY"
+          },
+          "ownerId": 1,
+          "partyType": "OWNER_IND",
+          "phoneNumber": "9728347237",
+          "type": "JOINT"
+        },
         {
           "address": {
-            "city": "VERNON", 
-            "country": "CA", 
-            "postalCode": "V1H 1Z6", 
-            "region": "BC", 
-            "street": "8-5920 HERITAGE DR"
-          }, 
+            "city": "KELOWNA",
+            "country": "CA",
+            "postalCode": "V1Y 2Z6",
+            "region": "BC",
+            "street": "24-2055 ETHEL ST"
+          },
           "individualName": {
-            "first": "JOHN", 
-            "last": "SMITH", 
-            "middle": "P"
-          }, 
-          "phoneNumber": "234324123", 
-          "suffix": "Jr.", 
-          "type": "SOLE"
+            "first": "JANE",
+            "last": "LARRY"
+          },
+          "ownerId": 2,
+          "partyType": "OWNER_IND",
+          "phoneNumber": "9728347237",
+          "type": "JOINT"
         }
-      ], 
-      "status": "ACTIVE", 
-      "tenancySpecified": false, 
-      "type": "SOLE"
+      ],
+      "status": "ACTIVE",
+      "tenancySpecified": true,
+      "type": "JOINT"
     }
-  ], 
-  "status": "ACTIVE", 
+  ],
+  "payment": {
+    "invoiceId": "27520",
+    "receipt": "/api/v1/payment-requests/27520/receipts"
+  },
+  "registrationType": "MHREG",
+  "status": "ACTIVE",
   "submittingParty": {
     "address": {
-      "city": "NORTH VANCOUVER", 
-      "country": "CA", 
-      "postalCode": "V7G 2L3", 
-      "region": "BC", 
-      "street": "21-3824 BROCKTON CRES"
-    }, 
-    "emailAddress": "email@test.ca", 
-    "individualName": {
-      "first": "JAMES", 
-      "last": "SMITH", 
-      "middle": "ROBERT"
-    }, 
-    "phoneExtension": "1", 
-    "phoneNumber": "2342434234"
-  }
+      "city": "VICTORIA",
+      "country": "US",
+      "postalCode": "V8W 2V8",
+      "region": "BC",
+      "streetAdditional": "SECOND FLOOR",
+      "street": "222 SUMMER STREET"
+    },
+    "businessName": "ABC SEARCHING COMPANY",
+    "emailAddress": "bsmith@abc-search.com"
+  },
+  "username": "Business Registry Test 1"
 }
