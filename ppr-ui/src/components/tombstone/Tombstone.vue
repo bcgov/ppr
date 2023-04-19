@@ -1,7 +1,10 @@
 <template>
   <v-container class="header-container view-container px-15 py-0" fluid style="background-color: white;">
     <div class="container pa-0" style="padding: 29px 0 !important;">
-      <tombstone-discharge v-if="displayDischarge || displayRenewal || displayAmendment || displayMhrInformation" />
+      <tombstone-discharge
+        v-if="displayDischarge || displayRenewal || displayAmendment || displayMhrInformation"
+        :isMhrInformation="displayMhrInformation"
+      />
       <tombstone-default v-else />
     </div>
   </v-container>
