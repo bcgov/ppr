@@ -10,6 +10,7 @@
   >
     <td
       v-if="inSelectedHeaders('registrationNumber') || inSelectedHeaders('mhrNumber')"
+      class=""
       :class="isChild || isExpanded ? $style['border-left']: ''"
     >
       <v-row no-gutters>
@@ -28,10 +29,16 @@
             <v-icon v-else>mdi-chevron-down</v-icon>
           </v-btn>
         </v-col>
+        <v-col v-if="isTransAffi(item.registrationType)" cols="2">
+          <v-icon class="mt-n1" color="caution">mdi-alert</v-icon>
+        </v-col>
         <v-col style="padding-top: 2px;">
           <p v-if="isDraft(item)" :class="{ 'ma-0': true, 'pl-9': isChild }">Pending</p>
           <!-- child drafts will sometimes show outside their base reg during the sort -->
-          <div v-if="isChild || (isDraft(item) && item.baseRegistrationNumber)" :class="isChild ? 'pl-9' : ''">
+          <div
+            v-if="isChild || (isDraft(item) && item.baseRegistrationNumber)"
+            :class="(isChild && !isTransAffi(item.registrationType)) ? 'pl-9' : 'pl-1'"
+          >
             <p v-if="isPpr" class="ma-0">{{ item.registrationNumber }}</p>
             <p v-else-if="!isPpr && !isDraft(item)" style="font-size: 0.875rem;" class="ma-0">
               {{ item.documentRegistrationNumber }}
@@ -43,7 +50,22 @@
           <p v-else class="ma-0">
             <b>{{ item.baseRegistrationNumber || item.mhrNumber }}</b>
           </p>
+          <!-- Lien Badge when one exists -->
           <InfoChip v-if="!isPpr && !isChild && hasLien(item)" action="LIEN"></InfoChip>
+        </v-col>
+      </v-row>
+
+      <!-- Caution message for Frozen MHR state -->
+      <v-row
+        v-if="!isPpr && !isChild && item.statusType === mhApiStatusTypes.FROZEN"
+        class="mt-8"
+        :class="item.changes && 'pt-4'"
+      >
+        <v-col class="pb-0">
+          <p class="mb-0 text-no-wrap">
+            <v-icon class="mt-n1" color="caution">mdi-alert</v-icon>
+            <span class="pl-3 pb-n2">A Transfer Due to Sale or Gift must be completed.</span>
+          </p>
         </v-col>
       </v-row>
     </td>
@@ -422,7 +444,8 @@ import {
   DraftTypes,
   TableActions,
   UIRegistrationClassTypes,
-  UITransferTypes
+  UITransferTypes,
+  mhApiStatusTypes, ApiTransferTypes
 } from '@/enums'
 import { useRegistration } from '@/composables/useRegistration'
 import moment from 'moment'
@@ -588,8 +611,8 @@ export default defineComponent({
     }
 
     const isEnabledMhr = (item: MhRegistrationSummaryIF) => {
-      return item.statusType === APIStatusTypes.MHR_ACTIVE && localState.enableOpenEdit &&
-     (item.registrationDescription === APIMhrDescriptionTypes.REGISTER_NEW_UNIT ||
+      return [APIStatusTypes.MHR_ACTIVE, mhApiStatusTypes.FROZEN].includes(item.statusType as APIStatusTypes) &&
+        localState.enableOpenEdit && (item.registrationDescription === APIMhrDescriptionTypes.REGISTER_NEW_UNIT ||
           item.registrationDescription === APIMhrDescriptionTypes.CONVERTED)
     }
 
@@ -670,6 +693,11 @@ export default defineComponent({
 
     const isRepairersLien = (item: RegistrationSummaryIF): boolean => {
       return item.registrationType === APIRegistrationTypes.REPAIRERS_LIEN
+    }
+
+    const isTransAffi = (type: ApiTransferTypes): boolean => {
+      // RegistrationSummaryIF | DraftResultIF | MhrDraftApiIF
+      return type === ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL
     }
 
     const refresh = async (item: RegistrationSummaryIF): Promise<void> => {
@@ -774,6 +802,7 @@ export default defineComponent({
 
     return {
       freezeScrolling,
+      mhApiStatusTypes,
       APIMhrDescriptionTypes,
       getFormattedDate,
       getRegistrationType,
@@ -806,6 +835,7 @@ export default defineComponent({
       isMhrTransfer,
       hasLien,
       getMhrDescription,
+      isTransAffi,
       ...toRefs(localState)
     }
   }

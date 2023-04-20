@@ -1,4 +1,4 @@
-import {APIAmendmentTypes, APIMhrTypes, APIRegistrationTypes, DraftTypes} from '@/enums'
+import { APIAmendmentTypes, APIMhrTypes, APIRegistrationTypes, DraftTypes } from '@/enums'
 import {
   CourtOrderIF,
   DebtorNameIF,
@@ -8,7 +8,7 @@ import {
   PartyIF,
   VehicleCollateralIF
 } from '@/interfaces'
-import mhrRegistration from '@/views/newMhrRegistration/MhrRegistration.vue';
+import mhrRegistration from '@/views/newMhrRegistration/MhrRegistration.vue'
 
 // Payment (pay-api) reference interface.
 export interface PaymentIF {
