@@ -6,11 +6,7 @@
     <title>{{ meta_title }}</title>
     <meta charset="UTF-8">
     <meta name="author" content="BC Registries and Online Services">
-    {% if environment == '' %}
-        [[v2/stylePageRegistration.html]]
-    {% else %}
-        [[v2/stylePageRegistrationDraft.html]]
-    {% endif %}
+    [[v2/stylePageCover.html]]
     [[v2/style.html]]
   </head>
   <body>
@@ -49,13 +45,21 @@
             </tr>
           </table> 
         {% else %}
-          <table class="cover-data-table-5 mt-0" role="presentation">
+          <table class="cover-data-table-5 mtn-1-1" role="presentation">
             <tr>
                 <td>
                 <div>{{ regCover.line1 }}</div>
                 <div>{{ regCover.line2 }}</div>
                 <div>{{ regCover.line3 }}</div>
-                <div>{{ regCover.line4 }}</div>
+                <div>
+                  {% set breaks = regCover.line4.split('\n') %}
+                  {% for item in breaks %}
+                     {{ item }}
+                     {% if not loop.last %}
+                        &nbsp;&nbsp;
+                     {% endif %}
+                  {% endfor %}
+                </div>
                 <div>{{ regCover.line5 }}</div>
                 </td>
             </tr>  

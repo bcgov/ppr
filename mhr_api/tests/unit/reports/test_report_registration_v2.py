@@ -35,6 +35,7 @@ REGISTRATON_JOINT_DATAFILE = 'tests/unit/reports/data/registration-joint-example
 REGISTRATON_JOINT_PDFFILE = 'tests/unit/reports/data/registration-joint-example.pdf'
 REGISTRATON_MAIL_PDFFILE = 'tests/unit/reports/data/registration-mail-example.pdf'
 REGISTRATON_COVER_PDFFILE = 'tests/unit/reports/data/registration-cover-example.pdf'
+REGISTRATON_STAFF_PDFFILE = 'tests/unit/reports/data/registration-staff-example.pdf'
 
 TRANSFER_TEST_SO_DATAFILE = 'tests/unit/reports/data/trans-test-example.json'
 TRANSFER_TEST_SO_PDFFILE = 'tests/unit/reports/data/trans-test-example-so.pdf'
@@ -159,8 +160,8 @@ def test_cover_registration(session, client, jwt):
     """Assert that generation of a mail cover page report is as expected."""
     # setup
     if is_report_v2():
-        json_data = get_json_from_file(REGISTRATON_SOLE_DATAFILE)
-        report = Report(json_data, 'PS12345', ReportTypes.MHR_COVER, 'Account Name')
+        json_data = get_json_from_file(REGISTRATON_TEST_DATAFILE)
+        report = Report(json_data, 'ppr_staff', ReportTypes.MHR_REGISTRATION_COVER, 'Account Name')
         # test
         content, status, headers = report.get_pdf()
         assert headers
@@ -168,17 +169,17 @@ def test_cover_registration(session, client, jwt):
         check_response(content, status, REGISTRATON_COVER_PDFFILE)
 
 
-def test_mail_registration(session, client, jwt):
-    """Assert that generation of a mail report is as expected."""
+def test_staff_registration(session, client, jwt):
+    """Assert that generation of a staff registration report is as expected."""
     # setup
     if is_report_v2():
         json_data = get_json_from_file(REGISTRATON_TEST_DATAFILE)
-        report = Report(json_data, 'PS12345', ReportTypes.MHR_REGISTRATION_MAIL, 'Account Name')
+        report = Report(json_data, 'ppr_staff', ReportTypes.MHR_REGISTRATION_STAFF, 'Account Name')
         # test
         content, status, headers = report.get_pdf()
         assert headers
         # verify
-        check_response(content, status, REGISTRATON_MAIL_PDFFILE)
+        check_response(content, status, REGISTRATON_STAFF_PDFFILE)
 
 
 def test_exemption_res(session, client, jwt):

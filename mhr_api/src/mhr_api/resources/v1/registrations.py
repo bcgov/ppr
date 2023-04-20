@@ -16,13 +16,14 @@
 from http import HTTPStatus
 
 from flask import Blueprint
-from flask import current_app, jsonify, request
+from flask import g, current_app, jsonify, request
 from flask_cors import cross_origin
 from registry_schemas import utils as schema_utils
 
 from mhr_api.utils.auth import jwt
 from mhr_api.exceptions import BusinessException, DatabaseException
 from mhr_api.services.authz import authorized, authorized_role, is_staff, is_all_staff_account, REGISTER_MH
+from mhr_api.services.authz import is_reg_staff_account
 from mhr_api.models import MhrRegistration
 from mhr_api.models.registration_utils import AccountRegistrationParams
 from mhr_api.reports.v2.report_utils import ReportTypes
@@ -112,10 +113,14 @@ def post_registrations():  # pylint: disable=too-many-return-statements
         # Return report if request header Accept MIME type is application/pdf.
         if resource_utils.is_pdf(request):
             current_app.logger.info('Report not yet available: returning JSON.')
-            # return reg_utils.get_registration_report(registration, response_json,
-            #                                        ReportTypes.MHR_REGISTRATION,
-            #                                        jwt.get_token_auth_header(), HTTPStatus.CREATED)
-        reg_utils.enqueue_registration_report(registration, response_json, ReportTypes.MHR_REGISTRATION)
+        if is_reg_staff_account(account_id):
+            token = g.jwt_oidc_token_info
+            username: str = token.get('firstname', '') + ' ' + token.get('lastname', '')
+            response_json['username'] = username
+            reg_utils.enqueue_registration_report(registration, response_json, ReportTypes.MHR_REGISTRATION_STAFF)
+            del response_json['username']
+        else:
+            reg_utils.enqueue_registration_report(registration, response_json, ReportTypes.MHR_REGISTRATION)
         return response_json, HTTPStatus.CREATED
 
     except DatabaseException as db_exception:
@@ -132,7 +137,7 @@ def post_registrations():  # pylint: disable=too-many-return-statements
 @bp.route('/<string:mhr_number>', methods=['GET', 'OPTIONS'])
 @cross_origin(origin='*')
 @jwt.requires_auth
-def get_registrations(mhr_number: str):  # pylint: disable=too-many-return-statements
+def get_registrations(mhr_number: str):  # pylint: disable=too-many-return-statements, too-many-branches
     """Get registration information for a previous MH registration created by the account."""
     try:
         current_app.logger.info(f'get_registrations mhr_number={mhr_number}')
@@ -169,10 +174,13 @@ def get_registrations(mhr_number: str):  # pylint: disable=too-many-return-state
         response_json = registration.new_registration_json
         # Return report if request header Accept MIME type is application/pdf.
         if resource_utils.is_pdf(request):
+            report_type = ReportTypes.MHR_REGISTRATION
+            if is_reg_staff_account(account_id):
+                report_type = ReportTypes.MHR_REGISTRATION_STAFF
             current_app.logger.info(f'Fetching registration report for MHR# {mhr_number}.')
             return reg_utils.get_registration_report(registration,
                                                      response_json,
-                                                     ReportTypes.MHR_REGISTRATION,
+                                                     report_type,
                                                      jwt.get_token_auth_header(),
                                                      HTTPStatus.CREATED)
 

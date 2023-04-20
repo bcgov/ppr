@@ -61,8 +61,8 @@ class Report:  # pylint: disable=too-few-public-methods
             return self.get_search_pdf()
         if self._report_key == ReportTypes.MHR_REGISTRATION_COVER:
             return self.get_registration_cover_pdf()
-        if self._report_key == ReportTypes.MHR_REGISTRATION_MAIL:
-            return self.get_registration_mail_pdf()
+        if self._report_key == ReportTypes.MHR_REGISTRATION_STAFF:
+            return self.get_registration_staff_pdf()
         current_app.logger.debug('Account {0} report type {1} setting up report data.'
                                  .format(self._account_id, self._report_key))
         data = self._setup_report_data()
@@ -148,16 +148,16 @@ class Report:  # pylint: disable=too-few-public-methods
             return jsonify(message=content), response_cover.status_code, None
         return response_cover.content, response_cover.status_code, {'Content-Type': 'application/pdf'}
 
-    def get_registration_mail_pdf(self):
-        """Render a mail registration report with cover letter."""
-        current_app.logger.debug('Account {0} setting up mail reg report data.'.format(self._account_id))
+    def get_registration_staff_pdf(self):
+        """Render a staff MH registration report with cover letter."""
+        current_app.logger.debug(f'Account {self._account_id} setting up staff reg report data.')
         create_ts = self._report_data['createDateTime']
         # 1: Generate the cover page report.
-        self._report_key = ReportTypes.MHR_COVER
+        self._report_key = ReportTypes.MHR_REGISTRATION_COVER
         data = self._setup_report_data()
         url = current_app.config.get('REPORT_SVC_URL') + SINGLE_URI
         meta_data = report_utils.get_report_meta_data(self._report_key)
-        files = report_utils.get_report_files(data, self._report_key, True)
+        files = report_utils.get_report_files(data, self._report_key, False)
         headers = {}
         token = GoogleAuthService.get_report_api_token()
         if token:
@@ -178,7 +178,7 @@ class Report:  # pylint: disable=too-few-public-methods
         current_app.logger.debug('Account {0} report type {1} calling report-api {2}.'
                                  .format(self._account_id, self._report_key, url))
         meta_data = report_utils.get_report_meta_data(self._report_key)
-        files = report_utils.get_report_files(data, self._report_key, True)
+        files = report_utils.get_report_files(data, self._report_key, False)
         response_reg = requests.post(url=url, headers=headers, data=meta_data, files=files)
         current_app.logger.debug('Account {0} report type {1} response status: {2}.'
                                  .format(self._account_id, self._report_key, response_reg.status_code))
@@ -187,7 +187,7 @@ class Report:  # pylint: disable=too-few-public-methods
             current_app.logger.error('Account {0} response status: {1} error: {2}.'
                                      .format(self._account_id, response_reg.status_code, content))
             return jsonify(message=content), response_reg.status_code, None
-        # 3: Merge cover leter and registraiton reports.
+        # 3: Merge cover letter and registraiton reports.
         url = current_app.config.get('REPORT_SVC_URL') + MERGE_URI
         files = {
             'pdf1.pdf': response_cover.content,
@@ -271,6 +271,7 @@ class Report:  # pylint: disable=too-few-public-methods
             'v2/style',
             'v2/styleMail',
             'v2/stylePage',
+            'v2/stylePageCover',
             'v2/stylePageDraft',
             'v2/stylePageMail',
             'v2/stylePageRegistration',
