@@ -10,7 +10,6 @@
   >
     <td
       v-if="inSelectedHeaders('registrationNumber') || inSelectedHeaders('mhrNumber')"
-      class=""
       :class="isChild || isExpanded ? $style['border-left']: ''"
     >
       <v-row no-gutters>
