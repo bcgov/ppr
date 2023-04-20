@@ -29,8 +29,8 @@
             <v-icon v-else>mdi-chevron-down</v-icon>
           </v-btn>
         </v-col>
-        <v-col v-if="isTransAffi(item.registrationType)" cols="2">
-          <v-icon class="mt-n1" color="caution">mdi-alert</v-icon>
+        <v-col v-if="isTransAffi(item.registrationType) && item.statusType === mhApiStatusTypes.FROZEN" cols="2">
+          <v-icon data-test-id="alert-icon" class="mt-n1" color="caution">mdi-alert</v-icon>
         </v-col>
         <v-col style="padding-top: 2px;">
           <p v-if="isDraft(item)" :class="{ 'ma-0': true, 'pl-9': isChild }">Pending</p>
@@ -63,8 +63,8 @@
       >
         <v-col class="pb-0">
           <p class="mb-0 text-no-wrap">
-            <v-icon class="mt-n1" color="caution">mdi-alert</v-icon>
-            <span class="pl-3 pb-n2">A Transfer Due to Sale or Gift must be completed.</span>
+            <v-icon data-test-id="alert-icon" class="mt-n1" color="caution">mdi-alert</v-icon>
+            <span class="pl-3">A Transfer Due to Sale or Gift must be completed.</span>
           </p>
         </v-col>
       </v-row>
@@ -696,8 +696,7 @@ export default defineComponent({
     }
 
     const isTransAffi = (type: ApiTransferTypes): boolean => {
-      // RegistrationSummaryIF | DraftResultIF | MhrDraftApiIF
-      return type === ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL
+      return type === ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL
     }
 
     const refresh = async (item: RegistrationSummaryIF): Promise<void> => {

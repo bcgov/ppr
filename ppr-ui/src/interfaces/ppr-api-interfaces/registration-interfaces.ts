@@ -1,4 +1,4 @@
-import { APIAmendmentTypes, APIMhrTypes, APIRegistrationTypes, DraftTypes } from '@/enums'
+import {APIAmendmentTypes, APIMhrTypes, APIRegistrationTypes, DraftTypes, mhApiStatusTypes} from '@/enums'
 import {
   CourtOrderIF,
   DebtorNameIF,
@@ -69,6 +69,7 @@ export interface MhrDraftIF {
   createDateTime?: string
   draftNumber?: string
   lastUpdateDateTime?: string
+  statusType?: string
 }
 
 export interface DraftResultIF {

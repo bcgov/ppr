@@ -5,13 +5,14 @@ import { getVuexStore } from '@/store'
 import CompositionApi from '@vue/composition-api'
 import { createLocalVue, mount, Wrapper, WrapperArray } from '@vue/test-utils'
 import flushPromises from 'flush-promises'
+import { getTestId, getLastEvent } from './utils'
 
 // local components
 import { TableRow } from '@/components/tables/common'
 // local types/helpers/etc.
-import { APIStatusTypes, TableActions } from '@/enums'
-import { DraftResultIF, RegistrationSummaryIF } from '@/interfaces'
-import { registrationTableHeaders } from '@/resources'
+import { APIStatusTypes, mhApiStatusTypes, TableActions } from '@/enums'
+import { DraftResultIF, MhrDraftIF, MhRegistrationSummaryIF, RegistrationSummaryIF } from '@/interfaces'
+import { mhRegistrationTableHeaders, registrationTableHeaders } from '@/resources'
 // unit test data/helpers
 import {
   mockedRegistration1,
@@ -20,9 +21,10 @@ import {
   mockedRegistration3,
   mockedRegistration1Collapsed,
   mockedRegistration2Collapsed,
-  mockedRegistration2Child
+  mockedRegistration2Child,
+  mockedMhRegistration,
+  mockedMhDraft
 } from './test-data'
-import { getLastEvent } from './utils'
 
 Vue.use(Vuetify)
 
@@ -40,7 +42,8 @@ const tableRowDraft = '.draft-registration-row'
  *
  * @returns a Wrapper<any> object with the given parameters.
  */
-function createComponent (item: DraftResultIF | RegistrationSummaryIF): Wrapper<any> {
+function createComponent (item: DraftResultIF | RegistrationSummaryIF | MhRegistrationSummaryIF, headers: any):
+  Wrapper<any> {
   const localVue = createLocalVue()
   localVue.use(CompositionApi)
   localVue.use(Vuetify)
@@ -52,7 +55,7 @@ function createComponent (item: DraftResultIF | RegistrationSummaryIF): Wrapper<
       setAddRegEffect: false,
       setDisableActionShadow: false,
       setChild: false,
-      setHeaders: [...registrationTableHeaders],
+      setHeaders: [...headers],
       setIsExpanded: false,
       setItem: item
     },
@@ -72,7 +75,7 @@ describe('TableRow tests', () => {
   ]
 
   beforeEach(async () => {
-    wrapper = createComponent(mockedRegistration1)
+    wrapper = createComponent(mockedRegistration1, registrationTableHeaders)
 
     wrapper.setProps({ isPpr: true })
   })
@@ -289,7 +292,7 @@ describe('TableRow tests', () => {
   it('emits button actions properly for draft registrations', async () => {
     // recreate wrapper with draft
     wrapper.destroy()
-    wrapper = createComponent(mockedDraft1)
+    wrapper = createComponent(mockedDraft1, registrationTableHeaders)
     wrapper.setProps({ isPpr: true })
     await flushPromises()
 
@@ -352,5 +355,163 @@ describe('TableRow tests', () => {
         regNum: mockedDraftAmend.baseRegistrationNumber
       }
     )
+  })
+})
+
+describe('Mhr TableRow tests', () => {
+  let wrapper: Wrapper<any>
+  const registrationHistory: (MhRegistrationSummaryIF | MhrDraftIF)[] = [
+    mockedMhDraft,
+    mockedMhRegistration
+  ]
+
+  beforeEach(async () => {
+    wrapper = createComponent(mockedMhRegistration, mhRegistrationTableHeaders)
+
+    wrapper.setProps({ isPpr: false })
+  })
+
+  afterEach(() => {
+    wrapper.destroy()
+  })
+
+  it('renders the row', async () => {
+    expect(wrapper.findComponent(TableRow).exists()).toBe(true)
+    expect(wrapper.vm.item).toEqual(mockedMhRegistration)
+    expect(wrapper.findAll(tableRow).length).toBe(1)
+    expect(wrapper.findAll(tableRowBaseReg).length).toBe(1)
+  })
+
+  it('displays properly in the row for all types of items', async () => {
+    for (let i = 0; i < registrationHistory.length; i++) {
+      // both below are the same variable, but typed differently
+      const baseReg = registrationHistory[i] as MhRegistrationSummaryIF
+      const draftReg = registrationHistory[i] as MhrDraftIF
+
+      const isChild = (draftReg.type && draftReg.mhrNumber) ||
+        (baseReg.mhrNumber && baseReg.mhrNumber !== baseReg.baseRegistrationNumber)
+      await wrapper.setProps({
+        setChild: isChild,
+        setItem: baseReg
+      })
+      expect(wrapper.vm.item).toEqual(baseReg)
+
+      // it sets addRegEffect when given
+      const applyAddedRegEffect = '.added-reg-effect'
+      expect(wrapper.findAll(applyAddedRegEffect).length).toBe(0)
+      await wrapper.setProps({ setAddRegEffect: true })
+      expect(wrapper.vm.applyAddedRegEffect).toBe(true)
+      expect(wrapper.findAll(applyAddedRegEffect).length).toBe(1)
+      // changes when updated
+      await wrapper.setProps({ setAddRegEffect: false })
+      expect(wrapper.vm.applyAddedRegEffect).toBe(false)
+      expect(wrapper.findAll(applyAddedRegEffect).length).toBe(0)
+
+      // check things specific to state / heirarchy of the item
+      if (!draftReg.type) {
+        // not a draft
+        let rowData: WrapperArray<Vue>
+        if (!isChild) {
+          // parent registration
+          rowData = wrapper.findAll(tableRowBaseReg + ' td')
+          expect(rowData.exists()).toBe(true)
+          expect(rowData.length).toBe(11)
+          // reg num
+          if (baseReg.changes) {
+            expect(rowData.at(0).find(btnExpArr).exists()).toBe(true)
+          } else {
+            expect(rowData.at(0).find(btnExpArr).exists()).toBe(false)
+          }
+          // base reg num
+          expect(rowData.at(0).text()).toContain(baseReg.baseRegistrationNumber)
+          // reg type
+          if (baseReg.changes) {
+            expect(rowData.at(1).find(btnExpTxt).exists()).toBe(true)
+            expect(rowData.at(1).find(btnExpTxt).text()).toContain('View')
+          } else {
+            expect(rowData.at(1).find(btnExpTxt).exists()).toBe(false)
+          }
+          // status type
+          expect(rowData.at(3).text()).toContain(wrapper.vm.getStatusDescription(baseReg.statusType))
+          // expire days
+          expect(rowData.at(8).text()).toContain(wrapper.vm.showExpireDays(baseReg))
+          // action btn
+          expect(rowData.at(10).text()).toContain('Remove From Table')
+        } else {
+          // child registration
+          rowData = wrapper.findAll(tableRow + ' td')
+          expect(rowData.exists()).toBe(true)
+          expect(rowData.length).toBe(11)
+          // regNum
+          expect(rowData.at(0).text()).toContain(`${baseReg.baseRegistrationNumber}`)
+          // reg type
+          expect(rowData.at(1).find(btnExpTxt).exists()).toBe(false)
+          // status type
+          expect(rowData.at(3).text()).toEqual('Active')
+          // expiry days
+          expect(rowData.at(8).text()).toEqual('')
+          // action btn is not there
+          expect(rowData.at(10).text()).toContain('')
+        }
+        // reg type
+        expect(rowData.at(1).text()).toContain(wrapper.vm.getRegistrationType(baseReg.registrationType))
+        // submitted date
+        expect(rowData.at(2).text()).toContain(wrapper.vm.getFormattedDate(baseReg.createDateTime))
+        // pdf
+        if (baseReg.path) expect(rowData.at(9).text()).toContain('PDF')
+        else expect(rowData.at(9).find('.mdi-information-outline').exists()).toBe(true)
+      } else {
+        // draft registration
+        let rowData: WrapperArray<Vue>
+        if (!isChild) rowData = wrapper.findAll(tableRowDraft + ' td')
+        else rowData = wrapper.findAll(tableRow + ' td')
+        expect(rowData.exists()).toBe(true)
+        expect(rowData.length).toBe(11)
+        // reg num
+        if (isChild) expect(rowData.at(0).text()).toBe(`Pending: ${baseReg.baseRegistrationNumber}`)
+        else expect(rowData.at(0).text()).toBe('Pending')
+        // submitted date
+        expect(rowData.at(2).text()).toBe('Not Registered')
+        // status type
+        expect(rowData.at(3).text()).toContain('')
+        // expire days
+        if (isChild) expect(rowData.at(8).text()).toEqual('')
+        else expect(rowData.at(8).text()).toBe('N/A')
+        // pdf
+        expect(rowData.at(9).text()).toEqual('')
+        // action btn
+        expect(rowData.at(10).text()).toContain('Edit')
+      }
+      // check things that apply to all items
+      const rowData = wrapper.findAll(tableRow + ' td')
+      expect(rowData.exists()).toBe(true)
+      // folio
+      expect(rowData.at(7).text()).toContain(baseReg.clientReferenceId)
+    }
+  })
+
+  it('displays caution icon for Frozen Mhrs', async () => {
+    const frozenRegistrationHistory: (MhRegistrationSummaryIF)[] = [
+      { ...mockedMhRegistration, statusType: mhApiStatusTypes.FROZEN }
+    ]
+
+    for (let i = 0; i < frozenRegistrationHistory.length; i++) {
+      // both below are the same variable, but typed differently
+      const baseReg = frozenRegistrationHistory[i] as MhRegistrationSummaryIF
+
+      await wrapper.setProps({
+        setChild: false,
+        setItem: baseReg
+      })
+      expect(wrapper.vm.item).toEqual(baseReg)
+
+      const rowData = wrapper.findAll(tableRowBaseReg + ' td')
+      expect(rowData.exists()).toBe(true)
+      expect(rowData.length).toBe(11)
+      // base reg num
+      expect(rowData.at(0).text()).toContain(baseReg.baseRegistrationNumber)
+      const alertIcon = rowData.at(0).find(getTestId('alert-icon'))
+      expect(alertIcon.exists()).toBeTruthy()
+    }
   })
 })

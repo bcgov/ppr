@@ -1,5 +1,11 @@
-import { APIAmendmentTypes, APIRegistrationTypes, APIStatusTypes, DraftTypes } from '@/enums'
-import { DraftResultIF, RegistrationSummaryIF } from '@/interfaces'
+import {
+  APIAmendmentTypes,
+  APIMhrTypes,
+  APIRegistrationTypes,
+  APIStatusTypes,
+  DraftTypes, mhApiStatusTypes
+} from '@/enums'
+import { DraftResultIF, MhrDraftIF, MhRegistrationSummaryIF, RegistrationSummaryIF } from '@/interfaces'
 
 export const mockedRegistration1: RegistrationSummaryIF = {
   baseRegistrationNumber: 'GOV2343',
@@ -135,4 +141,33 @@ export const mockedRegistration2Collapsed: RegistrationSummaryIF = {
   registrationType: APIAmendmentTypes.AMENDMENT,
   securedParties: 'Bank of Montreal',
   statusType: APIStatusTypes.ACTIVE
+}
+
+export const mockedMhRegistration: MhRegistrationSummaryIF = {
+  mhrNumber: '123456',
+  ownerNames: 'John Smith',
+  clientReferenceId: 'ABC123',
+  createDateTime: '2021-07-20T17:21:17+00:00',
+  expireDays: 500, // Number of days until expiry
+  hasDraft: true,
+  path: '/path/to/doc',
+  username: 'John Smith',
+  submittingParty: 'some Submitting Party',
+  registrationDescription: 'PPSA SECURITY AGREEMENT',
+  documentRegistrationNumber: 'GOV2343',
+  baseRegistrationNumber: '654321',
+  registrationType: APIMhrTypes.MANUFACTURED_HOME_REGISTRATION,
+  statusType: mhApiStatusTypes.ACTIVE
+}
+
+export const mockedMhDraft: MhrDraftIF = {
+  lastUpdateDateTime: '2021-08-03T17:21:17+00:00',
+  type: APIMhrTypes.MANUFACTURED_HOME_REGISTRATION,
+  mhrNumber: '',
+  registrationType: APIMhrTypes.MANUFACTURED_HOME_REGISTRATION,
+  registrationDescription: '',
+  path: '/path/to/doc',
+  createDateTime: '2021-08-03T17:21:17+00:00',
+  clientReferenceId: 'FFF555',
+  statusType: 'Draft'
 }
