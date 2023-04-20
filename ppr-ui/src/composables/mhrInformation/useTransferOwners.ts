@@ -296,7 +296,8 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     // check if supportingDocument is either Death Certificate or Grant of Probate
     hasValidSupportDocs: (owner: MhrRegistrationHomeOwnerIF): boolean => {
       let hasValidSupportingDoc = false
-      if (owner.supportingDocument === SupportingDocumentsOptions.DEATH_CERT) {
+      if (owner.supportingDocument === SupportingDocumentsOptions.DEATH_CERT ||
+        owner.supportingDocument === SupportingDocumentsOptions.AFFIDAVIT) {
         hasValidSupportingDoc = owner.hasDeathCertificate &&
           !!owner.deathCertificateNumber && !!owner.deathDateTime
       } else {
