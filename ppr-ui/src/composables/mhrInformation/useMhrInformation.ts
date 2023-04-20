@@ -77,6 +77,7 @@ export const useMhrInformation = () => {
   } = useHomeOwners(true)
   const {
     isTransferDueToDeath,
+    isTransferToExecutorProbateWill,
     getCurrentOwnerGroupIdByOwnerId
   } = useTransferOwners()
 
@@ -242,6 +243,30 @@ export const useMhrInformation = () => {
     return isDraft ? getMhrTransferHomeOwnerGroups.value : ownerGroups
   }
 
+  const parseDeletedWillOwnerGroups = (): any => {
+    const ownerGroups = []
+    getMhrTransferHomeOwnerGroups.value.forEach(ownerGroup => {
+      if (ownerGroup.owners.some(owner => owner.action === ActionTypes.REMOVED)) {
+        ownerGroups.push({
+          ...ownerGroup,
+          groupId: getCurrentOwnerGroupIdByOwnerId(ownerGroup.owners[0].ownerId),
+          owners: ownerGroup.owners.filter(owner => owner.action === ActionTypes.REMOVED).map(owner => {
+            return owner.individualName ? { ...owner, individualName: normalizeObject(owner.individualName) } : owner
+          }),
+          // Determine group tenancy type
+          type: getMhrTransferHomeOwnerGroups.value.length > 1
+            ? ApiHomeTenancyTypes.NA
+            : ownerGroup.owners.filter(owner => owner.action === ActionTypes.REMOVED).length > 1
+              ? ApiHomeTenancyTypes.JOINT
+              : ApiHomeTenancyTypes.SOLE
+        })
+        console.log(ownerGroup.owners)
+      }
+    })
+
+    return ownerGroups
+  }
+
   const parseDeletedOwnerGroups = (): any => {
     // Return the current state for Sale or Gift
     if (getMhrTransferType.value?.transferType === ApiTransferTypes.SALE_OR_GIFT) {
@@ -257,7 +282,8 @@ export const useMhrInformation = () => {
           owners: ownerGroup.owners.map(owner => {
             return owner.individualName ? { ...owner, individualName: normalizeObject(owner.individualName) } : owner
           }),
-          type: ApiHomeTenancyTypes.JOINT // Can only remove Joint Tenants outside SoG Transfers (ie death scenarios)
+          // Can only remove Joint Tenants outside SoG Transfers (ie death scenarios)
+          type: ApiHomeTenancyTypes.JOINT
         })
       }
     })
@@ -291,7 +317,9 @@ export const useMhrInformation = () => {
       addOwnerGroups: isTransferDueToDeath.value
         ? await parseDueToDeathOwnerGroups(isDraft)
         : await parseOwnerGroups(isDraft),
-      deleteOwnerGroups: await parseDeletedOwnerGroups()
+      deleteOwnerGroups: isTransferToExecutorProbateWill.value
+        ? await parseDeletedWillOwnerGroups()
+        : await parseDeletedOwnerGroups()
     }
 
     return data

@@ -18,7 +18,7 @@
             <span class="float-right">Registration Status: </span>
           </v-col>
           <v-col class="pl-3" cols="6">
-            {{ statusType }}
+            {{ statusType[0] + statusType.toLowerCase().slice(1) }}
           </v-col>
         </v-row>
       </v-col>
