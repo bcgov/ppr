@@ -77,7 +77,7 @@
                 </v-col>
               </v-row>
               <v-row no-gutters class="pt-3 pb-8">
-                  <v-col cols="12" class="pl-8 ma-0">
+                  <v-col cols="12" class="pl-10 ma-0">
                     <span class="summary-text"><span class="font-weight-bold">Date: </span>{{ currentDate }}</span>
                   </v-col>
               </v-row>

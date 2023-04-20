@@ -1,10 +1,10 @@
 <template>
   <v-card flat rounded id="submitting-party" class="mt-8 pa-8 pr-6">
     <v-row no-gutters>
-      <v-col :cols="isMhrTransfer ? '3' : '12'"  :sm="isMhrTransfer ? '0' : '2'">
+      <v-col cols="12" sm="2">
         <label class="generic-label" :class="{'error-text': validate}">Add Submitting Party</label>
       </v-col>
-      <v-col :cols="isMhrTransfer ? '9' : '12'"  :sm="isMhrTransfer ? '0' : '10'" class="px-1">
+      <v-col cols="12" sm="10" class="px-1">
         <v-radio-group
           id="submitting-party-type-options"
           v-model="submittingPartyType"
