@@ -260,7 +260,6 @@ export const useMhrInformation = () => {
               ? ApiHomeTenancyTypes.JOINT
               : ApiHomeTenancyTypes.SOLE
         })
-        console.log(ownerGroup.owners)
       }
     })
 
@@ -282,8 +281,7 @@ export const useMhrInformation = () => {
           owners: ownerGroup.owners.map(owner => {
             return owner.individualName ? { ...owner, individualName: normalizeObject(owner.individualName) } : owner
           }),
-          // Can only remove Joint Tenants outside SoG Transfers (ie death scenarios)
-          type: ApiHomeTenancyTypes.JOINT
+          type: ApiHomeTenancyTypes.JOINT // Can only remove Joint Tenants outside SoG Transfers (ie death scenarios)
         })
       }
     })
