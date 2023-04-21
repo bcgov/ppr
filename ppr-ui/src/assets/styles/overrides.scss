@@ -498,6 +498,8 @@ input#reg-textfield.v-text-field.v-input--dense:not(.v-text-field--outlined),
 
 #registration-table.v-data-table > .v-data-table__wrapper > table > tbody > tr > td:first-child {
   padding-left: 28px !important;
+  max-width: 9rem;
+  overflow: visible;
 }
 
 #registration-table.v-data-table > .v-data-table__wrapper > table > tbody > tr > td,

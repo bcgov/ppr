@@ -24,5 +24,6 @@ export enum mhApiStatusTypes {
   DRAFT = 'DRAFT',
   ACTIVE = 'ACTIVE',
   EXEMPT = 'EXEMPT',
-  HISTORICAL = 'HISTORICAL'
+  HISTORICAL = 'HISTORICAL',
+  FROZEN = 'FROZEN'
 }

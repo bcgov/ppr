@@ -86,7 +86,8 @@ async function start () {
             lightBlue: '#E2E8EE', // same as $app-lt-blue
             error: '#d3272c',
             success: '#1a9031',
-            darkGray: '#495057' // same as theme $gray7
+            darkGray: '#495057', // same as theme $gray7
+            caution: '#F8661A' // same as them $app-orange
           }
         }
       },

@@ -92,6 +92,11 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     return getMhrTransferType.value?.transferType === ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL
   })
 
+  /** Returns true when the passed transfer type is a 'TO_EXECUTOR_PROBATE_WILL' type **/
+  const isTransAffi = (type: ApiTransferTypes): boolean => {
+    return type === ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL
+  }
+
   /** Returns true when the selected transfer type is a 'SURVIVING_JOINT_TENANT' scenario **/
   const isTransferToSurvivingJointTenant = computed((): boolean => {
     return getMhrTransferType.value?.transferType === ApiTransferTypes.SURVIVING_JOINT_TENANT
@@ -514,6 +519,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     isDisabledForSJTChanges,
     isDisabledForWillChanges,
     TransWill, // Transfer Due to Death - Grant of Probate (with Will)
+    isTransAffi,
     isCurrentOwner,
     getMhrTransferType,
     isTransferDueToDeath,
