@@ -22,6 +22,12 @@
       @proceed="handleCancelDialogResp($event)"
     />
 
+    <BaseDialog
+      :setOptions="transferRequiredDialogOptions"
+      :setDisplay="showStartTransferRequiredDialog"
+      @proceed="handleStartTransferRequiredDialogResp($event)"
+    />
+
     <div class="view-container px-15 pt-0 pb-5">
       <div class="container pa-0 pt-4">
         <v-row no-gutters>
@@ -318,11 +324,17 @@ import { ConfirmCompletion, TransferDetails, TransferDetailsReview, TransferType
 import { HomeLocationReview, YourHomeReview } from '@/components/mhrRegistration/ReviewConfirm'
 import { HomeOwners } from '@/views'
 import { BaseDialog } from '@/components/dialogs'
-import { registrationSaveDraftError, unsavedChangesDialog, cancelOwnerChangeConfirm } from '@/resources/dialogOptions'
+import {
+  registrationSaveDraftError,
+  unsavedChangesDialog,
+  cancelOwnerChangeConfirm,
+  transferRequiredDialog
+} from '@/resources/dialogOptions'
 import AccountInfo from '@/components/common/AccountInfo.vue'
 /* eslint-disable no-unused-vars */
 import {
   AccountInfoIF,
+  DialogOptionsIF,
   MhrTransferApiIF,
   RegTableNewItemI,
   TransferTypeSelectIF
@@ -334,12 +346,12 @@ import {
   ActionTypes,
   APIMHRMapSearchTypes,
   APISearchTypes,
+  ApiTransferTypes,
   RouteNames,
   UIMHRSearchTypes
 } from '@/enums'
 import {
   createMhrDraft,
-  deleteMhrDraft,
   getAccountInfoFromAuth,
   getMhrDraft,
   getMHRegistrationSummary,
@@ -451,7 +463,9 @@ export default defineComponent({
     } = useHomeOwners(true)
     const { maxLength } = useInputRules()
     const {
-      isTransferDueToDeath
+      isTransferDueToDeath,
+      isTransferToExecutorUnder25Will,
+      TransAffidavit
     } = useTransferOwners()
 
     // Refs
@@ -481,6 +495,12 @@ export default defineComponent({
       showCancelDialog: false,
       showSaveDialog: false,
       showCancelChangeDialog: false,
+      showStartTransferRequiredDialog: false,
+      transferRequiredDialogOptions: computed((): DialogOptionsIF => {
+        transferRequiredDialog.text =
+          transferRequiredDialog.text.replace('mhr_number', getMhrInformation.value.mhrNumber)
+        return transferRequiredDialog
+      }),
       hasTransferChanges: computed((): boolean => {
         return localState.showTransferType &&
           (hasUnsavedChanges.value || !!getMhrTransferDeclaredValue.value || !!getMhrTransferType.value)
@@ -635,27 +655,47 @@ export default defineComponent({
         // Complete Filing
         localState.loading = true
         // Build filing to api specs
-        const apiData = await buildApiData()
+        const apiData: MhrTransferApiIF = await buildApiData()
         // Submit Transfer filing
         const mhrTransferFiling =
           await submitMhrTransfer(apiData, getMhrInformation.value.mhrNumber, localState.staffPayment)
+
         localState.loading = false
 
         if (!mhrTransferFiling.error) {
-          setUnsavedChanges(false)
-          const newItem: RegTableNewItemI = {
-            addedReg: mhrTransferFiling.documentId,
-            addedRegParent: getMhrInformation.value.mhrNumber,
-            addedRegSummary: null,
-            prevDraft: mhrTransferFiling.documentId || ''
+          // Affidavit Transfer has a different flow
+          if (isTransferToExecutorUnder25Will.value) {
+            TransAffidavit.setCompleted(true)
+            localState.loading = true
+            localState.validate = false
+            localState.isReviewMode = false
+
+            setUnsavedChanges(false)
+
+            // Pre-fill Transfer Gift Sale with current registration info
+            // WIP: for now use init draft to pre-fill the transfer
+            apiData.registrationType = ApiTransferTypes.SALE_OR_GIFT
+            await initDraftMhrInformation(apiData as MhrTransferApiIF)
+            localState.loading = false
+            localState.showStartTransferRequiredDialog = true
+          } else {
+            // Normal flow when not Affidavit Transfer
+            setUnsavedChanges(false)
+            const newItem: RegTableNewItemI = {
+              addedReg: mhrTransferFiling.documentId,
+              addedRegParent: getMhrInformation.value.mhrNumber,
+              addedRegSummary: null,
+              prevDraft: mhrTransferFiling.documentId || ''
+            }
+            setRegTableNewItem(newItem)
+            goToDash()
           }
-          setRegTableNewItem(newItem)
-          goToDash()
         } else console.log(mhrTransferFiling?.error) // Handle Schema or Api errors here.
       }
 
       // If transfer is valid, enter review mode
-      if (isValidTransfer.value) {
+      // For Affidavit Transfers, need to complete affidavit before proceeding
+      if (isValidTransfer.value && !TransAffidavit.isCompleted()) {
         localState.isReviewMode = true
         localState.validate = false
       }
@@ -731,6 +771,17 @@ export default defineComponent({
       localState.loading = true
       await resetMhrInformation()
       localState.loading = false
+    }
+
+    // For Transfer Sale or Gift after Affidavit is completed
+    const handleStartTransferRequiredDialogResp = async (val: boolean): Promise<void> => {
+      if (!val) {
+        // Complete Later button cancels and navigates to dashboard
+        setUnsavedChanges(false) // prevent unsaved changes dialog from showing up
+        goToDash()
+      }
+      // Start Gift/Sale Transfer simply closes the dialog, since the data is already pre-filled
+      localState.showStartTransferRequiredDialog = false
     }
 
     const quickMhrSearch = async (mhrNumber: string): Promise<void> => {
@@ -837,7 +888,9 @@ export default defineComponent({
       toggleTypeSelector,
       onStaffPaymentDataUpdate,
       handleCancelDialogResp,
+      handleStartTransferRequiredDialogResp,
       cancelOwnerChangeConfirm,
+      transferRequiredDialog,
       getMhrTransferSubmittingParty,
       ...toRefs(localState)
     }

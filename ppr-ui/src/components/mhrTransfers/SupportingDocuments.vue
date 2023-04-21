@@ -95,7 +95,8 @@ export default defineComponent({
     const updateDeletedOwner = (): void => {
       editHomeOwner({
         ...localState.deletedOwnerState,
-        hasDeathCertificate: localState.deletedOwnerState.supportingDocument === SupportingDocumentsOptions.DEATH_CERT
+        hasDeathCertificate: localState.deletedOwnerState.supportingDocument ===
+          (SupportingDocumentsOptions.DEATH_CERT || SupportingDocumentsOptions.AFFIDAVIT)
       },
       localState.deletedOwnerState.groupId
       )

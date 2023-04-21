@@ -29,19 +29,23 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     getMhrTransferType,
     getMhrTransferHomeOwners,
     getMhrTransferHomeOwnerGroups,
-    getMhrTransferCurrentHomeOwnerGroups
+    getMhrTransferCurrentHomeOwnerGroups,
+    getMhrTransferAffidavitCompleted
   } = useGetters<any>([
     'hasUnsavedChanges',
     'getMhrTransferType',
     'getMhrTransferHomeOwners',
     'getMhrTransferHomeOwnerGroups',
-    'getMhrTransferCurrentHomeOwnerGroups'
+    'getMhrTransferCurrentHomeOwnerGroups',
+    'getMhrTransferAffidavitCompleted'
   ])
 
   const {
-    setMhrTransferHomeOwnerGroups
+    setMhrTransferHomeOwnerGroups,
+    setMhrTransferAffidavitCompleted
   } = useActions<any>([
-    'setMhrTransferHomeOwnerGroups'
+    'setMhrTransferHomeOwnerGroups',
+    'setMhrTransferAffidavitCompleted'
   ])
 
   const {
@@ -343,7 +347,8 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
         .filter(owner => owner.groupId === groupId && owner.action !== ActionTypes.ADDED)
         .every(owner => {
           return owner.action === ActionTypes.REMOVED &&
-            owner.supportingDocument === SupportingDocumentsOptions.DEATH_CERT
+            // Affidavit type also has Death Certificate
+            (owner.supportingDocument === SupportingDocumentsOptions.DEATH_CERT)
         })
     },
     // Check if there's a deleted Owner with selected Grant of Probate or Affidavit as a supporting document.
@@ -409,7 +414,16 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       }
       return showSuffixError
     }
+  }
 
+  // Transfer Affidavit flow and all the related conditions/logic
+  const TransAffidavit = {
+    setCompleted: (completed: boolean): void => {
+      setMhrTransferAffidavitCompleted(completed)
+    },
+    isCompleted: (): boolean => {
+      return getMhrTransferAffidavitCompleted.value
+    }
   }
 
   /** Return true if the specified owner is part of the current/base ownership structure **/
@@ -519,6 +533,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     isDisabledForSJTChanges,
     isDisabledForWillChanges,
     TransWill, // Transfer Due to Death - Grant of Probate (with Will)
+    TransAffidavit, // Transfer to Executor under $25k - Affidavit
     isTransAffi,
     isCurrentOwner,
     getMhrTransferType,

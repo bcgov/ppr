@@ -63,3 +63,7 @@ export const getMhrTransferSubmittingParty = (state: StateIF): SubmittingPartyIF
 export const getMhrTransferAttentionReference = (state: StateIF): string => {
   return state.stateModel.mhrTransfer.attentionReference
 }
+
+export const getMhrTransferAffidavitCompleted = (state: StateIF): boolean => {
+  return state.stateModel.mhrTransfer.isAffidavitTransferCompleted
+}

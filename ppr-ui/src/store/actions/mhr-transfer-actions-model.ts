@@ -57,3 +57,7 @@ export const setMhrTransferSubmittingParty: ActionIF = ({ commit }, submittingPa
 export const setMhrTransferAttentionReference: ActionIF = ({ commit }, attentionReference: string): void => {
   commit('mutateMhrTransferAttentionReference', attentionReference)
 }
+
+export const setMhrTransferAffidavitCompleted: ActionIF = ({ commit }, isAffidavitCompleted: boolean): void => {
+  commit('mutateMhrTransferAffidavitCompleted', isAffidavitCompleted)
+}

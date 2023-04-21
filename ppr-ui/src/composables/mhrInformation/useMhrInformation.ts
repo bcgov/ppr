@@ -96,7 +96,8 @@ export const useMhrInformation = () => {
       consideration: '',
       transferDate: '',
       ownLand: false,
-      attentionReference: ''
+      attentionReference: '',
+      isAffidavitTransferCompleted: false
     }
   }
 

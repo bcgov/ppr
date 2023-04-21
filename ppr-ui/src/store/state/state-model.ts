@@ -304,7 +304,8 @@ export const stateModel: StateModelIF = {
     consideration: '',
     transferDate: '',
     attentionReference: '',
-    ownLand: false
+    ownLand: false,
+    isAffidavitTransferCompleted: false
   },
   // Manufactured Home Registration Information Validation Flags
   mhrInfoValidationState: {

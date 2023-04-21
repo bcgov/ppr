@@ -21,6 +21,7 @@ export interface MhrTransferIF {
   submittingParty: SubmittingPartyIF
   attentionReference: string
   error?: ErrorIF
+  isAffidavitTransferCompleted?: boolean
 }
 
 export interface MhrTransferApiIF {
