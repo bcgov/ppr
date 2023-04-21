@@ -303,12 +303,12 @@
                     id="suffix"
                     v-model="owner.suffix"
                     filled
-                    :label="isTransferToExecutorProbateWill ?
+                    :label="(isTransferToExecutorProbateWill || isTransferToExecutorUnder25Will) ?
                       'Additional Name Information' : 'Additional Name Information (Optional)'"
                     data-test-id="suffix"
                     hint="Example: Additional legal names, Jr., Sr., Executor of the will of the deceased, etc."
                     persistent-hint
-                    :rules="isTransferToExecutorProbateWill ?
+                    :rules="(isTransferToExecutorProbateWill || isTransferToExecutorUnder25Will) ?
                       customRules(required('This fields is required'), maxLength(70)) : maxLength(70)"
                     :disabled="disableNameFields"
                     :readonly="disableNameFields"

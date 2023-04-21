@@ -343,7 +343,8 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
         .filter(owner => owner.groupId === groupId && owner.action !== ActionTypes.ADDED)
         .every(owner => {
           return owner.action === ActionTypes.REMOVED &&
-            owner.supportingDocument === SupportingDocumentsOptions.DEATH_CERT
+            // Affidavit type also has Death Certificate
+            (owner.supportingDocument === SupportingDocumentsOptions.DEATH_CERT)
         })
     },
     // Check if there's a deleted Owner with selected Grant of Probate or Affidavit as a supporting document.
