@@ -217,8 +217,8 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                             note['remarks'] != 'MANUFACTURED HOME REGISTRATION CANCELLED':
                         # Only staff can see remarks if not default.
                         note['remarks'] = 'MANUFACTURED HOME REGISTRATION CANCELLED'
-                    elif doc_type == 'TAXN' and note.get('status') != 'A':  # Conditionally display remarks.
-                        note['remarks'] = ''
+                    elif doc_type == 'TAXN' and note.get('status') != 'A':  # Conditionally include if active.
+                        include = False
                     # Exclude if expiry elapsed.
                     elif doc_type in ('CAU', 'CAUC', 'CAUE') and note.get('expiryDate') and \
                             model_utils.date_elapsed(note.get('expiryDate')):

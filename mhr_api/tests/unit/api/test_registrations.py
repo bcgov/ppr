@@ -30,7 +30,20 @@ from tests.unit.services.utils import create_header, create_header_account
 
 MOCK_AUTH_URL = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/'
 MOCK_PAY_URL = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/pay/api/v1/'
-
+LOCATION = {
+    'locationType': 'MH_PARK',
+    'address': {
+      'street': '1117 GLENDALE AVENUE',
+      'city': 'SALMO',
+      'region': 'BC',
+      'country': 'CA',
+      'postalCode': ''
+    },
+    'leaveProvince': False,
+    'parkName': 'GLENDALE TRAILER PARK',
+    'pad': '2',
+    'additionalDescription': 'TEST PARK'
+}
 # testdata pattern is ({desc}, {roles}, {status}, {has_account}, {results_size})
 TEST_GET_ACCOUNT_DATA = [
     ('Missing account', [MHR_ROLE], HTTPStatus.BAD_REQUEST, False, 0),
@@ -136,6 +149,7 @@ def test_create(session, client, jwt, desc, has_submitting, roles, status, has_a
     current_app.config.update(AUTH_SVC_URL=MOCK_AUTH_URL)
     headers = None
     json_data = copy.deepcopy(REGISTRATION)
+    json_data['location'] = copy.deepcopy(LOCATION)
     if not has_submitting:
         del json_data['submittingParty']
     if has_account:

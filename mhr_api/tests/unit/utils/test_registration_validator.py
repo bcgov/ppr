@@ -21,8 +21,7 @@ from registry_schemas.example_data.mhr import REGISTRATION, TRANSFER, EXEMPTION
 
 from mhr_api.utils import registration_validator as validator
 from mhr_api.models import MhrRegistration
-from mhr_api.models.type_tables import MhrRegistrationStatusTypes, MhrTenancyTypes, MhrDocumentTypes, MhrLocationTypes, MhrRegistrationTypes
-from mhr_api.models.type_tables import MhrPartyTypes
+from mhr_api.models.type_tables import MhrRegistrationStatusTypes, MhrTenancyTypes, MhrDocumentTypes, MhrLocationTypes
 from mhr_api.models.utils import is_legacy
 
 
@@ -307,6 +306,76 @@ INTEREST_INVALID_1 = [
 INTEREST_INVALID_2 = [
     { 'numerator': 1, 'denominator': 2 }, { 'numerator': 2, 'denominator': 4 }, { 'numerator': 1, 'denominator': 4 }
 ]
+LOCATION_PARK = {
+    'locationType': 'MH_PARK',
+    'address': {
+      'street': '1117 GLENDALE AVENUE',
+      'city': 'SALMO',
+      'region': 'BC',
+      'country': 'CA',
+      'postalCode': ''
+    },
+    'leaveProvince': False,
+    'parkName': 'GLENDALE TRAILER PARK',
+    'pad': '2',
+    'additionalDescription': 'TEST PARK'
+}
+LOCATION_RESERVE = {
+    'locationType': 'RESERVE',
+    'bandName': 'BAND NAME',
+    'reserveNumber': '12',
+    'address': {
+        'street': '7612 LUDLOM RD.',
+        'city': 'DEKA LAKE',
+        'region': 'BC',
+        'country': 'CA',
+        'postalCode': ''
+    },
+    'leaveProvince': False,
+    'additionalDescription': 'TEST RESERVE'
+}
+LOCATION_OTHER = {
+    'locationType': 'OTHER',
+    'address': {
+        'street': '7612 LUDLOM RD.',
+        'city': 'DEKA LAKE',
+        'region': 'BC',
+        'country': 'CA',
+        'postalCode': ''
+    },
+    'pidNumber': '007351119',
+    'leaveProvince': False,
+    'additionalDescription': 'TEST OTHER'
+}
+LOCATION_STRATA = {
+    'locationType': 'STRATA',
+    'address': {
+        'street': '7612 LUDLOM RD.',
+        'city': 'DEKA LAKE',
+        'region': 'BC',
+        'country': 'CA',
+        'postalCode': ''
+    },
+    'leaveProvince': False,
+    'pidNumber': '007351119',
+    'taxCertificate': True,
+    'taxExpiryDate': '2035-01-31T08:00:00+00:00',
+    'additionalDescription': 'TEST STRATA'
+}
+LOCATION_MANUFACTURER = {
+    'locationType': 'MANUFACTURER',
+    'address': {
+      'street': '1117 GLENDALE AVENUE',
+      'city': 'SALMO',
+      'region': 'BC',
+      'country': 'CA',
+      'postalCode': ''
+    },
+    'leaveProvince': False,
+    'dealerName': 'DEALER-MANUFACTURER NAME',
+    'additionalDescription': 'TEST MANUFACTURER'
+}
+
 # testdata pattern is ({description}, {valid}, {staff}, {doc_id}, {message content})
 TEST_REG_DATA = [
     (DESC_VALID, True, True, DOC_ID_VALID, None),
@@ -349,13 +418,91 @@ TEST_PARTY_DATA = [
     ('Trans invalid middle name', None, 'first', INVALID_TEXT_CHARSET, 'last', INVALID_CHARSET_MESSAGE, TRANSFER),
     ('Trans invalid last name', None, 'first', 'middle', INVALID_TEXT_CHARSET, INVALID_CHARSET_MESSAGE, TRANSFER)
 ]
-# testdata pattern is ({description}, {park_name}, {dealer}, {additional}, {except_plan}, {band_name}, {message content})
-TEST_LOCATION_DATA = [
-    ('Non utf-8 park name', INVALID_TEXT_CHARSET, None, None, None, None, None),
-    ('Non utf-8 dealer name', None, INVALID_TEXT_CHARSET, None, None, None, None),
-    ('Non utf-8 additional description', None, None, INVALID_TEXT_CHARSET, None, None, None),
-    ('Non utf-8 exception plan', None, None, None, INVALID_TEXT_CHARSET, None, None),
-    ('Non utf-8 band name', None, None, None, None, INVALID_TEXT_CHARSET, None)
+# testdata pattern is ({description}, {park_name}, {dealer}, {pad}, {reserve_num}, {band_name}, {pid_num}, {message content})
+TEST_LOCATION_DATA_MANUFACTURER = [
+    ('Valid manufacturer', None, 'dealer', None, None, None, None, None),
+    ('Invalid manufacturer dealer', None, None, None, None, None, None, validator.LOCATION_DEALER_REQUIRED),
+    ('Invalid manufacturer park', 'park', 'dealer', None, None, None, None, validator.LOCATION_MANUFACTURER_ALLOWED),
+    ('Invalid manufacturer pad', None, 'dealer', '1234', None, None, None, validator.LOCATION_MANUFACTURER_ALLOWED),
+    ('Invalid manufacturer reserve', None, 'dealer', None, '1234', None, None, validator.LOCATION_MANUFACTURER_ALLOWED),
+    ('Invalid manufacturer band', None, 'dealer', None, None, 'band', None, validator.LOCATION_MANUFACTURER_ALLOWED),
+    ('Invalid manufacturer pid', None, 'dealer', None, None, None, '123-456-789',
+     validator.LOCATION_MANUFACTURER_ALLOWED)
+]
+# testdata pattern is ({description}, {band name}, {reserve_num}, {dealer}, {park}, {pad}, {pid}, {message content})
+TEST_LOCATION_DATA_RESERVE = [
+    ('Valid request', 'band', 'test', None, None, None, None, None),
+    ('Valid request pid', 'band', 'test', None, None, None, '123-456-789', None),
+    ('Missing band name', None, 'test', None, None, None, None, validator.BAND_NAME_REQUIRED),
+    ('Missing band name', '', 'test', None, None, None, None, validator.BAND_NAME_REQUIRED),
+    ('Missing reserve number', 'band name', '', None, None, None, None, validator.RESERVE_NUMBER_REQUIRED),
+    ('Missing reserve number', 'band name', None, None, None, None, None, validator.RESERVE_NUMBER_REQUIRED),
+    ('Invalid reserve dealer', 'band', 'test', 'dealer', None, None, None, validator.LOCATION_RESERVE_ALLOWED),
+    ('Invalid reserve park', 'band', 'test', None, 'park', None, None, validator.LOCATION_RESERVE_ALLOWED),
+    ('Invalid reserve pad', 'band', 'test', None, None, '1234', None, validator.LOCATION_RESERVE_ALLOWED)
+]
+# testdata pattern is ({description}, {park_name}, {dealer}, {pad}, {reserve_num}, {band_name}, {lot}, {message content})
+TEST_LOCATION_DATA_PARK = [
+    ('Valid park', 'park', None, '1234', None, None, None, None),
+    ('Invalid park dealer', None, 'dealer', None, None, None, None, validator.LOCATION_PARK_ALLOWED),
+    ('Invalid missing park', '', None, '1234', None, None, None, validator.LOCATION_PARK_NAME_REQUIRED),
+    ('Invalid missing park', None, None, '1234', None, None, None, validator.LOCATION_PARK_NAME_REQUIRED),
+    ('Invalid missing pad', 'park', None, '', None, None, None, validator.LOCATION_PARK_PAD_REQUIRED),
+    ('Invalid missing pad', 'park', None, None, None, None, None, validator.LOCATION_PARK_PAD_REQUIRED),
+    ('Invalid park reserve', 'park', None, '1234', '1234', None, None, validator.LOCATION_PARK_ALLOWED),
+    ('Invalid park band', 'park', None, '1234', None, 'band', None, validator.LOCATION_PARK_ALLOWED),
+    ('Invalid park lot', 'park', None, '1234', None, None, 'lot', validator.LOCATION_PARK_ALLOWED)
+]
+# testdata pattern is ({description}, {park}, {dealer}, {pad}, {reserve}, {band}, {pid}, {lot}, {plan}, {district}, 
+# {message content})
+TEST_LOCATION_DATA_STRATA = [
+    ('Valid strata pid', None, None, None, None, None, '123-456-789', None, None, None, None),
+    ('Valid strata lot', None, None, None, None, None, None, 'lot', 'plan', 'district', None),
+    ('Invalid strata pid', None, None, None, None, None, None, None, None, None,
+     validator.LOCATION_STRATA_REQUIRED),
+    ('Invalid strata lot', None, None, None, None, None, None, None, 'plan', 'district',
+     validator.LOCATION_STRATA_REQUIRED),
+    ('Invalid strata plan', None, None, None, None, None, None, 'lot', None, 'district',
+     validator.LOCATION_STRATA_REQUIRED),
+    ('Invalid strata district', None, None, None, None, None, None, 'lot', 'plan', None,
+     validator.LOCATION_STRATA_REQUIRED),
+    ('Invalid strata dealer', None, 'dealer', None, None, None, '123-456-789', None, None, None,
+     validator.LOCATION_STRATA_ALLOWED),
+    ('Invalid strata park', 'park', None, None, None, None, '123-456-789', None, None, None,
+     validator.LOCATION_STRATA_ALLOWED),
+    ('Invalid strata pad', None, None, '1234', None, None, '123-456-789', None, None, None,
+     validator.LOCATION_STRATA_ALLOWED),
+    ('Invalid strata reserve', None, None, None, '1234', None, '123-456-789', None, None, None,
+     validator.LOCATION_STRATA_ALLOWED),
+    ('Invalid strata band', None, None, None, None, 'band', '123-456-789', None, None, None,
+     validator.LOCATION_STRATA_ALLOWED)
+]
+# testdata pattern is ({description}, {park}, {dealer}, {pad}, {reserve}, {band}, {pid}, {lot}, {plan}, {district}, 
+# {dlot}, {message content})
+TEST_LOCATION_DATA_OTHER = [
+    ('Valid other pid', None, None, None, None, None, '123-456-789', None, None, None, None, None),
+    ('Valid other lot', None, None, None, None, None, None, 'lot', 'plan', 'district', None, None),
+    ('Valid other dlot', None, None, None, None, None, None, None, None, 'district', 'dlot', None),
+    ('Invalid other pid', None, None, None, None, None, None, None, None, None, None,
+     validator.LOCATION_OTHER_REQUIRED),
+    ('Invalid other lot', None, None, None, None, None, None, None, 'plan', 'district', None,
+     validator.LOCATION_OTHER_REQUIRED),
+    ('Invalid other plan', None, None, None, None, None, None, 'lot', None, 'district', None,
+     validator.LOCATION_OTHER_REQUIRED),
+    ('Invalid other district', None, None, None, None, None, None, 'lot', 'plan', None, 'dlot',
+     validator.LOCATION_OTHER_REQUIRED),
+    ('Invalid other dlot', None, None, None, None, None, None, None, None, 'district', None,
+     validator.LOCATION_OTHER_REQUIRED),
+    ('Invalid other dealer', None, 'dealer', None, None, None, '123-456-789', None, None, None, None,
+     validator.LOCATION_OTHER_ALLOWED),
+    ('Invalid other park', 'park', None, None, None, None, '123-456-789', None, None, None, None,
+     validator.LOCATION_OTHER_ALLOWED),
+    ('Invalid other pad', None, None, '1234', None, None, '123-456-789', None, None, None, None,
+     validator.LOCATION_OTHER_ALLOWED),
+    ('Invalid other reserve', None, None, None, '1234', None, '123-456-789', None, None, None, None,
+     validator.LOCATION_OTHER_ALLOWED),
+    ('Invalid other band', None, None, None, None, 'band', '123-456-789', None, None, None, None,
+     validator.LOCATION_OTHER_ALLOWED)
 ]
 # testdata pattern is ({description}, {rebuilt}, {other}, {message content})
 TEST_DESCRIPTION_DATA = [
@@ -397,14 +544,6 @@ TEST_DATA_GROUP_INTEREST = [
 TEST_DATA_LIEN_COUNT = [
     ('Valid request', '100000', '')
 ]
-# testdata pattern is ({description}, {valid}, {band name}, {reserve_number}, {message content})
-TEST_DATA_LOCATION_RESERVE = [
-    ('Valid request', True, 'band name', 'test_num', None),
-    ('Missing band name', False, '', 'test_num', validator.BAND_NAME_REQUIRED),
-    ('Missing band name', False, None, 'test_num', validator.BAND_NAME_REQUIRED),
-    ('Missing reserve number', False, 'band name', '', validator.RESERVE_NUMBER_REQUIRED),
-    ('Missing reserve number', False, 'band name', None, validator.RESERVE_NUMBER_REQUIRED)
-]
 
 
 @pytest.mark.parametrize('desc,valid,staff,doc_id,message_content', TEST_REG_DATA)
@@ -438,6 +577,7 @@ def test_validate_registration_group(session, desc, valid, numerator, denominato
     """Assert that new MH registration owner group validation works as expected."""
     # setup
     json_data = copy.deepcopy(REGISTRATION)
+    json_data['location'] = copy.deepcopy(LOCATION_PARK)
     json_data['ownerGroups'] = copy.deepcopy(groups)
     if json_data.get('documentId'):
         del json_data['documentId']
@@ -505,6 +645,7 @@ def test_validate_submitting(session, desc, bus_name, first, middle, last, messa
     """Assert that submitting party invalid character set validation works as expected."""
     # setup
     json_data = copy.deepcopy(data)
+    json_data['location'] = copy.deepcopy(LOCATION_PARK)
     party = json_data.get('submittingParty')
     if bus_name:
         party['businessName'] = bus_name
@@ -537,6 +678,7 @@ def test_validate_owner(session, desc, bus_name, first, middle, last, message_co
     """Assert that owner invalid character set validation works as expected."""
     # setup
     json_data = copy.deepcopy(data)
+    json_data['location'] = copy.deepcopy(LOCATION_PARK)
     group = None
     if json_data.get('ownerGroups'):
         group = json_data['ownerGroups'][0]
@@ -569,22 +711,26 @@ def test_validate_owner(session, desc, bus_name, first, middle, last, message_co
         assert not error_msg
 
 
-@pytest.mark.parametrize('desc,park_name,dealer,additional,except_plan,band_name,message_content', TEST_LOCATION_DATA)
-def test_validate_reg_location(session, desc, park_name, dealer, additional, except_plan, band_name, message_content):
-    """Assert that location invalid character set validation works as expected."""
+@pytest.mark.parametrize('desc,park_name,dealer,pad,reserve_num,band_name,pid_num,message_content',
+                         TEST_LOCATION_DATA_MANUFACTURER)
+def test_validate_location_man(session, desc, park_name, dealer, pad, reserve_num, band_name, pid_num, message_content):
+    """Assert that manufacturer location type validation works as expected."""
     # setup
     json_data = get_valid_registration(MhrTenancyTypes.SOLE)
-    location = json_data.get('location')
+    location = copy.deepcopy(LOCATION_MANUFACTURER)
     if park_name:
         location['parkName'] = park_name
-    elif dealer:
-        location['dealerName'] = dealer
-    elif additional:
-        location['additionalDescription'] = additional
-    elif except_plan:
-        location['exceptionPlan'] = except_plan
-    elif band_name:
+    if not dealer:
+        del location['dealerName']
+    if pad:
+        location['pad'] = pad
+    if reserve_num:
+        location['reserveNumber'] = reserve_num
+    if band_name:
         location['bandName'] = band_name
+    if pid_num:
+        location['pidNumber'] = pid_num
+    json_data['location'] = location
     error_msg = validator.validate_registration(json_data, False)
     if message_content:
         assert error_msg.find(message_content) != -1
@@ -656,6 +802,7 @@ def test_validate_group_interest(session, desc, valid, interest_data, common_den
 def get_valid_registration(o_type):
     """Build a valid registration"""
     json_data = copy.deepcopy(REGISTRATION)
+    json_data['location'] = copy.deepcopy(LOCATION_PARK)
     if o_type == MhrTenancyTypes.COMMON:
         json_data['ownerGroups'] = TC_GROUPS_VALID
     else:
@@ -673,18 +820,135 @@ def test_validate_ppr_lien(session, desc, mhr_number, message_content):
     assert error_msg == message_content
 
 
-@pytest.mark.parametrize('desc,valid,band_name,reserve_num,message_content', TEST_DATA_LOCATION_RESERVE)
-def test_validate_location_reserve(session, desc, valid, band_name, reserve_num, message_content):
+@pytest.mark.parametrize('desc,band_name,reserve_num,dealer,park,pad,pid,message_content', TEST_LOCATION_DATA_RESERVE)
+def test_validate_location_reserve(session, desc, band_name, reserve_num, dealer, park, pad, pid, message_content):
     """Assert that location RESERVE location type validation works as expected."""
-    # setup
     json_data = get_valid_registration(MhrTenancyTypes.SOLE)
-    location = json_data.get('location')
-    location['locationType'] = MhrLocationTypes.RESERVE
+    location = copy.deepcopy(LOCATION_RESERVE)
+    if park:
+        location['parkName'] = park
+    if dealer:
+        location['dealerName'] = dealer
+    if pad:
+        location['pad'] = pad
+    if reserve_num:
+        location['reserveNumber'] = reserve_num
+    else:
+        del location['reserveNumber']
     if band_name:
         location['bandName'] = band_name
-    if reserve_num:
-        location['reserveName'] = reserve_num
+    else:
+        del location['bandName']
+    if pid:
+        location['pidNumber'] = pid
+    json_data['location'] = location
     error_msg = validator.validate_registration(json_data, False)
-    assert error_msg != ''
     if message_content:
         assert error_msg.find(message_content) != -1
+    else:
+        assert not error_msg
+
+
+@pytest.mark.parametrize('desc,park_name,dealer,pad,reserve_num,band_name,lot,message_content',
+                         TEST_LOCATION_DATA_PARK)
+def test_validate_location_park(session, desc, park_name, dealer, pad, reserve_num, band_name, lot, message_content):
+    """Assert that park location type validation works as expected."""
+    # setup
+    json_data = get_valid_registration(MhrTenancyTypes.SOLE)
+    location = copy.deepcopy(LOCATION_PARK)
+    if park_name:
+        location['parkName'] = park_name
+    else:
+        del location['parkName']
+    if pad:
+        location['pad'] = pad
+    else:
+        del location['pad']
+    if dealer:
+        location['dealerName'] = dealer
+    if reserve_num:
+        location['reserveNumber'] = reserve_num
+    if band_name:
+        location['bandName'] = band_name
+    if lot:
+        location['lot'] = lot
+    json_data['location'] = location
+    error_msg = validator.validate_registration(json_data, False)
+    if message_content:
+        assert error_msg.find(message_content) != -1
+    else:
+        assert not error_msg
+
+
+@pytest.mark.parametrize('desc,park,dealer,pad,reserve,band,pid,lot,plan,district,message_content',
+                         TEST_LOCATION_DATA_STRATA)
+def test_validate_location_strata(session, desc, park, dealer, pad, reserve, band, pid, lot, plan, district,
+                                  message_content):
+    """Assert that strata location type validation works as expected."""
+    # setup
+    json_data = get_valid_registration(MhrTenancyTypes.SOLE)
+    location = copy.deepcopy(LOCATION_STRATA)
+    if park:
+        location['parkName'] = park
+    if pad:
+        location['pad'] = pad
+    if dealer:
+        location['dealerName'] = dealer
+    if reserve:
+        location['reserveNumber'] = reserve
+    if band:
+        location['bandName'] = band
+    if pid:
+        location['pidNumber'] = pid
+    else:
+        del location['pidNumber']
+    if lot:
+        location['lot'] = lot
+    if plan:
+        location['plan'] = plan
+    if district:
+        location['landDistrict'] = district
+    json_data['location'] = location
+    error_msg = validator.validate_registration(json_data, False)
+    if message_content:
+        assert error_msg.find(message_content) != -1
+    else:
+        assert not error_msg
+
+
+@pytest.mark.parametrize('desc,park,dealer,pad,reserve,band,pid,lot,plan,district,dlot,message_content',
+                         TEST_LOCATION_DATA_OTHER)
+def test_validate_location_other(session, desc, park, dealer, pad, reserve, band, pid, lot, plan, district, dlot,
+                                  message_content):
+    """Assert that other location type validation works as expected."""
+    # setup
+    json_data = get_valid_registration(MhrTenancyTypes.SOLE)
+    location = copy.deepcopy(LOCATION_OTHER)
+    if park:
+        location['parkName'] = park
+    if pad:
+        location['pad'] = pad
+    if dealer:
+        location['dealerName'] = dealer
+    if reserve:
+        location['reserveNumber'] = reserve
+    if band:
+        location['bandName'] = band
+    if pid:
+        location['pidNumber'] = pid
+    else:
+        del location['pidNumber']
+    if lot:
+        location['lot'] = lot
+    if plan:
+        location['plan'] = plan
+    if district:
+        location['landDistrict'] = district
+    if dlot:
+        location['districtLot'] = dlot
+    json_data['location'] = location
+    error_msg = validator.validate_registration(json_data, False)
+    if message_content:
+        assert error_msg.find(message_content) != -1
+    else:
+        assert not error_msg
