@@ -36,7 +36,9 @@
           <!-- child drafts will sometimes show outside their base reg during the sort -->
           <div
             v-if="isChild || (isDraft(item) && item.baseRegistrationNumber)"
-            :class="(isChild && !isTransAffi(item.registrationType)) ? 'pl-9' : 'pl-1'"
+            :class="(isChild && !isTransAffi(item.registrationType) && item.statusType !== mhApiStatusTypes.FROZEN)
+            ? 'pl-9'
+            : 'pl-1'"
           >
             <p v-if="isPpr" class="ma-0">{{ item.registrationNumber }}</p>
             <p v-else-if="!isPpr && !isDraft(item)" style="font-size: 0.875rem;" class="ma-0">
@@ -444,9 +446,10 @@ import {
   TableActions,
   UIRegistrationClassTypes,
   UITransferTypes,
-  mhApiStatusTypes, ApiTransferTypes
+  mhApiStatusTypes
 } from '@/enums'
 import { useRegistration } from '@/composables/useRegistration'
+import { useTransferOwners } from '@/composables'
 import moment from 'moment'
 
 export default defineComponent({
@@ -485,6 +488,7 @@ export default defineComponent({
       hasRenewal,
       securedParties
     } = useRegistration(null)
+    const { isTransAffi } = useTransferOwners()
 
     const localState = reactive({
       loadingPDF: '',
@@ -522,7 +526,6 @@ export default defineComponent({
           !isRoleStaffSbc.value &&
           !isRoleStaffBcol.value
       })
-
     })
 
     const deleteDraft = (item: DraftResultIF): void => {
@@ -692,10 +695,6 @@ export default defineComponent({
 
     const isRepairersLien = (item: RegistrationSummaryIF): boolean => {
       return item.registrationType === APIRegistrationTypes.REPAIRERS_LIEN
-    }
-
-    const isTransAffi = (type: ApiTransferTypes): boolean => {
-      return type === ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL
     }
 
     const refresh = async (item: RegistrationSummaryIF): Promise<void> => {
