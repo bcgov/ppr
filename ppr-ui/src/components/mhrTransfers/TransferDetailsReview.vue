@@ -55,14 +55,15 @@ export default defineComponent({
     ])
 
     const {
-      isTransferDueToDeath
+      isTransferDueToDeath,
+      isTransferToExecutorProbateWill
     } = useTransferOwners()
 
     const localState = reactive({
       landOrLeaseLabel: computed(() => {
         return `The manufactured home is <b>${!getMhrTransferOwnLand.value ? 'not' : ''}</b> located on land that the
-            ${!isTransferDueToDeath.value ? 'new' : ''} homeowners own, or on which they have a registered lease of 3
-            years or more.`
+            ${!isTransferDueToDeath.value || isTransferToExecutorProbateWill.value ? 'new' : ''} homeowners own, or
+            on which they have a registered lease of 3 years or more.`
       })
     })
 
