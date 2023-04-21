@@ -665,7 +665,7 @@ export default defineComponent({
         if (!mhrTransferFiling.error) {
           // Affidavit Transfer has a different flow
           if (isTransferToExecutorUnder25Will.value) {
-            TransAffidavit.affidavitCompleted = true
+            TransAffidavit.setCompleted(true)
             localState.loading = true
             localState.validate = false
             localState.isReviewMode = false
@@ -695,7 +695,7 @@ export default defineComponent({
 
       // If transfer is valid, enter review mode
       // For Affidavit Transfers, need to complete affidavit before proceeding
-      if (isValidTransfer.value && !TransAffidavit.affidavitCompleted) {
+      if (isValidTransfer.value && !TransAffidavit.isCompleted()) {
         localState.isReviewMode = true
         localState.validate = false
       }

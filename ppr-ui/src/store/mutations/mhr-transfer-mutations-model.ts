@@ -58,3 +58,7 @@ export const mutateMhrTransferSubmittingParty = (state: StateIF, submittingParty
 export const mutateMhrTransferAttentionReference = (state: StateIF, attentionReference: string) => {
   state.stateModel.mhrTransfer.attentionReference = attentionReference
 }
+
+export const mutateMhrTransferAffidavitCompleted = (state: StateIF, isAffidavitCompleted: boolean) => {
+  state.stateModel.mhrTransfer.isAffidavitTransferCompleted = isAffidavitCompleted
+}

@@ -29,19 +29,23 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     getMhrTransferType,
     getMhrTransferHomeOwners,
     getMhrTransferHomeOwnerGroups,
-    getMhrTransferCurrentHomeOwnerGroups
+    getMhrTransferCurrentHomeOwnerGroups,
+    getMhrTransferAffidavitCompleted
   } = useGetters<any>([
     'hasUnsavedChanges',
     'getMhrTransferType',
     'getMhrTransferHomeOwners',
     'getMhrTransferHomeOwnerGroups',
-    'getMhrTransferCurrentHomeOwnerGroups'
+    'getMhrTransferCurrentHomeOwnerGroups',
+    'getMhrTransferAffidavitCompleted'
   ])
 
   const {
-    setMhrTransferHomeOwnerGroups
+    setMhrTransferHomeOwnerGroups,
+    setMhrTransferAffidavitCompleted
   } = useActions<any>([
-    'setMhrTransferHomeOwnerGroups'
+    'setMhrTransferHomeOwnerGroups',
+    'setMhrTransferAffidavitCompleted'
   ])
 
   const {
@@ -414,7 +418,12 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
 
   // Transfer Affidavit flow and all the related conditions/logic
   const TransAffidavit = {
-    affidavitCompleted: false
+    setCompleted: (completed: boolean): void => {
+      setMhrTransferAffidavitCompleted(completed)
+    },
+    isCompleted: (): boolean => {
+      return getMhrTransferAffidavitCompleted.value
+    }
   }
 
   /** Return true if the specified owner is part of the current/base ownership structure **/
