@@ -410,7 +410,11 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       }
       return showSuffixError
     }
+  }
 
+  // Transfer Affidavit flow and all the related conditions/logic
+  const TransAffidavit = {
+    affidavitCompleted: false
   }
 
   /** Return true if the specified owner is part of the current/base ownership structure **/
@@ -520,6 +524,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     isDisabledForSJTChanges,
     isDisabledForWillChanges,
     TransWill, // Transfer Due to Death - Grant of Probate (with Will)
+    TransAffidavit, // Transfer to Executor under $25k - Affidavit
     isTransAffi,
     isCurrentOwner,
     getMhrTransferType,
