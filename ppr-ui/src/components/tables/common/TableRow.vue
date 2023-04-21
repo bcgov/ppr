@@ -28,15 +28,22 @@
             <v-icon v-else>mdi-chevron-down</v-icon>
           </v-btn>
         </v-col>
-        <v-col v-if="isTransAffi(item.registrationType) && item.statusType === mhApiStatusTypes.FROZEN" cols="2">
+        <v-col
+          v-if="isChild && hasFrozenParentReg(item) && (isTransAffi(item.registrationType) || isDraft)"
+          cols="2"
+        >
           <v-icon data-test-id="alert-icon" class="mt-n1" color="caution">mdi-alert</v-icon>
         </v-col>
         <v-col style="padding-top: 2px;">
-          <p v-if="isDraft(item)" :class="{ 'ma-0': true, 'pl-9': isChild }">Pending</p>
+          <p
+            v-if="isDraft(item)"
+            class="ma-0"
+            :class="isChild && !isTransAffi(item.registrationType) && !hasFrozenParentReg(item) ? 'pl-9': 'pl-1'"
+          >Pending</p>
           <!-- child drafts will sometimes show outside their base reg during the sort -->
           <div
             v-if="isChild || (isDraft(item) && item.baseRegistrationNumber)"
-            :class="(isChild && !isTransAffi(item.registrationType) && item.statusType !== mhApiStatusTypes.FROZEN)
+            :class="(isChild && !isTransAffi(item.registrationType) && !hasFrozenParentReg(item))
             ? 'pl-9'
             : 'pl-1'"
           >
@@ -471,12 +478,16 @@ export default defineComponent({
       isRoleStaff,
       isRoleStaffSbc,
       isRoleStaffBcol,
-      isRoleStaffReg
-    } = useGetters<any>(['isRoleQualifiedSupplier',
+      isRoleStaffReg,
+      getMhRegTableBaseRegs
+    } = useGetters<any>([
+      'isRoleQualifiedSupplier',
       'isRoleStaff',
       'isRoleStaffSbc',
       'isRoleStaffBcol',
-      'isRoleStaffReg'])
+      'isRoleStaffReg',
+      'getMhRegTableBaseRegs'
+    ])
 
     const {
       getFormattedDate,
@@ -664,6 +675,11 @@ export default defineComponent({
       return item.statusType === APIStatusTypes.ACTIVE
     }
 
+    const hasFrozenParentReg = (item: MhRegistrationSummaryIF): boolean => {
+      const parentReg = item.mhrNumber && getMhRegTableBaseRegs.value?.find(reg => reg.mhrNumber === item.mhrNumber)
+      return parentReg?.statusType === mhApiStatusTypes.FROZEN
+    }
+
     const isDischarged = (item: RegistrationSummaryIF): boolean => {
       return item.statusType === APIStatusTypes.DISCHARGED
     }
@@ -833,6 +849,7 @@ export default defineComponent({
       hasLien,
       getMhrDescription,
       isTransAffi,
+      hasFrozenParentReg,
       ...toRefs(localState)
     }
   }
