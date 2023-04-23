@@ -66,23 +66,23 @@
               <!-- Transfer Will error messages -->
               <span v-if="isTransferToExecutorProbateWill || isTransferToExecutorUnder25Will">
                 <span v-if="!TransWill.hasAllCurrentOwnersRemoved(row.item.groupId) &&
-                  !TransWill.hasExecutorsInGroup(row.item.groupId)">
+                  !TransWill.hasAddedExecutorsInGroup(row.item.groupId)">
                   All owners must be deceased and an executor added.
                 </span>
-                <span v-else-if="!TransWill.hasExecutorsInGroup(row.item.groupId) &&
+                <span v-else-if="!TransWill.hasAddedExecutorsInGroup(row.item.groupId) &&
                   getMhrTransferHomeOwnerGroups.length === 1">
                     Must contain at least one executor.
                 </span>
-                <span v-else-if="!TransWill.hasExecutorsInGroup(row.item.groupId) &&
+                <span v-else-if="!TransWill.hasAddedExecutorsInGroup(row.item.groupId) &&
                   TransWill.hasAllCurrentOwnersRemoved(row.item.groupId)">
                   Group must contain at least one executor.
                 </span>
                 <span v-else-if="!TransWill.hasAllCurrentOwnersRemoved(row.item.groupId) &&
-                  TransWill.hasExecutorsInGroup(row.item.groupId)">
+                  TransWill.hasAddedExecutorsInGroup(row.item.groupId)">
                   All owners must be deceased.
                 </span>
                 <span v-else-if="TransWill.isAllGroupOwnersWithDeathCerts(row.item.groupId)">
-                  One of the deceased owners must have a Grant of Probate with Will.
+                  {{ transfersErrors.allOwnersHaveDeathCerts[getMhrTransferType.transferType] }}
                 </span>
               </span>
               <!-- Other error messages -->
@@ -148,7 +148,9 @@
               </div>
               <div v-if="row.item.suffix"
                 class="font-light"
-                :class="{ 'suffix-error': showSuffixError && row.item.partyType === HomeOwnerPartyTypes.EXECUTOR}">
+                :class="{ 'suffix-error': showSuffixError &&
+                  row.item.partyType === HomeOwnerPartyTypes.EXECUTOR &&
+                  row.item.action === ActionTypes.ADDED }">
                 {{ row.item.suffix }}
               </div>
             </div>
@@ -535,7 +537,7 @@ export default defineComponent({
     const isInvalidOwnerGroup = (groupId): boolean => {
       if ((isTransferToExecutorProbateWill.value || isTransferToExecutorUnder25Will.value) && props.validateTransfer) {
         const hasRemovedOwners = TransWill.hasSomeOwnersRemoved(groupId)
-        const hasExecutors = TransWill.hasExecutorsInGroup(groupId)
+        const hasExecutors = TransWill.hasAddedExecutorsInGroup(groupId)
         const hasRemovedAllOwners = TransWill.hasAllCurrentOwnersRemoved(groupId)
         const hasValidDocs = TransWill.hasOwnersWithValidSupportDocs(groupId)
 
@@ -644,9 +646,9 @@ export default defineComponent({
       (
         index === 0 &&
         hasUnsavedChanges.value &&
-        (TransWill.hasSomeOwnersRemoved(groupId) || TransWill.hasExecutorsInGroup(groupId))
+        (TransWill.hasSomeOwnersRemoved(groupId) || TransWill.hasAddedExecutorsInGroup(groupId))
       ) &&
-      !(TransWill.hasExecutorsInGroup(groupId) &&
+      !(TransWill.hasAddedExecutorsInGroup(groupId) &&
         TransWill.hasAllCurrentOwnersRemoved(groupId) &&
         !TransWill.isAllGroupOwnersWithDeathCerts(groupId))
     }

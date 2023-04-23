@@ -320,10 +320,11 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
         .filter(owner => owner.action !== ActionTypes.ADDED)
         .length === 1
     },
-    hasExecutorsInGroup: (groupId): boolean => {
+    hasAddedExecutorsInGroup: (groupId): boolean => {
       return getMhrTransferHomeOwnerGroups.value
         .find(group => group.groupId === groupId).owners
-        .some(owner => owner.partyType === HomeOwnerPartyTypes.EXECUTOR)
+        .some(owner => owner.partyType === HomeOwnerPartyTypes.EXECUTOR &&
+          owner.action === ActionTypes.ADDED)
     },
     hasAllCurrentOwnersRemoved: (groupId): boolean => {
       return getMhrTransferHomeOwnerGroups.value
