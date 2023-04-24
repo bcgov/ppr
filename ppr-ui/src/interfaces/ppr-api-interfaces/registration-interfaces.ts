@@ -1,4 +1,4 @@
-import {APIAmendmentTypes, APIMhrTypes, APIRegistrationTypes, DraftTypes, mhApiStatusTypes} from '@/enums'
+import { APIAmendmentTypes, APIMhrTypes, APIRegistrationTypes, DraftTypes, mhApiStatusTypes } from '@/enums'
 import {
   CourtOrderIF,
   DebtorNameIF,
