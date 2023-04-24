@@ -9,7 +9,7 @@
         {% elif addOwnerGroups is defined and addOwnerGroups[0].type == 'SOLE' %}
             Sole Owner
         {% elif addOwnerGroups is defined and addOwnerGroups[0].type == 'JOINT' and
-                (addOwnerGroups[0].interestDenominator is not defined or addOwnerGroups[0].interestDenominator == '') %}
+                (addOwnerGroups[0].interestDenominator is not defined or addOwnerGroups[0].interestDenominator == 0) %}
             Joint Tenants
         {% elif addOwnerGroups is defined %}
             Tenants in Common
@@ -23,7 +23,7 @@
     </span>
 </div>
 {% if addOwnerGroups is defined and (addOwnerGroups[0].type == 'COMMON' or 
-      (addOwnerGroups[0].interestDenominator is defined and addOwnerGroups[0].interestDenominator != '')) %}
+      (addOwnerGroups[0].interestDenominator is defined and addOwnerGroups[0].interestDenominator != 0)) %}
     <div class="separator-section mt-3"></div>
 {% elif ownerGroups is defined and ownerGroups|length > 1 %}
     <div class="separator-section mt-3"></div>

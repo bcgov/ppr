@@ -38,6 +38,7 @@ class MhrDocument(db.Model):  # pylint: disable=too-many-instance-attributes
     consideration_value = db.Column('consideration_value', db.String(80), nullable=True)
     consent = db.Column('consent', db.String(60), nullable=True)
     transfer_date = db.Column('transfer_date', db.DateTime, nullable=True)
+    affirm_by = db.Column('affirm_by', db.String(60), nullable=True)
 
     # parent keys
     registration_id = db.Column('registration_id', db.Integer, db.ForeignKey('mhr_registrations.id'), nullable=False,

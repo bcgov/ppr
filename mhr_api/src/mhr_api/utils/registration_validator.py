@@ -58,9 +58,13 @@ BAND_NAME_REQUIRED = 'The location Indian Reserve band name is required for this
 RESERVE_NUMBER_REQUIRED = 'The location Indian Reserve number is required for this registration. '
 OWNERS_JOINT_INVALID = 'The owner group must contain at least 2 owners. '
 OWNERS_COMMON_INVALID = 'Each COMMON owner group must contain exactly 1 owner. '
-LOCATION_DEALER_REQUIRED = 'The location dealer name is required for this registration. '
+LOCATION_DEALER_REQUIRED = 'Location dealer/manufacturer name is required for this registration. '
 STATUS_CONFIRMATION_REQUIRED = 'The land status confirmation is required for this registration. '
-LOCATION_PARK_NAME_REQUIRED = 'The location park name is required for this registration. '
+LOCATION_PARK_NAME_REQUIRED = 'Location park name is required for this registration. '
+LOCATION_PARK_PAD_REQUIRED = 'Location park PAD is required for this registration. '
+LOCATION_STRATA_REQUIRED = 'Location parcel ID or all of lot, plan, land district are required for this registration. '
+LOCATION_OTHER_REQUIRED = 'Location parcel ID or all of lot, plan, land district or all of land district, district ' \
+    'lot are required for this registration. '
 LOCATION_ADDRESS_MISMATCH = 'The existing location address must match the current location address. '
 OWNER_NAME_MISMATCH = 'The existing owner name must match exactly a current owner name for this registration. '
 MANUFACTURER_DEALER_INVALID = 'The existing location must be a dealer or manufacturer lot for this registration. '
@@ -95,6 +99,15 @@ TRAN_WILL_NEW_OWNER = 'The new owners must be executors for this registration. '
 TRAN_EXEC_DEATH_CERT = 'All deceased owners must have a death certificate. '
 TRAN_ADMIN_GRANT = 'One (and only one) deceased owner must have a grant document (no death certificate). '
 TRAN_ADMIN_DEATH_CERT = 'Deceased owners without a grant document must have a death certificate. '
+LOCATION_MANUFACTURER_ALLOWED = 'Park name, PAD, band name, reserve number, parcel ID, and LTSA details are ' \
+    'not allowed with a MANUFACTURER location type. '
+LOCATION_PARK_ALLOWED = 'Dealer/manufacturer name, band name, reserve number, parcel ID, and LTSA details are ' \
+    'not allowed with a MH_PARK location type. '
+LOCATION_RESERVE_ALLOWED = 'Dealer/manufacturer name, park name, and PAD are not allowed with a RESERVE location type. '
+LOCATION_STRATA_ALLOWED = 'Dealer/manufacturer name, park name, PAD, band name, and reserve number are not allowed ' \
+    'with a STRATA location type. '
+LOCATION_OTHER_ALLOWED = 'Dealer/manufacturer name, park name, PAD, band name, and reserve number are not allowed ' \
+    'with an OTHER location type. '
 
 
 def validate_registration(json_data, staff: bool = False):
@@ -108,7 +121,7 @@ def validate_registration(json_data, staff: bool = False):
         error_msg += validate_submitting_party(json_data)
         owner_count: int = len(json_data.get('ownerGroups')) if json_data.get('ownerGroups') else 0
         error_msg += validate_owner_groups(json_data.get('ownerGroups'), True, None, None, owner_count)
-        error_msg += validate_location(json_data)
+        error_msg += validate_location(json_data.get('location'))
     except Exception as validation_exception:   # noqa: B902; eat all errors
         current_app.logger.error('validate_registration exception: ' + str(validation_exception))
         error_msg += VALIDATOR_ERROR
@@ -187,9 +200,9 @@ def validate_permit(registration: MhrRegistration, json_data, staff: bool = Fals
         error_msg += validate_submitting_party(json_data)
         error_msg += validate_registration_state(registration, staff, MhrRegistrationTypes.PERMIT)
         error_msg += validate_draft_state(json_data)
-        error_msg += validate_location(json_data)
         if json_data.get('newLocation'):
             location = json_data.get('newLocation')
+            error_msg += validate_location(location)
             error_msg += validate_tax_certificate(location, current_location)
             if not json_data.get('landStatusConfirmation'):
                 if location.get('locationType') and \
@@ -632,26 +645,76 @@ def validate_owner_groups_common(groups, registration: MhrRegistration = None, d
     return error_msg
 
 
-def validate_location(json_data):
-    """Verify location values are valid."""
+def validate_location(location):  # pylint: disable=too-many-branches
+    """Verify the combination of location values is valid."""
     error_msg = ''
-    if not json_data.get('location') and not json_data.get('newLocation'):
+    # No point validating if no no required locationType.
+    if not location or not location.get('locationType'):
         return error_msg
-    location = json_data.get('location')
-    if not location:
-        location = json_data.get('newLocation')
-    if location.get('locationType') and location['locationType'] == MhrLocationTypes.RESERVE:
+    loc_type = location['locationType']
+    if loc_type == MhrLocationTypes.RESERVE:
         if not location.get('bandName'):
             error_msg += BAND_NAME_REQUIRED
         if not location.get('reserveNumber'):
             error_msg += RESERVE_NUMBER_REQUIRED
-    elif location.get('locationType') and location['locationType'] == MhrLocationTypes.MANUFACTURER:
+    elif loc_type == MhrLocationTypes.MANUFACTURER:
         if not location.get('dealerName'):
             error_msg += LOCATION_DEALER_REQUIRED
-    elif location.get('locationType') and location['locationType'] == MhrLocationTypes.MH_PARK:
+    elif loc_type == MhrLocationTypes.MH_PARK:
         if not location.get('parkName'):
             error_msg += LOCATION_PARK_NAME_REQUIRED
+        if not location.get('pad'):
+            error_msg += LOCATION_PARK_PAD_REQUIRED
+    elif loc_type == MhrLocationTypes.STRATA:
+        if not location.get('pidNumber') and \
+                (not location.get('lot') or not location.get('plan') or not location.get('landDistrict')):
+            error_msg += LOCATION_STRATA_REQUIRED
+    elif loc_type == MhrLocationTypes.OTHER and not location.get('pidNumber'):
+        if not location.get('landDistrict'):
+            error_msg += LOCATION_OTHER_REQUIRED
+        elif location.get('plan') and location.get('lot'):
+            error_msg += ''
+        elif not location.get('districtLot'):
+            error_msg += LOCATION_OTHER_REQUIRED
+    error_msg += validate_location_allowed(location, loc_type)
     return error_msg
+
+
+def validate_location_allowed(location, loc_type):
+    """Verify the allowed location values by location type."""
+    error_msg = ''
+    if loc_type == MhrLocationTypes.MANUFACTURER:
+        if location.get('bandName') or location.get('parkName') or location.get('reserveNumber') or \
+                location.get('pad') or has_location_ltsa_details(location):
+            error_msg = LOCATION_MANUFACTURER_ALLOWED
+    elif loc_type == MhrLocationTypes.MH_PARK and \
+            (location.get('bandName') or location.get('reserveNumber') or
+             location.get('dealerName') or has_location_ltsa_details(location)):
+        error_msg = LOCATION_PARK_ALLOWED
+    elif loc_type == MhrLocationTypes.RESERVE and \
+            (location.get('dealerName') or location.get('parkName') or location.get('pad')):
+        error_msg = LOCATION_RESERVE_ALLOWED
+    elif loc_type in (MhrLocationTypes.STRATA, MhrLocationTypes.OTHER):
+        if location.get('dealerName') or location.get('parkName') or location.get('pad') or \
+                location.get('bandName') or location.get('reserveNumber'):
+            if loc_type == MhrLocationTypes.STRATA:
+                error_msg = LOCATION_STRATA_ALLOWED
+            else:
+                error_msg = LOCATION_OTHER_ALLOWED
+    return error_msg
+
+
+def has_location_ltsa_details(location) -> bool:
+    """Verify the location has ltsa detail properties."""
+    if location.get('lot') or location.get('parcel') or location.get('block') or location.get('districtLot') or\
+            location.get('partOf'):
+        return True
+    if location.get('section') or location.get('township') or location.get('range') or location.get('plan') or \
+            location.get('meridian'):
+        return True
+    if location.get('pidNumber') or location.get('legalDescription') or location.get('landDistrict'):
+        return True
+    return False
 
 
 def validate_individual_name(name_json, desc: str = ''):

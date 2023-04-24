@@ -205,8 +205,7 @@ LOCATION_MANUFACTURER_NO_DEALER = {
       'postalCode': ''
     },
     'leaveProvince': False,
-    'dealerName': '',
-    'pad': '2'
+    'dealerName': ''
 }
 LOCATION_PID = {
     'locationType': 'STRATA',
@@ -430,6 +429,7 @@ def test_validate_pid(session, desc, pid, valid, message_content):
     json_data = get_valid_registration()
     if json_data.get('documentId'):
         del json_data['documentId']
+    json_data['newLocation'] = copy.deepcopy(LOCATION_PID)
     json_data['newLocation']['pidNumber'] = pid
     # current_app.logger.info(json_data)
     valid_format, errors = schema_utils.validate(json_data, 'permit', 'mhr')
