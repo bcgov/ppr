@@ -19,7 +19,7 @@
               Confirm Completion
             </label>
           </v-col>
-          <v-col cols="9" class="confirm-completion-req">
+          <v-col cols="9" class="confirm-completion-req pl-0">
             <ol>
               <li v-if="!isTransferDueToDeath" class="pl-3 pb-3 mb-7" data-test-id="bill-of-sale-section">
                 <p><strong>Bill of sale</strong> has been signed by either all owners or by someone with the authority
@@ -90,7 +90,7 @@
                   at the time of registration.
                 </p>
               </li>
-              <li class="pl-3 pb-3 mb-0" data-test-id="ppr-lien-section">
+              <li class="pl-3 pb-0 mb-0" data-test-id="ppr-lien-section">
                 <p><strong>Personal Property Registry lien search</strong> has been completed and there are no liens
                 on the home that stop the transfer.</p>
                 <p class="confirm-completion-note">
@@ -99,20 +99,27 @@
                 </p>
               </li>
             </ol>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col cols="2">
+            <v-spacer></v-spacer>
+          </v-col>
+          <v-col cols="10" class="pt-0">
             <v-checkbox
-              class="pa-7 ma-0 confirm-checkbox"
-              :hide-details="true"
-              id="checkbox-certified"
-              v-model="confirmCompletion"
-              data-test-id="confirm-completion-checkbox"
-            >
-              <template v-slot:label>
-                <span data-test-id="confirm-checkbox-label" :class="{ 'invalid-color': showErrorComponent }">
-                  I, <strong>{{ legalName }}</strong
-                  >, confirm that all of the requirements listed above have been completed.
-                </span>
-              </template>
-            </v-checkbox>
+                class="pa-7 my-0 ml-12 confirm-checkbox"
+                :hide-details="true"
+                id="checkbox-certified"
+                v-model="confirmCompletion"
+                data-test-id="confirm-completion-checkbox"
+              >
+                <template v-slot:label>
+                  <span data-test-id="confirm-checkbox-label" :class="{ 'invalid-color': showErrorComponent }">
+                    I, <strong>{{ legalName }}</strong
+                    >, confirm that all of the requirements listed above have been completed.
+                  </span>
+                </template>
+              </v-checkbox>
           </v-col>
         </v-row>
       </v-form>
@@ -189,7 +196,7 @@ export default defineComponent({
   }
   .confirm-completion-req {
     ol {
-      padding-left: 50px;
+      padding-left: 27px !important;
     }
     ol li:not(:last-child) {
       border-bottom: 1px solid $gray3;
