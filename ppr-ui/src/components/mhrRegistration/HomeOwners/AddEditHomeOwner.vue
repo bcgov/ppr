@@ -552,7 +552,6 @@ export default defineComponent({
       phoneNumber: props.editHomeOwner?.phoneNumber || '',
       phoneExtension: props.editHomeOwner?.phoneExtension || '',
       suffix: props.editHomeOwner?.suffix || '',
-      description: props.editHomeOwner?.description || '',
       address: {
         street: props.editHomeOwner?.address.street || '',
         streetAdditional: props.editHomeOwner?.address.streetAdditional || '',
@@ -683,7 +682,6 @@ export default defineComponent({
             TransWill.hasDeletedOwnersWithProbateGrantOrAffidavit() &&
             localState.owner.partyType === HomeOwnerPartyTypes.EXECUTOR) {
             localState.ownerGroupId = localState.owner.groupId
-            localState.owner.description = localState.owner.suffix
           }
 
           addOwnerToTheGroup(
