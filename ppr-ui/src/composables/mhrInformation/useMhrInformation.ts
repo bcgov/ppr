@@ -237,7 +237,10 @@ export const useMhrInformation = () => {
                 ...owner,
                 description: owner.suffix,
                 individualName: normalizeObject(owner.individualName)
-              } : owner
+              } : {
+                ...owner,
+                description: owner.suffix
+              }
           }),
           type: ApiHomeTenancyTypes[
             Object.keys(HomeTenancyTypes).find(key => HomeTenancyTypes[key] as string === ownerGroup.type)
