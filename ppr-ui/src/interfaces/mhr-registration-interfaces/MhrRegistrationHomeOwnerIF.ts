@@ -21,4 +21,5 @@ export interface MhrRegistrationHomeOwnerIF {
   supportingDocument?: SupportingDocumentsOptions,
   partyType?: HomeOwnerPartyTypes
   type?: ApiHomeTenancyTypes
+  description?: string
 }

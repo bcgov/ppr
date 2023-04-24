@@ -5,7 +5,8 @@ import {
   MhrRegistrationHomeLocationIF,
   MhrTransferApiIF,
   MhrTransferIF,
-  SubmittingPartyIF
+  SubmittingPartyIF,
+  MhrRegistrationHomeOwnerGroupIF
 } from '@/interfaces'
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import {
@@ -198,7 +199,7 @@ export const useMhrInformation = () => {
 
   /** Filing Submission Helpers **/
 
-  const parseOwnerGroups = (isDraft: boolean = false): any => {
+  const parseOwnerGroups = (isDraft: boolean = false): MhrRegistrationHomeOwnerGroupIF[] => {
     const ownerGroups = []
 
     getMhrTransferHomeOwnerGroups.value.forEach(ownerGroup => {
@@ -224,14 +225,22 @@ export const useMhrInformation = () => {
     return isDraft ? ownerGroups : ownerGroups.filter(ownerGroup => ownerGroup.action !== ActionTypes.REMOVED)
   }
 
-  const parseDueToDeathOwnerGroups = (isDraft: boolean = false): any => {
+  const parseDueToDeathOwnerGroups = (isDraft: boolean = false): MhrRegistrationHomeOwnerGroupIF[] => {
     const ownerGroups = []
     getMhrTransferHomeOwnerGroups.value.forEach(ownerGroup => {
       if (ownerGroup.owners.some(owner => owner.action === ActionTypes.REMOVED)) {
         ownerGroups.push({
           ...ownerGroup,
           owners: ownerGroup.owners.filter(owner => owner.action !== ActionTypes.REMOVED).map(owner => {
-            return owner.individualName ? { ...owner, individualName: normalizeObject(owner.individualName) } : owner
+            return owner.individualName
+              ? {
+                ...owner,
+                description: owner.suffix,
+                individualName: normalizeObject(owner.individualName)
+              } : {
+                ...owner,
+                description: owner.suffix
+              }
           }),
           type: ApiHomeTenancyTypes[
             Object.keys(HomeTenancyTypes).find(key => HomeTenancyTypes[key] as string === ownerGroup.type)
@@ -242,7 +251,30 @@ export const useMhrInformation = () => {
     return isDraft ? getMhrTransferHomeOwnerGroups.value : ownerGroups
   }
 
-  const parseDeletedOwnerGroups = (): any => {
+  const parseDeletedDueToDeathOwnerGroups = (): MhrRegistrationHomeOwnerGroupIF[] => {
+    const ownerGroups = []
+    getMhrTransferHomeOwnerGroups.value.forEach(ownerGroup => {
+      if (ownerGroup.owners.some(owner => owner.action === ActionTypes.REMOVED)) {
+        ownerGroups.push({
+          ...ownerGroup,
+          groupId: getCurrentOwnerGroupIdByOwnerId(ownerGroup.owners[0].ownerId),
+          owners: ownerGroup.owners.filter(owner => owner.action === ActionTypes.REMOVED).map(owner => {
+            return owner.individualName ? { ...owner, individualName: normalizeObject(owner.individualName) } : owner
+          }),
+          // Determine group tenancy type
+          type: ownerGroup.owners.filter(owner => owner.action === ActionTypes.REMOVED).length > 1
+            ? ApiHomeTenancyTypes.JOINT
+            : getMhrTransferHomeOwnerGroups.value.length > 1
+              ? ApiHomeTenancyTypes.NA
+              : ApiHomeTenancyTypes.SOLE
+        })
+      }
+    })
+
+    return ownerGroups
+  }
+
+  const parseDeletedOwnerGroups = (): MhrRegistrationHomeOwnerGroupIF[] => {
     // Return the current state for Sale or Gift
     if (getMhrTransferType.value?.transferType === ApiTransferTypes.SALE_OR_GIFT) {
       return getMhrTransferCurrentHomeOwnerGroups.value
@@ -291,7 +323,9 @@ export const useMhrInformation = () => {
       addOwnerGroups: isTransferDueToDeath.value
         ? await parseDueToDeathOwnerGroups(isDraft)
         : await parseOwnerGroups(isDraft),
-      deleteOwnerGroups: await parseDeletedOwnerGroups()
+      deleteOwnerGroups: isTransferDueToDeath.value
+        ? await parseDeletedDueToDeathOwnerGroups()
+        : await parseDeletedOwnerGroups()
     }
 
     return data
