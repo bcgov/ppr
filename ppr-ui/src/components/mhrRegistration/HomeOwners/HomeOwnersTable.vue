@@ -66,23 +66,23 @@
               <!-- Transfer Will error messages -->
               <span v-if="isTransferToExecutorProbateWill || isTransferToExecutorUnder25Will">
                 <span v-if="!TransWill.hasAllCurrentOwnersRemoved(row.item.groupId) &&
-                  !TransWill.hasExecutorsInGroup(row.item.groupId)">
-                  All owners must be deceased and an executor added.
+                  !TransWill.hasAddedExecutorsInGroup(row.item.groupId)">
+                  {{ transfersErrors.ownersMustBeDeceasedAndExecutorAdded }}
                 </span>
-                <span v-else-if="!TransWill.hasExecutorsInGroup(row.item.groupId) &&
+                <span v-else-if="!TransWill.hasAddedExecutorsInGroup(row.item.groupId) &&
                   getMhrTransferHomeOwnerGroups.length === 1">
-                    Must contain at least one executor.
+                  {{ transfersErrors.mustContainOneExecutor }}
                 </span>
-                <span v-else-if="!TransWill.hasExecutorsInGroup(row.item.groupId) &&
+                <span v-else-if="!TransWill.hasAddedExecutorsInGroup(row.item.groupId) &&
                   TransWill.hasAllCurrentOwnersRemoved(row.item.groupId)">
-                  Group must contain at least one executor.
+                  {{ transfersErrors.mustContainOneExecutorInGroup }}
                 </span>
                 <span v-else-if="!TransWill.hasAllCurrentOwnersRemoved(row.item.groupId) &&
-                  TransWill.hasExecutorsInGroup(row.item.groupId)">
-                  All owners must be deceased.
+                  TransWill.hasAddedExecutorsInGroup(row.item.groupId)">
+                  {{ transfersErrors.ownersMustBeDeceased }}
                 </span>
                 <span v-else-if="TransWill.isAllGroupOwnersWithDeathCerts(row.item.groupId)">
-                  One of the deceased owners must have a Grant of Probate with Will.
+                  {{ transfersErrors.allOwnersHaveDeathCerts[getMhrTransferType.transferType] }}
                 </span>
               </span>
               <!-- Other error messages -->
@@ -148,7 +148,9 @@
               </div>
               <div v-if="row.item.suffix"
                 class="font-light"
-                :class="{ 'suffix-error': showSuffixError && row.item.partyType === HomeOwnerPartyTypes.EXECUTOR}">
+                :class="{ 'suffix-error': showSuffixError &&
+                  row.item.partyType === HomeOwnerPartyTypes.EXECUTOR &&
+                  row.item.action === ActionTypes.ADDED }">
                 {{ row.item.suffix }}
               </div>
             </div>
@@ -298,7 +300,7 @@
         >
           <td
             :colspan="homeOwnersTableHeaders.length"
-            class="py-0 pl-8"
+            class="pt-0 pl-8"
             :class="{ 'border-error-left': isInvalidOwnerGroup(row.item.groupId) }"
           >
             <v-expand-transition>
@@ -393,6 +395,7 @@ import { DeathCertificate, SupportingDocuments } from '@/components/mhrTransfers
 import { BaseDialog } from '@/components/dialogs'
 import TableGroupHeader from '@/components/mhrRegistration/HomeOwners/TableGroupHeader.vue'
 import { mhrDeceasedOwnerChanges } from '@/resources/dialogOptions'
+import { transfersErrors } from '@/resources'
 import { yyyyMmDdToPacificDate } from '@/utils/date-helper'
 import { InfoChip } from '@/components/common'
 /* eslint-disable no-unused-vars */
@@ -462,7 +465,8 @@ export default defineComponent({
       isTransferToExecutorUnder25Will,
       groupHasRemovedAllCurrentOwners,
       moveCurrentOwnersToPreviousOwners,
-      TransWill
+      TransWill,
+      getMhrTransferType
     } = useTransferOwners(!props.isMhrTransfer)
 
     const { setUnsavedChanges } = useActions<any>(['setUnsavedChanges'])
@@ -535,14 +539,14 @@ export default defineComponent({
     const isInvalidOwnerGroup = (groupId): boolean => {
       if ((isTransferToExecutorProbateWill.value || isTransferToExecutorUnder25Will.value) && props.validateTransfer) {
         const hasRemovedOwners = TransWill.hasSomeOwnersRemoved(groupId)
-        const hasExecutors = TransWill.hasExecutorsInGroup(groupId)
+        const hasExecutors = TransWill.hasAddedExecutorsInGroup(groupId)
         const hasRemovedAllOwners = TransWill.hasAllCurrentOwnersRemoved(groupId)
         const hasValidDocs = TransWill.hasOwnersWithValidSupportDocs(groupId)
+        const hasOwnersWithoutDeathCert = !TransWill.isAllGroupOwnersWithDeathCerts(groupId)
 
-        const isValid = hasUnsavedChanges.value &&
-          (hasRemovedOwners || hasExecutors) && !(hasExecutors && hasRemovedAllOwners)
+        const isInvalid = !(hasRemovedAllOwners && hasValidDocs && hasExecutors && hasOwnersWithoutDeathCert)
 
-        return isValid || hasValidDocs
+        return hasRemovedOwners && isInvalid
       }
 
       return props.validateTransfer && !isValidDeceasedOwnerGroup(groupId) && !localState.showTableError
@@ -644,9 +648,9 @@ export default defineComponent({
       (
         index === 0 &&
         hasUnsavedChanges.value &&
-        (TransWill.hasSomeOwnersRemoved(groupId) || TransWill.hasExecutorsInGroup(groupId))
+        (TransWill.hasSomeOwnersRemoved(groupId) || TransWill.hasAddedExecutorsInGroup(groupId))
       ) &&
-      !(TransWill.hasExecutorsInGroup(groupId) &&
+      !(TransWill.hasAddedExecutorsInGroup(groupId) &&
         TransWill.hasAllCurrentOwnersRemoved(groupId) &&
         !TransWill.isAllGroupOwnersWithDeathCerts(groupId))
     }
@@ -759,6 +763,8 @@ export default defineComponent({
       TransWill,
       getMhrInfoValidation,
       isTransferGroupValid,
+      transfersErrors,
+      getMhrTransferType,
       ...toRefs(localState)
     }
   }

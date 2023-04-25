@@ -203,8 +203,6 @@ export default defineComponent({
   height: 90px;
 }
 .death-certificate::v-deep {
-  margin-bottom: 43px;
-
   .generic-label {
     line-height: 24px;
   }
