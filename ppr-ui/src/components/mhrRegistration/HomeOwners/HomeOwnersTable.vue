@@ -300,7 +300,7 @@
         >
           <td
             :colspan="homeOwnersTableHeaders.length"
-            class="py-0 pl-8"
+            class="pt-0 pl-8"
             :class="{ 'border-error-left': isInvalidOwnerGroup(row.item.groupId) }"
           >
             <v-expand-transition>
