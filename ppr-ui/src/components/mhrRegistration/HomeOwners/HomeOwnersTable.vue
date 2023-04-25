@@ -363,7 +363,7 @@
             </v-row>
           </td>
         </tr>
-        <tr v-else-if="isRemovedHomeOwner(row.item) && showSupportingDocuments() && !isReadonlyTable">
+        <tr v-else-if="isRemovedHomeOwner(row.item) && showSupportingDocuments()">
           <td
             :colspan="homeOwnersTableHeaders.length"
             class="pl-14"
