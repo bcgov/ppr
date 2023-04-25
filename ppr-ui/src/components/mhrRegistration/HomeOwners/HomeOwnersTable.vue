@@ -67,19 +67,19 @@
               <span v-if="isTransferToExecutorProbateWill || isTransferToExecutorUnder25Will">
                 <span v-if="!TransWill.hasAllCurrentOwnersRemoved(row.item.groupId) &&
                   !TransWill.hasAddedExecutorsInGroup(row.item.groupId)">
-                  All owners must be deceased and an executor added.
+                  {{ transfersErrors.ownersMustBeDeceasedAndExecutorAdded }}
                 </span>
                 <span v-else-if="!TransWill.hasAddedExecutorsInGroup(row.item.groupId) &&
                   getMhrTransferHomeOwnerGroups.length === 1">
-                    Must contain at least one executor.
+                  {{ transfersErrors.mustContainOneExecutor }}
                 </span>
                 <span v-else-if="!TransWill.hasAddedExecutorsInGroup(row.item.groupId) &&
                   TransWill.hasAllCurrentOwnersRemoved(row.item.groupId)">
-                  Group must contain at least one executor.
+                  {{ transfersErrors.mustContainOneExecutorInGroup }}
                 </span>
                 <span v-else-if="!TransWill.hasAllCurrentOwnersRemoved(row.item.groupId) &&
                   TransWill.hasAddedExecutorsInGroup(row.item.groupId)">
-                  All owners must be deceased.
+                  {{ transfersErrors.ownersMustBeDeceased }}
                 </span>
                 <span v-else-if="TransWill.isAllGroupOwnersWithDeathCerts(row.item.groupId)">
                   {{ transfersErrors.allOwnersHaveDeathCerts[getMhrTransferType.transferType] }}
@@ -395,6 +395,7 @@ import { DeathCertificate, SupportingDocuments } from '@/components/mhrTransfers
 import { BaseDialog } from '@/components/dialogs'
 import TableGroupHeader from '@/components/mhrRegistration/HomeOwners/TableGroupHeader.vue'
 import { mhrDeceasedOwnerChanges } from '@/resources/dialogOptions'
+import { transfersErrors } from '@/resources'
 import { yyyyMmDdToPacificDate } from '@/utils/date-helper'
 import { InfoChip } from '@/components/common'
 /* eslint-disable no-unused-vars */
@@ -464,7 +465,8 @@ export default defineComponent({
       isTransferToExecutorUnder25Will,
       groupHasRemovedAllCurrentOwners,
       moveCurrentOwnersToPreviousOwners,
-      TransWill
+      TransWill,
+      getMhrTransferType
     } = useTransferOwners(!props.isMhrTransfer)
 
     const { setUnsavedChanges } = useActions<any>(['setUnsavedChanges'])
@@ -540,11 +542,11 @@ export default defineComponent({
         const hasExecutors = TransWill.hasAddedExecutorsInGroup(groupId)
         const hasRemovedAllOwners = TransWill.hasAllCurrentOwnersRemoved(groupId)
         const hasValidDocs = TransWill.hasOwnersWithValidSupportDocs(groupId)
+        const hasOwnersWithoutDeathCert = !TransWill.isAllGroupOwnersWithDeathCerts(groupId)
 
-        const isValid = hasUnsavedChanges.value &&
-          (hasRemovedOwners || hasExecutors) && !(hasExecutors && hasRemovedAllOwners)
+        const isInvalid = !(hasRemovedAllOwners && hasValidDocs && hasExecutors && hasOwnersWithoutDeathCert)
 
-        return isValid || hasValidDocs
+        return hasRemovedOwners && isInvalid
       }
 
       return props.validateTransfer && !isValidDeceasedOwnerGroup(groupId) && !localState.showTableError
@@ -761,6 +763,8 @@ export default defineComponent({
       TransWill,
       getMhrInfoValidation,
       isTransferGroupValid,
+      transfersErrors,
+      getMhrTransferType,
       ...toRefs(localState)
     }
   }

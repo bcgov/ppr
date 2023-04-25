@@ -283,7 +283,15 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     },
     isValidTransfer: computed((): boolean => {
       // check if there is a group that is valid for WILL transfer
-      return getMhrTransferHomeOwnerGroups.value.some(group => TransWill.isValidGroup(group))
+      const groupWithDeletedOwners: MhrRegistrationHomeOwnerGroupIF = getMhrTransferHomeOwnerGroups.value?.find(group =>
+        group.owners.some(owner => owner.action === ActionTypes.REMOVED))
+
+      if (!groupWithDeletedOwners) return false
+
+      const isValidGroup = TransWill.isValidGroup(groupWithDeletedOwners)
+      const hasOwnersWithoutDeathCert = !TransWill.isAllGroupOwnersWithDeathCerts(groupWithDeletedOwners.groupId)
+
+      return isValidGroup && hasOwnersWithoutDeathCert
     }),
     isValidGroup: (group: MhrRegistrationHomeOwnerGroupIF): boolean => {
       const isValidAddedOwner = group.owners.every((owner: MhrRegistrationHomeOwnerIF) => {
@@ -295,8 +303,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       return isValidAddedOwner && hasAddedExecutor
     },
     hasOwnersWithValidSupportDocs: (groupId: number): boolean => {
-      return TransWill.hasSomeOwnersRemoved(groupId) &&
-      !getMhrTransferHomeOwnerGroups.value
+      return getMhrTransferHomeOwnerGroups.value
         .find(group => group.groupId === groupId).owners
         .every((owner: MhrRegistrationHomeOwnerIF) => {
           return TransWill.hasValidSupportDocs(owner)
@@ -304,6 +311,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     },
     // check if supportingDocument is either Death Certificate or Grant of Probate
     hasValidSupportDocs: (owner: MhrRegistrationHomeOwnerIF): boolean => {
+      if (owner.action === ActionTypes.ADDED) return true
       let hasValidSupportingDoc = false
       if (owner.supportingDocument === SupportingDocumentsOptions.DEATH_CERT ||
         owner.supportingDocument === SupportingDocumentsOptions.AFFIDAVIT) {
