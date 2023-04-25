@@ -55,7 +55,6 @@ export function toTitleCase (value: string): string {
  * @returns a payment error rootCause message
  */
 export function parsePayDetail (rootCause: string): string {
-  console.log(rootCause)
   return rootCause?.substring(
     rootCause?.indexOf(':') + 5,
     rootCause?.indexOf('<') - 1

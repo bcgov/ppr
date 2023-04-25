@@ -83,7 +83,9 @@ import {
   getSbcFromAuth,
   navigate,
   updateLdUser,
-  fetchAccountProducts, axios, parsePayDetail
+  fetchAccountProducts,
+  axios,
+  parsePayDetail
 } from '@/utils'
 import { FeeCodes } from '@/composables/fees/enums'
 import {
