@@ -12,7 +12,7 @@ import {
 } from '@/interfaces'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 import { APIMhrTypes, APIStatusTypes, HomeTenancyTypes, HomeLocationTypes, mhApiStatusTypes } from '@/enums'
-import { getMhrDrafts, mhrRegistrationHistory } from '@/utils'
+import { createMhrDraft, getMhrDrafts, mhrRegistrationHistory, updateMhrDraft } from '@/utils'
 import { orderBy } from 'lodash'
 import { useHomeOwners } from '@/composables'
 
@@ -39,6 +39,7 @@ export const useNewMhrRegistration = () => {
   ])
   const {
     setMhrLocation,
+    setMhrDraftNumber,
     setMhrTableHistory,
     setMhrHomeDescription,
     setMhrAttentionReferenceNum,
@@ -47,6 +48,7 @@ export const useNewMhrRegistration = () => {
     setMhrRegistrationHomeOwnerGroups
   } = useActions<any>([
     'setMhrLocation',
+    'setMhrDraftNumber',
     'setMhrTableHistory',
     'setMhrHomeDescription',
     'setMhrAttentionReferenceNum',
@@ -299,6 +301,17 @@ export const useNewMhrRegistration = () => {
     setMhrTableHistory(filteredMhrHistory)
   }
 
+  const mhrDraftHandler = async (): Promise<MhrDraftIF> => {
+    const draft = getMhrDraftNumber.value
+      ? await updateMhrDraft(getMhrDraftNumber.value, APIMhrTypes.MANUFACTURED_HOME_REGISTRATION, buildApiData())
+      : await createMhrDraft(APIMhrTypes.MANUFACTURED_HOME_REGISTRATION, buildApiData())
+
+    // Set draftNumber to state to prevent duplicate drafts
+    if (draft) setMhrDraftNumber(draft.draftNumber)
+
+    return draft
+  }
+
   function addHistoryDraftsToMhr (
     mhrHistory: MhRegistrationSummaryIF[],
     mhrDrafts: MhrDraftIF[],
@@ -386,6 +399,7 @@ export const useNewMhrRegistration = () => {
   return {
     initNewMhr,
     initDraftMhr,
+    mhrDraftHandler,
     resetLocationInfoFields,
     buildApiData,
     parseStaffPayment,

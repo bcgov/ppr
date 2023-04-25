@@ -11,7 +11,7 @@
       id="payErrorDialogApp"
       :setDisplay="payErrorDisplay"
       :setOptions="payErrorOptions"
-      @proceed="payErrorDialogHandler()"
+      @proceed="payErrorDialogHandler($event)"
     />
 
     <sbc-header
@@ -83,7 +83,7 @@ import {
   getSbcFromAuth,
   navigate,
   updateLdUser,
-  fetchAccountProducts, axios
+  fetchAccountProducts, axios, parsePayDetail
 } from '@/utils'
 import { FeeCodes } from '@/composables/fees/enums'
 import {
@@ -266,13 +266,15 @@ export default defineComponent({
       }
     })
 
-    const payErrorDialogHandler = () => {
+    const payErrorDialogHandler = (confirmed: boolean) => {
       localState.payErrorDisplay = false
-      if ([RegistrationFlowType.NEW, RegistrationFlowType.AMENDMENT].includes(getRegistrationFlowType.value)) {
-        localState.saveDraftExitToggle = !localState.saveDraftExitToggle
-      } else {
-        setRegistrationNumber(null)
-        context.root.$router.push({ name: RouteNames.DASHBOARD })
+      if (confirmed) {
+        if ([RegistrationFlowType.NEW, RegistrationFlowType.AMENDMENT].includes(getRegistrationFlowType.value)) {
+          localState.saveDraftExitToggle = !localState.saveDraftExitToggle
+        } else {
+          setRegistrationNumber(null)
+          context.root.$router.push({ name: RouteNames.DASHBOARD })
+        }
       }
     }
 
@@ -545,6 +547,7 @@ export default defineComponent({
           localState.errorOptions = authAssetsError
           localState.errorDisplay = true
           break
+        case ErrorCategories.REGISTRATION_TRANSFER:
         case ErrorCategories.REGISTRATION_CREATE:
           handleErrorRegCreate(error)
           break
@@ -589,6 +592,7 @@ export default defineComponent({
       if (localState.registrationTypeUI) {
         localState.payErrorOptions.text = localState.payErrorOptions.text.replace('filing_type', filing)
       }
+      console.log(error)
       // errors with a 'type' are payment issues, other errors handles in 'default' logic
       switch (error.type) {
         case (
@@ -630,9 +634,10 @@ export default defineComponent({
             }
             localState.payErrorDisplay = true
           } else if (error.statusCode === StatusCodes.PAYMENT_REQUIRED) {
-            // generic cath all pay error
-            localState.payErrorOptions.text = '<b>The payment could not be completed at this time</b>' +
-              '<br/><br/>If this issue persists, please contact us.'
+            // generic catch all pay error
+            const errorDetail = error.type ? error.detail : parsePayDetail(error.detail)
+            localState.payErrorOptions.text = `The payment could not be completed at this time for the following
+              reason:<br/><br/><b>${errorDetail}</b><br/><br/>If this issue persists, please contact us.`
             localState.payErrorOptions.hasContactInfo = true
             localState.payErrorDisplay = true
           } else {
