@@ -48,7 +48,7 @@ export const mockedExecutor: MhrRegistrationHomeOwnerIF = {
 }
 
 export const mockedAddedExecutor: MhrRegistrationHomeOwnerIF = {
-  ownerId: 10,
+  ownerId: 20,
   individualName: {
     first: 'John',
     middle: 'A',
@@ -64,6 +64,19 @@ export const mockedAddedExecutor: MhrRegistrationHomeOwnerIF = {
 
 export const mockedPerson: MhrRegistrationHomeOwnerIF = {
   ownerId: 10,
+  individualName: {
+    first: 'John',
+    middle: 'A',
+    last: 'Smith'
+  },
+  suffix: 'Sr.',
+  phoneNumber: '(545) 333-2211',
+  phoneExtension: '1234',
+  address: mockedAddress
+}
+
+export const mockedPerson2: MhrRegistrationHomeOwnerIF = {
+  ownerId: 11,
   individualName: {
     first: 'John',
     middle: 'A',

@@ -19,13 +19,22 @@ import {
   mockedAddedOrganization,
   mockedRemovedPerson,
   mockedRemovedOrganization,
-  mockMhrTransferCurrentHomeOwnerGroup
+  mockMhrTransferCurrentHomeOwnerGroup,
+  mockedPerson2,
+  mockedAddedExecutor
 } from './test-data'
 import { getTestId } from './utils'
 import { MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF, TransferTypeSelectIF } from '@/interfaces'
-import { ApiHomeTenancyTypes, ApiTransferTypes, HomeOwnerPartyTypes, HomeTenancyTypes, UITransferTypes } from '@/enums'
+import {
+  ActionTypes,
+  ApiHomeTenancyTypes,
+  ApiTransferTypes,
+  HomeOwnerPartyTypes,
+  HomeTenancyTypes,
+  UITransferTypes
+} from '@/enums'
 import { DeathCertificate, SupportingDocuments } from '@/components/mhrTransfers'
-import { transferSupportingDocuments } from '@/resources'
+import { transferSupportingDocuments, transfersErrors } from '@/resources'
 
 Vue.use(Vuetify)
 
@@ -755,5 +764,56 @@ describe('Home Owners', () => {
     expect(homeOwners.find(getTestId('transfer-table-error')).exists()).toBeFalsy()
     expect(homeOwners.findAll(getTestId('DECEASED-badge')).length).toBe(2)
     expect(homeOwners.findAll(getTestId('ADDED-badge')).length).toBe(1)
+  })
+
+  it('TRANS Affidavit Flow: validations with different error messages', async () => {
+    // reset transfer type
+    await selectTransferType(null)
+
+    // setup transfer type to test
+    const TRANSFER_TYPE = ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL
+
+    // const homeOwnerGroup: MhrRegistrationHomeOwnerGroupIF[] = mockMhrTransferCurrentHomeOwnerGroup
+
+    const homeOwnerGroup: MhrRegistrationHomeOwnerGroupIF[] = [
+      { groupId: 1, owners: [mockedPerson, mockedPerson2], type: '' },
+      { groupId: 2, owners: [mockedPerson], type: '' }
+    ]
+
+    await selectTransferType(TRANSFER_TYPE)
+    await store.dispatch('setMhrTransferCurrentHomeOwnerGroups', homeOwnerGroup)
+
+    const homeOwners = wrapper.findComponent(HomeOwners)
+    const groupError = homeOwners.find(getTestId('invalid-group-msg'))
+
+    // One Owner is Deceased, no Executor added
+    await store.dispatch('setMhrTransferHomeOwnerGroups', [
+      { groupId: 1, owners: [mockedPerson, { ...mockedPerson2, action: ActionTypes.REMOVED }], type: '' },
+      { groupId: 2, owners: [mockedPerson], type: '' }
+    ])
+
+    expect(groupError.text()).toContain(transfersErrors.ownersMustBeDeceasedAndExecutorAdded)
+
+    // All Owners are Deceased, no Executor added
+    await store.dispatch('setMhrTransferHomeOwnerGroups', [
+      {
+        groupId: 1,
+        owners: [
+          { ...mockedPerson, action: ActionTypes.REMOVED },
+          { ...mockedPerson2, action: ActionTypes.REMOVED }],
+        type: ''
+      },
+      { groupId: 2, owners: [mockedPerson], type: '' }
+    ])
+
+    expect(groupError.text()).toContain(transfersErrors.mustContainOneExecutorInGroup)
+
+    // No Owners removed, one Executor added
+    await store.dispatch('setMhrTransferHomeOwnerGroups', [
+      { groupId: 1, owners: [mockedPerson, mockedPerson2, mockedAddedExecutor], type: '' },
+      { groupId: 2, owners: [mockedPerson], type: '' }
+    ])
+
+    expect(groupError.text()).toContain(transfersErrors.ownersMustBeDeceased)
   })
 })
