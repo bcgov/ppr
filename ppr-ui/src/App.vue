@@ -594,7 +594,6 @@ export default defineComponent({
       if (localState.registrationTypeUI) {
         localState.payErrorOptions.text = localState.payErrorOptions.text.replace('filing_type', filing)
       }
-      console.log(error)
       // errors with a 'type' are payment issues, other errors handles in 'default' logic
       switch (error.type) {
         case (
