@@ -25,7 +25,7 @@ import { CertifyIF, MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF 
 import { nextTick } from '@vue/composition-api'
 import { TransferDetails, TransferDetailsReview, TransferType } from '@/components/mhrTransfers'
 
-import { toDisplayPhone } from '@/utils'
+import { defaultFlagSet, toDisplayPhone } from '@/utils'
 
 Vue.use(Vuetify)
 
@@ -129,6 +129,7 @@ describe('Mhr Information', () => {
   const LEGAL_NAME = 'TEST NAME'
 
   beforeEach(async () => {
+    defaultFlagSet['mhr-transfer-enabled'] = true
     await store.dispatch('setCertifyInformation', {
       valid: false,
       certified: false,
@@ -895,5 +896,17 @@ describe('Mhr Information', () => {
 
     expect(wrapper.find(TransferDetails).vm.$data.consideration).toBe('')
     expect(wrapper.find(TransferDetails).vm.$data.transferDate).toBe(null)
+  })
+
+  it('should hides the Transfer Change button when the feature flag is false', async () => {
+    defaultFlagSet['mhr-transfer-enabled'] = false
+    await Vue.nextTick()
+    const wrapper = createComponent()
+
+    setupCurrentHomeOwners()
+    wrapper.vm.$data.dataLoaded = true
+    await Vue.nextTick()
+
+    expect(wrapper.find('#home-owners-change-btn').exists()).toBe(false)
   })
 })

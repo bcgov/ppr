@@ -232,7 +232,7 @@
                       <img class="home-owners-icon mb-1 ml-1" src="@/assets/svgs/homeownersicon_reviewscreen.svg"/>
                       <span class="font-weight-bold pl-2">Home Owners</span>
                     </v-col>
-                    <v-col cols="3" class="text-right">
+                    <v-col v-if="enableHomeOwnerChanges" cols="3" class="text-right">
                       <v-btn
                         text id="home-owners-change-btn"
                         class="pl-1"
@@ -353,6 +353,7 @@ import {
 import {
   createMhrDraft,
   getAccountInfoFromAuth,
+  getFeatureFlag,
   getMhrDraft,
   getMHRegistrationSummary,
   mhrSearch,
@@ -537,6 +538,9 @@ export default defineComponent({
       }),
       reviewOwners: computed(() => {
         return getMhrTransferHomeOwners.value.filter(owner => owner.action !== ActionTypes.REMOVED)
+      }),
+      enableHomeOwnerChanges: computed(() => {
+        return getFeatureFlag('mhr-transfer-enabled')
       }),
       /** True if Jest is running the code. */
       isJestRunning: computed((): boolean => {
