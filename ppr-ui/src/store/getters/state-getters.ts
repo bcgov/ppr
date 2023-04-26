@@ -473,8 +473,17 @@ export const getMhrSteps = (state: any, getters: any): Array<any> => {
     text: 'Review <br />and Confirm',
     to: RouteNames.MHR_REVIEW_CONFIRM,
     disabled: getters.isBusySaving,
-    valid: useMhrValidations(toRefs(getMhrRegistrationValidationModel(state)))
-      .getStepValidation(MhrSectVal.REVIEW_CONFIRM_VALID),
+    valid:
+      state.stateModel.mhrValidationState.reviewConfirmValid.authorizationValid &&
+      state.stateModel.mhrValidationState.reviewConfirmValid.staffPaymentValid &&
+      useMhrValidations(toRefs(getMhrRegistrationValidationModel(state)))
+        .getStepValidation(MhrSectVal.YOUR_HOME_VALID) &&
+      useMhrValidations(toRefs(getMhrRegistrationValidationModel(state)))
+        .getStepValidation(MhrSectVal.SUBMITTING_PARTY_VALID) &&
+      useMhrValidations(toRefs(getMhrRegistrationValidationModel(state)))
+        .getStepValidation(MhrSectVal.HOME_OWNERS_VALID) &&
+      useMhrValidations(toRefs(getMhrRegistrationValidationModel(state)))
+        .getStepValidation(MhrSectVal.LOCATION_VALID),
     component: MhrReviewConfirm
   }]
 }

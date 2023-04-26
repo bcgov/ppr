@@ -73,7 +73,7 @@
               </v-col>
             </v-row>
 
-            <header id="yellow-message-bar" class="message-bar" v-if="isReviewMode">
+            <header id="yellow-message-bar" class="message-bar" v-if="isReviewMode && !isTransferToExecutorProbateWill">
               <label><b>Important:</b> This information must match the information on the bill of sale.</label>
             </header>
 
@@ -463,6 +463,7 @@ export default defineComponent({
     const { maxLength } = useInputRules()
     const {
       isTransferDueToDeath,
+      isTransferToExecutorProbateWill,
       isTransferToExecutorUnder25Will,
       TransAffidavit
     } = useTransferOwners()
@@ -890,6 +891,7 @@ export default defineComponent({
       hasLien,
       isRoleStaffReg,
       isTransferDueToDeath,
+      isTransferToExecutorProbateWill,
       setMhrTransferSubmittingParty,
       handleTransferTypeChange,
       getUiTransferType,
