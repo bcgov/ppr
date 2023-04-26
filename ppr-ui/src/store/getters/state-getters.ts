@@ -213,7 +213,7 @@ export const isMhrRegistration = (state: StateIF): boolean => {
 }
 
 /** Is true when all steps are valid as well as staff payment and authorization are valid */
-export const isReviewConfirmValid = (state: StateIF): boolean => {
+export const isMhrRegistrationReviewValid = (state: StateIF): boolean => {
   return state.stateModel.mhrValidationState.reviewConfirmValid.authorizationValid &&
   state.stateModel.mhrValidationState.reviewConfirmValid?.staffPaymentValid &&
   useMhrValidations(toRefs(getMhrRegistrationValidationModel(state)))
@@ -487,7 +487,7 @@ export const getMhrSteps = (state: any, getters: any): Array<any> => {
     text: 'Review <br />and Confirm',
     to: RouteNames.MHR_REVIEW_CONFIRM,
     disabled: getters.isBusySaving,
-    valid: getters.isReviewConfirmValid,
+    valid: getters.isMhrRegistrationReviewValid,
     component: MhrReviewConfirm
   }]
 }
