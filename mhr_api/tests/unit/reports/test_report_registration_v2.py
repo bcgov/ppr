@@ -43,6 +43,14 @@ TRANSFER_TEST_JT_DATAFILE = 'tests/unit/reports/data/trans-test-example-jt.json'
 TRANSFER_TEST_JT_PDFFILE = 'tests/unit/reports/data/trans-test-example-jt.pdf'
 TRANSFER_TEST_TC_DATAFILE = 'tests/unit/reports/data/trans-test-example-tc.json'
 TRANSFER_TEST_TC_PDFFILE = 'tests/unit/reports/data/trans-test-example-tc.pdf'
+TRANSFER_TEST_DEATH_DATAFILE = 'tests/unit/reports/data/trans-test-example-death.json'
+TRANSFER_TEST_DEATH_PDFFILE = 'tests/unit/reports/data/trans-test-example-death.pdf'
+TRANSFER_TEST_WILL_DATAFILE = 'tests/unit/reports/data/trans-test-example-will.json'
+TRANSFER_TEST_WILL_PDFFILE = 'tests/unit/reports/data/trans-test-example-will.pdf'
+TRANSFER_TEST_AFFIDAVIT_DATAFILE = 'tests/unit/reports/data/trans-test-example-affidavit.json'
+TRANSFER_TEST_AFFIDAVIT_PDFFILE = 'tests/unit/reports/data/trans-test-example-affidavit.pdf'
+TRANSFER_TEST_ADMIN_DATAFILE = 'tests/unit/reports/data/trans-test-example-admin.json'
+TRANSFER_TEST_ADMIN_PDFFILE = 'tests/unit/reports/data/trans-test-example-admin.pdf'
 
 EXEMPTION_TEST_RES_DATAFILE = 'tests/unit/reports/data/exempt-res-test-example.json'
 EXEMPTION_TEST_RES_PDFFILE = 'tests/unit/reports/data/exempt-res-test-example.pdf'
@@ -102,6 +110,58 @@ def test_transfer_trans_tc(session, client, jwt):
         assert headers
         # verify
         check_response(content, status, TRANSFER_TEST_TC_PDFFILE)
+
+
+def test_transfer_death(session, client, jwt):
+    """Assert that generation of a test report is as expected."""
+    # setup
+    if is_report_v2():
+        json_data = get_json_from_file(TRANSFER_TEST_DEATH_DATAFILE)
+        report = Report(json_data, 'PS12345', ReportTypes.MHR_TRANSFER, 'Account Name')
+        # test
+        content, status, headers = report.get_pdf()
+        assert headers
+        # verify
+        check_response(content, status, TRANSFER_TEST_DEATH_PDFFILE)
+
+
+def test_transfer_will(session, client, jwt):
+    """Assert that generation of a test report is as expected."""
+    # setup
+    if is_report_v2():
+        json_data = get_json_from_file(TRANSFER_TEST_WILL_DATAFILE)
+        report = Report(json_data, 'ppr_staff', ReportTypes.MHR_TRANSFER, '')
+        # test
+        content, status, headers = report.get_pdf()
+        assert headers
+        # verify
+        check_response(content, status, TRANSFER_TEST_WILL_PDFFILE)
+
+
+def test_transfer_admin(session, client, jwt):
+    """Assert that generation of a test report is as expected."""
+    # setup
+    if is_report_v2():
+        json_data = get_json_from_file(TRANSFER_TEST_ADMIN_DATAFILE)
+        report = Report(json_data, 'ppr_staff', ReportTypes.MHR_TRANSFER, '')
+        # test
+        content, status, headers = report.get_pdf()
+        assert headers
+        # verify
+        check_response(content, status, TRANSFER_TEST_ADMIN_PDFFILE)
+
+
+def test_transfer_affidavit(session, client, jwt):
+    """Assert that generation of a test report is as expected."""
+    # setup
+    if is_report_v2():
+        json_data = get_json_from_file(TRANSFER_TEST_AFFIDAVIT_DATAFILE)
+        report = Report(json_data, 'ppr_staff', ReportTypes.MHR_TRANSFER, '')
+        # test
+        content, status, headers = report.get_pdf()
+        assert headers
+        # verify
+        check_response(content, status, TRANSFER_TEST_AFFIDAVIT_PDFFILE)
 
 
 def test_registration_test(session, client, jwt):

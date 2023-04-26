@@ -17,6 +17,10 @@
   <div class="business-details-container mtn-2">
     <table class="registration-details-table-grey mt-0" role="presentation">
       <tr>
+        <td>Registration Type:</td>
+        <td>{{documentDescription|title}}</td>
+      </tr>
+      <tr>
         <td>Registration Status:</td>
         <td>{{status|title}}</td>
       </tr>
@@ -38,6 +42,7 @@
             {% endif %}
         </td>
       </tr>      
+     {# 
       <tr>
         <td>Declared Value:</td>
         <td>
@@ -48,7 +53,8 @@
             N/A
           {% endif %}
         </td>
-      </tr>        
+      </tr>
+      #}
     </table>
   </div>
 

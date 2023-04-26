@@ -1,0 +1,98 @@
+{
+  "mhrNumber": "150484",
+  "status": "ACTIVE",
+  "documentId": "90050160",
+  "documentRegistrationNumber": "00500914",
+  "createDateTime": "2023-03-16T10:50:09-07:53",
+  "clientReferenceId": "EX-TRAND-004",
+  "submittingParty": {
+    "personName": {
+      "first": "JOHN",
+      "last": "SMITH",
+      "middle": "B"
+    },
+    "address": {
+      "street": "222 SUMMER STREET",
+      "city": "VICTORIA",
+      "region": "BC",
+      "country": "CA",
+      "postalCode": "V8W 2V8"
+    },
+    "emailAddress": "jbsmith@gmail.com",
+    "phoneNumber": "2504930122",
+    "phoneExtension": "1"
+  },
+  "addOwnerGroups": [
+    {
+      "groupId": 2,
+      "type": "SOLE",
+      "status": "ACTIVE",
+      "interest": "",
+      "interestNumerator": 0,
+      "interestDenominator": 0,
+      "tenancySpecified": true,
+      "owners": [
+        {
+          "type": "SOLE",
+          "individualName": {
+            "first": "JOHN",
+            "last": "CONNOLLY",
+            "middle": "STEVEN"
+          },
+          "phoneNumber": "6044620279",
+          "address": {
+            "city": "LANGLEY",
+            "street": "6665 238TH STREET",
+            "region": "BC",
+            "country": "CA",
+            "postalCode": "V3A 6H4"
+          },
+          "suffix": "EXECUTOR OF THE ESTATE OF MARY-ANNE BICKNELL",
+          "partyType": "EXECUTOR",
+          "ownerId": 1
+        }
+      ]
+    }
+  ],
+  "deleteOwnerGroups": [
+    {
+      "groupId": 1,
+      "type": "SOLE",
+      "status": "PREVIOUS",
+      "interest": "",
+      "interestNumerator": 0,
+      "interestDenominator": 0,
+      "tenancySpecified": true,
+      "owners": [
+        {
+          "type": "SOLE",
+          "individualName": {
+            "first": "MARY-ANNE",
+            "last": "BICKNELL"
+          },
+          "phoneNumber": "6044620279",
+          "address": {
+            "city": "LANGLEY",
+            "street": "6665 238TH STREET",
+            "region": "BC",
+            "country": "CA",
+            "postalCode": "V3A 6H4"
+          },
+          "partyType": "OWNER_IND"
+        }
+      ]
+    }
+  ],
+  "declaredValue": 130000,
+  "consideration": "$130000.00",
+  "ownLand": true,
+  "affirmByName": "BUSINESS REGISTRY TEST 1",
+  "transferDate": "2022-10-11T09:00:00-07:53",
+  "registrationType": "TRANS_WILL",
+  "documentDescription": "TRANSFER TO EXECUTOR \u2013 GRANT OF PROBATE WITH WILL",
+  "payment": {
+    "invoiceId": "26927",
+    "receipt": "/api/v1/payment-requests/26927/receipts"
+  },
+  "username": "Business Registry Test 1"
+}

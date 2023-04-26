@@ -20,7 +20,7 @@ from flask import current_app, jsonify
 
 from mhr_api.exceptions import ResourceErrorCodes
 from mhr_api.models import utils as model_utils
-from mhr_api.models.type_tables import MhrTenancyTypes
+from mhr_api.models.type_tables import MhrTenancyTypes, MhrRegistrationTypes
 from mhr_api.reports import ppr_report_utils
 from mhr_api.reports.v2 import report_utils
 from mhr_api.reports.v2.report_utils import ReportTypes
@@ -173,6 +173,12 @@ class Report:  # pylint: disable=too-few-public-methods
 
         # 2: Generate the registration pdf.
         self._report_key = ReportTypes.MHR_REGISTRATION
+        if self._report_data.get('registrationType', '') in (MhrRegistrationTypes.TRANS,
+                                                             MhrRegistrationTypes.TRAND,
+                                                             MhrRegistrationTypes.TRANS_ADMIN,
+                                                             MhrRegistrationTypes.TRANS_AFFIDAVIT,
+                                                             MhrRegistrationTypes.TRANS_WILL):
+            self._report_key = ReportTypes.MHR_TRANSFER
         self._report_data['createDateTime'] = create_ts
         data = self._setup_report_data()
         current_app.logger.debug('Account {0} report type {1} calling report-api {2}.'
@@ -731,8 +737,8 @@ class ReportMeta:  # pylint: disable=too-few-public-methods
         ReportTypes.MHR_REGISTRATION_COVER: {
             'reportDescription': 'MHRRegistrationCover',
             'fileName': 'registrationCoverV2',
-            'metaTitle': 'VERIFICATION OF SERVICE',
-            'metaSubtitle': 'MANUFACTURED HOME ACT',
+            'metaTitle': 'MANUFACTURED HOME REGISTRY',
+            'metaSubtitle': 'BC Registries and Online Services',
             'metaSubject': ''
         },
         ReportTypes.SEARCH_DETAIL_REPORT: {
@@ -759,7 +765,7 @@ class ReportMeta:  # pylint: disable=too-few-public-methods
         ReportTypes.MHR_TRANSFER: {
             'reportDescription': 'MHRTransfer',
             'fileName': 'transferV2',
-            'metaTitle': 'TRANSFER VERIFICATION',
+            'metaTitle': 'OWNERSHIP TRANSFER OR CHANGE',
             'metaSubtitle': 'MANUFACTURED HOME ACT',
             'metaSubject': ''
         },

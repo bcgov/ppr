@@ -298,7 +298,9 @@ def get_report_files(request_data: dict, report_type: str, mail: bool = False) -
                        ReportTypes.MHR_EXEMPTION):
         if report_type in (ReportTypes.SEARCH_BODY_REPORT,
                            ReportTypes.SEARCH_DETAIL_REPORT,
-                           ReportTypes.SEARCH_TOC_REPORT):
+                           ReportTypes.SEARCH_TOC_REPORT,
+                           ReportTypes.MHR_REGISTRATION_COVER,
+                           ReportTypes.MHR_TRANSFER):
             title_text = request_data['templateVars'].get('meta_title', '')
         else:
             title_text = request_data['templateVars'].get('documentDescription', '')
