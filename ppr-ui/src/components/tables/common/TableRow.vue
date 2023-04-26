@@ -85,7 +85,7 @@
         {{ getRegistrationType(item.registrationType) }}
         <span v-if="isPpr && !isChild"> - Base Registration</span>
       </div>
-      <div v-else class="pr-2">{{ getMhrDescription(item.registrationDescription) }}
+      <div v-else class="pr-2">{{ item.registrationDescription }}
         <v-tooltip
         v-if="item.registrationDescription === APIMhrDescriptionTypes.CONVERTED"
         class="pa-2"
@@ -805,11 +805,6 @@ export default defineComponent({
       return !!item.lienRegistrationType
     }
 
-    const getMhrDescription = (description: APIMhrDescriptionTypes): string => {
-      if (description === APIMhrDescriptionTypes.CONVERTED) return 'Converted'
-      return description
-    }
-
     watch(() => props.setItem, (val) => {
     }, { deep: true, immediate: true })
 
@@ -847,7 +842,6 @@ export default defineComponent({
       removeMhrDraft,
       isMhrTransfer,
       hasLien,
-      getMhrDescription,
       isTransAffi,
       hasFrozenParentReg,
       ...toRefs(localState)
