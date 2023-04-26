@@ -11,12 +11,6 @@
     />
 
     <BaseDialog
-      :setOptions="saveOptions"
-      :setDisplay="showSaveDialog"
-      @proceed="handleDialogResp($event)"
-    />
-
-    <BaseDialog
       :setOptions="cancelOwnerChangeConfirm"
       :setDisplay="showCancelChangeDialog"
       @proceed="handleCancelDialogResp($event)"
@@ -325,7 +319,6 @@ import { HomeLocationReview, YourHomeReview } from '@/components/mhrRegistration
 import { HomeOwners } from '@/views'
 import { BaseDialog } from '@/components/dialogs'
 import {
-  registrationSaveDraftError,
   unsavedChangesDialog,
   cancelOwnerChangeConfirm,
   transferRequiredDialog
@@ -335,6 +328,7 @@ import AccountInfo from '@/components/common/AccountInfo.vue'
 import {
   AccountInfoIF,
   DialogOptionsIF,
+  ErrorIF,
   MhrTransferApiIF,
   RegTableNewItemI,
   TransferTypeSelectIF
@@ -383,6 +377,10 @@ export default defineComponent({
   },
   props: {
     appReady: {
+      type: Boolean,
+      default: false
+    },
+    saveDraftExit: {
       type: Boolean,
       default: false
     }
@@ -492,9 +490,7 @@ export default defineComponent({
       showTransferType: !!getMhrInformation.value.draftNumber || false,
       attentionReference: '',
       cancelOptions: unsavedChangesDialog,
-      saveOptions: registrationSaveDraftError,
       showCancelDialog: false,
-      showSaveDialog: false,
       showCancelChangeDialog: false,
       showStartTransferRequiredDialog: false,
       transferRequiredDialogOptions: computed((): DialogOptionsIF => {
@@ -581,6 +577,10 @@ export default defineComponent({
       localState.loading = false
       localState.dataLoaded = true
     })
+
+    const emitError = (error: ErrorIF): void => {
+      context.emit('error', error)
+    }
 
     const onStaffPaymentDataUpdate = (val: StaffPaymentIF) => {
       let staffPaymentData: StaffPaymentIF = {
@@ -694,7 +694,7 @@ export default defineComponent({
             setRegTableNewItem(newItem)
             goToDash()
           }
-        } else console.log(mhrTransferFiling?.error) // Handle Schema or Api errors here.
+        } else emitError(mhrTransferFiling?.error)
       }
 
       // If transfer is valid, enter review mode
@@ -735,8 +735,7 @@ export default defineComponent({
         setUnsavedChanges(false)
         goToDash()
       } else {
-        localState.showSaveDialog = true
-        console.error(mhrTransferDraft?.error)
+        emitError(mhrTransferDraft?.error)
       }
     }
 
@@ -866,7 +865,13 @@ export default defineComponent({
       }
     })
 
+    watch(() => props.saveDraftExit, () => {
+      // on change (T/F doesn't matter), save and go back to dash
+      onSave()
+    })
+
     return {
+      emitError,
       setValidation,
       getInfoValidation,
       hasUnsavedChanges,

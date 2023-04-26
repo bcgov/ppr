@@ -3,11 +3,7 @@
     <v-overlay v-model="submitting">
       <v-progress-circular color="primary" size="50" indeterminate />
     </v-overlay>
-    <base-dialog
-      :setOptions="options"
-      :setDisplay="showCancelDialog"
-      @proceed="showCancelDialog = false"
-    />
+
     <div class="view-container px-15 py-0">
       <div class="container pa-0 pt-4">
         <v-row no-gutters>
@@ -49,8 +45,9 @@
           :currentStatementType="statementType"
           :currentStepName="$route.name"
           :router="$router"
+          :forceSave="saveDraftExit"
           @registration-incomplete="registrationIncomplete()"
-          @error="emitError()"
+          @error="emitError($event)"
           @submit="submit()"
           @cancelProceed="resetAllValidations()"
         />
@@ -70,10 +67,9 @@ import ButtonFooter from '@/components/common/ButtonFooter.vue'
 import { useHomeOwners, useMhrValidations, useNewMhrRegistration } from '@/composables'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 /* eslint-disable no-unused-vars */
-import { MhrRegistrationIF, RegistrationTypeIF, RegTableNewItemI } from '@/interfaces'
+import { ErrorIF, MhrRegistrationIF, RegistrationTypeIF, RegTableNewItemI } from '@/interfaces'
 import { RegistrationLengthI } from '@/composables/fees/interfaces'
 import BaseDialog from '@/components/dialogs/BaseDialog.vue'
-import { registrationCompleteError } from '@/resources/dialogOptions'
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
@@ -90,6 +86,10 @@ export default defineComponent({
       default: false
     },
     isJestRunning: {
+      type: Boolean,
+      default: false
+    },
+    saveDraftExit: {
       type: Boolean,
       default: false
     }
@@ -160,9 +160,7 @@ export default defineComponent({
             getStepValidation(MhrSectVal.HOME_OWNERS_VALID) &&
             getStepValidation(MhrSectVal.LOCATION_VALID) &&
             getStepValidation(MhrSectVal.REVIEW_CONFIRM_VALID)
-      }),
-      options: registrationCompleteError,
-      showCancelDialog: false
+      })
     })
 
     /** Helper to check is the current route matches */
@@ -175,8 +173,8 @@ export default defineComponent({
       setValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_APP, true)
     }
 
-    const emitError = (): void => {
-      context.emit('error', true)
+    const emitError = (error: ErrorIF): void => {
+      context.emit('error', error)
     }
 
     const goToDash = (): void => {
@@ -236,9 +234,7 @@ export default defineComponent({
           setUnsavedChanges(false)
           await context.root.$router.push({ name: RouteNames.DASHBOARD })
         } else {
-          console.log(mhrSubmission?.error) // Handle Schema or Api errors here..
-          localState.options = registrationCompleteError
-          localState.showCancelDialog = true
+          emitError(mhrSubmission?.error)
         }
       } else {
         await scrollToInvalid(MhrSectVal.REVIEW_CONFIRM_VALID, 'mhr-review-confirm',

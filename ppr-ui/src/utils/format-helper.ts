@@ -48,3 +48,15 @@ export function fromDisplayPhone (phoneNumber: string): string {
 export function toTitleCase (value: string): string {
   return (value[0]?.toUpperCase() + value.slice(1)?.toLowerCase()) || ''
 }
+
+/**
+ * Formats a payment error string to extract just the rootCause message.
+ * @param rootCause the string to format
+ * @returns a payment error rootCause message
+ */
+export function parsePayDetail (rootCause: string): string {
+  return rootCause?.substring(
+    rootCause?.indexOf(':') + 5,
+    rootCause?.indexOf('<') - 1
+  )
+}

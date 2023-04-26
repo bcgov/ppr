@@ -9,7 +9,6 @@ import {
   MhrSearchCriteriaIF,
   MhRegistrationSummaryIF,
   ErrorIF,
-  MhrTransferApiIF,
   MhrDraftApiIF,
   RegistrationSortIF,
   MhrDraftIF
@@ -17,7 +16,7 @@ import {
 import { APIMhrTypes, ErrorCategories, ErrorCodes } from '@/enums'
 import { useSearch } from '@/composables/useSearch'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
-import { addTimestampToDate } from '@/utils'
+import { addTimestampToDate, parsePayDetail } from '@/utils'
 const { mapMhrSearchType } = useSearch()
 
 // Create default request base URL and headers.
@@ -307,7 +306,8 @@ export async function submitMhrRegistration (payloadData, staffPayment) {
       error: {
         category: ErrorCategories.REGISTRATION_CREATE,
         statusCode: error?.response?.status || StatusCodes.NOT_FOUND,
-        msg: error?.response?.data?.errorMesage || 'Unknown Error'
+        msg: error?.response?.data?.errorMesage || 'Unknown Error',
+        detail: error?.response?.data?.rootCause
       }
     }
   }
@@ -422,7 +422,8 @@ export async function submitMhrTransfer (payloadData, mhrNumber, staffPayment) {
       error: {
         category: ErrorCategories.REGISTRATION_TRANSFER,
         statusCode: error?.response?.status || StatusCodes.NOT_FOUND,
-        msg: error?.response?.data?.errorMesage || 'Unknown Error'
+        msg: error?.response?.data?.errorMesage || 'Unknown Error',
+        detail: error?.response?.data?.rootCause
       }
     }
   }
@@ -562,6 +563,30 @@ export async function updateMhrDraft (draftId: string, type: APIMhrTypes, draft:
         throw new Error('Invalid API response')
       }
       return data
+    })
+    .catch(error => {
+      if (error?.response?.data) {
+        try {
+          error.response.data.rootCause = error.response.data.rootCause
+            .replace('detail:', '"detail":"')
+            .replace('type:', '"type":"')
+            .replace('message:', '"message":"')
+            .replace('status_code:', '"statusCode":"')
+            .replaceAll(',', '",')
+          error.response.data.rootCause = `{${error.response.data.rootCause}"}`
+          error.response.data.rootCause = JSON.parse(error.response.data.rootCause)
+        } catch (error) {
+          // continue
+        }
+      }
+      draft.error = {
+        category: ErrorCategories.REGISTRATION_SAVE,
+        statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
+        message: error?.response?.data?.message,
+        detail: error?.response?.data?.rootCause?.detail,
+        type: error?.response?.data?.rootCause?.type?.trim() as ErrorCodes
+      }
+      return draft
     })
 }
 

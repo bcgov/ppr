@@ -87,8 +87,8 @@ import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composi
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import _ from 'lodash'
 // local helpers/enums/interfaces/resources
-import { createMhrDraft, saveFinancingStatement, saveFinancingStatementDraft, updateMhrDraft } from '@/utils'
-import { APIMhrTypes, RouteNames, StatementTypes } from '@/enums'
+import { saveFinancingStatement, saveFinancingStatementDraft } from '@/utils'
+import { RouteNames, StatementTypes } from '@/enums'
 import { BaseDialog } from '@/components/dialogs'
 import StaffPaymentDialog from '@/components/dialogs/StaffPaymentDialog.vue'
 import {
@@ -135,24 +135,22 @@ export default defineComponent({
       hasUnsavedChanges,
       isRoleStaffBcol,
       isRoleStaffReg,
-      isRoleStaffSbc,
-      getMhrDraftNumber
+      isRoleStaffSbc
     } = useGetters<any>([
       'getFooterButtonConfig',
       'getStateModel',
       'hasUnsavedChanges',
       'isRoleStaffBcol',
       'isRoleStaffReg',
-      'isRoleStaffSbc',
-      'getMhrDraftNumber'
+      'isRoleStaffSbc'
     ])
 
     const {
-      resetNewRegistration, setDraft, setRegTableNewItem, setUnsavedChanges, setMhrDraftNumber
+      resetNewRegistration, setDraft, setRegTableNewItem, setUnsavedChanges
     } = useActions<any>([
-      'resetNewRegistration', 'setDraft', 'setRegTableNewItem', 'setUnsavedChanges', 'setMhrDraftNumber'
+      'resetNewRegistration', 'setDraft', 'setRegTableNewItem', 'setUnsavedChanges'
     ])
-    const { buildApiData } = useNewMhrRegistration()
+    const { mhrDraftHandler } = useNewMhrRegistration()
 
     const localState = reactive({
       options: unsavedChangesDialog,
@@ -358,17 +356,6 @@ export default defineComponent({
       localState.submitting = false
       return statement
     }, 2000, { trailing: false })
-
-    const mhrDraftHandler = async (): Promise<MhrDraftIF> => {
-      const draft = getMhrDraftNumber.value
-        ? await updateMhrDraft(getMhrDraftNumber.value, APIMhrTypes.MANUFACTURED_HOME_REGISTRATION, buildApiData())
-        : await createMhrDraft(APIMhrTypes.MANUFACTURED_HOME_REGISTRATION, buildApiData())
-
-      // Set draftNumber to state to prevent duplicate drafts
-      if (draft) setMhrDraftNumber(draft.draftNumber)
-
-      return draft
-    }
 
     watch(() => props.forceSave, (val: boolean) => {
       // on change (T/F doesn't matter), save and go back to dash
