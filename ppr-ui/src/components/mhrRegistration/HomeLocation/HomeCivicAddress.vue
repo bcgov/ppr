@@ -73,7 +73,6 @@ import {
   useCountriesProvinces
 } from '@/composables/address/factories'
 import { AddressIF } from '@/interfaces'
-import { setExtra } from '@sentry/minimal'
 /* eslint-enable no-unused-vars */
 export default defineComponent({
   name: 'HomeCivicAddress',

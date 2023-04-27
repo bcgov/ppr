@@ -11,8 +11,7 @@ import VueCompositionApi from '@vue/composition-api'
 import { getVueRouter } from '@/router'
 import { getVuexStore } from '@/store'
 import Affix from 'vue-affix'
-import * as Sentry from '@sentry/browser'
-import * as Integrations from '@sentry/integrations'
+import * as Sentry from '@sentry/vue'
 import { TiptapVuetifyPlugin } from 'tiptap-vuetify'
 
 // Styles
@@ -65,8 +64,8 @@ async function start () {
     // initialize Sentry
     console.info('Initializing Sentry...') // eslint-disable-line no-console
     Sentry.init({
-      dsn: window['sentryDsn'], // eslint-disable-line dot-notation
-      integrations: [new Integrations.Vue({ Vue, attachProps: true })]
+      Vue,
+      dsn: window['sentryDsn'] // eslint-disable-line dot-notation
     })
   }
 
