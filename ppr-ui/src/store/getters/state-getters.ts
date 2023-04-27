@@ -217,14 +217,10 @@ export const isMhrRegistrationReviewValid = (state: StateIF): boolean => {
   const modelRef = toRefs(getMhrRegistrationValidationModel(state))
   return state.stateModel.mhrValidationState.reviewConfirmValid.authorizationValid &&
   state.stateModel.mhrValidationState.reviewConfirmValid?.staffPaymentValid &&
-  useMhrValidations(modelRef)
-    .getStepValidation(MhrSectVal.YOUR_HOME_VALID) &&
-  useMhrValidations(modelRef)
-    .getStepValidation(MhrSectVal.SUBMITTING_PARTY_VALID) &&
-  useMhrValidations(modelRef)
-    .getStepValidation(MhrSectVal.HOME_OWNERS_VALID) &&
-  useMhrValidations(modelRef)
-    .getStepValidation(MhrSectVal.LOCATION_VALID)
+  useMhrValidations(modelRef).getStepValidation(MhrSectVal.YOUR_HOME_VALID) &&
+  useMhrValidations(modelRef).getStepValidation(MhrSectVal.SUBMITTING_PARTY_VALID) &&
+  useMhrValidations(modelRef).getStepValidation(MhrSectVal.HOME_OWNERS_VALID) &&
+  useMhrValidations(modelRef).getStepValidation(MhrSectVal.LOCATION_VALID)
 }
 
 /** The selected registration flow type object. */
