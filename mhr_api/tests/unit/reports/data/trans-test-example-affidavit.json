@@ -1,0 +1,92 @@
+{
+  "mhrNumber": "003936",
+  "status": "ACTIVE",
+  "documentId": "90050198",
+  "documentRegistrationNumber": "00500971",
+  "createDateTime": "2023-03-24T10:27:44-07:53",
+  "clientReferenceId": "",
+  "submittingParty": {
+    "businessName": "TESTING NAME",
+    "address": {
+      "street": "123-1640 ELECTRA BLVD",
+      "city": "NORTH SAANICH",
+      "region": "BC",
+      "country": "CA",
+      "postalCode": "V8L 5V4"
+    },
+    "emailAddress": "cameron@email.com",
+    "phoneNumber": "1234567890"
+  },
+  "addOwnerGroups": [
+    {
+      "groupId": 3,
+      "type": "SOLE",
+      "status": "ACTIVE",
+      "interest": "",
+      "interestNumerator": 0,
+      "interestDenominator": 0,
+      "tenancySpecified": true,
+      "owners": [
+        {
+          "type": "SOLE",
+          "individualName": {
+            "first": "MARTIN",
+            "last": "AMIS"
+          },
+          "phoneNumber": "6047271234",
+          "address": {
+            "city": "KELOWNA",
+            "street": "1234 FRONT STREET",
+            "region": "BC",
+            "country": "CA",
+            "postalCode": "V2F 6H4"
+          },
+          "suffix": "EXECUTOR OF THE DECEASED.",
+          "partyType": "EXECUTOR",
+          "ownerId": 1
+        }
+      ]
+    }
+  ],
+  "deleteOwnerGroups": [
+    {
+      "groupId": 2,
+      "type": "SOLE",
+      "status": "PREVIOUS",
+      "interest": "",
+      "interestNumerator": 0,
+      "interestDenominator": 0,
+      "tenancySpecified": true,
+      "owners": [
+        {
+          "type": "SOLE",
+          "individualName": {
+            "first": "BERNICE",
+            "last": "INSCHO"
+          },
+          "phoneNumber": "604",
+          "address": {
+            "city": "WILLIAMS LAKE",
+            "street": "630 WINGER ROAD",
+            "region": "BC",
+            "country": "CA",
+            "postalCode": "V2G 3S7"
+          },
+          "partyType": "OWNER_IND"
+        }
+      ]
+    }
+  ],
+  "declaredValue": 1000,
+  "consideration": "$1000.00",
+  "ownLand": false,
+  "affirmByName": "BUSINESS REGISTRY TEST 1",
+  "transferDate": "2023-01-16T09:00:00-07:53",
+  "registrationType": "TRANS_AFFIDAVIT",
+  "documentDescription": "TRANSFER TO EXECUTOR \u2013 ESTATE UNDER $25000 WITH WILL",
+  "payment": {
+    "invoiceId": "27105",
+    "receipt": "/api/v1/payment-requests/27105/receipts"
+  },
+  "username": "Business Registry Test 1"
+}

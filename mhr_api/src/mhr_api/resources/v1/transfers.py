@@ -16,13 +16,13 @@
 from http import HTTPStatus
 
 from flask import Blueprint
-from flask import current_app, request, jsonify
+from flask import g, current_app, request, jsonify
 from flask_cors import cross_origin
 from registry_schemas import utils as schema_utils
 
 from mhr_api.utils.auth import jwt
 from mhr_api.exceptions import BusinessException, DatabaseException
-from mhr_api.services.authz import authorized_role, is_staff, is_all_staff_account, get_group
+from mhr_api.services.authz import authorized_role, is_staff, is_all_staff_account, get_group, is_reg_staff_account
 from mhr_api.services.authz import TRANSFER_SALE_BENEFICIARY, TRANSFER_DEATH_JT
 from mhr_api.models import MhrRegistration
 from mhr_api.models import registration_utils as model_reg_utils
@@ -49,6 +49,7 @@ def post_transfers(mhr_number: str):  # pylint: disable=too-many-return-statemen
             return resource_utils.account_required_response()
         # Verify request JWT role
         request_json = request.get_json(silent=True)
+        current_app.logger.info(request_json)
         if not model_reg_utils.is_transfer_due_to_death(request_json.get('registrationType')) and \
                 not authorized_role(jwt, TRANSFER_SALE_BENEFICIARY):
             current_app.logger.error('User not staff or missing required role: ' + TRANSFER_SALE_BENEFICIARY)
@@ -62,7 +63,6 @@ def post_transfers(mhr_number: str):  # pylint: disable=too-many-return-statemen
         current_reg: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_number,
                                                                               account_id,
                                                                               is_all_staff_account(account_id))
-
         # Validate request against the schema.
         valid_format, errors = schema_utils.validate(request_json, 'transfer', 'mhr')
         # Additional validation not covered by the schema.
@@ -82,7 +82,7 @@ def post_transfers(mhr_number: str):  # pylint: disable=too-many-return-statemen
         if resource_utils.is_pdf(request):
             current_app.logger.info('Report not yet available: returning JSON.')
         # Report data include all active owners.
-        setup_report(registration, response_json, current_reg)
+        setup_report(registration, response_json, current_reg, account_id)
         return jsonify(response_json), HTTPStatus.CREATED
 
     except DatabaseException as db_exception:
@@ -96,7 +96,7 @@ def post_transfers(mhr_number: str):  # pylint: disable=too-many-return-statemen
         return resource_utils.default_exception_response(default_exception)
 
 
-def setup_report(registration: MhrRegistration, response_json, current_reg: MhrRegistration):
+def setup_report(registration: MhrRegistration, response_json, current_reg: MhrRegistration, account_id: str):
     """Include all active owners in the transfer report request data and add it to the queue."""
     add_groups = response_json.get('addOwnerGroups')
     current_reg.current_view = True
@@ -117,5 +117,12 @@ def setup_report(registration: MhrRegistration, response_json, current_reg: MhrR
         if not added:
             new_groups.append(add_group)
     response_json['addOwnerGroups'] = new_groups
-    reg_utils.enqueue_registration_report(registration, response_json, ReportTypes.MHR_TRANSFER)
+    if is_reg_staff_account(account_id):
+        token = g.jwt_oidc_token_info
+        username: str = token.get('firstname', '') + ' ' + token.get('lastname', '')
+        response_json['username'] = username
+        reg_utils.enqueue_registration_report(registration, response_json, ReportTypes.MHR_REGISTRATION_STAFF)
+        del response_json['username']
+    else:
+        reg_utils.enqueue_registration_report(registration, response_json, ReportTypes.MHR_TRANSFER)
     response_json['addOwnerGroups'] = add_groups

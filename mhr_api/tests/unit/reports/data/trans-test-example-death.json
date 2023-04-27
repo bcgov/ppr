@@ -1,0 +1,135 @@
+{
+  "mhrNumber": "150511",
+  "status": "ACTIVE",
+  "documentId": "90050203",
+  "documentRegistrationNumber": "00500984",
+  "createDateTime": "2023-03-31T11:58:45-07:53",
+  "clientReferenceId": "",
+  "submittingParty": {
+    "businessName": "INTL ASSOC OF BRIDGE WORKERS UNION",
+    "address": {
+      "street": "123123",
+      "city": "VICTORIA",
+      "region": "BC",
+      "country": "CA",
+      "postalCode": "V4V4V4"
+    },
+    "emailAddress": "cameron@email.com",
+    "phoneNumber": "1123123123"
+  },
+  "addOwnerGroups": [
+    {
+      "groupId": 3,
+      "type": "COMMON",
+      "status": "ACTIVE",
+      "interest": "UNDIVIDED",
+      "interestNumerator": 1,
+      "interestDenominator": 2,
+      "tenancySpecified": true,
+      "owners": [
+        {
+          "type": "COMMON",
+          "individualName": {
+            "first": "EWFEDFSAEW",
+            "last": "DFREAWF"
+          },
+          "address": {
+            "city": "OAKVILLE",
+            "street": "23-1489 HERITAGE WAY",
+            "region": "ON",
+            "country": "CA",
+            "postalCode": "L6M 4M6"
+          },
+          "partyType": "OWNER_IND",
+          "ownerId": 1
+        }
+      ]
+    },
+    {
+      "groupId": 5,
+      "type": "COMMON",
+      "status": "ACTIVE",
+      "interest": "UNDIVIDED",
+      "interestNumerator": 1,
+      "interestDenominator": 2,
+      "tenancySpecified": true,
+      "owners": [
+        {
+          "type": "COMMON",
+          "individualName": {
+            "first": "CAMERON",
+            "last": "TESTING"
+          },
+          "phoneNumber": "1123123123",
+          "address": {
+            "city": "V4V 4V4",
+            "street": "123123",
+            "region": "BC",
+            "country": "CA",
+            "postalCode": "v4v 4v4",
+            "streetAdditional": "VICTORIA V4V 4V4"
+          },
+          "partyType": "OWNER_IND",
+          "ownerId": 2
+        }
+      ]
+    }
+  ],
+  "deleteOwnerGroups": [
+    {
+      "groupId": 4,
+      "type": "JOINT",
+      "status": "PREVIOUS",
+      "interest": "UNDIVIDED",
+      "interestNumerator": 1,
+      "interestDenominator": 2,
+      "tenancySpecified": true,
+      "owners": [
+        {
+          "type": "JOINT",
+          "individualName": {
+            "first": "BEN",
+            "last": "JONES"
+          },
+          "address": {
+            "city": "SCARBOROUGH",
+            "street": "43-70 ALFORD CRES",
+            "region": "ON",
+            "country": "CA",
+            "postalCode": "M1B 4C1"
+          },
+          "partyType": "OWNER_IND"
+        },
+        {
+          "type": "JOINT",
+          "individualName": {
+            "first": "CAMERON",
+            "last": "TESTING"
+          },
+          "phoneNumber": "1123123123",
+          "address": {
+            "city": "V4V 4V4",
+            "street": "123123",
+            "region": "BC",
+            "country": "CA",
+            "postalCode": "v4v 4v4",
+            "streetAdditional": "VICTORIA"
+          },
+          "partyType": "OWNER_IND"
+        }
+      ]
+    }
+  ],
+  "declaredValue": 1000,
+  "consideration": "",
+  "ownLand": false,
+  "affirmByName": "CAMERON BOWLER",
+  "transferDate": "2023-03-31T09:00:00-07:53",
+  "registrationType": "TRAND",
+  "documentDescription": "TRANSFER TO SURVIVING JOINT TENANT(S)",
+  "payment": {
+    "invoiceId": "27258",
+    "receipt": "/api/v1/payment-requests/27258/receipts"
+  },
+  "username": "Business Registry Test 1"
+}
