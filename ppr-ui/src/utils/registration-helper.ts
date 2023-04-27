@@ -378,13 +378,13 @@ export async function saveFinancingStatementDraft (stateModel:StateModelIF): Pro
 /** Save new financing statement. Data to be saved is in the store state model. */
 export async function saveFinancingStatement (stateModel:StateModelIF): Promise<FinancingStatementIF> {
   const registrationType: RegistrationTypeIF = stateModel.registration.registrationType
-  var error:ErrorIF = null
-  var draft:DraftIF = stateModel.registration.draft
+  const error:ErrorIF = null
+  const draft:DraftIF = stateModel.registration.draft
   const trustLength = stateModel.registration.lengthTrust
   const parties:AddPartiesIF = stateModel.registration.parties
   const collateral:AddCollateralIF = stateModel.registration.collateral
   const isStaff = getIsStaff(stateModel)
-  var statement:FinancingStatementIF = {
+  const statement:FinancingStatementIF = {
     type: stateModel.registration.registrationType.registrationTypeAPI,
     lifeInfinite: trustLength.lifeInfinite,
     registeringParty: parties.registeringParty,
@@ -450,7 +450,7 @@ export async function saveFinancingStatement (stateModel:StateModelIF): Promise<
 
 /** Save new discharge registration. Data to be saved is in the store state model. */
 export async function saveDischarge (stateModel:StateModelIF): Promise<DischargeRegistrationIF> {
-  var registration:DischargeRegistrationIF = {
+  const registration:DischargeRegistrationIF = {
     baseRegistrationNumber: stateModel.registration.registrationNumber,
     debtorName: stateModel.registration.confirmDebtorName,
     registeringParty: stateModel.registration.parties.registeringParty,
@@ -642,7 +642,7 @@ export async function setupAmendmentStatementFromDraft (
 export async function saveRenewal (stateModel:StateModelIF): Promise<RenewRegistrationIF> {
   const trustLength = stateModel.registration.lengthTrust
 
-  var registration:RenewRegistrationIF = {
+  const registration:RenewRegistrationIF = {
     baseRegistrationNumber: stateModel.registration.registrationNumber,
     debtorName: stateModel.registration.confirmDebtorName,
     registeringParty: stateModel.registration.parties.registeringParty,

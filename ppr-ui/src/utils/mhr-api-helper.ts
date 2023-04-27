@@ -320,7 +320,7 @@ export async function submitMhrRegistration (payloadData, staffPayment) {
  */
 export async function mhrRegistrationHistory (withCollapse: boolean = false, sortOptions: RegistrationSortIF = null) {
   try {
-    var path = withCollapse ? 'registrations?collapse=true' : 'registrations'
+    let path = withCollapse ? 'registrations?collapse=true' : 'registrations'
     if (sortOptions) {
       path = addSortParams(
         path,

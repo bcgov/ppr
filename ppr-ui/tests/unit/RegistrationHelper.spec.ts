@@ -151,7 +151,7 @@ describe('Registration API Helper Tests', () => {
     testDraft.financingStatement.lienAmount = '1000'
     testDraft.financingStatement.lifeYears = 1
     await store.dispatch('setDraft', testDraft)
-    var draft:DraftIF = await saveFinancingStatementDraft(wrapper.vm.$store.state.stateModel)
+    const draft:DraftIF = await saveFinancingStatementDraft(wrapper.vm.$store.state.stateModel)
     // console.log(JSON.stringify(statement))
     expect(draft.createDateTime).toBeDefined()
     expect(draft.financingStatement.documentId).toBeDefined()
@@ -262,7 +262,7 @@ describe('Registration API Helper Discharge Tests', () => {
     await store.dispatch('setFolioOrReferenceNumber', 'A-00000402')
     await store.dispatch('setRegistrationConfirmDebtorName', mockedDebtorNames[0])
 
-    var registration:DischargeRegistrationIF = await saveDischarge(wrapper.vm.$store.state.stateModel)
+    const registration:DischargeRegistrationIF = await saveDischarge(wrapper.vm.$store.state.stateModel)
     // console.log(JSON.stringify(statement))
     expect(registration.createDateTime).toBeDefined()
     expect(registration.baseRegistrationNumber).toBeDefined()
@@ -274,7 +274,7 @@ describe('Registration API Helper Discharge Tests', () => {
     await store.dispatch('setFolioOrReferenceNumber', 'A-00000402')
     await store.dispatch('setRegistrationConfirmDebtorName', mockedDebtorNames[2])
 
-    var registration:DischargeRegistrationIF = await saveDischarge(wrapper.vm.$store.state.stateModel)
+    const registration:DischargeRegistrationIF = await saveDischarge(wrapper.vm.$store.state.stateModel)
     // console.log(JSON.stringify(statement))
     expect(registration.createDateTime).toBeDefined()
     expect(registration.baseRegistrationNumber).toBeDefined()
@@ -285,7 +285,7 @@ describe('Registration API Helper Discharge Tests', () => {
   it('save business debtor no folio', async () => {
     await store.dispatch('setRegistrationConfirmDebtorName', mockedDebtorNames[0])
 
-    var registration:DischargeRegistrationIF = await saveDischarge(wrapper.vm.$store.state.stateModel)
+    const registration:DischargeRegistrationIF = await saveDischarge(wrapper.vm.$store.state.stateModel)
     // console.log(JSON.stringify(statement))
     expect(registration.createDateTime).toBeDefined()
     expect(registration.baseRegistrationNumber).toBeDefined()

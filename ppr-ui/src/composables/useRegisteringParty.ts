@@ -24,7 +24,7 @@ export const useRegisteringParty = () => {
 
   const getRegisteringParty = async () => {
     let regParty = null
-    var parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
+    const parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
     if (isRoleStaffBcol.value || isRoleStaffReg.value) {
       regParty = await getStaffegisteringParty(isRoleStaffBcol.value)
     } else if (isRoleStaffSbc.value) {
