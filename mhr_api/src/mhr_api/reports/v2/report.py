@@ -36,6 +36,13 @@ TO_SEARCH_DESCRIPTION = {
 }
 SINGLE_URI = '/forms/chromium/convert/html'
 MERGE_URI = '/forms/pdfengines/merge'
+TO_TRANSFER_DESC = {
+    'TRANS_WILL': 'Transfer to Executor - Grant of Probabe with Will',
+    'TRANS': 'Transfer Due to Sale or Gift',
+    'TRAND': 'Transfer to Surviving Joint Tenant(s)',
+    'TRANS_ADMIN': 'Transfer to Administrator - Grant of Administration',
+    'TRANS_AFFIDAVIT': 'Transfer to Executor - Estate under $25,000 with Will'
+}
 
 
 class Report:  # pylint: disable=too-few-public-methods
@@ -343,6 +350,9 @@ class Report:  # pylint: disable=too-few-public-methods
         elif self._report_key == ReportTypes.MHR_REGISTRATION_COVER:
             self._report_data['regCover'] = report_utils.set_registration_cover(self._report_data)
             self._report_data['createDateTime'] = Report._to_report_datetime(self._report_data['createDateTime'])
+            self._report_data['documentDescription'] = TO_TRANSFER_DESC.get(self._report_data.get('registrationType'))
+        elif self._report_key == ReportTypes.MHR_TRANSFER:
+            self._report_data['documentDescription'] = TO_TRANSFER_DESC.get(self._report_data.get('registrationType'))
         else:
             if self._report_key == ReportTypes.SEARCH_DETAIL_REPORT:
                 self._set_search_additional_message()

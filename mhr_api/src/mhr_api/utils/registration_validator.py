@@ -24,7 +24,7 @@ from mhr_api.models.type_tables import MhrOwnerStatusTypes, MhrTenancyTypes, Mhr
 from mhr_api.models.db2.owngroup import NEW_TENANCY_LEGACY
 from mhr_api.models.db2.utils import get_db2_permit_count
 from mhr_api.models.utils import is_legacy, to_db2_ind_name, now_ts, ts_from_iso_format, valid_tax_cert_date
-from mhr_api.services.authz import MANUFACTURER_GROUP
+from mhr_api.services.authz import MANUFACTURER_GROUP, QUALIFIED_USER_GROUP
 from mhr_api.services import ltsa
 from mhr_api.utils import valid_charset
 
@@ -108,6 +108,7 @@ LOCATION_STRATA_ALLOWED = 'Dealer/manufacturer name, park name, PAD, band name, 
     'with a STRATA location type. '
 LOCATION_OTHER_ALLOWED = 'Dealer/manufacturer name, park name, PAD, band name, and reserve number are not allowed ' \
     'with an OTHER location type. '
+TRAN_QUALIFIED_DELETE = 'Qualified suppliers mut either delete one owner group or all owner groups. '
 
 
 def validate_registration(json_data, staff: bool = False):
@@ -128,11 +129,11 @@ def validate_registration(json_data, staff: bool = False):
     return error_msg
 
 
-def validate_transfer(registration: MhrRegistration, json_data, staff: bool = False):
+def validate_transfer(registration: MhrRegistration, json_data, staff: bool, group: str):
     """Perform all transfer data validation checks not covered by schema validation."""
     error_msg = ''
     try:
-        current_app.logger.info(f'Validating transfer staff={staff}')
+        current_app.logger.info(f'Validating transfer staff={staff}, group={group}')
         if not staff and reg_utils.is_transfer_due_to_death_staff(json_data.get('registrationType')):
             return REG_STAFF_ONLY
         if registration:
@@ -158,6 +159,10 @@ def validate_transfer(registration: MhrRegistration, json_data, staff: bool = Fa
                 error_msg += CONSIDERATION_REQUIRED
             if not json_data.get('transferDate'):
                 error_msg += TRANSFER_DATE_REQUIRED
+            if json_data.get('deleteOwnerGroups') and len(json_data.get('deleteOwnerGroups')) != 1 and \
+                    group == QUALIFIED_USER_GROUP and \
+                    len(json_data.get('deleteOwnerGroups')) != get_existing_group_count(registration):
+                error_msg += TRAN_QUALIFIED_DELETE
         if reg_utils.is_transfer_due_to_death(json_data.get('registrationType')):
             error_msg += validate_transfer_death(registration, json_data)
     except Exception as validation_exception:   # noqa: B902; eat all errors
@@ -944,8 +949,15 @@ def get_active_group_count(json_data, registration: MhrRegistration) -> int:
             group_count += len(json_data.get('addOwnerGroups'))
         if json_data.get('deleteOwnerGroups'):
             group_count -= len(json_data.get('deleteOwnerGroups'))
-        if registration and is_legacy() and registration.manuhome:
-            for existing in registration.manuhome.reg_owner_groups:
-                if existing.status in (Db2Owngroup.StatusTypes.ACTIVE, Db2Owngroup.StatusTypes.EXEMPT):
-                    group_count += 1
+        group_count += get_existing_group_count(registration)
+    return group_count
+
+
+def get_existing_group_count(registration: MhrRegistration) -> int:
+    """Count number of existing owner groups."""
+    group_count: int = 0
+    if registration and is_legacy() and registration.manuhome:
+        for existing in registration.manuhome.reg_owner_groups:
+            if existing.status in (Db2Owngroup.StatusTypes.ACTIVE, Db2Owngroup.StatusTypes.EXEMPT):
+                group_count += 1
     return group_count

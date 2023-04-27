@@ -23,8 +23,35 @@ from mhr_api.utils import registration_validator as validator
 from mhr_api.models import MhrRegistration, utils as model_utils
 from mhr_api.models.type_tables import MhrRegistrationStatusTypes, MhrTenancyTypes, MhrRegistrationTypes
 from mhr_api.models.type_tables import MhrPartyTypes
-
-
+from mhr_api.services.authz import STAFF_ROLE, QUALIFIED_USER_GROUP
+from tests.unit.utils.test_transfer_data import (
+    SO_OWNER_MULTIPLE,
+    SO_GROUP_MULTIPLE,
+    JT_OWNER_SINGLE,
+    TC_GROUPS_VALID,
+    TC_GROUP_TRANSFER_DELETE,
+    TC_GROUP_TRANSFER_ADD,
+    TC_GROUP_TRANSFER_ADD2,
+    TC_GROUP_TRANSFER_DELETE_2,
+    TRAND_DELETE_GROUPS,
+    TRAND_ADD_GROUPS,
+    TRAND_DELETE_GROUPS2,
+    TRAND_ADD_GROUPS2,
+    EXEC_DELETE_GROUPS,
+    EXEC_ADD_GROUPS,
+    EXEC_ADD_GROUPS_INVALID,
+    WILL_DELETE_GROUPS,
+    WILL_DELETE_GROUPS1,
+    WILL_DELETE_GROUPS2,
+    ADMIN_ADD_GROUPS,
+    ADMIN_DELETE_GROUPS,
+    ADD_OWNER,
+    SO_GROUP,
+    ADD_GROUP,
+    TRANS_QS_1,
+    TRANS_QS_2,
+    TRANS_QS_3
+)
 DESC_VALID = 'Valid'
 DESC_MISSING_DOC_ID = 'Missing document id'
 DESC_MISSING_SUBMITTING = 'Missing submitting party'
@@ -36,742 +63,6 @@ DESC_NONEXISTENT_GROUP_ID = 'Invalid nonexistent delete owner group id'
 DOC_ID_EXISTS = '80038730'
 DOC_ID_VALID = '63166035'
 DOC_ID_INVALID_CHECKSUM = '63166034'
-SO_OWNER_MULTIPLE = [
-    {
-        'groupId': 2,
-        'owners': [
-            {
-            'individualName': {
-                'first': 'James',
-                'last': 'Smith'
-            },
-            'address': {
-                'street': '3122B LYNNLARK PLACE',
-                'city': 'VICTORIA',
-                'region': 'BC',
-                'postalCode': ' ',
-                'country': 'CA'
-            },
-            'phoneNumber': '6041234567'
-            },
-            {
-            'individualName': {
-                'first': 'John',
-                'last': 'Smith'
-            },
-            'address': {
-                'street': '3122B LYNNLARK PLACE',
-                'city': 'VICTORIA',
-                'region': 'BC',
-                'postalCode': ' ',
-                'country': 'CA'
-            },
-            'phoneNumber': '6041234567'
-            }
-        ],
-        'type': 'SOLE'
-    }
-]
-SO_GROUP_MULTIPLE = [
-    {
-        'groupId': 2,
-        'owners': [
-            {
-            'individualName': {
-                'first': 'James',
-                'last': 'Smith'
-            },
-            'address': {
-                'street': '3122B LYNNLARK PLACE',
-                'city': 'VICTORIA',
-                'region': 'BC',
-                'postalCode': ' ',
-                'country': 'CA'
-            },
-            'phoneNumber': '6041234567'
-            }
-        ],
-        'type': 'SOLE'
-    },
-    {
-        'groupId': 3,
-        'owners': [
-            {
-            'individualName': {
-                'first': 'James',
-                'last': 'Smith'
-            },
-            'address': {
-                'street': '3122B LYNNLARK PLACE',
-                'city': 'VICTORIA',
-                'region': 'BC',
-                'postalCode': ' ',
-                'country': 'CA'
-            },
-            'phoneNumber': '6041234567'
-            }
-        ],
-        'type': 'SOLE'
-    }
-]
-JT_OWNER_SINGLE = [
-    {
-        'groupId': 2,
-        'owners': [
-            {
-            'individualName': {
-                'first': 'James',
-                'last': 'Smith'
-            },
-            'address': {
-                'street': '3122B LYNNLARK PLACE',
-                'city': 'VICTORIA',
-                'region': 'BC',
-                'postalCode': ' ',
-                'country': 'CA'
-            },
-            'phoneNumber': '6041234567'
-            }
-        ],
-        'type': 'JOINT'
-    }
-]
-TC_GROUPS_VALID = [
-    {
-        'groupId': 1,
-        'owners': [
-            {
-            'individualName': {
-                'first': 'James',
-                'last': 'Smith'
-            },
-            'address': {
-                'street': '3122B LYNNLARK PLACE',
-                'city': 'VICTORIA',
-                'region': 'BC',
-                'postalCode': ' ',
-                'country': 'CA'
-            },
-            'phoneNumber': '6041234567'
-            }
-        ],
-        'type': 'COMMON',
-        'interest': 'UNDIVIDED 1/2',
-        'interestNumerator': 1,
-        'interestDenominator': 2
-    },
-    {
-        'groupId': 2,
-        'owners': [
-            {
-            'individualName': {
-                'first': 'James',
-                'last': 'Smith'
-            },
-            'address': {
-                'street': '3122B LYNNLARK PLACE',
-                'city': 'VICTORIA',
-                'region': 'BC',
-                'postalCode': ' ',
-                'country': 'CA'
-            },
-            'phoneNumber': '6041234567'
-            }, {
-            'individualName': {
-                'first': 'Jane',
-                'last': 'Smith'
-            },
-            'address': {
-                'street': '3122B LYNNLARK PLACE',
-                'city': 'VICTORIA',
-                'region': 'BC',
-                'postalCode': ' ',
-                'country': 'CA'
-            },
-            'phoneNumber': '6041234567'
-            }
-        ],
-        'type': 'JOINT',
-        'interest': 'UNDIVIDED',
-        'interestNumerator': 1,
-        'interestDenominator': 2
-    }
-]
-TC_GROUP_TRANSFER_DELETE = [
-    {
-        'groupId': 4,
-        'owners': [
-            {
-            'individualName': {
-                'first': 'James',
-                'last': 'Smith'
-            },
-            'address': {
-                'street': '3122B LYNNLARK PLACE',
-                'city': 'VICTORIA',
-                'region': 'BC',
-                'postalCode': ' ',
-                'country': 'CA'
-            },
-            'phoneNumber': '6041234567'
-            }
-        ],
-        'type': 'COMMON',
-        'interest': 'UNDIVIDED 1/2',
-        'interestNumerator': 1,
-        'interestDenominator': 2
-    }
-]
-TC_GROUP_TRANSFER_ADD = [
-    {
-        'groupId': 5,
-        'owners': [
-            {
-            'individualName': {
-                'first': 'James',
-                'last': 'Smith'
-            },
-            'address': {
-                'street': '3122B LYNNLARK PLACE',
-                'city': 'VICTORIA',
-                'region': 'BC',
-                'postalCode': ' ',
-                'country': 'CA'
-            },
-            'phoneNumber': '6041234567'
-            }, {
-            'individualName': {
-                'first': 'Jane',
-                'last': 'Smith'
-            },
-            'address': {
-                'street': '3122B LYNNLARK PLACE',
-                'city': 'VICTORIA',
-                'region': 'BC',
-                'postalCode': ' ',
-                'country': 'CA'
-            },
-            'phoneNumber': '6041234567'
-            }
-        ],
-        'type': 'JOINT',
-        'interest': 'UNDIVIDED',
-        'interestNumerator': 1,
-        'interestDenominator': 2
-    }
-]
-TC_GROUP_TRANSFER_ADD2 = [
-    {
-        'groupId': 5,
-        'owners': [
-            {
-            'individualName': {
-                'first': 'James',
-                'last': 'Smith'
-            },
-            'address': {
-                'street': '3122B LYNNLARK PLACE',
-                'city': 'VICTORIA',
-                'region': 'BC',
-                'postalCode': ' ',
-                'country': 'CA'
-            },
-            'phoneNumber': '6041234567'
-            }, {
-            'individualName': {
-                'first': 'Jane',
-                'last': 'Smith'
-            },
-            'address': {
-                'street': '3122B LYNNLARK PLACE',
-                'city': 'VICTORIA',
-                'region': 'BC',
-                'postalCode': ' ',
-                'country': 'CA'
-            },
-            'phoneNumber': '6041234567'
-            }
-        ],
-        'type': 'JOINT',
-        'interest': 'UNDIVIDED',
-        'interestNumerator': 1,
-        'interestDenominator': 2
-    }, {
-        'groupId': 6,
-        'owners': [
-            {
-            'individualName': {
-                'first': 'James',
-                'last': 'Smith'
-            },
-            'address': {
-                'street': '3122B LYNNLARK PLACE',
-                'city': 'VICTORIA',
-                'region': 'BC',
-                'postalCode': ' ',
-                'country': 'CA'
-            },
-            'phoneNumber': '6041234567'
-            }
-        ],
-        'type': 'COMMON',
-        'interest': 'UNDIVIDED',
-        'interestNumerator': 1,
-        'interestDenominator': 2
-    }
-]
-TC_GROUP_TRANSFER_DELETE_2 = [
-    {
-        'groupId': 3,
-        'owners': [
-            {
-            'organizationName': 'BRANDON CONSTRUCTION MANAGEMENT LTD.',
-            'address': {
-                'street': '3122B LYNNLARK PLACE',
-                'city': 'VICTORIA',
-                'region': 'BC',
-                'postalCode': ' ',
-                'country': 'CA'
-            },
-            'phoneNumber': '6041234567'
-            }
-        ],
-        'type': 'COMMON',
-        'interest': 'UNDIVIDED',
-        'interestNumerator': 4,
-        'interestDenominator': 10
-    }
-]
-
-TRAND_DELETE_GROUPS = [
-    {
-        'groupId': 3,
-        'owners': [
-            {
-                'individualName': {
-                    'first': 'ROBERT',
-                    'middle': 'JOHN',
-                    'last': 'MOWAT'
-                },
-                'address': {
-                    'street': '3122B LYNNLARK PLACE',
-                    'city': 'VICTORIA',
-                    'region': 'BC',
-                    'postalCode': 'V8S 4I6',
-                    'country': 'CA'
-                },
-                'phoneNumber': '6041234567'
-            }, {
-                'individualName': {
-                    'first': 'KAREN',
-                    'middle': 'PATRICIA',
-                    'last': 'MOWAT'
-                },
-                'address': {
-                    'street': '3122B LYNNLARK PLACE',
-                    'city': 'VICTORIA',
-                    'region': 'BC',
-                    'postalCode': 'V8S 4I6',
-                    'country': 'CA'
-                },
-                'phoneNumber': '6041234567',
-                'deathCertificateNumber': '232432432',
-                'deathDateTime': '2021-02-21T18:56:00+00:00'
-            }
-        ],
-        'type': 'JOINT'
-    }
-]
-TRAND_ADD_GROUPS = [
-    {
-        'groupId': 4,
-        'owners': [
-            {
-            'individualName': {
-                'first': 'ROBERT',
-                'middle': 'JOHN',
-                'last': 'MOWAT'
-            },
-            'address': {
-                'street': '3122B LYNNLARK PLACE',
-                'city': 'VICTORIA',
-                'region': 'BC',
-                'postalCode': 'V8S 4I6',
-                'country': 'CA'
-            },
-            'phoneNumber': '6041234567'
-            }
-        ],
-        'type': 'SOLE'
-    }
-]
-TRAND_DELETE_GROUPS2 = [
-    {
-        'groupId': 1,
-        'owners': [
-            {
-                'individualName': {
-                    'first': 'DENNIS',
-                    'last': 'HALL'
-                },
-                'address': {
-                    'street': 'SS 2, COMP. 2, SITE 19',
-                    'city': 'FORT ST. JOH',
-                    'region': 'BC',
-                    'postalCode': ' ',
-                    'country': 'CA'
-                },
-                'phoneNumber': '6041234567'
-            }, {
-                'individualName': {
-                    'first': 'SHARON',
-                    'last': 'HALL'
-                },
-                'address': {
-                    'street': 'SS 2, COMP. 2, SITE 19',
-                    'city': 'FORT ST. JOH',
-                    'region': 'BC',
-                    'postalCode': ' ',
-                    'country': 'CA'
-                },
-                'phoneNumber': '6041234567',
-                'deathCertificateNumber': '232432432',
-                'deathDateTime': '2021-02-21T18:56:00+00:00'
-            }
-        ],
-        'type': 'JOINT'
-    }
-]
-TRAND_ADD_GROUPS2 = [
-    {
-        'groupId': 4,
-        'owners': [
-            {
-                'individualName': {
-                    'first': 'DENNIS',
-                    'middle': '',
-                    'last': 'HALL'
-                },
-                'address': {
-                    'street': 'SS 2, COMP. 2, SITE 19',
-                    'city': 'FORT ST. JOH',
-                    'region': 'BC',
-                    'postalCode': ' ',
-                    'country': 'CA'
-                },
-                'phoneNumber': '6041234567'
-            }
-        ],
-        'type': 'SOLE'
-    }
-]
-EXEC_DELETE_GROUPS = [
-    {
-        'groupId': 1,
-        'owners': [
-            {
-                'individualName': {
-                    'first': 'SHARON',
-                    'last': 'HALL'
-                 },
-                'address': {
-                    'street': '3122B LYNNLARK PLACE',
-                    'city': 'VICTORIA',
-                    'region': 'BC',
-                    'postalCode': 'V8S 4I6',
-                    'country': 'CA'
-                },
-                'phoneNumber': '6041234567',
-                'deathCertificateNumber': '232432488',
-                'deathDateTime': '2023-03-14T18:56:00+00:00'
-            }, {
-                'individualName': {
-                    'first': 'DENNIS',
-                    'last': 'HALL'
-                },
-                'address': {
-                    'street': '3122B LYNNLARK PLACE',
-                    'city': 'VICTORIA',
-                    'region': 'BC',
-                    'postalCode': 'V8S 4I6',
-                    'country': 'CA'
-                },
-                'phoneNumber': '6041234567',
-                'deathCertificateNumber': '232432432',
-                'deathDateTime': '2023-03-14T18:56:00+00:00'
-            }
-        ],
-        'type': 'JOINT'
-    }
-]
-EXEC_ADD_GROUPS = [
-    {
-        'groupId': 2,
-        'owners': [
-            {
-                'individualName': {
-                    'first': 'APPOINTED',
-                    'last': 'EXECUTOR'
-                },
-                'address': {
-                    'street': '3122B LYNNLARK PLACE',
-                    'city': 'VICTORIA',
-                    'region': 'BC',
-                    'postalCode': 'V8S 4I6',
-                    'country': 'CA'
-                },
-                'phoneNumber': '6041234567',
-                'partyType': 'EXECUTOR',
-                'description': 'EXECUTOR of the deceased.'
-            }
-        ],
-        'type': 'SOLE'
-    }
-]
-EXEC_ADD_GROUPS_INVALID = [
-    {
-        'groupId': 2,
-        'owners': [
-            {
-                'individualName': {
-                    'first': 'SHARON',
-                    'last': 'HALL'
-                },
-                'address': {
-                    'street': '3122B LYNNLARK PLACE',
-                    'city': 'VICTORIA',
-                    'region': 'BC',
-                    'postalCode': 'V8S 4I6',
-                    'country': 'CA'
-                },
-                'phoneNumber': '6041234567',
-                'partyType': 'OWNER_IND'
-            }, {
-                'individualName': {
-                    'first': 'APPOINTED',
-                    'last': 'EXECUTOR'
-                },
-                'address': {
-                    'street': '3122B LYNNLARK PLACE',
-                    'city': 'VICTORIA',
-                    'region': 'BC',
-                    'postalCode': 'V8S 4I6',
-                    'country': 'CA'
-                },
-                'phoneNumber': '6041234567',
-                'partyType': 'EXECUTOR',
-                'description': 'EXECUTOR of the deceased.'
-            }
-        ],
-        'type': 'NA'
-    }
-]
-WILL_DELETE_GROUPS = [
-    {
-        'groupId': 1,
-        'owners': [
-            {
-                'individualName': {
-                    'first': 'SHARON',
-                    'last': 'HALL'
-                 },
-                'address': {
-                    'street': '3122B LYNNLARK PLACE',
-                    'city': 'VICTORIA',
-                    'region': 'BC',
-                    'postalCode': 'V8S 4I6',
-                    'country': 'CA'
-                },
-                'phoneNumber': '6041234567'
-            }, {
-                'individualName': {
-                    'first': 'DENNIS',
-                    'last': 'HALL'
-                },
-                'address': {
-                    'street': '3122B LYNNLARK PLACE',
-                    'city': 'VICTORIA',
-                    'region': 'BC',
-                    'postalCode': 'V8S 4I6',
-                    'country': 'CA'
-                },
-                'phoneNumber': '6041234567',
-                'deathCertificateNumber': '232432432',
-                'deathDateTime': '2021-02-21T18:56:00+00:00'
-            }
-        ],
-        'type': 'JOINT'
-    }
-]
-WILL_DELETE_GROUPS1 = [
-    {
-        'groupId': 1,
-        'owners': [
-            {
-                'individualName': {
-                    'first': 'SHARON',
-                    'last': 'HALL'
-                 },
-                'address': {
-                    'street': '3122B LYNNLARK PLACE',
-                    'city': 'VICTORIA',
-                    'region': 'BC',
-                    'postalCode': 'V8S 4I6',
-                    'country': 'CA'
-                },
-                'phoneNumber': '6041234567',
-                'deathCertificateNumber': '232432432',
-                'deathDateTime': '2021-02-21T18:56:00+00:00'
-            }, {
-                'individualName': {
-                    'first': 'DENNIS',
-                    'last': 'HALL'
-                },
-                'address': {
-                    'street': '3122B LYNNLARK PLACE',
-                    'city': 'VICTORIA',
-                    'region': 'BC',
-                    'postalCode': 'V8S 4I6',
-                    'country': 'CA'
-                },
-                'phoneNumber': '6041234567',
-                'deathCertificateNumber': '232432432',
-                'deathDateTime': '2021-02-21T18:56:00+00:00'
-            }
-        ],
-        'type': 'JOINT'
-    }
-]
-WILL_DELETE_GROUPS2 = [
-    {
-        'groupId': 1,
-        'owners': [
-            {
-                'individualName': {
-                    'first': 'SHARON',
-                    'last': 'HALL'
-                 },
-                'address': {
-                    'street': '3122B LYNNLARK PLACE',
-                    'city': 'VICTORIA',
-                    'region': 'BC',
-                    'postalCode': 'V8S 4I6',
-                    'country': 'CA'
-                },
-                'phoneNumber': '6041234567'
-            }, {
-                'individualName': {
-                    'first': 'DENNIS',
-                    'last': 'HALL'
-                },
-                'address': {
-                    'street': '3122B LYNNLARK PLACE',
-                    'city': 'VICTORIA',
-                    'region': 'BC',
-                    'postalCode': 'V8S 4I6',
-                    'country': 'CA'
-                },
-                'phoneNumber': '6041234567'
-            }
-        ],
-        'type': 'JOINT'
-    }
-]
-ADMIN_DELETE_GROUPS = WILL_DELETE_GROUPS
-ADMIN_ADD_GROUPS = [
-    {
-        'groupId': 2,
-        'owners': [
-            {
-                'individualName': {
-                    'first': 'APPOINTED',
-                    'last': 'ADMINISTRATOR'
-                },
-                'address': {
-                    'street': '3122B LYNNLARK PLACE',
-                    'city': 'VICTORIA',
-                    'region': 'BC',
-                    'postalCode': 'V8S 4I6',
-                    'country': 'CA'
-                },
-                'phoneNumber': '6041234567',
-                'partyType': 'ADMINISTRATOR',
-                'description': 'ADMINISTRATOR of the deceased.'
-            }
-        ],
-        'type': 'SOLE'
-    }
-]
-ADD_OWNER = {
-    'individualName': {
-        'first': 'Jane',
-        'last': 'Smith'
-    },
-    'address': {
-        'street': '3122B LYNNLARK PLACE',
-        'city': 'VICTORIA',
-        'region': 'BC',
-        'postalCode': ' ',
-        'country': 'CA'
-    },
-    'phoneNumber': '6041234567'
-}
-SO_GROUP = [
-    {
-        'groupId': 2,
-        'owners': [
-            {
-            'individualName': {
-                'first': 'John',
-                'last': 'Smith'
-            },
-            'address': {
-                'street': '3122B LYNNLARK PLACE',
-                'city': 'VICTORIA',
-                'region': 'BC',
-                'postalCode': ' ',
-                'country': 'CA'
-            },
-            'phoneNumber': '6041234567'
-            }
-        ],
-        'type': 'SOLE'
-    }
-]
-ADD_GROUP = {
-        'groupId': 2,
-        'owners': [
-            {
-            'individualName': {
-                'first': 'John',
-                'last': 'Smith'
-            },
-            'address': {
-                'street': '3122B LYNNLARK PLACE',
-                'city': 'VICTORIA',
-                'region': 'BC',
-                'postalCode': ' ',
-                'country': 'CA'
-            },
-            'phoneNumber': '6041234567'
-            },
-            {
-            'individualName': {
-                'first': 'Jane',
-                'last': 'Smith'
-            },
-            'address': {
-                'street': '3122B LYNNLARK PLACE',
-                'city': 'VICTORIA',
-                'region': 'BC',
-                'postalCode': ' ',
-                'country': 'CA'
-            },
-            'phoneNumber': '6041234567'
-            }
-        ],
-        'type': 'JOINT'
-}
 
 # testdata pattern is ({description}, {valid}, {staff}, {doc_id}, {message content}, {status})
 TEST_TRANSFER_DATA = [
@@ -917,6 +208,13 @@ TEST_TRANSFER_DATA_GROUP_INTEREST = [
     ('Invalid numerator < 1', False, 1, 4, validator.GROUP_INTEREST_MISMATCH),
     ('Invalid numerator sum high', False, 3, 4, validator.GROUP_INTEREST_MISMATCH)
 ]
+# testdata pattern is ({description}, {valid}, {staff}, {kc_group}, {mhr_num}, {json_data}, {message content})
+TEST_TRANSFER_DATA_QS = [
+    ('Valid QS TC 1', True, False, QUALIFIED_USER_GROUP, '099853', TRANS_QS_1, None),
+    ('Valid QS TC all', True, False, QUALIFIED_USER_GROUP, '099853', TRANS_QS_3, None),
+    ('Valid staff 2 groups', True, True, STAFF_ROLE, '099853', TRANS_QS_2, None),
+    ('Invalid QS TC groups', False, False, QUALIFIED_USER_GROUP, '099853', TRANS_QS_2, validator.TRAN_QUALIFIED_DELETE)
+]
 
 
 @pytest.mark.parametrize('desc,valid,staff,doc_id,message_content,status', TEST_TRANSFER_DATA)
@@ -950,7 +248,7 @@ def test_validate_transfer(session, desc, valid, staff, doc_id, message_content,
     registration: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account_id)
     if status:
         registration.status_type = status
-    error_msg = validator.validate_transfer(registration, json_data, staff)
+    error_msg = validator.validate_transfer(registration, json_data, staff, STAFF_ROLE)
     if errors:
         current_app.logger.debug(errors)
     if valid:
@@ -987,7 +285,7 @@ def test_validate_transfer_details(session, desc, valid, staff, trans_dt, dec_va
     valid_format, errors = schema_utils.validate(json_data, 'transfer', 'mhr')
     # Additional validation not covered by the schema.
     registration: MhrRegistration = MhrRegistration.find_by_mhr_number('045349', 'PS12345')
-    error_msg = validator.validate_transfer(registration, json_data, staff)
+    error_msg = validator.validate_transfer(registration, json_data, staff, STAFF_ROLE)
     if errors:
         current_app.logger.debug(errors)
     if valid:
@@ -1026,7 +324,7 @@ def test_validate_transfer_group(session, desc, valid, numerator, denominator, a
     valid_format, errors = schema_utils.validate(json_data, 'transfer', 'mhr')
     # Additional validation not covered by the schema.
     registration: MhrRegistration = MhrRegistration.find_by_mhr_number('045349', 'PS12345')
-    error_msg = validator.validate_transfer(registration, json_data, False)
+    error_msg = validator.validate_transfer(registration, json_data, False, STAFF_ROLE)
     if errors:
         current_app.logger.debug(errors)
     if valid:
@@ -1067,7 +365,7 @@ def test_validate_transfer_trand(session, desc, valid, mhr_num, account_id, dele
     valid_format, errors = schema_utils.validate(json_data, 'transfer', 'mhr')
     # Additional validation not covered by the schema.
     registration: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account_id)
-    error_msg = validator.validate_transfer(registration, json_data, staff)
+    error_msg = validator.validate_transfer(registration, json_data, staff, STAFF_ROLE)
     # if valid and error_msg:
     #    current_app.logger.debug('UNEXPECTED ERROR: ' + error_msg)
     if errors:
@@ -1117,7 +415,7 @@ def test_validate_transfer_admin(session, desc, valid, mhr_num, account_id, dele
     valid_format, errors = schema_utils.validate(json_data, 'transfer', 'mhr')
     # Additional validation not covered by the schema.
     registration: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account_id)
-    error_msg = validator.validate_transfer(registration, json_data, staff)
+    error_msg = validator.validate_transfer(registration, json_data, staff, STAFF_ROLE)
     if errors:
         current_app.logger.debug(errors)
     if valid:
@@ -1173,7 +471,7 @@ def test_validate_transfer_affidavit(session, desc, valid, mhr_num, account_id, 
     valid_format, errors = schema_utils.validate(json_data, 'transfer', 'mhr')
     # Additional validation not covered by the schema.
     registration: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account_id)
-    error_msg = validator.validate_transfer(registration, json_data, staff)
+    error_msg = validator.validate_transfer(registration, json_data, staff, STAFF_ROLE)
     if errors:
         current_app.logger.debug(errors)
     if valid:
@@ -1215,7 +513,7 @@ def test_validate_transfer_will(session, desc, valid, mhr_num, account_id, delet
     valid_format, errors = schema_utils.validate(json_data, 'transfer', 'mhr')
     # Additional validation not covered by the schema.
     registration: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account_id)
-    error_msg = validator.validate_transfer(registration, json_data, staff)
+    error_msg = validator.validate_transfer(registration, json_data, staff, STAFF_ROLE)
     current_app.logger.info(error_msg)
     if errors:
         current_app.logger.debug(errors)
@@ -1249,7 +547,7 @@ def test_validate_transfer_death_na(session, desc, valid, mhr_num, tenancy_type,
     valid_format, errors = schema_utils.validate(json_data, 'transfer', 'mhr')
     # Additional validation not covered by the schema.
     registration: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, '2523')
-    error_msg = validator.validate_transfer(registration, json_data, False)
+    error_msg = validator.validate_transfer(registration, json_data, False, STAFF_ROLE)
     if errors:
         current_app.logger.debug(errors)
     if valid:
@@ -1271,7 +569,25 @@ def test_validate_transfer_group_interest(session, desc, valid, numerator, denom
     json_data['addOwnerGroups'][0]['interestDenominator'] = denominator
     valid_format, errors = schema_utils.validate(json_data, 'transfer', 'mhr')
     registration: MhrRegistration = MhrRegistration.find_by_mhr_number('088912', 'PS12345')
-    error_msg = validator.validate_transfer(registration, json_data, False)
+    error_msg = validator.validate_transfer(registration, json_data, False, STAFF_ROLE)
+    if errors:
+        current_app.logger.debug(errors)
+    if valid:
+        assert valid_format and error_msg == ''
+    else:
+        assert error_msg != ''
+        if message_content:
+            assert error_msg.find(message_content) != -1
+
+
+@pytest.mark.parametrize('desc,valid,staff,kc_group,mhr_num,json_data,message_content', TEST_TRANSFER_DATA_QS)
+def test_validate_transfer_qs(session, desc, valid, staff, kc_group, mhr_num, json_data, message_content):
+    """Assert that MH transfer validation rules for qualified suppliers works as expected."""
+    # setup
+    valid_format, errors = schema_utils.validate(json_data, 'transfer', 'mhr')
+    # Additional validation not covered by the schema.
+    registration: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, '2523')
+    error_msg = validator.validate_transfer(registration, json_data, staff, kc_group)
     if errors:
         current_app.logger.debug(errors)
     if valid:

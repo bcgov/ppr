@@ -66,7 +66,10 @@ def post_transfers(mhr_number: str):  # pylint: disable=too-many-return-statemen
         # Validate request against the schema.
         valid_format, errors = schema_utils.validate(request_json, 'transfer', 'mhr')
         # Additional validation not covered by the schema.
-        extra_validation_msg = resource_utils.validate_transfer(current_reg, request_json, is_staff(jwt))
+        extra_validation_msg = resource_utils.validate_transfer(current_reg,
+                                                                request_json,
+                                                                is_staff(jwt),
+                                                                get_group(jwt))
         if not valid_format or extra_validation_msg != '':
             return resource_utils.validation_error_response(errors, reg_utils.VAL_ERROR, extra_validation_msg)
         # Set up the registration, pay, and save the data.
