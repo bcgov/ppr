@@ -18,7 +18,7 @@
             <span class="float-right">Registration Status: </span>
           </v-col>
           <v-col class="pl-3" cols="6">
-            {{ statusType[0] + statusType.toLowerCase().slice(1) }}
+            {{ statusType }}
           </v-col>
         </v-row>
       </v-col>
@@ -52,6 +52,7 @@ import { useGetters } from 'vuex-composition-helpers'
 // local
 import { formatExpiryDate, pacificDate } from '@/utils'
 import { RegistrationTypeIF } from '@/interfaces' // eslint-disable-line
+import { mhApiStatusTypes } from '@/enums'
 
 export default defineComponent({
   name: 'TombstoneDischarge',
@@ -66,13 +67,15 @@ export default defineComponent({
       getRegistrationExpiryDate,
       getRegistrationNumber,
       getRegistrationType,
-      getMhrInformation
+      getMhrInformation,
+      getMhRegTableBaseRegs
     } = useGetters<any>([
       'getRegistrationCreationDate',
       'getRegistrationExpiryDate',
       'getRegistrationNumber',
       'getRegistrationType',
-      'getMhrInformation'
+      'getMhrInformation',
+      'getMhRegTableBaseRegs'
     ])
     const localState = reactive({
       creationDate: computed((): string => {
@@ -94,7 +97,11 @@ export default defineComponent({
         return 'No Expiry'
       }),
       statusType: computed((): string => {
-        return getMhrInformation.value?.statusType || 'N/A'
+        const parentReg = getMhrInformation.value.mhrNumber &&
+                          getMhRegTableBaseRegs.value?.find(reg => reg.mhrNumber === getMhrInformation.value.mhrNumber)
+        const status = parentReg?.statusType
+        if (status === mhApiStatusTypes.FROZEN) return 'Active'
+        else return status ? status[0] + status.toLowerCase().slice(1) : ''
       }),
       header: computed((): string => {
         const numberType = getRegistrationNumber.value ? 'Base' : 'Manufactured Home'
