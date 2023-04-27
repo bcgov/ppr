@@ -214,15 +214,16 @@ export const isMhrRegistration = (state: StateIF): boolean => {
 
 /** Is true when all steps are valid as well as staff payment and authorization are valid */
 export const isMhrRegistrationReviewValid = (state: StateIF): boolean => {
+  const modelRef = toRefs(getMhrRegistrationValidationModel(state))
   return state.stateModel.mhrValidationState.reviewConfirmValid.authorizationValid &&
   state.stateModel.mhrValidationState.reviewConfirmValid?.staffPaymentValid &&
-  useMhrValidations(toRefs(getMhrRegistrationValidationModel(state)))
+  useMhrValidations(modelRef)
     .getStepValidation(MhrSectVal.YOUR_HOME_VALID) &&
-  useMhrValidations(toRefs(getMhrRegistrationValidationModel(state)))
+  useMhrValidations(modelRef)
     .getStepValidation(MhrSectVal.SUBMITTING_PARTY_VALID) &&
-  useMhrValidations(toRefs(getMhrRegistrationValidationModel(state)))
+  useMhrValidations(modelRef)
     .getStepValidation(MhrSectVal.HOME_OWNERS_VALID) &&
-  useMhrValidations(toRefs(getMhrRegistrationValidationModel(state)))
+  useMhrValidations(modelRef)
     .getStepValidation(MhrSectVal.LOCATION_VALID)
 }
 
