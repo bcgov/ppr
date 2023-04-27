@@ -220,7 +220,7 @@
                 </div>
 
                 <!-- Home Owners Header -->
-                <header class="review-header mt-10 rounded-top">
+                <header id="home-owners-header" class="review-header mt-10 rounded-top">
                   <v-row no-gutters align="center">
                     <v-col cols="9">
                       <img class="home-owners-icon mb-1 ml-1" src="@/assets/svgs/homeownersicon_reviewscreen.svg"/>
@@ -232,6 +232,7 @@
                         class="pl-1"
                         color="primary"
                         :ripple="false"
+                        :disabled="isFrozenMhr"
                         @click="toggleTypeSelector()"
                       >
                         <span v-if="!showTransferType">
@@ -250,6 +251,7 @@
                   <TransferType
                     v-if="showTransferType"
                     :validate="validate"
+                    :disableSelect="isFrozenMhr"
                     @emitType="handleTransferTypeChange($event)"
                     @emitDeclaredValue="handleDeclaredValueChange($event)"
                     @emitValid="setValidation('isValidTransferType', $event)"
@@ -268,6 +270,7 @@
                 <TransferDetails
                   v-if="hasUnsavedChanges"
                   ref="transferDetailsComponent"
+                  :disablePrefill="isFrozenMhr"
                   :validate="!isTransferDueToDeath && validate"
                   @isValid="setValidation('isTransferDetailsValid', $event)"
                 />
@@ -341,6 +344,7 @@ import {
   APIMHRMapSearchTypes,
   APISearchTypes,
   ApiTransferTypes,
+  MhApiStatusTypes,
   RouteNames,
   UIMHRSearchTypes
 } from '@/enums'
@@ -442,8 +446,9 @@ export default defineComponent({
 
     // Composable Instances
     const {
-      initMhrTransfer,
+      isFrozenMhr,
       buildApiData,
+      initMhrTransfer,
       getUiTransferType,
       parseMhrInformation,
       initDraftMhrInformation,
@@ -487,7 +492,7 @@ export default defineComponent({
         folioNumber: '',
         isPriority: false
       },
-      showTransferType: !!getMhrInformation.value.draftNumber || false,
+      showTransferType: !!getMhrInformation.value.draftNumber || isFrozenMhr.value || false,
       attentionReference: '',
       cancelOptions: unsavedChangesDialog,
       showCancelDialog: false,
@@ -558,12 +563,16 @@ export default defineComponent({
       setEmptyMhrTransfer(initMhrTransfer())
 
       // Set baseline MHR Information to state
-      await parseMhrInformation()
+      await parseMhrInformation(isFrozenMhr.value)
 
       if (getMhrInformation.value.draftNumber) {
         // Retrieve draft if it exists
         const { registration } = await getMhrDraft(getMhrInformation.value.draftNumber)
         await initDraftMhrInformation(registration as MhrTransferApiIF)
+      } else if (isFrozenMhr.value) {
+        const apiData: MhrTransferApiIF = await buildApiData()
+        await initFrozenSaleOrGift(apiData)
+        await scrollToFirstError(false, 'home-owners-header')
       } else {
         // When not a draft Transfer, force no unsaved changes after loading current owners
         await setUnsavedChanges(false)
@@ -667,6 +676,17 @@ export default defineComponent({
         localState.loading = false
 
         if (!mhrTransferFiling.error) {
+          // Set new filing to Reg Table
+          // Normal flow when not Affidavit Transfer
+          setUnsavedChanges(false)
+          const newItem: RegTableNewItemI = {
+            addedReg: mhrTransferFiling.documentId,
+            addedRegParent: getMhrInformation.value.mhrNumber,
+            addedRegSummary: null,
+            prevDraft: mhrTransferFiling.documentId || ''
+          }
+          setRegTableNewItem(newItem)
+
           // Affidavit Transfer has a different flow
           if (isTransferToExecutorUnder25Will.value) {
             TransAffidavit.setCompleted(true)
@@ -674,26 +694,11 @@ export default defineComponent({
             localState.validate = false
             localState.isReviewMode = false
 
-            setUnsavedChanges(false)
+            await initFrozenSaleOrGift(apiData)
 
-            // Pre-fill Transfer Gift Sale with current registration info
-            // WIP: for now use init draft to pre-fill the transfer
-            apiData.registrationType = ApiTransferTypes.SALE_OR_GIFT
-            await initDraftMhrInformation(apiData as MhrTransferApiIF)
             localState.loading = false
             localState.showStartTransferRequiredDialog = true
-          } else {
-            // Normal flow when not Affidavit Transfer
-            setUnsavedChanges(false)
-            const newItem: RegTableNewItemI = {
-              addedReg: mhrTransferFiling.documentId,
-              addedRegParent: getMhrInformation.value.mhrNumber,
-              addedRegSummary: null,
-              prevDraft: mhrTransferFiling.documentId || ''
-            }
-            setRegTableNewItem(newItem)
-            goToDash()
-          }
+          } else goToDash()
         } else emitError(mhrTransferFiling?.error)
       }
 
@@ -849,6 +854,13 @@ export default defineComponent({
     const handleDeclaredValueChange = async (declaredValue: number): Promise<void> => {
       await setMhrTransferDeclaredValue(declaredValue)
     }
+
+    /** Pre-fill Transfer Gift Sale with current registration info */
+    const initFrozenSaleOrGift = async (apiData: MhrTransferApiIF): Promise<void> => {
+      apiData.registrationType = ApiTransferTypes.SALE_OR_GIFT
+      await initDraftMhrInformation(apiData as MhrTransferApiIF)
+    }
+
     watch(() => localState.attentionReference, (val: string) => {
       setMhrTransferAttentionReference(val)
     })
@@ -871,6 +883,7 @@ export default defineComponent({
     })
 
     return {
+      isFrozenMhr,
       emitError,
       setValidation,
       getInfoValidation,
@@ -901,6 +914,7 @@ export default defineComponent({
       cancelOwnerChangeConfirm,
       transferRequiredDialog,
       getMhrTransferSubmittingParty,
+      initFrozenSaleOrGift,
       ...toRefs(localState)
     }
   }
@@ -945,6 +959,10 @@ export default defineComponent({
 ::v-deep {
   #home-owners-change-btn {
     height: 24px;
+    color: $primary-blue !important;
+  }
+  .theme--light.v-btn.v-btn--disabled {
+    opacity: 0.4 !important;
   }
   .home-owners-icon {
     vertical-align: middle;

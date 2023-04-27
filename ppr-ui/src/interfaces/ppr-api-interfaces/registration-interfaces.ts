@@ -1,4 +1,4 @@
-import { APIAmendmentTypes, APIMhrTypes, APIRegistrationTypes, DraftTypes, mhApiStatusTypes } from '@/enums'
+import { APIAmendmentTypes, APIMhrTypes, APIRegistrationTypes, DraftTypes, MhApiStatusTypes } from '@/enums'
 import {
   CourtOrderIF,
   DebtorNameIF,
@@ -118,6 +118,7 @@ export interface MhRegistrationSummaryIF {
   error?: ErrorIF
   clientReferenceId: string
   createDateTime: string
+  declaredValue?: string
   draftNumber?: string
   mhrNumber: string
   ownerNames: string

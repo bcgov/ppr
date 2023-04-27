@@ -13,14 +13,14 @@ export enum UIStatusTypes {
   DISCHARGED = 'Discharged'
 }
 
-export enum mhUIStatusTypes {
+export enum MhUIStatusTypes {
   DRAFT = 'Draft',
   ACTIVE = 'Active',
   EXEMPT = 'Exempt',
   HISTORICAL = 'Historical'
 }
 
-export enum mhApiStatusTypes {
+export enum MhApiStatusTypes {
   DRAFT = 'DRAFT',
   ACTIVE = 'ACTIVE',
   EXEMPT = 'EXEMPT',

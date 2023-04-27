@@ -1,4 +1,4 @@
-import { ProductCode, RegistrationFlowType } from '@/enums'
+import { MhApiStatusTypes, ProductCode, RegistrationFlowType } from '@/enums'
 import {
   AccountInformationIF,
   AddCollateralIF,
@@ -368,6 +368,10 @@ export const setMhrTableHistory: ActionIF = ({ commit }, baseRegs: MhRegistratio
 // MHR Information
 export const setMhrInformation: ActionIF = ({ commit }, mhrInfo: MhRegistrationSummaryIF): void => {
   commit('mutateMhrInformation', mhrInfo)
+}
+
+export const setMhrStatusType: ActionIF = ({ commit }, status: MhApiStatusTypes): void => {
+  commit('mutateMhrStatusType', status)
 }
 
 export const setLienType: ActionIF = ({ commit }, lienType: string): void => {

@@ -93,7 +93,16 @@ export default defineComponent({
   name: 'TransferDetails',
   emits: ['isValid'],
   components: { SharedDatePicker },
-  props: { validate: { type: Boolean, default: false } },
+  props: {
+    validate: {
+      type: Boolean,
+      default: false
+    },
+    disablePrefill: {
+      type: Boolean,
+      default: false
+    }
+  },
   setup (props, context) {
     const { customRules, required, maxLength } = useInputRules()
 
@@ -129,6 +138,7 @@ export default defineComponent({
     const considerationRef = ref(null)
 
     const updateConsideration = () => {
+      if (props.disablePrefill) return
       // copy Declared Value into Consideration field - the initial time only
       if (!localState.consideration && getMhrTransferDeclaredValue.value) {
         localState.consideration = `$${getMhrTransferDeclaredValue.value}.00`

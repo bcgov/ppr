@@ -10,7 +10,7 @@ import { getTestId, getLastEvent } from './utils'
 // local components
 import { TableRow } from '@/components/tables/common'
 // local types/helpers/etc.
-import { APIStatusTypes, mhApiStatusTypes, TableActions } from '@/enums'
+import { APIStatusTypes, MhApiStatusTypes, TableActions } from '@/enums'
 import { DraftResultIF, MhrDraftIF, MhRegistrationSummaryIF, RegistrationSummaryIF } from '@/interfaces'
 import { mhRegistrationTableHeaders, registrationTableHeaders } from '@/resources'
 // unit test data/helpers
@@ -492,7 +492,7 @@ describe('Mhr TableRow tests', () => {
 
   it('displays caution icon for Frozen Mhrs', async () => {
     const frozenRegistrationHistory: (MhRegistrationSummaryIF)[] = [
-      { ...mockedMhRegistration, statusType: mhApiStatusTypes.FROZEN }
+      { ...mockedMhRegistration, statusType: MhApiStatusTypes.FROZEN }
     ]
 
     for (let i = 0; i < frozenRegistrationHistory.length; i++) {

@@ -1,4 +1,4 @@
-import { ProductCode, RegistrationFlowType } from '@/enums'
+import { MhApiStatusTypes, ProductCode, RegistrationFlowType } from '@/enums'
 import {
   AccountInformationIF,
   AddCollateralIF,
@@ -419,6 +419,10 @@ export const mutateMhrTableHistory = (state: StateIF, value: MhRegistrationSumma
 // MHR Information
 export const mutateMhrInformation = (state: StateIF, mhrInfo: MhRegistrationSummaryIF) => {
   state.stateModel.mhrInformation = mhrInfo
+}
+
+export const mutateMhrStatusType = (state: StateIF, status: MhApiStatusTypes) => {
+  state.stateModel.mhrInformation.statusType = status
 }
 
 export const mutateLienType = (state: StateIF, lienType: string) => {

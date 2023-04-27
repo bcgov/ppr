@@ -3,7 +3,7 @@ import {
   ApiHomeTenancyTypes,
   ApiTransferTypes,
   HomeOwnerPartyTypes,
-  HomeTenancyTypes,
+  HomeTenancyTypes, MhApiStatusTypes,
   SupportingDocumentsOptions
 } from '@/enums'
 import { useActions, useGetters } from 'vuex-composition-helpers'
@@ -16,7 +16,7 @@ import {
 import { computed, reactive, toRefs } from '@vue/composition-api'
 import { isEqual, find } from 'lodash'
 import { normalizeObject } from '@/utils'
-import { useHomeOwners } from '@/composables'
+import { useHomeOwners, useMhrInformation } from '@/composables'
 import { transferSupportingDocumentTypes } from '@/resources/'
 
 /**
@@ -27,6 +27,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
   const {
     hasUnsavedChanges,
     getMhrTransferType,
+    getMhrInformation,
     getMhrTransferHomeOwners,
     getMhrTransferHomeOwnerGroups,
     getMhrTransferCurrentHomeOwnerGroups,
@@ -34,6 +35,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
   } = useGetters<any>([
     'hasUnsavedChanges',
     'getMhrTransferType',
+    'getMhrInformation',
     'getMhrTransferHomeOwners',
     'getMhrTransferHomeOwnerGroups',
     'getMhrTransferCurrentHomeOwnerGroups',
@@ -174,7 +176,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
 
     switch (getMhrTransferType.value?.transferType) {
       case ApiTransferTypes.SALE_OR_GIFT:
-        return true // Always enable for Sale or Gift
+        return getMhrInformation.value.statusType !== MhApiStatusTypes.FROZEN // Enable for all but FROZEN status
       case ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL:
       case ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL:
       case ApiTransferTypes.SURVIVING_JOINT_TENANT:
@@ -230,9 +232,25 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       case ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL:
       case ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL:
         return false // Disable for Grant of Probate with Will
+      case ApiTransferTypes.SALE_OR_GIFT:
+        return getMhrInformation.value.statusType !== MhApiStatusTypes.FROZEN
       default:
         return true
     }
+  }
+
+  /** Return true if the specified owners group does not contain the executor or administrator **/
+  const isDisabledForSoGChanges = (owner: MhrRegistrationHomeOwnerIF): boolean => {
+    if (getMhrTransferType.value?.transferType === ApiTransferTypes.SALE_OR_GIFT &&
+      getMhrInformation.value.statusType === MhApiStatusTypes.FROZEN) {
+      const isExecutorOrAdministratorOwnerGroup = getMhrTransferHomeOwnerGroups.value.find(group =>
+        group.groupId === owner.groupId).owners.some(owner => {
+        return owner.partyType === HomeOwnerPartyTypes.EXECUTOR || owner.partyType === HomeOwnerPartyTypes.ADMINISTRATOR
+      })
+
+      return !isExecutorOrAdministratorOwnerGroup
+    }
+    return false
   }
 
   /**
@@ -539,6 +557,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     enableDeleteAllGroupsActions,
     showDeathCertificate,
     showSupportingDocuments,
+    isDisabledForSoGChanges,
     isDisabledForSJTChanges,
     isDisabledForWillChanges,
     TransWill, // Transfer Due to Death - Grant of Probate (with Will)
