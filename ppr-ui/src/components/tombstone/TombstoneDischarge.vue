@@ -52,7 +52,8 @@ import { useGetters } from 'vuex-composition-helpers'
 // local
 import { formatExpiryDate, pacificDate } from '@/utils'
 import { RegistrationTypeIF } from '@/interfaces' // eslint-disable-line
-import { mhApiStatusTypes, mhUIStatusTypes } from '@/enums'
+import { MhUIStatusTypes } from '@/enums'
+import { useMhrInformation } from '@/composables'
 
 export default defineComponent({
   name: 'TombstoneDischarge',
@@ -67,16 +68,15 @@ export default defineComponent({
       getRegistrationExpiryDate,
       getRegistrationNumber,
       getRegistrationType,
-      getMhrInformation,
-      getMhRegTableBaseRegs
+      getMhrInformation
     } = useGetters<any>([
       'getRegistrationCreationDate',
       'getRegistrationExpiryDate',
       'getRegistrationNumber',
       'getRegistrationType',
-      'getMhrInformation',
-      'getMhRegTableBaseRegs'
+      'getMhrInformation'
     ])
+    const { isFrozenMhr } = useMhrInformation()
     const localState = reactive({
       creationDate: computed((): string => {
         if (getRegistrationCreationDate.value) {
@@ -97,11 +97,9 @@ export default defineComponent({
         return 'No Expiry'
       }),
       statusType: computed((): string => {
-        const parentReg = getMhRegTableBaseRegs.value?.find(reg => reg.mhrNumber === getMhrInformation.value.mhrNumber)
-        // if no parent statusType, fall back on current statusType
-        const regStatus = parentReg?.statusType || getMhrInformation.value.statusType
-        return regStatus === mhApiStatusTypes.FROZEN
-          ? mhUIStatusTypes.ACTIVE
+        const regStatus = getMhrInformation.value.statusType
+        return isFrozenMhr
+          ? MhUIStatusTypes.ACTIVE
           : regStatus[0] + regStatus.toLowerCase().slice(1)
       }),
       header: computed((): string => {
