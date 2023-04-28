@@ -13,7 +13,7 @@
             {{ creationDate }}
           </v-col>
         </v-row>
-        <v-row v-else justify="end" no-gutters>
+        <v-row v-else-if="isMhrInformation" justify="end" no-gutters>
           <v-col :class="$style['info-label']" cols="6">
             <span class="float-right">Registration Status: </span>
           </v-col>
@@ -52,7 +52,7 @@ import { useGetters } from 'vuex-composition-helpers'
 // local
 import { formatExpiryDate, pacificDate } from '@/utils'
 import { RegistrationTypeIF } from '@/interfaces' // eslint-disable-line
-import { mhApiStatusTypes } from '@/enums'
+import { mhApiStatusTypes, mhUIStatusTypes } from '@/enums'
 
 export default defineComponent({
   name: 'TombstoneDischarge',
@@ -97,11 +97,12 @@ export default defineComponent({
         return 'No Expiry'
       }),
       statusType: computed((): string => {
-        const parentReg = getMhrInformation.value.mhrNumber &&
-                          getMhRegTableBaseRegs.value?.find(reg => reg.mhrNumber === getMhrInformation.value.mhrNumber)
-        const status = parentReg?.statusType
-        if (status === mhApiStatusTypes.FROZEN) return 'Active'
-        else return status ? status[0] + status.toLowerCase().slice(1) : ''
+        const parentReg = getMhRegTableBaseRegs.value?.find(reg => reg.mhrNumber === getMhrInformation.value.mhrNumber)
+        // if no parent statusType, fall back on current statusType
+        const regStatus = parentReg?.statusType || getMhrInformation.value.statusType
+        return regStatus === mhApiStatusTypes.FROZEN
+          ? mhUIStatusTypes.ACTIVE
+          : regStatus[0] + regStatus.toLowerCase().slice(1)
       }),
       header: computed((): string => {
         const numberType = getRegistrationNumber.value ? 'Base' : 'Manufactured Home'

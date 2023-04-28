@@ -11,7 +11,7 @@ import { TombstoneDischarge } from '@/components/tombstone'
 
 // Other
 import { FinancingStatementIF } from '@/interfaces'
-import { mockedFinancingStatementComplete, mockedSelectSecurityAgreement } from './test-data'
+import { mockedFinancingStatementComplete, mockedMhrInformation, mockedSelectSecurityAgreement } from './test-data'
 import mockRouter from './MockRouter'
 import { RouteNames } from '@/enums'
 import { pacificDate } from '@/utils'
@@ -76,8 +76,11 @@ describe('Tombstone component', () => {
   })
 
   it('renders Tombstone component properly for Total Discharge', async () => {
+    await store.dispatch('setMhrInformation', mockedMhrInformation)
     wrapper = createComponent(RouteNames.REVIEW_DISCHARGE)
-    expect(wrapper.findComponent(TombstoneDischarge).exists()).toBe(true)
+    const tombstoneDischarge = wrapper.findComponent(TombstoneDischarge)
+    tombstoneDischarge.vm.$props.isMhrInformation = true
+    expect(tombstoneDischarge.exists()).toBe(true)
     const header = wrapper.findAll(tombstoneHeader)
     expect(header.length).toBe(1)
     expect(header.at(0).text()).toContain('Base Registration Number ' + registration.baseRegistrationNumber)
