@@ -212,6 +212,17 @@ export const isMhrRegistration = (state: StateIF): boolean => {
     APIRegistrationTypes.MANUFACTURED_HOME_REGISTRATION
 }
 
+/** Is true when all steps are valid as well as staff payment and authorization are valid */
+export const isMhrRegistrationReviewValid = (state: StateIF): boolean => {
+  const modelRef = toRefs(getMhrRegistrationValidationModel(state))
+  return state.stateModel.mhrValidationState.reviewConfirmValid.authorizationValid &&
+  state.stateModel.mhrValidationState.reviewConfirmValid?.staffPaymentValid &&
+  useMhrValidations(modelRef).getStepValidation(MhrSectVal.YOUR_HOME_VALID) &&
+  useMhrValidations(modelRef).getStepValidation(MhrSectVal.SUBMITTING_PARTY_VALID) &&
+  useMhrValidations(modelRef).getStepValidation(MhrSectVal.HOME_OWNERS_VALID) &&
+  useMhrValidations(modelRef).getStepValidation(MhrSectVal.LOCATION_VALID)
+}
+
 /** The selected registration flow type object. */
 export const getRegistrationFlowType = (state: StateIF): RegistrationFlowType => {
   return state.stateModel.registration.registrationFlowType
@@ -473,8 +484,7 @@ export const getMhrSteps = (state: any, getters: any): Array<any> => {
     text: 'Review <br />and Confirm',
     to: RouteNames.MHR_REVIEW_CONFIRM,
     disabled: getters.isBusySaving,
-    valid: useMhrValidations(toRefs(getMhrRegistrationValidationModel(state)))
-      .getStepValidation(MhrSectVal.REVIEW_CONFIRM_VALID),
+    valid: getters.isMhrRegistrationReviewValid,
     component: MhrReviewConfirm
   }]
 }

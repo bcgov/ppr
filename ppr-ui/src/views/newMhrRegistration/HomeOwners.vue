@@ -11,7 +11,7 @@
         cancelText: 'Cancel'
       }"
     />
-    <section id="mhr-owners" class="mt-10">
+    <section id="mhr-owners" :class="{'mt-10': !isReadonlyTable && !isMhrTransfer}">
       <template v-if="!isMhrTransfer">
         <h2>1. Owners</h2>
         <p class="mt-2 mb-0">
