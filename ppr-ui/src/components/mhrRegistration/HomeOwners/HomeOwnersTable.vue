@@ -219,7 +219,7 @@
             <!-- Existing Owner Actions -->
             <template v-else-if="enableTransferOwnerActions(row.item)">
               <v-btn
-                v-if="!isRemovedHomeOwner(row.item) && !isChangedOwner(row.item)"
+                v-if="!isRemovedHomeOwner(row.item) && !isChangedOwner(row.item) && !isDisabledForSoGChanges(row.item)"
                 text color="primary" class="mr-n4"
                 :ripple="false"
                 :disabled="isAddingMode || isEditingMode || isGlobalEditingMode ||
@@ -472,6 +472,7 @@ export default defineComponent({
       enableTransferOwnerMenuActions,
       showDeathCertificate,
       showSupportingDocuments,
+      isDisabledForSoGChanges,
       isDisabledForSJTChanges,
       isDisabledForWillChanges,
       isCurrentOwner,
@@ -762,6 +763,7 @@ export default defineComponent({
       enableTransferOwnerMenuActions,
       showDeathCertificate,
       showSupportingDocuments,
+      isDisabledForSoGChanges,
       isDisabledForSJTChanges,
       isDisabledForWillChanges,
       isTransferToExecutorProbateWill,

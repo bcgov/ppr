@@ -68,7 +68,7 @@ export function isInt (intValue) {
   if (isNaN(intValue)) {
     return false
   }
-  var x = parseFloat(intValue)
+  const x = parseFloat(intValue)
   return (x | 0) === x
 }
 

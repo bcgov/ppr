@@ -72,9 +72,19 @@ export const useMhrInfoValidation = (validationState: mhrInfoValidationStateIF) 
     )
   })
 
-  /** Scroll to first designated error on Information or Review page **/
-  const scrollToFirstError = async (scrollToTop: boolean = false): Promise<void> => {
+  /**
+   * Scroll to first designated error on Information or Review page
+   * @param scrollToTop Force scroll to top of MHR
+   * @param forceTarget A custom ID to force scroll too.
+   * @return void
+   * **/
+  const scrollToFirstError = async (scrollToTop: boolean = false, forceTarget: string = ''): Promise<void> => {
     setTimeout(() => {
+      if (forceTarget) {
+        document.getElementById(forceTarget).scrollIntoView({ behavior: 'smooth' })
+        return
+      }
+
       if (scrollToTop) {
         document.getElementById('mhr-information-header').scrollIntoView({ behavior: 'smooth' })
         return

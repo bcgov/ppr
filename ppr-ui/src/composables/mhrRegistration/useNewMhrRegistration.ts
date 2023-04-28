@@ -11,7 +11,7 @@ import {
   MhrDraftIF
 } from '@/interfaces'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
-import { APIMhrTypes, APIStatusTypes, HomeTenancyTypes, HomeLocationTypes, mhApiStatusTypes } from '@/enums'
+import { APIMhrTypes, APIStatusTypes, HomeTenancyTypes, HomeLocationTypes, MhApiStatusTypes } from '@/enums'
 import { createMhrDraft, getMhrDrafts, mhrRegistrationHistory, updateMhrDraft } from '@/utils'
 import { orderBy } from 'lodash'
 import { useHomeOwners } from '@/composables'
@@ -362,7 +362,7 @@ export const useNewMhrRegistration = () => {
             username: '',
             documentId: draft.draftNumber
           }
-          if (sortOptions?.status === mhApiStatusTypes.DRAFT) {
+          if (sortOptions?.status === MhApiStatusTypes.DRAFT) {
             mhrTableData.push(newDraft)
           } else {
             transfer.changes.push(newDraft)
@@ -371,7 +371,7 @@ export const useNewMhrRegistration = () => {
         transfer.changes = orderBy(transfer.changes, ['createDateTime'], ['desc'])
       }
     })
-    if (sortOptions?.status !== mhApiStatusTypes.DRAFT) mhrTableData = mhrHistory
+    if (sortOptions?.status !== MhApiStatusTypes.DRAFT) mhrTableData = mhrHistory
     return [...mhRegDrafts, ...mhrTableData]
   }
   /**

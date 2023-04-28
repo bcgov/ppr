@@ -38,6 +38,7 @@
               v-model="selectedTransferType"
               :rules="transferTypeRules"
               :menu-props="{ bottom: true, offsetY: true }"
+              :disabled="disableSelect"
               return-object
             >
               <template v-slot:item="{ item }">
@@ -110,8 +111,9 @@
                 ref="declaredValueRef"
                 v-model.number="declaredValue"
                 filled
-                :rules="declaredValueRules"
                 label="Amount in Canadian Dollars"
+                :disabled="disableSelect"
+                :rules="declaredValueRules"
                 :hint="declaredHomeValueHint"
                 :persistent-hint="isDeclaredHitPersistent"
                 data-test-id="declared-value"
@@ -141,7 +143,10 @@ import { cloneDeep } from 'lodash'
 export default defineComponent({
   name: 'TransferType',
   emits: ['emitType', 'emitDeclaredValue', 'emitValid'],
-  props: { validate: { type: Boolean, default: false } },
+  props: {
+    validate: { type: Boolean, default: false },
+    disableSelect: { type: Boolean, default: false }
+  },
   components: { BaseDialog },
   setup (props, context) {
     const { customRules, required, isNumber, maxLength, greaterThan } = useInputRules()
@@ -289,5 +294,10 @@ export default defineComponent({
   color: $gray9 !important;
   font-weight: bold;
   pointer-events: all;
+}
+::v-deep {
+  .theme--light.v-select .v-select__selection--disabled {
+    color: $gray9 !important;
+  }
 }
 </style>

@@ -5,6 +5,14 @@ import {
   RegistrationSortIF,
   RegistrationSummaryIF
 } from '@/interfaces'
+
+export interface RegTableNewItemI {
+  addedReg: string // used for highlight / scroll to
+  addedRegParent: string // used for expand
+  addedRegSummary: RegistrationSummaryIF | MhRegistrationSummaryIF | DraftResultIF | MhrDraftIF // add new item to table
+  prevDraft: string // used to remove previous draft
+}
+
 export interface RegTableDataI {
   baseRegs: RegistrationSummaryIF[]
   baseMhRegs: MhRegistrationSummaryIF[]
@@ -15,10 +23,4 @@ export interface RegTableDataI {
   sortOptions: RegistrationSortIF
   sortPage: number
   totalRowCount: number
-}
-export interface RegTableNewItemI {
-  addedReg: string // used for highlight / scroll to
-  addedRegParent: string // used for expand
-  addedRegSummary: RegistrationSummaryIF | MhRegistrationSummaryIF | DraftResultIF | MhrDraftIF // add new item to table
-  prevDraft: string // used to remove previous draft
 }

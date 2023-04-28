@@ -60,3 +60,12 @@ export function parsePayDetail (rootCause: string): string {
     rootCause?.indexOf('<') - 1
   )
 }
+
+/**
+ * Removes any characters that are not a letter.
+ * @param string the string to format
+ * @returns a stripped string containing only letters
+ */
+export function stripChars (string: string): string {
+  return string.replace(/[^A-Za-z0-9]/g, '')
+}

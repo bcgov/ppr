@@ -12,14 +12,18 @@ import { useActions, useGetters } from 'vuex-composition-helpers'
 import {
   ActionTypes,
   ApiHomeTenancyTypes,
-  ApiTransferTypes, HomeCertificationOptions, HomeLocationTypes,
+  ApiTransferTypes,
+  HomeCertificationOptions,
+  HomeLocationTypes,
   HomeTenancyTypes,
+  MhApiStatusTypes,
   UIRegistrationTypes,
   UITransferTypes
 } from '@/enums'
 import { fetchMhRegistration, normalizeObject } from '@/utils'
 import { cloneDeep } from 'lodash'
 import { useHomeOwners, useTransferOwners } from '@/composables'
+import { computed, reactive, toRefs } from '@vue/composition-api'
 
 export const useMhrInformation = () => {
   const {
@@ -48,6 +52,7 @@ export const useMhrInformation = () => {
   ])
 
   const {
+    setMhrStatusType,
     setMhrTransferHomeOwnerGroups,
     setMhrTransferCurrentHomeOwnerGroups,
     setMhrLocation,
@@ -60,6 +65,7 @@ export const useMhrInformation = () => {
     setMhrTransferConsideration,
     setMhrTransferSubmittingParty
   } = useActions<any>([
+    'setMhrStatusType',
     'setMhrTransferHomeOwnerGroups',
     'setMhrTransferCurrentHomeOwnerGroups',
     'setMhrLocation',
@@ -80,6 +86,13 @@ export const useMhrInformation = () => {
     isTransferDueToDeath,
     getCurrentOwnerGroupIdByOwnerId
   } = useTransferOwners()
+
+  /** Local State for custom computed properties. **/
+  const localState = reactive({
+    isFrozenMhr: computed((): boolean => {
+      return getMhrInformation.value.statusType === MhApiStatusTypes.FROZEN
+    })
+  })
 
   /** New Filings / Initializing **/
 
@@ -102,8 +115,13 @@ export const useMhrInformation = () => {
     }
   }
 
-  const parseMhrInformation = async (): Promise<void> => {
+  const parseMhrInformation = async (includeDetails = false): Promise<void> => {
     const { data } = await fetchMhRegistration(getMhrInformation.value.mhrNumber)
+
+    // Assign frozen state when the base registration is frozen (for drafts)
+    if (data.status === MhApiStatusTypes.FROZEN) {
+      await setMhrStatusType(MhApiStatusTypes.FROZEN)
+    }
 
     const homeDetails = data?.description || {} // Safety check. Should always have description
     await parseMhrHomeDetails(homeDetails)
@@ -114,6 +132,10 @@ export const useMhrInformation = () => {
 
     const currentOwnerGroups = data?.ownerGroups || [] // Safety check. Should always have ownerGroups
     await parseMhrHomeOwners(cloneDeep(currentOwnerGroups))
+
+    // Parse transfer details conditionally.
+    // Some situations call for it being pre-populated from base registration.
+    includeDetails && parseTransferDetails(data)
   }
 
   const parseMhrHomeDetails = async (homeDetails: MhrRegistrationDescriptionIF): Promise<void> => {
@@ -183,18 +205,18 @@ export const useMhrInformation = () => {
     setMhrTransferType({ transferType: draft.registrationType })
 
     // Set draft transfer details
-    parseDraftTransferDetails(draft)
+    parseTransferDetails(draft)
 
     // Set draft owner groups
     setShowGroups(draft.addOwnerGroups.length > 1 || draft.deleteOwnerGroups.length > 1)
     setMhrTransferHomeOwnerGroups([...draft.addOwnerGroups])
   }
 
-  const parseDraftTransferDetails = (draft: MhrTransferApiIF): void => {
-    setMhrTransferDeclaredValue(draft.declaredValue || '')
-    setMhrTransferConsideration(draft.consideration || '')
-    setMhrTransferDate(draft.transferDate || null)
-    setMhrTransferOwnLand(draft.ownLand || null)
+  const parseTransferDetails = (data: MhrTransferApiIF): void => {
+    setMhrTransferDeclaredValue(data.declaredValue || '')
+    setMhrTransferConsideration(data.consideration || '')
+    setMhrTransferDate(data.transferDate || null)
+    setMhrTransferOwnLand(data.ownLand || null)
   }
 
   /** Filing Submission Helpers **/
@@ -307,7 +329,7 @@ export const useMhrInformation = () => {
       ownLand: getMhrTransferOwnLand.value || false,
       attentionReference: getMhrTransferAttentionReference.value,
       documentDescription: UIRegistrationTypes.TRANSFER_OF_SALE,
-      registrationType: getMhrTransferType.value.transferType,
+      registrationType: getMhrTransferType.value?.transferType,
       submittingParty: {
         businessName: getMhrTransferSubmittingParty.value.businessName,
         personName: getMhrTransferSubmittingParty.value.personName,
@@ -321,11 +343,11 @@ export const useMhrInformation = () => {
         })
       },
       addOwnerGroups: isTransferDueToDeath.value
-        ? await parseDueToDeathOwnerGroups(isDraft)
-        : await parseOwnerGroups(isDraft),
+        ? parseDueToDeathOwnerGroups(isDraft)
+        : parseOwnerGroups(isDraft),
       deleteOwnerGroups: isTransferDueToDeath.value
-        ? await parseDeletedDueToDeathOwnerGroups()
-        : await parseDeletedOwnerGroups()
+        ? parseDeletedDueToDeathOwnerGroups()
+        : parseDeletedOwnerGroups()
     }
 
     return data
@@ -335,9 +357,10 @@ export const useMhrInformation = () => {
     getUiTransferType,
     initMhrTransfer,
     buildApiData,
-    parseDraftTransferDetails,
+    parseTransferDetails,
     parseMhrInformation,
     initDraftMhrInformation,
-    parseSubmittingPartyInfo
+    parseSubmittingPartyInfo,
+    ...toRefs(localState)
   }
 }

@@ -29,7 +29,7 @@
           </v-btn>
         </v-col>
         <v-col
-          v-if="isChild && hasFrozenParentReg(item) && (isTransAffi(item.registrationType) || isDraft)"
+          v-if="isChild && hasFrozenParentReg(item) && (isTransAffi(item.registrationType) || isDraft(item))"
           cols="2"
         >
           <v-icon data-test-id="alert-icon" class="mt-n1" color="caution">mdi-alert</v-icon>
@@ -65,7 +65,7 @@
 
       <!-- Caution message for Frozen MHR state -->
       <v-row
-        v-if="!isPpr && !isChild && item.statusType === mhApiStatusTypes.FROZEN"
+        v-if="!isPpr && !isChild && item.statusType === MhApiStatusTypes.FROZEN"
         class="mt-8"
         :class="item.changes && 'pt-4'"
       >
@@ -437,7 +437,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
-import { getRegistrationSummary, mhRegistrationPDF, registrationPDF } from '@/utils'
+import { getRegistrationSummary, mhRegistrationPDF, registrationPDF, stripChars } from '@/utils'
 import { useGetters } from 'vuex-composition-helpers'
 import InfoChip from '@/components/common/InfoChip.vue'
 
@@ -453,7 +453,7 @@ import {
   TableActions,
   UIRegistrationClassTypes,
   UITransferTypes,
-  mhApiStatusTypes
+  MhApiStatusTypes
 } from '@/enums'
 import { useRegistration } from '@/composables/useRegistration'
 import { useTransferOwners } from '@/composables'
@@ -624,7 +624,7 @@ export default defineComponent({
     }
 
     const isEnabledMhr = (item: MhRegistrationSummaryIF) => {
-      return [APIStatusTypes.MHR_ACTIVE, mhApiStatusTypes.FROZEN].includes(item.statusType as APIStatusTypes) &&
+      return [APIStatusTypes.MHR_ACTIVE, MhApiStatusTypes.FROZEN].includes(item.statusType as APIStatusTypes) &&
         localState.enableOpenEdit && (item.registrationDescription === APIMhrDescriptionTypes.REGISTER_NEW_UNIT ||
           item.registrationDescription === APIMhrDescriptionTypes.CONVERTED)
     }
@@ -639,12 +639,16 @@ export default defineComponent({
     }
 
     const isMhrTransfer = (item: any): boolean => {
-      return item.statusType === APIStatusTypes.MHR_ACTIVE &&
-      (item.registrationDescription === UITransferTypes.SALE_OR_GIFT.toUpperCase() ||
-       item.registrationDescription === UITransferTypes.SURVIVING_JOINT_TENANT.toUpperCase() ||
-       item.registrationDescription === UITransferTypes.TO_ADMIN_PROBATE_NO_WILL.toUpperCase() ||
-       item.registrationDescription === UITransferTypes.TO_EXECUTOR_PROBATE_WILL.toUpperCase() ||
-       item.registrationDescription === UITransferTypes.TO_EXECUTOR_UNDER_25K_WILL.toUpperCase())
+      const formattedTransferTypes = [
+        UITransferTypes.SALE_OR_GIFT,
+        UITransferTypes.SURVIVING_JOINT_TENANT,
+        UITransferTypes.TO_ADMIN_PROBATE_NO_WILL,
+        UITransferTypes.TO_EXECUTOR_PROBATE_WILL,
+        UITransferTypes.TO_EXECUTOR_UNDER_25K_WILL
+      ].map(type => stripChars(type).toUpperCase())
+
+      return [MhApiStatusTypes.ACTIVE, MhApiStatusTypes.FROZEN].includes(item.statusType) &&
+        formattedTransferTypes.includes(stripChars(item.registrationDescription))
     }
 
     const removeMhrDraft = (item: MhRegistrationSummaryIF): void => {
@@ -677,7 +681,7 @@ export default defineComponent({
 
     const hasFrozenParentReg = (item: MhRegistrationSummaryIF): boolean => {
       const parentReg = item.mhrNumber && getMhRegTableBaseRegs.value?.find(reg => reg.mhrNumber === item.mhrNumber)
-      return parentReg?.statusType === mhApiStatusTypes.FROZEN
+      return parentReg?.statusType === MhApiStatusTypes.FROZEN
     }
 
     const isDischarged = (item: RegistrationSummaryIF): boolean => {
@@ -810,7 +814,7 @@ export default defineComponent({
 
     return {
       freezeScrolling,
-      mhApiStatusTypes,
+      MhApiStatusTypes,
       APIMhrDescriptionTypes,
       getFormattedDate,
       getRegistrationType,

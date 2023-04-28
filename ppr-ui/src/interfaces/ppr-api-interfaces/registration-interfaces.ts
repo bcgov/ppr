@@ -1,4 +1,4 @@
-import { APIAmendmentTypes, APIMhrTypes, APIRegistrationTypes, DraftTypes, mhApiStatusTypes } from '@/enums'
+import { APIAmendmentTypes, APIMhrTypes, APIRegistrationTypes, DraftTypes, MhApiStatusTypes } from '@/enums'
 import {
   CourtOrderIF,
   DebtorNameIF,
@@ -38,6 +38,33 @@ export interface FinancingStatementIF {
   createDateTime?: string // Included in a successful response.
   payment?: PaymentIF // Included in a successful response.
   otherTypeDescription?: string // Included if type is Other
+  error?: ErrorIF
+  authorizationReceived?: boolean // Always true for the UI: API requirement.
+}
+
+// Amendment Statement interface. All dates/date time properties are in the ISO 8601 format YYYY-MM-DDThh:mm:ssTZD.
+export interface AmendmentStatementIF {
+  changeType?: APIAmendmentTypes // Mandatory can save draft without it.
+  clientReferenceId?: string // AKA folio max length 20.
+  documentId?: string // Optional draft ID if draft created.
+  description?: string // Mandatory description of amendment can save draft without it.
+  baseRegistrationNumber: string // The identifier of the registration being amended.
+  debtorName: DebtorNameIF // Mandatory name of current debtor.
+  registeringParty?: PartyIF // Mandatory can save draft without it.
+  courtOrderInformation?: CourtOrderIF // Only populated if all court order elements present.
+  addSecuredParties?: PartyIF[] // Only populated if adding.
+  deleteSecuredParties?: PartyIF[] // Only populated if deleting.
+  addDebtors?: PartyIF[] // Only populated if adding.
+  deleteDebtors?: PartyIF[] // Only populated if deleting.
+  addVehicleCollateral?: VehicleCollateralIF[] // Only populated if adding.
+  deleteVehicleCollateral?: VehicleCollateralIF[] // Only populated if deleting.
+  addGeneralCollateral?: GeneralCollateralIF[] // Only populated if adding.
+  deleteGeneralCollateral?: GeneralCollateralIF[] // Only populated if deleting.
+  addTrustIndenture?: boolean // Include if adding a trust indenture for a SA.
+  removeTrustIndenture?: boolean // Include if removing a trust indenture for a SA.
+  createDateTime?: string // Included in a successful response.
+  amendmentRegistrationNumber?: string // Included in a successful response. The unique identifier of the registration.
+  payment?: PaymentIF // Included in a successful response.
   error?: ErrorIF
   authorizationReceived?: boolean // Always true for the UI: API requirement.
 }
@@ -118,6 +145,7 @@ export interface MhRegistrationSummaryIF {
   error?: ErrorIF
   clientReferenceId: string
   createDateTime: string
+  declaredValue?: string
   draftNumber?: string
   mhrNumber: string
   ownerNames: string
@@ -165,31 +193,4 @@ export interface RenewRegistrationIF {
   error?: ErrorIF
   authorizationReceived?: boolean // Always true for the UI: API requirement.
   courtOrderInformation?: CourtOrderIF // Only populated if RL renewal and all court order elements present.
-}
-
-// Amendment Statement interface. All dates/date time properties are in the ISO 8601 format YYYY-MM-DDThh:mm:ssTZD.
-export interface AmendmentStatementIF {
-  changeType?: APIAmendmentTypes // Mandatory can save draft without it.
-  clientReferenceId?: string // AKA folio max length 20.
-  documentId?: string // Optional draft ID if draft created.
-  description?: string // Mandatory description of amendment can save draft without it.
-  baseRegistrationNumber: string // The identifier of the registration being amended.
-  debtorName: DebtorNameIF // Mandatory name of current debtor.
-  registeringParty?: PartyIF // Mandatory can save draft without it.
-  courtOrderInformation?: CourtOrderIF // Only populated if all court order elements present.
-  addSecuredParties?: PartyIF[] // Only populated if adding.
-  deleteSecuredParties?: PartyIF[] // Only populated if deleting.
-  addDebtors?: PartyIF[] // Only populated if adding.
-  deleteDebtors?: PartyIF[] // Only populated if deleting.
-  addVehicleCollateral?: VehicleCollateralIF[] // Only populated if adding.
-  deleteVehicleCollateral?: VehicleCollateralIF[] // Only populated if deleting.
-  addGeneralCollateral?: GeneralCollateralIF[] // Only populated if adding.
-  deleteGeneralCollateral?: GeneralCollateralIF[] // Only populated if deleting.
-  addTrustIndenture?: boolean // Include if adding a trust indenture for a SA.
-  removeTrustIndenture?: boolean // Include if removing a trust indenture for a SA.
-  createDateTime?: string // Included in a successful response.
-  amendmentRegistrationNumber?: string // Included in a successful response. The unique identifier of the registration.
-  payment?: PaymentIF // Included in a successful response.
-  error?: ErrorIF
-  authorizationReceived?: boolean // Always true for the UI: API requirement.
 }

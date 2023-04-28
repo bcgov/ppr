@@ -3,7 +3,8 @@ import {
   APIMhrTypes,
   APIRegistrationTypes,
   APIStatusTypes,
-  DraftTypes, mhApiStatusTypes
+  DraftTypes,
+  MhApiStatusTypes
 } from '@/enums'
 import { DraftResultIF, MhrDraftIF, MhRegistrationSummaryIF, RegistrationSummaryIF } from '@/interfaces'
 
@@ -157,7 +158,7 @@ export const mockedMhRegistration: MhRegistrationSummaryIF = {
   documentRegistrationNumber: 'GOV2343',
   baseRegistrationNumber: '654321',
   registrationType: APIMhrTypes.MANUFACTURED_HOME_REGISTRATION,
-  statusType: mhApiStatusTypes.ACTIVE
+  statusType: MhApiStatusTypes.ACTIVE
 }
 
 export const mockedMhDraft: MhrDraftIF = {

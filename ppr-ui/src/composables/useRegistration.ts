@@ -4,6 +4,8 @@ import {
   APIAmendmentTypes,
   APIRegistrationTypes,
   APIStatusTypes,
+  MhApiStatusTypes,
+  MhUIStatusTypes,
   UIAmendmentTypes,
   UIRegistrationTypes,
   UIStatusTypes
@@ -40,8 +42,10 @@ export const useRegistration = (setSort: RegistrationSortIF) => {
     }
   }
 
-  const getStatusDescription = (status: APIStatusTypes): string => {
+  const getStatusDescription = (status: APIStatusTypes | MhApiStatusTypes): string => {
     if (!status) return UIStatusTypes.DRAFT
+    if (status === MhApiStatusTypes.FROZEN) return MhUIStatusTypes.ACTIVE
+
     for (let i = 0; i < StatusTypes.length; i++) {
       if (StatusTypes[i].value === status || StatusTypes[i].mhrValue === status) {
         return StatusTypes[i].text
