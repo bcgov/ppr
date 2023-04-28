@@ -98,7 +98,7 @@ export default defineComponent({
       }),
       statusType: computed((): string => {
         const regStatus = getMhrInformation.value.statusType
-        return isFrozenMhr
+        return isFrozenMhr.value
           ? MhUIStatusTypes.ACTIVE
           : regStatus[0] + regStatus.toLowerCase().slice(1)
       }),
