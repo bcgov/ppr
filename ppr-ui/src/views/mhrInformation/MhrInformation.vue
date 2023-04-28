@@ -260,7 +260,7 @@
 
                 <HomeOwners
                   isMhrTransfer
-                  class="mt-n2"
+                  class="mt-10"
                   ref="homeOwnersComponentRef"
                   :class="{ 'mb-10': !hasUnsavedChanges }"
                   :validateTransfer="validate"
@@ -419,6 +419,7 @@ export default defineComponent({
     ])
 
     const {
+      setMhrStatusType,
       setMhrTransferSubmittingParty,
       setMhrTransferAttentionReference,
       setUnsavedChanges,
@@ -431,6 +432,7 @@ export default defineComponent({
       setEmptyMhrTransfer,
       setStaffPayment
     } = useActions<any>([
+      'setMhrStatusType',
       'setMhrTransferSubmittingParty',
       'setMhrTransferAttentionReference',
       'setUnsavedChanges',
@@ -695,6 +697,8 @@ export default defineComponent({
             localState.validate = false
             localState.isReviewMode = false
 
+            // Set Frozen state manually as the base reg isn't re-fetched in this flow
+            await setMhrStatusType(MhApiStatusTypes.FROZEN)
             await initFrozenSaleOrGift(apiData)
 
             localState.loading = false
