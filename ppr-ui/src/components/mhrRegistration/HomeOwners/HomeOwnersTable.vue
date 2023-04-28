@@ -52,8 +52,7 @@
       <template v-slot:item="row" v-if="homeOwners.length">
 
         <!-- Transfer scenario: Display error for groups that 'removed' all owners but they still exist in the table -->
-        <tr v-if="isGroupWithNoOwners(row.item, row.index) || isTransferGroupValid(row.item.groupId, row.index)"
-        >
+        <tr v-if="isGroupWithNoOwners(row.item, row.index) || isTransferGroupValid(row.item.groupId, row.index)">
           <td :colspan="4"
             class="py-1"
             :class="{ 'border-error-left': isInvalidOwnerGroup(row.item.groupId)}"
@@ -320,6 +319,23 @@
           <td :colspan="homeOwnersTableHeaders.length" class="deceased-review-info">
             <v-row no-gutters class="ml-8 my-n3">
               <v-col cols="12">
+                <div v-if="row.item.supportingDocument === SupportingDocumentsOptions.AFFIDAVIT"
+                  data-test-id="affidavit-review-note">
+                  <p class="generic-label fs-14 mb-3">
+                    Affidavit of Executor with Death Certificate<br>
+                    <span class="font-light ml-0">
+                      Note: Ensure you have the original signed Affidavit of Executor form and a
+                      court certified true copy of the will.
+                    </span>
+                  </p>
+                    <p class="generic-label fs-14">
+                      Death Certificate Registration Number:
+                      <span class="font-light mx-1">{{row.item.deathCertificateNumber}}</span>
+                    </p>
+                    <p class="generic-label fs-14 mt-n4">Date of Death:
+                      <span class="font-light mx-1">{{yyyyMmDdToPacificDate(row.item.deathDateTime, true)}}</span>
+                    </p>
+                </div>
                 <div
                   v-if="row.item.supportingDocument === SupportingDocumentsOptions.DEATH_CERT || showDeathCertificate()"
                   data-test-id="death-cert-review-note"

@@ -52,7 +52,7 @@
     <section id="mhr-other-information" class="mt-10">
       <h2>Other Information</h2>
       <p class="mt-2">
-        Include an other relevant information about the home.
+        Include any other relevant information about the home.
       </p>
 
       <OtherInformation
