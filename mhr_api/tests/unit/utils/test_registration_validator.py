@@ -23,6 +23,7 @@ from mhr_api.utils import registration_validator as validator
 from mhr_api.models import MhrRegistration
 from mhr_api.models.type_tables import MhrRegistrationStatusTypes, MhrTenancyTypes, MhrDocumentTypes, MhrLocationTypes
 from mhr_api.models.utils import is_legacy
+from mhr_api.services.authz import QUALIFIED_USER_GROUP
 
 
 DESC_VALID = 'Valid'
@@ -666,7 +667,7 @@ def test_validate_submitting(session, desc, bus_name, first, middle, last, messa
     if desc.startswith('Reg'):
         error_msg = validator.validate_registration(json_data, False)
     else:
-        error_msg = validator.validate_transfer(None, json_data, False)
+        error_msg = validator.validate_transfer(None, json_data, False, QUALIFIED_USER_GROUP)
     if message_content:
         assert error_msg.find(message_content) != -1
     else:
@@ -704,7 +705,7 @@ def test_validate_owner(session, desc, bus_name, first, middle, last, message_co
     if desc.startswith('Reg'):
         error_msg = validator.validate_registration(json_data, False)
     else:
-        error_msg = validator.validate_transfer(None, json_data, False)
+        error_msg = validator.validate_transfer(None, json_data, False, QUALIFIED_USER_GROUP)
     if message_content:
         assert error_msg.find(message_content) != -1
     else:

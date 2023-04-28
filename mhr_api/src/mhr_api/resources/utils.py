@@ -251,9 +251,9 @@ def validate_registration(json_data, is_staff: bool = False):
     return registration_validator.validate_registration(json_data, is_staff)
 
 
-def validate_transfer(registration, json_data, is_staff: bool = False):
+def validate_transfer(registration, json_data, is_staff: bool, group: str):
     """Perform non-schema extra validation on a transfer registration."""
-    return registration_validator.validate_transfer(registration, json_data, is_staff)
+    return registration_validator.validate_transfer(registration, json_data, is_staff, group)
 
 
 def validate_exemption(registration, json_data, is_staff: bool = False):
