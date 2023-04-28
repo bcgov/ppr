@@ -13,12 +13,12 @@
             {{ creationDate }}
           </v-col>
         </v-row>
-        <v-row v-else justify="end" no-gutters>
+        <v-row v-else-if="isMhrInformation" justify="end" no-gutters>
           <v-col :class="$style['info-label']" cols="6">
             <span class="float-right">Registration Status: </span>
           </v-col>
           <v-col class="pl-3" cols="6">
-            {{ statusType[0] + statusType.toLowerCase().slice(1) }}
+            {{ statusType }}
           </v-col>
         </v-row>
       </v-col>
@@ -52,6 +52,8 @@ import { useGetters } from 'vuex-composition-helpers'
 // local
 import { formatExpiryDate, pacificDate } from '@/utils'
 import { RegistrationTypeIF } from '@/interfaces' // eslint-disable-line
+import { MhUIStatusTypes } from '@/enums'
+import { useMhrInformation } from '@/composables'
 
 export default defineComponent({
   name: 'TombstoneDischarge',
@@ -74,6 +76,7 @@ export default defineComponent({
       'getRegistrationType',
       'getMhrInformation'
     ])
+    const { isFrozenMhr } = useMhrInformation()
     const localState = reactive({
       creationDate: computed((): string => {
         if (getRegistrationCreationDate.value) {
@@ -94,7 +97,10 @@ export default defineComponent({
         return 'No Expiry'
       }),
       statusType: computed((): string => {
-        return getMhrInformation.value?.statusType || 'N/A'
+        const regStatus = getMhrInformation.value.statusType
+        return isFrozenMhr.value
+          ? MhUIStatusTypes.ACTIVE
+          : regStatus[0] + regStatus.toLowerCase().slice(1)
       }),
       header: computed((): string => {
         const numberType = getRegistrationNumber.value ? 'Base' : 'Manufactured Home'

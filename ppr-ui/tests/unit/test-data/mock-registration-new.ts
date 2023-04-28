@@ -17,7 +17,8 @@ import {
   PartyIF,
   RegistrationTypeIF,
   VehicleCollateralIF,
-  SearchPartyIF
+  SearchPartyIF,
+  MhRegistrationSummaryIF
 } from '@/interfaces'
 
 export const mockedSelectSecurityAgreement = (): RegistrationTypeIF => {
@@ -434,4 +435,16 @@ export const mockedFinancingStatementRepairers: FinancingStatementIF = {
   lifeYears: 1,
   trustIndenture: false,
   lifeInfinite: false
+}
+
+export const mockedMhrInformation: MhRegistrationSummaryIF = {
+  clientReferenceId: 'UT-MHREG-SOLE',
+  createDateTime: '2023-04-28T10:11:37-07:53',
+  mhrNumber: '150575',
+  ownerNames: 'MARY-ANNE BICKNELL',
+  path: '/mhr/api/v1/registrations/150575',
+  registrationDescription: 'MANUFACTURED HOME REGISTRATION',
+  statusType: 'ACTIVE',
+  submittingParty: 'ABC SUBMITTING COMPANY',
+  username: 'BUSINESS REGISTRY TEST 1'
 }
