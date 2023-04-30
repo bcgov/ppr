@@ -10,7 +10,7 @@
       </v-col>
       <v-col cols="9">
         <!-- Owner Roles -->
-        <v-row no-gutters v-if="isTransferDueToDeath">
+        <v-row no-gutters v-if="isTransferDueToDeath || isFrozenMhr">
           <v-col cols="12">
             <label class="generic-label">
               Role
@@ -32,7 +32,7 @@
                 v-model="HomeOwnerPartyTypes.OWNER_IND"
               />
               <v-tooltip
-                v-if="isTransferDueToDeath"
+                v-if="isTransferDueToDeath || isFrozenMhr"
                 top
                 nudge-right="18"
                 content-class="top-tooltip pa-5"
@@ -44,7 +44,7 @@
                     id="executor-option"
                     class="executor-radio px-4"
                     active-class="selected-radio"
-                    :disabled="disableNameFields"
+                    :disabled="disableNameFields || isFrozenMhr"
                     v-model="HomeOwnerPartyTypes.EXECUTOR"
                    >
                     <template v-slot:label><div :class="{'underline' : !disableNameFields}">Executor</div></template>
@@ -58,7 +58,7 @@
                 class="trustee-radio px-4"
                 label="Trustee"
                 active-class="selected-radio"
-                :disabled="isTransferDueToDeath || isTransferToExecutorProbateWill"
+                :disabled="isTransferDueToDeath || isTransferToExecutorProbateWill || isFrozenMhr"
                 v-model="HomeOwnerPartyTypes.TRUSTEE"
               />
               <v-radio
@@ -66,7 +66,7 @@
                 class="administrator-radio pl-4"
                 label="Administrator"
                 active-class="selected-radio"
-                :disabled="isTransferDueToDeath || isTransferToExecutorProbateWill"
+                :disabled="isTransferDueToDeath || isTransferToExecutorProbateWill || isFrozenMhr"
                 v-model="HomeOwnerPartyTypes.ADMINISTRATOR"
               />
             </v-radio-group>
@@ -361,7 +361,7 @@
           />
 
           <!-- Group Add / Edit -->
-          <template v-if="!isTransferDueToDeath">
+          <template v-if="!isTransferDueToDeath && !isFrozenMhr">
             <hr class="mt-3 mb-10" />
             <HomeOwnerGroups
               :groupId="isDefinedGroup ? ownersGroupId : null"
@@ -444,7 +444,7 @@ import { SimpleHelpToggle } from '@/components/common'
 import HomeOwnerGroups from './HomeOwnerGroups.vue'
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import { find } from 'lodash'
-import { useTransferOwners } from '@/composables'
+import { useMhrInformation, useTransferOwners } from '@/composables'
 import { ActionTypes, HomeOwnerPartyTypes } from '@/enums'
 import { transfersContent } from '@/resources'
 
@@ -532,12 +532,18 @@ export default defineComponent({
     const {
       isCurrentOwner,
       isTransferDueToDeath,
+      isTransferDueToSaleOrGift,
       isTransferToExecutorProbateWill,
       isTransferToExecutorUnder25Will,
       hasCurrentOwnerChanges,
       disableNameFields,
-      TransWill
+      TransWill,
+      TransAffidavit
     } = useTransferOwners()
+
+    const {
+      isFrozenMhr
+    } = useMhrInformation()
 
     const addressSchema = PartyAddressSchema
     const addHomeOwnerForm = ref(null)
@@ -579,6 +585,10 @@ export default defineComponent({
       TransWill.hasDeletedOwnersWithProbateGrantOrAffidavit() &&
       !props.editHomeOwner) {
       TransWill.prefillOwnerAsExecutor(defaultHomeOwner)
+    }
+
+    if (isFrozenMhr.value) {
+      defaultHomeOwner.partyType = HomeOwnerPartyTypes.OWNER_IND
     }
 
     const allFractionalData = (getTransferOrRegistrationHomeOwnerGroups() || [{}]).map(group => {
@@ -684,9 +694,17 @@ export default defineComponent({
             localState.ownerGroupId = localState.owner.groupId
           }
 
+          // In Sale or Gift Transfer after Affidavit (aka Frozen) flow, add new owners to same group as Executor
+          if (props.isMhrTransfer &&
+              isTransferDueToSaleOrGift.value &&
+              isFrozenMhr.value) {
+            // Find the GroupId with an Executor
+            localState.ownerGroupId = localState.owner.groupId
+          }
+
           addOwnerToTheGroup(
             localState.owner as MhrRegistrationHomeOwnerIF,
-            localState.ownerGroupId
+            localState.ownerGroupId = TransAffidavit.getGroupIdWithExecutor()
           )
         }
 
@@ -781,6 +799,7 @@ export default defineComponent({
       HomeOwnerPartyTypes,
       getMhrTransferType,
       transfersContent,
+      isFrozenMhr,
       customRules,
       required,
       ...toRefs(localState)

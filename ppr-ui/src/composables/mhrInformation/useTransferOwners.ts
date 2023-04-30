@@ -88,6 +88,11 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     return group.action === ActionTypes.CHANGED
   }
 
+  /** Returns true when the selected transfer type is a 'SALE_OR_GIFT' scenario **/
+  const isTransferDueToSaleOrGift = computed((): boolean => {
+    return getMhrTransferType.value?.transferType === ApiTransferTypes.SALE_OR_GIFT
+  })
+
   /** Returns true when the selected transfer type is a 'TO_EXECUTOR_PROBATE_WILL' scenario **/
   const isTransferToExecutorProbateWill = computed((): boolean => {
     return getMhrTransferType.value?.transferType === ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL
@@ -450,6 +455,11 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     },
     isCompleted: (): boolean => {
       return getMhrTransferAffidavitCompleted.value
+    },
+    getGroupIdWithExecutor: (): number => {
+      return getMhrTransferHomeOwnerGroups.value.find(group =>
+        group.owners.some(owner => owner.partyType === HomeOwnerPartyTypes.EXECUTOR)
+      ).groupId
     }
   }
 
@@ -566,6 +576,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     isCurrentOwner,
     getMhrTransferType,
     isTransferDueToDeath,
+    isTransferDueToSaleOrGift,
     isTransferToSurvivingJointTenant,
     isTransferToExecutorProbateWill,
     isTransferToExecutorUnder25Will,
