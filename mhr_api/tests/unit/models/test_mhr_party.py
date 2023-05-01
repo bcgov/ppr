@@ -178,7 +178,7 @@ def test_create_from_json(session):
     assert party.change_registration_id == 1000
     assert party.party_type == MhrPartyTypes.SUBMITTING
     assert party.status_type == MhrOwnerStatusTypes.ACTIVE
-    assert party.compressed_name
+    assert not party.compressed_name
     assert party.business_name or party.last_name
     if party.last_name:
         assert party.first_name
@@ -200,7 +200,7 @@ def test_create_from_registration_json(session):
         assert party.change_registration_id == 1000
         assert party.party_type in MhrPartyTypes
         assert party.status_type in MhrOwnerStatusTypes
-        assert party.compressed_name
+        assert not party.compressed_name
         assert party.business_name or party.last_name
         if party.last_name:
             assert party.first_name
