@@ -35,7 +35,7 @@ export interface MhrTransferApiIF {
   ownLand: boolean
   registrationType: ApiTransferTypes
   submittingParty: SubmittingPartyIF
-  attentionReference: string
+  attentionReference?: string
   deleteOwnerGroups?: Array<MhrHomeOwnerGroupIF>
   addOwnerGroups: Array<MhrHomeOwnerGroupIF>
   createDateTime?: string

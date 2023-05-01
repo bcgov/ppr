@@ -27,7 +27,9 @@ import { computed, reactive, toRefs } from '@vue/composition-api'
 
 export const useMhrInformation = () => {
   const {
+    isRoleStaffReg,
     getMhrInformation,
+    isRoleQualifiedSupplier,
     getMhrTransferDeclaredValue,
     getMhrTransferConsideration,
     getMhrTransferDate,
@@ -38,7 +40,9 @@ export const useMhrInformation = () => {
     getMhrTransferCurrentHomeOwnerGroups,
     getMhrTransferType
   } = useGetters<any>([
+    'isRoleStaffReg',
     'getMhrInformation',
+    'isRoleQualifiedSupplier',
     'getMhrTransferHomeOwners',
     'getMhrTransferDeclaredValue',
     'getMhrTransferConsideration',
@@ -327,7 +331,6 @@ export const useMhrInformation = () => {
       consideration: getMhrTransferConsideration.value,
       transferDate: getMhrTransferDate.value,
       ownLand: getMhrTransferOwnLand.value || false,
-      attentionReference: getMhrTransferAttentionReference.value,
       documentDescription: UIRegistrationTypes.TRANSFER_OF_SALE,
       registrationType: getMhrTransferType.value?.transferType,
       submittingParty: {
@@ -342,6 +345,12 @@ export const useMhrInformation = () => {
           phoneExtension: getMhrTransferSubmittingParty.value.phoneExtension
         })
       },
+      ...(isRoleQualifiedSupplier.value && !isRoleStaffReg.value && {
+        clientReferenceId: getMhrTransferAttentionReference.value
+      }),
+      ...(isRoleStaffReg.value && {
+        attentionReference: getMhrTransferAttentionReference.value
+      }),
       addOwnerGroups: isTransferDueToDeath.value
         ? parseDueToDeathOwnerGroups(isDraft)
         : parseOwnerGroups(isDraft),

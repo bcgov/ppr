@@ -148,7 +148,7 @@
                             class="generic-label"
                             :class="{ 'error-text': !getInfoValidation('isRefNumValid') }"
                           >
-                            {{ attnOrRefConfig.title }}
+                            {{ attnOrRefConfig.inputTitle || attnOrRefConfig.title }}
                           </label>
                         </v-col>
                         <v-col cols="9" class="px-1">
@@ -158,7 +158,7 @@
                             class="pr-2"
                             :label="attnOrRefConfig.inputLabel"
                             v-model="attentionReference"
-                            :rules="maxLength(40)"
+                            :rules="isRoleStaffReg ? maxLength(40) : maxLength(30)"
                             data-test-id="attn-ref-number-field"
                           />
                         </v-col>
@@ -698,9 +698,9 @@ export default defineComponent({
             localState.validate = false
             localState.isReviewMode = false
 
+            await initFrozenSaleOrGift(apiData)
             // Set Frozen state manually as the base reg isn't re-fetched in this flow
             await setMhrStatusType(MhApiStatusTypes.FROZEN)
-            await initFrozenSaleOrGift(apiData)
 
             localState.loading = false
             localState.showStartTransferRequiredDialog = true
@@ -796,6 +796,7 @@ export default defineComponent({
       }
       // Start Gift/Sale Transfer simply closes the dialog, since the data is already pre-filled
       localState.showStartTransferRequiredDialog = false
+      await scrollToFirstError(false, 'home-owners-header')
     }
 
     const quickMhrSearch = async (mhrNumber: string): Promise<void> => {
