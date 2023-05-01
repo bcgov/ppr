@@ -76,10 +76,16 @@
                   </p>
               </li>
               <li v-if="isRoleStaff" class="pl-3 pb-3 mb-7" data-test-id="change-ownership-section">
-                <p><strong>Transfer or Change Ownership form</strong> has been recieved and retained.</p>
+                <p><strong>Transfer or Change Ownership form</strong> has been received and retained.</p>
               </li>
               <li v-if="isTransferToExecutorProbateWill" class="pl-3 pb-3 mb-7" data-test-id="probate-will-section">
                 <p><strong>Court certified true copy of the Probate with the will.</strong></p>
+              </li>
+              <li v-if="isTransferToExecutorUnder25Will" class="pl-3 pb-3 mb-7">
+                <p><strong>Certified true copy of the will.</strong></p>
+              </li>
+              <li v-if="isTransferToExecutorUnder25Will" class="pl-3 pb-3 mb-7">
+                <p><strong>Original signed Affidavit of Executor form</strong> has been received and retained.</p>
               </li>
               <li v-if="!isTransferDueToDeath" class="pl-3 pb-3 mb-7" data-test-id="confirm-search-section">
                 <p><strong>Search of the Corporate Register</strong> has been completed if one or more of the current or
@@ -160,7 +166,11 @@ export default defineComponent({
       'isRoleStaff'
     ])
 
-    const { isTransferDueToDeath, isTransferToExecutorProbateWill } = useTransferOwners()
+    const {
+      isTransferDueToDeath,
+      isTransferToExecutorProbateWill,
+      isTransferToExecutorUnder25Will
+    } = useTransferOwners()
 
     const localState = reactive({
       showErrorComponent: computed((): boolean => {
@@ -182,6 +192,7 @@ export default defineComponent({
       ApiTransferTypes,
       isTransferDueToDeath,
       isTransferToExecutorProbateWill,
+      isTransferToExecutorUnder25Will,
       ...toRefs(localState)
     }
   }
