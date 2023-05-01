@@ -1,10 +1,11 @@
 import { AttnRefConfigIF } from '@/interfaces'
 
 export const clientConfig: AttnRefConfigIF = {
-  title: 'Attention or Reference Number',
-  description: 'Add an optional Attention or Reference Number information for this transaction. If entered,' +
-    ' it will appear on the Verification of Service document.',
-  inputLabel: 'Attention or Reference Number (Optional)'
+  title: 'Folio or Reference Number',
+  description: 'Add an optional number for this transaction for your own tracking purposes. This information is not' +
+    ' used by the Manufactured Home Registry.',
+  inputTitle: 'Folio Number',
+  inputLabel: 'Folio or Reference Number (Optional)'
 }
 
 export const staffConfig: AttnRefConfigIF = {
