@@ -131,11 +131,8 @@
                 </section>
 
                 <section id="transfer-ref-num-section" class="mt-10 py-4">
-                  <h2>{{ isRoleStaffReg ? '2.' : '1.'}} Attention or Reference Number</h2>
-                  <p class="mt-2">
-                    Add an optional Attention or Reference Number information for this transaction. If entered, it will
-                    appear on the Transfer Verification document.
-                  </p>
+                  <h2>{{ isRoleStaffReg ? '2.' : '1.'}} {{ attnOrRefConfig.title }}</h2>
+                  <p class="mt-2">{{ attnOrRefConfig.description }}</p>
                   <v-card
                     flat
                     rounded
@@ -151,7 +148,7 @@
                             class="generic-label"
                             :class="{ 'error-text': !getInfoValidation('isRefNumValid') }"
                           >
-                            Attention or Reference Number
+                            {{ attnOrRefConfig.title }}
                           </label>
                         </v-col>
                         <v-col cols="9" class="px-1">
@@ -159,7 +156,7 @@
                             filled
                             id="attention-or-reference-number"
                             class="pr-2"
-                            label="Attention or Reference Number (Optional)"
+                            :label="attnOrRefConfig.inputLabel"
                             v-model="attentionReference"
                             :rules="maxLength(40)"
                             data-test-id="attn-ref-number-field"
@@ -329,7 +326,7 @@ import {
 import AccountInfo from '@/components/common/AccountInfo.vue'
 /* eslint-disable no-unused-vars */
 import {
-  AccountInfoIF,
+  AccountInfoIF, AttnRefConfigIF,
   DialogOptionsIF,
   ErrorIF,
   MhrTransferApiIF,
@@ -359,6 +356,7 @@ import {
   submitMhrTransfer,
   updateMhrDraft
 } from '@/utils'
+import { clientConfig, staffConfig } from '@/resources/attnRefConfigs'
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
@@ -545,6 +543,9 @@ export default defineComponent({
       }),
       enableHomeOwnerChanges: computed(() => {
         return getFeatureFlag('mhr-transfer-enabled')
+      }),
+      attnOrRefConfig: computed((): AttnRefConfigIF => {
+        return isRoleStaffReg.value ? staffConfig : clientConfig
       }),
       /** True if Jest is running the code. */
       isJestRunning: computed((): boolean => {

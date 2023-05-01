@@ -38,6 +38,9 @@ export const useMhrValidations = (validationState: any) => {
     // Reset home location validations
     setValidation(MhrSectVal.LOCATION_VALID, MhrCompVal.LOCATION_TYPE_VALID, false)
     setValidation(MhrSectVal.LOCATION_VALID, MhrCompVal.CIVIC_ADDRESS_VALID, false)
+
+    // Reset Review validations
+    setValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_STEPS, false)
   }
 
   /** Is true when input field ref is in error. */

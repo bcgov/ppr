@@ -65,10 +65,9 @@
     </section>
 
     <section id="mhr-submitting-party-reference" class="mt-10">
-      <h2>Attention or Reference Number</h2>
+      <h2>{{ attnOrRefConfig.title }}</h2>
       <p class="mt-2">
-        Add an optional Attention or Reference Number information for this transaction. If entered, it will appear on
-        the Verification of Service document.
+        {{ attnOrRefConfig.description }}
       </p>
 
       <!-- Insert Attention or Reference Number here -->
@@ -83,7 +82,7 @@
           <v-row no-gutters class="pt-3">
             <v-col cols="12" sm="2">
               <label class="generic-label" :class="{ 'error-text': validateRefNum }">
-                Attention or Reference Number
+                {{ attnOrRefConfig.title }}
               </label>
             </v-col>
             <v-col cols="12" sm="10" class="px-1">
@@ -91,8 +90,8 @@
                 filled
                 id="attention-or-reference-number"
                 class="pr-2"
-                label="Attention or Reference Number (Optional)"
-                v-model="attentionReferenceNum"
+                :label="attnOrRefConfig.inputLabel"
+                v-model="attentionReference"
                 :rules="maxLength(40)"
               />
             </v-col>
@@ -112,7 +111,8 @@ import { useActions, useGetters } from 'vuex-composition-helpers'
 import { useInputRules } from '@/composables'
 import { validateDocumentID } from '@/utils'
 // eslint-disable-next-line no-unused-vars
-import { MhrDocIdResponseIF } from '@/interfaces'
+import { AttnRefConfigIF, MhrDocIdResponseIF } from '@/interfaces'
+import { clientConfig, staffConfig } from '@/resources/attnRefConfigs'
 
 export default defineComponent({
   name: 'SubmittingParty',
@@ -123,10 +123,12 @@ export default defineComponent({
   props: {},
   setup (props, context) {
     const {
+      isRoleStaffReg,
       getMhrAttentionReferenceNum,
       getMhrRegistrationDocumentId,
       getMhrRegistrationValidationModel
     } = useGetters<any>([
+      'isRoleStaffReg',
       'getMhrAttentionReferenceNum',
       'getMhrRegistrationDocumentId',
       'getMhrRegistrationValidationModel'
@@ -153,7 +155,7 @@ export default defineComponent({
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
     const localState = reactive({
-      attentionReferenceNum: getMhrAttentionReferenceNum.value || '',
+      attentionReference: getMhrAttentionReferenceNum.value || '',
       documentId: getMhrRegistrationDocumentId.value || '',
       isDocumentIdValid: false,
       isRefNumValid: false,
@@ -188,6 +190,9 @@ export default defineComponent({
       uniqueDocIdError: computed(() => {
         // Manual error handling for Unique DocId Lookup
         return localState.displayDocIdError ? ['Must be unique number'] : []
+      }),
+      attnOrRefConfig: computed((): AttnRefConfigIF => {
+        return isRoleStaffReg.value ? staffConfig : clientConfig
       })
     })
 
@@ -214,7 +219,7 @@ export default defineComponent({
       await context.refs.documentIdForm.validate()
     })
 
-    watch(() => localState.attentionReferenceNum, (val: string) => {
+    watch(() => localState.attentionReference, (val: string) => {
       setMhrAttentionReferenceNum(val)
     })
 

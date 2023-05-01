@@ -91,7 +91,7 @@
 
           <v-row no-gutters class="px-6 py-7">
             <v-col cols="3">
-              <p class="side-header">Attention or<br>Reference Number</p>
+              <p class="side-header">Attention <span v-if="!isRoleStaffReg"> or<br>Reference Number</span></p>
             </v-col>
             <v-col cols="9">
               <p class="content ref-text">{{getMhrAttentionReferenceNum || '(Not Entered)'}}</p>
@@ -120,11 +120,13 @@ export default defineComponent({
   props: {},
   setup () {
     const {
+      isRoleStaffReg,
       getMhrRegistrationSubmittingParty,
       getMhrRegistrationDocumentId,
       getMhrAttentionReferenceNum,
       getMhrRegistrationValidationModel
     } = useGetters<any>([
+      'isRoleStaffReg',
       'getMhrRegistrationSubmittingParty',
       'getMhrRegistrationDocumentId',
       'getMhrAttentionReferenceNum',
@@ -170,6 +172,7 @@ export default defineComponent({
       RouteNames,
       addressSchema,
       MhrSectVal,
+      isRoleStaffReg,
       getMhrRegistrationSubmittingParty,
       getMhrRegistrationDocumentId,
       getMhrAttentionReferenceNum,
