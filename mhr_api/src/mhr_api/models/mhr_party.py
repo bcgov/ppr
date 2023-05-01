@@ -15,13 +15,17 @@
 from __future__ import annotations
 
 # from flask import current_app
+from sqlalchemy import event, text
 from sqlalchemy.dialects.postgresql import ENUM as PG_ENUM
-
-from mhr_api.models import utils as model_utils
 
 from .db import db
 from .address import Address  # noqa: F401 pylint: disable=unused-import
 from .type_tables import MhrPartyTypes, MhrOwnerStatusTypes
+
+
+NAME_KEY_QUERY = """
+    SELECT mhr_name_compressed_key(:actual_name)
+"""
 
 
 class MhrParty(db.Model):  # pylint: disable=too-many-instance-attributes
@@ -148,10 +152,8 @@ class MhrParty(db.Model):  # pylint: disable=too-many-instance-attributes
         party.status_type = MhrOwnerStatusTypes.ACTIVE
         if json_data.get('businessName'):
             party.business_name = json_data['businessName'].strip().upper()
-            party.compressed_name = model_utils.get_compressed_key(party.business_name)
         elif json_data.get('organizationName'):
             party.business_name = json_data['organizationName'].strip().upper()
-            party.compressed_name = model_utils.get_compressed_key(party.business_name)
         elif json_data.get('individualName'):
             party.last_name = json_data['individualName']['last'].strip().upper()
             party.first_name = json_data['individualName']['first'].strip().upper()
@@ -159,7 +161,6 @@ class MhrParty(db.Model):  # pylint: disable=too-many-instance-attributes
             if json_data['individualName'].get('middle'):
                 party.middle_name = json_data['individualName']['middle'].strip().upper()
                 name += ' ' + party.middle_name
-            party.compressed_name = model_utils.get_compressed_key(name)
         else:
             party.last_name = json_data['personName']['last'].strip().upper()
             party.first_name = json_data['personName']['first'].strip().upper()
@@ -167,7 +168,6 @@ class MhrParty(db.Model):  # pylint: disable=too-many-instance-attributes
             if json_data['personName'].get('middle'):
                 party.middle_name = json_data['personName']['middle'].strip().upper()
                 name += ' ' + party.middle_name
-            party.compressed_name = model_utils.get_compressed_key(name)
 
         if json_data.get('emailAddress'):
             party.email_id = json_data['emailAddress'].strip()
@@ -195,3 +195,21 @@ class MhrParty(db.Model):  # pylint: disable=too-many-instance-attributes
             parties.append(MhrParty.create_from_json(party, MhrPartyTypes.SUBMITTING, registration_id))
         # owners and owner groups here.
         return parties
+
+
+@event.listens_for(MhrParty, 'before_insert')
+def party_before_insert_listener(mapper,   # pylint: disable=unused-argument; don't use mapper
+                                 connection,
+                                 target: MhrParty):
+    """Set party compressed key value for searching."""
+    stmt = text(NAME_KEY_QUERY)
+    if target.business_name:
+        stmt = stmt.bindparams(actual_name=target.business_name)
+    else:
+        search_name: str = target.last_name + ' ' + target.first_name
+        if target.middle_name:
+            search_name += ' ' + target.middle_name
+        stmt = stmt.bindparams(actual_name=search_name)
+    result = connection.execute(stmt)
+    row = result.first()
+    target.compressed_name = str(row[0])

@@ -691,7 +691,7 @@ def test_create_new_from_json(session):
         assert party.change_registration_id > 0
         assert party.party_type in MhrPartyTypes
         assert party.status_type in MhrOwnerStatusTypes
-        assert party.compressed_name
+        assert not party.compressed_name
     assert registration.locations
     location = registration.locations[0]
     assert location.registration_id > 0
@@ -734,6 +734,11 @@ def test_save_new(session):
     json_data['documentId'] = '88878888'
     registration: MhrRegistration = MhrRegistration.create_new_from_json(json_data, 'PS12345')
     registration.save()
+    for party in registration.parties:
+        assert party.compressed_name
+    for group in registration.owner_groups:
+        for party in group.owners:
+            assert party.compressed_name
     mh_json = registration.new_registration_json
     assert mh_json
     reg_new = MhrRegistration.find_by_mhr_number(registration.mhr_number, 'PS12345')
@@ -903,6 +908,16 @@ def test_save_transfer(session, mhr_num, user_group, account_id):
                                                                               'userid',
                                                                               user_group)
     registration.save()
+    for party in registration.parties:
+        if not party.compressed_name:
+            current_app.logger.error(party.json)
+        assert party.compressed_name
+    for group in registration.owner_groups:
+        for party in group.owners:
+            if not party.compressed_name:
+                current_app.logger.error(party.json)
+            assert party.compressed_name
+
     reg_new = MhrRegistration.find_by_mhr_number(registration.mhr_number,
                                                  account_id,
                                                  False,

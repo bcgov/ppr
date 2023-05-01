@@ -350,7 +350,9 @@ class Report:  # pylint: disable=too-few-public-methods
         elif self._report_key == ReportTypes.MHR_REGISTRATION_COVER:
             self._report_data['regCover'] = report_utils.set_registration_cover(self._report_data)
             self._report_data['createDateTime'] = Report._to_report_datetime(self._report_data['createDateTime'])
-            self._report_data['documentDescription'] = TO_TRANSFER_DESC.get(self._report_data.get('registrationType'))
+            if str(self._report_data.get('registrationType', '')).startswith('TRAN'):
+                self._report_data['documentDescription'] = \
+                    TO_TRANSFER_DESC.get(self._report_data.get('registrationType'))
         elif self._report_key == ReportTypes.MHR_TRANSFER:
             self._report_data['documentDescription'] = TO_TRANSFER_DESC.get(self._report_data.get('registrationType'))
         else:

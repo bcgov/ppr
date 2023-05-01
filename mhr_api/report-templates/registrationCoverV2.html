@@ -77,7 +77,13 @@
         of the document registration date.
       </div>
       <div class="cover-data mt-4"><span class="cover-data-bold">Manufactured Home Registration Number:</span> {{ mhrNumber }}</div>
-      <div class="cover-data mt-4"><span class="cover-data-bold">Registration Type:</span> {{ documentDescription }}</div>
+      <div class="cover-data mt-4"><span class="cover-data-bold">Registration Type:</span>
+        {% if registrationType == 'MHREG' %}    
+          {{ documentDescription|title }}
+        {% else %}
+          {{ documentDescription }}
+        {% endif %}        
+      </div>
       <div class="cover-data"><span class="cover-data-bold">Document Registration Number:</span>
         {% if documentRegistrationNumber is defined and documentRegistrationNumber != '' %}
          {{ documentRegistrationNumber }}
