@@ -390,7 +390,7 @@ export const mutateMhrRegistrationDocumentId = (state: StateIF, value: string) =
 }
 
 export const mutateMhrAttentionReferenceNum = (state: StateIF, value) => {
-  state.stateModel.mhrRegistration.attentionReferenceNum = value
+  state.stateModel.mhrRegistration.attentionReference = value
 }
 
 export const mutateMhrLocation = (state: StateIF, { key, value }) => {

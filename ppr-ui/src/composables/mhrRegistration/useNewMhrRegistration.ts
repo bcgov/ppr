@@ -87,7 +87,7 @@ export const useNewMhrRegistration = () => {
         phoneExtension: ''
       },
       ownerGroups: [],
-      attentionReferenceNum: '',
+      attentionReference: '',
       isManualLocationInfo: false,
       location: {
         parkName: '',
@@ -174,7 +174,7 @@ export const useNewMhrRegistration = () => {
     // Set Document Id
     setMhrRegistrationDocumentId(draft.documentId)
     // Set attention
-    setMhrAttentionReferenceNum(draft.attentionReferenceNum)
+    setMhrAttentionReferenceNum(draft.attentionReference)
     // Set HomeOwners
     setMhrRegistrationHomeOwnerGroups(draft.ownerGroups)
     // Show groups for Tenants in Common
@@ -284,7 +284,7 @@ export const useNewMhrRegistration = () => {
     }
 
     if (getMhrAttentionReferenceNum.value) {
-      data.attentionReferenceNum = getMhrAttentionReferenceNum.value
+      data.attentionReference = getMhrAttentionReferenceNum.value
     }
 
     if (getMhrDraftNumber.value) {

@@ -11,7 +11,7 @@ export interface MhrRegistrationIF {
   declaredValue: string
   submittingParty: SubmittingPartyIF
   ownerGroups: MhrRegistrationHomeOwnerGroupIF[]
-  attentionReferenceNum: string
+  attentionReference: string
   isManualLocationInfo: boolean
   location: MhrRegistrationHomeLocationIF
   description: MhrRegistrationDescriptionIF
@@ -59,7 +59,7 @@ export interface NewMhrRegistrationApiIF {
   ownerGroups: MhrRegistrationHomeOwnerGroupIF[]
   location: MhrRegistrationHomeLocationIF
   description: MhrRegistrationDescriptionIF
-  attentionReferenceNum?: string
+  attentionReference?: string
   isManualLocationInfo?: boolean
   notes?: [
     {

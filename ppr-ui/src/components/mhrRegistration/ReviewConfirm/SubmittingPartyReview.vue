@@ -91,7 +91,7 @@
 
           <v-row no-gutters class="px-6 py-7">
             <v-col cols="3">
-              <p class="side-header">Attention or<br>Reference Number</p>
+              <p class="side-header">{{ attnOrRefConfig.title }}</p>
             </v-col>
             <v-col cols="9">
               <p class="content ref-text">{{getMhrAttentionReferenceNum || '(Not Entered)'}}</p>
@@ -111,6 +111,8 @@ import { BaseAddress } from '@/composables/address'
 import { PartyAddressSchema } from '@/schemas'
 import { toDisplayPhone } from '@/utils'
 import { useMhrValidations } from '@/composables'
+import { AttnRefConfigIF } from '@/interfaces'
+import { clientConfig, staffConfig } from '@/resources/attnRefConfigs'
 
 export default defineComponent({
   name: 'SubmittingPartyReview',
@@ -120,11 +122,13 @@ export default defineComponent({
   props: {},
   setup () {
     const {
+      isRoleStaffReg,
       getMhrRegistrationSubmittingParty,
       getMhrRegistrationDocumentId,
       getMhrAttentionReferenceNum,
       getMhrRegistrationValidationModel
     } = useGetters<any>([
+      'isRoleStaffReg',
       'getMhrRegistrationSubmittingParty',
       'getMhrRegistrationDocumentId',
       'getMhrAttentionReferenceNum',
@@ -140,7 +144,10 @@ export default defineComponent({
       address: computed(() => getMhrRegistrationSubmittingParty.value.address),
       businessName: computed(() => getMhrRegistrationSubmittingParty.value.businessName),
       personName: computed(() => getMhrRegistrationSubmittingParty.value.personName),
-      hasAddress: computed(() => !Object.values(localState.address).every(val => !val))
+      hasAddress: computed(() => !Object.values(localState.address).every(val => !val)),
+      attnOrRefConfig: computed((): AttnRefConfigIF => {
+        return isRoleStaffReg.value ? staffConfig : clientConfig
+      })
     })
 
     const addressSchema = PartyAddressSchema
@@ -170,6 +177,7 @@ export default defineComponent({
       RouteNames,
       addressSchema,
       MhrSectVal,
+      isRoleStaffReg,
       getMhrRegistrationSubmittingParty,
       getMhrRegistrationDocumentId,
       getMhrAttentionReferenceNum,

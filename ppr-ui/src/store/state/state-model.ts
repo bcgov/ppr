@@ -188,7 +188,7 @@ export const stateModel: StateModelIF = {
     },
     ownerGroups: [],
     isManualLocationInfo: false,
-    attentionReferenceNum: '',
+    attentionReference: '',
     location: {
       parkName: '',
       pad: '',

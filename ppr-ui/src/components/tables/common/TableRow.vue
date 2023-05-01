@@ -43,7 +43,7 @@
           <!-- child drafts will sometimes show outside their base reg during the sort -->
           <div
             v-if="isChild || (isDraft(item) && item.baseRegistrationNumber)"
-            :class="(isChild && !isTransAffi(item.registrationType))
+            :class="!(isChild && hasFrozenParentReg(item) && (isTransAffi(item.registrationType) || isDraft(item)))
             ? 'pl-9'
             : 'pl-1'"
           >

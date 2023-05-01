@@ -626,7 +626,7 @@ export const getMhrRegistrationDocumentId = (state: StateIF): string => {
 }
 
 export const getMhrAttentionReferenceNum = (state: StateIF): any => {
-  return state.stateModel.mhrRegistration.attentionReferenceNum
+  return state.stateModel.mhrRegistration.attentionReference
 }
 
 export const getMhrRegistrationLocation = (state: StateIF): MhrRegistrationHomeLocationIF => {
