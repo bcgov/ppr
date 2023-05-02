@@ -353,11 +353,12 @@ class Report:  # pylint: disable=too-few-public-methods
             if str(self._report_data.get('registrationType', '')).startswith('TRAN'):
                 self._report_data['documentDescription'] = \
                     TO_TRANSFER_DESC.get(self._report_data.get('registrationType'))
-        elif self._report_key == ReportTypes.MHR_TRANSFER:
-            self._report_data['documentDescription'] = TO_TRANSFER_DESC.get(self._report_data.get('registrationType'))
         else:
             if self._report_key == ReportTypes.SEARCH_DETAIL_REPORT:
                 self._set_search_additional_message()
+            elif self._report_key == ReportTypes.MHR_TRANSFER:
+                self._report_data['documentDescription'] = \
+                    TO_TRANSFER_DESC.get(self._report_data.get('registrationType'))
             self._set_date_times()
             self._set_addresses()
             self._set_owner_groups()
