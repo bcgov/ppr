@@ -40,7 +40,7 @@ export const mockedExecutor: MhrRegistrationHomeOwnerIF = {
     middle: 'A',
     last: 'Smith'
   },
-  suffix: 'Sr.',
+  suffix: 'Executor of the will of John Smith',
   phoneNumber: '(545) 333-2211',
   phoneExtension: '1234',
   partyType: HomeOwnerPartyTypes.EXECUTOR,

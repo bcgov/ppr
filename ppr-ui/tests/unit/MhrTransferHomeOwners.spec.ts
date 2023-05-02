@@ -581,6 +581,49 @@ describe('Home Owners', () => {
     ).toBe(HomeTenancyTypes.NA)
   })
 
+  it('TRANS Sale or Gift Flow: validations for mixed owners types in the table', async () => {
+    // reset transfer type
+    await selectTransferType(null)
+
+    await selectTransferType(ApiTransferTypes.SALE_OR_GIFT)
+
+    const homeOwnerGroup: MhrRegistrationHomeOwnerGroupIF[] = [
+      {
+        groupId: 1,
+        owners: [
+          {
+            ...mockedExecutor,
+            id: '1',
+            partyType: HomeOwnerPartyTypes.EXECUTOR
+          } as MhrRegistrationHomeOwnerIF,
+        {
+          ...mockedPerson,
+          id: '2',
+          partyType: HomeOwnerPartyTypes.OWNER_IND,
+          action: ActionTypes.ADDED
+        } as MhrRegistrationHomeOwnerIF],
+        type: ''
+      }
+    ]
+    await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerGroup)
+
+    const homeOwners = wrapper.findComponent(HomeOwners)
+    const groupError = homeOwners.find(getTestId('invalid-group-msg'))
+
+    expect(groupError.text()).toContain(transfersErrors.hasMixedOwnerTypes)
+
+    // add one more owner to the second group to trigger a new error message
+    homeOwnerGroup.push({
+      groupId: 2,
+      owners: [mockedPerson],
+      type: ''
+    } as MhrRegistrationHomeOwnerGroupIF)
+
+    await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerGroup)
+
+    expect(groupError.text()).toContain(transfersErrors.hasMixedOwnerTypesInGroup)
+  })
+
   it('TRANS WILL Flow: validations with sole Owner in one group', async () => {
     // reset transfer type
     await selectTransferType(null)
@@ -772,8 +815,6 @@ describe('Home Owners', () => {
 
     // setup transfer type to test
     const TRANSFER_TYPE = ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL
-
-    // const homeOwnerGroup: MhrRegistrationHomeOwnerGroupIF[] = mockMhrTransferCurrentHomeOwnerGroup
 
     const homeOwnerGroup: MhrRegistrationHomeOwnerGroupIF[] = [
       { groupId: 1, owners: [mockedPerson, mockedPerson2], type: '' },
