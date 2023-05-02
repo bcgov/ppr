@@ -89,7 +89,9 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
 
   const getHomeTenancyType = (): HomeTenancyTypes => {
     // check if there are any groups with mixed owner types for Sale or Gift transfers
-    if (isMhrTransfer && getMhrTransferType.value?.transferType === ApiTransferTypes.SALE_OR_GIFT) {
+    if (isMhrTransfer &&
+      getMhrTransferType.value?.transferType === ApiTransferTypes.SALE_OR_GIFT &&
+      getMhrTransferHomeOwnerGroups.value.length === 1) {
       const hasMixedOwners = !getMhrTransferHomeOwnerGroups.value
         .every((group: MhrRegistrationHomeOwnerGroupIF) => {
           const ownerTypes = group.owners
