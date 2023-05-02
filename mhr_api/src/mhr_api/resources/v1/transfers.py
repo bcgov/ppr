@@ -25,7 +25,8 @@ from mhr_api.exceptions import BusinessException, DatabaseException
 from mhr_api.services.authz import authorized_role, is_staff, is_all_staff_account, get_group, is_reg_staff_account
 from mhr_api.services.authz import TRANSFER_SALE_BENEFICIARY, TRANSFER_DEATH_JT
 from mhr_api.models import MhrRegistration
-from mhr_api.models import registration_utils as model_reg_utils
+from mhr_api.models import registration_utils as model_reg_utils, utils as model_utils
+from mhr_api.models.type_tables import MhrRegistrationStatusTypes
 from mhr_api.reports.v2.report_utils import ReportTypes
 from mhr_api.resources import utils as resource_utils, registration_utils as reg_utils
 from mhr_api.services.payment import TransactionTypes
@@ -99,7 +100,10 @@ def post_transfers(mhr_number: str):  # pylint: disable=too-many-return-statemen
         return resource_utils.default_exception_response(default_exception)
 
 
-def setup_report(registration: MhrRegistration, response_json, current_reg: MhrRegistration, account_id: str):
+def setup_report(registration: MhrRegistration,  # pylint: disable=too-many-locals
+                 response_json,
+                 current_reg: MhrRegistration,
+                 account_id: str):
     """Include all active owners in the transfer report request data and add it to the queue."""
     add_groups = response_json.get('addOwnerGroups')
     current_reg.current_view = True
@@ -120,6 +124,10 @@ def setup_report(registration: MhrRegistration, response_json, current_reg: MhrR
         if not added:
             new_groups.append(add_group)
     response_json['addOwnerGroups'] = new_groups
+    # Report setup is current view except for FROZEN status: update report data.
+    status: str = response_json.get('status')
+    if status == model_utils.STATUS_FROZEN:
+        response_json['status'] = MhrRegistrationStatusTypes.ACTIVE
     if is_reg_staff_account(account_id):
         token = g.jwt_oidc_token_info
         username: str = token.get('firstname', '') + ' ' + token.get('lastname', '')
@@ -129,3 +137,4 @@ def setup_report(registration: MhrRegistration, response_json, current_reg: MhrR
     else:
         reg_utils.enqueue_registration_report(registration, response_json, ReportTypes.MHR_TRANSFER)
     response_json['addOwnerGroups'] = add_groups
+    response_json['status'] = status
