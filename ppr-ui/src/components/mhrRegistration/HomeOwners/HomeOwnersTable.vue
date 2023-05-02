@@ -84,6 +84,15 @@
                   {{ transfersErrors.allOwnersHaveDeathCerts[getMhrTransferType.transferType] }}
                 </span>
               </span>
+              <!-- Transfer Sale or Gift error messages -->
+              <span v-else-if="isTransferDueToSaleOrGift && TransSaleOrGift.hasMixedOwnersInGroup(row.item.groupId)">
+                <span v-if="getMhrTransferHomeOwnerGroups.length === 1">
+                  {{ transfersErrors.hasMixedOwnerTypes }}
+                </span>
+                <span v-else>
+                  {{ transfersErrors.hasMixedOwnerTypesInGroup }}
+                </span>
+              </span>
               <!-- Other error messages -->
               <span v-else>
                 Group must contain at least one owner.
@@ -477,11 +486,13 @@ export default defineComponent({
       isDisabledForWillChanges,
       isCurrentOwner,
       getCurrentOwnerStateById,
+      isTransferDueToSaleOrGift,
       isTransferToSurvivingJointTenant,
       isTransferToExecutorProbateWill,
       isTransferToExecutorUnder25Will,
       groupHasRemovedAllCurrentOwners,
       moveCurrentOwnersToPreviousOwners,
+      TransSaleOrGift,
       TransWill,
       getMhrTransferType
     } = useTransferOwners(!props.isMhrTransfer)
@@ -515,7 +526,9 @@ export default defineComponent({
       isValidDeathCertificate: false,
       showTableError: computed((): boolean => {
         // For certain Transfers, we only need to check for global changes and do not show table error in other cases
-        if (isTransferToExecutorProbateWill.value || isTransferToExecutorUnder25Will.value) {
+        if (isTransferToExecutorProbateWill.value ||
+          isTransferToExecutorUnder25Will.value ||
+          isTransferDueToSaleOrGift.value) {
           return (props.validateTransfer || localState.reviewedOwners) &&
             (props.isMhrTransfer && !hasUnsavedChanges.value)
         }
@@ -564,6 +577,10 @@ export default defineComponent({
         const isInvalid = !(hasRemovedAllOwners && hasValidDocs && hasExecutors && hasOwnersWithoutDeathCert)
 
         return hasRemovedOwners && isInvalid
+      }
+
+      if (isTransferDueToSaleOrGift.value && props.validateTransfer) {
+        return TransSaleOrGift.hasMixedOwnersInGroup(groupId)
       }
 
       return props.validateTransfer && !isValidDeceasedOwnerGroup(groupId) && !localState.showTableError
@@ -659,17 +676,23 @@ export default defineComponent({
       return hasNoOwners && index === 0
     }
 
-    // validate group for Will Transfers
+    // validate group for different Transfers types
     const isTransferGroupValid = (groupId: number, index) => {
-      return (isTransferToExecutorProbateWill.value || isTransferToExecutorUnder25Will.value) &&
-      (
-        index === 0 &&
-        hasUnsavedChanges.value &&
-        (TransWill.hasSomeOwnersRemoved(groupId) || TransWill.hasAddedExecutorsInGroup(groupId))
-      ) &&
-      !(TransWill.hasAddedExecutorsInGroup(groupId) &&
-        TransWill.hasAllCurrentOwnersRemoved(groupId) &&
-        !TransWill.isAllGroupOwnersWithDeathCerts(groupId))
+      if (isTransferToExecutorProbateWill.value || isTransferToExecutorUnder25Will.value) {
+        return (
+          index === 0 &&
+          hasUnsavedChanges.value &&
+          (TransWill.hasSomeOwnersRemoved(groupId) || TransWill.hasAddedExecutorsInGroup(groupId))
+        ) &&
+        !(TransWill.hasAddedExecutorsInGroup(groupId) &&
+          TransWill.hasAllCurrentOwnersRemoved(groupId) &&
+          !TransWill.isAllGroupOwnersWithDeathCerts(groupId))
+      }
+      if (isTransferDueToSaleOrGift.value) {
+        return index === 0 &&
+          hasUnsavedChanges.value &&
+          TransSaleOrGift.hasMixedOwnersInGroup(groupId)
+      }
     }
 
     const removeOwnerHandler = (owner: MhrRegistrationHomeOwnerIF): void => {
@@ -716,6 +739,7 @@ export default defineComponent({
         hasMinimumGroups() &&
         localState.isValidAllocation &&
         !localState.hasGroupsWithNoOwners &&
+        (isTransferDueToSaleOrGift.value ? !TransSaleOrGift.hasMixedOwners.value : true) &&
         (isTransferToSurvivingJointTenant.value ? localState.isValidDeathCertificate : true) &&
         ((isTransferToExecutorProbateWill.value || isTransferToExecutorUnder25Will.value)
           ? TransWill.isValidTransfer.value : true)
@@ -766,6 +790,7 @@ export default defineComponent({
       isDisabledForSoGChanges,
       isDisabledForSJTChanges,
       isDisabledForWillChanges,
+      isTransferDueToSaleOrGift,
       isTransferToExecutorProbateWill,
       isTransferToExecutorUnder25Will,
       isCurrentOwner,
@@ -778,6 +803,7 @@ export default defineComponent({
       isInvalidOwnerGroup,
       HomeOwnerPartyTypes,
       SupportingDocumentsOptions,
+      TransSaleOrGift,
       TransWill,
       getMhrInfoValidation,
       isTransferGroupValid,

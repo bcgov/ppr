@@ -14,7 +14,7 @@ import {
   MhrRegistrationHomeOwnerIF
 } from '@/interfaces'
 import { computed, reactive, toRefs } from '@vue/composition-api'
-import { isEqual, find } from 'lodash'
+import { isEqual, find, uniq } from 'lodash'
 import { normalizeObject } from '@/utils'
 import { useHomeOwners, useMhrInformation } from '@/composables'
 import { transferSupportingDocumentTypes } from '@/resources/'
@@ -298,6 +298,21 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     return false
   }
 
+  // Transfer Due to Sale or Gift flow and all the related conditions/logic
+  const TransSaleOrGift: any = {
+    hasMixedOwners: computed((): boolean => {
+      return getMhrTransferHomeOwnerGroups.value
+        .every((group: MhrRegistrationHomeOwnerGroupIF) => !TransSaleOrGift.hasMixedOwnersInGroup(group.groupId))
+    }),
+    hasMixedOwnersInGroup: (groupId: number): boolean => {
+      const ownerTypes: HomeOwnerPartyTypes[] = getMhrTransferHomeOwnerGroups.value
+        .find(group => group.groupId === groupId).owners
+        .filter(owner => owner.action !== ActionTypes.REMOVED)
+        .map(owner => owner.partyType)
+      return uniq(ownerTypes).length > 1
+    }
+  }
+
   // Transfer Will flow and all the related conditions/logic
   const TransWill: any = {
     // based on the current/active transfer type, get the corresponding supporting document
@@ -570,6 +585,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     isDisabledForSoGChanges,
     isDisabledForSJTChanges,
     isDisabledForWillChanges,
+    TransSaleOrGift,
     TransWill, // Transfer Due to Death - Grant of Probate (with Will)
     TransAffidavit, // Transfer to Executor under $25k - Affidavit
     isTransAffi,

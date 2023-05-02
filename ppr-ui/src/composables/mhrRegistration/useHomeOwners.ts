@@ -12,7 +12,7 @@ import { useActions, useGetters } from 'vuex-composition-helpers'
 import { ActionTypes, HomeTenancyTypes, HomeOwnerPartyTypes, ApiTransferTypes } from '@/enums'
 import { MhrCompVal, MhrSectVal } from '@/composables/mhrRegistration/enums'
 import { useMhrValidations } from '@/composables'
-import { find, findIndex, remove, set } from 'lodash'
+import { find, findIndex, remove, set, uniq } from 'lodash'
 
 const DEFAULT_GROUP_ID = 1
 
@@ -88,6 +88,21 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
   }
 
   const getHomeTenancyType = (): HomeTenancyTypes => {
+    // check if there are any groups with mixed owner types for Sale or Gift transfers
+    if (isMhrTransfer && getMhrTransferType.value?.transferType === ApiTransferTypes.SALE_OR_GIFT) {
+      const hasMixedOwners = !getMhrTransferHomeOwnerGroups.value
+        .every((group: MhrRegistrationHomeOwnerGroupIF) => {
+          const ownerTypes = group.owners
+            .filter(owner => owner.action !== ActionTypes.REMOVED)
+            .map(owner => owner.partyType)
+          return uniq(ownerTypes).length < 2
+        })
+
+      if (hasMixedOwners) {
+        return HomeTenancyTypes.NA
+      }
+    }
+
     // Groups
     const groups = getTransferOrRegistrationHomeOwnerGroups().filter(owner => owner.action !== ActionTypes.REMOVED)
 

@@ -20,5 +20,9 @@ export const transfersErrors = {
       'One of the deceased owners must have a Grant of Probate with Will.',
     [ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL]:
       'One of the deceased owners must have an Affidavit of Executor with Death Certificate.'
-  }
+  },
+
+  // Sale or Gift Transfer
+  hasMixedOwnerTypes: 'Cannot have a mix of owner, executor, administrator and bankruptcy trustee roles.',
+  hasMixedOwnerTypesInGroup: 'Group cannot have a mix of owner, executor, administrator and bankruptcy trustee roles.'
 }
