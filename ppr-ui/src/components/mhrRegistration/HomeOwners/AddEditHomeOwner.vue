@@ -699,12 +699,12 @@ export default defineComponent({
               isTransferDueToSaleOrGift.value &&
               isFrozenMhr.value) {
             // Find the GroupId with an Executor
-            localState.ownerGroupId = localState.owner.groupId
+            localState.ownerGroupId = TransAffidavit.getGroupIdWithExecutor()
           }
 
           addOwnerToTheGroup(
             localState.owner as MhrRegistrationHomeOwnerIF,
-            localState.ownerGroupId = TransAffidavit.getGroupIdWithExecutor()
+            localState.ownerGroupId
           )
         }
 
