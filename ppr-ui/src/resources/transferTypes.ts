@@ -78,13 +78,17 @@ export const StaffTransferTypes: Array<TransferTypeSelectIF> = [
   {
     divider: false,
     selectDisabled: false,
-    transferType: ApiTransferTypes.TO_ADMIN_PROBATE_NO_WILL,
-    textLabel: UITransferTypes.TO_ADMIN_PROBATE_NO_WILL,
+    transferType: ApiTransferTypes.TO_ADMIN_NO_WILL,
+    textLabel: UITransferTypes.TO_ADMIN_NO_WILL,
     group: 2,
     tooltip: {
       title: 'Supporting Documents Required',
-      bullets: ['Original court certified true copy of Grant of Administration',
-        'Affidavit of Administration with List of Assets and Liabilities', 'Transfer form', 'Transfer fee']
+      bullets: ['Ownership Transfer or Change form',
+        'Certified true copy of Grant of Administration issued by the court',
+        'Affidavit of Administration with list of Assets and Liabilities',
+        'Original or certified copy of death certificate issued from Canada or the United States ' +
+          'for deceased joint tenants, if any, except for the person who last died.'
+      ]
     }
   }
 ]

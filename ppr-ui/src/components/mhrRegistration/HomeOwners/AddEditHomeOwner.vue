@@ -28,7 +28,9 @@
                 class="owner-radio pr-4"
                 label="Owner"
                 active-class="selected-radio"
-                :disabled="isTransferToExecutorProbateWill || isTransferToExecutorUnder25Will"
+                :disabled="isTransferToExecutorProbateWill ||
+                  isTransferToExecutorUnder25Will ||
+                  isTransferToAdminNoWill"
                 v-model="HomeOwnerPartyTypes.OWNER_IND"
               />
               <v-tooltip
@@ -44,7 +46,7 @@
                     id="executor-option"
                     class="executor-radio px-4"
                     active-class="selected-radio"
-                    :disabled="disableNameFields || isFrozenMhr"
+                    :disabled="disableNameFields || isTransferToAdminNoWill || isFrozenMhr"
                     v-model="HomeOwnerPartyTypes.EXECUTOR"
                    >
                     <template v-slot:label><div :class="{'underline' : !disableNameFields}">Executor</div></template>
@@ -66,7 +68,10 @@
                 class="administrator-radio pl-4"
                 label="Administrator"
                 active-class="selected-radio"
-                :disabled="isTransferDueToDeath || isTransferToExecutorProbateWill || isFrozenMhr"
+                :disabled="isTransferToSurvivingJointTenant ||
+                  isTransferToExecutorUnder25Will ||
+                  isTransferToExecutorProbateWill ||
+                  isFrozenMhr"
                 v-model="HomeOwnerPartyTypes.ADMINISTRATOR"
               />
             </v-radio-group>
@@ -291,7 +296,8 @@
           <v-row>
             <v-col class="col">
               <v-tooltip
-                :disabled="owner.partyType !== HomeOwnerPartyTypes.EXECUTOR"
+                :disabled="owner.partyType !== HomeOwnerPartyTypes.EXECUTOR &&
+                  owner.partyType !== HomeOwnerPartyTypes.ADMINISTRATOR"
                 right
                 content-class="right-tooltip pa-5"
                 transition="fade-transition"
@@ -314,7 +320,7 @@
                     :readonly="disableNameFields"
                   />
                 </template>
-                  {{ isMhrTransfer && transfersContent.executorTooltip[getMhrTransferType.transferType] }}
+                  {{ isMhrTransfer && transfersContent.additionalNameTooltip[getMhrTransferType.transferType] }}
               </v-tooltip>
             </v-col>
           </v-row>
@@ -533,8 +539,10 @@ export default defineComponent({
       isCurrentOwner,
       isTransferDueToDeath,
       isTransferDueToSaleOrGift,
+      isTransferToSurvivingJointTenant,
       isTransferToExecutorProbateWill,
       isTransferToExecutorUnder25Will,
+      isTransferToAdminNoWill,
       hasCurrentOwnerChanges,
       disableNameFields,
       TransWill,
@@ -585,6 +593,10 @@ export default defineComponent({
       TransWill.hasDeletedOwnersWithProbateGrantOrAffidavit() &&
       !props.editHomeOwner) {
       TransWill.prefillOwnerAsExecutor(defaultHomeOwner)
+    }
+
+    if (isTransferToAdminNoWill.value) {
+      defaultHomeOwner.partyType = HomeOwnerPartyTypes.ADMINISTRATOR
     }
 
     if (isFrozenMhr.value) {
@@ -793,8 +805,10 @@ export default defineComponent({
       MhrSectVal,
       isCurrentOwner,
       isTransferDueToDeath,
+      isTransferToSurvivingJointTenant,
       isTransferToExecutorProbateWill,
       isTransferToExecutorUnder25Will,
+      isTransferToAdminNoWill,
       disableNameFields,
       HomeOwnerPartyTypes,
       getMhrTransferType,

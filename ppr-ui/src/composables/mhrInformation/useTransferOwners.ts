@@ -70,7 +70,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       // transfers types where Owner Groups cannot have the 'Deceased' owners
       // therefore Will Transfer type is not applicable
       ApiTransferTypes.SURVIVING_JOINT_TENANT,
-      ApiTransferTypes.TO_ADMIN_PROBATE_NO_WILL,
+      ApiTransferTypes.TO_ADMIN_NO_WILL,
       ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL,
       ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL
     ].includes(getMhrTransferType.value?.transferType)
@@ -93,6 +93,11 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     return getMhrTransferType.value?.transferType === ApiTransferTypes.SALE_OR_GIFT
   })
 
+  /** Returns true when the selected transfer type is a 'SURVIVING_JOINT_TENANT' scenario **/
+  const isTransferToSurvivingJointTenant = computed((): boolean => {
+    return getMhrTransferType.value?.transferType === ApiTransferTypes.SURVIVING_JOINT_TENANT
+  })
+
   /** Returns true when the selected transfer type is a 'TO_EXECUTOR_PROBATE_WILL' scenario **/
   const isTransferToExecutorProbateWill = computed((): boolean => {
     return getMhrTransferType.value?.transferType === ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL
@@ -103,15 +108,15 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     return getMhrTransferType.value?.transferType === ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL
   })
 
+  /** Returns true when the selected transfer type is a 'TO_ADMIN_NO_WILL' scenario **/
+  const isTransferToAdminNoWill = computed((): boolean => {
+    return getMhrTransferType.value?.transferType === ApiTransferTypes.TO_ADMIN_NO_WILL
+  })
+
   /** Returns true when the passed transfer type is a 'TO_EXECUTOR_PROBATE_WILL' type **/
   const isTransAffi = (type: ApiTransferTypes): boolean => {
     return type === ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL
   }
-
-  /** Returns true when the selected transfer type is a 'SURVIVING_JOINT_TENANT' scenario **/
-  const isTransferToSurvivingJointTenant = computed((): boolean => {
-    return getMhrTransferType.value?.transferType === ApiTransferTypes.SURVIVING_JOINT_TENANT
-  })
 
   /** Returns true when Add/Edit Owner name fields should be disabled **/
   const disableNameFields = computed((): boolean => {
@@ -135,8 +140,11 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
 
   /** Conditionally show Grant of Probate with Will supporting options based on Transfer Type **/
   const showSupportingDocuments = (): boolean => {
-    return getMhrTransferType.value?.transferType === ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL ||
-      getMhrTransferType.value?.transferType === ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL
+    return [
+      ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL,
+      ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL,
+      ApiTransferTypes.TO_ADMIN_NO_WILL
+    ].includes(getMhrTransferType.value?.transferType)
   }
 
   /** Conditionally Enable HomeOwner Changes based on Transfer Type **/
@@ -148,7 +156,8 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       case ApiTransferTypes.SALE_OR_GIFT:
       case ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL:
       case ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL:
-        return true // Always enable for Sale or Gift
+      case ApiTransferTypes.TO_ADMIN_NO_WILL:
+        return true // Always enable for above transfer types
       case ApiTransferTypes.SURVIVING_JOINT_TENANT:
         // Check for joint tenancy (at least two owners who are not executors, trustees or admins)
         return isJointTenancyStructure.value
@@ -166,6 +175,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       case ApiTransferTypes.SALE_OR_GIFT:
       case ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL:
       case ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL:
+      case ApiTransferTypes.TO_ADMIN_NO_WILL:
         return true
       case ApiTransferTypes.SURVIVING_JOINT_TENANT:
         return false // Disable for Surviving Joint Tenants
@@ -200,7 +210,8 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       case ApiTransferTypes.SALE_OR_GIFT:
       case ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL:
       case ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL:
-        return true // Always enable for Sale or Gift and Executor Will
+      case ApiTransferTypes.TO_ADMIN_NO_WILL:
+        return true // Always enable for above transfer types
       case ApiTransferTypes.SURVIVING_JOINT_TENANT:
         // Check for joint tenancy (at least two owners who are not executors, trustees or admins)
         return owner.type === ApiHomeTenancyTypes.JOINT
@@ -236,7 +247,8 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     switch (getMhrTransferType.value?.transferType) {
       case ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL:
       case ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL:
-        return false // Disable for Grant of Probate with Will
+      case ApiTransferTypes.TO_ADMIN_NO_WILL:
+        return false // Disable for above transfer types
       case ApiTransferTypes.SALE_OR_GIFT:
         return getMhrInformation.value.statusType !== MhApiStatusTypes.FROZEN
       default:
@@ -597,6 +609,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     isTransferToSurvivingJointTenant,
     isTransferToExecutorProbateWill,
     isTransferToExecutorUnder25Will,
+    isTransferToAdminNoWill,
     disableNameFields,
     isJointTenancyStructure,
     getCurrentOwnerStateById,

@@ -857,4 +857,30 @@ describe('Home Owners', () => {
 
     expect(groupError.text()).toContain(transfersErrors.ownersMustBeDeceased)
   })
+
+  it('TRANS ADMIN No Flow: display Supporting Document component for deleted Owner', async () => {
+    // reset transfer type
+    await selectTransferType(null)
+    const TRANSFER_TYPE = ApiTransferTypes.TO_ADMIN_NO_WILL
+
+    const homeOwnerGroup: MhrRegistrationHomeOwnerGroupIF[] = [{ groupId: 1, owners: [mockedPerson], type: '' }]
+
+    await store.dispatch('setMhrTransferCurrentHomeOwnerGroups', homeOwnerGroup)
+    await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerGroup)
+
+    await selectTransferType(TRANSFER_TYPE)
+
+    const homeOwners = wrapper.findComponent(HomeOwners)
+    // delete the sole owner
+    await homeOwners.find(getTestId('table-delete-btn')).trigger('click')
+
+    const supportingDocumentsComponent = wrapper.findComponent(SupportingDocuments)
+    expect(supportingDocumentsComponent.isVisible()).toBeTruthy()
+
+    expect(supportingDocumentsComponent.text()).toContain(transferSupportingDocuments[TRANSFER_TYPE].optionOne.text)
+    expect(supportingDocumentsComponent.text()).toContain(transferSupportingDocuments[TRANSFER_TYPE].optionTwo.text)
+
+    await supportingDocumentsComponent.find(getTestId('supporting-doc-option-one')).trigger('click')
+    expect(supportingDocumentsComponent.text()).toContain(transferSupportingDocuments[TRANSFER_TYPE].optionOne.note)
+  })
 })

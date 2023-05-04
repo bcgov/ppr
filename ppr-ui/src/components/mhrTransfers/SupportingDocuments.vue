@@ -179,6 +179,7 @@ export default defineComponent({
     border-top: 1px solid $gray3;
     margin-top: 35px;
     padding-top: 35px;
+    white-space: normal;
   }
 
   .supporting-doc-two {
