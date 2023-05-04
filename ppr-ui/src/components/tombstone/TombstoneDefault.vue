@@ -28,7 +28,7 @@
               <v-tooltip top content-class="top-tooltip pa-5" nudge-left="30" transition="fade-transition">
                 <template  v-slot:activator="{ on, attrs }">
                   <a :href="'https://www2.gov.bc.ca/gov/content/employment-business/business/managing-a-business/'
-                           +'permits-licences/news-updates/modernization-updates/modernization-resources#ppr'"
+                           +'permits-licences/news-updates/modernization-updates/modernization-resources#userguideacct'"
                     class="text-decoration-none"
                     target="_blank"
                     rel="noopener noreferrer">
