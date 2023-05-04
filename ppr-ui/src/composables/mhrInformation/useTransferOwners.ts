@@ -301,15 +301,16 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
   // Transfer Due to Sale or Gift flow and all the related conditions/logic
   const TransSaleOrGift: any = {
     hasMixedOwners: computed((): boolean => {
-      return getMhrTransferHomeOwnerGroups.value
-        .every((group: MhrRegistrationHomeOwnerGroupIF) => !TransSaleOrGift.hasMixedOwnersInGroup(group.groupId))
+      return !getMhrTransferHomeOwnerGroups.value
+        .every((group: MhrRegistrationHomeOwnerGroupIF) =>
+          !TransSaleOrGift.hasMixedOwnersInGroup(group.groupId))
     }),
     hasMixedOwnersInGroup: (groupId: number): boolean => {
       const ownerTypes: HomeOwnerPartyTypes[] = getMhrTransferHomeOwnerGroups.value
         .find(group => group.groupId === groupId).owners
         .filter(owner => owner.action !== ActionTypes.REMOVED)
         .map(owner => owner.partyType)
-      return uniq(ownerTypes).length > 1
+      return ownerTypes.length === 1 ? false : uniq(ownerTypes).length > 1
     }
   }
 

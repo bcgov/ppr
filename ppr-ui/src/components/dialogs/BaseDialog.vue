@@ -21,12 +21,13 @@
           </v-btn>
         </v-col>
       </v-row>
-      <div class="pt-7">
+      <div class="pt-7 action-buttons">
         <!-- can be replaced with <template v-slot:buttons> -->
         <slot name="buttons">
           <dialog-buttons
             :setAcceptText="options.acceptText"
             :setCancelText="options.cancelText"
+            :reverseButtons="reverseActionButtons"
             @proceed="proceed($event)"
           />
         </slot>
@@ -58,7 +59,11 @@ export default defineComponent({
   props: {
     setAttach: { default: '' },
     setDisplay: { default: false },
-    setOptions: Object as () => DialogOptionsIF
+    setOptions: Object as () => DialogOptionsIF,
+    reverseActionButtons: {
+      type: Boolean,
+      default: false
+    }
   },
   emits: ['proceed'],
   setup (props, { emit }) {
