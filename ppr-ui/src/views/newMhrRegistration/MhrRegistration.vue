@@ -111,10 +111,12 @@ export default defineComponent({
 
     const {
       setUnsavedChanges,
-      setRegTableNewItem
+      setRegTableNewItem,
+      setMhrTransferType
     } = useActions<any>([
       'setUnsavedChanges',
-      'setRegTableNewItem'
+      'setRegTableNewItem',
+      'setMhrTransferType'
     ])
 
     const {
@@ -198,6 +200,7 @@ export default defineComponent({
       }
 
       // Reset validations
+      setMhrTransferType(null)
       setValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_STEPS, false)
       setValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_APP, false)
 

@@ -550,7 +550,7 @@ export async function updateMhrDraft (draftId: string, type: APIMhrTypes, draft:
     return draft
   }
   const payload = {
-    type: APIMhrTypes,
+    type: type,
     draftNumber: draftId,
     registration: draft
   }
