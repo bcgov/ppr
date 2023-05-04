@@ -250,7 +250,7 @@ export default defineComponent({
         case ApiTransferTypes.SALE_OR_GIFT:
         case ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL:
         case ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL:
-        case ApiTransferTypes.TO_ADMIN_PROBATE_NO_WILL:
+        case ApiTransferTypes.TO_ADMIN_NO_WILL:
           localState.transferTypeRules = customRules(
             required('Select transfer type')
           )

@@ -19,6 +19,7 @@
     <BaseDialog
       :setOptions="transferRequiredDialogOptions"
       :setDisplay="showStartTransferRequiredDialog"
+      reverseActionButtons
       @proceed="handleStartTransferRequiredDialogResp($event)"
     />
 
@@ -788,15 +789,16 @@ export default defineComponent({
     }
 
     // For Transfer Sale or Gift after Affidavit is completed
-    const handleStartTransferRequiredDialogResp = async (val: boolean): Promise<void> => {
-      if (!val) {
+    const handleStartTransferRequiredDialogResp = async (proceed: boolean): Promise<void> => {
+      if (proceed) {
         // Complete Later button cancels and navigates to dashboard
         setUnsavedChanges(false) // prevent unsaved changes dialog from showing up
         goToDash()
+      } else {
+        // Start Gift/Sale Transfer simply closes the dialog, since the data is already pre-filled
+        localState.showStartTransferRequiredDialog = false
+        await scrollToFirstError(false, 'home-owners-header')
       }
-      // Start Gift/Sale Transfer simply closes the dialog, since the data is already pre-filled
-      localState.showStartTransferRequiredDialog = false
-      await scrollToFirstError(false, 'home-owners-header')
     }
 
     const quickMhrSearch = async (mhrNumber: string): Promise<void> => {

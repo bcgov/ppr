@@ -353,6 +353,7 @@ export default defineComponent({
       isTransferDueToDeath,
       isTransferToExecutorProbateWill,
       isTransferToExecutorUnder25Will,
+      isTransferToAdminNoWill,
       TransWill
     } = useTransferOwners(!props.isMhrTransfer)
 
@@ -390,7 +391,9 @@ export default defineComponent({
       // capture different errors in the table to turn off Add Owner buttons and show error
       hasHomeOwnersTableErrors: computed(
         () => {
-          return (isTransferToExecutorProbateWill.value || isTransferToExecutorUnder25Will.value)
+          return (isTransferToExecutorProbateWill.value ||
+          isTransferToExecutorUnder25Will.value ||
+          isTransferToAdminNoWill.value)
             ? !TransWill.hasDeletedOwnersWithProbateGrantOrAffidavit() : false
         }
       ),
@@ -546,6 +549,7 @@ export default defineComponent({
       isValidTransferOwners,
       isTransferToExecutorProbateWill,
       isTransferToExecutorUnder25Will,
+      isTransferToAdminNoWill,
       hasUnsavedChanges,
       getMhrTransferType,
       transfersErrors,
