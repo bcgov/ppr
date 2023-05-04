@@ -16,7 +16,7 @@ import {
 import { computed, reactive, toRefs } from '@vue/composition-api'
 import { isEqual, find, uniq } from 'lodash'
 import { normalizeObject } from '@/utils'
-import { useHomeOwners, useMhrInformation } from '@/composables'
+import { useHomeOwners } from '@/composables'
 import { transferSupportingDocumentTypes } from '@/resources/'
 
 /**
