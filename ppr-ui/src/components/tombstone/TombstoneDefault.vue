@@ -41,8 +41,9 @@
                     </div>
                   </a>
                 </template>
-                Learn about the Personal Property Registry and how to use the application through step-by-step guides,
-                online videos, and downloadable quick guides.
+                Learn how to use the BC Registries applications through step-by-step
+                downloadable user guides and online help videos,
+                or contact us to recieve help by email or phone.
               </v-tooltip>
             </v-row>
           </v-col>
