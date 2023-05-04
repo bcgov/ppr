@@ -642,7 +642,7 @@ export default defineComponent({
       const formattedTransferTypes = [
         UITransferTypes.SALE_OR_GIFT,
         UITransferTypes.SURVIVING_JOINT_TENANT,
-        UITransferTypes.TO_ADMIN_PROBATE_NO_WILL,
+        UITransferTypes.TO_ADMIN_NO_WILL,
         UITransferTypes.TO_EXECUTOR_PROBATE_WILL,
         UITransferTypes.TO_EXECUTOR_UNDER_25K_WILL
       ].map(type => stripChars(type).toUpperCase())
