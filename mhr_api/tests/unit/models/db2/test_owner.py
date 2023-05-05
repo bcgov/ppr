@@ -51,16 +51,17 @@ TEST_DATA_PARTY_TYPE = [
    ('B', 'TEST', '', MhrPartyTypes.OWNER_BUS),
    ('B', 'TEST', 'EXECUTOR TEST', MhrPartyTypes.EXECUTOR),
    ('B', 'TEST', 'EXECUTRIX TEST', MhrPartyTypes.EXECUTOR),
-   ('B', 'TEST', 'TRUSTEE TEST', MhrPartyTypes.TRUSTEE),
-   ('B', 'TEST', 'TRUST TEST', MhrPartyTypes.TRUST),
+   ('B', 'TEST', 'BANKRUPTCY TRUSTEE TEST', MhrPartyTypes.TRUSTEE),
+   # ('B', 'TEST', 'TRUST TEST', MhrPartyTypes.TRUST),
    ('B', 'TEST', 'ADMINISTRATOR TEST', MhrPartyTypes.ADMINISTRATOR)
 ]
 # testdata pattern is ({party_type}, {description}, {suffix})
 TEST_DATA_PARTY_TYPE_CREATE = [
    (MhrPartyTypes.ADMINISTRATOR, 'Administrator of estate of John Smith', 'ADMINISTRATOR OF ESTATE OF JOHN SMITH'),
    (MhrPartyTypes.EXECUTOR, 'estate of John Smith', 'EXECUTOR ESTATE OF JOHN SMITH'),
-   (MhrPartyTypes.TRUSTEE, 'Trustee of estate of John Smith', 'TRUSTEE OF ESTATE OF JOHN SMITH'),
-   (MhrPartyTypes.TRUST, 'estate of John Smith', 'TRUST ESTATE OF JOHN SMITH')
+   # (MhrPartyTypes.TRUST, 'estate of John Smith', 'TRUST ESTATE OF JOHN SMITH'),
+   (MhrPartyTypes.TRUSTEE, 'Trustee of estate of John Smith, a bankrupt', 'TRUSTEE OF ESTATE OF JOHN SMITH, A BANKRUPT'),
+   (MhrPartyTypes.TRUSTEE, 'Trustee of estate of John Smith', 'BANKRUPT TRUSTEE OF ESTATE OF JOHN SMITH')
 ]
 
 @pytest.mark.parametrize('exists,manuhome_id,owner_id,type', TEST_DATA)

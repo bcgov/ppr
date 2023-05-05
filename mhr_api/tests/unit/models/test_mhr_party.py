@@ -72,10 +72,11 @@ SUBMITTING_IND = {
     'phoneNumber': '6041234567',
     'phoneExtension': '546'
 }
-# testdata pattern is ({middle}, {email}, {phone}, {phoneExtension}, {data})
+# testdata pattern is ({middle}, {email}, {phone}, {phoneExtension}, {ptype}, {desc}, {suffix}, {data})
 TEST_IND_DATA = [
-    (None, None, None, None, OWNER_IND),
-    (None, None, None, None, SUBMITTING_IND)
+    (None, None, None, None, None, None, None, OWNER_IND),
+    (None, None, None, None, MhrPartyTypes.EXECUTOR, 'EXECUTOR DESC', "JR", OWNER_IND),
+    (None, None, None, None, None, None, None, SUBMITTING_IND)
 ]
 # testdata pattern is ({id}, {has_results})
 TEST_ID_DATA = [
@@ -211,8 +212,8 @@ def test_create_from_registration_json(session):
             assert not party.last_name
 
 
-@pytest.mark.parametrize('middle, email, phone, phone_extension, data', TEST_IND_DATA)
-def test_create_ind_from_json(session, middle, email, phone, phone_extension, data):
+@pytest.mark.parametrize('middle, email, phone, phone_extension, ptype, desc, suffix, data', TEST_IND_DATA)
+def test_create_ind_from_json(session, middle, email, phone, phone_extension, ptype, desc, suffix, data):
     json_data = copy.deepcopy(data)
     if json_data.get('personName'):
         json_data['personName']['middle'] = middle
@@ -221,7 +222,14 @@ def test_create_ind_from_json(session, middle, email, phone, phone_extension, da
     json_data['emailAddress'] = email
     json_data['phoneNumber'] = phone
     json_data['phoneExtension'] = phone_extension
-    party: MhrParty = MhrParty.create_from_json(json_data, MhrPartyTypes.SUBMITTING, 1000)
+    party_type = ptype if ptype else MhrPartyTypes.SUBMITTING
+    if ptype:
+        json_data['partyType'] = ptype
+    if desc:
+        json_data['description'] = desc
+    if suffix:
+        json_data['suffix'] = suffix
+    party: MhrParty = MhrParty.create_from_json(json_data, party_type, 1000)
     assert party
     if middle:
         assert party.middle_name
@@ -239,6 +247,16 @@ def test_create_ind_from_json(session, middle, email, phone, phone_extension, da
         assert party.phone_extension
     else:
         assert not party.phone_extension
+    if ptype:
+        assert party.party_type == ptype
+    if desc:
+        assert party.description
+    else:
+        assert not party.description
+    if suffix:
+        assert party.suffix
+    else:
+        assert not party.suffix
 
 
 @pytest.mark.parametrize('data, party_type, expected', TEST_PARTY_TYPE_DATA)

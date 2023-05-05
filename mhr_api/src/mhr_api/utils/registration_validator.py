@@ -74,8 +74,9 @@ LOCATION_TAX_CERT_REQUIRED = 'Location tax certificate and tax certificate expir
 LOCATION_PID_INVALID = 'Location PID verification failed: either the PID is invalid or the LTSA service is ' + \
                        'unavailable. '
 PARTY_TYPE_INVALID = 'Death of owner requires an executor, trustee, administrator owner party type. '
-GROUP_PARTY_TYPE_INVALID = 'Death of owner all owner party types within the group must be identical. '
-OWNER_DESCRIPTION_REQUIRED = 'Death of owner description of owner party type is required. '
+GROUP_PARTY_TYPE_INVALID = 'For TRUSTEE, ADMINISTRATOR, or EXECUTOR, all owner party types within the group ' + \
+                            'must be identical. '
+OWNER_DESCRIPTION_REQUIRED = 'Owner description is required for the owner party type. '
 TRANSFER_PARTY_TYPE_INVALID = 'Owner party type of administrator, executor, trustee not allowed for this registration. '
 TENANCY_PARTY_TYPE_INVALID = 'Owner group tenancy type must be NA for executors, trustees, or administrators. '
 TENANCY_TYPE_NA_INVALID = 'Tenancy type NA is not allowed when there is 1 active owner group with 1 owner. '
@@ -122,6 +123,7 @@ def validate_registration(json_data, staff: bool = False):
         error_msg += validate_submitting_party(json_data)
         owner_count: int = len(json_data.get('ownerGroups')) if json_data.get('ownerGroups') else 0
         error_msg += validate_owner_groups(json_data.get('ownerGroups'), True, None, None, owner_count)
+        error_msg += validate_owner_party_type(json_data, json_data.get('ownerGroups'), True, owner_count)
         error_msg += validate_location(json_data.get('location'))
     except Exception as validation_exception:   # noqa: B902; eat all errors
         current_app.logger.error('validate_registration exception: ' + str(validation_exception))
@@ -616,7 +618,7 @@ def validate_owner_groups(groups,
         return validate_owner_groups_common(groups, registration, delete_groups)
     for group in groups:
         tenancy_type: str = NEW_TENANCY_LEGACY.get(group.get('type', ''), '') if groups else ''
-        if new and tenancy_type == Db2Owngroup.TenancyTypes.COMMON:
+        if new and tenancy_type == Db2Owngroup.TenancyTypes.COMMON and group.get('type', '') != MhrTenancyTypes.NA:
             error_msg += GROUP_COMMON_INVALID
         error_msg += validate_owner_group(group, False)
         for owner in group.get('owners'):
@@ -900,35 +902,27 @@ def validate_owner_party_type(json_data,  # pylint: disable=too-many-branches
     for group in groups:
         party_count: int = 0
         owner_count: int = 0
+        group_parties_invalid: bool = False
+        first_party_type: str = None
         if group.get('owners'):
             owner_count = len(group.get('owners'))
-            # valid_type: bool = True
-            # first_type: str = None
-            # if group['owners'][0].get('partyType'):
-            #    first_type = group['owners'][0].get('partyType')
             for owner in group['owners']:
                 party_type = owner.get('partyType', None)
                 if party_type and party_type in (MhrPartyTypes.ADMINISTRATOR, MhrPartyTypes.EXECUTOR,
                                                  MhrPartyTypes.TRUSTEE):
                     party_count += 1
-                if not new and owner_death and party_type and not owner.get('description') and \
+                    if not first_party_type:
+                        first_party_type = party_type
+                    if first_party_type and party_type != first_party_type:
+                        group_parties_invalid = True
+                if party_type and not owner.get('description') and \
                         party_type in (MhrPartyTypes.ADMINISTRATOR, MhrPartyTypes.EXECUTOR,
                                        MhrPartyTypes.TRUST, MhrPartyTypes.TRUSTEE):
                     error_msg += OWNER_DESCRIPTION_REQUIRED
-                    # PartyType and description of owner partyType required.
-                    # if not party_type or party_type not in (MhrPartyTypes.ADMINISTRATOR, MhrPartyTypes.EXECUTOR,
-                    #                                        MhrPartyTypes.TRUST, MhrPartyTypes.TRUSTEE):
-                    #    error_msg += PARTY_TYPE_INVALID
-                    # if not first_type or party_type != first_type:
-                    #    valid_type = False
-                    # if not owner.get('description'):
-                    #    error_msg += OWNER_DESCRIPTION_REQUIRED
-                elif not new and not owner_death and party_type and \
+                if not new and not owner_death and party_type and \
                         party_type in (MhrPartyTypes.ADMINISTRATOR, MhrPartyTypes.EXECUTOR,
                                        MhrPartyTypes.TRUST, MhrPartyTypes.TRUSTEE):
                     error_msg += TRANSFER_PARTY_TYPE_INVALID
-            # if not valid_type and len(group['owners']) > 1:
-            #    error_msg += GROUP_PARTY_TYPE_INVALID
         if active_group_count < 2 and group.get('type', '') == MhrTenancyTypes.NA and owner_count == 1:
             error_msg += TENANCY_TYPE_NA_INVALID  # SOLE owner cannot be NA
         elif active_group_count > 1 and party_count > 0 and group.get('type', '') != MhrTenancyTypes.NA:
@@ -936,6 +930,8 @@ def validate_owner_party_type(json_data,  # pylint: disable=too-many-branches
         elif active_group_count == 1 and owner_count > 1 and party_count > 0 and \
                 group.get('type', '') != MhrTenancyTypes.NA:
             error_msg += TENANCY_PARTY_TYPE_INVALID  # JOINT scenario
+        if new and group_parties_invalid:
+            error_msg += GROUP_PARTY_TYPE_INVALID
     return error_msg
 
 
