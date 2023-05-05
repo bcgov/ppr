@@ -62,6 +62,21 @@ export const mockedAddedExecutor: MhrRegistrationHomeOwnerIF = {
   address: mockedAddress
 }
 
+export const mockedAddedAdministrator: MhrRegistrationHomeOwnerIF = {
+  ownerId: 30,
+  individualName: {
+    first: 'John',
+    middle: 'A',
+    last: 'Smith'
+  },
+  suffix: 'Sr.',
+  phoneNumber: '(545) 333-2211',
+  phoneExtension: '1234',
+  partyType: HomeOwnerPartyTypes.ADMINISTRATOR,
+  action: ActionTypes.ADDED,
+  address: mockedAddress
+}
+
 export const mockedPerson: MhrRegistrationHomeOwnerIF = {
   ownerId: 10,
   individualName: {
