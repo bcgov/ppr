@@ -577,11 +577,14 @@ class Db2Manuhome(db.Model):
                     #    if den != common_denominator:
                     #        group.interest_denominator = common_denominator
                     #        group.interest_numerator = int((common_denominator/den * num))
-                    if group.interest.upper().startswith(model_utils.OWNER_INTEREST_UNDIVIDED):
+                    fraction: str = str(group.interest_numerator) + '/' + str(group.interest_denominator)
+                    if len(fraction) > 10:
+                        group.interest = ''
+                    elif group.interest.upper().startswith(model_utils.OWNER_INTEREST_UNDIVIDED):
                         group.interest = model_utils.OWNER_INTEREST_UNDIVIDED + ' '
                     else:
                         group.interest = ''
-                    group.interest += str(group.interest_numerator) + '/' + str(group.interest_denominator)
+                    group.interest += fraction
                     current_app.logger.debug('Updating group interest to: ' + group.interest)
 
     @staticmethod
