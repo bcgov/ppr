@@ -529,11 +529,10 @@ export default defineComponent({
         if (isTransferToExecutorProbateWill.value ||
           isTransferToExecutorUnder25Will.value ||
           isTransferDueToSaleOrGift.value) {
-          return (props.validateTransfer || localState.reviewedOwners) &&
-            (props.isMhrTransfer && !hasUnsavedChanges.value)
+          return props.validateTransfer && props.isMhrTransfer && !hasUnsavedChanges.value
         }
 
-        return (props.validateTransfer || localState.reviewedOwners) &&
+        return (props.validateTransfer || (!props.isMhrTransfer && localState.reviewedOwners)) &&
           (
             !hasMinimumGroups() ||
             hasEmptyGroup.value ||
