@@ -24,6 +24,34 @@ from mhr_api.models import MhrRegistration
 from mhr_api.models.type_tables import MhrRegistrationStatusTypes, MhrTenancyTypes, MhrDocumentTypes, MhrLocationTypes
 from mhr_api.models.utils import is_legacy
 from mhr_api.services.authz import QUALIFIED_USER_GROUP
+from tests.unit.utils.test_registration_data import (
+    SO_VALID,
+    JT_VALID,
+    SO_OWNER_MULTIPLE,
+    SO_GROUP_MULTIPLE,
+    JT_OWNER_SINGLE,
+    TC_GROUPS_VALID,
+    TC_GROUP_VALID,
+    INTEREST_VALID_1,
+    INTEREST_VALID_2,
+    INTEREST_VALID_3,
+    INTEREST_INVALID_1,
+    INTEREST_INVALID_2,
+    LOCATION_PARK,
+    LOCATION_RESERVE,
+    LOCATION_OTHER,
+    LOCATION_STRATA,
+    LOCATION_MANUFACTURER,
+    SO_VALID_EXEC,
+    SO_VALID_TRUSTEE,
+    SO_VALID_ADMIN,
+    JT_VALID_EXEC,
+    JT_VALID_TRUSTEE,
+    JT_VALID_ADMIN,
+    TC_VALID_EXEC,
+    TC_VALID_TRUSTEE,
+    TC_VALID_ADMIN
+)
 
 
 DESC_VALID = 'Valid'
@@ -39,343 +67,6 @@ DOC_ID_VALID = '63166035'
 DOC_ID_INVALID_CHECKSUM = '63166034'
 INVALID_TEXT_CHARSET = 'TEST \U0001d5c4\U0001d5c6/\U0001d5c1 INVALID'
 INVALID_CHARSET_MESSAGE = 'The character set is not supported'
-SO_VALID = [
-    {
-        'groupId': 2,
-        'owners': [
-            {
-            'individualName': {
-                'first': 'James',
-                'last': 'Smith'
-            },
-            'address': {
-                'street': '3122B LYNNLARK PLACE',
-                'city': 'VICTORIA',
-                'region': 'BC',
-                'postalCode': ' ',
-                'country': 'CA'
-            },
-            'phoneNumber': '6041234567'
-            }
-        ],
-        'type': 'SOLE'
-    }
-]
-JT_VALID = [
-    {
-        'groupId': 2,
-        'owners': [
-            {
-            'individualName': {
-                'first': 'James',
-                'last': 'Smith'
-            },
-            'address': {
-                'street': '3122B LYNNLARK PLACE',
-                'city': 'VICTORIA',
-                'region': 'BC',
-                'postalCode': ' ',
-                'country': 'CA'
-            },
-            'phoneNumber': '6041234567'
-            },
-            {
-            'individualName': {
-                'first': 'John',
-                'last': 'Smith'
-            },
-            'address': {
-                'street': '3122B LYNNLARK PLACE',
-                'city': 'VICTORIA',
-                'region': 'BC',
-                'postalCode': ' ',
-                'country': 'CA'
-            },
-            'phoneNumber': '6041234567'
-            }
-        ],
-        'type': 'JOINT'
-    }
-]
-SO_OWNER_MULTIPLE = [
-    {
-        'groupId': 2,
-        'owners': [
-            {
-            'individualName': {
-                'first': 'James',
-                'last': 'Smith'
-            },
-            'address': {
-                'street': '3122B LYNNLARK PLACE',
-                'city': 'VICTORIA',
-                'region': 'BC',
-                'postalCode': ' ',
-                'country': 'CA'
-            },
-            'phoneNumber': '6041234567'
-            },
-            {
-            'individualName': {
-                'first': 'John',
-                'last': 'Smith'
-            },
-            'address': {
-                'street': '3122B LYNNLARK PLACE',
-                'city': 'VICTORIA',
-                'region': 'BC',
-                'postalCode': ' ',
-                'country': 'CA'
-            },
-            'phoneNumber': '6041234567'
-            }
-        ],
-        'type': 'SOLE'
-    }
-]
-SO_GROUP_MULTIPLE = [
-    {
-        'groupId': 2,
-        'owners': [
-            {
-            'individualName': {
-                'first': 'James',
-                'last': 'Smith'
-            },
-            'address': {
-                'street': '3122B LYNNLARK PLACE',
-                'city': 'VICTORIA',
-                'region': 'BC',
-                'postalCode': ' ',
-                'country': 'CA'
-            },
-            'phoneNumber': '6041234567'
-            }
-        ],
-        'type': 'SOLE'
-    },
-    {
-        'groupId': 3,
-        'owners': [
-            {
-            'individualName': {
-                'first': 'James',
-                'last': 'Smith'
-            },
-            'address': {
-                'street': '3122B LYNNLARK PLACE',
-                'city': 'VICTORIA',
-                'region': 'BC',
-                'postalCode': ' ',
-                'country': 'CA'
-            },
-            'phoneNumber': '6041234567'
-            }
-        ],
-        'type': 'SOLE'
-    }
-]
-JT_OWNER_SINGLE = [
-    {
-        'groupId': 2,
-        'owners': [
-            {
-            'individualName': {
-                'first': 'James',
-                'last': 'Smith'
-            },
-            'address': {
-                'street': '3122B LYNNLARK PLACE',
-                'city': 'VICTORIA',
-                'region': 'BC',
-                'postalCode': ' ',
-                'country': 'CA'
-            },
-            'phoneNumber': '6041234567'
-            }
-        ],
-        'type': 'JOINT'
-    }
-]
-TC_GROUPS_VALID = [
-    {
-        'groupId': 1,
-        'owners': [
-            {
-            'individualName': {
-                'first': 'James',
-                'last': 'Smith'
-            },
-            'address': {
-                'street': '3122B LYNNLARK PLACE',
-                'city': 'VICTORIA',
-                'region': 'BC',
-                'postalCode': ' ',
-                'country': 'CA'
-            },
-            'phoneNumber': '6041234567'
-            }
-        ],
-        'type': 'COMMON',
-        'interest': 'UNDIVIDED 1/2',
-        'interestNumerator': 1,
-        'interestDenominator': 2
-    },
-    {
-        'groupId': 2,
-        'owners': [
-            {
-            'individualName': {
-                'first': 'James',
-                'last': 'Smith'
-            },
-            'address': {
-                'street': '3122B LYNNLARK PLACE',
-                'city': 'VICTORIA',
-                'region': 'BC',
-                'postalCode': ' ',
-                'country': 'CA'
-            },
-            'phoneNumber': '6041234567'
-            }, {
-            'individualName': {
-                'first': 'Jane',
-                'last': 'Smith'
-            },
-            'address': {
-                'street': '3122B LYNNLARK PLACE',
-                'city': 'VICTORIA',
-                'region': 'BC',
-                'postalCode': ' ',
-                'country': 'CA'
-            },
-            'phoneNumber': '6041234567'
-            }
-        ],
-        'type': 'JOINT',
-        'interest': 'UNDIVIDED',
-        'interestNumerator': 1,
-        'interestDenominator': 2
-    }
-]
-TC_GROUP_VALID = {
-    'owners': [
-        {
-        'individualName': {
-            'first': 'James',
-            'last': 'Smith'
-        },
-        'address': {
-            'street': '3122B LYNNLARK PLACE',
-            'city': 'VICTORIA',
-            'region': 'BC',
-            'postalCode': ' ',
-            'country': 'CA'
-        },
-        'phoneNumber': '6041234567'
-        }, {
-        'individualName': {
-            'first': 'Jane',
-            'last': 'Smith'
-        },
-        'address': {
-            'street': '3122B LYNNLARK PLACE',
-            'city': 'VICTORIA',
-            'region': 'BC',
-            'postalCode': ' ',
-            'country': 'CA'
-        }
-        }
-    ],
-    'type': 'JOINT',
-    'interest': 'UNDIVIDED',
-    'interestNumerator': 1,
-    'interestDenominator': 2
-}
-INTEREST_VALID_1 = [
-    { 'numerator': 1, 'denominator': 2 }, { 'numerator': 1, 'denominator': 2 }
-]
-INTEREST_VALID_2 = [
-    { 'numerator': 1, 'denominator': 2 }, { 'numerator': 1, 'denominator': 4 }, { 'numerator': 1, 'denominator': 4 }
-]
-INTEREST_VALID_3 = [
-    { 'numerator': 1, 'denominator': 10 }, { 'numerator': 1, 'denominator': 2 }, { 'numerator': 2, 'denominator': 5 }
-]
-INTEREST_INVALID_1 = [
-    { 'numerator': 1, 'denominator': 2 }, { 'numerator': 1, 'denominator': 4 }
-]
-INTEREST_INVALID_2 = [
-    { 'numerator': 1, 'denominator': 2 }, { 'numerator': 2, 'denominator': 4 }, { 'numerator': 1, 'denominator': 4 }
-]
-LOCATION_PARK = {
-    'locationType': 'MH_PARK',
-    'address': {
-      'street': '1117 GLENDALE AVENUE',
-      'city': 'SALMO',
-      'region': 'BC',
-      'country': 'CA',
-      'postalCode': ''
-    },
-    'leaveProvince': False,
-    'parkName': 'GLENDALE TRAILER PARK',
-    'pad': '2',
-    'additionalDescription': 'TEST PARK'
-}
-LOCATION_RESERVE = {
-    'locationType': 'RESERVE',
-    'bandName': 'BAND NAME',
-    'reserveNumber': '12',
-    'address': {
-        'street': '7612 LUDLOM RD.',
-        'city': 'DEKA LAKE',
-        'region': 'BC',
-        'country': 'CA',
-        'postalCode': ''
-    },
-    'leaveProvince': False,
-    'additionalDescription': 'TEST RESERVE'
-}
-LOCATION_OTHER = {
-    'locationType': 'OTHER',
-    'address': {
-        'street': '7612 LUDLOM RD.',
-        'city': 'DEKA LAKE',
-        'region': 'BC',
-        'country': 'CA',
-        'postalCode': ''
-    },
-    'pidNumber': '007351119',
-    'leaveProvince': False,
-    'additionalDescription': 'TEST OTHER'
-}
-LOCATION_STRATA = {
-    'locationType': 'STRATA',
-    'address': {
-        'street': '7612 LUDLOM RD.',
-        'city': 'DEKA LAKE',
-        'region': 'BC',
-        'country': 'CA',
-        'postalCode': ''
-    },
-    'leaveProvince': False,
-    'pidNumber': '007351119',
-    'taxCertificate': True,
-    'taxExpiryDate': '2035-01-31T08:00:00+00:00',
-    'additionalDescription': 'TEST STRATA'
-}
-LOCATION_MANUFACTURER = {
-    'locationType': 'MANUFACTURER',
-    'address': {
-      'street': '1117 GLENDALE AVENUE',
-      'city': 'SALMO',
-      'region': 'BC',
-      'country': 'CA',
-      'postalCode': ''
-    },
-    'leaveProvince': False,
-    'dealerName': 'DEALER-MANUFACTURER NAME',
-    'additionalDescription': 'TEST MANUFACTURER'
-}
 
 # testdata pattern is ({description}, {valid}, {staff}, {doc_id}, {message content})
 TEST_REG_DATA = [
@@ -544,6 +235,25 @@ TEST_DATA_GROUP_INTEREST = [
 # testdata pattern is ({description}, {mhr_number}, {message content})
 TEST_DATA_LIEN_COUNT = [
     ('Valid request', '100000', '')
+]
+# testdata pattern is ({description}, {valid}, {group1}, {group2}, {g1_type}, {o2_party_type}, {message})
+TEST_PARTY_TYPE_DATA = [
+    ('Valid SO exec', True, SO_VALID_EXEC, None, None, None, None),
+    ('Valid SO trustee', True, SO_VALID_TRUSTEE, None, None, None, None),
+    ('Valid SO admin', True, SO_VALID_ADMIN, None, None, None, None),
+    ('Valid JT exec', True, JT_VALID_EXEC, None, None, None, None),
+    ('Valid JT trustee', True, JT_VALID_TRUSTEE, None, None, None, None),
+    ('Valid JT admin', True, JT_VALID_ADMIN, None, None, None, None),
+    ('Valid TC exec', True, JT_VALID_EXEC, TC_VALID_EXEC, None, None, None),
+    ('Valid TC trustee', True, JT_VALID_TRUSTEE, TC_VALID_TRUSTEE, None, None, None),
+    ('Valid TC admin', True, JT_VALID_ADMIN, TC_VALID_ADMIN, None, None, None),
+    ('Invalid SO type NA', False, SO_VALID_EXEC, None, 'NA', None, validator.TENANCY_TYPE_NA_INVALID),
+    ('Invalid SO exec no desc', False, SO_VALID_EXEC, None, None, None, validator.OWNER_DESCRIPTION_REQUIRED),
+    ('Invalid common type JOINT', False, JT_VALID_EXEC, TC_VALID_EXEC, 'JOINT', None,
+     validator.TENANCY_PARTY_TYPE_INVALID),
+    ('Invalid JT party types 1', False, JT_VALID_EXEC, None, None, 'ADMINISTRATOR', validator.GROUP_PARTY_TYPE_INVALID),
+    ('Invalid JT party types 2', False, JT_VALID_TRUSTEE, None, None, 'EXECUTOR', validator.GROUP_PARTY_TYPE_INVALID),
+    ('Invalid JT party types 3', False, JT_VALID_ADMIN, None, None, 'TRUSTEE', validator.GROUP_PARTY_TYPE_INVALID)
 ]
 
 
@@ -953,3 +663,41 @@ def test_validate_location_other(session, desc, park, dealer, pad, reserve, band
         assert error_msg.find(message_content) != -1
     else:
         assert not error_msg
+
+
+@pytest.mark.parametrize('desc,valid,group1,group2,g1_type,o1_party_type,message_content', TEST_PARTY_TYPE_DATA)
+def test_validate_registration_party(session, desc, valid, group1, group2, g1_type, o1_party_type, message_content):
+    """Assert that new MH registration owner group party type validation works as expected."""
+    # setup
+    json_data = get_valid_registration(MhrTenancyTypes.SOLE)
+    owner_groups = []
+    group_1 = copy.deepcopy(group1)
+    group_2 = copy.deepcopy(group2) if group2 else None
+    if g1_type:
+        group_1['type'] = g1_type
+    if o1_party_type:
+        group_1['owners'][1]['partyType'] = o1_party_type
+    if group_2:
+        group_1['interest'] = 'UNDIVIDED'
+        group_1['interestNumerator'] = 1
+        group_1['interestDenominator'] = 2
+    if desc == 'Invalid SO exec no desc':
+        del group_1['owners'][0]['description']
+    owner_groups.append(group_1)
+    if group_2:
+        group_2['interest'] = 'UNDIVIDED'
+        group_2['interestNumerator'] = 1
+        group_2['interestDenominator'] = 2
+        owner_groups.append(group_2)
+    json_data['ownerGroups'] = owner_groups
+    valid_format, errors = schema_utils.validate(json_data, 'registration', 'mhr')
+    # Additional validation not covered by the schema.
+    error_msg = validator.validate_registration(json_data, False)
+    # if error_msg:
+    #    current_app.logger.debug(error_msg)
+    if valid:
+        assert valid_format and error_msg == ''
+    else:
+        assert error_msg != ''
+        if message_content:
+            assert error_msg.find(message_content) != -1

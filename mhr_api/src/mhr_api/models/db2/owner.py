@@ -34,7 +34,7 @@ select o.manhomid, o.owngrpid, o.ownerid, o.ownseqno, o.verified, o.ownrfone, o.
 """
 EXECUTOR_SUFFIX = 'EXEC'
 TRUST_SUFFIX = 'TRUST'
-TRUSTEE_SUFFIX = 'TRUSTEE'
+TRUSTEE_SUFFIX = 'BANKRUPT'
 ADMIN_SUFFIX = 'ADMIN'
 
 
@@ -196,8 +196,8 @@ class Db2Owner(db.Model):
                 party_type = MhrPartyTypes.EXECUTOR
             elif suffix.find(TRUSTEE_SUFFIX) != -1:
                 party_type = MhrPartyTypes.TRUSTEE
-            elif suffix.find(TRUST_SUFFIX) != -1:
-                party_type = MhrPartyTypes.TRUST
+            # elif suffix.find(TRUST_SUFFIX) != -1:
+            #    party_type = MhrPartyTypes.TRUST
             elif suffix.find(ADMIN_SUFFIX) != -1:
                 party_type = MhrPartyTypes.ADMINISTRATOR
         return party_type
@@ -239,7 +239,9 @@ class Db2Owner(db.Model):
             suffix = suffix.strip().upper()
         if new_info.get('partyType') and new_info.get('description'):
             suffix = str(new_info.get('description')).strip().upper()
-            if suffix.find(new_info.get('partyType')) < 0:
+            if new_info.get('partyType') == MhrPartyTypes.TRUSTEE and suffix.find(TRUSTEE_SUFFIX) < 0:
+                suffix = TRUSTEE_SUFFIX + ' ' + suffix
+            elif suffix.find(new_info.get('partyType')) < 0:
                 suffix = new_info.get('partyType') + ' ' + suffix
         if len(suffix) > 70:
             suffix = suffix[0:70]

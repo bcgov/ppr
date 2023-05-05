@@ -144,7 +144,9 @@ class MhrParty(db.Model):  # pylint: disable=too-many-instance-attributes
         return parties
 
     @staticmethod
-    def create_from_json(json_data, party_type: str, registration_id: int = None, change_registration_id: int = None):
+    def create_from_json(json_data, party_type: str,  # pylint: disable=too-many-branches
+                         registration_id: int = None,
+                         change_registration_id: int = None):
         """Create a party object from a json schema object: map json to db."""
         # current_app.logger.info(json_data)
         party: MhrParty = MhrParty()
@@ -175,6 +177,10 @@ class MhrParty(db.Model):  # pylint: disable=too-many-instance-attributes
             party.phone_number = json_data['phoneNumber'].strip()
         if json_data.get('phoneExtension'):
             party.phone_extension = json_data['phoneExtension'].strip()
+        if json_data.get('description'):
+            party.description = json_data['description'].strip().upper()
+        if json_data.get('suffix'):
+            party.suffix = json_data['suffix'].strip().upper()
 
         party.address = Address.create_from_json(json_data['address'])
 
