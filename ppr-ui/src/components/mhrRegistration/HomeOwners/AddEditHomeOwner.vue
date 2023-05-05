@@ -474,7 +474,7 @@ export default defineComponent({
       isTransferToAdminNoWill,
       hasCurrentOwnerChanges,
       disableNameFields,
-      TransWill,
+      TransToExec,
       TransAffidavit
     } = useTransferOwners()
 
@@ -518,11 +518,11 @@ export default defineComponent({
       defaultHomeOwner.organizationName = props.editHomeOwner?.organizationName || ''
     }
 
-    // TransWill flow: Pre-fill only new Owner as Executor (not when editing existing owner)
+    // Transfer Will flow: Pre-fill only new Owner as Executor (not when editing existing owner)
     if ((isTransferToExecutorProbateWill.value || isTransferToExecutorUnder25Will.value) &&
-      TransWill.hasDeletedOwnersWithProbateGrantOrAffidavit() &&
+      TransToExec.hasDeletedOwnersWithProbateGrantOrAffidavit() &&
       !props.editHomeOwner) {
-      TransWill.prefillOwnerAsExecutor(defaultHomeOwner)
+      TransToExec.prefillOwnerAsExecutor(defaultHomeOwner)
     }
 
     if (isTransferToAdminNoWill.value) {
@@ -645,9 +645,9 @@ export default defineComponent({
             localState.ownerGroupId || 1
           )
         } else {
-          // In TransWill flow, if the owner is the executor, add to same group as deleted owner with Probate Grant
+          // In TransToExec flow, if the owner is the executor, add to same group as deleted owner with Probate Grant
           if (props.isMhrTransfer &&
-            TransWill.hasDeletedOwnersWithProbateGrantOrAffidavit() &&
+            TransToExec.hasDeletedOwnersWithProbateGrantOrAffidavit() &&
             localState.owner.partyType === HomeOwnerPartyTypes.EXECUTOR) {
             localState.ownerGroupId = localState.owner.groupId
           }
