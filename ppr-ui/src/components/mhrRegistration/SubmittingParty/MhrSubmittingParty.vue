@@ -234,7 +234,7 @@ export default defineComponent({
       submittingPartyType: null as SubmittingPartyTypes,
       submittingPartyValid: false,
       addressValid: false,
-      submittingParty: {
+      submittingParty: getMhrRegistrationSubmittingParty.value || {
         personName: {
           first: '',
           last: '',

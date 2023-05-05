@@ -66,6 +66,7 @@ export const useMhrInformation = () => {
     setMhrTransferType,
     setMhrTransferDate,
     setMhrTransferOwnLand,
+    setMhrAttentionReferenceNum,
     setMhrTransferConsideration,
     setMhrTransferSubmittingParty
   } = useActions<any>([
@@ -78,6 +79,7 @@ export const useMhrInformation = () => {
     'setMhrTransferType',
     'setMhrTransferDate',
     'setMhrTransferOwnLand',
+    'setMhrAttentionReferenceNum',
     'setMhrTransferDeclaredValue',
     'setMhrTransferConsideration',
     'setMhrTransferSubmittingParty'
@@ -217,6 +219,9 @@ export const useMhrInformation = () => {
 
     // Set submitting party
     setMhrTransferSubmittingParty(draft.submittingParty)
+
+    // Set Attention
+    setMhrAttentionReferenceNum(draft.attentionReference)
   }
 
   const parseTransferDetails = (data: MhrTransferApiIF): void => {

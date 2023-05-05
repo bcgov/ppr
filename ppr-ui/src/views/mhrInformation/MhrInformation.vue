@@ -401,6 +401,7 @@ export default defineComponent({
       getMhrTransferType,
       getMhrTransferDeclaredValue,
       getMhrInfoValidation,
+      getMhrAttentionReferenceNum,
       getMhrTransferSubmittingParty
     } = useGetters<any>([
       'getMhrTransferHomeOwners',
@@ -414,6 +415,7 @@ export default defineComponent({
       'getMhrTransferType',
       'getMhrTransferDeclaredValue',
       'getMhrInfoValidation',
+      'getMhrAttentionReferenceNum',
       'getMhrTransferSubmittingParty'
     ])
 
@@ -495,7 +497,7 @@ export default defineComponent({
         isPriority: false
       },
       showTransferType: !!getMhrInformation.value.draftNumber || isFrozenMhr.value || false,
-      attentionReference: '',
+      attentionReference: getMhrAttentionReferenceNum.value || '',
       cancelOptions: unsavedChangesDialog,
       showCancelDialog: false,
       showCancelChangeDialog: false,
@@ -575,8 +577,7 @@ export default defineComponent({
         const { registration } = await getMhrDraft(getMhrInformation.value.draftNumber)
         await initDraftMhrInformation(registration as MhrTransferApiIF)
       } else if (isFrozenMhr.value) {
-        const apiData: MhrTransferApiIF = await buildApiData()
-        await initFrozenSaleOrGift(apiData)
+        setMhrTransferType({ transferType: ApiTransferTypes.SALE_OR_GIFT })
         await scrollToFirstError(false, 'home-owners-header')
       } else {
         // When not a draft Transfer, force no unsaved changes after loading current owners
@@ -697,12 +698,14 @@ export default defineComponent({
             TransAffidavit.setCompleted(true)
             localState.loading = true
             localState.validate = false
-            localState.isReviewMode = false
 
-            await initFrozenSaleOrGift(apiData)
             // Set Frozen state manually as the base reg isn't re-fetched in this flow
             await setMhrStatusType(MhApiStatusTypes.FROZEN)
+            await setMhrTransferType({ transferType: ApiTransferTypes.SALE_OR_GIFT })
+            // Set baseline MHR Information to state
+            await parseMhrInformation(isFrozenMhr.value)
 
+            localState.isReviewMode = false
             localState.loading = false
             localState.showStartTransferRequiredDialog = true
           } else goToDash()
@@ -864,14 +867,8 @@ export default defineComponent({
       await setMhrTransferDeclaredValue(declaredValue)
     }
 
-    /** Pre-fill Transfer Gift Sale with current registration info */
-    const initFrozenSaleOrGift = async (apiData: MhrTransferApiIF): Promise<void> => {
-      apiData.registrationType = ApiTransferTypes.SALE_OR_GIFT
-      await initDraftMhrInformation(apiData as MhrTransferApiIF)
-    }
-
     watch(() => localState.attentionReference, (val: string) => {
-      setMhrTransferAttentionReference(val)
+      val && setMhrTransferAttentionReference(val)
     })
     watch(() => isValidTransfer.value, (val: boolean) => {
       if (val) localState.validate = false
@@ -924,7 +921,6 @@ export default defineComponent({
       cancelOwnerChangeConfirm,
       transferRequiredDialog,
       getMhrTransferSubmittingParty,
-      initFrozenSaleOrGift,
       ...toRefs(localState)
     }
   }
