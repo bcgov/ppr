@@ -21,7 +21,8 @@ import {
   mockedRemovedOrganization,
   mockMhrTransferCurrentHomeOwnerGroup,
   mockedPerson2,
-  mockedAddedExecutor
+  mockedAddedExecutor,
+  mockedAddedAdministrator
 } from './test-data'
 import { getTestId } from './utils'
 import { MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF, TransferTypeSelectIF } from '@/interfaces'
@@ -391,7 +392,7 @@ describe('Home Owners', () => {
     wrapper.findComponent(HomeOwners).vm.$data.setShowGroups(false)
   })
 
-  it('TRANS SALE GIFT Flow: validations with sole Owner in one group', async () => {
+  it('TRANS SALE GIFT: validations with sole Owner in one group', async () => {
     // reset transfer type
     await selectTransferType(null)
 
@@ -435,7 +436,7 @@ describe('Home Owners', () => {
     expect(homeOwners.find(getTestId('no-data-msg')).exists()).toBeFalsy()
   })
 
-  it('TRANS WILL Flow: display Supporting Document component for deleted sole Owner and add Executor', async () => {
+  it('TRANS WILL: display Supporting Document component for deleted sole Owner and add Executor', async () => {
     // reset transfer type
     await selectTransferType(null)
 
@@ -471,20 +472,20 @@ describe('Home Owners', () => {
     expect(deceasedBadge.exists()).toBeTruthy()
     expect(deceasedBadge.text()).toContain('DECEASED')
 
-    const supportingDocumentsComponent = wrapper.findComponent(SupportingDocuments)
-    expect(supportingDocumentsComponent.isVisible()).toBeTruthy()
+    const supportingDocuments = wrapper.findComponent(SupportingDocuments)
+    expect(supportingDocuments.isVisible()).toBeTruthy()
 
-    expect(supportingDocumentsComponent.text()).toContain(transferSupportingDocuments[TRANSFER_TYPE].optionOne.text)
-    expect(supportingDocumentsComponent.text()).toContain(transferSupportingDocuments[TRANSFER_TYPE].optionTwo.text)
+    expect(supportingDocuments.text()).toContain(transferSupportingDocuments[TRANSFER_TYPE].optionOne.text)
+    expect(supportingDocuments.text()).toContain(transferSupportingDocuments[TRANSFER_TYPE].optionTwo.text)
 
     const radioButtonGrantOfProbate = <HTMLInputElement>(
-      supportingDocumentsComponent.find(getTestId('supporting-doc-option-one')).element
+      supportingDocuments.find(getTestId('supporting-doc-option-one')).element
     )
     // check that Grant of Probate radio button option is selected by default
     expect(radioButtonGrantOfProbate.checked).toBeTruthy()
 
     const radioButtonDeathCert = <HTMLInputElement>(
-      supportingDocumentsComponent.find(getTestId('supporting-doc-option-two'))).element
+      supportingDocuments.find(getTestId('supporting-doc-option-two'))).element
 
     // check disabled state of Death Certificate radio button
     expect(radioButtonDeathCert.disabled).toBeTruthy()
@@ -505,7 +506,7 @@ describe('Home Owners', () => {
     expect(suffix.value).toBe(`Executor of the will of ${first} ${middle} ${last}`)
   })
 
-  it('TRANS WILL Flow: displays correct tenancy type in Executor scenarios', async () => {
+  it('TRANS WILL: displays correct tenancy type in Executor scenarios', async () => {
     // setup transfer type to test
     const TRANSFER_TYPE = ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL
 
@@ -581,7 +582,7 @@ describe('Home Owners', () => {
     ).toBe(HomeTenancyTypes.NA)
   })
 
-  it('TRANS Sale or Gift Flow: validations for mixed owners types in the table', async () => {
+  it('TRANS Sale or Gift: validations for mixed owners types in the table', async () => {
     // reset transfer type
     await selectTransferType(null)
 
@@ -624,7 +625,7 @@ describe('Home Owners', () => {
     expect(groupError.text()).toContain(transfersErrors.hasMixedOwnerTypesInGroup)
   })
 
-  it('TRANS WILL Flow: validations with sole Owner in one group', async () => {
+  it('TRANS WILL: validations with sole Owner in one group', async () => {
     // reset transfer type
     await selectTransferType(null)
 
@@ -636,19 +637,19 @@ describe('Home Owners', () => {
 
     await selectTransferType(TRANSFER_TYPE)
 
-    const homeOwnersTable = wrapper.findComponent(HomeOwners)
+    const homeOwners = wrapper.findComponent(HomeOwners)
 
-    const invalidGroupMsg = homeOwnersTable.find(getTestId('invalid-group-msg'))
+    const invalidGroupMsg = homeOwners.find(getTestId('invalid-group-msg'))
     expect(invalidGroupMsg.exists()).toBeFalsy()
 
-    await homeOwnersTable.find(getTestId('table-delete-btn')).trigger('click')
+    await homeOwners.find(getTestId('table-delete-btn')).trigger('click')
 
     // group error message should be displayed
-    expect(homeOwnersTable.find(getTestId('invalid-group-msg')).exists()).toBeTruthy()
-    expect(homeOwnersTable.find(getTestId('invalid-group-msg')).text()).toContain('Must contain at least one executor.')
+    expect(homeOwners.find(getTestId('invalid-group-msg')).exists()).toBeTruthy()
+    expect(homeOwners.find(getTestId('invalid-group-msg')).text()).toContain('Must contain at least one executor.')
 
     const deletedOwner: MhrRegistrationHomeOwnerIF =
-      homeOwnersTable.vm.$data.getMhrTransferHomeOwnerGroups[0].owners[0]
+      homeOwners.vm.$data.getMhrTransferHomeOwnerGroups[0].owners[0]
 
     const addedExecutor: MhrRegistrationHomeOwnerIF = {
       ...mockedAddedPerson,
@@ -663,31 +664,31 @@ describe('Home Owners', () => {
       [{ groupId: 1, owners: [deletedOwner, addedExecutor] }] as MhrRegistrationHomeOwnerGroupIF[])
 
     // make sure current owner group is not altered
-    expect(homeOwnersTable.vm.$data.getMhrTransferCurrentHomeOwnerGroups[0].owners.length).toBe(1)
+    expect(homeOwners.vm.$data.getMhrTransferCurrentHomeOwnerGroups[0].owners.length).toBe(1)
 
-    const homeOwners = homeOwnersTable.vm.$data.getHomeOwners
-    expect(homeOwners.length).toBe(2)
+    const homeOwnersData = homeOwners.vm.$data.getHomeOwners
+    expect(homeOwnersData.length).toBe(2)
 
     // make sure all owners are in the same group, that is not shown for Sole Owner tenancy type
-    expect(homeOwners.every((owner: MhrRegistrationHomeOwnerGroupIF) => owner.groupId === 1)).toBeTruthy()
-    expect(homeOwnersTable.text()).not.toContain('Group 1')
+    expect(homeOwnersData.every((owner: MhrRegistrationHomeOwnerGroupIF) => owner.groupId === 1)).toBeTruthy()
+    expect(homeOwners.text()).not.toContain('Group 1')
 
     // group error message should not be displayed
-    expect(homeOwnersTable.find(getTestId('invalid-group-msg')).exists()).toBeFalsy()
+    expect(homeOwners.find(getTestId('invalid-group-msg')).exists()).toBeFalsy()
 
     // undo delete to trigger another error message
-    await homeOwnersTable.find(getTestId('table-undo-btn')).trigger('click')
+    await homeOwners.find(getTestId('table-undo-btn')).trigger('click')
 
-    expect(homeOwnersTable.find(getTestId('invalid-group-msg')).text())
+    expect(homeOwners.find(getTestId('invalid-group-msg')).text())
       .toContain('All owners must be deceased.')
 
-    await homeOwnersTable.find(getTestId('table-delete-btn')).trigger('click')
+    await homeOwners.find(getTestId('table-delete-btn')).trigger('click')
 
     // at the end no error message should be displayed
-    expect(homeOwnersTable.find(getTestId('invalid-group-msg')).exists()).toBeFalsy()
+    expect(homeOwners.find(getTestId('invalid-group-msg')).exists()).toBeFalsy()
   })
 
-  it('TRANS WILL Flow: validations with multiple Owners in multiple groups', async () => {
+  it('TRANS WILL: validations with multiple Owners in multiple groups', async () => {
     // reset transfer type
     await selectTransferType(null)
 
@@ -721,14 +722,14 @@ describe('Home Owners', () => {
     expect(homeOwners.find(getTestId('transfer-table-error')).text())
       .toContain('You must delete a deceased owner using Grant of Probate with Will before adding an executor')
 
-    const supportingDocumentsComponent = wrapper.findComponent(SupportingDocuments)
+    const supportingDocuments = wrapper.findComponent(SupportingDocuments)
 
-    expect(supportingDocumentsComponent.text()).not.toContain(transferSupportingDocuments[TRANSFER_TYPE].optionOne.note)
+    expect(supportingDocuments.text()).not.toContain(transferSupportingDocuments[TRANSFER_TYPE].optionOne.note)
 
     // click on Grant of Probate with Will radio button in SupportingDocuments component
-    await supportingDocumentsComponent.find(getTestId('supporting-doc-option-one')).trigger('click')
+    await supportingDocuments.find(getTestId('supporting-doc-option-one')).trigger('click')
 
-    expect(supportingDocumentsComponent.text()).toContain(transferSupportingDocuments[TRANSFER_TYPE].optionOne.note)
+    expect(supportingDocuments.text()).toContain(transferSupportingDocuments[TRANSFER_TYPE].optionOne.note)
 
     // error message under the Add a Person button should not be displayed
     expect(homeOwners.find(getTestId('transfer-table-error')).exists()).toBeFalsy()
@@ -809,7 +810,7 @@ describe('Home Owners', () => {
     expect(homeOwners.findAll(getTestId('ADDED-badge')).length).toBe(1)
   })
 
-  it('TRANS Affidavit Flow: validations with different error messages', async () => {
+  it('TRANS Affidavit: validations with different error messages', async () => {
     // reset transfer type
     await selectTransferType(null)
 
@@ -858,7 +859,7 @@ describe('Home Owners', () => {
     expect(groupError.text()).toContain(transfersErrors.ownersMustBeDeceased)
   })
 
-  it('TRANS ADMIN No Flow: display Supporting Document component for deleted Owner', async () => {
+  it('TRANS ADMIN No Will: display Supporting Document component for deleted Owner', async () => {
     // reset transfer type
     await selectTransferType(null)
     const TRANSFER_TYPE = ApiTransferTypes.TO_ADMIN_NO_WILL
@@ -874,13 +875,65 @@ describe('Home Owners', () => {
     // delete the sole owner
     await homeOwners.find(getTestId('table-delete-btn')).trigger('click')
 
-    const supportingDocumentsComponent = wrapper.findComponent(SupportingDocuments)
-    expect(supportingDocumentsComponent.isVisible()).toBeTruthy()
+    const supportingDocuments = wrapper.findComponent(SupportingDocuments)
+    expect(supportingDocuments.isVisible()).toBeTruthy()
 
-    expect(supportingDocumentsComponent.text()).toContain(transferSupportingDocuments[TRANSFER_TYPE].optionOne.text)
-    expect(supportingDocumentsComponent.text()).toContain(transferSupportingDocuments[TRANSFER_TYPE].optionTwo.text)
+    expect(supportingDocuments.text()).toContain(transferSupportingDocuments[TRANSFER_TYPE].optionOne.text)
+    expect(supportingDocuments.text()).toContain(transferSupportingDocuments[TRANSFER_TYPE].optionTwo.text)
 
-    await supportingDocumentsComponent.find(getTestId('supporting-doc-option-one')).trigger('click')
-    expect(supportingDocumentsComponent.text()).toContain(transferSupportingDocuments[TRANSFER_TYPE].optionOne.note)
+    await supportingDocuments.find(getTestId('supporting-doc-option-one')).trigger('click')
+    expect(supportingDocuments.text()).toContain(transferSupportingDocuments[TRANSFER_TYPE].optionOne.note)
+  })
+
+  it('TRANS ADMIN No Will: validations with different error messages', async () => {
+    // reset transfer type
+    await selectTransferType(null)
+
+    // setup transfer type to test
+    const TRANSFER_TYPE = ApiTransferTypes.TO_ADMIN_NO_WILL
+
+    const homeOwnerGroup: MhrRegistrationHomeOwnerGroupIF[] = [
+      { groupId: 1, owners: [mockedPerson, mockedPerson2], type: '' },
+      { groupId: 2, owners: [mockedPerson], type: '' }
+    ]
+
+    await selectTransferType(TRANSFER_TYPE)
+    await store.dispatch('setMhrTransferCurrentHomeOwnerGroups', homeOwnerGroup)
+    await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerGroup)
+
+    const homeOwners = wrapper.findComponent(HomeOwners)
+    expect(homeOwners.find(getTestId('invalid-group-msg')).exists()).toBeFalsy()
+
+    // One Owner is Deceased, no Administrator added
+    await store.dispatch('setMhrTransferHomeOwnerGroups', [
+      { groupId: 1, owners: [mockedPerson, { ...mockedPerson2, action: ActionTypes.REMOVED }], type: '' },
+      { groupId: 2, owners: [mockedPerson], type: '' }
+    ])
+
+    const groupError = homeOwners.find(getTestId('invalid-group-msg'))
+
+    expect(groupError.text()).toContain(transfersErrors.ownersMustBeDeceasedAndAdminAdded)
+
+    // All Owners are Deceased, no Administrator added
+    await store.dispatch('setMhrTransferHomeOwnerGroups', [
+      {
+        groupId: 1,
+        owners: [
+          { ...mockedPerson, action: ActionTypes.REMOVED },
+          { ...mockedPerson2, action: ActionTypes.REMOVED }],
+        type: ''
+      },
+      { groupId: 2, owners: [mockedPerson], type: '' }
+    ])
+
+    expect(groupError.text()).toContain(transfersErrors.mustContainOneAdminInGroup)
+
+    // No Owners removed, one Administrator added
+    await store.dispatch('setMhrTransferHomeOwnerGroups', [
+      { groupId: 1, owners: [mockedPerson, mockedPerson2, mockedAddedAdministrator], type: '' },
+      { groupId: 2, owners: [mockedPerson], type: '' }
+    ])
+
+    expect(groupError.text()).toContain(transfersErrors.ownersMustBeDeceased)
   })
 })
