@@ -292,16 +292,19 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
   // Disable Delete button for all Owners that are not in the Group of initially deleted owner (WILL transfer flow)
   const isDisabledForWillChanges = (owner: MhrRegistrationHomeOwnerIF): boolean => {
     if (getMhrTransferType.value?.transferType === ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL ||
-        getMhrTransferType.value?.transferType === ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL) {
+        getMhrTransferType.value?.transferType === ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL ||
+        getMhrTransferType.value?.transferType === ApiTransferTypes.TO_ADMIN_NO_WILL) {
       const hasDeletedOwners = getMhrTransferHomeOwnerGroups.value.some(group =>
         group.owners.some(owner => owner.action === ActionTypes.REMOVED))
 
       const isDeletedOwnersInGroup = getMhrTransferHomeOwnerGroups.value.find(group =>
         group.groupId === owner.groupId).owners.some(owner => owner.action === ActionTypes.REMOVED)
 
+      const partyType = isTransferToAdminNoWill.value ? HomeOwnerPartyTypes.ADMINISTRATOR : HomeOwnerPartyTypes.EXECUTOR
+
       const hasAddedExecutorInGroup = getMhrTransferHomeOwnerGroups.value
         .find(group => group.groupId === owner.groupId).owners
-        .some(owner => owner.partyType === HomeOwnerPartyTypes.EXECUTOR)
+        .some(owner => owner.partyType === partyType)
 
       return (hasDeletedOwners && !isDeletedOwnersInGroup) ||
         // in case of Undo, still disable Delete button
@@ -491,6 +494,15 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     }
   }
 
+  const TransToAdmin = {
+    hasAddedAdministratorsInGroup: (groupId): boolean => {
+      return getMhrTransferHomeOwnerGroups.value
+        .find(group => group.groupId === groupId).owners
+        .some(owner => owner.partyType === HomeOwnerPartyTypes.ADMINISTRATOR &&
+          owner.action === ActionTypes.ADDED)
+    }
+  }
+
   /** Return true if the specified owner is part of the current/base ownership structure **/
   const isCurrentOwner = (owner: MhrRegistrationHomeOwnerIF): boolean => {
     return getMhrTransferCurrentHomeOwnerGroups.value.some(group =>
@@ -601,6 +613,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     TransSaleOrGift,
     TransWill, // Transfer Due to Death - Grant of Probate (with Will)
     TransAffidavit, // Transfer to Executor under $25k - Affidavit
+    TransToAdmin,
     isTransAffi,
     isCurrentOwner,
     getMhrTransferType,

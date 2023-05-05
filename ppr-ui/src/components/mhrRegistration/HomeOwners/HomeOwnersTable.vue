@@ -21,7 +21,10 @@
       <template
         v-slot:header
         v-if="isMhrTransfer && !hasActualOwners(homeOwners) && homeOwners.length > 0 &&
-          hasRemovedAllHomeOwnerGroups() && !isTransferToExecutorProbateWill && !isTransferToExecutorUnder25Will"
+          hasRemovedAllHomeOwnerGroups() &&
+          !isTransferToExecutorProbateWill &&
+          !isTransferToExecutorUnder25Will &&
+          !isTransferToAdminNoWill"
       >
         <tr class="fs-14 text-center no-owners-head-row" data-test-id="no-data-msg">
           <td class="pa-6" :colspan="homeOwnersTableHeaders.length">
@@ -62,7 +65,7 @@
               class="error-text my-6 text-center"
               :data-test-id="`no-owners-msg-group-${homeOwners.indexOf(row.item)}`"
             >
-              <!-- Transfer Will error messages -->
+              <!-- Transfer to Executor error messages -->
               <span v-if="isTransferToExecutorProbateWill || isTransferToExecutorUnder25Will">
                 <span v-if="!TransWill.hasAllCurrentOwnersRemoved(row.item.groupId) &&
                   !TransWill.hasAddedExecutorsInGroup(row.item.groupId)">
@@ -91,6 +94,28 @@
                 </span>
                 <span v-else>
                   {{ transfersErrors.hasMixedOwnerTypesInGroup }}
+                </span>
+              </span>
+              <!-- Transfer to Admin error messages -->
+              <span v-else-if="isTransferToAdminNoWill">
+                <span v-if="!TransWill.hasAllCurrentOwnersRemoved(row.item.groupId) &&
+                  !TransToAdmin.hasAddedAdministratorsInGroup(row.item.groupId)">
+                  {{ transfersErrors.ownersMustBeDeceasedAndAdminAdded }}
+                </span>
+                <span v-else-if="!TransToAdmin.hasAddedAdministratorsInGroup(row.item.groupId) &&
+                  getMhrTransferHomeOwnerGroups.length === 1">
+                  {{ transfersErrors.mustContainOneAdmin }}
+                </span>
+                <span v-else-if="!TransToAdmin.hasAddedAdministratorsInGroup(row.item.groupId) &&
+                  TransWill.hasAllCurrentOwnersRemoved(row.item.groupId)">
+                  {{ transfersErrors.mustContainOneAdminInGroup }}
+                </span>
+                <span v-else-if="!TransWill.hasAllCurrentOwnersRemoved(row.item.groupId) &&
+                  TransToAdmin.hasAddedAdministratorsInGroup(row.item.groupId)">
+                  {{ transfersErrors.ownersMustBeDeceased }}
+                </span>
+                <span v-else-if="TransWill.isAllGroupOwnersWithDeathCerts(row.item.groupId)">
+                  {{ transfersErrors.allOwnersHaveDeathCerts[getMhrTransferType.transferType] }}
                 </span>
               </span>
               <!-- Other error messages -->
@@ -488,10 +513,12 @@ export default defineComponent({
       isTransferToSurvivingJointTenant,
       isTransferToExecutorProbateWill,
       isTransferToExecutorUnder25Will,
+      isTransferToAdminNoWill,
       groupHasRemovedAllCurrentOwners,
       moveCurrentOwnersToPreviousOwners,
       TransSaleOrGift,
       TransWill,
+      TransToAdmin,
       getMhrTransferType
     } = useTransferOwners(!props.isMhrTransfer)
 
@@ -518,7 +545,6 @@ export default defineComponent({
       showOwnerChangesDialog: false,
       showSuffixError: false,
       ownerToDecease: null as MhrRegistrationHomeOwnerIF,
-      transWillSupportDoc: null as SupportingDocumentsOptions,
       isEditingMode: computed((): boolean => localState.currentlyEditingHomeOwnerId >= 0),
       isAddingMode: computed((): boolean => props.isAdding),
       isValidDeathCertificate: false,
@@ -576,6 +602,18 @@ export default defineComponent({
         return hasRemovedOwners && isInvalid
       }
 
+      if (isTransferToExecutorProbateWill.value && props.validateTransfer) {
+        const hasRemovedOwners = TransWill.hasSomeOwnersRemoved(groupId)
+        const hasExecutors = TransToAdmin.hasAddedAdministratorsInGroup(groupId)
+        const hasRemovedAllOwners = TransWill.hasAllCurrentOwnersRemoved(groupId)
+        const hasValidDocs = TransWill.hasOwnersWithValidSupportDocs(groupId)
+        const hasOwnersWithoutDeathCert = !TransWill.isAllGroupOwnersWithDeathCerts(groupId)
+
+        const isInvalid = !(hasRemovedAllOwners && hasValidDocs && hasExecutors && hasOwnersWithoutDeathCert)
+
+        return hasRemovedOwners && isInvalid
+      }
+
       if (isTransferDueToSaleOrGift.value && props.validateTransfer) {
         return TransSaleOrGift.hasMixedOwnersInGroup(groupId)
       }
@@ -622,7 +660,10 @@ export default defineComponent({
 
     const mapInfoChipAction = (item: MhrRegistrationHomeOwnerIF): string => {
       return item.action === ActionTypes.REMOVED &&
-        (showDeathCertificate() || isTransferToExecutorProbateWill.value || isTransferToExecutorUnder25Will.value)
+        (showDeathCertificate() ||
+          isTransferToExecutorProbateWill.value ||
+          isTransferToExecutorUnder25Will.value ||
+          isTransferToAdminNoWill.value)
         ? 'DECEASED'
         : item.action
     }
@@ -682,6 +723,16 @@ export default defineComponent({
           (TransWill.hasSomeOwnersRemoved(groupId) || TransWill.hasAddedExecutorsInGroup(groupId))
         ) &&
         !(TransWill.hasAddedExecutorsInGroup(groupId) &&
+          TransWill.hasAllCurrentOwnersRemoved(groupId) &&
+          !TransWill.isAllGroupOwnersWithDeathCerts(groupId))
+      }
+      if (isTransferToAdminNoWill.value) {
+        return (
+          index === 0 &&
+          hasUnsavedChanges.value &&
+          (TransWill.hasSomeOwnersRemoved(groupId) || TransToAdmin.hasAddedAdministratorsInGroup(groupId))
+        ) &&
+        !(TransToAdmin.hasAddedAdministratorsInGroup(groupId) &&
           TransWill.hasAllCurrentOwnersRemoved(groupId) &&
           !TransWill.isAllGroupOwnersWithDeathCerts(groupId))
       }
@@ -809,6 +860,7 @@ export default defineComponent({
       isTransferDueToSaleOrGift,
       isTransferToExecutorProbateWill,
       isTransferToExecutorUnder25Will,
+      isTransferToAdminNoWill,
       isCurrentOwner,
       mhrDeceasedOwnerChanges,
       removeOwnerHandler,
@@ -821,6 +873,7 @@ export default defineComponent({
       SupportingDocumentsOptions,
       TransSaleOrGift,
       TransWill,
+      TransToAdmin,
       getMhrInfoValidation,
       isTransferGroupValid,
       transfersErrors,
