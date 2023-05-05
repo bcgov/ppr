@@ -131,10 +131,9 @@
               <div v-if="row.item.individualName" class="owner-icon-name">
                 <v-icon
                   class="mr-2"
-                  :class="{'person-executor-icon': row.item.partyType === HomeOwnerPartyTypes.EXECUTOR}"
+                  :class="{'person-executor-icon': row.item.partyType !== HomeOwnerPartyTypes.OWNER_IND}"
                 >
-                  {{ row.item.partyType === HomeOwnerPartyTypes.EXECUTOR ?
-                    '$vuetify.icons.values.ExecutorPersonIcon' : 'mdi-account' }}
+                  {{ getHomeOwnerIcon(row.item.partyType) }}
                 </v-icon>
                 <div class="font-weight-bold">
                   {{ row.item.individualName.first }}
@@ -145,10 +144,9 @@
               <div v-else class="owner-icon-name">
                 <v-icon
                   class="mr-2"
-                  :class="{'business-executor-icon': row.item.partyType === HomeOwnerPartyTypes.EXECUTOR}"
+                  :class="{'business-executor-icon': row.item.partyType !== HomeOwnerPartyTypes.OWNER_BUS}"
                 >
-                  {{ row.item.partyType === HomeOwnerPartyTypes.EXECUTOR ?
-                    '$vuetify.icons.values.ExecutorBusinessIcon' : 'mdi-domain' }}
+                  {{ getHomeOwnerIcon(row.item.partyType, true) }}
                 </v-icon>
                 <div class="font-weight-bold">
                   {{ row.item.organizationName }}
@@ -721,6 +719,25 @@ export default defineComponent({
       return isRemovedHomeOwner(rowItem) && (showDeathCertificate() || showSupportingDocuments())
     }
 
+    const getHomeOwnerIcon = (partyType: HomeOwnerPartyTypes, isBusiness = false): string => {
+      const uniqueRoleIcon = isBusiness
+        ? '$vuetify.icons.values.ExecutorBusinessIcon'
+        : '$vuetify.icons.values.ExecutorPersonIcon'
+      const ownerIcon = isBusiness
+        ? 'mdi-domain'
+        : 'mdi-account'
+
+      switch (partyType) {
+        case HomeOwnerPartyTypes.EXECUTOR:
+        case HomeOwnerPartyTypes.ADMINISTRATOR:
+        case HomeOwnerPartyTypes.TRUSTEE:
+          return uniqueRoleIcon
+        case HomeOwnerPartyTypes.OWNER_IND:
+        case HomeOwnerPartyTypes.OWNER_BUS:
+          return ownerIcon
+      }
+    }
+
     watch(() => localState.currentlyEditingHomeOwnerId, () => {
       setGlobalEditingMode(localState.isEditingMode)
     })
@@ -808,6 +825,7 @@ export default defineComponent({
       isTransferGroupValid,
       transfersErrors,
       getMhrTransferType,
+      getHomeOwnerIcon,
       ...toRefs(localState)
     }
   }
