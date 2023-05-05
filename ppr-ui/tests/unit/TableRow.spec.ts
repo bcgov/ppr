@@ -10,7 +10,7 @@ import { getTestId, getLastEvent } from './utils'
 // local components
 import { TableRow } from '@/components/tables/common'
 // local types/helpers/etc.
-import { APIStatusTypes, MhApiStatusTypes, TableActions } from '@/enums'
+import { APIStatusTypes, MhApiStatusTypes, MhUIStatusTypes, TableActions } from '@/enums'
 import { DraftResultIF, MhrDraftIF, MhRegistrationSummaryIF, RegistrationSummaryIF } from '@/interfaces'
 import { mhRegistrationTableHeaders, registrationTableHeaders } from '@/resources'
 // unit test data/helpers
@@ -512,6 +512,48 @@ describe('Mhr TableRow tests', () => {
       expect(rowData.at(0).text()).toContain(baseReg.baseRegistrationNumber)
       const alertIcon = rowData.at(0).find(getTestId('alert-icon'))
       expect(alertIcon.exists()).toBeTruthy()
+    }
+  })
+
+  it('displays the correct status for all mhStatusTypes', async () => {
+    const registrations: (MhRegistrationSummaryIF)[] = [
+      { ...mockedMhRegistration, statusType: MhApiStatusTypes.EXEMPT },
+      { ...mockedMhRegistration, statusType: MhApiStatusTypes.HISTORICAL },
+      { ...mockedMhRegistration, statusType: MhApiStatusTypes.ACTIVE },
+      { ...mockedMhRegistration, statusType: MhApiStatusTypes.DRAFT },
+      { ...mockedMhRegistration, statusType: MhApiStatusTypes.FROZEN }
+    ]
+
+    for (let i = 0; i < registrations.length; i++) {
+      // both below are the same variable, but typed differently
+      const reg = registrations[i] as MhRegistrationSummaryIF
+
+      await wrapper.setProps({
+        setItem: reg
+      })
+
+      expect(wrapper.vm.item).toEqual(reg)
+      const rowData = wrapper.findAll(tableRow + ' td')
+      expect(rowData.exists()).toBe(true)
+      switch (reg.statusType) {
+        case MhApiStatusTypes.ACTIVE:
+          expect(rowData.at(3).text()).toContain(MhUIStatusTypes.ACTIVE)
+          break
+        case MhApiStatusTypes.DRAFT:
+          expect(rowData.at(3).text()).toContain(MhUIStatusTypes.DRAFT)
+          break
+        case MhApiStatusTypes.EXEMPT:
+          expect(rowData.at(3).text()).toContain(MhUIStatusTypes.EXEMPT)
+          break
+        case MhApiStatusTypes.FROZEN:
+          expect(rowData.at(3).text()).toContain(MhUIStatusTypes.ACTIVE)
+          break
+        case MhApiStatusTypes.HISTORICAL:
+          expect(rowData.at(3).text()).toContain(MhUIStatusTypes.HISTORICAL)
+          break
+        default:
+          fail('No/Unknown MhStatusType')
+      }
     }
   })
 })
