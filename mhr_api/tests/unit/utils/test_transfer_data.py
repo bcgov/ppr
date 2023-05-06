@@ -1083,5 +1083,116 @@ TRANS_QS_3 = {
   'consideration': '$78766.00',
   'transferDate': '2022-10-04T20:29:36+00:00'
 }
+TRANS_TC_3 = {
+  'mhrNumber': '004834',
+  'registrationType': 'TRANS',
+  'submittingParty': {
+    'businessName': 'ABC SEARCHING COMPANY',
+    'address': {
+      'street': '222 SUMMER STREET',
+      'city': 'VICTORIA',
+      'region': 'BC',
+      'country': 'CA',
+      'postalCode': 'V8W 2V8'
+    }
+  },
+  'deleteOwnerGroups': [
+    {
+      'groupId': 3,
+      'owners': [
+        {
+          'individualName': {
+            'first': 'BRYAN',
+            'middle': 'LANCE',
+            'last': 'WILLIAMS'
+          },
+          'address': {
+            'street': '3122B LYNNLARK PLACE',
+            'city': 'VICTORIA',
+            'region': 'BC',
+            'postalCode': ' ',
+            'country': 'CA'
+          }
+        }
+      ],
+        'type': 'COMMON',
+        'interest': 'UNDIVIDED 1/3',
+        'interestNumerator': 1,
+        'interestDenominator': 3
+    }, {
+      'groupId': 4,
+      'owners': [
+        {
+          'individualName': {
+            'first': 'MARLA',
+            'middle': 'KAREN',
+            'last': 'WILLIAMS'
+          },
+          'address': {
+            'street': '3122B LYNNLARK PLACE',
+            'city': 'VICTORIA',
+            'region': 'BC',
+            'postalCode': ' ',
+            'country': 'CA'
+          }
+        }
+      ],
+        'type': 'COMMON',
+        'interest': 'UNDIVIDED 1/3',
+        'interestNumerator': 1,
+        'interestDenominator': 3
+    }, {
+      'groupId': 5,
+      'owners': [
+        {
+          'individualName': {
+            'first': 'CALVIN',
+            'middle': 'ROY',
+            'last': 'WILLIAMS'
+          },
+          'address': {
+            'street': '3122B LYNNLARK PLACE',
+            'city': 'VICTORIA',
+            'region': 'BC',
+            'postalCode': ' ',
+            'country': 'CA'
+          }
+        }
+      ],
+        'type': 'COMMON',
+        'interest': 'UNDIVIDED 1/3',
+        'interestNumerator': 1,
+        'interestDenominator': 3
+    }
+  ],
+  'addOwnerGroups': [
+    {
+      'groupId': 6,
+      'owners': [
+        {
+          'individualName': {
+            'first': 'JANET',
+            'middle': 'ALICE',
+            'last': 'HUFF'
+          },
+          'address': {
+            'street': '3122B LYNNLARK PLACE',
+            'city': 'VICTORIA',
+            'region': 'BC',
+            'postalCode': ' ',
+            'country': 'CA'
+          }
+        }
+      ],
+        'type': 'COMMON',
+        'interest': 'UNDIVIDED 1/3',
+        'interestNumerator': 1,
+        'interestDenominator': 3
+    }
+  ],
+  'declaredValue': 78766,
+  'consideration': '$78766.00',
+  'transferDate': '2022-10-04T20:29:36+00:00'
+}
 
 

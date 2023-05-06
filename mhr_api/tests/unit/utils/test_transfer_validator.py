@@ -50,7 +50,8 @@ from tests.unit.utils.test_transfer_data import (
     ADD_GROUP,
     TRANS_QS_1,
     TRANS_QS_2,
-    TRANS_QS_3
+    TRANS_QS_3,
+    TRANS_TC_3
 )
 DESC_VALID = 'Valid'
 DESC_MISSING_DOC_ID = 'Missing document id'
@@ -214,6 +215,12 @@ TEST_TRANSFER_DATA_QS = [
     ('Valid QS TC all', True, False, QUALIFIED_USER_GROUP, '099853', TRANS_QS_3, None),
     ('Valid staff 2 groups', True, True, STAFF_ROLE, '099853', TRANS_QS_2, None),
     ('Invalid QS TC groups', False, False, QUALIFIED_USER_GROUP, '099853', TRANS_QS_2, validator.TRAN_QUALIFIED_DELETE)
+]
+# testdata pattern is ({description}, {valid}, {staff}, {gtype}, {mhr_num}, {json_data}, {message content})
+TEST_TRANSFER_DATA_TC = [
+    ('Valid', True, True, 'SOLE', '004834', TRANS_TC_3, None),
+    ('Invalid add TC type', False, True, 'COMMON', '004834', TRANS_TC_3, validator.GROUP_COMMON_INVALID),
+    ('Invalid add NA type', False, True, 'NA', '004834', TRANS_TC_3, validator.GROUP_COMMON_INVALID)
 ]
 
 
@@ -596,3 +603,24 @@ def test_validate_transfer_qs(session, desc, valid, staff, kc_group, mhr_num, js
         assert error_msg != ''
         if message_content:
             assert error_msg.find(message_content) != -1
+
+
+@pytest.mark.parametrize('desc,valid,staff,gtype,mhr_num,data,message_content', TEST_TRANSFER_DATA_TC)
+def test_validate_transfer_tc(session, desc, valid, staff, gtype, mhr_num, data, message_content):
+    """Assert that MH transfer validation rules for COMMON to SOLE works as expected."""
+    # setup
+    json_data = copy.deepcopy(data)
+    json_data['addOwnerGroups'][0]['type'] = gtype
+    valid_format, errors = schema_utils.validate(json_data, 'transfer', 'mhr')
+    # Additional validation not covered by the schema.
+    registration: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, '2523')
+    error_msg = validator.validate_transfer(registration, json_data, staff, STAFF_ROLE)
+    if errors:
+        current_app.logger.debug(errors)
+    if valid:
+        assert valid_format and error_msg == ''
+    else:
+        assert error_msg != ''
+        if message_content:
+            assert error_msg.find(message_content) != -1
+

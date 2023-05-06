@@ -84,6 +84,8 @@ TEST_DATA_DOC_ID = [
 TEST_DATA_GROUP_INTEREST = [
     ('', 1, 2, '1/2'),
     ('UNDIVIDED', 1, 2, 'UNDIVIDED 1/2'),
+    ('UNDIVIDED', 9999, 10000, 'UNDIVIDED 9999/10000'),
+    ('UNDIVIDED', 10000, 20000, '10000/20000'),
     ('Undivided', 1, 2, 'UNDIVIDED 1/2'),
     ('Junk', 1, 2, '1/2')
 ]

@@ -16,8 +16,8 @@
          <tr class="no-page-break">
             <td><div class="mb-3">{{loop.index}}.</div></td>
             <td><div class="mb-3">{{section.serialNumber}}</div></td>
-            <td><div class="mb-3">{{section.lengthFeet}} feet {{section.lengthInches}} inches</div></td>
-            <td><div class="mb-3">{{section.widthFeet}} feet {{section.widthInches}} inches</div></td>
+            <td><div class="mb-3">{{section.lengthFeet}} feet {% if section.lengthInches is defined %}{{section.lengthInches}}{% else %}0{% endif %} inches</div></td>
+            <td><div class="mb-3">{{section.widthFeet}} feet {% if section.widthInches is defined %}{{section.widthInches}}{% else %}0{% endif %} inches</div></td>
          </tr>
       {% endfor %}
    </table>
