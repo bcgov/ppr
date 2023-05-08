@@ -18,6 +18,7 @@ import { useHomeOwners } from '@/composables'
 
 export const useNewMhrRegistration = () => {
   const {
+    isRoleStaffReg,
     getMhrRegistrationHomeDescription,
     getMhrRegistrationSubmittingParty,
     getMhrRegistrationDocumentId,
@@ -27,6 +28,7 @@ export const useNewMhrRegistration = () => {
     getStaffPayment,
     getMhrDraftNumber
   } = useGetters<any>([
+    'isRoleStaffReg',
     'getMhrRegistrationHomeDescription',
     'getMhrRegistrationSubmittingParty',
     'getMhrRegistrationDocumentId',
@@ -280,7 +282,10 @@ export const useNewMhrRegistration = () => {
       submittingParty: parseSubmittingParty(),
       ownerGroups: parseOwnerGroups(),
       location: parseLocation(),
-      description: parseDescription()
+      description: parseDescription(),
+      ...(isRoleStaffReg.value && !!getStaffPayment.value && {
+        clientReferenceId: getStaffPayment.value.folioNumber
+      })
     }
 
     if (getMhrAttentionReferenceNum.value) {
