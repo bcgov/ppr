@@ -1,5 +1,5 @@
 import { reactive, toRefs } from '@vue/composition-api'
-import { StatusTypes } from '@/resources'
+import { MhStatusTypes, StatusTypes } from '@/resources'
 import {
   APIAmendmentTypes,
   APIRegistrationTypes,
@@ -46,9 +46,15 @@ export const useRegistration = (setSort: RegistrationSortIF) => {
     if (!status) return UIStatusTypes.DRAFT
     if (status === MhApiStatusTypes.FROZEN) return MhUIStatusTypes.ACTIVE
 
-    for (let i = 0; i < StatusTypes.length; i++) {
-      if (StatusTypes[i].value === status || StatusTypes[i].mhrValue === status) {
-        return StatusTypes[i].text
+    for (const statusType of StatusTypes) {
+      if (statusType.value === status) {
+        return statusType.text
+      }
+    }
+
+    for (const mhStatusType of MhStatusTypes) {
+      if (mhStatusType.value === status) {
+        return mhStatusType.text
       }
     }
   }
