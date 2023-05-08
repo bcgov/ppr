@@ -497,7 +497,8 @@ export default defineComponent({
         // For certain Transfers, we only need to check for global changes and do not show table error in other cases
         if (isTransferToExecutorProbateWill.value ||
           isTransferToExecutorUnder25Will.value ||
-          isTransferDueToSaleOrGift.value) {
+          isTransferDueToSaleOrGift.value ||
+          isTransferToAdminNoWill.value) {
           return props.validateTransfer && props.isMhrTransfer && !hasUnsavedChanges.value
         }
 
@@ -547,7 +548,7 @@ export default defineComponent({
         return hasRemovedOwners && isInvalid
       }
 
-      if (isTransferToExecutorProbateWill.value && props.validateTransfer) {
+      if (isTransferToAdminNoWill.value && props.validateTransfer) {
         const hasRemovedOwners = TransToExec.hasSomeOwnersRemoved(groupId)
         const hasExecutors = TransToAdmin.hasAddedAdministratorsInGroup(groupId)
         const hasRemovedAllOwners = TransToExec.hasAllCurrentOwnersRemoved(groupId)
