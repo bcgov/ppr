@@ -79,7 +79,7 @@
                 <p><strong>Transfer or Change Ownership form</strong> has been received and retained.</p>
               </li>
               <li v-if="isTransferToExecutorProbateWill" class="pl-3 pb-3 mb-7" data-test-id="probate-will-section">
-                <p><strong>Court certified true copy of the Probate with the will.</strong></p>
+                <p><strong>Court certified true copy of the Grant of Probate with the will attached.</strong></p>
               </li>
               <li v-if="isTransferToExecutorUnder25Will" class="pl-3 pb-3 mb-7">
                 <p><strong>Certified true copy of the will.</strong></p>

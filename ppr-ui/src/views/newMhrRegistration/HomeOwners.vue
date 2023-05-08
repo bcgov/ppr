@@ -354,7 +354,7 @@ export default defineComponent({
       isTransferToExecutorProbateWill,
       isTransferToExecutorUnder25Will,
       isTransferToAdminNoWill,
-      TransWill
+      TransToExec
     } = useTransferOwners(!props.isMhrTransfer)
 
     const {
@@ -394,7 +394,7 @@ export default defineComponent({
           return (isTransferToExecutorProbateWill.value ||
           isTransferToExecutorUnder25Will.value ||
           isTransferToAdminNoWill.value)
-            ? !TransWill.hasDeletedOwnersWithProbateGrantOrAffidavit() : false
+            ? !TransToExec.hasDeletedOwnersWithProbateGrantOrAffidavit() : false
         }
       ),
       showError: false,

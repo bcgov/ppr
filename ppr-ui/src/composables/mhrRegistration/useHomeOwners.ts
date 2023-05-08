@@ -251,7 +251,8 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
     // For Mhr Transfers with Removed Groups, assign a sequential groupId
     // If WILL flow, add new executor to existing group instead of incrementing the group
     let transferDefaultId = groupId
-    if (getMhrTransferType.value?.transferType !== ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL) {
+    if (getMhrTransferType.value?.transferType !== ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL ||
+      getMhrTransferType.value?.transferType !== ApiTransferTypes.TO_ADMIN_NO_WILL) {
       transferDefaultId = homeOwnerGroups.find(group => group.action !== ActionTypes.REMOVED)?.groupId ||
       homeOwnerGroups.filter(group => group.action === ActionTypes.REMOVED).length + 1
     }
