@@ -151,10 +151,6 @@ export default defineComponent({
       validate && (context.refs.deathCertificateForm as FormIF).validate()
     }, { immediate: true })
 
-    watch(() => localState.isDeathCertificateFormValid, async (val: boolean) => {
-      context.emit('isValid', val)
-    }, { immediate: true })
-
     // Update deceased owner deathCertificateNumber when value changes
     watch(() => localState.deathCertificateNumber, async (val: string) => {
       await nextTick()

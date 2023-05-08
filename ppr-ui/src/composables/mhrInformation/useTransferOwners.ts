@@ -479,6 +479,23 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     }
   }
 
+  const TransJointTenants = {
+    isValidTransfer: computed((): boolean => {
+      const groupWithDeletedOwners: MhrRegistrationHomeOwnerGroupIF = getMhrTransferHomeOwnerGroups.value?.find(group =>
+        group.owners.some(owner => owner.action === ActionTypes.REMOVED))
+
+      if (!groupWithDeletedOwners) return false
+
+      const isValidGroup = groupWithDeletedOwners.owners
+        .filter(owner => owner.action === ActionTypes.REMOVED)
+        .every(owner =>
+          owner.hasDeathCertificate && !!owner.deathCertificateNumber && !!owner.deathDateTime)
+      const hasLivingOwners = !groupWithDeletedOwners.owners.every(owner => owner.action === ActionTypes.REMOVED)
+
+      return isValidGroup && hasLivingOwners
+    })
+  }
+
   // Transfer Affidavit flow and all the related conditions/logic
   const TransAffidavit = {
     setCompleted: (completed: boolean): void => {
@@ -612,6 +629,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     isDisabledForWillChanges,
     TransSaleOrGift,
     TransToExec, // Transfer Due to Death - Grant of Probate (with Will)
+    TransJointTenants,
     TransAffidavit, // Transfer to Executor under $25k - Affidavit
     TransToAdmin,
     isTransAffi,
