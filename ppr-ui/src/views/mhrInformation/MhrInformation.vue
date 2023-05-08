@@ -319,24 +319,19 @@ import { ConfirmCompletion, TransferDetails, TransferDetailsReview, TransferType
 import { HomeLocationReview, YourHomeReview } from '@/components/mhrRegistration/ReviewConfirm'
 import { HomeOwners } from '@/views'
 import { BaseDialog } from '@/components/dialogs'
-import {
-  unsavedChangesDialog,
-  cancelOwnerChangeConfirm,
-  transferRequiredDialog
-} from '@/resources/dialogOptions'
+import { cancelOwnerChangeConfirm, transferRequiredDialog, unsavedChangesDialog } from '@/resources/dialogOptions'
 import AccountInfo from '@/components/common/AccountInfo.vue'
 /* eslint-disable no-unused-vars */
 import {
-  AccountInfoIF, AttnRefConfigIF,
+  AccountInfoIF,
+  AttnRefConfigIF,
   DialogOptionsIF,
   ErrorIF,
   MhrTransferApiIF,
   RegTableNewItemI,
   TransferTypeSelectIF
 } from '@/interfaces'
-import {
-  StaffPaymentIF
-} from '@bcrs-shared-components/interfaces'
+import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 import {
   ActionTypes,
   APIMHRMapSearchTypes,
@@ -472,8 +467,7 @@ export default defineComponent({
     const {
       isTransferDueToDeath,
       isTransferToExecutorProbateWill,
-      isTransferToExecutorUnder25Will,
-      TransAffidavit
+      isTransferToExecutorUnder25Will
     } = useTransferOwners()
 
     // Refs
@@ -679,8 +673,6 @@ export default defineComponent({
         const mhrTransferFiling =
           await submitMhrTransfer(apiData, getMhrInformation.value.mhrNumber, localState.staffPayment)
 
-        localState.loading = false
-
         if (!mhrTransferFiling.error) {
           // Set new filing to Reg Table
           // Normal flow when not Affidavit Transfer
@@ -695,9 +687,8 @@ export default defineComponent({
 
           // Affidavit Transfer has a different flow
           if (isTransferToExecutorUnder25Will.value) {
-            TransAffidavit.setCompleted(true)
-            localState.loading = true
             localState.validate = false
+            localState.staffPayment.option = StaffPaymentOptions.NONE
 
             // Set Frozen state manually as the base reg isn't re-fetched in this flow
             await setMhrStatusType(MhApiStatusTypes.FROZEN)
@@ -706,15 +697,15 @@ export default defineComponent({
             await parseMhrInformation(isFrozenMhr.value)
 
             localState.isReviewMode = false
-            localState.loading = false
             localState.showStartTransferRequiredDialog = true
           } else goToDash()
         } else emitError(mhrTransferFiling?.error)
+        localState.loading = false
       }
 
       // If transfer is valid, enter review mode
       // For Affidavit Transfers, need to complete affidavit before proceeding
-      if (isValidTransfer.value && !TransAffidavit.isCompleted()) {
+      if (isValidTransfer.value) {
         localState.isReviewMode = true
         localState.validate = false
       }
