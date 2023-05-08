@@ -9,74 +9,8 @@
         </label>
       </v-col>
       <v-col cols="9">
-        <!-- Owner Roles -->
-        <v-row no-gutters v-if="isTransferDueToDeath || isFrozenMhr">
-          <v-col cols="12">
-            <label class="generic-label">
-              Role
-            </label>
-          </v-col>
-          <v-col class="pt-2 pb-9">
-            <v-radio-group
-              id="owner-role-options"
-              class="mt-0 pr-2" row
-              hide-details="true"
-              v-model="owner.partyType"
-            >
-              <v-radio
-                id="owner-option"
-                class="owner-radio pr-4"
-                label="Owner"
-                active-class="selected-radio"
-                :disabled="isTransferToExecutorProbateWill ||
-                  isTransferToExecutorUnder25Will ||
-                  isTransferToAdminNoWill"
-                v-model="HomeOwnerPartyTypes.OWNER_IND"
-              />
-              <v-tooltip
-                v-if="isTransferDueToDeath || isFrozenMhr"
-                top
-                nudge-right="18"
-                content-class="top-tooltip pa-5"
-                transition="fade-transition"
-              >
-                <template v-slot:activator="{ on }">
-                  <v-radio
-                    v-on="on"
-                    id="executor-option"
-                    class="executor-radio px-4"
-                    active-class="selected-radio"
-                    :disabled="disableNameFields || isTransferToAdminNoWill || isFrozenMhr"
-                    v-model="HomeOwnerPartyTypes.EXECUTOR"
-                   >
-                    <template v-slot:label><div :class="{'underline' : !disableNameFields}">Executor</div></template>
-                  </v-radio>
-                </template>
-                  An Executor is the personal representative named in the will or appointed by court to carry out the
-                  requirements of a will. They are also referred to as trustee or liquidator (in Quebec).
-              </v-tooltip>
-              <v-radio
-                id="trustee-option"
-                class="trustee-radio px-4"
-                label="Trustee"
-                active-class="selected-radio"
-                :disabled="isTransferDueToDeath || isTransferToExecutorProbateWill || isFrozenMhr"
-                v-model="HomeOwnerPartyTypes.TRUSTEE"
-              />
-              <v-radio
-                id="administrator-option"
-                class="administrator-radio pl-4"
-                label="Administrator"
-                active-class="selected-radio"
-                :disabled="isTransferToSurvivingJointTenant ||
-                  isTransferToExecutorUnder25Will ||
-                  isTransferToExecutorProbateWill ||
-                  isFrozenMhr"
-                v-model="HomeOwnerPartyTypes.ADMINISTRATOR"
-              />
-            </v-radio-group>
-          </v-col>
-        </v-row>
+        <!-- Owner Roles Component-->
+        <HomeOwnerRoles :partyType="owner.partyType"  @update:partyType="owner.partyType = $event"/>
 
         <v-form
           id="addHomeOwnerForm"
@@ -293,15 +227,15 @@
               {{ disabledNameEditTooltip }}
             </v-tooltip>
           </label>
+
           <v-row>
             <v-col class="col">
               <v-tooltip
-                :disabled="owner.partyType !== HomeOwnerPartyTypes.EXECUTOR &&
-                  owner.partyType !== HomeOwnerPartyTypes.ADMINISTRATOR"
                 right
                 content-class="right-tooltip pa-5"
                 transition="fade-transition"
                 nudge-top="12"
+                :disabled="!additionalNameTooltip"
               >
                 <template v-slot:activator="{ on }">
                   <v-text-field
@@ -309,18 +243,16 @@
                     id="suffix"
                     v-model="owner.suffix"
                     filled
-                    :label="(isTransferToExecutorProbateWill || isTransferToExecutorUnder25Will) ?
-                      'Additional Name Information' : 'Additional Name Information (Optional)'"
+                    :label="nameConfig.label"
                     data-test-id="suffix"
-                    hint="Example: Additional legal names, Jr., Sr., Executor of the will of the deceased, etc."
+                    :hint="nameConfig.hint"
                     persistent-hint
-                    :rules="(isTransferToExecutorProbateWill || isTransferToExecutorUnder25Will) ?
-                      customRules(required('This fields is required'), maxLength(70)) : maxLength(70)"
+                    :rules="additionalNameRules"
                     :disabled="disableNameFields"
                     :readonly="disableNameFields"
                   />
                 </template>
-                  {{ isMhrTransfer && transfersContent.additionalNameTooltip[getMhrTransferType.transferType] }}
+                  {{ additionalNameTooltip }}
               </v-tooltip>
             </v-col>
           </v-row>
@@ -423,14 +355,7 @@
 </template>
 
 <script lang="ts">
-import {
-  computed,
-  defineComponent,
-  reactive,
-  ref,
-  toRefs,
-  watch
-} from '@vue/composition-api'
+import { computed, defineComponent, reactive, ref, toRefs, watch } from '@vue/composition-api'
 import { useInputRules } from '@/composables/useInputRules'
 import { useHomeOwners, useMhrValidations } from '@/composables/mhrRegistration'
 import { BusinessSearchAutocomplete } from '@/components/search'
@@ -441,6 +366,7 @@ import { VueMaskDirective } from 'v-mask'
 
 /* eslint-disable no-unused-vars */
 import {
+  AdditionalNameConfigIF,
   MhrRegistrationFractionalOwnershipIF,
   MhrRegistrationHomeOwnerGroupIF,
   MhrRegistrationHomeOwnerIF
@@ -448,11 +374,12 @@ import {
 /* eslint-enable no-unused-vars */
 import { SimpleHelpToggle } from '@/components/common'
 import HomeOwnerGroups from './HomeOwnerGroups.vue'
+import HomeOwnerRoles from './HomeOwnerRoles.vue'
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import { find } from 'lodash'
 import { useMhrInformation, useTransferOwners } from '@/composables'
 import { ActionTypes, HomeOwnerPartyTypes } from '@/enums'
-import { transfersContent } from '@/resources'
+import { AdditionalNameConfig, transfersContent } from '@/resources'
 
 interface FractionalOwnershipWithGroupIdIF extends MhrRegistrationFractionalOwnershipIF {
   groupId: number
@@ -466,6 +393,7 @@ export default defineComponent({
   components: {
     BaseAddress,
     SimpleHelpToggle,
+    HomeOwnerRoles,
     HomeOwnerGroups,
     BusinessSearchAutocomplete
   },
@@ -492,12 +420,14 @@ export default defineComponent({
   },
   setup (props, context) {
     const {
+      isRoleStaffReg,
       getMhrRegistrationHomeOwnerGroups,
       getMhrTransferHomeOwnerGroups,
       getMhrTransferHomeOwners,
       getMhrRegistrationValidationModel,
       getMhrTransferType
     } = useGetters<any>([
+      'isRoleStaffReg',
       'getMhrRegistrationHomeOwnerGroups',
       'getMhrTransferHomeOwnerGroups',
       'getMhrTransferHomeOwners',
@@ -539,7 +469,6 @@ export default defineComponent({
       isCurrentOwner,
       isTransferDueToDeath,
       isTransferDueToSaleOrGift,
-      isTransferToSurvivingJointTenant,
       isTransferToExecutorProbateWill,
       isTransferToExecutorUnder25Will,
       isTransferToAdminNoWill,
@@ -575,7 +504,8 @@ export default defineComponent({
         postalCode: props.editHomeOwner?.address.postalCode || '',
         deliveryInstructions: props.editHomeOwner?.address.deliveryInstructions || ''
       },
-      action: props.editHomeOwner?.action || null
+      action: props.editHomeOwner?.action || null,
+      partyType: props.editHomeOwner?.partyType || HomeOwnerPartyTypes.OWNER_IND
     }
 
     if (props.isHomeOwnerPerson) {
@@ -677,6 +607,22 @@ export default defineComponent({
       isDefinedGroup: computed((): boolean => {
         return !!localState.groupFractionalData?.interestNumerator &&
           !!localState.groupFractionalData?.interestDenominator
+      }),
+      nameConfig: computed((): AdditionalNameConfigIF => {
+        return AdditionalNameConfig[localState.owner.partyType]
+      }),
+      additionalNameRules: computed((): Array<Function> => {
+        return localState.nameConfig.isRequired
+          ? customRules(required('This fields is required'), maxLength(70))
+          : maxLength(70)
+      }),
+      additionalNameTooltip: computed((): string => {
+        // Display owner tooltip for Staff only
+        if (isRoleStaffReg.value && localState.owner.partyType === HomeOwnerPartyTypes.OWNER_IND) {
+          return localState.nameConfig?.tooltipContent.default
+        }
+
+        return localState.nameConfig?.tooltipContent[getMhrTransferType.value?.transferType]
       }),
       disabledNameEditTooltip: `Owner name’s cannot be changed here. Name change requests should be submitted
         separately, with the appropriate supporting documents, prior to completing this transfer. See Help with
@@ -805,7 +751,6 @@ export default defineComponent({
       MhrSectVal,
       isCurrentOwner,
       isTransferDueToDeath,
-      isTransferToSurvivingJointTenant,
       isTransferToExecutorProbateWill,
       isTransferToExecutorUnder25Will,
       isTransferToAdminNoWill,
@@ -816,6 +761,7 @@ export default defineComponent({
       isFrozenMhr,
       customRules,
       required,
+      AdditionalNameConfig,
       ...toRefs(localState)
     }
   }

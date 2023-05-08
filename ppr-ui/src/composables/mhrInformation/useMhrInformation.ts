@@ -28,6 +28,7 @@ import { computed, reactive, toRefs } from '@vue/composition-api'
 export const useMhrInformation = () => {
   const {
     isRoleStaffReg,
+    getStaffPayment,
     getMhrInformation,
     isRoleQualifiedSupplier,
     getMhrTransferDeclaredValue,
@@ -41,6 +42,7 @@ export const useMhrInformation = () => {
     getMhrTransferType
   } = useGetters<any>([
     'isRoleStaffReg',
+    'getStaffPayment',
     'getMhrInformation',
     'isRoleQualifiedSupplier',
     'getMhrTransferHomeOwners',
@@ -356,7 +358,10 @@ export const useMhrInformation = () => {
       ...(isRoleQualifiedSupplier.value && !isRoleStaffReg.value && {
         clientReferenceId: getMhrTransferAttentionReference.value
       }),
-      ...(isRoleStaffReg.value && {
+      ...(isRoleStaffReg.value && !!getStaffPayment.value && {
+        clientReferenceId: getStaffPayment.value.folioNumber
+      }),
+      ...(isRoleStaffReg.value && !!getMhrTransferAttentionReference.value && {
         attentionReference: getMhrTransferAttentionReference.value
       }),
       addOwnerGroups: isTransferDueToDeath.value
