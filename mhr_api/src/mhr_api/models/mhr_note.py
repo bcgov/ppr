@@ -52,7 +52,9 @@ class MhrNote(db.Model):  # pylint: disable=too-many-instance-attributes
     def json(self) -> dict:
         """Return the note as a json object."""
         document = {
+            'documentId': str(self.document_id).rjust(8, '0'),
             'documentType': self.document_type,
+            'status': self.status_type,
             'remarks': self.remarks,
             'destroyed': False
         }

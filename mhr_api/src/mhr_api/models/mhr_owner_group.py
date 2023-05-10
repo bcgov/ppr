@@ -61,6 +61,12 @@ class MhrOwnerGroup(db.Model):  # pylint: disable=too-many-instance-attributes
             'tenancySpecified': True
         }
         # Add owners here
+        owners = []
+        for owner in self.owners:
+            owner_json = owner.json
+            owner_json['type'] = self.tenancy_type
+            owners.append(owner_json)
+        group['owners'] = owners
         if self.tenancy_specified == 'N':
             group['tenancySpecified'] = False
         if self.interest:

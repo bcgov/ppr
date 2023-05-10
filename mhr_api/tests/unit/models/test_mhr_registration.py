@@ -745,6 +745,59 @@ def test_save_new(session):
     assert reg_new
     draft_new = MhrDraft.find_by_draft_number(registration.draft.draft_number, True)
     assert draft_new
+    registration.report_view = True
+    mh_report_json = registration.new_registration_json
+    assert mh_report_json.get('mhrNumber') == mh_json.get('mhrNumber')
+    assert mh_report_json.get('status') == mh_json.get('status')
+    assert mh_report_json.get('registrationType') == mh_json.get('registrationType')
+    assert mh_report_json.get('documentDescription') == mh_json.get('documentDescription')
+    assert mh_report_json.get('clientReferenceId') == mh_json.get('clientReferenceId')
+    assert mh_report_json.get('documentId') == mh_json.get('documentId')
+    assert mh_report_json.get('documentRegistrationNumber') == mh_json.get('documentRegistrationNumber')
+    assert mh_report_json.get('attentionReference') == mh_json.get('attentionReference')
+    assert mh_report_json.get('description') == mh_json.get('description')
+    assert mh_report_json.get('location') == mh_json.get('location')
+    assert mh_report_json.get('submittingParty') == mh_json.get('submittingParty')
+    assert mh_report_json.get('payment') == mh_json.get('payment')
+    groups1 =  mh_json.get('ownerGroups')
+    groups2 = mh_report_json.get('ownerGroups')
+    assert len(groups1) == len(groups2)
+    for group1 in groups1:
+        group = None
+        for group2 in groups2:
+            if group2.get('groupId') == group1.get('groupId'):
+                group = group2
+        assert group
+        assert group1.get('type') == group.get('type')
+        assert group1.get('tenancySpecified') == group.get('tenancySpecified')
+        assert group1.get('interest', '') == group.get('interest', '')
+        assert group1.get('interestDenominator', 0) == group.get('interestDenominator', 0)
+        assert group1.get('interestNumerator', 0) == group.get('interestNumerator', 0)
+        owners1 = group1.get('owners')
+        owners2 = group.get('owners')
+        assert len(owners1) == len(owners2)
+        for owner1 in owners1:
+            owner = None
+            for owner2 in owners2:
+                if owner2.get('individualName') and owner1.get('individualName') and \
+                        owner2.get('individualName') == owner1.get('individualName'):
+                    owner = owner2
+                elif owner2.get('organizationName') and owner1.get('organizationName') and \
+                        owner2.get('organizationName') == owner1.get('organizationName'):
+                    owner = owner2
+            assert owner
+            assert owner1.get('partyType') == owner.get('partyType')
+            assert owner1.get('phoneNumber', '') == owner.get('phoneNumber', '')
+            assert owner1.get('individualName', None) == owner.get('individualName', None)
+            assert owner1.get('organizationName', '') == owner.get('organizationName', '')
+            address1 = owner1.get('address')
+            address2 = owner.get('address')
+            assert address1.get('city', '') ==  address2.get('city', '')
+            assert address1.get('street', '') ==  address2.get('street', '')
+            assert address1.get('streetAdditional', '') ==  address2.get('streetAdditional', '')
+            assert address1.get('postalCode', '') ==  address2.get('postalCode', '')
+            assert address1.get('region', '') ==  address2.get('region', '')
+            assert address1.get('country', '') ==  address2.get('country', '')
 
 
 @pytest.mark.parametrize('doc_id, exists_count', TEST_DOC_ID_DATA)

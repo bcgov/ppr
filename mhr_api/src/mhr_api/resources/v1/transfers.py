@@ -26,7 +26,7 @@ from mhr_api.services.authz import authorized_role, is_staff, is_all_staff_accou
 from mhr_api.services.authz import TRANSFER_SALE_BENEFICIARY, TRANSFER_DEATH_JT
 from mhr_api.models import MhrRegistration
 from mhr_api.models import registration_utils as model_reg_utils, utils as model_utils
-from mhr_api.models.type_tables import MhrRegistrationStatusTypes
+from mhr_api.models.type_tables import MhrRegistrationStatusTypes, MhrOwnerStatusTypes
 from mhr_api.reports.v2.report_utils import ReportTypes
 from mhr_api.resources import utils as resource_utils, registration_utils as reg_utils
 from mhr_api.services.payment import TransactionTypes
@@ -100,7 +100,7 @@ def post_transfers(mhr_number: str):  # pylint: disable=too-many-return-statemen
         return resource_utils.default_exception_response(default_exception)
 
 
-def setup_report(registration: MhrRegistration,  # pylint: disable=too-many-locals
+def setup_report(registration: MhrRegistration,  # pylint: disable=too-many-locals,too-many-branches
                  response_json,
                  current_reg: MhrRegistration,
                  account_id: str):
@@ -109,6 +109,12 @@ def setup_report(registration: MhrRegistration,  # pylint: disable=too-many-loca
     current_reg.current_view = True
     current_json = current_reg.new_registration_json
     new_groups = []
+    if not response_json.get('deleteOwnerGroups'):
+        delete_groups = []
+        for group in current_reg.owner_groups:
+            if group.change_registration_id == registration.id and group.status_type == MhrOwnerStatusTypes.PREVIOUS:
+                delete_groups.append(group.json)
+        response_json['deleteOwnerGroups'] = delete_groups
     for group in current_json.get('ownerGroups'):
         deleted: bool = False
         for delete_group in response_json.get('deleteOwnerGroups'):

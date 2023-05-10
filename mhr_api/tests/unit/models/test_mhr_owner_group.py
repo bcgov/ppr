@@ -111,7 +111,8 @@ def test_group_json(session):
         'tenancySpecified': True,
         'interest': group.interest,
         'interestNumerator': group.interest_numerator,
-        'interestDenominator': group.interest_denominator
+        'interestDenominator': group.interest_denominator,
+        'owners': []
     }
     assert group.json == group_json
 

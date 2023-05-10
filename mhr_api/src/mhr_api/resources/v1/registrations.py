@@ -108,6 +108,7 @@ def post_registrations():  # pylint: disable=too-many-return-statements
                                                            request_json,
                                                            account_id,
                                                            TransactionTypes.REGISTRATION)
+        registration.report_view = True
         response_json = registration.new_registration_json
 
         # Return report if request header Accept MIME type is application/pdf.

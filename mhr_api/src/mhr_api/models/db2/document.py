@@ -80,7 +80,6 @@ class Db2Document(db.Model):
         """Save the object to the database immediately."""
         try:
             db.session.add(self)
-            db.session.commit()
         except Exception as db_exception:   # noqa: B902; return nicer error
             current_app.logger.error('Db2Document.save exception: ' + str(db_exception))
             raise DatabaseException(db_exception)

@@ -56,9 +56,8 @@ class MhrDocument(db.Model):  # pylint: disable=too-many-instance-attributes
         """Return the document as a json object."""
         document = {
             'documentId': self.document_id,
-            'documentRegistrationNumber': self.document_registration_number,
+            'documentRegistrationNumber': model_utils.format_doc_reg_number(self.document_registration_number),
             'documentType': self.document_type,
-            'declaredValue': self.declared_value,
             'ownLand': False
         }
         if self.attention_reference:
@@ -73,6 +72,10 @@ class MhrDocument(db.Model):  # pylint: disable=too-many-instance-attributes
             document['ownLand'] = True
         if self.transfer_date:
             document['transferDate'] = model_utils.format_ts(self.transfer_date)
+        if self.declared_value is not None:
+            document['declaredValue'] = self.declared_value
+        if self.affirm_by:
+            document['affirmByName'] = self.affirm_by
         return document
 
     @classmethod
@@ -144,7 +147,7 @@ class MhrDocument(db.Model):  # pylint: disable=too-many-instance-attributes
                           document_id=registration.doc_id,
                           document_type=doc_type,
                           document_registration_number=registration.doc_reg_number,
-                          own_land='Y')
+                          own_land='N')
         if not change_registration_id:
             doc.change_registration_id = registration.id
         else:
@@ -161,6 +164,8 @@ class MhrDocument(db.Model):  # pylint: disable=too-many-instance-attributes
             doc.own_land = 'Y'
         if reg_json.get('ownerCrossReference'):
             doc.owner_cross_reference = reg_json['ownerCrossReference']
+        if reg_json.get('affirmByName'):
+            doc.affirm_by = str(reg_json['affirmByName']).upper()
         if doc_type in (MhrDocumentTypes.TRAN, MhrDocumentTypes.DEAT) and reg_json.get('transferDate'):
             doc.transfer_date = model_utils.ts_from_iso_format(reg_json['transferDate'])
         return doc

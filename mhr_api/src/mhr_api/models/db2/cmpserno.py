@@ -24,19 +24,20 @@ class Db2Cmpserno(db.Model):
     __bind_key__ = 'db2'
     __tablename__ = 'cmpserno'
 
-    manuhome_id = db.Column('MANHOMID', db.Integer, primary_key=True)
+    manuhome_id = db.Column('MANHOMID', db.Integer, db.ForeignKey('manuhome.manhomid'), primary_key=True)
     compressed_id = db.Column('CMPSERID', db.Integer, primary_key=True)
     compressed_key = db.Column('SERIALNO', db.String(3), nullable=False)
 
     # parent keys
 
     # Relationships
+    registration = db.relationship('Db2Manuhome', foreign_keys=[manuhome_id],
+                                   back_populates='serial_nums', cascade='all, delete', uselist=False)
 
     def save(self):
         """Save the object to the database immediately."""
         try:
             db.session.add(self)
-            db.session.commit()
             # current_app.logger.debug(f'Saved {self.json}')
         except Exception as db_exception:   # noqa: B902; return nicer error
             current_app.logger.error('DB2Cmpserno.save exception: ' + str(db_exception))

@@ -63,7 +63,7 @@ class Db2Owngroup(db.Model):
     __bind_key__ = 'db2'
     __tablename__ = 'owngroup'
 
-    manuhome_id = db.Column('MANHOMID', db.Integer, primary_key=True)
+    manuhome_id = db.Column('MANHOMID', db.Integer, db.ForeignKey('manuhome.manhomid'), primary_key=True)
     group_id = db.Column('OWNGRPID', db.Integer, primary_key=True)
     copy_id = db.Column('COPGRPID', db.Integer, nullable=False)
     sequence_number = db.Column('GRPSEQNO', db.Integer, nullable=False)
@@ -81,6 +81,9 @@ class Db2Owngroup(db.Model):
     # parent keys
 
     # Relationships
+    registration = db.relationship('Db2Manuhome', foreign_keys=[manuhome_id],
+                                   back_populates='owner_groups', cascade='all, delete', uselist=False)
+    group_owners = db.relationship('Db2Owner', overlaps='owner_group,registration')
 
     owners = []
     modified: bool = False
@@ -91,7 +94,6 @@ class Db2Owngroup(db.Model):
         try:
             # current_app.logger.info('saving owner group')
             db.session.add(self)
-            db.session.commit()
             # current_app.logger.info(self.json)
             if self.owners and self.status != Db2Owngroup.StatusTypes.PREVIOUS:
                 for owner in self.owners:
