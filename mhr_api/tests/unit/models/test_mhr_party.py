@@ -159,10 +159,10 @@ def test_party_json(session):
         address_id=1000
     )
     party_json = {
-        'partyId': party.id,
+        'ownerId': party.id,
         'status': party.status_type,
         'partyType': party.party_type,
-        'businessName': party.business_name,
+        'organizationName': party.business_name,
         'emailAddress': party.email_id,
         'phoneNumber': party.phone_number,
         'phoneExtension': party.phone_extension

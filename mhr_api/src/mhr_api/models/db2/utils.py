@@ -22,6 +22,19 @@ from mhr_api.models.type_tables import MhrDocumentType, MhrRegistrationTypes
 from mhr_api.models.db import db
 
 
+FROM_LEGACY_REGISTRATION_TYPE = {
+    '101': 'MHREG',
+    'TRAN': 'TRANS',
+    'DEAT': 'TRAND',
+    'AFFE': 'TRANS_AFFIDAVIT',
+    'LETA': 'TRANS_ADMIN',
+    'WILL': 'TRANS_WILL',
+    '102': 'DECAL_REPLACE',
+    '103': 'PERMIT',
+    '103E': 'PERMIT_EXTENSION',
+    'EXRS': 'EXEMPTION_RES',
+    'EXNR': 'EXEMPTION_NON_RES'
+}
 FROM_LEGACY_DOC_TYPE = {
     '101': 'REG_101',
     '102': 'REG_102',
@@ -307,7 +320,6 @@ REG_FILTER_DATE_COLLAPSE = """
                                              WHERE d2.mhregnum = mh.mhregnum
                                                AND d2.regidate BETWEEN :query_start AND :query_end)))
 """
-
 SORT_DESCENDING = ' DESC'
 SORT_ASCENDING = ' ASC'
 DEFAULT_REG_TYPE_FILTER = "'101 '"
@@ -886,3 +898,98 @@ def update_pid_list(pid_list, status: str):
     except Exception as db_exception:   # noqa: B902; return nicer error
         current_app.logger.error('update_pid_list db exception: ' + str(db_exception))
         raise DatabaseException(db_exception)
+
+
+def get_doc_desc(doc_type) -> str:
+    """Try to find the document description by document type."""
+    if doc_type:
+        doc_type_info: MhrDocumentType = MhrDocumentType.find_by_doc_type(doc_type)
+        if doc_type_info:
+            return doc_type_info.document_type_desc
+    return ''
+
+
+def get_registration_json(registration):
+    """Build the registration json from bot DB2 and PosgreSQL."""
+    reg_json = registration.manuhome.json
+    doc_type = reg_json.get('documentType')
+    if FROM_LEGACY_REGISTRATION_TYPE.get(doc_type):
+        reg_json['registrationType'] = FROM_LEGACY_REGISTRATION_TYPE.get(doc_type)
+    if FROM_LEGACY_DOC_TYPE.get(doc_type):
+        doc_type = FROM_LEGACY_DOC_TYPE.get(doc_type)
+    reg_json['documentDescription'] = get_doc_desc(doc_type)
+    reg_json = registration.set_submitting_json(reg_json)  # For MHR registrations use MHR submitting party data.
+    reg_json = registration.set_location_json(reg_json, False)   # For MHR registrations use MHR location data.
+    reg_json = registration.set_description_json(reg_json, False)  # For MHR registrations use MHR description data.
+    if reg_json.get('documentType'):
+        del reg_json['documentType']
+    current_app.logger.debug('Built JSON from DB2 and PostgreSQL')
+    if registration.pay_invoice_id and registration.pay_invoice_id > 0:  # Legacy will have no payment info.
+        return registration.set_payment_json(reg_json)
+    return reg_json
+
+
+def get_search_json(registration):
+    """Build the search version of the registration as a json object."""
+    reg_json = registration.manuhome.registration_json
+    if reg_json and reg_json.get('notes'):
+        updated_notes = []
+        for note in reg_json.get('notes'):
+            include: bool = True
+            doc_type = note.get('documentType', '')
+            current_app.logger.debug('updating doc type=' + doc_type)
+            if doc_type in ('103', '103E', 'STAT'):  # Always exclude
+                include = False
+            elif not registration.staff and doc_type in ('102', 'NCON'):  # Always exclude for non-staff
+                include = False
+            elif not registration.staff and doc_type == 'FZE':  # Only staff can see remarks.
+                note['remarks'] = ''
+            elif not registration.staff and doc_type == 'REGC' and note.get('remarks') and \
+                    note['remarks'] != 'MANUFACTURED HOME REGISTRATION CANCELLED':
+                # Only staff can see remarks if not default.
+                note['remarks'] = 'MANUFACTURED HOME REGISTRATION CANCELLED'
+            elif doc_type in ('TAXN', 'EXNR', 'NPUB', 'REST') and note.get('status') != 'A':  # Exclude if not active.
+                include = False
+            elif doc_type in ('CAU', 'CAUC', 'CAUE') and note.get('expiryDate') and \
+                    model_utils.date_elapsed(note.get('expiryDate')):  # Exclude if expiry elapsed.
+                include = reg_utils.include_caution_note(reg_json.get('notes'), note.get('documentId'))
+            if doc_type == 'FZE':  # Do not display contact info.
+                if note.get('contactName'):
+                    del note['contactName']
+                if note.get('contactAddress'):
+                    del note['contactAddress']
+                if note.get('contactPhoneNumber'):
+                    del note['contactPhoneNumber']
+            if include:
+                if FROM_LEGACY_DOC_TYPE.get(doc_type):
+                    doc_type = FROM_LEGACY_DOC_TYPE.get(doc_type)
+                note['documentDescription'] = get_doc_desc(doc_type)
+                updated_notes.append(note)
+        reg_json['notes'] = updated_notes
+    reg_json = registration.set_location_json(reg_json, True)
+    reg_json = registration.set_description_json(reg_json, True)
+    current_app.logger.debug('Built JSON from DB2 and PostgreSQL')
+    return reg_json
+
+
+def get_new_registration_json(registration):
+    """Build the new registration version of the registration as a json object."""
+    registration.manuhome.current_view = registration.current_view
+    reg_json = registration.manuhome.new_registration_json
+    reg_doc = None
+    doc_type = ''
+    for doc in registration.manuhome.reg_documents:
+        if registration.manuhome.reg_document_id and registration.manuhome.reg_document_id == doc.id:
+            reg_doc = doc
+    if reg_doc:
+        doc_type = reg_doc.document_type
+        if FROM_LEGACY_REGISTRATION_TYPE.get(doc_type):
+            reg_json['registrationType'] = FROM_LEGACY_REGISTRATION_TYPE.get(doc_type)
+        if FROM_LEGACY_DOC_TYPE.get(doc_type):
+            doc_type = FROM_LEGACY_DOC_TYPE.get(doc_type)
+    reg_json['documentDescription'] = get_doc_desc(doc_type)
+    reg_json = registration.set_submitting_json(reg_json)
+    reg_json = registration.set_location_json(reg_json, False)
+    reg_json = registration.set_description_json(reg_json, False)
+    current_app.logger.debug('Built JSON from DB2 and PostgreSQL')
+    return registration.set_payment_json(reg_json)

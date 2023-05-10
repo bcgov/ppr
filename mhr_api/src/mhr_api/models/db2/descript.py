@@ -39,7 +39,8 @@ class Db2Descript(db.Model):
     __bind_key__ = 'db2'
     __tablename__ = 'descript'
 
-    manuhome_id = db.Column('MANHOMID', db.Integer, primary_key=True)
+    # manuhome_id = db.Column('MANHOMID', db.Integer, primary_key=True)
+    manuhome_id = db.Column('MANHOMID', db.Integer, db.ForeignKey('manuhome.manhomid'), primary_key=True)
     description_id = db.Column('DESCRNID', db.Integer, primary_key=True)
     status = db.Column('status', db.String(1), nullable=False)
     reg_document_id = db.Column('REGDOCID', db.String(8), nullable=False)
@@ -80,6 +81,8 @@ class Db2Descript(db.Model):
     # parent keys
 
     # Relationships
+    registration = db.relationship('Db2Manuhome', foreign_keys=[manuhome_id],
+                                   back_populates='descriptions', cascade='all, delete', uselist=False)
 
     compressed_keys = []
 
@@ -87,7 +90,6 @@ class Db2Descript(db.Model):
         """Save the object to the database immediately."""
         try:
             db.session.add(self)
-            db.session.commit()
             if self.compressed_keys:
                 for key in self.compressed_keys:
                     key.save()

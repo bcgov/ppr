@@ -70,6 +70,12 @@ class Db2Manuhome(db.Model):
     # parent keys
 
     # relationships
+    descriptions = db.relationship('Db2Descript', back_populates='registration')
+    locations = db.relationship('Db2Location', back_populates='registration')
+    notes = db.relationship('Db2Mhomnote', back_populates='registration')
+    owners = db.relationship('Db2Owner', back_populates='registration', overlaps='group_owners,owner_group')
+    owner_groups = db.relationship('Db2Owngroup', back_populates='registration')
+    serial_nums = db.relationship('Db2Cmpserno', back_populates='registration')
 
     reg_documents = []
     reg_owners = []
@@ -84,7 +90,6 @@ class Db2Manuhome(db.Model):
         """Save the object to the database immediately."""
         try:
             db.session.add(self)
-            db.session.commit()
             if self.reg_documents:
                 doc: Db2Document = self.reg_documents[0]
                 doc.save()
@@ -95,7 +100,6 @@ class Db2Manuhome(db.Model):
             if self.reg_owner_groups:
                 for group in self.reg_owner_groups:
                     group.save()
-            db.session.commit()
         except Exception as db_exception:   # noqa: B902; return nicer error
             current_app.logger.error('Db2Manuhome.save exception: ' + str(db_exception))
             raise DatabaseException(db_exception)
@@ -112,7 +116,6 @@ class Db2Manuhome(db.Model):
                 for group in self.reg_owner_groups:
                     if group.modified:
                         group.save()
-            db.session.commit()
         except Exception as db_exception:   # noqa: B902; return nicer error
             current_app.logger.error('Db2Manuhome.save_transfer exception: ' + str(db_exception))
             raise DatabaseException(db_exception)
@@ -130,7 +133,6 @@ class Db2Manuhome(db.Model):
                     note: Db2Mhomnote = self.reg_notes[index]
                     if note.reg_document_id == doc.id:
                         note.save()
-            db.session.commit()
         except Exception as db_exception:   # noqa: B902; return nicer error
             current_app.logger.error('Db2Manuhome.save_exemption exception: ' + str(db_exception))
             raise DatabaseException(db_exception)
@@ -151,7 +153,6 @@ class Db2Manuhome(db.Model):
             if self.new_location:
                 self.reg_location.save()
                 self.new_location.save()
-            db.session.commit()
         except Exception as db_exception:   # noqa: B902; return nicer error
             current_app.logger.error('Db2Manuhome.save_permit exception: ' + str(db_exception))
             raise DatabaseException(db_exception)

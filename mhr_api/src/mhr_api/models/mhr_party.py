@@ -76,17 +76,20 @@ class MhrParty(db.Model):  # pylint: disable=too-many-instance-attributes
     #                               back_populates='party', cascade='all, delete', uselist=False)
 
     @property
-    def json(self) -> dict:
+    def json(self) -> dict:  # pylint: disable=too-many-branches
         """Return the party as a json object."""
         party = {
         }
         if self.party_type != MhrPartyTypes.SUBMITTING:
-            party['partyId'] = self.id
+            party['ownerId'] = self.id
             party['status'] = self.status_type
             party['partyType'] = self.party_type
 
         if self.business_name:
-            party['businessName'] = self.business_name
+            if self.party_type == MhrPartyTypes.SUBMITTING:
+                party['businessName'] = self.business_name
+            else:
+                party['organizationName'] = self.business_name
         elif self.last_name:
             person_name = {
                 'first': self.first_name,

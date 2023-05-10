@@ -41,7 +41,7 @@ class Db2Location(db.Model):
     __bind_key__ = 'db2'
     __tablename__ = 'location'
 
-    manuhome_id = db.Column('MANHOMID', db.Integer, primary_key=True)
+    manuhome_id = db.Column('MANHOMID', db.Integer, db.ForeignKey('manuhome.manhomid'), primary_key=True)
     location_id = db.Column('LOCATNID', db.Integer, primary_key=True)
     status = db.Column('status', db.String(1), nullable=False)
     reg_document_id = db.Column('REGDOCID', db.String(8), nullable=False)
@@ -77,13 +77,14 @@ class Db2Location(db.Model):
     # parent keys
 
     # Relationships
+    registration = db.relationship('Db2Manuhome', foreign_keys=[manuhome_id],
+                                   back_populates='locations', cascade='all, delete', uselist=False)
     ltsa: LtsaDescription = None
 
     def save(self):
         """Save the object to the database immediately."""
         try:
             db.session.add(self)
-            db.session.commit()
         except Exception as db_exception:   # noqa: B902; return nicer error
             current_app.logger.error('DB2 location.save exception: ' + str(db_exception))
             raise DatabaseException(db_exception)

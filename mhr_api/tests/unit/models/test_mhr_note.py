@@ -112,6 +112,8 @@ def test_note_json(session):
     """Assert that the document model renders to a json format correctly."""
     note: MhrNote = TEST_NOTE
     note_json = {
+        'documentId': str(note.document_id),
+        'status': note.status_type,
         'documentType': note.document_type,
         'remarks': note.remarks,
         'destroyed': False

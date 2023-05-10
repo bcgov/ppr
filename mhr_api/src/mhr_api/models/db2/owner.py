@@ -50,9 +50,9 @@ class Db2Owner(db.Model):
     __bind_key__ = 'db2'
     __tablename__ = 'owner'
 
-    manuhome_id = db.Column('MANHOMID', db.Integer, primary_key=True)
-    group_id = db.Column('OWNGRPID', db.Integer, primary_key=True)
-    owner_id = db.Column('OWNERID', db.Integer, primary_key=True)
+    manuhome_id = db.Column('MANHOMID', db.Integer, db.ForeignKey('manuhome.manhomid'))
+    group_id = db.Column('OWNGRPID', db.Integer)
+    owner_id = db.Column('OWNERID', db.Integer)
     sequence_number = db.Column('OWNSEQNO', db.Integer, nullable=False)
     verified_flag = db.Column('VERIFIED', db.String(1), nullable=False)
     owner_type = db.Column('OWNRTYPE', db.String(1), nullable=False)
@@ -65,6 +65,18 @@ class Db2Owner(db.Model):
 
     # parent keys
 
+    # Relationships
+    registration = db.relationship('Db2Manuhome', foreign_keys=[manuhome_id],
+                                   back_populates='owners', cascade='all, delete', uselist=False)
+    owner_group = db.relationship('Db2Owngroup', foreign_keys=[manuhome_id, group_id], overlaps='registration')
+
+    __table_args__ = (
+        db.PrimaryKeyConstraint('MANHOMID', 'OWNGRPID', 'OWNERID'),
+        db.ForeignKeyConstraint(
+            ['MANHOMID', 'OWNGRPID'], ['owngroup.MANHOMID', 'owngroup.OWNGRPID']
+        )
+    )
+
     type: str = None
     status: str = None
 
@@ -73,7 +85,6 @@ class Db2Owner(db.Model):
         try:
             # current_app.logger.info('saving owner')
             db.session.add(self)
-            # db.session.commit()
             # current_app.logger.info(self.json)
         except Exception as db_exception:   # noqa: B902; return nicer error
             current_app.logger.error('DB2Owner.save exception: ' + str(db_exception))

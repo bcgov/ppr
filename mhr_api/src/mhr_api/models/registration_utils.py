@@ -15,13 +15,16 @@
 # pylint: disable=too-few-public-methods
 
 """This module holds methods to support registration model updates - mostly account registration summary."""
+import json
+
 from flask import current_app
 from sqlalchemy.sql import text
 
-from mhr_api.exceptions import DatabaseException
-from mhr_api.models import utils as model_utils
+from mhr_api.exceptions import BusinessException, DatabaseException
+from mhr_api.models import utils as model_utils, MhrDraft
 from mhr_api.models.db import db
 from mhr_api.models.type_tables import MhrRegistrationTypes
+from mhr_api.services.authz import MANUFACTURER_GROUP, QUALIFIED_USER_GROUP, GENERAL_USER_GROUP, BCOL_HELP
 
 
 # Account registration request parameters to support sorting and filtering.
@@ -48,6 +51,35 @@ SELECT COUNT(base_registration_num)
   FROM mhr_lien_check_vw
  WHERE mhr_number = :query_value
 """
+QUERY_PKEYS = """
+select nextval('mhr_registration_id_seq') AS reg_id,
+       nextval('mhr_document_id_seq') AS doc_id,
+       get_mhr_number() AS mhr_number,
+       get_mhr_doc_reg_number() AS doc_reg_id,
+       get_mhr_draft_number() AS draft_num,
+       nextval('mhr_draft_id_seq') AS draft_id
+"""
+QUERY_PKEYS_NO_DRAFT = """
+select nextval('mhr_registration_id_seq') AS reg_id,
+       nextval('mhr_document_id_seq') AS doc_id,
+       get_mhr_number() AS mhr_number,
+       get_mhr_doc_reg_number() AS doc_reg_id
+"""
+CHANGE_QUERY_PKEYS = """
+select nextval('mhr_registration_id_seq') AS reg_id,
+       nextval('mhr_document_id_seq') AS doc_id,
+       get_mhr_doc_reg_number() AS doc_reg_id,
+       get_mhr_draft_number() AS draft_num,
+       nextval('mhr_draft_id_seq') AS draft_id
+"""
+CHANGE_QUERY_PKEYS_NO_DRAFT = """
+select nextval('mhr_registration_id_seq') AS reg_id,
+       nextval('mhr_document_id_seq') AS doc_id,
+       get_mhr_doc_reg_number() AS doc_reg_id
+"""
+DOC_ID_QUALIFIED_CLAUSE = ',  get_mhr_doc_qualified_id() AS doc_id'
+DOC_ID_MANUFACTURER_CLAUSE = ',  get_mhr_doc_manufacturer_id() AS doc_id'
+DOC_ID_GOV_AGENT_CLAUSE = ',  get_mhr_doc_gov_agent_id() AS doc_id'
 
 
 class AccountRegistrationParams():
@@ -161,3 +193,110 @@ def is_transfer_due_to_death_staff(reg_type: str) -> bool:
     return reg_type and reg_type in (MhrRegistrationTypes.TRANS_ADMIN,
                                      MhrRegistrationTypes.TRANS_AFFIDAVIT,
                                      MhrRegistrationTypes.TRANS_WILL)
+
+
+def get_generated_values(registration, draft):
+    """Get db generated identifiers that are in more than one table.
+
+    Get registration_id, mhr_number, and optionally draft_number.
+    """
+    # generate reg id, MHR number. If not existing draft also generate draft number
+    query = QUERY_PKEYS
+    if draft:
+        query = QUERY_PKEYS_NO_DRAFT
+    result = db.session.execute(query)
+    row = result.first()
+    registration.id = int(row[0])
+    registration.doc_pkey = int(row[1])
+    registration.mhr_number = str(row[2])
+    registration.doc_reg_number = str(row[3])
+    if not draft:
+        registration.draft_number = str(row[4])
+        registration.draft_id = int(row[5])
+    return registration
+
+
+def get_change_generated_values(registration, draft, user_group: str = None):
+    """Get db generated identifiers that are in more than one table.
+
+    Get registration_id, mhr_number, and optionally draft_number.
+    """
+    # generate reg id, MHR number. If not existing draft also generate draft number
+    query = CHANGE_QUERY_PKEYS
+    if draft:
+        query = CHANGE_QUERY_PKEYS_NO_DRAFT
+    if user_group and user_group in (QUALIFIED_USER_GROUP, GENERAL_USER_GROUP, BCOL_HELP):
+        query += DOC_ID_QUALIFIED_CLAUSE
+    elif user_group and user_group == MANUFACTURER_GROUP:
+        query += DOC_ID_MANUFACTURER_CLAUSE
+    # elif user_group and user_group == GOV_ACCOUNT_ROLE:
+    else:
+        query += DOC_ID_GOV_AGENT_CLAUSE
+    result = db.session.execute(query)
+    row = result.first()
+    registration.id = int(row[0])
+    registration.doc_pkey = int(row[1])
+    registration.doc_reg_number = str(row[2])
+    if not draft:
+        registration.draft_number = str(row[3])
+        registration.draft_id = int(row[4])
+    # if user_group and user_group in (QUALIFIED_USER_GROUP, MANUFACTURER_GROUP, GOV_ACCOUNT_ROLE,
+    #                                 GENERAL_USER_GROUP, BCOL_HELP):
+    if draft:
+        registration.doc_id = str(row[3])
+    else:
+        registration.doc_id = str(row[5])
+    return registration
+
+
+def find_draft(json_data, registration_type: str = None):
+    """Try to find an existing draft if a draftNumber is in json_data.).
+
+    Return None if not found or no documentId.
+    """
+    draft = None
+    if json_data.get('draftNumber'):
+        try:
+            draft_number = json_data['draftNumber'].strip()
+            if draft_number != '':
+                draft: MhrDraft = MhrDraft.find_by_draft_number(draft_number, False)
+                if draft:
+                    draft.draft = json.dumps(json_data)
+                    if registration_type:
+                        draft.registration_type = registration_type
+        except BusinessException:
+            draft = None
+    return draft
+
+
+def update_deceased(owners_json, owner):
+    """Set deceased information for transfer due to death registrations."""
+    existing_json = owner.json
+    match_json = None
+    for owner_json in owners_json:
+        if owner_json.get('organizationName') and existing_json.get('organizationName') and \
+                owner_json.get('organizationName') == existing_json.get('organizationName'):
+            match_json = owner_json
+            break
+        elif owner_json.get('individualName') and existing_json.get('individualName') and \
+                owner_json.get('individualName') == existing_json.get('individualName'):
+            match_json = owner_json
+            break
+    if match_json:
+        if match_json.get('deathCertificateNumber'):
+            owner.death_cert_number = str(match_json.get('deathCertificateNumber')).strip()
+        if match_json.get('deathDateTime'):
+            owner.death_ts = model_utils.ts_from_iso_format(match_json.get('deathDateTime'))
+
+
+def include_caution_note(notes, document_id: str) -> bool:
+    """Include expired caution note if subsequent continue or extend caution has not expired."""
+    latest_caution = None
+    for note in notes:
+        if not latest_caution and note.get('documentType', '') in ('CAUC', 'CAUE', 'CAU '):
+            latest_caution = note
+        if note.get('documentId') == document_id:
+            break
+        elif latest_caution and note.get('documentType', '') not in ('CAUC', 'CAUE', 'CAU '):
+            return False
+    return latest_caution and not model_utils.date_elapsed(latest_caution.get('expiryDate'))
