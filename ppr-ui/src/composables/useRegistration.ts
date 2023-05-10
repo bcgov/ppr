@@ -1,5 +1,5 @@
 import { reactive, toRefs } from '@vue/composition-api'
-import { MhStatusTypes, StatusTypes } from '@/resources'
+import { MhrAPIToUIStatusTypesMap, PprAPIToUIStatusTypesMap } from '@/resources'
 import {
   APIAmendmentTypes,
   APIRegistrationTypes,
@@ -42,21 +42,12 @@ export const useRegistration = (setSort: RegistrationSortIF) => {
     }
   }
 
-  const getStatusDescription = (status: APIStatusTypes | MhApiStatusTypes): string => {
+  const getStatusDescription = (status: APIStatusTypes | MhApiStatusTypes,
+    isChild: boolean, isPpr: boolean): string => {
     if (!status) return UIStatusTypes.DRAFT
     if (status === MhApiStatusTypes.FROZEN) return MhUIStatusTypes.ACTIVE
-
-    for (const statusType of StatusTypes) {
-      if (statusType.value === status) {
-        return statusType.text
-      }
-    }
-
-    for (const mhStatusType of MhStatusTypes) {
-      if (mhStatusType.value === status) {
-        return mhStatusType.text
-      }
-    }
+    if (isChild && (status === MhApiStatusTypes.HISTORICAL || status === MhApiStatusTypes.EXEMPT)) return ''
+    return isPpr ? PprAPIToUIStatusTypesMap[status] : MhrAPIToUIStatusTypesMap[status]
   }
 
   const getRegisteringName = (name: string): string => {
