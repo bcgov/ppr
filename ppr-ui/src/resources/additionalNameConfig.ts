@@ -7,8 +7,8 @@ export const AdditionalNameConfig: AdditionalNameConfigsIF = {
     hint: 'Example: Additional legal names, Jr., Sr., etc.',
     isRequired: false,
     tooltipContent: {
-      default: 'If the owner is a Trustee of a trust, enter the Trustee’s title. Example Trustee of the ABC Family' +
-        ' Trust'
+      default: `If the owner is a Trustee of a trust, enter the Trustee’s title. Example:<br><br>Trustee of the ABC
+        Family Trust`
     }
   },
   [HomeOwnerPartyTypes.OWNER_BUS]: {
@@ -16,8 +16,8 @@ export const AdditionalNameConfig: AdditionalNameConfigsIF = {
     hint: 'Example: Additional legal names, Jr., Sr., etc.',
     isRequired: false,
     tooltipContent: {
-      default: 'If the owner is a Trustee of a trust, enter the Trustee’s title. Example Trustee of the ABC Family' +
-        ' Trust'
+      default: `If the owner is a Trustee of a trust, enter the Trustee’s title. Example:<br><br>Trustee of the ABC
+        Family Trust`
     }
   },
   [HomeOwnerPartyTypes.EXECUTOR]: {

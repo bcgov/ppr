@@ -252,7 +252,7 @@
                     :readonly="disableNameFields"
                   />
                 </template>
-                  {{ additionalNameTooltip }}
+                <span v-html="additionalNameTooltip"></span>
               </v-tooltip>
             </v-col>
           </v-row>
