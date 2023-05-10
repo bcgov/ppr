@@ -282,7 +282,6 @@
               <DeathCertificate
                 :deceasedOwner="row.item"
                 :validate="validateTransfer"
-                @isValid="isValidDeathCertificate = $event"
               />
             </v-expand-transition>
           </td>
@@ -358,7 +357,6 @@
                   <DeathCertificate
                     :deceasedOwner="row.item"
                     :validate="validateTransfer"
-                    @isValid="isValidDeathCertificate = $event"
                     :isDisabled="isGlobalEditingMode"
                   />
                 </template>
@@ -464,6 +462,7 @@ export default defineComponent({
       TransSaleOrGift,
       TransToExec,
       TransToAdmin,
+      TransJointTenants,
       getMhrTransferType
     } = useTransferOwners(!props.isMhrTransfer)
 
@@ -492,7 +491,6 @@ export default defineComponent({
       ownerToDecease: null as MhrRegistrationHomeOwnerIF,
       isEditingMode: computed((): boolean => localState.currentlyEditingHomeOwnerId >= 0),
       isAddingMode: computed((): boolean => props.isAdding),
-      isValidDeathCertificate: false,
       showTableError: computed((): boolean => {
         // For certain Transfers, we only need to check for global changes and do not show table error in other cases
         if (isTransferToExecutorProbateWill.value ||
@@ -753,7 +751,7 @@ export default defineComponent({
         localState.isValidAllocation &&
         !localState.hasGroupsWithNoOwners &&
         (isTransferDueToSaleOrGift.value ? !TransSaleOrGift.hasMixedOwners.value : true) &&
-        (isTransferToSurvivingJointTenant.value ? localState.isValidDeathCertificate : true) &&
+        (isTransferToSurvivingJointTenant.value ? TransJointTenants.isValidTransfer.value : true) &&
         ((isTransferToExecutorProbateWill.value || isTransferToExecutorUnder25Will.value)
           ? TransToExec.isValidTransfer.value : true)
       )
