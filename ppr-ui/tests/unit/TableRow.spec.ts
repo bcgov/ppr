@@ -159,7 +159,7 @@ describe('TableRow tests', () => {
             expect(rowData.at(1).find(btnExpTxt).exists()).toBe(false)
           }
           // status type
-          expect(rowData.at(3).text()).toContain(wrapper.vm.getStatusDescription(baseReg.statusType))
+          expect(rowData.at(3).text()).toContain(wrapper.vm.getStatusDescription(baseReg.statusType, false, true))
           // expire days
           if ([APIStatusTypes.DISCHARGED, APIStatusTypes.EXPIRED].includes(baseReg.statusType as APIStatusTypes)) {
             expect(rowData.at(8).text()).toContain('—')
@@ -216,7 +216,7 @@ describe('TableRow tests', () => {
         // submitted date
         expect(rowData.at(2).text()).toBe('Not Registered')
         // status type
-        expect(rowData.at(3).text()).toContain(wrapper.vm.getStatusDescription(baseReg.statusType))
+        expect(rowData.at(3).text()).toContain(wrapper.vm.getStatusDescription(baseReg.statusType, isChild, true))
         // expire days
         if (isChild) expect(rowData.at(8).text()).toEqual('')
         else expect(rowData.at(8).text()).toBe('N/A')
@@ -432,7 +432,7 @@ describe('Mhr TableRow tests', () => {
             expect(rowData.at(1).find(btnExpTxt).exists()).toBe(false)
           }
           // status type
-          expect(rowData.at(3).text()).toContain(wrapper.vm.getStatusDescription(baseReg.statusType))
+          expect(rowData.at(3).text()).toContain(wrapper.vm.getStatusDescription(baseReg.statusType, isChild, false))
           // expire days
           expect(rowData.at(8).text()).toContain(wrapper.vm.showExpireDays(baseReg))
           // action btn
@@ -524,10 +524,7 @@ describe('Mhr TableRow tests', () => {
       { ...mockedMhRegistration, statusType: MhApiStatusTypes.FROZEN }
     ]
 
-    for (let i = 0; i < registrations.length; i++) {
-      // both below are the same variable, but typed differently
-      const reg = registrations[i] as MhRegistrationSummaryIF
-
+    for (const reg of registrations) {
       await wrapper.setProps({
         setItem: reg
       })
@@ -550,6 +547,46 @@ describe('Mhr TableRow tests', () => {
           break
         case MhApiStatusTypes.HISTORICAL:
           expect(rowData.at(3).text()).toContain(MhUIStatusTypes.HISTORICAL)
+          break
+        default:
+          fail('No/Unknown MhStatusType')
+      }
+    }
+  })
+
+  it('displays the correct status for all mhStatusTypes as children', async () => {
+    const registrations: (MhRegistrationSummaryIF)[] = [
+      { ...mockedMhRegistration, statusType: MhApiStatusTypes.EXEMPT },
+      { ...mockedMhRegistration, statusType: MhApiStatusTypes.HISTORICAL },
+      { ...mockedMhRegistration, statusType: MhApiStatusTypes.ACTIVE },
+      { ...mockedMhRegistration, statusType: MhApiStatusTypes.DRAFT },
+      { ...mockedMhRegistration, statusType: MhApiStatusTypes.FROZEN }
+    ]
+
+    for (const reg of registrations) {
+      await wrapper.setProps({
+        setItem: reg,
+        setChild: true
+      })
+
+      expect(wrapper.vm.item).toEqual(reg)
+      const rowData = wrapper.findAll(tableRow + ' td')
+      expect(rowData.exists()).toBe(true)
+      switch (reg.statusType) {
+        case MhApiStatusTypes.ACTIVE:
+          expect(rowData.at(3).text()).toContain(MhUIStatusTypes.ACTIVE)
+          break
+        case MhApiStatusTypes.DRAFT:
+          expect(rowData.at(3).text()).toContain(MhUIStatusTypes.DRAFT)
+          break
+        case MhApiStatusTypes.EXEMPT:
+          expect(rowData.at(3).text()).toContain('')
+          break
+        case MhApiStatusTypes.FROZEN:
+          expect(rowData.at(3).text()).toContain(MhUIStatusTypes.ACTIVE)
+          break
+        case MhApiStatusTypes.HISTORICAL:
+          expect(rowData.at(3).text()).toContain('')
           break
         default:
           fail('No/Unknown MhStatusType')

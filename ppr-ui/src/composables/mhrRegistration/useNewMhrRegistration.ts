@@ -360,10 +360,10 @@ export const useNewMhrRegistration = () => {
             createDateTime: draft.createDateTime,
             error: draft.error,
             registrationDescription: draft.registrationDescription,
-            hasDraft: sortOptions?.status === APIStatusTypes.DRAFT,
+            hasDraft: false,
             ownerNames: '',
             path: draft.path,
-            statusType: APIStatusTypes.DRAFT,
+            statusType: MhApiStatusTypes.DRAFT,
             username: '',
             documentId: draft.draftNumber
           }

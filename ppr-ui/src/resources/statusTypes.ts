@@ -7,7 +7,6 @@ export const StatusTypes = [
   },
   {
     value: APIStatusTypes.ACTIVE,
-    mhrValue: APIStatusTypes.MHR_ACTIVE,
     text: UIStatusTypes.ACTIVE
   },
   {
@@ -38,3 +37,17 @@ export const MhStatusTypes = [
     text: MhUIStatusTypes.HISTORICAL
   }
 ]
+
+export const PprAPIToUIStatusTypesMap = {
+  [APIStatusTypes.DRAFT]: UIStatusTypes.DRAFT,
+  [APIStatusTypes.ACTIVE]: UIStatusTypes.ACTIVE,
+  [APIStatusTypes.EXPIRED]: UIStatusTypes.EXPIRED,
+  [APIStatusTypes.DISCHARGED]: UIStatusTypes.DISCHARGED
+}
+
+export const MhrAPIToUIStatusTypesMap = {
+  [MhApiStatusTypes.DRAFT]: MhUIStatusTypes.DRAFT,
+  [MhApiStatusTypes.ACTIVE]: MhUIStatusTypes.ACTIVE,
+  [MhApiStatusTypes.EXEMPT]: MhUIStatusTypes.EXEMPT,
+  [MhApiStatusTypes.HISTORICAL]: MhUIStatusTypes.HISTORICAL
+}
