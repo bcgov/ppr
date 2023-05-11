@@ -192,7 +192,17 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
     const hasNoGroups = [HomeTenancyTypes.SOLE, HomeTenancyTypes.JOINT].includes(getHomeTenancyType())
     return hasNoGroups || !groups || groups.length >= 2
   }
+
+  const hasMixedOwnersInGroup = (groupId: number): boolean => {
+    const owners = getGroupById(groupId).owners
+    if (owners.length < 2) return false
+    const partyType = owners[0]?.partyType
+    return owners.some(owner => owner.partyType !== partyType)
+  }
   // WORKING WITH GROUPS
+
+  const hasMixedOwnersInAGroup = (): boolean =>
+    getTransferOrRegistrationHomeOwnerGroups().some(group => hasMixedOwnersInGroup(group.groupId) === true)
 
   // Generate dropdown items for the group selection
   const getGroupDropdownItems = (isAddingHomeOwner: Boolean, groupId: number): Array<any> => {
@@ -500,11 +510,11 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
         !getTotalOwnershipAllocationStatus().hasMinimumGroupsError &&
         !getTotalOwnershipAllocationStatus().hasTotalAllocationError &&
         !hasEmptyGroup.value &&
-        !isGlobalEditingMode.value
+        !isGlobalEditingMode.value && !hasMixedOwnersInAGroup()
     } else {
       // must have at least one owner with proper id and add/edit form must be closed
       isHomeOwnersStepValid = !!getMhrRegistrationHomeOwners.value.find(owner => owner.ownerId) &&
-                              !isGlobalEditingMode.value
+                              !isGlobalEditingMode.value && !hasMixedOwnersInAGroup()
     }
     setValidation(MhrSectVal.HOME_OWNERS_VALID, MhrCompVal.OWNERS_VALID, isHomeOwnersStepValid)
   })
@@ -528,6 +538,8 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
     deleteGroup,
     setGroupFractionalInterest,
     hasMinimumGroups,
+    hasMixedOwnersInAGroup,
+    hasMixedOwnersInGroup,
     getGroupTenancyType,
     getTransferOrRegistrationHomeOwners,
     getTransferOrRegistrationHomeOwnerGroups,
