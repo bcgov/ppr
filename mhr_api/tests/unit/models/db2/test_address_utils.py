@@ -31,6 +31,33 @@ DB2_ADDRESS_NO_ADD = '2400 OAKDALE WAY                        ' + \
                     '                                        ' + \
                     'KAMLOOPS                                ' + \
                     'BC CA                            V8R 3L7'
+ADDRESS1 = {
+    'street': '3122B LYNNLARK PLACE',
+    'city': 'VICTORIA',
+    'region': 'BC',
+    'postalCode': '',
+    'country': 'CA'
+}
+ADDRESS2 = {
+    'street': '3122B LYNNLARK PLACE',
+    'streetAdditional': 'SECOND FLOOR',
+    'city': 'VICTORIA',
+    'region': 'BC',
+    'postalCode': 'v1v1v1',
+    'country': 'CA'
+}
+ADDRESS3 = {
+    'street': '3122B LYNNLARK PLACE',
+    'streetAdditional': 'SECOND FLOOR',
+    'city': 'VICTORIA'
+}
+ADDRESS4 = {
+    'street': '3122B LYNNLARK PLACE',
+    'city': 'VICTORIA',
+    'region': 'BC',
+    'postalCode': 'V1V-1V1'
+}
+
 
 # testdata pattern is ({street}, {street_2}, {city}, {p_code}, {db2_address})
 TEST_DATA_LEGACY_ADDRESS = [
@@ -127,6 +154,13 @@ TEST_DB2_ADDRESS_OWNER = [
     ('11 WILLIAM STREET', '', 'UPPER KINGSCLEAR', 'NB', 'CA', 'V0M 1K0', '11 WILLIAM STREET                       UPPER KINGSCLEAR, NEW BRUNSWICK'),
     ('P.O. BOX 1804', '', 'GARIBALDI HIGHLANDS', '', 'CA', 'V0M 1K0', 'P.O. BOX 1804                                                                                                           GARIBALDI HIGHLANDS'),
     ('#715, 603 SEAGAZE DRIVE', '', 'OCEANSIDE', 'CA', 'US', '92054', '#715, 603 SEAGAZE DRIVE                 OCEANSIDE, CA                           U.S.A.   92054')
+]
+# testdata pattern is ({address}, {p_code}, {legacy_address})
+TEST_DB2_ADDRESS_OWNER_FORMAT = [
+    (ADDRESS1, '', '3122B LYNNLARK PLACE                    VICTORIA                                BC CA                                                                           '),
+    (ADDRESS2, 'V1V 1V1', '3122B LYNNLARK PLACE                    SECOND FLOOR                            VICTORIA                                BC CA                                   '),
+    (ADDRESS3, '', '3122B LYNNLARK PLACE                    SECOND FLOOR                            VICTORIA                                                                        '),
+    (ADDRESS4, 'V1V 1V1', '3122B LYNNLARK PLACE                    VICTORIA                                BC CA                                                                           ')
 ]
 
 
@@ -244,3 +278,22 @@ def test_db2_address_owner(session, street1, street2, city, region, country, p_c
         assert test_address['streetAdditional'] == street2
     else:
         assert not test_address.get('streetAdditional')
+
+
+@pytest.mark.parametrize('address, p_code, legacy_address', TEST_DB2_ADDRESS_OWNER_FORMAT)
+def test_db2_address_owner_format(session, address, p_code, legacy_address):
+    """Assert that formatting an address to  the legacy owner format works as expected."""
+    test_address: str = address_utils.to_db2_owner_address(address)
+    assert test_address == legacy_address
+    test_pcode = address_utils.format_postal_code(address)
+    assert p_code == test_pcode
+    address_json = address_utils.get_address_from_db2_owner(test_address, test_pcode)
+    assert address_json.get('street') == address.get('street')
+    assert address_json.get('streetAdditional', '') == address.get('streetAdditional', '')
+    assert address_json.get('city', '') == address.get('city', '')
+    assert address_json.get('region', '') == address.get('region', '')
+    assert address_json.get('postalCode', '') == test_pcode
+    if address.get('country'):
+        assert address_json.get('country') == address.get('country')
+    elif address.get('region'):
+        assert address_json.get('country')

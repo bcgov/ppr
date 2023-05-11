@@ -263,9 +263,9 @@ class Db2Owner(db.Model):
                          owner_type=owner_type,
                          verified_flag='',
                          phone_number=str(new_info.get('phoneNumber', ''))[0:10],
-                         postal_code=address.get('postalCode', ''),
+                         postal_code=address_utils.format_postal_code(address),
                          name=name[0:70],
                          compressed_name=compressed_name,
                          suffix=suffix,
-                         legacy_address=address_utils.to_db2_address(address))
+                         legacy_address=address_utils.to_db2_owner_address(address))
         return owner
