@@ -70,6 +70,13 @@
           </td>
         </tr>
 
+        <tr v-else-if="!isMhrTransfer && row.index === 0 && hasMixedOwnersInGroup(row.item.groupId)">
+          <HomeOwnersMixedRolesError
+            :groupId="row.item.groupId"
+            :borderError ='isInvalidOwnerGroup(row.item.groupId)'
+            />
+        </tr>
+
         <tr v-if="isCurrentlyEditing(homeOwners.indexOf(row.item))">
           <td class="pa-0" :colspan="homeOwnersTableHeaders.length">
             <v-expand-transition>
@@ -381,6 +388,7 @@ import { BaseAddress } from '@/composables/address'
 import { PartyAddressSchema } from '@/schemas'
 import { toDisplayPhone } from '@/utils'
 import { AddEditHomeOwner } from '@/components/mhrRegistration/HomeOwners'
+import HomeOwnersMixedRolesError from './HomeOwnersMixedRolesError.vue'
 import { DeathCertificate, SupportingDocuments, HomeOwnersGroupError } from '@/components/mhrTransfers'
 import { BaseDialog } from '@/components/dialogs'
 import TableGroupHeader from '@/components/mhrRegistration/HomeOwners/TableGroupHeader.vue'
@@ -393,6 +401,7 @@ import { MhrRegistrationHomeOwnerIF } from '@/interfaces'
 import { ActionTypes, HomeOwnerPartyTypes, HomeTenancyTypes, SupportingDocumentsOptions } from '@/enums'
 /* eslint-enable no-unused-vars */
 import { useActions, useGetters } from 'vuex-composition-helpers'
+import { MhrErrorMsgs } from '@/enums/Errors/mhrErrors'
 
 export default defineComponent({
   name: 'HomeOwnersTable',
@@ -414,7 +423,8 @@ export default defineComponent({
     SupportingDocuments,
     DeathCertificate,
     InfoChip,
-    HomeOwnersGroupError
+    HomeOwnersGroupError,
+    HomeOwnersMixedRolesError
   },
   setup (props, context) {
     const addressSchema = PartyAddressSchema
@@ -432,6 +442,8 @@ export default defineComponent({
       undoGroupChanges,
       getHomeTenancyType,
       getGroupNumberById,
+      hasMixedOwnersInAGroup,
+      hasMixedOwnersInGroup,
       hasRemovedAllHomeOwners,
       hasRemovedAllHomeOwnerGroups,
       hasUndefinedGroupInterest,
@@ -483,6 +495,30 @@ export default defineComponent({
     const { getValidation, MhrSectVal, MhrCompVal } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
     const { isValidDeceasedOwnerGroup } = useMhrInfoValidation(getMhrInfoValidation.value)
 
+    const showTableError = computed((): boolean => {
+    // For certain Transfers, we only need to check for global changes and do not show table error in other cases
+      if (isTransferToExecutorProbateWill.value ||
+          isTransferToExecutorUnder25Will.value ||
+          isTransferDueToSaleOrGift.value ||
+          isTransferToAdminNoWill.value) {
+        return props.validateTransfer && props.isMhrTransfer && !hasUnsavedChanges.value
+      }
+
+      const groups = getTransferOrRegistrationHomeOwnerGroups()
+
+      return ((props.validateTransfer || (!props.isMhrTransfer && localState.reviewedOwners)) &&
+          (
+            !hasMinimumGroups() ||
+            hasEmptyGroup.value ||
+            (props.isMhrTransfer && !hasUnsavedChanges.value) ||
+            !localState.isValidAllocation ||
+            localState.hasGroupsWithNoOwners ||
+            (!localState.isUngroupedTenancy && hasUndefinedGroupInterest(groups)) ||
+            (hasMixedOwnersInAGroup() && groups[0].groupId === 0)
+          )
+      )
+    })
+
     const localState = reactive({
       currentlyEditingHomeOwnerId: -1,
       reviewed: false,
@@ -491,25 +527,8 @@ export default defineComponent({
       ownerToDecease: null as MhrRegistrationHomeOwnerIF,
       isEditingMode: computed((): boolean => localState.currentlyEditingHomeOwnerId >= 0),
       isAddingMode: computed((): boolean => props.isAdding),
-      showTableError: computed((): boolean => {
-        // For certain Transfers, we only need to check for global changes and do not show table error in other cases
-        if (isTransferToExecutorProbateWill.value ||
-          isTransferToExecutorUnder25Will.value ||
-          isTransferDueToSaleOrGift.value ||
-          isTransferToAdminNoWill.value) {
-          return props.validateTransfer && props.isMhrTransfer && !hasUnsavedChanges.value
-        }
-
-        return (props.validateTransfer || (!props.isMhrTransfer && localState.reviewedOwners)) &&
-          (
-            !hasMinimumGroups() ||
-            hasEmptyGroup.value ||
-            (props.isMhrTransfer && !hasUnsavedChanges.value) ||
-            !localState.isValidAllocation ||
-            localState.hasGroupsWithNoOwners ||
-            (!localState.isUngroupedTenancy && hasUndefinedGroupInterest(getTransferOrRegistrationHomeOwnerGroups()))
-          )
-      }),
+      isValidDeathCertificate: false,
+      showTableError: showTableError,
       reviewedOwners: computed((): boolean =>
         getValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_STEPS)),
       showEditActions: computed((): boolean => !props.isReadonlyTable),
@@ -532,37 +551,37 @@ export default defineComponent({
       })
     })
 
+    const isInvalidRegistrationOwnerGroup = (groupId: number) =>
+      hasMixedOwnersInGroup(groupId) && localState.reviewedOwners && !localState.showTableError
+
+    const isInvalidTransferOwnerGroup = (groupId: number, hasRoleInGroup: boolean) => {
+      const hasRemovedOwners = TransToExec.hasSomeOwnersRemoved(groupId)
+      const hasRemovedAllOwners = TransToExec.hasAllCurrentOwnersRemoved(groupId)
+      const hasValidDocs = TransToExec.hasOwnersWithValidSupportDocs(groupId)
+      const hasOwnersWithoutDeathCert = !TransToExec.isAllGroupOwnersWithDeathCerts(groupId)
+
+      const isInvalid = !(hasRemovedAllOwners && hasValidDocs && hasRoleInGroup && hasOwnersWithoutDeathCert)
+
+      return hasRemovedOwners && isInvalid
+    }
+
     // check if Owner Group that has deceased Owners is valid
-    const isInvalidOwnerGroup = (groupId): boolean => {
-      if ((isTransferToExecutorProbateWill.value || isTransferToExecutorUnder25Will.value) && props.validateTransfer) {
-        const hasRemovedOwners = TransToExec.hasSomeOwnersRemoved(groupId)
-        const hasExecutors = TransToExec.hasAddedExecutorsInGroup(groupId)
-        const hasRemovedAllOwners = TransToExec.hasAllCurrentOwnersRemoved(groupId)
-        const hasValidDocs = TransToExec.hasOwnersWithValidSupportDocs(groupId)
-        const hasOwnersWithoutDeathCert = !TransToExec.isAllGroupOwnersWithDeathCerts(groupId)
+    const isInvalidOwnerGroup = (groupId: number): boolean => {
+      if (!props.isMhrTransfer) return isInvalidRegistrationOwnerGroup(groupId)
+      if (!props.validateTransfer) return false
+      if (isTransferDueToSaleOrGift.value) return TransSaleOrGift.hasMixedOwnersInGroup(groupId)
 
-        const isInvalid = !(hasRemovedAllOwners && hasValidDocs && hasExecutors && hasOwnersWithoutDeathCert)
+      if ((isTransferToExecutorProbateWill.value ||
+          isTransferToExecutorUnder25Will.value ||
+          isTransferToAdminNoWill.value)) {
+        const hasRoleInGroup = isTransferToAdminNoWill
+          ? TransToAdmin.hasAddedAdministratorsInGroup(groupId)
+          : TransToExec.hasAddedExecutorsInGroup(groupId)
 
-        return hasRemovedOwners && isInvalid
+        return isInvalidTransferOwnerGroup(groupId, hasRoleInGroup)
       }
 
-      if (isTransferToAdminNoWill.value && props.validateTransfer) {
-        const hasRemovedOwners = TransToExec.hasSomeOwnersRemoved(groupId)
-        const hasExecutors = TransToAdmin.hasAddedAdministratorsInGroup(groupId)
-        const hasRemovedAllOwners = TransToExec.hasAllCurrentOwnersRemoved(groupId)
-        const hasValidDocs = TransToExec.hasOwnersWithValidSupportDocs(groupId)
-        const hasOwnersWithoutDeathCert = !TransToExec.isAllGroupOwnersWithDeathCerts(groupId)
-
-        const isInvalid = !(hasRemovedAllOwners && hasValidDocs && hasExecutors && hasOwnersWithoutDeathCert)
-
-        return hasRemovedOwners && isInvalid
-      }
-
-      if (isTransferDueToSaleOrGift.value && props.validateTransfer) {
-        return TransSaleOrGift.hasMixedOwnersInGroup(groupId)
-      }
-
-      return props.validateTransfer && !isValidDeceasedOwnerGroup(groupId) && !localState.showTableError
+      return !isValidDeceasedOwnerGroup(groupId) && !localState.showTableError
     }
 
     const remove = (item): void => {
@@ -660,31 +679,23 @@ export default defineComponent({
 
     // validate group for different Transfers types
     const isTransferGroupValid = (groupId: number, index) => {
-      if (isTransferToExecutorProbateWill.value || isTransferToExecutorUnder25Will.value) {
+      if (index !== 0 || !hasUnsavedChanges.value) return false
+      if (isTransferToExecutorProbateWill.value ||
+          isTransferToExecutorUnder25Will.value ||
+          isTransferToAdminNoWill.value) {
+        const hasAddedRoleInGroup = isTransferToAdminNoWill.value
+          ? TransToAdmin.hasAddedAdministratorsInGroup(groupId)
+          : TransToExec.hasAddedExecutorsInGroup(groupId)
+
         return (
-          index === 0 &&
-          hasUnsavedChanges.value &&
-          (TransToExec.hasSomeOwnersRemoved(groupId) || TransToExec.hasAddedExecutorsInGroup(groupId))
-        ) &&
-        !(TransToExec.hasAddedExecutorsInGroup(groupId) &&
+          (TransToExec.hasSomeOwnersRemoved(groupId) || hasAddedRoleInGroup) &&
+          !(hasAddedRoleInGroup &&
           TransToExec.hasAllCurrentOwnersRemoved(groupId) &&
           !TransToExec.isAllGroupOwnersWithDeathCerts(groupId))
+        )
       }
-      if (isTransferToAdminNoWill.value) {
-        return (
-          index === 0 &&
-          hasUnsavedChanges.value &&
-          (TransToExec.hasSomeOwnersRemoved(groupId) || TransToAdmin.hasAddedAdministratorsInGroup(groupId))
-        ) &&
-        !(TransToAdmin.hasAddedAdministratorsInGroup(groupId) &&
-          TransToExec.hasAllCurrentOwnersRemoved(groupId) &&
-          !TransToExec.isAllGroupOwnersWithDeathCerts(groupId))
-      }
-      if (isTransferDueToSaleOrGift.value) {
-        return index === 0 &&
-          hasUnsavedChanges.value &&
-          TransSaleOrGift.hasMixedOwnersInGroup(groupId)
-      }
+
+      if (isTransferDueToSaleOrGift.value) return TransSaleOrGift.hasMixedOwnersInGroup(groupId)
     }
 
     const removeOwnerHandler = (owner: MhrRegistrationHomeOwnerIF): void => {
@@ -783,6 +794,7 @@ export default defineComponent({
       markForRemoval,
       undo,
       mapInfoChipAction,
+      hasMixedOwnersInGroup,
       hasRemovedAllHomeOwners,
       hasRemovedAllHomeOwnerGroups,
       isAddedHomeOwnerGroup,
@@ -807,6 +819,7 @@ export default defineComponent({
       isTransferToAdminNoWill,
       isCurrentOwner,
       mhrDeceasedOwnerChanges,
+      MhrErrorMsgs,
       removeOwnerHandler,
       removeChangeOwnerHandler,
       handleOwnerChangesDialogResp,
