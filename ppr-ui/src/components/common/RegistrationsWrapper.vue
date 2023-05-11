@@ -156,7 +156,7 @@
 <script lang="ts">
 // Components
 /* eslint-disable no-unused-vars */
-import { computed, defineComponent, onBeforeMount, reactive, toRefs, watch } from '@vue/composition-api'
+import { computed, defineComponent, nextTick, onBeforeMount, reactive, toRefs, watch } from '@vue/composition-api'
 import { useActions, useGetters } from 'vuex-composition-helpers'
 import { RegistrationBar } from '@/components/registration'
 import { RegistrationTable } from '@/components/tables'
@@ -563,7 +563,7 @@ export default defineComponent({
         // not a base registration so add parent reg num
           parentRegNum = addReg.mhrNumber.toUpperCase()
         }
-        await fetchMhRegistrations()
+
         const newRegItem: RegTableNewItemI = {
           addedReg: regNum,
           addedRegParent: parentRegNum,
@@ -571,6 +571,7 @@ export default defineComponent({
           prevDraft: ''
         }
         setRegTableNewItem(newRegItem)
+        await fetchMhRegistrations()
       }
       localState.loading = false
     }
