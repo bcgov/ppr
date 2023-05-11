@@ -67,7 +67,7 @@ TO_REGISTRATION_TYPE = {
     'AFFE': 'TRANS_AFFIDAVIT',
     'LETA': 'TRANS_ADMIN',
     'WILL': 'TRANS_WILL',
-    'EXRS': 'EXEXEMPTION_RESRS',
+    'EXRS': 'EXEMPTION_RES',
     'EXNR': 'EXEMPTION_NON_RES',
     '103': 'PERMIT',
     '102': 'DECAL_REPLACE',
@@ -121,7 +121,9 @@ WHERE account_id = :query_value
 )
 """
 QUERY_ACCOUNT_REGISTRATIONS_SUMMARY = """
-SELECT mr.id, mr.registration_ts, mr.account_id, mr.registration_type, mr.mhr_number, mr.document_id,
+SELECT mr.id, mr.registration_ts, mr.account_id, mr.registration_type, mr.mhr_number,
+       (SELECT d.document_id FROM mhr_documents d WHERE d.registration_id = mr.id FETCH FIRST 1 ROWS ONLY)
+       AS document_id,
        mrr.create_ts as doc_ts, mrr.doc_storage_url, mrt.registration_type_desc,
        (SELECT CASE WHEN mr.user_id IS NULL THEN ''
           ELSE (SELECT u.firstname || ' ' || u.lastname FROM users u WHERE u.username = mr.user_id
@@ -719,8 +721,9 @@ def __get_owner_names(result, results) -> str:
     """Get owner names from the most recent registration matching the mhr number."""
     names = ''
     for reg in results:
-        if reg['mhrNumber'] == result['mhrNumber'] and reg['documentId'] != result['documentId']:
-            return result['ownerNames']
+        if reg['mhrNumber'] == result['mhrNumber'] and reg['documentId'] != result['documentId'] and \
+                reg.get('ownerNames'):
+            return reg['ownerNames']
     return names
 
 
@@ -734,9 +737,6 @@ def __get_summary_result(result, reg_summary_list) -> dict:
     for reg in reg_summary_list:
         reg_mhr_num = reg.get('mhr_number')
         reg_doc_id = reg.get('document_id')
-        if reg_mhr_num == mhr_num and reg.get('registration_type') == MhrRegistrationTypes.MHREG:
-            match = reg
-            break
         if reg_mhr_num == mhr_num and reg_doc_id == doc_id:
             match = reg
             break
@@ -778,7 +778,7 @@ def __build_summary(row, add_in_user_list: bool = True, mhr_list=None):
     mhr_number = str(row[0])
     # current_app.logger.info(f'summary mhr#={mhr_number}')
     timestamp = row[2]
-    owners = str(row[6])
+    owners = str(row[6]) if row[6] else None
     owner_names = ''
     if owners:
         owners = owners.replace('<owner>', '')

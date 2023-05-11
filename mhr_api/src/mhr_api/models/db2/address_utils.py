@@ -467,6 +467,52 @@ def remove_region_country(legacy_value: str, region: str, country: str) -> str:
     return value.strip()
 
 
+def format_postal_code(address: dict) -> str:
+    """Format a Canadian address postal code."""
+    postal_code = str(address.get('postalCode', ''))
+    if not postal_code:
+        return postal_code
+    country = str(address.get('country', ''))
+    if not country:
+        country = get_country_from_region(address.get('region', ''))
+    p_code: str = postal_code.strip().upper()
+    if country and country == COUNTRY_CA:
+        p_code = p_code.replace('-', ' ')
+        if len(p_code) == 6:
+            p_code = p_code[0:3] + ' ' + p_code[3:]
+    return p_code
+
+
+def to_db2_owner_address(address_json):
+    """Convert address json to a DB2 legacy owner address."""
+    db2_address = str(address_json['street']).upper().ljust(40, ' ')
+    city = str(address_json['city']).upper().ljust(40, ' ')
+    region: str = ''
+    country: str = ''
+    rest: str = ''
+    if address_json.get('region'):
+        region = str(address_json['region']).upper()
+    if address_json.get('country'):
+        country = str(address_json['country']).upper()
+    if region and not country:
+        country = get_country_from_region(region, '')
+    if country:
+        region += ' ' + country.upper()
+    if address_json.get('streetAdditional'):
+        street_2 = str(address_json['streetAdditional']).upper().ljust(40, ' ')
+        db2_address += street_2[0:40]
+    db2_address += city
+    if region:
+        db2_address += region.strip().ljust(40, ' ')
+    if len(db2_address) < 81:
+        rest = rest.rjust(80, ' ')
+        db2_address += rest
+    elif len(db2_address) < 121:
+        rest = rest.rjust(40, ' ')
+        db2_address += rest
+    return db2_address[:160]
+
+
 def to_db2_address(address_json):
     """Convert address json to a DB2 legacy address."""
     db2_address = str(address_json['street']).upper().ljust(40, ' ')
