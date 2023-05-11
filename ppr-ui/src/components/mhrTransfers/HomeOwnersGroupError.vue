@@ -23,10 +23,10 @@
   <!-- Transfer Sale or Gift error messages -->
   <span v-else-if="isTransferDueToSaleOrGift && TransSaleOrGift.hasMixedOwnersInGroup(groupId)">
     <span v-if="hasOneHomeOwnerGroup">
-      {{ transfersErrors.hasMixedOwnerTypes }}
+      {{ MhrErrorMsgs.HAS_MIXED_OWNER_TYPES }}
     </span>
     <span v-else>
-      {{ transfersErrors.hasMixedOwnerTypesInGroup }}
+      {{ MhrErrorMsgs.HAS_MIXED_OWNER_TYPES_IN_GROUP }}
     </span>
   </span>
   <!-- Transfer to Admin error messages -->
@@ -61,6 +61,7 @@ import { computed, defineComponent, reactive, toRefs } from '@vue/composition-ap
 import { transfersErrors } from '@/resources'
 import { useGetters } from 'vuex-composition-helpers'
 import { useTransferOwners } from '@/composables/mhrInformation'
+import { MhrErrorMsgs } from '@/enums/Errors/mhrErrors'
 
 export default defineComponent({
   name: 'HomeOwnersGroupError',
@@ -101,6 +102,7 @@ export default defineComponent({
       isTransferToExecutorUnder25Will,
       isTransferToAdminNoWill,
       getMhrTransferType,
+      MhrErrorMsgs,
       transfersErrors,
       ...toRefs(localState)
     }
