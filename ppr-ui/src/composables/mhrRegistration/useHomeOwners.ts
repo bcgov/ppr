@@ -92,13 +92,12 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
     if (isMhrTransfer &&
       getMhrTransferType.value?.transferType === ApiTransferTypes.SALE_OR_GIFT &&
       getMhrTransferHomeOwnerGroups.value.length === 1) {
-      const hasMixedOwners = !getMhrTransferHomeOwnerGroups.value
-        .every((group: MhrRegistrationHomeOwnerGroupIF) => {
-          const ownerTypes = group.owners
-            .filter(owner => owner.action !== ActionTypes.REMOVED)
-            .map(owner => owner.partyType)
-          return uniq(ownerTypes).length < 2
-        })
+      // git first group since there is only one group in this case
+      const ownerTypes = getMhrTransferHomeOwnerGroups.value[0].owners
+        .filter(owner => owner.action !== ActionTypes.REMOVED)
+        .map(owner => owner.partyType)
+
+      const hasMixedOwners = ownerTypes.length === 1 ? false : uniq(ownerTypes).length > 1
 
       if (hasMixedOwners) {
         return HomeTenancyTypes.NA
@@ -153,7 +152,8 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
       HomeOwnerPartyTypes.TRUSTEE,
       HomeOwnerPartyTypes.ADMINISTRATOR
     ]
-    return group.owners.some(owner => executorTrusteeAdmin.includes(owner.partyType))
+    return group.owners.some(owner => executorTrusteeAdmin.includes(owner.partyType) &&
+      owner.action !== ActionTypes.REMOVED)
   }
 
   /**
@@ -269,7 +269,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
         (groupToUpdate.action !== ActionTypes.REMOVED ||
          (getMhrTransferType.value?.transferType === ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL ||
           getMhrTransferType.value?.transferType === ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL))) {
-      groupToUpdate.owners.push(owner)
+      groupToUpdate.owners.push({ ...owner, groupId: groupId || fallBackId })
     } else {
       // No groups exist, need to create a new one
       const newGroup = {
