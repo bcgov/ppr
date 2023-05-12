@@ -35,8 +35,7 @@ import {
   UITransferTypes
 } from '@/enums'
 import { DeathCertificate, SupportingDocuments } from '@/components/mhrTransfers'
-import { transferSupportingDocuments, transfersErrors } from '@/resources'
-import { MhrErrorMsgs } from '@/enums/Errors/mhrErrors'
+import { transferSupportingDocuments, transfersErrors, MixedRolesErrors } from '@/resources'
 
 Vue.use(Vuetify)
 
@@ -612,7 +611,7 @@ describe('Home Owners', () => {
     const homeOwners = wrapper.findComponent(HomeOwners)
     const groupError = homeOwners.find(getTestId('invalid-group-msg'))
 
-    expect(groupError.text()).toContain(MhrErrorMsgs.HAS_MIXED_OWNER_TYPES)
+    expect(groupError.text()).toContain(MixedRolesErrors.hasMixedOwnerTypes)
 
     // add one more owner to the second group to trigger a new error message
     homeOwnerGroup.push({
@@ -623,7 +622,7 @@ describe('Home Owners', () => {
 
     await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerGroup)
 
-    expect(groupError.text()).toContain(MhrErrorMsgs.HAS_MIXED_OWNER_TYPES_IN_GROUP)
+    expect(groupError.text()).toContain(MixedRolesErrors.hasMixedOwnerTypesInGroup)
   })
 
   it('TRANS WILL: validations with sole Owner in one group', async () => {

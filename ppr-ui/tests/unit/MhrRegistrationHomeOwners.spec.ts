@@ -13,11 +13,11 @@ import {
   HomeOwnersMixedRolesError
 } from '@/components/mhrRegistration/HomeOwners'
 import { SimpleHelpToggle } from '@/components/common'
-import { mockedPerson, mockedOrganization, mockedEmptyGroup, mockedExecutor, mockedOwner } from './test-data'
+import { mockedPerson, mockedOrganization, mockedExecutor, mockedOwner } from './test-data'
 import { getTestId } from './utils'
 import { MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF } from '@/interfaces'
 import { HomeTenancyTypes } from '@/enums'
-import { MhrErrorMsgs } from '@/enums/Errors/mhrErrors'
+import { MixedRolesErrors } from '@/resources'
 
 Vue.use(Vuetify)
 
@@ -483,7 +483,7 @@ describe('Home Owners', () => {
     const homeOwners = wrapper.findComponent(HomeOwners)
     const MixedRolesError = homeOwners.find(getTestId('invalid-group-mixed-owners'))
     expect(MixedRolesError.exists()).toBeTruthy()
-    expect(MixedRolesError.text()).toContain(MhrErrorMsgs.HAS_MIXED_OWNER_TYPES)
+    expect(MixedRolesError.text()).toContain(MixedRolesErrors.hasMixedOwnerTypes)
 
     // add one more owner to the second group to trigger a new error message
     homeOwnerGroups.push({
@@ -495,7 +495,7 @@ describe('Home Owners', () => {
     await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerGroups)
     await Vue.nextTick()
 
-    expect(MixedRolesError.text()).toContain(MhrErrorMsgs.HAS_MIXED_OWNER_TYPES_IN_GROUP)
+    expect(MixedRolesError.text()).toContain(MixedRolesErrors.hasMixedOwnerTypesInGroup)
 
     // Expect the error message to be shown for the first group only
     expect(homeOwners.find(getTestId('mixed-owners-msg-group-1')).exists()).toBeTruthy()
