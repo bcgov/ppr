@@ -302,13 +302,9 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
 
       const partyType = isTransferToAdminNoWill.value ? HomeOwnerPartyTypes.ADMINISTRATOR : HomeOwnerPartyTypes.EXECUTOR
 
-      const hasAddedExecutorInGroup = getMhrTransferHomeOwnerGroups.value
-        .find(group => group.groupId === owner.groupId).owners
-        .some(owner => owner.partyType === partyType)
-
       return (hasDeletedOwners && !isDeletedOwnersInGroup) ||
         // in case of Undo, still disable Delete button
-        ((hasUnsavedChanges.value && !hasDeletedOwners) && !hasAddedExecutorInGroup)
+        ((hasUnsavedChanges.value && !hasDeletedOwners) && !hasAddedPartyTypeToGroup(owner.groupId, partyType))
     }
     return false
   }
@@ -382,12 +378,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
         .filter(owner => owner.action !== ActionTypes.ADDED)
         .length === 1
     },
-    hasAddedExecutorsInGroup: (groupId): boolean => {
-      return getMhrTransferHomeOwnerGroups.value
-        .find(group => group.groupId === groupId).owners
-        .some(owner => owner.partyType === HomeOwnerPartyTypes.EXECUTOR &&
-          owner.action === ActionTypes.ADDED)
-    },
+    hasAddedExecutorsInGroup: (groupId): boolean => hasAddedPartyTypeToGroup(groupId, HomeOwnerPartyTypes.EXECUTOR),
     hasAllCurrentOwnersRemoved: (groupId): boolean => {
       return getMhrTransferHomeOwnerGroups.value
         .find(group => group.groupId === groupId).owners
@@ -512,12 +503,8 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
   }
 
   const TransToAdmin = {
-    hasAddedAdministratorsInGroup: (groupId): boolean => {
-      return getMhrTransferHomeOwnerGroups.value
-        .find(group => group.groupId === groupId).owners
-        .some(owner => owner.partyType === HomeOwnerPartyTypes.ADMINISTRATOR &&
-          owner.action === ActionTypes.ADDED)
-    }
+    hasAddedAdministratorsInGroup: (groupId): boolean =>
+      hasAddedPartyTypeToGroup(groupId, HomeOwnerPartyTypes.ADMINISTRATOR)
   }
 
   /** Return true if the specified owner is part of the current/base ownership structure **/
@@ -610,6 +597,14 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     const isEqualDenominator = isEqual(currentGroup?.interestDenominator, fractionalData.interestDenominator)
 
     return currentGroup && (!isEqualNumerator || !isEqualDenominator)
+  }
+
+  /** Return true if a member of a specified partyType has been added to the group **/
+  const hasAddedPartyTypeToGroup = (groupId: number, partyType: HomeOwnerPartyTypes): boolean => {
+    return getMhrTransferHomeOwnerGroups.value
+      .find(group => group.groupId === groupId).owners
+      .some(owner => owner.partyType === partyType &&
+        owner.action === ActionTypes.ADDED)
   }
 
   return {

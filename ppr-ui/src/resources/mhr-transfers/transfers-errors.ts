@@ -32,9 +32,5 @@ export const transfersErrors = {
       'One of the deceased owners must have an Affidavit of Executor with Death Certificate.',
     [ApiTransferTypes.TO_ADMIN_NO_WILL]:
       'One of the deceased owners must have a Grant of Administration.'
-  },
-
-  // Sale or Gift Transfer
-  hasMixedOwnerTypes: 'Cannot have a mix of owner, executor, administrator and bankruptcy trustee roles.',
-  hasMixedOwnerTypesInGroup: 'Group cannot have a mix of owner, executor, administrator and bankruptcy trustee roles.'
+  }
 }

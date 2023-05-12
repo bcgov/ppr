@@ -9,13 +9,15 @@ import {
   HomeOwnersTable,
   HomeOwnerGroups,
   TableGroupHeader,
-  FractionalOwnership
+  FractionalOwnership,
+  HomeOwnersMixedRolesError
 } from '@/components/mhrRegistration/HomeOwners'
 import { SimpleHelpToggle } from '@/components/common'
-import { mockedPerson, mockedOrganization } from './test-data'
+import { mockedPerson, mockedOrganization, mockedExecutor, mockedOwner } from './test-data'
 import { getTestId } from './utils'
 import { MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF } from '@/interfaces'
 import { HomeTenancyTypes } from '@/enums'
+import { MixedRolesErrors } from '@/resources'
 
 Vue.use(Vuetify)
 
@@ -465,5 +467,61 @@ describe('Home Owners', () => {
         .find(getTestId('home-owner-tenancy-type'))
         .text()
     ).toBe(HomeTenancyTypes.COMMON)
+  })
+
+  it('should show Mixed Role error', async () => {
+    const homeOwnerGroups: MhrRegistrationHomeOwnerGroupIF[] = [
+      {
+        groupId: 1,
+        owners: [mockedOwner, mockedExecutor],
+        type: ''
+      }
+    ]
+    await store.dispatch('setMhrRegistrationHomeOwnerGroups', homeOwnerGroups)
+    await Vue.nextTick()
+
+    const homeOwners = wrapper.findComponent(HomeOwners)
+    const MixedRolesError = homeOwners.find(getTestId('invalid-group-mixed-owners'))
+    expect(MixedRolesError.exists()).toBeTruthy()
+    expect(MixedRolesError.text()).toContain(MixedRolesErrors.hasMixedOwnerTypes)
+
+    // add one more owner to the second group to trigger a new error message
+    homeOwnerGroups.push({
+      groupId: 2,
+      owners: [mockedExecutor, mockedExecutor],
+      type: ''
+    } as MhrRegistrationHomeOwnerGroupIF)
+
+    await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerGroups)
+    await Vue.nextTick()
+
+    expect(MixedRolesError.text()).toContain(MixedRolesErrors.hasMixedOwnerTypesInGroup)
+
+    // Expect the error message to be shown for the first group only
+    expect(homeOwners.find(getTestId('mixed-owners-msg-group-1')).exists()).toBeTruthy()
+    expect(homeOwners.find(getTestId('mixed-owners-msg-group-2')).exists()).toBeFalsy()
+  })
+
+  it('should remove error message if no longer has mixed role', async () => {
+    const homeOwnerGroups: MhrRegistrationHomeOwnerGroupIF[] = [
+      {
+        groupId: 1,
+        owners: [mockedOwner, mockedExecutor],
+        type: ''
+      }
+    ]
+    await store.dispatch('setMhrRegistrationHomeOwnerGroups', homeOwnerGroups)
+    await Vue.nextTick()
+
+    const homeOwners = wrapper.findComponent(HomeOwners)
+    const MixedRolesError = homeOwners.find(getTestId('invalid-group-mixed-owners'))
+    expect(MixedRolesError.exists()).toBeTruthy()
+
+    // remove the executor from the group
+    homeOwnerGroups[0].owners = [mockedOwner]
+    await store.dispatch('setMhrRegistrationHomeOwnerGroups', homeOwnerGroups)
+    await Vue.nextTick()
+
+    expect(MixedRolesError.exists()).toBeFalsy()
   })
 })
