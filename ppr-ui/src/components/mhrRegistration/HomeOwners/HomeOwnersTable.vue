@@ -573,7 +573,7 @@ export default defineComponent({
       if ((isTransferToExecutorProbateWill.value ||
           isTransferToExecutorUnder25Will.value ||
           isTransferToAdminNoWill.value)) {
-        const hasRoleInGroup = isTransferToAdminNoWill
+        const hasRoleInGroup = isTransferToAdminNoWill.value
           ? TransToAdmin.hasAddedAdministratorsInGroup(groupId)
           : TransToExec.hasAddedExecutorsInGroup(groupId)
 
