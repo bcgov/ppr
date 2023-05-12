@@ -47,6 +47,20 @@ export const mockedExecutor: MhrRegistrationHomeOwnerIF = {
   address: mockedAddress
 }
 
+export const mockedOwner: MhrRegistrationHomeOwnerIF = {
+  ownerId: 45,
+  individualName: {
+    first: 'Owner',
+    middle: 'A',
+    last: 'Smith'
+  },
+  suffix: 'I am an owner!',
+  phoneNumber: '(123) 777-2211',
+  phoneExtension: '1234',
+  partyType: HomeOwnerPartyTypes.OWNER_IND,
+  address: mockedAddress
+}
+
 export const mockedAddedExecutor: MhrRegistrationHomeOwnerIF = {
   ownerId: 20,
   individualName: {
