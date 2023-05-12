@@ -1,27 +1,25 @@
 <template>
-    <td :colspan="4"
-            class="py-1"
-            :class="{ 'border-error-left': borderError}"
-            data-test-id="invalid-group-mixed-owners"
+      <td
+        class="py-1"
+        :class="{ 'border-error-left': showBorderError }"
+        :colspan="4"
+        data-test-id="invalid-group-mixed-owners"
+        >
+          <div
+          class="error-text my-6 text-center"
+          :data-test-id="`mixed-owners-msg-group-${groupId}`"
           >
-            <div
-              class="error-text my-6 text-center"
-              :data-test-id="`mixed-owners-msg-group-${groupId}`"
-            >
-                <span v-if="hasOneHomeOwnerGroup">
-                  {{ MhrErrorMsgs.HAS_MIXED_OWNER_TYPES }}
-                </span>
-                <span v-else>
-                  {{ MhrErrorMsgs.HAS_MIXED_OWNER_TYPES_IN_GROUP }}
-                </span>
-              </div>
-         </td>
+            <span>
+            {{ mixedRoleErrorMsg }}
+            </span>
+          </div>
+      </td>
 </template>
 
 <script lang="ts">
 import { computed, defineComponent, reactive, toRefs } from '@vue/composition-api'
 import { useGetters } from 'vuex-composition-helpers'
-import { MhrErrorMsgs } from '@/enums/Errors/mhrErrors'
+import { MixedRolesErrors } from '@/resources'
 
 export default defineComponent({
   name: 'HomeOwnersMixedRolesError',
@@ -30,7 +28,7 @@ export default defineComponent({
       type: Number,
       required: true
     },
-    borderError: {
+    showBorderError: {
       type: Boolean,
       required: true
     }
@@ -43,11 +41,11 @@ export default defineComponent({
     ])
 
     const localState = reactive({
-      hasOneHomeOwnerGroup: computed(() => getMhrRegistrationHomeOwnerGroups.value.length === 1)
+      mixedRoleErrorMsg: computed(() => getMhrRegistrationHomeOwnerGroups.value.length === 1
+        ? MixedRolesErrors.hasMixedOwnerTypes : MixedRolesErrors.hasMixedOwnerTypesInGroup)
     })
 
     return {
-      MhrErrorMsgs,
       ...toRefs(localState)
     }
   }

@@ -601,8 +601,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
 
   /** Return true if a member of a specified partyType has been added to the group **/
   const hasAddedpartyTypeToGroup = (groupId: number, partyType: HomeOwnerPartyTypes): boolean => {
-    const value = getMhrTransferHomeOwnerGroups.value
-    return value
+    return getMhrTransferHomeOwnerGroups.value
       .find(group => group.groupId === groupId).owners
       .some(owner => owner.partyType === partyType &&
         owner.action === ActionTypes.ADDED)
