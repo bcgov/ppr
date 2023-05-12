@@ -132,8 +132,8 @@
               <div v-if="row.item.suffix"
                 class="font-light"
                 :class="{ 'suffix-error': showSuffixError &&
-                    row.item.partyType === HomeOwnerPartyTypes.EXECUTOR &&
-                    row.item.action === ActionTypes.ADDED }">
+                  row.item.partyType === HomeOwnerPartyTypes.EXECUTOR &&
+                  row.item.action === ActionTypes.ADDED }">
                 {{ row.item.suffix }}
               </div>
             </div>
@@ -181,8 +181,8 @@
               <v-menu offset-y left nudge-bottom="0">
                 <template v-slot:activator="{ on }">
                   <v-btn text v-on="on"
-                          color="primary" class="px-0"
-                          :disabled="isAddingMode || isGlobalEditingMode"
+                         color="primary" class="px-0"
+                         :disabled="isAddingMode || isGlobalEditingMode"
                   >
                     <v-icon>mdi-menu-down</v-icon>
                   </v-btn>
@@ -296,8 +296,8 @@
         </tr>
         <tr
           v-else-if="isRemovedHomeOwner(row.item) &&
-            (showDeathCertificate() || showSupportingDocuments()) &&
-            isReadonlyTable"
+                    (showDeathCertificate() || showSupportingDocuments()) &&
+                    isReadonlyTable"
         >
           <td :colspan="homeOwnersTableHeaders.length" class="deceased-review-info">
             <v-row no-gutters class="ml-8 my-n3">
