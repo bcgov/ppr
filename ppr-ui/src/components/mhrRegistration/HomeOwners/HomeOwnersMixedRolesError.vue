@@ -41,7 +41,7 @@ export default defineComponent({
     ])
 
     const localState = reactive({
-      mixedRoleErrorMsg: computed(() => getMhrRegistrationHomeOwnerGroups.value.length === 1
+      mixedRoleErrorMsg: computed(() => getMhrRegistrationHomeOwnerGroups.value?.length === 1
         ? MixedRolesErrors.hasMixedOwnerTypes : MixedRolesErrors.hasMixedOwnerTypesInGroup)
     })
 

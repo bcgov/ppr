@@ -22,9 +22,9 @@
   </span>
   <!-- Transfer Sale or Gift error messages -->
   <span v-else-if="isTransferDueToSaleOrGift && TransSaleOrGift.hasMixedOwnersInGroup(groupId)">
-              {{ hasOneHomeOwnerGroup ?
-                MixedRolesErrors.hasMixedOwnerTypes :
-                MixedRolesErrors.hasMixedOwnerTypesInGroup }}
+    {{ hasOneHomeOwnerGroup ?
+      MixedRolesErrors.hasMixedOwnerTypes :
+      MixedRolesErrors.hasMixedOwnerTypesInGroup }}
   </span>
   <!-- Transfer to Admin error messages -->
   <span v-else-if="isTransferToAdminNoWill">
