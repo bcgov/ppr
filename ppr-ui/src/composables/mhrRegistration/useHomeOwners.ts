@@ -315,7 +315,8 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
 
       if (!groupToUpdate.interestNumerator && !groupToUpdate.interestDenominator &&
         groupToUpdate.owners.every(owner => owner.action === ActionTypes.REMOVED &&
-        getMhrTransferType.value.transferType !== ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL)) {
+        getMhrTransferType.value.transferType !== ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL &&
+        getMhrTransferType.value.transferType !== ApiTransferTypes.TO_ADMIN_NO_WILL)) {
         set(groupToUpdate, 'action', ActionTypes.REMOVED)
       }
 
