@@ -120,7 +120,8 @@ export default defineComponent({
       updateDeletedOwner()
       // Only one Grant of Probate document can be selected for the group
       if (localState.deletedOwnerState.supportingDocument === SupportingDocumentsOptions.PROBATE_GRANT ||
-        localState.deletedOwnerState.supportingDocument === SupportingDocumentsOptions.AFFIDAVIT) {
+        localState.deletedOwnerState.supportingDocument === SupportingDocumentsOptions.AFFIDAVIT ||
+        localState.deletedOwnerState.supportingDocument === SupportingDocumentsOptions.ADMIN_GRANT) {
         emit('handleDocOptionOneSelected')
       }
     })
