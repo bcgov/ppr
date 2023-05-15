@@ -1,7 +1,7 @@
 <template>
   <span>
     <v-icon
-      v-if="desc"
+      v-if="sortAsc"
       small
       color="black"
       @click="emitSort(true)"
@@ -29,7 +29,7 @@ export default defineComponent({
   emits: ['sortEvent'],
   components: {},
   props: {
-    desc: {
+    sortAsc: {
       type: Boolean,
       default: false
     }

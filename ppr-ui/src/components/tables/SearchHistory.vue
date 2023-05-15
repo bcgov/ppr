@@ -16,7 +16,7 @@
                   <!-- Date Sort Icon/Button -->
                   <SortingIcon
                     v-if="header.sortable"
-                    :desc="sortDesc"
+                    :sortAsc="sortAsc"
                     @sortEvent="dateSortHandler(searchHistory, 'searchDateTime', $event)"
                   />
                 </th>
@@ -204,7 +204,7 @@ export default defineComponent({
 
     const localState = reactive({
       keyValue: 0,
-      sortDesc: false,
+      sortAsc: false,
       headers: computed((): Array<any> => {
         const tableHeaders = cloneDeep(searchHistoryTableHeaders)
         if (localState.isStaff) {
@@ -408,7 +408,7 @@ export default defineComponent({
     }
     /** Date sort handler to sort and change sort icon state **/
     const dateSortHandler = (searchHistory: Array<SearchResponseIF>, dateType: string, reverse: boolean) => {
-      localState.sortDesc = !localState.sortDesc
+      localState.sortAsc = !localState.sortAsc
       sortDates(searchHistory, dateType, reverse)
     }
 

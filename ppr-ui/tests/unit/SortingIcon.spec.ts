@@ -9,7 +9,7 @@ describe('SortingIcon', () => {
   beforeEach(() => {
     wrapper = mount(SortingIcon, {
       propsData: {
-        desc: false
+        sortAsc: false
       }
     })
   })
@@ -22,7 +22,7 @@ describe('SortingIcon', () => {
   })
 
   it('should emit sortEvent with true when sorted and clicked', async () => {
-    wrapper.setProps({ desc: true })
+    wrapper.setProps({ sortAsc: true })
     await nextTick()
 
     await wrapper.find('v-icon').trigger('click')
@@ -41,7 +41,7 @@ describe('SortingIcon', () => {
   })
 
   it('should render the down arrow icon when desc', async () => {
-    wrapper.setProps({ desc: true })
+    wrapper.setProps({ sortAsc: true })
     await nextTick()
 
     const upArrowIcon = wrapper.find(getTestId('up-arrow-icon'))
