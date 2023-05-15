@@ -137,6 +137,7 @@ export const searchHistoryTableHeaders: Array<BaseHeaderIF> = [
   },
   {
     class: 'column-mdl',
+    sortable: true,
     text: 'Date/Time (Pacific time)',
     value: 'searchDateTime'
   },
@@ -193,6 +194,7 @@ export const searchHistoryTableHeadersStaff: Array<BaseHeaderIF> = [
   },
   {
     class: 'column-lg',
+    sortable: true,
     text: 'Date/Time (Pacific time)',
     value: 'searchDateTime'
   },
