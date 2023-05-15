@@ -36,7 +36,7 @@ export default defineComponent({
   },
   setup (props, context) {
     const localState = reactive({})
-    const emitSort = (val) => context.emit('sortEvent', val)
+    const emitSort = isAsc => context.emit('sortEvent', isAsc)
 
     return {
       emitSort,
