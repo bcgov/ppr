@@ -17,7 +17,7 @@ import { computed, reactive, toRefs } from '@vue/composition-api'
 import { isEqual, find, uniq } from 'lodash'
 import { normalizeObject } from '@/utils'
 import { useHomeOwners } from '@/composables'
-import { transferSupportingDocumentTypes } from '@/resources/'
+import { transferOwnerPrefillTypes, transferSupportingDocumentTypes } from '@/resources/'
 
 /**
  * Composable to handle Ownership functionality and permissions specific to the varying Transfer of Ownership filings.
@@ -405,13 +405,14 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
             (owner.supportingDocument === SupportingDocumentsOptions.DEATH_CERT)
         })
     },
-    // Check if there's a deleted Owner with selected Grant of Probate or Affidavit as a supporting document.
+    // Check if there's a deleted Owner with selected
+    // Grant of Probate or Affidavit or Admin Grant as a supporting document.
     hasDeletedOwnersWithProbateGrantOrAffidavit: (): boolean => {
       return getMhrTransferHomeOwnerGroups.value.some(group =>
         group.owners.some(owner =>
           owner.supportingDocument === TransToExec.getSupportingDocForActiveTransfer()))
     },
-    prefillOwnerAsExecutor: (owner: MhrRegistrationHomeOwnerIF): void => {
+    prefillOwnerAsExecOrAdmin: (owner: MhrRegistrationHomeOwnerIF): void => {
       const allOwners = getMhrTransferHomeOwners.value
       const deletedOwnerGroup = find(getMhrTransferHomeOwnerGroups.value, { owners: [{ action: ActionTypes.REMOVED }] })
       const supportingDocOfTheTransferType = TransToExec.getSupportingDocForActiveTransfer()
@@ -425,7 +426,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
         suffix: deletedOwner.organizationName?.length > 0
           ? 'Executor of the will of ' + deletedOwner.organizationName
           : 'Executor of the will of ' + Object.values(deletedOwner.individualName).join(' '),
-        partyType: HomeOwnerPartyTypes.EXECUTOR,
+        partyType: transferOwnerPrefillTypes[getMhrTransferType.value?.transferType],
         groupId: deletedOwnerGroup.groupId // new Owner will be added to the same group as deleted Owner
       } as MhrRegistrationHomeOwnerIF)
     },

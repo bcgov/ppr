@@ -1,9 +1,15 @@
-import { ApiTransferTypes, SupportingDocumentsOptions } from '@/enums'
+import { ApiTransferTypes, HomeOwnerPartyTypes, SupportingDocumentsOptions } from '@/enums'
 
 export const transferSupportingDocumentTypes = {
   [ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL]: SupportingDocumentsOptions.PROBATE_GRANT,
   [ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL]: SupportingDocumentsOptions.AFFIDAVIT,
   [ApiTransferTypes.TO_ADMIN_NO_WILL]: SupportingDocumentsOptions.ADMIN_GRANT
+}
+
+export const transferOwnerPrefillTypes = {
+  [ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL]: HomeOwnerPartyTypes.EXECUTOR,
+  [ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL]: HomeOwnerPartyTypes.EXECUTOR,
+  [ApiTransferTypes.TO_ADMIN_NO_WILL]: HomeOwnerPartyTypes.ADMINISTRATOR
 }
 
 export const transferSupportingDocuments = {
