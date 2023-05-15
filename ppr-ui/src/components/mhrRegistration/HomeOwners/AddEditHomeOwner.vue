@@ -518,15 +518,10 @@ export default defineComponent({
       defaultHomeOwner.organizationName = props.editHomeOwner?.organizationName || ''
     }
 
-    // Transfer Will flow: Pre-fill only new Owner as Executor (not when editing existing owner)
-    if ((isTransferToExecutorProbateWill.value || isTransferToExecutorUnder25Will.value) &&
-      TransToExec.hasDeletedOwnersWithProbateGrantOrAffidavit() &&
-      !props.editHomeOwner) {
-      TransToExec.prefillOwnerAsExecutor(defaultHomeOwner)
-    }
-
-    if (isTransferToAdminNoWill.value) {
-      defaultHomeOwner.partyType = HomeOwnerPartyTypes.ADMINISTRATOR
+    // Transfers flow: Pre-fill suffix and type for new owners (not when editing existing owner)
+    if (props.isMhrTransfer && !props.editHomeOwner &&
+      TransToExec.hasDeletedOwnersWithProbateGrantOrAffidavit()) {
+      TransToExec.prefillOwnerAsExecOrAdmin(defaultHomeOwner)
     }
 
     if (isFrozenMhr.value) {
