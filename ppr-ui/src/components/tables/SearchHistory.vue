@@ -2,30 +2,34 @@
   <v-container class="main-results-div pa-0 white">
     <v-row no-gutters class="pt-4">
       <v-col cols="12">
-        <v-data-table
+        <v-simple-table
           v-if="searchHistory"
           id="search-history-table"
-          hide-default-footer
-          fixed
-          fixed-header
-          :headers="headers"
           height="20rem"
-          :items="searchHistory"
-          item-key="searchId"
-          :items-per-page="-1"
-          mobile-breakpoint="0"
-          sort-by="searchDateTime"
-          sort-desc
-          return-object
+          fixed-header
         >
-          <template v-slot:body="{ items, headers }">
-            <tbody v-if="items.length > 0">
-              <tr v-for="item in items" :key="`${item.name}: ${items.indexOf(item) + keyValue}`">
+          <template v-slot:default>
+            <thead>
+              <tr>
+                <th v-for="header in headers" :key="header.value" :class="header.class">
+                  {{ header.text }}
+                  <!-- Date Sort Icon/Button -->
+                  <SortingIcon
+                    v-if="header.sortable"
+                    :desc="sortDesc"
+                    @sortEvent="dateSortHandler(searchHistory, 'searchDateTime', $event)"
+                  />
+                </th>
+              </tr>
+            </thead>
+
+            <tbody v-if="searchHistory.length > 0">
+              <tr v-for="item in searchHistory" :key="item.searchId">
                 <td>
                   <v-row no-gutters>
                     <v-col cols="2">
-                      <v-icon v-if="isPprSearch(item)" class="pr-2" color="#212529">mdi-account-details</v-icon>
-                      <v-icon v-else class="pr-2" color="#212529">mdi-home</v-icon>
+                      <v-icon v-if="isPprSearch(item)" class="pr-2 mt-n1" color="#212529">mdi-account-details</v-icon>
+                      <v-icon v-else class="pr-2 mt-n1" color="#212529">mdi-home</v-icon>
                     </v-col>
                     <v-col>
                       {{ displaySearchValue(item.searchQuery) }}
@@ -151,7 +155,7 @@
               </tr>
             </tbody>
           </template>
-        </v-data-table>
+        </v-simple-table>
       </v-col>
     </v-row>
   </v-container>
@@ -175,9 +179,12 @@ import { useSearch } from '@/composables/useSearch'
 import { cloneDeep } from 'lodash' // eslint-disable-line
 import _ from 'lodash' // eslint-disable-line
 import { ErrorCategories } from '@/enums'
+import { useTableFeatures } from '@/composables'
+import { SortingIcon } from '@/components/tables/common'
 
 export default defineComponent({
   components: {
+    SortingIcon,
     ErrorContact
   },
   setup (props, { emit }) {
@@ -194,8 +201,10 @@ export default defineComponent({
       'hasPprRole',
       'hasMhrRole'
     ])
+
     const localState = reactive({
       keyValue: 0,
+      sortDesc: false,
       headers: computed((): Array<any> => {
         const tableHeaders = cloneDeep(searchHistoryTableHeaders)
         if (localState.isStaff) {
@@ -207,10 +216,7 @@ export default defineComponent({
         return hasPprRole.value && hasMhrRole.value
       }),
       isStaff: computed((): boolean => {
-        if (isRoleStaff.value) {
-          return true
-        }
-        return false
+        return !!isRoleStaff.value
       }),
       historyLength: computed((): number => {
         return localState.searchHistory?.length || 0
@@ -221,13 +227,11 @@ export default defineComponent({
         }
       ),
       isSearchHistory: computed((): boolean => {
-        if (getSearchHistory.value) {
-          return true
-        }
-        return false
+        return !!getSearchHistory.value
       })
     })
     const { mapMhrSearchType } = useSearch()
+    const { sortDates } = useTableFeatures()
     const displayDate = (searchDate: string): string => {
       const date = new Date(searchDate)
       return convertDate(date, true, false)
@@ -395,7 +399,6 @@ export default defineComponent({
     const isPprSearch = (item: SearchResponseIF): boolean => {
       return item.exactResultsSize >= 0
     }
-
     const refreshRow = async (item): Promise<void> => {
       const pdf = await downloadPDF(item)
       if (pdf) {
@@ -403,6 +406,12 @@ export default defineComponent({
         localState.keyValue += 1
       }
     }
+    /** Date sort handler to sort and change sort icon state **/
+    const dateSortHandler = (searchHistory: Array<SearchResponseIF>, dateType: string, reverse: boolean) => {
+      localState.sortDesc = !localState.sortDesc
+      sortDates(searchHistory, dateType, reverse)
+    }
+
     return {
       ...toRefs(localState),
       displayDate,
@@ -416,7 +425,8 @@ export default defineComponent({
       isPprSearch,
       isSearchOwner,
       refreshRow,
-      retrySearch
+      retrySearch,
+      dateSortHandler
     }
   }
 })
@@ -443,6 +453,9 @@ export default defineComponent({
     height: 24px;
     min-width: 24px;
     width: 24px;
+  }
+  .v-icon.v-icon::after {
+    background-color: white; // Prevent grey background on icons when selected
   }
 }
 </style>
