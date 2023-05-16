@@ -97,7 +97,7 @@
             filled
             id="submitting-party-email"
             class="pt-4 pr-2"
-            label="Email Address"
+            label="Email Address (Optional)"
             v-model="submittingParty.emailAddress"
             :rules="emailRules"
           />
@@ -219,7 +219,7 @@ export default defineComponent({
       isStringOrNumber,
       required,
       isNumber,
-      isEmail,
+      isEmailOrEmpty,
       isPhone
     } = useInputRules()
 
@@ -276,7 +276,7 @@ export default defineComponent({
 
     const emailRules = customRules(
       maxLength(250),
-      isEmail(),
+      isEmailOrEmpty(),
       invalidSpaces()
     )
 
