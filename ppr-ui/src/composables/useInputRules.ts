@@ -61,11 +61,10 @@ export const useInputRules = () => {
     ]
   }
 
-  const isEmail = (): Array<Function> => [
-    (v: string) => !!v || 'Enter an email address',
+  const isEmailOptional = (): Array<Function> => [
     (v: string) => {
       const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-      return pattern.test(v) || 'Enter a valid email address'
+      return !v || pattern.test(v) || 'Enter a valid email address'
     }
   ]
 
@@ -108,7 +107,7 @@ export const useInputRules = () => {
 
   return {
     customRules,
-    isEmail,
+    isEmailOptional,
     isEmpty,
     invalidSpaces,
     isLettersOnly,

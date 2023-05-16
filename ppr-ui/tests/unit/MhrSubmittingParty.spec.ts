@@ -138,6 +138,21 @@ describe('mhr submitting party', () => {
     await Vue.nextTick()
     expect(submittingPartySection.findAll(ERROR_MSG).length).toBe(0)
 
+    await email.setValue('notAnEmail')
+    await Vue.nextTick()
+    await Vue.nextTick()
+    expect(submittingPartySection.findAll(ERROR_MSG).length).toBe(1)
+
+    await email.setValue(' ')
+    await Vue.nextTick()
+    await Vue.nextTick()
+    expect(submittingPartySection.findAll(ERROR_MSG).length).toBe(1)
+
+    await email.setValue('')
+    await Vue.nextTick()
+    await Vue.nextTick()
+    expect(submittingPartySection.findAll(ERROR_MSG).length).toBe(0)
+
     const phoneNum = submittingPartySection.find('#submitting-party-phone')
     phoneNum.setValue('1234567890')
     await Vue.nextTick()
