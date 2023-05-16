@@ -132,7 +132,7 @@
               <div v-if="row.item.suffix"
                 class="font-light"
                 :class="{ 'suffix-error': showSuffixError &&
-                  row.item.partyType === HomeOwnerPartyTypes.EXECUTOR &&
+                  row.item.partyType === getPartyTypeForActiveTransfer &&
                   row.item.action === ActionTypes.ADDED }">
                 {{ row.item.suffix }}
               </div>
@@ -394,7 +394,7 @@ import { DeathCertificate, SupportingDocuments, HomeOwnersGroupError } from '@/c
 import { BaseDialog } from '@/components/dialogs'
 import TableGroupHeader from '@/components/mhrRegistration/HomeOwners/TableGroupHeader.vue'
 import { mhrDeceasedOwnerChanges } from '@/resources/dialogOptions'
-import { transfersErrors } from '@/resources'
+import { transferOwnerPartyTypes, transfersErrors } from '@/resources'
 import { yyyyMmDdToPacificDate } from '@/utils/date-helper'
 import { InfoChip } from '@/components/common'
 /* eslint-disable no-unused-vars */
@@ -503,7 +503,6 @@ export default defineComponent({
       ownerToDecease: null as MhrRegistrationHomeOwnerIF,
       isEditingMode: computed((): boolean => localState.currentlyEditingHomeOwnerId >= 0),
       isAddingMode: computed((): boolean => props.isAdding),
-      isValidDeathCertificate: false,
       showTableError: computed((): boolean => {
         // For certain Transfers, we only need to check for global changes and do not show table error in other cases
         if (isTransferToExecutorProbateWill.value ||
@@ -546,7 +545,8 @@ export default defineComponent({
       }),
       isUngroupedTenancy: computed((): boolean => {
         return [HomeTenancyTypes.SOLE, HomeTenancyTypes.JOINT].includes(getHomeTenancyType())
-      })
+      }),
+      getPartyTypeForActiveTransfer: computed(() => transferOwnerPartyTypes[getMhrTransferType.value?.transferType])
     })
 
     const isInvalidRegistrationOwnerGroup = (groupId: number) =>
@@ -755,7 +755,9 @@ export default defineComponent({
       setUnsavedChanges(val.some(owner => !!owner.action || !owner.ownerId))
 
       // update suffix for executor(s) in certain Transfers flows
-      if (isTransferToExecutorProbateWill.value || isTransferToExecutorUnder25Will.value) {
+      if (isTransferToExecutorProbateWill.value ||
+        isTransferToExecutorUnder25Will.value ||
+        isTransferToAdminNoWill.value) {
         localState.showSuffixError = TransToExec.updateExecutorSuffix()
       }
 
