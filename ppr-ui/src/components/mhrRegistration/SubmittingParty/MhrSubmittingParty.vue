@@ -219,7 +219,7 @@ export default defineComponent({
       isStringOrNumber,
       required,
       isNumber,
-      isEmailOrEmpty,
+      isEmailOptional,
       isPhone
     } = useInputRules()
 
@@ -276,7 +276,7 @@ export default defineComponent({
 
     const emailRules = customRules(
       maxLength(250),
-      isEmailOrEmpty(),
+      isEmailOptional(),
       invalidSpaces()
     )
 
