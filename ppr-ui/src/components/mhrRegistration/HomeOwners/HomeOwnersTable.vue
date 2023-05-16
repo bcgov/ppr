@@ -546,7 +546,7 @@ export default defineComponent({
       isUngroupedTenancy: computed((): boolean => {
         return [HomeTenancyTypes.SOLE, HomeTenancyTypes.JOINT].includes(getHomeTenancyType())
       }),
-      getPartyTypeForActiveTransfer: computed(() => transferOwnerPartyTypes[getMhrTransferType.value.transferType])
+      getPartyTypeForActiveTransfer: computed(() => transferOwnerPartyTypes[getMhrTransferType.value?.transferType])
     })
 
     const isInvalidRegistrationOwnerGroup = (groupId: number) =>
