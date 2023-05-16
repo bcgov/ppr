@@ -17,7 +17,11 @@ import { computed, reactive, toRefs } from '@vue/composition-api'
 import { isEqual, find, uniq } from 'lodash'
 import { normalizeObject } from '@/utils'
 import { useHomeOwners } from '@/composables'
-import { transferOwnerPrefillTypes, transferSupportingDocumentTypes } from '@/resources/'
+import {
+  transferOwnerPrefillAdditionalName,
+  transferOwnerPartyTypes,
+  transferSupportingDocumentTypes
+} from '@/resources/'
 
 /**
  * Composable to handle Ownership functionality and permissions specific to the varying Transfer of Ownership filings.
@@ -413,6 +417,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
           owner.supportingDocument === TransToExec.getSupportingDocForActiveTransfer()))
     },
     prefillOwnerAsExecOrAdmin: (owner: MhrRegistrationHomeOwnerIF): void => {
+      const transferType = getMhrTransferType.value?.transferType
       const allOwners = getMhrTransferHomeOwners.value
       const deletedOwnerGroup = find(getMhrTransferHomeOwnerGroups.value, { owners: [{ action: ActionTypes.REMOVED }] })
       const supportingDocOfTheTransferType = TransToExec.getSupportingDocForActiveTransfer()
@@ -424,9 +429,9 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       Object.assign(owner, {
         ownerId: allOwners.length + 1,
         suffix: deletedOwner.organizationName?.length > 0
-          ? 'Executor of the will of ' + deletedOwner.organizationName
-          : 'Executor of the will of ' + Object.values(deletedOwner.individualName).join(' '),
-        partyType: transferOwnerPrefillTypes[getMhrTransferType.value?.transferType],
+          ? transferOwnerPrefillAdditionalName[transferType] + deletedOwner.organizationName
+          : transferOwnerPrefillAdditionalName[transferType] + Object.values(deletedOwner.individualName).join(' '),
+        partyType: transferOwnerPartyTypes[transferType],
         groupId: deletedOwnerGroup.groupId // new Owner will be added to the same group as deleted Owner
       } as MhrRegistrationHomeOwnerIF)
     },
@@ -450,20 +455,22 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
         })
     },
     addRemoveExecutorSuffix: (owner: MhrRegistrationHomeOwnerIF): boolean => {
+      const transferType = getMhrTransferType.value?.transferType
       let showSuffixError = false
 
       const allExecutors = getMhrTransferHomeOwners.value
-        .filter(owner => owner.partyType === HomeOwnerPartyTypes.EXECUTOR && owner.action === ActionTypes.ADDED)
+        .filter(owner => owner.partyType === transferOwnerPartyTypes[transferType] &&
+          owner.action === ActionTypes.ADDED)
 
       if (allExecutors.length === 1 && owner !== null) {
         const suffix = owner.individualName
-          ? 'Executor of the will of ' + Object.values(owner.individualName).join(' ')
-          : 'Executor of the will of ' + owner.organizationName
+          ? transferOwnerPrefillAdditionalName[transferType] + Object.values(owner.individualName).join(' ')
+          : transferOwnerPrefillAdditionalName[transferType] + owner.organizationName
         allExecutors[0].suffix = suffix
         showSuffixError = false
       } else {
         allExecutors.forEach((executor: MhrRegistrationHomeOwnerIF) => {
-          executor.suffix = 'Executor of the will of N/A'
+          executor.suffix = transferOwnerPrefillAdditionalName[transferType] + 'N/A'
           showSuffixError = true
         })
       }

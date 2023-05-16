@@ -6,10 +6,16 @@ export const transferSupportingDocumentTypes = {
   [ApiTransferTypes.TO_ADMIN_NO_WILL]: SupportingDocumentsOptions.ADMIN_GRANT
 }
 
-export const transferOwnerPrefillTypes = {
+export const transferOwnerPartyTypes = {
   [ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL]: HomeOwnerPartyTypes.EXECUTOR,
   [ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL]: HomeOwnerPartyTypes.EXECUTOR,
   [ApiTransferTypes.TO_ADMIN_NO_WILL]: HomeOwnerPartyTypes.ADMINISTRATOR
+}
+
+export const transferOwnerPrefillAdditionalName = {
+  [ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL]: 'Executor of the will of ',
+  [ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL]: 'Executor of the will of ',
+  [ApiTransferTypes.TO_ADMIN_NO_WILL]: 'Administrator of the will of '
 }
 
 export const transferSupportingDocuments = {
