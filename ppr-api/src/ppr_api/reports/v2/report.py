@@ -664,27 +664,39 @@ class Report:  # pylint: disable=too-few-public-methods
         for delete_party in delete_parties:
             if 'reg_id' in add_party and 'reg_id' in delete_party and \
                     add_party['reg_id'] == delete_party['reg_id'] and 'edit' not in delete_party:
-                if add_party['address'] == delete_party['address']:
+                if add_party.get('amendPartyId', 0) > 0 and add_party['amendPartyId'] == delete_party.get('partyId'):
+                    delete_party['edit'] = True
                     if 'businessName' in add_party and 'businessName' in delete_party and \
                             add_party['businessName'] != delete_party['businessName']:
                         add_party['name_change'] = True
-                        delete_party['edit'] = True
-                        break
                     elif 'personName' in add_party and 'personName' in delete_party and \
                             add_party['personName'] != delete_party['personName']:
                         add_party['name_change'] = True
+                    else:
+                        add_party['address_change'] = True
+                    break
+                elif 'amendPartyId' not in add_party:
+                    if add_party['address'] == delete_party['address']:
+                        if 'businessName' in add_party and 'businessName' in delete_party and \
+                                add_party['businessName'] != delete_party['businessName']:
+                            add_party['name_change'] = True
+                            delete_party['edit'] = True
+                            break
+                        elif 'personName' in add_party and 'personName' in delete_party and \
+                                add_party['personName'] != delete_party['personName']:
+                            add_party['name_change'] = True
+                            delete_party['edit'] = True
+                            break
+                    elif 'businessName' in add_party and 'businessName' in delete_party and \
+                            add_party['businessName'] == delete_party['businessName']:
+                        add_party['address_change'] = True
                         delete_party['edit'] = True
                         break
-                elif 'businessName' in add_party and 'businessName' in delete_party and \
-                        add_party['businessName'] == delete_party['businessName']:
-                    add_party['address_change'] = True
-                    delete_party['edit'] = True
-                    break
-                elif 'personName' in add_party and 'personName' in delete_party and \
-                        add_party['personName'] == delete_party['personName']:
-                    add_party['address_change'] = True
-                    delete_party['edit'] = True
-                    break
+                    elif 'personName' in add_party and 'personName' in delete_party and \
+                            add_party['personName'] == delete_party['personName']:
+                        add_party['address_change'] = True
+                        delete_party['edit'] = True
+                        break
 
     def _set_modified_parties(self, statement):
         """Replace amendment or change address country code with description. Set if party edited."""

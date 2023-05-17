@@ -93,18 +93,19 @@ UPDATE financing_statements
 -- RL begin
 INSERT INTO drafts(id, document_number, account_id, create_ts, registration_type_cl, registration_type,
                   registration_number, update_ts, draft)
-  VALUES(200000024, 'D-T-0017', 'PS12345', timestamp with time zone '2021-08-31 12:00:00-07' at time zone 'utc', 
+  VALUES(200000024, 'D-T-0017', 'PS12345', current_timestamp - interval '366 days', 
          'PPSALIEN', 'RL', 'TEST0017', null, '{}');
 INSERT INTO financing_statements(id, state_type, expire_date, life, discharged, renewed)
-  VALUES(200000011, 'ACT', timestamp with time zone '2022-02-27 23:59:59-07' at time zone 'utc', 0, 'N' , null)
+  VALUES(200000011, 'ACT', current_timestamp - interval '186 days', 0, 'N' , null)
 ;
 INSERT INTO registrations(id, financing_id, registration_number, base_reg_number, registration_type,
                          registration_type_cl, registration_ts, draft_id, life, lien_value,
                          surrender_date, account_id, client_reference_id, pay_invoice_id, pay_path)
     VALUES(200000021, 200000011, 'TEST0017', null, 'RL', 'PPSALIEN', 
-           timestamp with time zone '2021-08-31 12:00:00-07' at time zone 'utc', 200000024, 0,
+           current_timestamp - interval '366 days', 200000024, 0,
            '1000.00', current_timestamp, 'PS12345', 'TEST-RL-0017', null, null)
 ;
+
 INSERT INTO addresses(id, street, street_additional, city, region, postal_code, country)
   VALUES(200000023, 'TEST-0017', 'line 2', 'city', 'BC', 'V8R3A5', 'CA')
 ;
@@ -132,13 +133,13 @@ INSERT INTO serial_collateral(id, serial_type, registration_id, financing_id, re
 -- Renewal #1
 INSERT INTO drafts(id, document_number, account_id, create_ts, registration_type_cl, registration_type,
                   registration_number, update_ts, draft)
-  VALUES(200000025, 'D-T-0017R1', 'PS12345', timestamp with time zone '2021-08-31 13:00:00-07' at time zone 'utc', 
+  VALUES(200000025, 'D-T-0017R1', 'PS12345',  current_timestamp - interval '365 days', 
          'RENEWAL', 'RE', 'TEST0017R1', null, '{}');
 INSERT INTO registrations(id, financing_id, registration_number, base_reg_number, registration_type,
                          registration_type_cl, registration_ts, draft_id, life, lien_value,
                          surrender_date, account_id, client_reference_id, pay_invoice_id, pay_path)
     VALUES(200000022, 200000011, 'TEST0017R1', 'TEST0017', 'RE', 'RENEWAL', 
-           timestamp with time zone '2021-08-31 13:00:00-07' at time zone 'utc', 200000025, 0,
+           current_timestamp - interval '365 days', 200000025, 0,
            null, null, 'PS12345', 'TEST-REN-0017-1', null, null)
 ;
 INSERT INTO addresses(id, street, street_additional, city, region, postal_code, country)
@@ -153,13 +154,13 @@ INSERT INTO parties(id, party_type, registration_id, financing_id, registration_
 -- Renewal #2
 INSERT INTO drafts(id, document_number, account_id, create_ts, registration_type_cl, registration_type,
                   registration_number, update_ts, draft)
-  VALUES(200000026, 'D-T-0017R2', 'PS12345', timestamp with time zone '2021-08-31 14:00:00-07' at time zone 'utc', 
+  VALUES(200000026, 'D-T-0017R2', 'PS12345', current_timestamp - interval '364 days', 
          'RENEWAL', 'RE', 'TEST0017R2', null, '{}');
 INSERT INTO registrations(id, financing_id, registration_number, base_reg_number, registration_type,
                          registration_type_cl, registration_ts, draft_id, life, lien_value,
                          surrender_date, account_id, client_reference_id, pay_invoice_id, pay_path)
     VALUES(200000023, 200000011, 'TEST0017R2', 'TEST0017', 'RE', 'RENEWAL', 
-           timestamp with time zone '2021-08-31 14:00:00-07' at time zone 'utc', 200000026, 0,
+           current_timestamp - interval '364 days', 200000026, 0,
            null, null, 'PS12345', 'TEST-REN-0017-2', null, null)
 ;
 INSERT INTO addresses(id, street, street_additional, city, region, postal_code, country)

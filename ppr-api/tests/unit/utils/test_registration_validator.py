@@ -500,14 +500,17 @@ def test_validate_authorization(session, desc, valid, message_content):
         assert error_msg.find(message_content) != -1
 
 
-# testdata pattern is ({base_reg_num}, {json_data}, {valid}, {message content})
-@pytest.mark.parametrize('base_reg_num,json_data,valid,message_content', TEST_RENEWAL_DATA)
-def test_validate_renewal(session, base_reg_num, json_data, valid, message_content):
+@pytest.mark.parametrize('base_reg_num,data,valid,message_content', TEST_RENEWAL_DATA)
+def test_validate_renewal(session, base_reg_num, data, valid, message_content):
     """Assert that renewal registration extra validation works as expected."""
+    json_data = copy.deepcopy(data)
     # setup
     statement = FinancingStatement.find_by_registration_number(base_reg_num, 'PS12345')
     if base_reg_num == 'TEST0012':
         statement.life = model_utils.LIFE_INFINITE
+    elif base_reg_num == 'TEST0017' and valid and json_data.get('courtOrderInformation'):
+        json_data['courtOrderInformation']['orderDate'] = model_utils.format_ts(model_utils.now_ts())
+        
     # test
     error_msg = validator.validate_renewal(json_data, statement)
     if valid:

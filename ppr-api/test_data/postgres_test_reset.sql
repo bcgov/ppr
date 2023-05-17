@@ -2,7 +2,7 @@
 DELETE FROM verification_reports
   WHERE id >= 200000000;
 DELETE FROM mail_reports
-  WHERE id >= 200000000;
+  WHERE party_id >= 200000000;
 DELETE FROM search_results
   WHERE search_id >= 200000000;
 DELETE FROM search_requests
@@ -18,7 +18,7 @@ DELETE FROM parties
 DELETE FROM trust_indentures
   WHERE financing_id >= 200000000;
 DELETE FROM court_orders
-  WHERE registration_id >= 200000000;
+ WHERE registration_id IN (SELECT id FROM registrations where financing_id >= 200000000);
 DELETE FROM registrations
   WHERE financing_id >= 200000000;
 DELETE FROM previous_financing_statements

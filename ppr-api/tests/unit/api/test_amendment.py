@@ -64,6 +64,82 @@ STATEMENT_VALID = {
     }
   ]
 }
+AMENDMENT_EDIT = {
+  'baseRegistrationNumber': 'TEST0001',
+  'debtorName': {
+      'businessName': 'TEST BUS 2 DEBTOR'
+  },
+  'authorizationReceived': True,
+  'registeringParty': {
+      'businessName': 'ABC SEARCHING COMPANY',
+      'address': {
+          'street': '222 SUMMER STREET',
+          'city': 'VICTORIA',
+          'region': 'BC',
+          'country': 'CA',
+          'postalCode': 'V8W 2V8'
+      },
+      'emailAddress': 'bsmith@abc-search.com'
+  },
+  'changeType': 'AM',
+  'description': 'Test amendment.',
+  'deleteDebtors': [
+    {
+      'businessName': 'TEST BUS 2 DEBTOR',
+      'partyId': 200000002,
+      'address': {
+          'street': 'TEST-0001',
+          'streetAdditional': 'LINE 2',
+          'city': 'CITY',
+          'region': 'BC',
+          'country': 'CA',
+          'postalCode': 'V8R 3A5'
+      }
+    }
+  ],
+  'addDebtors': [
+    {
+      'businessName': 'NEW TEST BUS DEBTOR',
+      'amendPartyId': 200000002,
+      'address': {
+          'street': 'TEST-0001',
+          'streetAdditional': 'LINE 2',
+          'city': 'CITY',
+          'region': 'BC',
+          'country': 'CA',
+          'postalCode': 'V8R 3A5'
+      }
+    }
+  ],
+  'deleteSecuredParties': [
+    {
+      'businessName': 'TEST 9 CHANGE TRANSFER SECURED PARTY',
+      'partyId': 200000026,
+      'address': {
+          'street': 'TEST-00C9',
+          'streetAdditional': 'LINE 2',
+          'city': 'CITY',
+          'region': 'BC',
+          'country': 'CA',
+          'postalCode': 'V8R 3A5'
+      }
+    }
+  ],
+  'addSecuredParties': [
+    {
+      'businessName': 'NEW TEST SECURED PARTY',
+      'amendPartyId': 200000026,
+      'address': {
+          'street': 'TEST-00C9',
+          'streetAdditional': 'LINE 2',
+          'city': 'CITY',
+          'region': 'BC',
+          'country': 'CA',
+          'postalCode': 'V8R 3A5'
+      }
+    }
+  ]
+}
 INVALID_REG_NUM = {
   'baseRegistrationNumber': 'TESTXXX1',
   'debtorName': {
@@ -291,6 +367,13 @@ TEST_DATA_AMENDMENT_CHANGE_TYPE = [
     (model_utils.REG_TYPE_AMEND_PARIAL_DISCHARGE, False),
     (model_utils.REG_TYPE_AMEND_SP_TRANSFER, False)
 ]
+# testdata pattern is ({description}, {data}, {valid}, {sp_amend_id}, {debtor_amend_id})
+TEST_AMENDMENT_EDIT_DATA = [
+    ('Valid parties no amend id', AMENDMENT_EDIT, None, None),
+    ('Valid parties amend id 0', AMENDMENT_EDIT, 0, 0),
+    ('Valid secured party amend id', AMENDMENT_EDIT, 200000026, 0),
+    ('Valid debtor amend id', AMENDMENT_EDIT, 0, 200000002)
+]
 
 
 @pytest.mark.parametrize('desc,json_data,roles,status,has_account,reg_num', TEST_CREATE_DATA)
@@ -350,6 +433,37 @@ def test_create_amendment_staff(session, client, jwt, role, routing_slip, bcol_n
         reg_num = response.json['amendmentRegistrationNumber']
         registration: Registration = Registration.find_by_registration_number(reg_num, 'PS12345', True)
         assert registration.verification_report
+
+
+@pytest.mark.parametrize('description,data,sp_amend_id,debtor_amend_id', TEST_AMENDMENT_EDIT_DATA)
+def test_create_amendment_edit(session, client, jwt, description, data, sp_amend_id, debtor_amend_id):
+    """Assert that creating an amendment statement with secured party and debtor edits worksa as expected."""
+    json_data = copy.deepcopy(data)
+    if sp_amend_id is not None:
+        json_data['addSecuredParties'][0]['amendPartyId'] = sp_amend_id
+    else:
+        del json_data['addSecuredParties'][0]['amendPartyId']
+    if debtor_amend_id is not None:
+        json_data['addDebtors'][0]['amendPartyId'] = debtor_amend_id
+    else:
+        del json_data['addDebtors'][0]['amendPartyId']
+    current_app.config.update(PAYMENT_SVC_URL=MOCK_PAY_URL)
+    current_app.config.update(AUTH_SVC_URL=MOCK_URL_NO_KEY)
+
+    response = client.post('/api/v1/financing-statements/TEST0001/amendments',
+                           json=json_data,
+                           headers=create_header_account(jwt, [PPR_ROLE, STAFF_ROLE], 'test-user', STAFF_ROLE),
+                           content_type='application/json')
+    assert response.status_code == HTTPStatus.CREATED
+    result = response.json
+    if sp_amend_id is None or sp_amend_id > 0:
+        assert result['changes'][0]['addSecuredParties'][0].get('former_name')
+    else:
+        assert 'former_name' not in result['changes'][0]['addSecuredParties'][0]
+    if debtor_amend_id is None or debtor_amend_id > 0:
+        assert result['changes'][0]['addDebtors'][0].get('former_name')
+    else:
+        assert 'former_name' not in result['changes'][0]['addDebtors'][0]
 
 
 @pytest.mark.parametrize('desc,roles,status,has_account,reg_num,base_reg_num', TEST_GET_STATEMENT)

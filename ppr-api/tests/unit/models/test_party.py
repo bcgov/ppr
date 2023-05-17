@@ -224,6 +224,7 @@ def test_save_business(session):
     party_bus_json = {
         'businessName': 'business\'s, holdings inc',
         'emailAddress': 'asmith@gmail.com',
+        'amendPartyId': 12343422,
         'address': {
             'street': 'street',
             'streetAdditional': 'additional',
@@ -242,6 +243,7 @@ def test_save_business(session):
     assert party_bus.id
     assert party_bus.bus_name_base
     assert party_bus.bus_name_key_char1 == 'B'
+    assert party_bus.previous_party_id == party_bus_json.get('amendPartyId')
 
 
 def test_save_individual(session):
@@ -254,6 +256,7 @@ def test_save_individual(session):
         },
         'emailAddress': 'asmith@gmail.com',
         'birthDate': '1990-06-15',
+        'amendPartyId': 12343422,
         'address': {
             'street': 'street',
             'streetAdditional': 'additional',
@@ -278,4 +281,5 @@ def test_save_individual(session):
     assert party.first_name_char1 == 'J'
     assert party.first_name_char2 == 'E'
     assert party.first_name_key_char1 == 'P'
+    assert party.previous_party_id == party_ind_json.get('amendPartyId')
  

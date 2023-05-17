@@ -673,6 +673,15 @@ TEST_PARTIES_AM_DUPLICATES = [
     ('Duplicate party person', AMENDMENT_DUPLICATE_PARTIES_PERSON, False,
      validator.DUPLICATE_SECURED_PARTY_PERSON)
 ]
+# testdata pattern is ({description}, {data}, {valid}, {sp_amend_id}, {debtor_amend_id}, {message contents})
+TEST_PARTIES_AM_EDIT_DATA = [
+    ('Valid parties no amend id', AMENDMENT_VALID, True, None, None, None),
+    ('Valid parties amend id 0', AMENDMENT_VALID, True, 0, 0, None),
+    ('Valid secured party amend id', AMENDMENT_VALID, True, 1321095, 0, None),
+    ('Valid debtor amend id', AMENDMENT_VALID, True, 0, 1321961, None),
+    ('Invalid secured party amend id', AMENDMENT_VALID, False, 1321099, 0, validator.INVALID_AMEND_PARTY_ID_SECURED),
+    ('Invalid debtor amend id', AMENDMENT_VALID, False, 0, 1321969, validator.INVALID_AMEND_PARTY_ID_DEBTOR)
+]
 # testdata pattern is ({description}, {amendment statement data}, {valid}, {message contents})
 TEST_PARTIES_FS_NAME_DATA = [
     ('Valid names', FINANCING_VALID, True, None),
@@ -784,6 +793,36 @@ def test_validate_registration_party_duplicates(session, desc, json_data, valid,
     elif message_content:
         assert error_msg != ''
         assert error_msg.find(message_content) != -1
+
+
+@pytest.mark.parametrize('desc,data,valid,sp_amend_id,debtor_amend_id,message_content', TEST_PARTIES_AM_EDIT_DATA)
+def test_validate_amend_party_ids(session, desc, data, valid, sp_amend_id, debtor_amend_id, message_content):
+    """Assert that amendment registration amend party id validation works as expected."""
+    json_data = copy.deepcopy(data)
+    if sp_amend_id:
+        json_data['addSecuredParties'][0]['amendPartyId'] = sp_amend_id
+    if debtor_amend_id:
+        json_data['addDebtors'][0]['amendPartyId'] = debtor_amend_id
+    error_msg = validator.validate_registration_parties(json_data)
+    if sp_amend_id:
+        assert json_data['addSecuredParties'][0]['amendPartyId'] == sp_amend_id
+    else:
+        assert 'amendPartyId' not in json_data['addSecuredParties'][0]
+    if debtor_amend_id:
+        assert json_data['addDebtors'][0]['amendPartyId'] == debtor_amend_id
+    else:
+        assert 'amendPartyId' not in json_data['addDebtors'][0]
+          
+    if valid:
+        assert error_msg == ''
+    elif message_content:
+        assert error_msg != ''
+        msg: str = ''
+        if message_content == validator.INVALID_AMEND_PARTY_ID_SECURED:
+            msg =  message_content.format(str(sp_amend_id))
+        else:
+            msg =  message_content.format(str(debtor_amend_id))
+        assert error_msg.find(msg) != -1
 
 
 def test_actual_party_ids(session):
