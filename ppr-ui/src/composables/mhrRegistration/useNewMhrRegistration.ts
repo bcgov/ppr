@@ -213,9 +213,17 @@ export const useNewMhrRegistration = () => {
   }
 
   const parseOwnerGroups = (): MhrRegistrationHomeOwnerGroupIF[] => {
-    const ownerGroups: MhrRegistrationHomeOwnerGroupIF[] =
-      Object.values(cleanEmpty(getMhrRegistrationHomeOwnerGroups.value))
-    ownerGroups.forEach(ownerGroup => {
+    const ownersGroups: MhrRegistrationHomeOwnerGroupIF[] =
+      getMhrRegistrationHomeOwnerGroups.value.map(group => {
+        group.owners.forEach(owner => {
+          owner.description = owner.suffix
+        })
+
+        return group
+      })
+
+    const parsedOwnerGroups = Object.values(cleanEmpty(ownersGroups))
+    parsedOwnerGroups.forEach((ownerGroup: MhrRegistrationHomeOwnerGroupIF) => {
       ownerGroup.owners = Object.values(ownerGroup.owners)
 
       // @ts-ignore - TODO: Mhr-Submission - api asks for number, maybe fix this once step 3 is finished?
@@ -224,7 +232,7 @@ export const useNewMhrRegistration = () => {
       ownerGroup.type = Object.keys(HomeTenancyTypes).find(key => HomeTenancyTypes[key] as string === ownerGroup.type)
     })
 
-    return ownerGroups
+    return parsedOwnerGroups
   }
 
   const parseDescription = (): MhrRegistrationDescriptionIF => {
