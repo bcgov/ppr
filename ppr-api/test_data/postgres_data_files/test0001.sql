@@ -16,7 +16,7 @@ INSERT INTO trust_indentures(id, registration_id, financing_id, trust_indenture,
   VALUES(200000000, 200000000, 200000000, 'Y', null)
 ;
 INSERT INTO addresses(id, street, street_additional, city, region, postal_code, country)
-  VALUES(200000002, 'TEST-0001', 'line 2', 'city', 'BC', 'V8R3A5', 'CA')
+  VALUES(200000002, 'TEST-0001', 'LINE 2', 'CITY', 'BC', 'V8R 3A5', 'CA')
 ;
 INSERT INTO parties(id, party_type, registration_id, financing_id, registration_id_end, branch_id, first_name,
                   middle_initial, last_name, business_name, birth_date, address_id)
@@ -37,7 +37,7 @@ INSERT INTO parties(id, party_type, registration_id, financing_id, registration_
                   middle_initial, last_name, business_name, birth_date, address_id,
                   business_srch_key, bus_name_base, bus_name_key_char1)
     VALUES(200000002, 'DB', 200000000, 200000000, null, null, null, null, null, 'TEST BUS 2 DEBTOR',
-           null, 200000002, searchkey_business_name('TEST BUS 2 DEBTOR'), 'TEST BUS 2 DEBTOR', 'T')
+           null, 200000002, searchkey_business_name('TEST BUS 2 DEBTOR'), business_name_strip_designation('TEST BUS 2 DEBTOR'), 'T')
 ;
 INSERT INTO parties(id, party_type, registration_id, financing_id, registration_id_end, branch_id, first_name,
                   middle_initial, last_name, business_name, birth_date, address_id)

@@ -37,6 +37,8 @@ INVALID_REGION_DEBTOR = 'Debtor region {} is invalid. '
 CHARACTER_SET_UNSUPPORTED = 'The character set is not supported for name {}. '
 DUPLICATE_SECURED_PARTY_BUSINESS = 'Duplicate Secured Party Business. '
 DUPLICATE_SECURED_PARTY_PERSON = 'Duplicate Secured Party Person. '
+INVALID_AMEND_PARTY_ID_SECURED = 'Invalid amendPartyId {} in add Secured Parties. '
+INVALID_AMEND_PARTY_ID_DEBTOR = 'Invalid amendPartyId {} in add Debtors. '
 
 
 def validate_financing_parties(json_data):
@@ -227,7 +229,26 @@ def validate_party_ids(json_data, financing_statement=None):
                                             financing_statement.parties)
                 if not existing:
                     error_msg += INVALID_PARTY_ID_DEBTOR.format(str(party['partyId']))
+    error_msg += validate_amend_party_ids(json_data)
+    return error_msg
 
+
+def validate_amend_party_ids(json_data):
+    """Verify amend party ID's. when editing secured parties and debtors."""
+    error_msg = ''
+    if 'addSecuredParties' in json_data:  # Verify amendPartyId if present for amendment added secured parties
+        for party in json_data['addSecuredParties']:
+            if party.get('amendPartyId', 0) > 0:
+                existing = find_deleted_party_by_id(party['amendPartyId'], json_data.get('deleteSecuredParties'))
+                if not existing:
+                    error_msg += INVALID_AMEND_PARTY_ID_SECURED.format(str(party['amendPartyId']))
+
+    if 'addDebtors' in json_data:  # Verify amendPartyId if present for amendment added debtors
+        for party in json_data['addDebtors']:
+            if party.get('amendPartyId', 0) > 0:
+                existing = find_deleted_party_by_id(party['amendPartyId'], json_data.get('deleteDebtors'))
+                if not existing:
+                    error_msg += INVALID_AMEND_PARTY_ID_DEBTOR.format(str(party['amendPartyId']))
     return error_msg
 
 
@@ -245,6 +266,17 @@ def find_party_by_id(party_id: int, party_type: str, parties):
                     not eval_party.registration_id_end:
                 party = eval_party
 
+    return party
+
+
+def find_deleted_party_by_id(party_id: int, parties):
+    """Search list of deleted parties for a matching amended party id."""
+    party = None
+    if party_id and parties:
+        for eval_party in parties:
+            if eval_party.get('partyId', 0) == party_id:
+                party = eval_party
+                break
     return party
 
 

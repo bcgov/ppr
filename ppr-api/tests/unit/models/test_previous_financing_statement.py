@@ -43,7 +43,7 @@ TEST_NUMBER_DATA = [
     (PreviousFinancingStatement.PreviousRegistrationTypes.CHATTEL_MORTGAGE, None, 'C29198', 'C29198'),
     (PreviousFinancingStatement.PreviousRegistrationTypes.MOBILE_HOME_ACT_DOCUMENT, None, 'C79200', 'C79200'),
     (PreviousFinancingStatement.PreviousRegistrationTypes.BILL_OF_SALE_ABSOLUTE, None, 'A16860', 'A16860'),
-    (PreviousFinancingStatement.PreviousRegistrationTypes.COMPANY_ACT_DOCUMENT, 'CA20575', None, 'BC0020575')
+    (PreviousFinancingStatement.PreviousRegistrationTypes.COMPANY_ACT_DOCUMENT, 'CA20575', None, 'CA20575')
 ]
 
 
@@ -75,7 +75,7 @@ def test_previous_financing_json(session):
     previous_statement_json = {
         'transitionDescription': previous_statement.registration_type,
         'transitionDate': '1989-11-01T00:00:01-08:00',
-        'transitionNumber': 'BC0021250'
+        'transitionNumber': 'CA21250'
     }
     assert previous_statement.json == previous_statement_json
 

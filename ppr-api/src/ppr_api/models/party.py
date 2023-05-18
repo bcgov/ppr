@@ -82,6 +82,8 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
     # For bus debtor searching
     bus_name_base = db.Column('bus_name_base', db.String(150), nullable=True)
     bus_name_key_char1 = db.Column('bus_name_key_char1', db.String(1), nullable=True)
+    # For amendment distinguishing party edit from remove/add
+    previous_party_id = db.Column('previous_party_id', db.Integer, nullable=True)
 
     # parent keys
     address_id = db.Column('address_id', db.Integer, db.ForeignKey('addresses.id'), nullable=True, index=True)
@@ -113,7 +115,7 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
                                   back_populates='party', cascade='all, delete', uselist=False)
 
     @property
-    def json(self) -> dict:
+    def json(self) -> dict:  # pylint: disable=too-many-branches
         """Return the party as a json object."""
         party = {
         }
@@ -153,6 +155,10 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
             if self.birth_date:
                 party['birthDate'] = model_utils.format_ts(self.birth_date)
 
+        if self.party_type in (Party.PartyTypes.DEBTOR_COMPANY.value,
+                               Party.PartyTypes.DEBTOR_INDIVIDUAL.value,
+                               Party.PartyTypes.SECURED_PARTY.value) and self.previous_party_id is not None:
+            party['amendPartyId'] = self.previous_party_id
         return party
 
     def save(self):
@@ -201,7 +207,7 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
         return parties
 
     @staticmethod
-    def create_from_json(json_data, party_type: str, registration_id: int = None):
+    def create_from_json(json_data, party_type: str, registration_id: int = None):  # pylint: disable=too-many-branches
         """Create a party object from a json schema object: map json to db."""
         party = Party()
         if party_type != model_utils.PARTY_DEBTOR_BUS:
@@ -234,7 +240,10 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
 
         if registration_id:
             party.registration_id = registration_id
-
+        if party.party_type in (Party.PartyTypes.DEBTOR_COMPANY.value,
+                                Party.PartyTypes.DEBTOR_INDIVIDUAL.value,
+                                Party.PartyTypes.SECURED_PARTY.value) and 'amendPartyId' in json_data:
+            party.previous_party_id = json_data['amendPartyId']
         return party
 
     @staticmethod

@@ -9,7 +9,7 @@ INSERT INTO registrations(id, financing_id, registration_number, base_reg_number
            null, null, 'PS12345', 'TEST-CH-0009', null, null)
 ;
 INSERT INTO addresses(id, street, street_additional, city, region, postal_code, country)
-  VALUES(200000012, 'TEST-00C9', 'line 2', 'city', 'BC', 'V8R3A5', 'CA')
+  VALUES(200000012, 'TEST-00C9', 'LINE 2', 'CITY', 'BC', 'V8R 3A5', 'CA')
 ;
 INSERT INTO parties(id, party_type, registration_id, financing_id, registration_id_end, branch_id, first_name,
                   middle_initial, last_name, business_name, birth_date, address_id)

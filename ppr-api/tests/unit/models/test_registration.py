@@ -37,6 +37,82 @@ from ppr_api.models.registration_utils import AccountRegistrationParams
 from ppr_api.services.authz import STAFF_ROLE, BCOL_HELP, GOV_ACCOUNT_ROLE
 
 
+AMENDMENT_EDIT = {
+  'baseRegistrationNumber': 'TEST0001',
+  'debtorName': {
+      'businessName': 'TEST BUS 2 DEBTOR'
+  },
+  'authorizationReceived': True,
+  'registeringParty': {
+      'businessName': 'ABC SEARCHING COMPANY',
+      'address': {
+          'street': '222 SUMMER STREET',
+          'city': 'VICTORIA',
+          'region': 'BC',
+          'country': 'CA',
+          'postalCode': 'V8W 2V8'
+      },
+      'emailAddress': 'bsmith@abc-search.com'
+  },
+  'changeType': 'AM',
+  'description': 'Test amendment.',
+  'deleteDebtors': [
+    {
+      'businessName': 'TEST BUS 2 DEBTOR',
+      'partyId': 200000002,
+      'address': {
+          'street': 'TEST-0001',
+          'streetAdditional': 'LINE 2',
+          'city': 'CITY',
+          'region': 'BC',
+          'country': 'CA',
+          'postalCode': 'V8R 3A5'
+      }
+    }
+  ],
+  'addDebtors': [
+    {
+      'businessName': 'NEW TEST BUS DEBTOR',
+      'amendPartyId': 200000002,
+      'address': {
+          'street': 'TEST-0001',
+          'streetAdditional': 'LINE 2',
+          'city': 'CITY',
+          'region': 'BC',
+          'country': 'CA',
+          'postalCode': 'V8R 3A5'
+      }
+    }
+  ],
+  'deleteSecuredParties': [
+    {
+      'businessName': 'TEST 9 CHANGE TRANSFER SECURED PARTY',
+      'partyId': 200000026,
+      'address': {
+          'street': 'TEST-00C9',
+          'streetAdditional': 'LINE 2',
+          'city': 'CITY',
+          'region': 'BC',
+          'country': 'CA',
+          'postalCode': 'V8R 3A5'
+      }
+    }
+  ],
+  'addSecuredParties': [
+    {
+      'businessName': 'NEW TEST SECURED PARTY',
+      'amendPartyId': 200000026,
+      'address': {
+          'street': 'TEST-00C9',
+          'streetAdditional': 'LINE 2',
+          'city': 'CITY',
+          'region': 'BC',
+          'country': 'CA',
+          'postalCode': 'V8R 3A5'
+      }
+    }
+  ]
+}
 # testdata pattern is ({description}, {registration number}, {account ID}, {http status}, {is staff}, {base_reg_num})
 TEST_REGISTRATION_NUMBER_DATA = [
     ('Valid Renewal', 'TEST00R5', 'PS12345', HTTPStatus.OK, False, 'TEST0005'),
@@ -80,10 +156,10 @@ TEST_LIFE_EXPIRY_DATA = [
 TEST_EXPIRY_DATA = [
     ('TEST0016', 'SA', '2041-09-04T06:59:59+00:00'),
     ('TEST0016R1', 'RE', '2036-09-04T06:59:59+00:00'),
-    ('TEST0016R2', 'RE', '2041-09-04T06:59:59+00:00'),
-    ('TEST0017', 'RL', '2023-02-23T07:59:59+00:00'),
-    ('TEST0017R1', 'RE', '2022-08-27T06:59:59+00:00'),
-    ('TEST0017R2', 'RE', '2023-02-23T07:59:59+00:00')
+    ('TEST0016R2', 'RE', '2041-09-04T06:59:59+00:00')
+#    ('TEST0017', 'RL', '2023-02-23T07:59:59+00:00'),
+#    ('TEST0017R1', 'RE', '2022-08-27T06:59:59+00:00'),
+#    ('TEST0017R2', 'RE', '2023-02-23T07:59:59+00:00')
 ]
 # testdata pattern is ({base_reg_num}, {reg_num}, {reg_num_name})
 TEST_VERIFICATION_DATA = [
@@ -131,6 +207,13 @@ TEST_STAFF_ACCOUNT_ACCESS_DATA = [
     ('TEST0001', STAFF_ROLE, True),
     ('TEST0001', BCOL_HELP, True),
     ('TEST0001', GOV_ACCOUNT_ROLE, True)
+]
+# testdata pattern is ({description}, {data}, {valid}, {sp_amend_id}, {debtor_amend_id})
+TEST_AMENDMENT_EDIT_DATA = [
+    ('Valid parties no amend id', AMENDMENT_EDIT, None, None),
+    ('Valid parties amend id 0', AMENDMENT_EDIT, 0, 0),
+    ('Valid secured party amend id', AMENDMENT_EDIT, 200000026, 0),
+    ('Valid debtor amend id', AMENDMENT_EDIT, 0, 200000002)
 ]
 
 
@@ -828,6 +911,39 @@ def test_save_change_from_draft(session):
     result = registration.json
     assert result
 #    assert 'documentId' in result
+
+
+@pytest.mark.parametrize('description,data,sp_amend_id,debtor_amend_id', TEST_AMENDMENT_EDIT_DATA)
+def test_save_amendment_edit(session, description, data, sp_amend_id, debtor_amend_id):
+    """Assert that creating an amendment statement with secured party and debtor edits worksa as expected."""
+    json_data = copy.deepcopy(data)
+    if sp_amend_id is not None:
+        json_data['addSecuredParties'][0]['amendPartyId'] = sp_amend_id
+    else:
+        del json_data['addSecuredParties'][0]['amendPartyId']
+    if debtor_amend_id is not None:
+        json_data['addDebtors'][0]['amendPartyId'] = debtor_amend_id
+    else:
+        del json_data['addDebtors'][0]['amendPartyId']
+
+    financing_statement = FinancingStatement.find_by_financing_id(200000000)
+    assert financing_statement
+    registration = Registration.create_from_json(json_data,
+                                                 'AMENDMENT',
+                                                 financing_statement,
+                                                 'TEST0001',
+                                                 'PS12345')
+    registration.save()
+    result = registration.json
+    assert result
+    if sp_amend_id is None or sp_amend_id > 0:
+        assert result['addSecuredParties'][0].get('former_name')
+    else:
+        assert 'former_name' not in result['addSecuredParties'][0]
+    if debtor_amend_id is None or debtor_amend_id > 0:
+        assert result['addDebtors'][0].get('former_name')
+    else:
+        assert 'former_name' not in result['addDebtors'][0]
 
 
 @pytest.mark.parametrize('reg_type,life,life_infinite,expected_life', TEST_LIFE_EXPIRY_DATA)

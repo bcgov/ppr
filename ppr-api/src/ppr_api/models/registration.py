@@ -63,10 +63,10 @@ class CrownChargeTypes(str, Enum):
     PROPERTY_TRANSFER_TAX = 'PT'
     RURAL_TAX = 'RA'
     SCHOOL_ACT = 'SC'
-    TOBACCO_TAX_ACT = 'TO'
-    SPECULATION_VACANCY_TAX_ACT = "SV"
     SOCIAL_TAX = 'SS'
     TAX_LIEN = 'TL'
+    TOBACCO_TAX = 'TO'
+    SPECULATION_TAX = 'SV'
 
 
 class MiscellaneousTypes(str, Enum):
@@ -214,14 +214,15 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
                         party.registration_id == registration_id:
                     party_json = party.json
                     party_json['reg_id'] = party.registration_id
-                    party_json['former_name'] = self.get_former_party_name(party)
+                    if 'amendPartyId' not in party_json or party_json.get('amendPartyId', 0) > 0:
+                        party_json['former_name'] = self.get_former_party_name(party)
                     debtors.append(party_json)
                 elif party.party_type == model_utils.PARTY_SECURED and party.registration_id == registration_id:
                     party_json = party.json
                     party_json['reg_id'] = party.registration_id
-                    party_json['former_name'] = self.get_former_party_name(party)
+                    if 'amendPartyId' not in party_json or party_json.get('amendPartyId', 0) > 0:
+                        party_json['former_name'] = self.get_former_party_name(party)
                     secured.append(party_json)
-
             if debtors:
                 registration['addDebtors'] = debtors
             if secured:
@@ -338,8 +339,8 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
         """Lookup registration type record if it has not already been fetched."""
         if self.reg_type is None and self.registration_type:
             self.reg_type = db.session.query(RegistrationType).\
-                filter(RegistrationType.registration_type == self.registration_type).\
-                one_or_none()
+                            filter(RegistrationType.registration_type == self.registration_type).\
+                            one_or_none()
 
     def is_financing(self):
         """Check if the registration is a financing registration for some conditions."""
@@ -511,7 +512,6 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
             results = db.session.execute(query, query_params)
             rows = results.fetchall()
             results_json = registration_utils.update_account_reg_results(params, rows, results_json)
-
         return results_json
 
     @classmethod
@@ -802,7 +802,6 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
                                                          financing_statement.parties)
                 if existing:
                     existing.registration_id_end = registration.id
-
         if 'deleteSecuredParties' in json_data and json_data['deleteSecuredParties']:
             for party in json_data['deleteSecuredParties']:
                 existing = Registration.find_party_by_id(party['partyId'],
@@ -810,22 +809,12 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
                                                          financing_statement.parties)
                 if existing:
                     existing.registration_id_end = registration.id
-
-        # In "add only" general collateral solution gc records are never logically deleted.
-        # if 'deleteGeneralCollateral' in json_data and json_data['deleteGeneralCollateral']:
-        #    for gen_c in json_data['deleteGeneralCollateral']:
-        #        collateral = Registration.find_general_collateral_by_id(gen_c['collateralId'],
-        #                                                                financing_statement.general_collateral)
-        #        if collateral:
-        #            collateral.registration_id_end = registration.id
-
         if 'deleteVehicleCollateral' in json_data and json_data['deleteVehicleCollateral']:
             for vehicle_c in json_data['deleteVehicleCollateral']:
                 collateral = Registration.find_vehicle_collateral_by_id(vehicle_c['vehicleId'],
                                                                         financing_statement.vehicle_collateral)
                 if collateral:
                     collateral.registration_id_end = registration.id
-
         if 'removeTrustIndenture' in json_data and json_data['removeTrustIndenture'] and \
                 financing_statement.trust_indenture:
             for trust_indenture in financing_statement.trust_indenture:
@@ -845,7 +834,6 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
         Return None if not found or no documentId.
         """
         draft = None
-
         if 'documentId' in json_data:
             try:
                 doc_id = json_data['documentId'].strip()
@@ -859,7 +847,6 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
                             draft.registration_type = registration_type
             except BusinessException:
                 draft = None
-
         return draft
 
     @staticmethod
@@ -869,7 +856,6 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
         Get registration_id, registration_number, and optionally document_number.
         """
         registration = Registration()
-
         # generate reg id, reg number. If not existing draft also generate doc number
         query = """
         select nextval('registration_id_seq') AS reg_id,
@@ -878,21 +864,18 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
         """
         if draft:
             query = "select nextval('registration_id_seq') AS reg_id, get_registration_num() AS reg_num"
-
         result = db.session.execute(query)
         row = result.first()
         registration.id = int(row._mapping['reg_id'])  # pylint: disable=protected-access; follows documentation
         registration.registration_num = str(row._mapping['reg_num'])  # pylint: disable=protected-access
         if not draft:
             registration.document_number = str(row._mapping['doc_num'])  # pylint: disable=protected-access
-
         return registration
 
     @staticmethod
     def find_party_by_id(party_id: int, party_type: str, parties):
         """Search existing list of party objects for a matching party id and type."""
         party = None
-
         if party_id and party_type and parties:
             for eval_party in parties:
                 if eval_party.id == party_id and party_type == eval_party.party_type and \
@@ -909,7 +892,6 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
     def find_vehicle_collateral_by_id(vehicle_id: int, vehicle_collateral):
         """Search existing list of vehicle_collateral objects for a matching vehicle id."""
         collateral = None
-
         if vehicle_id and vehicle_collateral:
             for v_collateral in vehicle_collateral:
                 if v_collateral.id == vehicle_id and not v_collateral.registration_id_end:
@@ -920,7 +902,6 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
     def find_general_collateral_by_id(collateral_id: int, general_collateral):
         """Search existing list of general_collateral objects for a matching collateral id."""
         collateral = None
-
         if collateral_id and general_collateral:
             for g_collateral in general_collateral:
                 if g_collateral.id == collateral_id and not g_collateral.registration_id_end:
@@ -932,6 +913,16 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
         former_name = ''
         for party in self.financing_statement.parties:
             if new_party.party_type == party.party_type and new_party.registration_id == party.registration_id_end:
+                if new_party.previous_party_id and new_party.previous_party_id == party.id:
+                    if party.client_code and party.client_code.name:
+                        former_name = party.client_code.name
+                    elif party.business_name:
+                        former_name = party.business_name
+                    else:
+                        former_name = party.last_name + ', ' + party.first_name
+                        if party.middle_initial:
+                            former_name += ' ' + party.middle_initial
+                    return former_name
                 address1 = party.address
                 address2 = new_party.address
                 if address1 is None and party.client_code:
@@ -977,7 +968,6 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
             if registration.registration_type_cl in (model_utils.REG_CLASS_CROWN, model_utils.REG_CLASS_MISC,
                                                      model_utils.REG_CLASS_PPSA):
                 expiry_ts = model_utils.expiry_dt_from_registration(registration.registration_ts, None)
-
         for registration in self.financing_statement.registration:
             if registration.registration_type == model_utils.REG_TYPE_RENEWAL and registration.id <= self.id:
                 expiry_ts = model_utils.expiry_dt_repairer_lien(expiry_ts)
@@ -987,7 +977,6 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
         """Build a non-repairer's lien expiry date as the sum of previous registrations."""
         if self.life == model_utils.LIFE_INFINITE:
             return 'Never'
-
         expiry_ts = None
         for registration in self.financing_statement.registration:
             if registration.registration_type_cl in (model_utils.REG_CLASS_CROWN, model_utils.REG_CLASS_MISC,
