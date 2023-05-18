@@ -52,7 +52,7 @@ import { useGetters } from 'vuex-composition-helpers'
 // local
 import { formatExpiryDate, pacificDate } from '@/utils'
 import { RegistrationTypeIF } from '@/interfaces' // eslint-disable-line
-import { APIStatusTypes, MhUIStatusTypes } from '@/enums'
+import { MhApiStatusTypes, MhUIStatusTypes } from '@/enums'
 import { useMhrInformation } from '@/composables'
 
 export default defineComponent({
@@ -99,7 +99,7 @@ export default defineComponent({
       statusType: computed((): string => {
         const regStatus = getMhrInformation.value.statusType
 
-        return isFrozenMhr.value || regStatus === APIStatusTypes.DRAFT
+        return isFrozenMhr.value || regStatus === MhApiStatusTypes.DRAFT
           ? MhUIStatusTypes.ACTIVE
           : regStatus[0] + regStatus.toLowerCase().slice(1)
       }),
