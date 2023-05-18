@@ -624,7 +624,7 @@ export default defineComponent({
     }
 
     const isEnabledMhr = (item: MhRegistrationSummaryIF) => {
-      return [APIStatusTypes.MHR_ACTIVE, MhApiStatusTypes.FROZEN].includes(item.statusType as APIStatusTypes) &&
+      return [MhApiStatusTypes.ACTIVE, MhApiStatusTypes.FROZEN].includes(item.statusType as MhApiStatusTypes) &&
         localState.enableOpenEdit && (item.registrationDescription === APIMhrDescriptionTypes.REGISTER_NEW_UNIT ||
           item.registrationDescription === APIMhrDescriptionTypes.CONVERTED)
     }
@@ -706,7 +706,7 @@ export default defineComponent({
       // RegistrationSummaryIF | DraftResultIF | MhrDraftApiIF
       return props.isPpr
         ? item.type !== undefined
-        : (item.statusType === APIStatusTypes.DRAFT || item.statusType === undefined || !item.mhrNumber)
+        : (item.statusType === MhApiStatusTypes.DRAFT || item.statusType === undefined || !item.mhrNumber)
     }
 
     const isExpired = (item: RegistrationSummaryIF): boolean => {

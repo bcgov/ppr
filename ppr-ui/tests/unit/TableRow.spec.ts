@@ -538,6 +538,7 @@ describe('Mhr TableRow tests', () => {
           break
         case MhApiStatusTypes.DRAFT:
           expect(rowData.at(3).text()).toContain(MhUIStatusTypes.DRAFT)
+          expect(rowData.at(rowData.length - 1).text()).toContain('Edit')
           break
         case MhApiStatusTypes.EXEMPT:
           expect(rowData.at(3).text()).toContain(MhUIStatusTypes.EXEMPT)
@@ -578,6 +579,7 @@ describe('Mhr TableRow tests', () => {
           break
         case MhApiStatusTypes.DRAFT:
           expect(rowData.at(3).text()).toContain(MhUIStatusTypes.DRAFT)
+          expect(rowData.at(rowData.length - 1).text()).toContain('Edit')
           break
         case MhApiStatusTypes.EXEMPT:
           expect(rowData.at(3).text()).toContain('')

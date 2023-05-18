@@ -325,9 +325,13 @@ export const useNewMhrRegistration = () => {
     let mhrTableData = []
     // Collect MH Transfer and Registration Drafts
     const sortedDraftFilings = orderBy(mhrDrafts, ['createDateTime'], ['desc'])
-    const mhRegDrafts = mhrDrafts.filter(draft =>
-      !draft.mhrNumber && draft.registrationType === APIMhrTypes.MANUFACTURED_HOME_REGISTRATION
-    )
+    let mhRegDrafts = []
+
+    if (!sortOptions?.status || sortOptions?.status === MhApiStatusTypes.DRAFT) {
+      mhRegDrafts = mhrDrafts.filter(draft =>
+        !draft.mhrNumber && draft.registrationType === APIMhrTypes.MANUFACTURED_HOME_REGISTRATION
+      )
+    }
 
     // add Transfer drafts to parent registrations.
     mhrHistory.forEach(transfer => {
