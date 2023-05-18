@@ -670,6 +670,7 @@ def test_find_by_document_id(session, http_status, doc_id, mhr_num, doc_type, le
 def test_create_new_from_json(session):
     """Assert that the new MHR registration is created from json data correctly."""
     json_data = copy.deepcopy(REGISTRATION)
+    json_data['ownLand'] = True
     registration: MhrRegistration = MhrRegistration.create_new_from_json(json_data, 'PS12345')
     assert registration.id > 0
     assert registration.mhr_number
@@ -713,6 +714,7 @@ def test_create_new_from_json(session):
     assert doc.document_id == registration.doc_id
     assert doc.document_type == MhrDocumentTypes.REG_101
     assert doc.document_registration_number == registration.doc_reg_number
+    assert doc.own_land == 'Y'
     assert registration.owner_groups
     assert len(registration.owner_groups) == 2
     for group in registration.owner_groups:
@@ -723,9 +725,10 @@ def test_create_new_from_json(session):
         assert group.status_type == MhrOwnerStatusTypes.ACTIVE
         assert group.owners
         assert len(group.owners) == 1
-
+    registration.report_view = True
     mh_json = registration.new_registration_json
     assert mh_json
+    assert mh_json['ownLand']
 
 
 def test_save_new(session):
@@ -741,6 +744,7 @@ def test_save_new(session):
             assert party.compressed_name
     mh_json = registration.new_registration_json
     assert mh_json
+    assert 'ownLand' in mh_json
     reg_new = MhrRegistration.find_by_mhr_number(registration.mhr_number, 'PS12345')
     assert reg_new
     draft_new = MhrDraft.find_by_draft_number(registration.draft.draft_number, True)
@@ -758,6 +762,7 @@ def test_save_new(session):
     assert mh_report_json.get('description') == mh_json.get('description')
     assert mh_report_json.get('location') == mh_json.get('location')
     assert mh_report_json.get('submittingParty') == mh_json.get('submittingParty')
+    assert mh_report_json.get('ownLand') == mh_json.get('ownLand')
     assert mh_report_json.get('payment') == mh_json.get('payment')
     groups1 =  mh_json.get('ownerGroups')
     groups2 = mh_report_json.get('ownerGroups')

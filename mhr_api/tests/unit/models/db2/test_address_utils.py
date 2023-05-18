@@ -77,7 +77,7 @@ TEST_DB2_ADDRESS = [
     ('101 JASPER DRIVE', None, 'LOGAN LAKE', 'BC', '101 JASPER DRIVE                        LOGAN LAKE, BC'),
     ('LAKAHAMEN TRAILER COURT', 'PAD 12, 41495 NORTH NICOMEN ROAD', 'DEROCHE', 'BC', 'LAKAHAMEN TRAILER COURT                 PAD 12, 41495 NORTH NICOMEN ROAD        DEROCHE, BC'),
     ('GREEN TREE MOBILE HOME ESTATES', 'PAD 25 15820 FRASER HIGHWAY', 'SURREY', 'BC', 'GREEN TREE MOBILE HOME ESTATES          PAD 25                                  15820 FRASER HIGHWAY                    SURREY, BC'),
-    ('2269 - 30TH AVENUE NORTH', 'CRANBROOK S.S.#3, SITE 5 A-8', 'CRANBROOK', 'BC', '2269 - 30TH AVENUE NORTH                CRANBROOK, BC                           S.S.#3, SITE 5 A-8                      CRANBROOK, BC'),
+    ('2269 - 30TH AVENUE NORTH', 'CRANBROOK, BC S.S.#3, SITE 5 A-8', 'CRANBROOK', 'BC', '2269 - 30TH AVENUE NORTH                CRANBROOK, BC                           S.S.#3, SITE 5 A-8                      CRANBROOK, BC'),
     ('1870 WILLIS ROAD', None, 'CAMPBELL RIVER', 'BC', '1870 WILLIS ROAD                                                                CAMPBELL RIVER                          BRITISH COLUMBIA'),
     ('#133', '1840 - 160TH STREET', 'SURREY', 'BC', '#133                                    1840 - 160TH STREET                     SURREY                                  BC'),
     ('#61-5130 NORTH NECHAKO ROAD', None, 'PRINCE GEORGE', 'BC', '#61-5130 NORTH NECHAKO ROAD             PRINCE GEORGE                           BRITISH COLUMBIA                        CANADA'),
@@ -145,7 +145,8 @@ TEST_DB2_ADDRESS_DOCUMENT = [
 ]
 TEST_DB2_ADDRESS_OWNER = [
 #    ('', '', '', 'BC', 'CA', '', ''),
-    ('233-16TH AVENUE SOUTH', '', 'CRANBROOK', 'BC', 'CA', '', '233-16TH AVENUE SOUTH                   CRANBROOK                               BC                                      V1C 2Z5'),
+    ('233-16TH AVENUE SOUTH', '', 'CRANBROOK', 'BC', 'CA', 'V1C 2Z5', '233-16TH AVENUE SOUTH                   CRANBROOK                               BC                                             '),
+    ('233-16TH AVENUE SOUTH', '', 'CRANBROOK', 'BC', 'CA', 'V1C 2Z5', '233-16TH AVENUE SOUTH                   CRANBROOK                               BC CA                                          '),
     ('STUTTGARTER STRASSE 56', '74321 BIETIGHEIM', 'BISSINGEN', '', 'DE', '', 'STUTTGARTER STRASSE 56                  74321 BIETIGHEIM                        BISSINGEN, GERMANY'),
     ('45116 YALE ROAD WEST', 'PO BOX 158', 'CHILLIWACK', 'BC', 'CA', 'V0M 1K0', '45116 YALE ROAD WEST                    PO BOX 158                              CHILLIWACK BC'),
     ('PO BOX 529, STATION C', '82 WINNIPEG STREET', 'GOOSE BAY, LABRADOR', 'NL', 'CA', 'V0M 1K0', 'PO BOX 529, STATION C                   82 WINNIPEG STREET                      GOOSE BAY, LABRADOR, NL'),
@@ -153,7 +154,8 @@ TEST_DB2_ADDRESS_OWNER = [
     ('98-1277 KAAHUMANU STREET', 'SUITE 106-729', 'AIEA', 'HI', 'US', '92054', '98-1277 KAAHUMANU STREET                SUITE 106-729                           AIEA, HAWAII                            USA'),
     ('11 WILLIAM STREET', '', 'UPPER KINGSCLEAR', 'NB', 'CA', 'V0M 1K0', '11 WILLIAM STREET                       UPPER KINGSCLEAR, NEW BRUNSWICK'),
     ('P.O. BOX 1804', '', 'GARIBALDI HIGHLANDS', '', 'CA', 'V0M 1K0', 'P.O. BOX 1804                                                                                                           GARIBALDI HIGHLANDS'),
-    ('#715, 603 SEAGAZE DRIVE', '', 'OCEANSIDE', 'CA', 'US', '92054', '#715, 603 SEAGAZE DRIVE                 OCEANSIDE, CA                           U.S.A.   92054')
+    ('#715, 603 SEAGAZE DRIVE', '', 'OCEANSIDE', 'CA', 'US', '92054', '#715, 603 SEAGAZE DRIVE                 OCEANSIDE, CA                           U.S.A.   92054'),
+    ('111 SMITHÉ', '', 'QUE', 'QC', 'CA', 'H9H 9H9', '111 SMITHÉ                              QUE                                     QC CA                                                                           ')
 ]
 # testdata pattern is ({address}, {p_code}, {legacy_address})
 TEST_DB2_ADDRESS_OWNER_FORMAT = [

@@ -130,6 +130,8 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                 reg_json = self.set_transfer_group_json(reg_json)
             elif self.registration_type in (MhrRegistrationTypes.EXEMPTION_NON_RES, MhrRegistrationTypes.EXEMPTION_RES):
                 reg_json = self.set_note_json(reg_json, False)
+            elif self.registration_type == MhrRegistrationTypes.MHREG:
+                reg_json['ownLand'] = doc_json.get('ownLand')
             current_app.logger.debug(f'Built registration JSON for type={self.registration_type}.')
             return self.set_payment_json(reg_json)
 
@@ -166,7 +168,8 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                 'declaredValue': doc_json.get('declaredValue', 0),
                 'documentDescription': MhrRegistration.get_doc_desc(doc_json.get('documentType')),
                 'documentId': doc_json.get('documentId'),
-                'documentRegistrationNumber': doc_json.get('documentRegistrationNumber')
+                'documentRegistrationNumber': doc_json.get('documentRegistrationNumber'),
+                'ownLand': doc_json.get('ownLand')
             }
             if self.client_reference_id:
                 reg_json['clientReferenceId'] = self.client_reference_id

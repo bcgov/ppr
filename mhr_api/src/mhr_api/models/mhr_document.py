@@ -160,7 +160,7 @@ class MhrDocument(db.Model):  # pylint: disable=too-many-instance-attributes
             doc.consideration_value = reg_json['consideration']
         if reg_json.get('consent'):
             doc.consent = reg_json['consent']
-        if reg_json.get('ownland'):
+        if 'ownLand' in reg_json and reg_json['ownLand'] is True:
             doc.own_land = 'Y'
         if reg_json.get('ownerCrossReference'):
             doc.owner_cross_reference = reg_json['ownerCrossReference']

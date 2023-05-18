@@ -316,7 +316,8 @@ class Db2Manuhome(db.Model):
             'documentType': doc_json.get('documentType', ''),
             'createDateTime': doc_json.get('createDateTime', ''),
             'clientReferenceId': doc_json.get('clientReferenceId', ''),
-            'submittingParty': doc_json.get('submittingParty')
+            'submittingParty': doc_json.get('submittingParty'),
+            'ownLand': doc_json.get('ownLand')
         }
         if doc.document_type == Db2Document.DocumentTypes.TRANS_AFFIDAVIT:
             man_home['status'] = model_utils.STATUS_FROZEN
@@ -401,6 +402,7 @@ class Db2Manuhome(db.Model):
                     man_home['createDateTime'] = doc_json.get('createDateTime', '')
                     man_home['clientReferenceId'] = doc_json.get('clientReferenceId', '')
                     man_home['attentionReference'] = doc_json.get('attentionReference', '')
+                    man_home['ownLand'] = doc_json.get('ownLand')
                 if doc.declared_value > 0 and declared_value == 0:
                     declared_value = doc.declared_value
                     declared_ts = doc.registration_ts
@@ -457,6 +459,7 @@ class Db2Manuhome(db.Model):
                     man_home['createDateTime'] = doc_json.get('createDateTime', '')
                     man_home['clientReferenceId'] = doc_json.get('clientReferenceId', '')
                     man_home['attentionReference'] = doc_json.get('attentionReference', '')
+                    man_home['ownLand'] = doc_json.get('ownLand')
                 if doc.declared_value > 0 and declared_value == 0:
                     declared_value = doc.declared_value
                     declared_ts = doc.registration_ts

@@ -52,10 +52,10 @@ TEST_DATA = [
     (True, 1, '022911', 'E', 'REG22911'),
     (False, 0, None, None, None)
 ]
-# testdata pattern is ({http_status}, {id}, {mhr_num}, {status}, {doc_id})
+# testdata pattern is ({http_status}, {id}, {mhr_num}, {status}, {doc_id}, {own_land})
 TEST_MHR_NUM_DATA = [
-    (HTTPStatus.OK, 1, '022911', 'E', 'REG22911'),
-    (HTTPStatus.NOT_FOUND, 0, None, None, None)
+    (HTTPStatus.OK, 1, '022911', 'E', 'REG22911', False),
+    (HTTPStatus.NOT_FOUND, 0, None, None, None, False)
 ]
 # testdata pattern is ({mhr_num}, {group_id}, {doc_id_prefix}, {account_id})
 TEST_DATA_TRANSFER = [
@@ -155,8 +155,8 @@ def test_find_by_id(session, exists, id, mhr_num, status, doc_id):
         assert not manuhome
 
 
-@pytest.mark.parametrize('http_status,id,mhr_num,status,doc_id', TEST_MHR_NUM_DATA)
-def test_find_by_mhr_number(session, http_status, id, mhr_num, status, doc_id):
+@pytest.mark.parametrize('http_status,id,mhr_num,status,doc_id,own_land', TEST_MHR_NUM_DATA)
+def test_find_by_mhr_number(session, http_status, id, mhr_num, status, doc_id, own_land):
     """Assert that find manufauctured home by mhr_number contains all expected elements."""
     if http_status == HTTPStatus.OK:
         manuhome: Db2Manuhome = Db2Manuhome.find_by_mhr_number(mhr_num)
@@ -188,6 +188,7 @@ def test_find_by_mhr_number(session, http_status, id, mhr_num, status, doc_id):
         assert report_json.get('location')
         assert report_json.get('description')
         assert report_json.get('notes')
+        assert report_json['ownLand'] == own_land
         for note in report_json.get('notes'):
             assert note.get('documentRegistrationNumber')
     else:
@@ -198,8 +199,8 @@ def test_find_by_mhr_number(session, http_status, id, mhr_num, status, doc_id):
         assert request_err.value.status_code == http_status
 
 
-@pytest.mark.parametrize('http_status,id,mhr_num,status,doc_id', TEST_MHR_NUM_DATA)
-def test_find_original_by_mhr_number(session, http_status, id, mhr_num, status, doc_id):
+@pytest.mark.parametrize('http_status,id,mhr_num,status,doc_id,own_land', TEST_MHR_NUM_DATA)
+def test_find_original_by_mhr_number(session, http_status, id, mhr_num, status, doc_id, own_land):
     """Assert that find the original manufauctured home information by mhr_number contains all expected elements."""
     if http_status == HTTPStatus.OK:
         manuhome: Db2Manuhome = Db2Manuhome.find_original_by_mhr_number(mhr_num)
@@ -230,6 +231,7 @@ def test_find_original_by_mhr_number(session, http_status, id, mhr_num, status, 
         assert report_json.get('ownerGroups')
         assert report_json.get('location')
         assert report_json.get('description')
+        assert report_json['ownLand'] == own_land
     else:
         with pytest.raises(BusinessException) as request_err:
             Db2Manuhome.find_by_mhr_number(mhr_num)
