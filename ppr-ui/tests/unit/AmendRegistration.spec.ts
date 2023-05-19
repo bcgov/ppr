@@ -6,7 +6,7 @@ import { getVuexStore } from '@/store'
 import { createLocalVue, shallowMount } from '@vue/test-utils'
 import sinon from 'sinon'
 // Components
-import { AmendRegistration } from '@/views'
+import AmendRegistration from '@/views/amendment/AmendRegistration.vue'
 import { Collateral } from '@/components/collateral'
 import {
   AmendmentDescription, RegistrationLengthTrustAmendment, RegistrationLengthTrustSummary
@@ -69,7 +69,7 @@ describe('Amendment registration component', () => {
       name: RouteNames.AMEND_REGISTRATION,
       query: { 'reg-num': '123456B' }
     })
-    wrapper = shallowMount(AmendRegistration, { localVue, store, router, vuetify })
+    wrapper = shallowMount((AmendRegistration as any), { localVue, store, router, vuetify })
     wrapper.setProps({ appReady: true })
     await flushPromises()
   })
@@ -220,7 +220,7 @@ describe('Amendment for repairers lien component', () => {
       name: RouteNames.AMEND_REGISTRATION,
       query: { 'reg-num': '123456B' }
     })
-    wrapper = shallowMount(AmendRegistration, { localVue, store, router, vuetify })
+    wrapper = shallowMount((AmendRegistration as any), { localVue, store, router, vuetify })
     wrapper.setProps({ appReady: true })
     await flushPromises()
   })

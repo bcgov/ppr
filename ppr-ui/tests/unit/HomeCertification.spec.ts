@@ -2,7 +2,7 @@
 import Vue from 'vue'
 import Vuetify from 'vuetify'
 import { getVuexStore } from '@/store'
-import CompositionApi, { nextTick } from '@vue/composition-api'
+import CompositionApi, { nextTick } from ''
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 
 // Components
@@ -22,10 +22,10 @@ const store = getVuexStore()
  */
 function createComponent (): Wrapper<any> {
   const localVue = createLocalVue()
-  localVue.use(CompositionApi)
+
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
-  return mount(HomeCertification, {
+  return mount((HomeCertification as any), {
     localVue,
     propsData: {},
     store,

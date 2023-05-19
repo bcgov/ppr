@@ -2,7 +2,7 @@
 import Vue from 'vue'
 import Vuetify from 'vuetify'
 import { getVuexStore } from '@/store'
-import CompositionApi from '@vue/composition-api'
+
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import flushPromises from 'flush-promises'
 
@@ -50,10 +50,10 @@ function createComponent (display: boolean): Wrapper<any> {
   const attach = '#app'
   const options = { ...registrationOtherDialog }
   const localVue = createLocalVue()
-  localVue.use(CompositionApi)
+
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
-  return mount(RegistrationOtherDialog, {
+  return mount((RegistrationOtherDialog as any), {
     localVue,
     propsData: { attach: attach, display: display, options: options },
     store,

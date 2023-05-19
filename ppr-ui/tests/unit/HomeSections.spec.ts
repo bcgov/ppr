@@ -2,7 +2,7 @@
 import Vue from 'vue'
 import Vuetify from 'vuetify'
 import { getVuexStore } from '@/store'
-import CompositionApi from '@vue/composition-api'
+
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 
 // Components
@@ -27,10 +27,10 @@ const errorText = '.error-text'
  */
 function createComponent (): Wrapper<any> {
   const localVue = createLocalVue()
-  localVue.use(CompositionApi)
+
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
-  return mount(HomeSections, {
+  return mount((HomeSections as any), {
     localVue,
     propsData: {},
     store,

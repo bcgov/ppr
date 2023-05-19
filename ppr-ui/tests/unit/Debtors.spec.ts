@@ -28,7 +28,7 @@ function createComponent (): Wrapper<any> {
   const localVue = createLocalVue()
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
-  return mount(Debtors, {
+  return mount((Debtors as any), {
     localVue,
     propsData: {},
     store,

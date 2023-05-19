@@ -92,13 +92,13 @@
 
 <script lang="ts">
 // external libraries
-import { defineComponent, reactive, toRefs, watch, computed } from '@vue/composition-api'
+import { defineComponent, reactive, toRefs, watch, computed } from 'vue'
 // local helpers / types / etc.
 import { useCountriesProvinces } from '@/composables/address/factories'
 import { useSecuredParty } from '@/components/parties/composables/useSecuredParty'
 import { ActionTypes } from '@/enums'
 import { SearchPartyIF, PartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
-import { useActions } from 'vuex-composition-helpers'
+import { useStore } from '@/store/store'
 
 export default defineComponent({
   name: 'PartyAutocomplete',
@@ -130,12 +130,7 @@ export default defineComponent({
       setMhrTransferSubmittingParty,
       setMhrTransferSubmittingPartyKey,
       setMhrRegistrationSubmittingParty
-    } = useActions<any>([
-      'setMhrSubmittingParty',
-      'setMhrTransferSubmittingParty',
-      'setMhrTransferSubmittingPartyKey',
-      'setMhrRegistrationSubmittingParty'
-    ])
+    } = useStore()
     const { addSecuredParty, setRegisteringParty, isExistingSecuredParty } = useSecuredParty(props, context)
     const countryProvincesHelpers = useCountriesProvinces()
     const localState = reactive({
@@ -203,11 +198,7 @@ export default defineComponent({
       () => props.autoCompleteItems,
       (items: Array<any>) => {
         localState.autoCompleteResults = items
-        if (items) {
-          localState.autoCompleteIsActive = true
-        } else {
-          localState.autoCompleteIsActive = false
-        }
+        localState.autoCompleteIsActive = !!items;
       },
       { immediate: true, deep: true }
     )

@@ -29,7 +29,7 @@ function createComponent (activeIndex: Number, isBusiness: boolean, invalidSecti
   const localVue = createLocalVue()
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
-  return mount(EditDebtor, {
+  return mount((EditDebtor as any), {
     localVue,
     propsData: { activeIndex, isBusiness, invalidSection },
     store,

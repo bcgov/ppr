@@ -190,26 +190,22 @@
 
 <script lang="ts">
 /* eslint-disable no-unused-vars */
-import { computed, defineComponent, onMounted, reactive, toRefs, watch } from '@vue/composition-api'
+import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue'
 import { MhrLocationInfoIF } from '@/interfaces'
 import { useInputRules } from '@/composables/useInputRules'
-import { useGetters } from 'vuex-composition-helpers'
+import { useStore } from '@/store/store'
 /* eslint-disable no-unused-vars */
 
 export default defineComponent({
   name: 'HomeLocationInfo',
-  emits: ['updateLocationInfo', 'updateLocationDescription', 'updateLocationValid'],
+  emits: ['updateLocationInfo', 'updateLocationDescription', 'updateLocationInfoValid'],
   props: {
     validate: { type: Boolean, default: false },
     isReserve: { type: Boolean, default: false },
     isStrata: { type: Boolean, default: false }
   },
   setup (props, context) {
-    const {
-      getMhrRegistrationLocation
-    } = useGetters<any>([
-      'getMhrRegistrationLocation'
-    ])
+    const { getMhrRegistrationLocation } = useStore()
     const {
       customRules,
       maxLength,
@@ -234,7 +230,7 @@ export default defineComponent({
         block: '',
         exceptionPlan: ''
       } as MhrLocationInfoIF,
-      additionalDescription: getMhrRegistrationLocation.value?.additionalDescription || '',
+      additionalDescription: getMhrRegistrationLocation?.additionalDescription || '',
       reserveLengthErrMsg: 'Band Name, Reserve Number and Details combined cannot exceed 80 characters',
       isReserveLengthErr: computed((): boolean => {
         return (
@@ -252,7 +248,7 @@ export default defineComponent({
     onMounted(() => {
       if (props.validate) validateLocationInfo()
       // Map specific local properties to draft data if it exists
-      for (const key in localState.locationInfo) localState.locationInfo[key] = getMhrRegistrationLocation.value[key]
+      for (const key in localState.locationInfo) localState.locationInfo[key] = getMhrRegistrationLocation[key]
     })
 
     const locationInputRules = (length: number = null, requiredMsg: string, fieldId: string = null) => {

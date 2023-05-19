@@ -61,7 +61,7 @@ describe('ReviewConfirm new registration component', () => {
       name: RouteNames.REVIEW_DISCHARGE,
       query: { 'reg-num': '123456B' }
     })
-    wrapper = shallowMount(ReviewRegistration, { localVue, store, router, vuetify })
+    wrapper = shallowMount((ReviewRegistration as any), { localVue, store, router, vuetify })
     wrapper.setProps({ appReady: true })
     await flushPromises()
   })

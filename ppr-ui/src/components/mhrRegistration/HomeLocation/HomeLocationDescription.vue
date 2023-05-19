@@ -89,9 +89,9 @@
 
 <script lang="ts">
 /* eslint-disable no-unused-vars */
-import { defineComponent, computed, reactive, toRefs, watch, onMounted } from '@vue/composition-api'
+import { defineComponent, computed, reactive, toRefs, watch, onMounted } from 'vue'
 import { HomeLocationInfo } from '@/components/common'
-import { useActions, useGetters } from 'vuex-composition-helpers'
+import { useStore } from '@/store/store'
 import { useInputRules, useNewMhrRegistration } from '@/composables'
 import { MhrLocationInfoIF } from '@/interfaces'
 /* eslint-enable no-unused-vars */
@@ -109,16 +109,7 @@ export default defineComponent({
     isStrata: { type: Boolean, default: false }
   },
   setup (props, context) {
-    const {
-      getMhrRegistrationLocation
-    } = useGetters<any>([
-      'getMhrRegistrationLocation'
-    ])
-    const {
-      setIsManualLocation
-    } = useActions<any>([
-      'setIsManualLocation'
-    ])
+    const { getMhrRegistrationLocation, setIsManualLocation } = useStore()
 
     const { maxLength } = useInputRules()
     const { resetLocationInfoFields } = useNewMhrRegistration()
@@ -127,7 +118,7 @@ export default defineComponent({
       isValidLocationInfo: false,
       showLocationInfo: false,
       locationInfo: {} as MhrLocationInfoIF,
-      additionalDescription: getMhrRegistrationLocation.value?.additionalDescription || '',
+      additionalDescription: getMhrRegistrationLocation?.additionalDescription || '',
       isHomeLocationDescriptionValid: false,
       isValidDescription: computed((): boolean => {
         return localState.isHomeLocationDescriptionValid &&
@@ -149,7 +140,7 @@ export default defineComponent({
         'partOf', 'section', 'township', 'range',
         'meridian', 'parcel', 'block', 'exceptionPlan'
       ]
-      localState.showLocationInfo = commonLocationProperties.some(key => !!getMhrRegistrationLocation.value[key])
+      localState.showLocationInfo = commonLocationProperties.some(key => !!getMhrRegistrationLocation[key])
     })
 
     const handleCancel = (): void => {

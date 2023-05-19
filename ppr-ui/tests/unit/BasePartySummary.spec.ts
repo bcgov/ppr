@@ -35,7 +35,7 @@ function createComponent (
   const localVue = createLocalVue()
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
-  return mount(BasePartySummary, {
+  return mount((BasePartySummary as any), {
     localVue,
     propsData: { setHeaders, setItems, setOptions },
     store,

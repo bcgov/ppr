@@ -1,4 +1,4 @@
-import { ref } from '@vue/composition-api'
+import { ref } from 'vue'
 import { createDefaultValidationResult } from '@lemoncode/fonk'
 import { formValidation } from './securedPartyFormValidator'
 import { useValidation } from '@/utils/validators/use-validation'
@@ -56,8 +56,7 @@ export const useSecuredPartyValidation = () => {
 
   /**
    * Handles validity events from address sub-components.
-   * @param addressToValidate the address to set the validity of
-   * @param isValid whether the address is valid
+   * @param valid whether the address is valid
    */
   const updateValidity = (valid: boolean): void => {
     errors.value.address.succeeded = valid

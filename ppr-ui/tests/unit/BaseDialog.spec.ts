@@ -53,7 +53,7 @@ describe('Base Dialog tests', () => {
   beforeEach(async () => {
     const localVue = createLocalVue()
     localVue.use(Vuetify)
-    wrapper = mount(BaseDialog, {
+    wrapper = mount((BaseDialog as any), {
       localVue,
       store,
       propsData: {

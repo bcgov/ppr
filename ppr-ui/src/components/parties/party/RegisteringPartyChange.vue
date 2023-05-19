@@ -53,8 +53,8 @@ import {
   onMounted,
   watch,
   computed
-} from '@vue/composition-api'
-import { useGetters } from 'vuex-composition-helpers'
+} from 'vue'
+import { useStore } from '@/store/store'
 // local components
 import { EditParty, PartySearch, RegisteringParty } from '@/components/parties/party'
 // local helpers / types / etc.
@@ -77,17 +77,14 @@ export default defineComponent({
     }
   },
   setup (props, context) {
-    const { getAddSecuredPartiesAndDebtors } = useGetters<any>([
-      'getAddSecuredPartiesAndDebtors'
-    ])
-    const { isRoleStaffSbc } = useGetters<any>(['getRegistrationType', 'isRoleStaffSbc'])
+    const { getAddSecuredPartiesAndDebtors, isRoleStaffSbc } = useStore()
     const localState = reactive({
       openChangeScreen: false,
-      isSbc: isRoleStaffSbc.value,
+      isSbc: isRoleStaffSbc,
       showAddRegisteringParty: false,
       addEditInProgress: false,
       registeringParty: computed((): PartyIF => {
-        return getAddSecuredPartiesAndDebtors.value.registeringParty
+        return getAddSecuredPartiesAndDebtors.registeringParty
       }),
       summaryView: computed((): boolean => {
         return props.isSummary
@@ -98,7 +95,7 @@ export default defineComponent({
     })
 
     onMounted(() => {
-      if ((isRoleStaffSbc.value) && ((!localState.registeringParty) || (!localState.registeringParty?.action))) {
+      if ((isRoleStaffSbc) && ((!localState.registeringParty) || (!localState.registeringParty?.action))) {
         localState.openChangeScreen = true
         context.emit('registeringPartyOpen', true)
       }
@@ -118,10 +115,8 @@ export default defineComponent({
     const resetData = () => {
       localState.addEditInProgress = false
       localState.showAddRegisteringParty = false
-      localState.openChangeScreen = false
-      if ((isRoleStaffSbc.value) && ((!localState.registeringParty) || (!localState.registeringParty.action))) {
-        localState.openChangeScreen = true
-      }
+      localState.openChangeScreen = isRoleStaffSbc && ((!localState.registeringParty) ||
+        (!localState.registeringParty.action))
       context.emit('registeringPartyOpen', false)
     }
 

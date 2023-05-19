@@ -2,7 +2,7 @@ import sinon from 'sinon'
 import Vue from 'vue'
 import Vuetify from 'vuetify'
 import { getVuexStore } from '@/store'
-import CompositionApi from '@vue/composition-api'
+
 import { mount, Wrapper, createLocalVue } from '@vue/test-utils'
 import flushPromises from 'flush-promises'
 // local components
@@ -52,10 +52,10 @@ describe('Registration Confirmation Dialog', () => {
       )
     )
     const localVue = createLocalVue()
-    localVue.use(CompositionApi)
+
     localVue.use(Vuetify)
 
-    wrapper = mount(RegistrationConfirmation, {
+    wrapper = mount((RegistrationConfirmation as any), {
       localVue,
       store,
       propsData: {

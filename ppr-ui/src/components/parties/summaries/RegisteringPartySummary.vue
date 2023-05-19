@@ -16,8 +16,9 @@ import {
   computed,
   onMounted,
   toRefs
-} from '@vue/composition-api'
-import { useGetters, useActions } from 'vuex-composition-helpers'
+} from 'vue'
+import { useStore } from '@/store/store'
+import { useRouter } from '@/router'
 
 import { BasePartySummary } from '@/components/parties/summaries'
 import { AddPartiesIF, PartyIF, PartySummaryOptionsI } from '@/interfaces' // eslint-disable-line no-unused-vars
@@ -39,21 +40,17 @@ export default defineComponent({
       default: ''
     }
   },
-  setup (props, context) {
+  setup (props) {
+    const router = useRouter()
     const {
+      // Getters
       getAddSecuredPartiesAndDebtors,
       getOriginalAddSecuredPartiesAndDebtors,
-      getRegistrationFlowType
-    } = useGetters<any>([
-      'getAddSecuredPartiesAndDebtors',
-      'getOriginalAddSecuredPartiesAndDebtors',
-      'getRegistrationFlowType'
-    ])
-    const { setAddSecuredPartiesAndDebtors } = useActions<any>([
-      'setAddSecuredPartiesAndDebtors'
-    ])
+      getRegistrationFlowType,
+      // Actions
+      setAddSecuredPartiesAndDebtors
+    } = useStore()
     const { getRegisteringParty } = useRegisteringParty()
-    const router = context.root.$router
     const parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
 
     const localState = reactive({
@@ -70,8 +67,7 @@ export default defineComponent({
         return []
       }),
       registeringPartyHeaders: computed(function () {
-        const headersToShow = [...registeringTableHeaders]
-        return headersToShow
+        return [...registeringTableHeaders]
       }),
       registeringPartyOptions: {
         header: props.setHeader,

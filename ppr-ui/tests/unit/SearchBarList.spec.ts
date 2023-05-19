@@ -34,7 +34,7 @@ function createComponent (): Wrapper<any> {
   const localVue = createLocalVue()
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
-  return mount(SearchBarList, {
+  return mount((SearchBarList as any), {
     localVue,
     propsData: {},
     store,

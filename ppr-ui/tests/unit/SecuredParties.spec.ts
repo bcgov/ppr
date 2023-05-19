@@ -42,7 +42,7 @@ function createComponent (
   const localVue = createLocalVue()
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
-  return mount(SecuredParties, {
+  return mount((SecuredParties as any), {
     localVue,
     propsData: {},
     store,

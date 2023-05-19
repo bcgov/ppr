@@ -11,7 +11,7 @@
 </template>
 <script lang="ts">
 // external
-import { computed, defineComponent, reactive, toRefs } from '@vue/composition-api'
+import { computed, defineComponent, reactive, toRefs } from 'vue'
 // local
 import { TombstoneDefault, TombstoneDischarge } from '@/components/tombstone'
 
@@ -26,7 +26,7 @@ export default defineComponent({
       default: ''
     }
   },
-  setup (props, { root }) {
+  setup (props) {
     const localState = reactive({
       currentPath: computed((): string => {
         return props.setCurrentPath

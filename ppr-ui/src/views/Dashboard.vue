@@ -80,8 +80,9 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, reactive, toRefs, watch } from '@vue/composition-api'
-import { useActions, useGetters } from 'vuex-composition-helpers'
+import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue'
+import { useRouter } from '@/router'
+import { useStore } from '@/store/store'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { ProductCode, RouteNames } from '@/enums'
 import {
@@ -129,6 +130,7 @@ export default defineComponent({
     }
   },
   setup (props, context) {
+    const router = useRouter()
     const {
       isRoleStaff,
       hasMhrRole,
@@ -237,12 +239,12 @@ export default defineComponent({
       if (results) {
         if (localState.isMHRSearchType(results.searchQuery.type)) {
           setManufacturedHomeSearchResults(results)
-          context.root.$router.replace({
+          router.replace({
             name: RouteNames.MHRSEARCH
           })
         } else {
           setSearchResults(results)
-          context.root.$router.replace({
+          router.replace({
             name: RouteNames.SEARCH
           })
         }

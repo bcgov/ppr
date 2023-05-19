@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuetify from 'vuetify'
 import { getVuexStore } from '@/store'
-import CompositionApi from '@vue/composition-api'
+
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import { getTestId } from './utils'
 import { RebuiltStatus } from '@/components/mhrRegistration'
@@ -16,8 +16,8 @@ const store = getVuexStore()
  */
 function createComponent (): Wrapper<any> {
   const localVue = createLocalVue()
-  localVue.use(CompositionApi)
-  return mount(RebuiltStatus, {
+
+  return mount((RebuiltStatus as any), {
     localVue,
     store
   })

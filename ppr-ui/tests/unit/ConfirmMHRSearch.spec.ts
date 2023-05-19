@@ -47,7 +47,7 @@ describe('Confirm MHRSearch view', () => {
     await router.push({
       name: RouteNames.MHRSEARCH_CONFIRM
     })
-    wrapper = shallowMount(ConfirmMHRSearch, { localVue, store, router, vuetify })
+    wrapper = shallowMount((ConfirmMHRSearch as any), { localVue, store, router, vuetify })
     wrapper.setProps({ appReady: true })
     await flushPromises()
   })

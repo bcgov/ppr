@@ -53,8 +53,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs, watch, computed } from '@vue/composition-api'
-import { useGetters, useActions } from 'vuex-composition-helpers'
+import { defineComponent, reactive, toRefs, watch, computed } from 'vue'
+import { useStore } from '@/store/store'
 
 export default defineComponent({
   props: {

@@ -94,7 +94,7 @@ describe('Confirm Amendment registration component', () => {
       name: RouteNames.CONFIRM_AMENDMENT,
       query: { 'reg-num': '123456B' }
     })
-    wrapper = shallowMount(ConfirmAmendment, { localVue, store, router, vuetify })
+    wrapper = shallowMount((ConfirmAmendment as any), { localVue, store, router, vuetify })
     wrapper.setProps({ appReady: true })
     await flushPromises()
   })
@@ -229,7 +229,7 @@ describe('Confirm Amendment registration save registration', () => {
       name: RouteNames.CONFIRM_AMENDMENT,
       query: { 'reg-num': '123456B' }
     })
-    wrapper = shallowMount(ConfirmAmendment, { localVue, store, router, vuetify })
+    wrapper = shallowMount((ConfirmAmendment as any), { localVue, store, router, vuetify })
     wrapper.setProps({ appReady: true })
     await flushPromises()
   })
@@ -323,7 +323,7 @@ describe('Confirm Amendment for staff', () => {
       name: RouteNames.CONFIRM_AMENDMENT,
       query: { 'reg-num': '123456B' }
     })
-    wrapper = shallowMount(ConfirmAmendment, { localVue, store, router, vuetify })
+    wrapper = shallowMount((ConfirmAmendment as any), { localVue, store, router, vuetify })
     wrapper.setProps({ appReady: true })
     await flushPromises()
   })

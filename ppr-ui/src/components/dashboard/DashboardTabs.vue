@@ -52,9 +52,9 @@
 <script lang="ts">
 // Components
 /* eslint-disable no-unused-vars */
-import { computed, defineComponent, onMounted, reactive, set, toRefs } from '@vue/composition-api'
+import { computed, defineComponent, onMounted, reactive, toRefs } from 'vue'
+import { useStore } from '@/store/store'
 import { RegistrationsWrapper } from '@/components/common'
-import { useActions, useGetters } from 'vuex-composition-helpers'
 import { useNewMhrRegistration } from '@/composables'
 /* eslint-enable no-unused-vars */
 
@@ -75,19 +75,20 @@ export default defineComponent({
   },
   setup (props, context) {
     const {
-      getMhRegTableBaseRegs, getRegTableTotalRowCount, getCurrentRegistrationsTab
-    } = useGetters<any>(['getMhRegTableBaseRegs', 'getRegTableTotalRowCount', 'getCurrentRegistrationsTab'])
-
-    const {
+      // Getters
+      getMhRegTableBaseRegs,
+      getRegTableTotalRowCount,
+      getCurrentRegistrationsTab,
+      // Actions
       setCurrentRegistrationsTab
-    } = useActions<any>(['setCurrentRegistrationsTab'])
+    } = useStore()
 
     const {
       fetchMhRegistrations
     } = useNewMhrRegistration()
 
     const localState = reactive({
-      tabNumber: getCurrentRegistrationsTab.value,
+      tabNumber: getCurrentRegistrationsTab,
       isPprTab: computed((): boolean => {
         return localState.tabNumber === 0
       }),

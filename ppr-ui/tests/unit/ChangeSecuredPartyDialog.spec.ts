@@ -27,7 +27,7 @@ describe('Confirmation Dialog', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
-    wrapper = mount(ChangeSecuredPartyDialog, {
+    wrapper = mount((ChangeSecuredPartyDialog as any), {
       vuetify,
       store,
       propsData: {

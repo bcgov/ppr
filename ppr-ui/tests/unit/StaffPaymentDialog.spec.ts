@@ -4,7 +4,7 @@ import Vuetify from 'vuetify'
 import flushPromises from 'flush-promises'
 import { getVuexStore } from '@/store'
 import { mount, createLocalVue } from '@vue/test-utils'
-import CompositionApi from '@vue/composition-api'
+
 
 // Components
 import { StaffPayment as StaffPaymentComponent } from '@bcrs-shared-components/staff-payment'
@@ -32,9 +32,9 @@ describe('Payment component', () => {
 
   beforeEach(async () => {
     const localVue = createLocalVue()
-    localVue.use(CompositionApi)
+
     localVue.use(Vuetify)
-    wrapper = mount(StaffPaymentDialog,
+    wrapper = mount((StaffPaymentDialog as any),
       {
         localVue,
         store,

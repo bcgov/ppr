@@ -94,7 +94,7 @@ describe('App component basic rendering normal account', () => {
     localVue.use(VueRouter)
     const router = mockRouter.mock()
     router.push({ name: 'dashboard' })
-    wrapper = shallowMount(App, { localVue, store, router, vuetify, stubs: { Affix: true } })
+    wrapper = shallowMount((App as any), { localVue, store, router, vuetify, stubs: { Affix: true } })
 
     // wait for all queries to complete
     await flushPromises()
@@ -188,7 +188,7 @@ describe('App component basic rendering non billable account', () => {
     localVue.use(VueRouter)
     const router = mockRouter.mock()
     router.push({ name: 'dashboard' })
-    wrapper = shallowMount(App, { localVue, store, router, vuetify, stubs: { Affix: true } })
+    wrapper = shallowMount((App as any), { localVue, store, router, vuetify, stubs: { Affix: true } })
 
     // wait for all queries to complete
     await flushPromises()

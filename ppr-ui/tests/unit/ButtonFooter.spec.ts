@@ -3,7 +3,6 @@ import Vue from 'vue'
 import Vuetify from 'vuetify'
 import VueRouter from 'vue-router' // eslint-disable-line no-unused-vars
 import { getVuexStore } from '@/store'
-import CompositionApi from '@vue/composition-api'
 import { mount, createLocalVue, shallowMount, Wrapper } from '@vue/test-utils'
 import flushPromises from 'flush-promises'
 import sinon from 'sinon'
@@ -11,7 +10,7 @@ import sinon from 'sinon'
 // Components
 import { ButtonFooter } from '@/components/common'
 import { StaffPaymentDialog } from '@/components/dialogs'
-import { LengthTrust, AddSecuredPartiesAndDebtors, AddCollateral, ReviewConfirm } from '@/views'
+import { LengthTrust, AddSecuredPartiesAndDebtors, AddCollateral, ReviewConfirm } from '@/views/newRegistration'
 import { getLastEvent } from './utils'
 
 // Other
@@ -45,11 +44,10 @@ function createComponent (
   currentStepName: String
 ): Wrapper<any> {
   const localVue = createLocalVue()
-  localVue.use(CompositionApi)
   localVue.use(Vuetify)
   // await router.push({ name: 'length-trust' })
   document.body.setAttribute('data-app', 'true')
-  return mount(ButtonFooter, {
+  return mount((ButtonFooter as any), {
     localVue,
     propsData: { currentStatementType, router, currentStepName },
     store,
@@ -67,7 +65,7 @@ describe('New Financing Statement Registration Buttons Step 1', () => {
   beforeEach(async () => {
     const localVue = createLocalVue()
     localVue.use(VueRouter)
-    wrapper2 = shallowMount(LengthTrust, { localVue, store, router, vuetify })
+    wrapper2 = shallowMount((LengthTrust as any), { localVue, store, router, vuetify })
     wrapper = createComponent(currentStatementType, currentStepName)
   })
   afterEach(() => {
@@ -119,7 +117,7 @@ describe('New Financing Statement Registration Buttons Step 2', () => {
   beforeEach(async () => {
     const localVue = createLocalVue()
     localVue.use(VueRouter)
-    wrapper2 = shallowMount(AddSecuredPartiesAndDebtors, { localVue, store, router, vuetify })
+    wrapper2 = shallowMount((AddSecuredPartiesAndDebtors as any), { localVue, store, router, vuetify })
     wrapper = createComponent(currentStatementType, currentStepName)
   })
   afterEach(() => {
@@ -182,7 +180,7 @@ describe('New Financing Statement Registration Buttons Step 3', () => {
   beforeEach(async () => {
     const localVue = createLocalVue()
     localVue.use(VueRouter)
-    wrapper2 = shallowMount(AddCollateral, { localVue, store, router, vuetify })
+    wrapper2 = shallowMount((AddCollateral as any), { localVue, store, router, vuetify })
     wrapper = createComponent(currentStatementType, currentStepName)
   })
   afterEach(() => {
@@ -244,7 +242,7 @@ describe('New Financing Statement Registration Buttons Step 4', () => {
   beforeEach(async () => {
     const localVue = createLocalVue()
     localVue.use(VueRouter)
-    wrapper2 = shallowMount(ReviewConfirm, { localVue, store, router, vuetify })
+    wrapper2 = shallowMount((ReviewConfirm as any), { localVue, store, router, vuetify })
     wrapper = createComponent(currentStatementType, currentStepName)
   })
   afterEach(() => {
@@ -307,7 +305,7 @@ describe('Step 4 for SBC staff', () => {
     const localVue = createLocalVue()
     localVue.use(VueRouter)
     await store.dispatch('setAuthRoles', ['staff', 'ppr_staff'])
-    wrapper2 = shallowMount(ReviewConfirm, { localVue, store, router, vuetify })
+    wrapper2 = shallowMount((ReviewConfirm as any), { localVue, store, router, vuetify })
     wrapper = createComponent(currentStatementType, currentStepName)
   })
   afterEach(() => {

@@ -253,8 +253,8 @@ import {
   toRefs,
   computed,
   watch
-} from '@vue/composition-api'
-import { useGetters, useActions } from 'vuex-composition-helpers'
+} from 'vue'
+import { useStore } from '@/store/store'
 import { AddPartiesIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import EditDebtor from './EditDebtor.vue'
 import { useParty } from '@/composables/useParty'
@@ -285,22 +285,17 @@ export default defineComponent({
     }
   },
   setup (props, { emit }) {
-    const { setAddSecuredPartiesAndDebtors } = useActions<any>([
-      'setAddSecuredPartiesAndDebtors'
-    ])
     const {
+      // Getters
       getAddSecuredPartiesAndDebtors,
       getRegistrationFlowType,
       getRegistrationType,
-      getOriginalAddSecuredPartiesAndDebtors
-    } = useGetters<any>([
-      'getAddSecuredPartiesAndDebtors',
-      'getRegistrationFlowType',
-      'getRegistrationType',
-      'getOriginalAddSecuredPartiesAndDebtors'
-    ])
+      getOriginalAddSecuredPartiesAndDebtors,
+      // Actions
+      setAddSecuredPartiesAndDebtors
+    } = useStore()
 
-    const registrationFlowType = getRegistrationFlowType.value
+    const registrationFlowType = getRegistrationFlowType
     const addressSchema = PartyAddressSchema
     const {
       getName,
@@ -317,13 +312,13 @@ export default defineComponent({
       invalidSection: false,
       activeIndex: -1,
       showEditDebtor: [false],
-      debtors: getAddSecuredPartiesAndDebtors.value.debtors,
+      debtors: getAddSecuredPartiesAndDebtors.debtors,
       showErrorSummary: computed((): boolean => {
-        return !getAddSecuredPartiesAndDebtors.value.valid
+        return !getAddSecuredPartiesAndDebtors.valid
       }),
-      showErrorDebtors: getAddSecuredPartiesAndDebtors.value.showInvalid,
+      showErrorDebtors: getAddSecuredPartiesAndDebtors.showInvalid,
       parties: computed((): AddPartiesIF => {
-        return getAddSecuredPartiesAndDebtors.value
+        return getAddSecuredPartiesAndDebtors
       }),
       showErrorBar: computed((): boolean => {
         return props.setShowErrorBar
@@ -332,7 +327,7 @@ export default defineComponent({
     })
 
     const removeDebtor = (index: number): void => {
-      let currentParties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
+      let currentParties = getAddSecuredPartiesAndDebtors // eslint-disable-line
       const currentDebtor = currentParties.debtors[index]
       if ((registrationFlowType === RegistrationFlowType.AMENDMENT) && (currentDebtor.action !== ActionTypes.ADDED)) {
         currentDebtor.action = ActionTypes.REMOVED
@@ -341,7 +336,7 @@ export default defineComponent({
       } else {
         localState.debtors.splice(index, 1)
         currentParties.debtors = localState.debtors
-        currentParties.valid = isPartiesValid(currentParties, getRegistrationType.value.registrationTypeAPI)
+        currentParties.valid = isPartiesValid(currentParties, getRegistrationType.registrationTypeAPI)
         setAddSecuredPartiesAndDebtors(currentParties)
       }
       const isValid = getDebtorValidity()
@@ -367,8 +362,8 @@ export default defineComponent({
       localState.addEditInProgress = false
       localState.showAddDebtor = false
       localState.showEditDebtor = [false]
-      let currentParties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
-      currentParties.valid = isPartiesValid(currentParties, getRegistrationType.value.registrationTypeAPI)
+      let currentParties = getAddSecuredPartiesAndDebtors // eslint-disable-line
+      currentParties.valid = isPartiesValid(currentParties, getRegistrationType.registrationTypeAPI)
       setAddSecuredPartiesAndDebtors(currentParties)
       const isValid = getDebtorValidity()
       emitDebtorValidity(isValid)
@@ -376,7 +371,7 @@ export default defineComponent({
     }
 
     const undo = (index: number): void => {
-      const originalParties = getOriginalAddSecuredPartiesAndDebtors.value
+      const originalParties = getOriginalAddSecuredPartiesAndDebtors
       localState.debtors.splice(index, 1, cloneDeep(originalParties.debtors[index]))
       const isValid = getDebtorValidity()
       emitDebtorValidity(isValid)

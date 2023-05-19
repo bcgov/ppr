@@ -55,8 +55,8 @@ import {
   defineComponent,
   reactive,
   toRefs
-} from '@vue/composition-api'
-import { useGetters, useActions } from 'vuex-composition-helpers'
+} from 'vue'
+import { useStore } from '@/store/store'
 
 // local
 import { LengthTrustIF } from '@/interfaces' // eslint-disable-line no-unused-vars
@@ -71,10 +71,7 @@ export default defineComponent({
   },
   emits: ['editTrustIndenture', 'resetEvent'],
   setup (props, context) {
-    const { setLengthTrust } = useActions<any>(['setLengthTrust'])
-    const { getLengthTrust } = useGetters<any>(['getLengthTrust'])
-    const modal = false
-
+    const { getLengthTrust, setLengthTrust } = useStore()
     const localState = reactive({
       existingTrustIndenture: props.currentTrustIndenture,
       trustIndenture: props.currentTrustIndenture,
@@ -100,7 +97,6 @@ export default defineComponent({
     return {
       onSubmitForm,
       resetData,
-      modal,
       ...toRefs(localState)
     }
   }

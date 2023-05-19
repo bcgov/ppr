@@ -355,7 +355,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, ref, toRefs, watch } from '@vue/composition-api'
+import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue'
 import { useInputRules } from '@/composables/useInputRules'
 import { useHomeOwners, useMhrValidations } from '@/composables/mhrRegistration'
 import { BusinessSearchAutocomplete } from '@/components/search'
@@ -375,7 +375,7 @@ import {
 import { SimpleHelpToggle } from '@/components/common'
 import HomeOwnerGroups from './HomeOwnerGroups.vue'
 import HomeOwnerRoles from './HomeOwnerRoles.vue'
-import { useActions, useGetters } from 'vuex-composition-helpers'
+import { useStore } from '@/store/store'
 import { find } from 'lodash'
 import { useMhrInformation, useTransferOwners } from '@/composables'
 import { ActionTypes, HomeOwnerPartyTypes } from '@/enums'
@@ -420,23 +420,16 @@ export default defineComponent({
   },
   setup (props, context) {
     const {
+      // Getters
       isRoleStaffReg,
       getMhrRegistrationHomeOwnerGroups,
       getMhrTransferHomeOwnerGroups,
       getMhrTransferHomeOwners,
       getMhrRegistrationValidationModel,
-      getMhrTransferType
-    } = useGetters<any>([
-      'isRoleStaffReg',
-      'getMhrRegistrationHomeOwnerGroups',
-      'getMhrTransferHomeOwnerGroups',
-      'getMhrTransferHomeOwners',
-      'getMhrRegistrationValidationModel',
-      'getMhrTransferType'
-    ])
-    const {
+      getMhrTransferType,
+      // Actions
       setUnsavedChanges
-    } = useActions<any>(['setUnsavedChanges'])
+    } = useStore()
 
     // Composables
     const {
@@ -444,7 +437,7 @@ export default defineComponent({
       getStepValidation,
       setValidation,
       MhrCompVal
-    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
+    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel))
 
     const {
       required,
@@ -484,12 +477,12 @@ export default defineComponent({
     const addHomeOwnerForm = ref(null)
 
     const getTransferOrRegistrationHomeOwnerGroups = () =>
-      props.isMhrTransfer ? getMhrTransferHomeOwnerGroups.value : getMhrRegistrationHomeOwnerGroups.value
+      props.isMhrTransfer ? getMhrTransferHomeOwnerGroups : getMhrRegistrationHomeOwnerGroups
 
     const defaultHomeOwner: MhrRegistrationHomeOwnerIF = {
       ...props.editHomeOwner,
       ownerId: props.editHomeOwner?.ownerId ||
-        (props.isMhrTransfer ? getMhrTransferHomeOwners.value.length + 1 : DEFAULT_OWNER_ID++),
+        (props.isMhrTransfer ? getMhrTransferHomeOwners.length + 1 : DEFAULT_OWNER_ID++),
       phoneNumber: props.editHomeOwner?.phoneNumber || '',
       phoneExtension: props.editHomeOwner?.phoneExtension || '',
       suffix: props.editHomeOwner?.suffix || '',
@@ -612,11 +605,11 @@ export default defineComponent({
       }),
       additionalNameTooltip: computed((): string => {
         // Display owner tooltip for Staff only
-        if (isRoleStaffReg.value && localState.owner.partyType === HomeOwnerPartyTypes.OWNER_IND) {
+        if (isRoleStaffReg && localState.owner.partyType === HomeOwnerPartyTypes.OWNER_IND) {
           return localState.nameConfig?.tooltipContent.default
         }
 
-        return localState.nameConfig?.tooltipContent[getMhrTransferType.value?.transferType]
+        return localState.nameConfig?.tooltipContent[getMhrTransferType?.transferType]
       }),
       disabledNameEditTooltip: `Owner name’s cannot be changed here. Name change requests should be submitted
         separately, with the appropriate supporting documents, prior to completing this transfer. See Help with

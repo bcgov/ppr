@@ -70,8 +70,9 @@ import {
   reactive,
   computed,
   toRefs
-} from '@vue/composition-api'
-import { useGetters, useActions } from 'vuex-composition-helpers'
+} from 'vue'
+import { useStore } from '@/store/store'
+import { useRouter } from '@/router'
 
 import {
   DebtorSummary,
@@ -94,16 +95,10 @@ export default defineComponent({
     RegisteringPartySummary,
     SecuredPartySummary
   },
-  setup (props, context) {
-    const { getAddSecuredPartiesAndDebtors } = useGetters<any>([
-      'getAddSecuredPartiesAndDebtors'
-    ])
-    const { setAddSecuredPartiesAndDebtors } = useActions<any>([
-      'setAddSecuredPartiesAndDebtors'
-    ])
-    const router = context.root.$router
-
-    const parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
+  setup () {
+    const router = useRouter()
+    const { getAddSecuredPartiesAndDebtors, setAddSecuredPartiesAndDebtors } = useStore()
+    const parties: AddPartiesIF = getAddSecuredPartiesAndDebtors
     const addressSchema = PartyAddressSchema
 
     const { getName, getFormattedBirthdate, isBusiness } = useParty()
@@ -127,10 +122,7 @@ export default defineComponent({
         return !parties.valid
       }),
       shouldShowHint: computed((): boolean => {
-        if ((parties.registeringParty) && (parties.registeringParty.action)) {
-          return true
-        }
-        return false
+        return !!((parties.registeringParty) && (parties.registeringParty.action))
       })
     })
 

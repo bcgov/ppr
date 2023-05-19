@@ -65,7 +65,7 @@ import {
   reactive,
   toRefs,
   watch
-} from '@vue/composition-api'
+} from 'vue'
 
 // local
 import { UIRegistrationTypes } from '@/enums' // eslint-disable-line no-unused-vars
@@ -91,10 +91,7 @@ export default defineComponent({
       regType: props.setRegType as UIRegistrationTypes,
       showErrors: props.setShowErrors,
       valid: computed(() => {
-        if (localState.checkbox1 && localState.checkbox2 && localState.checkbox3) {
-          return true
-        }
-        return false
+        return localState.checkbox1 && localState.checkbox2 && localState.checkbox3
       })
     })
 

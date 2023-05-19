@@ -15,9 +15,9 @@ import {
   reactive,
   computed,
   toRefs
-} from '@vue/composition-api'
-import { useGetters, useActions } from 'vuex-composition-helpers'
-
+} from 'vue'
+import { useStore } from '@/store/store'
+import { useRouter } from '@/router'
 import { BasePartySummary } from '@/components/parties/summaries'
 import { AddPartiesIF, PartySummaryOptionsI } from '@/interfaces' // eslint-disable-line no-unused-vars
 
@@ -36,15 +36,10 @@ export default defineComponent({
       default: ''
     }
   },
-  setup (props, context) {
-    const { getAddSecuredPartiesAndDebtors } = useGetters<any>([
-      'getAddSecuredPartiesAndDebtors'
-    ])
-    const { setAddSecuredPartiesAndDebtors } = useActions<any>([
-      'setAddSecuredPartiesAndDebtors'
-    ])
-    const router = context.root.$router
-    const parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
+  setup (props) {
+    const router = useRouter()
+    const { getAddSecuredPartiesAndDebtors, setAddSecuredPartiesAndDebtors } = useStore()
+    const parties: AddPartiesIF = getAddSecuredPartiesAndDebtors
 
     const localState = reactive({
       debtors: parties.debtors,

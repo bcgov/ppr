@@ -1,11 +1,11 @@
-import { useGetters } from 'vuex-composition-helpers'
+import { useStore } from '@/store/store'
 // @ts-ignore
 import {
   mhrInfoValidationStateIF,
   MhrRegistrationHomeOwnerGroupIF,
   MhrRegistrationHomeOwnerIF
 } from '@/interfaces'
-import { computed } from '@vue/composition-api'
+import { computed } from 'vue'
 import { useHomeOwners, useTransferOwners } from '@/composables'
 import { ActionTypes } from '@/enums'
 

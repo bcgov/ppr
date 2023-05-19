@@ -43,7 +43,7 @@
 
 <script lang="ts">
 /* eslint-disable no-unused-vars */
-import { defineComponent, PropType, reactive, toRefs, watch } from '@vue/composition-api'
+import { defineComponent, PropType, reactive, toRefs, watch } from 'vue'
 import { HomeOwnerPartyTypes } from '@/enums'
 import { HomeOwnerRoles } from '@/resources'
 import { useMhrInformation, useTransferOwners } from '@/composables'

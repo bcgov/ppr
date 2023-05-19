@@ -368,8 +368,8 @@ import {
   computed,
   watch,
   onMounted
-} from '@vue/composition-api'
-import { useGetters, useActions } from 'vuex-composition-helpers'
+} from 'vue'
+import { useStore } from '@/store/store'
 import { cloneDeep, isEqual } from 'lodash'
 // local components
 import { ChangeSecuredPartyDialog } from '@/components/dialogs'
@@ -406,24 +406,18 @@ export default defineComponent({
     }
   },
   setup (props, context) {
-    const { setAddSecuredPartiesAndDebtors } = useActions<any>([
-      'setAddSecuredPartiesAndDebtors'
-    ])
     const {
+      // Getters
       getAddSecuredPartiesAndDebtors,
       getRegistrationType,
       getOriginalAddSecuredPartiesAndDebtors,
       getRegistrationFlowType,
-      isRoleStaffReg
-    } = useGetters<any>([
-      'getAddSecuredPartiesAndDebtors',
-      'getRegistrationType',
-      'getOriginalAddSecuredPartiesAndDebtors',
-      'getRegistrationFlowType',
-      'isRoleStaffReg'
-    ])
-    const registrationType = getRegistrationType.value.registrationTypeAPI
-    const registrationFlowType = getRegistrationFlowType.value
+      isRoleStaffReg,
+      // Actions
+      setAddSecuredPartiesAndDebtors
+    } = useStore()
+    const registrationType = getRegistrationType.registrationTypeAPI
+    const registrationFlowType = getRegistrationFlowType
     const countryProvincesHelpers = useCountriesProvinces()
 
     const addressSchema = PartyAddressSchema
@@ -442,18 +436,18 @@ export default defineComponent({
       searchValue: { code: '', businessName: '' },
       loading: false,
       parties: computed((): AddPartiesIF => {
-        return getAddSecuredPartiesAndDebtors.value
+        return getAddSecuredPartiesAndDebtors
       }),
       isStaffReg: computed((): boolean => {
-        return isRoleStaffReg.value
+        return isRoleStaffReg
       }),
-      securedParties: getAddSecuredPartiesAndDebtors.value.securedParties,
+      securedParties: getAddSecuredPartiesAndDebtors.securedParties,
       registeringPartyAdded: false,
       currentPartyName: '',
       showDialog: false,
       savedParty: null,
       showErrorSummary: computed((): boolean => {
-        return !getAddSecuredPartiesAndDebtors.value.valid
+        return !getAddSecuredPartiesAndDebtors.valid
       }),
       showErrorBar: computed((): boolean => {
         return props.setShowErrorBar
@@ -463,7 +457,7 @@ export default defineComponent({
     })
 
     const removeParty = (index: number): void => {
-      let currentParties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
+      let currentParties = getAddSecuredPartiesAndDebtors // eslint-disable-line
       if (isRegisteringParty(localState.securedParties[index])) {
         localState.registeringPartyAdded = false
       }
@@ -500,8 +494,8 @@ export default defineComponent({
     }
 
     const undo = (index: number): void => {
-      const originalParties = getOriginalAddSecuredPartiesAndDebtors.value
-      const currentParties = getAddSecuredPartiesAndDebtors.value
+      const originalParties = getOriginalAddSecuredPartiesAndDebtors
+      const currentParties = getAddSecuredPartiesAndDebtors
       if (isSecuredPartyRestrictedList(registrationType)) {
         localState.securedParties = cloneDeep(originalParties.securedParties)
         delete localState.securedParties[0].action
@@ -517,7 +511,7 @@ export default defineComponent({
     }
 
     const addRegisteringParty = () => {
-      let parties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
+      let parties = getAddSecuredPartiesAndDebtors // eslint-disable-line
       let newList: PartyIF[] = parties.securedParties // eslint-disable-line
       const registeringParty: PartyIF =
         parties.registeringParty !== null ? parties.registeringParty : null
@@ -554,7 +548,7 @@ export default defineComponent({
       localState.addEditInProgress = false
       localState.showAddSecuredParty = false
       localState.showEditParty = [false]
-      let currentParties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
+      let currentParties = getAddSecuredPartiesAndDebtors // eslint-disable-line
       currentParties.valid = isPartiesValid(currentParties, registrationType)
       setAddSecuredPartiesAndDebtors(currentParties)
       const isValid = getSecuredPartyValidity()
@@ -576,7 +570,7 @@ export default defineComponent({
     }
 
     onMounted(() => {
-      localState.showErrorSecuredParties = getAddSecuredPartiesAndDebtors.value.showInvalid
+      localState.showErrorSecuredParties = getAddSecuredPartiesAndDebtors.showInvalid
       for (let i = 0; i < localState.securedParties.length; i++) {
         if (isEqual(localState.securedParties[i], localState.parties.registeringParty)) {
           localState.registeringPartyAdded = true
@@ -627,7 +621,7 @@ export default defineComponent({
     }
 
     const selectResult = (party: SearchPartyIF) => {
-      let parties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
+      let parties = getAddSecuredPartiesAndDebtors // eslint-disable-line
       const newParty: PartyIF = {
         code: party.code,
         businessName: party.businessName,
@@ -655,9 +649,9 @@ export default defineComponent({
 
     const dialogSubmit = (proceed: boolean) => {
       if (proceed) {
-        let parties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
+        let parties = getAddSecuredPartiesAndDebtors // eslint-disable-line
         if (registrationFlowType === RegistrationFlowType.AMENDMENT) {
-          const originalParties = getOriginalAddSecuredPartiesAndDebtors.value
+          const originalParties = getOriginalAddSecuredPartiesAndDebtors
           // original secured party must be shown as removed
           const originalParty = cloneDeep(originalParties.securedParties[0])
           originalParty.action = ActionTypes.REMOVED

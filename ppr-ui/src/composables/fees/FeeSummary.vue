@@ -185,8 +185,8 @@
 
 <script lang="ts">
 // external
-import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
-import { useGetters } from 'vuex-composition-helpers'
+import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
+import { useStore } from '@/store/store'
 // local
 /* eslint-disable no-unused-vars */
 import { UIRegistrationTypes, UITransferTypes } from '@/enums'

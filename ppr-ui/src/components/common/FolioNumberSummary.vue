@@ -47,8 +47,8 @@ import {
   ref,
   onMounted,
   computed
-} from '@vue/composition-api'
-import { useGetters, useActions } from 'vuex-composition-helpers'
+} from 'vue'
+import { useStore } from '@/store/store'
 
 export default defineComponent({
   props: {
@@ -60,12 +60,7 @@ export default defineComponent({
     }
   },
   setup (props, context) {
-    const { setFolioOrReferenceNumber } = useActions<any>([
-      'setFolioOrReferenceNumber'
-    ])
-    const { getFolioOrReferenceNumber } = useGetters<any>([
-      'getFolioOrReferenceNumber'
-    ])
+    const { getFolioOrReferenceNumber, setFolioOrReferenceNumber } = useStore()
     const form = ref(null)
 
     const localState = reactive({
@@ -99,7 +94,7 @@ export default defineComponent({
     }
 
     onMounted(() => {
-      localState.folioNumber = getFolioOrReferenceNumber.value
+      localState.folioNumber = getFolioOrReferenceNumber
     })
 
     return {

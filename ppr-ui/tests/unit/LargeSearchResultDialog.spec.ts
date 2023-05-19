@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuetify from 'vuetify'
 import { getVuexStore } from '@/store'
-import CompositionApi from '@vue/composition-api'
+
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 // local
 import { LargeSearchResultDialog, BaseDialog } from '@/components/dialogs'
@@ -30,11 +30,11 @@ document.body.setAttribute('data-app', 'true')
 describe('Large Search Result Dialog', () => {
   let wrapper: Wrapper<any>
   const localVue = createLocalVue()
-  localVue.use(CompositionApi)
+
   localVue.use(Vuetify)
 
   beforeEach(async () => {
-    wrapper = mount(LargeSearchResultDialog,
+    wrapper = mount((LargeSearchResultDialog as any),
       {
         localVue,
         store,

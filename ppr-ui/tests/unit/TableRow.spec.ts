@@ -2,7 +2,7 @@
 import Vue from 'vue'
 import Vuetify from 'vuetify'
 import { getVuexStore } from '@/store'
-import CompositionApi from '@vue/composition-api'
+
 import { createLocalVue, mount, Wrapper, WrapperArray } from '@vue/test-utils'
 import flushPromises from 'flush-promises'
 import { getTestId, getLastEvent } from './utils'
@@ -45,10 +45,10 @@ const tableRowDraft = '.draft-registration-row'
 function createComponent (item: DraftResultIF | RegistrationSummaryIF | MhRegistrationSummaryIF, headers: any):
   Wrapper<any> {
   const localVue = createLocalVue()
-  localVue.use(CompositionApi)
+
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
-  return mount(TableRow, {
+  return mount((TableRow as any), {
     localVue,
     store,
     propsData: {

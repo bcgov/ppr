@@ -29,9 +29,9 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs } from '@vue/composition-api'
+import { computed, defineComponent, reactive, toRefs } from 'vue'
 import { convertDate } from '@/utils'
-import { useGetters } from 'vuex-composition-helpers'
+import { useStore } from '@/store/store'
 import { useTransferOwners } from '@/composables'
 
 export default defineComponent({
@@ -48,11 +48,7 @@ export default defineComponent({
       getMhrTransferConsideration,
       getMhrTransferDate,
       getMhrTransferOwnLand
-    } = useGetters<any>([
-      'getMhrTransferConsideration',
-      'getMhrTransferDate',
-      'getMhrTransferOwnLand'
-    ])
+    } = useStore()
 
     const {
       isTransferDueToDeath,
@@ -61,7 +57,7 @@ export default defineComponent({
 
     const localState = reactive({
       landOrLeaseLabel: computed(() => {
-        return `The manufactured home is <b>${!getMhrTransferOwnLand.value ? 'not' : ''}</b> located on land that the
+        return `The manufactured home is <b>${!getMhrTransferOwnLand ? 'not' : ''}</b> located on land that the
             ${!isTransferDueToDeath.value || isTransferToExecutorProbateWill.value ? 'new' : ''} homeowners own, or
             on which they have a registered lease of 3 years or more.`
       })

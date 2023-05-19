@@ -135,8 +135,8 @@ import {
   ref,
   toRefs,
   watch
-} from '@vue/composition-api'
-import { useGetters, useActions } from 'vuex-composition-helpers'
+} from 'vue'
+import { useStore } from '@/store/store'
 import { useInputRules, useMhrValidations } from '@/composables/'
 
 export default defineComponent({
@@ -155,28 +155,17 @@ export default defineComponent({
     const modelRef = ref(null)
 
     const {
+      // Getters
       getMhrRegistrationValidationModel,
       getMhrRegistrationManufacturerName,
       getMhrRegistrationYearOfManufacture,
       getMhrRegistrationIsYearApproximate,
       getMhrRegistrationHomeMake,
-      getMhrRegistrationHomeModel
-    } = useGetters<any>([
-      'getMhrRegistrationValidationModel',
-      'getMhrRegistrationManufacturerName',
-      'getMhrRegistrationYearOfManufacture',
-      'getMhrRegistrationIsYearApproximate',
-      'getMhrRegistrationHomeMake',
-      'getMhrRegistrationHomeModel'
-    ])
-
-    const {
+      getMhrRegistrationHomeModel,
+      // Actions
       setMhrHomeDescription,
       setMhrHomeBaseInformation
-    } = useActions<any>([
-      'setMhrHomeDescription',
-      'setMhrHomeBaseInformation'
-    ])
+    } = useStore()
 
     const {
       customRules,
@@ -193,7 +182,7 @@ export default defineComponent({
       MhrSectVal,
       hasError,
       setValidation
-    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
+    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel))
 
     const manufactureYearRules = computed((): Array<Function> =>
       customRules(
@@ -236,11 +225,11 @@ export default defineComponent({
 
     const localState = reactive({
       makeModelValid: false,
-      manufacturerName: getMhrRegistrationManufacturerName.value,
-      yearOfManufacture: getMhrRegistrationYearOfManufacture.value?.toString(),
-      circa: getMhrRegistrationIsYearApproximate.value,
-      make: getMhrRegistrationHomeMake.value,
-      model: getMhrRegistrationHomeModel.value
+      manufacturerName: getMhrRegistrationManufacturerName,
+      yearOfManufacture: getMhrRegistrationYearOfManufacture?.toString(),
+      circa: getMhrRegistrationIsYearApproximate,
+      make: getMhrRegistrationHomeMake,
+      model: getMhrRegistrationHomeModel
     })
 
     watch(() => localState.manufacturerName, (val: string) => {

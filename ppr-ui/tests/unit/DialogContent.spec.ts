@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Vuetify from 'vuetify'
 import { getVuexStore } from '@/store'
 import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
-import CompositionApi from '@vue/composition-api'
+
 import flushPromises from 'flush-promises'
 // local
 import { ErrorContact } from '@/components/common'
@@ -24,9 +24,9 @@ describe('Dialog Content tests', () => {
 
   beforeEach(async () => {
     const localVue = createLocalVue()
-    localVue.use(CompositionApi)
+
     localVue.use(Vuetify)
-    wrapper = mount(DialogContent,
+    wrapper = mount((DialogContent as any),
       {
         localVue,
         store,

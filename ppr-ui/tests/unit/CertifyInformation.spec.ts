@@ -1,7 +1,6 @@
 // Libraries
 import Vue from 'vue'
 import Vuetify from 'vuetify'
-import CompositionApi from '@vue/composition-api'
 import { getVuexStore } from '@/store'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import {
@@ -34,10 +33,9 @@ function createComponent (
   showErrors: boolean
 ): Wrapper<any> {
   const localVue = createLocalVue()
-  localVue.use(CompositionApi)
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
-  return mount(CertifyInformation, {
+  return mount((CertifyInformation as any), {
     localVue,
     propsData: { setShowErrors: showErrors },
     store,

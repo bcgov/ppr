@@ -29,7 +29,7 @@ function createComponent (): Wrapper<any> {
   localVue.use(Vuetify)
 
   document.body.setAttribute('data-app', 'true')
-  return mount(HomeOwners, {
+  return mount((HomeOwners as any), {
     localVue,
     propsData: {},
     store,

@@ -5,7 +5,7 @@ import {
   reactive,
   toRefs,
   onMounted
-} from '@vue/composition-api'
+} from 'vue'
 import { createDefaultValidationResult } from '@lemoncode/fonk'
 import { formValidation } from './collateralFormValidator'
 

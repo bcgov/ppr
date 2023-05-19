@@ -172,7 +172,7 @@ import {
   reactive,
   toRefs,
   computed
-} from '@vue/composition-api'
+} from 'vue'
 import { SearchPartyIF, PartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { useSecuredParty } from '@/components/parties/composables/useSecuredParty'
 import {

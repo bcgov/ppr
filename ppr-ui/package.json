@@ -21,7 +21,6 @@
     "@lemoncode/fonk": "^1.5.1",
     "@lemoncode/fonk-range-number-validator": "^1.1.0",
     "@sentry/vue": "^7.50.0",
-    "@vue/composition-api": "^1.0.0-rc.9",
     "@vuelidate/core": "^2.0.0-alpha.19",
     "axios": "^0.21.1",
     "core-js": "^3.6.5",
@@ -30,85 +29,60 @@
     "material-design-icons": "^3.0.1",
     "moment": "^2.29.1",
     "moment-timezone": "^0.5.34",
+    "pinia": "^2.0.35",
     "sbc-common-components": "^3.0.5",
     "sinon": "^9.2.4",
     "tiptap-vuetify": "^2.24.0",
-    "vue": "^2.6.12",
+    "vue": "^2.7.14",
     "vue-affix": "^0.5.2",
     "vue-plugin-helper-decorator": "^0.0.12",
     "vue-property-decorator": "^9.1.2",
-    "vue-router": "^3.5.1",
-    "vuetify": "2.3.10",
-    "vuetify-loader": "^1.7.1",
+    "vue-router": "3.6.5",
+    "vuetify": "2.6.15",
+    "vuetify-loader": "^1.9.2",
     "vuex": "^3.4.0",
-    "vuex-class": "^0.3.2",
-    "vuex-composition-helpers": "^1.0.22"
+    "vuex-class": "^0.3.2"
   },
   "devDependencies": {
     "@mdi/font": "^6.7.96",
-    "@types/jest": "^25.1.4",
-    "@typescript-eslint/eslint-plugin": "4.1.1",
-    "@typescript-eslint/parser": "4.1.1",
-    "@vue/cli-plugin-babel": "~4.5.0",
-    "@vue/cli-plugin-eslint": "~4.5.0",
-    "@vue/cli-plugin-router": "~4.5.0",
-    "@vue/cli-plugin-typescript": "~4.5.0",
-    "@vue/cli-plugin-unit-jest": "~4.5.0",
-    "@vue/cli-plugin-vuex": "~4.5.0",
-    "@vue/cli-service": "~4.5.0",
-    "@vue/eslint-config-standard": "^5.1.2",
-    "@vue/eslint-config-typescript": "^5.0.2",
-    "@vue/test-utils": "^1.3.0",
+    "@pinia/testing": "^0.0.15",
+    "@types/jest": "^27.5.2",
+    "@typescript-eslint/eslint-plugin": "^5.38.0",
+    "@typescript-eslint/parser": "^5.38.0",
+    "@vue/cli-plugin-babel": "^5.0.8",
+    "@vue/cli-plugin-eslint": "^5.0.8",
+    "@vue/cli-plugin-typescript": "^5.0.8",
+    "@vue/cli-plugin-unit-jest": "^5.0.8",
+    "@vue/cli-service": "^5.0.8",
+    "@vue/eslint-config-standard": "^4.0.0",
+    "@vue/eslint-config-typescript": "^9.1.0",
+    "@vue/test-utils": "^1.3.5",
+    "@vue/vue2-jest": "^27.0.0",
+    "babel-jest": "^27.5.1",
     "eslint": "7.32.0",
+    "eslint-plugin-vue": "^8.0.3",
+    "eslint-plugin-vuetify": "^1.1.0",
     "eslint-plugin-import": "^2.20.2",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-standard": "^4.0.0",
-    "eslint-plugin-vue": "9.10.0",
-    "eslint-plugin-vuetify": "^1.1.0",
-    "node-sass": "^7.0.1",
-    "sass": "^1.26.5",
-    "sass-loader": "^8.0.2",
-    "typescript": "4.1.6",
+    "sass": "~1.32.13",
+    "sass-loader": "^10.1.1",
+    "ts-jest": "^27.0.4",
+    "typescript": "4.5.5",
     "v-mask": "^2.3.0",
     "vue-class-component": "^7.2.3",
     "vue-cli-plugin-vuetify": "^2.1.0",
-    "vue-template-compiler": "^2.6.11",
+    "vue-template-compiler": "^2.7.14",
     "vue-test-utils-helpers": "git+https://github.com/bcgov/vue-test-utils-helpers.git",
     "vuex-module-decorators": "^0.16.1"
   },
-  "eslintConfig": {
-    "root": true,
-    "env": {
-      "node": true
-    },
-    "extends": [
-      "plugin:vue/essential",
-      "@vue/standard",
-      "@vue/typescript/recommended"
-    ],
-    "parserOptions": {
-      "ecmaVersion": 2020
-    },
-    "rules": {},
-    "overrides": [
-      {
-        "files": [
-          "**/__tests__/*.{j,t}s?(x)",
-          "**/tests/unit/**/*.spec.{j,t}s?(x)"
-        ],
-        "env": {
-          "jest": true
-        }
-      }
-    ]
+  "overrides": {
+    "webpack": "5.78"
   },
   "browserslist": [
     "> 1%",
     "last 2 versions",
     "not dead"
-  ],
-  "jest": {
-    "preset": "@vue/cli-plugin-unit-jest/presets/typescript-and-babel"
-  }
+  ]
 }

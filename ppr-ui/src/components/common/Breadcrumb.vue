@@ -39,8 +39,9 @@
 </template>
 <script lang="ts">
 // external
-import { computed, defineComponent, reactive, toRefs, Ref } from '@vue/composition-api' // eslint-disable-line
-import { useGetters } from 'vuex-composition-helpers'
+import { computed, defineComponent, reactive, toRefs, Ref } from 'vue' // eslint-disable-line
+import { useRouter } from '@/router'
+import { useStore } from '@/store/store'
 // local
 import { BreadcrumbIF } from '@/interfaces' // eslint-disable-line
 import {
@@ -63,16 +64,18 @@ export default defineComponent({
     setCurrentPath: String,
     setCurrentPathName: String
   },
-  setup (props, context) {
+  setup (props) {
+    const router = useRouter()
     const {
+      // Getters
       getRegistrationNumber,
       getRegistrationType,
       isRoleStaff,
       getUserRoles,
       getUserProductSubscriptionsCodes,
       getMhrInformation
-    } = useGetters<any>(['getRegistrationNumber', 'getRegistrationType',
-      'isRoleStaff', 'getUserRoles', 'getUserProductSubscriptionsCodes', 'getMhrInformation'])
+    } = useStore()
+
     const currentPath = toRefs(props).setCurrentPath
     const routeName = toRefs(props).setCurrentPathName as Ref<RouteNames>
     const localState = reactive({
@@ -85,9 +88,8 @@ export default defineComponent({
         return ''
       }),
       breadcrumbs: computed((): Array<BreadcrumbIF> => {
-        const roleBasedBreadcrumbTitle = breadcrumbsTitles[
-          getRoleProductCode(getUserRoles.value, getUserProductSubscriptionsCodes.value)
-        ]
+        const roleBasedBreadcrumbTitle =
+          breadcrumbsTitles[getRoleProductCode(getUserRoles, getUserProductSubscriptionsCodes)]
         const allTombstoneBreadcrumbs = [
           tombstoneBreadcrumbDashboard,
           tombstoneBreadcrumbDischarge,
@@ -98,7 +100,7 @@ export default defineComponent({
           tombstoneBreadcrumbSearchConfirm,
           tombstoneBreadcrumbMhrInformation
         ]
-        if (isRoleStaff.value) {
+        if (isRoleStaff) {
           for (const tombstoneBreadcrumb of allTombstoneBreadcrumbs) {
             tombstoneBreadcrumb[0].text = 'Staff Dashboard'
           }
@@ -117,36 +119,36 @@ export default defineComponent({
           const dischargeBreadcrumb = [...tombstoneBreadcrumbDischarge]
           dischargeBreadcrumb[1].text = roleBasedBreadcrumbTitle
           dischargeBreadcrumb[2].text =
-            `Base Registration ${getRegistrationNumber.value} - Total Discharge` || dischargeBreadcrumb[2].text
+            `Base Registration ${getRegistrationNumber} - Total Discharge` || dischargeBreadcrumb[2].text
           return dischargeBreadcrumb
         } else if (currentPath.value?.includes('renew')) {
           const renewBreadcrumb = [...tombstoneBreadcrumbRenewal]
           renewBreadcrumb[1].text = roleBasedBreadcrumbTitle || renewBreadcrumb[1].text
           renewBreadcrumb[2].text =
-            `Base Registration ${getRegistrationNumber.value} - Renewal` || renewBreadcrumb[2].text
+            `Base Registration ${getRegistrationNumber} - Renewal` || renewBreadcrumb[2].text
           return renewBreadcrumb
         } else if (currentPath.value?.includes('amend')) {
           const amendBreadcrumb = [...tombstoneBreadcrumbAmendment]
           amendBreadcrumb[1].text = roleBasedBreadcrumbTitle || amendBreadcrumb[1].text
           amendBreadcrumb[2].text =
-            `Base Registration ${getRegistrationNumber.value} - Amendment` || amendBreadcrumb[2].text
+            `Base Registration ${getRegistrationNumber} - Amendment` || amendBreadcrumb[2].text
           return amendBreadcrumb
         } else if (routeName.value === RouteNames.MHR_INFORMATION) {
           const mhrInfoBreadcrumb = [...tombstoneBreadcrumbMhrInformation]
-          mhrInfoBreadcrumb[2].text = `MHR Number ${getMhrInformation.value.mhrNumber}`
+          mhrInfoBreadcrumb[2].text = `MHR Number ${getMhrInformation.mhrNumber}`
           return mhrInfoBreadcrumb
         } else {
           const registrationBreadcrumb = [...tombstoneBreadcrumbRegistration]
           registrationBreadcrumb[1].text = roleBasedBreadcrumbTitle || registrationBreadcrumb[1].text
           registrationBreadcrumb[2].text =
-            getRegistrationType.value?.registrationTypeUI || registrationBreadcrumb[2].text
+            getRegistrationType?.registrationTypeUI || registrationBreadcrumb[2].text
           return registrationBreadcrumb
         }
       })
     })
 
     const handleStaff = (breadcrumbText): string => {
-      if (isRoleStaff.value) {
+      if (isRoleStaff) {
         breadcrumbText = breadcrumbText.replace('My', 'Staff')
       }
       return breadcrumbText
@@ -160,7 +162,7 @@ export default defineComponent({
       const breadcrumb = localState.breadcrumbs[localState.breadcrumbs.length - 2] as BreadcrumbIF
 
       if (breadcrumb.to) {
-        context.root.$router.push(breadcrumb.to).catch(error => error)
+        router.push(breadcrumb.to).catch(error => error)
       } else if (breadcrumb.href) {
         window.location.assign(buildHref(breadcrumb.href))
       }

@@ -72,8 +72,8 @@
 
 <script lang="ts">
 import { useInputRules, useHomeOwners } from '@/composables'
-import { computed, defineComponent, nextTick, reactive, ref, toRefs, watch } from '@vue/composition-api'
-import { useActions } from 'vuex-composition-helpers'
+import { computed, defineComponent, nextTick, reactive, ref, toRefs, watch } from 'vue'
+import { useStore } from '@/store/store'
 import { FormIF, MhrRegistrationHomeOwnerIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { SharedDatePicker } from '@/components/common'
 import { localTodayDate } from '@/utils'
@@ -97,16 +97,10 @@ export default defineComponent({
     }
   },
   components: { SharedDatePicker },
-  setup (props, context) {
+  setup (props) {
     const { customRules, required, maxLength } = useInputRules()
-
     const { editHomeOwner } = useHomeOwners(true)
-
-    const {
-      setUnsavedChanges
-    } = useActions([
-      'setUnsavedChanges'
-    ])
+    const { setUnsavedChanges } = useStore
     const deathCertificateForm = ref(null)
     const deathCertificateNumberRef = ref(null)
     const deathCertificateNumberRules = computed(
@@ -148,7 +142,7 @@ export default defineComponent({
     // Validate form when prompted
     watch(() => props.validate, async (validate: boolean) => {
       await nextTick()
-      validate && (context.refs.deathCertificateForm as FormIF).validate()
+      validate && (deathCertificateForm as FormIF).validate()
     }, { immediate: true })
 
     // Update deceased owner deathCertificateNumber when value changes

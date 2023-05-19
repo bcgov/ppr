@@ -35,7 +35,7 @@ function createComponent (): Wrapper<any> {
   })
 
   document.body.setAttribute('data-app', 'true')
-  return mount(MhrRegistration, {
+  return mount((MhrRegistration as any), {
     localVue,
     store,
     propsData: {

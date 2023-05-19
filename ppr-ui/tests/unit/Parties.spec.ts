@@ -32,7 +32,7 @@ function createComponent (isSummary: boolean): Wrapper<any> {
   const localVue = createLocalVue()
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
-  return mount(Parties, {
+  return mount((Parties as any), {
     localVue,
     propsData: { isSummary: isSummary },
     store,

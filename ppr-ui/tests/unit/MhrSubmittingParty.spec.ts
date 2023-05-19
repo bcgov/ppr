@@ -14,7 +14,7 @@ const vuetify = new Vuetify({})
  */
 function createComponent (): Wrapper<any> {
   const localVue = createLocalVue()
-  return mount(MhrSubmittingParty, {
+  return mount((MhrSubmittingParty as any), {
     localVue,
     store,
     vuetify

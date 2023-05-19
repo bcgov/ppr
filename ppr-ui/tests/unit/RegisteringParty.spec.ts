@@ -2,7 +2,7 @@
 import Vue from 'vue'
 import Vuetify from 'vuetify'
 import { getVuexStore } from '@/store'
-import CompositionApi from '@vue/composition-api'
+
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import { mockedRegisteringParty1 } from './test-data'
 
@@ -31,10 +31,10 @@ const store = getVuexStore()
 function createComponent (
 ): Wrapper<any> {
   const localVue = createLocalVue()
-  localVue.use(CompositionApi)
+
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
-  return mount(RegisteringParty, {
+  return mount((RegisteringParty as any), {
     localVue,
     propsData: {},
     store,

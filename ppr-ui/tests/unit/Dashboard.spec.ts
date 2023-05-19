@@ -114,7 +114,7 @@ describe('Dashboard component', () => {
     localVue.use(VueRouter)
     const router = mockRouter.mock()
     await router.push({ name: 'dashboard' })
-    wrapper = mount(Dashboard, {
+    wrapper = mount((Dashboard as any), {
       localVue,
       store,
       propsData: { appReady: true },
@@ -312,7 +312,7 @@ describe('Dashboard error modal tests', () => {
     localVue.use(VueRouter)
     const router = mockRouter.mock()
     await router.push({ name: 'dashboard' })
-    wrapper = shallowMount(Dashboard, { localVue, store, propsData: { appReady: true }, router, vuetify })
+    wrapper = shallowMount((Dashboard as any), { localVue, store, propsData: { appReady: true }, router, vuetify })
     await flushPromises()
   })
 

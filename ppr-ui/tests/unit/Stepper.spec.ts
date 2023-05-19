@@ -3,7 +3,7 @@ import Vue from 'vue'
 import Vuetify from 'vuetify'
 import VueRouter from 'vue-router'
 import { getVuexStore } from '@/store'
-import CompositionApi from '@vue/composition-api'
+
 import { shallowMount } from '@vue/test-utils'
 
 // Components
@@ -26,7 +26,7 @@ describe('Stepper component', () => {
 
   beforeEach(async () => {
     await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement)
-    wrapper = shallowMount(Stepper, { store, vuetify, router })
+    wrapper = shallowMount((Stepper as any), { store, vuetify, router })
   })
 
   afterEach(() => {

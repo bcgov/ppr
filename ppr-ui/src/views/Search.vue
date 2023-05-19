@@ -60,8 +60,9 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onBeforeMount, reactive, toRefs, watch } from '@vue/composition-api'
-import { useGetters } from 'vuex-composition-helpers'
+import { computed, defineComponent, onBeforeMount, reactive, toRefs, watch } from 'vue'
+import { useRouter } from '@/router'
+import { useStore } from '@/store/store'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import {
   BaseDialog,
@@ -111,6 +112,7 @@ export default defineComponent({
     }
   },
   setup (props, context) {
+    const router = useRouter()
     const {
       getSearchedType,
       getUserSettings,
@@ -213,7 +215,7 @@ export default defineComponent({
       window.onbeforeunload = (event) => {
         // unsaved selections if app is ready, search results exist, and on the search page
         const isSearchReportUnsaved = (
-          context.root.$router.currentRoute.name === RouteNames.SEARCH &&
+          router.currentRoute.name === RouteNames.SEARCH &&
           props.appReady &&
           !!getSearchResults.value
         )
@@ -230,7 +232,7 @@ export default defineComponent({
       localState.errorDialog = false
       if (!stayOnSearchResults || (localState.errorOptions !== searchReportError &&
         localState.errorOptions !== saveSelectionsError)) {
-        context.root.$router.push({ name: RouteNames.DASHBOARD })
+        router.push({ name: RouteNames.DASHBOARD })
       }
     }
 
@@ -287,7 +289,7 @@ export default defineComponent({
           localState.errorDialog = true
           console.error({ statusCode: statusCode })
         } else {
-          context.root.$router.push({ name: RouteNames.DASHBOARD })
+          router.push({ name: RouteNames.DASHBOARD })
         }
       }
     }
@@ -315,7 +317,7 @@ export default defineComponent({
 
       // if navigated here without search results redirect to the dashboard
       if (!getSearchResults.value) {
-        context.root.$router.push({
+        router.push({
           name: RouteNames.DASHBOARD
         })
         emitHaveData(false)

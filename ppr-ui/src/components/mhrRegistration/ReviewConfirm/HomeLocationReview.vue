@@ -253,9 +253,9 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs } from '@vue/composition-api'
+import { computed, defineComponent, reactive, toRefs } from 'vue'
 import { HomeLocationTypes, RouteNames } from '@/enums'
-import { useGetters } from 'vuex-composition-helpers'
+import { useStore } from '@/store/store'
 import { useMhrValidations } from '@/composables'
 
 export default defineComponent({
@@ -273,42 +273,37 @@ export default defineComponent({
       getMhrRegistrationValidationModel,
       getIsManualLocation,
       getMhrRegistrationOwnLand
-    } = useGetters<any>([
-      'getMhrRegistrationLocation',
-      'getMhrRegistrationValidationModel',
-      'getIsManualLocation',
-      'getMhrRegistrationOwnLand'
-    ])
+    } = useStore()
 
     const {
       MhrSectVal,
       getStepValidation
-    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
+    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel))
 
     const localState = reactive({
       includesPid: computed((): boolean => {
         return [HomeLocationTypes.OTHER_STRATA, HomeLocationTypes.OTHER_TYPE]
-          .includes(getMhrRegistrationLocation.value.otherType)
+          .includes(getMhrRegistrationLocation.otherType)
       }),
       hasAddress: computed((): boolean => {
-        return getMhrRegistrationLocation.value.address?.street ||
-        getMhrRegistrationLocation.value.address?.streetAdditional ||
-        getMhrRegistrationLocation.value.address?.city
+        return getMhrRegistrationLocation.address?.street ||
+        getMhrRegistrationLocation.address?.streetAdditional ||
+        getMhrRegistrationLocation.address?.city
       }),
       displayPid: computed((): string => {
-        return getMhrRegistrationLocation.value.pidNumber.replace(/(\d{3})(\d{3})(\d{3})/, '$1-$2-$3')
+        return getMhrRegistrationLocation.pidNumber.replace(/(\d{3})(\d{3})(\d{3})/, '$1-$2-$3')
       }),
       displayStrata: computed((): boolean => {
-        return getMhrRegistrationLocation.value.otherType === HomeLocationTypes.OTHER_STRATA
+        return getMhrRegistrationLocation.otherType === HomeLocationTypes.OTHER_STRATA
       }),
       locationType: computed((): string => {
-        switch (getMhrRegistrationLocation.value.locationType) {
+        switch (getMhrRegistrationLocation.locationType) {
           case HomeLocationTypes.LOT:
             return 'Dealer\'s / Manufacturer\'s lot'
           case HomeLocationTypes.HOME_PARK:
             return 'Manufactured home park (other than a strata park)'
           case HomeLocationTypes.OTHER_LAND:
-            switch (getMhrRegistrationLocation.value.otherType) {
+            switch (getMhrRegistrationLocation.otherType) {
               case HomeLocationTypes.OTHER_RESERVE:
                 return 'Indian Reserve'
               case HomeLocationTypes.OTHER_STRATA:
@@ -323,7 +318,7 @@ export default defineComponent({
         }
       }),
       hasManualEntries: computed((): boolean => {
-        const location = getMhrRegistrationLocation.value
+        const location = getMhrRegistrationLocation
         return !!location.lot || !!location.parcel || !!location.block || !!location.districtLot || !!location.partOf ||
           !!location.section || !!location.township || !!location.range || !!location.meridian ||
           !!location.landDistrict || !!location.plan || !!location.exceptionPlan

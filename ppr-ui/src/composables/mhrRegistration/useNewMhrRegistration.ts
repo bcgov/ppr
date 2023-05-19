@@ -1,4 +1,4 @@
-import { useActions, useGetters } from 'vuex-composition-helpers'
+import { useStore } from '@/store/store'
 import {
   MhrRegistrationDescriptionIF,
   MhrRegistrationHomeLocationIF,

@@ -104,9 +104,9 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs } from '@vue/composition-api'
+import { computed, defineComponent, reactive, toRefs } from 'vue'
 import { RouteNames } from '@/enums'
-import { useGetters } from 'vuex-composition-helpers'
+import { useStore } from '@/store/store'
 import { BaseAddress } from '@/composables/address'
 import { PartyAddressSchema } from '@/schemas'
 import { toDisplayPhone } from '@/utils'
@@ -127,33 +127,27 @@ export default defineComponent({
       getMhrRegistrationDocumentId,
       getMhrAttentionReferenceNum,
       getMhrRegistrationValidationModel
-    } = useGetters<any>([
-      'isRoleStaffReg',
-      'getMhrRegistrationSubmittingParty',
-      'getMhrRegistrationDocumentId',
-      'getMhrAttentionReferenceNum',
-      'getMhrRegistrationValidationModel'
-    ])
+    } = useStore()
 
     const {
       MhrSectVal,
       getStepValidation
-    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
+    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel))
 
     const localState = reactive({
-      address: computed(() => getMhrRegistrationSubmittingParty.value.address),
-      businessName: computed(() => getMhrRegistrationSubmittingParty.value.businessName),
-      personName: computed(() => getMhrRegistrationSubmittingParty.value.personName),
+      address: computed(() => getMhrRegistrationSubmittingParty.address),
+      businessName: computed(() => getMhrRegistrationSubmittingParty.businessName),
+      personName: computed(() => getMhrRegistrationSubmittingParty.personName),
       hasAddress: computed(() => !Object.values(localState.address).every(val => !val)),
       attnOrRefConfig: computed((): AttnRefConfigIF => {
-        return isRoleStaffReg.value ? staffConfig : clientConfig
+        return isRoleStaffReg ? staffConfig : clientConfig
       })
     })
 
     const addressSchema = PartyAddressSchema
 
     const parsePhoneNumber = () => {
-      const phone = getMhrRegistrationSubmittingParty.value
+      const phone = getMhrRegistrationSubmittingParty
       const phoneNum = phone.phoneNumber
       const ext = phone.phoneExtension ? ' &nbsp;Ext ' + phone.phoneExtension : ''
       return phoneNum ? `${toDisplayPhone(phoneNum)}${ext}` : '(Not Entered)'

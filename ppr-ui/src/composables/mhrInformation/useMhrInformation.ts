@@ -8,7 +8,7 @@ import {
   SubmittingPartyIF,
   MhrRegistrationHomeOwnerGroupIF
 } from '@/interfaces'
-import { useActions, useGetters } from 'vuex-composition-helpers'
+import { useStore } from '@/store/store'
 import {
   ActionTypes,
   ApiHomeTenancyTypes,
@@ -23,7 +23,7 @@ import {
 import { fetchMhRegistration, normalizeObject } from '@/utils'
 import { cloneDeep } from 'lodash'
 import { useHomeOwners, useTransferOwners } from '@/composables'
-import { computed, reactive, toRefs } from '@vue/composition-api'
+import { computed, reactive, toRefs } from 'vue'
 
 export const useMhrInformation = () => {
   const {

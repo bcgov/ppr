@@ -63,9 +63,9 @@
 
 <script lang="ts">
 /* eslint-disable no-unused-vars */
-import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
+import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
 import { CivicAddressSchema } from '@/schemas/civic-address'
-import { useActions, useGetters } from 'vuex-composition-helpers'
+import { useStore } from '@/store/store'
 import { useMhrValidations } from '@/composables'
 import {
   useAddress,
@@ -95,22 +95,12 @@ export default defineComponent({
     }
   },
   setup (props, context) {
-    const {
-      getMhrRegistrationValidationModel
-    } = useGetters<any>([
-      'getMhrRegistrationValidationModel'
-    ])
-    const {
-      setCivicAddress
-    } = useActions<any>([
-      'setCivicAddress'
-    ])
-
+    const { getMhrRegistrationValidationModel, setCivicAddress } = useStore()
     const {
       MhrCompVal,
       MhrSectVal,
       setValidation
-    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
+    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel))
 
     const countryProvincesHelpers = useCountriesProvinces()
 

@@ -65,8 +65,8 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
-import { useGetters } from 'vuex-composition-helpers'
+import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
+import { useStore } from '@/store/store'
 import {
   HomeCertification,
   HomeSections,

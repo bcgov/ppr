@@ -129,10 +129,10 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, ref, toRefs, watch } from '@vue/composition-api'
+import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue'
 import { BaseDialog } from '@/components/dialogs'
 import { ClientTransferTypes, StaffTransferTypes, transfersContent, transfersErrors } from '@/resources'
-import { useGetters } from 'vuex-composition-helpers'
+import { useStore } from '@/store/store'
 import { changeTransferType } from '@/resources/dialogOptions'
 import { useInputRules, useTransferOwners } from '@/composables'
 // eslint-disable-next-line no-unused-vars
@@ -152,18 +152,15 @@ export default defineComponent({
     const { customRules, required, isNumber, maxLength, greaterThan } = useInputRules()
     const transferTypeSelectRef = ref(null)
     const declaredValueRef = ref(null)
+    const transferTypeForm = ref(null) as FormIF
 
     const {
+      // Getters
       isRoleStaffReg,
       hasUnsavedChanges,
       getMhrTransferType,
       getMhrTransferDeclaredValue
-    } = useGetters<any>([
-      'isRoleStaffReg',
-      'hasUnsavedChanges',
-      'getMhrTransferType',
-      'getMhrTransferDeclaredValue'
-    ])
+    } = useStore()
 
     const {
       isJointTenancyStructure
@@ -171,15 +168,15 @@ export default defineComponent({
 
     const localState = reactive({
       isValid: false,
-      declaredValue: getMhrTransferDeclaredValue.value,
-      selectedTransferType: getMhrTransferType.value as TransferTypeSelectIF,
+      declaredValue: getMhrTransferDeclaredValue,
+      selectedTransferType: getMhrTransferType as TransferTypeSelectIF,
       showTransferChangeDialog: false,
       previousType: null as TransferTypeSelectIF,
       declaredValueRules: computed((): Array<Function> => {
         return customRules(
           maxLength(7, true),
           isNumber(),
-          getMhrTransferType.value?.transferType === ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL
+          getMhrTransferType?.transferType === ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL
             ? greaterThan(25000,
               transfersErrors.declaredHomeValueMax[ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL])
             : [],
@@ -188,10 +185,10 @@ export default defineComponent({
       showFormError: computed(() => props.validate && !localState.isValid),
       isDeclaredHitPersistent: computed(() =>
         [ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL,
-          ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL].includes(getMhrTransferType.value?.transferType)
+          ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL].includes(getMhrTransferType?.transferType)
       ),
       declaredHomeValueHint: computed(() =>
-        transfersContent.declaredHomeValueHint[getMhrTransferType.value?.transferType]
+        transfersContent.declaredHomeValueHint[getMhrTransferType?.transferType]
       ),
       transferTypeRules: required('Select transfer type')
     })
@@ -210,7 +207,7 @@ export default defineComponent({
 
     const handleTypeChange = async (item: TransferTypeSelectIF): Promise<void> => {
       if (item.transferType !== localState.previousType?.transferType &&
-        (hasUnsavedChanges.value || !!getMhrTransferDeclaredValue.value)) {
+        (hasUnsavedChanges || !!getMhrTransferDeclaredValue)) {
         localState.showTransferChangeDialog = true
       } else {
         localState.previousType = cloneDeep(item)
@@ -228,7 +225,7 @@ export default defineComponent({
     }
 
     watch(() => props.validate, (validate: boolean) => {
-      validate && (context.refs.transferTypeForm as FormIF).validate()
+      validate && transferTypeForm.validate()
     })
 
     watch(() => localState.isValid, () => {
@@ -239,12 +236,12 @@ export default defineComponent({
       return context.emit('emitDeclaredValue', val)
     })
 
-    watch(() => getMhrTransferDeclaredValue.value, async (val: number) => {
+    watch(() => getMhrTransferDeclaredValue, async (val: number) => {
       localState.declaredValue = val
     })
 
     watch(() => localState.selectedTransferType, (val:TransferTypeSelectIF) => {
-      (context.refs.transferTypeForm as FormIF).resetValidation()
+      transferTypeForm.resetValidation()
 
       switch (val.transferType) {
         case ApiTransferTypes.SALE_OR_GIFT:

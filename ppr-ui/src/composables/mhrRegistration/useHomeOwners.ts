@@ -5,10 +5,9 @@ import {
   MhrRegistrationHomeOwnerIF,
   MhrRegistrationTotalOwnershipAllocationIF
 } from '@/interfaces'
-import '@/utils/use-composition-api'
 
-import { readonly, ref, toRefs, watch } from '@vue/composition-api'
-import { useActions, useGetters } from 'vuex-composition-helpers'
+import { readonly, ref, toRefs, watch } from 'vue'
+import { useStore } from '@/store/store'
 import { ActionTypes, HomeTenancyTypes, HomeOwnerPartyTypes, ApiTransferTypes } from '@/enums'
 import { MhrCompVal, MhrSectVal } from '@/composables/mhrRegistration/enums'
 import { useMhrValidations } from '@/composables'
@@ -25,30 +24,18 @@ const hasEmptyGroup = ref(false)
 
 export function useHomeOwners (isMhrTransfer: boolean = false) {
   const {
+    // Getters
     getMhrRegistrationHomeOwners,
     getMhrRegistrationHomeOwnerGroups,
     getMhrRegistrationValidationModel,
     getMhrTransferHomeOwnerGroups,
     getMhrTransferHomeOwners,
     getMhrTransferCurrentHomeOwnerGroups,
-    getMhrTransferType
-  } = useGetters<any>([
-    'getMhrRegistrationHomeOwners',
-    'getMhrRegistrationHomeOwnerGroups',
-    'getMhrRegistrationValidationModel',
-    'getMhrTransferHomeOwnerGroups',
-    'getMhrTransferHomeOwners',
-    'getMhrTransferCurrentHomeOwnerGroups',
-    'getMhrTransferType'
-  ])
-
-  const {
+    getMhrTransferType,
+    // Actions
     setMhrRegistrationHomeOwnerGroups,
     setMhrTransferHomeOwnerGroups
-  } = useActions<any>([
-    'setMhrRegistrationHomeOwnerGroups',
-    'setMhrTransferHomeOwnerGroups'
-  ])
+  } = useStore()
 
   // Get Transfer or Registration Home Owners
   const getTransferOrRegistrationHomeOwners = (): MhrRegistrationHomeOwnerIF[] =>

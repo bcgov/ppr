@@ -66,7 +66,7 @@ describe('ConfirmDischarge registration view', () => {
       name: RouteNames.CONFIRM_DISCHARGE,
       query: { 'reg-num': regNum }
     })
-    wrapper = shallowMount(ConfirmDischarge, { localVue, store, router, vuetify })
+    wrapper = shallowMount((ConfirmDischarge as any), { localVue, store, router, vuetify })
     wrapper.setProps({ appReady: true })
     await flushPromises()
   })

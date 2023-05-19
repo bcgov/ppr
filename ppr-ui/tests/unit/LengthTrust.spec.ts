@@ -43,7 +43,7 @@ function createComponent (): Wrapper<any> {
   const router = mockRouter.mock()
   router.push({ name: RouteNames.LENGTH_TRUST })
 
-  return mount(LengthTrust, {
+  return mount((LengthTrust as any), {
     localVue,
     propsData: {
       appReady: true,

@@ -91,8 +91,8 @@ import {
   toRefs,
   onMounted,
   computed
-} from '@vue/composition-api'
-import { useGetters, useActions } from 'vuex-composition-helpers'
+} from 'vue'
+import { useStore } from '@/store/store'
 // import the component and the necessary extensions
 import {
   TiptapVuetify,
@@ -131,10 +131,7 @@ export default defineComponent({
     TiptapVuetify
   },
   setup (props, { emit }) {
-    const { getGeneralCollateral } = useGetters<any>([
-      'getGeneralCollateral'
-    ])
-    const { setGeneralCollateral } = useActions<any>(['setGeneralCollateral'])
+    const { getGeneralCollateral, setGeneralCollateral } = useStore()
     const extensions = [
       History,
       Blockquote,
@@ -165,7 +162,7 @@ export default defineComponent({
       delDesc: '',
       addDesc: '',
       generalCollateral: computed((): GeneralCollateralIF[] => {
-        return (getGeneralCollateral.value as GeneralCollateralIF[]) || []
+        return (getGeneralCollateral as GeneralCollateralIF[]) || []
       }),
       showErrorComponent: computed((): boolean => {
         return props.showInvalid

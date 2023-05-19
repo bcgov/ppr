@@ -21,7 +21,7 @@ function createComponent (msg: string): Wrapper<any> {
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
 
-  return mount(BaseSnackbar, {
+  return mount((BaseSnackbar as any), {
     localVue,
     propsData: {
       setMessage: msg,

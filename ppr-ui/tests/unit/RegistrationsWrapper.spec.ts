@@ -109,7 +109,7 @@ describe('Ppr registration table tests', () => {
     localVue.use(VueRouter)
     const router = mockRouter.mock()
     await router.push({ name: 'dashboard' })
-    wrapper = mount(RegistrationsWrapper, {
+    wrapper = mount((RegistrationsWrapper as any), {
       localVue,
       store,
       propsData: { appReady: true, isPpr: true },
@@ -296,7 +296,7 @@ describe('Dashboard add registration tests', () => {
     localVue.use(VueRouter)
     const router = mockRouter.mock()
     await router.push({ name: 'dashboard' })
-    wrapper = mount(RegistrationsWrapper, {
+    wrapper = mount((RegistrationsWrapper as any), {
       localVue,
       store,
       propsData: { appReady: true, isPpr: true },

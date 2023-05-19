@@ -52,7 +52,7 @@ function createComponent (): Wrapper<any> {
   const router = mockRouter.mock()
   router.push({ name: RouteNames.REVIEW_CONFIRM })
 
-  return mount(ReviewConfirm, {
+  return mount((ReviewConfirm as any), {
     localVue,
     propsData: {
       appReady: true,

@@ -1,6 +1,6 @@
-import { reactive, toRefs, computed } from '@vue/composition-api'
+import { reactive, toRefs, computed } from 'vue'
 import { PartyIF, AddressIF } from '@/interfaces' // eslint-disable-line no-unused-vars
-import { useGetters, useActions } from 'vuex-composition-helpers'
+import { useStore } from '@/store/store'
 import { PartyAddressSchema } from '@/schemas'
 import { ActionTypes, APIRegistrationTypes, RegistrationFlowType, SecuredPartyTypes } from '@/enums'
 import { checkAddress, formatAddress } from '@/composables/address/factories/address-factory'
@@ -20,12 +20,15 @@ const initAddress = {
 const { isPartiesValid } = useParty()
 
 export const useSecuredParty = (props, context) => {
-  const { setAddSecuredPartiesAndDebtors } = useActions<any>([
-    'setAddSecuredPartiesAndDebtors'
-  ])
-  const { getAddSecuredPartiesAndDebtors, getRegistrationFlowType, getRegistrationType } = useGetters<any>([
-    'getAddSecuredPartiesAndDebtors', 'getRegistrationFlowType', 'getRegistrationType'
-  ])
+  const {
+    // Getters
+    getAddSecuredPartiesAndDebtors,
+    getRegistrationFlowType,
+    getRegistrationType,
+    // Actions
+    setAddSecuredPartiesAndDebtors
+  } = useStore()
+
   const localState = reactive({
     currentSecuredParty: {
       businessName: '',
@@ -35,14 +38,14 @@ export const useSecuredParty = (props, context) => {
     } as PartyIF,
     currentIsBusiness: null,
     partyType: SecuredPartyTypes.NONE,
-    registrationFlowType: getRegistrationFlowType.value,
+    registrationFlowType: getRegistrationFlowType,
     originalSecuredParty: null
   })
 
   const getSecuredParty = (isRegisteringParty) => {
     const securedParties: PartyIF[] =
-      getAddSecuredPartiesAndDebtors.value.securedParties
-    const registeringParty: PartyIF = getAddSecuredPartiesAndDebtors.value.registeringParty
+      getAddSecuredPartiesAndDebtors.securedParties
+    const registeringParty: PartyIF = getAddSecuredPartiesAndDebtors.registeringParty
     if (isRegisteringParty && registeringParty && registeringParty.action && !registeringParty.code) {
       // copy the existing registering party
       localState.currentSecuredParty = JSON.parse(JSON.stringify(registeringParty))
@@ -88,7 +91,7 @@ export const useSecuredParty = (props, context) => {
   }
 
   const isExistingSecuredParty = (partyCode: string): boolean => {
-    let parties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
+    let parties = getAddSecuredPartiesAndDebtors // eslint-disable-line
     const idx = parties.securedParties.findIndex(party =>
       party.code === partyCode
     )
@@ -97,7 +100,7 @@ export const useSecuredParty = (props, context) => {
 
   const hasMatchingSecuredParty = (addedParty: PartyIF, isEditMode: boolean): boolean => {
     // store state without newly added party.
-    const parties = cloneDeep(getAddSecuredPartiesAndDebtors.value.securedParties)
+    const parties = cloneDeep(getAddSecuredPartiesAndDebtors.securedParties)
     if (isEditMode) parties.splice(props.activeIndex, 1)
     if (localState.partyType === SecuredPartyTypes.INDIVIDUAL) {
       return parties.some(party =>
@@ -118,7 +121,7 @@ export const useSecuredParty = (props, context) => {
   }
 
   const addEditSecuredParty = async () => {
-    let parties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
+    let parties = getAddSecuredPartiesAndDebtors // eslint-disable-line
     let newList: PartyIF[] = parties.securedParties // eslint-disable-line
     if (!localState.currentSecuredParty.businessName) {
       delete localState.currentSecuredParty.businessName
@@ -151,15 +154,15 @@ export const useSecuredParty = (props, context) => {
   }
 
   const setRegisteringParty = (registeringParty: PartyIF) => {
-    let parties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
+    let parties = getAddSecuredPartiesAndDebtors // eslint-disable-line
     registeringParty.action = ActionTypes.EDITED
     parties.registeringParty = registeringParty
-    parties.valid = isPartiesValid(parties, getRegistrationType.value.registrationTypeAPI)
+    parties.valid = isPartiesValid(parties, getRegistrationType.registrationTypeAPI)
     setAddSecuredPartiesAndDebtors(parties)
   }
 
   const addSecuredParty = (newParty: PartyIF, activeIndex: number = -1) => {
-    const parties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
+    const parties = getAddSecuredPartiesAndDebtors // eslint-disable-line
     const newList: PartyIF[] = parties.securedParties
     if (activeIndex > -1) {
       newParty.action = ActionTypes.ADDED
@@ -171,7 +174,7 @@ export const useSecuredParty = (props, context) => {
       newList.push(newParty)
     }
     parties.securedParties = newList
-    parties.valid = isPartiesValid(parties, getRegistrationType.value.registrationTypeAPI)
+    parties.valid = isPartiesValid(parties, getRegistrationType.registrationTypeAPI)
     setAddSecuredPartiesAndDebtors(parties)
   }
 

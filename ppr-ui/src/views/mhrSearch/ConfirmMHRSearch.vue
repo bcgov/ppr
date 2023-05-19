@@ -106,8 +106,9 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, nextTick, onMounted, reactive, toRefs, watch } from '@vue/composition-api'
-import { useActions, useGetters } from 'vuex-composition-helpers'
+import { computed, defineComponent, nextTick, onMounted, reactive, toRefs, watch } from 'vue'
+import { useRouter } from '@/router'
+import { useStore } from '@/store/store'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { FolioNumberSummary, StickyContainer } from '@/components/common'
 import { BaseDialog } from '@/components/dialogs'
@@ -146,6 +147,7 @@ export default defineComponent({
     }
   },
   setup (props, context) {
+    const router = useRouter()
     const {
       isRoleStaffReg,
       isRoleStaffSbc,
@@ -240,14 +242,14 @@ export default defineComponent({
     }
 
     const goToDashboard = (): void => {
-      context.root.$router.push({
+      router.push({
         name: RouteNames.DASHBOARD
       })
       emitHaveData(false)
     }
 
     const goToSearchResult = (): void => {
-      context.root.$router.push({
+      router.push({
         name: RouteNames.MHRSEARCH
       })
     }
@@ -361,7 +363,7 @@ export default defineComponent({
 
       // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
       if (!localState.isAuthenticated || (!props.isJestRunning && !getFeatureFlag('mhr-ui-enabled'))) {
-        context.root.$router.push({
+        router.push({
           name: RouteNames.DASHBOARD
         })
         return

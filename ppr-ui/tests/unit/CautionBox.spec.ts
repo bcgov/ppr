@@ -2,7 +2,6 @@
 import Vue from 'vue'
 import Vuetify from 'vuetify'
 import { getVuexStore } from '@/store'
-import CompositionApi from '@vue/composition-api'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 
 // Components
@@ -20,11 +19,10 @@ const store = getVuexStore()
  */
 function createComponent (setMsg: string): Wrapper<any> {
   const localVue = createLocalVue()
-  localVue.use(CompositionApi)
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
 
-  return mount(CautionBox, {
+  return mount((CautionBox as any), {
     localVue,
     propsData: { setMsg: setMsg },
     store,

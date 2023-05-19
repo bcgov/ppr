@@ -43,8 +43,8 @@ import {
   watch,
   onMounted,
   computed
-} from '@vue/composition-api'
-import { useGetters, useActions } from 'vuex-composition-helpers'
+} from 'vue'
+import { useStore } from '@/store/store'
 // local
 import { RegistrationFlowType } from '@/enums' // eslint-disable-line no-unused-vars
 import { GeneralCollateralIF } from '@/interfaces' // eslint-disable-line no-unused-vars
@@ -81,11 +81,7 @@ export default defineComponent({
     }
   },
   setup (props) {
-    const { getGeneralCollateral } = useGetters<any>(['getGeneralCollateral'])
-    const { getRegistrationFlowType } = useGetters<any>([
-      'getRegistrationFlowType'
-    ])
-    const { setGeneralCollateral } = useActions<any>(['setGeneralCollateral'])
+    const { getGeneralCollateral, getRegistrationFlowType, setGeneralCollateral } = useStore()
     const extensions = [
       History,
       Blockquote,
@@ -124,7 +120,7 @@ export default defineComponent({
     const localState = reactive({
       newDesc: '',
       generalCollateral: computed((): GeneralCollateralIF[] => {
-        return (getGeneralCollateral.value as GeneralCollateralIF[]) || []
+        return (getGeneralCollateral as GeneralCollateralIF[]) || []
       }),
       showErrorComponent: computed((): boolean => {
         return props.showInvalid
@@ -132,7 +128,7 @@ export default defineComponent({
     })
 
     onMounted(() => {
-      if (getRegistrationFlowType.value === RegistrationFlowType.NEW) {
+      if (getRegistrationFlowType === RegistrationFlowType.NEW) {
         if (localState.generalCollateral.length > 0) {
           localState.newDesc = localState.generalCollateral[0].description
         }
@@ -142,7 +138,7 @@ export default defineComponent({
     watch(
       () => localState.newDesc,
       (val: string) => {
-        if (getRegistrationFlowType.value === RegistrationFlowType.NEW) {
+        if (getRegistrationFlowType === RegistrationFlowType.NEW) {
           if (val) {
             setGeneralCollateral([{ description: val }])
           } else {
@@ -155,7 +151,7 @@ export default defineComponent({
     watch(
       () => localState.generalCollateral,
       (val: GeneralCollateralIF[]) => {
-        if (getRegistrationFlowType.value === RegistrationFlowType.NEW) {
+        if (getRegistrationFlowType === RegistrationFlowType.NEW) {
           if (val.length > 0 && val[0].description !== localState.newDesc) {
             localState.newDesc = val[0].description
           }

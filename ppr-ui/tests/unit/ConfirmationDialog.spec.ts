@@ -1,7 +1,7 @@
 import sinon from 'sinon'
 import Vue from 'vue'
 import Vuetify from 'vuetify'
-import CompositionApi from '@vue/composition-api'
+
 import { getVuexStore } from '@/store'
 import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
 // local
@@ -46,9 +46,9 @@ describe('Confirmation Dialog', () => {
     })
 
     const localVue = createLocalVue()
-    localVue.use(CompositionApi)
+
     localVue.use(Vuetify)
-    wrapper = mount(ConfirmationDialog,
+    wrapper = mount((ConfirmationDialog as any),
       {
         localVue,
         vuetify,

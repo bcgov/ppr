@@ -10,7 +10,7 @@ import flushPromises from 'flush-promises'
 import { Parties } from '@/components/parties'
 import { Stepper, StickyContainer } from '@/components/common'
 import ButtonFooter from '@/components/common/ButtonFooter.vue'
-import { AddSecuredPartiesAndDebtors } from '@/views'
+import { AddSecuredPartiesAndDebtors } from '@/views/newRegistration'
 // Local types/helpers
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { RegistrationFlowType, RouteNames, StatementTypes, UIRegistrationTypes } from '@/enums'
@@ -44,7 +44,7 @@ function createComponent (): Wrapper<any> {
   const router = mockRouter.mock()
   router.push({ name: RouteNames.ADD_SECUREDPARTIES_AND_DEBTORS })
 
-  return mount(AddSecuredPartiesAndDebtors, {
+  return mount((AddSecuredPartiesAndDebtors as any), {
     localVue,
     propsData: {
       appReady: true,

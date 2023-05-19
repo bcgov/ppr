@@ -24,7 +24,7 @@ import { getTestId } from './utils'
 // unit test resources
 import mockRouter from './MockRouter'
 import { defaultFlagSet, getRoleProductCode } from '@/utils'
-import { nextTick } from '@vue/composition-api'
+import { nextTick } from 'vue'
 import flushPromises from 'flush-promises'
 
 Vue.use(Vuetify)
@@ -48,7 +48,7 @@ function createComponent (mockRoute: string, setCurrentPath: string, setCurrentP
   const router = mockRouter.mock()
   router.push({ name: mockRoute })
 
-  return mount(Breadcrumb, {
+  return mount((Breadcrumb as any), {
     localVue,
     propsData: {
       setCurrentPath: setCurrentPath,

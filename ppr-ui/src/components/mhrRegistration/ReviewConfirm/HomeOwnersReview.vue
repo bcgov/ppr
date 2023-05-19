@@ -39,8 +39,8 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs } from '@vue/composition-api'
-import { useGetters } from 'vuex-composition-helpers'
+import { computed, defineComponent, reactive, toRefs } from 'vue'
+import { useStore } from '@/store/store'
 import { RouteNames } from '@/enums'
 import { HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
 import { useHomeOwners, useMhrValidations } from '@/composables/mhrRegistration'
@@ -54,15 +54,10 @@ export default defineComponent({
       default: false
     }
   },
-  // eslint-disable-next-line
-  setup(props) {
-    const {
-      getMhrRegistrationValidationModel
-    } = useGetters<any>([
-      'getMhrRegistrationValidationModel'
-    ])
+  setup (props) {
+    const { getMhrRegistrationValidationModel } = useStore()
 
-    const { MhrSectVal, getStepValidation } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
+    const { MhrSectVal, getStepValidation } = useMhrValidations(toRefs(getMhrRegistrationValidationModel))
     const {
       getHomeTenancyType,
       getTotalOwnershipAllocationStatus,

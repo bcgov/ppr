@@ -3,7 +3,6 @@ import Vue from 'vue'
 import Vuetify from 'vuetify'
 import VueRouter from 'vue-router'
 import { getVuexStore } from '@/store'
-
 import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
 import flushPromises from 'flush-promises'
 import { TiptapVuetifyPlugin } from 'tiptap-vuetify'
@@ -12,7 +11,7 @@ import { TiptapVuetifyPlugin } from 'tiptap-vuetify'
 import { Collateral } from '@/components/collateral'
 import { Stepper, StickyContainer } from '@/components/common'
 import ButtonFooter from '@/components/common/ButtonFooter.vue'
-import { AddCollateral } from '@/views'
+import AddCollateral from '@/views/newRegistration/AddCollateral.vue'
 // Local types/helpers
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { RegistrationFlowType, RouteNames, StatementTypes, UIRegistrationTypes } from '@/enums'
@@ -52,7 +51,7 @@ function createComponent (): Wrapper<any> {
   const router = mockRouter.mock()
   router.push({ name: RouteNames.ADD_COLLATERAL })
 
-  return mount(AddCollateral, {
+  return mount((AddCollateral as any), {
     localVue,
     propsData: {
       appReady: true,

@@ -84,8 +84,8 @@ import {
   reactive,
   computed,
   toRefs
-} from '@vue/composition-api'
-import { useGetters } from 'vuex-composition-helpers'
+} from 'vue'
+import { useStore } from '@/store/store'
 
 // local
 import { BaseAddress } from '@/composables/address'
@@ -121,11 +121,9 @@ export default defineComponent({
   },
   emits: ['triggerNoDataAction'],
   setup (props, { emit }) {
-    const { getRegistrationFlowType, getRegistrationType } = useGetters<any>([
-      'getRegistrationFlowType', 'getRegistrationType'
-    ])
-    const registrationFlowType = getRegistrationFlowType.value
-    const registrationType = getRegistrationType.value.registrationTypeAPI
+    const { getRegistrationFlowType, getRegistrationType } = useStore()
+    const registrationFlowType = getRegistrationFlowType
+    const registrationType = getRegistrationType.registrationTypeAPI
     const localState = reactive({
       headers: props.setHeaders,
       items: computed((): PartyIF[] => {

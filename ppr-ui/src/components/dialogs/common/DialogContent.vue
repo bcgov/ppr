@@ -25,7 +25,7 @@ import {
   defineComponent,
   reactive,
   toRefs
-} from '@vue/composition-api'
+} from 'vue'
 // local
 import ErrorContact from '@/components/common/ErrorContact.vue'
 

@@ -71,8 +71,8 @@ import {
   toRefs,
   watch,
   computed
-} from '@vue/composition-api'
-import { useGetters } from 'vuex-composition-helpers'
+} from 'vue'
+import { useStore } from '@/store/store'
 // local components
 import { PartyAutocomplete } from '@/components/parties/party'
 // local helpers / types / etc.
@@ -107,15 +107,15 @@ export default defineComponent({
     }
   },
   emits: [
+    'selectItem',
+    'hideSearch',
     'showSecuredPartyAdd',
     'addRegisteringParty',
     'removeRegisteringParty'
   ],
   setup (props, context) {
-    const { getRegistrationFlowType } = useGetters<any>([
-      'getRegistrationFlowType'
-    ])
-    const registrationFlowType = getRegistrationFlowType.value
+    const { getRegistrationFlowType } = useStore()
+    const registrationFlowType = getRegistrationFlowType
     const localState = reactive({
       searchValue: '',
       autoCompleteResults: null,

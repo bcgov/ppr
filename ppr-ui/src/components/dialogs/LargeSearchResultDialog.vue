@@ -22,7 +22,7 @@ import {
   defineComponent,
   reactive,
   toRefs
-} from '@vue/composition-api'
+} from 'vue'
 // local components
 import BaseDialog from './BaseDialog.vue'
 // local types/helpers/etc.

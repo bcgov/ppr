@@ -161,7 +161,8 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, reactive, toRefs, watch } from '@vue/composition-api'
+import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router/composables'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // local components
 import {
@@ -186,7 +187,7 @@ import {
   saveAmendmentStatement,
   saveAmendmentStatementDraft
 } from '@/utils'
-import { useActions, useGetters } from 'vuex-composition-helpers'
+import { useStore } from '@/store/store'
 /* eslint-disable no-unused-vars */
 import {
   ActionTypes,
@@ -244,6 +245,8 @@ export default defineComponent({
     }
   },
   setup (props, context) {
+    const route = useRoute()
+    const router = useRouter()
     const {
       getStateModel,
       getLengthTrust,
@@ -324,7 +327,7 @@ export default defineComponent({
         return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
       }),
       registrationNumber: computed((): string => {
-        return (context.root.$route.query['reg-num'] as string) || ''
+        return (route.query['reg-num'] as string) || ''
       }),
       registrationTypeUI: computed((): UIRegistrationTypes => {
         return getRegistrationType.value?.registrationTypeUI || null
@@ -481,7 +484,7 @@ export default defineComponent({
         } else {
           console.error('No debtor name confirmed for this amendment. Redirecting to dashboard...')
         }
-        context.root.$router.push({
+        router.push({
           name: RouteNames.DASHBOARD
         })
         return
@@ -532,7 +535,7 @@ export default defineComponent({
     }
 
     const goToReviewAmendment = (): void => {
-      context.root.$router.push({
+      router.push({
         name: RouteNames.AMEND_REGISTRATION,
         query: { 'reg-num': localState.registrationNumber + '-confirm' }
       })
@@ -580,7 +583,7 @@ export default defineComponent({
           prevDraft: prevDraftId
         }
         setRegTableNewItem(newItem)
-        context.root.$router.push({
+        router.push({
           name: RouteNames.DASHBOARD
         })
         emitHaveData(false)
@@ -634,7 +637,7 @@ export default defineComponent({
     }
 
     const goToDashboard = (): void => {
-      context.root.$router.push({
+      router.push({
         name: RouteNames.DASHBOARD
       })
       emitHaveData(false)
@@ -646,7 +649,7 @@ export default defineComponent({
 
       // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
       if (!localState.isAuthenticated || (!props.isJestRunning && !getFeatureFlag('ppr-ui-enabled'))) {
-        context.root.$router.push({
+        router.push({
           name: RouteNames.DASHBOARD
         })
         return

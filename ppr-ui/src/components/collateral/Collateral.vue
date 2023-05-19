@@ -86,8 +86,10 @@ import {
   toRefs,
   watch,
   onUnmounted
-} from '@vue/composition-api'
-import { useActions, useGetters } from 'vuex-composition-helpers'
+} from 'vue'
+import { useStore } from '@/store/store'
+import { useRouter } from '@/router'
+
 // local components
 import { GeneralCollateral } from './generalCollateral'
 import { VehicleCollateral } from './vehicleCollateral'
@@ -118,21 +120,21 @@ export default defineComponent({
     }
   },
   setup (props, context) {
+    const router = useRouter()
     const {
+      // Getters
       getAddCollateral,
       getRegistrationFlowType,
-      getRegistrationType
-    } = useGetters<any>(['getAddCollateral', 'getRegistrationFlowType', 'getRegistrationType'])
+      getRegistrationType,
 
-    const {
+      // Actions
       setCollateralShowInvalid,
       setCollateralValid,
       setGeneralCollateral
-    } = useActions<any>(['setCollateralShowInvalid', 'setCollateralValid', 'setGeneralCollateral'])
+    } = useStore()
 
-    const router = context.root.$router
-    const registrationFlowType = getRegistrationFlowType.value
-    const registrationType = getRegistrationType.value.registrationTypeAPI
+    const registrationFlowType = getRegistrationFlowType
+    const registrationType = getRegistrationType.registrationTypeAPI
 
     const {
       hasVehicleCollateral,
@@ -150,7 +152,7 @@ export default defineComponent({
         return props.isSummary
       }),
       collateral: computed((): AddCollateralIF => {
-        return getAddCollateral.value as AddCollateralIF
+        return getAddCollateral as AddCollateralIF
       }),
       generalCollateralLength: computed((): number => {
         return localState.collateral.generalCollateral?.length || 0
@@ -172,7 +174,7 @@ export default defineComponent({
 
     onMounted(() => {
       if (
-        getRegistrationFlowType.value === RegistrationFlowType.NEW &&
+        getRegistrationFlowType === RegistrationFlowType.NEW &&
         localState.collateral?.generalCollateral?.length === 0 &&
         !localState.summaryView
       ) {
@@ -195,12 +197,12 @@ export default defineComponent({
 
     onUnmounted(() => {
       // clear general collateral description if there is no valid text left in editor (html tags not included)
-      if (getAddCollateral.value.generalCollateral[0]?.description?.replace(/(<([^>]+)>)/ig, '').trim().length === 0) {
+      if (getAddCollateral.generalCollateral[0]?.description?.replace(/(<([^>]+)>)/ig, '').trim().length === 0) {
         setGeneralCollateral([])
         // clear collateral step check mark if there are no vehicles
         // (this resets check mark that was set by general collateral description)
-        if (getAddCollateral.value.vehicleCollateral.length === 0) {
-          getAddCollateral.value.valid = false
+        if (getAddCollateral.vehicleCollateral.length === 0) {
+          getAddCollateral.valid = false
         }
       }
     })

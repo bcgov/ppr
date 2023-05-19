@@ -43,7 +43,7 @@ describe('Search component', () => {
     localVue.use(VueRouter)
     const router = mockRouter.mock()
     await router.push({ name: 'mhr-search' })
-    wrapper = shallowMount(MHRSearch, { localVue, store, router, vuetify })
+    wrapper = shallowMount((MHRSearch as any), { localVue, store, router, vuetify })
   })
 
   afterEach(() => {

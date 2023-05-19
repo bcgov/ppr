@@ -80,9 +80,8 @@
 
 <script lang="ts">
 /* eslint-disable no-unused-vars */
-import vue from 'vue'
-import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
-import { useGetters } from 'vuex-composition-helpers'
+import { computed, defineComponent, nextTick, reactive, toRefs, watch } from 'vue'
+import { useStore } from '@/store/store'
 import { useInputRules } from '@/composables'
 import { ltsaDetails } from '@/utils/ltsa-api-helper'
 import { BaseDialog } from '@/components/dialogs'
@@ -92,7 +91,7 @@ import { LtsaDetailsIF, PidInfoIF } from '@/interfaces/ltsa-api-interfaces'
 
 export default defineComponent({
   name: 'PidNumber',
-  emits: ['setPid'],
+  emits: ['setPid', 'verifyingPid'],
   components: {
     BaseDialog
   },
@@ -101,21 +100,13 @@ export default defineComponent({
     required: { type: Boolean, default: false }
   },
   setup (props, context) {
-    const {
-      getMhrRegistrationLocation
-    } = useGetters<any>([
-      'getMhrRegistrationLocation'
-    ])
-
-    // Composable(s)
-    const {
-      isNumber
-    } = useInputRules()
+    const { getMhrRegistrationLocation } = useStore()
+    const { isNumber } = useInputRules()
 
     const localState = reactive({
-      pidOne: getMhrRegistrationLocation.value?.pidNumber.slice(0, 3) || '',
-      pidTwo: getMhrRegistrationLocation.value?.pidNumber.slice(3, 6) || '',
-      pidThree: getMhrRegistrationLocation.value?.pidNumber.slice(6, 9) || '',
+      pidOne: getMhrRegistrationLocation?.pidNumber.slice(0, 3) || '',
+      pidTwo: getMhrRegistrationLocation?.pidNumber.slice(3, 6) || '',
+      pidThree: getMhrRegistrationLocation?.pidNumber.slice(6, 9) || '',
       enablePidLoader: false,
       dialogOptions: pidNotFoundDialog,
       showNotFoundDialog: false,
@@ -188,17 +179,17 @@ export default defineComponent({
 
     watch(() => localState.pidOne, () => {
       // @ts-ignore - function exists
-      if (localState.pidOne.length === 3) vue.nextTick(() => { context.refs.pidTwoRef.focus() })
+      if (localState.pidOne.length === 3) nextTick(() => { context.refs.pidTwoRef.focus() })
     })
     watch(() => localState.pidTwo, () => {
       // @ts-ignore - function exists
-      if (localState.pidTwo.length === 3) vue.nextTick(() => { context.refs.pidThreeRef.focus() })
+      if (localState.pidTwo.length === 3) nextTick(() => { context.refs.pidThreeRef.focus() })
       // @ts-ignore - function exists
-      if (localState.pidTwo.length === 0) vue.nextTick(() => { context.refs.pidOneRef.focus() })
+      if (localState.pidTwo.length === 0) nextTick(() => { context.refs.pidOneRef.focus() })
     })
     watch(() => localState.pidThree, () => {
       // @ts-ignore - function exists
-      if (localState.pidThree.length === 0) vue.nextTick(() => { context.refs.pidTwoRef.focus() })
+      if (localState.pidThree.length === 0) nextTick(() => { context.refs.pidTwoRef.focus() })
     })
     watch(() => localState.enablePidLoader, () => {
       context.emit('verifyingPid', localState.enablePidLoader)

@@ -1,7 +1,7 @@
 // Libraries
 import Vue from 'vue'
 import Vuetify from 'vuetify'
-import CompositionApi from '@vue/composition-api'
+
 import { getVuexStore } from '@/store'
 import { mount, createLocalVue } from '@vue/test-utils'
 
@@ -22,10 +22,10 @@ describe('Folio number on the summary page', () => {
   beforeEach(async () => {
     // create a Local Vue and install router on it
     const localVue = createLocalVue()
-    localVue.use(CompositionApi)
+
     localVue.use(Vuetify)
     document.body.setAttribute('data-app', 'true')
-    wrapper = mount(FolioNumberSummary, {
+    wrapper = mount((FolioNumberSummary as any), {
       localVue,
       propsData: {},
       store,

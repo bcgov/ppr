@@ -83,8 +83,8 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, ref, toRefs, watch } from '@vue/composition-api'
-import { useActions, useGetters } from 'vuex-composition-helpers'
+import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue'
+import { useStore } from '@/store/store'
 import { useInputRules, useTransferOwners } from '@/composables'
 import { SharedDatePicker } from '@/components/common'
 import { FormIF } from '@/interfaces' // eslint-disable-line no-unused-vars
@@ -104,31 +104,21 @@ export default defineComponent({
     }
   },
   setup (props, context) {
+    const transferDetailsForm = ref(null) as FormIF
     const { customRules, required, maxLength } = useInputRules()
 
     const {
+      // Getters
       getMhrTransferDeclaredValue,
       getMhrTransferConsideration,
       getMhrTransferDate,
-      getMhrTransferOwnLand
-    } = useGetters<any>([
-      'getMhrTransferDeclaredValue',
-      'getMhrTransferConsideration',
-      'getMhrTransferDate',
-      'getMhrTransferOwnLand'
-    ])
-
-    const {
+      getMhrTransferOwnLand,
+      // Actions
       setMhrTransferConsideration,
       setMhrTransferDate,
       setMhrTransferOwnLand,
       setUnsavedChanges
-    } = useActions([
-      'setMhrTransferConsideration',
-      'setMhrTransferDate',
-      'setMhrTransferOwnLand',
-      'setUnsavedChanges'
-    ])
+    } = useStore()
 
     const {
       isTransferDueToDeath,
@@ -140,16 +130,16 @@ export default defineComponent({
     const updateConsideration = () => {
       if (props.disablePrefill) return
       // copy Declared Value into Consideration field - the initial time only
-      if (!localState.consideration && getMhrTransferDeclaredValue.value) {
-        localState.consideration = `$${getMhrTransferDeclaredValue.value}.00`
+      if (!localState.consideration && getMhrTransferDeclaredValue) {
+        localState.consideration = `$${getMhrTransferDeclaredValue}.00`
       }
     }
 
     const localState = reactive({
       isValidForm: false, // TransferDetails form without Transfer Date Picker
-      consideration: getMhrTransferConsideration.value,
-      transferDate: getMhrTransferDate.value,
-      isOwnLand: getMhrTransferOwnLand.value || false,
+      consideration: getMhrTransferConsideration,
+      transferDate: getMhrTransferDate,
+      isOwnLand: getMhrTransferOwnLand || false,
       enableWarningMsg: false,
       landOrLeaseLabel: computed(() => {
         return `The manufactured home is located on land that the ${!isTransferDueToDeath.value ||
@@ -175,7 +165,7 @@ export default defineComponent({
     }
 
     watch(() => props.validate, (val: boolean) => {
-      (context.refs.transferDetailsForm as FormIF).validate()
+      transferDetailsForm.validate()
     })
 
     watch(() => localState.consideration, (val: string) => {

@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { computed, reactive, ref, Ref } from '@vue/composition-api'
+import { computed, reactive, ref, Ref } from 'vue'
 import { uniqueId } from 'lodash'
 
 import { AddressIF, SchemaIF } from '@/composables/address/interfaces'

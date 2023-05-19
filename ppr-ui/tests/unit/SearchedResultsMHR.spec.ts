@@ -2,7 +2,7 @@
 import Vue from 'vue'
 import Vuetify from 'vuetify'
 import { getVuexStore } from '@/store'
-import CompositionApi, { nextTick } from '@vue/composition-api'
+import { nextTick } from 'vue'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import { uniqBy } from 'lodash'
 
@@ -52,10 +52,9 @@ const noResultsDiv = '#search-no-results-info'
  */
 function createComponent (propsData: any = null): Wrapper<any> {
   const localVue = createLocalVue()
-  localVue.use(CompositionApi)
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
-  return mount(SearchedResultMhr, {
+  return mount((SearchedResultMhr as any), {
     localVue,
     store,
     vuetify,

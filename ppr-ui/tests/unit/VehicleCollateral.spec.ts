@@ -2,7 +2,7 @@
 import Vue from 'vue'
 import Vuetify from 'vuetify'
 import { getVuexStore } from '@/store'
-import CompositionApi from '@vue/composition-api'
+
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import {
   mockedVehicleCollateral1,
@@ -36,10 +36,10 @@ function createComponent (
   showInvalid: boolean
 ): Wrapper<any> {
   const localVue = createLocalVue()
-  localVue.use(CompositionApi)
+
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
-  return mount(VehicleCollateral, {
+  return mount((VehicleCollateral as any), {
     localVue,
     propsData: {
       isSummary: isSummary,

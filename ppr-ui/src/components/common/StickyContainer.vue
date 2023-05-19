@@ -40,8 +40,8 @@ import {
   reactive,
   toRefs,
   watch
-} from '@vue/composition-api'
-import { useGetters } from 'vuex-composition-helpers'
+} from 'vue'
+import { useStore } from '@/store/store'
 // local components
 import { ButtonsStacked } from '@/components/common'
 import { FeeSummary } from '@/composables/fees'
@@ -120,16 +120,7 @@ export default defineComponent({
   setup (props, { emit }) {
     const {
       getUserServiceFee, isNonBillable, getIsStaffClientPayment, isRoleStaffReg, isRoleStaffSbc, getStaffPayment
-    } = useGetters<any>(
-      [
-        'getUserServiceFee',
-        'isNonBillable',
-        'getIsStaffClientPayment',
-        'isRoleStaffReg',
-        'isRoleStaffSbc',
-        'getStaffPayment'
-      ]
-    )
+    } = useStore()
 
     const localState = reactive({
       cancelBtn: props.setCancelBtn,
@@ -143,27 +134,27 @@ export default defineComponent({
       saveBtn: props.setSaveBtn,
       disableSubmitBtn: props.setDisableSubmitBtn,
       feeOverride: computed(() => {
-        if (isNonBillable.value || localState.isNoFeePayment) {
+        if (isNonBillable || localState.isNoFeePayment) {
           return {
             feeAmount: 0,
             processingFee: null, // not used in override
             quantity: null, // not used in override
-            serviceFee: getUserServiceFee.value as number
+            serviceFee: getUserServiceFee as number
           } as FeeSummaryI
         }
         return null
       }),
       isStaffReg: computed(() => {
-        return isRoleStaffReg.value as boolean
+        return isRoleStaffReg as boolean
       }),
       isStaffSBC: computed(() => {
-        return isRoleStaffSbc.value as boolean
+        return isRoleStaffSbc as boolean
       }),
       isStaffClientPayment: computed(() => {
         return getIsStaffClientPayment
       }),
       isNoFeePayment: computed(() => {
-        return getStaffPayment.value?.option === 0
+        return getStaffPayment?.option === 0
       })
     })
     const back = () => {

@@ -44,7 +44,7 @@ describe('Search component', () => {
     localVue.use(VueRouter)
     const router = mockRouter.mock()
     await router.push({ name: 'search' })
-    wrapper = shallowMount(Search, { localVue, store, router, vuetify })
+    wrapper = shallowMount((Search as any), { localVue, store, router, vuetify })
   })
 
   afterEach(() => {

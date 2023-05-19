@@ -305,8 +305,9 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, nextTick, onMounted, reactive, ref, toRefs, watch } from '@vue/composition-api'
-import { useActions, useGetters } from 'vuex-composition-helpers'
+import { computed, defineComponent, nextTick, onMounted, reactive, ref, toRefs, watch } from 'vue'
+import { useRouter } from '@/router'
+import { useStore } from '@/store/store'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { StaffPayment } from '@bcrs-shared-components/staff-payment'
 import { StaffPaymentOptions } from '@bcrs-shared-components/enums'
@@ -384,6 +385,7 @@ export default defineComponent({
     }
   },
   setup (props, context) {
+    const router = useRouter()
     const {
       getMhrTransferHomeOwners,
       getMhrInformation,
@@ -712,7 +714,7 @@ export default defineComponent({
 
       // Force show removed/deceased homeOwners when invalid
       if (!getInfoValidation('isValidTransferOwners')) {
-        (context.refs.homeOwnersComponentRef as any)?.hideShowRemovedOwners(true)
+        (homeOwnersComponentRef as any)?.hideShowRemovedOwners(true)
       }
 
       await nextTick()
@@ -753,7 +755,7 @@ export default defineComponent({
         setEmptyMhrTransfer(initMhrTransfer())
         resetValidationState()
 
-        context.root.$router.push({
+        router.push({
           name: RouteNames.DASHBOARD
         })
       }
@@ -818,7 +820,7 @@ export default defineComponent({
         results.results[0].includeLienInfo = true
 
         await setManufacturedHomeSearchResults(results)
-        await context.root.$router.replace({
+        await router.replace({
           name: RouteNames.MHRSEARCH
         })
       } else {
@@ -869,8 +871,8 @@ export default defineComponent({
     })
 
     watch(() => hasUnsavedChanges.value, (val: boolean) => {
-      if (!val && context.refs.transferDetailsComponent) {
-        (context.refs.transferDetailsComponent as any).clearTransferDetailsData()
+      if (!val && transferDetailsComponent) {
+        (transferDetailsComponent as any).clearTransferDetailsData()
       }
     })
 

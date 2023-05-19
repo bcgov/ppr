@@ -16,7 +16,6 @@ import { mockedSearchResponse, mockedVonResponse } from './test-data'
 import { UISearchTypes } from '@/enums'
 import { getLastEvent } from './utils'
 
-// Vue.use(CompositionApi)
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
@@ -38,7 +37,7 @@ function createComponent (setAutoCompleteIsActive: boolean, searchValue: string)
   const localVue = createLocalVue()
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
-  return mount(AutoComplete, {
+  return mount((AutoComplete as any), {
     localVue,
     propsData: { setAutoCompleteIsActive, searchValue },
     store,

@@ -29,12 +29,12 @@ import {
   reactive,
   watch,
   toRefs
-} from '@vue/composition-api'
+} from 'vue'
 // local components
 import { GenColEdit, GenColSummary, GenColAmend } from '.'
 // local types/helpers/etc.
 import { APIRegistrationTypes, RegistrationFlowType } from '@/enums' // eslint-disable-line no-unused-vars
-import { useGetters } from 'vuex-composition-helpers'
+import { useStore } from '@/store/store'
 
 export default defineComponent({
   name: 'GeneralCollateral',
@@ -61,9 +61,9 @@ export default defineComponent({
   setup (props, context) {
     const {
       getRegistrationFlowType
-    } = useGetters<any>(['getRegistrationFlowType'])
+    } = useStore()
 
-    const registrationFlowType = getRegistrationFlowType.value
+    const registrationFlowType = getRegistrationFlowType
     const localState = reactive({
       summaryView: props.isSummary,
       amendMode: false,

@@ -157,9 +157,9 @@
 
 <script lang="ts">
 /* eslint-disable no-unused-vars */
-import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
+import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
 import { useInputRules, useMhrValidations } from '@/composables'
-import { useActions, useGetters } from 'vuex-composition-helpers'
+import { useStore } from '@/store/store'
 import { BaseAddress } from '@/composables/address'
 import { SubmittingPartyTypes } from '@/enums'
 import { PartyAddressSchema } from '@/schemas'
@@ -195,21 +195,14 @@ export default defineComponent({
   },
   setup (props, context) {
     const {
-      setMhrRegistrationSubmittingParty,
-      setMhrTransferSubmittingParty
-    } = useActions<any>([
-      'setMhrRegistrationSubmittingParty',
-      'setMhrTransferSubmittingParty'
-    ])
-    const {
+      // Getters
       getMhrRegistrationSubmittingParty,
       getMhrTransferSubmittingParty,
-      getMhrRegistrationValidationModel
-    } = useGetters<any>([
-      'getMhrRegistrationSubmittingParty',
-      'getMhrTransferSubmittingParty',
-      'getMhrRegistrationValidationModel'
-    ])
+      getMhrRegistrationValidationModel,
+      // Actions
+      setMhrRegistrationSubmittingParty,
+      setMhrTransferSubmittingParty
+    } = useStore()
 
     // InputField Rules
     const {
@@ -227,14 +220,14 @@ export default defineComponent({
       MhrCompVal,
       MhrSectVal,
       setValidation
-    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
+    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel))
 
     const localState = reactive({
       enableLookUp: true,
       submittingPartyType: null as SubmittingPartyTypes,
       submittingPartyValid: false,
       addressValid: false,
-      submittingParty: getMhrRegistrationSubmittingParty.value || {
+      submittingParty: getMhrRegistrationSubmittingParty || {
         personName: {
           first: '',
           last: '',
@@ -313,8 +306,8 @@ export default defineComponent({
       () => {
         if (localState.enableLookUp) {
           const submittingParty = (props.isMhrTransfer
-            ? getMhrTransferSubmittingParty.value
-            : getMhrRegistrationSubmittingParty.value) as SubmittingPartyIF
+            ? getMhrTransferSubmittingParty
+            : getMhrRegistrationSubmittingParty) as SubmittingPartyIF
           // Copy submitting party to local model if data is retrieved through the look-up
           localState.submittingParty = cloneDeep({
             ...localState.submittingParty,

@@ -49,7 +49,7 @@ function createComponent (value: AddressIF, schema: SchemaIF, editing: boolean, 
   const localVue = createLocalVue()
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
-  return mount(BaseAddress, {
+  return mount((BaseAddress as any), {
     localVue,
     propsData: { value, editing, schema, triggerErrors },
     store,

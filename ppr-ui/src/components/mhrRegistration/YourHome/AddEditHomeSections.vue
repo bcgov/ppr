@@ -119,7 +119,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs } from '@vue/composition-api'
+import { computed, defineComponent, reactive, toRefs } from 'vue'
 /* eslint-disable no-unused-vars */
 import { HomeSectionIF } from '@/interfaces'
 import { useInputRules } from '@/composables/useInputRules'

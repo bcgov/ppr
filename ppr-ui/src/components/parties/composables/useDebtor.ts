@@ -1,6 +1,6 @@
-import { reactive, toRefs } from '@vue/composition-api'
+import { reactive, toRefs } from 'vue'
 import { PartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
-import { useGetters, useActions } from 'vuex-composition-helpers'
+import { useStore } from '@/store/store'
 import { Months } from '@/resources/months'
 import { PartyAddressSchema } from '@/schemas'
 import { useParty } from '@/composables/useParty'
@@ -22,12 +22,7 @@ const initAddress = {
 const { getDay, getMonth, getMonthFull, getYear } = useParty()
 
 export const useDebtor = (props, context) => {
-  const { setAddSecuredPartiesAndDebtors } = useActions<any>([
-    'setAddSecuredPartiesAndDebtors'
-  ])
-  const { getAddSecuredPartiesAndDebtors, getRegistrationFlowType } = useGetters<any>([
-    'getAddSecuredPartiesAndDebtors', 'getRegistrationFlowType'
-  ])
+  const { setAddSecuredPartiesAndDebtors, getAddSecuredPartiesAndDebtors, getRegistrationFlowType } = useStore()
   const localState = reactive({
     addressSchema: { ...PartyAddressSchema },
     currentDebtor: {
@@ -49,7 +44,7 @@ export const useDebtor = (props, context) => {
   })
 
   const getDebtor = () => {
-    const debtors: PartyIF[] = getAddSecuredPartiesAndDebtors.value.debtors
+    const debtors: PartyIF[] = getAddSecuredPartiesAndDebtors.debtors
     if (props.activeIndex >= 0) {
       // deep copy so original object doesn't get modified
       localState.currentDebtor = JSON.parse(JSON.stringify(debtors[props.activeIndex]))
@@ -129,7 +124,7 @@ export const useDebtor = (props, context) => {
       resetFormAndData(true)
       return
     }
-    let parties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
+    let parties = getAddSecuredPartiesAndDebtors // eslint-disable-line
     let newList: PartyIF[] = parties.debtors // eslint-disable-line
     // New debtor
     if (props.activeIndex === -1) {

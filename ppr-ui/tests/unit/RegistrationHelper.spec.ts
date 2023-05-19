@@ -1,7 +1,7 @@
 // Libraries
 import Vue from 'vue'
 import Vuetify from 'vuetify'
-import CompositionApi from '@vue/composition-api'
+
 import { getVuexStore } from '@/store'
 import { mount, createLocalVue } from '@vue/test-utils'
 import flushPromises from 'flush-promises'
@@ -88,10 +88,10 @@ describe('Registration API Helper Tests', () => {
   beforeEach(async () => {
     // create a Local Vue and install router on it
     const localVue = createLocalVue()
-    localVue.use(CompositionApi)
+
     localVue.use(Vuetify)
     document.body.setAttribute('data-app', 'true')
-    wrapper = mount(FolioNumberSummary, {
+    wrapper = mount((FolioNumberSummary as any), {
       localVue,
       propsData: {},
       store,
@@ -238,10 +238,10 @@ describe('Registration API Helper Discharge Tests', () => {
   beforeEach(async () => {
     // create a Local Vue and install router on it
     const localVue = createLocalVue()
-    localVue.use(CompositionApi)
+
     localVue.use(Vuetify)
     document.body.setAttribute('data-app', 'true')
-    wrapper = mount(FolioNumberSummary, {
+    wrapper = mount((FolioNumberSummary as any), {
       localVue,
       propsData: {},
       store,
@@ -300,10 +300,10 @@ describe('Registration API Helper Draft Amendment setup tests', () => {
   beforeEach(async () => {
     // create a Local Vue and install router on it
     const localVue = createLocalVue()
-    localVue.use(CompositionApi)
+
     localVue.use(Vuetify)
     document.body.setAttribute('data-app', 'true')
-    wrapper = mount(FolioNumberSummary, {
+    wrapper = mount((FolioNumberSummary as any), {
       localVue,
       propsData: {},
       store,
@@ -411,10 +411,10 @@ describe('Registration API Helper Save Draft Amendment Tests', () => {
   beforeEach(async () => {
     // create a Local Vue and install router on it
     const localVue = createLocalVue()
-    localVue.use(CompositionApi)
+
     localVue.use(Vuetify)
     document.body.setAttribute('data-app', 'true')
-    wrapper = mount(FolioNumberSummary, {
+    wrapper = mount((FolioNumberSummary as any), {
       localVue,
       propsData: {},
       store,
@@ -517,10 +517,10 @@ describe('Registration API Helper Create Amendment Tests', () => {
   beforeEach(async () => {
     // create a Local Vue and install router on it
     const localVue = createLocalVue()
-    localVue.use(CompositionApi)
+
     localVue.use(Vuetify)
     document.body.setAttribute('data-app', 'true')
-    wrapper = mount(FolioNumberSummary, {
+    wrapper = mount((FolioNumberSummary as any), {
       localVue,
       propsData: {},
       store,
@@ -560,10 +560,10 @@ describe('Draft Amendment Setup State Model Tests', () => {
   beforeEach(async () => {
     // create a Local Vue and install router on it
     const localVue = createLocalVue()
-    localVue.use(CompositionApi)
+
     localVue.use(Vuetify)
     document.body.setAttribute('data-app', 'true')
-    wrapper = mount(FolioNumberSummary, {
+    wrapper = mount((FolioNumberSummary as any), {
       localVue,
       propsData: {},
       store,
@@ -665,10 +665,10 @@ describe('Registration API Helper Load Amendment Draft Tests', () => {
   beforeEach(async () => {
     // create a Local Vue and install router on it
     const localVue = createLocalVue()
-    localVue.use(CompositionApi)
+
     localVue.use(Vuetify)
     document.body.setAttribute('data-app', 'true')
-    wrapper = mount(FolioNumberSummary, {
+    wrapper = mount((FolioNumberSummary as any), {
       localVue,
       propsData: {},
       store,

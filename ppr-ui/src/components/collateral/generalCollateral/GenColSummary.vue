@@ -170,8 +170,8 @@ import {
   reactive,
   toRefs,
   computed
-} from '@vue/composition-api'
-import { useActions, useGetters } from 'vuex-composition-helpers'
+} from 'vue'
+import { useStore } from '@/store/store'
 // local
 import { RegistrationFlowType } from '@/enums' // eslint-disable-line no-unused-vars
 import { GeneralCollateralIF } from '@/interfaces' // eslint-disable-line no-unused-vars
@@ -202,13 +202,9 @@ export default defineComponent({
     const {
       getGeneralCollateral,
       getOriginalAddCollateral,
-      getRegistrationFlowType
-    } = useGetters<any>([
-      'getGeneralCollateral',
-      'getOriginalAddCollateral',
-      'getRegistrationFlowType'
-    ])
-    const { setGeneralCollateral } = useActions<any>(['setGeneralCollateral'])
+      getRegistrationFlowType,
+      setGeneralCollateral
+    } = useStore()
 
     const localState = reactive({
       showingHistory: props.setShowHistory,
@@ -232,7 +228,7 @@ export default defineComponent({
         return -1
       }),
       generalCollateral: computed((): GeneralCollateralIF[] => {
-        const generalCollateral = getGeneralCollateral.value as GeneralCollateralIF[] || []
+        const generalCollateral = getGeneralCollateral as GeneralCollateralIF[] || []
         const cleanedGeneralCollateral = [] as GeneralCollateralIF[]
         for (let i = 0; i < generalCollateral.length; i++) {
           if (!generalCollateral[i].addedDateTime) {
@@ -298,7 +294,7 @@ export default defineComponent({
         return localState.generalCollateral.length - 1
       }),
       registrationFlowType: computed((): RegistrationFlowType => {
-        return getRegistrationFlowType.value
+        return getRegistrationFlowType
       }),
       showAmendLink: computed((): boolean => {
         return props.setShowAmendLink
@@ -317,7 +313,7 @@ export default defineComponent({
 
     const undo = () => {
       const originalGeneralCollateral =
-        cloneDeep(getOriginalAddCollateral.value.generalCollateral)
+        cloneDeep(getOriginalAddCollateral.generalCollateral)
       setGeneralCollateral(originalGeneralCollateral)
     }
 

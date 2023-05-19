@@ -15,11 +15,12 @@ import {
   reactive,
   computed,
   toRefs
-} from '@vue/composition-api'
-import { useGetters, useActions } from 'vuex-composition-helpers'
+} from 'vue'
+import { useStore } from '@/store/store'
 
 import { BasePartySummary } from '@/components/parties/summaries'
 import { AddPartiesIF, PartySummaryOptionsI } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { useRouter } from '@/router'
 
 import { partyTableHeaders } from '@/resources'
 import { isSecuredPartyRestrictedList } from '@/utils'
@@ -38,26 +39,22 @@ export default defineComponent({
       default: ''
     }
   },
-  setup (props, context) {
+  setup (props) {
+    const router = useRouter()
     const {
+      // Getters
       getAddSecuredPartiesAndDebtors,
       getRegistrationType,
-      getRegistrationFlowType
-    } = useGetters<any>([
-      'getAddSecuredPartiesAndDebtors',
-      'getRegistrationType',
-      'getRegistrationFlowType'
-    ])
-    const { setAddSecuredPartiesAndDebtors } = useActions<any>([
-      'setAddSecuredPartiesAndDebtors'
-    ])
-    const router = context.root.$router
-    const parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
+      getRegistrationFlowType,
+      // Actions
+      setAddSecuredPartiesAndDebtors
+    } = useStore()
+    const parties: AddPartiesIF = getAddSecuredPartiesAndDebtors
 
     const localState = reactive({
       securedParties: computed(function () {
-        if (getRegistrationFlowType.value === RegistrationFlowType.NEW) {
-          if (isSecuredPartyRestrictedList(getRegistrationType.value.registrationTypeAPI) &&
+        if (getRegistrationFlowType === RegistrationFlowType.NEW) {
+          if (isSecuredPartyRestrictedList(getRegistrationType.registrationTypeAPI) &&
             parties.securedParties.length > 1) {
             return []
           }
@@ -65,8 +62,7 @@ export default defineComponent({
         return parties.securedParties
       }),
       securedPartyHeaders: computed(function () {
-        const headersToShow = [...partyTableHeaders]
-        return headersToShow
+        return [...partyTableHeaders]
       }),
       securedPartyOptions: {
         header: props.setHeader,

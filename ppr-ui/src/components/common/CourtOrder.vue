@@ -174,15 +174,8 @@
 
 <script lang="ts">
 // external
-import {
-  defineComponent,
-  reactive,
-  toRefs,
-  watch,
-  computed,
-  onMounted
-} from '@vue/composition-api'
-import { useGetters, useActions } from 'vuex-composition-helpers'
+import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue'
+import { useStore } from '@/store/store'
 import { isEqual } from 'lodash'
 // bcregistry
 import SharedDatePicker from '@/components/common/SharedDatePicker.vue'
@@ -212,14 +205,17 @@ export default defineComponent({
     }
   },
   setup (props, { emit }) {
-    const { setCourtOrderInformation, setUnsavedChanges } = useActions<any>([
-      'setCourtOrderInformation', 'setUnsavedChanges'
-    ])
     const {
-      getCourtOrderInformation, getRegistrationType, getRegistrationCreationDate, hasUnsavedChanges
-    } = useGetters<any>([
-      'getCourtOrderInformation', 'getRegistrationType', 'getRegistrationCreationDate', 'hasUnsavedChanges'
-    ])
+      // Getters
+      getCourtOrderInformation,
+      getRegistrationType,
+      getRegistrationCreationDate,
+      hasUnsavedChanges,
+
+      // Actions
+      setCourtOrderInformation,
+      setUnsavedChanges
+    } = useStore()
     const {
       errors,
       valid,
@@ -228,7 +224,7 @@ export default defineComponent({
       resetErrors
     } = useCourtOrderValidation()
     const modal = false
-    const registrationType = getRegistrationType.value?.registrationTypeAPI
+    const registrationType = getRegistrationType?.registrationTypeAPI
     const localState = reactive({
       renewalView: props.isRenewal,
       courtName: '',
@@ -239,16 +235,16 @@ export default defineComponent({
       datePickerKey: Math.random(),
       courtOrderInfo: computed(
         (): CourtOrderIF => {
-          return getCourtOrderInformation.value as CourtOrderIF
+          return getCourtOrderInformation as CourtOrderIF
         }
       ),
       computedDateFormatted: computed((): string => {
-        if (getCourtOrderInformation.value === null) {
+        if (getCourtOrderInformation === null) {
           return ''
         }
-        return getCourtOrderInformation.value?.orderDate !== ''
+        return getCourtOrderInformation?.orderDate !== ''
           ? convertDate(
-            new Date(getCourtOrderInformation.value.orderDate + 'T09:00:00Z'),
+            new Date(getCourtOrderInformation.orderDate + 'T09:00:00Z'),
             false,
             false
           )
@@ -268,15 +264,14 @@ export default defineComponent({
       }),
       minCourtDate: computed((): string => {
         if (registrationType === APIRegistrationTypes.REPAIRERS_LIEN) {
-          const minDate = new Date(getRegistrationCreationDate.value)
+          const minDate = new Date(getRegistrationCreationDate as string)
           return localTodayDate(minDate)
         } else {
           return '0'
         }
       }),
       maxCourtDate: computed((): string => {
-        const maxDate = localTodayDate()
-        return maxDate
+        return localTodayDate()
       }),
       fileNumberMessage: computed((): string => {
         if (localState.fileNumber.length > 20) {
@@ -315,12 +310,9 @@ export default defineComponent({
     }
 
     const shouldValidate = () => {
-      if ((localState.courtName) || (localState.courtRegistry) ||
-          (localState.fileNumber) || (localState.orderDate) || (localState.effectOfOrder) ||
-          (localState.requireCourtOrder)) {
-        return true
-      }
-      return false
+      return !!((localState.courtName) || (localState.courtRegistry) ||
+        (localState.fileNumber) || (localState.orderDate) || (localState.effectOfOrder) ||
+        (localState.requireCourtOrder))
     }
 
     watch(
@@ -390,7 +382,7 @@ export default defineComponent({
         }
       } else {
         // get unsavedChanges to reset it after court order setup
-        const unsavedChanges = hasUnsavedChanges.value as Boolean
+        const unsavedChanges = hasUnsavedChanges as boolean
         if (localState.courtOrderInfo.orderDate?.length > 10) {
           // convert back to local iso date string
           const orderDate = new Date(localState.courtOrderInfo.orderDate)

@@ -27,7 +27,7 @@ function createComponent (activeIndex: Number, invalidSection: boolean): Wrapper
   const localVue = createLocalVue()
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
-  return mount(EditParty, {
+  return mount((EditParty as any), {
     localVue,
     propsData: { activeIndex, invalidSection },
     store,

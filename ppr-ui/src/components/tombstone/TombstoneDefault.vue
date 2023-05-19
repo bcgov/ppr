@@ -60,15 +60,15 @@ import {
   onMounted,
   reactive,
   toRefs
-} from '@vue/composition-api'
-import { useGetters } from 'vuex-composition-helpers'
+} from 'vue'
+import { useStore } from '@/store/store'
 import { tombstoneTitles } from '@/resources'
 // local
 import { pacificDate, getRoleProductCode } from '@/utils'
 
 export default defineComponent({
   name: 'TombstoneDefault',
-  setup (props, { root }) {
+  setup () {
     const {
       getAccountLabel,
       getUserFirstName,

@@ -28,7 +28,7 @@ function createComponent (showInvalid: boolean, summaryView: boolean): Wrapper<a
   const localVue = createLocalVue()
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
-  return mount(AmendmentDescription, {
+  return mount((AmendmentDescription as any), {
     localVue,
     propsData: { setShowErrors: showInvalid, isSummary: summaryView },
     store,

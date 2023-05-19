@@ -1,7 +1,6 @@
 // Libraries
 import Vue from 'vue'
 import Vuetify from 'vuetify'
-import CompositionApi from '@vue/composition-api'
 import { getVuexStore } from '@/store'
 import { mount, createLocalVue } from '@vue/test-utils'
 
@@ -24,7 +23,6 @@ describe('Court Order component', () => {
   beforeEach(async () => {
     // create a Local Vue and install router on it
     const localVue = createLocalVue()
-    localVue.use(CompositionApi)
     localVue.use(Vuetify)
     document.body.setAttribute('data-app', 'true')
     await store.dispatch('setCourtOrderInformation',
@@ -35,7 +33,7 @@ describe('Court Order component', () => {
         fileNumber: 'DEF',
         effectOfOrder: 'Good'
       })
-    wrapper = mount(CourtOrder, {
+    wrapper = mount((CourtOrder as any), {
       localVue,
       propsData: {},
       store,
@@ -110,7 +108,6 @@ describe('Court Order summary component', () => {
   beforeEach(async () => {
     // create a Local Vue and install router on it
     const localVue = createLocalVue()
-    localVue.use(CompositionApi)
     localVue.use(Vuetify)
     document.body.setAttribute('data-app', 'true')
     await store.dispatch('setCourtOrderInformation',
@@ -121,7 +118,7 @@ describe('Court Order summary component', () => {
         fileNumber: 'DEF',
         effectOfOrder: 'Good'
       })
-    wrapper = mount(CourtOrder, {
+    wrapper = mount((CourtOrder  as any), {
       localVue,
       propsData: { setSummary: true },
       store,

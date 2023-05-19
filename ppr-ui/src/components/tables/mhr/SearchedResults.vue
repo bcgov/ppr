@@ -244,8 +244,9 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs, onMounted, watch } from '@vue/composition-api'
-import { useActions, useGetters } from 'vuex-composition-helpers' // eslint-disable-line no-unused-vars
+import { computed, defineComponent, reactive, toRefs, onMounted, watch } from 'vue'
+import { useRouter } from '@/router'
+import { useStore } from '@/store/store' // eslint-disable-line no-unused-vars
 import {
   mhSearchMhrNumberHeaders,
   mhSearchMhrNumberHeadersReview,
@@ -266,7 +267,8 @@ export default defineComponent({
   props: {
     isReviewMode: { default: false }
   },
-  setup (props, context) {
+  setup (props) {
+    const router = useRouter()
     const {
       getManufacturedHomeSearchResults,
       getFolioOrReferenceNumber,
@@ -285,7 +287,6 @@ export default defineComponent({
       'setSelectedManufacturedHomes',
       'setFolioOrReferenceNumber'
     ])
-    const router = context.root.$router
 
     const localState = reactive({
       searched: false,

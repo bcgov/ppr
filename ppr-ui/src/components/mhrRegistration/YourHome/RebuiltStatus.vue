@@ -24,8 +24,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
-import { useActions, useGetters } from 'vuex-composition-helpers'
+import { defineComponent, reactive, toRefs, watch } from 'vue'
+import { useStore } from '@/store/store'
 import { useInputRules, useMhrValidations } from '@/composables/'
 
 export default defineComponent({
@@ -38,14 +38,7 @@ export default defineComponent({
     }
   },
   setup (props, context) {
-    const { getMhrRegistrationHomeDescription, getMhrRegistrationValidationModel } = useGetters<any>([
-      'getMhrRegistrationHomeDescription', 'getMhrRegistrationValidationModel'
-    ])
-
-    const { setMhrHomeDescription } = useActions<any>([
-      'setMhrHomeDescription'
-    ])
-
+    const { getMhrRegistrationHomeDescription, getMhrRegistrationValidationModel, setMhrHomeDescription } = useStore()
     const { maxLength } = useInputRules()
     const {
       MhrCompVal,

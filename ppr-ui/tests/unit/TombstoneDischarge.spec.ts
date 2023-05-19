@@ -3,7 +3,7 @@ import Vue from 'vue'
 import Vuetify from 'vuetify'
 import VueRouter from 'vue-router'
 import { getVuexStore } from '@/store'
-import CompositionApi from '@vue/composition-api'
+
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 
 // Components
@@ -33,14 +33,14 @@ const tombstoneInfo: string = '.tombstone-info'
  */
 function createComponent (mockRoute: string): Wrapper<any> {
   const localVue = createLocalVue()
-  localVue.use(CompositionApi)
+
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
   localVue.use(VueRouter)
   const router = mockRouter.mock()
   router.push({ name: mockRoute })
 
-  return mount(TombstoneDischarge, {
+  return mount((TombstoneDischarge as any), {
     localVue,
     propsData: {},
     store,

@@ -2,7 +2,6 @@
 import Vue from 'vue'
 import Vuetify from 'vuetify'
 import { getVuexStore } from '@/store'
-import CompositionApi from '@vue/composition-api'
 import { TiptapVuetifyPlugin, TiptapVuetify } from 'tiptap-vuetify'
 
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
@@ -38,10 +37,9 @@ function createComponent (
   showInvalid: boolean
 ): Wrapper<any> {
   const localVue = createLocalVue()
-  localVue.use(CompositionApi)
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
-  return mount(GenColEdit, {
+  return mount((GenColEdit as any), {
     localVue,
     propsData: { showInvalid: showInvalid },
     store,

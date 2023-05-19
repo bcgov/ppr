@@ -321,8 +321,8 @@ import {
   defineComponent,
   reactive,
   toRefs
-} from '@vue/composition-api'
-import { useGetters, useActions } from 'vuex-composition-helpers'
+} from 'vue'
+import { useStore } from '@/store/store'
 // local components
 import { EditCollateral } from '.'
 // local types/etc.
@@ -352,22 +352,20 @@ export default defineComponent({
   },
   setup (props, context) {
     const {
+      // Getters
       getVehicleCollateral,
       getRegistrationFlowType,
       getOriginalAddCollateral,
-      getRegistrationType
-    } = useGetters<any>([
-      'getVehicleCollateral',
-      'getRegistrationFlowType',
-      'getOriginalAddCollateral',
-      'getRegistrationType'
-    ])
-    const { setVehicleCollateral } = useActions<any>(['setVehicleCollateral'])
+      getRegistrationType,
+
+      // Actions
+      setVehicleCollateral
+    } = useStore()
 
     const { hasVehicleCollateral, hasOptionalVehicleCollateral } = useVehicle(props, context)
 
-    const registrationFlowType = getRegistrationFlowType.value
-    const registrationType = getRegistrationType.value.registrationTypeAPI
+    const registrationFlowType = getRegistrationFlowType
+    const registrationType = getRegistrationType.registrationTypeAPI
 
     const localState = reactive({
       activeIndex: -1,
@@ -376,20 +374,15 @@ export default defineComponent({
       showAddVehicle: false,
       showEditVehicle: [false],
       isRepairersLienAmendment: computed((): boolean => {
-        if (
-          registrationFlowType === RegistrationFlowType.AMENDMENT &&
+        return registrationFlowType === RegistrationFlowType.AMENDMENT &&
           registrationType === APIRegistrationTypes.REPAIRERS_LIEN
-        ) {
-          return true
-        }
-        return false
       }),
       isLastDelete: computed((): boolean => {
         if (localState.isRepairersLienAmendment) {
           let ctr = 0
-          for (let i = 0; i < getVehicleCollateral.value.length; i++) {
+          for (let i = 0; i < getVehicleCollateral.length; i++) {
             // is valid if there is at least one vehicle
-            if (getVehicleCollateral.value[i].action !== ActionTypes.REMOVED) {
+            if (getVehicleCollateral[i].action !== ActionTypes.REMOVED) {
               ctr++
             }
           }
@@ -410,18 +403,18 @@ export default defineComponent({
       }),
       summaryView: props.isSummary,
       getMH: computed(function () {
-        const vc = getVehicleCollateral.value as VehicleCollateralIF[]
+        const vc = getVehicleCollateral as VehicleCollateralIF[]
         return vc?.find(obj => obj.type === APIVehicleTypes.MANUFACTURED_HOME)
       }),
       getNumCols: computed((): number => {
-        const vc = getVehicleCollateral.value as VehicleCollateralIF[]
+        const vc = getVehicleCollateral as VehicleCollateralIF[]
         if (vc?.find(obj => obj.type === APIVehicleTypes.MANUFACTURED_HOME)) {
           return 7
         }
         return 6
       }),
       headers: computed(function () {
-        const vc = getVehicleCollateral.value as VehicleCollateralIF[]
+        const vc = getVehicleCollateral as VehicleCollateralIF[]
         const headersToShow = [...vehicleTableHeaders]
         const editRow = headersToShow.pop()
         if (vc?.find(obj => obj.type === APIVehicleTypes.MANUFACTURED_HOME)) {
@@ -442,7 +435,7 @@ export default defineComponent({
         return headersToShow
       }),
       vehicleCollateral: computed((): VehicleCollateralIF[] => {
-        const vehicles = getVehicleCollateral.value as VehicleCollateralIF[] || []
+        const vehicles = getVehicleCollateral as VehicleCollateralIF[] || []
         if ((registrationFlowType === RegistrationFlowType.AMENDMENT) && (localState.summaryView)) {
           const displayArray = []
           for (let i = 0; i < vehicles.length; i++) {
@@ -490,7 +483,7 @@ export default defineComponent({
     }
 
     const getVehicleDescription = (code: string): string => {
-      const vehicle = VehicleTypes.find(obj => obj.value === code)
+      const vehicle = VehicleTypes.find(obj => obj === code)
       return vehicle.text
     }
 
@@ -517,7 +510,7 @@ export default defineComponent({
 
     const undo = (index: number): void => {
       const newVCollateral = [...localState.vehicleCollateral]
-      const originalCollateral = getOriginalAddCollateral.value
+      const originalCollateral = getOriginalAddCollateral
       newVCollateral.splice(index, 1, cloneDeep(originalCollateral.vehicleCollateral[index]))
       setVehicleCollateral(newVCollateral)
     }

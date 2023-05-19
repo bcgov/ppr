@@ -43,8 +43,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs } from '@vue/composition-api'
-import { useGetters } from 'vuex-composition-helpers'
+import { defineComponent, reactive, toRefs } from 'vue'
+import { useStore } from '@/store/store'
+import { useRoute, useRouter } from '@/router'
 
 export default defineComponent({
   name: 'Stepper',
@@ -55,21 +56,21 @@ export default defineComponent({
       default: false
     }
   },
-  setup (props, context) {
-    const { getSteps, showStepErrors } = useGetters<any>([
-      'getSteps', 'showStepErrors'
-    ])
+  setup (props) {
+    const route = useRoute()
+    const router = useRouter()
+    const { getSteps, showStepErrors } = useStore()
 
     const goTo = (step) => {
-      context.root.$router.push(step.to).catch(error => error)
+      router.push(step.to).catch(error => error)
     }
 
     const isCurrentStep = (step): boolean => {
-      return context.root.$route.name === step.to
+      return route.name === step.to
     }
 
     const showInvalid = (step): boolean => {
-      return ((showStepErrors.value || props.showStepErrorsFlag) && (!step.valid))
+      return ((showStepErrors || props.showStepErrorsFlag) && (!step.valid))
     }
 
     const localState = reactive({})

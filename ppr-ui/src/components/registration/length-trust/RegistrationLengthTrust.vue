@@ -125,8 +125,8 @@ import {
   toRefs,
   watch,
   onMounted
-} from '@vue/composition-api'
-import { useGetters, useActions } from 'vuex-composition-helpers'
+} from 'vue'
+import { useStore } from '@/store/store'
 
 // local
 import { LengthTrustIF } from '@/interfaces' // eslint-disable-line no-unused-vars
@@ -146,25 +146,28 @@ export default defineComponent({
     }
   },
   setup (props, context) {
-    const { setLengthTrust } = useActions<any>(['setLengthTrust'])
-    const { getLengthTrust } = useGetters<any>(['getLengthTrust'])
-    const { getRegistrationType, getRegistrationExpiryDate } = useGetters<any>([
-      'getRegistrationType', 'getRegistrationExpiryDate'
-    ])
-    const registrationType = getRegistrationType.value?.registrationTypeAPI
+    const {
+      // Getters
+      getLengthTrust,
+      getRegistrationType,
+      getRegistrationExpiryDate,
+      // Actions
+      setLengthTrust
+    } = useStore()
+    const registrationType = getRegistrationType?.registrationTypeAPI
     const feeInfoYears = getFinancingFee(false)
     const modal = false
 
     const localState = reactive({
       renewalView: props.isRenewal,
-      trustIndenture: getLengthTrust.value.trustIndenture,
-      lifeYearsDisabled: computed((): string => { return getLengthTrust.value.lifeInfinite }),
-      lifeInfinite: getLengthTrust.value.valid ? getLengthTrust.value.lifeInfinite.toString() : '',
+      trustIndenture: getLengthTrust.trustIndenture,
+      lifeYearsDisabled: computed((): string => { return getLengthTrust.lifeInfinite }),
+      lifeInfinite: getLengthTrust.valid ? getLengthTrust.lifeInfinite.toString() : '',
       maxYears: feeInfoYears.quantityMax.toString(),
-      lifeYearsEdit: getLengthTrust.value.lifeYears > 0 ? getLengthTrust.value.lifeYears.toString() : '',
+      lifeYearsEdit: getLengthTrust.lifeYears > 0 ? getLengthTrust.lifeYears.toString() : '',
       lifeYearsMessage: '',
       trustIndentureHint: '',
-      showInvalid: getLengthTrust.value.showInvalid,
+      showInvalid: getLengthTrust.showInvalid,
       lifeYearsHint:
         'Minimum 1 year, Maximum ' +
         feeInfoYears.quantityMax.toString() +
@@ -173,12 +176,12 @@ export default defineComponent({
         ' per year)',
       showTrustIndenture: computed((): boolean => {
         if (localState.renewalView) {
-          return getLengthTrust.value.trustIndenture
+          return getLengthTrust.trustIndenture
         }
         return registrationType === APIRegistrationTypes.SECURITY_AGREEMENT
       }),
       showErrorSummary: computed((): boolean => {
-        return !getLengthTrust.value.valid
+        return !getLengthTrust.valid
       }),
       regTitle: computed((): string => {
         if (props.isRenewal) {
@@ -188,11 +191,11 @@ export default defineComponent({
       }),
       computedExpiryDateFormatted: computed((): string => {
         if (props.isRenewal) {
-          if (getLengthTrust.value.lifeInfinite) {
+          if (getLengthTrust.lifeInfinite) {
             return 'No Expiry'
           }
-          if ((getRegistrationExpiryDate.value) && (parseInt(localState.lifeYearsEdit) > 0)) {
-            const expiryDate = getRegistrationExpiryDate.value
+          if ((getRegistrationExpiryDate) && (parseInt(localState.lifeYearsEdit) > 0)) {
+            const expiryDate = getRegistrationExpiryDate
             const numYears = parseInt(localState.lifeYearsEdit)
             const newExpDate = new Date(new Date(expiryDate).toLocaleString('en-US', { timeZone: 'America/Vancouver' }))
             newExpDate.setFullYear(newExpDate.getFullYear() + numYears)
@@ -203,10 +206,10 @@ export default defineComponent({
         return ''
       }),
       lengthTrust: computed((): LengthTrustIF => {
-        return getLengthTrust.value as LengthTrustIF || null
+        return getLengthTrust as LengthTrustIF || null
       }),
       trustIndentureSummary: computed((): string => {
-        return getLengthTrust.value.trustIndenture ? 'Yes' : 'No'
+        return getLengthTrust.trustIndenture ? 'Yes' : 'No'
       })
     })
 

@@ -31,7 +31,7 @@ import {
   reactive,
   toRefs,
   watch
-} from '@vue/composition-api'
+} from 'vue'
 
 export default defineComponent({
   name: 'BaseSnackbar',

@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Vuetify from 'vuetify'
 import { getVuexStore } from '@/store'
 import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
-import CompositionApi from '@vue/composition-api'
+
 import flushPromises from 'flush-promises'
 // local
 import { DialogButtons } from '@/components/dialogs/common'
@@ -28,9 +28,9 @@ describe('Dialog Button tests', () => {
 
   beforeEach(async () => {
     const localVue = createLocalVue()
-    localVue.use(CompositionApi)
+
     localVue.use(Vuetify)
-    wrapper = mount(DialogButtons,
+    wrapper = mount((DialogButtons as any),
       {
         localVue,
         store,

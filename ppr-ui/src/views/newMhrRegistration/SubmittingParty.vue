@@ -103,11 +103,11 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
+import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
 import { MhrSubmittingParty } from '@/components/mhrRegistration/SubmittingParty'
 import { PartySearch } from '@/components/parties/party'
 import { useMhrValidations } from '@/composables/mhrRegistration/useMhrValidations'
-import { useActions, useGetters } from 'vuex-composition-helpers'
+import { useStore } from '@/store/store'
 import { useInputRules } from '@/composables'
 import { validateDocumentID } from '@/utils'
 // eslint-disable-next-line no-unused-vars

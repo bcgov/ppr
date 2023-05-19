@@ -195,8 +195,8 @@
 
 <script lang="ts">
 /* eslint-disable no-unused-vars */
-import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
-import { useActions, useGetters } from 'vuex-composition-helpers'
+import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
+import { useStore } from '@/store/store'
 import { HomeLocationTypes } from '@/enums'
 import { PidNumber } from '@/components/common'
 import HomeLocationDescription from './HomeLocationDescription.vue'
@@ -219,19 +219,13 @@ export default defineComponent({
   },
   setup (props, context) {
     const {
+      // Getters
       getMhrRegistrationLocation,
-      getMhrRegistrationValidationModel
-    } = useGetters<any>([
-      'getMhrRegistrationLocation',
-      'getMhrRegistrationValidationModel'
-    ])
-    const {
+      getMhrRegistrationValidationModel,
+      // Actions
       setMhrLocation,
       setIsManualLocation
-    } = useActions<any>([
-      'setMhrLocation',
-      'setIsManualLocation'
-    ])
+    } = useStore()
 
     const { resetLocationInfoFields } = useNewMhrRegistration()
     const { customRules, maxLength, required } = useInputRules()
@@ -239,11 +233,11 @@ export default defineComponent({
       MhrCompVal,
       MhrSectVal,
       setValidation
-    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
+    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel))
 
     // Home location store properties
     const { additionalDescription, dealerName, legalDescription, locationType, pad, pidNumber, parkName, otherType } =
-      getMhrRegistrationLocation.value
+      getMhrRegistrationLocation
 
     const localState = reactive({
       isValidLot: false,

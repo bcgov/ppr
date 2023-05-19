@@ -61,7 +61,7 @@ describe('Renew registration component', () => {
       name: RouteNames.RENEW_REGISTRATION,
       query: { 'reg-num': '123456B' }
     })
-    wrapper = shallowMount(RenewRegistration, { localVue, store, router, vuetify })
+    wrapper = shallowMount((RenewRegistration as any), { localVue, store, router, vuetify })
     wrapper.setProps({ appReady: true })
     await flushPromises()
   })
@@ -170,7 +170,7 @@ describe('Renew registration component for repairers lien', () => {
       name: RouteNames.RENEW_REGISTRATION,
       query: { 'reg-num': '123456B' }
     })
-    wrapper = shallowMount(RenewRegistration, { localVue, store, router, vuetify })
+    wrapper = shallowMount((RenewRegistration as any), { localVue, store, router, vuetify })
     wrapper.setProps({ appReady: true })
     await flushPromises()
   })

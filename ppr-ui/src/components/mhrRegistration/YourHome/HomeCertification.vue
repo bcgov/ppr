@@ -101,11 +101,11 @@
 
 <script lang="ts">
 /* eslint-disable no-unused-vars */
-import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
+import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
 import { SharedDatePicker } from '@/components/common'
 import { HomeCertificationOptions } from '@/enums'
 import { useInputRules, useMhrValidations } from '@/composables'
-import { useActions, useGetters } from 'vuex-composition-helpers'
+import { useStore } from '@/store/store'
 import { createUtcDate, localTodayDate } from '@/utils/date-helper'
 
 export default defineComponent({
@@ -121,17 +121,12 @@ export default defineComponent({
   },
   setup (props, context) {
     const {
-      setMhrHomeDescription
-    } = useActions<any>([
-      'setMhrHomeDescription'
-    ])
-    const {
+      // Getters
       getMhrRegistrationHomeDescription,
-      getMhrRegistrationValidationModel
-    } = useGetters<any>([
-      'getMhrRegistrationHomeDescription',
-      'getMhrRegistrationValidationModel'
-    ])
+      getMhrRegistrationValidationModel,
+      // Actions
+      setMhrHomeDescription
+    } = useStore()
 
     // Composable(s)
     const {
@@ -145,16 +140,16 @@ export default defineComponent({
       MhrCompVal,
       MhrSectVal,
       setValidation
-    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
+    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel))
 
     const localState = reactive({
       homeCertificationValid: false,
-      certificationOption: getMhrRegistrationHomeDescription.value?.certificationOption || null,
-      csaNumber: getMhrRegistrationHomeDescription.value?.csaNumber || '',
-      csaStandard: getMhrRegistrationHomeDescription.value?.csaStandard || '',
+      certificationOption: getMhrRegistrationHomeDescription?.certificationOption || null,
+      csaNumber: getMhrRegistrationHomeDescription?.csaNumber || '',
+      csaStandard: getMhrRegistrationHomeDescription?.csaStandard || '',
       csaStandardOptions: ['A277', 'Z240'],
-      engineerName: getMhrRegistrationHomeDescription.value?.engineerName || '',
-      engineerDate: getMhrRegistrationHomeDescription.value?.engineerDate || '',
+      engineerName: getMhrRegistrationHomeDescription?.engineerName || '',
+      engineerDate: getMhrRegistrationHomeDescription?.engineerDate || '',
       isCsaValid: false,
       isEngineerValid: false,
       isCsaOption: computed((): boolean => {
@@ -184,7 +179,7 @@ export default defineComponent({
       today: computed(() => localTodayDate()),
       minDate: computed(() => {
         // Determined by YEAR value in Manufacturers, Make, Model Section
-        const utcDate = createUtcDate(getMhrRegistrationHomeDescription.value?.baseInformation.year, 0, 1)
+        const utcDate = createUtcDate(getMhrRegistrationHomeDescription?.baseInformation.year, 0, 1)
         return localTodayDate(utcDate)
       })
     })

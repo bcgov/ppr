@@ -1,4 +1,4 @@
-import { useGetters, useActions } from 'vuex-composition-helpers'
+import { useStore } from '@/store/store'
 import { useParty } from './useParty'
 import { AddPartiesIF } from '@/interfaces'
 import { getStaffegisteringParty, getRegisteringPartyFromAuth } from '@/utils'

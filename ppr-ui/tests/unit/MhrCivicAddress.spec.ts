@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuetify from 'vuetify'
 import { getVuexStore } from '@/store'
-import CompositionApi from '@vue/composition-api'
+
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import { HomeCivicAddress } from '@/components/mhrRegistration/HomeLocation'
 
@@ -15,8 +15,8 @@ const vuetify = new Vuetify({})
  */
 function createComponent (): Wrapper<any> {
   const localVue = createLocalVue()
-  localVue.use(CompositionApi)
-  return mount(HomeCivicAddress, {
+
+  return mount((HomeCivicAddress as any), {
     localVue,
     store,
     vuetify

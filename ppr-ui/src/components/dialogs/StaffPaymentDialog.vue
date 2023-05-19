@@ -34,8 +34,8 @@ import {
   defineComponent,
   reactive,
   toRefs
-} from '@vue/composition-api'
-import { useActions, useGetters } from 'vuex-composition-helpers'
+} from 'vue'
+import { useStore } from '@/store/store'
 
 // Components
 import { StaffPayment as StaffPaymentComponent } from '@bcrs-shared-components/staff-payment'
@@ -75,11 +75,7 @@ export default defineComponent({
   },
   emits: ['proceed'],
   setup (props, { emit }) {
-    const { setStaffPayment, setSearchCertified } = useActions<any>([
-      'setStaffPayment',
-      'setSearchCertified'
-    ])
-    const { getStaffPayment } = useGetters<any>(['getStaffPayment'])
+    const { setStaffPayment, setSearchCertified, getStaffPayment } = useStore()
     const localState = reactive({
       certify: false,
       valid: false,
@@ -95,7 +91,7 @@ export default defineComponent({
         return props.setShowCertifiedCheckbox
       }),
       staffPaymentData: computed(() => {
-        let pd = getStaffPayment.value
+        let pd = getStaffPayment
         if (!pd) {
           pd = {
             option: StaffPaymentOptions.NONE,

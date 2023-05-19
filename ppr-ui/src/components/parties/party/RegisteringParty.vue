@@ -131,8 +131,8 @@ import {
   reactive,
   computed,
   toRefs
-} from '@vue/composition-api'
-import { useGetters } from 'vuex-composition-helpers'
+} from 'vue'
+import { useStore } from '@/store/store'
 // local components
 import { EditParty } from '@/components/parties/party'
 import { BaseAddress } from '@/composables/address'
@@ -152,19 +152,13 @@ export default defineComponent({
     ErrorContact
   },
   setup (props, context) {
-    const {
-      getAddSecuredPartiesAndDebtors,
-      getRegistrationFlowType
-    } = useGetters<any>([
-      'getAddSecuredPartiesAndDebtors',
-      'getRegistrationFlowType'
-    ])
+    const { getAddSecuredPartiesAndDebtors, getRegistrationFlowType } = useStore()
     const addressSchema = PartyAddressSchema
-    const registrationFlowType = getRegistrationFlowType.value
+    const registrationFlowType = getRegistrationFlowType
 
     /** First time get read only registering party from the auth api. After that get from the store. */
     onMounted(async () => {
-      const regParty = getAddSecuredPartiesAndDebtors.value?.registeringParty
+      const regParty = getAddSecuredPartiesAndDebtors?.registeringParty
       if (regParty === null) {
         try {
           await getRegisteringParty()
@@ -179,7 +173,7 @@ export default defineComponent({
       addEditInProgress: false,
       showEditParty: false,
       registeringParty: computed((): Array<PartyIF> => {
-        const regParty: PartyIF = getAddSecuredPartiesAndDebtors.value?.registeringParty
+        const regParty: PartyIF = getAddSecuredPartiesAndDebtors?.registeringParty
         if (regParty !== null) {
           return [regParty]
         }

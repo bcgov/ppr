@@ -22,7 +22,7 @@ import {
   mockedAccountInfo
 } from './test-data'
 import { CertifyIF, MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF } from '@/interfaces'
-import { nextTick } from '@vue/composition-api'
+import { nextTick } from 'vue'
 import { TransferDetails, TransferDetailsReview, TransferType } from '@/components/mhrTransfers'
 
 import { defaultFlagSet, toDisplayPhone } from '@/utils'
@@ -47,7 +47,7 @@ function createComponent (): Wrapper<any> {
   })
 
   document.body.setAttribute('data-app', 'true')
-  return mount(MhrInformation, {
+  return mount((MhrInformation as any), {
     localVue,
     store,
     propsData: {

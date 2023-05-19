@@ -6,14 +6,14 @@ import {
   HomeTenancyTypes, MhApiStatusTypes,
   SupportingDocumentsOptions
 } from '@/enums'
-import { useActions, useGetters } from 'vuex-composition-helpers'
+import { useStore } from '@/store/store'
 import {
   MhrHomeOwnerGroupIF,
   MhrRegistrationFractionalOwnershipIF,
   MhrRegistrationHomeOwnerGroupIF,
   MhrRegistrationHomeOwnerIF
 } from '@/interfaces'
-import { computed, reactive, toRefs } from '@vue/composition-api'
+import { computed, reactive, toRefs } from 'vue'
 import { isEqual, find, uniq } from 'lodash'
 import { normalizeObject } from '@/utils'
 import { useHomeOwners } from '@/composables'

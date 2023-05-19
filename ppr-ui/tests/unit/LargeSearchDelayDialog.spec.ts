@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuetify from 'vuetify'
 import { getVuexStore } from '@/store'
-import CompositionApi from '@vue/composition-api'
+
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 // local
 import { LargeSearchDelayDialog } from '@/components/dialogs'
@@ -29,11 +29,11 @@ document.body.setAttribute('data-app', 'true')
 describe('Delay Dialog', () => {
   let wrapper: Wrapper<any>
   const localVue = createLocalVue()
-  localVue.use(CompositionApi)
+
   localVue.use(Vuetify)
 
   beforeEach(async () => {
-    wrapper = mount(LargeSearchDelayDialog,
+    wrapper = mount((LargeSearchDelayDialog as any),
       {
         localVue,
         store,

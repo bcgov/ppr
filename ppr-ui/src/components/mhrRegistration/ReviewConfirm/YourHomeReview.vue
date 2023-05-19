@@ -158,8 +158,8 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs } from '@vue/composition-api'
-import { useGetters } from 'vuex-composition-helpers'
+import { computed, defineComponent, reactive, toRefs } from 'vue'
+import { useStore } from '@/store/store'
 import { HomeCertificationOptions, RouteNames } from '@/enums'
 import { yyyyMmDdToPacificDate, formatAsHtml } from '@/utils'
 import { HomeSections } from '@/components/mhrRegistration'
@@ -181,27 +181,23 @@ export default defineComponent({
       getMhrRegistrationHomeDescription,
       getMhrRegistrationOtherInfo,
       getMhrRegistrationValidationModel
-    } = useGetters<any>([
-      'getMhrRegistrationOtherInfo',
-      'getMhrRegistrationHomeDescription',
-      'getMhrRegistrationValidationModel'
-    ])
+    } = useStore()
 
     const {
       MhrSectVal,
       getStepValidation
-    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
+    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel))
 
     const localState = reactive({
       isCSA: computed((): boolean => {
-        return getMhrRegistrationHomeDescription.value?.certificationOption === HomeCertificationOptions.CSA
+        return getMhrRegistrationHomeDescription?.certificationOption === HomeCertificationOptions.CSA
       }),
       isEngineerInspection: computed((): boolean => {
-        return getMhrRegistrationHomeDescription.value?.certificationOption ===
+        return getMhrRegistrationHomeDescription?.certificationOption ===
           HomeCertificationOptions.ENGINEER_INSPECTION
       }),
       engineerDisplayDate: computed((): string => {
-        return yyyyMmDdToPacificDate(getMhrRegistrationHomeDescription.value?.engineerDate, true)
+        return yyyyMmDdToPacificDate(getMhrRegistrationHomeDescription?.engineerDate, true)
       })
     })
 

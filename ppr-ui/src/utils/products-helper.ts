@@ -11,7 +11,7 @@ import { getFeatureFlag } from '@/utils'
  * @returns String to describe user's roles and products. e.g. STAFF_PPR
  */
 export function getRoleProductCode (
-  authRoles: Array<AuthRoles>,
+  authRoles: Array<string>,
   subscribedProductCodes: Array<ProductCode> = []): string {
   const accessRole = []
 

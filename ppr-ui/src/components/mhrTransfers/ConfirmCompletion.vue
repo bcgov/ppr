@@ -134,8 +134,8 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
-import { useGetters } from 'vuex-composition-helpers'
+import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
+import { useStore } from '@/store/store'
 import { ApiTransferTypes } from '@/enums'
 import { useTransferOwners } from '@/composables'
 
@@ -161,10 +161,7 @@ export default defineComponent({
     const {
       getMhrTransferType,
       isRoleStaff
-    } = useGetters<any>([
-      'getMhrTransferType',
-      'isRoleStaff'
-    ])
+    } = useStore()
 
     const {
       isTransferDueToDeath,
@@ -177,7 +174,7 @@ export default defineComponent({
         return (props.setShowErrors && !localState.confirmCompletion)
       }),
       confirmCompletion: false,
-      transferType: getMhrTransferType.value?.transferType
+      transferType: getMhrTransferType?.transferType
     })
 
     watch(

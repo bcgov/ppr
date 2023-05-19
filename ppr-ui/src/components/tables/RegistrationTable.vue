@@ -290,8 +290,8 @@ import {
   ref,
   toRefs,
   watch
-} from '@vue/composition-api'
-import { useGetters } from 'vuex-composition-helpers'
+} from 'vue'
+import { useStore } from '@/store/store'
 import flushPromises from 'flush-promises'
 import _ from 'lodash'
 // local components

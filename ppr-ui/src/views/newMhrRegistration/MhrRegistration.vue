@@ -57,10 +57,11 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, nextTick, onMounted, reactive, toRefs } from '@vue/composition-api'
-import { useActions, useGetters } from 'vuex-composition-helpers'
+import { computed, defineComponent, nextTick, onMounted, reactive, toRefs } from 'vue'
+import { useRoute, useRouter } from 'vue-router/composables'
+import { useStore } from '@/store/store'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
-import { RegistrationFlowType, RouteNames, StatementTypes } from '@/enums'
+import { RegistrationFlowType, RouteNames, StatementTypes, UIRegistrationTypes } from '@/enums'
 import { getFeatureFlag, getMhrDraft, submitMhrRegistration } from '@/utils'
 import { Stepper, StickyContainer } from '@/components/common'
 import ButtonFooter from '@/components/common/ButtonFooter.vue'
@@ -95,29 +96,21 @@ export default defineComponent({
     }
   },
   setup (props, context) {
+    const route = useRoute()
+    const router = useRouter()
     const {
+      // Getters
       getSteps,
       getMhrDraftNumber,
       getRegistrationType,
       getRegistrationFlowType,
-      getMhrRegistrationValidationModel
-    } = useGetters<any>([
-      'getSteps',
-      'getMhrDraftNumber',
-      'getRegistrationType',
-      'getRegistrationFlowType',
-      'getMhrRegistrationValidationModel'
-    ])
+      getMhrRegistrationValidationModel,
 
-    const {
+      // Actions
       setUnsavedChanges,
       setRegTableNewItem,
       setMhrTransferType
-    } = useActions<any>([
-      'setUnsavedChanges',
-      'setRegTableNewItem',
-      'setMhrTransferType'
-    ])
+    } = useStore()
 
     const {
       MhrCompVal,
@@ -127,7 +120,7 @@ export default defineComponent({
       getStepValidation,
       resetAllValidations,
       scrollToInvalid
-    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
+    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel))
 
     const {
       initDraftMhr,
@@ -150,8 +143,8 @@ export default defineComponent({
       registrationLength: computed((): RegistrationLengthI => {
         return { lifeInfinite: true, lifeYears: 0 }
       }),
-      registrationTypeUI: computed((): RegistrationTypeIF => {
-        return getRegistrationType.value?.registrationTypeUI || ''
+      registrationTypeUI: computed((): UIRegistrationTypes => {
+        return getRegistrationType?.registrationTypeUI || ('' as UIRegistrationTypes)
       }),
       isValidatingApp: computed((): boolean => {
         return getValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_APP)
@@ -167,7 +160,7 @@ export default defineComponent({
 
     /** Helper to check is the current route matches */
     const isRouteName = (routeName: RouteNames): boolean => {
-      return (context.root.$route.name === routeName)
+      return (route.name === routeName)
     }
 
     const registrationIncomplete = (): void => {
@@ -180,7 +173,7 @@ export default defineComponent({
     }
 
     const goToDash = (): void => {
-      context.root.$router.push({
+      router.push({
         name: RouteNames.DASHBOARD
       })
     }
@@ -194,7 +187,7 @@ export default defineComponent({
         return
       }
       // redirect if store doesn't contain all needed data (happens on page reload, etc.)
-      if (!getRegistrationType.value || getRegistrationFlowType.value !== RegistrationFlowType.NEW) {
+      if (!getRegistrationType || getRegistrationFlowType !== RegistrationFlowType.NEW) {
         goToDash()
         return
       }
@@ -205,8 +198,8 @@ export default defineComponent({
       setValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_APP, false)
 
       // page is ready to view
-      if (getMhrDraftNumber.value) {
-        const { registration } = await getMhrDraft(getMhrDraftNumber.value)
+      if (getMhrDraftNumber) {
+        const { registration } = await getMhrDraft(getMhrDraftNumber)
         await initDraftMhr(registration as unknown as MhrRegistrationIF)
       }
 
@@ -235,7 +228,7 @@ export default defineComponent({
           }
           setRegTableNewItem(newRegItem)
           setUnsavedChanges(false)
-          await context.root.$router.push({ name: RouteNames.DASHBOARD })
+          await router.push({ name: RouteNames.DASHBOARD })
         } else {
           emitError(mhrSubmission?.error)
         }

@@ -97,8 +97,8 @@ import {
   toRefs,
   watch,
   onMounted
-} from '@vue/composition-api'
-import { useGetters, useActions } from 'vuex-composition-helpers'
+} from 'vue'
+import { useStore } from '@/store/store'
 // local
 import { convertDate, getRegisteringPartyFromAuth } from '@/utils'
 import { BaseAddress } from '@/composables/address'
@@ -125,21 +125,20 @@ export default defineComponent({
     }
   },
   setup (props, { emit }) {
-    const { setCertifyInformation } = useActions<any>([
-      'setCertifyInformation'
-    ])
     const {
+      // Getters
       getCertifyInformation,
       getUserFirstName,
       getUserLastName,
       isRoleStaff,
       isRoleStaffSbc,
       isRoleStaffBcol,
-      getUserEmail
-    } = useGetters<any>([
-      'getCertifyInformation', 'getUserFirstName', 'getUserLastName', 'isRoleStaff', 'isRoleStaffSbc',
-      'isRoleStaffBcol', 'getUserEmail'
-    ])
+      getUserEmail,
+
+      // Actions
+      setCertifyInformation
+    } = useStore()
+
     const authorizedTableHeaders: Array<BaseHeaderIF> = [
       {
         class: 'column-md extra-indent py-4',
@@ -204,10 +203,10 @@ export default defineComponent({
     )
 
     onMounted(async () => {
-      const certifyInfo:CertifyIF = getCertifyInformation.value
+      const certifyInfo:CertifyIF = getCertifyInformation
       let update:boolean = false
       let email = ''
-      if ((!certifyInfo.registeringParty) && (!isRoleStaff.value)) {
+      if ((!certifyInfo.registeringParty) && (!isRoleStaff)) {
         update = true
         const regParty = await getRegisteringPartyFromAuth()
         if (regParty) {
@@ -217,9 +216,9 @@ export default defineComponent({
 
       if (!certifyInfo.legalName) {
         update = true
-        if (getUserFirstName.value && getUserLastName.value) {
-          certifyInfo.legalName = `${getUserFirstName.value} ${getUserLastName.value}`
-          if (certifyInfo.registeringParty) certifyInfo.registeringParty.emailAddress = getUserEmail.value
+        if (getUserFirstName && getUserLastName) {
+          certifyInfo.legalName = `${getUserFirstName} ${getUserLastName}`
+          if (certifyInfo.registeringParty) certifyInfo.registeringParty.emailAddress = getUserEmail
         } else {
           try {
             const token = sessionStorage.getItem(SessionStorageKeys.KeyCloakToken)
@@ -244,13 +243,13 @@ export default defineComponent({
           }
         }
       }
-      if (isRoleStaff.value) {
-        if (isRoleStaffSbc.value) {
+      if (isRoleStaff) {
+        if (isRoleStaffSbc) {
           certifyInfo.registeringParty = {
             businessName: 'SBC Staff',
             emailAddress: email
           }
-        } else if (isRoleStaffBcol.value) {
+        } else if (isRoleStaffBcol) {
           certifyInfo.registeringParty = {
             businessName: 'BC Online Help',
             emailAddress: email

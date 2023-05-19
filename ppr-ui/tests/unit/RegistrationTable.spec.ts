@@ -47,7 +47,7 @@ function createComponent (): Wrapper<any> {
   const localVue = createLocalVue()
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
-  return mount(RegistrationTable, {
+  return mount((RegistrationTable as any), {
     localVue,
     store,
     propsData: {

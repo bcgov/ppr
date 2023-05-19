@@ -1,4 +1,5 @@
 // Libraries
+import { createPinia, PiniaVuePlugin } from 'pinia'
 import Vue from 'vue'
 import Vuex from 'vuex'
 
@@ -14,12 +15,19 @@ import * as Actions from './actions'
 export function getVuexStore () {
   Vue.use(Vuex)
 
-  const store = new Vuex.Store<any>({
+  return new Vuex.Store<any>({
     state: { ...State },
     getters: { ...Getters },
     mutations: { ...Mutations },
     actions: { ...Actions }
   })
+}
 
-  return store
+/**
+ * Configures and returns Pinia Store.
+ */
+export function getPiniaStore () {
+  Vue.use(PiniaVuePlugin)
+
+  return createPinia()
 }

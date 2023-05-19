@@ -68,7 +68,7 @@ describe('Confirm Renewal new registration component', () => {
       name: RouteNames.CONFIRM_RENEWAL,
       query: { 'reg-num': '123456B' }
     })
-    wrapper = shallowMount(ConfirmRenewal, { localVue, store, router, vuetify })
+    wrapper = shallowMount((ConfirmRenewal as any), { localVue, store, router, vuetify })
     wrapper.setProps({ appReady: true })
     await flushPromises()
   })
@@ -191,7 +191,7 @@ describe('Confirm Renewal new RL registration component', () => {
       name: RouteNames.CONFIRM_RENEWAL,
       query: { 'reg-num': '123456B' }
     })
-    wrapper = shallowMount(ConfirmRenewal, { localVue, store, router, vuetify })
+    wrapper = shallowMount((ConfirmRenewal as any), { localVue, store, router, vuetify })
     wrapper.setProps({ appReady: true })
     await flushPromises()
   })
