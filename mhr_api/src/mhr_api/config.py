@@ -186,6 +186,7 @@ class _Config():  # pylint: disable=too-few-public-methods
     SUBSCRIPTION_API_KEY = os.getenv('SUBSCRIPTION_API_KEY')
     GATEWAY_API_KEY = os.getenv('GATEWAY_API_KEY')
     GATEWAY_LTSA_URL = os.getenv('GATEWAY_LTSA_URL')
+    DB2_RACF_ID = os.getenv('DB2_DATABASE_USERNAME')
 
 
 class DevConfig(_Config):  # pylint: disable=too-few-public-methods

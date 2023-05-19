@@ -43,8 +43,10 @@ from tests.unit.utils.test_transfer_data import (
     WILL_DELETE_GROUPS,
     WILL_DELETE_GROUPS1,
     WILL_DELETE_GROUPS2,
+    WILL_DELETE_GROUPS3,
     ADMIN_ADD_GROUPS,
     ADMIN_DELETE_GROUPS,
+    ADMIN_DELETE_GROUPS1,
     ADD_OWNER,
     SO_GROUP,
     ADD_GROUP,
@@ -130,6 +132,7 @@ TEST_TRANSFER_DATA_TRAND = [
 # testdata pattern is ({description},{valid},{mhr_num},{account_id},{delete_groups},{add_groups},{message content},{staff})
 TEST_TRANSFER_DATA_ADMIN = [
     ('Valid', True,  '001020', '2523', ADMIN_DELETE_GROUPS, ADMIN_ADD_GROUPS, None, True),
+    ('Valid delete ADMIN', True,  '094474', '2523', ADMIN_DELETE_GROUPS1, ADMIN_ADD_GROUPS, None, True),
     ('Invalid non-staff', False,  '001020', '2523', ADMIN_DELETE_GROUPS, ADMIN_ADD_GROUPS,
      validator.REG_STAFF_ONLY, False),
     ('Valid party type EXECUTOR', True,  '001020', '2523', ADMIN_DELETE_GROUPS, ADMIN_ADD_GROUPS, None, True),
@@ -176,6 +179,7 @@ TEST_TRANSFER_DATA_AFFIDAVIT = [
 # testdata pattern is ({description},{valid},{mhr_num},{account_id},{delete_groups},{add_groups},{message content},{staff})
 TEST_TRANSFER_DATA_WILL = [
     ('Valid', True,  '001020', '2523', WILL_DELETE_GROUPS, EXEC_ADD_GROUPS, None, True),
+    ('Valid delete EXEC', True,  '092494', '2523', WILL_DELETE_GROUPS3, EXEC_ADD_GROUPS, None, True),
     ('Invalid non-staff', False,  '001020', '2523', WILL_DELETE_GROUPS, EXEC_ADD_GROUPS,
      validator.REG_STAFF_ONLY, False),
     ('Invalid add owner', False,  '001020', '2523', WILL_DELETE_GROUPS, EXEC_ADD_GROUPS,

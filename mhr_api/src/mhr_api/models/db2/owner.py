@@ -172,9 +172,12 @@ class Db2Owner(db.Model):
             owner['status'] = 'EXEMPT'
         else:
             owner['status'] = 'PREVIOUS'
-        if self.suffix:
-            owner['suffix'] = self.suffix
         owner['partyType'] = self.get_party_type()
+        # Make legacy json consistent with new json.
+        if owner['partyType'] in (MhrPartyTypes.EXECUTOR, MhrPartyTypes.TRUSTEE, MhrPartyTypes.ADMINISTRATOR):
+            owner['description'] = self.suffix
+        elif self.suffix:
+            owner['suffix'] = self.suffix
         return owner
 
     @property
@@ -191,9 +194,12 @@ class Db2Owner(db.Model):
         if self.phone_number:
             owner['phoneNumber'] = self.phone_number
         owner['address'] = address_utils.get_address_from_db2_owner(self.legacy_address, self.postal_code)
-        if self.suffix:
-            owner['suffix'] = self.suffix
         owner['partyType'] = self.get_party_type()
+        # Make legacy json consistent with new json.
+        if owner['partyType'] in (MhrPartyTypes.EXECUTOR, MhrPartyTypes.TRUSTEE, MhrPartyTypes.ADMINISTRATOR):
+            owner['description'] = self.suffix
+        elif self.suffix:
+            owner['suffix'] = self.suffix
         return owner
 
     def get_party_type(self) -> str:

@@ -117,6 +117,10 @@ def test_party_type(session, owner_type, name, suffix, party_type):
     assert owner_json.get('partyType') == party_type
     owner_json = owner.new_registration_json
     assert owner_json.get('partyType') == party_type
+    if owner_json.get('partyType') in (MhrPartyTypes.OWNER_BUS, MhrPartyTypes.OWNER_IND):
+        assert not owner_json.get('description')
+    else:
+        assert owner_json.get('description')
 
 
 @pytest.mark.parametrize('party_type,description,suffix', TEST_DATA_PARTY_TYPE_CREATE)
@@ -128,6 +132,10 @@ def test_party_type_create(session, party_type, description, suffix):
     owner: Db2Owner = Db2Owner.create_from_registration(reg, json_data, 1, 1)
     assert owner.get_party_type() == party_type
     assert owner.suffix == suffix
+    owner_json = owner.registration_json
+    assert owner_json.get('description')
+    owner_json = owner.new_registration_json
+    assert owner_json.get('description')
 
 
 def test_owner_json(session):
