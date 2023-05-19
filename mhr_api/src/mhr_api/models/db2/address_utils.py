@@ -322,24 +322,38 @@ STATE_CODES = ' AK AR AZ CA CO CT FL GA HI ID IL IN KS KY LA MA MD MI MO MT MN N
 def get_region_country(legacy_value: str, default_region: str = '', default_country: str = ''):
     """Get a province or state code and country code from DB2 legacy address text (not the street)."""
     region: str = default_region
+    # current_app.logger.info(f'legacy_value ${legacy_value}$')
     for key, val in DB2_PROVINCE_MAPPING.items():
-        if legacy_value.find(key) > 0:
+        if legacy_value.find(key) > -1:
             region = val
             break
     if region and PROVINCE_CODES.find(region) > 0:
         return region, COUNTRY_CA
     for key_state, val2 in DB2_STATE_MAPPING.items():
-        if legacy_value.find(key_state) > 0:
+        if legacy_value.find(key_state) > -1:
             region = val2
             break
     if region and STATE_CODES.find(region) > 0:
         return region, COUNTRY_US
     # No region but country identified
     for key_country, val3 in DB2_COUNTRY_MAPPING.items():
-        if legacy_value.find(key_country) > 0:
+        if legacy_value.find(key_country) > -1:
             return region, val3
     # Default region and country.
     return region, default_country
+
+
+def get_region(legacy_value: str, default_region: str = ''):
+    """Get a province or state code when country exists but no region extracted yet."""
+    region: str = default_region
+    # current_app.logger.info(f'legacy_value ${legacy_value}$')
+    for key, val in DB2_PROVINCE_MAPPING.items():
+        if legacy_value.find(key) > 0:
+            return val
+    for key_state, val2 in DB2_STATE_MAPPING.items():
+        if legacy_value.find(key_state) > 0:
+            return val2
+    return region
 
 
 def get_country_from_region(region: str, default: str = ''):
@@ -434,7 +448,7 @@ def get_postal_code(legacy_value: str, country: str):
     return ''
 
 
-def remove_region_country(legacy_value: str, region: str, country: str) -> str:
+def remove_region_country(legacy_value: str, region: str, country: str, region_only: bool = False) -> str:
     """Remove region and country from the legacy text."""
     if legacy_value.strip() == '':
         return legacy_value
@@ -448,22 +462,24 @@ def remove_region_country(legacy_value: str, region: str, country: str) -> str:
         for key in DB2_STATE_MAPPING:
             if value.find(key) > -1:
                 value = value.replace(key, '')
-    for key_country in DB2_COUNTRY_MAPPING:
-        if value.find(key_country) > -1:
-            value = value.replace(key_country, '')
+    if not region_only:
+        for key_country in DB2_COUNTRY_MAPPING:
+            if value.find(key_country) > -1:
+                value = value.replace(key_country, '')
     value = value.strip()
     if value.endswith(','):
         value = value[0:(len(value) - 1)]
-    if country and value == country:
-        return ''
-    for remove_country in DB2_REMOVE_TRAILING_COUNTRY:
-        if value.endswith(remove_country):
-            end_pos: int = len(value) - len(remove_country) + 1
-            value = value[0:end_pos]
-    for remove_country in DB2_REMOVE_STARTING_COUNTRY:
-        if value.startswith(remove_country):
-            start_pos: int = len(remove_country)
-            value = value[start_pos:]
+    if not region_only:
+        if country and value == country:
+            return ''
+        for remove_country in DB2_REMOVE_TRAILING_COUNTRY:
+            if value.endswith(remove_country):
+                end_pos: int = len(value) - len(remove_country) + 1
+                value = value[0:end_pos]
+        for remove_country in DB2_REMOVE_STARTING_COUNTRY:
+            if value.startswith(remove_country):
+                start_pos: int = len(remove_country)
+                value = value[start_pos:]
     return value.strip()
 
 
@@ -546,24 +562,42 @@ def get_address_from_db2(legacy_address: str):
     street = legacy_address[0:40].strip()
     legacy_text: str = legacy_address[40:]
     region, country = get_region_country(legacy_text + ' ')
-    if not country:
-        region, country = get_region_country_from_postal_code(legacy_text)
-    # current_app.logger.info('region=' + region + ', country=' + country)
+    region: str = ''
+    country: str = ''
     line2: str = legacy_text[0:40].strip()
     line3: str = legacy_text[40:80].strip()
     line4: str = legacy_text[80:].strip()
-    if line2:
-        line2 = remove_region_country(' ' + line2 + ' ', region, country)
-    if line3:
-        line3 = remove_region_country(' ' + line3 + ' ', region, country)
     if line4:
-        line4 = remove_region_country(' ' + line4 + ' ', region, country)
-    # current_app.logger.info('2=' + line2)
-    # current_app.logger.info('3=' + line3)
-    # current_app.logger.info('4=' + line4)
+        region, country = get_region_country(' ' + line4 + ' ')
+        if country:
+            line4 = remove_region_country(' ' + line4 + ' ', region, country)
+            if not region:
+                region = get_region(' ' + line3 + ' ')
+                line3 = remove_region_country(' ' + line3 + ' ', region, country, True)
+        else:
+            region, country = get_region_country(' ' + line3 + ' ')
+            line3 = remove_region_country(' ' + line3 + ' ', region, country)
+            if country and not region:
+                region = get_region(' ' + line2 + ' ')
+                line2 = remove_region_country(' ' + line2 + ' ', region, country, True)
+    elif line3:
+        region, country = get_region_country(' ' + line3 + ' ')
+        if country:
+            line3 = remove_region_country(' ' + line3 + ' ', region, country)
+            if not region:
+                region = get_region(' ' + line2 + ' ')
+                line2 = remove_region_country(' ' + line2 + ' ', region, country, True)
+        else:
+            region, country = get_region_country(' ' + line2 + ' ')
+            line2 = remove_region_country(' ' + line2 + ' ', region, country)
+    elif line2:
+        region, country = get_region_country(' ' + line2 + ' ')
+        line2 = remove_region_country(' ' + line2 + ' ', region, country)
     street_add: str = ''
     city: str = ''
     p_code: str = ''
+    if not country:
+        region, country = get_region_country_from_postal_code(legacy_text)
     # 1. Postal code is always last after removing region and country.
     # 2. postal code can be in line4, lin3, or line2.
     # 3. A line can contain a city and a postal code.
@@ -627,19 +661,30 @@ def get_address_from_db2_owner(legacy_address: str, postal_code: str):
     legacy_text: str = legacy_address[40:]
     if legacy_text.find(' ' + p_code) > -1:
         legacy_text = legacy_text.replace((' ' + p_code), '')
-    region, country = get_region_country(legacy_text + ' ')
-    if not country:
-        country = get_country_from_postal_code(p_code)
-    # current_app.logger.info('region=' + region + ', country=' + country)
+    region: str = ''
+    country: str = ''
     line2: str = legacy_text[0:40].strip()
     line3: str = legacy_text[40:80].strip()
     line4: str = legacy_text[80:].strip()
-    if line2:
-        line2 = remove_region_country(' ' + line2 + ' ', region, country)
-    if line3:
-        line3 = remove_region_country(' ' + line3 + ' ', region, country)
     if line4:
+        region, country = get_region_country(' ' + line4 + ' ')
         line4 = remove_region_country(' ' + line4 + ' ', region, country)
+        if country and not region:
+            region = get_region(' ' + line3 + ' ')
+            line3 = remove_region_country(' ' + line3 + ' ', region, country, True)
+    elif line3:
+        # current_app.logger.info(f'LINE 3={line3}')
+        region, country = get_region_country(' ' + line3 + ' ')
+        # current_app.logger.info(f'LINE 3 region={region}, country={country}')
+        line3 = remove_region_country(' ' + line3 + ' ', region, country)
+        if country and not region:
+            region = get_region(' ' + line2 + ' ')
+            line2 = remove_region_country(' ' + line2 + ' ', region, country, True)
+    elif line2:
+        region, country = get_region_country(' ' + line2 + ' ')
+        line2 = remove_region_country(' ' + line2 + ' ', region, country)
+    if not country:
+        country = get_country_from_postal_code(p_code)
     # current_app.logger.info('2=' + line2)
     # current_app.logger.info('3=' + line3)
     # current_app.logger.info('4=' + line4)
