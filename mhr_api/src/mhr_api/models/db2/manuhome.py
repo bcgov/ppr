@@ -595,6 +595,7 @@ class Db2Manuhome(db.Model):
     def create_from_registration(registration, reg_json):
         """Create a new manufactured home object from a new MH registration."""
         doc_id = reg_json.get('documentId', '')
+        update_id = current_app.config.get('DB2_RACF_ID', '')
         manuhome: Db2Manuhome = Db2Manuhome(id=registration.id,
                                             mhr_number=registration.mhr_number,
                                             mh_status=Db2Manuhome.StatusTypes.REGISTERED.value,
@@ -602,7 +603,7 @@ class Db2Manuhome(db.Model):
                                             exempt_flag='',
                                             presold_decal='',
                                             update_count=0,
-                                            update_id='',
+                                            update_id=update_id,
                                             accession_number=0,
                                             box_number=0)
         now_local = model_utils.today_local()
@@ -617,10 +618,12 @@ class Db2Manuhome(db.Model):
 
         # Create document if doc id
         if doc_id:
-            manuhome.reg_documents.append(Db2Document.create_from_registration(registration,
-                                                                               reg_json,
-                                                                               Db2Document.DocumentTypes.MHREG,
-                                                                               now_local))
+            doc: Db2Document = Db2Document.create_from_registration(registration,
+                                                                    reg_json,
+                                                                    Db2Document.DocumentTypes.MHREG,
+                                                                    now_local)
+            doc.update_id = manuhome.update_id
+            manuhome.reg_documents.append(doc)
         manuhome.reg_location = Db2Location.create_from_registration(registration, reg_json, False)
         # Adjust location address info.
         address = reg_json['location']['address']
@@ -667,10 +670,12 @@ class Db2Manuhome(db.Model):
         else:
             doc_type = Db2Document.DocumentTypes.TRANS
         # Create document
-        manuhome.reg_documents.append(Db2Document.create_from_registration(registration,
-                                                                           reg_json,
-                                                                           doc_type,
-                                                                           now_local))
+        doc: Db2Document = Db2Document.create_from_registration(registration,
+                                                                reg_json,
+                                                                doc_type,
+                                                                now_local)
+        doc.update_id = current_app.config.get('DB2_RACF_ID', '')
+        manuhome.reg_documents.append(doc)
         # Update owner groups: group ID increments with each change.
         if reg_json.get('deleteOwnerGroups'):
             for group in reg_json.get('deleteOwnerGroups'):
@@ -716,6 +721,7 @@ class Db2Manuhome(db.Model):
                                                                 reg_json,
                                                                 doc_type,
                                                                 now_local)
+        doc.update_id = current_app.config.get('DB2_RACF_ID', '')
         manuhome.reg_documents.append(doc)
         # Add note.
         if reg_json.get('note'):
@@ -739,6 +745,7 @@ class Db2Manuhome(db.Model):
                                                                 reg_json,
                                                                 doc_type,
                                                                 now_local)
+        doc.update_id = current_app.config.get('DB2_RACF_ID', '')
         manuhome.reg_documents.append(doc)
         # Create note, which holds permit expiry date.
         note: Db2Mhomnote = Db2Mhomnote.create_from_registration(reg_json.get('note'), doc, manuhome.id)

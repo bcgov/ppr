@@ -337,8 +337,11 @@ def test_create_new_from_json(session):
     assert manuhome.mhr_number == registration.mhr_number
     assert manuhome.reg_document_id == json_data['documentId'] 
     assert manuhome.mh_status == Db2Manuhome.StatusTypes.REGISTERED
+    assert manuhome.update_id == current_app.config.get('DB2_RACF_ID')
     assert manuhome.reg_documents
     assert len(manuhome.reg_documents) == 1
+    doc: Db2Document = manuhome.reg_documents[0]
+    assert doc.update_id == manuhome.update_id
     assert manuhome.reg_location
     assert manuhome.reg_location.status == 'A'
     assert manuhome.reg_descript
@@ -384,6 +387,7 @@ def test_create_transfer_from_json(session, mhr_num, user_group, doc_id_prefix, 
     assert doc.id == registration.doc_id
     assert doc.document_type == Db2Document.DocumentTypes.TRANS
     assert doc.document_reg_id == registration.doc_reg_number
+    assert doc.update_id == current_app.config.get('DB2_RACF_ID')
     assert manuhome.reg_owner_groups
     assert len(manuhome.reg_owner_groups) > 2
     for group in manuhome.reg_owner_groups:

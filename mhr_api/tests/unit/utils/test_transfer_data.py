@@ -655,7 +655,70 @@ WILL_DELETE_GROUPS2 = [
         'type': 'JOINT'
     }
 ]
+WILL_DELETE_GROUPS3 = [
+    {
+        'groupId': 6,
+        'owners': [
+            {
+                'partyType': 'EXECUTOR',
+                'description': 'EXECUTOR OF THE ESTATE OF MARY LILLIAN MURRAY, DECEASED',
+                'individualName': {
+                    'first': 'JOANNE',
+                    'last': 'KOLLN'
+                 },
+                'address': {
+                    'street': '5382 BABCOCK ROAD',
+                    'city': '100 MILE HOUSE',
+                    'region': 'BC',
+                    'postalCode': 'V0K 2E1',
+                    'country': 'CA'
+                },
+                'phoneNumber': '6041234567'
+            }, {
+                'partyType': 'EXECUTOR',
+                'description': 'EXECUTOR OF THE ESTATE OF MARY LILLIAN MURRAY, DECEASED',
+                'individualName': {
+                    'first': 'KENNETH',
+                    'last': 'UNRAU'
+                },
+                'address': {
+                    'street': '45 - 1322 DOG CREEK ROAD',
+                    'city': 'WILLIAMS LAKE',
+                    'region': 'BC',
+                    'postalCode': 'V2G 3G9',
+                    'country': 'CA'
+                },
+                'phoneNumber': '6041234567'
+            }
+        ],
+        'type': 'NA'
+    }
+]
 ADMIN_DELETE_GROUPS = WILL_DELETE_GROUPS
+ADMIN_DELETE_GROUPS1 = [
+    {
+        'groupId': 5,
+        'owners': [
+            {
+              'partyType': 'ADMINISTRATOR',
+              'description': 'ADMINISTRATOR OF THE ESTATE OF BEVERLY JOY STROM, DECEASED',
+              'individualName': {
+                    'first': 'JOHN',
+                    'last': 'KIDDER'
+                 },
+                'address': {
+                    'street': '26624 - 29B AVENUE',
+                    'city': 'ALDERGROVE',
+                    'region': 'BC',
+                    'postalCode': 'V4W 3B5',
+                    'country': 'CA'
+                }
+            }
+        ],
+        'type': 'SOLE'
+    }
+]
+
 ADMIN_ADD_GROUPS = [
     {
         'groupId': 2,
