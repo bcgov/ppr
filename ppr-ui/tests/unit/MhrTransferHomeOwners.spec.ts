@@ -712,7 +712,7 @@ describe('Home Owners', () => {
 
     expect(homeOwners.find(getTestId('invalid-group-msg')).exists()).toBeTruthy()
     expect(homeOwners.find(getTestId('invalid-group-msg')).text())
-      .toContain('All owners must be deceased and an executor added.')
+      .toContain(transfersErrors.allOwnersHaveDeathCerts[TRANSFER_TYPE])
 
     await homeOwners.find(getTestId('add-person-btn')).trigger('click')
     await Vue.nextTick()
@@ -834,7 +834,7 @@ describe('Home Owners', () => {
       { groupId: 2, owners: [mockedPerson], type: '' }
     ])
 
-    expect(groupError.text()).toContain(transfersErrors.ownersMustBeDeceasedAndExecutorAdded)
+    expect(groupError.text()).toContain(transfersErrors.allOwnersHaveDeathCerts[TRANSFER_TYPE])
 
     // All Owners are Deceased, no Executor added
     await store.dispatch('setMhrTransferHomeOwnerGroups', [
@@ -848,7 +848,7 @@ describe('Home Owners', () => {
       { groupId: 2, owners: [mockedPerson], type: '' }
     ])
 
-    expect(groupError.text()).toContain(transfersErrors.mustContainOneExecutorInGroup)
+    expect(groupError.text()).toContain(transfersErrors.allOwnersHaveDeathCerts[TRANSFER_TYPE])
 
     // No Owners removed, one Executor added
     await store.dispatch('setMhrTransferHomeOwnerGroups', [
@@ -912,7 +912,7 @@ describe('Home Owners', () => {
 
     const groupError = homeOwners.find(getTestId('invalid-group-msg'))
 
-    expect(groupError.text()).toContain(transfersErrors.ownersMustBeDeceasedAndAdminAdded)
+    expect(groupError.text()).toContain(transfersErrors.allOwnersHaveDeathCerts[TRANSFER_TYPE])
 
     // All Owners are Deceased, no Administrator added
     await store.dispatch('setMhrTransferHomeOwnerGroups', [
@@ -926,7 +926,7 @@ describe('Home Owners', () => {
       { groupId: 2, owners: [mockedPerson], type: '' }
     ])
 
-    expect(groupError.text()).toContain(transfersErrors.mustContainOneAdminInGroup)
+    expect(groupError.text()).toContain(transfersErrors.allOwnersHaveDeathCerts[TRANSFER_TYPE])
 
     // No Owners removed, one Administrator added
     await store.dispatch('setMhrTransferHomeOwnerGroups', [

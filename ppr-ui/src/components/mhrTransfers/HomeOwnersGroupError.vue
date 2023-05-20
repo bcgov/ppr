@@ -1,7 +1,11 @@
 <template>
   <!-- Transfer to Executor error messages -->
   <span v-if="isTransferToExecutorProbateWill || isTransferToExecutorUnder25Will">
-    <span v-if="!TransToExec.hasAllCurrentOwnersRemoved(groupId) &&
+    <span v-if="!TransToExec.hasAddedExecutorsInGroup(groupId) &&
+      !TransToExec.hasDeletedOwnersWithProbateGrantOrAffidavit()">
+      {{ transfersErrors.allOwnersHaveDeathCerts[getMhrTransferType.transferType] }}
+    </span>
+    <span v-else-if="!TransToExec.hasAllCurrentOwnersRemoved(groupId) &&
       !TransToExec.hasAddedExecutorsInGroup(groupId)">
       {{ transfersErrors.ownersMustBeDeceasedAndExecutorAdded }}
     </span>
@@ -28,7 +32,11 @@
   </span>
   <!-- Transfer to Admin error messages -->
   <span v-else-if="isTransferToAdminNoWill">
-    <span v-if="!TransToExec.hasAllCurrentOwnersRemoved(groupId) &&
+    <span v-if="!TransToAdmin.hasAddedAdministratorsInGroup(groupId) &&
+      !TransToExec.hasDeletedOwnersWithProbateGrantOrAffidavit()">
+      {{ transfersErrors.allOwnersHaveDeathCerts[getMhrTransferType.transferType] }}
+    </span>
+    <span v-else-if="!TransToExec.hasAllCurrentOwnersRemoved(groupId) &&
       !TransToAdmin.hasAddedAdministratorsInGroup(groupId)">
       {{ transfersErrors.ownersMustBeDeceasedAndAdminAdded }}
     </span>
