@@ -1,5 +1,6 @@
 import { ApiTransferTypes } from '@/enums'
 
+/* eslint-disable max-len */
 export const transfersErrors = {
   ownersMustBeDeceased: 'All owners must be deceased.',
 
@@ -15,11 +16,11 @@ export const transfersErrors = {
 
   noSupportingDocSelected: {
     [ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL]:
-      'You must delete a deceased owner using Grant of Probate with Will before adding an executor',
+      'You must delete a deceased owner using Grant of Probate with Will, or delete an executor, before adding an executor',
     [ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL]:
-      'You must delete a deceased owner using Affidavit of Executor before adding an executor',
+      'You must delete a deceased owner using Grant of Probate with Will, or delete an executor, before adding an executor',
     [ApiTransferTypes.TO_ADMIN_NO_WILL]:
-      'You must delete a deceased owner using Grant of Administration before adding an administrator'
+      'You must delete a deceased owner using Grant of Administration, or delete an administrator, before adding an administrator'
   },
   declaredHomeValueMax: {
     [ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL]:
