@@ -553,18 +553,18 @@ export default defineComponent({
       hasMixedOwnersInGroup(groupId) && localState.reviewedOwners &&
       !localState.showTableError && !props.isReadonlyTable
 
-    const isInvalidTransferOwnerGroup = (groupId: number, hasAdminOrExecInGroup: boolean) => {
+    const isInvalidTransferOwnerGroup = (groupId: number, hasExecOrAdminInGroup: boolean) => {
       if (props.validateTransfer && !hasUnsavedChanges.value) return false
 
       const hasRemovedOwners = TransToExec.hasSomeOwnersRemoved(groupId)
       // groups that are not edited are valid
-      if (!hasRemovedOwners && !hasAdminOrExecInGroup) return false
+      if (!hasRemovedOwners && !hasExecOrAdminInGroup) return false
 
       const hasRemovedAllOwners = TransToExec.hasAllCurrentOwnersRemoved(groupId)
       const hasValidDocs = TransToExec.hasOwnersWithValidSupportDocs(groupId)
       const hasOwnersWithoutDeathCert = !TransToExec.isAllGroupOwnersWithDeathCerts(groupId)
 
-      return !(hasRemovedAllOwners && hasValidDocs && hasOwnersWithoutDeathCert && hasAdminOrExecInGroup)
+      return !(hasRemovedAllOwners && hasValidDocs && hasOwnersWithoutDeathCert && hasExecOrAdminInGroup)
     }
 
     // check if Owner Group that has deceased Owners is valid
@@ -576,11 +576,11 @@ export default defineComponent({
       if ((isTransferToExecutorProbateWill.value ||
           isTransferToExecutorUnder25Will.value ||
           isTransferToAdminNoWill.value)) {
-        const hasAdminOrExecInGroup = isTransferToAdminNoWill.value
+        const hasExecOrAdminInGroup = isTransferToAdminNoWill.value
           ? TransToAdmin.hasAddedAdministratorsInGroup(groupId)
           : TransToExec.hasAddedExecutorsInGroup(groupId)
 
-        return isInvalidTransferOwnerGroup(groupId, hasAdminOrExecInGroup)
+        return isInvalidTransferOwnerGroup(groupId, hasExecOrAdminInGroup)
       }
 
       return !isValidDeceasedOwnerGroup(groupId) && !localState.showTableError

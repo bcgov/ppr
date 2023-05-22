@@ -80,6 +80,16 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     ].includes(getMhrTransferType.value?.transferType)
   })
 
+  /** Returns true when the selected transfer involves Executors or Administrators **/
+  const isTransferToExecOrAdmin = computed((): boolean => {
+    return [
+      // transfers to Executors or Administrators
+      ApiTransferTypes.TO_ADMIN_NO_WILL,
+      ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL,
+      ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL
+    ].includes(getMhrTransferType.value?.transferType)
+  })
+
   const isRemovedHomeOwnerGroup = (group: MhrHomeOwnerGroupIF): boolean => {
     return group.action === ActionTypes.REMOVED
   }
@@ -426,11 +436,13 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
         supportingDocument: supportingDocOfTheTransferType
       }) as MhrRegistrationHomeOwnerIF
 
+      const { first, middle, last } = deletedOwner.individualName
+
       Object.assign(owner, {
         ownerId: allOwners.length + 1,
         suffix: deletedOwner.organizationName?.length > 0
           ? transferOwnerPrefillAdditionalName[transferType] + deletedOwner.organizationName
-          : transferOwnerPrefillAdditionalName[transferType] + Object.values(deletedOwner.individualName).join(' '),
+          : transferOwnerPrefillAdditionalName[transferType] + [first, middle, last].filter(Boolean).join(' '),
         partyType: transferOwnerPartyTypes[transferType],
         groupId: deletedOwnerGroup.groupId // new Owner will be added to the same group as deleted Owner
       } as MhrRegistrationHomeOwnerIF)
@@ -463,8 +475,9 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
           owner.action === ActionTypes.ADDED)
 
       if (allExecutors.length === 1 && owner !== null) {
+        const { first, middle, last } = owner.individualName
         const suffix = owner.individualName
-          ? transferOwnerPrefillAdditionalName[transferType] + Object.values(owner.individualName).join(' ')
+          ? transferOwnerPrefillAdditionalName[transferType] + [first, middle, last].filter(Boolean).join(' ')
           : transferOwnerPrefillAdditionalName[transferType] + owner.organizationName
         allExecutors[0].suffix = suffix
         showSuffixError = false
@@ -639,6 +652,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     isCurrentOwner,
     getMhrTransferType,
     isTransferDueToDeath,
+    isTransferToExecOrAdmin,
     isTransferDueToSaleOrGift,
     isTransferToSurvivingJointTenant,
     isTransferToExecutorProbateWill,

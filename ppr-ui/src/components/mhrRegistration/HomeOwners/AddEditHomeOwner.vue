@@ -471,6 +471,7 @@ export default defineComponent({
       isTransferDueToSaleOrGift,
       hasCurrentOwnerChanges,
       disableNameFields,
+      isTransferToExecOrAdmin,
       TransToExec,
       TransAffidavit
     } = useTransferOwners()
@@ -516,7 +517,7 @@ export default defineComponent({
     }
 
     // Transfers flow: Pre-fill suffix and type for new owners (not when editing existing owner)
-    if (props.isMhrTransfer && !props.editHomeOwner &&
+    if (props.isMhrTransfer && isTransferToExecOrAdmin.value && !props.editHomeOwner &&
       TransToExec.hasDeletedOwnersWithProbateGrantOrAffidavit()) {
       TransToExec.prefillOwnerAsExecOrAdmin(defaultHomeOwner)
     }
