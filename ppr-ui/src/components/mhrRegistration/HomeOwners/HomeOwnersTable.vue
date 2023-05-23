@@ -435,18 +435,15 @@ export default defineComponent({
       deleteGroup,
       isGlobalEditingMode,
       setGlobalEditingMode,
-      hasEmptyGroup,
       hasMinimumGroups,
       editHomeOwner,
       getGroupById,
       undoGroupChanges,
-      getHomeTenancyType,
       getGroupNumberById,
       hasMixedOwnersInAGroup,
       hasMixedOwnersInGroup,
       hasRemovedAllHomeOwners,
       hasRemovedAllHomeOwnerGroups,
-      hasUndefinedGroupInterest,
       getTotalOwnershipAllocationStatus,
       getTransferOrRegistrationHomeOwners,
       getTransferOrRegistrationHomeOwnerGroups
@@ -512,17 +509,13 @@ export default defineComponent({
           return props.validateTransfer && props.isMhrTransfer && !hasUnsavedChanges.value
         }
 
-        const groups = getTransferOrRegistrationHomeOwnerGroups()
-
         return ((props.validateTransfer || (!props.isMhrTransfer && localState.reviewedOwners)) &&
           (
             !hasMinimumGroups() ||
-            hasEmptyGroup.value ||
             (props.isMhrTransfer && !hasUnsavedChanges.value) ||
             !localState.isValidAllocation ||
             localState.hasGroupsWithNoOwners ||
-            (!localState.isUngroupedTenancy && hasUndefinedGroupInterest(groups)) ||
-            (hasMixedOwnersInAGroup() && groups[0].groupId === 0)
+            (hasMixedOwnersInAGroup() && !showGroups.value)
           )
         )
       }),
@@ -541,10 +534,7 @@ export default defineComponent({
         return groups.some(group => group.owners.filter(owner => owner.action !== ActionTypes.REMOVED).length === 0)
       }),
       isValidAllocation: computed((): boolean => {
-        return localState.isUngroupedTenancy || !getTotalOwnershipAllocationStatus().hasTotalAllocationError
-      }),
-      isUngroupedTenancy: computed((): boolean => {
-        return [HomeTenancyTypes.SOLE, HomeTenancyTypes.JOINT].includes(getHomeTenancyType())
+        return !showGroups.value || !getTotalOwnershipAllocationStatus().hasTotalAllocationError
       }),
       getPartyTypeForActiveTransfer: computed(() => transferOwnerPartyTypes[getMhrTransferType.value?.transferType])
     })
@@ -786,7 +776,6 @@ export default defineComponent({
       openForEditing,
       isCurrentlyEditing,
       showGroups,
-      hasEmptyGroup,
       hasActualOwners,
       remove,
       deleteGroup,
