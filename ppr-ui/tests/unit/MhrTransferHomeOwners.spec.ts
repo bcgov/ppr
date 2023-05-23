@@ -720,7 +720,7 @@ describe('Home Owners', () => {
     // check error message under the Add a Person button
     expect(homeOwners.find(getTestId('transfer-table-error')).exists()).toBeTruthy()
     expect(homeOwners.find(getTestId('transfer-table-error')).text())
-      .toContain('You must delete a deceased owner using Grant of Probate with Will before adding an executor')
+      .toContain(transfersErrors.noSupportingDocSelected[TRANSFER_TYPE])
 
     const supportingDocuments = wrapper.findComponent(SupportingDocuments)
 
