@@ -168,8 +168,10 @@ export const useNewMhrRegistration = () => {
    */
   const initDraftMhr = async (draft: MhrRegistrationIF): Promise<void> => {
     // Set description
-    for (const [key, val] of Object.entries(draft.description)) {
-      setMhrHomeDescription({ key: key, value: val })
+    for (const [key, val] of Object.entries(initNewMhr().description)) {
+      draft.description[key]
+        ? setMhrHomeDescription({ key: key, value: draft.description[key] })
+        : setMhrHomeDescription({ key: key, value: val }) // set missing description values to default
     }
     // Set Submitting Party
     setMhrRegistrationSubmittingParty(draft.submittingParty)
