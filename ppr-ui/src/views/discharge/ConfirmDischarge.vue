@@ -151,33 +151,20 @@ export default defineComponent({
     const route = useRoute()
     const router = useRouter()
     const {
+      // Getters
       getStateModel,
       isRoleStaffBcol,
       getConfirmDebtorName,
       getRegistrationType,
-      getAddSecuredPartiesAndDebtors
-    } = useGetters([
-      'getStateModel',
-      'isRoleStaffBcol',
-      'getConfirmDebtorName',
-      'getRegistrationType',
-      'getAddSecuredPartiesAndDebtors'
-    ])
-    const {
+      getAddSecuredPartiesAndDebtors,
+      // Actions
       setRegTableNewItem,
       setRegistrationType,
       setRegistrationNumber,
       setRegistrationExpiryDate,
       setRegistrationCreationDate,
       setAddSecuredPartiesAndDebtors
-    } = useActions([
-      'setRegTableNewItem',
-      'setRegistrationType',
-      'setRegistrationNumber',
-      'setRegistrationExpiryDate',
-      'setRegistrationCreationDate',
-      'setAddSecuredPartiesAndDebtors'
-    ])
+    } = useStore()
 
     const localState = reactive({
       cautionTxt: 'The Registry will provide the verification statement to all Secured Parties named in this ' +
@@ -207,10 +194,10 @@ export default defineComponent({
         return (route.query['reg-num'] as string) || ''
       }),
       registrationTypeUI: computed((): UIRegistrationTypes => {
-        return getRegistrationType.value?.registrationTypeUI || null
+        return getRegistrationType?.registrationTypeUI || null
       }),
       registrationType: computed((): APIRegistrationTypes => {
-        return getRegistrationType.value?.registrationTypeAPI || null
+        return getRegistrationType?.registrationTypeAPI || null
       }),
       stickyComponentErrMsg: computed((): string => {
         if ((!localState.validConfirm || !localState.validFolio) && localState.showErrors) {
@@ -225,7 +212,7 @@ export default defineComponent({
     })
 
     const loadRegistration = async (): Promise<void> => {
-      if (!localState.registrationNumber || !getConfirmDebtorName.value) {
+      if (!localState.registrationNumber || !getConfirmDebtorName) {
         if (!localState.registrationNumber) {
           console.error('No registration number given to discharge. Redirecting to dashboard...')
         } else {
@@ -335,7 +322,7 @@ export default defineComponent({
         return
       }
 
-      const stateModel: StateModelIF = getStateModel.value
+      const stateModel: StateModelIF = getStateModel
       localState.submitting = true
       const apiResponse: DischargeRegistrationIF = await saveDischarge(stateModel)
       localState.submitting = false
@@ -363,7 +350,7 @@ export default defineComponent({
     }
 
     const setShowWarning = (): void => {
-      const parties = getAddSecuredPartiesAndDebtors.value
+      const parties = getAddSecuredPartiesAndDebtors
       localState.showRegMsg = parties.registeringParty?.action === ActionTypes.EDITED
     }
 

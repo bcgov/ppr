@@ -198,7 +198,7 @@ export default defineComponent({
       () => props.autoCompleteItems,
       (items: Array<any>) => {
         localState.autoCompleteResults = items
-        localState.autoCompleteIsActive = !!items;
+        localState.autoCompleteIsActive = !!items
       },
       { immediate: true, deep: true }
     )

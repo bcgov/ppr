@@ -12,11 +12,7 @@ export const useParty = () => {
   }
 
   const isBusiness = (party: PartyIF): boolean => {
-    if (party.businessName) {
-      return true
-    } else {
-      return false
-    }
+    return !!party.businessName
   }
 
   const getFormattedBirthdate = (party: PartyIF): string => {

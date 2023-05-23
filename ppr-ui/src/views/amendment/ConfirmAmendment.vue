@@ -164,7 +164,6 @@
 import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router/composables'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
-// local components
 import {
   CautionBox,
   CourtOrder,
@@ -248,6 +247,7 @@ export default defineComponent({
     const route = useRoute()
     const router = useRouter()
     const {
+      // Getters
       getStateModel,
       getLengthTrust,
       isRoleStaffBcol,
@@ -261,24 +261,8 @@ export default defineComponent({
       getRegistrationNumber,
       getAmendmentDescription,
       getCourtOrderInformation,
-      getAddSecuredPartiesAndDebtors
-    } = useGetters<any>([
-      'getStateModel',
-      'getLengthTrust',
-      'isRoleStaffBcol',
-      'isRoleStaffReg',
-      'isRoleStaffSbc',
-      'getAddCollateral',
-      'hasUnsavedChanges',
-      'getRegistrationType',
-      'getConfirmDebtorName',
-      'getCertifyInformation',
-      'getRegistrationNumber',
-      'getAmendmentDescription',
-      'getCourtOrderInformation',
-      'getAddSecuredPartiesAndDebtors'
-    ])
-    const {
+      getAddSecuredPartiesAndDebtors,
+      // Actions
       setUnsavedChanges,
       setRegTableNewItem,
       setRegistrationType,
@@ -286,15 +270,8 @@ export default defineComponent({
       setRegistrationExpiryDate,
       setRegistrationCreationDate,
       setAddSecuredPartiesAndDebtors
-    } = useActions<any>([
-      'setUnsavedChanges',
-      'setRegTableNewItem',
-      'setRegistrationType',
-      'setRegistrationNumber',
-      'setRegistrationExpiryDate',
-      'setRegistrationCreationDate',
-      'setAddSecuredPartiesAndDebtors'
-    ])
+    } = useStore()
+
     const localState = reactive({
       collateralSummary: '',
       dataLoaded: false,
@@ -330,25 +307,25 @@ export default defineComponent({
         return (route.query['reg-num'] as string) || ''
       }),
       registrationTypeUI: computed((): UIRegistrationTypes => {
-        return getRegistrationType.value?.registrationTypeUI || null
+        return getRegistrationType?.registrationTypeUI || null
       }),
       registrationType: computed((): APIRegistrationTypes => {
-        return getRegistrationType.value?.registrationTypeAPI || null
+        return getRegistrationType?.registrationTypeAPI || null
       }),
       registrationLength: computed((): RegistrationLengthI => {
         return {
-          lifeInfinite: getLengthTrust.value?.lifeInfinite || false,
-          lifeYears: getLengthTrust.value?.lifeYears || 0
+          lifeInfinite: getLengthTrust?.lifeInfinite || false,
+          lifeYears: getLengthTrust?.lifeYears || 0
         }
       }),
       showDescription: computed((): boolean => {
-        return !!getAmendmentDescription.value
+        return !!getAmendmentDescription
       }),
       currentRegNumber: computed((): string => {
-        return getRegistrationNumber.value || ''
+        return getRegistrationNumber || ''
       }),
       showCourtOrder: computed((): boolean => {
-        const courtOrder: CourtOrderIF = getCourtOrderInformation.value
+        const courtOrder: CourtOrderIF = getCourtOrderInformation
         return courtOrder &&
           (
             courtOrder?.courtName.length > 0 ||
@@ -359,11 +336,11 @@ export default defineComponent({
           )
       }),
       showLengthTrustIndenture: computed((): boolean => {
-        const lengthTrust: LengthTrustIF = getLengthTrust.value
+        const lengthTrust: LengthTrustIF = getLengthTrust
         return !!lengthTrust.action
       }),
       showSecuredParties: computed((): boolean => {
-        const parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
+        const parties: AddPartiesIF = getAddSecuredPartiesAndDebtors
         for (let i = 0; i < parties.securedParties.length; i++) {
           if (parties.securedParties[i].action) {
             return true
@@ -373,7 +350,7 @@ export default defineComponent({
       }),
 
       showDebtors: computed((): boolean => {
-        const parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
+        const parties: AddPartiesIF = getAddSecuredPartiesAndDebtors
         for (let i = 0; i < parties.debtors.length; i++) {
           if (parties.debtors[i].action) {
             return true
@@ -382,7 +359,7 @@ export default defineComponent({
         return false
       }),
       showVehicleCollateral: computed((): boolean => {
-        const addCollateral:AddCollateralIF = getAddCollateral.value
+        const addCollateral:AddCollateralIF = getAddCollateral
         if (!addCollateral.vehicleCollateral) {
           return false
         }
@@ -394,7 +371,7 @@ export default defineComponent({
         return false
       }),
       showGeneralCollateral: computed((): boolean => {
-        const addCollateral:AddCollateralIF = getAddCollateral.value
+        const addCollateral:AddCollateralIF = getAddCollateral
         if (!addCollateral.generalCollateral) {
           return false
         }
@@ -406,15 +383,15 @@ export default defineComponent({
         return false
       }),
       collateralValid: computed((): boolean => {
-        const addCollateral:AddCollateralIF = getAddCollateral.value
+        const addCollateral:AddCollateralIF = getAddCollateral
         return (addCollateral.valid || (!localState.showGeneralCollateral && !localState.showVehicleCollateral))
       }),
       partiesValid: computed((): boolean => {
-        const parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
+        const parties: AddPartiesIF = getAddSecuredPartiesAndDebtors
         return (parties.valid || (!localState.showSecuredParties && !localState.showDebtors))
       }),
       courtOrderValid: computed((): boolean => {
-        const courtOrder: CourtOrderIF = getCourtOrderInformation.value
+        const courtOrder: CourtOrderIF = getCourtOrderInformation
         return (!courtOrder ||
           (courtOrder.courtName.length === 0 &&
             courtOrder.courtRegistry.length === 0 &&
@@ -428,7 +405,7 @@ export default defineComponent({
             courtOrder.effectOfOrder.length > 0))
       }),
       certifyInformationValid: computed((): boolean => {
-        return getCertifyInformation.value.valid
+        return getCertifyInformation.valid
       }),
       stickyComponentErrMsg: computed((): string => {
         if ((!localState.validFolio || !localState.courtOrderValid) && localState.showErrors) {
@@ -446,7 +423,7 @@ export default defineComponent({
     })
 
     const cancel = (): void => {
-      if (hasUnsavedChanges.value) localState.showCancelDialog = true
+      if (hasUnsavedChanges) localState.showCancelDialog = true
       else goToDashboard()
     }
 
@@ -478,7 +455,7 @@ export default defineComponent({
     }
 
     const loadRegistration = async (): Promise<void> => {
-      if (!localState.registrationNumber || !getConfirmDebtorName.value) {
+      if (!localState.registrationNumber || !getConfirmDebtorName) {
         if (!localState.registrationNumber) {
           console.error('No registration number this amendment. Redirecting to dashboard...')
         } else {
@@ -543,7 +520,7 @@ export default defineComponent({
     }
 
     const setShowWarning = (): void => {
-      const parties = getAddSecuredPartiesAndDebtors.value
+      const parties = getAddSecuredPartiesAndDebtors
       localState.showRegMsg = parties.registeringParty?.action === ActionTypes.EDITED
     }
 
@@ -566,7 +543,7 @@ export default defineComponent({
     }
 
     const saveDraft = async (): Promise<void> => {
-      const stateModel: StateModelIF = getStateModel.value
+      const stateModel: StateModelIF = getStateModel
       localState.submitting = true
       const draft: DraftIF = await saveAmendmentStatementDraft(stateModel)
       localState.submitting = false
@@ -596,7 +573,7 @@ export default defineComponent({
         scrollToInvalid()
         return
       }
-      if ((isRoleStaffReg.value) || (isRoleStaffSbc.value)) {
+      if ((isRoleStaffReg) || (isRoleStaffSbc)) {
         localState.staffPaymentDialogDisplay = true
       } else {
         submitAmendment()
@@ -606,7 +583,7 @@ export default defineComponent({
     const submitAmendment = async (): Promise<void> => {
       // Incomplete validation check: all changes must be valid to submit registration.
       if (localState.collateralValid && localState.partiesValid && localState.courtOrderValid) {
-        const stateModel: StateModelIF = getStateModel.value
+        const stateModel: StateModelIF = getStateModel
         localState.submitting = true
         const apiResponse: AmendmentStatementIF = await saveAmendmentStatement(stateModel)
         localState.submitting = false

@@ -230,17 +230,15 @@ export default defineComponent({
   setup (props) {
     const {
       getLengthTrust, isRoleStaff, getStaffPayment, isSearchCertified
-    } = useGetters<any>([
-      'getLengthTrust', 'isRoleStaff', 'getStaffPayment', 'isSearchCertified'
-    ])
+    } = useStore()
     const localState = reactive({
       feeType: props.setFeeType,
       registrationType: props.setRegistrationType,
-      hasPriorityFee: computed((): Boolean => getStaffPayment.value?.isPriority),
-      hasCertifyFee: computed((): Boolean => isSearchCertified.value),
+      hasPriorityFee: computed((): Boolean => getStaffPayment?.isPriority),
+      hasCertifyFee: computed((): Boolean => isSearchCertified),
       registrationLength: computed((): RegistrationLengthI => props.setRegistrationLength),
       isValid: computed((): boolean => {
-        return getLengthTrust.value.valid ||
+        return getLengthTrust.valid ||
           [FeeSummaryTypes.MHSEARCH, FeeSummaryTypes.NEW_MHR, FeeSummaryTypes.MHR_TRANSFER].includes(localState.feeType)
       }),
       isPPRFee: computed((): boolean => {
@@ -265,7 +263,7 @@ export default defineComponent({
           localState.feeType,
           localState.registrationType,
           localState.registrationLength,
-          isRoleStaff.value,
+          isRoleStaff,
           props.setStaffClientPayment
         )
         if (props.setFeeQuantity) {
@@ -287,7 +285,7 @@ export default defineComponent({
           props.additionalFees?.feeType,
           props.additionalFees?.registrationType,
           props.additionalFees?.registrationLength,
-          isRoleStaff.value,
+          isRoleStaff,
           props.setStaffClientPayment
         )
         if (props.additionalFees?.quantity) {
@@ -323,7 +321,7 @@ export default defineComponent({
           if (localState.hasProcessingFee) {
             extraFee = localState.feeSummary.processingFee
           }
-          if (getStaffPayment.value?.isPriority) {
+          if (getStaffPayment?.isPriority) {
             extraFee = extraFee + 100
           }
           if (localState.hasCertifyFee) {

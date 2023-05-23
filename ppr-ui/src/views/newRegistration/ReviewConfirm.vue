@@ -152,35 +152,22 @@ export default defineComponent({
   setup (props, context) {
     const router = useRouter()
     const {
+      // Getters
       getAddCollateral,
       getLengthTrust,
       hasUnsavedChanges,
       getRegistrationOther,
       getRegistrationType,
       getRegistrationFlowType,
-      getAddSecuredPartiesAndDebtors
-    } = useGetters([
-      'getAddCollateral',
-      'getLengthTrust',
-      'hasUnsavedChanges',
-      'getRegistrationOther',
-      'getRegistrationType',
-      'getRegistrationFlowType',
-      'getAddSecuredPartiesAndDebtors'
-    ])
-    const {
+      getAddSecuredPartiesAndDebtors,
+      // Actions
       setLengthTrust,
       setAddCollateral,
       setShowStepErrors,
       setUnsavedChanges,
       setAddSecuredPartiesAndDebtors
-    } = useActions([
-      'setLengthTrust',
-      'setAddCollateral',
-      'setShowStepErrors',
-      'setUnsavedChanges',
-      'setAddSecuredPartiesAndDebtors'
-    ])
+    } = useStore()
+
     const localState = reactive({
       dataLoaded: false,
       feeType: FeeSummaryTypes.NEW,
@@ -194,18 +181,18 @@ export default defineComponent({
       }),
       registrationLength: computed((): RegistrationLengthI => {
         return {
-          lifeInfinite: getLengthTrust.value?.lifeInfinite || false,
-          lifeYears: getLengthTrust.value?.lifeYears || 0
+          lifeInfinite: getLengthTrust?.lifeInfinite || false,
+          lifeYears: getLengthTrust?.lifeYears || 0
         }
       }),
       registrationTypeUI: computed((): string => {
-        if (getRegistrationType.value?.registrationTypeAPI === APIRegistrationTypes.OTHER) {
-          return getRegistrationOther.value || ''
+        if (getRegistrationType?.registrationTypeAPI === APIRegistrationTypes.OTHER) {
+          return getRegistrationOther || ''
         }
-        return getRegistrationType.value?.registrationTypeUI || ''
+        return getRegistrationType?.registrationTypeUI || ''
       }),
       registrationType: computed((): APIRegistrationTypes => {
-        return getRegistrationType.value?.registrationTypeAPI || ''
+        return getRegistrationType?.registrationTypeAPI || ''
       })
     })
 
@@ -225,24 +212,24 @@ export default defineComponent({
         return
       }
       // redirect if store doesn't contain all needed data (happens on page reload, etc.)
-      if (!getRegistrationType.value || getRegistrationFlowType.value !== RegistrationFlowType.NEW) {
+      if (!getRegistrationType || getRegistrationFlowType !== RegistrationFlowType.NEW) {
         router.push({
           name: RouteNames.DASHBOARD
         })
         return
       }
-      const unsavedChanges = hasUnsavedChanges.value
-      const collateral = getAddCollateral.value
+      const unsavedChanges = hasUnsavedChanges
+      const collateral = getAddCollateral
       if (!collateral.valid) {
         collateral.showInvalid = true
         setAddCollateral(collateral)
       }
-      const lengthTrust = getLengthTrust.value
+      const lengthTrust = getLengthTrust
       if (!lengthTrust.valid) {
         lengthTrust.showInvalid = true
         setLengthTrust(lengthTrust)
       }
-      const parties = getAddSecuredPartiesAndDebtors.value
+      const parties = getAddSecuredPartiesAndDebtors
       if (!parties.valid) {
         parties.showInvalid = true
         setAddSecuredPartiesAndDebtors(parties)
@@ -311,8 +298,8 @@ export default defineComponent({
   body {
     overflow: auto;
     height: auto;
-    -webkit-print-color-adjust: exact !important;   /* Chrome, Safari, Edge */
-    color-adjust: exact !important;                 /*Firefox*/
+    -webkit-print-print-color-adjust: exact !important;   /* Chrome, Safari, Edge */
+    print-color-adjust: exact !important;                 /*Firefox*/
   }
   ::v-deep .v-data-table__wrapper {
     overflow: visible;

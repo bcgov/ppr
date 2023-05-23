@@ -53,7 +53,6 @@
   </v-row>
 </template>
 <script lang="ts">
-// external
 import {
   computed,
   defineComponent,
@@ -63,7 +62,6 @@ import {
 } from 'vue'
 import { useStore } from '@/store/store'
 import { tombstoneTitles } from '@/resources'
-// local
 import { pacificDate, getRoleProductCode } from '@/utils'
 
 export default defineComponent({
@@ -78,38 +76,29 @@ export default defineComponent({
       isRoleStaffSbc,
       getUserRoles,
       getUserProductSubscriptionsCodes
-    } = useGetters<any>([
-      'getAccountLabel',
-      'getUserFirstName',
-      'getUserLastName',
-      'isRoleStaff',
-      'isRoleStaffBcol',
-      'isRoleStaffSbc',
-      'getUserRoles',
-      'getUserProductSubscriptionsCodes'
-    ])
+    } = useStore()
     const localState = reactive({
       userName: computed((): string => {
-        return `${getUserFirstName.value} ${getUserLastName.value}`
+        return `${getUserFirstName} ${getUserLastName}`
       }),
       date: '',
       header: computed((): string => {
-        return tombstoneTitles[getRoleProductCode(getUserRoles.value, getUserProductSubscriptionsCodes.value)]
+        return tombstoneTitles[getRoleProductCode(getUserRoles, getUserProductSubscriptionsCodes)]
       }),
       isStaff: computed((): boolean => {
-        return isRoleStaff.value
+        return isRoleStaff
       }),
       isStaffBcol: computed((): boolean => {
-        return isRoleStaffBcol.value
+        return isRoleStaffBcol
       }),
       isStaffSbc: computed((): boolean => {
-        return isRoleStaffSbc.value
+        return isRoleStaffSbc
       }),
       accountName: computed((): string => {
         if (localState.isStaffBcol) return 'BC Online Help'
         if (localState.isStaffSbc) return 'SBC Staff'
         if (localState.isStaff) return 'BC Registries Staff'
-        return getAccountLabel.value
+        return getAccountLabel
       })
     })
     onMounted(() => {

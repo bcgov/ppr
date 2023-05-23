@@ -89,16 +89,14 @@ export default defineComponent({
   setup () {
     const {
       getMhrRegistrationValidationModel
-    } = useGetters<any>([
-      'getMhrRegistrationValidationModel'
-    ])
+    } = useStore()
 
     const {
       MhrCompVal,
       MhrSectVal,
       getSectionValidation,
       scrollToInvalid
-    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
+    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel))
 
     const localState = reactive({
       validateMakeModel: computed(() => {

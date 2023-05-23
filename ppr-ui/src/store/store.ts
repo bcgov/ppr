@@ -512,6 +512,9 @@ export const useStore = defineStore('state', () => {
     // Current state is to verify the property exists. Future state may be more granular dependent on type.
     return !!state.value.mhrInformation.lienRegistrationType
   })
+  const getMhrRegistrationOwnLand = computed<boolean>(() => {
+    return state.value.mhrRegistration.ownLand
+  })
 
   /** MHR Getters **/
   const mhrInfoValidation = computed(() => {
@@ -937,6 +940,10 @@ export const useStore = defineStore('state', () => {
   function setMhrTransferAffidavitCompleted (isAffidavitCompleted: boolean) {
     state.value.mhrTransfer.isAffidavitTransferCompleted = isAffidavitCompleted
   }
+  function setMhrRegistrationOwnLand (ownLand: boolean) {
+    state.value.mhrRegistration.ownLand = ownLand
+    setUnsavedChanges(true)
+  }
 
   return {
     // User-related getters
@@ -1068,6 +1075,7 @@ export const useStore = defineStore('state', () => {
     getMhrRegistrationHomeOwnerGroups,
     getMhrRegistrationValidationModel,
     getMhrInformation,
+    getMhrRegistrationOwnLand,
 
     // Lien-related getter
     hasLien,
@@ -1167,6 +1175,7 @@ export const useStore = defineStore('state', () => {
     setCivicAddress,
     setMhrRegistrationHomeOwnerGroups,
     setMhrTableHistory,
+    setMhrRegistrationOwnLand,
 
     // MHR Information
     setMhrInformation,

@@ -387,6 +387,7 @@ export default defineComponent({
   setup (props, context) {
     const router = useRouter()
     const {
+      // Getters
       getMhrTransferHomeOwners,
       getMhrInformation,
       getMhrTransferCurrentHomeOwnerGroups,
@@ -399,24 +400,8 @@ export default defineComponent({
       getMhrTransferDeclaredValue,
       getMhrInfoValidation,
       getMhrAttentionReferenceNum,
-      getMhrTransferSubmittingParty
-    } = useGetters<any>([
-      'getMhrTransferHomeOwners',
-      'getMhrInformation',
-      'getMhrTransferCurrentHomeOwnerGroups',
-      'getCertifyInformation',
-      'hasUnsavedChanges',
-      'hasLien',
-      'isRoleStaffReg',
-      'isRoleQualifiedSupplier',
-      'getMhrTransferType',
-      'getMhrTransferDeclaredValue',
-      'getMhrInfoValidation',
-      'getMhrAttentionReferenceNum',
-      'getMhrTransferSubmittingParty'
-    ])
-
-    const {
+      getMhrTransferSubmittingParty,
+      // Actions
       setMhrStatusType,
       setMhrTransferSubmittingParty,
       setMhrTransferAttentionReference,
@@ -429,22 +414,7 @@ export default defineComponent({
       setMhrTransferDeclaredValue,
       setEmptyMhrTransfer,
       setStaffPayment
-    } = useActions<any>([
-      'setMhrStatusType',
-      'setMhrTransferSubmittingParty',
-      'setMhrTransferAttentionReference',
-      'setUnsavedChanges',
-      'setRegTableNewItem',
-      'setSearchedType',
-      'setManufacturedHomeSearchResults',
-      'setLienType',
-      'setMhrTransferType',
-      'setMhrTransferDeclaredValue',
-      'setEmptyMhrTransfer',
-      'setStaffPayment'
-    ])
-
-    // Composable Instances
+    } = useStore()
     const {
       isFrozenMhr,
       buildApiData,
@@ -461,7 +431,7 @@ export default defineComponent({
       isValidTransferReview,
       scrollToFirstError,
       resetValidationState
-    } = useMhrInfoValidation(getMhrInfoValidation.value)
+    } = useMhrInfoValidation(getMhrInfoValidation)
     const {
       setGlobalEditingMode
     } = useHomeOwners(true)
@@ -492,20 +462,20 @@ export default defineComponent({
         folioNumber: '',
         isPriority: false
       },
-      showTransferType: !!getMhrInformation.value.draftNumber || isFrozenMhr.value || false,
-      attentionReference: getMhrAttentionReferenceNum.value || '',
+      showTransferType: !!getMhrInformation.draftNumber || isFrozenMhr.value || false,
+      attentionReference: getMhrAttentionReferenceNum || '',
       cancelOptions: unsavedChangesDialog,
       showCancelDialog: false,
       showCancelChangeDialog: false,
       showStartTransferRequiredDialog: false,
       transferRequiredDialogOptions: computed((): DialogOptionsIF => {
         transferRequiredDialog.text =
-          transferRequiredDialog.text.replace('mhr_number', getMhrInformation.value.mhrNumber)
+          transferRequiredDialog.text.replace('mhr_number', getMhrInformation.mhrNumber)
         return transferRequiredDialog
       }),
       hasTransferChanges: computed((): boolean => {
         return localState.showTransferType &&
-          (hasUnsavedChanges.value || !!getMhrTransferDeclaredValue.value || !!getMhrTransferType.value)
+          (hasUnsavedChanges || !!getMhrTransferDeclaredValue || !!getMhrTransferType)
       }),
       isAuthenticated: computed((): boolean => {
         return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
@@ -526,10 +496,10 @@ export default defineComponent({
         return localState.validate && !getInfoValidation('isAuthorizationValid')
       }),
       validateStaffPayment: computed(() => {
-        return isRoleStaffReg.value && localState.validate && !getInfoValidation('isStaffPaymentValid')
+        return isRoleStaffReg && localState.validate && !getInfoValidation('isStaffPaymentValid')
       }),
       transferErrorMsg: computed((): string => {
-        if (localState.validate && hasLien.value) return '< Lien on this home is preventing transfer'
+        if (localState.validate && hasLien) return '< Lien on this home is preventing transfer'
 
         const isValidReview = localState.isReviewMode ? isValidTransferReview.value : isValidTransfer.value
         return localState.validate && !isValidReview ? '< Please complete required information' : ''
@@ -538,13 +508,13 @@ export default defineComponent({
         return localState.isReviewMode ? 'Register Changes and Pay' : 'Review and Confirm'
       }),
       reviewOwners: computed(() => {
-        return getMhrTransferHomeOwners.value.filter(owner => owner.action !== ActionTypes.REMOVED)
+        return getMhrTransferHomeOwners.filter(owner => owner.action !== ActionTypes.REMOVED)
       }),
       enableHomeOwnerChanges: computed(() => {
         return getFeatureFlag('mhr-transfer-enabled')
       }),
       attnOrRefConfig: computed((): AttnRefConfigIF => {
-        return isRoleStaffReg.value ? staffConfig : clientConfig
+        return isRoleStaffReg ? staffConfig : clientConfig
       }),
       /** True if Jest is running the code. */
       isJestRunning: computed((): boolean => {
@@ -568,9 +538,9 @@ export default defineComponent({
       // Set baseline MHR Information to state
       await parseMhrInformation(isFrozenMhr.value)
 
-      if (getMhrInformation.value.draftNumber) {
+      if (getMhrInformation.draftNumber) {
         // Retrieve draft if it exists
-        const { registration } = await getMhrDraft(getMhrInformation.value.draftNumber)
+        const { registration } = await getMhrDraft(getMhrInformation.draftNumber)
         await initDraftMhrInformation(registration as MhrTransferApiIF)
       } else if (isFrozenMhr.value) {
         setMhrTransferType({ transferType: ApiTransferTypes.SALE_OR_GIFT })
@@ -580,7 +550,7 @@ export default defineComponent({
         await setUnsavedChanges(false)
       }
 
-      if (isRoleQualifiedSupplier.value && !isRoleStaffReg.value) {
+      if (isRoleQualifiedSupplier && !isRoleStaffReg) {
         // Get Account Info from Auth to be used in Submitting Party section in Review screen
         localState.accountInfo = await getAccountInfoFromAuth() as AccountInfoIF
         parseSubmittingPartyInfo(localState.accountInfo)
@@ -644,7 +614,7 @@ export default defineComponent({
       await nextTick()
 
       // Prevent proceeding when Lien present
-      if (hasLien.value) {
+      if (hasLien) {
         await scrollToFirstError(true)
         return
       }
@@ -653,7 +623,7 @@ export default defineComponent({
       if (localState.isReviewMode) {
         // Verify no lien exists prior to submitting filing
         const regSum = !localState.isJestRunning
-          ? await getMHRegistrationSummary(getMhrInformation.value.mhrNumber, false)
+          ? await getMHRegistrationSummary(getMhrInformation.mhrNumber, false)
           : null
         if (!!regSum && !!regSum.lienRegistrationType) {
           await setLienType(regSum.lienRegistrationType)
@@ -673,7 +643,7 @@ export default defineComponent({
         const apiData: MhrTransferApiIF = await buildApiData()
         // Submit Transfer filing
         const mhrTransferFiling =
-          await submitMhrTransfer(apiData, getMhrInformation.value.mhrNumber, localState.staffPayment)
+          await submitMhrTransfer(apiData, getMhrInformation.mhrNumber, localState.staffPayment)
 
         if (!mhrTransferFiling.error) {
           // Set new filing to Reg Table
@@ -681,7 +651,7 @@ export default defineComponent({
           setUnsavedChanges(false)
           const newItem: RegTableNewItemI = {
             addedReg: mhrTransferFiling.documentId,
-            addedRegParent: getMhrInformation.value.mhrNumber,
+            addedRegParent: getMhrInformation.mhrNumber,
             addedRegSummary: null,
             prevDraft: mhrTransferFiling.documentId || ''
           }
@@ -726,15 +696,15 @@ export default defineComponent({
       localState.loading = true
       const apiData = await buildApiData(true)
 
-      const mhrTransferDraft = getMhrInformation.value.draftNumber
-        ? await updateMhrDraft(getMhrInformation.value.draftNumber, getMhrTransferType.value?.transferType, apiData)
-        : await createMhrDraft(getMhrTransferType.value?.transferType, apiData)
+      const mhrTransferDraft = getMhrInformation.draftNumber
+        ? await updateMhrDraft(getMhrInformation.draftNumber, getMhrTransferType?.transferType, apiData)
+        : await createMhrDraft(getMhrTransferType?.transferType, apiData)
 
       const newItem: RegTableNewItemI = {
         addedReg: mhrTransferDraft.draftNumber,
         addedRegParent: apiData.mhrNumber,
         addedRegSummary: null,
-        prevDraft: (getMhrInformation.value.changes && getMhrInformation.value.changes[0].documentId) || ''
+        prevDraft: (getMhrInformation.changes && getMhrInformation.changes[0].documentId) || ''
       }
       setRegTableNewItem(newItem)
 
@@ -748,7 +718,7 @@ export default defineComponent({
     }
 
     const goToDash = (): void => {
-      if (hasUnsavedChanges.value === true) localState.showCancelDialog = true
+      if (hasUnsavedChanges === true) localState.showCancelDialog = true
       else {
         setUnsavedChanges(false)
         setGlobalEditingMode(false)
@@ -849,7 +819,7 @@ export default defineComponent({
     const handleTransferTypeChange = async (transferTypeSelect: TransferTypeSelectIF): Promise<void> => {
       // Reset state until support is built for other Transfer Types
       if (localState.hasTransferChanges && transferTypeSelect?.transferType &&
-        (transferTypeSelect?.transferType !== getMhrTransferType.value?.transferType)
+        (transferTypeSelect?.transferType !== getMhrTransferType?.transferType)
       ) await resetMhrInformation()
 
       localState.showTransferChangeDialog = true
@@ -870,7 +840,7 @@ export default defineComponent({
       setValidation('isRefNumValid', isValid)
     })
 
-    watch(() => hasUnsavedChanges.value, (val: boolean) => {
+    watch(() => hasUnsavedChanges, (val: boolean) => {
       if (!val && transferDetailsComponent) {
         (transferDetailsComponent as any).clearTransferDetailsData()
       }

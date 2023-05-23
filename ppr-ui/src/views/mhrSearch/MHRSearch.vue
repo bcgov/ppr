@@ -70,9 +70,7 @@ export default defineComponent({
     const router = useRouter()
     const {
       getManufacturedHomeSearchResults
-    } = useGetters<any>([
-      'getManufacturedHomeSearchResults'
-    ])
+    } = useStore()
 
     const localState = reactive({
       loading: false,
@@ -80,7 +78,7 @@ export default defineComponent({
         return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
       }),
       totalResultsLength: computed((): number => {
-        const searchResult = getManufacturedHomeSearchResults.value
+        const searchResult = getManufacturedHomeSearchResults
         if (searchResult) {
           return searchResult.totalResultsSize
         }
@@ -94,7 +92,7 @@ export default defineComponent({
         const isSearchReportUnsaved = (
           router.currentRoute.name === RouteNames.MHRSEARCH &&
            props.appReady &&
-           !!getManufacturedHomeSearchResults.value
+           !!getManufacturedHomeSearchResults
         )
 
         if (isSearchReportUnsaved) {
@@ -129,7 +127,7 @@ export default defineComponent({
       }
 
       // if navigated here without search results redirect to the dashboard
-      if (!getManufacturedHomeSearchResults.value) {
+      if (!getManufacturedHomeSearchResults) {
         router.push({
           name: RouteNames.DASHBOARD
         })

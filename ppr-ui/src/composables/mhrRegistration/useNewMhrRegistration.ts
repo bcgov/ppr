@@ -11,13 +11,14 @@ import {
   MhrDraftIF
 } from '@/interfaces'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
-import { APIMhrTypes, APIStatusTypes, HomeTenancyTypes, HomeLocationTypes, MhApiStatusTypes } from '@/enums'
+import { APIMhrTypes, HomeTenancyTypes, HomeLocationTypes, MhApiStatusTypes } from '@/enums'
 import { createMhrDraft, getMhrDrafts, mhrRegistrationHistory, updateMhrDraft } from '@/utils'
 import { orderBy } from 'lodash'
 import { useHomeOwners } from '@/composables'
 
 export const useNewMhrRegistration = () => {
   const {
+    // Getters
     isRoleStaffReg,
     getMhrRegistrationHomeDescription,
     getMhrRegistrationSubmittingParty,
@@ -27,21 +28,9 @@ export const useNewMhrRegistration = () => {
     getMhrRegistrationHomeOwnerGroups,
     getMhrRegistrationOwnLand,
     getStaffPayment,
-    getMhrDraftNumber
-  } = useGetters<any>([
-    'isRoleStaffReg',
-    'getMhrRegistrationHomeDescription',
-    'getMhrRegistrationSubmittingParty',
-    'getMhrRegistrationDocumentId',
-    'getMhrAttentionReferenceNum',
-    'getMhrRegistrationLocation',
-    'getMhrRegistrationHomeOwnerGroups',
-    'getMhrRegistrationOwnLand',
-    'getCertifyInformation',
-    'getStaffPayment',
-    'getMhrDraftNumber'
-  ])
-  const {
+    getMhrDraftNumber,
+
+    // Actions
     setMhrLocation,
     setMhrDraftNumber,
     setMhrTableHistory,
@@ -51,17 +40,7 @@ export const useNewMhrRegistration = () => {
     setMhrRegistrationOwnLand,
     setMhrRegistrationSubmittingParty,
     setMhrRegistrationHomeOwnerGroups
-  } = useActions<any>([
-    'setMhrLocation',
-    'setMhrDraftNumber',
-    'setMhrTableHistory',
-    'setMhrHomeDescription',
-    'setMhrAttentionReferenceNum',
-    'setMhrRegistrationDocumentId',
-    'setMhrRegistrationOwnLand',
-    'setMhrRegistrationSubmittingParty',
-    'setMhrRegistrationHomeOwnerGroups'
-  ])
+  } = useStore
 
   const {
     setShowGroups,
@@ -212,7 +191,7 @@ export const useNewMhrRegistration = () => {
   }
 
   const parseSubmittingParty = () => {
-    const submittingParty = cleanEmpty(getMhrRegistrationSubmittingParty.value)
+    const submittingParty = cleanEmpty(getMhrRegistrationSubmittingParty)
 
     if (submittingParty.businessName) {
       delete submittingParty.personName
@@ -245,7 +224,7 @@ export const useNewMhrRegistration = () => {
   }
 
   const parseDescription = (): MhrRegistrationDescriptionIF => {
-    let description: MhrRegistrationDescriptionIF = getMhrRegistrationHomeDescription.value
+    let description: MhrRegistrationDescriptionIF = getMhrRegistrationHomeDescription
 
     // Apply default manufacturer
     if (!description.manufacturer) {
@@ -259,7 +238,7 @@ export const useNewMhrRegistration = () => {
   }
 
   const parseLocation = (): MhrRegistrationHomeLocationIF => {
-    const location: MhrRegistrationHomeLocationIF = cleanEmpty(getMhrRegistrationLocation.value)
+    const location: MhrRegistrationHomeLocationIF = cleanEmpty(getMhrRegistrationLocation)
     // location is always in BC
     location.address.country = 'CA'
     location.address.region = 'BC'
@@ -279,7 +258,7 @@ export const useNewMhrRegistration = () => {
 
   // Staff Payment will be submitted as request parameters
   const parseStaffPayment = () => {
-    const staffPayment = Object.create(cleanEmpty(getStaffPayment.value) as StaffPaymentIF)
+    const staffPayment = Object.create(cleanEmpty(getStaffPayment) as StaffPaymentIF)
 
     // do not need this in the request param
     delete staffPayment.option
@@ -301,17 +280,17 @@ export const useNewMhrRegistration = () => {
       ownerGroups: parseOwnerGroups(),
       location: parseLocation(),
       description: parseDescription(),
-      ...(isRoleStaffReg.value && !!getStaffPayment.value && {
-        clientReferenceId: getStaffPayment.value.folioNumber
+      ...(isRoleStaffReg && !!getStaffPayment && {
+        clientReferenceId: getStaffPayment.folioNumber
       })
     }
 
-    if (getMhrAttentionReferenceNum.value) {
-      data.attentionReference = getMhrAttentionReferenceNum.value
+    if (getMhrAttentionReferenceNum) {
+      data.attentionReference = getMhrAttentionReferenceNum
     }
 
-    if (getMhrDraftNumber.value) {
-      data.draftNumber = getMhrDraftNumber.value
+    if (getMhrDraftNumber) {
+      data.draftNumber = getMhrDraftNumber
     }
 
     return data
@@ -325,8 +304,8 @@ export const useNewMhrRegistration = () => {
   }
 
   const mhrDraftHandler = async (): Promise<MhrDraftIF> => {
-    const draft = getMhrDraftNumber.value
-      ? await updateMhrDraft(getMhrDraftNumber.value, APIMhrTypes.MANUFACTURED_HOME_REGISTRATION, buildApiData())
+    const draft = getMhrDraftNumber
+      ? await updateMhrDraft(getMhrDraftNumber, APIMhrTypes.MANUFACTURED_HOME_REGISTRATION, buildApiData())
       : await createMhrDraft(APIMhrTypes.MANUFACTURED_HOME_REGISTRATION, buildApiData())
 
     // Set draftNumber to state to prevent duplicate drafts

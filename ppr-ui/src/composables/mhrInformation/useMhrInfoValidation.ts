@@ -1,8 +1,6 @@
 import { useStore } from '@/store/store'
-// @ts-ignore
 import {
   mhrInfoValidationStateIF,
-  MhrRegistrationHomeOwnerGroupIF,
   MhrRegistrationHomeOwnerIF
 } from '@/interfaces'
 import { computed } from 'vue'
@@ -14,11 +12,7 @@ export const useMhrInfoValidation = (validationState: mhrInfoValidationStateIF) 
     hasLien,
     isRoleStaffReg,
     hasUnsavedChanges
-  } = useGetters<any>([
-    'hasLien',
-    'isRoleStaffReg',
-    'hasUnsavedChanges'
-  ])
+  } = useStore()
 
   const {
     isGlobalEditingMode,
@@ -52,23 +46,23 @@ export const useMhrInfoValidation = (validationState: mhrInfoValidationStateIF) 
   /** Returns true when the Transfer is complete and valid **/
   const isValidTransfer = computed((): boolean => {
     return (
-      hasUnsavedChanges.value &&
+      hasUnsavedChanges &&
       !isGlobalEditingMode.value &&
       validationState.isValidTransferType &&
       validationState.isValidTransferOwners &&
       (isTransferDueToDeath.value || validationState.isTransferDetailsValid) &&
-      !hasLien.value
+      !hasLien
     )
   })
 
   /** Returns true when the Transfer Review is complete and valid **/
   const isValidTransferReview = computed((): boolean => {
     return (
-      (isRoleStaffReg.value ? validationState.isSubmittingPartyValid : true) &&
+      (isRoleStaffReg ? validationState.isSubmittingPartyValid : true) &&
       validationState.isRefNumValid &&
       validationState.isCompletionConfirmed &&
       validationState.isAuthorizationValid &&
-      (isRoleStaffReg.value ? validationState.isStaffPaymentValid : true)
+      (isRoleStaffReg ? validationState.isStaffPaymentValid : true)
     )
   })
 

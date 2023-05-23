@@ -99,12 +99,7 @@ export default defineComponent({
       getRegistrationType,
       getRegistrationOther,
       getRegistrationFlowType
-    } = useGetters([
-      'getLengthTrust',
-      'getRegistrationType',
-      'getRegistrationOther',
-      'getRegistrationFlowType'
-    ])
+    } = useStore()
 
     const localState = reactive({
       dataLoaded: false,
@@ -116,15 +111,15 @@ export default defineComponent({
       }),
       registrationLength: computed((): RegistrationLengthI => {
         return {
-          lifeInfinite: getLengthTrust.value?.lifeInfinite || false,
-          lifeYears: getLengthTrust.value?.lifeYears || 0
+          lifeInfinite: getLengthTrust?.lifeInfinite || false,
+          lifeYears: getLengthTrust?.lifeYears || 0
         }
       }),
       registrationTypeUI: computed((): string => {
-        if (getRegistrationType.value?.registrationTypeAPI === APIRegistrationTypes.OTHER) {
-          return getRegistrationOther.value || ''
+        if (getRegistrationType?.registrationTypeAPI === APIRegistrationTypes.OTHER) {
+          return getRegistrationOther || ''
         }
-        return getRegistrationType.value?.registrationTypeUI || ''
+        return getRegistrationType?.registrationTypeUI || ''
       })
     })
 
@@ -145,7 +140,7 @@ export default defineComponent({
       }
 
       // redirect if store doesn't contain all needed data (happens on page reload, etc.)
-      if (!getRegistrationType.value || getRegistrationFlowType.value !== RegistrationFlowType.NEW) {
+      if (!getRegistrationType || getRegistrationFlowType !== RegistrationFlowType.NEW) {
         router.push({
           name: RouteNames.DASHBOARD
         })

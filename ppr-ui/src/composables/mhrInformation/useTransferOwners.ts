@@ -29,30 +29,18 @@ import {
  */
 export const useTransferOwners = (enableAllActions: boolean = false) => {
   const {
+    // Getters
     hasUnsavedChanges,
     getMhrTransferType,
     getMhrInformation,
     getMhrTransferHomeOwners,
     getMhrTransferHomeOwnerGroups,
     getMhrTransferCurrentHomeOwnerGroups,
-    getMhrTransferAffidavitCompleted
-  } = useGetters<any>([
-    'hasUnsavedChanges',
-    'getMhrTransferType',
-    'getMhrInformation',
-    'getMhrTransferHomeOwners',
-    'getMhrTransferHomeOwnerGroups',
-    'getMhrTransferCurrentHomeOwnerGroups',
-    'getMhrTransferAffidavitCompleted'
-  ])
-
-  const {
+    getMhrTransferAffidavitCompleted,
+    // Actions
     setMhrTransferHomeOwnerGroups,
     setMhrTransferAffidavitCompleted
-  } = useActions<any>([
-    'setMhrTransferHomeOwnerGroups',
-    'setMhrTransferAffidavitCompleted'
-  ])
+  } = useStore()
 
   const {
     getGroupById,
@@ -62,9 +50,9 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
   /** Local State for custom computed properties. **/
   const localState = reactive({
     isSOorJT: computed((): boolean => {
-      return getMhrTransferCurrentHomeOwnerGroups.value.length === 1 &&
-        (getMhrTransferCurrentHomeOwnerGroups.value[0].type === ApiHomeTenancyTypes.SOLE ||
-        getMhrTransferCurrentHomeOwnerGroups.value[0].type === ApiHomeTenancyTypes.JOINT)
+      return getMhrTransferCurrentHomeOwnerGroups.length === 1 &&
+        (getMhrTransferCurrentHomeOwnerGroups[0].type === ApiHomeTenancyTypes.SOLE ||
+        getMhrTransferCurrentHomeOwnerGroups[0].type === ApiHomeTenancyTypes.JOINT)
     })
   })
 
@@ -77,7 +65,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       ApiTransferTypes.TO_ADMIN_NO_WILL,
       ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL,
       ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL
-    ].includes(getMhrTransferType.value?.transferType)
+    ].includes(getMhrTransferType?.transferType)
   })
 
   /** Returns true when the selected transfer involves Executors or Administrators **/
@@ -104,27 +92,27 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
 
   /** Returns true when the selected transfer type is a 'SALE_OR_GIFT' scenario **/
   const isTransferDueToSaleOrGift = computed((): boolean => {
-    return getMhrTransferType.value?.transferType === ApiTransferTypes.SALE_OR_GIFT
+    return getMhrTransferType?.transferType === ApiTransferTypes.SALE_OR_GIFT
   })
 
   /** Returns true when the selected transfer type is a 'SURVIVING_JOINT_TENANT' scenario **/
   const isTransferToSurvivingJointTenant = computed((): boolean => {
-    return getMhrTransferType.value?.transferType === ApiTransferTypes.SURVIVING_JOINT_TENANT
+    return getMhrTransferType?.transferType === ApiTransferTypes.SURVIVING_JOINT_TENANT
   })
 
   /** Returns true when the selected transfer type is a 'TO_EXECUTOR_PROBATE_WILL' scenario **/
   const isTransferToExecutorProbateWill = computed((): boolean => {
-    return getMhrTransferType.value?.transferType === ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL
+    return getMhrTransferType?.transferType === ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL
   })
 
   /** Returns true when the selected transfer type is a 'TO_EXECUTOR_PROBATE_WILL' scenario **/
   const isTransferToExecutorUnder25Will = computed((): boolean => {
-    return getMhrTransferType.value?.transferType === ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL
+    return getMhrTransferType?.transferType === ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL
   })
 
   /** Returns true when the selected transfer type is a 'TO_ADMIN_NO_WILL' scenario **/
   const isTransferToAdminNoWill = computed((): boolean => {
-    return getMhrTransferType.value?.transferType === ApiTransferTypes.TO_ADMIN_NO_WILL
+    return getMhrTransferType?.transferType === ApiTransferTypes.TO_ADMIN_NO_WILL
   })
 
   /** Returns true when the passed transfer type is a 'TO_EXECUTOR_PROBATE_WILL' type **/
@@ -136,12 +124,12 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
   const disableNameFields = computed((): boolean => {
     return [
       ApiTransferTypes.SURVIVING_JOINT_TENANT
-    ].includes(getMhrTransferType.value?.transferType)
+    ].includes(getMhrTransferType?.transferType)
   })
 
   /** Returns true when ownership structure is joint tenancy /w min 2  owners but not executors, trustees or admins. **/
   const isJointTenancyStructure = computed((): boolean => {
-    return getMhrTransferCurrentHomeOwnerGroups.value.some(group => group.type === ApiHomeTenancyTypes.JOINT &&
+    return getMhrTransferCurrentHomeOwnerGroups.some(group => group.type === ApiHomeTenancyTypes.JOINT &&
       group.owners.filter(owner => owner.partyType === HomeOwnerPartyTypes.OWNER_IND ||
         owner.partyType === HomeOwnerPartyTypes.OWNER_BUS).length >= 2
     )
@@ -149,7 +137,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
 
   /** Conditionally show DeathCertificate based on Transfer Type **/
   const showDeathCertificate = (): boolean => {
-    return getMhrTransferType.value?.transferType === ApiTransferTypes.SURVIVING_JOINT_TENANT
+    return getMhrTransferType?.transferType === ApiTransferTypes.SURVIVING_JOINT_TENANT
   }
 
   /** Conditionally show Grant of Probate with Will supporting options based on Transfer Type **/
@@ -158,7 +146,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL,
       ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL,
       ApiTransferTypes.TO_ADMIN_NO_WILL
-    ].includes(getMhrTransferType.value?.transferType)
+    ].includes(getMhrTransferType?.transferType)
   }
 
   /** Conditionally Enable HomeOwner Changes based on Transfer Type **/
@@ -166,7 +154,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     // Manual override to force enable all actions (ie MhRegistrations)
     if (enableAllActions) return true
 
-    switch (getMhrTransferType.value?.transferType) {
+    switch (getMhrTransferType?.transferType) {
       case ApiTransferTypes.SALE_OR_GIFT:
       case ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL:
       case ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL:
@@ -185,7 +173,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     // Manual override to force enable all actions (ie MhRegistrations)
     if (enableAllActions) return true
 
-    switch (getMhrTransferType.value?.transferType) {
+    switch (getMhrTransferType?.transferType) {
       case ApiTransferTypes.SALE_OR_GIFT:
       case ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL:
       case ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL:
@@ -203,9 +191,9 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     // Manual override to force enable all actions (ie MhRegistrations)
     if (enableAllActions) return true
 
-    switch (getMhrTransferType.value?.transferType) {
+    switch (getMhrTransferType?.transferType) {
       case ApiTransferTypes.SALE_OR_GIFT:
-        return getMhrInformation.value.statusType !== MhApiStatusTypes.FROZEN // Enable for all but FROZEN status
+        return getMhrInformation.statusType !== MhApiStatusTypes.FROZEN // Enable for all but FROZEN status
       case ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL:
       case ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL:
       case ApiTransferTypes.SURVIVING_JOINT_TENANT:
@@ -220,7 +208,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     // Manual override to force enable all actions (ie MhRegistrations)
     if (enableAllActions) return true
 
-    switch (getMhrTransferType.value?.transferType) {
+    switch (getMhrTransferType?.transferType) {
       case ApiTransferTypes.SALE_OR_GIFT:
       case ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL:
       case ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL:
@@ -239,7 +227,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     // Manual override to force enable all actions (ie MhRegistrations)
     if (enableAllActions) return true
 
-    switch (getMhrTransferType.value?.transferType) {
+    switch (getMhrTransferType?.transferType) {
       case ApiTransferTypes.SALE_OR_GIFT:
         return false // Disable for Sale or Gift
       case ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL:
@@ -258,13 +246,13 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     // Manual override to force enable all actions (ie MhRegistrations)
     if (enableAllActions) return true
 
-    switch (getMhrTransferType.value?.transferType) {
+    switch (getMhrTransferType?.transferType) {
       case ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL:
       case ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL:
       case ApiTransferTypes.TO_ADMIN_NO_WILL:
         return false // Disable for above transfer types
       case ApiTransferTypes.SALE_OR_GIFT:
-        return getMhrInformation.value.statusType !== MhApiStatusTypes.FROZEN
+        return getMhrInformation.statusType !== MhApiStatusTypes.FROZEN
       default:
         return true
     }
@@ -272,9 +260,9 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
 
   /** Return true if the specified owners group does not contain the executor or administrator **/
   const isDisabledForSoGChanges = (owner: MhrRegistrationHomeOwnerIF): boolean => {
-    if (getMhrTransferType.value?.transferType === ApiTransferTypes.SALE_OR_GIFT &&
-      getMhrInformation.value.statusType === MhApiStatusTypes.FROZEN) {
-      const isExecutorOrAdministratorOwnerGroup = getMhrTransferHomeOwnerGroups.value.find(group =>
+    if (getMhrTransferType?.transferType === ApiTransferTypes.SALE_OR_GIFT &&
+      getMhrInformation.statusType === MhApiStatusTypes.FROZEN) {
+      const isExecutorOrAdministratorOwnerGroup = getMhrTransferHomeOwnerGroups.find(group =>
         group.groupId === owner.groupId).owners.some(owner => {
         return owner.partyType === HomeOwnerPartyTypes.EXECUTOR || owner.partyType === HomeOwnerPartyTypes.ADMINISTRATOR
       })
@@ -289,11 +277,11 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
    * in Surviving Joint Tenants
    **/
   const isDisabledForSJTChanges = (owner: MhrRegistrationHomeOwnerIF): boolean => {
-    if (getMhrTransferType.value?.transferType === ApiTransferTypes.SURVIVING_JOINT_TENANT) {
-      const hasDeceasedOrChangedOwners = getMhrTransferHomeOwnerGroups.value.some(group =>
+    if (getMhrTransferType?.transferType === ApiTransferTypes.SURVIVING_JOINT_TENANT) {
+      const hasDeceasedOrChangedOwners = getMhrTransferHomeOwnerGroups.some(group =>
         group.owners.some(owner => owner.action === ActionTypes.REMOVED || owner.action === ActionTypes.CHANGED))
 
-      const isDeceasedOrChangedOwnerGroup = getMhrTransferHomeOwnerGroups.value.find(group =>
+      const isDeceasedOrChangedOwnerGroup = getMhrTransferHomeOwnerGroups.find(group =>
         group.groupId === owner.groupId).owners.some(owner =>
         owner.action === ActionTypes.REMOVED || owner.action === ActionTypes.CHANGED
       )
@@ -305,20 +293,20 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
 
   // Disable Delete button for all Owners that are not in the Group of initially deleted owner (WILL transfer flow)
   const isDisabledForWillChanges = (owner: MhrRegistrationHomeOwnerIF): boolean => {
-    if (getMhrTransferType.value?.transferType === ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL ||
-        getMhrTransferType.value?.transferType === ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL ||
-        getMhrTransferType.value?.transferType === ApiTransferTypes.TO_ADMIN_NO_WILL) {
-      const hasDeletedOwners = getMhrTransferHomeOwnerGroups.value.some(group =>
+    if (getMhrTransferType?.transferType === ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL ||
+        getMhrTransferType?.transferType === ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL ||
+        getMhrTransferType?.transferType === ApiTransferTypes.TO_ADMIN_NO_WILL) {
+      const hasDeletedOwners = getMhrTransferHomeOwnerGroups.some(group =>
         group.owners.some(owner => owner.action === ActionTypes.REMOVED))
 
-      const isDeletedOwnersInGroup = getMhrTransferHomeOwnerGroups.value.find(group =>
+      const isDeletedOwnersInGroup = getMhrTransferHomeOwnerGroups.find(group =>
         group.groupId === owner.groupId).owners.some(owner => owner.action === ActionTypes.REMOVED)
 
       const partyType = isTransferToAdminNoWill.value ? HomeOwnerPartyTypes.ADMINISTRATOR : HomeOwnerPartyTypes.EXECUTOR
 
       return (hasDeletedOwners && !isDeletedOwnersInGroup) ||
         // in case of Undo, still disable Delete button
-        ((hasUnsavedChanges.value && !hasDeletedOwners) && !hasAddedPartyTypeToGroup(owner.groupId, partyType))
+        ((hasUnsavedChanges && !hasDeletedOwners) && !hasAddedPartyTypeToGroup(owner.groupId, partyType))
     }
     return false
   }
@@ -326,12 +314,12 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
   // Transfer Due to Sale or Gift flow and all the related conditions/logic
   const TransSaleOrGift: any = {
     hasMixedOwners: computed((): boolean => {
-      return !getMhrTransferHomeOwnerGroups.value
+      return !getMhrTransferHomeOwnerGroups
         .every((group: MhrRegistrationHomeOwnerGroupIF) =>
           !TransSaleOrGift.hasMixedOwnersInGroup(group.groupId))
     }),
     hasMixedOwnersInGroup: (groupId: number): boolean => {
-      const ownerTypes: HomeOwnerPartyTypes[] = getMhrTransferHomeOwnerGroups.value
+      const ownerTypes: HomeOwnerPartyTypes[] = getMhrTransferHomeOwnerGroups
         .find(group => group.groupId === groupId).owners
         .filter(owner => owner.action !== ActionTypes.REMOVED)
         .map(owner => owner.partyType)
@@ -343,11 +331,11 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
   const TransToExec: any = {
     // based on the current/active transfer type, get the corresponding supporting document
     getSupportingDocForActiveTransfer: (): ApiTransferTypes => {
-      return transferSupportingDocumentTypes[getMhrTransferType.value?.transferType]
+      return transferSupportingDocumentTypes[getMhrTransferType?.transferType]
     },
     isValidTransfer: computed((): boolean => {
       // check if there is a group that is valid for WILL transfer
-      const groupWithDeletedOwners: MhrRegistrationHomeOwnerGroupIF = getMhrTransferHomeOwnerGroups.value?.find(group =>
+      const groupWithDeletedOwners: MhrRegistrationHomeOwnerGroupIF = getMhrTransferHomeOwnerGroups?.find(group =>
         group.owners.some(owner => owner.action === ActionTypes.REMOVED))
 
       if (!groupWithDeletedOwners) return false
@@ -367,7 +355,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       return isValidAddedOwner && hasAddedExecutor
     },
     hasOwnersWithValidSupportDocs: (groupId: number): boolean => {
-      return getMhrTransferHomeOwnerGroups.value
+      return getMhrTransferHomeOwnerGroups
         .find(group => group.groupId === groupId).owners
         .every((owner: MhrRegistrationHomeOwnerIF) => {
           return TransToExec.hasValidSupportDocs(owner)
@@ -394,31 +382,31 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       return hasValidSupportingDoc && owner.action === ActionTypes.REMOVED
     },
     hasOnlyOneOwnerInGroup: (groupId): boolean => {
-      return getMhrTransferHomeOwnerGroups.value
+      return getMhrTransferHomeOwnerGroups
         .find(group => group.groupId === groupId).owners
         .filter(owner => owner.action !== ActionTypes.ADDED)
         .length === 1
     },
     hasAddedExecutorsInGroup: (groupId): boolean => hasAddedPartyTypeToGroup(groupId, HomeOwnerPartyTypes.EXECUTOR),
     hasAllCurrentOwnersRemoved: (groupId): boolean => {
-      return getMhrTransferHomeOwnerGroups.value
+      return getMhrTransferHomeOwnerGroups
         .find(group => group.groupId === groupId).owners
         .every(owner => isCurrentOwner(owner)
           ? owner.action === ActionTypes.REMOVED
           : owner.action === ActionTypes.ADDED)
     },
     hasSomeOwnersRemoved: (groupId): boolean => {
-      return getMhrTransferHomeOwnerGroups.value
+      return getMhrTransferHomeOwnerGroups
         .find(group => group.groupId === groupId).owners
         .some(owner => owner.action === ActionTypes.REMOVED)
     },
     hasOwnerWithDeathCertificate: (): boolean => {
-      return getMhrTransferHomeOwners.value.some(owner =>
+      return getMhrTransferHomeOwners.some(owner =>
         owner.supportingDocument === SupportingDocumentsOptions.DEATH_CERT)
     },
     // Check if all Owners within a group have Death Certificate as a supporting document
     isAllGroupOwnersWithDeathCerts: (groupId): boolean => {
-      return getMhrTransferHomeOwners.value
+      return getMhrTransferHomeOwners
         .filter(owner => owner.groupId === groupId && owner.action !== ActionTypes.ADDED)
         .every(owner => {
           return owner.action === ActionTypes.REMOVED &&
@@ -429,7 +417,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     // Check if there's a deleted Owner with selected
     // Grant of Probate or Affidavit or Admin Grant as a supporting document.
     hasDeletedOwnersWithProbateGrantOrAffidavit: (): boolean => {
-      return getMhrTransferHomeOwnerGroups.value.some(group =>
+      return getMhrTransferHomeOwnerGroups.some(group =>
         group.owners.some(owner =>
           (owner.action === ActionTypes.REMOVED &&
           owner.partyType === HomeOwnerPartyTypes.OWNER_IND &&
@@ -478,7 +466,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     // find owners that 1. belong to groupId, 2. that are also removed, 3. have Grant of Probate as supporting document
     // switch their supporting document to Death Certificate if they have Grant of Probate selected
     resetGrantOfProbate: (groupId, excludedOwnerId) => {
-      getMhrTransferHomeOwnerGroups.value
+      getMhrTransferHomeOwnerGroups
         .find(group => group.groupId === groupId).owners
         .forEach((owner: MhrRegistrationHomeOwnerIF) => {
           if (owner.action === ActionTypes.REMOVED && owner.ownerId !== excludedOwnerId &&
@@ -523,7 +511,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
 
   const TransJointTenants = {
     isValidTransfer: computed((): boolean => {
-      const groupWithDeletedOwners: MhrRegistrationHomeOwnerGroupIF = getMhrTransferHomeOwnerGroups.value?.find(group =>
+      const groupWithDeletedOwners: MhrRegistrationHomeOwnerGroupIF = getMhrTransferHomeOwnerGroups?.find(group =>
         group.owners.some(owner => owner.action === ActionTypes.REMOVED))
 
       if (!groupWithDeletedOwners) return false
@@ -547,7 +535,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       return getMhrTransferAffidavitCompleted.value
     },
     getGroupIdWithExecutor: (): number => {
-      return getMhrTransferHomeOwnerGroups.value.find(group =>
+      return getMhrTransferHomeOwnerGroups.find(group =>
         group.owners.some(owner => owner.partyType === HomeOwnerPartyTypes.EXECUTOR)
       ).groupId
     }
@@ -560,7 +548,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
 
   /** Return true if the specified owner is part of the current/base ownership structure **/
   const isCurrentOwner = (owner: MhrRegistrationHomeOwnerIF): boolean => {
-    return getMhrTransferCurrentHomeOwnerGroups.value.some(group =>
+    return getMhrTransferCurrentHomeOwnerGroups.some(group =>
       group.owners.some(baseOwner => baseOwner.ownerId === owner.ownerId)
     )
   }
@@ -580,7 +568,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       .map(owner => { return { ...owner, action: ActionTypes.REMOVED } })
 
     // Get current ownership structure and modify group ids and remove current owners
-    const updatedGroups = getMhrTransferHomeOwnerGroups.value.map(group => {
+    const updatedGroups = getMhrTransferHomeOwnerGroups.map(group => {
       return {
         ...group,
         groupId: group.groupId + 1,
@@ -611,7 +599,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
    */
   const getCurrentOwnerStateById = (ownerId: number): MhrRegistrationHomeOwnerIF => {
     let currentOwner
-    getMhrTransferCurrentHomeOwnerGroups.value.forEach(group => group.owners.find(owner => {
+    getMhrTransferCurrentHomeOwnerGroups.forEach(group => group.owners.find(owner => {
       if (owner.ownerId === ownerId) currentOwner = owner
     }))
 
@@ -624,7 +612,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
    */
   const getCurrentOwnerGroupIdByOwnerId = (ownerId: number): MhrRegistrationHomeOwnerIF => {
     let currentOwnerGroupId
-    getMhrTransferCurrentHomeOwnerGroups.value.forEach(group => group.owners.find(owner => {
+    getMhrTransferCurrentHomeOwnerGroups.forEach(group => group.owners.find(owner => {
       if (owner.ownerId === ownerId) currentOwnerGroupId = group.groupId
     }))
 
@@ -652,7 +640,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
 
   /** Return true if a member of a specified partyType has been added to the group **/
   const hasAddedPartyTypeToGroup = (groupId: number, partyType: HomeOwnerPartyTypes): boolean => {
-    return getMhrTransferHomeOwnerGroups.value
+    return getMhrTransferHomeOwnerGroups
       .find(group => group.groupId === groupId).owners
       .some(owner => owner.partyType === partyType &&
         owner.action === ActionTypes.ADDED)

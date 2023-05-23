@@ -214,6 +214,7 @@ export default defineComponent({
     const route = useRoute()
     const router = useRouter()
     const {
+      // Getters
       getStateModel,
       getLengthTrust,
       getAddCollateral,
@@ -225,23 +226,8 @@ export default defineComponent({
       getAmendmentDescription,
       getCourtOrderInformation,
       getAddSecuredPartiesAndDebtors,
-      getOriginalAddSecuredPartiesAndDebtors
-    } = useGetters<any>([
-      'getStateModel',
-      'getLengthTrust',
-      'getAddCollateral',
-      'hasUnsavedChanges',
-      'getRegistrationType',
-      'getConfirmDebtorName',
-      'getOriginalAddCollateral',
-      'getOriginalLengthTrust',
-      'getOriginalAddCollateral',
-      'getAmendmentDescription',
-      'getCourtOrderInformation',
-      'getAddSecuredPartiesAndDebtors',
-      'getOriginalAddSecuredPartiesAndDebtors'
-    ])
-    const {
+      getOriginalAddSecuredPartiesAndDebtors,
+      // Actions
       setAddCollateral,
       setStaffPayment,
       setLengthTrust,
@@ -261,27 +247,7 @@ export default defineComponent({
       setRegistrationExpiryDate,
       setAddSecuredPartiesAndDebtors,
       setOriginalAddSecuredPartiesAndDebtors
-    } = useActions<any>([
-      'setAddCollateral',
-      'setStaffPayment',
-      'setLengthTrust',
-      'setOriginalAddCollateral',
-      'setRegistrationNumber',
-      'setRegistrationType',
-      'setRegistrationFlowType',
-      'setCertifyInformation',
-      'setCollateralShowInvalid',
-      'setRegTableNewItem',
-      'setUnsavedChanges',
-      'setAmendmentDescription',
-      'setCourtOrderInformation',
-      'setFolioOrReferenceNumber',
-      'setOriginalLengthTrust',
-      'setRegistrationCreationDate',
-      'setRegistrationExpiryDate',
-      'setAddSecuredPartiesAndDebtors',
-      'setOriginalAddSecuredPartiesAndDebtors'
-    ])
+    } = useStore()
 
     const localState = reactive({
       cautionTxt: 'The Registry will provide the verification statement to all Secured Parties named in this ' +
@@ -331,10 +297,10 @@ export default defineComponent({
         return (route.query['document-id'] as string) || ''
       }),
       registrationTypeUI: computed((): UIRegistrationTypes => {
-        return getRegistrationType.value?.registrationTypeUI || null
+        return getRegistrationType?.registrationTypeUI || null
       }),
       registrationType: computed((): APIRegistrationTypes => {
-        return getRegistrationType.value?.registrationTypeAPI || null
+        return getRegistrationType?.registrationTypeAPI || null
       }),
       registrationTypeRL: computed((): string => {
         return APIRegistrationTypes.REPAIRERS_LIEN
@@ -346,7 +312,7 @@ export default defineComponent({
     })
 
     const cancel = (): void => {
-      if (hasUnsavedChanges.value) localState.showCancelDialog = true
+      if (hasUnsavedChanges) localState.showCancelDialog = true
       else goToDashboard()
     }
 
@@ -367,7 +333,7 @@ export default defineComponent({
     }
 
     const loadRegistration = async (): Promise<void> => {
-      if (!localState.registrationNumber || (!getConfirmDebtorName.value && !localState.documentId)) {
+      if (!localState.registrationNumber || (!getConfirmDebtorName && !localState.documentId)) {
         if (!localState.registrationNumber) {
           console.error('No registration number given to amend. Redirecting to dashboard...')
         } else {
@@ -467,7 +433,7 @@ export default defineComponent({
       })
       if (localState.documentId) {
         const stateModel: StateModelIF =
-          await setupAmendmentStatementFromDraft(getStateModel.value, localState.documentId)
+          await setupAmendmentStatementFromDraft(getStateModel, localState.documentId)
         if (stateModel.registration.draft.error) {
           emitError(stateModel.registration.draft.error)
           router.push({ name: RouteNames.DASHBOARD })
@@ -561,7 +527,7 @@ export default defineComponent({
         localState.amendErrMsg = '< Please make any required changes'
         return
       }
-      const description = getAmendmentDescription.value
+      const description = getAmendmentDescription
       if (
         localState.debtorValid &&
         localState.securedPartiesValid &&
@@ -590,27 +556,27 @@ export default defineComponent({
 
     const hasAmendmentChanged = (): boolean => {
       let hasChanged = false
-      if (!isEqual(getAddSecuredPartiesAndDebtors.value.securedParties,
-        getOriginalAddSecuredPartiesAndDebtors.value.securedParties)) {
+      if (!isEqual(getAddSecuredPartiesAndDebtors.securedParties,
+        getOriginalAddSecuredPartiesAndDebtors.securedParties)) {
         hasChanged = true
       }
-      if (!isEqual(getAddSecuredPartiesAndDebtors.value.debtors,
-        getOriginalAddSecuredPartiesAndDebtors.value.debtors)) {
+      if (!isEqual(getAddSecuredPartiesAndDebtors.debtors,
+        getOriginalAddSecuredPartiesAndDebtors.debtors)) {
         hasChanged = true
       }
-      if (!isEqual(getLengthTrust.value, getOriginalLengthTrust.value)) {
+      if (!isEqual(getLengthTrust, getOriginalLengthTrust)) {
         hasChanged = true
       }
-      if (!isEqual(getAddCollateral.value.vehicleCollateral, getOriginalAddCollateral.value.vehicleCollateral)) {
+      if (!isEqual(getAddCollateral.vehicleCollateral, getOriginalAddCollateral.vehicleCollateral)) {
         hasChanged = true
       }
-      const gcLength = getAddCollateral.value.generalCollateral?.length
-      const originalLength = getOriginalAddCollateral.value.generalCollateral?.length
+      const gcLength = getAddCollateral.generalCollateral?.length
+      const originalLength = getOriginalAddCollateral.generalCollateral?.length
       if (gcLength !== originalLength) {
         hasChanged = true
       }
 
-      if (getAmendmentDescription.value) {
+      if (getAmendmentDescription) {
         hasChanged = true
       }
 
@@ -621,7 +587,7 @@ export default defineComponent({
         fileNumber: '',
         orderDate: ''
       }
-      if (!isEqual(getCourtOrderInformation.value, blankCourtOrder)) {
+      if (!isEqual(getCourtOrderInformation, blankCourtOrder)) {
         hasChanged = true
       }
       return hasChanged
@@ -663,7 +629,7 @@ export default defineComponent({
 
     const validateSecuredParties = (): void => {
       if (localState.registrationType === APIRegistrationTypes.SECURITY_AGREEMENT) {
-        const sp = getAddSecuredPartiesAndDebtors.value.securedParties
+        const sp = getAddSecuredPartiesAndDebtors.securedParties
         const securedPartyCount = sp.filter(removed => removed.action !== ActionTypes.REMOVED).length
         setValidSecuredParties(securedPartyCount >= 1)
       }
@@ -671,14 +637,14 @@ export default defineComponent({
 
     const validateDebtors = (): void => {
       if (localState.registrationType === APIRegistrationTypes.SECURITY_AGREEMENT) {
-        const sp = getAddSecuredPartiesAndDebtors.value.debtors
+        const sp = getAddSecuredPartiesAndDebtors.debtors
         const debtorCount = sp.filter(removed => removed.action !== ActionTypes.REMOVED).length
         setValidDebtor(debtorCount >= 1)
       }
     }
 
     const isCrownError = (): boolean => {
-      const sp = getAddSecuredPartiesAndDebtors.value.securedParties
+      const sp = getAddSecuredPartiesAndDebtors.securedParties
       let securedPartyCount = 0
       if (isSecuredPartyRestrictedList(localState.registrationType)) {
         for (let i = 0; i < sp.length; i++) {
@@ -698,7 +664,7 @@ export default defineComponent({
       if (!val) {
         localState.showInvalid = true
         localState.errorBar = true
-        const collateral = getAddCollateral.value
+        const collateral = getAddCollateral
         collateral.showInvalid = true
         setAddCollateral(collateral)
         localState.amendErrMsg = '< Please make any required changes'
@@ -711,7 +677,7 @@ export default defineComponent({
 
     const saveDraft = async (): Promise<void> => {
       localState.submitting = true
-      const stateModel: StateModelIF = getStateModel.value
+      const stateModel: StateModelIF = getStateModel
       const draft = await saveAmendmentStatementDraft(stateModel)
       localState.submitting = false
       if (draft.error) {

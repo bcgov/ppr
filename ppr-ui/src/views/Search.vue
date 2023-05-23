@@ -117,11 +117,7 @@ export default defineComponent({
       getSearchedType,
       getUserSettings,
       getSearchResults
-    } = useGetters([
-      'getSearchedType',
-      'getUserSettings',
-      'getSearchResults'
-    ])
+    } = useStore()
 
     const localState = reactive({
       loading: false,
@@ -136,14 +132,14 @@ export default defineComponent({
       selectedMatches: [] as Array<SearchResultIF>,
       settingOption: SettingOptions.SELECT_CONFIRMATION_DIALOG,
       folioNumber: computed((): string => {
-        return getSearchResults.value?.searchQuery?.clientReferenceId || ''
+        return getSearchResults?.searchQuery?.clientReferenceId || ''
       }),
       isAuthenticated: computed((): boolean => {
         return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
       }),
       searchTime: computed((): string => {
         // return formatted date
-        const searchResult = getSearchResults.value
+        const searchResult = getSearchResults
         if (searchResult) {
           const searchDate = new Date(searchResult.searchDateTime)
           return ` as of ${pacificDate(searchDate)}`
@@ -151,10 +147,10 @@ export default defineComponent({
         return ''
       }),
       searchType: computed((): string => {
-        return getSearchedType.value?.searchTypeUI || ''
+        return getSearchedType?.searchTypeUI || ''
       }),
       searchValue: computed((): string => {
-        const searchResult = getSearchResults.value
+        const searchResult = getSearchResults
         if (searchResult) {
           // will put in more logic when doing individual debtor
           const first = searchResult.searchQuery?.criteria?.debtorName?.first
@@ -172,7 +168,7 @@ export default defineComponent({
         return ''
       }),
       totalResultsLength: computed((): number => {
-        const searchResult = getSearchResults.value
+        const searchResult = getSearchResults
         if (searchResult) {
           return searchResult.totalResultsSize
         }
@@ -180,7 +176,7 @@ export default defineComponent({
       }),
       exactResultsLength: computed((): number => {
         const selectedExactMatches = []
-        const results = getSearchResults.value?.results
+        const results = getSearchResults?.results
         let count = 0
         let x:any
         for (x in results) {
@@ -198,7 +194,7 @@ export default defineComponent({
         return 0
       }),
       similarResultsLength: computed((): number => {
-        const searchResult = getSearchResults.value
+        const searchResult = getSearchResults
         let similarCount = 0
         if (searchResult?.results) {
           for (const result of searchResult.results) {
@@ -217,7 +213,7 @@ export default defineComponent({
         const isSearchReportUnsaved = (
           router.currentRoute.name === RouteNames.SEARCH &&
           props.appReady &&
-          !!getSearchResults.value
+          !!getSearchResults
         )
         if (isSearchReportUnsaved) {
           event.preventDefault()
@@ -260,7 +256,7 @@ export default defineComponent({
       } else if (localState.selectedMatches?.length >= 75) {
         localState.largeSearchResultDialog = true
       } else if (
-        getUserSettings.value?.selectConfirmationDialog &&
+        getUserSettings?.selectConfirmationDialog &&
         localState.totalResultsLength > 0 && localState.totalResultsLength < 75 &&
         localState.similarResultsLength > 0 && localState.similarResultsLength < 75
       ) {
@@ -282,7 +278,7 @@ export default defineComponent({
           shouldCallback = true
         }
         const statusCode =
-          await submitSelected(getSearchResults.value.searchId, localState.selectedMatches, shouldCallback)
+          await submitSelected(getSearchResults.searchId, localState.selectedMatches, shouldCallback)
         localState.loading = false
         if (!successfulPPRResponses.includes(statusCode)) {
           localState.errorOptions = { ...saveResultsError }
@@ -296,7 +292,7 @@ export default defineComponent({
 
     const updateSelectedMatches = async (matches:Array<SearchResultIF>): Promise<void> => {
       localState.selectedMatches = matches
-      const statusCode = await updateSelected(getSearchResults.value.searchId, matches)
+      const statusCode = await updateSelected(getSearchResults.searchId, matches)
       if (!successfulPPRResponses.includes(statusCode)) {
         localState.errorOptions = { ...saveSelectionsError }
         localState.errorDialog = true
@@ -316,7 +312,7 @@ export default defineComponent({
       }
 
       // if navigated here without search results redirect to the dashboard
-      if (!getSearchResults.value) {
+      if (!getSearchResults) {
         router.push({
           name: RouteNames.DASHBOARD
         })

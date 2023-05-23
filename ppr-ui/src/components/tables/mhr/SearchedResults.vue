@@ -270,23 +270,15 @@ export default defineComponent({
   setup (props) {
     const router = useRouter()
     const {
+      // Getters
       getManufacturedHomeSearchResults,
       getFolioOrReferenceNumber,
       getSearchedType,
-      getSelectedManufacturedHomes
-    } = useGetters<any>([
-      'getManufacturedHomeSearchResults',
-      'getFolioOrReferenceNumber',
-      'getSearchedType',
-      'getSelectedManufacturedHomes'
-    ])
-    const {
+      getSelectedManufacturedHomes,
+      // Actions
       setSelectedManufacturedHomes,
       setFolioOrReferenceNumber
-    } = useActions<any>([
-      'setSelectedManufacturedHomes',
-      'setFolioOrReferenceNumber'
-    ])
+    } = useStore()
 
     const localState = reactive({
       searched: false,
@@ -294,7 +286,7 @@ export default defineComponent({
       searchType: null as UIMHRSearchTypes,
       selectAll: false,
       selectAllLien: false,
-      folioNumber: getFolioOrReferenceNumber.value,
+      folioNumber: getFolioOrReferenceNumber,
       tooltipTxtSrchMtchs: 'One or more of the selected matches appear in ' +
         'the same registration. That registration will only be shown once in the report.',
       results: [],
@@ -309,7 +301,7 @@ export default defineComponent({
       ),
       totalResultsLength: 0,
       headerSearchTypeSlot: computed((): string => {
-        switch (getSearchedType.value?.searchTypeUI) {
+        switch (getSearchedType?.searchTypeUI) {
           case UIMHRSearchTypes.MHROWNER_NAME:
           case UIMHRSearchTypes.MHRORGANIZATION_NAME:
             return `header.${UIMHRSearchTypeValues.MHROWNER_NAME}`
@@ -322,7 +314,7 @@ export default defineComponent({
         }
       }),
       itemSearchTypeSlot: computed((): string => {
-        switch (getSearchedType.value?.searchTypeUI) {
+        switch (getSearchedType?.searchTypeUI) {
           case UIMHRSearchTypes.MHROWNER_NAME:
           case UIMHRSearchTypes.MHRORGANIZATION_NAME:
             return `item.${UIMHRSearchTypeValues.MHROWNER_NAME}`
@@ -358,7 +350,7 @@ export default defineComponent({
         return localState.searchType === UIMHRSearchTypes.MHRMHR_NUMBER ? 'Registration Number' : localState.searchType
       }),
       ownerOrOrgHeader: computed((): string => {
-        const found = getManufacturedHomeSearchResults.value.results
+        const found = getManufacturedHomeSearchResults.results
         if (found) {
           return found[0]?.organizationName ? 'Organization' : 'Owner'
         } else return ''
@@ -367,8 +359,8 @@ export default defineComponent({
         return localState.results?.every(result => result && result.selected === true)
       }),
       activeResults: computed((): any => {
-        const selectedResults = cloneDeep(getSelectedManufacturedHomes).value
-        const baseResults = cloneDeep(getManufacturedHomeSearchResults.value?.results)
+        const selectedResults = cloneDeep(getSelectedManufacturedHomes)
+        const baseResults = cloneDeep(getManufacturedHomeSearchResults?.results)
 
         // Map selected results with base results when user navigates back to edit selections further
         const activeResults = baseResults?.map(result => {
@@ -504,11 +496,11 @@ export default defineComponent({
     }
 
     onMounted(async () => {
-      const resp = getManufacturedHomeSearchResults.value
+      const resp = getManufacturedHomeSearchResults
       if (!resp) await router.push({ name: RouteNames.DASHBOARD })
       localState.searchValue = resp?.searchQuery.criteria.value || getOwnerName(resp?.searchQuery.criteria)
       localState.searched = true
-      localState.searchType = getSearchedType.value?.searchTypeUI || ''
+      localState.searchType = getSearchedType?.searchTypeUI || ''
       localState.results = localState.activeResults
       localState.results = localState.results?.map(result => {
         // includeLienInfo needs to be initialized because it doesn't exist in the DB/results response

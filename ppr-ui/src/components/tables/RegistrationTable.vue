@@ -401,9 +401,7 @@ export default defineComponent({
       clientReferenceId: 7
     }
     // getters
-    const { getAccountProductSubscriptions } = useGetters<any>([
-      'getAccountProductSubscriptions'
-    ])
+    const { getAccountProductSubscriptions } = useStore()
     // helpers
     const {
       // filters
@@ -436,7 +434,7 @@ export default defineComponent({
       mhStatusTypes: MhStatusTypes,
       hasRPPR: computed(() => {
         const productSubscriptions =
-          getAccountProductSubscriptions.value as AccountProductSubscriptionIF
+          getAccountProductSubscriptions as AccountProductSubscriptionIF
         return (
           productSubscriptions?.[AccountProductCodes.RPPR]?.roles
             .includes(AccountProductRoles.EDIT) || false
@@ -455,14 +453,9 @@ export default defineComponent({
       registrationHistory: computed(() => { return props.setRegistrationHistory }),
       search: computed(() => { return props.setSearch }),
       tableFiltersActive: computed((): boolean => {
-        if (
-          dateTxt.value || registrationNumber.value || registrationType.value ||
+        return !!(dateTxt.value || registrationNumber.value || registrationType.value ||
           status.value || registeredBy.value || registeringParty.value ||
-          securedParties.value || folioNumber.value
-        ) {
-          return true
-        }
-        return false
+          securedParties.value || folioNumber.value)
       }),
       tableHeadersWidth: computed(() => {
         const width = tableHeaderRef?.value?.clientWidth || 0

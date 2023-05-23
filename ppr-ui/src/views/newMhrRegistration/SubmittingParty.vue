@@ -123,27 +123,16 @@ export default defineComponent({
   props: {},
   setup (props, context) {
     const {
+      // Getters
       isRoleStaffReg,
       getMhrAttentionReferenceNum,
       getMhrRegistrationDocumentId,
-      getMhrRegistrationValidationModel
-    } = useGetters<any>([
-      'isRoleStaffReg',
-      'getMhrAttentionReferenceNum',
-      'getMhrRegistrationDocumentId',
-      'getMhrRegistrationValidationModel'
-    ])
-
-    const {
+      getMhrRegistrationValidationModel,
+      // Actions
       setMhrRegistrationDocumentId,
       setMhrAttentionReferenceNum
-    } = useActions<any>([
-      'setMhrRegistrationDocumentId',
-      'setMhrAttentionReferenceNum'
-    ])
-
+    } = useStore()
     const { customRules, isNumber, maxLength, minLength, required } = useInputRules()
-
     const {
       MhrCompVal,
       MhrSectVal,
@@ -152,11 +141,11 @@ export default defineComponent({
       getValidation,
       getSectionValidation,
       scrollToInvalid
-    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
+    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel))
 
     const localState = reactive({
-      attentionReference: getMhrAttentionReferenceNum.value || '',
-      documentId: getMhrRegistrationDocumentId.value || '',
+      attentionReference: getMhrAttentionReferenceNum || '',
+      documentId: getMhrRegistrationDocumentId || '',
       isDocumentIdValid: false,
       isRefNumValid: false,
       loadingDocId: false,
@@ -192,7 +181,7 @@ export default defineComponent({
         return localState.displayDocIdError ? ['Must be unique number'] : []
       }),
       attnOrRefConfig: computed((): AttnRefConfigIF => {
-        return isRoleStaffReg.value ? staffConfig : clientConfig
+        return isRoleStaffReg ? staffConfig : clientConfig
       })
     })
 

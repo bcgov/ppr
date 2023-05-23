@@ -53,6 +53,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
+import { useStore } from '@/store/store'
 import { StaffPayment } from '@bcrs-shared-components/staff-payment'
 import {
   HomeLocationReview,
@@ -63,7 +64,6 @@ import {
 import { CertifyInformation } from '@/components/common'
 import { useMhrValidations } from '@/composables'
 import { RouteNames } from '@/enums'
-import { useStore } from '@/store/store'
 /* eslint-disable no-unused-vars */
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 import { StaffPaymentOptions } from '@bcrs-shared-components/enums'
@@ -82,13 +82,9 @@ export default defineComponent({
     CertifyInformation,
     StaffPayment
   },
-  props: {},
-  setup (props) {
-    const { getMhrRegistrationValidationModel, isRoleStaffReg } = useGetters<any>([
-      'isRoleStaffReg', 'getMhrRegistrationValidationModel'
-    ])
+  setup () {
+    const { getMhrRegistrationValidationModel, isRoleStaffReg, setStaffPayment } = useStore()
     const route = useRoute()
-    const { setStaffPayment } = useActions<any>(['setStaffPayment'])
     const {
       MhrCompVal,
       MhrSectVal,
@@ -96,7 +92,7 @@ export default defineComponent({
       scrollToInvalid,
       getValidation,
       getStepValidation
-    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
+    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel))
 
     const{
       isGlobalEditingMode

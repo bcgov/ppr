@@ -285,19 +285,7 @@ export default defineComponent({
   },
   setup (props, { emit }) {
     const {
-      setIsStaffClientPayment,
-      setSearching,
-      setStaffPayment,
-      setFolioOrReferenceNumber,
-      setSelectedManufacturedHomes
-    } = useActions<any>([
-      'setIsStaffClientPayment',
-      'setSearching',
-      'setStaffPayment',
-      'setFolioOrReferenceNumber',
-      'setSelectedManufacturedHomes'
-    ])
-    const {
+      // Getters
       getUserSettings,
       isSearching,
       isRoleStaff,
@@ -307,19 +295,14 @@ export default defineComponent({
       isSearchCertified,
       getStaffPayment,
       hasPprEnabled,
-      hasMhrEnabled
-    } = useGetters<any>([
-      'getUserSettings',
-      'isSearching',
-      'isRoleStaff',
-      'isRoleStaffBcol',
-      'isRoleStaffReg',
-      'isRoleStaffSbc',
-      'isSearchCertified',
-      'getStaffPayment',
-      'hasPprEnabled',
-      'hasMhrEnabled'
-    ])
+      hasMhrEnabled,
+      // Actions
+      setIsStaffClientPayment,
+      setSearching,
+      setStaffPayment,
+      setFolioOrReferenceNumber,
+      setSelectedManufacturedHomes
+    } = useStore()
     const { isMHRSearchType, isPPRSearchType, mapMhrSearchType } = useSearch()
     const localState = reactive({
       autoCompleteIsActive: true,
@@ -344,11 +327,11 @@ export default defineComponent({
         return localState.validations?.category?.message || ''
       }),
       showPprFeeHint: computed((): boolean => {
-        return !(isRoleStaffBcol.value || isRoleStaffReg.value) && ((hasPprEnabled.value && !hasMhrEnabled.value) ||
+        return !(isRoleStaffBcol || isRoleStaffReg) && ((hasPprEnabled && !hasMhrEnabled) ||
           isPPRSearchType(localState.selectedSearchType?.searchTypeAPI))
       }),
       showMhrHint: computed((): boolean => {
-        return !(isRoleStaffBcol.value || isRoleStaffReg.value) && ((hasMhrEnabled.value && !hasPprEnabled.value) ||
+        return !(isRoleStaffBcol || isRoleStaffReg) && ((hasMhrEnabled && !hasPprEnabled) ||
           isMHRSearchType(localState.selectedSearchType?.searchTypeAPI))
       }),
       dialogOptions: computed((): DialogOptionsIF => {
@@ -357,7 +340,7 @@ export default defineComponent({
         return options
       }),
       fee: computed((): string => {
-        if (isRoleStaffSbc.value) return '10.00'
+        if (isRoleStaffSbc) return '10.00'
         if (props.isNonBillable) {
           const serviceFee = `${props.serviceFee}`
           if (serviceFee.includes('.')) {
@@ -394,30 +377,30 @@ export default defineComponent({
         return localState.isRoleStaff || localState.isStaffSbc ? '15.00' : '12.00'
       }),
       isRoleStaff: computed((): boolean => {
-        return isRoleStaff.value
+        return isRoleStaff
       }),
       isStaffBcolReg: computed((): boolean => {
-        return isRoleStaffBcol.value || isRoleStaffReg.value
+        return isRoleStaffBcol || isRoleStaffReg
       }),
       isRoleStaffReg: computed((): boolean => {
-        return isRoleStaffReg.value
+        return isRoleStaffReg
       }),
       isStaffSbc: computed((): boolean => {
-        return isRoleStaffSbc.value
+        return isRoleStaffSbc
       }),
       searching: computed((): boolean => {
-        return isSearching.value
+        return isSearching
       }),
       searchMessage: computed((): string => {
         return localState.validations?.searchValue?.message || ''
       }),
       optionFirst: computed((): string => {
-        return isRoleStaffReg.value && isMHRSearchType(localState.selectedSearchType?.searchTypeAPI)
+        return isRoleStaffReg && isMHRSearchType(localState.selectedSearchType?.searchTypeAPI)
           ? 'First Name (Optional)' : 'First Name'
       }),
       typeOfSearch: computed((): string => {
         // only show the type of search if authorized to both types
-        if (((hasPprEnabled.value && hasMhrEnabled.value) || isRoleStaff.value || localState.isStaffBcolReg)) {
+        if (((hasPprEnabled && hasMhrEnabled) || isRoleStaff || localState.isStaffBcolReg)) {
           if (localState.selectedSearchType) {
             if (isPPRSearchType(localState.selectedSearchType.searchTypeAPI)) {
               return '<i aria-hidden="true" class="v-icon notranslate menu-icon mdi ' + SearchTypes[0].icon +
@@ -463,7 +446,7 @@ export default defineComponent({
         // don't show confirmation dialog if bcol or reg staff
         if (localState.isStaffBcolReg || isMHRSearchType(localState.selectedSearchType?.searchTypeAPI)) return false
 
-        const settings: UserSettingsIF = getUserSettings.value
+        const settings: UserSettingsIF = getUserSettings
         return settings?.paymentConfirmationDialog
       })
     })
@@ -525,12 +508,12 @@ export default defineComponent({
         setSearching(true)
         emit('search-data', null) // clear any current results
         let resp
-        if (isRoleStaffReg.value) {
+        if (isRoleStaffReg) {
           if (isPPRSearchType(localState.selectedSearchType?.searchTypeAPI)) {
             resp = await staffSearch(
               getSearchApiParams(),
-              getStaffPayment.value,
-              isSearchCertified.value)
+              getStaffPayment,
+              isSearchCertified)
             setStaffPayment(null)
           }
           if (isMHRSearchType(localState.selectedSearchType.searchTypeAPI)) {

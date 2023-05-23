@@ -69,16 +69,14 @@ export default defineComponent({
   },
   emits: ['valid'],
   setup (props, { emit }) {
-    const { getAmendmentDescription } = useGetters<any>(['getAmendmentDescription'])
-    const { setAmendmentDescription } = useActions<any>(['setAmendmentDescription'])
-
+    const { getAmendmentDescription, setAmendmentDescription } = useStore()
     const localState = reactive({
-      detailDescription: getAmendmentDescription.value || '',
+      detailDescription: getAmendmentDescription || '',
       summaryView: computed((): boolean => {
         return props.isSummary
       }),
       amendmentDescription: computed((): string => {
-        return getAmendmentDescription.value || ''
+        return getAmendmentDescription || ''
       }),
       showErrorComponent: computed((): boolean => {
         return (props.setShowErrors && !localState.valid)

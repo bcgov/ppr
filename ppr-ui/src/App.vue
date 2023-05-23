@@ -1,18 +1,18 @@
 <template>
   <v-app class="app-container" id="app">
-<!--    &lt;!&ndash; Dialogs &ndash;&gt;-->
-<!--    <base-dialog-->
-<!--      id="errorDialogApp"-->
-<!--      :setDisplay="errorDisplay"-->
-<!--      :setOptions="errorOptions"-->
-<!--      @proceed="proceedAfterError"-->
-<!--    />-->
-<!--    <base-dialog-->
-<!--      id="payErrorDialogApp"-->
-<!--      :setDisplay="payErrorDisplay"-->
-<!--      :setOptions="payErrorOptions"-->
-<!--      @proceed="payErrorDialogHandler($event)"-->
-<!--    />-->
+    <!-- Dialogs -->
+    <base-dialog
+      id="errorDialogApp"
+      :setDisplay="errorDisplay"
+      :setOptions="errorOptions"
+      @proceed="proceedAfterError"
+    />
+    <base-dialog
+      id="payErrorDialogApp"
+      :setDisplay="payErrorDisplay"
+      :setOptions="payErrorOptions"
+      @proceed="payErrorDialogHandler($event)"
+    />
 
     <sbc-header
         class="sbc-header"
@@ -30,23 +30,23 @@
           icon=" "
         ></sbc-system-banner>
         <breadcrumb :setCurrentPath="currentPath" :setCurrentPathName="currentPathName" v-if="haveData" />
-<!--        <tombstone :setCurrentPath="currentPath" v-if="haveData" />-->
-<!--        <v-container class="view-container pa-0 ma-0">-->
-<!--          <v-row no-gutters>-->
-<!--            <v-col cols="12">-->
-<!--              <router-view-->
-<!--                :appLoadingData="!haveData"-->
-<!--                :appReady="appReady"-->
-<!--                :isJestRunning="isJestRunning"-->
-<!--                :saveDraftExit="saveDraftExitToggle"-->
-<!--                :registryUrl="registryUrl"-->
-<!--                @profileReady="profileReady = true"-->
-<!--                @error="handleError($event)"-->
-<!--                @haveData="haveData = $event"-->
-<!--              />-->
-<!--            </v-col>-->
-<!--          </v-row>-->
-<!--        </v-container>-->
+        <tombstone :setCurrentPath="currentPath" v-if="haveData" />
+        <v-container class="view-container pa-0 ma-0">
+          <v-row no-gutters>
+            <v-col cols="12">
+              <router-view
+                :appLoadingData="!haveData"
+                :appReady="appReady"
+                :isJestRunning="isJestRunning"
+                :saveDraftExit="saveDraftExitToggle"
+                :registryUrl="registryUrl"
+                @profileReady="profileReady = true"
+                @error="handleError($event)"
+                @haveData="haveData = $event"
+              />
+            </v-col>
+          </v-row>
+        </v-container>
       </main>
     </div>
 
@@ -64,10 +64,10 @@ import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import SbcHeader from 'sbc-common-components/src/components/SbcHeader.vue'
 import SbcFooter from 'sbc-common-components/src/components/SbcFooter.vue'
 import SbcSystemBanner from 'sbc-common-components/src/components/SbcSystemBanner.vue'
-// import * as Dialogs from '@/components/dialogs'
+import * as Dialogs from '@/components/dialogs'
 import { Breadcrumb } from '@/components/common'
-// import { Tombstone } from '@/components/tombstone'
-// import * as Views from '@/views'
+import { Tombstone } from '@/components/tombstone'
+import * as Views from '@/views'
 import {
   authPprError, authAssetsError, draftDeleteError, historyRegError, loginError, openDocError, paymentErrorReg,
   paymentErrorSearch, registrationCompleteError, registrationDeleteError, registrationLoadError,
@@ -97,9 +97,6 @@ import {
   ErrorIF, UserInfoIF, UserSettingsIF // eslint-disable-line
 } from '@/interfaces'
 import { useRoute, useRouter } from '@/router'
-// Tombstone,
-// ...Dialogs,
-// ...Views
 
 export default defineComponent({
   name: 'App',
@@ -107,7 +104,10 @@ export default defineComponent({
     SbcHeader,
     SbcFooter,
     Breadcrumb,
-    SbcSystemBanner
+    SbcSystemBanner,
+    Tombstone,
+    ...Dialogs,
+    ...Views
   },
   setup () {
     const route = useRoute()
@@ -302,9 +302,7 @@ export default defineComponent({
         }
       }
 
-      // Safety check for client account products
-      if (!isRoleStaff && !isRoleStaffReg && !isRoleStaffBcol && !hasPprEnabled &&
-        !hasMhrEnabled) {
+      if (!isRoleStaff && !isRoleStaffReg && !isRoleStaffBcol && !hasPprEnabled && !hasMhrEnabled) {
         handleError({
           category: ErrorCategories.PRODUCT_ACCESS,
           message: '',
@@ -694,7 +692,6 @@ export default defineComponent({
     }
 
     watch(() => route, (newVal: any) => {
-      console.log(newVal)
       localState.currentPath = newVal.path
       localState.currentPathName = newVal.name as RouteNames
     }, { immediate: true, deep: true })

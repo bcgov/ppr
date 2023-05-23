@@ -69,52 +69,46 @@ export default defineComponent({
       getRegistrationNumber,
       getRegistrationType,
       getMhrInformation
-    } = useGetters<any>([
-      'getRegistrationCreationDate',
-      'getRegistrationExpiryDate',
-      'getRegistrationNumber',
-      'getRegistrationType',
-      'getMhrInformation'
-    ])
+    } = useStore()
     const { isFrozenMhr } = useMhrInformation()
     const localState = reactive({
       creationDate: computed((): string => {
-        if (getRegistrationCreationDate.value) {
-          const date = new Date(getRegistrationCreationDate.value)
+        if (getRegistrationCreationDate) {
+          const date = new Date(getRegistrationCreationDate)
           return pacificDate(date)
         }
-        if (getMhrInformation.value) {
-          const date = new Date(getMhrInformation.value.createDateTime)
+        if (getMhrInformation) {
+          const date = new Date(getMhrInformation.createDateTime)
           return pacificDate(date)
         }
         return ''
       }),
       expiryDate: computed((): string => {
-        if (getRegistrationExpiryDate.value) {
-          return formatExpiryDate(new Date(new Date(getRegistrationExpiryDate.value)
+        if (getRegistrationExpiryDate) {
+          return formatExpiryDate(new Date(new Date(getRegistrationExpiryDate)
             .toLocaleString('en-US', { timeZone: 'America/Vancouver' })))
         }
         return 'No Expiry'
       }),
       statusType: computed((): string => {
-        const regStatus = getMhrInformation.value.statusType
+        const regStatus = getMhrInformation.statusType
 
         return isFrozenMhr.value || regStatus === MhApiStatusTypes.DRAFT
           ? MhUIStatusTypes.ACTIVE
           : regStatus[0] + regStatus.toLowerCase().slice(1)
       }),
       header: computed((): string => {
-        const numberType = getRegistrationNumber.value ? 'Base' : 'Manufactured Home'
-        const regNum = getRegistrationNumber.value || getMhrInformation.value.mhrNumber || ''
+        const numberType = getRegistrationNumber ? 'Base' : 'Manufactured Home'
+        const regNum = getRegistrationNumber || getMhrInformation.mhrNumber || ''
 
         return numberType + ' Registration Number ' + regNum
       }),
       registrationType: computed((): string => {
-        const registration = getRegistrationType.value as RegistrationTypeIF
+        const registration = getRegistrationType as RegistrationTypeIF
         return registration?.registrationTypeUI || ''
       }),
       dateTimePrefix: computed(() => {
-        return getRegistrationNumber.value ? 'Base' : 'MH'
+        return getRegistrationNumber ? 'Base' : 'MH'
       })
     })
 

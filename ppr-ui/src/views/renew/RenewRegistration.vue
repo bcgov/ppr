@@ -151,19 +151,13 @@ export default defineComponent({
     const route = useRoute()
     const router = useRouter()
     const {
+      // Getters
       getLengthTrust,
       getRegistrationType,
       getConfirmDebtorName,
       getRegistrationNumber,
-      getRegistrationFlowType
-    } = useGetters([
-      'getLengthTrust',
-      'getRegistrationType',
-      'getConfirmDebtorName',
-      'getRegistrationNumber',
-      'getRegistrationFlowType'
-    ])
-    const {
+      getRegistrationFlowType,
+      // Actions
       setLengthTrust,
       setAddCollateral,
       setStaffPayment,
@@ -177,21 +171,8 @@ export default defineComponent({
       setRegistrationCreationDate,
       setAddSecuredPartiesAndDebtors,
       setOriginalAddSecuredPartiesAndDebtors
-    } = useActions([
-      'setLengthTrust',
-      'setAddCollateral',
-      'setStaffPayment',
-      'setRegistrationNumber',
-      'setRegistrationType',
-      'setRegistrationFlowType',
-      'setCourtOrderInformation',
-      'setCertifyInformation',
-      'setFolioOrReferenceNumber',
-      'setRegistrationExpiryDate',
-      'setRegistrationCreationDate',
-      'setAddSecuredPartiesAndDebtors',
-      'setOriginalAddSecuredPartiesAndDebtors'
-    ])
+    } = useStore()
+
     const localState = reactive({
       dataLoaded: false,
       dataLoadError: false,
@@ -215,15 +196,15 @@ export default defineComponent({
       }),
       registrationLength: computed((): RegistrationLengthI => {
         return {
-          lifeInfinite: getLengthTrust.value?.lifeInfinite || false,
-          lifeYears: getLengthTrust.value?.lifeYears || 0
+          lifeInfinite: getLengthTrust?.lifeInfinite || false,
+          lifeYears: getLengthTrust?.lifeYears || 0
         }
       }),
       registrationTypeUI: computed((): string => {
-        return getRegistrationType.value?.registrationTypeUI || null
+        return getRegistrationType?.registrationTypeUI || null
       }),
       registrationType: computed((): APIRegistrationTypes => {
-        return getRegistrationType.value?.registrationTypeAPI || ''
+        return getRegistrationType?.registrationTypeAPI || ''
       }),
       registrationNumber: computed((): string => {
         return (route.query['reg-num'] as string) || ''
@@ -247,10 +228,10 @@ export default defineComponent({
 
     const loadRegistration = async (): Promise<void> => {
       if (
-        !getRegistrationNumber.value ||
-        getRegistrationFlowType.value !== RegistrationFlowType.RENEWAL
+        !getRegistrationNumber ||
+        getRegistrationFlowType !== RegistrationFlowType.RENEWAL
       ) {
-        if (!localState.registrationNumber || !getConfirmDebtorName.value) {
+        if (!localState.registrationNumber || !getConfirmDebtorName) {
           if (!localState.registrationNumber) {
             console.error('No registration number given to discharge. Redirecting to dashboard...')
           } else {

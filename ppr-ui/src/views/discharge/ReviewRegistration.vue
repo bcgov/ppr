@@ -64,6 +64,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue'
+import { useStore } from '@/store/store'
 import { useRoute, useRouter } from 'vue-router/composables'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { CautionBox, StickyContainer } from '@/components/common'
@@ -82,12 +83,7 @@ import {
   UIRegistrationTypes
 } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
-import {
-  ActionBindingIF, ErrorIF, AddPartiesIF,
-  RegistrationTypeIF, AddCollateralIF, LengthTrustIF,
-  CertifyIF, DebtorNameIF, DialogOptionsIF
-} from '@/interfaces'
-import { useStore } from '@/store/store'
+import { ErrorIF, AddPartiesIF, AddCollateralIF, LengthTrustIF, CertifyIF, DialogOptionsIF } from '@/interfaces'
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
@@ -117,13 +113,10 @@ export default defineComponent({
     const route = useRoute()
     const router = useRouter()
     const {
+      // Getters
       getRegistrationType,
-      getConfirmDebtorName
-    } = useGetters([
-      'getRegistrationType',
-      'getConfirmDebtorName'
-    ])
-    const {
+      getConfirmDebtorName,
+      // Actions
       setLengthTrust,
       setAddCollateral,
       setRegistrationType,
@@ -135,19 +128,7 @@ export default defineComponent({
       setRegistrationCreationDate,
       setAddSecuredPartiesAndDebtors,
       setOriginalAddSecuredPartiesAndDebtors
-    } = useActions([
-      'setLengthTrust',
-      'setAddCollateral',
-      'setRegistrationType',
-      'setCertifyInformation',
-      'setRegistrationNumber',
-      'setRegistrationFlowType',
-      'setFolioOrReferenceNumber',
-      'setRegistrationExpiryDate',
-      'setRegistrationCreationDate',
-      'setAddSecuredPartiesAndDebtors',
-      'setOriginalAddSecuredPartiesAndDebtors'
-    ])
+    } = useStore()
 
     const localState = reactive({
       cautionTxt: 'The Registry will provide the verification statement to all Secured Parties named in this ' +
@@ -173,10 +154,10 @@ export default defineComponent({
         return route.query['reg-num'] as string || ''
       }),
       registrationTypeUI: computed((): UIRegistrationTypes => {
-        return getRegistrationType.value?.registrationTypeUI || null
+        return getRegistrationType?.registrationTypeUI || null
       }),
       registrationType: computed((): APIRegistrationTypes => {
-        return getRegistrationType.value?.registrationTypeAPI || null
+        return getRegistrationType?.registrationTypeAPI || null
       })
     })
 
@@ -193,7 +174,7 @@ export default defineComponent({
     }
 
     const loadRegistration = async (): Promise<void> => {
-      if (!localState.registrationNumber || !getConfirmDebtorName.value) {
+      if (!localState.registrationNumber || !getConfirmDebtorName) {
         if (!localState.registrationNumber) {
           console.error('No registration number given to discharge. Redirecting to dashboard...')
         } else {

@@ -121,7 +121,7 @@ import { getFeatureFlag, submitSelectedMhr } from '@/utils'
 import { SearchedResultMhr } from '@/components/tables'
 import { uniqBy } from 'lodash'
 /* eslint-disable no-unused-vars */
-import { ErrorIF, DialogOptionsIF } from '@/interfaces'
+import { DialogOptionsIF } from '@/interfaces'
 import { AdditionalSearchFeeIF } from '@/composables/fees/interfaces'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 /* eslint-enable no-unused-vars */
@@ -149,6 +149,7 @@ export default defineComponent({
   setup (props, context) {
     const router = useRouter()
     const {
+      // Getters
       isRoleStaffReg,
       isRoleStaffSbc,
       getStaffPayment,
@@ -156,25 +157,12 @@ export default defineComponent({
       getIsStaffClientPayment,
       getFolioOrReferenceNumber,
       getSelectedManufacturedHomes,
-      getManufacturedHomeSearchResults
-    } = useGetters([
-      'isRoleStaffReg',
-      'isRoleStaffSbc',
-      'getStaffPayment',
-      'isSearchCertified',
-      'getIsStaffClientPayment',
-      'getFolioOrReferenceNumber',
-      'getSelectedManufacturedHomes',
-      'getManufacturedHomeSearchResults'
-    ])
-
-    const {
+      getManufacturedHomeSearchResults,
+      // Actions
       setStaffPayment,
       setSearchCertified
-    } = useActions([
-      'setStaffPayment',
-      'setSearchCertified'
-    ])
+    } = useStore()
+
     const localState = reactive({
       dataLoaded: false,
       dataLoadError: false,
@@ -200,7 +188,7 @@ export default defineComponent({
         return ''
       }),
       combinedSearchFees: computed((): AdditionalSearchFeeIF => {
-        const searchQuantity = uniqBy(getSelectedManufacturedHomes.value, UIMHRSearchTypeValues.MHRMHR_NUMBER)
+        const searchQuantity = uniqBy(getSelectedManufacturedHomes, UIMHRSearchTypeValues.MHRMHR_NUMBER)
           .filter(item => item.includeLienInfo === true)
           .length
         return searchQuantity > 0
@@ -212,12 +200,12 @@ export default defineComponent({
       }),
       feeQuantity: computed((): number => {
         // Return selected quantity that is not a combination search
-        return uniqBy(getSelectedManufacturedHomes.value, UIMHRSearchTypeValues.MHRMHR_NUMBER)
+        return uniqBy(getSelectedManufacturedHomes, UIMHRSearchTypeValues.MHRMHR_NUMBER)
           .filter(result => result.selected && !result.includeLienInfo)
           .length
       }),
       staffPaymentData: computed((): StaffPaymentIF => {
-        let pd = getStaffPayment.value
+        let pd = getStaffPayment
         if (!pd) {
           pd = {
             option: StaffPaymentOptions.NONE,
@@ -266,7 +254,7 @@ export default defineComponent({
       localState.validating = true
       await nextTick()
       if (!localState.validFolio || (
-        (getIsStaffClientPayment.value && !isRoleStaffSbc.value) && !localState.staffPaymentValid)
+        (getIsStaffClientPayment && !isRoleStaffSbc) && !localState.staffPaymentValid)
       ) {
         localState.showErrors = true
         document.getElementById('staff-payment-dialog').scrollIntoView({ behavior: 'smooth' })
@@ -274,19 +262,19 @@ export default defineComponent({
       }
       localState.submitting = true
       let apiResponse
-      if (isRoleStaffReg.value) {
+      if (isRoleStaffReg) {
         apiResponse = await submitSelectedMhr(
-          getManufacturedHomeSearchResults.value.searchId,
-          uniqBy(getSelectedManufacturedHomes.value, UIMHRSearchTypeValues.MHRMHR_NUMBER),
-          getFolioOrReferenceNumber.value,
-          getStaffPayment.value,
-          isSearchCertified.value
+          getManufacturedHomeSearchResults.searchId,
+          uniqBy(getSelectedManufacturedHomes, UIMHRSearchTypeValues.MHRMHR_NUMBER),
+          getFolioOrReferenceNumber,
+          getStaffPayment,
+          isSearchCertified
         )
       } else {
         apiResponse = await submitSelectedMhr(
-          getManufacturedHomeSearchResults.value.searchId,
-          uniqBy(getSelectedManufacturedHomes.value, UIMHRSearchTypeValues.MHRMHR_NUMBER),
-          getFolioOrReferenceNumber.value
+          getManufacturedHomeSearchResults.searchId,
+          uniqBy(getSelectedManufacturedHomes, UIMHRSearchTypeValues.MHRMHR_NUMBER),
+          getFolioOrReferenceNumber
         )
       }
       localState.submitting = false

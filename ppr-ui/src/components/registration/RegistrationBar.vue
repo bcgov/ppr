@@ -57,14 +57,19 @@ export default defineComponent({
   },
   emits: ['selected-registration-type'],
   setup (props, { emit }) {
-    const { getAccountProductSubscriptions, isRoleQualifiedSupplier, isRoleStaff } =
-      useGetters<any>(['getAccountProductSubscriptions', 'isRoleQualifiedSupplier', 'isRoleStaff'])
-    const { setRegistrationTypeOtherDesc } = useActions<any>(['setRegistrationTypeOtherDesc'])
+    const {
+      // Getters
+      getAccountProductSubscriptions,
+      isRoleQualifiedSupplier,
+      isRoleStaff,
+      // Actions
+      setRegistrationTypeOtherDesc
+    } = useStore()
     const localState = reactive({
       labelText: 'Start a New Personal Property Registration'
     })
     const hasRPPR = computed(() => {
-      const productSubscriptions = getAccountProductSubscriptions.value as AccountProductSubscriptionIF
+      const productSubscriptions = getAccountProductSubscriptions as AccountProductSubscriptionIF
       return (
         productSubscriptions?.[AccountProductCodes.RPPR]?.roles.includes(AccountProductRoles.EDIT) || false
       )

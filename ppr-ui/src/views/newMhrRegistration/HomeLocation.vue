@@ -53,17 +53,14 @@ export default defineComponent({
     const {
       getMhrRegistrationLocation,
       getMhrRegistrationValidationModel
-    } = useGetters<any>([
-      'getMhrRegistrationLocation',
-      'getMhrRegistrationValidationModel'
-    ])
+    } = useStore()
 
     const {
       MhrCompVal,
       MhrSectVal,
       getSectionValidation,
       scrollToInvalid
-    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
+    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel))
 
     const localState = reactive({
       validateLocationType: computed(() => {

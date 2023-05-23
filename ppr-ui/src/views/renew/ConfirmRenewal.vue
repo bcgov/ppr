@@ -156,6 +156,7 @@ export default defineComponent({
     const route = useRoute()
     const router = useRouter()
     const {
+      // Getters
       getStateModel,
       getLengthTrust,
       isRoleStaffBcol,
@@ -163,32 +164,15 @@ export default defineComponent({
       isRoleStaffSbc,
       getRegistrationType,
       getConfirmDebtorName,
-      getAddSecuredPartiesAndDebtors
-    } = useGetters([
-      'getStateModel',
-      'getLengthTrust',
-      'isRoleStaffBcol',
-      'isRoleStaffReg',
-      'isRoleStaffSbc',
-      'getRegistrationType',
-      'getConfirmDebtorName',
-      'getAddSecuredPartiesAndDebtors'
-    ])
-    const {
+      getAddSecuredPartiesAndDebtors,
+      // Actions
       setRegistrationType,
       setRegTableNewItem,
       setRegistrationNumber,
       setRegistrationCreationDate,
       setRegistrationExpiryDate,
       setAddSecuredPartiesAndDebtors
-    } = useActions([
-      'setRegistrationType',
-      'setRegTableNewItem',
-      'setRegistrationNumber',
-      'setRegistrationCreationDate',
-      'setRegistrationExpiryDate',
-      'setAddSecuredPartiesAndDebtors'
-    ])
+    } = useStore()
 
     const localState = reactive({
       collateralSummary: '', // eslint-disable-line lines-between-class-members
@@ -222,15 +206,15 @@ export default defineComponent({
       }),
       registrationLength: computed((): RegistrationLengthI => {
         return {
-          lifeInfinite: getLengthTrust.value?.lifeInfinite || false,
-          lifeYears: getLengthTrust.value?.lifeYears || 0
+          lifeInfinite: getLengthTrust?.lifeInfinite || false,
+          lifeYears: getLengthTrust?.lifeYears || 0
         }
       }),
       registrationTypeUI: computed((): string => {
-        return getRegistrationType.value?.registrationTypeUI || null
+        return getRegistrationType?.registrationTypeUI || null
       }),
       registrationType: computed((): APIRegistrationTypes => {
-        return getRegistrationType.value?.registrationTypeAPI || ''
+        return getRegistrationType?.registrationTypeAPI || ''
       }),
       registrationNumber: computed((): string => {
         return (route.query['reg-num'] as string) || ''
@@ -242,7 +226,7 @@ export default defineComponent({
         return ''
       }),
       showCourtOrderInfo: computed((): boolean => {
-        return (getRegistrationType.value && localState.registrationType === APIRegistrationTypes.REPAIRERS_LIEN)
+        return (getRegistrationType && localState.registrationType === APIRegistrationTypes.REPAIRERS_LIEN)
       })
     })
 
@@ -267,7 +251,7 @@ export default defineComponent({
     }
 
     const loadRegistration = async (): Promise<void> => {
-      if (!localState.registrationNumber || !getConfirmDebtorName.value) {
+      if (!localState.registrationNumber || !getConfirmDebtorName) {
         if (!localState.registrationNumber) {
           console.error('No registration number given to discharge. Redirecting to dashboard...')
         } else {
@@ -342,7 +326,7 @@ export default defineComponent({
         localState.showErrors = true
         return
       }
-      if ((isRoleStaffReg.value) || (isRoleStaffSbc.value)) {
+      if ((isRoleStaffReg) || (isRoleStaffSbc)) {
         localState.staffPaymentDialogDisplay = true
       } else {
         submitRenewal()
@@ -350,7 +334,7 @@ export default defineComponent({
     }
 
     const submitRenewal = async (): Promise<void> => {
-      const stateModel: StateModelIF = getStateModel.value
+      const stateModel: StateModelIF = getStateModel
       localState.submitting = true
       const apiResponse: RenewRegistrationIF = await saveRenewal(stateModel)
       localState.submitting = false
@@ -383,7 +367,7 @@ export default defineComponent({
     }
 
     const setShowWarning = (): void => {
-      const parties = getAddSecuredPartiesAndDebtors.value
+      const parties = getAddSecuredPartiesAndDebtors
       localState.showRegMsg = parties.registeringParty?.action === ActionTypes.EDITED
     }
 

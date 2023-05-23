@@ -989,7 +989,7 @@ export default defineComponent({
         : { columns: localState.pprColumnSettings, mhrColumns: val }
 
       for (let i = 0; i < baseHeaders.length; i++) {
-        if (baseHeaders[i] === 'actions') headers.push(baseHeaders[i])
+        if (baseHeaders[i].value === 'actions') headers.push(baseHeaders[i])
         else if (val.find(header => header === baseHeaders[i])) {
           headers.push(baseHeaders[i])
         }

@@ -194,13 +194,7 @@ export default defineComponent({
       isRoleStaff,
       hasPprRole,
       hasMhrRole
-    } = useGetters<any>([
-      'getSearchHistory',
-      'getUserUsername',
-      'isRoleStaff',
-      'hasPprRole',
-      'hasMhrRole'
-    ])
+    } = useStore()
 
     const localState = reactive({
       keyValue: 0,
@@ -213,21 +207,21 @@ export default defineComponent({
         return tableHeaders
       }),
       hasBothRoles: computed((): boolean => {
-        return hasPprRole.value && hasMhrRole.value
+        return hasPprRole && hasMhrRole
       }),
       isStaff: computed((): boolean => {
-        return !!isRoleStaff.value
+        return !!isRoleStaff
       }),
       historyLength: computed((): number => {
         return localState.searchHistory?.length || 0
       }),
       searchHistory: computed(
         (): Array<SearchResponseIF> => {
-          return getSearchHistory.value || []
+          return getSearchHistory || []
         }
       ),
       isSearchHistory: computed((): boolean => {
-        return !!getSearchHistory.value
+        return !!getSearchHistory
       })
     })
     const { mapMhrSearchType } = useSearch()
@@ -391,7 +385,7 @@ export default defineComponent({
       return diffDays < 15
     }
     const isSearchOwner = (item: SearchResponseIF): Boolean => {
-      return getUserUsername.value === item?.userId
+      return getUserUsername === item?.userId
     }
     const retrySearch = (): void => {
       emit('retry')

@@ -165,7 +165,7 @@ export default defineComponent({
   },
   emits: ['selected-matches', 'submit'],
   setup (props, { emit }) {
-    const { getSearchResults } = useGetters<any>(['getSearchResults'])
+    const { getSearchResults } = useStore()
     const localState = reactive({
       searched: false,
       searchValue: '',
@@ -184,7 +184,7 @@ export default defineComponent({
       }),
       setTableData: computed((): SearchResponseIF => {
         let resp = null
-        resp = getSearchResults.value
+        resp = getSearchResults
 
         if (resp) {
           localState.searchValue = resp.searchQuery.criteria.value

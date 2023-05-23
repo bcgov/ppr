@@ -1,8 +1,7 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
 import { getVuexStore } from '@/store'
-import CompositionApi, { nextTick } from ''
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 
 // Components

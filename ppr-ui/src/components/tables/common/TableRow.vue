@@ -480,14 +480,7 @@ export default defineComponent({
       isRoleStaffBcol,
       isRoleStaffReg,
       getMhRegTableBaseRegs
-    } = useGetters<any>([
-      'isRoleQualifiedSupplier',
-      'isRoleStaff',
-      'isRoleStaffSbc',
-      'isRoleStaffBcol',
-      'isRoleStaffReg',
-      'getMhRegTableBaseRegs'
-    ])
+    } = useStore()
 
     const {
       getFormattedDate,
@@ -533,9 +526,9 @@ export default defineComponent({
         return props.setItem
       }),
       enableOpenEdit: computed(() => {
-        return (isRoleQualifiedSupplier.value || isRoleStaffReg.value || isRoleStaff.value) &&
-          !isRoleStaffSbc.value &&
-          !isRoleStaffBcol.value
+        return (isRoleQualifiedSupplier || isRoleStaffReg || isRoleStaff) &&
+          !isRoleStaffSbc &&
+          !isRoleStaffBcol
       })
     })
 
@@ -680,7 +673,7 @@ export default defineComponent({
     }
 
     const hasFrozenParentReg = (item: MhRegistrationSummaryIF): boolean => {
-      const parentReg = item.mhrNumber && getMhRegTableBaseRegs.value?.find(reg => reg.mhrNumber === item.mhrNumber)
+      const parentReg = item.mhrNumber && getMhRegTableBaseRegs?.find(reg => reg.mhrNumber === item.mhrNumber)
       return parentReg?.statusType === MhApiStatusTypes.FROZEN
     }
 

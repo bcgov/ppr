@@ -79,13 +79,7 @@ export default defineComponent({
       isRoleStaff,
       hasPprEnabled,
       hasMhrEnabled
-    } = useGetters<any>([
-      'isRoleStaffReg',
-      'isRoleStaff',
-      'hasPprEnabled',
-      'hasMhrEnabled',
-      'getUserProductSubscriptionsCodes'
-    ])
+    } = useStore()
     const searchSelect = ref(null)
     const localState = reactive({
       searchTypes: UISearchTypes,
@@ -112,7 +106,7 @@ export default defineComponent({
         const allSearchTypes = []
 
         // Staff Only Options
-        if (isRoleStaff.value || isRoleStaffReg.value) {
+        if (isRoleStaff || isRoleStaffReg) {
           if (getFeatureFlag('mhr-ui-enabled')) {
             allSearchTypes.push(...SearchTypes, ...MHRSearchTypes)
             return allSearchTypes
@@ -123,32 +117,32 @@ export default defineComponent({
         }
 
         // Client Only Blocks
-        if (hasPprEnabled.value && hasMhrEnabled.value) {
+        if (hasPprEnabled && hasMhrEnabled) {
           allSearchTypes.push(...SearchTypes, ...MHRSearchTypes)
           return allSearchTypes
         }
 
-        if (hasPprEnabled.value) {
+        if (hasPprEnabled) {
           allSearchTypes.push(...SearchTypes)
           return allSearchTypes.slice(1)
         }
 
-        if (hasMhrEnabled.value) {
+        if (hasMhrEnabled) {
           allSearchTypes.push(...MHRSearchTypes)
           return allSearchTypes.slice(1)
         }
         return allSearchTypes
       }),
       isSingleSearchOption: computed((): boolean => {
-        return ((hasPprEnabled.value && !hasMhrEnabled.value) || (!hasPprEnabled.value && hasMhrEnabled.value)) &&
-          !(isRoleStaff.value || isRoleStaffReg.value)
+        return ((hasPprEnabled && !hasMhrEnabled) || (!hasPprEnabled && hasMhrEnabled)) &&
+          !(isRoleStaff || isRoleStaffReg)
       }),
       displayItems: [],
       displayGroup: {
-        1: !(isRoleStaff.value || isRoleStaffReg.value)
-          ? (hasPprEnabled.value && !hasMhrEnabled.value)
-          : !hasMhrEnabled.value,
-        2: !(isRoleStaff.value || isRoleStaffReg.value) && (!hasPprEnabled.value && hasMhrEnabled.value)
+        1: !(isRoleStaff || isRoleStaffReg)
+          ? (hasPprEnabled && !hasMhrEnabled)
+          : !hasMhrEnabled,
+        2: !(isRoleStaff || isRoleStaffReg) && (!hasPprEnabled && hasMhrEnabled)
       },
       showMenu: false
     })
@@ -202,7 +196,7 @@ export default defineComponent({
     }
     const updateSelections = () => {
       localState.displayItems = localState.origItems
-      if (hasPprEnabled.value && hasMhrEnabled.value) {
+      if (hasPprEnabled && hasMhrEnabled) {
         localState.displayGroup = { 1: false, 2: false }
       }
     }

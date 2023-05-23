@@ -288,11 +288,11 @@
 </template>
 
 <script lang="ts">
+import { computed, defineComponent, onBeforeMount, reactive, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
 import { AddEditHomeOwner, HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
 import { BaseDialog } from '@/components/dialogs'
 import { SimpleHelpToggle } from '@/components/common'
-import { computed, defineComponent, onBeforeMount, reactive, toRefs, watch } from 'vue'
 import { useHomeOwners, useMhrValidations, useMhrInformation, useTransferOwners } from '@/composables'
 /* eslint-disable no-unused-vars */
 import { MhrRegistrationTotalOwnershipAllocationIF } from '@/interfaces'
@@ -332,15 +332,7 @@ export default defineComponent({
       hasUnsavedChanges,
       getMhrTransferType,
       getMhrTransferDeclaredValue
-    } = useGetters<any>([
-      'getMhrRegistrationHomeOwners',
-      'getMhrTransferHomeOwnerGroups',
-      'getMhrTransferCurrentHomeOwnerGroups',
-      'getMhrRegistrationValidationModel',
-      'hasUnsavedChanges',
-      'getMhrTransferType',
-      'getMhrTransferDeclaredValue'
-    ])
+    } = useStore()
 
     const {
       getUiTransferType
@@ -361,7 +353,7 @@ export default defineComponent({
       getValidation,
       MhrSectVal,
       MhrCompVal
-    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
+    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel))
 
     const {
       getHomeTenancyType,
@@ -447,7 +439,7 @@ export default defineComponent({
           (showGroups && localState.ownershipAllocation.hasMinimumGroupsError && localState.showTotalOwnership)
       }),
       changesRequired: computed((): boolean => {
-        return props.validateTransfer && !hasUnsavedChanges.value
+        return props.validateTransfer && !hasUnsavedChanges
       })
     })
 

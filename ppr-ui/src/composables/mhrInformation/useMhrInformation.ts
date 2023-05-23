@@ -27,6 +27,7 @@ import { computed, reactive, toRefs } from 'vue'
 
 export const useMhrInformation = () => {
   const {
+    // Getters
     isRoleStaffReg,
     getStaffPayment,
     getMhrInformation,
@@ -39,25 +40,8 @@ export const useMhrInformation = () => {
     getMhrTransferAttentionReference,
     getMhrTransferHomeOwnerGroups,
     getMhrTransferCurrentHomeOwnerGroups,
-    getMhrTransferType
-  } = useGetters<any>([
-    'isRoleStaffReg',
-    'getStaffPayment',
-    'getMhrInformation',
-    'isRoleQualifiedSupplier',
-    'getMhrTransferHomeOwners',
-    'getMhrTransferDeclaredValue',
-    'getMhrTransferConsideration',
-    'getMhrTransferDate',
-    'getMhrTransferOwnLand',
-    'getMhrTransferSubmittingParty',
-    'getMhrTransferAttentionReference',
-    'getMhrTransferHomeOwnerGroups',
-    'getMhrTransferCurrentHomeOwnerGroups',
-    'getMhrTransferType'
-  ])
-
-  const {
+    getMhrTransferType,
+    // Actions
     setMhrStatusType,
     setMhrTransferHomeOwnerGroups,
     setMhrTransferCurrentHomeOwnerGroups,
@@ -71,21 +55,7 @@ export const useMhrInformation = () => {
     setMhrAttentionReferenceNum,
     setMhrTransferConsideration,
     setMhrTransferSubmittingParty
-  } = useActions<any>([
-    'setMhrStatusType',
-    'setMhrTransferHomeOwnerGroups',
-    'setMhrTransferCurrentHomeOwnerGroups',
-    'setMhrLocation',
-    'setIsManualLocation',
-    'setMhrHomeDescription',
-    'setMhrTransferType',
-    'setMhrTransferDate',
-    'setMhrTransferOwnLand',
-    'setMhrAttentionReferenceNum',
-    'setMhrTransferDeclaredValue',
-    'setMhrTransferConsideration',
-    'setMhrTransferSubmittingParty'
-  ])
+  } = useStore()
 
   const {
     setShowGroups
@@ -98,7 +68,7 @@ export const useMhrInformation = () => {
   /** Local State for custom computed properties. **/
   const localState = reactive({
     isFrozenMhr: computed((): boolean => {
-      return getMhrInformation.value.statusType === MhApiStatusTypes.FROZEN
+      return getMhrInformation.statusType === MhApiStatusTypes.FROZEN
     })
   })
 
@@ -124,7 +94,7 @@ export const useMhrInformation = () => {
   }
 
   const parseMhrInformation = async (includeDetails = false): Promise<void> => {
-    const { data } = await fetchMhRegistration(getMhrInformation.value.mhrNumber)
+    const { data } = await fetchMhRegistration(getMhrInformation.mhrNumber)
 
     // Assign frozen state when the base registration is frozen (for drafts)
     if (data.status === MhApiStatusTypes.FROZEN) {
@@ -197,10 +167,8 @@ export const useMhrInformation = () => {
   }
 
   const getUiTransferType = (): UITransferTypes => {
-    return UITransferTypes[
-      Object.keys(ApiTransferTypes).find(key =>
-        ApiTransferTypes[key] as string === getMhrTransferType.value?.transferType
-      )]
+    return UITransferTypes[Object.keys(ApiTransferTypes)
+      .find(key => ApiTransferTypes[key] as string === getMhrTransferType?.transferType)]
   }
 
   /** Draft Filings **/
@@ -238,7 +206,7 @@ export const useMhrInformation = () => {
   const parseOwnerGroups = (isDraft: boolean = false): MhrRegistrationHomeOwnerGroupIF[] => {
     const ownerGroups = []
 
-    getMhrTransferHomeOwnerGroups.value.forEach(ownerGroup => {
+    getMhrTransferHomeOwnerGroups.forEach(ownerGroup => {
       if (ownerGroup.action !== ActionTypes.REMOVED || isDraft) {
         ownerGroup.interestDenominator = ownerGroup.interestDenominator || 0
         ownerGroup.interestNumerator = ownerGroup.interestNumerator || 0
@@ -251,8 +219,8 @@ export const useMhrInformation = () => {
           ...ownerGroup,
           owners: isDraft ? ownerGroup.owners : addedEditedOwners,
           groupId: ownerGroup.groupId,
-          type: ApiHomeTenancyTypes[
-            Object.keys(HomeTenancyTypes).find(key => HomeTenancyTypes[key] as string === ownerGroup.type)
+          type: ApiHomeTenancyTypes[Object.keys(HomeTenancyTypes).find(key =>
+            HomeTenancyTypes[key] as string === ownerGroup.type)
           ]
         })
       }
@@ -263,7 +231,7 @@ export const useMhrInformation = () => {
 
   const parseDueToDeathOwnerGroups = (isDraft: boolean = false): MhrRegistrationHomeOwnerGroupIF[] => {
     const ownerGroups = []
-    getMhrTransferHomeOwnerGroups.value.forEach(ownerGroup => {
+    getMhrTransferHomeOwnerGroups.forEach(ownerGroup => {
       if (ownerGroup.owners.some(owner => owner.action === ActionTypes.REMOVED)) {
         ownerGroups.push({
           ...ownerGroup,
@@ -278,18 +246,18 @@ export const useMhrInformation = () => {
                 description: owner.suffix
               }
           }),
-          type: ApiHomeTenancyTypes[
-            Object.keys(HomeTenancyTypes).find(key => HomeTenancyTypes[key] as string === ownerGroup.type)
+          type: ApiHomeTenancyTypes[Object.keys(HomeTenancyTypes).find(key =>
+            HomeTenancyTypes[key] as string === ownerGroup.type)
           ]
         })
       }
     })
-    return isDraft ? getMhrTransferHomeOwnerGroups.value : ownerGroups
+    return isDraft ? getMhrTransferHomeOwnerGroups : ownerGroups
   }
 
   const parseDeletedDueToDeathOwnerGroups = (): MhrRegistrationHomeOwnerGroupIF[] => {
     const ownerGroups = []
-    getMhrTransferHomeOwnerGroups.value.forEach(ownerGroup => {
+    getMhrTransferHomeOwnerGroups.forEach(ownerGroup => {
       if (ownerGroup.owners.some(owner => owner.action === ActionTypes.REMOVED)) {
         ownerGroups.push({
           ...ownerGroup,
@@ -299,9 +267,9 @@ export const useMhrInformation = () => {
           }),
           // Determine group tenancy type
           type: (ownerGroup.owners.filter(owner => owner.action === ActionTypes.REMOVED).length > 1 ||
-            getMhrTransferType.value?.transferType === ApiTransferTypes.SURVIVING_JOINT_TENANT)
+            getMhrTransferType?.transferType === ApiTransferTypes.SURVIVING_JOINT_TENANT)
             ? ApiHomeTenancyTypes.JOINT
-            : getMhrTransferHomeOwnerGroups.value.length > 1
+            : getMhrTransferHomeOwnerGroups.length > 1
               ? ApiHomeTenancyTypes.NA
               : ApiHomeTenancyTypes.SOLE
         })
@@ -313,12 +281,12 @@ export const useMhrInformation = () => {
 
   const parseDeletedOwnerGroups = (): MhrRegistrationHomeOwnerGroupIF[] => {
     // Return the current state for Sale or Gift
-    if (getMhrTransferType.value?.transferType === ApiTransferTypes.SALE_OR_GIFT) {
-      return getMhrTransferCurrentHomeOwnerGroups.value
+    if (getMhrTransferType?.transferType === ApiTransferTypes.SALE_OR_GIFT) {
+      return getMhrTransferCurrentHomeOwnerGroups
     }
 
     const ownerGroups = []
-    getMhrTransferHomeOwnerGroups.value.forEach(ownerGroup => {
+    getMhrTransferHomeOwnerGroups.forEach(ownerGroup => {
       if (ownerGroup.owners.some(owner => owner.action === ActionTypes.REMOVED)) {
         ownerGroups.push({
           ...ownerGroup,
@@ -336,14 +304,14 @@ export const useMhrInformation = () => {
 
   const buildApiData = async (isDraft: boolean = false): Promise<MhrTransferApiIF> => {
     const data: MhrTransferApiIF = {
-      draftNumber: getMhrInformation.value.draftNumber,
-      mhrNumber: getMhrInformation.value.mhrNumber,
-      declaredValue: getMhrTransferDeclaredValue.value,
-      consideration: getMhrTransferConsideration.value,
-      transferDate: getMhrTransferDate.value,
-      ownLand: getMhrTransferOwnLand.value || false,
+      draftNumber: getMhrInformation.draftNumber,
+      mhrNumber: getMhrInformation.mhrNumber,
+      declaredValue: getMhrTransferDeclaredValue,
+      consideration: getMhrTransferConsideration,
+      transferDate: getMhrTransferDate,
+      ownLand: getMhrTransferOwnLand || false,
       documentDescription: UIRegistrationTypes.TRANSFER_OF_SALE,
-      registrationType: getMhrTransferType.value?.transferType,
+      registrationType: getMhrTransferType?.transferType,
       submittingParty: {
         businessName: getMhrTransferSubmittingParty.value.businessName,
         personName: getMhrTransferSubmittingParty.value.personName,
@@ -354,23 +322,23 @@ export const useMhrInformation = () => {
         ...(getMhrTransferSubmittingParty.value.phoneNumber && {
           phoneNumber: getMhrTransferSubmittingParty.value.phoneNumber?.replace(/[^A-Z0-9]/ig, '')
         }),
-        ...(getMhrTransferSubmittingParty.value.phoneExtension && {
-          phoneExtension: getMhrTransferSubmittingParty.value.phoneExtension
+        ...(getMhrTransferSubmittingParty.phoneExtension && {
+          phoneExtension: getMhrTransferSubmittingParty.phoneExtension
         })
       },
-      ...(isRoleQualifiedSupplier.value && !isRoleStaffReg.value && {
-        clientReferenceId: getMhrTransferAttentionReference.value
+      ...(isRoleQualifiedSupplier && !isRoleStaffReg && {
+        clientReferenceId: getMhrTransferAttentionReference
       }),
-      ...(isRoleStaffReg.value && !!getStaffPayment.value && {
-        clientReferenceId: getStaffPayment.value.folioNumber
+      ...(isRoleStaffReg && !!getStaffPayment && {
+        clientReferenceId: getStaffPayment.folioNumber
       }),
-      ...(isRoleStaffReg.value && !!getMhrTransferAttentionReference.value && {
-        attentionReference: getMhrTransferAttentionReference.value
+      ...(isRoleStaffReg && !!getMhrTransferAttentionReference && {
+        attentionReference: getMhrTransferAttentionReference
       }),
-      addOwnerGroups: isTransferDueToDeath.value
+      addOwnerGroups: isTransferDueToDeath
         ? parseDueToDeathOwnerGroups(isDraft)
         : parseOwnerGroups(isDraft),
-      deleteOwnerGroups: isTransferDueToDeath.value
+      deleteOwnerGroups: isTransferDueToDeath
         ? parseDeletedDueToDeathOwnerGroups()
         : parseDeletedOwnerGroups()
     }

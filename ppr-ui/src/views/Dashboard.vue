@@ -132,6 +132,7 @@ export default defineComponent({
   setup (props, context) {
     const router = useRouter()
     const {
+      // Getters
       isRoleStaff,
       hasMhrRole,
       hasPprRole,
@@ -143,22 +144,8 @@ export default defineComponent({
       getUserServiceFee,
       getSearchHistoryLength,
       isRoleQualifiedSupplier,
-      getUserProductSubscriptionsCodes
-    } = useGetters([
-      'isRoleStaff',
-      'hasMhrRole',
-      'hasPprRole',
-      'isNonBillable',
-      'hasMhrEnabled',
-      'isRoleStaffBcol',
-      'isRoleStaffReg',
-      'getSearchHistory',
-      'getUserServiceFee',
-      'getSearchHistoryLength',
-      'isRoleQualifiedSupplier',
-      'getUserProductSubscriptionsCodes'
-    ])
-    const {
+      getUserProductSubscriptionsCodes,
+      // Actions
       setSearchHistory,
       setSearchResults,
       setSearchedType,
@@ -167,16 +154,7 @@ export default defineComponent({
       setRegistrationType,
       resetNewRegistration,
       setManufacturedHomeSearchResults
-    } = useActions([
-      'setSearchHistory',
-      'setSearchResults',
-      'setSearchedType',
-      'setSearchedValue',
-      'setSearchDebtorName',
-      'setRegistrationType',
-      'resetNewRegistration',
-      'setManufacturedHomeSearchResults'
-    ])
+    } = useStore()
 
     const localState = reactive({
       loading: false,
@@ -185,28 +163,28 @@ export default defineComponent({
       toggleSnackbar: false,
       enableDashboardTabs: computed((): boolean => {
         return getFeatureFlag('mhr-registration-enabled') &&
-          hasPprRole.value && hasMhrRole.value && (isRoleStaff.value || isRoleQualifiedSupplier.value)
+          hasPprRole && hasMhrRole && (isRoleStaff || isRoleQualifiedSupplier)
       }),
       isAuthenticated: computed((): boolean => {
         return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
       }),
       searchHistoryLength: computed((): number => {
-        return getSearchHistory.value?.length || 0
+        return getSearchHistory?.length || 0
       }),
       hasPPR: computed((): boolean => {
         // For Staff, we check roles, for Client we check Products
-        if (isRoleStaff.value || isRoleStaffBcol.value || isRoleStaffReg.value) {
-          return hasPprRole.value
+        if (isRoleStaff || isRoleStaffBcol || isRoleStaffReg) {
+          return hasPprRole
         } else {
-          return getUserProductSubscriptionsCodes.value.includes(ProductCode.PPR)
+          return getUserProductSubscriptionsCodes.includes(ProductCode.PPR)
         }
       }),
       hasMHR: computed((): boolean => {
         // For Staff, we check roles, for Client we check Products
-        if (isRoleStaff.value || isRoleStaffBcol.value || isRoleStaffReg.value) {
-          return hasMhrRole.value && getFeatureFlag('mhr-ui-enabled')
+        if (isRoleStaff || isRoleStaffBcol || isRoleStaffReg) {
+          return hasMhrRole && getFeatureFlag('mhr-ui-enabled')
         } else {
-          return hasMhrEnabled.value
+          return hasMhrEnabled
         }
       })
     })
@@ -292,7 +270,7 @@ export default defineComponent({
       onAppReady(val)
     })
 
-    watch(() => getSearchHistoryLength.value, (newVal: number, oldVal: number): void => {
+    watch(() => getSearchHistoryLength, (newVal: number, oldVal: number): void => {
       // show snackbar if oldVal was not null
       if (oldVal !== null) {
         localState.snackbarMsg = 'Your search was successfully added to your table.'
