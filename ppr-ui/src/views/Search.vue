@@ -81,7 +81,8 @@ import {
   saveSelectionsError
 } from '@/resources/dialogOptions'
 import { getFeatureFlag, submitSelected, successfulPPRResponses, updateSelected, navigate, pacificDate } from '@/utils'
-import { SearchResultIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { SearchResultIF } from '@/interfaces'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'Search',
@@ -113,11 +114,13 @@ export default defineComponent({
   },
   setup (props, context) {
     const router = useRouter()
+    const store = useStore()
+
     const {
       getSearchedType,
       getUserSettings,
       getSearchResults
-    } = useStore()
+    } = storeToRefs(store)
 
     const localState = reactive({
       loading: false,
@@ -132,25 +135,25 @@ export default defineComponent({
       selectedMatches: [] as Array<SearchResultIF>,
       settingOption: SettingOptions.SELECT_CONFIRMATION_DIALOG,
       folioNumber: computed((): string => {
-        return getSearchResults?.searchQuery?.clientReferenceId || ''
+        return getSearchResults?.value.searchQuery?.clientReferenceId || ''
       }),
       isAuthenticated: computed((): boolean => {
         return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
       }),
       searchTime: computed((): string => {
         // return formatted date
-        const searchResult = getSearchResults
+        const searchResult = getSearchResults.value
         if (searchResult) {
-          const searchDate = new Date(searchResult.searchDateTime)
+          const searchDate = new Date(searchResult.value.searchDateTime)
           return ` as of ${pacificDate(searchDate)}`
         }
         return ''
       }),
       searchType: computed((): string => {
-        return getSearchedType?.searchTypeUI || ''
+        return getSearchedType?.value.searchTypeUI || ''
       }),
       searchValue: computed((): string => {
-        const searchResult = getSearchResults
+        const searchResult = getSearchResults.value
         if (searchResult) {
           // will put in more logic when doing individual debtor
           const first = searchResult.searchQuery?.criteria?.debtorName?.first
@@ -168,7 +171,7 @@ export default defineComponent({
         return ''
       }),
       totalResultsLength: computed((): number => {
-        const searchResult = getSearchResults
+        const searchResult = getSearchResults.value
         if (searchResult) {
           return searchResult.totalResultsSize
         }
@@ -176,7 +179,7 @@ export default defineComponent({
       }),
       exactResultsLength: computed((): number => {
         const selectedExactMatches = []
-        const results = getSearchResults?.results
+        const results = getSearchResults?.value.results
         let count = 0
         let x:any
         for (x in results) {
@@ -196,8 +199,8 @@ export default defineComponent({
       similarResultsLength: computed((): number => {
         const searchResult = getSearchResults
         let similarCount = 0
-        if (searchResult?.results) {
-          for (const result of searchResult.results) {
+        if (searchResult?.value.results) {
+          for (const result of searchResult.value.results) {
             if (result.matchType !== 'EXACT') {
               similarCount += 1
             }
@@ -256,7 +259,7 @@ export default defineComponent({
       } else if (localState.selectedMatches?.length >= 75) {
         localState.largeSearchResultDialog = true
       } else if (
-        getUserSettings?.selectConfirmationDialog &&
+        getUserSettings?.value.selectConfirmationDialog &&
         localState.totalResultsLength > 0 && localState.totalResultsLength < 75 &&
         localState.similarResultsLength > 0 && localState.similarResultsLength < 75
       ) {
@@ -278,7 +281,7 @@ export default defineComponent({
           shouldCallback = true
         }
         const statusCode =
-          await submitSelected(getSearchResults.searchId, localState.selectedMatches, shouldCallback)
+          await submitSelected(getSearchResults.value.searchId, localState.selectedMatches, shouldCallback)
         localState.loading = false
         if (!successfulPPRResponses.includes(statusCode)) {
           localState.errorOptions = { ...saveResultsError }
@@ -292,7 +295,7 @@ export default defineComponent({
 
     const updateSelectedMatches = async (matches:Array<SearchResultIF>): Promise<void> => {
       localState.selectedMatches = matches
-      const statusCode = await updateSelected(getSearchResults.searchId, matches)
+      const statusCode = await updateSelected(getSearchResults.value.searchId, matches)
       if (!successfulPPRResponses.includes(statusCode)) {
         localState.errorOptions = { ...saveSelectionsError }
         localState.errorDialog = true

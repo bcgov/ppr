@@ -1,4 +1,5 @@
 import { useStore } from '@/store/store'
+import { storeToRefs } from 'pinia'
 import {
   MhrRegistrationDescriptionIF,
   MhrRegistrationHomeLocationIF,
@@ -18,6 +19,18 @@ import { useHomeOwners } from '@/composables'
 
 export const useNewMhrRegistration = () => {
   const {
+    // Actions
+    setMhrLocation,
+    setMhrDraftNumber,
+    setMhrTableHistory,
+    setMhrHomeDescription,
+    setMhrAttentionReferenceNum,
+    setMhrRegistrationDocumentId,
+    setMhrRegistrationSubmittingParty,
+    setMhrRegistrationHomeOwnerGroups,
+    setMhrRegistrationOwnLand
+  } = useStore()
+  const {
     // Getters
     isRoleStaffReg,
     getMhrRegistrationHomeDescription,
@@ -28,19 +41,8 @@ export const useNewMhrRegistration = () => {
     getMhrRegistrationHomeOwnerGroups,
     getMhrRegistrationOwnLand,
     getStaffPayment,
-    getMhrDraftNumber,
-
-    // Actions
-    setMhrLocation,
-    setMhrDraftNumber,
-    setMhrTableHistory,
-    setMhrHomeDescription,
-    setMhrAttentionReferenceNum,
-    setMhrRegistrationDocumentId,
-    setMhrRegistrationOwnLand,
-    setMhrRegistrationSubmittingParty,
-    setMhrRegistrationHomeOwnerGroups
-  } = useStore
+    getMhrDraftNumber
+  } = storeToRefs(useStore())
 
   const {
     setShowGroups,
@@ -191,7 +193,7 @@ export const useNewMhrRegistration = () => {
   }
 
   const parseSubmittingParty = () => {
-    const submittingParty = cleanEmpty(getMhrRegistrationSubmittingParty)
+    const submittingParty = cleanEmpty(getMhrRegistrationSubmittingParty.value)
 
     if (submittingParty.businessName) {
       delete submittingParty.personName
@@ -224,7 +226,7 @@ export const useNewMhrRegistration = () => {
   }
 
   const parseDescription = (): MhrRegistrationDescriptionIF => {
-    let description: MhrRegistrationDescriptionIF = getMhrRegistrationHomeDescription
+    let description: MhrRegistrationDescriptionIF = getMhrRegistrationHomeDescription.value
 
     // Apply default manufacturer
     if (!description.manufacturer) {
@@ -238,7 +240,7 @@ export const useNewMhrRegistration = () => {
   }
 
   const parseLocation = (): MhrRegistrationHomeLocationIF => {
-    const location: MhrRegistrationHomeLocationIF = cleanEmpty(getMhrRegistrationLocation)
+    const location: MhrRegistrationHomeLocationIF = cleanEmpty(getMhrRegistrationLocation.value)
     // location is always in BC
     location.address.country = 'CA'
     location.address.region = 'BC'
@@ -258,7 +260,7 @@ export const useNewMhrRegistration = () => {
 
   // Staff Payment will be submitted as request parameters
   const parseStaffPayment = () => {
-    const staffPayment = Object.create(cleanEmpty(getStaffPayment) as StaffPaymentIF)
+    const staffPayment = Object.create(cleanEmpty(getStaffPayment.value) as StaffPaymentIF)
 
     // do not need this in the request param
     delete staffPayment.option
@@ -280,17 +282,17 @@ export const useNewMhrRegistration = () => {
       ownerGroups: parseOwnerGroups(),
       location: parseLocation(),
       description: parseDescription(),
-      ...(isRoleStaffReg && !!getStaffPayment && {
-        clientReferenceId: getStaffPayment.folioNumber
+      ...(isRoleStaffReg.value && !!getStaffPayment.value && {
+        clientReferenceId: getStaffPayment.value.folioNumber
       })
     }
 
-    if (getMhrAttentionReferenceNum) {
-      data.attentionReference = getMhrAttentionReferenceNum
+    if (getMhrAttentionReferenceNum.value) {
+      data.attentionReference = getMhrAttentionReferenceNum.value
     }
 
-    if (getMhrDraftNumber) {
-      data.draftNumber = getMhrDraftNumber
+    if (getMhrDraftNumber.value) {
+      data.draftNumber = getMhrDraftNumber.value
     }
 
     return data
@@ -304,8 +306,8 @@ export const useNewMhrRegistration = () => {
   }
 
   const mhrDraftHandler = async (): Promise<MhrDraftIF> => {
-    const draft = getMhrDraftNumber
-      ? await updateMhrDraft(getMhrDraftNumber, APIMhrTypes.MANUFACTURED_HOME_REGISTRATION, buildApiData())
+    const draft = getMhrDraftNumber.value
+      ? await updateMhrDraft(getMhrDraftNumber.value, APIMhrTypes.MANUFACTURED_HOME_REGISTRATION, buildApiData())
       : await createMhrDraft(APIMhrTypes.MANUFACTURED_HOME_REGISTRATION, buildApiData())
 
     // Set draftNumber to state to prevent duplicate drafts

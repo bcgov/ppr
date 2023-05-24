@@ -888,6 +888,7 @@ export const useStore = defineStore('assetsStore', () => {
     setUnsavedChanges(true)
   }
   function setMhrTableHistory (baseRegs: MhRegistrationSummaryIF[]) {
+    console.log(baseRegs)
     state.value.registrationTable.baseMhRegs = baseRegs
   }
   // MHR Information

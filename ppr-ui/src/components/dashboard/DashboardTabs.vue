@@ -54,6 +54,7 @@
 /* eslint-disable no-unused-vars */
 import { computed, defineComponent, onMounted, reactive, toRefs } from 'vue'
 import { useStore } from '@/store/store'
+import { storeToRefs } from 'pinia'
 import { RegistrationsWrapper } from '@/components/common'
 import { useNewMhrRegistration } from '@/composables'
 /* eslint-enable no-unused-vars */
@@ -74,21 +75,24 @@ export default defineComponent({
     }
   },
   setup (props, context) {
+    const store = useStore()
+    const {
+      // Actions
+      setCurrentRegistrationsTab
+    } = useStore()
     const {
       // Getters
       getMhRegTableBaseRegs,
       getRegTableTotalRowCount,
-      getCurrentRegistrationsTab,
-      // Actions
-      setCurrentRegistrationsTab
-    } = useStore()
+      getCurrentRegistrationsTab
+    } = storeToRefs(store)
 
     const {
       fetchMhRegistrations
     } = useNewMhrRegistration()
 
     const localState = reactive({
-      tabNumber: getCurrentRegistrationsTab,
+      tabNumber: getCurrentRegistrationsTab.value,
       isPprTab: computed((): boolean => {
         return localState.tabNumber === 0
       }),

@@ -30,7 +30,7 @@
           icon=" "
         ></sbc-system-banner>
         <breadcrumb :setCurrentPath="currentPath" :setCurrentPathName="currentPathName" v-if="haveData" />
-        <tombstone :setCurrentPath="currentPath" v-if="haveData" />{{isRoleStaff}}
+        <tombstone :setCurrentPath="currentPath" v-if="haveData" />
         <v-container class="view-container pa-0 ma-0">
           <v-row no-gutters>
             <v-col cols="12">
@@ -187,8 +187,8 @@ export default defineComponent({
         return Boolean(false)
       }),
       registrationTypeUI: computed((): string => {
-        const regType = getRegistrationType as unknown as RegistrationTypeIF
-        const regOther = getRegistrationOther as unknown as string
+        const regType = getRegistrationType.value as unknown as RegistrationTypeIF
+        const regOther = getRegistrationOther.value as unknown as string
         if (regType.registrationTypeAPI === APIRegistrationTypes.OTHER) {
           return regOther || ''
         }
@@ -233,7 +233,7 @@ export default defineComponent({
           const routeName = router.currentRoute.name as RouteNames
           if (
             (changeRoutes.includes(routeName) || newAmendRoutes.includes(routeName) || mhrRoutes.includes(routeName)) &&
-            hasUnsavedChanges) {
+            hasUnsavedChanges.value) {
             // browser popup
             event.preventDefault()
             // NB: custom text is no longer supported in any major browsers due to security reasons.
@@ -251,7 +251,7 @@ export default defineComponent({
     })
 
     const payErrorDialogHandler = (confirmed: boolean) => {
-      const flowType = getRegistrationFlowType as unknown as RegistrationFlowType
+      const flowType = getRegistrationFlowType.value as unknown as RegistrationFlowType
       localState.payErrorDisplay = false
       if (confirmed) {
         if ([RegistrationFlowType.NEW, RegistrationFlowType.AMENDMENT].includes(flowType)) {
@@ -308,7 +308,8 @@ export default defineComponent({
         }
       }
 
-      if (!isRoleStaff && !isRoleStaffReg && !isRoleStaffBcol && !hasPprEnabled && !hasMhrEnabled) {
+      if (!isRoleStaff.value && !isRoleStaffReg.value && !isRoleStaffBcol.value && !hasPprEnabled.value &&
+        !hasMhrEnabled.value) {
         handleError({
           category: ErrorCategories.PRODUCT_ACCESS,
           message: '',
@@ -400,7 +401,7 @@ export default defineComponent({
         if (settings?.error) {
           message = 'Unable to get user settings.'
           statusCode = settings.error.statusCode
-        } else if (!isRoleStaff) {
+        } else if (!isRoleStaff.value) {
           // check if non-billable
           userInfo.feeSettings = null
           const fees = await getFees(FeeCodes.SEARCH)
@@ -416,7 +417,6 @@ export default defineComponent({
         }
         setUserInfo(userInfo)
 
-        console.log(getAccountId.value)
         if (getAccountId.value) {
           const subscribedProducts = await fetchAccountProducts((getAccountId.value as unknown as number))
           if (subscribedProducts) {
@@ -474,14 +474,14 @@ export default defineComponent({
     /** Gets product subscription autorizations (for now just RPPR) and stores it. */
     const loadAccountProductSubscriptions = async (): Promise<any> => {
       let rpprSubscription = {} as AccountProductSubscriptionIF
-      if (isRoleStaff) {
+      if (isRoleStaff.value) {
         rpprSubscription = {
           [AccountProductCodes.RPPR]: {
             membership: AccountProductMemberships.MEMBER,
             roles: [AccountProductRoles.PAY, AccountProductRoles.SEARCH]
           }
         }
-        if (isRoleStaffBcol || isRoleStaffReg) {
+        if (isRoleStaffBcol.value || isRoleStaffReg.value) {
           rpprSubscription.RPPR.roles.push(AccountProductRoles.EDIT)
         }
       } else rpprSubscription = await getProductSubscription(AccountProductCodes.RPPR)
@@ -491,12 +491,12 @@ export default defineComponent({
     /** Updates Launch Darkly with user info. */
     const updateLaunchDarkly = async (): Promise<any> => {
       // since username is unique, use it as the user key
-      const key: string = getUserUsername as unknown as string
-      const email: string = getUserEmail as unknown as string
-      const firstName: string = getUserFirstName as unknown as string
-      const lastName: string = getUserLastName as unknown as string
+      const key: string = getUserUsername.value as unknown as string
+      const email: string = getUserEmail.value as unknown as string
+      const firstName: string = getUserFirstName.value as unknown as string
+      const lastName: string = getUserLastName.value as unknown as string
       // remove leading { and trailing } and tokenize string
-      const custom: any = { roles: getUserRoles }
+      const custom: any = { roles: getUserRoles.value }
 
       await updateLdUser(key, email, firstName, lastName, custom)
     }
@@ -568,7 +568,7 @@ export default defineComponent({
     const handleErrorRegCreate = (error: ErrorIF) => {
       // prep for registration payment issues
       let filing = localState.registrationTypeUI
-      const flowType = getRegistrationFlowType as unknown as RegistrationFlowType
+      const flowType = getRegistrationFlowType.value as unknown as RegistrationFlowType
 
       if (flowType !== RegistrationFlowType.NEW) {
         filing = flowType?.toLowerCase() || 'registration'
@@ -710,7 +710,6 @@ export default defineComponent({
     })
 
     return {
-      isRoleStaff,
       handleError,
       proceedAfterError,
       payErrorDialogHandler,

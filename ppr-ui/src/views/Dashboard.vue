@@ -20,7 +20,7 @@
             </v-col>
           </v-row>
           <v-row no-gutters>
-            <search-bar
+            <SearchBar
               class="soft-corners-bottom"
               :isNonBillable="isNonBillable"
               :serviceFee="getUserServiceFee"
@@ -83,6 +83,7 @@
 import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue'
 import { useRouter } from '@/router'
 import { useStore } from '@/store/store'
+import { storeToRefs } from 'pinia'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { ProductCode, RouteNames } from '@/enums'
 import {
@@ -131,6 +132,18 @@ export default defineComponent({
   },
   setup (props, context) {
     const router = useRouter()
+    const store = useStore()
+    const {
+      // Actions
+      setSearchHistory,
+      setSearchResults,
+      setSearchedType,
+      setSearchedValue,
+      setSearchDebtorName,
+      setRegistrationType,
+      resetNewRegistration,
+      setManufacturedHomeSearchResults
+    } = store
     const {
       // Getters
       isRoleStaff,
@@ -144,17 +157,8 @@ export default defineComponent({
       getUserServiceFee,
       getSearchHistoryLength,
       isRoleQualifiedSupplier,
-      getUserProductSubscriptionsCodes,
-      // Actions
-      setSearchHistory,
-      setSearchResults,
-      setSearchedType,
-      setSearchedValue,
-      setSearchDebtorName,
-      setRegistrationType,
-      resetNewRegistration,
-      setManufacturedHomeSearchResults
-    } = useStore()
+      getUserProductSubscriptionsCodes
+    } = storeToRefs(store)
 
     const localState = reactive({
       loading: false,
@@ -163,20 +167,20 @@ export default defineComponent({
       toggleSnackbar: false,
       enableDashboardTabs: computed((): boolean => {
         return getFeatureFlag('mhr-registration-enabled') &&
-          hasPprRole && hasMhrRole && (isRoleStaff || isRoleQualifiedSupplier)
+          hasPprRole.value && hasMhrRole.value && (isRoleStaff.value || isRoleQualifiedSupplier.value)
       }),
       isAuthenticated: computed((): boolean => {
         return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
       }),
       searchHistoryLength: computed((): number => {
-        return getSearchHistory?.length || 0
+        return (getSearchHistory.value as unknown as SearchResponseIF[])?.length || 0
       }),
       hasPPR: computed((): boolean => {
         // For Staff, we check roles, for Client we check Products
-        if (isRoleStaff || isRoleStaffBcol || isRoleStaffReg) {
-          return hasPprRole
+        if (isRoleStaff.value || isRoleStaffBcol.value || isRoleStaffReg.value) {
+          return hasPprRole.value
         } else {
-          return getUserProductSubscriptionsCodes.includes(ProductCode.PPR)
+          return getUserProductSubscriptionsCodes.value.includes(ProductCode.PPR)
         }
       }),
       hasMHR: computed((): boolean => {
@@ -184,7 +188,7 @@ export default defineComponent({
         if (isRoleStaff || isRoleStaffBcol || isRoleStaffReg) {
           return hasMhrRole && getFeatureFlag('mhr-ui-enabled')
         } else {
-          return hasMhrEnabled
+          return hasMhrEnabled.value
         }
       })
     })
@@ -270,7 +274,7 @@ export default defineComponent({
       onAppReady(val)
     })
 
-    watch(() => getSearchHistoryLength, (newVal: number, oldVal: number): void => {
+    watch(() => getSearchHistoryLength.value, (newVal: number, oldVal: number): void => {
       // show snackbar if oldVal was not null
       if (oldVal !== null) {
         localState.snackbarMsg = 'Your search was successfully added to your table.'
