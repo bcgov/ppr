@@ -15,7 +15,7 @@ export const transferOwnerPartyTypes = {
 export const transferOwnerPrefillAdditionalName = {
   [ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL]: 'Executor of the will of ',
   [ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL]: 'Executor of the will of ',
-  [ApiTransferTypes.TO_ADMIN_NO_WILL]: 'Administrator of the will of '
+  [ApiTransferTypes.TO_ADMIN_NO_WILL]: 'Administrator of the estate of '
 }
 
 export const transferSupportingDocuments = {
