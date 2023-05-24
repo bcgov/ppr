@@ -195,6 +195,7 @@ import { FeeSummaryTypes } from './enums'
 import { AdditionalSearchFeeIF, FeeSummaryI, RegistrationLengthI } from './interfaces'
 // eslint-enable no-unused-vars
 import { getFeeHint, getFeeSummary } from './factories'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'FeeSummary',
@@ -230,15 +231,15 @@ export default defineComponent({
   setup (props) {
     const {
       getLengthTrust, isRoleStaff, getStaffPayment, isSearchCertified
-    } = useStore()
+    } = storeToRefs(useStore())
     const localState = reactive({
       feeType: props.setFeeType,
       registrationType: props.setRegistrationType,
-      hasPriorityFee: computed((): Boolean => getStaffPayment?.isPriority),
-      hasCertifyFee: computed((): Boolean => isSearchCertified),
+      hasPriorityFee: computed((): Boolean => getStaffPayment.value?.isPriority),
+      hasCertifyFee: computed((): Boolean => isSearchCertified.value),
       registrationLength: computed((): RegistrationLengthI => props.setRegistrationLength),
       isValid: computed((): boolean => {
-        return getLengthTrust.valid ||
+        return getLengthTrust.value.valid ||
           [FeeSummaryTypes.MHSEARCH, FeeSummaryTypes.NEW_MHR, FeeSummaryTypes.MHR_TRANSFER].includes(localState.feeType)
       }),
       isPPRFee: computed((): boolean => {
@@ -263,7 +264,7 @@ export default defineComponent({
           localState.feeType,
           localState.registrationType,
           localState.registrationLength,
-          isRoleStaff,
+          isRoleStaff.value,
           props.setStaffClientPayment
         )
         if (props.setFeeQuantity) {
@@ -285,7 +286,7 @@ export default defineComponent({
           props.additionalFees?.feeType,
           props.additionalFees?.registrationType,
           props.additionalFees?.registrationLength,
-          isRoleStaff,
+          isRoleStaff.value,
           props.setStaffClientPayment
         )
         if (props.additionalFees?.quantity) {
@@ -321,7 +322,7 @@ export default defineComponent({
           if (localState.hasProcessingFee) {
             extraFee = localState.feeSummary.processingFee
           }
-          if (getStaffPayment?.isPriority) {
+          if (getStaffPayment.value?.isPriority) {
             extraFee = extraFee + 100
           }
           if (localState.hasCertifyFee) {

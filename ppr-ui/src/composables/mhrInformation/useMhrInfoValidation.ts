@@ -6,13 +6,14 @@ import {
 import { computed } from 'vue-demi'
 import { useHomeOwners, useTransferOwners } from '@/composables'
 import { ActionTypes } from '@/enums'
+import { storeToRefs } from 'pinia'
 
 export const useMhrInfoValidation = (validationState: mhrInfoValidationStateIF) => {
   const {
     hasLien,
     isRoleStaffReg,
     hasUnsavedChanges
-  } = useStore()
+  } = storeToRefs(useStore())
 
   const {
     isGlobalEditingMode,
@@ -46,23 +47,23 @@ export const useMhrInfoValidation = (validationState: mhrInfoValidationStateIF) 
   /** Returns true when the Transfer is complete and valid **/
   const isValidTransfer = computed((): boolean => {
     return (
-      hasUnsavedChanges &&
+      hasUnsavedChanges.value &&
       !isGlobalEditingMode.value &&
       validationState.isValidTransferType &&
       validationState.isValidTransferOwners &&
       (isTransferDueToDeath.value || validationState.isTransferDetailsValid) &&
-      !hasLien
+      !hasLien.value
     )
   })
 
   /** Returns true when the Transfer Review is complete and valid **/
   const isValidTransferReview = computed((): boolean => {
     return (
-      (isRoleStaffReg ? validationState.isSubmittingPartyValid : true) &&
+      (isRoleStaffReg.value ? validationState.isSubmittingPartyValid : true) &&
       validationState.isRefNumValid &&
       validationState.isCompletionConfirmed &&
       validationState.isAuthorizationValid &&
-      (isRoleStaffReg ? validationState.isStaffPaymentValid : true)
+      (isRoleStaffReg.value ? validationState.isStaffPaymentValid : true)
     )
   })
 

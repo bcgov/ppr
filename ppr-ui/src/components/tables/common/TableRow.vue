@@ -10,13 +10,12 @@
   >
     <td
       v-if="inSelectedHeaders('registrationNumber') || inSelectedHeaders('mhrNumber')"
-      :class="isChild || isExpanded ? $style['border-left']: ''"
+      :class="(isChild || isExpanded) ? 'border-left': ''"
     >
       <v-row no-gutters>
         <v-col v-if="item.changes" class="pr-2" cols="auto">
           <v-btn
-            :class="$style['btn-expand']"
-            class="btn-row-expand-arr"
+            class="btn-row-expand-arr btn-expand"
             color="white"
             icon
             small
@@ -79,7 +78,7 @@
     </td>
     <td
       v-if="inSelectedHeaders('registrationType') || inSelectedHeaders('registrationDescription')"
-      :class="isChild || item.expanded ? $style['border-left']: ''"
+      :class="isChild || item.expanded ? 'border-left': ''"
     >
       <div v-if="isPpr && !!item.registrationType">
         {{ getRegistrationType(item.registrationType) }}
@@ -107,8 +106,7 @@
       </div>
       <v-btn
         v-if="item.changes"
-        :class="[$style['btn-txt'], 'pa-0']"
-        class="btn-row-expand-txt"
+        class="btn-row-expand-txt btn-txt pa-0"
         color="primary"
         text
         underlined
@@ -123,7 +121,7 @@
         </label>
       </v-btn>
     </td>
-    <td v-if="inSelectedHeaders('createDateTime')" :class="isChild || item.expanded ? $style['border-left']: ''">
+    <td v-if="inSelectedHeaders('createDateTime')" :class="isChild || item.expanded ? 'border-left': ''">
       <span v-if="!isDraft(item)">
         {{ getFormattedDate(item.createDateTime) }}
       </span>
@@ -133,7 +131,7 @@
     </td>
     <td
       v-if="inSelectedHeaders('statusType')"
-      :class="isChild || item.expanded ? $style['border-left']: ''"
+      :class="isChild || item.expanded ? 'border-left': ''"
     >
       <div v-if="!isChild || isDraft(item) || !isPpr">
         {{  isMhrTransfer(item) ?
@@ -145,43 +143,43 @@
     </td>
     <td
       v-if="inSelectedHeaders('registeringName')"
-      :class="isChild || item.expanded ? $style['border-left']: ''"
+      :class="isChild || item.expanded ? 'border-left': ''"
     >
       <span v-if="item.registeringName">{{ getRegisteringName(item.registeringName) }}</span>
       <span v-else>{{ item.username || 'N/A' }}</span>
     </td>
     <td
       v-if="inSelectedHeaders('registeringParty')"
-      :class="isChild || item.expanded ? $style['border-left']: ''"
+      :class="isChild || item.expanded ? 'border-left': ''"
     >
       {{ item.registeringParty || item.submittingParty }}
     </td>
     <td
       v-if="inSelectedHeaders('ownerNames')"
-      :class="isChild || item.expanded ? $style['border-left']: ''"
+      :class="isChild || item.expanded ? 'border-left': ''"
     >
       {{ item.ownerNames}}
     </td>
     <td
       v-if="inSelectedHeaders('securedParties') && isPpr"
-      :class="isChild || item.expanded ? $style['border-left']: ''"
+      :class="isChild || item.expanded ? 'border-left': ''"
     >
       {{ item.securedParties || '' }}
     </td>
     <td
       v-if="inSelectedHeaders('clientReferenceId')"
-      :class="isChild || item.expanded ? $style['border-left']: ''"
+      :class="isChild || item.expanded ? 'border-left': ''"
     >
       {{ item.clientReferenceId }}
     </td>
     <td
       v-if="inSelectedHeaders('expireDays')"
       v-html="showExpireDays(item)"
-      :class="isChild || item.expanded ? $style['border-left']: ''"
+      :class="isChild || item.expanded ? 'border-left': ''"
     />
     <td
       v-if="inSelectedHeaders('vs')"
-      :class="isChild || item.expanded ? $style['border-left']: ''"
+      :class="isChild || item.expanded ? 'border-left': ''"
     >
       <v-btn
         :id="`pdf-btn-${item.id}`"
@@ -222,7 +220,7 @@
         <v-col class="edit-action pa-0" cols="auto">
           <v-btn
             v-if="isDraft(item)"
-            :class="$style['edit-btn']"
+            class="edit-btn"
             color="primary"
             elevation="0"
             @click="editDraft(item)"
@@ -231,17 +229,17 @@
           </v-btn>
           <v-btn
             v-else-if="isRepairersLien(item) && isActive(item)"
-            :class="$style['edit-btn']"
+            class="edit-btn"
             style="flex:0"
             color="primary"
             elevation="0"
             @click="handleAction(item, TableActions.DISCHARGE)"
           >
-            <span :class="[$style['discharge-btn'], 'text-wrap']">Total Discharge</span>
+            <span class="discharge-btn text-wrap">Total Discharge</span>
           </v-btn>
           <v-btn
             v-else-if="!isExpired(item) && !isDischarged(item)"
-            :class="$style['edit-btn']"
+            class="edit-btn"
             color="primary"
             elevation="0"
             @click="handleAction(item, TableActions.AMEND)"
@@ -255,7 +253,7 @@
             elevation="0"
             @click="handleAction(item, TableActions.REMOVE)"
           >
-            <span :class="[$style['remove-btn'], 'text-wrap']">Remove From<br>Table</span>
+            <span class="remove-btn text-wrap">Remove From<br>Table</span>
           </v-btn>
         </v-col>
         <v-col class="actions__more pa-0" v-if="!isExpired(item) && !isDischarged(item)">
@@ -266,8 +264,7 @@
                 elevation="0"
                 v-on="onMenu"
                 color="primary"
-                class="actions__more-actions__btn reg-table"
-                :class="$style['down-btn']"
+                class="actions__more-actions__btn reg-table down-btn"
               >
                 <v-icon v-if="value">mdi-menu-up</v-icon>
                 <v-icon v-else>mdi-menu-down</v-icon>
@@ -359,7 +356,7 @@
             color="primary"
             elevation="0"
             width="100"
-            :class="$style['edit-btn']"
+            class="edit-btn"
             @click="openMhr(item)"
           >
             <span>Open</span>
@@ -373,8 +370,7 @@
                 elevation="0"
                 v-on="onMenu"
                 color="primary"
-                class="actions__more-actions__btn reg-table"
-                :class="$style['down-btn']"
+                class="actions__more-actions__btn reg-table down-btn"
               >
                 <v-icon v-if="value">mdi-menu-up</v-icon>
                 <v-icon v-else>mdi-menu-down</v-icon>
@@ -399,7 +395,7 @@
             color="primary"
             elevation="0"
             width="100"
-            :class="$style['edit-btn']"
+            class="edit-btn"
             @click="openMhr(item)"
           >
             <span>Edit</span>
@@ -413,8 +409,7 @@
                 elevation="0"
                 v-on="onMenu"
                 color="primary"
-                class="actions__more-actions__btn reg-table"
-                :class="$style['down-btn']"
+                class="actions__more-actions__btn reg-table down-btn"
               >
                 <v-icon v-if="value">mdi-menu-up</v-icon>
                 <v-icon v-else>mdi-menu-down</v-icon>
@@ -440,7 +435,6 @@ import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
 import { getRegistrationSummary, mhRegistrationPDF, registrationPDF, stripChars } from '@/utils'
 import { useStore } from '@/store/store'
 import InfoChip from '@/components/common/InfoChip.vue'
-
 /* eslint-disable no-unused-vars */
 import { BaseHeaderIF, DraftResultIF, MhRegistrationSummaryIF, RegistrationSummaryIF } from '@/interfaces'
 /* eslint-enable no-unused-vars */
@@ -474,7 +468,6 @@ export default defineComponent({
   },
   emits: ['action', 'error', 'freezeScroll', 'toggleExpand'],
   setup (props, { emit }) {
-    const store = useStore()
     const {
       isRoleQualifiedSupplier,
       isRoleStaff,
@@ -482,7 +475,7 @@ export default defineComponent({
       isRoleStaffBcol,
       isRoleStaffReg,
       getMhRegTableBaseRegs
-    } = storeToRefs(store)
+    } = storeToRefs(useStore())
 
     const {
       getFormattedDate,
@@ -848,7 +841,7 @@ export default defineComponent({
 })
 </script>
 
-<style lang="scss" module>
+<style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
 .border-left:nth-child(1) {
   border-left: 3px solid $primary-blue

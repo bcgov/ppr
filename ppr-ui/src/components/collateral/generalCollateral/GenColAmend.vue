@@ -114,7 +114,8 @@ import {
   TableRow
 } from 'tiptap-vuetify'
 // local
-import { GeneralCollateralIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { GeneralCollateralIF } from '@/interfaces'
+import { storeToRefs } from 'pinia' // eslint-disable-line no-unused-vars
 
 export default defineComponent({
   props: {
@@ -131,7 +132,8 @@ export default defineComponent({
     TiptapVuetify
   },
   setup (props, { emit }) {
-    const { getGeneralCollateral, setGeneralCollateral } = useStore()
+    const { setGeneralCollateral } = useStore()
+    const { getGeneralCollateral } = storeToRefs(useStore())
     const extensions = [
       History,
       Blockquote,
@@ -162,7 +164,7 @@ export default defineComponent({
       delDesc: '',
       addDesc: '',
       generalCollateral: computed((): GeneralCollateralIF[] => {
-        return (getGeneralCollateral as GeneralCollateralIF[]) || []
+        return (getGeneralCollateral.value as GeneralCollateralIF[]) || []
       }),
       showErrorComponent: computed((): boolean => {
         return props.showInvalid

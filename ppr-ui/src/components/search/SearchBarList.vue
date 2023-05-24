@@ -25,7 +25,7 @@
                 style="width: 45rem; pointer-events: all;"
                 @click="toggleGroup(item.group)"
               >
-                <v-col class="py-0" align-self="center">
+                <v-col align-self="center">
                   <span class="search-list-header"><v-icon class="menu-icon" :color="item.color">{{item.icon}}</v-icon>
                   {{ item.textLabel }}</span>
                 </v-col>

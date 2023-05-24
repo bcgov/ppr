@@ -24,23 +24,10 @@ import { fetchMhRegistration, normalizeObject } from '@/utils'
 import { cloneDeep } from 'lodash'
 import { useHomeOwners, useTransferOwners } from '@/composables'
 import { computed, reactive, toRefs } from 'vue-demi'
+import { storeToRefs } from 'pinia'
 
 export const useMhrInformation = () => {
   const {
-    // Getters
-    isRoleStaffReg,
-    getStaffPayment,
-    getMhrInformation,
-    isRoleQualifiedSupplier,
-    getMhrTransferDeclaredValue,
-    getMhrTransferConsideration,
-    getMhrTransferDate,
-    getMhrTransferOwnLand,
-    getMhrTransferSubmittingParty,
-    getMhrTransferAttentionReference,
-    getMhrTransferHomeOwnerGroups,
-    getMhrTransferCurrentHomeOwnerGroups,
-    getMhrTransferType,
     // Actions
     setMhrStatusType,
     setMhrTransferHomeOwnerGroups,
@@ -56,6 +43,22 @@ export const useMhrInformation = () => {
     setMhrTransferConsideration,
     setMhrTransferSubmittingParty
   } = useStore()
+  const {
+    // Getters
+    isRoleStaffReg,
+    getStaffPayment,
+    getMhrInformation,
+    isRoleQualifiedSupplier,
+    getMhrTransferDeclaredValue,
+    getMhrTransferConsideration,
+    getMhrTransferDate,
+    getMhrTransferOwnLand,
+    getMhrTransferSubmittingParty,
+    getMhrTransferAttentionReference,
+    getMhrTransferHomeOwnerGroups,
+    getMhrTransferCurrentHomeOwnerGroups,
+    getMhrTransferType
+  } = storeToRefs(useStore())
 
   const {
     setShowGroups
@@ -68,7 +71,7 @@ export const useMhrInformation = () => {
   /** Local State for custom computed properties. **/
   const localState = reactive({
     isFrozenMhr: computed((): boolean => {
-      return getMhrInformation.statusType === MhApiStatusTypes.FROZEN
+      return getMhrInformation.value.statusType === MhApiStatusTypes.FROZEN
     })
   })
 
@@ -94,7 +97,7 @@ export const useMhrInformation = () => {
   }
 
   const parseMhrInformation = async (includeDetails = false): Promise<void> => {
-    const { data } = await fetchMhRegistration(getMhrInformation.mhrNumber)
+    const { data } = await fetchMhRegistration(getMhrInformation.value.mhrNumber)
 
     // Assign frozen state when the base registration is frozen (for drafts)
     if (data.status === MhApiStatusTypes.FROZEN) {
@@ -167,8 +170,10 @@ export const useMhrInformation = () => {
   }
 
   const getUiTransferType = (): UITransferTypes => {
-    return UITransferTypes[Object.keys(ApiTransferTypes)
-      .find(key => ApiTransferTypes[key] as string === getMhrTransferType?.transferType)]
+    return UITransferTypes[
+      Object.keys(ApiTransferTypes).find(key =>
+        ApiTransferTypes[key] as string === getMhrTransferType.value?.transferType
+      )]
   }
 
   /** Draft Filings **/
@@ -206,7 +211,7 @@ export const useMhrInformation = () => {
   const parseOwnerGroups = (isDraft: boolean = false): MhrRegistrationHomeOwnerGroupIF[] => {
     const ownerGroups = []
 
-    getMhrTransferHomeOwnerGroups.forEach(ownerGroup => {
+    getMhrTransferHomeOwnerGroups.value.forEach(ownerGroup => {
       if (ownerGroup.action !== ActionTypes.REMOVED || isDraft) {
         ownerGroup.interestDenominator = ownerGroup.interestDenominator || 0
         ownerGroup.interestNumerator = ownerGroup.interestNumerator || 0
@@ -219,8 +224,8 @@ export const useMhrInformation = () => {
           ...ownerGroup,
           owners: isDraft ? ownerGroup.owners : addedEditedOwners,
           groupId: ownerGroup.groupId,
-          type: ApiHomeTenancyTypes[Object.keys(HomeTenancyTypes).find(key =>
-            HomeTenancyTypes[key] as string === ownerGroup.type)
+          type: ApiHomeTenancyTypes[
+            Object.keys(HomeTenancyTypes).find(key => HomeTenancyTypes[key] as string === ownerGroup.type)
           ]
         })
       }
@@ -231,7 +236,7 @@ export const useMhrInformation = () => {
 
   const parseDueToDeathOwnerGroups = (isDraft: boolean = false): MhrRegistrationHomeOwnerGroupIF[] => {
     const ownerGroups = []
-    getMhrTransferHomeOwnerGroups.forEach(ownerGroup => {
+    getMhrTransferHomeOwnerGroups.value.forEach(ownerGroup => {
       if (ownerGroup.owners.some(owner => owner.action === ActionTypes.REMOVED)) {
         ownerGroups.push({
           ...ownerGroup,
@@ -246,18 +251,18 @@ export const useMhrInformation = () => {
                 description: owner.suffix
               }
           }),
-          type: ApiHomeTenancyTypes[Object.keys(HomeTenancyTypes).find(key =>
-            HomeTenancyTypes[key] as string === ownerGroup.type)
+          type: ApiHomeTenancyTypes[
+            Object.keys(HomeTenancyTypes).find(key => HomeTenancyTypes[key] as string === ownerGroup.type)
           ]
         })
       }
     })
-    return isDraft ? getMhrTransferHomeOwnerGroups : ownerGroups
+    return isDraft ? getMhrTransferHomeOwnerGroups.value : ownerGroups
   }
 
   const parseDeletedDueToDeathOwnerGroups = (): MhrRegistrationHomeOwnerGroupIF[] => {
     const ownerGroups = []
-    getMhrTransferHomeOwnerGroups.forEach(ownerGroup => {
+    getMhrTransferHomeOwnerGroups.value.forEach(ownerGroup => {
       if (ownerGroup.owners.some(owner => owner.action === ActionTypes.REMOVED)) {
         ownerGroups.push({
           ...ownerGroup,
@@ -267,9 +272,9 @@ export const useMhrInformation = () => {
           }),
           // Determine group tenancy type
           type: (ownerGroup.owners.filter(owner => owner.action === ActionTypes.REMOVED).length > 1 ||
-            getMhrTransferType?.transferType === ApiTransferTypes.SURVIVING_JOINT_TENANT)
+            getMhrTransferType.value?.transferType === ApiTransferTypes.SURVIVING_JOINT_TENANT)
             ? ApiHomeTenancyTypes.JOINT
-            : getMhrTransferHomeOwnerGroups.length > 1
+            : getMhrTransferHomeOwnerGroups.value.length > 1
               ? ApiHomeTenancyTypes.NA
               : ApiHomeTenancyTypes.SOLE
         })
@@ -281,12 +286,12 @@ export const useMhrInformation = () => {
 
   const parseDeletedOwnerGroups = (): MhrRegistrationHomeOwnerGroupIF[] => {
     // Return the current state for Sale or Gift
-    if (getMhrTransferType?.transferType === ApiTransferTypes.SALE_OR_GIFT) {
-      return getMhrTransferCurrentHomeOwnerGroups
+    if (getMhrTransferType.value?.transferType === ApiTransferTypes.SALE_OR_GIFT) {
+      return getMhrTransferCurrentHomeOwnerGroups.value
     }
 
     const ownerGroups = []
-    getMhrTransferHomeOwnerGroups.forEach(ownerGroup => {
+    getMhrTransferHomeOwnerGroups.value.forEach(ownerGroup => {
       if (ownerGroup.owners.some(owner => owner.action === ActionTypes.REMOVED)) {
         ownerGroups.push({
           ...ownerGroup,
@@ -304,14 +309,14 @@ export const useMhrInformation = () => {
 
   const buildApiData = async (isDraft: boolean = false): Promise<MhrTransferApiIF> => {
     const data: MhrTransferApiIF = {
-      draftNumber: getMhrInformation.draftNumber,
-      mhrNumber: getMhrInformation.mhrNumber,
-      declaredValue: getMhrTransferDeclaredValue,
-      consideration: getMhrTransferConsideration,
-      transferDate: getMhrTransferDate,
-      ownLand: getMhrTransferOwnLand || false,
+      draftNumber: getMhrInformation.value.draftNumber,
+      mhrNumber: getMhrInformation.value.mhrNumber,
+      declaredValue: getMhrTransferDeclaredValue.value,
+      consideration: getMhrTransferConsideration.value,
+      transferDate: getMhrTransferDate.value,
+      ownLand: getMhrTransferOwnLand.value || false,
       documentDescription: UIRegistrationTypes.TRANSFER_OF_SALE,
-      registrationType: getMhrTransferType?.transferType,
+      registrationType: getMhrTransferType.value?.transferType,
       submittingParty: {
         businessName: getMhrTransferSubmittingParty.value.businessName,
         personName: getMhrTransferSubmittingParty.value.personName,
@@ -322,23 +327,23 @@ export const useMhrInformation = () => {
         ...(getMhrTransferSubmittingParty.value.phoneNumber && {
           phoneNumber: getMhrTransferSubmittingParty.value.phoneNumber?.replace(/[^A-Z0-9]/ig, '')
         }),
-        ...(getMhrTransferSubmittingParty.phoneExtension && {
-          phoneExtension: getMhrTransferSubmittingParty.phoneExtension
+        ...(getMhrTransferSubmittingParty.value.phoneExtension && {
+          phoneExtension: getMhrTransferSubmittingParty.value.phoneExtension
         })
       },
-      ...(isRoleQualifiedSupplier && !isRoleStaffReg && {
-        clientReferenceId: getMhrTransferAttentionReference
+      ...(isRoleQualifiedSupplier.value && !isRoleStaffReg.value && {
+        clientReferenceId: getMhrTransferAttentionReference.value
       }),
-      ...(isRoleStaffReg && !!getStaffPayment && {
-        clientReferenceId: getStaffPayment.folioNumber
+      ...(isRoleStaffReg.value && !!getStaffPayment.value && {
+        clientReferenceId: getStaffPayment.value.folioNumber
       }),
-      ...(isRoleStaffReg && !!getMhrTransferAttentionReference && {
-        attentionReference: getMhrTransferAttentionReference
+      ...(isRoleStaffReg.value && !!getMhrTransferAttentionReference.value && {
+        attentionReference: getMhrTransferAttentionReference.value
       }),
-      addOwnerGroups: isTransferDueToDeath
+      addOwnerGroups: isTransferDueToDeath.value
         ? parseDueToDeathOwnerGroups(isDraft)
         : parseOwnerGroups(isDraft),
-      deleteOwnerGroups: isTransferDueToDeath
+      deleteOwnerGroups: isTransferDueToDeath.value
         ? parseDeletedDueToDeathOwnerGroups()
         : parseDeletedOwnerGroups()
     }

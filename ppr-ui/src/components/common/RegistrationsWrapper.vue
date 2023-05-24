@@ -992,7 +992,7 @@ export default defineComponent({
 
       for (let i = 0; i < baseHeaders.length; i++) {
         if (baseHeaders[i].value === 'actions') headers.push(baseHeaders[i])
-        else if (val.find(header => header === baseHeaders[i])) {
+        else if (val.find(header => header.value === baseHeaders[i].value)) {
           headers.push(baseHeaders[i])
         }
       }

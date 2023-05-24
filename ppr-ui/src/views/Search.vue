@@ -23,21 +23,21 @@
       @proceed="submit($event)"
     />
     <v-container class="container">
-      <b :class="$style['search-title']">Search Results</b>
-      <p v-if="!getSearchResults" :class="[$style['search-info'], 'ma-0']" style="padding-top: 26px;">
+      <b class="search-title">Search Results</b>
+      <p v-if="!getSearchResults" class="search-info ma-0" style="padding-top: 26px;">
         Your search results will display below.
       </p>
       <div v-else style="padding-top: 26px;">
         <p id="search-meta-info" class="ma-0">
-          <span :class="$style['search-sub-title']"><b>for {{ searchType }} "{{ searchValue }}"</b></span>
-          <span :class="$style['search-info']">{{ searchTime }}</span>
+          <span class="search-sub-title"><b>for {{ searchType }} "{{ searchValue }}"</b></span>
+          <span class="search-info">{{ searchTime }}</span>
         </p>
         <p v-if="folioNumber" id="results-folio-header" class="ma-0" style="padding-top: 22px;">
-          <b :class="$style['search-table-title']">Folio Number: </b>
-          <span :class="$style['search-info']">{{ folioNumber }}</span>
+          <b class="search-table-title">Folio Number: </b>
+          <span class="search-info">{{ folioNumber }}</span>
         </p>
         <v-row no-gutters style="padding-top: 22px;">
-          <v-col :class="$style['search-info']">
+          <v-col class="'search-info">
             <span v-if="totalResultsLength !== 0" id="results-info">
               Select the registrations you want to include in a printable PDF search report. Exact matches
               are automatically selected. This report will contain the full record of the registration for
@@ -349,7 +349,7 @@ export default defineComponent({
 })
 </script>
 
-<style lang="scss" module>
+<style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
 #done-btn {
   font-size: 0.825rem !important;

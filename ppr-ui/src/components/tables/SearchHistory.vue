@@ -181,6 +181,7 @@ import _ from 'lodash' // eslint-disable-line
 import { ErrorCategories } from '@/enums'
 import { useTableFeatures } from '@/composables'
 import { SortingIcon } from '@/components/tables/common'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   components: {
@@ -194,7 +195,7 @@ export default defineComponent({
       isRoleStaff,
       hasPprRole,
       hasMhrRole
-    } = useStore()
+    } = storeToRefs(useStore())
 
     const localState = reactive({
       keyValue: 0,
@@ -207,21 +208,21 @@ export default defineComponent({
         return tableHeaders
       }),
       hasBothRoles: computed((): boolean => {
-        return hasPprRole && hasMhrRole
+        return hasPprRole.value && hasMhrRole.value
       }),
       isStaff: computed((): boolean => {
-        return !!isRoleStaff
+        return !!isRoleStaff.value
       }),
       historyLength: computed((): number => {
         return localState.searchHistory?.length || 0
       }),
       searchHistory: computed(
         (): Array<SearchResponseIF> => {
-          return getSearchHistory || []
+          return getSearchHistory.value || []
         }
       ),
       isSearchHistory: computed((): boolean => {
-        return !!getSearchHistory
+        return !!getSearchHistory.value
       })
     })
     const { mapMhrSearchType } = useSearch()
@@ -385,7 +386,7 @@ export default defineComponent({
       return diffDays < 15
     }
     const isSearchOwner = (item: SearchResponseIF): Boolean => {
-      return getUserUsername === item?.userId
+      return getUserUsername.value === item?.userId
     }
     const retrySearch = (): void => {
       emit('retry')

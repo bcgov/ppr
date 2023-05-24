@@ -517,10 +517,10 @@ export const useStore = defineStore('assetsStore', () => {
   })
 
   /** MHR Getters **/
-  const mhrInfoValidation = computed(() => {
+  const getMhrInfoValidation = computed(() => {
     return state.value.mhrInfoValidationState
   })
-  const mhrTransferHomeOwners = computed(() => {
+  const getMhrTransferHomeOwners = computed(() => {
     const owners = [] as MhrRegistrationHomeOwnerIF[]
     state.value.mhrTransfer.ownerGroups.forEach((group) => {
       if (group.owners.length === 0) {
@@ -531,34 +531,34 @@ export const useStore = defineStore('assetsStore', () => {
     })
     return owners
   })
-  const mhrTransferHomeOwnerGroups = computed(() => {
+  const getMhrTransferHomeOwnerGroups = computed(() => {
     return state.value.mhrTransfer.ownerGroups
   })
-  const mhrTransferCurrentHomeOwnerGroups = computed(() => {
+  const getMhrTransferCurrentHomeOwnerGroups = computed(() => {
     return state.value.mhrTransfer.currentOwnerGroups
   })
-  const mhrTransferType = computed(() => {
+  const getMhrTransferType = computed(() => {
     return state.value.mhrTransfer.transferType
   })
-  const mhrTransferDeclaredValue = computed(() => {
+  const getMhrTransferDeclaredValue = computed(() => {
     return state.value.mhrTransfer.declaredValue
   })
-  const mhrTransferConsideration = computed(() => {
+  const getMhrTransferConsideration = computed(() => {
     return state.value.mhrTransfer.consideration
   })
-  const mhrTransferDate = computed(() => {
+  const getMhrTransferDate = computed(() => {
     return state.value.mhrTransfer.transferDate
   })
-  const mhrTransferOwnLand = computed(() => {
+  const getMhrTransferOwnLand = computed(() => {
     return state.value.mhrTransfer.ownLand
   })
-  const mhrTransferSubmittingParty = computed(() => {
+  const getMhrTransferSubmittingParty = computed(() => {
     return state.value.mhrTransfer.submittingParty
   })
-  const mhrTransferAttentionReference = computed(() => {
+  const getMhrTransferAttentionReference = computed(() => {
     return state.value.mhrTransfer.attentionReference
   })
-  const mhrTransferAffidavitCompleted = computed(() => {
+  const getMhrTransferAffidavitCompleted = computed(() => {
     return state.value.mhrTransfer.isAffidavitTransferCompleted
   })
 
@@ -1081,22 +1081,22 @@ export const useStore = defineStore('assetsStore', () => {
     hasLien,
 
     // Mhr Info Validation State
-    mhrInfoValidation,
+    getMhrInfoValidation,
 
     // Home Owners
-    mhrTransferHomeOwners,
-    mhrTransferHomeOwnerGroups,
-    mhrTransferCurrentHomeOwnerGroups,
+    getMhrTransferHomeOwners,
+    getMhrTransferHomeOwnerGroups,
+    getMhrTransferCurrentHomeOwnerGroups,
 
     // Ownership Transfers
-    mhrTransferType,
-    mhrTransferDeclaredValue,
-    mhrTransferConsideration,
-    mhrTransferDate,
-    mhrTransferOwnLand,
-    mhrTransferSubmittingParty,
-    mhrTransferAttentionReference,
-    mhrTransferAffidavitCompleted,
+    getMhrTransferType,
+    getMhrTransferDeclaredValue,
+    getMhrTransferConsideration,
+    getMhrTransferDate,
+    getMhrTransferOwnLand,
+    getMhrTransferSubmittingParty,
+    getMhrTransferAttentionReference,
+    getMhrTransferAffidavitCompleted,
 
     // ACTIONS
 

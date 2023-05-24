@@ -225,10 +225,6 @@ export default defineComponent({
   min-height: 0;
 }
 
-::v-deep .theme--light.v-list-item--disabled {
-  min-height: 0;
-}
-
 .v-input__icon--clear {
   .v-icon {
     font-size: 18px;

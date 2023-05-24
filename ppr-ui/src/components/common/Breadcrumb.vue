@@ -57,6 +57,7 @@ import {
 } from '@/resources'
 import { RouteNames } from '@/enums'
 import { getRoleProductCode } from '@/utils'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'Breadcrumb',
@@ -74,7 +75,7 @@ export default defineComponent({
       getUserRoles,
       getUserProductSubscriptionsCodes,
       getMhrInformation
-    } = useStore()
+    } = storeToRefs(useStore())
 
     const currentPath = toRefs(props).setCurrentPath
     const routeName = toRefs(props).setCurrentPathName as Ref<RouteNames>
@@ -88,8 +89,9 @@ export default defineComponent({
         return ''
       }),
       breadcrumbs: computed((): Array<BreadcrumbIF> => {
-        const roleBasedBreadcrumbTitle =
-          breadcrumbsTitles[getRoleProductCode(getUserRoles, getUserProductSubscriptionsCodes)]
+        const roleBasedBreadcrumbTitle = breadcrumbsTitles[
+          getRoleProductCode(getUserRoles.value, getUserProductSubscriptionsCodes.value)
+        ]
         const allTombstoneBreadcrumbs = [
           tombstoneBreadcrumbDashboard,
           tombstoneBreadcrumbDischarge,
@@ -100,7 +102,7 @@ export default defineComponent({
           tombstoneBreadcrumbSearchConfirm,
           tombstoneBreadcrumbMhrInformation
         ]
-        if (isRoleStaff) {
+        if (isRoleStaff.value) {
           for (const tombstoneBreadcrumb of allTombstoneBreadcrumbs) {
             tombstoneBreadcrumb[0].text = 'Staff Dashboard'
           }
@@ -119,36 +121,36 @@ export default defineComponent({
           const dischargeBreadcrumb = [...tombstoneBreadcrumbDischarge]
           dischargeBreadcrumb[1].text = roleBasedBreadcrumbTitle
           dischargeBreadcrumb[2].text =
-            `Base Registration ${getRegistrationNumber} - Total Discharge` || dischargeBreadcrumb[2].text
+            `Base Registration ${getRegistrationNumber.value} - Total Discharge` || dischargeBreadcrumb[2].text
           return dischargeBreadcrumb
         } else if (currentPath.value?.includes('renew')) {
           const renewBreadcrumb = [...tombstoneBreadcrumbRenewal]
           renewBreadcrumb[1].text = roleBasedBreadcrumbTitle || renewBreadcrumb[1].text
           renewBreadcrumb[2].text =
-            `Base Registration ${getRegistrationNumber} - Renewal` || renewBreadcrumb[2].text
+            `Base Registration ${getRegistrationNumber.value} - Renewal` || renewBreadcrumb[2].text
           return renewBreadcrumb
         } else if (currentPath.value?.includes('amend')) {
           const amendBreadcrumb = [...tombstoneBreadcrumbAmendment]
           amendBreadcrumb[1].text = roleBasedBreadcrumbTitle || amendBreadcrumb[1].text
           amendBreadcrumb[2].text =
-            `Base Registration ${getRegistrationNumber} - Amendment` || amendBreadcrumb[2].text
+            `Base Registration ${getRegistrationNumber.value} - Amendment` || amendBreadcrumb[2].text
           return amendBreadcrumb
         } else if (routeName.value === RouteNames.MHR_INFORMATION) {
           const mhrInfoBreadcrumb = [...tombstoneBreadcrumbMhrInformation]
-          mhrInfoBreadcrumb[2].text = `MHR Number ${getMhrInformation.mhrNumber}`
+          mhrInfoBreadcrumb[2].text = `MHR Number ${getMhrInformation.value.mhrNumber}`
           return mhrInfoBreadcrumb
         } else {
           const registrationBreadcrumb = [...tombstoneBreadcrumbRegistration]
           registrationBreadcrumb[1].text = roleBasedBreadcrumbTitle || registrationBreadcrumb[1].text
           registrationBreadcrumb[2].text =
-            getRegistrationType?.registrationTypeUI || registrationBreadcrumb[2].text
+            getRegistrationType.value?.registrationTypeUI || registrationBreadcrumb[2].text
           return registrationBreadcrumb
         }
       })
     })
 
     const handleStaff = (breadcrumbText): string => {
-      if (isRoleStaff) {
+      if (isRoleStaff.value) {
         breadcrumbText = breadcrumbText.replace('My', 'Staff')
       }
       return breadcrumbText

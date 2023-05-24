@@ -102,6 +102,7 @@ import {
 } from '@/interfaces'
 import { useGeneralCollateral } from './generalCollateral/factories'
 import { useVehicle } from './vehicleCollateral/factories'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'Collateral',
@@ -122,19 +123,20 @@ export default defineComponent({
   setup (props, context) {
     const router = useRouter()
     const {
-      // Getters
-      getAddCollateral,
-      getRegistrationFlowType,
-      getRegistrationType,
-
       // Actions
       setCollateralShowInvalid,
       setCollateralValid,
       setGeneralCollateral
     } = useStore()
+    const {
+      // Getters
+      getAddCollateral,
+      getRegistrationFlowType,
+      getRegistrationType
+    } = storeToRefs(useStore())
 
-    const registrationFlowType = getRegistrationFlowType
-    const registrationType = getRegistrationType.registrationTypeAPI
+    const registrationFlowType = getRegistrationFlowType.value
+    const registrationType = getRegistrationType.value.registrationTypeAPI
 
     const {
       hasVehicleCollateral,
@@ -152,7 +154,7 @@ export default defineComponent({
         return props.isSummary
       }),
       collateral: computed((): AddCollateralIF => {
-        return getAddCollateral as AddCollateralIF
+        return getAddCollateral.value as AddCollateralIF
       }),
       generalCollateralLength: computed((): number => {
         return localState.collateral.generalCollateral?.length || 0
@@ -174,7 +176,7 @@ export default defineComponent({
 
     onMounted(() => {
       if (
-        getRegistrationFlowType === RegistrationFlowType.NEW &&
+        getRegistrationFlowType.value === RegistrationFlowType.NEW &&
         localState.collateral?.generalCollateral?.length === 0 &&
         !localState.summaryView
       ) {
@@ -197,12 +199,12 @@ export default defineComponent({
 
     onUnmounted(() => {
       // clear general collateral description if there is no valid text left in editor (html tags not included)
-      if (getAddCollateral.generalCollateral[0]?.description?.replace(/(<([^>]+)>)/ig, '').trim().length === 0) {
+      if (getAddCollateral.value.generalCollateral[0]?.description?.replace(/(<([^>]+)>)/ig, '').trim().length === 0) {
         setGeneralCollateral([])
         // clear collateral step check mark if there are no vehicles
         // (this resets check mark that was set by general collateral description)
-        if (getAddCollateral.vehicleCollateral.length === 0) {
-          getAddCollateral.valid = false
+        if (getAddCollateral.value.vehicleCollateral.length === 0) {
+          getAddCollateral.value.valid = false
         }
       }
     })

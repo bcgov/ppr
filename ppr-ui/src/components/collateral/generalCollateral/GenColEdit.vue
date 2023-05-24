@@ -68,6 +68,7 @@ import {
   TableHeader,
   TableRow
 } from 'tiptap-vuetify'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'GenColEdit',
@@ -81,7 +82,8 @@ export default defineComponent({
     }
   },
   setup (props) {
-    const { getGeneralCollateral, getRegistrationFlowType, setGeneralCollateral } = useStore()
+    const { setGeneralCollateral } = useStore()
+    const { getGeneralCollateral, getRegistrationFlowType } = storeToRefs(useStore())
     const extensions = [
       History,
       Blockquote,
@@ -120,7 +122,7 @@ export default defineComponent({
     const localState = reactive({
       newDesc: '',
       generalCollateral: computed((): GeneralCollateralIF[] => {
-        return (getGeneralCollateral as GeneralCollateralIF[]) || []
+        return (getGeneralCollateral.value as GeneralCollateralIF[]) || []
       }),
       showErrorComponent: computed((): boolean => {
         return props.showInvalid
@@ -128,7 +130,7 @@ export default defineComponent({
     })
 
     onMounted(() => {
-      if (getRegistrationFlowType === RegistrationFlowType.NEW) {
+      if (getRegistrationFlowType.value === RegistrationFlowType.NEW) {
         if (localState.generalCollateral.length > 0) {
           localState.newDesc = localState.generalCollateral[0].description
         }
@@ -138,7 +140,7 @@ export default defineComponent({
     watch(
       () => localState.newDesc,
       (val: string) => {
-        if (getRegistrationFlowType === RegistrationFlowType.NEW) {
+        if (getRegistrationFlowType.value === RegistrationFlowType.NEW) {
           if (val) {
             setGeneralCollateral([{ description: val }])
           } else {
@@ -151,7 +153,7 @@ export default defineComponent({
     watch(
       () => localState.generalCollateral,
       (val: GeneralCollateralIF[]) => {
-        if (getRegistrationFlowType === RegistrationFlowType.NEW) {
+        if (getRegistrationFlowType.value === RegistrationFlowType.NEW) {
           if (val.length > 0 && val[0].description !== localState.newDesc) {
             localState.newDesc = val[0].description
           }

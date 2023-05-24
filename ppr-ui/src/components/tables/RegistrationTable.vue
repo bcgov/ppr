@@ -126,7 +126,7 @@
                   >
                     <v-text-field
                       v-if="header.value === 'createDateTime'"
-                      :id="$style['reg-textfield']"
+                      id="reg-textfield"
                       class="reg-textfield date-filter"
                       :class="{ 'active': dateTxt === 'Custom' }"
                       append-icon="mdi-calendar"
@@ -197,7 +197,7 @@
                   />
                   <v-btn
                     v-if="header.value === 'actions' && headers.length > 1 && tableFiltersActive"
-                    :class="[$style['clear-filters-btn'], 'registration-action', 'ma-0', 'px-0', 'pl-6', 'pt-4']"
+                    class="clear-filters-btn registration-action ma-0 px-0 pl-6 pt-4"
                     color="primary"
                     :ripple="false"
                     text
@@ -238,7 +238,7 @@
         </thead>
       </template>
       <template v-slot:item="{ expand, item, isExpanded }">
-        <table-row
+        <TableRow
           class="registration-data-table"
           :ref="setRowRef(item)"
           :setAddRegEffect="['newRegItem', 'newAndFirstItem'].includes(setRowRef(item))"
@@ -254,7 +254,7 @@
         />
       </template>
       <template v-slot:expanded-item="{ item }">
-        <table-row
+        <TableRow
           v-for="change in item.changes"
           class="registration-data-table"
           :key="`change-${change.documentId || change.registrationNumber}`"
@@ -736,7 +736,7 @@ export default defineComponent({
 })
 </script>
 
-<style lang="scss" module>
+<style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
 #reg-textfield {
   cursor: pointer !important;
