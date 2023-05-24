@@ -61,7 +61,7 @@ class MhrManufacturer(db.Model):  # pylint: disable=too-many-instance-attributes
         }
         owners = []
         owner = {
-            'businessName': self.owner.business_name,
+            'organizationName': self.owner.business_name,
             'partyType': self.owner.party_type.value,
             'address': self.owner.address.json
         }

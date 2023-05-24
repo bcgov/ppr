@@ -56,7 +56,7 @@ MANUFACTURER_JSON = {
       'groupId': 1,
       'owners': [
         {
-          'businessName': 'OWNER REAL ENGINEERED HOMES INC',
+          'organizationName': 'OWNER REAL ENGINEERED HOMES INC',
           'partyType': 'OWNER_BUS',
           'address': {
             'street': '1704 GOVERNMENT ST.',
@@ -155,7 +155,7 @@ def test_find_by_account_id(session, account_id, has_results):
         assert json_data['ownerGroups'][0].get('type') == 'SOLE'
         assert json_data['ownerGroups'][0].get('owners')
         owner = json_data['ownerGroups'][0]['owners'][0]
-        assert owner.get('businessName')
+        assert owner.get('organizationName')
         assert owner.get('address')
         assert json_data.get('location')
         assert json_data['location'].get('locationType')
@@ -179,7 +179,7 @@ def test_manufacturer_json(session):
                                    phone_number=MANUFACTURER_JSON['submittingParty'].get('phoneNumber'))
     owner: MhrParty = MhrParty(id=2, 
                                party_type=MhrPartyTypes.OWNER_BUS,
-                               business_name=MANUFACTURER_JSON['ownerGroups'][0]['owners'][0].get('businessName'),
+                               business_name=MANUFACTURER_JSON['ownerGroups'][0]['owners'][0].get('organizationName'),
                                address=owner_address)
     dealer: MhrParty = MhrParty(id=3, 
                                 party_type=MhrPartyTypes.MANUFACTURER,

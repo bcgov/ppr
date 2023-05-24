@@ -58,7 +58,7 @@ def test_account_manufacturer(session, client, jwt, desc, roles, account_id, sta
         assert json_data['ownerGroups'][0].get('type') == 'SOLE'
         assert json_data['ownerGroups'][0].get('owners')
         owner = json_data['ownerGroups'][0]['owners'][0]
-        assert owner.get('businessName')
+        assert owner.get('organizationName')
         assert owner.get('address')
         assert json_data.get('location')
         assert json_data['location'].get('locationType')
