@@ -53,9 +53,9 @@ import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 import { HomeLocation, HomeOwners, MhrReviewConfirm, SubmittingParty, YourHome } from '@/views'
 import { MHRButtonFooterConfig, RegistrationButtonFooterConfig } from '@/resources/buttoneFooterConfig'
 
-export const useStore = defineStore('state', () => {
+export const useStore = defineStore('assetsStore', () => {
   // State Model
-  const state = ref({ ...stateModel })
+  const state = ref(stateModel)
 
   /** PPR Getters **/
 
@@ -99,10 +99,10 @@ export const useStore = defineStore('state', () => {
   const getAccountProductSubscriptions = computed((): AccountProductSubscriptionIF => {
     return state.value.accountProductSubscriptions
   })
-  const getUserProductSubscriptions = computed((): Array<UserProductSubscriptionIF> => {
+  const getUserProductSubscriptions = computed((): UserProductSubscriptionIF[] => {
     return state.value.userProductSubscriptions
   })
-  const getUserProductSubscriptionsCodes = computed((): Array<ProductCode> => {
+  const getUserProductSubscriptionsCodes = computed<ProductCode[]>((): ProductCode[] => {
     return state.value.userProductSubscriptionsCodes
   })
   /** The registration collateral object. */
@@ -135,7 +135,7 @@ export const useStore = defineStore('state', () => {
   const getCourtOrderInformation = computed<CourtOrderIF>(() => {
     return state.value.registration.courtOrderInformation
   })
-  const getCurrentRegistrationsTab = computed<Number>(() => {
+  const getCurrentRegistrationsTab = computed<number>((): number => {
     return state.value.currentRegistrationsTab
   })
   const getDraft = computed<DraftIF>(() => {
@@ -163,7 +163,7 @@ export const useStore = defineStore('state', () => {
     return state.value.registration.registrationNumber
   })
   /** The selected registration type object. */
-  const getRegistrationType = computed<RegistrationTypeIF>(() => {
+  const getRegistrationType = computed<RegistrationTypeIF>((): RegistrationTypeIF => {
     return state.value.registration.registrationType
   })
   const isMhrRegistration = computed<boolean>(() => {
@@ -185,8 +185,8 @@ export const useStore = defineStore('state', () => {
     return state.value.registration.registrationFlowType
   })
   /** The selected registration type object. */
-  const getRegistrationOther = computed<string>(() => {
-    return state.value.registration.registrationTypeOtherDesc
+  const getRegistrationOther = computed<string>((): string => {
+    return state.value.registration.registrationTypeOtherDesc as unknown as string
   })
   const getRegistration = computed<string>(() => {
     return state.value.registration.registrationTypeOtherDesc
@@ -213,10 +213,10 @@ export const useStore = defineStore('state', () => {
     return state.value.search.searchedValue
   })
   /** The list of past search responses for this account. */
-  const getSearchHistory = computed<Array<SearchResponseIF>>(() => {
+  const getSearchHistory = computed<SearchResponseIF[]>(() => {
     return state.value.search.searchHistory
   })
-  const getSearchHistoryLength = computed<Number>(() => {
+  const getSearchHistoryLength = computed<number>((): number => {
     return state.value.search.searchHistoryLength
   })
   const getUserEmail = computed<string>(() => {
@@ -229,7 +229,7 @@ export const useStore = defineStore('state', () => {
   const getUserLastName = computed<string>(() => {
     return state.value.userInfo?.lastname || ''
   })
-  const getUserRoles = computed<Array<string>>(() => {
+  const getUserRoles = computed<string[]>(() => {
     return state.value.authorization?.authRoles
   })
   const hasPprRole = computed<boolean>(() => {
@@ -256,7 +256,7 @@ export const useStore = defineStore('state', () => {
   const getVehicleCollateral = computed<VehicleCollateralIF[]>(() => {
     return state.value.registration.collateral.vehicleCollateral
   })
-  const hasUnsavedChanges = computed<Boolean>(() => {
+  const hasUnsavedChanges = computed<boolean>(() => {
     return state.value.unsavedChanges
   })
   const isNonBillable = computed<boolean>(() => {
@@ -280,7 +280,7 @@ export const useStore = defineStore('state', () => {
   const showStepErrors = computed<boolean>(() => {
     return state.value.registration.showStepErrors
   })
-  const getSteps = computed<Array<any>>(() => {
+  const getSteps = computed<any[]>(() => {
     return isMhrRegistration.value
       ? getMhrSteps.value
       : getPprSteps.value
@@ -396,7 +396,7 @@ export const useStore = defineStore('state', () => {
       }
     ]
   })
-  const getFooterButtonConfig = computed<Array<ButtonConfigIF>>(() => {
+  const getFooterButtonConfig = computed<ButtonConfigIF[]>(() => {
     return isMhrRegistration.value ? MHRButtonFooterConfig : RegistrationButtonFooterConfig
   })
   const getMaxStep = computed<number>(() => {
@@ -443,7 +443,7 @@ export const useStore = defineStore('state', () => {
   const hasMorePages = computed<boolean>(() => {
     return state.value.registrationTable.sortHasMorePages
   })
-  const getMhrHomeSections = computed<Array<HomeSectionIF>>(() => {
+  const getMhrHomeSections = computed<HomeSectionIF[]>(() => {
     return state.value.mhrRegistration.description.sections
   })
   // MHR Getters
@@ -475,7 +475,7 @@ export const useStore = defineStore('state', () => {
     return state.value.mhrRegistration.submittingParty
   })
   const getMhrRegistrationHomeOwners = computed<MhrRegistrationHomeOwnerIF[]>(() => {
-    const owners: MhrRegistrationHomeOwnerIF[] = []
+    const owners = [] as MhrRegistrationHomeOwnerIF[]
     state.value.mhrRegistration.ownerGroups.forEach((group: any) => {
       if (group.owners.length === 0) {
         // Groups with no owners should have at least one 'placeholder' owner
@@ -521,10 +521,10 @@ export const useStore = defineStore('state', () => {
     return state.value.mhrInfoValidationState
   })
   const mhrTransferHomeOwners = computed(() => {
-    const owners = []
+    const owners = [] as MhrRegistrationHomeOwnerIF[]
     state.value.mhrTransfer.ownerGroups.forEach((group) => {
       if (group.owners.length === 0) {
-        owners.push({ groupId: group.groupId })
+        owners.push(({ groupId: group.groupId } as MhrRegistrationHomeOwnerIF))
       } else {
         group.owners.forEach((owner) => owners.push({ ...owner, groupId: group.groupId }))
       }
@@ -644,10 +644,10 @@ export const useStore = defineStore('state', () => {
   function setAccountProductSubscription (productSubscriptions: AccountProductSubscriptionIF) {
     state.value.accountProductSubscriptions = productSubscriptions
   }
-  function setUserProductSubscriptions (products: Array<UserProductSubscriptionIF>) {
+  function setUserProductSubscriptions (products: UserProductSubscriptionIF[]) {
     state.value.userProductSubscriptions = products
   }
-  function setUserProductSubscriptionsCodes (activeProducts: Array<ProductCode>) {
+  function setUserProductSubscriptionsCodes (activeProducts: ProductCode[]) {
     state.value.userProductSubscriptionsCodes = activeProducts
   }
   function setAccountInformation (accountInformation: AccountInformationIF) {
@@ -671,7 +671,7 @@ export const useStore = defineStore('state', () => {
     state.value.registration.amendmentDescription = description
     setUnsavedChanges(true)
   }
-  function setAuthRoles (authRoles: Array<string>) {
+  function setAuthRoles (authRoles: string[]) {
     state.value.authorization.authRoles = authRoles
   }
   function setRoleSbc (isSbc: boolean) {
@@ -741,7 +741,7 @@ export const useStore = defineStore('state', () => {
   function setSearchDebtorName (debtorName: IndividualNameIF) {
     state.value.search.searchDebtorName = debtorName
   }
-  function setSearchHistory (searchHistory: Array<SearchResponseIF>) {
+  function setSearchHistory (searchHistory: SearchResponseIF[]) {
     // need to set .loadingPDF so that the loader circle triggers when set
     //  - if it starts as undefined it wont trigger on change
     for (let i = 0; i < searchHistory?.length || 0; i++) {
@@ -838,7 +838,7 @@ export const useStore = defineStore('state', () => {
   function setUnsavedChanges (unsavedChanges: boolean) {
     state.value.unsavedChanges = unsavedChanges
   }
-  function setCurrentRegistrationsTab (currentRegistrationsTab: Number) {
+  function setCurrentRegistrationsTab (currentRegistrationsTab: number) {
     state.value.currentRegistrationsTab = currentRegistrationsTab
   }
   // MHR Registration

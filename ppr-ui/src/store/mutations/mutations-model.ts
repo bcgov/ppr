@@ -356,7 +356,7 @@ export const mutateUnsavedChanges = (state: StateIF, unsavedChanges: boolean) =>
   state.stateModel.unsavedChanges = unsavedChanges
 }
 
-export const mutateCurrentRegistrationsTab = (state: StateIF, currentRegistrationsTab: Number) => {
+export const mutateCurrentRegistrationsTab = (state: StateIF, currentRegistrationsTab: number) => {
   state.stateModel.currentRegistrationsTab = currentRegistrationsTab
 }
 

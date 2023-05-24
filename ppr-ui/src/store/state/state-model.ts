@@ -1,5 +1,5 @@
 import { RegistrationFlowType } from '@/enums'
-import { StateModelIF } from '@/interfaces'
+import { RegistrationTypeIF, StateModelIF } from '@/interfaces'
 
 export const stateModel: StateModelIF = {
   accountInformation: {
@@ -78,7 +78,7 @@ export const stateModel: StateModelIF = {
       surrenderDate: ''
     },
     registrationNumber: '',
-    registrationType: null,
+    registrationType: {} as RegistrationTypeIF,
     registrationFlowType: RegistrationFlowType.NEW,
     registrationTypeOtherDesc: null,
     showStepErrors: false,
@@ -122,7 +122,7 @@ export const stateModel: StateModelIF = {
   search: {
     searchDebtorName: null,
     searchHistory: null,
-    searchHistoryLength: null,
+    searchHistoryLength: 0,
     searchResults: null,
     manufacturedHomeSearchResults: null,
     searchedType: null,
