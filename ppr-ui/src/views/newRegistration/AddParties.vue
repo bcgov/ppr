@@ -60,7 +60,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue'
+import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue-demi'
 import { useRouter } from '@/router'
 import { useStore } from '@/store/store'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
@@ -71,7 +71,8 @@ import ButtonFooter from '@/components/common/ButtonFooter.vue'
 import { Parties } from '@/components/parties'
 import { getFeatureFlag } from '@/utils'
 import { ErrorIF } from '@/interfaces' // eslint-disable-line
-import { RegistrationLengthI } from '@/composables/fees/interfaces' // eslint-disable-line no-unused-vars
+import { RegistrationLengthI } from '@/composables/fees/interfaces'
+import { storeToRefs } from 'pinia' // eslint-disable-line no-unused-vars
 
 export default defineComponent({
   name: 'AddParties',
@@ -99,7 +100,7 @@ export default defineComponent({
       getRegistrationType,
       getRegistrationOther,
       getRegistrationFlowType
-    } = useStore()
+    } = storeToRefs(useStore())
 
     const localState = reactive({
       dataLoaded: false,
@@ -111,15 +112,15 @@ export default defineComponent({
       }),
       registrationLength: computed((): RegistrationLengthI => {
         return {
-          lifeInfinite: getLengthTrust?.lifeInfinite || false,
-          lifeYears: getLengthTrust?.lifeYears || 0
+          lifeInfinite: getLengthTrust.value?.lifeInfinite || false,
+          lifeYears: getLengthTrust.value?.lifeYears || 0
         }
       }),
       registrationTypeUI: computed((): string => {
-        if (getRegistrationType?.registrationTypeAPI === APIRegistrationTypes.OTHER) {
-          return getRegistrationOther || ''
+        if (getRegistrationType.value?.registrationTypeAPI === APIRegistrationTypes.OTHER) {
+          return getRegistrationOther.value || ''
         }
-        return getRegistrationType?.registrationTypeUI || ''
+        return getRegistrationType.value?.registrationTypeUI || ''
       })
     })
 
@@ -140,7 +141,7 @@ export default defineComponent({
       }
 
       // redirect if store doesn't contain all needed data (happens on page reload, etc.)
-      if (!getRegistrationType || getRegistrationFlowType !== RegistrationFlowType.NEW) {
+      if (!getRegistrationType.value || getRegistrationFlowType.value !== RegistrationFlowType.NEW) {
         router.push({
           name: RouteNames.DASHBOARD
         })

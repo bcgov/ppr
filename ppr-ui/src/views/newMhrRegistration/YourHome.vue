@@ -65,7 +65,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
+import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
 import { useStore } from '@/store/store'
 import {
   HomeCertification,
@@ -75,6 +75,7 @@ import {
   OtherInformation
 } from '@/components/mhrRegistration/YourHome'
 import { useMhrValidations } from '@/composables/mhrRegistration/useMhrValidations'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'YourHome',
@@ -89,14 +90,14 @@ export default defineComponent({
   setup () {
     const {
       getMhrRegistrationValidationModel
-    } = useStore()
+    } = storeToRefs(useStore())
 
     const {
       MhrCompVal,
       MhrSectVal,
       getSectionValidation,
       scrollToInvalid
-    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel))
+    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
     const localState = reactive({
       validateMakeModel: computed(() => {

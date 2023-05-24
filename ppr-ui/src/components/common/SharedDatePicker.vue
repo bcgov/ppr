@@ -49,7 +49,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onBeforeMount, reactive, ref, toRefs, watch } from 'vue'
+import { computed, defineComponent, onBeforeMount, reactive, ref, toRefs, watch } from 'vue-demi'
 import { useRoute } from '@/router'
 import { yyyyMmDdToPacificDate } from '@/utils'
 // eslint-disable-next-line no-unused-vars

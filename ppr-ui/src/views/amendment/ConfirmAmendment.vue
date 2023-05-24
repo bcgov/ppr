@@ -161,8 +161,10 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue'
+import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue-demi'
 import { useRoute, useRouter } from 'vue-router/composables'
+import { useStore } from '@/store/store'
+import { storeToRefs } from 'pinia'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import {
   CautionBox,
@@ -186,7 +188,6 @@ import {
   saveAmendmentStatement,
   saveAmendmentStatementDraft
 } from '@/utils'
-import { useStore } from '@/store/store'
 /* eslint-disable no-unused-vars */
 import {
   ActionTypes,
@@ -247,6 +248,16 @@ export default defineComponent({
     const route = useRoute()
     const router = useRouter()
     const {
+      // Actions
+      setUnsavedChanges,
+      setRegTableNewItem,
+      setRegistrationType,
+      setRegistrationNumber,
+      setRegistrationExpiryDate,
+      setRegistrationCreationDate,
+      setAddSecuredPartiesAndDebtors
+    } = useStore()
+    const {
       // Getters
       getStateModel,
       getLengthTrust,
@@ -261,16 +272,8 @@ export default defineComponent({
       getRegistrationNumber,
       getAmendmentDescription,
       getCourtOrderInformation,
-      getAddSecuredPartiesAndDebtors,
-      // Actions
-      setUnsavedChanges,
-      setRegTableNewItem,
-      setRegistrationType,
-      setRegistrationNumber,
-      setRegistrationExpiryDate,
-      setRegistrationCreationDate,
-      setAddSecuredPartiesAndDebtors
-    } = useStore()
+      getAddSecuredPartiesAndDebtors
+    } = storeToRefs(useStore())
 
     const localState = reactive({
       collateralSummary: '',
@@ -307,25 +310,25 @@ export default defineComponent({
         return (route.query['reg-num'] as string) || ''
       }),
       registrationTypeUI: computed((): UIRegistrationTypes => {
-        return getRegistrationType?.registrationTypeUI || null
+        return getRegistrationType.value?.registrationTypeUI || null
       }),
       registrationType: computed((): APIRegistrationTypes => {
-        return getRegistrationType?.registrationTypeAPI || null
+        return getRegistrationType.value?.registrationTypeAPI || null
       }),
       registrationLength: computed((): RegistrationLengthI => {
         return {
-          lifeInfinite: getLengthTrust?.lifeInfinite || false,
-          lifeYears: getLengthTrust?.lifeYears || 0
+          lifeInfinite: getLengthTrust.value?.lifeInfinite || false,
+          lifeYears: getLengthTrust.value?.lifeYears || 0
         }
       }),
       showDescription: computed((): boolean => {
         return !!getAmendmentDescription
       }),
       currentRegNumber: computed((): string => {
-        return getRegistrationNumber || ''
+        return getRegistrationNumber.value || ''
       }),
       showCourtOrder: computed((): boolean => {
-        const courtOrder: CourtOrderIF = getCourtOrderInformation
+        const courtOrder: CourtOrderIF = getCourtOrderInformation.value
         return courtOrder &&
           (
             courtOrder?.courtName.length > 0 ||
@@ -336,11 +339,11 @@ export default defineComponent({
           )
       }),
       showLengthTrustIndenture: computed((): boolean => {
-        const lengthTrust: LengthTrustIF = getLengthTrust
+        const lengthTrust: LengthTrustIF = getLengthTrust.value
         return !!lengthTrust.action
       }),
       showSecuredParties: computed((): boolean => {
-        const parties: AddPartiesIF = getAddSecuredPartiesAndDebtors
+        const parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
         for (let i = 0; i < parties.securedParties.length; i++) {
           if (parties.securedParties[i].action) {
             return true
@@ -350,7 +353,7 @@ export default defineComponent({
       }),
 
       showDebtors: computed((): boolean => {
-        const parties: AddPartiesIF = getAddSecuredPartiesAndDebtors
+        const parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
         for (let i = 0; i < parties.debtors.length; i++) {
           if (parties.debtors[i].action) {
             return true
@@ -359,7 +362,7 @@ export default defineComponent({
         return false
       }),
       showVehicleCollateral: computed((): boolean => {
-        const addCollateral:AddCollateralIF = getAddCollateral
+        const addCollateral:AddCollateralIF = getAddCollateral.value
         if (!addCollateral.vehicleCollateral) {
           return false
         }
@@ -371,7 +374,7 @@ export default defineComponent({
         return false
       }),
       showGeneralCollateral: computed((): boolean => {
-        const addCollateral:AddCollateralIF = getAddCollateral
+        const addCollateral:AddCollateralIF = getAddCollateral.value
         if (!addCollateral.generalCollateral) {
           return false
         }
@@ -383,15 +386,15 @@ export default defineComponent({
         return false
       }),
       collateralValid: computed((): boolean => {
-        const addCollateral:AddCollateralIF = getAddCollateral
+        const addCollateral:AddCollateralIF = getAddCollateral.value
         return (addCollateral.valid || (!localState.showGeneralCollateral && !localState.showVehicleCollateral))
       }),
       partiesValid: computed((): boolean => {
-        const parties: AddPartiesIF = getAddSecuredPartiesAndDebtors
+        const parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
         return (parties.valid || (!localState.showSecuredParties && !localState.showDebtors))
       }),
       courtOrderValid: computed((): boolean => {
-        const courtOrder: CourtOrderIF = getCourtOrderInformation
+        const courtOrder: CourtOrderIF = getCourtOrderInformation.value
         return (!courtOrder ||
           (courtOrder.courtName.length === 0 &&
             courtOrder.courtRegistry.length === 0 &&
@@ -405,7 +408,7 @@ export default defineComponent({
             courtOrder.effectOfOrder.length > 0))
       }),
       certifyInformationValid: computed((): boolean => {
-        return getCertifyInformation.valid
+        return getCertifyInformation.value.valid
       }),
       stickyComponentErrMsg: computed((): string => {
         if ((!localState.validFolio || !localState.courtOrderValid) && localState.showErrors) {
@@ -520,7 +523,7 @@ export default defineComponent({
     }
 
     const setShowWarning = (): void => {
-      const parties = getAddSecuredPartiesAndDebtors
+      const parties = getAddSecuredPartiesAndDebtors.value
       localState.showRegMsg = parties.registeringParty?.action === ActionTypes.EDITED
     }
 
@@ -543,7 +546,7 @@ export default defineComponent({
     }
 
     const saveDraft = async (): Promise<void> => {
-      const stateModel: StateModelIF = getStateModel
+      const stateModel: StateModelIF = getStateModel.value
       localState.submitting = true
       const draft: DraftIF = await saveAmendmentStatementDraft(stateModel)
       localState.submitting = false
@@ -583,7 +586,7 @@ export default defineComponent({
     const submitAmendment = async (): Promise<void> => {
       // Incomplete validation check: all changes must be valid to submit registration.
       if (localState.collateralValid && localState.partiesValid && localState.courtOrderValid) {
-        const stateModel: StateModelIF = getStateModel
+        const stateModel: StateModelIF = getStateModel.value
         localState.submitting = true
         const apiResponse: AmendmentStatementIF = await saveAmendmentStatement(stateModel)
         localState.submitting = false

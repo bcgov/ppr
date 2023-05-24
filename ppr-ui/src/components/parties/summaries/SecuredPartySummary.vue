@@ -15,7 +15,7 @@ import {
   reactive,
   computed,
   toRefs
-} from 'vue'
+} from 'vue-demi'
 import { useStore } from '@/store/store'
 
 import { BasePartySummary } from '@/components/parties/summaries'

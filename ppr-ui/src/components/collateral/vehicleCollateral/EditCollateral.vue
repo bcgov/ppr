@@ -209,7 +209,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, reactive, computed, toRefs } from 'vue'
+import { defineComponent, onMounted, reactive, computed, toRefs } from 'vue-demi'
 
 import { useCollateralValidation, useVehicle } from './factories'
 import { APIVehicleTypes } from '@/enums'

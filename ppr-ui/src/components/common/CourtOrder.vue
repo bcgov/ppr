@@ -174,7 +174,7 @@
 
 <script lang="ts">
 // external
-import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue'
+import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue-demi'
 import { useStore } from '@/store/store'
 import { isEqual } from 'lodash'
 // bcregistry

@@ -52,7 +52,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
+import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
 import { useStore } from '@/store/store'
 import { StaffPayment } from '@bcrs-shared-components/staff-payment'
 import {
@@ -69,6 +69,7 @@ import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 import { StaffPaymentOptions } from '@bcrs-shared-components/enums'
 import { useHomeOwners } from '@/composables/mhrRegistration'
 import { useRoute } from 'vue-router/composables'
+import { storeToRefs } from 'pinia'
 /* eslint-enable no-unused-vars */
 
 /* eslint-disable */
@@ -83,7 +84,8 @@ export default defineComponent({
     StaffPayment
   },
   setup () {
-    const { getMhrRegistrationValidationModel, isRoleStaffReg, setStaffPayment } = useStore()
+    const { setStaffPayment } = useStore()
+    const { getMhrRegistrationValidationModel, isRoleStaffReg } = storeToRefs(useStore())
     const route = useRoute()
     const {
       MhrCompVal,
@@ -92,7 +94,7 @@ export default defineComponent({
       scrollToInvalid,
       getValidation,
       getStepValidation
-    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel))
+    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
     const{
       isGlobalEditingMode

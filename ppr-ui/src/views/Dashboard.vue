@@ -80,7 +80,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue'
+import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue-demi'
 import { useRouter } from '@/router'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
@@ -132,7 +132,6 @@ export default defineComponent({
   },
   setup (props, context) {
     const router = useRouter()
-    const store = useStore()
     const {
       // Actions
       setSearchHistory,
@@ -143,7 +142,7 @@ export default defineComponent({
       setRegistrationType,
       resetNewRegistration,
       setManufacturedHomeSearchResults
-    } = store
+    } = useStore()
     const {
       // Getters
       isRoleStaff,
@@ -158,7 +157,7 @@ export default defineComponent({
       getSearchHistoryLength,
       isRoleQualifiedSupplier,
       getUserProductSubscriptionsCodes
-    } = storeToRefs(store)
+    } = storeToRefs(useStore())
 
     const localState = reactive({
       loading: false,
@@ -173,7 +172,7 @@ export default defineComponent({
         return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
       }),
       searchHistoryLength: computed((): number => {
-        return (getSearchHistory.value as unknown as SearchResponseIF[])?.length || 0
+        return (getSearchHistory.value as SearchResponseIF[])?.length || 0
       }),
       hasPPR: computed((): boolean => {
         // For Staff, we check roles, for Client we check Products

@@ -53,7 +53,7 @@ import {
   onMounted,
   watch,
   computed
-} from 'vue'
+} from 'vue-demi'
 import { useStore } from '@/store/store'
 // local components
 import { EditParty, PartySearch, RegisteringParty } from '@/components/parties/party'

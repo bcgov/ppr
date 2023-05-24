@@ -106,9 +106,10 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, nextTick, onMounted, reactive, toRefs, watch } from 'vue'
+import { computed, defineComponent, nextTick, onMounted, reactive, toRefs, watch } from 'vue-demi'
 import { useRouter } from '@/router'
 import { useStore } from '@/store/store'
+import { storeToRefs } from 'pinia'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { FolioNumberSummary, StickyContainer } from '@/components/common'
 import { BaseDialog } from '@/components/dialogs'
@@ -149,6 +150,11 @@ export default defineComponent({
   setup (props, context) {
     const router = useRouter()
     const {
+      // Actions
+      setStaffPayment,
+      setSearchCertified
+    } = useStore()
+    const {
       // Getters
       isRoleStaffReg,
       isRoleStaffSbc,
@@ -157,11 +163,8 @@ export default defineComponent({
       getIsStaffClientPayment,
       getFolioOrReferenceNumber,
       getSelectedManufacturedHomes,
-      getManufacturedHomeSearchResults,
-      // Actions
-      setStaffPayment,
-      setSearchCertified
-    } = useStore()
+      getManufacturedHomeSearchResults
+    } = storeToRefs(useStore())
 
     const localState = reactive({
       dataLoaded: false,
@@ -205,7 +208,7 @@ export default defineComponent({
           .length
       }),
       staffPaymentData: computed((): StaffPaymentIF => {
-        let pd = getStaffPayment
+        let pd = getStaffPayment.value
         if (!pd) {
           pd = {
             option: StaffPaymentOptions.NONE,
@@ -262,19 +265,19 @@ export default defineComponent({
       }
       localState.submitting = true
       let apiResponse
-      if (isRoleStaffReg) {
+      if (isRoleStaffReg.value) {
         apiResponse = await submitSelectedMhr(
-          getManufacturedHomeSearchResults.searchId,
+          getManufacturedHomeSearchResults.value.searchId,
           uniqBy(getSelectedManufacturedHomes, UIMHRSearchTypeValues.MHRMHR_NUMBER),
-          getFolioOrReferenceNumber,
-          getStaffPayment,
-          isSearchCertified
+          getFolioOrReferenceNumber.value,
+          getStaffPayment.value,
+          isSearchCertified.value
         )
       } else {
         apiResponse = await submitSelectedMhr(
-          getManufacturedHomeSearchResults.searchId,
+          getManufacturedHomeSearchResults.value.searchId,
           uniqBy(getSelectedManufacturedHomes, UIMHRSearchTypeValues.MHRMHR_NUMBER),
-          getFolioOrReferenceNumber
+          getFolioOrReferenceNumber.value
         )
       }
       localState.submitting = false

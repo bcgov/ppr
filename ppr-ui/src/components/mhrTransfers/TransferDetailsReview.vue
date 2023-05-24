@@ -29,7 +29,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs } from 'vue'
+import { computed, defineComponent, reactive, toRefs } from 'vue-demi'
 import { convertDate } from '@/utils'
 import { useStore } from '@/store/store'
 import { useTransferOwners } from '@/composables'

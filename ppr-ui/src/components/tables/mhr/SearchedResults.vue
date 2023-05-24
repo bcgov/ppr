@@ -244,7 +244,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs, onMounted, watch } from 'vue'
+import { computed, defineComponent, reactive, toRefs, onMounted, watch } from 'vue-demi'
 import { useRouter } from '@/router'
 import { useStore } from '@/store/store' // eslint-disable-line no-unused-vars
 import {

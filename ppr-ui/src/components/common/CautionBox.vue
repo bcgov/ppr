@@ -12,7 +12,7 @@ import {
   defineComponent,
   reactive,
   toRefs
-} from 'vue'
+} from 'vue-demi'
 
 export default defineComponent({
   name: 'CautionBox',

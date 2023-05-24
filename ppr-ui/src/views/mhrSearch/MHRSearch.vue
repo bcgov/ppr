@@ -34,13 +34,14 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onBeforeMount, reactive, toRefs, watch } from 'vue'
+import { computed, defineComponent, onBeforeMount, reactive, toRefs, watch } from 'vue-demi'
 import { useRouter } from '@/router'
 import { useStore } from '@/store/store'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { SearchedResultMhr } from '@/components/tables'
 import { RouteNames } from '@/enums'
 import { getFeatureFlag, navigate } from '@/utils'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'MHRSearch',
@@ -70,7 +71,7 @@ export default defineComponent({
     const router = useRouter()
     const {
       getManufacturedHomeSearchResults
-    } = useStore()
+    } = storeToRefs(useStore())
 
     const localState = reactive({
       loading: false,
@@ -78,7 +79,7 @@ export default defineComponent({
         return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
       }),
       totalResultsLength: computed((): number => {
-        const searchResult = getManufacturedHomeSearchResults
+        const searchResult = getManufacturedHomeSearchResults.value
         if (searchResult) {
           return searchResult.totalResultsSize
         }
@@ -92,7 +93,7 @@ export default defineComponent({
         const isSearchReportUnsaved = (
           router.currentRoute.name === RouteNames.MHRSEARCH &&
            props.appReady &&
-           !!getManufacturedHomeSearchResults
+           !!getManufacturedHomeSearchResults.value
         )
 
         if (isSearchReportUnsaved) {

@@ -36,10 +36,11 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
-import { useGetters } from 'vuex-composition-helpers'
+import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
+import { useStore } from '@/store/store'
 import { HomeLocationType, HomeCivicAddress, HomeLandOwnership } from '@/components/mhrRegistration'
 import { useMhrValidations } from '@/composables/mhrRegistration/useMhrValidations'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'HomeLocation',
@@ -53,14 +54,14 @@ export default defineComponent({
     const {
       getMhrRegistrationLocation,
       getMhrRegistrationValidationModel
-    } = useStore()
+    } = storeToRefs(useStore())
 
     const {
       MhrCompVal,
       MhrSectVal,
       getSectionValidation,
       scrollToInvalid
-    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel))
+    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
     const localState = reactive({
       validateLocationType: computed(() => {

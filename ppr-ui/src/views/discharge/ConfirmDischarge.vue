@@ -96,9 +96,10 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue'
+import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue-demi'
 import { useRoute, useRouter } from 'vue-router/composables'
 import { useStore } from '@/store/store'
+import { storeToRefs } from 'pinia'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import {
   CautionBox,
@@ -151,12 +152,6 @@ export default defineComponent({
     const route = useRoute()
     const router = useRouter()
     const {
-      // Getters
-      getStateModel,
-      isRoleStaffBcol,
-      getConfirmDebtorName,
-      getRegistrationType,
-      getAddSecuredPartiesAndDebtors,
       // Actions
       setRegTableNewItem,
       setRegistrationType,
@@ -165,6 +160,14 @@ export default defineComponent({
       setRegistrationCreationDate,
       setAddSecuredPartiesAndDebtors
     } = useStore()
+    const {
+      // Getters
+      getStateModel,
+      isRoleStaffBcol,
+      getConfirmDebtorName,
+      getRegistrationType,
+      getAddSecuredPartiesAndDebtors
+    } = storeToRefs(useStore())
 
     const localState = reactive({
       cautionTxt: 'The Registry will provide the verification statement to all Secured Parties named in this ' +
@@ -194,10 +197,10 @@ export default defineComponent({
         return (route.query['reg-num'] as string) || ''
       }),
       registrationTypeUI: computed((): UIRegistrationTypes => {
-        return getRegistrationType?.registrationTypeUI || null
+        return getRegistrationType.value?.registrationTypeUI || null
       }),
       registrationType: computed((): APIRegistrationTypes => {
-        return getRegistrationType?.registrationTypeAPI || null
+        return getRegistrationType.value?.registrationTypeAPI || null
       }),
       stickyComponentErrMsg: computed((): string => {
         if ((!localState.validConfirm || !localState.validFolio) && localState.showErrors) {
@@ -322,7 +325,7 @@ export default defineComponent({
         return
       }
 
-      const stateModel: StateModelIF = getStateModel
+      const stateModel: StateModelIF = getStateModel.value
       localState.submitting = true
       const apiResponse: DischargeRegistrationIF = await saveDischarge(stateModel)
       localState.submitting = false
@@ -350,7 +353,7 @@ export default defineComponent({
     }
 
     const setShowWarning = (): void => {
-      const parties = getAddSecuredPartiesAndDebtors
+      const parties = getAddSecuredPartiesAndDebtors.value
       localState.showRegMsg = parties.registeringParty?.action === ActionTypes.EDITED
     }
 

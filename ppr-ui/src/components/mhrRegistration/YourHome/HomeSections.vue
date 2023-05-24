@@ -48,12 +48,12 @@
 
 <script lang="ts">
 /* eslint-disable no-unused-vars */
-import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
+import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
 import { useStore } from '@/store/store'
+import { storeToRefs } from 'pinia'
 import { HomeSectionIF } from '@/interfaces'
 import AddEditHomeSections from '@/components/mhrRegistration/YourHome/AddEditHomeSections.vue'
 import HomeSectionsTable from '@/components/tables/mhr/HomeSectionsTable.vue'
-import { setMhrHomeDescription } from '@/store/actions'
 import { useMhrValidations } from '@/composables'
 /* eslint-enable no-unused-vars */
 
@@ -75,18 +75,20 @@ export default defineComponent({
   },
   setup () {
     const {
-      // Getters
-      getMhrHomeSections,
-      getMhrRegistrationValidationModel,
       // Actions
       setMhrHomeDescription
     } = useStore()
+    const {
+      // Getters
+      getMhrHomeSections,
+      getMhrRegistrationValidationModel
+    } = storeToRefs(useStore())
 
     const {
       MhrCompVal,
       MhrSectVal,
       setValidation
-    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel))
+    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
     const localState = reactive({
       isEditingHomeSection: false,
@@ -94,10 +96,10 @@ export default defineComponent({
       displayHomeSectionsError: false,
       showAddEditHomeSections: false,
       isMaxHomeSections: computed((): boolean => {
-        return getMhrHomeSections.length === 4
+        return getMhrHomeSections.value.length === 4
       }),
       hasMinimumHomeSections: computed((): boolean => {
-        return getMhrHomeSections.length >= 1
+        return getMhrHomeSections.value.length >= 1
       })
     })
 
@@ -109,14 +111,14 @@ export default defineComponent({
     }
 
     const addHomeSection = (homeSection: HomeSectionIF): void => {
-      const homeSections = [...getMhrHomeSections]
+      const homeSections = [...getMhrHomeSections.value]
       // Add new home section to array
       homeSections.push(homeSection)
       setMhrHomeDescription({ key: 'sections', value: homeSections })
     }
 
     const editHomeSection = (homeSection: HomeSectionIF): void => {
-      const homeSections = [...getMhrHomeSections]
+      const homeSections = [...getMhrHomeSections.value]
       // Create edited homeSection without id
       const { id, ...editedSection } = homeSection
       // Apply edited section to temp array
@@ -126,7 +128,7 @@ export default defineComponent({
     }
 
     const removeHomeSection = (homeSection: HomeSectionIF): void => {
-      const homeSections = [...getMhrHomeSections]
+      const homeSections = [...getMhrHomeSections.value]
       // Remove home section from array
       homeSections.splice(homeSections.indexOf(homeSection), 1)
       setMhrHomeDescription({ key: 'sections', value: homeSections })

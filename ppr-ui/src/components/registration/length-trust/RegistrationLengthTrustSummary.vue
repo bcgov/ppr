@@ -99,7 +99,7 @@ import {
   defineComponent,
   reactive,
   toRefs
-} from 'vue'
+} from 'vue-demi'
 import { useStore } from '@/store/store'
 import { useRoute, useRouter } from '@/router'
 

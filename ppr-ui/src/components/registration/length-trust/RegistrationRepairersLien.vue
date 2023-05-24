@@ -140,7 +140,7 @@ import {
   toRefs,
   watch,
   onMounted
-} from 'vue'
+} from 'vue-demi'
 import { useStore } from '@/store/store'
 // bcregistry
 import SharedDatePicker from '@/components/common/SharedDatePicker.vue'

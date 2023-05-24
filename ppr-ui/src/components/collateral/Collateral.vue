@@ -86,7 +86,7 @@ import {
   toRefs,
   watch,
   onUnmounted
-} from 'vue'
+} from 'vue-demi'
 import { useStore } from '@/store/store'
 import { useRouter } from '@/router'
 

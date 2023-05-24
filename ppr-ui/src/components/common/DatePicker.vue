@@ -66,7 +66,7 @@ import {
   reactive,
   toRefs,
   watch
-} from 'vue'
+} from 'vue-demi'
 
 export default defineComponent({
   name: 'DatePicker',

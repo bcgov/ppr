@@ -29,7 +29,7 @@ function createComponent (): Wrapper<any> {
 
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
-  return mount((DatePicker  as any), {
+  return mount((DatePicker as any), {
     localVue,
     store,
     propsData: {

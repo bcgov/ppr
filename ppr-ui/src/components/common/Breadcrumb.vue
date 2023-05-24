@@ -39,7 +39,7 @@
 </template>
 <script lang="ts">
 // external
-import { computed, defineComponent, reactive, toRefs, Ref } from 'vue' // eslint-disable-line
+import { computed, defineComponent, reactive, toRefs, Ref } from 'vue-demi' // eslint-disable-line
 import { useRouter } from '@/router'
 import { useStore } from '@/store/store'
 // local

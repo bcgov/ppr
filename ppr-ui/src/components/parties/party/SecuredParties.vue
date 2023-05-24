@@ -368,7 +368,7 @@ import {
   computed,
   watch,
   onMounted
-} from 'vue'
+} from 'vue-demi'
 import { useStore } from '@/store/store'
 import { cloneDeep, isEqual } from 'lodash'
 // local components

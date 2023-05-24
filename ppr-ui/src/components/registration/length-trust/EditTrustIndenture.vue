@@ -55,7 +55,7 @@ import {
   defineComponent,
   reactive,
   toRefs
-} from 'vue'
+} from 'vue-demi'
 import { useStore } from '@/store/store'
 
 // local

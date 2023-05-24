@@ -45,7 +45,7 @@ import {
   RegistrationFlowType,
   RouteNames
 } from '@/enums'
-import { computed, ref, set, toRefs } from 'vue'
+import { computed, ref, set, toRefs } from 'vue-demi'
 import { useMhrValidations } from '@/composables'
 import { MhrSectVal } from '@/composables/mhrRegistration/enums'
 import { getFeatureFlag } from '@/utils'
@@ -888,7 +888,6 @@ export const useStore = defineStore('assetsStore', () => {
     setUnsavedChanges(true)
   }
   function setMhrTableHistory (baseRegs: MhRegistrationSummaryIF[]) {
-    console.log(baseRegs)
     state.value.registrationTable.baseMhRegs = baseRegs
   }
   // MHR Information

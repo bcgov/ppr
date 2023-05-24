@@ -185,7 +185,7 @@
 
 <script lang="ts">
 // external
-import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
+import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
 import { useStore } from '@/store/store'
 // local
 /* eslint-disable no-unused-vars */

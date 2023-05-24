@@ -129,7 +129,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue'
+import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue-demi'
 import { BaseDialog } from '@/components/dialogs'
 import { ClientTransferTypes, StaffTransferTypes, transfersContent, transfersErrors } from '@/resources'
 import { useStore } from '@/store/store'

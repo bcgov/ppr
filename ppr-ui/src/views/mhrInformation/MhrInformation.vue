@@ -305,9 +305,10 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, nextTick, onMounted, reactive, ref, toRefs, watch } from 'vue'
+import { computed, defineComponent, nextTick, onMounted, reactive, ref, toRefs, watch } from 'vue-demi'
 import { useRouter } from '@/router'
 import { useStore } from '@/store/store'
+import { storeToRefs } from 'pinia'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { StaffPayment } from '@bcrs-shared-components/staff-payment'
 import { StaffPaymentOptions } from '@bcrs-shared-components/enums'
@@ -387,20 +388,6 @@ export default defineComponent({
   setup (props, context) {
     const router = useRouter()
     const {
-      // Getters
-      getMhrTransferHomeOwners,
-      getMhrInformation,
-      getMhrTransferCurrentHomeOwnerGroups,
-      getCertifyInformation,
-      hasUnsavedChanges,
-      hasLien,
-      isRoleStaffReg,
-      isRoleQualifiedSupplier,
-      getMhrTransferType,
-      getMhrTransferDeclaredValue,
-      getMhrInfoValidation,
-      getMhrAttentionReferenceNum,
-      getMhrTransferSubmittingParty,
       // Actions
       setMhrStatusType,
       setMhrTransferSubmittingParty,
@@ -415,6 +402,22 @@ export default defineComponent({
       setEmptyMhrTransfer,
       setStaffPayment
     } = useStore()
+    const {
+      // Getters
+      getMhrTransferHomeOwners,
+      getMhrInformation,
+      getMhrTransferCurrentHomeOwnerGroups,
+      getCertifyInformation,
+      hasUnsavedChanges,
+      hasLien,
+      isRoleStaffReg,
+      isRoleQualifiedSupplier,
+      getMhrTransferType,
+      getMhrTransferDeclaredValue,
+      getMhrInfoValidation,
+      getMhrAttentionReferenceNum,
+      getMhrTransferSubmittingParty
+    } = storeToRefs(useStore())
     const {
       isFrozenMhr,
       buildApiData,
@@ -431,7 +434,7 @@ export default defineComponent({
       isValidTransferReview,
       scrollToFirstError,
       resetValidationState
-    } = useMhrInfoValidation(getMhrInfoValidation)
+    } = useMhrInfoValidation(getMhrInfoValidation.value)
     const {
       setGlobalEditingMode
     } = useHomeOwners(true)
@@ -462,7 +465,7 @@ export default defineComponent({
         folioNumber: '',
         isPriority: false
       },
-      showTransferType: !!getMhrInformation.draftNumber || isFrozenMhr.value || false,
+      showTransferType: !!getMhrInformation.value.draftNumber || isFrozenMhr.value || false,
       attentionReference: getMhrAttentionReferenceNum || '',
       cancelOptions: unsavedChangesDialog,
       showCancelDialog: false,
@@ -470,12 +473,12 @@ export default defineComponent({
       showStartTransferRequiredDialog: false,
       transferRequiredDialogOptions: computed((): DialogOptionsIF => {
         transferRequiredDialog.text =
-          transferRequiredDialog.text.replace('mhr_number', getMhrInformation.mhrNumber)
+          transferRequiredDialog.text.replace('mhr_number', getMhrInformation.value.mhrNumber)
         return transferRequiredDialog
       }),
       hasTransferChanges: computed((): boolean => {
         return localState.showTransferType &&
-          (hasUnsavedChanges || !!getMhrTransferDeclaredValue || !!getMhrTransferType)
+          (hasUnsavedChanges.value || !!getMhrTransferDeclaredValue.value || !!getMhrTransferType.value)
       }),
       isAuthenticated: computed((): boolean => {
         return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
@@ -508,7 +511,7 @@ export default defineComponent({
         return localState.isReviewMode ? 'Register Changes and Pay' : 'Review and Confirm'
       }),
       reviewOwners: computed(() => {
-        return getMhrTransferHomeOwners.filter(owner => owner.action !== ActionTypes.REMOVED)
+        return getMhrTransferHomeOwners.value.filter(owner => owner.action !== ActionTypes.REMOVED)
       }),
       enableHomeOwnerChanges: computed(() => {
         return getFeatureFlag('mhr-transfer-enabled')
@@ -538,9 +541,9 @@ export default defineComponent({
       // Set baseline MHR Information to state
       await parseMhrInformation(isFrozenMhr.value)
 
-      if (getMhrInformation.draftNumber) {
+      if (getMhrInformation.value.draftNumber) {
         // Retrieve draft if it exists
-        const { registration } = await getMhrDraft(getMhrInformation.draftNumber)
+        const { registration } = await getMhrDraft(getMhrInformation.value.draftNumber)
         await initDraftMhrInformation(registration as MhrTransferApiIF)
       } else if (isFrozenMhr.value) {
         setMhrTransferType({ transferType: ApiTransferTypes.SALE_OR_GIFT })
@@ -623,7 +626,7 @@ export default defineComponent({
       if (localState.isReviewMode) {
         // Verify no lien exists prior to submitting filing
         const regSum = !localState.isJestRunning
-          ? await getMHRegistrationSummary(getMhrInformation.mhrNumber, false)
+          ? await getMHRegistrationSummary(getMhrInformation.value.mhrNumber, false)
           : null
         if (!!regSum && !!regSum.lienRegistrationType) {
           await setLienType(regSum.lienRegistrationType)
@@ -643,7 +646,7 @@ export default defineComponent({
         const apiData: MhrTransferApiIF = await buildApiData()
         // Submit Transfer filing
         const mhrTransferFiling =
-          await submitMhrTransfer(apiData, getMhrInformation.mhrNumber, localState.staffPayment)
+          await submitMhrTransfer(apiData, getMhrInformation.value.mhrNumber, localState.staffPayment)
 
         if (!mhrTransferFiling.error) {
           // Set new filing to Reg Table
@@ -651,7 +654,7 @@ export default defineComponent({
           setUnsavedChanges(false)
           const newItem: RegTableNewItemI = {
             addedReg: mhrTransferFiling.documentId,
-            addedRegParent: getMhrInformation.mhrNumber,
+            addedRegParent: getMhrInformation.value.mhrNumber,
             addedRegSummary: null,
             prevDraft: mhrTransferFiling.documentId || ''
           }
@@ -696,15 +699,15 @@ export default defineComponent({
       localState.loading = true
       const apiData = await buildApiData(true)
 
-      const mhrTransferDraft = getMhrInformation.draftNumber
-        ? await updateMhrDraft(getMhrInformation.draftNumber, getMhrTransferType?.transferType, apiData)
-        : await createMhrDraft(getMhrTransferType?.transferType, apiData)
+      const mhrTransferDraft = getMhrInformation.value.draftNumber
+        ? await updateMhrDraft(getMhrInformation.value.draftNumber, getMhrTransferType.value?.transferType, apiData)
+        : await createMhrDraft(getMhrTransferType.value?.transferType, apiData)
 
       const newItem: RegTableNewItemI = {
         addedReg: mhrTransferDraft.draftNumber,
         addedRegParent: apiData.mhrNumber,
         addedRegSummary: null,
-        prevDraft: (getMhrInformation.changes && getMhrInformation.changes[0].documentId) || ''
+        prevDraft: (getMhrInformation.value.changes && getMhrInformation.value.changes[0].documentId) || ''
       }
       setRegTableNewItem(newItem)
 
@@ -718,7 +721,7 @@ export default defineComponent({
     }
 
     const goToDash = (): void => {
-      if (hasUnsavedChanges === true) localState.showCancelDialog = true
+      if (hasUnsavedChanges.value === true) localState.showCancelDialog = true
       else {
         setUnsavedChanges(false)
         setGlobalEditingMode(false)
@@ -819,7 +822,7 @@ export default defineComponent({
     const handleTransferTypeChange = async (transferTypeSelect: TransferTypeSelectIF): Promise<void> => {
       // Reset state until support is built for other Transfer Types
       if (localState.hasTransferChanges && transferTypeSelect?.transferType &&
-        (transferTypeSelect?.transferType !== getMhrTransferType?.transferType)
+        (transferTypeSelect?.transferType !== getMhrTransferType.value?.transferType)
       ) await resetMhrInformation()
 
       localState.showTransferChangeDialog = true
@@ -840,7 +843,7 @@ export default defineComponent({
       setValidation('isRefNumValid', isValid)
     })
 
-    watch(() => hasUnsavedChanges, (val: boolean) => {
+    watch(() => hasUnsavedChanges.value, (val: boolean) => {
       if (!val && transferDetailsComponent) {
         (transferDetailsComponent as any).clearTransferDetailsData()
       }

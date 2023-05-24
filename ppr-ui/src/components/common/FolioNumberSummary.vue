@@ -47,7 +47,7 @@ import {
   ref,
   onMounted,
   computed
-} from 'vue'
+} from 'vue-demi'
 import { useStore } from '@/store/store'
 
 export default defineComponent({

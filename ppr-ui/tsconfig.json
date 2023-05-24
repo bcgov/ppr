@@ -12,6 +12,7 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "sourceMap": true,
+    "allowJs": true,
     "baseUrl": ".",
     "types": [
       "webpack-env",
@@ -30,6 +31,9 @@
       "scripthost"
     ]
   },
+  "files": [
+    "vue-demi-shim.d.ts"
+  ],
   "include": [
     "src/**/*.ts",
     "src/**/*.tsx",

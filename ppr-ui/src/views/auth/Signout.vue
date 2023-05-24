@@ -3,7 +3,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs } from 'vue'
+import { computed, defineComponent, reactive, toRefs } from 'vue-demi'
 // Common Component
 import SbcSignout from 'sbc-common-components/src/components/SbcSignout.vue'
 

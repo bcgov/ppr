@@ -47,7 +47,7 @@
 </template>
 <script lang="ts">
 // external
-import { computed, defineComponent, reactive, toRefs } from 'vue'
+import { computed, defineComponent, reactive, toRefs } from 'vue-demi'
 import { useStore } from '@/store/store'
 // local
 import { formatExpiryDate, pacificDate } from '@/utils'

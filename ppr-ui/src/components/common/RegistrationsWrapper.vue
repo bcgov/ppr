@@ -156,8 +156,8 @@
 <script lang="ts">
 // Components
 /* eslint-disable no-unused-vars */
-import { computed, defineComponent, onBeforeMount, reactive, toRefs, watch } from 'vue'
-import { useRoute, useRouter } from '@/router'
+import { computed, defineComponent, onBeforeMount, reactive, toRefs, watch } from 'vue-demi'
+import { useRouter } from '@/router'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { RegistrationBar } from '@/components/registration'
@@ -250,7 +250,6 @@ export default defineComponent({
   },
   setup (props, context) {
     const router = useRouter()
-    const store = useStore()
     const {
       // Actions
       resetNewRegistration, setRegistrationType, setRegTableCollapsed, setRegTableNewItem, setLengthTrust,
@@ -258,13 +257,13 @@ export default defineComponent({
       setRegTableDraftsChildReg, setRegTableTotalRowCount, setRegTableBaseRegs, setRegTableSortPage,
       setRegTableSortHasMorePages, setRegTableSortOptions, setUserSettings, resetRegTableData, setMhrInformation,
       setMhrTableHistory, setMhrDraftNumber, setEmptyMhr
-    } = store
+    } = useStore()
     const {
       // Getters
       getRegTableBaseRegs, getRegTableDraftsBaseReg, isMhrRegistration, getRegTableTotalRowCount, getStateModel,
       getRegTableDraftsChildReg, hasMorePages, getRegTableNewItem, getRegTableSortOptions, getRegTableSortPage,
       getUserSettings, getMhRegTableBaseRegs
-    } = storeToRefs(store)
+    } = storeToRefs(useStore())
 
     const {
       initNewMhr,
@@ -993,7 +992,7 @@ export default defineComponent({
 
       for (let i = 0; i < baseHeaders.length; i++) {
         if (baseHeaders[i].value === 'actions') headers.push(baseHeaders[i])
-        else if (val.find(header => header === (baseHeaders[i].value as unknown as BaseHeaderIF))) {
+        else if (val.find(header => header === baseHeaders[i])) {
           headers.push(baseHeaders[i])
         }
       }

@@ -12,7 +12,6 @@ import { getPiniaStore, getVuexStore } from '@/store'
 import Affix from 'vue-affix'
 import * as Sentry from '@sentry/vue'
 import { TiptapVuetifyPlugin } from 'tiptap-vuetify'
-
 // Styles
 // NB: order matters - do not change
 import '@mdi/font/css/materialdesignicons.min.css' // ensure you are using css-loader

@@ -55,8 +55,8 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onBeforeMount, reactive, toRefs, watch } from 'vue'
-import { useStore } from './store/store'
+import { computed, defineComponent, onBeforeMount, toRefs, reactive, watch } from 'vue-demi'
+import { useStore } from '@/store/store'
 import { useRoute, useRouter } from '@/router'
 import { storeToRefs } from 'pinia'
 
@@ -113,7 +113,6 @@ export default defineComponent({
   setup () {
     const route = useRoute()
     const router = useRouter()
-    const store = useStore()
     const {
       // Actions
       setRoleSbc,
@@ -124,7 +123,7 @@ export default defineComponent({
       setUserProductSubscriptions,
       setAccountProductSubscription,
       setUserProductSubscriptionsCodes
-    } = store
+    } = useStore()
     const {
       // Getters
       isRoleStaff,
@@ -143,7 +142,7 @@ export default defineComponent({
       getRegistrationOther,
       getRegistrationFlowType,
       getUserProductSubscriptionsCodes
-    } = storeToRefs(store)
+    } = storeToRefs(useStore())
 
     const localState = reactive({
       currentPath: '',
@@ -187,8 +186,8 @@ export default defineComponent({
         return Boolean(false)
       }),
       registrationTypeUI: computed((): string => {
-        const regType = getRegistrationType.value as unknown as RegistrationTypeIF
-        const regOther = getRegistrationOther.value as unknown as string
+        const regType = getRegistrationType.value
+        const regOther = getRegistrationOther.value
         if (regType.registrationTypeAPI === APIRegistrationTypes.OTHER) {
           return regOther || ''
         }
@@ -251,7 +250,7 @@ export default defineComponent({
     })
 
     const payErrorDialogHandler = (confirmed: boolean) => {
-      const flowType = getRegistrationFlowType.value as unknown as RegistrationFlowType
+      const flowType = getRegistrationFlowType.value
       localState.payErrorDisplay = false
       if (confirmed) {
         if ([RegistrationFlowType.NEW, RegistrationFlowType.AMENDMENT].includes(flowType)) {
@@ -418,7 +417,7 @@ export default defineComponent({
         setUserInfo(userInfo)
 
         if (getAccountId.value) {
-          const subscribedProducts = await fetchAccountProducts((getAccountId.value as unknown as number))
+          const subscribedProducts = await fetchAccountProducts((getAccountId.value))
           if (subscribedProducts) {
             setUserProductSubscriptions(subscribedProducts)
 
@@ -453,7 +452,7 @@ export default defineComponent({
 
     /** Gets user products and sets browser title accordingly. */
     const setBrowserTitle = (): void => {
-      const userProducts = Array.from(getUserProductSubscriptionsCodes.value) as unknown as ProductCode[]
+      const userProducts = Array.from(getUserProductSubscriptionsCodes.value) as ProductCode[]
       if (userProducts.includes(ProductCode.PPR) &&
         userProducts.includes(ProductCode.MHR)) {
         document.title = 'BC Asset Registries (MHR/PPR)'
@@ -491,10 +490,10 @@ export default defineComponent({
     /** Updates Launch Darkly with user info. */
     const updateLaunchDarkly = async (): Promise<any> => {
       // since username is unique, use it as the user key
-      const key: string = getUserUsername.value as unknown as string
-      const email: string = getUserEmail.value as unknown as string
-      const firstName: string = getUserFirstName.value as unknown as string
-      const lastName: string = getUserLastName.value as unknown as string
+      const key: string = getUserUsername.value as string
+      const email: string = getUserEmail.value as string
+      const firstName: string = getUserFirstName.value as string
+      const lastName: string = getUserLastName.value as string
       // remove leading { and trailing } and tokenize string
       const custom: any = { roles: getUserRoles.value }
 
@@ -568,7 +567,7 @@ export default defineComponent({
     const handleErrorRegCreate = (error: ErrorIF) => {
       // prep for registration payment issues
       let filing = localState.registrationTypeUI
-      const flowType = getRegistrationFlowType.value as unknown as RegistrationFlowType
+      const flowType = getRegistrationFlowType.value as RegistrationFlowType
 
       if (flowType !== RegistrationFlowType.NEW) {
         filing = flowType?.toLowerCase() || 'registration'

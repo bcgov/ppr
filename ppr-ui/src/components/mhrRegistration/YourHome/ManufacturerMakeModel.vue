@@ -135,7 +135,7 @@ import {
   ref,
   toRefs,
   watch
-} from 'vue'
+} from 'vue-demi'
 import { useStore } from '@/store/store'
 import { useInputRules, useMhrValidations } from '@/composables/'
 

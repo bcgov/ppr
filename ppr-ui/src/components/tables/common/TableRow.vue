@@ -436,7 +436,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
+import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
 import { getRegistrationSummary, mhRegistrationPDF, registrationPDF, stripChars } from '@/utils'
 import { useStore } from '@/store/store'
 import InfoChip from '@/components/common/InfoChip.vue'
@@ -458,6 +458,7 @@ import {
 import { useRegistration } from '@/composables/useRegistration'
 import { useTransferOwners } from '@/composables'
 import moment from 'moment'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'TableRow',
@@ -473,6 +474,7 @@ export default defineComponent({
   },
   emits: ['action', 'error', 'freezeScroll', 'toggleExpand'],
   setup (props, { emit }) {
+    const store = useStore()
     const {
       isRoleQualifiedSupplier,
       isRoleStaff,
@@ -480,7 +482,7 @@ export default defineComponent({
       isRoleStaffBcol,
       isRoleStaffReg,
       getMhRegTableBaseRegs
-    } = useStore()
+    } = storeToRefs(store)
 
     const {
       getFormattedDate,
@@ -526,9 +528,8 @@ export default defineComponent({
         return props.setItem
       }),
       enableOpenEdit: computed(() => {
-        return (isRoleQualifiedSupplier || isRoleStaffReg || isRoleStaff) &&
-          !isRoleStaffSbc &&
-          !isRoleStaffBcol
+        return (isRoleQualifiedSupplier.value || isRoleStaffReg.value || isRoleStaff.value) &&
+          !isRoleStaffSbc.value && !isRoleStaffBcol.value
       })
     })
 
@@ -673,7 +674,7 @@ export default defineComponent({
     }
 
     const hasFrozenParentReg = (item: MhRegistrationSummaryIF): boolean => {
-      const parentReg = item.mhrNumber && getMhRegTableBaseRegs?.find(reg => reg.mhrNumber === item.mhrNumber)
+      const parentReg = item.mhrNumber && getMhRegTableBaseRegs.value?.find(reg => reg.mhrNumber === item.mhrNumber)
       return parentReg?.statusType === MhApiStatusTypes.FROZEN
     }
 

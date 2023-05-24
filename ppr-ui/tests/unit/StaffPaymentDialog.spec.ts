@@ -5,7 +5,6 @@ import flushPromises from 'flush-promises'
 import { getVuexStore } from '@/store'
 import { mount, createLocalVue } from '@vue/test-utils'
 
-
 // Components
 import { StaffPayment as StaffPaymentComponent } from '@bcrs-shared-components/staff-payment'
 import { StaffPaymentDialog, BaseDialog } from '@/components/dialogs'

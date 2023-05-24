@@ -168,7 +168,7 @@ import {
   defineComponent,
   reactive,
   toRefs
-} from 'vue'
+} from 'vue-demi'
 import { useStore } from '@/store/store'
 // local
 import { SearchCriteriaIF, SearchResponseIF } from '@/interfaces' // eslint-disable-line no-unused-vars

@@ -57,7 +57,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, nextTick, onMounted, reactive, toRefs } from 'vue'
+import { computed, defineComponent, nextTick, onMounted, reactive, toRefs } from 'vue-demi'
 import { useRoute, useRouter } from 'vue-router/composables'
 import { useStore } from '@/store/store'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
@@ -71,6 +71,7 @@ import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { ErrorIF, MhrRegistrationIF, RegistrationTypeIF, RegTableNewItemI } from '@/interfaces'
 import { RegistrationLengthI } from '@/composables/fees/interfaces'
 import BaseDialog from '@/components/dialogs/BaseDialog.vue'
+import { storeToRefs } from 'pinia'
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
@@ -99,18 +100,19 @@ export default defineComponent({
     const route = useRoute()
     const router = useRouter()
     const {
-      // Getters
-      getSteps,
-      getMhrDraftNumber,
-      getRegistrationType,
-      getRegistrationFlowType,
-      getMhrRegistrationValidationModel,
-
       // Actions
       setUnsavedChanges,
       setRegTableNewItem,
       setMhrTransferType
     } = useStore()
+    const {
+      // Getters
+      getSteps,
+      getMhrDraftNumber,
+      getRegistrationType,
+      getRegistrationFlowType,
+      getMhrRegistrationValidationModel
+    } = storeToRefs(useStore())
 
     const {
       MhrCompVal,
@@ -120,7 +122,7 @@ export default defineComponent({
       getStepValidation,
       resetAllValidations,
       scrollToInvalid
-    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel))
+    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
     const {
       initDraftMhr,
@@ -144,7 +146,7 @@ export default defineComponent({
         return { lifeInfinite: true, lifeYears: 0 }
       }),
       registrationTypeUI: computed((): UIRegistrationTypes => {
-        return getRegistrationType?.registrationTypeUI || ('' as UIRegistrationTypes)
+        return getRegistrationType.value?.registrationTypeUI || ('' as UIRegistrationTypes)
       }),
       isValidatingApp: computed((): boolean => {
         return getValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_APP)
@@ -187,7 +189,7 @@ export default defineComponent({
         return
       }
       // redirect if store doesn't contain all needed data (happens on page reload, etc.)
-      if (!getRegistrationType || getRegistrationFlowType !== RegistrationFlowType.NEW) {
+      if (!getRegistrationType.value || getRegistrationFlowType.value !== RegistrationFlowType.NEW) {
         goToDash()
         return
       }
@@ -198,8 +200,8 @@ export default defineComponent({
       setValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_APP, false)
 
       // page is ready to view
-      if (getMhrDraftNumber) {
-        const { registration } = await getMhrDraft(getMhrDraftNumber)
+      if (getMhrDraftNumber.value) {
+        const { registration } = await getMhrDraft(getMhrDraftNumber.value)
         await initDraftMhr(registration as unknown as MhrRegistrationIF)
       }
 

@@ -72,7 +72,7 @@
 
 <script lang="ts">
 import { useInputRules, useHomeOwners } from '@/composables'
-import { computed, defineComponent, nextTick, reactive, ref, toRefs, watch } from 'vue'
+import { computed, defineComponent, nextTick, reactive, ref, toRefs, watch } from 'vue-demi'
 import { useStore } from '@/store/store'
 import { FormIF, MhrRegistrationHomeOwnerIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { SharedDatePicker } from '@/components/common'

@@ -83,7 +83,7 @@
 <script lang="ts">
 // external
 import VueRouter from 'vue-router' // eslint-disable-line no-unused-vars
-import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
+import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
 import { useStore } from '@/store/store'
 import _ from 'lodash'
 // local helpers/enums/interfaces/resources

@@ -88,7 +88,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue'
+import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue-demi'
 import { useRoute, useRouter } from 'vue-router/composables'
 import { useStore } from '@/store/store'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
@@ -121,6 +121,7 @@ import {
   DialogOptionsIF
 } from '@/interfaces'
 import { RegistrationLengthI } from '@/composables/fees/interfaces'
+import { storeToRefs } from 'pinia'
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
@@ -151,12 +152,6 @@ export default defineComponent({
     const route = useRoute()
     const router = useRouter()
     const {
-      // Getters
-      getLengthTrust,
-      getRegistrationType,
-      getConfirmDebtorName,
-      getRegistrationNumber,
-      getRegistrationFlowType,
       // Actions
       setLengthTrust,
       setAddCollateral,
@@ -172,6 +167,14 @@ export default defineComponent({
       setAddSecuredPartiesAndDebtors,
       setOriginalAddSecuredPartiesAndDebtors
     } = useStore()
+    const {
+      // Getters
+      getLengthTrust,
+      getRegistrationType,
+      getConfirmDebtorName,
+      getRegistrationNumber,
+      getRegistrationFlowType
+    } = storeToRefs(useStore())
 
     const localState = reactive({
       dataLoaded: false,
@@ -196,15 +199,15 @@ export default defineComponent({
       }),
       registrationLength: computed((): RegistrationLengthI => {
         return {
-          lifeInfinite: getLengthTrust?.lifeInfinite || false,
-          lifeYears: getLengthTrust?.lifeYears || 0
+          lifeInfinite: getLengthTrust.value?.lifeInfinite || false,
+          lifeYears: getLengthTrust.value?.lifeYears || 0
         }
       }),
       registrationTypeUI: computed((): string => {
-        return getRegistrationType?.registrationTypeUI || null
+        return getRegistrationType.value?.registrationTypeUI || null
       }),
       registrationType: computed((): APIRegistrationTypes => {
-        return getRegistrationType?.registrationTypeAPI || ''
+        return getRegistrationType.value?.registrationTypeAPI || ''
       }),
       registrationNumber: computed((): string => {
         return (route.query['reg-num'] as string) || ''
@@ -228,8 +231,8 @@ export default defineComponent({
 
     const loadRegistration = async (): Promise<void> => {
       if (
-        !getRegistrationNumber ||
-        getRegistrationFlowType !== RegistrationFlowType.RENEWAL
+        !getRegistrationNumber.value ||
+        getRegistrationFlowType.value !== RegistrationFlowType.RENEWAL
       ) {
         if (!localState.registrationNumber || !getConfirmDebtorName) {
           if (!localState.registrationNumber) {

@@ -27,7 +27,7 @@
       <p v-if="!getSearchResults" :class="[$style['search-info'], 'ma-0']" style="padding-top: 26px;">
         Your search results will display below.
       </p>
-      <div v-else no-gutters style="padding-top: 26px;">
+      <div v-else style="padding-top: 26px;">
         <p id="search-meta-info" class="ma-0">
           <span :class="$style['search-sub-title']"><b>for {{ searchType }} "{{ searchValue }}"</b></span>
           <span :class="$style['search-info']">{{ searchTime }}</span>
@@ -60,7 +60,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onBeforeMount, reactive, toRefs, watch } from 'vue'
+import { computed, defineComponent, onBeforeMount, reactive, toRefs, watch } from 'vue-demi'
 import { useRouter } from '@/router'
 import { useStore } from '@/store/store'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
@@ -114,13 +114,11 @@ export default defineComponent({
   },
   setup (props, context) {
     const router = useRouter()
-    const store = useStore()
-
     const {
       getSearchedType,
       getUserSettings,
       getSearchResults
-    } = storeToRefs(store)
+    } = storeToRefs(useStore())
 
     const localState = reactive({
       loading: false,

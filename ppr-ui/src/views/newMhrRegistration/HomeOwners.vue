@@ -288,7 +288,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onBeforeMount, reactive, toRefs, watch } from 'vue'
+import { computed, defineComponent, onBeforeMount, reactive, toRefs, watch } from 'vue-demi'
 import { useStore } from '@/store/store'
 import { AddEditHomeOwner, HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
 import { BaseDialog } from '@/components/dialogs'
@@ -299,6 +299,7 @@ import { MhrRegistrationTotalOwnershipAllocationIF } from '@/interfaces'
 import { ActionTypes } from '@/enums'
 /* eslint-enable no-unused-vars */
 import { transfersErrors } from '@/resources'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'HomeOwners',
@@ -332,7 +333,7 @@ export default defineComponent({
       hasUnsavedChanges,
       getMhrTransferType,
       getMhrTransferDeclaredValue
-    } = useStore()
+    } = storeToRefs(useStore())
 
     const {
       getUiTransferType
@@ -353,7 +354,7 @@ export default defineComponent({
       getValidation,
       MhrSectVal,
       MhrCompVal
-    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel))
+    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
     const {
       getHomeTenancyType,
@@ -439,7 +440,7 @@ export default defineComponent({
           (showGroups && localState.ownershipAllocation.hasMinimumGroupsError && localState.showTotalOwnership)
       }),
       changesRequired: computed((): boolean => {
-        return props.validateTransfer && !hasUnsavedChanges
+        return props.validateTransfer && !hasUnsavedChanges.value
       })
     })
 

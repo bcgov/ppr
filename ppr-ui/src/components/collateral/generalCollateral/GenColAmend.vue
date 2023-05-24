@@ -91,7 +91,7 @@ import {
   toRefs,
   onMounted,
   computed
-} from 'vue'
+} from 'vue-demi'
 import { useStore } from '@/store/store'
 // import the component and the necessary extensions
 import {

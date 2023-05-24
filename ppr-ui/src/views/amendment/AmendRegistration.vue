@@ -133,9 +133,10 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue'
+import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue-demi'
 import { useRoute, useRouter } from 'vue-router/composables'
 import { useStore } from '@/store/store'
+import { storeToRefs } from 'pinia'
 import { cloneDeep, isEqual } from 'lodash'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { CautionBox, StickyContainer, CourtOrder } from '@/components/common'
@@ -214,19 +215,6 @@ export default defineComponent({
     const route = useRoute()
     const router = useRouter()
     const {
-      // Getters
-      getStateModel,
-      getLengthTrust,
-      getAddCollateral,
-      hasUnsavedChanges,
-      getRegistrationType,
-      getConfirmDebtorName,
-      getOriginalLengthTrust,
-      getOriginalAddCollateral,
-      getAmendmentDescription,
-      getCourtOrderInformation,
-      getAddSecuredPartiesAndDebtors,
-      getOriginalAddSecuredPartiesAndDebtors,
       // Actions
       setAddCollateral,
       setStaffPayment,
@@ -248,6 +236,21 @@ export default defineComponent({
       setAddSecuredPartiesAndDebtors,
       setOriginalAddSecuredPartiesAndDebtors
     } = useStore()
+    const {
+      // Getters
+      getStateModel,
+      getLengthTrust,
+      getAddCollateral,
+      hasUnsavedChanges,
+      getRegistrationType,
+      getConfirmDebtorName,
+      getOriginalLengthTrust,
+      getOriginalAddCollateral,
+      getAmendmentDescription,
+      getCourtOrderInformation,
+      getAddSecuredPartiesAndDebtors,
+      getOriginalAddSecuredPartiesAndDebtors
+    } = storeToRefs(useStore())
 
     const localState = reactive({
       cautionTxt: 'The Registry will provide the verification statement to all Secured Parties named in this ' +
@@ -297,10 +300,10 @@ export default defineComponent({
         return (route.query['document-id'] as string) || ''
       }),
       registrationTypeUI: computed((): UIRegistrationTypes => {
-        return getRegistrationType?.registrationTypeUI || null
+        return getRegistrationType.value?.registrationTypeUI || null
       }),
       registrationType: computed((): APIRegistrationTypes => {
-        return getRegistrationType?.registrationTypeAPI || null
+        return getRegistrationType.value?.registrationTypeAPI || null
       }),
       registrationTypeRL: computed((): string => {
         return APIRegistrationTypes.REPAIRERS_LIEN
@@ -433,7 +436,7 @@ export default defineComponent({
       })
       if (localState.documentId) {
         const stateModel: StateModelIF =
-          await setupAmendmentStatementFromDraft(getStateModel, localState.documentId)
+          await setupAmendmentStatementFromDraft(getStateModel.value, localState.documentId)
         if (stateModel.registration.draft.error) {
           emitError(stateModel.registration.draft.error)
           router.push({ name: RouteNames.DASHBOARD })
@@ -527,7 +530,7 @@ export default defineComponent({
         localState.amendErrMsg = '< Please make any required changes'
         return
       }
-      const description = getAmendmentDescription
+      const description = getAmendmentDescription.value
       if (
         localState.debtorValid &&
         localState.securedPartiesValid &&
@@ -556,22 +559,22 @@ export default defineComponent({
 
     const hasAmendmentChanged = (): boolean => {
       let hasChanged = false
-      if (!isEqual(getAddSecuredPartiesAndDebtors.securedParties,
-        getOriginalAddSecuredPartiesAndDebtors.securedParties)) {
+      if (!isEqual(getAddSecuredPartiesAndDebtors.value.securedParties,
+        getOriginalAddSecuredPartiesAndDebtors.value.securedParties)) {
         hasChanged = true
       }
-      if (!isEqual(getAddSecuredPartiesAndDebtors.debtors,
-        getOriginalAddSecuredPartiesAndDebtors.debtors)) {
+      if (!isEqual(getAddSecuredPartiesAndDebtors.value.debtors,
+        getOriginalAddSecuredPartiesAndDebtors.value.debtors)) {
         hasChanged = true
       }
       if (!isEqual(getLengthTrust, getOriginalLengthTrust)) {
         hasChanged = true
       }
-      if (!isEqual(getAddCollateral.vehicleCollateral, getOriginalAddCollateral.vehicleCollateral)) {
+      if (!isEqual(getAddCollateral.value.vehicleCollateral, getOriginalAddCollateral.value.vehicleCollateral)) {
         hasChanged = true
       }
-      const gcLength = getAddCollateral.generalCollateral?.length
-      const originalLength = getOriginalAddCollateral.generalCollateral?.length
+      const gcLength = getAddCollateral.value.generalCollateral?.length
+      const originalLength = getOriginalAddCollateral.value.generalCollateral?.length
       if (gcLength !== originalLength) {
         hasChanged = true
       }
@@ -629,7 +632,7 @@ export default defineComponent({
 
     const validateSecuredParties = (): void => {
       if (localState.registrationType === APIRegistrationTypes.SECURITY_AGREEMENT) {
-        const sp = getAddSecuredPartiesAndDebtors.securedParties
+        const sp = getAddSecuredPartiesAndDebtors.value.securedParties
         const securedPartyCount = sp.filter(removed => removed.action !== ActionTypes.REMOVED).length
         setValidSecuredParties(securedPartyCount >= 1)
       }
@@ -637,14 +640,14 @@ export default defineComponent({
 
     const validateDebtors = (): void => {
       if (localState.registrationType === APIRegistrationTypes.SECURITY_AGREEMENT) {
-        const sp = getAddSecuredPartiesAndDebtors.debtors
+        const sp = getAddSecuredPartiesAndDebtors.value.debtors
         const debtorCount = sp.filter(removed => removed.action !== ActionTypes.REMOVED).length
         setValidDebtor(debtorCount >= 1)
       }
     }
 
     const isCrownError = (): boolean => {
-      const sp = getAddSecuredPartiesAndDebtors.securedParties
+      const sp = getAddSecuredPartiesAndDebtors.value.securedParties
       let securedPartyCount = 0
       if (isSecuredPartyRestrictedList(localState.registrationType)) {
         for (let i = 0; i < sp.length; i++) {
@@ -664,7 +667,7 @@ export default defineComponent({
       if (!val) {
         localState.showInvalid = true
         localState.errorBar = true
-        const collateral = getAddCollateral
+        const collateral = getAddCollateral.value
         collateral.showInvalid = true
         setAddCollateral(collateral)
         localState.amendErrMsg = '< Please make any required changes'
@@ -677,7 +680,7 @@ export default defineComponent({
 
     const saveDraft = async (): Promise<void> => {
       localState.submitting = true
-      const stateModel: StateModelIF = getStateModel
+      const stateModel: StateModelIF = getStateModel.value
       const draft = await saveAmendmentStatementDraft(stateModel)
       localState.submitting = false
       if (draft.error) {

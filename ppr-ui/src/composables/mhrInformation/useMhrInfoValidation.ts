@@ -3,7 +3,7 @@ import {
   mhrInfoValidationStateIF,
   MhrRegistrationHomeOwnerIF
 } from '@/interfaces'
-import { computed } from 'vue'
+import { computed } from 'vue-demi'
 import { useHomeOwners, useTransferOwners } from '@/composables'
 import { ActionTypes } from '@/enums'
 

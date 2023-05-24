@@ -71,7 +71,7 @@ import {
   toRefs,
   watch,
   computed
-} from 'vue'
+} from 'vue-demi'
 import { useStore } from '@/store/store'
 // local components
 import { PartyAutocomplete } from '@/components/parties/party'

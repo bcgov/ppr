@@ -1,5 +1,5 @@
 // utils.js
-import { getCurrentInstance } from 'vue'
+import { getCurrentInstance } from 'vue-demi'
 
 export function useRoute () {
   const { proxy } = getCurrentInstance()

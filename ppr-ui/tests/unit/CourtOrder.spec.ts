@@ -118,7 +118,7 @@ describe('Court Order summary component', () => {
         fileNumber: 'DEF',
         effectOfOrder: 'Good'
       })
-    wrapper = mount((CourtOrder  as any), {
+    wrapper = mount((CourtOrder as any), {
       localVue,
       propsData: { setSummary: true },
       store,

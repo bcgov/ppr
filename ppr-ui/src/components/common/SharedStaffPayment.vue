@@ -83,7 +83,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, reactive, ref, toRefs, watch, nextTick } from 'vue'
+import { defineComponent, onMounted, reactive, ref, toRefs, watch, nextTick } from 'vue-demi'
 import { StaffPaymentOptions } from '@bcrs-shared-components/enums'
 import { FolioNumberInput } from '@bcrs-shared-components/folio-number-input'
 // eslint-disable-next-line no-unused-vars

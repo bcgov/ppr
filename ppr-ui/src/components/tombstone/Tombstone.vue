@@ -11,7 +11,7 @@
 </template>
 <script lang="ts">
 // external
-import { computed, defineComponent, reactive, toRefs } from 'vue'
+import { computed, defineComponent, reactive, toRefs } from 'vue-demi'
 // local
 import { TombstoneDefault, TombstoneDischarge } from '@/components/tombstone'
 

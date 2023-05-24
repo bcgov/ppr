@@ -43,7 +43,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs } from 'vue'
+import { defineComponent, reactive, toRefs } from 'vue-demi'
 import { useStore } from '@/store/store'
 import { useRoute, useRouter } from '@/router'
 

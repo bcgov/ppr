@@ -253,7 +253,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs } from 'vue'
+import { computed, defineComponent, reactive, toRefs } from 'vue-demi'
 import { HomeLocationTypes, RouteNames } from '@/enums'
 import { useStore } from '@/store/store'
 import { useMhrValidations } from '@/composables'

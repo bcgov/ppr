@@ -23,7 +23,7 @@ import {
 import { fetchMhRegistration, normalizeObject } from '@/utils'
 import { cloneDeep } from 'lodash'
 import { useHomeOwners, useTransferOwners } from '@/composables'
-import { computed, reactive, toRefs } from 'vue'
+import { computed, reactive, toRefs } from 'vue-demi'
 
 export const useMhrInformation = () => {
   const {

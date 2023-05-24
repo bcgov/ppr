@@ -6,7 +6,7 @@ import {
   MhrRegistrationTotalOwnershipAllocationIF
 } from '@/interfaces'
 
-import { readonly, ref, toRefs, watch } from 'vue'
+import { readonly, ref, toRefs, watch } from 'vue-demi'
 import { useStore } from '@/store/store'
 import { ActionTypes, HomeTenancyTypes, HomeOwnerPartyTypes, ApiTransferTypes } from '@/enums'
 import { MhrCompVal, MhrSectVal } from '@/composables/mhrRegistration/enums'

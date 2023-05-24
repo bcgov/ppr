@@ -53,7 +53,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs, watch, computed } from 'vue'
+import { defineComponent, reactive, toRefs, watch, computed } from 'vue-demi'
 import { useStore } from '@/store/store'
 
 export default defineComponent({

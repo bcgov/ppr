@@ -3,7 +3,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs } from 'vue'
+import { computed, defineComponent, reactive, toRefs } from 'vue-demi'
 import { useRoute } from 'vue-router/composables'
 // Common Component
 import SbcLogin from 'sbc-common-components/src/components/SbcLogin.vue'

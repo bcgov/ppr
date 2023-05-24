@@ -52,7 +52,7 @@
 <script lang="ts">
 // Components
 /* eslint-disable no-unused-vars */
-import { computed, defineComponent, onMounted, reactive, toRefs } from 'vue'
+import { computed, defineComponent, onMounted, reactive, toRefs } from 'vue-demi'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { RegistrationsWrapper } from '@/components/common'
@@ -75,7 +75,6 @@ export default defineComponent({
     }
   },
   setup (props, context) {
-    const store = useStore()
     const {
       // Actions
       setCurrentRegistrationsTab
@@ -85,7 +84,7 @@ export default defineComponent({
       getMhRegTableBaseRegs,
       getRegTableTotalRowCount,
       getCurrentRegistrationsTab
-    } = storeToRefs(store)
+    } = storeToRefs(useStore())
 
     const {
       fetchMhRegistrations

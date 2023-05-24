@@ -97,7 +97,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue'
+import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue-demi'
 import { useRoute, useRouter } from 'vue-router/composables'
 import { useStore } from '@/store/store'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
@@ -126,6 +126,7 @@ import {
   RegTableNewItemI
 } from '@/interfaces'
 import { RegistrationLengthI } from '@/composables/fees/interfaces'
+import { storeToRefs } from 'pinia'
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
@@ -156,15 +157,6 @@ export default defineComponent({
     const route = useRoute()
     const router = useRouter()
     const {
-      // Getters
-      getStateModel,
-      getLengthTrust,
-      isRoleStaffBcol,
-      isRoleStaffReg,
-      isRoleStaffSbc,
-      getRegistrationType,
-      getConfirmDebtorName,
-      getAddSecuredPartiesAndDebtors,
       // Actions
       setRegistrationType,
       setRegTableNewItem,
@@ -173,6 +165,17 @@ export default defineComponent({
       setRegistrationExpiryDate,
       setAddSecuredPartiesAndDebtors
     } = useStore()
+    const {
+      // Getters
+      getStateModel,
+      getLengthTrust,
+      isRoleStaffBcol,
+      isRoleStaffReg,
+      isRoleStaffSbc,
+      getRegistrationType,
+      getConfirmDebtorName,
+      getAddSecuredPartiesAndDebtors
+    } = storeToRefs(useStore())
 
     const localState = reactive({
       collateralSummary: '', // eslint-disable-line lines-between-class-members
@@ -206,15 +209,15 @@ export default defineComponent({
       }),
       registrationLength: computed((): RegistrationLengthI => {
         return {
-          lifeInfinite: getLengthTrust?.lifeInfinite || false,
-          lifeYears: getLengthTrust?.lifeYears || 0
+          lifeInfinite: getLengthTrust.value?.lifeInfinite || false,
+          lifeYears: getLengthTrust.value?.lifeYears || 0
         }
       }),
       registrationTypeUI: computed((): string => {
-        return getRegistrationType?.registrationTypeUI || null
+        return getRegistrationType.value?.registrationTypeUI || null
       }),
       registrationType: computed((): APIRegistrationTypes => {
-        return getRegistrationType?.registrationTypeAPI || ''
+        return getRegistrationType.value?.registrationTypeAPI || ''
       }),
       registrationNumber: computed((): string => {
         return (route.query['reg-num'] as string) || ''
@@ -226,7 +229,7 @@ export default defineComponent({
         return ''
       }),
       showCourtOrderInfo: computed((): boolean => {
-        return (getRegistrationType && localState.registrationType === APIRegistrationTypes.REPAIRERS_LIEN)
+        return (getRegistrationType.value && localState.registrationType === APIRegistrationTypes.REPAIRERS_LIEN)
       })
     })
 
@@ -251,7 +254,7 @@ export default defineComponent({
     }
 
     const loadRegistration = async (): Promise<void> => {
-      if (!localState.registrationNumber || !getConfirmDebtorName) {
+      if (!localState.registrationNumber || !getConfirmDebtorName.value) {
         if (!localState.registrationNumber) {
           console.error('No registration number given to discharge. Redirecting to dashboard...')
         } else {
@@ -326,7 +329,7 @@ export default defineComponent({
         localState.showErrors = true
         return
       }
-      if ((isRoleStaffReg) || (isRoleStaffSbc)) {
+      if ((isRoleStaffReg.value) || (isRoleStaffSbc.value)) {
         localState.staffPaymentDialogDisplay = true
       } else {
         submitRenewal()
@@ -334,7 +337,7 @@ export default defineComponent({
     }
 
     const submitRenewal = async (): Promise<void> => {
-      const stateModel: StateModelIF = getStateModel
+      const stateModel: StateModelIF = getStateModel.value
       localState.submitting = true
       const apiResponse: RenewRegistrationIF = await saveRenewal(stateModel)
       localState.submitting = false
@@ -367,7 +370,7 @@ export default defineComponent({
     }
 
     const setShowWarning = (): void => {
-      const parties = getAddSecuredPartiesAndDebtors
+      const parties = getAddSecuredPartiesAndDebtors.value
       localState.showRegMsg = parties.registeringParty?.action === ActionTypes.EDITED
     }
 

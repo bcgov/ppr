@@ -262,7 +262,7 @@ import {
   computed,
   reactive,
   toRefs
-} from 'vue'
+} from 'vue-demi'
 // local components
 import { BusinessSearchAutocomplete } from '@/components/search'
 import { BaseAddress } from '@/composables/address'

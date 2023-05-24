@@ -98,7 +98,7 @@ import {
   toRefs,
   watch,
   onMounted
-} from 'vue'
+} from 'vue-demi'
 import { useStore } from '@/store/store'
 import EditTrustIndenture from './EditTrustIndenture.vue'
 

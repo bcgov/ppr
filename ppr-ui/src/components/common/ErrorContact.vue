@@ -15,7 +15,7 @@
 // external
 import {
   defineComponent
-} from 'vue'
+} from 'vue-demi'
 
 export default defineComponent({
   name: 'ErrorContact',

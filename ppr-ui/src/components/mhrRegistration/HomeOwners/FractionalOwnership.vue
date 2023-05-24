@@ -54,7 +54,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs } from 'vue'
+import { computed, defineComponent, reactive, toRefs } from 'vue-demi'
 import { useInputRules } from '@/composables/useInputRules'
 import { toTitleCase } from '@/utils'
 import { useHomeOwners } from '@/composables'

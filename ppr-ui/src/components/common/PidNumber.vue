@@ -80,7 +80,7 @@
 
 <script lang="ts">
 /* eslint-disable no-unused-vars */
-import { computed, defineComponent, nextTick, reactive, toRefs, watch } from 'vue'
+import { computed, defineComponent, nextTick, reactive, toRefs, watch } from 'vue-demi'
 import { useStore } from '@/store/store'
 import { useInputRules } from '@/composables'
 import { ltsaDetails } from '@/utils/ltsa-api-helper'

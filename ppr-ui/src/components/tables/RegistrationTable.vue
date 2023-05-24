@@ -290,7 +290,7 @@ import {
   ref,
   toRefs,
   watch
-} from 'vue'
+} from 'vue-demi'
 import { useStore } from '@/store/store'
 import flushPromises from 'flush-promises'
 import _ from 'lodash'
@@ -320,6 +320,7 @@ import {
 } from '@/enums'
 import { useRegistration } from '@/composables/useRegistration'
 import { MHRegistrationTypes, RegistrationTypesStandard, StatusTypes, MhStatusTypes } from '@/resources'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   components: {
@@ -401,7 +402,7 @@ export default defineComponent({
       clientReferenceId: 7
     }
     // getters
-    const { getAccountProductSubscriptions } = useStore()
+    const { getAccountProductSubscriptions } = storeToRefs(useStore())
     // helpers
     const {
       // filters
@@ -434,7 +435,7 @@ export default defineComponent({
       mhStatusTypes: MhStatusTypes,
       hasRPPR: computed(() => {
         const productSubscriptions =
-          getAccountProductSubscriptions as AccountProductSubscriptionIF
+          getAccountProductSubscriptions.value as AccountProductSubscriptionIF
         return (
           productSubscriptions?.[AccountProductCodes.RPPR]?.roles
             .includes(AccountProductRoles.EDIT) || false

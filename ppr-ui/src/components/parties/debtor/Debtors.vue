@@ -253,7 +253,7 @@ import {
   toRefs,
   computed,
   watch
-} from 'vue'
+} from 'vue-demi'
 import { useStore } from '@/store/store'
 import { AddPartiesIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import EditDebtor from './EditDebtor.vue'

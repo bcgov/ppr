@@ -63,8 +63,9 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue'
+import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue-demi'
 import { useStore } from '@/store/store'
+import { storeToRefs } from 'pinia'
 import { useRoute, useRouter } from 'vue-router/composables'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { CautionBox, StickyContainer } from '@/components/common'
@@ -113,9 +114,6 @@ export default defineComponent({
     const route = useRoute()
     const router = useRouter()
     const {
-      // Getters
-      getRegistrationType,
-      getConfirmDebtorName,
       // Actions
       setLengthTrust,
       setAddCollateral,
@@ -129,6 +127,11 @@ export default defineComponent({
       setAddSecuredPartiesAndDebtors,
       setOriginalAddSecuredPartiesAndDebtors
     } = useStore()
+    const {
+      // Getters
+      getRegistrationType,
+      getConfirmDebtorName
+    } = storeToRefs(useStore())
 
     const localState = reactive({
       cautionTxt: 'The Registry will provide the verification statement to all Secured Parties named in this ' +
@@ -154,10 +157,10 @@ export default defineComponent({
         return route.query['reg-num'] as string || ''
       }),
       registrationTypeUI: computed((): UIRegistrationTypes => {
-        return getRegistrationType?.registrationTypeUI || null
+        return getRegistrationType.value?.registrationTypeUI || null
       }),
       registrationType: computed((): APIRegistrationTypes => {
-        return getRegistrationType?.registrationTypeAPI || null
+        return getRegistrationType.value?.registrationTypeAPI || null
       })
     })
 
@@ -174,7 +177,7 @@ export default defineComponent({
     }
 
     const loadRegistration = async (): Promise<void> => {
-      if (!localState.registrationNumber || !getConfirmDebtorName) {
+      if (!localState.registrationNumber || !getConfirmDebtorName.value) {
         if (!localState.registrationNumber) {
           console.error('No registration number given to discharge. Redirecting to dashboard...')
         } else {

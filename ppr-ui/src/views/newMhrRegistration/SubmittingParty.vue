@@ -103,7 +103,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
+import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
 import { MhrSubmittingParty } from '@/components/mhrRegistration/SubmittingParty'
 import { PartySearch } from '@/components/parties/party'
 import { useMhrValidations } from '@/composables/mhrRegistration/useMhrValidations'
@@ -113,6 +113,7 @@ import { validateDocumentID } from '@/utils'
 // eslint-disable-next-line no-unused-vars
 import { AttnRefConfigIF, MhrDocIdResponseIF } from '@/interfaces'
 import { clientConfig, staffConfig } from '@/resources/attnRefConfigs'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'SubmittingParty',
@@ -123,15 +124,17 @@ export default defineComponent({
   props: {},
   setup (props, context) {
     const {
-      // Getters
-      isRoleStaffReg,
-      getMhrAttentionReferenceNum,
-      getMhrRegistrationDocumentId,
-      getMhrRegistrationValidationModel,
       // Actions
       setMhrRegistrationDocumentId,
       setMhrAttentionReferenceNum
     } = useStore()
+    const {
+      // Getters
+      isRoleStaffReg,
+      getMhrAttentionReferenceNum,
+      getMhrRegistrationDocumentId,
+      getMhrRegistrationValidationModel
+    } = storeToRefs(useStore())
     const { customRules, isNumber, maxLength, minLength, required } = useInputRules()
     const {
       MhrCompVal,
@@ -141,11 +144,11 @@ export default defineComponent({
       getValidation,
       getSectionValidation,
       scrollToInvalid
-    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel))
+    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
     const localState = reactive({
-      attentionReference: getMhrAttentionReferenceNum || '',
-      documentId: getMhrRegistrationDocumentId || '',
+      attentionReference: getMhrAttentionReferenceNum.value || '',
+      documentId: getMhrRegistrationDocumentId.value || '',
       isDocumentIdValid: false,
       isRefNumValid: false,
       loadingDocId: false,
@@ -181,7 +184,7 @@ export default defineComponent({
         return localState.displayDocIdError ? ['Must be unique number'] : []
       }),
       attnOrRefConfig: computed((): AttnRefConfigIF => {
-        return isRoleStaffReg ? staffConfig : clientConfig
+        return isRoleStaffReg.value ? staffConfig : clientConfig
       })
     })
 

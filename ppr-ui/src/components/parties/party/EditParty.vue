@@ -256,7 +256,7 @@ import {
   toRefs,
   computed,
   watch
-} from 'vue'
+} from 'vue-demi'
 // local components
 import { SecuredPartyDialog } from '@/components/dialogs'
 import { BusinessSearchAutocomplete } from '@/components/search'

@@ -59,7 +59,7 @@ import {
   onMounted,
   reactive,
   toRefs
-} from 'vue'
+} from 'vue-demi'
 import { useStore } from '@/store/store'
 import { tombstoneTitles } from '@/resources'
 import { pacificDate, getRoleProductCode } from '@/utils'

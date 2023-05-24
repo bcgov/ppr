@@ -170,7 +170,7 @@ import {
   reactive,
   toRefs,
   computed
-} from 'vue'
+} from 'vue-demi'
 import { useStore } from '@/store/store'
 // local
 import { RegistrationFlowType } from '@/enums' // eslint-disable-line no-unused-vars

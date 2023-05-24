@@ -1,4 +1,4 @@
-import { reactive, toRefs, computed } from 'vue'
+import { reactive, toRefs, computed } from 'vue-demi'
 import { PartyIF, AddressIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { useStore } from '@/store/store'
 import { PartyAddressSchema } from '@/schemas'

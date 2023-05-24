@@ -27,7 +27,7 @@ import {
   reactive,
   toRefs,
   watch
-} from 'vue'
+} from 'vue-demi'
 import { useStore } from '@/store/store'
 // local components
 import { BaseDialog } from '.'

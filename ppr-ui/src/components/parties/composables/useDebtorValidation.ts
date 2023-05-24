@@ -1,4 +1,4 @@
-import { ref } from 'vue'
+import { ref } from 'vue-demi'
 import { createDefaultValidationResult } from '@lemoncode/fonk'
 import { useValidation } from '@/utils/validators/use-validation'
 

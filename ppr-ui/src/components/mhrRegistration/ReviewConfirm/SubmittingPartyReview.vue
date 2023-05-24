@@ -104,7 +104,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs } from 'vue'
+import { computed, defineComponent, reactive, toRefs } from 'vue-demi'
 import { RouteNames } from '@/enums'
 import { useStore } from '@/store/store'
 import { BaseAddress } from '@/composables/address'

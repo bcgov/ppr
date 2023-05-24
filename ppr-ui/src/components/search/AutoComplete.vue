@@ -26,7 +26,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
+import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
 import { getAutoComplete } from '@/utils'
 import { AutoCompleteResponseIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 

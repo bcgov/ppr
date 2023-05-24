@@ -125,7 +125,7 @@ import {
   toRefs,
   watch,
   onMounted
-} from 'vue'
+} from 'vue-demi'
 import { useStore } from '@/store/store'
 
 // local
