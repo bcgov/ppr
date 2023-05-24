@@ -152,7 +152,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"type\": \"TRANS\",\n  \"registration\": {\n    \"mhrNumber\": \"125234\",\n    \"clientReferenceId\": \"EX-TRANS-002\",\n    \"submittingParty\": {\n      \"personName\": {\n        \"first\": \"JOHN\",\n        \"middle\": \"B\",\n        \"last\": \"SMITH\"\n      },\n      \"address\": {\n        \"street\": \"222 SUMMER STREET\",\n        \"city\": \"VICTORIA\",\n        \"region\": \"BC\",\n        \"country\": \"CA\",\n        \"postalCode\": \"V8W 2V8\"\n      },\n      \"emailAddress\": \"jbsmith@gmail.com\",\n      \"phoneNumber\": \"2504930122\",\n      \"phoneExtension\": \"\"\n    },\n    \"deleteOwnerGroups\": [\n      {\n        \"groupId\": 1,\n        \"owners\": [\n          {\n            \"individualName\": {\n              \"first\": \"MARY-ANNE\",\n              \"last\": \"BICKNELL\"\n            },\n            \"address\": {\n              \"street\": \"6665 238TH STREET\",\n              \"city\": \"LANGLEY\",\n              \"region\": \"BC\",\n              \"country\": \"CA\",\n              \"postalCode\": \"V3A 6H4\"\n            },\n            \"phoneNumber\": \"6044620279\"\n          }\n        ],\n        \"type\": \"SOLE\",\n        \"status\": \"ACTIVE\"\n      }\n    ],\n    \"addOwnerGroups\": [\n      {\n        \"groupId\": 2,\n        \"owners\": [\n          {\n            \"individualName\": {\n              \"first\": \"JOHN\",\n              \"middle\": \"STEVEN\",\n              \"last\": \"CONNOLLY\"\n            },\n            \"address\": {\n              \"street\": \"6665 238TH STREET\",\n              \"city\": \"LANGLEY\",\n              \"region\": \"BC\",\n              \"country\": \"CA\",\n              \"postalCode\": \"V3A 6H4\"\n            },\n            \"phoneNumber\": \"6044620279\"\n          }\n        ],\n        \"type\": \"SOLE\"\n      }\n    ],\n  }\n}\n"
+							"raw": "{\n  \"type\": \"TRANS\",\n  \"registration\": {\n    \"mhrNumber\": \"125234\",\n    \"clientReferenceId\": \"EX-TRANS-002\",\n    \"submittingParty\": {\n      \"personName\": {\n        \"first\": \"JOHN\",\n        \"middle\": \"B\",\n        \"last\": \"SMITH\"\n      },\n      \"address\": {\n        \"street\": \"222 SUMMER STREET\",\n        \"city\": \"VICTORIA\",\n        \"region\": \"BC\",\n        \"country\": \"CA\",\n        \"postalCode\": \"V8W 2V8\"\n      },\n      \"emailAddress\": \"jbsmith@gmail.com\",\n      \"phoneNumber\": \"2504930122\",\n      \"phoneExtension\": \"\"\n    },\n    \"deleteOwnerGroups\": [\n      {\n        \"groupId\": 1,\n        \"owners\": [\n          {\n            \"individualName\": {\n              \"first\": \"MARY-ANNE\",\n              \"last\": \"BICKNELL\"\n            },\n            \"address\": {\n              \"street\": \"6665 238TH STREET\",\n              \"city\": \"LANGLEY\",\n              \"region\": \"BC\",\n              \"country\": \"CA\",\n              \"postalCode\": \"V3A 6H4\"\n            },\n            \"phoneNumber\": \"6044620279\"\n          }\n        ],\n        \"type\": \"SOLE\",\n        \"status\": \"ACTIVE\"\n      }\n    ],\n    \"addOwnerGroups\": [\n      {\n        \"groupId\": 2,\n        \"owners\": [\n          {\n            \"individualName\": {\n              \"first\": \"JOHN\",\n              \"middle\": \"STEVEN\",\n              \"last\": \"CONNOLLY\"\n            },\n            \"address\": {\n              \"street\": \"6665 238TH STREET\",\n              \"city\": \"LANGLEY\",\n              \"region\": \"BC\",\n              \"country\": \"CA\",\n              \"postalCode\": \"V3A 6H4\"\n            },\n            \"phoneNumber\": \"6044620279\"\n          }\n        ],\n        \"type\": \"SOLE\"\n      }\n    ],\n    \"deathOfOwner\": false\n  }\n}\n"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/drafts",
@@ -256,7 +256,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"draftId\": \"100169\",\n  \"createDateTime\": \"2022-11-23T14:31:01-08:00\",\n  \"lastUpdateDateTime\": \"2022-11-23T14:31:01-08:00\",\n  \"type\": \"TRANS\",\n  \"registration\": {\n    \"mhrNumber\": \"125234\",\n    \"clientReferenceId\": \"EX-TRANS-0022\",\n    \"submittingParty\": {\n      \"personName\": {\n        \"first\": \"JOHN\",\n        \"middle\": \"BARNARD\",\n        \"last\": \"SMITH\"\n      },\n      \"address\": {\n        \"street\": \"222 SUMMER STREET\",\n        \"city\": \"VICTORIA\",\n        \"region\": \"BC\",\n        \"country\": \"CA\",\n        \"postalCode\": \"V8W 2V8\"\n      },\n      \"emailAddress\": \"jbsmith@gmail.com\",\n      \"phoneNumber\": \"2504930122\",\n      \"phoneExtension\": \"\"\n    },\n    \"deleteOwnerGroups\": [\n      {\n        \"groupId\": 1,\n        \"owners\": [\n          {\n            \"individualName\": {\n              \"first\": \"MARY-ANNE\",\n              \"last\": \"BICKNELL\"\n            },\n            \"address\": {\n              \"street\": \"6665 238TH STREET\",\n              \"city\": \"LANGLEY\",\n              \"region\": \"BC\",\n              \"country\": \"CA\",\n              \"postalCode\": \"V3A 6H4\"\n            },\n            \"phoneNumber\": \"6044620279\"\n          }\n        ],\n        \"type\": \"SOLE\",\n        \"status\": \"ACTIVE\"\n      }\n    ],\n    \"addOwnerGroups\": [\n      {\n        \"groupId\": 2,\n        \"owners\": [\n          {\n            \"individualName\": {\n              \"first\": \"JOHN\",\n              \"middle\": \"STEVEN\",\n              \"last\": \"CONNOLLY\"\n            },\n            \"address\": {\n              \"street\": \"6665 238TH STREET\",\n              \"city\": \"LANGLEY\",\n              \"region\": \"BC\",\n              \"country\": \"CA\",\n              \"postalCode\": \"V3A 6H4\"\n            },\n            \"phoneNumber\": \"6044620279\"\n          }\n        ],\n        \"type\": \"SOLE\"\n      }\n    ],\n  }\n}\n"
+							"raw": "{\n  \"draftId\": \"100169\",\n  \"createDateTime\": \"2022-11-23T14:31:01-08:00\",\n  \"lastUpdateDateTime\": \"2022-11-23T14:31:01-08:00\",\n  \"type\": \"TRANS\",\n  \"registration\": {\n    \"mhrNumber\": \"125234\",\n    \"clientReferenceId\": \"EX-TRANS-0022\",\n    \"submittingParty\": {\n      \"personName\": {\n        \"first\": \"JOHN\",\n        \"middle\": \"BARNARD\",\n        \"last\": \"SMITH\"\n      },\n      \"address\": {\n        \"street\": \"222 SUMMER STREET\",\n        \"city\": \"VICTORIA\",\n        \"region\": \"BC\",\n        \"country\": \"CA\",\n        \"postalCode\": \"V8W 2V8\"\n      },\n      \"emailAddress\": \"jbsmith@gmail.com\",\n      \"phoneNumber\": \"2504930122\",\n      \"phoneExtension\": \"\"\n    },\n    \"deleteOwnerGroups\": [\n      {\n        \"groupId\": 1,\n        \"owners\": [\n          {\n            \"individualName\": {\n              \"first\": \"MARY-ANNE\",\n              \"last\": \"BICKNELL\"\n            },\n            \"address\": {\n              \"street\": \"6665 238TH STREET\",\n              \"city\": \"LANGLEY\",\n              \"region\": \"BC\",\n              \"country\": \"CA\",\n              \"postalCode\": \"V3A 6H4\"\n            },\n            \"phoneNumber\": \"6044620279\"\n          }\n        ],\n        \"type\": \"SOLE\",\n        \"status\": \"ACTIVE\"\n      }\n    ],\n    \"addOwnerGroups\": [\n      {\n        \"groupId\": 2,\n        \"owners\": [\n          {\n            \"individualName\": {\n              \"first\": \"JOHN\",\n              \"middle\": \"STEVEN\",\n              \"last\": \"CONNOLLY\"\n            },\n            \"address\": {\n              \"street\": \"6665 238TH STREET\",\n              \"city\": \"LANGLEY\",\n              \"region\": \"BC\",\n              \"country\": \"CA\",\n              \"postalCode\": \"V3A 6H4\"\n            },\n            \"phoneNumber\": \"6044620279\"\n          }\n        ],\n        \"type\": \"SOLE\"\n      }\n    ],\n    \"deathOfOwner\": false\n  }\n}\n"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/drafts/100169",
@@ -917,15 +917,14 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/v1/manufacturers/parties",
+							"raw": "{{base_url}}/api/v1/manufacturers",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"api",
 								"v1",
-								"manufacturers",
-								"parties"
+								"manufacturers"
 							]
 						},
 						"description": "Retrieve the recent history of search requests for the account."
@@ -1448,178 +1447,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"clientReferenceId\": \"EX-TRAND-001\",\n  \"submittingParty\": {\n    \"personName\": {\n      \"first\": \"JOHN\",\n      \"middle\": \"B\",\n      \"last\": \"SMITH\"\n    },\n    \"address\": {\n      \"street\": \"222 SUMMER STREET\",\n      \"city\": \"VICTORIA\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V8W 2V8\"\n    },\n    \"emailAddress\": \"jbsmith@gmail.com\",\n    \"phoneNumber\": \"2504930122\",\n    \"phoneExtension\": \"\"\n  },\n  \"deleteOwnerGroups\": [\n    {\n      \"groupId\": 1,\n      \"owners\": [\n        {\n          \"individualName\": {\n            \"first\": \"MARY-ANNE\",\n            \"last\": \"BICKNELL\"\n          },\n          \"address\": {\n            \"street\": \"6665 238TH STREET\",\n            \"city\": \"LANGLEY\",\n            \"region\": \"BC\",\n            \"country\": \"CA\",\n            \"postalCode\": \"V3A 6H4\"\n          },\n          \"phoneNumber\": \"6044620279\",\n          \"ownerId\": 1\n        }\n      ],\n      \"type\": \"SOLE\",\n      \"status\": \"ACTIVE\"\n    }\n  ],\n  \"addOwnerGroups\": [\n    {\n      \"groupId\": 2,\n      \"owners\": [\n        {\n          \"individualName\": {\n            \"first\": \"JOHN\",\n            \"middle\": \"STEVEN\",\n            \"last\": \"CONNOLLY\"\n          },\n          \"partyType\": \"EXECUTOR\",\n          \"description\": \"EXECUTOR OF THE ESTATE OF MARY-ANNE BICKNELL\",\n          \"address\": {\n            \"street\": \"6665 238TH STREET\",\n            \"city\": \"LANGLEY\",\n            \"region\": \"BC\",\n            \"country\": \"CA\",\n            \"postalCode\": \"V3A 6H4\"\n          },\n          \"phoneNumber\": \"6044620279\",\n          \"ownerId\": 2\n        }\n      ],\n      \"type\": \"SOLE\"\n    }\n  ],\n  \"declaredValue\": 78766,\n  \"consideration\": \"$78766.00\",\n  \"transferDate\": \"2022-10-04T20:29:36+00:00\",\n  \"ownLand\": false,\n }\n"
-						},
-						"url": {
-							"raw": "{{base_url}}/api/v1/transfers/125235",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"transfers",
-								"125235"
-							]
-						},
-						"description": "Retrieve the recent history of search requests for the account."
-					},
-					"response": []
-				},
-				{
-					"name": "Create TRANS_ADMIN Transfer Due to Death",
-					"protocolProfileBehavior": {
-						"disabledSystemHeaders": {
-							"accept": true
-						}
-					},
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Accept",
-								"type": "text",
-								"value": "application/json"
-							},
-							{
-								"key": "Account-Id",
-								"type": "text",
-								"value": "{{account_id}}"
-							},
-							{
-								"key": "Content-Type",
-								"type": "text",
-								"value": "application/json"
-							},
-							{
-								"description": "Prism only local mock server header.",
-								"key": "Prefer",
-								"type": "text",
-								"value": "example=/api/v1/searches/1294376/put"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt}}",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"clientReferenceId\": \"EX-TRAND-002\",\n \"registrationType\": \"TRANS_ADMIN\",\n \"transferDate\": \"2022-10-11T17:05:15-07:53\",\n  \"declaredValue\": 130000,\n  \"consideration\": \"$130000.00\",\n  \"ownLand\": true,\n  \"submittingParty\": {\n    \"personName\": {\n      \"first\": \"JOHN\",\n      \"middle\": \"B\",\n      \"last\": \"SMITH\"\n    },\n    \"address\": {\n      \"street\": \"222 SUMMER STREET\",\n      \"city\": \"VICTORIA\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V8W 2V8\"\n    },\n    \"emailAddress\": \"jbsmith@gmail.com\",\n    \"phoneNumber\": \"2504930122\",\n    \"phoneExtension\": \"\"\n  },\n  \"deleteOwnerGroups\": [\n    {\n      \"groupId\": 2,\n      \"owners\": [\n        {\n          \"individualName\": {\n            \"first\": \"MARY-ANNE\",\n            \"last\": \"BICKNELL\"\n          },\n          \"address\": {\n            \"street\": \"6665 238TH STREET\",\n            \"city\": \"LANGLEY\",\n            \"region\": \"BC\",\n            \"country\": \"CA\",\n            \"postalCode\": \"V3A 6H4\"\n          },\n          \"phoneNumber\": \"6044620279\",\n          \"ownerId\": 1\n        }\n      ],\n      \"type\": \"SOLE\",\n      \"status\": \"ACTIVE\"\n    }\n  ],\n  \"addOwnerGroups\": [\n    {\n      \"groupId\": 2,\n      \"owners\": [\n        {\n          \"individualName\": {\n            \"first\": \"JOHN\",\n            \"middle\": \"STEVEN\",\n            \"last\": \"CONNOLLY\"\n          },\n          \"partyType\": \"EXECUTOR\",\n          \"description\": \"EXECUTOR OF THE ESTATE OF MARY-ANNE BICKNELL\",\n          \"address\": {\n            \"street\": \"6665 238TH STREET\",\n            \"city\": \"LANGLEY\",\n            \"region\": \"BC\",\n            \"country\": \"CA\",\n            \"postalCode\": \"V3A 6H4\"\n          },\n          \"phoneNumber\": \"6044620279\",\n          \"ownerId\": 2\n        }\n      ],\n      \"type\": \"SOLE\"\n    }\n  ],\n  \"declaredValue\": 78766,\n  \"consideration\": \"$78766.00\",\n  \"transferDate\": \"2022-10-04T20:29:36+00:00\",\n  \"ownLand\": false,\n }\n"
-						},
-						"url": {
-							"raw": "{{base_url}}/api/v1/transfers/125235",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"transfers",
-								"125235"
-							]
-						},
-						"description": "Retrieve the recent history of search requests for the account."
-					},
-					"response": []
-				},
-				{
-					"name": "Create TRANS_AFFIDAVIT Transfer Due to Death",
-					"protocolProfileBehavior": {
-						"disabledSystemHeaders": {
-							"accept": true
-						}
-					},
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Accept",
-								"type": "text",
-								"value": "application/json"
-							},
-							{
-								"key": "Account-Id",
-								"type": "text",
-								"value": "{{account_id}}"
-							},
-							{
-								"key": "Content-Type",
-								"type": "text",
-								"value": "application/json"
-							},
-							{
-								"description": "Prism only local mock server header.",
-								"key": "Prefer",
-								"type": "text",
-								"value": "example=/api/v1/searches/1294376/put"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt}}",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"clientReferenceId\": \"EX-TRAND-003\",\n \"registrationType\": \"TRANS_AFFIDAVIT\",\n \"transferDate\": \"2022-10-11T17:05:15-07:53\",\n  \"declaredValue\": 130000,\n  \"consideration\": \"$130000.00\",\n  \"ownLand\": true,\n  \"submittingParty\": {\n    \"personName\": {\n      \"first\": \"JOHN\",\n      \"middle\": \"B\",\n      \"last\": \"SMITH\"\n    },\n    \"address\": {\n      \"street\": \"222 SUMMER STREET\",\n      \"city\": \"VICTORIA\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V8W 2V8\"\n    },\n    \"emailAddress\": \"jbsmith@gmail.com\",\n    \"phoneNumber\": \"2504930122\",\n    \"phoneExtension\": \"\"\n  },\n  \"deleteOwnerGroups\": [\n    {\n      \"groupId\": 3,\n      \"owners\": [\n        {\n          \"individualName\": {\n            \"first\": \"MARY-ANNE\",\n            \"last\": \"BICKNELL\"\n          },\n          \"address\": {\n            \"street\": \"6665 238TH STREET\",\n            \"city\": \"LANGLEY\",\n            \"region\": \"BC\",\n            \"country\": \"CA\",\n            \"postalCode\": \"V3A 6H4\"\n          },\n          \"phoneNumber\": \"6044620279\",\n          \"ownerId\": 1\n        }\n      ],\n      \"type\": \"SOLE\",\n      \"status\": \"ACTIVE\"\n    }\n  ],\n  \"addOwnerGroups\": [\n    {\n      \"groupId\": 2,\n      \"owners\": [\n        {\n          \"individualName\": {\n            \"first\": \"JOHN\",\n            \"middle\": \"STEVEN\",\n            \"last\": \"CONNOLLY\"\n          },\n          \"partyType\": \"EXECUTOR\",\n          \"description\": \"EXECUTOR OF THE ESTATE OF MARY-ANNE BICKNELL\",\n          \"address\": {\n            \"street\": \"6665 238TH STREET\",\n            \"city\": \"LANGLEY\",\n            \"region\": \"BC\",\n            \"country\": \"CA\",\n            \"postalCode\": \"V3A 6H4\"\n          },\n          \"phoneNumber\": \"6044620279\",\n          \"ownerId\": 2\n        }\n      ],\n      \"type\": \"SOLE\"\n    }\n  ],\n  \"declaredValue\": 78766,\n  \"consideration\": \"$78766.00\",\n  \"transferDate\": \"2022-10-04T20:29:36+00:00\",\n  \"ownLand\": false,\n }\n"
-						},
-						"url": {
-							"raw": "{{base_url}}/api/v1/transfers/125235",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"transfers",
-								"125235"
-							]
-						},
-						"description": "Retrieve the recent history of search requests for the account."
-					},
-					"response": []
-				},
-				{
-					"name": "Create TRANS_WILL Transfer Due to Death",
-					"protocolProfileBehavior": {
-						"disabledSystemHeaders": {
-							"accept": true
-						}
-					},
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Accept",
-								"type": "text",
-								"value": "application/json"
-							},
-							{
-								"key": "Account-Id",
-								"type": "text",
-								"value": "{{account_id}}"
-							},
-							{
-								"key": "Content-Type",
-								"type": "text",
-								"value": "application/json"
-							},
-							{
-								"description": "Prism only local mock server header.",
-								"key": "Prefer",
-								"type": "text",
-								"value": "example=/api/v1/searches/1294376/put"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt}}",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"clientReferenceId\": \"EX-TRAND-004\",\n \"registrationType\": \"TRANS_WILL\",\n \"transferDate\": \"2022-10-11T17:05:15-07:53\",\n  \"declaredValue\": 130000,\n  \"consideration\": \"$130000.00\",\n  \"ownLand\": true,\n  \"submittingParty\": {\n    \"personName\": {\n      \"first\": \"JOHN\",\n      \"middle\": \"B\",\n      \"last\": \"SMITH\"\n    },\n    \"address\": {\n      \"street\": \"222 SUMMER STREET\",\n      \"city\": \"VICTORIA\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V8W 2V8\"\n    },\n    \"emailAddress\": \"jbsmith@gmail.com\",\n    \"phoneNumber\": \"2504930122\",\n    \"phoneExtension\": \"\"\n  },\n  \"deleteOwnerGroups\": [\n    {\n      \"groupId\": 4,\n      \"owners\": [\n        {\n          \"individualName\": {\n            \"first\": \"MARY-ANNE\",\n            \"last\": \"BICKNELL\"\n          },\n          \"address\": {\n            \"street\": \"6665 238TH STREET\",\n            \"city\": \"LANGLEY\",\n            \"region\": \"BC\",\n            \"country\": \"CA\",\n            \"postalCode\": \"V3A 6H4\"\n          },\n          \"phoneNumber\": \"6044620279\",\n          \"ownerId\": 1\n        }\n      ],\n      \"type\": \"SOLE\",\n      \"status\": \"ACTIVE\"\n    }\n  ],\n  \"addOwnerGroups\": [\n    {\n      \"groupId\": 2,\n      \"owners\": [\n        {\n          \"individualName\": {\n            \"first\": \"JOHN\",\n            \"middle\": \"STEVEN\",\n            \"last\": \"CONNOLLY\"\n          },\n          \"partyType\": \"EXECUTOR\",\n          \"description\": \"EXECUTOR OF THE ESTATE OF MARY-ANNE BICKNELL\",\n          \"address\": {\n            \"street\": \"6665 238TH STREET\",\n            \"city\": \"LANGLEY\",\n            \"region\": \"BC\",\n            \"country\": \"CA\",\n            \"postalCode\": \"V3A 6H4\"\n          },\n          \"phoneNumber\": \"6044620279\",\n          \"ownerId\": 2\n        }\n      ],\n      \"type\": \"SOLE\"\n    }\n  ],\n  \"declaredValue\": 78766,\n  \"consideration\": \"$78766.00\",\n  \"transferDate\": \"2022-10-04T20:29:36+00:00\",\n  \"ownLand\": false,\n }\n"
+							"raw": "{\n  \"clientReferenceId\": \"EX-TRAND-001\",\n  \"submittingParty\": {\n    \"personName\": {\n      \"first\": \"JOHN\",\n      \"middle\": \"B\",\n      \"last\": \"SMITH\"\n    },\n    \"address\": {\n      \"street\": \"222 SUMMER STREET\",\n      \"city\": \"VICTORIA\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V8W 2V8\"\n    },\n    \"emailAddress\": \"jbsmith@gmail.com\",\n    \"phoneNumber\": \"2504930122\",\n    \"phoneExtension\": \"\"\n  },\n  \"deleteOwnerGroups\": [\n    {\n      \"groupId\": 1,\n      \"owners\": [\n        {\n          \"individualName\": {\n            \"first\": \"MARY-ANNE\",\n            \"last\": \"BICKNELL\"\n          },\n          \"address\": {\n            \"street\": \"6665 238TH STREET\",\n            \"city\": \"LANGLEY\",\n            \"region\": \"BC\",\n            \"country\": \"CA\",\n            \"postalCode\": \"V3A 6H4\"\n          },\n          \"phoneNumber\": \"6044620279\",\n          \"ownerId\": 1\n        }\n      ],\n      \"type\": \"SOLE\",\n      \"status\": \"ACTIVE\"\n    }\n  ],\n  \"addOwnerGroups\": [\n    {\n      \"groupId\": 2,\n      \"owners\": [\n        {\n          \"individualName\": {\n            \"first\": \"JOHN\",\n            \"middle\": \"STEVEN\",\n            \"last\": \"CONNOLLY\"\n          },\n          \"partyType\": \"EXECUTOR\",\n          \"description\": \"EXECUTOR OF THE ESTATE OF MARY-ANNE BICKNELL\",\n          \"address\": {\n            \"street\": \"6665 238TH STREET\",\n            \"city\": \"LANGLEY\",\n            \"region\": \"BC\",\n            \"country\": \"CA\",\n            \"postalCode\": \"V3A 6H4\"\n          },\n          \"phoneNumber\": \"6044620279\",\n          \"ownerId\": 2\n        }\n      ],\n      \"type\": \"SOLE\"\n    }\n  ],\n  \"declaredValue\": 78766,\n  \"consideration\": \"$78766.00\",\n  \"transferDate\": \"2022-10-04T20:29:36+00:00\",\n  \"ownLand\": false,\n  \"deathOfOwner\": true\n}\n"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/transfers/125235",
@@ -1637,7 +1465,7 @@
 					},
 					"response": []
 				}
-			]	
+			]
 		},
 		{
 			"name": "transport permits",

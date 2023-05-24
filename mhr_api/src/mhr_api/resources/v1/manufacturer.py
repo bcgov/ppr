@@ -24,18 +24,18 @@ from flask_cors import cross_origin
 from mhr_api.utils.auth import jwt
 from mhr_api.exceptions import BusinessException, DatabaseException
 from mhr_api.services.authz import authorized
-from mhr_api.models import AccountBcolId, Db2Manufact
+from mhr_api.models import MhrManufacturer
 from mhr_api.resources import utils as resource_utils
 
 
 bp = Blueprint('MANUFACTURER1', __name__, url_prefix='/api/v1/manufacturers')  # pylint: disable=invalid-name
 
 
-@bp.route('/parties', methods=['GET', 'OPTIONS'])
+@bp.route('', methods=['GET', 'OPTIONS'])
 @cross_origin(origin='*')
 @jwt.requires_auth
-def get_manufacturer_parties():
-    """Get account manufacturer party information."""
+def get_account_manufacturer():
+    """Get account manufacturer information."""
     try:
         # Quick check: must have an account ID.
         account_id = resource_utils.get_account_id(request)
@@ -46,30 +46,15 @@ def get_manufacturer_parties():
         if not authorized(account_id, jwt):
             return resource_utils.unauthorized_error_response(account_id)
         # Try to get bcol account from account ID: from business an account should have at most 1 bcol number.
-        current_app.logger.info(f'Fetching BCOL account number for {account_id}.')
-        bcol_accounts = AccountBcolId.find_by_account_id(account_id)
-        ids = []
-        if bcol_accounts:
-            for account in bcol_accounts:
-                ids.append(str(account.bconline_account))
-        else:
-            current_app.logger.info(f'No BCOL account number found for {account_id}.')
-            return jsonify([]), HTTPStatus.OK
-
-        # Try to fetch search history by account id.
-        # No results returns an empty array.
-        bcol_account = ids[0]
-        current_app.logger.info(f'Fetching account manufacturers for {account_id}, BCOL account {bcol_account}.')
-        manufacturers = Db2Manufact.find_by_bcol_account(bcol_account)
-        if not manufacturers:
-            return jsonify([]), HTTPStatus.OK
-        results = []
-        for result in manufacturers:
-            results.append(result.json)
-        return jsonify(results), HTTPStatus.OK
+        current_app.logger.info(f'Getting manufacturer information for account number for {account_id}.')
+        manufacturer: MhrManufacturer = MhrManufacturer.find_by_account_id(account_id)
+        if manufacturer:
+            return jsonify(manufacturer.json), HTTPStatus.OK
+        current_app.logger.info(f'No manufacturer info found for account {account_id}.')
+        return resource_utils.not_found_error_response('manufacturer information', account_id)
 
     except DatabaseException as db_exception:
-        return resource_utils.db_exception_response(db_exception, account_id, 'GET manufacturer parties')
+        return resource_utils.db_exception_response(db_exception, account_id, 'GET manufacturer info')
     except BusinessException as exception:
         return resource_utils.business_exception_response(exception)
     except Exception as default_exception:   # noqa: B902; return nicer default error
