@@ -35,6 +35,7 @@ import { GenColEdit, GenColSummary, GenColAmend } from '.'
 // local types/helpers/etc.
 import { APIRegistrationTypes, RegistrationFlowType } from '@/enums' // eslint-disable-line no-unused-vars
 import { useStore } from '@/store/store'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'GeneralCollateral',
@@ -61,9 +62,9 @@ export default defineComponent({
   setup (props, context) {
     const {
       getRegistrationFlowType
-    } = useStore()
+    } = storeToRefs(useStore())
 
-    const registrationFlowType = getRegistrationFlowType
+    const registrationFlowType = getRegistrationFlowType.value
     const localState = reactive({
       summaryView: props.isSummary,
       amendMode: false,

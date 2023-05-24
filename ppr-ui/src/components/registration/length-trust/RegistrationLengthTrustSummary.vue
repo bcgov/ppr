@@ -101,7 +101,7 @@ import {
   toRefs
 } from 'vue-demi'
 import { useStore } from '@/store/store'
-import { useRoute, useRouter } from '@/router'
+import { useRoute, useRouter } from 'vue2-helpers/vue-router'
 
 // local
 import { LengthTrustIF } from '@/interfaces' // eslint-disable-line no-unused-vars

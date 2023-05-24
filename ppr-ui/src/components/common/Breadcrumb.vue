@@ -40,7 +40,7 @@
 <script lang="ts">
 // external
 import { computed, defineComponent, reactive, toRefs, Ref } from 'vue-demi' // eslint-disable-line
-import { useRouter } from '@/router'
+import { useRoute, useRouter } from 'vue2-helpers/vue-router'
 import { useStore } from '@/store/store'
 // local
 import { BreadcrumbIF } from '@/interfaces' // eslint-disable-line
@@ -61,11 +61,8 @@ import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'Breadcrumb',
-  props: {
-    setCurrentPath: String,
-    setCurrentPathName: String
-  },
-  setup (props) {
+  setup () {
+    const route = useRoute()
     const router = useRouter()
     const {
       // Getters
@@ -77,8 +74,6 @@ export default defineComponent({
       getMhrInformation
     } = storeToRefs(useStore())
 
-    const currentPath = toRefs(props).setCurrentPath
-    const routeName = toRefs(props).setCurrentPathName as Ref<RouteNames>
     const localState = reactive({
       backUrl: computed((): any => {
         const length = localState.breadcrumbs?.length || 0
@@ -107,35 +102,35 @@ export default defineComponent({
             tombstoneBreadcrumb[0].text = 'Staff Dashboard'
           }
         }
-        if ((routeName.value === RouteNames.DASHBOARD) || (routeName.value === RouteNames.SIGN_IN)) {
+        if ((route.name === RouteNames.DASHBOARD) || (route.name === RouteNames.SIGN_IN)) {
           tombstoneBreadcrumbDashboard[1].text = roleBasedBreadcrumbTitle || tombstoneBreadcrumbDashboard[1].text
           return tombstoneBreadcrumbDashboard
-        } else if ((routeName.value === RouteNames.SEARCH) || (routeName.value === RouteNames.MHRSEARCH)) {
+        } else if ((route.name === RouteNames.SEARCH) || (route.name === RouteNames.MHRSEARCH)) {
           tombstoneBreadcrumbSearch[1].text = roleBasedBreadcrumbTitle
           return tombstoneBreadcrumbSearch
-        } else if (routeName.value === RouteNames.MHRSEARCH_CONFIRM) {
+        } else if (route.name === RouteNames.MHRSEARCH_CONFIRM) {
           tombstoneBreadcrumbSearchConfirm[1].text = roleBasedBreadcrumbTitle ||
             tombstoneBreadcrumbSearchConfirm[1].text
           return tombstoneBreadcrumbSearchConfirm
-        } else if (currentPath.value?.includes('discharge')) {
+        } else if (route.path?.includes('discharge')) {
           const dischargeBreadcrumb = [...tombstoneBreadcrumbDischarge]
           dischargeBreadcrumb[1].text = roleBasedBreadcrumbTitle
           dischargeBreadcrumb[2].text =
             `Base Registration ${getRegistrationNumber.value} - Total Discharge` || dischargeBreadcrumb[2].text
           return dischargeBreadcrumb
-        } else if (currentPath.value?.includes('renew')) {
+        } else if (route.path?.includes('renew')) {
           const renewBreadcrumb = [...tombstoneBreadcrumbRenewal]
           renewBreadcrumb[1].text = roleBasedBreadcrumbTitle || renewBreadcrumb[1].text
           renewBreadcrumb[2].text =
             `Base Registration ${getRegistrationNumber.value} - Renewal` || renewBreadcrumb[2].text
           return renewBreadcrumb
-        } else if (currentPath.value?.includes('amend')) {
+        } else if (route.path?.includes('amend')) {
           const amendBreadcrumb = [...tombstoneBreadcrumbAmendment]
           amendBreadcrumb[1].text = roleBasedBreadcrumbTitle || amendBreadcrumb[1].text
           amendBreadcrumb[2].text =
             `Base Registration ${getRegistrationNumber.value} - Amendment` || amendBreadcrumb[2].text
           return amendBreadcrumb
-        } else if (routeName.value === RouteNames.MHR_INFORMATION) {
+        } else if (route.name === RouteNames.MHR_INFORMATION) {
           const mhrInfoBreadcrumb = [...tombstoneBreadcrumbMhrInformation]
           mhrInfoBreadcrumb[2].text = `MHR Number ${getMhrInformation.value.mhrNumber}`
           return mhrInfoBreadcrumb

@@ -45,7 +45,7 @@
 <script lang="ts">
 import { defineComponent, reactive, toRefs } from 'vue-demi'
 import { useStore } from '@/store/store'
-import { useRoute, useRouter } from '@/router'
+import { useRoute, useRouter } from 'vue2-helpers/vue-router'
 
 export default defineComponent({
   name: 'Stepper',

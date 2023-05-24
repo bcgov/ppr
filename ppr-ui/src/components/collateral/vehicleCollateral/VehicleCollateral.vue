@@ -331,6 +331,7 @@ import { VehicleCollateralIF } from '@/interfaces' // eslint-disable-line no-unu
 import { vehicleTableHeaders, VehicleTypes } from '@/resources'
 import { useVehicle } from './factories/useVehicle'
 import { cloneDeep } from 'lodash'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   components: {
@@ -351,21 +352,17 @@ export default defineComponent({
     }
   },
   setup (props, context) {
+    const { setVehicleCollateral } = useStore()
     const {
-      // Getters
       getVehicleCollateral,
       getRegistrationFlowType,
       getOriginalAddCollateral,
-      getRegistrationType,
-
-      // Actions
-      setVehicleCollateral
-    } = useStore()
-
+      getRegistrationType
+    } = storeToRefs(useStore())
     const { hasVehicleCollateral, hasOptionalVehicleCollateral } = useVehicle(props, context)
 
-    const registrationFlowType = getRegistrationFlowType
-    const registrationType = getRegistrationType.registrationTypeAPI
+    const registrationFlowType = getRegistrationFlowType.value
+    const registrationType = getRegistrationType.value.registrationTypeAPI
 
     const localState = reactive({
       activeIndex: -1,
@@ -380,9 +377,9 @@ export default defineComponent({
       isLastDelete: computed((): boolean => {
         if (localState.isRepairersLienAmendment) {
           let ctr = 0
-          for (let i = 0; i < getVehicleCollateral.length; i++) {
+          for (let i = 0; i < getVehicleCollateral.value.length; i++) {
             // is valid if there is at least one vehicle
-            if (getVehicleCollateral[i].action !== ActionTypes.REMOVED) {
+            if (getVehicleCollateral.value[i].action !== ActionTypes.REMOVED) {
               ctr++
             }
           }
@@ -403,18 +400,18 @@ export default defineComponent({
       }),
       summaryView: props.isSummary,
       getMH: computed(function () {
-        const vc = getVehicleCollateral as VehicleCollateralIF[]
+        const vc = getVehicleCollateral.value as VehicleCollateralIF[]
         return vc?.find(obj => obj.type === APIVehicleTypes.MANUFACTURED_HOME)
       }),
       getNumCols: computed((): number => {
-        const vc = getVehicleCollateral as VehicleCollateralIF[]
+        const vc = getVehicleCollateral.value as VehicleCollateralIF[]
         if (vc?.find(obj => obj.type === APIVehicleTypes.MANUFACTURED_HOME)) {
           return 7
         }
         return 6
       }),
       headers: computed(function () {
-        const vc = getVehicleCollateral as VehicleCollateralIF[]
+        const vc = getVehicleCollateral.value as VehicleCollateralIF[]
         const headersToShow = [...vehicleTableHeaders]
         const editRow = headersToShow.pop()
         if (vc?.find(obj => obj.type === APIVehicleTypes.MANUFACTURED_HOME)) {
@@ -435,7 +432,7 @@ export default defineComponent({
         return headersToShow
       }),
       vehicleCollateral: computed((): VehicleCollateralIF[] => {
-        const vehicles = getVehicleCollateral as VehicleCollateralIF[] || []
+        const vehicles = getVehicleCollateral.value as VehicleCollateralIF[] || []
         if ((registrationFlowType === RegistrationFlowType.AMENDMENT) && (localState.summaryView)) {
           const displayArray = []
           for (let i = 0; i < vehicles.length; i++) {
@@ -483,7 +480,7 @@ export default defineComponent({
     }
 
     const getVehicleDescription = (code: string): string => {
-      const vehicle = VehicleTypes.find(obj => obj === code)
+      const vehicle = VehicleTypes.find(obj => obj.value === code)
       return vehicle.text
     }
 
@@ -510,7 +507,7 @@ export default defineComponent({
 
     const undo = (index: number): void => {
       const newVCollateral = [...localState.vehicleCollateral]
-      const originalCollateral = getOriginalAddCollateral
+      const originalCollateral = getOriginalAddCollateral.value
       newVCollateral.splice(index, 1, cloneDeep(originalCollateral.vehicleCollateral[index]))
       setVehicleCollateral(newVCollateral)
     }

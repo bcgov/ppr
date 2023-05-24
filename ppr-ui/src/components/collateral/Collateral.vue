@@ -88,7 +88,7 @@ import {
   onUnmounted
 } from 'vue-demi'
 import { useStore } from '@/store/store'
-import { useRouter } from '@/router'
+import { useRouter } from 'vue2-helpers/vue-router'
 
 // local components
 import { GeneralCollateral } from './generalCollateral'

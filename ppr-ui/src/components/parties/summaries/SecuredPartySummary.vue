@@ -20,7 +20,7 @@ import { useStore } from '@/store/store'
 
 import { BasePartySummary } from '@/components/parties/summaries'
 import { AddPartiesIF, PartySummaryOptionsI } from '@/interfaces' // eslint-disable-line no-unused-vars
-import { useRouter } from '@/router'
+import { useRouter } from 'vue2-helpers/vue-router'
 
 import { partyTableHeaders } from '@/resources'
 import { isSecuredPartyRestrictedList } from '@/utils'

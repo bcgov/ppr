@@ -50,7 +50,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, onBeforeMount, reactive, ref, toRefs, watch } from 'vue-demi'
-import { useRoute } from '@/router'
+import { useRoute } from 'vue2-helpers/vue-router'
 import { yyyyMmDdToPacificDate } from '@/utils'
 // eslint-disable-next-line no-unused-vars
 import { FormIF } from '@/interfaces'

@@ -177,6 +177,7 @@ import { RegistrationFlowType } from '@/enums' // eslint-disable-line no-unused-
 import { GeneralCollateralIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { pacificDate } from '@/utils'
 import { cloneDeep } from 'lodash'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'GenColSummary',
@@ -199,13 +200,8 @@ export default defineComponent({
     }
   },
   setup (props, { emit }) {
-    const {
-      getGeneralCollateral,
-      getOriginalAddCollateral,
-      getRegistrationFlowType,
-      setGeneralCollateral
-    } = useStore()
-
+    const { setGeneralCollateral } = useStore()
+    const { getGeneralCollateral, getOriginalAddCollateral, getRegistrationFlowType } = storeToRefs(useStore())
     const localState = reactive({
       showingHistory: props.setShowHistory,
       baseGenCollateralIndex: computed(() => {
@@ -228,7 +224,7 @@ export default defineComponent({
         return -1
       }),
       generalCollateral: computed((): GeneralCollateralIF[] => {
-        const generalCollateral = getGeneralCollateral as GeneralCollateralIF[] || []
+        const generalCollateral = getGeneralCollateral.value as GeneralCollateralIF[] || []
         const cleanedGeneralCollateral = [] as GeneralCollateralIF[]
         for (let i = 0; i < generalCollateral.length; i++) {
           if (!generalCollateral[i].addedDateTime) {
@@ -294,7 +290,7 @@ export default defineComponent({
         return localState.generalCollateral.length - 1
       }),
       registrationFlowType: computed((): RegistrationFlowType => {
-        return getRegistrationFlowType
+        return getRegistrationFlowType.value
       }),
       showAmendLink: computed((): boolean => {
         return props.setShowAmendLink
@@ -313,7 +309,7 @@ export default defineComponent({
 
     const undo = () => {
       const originalGeneralCollateral =
-        cloneDeep(getOriginalAddCollateral.generalCollateral)
+        cloneDeep(getOriginalAddCollateral.value.generalCollateral)
       setGeneralCollateral(originalGeneralCollateral)
     }
 

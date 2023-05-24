@@ -12,6 +12,7 @@
 <script lang="ts">
 // external
 import { computed, defineComponent, reactive, toRefs } from 'vue-demi'
+import { useRoute } from 'vue2-helpers/vue-router'
 // local
 import { TombstoneDefault, TombstoneDischarge } from '@/components/tombstone'
 
@@ -21,15 +22,11 @@ export default defineComponent({
     TombstoneDefault,
     TombstoneDischarge
   },
-  props: {
-    setCurrentPath: {
-      default: ''
-    }
-  },
-  setup (props) {
+  setup () {
+    const route = useRoute()
     const localState = reactive({
       currentPath: computed((): string => {
-        return props.setCurrentPath
+        return route.path
       }),
       displayDischarge: computed((): boolean => {
         return localState.currentPath.includes('discharge')

@@ -72,7 +72,7 @@ import {
   toRefs
 } from 'vue-demi'
 import { useStore } from '@/store/store'
-import { useRouter } from '@/router'
+import { useRouter } from 'vue2-helpers/vue-router'
 
 import {
   DebtorSummary,

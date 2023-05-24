@@ -245,7 +245,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, reactive, toRefs, onMounted, watch } from 'vue-demi'
-import { useRouter } from '@/router'
+import { useRouter } from 'vue2-helpers/vue-router'
 import { useStore } from '@/store/store' // eslint-disable-line no-unused-vars
 import {
   mhSearchMhrNumberHeaders,

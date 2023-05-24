@@ -29,8 +29,8 @@
           v-bind:message="bannerText"
           icon=" "
         ></sbc-system-banner>
-        <breadcrumb :setCurrentPath="currentPath" :setCurrentPathName="currentPathName" v-if="haveData" />
-        <tombstone :setCurrentPath="currentPath" v-if="haveData" />
+        <breadcrumb v-if="haveData" />
+        <tombstone v-if="haveData" />
         <v-container class="view-container pa-0 ma-0">
           <v-row no-gutters>
             <v-col cols="12">
@@ -57,7 +57,7 @@
 <script lang="ts">
 import { computed, defineComponent, onBeforeMount, toRefs, reactive, watch } from 'vue-demi'
 import { useStore } from '@/store/store'
-import { useRoute, useRouter } from '@/router'
+import { useRoute, useRouter } from 'vue2-helpers/vue-router'
 import { storeToRefs } from 'pinia'
 
 import { StatusCodes } from 'http-status-codes'
@@ -145,8 +145,6 @@ export default defineComponent({
     } = storeToRefs(useStore())
 
     const localState = reactive({
-      currentPath: '',
-      currentPathName: null as RouteNames,
       errorDisplay: false,
       errorOptions: loginError as DialogOptionsIF,
       saveDraftExitToggle: false,
@@ -697,11 +695,6 @@ export default defineComponent({
         setBrowserTitle()
       }
     }
-
-    watch(() => route, (newVal: any) => {
-      localState.currentPath = newVal.path
-      localState.currentPathName = newVal.name as RouteNames
-    }, { immediate: true, deep: true })
 
     /** Called when profile is ready -- we can now init app. */
     watch(() => localState.profileReady, async (val: boolean) => {

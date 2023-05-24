@@ -157,7 +157,7 @@
 // Components
 /* eslint-disable no-unused-vars */
 import { computed, defineComponent, onBeforeMount, reactive, toRefs, watch } from 'vue-demi'
-import { useRouter } from '@/router'
+import { useRouter } from 'vue2-helpers/vue-router'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { RegistrationBar } from '@/components/registration'

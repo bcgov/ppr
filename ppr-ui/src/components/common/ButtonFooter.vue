@@ -81,22 +81,21 @@
 </template>
 
 <script lang="ts">
-// external
 import VueRouter from 'vue-router' // eslint-disable-line no-unused-vars
 import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
 import { useStore } from '@/store/store'
 import _ from 'lodash'
-// local helpers/enums/interfaces/resources
 import { saveFinancingStatement, saveFinancingStatementDraft } from '@/utils'
 import { RouteNames, StatementTypes } from '@/enums'
 import { BaseDialog } from '@/components/dialogs'
 import StaffPaymentDialog from '@/components/dialogs/StaffPaymentDialog.vue'
 import {
   // eslint-disable-next-line no-unused-vars
-  ButtonConfigIF, DraftIF, ErrorIF, FinancingStatementIF, MhrDraftIF, RegTableNewItemI, StateModelIF
+  ButtonConfigIF, DraftIF, ErrorIF, FinancingStatementIF, RegTableNewItemI, StateModelIF
 } from '@/interfaces'
 import { unsavedChangesDialog } from '@/resources/dialogOptions'
 import { useNewMhrRegistration } from '@/composables'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   components: {
@@ -130,20 +129,21 @@ export default defineComponent({
   },
   setup (props, { emit }) {
     const {
-      // Getters
-      getFooterButtonConfig,
-      getStateModel,
-      hasUnsavedChanges,
-      isRoleStaffBcol,
-      isRoleStaffReg,
-      isRoleStaffSbc,
-
       // Actions
       resetNewRegistration,
       setDraft,
       setRegTableNewItem,
       setUnsavedChanges
     } = useStore()
+    const {
+      // Getters
+      getFooterButtonConfig,
+      getStateModel,
+      hasUnsavedChanges,
+      isRoleStaffBcol,
+      isRoleStaffReg,
+      isRoleStaffSbc
+    } = storeToRefs(useStore())
     const { mhrDraftHandler } = useNewMhrRegistration()
 
     const localState = reactive({
@@ -162,21 +162,21 @@ export default defineComponent({
         return props.certifyValid
       }),
       isStaffReg: computed((): boolean => {
-        return isRoleStaffReg
+        return isRoleStaffReg.value
       }),
       isStaffBcol: computed((): boolean => {
-        return isRoleStaffBcol
+        return isRoleStaffBcol.value
       }),
       lastStepBcol: computed((): boolean => {
         // bcol can't submit
-        return ((props.currentStepName === RouteNames.REVIEW_CONFIRM) && isRoleStaffBcol)
+        return ((props.currentStepName === RouteNames.REVIEW_CONFIRM) && isRoleStaffBcol.value)
       }),
       isStaffSbc: computed((): boolean => {
-        return isRoleStaffSbc
+        return isRoleStaffSbc.value
       }),
       buttonConfig: computed((): ButtonConfigIF => {
         if (localState.statementType.toUpperCase() === StatementTypes.FINANCING_STATEMENT) {
-          const stepConfig: Array<ButtonConfigIF> = getFooterButtonConfig
+          const stepConfig: Array<ButtonConfigIF> = getFooterButtonConfig.value
           let config: ButtonConfigIF
 
           for (const i in stepConfig) {
@@ -191,7 +191,7 @@ export default defineComponent({
       )
     })
     const cancel = () => {
-      if (hasUnsavedChanges === true) localState.showCancelDialog = true
+      if (hasUnsavedChanges.value === true) localState.showCancelDialog = true
       else goToDashboard()
     }
     const goToDashboard = () => {
@@ -215,7 +215,7 @@ export default defineComponent({
       if (props.isMhr) {
         draft = await mhrDraftHandler()
       } else {
-        const stateModel: StateModelIF = getStateModel
+        const stateModel: StateModelIF = getStateModel.value
         draft = await throttleSubmitStatementDraft(stateModel)
         prevDraftId = stateModel.registration?.draft?.financingStatement?.documentId || ''
       }
@@ -288,7 +288,7 @@ export default defineComponent({
     }
 
     const checkValid = (): boolean => {
-      const stateModel: StateModelIF = getStateModel
+      const stateModel: StateModelIF = getStateModel.value
       return stateModel.registration.lengthTrust.valid &&
         stateModel.registration.parties.valid &&
         stateModel.registration.collateral.valid &&
@@ -304,7 +304,7 @@ export default defineComponent({
 
     /** Check all steps are valid, make api call to create a financing statement, handle api errors. */
     const submitFinancingStatement = async () => {
-      const stateModel: StateModelIF = getStateModel
+      const stateModel: StateModelIF = getStateModel.value
       if (checkValid()) {
         // API call here
         const apiResponse: FinancingStatementIF = await throttleSubmitStatement(stateModel)
