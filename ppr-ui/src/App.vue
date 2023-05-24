@@ -95,7 +95,6 @@ import {
   ErrorCodes, ProductStatus, RegistrationFlowType, RouteNames, ProductCode
 } from '@/enums'
 import {
-  AccountModelIF,
   AccountProductSubscriptionIF, DialogOptionsIF, // eslint-disable-line
   ErrorIF, RegistrationTypeIF, UserInfoIF, UserSettingsIF // eslint-disable-line
 } from '@/interfaces'
@@ -133,7 +132,7 @@ export default defineComponent({
       isRoleStaffReg,
       hasPprEnabled,
       hasMhrEnabled,
-      getAccountModel,
+      getAccountId,
       getUserEmail,
       getUserFirstName,
       getUserLastName,
@@ -144,7 +143,7 @@ export default defineComponent({
       getRegistrationOther,
       getRegistrationFlowType,
       getUserProductSubscriptionsCodes
-    } = storeToRefs<any>(store)
+    } = storeToRefs(store)
 
     const localState = reactive({
       currentPath: '',
@@ -417,10 +416,9 @@ export default defineComponent({
         }
         setUserInfo(userInfo)
 
-        const accountId = (getAccountModel as unknown as AccountModelIF)?.currentAccount?.id
-
-        if (accountId) {
-          const subscribedProducts = await fetchAccountProducts(accountId)
+        console.log(getAccountId.value)
+        if (getAccountId.value) {
+          const subscribedProducts = await fetchAccountProducts((getAccountId.value as unknown as number))
           if (subscribedProducts) {
             setUserProductSubscriptions(subscribedProducts)
 
@@ -455,12 +453,11 @@ export default defineComponent({
 
     /** Gets user products and sets browser title accordingly. */
     const setBrowserTitle = (): void => {
-      const userProducts = getUserProductSubscriptionsCodes as unknown as ProductCode[]
-      console.log(userProducts)
-      console.log(Array.from(userProducts))
-      if (Array.from(userProducts).includes(ProductCode.PPR) && Array.from(userProducts).includes(ProductCode.MHR)) {
+      const userProducts = Array.from(getUserProductSubscriptionsCodes.value) as unknown as ProductCode[]
+      if (userProducts.includes(ProductCode.PPR) &&
+        userProducts.includes(ProductCode.MHR)) {
         document.title = 'BC Asset Registries (MHR/PPR)'
-      } else if (Array.from(userProducts).includes(ProductCode.MHR)) {
+      } else if (userProducts.includes(ProductCode.MHR)) {
         document.title = 'BC Manufactured Home Registry'
       }
     }

@@ -12,7 +12,6 @@ import { getPiniaStore, getVuexStore } from '@/store'
 import Affix from 'vue-affix'
 import * as Sentry from '@sentry/vue'
 import { TiptapVuetifyPlugin } from 'tiptap-vuetify'
-import { createPinia, PiniaVuePlugin } from 'pinia'
 
 // Styles
 // NB: order matters - do not change
@@ -39,8 +38,7 @@ Vue.config.productionTip = false
 Vue.use(Vuetify)
 Vue.use(Affix)
 Vue.use(Vuelidate)
-Vue.use(PiniaVuePlugin)
-const pinia = createPinia()
+
 const vuetify = new Vuetify()
 // use this package's plugin
 Vue.use(TiptapVuetifyPlugin, {
@@ -110,7 +108,7 @@ async function start () {
     }),
     router: getVueRouter(),
     store: getVuexStore(),
-    pinia,
+    pinia: getPiniaStore(),
     render: h => h(App)
   }).$mount('#app')
 }

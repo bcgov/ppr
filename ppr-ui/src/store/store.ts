@@ -55,7 +55,7 @@ import { MHRButtonFooterConfig, RegistrationButtonFooterConfig } from '@/resourc
 
 export const useStore = defineStore('assetsStore', () => {
   // State Model
-  const state = ref(stateModel)
+  const state = ref({ ...stateModel })
 
   /** PPR Getters **/
 
