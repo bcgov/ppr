@@ -9,7 +9,8 @@
       <v-col cols="12" sm="10">
         <v-checkbox
           id="ownership"
-          :label="landOwnershipLabel"
+          label="The manufactured home is located on land that the homeowners own,
+                or on which they have a registered lease of 3 years or more."
           v-model="isOwnLand"
           class="my-0 py-0 px-0 ownership-checkbox"
           data-test-id="ownership-checkbox"
@@ -39,9 +40,7 @@ export default defineComponent({
     ])
 
     const localState = reactive({
-      isOwnLand: Boolean(getMhrRegistrationOwnLand.value || false),
-      landOwnershipLabel: `The manufactured home is located on land that the homeowners own,
-                or on which they have a registered lease of 3 years or more.`
+      isOwnLand: Boolean(getMhrRegistrationOwnLand.value || false)
     })
 
     watch(() => localState.isOwnLand, (val: boolean) => {
