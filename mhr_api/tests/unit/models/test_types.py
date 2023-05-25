@@ -70,7 +70,7 @@ def test_mhr_party_type(session):
     """Assert that MhrPartyType.find_all() contains all expected elements."""
     results = type_tables.MhrPartyType.find_all()
     assert results
-    assert len(results) == 7
+    assert len(results) == 9
     for result in results:
         assert result.party_type in type_tables.MhrPartyTypes
         assert result.party_type_desc

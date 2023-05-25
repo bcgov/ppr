@@ -248,6 +248,8 @@ class MhrPartyTypes(BaseEnum):
     ADMINISTRATOR = 'ADMINISTRATOR'
     TRUSTEE = 'TRUSTEE'
     TRUST = 'TRUST'
+    MANUFACTURER = 'MANUFACTURER'
+    CONTACT = 'CONTACT'
 
 
 class MhrRegistrationStatusTypes(BaseEnum):
@@ -273,6 +275,7 @@ class MhrRegistrationTypes(BaseEnum):
     EXEMPTION_NON_RES = 'EXEMPTION_NON_RES'
     PERMIT = 'PERMIT'
     PERMIT_EXTENSION = 'PERMIT_EXTENSION'
+    MANUFACTURER = 'MANUFACTURER'
 
 
 class MhrStatusTypes(BaseEnum):
