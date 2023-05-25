@@ -91,9 +91,7 @@
 </template>
 
 <script lang="ts">
-// external libraries
 import { defineComponent, reactive, toRefs, watch, computed } from 'vue-demi'
-// local helpers / types / etc.
 import { useCountriesProvinces } from '@/composables/address/factories'
 import { useSecuredParty } from '@/components/parties/composables/useSecuredParty'
 import { ActionTypes } from '@/enums'

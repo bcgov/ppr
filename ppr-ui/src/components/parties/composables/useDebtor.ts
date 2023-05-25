@@ -8,6 +8,7 @@ import { ActionTypes, RegistrationFlowType } from '@/enums'
 import { checkAddress, formatAddress } from '@/composables/address/factories/address-factory'
 import { cloneDeep, isEqual } from 'lodash'
 import { localTodayDate } from '@/utils/date-helper'
+import { storeToRefs } from 'pinia'
 
 const initPerson = { first: '', middle: '', last: '' }
 const initAddress = {
@@ -22,7 +23,8 @@ const initAddress = {
 const { getDay, getMonth, getMonthFull, getYear } = useParty()
 
 export const useDebtor = (props, context) => {
-  const { setAddSecuredPartiesAndDebtors, getAddSecuredPartiesAndDebtors, getRegistrationFlowType } = useStore()
+  const { setAddSecuredPartiesAndDebtors } = useStore()
+  const { getAddSecuredPartiesAndDebtors, getRegistrationFlowType } = storeToRefs(useStore())
   const localState = reactive({
     addressSchema: { ...PartyAddressSchema },
     currentDebtor: {
@@ -44,7 +46,7 @@ export const useDebtor = (props, context) => {
   })
 
   const getDebtor = () => {
-    const debtors: PartyIF[] = getAddSecuredPartiesAndDebtors.debtors
+    const debtors: PartyIF[] = getAddSecuredPartiesAndDebtors.value.debtors
     if (props.activeIndex >= 0) {
       // deep copy so original object doesn't get modified
       localState.currentDebtor = JSON.parse(JSON.stringify(debtors[props.activeIndex]))
@@ -124,7 +126,7 @@ export const useDebtor = (props, context) => {
       resetFormAndData(true)
       return
     }
-    let parties = getAddSecuredPartiesAndDebtors // eslint-disable-line
+    let parties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
     let newList: PartyIF[] = parties.debtors // eslint-disable-line
     // New debtor
     if (props.activeIndex === -1) {

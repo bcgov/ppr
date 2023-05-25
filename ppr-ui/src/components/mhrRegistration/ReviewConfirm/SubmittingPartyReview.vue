@@ -113,6 +113,7 @@ import { toDisplayPhone } from '@/utils'
 import { useMhrValidations } from '@/composables'
 import { AttnRefConfigIF } from '@/interfaces'
 import { clientConfig, staffConfig } from '@/resources/attnRefConfigs'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'SubmittingPartyReview',
@@ -127,27 +128,27 @@ export default defineComponent({
       getMhrRegistrationDocumentId,
       getMhrAttentionReferenceNum,
       getMhrRegistrationValidationModel
-    } = useStore()
+    } = storeToRefs(useStore())
 
     const {
       MhrSectVal,
       getStepValidation
-    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel))
+    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
     const localState = reactive({
-      address: computed(() => getMhrRegistrationSubmittingParty.address),
-      businessName: computed(() => getMhrRegistrationSubmittingParty.businessName),
-      personName: computed(() => getMhrRegistrationSubmittingParty.personName),
+      address: computed(() => getMhrRegistrationSubmittingParty.value.address),
+      businessName: computed(() => getMhrRegistrationSubmittingParty.value.businessName),
+      personName: computed(() => getMhrRegistrationSubmittingParty.value.personName),
       hasAddress: computed(() => !Object.values(localState.address).every(val => !val)),
       attnOrRefConfig: computed((): AttnRefConfigIF => {
-        return isRoleStaffReg ? staffConfig : clientConfig
+        return isRoleStaffReg.value ? staffConfig : clientConfig
       })
     })
 
     const addressSchema = PartyAddressSchema
 
     const parsePhoneNumber = () => {
-      const phone = getMhrRegistrationSubmittingParty
+      const phone = getMhrRegistrationSubmittingParty.value
       const phoneNum = phone.phoneNumber
       const ext = phone.phoneExtension ? ' &nbsp;Ext ' + phone.phoneExtension : ''
       return phoneNum ? `${toDisplayPhone(phoneNum)}${ext}` : '(Not Entered)'

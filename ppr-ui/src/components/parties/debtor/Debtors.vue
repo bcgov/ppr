@@ -264,6 +264,7 @@ import { debtorTableHeaders, editTableHeaders } from '@/resources'
 import { PartyAddressSchema } from '@/schemas'
 import { ActionTypes, RegistrationFlowType } from '@/enums'
 import { cloneDeep } from 'lodash'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   components: {
@@ -285,17 +286,16 @@ export default defineComponent({
     }
   },
   setup (props, { emit }) {
+    const { setAddSecuredPartiesAndDebtors } = useStore()
     const {
       // Getters
       getAddSecuredPartiesAndDebtors,
       getRegistrationFlowType,
       getRegistrationType,
-      getOriginalAddSecuredPartiesAndDebtors,
-      // Actions
-      setAddSecuredPartiesAndDebtors
-    } = useStore()
+      getOriginalAddSecuredPartiesAndDebtors
+    } = storeToRefs(useStore())
 
-    const registrationFlowType = getRegistrationFlowType
+    const registrationFlowType = getRegistrationFlowType.value
     const addressSchema = PartyAddressSchema
     const {
       getName,
@@ -312,13 +312,13 @@ export default defineComponent({
       invalidSection: false,
       activeIndex: -1,
       showEditDebtor: [false],
-      debtors: getAddSecuredPartiesAndDebtors.debtors,
+      debtors: getAddSecuredPartiesAndDebtors.value.debtors,
       showErrorSummary: computed((): boolean => {
-        return !getAddSecuredPartiesAndDebtors.valid
+        return !getAddSecuredPartiesAndDebtors.value.valid
       }),
-      showErrorDebtors: getAddSecuredPartiesAndDebtors.showInvalid,
+      showErrorDebtors: getAddSecuredPartiesAndDebtors.value.showInvalid,
       parties: computed((): AddPartiesIF => {
-        return getAddSecuredPartiesAndDebtors
+        return getAddSecuredPartiesAndDebtors.value
       }),
       showErrorBar: computed((): boolean => {
         return props.setShowErrorBar
@@ -327,7 +327,7 @@ export default defineComponent({
     })
 
     const removeDebtor = (index: number): void => {
-      let currentParties = getAddSecuredPartiesAndDebtors // eslint-disable-line
+      let currentParties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
       const currentDebtor = currentParties.debtors[index]
       if ((registrationFlowType === RegistrationFlowType.AMENDMENT) && (currentDebtor.action !== ActionTypes.ADDED)) {
         currentDebtor.action = ActionTypes.REMOVED
@@ -336,7 +336,7 @@ export default defineComponent({
       } else {
         localState.debtors.splice(index, 1)
         currentParties.debtors = localState.debtors
-        currentParties.valid = isPartiesValid(currentParties, getRegistrationType.registrationTypeAPI)
+        currentParties.valid = isPartiesValid(currentParties, getRegistrationType.value.registrationTypeAPI)
         setAddSecuredPartiesAndDebtors(currentParties)
       }
       const isValid = getDebtorValidity()
@@ -362,8 +362,8 @@ export default defineComponent({
       localState.addEditInProgress = false
       localState.showAddDebtor = false
       localState.showEditDebtor = [false]
-      let currentParties = getAddSecuredPartiesAndDebtors // eslint-disable-line
-      currentParties.valid = isPartiesValid(currentParties, getRegistrationType.registrationTypeAPI)
+      let currentParties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
+      currentParties.valid = isPartiesValid(currentParties, getRegistrationType.value.registrationTypeAPI)
       setAddSecuredPartiesAndDebtors(currentParties)
       const isValid = getDebtorValidity()
       emitDebtorValidity(isValid)
@@ -371,7 +371,7 @@ export default defineComponent({
     }
 
     const undo = (index: number): void => {
-      const originalParties = getOriginalAddSecuredPartiesAndDebtors
+      const originalParties = getOriginalAddSecuredPartiesAndDebtors.value
       localState.debtors.splice(index, 1, cloneDeep(originalParties.debtors[index]))
       const isValid = getDebtorValidity()
       emitDebtorValidity(isValid)

@@ -27,6 +27,7 @@
 import { defineComponent, reactive, toRefs, watch } from 'vue-demi'
 import { useStore } from '@/store/store'
 import { useInputRules, useMhrValidations } from '@/composables/'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'RebuiltStatus',
@@ -38,7 +39,8 @@ export default defineComponent({
     }
   },
   setup (props, context) {
-    const { getMhrRegistrationHomeDescription, getMhrRegistrationValidationModel, setMhrHomeDescription } = useStore()
+    const { setMhrHomeDescription } = useStore()
+    const { getMhrRegistrationHomeDescription, getMhrRegistrationValidationModel } = storeToRefs(useStore())
     const { maxLength } = useInputRules()
     const {
       MhrCompVal,

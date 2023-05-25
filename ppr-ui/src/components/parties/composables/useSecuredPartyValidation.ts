@@ -3,9 +3,7 @@ import { createDefaultValidationResult } from '@lemoncode/fonk'
 import { formValidation } from './securedPartyFormValidator'
 import { useValidation } from '@/utils/validators/use-validation'
 import { SecuredPartyTypes } from '@/enums'
-const {
-  validateName
-} = useValidation()
+const { validateName } = useValidation()
 
 const createEmptyErrors = () => ({
   businessName: createDefaultValidationResult(),

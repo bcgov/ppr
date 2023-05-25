@@ -194,6 +194,7 @@ import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'v
 import { MhrLocationInfoIF } from '@/interfaces'
 import { useInputRules } from '@/composables/useInputRules'
 import { useStore } from '@/store/store'
+import { storeToRefs } from 'pinia'
 /* eslint-disable no-unused-vars */
 
 export default defineComponent({
@@ -205,7 +206,7 @@ export default defineComponent({
     isStrata: { type: Boolean, default: false }
   },
   setup (props, context) {
-    const { getMhrRegistrationLocation } = useStore()
+    const { getMhrRegistrationLocation } = storeToRefs(useStore())
     const {
       customRules,
       maxLength,
@@ -230,7 +231,7 @@ export default defineComponent({
         block: '',
         exceptionPlan: ''
       } as MhrLocationInfoIF,
-      additionalDescription: getMhrRegistrationLocation?.additionalDescription || '',
+      additionalDescription: getMhrRegistrationLocation.value?.additionalDescription || '',
       reserveLengthErrMsg: 'Band Name, Reserve Number and Details combined cannot exceed 80 characters',
       isReserveLengthErr: computed((): boolean => {
         return (
@@ -248,7 +249,7 @@ export default defineComponent({
     onMounted(() => {
       if (props.validate) validateLocationInfo()
       // Map specific local properties to draft data if it exists
-      for (const key in localState.locationInfo) localState.locationInfo[key] = getMhrRegistrationLocation[key]
+      for (const key in localState.locationInfo) localState.locationInfo[key] = getMhrRegistrationLocation.value[key]
     })
 
     const locationInputRules = (length: number = null, requiredMsg: string, fieldId: string = null) => {

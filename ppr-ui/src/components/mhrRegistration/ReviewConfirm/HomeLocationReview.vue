@@ -257,6 +257,7 @@ import { computed, defineComponent, reactive, toRefs } from 'vue-demi'
 import { HomeLocationTypes, RouteNames } from '@/enums'
 import { useStore } from '@/store/store'
 import { useMhrValidations } from '@/composables'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'HomeLocationReview',
@@ -273,37 +274,37 @@ export default defineComponent({
       getMhrRegistrationValidationModel,
       getIsManualLocation,
       getMhrRegistrationOwnLand
-    } = useStore()
+    } = storeToRefs(useStore())
 
     const {
       MhrSectVal,
       getStepValidation
-    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel))
+    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
     const localState = reactive({
       includesPid: computed((): boolean => {
         return [HomeLocationTypes.OTHER_STRATA, HomeLocationTypes.OTHER_TYPE]
-          .includes(getMhrRegistrationLocation.otherType)
+          .includes(getMhrRegistrationLocation.value.otherType)
       }),
       hasAddress: computed((): boolean => {
-        return getMhrRegistrationLocation.address?.street ||
-        getMhrRegistrationLocation.address?.streetAdditional ||
-        getMhrRegistrationLocation.address?.city
+        return getMhrRegistrationLocation.value.address?.street ||
+        getMhrRegistrationLocation.value.address?.streetAdditional ||
+        getMhrRegistrationLocation.value.address?.city
       }),
       displayPid: computed((): string => {
-        return getMhrRegistrationLocation.pidNumber.replace(/(\d{3})(\d{3})(\d{3})/, '$1-$2-$3')
+        return getMhrRegistrationLocation.value.pidNumber.replace(/(\d{3})(\d{3})(\d{3})/, '$1-$2-$3')
       }),
       displayStrata: computed((): boolean => {
-        return getMhrRegistrationLocation.otherType === HomeLocationTypes.OTHER_STRATA
+        return getMhrRegistrationLocation.value.otherType === HomeLocationTypes.OTHER_STRATA
       }),
       locationType: computed((): string => {
-        switch (getMhrRegistrationLocation.locationType) {
+        switch (getMhrRegistrationLocation.value.locationType) {
           case HomeLocationTypes.LOT:
             return 'Dealer\'s / Manufacturer\'s lot'
           case HomeLocationTypes.HOME_PARK:
             return 'Manufactured home park (other than a strata park)'
           case HomeLocationTypes.OTHER_LAND:
-            switch (getMhrRegistrationLocation.otherType) {
+            switch (getMhrRegistrationLocation.value.otherType) {
               case HomeLocationTypes.OTHER_RESERVE:
                 return 'Indian Reserve'
               case HomeLocationTypes.OTHER_STRATA:
@@ -318,7 +319,7 @@ export default defineComponent({
         }
       }),
       hasManualEntries: computed((): boolean => {
-        const location = getMhrRegistrationLocation
+        const location = getMhrRegistrationLocation.value
         return !!location.lot || !!location.parcel || !!location.block || !!location.districtLot || !!location.partOf ||
           !!location.section || !!location.township || !!location.range || !!location.meridian ||
           !!location.landDistrict || !!location.plan || !!location.exceptionPlan

@@ -86,13 +86,12 @@ import {
   toRefs
 } from 'vue-demi'
 import { useStore } from '@/store/store'
-
-// local
 import { BaseAddress } from '@/composables/address'
 import { DefaultSchema } from '@/composables/address/resources'
 import { useParty } from '@/composables/useParty'
 import { BaseHeaderIF, PartyIF, PartySummaryOptionsI } from '@/interfaces' // eslint-disable-line no-unused-vars
-import { RegistrationFlowType, ActionTypes, APIRegistrationTypes } from '@/enums' // eslint-disable-line no-unused-vars
+import { RegistrationFlowType, ActionTypes, APIRegistrationTypes } from '@/enums'
+import { storeToRefs } from 'pinia' // eslint-disable-line no-unused-vars
 
 export default defineComponent({
   name: 'BasePartySummary',
@@ -121,9 +120,9 @@ export default defineComponent({
   },
   emits: ['triggerNoDataAction'],
   setup (props, { emit }) {
-    const { getRegistrationFlowType, getRegistrationType } = useStore()
-    const registrationFlowType = getRegistrationFlowType
-    const registrationType = getRegistrationType.registrationTypeAPI
+    const { getRegistrationFlowType, getRegistrationType } = storeToRefs(useStore())
+    const registrationFlowType = getRegistrationFlowType.value
+    const registrationType = getRegistrationType.value.registrationTypeAPI
     const localState = reactive({
       headers: props.setHeaders,
       items: computed((): PartyIF[] => {

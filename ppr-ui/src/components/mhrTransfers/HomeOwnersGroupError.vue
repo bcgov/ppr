@@ -66,6 +66,7 @@ import { computed, defineComponent, reactive, toRefs } from 'vue-demi'
 import { transfersErrors, MixedRolesErrors } from '@/resources'
 import { useStore } from '@/store/store'
 import { useTransferOwners } from '@/composables/mhrInformation'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'HomeOwnersGroupError',
@@ -86,10 +87,10 @@ export default defineComponent({
       isTransferToAdminNoWill,
       getMhrTransferType
     } = useTransferOwners()
-    const { getMhrTransferHomeOwnerGroups } = useStore()
+    const { getMhrTransferHomeOwnerGroups } = storeToRefs(useStore())
 
     const localState = reactive({
-      hasOneHomeOwnerGroup: computed(() => getMhrTransferHomeOwnerGroups.length === 1)
+      hasOneHomeOwnerGroup: computed(() => getMhrTransferHomeOwnerGroups.value.length === 1)
     })
 
     return {

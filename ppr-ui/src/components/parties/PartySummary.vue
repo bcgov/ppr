@@ -88,6 +88,7 @@ import {
   debtorTableHeaders,
   registeringTableHeaders
 } from '@/resources'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   components: {
@@ -97,8 +98,9 @@ export default defineComponent({
   },
   setup () {
     const router = useRouter()
-    const { getAddSecuredPartiesAndDebtors, setAddSecuredPartiesAndDebtors } = useStore()
-    const parties: AddPartiesIF = getAddSecuredPartiesAndDebtors
+    const { setAddSecuredPartiesAndDebtors } = useStore()
+    const { getAddSecuredPartiesAndDebtors } = storeToRefs(useStore())
+    const parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
     const addressSchema = PartyAddressSchema
 
     const { getName, getFormattedBirthdate, isBusiness } = useParty()

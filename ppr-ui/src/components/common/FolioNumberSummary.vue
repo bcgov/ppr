@@ -45,10 +45,10 @@ import {
   toRefs,
   watch,
   ref,
-  onMounted,
   computed
 } from 'vue-demi'
 import { useStore } from '@/store/store'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   props: {
@@ -60,12 +60,13 @@ export default defineComponent({
     }
   },
   setup (props, context) {
-    const { getFolioOrReferenceNumber, setFolioOrReferenceNumber } = useStore()
+    const { setFolioOrReferenceNumber } = useStore()
+    const { getFolioOrReferenceNumber } = storeToRefs(useStore())
     const form = ref(null)
 
     const localState = reactive({
       isValid: true,
-      folioNumber: '',
+      folioNumber: getFolioOrReferenceNumber.value || '',
       showErrors: props.setShowErrors,
       rules: [
         (v: string) => !v || v.length <= 50 || 'Maximum 50 characters reached' // maximum character count
@@ -92,10 +93,6 @@ export default defineComponent({
       context.emit('folioValid', localState.isValid)
       setFolioOrReferenceNumber(val)
     }
-
-    onMounted(() => {
-      localState.folioNumber = getFolioOrReferenceNumber
-    })
 
     return {
       form,

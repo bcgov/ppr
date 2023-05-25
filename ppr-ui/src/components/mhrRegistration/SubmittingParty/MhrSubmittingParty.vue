@@ -167,6 +167,7 @@ import { cloneDeep } from 'lodash'
 import { VueMaskDirective } from 'v-mask'
 import { fromDisplayPhone, toDisplayPhone } from '@/utils'
 import { ContentIF, SubmittingPartyIF } from '@/interfaces'
+import { storeToRefs } from 'pinia'
 
 /* eslint-enable no-unused-vars */
 
@@ -195,15 +196,16 @@ export default defineComponent({
   },
   setup (props, context) {
     const {
-      // Getters
-      getMhrRegistrationSubmittingParty,
-      getMhrTransferSubmittingParty,
-      getMhrRegistrationValidationModel,
       // Actions
       setMhrRegistrationSubmittingParty,
       setMhrTransferSubmittingParty
     } = useStore()
-
+    const {
+      // Getters
+      getMhrRegistrationSubmittingParty,
+      getMhrTransferSubmittingParty,
+      getMhrRegistrationValidationModel
+    } = storeToRefs(useStore())
     // InputField Rules
     const {
       customRules,
@@ -220,14 +222,14 @@ export default defineComponent({
       MhrCompVal,
       MhrSectVal,
       setValidation
-    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel))
+    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
     const localState = reactive({
       enableLookUp: true,
       submittingPartyType: null as SubmittingPartyTypes,
       submittingPartyValid: false,
       addressValid: false,
-      submittingParty: getMhrRegistrationSubmittingParty || {
+      submittingParty: getMhrRegistrationSubmittingParty.value || {
         personName: {
           first: '',
           last: '',
@@ -302,12 +304,12 @@ export default defineComponent({
 
     /** Apply store properties to local model. **/
     watch(
-      [getMhrRegistrationSubmittingParty, getMhrTransferSubmittingParty],
+      [getMhrRegistrationSubmittingParty.value, getMhrTransferSubmittingParty.value],
       () => {
         if (localState.enableLookUp) {
           const submittingParty = (props.isMhrTransfer
-            ? getMhrTransferSubmittingParty
-            : getMhrRegistrationSubmittingParty) as SubmittingPartyIF
+            ? getMhrTransferSubmittingParty.value
+            : getMhrRegistrationSubmittingParty.value) as SubmittingPartyIF
           // Copy submitting party to local model if data is retrieved through the look-up
           localState.submittingParty = cloneDeep({
             ...localState.submittingParty,

@@ -28,7 +28,6 @@
 </template>
 
 <script lang="ts">
-// external
 import {
   computed,
   defineComponent,
@@ -36,15 +35,12 @@ import {
   toRefs
 } from 'vue-demi'
 import { useStore } from '@/store/store'
-
-// Components
 import { StaffPayment as StaffPaymentComponent } from '@bcrs-shared-components/staff-payment'
 import BaseDialog from '@/components/dialogs/BaseDialog.vue'
-
-// Interfaces and Enums
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces' // eslint-disable-line no-unused-vars
 import { StaffPaymentOptions } from '@bcrs-shared-components/enums'
-import { DialogOptionsIF } from '@/interfaces' // eslint-disable-line
+import { DialogOptionsIF } from '@/interfaces'
+import { storeToRefs } from 'pinia' // eslint-disable-line
 
 export default defineComponent({
   name: 'StaffPaymentDialog',
@@ -75,7 +71,8 @@ export default defineComponent({
   },
   emits: ['proceed'],
   setup (props, { emit }) {
-    const { setStaffPayment, setSearchCertified, getStaffPayment } = useStore()
+    const { setStaffPayment, setSearchCertified } = useStore()
+    const { getStaffPayment } = storeToRefs(useStore())
     const localState = reactive({
       certify: false,
       valid: false,
@@ -91,7 +88,7 @@ export default defineComponent({
         return props.setShowCertifiedCheckbox
       }),
       staffPaymentData: computed(() => {
-        let pd = getStaffPayment
+        let pd = getStaffPayment.value
         if (!pd) {
           pd = {
             option: StaffPaymentOptions.NONE,

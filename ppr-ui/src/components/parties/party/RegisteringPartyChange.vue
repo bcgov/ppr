@@ -45,7 +45,6 @@
 </template>
 
 <script lang="ts">
-// external libraries
 import {
   defineComponent,
   reactive,
@@ -55,10 +54,9 @@ import {
   computed
 } from 'vue-demi'
 import { useStore } from '@/store/store'
-// local components
 import { EditParty, PartySearch, RegisteringParty } from '@/components/parties/party'
-// local helpers / types / etc.
-import { PartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { PartyIF } from '@/interfaces'
+import { storeToRefs } from 'pinia' // eslint-disable-line no-unused-vars
 
 export default defineComponent({
   components: {
@@ -77,14 +75,14 @@ export default defineComponent({
     }
   },
   setup (props, context) {
-    const { getAddSecuredPartiesAndDebtors, isRoleStaffSbc } = useStore()
+    const { getAddSecuredPartiesAndDebtors, isRoleStaffSbc } = storeToRefs(useStore())
     const localState = reactive({
       openChangeScreen: false,
-      isSbc: isRoleStaffSbc,
+      isSbc: isRoleStaffSbc.value,
       showAddRegisteringParty: false,
       addEditInProgress: false,
       registeringParty: computed((): PartyIF => {
-        return getAddSecuredPartiesAndDebtors.registeringParty
+        return getAddSecuredPartiesAndDebtors.value.registeringParty
       }),
       summaryView: computed((): boolean => {
         return props.isSummary
@@ -95,7 +93,7 @@ export default defineComponent({
     })
 
     onMounted(() => {
-      if ((isRoleStaffSbc) && ((!localState.registeringParty) || (!localState.registeringParty?.action))) {
+      if ((isRoleStaffSbc.value) && ((!localState.registeringParty) || (!localState.registeringParty?.action))) {
         localState.openChangeScreen = true
         context.emit('registeringPartyOpen', true)
       }
@@ -115,7 +113,7 @@ export default defineComponent({
     const resetData = () => {
       localState.addEditInProgress = false
       localState.showAddRegisteringParty = false
-      localState.openChangeScreen = isRoleStaffSbc && ((!localState.registeringParty) ||
+      localState.openChangeScreen = isRoleStaffSbc.value && ((!localState.registeringParty) ||
         (!localState.registeringParty.action))
       context.emit('registeringPartyOpen', false)
     }

@@ -19,13 +19,12 @@ import {
 } from 'vue-demi'
 import { useStore } from '@/store/store'
 import { useRouter } from 'vue2-helpers/vue-router'
-
 import { BasePartySummary } from '@/components/parties/summaries'
 import { AddPartiesIF, PartyIF, PartySummaryOptionsI } from '@/interfaces' // eslint-disable-line no-unused-vars
-
 import { registeringTableHeaders } from '@/resources'
 import { RegistrationFlowType } from '@/enums'
 import { useRegisteringParty } from '@/composables/useRegisteringParty'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'RegisteringPartySummary',
@@ -42,14 +41,13 @@ export default defineComponent({
   },
   setup (props) {
     const router = useRouter()
+    const { setAddSecuredPartiesAndDebtors } = useStore()
     const {
       // Getters
       getAddSecuredPartiesAndDebtors,
       getOriginalAddSecuredPartiesAndDebtors,
-      getRegistrationFlowType,
-      // Actions
-      setAddSecuredPartiesAndDebtors
-    } = useStore()
+      getRegistrationFlowType
+    } = storeToRefs(useStore())
     const { getRegisteringParty } = useRegisteringParty()
     const parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
 

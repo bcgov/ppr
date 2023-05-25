@@ -27,6 +27,7 @@
 import { defineComponent, reactive, toRefs, watch } from 'vue-demi'
 import { useStore } from '@/store/store'
 import { useInputRules, useMhrValidations } from '@/composables/'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   props: {
@@ -36,24 +37,18 @@ export default defineComponent({
     }
   },
   setup (props, context) {
-    const {
-      // Getters
-      getMhrRegistrationOtherInfo,
-      getMhrRegistrationValidationModel,
-      // Actions
-      setMhrHomeDescription
-    } = useStore()
-
+    const { setMhrHomeDescription } = useStore()
+    const { getMhrRegistrationOtherInfo, getMhrRegistrationValidationModel } = storeToRefs(useStore())
     const { maxLength } = useInputRules()
     const {
       MhrCompVal,
       MhrSectVal,
       setValidation
-    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel))
+    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
     const localState = reactive({
       isOtherInfoValid: false,
-      otherRemarks: getMhrRegistrationOtherInfo
+      otherRemarks: getMhrRegistrationOtherInfo.value
     })
 
     watch(() => localState.otherRemarks, (val: string) => {

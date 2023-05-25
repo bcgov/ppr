@@ -104,6 +104,7 @@ import { CautionBox } from '@/components/common'
 // local helpers / types / etc.
 import { PartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { isSecuredPartyRestrictedList } from '@/utils'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   components: {
@@ -120,16 +121,17 @@ export default defineComponent({
     }
   },
   setup (props) {
-    const { getAddSecuredPartiesAndDebtors, getRegistrationType, isRoleStaffSbc } = useStore()
-    const registrationType = getRegistrationType.registrationTypeAPI
+    const { isRoleStaffSbc } = useStore()
+    const { getAddSecuredPartiesAndDebtors, getRegistrationType } = storeToRefs(useStore())
+    const registrationType = getRegistrationType.value.registrationTypeAPI
     const localState = reactive({
-      securedParties: getAddSecuredPartiesAndDebtors.securedParties,
-      debtors: getAddSecuredPartiesAndDebtors.debtors,
+      securedParties: getAddSecuredPartiesAndDebtors.value.securedParties,
+      debtors: getAddSecuredPartiesAndDebtors.value.debtors,
       isSbc: isRoleStaffSbc,
       cautionTxt: 'The Registry will not provide the verification statement for this registration ' +
         'to the Registering Party named above.',
       registeringParty: computed((): PartyIF => {
-        return getAddSecuredPartiesAndDebtors.registeringParty
+        return getAddSecuredPartiesAndDebtors.value.registeringParty
       }),
       securedPartyText: computed((): string => {
         if (isSecuredPartyRestrictedList(registrationType)) {

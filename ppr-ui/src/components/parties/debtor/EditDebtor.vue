@@ -254,7 +254,6 @@
 </template>
 
 <script lang="ts">
-// external libraries
 import {
   defineComponent,
   onMounted,
@@ -263,10 +262,8 @@ import {
   reactive,
   toRefs
 } from 'vue-demi'
-// local components
 import { BusinessSearchAutocomplete } from '@/components/search'
 import { BaseAddress } from '@/composables/address'
-// local helpers / types / etc.
 import { useDebtor } from '@/components/parties/composables/useDebtor'
 import { useDebtorValidation } from '@/components/parties/composables/useDebtorValidation'
 import { formatAddress } from '@/composables/address/factories'

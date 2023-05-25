@@ -73,6 +73,7 @@ import {
   useCountriesProvinces
 } from '@/composables/address/factories'
 import { AddressIF } from '@/interfaces'
+import { storeToRefs } from 'pinia'
 /* eslint-enable no-unused-vars */
 export default defineComponent({
   name: 'HomeCivicAddress',
@@ -95,12 +96,13 @@ export default defineComponent({
     }
   },
   setup (props, context) {
-    const { getMhrRegistrationValidationModel, setCivicAddress } = useStore()
+    const { setCivicAddress } = useStore()
+    const { getMhrRegistrationValidationModel } = storeToRefs(useStore())
     const {
       MhrCompVal,
       MhrSectVal,
       setValidation
-    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel))
+    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
     const countryProvincesHelpers = useCountriesProvinces()
 

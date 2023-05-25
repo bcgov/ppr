@@ -139,6 +139,7 @@ import { useInputRules, useTransferOwners } from '@/composables'
 import { FormIF, TransferTypeSelectIF } from '@/interfaces'
 import { ApiTransferTypes } from '@/enums'
 import { cloneDeep } from 'lodash'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'TransferType',
@@ -160,7 +161,7 @@ export default defineComponent({
       hasUnsavedChanges,
       getMhrTransferType,
       getMhrTransferDeclaredValue
-    } = useStore()
+    } = storeToRefs(useStore())
 
     const {
       isJointTenancyStructure
@@ -168,15 +169,15 @@ export default defineComponent({
 
     const localState = reactive({
       isValid: false,
-      declaredValue: getMhrTransferDeclaredValue,
-      selectedTransferType: getMhrTransferType as TransferTypeSelectIF,
+      declaredValue: getMhrTransferDeclaredValue.value,
+      selectedTransferType: getMhrTransferType.value as TransferTypeSelectIF,
       showTransferChangeDialog: false,
       previousType: null as TransferTypeSelectIF,
       declaredValueRules: computed((): Array<Function> => {
         return customRules(
           maxLength(7, true),
           isNumber(),
-          getMhrTransferType?.transferType === ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL
+          getMhrTransferType.value?.transferType === ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL
             ? greaterThan(25000,
               transfersErrors.declaredHomeValueMax[ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL])
             : [],
@@ -185,10 +186,10 @@ export default defineComponent({
       showFormError: computed(() => props.validate && !localState.isValid),
       isDeclaredHitPersistent: computed(() =>
         [ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL,
-          ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL].includes(getMhrTransferType?.transferType)
+          ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL].includes(getMhrTransferType.value?.transferType)
       ),
       declaredHomeValueHint: computed(() =>
-        transfersContent.declaredHomeValueHint[getMhrTransferType?.transferType]
+        transfersContent.declaredHomeValueHint[getMhrTransferType.value?.transferType]
       ),
       transferTypeRules: required('Select transfer type')
     })
@@ -207,7 +208,7 @@ export default defineComponent({
 
     const handleTypeChange = async (item: TransferTypeSelectIF): Promise<void> => {
       if (item.transferType !== localState.previousType?.transferType &&
-        (hasUnsavedChanges || !!getMhrTransferDeclaredValue)) {
+        (hasUnsavedChanges.value || !!getMhrTransferDeclaredValue.value)) {
         localState.showTransferChangeDialog = true
       } else {
         localState.previousType = cloneDeep(item)
@@ -236,7 +237,7 @@ export default defineComponent({
       return context.emit('emitDeclaredValue', val)
     })
 
-    watch(() => getMhrTransferDeclaredValue, async (val: number) => {
+    watch(() => getMhrTransferDeclaredValue.value, async (val: number) => {
       localState.declaredValue = val
     })
 

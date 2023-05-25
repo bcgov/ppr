@@ -409,6 +409,7 @@ import { InfoChip } from '@/components/common'
 /* eslint-disable no-unused-vars */
 import { MhrRegistrationHomeOwnerIF } from '@/interfaces'
 import { ActionTypes, HomeOwnerPartyTypes, HomeTenancyTypes, SupportingDocumentsOptions } from '@/enums'
+import { storeToRefs } from 'pinia'
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
@@ -436,16 +437,13 @@ export default defineComponent({
   },
   setup (props, context) {
     const addressSchema = PartyAddressSchema
-    const {
-      // Getters
+    const { setUnsavedChanges } = useStore()
+    const { // Getters
       getMhrRegistrationValidationModel,
       getMhrInfoValidation,
       hasUnsavedChanges,
-      getMhrTransferHomeOwnerGroups,
-      // Actions
-      setUnsavedChanges
-    } = useStore()
-
+      getMhrTransferHomeOwnerGroups
+    } = storeToRefs(useStore())
     const {
       showGroups,
       removeOwner,
@@ -491,8 +489,9 @@ export default defineComponent({
       TransJointTenants,
       getMhrTransferType
     } = useTransferOwners(!props.isMhrTransfer)
-    const { getValidation, MhrSectVal, MhrCompVal } = useMhrValidations(toRefs(getMhrRegistrationValidationModel))
-    const { isValidDeceasedOwnerGroup } = useMhrInfoValidation(getMhrInfoValidation)
+
+    const { getValidation, MhrSectVal, MhrCompVal } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
+    const { isValidDeceasedOwnerGroup } = useMhrInfoValidation(getMhrInfoValidation.value)
 
     const localState = reactive({
       currentlyEditingHomeOwnerId: -1,

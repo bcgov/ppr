@@ -138,6 +138,7 @@ import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
 import { useStore } from '@/store/store'
 import { ApiTransferTypes } from '@/enums'
 import { useTransferOwners } from '@/composables'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'ConfirmCompletion',
@@ -161,7 +162,7 @@ export default defineComponent({
     const {
       getMhrTransferType,
       isRoleStaff
-    } = useStore()
+    } = storeToRefs(useStore())
 
     const {
       isTransferDueToDeath,
@@ -174,7 +175,7 @@ export default defineComponent({
         return (props.setShowErrors && !localState.confirmCompletion)
       }),
       confirmCompletion: false,
-      transferType: getMhrTransferType?.transferType
+      transferType: getMhrTransferType.value?.transferType
     })
 
     watch(

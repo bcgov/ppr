@@ -46,6 +46,7 @@
 import { defineComponent, reactive, toRefs } from 'vue-demi'
 import { useStore } from '@/store/store'
 import { useRoute, useRouter } from 'vue2-helpers/vue-router'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'Stepper',
@@ -59,7 +60,7 @@ export default defineComponent({
   setup (props) {
     const route = useRoute()
     const router = useRouter()
-    const { getSteps, showStepErrors } = useStore()
+    const { getSteps, showStepErrors } = storeToRefs(useStore())
 
     const goTo = (step) => {
       router.push(step.to).catch(error => error)
@@ -70,7 +71,7 @@ export default defineComponent({
     }
 
     const showInvalid = (step): boolean => {
-      return ((showStepErrors || props.showStepErrorsFlag) && (!step.valid))
+      return ((showStepErrors.value || props.showStepErrorsFlag) && (!step.valid))
     }
 
     const localState = reactive({})

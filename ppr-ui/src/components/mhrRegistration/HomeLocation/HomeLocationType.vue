@@ -203,6 +203,7 @@ import HomeLocationDescription from './HomeLocationDescription.vue'
 import { useInputRules, useMhrValidations, useNewMhrRegistration } from '@/composables'
 import { MhrLocationInfoIF } from '@/interfaces'
 import { PidInfoIF } from '@/interfaces/ltsa-api-interfaces'
+import { storeToRefs } from 'pinia'
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
@@ -219,25 +220,27 @@ export default defineComponent({
   },
   setup (props, context) {
     const {
-      // Getters
-      getMhrRegistrationLocation,
-      getMhrRegistrationValidationModel,
       // Actions
       setMhrLocation,
       setIsManualLocation
     } = useStore()
-
+    const {
+      // Getters
+      getMhrRegistrationLocation,
+      getMhrRegistrationValidationModel
+    } = storeToRefs(useStore())
     const { resetLocationInfoFields } = useNewMhrRegistration()
     const { customRules, maxLength, required } = useInputRules()
     const {
       MhrCompVal,
       MhrSectVal,
       setValidation
-    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel))
+    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
     // Home location store properties
+    // Developer note: de-construction of store computed properties in this manner will result in the loss of reactivity
     const { additionalDescription, dealerName, legalDescription, locationType, pad, pidNumber, parkName, otherType } =
-      getMhrRegistrationLocation
+      getMhrRegistrationLocation.value
 
     const localState = reactive({
       isValidLot: false,

@@ -87,6 +87,7 @@ import { ltsaDetails } from '@/utils/ltsa-api-helper'
 import { BaseDialog } from '@/components/dialogs'
 import { pidNotFoundDialog } from '@/resources/dialogOptions'
 import { LtsaDetailsIF, PidInfoIF } from '@/interfaces/ltsa-api-interfaces'
+import { storeToRefs } from 'pinia'
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
@@ -100,13 +101,13 @@ export default defineComponent({
     required: { type: Boolean, default: false }
   },
   setup (props, context) {
-    const { getMhrRegistrationLocation } = useStore()
+    const { getMhrRegistrationLocation } = storeToRefs(useStore())
     const { isNumber } = useInputRules()
 
     const localState = reactive({
-      pidOne: getMhrRegistrationLocation?.pidNumber.slice(0, 3) || '',
-      pidTwo: getMhrRegistrationLocation?.pidNumber.slice(3, 6) || '',
-      pidThree: getMhrRegistrationLocation?.pidNumber.slice(6, 9) || '',
+      pidOne: getMhrRegistrationLocation.value?.pidNumber.slice(0, 3) || '',
+      pidTwo: getMhrRegistrationLocation.value?.pidNumber.slice(3, 6) || '',
+      pidThree: getMhrRegistrationLocation.value?.pidNumber.slice(6, 9) || '',
       enablePidLoader: false,
       dialogOptions: pidNotFoundDialog,
       showNotFoundDialog: false,

@@ -44,6 +44,7 @@ import { useStore } from '@/store/store'
 import { RouteNames } from '@/enums'
 import { HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
 import { useHomeOwners, useMhrValidations } from '@/composables/mhrRegistration'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'HomeOwnersReview',
@@ -55,9 +56,9 @@ export default defineComponent({
     }
   },
   setup (props) {
-    const { getMhrRegistrationValidationModel } = useStore()
+    const { getMhrRegistrationValidationModel } = storeToRefs(useStore())
 
-    const { MhrSectVal, getStepValidation } = useMhrValidations(toRefs(getMhrRegistrationValidationModel))
+    const { MhrSectVal, getStepValidation } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
     const {
       getHomeTenancyType,
       getTotalOwnershipAllocationStatus,

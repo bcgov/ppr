@@ -138,6 +138,7 @@ import {
 } from 'vue-demi'
 import { useStore } from '@/store/store'
 import { useInputRules, useMhrValidations } from '@/composables/'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   props: {
@@ -153,7 +154,7 @@ export default defineComponent({
     const yearRef = ref(null)
     const makeRef = ref(null)
     const modelRef = ref(null)
-
+    const { setMhrHomeDescription, setMhrHomeBaseInformation } = useStore()
     const {
       // Getters
       getMhrRegistrationValidationModel,
@@ -161,12 +162,8 @@ export default defineComponent({
       getMhrRegistrationYearOfManufacture,
       getMhrRegistrationIsYearApproximate,
       getMhrRegistrationHomeMake,
-      getMhrRegistrationHomeModel,
-      // Actions
-      setMhrHomeDescription,
-      setMhrHomeBaseInformation
-    } = useStore()
-
+      getMhrRegistrationHomeModel
+    } = storeToRefs(useStore())
     const {
       customRules,
       required,
@@ -182,7 +179,7 @@ export default defineComponent({
       MhrSectVal,
       hasError,
       setValidation
-    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel))
+    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
     const manufactureYearRules = computed((): Array<Function> =>
       customRules(
@@ -225,11 +222,11 @@ export default defineComponent({
 
     const localState = reactive({
       makeModelValid: false,
-      manufacturerName: getMhrRegistrationManufacturerName,
-      yearOfManufacture: getMhrRegistrationYearOfManufacture?.toString(),
-      circa: getMhrRegistrationIsYearApproximate,
-      make: getMhrRegistrationHomeMake,
-      model: getMhrRegistrationHomeModel
+      manufacturerName: getMhrRegistrationManufacturerName.value,
+      yearOfManufacture: getMhrRegistrationYearOfManufacture.value?.toString(),
+      circa: getMhrRegistrationIsYearApproximate.value,
+      make: getMhrRegistrationHomeMake.value,
+      model: getMhrRegistrationHomeModel.value
     })
 
     watch(() => localState.manufacturerName, (val: string) => {

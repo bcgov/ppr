@@ -54,6 +54,7 @@ import {
   FeeSummaryI,
   RegistrationLengthI
 } from '@/composables/fees/interfaces'
+import { storeToRefs } from 'pinia'
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
@@ -120,7 +121,7 @@ export default defineComponent({
   setup (props, { emit }) {
     const {
       getUserServiceFee, isNonBillable, getIsStaffClientPayment, isRoleStaffReg, isRoleStaffSbc, getStaffPayment
-    } = useStore()
+    } = storeToRefs(useStore())
 
     const localState = reactive({
       cancelBtn: props.setCancelBtn,
@@ -134,27 +135,27 @@ export default defineComponent({
       saveBtn: props.setSaveBtn,
       disableSubmitBtn: props.setDisableSubmitBtn,
       feeOverride: computed(() => {
-        if (isNonBillable || localState.isNoFeePayment) {
+        if (isNonBillable.value || localState.isNoFeePayment) {
           return {
             feeAmount: 0,
             processingFee: null, // not used in override
             quantity: null, // not used in override
-            serviceFee: getUserServiceFee as number
+            serviceFee: getUserServiceFee.value as number
           } as FeeSummaryI
         }
         return null
       }),
       isStaffReg: computed(() => {
-        return isRoleStaffReg as boolean
+        return isRoleStaffReg.value as boolean
       }),
       isStaffSBC: computed(() => {
-        return isRoleStaffSbc as boolean
+        return isRoleStaffSbc.value as boolean
       }),
       isStaffClientPayment: computed(() => {
         return getIsStaffClientPayment
       }),
       isNoFeePayment: computed(() => {
-        return getStaffPayment?.option === 0
+        return getStaffPayment.value?.option === 0
       })
     })
     const back = () => {

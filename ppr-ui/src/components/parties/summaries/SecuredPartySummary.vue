@@ -17,14 +17,13 @@ import {
   toRefs
 } from 'vue-demi'
 import { useStore } from '@/store/store'
-
 import { BasePartySummary } from '@/components/parties/summaries'
 import { AddPartiesIF, PartySummaryOptionsI } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { useRouter } from 'vue2-helpers/vue-router'
-
 import { partyTableHeaders } from '@/resources'
 import { isSecuredPartyRestrictedList } from '@/utils'
 import { RegistrationFlowType } from '@/enums'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'SecuredPartySummary',
@@ -41,20 +40,19 @@ export default defineComponent({
   },
   setup (props) {
     const router = useRouter()
+    const { setAddSecuredPartiesAndDebtors } = useStore()
     const {
       // Getters
       getAddSecuredPartiesAndDebtors,
       getRegistrationType,
-      getRegistrationFlowType,
-      // Actions
-      setAddSecuredPartiesAndDebtors
-    } = useStore()
-    const parties: AddPartiesIF = getAddSecuredPartiesAndDebtors
+      getRegistrationFlowType
+    } = storeToRefs(useStore())
+    const parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
 
     const localState = reactive({
       securedParties: computed(function () {
-        if (getRegistrationFlowType === RegistrationFlowType.NEW) {
-          if (isSecuredPartyRestrictedList(getRegistrationType.registrationTypeAPI) &&
+        if (getRegistrationFlowType.value === RegistrationFlowType.NEW) {
+          if (isSecuredPartyRestrictedList(getRegistrationType.value.registrationTypeAPI) &&
             parties.securedParties.length > 1) {
             return []
           }

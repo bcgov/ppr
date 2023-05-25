@@ -107,6 +107,7 @@ import { HomeCertificationOptions } from '@/enums'
 import { useInputRules, useMhrValidations } from '@/composables'
 import { useStore } from '@/store/store'
 import { createUtcDate, localTodayDate } from '@/utils/date-helper'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'HomeCertification',
@@ -120,13 +121,8 @@ export default defineComponent({
     }
   },
   setup (props, context) {
-    const {
-      // Getters
-      getMhrRegistrationHomeDescription,
-      getMhrRegistrationValidationModel,
-      // Actions
-      setMhrHomeDescription
-    } = useStore()
+    const { setMhrHomeDescription } = useStore()
+    const { getMhrRegistrationHomeDescription, getMhrRegistrationValidationModel } = storeToRefs(useStore())
 
     // Composable(s)
     const {
@@ -140,16 +136,16 @@ export default defineComponent({
       MhrCompVal,
       MhrSectVal,
       setValidation
-    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel))
+    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
     const localState = reactive({
       homeCertificationValid: false,
-      certificationOption: getMhrRegistrationHomeDescription?.certificationOption || null,
-      csaNumber: getMhrRegistrationHomeDescription?.csaNumber || '',
-      csaStandard: getMhrRegistrationHomeDescription?.csaStandard || '',
+      certificationOption: getMhrRegistrationHomeDescription.value?.certificationOption || null,
+      csaNumber: getMhrRegistrationHomeDescription.value?.csaNumber || '',
+      csaStandard: getMhrRegistrationHomeDescription.value?.csaStandard || '',
       csaStandardOptions: ['A277', 'Z240'],
-      engineerName: getMhrRegistrationHomeDescription?.engineerName || '',
-      engineerDate: getMhrRegistrationHomeDescription?.engineerDate || '',
+      engineerName: getMhrRegistrationHomeDescription.value?.engineerName || '',
+      engineerDate: getMhrRegistrationHomeDescription.value?.engineerDate || '',
       isCsaValid: false,
       isEngineerValid: false,
       isCsaOption: computed((): boolean => {
@@ -179,7 +175,7 @@ export default defineComponent({
       today: computed(() => localTodayDate()),
       minDate: computed(() => {
         // Determined by YEAR value in Manufacturers, Make, Model Section
-        const utcDate = createUtcDate(getMhrRegistrationHomeDescription?.baseInformation.year, 0, 1)
+        const utcDate = createUtcDate(getMhrRegistrationHomeDescription.value?.baseInformation.year, 0, 1)
         return localTodayDate(utcDate)
       })
     })

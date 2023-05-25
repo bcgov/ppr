@@ -124,7 +124,6 @@
 </template>
 
 <script lang="ts">
-// external libraries
 import {
   defineComponent,
   onMounted,
@@ -133,17 +132,16 @@ import {
   toRefs
 } from 'vue-demi'
 import { useStore } from '@/store/store'
-// local components
 import { EditParty } from '@/components/parties/party'
 import { BaseAddress } from '@/composables/address'
-// local helpers / types / etc.
 import { useParty } from '@/composables/useParty'
 import { useRegisteringParty } from '@/composables/useRegisteringParty'
 import { RegistrationFlowType, ActionTypes } from '@/enums'
 import { PartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { editTableHeaders, registeringTableHeaders } from '@/resources'
-import { PartyAddressSchema } from '@/schemas'
+import { PartyAddressSchema } from '@/schemas' // eslint-disable-line no-unused-vars
 import { ErrorContact } from '@/components/common'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   components: {
@@ -152,13 +150,13 @@ export default defineComponent({
     ErrorContact
   },
   setup (props, context) {
-    const { getAddSecuredPartiesAndDebtors, getRegistrationFlowType } = useStore()
+    const { getAddSecuredPartiesAndDebtors, getRegistrationFlowType } = storeToRefs(useStore())
     const addressSchema = PartyAddressSchema
-    const registrationFlowType = getRegistrationFlowType
+    const registrationFlowType = getRegistrationFlowType.value
 
     /** First time get read only registering party from the auth api. After that get from the store. */
     onMounted(async () => {
-      const regParty = getAddSecuredPartiesAndDebtors?.registeringParty
+      const regParty = getAddSecuredPartiesAndDebtors.value?.registeringParty
       if (regParty === null) {
         try {
           await getRegisteringParty()
@@ -173,7 +171,7 @@ export default defineComponent({
       addEditInProgress: false,
       showEditParty: false,
       registeringParty: computed((): Array<PartyIF> => {
-        const regParty: PartyIF = getAddSecuredPartiesAndDebtors?.registeringParty
+        const regParty: PartyIF = getAddSecuredPartiesAndDebtors.value?.registeringParty
         if (regParty !== null) {
           return [regParty]
         }

@@ -94,6 +94,7 @@ import { HomeLocationInfo } from '@/components/common'
 import { useStore } from '@/store/store'
 import { useInputRules, useNewMhrRegistration } from '@/composables'
 import { MhrLocationInfoIF } from '@/interfaces'
+import { storeToRefs } from 'pinia'
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
@@ -109,7 +110,8 @@ export default defineComponent({
     isStrata: { type: Boolean, default: false }
   },
   setup (props, context) {
-    const { getMhrRegistrationLocation, setIsManualLocation } = useStore()
+    const { setIsManualLocation } = useStore()
+    const { getMhrRegistrationLocation } = storeToRefs(useStore())
 
     const { maxLength } = useInputRules()
     const { resetLocationInfoFields } = useNewMhrRegistration()
@@ -118,7 +120,7 @@ export default defineComponent({
       isValidLocationInfo: false,
       showLocationInfo: false,
       locationInfo: {} as MhrLocationInfoIF,
-      additionalDescription: getMhrRegistrationLocation?.additionalDescription || '',
+      additionalDescription: getMhrRegistrationLocation.value?.additionalDescription || '',
       isHomeLocationDescriptionValid: false,
       isValidDescription: computed((): boolean => {
         return localState.isHomeLocationDescriptionValid &&
@@ -140,7 +142,7 @@ export default defineComponent({
         'partOf', 'section', 'township', 'range',
         'meridian', 'parcel', 'block', 'exceptionPlan'
       ]
-      localState.showLocationInfo = commonLocationProperties.some(key => !!getMhrRegistrationLocation[key])
+      localState.showLocationInfo = commonLocationProperties.some(key => !!getMhrRegistrationLocation.value[key])
     })
 
     const handleCancel = (): void => {

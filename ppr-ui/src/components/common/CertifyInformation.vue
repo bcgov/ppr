@@ -105,6 +105,7 @@ import { BaseAddress } from '@/composables/address'
 import { DefaultSchema } from '@/composables/address/resources'
 import { BaseHeaderIF, CertifyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   components: {
@@ -125,6 +126,7 @@ export default defineComponent({
     }
   },
   setup (props, { emit }) {
+    const { setCertifyInformation } = useStore()
     const {
       // Getters
       getCertifyInformation,
@@ -133,11 +135,8 @@ export default defineComponent({
       isRoleStaff,
       isRoleStaffSbc,
       isRoleStaffBcol,
-      getUserEmail,
-
-      // Actions
-      setCertifyInformation
-    } = useStore()
+      getUserEmail
+    } = storeToRefs(useStore())
 
     const authorizedTableHeaders: Array<BaseHeaderIF> = [
       {
@@ -203,10 +202,10 @@ export default defineComponent({
     )
 
     onMounted(async () => {
-      const certifyInfo:CertifyIF = getCertifyInformation
+      const certifyInfo:CertifyIF = getCertifyInformation.value
       let update:boolean = false
       let email = ''
-      if ((!certifyInfo.registeringParty) && (!isRoleStaff)) {
+      if ((!certifyInfo.registeringParty) && (!isRoleStaff.value)) {
         update = true
         const regParty = await getRegisteringPartyFromAuth()
         if (regParty) {
@@ -216,9 +215,9 @@ export default defineComponent({
 
       if (!certifyInfo.legalName) {
         update = true
-        if (getUserFirstName && getUserLastName) {
-          certifyInfo.legalName = `${getUserFirstName} ${getUserLastName}`
-          if (certifyInfo.registeringParty) certifyInfo.registeringParty.emailAddress = getUserEmail
+        if (getUserFirstName.value && getUserLastName.value) {
+          certifyInfo.legalName = `${getUserFirstName.value} ${getUserLastName.value}`
+          if (certifyInfo.registeringParty) certifyInfo.registeringParty.emailAddress = getUserEmail.value
         } else {
           try {
             const token = sessionStorage.getItem(SessionStorageKeys.KeyCloakToken)
@@ -243,13 +242,13 @@ export default defineComponent({
           }
         }
       }
-      if (isRoleStaff) {
-        if (isRoleStaffSbc) {
+      if (isRoleStaff.value) {
+        if (isRoleStaffSbc.value) {
           certifyInfo.registeringParty = {
             businessName: 'SBC Staff',
             emailAddress: email
           }
-        } else if (isRoleStaffBcol) {
+        } else if (isRoleStaffBcol.value) {
           certifyInfo.registeringParty = {
             businessName: 'BC Online Help',
             emailAddress: email

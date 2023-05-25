@@ -20,6 +20,7 @@
 import { computed, defineComponent, reactive, toRefs } from 'vue-demi'
 import { useStore } from '@/store/store'
 import { MixedRolesErrors } from '@/resources'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'HomeOwnersMixedRolesError',
@@ -34,10 +35,10 @@ export default defineComponent({
     }
   },
   setup () {
-    const { getMhrRegistrationHomeOwnerGroups } = useStore()
+    const { getMhrRegistrationHomeOwnerGroups } = storeToRefs(useStore())
 
     const localState = reactive({
-      mixedRoleErrorMsg: computed(() => getMhrRegistrationHomeOwnerGroups?.length === 1
+      mixedRoleErrorMsg: computed(() => getMhrRegistrationHomeOwnerGroups.value?.length === 1
         ? MixedRolesErrors.hasMixedOwnerTypes : MixedRolesErrors.hasMixedOwnerTypesInGroup)
     })
 

@@ -64,7 +64,6 @@
 </template>
 
 <script lang="ts">
-// external libraries
 import {
   defineComponent,
   reactive,
@@ -73,12 +72,11 @@ import {
   computed
 } from 'vue-demi'
 import { useStore } from '@/store/store'
-// local components
 import { PartyAutocomplete } from '@/components/parties/party'
-// local helpers / types / etc.
 import { RegistrationFlowType } from '@/enums'
 import { SearchPartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { partyCodeSearch } from '@/utils'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   components: {
@@ -114,8 +112,8 @@ export default defineComponent({
     'removeRegisteringParty'
   ],
   setup (props, context) {
-    const { getRegistrationFlowType } = useStore()
-    const registrationFlowType = getRegistrationFlowType
+    const { getRegistrationFlowType } = storeToRefs(useStore())
+    const registrationFlowType = getRegistrationFlowType.value
     const localState = reactive({
       searchValue: '',
       autoCompleteResults: null,

@@ -33,6 +33,7 @@ import { computed, defineComponent, reactive, toRefs } from 'vue-demi'
 import { convertDate } from '@/utils'
 import { useStore } from '@/store/store'
 import { useTransferOwners } from '@/composables'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'TransferDetailsReview',
@@ -48,7 +49,7 @@ export default defineComponent({
       getMhrTransferConsideration,
       getMhrTransferDate,
       getMhrTransferOwnLand
-    } = useStore()
+    } = storeToRefs(useStore())
 
     const {
       isTransferDueToDeath,
@@ -57,7 +58,7 @@ export default defineComponent({
 
     const localState = reactive({
       landOrLeaseLabel: computed(() => {
-        return `The manufactured home is <b>${!getMhrTransferOwnLand ? 'not' : ''}</b> located on land that the
+        return `The manufactured home is <b>${!getMhrTransferOwnLand.value ? 'not' : ''}</b> located on land that the
             ${!isTransferDueToDeath.value || isTransferToExecutorProbateWill.value ? 'new' : ''} homeowners own, or
             on which they have a registered lease of 3 years or more.`
       })

@@ -164,6 +164,7 @@ import { HomeCertificationOptions, RouteNames } from '@/enums'
 import { yyyyMmDdToPacificDate, formatAsHtml } from '@/utils'
 import { HomeSections } from '@/components/mhrRegistration'
 import { useMhrValidations } from '@/composables'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'YourHomeReview',
@@ -181,23 +182,23 @@ export default defineComponent({
       getMhrRegistrationHomeDescription,
       getMhrRegistrationOtherInfo,
       getMhrRegistrationValidationModel
-    } = useStore()
+    } = storeToRefs(useStore())
 
     const {
       MhrSectVal,
       getStepValidation
-    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel))
+    } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
     const localState = reactive({
       isCSA: computed((): boolean => {
-        return getMhrRegistrationHomeDescription?.certificationOption === HomeCertificationOptions.CSA
+        return getMhrRegistrationHomeDescription.value?.certificationOption === HomeCertificationOptions.CSA
       }),
       isEngineerInspection: computed((): boolean => {
-        return getMhrRegistrationHomeDescription?.certificationOption ===
+        return getMhrRegistrationHomeDescription.value?.certificationOption ===
           HomeCertificationOptions.ENGINEER_INSPECTION
       }),
       engineerDisplayDate: computed((): string => {
-        return yyyyMmDdToPacificDate(getMhrRegistrationHomeDescription?.engineerDate, true)
+        return yyyyMmDdToPacificDate(getMhrRegistrationHomeDescription.value?.engineerDate, true)
       })
     })
 

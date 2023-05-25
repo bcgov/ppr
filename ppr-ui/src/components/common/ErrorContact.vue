@@ -19,7 +19,7 @@ import {
 
 export default defineComponent({
   name: 'ErrorContact',
-  setup (props) {
+  setup () {
     const contactInfo = [
       {
         icon: 'mdi-phone',
