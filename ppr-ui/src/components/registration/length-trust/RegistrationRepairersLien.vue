@@ -132,7 +132,6 @@
 </template>
 
 <script lang="ts">
-// external
 import {
   computed,
   defineComponent,
@@ -142,12 +141,11 @@ import {
   onMounted
 } from 'vue-demi'
 import { useStore } from '@/store/store'
-// bcregistry
 import SharedDatePicker from '@/components/common/SharedDatePicker.vue'
-// local
 import { LengthTrustIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { convertDate, formatExpiryDate, localTodayDate } from '@/utils'
 import { APIRegistrationTypes } from '@/enums'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   components: {
@@ -160,49 +158,48 @@ export default defineComponent({
     }
   },
   setup (props) {
+    const { setLengthTrust } = useStore()
     const {
       getLengthTrust,
       getRegistrationType,
       getRegistrationExpiryDate,
-      getRegistrationSurrenderDate,
-      // Actions
-      setLengthTrust
-    } = useStore()
-    const registrationType = getRegistrationType?.registrationTypeAPI
+      getRegistrationSurrenderDate
+    } = storeToRefs(useStore())
+    const registrationType = getRegistrationType.value?.registrationTypeAPI
     const modal = false
 
     const localState = reactive({
       datePickerKey: Math.random(),
       renewalView: props.isRenewal,
       trustIndentureHint: '',
-      surrenderDate: getLengthTrust.surrenderDate,
-      lienAmount: getLengthTrust.lienAmount,
+      surrenderDate: getLengthTrust.value.surrenderDate,
+      lienAmount: getLengthTrust.value.lienAmount,
       showErrorSummary: computed((): boolean => {
-        return !getLengthTrust.valid
+        return !getLengthTrust.value.valid
       }),
       showErrorLienAmount: computed((): boolean => {
         if (
-          getLengthTrust.lienAmount !== '' &&
+          getLengthTrust.value.lienAmount !== '' &&
           localState.lienAmountMessage?.length > 0
         ) {
           return true
         }
-        return getLengthTrust.showInvalid && getLengthTrust.lienAmount === ''
+        return getLengthTrust.value.showInvalid && getLengthTrust.value.lienAmount === ''
       }),
       showErrorSurrenderDate: computed((): boolean => {
-        return getLengthTrust.showInvalid && getLengthTrust.surrenderDate === ''
+        return getLengthTrust.value.showInvalid && getLengthTrust.value.surrenderDate === ''
       }),
       lienAmountMessage: computed((): string => {
-        if (getLengthTrust.showInvalid && getLengthTrust.lienAmount === '') {
+        if (getLengthTrust.value.showInvalid && getLengthTrust.value.lienAmount === '') {
           return 'This field is required'
         }
-        if (getLengthTrust.lienAmount?.length > 0 && !validLienAmount(getLengthTrust.lienAmount)) {
+        if (getLengthTrust.value.lienAmount?.length > 0 && !validLienAmount(getLengthTrust.value.lienAmount)) {
           return 'Lien amount must be a number greater than 0.'
         }
         return ''
       }),
       surrenderDateMessage: computed((): string => {
-        if (getLengthTrust.showInvalid && getLengthTrust.surrenderDate === '') {
+        if (getLengthTrust.value.showInvalid && getLengthTrust.value.surrenderDate === '') {
           return 'This field is required'
         }
         return ''
@@ -221,7 +218,7 @@ export default defineComponent({
       }),
       computedExpiryDateFormatted: computed((): string => {
         if (props.isRenewal) {
-          const expiryDate = getRegistrationExpiryDate
+          const expiryDate = getRegistrationExpiryDate.value
           const newExpDate = new Date(new Date(expiryDate).toLocaleString('en-US', { timeZone: 'America/Vancouver' }))
           newExpDate.setDate(newExpDate.getDate() + 180)
           return formatExpiryDate(newExpDate)
@@ -229,17 +226,17 @@ export default defineComponent({
         return ''
       }),
       lengthTrust: computed((): LengthTrustIF => {
-        return getLengthTrust as LengthTrustIF || null
+        return getLengthTrust.value as LengthTrustIF || null
       }),
       lienAmountSummary: computed((): string => {
-        if (getLengthTrust.lienAmount) {
+        if (getLengthTrust.value.lienAmount) {
           // Format as CDN currency.
-          var currency = getLengthTrust.lienAmount
+          var currency = getLengthTrust.value.lienAmount
             ?.replace('$', '')
             ?.replaceAll(',', '')
           var lienFloat = parseFloat(currency)
           if (isNaN(lienFloat)) {
-            return getLengthTrust.lienAmount
+            return getLengthTrust.value.lienAmount
           }
           return '$' + lienFloat.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')
         }
@@ -249,24 +246,24 @@ export default defineComponent({
         if (props.isRenewal) {
           // TODO: I'm not sure assigning a computed to a computed works as expected or at all. Revisit this asap.
           // eslint-disable-next-line vue/no-side-effects-in-computed-properties
-          getLengthTrust.surrenderDate = getRegistrationSurrenderDate
+          getLengthTrust.value.surrenderDate = getRegistrationSurrenderDate.value
           return convertDate(
-            new Date(getLengthTrust.surrenderDate),
+            new Date(getLengthTrust.value.surrenderDate),
             false,
             false
           )
         }
-        if (getLengthTrust.surrenderDate?.length >= 10) {
+        if (getLengthTrust.value.surrenderDate?.length >= 10) {
           return convertDate(
-            new Date(getLengthTrust.surrenderDate + 'T09:00:00Z'),
+            new Date(getLengthTrust.value.surrenderDate + 'T09:00:00Z'),
             false,
             false
           )
         }
-        if (getLengthTrust.surrenderDate === '') {
+        if (getLengthTrust.value.surrenderDate === '') {
           return 'Not entered'
         }
-        return getLengthTrust.surrenderDate
+        return getLengthTrust.value.surrenderDate
       })
     })
 
@@ -318,7 +315,7 @@ export default defineComponent({
     )
 
     onMounted(() => {
-      if (props.isRenewal && (getLengthTrust.lifeYears !== 1)) {
+      if (props.isRenewal && (getLengthTrust.value.lifeYears !== 1)) {
         const lt = localState.lengthTrust
         lt.valid = true
         lt.lifeYears = 1

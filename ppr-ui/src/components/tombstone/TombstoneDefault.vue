@@ -63,6 +63,7 @@ import {
 import { useStore } from '@/store/store'
 import { tombstoneTitles } from '@/resources'
 import { pacificDate, getRoleProductCode } from '@/utils'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'TombstoneDefault',
@@ -76,29 +77,30 @@ export default defineComponent({
       isRoleStaffSbc,
       getUserRoles,
       getUserProductSubscriptionsCodes
-    } = useStore()
+    } = storeToRefs(useStore())
+
     const localState = reactive({
       userName: computed((): string => {
-        return `${getUserFirstName} ${getUserLastName}`
+        return `${getUserFirstName.value} ${getUserLastName.value}`
       }),
       date: '',
       header: computed((): string => {
-        return tombstoneTitles[getRoleProductCode(getUserRoles, getUserProductSubscriptionsCodes)]
+        return tombstoneTitles[getRoleProductCode(getUserRoles.value, getUserProductSubscriptionsCodes.value)]
       }),
       isStaff: computed((): boolean => {
-        return isRoleStaff
+        return isRoleStaff.value
       }),
       isStaffBcol: computed((): boolean => {
-        return isRoleStaffBcol
+        return isRoleStaffBcol.value
       }),
       isStaffSbc: computed((): boolean => {
-        return isRoleStaffSbc
+        return isRoleStaffSbc.value
       }),
       accountName: computed((): string => {
         if (localState.isStaffBcol) return 'BC Online Help'
         if (localState.isStaffSbc) return 'SBC Staff'
         if (localState.isStaff) return 'BC Registries Staff'
-        return getAccountLabel
+        return getAccountLabel.value
       })
     })
     onMounted(() => {

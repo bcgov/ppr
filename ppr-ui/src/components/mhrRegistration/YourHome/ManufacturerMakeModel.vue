@@ -139,6 +139,7 @@ import {
 import { useStore } from '@/store/store'
 import { useInputRules, useMhrValidations } from '@/composables/'
 import { storeToRefs } from 'pinia'
+import { FormIF } from '@/interfaces'
 
 export default defineComponent({
   props: {
@@ -147,10 +148,11 @@ export default defineComponent({
       default: false
     }
   },
-  setup (props, context) {
+  setup (props) {
     // Form Refs
-    const makeModelComboForm = ref(null)
+    const makeModelComboForm = ref(null) as FormIF
     const nameRef = ref(null)
+
     const yearRef = ref(null)
     const makeRef = ref(null)
     const modelRef = ref(null)
@@ -255,9 +257,8 @@ export default defineComponent({
       setValidation(MhrSectVal.YOUR_HOME_VALID, MhrCompVal.MAKE_MODEL_VALID, val)
     })
 
-    watch(() => props.validate, async () => {
-      // @ts-ignore - function exists
-      await context.refs.makeModelComboForm.validate()
+    watch(() => props.validate, () => {
+      makeModelComboForm.validate()
     })
 
     return {

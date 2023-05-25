@@ -162,7 +162,6 @@
 </template>
 
 <script lang="ts">
-// external
 import {
   computed,
   defineComponent,
@@ -170,7 +169,6 @@ import {
   toRefs
 } from 'vue-demi'
 import { useStore } from '@/store/store'
-// local
 import { SearchCriteriaIF, SearchResponseIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { MHRSearchTypes, searchHistoryTableHeaders, searchHistoryTableHeadersStaff, SearchTypes } from '@/resources'
 import { convertDate, searchPDF, submitSelected, successfulPPRResponses, searchMhrPDF, delayActions } from '@/utils'

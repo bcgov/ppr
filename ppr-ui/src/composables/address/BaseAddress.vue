@@ -134,7 +134,6 @@
 
 <script lang="ts">
 import { defineComponent, onMounted, toRefs, watch } from 'vue-demi'
-
 import {
   baseRules,
   useAddress,

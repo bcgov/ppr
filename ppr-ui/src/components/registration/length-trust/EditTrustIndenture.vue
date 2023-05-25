@@ -49,7 +49,6 @@
 </template>
 
 <script lang="ts">
-// external
 import {
   computed,
   defineComponent,
@@ -57,10 +56,9 @@ import {
   toRefs
 } from 'vue-demi'
 import { useStore } from '@/store/store'
-
-// local
 import { LengthTrustIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { ActionTypes } from '@/enums'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   props: {
@@ -71,7 +69,8 @@ export default defineComponent({
   },
   emits: ['editTrustIndenture', 'resetEvent'],
   setup (props, context) {
-    const { getLengthTrust, setLengthTrust } = useStore()
+    const { setLengthTrust } = useStore()
+    const { getLengthTrust } = storeToRefs(useStore())
     const localState = reactive({
       existingTrustIndenture: props.currentTrustIndenture,
       trustIndenture: props.currentTrustIndenture,

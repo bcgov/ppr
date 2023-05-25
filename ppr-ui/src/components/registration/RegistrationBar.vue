@@ -39,6 +39,7 @@ import {
 } from '@/enums'
 import { AccountProductSubscriptionIF, RegistrationTypeIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { MhrRegistrationType } from '@/resources'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   components: {
@@ -57,19 +58,18 @@ export default defineComponent({
   },
   emits: ['selected-registration-type'],
   setup (props, { emit }) {
+    const { setRegistrationTypeOtherDesc } = useStore()
     const {
       // Getters
       getAccountProductSubscriptions,
       isRoleQualifiedSupplier,
-      isRoleStaff,
-      // Actions
-      setRegistrationTypeOtherDesc
-    } = useStore()
+      isRoleStaff
+    } = storeToRefs(useStore())
     const localState = reactive({
       labelText: 'Start a New Personal Property Registration'
     })
     const hasRPPR = computed(() => {
-      const productSubscriptions = getAccountProductSubscriptions as AccountProductSubscriptionIF
+      const productSubscriptions = getAccountProductSubscriptions.value as AccountProductSubscriptionIF
       return (
         productSubscriptions?.[AccountProductCodes.RPPR]?.roles.includes(AccountProductRoles.EDIT) || false
       )

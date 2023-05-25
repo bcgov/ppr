@@ -43,7 +43,6 @@ export const useNewMhrRegistration = () => {
     getStaffPayment,
     getMhrDraftNumber
   } = storeToRefs(useStore())
-
   const {
     setShowGroups,
     getHomeTenancyType

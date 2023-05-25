@@ -55,6 +55,7 @@
 <script lang="ts">
 import { defineComponent, reactive, toRefs, watch, computed } from 'vue-demi'
 import { useStore } from '@/store/store'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   props: {
@@ -69,14 +70,15 @@ export default defineComponent({
   },
   emits: ['valid'],
   setup (props, { emit }) {
-    const { getAmendmentDescription, setAmendmentDescription } = useStore()
+    const { setAmendmentDescription } = useStore()
+    const { getAmendmentDescription } = storeToRefs(useStore())
     const localState = reactive({
-      detailDescription: getAmendmentDescription || '',
+      detailDescription: getAmendmentDescription.value || '',
       summaryView: computed((): boolean => {
         return props.isSummary
       }),
       amendmentDescription: computed((): string => {
-        return getAmendmentDescription || ''
+        return getAmendmentDescription.value || ''
       }),
       showErrorComponent: computed((): boolean => {
         return (props.setShowErrors && !localState.valid)

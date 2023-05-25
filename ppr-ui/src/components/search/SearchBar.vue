@@ -234,7 +234,6 @@
 import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
 import { useStore } from '@/store/store'
 import _ from 'lodash'
-
 import { mhrSearch, search, staffSearch, validateSearchAction, validateSearchRealTime } from '@/utils'
 import { MHRSearchTypes, SearchTypes } from '@/resources'
 import { paymentConfirmaionDialog, staffPaymentDialog } from '@/resources/dialogOptions'
@@ -249,13 +248,13 @@ import {
 } from '@/interfaces'
 /* eslint-enable no-unused-vars */
 import { APIMHRMapSearchTypes, APISearchTypes, SettingOptions } from '@/enums'
-// won't render properly from @/components/search
 import AutoComplete from '@/components/search/AutoComplete.vue'
 import SearchBarList from '@/components/search/SearchBarList.vue'
 import BusinessSearchAutocomplete from '@/components/search/BusinessSearchAutocomplete.vue'
 import { FolioNumber } from '@/components/common'
 import { ConfirmationDialog, StaffPaymentDialog } from '@/components/dialogs'
 import { useSearch } from '@/composables/useSearch'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   components: {
@@ -285,6 +284,14 @@ export default defineComponent({
   },
   setup (props, { emit }) {
     const {
+      // Actions
+      setIsStaffClientPayment,
+      setSearching,
+      setStaffPayment,
+      setFolioOrReferenceNumber,
+      setSelectedManufacturedHomes
+    } = useStore()
+    const {
       // Getters
       getUserSettings,
       isSearching,
@@ -295,14 +302,8 @@ export default defineComponent({
       isSearchCertified,
       getStaffPayment,
       hasPprEnabled,
-      hasMhrEnabled,
-      // Actions
-      setIsStaffClientPayment,
-      setSearching,
-      setStaffPayment,
-      setFolioOrReferenceNumber,
-      setSelectedManufacturedHomes
-    } = useStore()
+      hasMhrEnabled
+    } = storeToRefs(useStore())
     const { isMHRSearchType, isPPRSearchType, mapMhrSearchType } = useSearch()
     const localState = reactive({
       autoCompleteIsActive: true,
@@ -327,11 +328,11 @@ export default defineComponent({
         return localState.validations?.category?.message || ''
       }),
       showPprFeeHint: computed((): boolean => {
-        return !(isRoleStaffBcol || isRoleStaffReg) && ((hasPprEnabled && !hasMhrEnabled) ||
+        return !(isRoleStaffBcol.value || isRoleStaffReg.value) && ((hasPprEnabled.value && !hasMhrEnabled.value) ||
           isPPRSearchType(localState.selectedSearchType?.searchTypeAPI))
       }),
       showMhrHint: computed((): boolean => {
-        return !(isRoleStaffBcol || isRoleStaffReg) && ((hasMhrEnabled && !hasPprEnabled) ||
+        return !(isRoleStaffBcol.value || isRoleStaffReg.value) && ((hasMhrEnabled.value && !hasPprEnabled.value) ||
           isMHRSearchType(localState.selectedSearchType?.searchTypeAPI))
       }),
       dialogOptions: computed((): DialogOptionsIF => {
@@ -340,7 +341,7 @@ export default defineComponent({
         return options
       }),
       fee: computed((): string => {
-        if (isRoleStaffSbc) return '10.00'
+        if (isRoleStaffSbc.value) return '10.00'
         if (props.isNonBillable) {
           const serviceFee = `${props.serviceFee}`
           if (serviceFee.includes('.')) {
@@ -377,30 +378,30 @@ export default defineComponent({
         return localState.isRoleStaff || localState.isStaffSbc ? '15.00' : '12.00'
       }),
       isRoleStaff: computed((): boolean => {
-        return isRoleStaff
+        return isRoleStaff.value
       }),
       isStaffBcolReg: computed((): boolean => {
-        return isRoleStaffBcol || isRoleStaffReg
+        return isRoleStaffBcol.value || isRoleStaffReg.value
       }),
       isRoleStaffReg: computed((): boolean => {
-        return isRoleStaffReg
+        return isRoleStaffReg.value
       }),
       isStaffSbc: computed((): boolean => {
-        return isRoleStaffSbc
+        return isRoleStaffSbc.value
       }),
       searching: computed((): boolean => {
-        return isSearching
+        return isSearching.value
       }),
       searchMessage: computed((): string => {
         return localState.validations?.searchValue?.message || ''
       }),
       optionFirst: computed((): string => {
-        return isRoleStaffReg && isMHRSearchType(localState.selectedSearchType?.searchTypeAPI)
+        return isRoleStaffReg.value && isMHRSearchType(localState.selectedSearchType?.searchTypeAPI)
           ? 'First Name (Optional)' : 'First Name'
       }),
       typeOfSearch: computed((): string => {
         // only show the type of search if authorized to both types
-        if (((hasPprEnabled && hasMhrEnabled) || isRoleStaff || localState.isStaffBcolReg)) {
+        if (((hasPprEnabled.value && hasMhrEnabled.value) || isRoleStaff.value || localState.isStaffBcolReg)) {
           if (localState.selectedSearchType) {
             if (isPPRSearchType(localState.selectedSearchType.searchTypeAPI)) {
               return '<i aria-hidden="true" class="v-icon notranslate menu-icon mdi ' + SearchTypes[0].icon +
@@ -446,7 +447,7 @@ export default defineComponent({
         // don't show confirmation dialog if bcol or reg staff
         if (localState.isStaffBcolReg || isMHRSearchType(localState.selectedSearchType?.searchTypeAPI)) return false
 
-        const settings: UserSettingsIF = getUserSettings
+        const settings: UserSettingsIF = getUserSettings.value
         return settings?.paymentConfirmationDialog
       })
     })
@@ -508,12 +509,12 @@ export default defineComponent({
         setSearching(true)
         emit('search-data', null) // clear any current results
         let resp
-        if (isRoleStaffReg) {
+        if (isRoleStaffReg.value) {
           if (isPPRSearchType(localState.selectedSearchType?.searchTypeAPI)) {
             resp = await staffSearch(
               getSearchApiParams(),
-              getStaffPayment,
-              isSearchCertified)
+              getStaffPayment.value,
+              isSearchCertified.value)
             setStaffPayment(null)
           }
           if (isMHRSearchType(localState.selectedSearchType.searchTypeAPI)) {

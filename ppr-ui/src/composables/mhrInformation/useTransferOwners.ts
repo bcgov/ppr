@@ -44,7 +44,6 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     getMhrTransferCurrentHomeOwnerGroups,
     getMhrTransferAffidavitCompleted
   } = storeToRefs(useStore())
-
   const {
     getGroupById,
     getCurrentGroupById

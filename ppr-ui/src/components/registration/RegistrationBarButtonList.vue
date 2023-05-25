@@ -149,7 +149,6 @@
 </template>
 <script lang="ts">
 import { defineComponent, reactive, toRefs } from 'vue-demi'
-
 import { RegistrationTypes } from '@/resources'
 import { UIRegistrationTypes, APIRegistrationTypes } from '@/enums'
 
@@ -164,7 +163,7 @@ export default defineComponent({
     })
     const selectRegistration = (val: APIRegistrationTypes) => {
       const reg = RegistrationTypes.find(
-        function (reg, index) {
+        function (reg) {
           if (reg.registrationTypeAPI === val) {
             return true
           }

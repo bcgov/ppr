@@ -60,6 +60,7 @@ import { MHRSearchTypes, SearchTypes } from '@/resources'
 import { APISearchTypes, UISearchTypes } from '@/enums'
 import { SearchTypeIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { getFeatureFlag } from '@/utils'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'SearchBarList',
@@ -79,7 +80,7 @@ export default defineComponent({
       isRoleStaff,
       hasPprEnabled,
       hasMhrEnabled
-    } = useStore()
+    } = storeToRefs(useStore())
     const searchSelect = ref(null)
     const localState = reactive({
       searchTypes: UISearchTypes,
@@ -106,7 +107,7 @@ export default defineComponent({
         const allSearchTypes = []
 
         // Staff Only Options
-        if (isRoleStaff || isRoleStaffReg) {
+        if (isRoleStaff.value || isRoleStaffReg.value) {
           if (getFeatureFlag('mhr-ui-enabled')) {
             allSearchTypes.push(...SearchTypes, ...MHRSearchTypes)
             return allSearchTypes
@@ -117,32 +118,32 @@ export default defineComponent({
         }
 
         // Client Only Blocks
-        if (hasPprEnabled && hasMhrEnabled) {
+        if (hasPprEnabled.value && hasMhrEnabled.value) {
           allSearchTypes.push(...SearchTypes, ...MHRSearchTypes)
           return allSearchTypes
         }
 
-        if (hasPprEnabled) {
+        if (hasPprEnabled.value) {
           allSearchTypes.push(...SearchTypes)
           return allSearchTypes.slice(1)
         }
 
-        if (hasMhrEnabled) {
+        if (hasMhrEnabled.value) {
           allSearchTypes.push(...MHRSearchTypes)
           return allSearchTypes.slice(1)
         }
         return allSearchTypes
       }),
       isSingleSearchOption: computed((): boolean => {
-        return ((hasPprEnabled && !hasMhrEnabled) || (!hasPprEnabled && hasMhrEnabled)) &&
-          !(isRoleStaff || isRoleStaffReg)
+        return ((hasPprEnabled.value && !hasMhrEnabled.value) || (!hasPprEnabled.value && hasMhrEnabled.value)) &&
+          !(isRoleStaff.value || isRoleStaffReg.value)
       }),
       displayItems: [],
       displayGroup: {
-        1: !(isRoleStaff || isRoleStaffReg)
-          ? (hasPprEnabled && !hasMhrEnabled)
-          : !hasMhrEnabled,
-        2: !(isRoleStaff || isRoleStaffReg) && (!hasPprEnabled && hasMhrEnabled)
+        1: !(isRoleStaff.value || isRoleStaffReg.value)
+          ? (hasPprEnabled.value && !hasMhrEnabled.value)
+          : !hasMhrEnabled.value,
+        2: !(isRoleStaff.value || isRoleStaffReg.value) && (!hasPprEnabled.value && hasMhrEnabled.value)
       },
       showMenu: false
     })
@@ -196,7 +197,7 @@ export default defineComponent({
     }
     const updateSelections = () => {
       localState.displayItems = localState.origItems
-      if (hasPprEnabled && hasMhrEnabled) {
+      if (hasPprEnabled.value && hasMhrEnabled.value) {
         localState.displayGroup = { 1: false, 2: false }
       }
     }

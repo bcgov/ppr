@@ -259,6 +259,7 @@ import { BaseHeaderIF, ManufacturedHomeSearchResultIF } from '@/interfaces' // e
 import { FolioNumber } from '@/components/common'
 import { RouteNames, UIMHRSearchTypeMap, UIMHRSearchTypes, UIMHRSearchTypeValues } from '@/enums'
 import { cloneDeep, uniqBy, filter, sortBy, groupBy } from 'lodash'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   components: {
@@ -270,15 +271,17 @@ export default defineComponent({
   setup (props) {
     const router = useRouter()
     const {
-      // Getters
-      getManufacturedHomeSearchResults,
-      getFolioOrReferenceNumber,
-      getSearchedType,
-      getSelectedManufacturedHomes,
       // Actions
       setSelectedManufacturedHomes,
       setFolioOrReferenceNumber
     } = useStore()
+    const {
+      // Getters
+      getManufacturedHomeSearchResults,
+      getFolioOrReferenceNumber,
+      getSearchedType,
+      getSelectedManufacturedHomes
+    } = storeToRefs(useStore())
 
     const localState = reactive({
       searched: false,
@@ -286,7 +289,7 @@ export default defineComponent({
       searchType: null as UIMHRSearchTypes,
       selectAll: false,
       selectAllLien: false,
-      folioNumber: getFolioOrReferenceNumber,
+      folioNumber: getFolioOrReferenceNumber.value,
       tooltipTxtSrchMtchs: 'One or more of the selected matches appear in ' +
         'the same registration. That registration will only be shown once in the report.',
       results: [],
@@ -301,7 +304,7 @@ export default defineComponent({
       ),
       totalResultsLength: 0,
       headerSearchTypeSlot: computed((): string => {
-        switch (getSearchedType?.searchTypeUI) {
+        switch (getSearchedType.value?.searchTypeUI) {
           case UIMHRSearchTypes.MHROWNER_NAME:
           case UIMHRSearchTypes.MHRORGANIZATION_NAME:
             return `header.${UIMHRSearchTypeValues.MHROWNER_NAME}`
@@ -314,7 +317,7 @@ export default defineComponent({
         }
       }),
       itemSearchTypeSlot: computed((): string => {
-        switch (getSearchedType?.searchTypeUI) {
+        switch (getSearchedType.value?.searchTypeUI) {
           case UIMHRSearchTypes.MHROWNER_NAME:
           case UIMHRSearchTypes.MHRORGANIZATION_NAME:
             return `item.${UIMHRSearchTypeValues.MHROWNER_NAME}`
@@ -350,7 +353,7 @@ export default defineComponent({
         return localState.searchType === UIMHRSearchTypes.MHRMHR_NUMBER ? 'Registration Number' : localState.searchType
       }),
       ownerOrOrgHeader: computed((): string => {
-        const found = getManufacturedHomeSearchResults.results
+        const found = getManufacturedHomeSearchResults.value.results
         if (found) {
           return found[0]?.organizationName ? 'Organization' : 'Owner'
         } else return ''
@@ -359,8 +362,8 @@ export default defineComponent({
         return localState.results?.every(result => result && result.selected === true)
       }),
       activeResults: computed((): any => {
-        const selectedResults = cloneDeep(getSelectedManufacturedHomes)
-        const baseResults = cloneDeep(getManufacturedHomeSearchResults?.results)
+        const selectedResults = cloneDeep(getSelectedManufacturedHomes).value
+        const baseResults = cloneDeep(getManufacturedHomeSearchResults.value?.results)
 
         // Map selected results with base results when user navigates back to edit selections further
         const activeResults = baseResults?.map(result => {
@@ -496,11 +499,11 @@ export default defineComponent({
     }
 
     onMounted(async () => {
-      const resp = getManufacturedHomeSearchResults
+      const resp = getManufacturedHomeSearchResults.value
       if (!resp) await router.push({ name: RouteNames.DASHBOARD })
       localState.searchValue = resp?.searchQuery.criteria.value || getOwnerName(resp?.searchQuery.criteria)
       localState.searched = true
-      localState.searchType = getSearchedType?.searchTypeUI || ''
+      localState.searchType = getSearchedType.value?.searchTypeUI || ''
       localState.results = localState.activeResults
       localState.results = localState.results?.map(result => {
         // includeLienInfo needs to be initialized because it doesn't exist in the DB/results response

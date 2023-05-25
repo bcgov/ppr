@@ -117,7 +117,6 @@
 </template>
 
 <script lang="ts">
-// external
 import {
   computed,
   defineComponent,
@@ -127,12 +126,11 @@ import {
   onMounted
 } from 'vue-demi'
 import { useStore } from '@/store/store'
-
-// local
 import { LengthTrustIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { formatExpiryDate, isInt } from '@/utils'
 import { APIRegistrationTypes } from '@/enums'
 import { getFinancingFee } from '@/composables/fees/factories'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   props: {
@@ -146,28 +144,27 @@ export default defineComponent({
     }
   },
   setup (props, context) {
+    const { setLengthTrust } = useStore()
     const {
       // Getters
       getLengthTrust,
       getRegistrationType,
-      getRegistrationExpiryDate,
-      // Actions
-      setLengthTrust
-    } = useStore()
-    const registrationType = getRegistrationType?.registrationTypeAPI
+      getRegistrationExpiryDate
+    } = storeToRefs(useStore())
+    const registrationType = getRegistrationType.value?.registrationTypeAPI
     const feeInfoYears = getFinancingFee(false)
     const modal = false
 
     const localState = reactive({
       renewalView: props.isRenewal,
-      trustIndenture: getLengthTrust.trustIndenture,
-      lifeYearsDisabled: computed((): string => { return getLengthTrust.lifeInfinite }),
-      lifeInfinite: getLengthTrust.valid ? getLengthTrust.lifeInfinite.toString() : '',
+      trustIndenture: getLengthTrust.value.trustIndenture,
+      lifeYearsDisabled: computed((): string => { return getLengthTrust.value.lifeInfinite }),
+      lifeInfinite: getLengthTrust.value.valid ? getLengthTrust.value.lifeInfinite.toString() : '',
       maxYears: feeInfoYears.quantityMax.toString(),
-      lifeYearsEdit: getLengthTrust.lifeYears > 0 ? getLengthTrust.lifeYears.toString() : '',
+      lifeYearsEdit: getLengthTrust.value.lifeYears > 0 ? getLengthTrust.value.lifeYears.toString() : '',
       lifeYearsMessage: '',
       trustIndentureHint: '',
-      showInvalid: getLengthTrust.showInvalid,
+      showInvalid: getLengthTrust.value.showInvalid,
       lifeYearsHint:
         'Minimum 1 year, Maximum ' +
         feeInfoYears.quantityMax.toString() +
@@ -176,12 +173,12 @@ export default defineComponent({
         ' per year)',
       showTrustIndenture: computed((): boolean => {
         if (localState.renewalView) {
-          return getLengthTrust.trustIndenture
+          return getLengthTrust.value.trustIndenture
         }
         return registrationType === APIRegistrationTypes.SECURITY_AGREEMENT
       }),
       showErrorSummary: computed((): boolean => {
-        return !getLengthTrust.valid
+        return !getLengthTrust.value.valid
       }),
       regTitle: computed((): string => {
         if (props.isRenewal) {
@@ -191,11 +188,11 @@ export default defineComponent({
       }),
       computedExpiryDateFormatted: computed((): string => {
         if (props.isRenewal) {
-          if (getLengthTrust.lifeInfinite) {
+          if (getLengthTrust.value.lifeInfinite) {
             return 'No Expiry'
           }
-          if ((getRegistrationExpiryDate) && (parseInt(localState.lifeYearsEdit) > 0)) {
-            const expiryDate = getRegistrationExpiryDate
+          if ((getRegistrationExpiryDate.value) && (parseInt(localState.lifeYearsEdit) > 0)) {
+            const expiryDate = getRegistrationExpiryDate.value
             const numYears = parseInt(localState.lifeYearsEdit)
             const newExpDate = new Date(new Date(expiryDate).toLocaleString('en-US', { timeZone: 'America/Vancouver' }))
             newExpDate.setFullYear(newExpDate.getFullYear() + numYears)
@@ -206,10 +203,10 @@ export default defineComponent({
         return ''
       }),
       lengthTrust: computed((): LengthTrustIF => {
-        return getLengthTrust as LengthTrustIF || null
+        return getLengthTrust.value as LengthTrustIF || null
       }),
       trustIndentureSummary: computed((): string => {
-        return getLengthTrust.trustIndenture ? 'Yes' : 'No'
+        return getLengthTrust.value.trustIndenture ? 'Yes' : 'No'
       })
     })
 

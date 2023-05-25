@@ -108,6 +108,7 @@ import { LengthTrustIF } from '@/interfaces' // eslint-disable-line no-unused-va
 import { convertDate, formatExpiryDate, isInt } from '@/utils'
 import { APIRegistrationTypes, RouteNames, RegistrationFlowType } from '@/enums'
 import { getFinancingFee } from '@/composables/fees/factories'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   props: {
@@ -119,35 +120,34 @@ export default defineComponent({
   setup (props) {
     const route = useRoute()
     const router = useRouter()
+    const { setLengthTrust } = useStore()
     const {
       // Getters
       getLengthTrust,
       getRegistrationType,
       getRegistrationExpiryDate,
       getRegistrationSurrenderDate,
-      getRegistrationFlowType,
-      // Actions
-      setLengthTrust
-    } = useStore()
-    const registrationType = getRegistrationType?.registrationTypeAPI
+      getRegistrationFlowType
+    } = storeToRefs(useStore())
+    const registrationType = getRegistrationType.value?.registrationTypeAPI
     const feeInfoYears = getFinancingFee(false)
 
     const localState = reactive({
       renewalView: props.isRenewal,
-      trustIndenture: getLengthTrust.trustIndenture,
-      lifeInfinite: getLengthTrust.valid
-        ? getLengthTrust.lifeInfinite.toString()
+      trustIndenture: getLengthTrust.value.trustIndenture,
+      lifeInfinite: getLengthTrust.value.valid
+        ? getLengthTrust.value.lifeInfinite.toString()
         : '',
-      surrenderDate: getLengthTrust.surrenderDate,
-      lienAmount: getLengthTrust.lienAmount,
+      surrenderDate: getLengthTrust.value.surrenderDate,
+      lienAmount: getLengthTrust.value.lienAmount,
       showTrustIndenture: computed((): boolean => {
         if (localState.renewalView) {
-          return getLengthTrust.trustIndenture
+          return getLengthTrust.value.trustIndenture
         }
         return registrationType === APIRegistrationTypes.SECURITY_AGREEMENT
       }),
       showErrorSummary: computed((): boolean => {
-        return !getLengthTrust.valid
+        return !getLengthTrust.value.valid
       }),
       regTitle: computed((): string => {
         if (props.isRenewal) {
@@ -156,23 +156,23 @@ export default defineComponent({
         return 'Registration'
       }),
       computedDateFormatted: computed((): string => {
-        return getLengthTrust.surrenderDate !== ''
-          ? convertDate(new Date(getLengthTrust.surrenderDate + 'T09:00:00Z'), false, false) : ''
+        return getLengthTrust.value.surrenderDate !== ''
+          ? convertDate(new Date(getLengthTrust.value.surrenderDate + 'T09:00:00Z'), false, false) : ''
       }),
       computedExpiryDateFormatted: computed((): string => {
         if (props.isRenewal) {
-          if (getLengthTrust.lifeInfinite) {
+          if (getLengthTrust.value.lifeInfinite) {
             return 'No Expiry'
           }
-          if ((getRegistrationExpiryDate) && ((registrationType === APIRegistrationTypes.REPAIRERS_LIEN))) {
-            const expiryDate = getRegistrationExpiryDate
+          if ((getRegistrationExpiryDate.value) && ((registrationType === APIRegistrationTypes.REPAIRERS_LIEN))) {
+            const expiryDate = getRegistrationExpiryDate.value
             const newExpDate = new Date(new Date(expiryDate).toLocaleString('en-US', { timeZone: 'America/Vancouver' }))
             newExpDate.setDate(newExpDate.getDate() + 180)
             return formatExpiryDate(newExpDate)
           }
-          if ((getRegistrationExpiryDate) && (getLengthTrust.lifeYears > 0)) {
-            const expiryDate = getRegistrationExpiryDate
-            const numYears = getLengthTrust.lifeYears
+          if ((getRegistrationExpiryDate.value) && (getLengthTrust.value.lifeYears > 0)) {
+            const expiryDate = getRegistrationExpiryDate.value
+            const numYears = getLengthTrust.value.lifeYears
             const newExpDate = new Date(new Date(expiryDate).toLocaleString('en-US', { timeZone: 'America/Vancouver' }))
             newExpDate.setFullYear(newExpDate.getFullYear() + numYears)
             return formatExpiryDate(newExpDate)
@@ -185,70 +185,70 @@ export default defineComponent({
         if (registrationType === APIRegistrationTypes.REPAIRERS_LIEN) {
           return '180 Days'
         }
-        if (!getLengthTrust.lifeInfinite && getRegistrationFlowType === RegistrationFlowType.NEW &&
-          (!isInt(getLengthTrust.lifeYears) ||
-          getLengthTrust.lifeYears < 1 || getLengthTrust.lifeYears > feeInfoYears.quantityMax)) {
+        if (!getLengthTrust.value.lifeInfinite && getRegistrationFlowType.value === RegistrationFlowType.NEW &&
+          (!isInt(getLengthTrust.value.lifeYears) ||
+          getLengthTrust.value.lifeYears < 1 || getLengthTrust.value.lifeYears > feeInfoYears.quantityMax)) {
           return 'Not valid'
         }
-        if (!getLengthTrust.lifeInfinite && getLengthTrust.lifeYears < 1) {
+        if (!getLengthTrust.value.lifeInfinite && getLengthTrust.value.lifeYears < 1) {
           return 'Not entered'
         }
-        if (getLengthTrust.lifeInfinite) {
+        if (getLengthTrust.value.lifeInfinite) {
           return 'Infinite'
         }
-        if (getLengthTrust.lifeYears === 1) {
-          return getLengthTrust.lifeYears.toString() + ' Year'
+        if (getLengthTrust.value.lifeYears === 1) {
+          return getLengthTrust.value.lifeYears.toString() + ' Year'
         }
-        return getLengthTrust.lifeYears.toString() + ' Years'
+        return getLengthTrust.value.lifeYears.toString() + ' Years'
       }),
       trustIndentureSummary: computed((): string => {
-        return getLengthTrust.trustIndenture ? 'Yes' : 'No'
+        return getLengthTrust.value.trustIndenture ? 'Yes' : 'No'
       }),
       lienAmountSummary: computed((): string => {
-        if (getLengthTrust.lienAmount) {
+        if (getLengthTrust.value.lienAmount) {
           // Format as CDN currency.
-          var currency = getLengthTrust.lienAmount
+          var currency = getLengthTrust.value.lienAmount
             ?.replace('$', '')
             ?.replaceAll(',', '')
           var lienFloat = parseFloat(currency)
           if (isNaN(lienFloat)) {
-            return getLengthTrust.lienAmount
+            return getLengthTrust.value.lienAmount
           }
           return '$' + lienFloat.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')
         }
         return 'Not entered'
       }),
       lengthTrust: computed((): LengthTrustIF => {
-        return getLengthTrust as LengthTrustIF || null
+        return getLengthTrust.value as LengthTrustIF || null
       }),
       surrenderDateSummary: computed((): string => {
         if (props.isRenewal) {
           // TODO: I'm not sure assigning a computed to a computed works as expected or at all. Revisit this asap.
           // eslint-disable-next-line vue/no-side-effects-in-computed-properties
-          getLengthTrust.surrenderDate = getRegistrationSurrenderDate
+          getLengthTrust.value.surrenderDate = getRegistrationSurrenderDate.value
           return convertDate(
-            new Date(getLengthTrust.surrenderDate),
+            new Date(getLengthTrust.value.surrenderDate),
             false,
             false
           )
         }
-        if (getLengthTrust.surrenderDate?.length === 10) {
+        if (getLengthTrust.value.surrenderDate?.length === 10) {
           return convertDate(
-            new Date(getLengthTrust.surrenderDate + 'T09:00:00Z'),
+            new Date(getLengthTrust.value.surrenderDate + 'T09:00:00Z'),
             false,
             false
           )
-        } else if (getLengthTrust.surrenderDate?.length > 10) {
+        } else if (getLengthTrust.value.surrenderDate?.length > 10) {
           return convertDate(
-            new Date(getLengthTrust.surrenderDate),
+            new Date(getLengthTrust.value.surrenderDate),
             false,
             false
           )
         }
-        if (getLengthTrust.surrenderDate === '') {
+        if (getLengthTrust.value.surrenderDate === '') {
           return 'Not entered'
         }
-        return getLengthTrust.surrenderDate
+        return getLengthTrust.value.surrenderDate
       })
     })
     const goToLengthTrust = (): void => {

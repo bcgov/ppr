@@ -106,6 +106,7 @@ import EditTrustIndenture from './EditTrustIndenture.vue'
 import { LengthTrustIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { formatExpiryDate } from '@/utils'
 import { APIRegistrationTypes } from '@/enums'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   components: {
@@ -122,23 +123,22 @@ export default defineComponent({
     }
   },
   setup (props, context) {
+    const { setLengthTrust } = useStore()
     const {
       // Getters
       getLengthTrust,
       getOriginalLengthTrust,
       getRegistrationType,
-      getRegistrationExpiryDate,
-      // Actions
-      setLengthTrust
-    } = useStore()
-    const registrationType = getRegistrationType?.registrationTypeAPI
+      getRegistrationExpiryDate
+    } = storeToRefs(useStore())
+    const registrationType = getRegistrationType.value?.registrationTypeAPI
     const modal = false
 
     const localState = reactive({
       showEditTrustIndenture: false,
       editInProgress: false,
-      originalTrustIndenture: getOriginalLengthTrust.trustIndenture,
-      lifeInfinite: getLengthTrust.valid ? getLengthTrust.lifeInfinite.toString() : '',
+      originalTrustIndenture: getOriginalLengthTrust.value.trustIndenture,
+      lifeInfinite: getLengthTrust.value.valid ? getLengthTrust.value.lifeInfinite.toString() : '',
       trustIndentureHint: '',
       showTrustIndenture: computed((): boolean => {
         return registrationType === APIRegistrationTypes.SECURITY_AGREEMENT
@@ -147,17 +147,17 @@ export default defineComponent({
         return props.isSummary
       }),
       computedExpiryDateFormatted: computed((): string => {
-        if (getLengthTrust.lifeInfinite) {
+        if (getLengthTrust.value.lifeInfinite) {
           return 'No Expiry'
         }
-        if ((getRegistrationExpiryDate)) {
-          return formatExpiryDate(new Date(new Date(getRegistrationExpiryDate)
+        if ((getRegistrationExpiryDate.value)) {
+          return formatExpiryDate(new Date(new Date(getRegistrationExpiryDate.value)
             .toLocaleString('en-US', { timeZone: 'America/Vancouver' })))
         }
         return ''
       }),
       lengthTrust: computed((): LengthTrustIF => {
-        return getLengthTrust as LengthTrustIF || null
+        return getLengthTrust.value as LengthTrustIF || null
       }),
       trustIndenture: computed((): boolean => {
         return localState.lengthTrust.trustIndenture
@@ -174,7 +174,7 @@ export default defineComponent({
     })
 
     const undoTrustIndenture = (): void => {
-      const lt = getLengthTrust
+      const lt = getLengthTrust.value
       lt.trustIndenture = localState.originalTrustIndenture
       delete lt.action
       setLengthTrust(lt)

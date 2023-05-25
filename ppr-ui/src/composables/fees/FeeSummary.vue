@@ -232,6 +232,7 @@ export default defineComponent({
     const {
       getLengthTrust, isRoleStaff, getStaffPayment, isSearchCertified
     } = storeToRefs(useStore())
+
     const localState = reactive({
       feeType: props.setFeeType,
       registrationType: props.setRegistrationType,

@@ -145,11 +145,11 @@
 <script lang="ts">
 import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
 import { useStore } from '@/store/store'
-
 import { searchTableHeaders, VehicleTypes } from '@/resources'
 import { SearchResponseIF, SearchResultIF, TableHeadersIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { MatchTypes } from '@/enums'
 import { convertDate } from '@/utils'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   props: {
@@ -165,7 +165,8 @@ export default defineComponent({
   },
   emits: ['selected-matches', 'submit'],
   setup (props, { emit }) {
-    const { getSearchResults } = useStore()
+    const { getSearchResults } = storeToRefs(useStore())
+
     const localState = reactive({
       searched: false,
       searchValue: '',
@@ -184,7 +185,7 @@ export default defineComponent({
       }),
       setTableData: computed((): SearchResponseIF => {
         let resp = null
-        resp = getSearchResults
+        resp = getSearchResults.value
 
         if (resp) {
           localState.searchValue = resp.searchQuery.criteria.value

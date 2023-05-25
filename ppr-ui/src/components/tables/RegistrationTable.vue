@@ -294,11 +294,9 @@ import {
 import { useStore } from '@/store/store'
 import flushPromises from 'flush-promises'
 import _ from 'lodash'
-// local components
 import { DatePicker } from '@/components/common'
 import RegistrationBarTypeAheadList from '@/components/registration/RegistrationBarTypeAheadList.vue'
 import { TableObserver, TableRow } from './common'
-// local types/helpers/etc.
 /* eslint-disable no-unused-vars */
 import {
   RegistrationSummaryIF,

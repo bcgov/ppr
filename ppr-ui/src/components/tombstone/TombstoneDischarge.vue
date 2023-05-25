@@ -54,6 +54,7 @@ import { formatExpiryDate, pacificDate } from '@/utils'
 import { RegistrationTypeIF } from '@/interfaces' // eslint-disable-line
 import { MhApiStatusTypes, MhUIStatusTypes } from '@/enums'
 import { useMhrInformation } from '@/composables'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'TombstoneDischarge',
@@ -69,46 +70,47 @@ export default defineComponent({
       getRegistrationNumber,
       getRegistrationType,
       getMhrInformation
-    } = useStore()
+    } = storeToRefs(useStore())
     const { isFrozenMhr } = useMhrInformation()
+
     const localState = reactive({
       creationDate: computed((): string => {
-        if (getRegistrationCreationDate) {
-          const date = new Date(getRegistrationCreationDate)
+        if (getRegistrationCreationDate.value) {
+          const date = new Date(getRegistrationCreationDate.value)
           return pacificDate(date)
         }
-        if (getMhrInformation) {
-          const date = new Date(getMhrInformation.createDateTime)
+        if (getMhrInformation.value) {
+          const date = new Date(getMhrInformation.value.createDateTime)
           return pacificDate(date)
         }
         return ''
       }),
       expiryDate: computed((): string => {
-        if (getRegistrationExpiryDate) {
-          return formatExpiryDate(new Date(new Date(getRegistrationExpiryDate)
+        if (getRegistrationExpiryDate.value) {
+          return formatExpiryDate(new Date(new Date(getRegistrationExpiryDate.value)
             .toLocaleString('en-US', { timeZone: 'America/Vancouver' })))
         }
         return 'No Expiry'
       }),
       statusType: computed((): string => {
-        const regStatus = getMhrInformation.statusType
+        const regStatus = getMhrInformation.value.statusType
 
         return isFrozenMhr.value || regStatus === MhApiStatusTypes.DRAFT
           ? MhUIStatusTypes.ACTIVE
           : regStatus[0] + regStatus.toLowerCase().slice(1)
       }),
       header: computed((): string => {
-        const numberType = getRegistrationNumber ? 'Base' : 'Manufactured Home'
-        const regNum = getRegistrationNumber || getMhrInformation.mhrNumber || ''
+        const numberType = getRegistrationNumber.value ? 'Base' : 'Manufactured Home'
+        const regNum = getRegistrationNumber.value || getMhrInformation.value.mhrNumber || ''
 
         return numberType + ' Registration Number ' + regNum
       }),
       registrationType: computed((): string => {
-        const registration = getRegistrationType as RegistrationTypeIF
+        const registration = getRegistrationType.value as RegistrationTypeIF
         return registration?.registrationTypeUI || ''
       }),
       dateTimePrefix: computed(() => {
-        return getRegistrationNumber ? 'Base' : 'MH'
+        return getRegistrationNumber.value ? 'Base' : 'MH'
       })
     })
 

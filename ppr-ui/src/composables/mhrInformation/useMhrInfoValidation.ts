@@ -14,7 +14,6 @@ export const useMhrInfoValidation = (validationState: mhrInfoValidationStateIF) 
     isRoleStaffReg,
     hasUnsavedChanges
   } = storeToRefs(useStore())
-
   const {
     isGlobalEditingMode,
     getGroupById
