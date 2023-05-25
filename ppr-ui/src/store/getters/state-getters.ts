@@ -637,6 +637,10 @@ export const getIsManualLocation = (state: StateIF): boolean => {
   return state.stateModel.mhrRegistration.isManualLocationInfo
 }
 
+export const getMhrRegistrationOwnLand = (state: StateIF): boolean => {
+  return state.stateModel.mhrRegistration.ownLand
+}
+
 export const getMhrRegistrationHomeOwnerGroups = (state: StateIF): MhrRegistrationHomeOwnerGroupIF[] => {
   return state.stateModel.mhrRegistration.ownerGroups
 }

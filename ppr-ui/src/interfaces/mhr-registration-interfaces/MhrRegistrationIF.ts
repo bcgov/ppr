@@ -13,6 +13,7 @@ export interface MhrRegistrationIF {
   ownerGroups: MhrRegistrationHomeOwnerGroupIF[]
   attentionReference: string
   isManualLocationInfo: boolean
+  ownLand: boolean
   location: MhrRegistrationHomeLocationIF
   description: MhrRegistrationDescriptionIF
   notes: [
@@ -61,6 +62,7 @@ export interface NewMhrRegistrationApiIF {
   description: MhrRegistrationDescriptionIF
   attentionReference?: string
   isManualLocationInfo?: boolean
+  ownLand?: boolean
   notes?: [
     {
       documentType: string
