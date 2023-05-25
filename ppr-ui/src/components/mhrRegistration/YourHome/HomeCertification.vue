@@ -100,14 +100,16 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable no-unused-vars */
-import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue-demi'
 import { SharedDatePicker } from '@/components/common'
 import { HomeCertificationOptions } from '@/enums'
 import { useInputRules, useMhrValidations } from '@/composables'
 import { useStore } from '@/store/store'
 import { createUtcDate, localTodayDate } from '@/utils/date-helper'
 import { storeToRefs } from 'pinia'
+/* eslint-disable no-unused-vars */
+import { FormIF } from '@/interfaces'
+/* eslint-enable no-unused-vars */
 
 export default defineComponent({
   name: 'HomeCertification',
@@ -120,10 +122,9 @@ export default defineComponent({
       default: false
     }
   },
-  setup (props, context) {
+  setup (props) {
     const { setMhrHomeDescription } = useStore()
     const { getMhrRegistrationHomeDescription, getMhrRegistrationValidationModel } = storeToRefs(useStore())
-
     // Composable(s)
     const {
       customRules,
@@ -131,12 +132,14 @@ export default defineComponent({
       maxLength,
       required
     } = useInputRules()
-
     const {
       MhrCompVal,
       MhrSectVal,
       setValidation
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
+    const csaForm = ref(null) as FormIF
+    const engineerForm = ref(null) as FormIF
+    const datePicker = ref(null) as FormIF
 
     const localState = reactive({
       homeCertificationValid: false,
@@ -182,14 +185,11 @@ export default defineComponent({
 
     const validateForms = async () => {
       if (localState.isCsaOption) {
-        // @ts-ignore - function exists
-        await context.refs.csaForm?.validate()
+        csaForm.value?.validate()
       }
       if (localState.isEngineerOption) {
-        // @ts-ignore - function exists
-        await context.refs.engineerForm?.validate()
-        // @ts-ignore - function exists
-        await context.refs.datePicker?.validateForm()
+        engineerForm.value?.validate()
+        await datePicker.value?.validate()
       }
     }
 
@@ -220,7 +220,7 @@ export default defineComponent({
     watch(() => localState.certificationOption, async () => {
       if (localState.isCsaOption) {
         // @ts-ignore - function exists
-        await context.refs.engineerForm?.resetValidation()
+        engineerForm.value?.resetValidation()
         props.validate && await validateForms()
 
         localState.engineerName = ''
@@ -228,7 +228,7 @@ export default defineComponent({
       }
       if (localState.isEngineerOption) {
         // @ts-ignore - function exists
-        await context.refs.csaForm?.resetValidation()
+        csaForm.value?.resetValidation()
         props.validate && await validateForms()
 
         localState.csaNumber = ''

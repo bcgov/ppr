@@ -258,7 +258,7 @@ export default defineComponent({
     })
 
     watch(() => props.validate, () => {
-      makeModelComboForm.validate()
+      makeModelComboForm.value?.validate()
     })
 
     return {

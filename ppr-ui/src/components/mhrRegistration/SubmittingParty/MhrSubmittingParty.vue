@@ -156,19 +156,18 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable no-unused-vars */
-import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue-demi'
 import { useInputRules, useMhrValidations } from '@/composables'
 import { useStore } from '@/store/store'
+import { storeToRefs } from 'pinia'
 import { BaseAddress } from '@/composables/address'
 import { SubmittingPartyTypes } from '@/enums'
 import { PartyAddressSchema } from '@/schemas'
 import { cloneDeep } from 'lodash'
 import { VueMaskDirective } from 'v-mask'
 import { fromDisplayPhone, toDisplayPhone } from '@/utils'
-import { ContentIF, SubmittingPartyIF } from '@/interfaces'
-import { storeToRefs } from 'pinia'
-
+/* eslint-disable no-unused-vars */
+import { ContentIF, FormIF, SubmittingPartyIF } from '@/interfaces'
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
@@ -217,12 +216,12 @@ export default defineComponent({
       isEmailOptional,
       isPhone
     } = useInputRules()
-
     const {
       MhrCompVal,
       MhrSectVal,
       setValidation
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
+    const submittingPartyForm = ref(null) as FormIF
 
     const localState = reactive({
       enableLookUp: true,
@@ -359,8 +358,7 @@ export default defineComponent({
     })
 
     watch(() => props.validate, async () => {
-      // @ts-ignore - function exists
-      await context.refs.submittingPartyForm.validate()
+      submittingPartyForm.value?.validate()
     })
 
     watch(() => localState.isSubmitterValid, (val: boolean) => {

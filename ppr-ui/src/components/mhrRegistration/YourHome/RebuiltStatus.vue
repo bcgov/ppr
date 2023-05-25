@@ -24,10 +24,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs, watch } from 'vue-demi'
+import { defineComponent, reactive, ref, toRefs, watch } from 'vue-demi'
 import { useStore } from '@/store/store'
 import { useInputRules, useMhrValidations } from '@/composables/'
 import { storeToRefs } from 'pinia'
+import { FormIF } from '@/interfaces'
 
 export default defineComponent({
   name: 'RebuiltStatus',
@@ -38,7 +39,7 @@ export default defineComponent({
       default: false
     }
   },
-  setup (props, context) {
+  setup (props) {
     const { setMhrHomeDescription } = useStore()
     const { getMhrRegistrationHomeDescription, getMhrRegistrationValidationModel } = storeToRefs(useStore())
     const { maxLength } = useInputRules()
@@ -47,6 +48,7 @@ export default defineComponent({
       MhrSectVal,
       setValidation
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
+    const rebuiltStatus = ref(null) as FormIF
 
     const localState = reactive({
       isRebuiltStatusValid: false,
@@ -62,8 +64,7 @@ export default defineComponent({
     })
 
     watch(() => props.validate, async () => {
-      // @ts-ignore - function exists
-      await context.refs.rebuiltStatus.validate()
+      rebuiltStatus.validate()
     })
 
     return { maxLength, ...toRefs(localState) }

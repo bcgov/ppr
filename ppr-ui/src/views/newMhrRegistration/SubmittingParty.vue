@@ -103,7 +103,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue-demi'
 import { MhrSubmittingParty } from '@/components/mhrRegistration/SubmittingParty'
 import { PartySearch } from '@/components/parties/party'
 import { useMhrValidations } from '@/composables/mhrRegistration/useMhrValidations'
@@ -111,7 +111,7 @@ import { useStore } from '@/store/store'
 import { useInputRules } from '@/composables'
 import { validateDocumentID } from '@/utils'
 // eslint-disable-next-line no-unused-vars
-import { AttnRefConfigIF, MhrDocIdResponseIF } from '@/interfaces'
+import { AttnRefConfigIF, MhrDocIdResponseIF, FormIF } from '@/interfaces'
 import { clientConfig, staffConfig } from '@/resources/attnRefConfigs'
 import { storeToRefs } from 'pinia'
 
@@ -121,8 +121,7 @@ export default defineComponent({
     PartySearch,
     MhrSubmittingParty
   },
-  props: {},
-  setup (props, context) {
+  setup () {
     const {
       // Actions
       setMhrRegistrationDocumentId,
@@ -145,6 +144,7 @@ export default defineComponent({
       getSectionValidation,
       scrollToInvalid
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
+    const documentIdForm = ref(null) as FormIF
 
     const localState = reactive({
       attentionReference: getMhrAttentionReferenceNum.value || '',
@@ -206,9 +206,8 @@ export default defineComponent({
     }, { immediate: true }
     )
 
-    watch(() => localState.validateDocId, async () => {
-      // @ts-ignore - function exists
-      await context.refs.documentIdForm.validate()
+    watch(() => localState.validateDocId, () => {
+      documentIdForm.value?.validate()
     })
 
     watch(() => localState.attentionReference, (val: string) => {

@@ -100,15 +100,14 @@ export default defineComponent({
     }
 
     /** Triggers the form validation. */
-    const validateForm = (): boolean => {
-      // @ts-ignore - function exists
-      return context.refs.form.validate()
+    const validate = (): boolean => {
+      return form.value.validate()
     }
 
     /** Returns whether date validation passes. */
     const isDateValid = (): boolean => {
       // @ts-ignore - function exists
-      return context.refs?.dateTextField?.valid
+      return dateTextField.value?.valid
     }
 
     /** Called before component is mounted. */
@@ -148,7 +147,7 @@ export default defineComponent({
       emitDate,
       emitCancel,
       emitClear,
-      validateForm,
+      validate,
       isDateValid,
       ...toRefs(localState)
     }
