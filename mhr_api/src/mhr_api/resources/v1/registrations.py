@@ -23,8 +23,8 @@ from registry_schemas import utils as schema_utils
 from mhr_api.utils.auth import jwt
 from mhr_api.exceptions import BusinessException, DatabaseException
 from mhr_api.services.authz import authorized, authorized_role, is_staff, is_all_staff_account, REGISTER_MH
-from mhr_api.services.authz import is_reg_staff_account
-from mhr_api.models import MhrRegistration
+from mhr_api.services.authz import is_reg_staff_account, get_group, MANUFACTURER_GROUP
+from mhr_api.models import MhrRegistration, MhrManufacturer
 from mhr_api.models.registration_utils import AccountRegistrationParams
 from mhr_api.reports.v2.report_utils import ReportTypes
 from mhr_api.resources import utils as resource_utils, registration_utils as reg_utils
@@ -36,6 +36,7 @@ bp = Blueprint('REGISTRATIONS1',  # pylint: disable=invalid-name
                __name__, url_prefix='/api/v1/registrations')
 CURRENT_PARAM: str = 'current'
 COLLAPSE_PARAM: str = 'collapse'
+ACCOUNT_MANUFACTURER_ERROR = 'No existing manufacturer information found for account={account_id}.'
 
 
 @bp.route('', methods=['GET', 'OPTIONS'])
@@ -80,7 +81,7 @@ def get_account_registrations():
 @bp.route('', methods=['POST', 'OPTIONS'])
 @cross_origin(origin='*')
 @jwt.requires_auth
-def post_registrations():  # pylint: disable=too-many-return-statements
+def post_registrations():  # pylint: disable=too-many-return-statements,too-many-branches
     """Create a new MHR registration."""
     account_id = ''
     try:
@@ -92,6 +93,14 @@ def post_registrations():  # pylint: disable=too-many-return-statements
         if not authorized_role(jwt, REGISTER_MH):
             current_app.logger.error('User not staff or missing required role: ' + REGISTER_MH)
             return resource_utils.unauthorized_error_response(account_id)
+        manufacturer: MhrManufacturer = None
+        if get_group(jwt) == MANUFACTURER_GROUP:
+            current_app.logger.debug(f'Manufacturer request looking up info for account={account_id}.')
+            manufacturer = MhrManufacturer.find_by_account_id(account_id)
+            if not manufacturer:
+                current_app.logger.info(f'No manufacturer info found for account id={account_id}')
+                return resource_utils.bad_request_response(ACCOUNT_MANUFACTURER_ERROR.format(account_id=account_id))
+
         request_json = request.get_json(silent=True)
         # Validate request against the schema.
         # Location may have no street - replace with blank to pass validation
@@ -101,12 +110,17 @@ def post_registrations():  # pylint: disable=too-many-return-statements
         valid_format, errors = schema_utils.validate(request_json, 'registration', 'mhr')
         # Additional validation not covered by the schema.
         extra_validation_msg = resource_utils.validate_registration(request_json, is_staff(jwt))
+        group: str = get_group(jwt)
+        if manufacturer and group == MANUFACTURER_GROUP:
+            extra_validation_msg += resource_utils.validate_registration_manufacturer(request_json, manufacturer)
+
         if not valid_format or extra_validation_msg != '':
             return resource_utils.validation_error_response(errors, reg_utils.VAL_ERROR, extra_validation_msg)
         # Set up the registration, pay, and save the data.
         registration = reg_utils.pay_and_save_registration(request,
                                                            request_json,
                                                            account_id,
+                                                           group,
                                                            TransactionTypes.REGISTRATION)
         registration.report_view = True
         response_json = registration.new_registration_json
@@ -114,6 +128,7 @@ def post_registrations():  # pylint: disable=too-many-return-statements
         # Return report if request header Accept MIME type is application/pdf.
         if resource_utils.is_pdf(request):
             current_app.logger.info('Report not yet available: returning JSON.')
+        response_json['usergroup'] = group
         if is_reg_staff_account(account_id):
             token = g.jwt_oidc_token_info
             username: str = token.get('firstname', '') + ' ' + token.get('lastname', '')
@@ -122,6 +137,7 @@ def post_registrations():  # pylint: disable=too-many-return-statements
             del response_json['username']
         else:
             reg_utils.enqueue_registration_report(registration, response_json, ReportTypes.MHR_REGISTRATION)
+        del response_json['usergroup']
         return response_json, HTTPStatus.CREATED
 
     except DatabaseException as db_exception:

@@ -780,3 +780,9 @@ def search_ts_local(date_iso: str, start: bool = True):
         return _datetime.combine(date_part, day_time)
     day_time = time(23, 59, 59, tzinfo=LOCAL_TZ)
     return _datetime.combine(date_part, day_time)
+
+
+def valid_manufacturer_year(year: int) -> bool:
+    """Check if a manufacturer MH home year is within 1 year of the current year."""
+    now = now_ts()
+    return now.year == year or now.year == (year + 1) or now.year == (year - 1)

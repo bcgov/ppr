@@ -23,8 +23,10 @@ import pytest
 from flask import current_app
 from registry_schemas.example_data.mhr import REGISTRATION
 
-from mhr_api.models import MhrRegistration, registration_utils as reg_utils
+from mhr_api.models import MhrRegistration, registration_utils as reg_utils, utils as model_utils
 from mhr_api.services.authz import COLIN_ROLE, MHR_ROLE, STAFF_ROLE, BCOL_HELP, ASSETS_HELP
+from mhr_api.services.authz import REGISTER_MH, TRANSFER_SALE_BENEFICIARY, MANUFACTURER_GROUP
+
 from tests.unit.services.utils import create_header, create_header_account
 
 
@@ -44,6 +46,73 @@ LOCATION = {
     'pad': '2',
     'additionalDescription': 'TEST PARK'
 }
+MANUFACTURER_VALID = {
+  'clientReferenceId': 'EX-MH001234',
+  'attentionReference': 'GWB14768.100',
+  'description': {
+    'manufacturer': 'REAL ENGINEERED HOMES INC',
+    'baseInformation': {
+      'year': 2023,
+      'make': 'WATSON IND. (ALTA)',
+      'model': 'DUCHESS'
+    },
+    'sectionCount': 1,
+    'sections': [
+      {
+        'serialNumber': '52D70556',
+        'lengthFeet': 52,
+        'lengthInches': 0,
+        'widthFeet': 12,
+        'widthInches': 0
+      }
+    ],
+    'csaNumber': '786356',
+    'csaStandard': 'Z240'
+  }, 
+  'location': {
+    'address': {
+      'city': 'PENTICTON', 
+      'country': 'CA', 
+      'postalCode': 'V2A 7A1', 
+      'region': 'BC', 
+      'street': '1704 GOVERNMENT ST.'
+    }, 
+    'dealerName': 'REAL ENGINEERED HOMES INC', 
+    'leaveProvince': False, 
+    'locationType': 'MANUFACTURER'
+  }, 
+  'ownerGroups': [
+    {
+      'groupId': 1, 
+      'owners': [
+        {
+          'address': {
+            'city': 'PENTICTON', 
+            'country': 'CA', 
+            'postalCode': 'V2A 7A1', 
+            'region': 'BC', 
+            'street': '1704 GOVERNMENT ST.'
+          }, 
+          'organizationName': 'REAL ENGINEERED HOMES INC', 
+          'partyType': 'OWNER_BUS'
+        }
+      ], 
+      'type': 'SOLE'
+    }
+  ], 
+  'submittingParty': {
+    'address': {
+      'city': 'PENTICTON', 
+      'country': 'CA', 
+      'postalCode': 'V2A 7A1', 
+      'region': 'BC', 
+      'street': '1704 GOVERNMENT ST.'
+    }, 
+    'businessName': 'REAL ENGINEERED HOMES INC', 
+    'phoneNumber': '2507701067'
+  }
+}
+MANUFACTURER_ROLES = [MHR_ROLE, TRANSFER_SALE_BENEFICIARY, REGISTER_MH]
 # testdata pattern is ({desc}, {roles}, {status}, {has_account}, {results_size})
 TEST_GET_ACCOUNT_DATA = [
     ('Missing account', [MHR_ROLE], HTTPStatus.BAD_REQUEST, False, 0),
@@ -59,6 +128,12 @@ TEST_CREATE_DATA = [
     ('Invalid role', True, [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, True),
     ('Invalid non-staff role', True, [MHR_ROLE], HTTPStatus.UNAUTHORIZED, True),
     ('Valid staff', True, [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, True)
+]
+# testdata pattern is ({description}, {year_offset}, {status}, {account_id})
+TEST_CREATE_MANUFACTURER_DATA = [
+    ('Valid', 0, HTTPStatus.CREATED, '2523')
+#    ('Invalid account id', 0, HTTPStatus.BAD_REQUEST, 'JUNK'),
+#    ('Invalid MH year', -2, HTTPStatus.BAD_REQUEST, '2523')
 ]
 # testdata pattern is ({description}, {roles}, {status}, {account}, {mhr_num})
 TEST_GET_REGISTRATION = [
@@ -170,6 +245,31 @@ def test_create(session, client, jwt, desc, has_submitting, roles, status, has_a
     if response.status_code == HTTPStatus.CREATED:
         registration: MhrRegistration = MhrRegistration.find_by_mhr_number(response.json['mhrNumber'],
                                                                            'PS12345')
+        assert registration
+
+
+@pytest.mark.parametrize('desc,year_offset,status,account_id', TEST_CREATE_MANUFACTURER_DATA)
+def test_create_man(session, client, jwt, desc, year_offset, status, account_id):
+    """Assert that a post MH registration for a manufacturer works as expected."""
+    # setup
+    current_app.config.update(PAYMENT_SVC_URL=MOCK_PAY_URL)
+    current_app.config.update(AUTH_SVC_URL=MOCK_AUTH_URL)
+    json_data = copy.deepcopy(MANUFACTURER_VALID)
+    now = model_utils.now_ts()
+    json_data['description']['baseInformation']['year'] = now.year + year_offset
+    headers = create_header_account(jwt, MANUFACTURER_ROLES, 'test-user', account_id)
+
+    # test
+    response = client.post('/api/v1/registrations',
+                           json=json_data,
+                           headers=headers,
+                           content_type='application/json')
+
+    # check
+    assert response.status_code == status
+    if response.status_code == HTTPStatus.CREATED:
+        registration: MhrRegistration = MhrRegistration.find_by_mhr_number(response.json['mhrNumber'],
+                                                                           account_id)
         assert registration
 
 

@@ -19,10 +19,10 @@ import pytest
 from registry_schemas import utils as schema_utils
 from registry_schemas.example_data.mhr import REGISTRATION, TRANSFER, EXEMPTION
 
-from mhr_api.utils import registration_validator as validator
-from mhr_api.models import MhrRegistration
-from mhr_api.models.type_tables import MhrRegistrationStatusTypes, MhrTenancyTypes, MhrDocumentTypes, MhrLocationTypes
-from mhr_api.models.utils import is_legacy
+from mhr_api.utils import registration_validator as validator, manufacturer_validator as man_validator
+from mhr_api.models import MhrRegistration, MhrManufacturer
+from mhr_api.models.type_tables import MhrRegistrationStatusTypes, MhrTenancyTypes, MhrDocumentTypes
+from mhr_api.models.utils import is_legacy, now_ts
 from mhr_api.services.authz import QUALIFIED_USER_GROUP
 from tests.unit.utils.test_registration_data import (
     SO_VALID,
@@ -50,7 +50,11 @@ from tests.unit.utils.test_registration_data import (
     JT_VALID_ADMIN,
     TC_VALID_EXEC,
     TC_VALID_TRUSTEE,
-    TC_VALID_ADMIN
+    TC_VALID_ADMIN,
+    MANUFACTURER_VALID,
+    MANUFACTURER_SUB_INVALID,
+    MANUFACTURER_LOCATION_INVALID,
+    MANUFACTURER_DESC_INVALID
 )
 
 
@@ -77,6 +81,30 @@ TEST_REG_DATA = [
     (DESC_MISSING_OWNER_GROUP, False, True, DOC_ID_VALID, validator.OWNER_GROUPS_REQUIRED),
     (DESC_MISSING_DOC_ID, False, True, None, validator.DOC_ID_REQUIRED),
     (DESC_DOC_ID_EXISTS, False, True, DOC_ID_EXISTS, validator.DOC_ID_EXISTS)
+]
+# testdata pattern is ({description}, {valid}, {submitting}, {owners}, {location}, {desc}, {message content})
+TEST_MANUFACTURER_DATA = [
+    ('Valid', True, None, None, None, None, None),
+    ('Invalid submitting party', False, MANUFACTURER_SUB_INVALID, None, None, None, man_validator.SUBMITTING_MISMATCH),
+    ('Invalid owner', False, None, SO_VALID, None, None, man_validator.OWNER_MISMATCH),
+    ('Invalid owner count', False, None, JT_VALID, None, None, man_validator.OWNER_COUNT_INVALID),
+    ('Invalid group type', False, None, JT_VALID, None, None, man_validator.OWNER_GROUP_TYPE_INVALID),
+    ('Invalid group count', False, None, TC_GROUPS_VALID, None, None, man_validator.OWNER_GROUP_COUNT_INVALID),
+    ('Invalid loc type', False, None, None, MANUFACTURER_LOCATION_INVALID, None, man_validator.LOCATION_TYPE_INVALID),
+    ('Invalid location', False, None, None, MANUFACTURER_LOCATION_INVALID, None, man_validator.LOCATION_MISMATCH),
+    ('Invalid description', False, None, None, None, MANUFACTURER_DESC_INVALID,
+     man_validator.DESC_MANUFACTURER_MISMATCH)
+]
+# testdata pattern is ({year_offset}, {rebuilt}, {other}, {csa}, {eng_date}, {eng_name}, {message content})
+TEST_MANUFACTURER_DESC_DATA = [
+    (-1, None, None, '786356', None, None, None),
+    (1, None, None, '786356', None, None, None),
+    (-2, None, None, '786356', None, None, man_validator.YEAR_INVALID),
+    (0, 'TEST', None, '786356', None, None, man_validator.REBUILT_INVALID),
+    (0, None, 'TEST', '786356', None, None, man_validator.OTHER_INVALID),
+    (0, None, None, None, None, None, man_validator.CSA_NUMBER_REQIRED),
+    (0, None, None, '786356', '2022-11-28T17:05:15-07:53', None, man_validator.ENGINEER_DATE_INVALID),
+    (0, None, None, '786356', None, 'TEST', man_validator.ENGINEER_NAME_INVALID)
 ]
 # testdata pattern is ({doc_id}, {valid})
 TEST_CHECKSUM_DATA = [
@@ -275,6 +303,38 @@ def test_validate_registration(session, desc, valid, staff, doc_id, message_cont
     error_msg = validator.validate_registration(json_data, staff)
     if errors:
         current_app.logger.debug(errors)
+    if valid:
+        assert valid_format and error_msg == ''
+    else:
+        assert error_msg != ''
+        if message_content:
+            assert error_msg.find(message_content) != -1
+
+
+@pytest.mark.parametrize('desc,valid,submitting,owners,location,description,message_content', TEST_MANUFACTURER_DATA)
+def test_validate_registration_man(session, desc, valid, submitting, owners, location, description, message_content):
+    """Assert that new MH registration validation for a manufacturer works as expected."""
+    # setup
+    json_data = copy.deepcopy(MANUFACTURER_VALID)
+    now = now_ts()
+    json_data['description']['baseInformation']['year'] = now.year
+    if submitting:
+        json_data['submittingParty'] = submitting
+    if owners:
+        json_data['ownerGroups'] = owners
+    if location:
+        json_data['location'] = location
+    if description:
+        json_data['description'] = description
+    manufacturer: MhrManufacturer = MhrManufacturer.find_by_account_id('2523')
+    valid_format, errors = schema_utils.validate(json_data, 'registration', 'mhr')
+    # if errors:
+    #    current_app.logger.debug('Schema errors')
+    #    for error in errors:
+    #        current_app.logger.debug(error)
+    # Additional validation not covered by the schema.
+    error_msg = validator.validate_registration(json_data, False)
+    error_msg += man_validator.validate_registration(json_data, manufacturer)
     if valid:
         assert valid_format and error_msg == ''
     else:
@@ -697,6 +757,35 @@ def test_validate_registration_party(session, desc, valid, group1, group2, g1_ty
     #    current_app.logger.debug(error_msg)
     if valid:
         assert valid_format and error_msg == ''
+    else:
+        assert error_msg != ''
+        if message_content:
+            assert error_msg.find(message_content) != -1
+
+
+@pytest.mark.parametrize('year_offset,rebuilt,other,csa,eng_date,eng_name,message_content', TEST_MANUFACTURER_DESC_DATA)
+def test_validate_man_desc(session, year_offset, rebuilt, other, csa, eng_date, eng_name, message_content):
+    """Assert that new MH registration validation for a manufacturer description works as expected."""
+    # setup
+    json_data = copy.deepcopy(MANUFACTURER_VALID)
+    now = now_ts()
+    description = json_data['description']
+    description['baseInformation']['year'] = now.year + year_offset
+    if rebuilt:
+        description['rebuiltRemarks'] = rebuilt
+    if other:
+        description['otherRemarks'] = other
+    if not csa:
+        del description['csaNumber']
+    if eng_date:
+        description['engineerDate'] = eng_date
+    if eng_name:
+        description['engineerName'] = eng_name
+    manufacturer: MhrManufacturer = MhrManufacturer.find_by_account_id('2523')
+    # Additional validation not covered by the schema.
+    error_msg = man_validator.validate_registration(json_data, manufacturer)
+    if not message_content:
+        assert error_msg == ''
     else:
         assert error_msg != ''
         if message_content:

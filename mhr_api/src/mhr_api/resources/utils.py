@@ -22,7 +22,7 @@ from mhr_api.models import utils as model_utils, registration_utils as reg_utils
 from mhr_api.models.registration_utils import AccountRegistrationParams
 from mhr_api.services.authz import user_orgs, is_reg_staff_account, is_sbc_office_account, is_bcol_help
 from mhr_api.services.payment.exceptions import SBCPaymentException
-from mhr_api.utils import registration_validator
+from mhr_api.utils import registration_validator, manufacturer_validator
 
 
 # Resource error messages
@@ -249,6 +249,11 @@ def get_account_name(token: str, account_id: str = None):  # pylint: disable=too
 def validate_registration(json_data, is_staff: bool = False):
     """Perform non-schema extra validation on a MH new registration."""
     return registration_validator.validate_registration(json_data, is_staff)
+
+
+def validate_registration_manufacturer(json_data, manufacturer):
+    """Perform non-schema extra validation on a MH new registration for a manufacturer."""
+    return manufacturer_validator.validate_registration(json_data, manufacturer)
 
 
 def validate_transfer(registration, json_data, is_staff: bool, group: str):

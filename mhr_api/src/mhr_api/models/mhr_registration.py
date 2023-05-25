@@ -169,7 +169,8 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                 'documentDescription': MhrRegistration.get_doc_desc(doc_json.get('documentType')),
                 'documentId': doc_json.get('documentId'),
                 'documentRegistrationNumber': doc_json.get('documentRegistrationNumber'),
-                'ownLand': doc_json.get('ownLand')
+                'ownLand': doc_json.get('ownLand'),
+                'affirmByName': doc_json.get('affirmByName')
             }
             if self.client_reference_id:
                 reg_json['clientReferenceId'] = self.client_reference_id
@@ -539,11 +540,11 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         return registration
 
     @staticmethod
-    def create_new_from_json(json_data, account_id: str = None, user_id: str = None):
+    def create_new_from_json(json_data, account_id: str = None, user_id: str = None, user_group: str = None):
         """Create a new registration object from dict/json."""
         # Create or update draft.
         draft = reg_utils.find_draft(json_data)
-        reg_vals: MhrRegistration = reg_utils.get_generated_values(MhrRegistration(), draft)
+        reg_vals: MhrRegistration = reg_utils.get_generated_values(MhrRegistration(), draft, user_group)
         registration: MhrRegistration = MhrRegistration()
         registration.id = reg_vals.id  # pylint: disable=invalid-name; allow name of id.
         registration.mhr_number = reg_vals.mhr_number
@@ -554,7 +555,11 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         registration.status_type = MhrRegistrationStatusTypes.ACTIVE
         registration.account_id = account_id
         registration.user_id = user_id
-        registration.doc_id = json_data.get('documentId', '')
+        if json_data.get('documentId'):
+            registration.doc_id = json_data.get('documentId')
+        else:
+            registration.doc_id = reg_vals.doc_id
+            json_data['documentId'] = registration.doc_id
         registration.reg_json = json_data
         if not draft:
             registration.draft_number = reg_vals.draft_number

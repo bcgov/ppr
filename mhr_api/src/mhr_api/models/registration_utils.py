@@ -25,6 +25,7 @@ from mhr_api.models import utils as model_utils, MhrDraft
 from mhr_api.models.db import db
 from mhr_api.models.type_tables import MhrRegistrationTypes
 from mhr_api.services.authz import MANUFACTURER_GROUP, QUALIFIED_USER_GROUP, GENERAL_USER_GROUP, BCOL_HELP
+from mhr_api.services.authz import GOV_ACCOUNT_ROLE
 
 
 # Account registration request parameters to support sorting and filtering.
@@ -195,15 +196,28 @@ def is_transfer_due_to_death_staff(reg_type: str) -> bool:
                                      MhrRegistrationTypes.TRANS_WILL)
 
 
-def get_generated_values(registration, draft):
+def get_generated_values(registration, draft, user_group: str = None):
     """Get db generated identifiers that are in more than one table.
 
     Get registration_id, mhr_number, and optionally draft_number.
     """
     # generate reg id, MHR number. If not existing draft also generate draft number
     query = QUERY_PKEYS
+    gen_doc_id: bool = False
     if draft:
         query = QUERY_PKEYS_NO_DRAFT
+    if user_group and user_group in (QUALIFIED_USER_GROUP, GENERAL_USER_GROUP, BCOL_HELP):
+        query += DOC_ID_QUALIFIED_CLAUSE
+        gen_doc_id = True
+        current_app.logger.debug('Updating query to generate qualified user document id.')
+    elif user_group and user_group == MANUFACTURER_GROUP:
+        query += DOC_ID_MANUFACTURER_CLAUSE
+        gen_doc_id = True
+        current_app.logger.debug('Updating query to generate manufacturer document id.')
+    elif user_group and user_group == GOV_ACCOUNT_ROLE:
+        query += DOC_ID_GOV_AGENT_CLAUSE
+        gen_doc_id = True
+        current_app.logger.debug('Updating query to generate government agent document id.')
     result = db.session.execute(query)
     row = result.first()
     registration.id = int(row[0])
@@ -213,6 +227,10 @@ def get_generated_values(registration, draft):
     if not draft:
         registration.draft_number = str(row[4])
         registration.draft_id = int(row[5])
+    if gen_doc_id and not draft:
+        registration.doc_id = str(row[4])
+    elif gen_doc_id and draft:
+        registration.doc_id = str(row[6])
     return registration
 
 
