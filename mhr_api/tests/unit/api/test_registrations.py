@@ -131,9 +131,9 @@ TEST_CREATE_DATA = [
 ]
 # testdata pattern is ({description}, {year_offset}, {status}, {account_id})
 TEST_CREATE_MANUFACTURER_DATA = [
-    ('Valid', 0, HTTPStatus.CREATED, '2523')
-#    ('Invalid account id', 0, HTTPStatus.BAD_REQUEST, 'JUNK'),
-#    ('Invalid MH year', -2, HTTPStatus.BAD_REQUEST, '2523')
+    ('Valid', 0, HTTPStatus.CREATED, '2523'),
+    ('Invalid account id', 0, HTTPStatus.BAD_REQUEST, 'JUNK'),
+    ('Invalid MH year', -2, HTTPStatus.BAD_REQUEST, '2523')
 ]
 # testdata pattern is ({description}, {roles}, {status}, {account}, {mhr_num})
 TEST_GET_REGISTRATION = [
