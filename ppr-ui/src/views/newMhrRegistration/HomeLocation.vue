@@ -25,20 +25,28 @@
         :class="{ 'border-error-left': validateCivicAddress }"
       />
     </section>
+    <section id="mhr-home-land-ownership-wrapper" class="mt-10">
+      <h2>Land Details</h2>
+      <p class="mt-2">
+        Confirm the land lease or ownership information for the home.
+      </p>
+      <HomeLandOwnership />
+    </section>
   </div>
 </template>
 
 <script lang="ts">
 import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
 import { useGetters } from 'vuex-composition-helpers'
-import { HomeLocationType, HomeCivicAddress } from '@/components/mhrRegistration'
+import { HomeLocationType, HomeCivicAddress, HomeLandOwnership } from '@/components/mhrRegistration'
 import { useMhrValidations } from '@/composables/mhrRegistration/useMhrValidations'
 
 export default defineComponent({
   name: 'HomeLocation',
   components: {
     HomeLocationType,
-    HomeCivicAddress
+    HomeCivicAddress,
+    HomeLandOwnership
   },
   props: {},
   setup () {
