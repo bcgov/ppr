@@ -733,7 +733,7 @@ def __get_summary_result(result, reg_summary_list) -> dict:
     if not reg_summary_list:
         return match
     mhr_num = result.get('mhrNumber')
-    doc_id = result.get('documentId')
+    doc_id = str(result.get('documentId')).strip()
     for reg in reg_summary_list:
         reg_mhr_num = reg.get('mhr_number')
         reg_doc_id = reg.get('document_id')
