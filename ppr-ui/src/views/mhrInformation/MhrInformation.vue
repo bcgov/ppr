@@ -305,7 +305,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, nextTick, onMounted, reactive, ref, toRefs, watch } from 'vue-demi'
+import { Component, computed, defineComponent, nextTick, onMounted, reactive, ref, toRefs, watch } from 'vue-demi'
 import { useRouter } from 'vue2-helpers/vue-router'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
@@ -446,8 +446,8 @@ export default defineComponent({
     } = useTransferOwners()
 
     // Refs
-    const homeOwnersComponentRef = ref(null)
-    const transferDetailsComponent = ref(null)
+    const homeOwnersComponentRef = ref(null) as Component
+    const transferDetailsComponent = ref(null) as Component
 
     const localState = reactive({
       dataLoaded: false,
@@ -687,7 +687,7 @@ export default defineComponent({
 
       // Force show removed/deceased homeOwners when invalid
       if (!getInfoValidation('isValidTransferOwners')) {
-        (homeOwnersComponentRef as any)?.hideShowRemovedOwners(true)
+        (homeOwnersComponentRef as any).value?.hideShowRemovedOwners(true)
       }
 
       await nextTick()
@@ -845,7 +845,7 @@ export default defineComponent({
 
     watch(() => hasUnsavedChanges.value, (val: boolean) => {
       if (!val && transferDetailsComponent) {
-        (transferDetailsComponent as any).clearTransferDetailsData()
+        (transferDetailsComponent as any).value?.clearTransferDetailsData()
       }
     })
 

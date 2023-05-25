@@ -107,7 +107,7 @@
                     <div v-if="otherTypeOption === HomeLocationTypes.OTHER_RESERVE" class="ml-8">
 
                       <HomeLocationDescription
-                        isReserve
+                        :isReserve="true"
                         :validate="validate"
                         :legalDescription="legalDescription"
                         @setIsValidLocationInfo="isValidLocationInfo = $event"
@@ -141,7 +141,7 @@
                       />
 
                       <HomeLocationDescription
-                        isStrata
+                        :isStrata="true"
                         :validate="validate"
                         :legalDescription="legalDescription"
                         @setIsValidLocationInfo="isValidLocationInfo = $event"
@@ -236,13 +236,13 @@ export default defineComponent({
       MhrSectVal,
       setValidation
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
+    const lotForm = ref(null) as FormIF
+    const homeParkForm = ref(null) as FormIF
 
     // Home location store properties
     // Developer note: de-construction of store computed properties in this manner will result in the loss of reactivity
     const { additionalDescription, dealerName, legalDescription, locationType, pad, pidNumber, parkName, otherType } =
       getMhrRegistrationLocation.value
-    const lotForm = ref(null) as FormIF
-    const homeParkForm = ref(null) as FormIF
 
     const localState = reactive({
       isValidLot: false,
@@ -375,6 +375,8 @@ export default defineComponent({
     })
 
     return {
+      lotForm,
+      homeParkForm,
       handlePidInfo,
       HomeLocationTypes,
       customRules,

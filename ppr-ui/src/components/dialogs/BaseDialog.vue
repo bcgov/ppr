@@ -57,8 +57,8 @@ export default defineComponent({
     DialogContent
   },
   props: {
-    setAttach: { default: '' },
-    setDisplay: { default: false },
+    setAttach: { type: String, default: '' },
+    setDisplay: { type: Boolean, default: false },
     setOptions: Object as () => DialogOptionsIF,
     reverseActionButtons: {
       type: Boolean,

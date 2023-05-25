@@ -49,6 +49,7 @@ import {
 } from 'vue-demi'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
+import { FormIF } from '@/interfaces'
 
 export default defineComponent({
   props: {
@@ -62,7 +63,7 @@ export default defineComponent({
   setup (props, context) {
     const { setFolioOrReferenceNumber } = useStore()
     const { getFolioOrReferenceNumber } = storeToRefs(useStore())
-    const form = ref(null)
+    const form = ref(null) as FormIF
 
     const localState = reactive({
       isValid: true,
@@ -87,9 +88,8 @@ export default defineComponent({
       }
     )
 
-    const setFolioAndEmit = async (val: string) => {
-      // @ts-ignore - function exists
-      await context.refs.form.validate()
+    const setFolioAndEmit = (val: string) => {
+      form.value.validate()
       context.emit('folioValid', localState.isValid)
       setFolioOrReferenceNumber(val)
     }

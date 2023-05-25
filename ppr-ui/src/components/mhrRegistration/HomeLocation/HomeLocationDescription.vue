@@ -30,7 +30,7 @@
           <v-col class="text-right" v-if="!isReserve">
             <v-btn
               text
-              plain="true"
+              plain
               color="primary"
               class="mr-n4"
               :ripple="false"

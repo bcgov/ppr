@@ -190,8 +190,8 @@
 
 <script lang="ts">
 /* eslint-disable no-unused-vars */
-import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue-demi'
-import { MhrLocationInfoIF } from '@/interfaces'
+import { computed, defineComponent, onMounted, reactive, ref, toRefs, watch } from 'vue-demi'
+import { FormIF, MhrLocationInfoIF } from '@/interfaces'
 import { useInputRules } from '@/composables/useInputRules'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
@@ -212,6 +212,7 @@ export default defineComponent({
       maxLength,
       required
     } = useInputRules()
+    const homeLocationInfoRef = ref(null) as FormIF
 
     const localState = reactive({
       homeLocationInfoValid: false,
@@ -272,8 +273,7 @@ export default defineComponent({
     }
 
     const validateLocationInfo = (): void => {
-      // @ts-ignore - function exists
-      context.refs.homeLocationInfoRef.validate()
+      homeLocationInfoRef.value?.validate()
     }
 
     const emitOtherTypeValid = (): void => {
@@ -307,6 +307,7 @@ export default defineComponent({
     return {
       maxLength,
       locationInputRules,
+      homeLocationInfoRef,
       ...toRefs(localState)
     }
   }

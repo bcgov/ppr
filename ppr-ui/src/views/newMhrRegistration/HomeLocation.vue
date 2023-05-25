@@ -64,11 +64,11 @@ export default defineComponent({
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
     const localState = reactive({
-      validateLocationType: computed(() => {
-        return getSectionValidation(MhrSectVal.LOCATION_VALID, MhrCompVal.LOCATION_TYPE_VALID)
+      validateLocationType: computed((): boolean => {
+        return !!getSectionValidation(MhrSectVal.LOCATION_VALID, MhrCompVal.LOCATION_TYPE_VALID)
       }),
-      validateCivicAddress: computed(() => {
-        return getSectionValidation(MhrSectVal.LOCATION_VALID, MhrCompVal.CIVIC_ADDRESS_VALID)
+      validateCivicAddress: computed((): boolean => {
+        return !!getSectionValidation(MhrSectVal.LOCATION_VALID, MhrCompVal.CIVIC_ADDRESS_VALID)
       })
     })
 

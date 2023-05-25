@@ -64,7 +64,7 @@ export default defineComponent({
     })
 
     watch(() => props.validate, async () => {
-      rebuiltStatus.validate()
+      rebuiltStatus.value?.validate()
     })
 
     return { maxLength, ...toRefs(localState) }

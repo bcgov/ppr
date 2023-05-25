@@ -163,6 +163,7 @@ export default defineComponent({
     }
 
     const selectItem = () => {
+      console.log('Inside Select Item')
       localState.searchValue = ''
       context.emit('selectItem')
       context.emit('hideSearch')

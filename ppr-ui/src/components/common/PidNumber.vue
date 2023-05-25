@@ -67,7 +67,7 @@
       <v-btn
         v-else-if="isCompletePid && isValidPid && !showNotFoundDialog"
         text
-        plain="true"
+        plain
         color="primary"
         :ripple="false"
         @click="clearPid()"
@@ -80,13 +80,14 @@
 
 <script lang="ts">
 /* eslint-disable no-unused-vars */
-import { computed, defineComponent, nextTick, reactive, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, nextTick, reactive, ref, toRefs, watch } from 'vue-demi'
 import { useStore } from '@/store/store'
 import { useInputRules } from '@/composables'
 import { ltsaDetails } from '@/utils/ltsa-api-helper'
 import { BaseDialog } from '@/components/dialogs'
 import { pidNotFoundDialog } from '@/resources/dialogOptions'
 import { LtsaDetailsIF, PidInfoIF } from '@/interfaces/ltsa-api-interfaces'
+import { FormIF } from '@/interfaces'
 import { storeToRefs } from 'pinia'
 /* eslint-enable no-unused-vars */
 
@@ -103,6 +104,9 @@ export default defineComponent({
   setup (props, context) {
     const { getMhrRegistrationLocation } = storeToRefs(useStore())
     const { isNumber } = useInputRules()
+    const pidOneRef = ref(null) as FormIF
+    const pidTwoRef = ref(null) as FormIF
+    const pidThreeRef = ref(null) as FormIF
 
     const localState = reactive({
       pidOne: getMhrRegistrationLocation.value?.pidNumber.slice(0, 3) || '',
@@ -169,8 +173,7 @@ export default defineComponent({
       emitPid()
       // Wait for pidThree watcher to complete and got to first field
       setTimeout(() => {
-        // @ts-ignore - function exists
-        context.refs.pidOneRef.focus()
+        pidOneRef.value?.focus()
       }, 10)
     }
     const emitPid = (): void => {
@@ -179,18 +182,14 @@ export default defineComponent({
     }
 
     watch(() => localState.pidOne, () => {
-      // @ts-ignore - function exists
-      if (localState.pidOne.length === 3) nextTick(() => { context.refs.pidTwoRef.focus() })
+      if (localState.pidOne.length === 3) nextTick(() => { pidTwoRef.value?.focus() })
     })
     watch(() => localState.pidTwo, () => {
-      // @ts-ignore - function exists
-      if (localState.pidTwo.length === 3) nextTick(() => { context.refs.pidThreeRef.focus() })
-      // @ts-ignore - function exists
-      if (localState.pidTwo.length === 0) nextTick(() => { context.refs.pidOneRef.focus() })
+      if (localState.pidTwo.length === 3) nextTick(() => { pidThreeRef.value?.focus() })
+      if (localState.pidTwo.length === 0) nextTick(() => { pidOneRef.value?.focus() })
     })
     watch(() => localState.pidThree, () => {
-      // @ts-ignore - function exists
-      if (localState.pidThree.length === 0) nextTick(() => { context.refs.pidTwoRef.focus() })
+      if (localState.pidThree.length === 0) nextTick(() => { pidTwoRef.value?.focus() })
     })
     watch(() => localState.enablePidLoader, () => {
       context.emit('verifyingPid', localState.enablePidLoader)
@@ -205,6 +204,9 @@ export default defineComponent({
     })
 
     return {
+      pidOneRef,
+      pidTwoRef,
+      pidThreeRef,
       parsePaste,
       isNumber,
       dialogRetry,
