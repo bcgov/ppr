@@ -344,6 +344,11 @@ export const setMhrLocation: ActionIF = ({ commit }, { key, value }): void => {
   commit('mutateUnsavedChanges', true)
 }
 
+export const setMhrRegistrationOwnLand: ActionIF = ({ commit }, ownLand: boolean): void => {
+  commit('mutateMhrRegistrationOwnLand', ownLand)
+  commit('mutateUnsavedChanges', true)
+}
+
 export const setIsManualLocation: ActionIF = ({ commit }, isManual: boolean): void => {
   commit('mutateIsManualLocation', isManual)
 }

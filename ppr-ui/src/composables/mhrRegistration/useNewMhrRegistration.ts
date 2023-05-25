@@ -25,6 +25,7 @@ export const useNewMhrRegistration = () => {
     getMhrAttentionReferenceNum,
     getMhrRegistrationLocation,
     getMhrRegistrationHomeOwnerGroups,
+    getMhrRegistrationOwnLand,
     getStaffPayment,
     getMhrDraftNumber
   } = useGetters<any>([
@@ -35,6 +36,7 @@ export const useNewMhrRegistration = () => {
     'getMhrAttentionReferenceNum',
     'getMhrRegistrationLocation',
     'getMhrRegistrationHomeOwnerGroups',
+    'getMhrRegistrationOwnLand',
     'getCertifyInformation',
     'getStaffPayment',
     'getMhrDraftNumber'
@@ -46,6 +48,7 @@ export const useNewMhrRegistration = () => {
     setMhrHomeDescription,
     setMhrAttentionReferenceNum,
     setMhrRegistrationDocumentId,
+    setMhrRegistrationOwnLand,
     setMhrRegistrationSubmittingParty,
     setMhrRegistrationHomeOwnerGroups
   } = useActions<any>([
@@ -55,6 +58,7 @@ export const useNewMhrRegistration = () => {
     'setMhrHomeDescription',
     'setMhrAttentionReferenceNum',
     'setMhrRegistrationDocumentId',
+    'setMhrRegistrationOwnLand',
     'setMhrRegistrationSubmittingParty',
     'setMhrRegistrationHomeOwnerGroups'
   ])
@@ -91,6 +95,7 @@ export const useNewMhrRegistration = () => {
       ownerGroups: [],
       attentionReference: '',
       isManualLocationInfo: false,
+      ownLand: false,
       location: {
         parkName: '',
         pad: '',
@@ -177,6 +182,8 @@ export const useNewMhrRegistration = () => {
     setMhrRegistrationSubmittingParty(draft.submittingParty)
     // Set Document Id
     setMhrRegistrationDocumentId(draft.documentId)
+    // Set Land Ownership
+    setMhrRegistrationOwnLand(draft.ownLand)
     // Set attention
     setMhrAttentionReferenceNum(draft.attentionReference)
     // Set HomeOwners
@@ -289,6 +296,7 @@ export const useNewMhrRegistration = () => {
   const buildApiData = (): NewMhrRegistrationApiIF => {
     const data: NewMhrRegistrationApiIF = {
       documentId: getMhrRegistrationDocumentId.value,
+      ownLand: getMhrRegistrationOwnLand.value,
       submittingParty: parseSubmittingParty(),
       ownerGroups: parseOwnerGroups(),
       location: parseLocation(),

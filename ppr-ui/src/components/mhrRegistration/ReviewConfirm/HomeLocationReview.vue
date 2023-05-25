@@ -206,7 +206,7 @@
           </template>
 
           <!-- Civic Address -->
-          <v-row no-gutters class="px-6 pt-1" >
+          <v-row no-gutters class="px-6 pt-1 pb-6" >
             <v-col cols="3" class="pt-1">
               <h3>Civic Address</h3>
             </v-col>
@@ -223,6 +223,28 @@
               </p>
             </v-col>
           </v-row>
+
+          <div class="px-4">
+            <v-divider />
+          </div>
+
+          <!-- Land Details -->
+          <v-row no-gutters class="px-6 pt-6" >
+            <v-col cols="3" class="pt-1">
+              <h3>Land Details</h3>
+            </v-col>
+          </v-row>
+
+          <!-- Lease or Land Ownership -->
+          <v-row no-gutters class="px-6 pt-1" >
+            <v-col cols="3" class="pt-1">
+              <h3>Lease or Land Ownership</h3>
+            </v-col>
+            <v-col cols="9" class="pt-1">
+              <span v-html="landOwnershipLabel"></span>
+            </v-col>
+          </v-row>
+
       </section>
     </div>
   </v-card>
@@ -247,11 +269,13 @@ export default defineComponent({
     const {
       getMhrRegistrationLocation,
       getMhrRegistrationValidationModel,
-      getIsManualLocation
+      getIsManualLocation,
+      getMhrRegistrationOwnLand
     } = useGetters<any>([
       'getMhrRegistrationLocation',
       'getMhrRegistrationValidationModel',
-      'getIsManualLocation'
+      'getIsManualLocation',
+      'getMhrRegistrationOwnLand'
     ])
 
     const {
@@ -301,6 +325,10 @@ export default defineComponent({
         return !!location.lot || !!location.parcel || !!location.block || !!location.districtLot || !!location.partOf ||
           !!location.section || !!location.township || !!location.range || !!location.meridian ||
           !!location.landDistrict || !!location.plan || !!location.exceptionPlan
+      }),
+      landOwnershipLabel: computed(() => {
+        return `The manufactured home is <b>${getMhrRegistrationOwnLand.value ? '' : 'not'}</b> located on land that the
+            homeowners own, or on which they have a registered lease of 3 years or more.`
       })
     })
 

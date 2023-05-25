@@ -405,6 +405,10 @@ export const mutateCivicAddress = (state: StateIF, { key, value }) => {
   state.stateModel.mhrRegistration.location.address[key] = value
 }
 
+export const mutateMhrRegistrationOwnLand = (state: StateIF, value) => {
+  state.stateModel.mhrRegistration.ownLand = value
+}
+
 export const mutateMhrHomeOwnerGroups = (
   state: StateIF,
   groups: Array<MhrRegistrationHomeOwnerGroupIF>
