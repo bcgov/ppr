@@ -241,7 +241,9 @@
               <h3>Lease or Land Ownership</h3>
             </v-col>
             <v-col cols="9" class="pt-1">
-              <span v-html="landOwnershipLabel"></span>
+              <p>
+                <span v-html="landOwnershipLabel"></span>
+              </p>
             </v-col>
           </v-row>
 
