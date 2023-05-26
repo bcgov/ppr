@@ -46,7 +46,7 @@ export function fromDisplayPhone (phoneNumber: string): string {
  * @returns a title case string word
  */
 export function toTitleCase (value: string): string {
-  return (value[0]?.toUpperCase() + value.slice(1)?.toLowerCase()) || ''
+  return value ? (value[0].toUpperCase() + value.slice(1).toLowerCase()) : ''
 }
 
 /**

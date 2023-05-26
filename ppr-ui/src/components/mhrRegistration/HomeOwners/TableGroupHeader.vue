@@ -296,8 +296,9 @@ export default defineComponent({
     const getOwnershipInterest = (): string => {
       const { interest, interestNumerator, interestDenominator } = localState.group
       if (!interestNumerator || !interestDenominator) return 'N/A'
+      const interestText = toTitleCase(interest) || 'Undivided'
 
-      return `${toTitleCase(interest)} ${interestNumerator}/${interestDenominator}`
+      return `${interestText} ${interestNumerator}/${interestDenominator}`
     }
 
     const done = (): void => {
