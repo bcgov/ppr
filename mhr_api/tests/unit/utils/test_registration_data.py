@@ -594,3 +594,112 @@ TC_VALID_ADMIN = {
     ],
     'type': 'NA'
 }
+MANUFACTURER_VALID = {
+  'clientReferenceId': 'EX-MH001234',
+  'attentionReference': 'GWB14768.100',
+  'description': {
+    'manufacturer': 'REAL ENGINEERED HOMES INC',
+    'baseInformation': {
+      'year': 2023,
+      'make': 'WATSON IND. (ALTA)',
+      'model': 'DUCHESS'
+    },
+    'sectionCount': 1,
+    'sections': [
+      {
+        'serialNumber': '52D70556',
+        'lengthFeet': 52,
+        'lengthInches': 0,
+        'widthFeet': 12,
+        'widthInches': 0
+      }
+    ],
+    'csaNumber': '786356',
+    'csaStandard': 'Z240'
+  }, 
+  'location': {
+    'address': {
+      'city': 'PENTICTON', 
+      'country': 'CA', 
+      'postalCode': 'V2A 7A1', 
+      'region': 'BC', 
+      'street': '1704 GOVERNMENT ST.'
+    }, 
+    'dealerName': 'REAL ENGINEERED HOMES INC', 
+    'leaveProvince': False, 
+    'locationType': 'MANUFACTURER'
+  }, 
+  'ownerGroups': [
+    {
+      'groupId': 1, 
+      'owners': [
+        {
+          'address': {
+            'city': 'PENTICTON', 
+            'country': 'CA', 
+            'postalCode': 'V2A 7A1', 
+            'region': 'BC', 
+            'street': '1704 GOVERNMENT ST.'
+          }, 
+          'organizationName': 'REAL ENGINEERED HOMES INC', 
+          'partyType': 'OWNER_BUS'
+        }
+      ], 
+      'type': 'SOLE'
+    }
+  ], 
+  'submittingParty': {
+    'address': {
+      'city': 'PENTICTON', 
+      'country': 'CA', 
+      'postalCode': 'V2A 7A1', 
+      'region': 'BC', 
+      'street': '1704 GOVERNMENT ST.'
+    }, 
+    'businessName': 'REAL ENGINEERED HOMES INC', 
+    'phoneNumber': '2507701067'
+  }
+}
+MANUFACTURER_SUB_INVALID = {
+    'address': {
+      'city': 'PENTICTON', 
+      'country': 'CA', 
+      'postalCode': 'V2A 7A1', 
+      'region': 'BC', 
+      'street': '1704 GOVERNMENT ST.'
+    }, 
+    'businessName': 'MODIFIED REAL ENGINEERED HOMES INC', 
+    'phoneNumber': '2507701067'
+}
+MANUFACTURER_LOCATION_INVALID = {
+    'address': {
+      'city': 'VICTORIA',
+      'country': 'CA', 
+      'postalCode': 'V2A 7A1', 
+      'region': 'BC', 
+      'street': '1704 GOVERNMENT ST.'
+    }, 
+    'dealerName': 'REAL ENGINEERED HOMES INC', 
+    'leaveProvince': False, 
+    'locationType': 'MH_PARK'
+}
+MANUFACTURER_DESC_INVALID = {
+    'manufacturer': 'MODIFIED REAL ENGINEERED HOMES INC',
+    'baseInformation': {
+      'year': 2023,
+      'make': 'WATSON IND. (ALTA)',
+      'model': 'DUCHESS'
+    },
+    'sectionCount': 1,
+    'sections': [
+      {
+        'serialNumber': '52D70556',
+        'lengthFeet': 52,
+        'lengthInches': 0,
+        'widthFeet': 12,
+        'widthInches': 0
+      }
+    ],
+    'csaNumber': '786356',
+    'csaStandard': 'Z240'
+}

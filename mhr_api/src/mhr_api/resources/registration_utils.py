@@ -58,14 +58,20 @@ PAY_DETAILS_LABEL = 'MH Registration Type:'
 PAY_DETAILS_LABEL_TRANS_ID = 'MH Registration {trans_id} Type:'
 
 
-def pay_and_save_registration(req: request, request_json, account_id: str, trans_type: str, trans_id: str = None):
+def pay_and_save_registration(req: request,  # pylint: disable=too-many-arguments
+                              request_json,
+                              account_id: str,
+                              user_group: str,
+                              trans_type: str,
+                              trans_id: str = None):
     """Set up the registration statement, pay, and save the data."""
     # Charge a fee.
     token: dict = g.jwt_oidc_token_info
     request_json['affirmByName'] = get_affirmby(token)
     registration: MhrRegistration = MhrRegistration.create_new_from_json(request_json,
                                                                          account_id,
-                                                                         token.get('username', None))
+                                                                         token.get('username', None),
+                                                                         user_group)
     invoice_id = None
     pay_ref = None
     if not is_reg_staff_account(account_id):

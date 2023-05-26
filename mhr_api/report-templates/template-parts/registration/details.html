@@ -42,26 +42,29 @@
                     {% endif %}
                 </td>
             </tr>
-            <tr>
-                <td class="section-sub-title">Engineer's Name:</td>
-                <td>
-                    {% if description.engineerName is defined and description.engineerName != '' %}
-                        {{description.engineerName}}
-                    {% else %}
-                        N/A
-                    {% endif %}
-                </td>
-            </tr>
-            <tr>
-                <td class="section-sub-title">Date of Engineer's Report:</td>
-                <td>
-                    {% if description.engineerDate is defined and description.engineerDate != '' %}
-                        {{description.engineerDate}}
-                    {% else %}
-                        N/A
-                    {% endif %}
-                </td>
-            </tr>
+
+            {% if usergroup is not defined or usergroup != 'mhr_manufacturer' %}             
+                <tr>
+                    <td class="section-sub-title">Engineer's Name:</td>
+                    <td>
+                        {% if description.engineerName is defined and description.engineerName != '' %}
+                            {{description.engineerName}}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="section-sub-title">Date of Engineer's Report:</td>
+                    <td>
+                        {% if description.engineerDate is defined and description.engineerDate != '' %}
+                            {{description.engineerDate}}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endif %}
         </table>
    {% endif %}
 
