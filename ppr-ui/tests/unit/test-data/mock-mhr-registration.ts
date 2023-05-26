@@ -101,6 +101,7 @@ export const mockedPerson: MhrRegistrationHomeOwnerIF = {
   suffix: 'Sr.',
   phoneNumber: '(545) 333-2211',
   phoneExtension: '1234',
+  partyType: HomeOwnerPartyTypes.OWNER_IND,
   address: mockedAddress
 }
 
@@ -114,6 +115,7 @@ export const mockedPerson2: MhrRegistrationHomeOwnerIF = {
   suffix: 'Sr.',
   phoneNumber: '(545) 333-2211',
   phoneExtension: '1234',
+  partyType: HomeOwnerPartyTypes.OWNER_IND,
   address: mockedAddress
 }
 

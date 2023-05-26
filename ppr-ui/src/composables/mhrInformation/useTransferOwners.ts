@@ -376,7 +376,14 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     // check if supportingDocument is either Death Certificate or Grant of Probate
     hasValidSupportDocs: (owner: MhrRegistrationHomeOwnerIF): boolean => {
       if (owner.action === ActionTypes.ADDED) return true
+
+      // if deleted Exec, Admin or Trustee, then docs are not required and are valid
+      if (owner.action === ActionTypes.REMOVED &&
+        [HomeOwnerPartyTypes.EXECUTOR, HomeOwnerPartyTypes.ADMINISTRATOR, HomeOwnerPartyTypes.TRUSTEE]
+          .includes(owner.partyType)) return true
+
       let hasValidSupportingDoc = false
+
       if (owner.supportingDocument === SupportingDocumentsOptions.DEATH_CERT ||
         owner.supportingDocument === SupportingDocumentsOptions.AFFIDAVIT) {
         hasValidSupportingDoc = owner.hasDeathCertificate &&
@@ -424,33 +431,48 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     hasDeletedOwnersWithProbateGrantOrAffidavit: (): boolean => {
       return getMhrTransferHomeOwnerGroups.value.some(group =>
         group.owners.some(owner =>
-          owner.supportingDocument === TransToExec.getSupportingDocForActiveTransfer()))
+          (owner.action === ActionTypes.REMOVED &&
+          owner.partyType === HomeOwnerPartyTypes.OWNER_IND &&
+          owner.supportingDocument === TransToExec.getSupportingDocForActiveTransfer()) ||
+          (owner.action === ActionTypes.REMOVED &&
+            [HomeOwnerPartyTypes.EXECUTOR, HomeOwnerPartyTypes.ADMINISTRATOR, HomeOwnerPartyTypes.TRUSTEE]
+              .includes(owner.partyType)))
+      )
     },
     prefillOwnerAsExecOrAdmin: (owner: MhrRegistrationHomeOwnerIF): void => {
       const transferType = getMhrTransferType.value?.transferType
       const allOwners = getMhrTransferHomeOwners.value
       const deletedOwnerGroup = find(getMhrTransferHomeOwnerGroups.value, { owners: [{ action: ActionTypes.REMOVED }] })
       const supportingDocOfTheTransferType = TransToExec.getSupportingDocForActiveTransfer()
+
+      // first try to find the deleted reg owner
       const deletedOwner = find(deletedOwnerGroup.owners, {
-        action: ActionTypes.REMOVED,
-        supportingDocument: supportingDocOfTheTransferType
+        action: ActionTypes.REMOVED
       }) as MhrRegistrationHomeOwnerIF
 
-      const { first, middle, last } = deletedOwner.individualName
+      let suffix = ''
+      if ([HomeOwnerPartyTypes.OWNER_IND, HomeOwnerPartyTypes.OWNER_BUS].includes(deletedOwner.partyType)) {
+        // if reg or business owner is deleted, prefill the additional name (suffix) with the name of the deleted owner
+        const { first, middle, last } = deletedOwner.individualName || {}
+
+        suffix = deletedOwner.organizationName?.length > 0
+          ? transferOwnerPrefillAdditionalName[transferType] + deletedOwner.organizationName
+          : transferOwnerPrefillAdditionalName[transferType] + [first, middle, last].filter(Boolean).join(' ')
+      } else {
+        // if executor, admin or trustee, copy the additional name (suffix) from the suffix of deleted owner
+        suffix = deletedOwner.description
+      }
 
       Object.assign(owner, {
         ownerId: allOwners.length + 1,
-        suffix: deletedOwner.organizationName?.length > 0
-          ? transferOwnerPrefillAdditionalName[transferType] + deletedOwner.organizationName
-          : transferOwnerPrefillAdditionalName[transferType] + [first, middle, last].filter(Boolean).join(' '),
+        suffix: suffix,
         partyType: transferOwnerPartyTypes[transferType],
         groupId: deletedOwnerGroup.groupId // new Owner will be added to the same group as deleted Owner
       } as MhrRegistrationHomeOwnerIF)
     },
     updateExecutorSuffix: (): boolean => {
       const deceasedOwners = getMhrTransferHomeOwners.value
-        .filter(owner => owner.action === ActionTypes.REMOVED &&
-          owner.supportingDocument === TransToExec.getSupportingDocForActiveTransfer())
+        .filter(owner => owner.action === ActionTypes.REMOVED)
 
       return TransToExec.addRemoveExecutorSuffix(deceasedOwners[0] || null)
     },
@@ -475,15 +497,24 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
           owner.action === ActionTypes.ADDED)
 
       if (allExecutors.length === 1 && owner !== null) {
-        const { first, middle, last } = owner.individualName
-        const suffix = owner.individualName
-          ? transferOwnerPrefillAdditionalName[transferType] + [first, middle, last].filter(Boolean).join(' ')
-          : transferOwnerPrefillAdditionalName[transferType] + owner.organizationName
+        let suffix = ''
+
+        if ([HomeOwnerPartyTypes.OWNER_IND, HomeOwnerPartyTypes.OWNER_BUS].includes(owner.partyType)) {
+          const { first, middle, last } = owner.individualName || {}
+          suffix = owner.organizationName?.length > 0
+            ? transferOwnerPrefillAdditionalName[transferType] + owner.organizationName
+            : transferOwnerPrefillAdditionalName[transferType] + [first, middle, last].filter(Boolean).join(' ')
+        } else {
+          suffix = owner.description
+        }
+
         allExecutors[0].suffix = suffix
         showSuffixError = false
       } else {
         allExecutors.forEach((executor: MhrRegistrationHomeOwnerIF) => {
-          executor.suffix = transferOwnerPrefillAdditionalName[transferType] + 'N/A'
+          // reset suffix or description
+          const additionalName = transferOwnerPrefillAdditionalName[transferType] + 'N/A'
+          executor.suffix = executor.suffix ? additionalName : executor.description = additionalName
           showSuffixError = true
         })
       }
