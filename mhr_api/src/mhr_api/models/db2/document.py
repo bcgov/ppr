@@ -311,11 +311,7 @@ class Db2Document(db.Model):
                 doc.phone_number = str(submitting.get('phoneNumber'))[0:10]
             else:
                 doc.phone_number = ''
-            if submitting.get('businessName'):
-                doc.name = str(submitting.get('businessName'))[0:40]
-            else:
-                ind_name: str = model_utils.to_db2_ind_name(submitting.get('personName'))
-                doc.name = ind_name[0:40]
+            doc.name = Db2Document.to_db2_submitting_name(submitting)
             doc.legacy_address = address_utils.to_db2_address(submitting.get('address'))
         else:
             doc.phone_number = ''
@@ -345,3 +341,18 @@ class Db2Document(db.Model):
         else:
             doc.own_land = 'N'
         return doc
+
+    @staticmethod
+    def to_db2_submitting_name(name_json):
+        """Convert a submitting party json name to a DB2 legacy name."""
+        if name_json.get('businessName'):
+            return str(name_json.get('businessName')).strip().upper()[0:40]
+        ind_name = name_json.get('personName')
+        db2_name = str(ind_name['first']).strip().upper() + ' '
+        last_name = str(ind_name['last']).strip().upper()
+        if (len(db2_name) + len(last_name)) < 40 and ind_name.get('middle'):
+            middle_name = str(ind_name['middle']).strip().upper()
+            if (len(db2_name) + len(middle_name) + len(last_name)) < 40:
+                db2_name += middle_name + ' '
+        db2_name += last_name
+        return db2_name[:40]

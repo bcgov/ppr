@@ -594,6 +594,87 @@ TC_VALID_ADMIN = {
     ],
     'type': 'NA'
 }
+JT_GROUP_VALID = {
+    'groupId': 1,
+    'owners': [
+        {
+        'individualName': {
+            'first': 'James',
+            'last': 'Smith'
+        },
+        'address': {
+            'street': '3122B LYNNLARK PLACE',
+            'city': 'VICTORIA',
+            'region': 'BC',
+            'postalCode': ' ',
+            'country': 'CA'
+        },
+        'phoneNumber': '6041234567'
+        },
+        {
+        'individualName': {
+            'first': 'John',
+            'last': 'Smith'
+        },
+        'address': {
+            'street': '3122B LYNNLARK PLACE',
+            'city': 'VICTORIA',
+            'region': 'BC',
+            'postalCode': ' ',
+            'country': 'CA'
+        },
+        'phoneNumber': '6041234567'
+        }
+    ],
+    'type': 'JOINT'
+}
+JT_GROUP_MIX = {
+    'groupId': 1,
+    'owners': [
+        {
+        'individualName': {
+            'first': 'James',
+            'last': 'Smith'
+        },
+        'address': {
+            'street': '3122B LYNNLARK PLACE',
+            'city': 'VICTORIA',
+            'region': 'BC',
+            'postalCode': ' ',
+            'country': 'CA'
+        },
+        'phoneNumber': '6041234567',
+        'partyType': 'EXECUTOR',
+        'description': 'EXECUTOR of the deceased.'
+        }, {
+        'individualName': {
+            'first': 'John',
+            'last': 'Smith'
+        },
+        'address': {
+            'street': '3122B LYNNLARK PLACE',
+            'city': 'VICTORIA',
+            'region': 'BC',
+            'postalCode': ' ',
+            'country': 'CA'
+        },
+        'phoneNumber': '6041234567',
+        'partyType': 'OWNER_IND'
+        }, {
+        'organizationName': 'DYE & DURHAM CORPORATION',
+        'address': {
+            'street': '3122B LYNNLARK PLACE',
+            'city': 'VICTORIA',
+            'region': 'BC',
+            'postalCode': ' ',
+            'country': 'CA'
+        },
+        'phoneNumber': '6041234567',
+        'partyType': 'OWNER_BUS'
+        }
+    ],
+    'type': 'NA'
+}
 MANUFACTURER_VALID = {
   'clientReferenceId': 'EX-MH001234',
   'attentionReference': 'GWB14768.100',
