@@ -513,13 +513,18 @@ export default defineComponent({
       const draftItem = item as DraftResultIF
       const firstBaseReg = localState.registrationHistory[0].baseRegistrationNumber
       const firstDocId = localState.registrationHistory[0].documentId
-      if (item.baseRegistrationNumber && item.baseRegistrationNumber === firstBaseReg) {
-        return true
-      }
-      if (!item.baseRegistrationNumber && draftItem.documentId === firstDocId) {
-        return true
-      }
-      return false
+      return item.baseRegistrationNumber
+        ? item.baseRegistrationNumber === firstBaseReg
+        : draftItem.documentId === firstDocId
+    }
+
+    const isFirstItemMhr = (item: MhRegistrationSummaryIF | MhrDraftIF): boolean => {
+      const draftItem = item as MhrDraftIF
+      const firstMhrNumber = localState.registrationHistory[0].mhrNumber
+      const firstDocId = localState.registrationHistory[0].draftNumber
+      return item.mhrNumber
+        ? item.mhrNumber === firstMhrNumber
+        : draftItem.draftNumber === firstDocId
     }
 
     const isNewRegItem =
@@ -563,8 +568,10 @@ export default defineComponent({
       }
     }
 
-    const setRowRef = (item: RegistrationSummaryIF | DraftResultIF): string => {
-      const isFirst = isFirstItem(item)
+    const setRowRef = (item: RegistrationSummaryIF | DraftResultIF | MhRegistrationSummaryIF | MhrDraftIF): string => {
+      const isFirst = props.isPpr
+        ? isFirstItem(item as RegistrationSummaryIF)
+        : isFirstItemMhr(item as MhRegistrationSummaryIF)
       const isNewReg = isNewRegItem(item)
       if (isFirst && isNewReg) return 'newAndFirstItem'
       if (isFirst) return 'firstItem'
