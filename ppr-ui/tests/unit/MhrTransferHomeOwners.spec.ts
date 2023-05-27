@@ -810,6 +810,71 @@ describe('Home Owners', () => {
     expect(homeOwners.findAll(getTestId('ADDED-badge')).length).toBe(1)
   })
 
+  it('TRANS WILL: remove existing Executor and add a new one', async () => {
+    // reset transfer type
+    await selectTransferType(null)
+    wrapper.vm.$data.dataLoaded = true
+    await Vue.nextTick()
+
+    const TRANSFER_TYPE = ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL
+    const homeOwnerGroup: MhrRegistrationHomeOwnerGroupIF[] = [
+      {
+        groupId: 1,
+        owners: [mockedExecutor],
+        type: ''
+      }
+    ]
+    await store.dispatch('setMhrTransferCurrentHomeOwnerGroups', homeOwnerGroup)
+    await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerGroup)
+    await selectTransferType(TRANSFER_TYPE)
+
+    const homeOwners = wrapper.findComponent(HomeOwners)
+    await homeOwners.find(getTestId('table-delete-btn')).trigger('click')
+
+    expect(homeOwners.find(getTestId('invalid-group-msg')).exists()).toBeTruthy()
+    expect(homeOwners.find(getTestId('invalid-group-msg')).text())
+      .toContain(transfersErrors.mustContainOneExecutor)
+
+    homeOwners.findComponent(InfoChip).vm.$data.action = 'DELETED'
+
+    await homeOwners.find(getTestId('add-person-btn')).trigger('click')
+    const addOwnerSection = homeOwners.findComponent(AddEditHomeOwner)
+    expect(addOwnerSection.exists()).toBeTruthy()
+    // check that additional name (suffix) is pre-filled
+    expect(addOwnerSection.text()).toContain(mockedExecutor.suffix)
+    // close Add a Person to add via store (instead of filling out the form)
+    await addOwnerSection.find(getTestId('cancel-btn')).trigger('click')
+
+    // add a new Executor via store, preserving first deleted Executor
+    await store.dispatch('setMhrTransferHomeOwnerGroups', [
+      {
+        groupId: 1,
+        owners: [
+          { ...mockedExecutor, action: ActionTypes.REMOVED },
+          { ...mockedAddedExecutor, suffix: mockedExecutor.suffix }
+        ],
+        type: ''
+      }
+    ])
+
+    // should have two Executors in the table
+    const owners: MhrRegistrationHomeOwnerIF[] = homeOwners.vm.$data.getMhrTransferHomeOwnerGroups[0].owners
+    expect(owners.length).toBe(2)
+    // both Executors should have the same suffix, because it was pre-filled
+    expect(owners[0].suffix).toBe(mockedExecutor.suffix)
+    expect(owners[1].suffix).toBe(mockedExecutor.suffix)
+
+    const allBadges = homeOwners.findAllComponents(InfoChip)
+    expect(allBadges.length).toBe(2) // Added and Deleted badges
+    expect(allBadges.at(0).text()).toContain('DELETED')
+    expect(allBadges.at(1).text()).toContain('ADDED')
+
+    expect(homeOwners.find(getTestId('invalid-group-msg')).exists()).toBeFalsy()
+
+    const addedExecutor = homeOwners.find(getTestId('owner-info-' + mockedAddedExecutor.ownerId))
+    expect(addedExecutor.exists()).toBeTruthy()
+  })
+
   it('TRANS Affidavit: validations with different error messages', async () => {
     // reset transfer type
     await selectTransferType(null)
@@ -825,14 +890,13 @@ describe('Home Owners', () => {
     await selectTransferType(TRANSFER_TYPE)
     await store.dispatch('setMhrTransferCurrentHomeOwnerGroups', homeOwnerGroup)
 
-    const homeOwners = wrapper.findComponent(HomeOwners)
-    const groupError = homeOwners.find(getTestId('invalid-group-msg'))
-
     // One Owner is Deceased, no Executor added
     await store.dispatch('setMhrTransferHomeOwnerGroups', [
       { groupId: 1, owners: [mockedPerson, { ...mockedPerson2, action: ActionTypes.REMOVED }], type: '' },
       { groupId: 2, owners: [mockedPerson], type: '' }
     ])
+    const homeOwners = wrapper.findComponent(HomeOwners)
+    const groupError = homeOwners.find(getTestId('invalid-group-msg'))
 
     expect(groupError.text()).toContain(transfersErrors.allOwnersHaveDeathCerts[TRANSFER_TYPE])
 

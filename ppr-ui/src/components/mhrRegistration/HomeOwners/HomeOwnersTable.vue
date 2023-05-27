@@ -130,11 +130,16 @@
                 </div>
               </div>
               <div v-if="row.item.suffix"
-                class="font-light"
+                class="font-light suffix"
                 :class="{ 'suffix-error': showSuffixError &&
                   row.item.partyType === getPartyTypeForActiveTransfer &&
                   row.item.action === ActionTypes.ADDED }">
                 {{ row.item.suffix }}
+              </div>
+              <div v-else-if="row.item.description"
+                class="font-light description"
+               >
+                {{ row.item.description }}
               </div>
             </div>
 
@@ -299,7 +304,7 @@
                     (showDeathCertificate() || showSupportingDocuments()) &&
                     isReadonlyTable"
         >
-          <td :colspan="homeOwnersTableHeaders.length" class="deceased-review-info">
+          <td v-if="row.item.supportingDocument" :colspan="homeOwnersTableHeaders.length" class="deceased-review-info">
             <v-row no-gutters class="ml-8 my-n3">
               <v-col cols="12">
                 <div v-if="row.item.supportingDocument === SupportingDocumentsOptions.AFFIDAVIT"
@@ -346,7 +351,10 @@
             </v-row>
           </td>
         </tr>
-        <tr v-else-if="isRemovedHomeOwner(row.item) && showSupportingDocuments() && !isReadonlyTable">
+        <tr v-else-if="isRemovedHomeOwner(row.item) &&
+          showSupportingDocuments() &&
+          !isReadonlyTable &&
+          isPartyTypeNotEAT(row.item)">
           <td
             :colspan="homeOwnersTableHeaders.length"
             class="pl-14"
@@ -615,6 +623,7 @@ export default defineComponent({
 
     const mapInfoChipAction = (item: MhrRegistrationHomeOwnerIF): string => {
       return item.action === ActionTypes.REMOVED &&
+       isPartyTypeNotEAT(item) &&
         (showDeathCertificate() ||
           isTransferToExecutorProbateWill.value ||
           isTransferToExecutorUnder25Will.value ||
@@ -645,6 +654,11 @@ export default defineComponent({
 
     const isRemovedHomeOwner = (item: MhrRegistrationHomeOwnerIF): boolean => {
       return item.action === ActionTypes.REMOVED
+    }
+
+    const isPartyTypeNotEAT = (item: MhrRegistrationHomeOwnerIF): boolean => {
+      return ![HomeOwnerPartyTypes.EXECUTOR, HomeOwnerPartyTypes.ADMINISTRATOR, HomeOwnerPartyTypes.TRUSTEE]
+        .includes(item.partyType)
     }
 
     const hasNoGroupInterest = (groupId: number): boolean => {
@@ -829,6 +843,7 @@ export default defineComponent({
       transfersErrors,
       getMhrTransferType,
       getHomeOwnerIcon,
+      isPartyTypeNotEAT,
       ...toRefs(localState)
     }
   }
