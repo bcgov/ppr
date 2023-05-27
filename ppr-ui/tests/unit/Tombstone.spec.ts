@@ -151,7 +151,7 @@ describe('Tombstone component', () => {
   })
 
   it('renders Tombstone component peoperly for Search', async () => {
-    wrapper = createComponent( RouteNames.SEARCH)
+    wrapper = createComponent(RouteNames.SEARCH)
     await nextTick()
 
     expect(wrapper.findComponent(Tombstone).exists()).toBe(true)

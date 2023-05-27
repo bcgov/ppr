@@ -17,7 +17,7 @@ Vue.use(Vuetify)
 const vuetify = new Vuetify({})
 
 setActivePinia(createPinia())
-const store= useStore()
+const store = useStore()
 
 // Events
 const valid: string = 'valid'

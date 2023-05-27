@@ -139,7 +139,7 @@ describe('Registration API Helper Tests', () => {
   it('save new financing statement draft', async () => {
     await store.setDraft(mockedDraftFinancingStatementAll)
     const draft:DraftIF = await saveFinancingStatementDraft(store.getStateModel)
-    
+
     expect(draft.createDateTime).toBeDefined()
     expect(draft.financingStatement.documentId).toBeDefined()
   })
@@ -152,7 +152,7 @@ describe('Registration API Helper Tests', () => {
     testDraft.financingStatement.lifeYears = 1
     await store.setDraft(testDraft)
     const draft:DraftIF = await saveFinancingStatementDraft(store.getStateModel)
-    
+
     expect(draft.createDateTime).toBeDefined()
     expect(draft.financingStatement.documentId).toBeDefined()
   })
@@ -263,7 +263,7 @@ describe('Registration API Helper Discharge Tests', () => {
     await store.setRegistrationConfirmDebtorName(mockedDebtorNames[0])
 
     const registration:DischargeRegistrationIF = await saveDischarge(store.getStateModel)
-    
+
     expect(registration.createDateTime).toBeDefined()
     expect(registration.baseRegistrationNumber).toBeDefined()
     expect(registration.dischargeRegistrationNumber).toBeDefined()
@@ -275,7 +275,7 @@ describe('Registration API Helper Discharge Tests', () => {
     await store.setRegistrationConfirmDebtorName(mockedDebtorNames[2])
 
     const registration:DischargeRegistrationIF = await saveDischarge(store.getStateModel)
-    
+
     expect(registration.createDateTime).toBeDefined()
     expect(registration.baseRegistrationNumber).toBeDefined()
     expect(registration.dischargeRegistrationNumber).toBeDefined()
@@ -286,7 +286,7 @@ describe('Registration API Helper Discharge Tests', () => {
     await store.setRegistrationConfirmDebtorName(mockedDebtorNames[0])
 
     const registration:DischargeRegistrationIF = await saveDischarge(store.getStateModel)
-    
+
     expect(registration.createDateTime).toBeDefined()
     expect(registration.baseRegistrationNumber).toBeDefined()
     expect(registration.dischargeRegistrationNumber).toBeDefined()
@@ -547,7 +547,7 @@ describe('Registration API Helper Create Amendment Tests', () => {
     })
 
     const registration:AmendmentStatementIF = await saveAmendmentStatement(store.getStateModel)
-    
+
     expect(registration.createDateTime).toBeDefined()
     expect(registration.baseRegistrationNumber).toBeDefined()
     expect(registration.payment).toBeDefined()

@@ -3,7 +3,8 @@ import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
 import VueRouter from 'vue-router'
 import { createPinia, setActivePinia } from 'pinia'
-import { useStore } from '../../src/store/store'import flushPromises from 'flush-promises'
+import { useStore } from '../../src/store/store'
+import flushPromises from 'flush-promises'
 
 import { mount, createLocalVue } from '@vue/test-utils'
 

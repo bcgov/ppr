@@ -896,7 +896,6 @@ describe('Mhr Information', () => {
     // Open up Transfer Details again and check that fields are cleared
     await triggerUnsavedChange()
 
-
     expect(store.getMhrTransferConsideration).toBe('')
     expect(store.getMhrTransferDate).toBe(null)
   })

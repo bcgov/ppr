@@ -18,7 +18,7 @@ Vue.use(Vuetify)
 const vuetify = new Vuetify({})
 
 setActivePinia(createPinia())
-const store= useStore()
+const store = useStore()
 
 const partyCodeAutoComplete = '#party-search-auto-complete'
 

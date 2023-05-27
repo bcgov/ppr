@@ -22,18 +22,18 @@ import {
 import { routes } from '@/router'
 import { getTestId } from './utils'
 
+// unit test resources
+import mockRouter from './MockRouter'
+
+import { defaultFlagSet, getRoleProductCode } from '@/utils'
+import flushPromises from 'flush-promises'
+
 Vue.use(Vuetify)
 const vuetify = new Vuetify({})
 
 setActivePinia(createPinia())
 const store = useStore()
-
-// unit test resources
-import mockRouter from './MockRouter'
 const router = mockRouter.mock()
-
-import { defaultFlagSet, getRoleProductCode } from '@/utils'
-import flushPromises from 'flush-promises'
 
 // selectors
 const backBtn = '#breadcrumb-back-btn'
@@ -62,7 +62,7 @@ describe('Breadcrumb component tests', () => {
   let wrapper: any
   const { assign } = window.location
 
-  beforeEach(async () => {// mock the window.location.assign function
+  beforeEach(async () => { // mock the window.location.assign function
     delete window.location
     window.location = { assign: jest.fn() } as any
 
@@ -106,7 +106,7 @@ describe('Breadcrumb component tests', () => {
     }
   })
 
-  it('renders on discharge: review discharge with breadcrumb',() => {
+  it('renders on discharge: review discharge with breadcrumb', () => {
     wrapper = createComponent(RouteNames.REVIEW_DISCHARGE)
 
     const userRoleProductCode = getRoleProductCode(store.getUserRoles, [ProductCode.PPR])
