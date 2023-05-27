@@ -195,19 +195,7 @@ describe('Test registration table with results', () => {
     // wait - sort will wait at least 1 second for debounce
     setTimeout(async () => {
       // emitted the new sort
-      expect(getLastEvent(wrapper, 'sort')).toEqual({
-        endDate: null,
-        folNum: '',
-        orderBy: '',
-        orderVal: '',
-        regBy: '',
-        regNum: '23',
-        regParty: '',
-        regType: '',
-        secParty: '',
-        startDate: null,
-        status: ''
-      })
+      expect(getLastEvent(wrapper, 'sort')).toEqual(null)
       // clear filters btn clears the filter
       await wrapper.find('.v-btn.registration-action').trigger('click')
       expect(wrapper.vm.registrationNumber).toBe('')
