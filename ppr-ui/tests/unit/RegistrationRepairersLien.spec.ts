@@ -1,7 +1,8 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { getVuexStore } from '@/store'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
 
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import {
@@ -17,7 +18,8 @@ import { RegistrationRepairersLien } from '@/components/registration'
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 /**
  * Creates and mounts a component, so that it can be tested.
@@ -42,7 +44,7 @@ function createComponent (
 describe('RegistrationLengthTrust RL tests', () => {
   let wrapper: Wrapper<any>
   beforeEach(async () => {
-    await store.dispatch('setRegistrationType', mockedRepairersLien())
+    await store.setRegistrationType(mockedRepairersLien())
     wrapper = createComponent(false)
   })
   afterEach(() => {
@@ -61,19 +63,19 @@ describe('RegistrationLengthTrust RL tests', () => {
     expect(wrapper.vm.surrenderDateSummary).toBe('Not entered')
   })
   it('renders lienAmount', async () => {
-    wrapper.vm.$data.lienAmount = '$1,000,000'
-    await Vue.nextTick()
+    wrapper.vm.lienAmount = '$1,000,000'
+    await nextTick()
     expect(wrapper.vm.lienAmountMessage).toBe('')
     expect(wrapper.vm.showErrorLienAmount).toBe(false)
-    wrapper.vm.$data.lienAmount = '$1'
-    await Vue.nextTick()
+    wrapper.vm.lienAmount = '$1'
+    await nextTick()
     expect(wrapper.vm.lienAmountMessage).toBe('')
     expect(wrapper.vm.showErrorLienAmount).toBe(false)
-    wrapper.vm.$data.lienAmount = 'junk'
+    wrapper.vm.lienAmount = 'junk'
     await Vue.nextTick()
     expect(wrapper.vm.lienAmountMessage).toBe('Lien amount must be a number greater than 0.')
     expect(wrapper.vm.showErrorLienAmount).toBe(true)
-    wrapper.vm.$data.lienAmount = '$1$'
+    wrapper.vm.lienAmount = '$1$'
     await Vue.nextTick()
     expect(wrapper.vm.lienAmountMessage).toBe('Lien amount must be a number greater than 0.')
     expect(wrapper.vm.showErrorLienAmount).toBe(true)
@@ -83,9 +85,9 @@ describe('RegistrationLengthTrust RL tests', () => {
 describe('RegistrationLengthTrust RL renewal test', () => {
   let wrapper: Wrapper<any>
   beforeEach(async () => {
-    await store.dispatch('setRegistrationType', mockedRepairersLien())
-    await store.dispatch('setRegistrationExpiryDate', '2021-07-28T07:59:59+00:00')
-    await store.dispatch('setLengthTrust', {
+    await store.setRegistrationType(mockedRepairersLien())
+    await store.setRegistrationExpiryDate('2021-07-28T07:59:59+00:00')
+    await store.setLengthTrust({
       valid: true,
       trustIndenture: false,
       lifeInfinite: false,

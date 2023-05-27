@@ -558,7 +558,7 @@ export default defineComponent({
       showReviewedError: computed(() =>
         (!getStepValidation(MhrSectVal.HOME_OWNERS_VALID) && !getStepValidation(MhrSectVal.ADD_EDIT_OWNERS_VALID))),
       ownerGroupId: props.editHomeOwner?.groupId,
-      showGroups: showGroups,
+      showGroups: showGroups.value,
       isPerson: props.isHomeOwnerPerson,
       isAddingHomeOwner: props.editHomeOwner == null,
       groupFractionalData: computed((): FractionalOwnershipWithGroupIdIF =>
@@ -740,6 +740,8 @@ export default defineComponent({
       isFrozenMhr,
       customRules,
       required,
+      showGroups,
+      setShowGroups,
       AdditionalNameConfig,
       ...toRefs(localState)
     }

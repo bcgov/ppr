@@ -1,7 +1,8 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { getVuexStore } from '@/store'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import {
   mockedPartyCodeSearchResponse,
@@ -14,7 +15,8 @@ import { SecuredPartyDialog } from '@/components/dialogs'
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 /**
  * Creates and mounts a component, so that it can be tested.
@@ -79,7 +81,7 @@ describe('Registering Party Dialog SA tests', () => {
   it('renders with default values', async () => {
     expect(wrapper.findComponent(SecuredPartyDialog).exists()).toBe(true)
     wrapper.vm.$props.defaultIsRegisteringParty = true
-    await Vue.nextTick()
+    await nextTick()
     expect(wrapper.find('#create-new-party').text()).toContain('new Registering Party')
   })
 })

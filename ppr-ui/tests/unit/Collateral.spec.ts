@@ -1,8 +1,8 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { getVuexStore } from '@/store'
-
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
 import { TiptapVuetifyPlugin } from 'tiptap-vuetify'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import {
@@ -27,7 +27,8 @@ Vue.use(TiptapVuetifyPlugin, {
   // optional, default to 'md' (default vuetify icons before v2.0.0)
   iconsGroup: 'mdi'
 })
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 // Input field selectors / buttons
 const collateralEdit = '#collateral-edit'
@@ -62,9 +63,9 @@ describe('Collateral SA tests (covers workflow for most registration types)', ()
   const registrationType = mockedSelectSecurityAgreement()
 
   beforeEach(async () => {
-    await store.dispatch('setRegistrationType', registrationType)
-    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.NEW)
-    await store.dispatch('setAddCollateral', {
+    await store.setRegistrationType(registrationType)
+    await store.setRegistrationFlowType(RegistrationFlowType.NEW)
+    await store.setAddCollateral({
       generalCollateral: [],
       vehicleCollateral: [],
       valid: false,
@@ -90,7 +91,7 @@ describe('Collateral SA tests (covers workflow for most registration types)', ()
   })
 
   it('renders summary view properly when vehicle collateral exists', async () => {
-    await store.dispatch('setAddCollateral', {
+    await store.setAddCollateral({
       generalCollateral: [],
       vehicleCollateral: mockedVehicleCollateral1,
       valid: true,
@@ -109,7 +110,7 @@ describe('Collateral SA tests (covers workflow for most registration types)', ()
   })
 
   it('renders summary view properly when general collateral exists', async () => {
-    await store.dispatch('setAddCollateral', {
+    await store.setAddCollateral({
       generalCollateral: mockedGeneralCollateral1,
       vehicleCollateral: [],
       valid: true,
@@ -127,7 +128,7 @@ describe('Collateral SA tests (covers workflow for most registration types)', ()
   })
 
   it('renders summary view properly when vehicle + general collateral exists', async () => {
-    await store.dispatch('setAddCollateral', {
+    await store.setAddCollateral({
       generalCollateral: mockedGeneralCollateral1,
       vehicleCollateral: mockedVehicleCollateral1,
       valid: true,
@@ -169,7 +170,7 @@ describe('Collateral SA tests (covers workflow for most registration types)', ()
 
   it('updates description in edit view when vehicle collateral is added', async () => {
     await wrapper.setProps({ isSummary: false })
-    await store.dispatch('setAddCollateral', {
+    await store.setAddCollateral({
       generalCollateral: [],
       vehicleCollateral: mockedVehicleCollateral1,
       valid: true,
@@ -182,13 +183,13 @@ describe('Collateral SA tests (covers workflow for most registration types)', ()
       'At least one form of collateral (vehicle or general)'
     )
     expect(wrapper.findAll(validCollateralIcon).length).toBe(1)
-    expect(wrapper.vm.$data.generalCollateralLength).toBe(0)
-    expect(wrapper.vm.$data.vehicleCollateralLength).toBe(2)
+    expect(wrapper.vm.generalCollateralLength).toBe(0)
+    expect(wrapper.vm.vehicleCollateralLength).toBe(2)
   })
 
   it('updates description in edit view when general collateral is added', async () => {
     await wrapper.setProps({ isSummary: false })
-    await store.dispatch('setAddCollateral', {
+    await store.setAddCollateral({
       generalCollateral: mockedGeneralCollateral1,
       vehicleCollateral: [],
       valid: true,
@@ -201,8 +202,8 @@ describe('Collateral SA tests (covers workflow for most registration types)', ()
       'At least one form of collateral (vehicle or general)'
     )
     expect(wrapper.findAll(validCollateralIcon).length).toBe(1)
-    expect(wrapper.vm.$data.generalCollateralLength).toBe(1)
-    expect(wrapper.vm.$data.vehicleCollateralLength).toBe(0)
+    expect(wrapper.vm.generalCollateralLength).toBe(1)
+    expect(wrapper.vm.vehicleCollateralLength).toBe(0)
   })
 })
 
@@ -211,9 +212,9 @@ describe('Collateral Lien unpaid wages summary test', () => {
   const registrationType = mockedLienUnpaid()
 
   beforeEach(async () => {
-    await store.dispatch('setRegistrationType', registrationType)
-    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.NEW)
-    await store.dispatch('setAddCollateral', {
+    await store.setRegistrationType(registrationType)
+    await store.setRegistrationFlowType(RegistrationFlowType.NEW)
+    await store.setAddCollateral({
       generalCollateral: [],
       vehicleCollateral: [],
       valid: false,
@@ -234,7 +235,7 @@ describe('Collateral Lien unpaid wages summary test', () => {
     expect(wrapper.findAll(collateralEdit).length).toBe(0)
     expect(wrapper.findAll('.invalid-message').length).toBe(2)
     expect(wrapper.find(goToCollateralBtn).exists()).toBe(true)
-    expect(wrapper.vm.$data.generalCollateralLength).toBe(0)
+    expect(wrapper.vm.generalCollateralLength).toBe(0)
   })
 })
 
@@ -243,9 +244,9 @@ describe('Collateral Lien unpaid wages edit tests', () => {
   const registrationType = mockedLienUnpaid()
 
   beforeEach(async () => {
-    await store.dispatch('setRegistrationType', registrationType)
-    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.NEW)
-    await store.dispatch('setAddCollateral', {
+    await store.setRegistrationType(registrationType)
+    await store.setRegistrationFlowType(RegistrationFlowType.NEW)
+    await store.setAddCollateral({
       generalCollateral: [],
       vehicleCollateral: [],
       valid: false,
@@ -272,13 +273,13 @@ describe('Collateral Lien unpaid wages edit tests', () => {
     expect(wrapper.findComponent(VehicleCollateral).vm.$props.isSummary).toBe(false)
     expect(wrapper.findComponent(VehicleCollateral).vm.$props.showInvalid).toBe(false)
     // general collateral
-    expect(wrapper.vm.$data.generalCollateralLength).toBe(1)
+    expect(wrapper.vm.generalCollateralLength).toBe(1)
     expect(wrapper.findComponent(GeneralCollateral).vm.$props.isSummary).toBe(false)
   })
 
   it('renders summary view without general collateral when none is given and it is in the discharge flow', async () => {
-    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.DISCHARGE)
-    await store.dispatch('setAddCollateral', {
+    await store.setRegistrationFlowType(RegistrationFlowType.DISCHARGE)
+    await store.setAddCollateral({
       generalCollateral: [],
       vehicleCollateral: [],
       valid: false,
@@ -291,8 +292,8 @@ describe('Collateral Lien unpaid wages edit tests', () => {
   })
 
   it('renders summary view without general collateral when none is given and it is in the renew flow', async () => {
-    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.RENEWAL)
-    await store.dispatch('setAddCollateral', {
+    await store.setRegistrationFlowType(RegistrationFlowType.RENEWAL)
+    await store.setAddCollateral({
       generalCollateral: [],
       vehicleCollateral: [],
       valid: false,
@@ -310,9 +311,9 @@ describe('Collateral Carbon Tax summary test', () => {
   const registrationType = mockedOtherCarbon()
 
   beforeEach(async () => {
-    await store.dispatch('setRegistrationType', registrationType)
-    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.NEW)
-    await store.dispatch('setAddCollateral', {
+    await store.setRegistrationType(registrationType)
+    await store.setRegistrationFlowType(RegistrationFlowType.NEW)
+    await store.setAddCollateral({
       generalCollateral: [],
       vehicleCollateral: [],
       valid: false,
@@ -333,7 +334,7 @@ describe('Collateral Carbon Tax summary test', () => {
     expect(wrapper.findAll(collateralEdit).length).toBe(0)
     expect(wrapper.findAll('.invalid-message').length).toBe(2)
     expect(wrapper.find(goToCollateralBtn).exists()).toBe(true)
-    expect(wrapper.vm.$data.generalCollateralLength).toBe(0)
+    expect(wrapper.vm.generalCollateralLength).toBe(0)
   })
 })
 
@@ -342,9 +343,9 @@ describe('Collateral Carbon Tax edit tests', () => {
   const registrationType = mockedOtherCarbon()
 
   beforeEach(async () => {
-    await store.dispatch('setRegistrationType', registrationType)
-    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.NEW)
-    await store.dispatch('setAddCollateral', {
+    await store.setRegistrationType(registrationType)
+    await store.setRegistrationFlowType(RegistrationFlowType.NEW)
+    await store.setAddCollateral({
       generalCollateral: [],
       vehicleCollateral: [],
       valid: false,
@@ -373,13 +374,13 @@ describe('Collateral Carbon Tax edit tests', () => {
     expect(wrapper.findComponent(VehicleCollateral).vm.$props.isSummary).toBe(false)
     expect(wrapper.findComponent(VehicleCollateral).vm.$props.showInvalid).toBe(false)
     // general collateral
-    expect(wrapper.vm.$data.generalCollateralLength).toBe(1)
+    expect(wrapper.vm.generalCollateralLength).toBe(1)
     expect(wrapper.findComponent(GeneralCollateral).vm.$props.isSummary).toBe(false)
   })
 
   it('renders summary view without general collateral when none is given and it is in the discharge flow', async () => {
-    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.DISCHARGE)
-    await store.dispatch('setAddCollateral', {
+    await store.setRegistrationFlowType(RegistrationFlowType.DISCHARGE)
+    await store.setAddCollateral({
       generalCollateral: [],
       vehicleCollateral: [],
       valid: false,
@@ -391,8 +392,8 @@ describe('Collateral Carbon Tax edit tests', () => {
   })
 
   it('renders summary view without general collateral when none is given and it is in the renew flow', async () => {
-    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.RENEWAL)
-    await store.dispatch('setAddCollateral', {
+    await store.setRegistrationFlowType(RegistrationFlowType.RENEWAL)
+    await store.setAddCollateral({
       generalCollateral: [],
       vehicleCollateral: [],
       valid: false,
@@ -410,9 +411,9 @@ describe('Collateral SA tests for amendments', () => {
   const registrationType = mockedSelectSecurityAgreement()
 
   beforeEach(async () => {
-    await store.dispatch('setRegistrationType', registrationType)
-    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.AMENDMENT)
-    await store.dispatch('setAddCollateral', {
+    await store.setRegistrationType(registrationType)
+    await store.setRegistrationFlowType(RegistrationFlowType.AMENDMENT)
+    await store.setAddCollateral({
       generalCollateral: [],
       vehicleCollateral: [],
       valid: false,
@@ -441,9 +442,9 @@ describe('Collateral RL tests for amendments', () => {
   const registrationType = mockedRepairersLien()
 
   beforeEach(async () => {
-    await store.dispatch('setRegistrationType', registrationType)
-    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.AMENDMENT)
-    await store.dispatch('setAddCollateral', {
+    await store.setRegistrationType(registrationType)
+    await store.setRegistrationFlowType(RegistrationFlowType.AMENDMENT)
+    await store.setAddCollateral({
       generalCollateral: [],
       vehicleCollateral: [],
       valid: false,

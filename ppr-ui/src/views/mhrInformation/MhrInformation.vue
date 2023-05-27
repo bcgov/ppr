@@ -466,7 +466,7 @@ export default defineComponent({
         isPriority: false
       },
       showTransferType: !!getMhrInformation.value.draftNumber || isFrozenMhr.value || false,
-      attentionReference: getMhrAttentionReferenceNum || '',
+      attentionReference: getMhrAttentionReferenceNum.value || '',
       cancelOptions: unsavedChangesDialog,
       showCancelDialog: false,
       showCancelChangeDialog: false,
@@ -499,10 +499,10 @@ export default defineComponent({
         return localState.validate && !getInfoValidation('isAuthorizationValid')
       }),
       validateStaffPayment: computed(() => {
-        return isRoleStaffReg && localState.validate && !getInfoValidation('isStaffPaymentValid')
+        return isRoleStaffReg.value && localState.validate && !getInfoValidation('isStaffPaymentValid')
       }),
       transferErrorMsg: computed((): string => {
-        if (localState.validate && hasLien) return '< Lien on this home is preventing transfer'
+        if (localState.validate && hasLien.value) return '< Lien on this home is preventing transfer'
 
         const isValidReview = localState.isReviewMode ? isValidTransferReview.value : isValidTransfer.value
         return localState.validate && !isValidReview ? '< Please complete required information' : ''
@@ -517,7 +517,7 @@ export default defineComponent({
         return getFeatureFlag('mhr-transfer-enabled')
       }),
       attnOrRefConfig: computed((): AttnRefConfigIF => {
-        return isRoleStaffReg ? staffConfig : clientConfig
+        return isRoleStaffReg.value ? staffConfig : clientConfig
       }),
       /** True if Jest is running the code. */
       isJestRunning: computed((): boolean => {
@@ -553,7 +553,7 @@ export default defineComponent({
         await setUnsavedChanges(false)
       }
 
-      if (isRoleQualifiedSupplier && !isRoleStaffReg) {
+      if (isRoleQualifiedSupplier.value && !isRoleStaffReg.value) {
         // Get Account Info from Auth to be used in Submitting Party section in Review screen
         localState.accountInfo = await getAccountInfoFromAuth() as AccountInfoIF
         parseSubmittingPartyInfo(localState.accountInfo)
@@ -617,7 +617,7 @@ export default defineComponent({
       await nextTick()
 
       // Prevent proceeding when Lien present
-      if (hasLien) {
+      if (hasLien.value) {
         await scrollToFirstError(true)
         return
       }

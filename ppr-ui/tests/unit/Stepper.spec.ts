@@ -1,8 +1,9 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
 import VueRouter from 'vue-router'
-import { getVuexStore } from '@/store'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
 
 import { shallowMount } from '@vue/test-utils'
 
@@ -19,13 +20,14 @@ Vue.use(VueRouter)
 const router = new VueRouter()
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 describe('Stepper component', () => {
   let wrapper: any
 
   beforeEach(async () => {
-    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement)
+    await store.setRegistrationType(mockedSelectSecurityAgreement)
     wrapper = shallowMount((Stepper as any), { store, vuetify, router })
   })
 

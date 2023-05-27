@@ -1,7 +1,8 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { getVuexStore } from '@/store'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
 
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import sinon from 'sinon'
@@ -18,7 +19,8 @@ import { axios } from '@/utils/axios-ppr'
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 // Input field selectors / buttons
 const historyTable: string = '#search-history-table'
@@ -44,7 +46,7 @@ describe('Test result table with no results', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
-    await store.dispatch('setSearchHistory', [])
+    await store.setSearchHistory([])
     wrapper = createComponent()
     await flushPromises()
   })
@@ -74,7 +76,7 @@ describe('Test result table with results', () => {
     get.returns(new Promise(resolve => resolve({
       data: { test: 'pdf' }
     })))
-    await store.dispatch('setSearchHistory', mockedSearchHistory.searches)
+    await store.setSearchHistory(mockedSearchHistory.searches)
     wrapper = createComponent()
   })
   afterEach(() => {
@@ -106,9 +108,9 @@ describe('Test result table with results', () => {
     for (let i = 0; i < mockedSearchHistory.searches.length; i++) {
       const searchQuery = mockedSearchHistory.searches[i].searchQuery
       const searchDate = mockedSearchHistory.searches[i].searchDateTime
-      const totalResultsSize = mockedSearchHistory.searches[i].totalResultsSize
-      const exactResultsSize = mockedSearchHistory.searches[i].exactResultsSize
-      const selectedResultsSize = mockedSearchHistory.searches[i].selectedResultsSize
+      const totalResultsSize = String(mockedSearchHistory.searches[i].totalResultsSize)
+      const exactResultsSize = String(mockedSearchHistory.searches[i].exactResultsSize)
+      const selectedResultsSize = String(mockedSearchHistory.searches[i].selectedResultsSize)
       const searchId = mockedSearchHistory.searches[i].searchId
       expect(rows.at(i + 1).text()).toContain(wrapper.vm.displaySearchValue(searchQuery))
       expect(rows.at(i + 1).text()).toContain(wrapper.vm.displayType(searchQuery.type))
@@ -118,13 +120,13 @@ describe('Test result table with results', () => {
       expect(rows.at(i + 1).text()).toContain(exactResultsSize)
       expect(rows.at(i + 1).text()).toContain(selectedResultsSize)
       // PDF only shows for selected result size < 76
-      if (selectedResultsSize < 76) {
+      if (Number(selectedResultsSize) < 76) {
         if (!wrapper.vm.isPDFAvailable(mockedSearchHistory.searches[i])) {
           expect(rows.at(i + 1).text()).not.toContain('PDF')
         } else {
           expect(rows.at(i + 1).text()).toContain('PDF')
           wrapper.find(`#pdf-btn-${searchId}`).trigger('click')
-          await Vue.nextTick()
+          await nextTick()
           expect(downloadMock).toHaveBeenCalledWith(mockedSearchHistory.searches[i])
         }
       }
@@ -143,7 +145,7 @@ describe('Test result table with results', () => {
     get.returns(new Promise(resolve => resolve({
       data: { test: 'pdf' }
     })))
-    await store.dispatch('setSearchHistory', mockedMHRSearchHistory.searches)
+    await store.setSearchHistory(mockedMHRSearchHistory.searches)
     wrapper = createComponent()
   })
   afterEach(() => {
@@ -175,8 +177,8 @@ describe('Test result table with results', () => {
     for (let i = 0; i < mockedMHRSearchHistory.searches.length; i++) {
       const searchQuery = mockedMHRSearchHistory.searches[i].searchQuery
       const searchDate = mockedMHRSearchHistory.searches[i].searchDateTime
-      const totalResultsSize = mockedMHRSearchHistory.searches[i].totalResultsSize
-      const selectedResultsSize = mockedMHRSearchHistory.searches[i].selectedResultsSize
+      const totalResultsSize = String(mockedMHRSearchHistory.searches[i].totalResultsSize)
+      const selectedResultsSize = String(mockedMHRSearchHistory.searches[i].selectedResultsSize)
       const searchId = mockedMHRSearchHistory.searches[i].searchId
       expect(rows.at(i + 1).text()).toContain(wrapper.vm.displaySearchValue(searchQuery))
       expect(rows.at(i + 1).text()).toContain(wrapper.vm.displayType(searchQuery.type))
@@ -185,13 +187,13 @@ describe('Test result table with results', () => {
       expect(rows.at(i + 1).text()).toContain(totalResultsSize)
       expect(rows.at(i + 1).text()).toContain(selectedResultsSize)
       // PDF only shows for selected result size < 76
-      if (selectedResultsSize < 76) {
+      if (Number(selectedResultsSize) < 76) {
         if (!wrapper.vm.isPDFAvailable(mockedMHRSearchHistory.searches[i])) {
           expect(rows.at(i + 1).text()).not.toContain('PDF')
         } else {
           expect(rows.at(i + 1).text()).toContain('PDF')
           wrapper.find(`#pdf-btn-${searchId}`).trigger('click')
-          await Vue.nextTick()
+          await nextTick()
           expect(downloadMock).toHaveBeenCalledWith(mockedMHRSearchHistory.searches[i])
         }
       }
@@ -203,7 +205,7 @@ describe('Test result table with error', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
-    await store.dispatch('setSearchHistory', null)
+    await store.setSearchHistory(null)
     wrapper = createComponent()
   })
   afterEach(() => {
@@ -224,7 +226,7 @@ describe('Test table headers', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
-    await store.dispatch('setSearchHistory', mockedSearchHistory.searches)
+    await store.setSearchHistory(mockedSearchHistory.searches)
     wrapper = createComponent()
   })
   afterEach(() => {
@@ -232,14 +234,14 @@ describe('Test table headers', () => {
   })
 
   it('headers for ppr only', async () => {
-    await store.dispatch('setAuthRoles', ['ppr'])
+    await store.setAuthRoles(['ppr'])
     expect(wrapper.findComponent(SearchHistory).exists()).toBe(true)
-    expect(wrapper.vm.$data.headers.length).toBe(9)
+    expect(wrapper.vm.headers.length).toBe(9)
   })
 
   it('headers for both mhr and ppr', async () => {
-    await store.dispatch('setAuthRoles', ['ppr', 'mhr'])
+    await store.setAuthRoles(['ppr', 'mhr'])
     expect(wrapper.findComponent(SearchHistory).exists()).toBe(true)
-    expect(wrapper.vm.$data.headers.length).toBe(9)
+    expect(wrapper.vm.headers.length).toBe(9)
   })
 })

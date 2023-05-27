@@ -1,7 +1,8 @@
 // Libraries
 import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { getVuexStore } from '@/store'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 
 // Components
@@ -12,7 +13,8 @@ import flushPromises from 'flush-promises'
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 /**
  * Creates and mounts a component, so that it can be tested.
@@ -37,8 +39,8 @@ describe('Home Certification', () => {
 
   beforeEach(async () => {
     wrapper = createComponent()
-    await store.dispatch('setMhrHomeDescription', { key: 'certificationOption', value: null })
-    wrapper.vm.$data.certificationOption = null
+    await store.setMhrHomeDescription({ key: 'certificationOption', value: null })
+    wrapper.vm.certificationOption = null
     await nextTick()
     await flushPromises()
   })

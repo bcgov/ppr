@@ -1,7 +1,8 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { getVuexStore } from '@/store'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
 import flushPromises from 'flush-promises'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import {
@@ -21,7 +22,8 @@ import { CautionBox } from '@/components/common'
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 /**
  * Creates and mounts a component, so that it can be tested.
@@ -44,9 +46,9 @@ describe('Parties tests', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
-    await store.dispatch('setAuthRoles', [])
-    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement())
-    await store.dispatch('setAddSecuredPartiesAndDebtors', {
+    await store.setAuthRoles([])
+    await store.setRegistrationType(mockedSelectSecurityAgreement())
+    await store.setAddSecuredPartiesAndDebtors({
       debtors: [],
       securedParties: [],
       registeringParty: mockedRegisteringParty1

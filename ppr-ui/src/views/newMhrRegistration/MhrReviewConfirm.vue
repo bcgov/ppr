@@ -97,6 +97,7 @@ export default defineComponent({
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
     const{
+      setShowGroups,
       isGlobalEditingMode
     } = useHomeOwners()
 
@@ -232,6 +233,7 @@ export default defineComponent({
     })
 
     return {
+      setShowGroups,
       isRoleStaffReg,
       onStaffPaymentDataUpdate,
       ...toRefs(localState)

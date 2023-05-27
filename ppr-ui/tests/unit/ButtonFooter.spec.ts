@@ -1,8 +1,7 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
 import VueRouter from 'vue-router' // eslint-disable-line no-unused-vars
-import { getVuexStore } from '@/store'
 import { mount, createLocalVue, shallowMount, Wrapper } from '@vue/test-utils'
 import flushPromises from 'flush-promises'
 import sinon from 'sinon'
@@ -18,12 +17,14 @@ import mockRouter from './MockRouter'
 import { RouteNames, StatementTypes } from '@/enums'
 import { axios } from '@/utils/axios-ppr'
 import { mockedModelAmendmdmentAdd } from './test-data'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
 
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
-
+setActivePinia(createPinia())
+const store = useStore()
 // Events
 
 // Input field selectors / buttons
@@ -45,7 +46,7 @@ function createComponent (
 ): Wrapper<any> {
   const localVue = createLocalVue()
   localVue.use(Vuetify)
-  // await router.push({ name: 'length-trust' })
+
   document.body.setAttribute('data-app', 'true')
   return mount((ButtonFooter as any), {
     localVue,
@@ -91,21 +92,21 @@ describe('New Financing Statement Registration Buttons Step 1', () => {
     expect(wrapper.vm.buttonConfig.nextText).toBe('Add Secured Parties and Debtors')
   })
   it('Step 1 cancel button event', async () => {
-    expect(wrapper.vm.$store.state.stateModel.unsavedChanges).toBe(false)
+    expect(store.getStateModel.unsavedChanges).toBe(false)
     await wrapper.find(cancelBtn).trigger('click')
     expect(wrapper.vm.showCancelDialog).toBe(false)
   })
   it('Step 1 next button event', async () => {
     wrapper.find(nextBtn).trigger('click')
-    await Vue.nextTick()
+    await nextTick()
   })
   it('Step 1 submitCancel', async () => {
     wrapper.vm.cancel()
-    await Vue.nextTick()
+    await nextTick()
   })
   it('Step 1 submitNext', async () => {
     wrapper.vm.submitNext()
-    await Vue.nextTick()
+    await nextTick()
   })
 })
 describe('New Financing Statement Registration Buttons Step 2', () => {
@@ -143,31 +144,31 @@ describe('New Financing Statement Registration Buttons Step 2', () => {
     expect(wrapper.vm.buttonConfig.nextText).toBe('Add Collateral')
   })
   it('Step 2 cancel button event', async () => {
-    expect(wrapper.vm.$store.state.stateModel.unsavedChanges).toBe(false)
+    expect(store.getStateModel.unsavedChanges).toBe(false)
     await wrapper.find(cancelBtn).trigger('click')
     expect(wrapper.vm.showCancelDialog).toBe(false)
   })
 
   it('Step 2 back button event', async () => {
     wrapper.find(backBtn).trigger('click')
-    await Vue.nextTick()
+    await nextTick()
   })
   it('Step 2 next button event', async () => {
     wrapper.find(nextBtn).trigger('click')
-    await Vue.nextTick()
+    await nextTick()
   })
 
   it('Step 2 submitCancel', async () => {
     wrapper.vm.cancel()
-    await Vue.nextTick()
+    await nextTick()
   })
   it('Step 2 submitBack', async () => {
     wrapper.vm.submitBack()
-    await Vue.nextTick()
+    await nextTick()
   })
   it('Step 2 submitNext', async () => {
     wrapper.vm.submitNext()
-    await Vue.nextTick()
+    await nextTick()
   })
 })
 
@@ -206,30 +207,30 @@ describe('New Financing Statement Registration Buttons Step 3', () => {
     expect(wrapper.vm.buttonConfig.nextText).toBe('Review and Confirm')
   })
   it('Step 3 cancel button event', async () => {
-    expect(wrapper.vm.$store.state.stateModel.unsavedChanges).toBe(false)
+    expect(store.getStateModel.unsavedChanges).toBe(false)
     await wrapper.find(cancelBtn).trigger('click')
     expect(wrapper.vm.showCancelDialog).toBe(false)
   })
   it('Step 3 back button event', async () => {
     wrapper.find(backBtn).trigger('click')
-    await Vue.nextTick()
+    await nextTick()
   })
   it('Step 3 next button event', async () => {
     wrapper.find(nextBtn).trigger('click')
-    await Vue.nextTick()
+    await nextTick()
   })
 
   it('Step 3 submitCancel', async () => {
     wrapper.vm.cancel()
-    await Vue.nextTick()
+    await nextTick()
   })
   it('Step 3 submitBack', async () => {
     wrapper.vm.submitBack()
-    await Vue.nextTick()
+    await nextTick()
   })
   it('Step 3 submitNext', async () => {
     wrapper.vm.submitNext()
-    await Vue.nextTick()
+    await nextTick()
   })
 })
 
@@ -268,30 +269,30 @@ describe('New Financing Statement Registration Buttons Step 4', () => {
     expect(wrapper.vm.buttonConfig.nextText).toBe('Register and Pay')
   })
   it('Step 4 cancel button event', async () => {
-    expect(wrapper.vm.$store.state.stateModel.unsavedChanges).toBe(false)
+    expect(store.getStateModel.unsavedChanges).toBe(false)
     await wrapper.find(cancelBtn).trigger('click')
     expect(wrapper.vm.showCancelDialog).toBe(false)
   })
   it('Step 4 back button event', async () => {
     wrapper.find(backBtn).trigger('click')
-    await Vue.nextTick()
+    await nextTick()
   })
   it('Step 4 next button event', async () => {
     wrapper.find(nextBtn).trigger('click')
-    await Vue.nextTick()
+    await nextTick()
   })
 
   it('Step 4 submitCancel', async () => {
     wrapper.vm.cancel()
-    await Vue.nextTick()
+    await nextTick()
   })
   it('Step 4 submitBack', async () => {
     wrapper.vm.submitBack()
-    await Vue.nextTick()
+    await nextTick()
   })
   it('Step 4 submitNext', async () => {
     wrapper.vm.submitNext()
-    await Vue.nextTick()
+    await nextTick()
   })
 })
 
@@ -304,7 +305,7 @@ describe('Step 4 for SBC staff', () => {
   beforeEach(async () => {
     const localVue = createLocalVue()
     localVue.use(VueRouter)
-    await store.dispatch('setAuthRoles', ['staff', 'ppr_staff'])
+    await store.setAuthRoles(['staff', 'ppr_staff'])
     wrapper2 = shallowMount((ReviewConfirm as any), { localVue, store, router, vuetify })
     wrapper = createComponent(currentStatementType, currentStepName)
   })
@@ -319,7 +320,7 @@ describe('Step 4 for SBC staff', () => {
 
   it('doesnt show staff payment dialog on submit if not valid', async () => {
     wrapper.find(nextBtn).trigger('click')
-    await Vue.nextTick()
+    await nextTick()
     expect(wrapper.findComponent(StaffPaymentDialog).vm.$props.setDisplay).toBe(false)
     expect(getLastEvent(wrapper, 'registration-incomplete')).toMatchObject({
       message: 'Registration incomplete: one or more steps is invalid.', statusCode: 400
@@ -327,21 +328,20 @@ describe('Step 4 for SBC staff', () => {
   })
 
   it('Shows staff payment dialog on submit', async () => {
-    wrapper.vm.$store.state.stateModel.registration.lengthTrust.valid = true
-    wrapper.vm.$store.state.stateModel.registration.parties.valid = true
-    wrapper.vm.$store.state.stateModel.registration.collateral.valid = true
+    store.getStateModel.registration.lengthTrust.valid = true
+    store.getStateModel.registration.parties.valid = true
+    store.getStateModel.registration.collateral.valid = true
     wrapper.vm.$props.certifyValid = true
-    await Vue.nextTick()
-    await Vue.nextTick()
+    await nextTick()
     wrapper.find(nextBtn).trigger('click')
-    await Vue.nextTick()
+    await nextTick()
 
     expect(wrapper.findComponent(StaffPaymentDialog).vm.$props.setDisplay).toBe(true)
   })
 
   it('disables button for bcol', async () => {
-    await store.dispatch('setAuthRoles', ['staff', 'helpdesk'])
-    await Vue.nextTick()
+    await store.setAuthRoles(['staff', 'helpdesk'])
+    await nextTick()
     expect(wrapper.find(nextBtn).attributes('disabled')).toBe('disabled')
   })
 })
@@ -367,10 +367,10 @@ describe('Button events', () => {
   })
 
   it('emits error', async () => {
-    wrapper.vm.$store.state.stateModel.registration = mockedModelAmendmdmentAdd.registration
-    wrapper.vm.$store.state.stateModel.registration.lengthTrust.valid = true
-    wrapper.vm.$store.state.stateModel.registration.parties.valid = true
-    wrapper.vm.$store.state.stateModel.registration.collateral.valid = true
+    store.getStateModel.registration = mockedModelAmendmdmentAdd.registration
+    store.getStateModel.registration.lengthTrust.valid = true
+    store.getStateModel.registration.parties.valid = true
+    store.getStateModel.registration.collateral.valid = true
     wrapper.vm.$props.certifyValid = true
     expect(getLastEvent(wrapper, 'error')).toBeNull()
     await wrapper.vm.submitNext()

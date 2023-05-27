@@ -31,7 +31,7 @@
         </v-row>
       </v-col>
       <v-col align-self="end" style="padding-right: 30px; width: 320px;">
-        <v-btn id="btn-generate-result" class="float-right" color="primary" depressed plain @click="emit('submit')">
+        <v-btn id="btn-generate-result" class="float-right" color="primary" depressed @click="emit('submit')">
           <img class="pr-1" src="@/assets/svgs/pdf-icon-white.svg">
           Generate Search Result Report
         </v-btn>

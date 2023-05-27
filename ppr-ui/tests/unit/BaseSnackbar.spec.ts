@@ -1,15 +1,17 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { getVuexStore } from '@/store'
+import { useStore } from '@/store/store'
+import { createPinia, setActivePinia } from 'pinia'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 // local components
 import { BaseSnackbar } from '@/components/common'
 
 Vue.use(Vuetify)
-
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+
+setActivePinia(createPinia())
+const store = useStore()
 
 /**
  * Creates and mounts a component, so that it can be tested.
@@ -58,11 +60,11 @@ describe('BaseSnackbar component tests', () => {
     // close snackbar
     expect(wrapper.find('.snackbar-btn-close').exists()).toBe(true)
     await wrapper.find('.snackbar-btn-close').trigger('click')
-    expect(wrapper.vm.$data.showSnackbar).toBe(false)
+    expect(wrapper.vm.showSnackbar).toBe(false)
     expect(wrapper.find('.v-snack__wrapper').isVisible()).toBe(false)
     // verify toggle works again after the first time
     await wrapper.setProps({ toggleSnackbar: false })
-    expect(wrapper.vm.$data.showSnackbar).toBe(true)
+    expect(wrapper.vm.showSnackbar).toBe(true)
     expect(wrapper.find('.v-snack__wrapper').isVisible()).toBe(true)
     expect(wrapper.find('.v-snack__wrapper').text()).toBe(msg)
   })

@@ -1,7 +1,8 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { getVuexStore } from '@/store'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
 
 import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
 import flushPromises from 'flush-promises'
@@ -13,7 +14,8 @@ import { getLastEvent } from './utils'
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 const dateSelectors = '.v-date-picker-table--date'
 const headers = '.picker-title'
@@ -83,21 +85,26 @@ describe('Date Picker tests', () => {
     // set start date only + test validation
     const startDate = '2021-10-22'
     wrapper.vm.startDate = startDate
-    await flushPromises()
+    wrapper.vm.endDate = null
+    await nextTick()
+    await nextTick()
     expect(wrapper.vm.startDate).toBe(startDate)
     // should still trigger validation err
     wrapper.findAll(submitButtons).at(0).trigger('click')
-    await flushPromises()
+    await nextTick()
+    await nextTick()
     expect(wrapper.vm.datePickerErr).toBe(true)
     // last event will be the same as before
     expect(getLastEvent(wrapper, 'submit')).toEqual({ endDate: null, startDate: null })
     // select end date and submit should emit values
     const endDate = '2021-10-23'
     wrapper.vm.endDate = endDate
-    await flushPromises()
+    await nextTick()
+    await nextTick()
     expect(wrapper.vm.endDate).toBe(endDate)
     wrapper.findAll(submitButtons).at(0).trigger('click')
-    await flushPromises()
+    await nextTick()
+    await nextTick()
     expect(wrapper.vm.datePickerErr).toBe(false)
     expect(getLastEvent(wrapper, 'submit')).toEqual({ startDate: startDate, endDate: endDate })
   })

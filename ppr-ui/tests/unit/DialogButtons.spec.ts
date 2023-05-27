@@ -1,6 +1,8 @@
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { getVuexStore } from '@/store'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
+
 import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
 
 import flushPromises from 'flush-promises'
@@ -11,7 +13,8 @@ import { getLastEvent } from './utils'
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 // emitted events
 const proceed: string = 'proceed'

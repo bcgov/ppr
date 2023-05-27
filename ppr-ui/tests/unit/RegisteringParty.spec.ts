@@ -1,7 +1,8 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { getVuexStore } from '@/store'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
 
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import { mockedRegisteringParty1 } from './test-data'
@@ -17,7 +18,8 @@ import { getLastEvent } from './utils'
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 // Events
 
@@ -61,7 +63,7 @@ describe('RegisteringParty store tests', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
-    await store.dispatch('setAddSecuredPartiesAndDebtors', {
+    await store.setAddSecuredPartiesAndDebtors({
       registeringParty: mockedRegisteringParty1
     })
     wrapper = createComponent()
@@ -100,7 +102,7 @@ describe('RegisteringParty store undo test', () => {
   sessionStorage.setItem('AUTH_API_URL', 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/')
 
   beforeEach(async () => {
-    await store.dispatch('setAddSecuredPartiesAndDebtors', {
+    await store.setAddSecuredPartiesAndDebtors({
       registeringParty:
       {
         businessName: 'ABC REGISTERING COMPANY LTD.',
@@ -125,7 +127,7 @@ describe('RegisteringParty store undo test', () => {
           businessName: 'ANOTHER COMPANY'
         }
       })))
-    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.NEW)
+    await store.setRegistrationFlowType(RegistrationFlowType.NEW)
 
     wrapper = createComponent()
   })
@@ -162,7 +164,7 @@ describe('Test result table with error', () => {
   sessionStorage.setItem('AUTH_API_URL', 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/')
 
   beforeEach(async () => {
-    await store.dispatch('setAddSecuredPartiesAndDebtors', {
+    await store.setAddSecuredPartiesAndDebtors({
       registeringParty: null
     })
 
@@ -172,7 +174,7 @@ describe('Test result table with error', () => {
       new Promise(resolve => resolve({
         data: null
       })))
-    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.NEW)
+    await store.setRegistrationFlowType(RegistrationFlowType.NEW)
     wrapper = createComponent()
   })
   afterEach(() => {

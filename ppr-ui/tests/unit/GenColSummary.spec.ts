@@ -1,7 +1,8 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { getVuexStore } from '@/store'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
 
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import {
@@ -16,7 +17,8 @@ import { pacificDate } from '@/utils'
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 // Input field selectors / buttons
 const title = 'h3'
@@ -50,16 +52,16 @@ describe('GenColSummary tests', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
-    await store.dispatch('setGeneralCollateral', [])
+    await store.setGeneralCollateral([])
   })
   afterEach(() => {
     wrapper.destroy()
   })
 
   it('renders showing general collateral under header in new reg flow', async () => {
-    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.NEW)
+    await store.setRegistrationFlowType(RegistrationFlowType.NEW)
     const newDescription = 'new description'
-    await store.dispatch('setGeneralCollateral', [{ description: newDescription }])
+    await store.setGeneralCollateral([{ description: newDescription }])
     wrapper = createComponent()
     expect(wrapper.findComponent(GenColSummary).exists()).toBe(true)
     expect(wrapper.vm.showingHistory).toBe(false)
@@ -71,8 +73,8 @@ describe('GenColSummary tests', () => {
   })
 
   it('renders showing general collateral under header in discharge flow', async () => {
-    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.DISCHARGE)
-    await store.dispatch('setGeneralCollateral', mockedGeneralCollateral2)
+    await store.setRegistrationFlowType(RegistrationFlowType.DISCHARGE)
+    await store.setGeneralCollateral(mockedGeneralCollateral2)
     wrapper = createComponent()
     expect(wrapper.findComponent(GenColSummary).exists()).toBe(true)
     expect(wrapper.vm.showingHistory).toBe(false)
@@ -88,7 +90,7 @@ describe('GenColSummary tests', () => {
     expect(wrapper.findAll(description).at(0).text()).toContain('Base Registration General Collateral:')
     expect(
       wrapper.findAll(description).at(0).text()
-    ).toContain(mockedGeneralCollateral2[wrapper.vm.$data.baseGenCollateralIndex].description)
+    ).toContain(mockedGeneralCollateral2[wrapper.vm.baseGenCollateralIndex].description)
     // ammended general collateral
     const descriptionAddAll = wrapper.findAll(descriptionAdd)
     const descriptionDeleteAll = wrapper.findAll(descriptionDelete)
@@ -119,7 +121,7 @@ describe('GenColSummary Amendment tests', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
-    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.AMENDMENT)
+    await store.setRegistrationFlowType(RegistrationFlowType.AMENDMENT)
   })
   afterEach(() => {
     wrapper.destroy()
@@ -127,7 +129,7 @@ describe('GenColSummary Amendment tests', () => {
 
   it('renders showing general collateral and amend button', async () => {
     const newDescription = 'new description'
-    await store.dispatch('setGeneralCollateral', [{ description: newDescription, addedDateTime: '2021-10-21' }])
+    await store.setGeneralCollateral([{ description: newDescription, addedDateTime: '2021-10-21' }])
     wrapper = createComponent()
     expect(wrapper.findComponent(GenColSummary).exists()).toBe(true)
     expect(wrapper.vm.showingHistory).toBe(false)
@@ -140,7 +142,7 @@ describe('GenColSummary Amendment tests', () => {
   })
 
   it('renders showing general collateral and undo button', async () => {
-    await store.dispatch('setGeneralCollateral', [{ descriptionAdd: 'test', descriptionDelete: 'othertest' }])
+    await store.setGeneralCollateral([{ descriptionAdd: 'test', descriptionDelete: 'othertest' }])
     wrapper = createComponent()
     expect(wrapper.findComponent(GenColSummary).exists()).toBe(true)
     expect(wrapper.vm.showingHistory).toBe(false)
@@ -157,7 +159,7 @@ describe('GenColSummary Amendment tests', () => {
     wrapper.vm.$props.setShowHistory = false
     wrapper.vm.$props.setShowAmendLink = false
     wrapper.vm.$props.setShowViewLink = false
-    await Vue.nextTick()
+    await nextTick()
     expect(wrapper.findComponent(GenColSummary).exists()).toBe(true)
     expect(wrapper.vm.showingHistory).toBe(false)
     // title should not show

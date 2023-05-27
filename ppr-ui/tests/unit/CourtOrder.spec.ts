@@ -1,8 +1,9 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { getVuexStore } from '@/store'
 import { mount, createLocalVue } from '@vue/test-utils'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
 
 // Components
 import { CourtOrder } from '@/components/common'
@@ -12,7 +13,8 @@ import flushPromises from 'flush-promises'
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 // Prevent the warning "[Vuetify] Unable to locate target [data-app]"
 document.body.setAttribute('data-app', 'true')
@@ -25,7 +27,7 @@ describe('Court Order component', () => {
     const localVue = createLocalVue()
     localVue.use(Vuetify)
     document.body.setAttribute('data-app', 'true')
-    await store.dispatch('setCourtOrderInformation',
+    await store.setCourtOrderInformation(
       {
         courtName: 'ABC',
         courtRegistry: '123',
@@ -83,9 +85,7 @@ describe('Court Order component', () => {
     wrapper.vm.$data.orderDate = 'October 7, 2021'
     invalidLengthTxt = 'x'.repeat(513)
     wrapper.find('#effect-of-order').setValue(invalidLengthTxt)
-    await Vue.nextTick()
-    await Vue.nextTick()
-    await Vue.nextTick()
+    await nextTick()
     const messages = wrapper.findAll('.v-messages__message')
     console.log(messages)
     expect(messages.length).toBe(4)
@@ -110,7 +110,7 @@ describe('Court Order summary component', () => {
     const localVue = createLocalVue()
     localVue.use(Vuetify)
     document.body.setAttribute('data-app', 'true')
-    await store.dispatch('setCourtOrderInformation',
+    await store.setCourtOrderInformation(
       {
         courtName: 'ABC',
         courtRegistry: '123',

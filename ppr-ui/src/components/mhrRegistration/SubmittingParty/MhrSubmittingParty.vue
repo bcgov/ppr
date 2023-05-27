@@ -303,7 +303,7 @@ export default defineComponent({
 
     /** Apply store properties to local model. **/
     watch(
-      [getMhrRegistrationSubmittingParty.value, getMhrTransferSubmittingParty.value],
+      [getMhrRegistrationSubmittingParty, getMhrTransferSubmittingParty],
       () => {
         if (localState.enableLookUp) {
           const submittingParty = (props.isMhrTransfer

@@ -1,7 +1,8 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { getVuexStore } from '@/store'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import flushPromises from 'flush-promises'
 
@@ -11,7 +12,8 @@ import { EditParty } from '@/components/parties/party'
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 // Events
 
@@ -50,7 +52,7 @@ describe('Secured Party validation tests - business', () => {
     const radios = wrapper.findAll('input[type=radio]')
     expect(radios.length).toBe(2)
     radios.at(1).trigger('click')
-    await Vue.nextTick()
+    await nextTick()
 
     // no input added
     wrapper.find('#txt-name-party').setValue('')
@@ -77,7 +79,7 @@ describe('Secured Party validation tests - individual', () => {
     const radios = wrapper.findAll('input[type=radio]')
     expect(radios.length).toBe(2)
     radios.at(0).trigger('click')
-    await Vue.nextTick()
+    await nextTick()
 
     // no input added
     wrapper.find('#txt-first-party').setValue('')
@@ -95,7 +97,7 @@ describe('Secured Party validation tests - individual', () => {
     const radios = wrapper.findAll('input[type=radio]')
     expect(radios.length).toBe(2)
     radios.at(0).trigger('click')
-    await Vue.nextTick()
+    await nextTick()
     wrapper.find('#txt-first-party').setValue('first')
     wrapper.find('#txt-last-party').setValue('person')
 

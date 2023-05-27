@@ -166,7 +166,7 @@ export default defineComponent({
     }
 
     watch(() => props.validate, (val: boolean) => {
-      transferDetailsForm.validate()
+      transferDetailsForm.value?.validate()
     })
 
     watch(() => localState.consideration, (val: string) => {

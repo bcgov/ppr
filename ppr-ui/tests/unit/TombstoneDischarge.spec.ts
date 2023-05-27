@@ -1,8 +1,9 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
 import VueRouter from 'vue-router'
-import { getVuexStore } from '@/store'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
 
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 
@@ -19,7 +20,8 @@ import { pacificDate } from '@/utils'
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 // selectors
 const tombstoneHeader: string = '.tombstone-header'
@@ -60,10 +62,10 @@ describe('Tombstone component', () => {
 
   beforeAll(async () => {
     // setup data
-    await store.dispatch('setRegistrationType', registrationType)
-    await store.dispatch('setRegistrationNumber', registration.baseRegistrationNumber)
-    await store.dispatch('setRegistrationCreationDate', registration.createDateTime)
-    await store.dispatch('setRegistrationExpiryDate', registration.expiryDate)
+    await store.setRegistrationType(registrationType)
+    await store.setRegistrationNumber(registration.baseRegistrationNumber)
+    await store.setRegistrationCreationDate(registration.createDateTime)
+    await store.setRegistrationExpiryDate(registration.expiryDate)
   })
 
   beforeEach(async () => {
@@ -85,6 +87,7 @@ describe('Tombstone component', () => {
   })
 
   it('renders Tombstone component properly for Total Discharge', async () => {
+    await store.setMhrInformation(mockedMhrInformation)
     wrapper = createComponent(RouteNames.REVIEW_DISCHARGE)
     const tombstoneDischarge = wrapper.findComponent(TombstoneDischarge)
     expect(tombstoneDischarge.exists()).toBe(true)

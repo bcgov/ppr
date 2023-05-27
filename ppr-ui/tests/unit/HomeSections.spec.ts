@@ -1,7 +1,8 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { getVuexStore } from '@/store'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
 
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 
@@ -14,7 +15,8 @@ import { mockedHomeSections } from './test-data/mock-home-sections'
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 const addEditHomeSectionBtn = '.add-home-section-btn'
 const sectionCounter = '#section-count'
@@ -43,7 +45,7 @@ describe('Home Sections', () => {
 
   beforeEach(async () => {
     // Set home sections default
-    await store.dispatch('setMhrHomeDescription', { key: 'sections', value: [] })
+    await store.setMhrHomeDescription({ key: 'sections', value: [] })
 
     wrapper = createComponent()
   })
@@ -85,7 +87,7 @@ describe('Home Sections', () => {
 
   it('counts the added Home Sections', async () => {
     expect(wrapper.find(sectionCounter).text()).toBe('Number of Sections: 0')
-    await store.dispatch('setMhrHomeDescription', { key: 'sections', value: mockedHomeSections })
+    await store.setMhrHomeDescription({ key: 'sections', value: mockedHomeSections })
 
     expect(wrapper.find(sectionCounter).text()).toBe('Number of Sections: 4')
   })
@@ -96,7 +98,7 @@ describe('Home Sections', () => {
     expect(wrapper.find(errorText).exists()).toBe(false)
 
     // Set homeSections
-    await store.dispatch('setMhrHomeDescription', { key: 'sections', value: mockedHomeSections })
+    await store.setMhrHomeDescription({ key: 'sections', value: mockedHomeSections })
 
     // Verify sections added
     expect(wrapper.find(sectionCounter).text()).toBe('Number of Sections: 4')

@@ -1,8 +1,10 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
 import VueRouter from 'vue-router'
-import { getVuexStore } from '@/store'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
+
 import { createLocalVue, shallowMount } from '@vue/test-utils'
 import sinon from 'sinon'
 import flushPromises from 'flush-promises'
@@ -12,13 +14,11 @@ import {
   FolioNumberSummary,
   StickyContainer
 } from '@/components/common'
-import { StaffPayment as StaffPaymentComponent } from '@bcrs-shared-components/staff-payment'
 import { BaseDialog } from '@/components/dialogs'
 // ppr enums/utils/etc.
 import { RouteNames } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { StateModelIF } from '@/interfaces'
-import { axios } from '@/utils/axios-ppr'
 // test mocks/data
 import mockRouter from './MockRouter'
 import { SearchedResultMhr } from '@/components/tables'
@@ -27,7 +27,8 @@ import { defaultFlagSet } from '@/utils'
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 // Prevent the warning "[Vuetify] Unable to locate target [data-app]"
 document.body.setAttribute('data-app', 'true')
@@ -63,7 +64,6 @@ describe('Confirm MHRSearch view', () => {
     expect(wrapper.vm.$route.name).toBe(RouteNames.MHRSEARCH_CONFIRM)
     expect(wrapper.vm.appReady).toBe(true)
     expect(wrapper.vm.dataLoaded).toBe(true)
-    const state = wrapper.vm.$store.state.stateModel as StateModelIF
     // check fee summary + buttons
     expect(wrapper.findComponent(StickyContainer).exists()).toBe(true)
     expect(wrapper.findComponent(StickyContainer).vm.$props.setShowFeeSummary).toBe(true)
@@ -86,7 +86,7 @@ describe('Confirm MHRSearch view', () => {
 
   it('processes cancel button action', async () => {
     // setup
-    await wrapper.vm.$store.dispatch('setUnsavedChanges', true)
+    await store.setUnsavedChanges(true)
     // dialog doesn't start visible
     expect(wrapper.findComponent(BaseDialog).vm.$props.setDisplay).toBe(false)
     // pressing cancel triggers dialog
@@ -109,18 +109,18 @@ describe('Confirm MHRSearch view', () => {
     setTimeout(async () => {
       await wrapper.findComponent(StickyContainer).vm.$emit('submit', true)
       // turn show errors on when invalid
-      expect(wrapper.vm.$data.showErrors).toBe(true)
+      expect(wrapper.vm.showErrors).toBe(true)
     }, 2000)
   })
 
   it('shows errors when staff payment is invalid', async () => {
-    store.state.stateModel.isStaffClientPayment = true
+    store.setIsStaffClientPayment(true)
     wrapper.vm.staffPaymentValid = false
     // need to wait 2 secs so throttle is done
     setTimeout(async () => {
       await wrapper.findComponent(StickyContainer).vm.$emit('submit', true)
       // turn show errors on when invalid
-      expect(wrapper.vm.$data.showErrors).toBe(true)
+      expect(wrapper.vm.showErrors).toBe(true)
     }, 2000)
   })
 

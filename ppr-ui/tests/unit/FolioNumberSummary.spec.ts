@@ -1,8 +1,8 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-
-import { getVuexStore } from '@/store'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
 import { mount, createLocalVue } from '@vue/test-utils'
 
 // Components
@@ -11,7 +11,8 @@ import { FolioNumberSummary } from '@/components/common'
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 // Prevent the warning "[Vuetify] Unable to locate target [data-app]"
 document.body.setAttribute('data-app', 'true')
@@ -31,7 +32,7 @@ describe('Folio number on the summary page', () => {
       store,
       vuetify
     })
-    await store.dispatch('setFolioOrReferenceNumber', 'ABC123')
+    await store.setFolioOrReferenceNumber('ABC123')
   })
 
   afterEach(() => {
@@ -44,24 +45,23 @@ describe('Folio number on the summary page', () => {
   })
 
   it('renders the folio data from the store', async () => {
-    expect(wrapper.vm.$data.folioNumber).toEqual('ABC123')
+    expect(wrapper.vm.folioNumber).toEqual('ABC123')
     expect(wrapper.find('#txt-folio').element.value).toBe('ABC123')
   })
 
   it('is valid and emits the valid event', async () => {
     wrapper.find('#txt-folio').setValue('MY TEST')
+    await nextTick()
     expect(wrapper.emitted().folioValid).toBeTruthy()
-    expect(wrapper.vm.$data.isValid).toBeTruthy()
+    expect(wrapper.vm.isValid).toBeTruthy()
   })
 
   it('sets the validity to false for > 50 characters', async () => {
     wrapper.find('#txt-folio').setValue(
       'MY TEST THAT IS VERY LONG IN FACT TOO LONG SKDJFA ASKDJFL ASDKFJL ASDKJFL ALKSJDFLKJ ALSDKFJ AKSDJF'
     )
-    await Vue.nextTick()
-    await Vue.nextTick()
-    await Vue.nextTick()
-    expect(wrapper.vm.$data.isValid).toBeFalsy()
+    await nextTick()
+    expect(wrapper.vm.isValid).toBeFalsy()
     expect(wrapper.emitted().folioValid).toBeTruthy()
   })
 })

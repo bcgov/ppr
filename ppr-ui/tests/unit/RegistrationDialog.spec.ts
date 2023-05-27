@@ -1,7 +1,8 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { getVuexStore } from '@/store'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
 
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import flushPromises from 'flush-promises'
@@ -13,7 +14,8 @@ import { registrationOtherDialog } from '@/resources/dialogOptions'
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 // Events
 const proceed = 'proceed'
@@ -107,7 +109,7 @@ describe('Registration Other Dialog tests', () => {
     wrapper.find(dialogSubmit).trigger('click')
     await flushPromises()
     // check emitted other + set other name desc
-    expect(wrapper.vm.$store.state.stateModel.registration.registrationTypeOtherDesc).toBe('test')
+    expect(store.getStateModel.registration.registrationTypeOtherDesc).toBe('test')
     expect(getLastEvent(wrapper, proceed)).toBe(true)
   })
 })

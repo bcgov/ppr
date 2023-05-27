@@ -1,8 +1,9 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
 import flushPromises from 'flush-promises'
-import { getVuexStore } from '@/store'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
 import { mount, createLocalVue } from '@vue/test-utils'
 
 // Components
@@ -16,7 +17,8 @@ import {
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 document.body.setAttribute('data-app', 'true')
 
@@ -76,12 +78,12 @@ describe('Payment component', () => {
   })
 
   it('updates search certified when checkbox is selected', async () => {
-    expect(wrapper.vm.$store.state.stateModel.search.searchCertified).toBe(false)
+    expect(store.getStateModel.search.searchCertified).toBe(false)
     wrapper.find('#certify-checkbox').trigger('click')
-    wrapper.vm.$data.valid = true
+    wrapper.vm.valid = true
     wrapper.findComponent(BaseDialog).vm.$emit(proceed, true)
     await flushPromises()
-    expect(wrapper.vm.$store.state.stateModel.search.searchCertified).toBe(true)
+    expect(store.getStateModel.search.searchCertified).toBe(true)
   })
 
   it('updates store payment info', async () => {
@@ -96,7 +98,7 @@ describe('Payment component', () => {
     await flushPromises()
     wrapper.findComponent(BaseDialog).vm.$emit(proceed, true)
     await flushPromises()
-    expect(wrapper.vm.$store.state.stateModel.staffPayment.routingSlipNumber).toBe('999888777')
+    expect(store.getStateModel.staffPayment.routingSlipNumber).toBe('999888777')
   })
 
   it('Clears the payment data on cancel', async () => {
@@ -112,6 +114,6 @@ describe('Payment component', () => {
     wrapper.findComponent(BaseDialog).vm.$emit(proceed, false)
     await flushPromises()
     expect(getLastEvent(wrapper, proceed)).toEqual(false)
-    expect(wrapper.vm.$store.state.stateModel.staffPayment.routingSlipNumber).toBe('')
+    expect(store.getStateModel.staffPayment.routingSlipNumber).toBe('')
   })
 })

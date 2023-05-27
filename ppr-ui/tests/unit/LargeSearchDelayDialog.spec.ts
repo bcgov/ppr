@@ -1,6 +1,7 @@
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { getVuexStore } from '@/store'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
 
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 // local
@@ -13,7 +14,8 @@ import { getLastEvent } from './utils'
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 // emitted events
 const proceed: string = 'proceed'
@@ -44,7 +46,7 @@ describe('Delay Dialog', () => {
         },
         vuetify
       })
-    await Vue.nextTick()
+    await nextTick()
   })
   afterEach(() => {
     wrapper.destroy()
@@ -59,7 +61,7 @@ describe('Delay Dialog', () => {
     expect(wrapper.find(text).text()).toContain(options.text)
     expect(wrapper.find(accept).exists()).toBe(true)
     wrapper.find(accept).trigger('click')
-    await Vue.nextTick()
+    await nextTick()
     expect(getLastEvent(wrapper, proceed)).toEqual(true)
   })
 })

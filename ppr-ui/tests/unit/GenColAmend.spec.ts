@@ -1,10 +1,9 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { getVuexStore } from '@/store'
-
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
 import { TiptapVuetifyPlugin, TiptapVuetify } from 'tiptap-vuetify'
-
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 
 // Components
@@ -22,7 +21,8 @@ Vue.use(TiptapVuetifyPlugin, {
   // optional, default to 'md' (default vuetify icons before v2.0.0)
   iconsGroup: 'mdi'
 })
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 // Input field selectors / buttons
 const doneButtonSelector: string = '#done-btn-gen-col'
@@ -53,8 +53,8 @@ describe('GenColAmend tests', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
-    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.AMENDMENT)
-    await store.dispatch('setGeneralCollateral', [])
+    await store.setRegistrationFlowType(RegistrationFlowType.AMENDMENT)
+    await store.setGeneralCollateral([])
   })
   afterEach(() => {
     wrapper.destroy()
@@ -70,7 +70,7 @@ describe('GenColAmend tests', () => {
   })
 
   it('shows saved general collateral', async () => {
-    await store.dispatch('setGeneralCollateral', [{ descriptionAdd: 'addexample', descriptionDelete: 'othertest' }])
+    await store.setGeneralCollateral([{ descriptionAdd: 'addexample', descriptionDelete: 'othertest' }])
 
     wrapper = createComponent(false)
     expect(wrapper.vm.addDesc).toBe('addexample')
@@ -78,7 +78,7 @@ describe('GenColAmend tests', () => {
   })
 
   it('does not show existing general collateral from previous amendment', async () => {
-    await store.dispatch('setGeneralCollateral',
+    await store.setGeneralCollateral(
       [{ descriptionAdd: 'addexample', descriptionDelete: 'othertest', addedDateTime: '2021-10-13' }])
 
     wrapper = createComponent(false)
@@ -87,7 +87,7 @@ describe('GenColAmend tests', () => {
   })
 
   it('updates general collateral', async () => {
-    await store.dispatch('setGeneralCollateral', [])
+    await store.setGeneralCollateral([])
     wrapper = createComponent(false)
     wrapper.vm.delDesc = 'JOE'
     wrapper.vm.addDesc = 'SCHMOE'
@@ -95,11 +95,11 @@ describe('GenColAmend tests', () => {
     expect(getLastEvent(wrapper, 'closeGenColAmend')).toBeTruthy()
     await flushPromises()
     // store should have 1 item now
-    expect(store.getters.getAddCollateral.generalCollateral.length).toBe(1)
+    expect(store.getAddCollateral.generalCollateral.length).toBe(1)
   })
 
   it('saves amended general collateral over the previous one', async () => {
-    await store.dispatch('setGeneralCollateral',
+    await store.setGeneralCollateral(
       [{ descriptionAdd: 'addexample', descriptionDelete: 'othertest' }])
     wrapper = createComponent(false)
     wrapper.vm.delDesc = 'JOE'
@@ -108,7 +108,7 @@ describe('GenColAmend tests', () => {
     expect(getLastEvent(wrapper, 'closeGenColAmend')).toBeTruthy()
     await flushPromises()
     // store should still have 1 item now (replaced the last one)
-    expect(store.getters.getAddCollateral.generalCollateral.length).toBe(1)
-    expect(store.getters.getAddCollateral.generalCollateral[0].descriptionAdd).toBe('SCHMOE')
+    expect(store.getAddCollateral.generalCollateral.length).toBe(1)
+    expect(store.getAddCollateral.generalCollateral[0].descriptionAdd).toBe('SCHMOE')
   })
 })

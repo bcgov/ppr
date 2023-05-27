@@ -1,7 +1,9 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { getVuexStore } from '@/store'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
+
 import { TiptapVuetifyPlugin, TiptapVuetify } from 'tiptap-vuetify'
 
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
@@ -20,7 +22,8 @@ Vue.use(TiptapVuetifyPlugin, {
   // optional, default to 'md' (default vuetify icons before v2.0.0)
   iconsGroup: 'mdi'
 })
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 // Input field selectors / buttons
 const generalCollateralEdit = '#general-collateral'
@@ -51,14 +54,14 @@ describe('GenColEdit tests', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
-    await store.dispatch('setGeneralCollateral', [])
+    await store.setGeneralCollateral([])
   })
   afterEach(() => {
     wrapper.destroy()
   })
 
   it('renders default with no existing collateral', async () => {
-    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.NEW)
+    await store.setRegistrationFlowType(RegistrationFlowType.NEW)
     wrapper = createComponent(false)
     expect(wrapper.findComponent(GenColEdit).exists()).toBe(true)
     expect(wrapper.vm.newDesc).toBe('')
@@ -71,36 +74,23 @@ describe('GenColEdit tests', () => {
   })
 
   it('updates general collateral with new description text', async () => {
-    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.NEW)
+    await store.setRegistrationFlowType(RegistrationFlowType.NEW)
     wrapper = createComponent(false)
     wrapper.vm.newDesc = 'new description'
-    await Vue.nextTick()
+    await nextTick()
     expect(wrapper.vm.generalCollateral).toEqual([{ description: 'new description' }])
   })
 
   it('updates new description text with existing general collateral txt in new registration', async () => {
-    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.NEW)
-    await store.dispatch('setGeneralCollateral', [{ description: 'existing general collateral' }])
+    await store.setRegistrationFlowType(RegistrationFlowType.NEW)
+    await store.setGeneralCollateral([{ description: 'existing general collateral' }])
     wrapper = createComponent(false)
     expect(wrapper.vm.generalCollateral).toEqual([{ description: 'existing general collateral' }])
     expect(wrapper.vm.newDesc).toBe('existing general collateral')
   })
 
-  // commenting out in case we add something like this back in
-  // it('emits validity when changed', async () => {
-  //   await store.dispatch('setRegistrationFlowType', RegistrationFlowType.NEW)
-  //   wrapper = createComponent(false)
-  //   const invalidTxt = 't'.repeat(4001)
-  //   await wrapper.find(newDescriptionTxt).setValue(invalidTxt)
-  //   expect(wrapper.vm.valid).toBe(false)
-  //   expect(getLastEvent(wrapper, 'valid')).toBe(false)
-  //   await wrapper.find(newDescriptionTxt).setValue('valid text')
-  //   expect(wrapper.vm.valid).toBe(true)
-  //   expect(getLastEvent(wrapper, 'valid')).toBe(true)
-  // })
-
   it('shows error bar when set', async () => {
-    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.NEW)
+    await store.setRegistrationFlowType(RegistrationFlowType.NEW)
     wrapper = createComponent(true)
     expect(wrapper.findAll(generalCollateralEdit).length).toBe(1)
     expect(wrapper.findComponent(TiptapVuetify).exists()).toBe(true)

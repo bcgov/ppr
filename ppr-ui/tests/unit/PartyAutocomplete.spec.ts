@@ -1,8 +1,8 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { getVuexStore } from '@/store'
-
+import { useStore } from '@/store/store'
+import { createPinia, setActivePinia } from 'pinia'
 import flushPromises from 'flush-promises'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 
@@ -15,9 +15,10 @@ import { mockedPartyCodeSearchResults, mockedSelectSecurityAgreement } from './t
 import { getLastEvent } from './utils'
 
 Vue.use(Vuetify)
-
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+
+setActivePinia(createPinia())
+const store= useStore()
 
 const partyCodeAutoComplete = '#party-search-auto-complete'
 
@@ -49,7 +50,7 @@ describe('Secured Party search autocomplete tests', () => {
 
   beforeEach(async () => {
     const registrationType = mockedSelectSecurityAgreement()
-    await store.dispatch('setRegistrationType', registrationType)
+    await store.setRegistrationType(registrationType)
     wrapper = createComponent(mockedPartyCodeSearchResults)
   })
   afterEach(() => {
@@ -57,8 +58,8 @@ describe('Secured Party search autocomplete tests', () => {
   })
 
   it('shows the auto complete drop down when searching for a party', async () => {
-    expect(wrapper.vm.$data.autoCompleteIsActive).toBe(true)
-    expect(wrapper.vm.$data.autoCompleteResults.length).toBe(3)
+    expect(wrapper.vm.autoCompleteIsActive).toBe(true)
+    expect(wrapper.vm.autoCompleteResults.length).toBe(3)
     const autoCompleteItems = wrapper.findAll('.v-list-item__subtitle')
     expect(wrapper.find(partyCodeAutoComplete).exists()).toBe(true)
     expect(autoCompleteItems.length).toBeGreaterThan(1)
@@ -66,14 +67,14 @@ describe('Secured Party search autocomplete tests', () => {
 
   it('adds the party aafter a name in the list is clicked', async () => {
     const partySearchAddLinks = wrapper.findAll('.v-list-item__action')
-    expect(store.getters.getAddSecuredPartiesAndDebtors.securedParties.length).toBe(0)
+    expect(store.getAddSecuredPartiesAndDebtors.securedParties.length).toBe(0)
     expect(partySearchAddLinks.length).toBe(3)
     const icon = partySearchAddLinks.at(0).find('.v-icon')
     icon.trigger('click')
     await flushPromises()
-    expect(store.getters.getAddSecuredPartiesAndDebtors.securedParties.length).toBe(1)
+    expect(store.getAddSecuredPartiesAndDebtors.securedParties.length).toBe(1)
     expect(
-      store.getters.getAddSecuredPartiesAndDebtors.securedParties[0].businessName
+      store.getAddSecuredPartiesAndDebtors.securedParties[0].businessName
     ).toBe('TONY SCOTT REVENUE ADMINISTRATION BRANCH')
     // the autocomplete is then closed & event emitted
     expect(wrapper.emitted().selectItem).toBeTruthy()
@@ -91,8 +92,8 @@ describe('Registering Party search autocomplete tests', () => {
   })
 
   it('shows the auto complete drop down when searching for a party', async () => {
-    wrapper.vm.$props.setIsRegisteringParty = true
-    await Vue.nextTick()
+    wrapper.setProps({ setIsRegisteringParty: true })
+    await nextTick()
 
     expect(wrapper.find('#no-party-matches').text()).toContain('No matches found')
     expect(wrapper.find('#no-party-matches').text()).toContain('Registering Party')

@@ -1,7 +1,8 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { getVuexStore } from '@/store'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
 
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import flushPromises from 'flush-promises'
@@ -18,7 +19,8 @@ import { UIRegistrationTypes } from '@/enums'
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 // selectors
 const errMsg = '.err-msg'
@@ -103,15 +105,15 @@ describe('Sticky Container component tests', () => {
     expect(wrapper.findComponent(ButtonsStacked).exists()).toBe(false)
     expect(wrapper.props().setFeeType).toBe(FeeSummaryTypes.NEW)
     expect(wrapper.findComponent(FeeSummary).vm.$props.setFeeType).toBe(FeeSummaryTypes.NEW)
-    expect(wrapper.vm.$data.registrationLength).toEqual(registrationLength)
+    expect(wrapper.vm.registrationLength).toEqual(registrationLength)
     expect(wrapper.findComponent(FeeSummary).vm.$props.setRegistrationLength).toEqual(registrationLength)
-    expect(wrapper.vm.$data.registrationType).toBe(UIRegistrationTypes.SECURITY_AGREEMENT)
+    expect(wrapper.vm.registrationType).toBe(UIRegistrationTypes.SECURITY_AGREEMENT)
     expect(wrapper.findComponent(FeeSummary).vm.$props.setRegistrationType).toBe(UIRegistrationTypes.SECURITY_AGREEMENT)
     // default has no fee override
-    expect(wrapper.vm.$store.state.stateModel.userInfo.feeSettings).toBe(null)
+    expect(store.getStateModel.userInfo.feeSettings).toBe(null)
     expect(wrapper.findComponent(FeeSummary).vm.$props.setFeeOverride).toBeNull()
     // updates fee summary when user is non billable
-    await wrapper.vm.$store.dispatch('setUserInfo', { feeSettings: { isNonBillable: true, serviceFee: 2.5 } })
+    await store.setUserInfo({ feeSettings: { isNonBillable: true, serviceFee: 2.5 } })
     const expectedFeeOveride = { feeAmount: 0, processingFee: null, quantity: null, serviceFee: 2.5 }
     expect(wrapper.findComponent(FeeSummary).vm.$props.setFeeOverride).toEqual(expectedFeeOveride)
 
@@ -125,7 +127,7 @@ describe('Sticky Container component tests', () => {
     })
 
     expect(wrapper.vm.$props.setRegistrationLength).toEqual(newRegistrationLength)
-    expect(wrapper.vm.$data.registrationLength).toEqual(newRegistrationLength)
+    expect(wrapper.vm.registrationLength).toEqual(newRegistrationLength)
     expect(wrapper.findComponent(FeeSummary).vm.$props.setRegistrationLength).toEqual(newRegistrationLength)
   })
 
@@ -148,7 +150,7 @@ describe('Sticky Container component tests', () => {
     expect(wrapper.findComponent(FeeSummary).exists()).toBe(false)
     expect(wrapper.findComponent(ButtonsStacked).exists()).toBe(true)
     expect(wrapper.findComponent(ButtonsStacked).vm.$props.setBackBtn).toBe(back)
-    expect(wrapper.vm.$data.cancelBtn).toBe(cancel)
+    expect(wrapper.vm.cancelBtn).toBe(cancel)
     expect(wrapper.findComponent(ButtonsStacked).vm.$props.setCancelBtn).toBe(cancel)
     expect(wrapper.findComponent(ButtonsStacked).vm.$props.setSubmitBtn).toBe(submit)
   })

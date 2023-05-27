@@ -1,8 +1,10 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
 import VueRouter from 'vue-router'
-import { getVuexStore } from '@/store'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
+
 import { createLocalVue, shallowMount } from '@vue/test-utils'
 import sinon from 'sinon'
 import flushPromises from 'flush-promises'
@@ -31,7 +33,8 @@ import {
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 // Prevent the warning "[Vuetify] Unable to locate target [data-app]"
 document.body.setAttribute('data-app', 'true')
@@ -47,7 +50,7 @@ describe('ConfirmDischarge registration view', () => {
     delete window.location
     window.location = { assign: jest.fn() } as any
     // store setup
-    await store.dispatch('setRegistrationConfirmDebtorName', mockedDebtorNames[0])
+    await store.setRegistrationConfirmDebtorName(mockedDebtorNames[0])
     // stub api call
     sandbox = sinon.createSandbox()
     const get = sandbox.stub(axios, 'get')
@@ -85,7 +88,7 @@ describe('ConfirmDischarge registration view', () => {
     expect(wrapper.vm.$route.name).toBe(RouteNames.CONFIRM_DISCHARGE)
     expect(wrapper.vm.appReady).toBe(true)
     expect(wrapper.vm.dataLoaded).toBe(true)
-    const state = wrapper.vm.$store.state.stateModel as StateModelIF
+    const state = store.getStateModel
     // check registering party
     expect(state.registration.parties.registeringParty).toBe(null)
     expect(wrapper.findComponent(RegisteringPartyChange).exists()).toBe(true)
@@ -125,7 +128,7 @@ describe('ConfirmDischarge registration view', () => {
 
   it('processes cancel button action', async () => {
     // setup
-    await wrapper.vm.$store.dispatch('setUnsavedChanges', true)
+    await store.setUnsavedChanges(true)
     // dialog doesn't start visible
     expect(wrapper.findComponent(BaseDialog).vm.$props.setDisplay).toBe(false)
     // pressing cancel triggers dialog
@@ -143,15 +146,15 @@ describe('ConfirmDischarge registration view', () => {
   })
 
   it('updates validity from checkboxes', async () => {
-    expect(wrapper.vm.$data.validConfirm).toBe(false)
+    expect(wrapper.vm.validConfirm).toBe(false)
     await wrapper.findComponent(DischargeConfirmSummary).vm.$emit('valid', true)
-    expect(wrapper.vm.$data.validConfirm).toBe(true)
+    expect(wrapper.vm.validConfirm).toBe(true)
   })
 
   it('updates validity from certify', async () => {
-    expect(wrapper.vm.$data.validCertify).toBe(false)
+    expect(wrapper.vm.validCertify).toBe(false)
     await wrapper.findComponent(CertifyInformation).vm.$emit('certifyValid', true)
-    expect(wrapper.vm.$data.validCertify).toBe(true)
+    expect(wrapper.vm.validCertify).toBe(true)
   })
 
   it('shows validation errors when needed when submitting', async () => {
@@ -171,18 +174,18 @@ describe('ConfirmDischarge registration view', () => {
     setTimeout(async () => {
       await wrapper.findComponent(StickyContainer).vm.$emit('submit', true)
       // turn show errors on when invalid
-      expect(wrapper.vm.$data.showErrors).toBe(true)
+      expect(wrapper.vm.showErrors).toBe(true)
     }, 2000)
   })
 
   it('processes submit button action', async () => {
     // Set up for valid discharge request
-    await store.dispatch('setRegistrationNumber', '023001B')
-    await store.dispatch('setFolioOrReferenceNumber', 'A-00000402')
-    const state = wrapper.vm.$store.state.stateModel as StateModelIF
+    await store.setRegistrationNumber('023001B')
+    await store.setFolioOrReferenceNumber('A-00000402')
+    const state = store.getStateModel
     const parties = state.registration.parties
     parties.registeringParty = mockedPartyCodeSearchResults[0]
-    await store.dispatch('setAddSecuredPartiesAndDebtors', parties)
+    await store.setAddSecuredPartiesAndDebtors(parties)
 
     await wrapper.findComponent(DischargeConfirmSummary).vm.$emit('valid', true)
     await wrapper.findComponent(CertifyInformation).vm.$emit('certifyValid', true)

@@ -1,8 +1,9 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
 import VueRouter from 'vue-router'
-import { getVuexStore } from '@/store'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
 import { createLocalVue, shallowMount } from '@vue/test-utils'
 import sinon from 'sinon'
 import flushPromises from 'flush-promises'
@@ -29,9 +30,8 @@ import { mockedDebtorNames, mockedFinancingStatementAll } from './test-data'
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
-
-// Input field selectors / buttons
+setActivePinia(createPinia())
+const store = useStore()
 
 // Prevent the warning "[Vuetify] Unable to locate target [data-app]"
 document.body.setAttribute('data-app', 'true')
@@ -46,7 +46,7 @@ describe('ReviewConfirm new registration component', () => {
     delete window.location
     window.location = { assign: jest.fn() } as any
     // setup store values
-    await store.dispatch('setRegistrationConfirmDebtorName', mockedDebtorNames[0])
+    await store.setRegistrationConfirmDebtorName(mockedDebtorNames[0])
     // stub api call
     sandbox = sinon.createSandbox()
     const get = sandbox.stub(axios, 'get')
@@ -81,9 +81,8 @@ describe('ReviewConfirm new registration component', () => {
     expect(wrapper.vm.appReady).toBe(true)
     expect(wrapper.vm.dataLoaded).toBe(true)
     // wait because store getting set still
-    await Vue.nextTick()
-    await Vue.nextTick()
-    const state = wrapper.vm.$store.state.stateModel as StateModelIF
+    await nextTick()
+    const state = store.getStateModel
     // check length trust summary
     expect(state.registration.lengthTrust.lifeInfinite).toBe(mockedFinancingStatementAll.lifeInfinite)
     expect(state.registration.lengthTrust.lifeYears).toBe(mockedFinancingStatementAll.lifeYears)

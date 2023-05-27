@@ -1,7 +1,8 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { getVuexStore } from '@/store'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import sinon from 'sinon'
 import { axios } from '@/utils/axios-ppr'
@@ -28,7 +29,8 @@ import flushPromises from 'flush-promises'
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 const partyAutoComplete = '#secured-party-autocomplete'
 
@@ -54,7 +56,7 @@ describe('Secured Party SA tests', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
-    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement())
+    await store.setRegistrationType(mockedSelectSecurityAgreement())
     wrapper = createComponent()
   })
   afterEach(() => {
@@ -73,7 +75,7 @@ describe('Secured Party store tests', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
-    await store.dispatch('setAddSecuredPartiesAndDebtors', {
+    await store.setAddSecuredPartiesAndDebtors({
       securedParties: mockedSecuredParties1
     })
     wrapper = createComponent()
@@ -119,8 +121,8 @@ describe('Secured Party Other registration type tests', () => {
         })
       )
     )
-    await store.dispatch('setRegistrationType', mockedOtherCarbon())
-    await store.dispatch('setAddSecuredPartiesAndDebtors', {
+    await store.setRegistrationType(mockedOtherCarbon())
+    await store.setAddSecuredPartiesAndDebtors({
       registeringParty: mockedRegisteringParty1,
       securedParties: mockedSecuredParties2
     })
@@ -162,22 +164,22 @@ describe('Secured Party Other registration type tests', () => {
   })
 
   it('is not valid if you remove the secured party for admendment', async () => {
-    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.AMENDMENT)
+    await store.setRegistrationFlowType(RegistrationFlowType.AMENDMENT)
     const parties = cloneDeep(mockedSecuredParties2)
     parties[0].action = ActionTypes.REMOVED
-    await store.dispatch('setAddSecuredPartiesAndDebtors', {
+    await store.setAddSecuredPartiesAndDebtors({
       registeringParty: mockedRegisteringParty1,
       securedParties: parties
     })
 
     // click remove
     wrapper.find('.v-data-table .party-row .actions__more-actions .v-remove').trigger('click')
-    await Vue.nextTick()
+    await nextTick()
     expect(wrapper.vm.getSecuredPartyValidity()).toBe(false)
   })
 
   it('shows the the removed & added secured parties for admendment', async () => {
-    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.AMENDMENT)
+    await store.setRegistrationFlowType(RegistrationFlowType.AMENDMENT)
     const parties = cloneDeep(mockedSecuredParties1)
     expect(parties.length).toEqual(1)
     parties[0].action = ActionTypes.REMOVED
@@ -198,7 +200,7 @@ describe('Secured Party Other registration type tests', () => {
 
     expect(parties.length).toEqual(2)
     wrapper.vm.securedParties = parties
-    await Vue.nextTick()
+    await nextTick()
     const rowCount = wrapper.vm.$el.querySelectorAll('.v-data-table .party-row').length
     // one removed party, one added party
     expect(rowCount).toEqual(2)
@@ -213,14 +215,14 @@ describe('Secured party amendment tests', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
-    await store.dispatch('setAddSecuredPartiesAndDebtors', {
+    await store.setAddSecuredPartiesAndDebtors({
       securedParties: mockedSecuredPartiesAmendment
     })
-    await store.dispatch('setOriginalAddSecuredPartiesAndDebtors', {
+    await store.setOriginalAddSecuredPartiesAndDebtors({
       securedParties: mockedSecuredPartiesAmendment
     })
-    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement())
-    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.AMENDMENT)
+    await store.setRegistrationType(mockedSelectSecurityAgreement())
+    await store.setRegistrationFlowType(RegistrationFlowType.AMENDMENT)
     wrapper = createComponent()
   })
   afterEach(() => {
@@ -255,12 +257,12 @@ describe('Secured party amendment tests', () => {
     expect(dropDowns.length).toBe(2)
     // click the drop down arrow
     dropDowns.at(0).trigger('click')
-    await Vue.nextTick()
+    await nextTick()
     expect(wrapper.findAll('.actions__more-actions .v-list-item__subtitle').length).toBe(1)
 
     // click the second drop down
     dropDowns.at(1).trigger('click')
-    await Vue.nextTick()
+    await nextTick()
     const options = wrapper.findAll('.actions__more-actions .v-list-item__subtitle')
     // options from first drop down
     expect(options.at(0).text()).toContain('Remove')
@@ -273,11 +275,11 @@ describe('Secured party amendment tests', () => {
     const parties = cloneDeep(mockedSecuredParties1)
     expect(parties.length).toEqual(1)
     parties[0].action = ActionTypes.REMOVED
-    wrapper.vm.$data.securedParties = parties
+    wrapper.vm.securedParties = parties
     wrapper.vm.$props.setShowInvalid = true
     expect(wrapper.vm.getSecuredPartyValidity()).toBe(false)
     wrapper.vm.$data.showErrorSecuredParties = true
-    await Vue.nextTick()
+    await nextTick()
     expect(wrapper.findAll('.invalid-message').length).toBe(1)
   })
 
@@ -290,20 +292,20 @@ describe('Secured party amendment tests', () => {
   it('goes from valid to invalid', async () => {
     const parties = cloneDeep(mockedSecuredParties1)
     expect(parties.length).toEqual(1)
-    wrapper.vm.$data.securedParties = parties
-    await Vue.nextTick()
+    wrapper.vm.securedParties = parties
+    await nextTick()
     expect(wrapper.vm.getSecuredPartyValidity()).toBe(true)
     expect(wrapper.findAll('.invalid-message').length).toBe(0)
     // remove said secured party
     // click the drop down arrow
     wrapper.find('.v-data-table .party-row .actions__more-actions__btn').trigger('click')
-    await Vue.nextTick()
+    await nextTick()
     // click remove
     wrapper.find('.actions__more-actions .v-list-item__subtitle').trigger('click')
-    await Vue.nextTick()
+    await nextTick()
     expect(wrapper.vm.getSecuredPartyValidity()).toBe(false)
-    wrapper.vm.$data.showErrorSecuredParties = true
-    await Vue.nextTick()
+    wrapper.vm.showErrorSecuredParties = true
+    await nextTick()
     expect(wrapper.findAll('.invalid-message').length).toBe(1)
   })
 })
@@ -312,13 +314,13 @@ describe('Secured party with code test', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
-    await store.dispatch('setAddSecuredPartiesAndDebtors', {
+    await store.setAddSecuredPartiesAndDebtors({
       securedParties: mockedSecuredParties3
     })
-    await store.dispatch('setOriginalAddSecuredPartiesAndDebtors', {
+    await store.setOriginalAddSecuredPartiesAndDebtors({
       securedParties: mockedSecuredParties3
     })
-    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement())
+    await store.setRegistrationType(mockedSelectSecurityAgreement())
     wrapper = createComponent()
   })
   afterEach(() => {

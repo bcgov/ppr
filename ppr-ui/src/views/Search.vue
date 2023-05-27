@@ -133,7 +133,7 @@ export default defineComponent({
       selectedMatches: [] as Array<SearchResultIF>,
       settingOption: SettingOptions.SELECT_CONFIRMATION_DIALOG,
       folioNumber: computed((): string => {
-        return getSearchResults?.value.searchQuery?.clientReferenceId || ''
+        return getSearchResults.value?.searchQuery?.clientReferenceId || ''
       }),
       isAuthenticated: computed((): boolean => {
         return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
@@ -142,13 +142,13 @@ export default defineComponent({
         // return formatted date
         const searchResult = getSearchResults.value
         if (searchResult) {
-          const searchDate = new Date(searchResult.value.searchDateTime)
+          const searchDate = new Date(searchResult.searchDateTime)
           return ` as of ${pacificDate(searchDate)}`
         }
         return ''
       }),
       searchType: computed((): string => {
-        return getSearchedType?.value.searchTypeUI || ''
+        return getSearchedType.value?.searchTypeUI || ''
       }),
       searchValue: computed((): string => {
         const searchResult = getSearchResults.value
@@ -177,7 +177,7 @@ export default defineComponent({
       }),
       exactResultsLength: computed((): number => {
         const selectedExactMatches = []
-        const results = getSearchResults?.value.results
+        const results = getSearchResults.value?.results
         let count = 0
         let x:any
         for (x in results) {
@@ -195,10 +195,10 @@ export default defineComponent({
         return 0
       }),
       similarResultsLength: computed((): number => {
-        const searchResult = getSearchResults
+        const searchResult = getSearchResults.value
         let similarCount = 0
-        if (searchResult?.value.results) {
-          for (const result of searchResult.value.results) {
+        if (searchResult && searchResult.results) {
+          for (const result of searchResult.results) {
             if (result.matchType !== 'EXACT') {
               similarCount += 1
             }
@@ -257,7 +257,7 @@ export default defineComponent({
       } else if (localState.selectedMatches?.length >= 75) {
         localState.largeSearchResultDialog = true
       } else if (
-        getUserSettings?.value.selectConfirmationDialog &&
+        getUserSettings.value?.selectConfirmationDialog &&
         localState.totalResultsLength > 0 && localState.totalResultsLength < 75 &&
         localState.similarResultsLength > 0 && localState.similarResultsLength < 75
       ) {

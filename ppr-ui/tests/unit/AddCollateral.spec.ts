@@ -1,8 +1,9 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
 import VueRouter from 'vue-router'
-import { getVuexStore } from '@/store'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '@/store/store'
 import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
 import flushPromises from 'flush-promises'
 import { TiptapVuetifyPlugin } from 'tiptap-vuetify'
@@ -30,7 +31,8 @@ Vue.use(TiptapVuetifyPlugin, {
   // optional, default to 'md' (default vuetify icons before v2.0.0)
   iconsGroup: 'mdi'
 })
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 // Input field selectors / buttons
 const header = '#registration-header'
@@ -68,8 +70,8 @@ describe('Add Collateral new registration component', () => {
   sessionStorage.setItem('KEYCLOAK_TOKEN', 'token')
 
   beforeEach(async () => {
-    await store.dispatch('setRegistrationType', null)
-    await store.dispatch('setRegistrationFlowType', null)
+    await store.setRegistrationType(null)
+    await store.setRegistrationFlowType(null)
   })
 
   afterEach(() => {
@@ -82,8 +84,8 @@ describe('Add Collateral new registration component', () => {
   })
 
   it('renders Add Collateral View with child components when store is set', async () => {
-    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement())
-    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.NEW)
+    await store.setRegistrationType(mockedSelectSecurityAgreement())
+    await store.setRegistrationFlowType(RegistrationFlowType.NEW)
     wrapper = createComponent()
     await flushPromises()
     expect(wrapper.vm.$route.name).toBe(RouteNames.ADD_COLLATERAL)
@@ -112,8 +114,8 @@ describe('Add Collateral new registration component', () => {
   })
 
   it('updates fee summary with registration length changes', async () => {
-    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement())
-    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.NEW)
+    await store.setRegistrationType(mockedSelectSecurityAgreement())
+    await store.setRegistrationFlowType(RegistrationFlowType.NEW)
     wrapper = createComponent()
     await flushPromises()
     expect(wrapper.findComponent(StickyContainer).vm.$props.setRegistrationLength).toEqual({
@@ -126,7 +128,7 @@ describe('Add Collateral new registration component', () => {
       lifeInfinite: true,
       lifeYears: 0
     }
-    await store.dispatch('setLengthTrust', newLengthTrust1)
+    await store.setLengthTrust(newLengthTrust1)
     expect(wrapper.findComponent(StickyContainer).vm.$props.setRegistrationLength).toEqual({
       lifeInfinite: newLengthTrust1.lifeInfinite,
       lifeYears: newLengthTrust1.lifeYears
@@ -137,7 +139,7 @@ describe('Add Collateral new registration component', () => {
       lifeInfinite: true,
       lifeYears: 0
     }
-    await store.dispatch('setLengthTrust', newLengthTrust2)
+    await store.setLengthTrust(newLengthTrust2)
     expect(wrapper.findComponent(StickyContainer).vm.$props.setRegistrationLength).toEqual({
       lifeInfinite: newLengthTrust2.lifeInfinite,
       lifeYears: newLengthTrust2.lifeYears
@@ -145,7 +147,6 @@ describe('Add Collateral new registration component', () => {
   })
 
   it('displays correct info based on registration type', async () => {
-    jest.setTimeout(30000)
     for (let i = 0; i < RegistrationTypes.length; i++) {
       // skip dividers + other
       if (
@@ -154,8 +155,8 @@ describe('Add Collateral new registration component', () => {
       ) {
         continue
       }
-      await store.dispatch('setRegistrationType', RegistrationTypes[i])
-      await store.dispatch('setRegistrationFlowType', RegistrationFlowType.NEW)
+      await store.setRegistrationType(RegistrationTypes[i])
+      await store.setRegistrationFlowType(RegistrationFlowType.NEW)
       wrapper = createComponent()
       await flushPromises()
       expect(wrapper.findComponent(StickyContainer).vm.$props.setRegistrationType).toBe(

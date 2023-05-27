@@ -220,8 +220,7 @@ export const useStore = defineStore('assetsStore', () => {
     return state.value.search.searchHistoryLength
   })
   const getUserEmail = computed<string>(() => {
-    const userInfo = state.value.userInfo
-    return userInfo?.contacts[0]?.email
+    return (!!state.value.userInfo?.contacts?.length && state.value.userInfo?.contacts[0]?.email) || ''
   })
   const getUserFirstName = computed<string>(() => {
     return state.value.userInfo?.firstname || ''

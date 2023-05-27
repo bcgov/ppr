@@ -1,8 +1,8 @@
 // Libraries
 import Vue from 'vue'
 import Vuetify from 'vuetify'
-import { getVuexStore } from '@/store'
-
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 
 // Components
@@ -18,7 +18,8 @@ import { mockedSearchResponse } from './test-data'
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 const noResults: SearchResponseIF = {
   maxResultsSize: 1000,
   searchId: '1294373',
@@ -59,7 +60,7 @@ describe('Test result table with no results', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
-    await store.dispatch('setSearchResults', noResults)
+    await store.setSearchResults(noResults)
     wrapper = createComponent()
   })
   afterEach(() => {
@@ -68,9 +69,9 @@ describe('Test result table with no results', () => {
 
   it('doesnt display table if there are no results', async () => {
     expect(wrapper.findComponent(SearchedResultPpr).exists()).toBe(true)
-    expect(wrapper.vm.$data.searched).toBeTruthy()
-    expect(wrapper.vm.$data.searchValue).toEqual(noResults.searchQuery.criteria.value)
-    expect(wrapper.vm.$data.totalResultsLength).toEqual(noResults.totalResultsSize)
+    expect(wrapper.vm.searched).toBeTruthy()
+    expect(wrapper.vm.searchValue).toEqual(noResults.searchQuery.criteria.value)
+    expect(wrapper.vm.totalResultsLength).toEqual(noResults.totalResultsSize)
     const datatable = wrapper.findAll(resultsTable)
     expect(datatable.length).toBe(0)
     const noResultsInfo = wrapper.findAll(noResultsDiv)
@@ -86,7 +87,7 @@ describe('Serial number results', () => {
   const testResults = mockedSearchResponse[UISearchTypes.SERIAL_NUMBER]
 
   beforeEach(async () => {
-    await store.dispatch('setSearchResults', testResults)
+    await store.setSearchResults(testResults)
     wrapper = createComponent()
   })
   afterEach(() => {
@@ -95,17 +96,17 @@ describe('Serial number results', () => {
 
   it('renders Results Component with serial number results data', () => {
     expect(wrapper.findComponent(SearchedResultPpr).exists()).toBe(true)
-    expect(wrapper.vm.$data.searched).toBeTruthy()
-    expect(wrapper.vm.$data.searchValue).toEqual(testResults.searchQuery.criteria.value)
-    expect(wrapper.vm.$data.headers).toStrictEqual(searchTableHeaders.SERIAL_NUMBER)
-    expect(wrapper.vm.$data.results).toStrictEqual(testResults.results)
-    expect(wrapper.vm.$data.totalResultsLength).toEqual(testResults.totalResultsSize)
+    expect(wrapper.vm.searched).toBeTruthy()
+    expect(wrapper.vm.searchValue).toEqual(testResults.searchQuery.criteria.value)
+    expect(wrapper.vm.headers).toStrictEqual(searchTableHeaders.SERIAL_NUMBER)
+    expect(wrapper.vm.results).toStrictEqual(testResults.results)
+    expect(wrapper.vm.totalResultsLength).toEqual(testResults.totalResultsSize)
     expect(wrapper.findAll(generateResult).length).toBe(1)
   })
 
   it('preselects exact results', () => {
-    expect(wrapper.vm.$data.exactMatchesLength).toBe(2)
-    expect(wrapper.vm.$data.selected).toStrictEqual([testResults.results[0], testResults.results[1]])
+    expect(wrapper.vm.exactMatchesLength).toBe(2)
+    expect(wrapper.vm.selected).toStrictEqual([testResults.results[0], testResults.results[1]])
   })
 
   it('displays results in the table', async () => {
@@ -129,7 +130,7 @@ describe('Individual debtor results', () => {
   const testResults = mockedSearchResponse[UISearchTypes.INDIVIDUAL_DEBTOR]
 
   beforeEach(async () => {
-    await store.dispatch('setSearchResults', testResults)
+    await store.setSearchResults(testResults)
     wrapper = createComponent()
   })
   afterEach(() => {
@@ -138,16 +139,16 @@ describe('Individual debtor results', () => {
 
   it('renders Results Component with individual debtor name results data', () => {
     expect(wrapper.findComponent(SearchedResultPpr).exists()).toBe(true)
-    expect(wrapper.vm.$data.searched).toBeTruthy()
-    expect(wrapper.vm.$data.searchValue).toEqual(testResults.searchQuery.criteria.value)
-    expect(wrapper.vm.$data.headers).toStrictEqual(searchTableHeaders.INDIVIDUAL_DEBTOR)
-    expect(wrapper.vm.$data.results).toStrictEqual(testResults.results)
-    expect(wrapper.vm.$data.totalResultsLength).toEqual(testResults.totalResultsSize)
+    expect(wrapper.vm.searched).toBeTruthy()
+    expect(wrapper.vm.searchValue).toEqual(testResults.searchQuery.criteria.value)
+    expect(wrapper.vm.headers).toStrictEqual(searchTableHeaders.INDIVIDUAL_DEBTOR)
+    expect(wrapper.vm.results).toStrictEqual(testResults.results)
+    expect(wrapper.vm.totalResultsLength).toEqual(testResults.totalResultsSize)
   })
 
   it('preselects exact results', () => {
-    expect(wrapper.vm.$data.exactMatchesLength).toBe(3)
-    expect(wrapper.vm.$data.selected).toStrictEqual(
+    expect(wrapper.vm.exactMatchesLength).toBe(3)
+    expect(wrapper.vm.selected).toStrictEqual(
       [testResults.results[0], testResults.results[1], testResults.results[2]])
   })
 
@@ -177,7 +178,7 @@ describe('Business debtor results', () => {
   const testResults = mockedSearchResponse[UISearchTypes.BUSINESS_DEBTOR]
 
   beforeEach(async () => {
-    await store.dispatch('setSearchResults', testResults)
+    await store.setSearchResults(testResults)
     wrapper = createComponent()
   })
   afterEach(() => {
@@ -186,16 +187,16 @@ describe('Business debtor results', () => {
 
   it('renders Results Component with business debtor name results data', () => {
     expect(wrapper.findComponent(SearchedResultPpr).exists()).toBe(true)
-    expect(wrapper.vm.$data.searched).toBeTruthy()
-    expect(wrapper.vm.$data.searchValue).toEqual(testResults.searchQuery.criteria.value)
-    expect(wrapper.vm.$data.headers).toStrictEqual(searchTableHeaders.BUSINESS_DEBTOR)
-    expect(wrapper.vm.$data.results).toStrictEqual(testResults.results)
-    expect(wrapper.vm.$data.totalResultsLength).toEqual(testResults.totalResultsSize)
+    expect(wrapper.vm.searched).toBeTruthy()
+    expect(wrapper.vm.searchValue).toEqual(testResults.searchQuery.criteria.value)
+    expect(wrapper.vm.headers).toStrictEqual(searchTableHeaders.BUSINESS_DEBTOR)
+    expect(wrapper.vm.results).toStrictEqual(testResults.results)
+    expect(wrapper.vm.totalResultsLength).toEqual(testResults.totalResultsSize)
   })
 
   it('preselects exact results', () => {
-    expect(wrapper.vm.$data.exactMatchesLength).toBe(2)
-    expect(wrapper.vm.$data.selected).toStrictEqual([testResults.results[0], testResults.results[1]])
+    expect(wrapper.vm.exactMatchesLength).toBe(2)
+    expect(wrapper.vm.selected).toStrictEqual([testResults.results[0], testResults.results[1]])
   })
 
   it('displays results in the table', async () => {
@@ -215,7 +216,7 @@ describe('Manufactured home results', () => {
   const testResults = mockedSearchResponse[UISearchTypes.MHR_NUMBER]
 
   beforeEach(async () => {
-    await store.dispatch('setSearchResults', testResults)
+    await store.setSearchResults(testResults)
     wrapper = createComponent()
   })
   afterEach(() => {
@@ -224,16 +225,16 @@ describe('Manufactured home results', () => {
 
   it('renders Results Component with manufactured home results data', () => {
     expect(wrapper.findComponent(SearchedResultPpr).exists()).toBe(true)
-    expect(wrapper.vm.$data.searched).toBeTruthy()
-    expect(wrapper.vm.$data.searchValue).toEqual(testResults.searchQuery.criteria.value)
-    expect(wrapper.vm.$data.headers).toStrictEqual(searchTableHeaders.MHR_NUMBER)
-    expect(wrapper.vm.$data.results).toStrictEqual(testResults.results)
-    expect(wrapper.vm.$data.totalResultsLength).toEqual(testResults.totalResultsSize)
+    expect(wrapper.vm.searched).toBeTruthy()
+    expect(wrapper.vm.searchValue).toEqual(testResults.searchQuery.criteria.value)
+    expect(wrapper.vm.headers).toStrictEqual(searchTableHeaders.MHR_NUMBER)
+    expect(wrapper.vm.results).toStrictEqual(testResults.results)
+    expect(wrapper.vm.totalResultsLength).toEqual(testResults.totalResultsSize)
   })
 
   it('preselects exact results', () => {
-    expect(wrapper.vm.$data.exactMatchesLength).toBe(2)
-    expect(wrapper.vm.$data.selected).toStrictEqual([testResults.results[0], testResults.results[1]])
+    expect(wrapper.vm.exactMatchesLength).toBe(2)
+    expect(wrapper.vm.selected).toStrictEqual([testResults.results[0], testResults.results[1]])
   })
 
   it('displays results in the table', async () => {
@@ -258,7 +259,7 @@ describe('Aircraft results', () => {
   const testResults = mockedSearchResponse[UISearchTypes.AIRCRAFT]
 
   beforeEach(async () => {
-    await store.dispatch('setSearchResults', testResults)
+    await store.setSearchResults(testResults)
     wrapper = createComponent()
   })
   afterEach(() => {
@@ -267,16 +268,16 @@ describe('Aircraft results', () => {
 
   it('renders Results Component with aircraft results data', () => {
     expect(wrapper.findComponent(SearchedResultPpr).exists()).toBe(true)
-    expect(wrapper.vm.$data.searched).toBeTruthy()
-    expect(wrapper.vm.$data.searchValue).toEqual(testResults.searchQuery.criteria.value)
-    expect(wrapper.vm.$data.headers).toStrictEqual(searchTableHeaders.AIRCRAFT_DOT)
-    expect(wrapper.vm.$data.results).toStrictEqual(testResults.results)
-    expect(wrapper.vm.$data.totalResultsLength).toEqual(testResults.totalResultsSize)
+    expect(wrapper.vm.searched).toBeTruthy()
+    expect(wrapper.vm.searchValue).toEqual(testResults.searchQuery.criteria.value)
+    expect(wrapper.vm.headers).toStrictEqual(searchTableHeaders.AIRCRAFT_DOT)
+    expect(wrapper.vm.results).toStrictEqual(testResults.results)
+    expect(wrapper.vm.totalResultsLength).toEqual(testResults.totalResultsSize)
   })
 
   it('preselects exact results', () => {
-    expect(wrapper.vm.$data.exactMatchesLength).toBe(2)
-    expect(wrapper.vm.$data.selected).toStrictEqual([testResults.results[0], testResults.results[1]])
+    expect(wrapper.vm.exactMatchesLength).toBe(2)
+    expect(wrapper.vm.selected).toStrictEqual([testResults.results[0], testResults.results[1]])
   })
 
   it('displays results in the table', async () => {
@@ -299,7 +300,7 @@ describe('Registration number results', () => {
   const testResults = mockedSearchResponse[UISearchTypes.REGISTRATION_NUMBER]
 
   beforeEach(async () => {
-    await store.dispatch('setSearchResults', testResults)
+    await store.setSearchResults(testResults)
     wrapper = createComponent()
   })
   afterEach(() => {
@@ -308,16 +309,16 @@ describe('Registration number results', () => {
 
   it('renders Results Component with registration number results data', () => {
     expect(wrapper.findComponent(SearchedResultPpr).exists()).toBe(true)
-    expect(wrapper.vm.$data.searched).toBeTruthy()
-    expect(wrapper.vm.$data.searchValue).toEqual(testResults.searchQuery.criteria.value)
-    expect(wrapper.vm.$data.headers).toStrictEqual(searchTableHeaders.REGISTRATION_NUMBER)
-    expect(wrapper.vm.$data.results).toStrictEqual(testResults.results)
-    expect(wrapper.vm.$data.totalResultsLength).toEqual(testResults.totalResultsSize)
+    expect(wrapper.vm.searched).toBeTruthy()
+    expect(wrapper.vm.searchValue).toEqual(testResults.searchQuery.criteria.value)
+    expect(wrapper.vm.headers).toStrictEqual(searchTableHeaders.REGISTRATION_NUMBER)
+    expect(wrapper.vm.results).toStrictEqual(testResults.results)
+    expect(wrapper.vm.totalResultsLength).toEqual(testResults.totalResultsSize)
   })
 
   it('preselects exact results', () => {
-    expect(wrapper.vm.$data.exactMatchesLength).toBe(1)
-    expect(wrapper.vm.$data.selected).toStrictEqual([testResults.results[0]])
+    expect(wrapper.vm.exactMatchesLength).toBe(1)
+    expect(wrapper.vm.selected).toStrictEqual([testResults.results[0]])
   })
 
   it('displays results in the table', async () => {

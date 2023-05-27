@@ -1,7 +1,8 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { getVuexStore } from '@/store'
+import { useStore } from '@/store/store'
+import { createPinia, setActivePinia } from 'pinia'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import sinon from 'sinon'
 import { axios as vonAxios } from '@/utils/axios-von'
@@ -19,7 +20,8 @@ import { getLastEvent } from './utils'
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 // Events
 const hideDetails: string = 'hide-details'
@@ -74,9 +76,7 @@ describe('AutoComplete component', () => {
   it('initially does not display anything with empty search value', async () => {
     wrapper.setProps({ searchValue: '' })
     // 3 ticks: watcher update, method run, results update
-    await Vue.nextTick()
-    await Vue.nextTick()
-    await Vue.nextTick()
+    await nextTick()
     const autoCompleteNames = wrapper.findAll('.auto-complete-item')
     expect(autoCompleteNames.length).toBe(0)
     expect(getLastEvent(wrapper, hideDetails)).toBeFalsy()
@@ -86,9 +86,9 @@ describe('AutoComplete component', () => {
   it('gets results and displays them when active + searchValue is not empty', async () => {
     wrapper.setProps({ searchValue: 'test' })
     // 3 ticks: watcher update, method run, results update
-    await Vue.nextTick()
-    await Vue.nextTick()
-    await Vue.nextTick()
+    await nextTick()
+    await nextTick()
+    await nextTick()
     const autoCompleteNames = wrapper.findAll('.auto-complete-item')
     // 6 in the response, but should only display up to 5
     expect(autoCompleteNames.length).toBe(5)
@@ -104,9 +104,9 @@ describe('AutoComplete component', () => {
     wrapper.setProps({ setAutoCompleteIsActive: false })
     wrapper.setProps({ searchValue: 'test' })
     // 3 ticks: watcher update, method run, results update
-    await Vue.nextTick()
-    await Vue.nextTick()
-    await Vue.nextTick()
+    await nextTick()
+    await nextTick()
+    await nextTick()
     const autoCompleteNames = wrapper.findAll('.auto-complete-item')
     expect(autoCompleteNames.length).toBe(0)
     expect(getLastEvent(wrapper, hideDetails)).toBeFalsy()
@@ -115,16 +115,16 @@ describe('AutoComplete component', () => {
   it('does closes display when outside clicked', async () => {
     wrapper.setProps({ searchValue: 'test' })
     // 3 ticks: watcher update, method run, results update
-    await Vue.nextTick()
-    await Vue.nextTick()
-    await Vue.nextTick()
+    await nextTick()
+    await nextTick()
+    await nextTick()
     const autoCompleteNames = wrapper.findAll('.auto-complete-item')
     expect(autoCompleteNames.length).toBe(5)
     // simulate clicking outside the autocomplete
-    wrapper.vm.$data.autoCompleteIsActive = false
-    await Vue.nextTick()
-    expect(wrapper.vm.$data.autoCompleteResults).toEqual([])
-    expect(wrapper.vm.$data.showAutoComplete).toBeFalsy()
+    wrapper.vm.autoCompleteIsActive = false
+    await nextTick()
+    expect(wrapper.vm.autoCompleteResults).toEqual([])
+    expect(wrapper.vm.showAutoComplete).toBeFalsy()
     expect(getLastEvent(wrapper, hideDetails)).toBeFalsy()
     const autoCompleteNamesAfterClose = wrapper.findAll('.auto-complete-item')
     expect(autoCompleteNamesAfterClose.length).toBe(0)
@@ -132,14 +132,14 @@ describe('AutoComplete component', () => {
   it('emits the search value and closes the list after a name in the list is clicked', async () => {
     wrapper.setProps({ searchValue: 'test' })
     // 3 ticks: watcher update, method run, results update
-    await Vue.nextTick()
-    await Vue.nextTick()
-    await Vue.nextTick()
+    await nextTick()
+    await nextTick()
+    await nextTick()
     const autoCompleteNames = wrapper.findAll('.auto-complete-item')
     expect(autoCompleteNames.length).toBe(5)
     const selectedText = autoCompleteNames.at(0).text()
     autoCompleteNames.at(0).trigger('click')
-    await Vue.nextTick()
+    await nextTick()
     expect(getLastEvent(wrapper, searchValue)).toEqual(selectedText)
   })
 })

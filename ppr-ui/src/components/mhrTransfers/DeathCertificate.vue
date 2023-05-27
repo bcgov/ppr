@@ -100,7 +100,7 @@ export default defineComponent({
   setup (props) {
     const { customRules, required, maxLength } = useInputRules()
     const { editHomeOwner } = useHomeOwners(true)
-    const { setUnsavedChanges } = useStore
+    const { setUnsavedChanges } = useStore()
     const deathCertificateForm = ref(null)
     const deathCertificateNumberRef = ref(null)
     const deathCertificateNumberRules = computed(

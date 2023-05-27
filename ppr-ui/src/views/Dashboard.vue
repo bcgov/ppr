@@ -184,8 +184,8 @@ export default defineComponent({
       }),
       hasMHR: computed((): boolean => {
         // For Staff, we check roles, for Client we check Products
-        if (isRoleStaff || isRoleStaffBcol || isRoleStaffReg) {
-          return hasMhrRole && getFeatureFlag('mhr-ui-enabled')
+        if (isRoleStaff.value || isRoleStaffBcol.value || isRoleStaffReg.value) {
+          return hasMhrRole.value && getFeatureFlag('mhr-ui-enabled')
         } else {
           return hasMhrEnabled.value
         }
@@ -250,7 +250,7 @@ export default defineComponent({
         return
       }
       emitHaveData(false)
-      resetNewRegistration(null) // Clear store data from any previous registration.
+      resetNewRegistration() // Clear store data from any previous registration.
       await retrieveSearchHistory()
 
       // tell App that we're finished loading

@@ -672,6 +672,7 @@ export default defineComponent({
       isRoleStaffBcol,
       handleDialogResp,
       scrollToInvalid,
+      submitAmendment,
       goToReviewAmendment,
       onStaffPaymentChanges,
       ...toRefs(localState)

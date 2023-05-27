@@ -1,7 +1,8 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { getVuexStore } from '@/store'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
 
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import {
@@ -21,7 +22,8 @@ import { EditTrustIndenture } from '@/components/registration'
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 // Input field selectors / buttons
 const doneButton: string = '#done-btn-trust-indenture'
@@ -51,18 +53,18 @@ function createComponent (
 describe('EditTrustAmendment component tests', () => {
   let wrapper: Wrapper<any>
   beforeEach(async () => {
-    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement())
-    await store.dispatch('setFolioOrReferenceNumber', 'A-00000402')
-    await store.dispatch('setRegistrationNumber', '0023001B')
-    await store.dispatch('setVehicleCollateral', mockedVehicleCollateralExisting)
-    await store.dispatch('setGeneralCollateral', mockedGeneralCollateralExisting)
-    await store.dispatch('setAddSecuredPartiesAndDebtors', {
+    await store.setRegistrationType(mockedSelectSecurityAgreement())
+    await store.setFolioOrReferenceNumber('A-00000402')
+    await store.setRegistrationNumber('0023001B')
+    await store.setVehicleCollateral(mockedVehicleCollateralExisting)
+    await store.setGeneralCollateral(mockedGeneralCollateralExisting)
+    await store.setAddSecuredPartiesAndDebtors({
       registeringParty: null,
       securedParties: mockedSecuredPartiesExisting,
       debtors: mockedDebtorsExisting
     })
-    await store.dispatch('setRegistrationExpiryDate', '2021-07-28T07:00:00+00:00')
-    await store.dispatch('setOriginalLengthTrust', {
+    await store.setRegistrationExpiryDate('2021-07-28T07:00:00+00:00')
+    await store.setOriginalLengthTrust({
       valid: true,
       trustIndenture: false,
       lifeInfinite: false,
@@ -71,7 +73,7 @@ describe('EditTrustAmendment component tests', () => {
       surrenderDate: '',
       lienAmount: ''
     })
-    await store.dispatch('setLengthTrust', {
+    await store.setLengthTrust({
       valid: true,
       trustIndenture: false,
       lifeInfinite: false,
@@ -96,10 +98,10 @@ describe('EditTrustAmendment component tests', () => {
     expect(wrapper.vm.trustIndenture).toBe(false)
     expect(wrapper.vm.lengthTrust.trustIndenture).toBe(false)
     wrapper.find(trustCheckbox).trigger('click')
-    await Vue.nextTick()
+    await nextTick()
     expect(wrapper.vm.trustIndenture).toBe(true)
     wrapper.find(cancelButton).trigger('click')
-    await Vue.nextTick()
+    await nextTick()
     expect(wrapper.emitted().resetEvent).toBeTruthy()
     expect(wrapper.vm.lengthTrust.trustIndenture).toBe(false)
   })
@@ -113,10 +115,10 @@ describe('EditTrustAmendment component tests', () => {
     expect(wrapper.vm.trustIndenture).toBe(false)
     expect(wrapper.vm.lengthTrust.trustIndenture).toBe(false)
     wrapper.find(trustCheckbox).trigger('click')
-    await Vue.nextTick()
+    await nextTick()
     expect(wrapper.vm.trustIndenture).toBe(true)
     wrapper.find(doneButton).trigger('click')
-    await Vue.nextTick()
+    await nextTick()
     expect(wrapper.emitted().editTrustIndenture).toBeTruthy()
     expect(wrapper.vm.lengthTrust.trustIndenture).toBe(true)
   })

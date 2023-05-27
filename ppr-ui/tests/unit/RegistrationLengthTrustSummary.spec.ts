@@ -1,7 +1,8 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { getVuexStore } from '@/store'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
 
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import {
@@ -23,7 +24,8 @@ import { RegistrationLengthTrustSummary } from '@/components/registration'
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 // Input field selectors / buttons
 const selectDropDown: string = '.registration-bar-type-select'
@@ -52,8 +54,8 @@ describe('RegistrationLengthTrust SA tests', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
-    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement())
-    await store.dispatch('setLengthTrust', mockedLengthTrust1)
+    await store.setRegistrationType(mockedSelectSecurityAgreement())
+    await store.setLengthTrust(mockedLengthTrust1)
     wrapper = createComponent(false)
   })
   afterEach(() => {
@@ -74,9 +76,9 @@ describe('RegistrationLengthTrust SA tests', () => {
 describe('RegistrationLengthTrust RL tests', () => {
   let wrapper: Wrapper<any>
   beforeEach(async () => {
-    await store.dispatch('setRegistrationType', mockedRepairersLien())
-    // await store.dispatch('setLengthTrust', mockedLengthTrust2)
-    await store.dispatch('setLengthTrust', {
+    await store.setRegistrationType(mockedRepairersLien())
+    // await store.setLengthTrust(mockedLengthTrust2)
+    await store.setLengthTrust({
       valid: true,
       trustIndenture: false,
       lifeInfinite: false,
@@ -105,7 +107,7 @@ describe('RegistrationLengthTrust RL tests', () => {
 describe('RegistrationLengthTrust SG tests', () => {
   let wrapper: Wrapper<any>
   beforeEach(async () => {
-    await store.dispatch('setLengthTrust', {
+    await store.setLengthTrust({
       valid: false,
       trustIndenture: false,
       lifeInfinite: false,
@@ -114,7 +116,7 @@ describe('RegistrationLengthTrust SG tests', () => {
       surrenderDate: '',
       lienAmount: ''
     })
-    await store.dispatch('setRegistrationType', mockedSaleOfGoods())
+    await store.setRegistrationType(mockedSaleOfGoods())
     wrapper = createComponent(false)
   })
   afterEach(() => {
@@ -133,8 +135,8 @@ describe('RegistrationLengthTrust SG tests', () => {
 describe('RegistrationLengthTrust Crown tests', () => {
   let wrapper: Wrapper<any>
   beforeEach(async () => {
-    await store.dispatch('setRegistrationType', mockedMarriageMH())
-    await store.dispatch('setLengthTrust', mockedLengthTrust2)
+    await store.setRegistrationType(mockedMarriageMH())
+    await store.setLengthTrust(mockedLengthTrust2)
     wrapper = createComponent(false)
   })
   afterEach(() => {

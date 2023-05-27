@@ -1,7 +1,9 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { getVuexStore } from '@/store'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
+
 import flushPromises from 'flush-promises'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import { mockedDebtors1, mockedDebtors2 } from './test-data'
@@ -12,7 +14,8 @@ import { EditDebtor } from '@/components/parties/debtor'
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 // Input field selectors / buttons
 const doneButtonSelector: string = '#done-btn-debtor'
@@ -62,17 +65,17 @@ describe('Debtor add individual tests', () => {
     wrapper.find('#txt-first-debtor').setValue('JOE')
     wrapper.find('#txt-last-debtor').setValue('SCHMOE')
     await wrapper.find('#txt-month').setValue(6)
-    wrapper.vm.$data.month = { value: 6, text: 'June' }
-    await Vue.nextTick()
+    wrapper.vm.month = { value: 6, text: 'June' }
+    await nextTick()
     wrapper.find('#txt-day').setValue('25')
     wrapper.find('#txt-year').setValue(1980)
     // for address
-    wrapper.vm.$data.currentDebtor.address.street = 'street'
-    wrapper.vm.$data.currentDebtor.address.city = 'victoria'
-    wrapper.vm.$data.currentDebtor.address.region = 'BC'
-    wrapper.vm.$data.currentDebtor.address.country = 'CA'
-    wrapper.vm.$data.currentDebtor.address.postalCode = 'v8r1w3'
-    await Vue.nextTick()
+    wrapper.vm.currentDebtor.address.street = 'street'
+    wrapper.vm.currentDebtor.address.city = 'victoria'
+    wrapper.vm.currentDebtor.address.region = 'BC'
+    wrapper.vm.currentDebtor.address.country = 'CA'
+    wrapper.vm.currentDebtor.address.postalCode = 'v8r1w3'
+    await nextTick()
     wrapper.find(doneButtonSelector).trigger('click')
     await flushPromises()
 
@@ -83,24 +86,24 @@ describe('Debtor add individual tests', () => {
 
     expect(wrapper.emitted().resetEvent).toBeTruthy()
     // store should have 1 item now
-    expect(store.getters.getAddSecuredPartiesAndDebtors.debtors.length).toBe(1)
+    expect(store.getAddSecuredPartiesAndDebtors.debtors.length).toBe(1)
   })
 
   it('adds a debtor birthdate validation', async () => {
     wrapper.find('#txt-first-debtor').setValue('JOE')
     wrapper.find('#txt-last-debtor').setValue('SCHMOE')
     await wrapper.find('#txt-month').setValue(6)
-    wrapper.vm.$data.month = { value: 6, text: 'June' }
-    await Vue.nextTick()
+    wrapper.vm.month = { value: 6, text: 'June' }
+    await nextTick()
     wrapper.find('#txt-day').setValue('ab')
     wrapper.find('#txt-year').setValue('abcd')
     // for address
-    wrapper.vm.$data.currentDebtor.address.street = 'street'
-    wrapper.vm.$data.currentDebtor.address.city = 'victoria'
-    wrapper.vm.$data.currentDebtor.address.region = 'BC'
-    wrapper.vm.$data.currentDebtor.address.country = 'CA'
-    wrapper.vm.$data.currentDebtor.address.postalCode = 'v8r1w3'
-    await Vue.nextTick()
+    wrapper.vm.currentDebtor.address.street = 'street'
+    wrapper.vm.currentDebtor.address.city = 'victoria'
+    wrapper.vm.currentDebtor.address.region = 'BC'
+    wrapper.vm.currentDebtor.address.country = 'CA'
+    wrapper.vm.currentDebtor.address.postalCode = 'v8r1w3'
+    await nextTick()
     wrapper.find(doneButtonSelector).trigger('click')
     await flushPromises()
 
@@ -130,14 +133,14 @@ describe('Debtor add business tests', () => {
   it('adds a debtor to the store', async () => {
     wrapper.find('#txt-name-debtor').setValue('TONYS TOOLS')
     // for the autocomplete
-    wrapper.vm.$data.searchValue = 'TONYS TOOLS'
+    wrapper.vm.searchValue = 'TONYS TOOLS'
     // for address
-    wrapper.vm.$data.currentDebtor.address.street = 'street'
-    wrapper.vm.$data.currentDebtor.address.city = 'victoria'
-    wrapper.vm.$data.currentDebtor.address.region = 'BC'
-    wrapper.vm.$data.currentDebtor.address.country = 'CA'
-    wrapper.vm.$data.currentDebtor.address.postalCode = 'v8r1w3'
-    await Vue.nextTick()
+    wrapper.vm.currentDebtor.address.street = 'street'
+    wrapper.vm.currentDebtor.address.city = 'victoria'
+    wrapper.vm.currentDebtor.address.region = 'BC'
+    wrapper.vm.currentDebtor.address.country = 'CA'
+    wrapper.vm.currentDebtor.address.postalCode = 'v8r1w3'
+    await nextTick()
     wrapper.find(doneButtonSelector).trigger('click')
     await flushPromises()
 
@@ -147,7 +150,7 @@ describe('Debtor add business tests', () => {
 
     expect(wrapper.emitted().resetEvent).toBeTruthy()
     // store should have 1 item now
-    expect(store.getters.getAddSecuredPartiesAndDebtors.debtors[1].businessName).toBe('TONYS TOOLS')
+    expect(store.getAddSecuredPartiesAndDebtors.debtors[1].businessName).toBe('TONYS TOOLS')
   })
 })
 
@@ -155,7 +158,7 @@ describe('Debtor edit individual tests', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
-    await store.dispatch('setAddSecuredPartiesAndDebtors', {
+    await store.setAddSecuredPartiesAndDebtors({
       debtors: mockedDebtors1
     })
     wrapper = createComponent(0, false, false)
@@ -173,7 +176,7 @@ describe('Debtor edit individual tests', () => {
 
   it('Emits reset event', async () => {
     wrapper.find(cancelButtonSelector).trigger('click')
-    await Vue.nextTick()
+    await nextTick()
     expect(wrapper.emitted().resetEvent).toBeTruthy()
   })
 })
@@ -182,7 +185,7 @@ describe('Debtor edit business tests', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
-    await store.dispatch('setAddSecuredPartiesAndDebtors', {
+    await store.setAddSecuredPartiesAndDebtors({
       debtors: mockedDebtors2
     })
     wrapper = createComponent(0, true, false)
@@ -199,7 +202,7 @@ describe('Debtor edit business tests', () => {
 
   it('shows error bar', async () => {
     await wrapper.setProps({ setShowErrorBar: true })
-    await Vue.nextTick()
+    await nextTick()
     expect(wrapper.find('.border-error-left').exists()).toBe(true)
   })
 })

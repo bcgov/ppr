@@ -1,8 +1,9 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
 import VueRouter from 'vue-router'
-import { getVuexStore } from '@/store'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
 import { shallowMount, createLocalVue } from '@vue/test-utils'
 
 // Components
@@ -18,7 +19,8 @@ import { SearchTypes } from '@/resources'
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 // Prevent the warning "[Vuetify] Unable to locate target [data-app]"
 document.body.setAttribute('data-app', 'true')
@@ -63,13 +65,13 @@ describe('Search component', () => {
     expect(wrapper.findComponent(SearchedResultPpr).exists()).toBe(false)
   })
   it('renders the Results component and displays search data elements with filled result set.', async () => {
-    await store.dispatch('setSearchedType', SearchTypes[1])
-    await store.dispatch('setSearchResults', mockedSearchResponse[UISearchTypes.SERIAL_NUMBER])
-    await Vue.nextTick()
+    await store.setSearchedType(SearchTypes[1])
+    await store.setSearchResults(mockedSearchResponse[UISearchTypes.SERIAL_NUMBER])
+    await nextTick()
 
-    expect(store.getters.getSearchResults).toStrictEqual(mockedSearchResponse[UISearchTypes.SERIAL_NUMBER])
-    expect(store.getters.getSearchedType).toStrictEqual(SearchTypes[1])
-    await Vue.nextTick()
+    expect(store.getSearchResults).toStrictEqual(mockedSearchResponse[UISearchTypes.SERIAL_NUMBER])
+    expect(store.getSearchedType).toStrictEqual(SearchTypes[1])
+    await nextTick()
 
     expect(wrapper.vm.folioNumber).toBe(mockedSearchResponse[UISearchTypes.SERIAL_NUMBER].searchQuery.clientReferenceId)
     expect(wrapper.vm.searchType).toBe(SearchTypes[1].searchTypeUI)
@@ -95,12 +97,12 @@ describe('Search component', () => {
     response.totalResultsSize = 0
     response.selectedResultsSize = 0
     response.results = []
-    await store.dispatch('setSearchedType', SearchTypes[1])
-    await store.dispatch('setSearchResults', response)
-    await Vue.nextTick()
-    expect(store.getters.getSearchResults).toStrictEqual(response)
-    expect(store.getters.getSearchedType).toStrictEqual(SearchTypes[1])
-    await Vue.nextTick()
+    await store.setSearchedType(SearchTypes[1])
+    await store.setSearchResults(response)
+    await nextTick()
+    expect(store.getSearchResults).toStrictEqual(response)
+    expect(store.getSearchedType).toStrictEqual(SearchTypes[1])
+    await nextTick()
     expect(wrapper.vm.folioNumber).toBe(mockedSearchResponse[UISearchTypes.SERIAL_NUMBER].searchQuery.clientReferenceId)
     expect(wrapper.vm.searchType).toBe(SearchTypes[1].searchTypeUI)
     expect(wrapper.vm.searchValue).toBe(mockedSearchResponse[UISearchTypes.SERIAL_NUMBER].searchQuery.criteria.value)

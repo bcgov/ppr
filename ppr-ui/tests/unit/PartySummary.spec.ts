@@ -1,7 +1,8 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { getVuexStore } from '@/store'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
 
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import {
@@ -17,7 +18,8 @@ import { PartySummary } from '@/components/parties'
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 /**
  * Creates and mounts a component, so that it can be tested.
@@ -43,8 +45,8 @@ describe('Party Summary SA tests', () => {
 
   beforeEach(async () => {
     const registrationType = mockedSelectSecurityAgreement()
-    await store.dispatch('setRegistrationType', registrationType)
-    await store.dispatch('setAddSecuredPartiesAndDebtors', {
+    await store.setRegistrationType(registrationType)
+    await store.setAddSecuredPartiesAndDebtors({
       securedParties: mockedSecuredParties1,
       registeringParty: mockedRegisteringParty1
     })
@@ -65,8 +67,8 @@ describe('Secured Party list tests', () => {
 
   beforeEach(async () => {
     const registrationType = mockedSelectSecurityAgreement()
-    await store.dispatch('setRegistrationType', registrationType)
-    await store.dispatch('setAddSecuredPartiesAndDebtors', {
+    await store.setRegistrationType(registrationType)
+    await store.setAddSecuredPartiesAndDebtors({
       securedParties: mockedSecuredParties1,
       registeringParty: mockedRegisteringParty1
     })
@@ -101,9 +103,9 @@ describe('Debtor list tests', () => {
 
   beforeEach(async () => {
     const registrationType = mockedSelectSecurityAgreement()
-    await store.dispatch('setRegistrationType', registrationType)
+    await store.setRegistrationType(registrationType)
 
-    await store.dispatch('setAddSecuredPartiesAndDebtors', {
+    await store.setAddSecuredPartiesAndDebtors({
       debtors: mockedDebtors1,
       registeringParty: mockedRegisteringParty1
     })
@@ -138,7 +140,7 @@ describe('Registering Party tests', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
-    await store.dispatch('setAddSecuredPartiesAndDebtors', {
+    await store.setAddSecuredPartiesAndDebtors({
       registeringParty: mockedRegisteringParty1
     })
     wrapper = createComponent()

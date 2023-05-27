@@ -37,7 +37,7 @@ export default defineComponent({
       default: false
     }
   },
-  setup (props, context) {
+  setup (props) {
     const { setMhrHomeDescription } = useStore()
     const { getMhrRegistrationOtherInfo, getMhrRegistrationValidationModel } = storeToRefs(useStore())
     const { maxLength } = useInputRules()

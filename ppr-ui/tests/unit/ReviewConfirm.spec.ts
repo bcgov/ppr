@@ -1,8 +1,9 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
 import VueRouter from 'vue-router'
-import { getVuexStore } from '@/store'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
 import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
 import flushPromises from 'flush-promises'
 
@@ -31,7 +32,8 @@ import { getLastEvent } from './utils'
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 // Input field selectors / buttons
 const header = '#registration-header'
@@ -74,8 +76,8 @@ describe('Review Confirm new registration component', () => {
   sessionStorage.setItem('AUTH_API_URL', 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/')
 
   beforeEach(async () => {
-    await store.dispatch('setRegistrationType', null)
-    await store.dispatch('setRegistrationFlowType', null)
+    await store.setRegistrationType(null)
+    await store.setRegistrationFlowType(null)
   })
 
   afterEach(() => {
@@ -88,8 +90,8 @@ describe('Review Confirm new registration component', () => {
   })
 
   it('renders Add Parties View with child components when store is set', async () => {
-    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement())
-    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.NEW)
+    await store.setRegistrationType(mockedSelectSecurityAgreement())
+    await store.setRegistrationFlowType(RegistrationFlowType.NEW)
     wrapper = createComponent()
     await flushPromises()
     expect(wrapper.vm.$route.name).toBe(RouteNames.REVIEW_CONFIRM)
@@ -125,8 +127,8 @@ describe('Review Confirm new registration component', () => {
   })
 
   it('updates fee summary with registration length changes', async () => {
-    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement())
-    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.NEW)
+    await store.setRegistrationType(mockedSelectSecurityAgreement())
+    await store.setRegistrationFlowType(RegistrationFlowType.NEW)
     wrapper = createComponent()
     await flushPromises()
     expect(wrapper.findComponent(StickyContainer).vm.$props.setRegistrationLength).toEqual({
@@ -139,7 +141,7 @@ describe('Review Confirm new registration component', () => {
       lifeInfinite: true,
       lifeYears: 0
     }
-    await store.dispatch('setLengthTrust', newLengthTrust1)
+    await store.setLengthTrust(newLengthTrust1)
     expect(wrapper.findComponent(StickyContainer).vm.$props.setRegistrationLength).toEqual({
       lifeInfinite: newLengthTrust1.lifeInfinite,
       lifeYears: newLengthTrust1.lifeYears
@@ -150,7 +152,7 @@ describe('Review Confirm new registration component', () => {
       lifeInfinite: true,
       lifeYears: 0
     }
-    await store.dispatch('setLengthTrust', newLengthTrust2)
+    await store.setLengthTrust(newLengthTrust2)
     expect(wrapper.findComponent(StickyContainer).vm.$props.setRegistrationLength).toEqual({
       lifeInfinite: newLengthTrust2.lifeInfinite,
       lifeYears: newLengthTrust2.lifeYears
@@ -158,7 +160,6 @@ describe('Review Confirm new registration component', () => {
   })
 
   it('displays correct info based on registration type', async () => {
-    jest.setTimeout(50000)
     for (let i = 0; i < RegistrationTypes.length; i++) {
       // skip dividers + other
       if (
@@ -167,8 +168,8 @@ describe('Review Confirm new registration component', () => {
       ) {
         continue
       }
-      await store.dispatch('setRegistrationType', RegistrationTypes[i])
-      await store.dispatch('setRegistrationFlowType', RegistrationFlowType.NEW)
+      await store.setRegistrationType(RegistrationTypes[i])
+      await store.setRegistrationFlowType(RegistrationFlowType.NEW)
       wrapper = createComponent()
       await flushPromises()
       expect(wrapper.findComponent(StickyContainer).vm.$props.setRegistrationType).toBe(
@@ -187,9 +188,9 @@ describe('Review Confirm new registration component', () => {
   })
 
   it('show error message in Collateral Summary section when description is empty', async () => {
-    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement())
-    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.NEW)
-    await store.dispatch('setAddCollateral', { generalCollateral: mockedGeneralCollateral1 })
+    await store.setRegistrationType(mockedSelectSecurityAgreement())
+    await store.setRegistrationFlowType(RegistrationFlowType.NEW)
+    await store.setAddCollateral({ generalCollateral: mockedGeneralCollateral1 })
 
     wrapper = createComponent()
     await flushPromises()
@@ -206,7 +207,7 @@ describe('Review Confirm new registration component', () => {
     expect(wrapper.vm.$route.name).toBe(RouteNames.ADD_COLLATERAL)
 
     // Delete text from General Collateral as leave just html styling tag (as per current behavior)
-    await store.dispatch('setAddCollateral', {
+    await store.setAddCollateral({
       generalCollateral:
       {
         addedDateTime: '2021-09-16T05:56:20Z',
@@ -223,8 +224,8 @@ describe('Review Confirm new registration component', () => {
   })
 
   it('emits error', async () => {
-    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement)
-    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.NEW)
+    await store.setRegistrationType(mockedSelectSecurityAgreement)
+    await store.setRegistrationFlowType(RegistrationFlowType.NEW)
     wrapper = createComponent()
     await flushPromises()
     const error = { statusCode: 404 }

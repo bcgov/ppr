@@ -1,8 +1,9 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
 import VueRouter from 'vue-router'
-import { getVuexStore } from '@/store'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
 
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 
@@ -19,7 +20,9 @@ import { convertDate, pacificDate } from '@/utils'
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
+const router = mockRouter.mock()
 
 // selectors
 const tombstoneHeader: string = '.tombstone-header'
@@ -31,18 +34,15 @@ const tombstoneInfo: string = '.tombstone-info'
  *
  * @returns a Wrapper<SearchedResultPpr> object with the given parameters.
  */
-function createComponent (currentPath: string, mockRoute: string): Wrapper<any> {
+function createComponent (mockRoute: string): Wrapper<any> {
   const localVue = createLocalVue()
-
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
   localVue.use(VueRouter)
-  const router = mockRouter.mock()
   router.push({ name: mockRoute })
 
   return mount((Tombstone as any), {
     localVue,
-    propsData: { setCurrentPath: currentPath },
     store,
     router,
     vuetify
@@ -94,23 +94,27 @@ describe('Tombstone component', () => {
     window.location = { assign: jest.fn() } as any
 
     // setup data used by header
-    await store.dispatch('setAccountInformation', accountInfo)
-    await store.dispatch('setUserInfo', userInfo)
-    await store.dispatch('setRegistrationType', registrationType)
-    await store.dispatch('setRegistrationNumber', registration.baseRegistrationNumber)
-    await store.dispatch('setRegistrationCreationDate', registration.createDateTime)
-    await store.dispatch('setRegistrationExpiryDate', registration.expiryDate)
-    await store.dispatch('setAuthRoles', [AuthRoles.PUBLIC, 'ppr'])
-    await store.dispatch('setUserProductSubscriptionsCodes', [ProductCode.PPR])
+    await store.setAccountInformation(accountInfo)
+    await store.setUserInfo(userInfo)
+    await store.setRegistrationType(registrationType)
+    await store.setRegistrationNumber(registration.baseRegistrationNumber)
+    await store.setRegistrationCreationDate(registration.createDateTime)
+    await store.setRegistrationExpiryDate(registration.expiryDate)
+    await store.setAuthRoles([AuthRoles.PUBLIC, 'ppr'])
+    await store.setUserProductSubscriptionsCodes([ProductCode.PPR])
+    await nextTick()
   })
 
   afterEach(() => {
+    router.replace('/')
     window.location.assign = assign
     wrapper.destroy()
   })
 
   it('renders Tombstone component properly for Total Discharge', async () => {
-    wrapper = createComponent('/discharge/review-discharge', RouteNames.REVIEW_DISCHARGE)
+    wrapper = createComponent(RouteNames.REVIEW_DISCHARGE)
+    await nextTick()
+
     expect(wrapper.findComponent(Tombstone).exists()).toBe(true)
     expect(wrapper.findComponent(TombstoneDischarge).exists()).toBe(true)
     const header = wrapper.findAll(tombstoneHeader)
@@ -128,9 +132,12 @@ describe('Tombstone component', () => {
   })
 
   it('renders Tombstone component properly for Dashboard', async () => {
-    wrapper = createComponent('/dashboard', RouteNames.DASHBOARD)
+    wrapper = createComponent(RouteNames.DASHBOARD)
+    await nextTick()
+
     expect(wrapper.findComponent(Tombstone).exists()).toBe(true)
     expect(wrapper.findComponent(TombstoneDefault).exists()).toBe(true)
+
     const header = wrapper.findAll(tombstoneHeader)
     expect(header.length).toBe(1)
     expect(header.at(0).text()).toContain('My Personal Property Registry')
@@ -144,7 +151,9 @@ describe('Tombstone component', () => {
   })
 
   it('renders Tombstone component peoperly for Search', async () => {
-    wrapper = createComponent('/search', RouteNames.SEARCH)
+    wrapper = createComponent( RouteNames.SEARCH)
+    await nextTick()
+
     expect(wrapper.findComponent(Tombstone).exists()).toBe(true)
     expect(wrapper.findComponent(TombstoneDefault).exists()).toBe(true)
     const header = wrapper.findAll(tombstoneHeader)
@@ -160,7 +169,9 @@ describe('Tombstone component', () => {
   })
 
   it('renders Tombstone component peoperly for New Registration: length-trust', async () => {
-    wrapper = createComponent('/new-registration/length-trust', RouteNames.LENGTH_TRUST)
+    wrapper = createComponent(RouteNames.LENGTH_TRUST)
+    await nextTick()
+
     expect(wrapper.findComponent(Tombstone).exists()).toBe(true)
     expect(wrapper.findComponent(TombstoneDefault).exists()).toBe(true)
     const header = wrapper.findAll(tombstoneHeader)
@@ -176,7 +187,9 @@ describe('Tombstone component', () => {
   })
 
   it('renders Tombstone component peoperly for New Registration: parties/debtors', async () => {
-    wrapper = createComponent('/new-registration/add-securedparties-debtors', RouteNames.ADD_SECUREDPARTIES_AND_DEBTORS)
+    wrapper = createComponent(RouteNames.ADD_SECUREDPARTIES_AND_DEBTORS)
+    await nextTick()
+
     expect(wrapper.findComponent(Tombstone).exists()).toBe(true)
     expect(wrapper.findComponent(TombstoneDefault).exists()).toBe(true)
     const header = wrapper.findAll(tombstoneHeader)
@@ -192,7 +205,9 @@ describe('Tombstone component', () => {
   })
 
   it('renders Tombstone component peoperly for New Registration: collateral', async () => {
-    wrapper = createComponent('/new-registration/add-collateral', RouteNames.ADD_COLLATERAL)
+    wrapper = createComponent(RouteNames.ADD_COLLATERAL)
+    await nextTick()
+
     expect(wrapper.findComponent(Tombstone).exists()).toBe(true)
     expect(wrapper.findComponent(TombstoneDefault).exists()).toBe(true)
     const header = wrapper.findAll(tombstoneHeader)
@@ -208,7 +223,9 @@ describe('Tombstone component', () => {
   })
 
   it('renders Tombstone component peoperly for New Registration: review/confirm', async () => {
-    wrapper = createComponent('/new-registration/review-confirm', RouteNames.REVIEW_CONFIRM)
+    wrapper = createComponent(RouteNames.REVIEW_CONFIRM)
+    await nextTick()
+
     expect(wrapper.findComponent(Tombstone).exists()).toBe(true)
     expect(wrapper.findComponent(TombstoneDefault).exists()).toBe(true)
     const header = wrapper.findAll(tombstoneHeader)

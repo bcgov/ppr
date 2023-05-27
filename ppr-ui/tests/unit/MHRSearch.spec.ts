@@ -1,8 +1,9 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
 import VueRouter from 'vue-router'
-import { getVuexStore } from '@/store'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
 import { shallowMount, createLocalVue } from '@vue/test-utils'
 
 // Components
@@ -18,7 +19,8 @@ import { MHRSearchTypes } from '@/resources'
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 // Prevent the warning "[Vuetify] Unable to locate target [data-app]"
 document.body.setAttribute('data-app', 'true')
@@ -61,7 +63,7 @@ describe('Search component', () => {
     expect(wrapper.findComponent(SearchedResultMhr).exists()).toBe(false)
   })
   it('renders the Results component and displays search data elements with filled result set.', async () => {
-    await store.dispatch('setManufacturedHomeSearchResults', mockedMHRSearchResponse[UIMHRSearchTypes.MHRMHR_NUMBER])
+    await store.setManufacturedHomeSearchResults(mockedMHRSearchResponse[UIMHRSearchTypes.MHRMHR_NUMBER])
     expect(wrapper.find(noResultsInfo).exists()).toBe(false)
     expect(wrapper.findComponent(SearchedResultMhr).exists()).toBe(true)
   })
@@ -69,7 +71,7 @@ describe('Search component', () => {
     const response = mockedMHRSearchResponse[UIMHRSearchTypes.MHRMHR_NUMBER]
     response.totalResultsSize = 0
     response.results = []
-    await store.dispatch('setManufacturedHomeSearchResults', response)
+    await store.setManufacturedHomeSearchResults(response)
     expect(wrapper.find(noResultsInfo).exists()).toBe(true)
     expect(wrapper.findComponent(SearchedResultMhr).exists()).toBe(true)
   })

@@ -1,7 +1,8 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { getVuexStore } from '@/store'
+import { useStore } from '@/store/store'
+import { createPinia, setActivePinia } from 'pinia'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import {
   mockedSecuredParties1,
@@ -18,9 +19,10 @@ import { partyTableHeaders } from '@/resources'
 import { RegistrationFlowType } from '@/enums'
 
 Vue.use(Vuetify)
-
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+
+setActivePinia(createPinia())
+const store = useStore()
 
 /**
  * Creates and mounts a component, so that it can be tested.
@@ -48,8 +50,8 @@ describe('Party Summary SA tests', () => {
 
   beforeEach(async () => {
     const registrationType = mockedSelectSecurityAgreement()
-    await store.dispatch('setRegistrationType', registrationType)
-    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.NEW)
+    await store.setRegistrationType(registrationType)
+    await store.setRegistrationFlowType(RegistrationFlowType.NEW)
     wrapper = createComponent(partyTableHeaders, mockedSecuredParties1, {
       enableNoDataAction: false,
       header: 'true',
@@ -75,7 +77,7 @@ describe('Secured Party list tests', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
-    await store.dispatch('setAddSecuredPartiesAndDebtors', {
+    await store.setAddSecuredPartiesAndDebtors({
       securedParties: mockedSecuredParties1,
       registeringParty: mockedRegisteringParty1
     })
@@ -154,7 +156,7 @@ describe('Secured Party amendment list tests', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
-    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.AMENDMENT)
+    await store.setRegistrationFlowType(RegistrationFlowType.AMENDMENT)
     wrapper = createComponent(partyTableHeaders, mockedSecuredPartiesAmendment, {
       enableNoDataAction: false,
       header: 'true',

@@ -1,7 +1,8 @@
 import sinon from 'sinon'
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { getVuexStore } from '@/store'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
 
 import { mount, Wrapper, createLocalVue } from '@vue/test-utils'
 import flushPromises from 'flush-promises'
@@ -21,7 +22,8 @@ import { getLastEvent } from './utils'
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 // Input field selectors / buttons
 const accept: string = '#accept-btn'
@@ -52,9 +54,7 @@ describe('Registration Confirmation Dialog', () => {
       )
     )
     const localVue = createLocalVue()
-
     localVue.use(Vuetify)
-
     wrapper = mount((RegistrationConfirmation as any), {
       localVue,
       store,
@@ -67,7 +67,7 @@ describe('Registration Confirmation Dialog', () => {
       vuetify
     })
 
-    await Vue.nextTick()
+    await nextTick()
   })
   afterEach(() => {
     sandbox.restore()
@@ -75,9 +75,6 @@ describe('Registration Confirmation Dialog', () => {
   })
 
   it('renders the component and allows debtor name selection', async () => {
-    await Vue.nextTick()
-    await Vue.nextTick()
-
     expect(wrapper.findComponent(RegistrationConfirmation).exists()).toBe(true)
     expect(wrapper.isVisible()).toBe(true)
     expect(wrapper.find(title).text()).toBe(dischargeOptions.title)
@@ -103,12 +100,10 @@ describe('Registration Confirmation Dialog', () => {
 
     expect(getLastEvent(wrapper, 'proceed')).toBe(true)
 
-    expect(store.getters.getConfirmDebtorName.businessName).toBe('Forrest Gump')
+    expect(store.getConfirmDebtorName.businessName).toBe('Forrest Gump')
   })
 
   it('the cancel button works', async () => {
-    await Vue.nextTick()
-
     expect(wrapper.findComponent(RegistrationConfirmation).exists()).toBe(true)
     expect(wrapper.isVisible()).toBe(true)
 
