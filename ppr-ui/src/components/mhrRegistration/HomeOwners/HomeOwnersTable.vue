@@ -728,7 +728,9 @@ export default defineComponent({
 
     // Hide bottom border for the owner's row that requires additional input (Death Certificate etc.)
     const hideRowBottomBorder = (rowItem: MhrRegistrationHomeOwnerIF): boolean => {
-      return isRemovedHomeOwner(rowItem) && (showDeathCertificate() || showSupportingDocuments())
+      return isRemovedHomeOwner(rowItem) &&
+      isPartyTypeNotEAT(rowItem) && // show the bottom border line for Execs, Admins and Trustees
+      (showDeathCertificate() || showSupportingDocuments())
     }
 
     const getHomeOwnerIcon = (partyType: HomeOwnerPartyTypes, isBusiness = false): string => {
