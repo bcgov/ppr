@@ -80,10 +80,10 @@ describe('Tombstone component', () => {
   })
 
   afterAll(async () => {
-    await store.dispatch('setRegistrationType', null)
-    await store.dispatch('setRegistrationNumber', null)
-    await store.dispatch('setRegistrationCreationDate', null)
-    await store.dispatch('setRegistrationExpiryDate', null)
+    await store.setRegistrationType(null)
+    await store.setRegistrationNumber(null)
+    await store.setRegistrationCreationDate(null)
+    await store.setRegistrationExpiryDate(null)
   })
 
   it('renders Tombstone component properly for Total Discharge', async () => {
@@ -151,7 +151,7 @@ describe('TombstoneDischarge component - MHR', () => {
     window.location = { assign: jest.fn() } as any
 
     // setup data
-    await store.dispatch('setMhrInformation', mockedMhrInformation)
+    await store.setMhrInformation(mockedMhrInformation)
   })
 
   afterEach(() => {

@@ -825,18 +825,19 @@ describe('Home Owners', () => {
         type: ''
       }
     ]
-    await store.dispatch('setMhrTransferCurrentHomeOwnerGroups', homeOwnerGroup)
-    await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerGroup)
+    await store.setMhrTransferCurrentHomeOwnerGroups(homeOwnerGroup)
+    await store.setMhrTransferHomeOwnerGroups(homeOwnerGroup)
     await selectTransferType(TRANSFER_TYPE)
 
-    const homeOwners = wrapper.findComponent(HomeOwners)
+    const homeOwners: Wrapper<any> = wrapper.findComponent(HomeOwners)
     await homeOwners.find(getTestId('table-delete-btn')).trigger('click')
 
     expect(homeOwners.find(getTestId('invalid-group-msg')).exists()).toBeTruthy()
     expect(homeOwners.find(getTestId('invalid-group-msg')).text())
       .toContain(transfersErrors.mustContainOneExecutor)
 
-    homeOwners.findComponent(InfoChip).vm.$data.action = 'DELETED'
+    const infoChip: Wrapper<any> = homeOwners.findComponent(InfoChip)
+    infoChip.vm.action = 'DELETED'
 
     await homeOwners.find(getTestId('add-person-btn')).trigger('click')
     const addOwnerSection = homeOwners.findComponent(AddEditHomeOwner)
@@ -848,7 +849,7 @@ describe('Home Owners', () => {
     await addOwnerSection.find(getTestId('cancel-btn')).trigger('click')
 
     // add a new Executor via store, preserving first deleted Executor
-    await store.dispatch('setMhrTransferHomeOwnerGroups', [
+    await store.setMhrTransferHomeOwnerGroups([
       {
         groupId: 1,
         owners: [
@@ -860,7 +861,7 @@ describe('Home Owners', () => {
     ])
 
     // should have two Executors in the table
-    const owners: MhrRegistrationHomeOwnerIF[] = homeOwners.vm.$data.getMhrTransferHomeOwnerGroups[0].owners
+    const owners: MhrRegistrationHomeOwnerIF[] = homeOwners.vm.getMhrTransferHomeOwnerGroups[0].owners
     expect(owners.length).toBe(2)
     // both Executors should have the same suffix, because it was pre-filled
     expect(owners[0].suffix).toBe(mockedExecutor.suffix)
@@ -893,13 +894,16 @@ describe('Home Owners', () => {
 
     await selectTransferType(TRANSFER_TYPE)
     await store.setMhrTransferCurrentHomeOwnerGroups(homeOwnerGroup)
-    const groupError = wrapper.find(getTestId('invalid-group-msg'))
 
     // One Owner is Deceased, no Executor added
     await store.setMhrTransferHomeOwnerGroups([
       { groupId: 1, owners: [mockedPerson, { ...mockedPerson2, action: ActionTypes.REMOVED }], type: '' },
       { groupId: 2, owners: [mockedPerson], type: '' }
     ])
+    await nextTick()
+    await nextTick()
+
+    const groupError = wrapper.find(getTestId('invalid-group-msg'))
     expect(groupError.text()).toContain(transfersErrors.allOwnersHaveDeathCerts[TRANSFER_TYPE])
 
     // All Owners are Deceased, no Executor added

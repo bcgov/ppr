@@ -21,23 +21,19 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
-import { useGetters, useActions } from 'vuex-composition-helpers'
+import { defineComponent, reactive, toRefs, watch } from 'vue-demi'
+import { useStore } from '@/store/store'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'HomeLandOwnership',
   setup () {
     const {
-      getMhrRegistrationOwnLand
-    } = useGetters<any>([
-      'getMhrRegistrationOwnLand'
-    ])
-
-    const {
       setMhrRegistrationOwnLand
-    } = useActions<any>([
-      'setMhrRegistrationOwnLand'
-    ])
+    } = useStore()
+    const {
+      getMhrRegistrationOwnLand
+    } = storeToRefs(useStore())
 
     const localState = reactive({
       isOwnLand: !!getMhrRegistrationOwnLand.value
