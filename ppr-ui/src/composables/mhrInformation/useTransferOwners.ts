@@ -443,7 +443,6 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       const transferType = getMhrTransferType.value?.transferType
       const allOwners = getMhrTransferHomeOwners.value
       const deletedOwnerGroup = find(getMhrTransferHomeOwnerGroups.value, { owners: [{ action: ActionTypes.REMOVED }] })
-      const supportingDocOfTheTransferType = TransToExec.getSupportingDocForActiveTransfer()
 
       // first try to find the deleted reg owner
       const deletedOwner = find(deletedOwnerGroup.owners, {

@@ -22,7 +22,8 @@ import {
   mockMhrTransferCurrentHomeOwnerGroup,
   mockedPerson2,
   mockedAddedExecutor,
-  mockedAddedAdministrator
+  mockedAddedAdministrator,
+  mockedAdministrator
 } from './test-data'
 import { getTestId } from './utils'
 import { MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF, TransferTypeSelectIF } from '@/interfaces'
@@ -813,8 +814,6 @@ describe('Home Owners', () => {
   it('TRANS WILL: remove existing Executor and add a new one', async () => {
     // reset transfer type
     await selectTransferType(null)
-    wrapper.vm.$data.dataLoaded = true
-    await Vue.nextTick()
 
     const TRANSFER_TYPE = ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL
     const homeOwnerGroup: MhrRegistrationHomeOwnerGroupIF[] = [
@@ -841,7 +840,8 @@ describe('Home Owners', () => {
     const addOwnerSection = homeOwners.findComponent(AddEditHomeOwner)
     expect(addOwnerSection.exists()).toBeTruthy()
     // check that additional name (suffix) is pre-filled
-    expect(addOwnerSection.text()).toContain(mockedExecutor.suffix)
+    const suffix = <HTMLInputElement>(addOwnerSection.find(getTestId('suffix'))).element
+    expect(suffix.value).toBe(mockedExecutor.description)
     // close Add a Person to add via store (instead of filling out the form)
     await addOwnerSection.find(getTestId('cancel-btn')).trigger('click')
 
@@ -873,6 +873,8 @@ describe('Home Owners', () => {
 
     const addedExecutor = homeOwners.find(getTestId('owner-info-' + mockedAddedExecutor.ownerId))
     expect(addedExecutor.exists()).toBeTruthy()
+    // check that additional name (suffix) of the deleted Executor is displayed for the new Executor
+    expect(addedExecutor.text()).toContain(mockedExecutor.description)
   })
 
   it('TRANS Affidavit: validations with different error messages', async () => {
@@ -999,5 +1001,64 @@ describe('Home Owners', () => {
     ])
 
     expect(groupError.text()).toContain(transfersErrors.ownersMustBeDeceased)
+  })
+
+  it('TRANS ADMIN No Will: remove existing Administrator and add a new one', async () => {
+    // reset transfer type
+    await selectTransferType(null)
+
+    const TRANSFER_TYPE = ApiTransferTypes.TO_ADMIN_NO_WILL
+    const homeOwnerGroup: MhrRegistrationHomeOwnerGroupIF[] = [
+      {
+        groupId: 1,
+        owners: [mockedAdministrator],
+        type: ''
+      }
+    ]
+    await store.dispatch('setMhrTransferCurrentHomeOwnerGroups', homeOwnerGroup)
+    await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerGroup)
+    await selectTransferType(TRANSFER_TYPE)
+
+    const homeOwners = wrapper.findComponent(HomeOwners)
+    await homeOwners.find(getTestId('table-delete-btn')).trigger('click')
+    await Vue.nextTick()
+
+    expect(homeOwners.find(getTestId('invalid-group-msg')).exists()).toBeTruthy()
+    expect(homeOwners.find(getTestId('invalid-group-msg')).text())
+      .toContain(transfersErrors.mustContainOneAdmin)
+
+    await homeOwners.find(getTestId('add-person-btn')).trigger('click')
+    const addEditHomeOwner = homeOwners.findComponent(AddEditHomeOwner)
+    expect(addEditHomeOwner.exists()).toBeTruthy()
+    // check that suffix field value is pre-populated with the name of deleted person
+    const suffix = <HTMLInputElement>(addEditHomeOwner.find(getTestId('suffix'))).element
+    expect(suffix.value).toBe(mockedAdministrator.description)
+
+    // expect(addEditHomeOwner.text()).toContain(mockedAdministrator.suffix)
+    // close Add a Person to add via store (instead of filling out the form)
+    await addEditHomeOwner.find(getTestId('cancel-btn')).trigger('click')
+
+    // add a new Executor via store, preserving first deleted Executor
+    await store.dispatch('setMhrTransferHomeOwnerGroups', [
+      {
+        groupId: 1,
+        owners: [
+          { ...mockedAdministrator, action: ActionTypes.REMOVED },
+          { ...mockedAddedAdministrator, suffix: mockedAdministrator.suffix }
+        ],
+        type: ''
+      }
+    ])
+
+    const allBadges = homeOwners.findAllComponents(InfoChip)
+    expect(allBadges.length).toBe(2) // Added and Deleted badges
+    expect(allBadges.at(0).text()).toContain('DELETED')
+    expect(allBadges.at(1).text()).toContain('ADDED')
+    expect(homeOwners.find(getTestId('invalid-group-msg')).exists()).toBeFalsy()
+
+    const addedAdministrator = homeOwners.find(getTestId('owner-info-' + mockedAdministrator.ownerId))
+    expect(addedAdministrator.exists()).toBeTruthy()
+    // check that additional name (suffix) of the deleted Administrator is displayed for the new Administrator
+    expect(addedAdministrator.text()).toContain(mockedAdministrator.description)
   })
 })
