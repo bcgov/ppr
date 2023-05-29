@@ -1,11 +1,13 @@
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { getVuexStore } from '@/store'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import { MhrSubmittingParty } from '@/components/mhrRegistration/SubmittingParty'
 
 Vue.use(Vuetify)
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 const vuetify = new Vuetify({})
 
 /**
@@ -14,7 +16,7 @@ const vuetify = new Vuetify({})
  */
 function createComponent (): Wrapper<any> {
   const localVue = createLocalVue()
-  return mount(MhrSubmittingParty, {
+  return mount((MhrSubmittingParty as any), {
     localVue,
     store,
     vuetify
@@ -35,7 +37,7 @@ describe('mhr submitting party', () => {
   })
 
   it('renders the component', async () => {
-    const submittingPartySection = wrapper.findComponent(MhrSubmittingParty)
+    const submittingPartySection = wrapper
     expect(submittingPartySection.exists()).toBe(true)
 
     submittingPartySection.find('#person-option').exists()
@@ -51,91 +53,91 @@ describe('mhr submitting party', () => {
   })
 
   it("has the right validations for a person's name", async () => {
-    const submittingPartySection = wrapper.findComponent(MhrSubmittingParty)
+    const submittingPartySection = wrapper
     expect(submittingPartySection.exists()).toBe(true)
 
     await submittingPartySection.find('#person-option').trigger('click')
 
     const firstName = submittingPartySection.find('#first-name')
     firstName.setValue('!?@#$%')
-    await Vue.nextTick()
-    await Vue.nextTick()
+    await nextTick()
+    await nextTick()
     expect(submittingPartySection.findAll(ERROR_MSG).at(0).text()).toContain('Invalid characters')
     await firstName.setValue(' abc ')
-    await Vue.nextTick()
-    await Vue.nextTick()
+    await nextTick()
+    await nextTick()
     expect(submittingPartySection.findAll(ERROR_MSG).at(0).text()).toContain('Invalid spaces')
     await firstName.setValue('abc'.repeat(6))
-    await Vue.nextTick()
-    await Vue.nextTick()
+    await nextTick()
+    await nextTick()
     expect(submittingPartySection.findAll(ERROR_MSG).at(0).text()).toContain('Maximum')
     await firstName.setValue('Gary')
-    await Vue.nextTick()
-    await Vue.nextTick()
+    await nextTick()
+    await nextTick()
     expect(submittingPartySection.findAll(ERROR_MSG).length).toBe(0)
 
     const middleName = submittingPartySection.find('#middle-name')
     middleName.setValue('!?@#$%')
-    await Vue.nextTick()
-    await Vue.nextTick()
+    await nextTick()
+    await nextTick()
     expect(submittingPartySection.findAll(ERROR_MSG).at(0).text()).toContain('Invalid characters')
     middleName.setValue(' abc ')
-    await Vue.nextTick()
-    await Vue.nextTick()
+    await nextTick()
+    await nextTick()
     expect(submittingPartySection.findAll(ERROR_MSG).at(0).text()).toContain('Invalid spaces')
     middleName.setValue('abc'.repeat(6))
-    await Vue.nextTick()
-    await Vue.nextTick()
+    await nextTick()
+    await nextTick()
     expect(submittingPartySection.findAll(ERROR_MSG).at(0).text()).toContain('Maximum')
     middleName.setValue('fatboy')
-    await Vue.nextTick()
-    await Vue.nextTick()
+    await nextTick()
+    await nextTick()
     expect(submittingPartySection.findAll(ERROR_MSG).length).toBe(0)
 
     const lastName = submittingPartySection.find('#last-name')
     lastName.setValue('!?@#$%')
-    await Vue.nextTick()
-    await Vue.nextTick()
+    await nextTick()
+    await nextTick()
     expect(submittingPartySection.findAll(ERROR_MSG).at(0).text()).toContain('Invalid characters')
     lastName.setValue(' abc ')
-    await Vue.nextTick()
-    await Vue.nextTick()
+    await nextTick()
+    await nextTick()
     expect(submittingPartySection.findAll(ERROR_MSG).at(0).text()).toContain('Invalid spaces')
     lastName.setValue('abcde'.repeat(6))
-    await Vue.nextTick()
-    await Vue.nextTick()
+    await nextTick()
+    await nextTick()
     expect(submittingPartySection.findAll(ERROR_MSG).at(0).text()).toContain('Maximum')
     lastName.setValue('fatboy')
-    await Vue.nextTick()
-    await Vue.nextTick()
+    await nextTick()
+    await nextTick()
     expect(submittingPartySection.findAll(ERROR_MSG).length).toBe(0)
   })
 
   it('has the right validations for business and other info', async () => {
-    const submittingPartySection = wrapper.findComponent(MhrSubmittingParty)
+    const submittingPartySection = wrapper
     expect(submittingPartySection.exists()).toBe(true)
 
     await submittingPartySection.find('#business-option').trigger('click')
-    await Vue.nextTick()
+    await nextTick()
 
     const businessName = submittingPartySection.find('#business-name')
     businessName.setValue(' abc ')
-    await Vue.nextTick()
-    await Vue.nextTick()
+    await nextTick()
+    await nextTick()
     expect(submittingPartySection.findAll(ERROR_MSG).at(0).text()).toContain('Invalid spaces')
     businessName.setValue('garyblabla123'.repeat(7))
-    await Vue.nextTick()
-    await Vue.nextTick()
+    await nextTick()
+    await nextTick()
     expect(submittingPartySection.findAll(ERROR_MSG).at(0).text()).toContain('Maximum')
     businessName.setValue('gary fatboy')
-    await Vue.nextTick()
-    await Vue.nextTick()
+    await nextTick()
+    await nextTick()
     expect(submittingPartySection.findAll(ERROR_MSG).length).toBe(0)
 
     const email = submittingPartySection.find('#submitting-party-email')
     await email.setValue('garyfatboy@gmail.com')
-    await Vue.nextTick()
-    await Vue.nextTick()
+    await nextTick()
+    await nextTick()
     expect(submittingPartySection.findAll(ERROR_MSG).length).toBe(0)
 
     await email.setValue('notAnEmail')
@@ -155,14 +157,14 @@ describe('mhr submitting party', () => {
 
     const phoneNum = submittingPartySection.find('#submitting-party-phone')
     phoneNum.setValue('1234567890')
-    await Vue.nextTick()
-    await Vue.nextTick()
+    await nextTick()
+    await nextTick()
     expect(submittingPartySection.findAll(ERROR_MSG).length).toBe(0)
 
     const phoneExt = submittingPartySection.find('#submitting-party-phone-ext')
     phoneExt.setValue('12344')
-    await Vue.nextTick()
-    await Vue.nextTick()
+    await nextTick()
+    await nextTick()
     expect(submittingPartySection.findAll(ERROR_MSG).length).toBe(0)
   })
 })

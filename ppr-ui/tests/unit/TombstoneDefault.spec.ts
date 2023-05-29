@@ -1,9 +1,10 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
 import VueRouter from 'vue-router'
-import { getVuexStore } from '@/store'
-import CompositionApi from '@vue/composition-api'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
+
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 
 // Components
@@ -18,7 +19,8 @@ import { defaultFlagSet } from '@/utils'
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 // selectors
 const tombstoneHeader: string = '.tombstone-header'
@@ -31,7 +33,7 @@ const tombstoneSubHeader: string = '.tombstone-sub-header'
  */
 function createComponent (mockRoute: string): Wrapper<any> {
   const localVue = createLocalVue()
-  localVue.use(CompositionApi)
+
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
   localVue.use(VueRouter)
@@ -54,9 +56,9 @@ function createComponent (mockRoute: string): Wrapper<any> {
 async function assertHeaderForRole (
   wrapper: Wrapper<any>, roles: Array<string>, headerContent: string, subscribedProductsCodes: Array<ProductCode> = []
 ) {
-  await store.dispatch('setAuthRoles', roles)
-  await store.dispatch('setRoleSbc', !roles.includes(AuthRoles.PUBLIC))
-  await store.dispatch('setUserProductSubscriptionsCodes', subscribedProductsCodes)
+  await store.setAuthRoles(roles)
+  await store.setRoleSbc(!roles.includes(AuthRoles.PUBLIC))
+  await store.setUserProductSubscriptionsCodes(subscribedProductsCodes)
   const header = wrapper.findAll(tombstoneHeader)
   await expect(header.length).toBe(1)
   await expect(header.at(0).text()).toContain(headerContent)
@@ -103,8 +105,8 @@ describe('TombstoneDefault component tests', () => {
     window.location = { assign: jest.fn() } as any
 
     // setup data used by header
-    await store.dispatch('setAccountInformation', accountInfo)
-    await store.dispatch('setUserInfo', userInfo)
+    await store.setAccountInformation(accountInfo)
+    await store.setUserInfo(userInfo)
     defaultFlagSet['mhr-ui-enabled'] = false
   })
 
@@ -115,8 +117,8 @@ describe('TombstoneDefault component tests', () => {
 
   it('renders default Tombstone component with header and user info displayed', async () => {
     wrapper = createComponent(RouteNames.DASHBOARD)
-    await store.dispatch('setAuthRoles', [AuthRoles.PUBLIC, AuthRoles.PPR])
-    await store.dispatch('setUserProductSubscriptionsCodes', [ProductCode.PPR])
+    await store.setAuthRoles([AuthRoles.PUBLIC, AuthRoles.PPR])
+    await store.setUserProductSubscriptionsCodes([ProductCode.PPR])
     expect(wrapper.findComponent(TombstoneDefault).exists()).toBe(true)
     const header = wrapper.findAll(tombstoneHeader)
     expect(header.length).toBe(1)
@@ -131,10 +133,10 @@ describe('TombstoneDefault component tests', () => {
   it('displays staff versions', async () => {
     wrapper = createComponent(RouteNames.DASHBOARD)
     const staffGroups = ['helpdesk', 'ppr_staff']
-    await store.dispatch('setAuthRoles', ['staff', 'ppr'])
+    await store.setAuthRoles(['staff', 'ppr'])
     for (let i = 0; i < staffGroups.length; i++) {
-      if (staffGroups[i] === 'gov_account_user') await store.dispatch('setAuthRoles', [staffGroups[i]])
-      else await store.dispatch('setAuthRoles', ['staff', 'ppr', staffGroups[i]])
+      if (staffGroups[i] === 'gov_account_user') await store.setAuthRoles([staffGroups[i]])
+      else await store.setAuthRoles(['staff', 'ppr', staffGroups[i]])
       const header = wrapper.findAll(tombstoneHeader)
       expect(header.length).toBe(1)
       expect(header.at(0).text()).toContain('Staff Personal Property Registry')
@@ -146,7 +148,7 @@ describe('TombstoneDefault component tests', () => {
       expect(subHeader.at(0).text()).toContain(userInfo.firstname)
       expect(subHeader.at(0).text()).toContain(userInfo.lastname)
     }
-    await store.dispatch('setRoleSbc', true)
+    await store.setRoleSbc(true)
     const subHeader = wrapper.findAll(tombstoneSubHeader)
     expect(subHeader.at(0).text()).toContain('SBC Staff')
   })

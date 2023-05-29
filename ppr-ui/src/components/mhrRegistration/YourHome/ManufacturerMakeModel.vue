@@ -135,9 +135,11 @@ import {
   ref,
   toRefs,
   watch
-} from '@vue/composition-api'
-import { useGetters, useActions } from 'vuex-composition-helpers'
+} from 'vue-demi'
+import { useStore } from '@/store/store'
 import { useInputRules, useMhrValidations } from '@/composables/'
+import { storeToRefs } from 'pinia'
+import { FormIF } from '@/interfaces'
 
 export default defineComponent({
   props: {
@@ -146,38 +148,24 @@ export default defineComponent({
       default: false
     }
   },
-  setup (props, context) {
+  setup (props) {
     // Form Refs
-    const makeModelComboForm = ref(null)
+    const makeModelComboForm = ref(null) as FormIF
     const nameRef = ref(null)
+
     const yearRef = ref(null)
     const makeRef = ref(null)
     const modelRef = ref(null)
-
+    const { setMhrHomeDescription, setMhrHomeBaseInformation } = useStore()
     const {
+      // Getters
       getMhrRegistrationValidationModel,
       getMhrRegistrationManufacturerName,
       getMhrRegistrationYearOfManufacture,
       getMhrRegistrationIsYearApproximate,
       getMhrRegistrationHomeMake,
       getMhrRegistrationHomeModel
-    } = useGetters<any>([
-      'getMhrRegistrationValidationModel',
-      'getMhrRegistrationManufacturerName',
-      'getMhrRegistrationYearOfManufacture',
-      'getMhrRegistrationIsYearApproximate',
-      'getMhrRegistrationHomeMake',
-      'getMhrRegistrationHomeModel'
-    ])
-
-    const {
-      setMhrHomeDescription,
-      setMhrHomeBaseInformation
-    } = useActions<any>([
-      'setMhrHomeDescription',
-      'setMhrHomeBaseInformation'
-    ])
-
+    } = storeToRefs(useStore())
     const {
       customRules,
       required,
@@ -269,9 +257,8 @@ export default defineComponent({
       setValidation(MhrSectVal.YOUR_HOME_VALID, MhrCompVal.MAKE_MODEL_VALID, val)
     })
 
-    watch(() => props.validate, async () => {
-      // @ts-ignore - function exists
-      await context.refs.makeModelComboForm.validate()
+    watch(() => props.validate, () => {
+      makeModelComboForm.value?.validate()
     })
 
     return {

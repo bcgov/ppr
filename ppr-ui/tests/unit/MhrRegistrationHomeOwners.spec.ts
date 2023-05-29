@@ -1,6 +1,5 @@
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { getVuexStore } from '@/store'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 
 import { HomeOwners } from '@/views'
@@ -18,18 +17,21 @@ import { getTestId } from './utils'
 import { MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF } from '@/interfaces'
 import { HomeTenancyTypes } from '@/enums'
 import { MixedRolesErrors } from '@/resources'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
 
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 function createComponent (): Wrapper<any> {
   const localVue = createLocalVue()
   localVue.use(Vuetify)
 
   document.body.setAttribute('data-app', 'true')
-  return mount(HomeOwners, {
+  return mount((HomeOwners as any), {
     localVue,
     propsData: {},
     store,
@@ -45,6 +47,7 @@ describe('Home Owners', () => {
 
   beforeEach(async () => {
     wrapper = createComponent()
+    await nextTick()
   })
   afterEach(() => {
     wrapper.destroy()
@@ -53,30 +56,27 @@ describe('Home Owners', () => {
   // Helper functions
 
   const openAddPerson = async () => {
-    const homeOwnersSection = wrapper.findComponent(HomeOwners)
-    await homeOwnersSection.find(getTestId('add-person-btn')).trigger('click')
-    await Vue.nextTick()
-    expect(homeOwnersSection.findComponent(AddEditHomeOwner).exists()).toBeTruthy()
-    expect(homeOwnersSection.findComponent(HomeOwnerGroups).exists()).toBeTruthy()
+    await wrapper.find(getTestId('add-person-btn')).trigger('click')
+    await nextTick()
+    expect(wrapper.findComponent(AddEditHomeOwner).exists()).toBeTruthy()
+    expect(wrapper.findComponent(HomeOwnerGroups).exists()).toBeTruthy()
   }
 
   const openAddOrganization = async () => {
-    const homeOwnersSection = wrapper.findComponent(HomeOwners)
-    await homeOwnersSection.find(getTestId('add-org-btn')).trigger('click')
-    await Vue.nextTick()
-    expect(homeOwnersSection.findComponent(AddEditHomeOwner).exists()).toBeTruthy()
-    expect(homeOwnersSection.findComponent(HomeOwnerGroups).exists()).toBeTruthy()
+    await wrapper.find(getTestId('add-org-btn')).trigger('click')
+    await nextTick()
+    expect(wrapper.findComponent(AddEditHomeOwner).exists()).toBeTruthy()
+    expect(wrapper.findComponent(HomeOwnerGroups).exists()).toBeTruthy()
   }
 
   const clickCancelAddOwner = async () => {
-    const homeOwnersSection = wrapper.findComponent(HomeOwners)
-    const addOwnerSection = homeOwnersSection.findComponent(AddEditHomeOwner)
+    const addOwnerSection = wrapper.findComponent(AddEditHomeOwner)
     expect(addOwnerSection.exists).toBeTruthy()
     const cancelBtn = addOwnerSection.find(getTestId('cancel-btn'))
     expect(cancelBtn.exists()).toBeTruthy()
     await cancelBtn.trigger('click')
-    await Vue.nextTick()
-    expect(homeOwnersSection.findComponent(AddEditHomeOwner).exists()).toBeFalsy()
+    await nextTick()
+    expect(addOwnerSection.exists()).toBeFalsy()
   }
 
   const clickDoneAddOwner = async () => {
@@ -88,14 +88,14 @@ describe('Home Owners', () => {
     // should not be any errors
     // expect(addOwnerSection.findAll(ERROR_MSG).length).toBe(0)
     setTimeout(async () => {
-      expect(wrapper.findComponent(AddEditHomeOwner).exists()).toBeFalsy() // Hidden by default
+      expect(addOwnerSection.exists()).toBeFalsy() // Hidden by default
     }, 500)
   }
 
   // Tests
 
   it('renders Home Owners and its sub components', () => {
-    expect(wrapper.findComponent(HomeOwners).exists()).toBeTruthy()
+    expect(wrapper.exists()).toBeTruthy()
     expect(wrapper.findComponent(AddEditHomeOwner).exists()).toBeFalsy() // Hidden by default
     expect(wrapper.findComponent(HomeOwnersTable).exists()).toBeTruthy()
     expect(wrapper.findComponent(SimpleHelpToggle).exists()).toBeTruthy()
@@ -104,14 +104,14 @@ describe('Home Owners', () => {
   it('renders Add Edit Home Owner and its sub components', async () => {
     expect(wrapper.findComponent(AddEditHomeOwner).exists()).toBe(false) // Hidden by default
     openAddPerson()
-    await Vue.nextTick()
-    await Vue.nextTick()
+    await nextTick()
+    await nextTick()
     clickCancelAddOwner()
-    await Vue.nextTick()
-    await Vue.nextTick()
+    await nextTick()
+    await nextTick()
     openAddOrganization()
-    await Vue.nextTick()
-    await Vue.nextTick()
+    await nextTick()
+    await nextTick()
     clickCancelAddOwner()
   })
 
@@ -120,11 +120,11 @@ describe('Home Owners', () => {
     const homeOwnerGroup = [{ groupId: 1, owners: owners }] as MhrRegistrationHomeOwnerGroupIF[]
 
     // add a person
-    await store.dispatch('setMhrRegistrationHomeOwnerGroups', homeOwnerGroup)
+    await store.setMhrRegistrationHomeOwnerGroups(homeOwnerGroup)
 
     expect(wrapper.findComponent(AddEditHomeOwner).exists()).toBeFalsy()
 
-    let ownersTable = wrapper.findComponent(HomeOwners).findComponent(HomeOwnersTable)
+    let ownersTable = wrapper.findComponent(HomeOwnersTable)
 
     // renders all fields
 
@@ -148,11 +148,11 @@ describe('Home Owners', () => {
 
     // add an organization
     homeOwnerGroup[0].owners.push(mockedOrganization)
-    await store.dispatch('setMhrRegistrationHomeOwnerGroups', homeOwnerGroup)
+    await store.setMhrRegistrationHomeOwnerGroups(homeOwnerGroup)
 
     expect(wrapper.findComponent(AddEditHomeOwner).exists()).toBeFalsy()
 
-    ownersTable = wrapper.findComponent(HomeOwners).findComponent(HomeOwnersTable)
+    ownersTable = wrapper.findComponent(HomeOwnersTable)
 
     // renders all fields
     expect(ownersTable.exists()).toBeTruthy()
@@ -173,15 +173,15 @@ describe('Home Owners', () => {
       { groupId: 1, owners: [mockedPerson, mockedOrganization] }
     ] as MhrRegistrationHomeOwnerGroupIF[]
 
-    await store.dispatch('setMhrRegistrationHomeOwnerGroups', homeOwnerGroup)
+    await store.setMhrRegistrationHomeOwnerGroups(homeOwnerGroup)
 
-    let ownersTable = wrapper.findComponent(HomeOwners).findComponent(HomeOwnersTable)
+    let ownersTable = wrapper.findComponent(HomeOwnersTable)
 
     expect(wrapper.findComponent(AddEditHomeOwner).exists()).toBeFalsy()
     expect(ownersTable.text()).not.toContain('Group 1')
 
     await ownersTable.find(getTestId('table-edit-btn')).trigger('click')
-    await Vue.nextTick()
+    await nextTick()
 
     const addOwnerSection = wrapper.findComponent(HomeOwnersTable).findComponent(AddEditHomeOwner)
 
@@ -197,7 +197,7 @@ describe('Home Owners', () => {
 
     expect(wrapper.findComponent(AddEditHomeOwner).exists()).toBeFalsy()
 
-    ownersTable = wrapper.findComponent(HomeOwners).findComponent(HomeOwnersTable)
+    ownersTable = wrapper.findComponent(HomeOwnersTable)
 
     // check for new values
     expect(ownersTable.exists()).toBeTruthy()
@@ -212,31 +212,34 @@ describe('Home Owners', () => {
       { groupId: 2, owners: [mockedOrganization] }
     ] as MhrRegistrationHomeOwnerGroupIF[]
 
-    await store.dispatch('setMhrRegistrationHomeOwnerGroups', homeOwnerGroups)
+    await store.setMhrRegistrationHomeOwnerGroups(homeOwnerGroups)
 
     // need to open Edit Owner section to set the showGroups flag
     await wrapper
       .findComponent(HomeOwnersTable)
       .find(getTestId('table-edit-btn'))
       .trigger('click')
+    await nextTick()
 
-    wrapper.findComponent(AddEditHomeOwner).vm.$data.showGroups = true
+    const AddEditHomeOwnerComp: Wrapper<any> = wrapper.findComponent(AddEditHomeOwner)
+    expect(AddEditHomeOwnerComp.exists()).toBeTruthy()
+    AddEditHomeOwnerComp.vm.setShowGroups(true)
+    await nextTick()
 
-    await wrapper
-      .findComponent(AddEditHomeOwner)
+    await AddEditHomeOwnerComp
       .find(getTestId('cancel-btn'))
       .trigger('click')
 
-    expect(wrapper.findComponent(AddEditHomeOwner).exists()).toBeFalsy()
+    expect(AddEditHomeOwnerComp.exists()).toBeFalsy()
 
-    const ownersTable = wrapper.findComponent(HomeOwners).findComponent(HomeOwnersTable)
+    const ownersTable = wrapper.findComponent(HomeOwnersTable)
     expect(ownersTable.findAllComponents(TableGroupHeader).length).toBe(2)
     expect(ownersTable.text()).toContain('Group 1')
     expect(ownersTable.text()).toContain('Group 2')
 
     // delete first group (person)
-    const homeOwnersTableData = wrapper.findComponent(HomeOwnersTable).vm.$data
-    await homeOwnersTableData.deleteGroup(1)
+    const homeOwnersTableData: Wrapper<any> = wrapper.findComponent(HomeOwnersTable)
+    await homeOwnersTableData.vm.deleteGroup(1)
 
     // second group should become first
     expect(wrapper.findComponent(HomeOwnersTable).text()).toContain(mockedOrganization.organizationName)
@@ -256,10 +259,9 @@ describe('Home Owners', () => {
     ] as MhrRegistrationHomeOwnerGroupIF[]
 
     // add a person
-    await store.dispatch('setMhrRegistrationHomeOwnerGroups', homeOwnerGroup)
+    await store.setMhrRegistrationHomeOwnerGroups(homeOwnerGroup)
 
     await wrapper
-      .findComponent(HomeOwners)
       .findComponent(HomeOwnersTable)
       .find(getTestId('table-edit-btn'))
       .trigger('click')
@@ -276,16 +278,15 @@ describe('Home Owners', () => {
   })
 
   it('should correctly display At Least One Owner check mark', async () => {
-    await store.dispatch('setMhrRegistrationHomeOwnerGroups', [{ groupId: 1, owners: [mockedPerson] }])
+    await store.setMhrRegistrationHomeOwnerGroups([{ groupId: 1, owners: [mockedPerson] }])
 
-    const registeredOwnerCheck = wrapper.findComponent(HomeOwners).find(getTestId('reg-owner-checkmark'))
+    const registeredOwnerCheck = wrapper.find(getTestId('reg-owner-checkmark'))
     expect(registeredOwnerCheck.exists()).toBeTruthy()
     expect(registeredOwnerCheck.isVisible()).toBeTruthy()
 
-    await store.dispatch('setMhrRegistrationHomeOwnerGroups', [])
+    await store.setMhrRegistrationHomeOwnerGroups([])
     expect(
       wrapper
-        .findComponent(HomeOwners)
         .find(getTestId('reg-owner-checkmark'))
         .exists()
     ).toBeFalsy()
@@ -313,25 +314,24 @@ describe('Home Owners', () => {
       }
     ] as MhrRegistrationHomeOwnerGroupIF[]
 
-    await store.dispatch('setMhrRegistrationHomeOwnerGroups', homeOwnerGroup)
+    await store.setMhrRegistrationHomeOwnerGroups(homeOwnerGroup)
 
-    const homeOwnersData = wrapper.findComponent(HomeOwners).vm.$data
+    const homeOwnersData = wrapper.vm
     expect(homeOwnersData.getHomeOwners.length).toBe(1)
     expect(homeOwnersData.isGlobalEditingMode).toBe(false)
 
     await wrapper
-      .findComponent(HomeOwners)
       .findComponent(HomeOwnersTable)
       .find(getTestId('table-edit-btn'))
       .trigger('click')
 
-    const addOwnerSection = wrapper.findComponent(HomeOwners).findComponent(AddEditHomeOwner)
+    const addOwnerSection = wrapper.findComponent(AddEditHomeOwner)
     expect(addOwnerSection.exists()).toBeTruthy()
 
     const clearGroupButton = addOwnerSection
       .findComponent(HomeOwnerGroups)
       .find('.owner-groups-select')
-      .find('.v-icon.mdi-close')
+      .find('.v-icon')
 
     expect(clearGroupButton.exists()).toBeTruthy()
     await clearGroupButton.trigger('click')
@@ -339,7 +339,7 @@ describe('Home Owners', () => {
     expect(addOwnerSection.findComponent(FractionalOwnership).exists()).toBeFalsy()
     await clickDoneAddOwner()
 
-    const ownersTable = wrapper.findComponent(HomeOwners).findComponent(HomeOwnersTable)
+    const ownersTable = wrapper.findComponent(HomeOwnersTable)
     expect(ownersTable.text()).toContain('Group 1')
     expect(ownersTable.text()).toContain('N/A')
     expect(ownersTable.text()).toContain(mockedOrganization.organizationName)
@@ -358,34 +358,35 @@ describe('Home Owners', () => {
       }
     ] as MhrRegistrationHomeOwnerGroupIF[]
 
-    await store.dispatch('setMhrRegistrationHomeOwnerGroups', homeOwnerGroup)
+    await store.setMhrRegistrationHomeOwnerGroups(homeOwnerGroup)
 
-    const homeOwnersData = wrapper.findComponent(HomeOwners).vm.$data
+    const homeOwnersData = wrapper.vm
     expect(homeOwnersData.getHomeOwners.length).toBe(1)
     expect(homeOwnersData.isGlobalEditingMode).toBe(false)
 
     await wrapper
-      .findComponent(HomeOwners)
       .findComponent(HomeOwnersTable)
       .find(getTestId('table-edit-btn'))
       .trigger('click')
 
-    const addOwnerSection = wrapper.findComponent(HomeOwners).findComponent(AddEditHomeOwner)
+    const addOwnerSection = wrapper.findComponent(AddEditHomeOwner)
 
     const clearGroupButton = addOwnerSection
       .findComponent(HomeOwnerGroups)
       .find('.owner-groups-select')
-      .find('.v-icon.mdi-close')
+      .find('.v-icon')
 
     await clearGroupButton.trigger('click')
     await clickCancelAddOwner()
 
-    const ownersTable = wrapper.findComponent(HomeOwners).findComponent(HomeOwnersTable)
+    const ownersTable = wrapper.findComponent(HomeOwnersTable)
     expect(ownersTable.text()).toContain('Group 1')
     expect(ownersTable.text()).toContain(mockedPerson.individualName.first)
     expect(ownersTable.text()).toContain(mockedPerson.individualName.last)
     expect(ownersTable.text()).toContain(mockedPerson.phoneNumber)
-    ownersTable.findComponent(TableGroupHeader).vm.$data.cancelOrProceed(true, '1')
+
+    const groupHeader: Wrapper<any> = ownersTable.findComponent(TableGroupHeader)
+    groupHeader.vm.cancelOrProceed(true, '1')
   })
 
   it('should show correct error messages when deleting Owners from the Home Owners table', async () => {
@@ -403,42 +404,42 @@ describe('Home Owners', () => {
       }
     ] as MhrRegistrationHomeOwnerGroupIF[]
 
-    await store.dispatch('setMhrRegistrationHomeOwnerGroups', homeOwnerGroup)
-    wrapper.findComponent(HomeOwners).vm.$data.setShowGroups(true)
-    await Vue.nextTick()
+    await store.setMhrRegistrationHomeOwnerGroups(homeOwnerGroup)
+    wrapper.vm.setShowGroups(true)
+    await nextTick()
 
-    const ownersTable = wrapper.findComponent(HomeOwners).findComponent(HomeOwnersTable)
+    const ownersTable: Wrapper<any> = wrapper.findComponent(HomeOwnersTable)
     expect(ownersTable.text()).toContain('Group ' + GROUP_ID)
     expect(ownersTable.findAllComponents(TableGroupHeader).length).toBe(1) // only one Group exists
-    expect(wrapper.findComponent(HomeOwners).vm.$data.getHomeOwners.length).toBe(1) // only one Owner exists
+    expect(wrapper.vm.getHomeOwners.length).toBe(1) // only one Owner exists
 
     // Delete Owner and check for correct error message
-    wrapper.findComponent(HomeOwnersTable).vm.$data.remove({ ...mockedPerson, groupId: GROUP_ID })
-    await Vue.nextTick()
+    ownersTable.vm.remove({ ...mockedPerson, groupId: GROUP_ID })
+    await nextTick()
     expect(ownersTable.text()).toContain('Group ' + GROUP_ID)
     expect(ownersTable.text()).toContain('10/20')
     expect(ownersTable.find(getTestId('no-owners-msg-group-0'))).toBeTruthy()
     expect(ownersTable.findAllComponents(TableGroupHeader).length).toBe(1) // only one Group exists
 
     // Delete Owners Group and check for correct error message
-    ownersTable.findComponent(TableGroupHeader).vm.$data.cancelOrProceed(true, GROUP_ID)
-    await Vue.nextTick()
+    const groupHeader: Wrapper<any> = ownersTable.findComponent(TableGroupHeader)
+    groupHeader.vm.cancelOrProceed(true, GROUP_ID)
+    await nextTick()
     expect(ownersTable.text()).not.toContain('Group ' + GROUP_ID)
     expect(ownersTable.find(getTestId('no-data-msg'))).toBeTruthy()
     expect(ownersTable.findAllComponents(TableGroupHeader).length).toBe(0) // no Groups exists
-    expect(wrapper.findComponent(HomeOwners).vm.$data.getHomeOwners.length).toBe(0) // no Owners exists
+    expect(wrapper.vm.getHomeOwners.length).toBe(0) // no Owners exists
   })
 
   it('should show correct Home Tenancy Type for MHR Registration', async () => {
     const homeOwnerGroup = [{ groupId: '1', owners: [mockedPerson] }]
 
-    await store.dispatch('setMhrRegistrationHomeOwnerGroups', homeOwnerGroup)
-    await Vue.nextTick()
+    await store.setMhrRegistrationHomeOwnerGroups(homeOwnerGroup)
+    await nextTick()
 
-    expect(wrapper.findComponent(HomeOwners).vm.$data.getMhrRegistrationHomeOwners.length).toBe(1)
+    expect(wrapper.vm.getMhrRegistrationHomeOwners.length).toBe(1)
     expect(
       wrapper
-        .findComponent(HomeOwners)
         .find(getTestId('home-owner-tenancy-type'))
         .text()
     ).toBe(HomeTenancyTypes.SOLE)
@@ -446,24 +447,22 @@ describe('Home Owners', () => {
     // Add a second Owner to the Group
     homeOwnerGroup.push({ groupId: '1', owners: [mockedOrganization] })
 
-    await store.dispatch('setMhrRegistrationHomeOwnerGroups', homeOwnerGroup)
-    await Vue.nextTick()
+    await store.setMhrRegistrationHomeOwnerGroups(homeOwnerGroup)
+    await nextTick()
 
-    expect(wrapper.findComponent(HomeOwners).vm.$data.getMhrRegistrationHomeOwners.length).toBe(2)
+    expect(wrapper.vm.getMhrRegistrationHomeOwners.length).toBe(2)
     expect(
       wrapper
-        .findComponent(HomeOwners)
         .find(getTestId('home-owner-tenancy-type'))
         .text()
     ).toBe(HomeTenancyTypes.JOINT)
 
     // Enable Groups
-    wrapper.findComponent(HomeOwners).vm.$data.setShowGroups(true)
-    await Vue.nextTick()
+    wrapper.vm.setShowGroups(true)
+    await nextTick()
 
     expect(
       wrapper
-        .findComponent(HomeOwners)
         .find(getTestId('home-owner-tenancy-type'))
         .text()
     ).toBe(HomeTenancyTypes.COMMON)
@@ -477,10 +476,10 @@ describe('Home Owners', () => {
         type: ''
       }
     ]
-    await store.dispatch('setMhrRegistrationHomeOwnerGroups', homeOwnerGroups)
-    await Vue.nextTick()
+    await store.setMhrRegistrationHomeOwnerGroups(homeOwnerGroups)
+    await nextTick()
 
-    const homeOwners = wrapper.findComponent(HomeOwners)
+    const homeOwners = wrapper
     const MixedRolesError = homeOwners.find(getTestId('invalid-group-mixed-owners'))
     expect(MixedRolesError.exists()).toBeTruthy()
     expect(MixedRolesError.text()).toContain(MixedRolesErrors.hasMixedOwnerTypes)
@@ -492,8 +491,8 @@ describe('Home Owners', () => {
       type: ''
     } as MhrRegistrationHomeOwnerGroupIF)
 
-    await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerGroups)
-    await Vue.nextTick()
+    await store.setMhrTransferHomeOwnerGroups(homeOwnerGroups)
+    await nextTick()
 
     expect(MixedRolesError.text()).toContain(MixedRolesErrors.hasMixedOwnerTypesInGroup)
 
@@ -510,17 +509,17 @@ describe('Home Owners', () => {
         type: ''
       }
     ]
-    await store.dispatch('setMhrRegistrationHomeOwnerGroups', homeOwnerGroups)
-    await Vue.nextTick()
+    await store.setMhrRegistrationHomeOwnerGroups(homeOwnerGroups)
+    await nextTick()
 
-    const homeOwners = wrapper.findComponent(HomeOwners)
+    const homeOwners = wrapper
     const MixedRolesError = homeOwners.find(getTestId('invalid-group-mixed-owners'))
     expect(MixedRolesError.exists()).toBeTruthy()
 
     // remove the executor from the group
     homeOwnerGroups[0].owners = [mockedOwner]
-    await store.dispatch('setMhrRegistrationHomeOwnerGroups', homeOwnerGroups)
-    await Vue.nextTick()
+    await store.setMhrRegistrationHomeOwnerGroups(homeOwnerGroups)
+    await nextTick()
 
     expect(MixedRolesError.exists()).toBeFalsy()
   })

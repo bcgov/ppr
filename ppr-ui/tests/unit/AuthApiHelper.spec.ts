@@ -16,7 +16,6 @@ describe('Auth API Helper Tests', () => {
 
   it('Get registering party from auth', async () => {
     const registeringParty:PartyIF = await getRegisteringPartyFromAuth()
-    console.log(JSON.stringify(registeringParty))
     expect(registeringParty.businessName).toBeDefined()
     expect(registeringParty.address).toBeDefined()
     expect(registeringParty.address.street).toBeDefined()

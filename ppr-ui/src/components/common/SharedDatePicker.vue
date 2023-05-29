@@ -49,14 +49,15 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onBeforeMount, reactive, ref, toRefs, watch } from '@vue/composition-api'
+import { computed, defineComponent, onBeforeMount, reactive, ref, toRefs, watch } from 'vue-demi'
+import { useRoute } from 'vue2-helpers/vue-router'
 import { yyyyMmDdToPacificDate } from '@/utils'
 // eslint-disable-next-line no-unused-vars
 import { FormIF } from '@/interfaces'
 
 export default defineComponent({
   name: 'SharedDatePicker',
-  emits: ['emitDate', 'emitCancel', 'emitClear'],
+  emits: ['emitDate', 'emitCancel', 'emitClear', 'emitDateSync'],
   props: {
     attach: { type: String, default: null },
     title: { type: String, default: '' },
@@ -75,6 +76,7 @@ export default defineComponent({
     clearable: { type: Boolean, default: false }
   },
   setup (props, context) {
+    const route = useRoute()
     const localState = reactive({
       dateText: null,
       displayPicker: false,
@@ -98,15 +100,14 @@ export default defineComponent({
     }
 
     /** Triggers the form validation. */
-    const validateForm = (): boolean => {
-      // @ts-ignore - function exists
-      return context.refs.form.validate()
+    const validate = (): boolean => {
+      return form.value.validate()
     }
 
     /** Returns whether date validation passes. */
     const isDateValid = (): boolean => {
       // @ts-ignore - function exists
-      return context.refs?.dateTextField?.valid
+      return dateTextField.value?.valid
     }
 
     /** Called before component is mounted. */
@@ -136,7 +137,7 @@ export default defineComponent({
       context.emit('emitDateSync', dateText)
     })
 
-    watch(() => context.root.$route, (): void => {
+    watch(() => route, (): void => {
       localState.displayPicker = false
     })
 
@@ -146,7 +147,7 @@ export default defineComponent({
       emitDate,
       emitCancel,
       emitClear,
-      validateForm,
+      validate,
       isDateValid,
       ...toRefs(localState)
     }

@@ -301,7 +301,7 @@ export async function submitMhrRegistration (payloadData, staffPayment) {
       throw new Error('Invalid API response')
     }
     return result.data
-  } catch (error) {
+  } catch (error: any) {
     return {
       error: {
         category: ErrorCategories.REGISTRATION_CREATE,
@@ -333,7 +333,7 @@ export async function mhrRegistrationHistory (withCollapse: boolean = false, sor
     }
 
     return result.data
-  } catch (error) {
+  } catch (error: any) {
     return {
       error: {
         category: ErrorCategories.REGISTRATION_CREATE,
@@ -398,7 +398,7 @@ export async function validateDocumentID (documentId: string) {
     }
 
     return result.data
-  } catch (error) {
+  } catch (error: any) {
     return {
       error: {
         category: ErrorCategories.DOCUMENT_ID,
@@ -417,7 +417,7 @@ export async function submitMhrTransfer (payloadData, mhrNumber, staffPayment) {
       throw new Error('Invalid API response')
     }
     return result.data
-  } catch (error) {
+  } catch (error: any) {
     return {
       error: {
         category: ErrorCategories.REGISTRATION_TRANSFER,

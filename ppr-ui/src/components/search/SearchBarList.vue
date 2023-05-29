@@ -54,12 +54,13 @@
   </v-select>
 </template>
 <script lang="ts">
-import { computed, defineComponent, reactive, ref, toRefs } from '@vue/composition-api'
-import { useGetters } from 'vuex-composition-helpers'
+import { computed, defineComponent, reactive, ref, toRefs } from 'vue-demi'
+import { useStore } from '@/store/store'
 import { MHRSearchTypes, SearchTypes } from '@/resources'
 import { APISearchTypes, UISearchTypes } from '@/enums'
 import { SearchTypeIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { getFeatureFlag } from '@/utils'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'SearchBarList',
@@ -79,13 +80,7 @@ export default defineComponent({
       isRoleStaff,
       hasPprEnabled,
       hasMhrEnabled
-    } = useGetters<any>([
-      'isRoleStaffReg',
-      'isRoleStaff',
-      'hasPprEnabled',
-      'hasMhrEnabled',
-      'getUserProductSubscriptionsCodes'
-    ])
+    } = storeToRefs(useStore())
     const searchSelect = ref(null)
     const localState = reactive({
       searchTypes: UISearchTypes,

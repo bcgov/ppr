@@ -48,12 +48,12 @@
 
 <script lang="ts">
 /* eslint-disable no-unused-vars */
-import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
-import { useActions, useGetters } from 'vuex-composition-helpers'
+import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
+import { useStore } from '@/store/store'
+import { storeToRefs } from 'pinia'
 import { HomeSectionIF } from '@/interfaces'
 import AddEditHomeSections from '@/components/mhrRegistration/YourHome/AddEditHomeSections.vue'
 import HomeSectionsTable from '@/components/tables/mhr/HomeSectionsTable.vue'
-import { setMhrHomeDescription } from '@/store/actions'
 import { useMhrValidations } from '@/composables'
 /* eslint-enable no-unused-vars */
 
@@ -75,18 +75,14 @@ export default defineComponent({
   },
   setup () {
     const {
+      // Actions
       setMhrHomeDescription
-    } = useActions<any>([
-      'setMhrHomeDescription'
-    ])
-
+    } = useStore()
     const {
+      // Getters
       getMhrHomeSections,
       getMhrRegistrationValidationModel
-    } = useGetters<any>([
-      'getMhrHomeSections',
-      'getMhrRegistrationValidationModel'
-    ])
+    } = storeToRefs(useStore())
 
     const {
       MhrCompVal,

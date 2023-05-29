@@ -70,8 +70,8 @@ import {
   reactive,
   toRefs,
   watch
-} from '@vue/composition-api'
-import { useActions } from 'vuex-composition-helpers'
+} from 'vue-demi'
+import { useStore } from '@/store/store'
 
 // local
 import { DebtorNameIF, DialogOptionsIF } from '@/interfaces' // eslint-disable-line
@@ -88,9 +88,7 @@ export default defineComponent({
   },
   emits: ['proceed'],
   setup (props, context) {
-    const { setRegistrationConfirmDebtorName } = useActions<any>([
-      'setRegistrationConfirmDebtorName'
-    ])
+    const { setRegistrationConfirmDebtorName } = useStore()
     const localState = reactive({
       validationErrors: '',
       userInput: { value: 0, text: '' },

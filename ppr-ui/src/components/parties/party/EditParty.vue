@@ -248,7 +248,6 @@
 </template>
 
 <script lang="ts">
-// external libraries
 import {
   defineComponent,
   onMounted,
@@ -256,13 +255,11 @@ import {
   toRefs,
   computed,
   watch
-} from '@vue/composition-api'
-// local components
+} from 'vue-demi'
 import { SecuredPartyDialog } from '@/components/dialogs'
 import { BusinessSearchAutocomplete } from '@/components/search'
 import { BaseAddress } from '@/composables/address'
 import { SecuredPartyTypes } from '@/enums'
-// local helpers / types / etc.
 import { useSecuredParty } from '@/components/parties/composables/useSecuredParty'
 import { useSecuredPartyValidation } from '@/components/parties/composables/useSecuredPartyValidation'
 import { formatAddress } from '@/composables/address/factories'

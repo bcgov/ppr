@@ -62,10 +62,11 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs } from '@vue/composition-api'
+import { computed, defineComponent, reactive, toRefs } from 'vue-demi'
 import { transfersErrors, MixedRolesErrors } from '@/resources'
-import { useGetters } from 'vuex-composition-helpers'
+import { useStore } from '@/store/store'
 import { useTransferOwners } from '@/composables/mhrInformation'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'HomeOwnersGroupError',
@@ -86,12 +87,7 @@ export default defineComponent({
       isTransferToAdminNoWill,
       getMhrTransferType
     } = useTransferOwners()
-
-    const {
-      getMhrTransferHomeOwnerGroups
-    } = useGetters<any>([
-      'getMhrTransferHomeOwnerGroups'
-    ])
+    const { getMhrTransferHomeOwnerGroups } = storeToRefs(useStore())
 
     const localState = reactive({
       hasOneHomeOwnerGroup: computed(() => getMhrTransferHomeOwnerGroups.value.length === 1)

@@ -91,8 +91,8 @@ import {
   toRefs,
   onMounted,
   computed
-} from '@vue/composition-api'
-import { useGetters, useActions } from 'vuex-composition-helpers'
+} from 'vue-demi'
+import { useStore } from '@/store/store'
 // import the component and the necessary extensions
 import {
   TiptapVuetify,
@@ -114,7 +114,8 @@ import {
   TableRow
 } from 'tiptap-vuetify'
 // local
-import { GeneralCollateralIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { GeneralCollateralIF } from '@/interfaces'
+import { storeToRefs } from 'pinia' // eslint-disable-line no-unused-vars
 
 export default defineComponent({
   props: {
@@ -131,10 +132,8 @@ export default defineComponent({
     TiptapVuetify
   },
   setup (props, { emit }) {
-    const { getGeneralCollateral } = useGetters<any>([
-      'getGeneralCollateral'
-    ])
-    const { setGeneralCollateral } = useActions<any>(['setGeneralCollateral'])
+    const { setGeneralCollateral } = useStore()
+    const { getGeneralCollateral } = storeToRefs(useStore())
     const extensions = [
       History,
       Blockquote,

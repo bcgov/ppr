@@ -104,15 +104,16 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs } from '@vue/composition-api'
+import { computed, defineComponent, reactive, toRefs } from 'vue-demi'
 import { RouteNames } from '@/enums'
-import { useGetters } from 'vuex-composition-helpers'
+import { useStore } from '@/store/store'
 import { BaseAddress } from '@/composables/address'
 import { PartyAddressSchema } from '@/schemas'
 import { toDisplayPhone } from '@/utils'
 import { useMhrValidations } from '@/composables'
 import { AttnRefConfigIF } from '@/interfaces'
 import { clientConfig, staffConfig } from '@/resources/attnRefConfigs'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'SubmittingPartyReview',
@@ -127,13 +128,7 @@ export default defineComponent({
       getMhrRegistrationDocumentId,
       getMhrAttentionReferenceNum,
       getMhrRegistrationValidationModel
-    } = useGetters<any>([
-      'isRoleStaffReg',
-      'getMhrRegistrationSubmittingParty',
-      'getMhrRegistrationDocumentId',
-      'getMhrAttentionReferenceNum',
-      'getMhrRegistrationValidationModel'
-    ])
+    } = storeToRefs(useStore())
 
     const {
       MhrSectVal,

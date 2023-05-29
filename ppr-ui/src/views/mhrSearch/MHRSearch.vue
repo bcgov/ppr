@@ -34,12 +34,14 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onBeforeMount, reactive, toRefs, watch } from '@vue/composition-api'
-import { useGetters } from 'vuex-composition-helpers'
+import { computed, defineComponent, onBeforeMount, reactive, toRefs, watch } from 'vue-demi'
+import { useRouter } from 'vue2-helpers/vue-router'
+import { useStore } from '@/store/store'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { SearchedResultMhr } from '@/components/tables'
 import { RouteNames } from '@/enums'
 import { getFeatureFlag, navigate } from '@/utils'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'MHRSearch',
@@ -66,11 +68,10 @@ export default defineComponent({
     }
   },
   setup (props, context) {
+    const router = useRouter()
     const {
       getManufacturedHomeSearchResults
-    } = useGetters<any>([
-      'getManufacturedHomeSearchResults'
-    ])
+    } = storeToRefs(useStore())
 
     const localState = reactive({
       loading: false,
@@ -90,7 +91,7 @@ export default defineComponent({
       window.onbeforeunload = (event) => {
         // unsaved selections if app is ready, search results exist, and on the search page
         const isSearchReportUnsaved = (
-          context.root.$router.currentRoute.name === RouteNames.MHRSEARCH &&
+          router.currentRoute.name === RouteNames.MHRSEARCH &&
            props.appReady &&
            !!getManufacturedHomeSearchResults.value
         )
@@ -127,8 +128,8 @@ export default defineComponent({
       }
 
       // if navigated here without search results redirect to the dashboard
-      if (!getManufacturedHomeSearchResults.value) {
-        context.root.$router.push({
+      if (!getManufacturedHomeSearchResults) {
+        router.push({
           name: RouteNames.DASHBOARD
         })
         emitHaveData(false)

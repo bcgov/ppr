@@ -1,7 +1,8 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { getVuexStore } from '@/store'
+import { useStore } from '@/store/store'
+import { createPinia, setActivePinia } from 'pinia'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 
 // Components
@@ -13,9 +14,10 @@ import { DefaultSchema } from '@/composables/address/resources'
 import { getLastEvent } from './utils'
 
 Vue.use(Vuetify)
-
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+
+setActivePinia(createPinia())
+const store = useStore()
 
 // Events
 const valid: string = 'valid'
@@ -49,7 +51,7 @@ function createComponent (value: AddressIF, schema: SchemaIF, editing: boolean, 
   const localVue = createLocalVue()
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
-  return mount(BaseAddress, {
+  return mount((BaseAddress as any), {
     localVue,
     propsData: { value, editing, schema, triggerErrors },
     store,

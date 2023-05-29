@@ -1,9 +1,9 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { getVuexStore } from '@/store'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
 import VueRouter from 'vue-router'
-import CompositionApi from '@vue/composition-api'
 import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
 
 // local components
@@ -23,7 +23,8 @@ import { RouteNames } from '@/enums'
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 /**
  * Creates and mounts a component, so that it can be tested.
@@ -32,7 +33,6 @@ const store = getVuexStore()
  */
 function createComponent (): Wrapper<any> {
   const localVue = createLocalVue()
-  localVue.use(CompositionApi)
   localVue.use(Vuetify)
   localVue.use(VueRouter)
   const router = mockRouter.mock()
@@ -58,7 +58,7 @@ describe('Your Home', () => {
   beforeEach(async () => {
     // Staff with MHR enabled
     defaultFlagSet['mhr-registration-enabled'] = true
-    await store.dispatch('setRegistrationType', MhrRegistrationType)
+    await store.setRegistrationType(MhrRegistrationType)
 
     wrapper = createComponent()
   })

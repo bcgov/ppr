@@ -132,7 +132,6 @@
 </template>
 
 <script lang="ts">
-// external
 import {
   computed,
   defineComponent,
@@ -140,14 +139,13 @@ import {
   toRefs,
   watch,
   onMounted
-} from '@vue/composition-api'
-import { useGetters, useActions } from 'vuex-composition-helpers'
-// bcregistry
+} from 'vue-demi'
+import { useStore } from '@/store/store'
 import SharedDatePicker from '@/components/common/SharedDatePicker.vue'
-// local
 import { LengthTrustIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { convertDate, formatExpiryDate, localTodayDate } from '@/utils'
 import { APIRegistrationTypes } from '@/enums'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   components: {
@@ -159,12 +157,14 @@ export default defineComponent({
       default: false
     }
   },
-  setup (props, context) {
-    const { setLengthTrust } = useActions<any>(['setLengthTrust'])
-    const { getLengthTrust } = useGetters<any>(['getLengthTrust'])
-    const { getRegistrationType, getRegistrationExpiryDate, getRegistrationSurrenderDate } = useGetters<any>([
-      'getRegistrationType', 'getRegistrationExpiryDate', 'getRegistrationSurrenderDate'
-    ])
+  setup (props) {
+    const { setLengthTrust } = useStore()
+    const {
+      getLengthTrust,
+      getRegistrationType,
+      getRegistrationExpiryDate,
+      getRegistrationSurrenderDate
+    } = storeToRefs(useStore())
     const registrationType = getRegistrationType.value?.registrationTypeAPI
     const modal = false
 

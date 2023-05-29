@@ -80,6 +80,8 @@ OWNER_DESCRIPTION_REQUIRED = 'Owner description is required for the owner party 
 TRANSFER_PARTY_TYPE_INVALID = 'Owner party type of administrator, executor, trustee not allowed for this registration. '
 TENANCY_PARTY_TYPE_INVALID = 'Owner group tenancy type must be NA for executors, trustees, or administrators. '
 TENANCY_TYPE_NA_INVALID = 'Tenancy type NA is not allowed when there is 1 active owner group with 1 owner. '
+TENANCY_TYPE_NA_INVALID2 = 'Tenancy type NA is only allowed when all owners are ADMINISTRATOR, EXECUTOR, ' \
+    'or TRUSTEE party types. '
 REG_STAFF_ONLY = 'Only BC Registries Staff are allowed to submit this registration. '
 TRAN_DEATH_GROUP_COUNT = 'Only one owner group can be modified in a transfer due to death registration. '
 TRAN_DEATH_JOINT_TYPE = 'The existing tenancy type must be joint for this transfer registration. '
@@ -535,6 +537,14 @@ def validate_owner_group(group, int_required: bool = False):
         if not group.get('interestDenominator') or group.get('interestDenominator', 0) < 1:
             error_msg += GROUP_DENOMINATOR_MISSING
 
+    if orig_type == MhrTenancyTypes.NA and group.get('owners') and len(group.get('owners')) > 1:
+        owner_count: int = 0
+        for owner in group.get('owners'):
+            if not owner.get('partyType') or \
+                    owner.get('partyType') in (MhrPartyTypes.OWNER_BUS, MhrPartyTypes.OWNER_IND):
+                owner_count += 1
+        if owner_count != 0:
+            error_msg += TENANCY_TYPE_NA_INVALID2
     if tenancy_type == Db2Owngroup.TenancyTypes.JOINT and (not group.get('owners') or len(group.get('owners')) < 2):
         error_msg += OWNERS_JOINT_INVALID
     elif orig_type != 'NA' and tenancy_type == Db2Owngroup.TenancyTypes.COMMON and \

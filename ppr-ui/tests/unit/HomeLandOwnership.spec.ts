@@ -1,20 +1,20 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { getVuexStore } from '@/store'
-import CompositionApi, { nextTick } from '@vue/composition-api'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 
 // Components
 import { HomeLandOwnership } from '@/components/mhrRegistration'
 import flushPromises from 'flush-promises'
 import { getTestId } from './utils'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
 
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
-
+setActivePinia(createPinia())
+const store = useStore()
 /**
  * Creates and mounts a component, so that it can be tested.
  *
@@ -22,10 +22,10 @@ const store = getVuexStore()
  */
 function createComponent (): Wrapper<any> {
   const localVue = createLocalVue()
-  localVue.use(CompositionApi)
   localVue.use(Vuetify)
+
   document.body.setAttribute('data-app', 'true')
-  return mount(HomeLandOwnership, {
+  return mount((HomeLandOwnership as any), {
     localVue,
     propsData: {},
     store,
@@ -50,10 +50,10 @@ describe('Home Land Ownership', () => {
   })
 
   it('ownership checkbox performs as expected', async () => {
-    expect(store.getters.getMhrRegistrationOwnLand).toBe(false)
+    expect(store.getMhrRegistrationOwnLand).toBe(false)
     expect(wrapper.find(getTestId('ownership-checkbox'))).toBeTruthy()
     wrapper.find(getTestId('ownership-checkbox')).setChecked()
     await nextTick()
-    expect(store.getters.getMhrRegistrationOwnLand).toBe(true)
+    expect(store.getMhrRegistrationOwnLand).toBe(true)
   })
 })

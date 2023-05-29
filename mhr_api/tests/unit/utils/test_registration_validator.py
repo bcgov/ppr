@@ -51,6 +51,8 @@ from tests.unit.utils.test_registration_data import (
     TC_VALID_EXEC,
     TC_VALID_TRUSTEE,
     TC_VALID_ADMIN,
+    JT_GROUP_VALID,
+    JT_GROUP_MIX,
     MANUFACTURER_VALID,
     MANUFACTURER_SUB_INVALID,
     MANUFACTURER_LOCATION_INVALID,
@@ -281,7 +283,10 @@ TEST_PARTY_TYPE_DATA = [
      validator.TENANCY_PARTY_TYPE_INVALID),
     ('Invalid JT party types 1', False, JT_VALID_EXEC, None, None, 'ADMINISTRATOR', validator.GROUP_PARTY_TYPE_INVALID),
     ('Invalid JT party types 2', False, JT_VALID_TRUSTEE, None, None, 'EXECUTOR', validator.GROUP_PARTY_TYPE_INVALID),
-    ('Invalid JT party types 3', False, JT_VALID_ADMIN, None, None, 'TRUSTEE', validator.GROUP_PARTY_TYPE_INVALID)
+    ('Invalid JT party types 3', False, JT_VALID_ADMIN, None, None, 'TRUSTEE', validator.GROUP_PARTY_TYPE_INVALID),
+    ('Invalid JT type NA', False, JT_GROUP_VALID, None, 'NA', None, validator.TENANCY_TYPE_NA_INVALID2),
+    ('Invalid NA type mix', False, JT_GROUP_MIX, None, None, None, validator.TENANCY_TYPE_NA_INVALID2),
+    ('Invalid JT type mix', False, JT_GROUP_MIX, None, 'JT', None, validator.TENANCY_PARTY_TYPE_INVALID)
 ]
 
 

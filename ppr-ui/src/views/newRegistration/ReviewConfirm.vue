@@ -106,8 +106,9 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, reactive, toRefs, watch } from '@vue/composition-api'
-import { useActions, useGetters } from 'vuex-composition-helpers'
+import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue-demi'
+import { useRouter } from 'vue2-helpers/vue-router'
+import { useStore } from '@/store/store'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { APIRegistrationTypes, RegistrationFlowType, RouteNames, StatementTypes } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
@@ -119,7 +120,8 @@ import { Parties } from '@/components/parties'
 import FolioNumberSummary from '@/components/common/FolioNumberSummary.vue'
 import { getFeatureFlag } from '@/utils'
 import { ErrorIF } from '@/interfaces' // eslint-disable-line no-unused-vars
-import { RegistrationLengthI } from '@/composables/fees/interfaces' // eslint-disable-line no-unused-vars
+import { RegistrationLengthI } from '@/composables/fees/interfaces'
+import { storeToRefs } from 'pinia' // eslint-disable-line no-unused-vars
 
 export default defineComponent({
   name: 'ReviewConfirm',
@@ -149,7 +151,17 @@ export default defineComponent({
     }
   },
   setup (props, context) {
+    const router = useRouter()
     const {
+      // Actions
+      setLengthTrust,
+      setAddCollateral,
+      setShowStepErrors,
+      setUnsavedChanges,
+      setAddSecuredPartiesAndDebtors
+    } = useStore()
+    const {
+      // Getters
       getAddCollateral,
       getLengthTrust,
       hasUnsavedChanges,
@@ -157,28 +169,8 @@ export default defineComponent({
       getRegistrationType,
       getRegistrationFlowType,
       getAddSecuredPartiesAndDebtors
-    } = useGetters([
-      'getAddCollateral',
-      'getLengthTrust',
-      'hasUnsavedChanges',
-      'getRegistrationOther',
-      'getRegistrationType',
-      'getRegistrationFlowType',
-      'getAddSecuredPartiesAndDebtors'
-    ])
-    const {
-      setLengthTrust,
-      setAddCollateral,
-      setShowStepErrors,
-      setUnsavedChanges,
-      setAddSecuredPartiesAndDebtors
-    } = useActions([
-      'setLengthTrust',
-      'setAddCollateral',
-      'setShowStepErrors',
-      'setUnsavedChanges',
-      'setAddSecuredPartiesAndDebtors'
-    ])
+    } = storeToRefs(useStore())
+
     const localState = reactive({
       dataLoaded: false,
       feeType: FeeSummaryTypes.NEW,
@@ -217,14 +209,14 @@ export default defineComponent({
       if (!val) return
       // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
       if (!localState.isAuthenticated || (!props.isJestRunning && !getFeatureFlag('ppr-ui-enabled'))) {
-        context.root.$router.push({
+        router.push({
           name: RouteNames.DASHBOARD
         })
         return
       }
       // redirect if store doesn't contain all needed data (happens on page reload, etc.)
       if (!getRegistrationType.value || getRegistrationFlowType.value !== RegistrationFlowType.NEW) {
-        context.root.$router.push({
+        router.push({
           name: RouteNames.DASHBOARD
         })
         return
@@ -309,8 +301,8 @@ export default defineComponent({
   body {
     overflow: auto;
     height: auto;
-    -webkit-print-color-adjust: exact !important;   /* Chrome, Safari, Edge */
-    color-adjust: exact !important;                 /*Firefox*/
+    -webkit-print-print-color-adjust: exact !important;   /* Chrome, Safari, Edge */
+    print-color-adjust: exact !important;                 /*Firefox*/
   }
   ::v-deep .v-data-table__wrapper {
     overflow: visible;

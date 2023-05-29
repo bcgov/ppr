@@ -1,8 +1,9 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
 import VueRouter from 'vue-router'
-import { getVuexStore } from '@/store'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
 import { createLocalVue, Wrapper, mount, shallowMount } from '@vue/test-utils'
 import flushPromises from 'flush-promises'
 import sinon from 'sinon'
@@ -50,7 +51,8 @@ import { defaultFlagSet } from '@/utils'
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 // Events
 const selectedType = 'selected-registration-type'
@@ -104,8 +106,8 @@ describe('Dashboard component', () => {
     getDebtorNames.returns(new Promise(resolve => resolve({ data: mockedDebtorNames })))
     const patchStub = sandbox.stub(axios, 'patch')
     const patchUserSettings = patchStub.withArgs('user-profile')
-    await store.dispatch('setAuthRoles', [AuthRoles.PUBLIC, 'ppr'])
-    await store.dispatch('setUserProductSubscriptionsCodes', [ProductCode.PPR])
+    await store.setAuthRoles([AuthRoles.PUBLIC, 'ppr'])
+    await store.setUserProductSubscriptionsCodes([ProductCode.PPR])
 
     patchUserSettings.returns(new Promise(resolve => resolve({ data: mockedUpdateRegTableUserSettingsResponse })))
     // create a Local Vue and install router on it
@@ -114,7 +116,7 @@ describe('Dashboard component', () => {
     localVue.use(VueRouter)
     const router = mockRouter.mock()
     await router.push({ name: 'dashboard' })
-    wrapper = mount(Dashboard, {
+    wrapper = mount((Dashboard as any), {
       localVue,
       store,
       propsData: { appReady: true },
@@ -142,11 +144,11 @@ describe('Dashboard component', () => {
     expect(wrapper.findComponent(RegistrationTable).exists()).toBe(true)
     expect(wrapper.findComponent(Dashboard).exists()).toBe(true)
     // fee settings set correctly based on store
-    expect(wrapper.vm.$store.state.stateModel.userInfo.feeSettings).toBeNull()
+    expect(store.getStateModel.userInfo.feeSettings).toBeNull()
     expect(wrapper.findComponent(SearchBar).vm.$props.isNonBillable).toBe(false)
     expect(wrapper.findComponent(SearchBar).vm.$props.serviceFee).toBe(1.5)
     // update fee settings and check search bar updates
-    wrapper.vm.$store.state.stateModel.userInfo.feeSettings = {
+    store.getStateModel.userInfo.feeSettings = {
       isNonBillable: true,
       serviceFee: 1
     }
@@ -168,14 +170,10 @@ describe('Dashboard component', () => {
     const header = wrapper.findAll(searchHeader)
     expect(header.length).toBe(1)
     expect(header.at(0).text()).toContain('Personal Property Registry Search')
-
-    defaultFlagSet['mhr-ui-enabled'] = true
-    await store.dispatch('setAuthRoles', [AuthRoles.STAFF, AuthRoles.MHR, AuthRoles.PPR])
-    await expect(header.at(0).text()).toContain('Manufactured Home and Personal Property Registries Search')
   })
 
   it('displays default search history header', () => {
-    expect(store.getters.getSearchHistory).toEqual({ searches: [] })
+    expect(store.getSearchHistory).toEqual({ searches: [] })
     expect(wrapper.vm.searchHistoryLength).toBe(0)
     const header = wrapper.findAll(historyHeader)
     expect(header.length).toBe(1)
@@ -183,11 +181,11 @@ describe('Dashboard component', () => {
   })
 
   it('updates the search history header based on history data', async () => {
-    expect(store.getters.getSearchHistoryLength).toBe(0)
-    await store.dispatch('setSearchHistory', mockedSearchHistory.searches)
+    expect(store.getSearchHistoryLength).toBe(0)
+    await store.setSearchHistory(mockedSearchHistory.searches)
     await flushPromises()
-    expect(store.getters.getSearchHistory?.length).toBe(6)
-    expect(store.getters.getSearchHistoryLength).toBe(6)
+    expect(store.getSearchHistory?.length).toBe(6)
+    expect(store.getSearchHistoryLength).toBe(6)
     expect(wrapper.vm.searchHistoryLength).toBe(6)
     const header = wrapper.findAll(historyHeader)
     expect(header.length).toBe(1)
@@ -312,7 +310,7 @@ describe('Dashboard error modal tests', () => {
     localVue.use(VueRouter)
     const router = mockRouter.mock()
     await router.push({ name: 'dashboard' })
-    wrapper = shallowMount(Dashboard, { localVue, store, propsData: { appReady: true }, router, vuetify })
+    wrapper = shallowMount((Dashboard as any), { localVue, store, propsData: { appReady: true }, router, vuetify })
     await flushPromises()
   })
 

@@ -1,9 +1,10 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
 import VueRouter from 'vue-router'
-import { getVuexStore } from '@/store'
-import CompositionApi from '@vue/composition-api'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
+
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 
 // Components
@@ -19,7 +20,8 @@ import { pacificDate } from '@/utils'
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 // selectors
 const tombstoneHeader: string = '.tombstone-header'
@@ -33,14 +35,14 @@ const tombstoneInfo: string = '.tombstone-info'
  */
 function createComponent (mockRoute: string): Wrapper<any> {
   const localVue = createLocalVue()
-  localVue.use(CompositionApi)
+
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
   localVue.use(VueRouter)
   const router = mockRouter.mock()
   router.push({ name: mockRoute })
 
-  return mount(TombstoneDischarge, {
+  return mount((TombstoneDischarge as any), {
     localVue,
     propsData: {},
     store,
@@ -60,10 +62,10 @@ describe('Tombstone component', () => {
 
   beforeAll(async () => {
     // setup data
-    await store.dispatch('setRegistrationType', registrationType)
-    await store.dispatch('setRegistrationNumber', registration.baseRegistrationNumber)
-    await store.dispatch('setRegistrationCreationDate', registration.createDateTime)
-    await store.dispatch('setRegistrationExpiryDate', registration.expiryDate)
+    await store.setRegistrationType(registrationType)
+    await store.setRegistrationNumber(registration.baseRegistrationNumber)
+    await store.setRegistrationCreationDate(registration.createDateTime)
+    await store.setRegistrationExpiryDate(registration.expiryDate)
   })
 
   beforeEach(async () => {
@@ -78,13 +80,14 @@ describe('Tombstone component', () => {
   })
 
   afterAll(async () => {
-    await store.dispatch('setRegistrationType', null)
-    await store.dispatch('setRegistrationNumber', null)
-    await store.dispatch('setRegistrationCreationDate', null)
-    await store.dispatch('setRegistrationExpiryDate', null)
+    await store.setRegistrationType(null)
+    await store.setRegistrationNumber(null)
+    await store.setRegistrationCreationDate(null)
+    await store.setRegistrationExpiryDate(null)
   })
 
   it('renders Tombstone component properly for Total Discharge', async () => {
+    await store.setMhrInformation(mockedMhrInformation)
     wrapper = createComponent(RouteNames.REVIEW_DISCHARGE)
     const tombstoneDischarge = wrapper.findComponent(TombstoneDischarge)
     expect(tombstoneDischarge.exists()).toBe(true)
@@ -148,7 +151,7 @@ describe('TombstoneDischarge component - MHR', () => {
     window.location = { assign: jest.fn() } as any
 
     // setup data
-    await store.dispatch('setMhrInformation', mockedMhrInformation)
+    await store.setMhrInformation(mockedMhrInformation)
   })
 
   afterEach(() => {

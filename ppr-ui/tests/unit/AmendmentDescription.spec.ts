@@ -1,7 +1,8 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { getVuexStore } from '@/store'
+import { useStore } from '@/store/store'
+import { createPinia, setActivePinia } from 'pinia'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 
 // Components
@@ -9,9 +10,10 @@ import { AmendmentDescription } from '@/components/registration'
 import { getLastEvent } from './utils'
 
 Vue.use(Vuetify)
-
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+
+setActivePinia(createPinia())
+const store = useStore()
 
 // Input field selectors / buttons
 const amendmentDescrption = '#amendment-detail-description'
@@ -28,7 +30,7 @@ function createComponent (showInvalid: boolean, summaryView: boolean): Wrapper<a
   const localVue = createLocalVue()
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
-  return mount(AmendmentDescription, {
+  return mount((AmendmentDescription as any), {
     localVue,
     propsData: { setShowErrors: showInvalid, isSummary: summaryView },
     store,
@@ -40,7 +42,7 @@ describe('Amendment Detail Description tests', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
-    await store.dispatch('setAmendmentDescription', '')
+    await store.setAmendmentDescription('')
   })
   afterEach(() => {
     wrapper.destroy()
@@ -86,7 +88,7 @@ describe('Amendment Detail Description summary view tests', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
-    await store.dispatch('setAmendmentDescription', 'test')
+    await store.setAmendmentDescription('test')
   })
   afterEach(() => {
     wrapper.destroy()

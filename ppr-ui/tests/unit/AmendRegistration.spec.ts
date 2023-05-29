@@ -1,12 +1,13 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
 import VueRouter from 'vue-router'
-import { getVuexStore } from '@/store'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
 import { createLocalVue, shallowMount } from '@vue/test-utils'
 import sinon from 'sinon'
 // Components
-import { AmendRegistration } from '@/views'
+import AmendRegistration from '@/views/amendment/AmendRegistration.vue'
 import { Collateral } from '@/components/collateral'
 import {
   AmendmentDescription, RegistrationLengthTrustAmendment, RegistrationLengthTrustSummary
@@ -33,7 +34,8 @@ import { FeeSummaryTypes } from '@/composables/fees/enums'
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 // Prevent the warning "[Vuetify] Unable to locate target [data-app]"
 document.body.setAttribute('data-app', 'true')
@@ -48,7 +50,7 @@ describe('Amendment registration component', () => {
     delete window.location
     window.location = { assign: jest.fn() } as any
     // store setup
-    await store.dispatch('setRegistrationConfirmDebtorName', mockedDebtorNames[0])
+    await store.setRegistrationConfirmDebtorName(mockedDebtorNames[0])
     // stub api call
     sandbox = sinon.createSandbox()
     const get = sandbox.stub(axios, 'get')
@@ -69,7 +71,7 @@ describe('Amendment registration component', () => {
       name: RouteNames.AMEND_REGISTRATION,
       query: { 'reg-num': '123456B' }
     })
-    wrapper = shallowMount(AmendRegistration, { localVue, store, router, vuetify })
+    wrapper = shallowMount((AmendRegistration as any), { localVue, store, router, vuetify })
     wrapper.setProps({ appReady: true })
     await flushPromises()
   })
@@ -86,8 +88,8 @@ describe('Amendment registration component', () => {
     expect(wrapper.vm.appReady).toBe(true)
     expect(wrapper.vm.dataLoaded).toBe(true)
     // wait because store getting set still
-    await Vue.nextTick()
-    const state = wrapper.vm.$store.state.stateModel as StateModelIF
+    await nextTick()
+    const state = store.getStateModel
     // check length trust summary
     expect(state.registration.lengthTrust.lifeInfinite).toBe(mockedFinancingStatementAll.lifeInfinite)
     expect(state.registration.lengthTrust.lifeYears).toBe(5)
@@ -120,7 +122,8 @@ describe('Amendment registration component', () => {
   })
 
   it('processes cancel button action', async () => {
-    await wrapper.vm.$store.dispatch('setUnsavedChanges', false)
+    await store.setUnsavedChanges(false)
+    await nextTick()
     await wrapper.find(StickyContainer).vm.$emit('cancel', true)
     expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)
   })
@@ -134,7 +137,7 @@ describe('Amendment registration component', () => {
 
   it('goes to the confirmation page', async () => {
     wrapper.vm.courtOrderValid = true
-    await store.dispatch('setAmendmentDescription', 'test12')
+    await store.setAmendmentDescription('test12')
     wrapper.find(StickyContainer).vm.$emit('submit', true)
     await flushPromises()
     expect(wrapper.vm.$route.name).toBe(RouteNames.CONFIRM_AMENDMENT)
@@ -142,7 +145,7 @@ describe('Amendment registration component', () => {
 
   it('does not go to the confirmation page if component open', async () => {
     wrapper.vm.debtorOpen = true
-    await Vue.nextTick()
+    await nextTick()
     wrapper.find(StickyContainer).vm.$emit('submit', true)
     await flushPromises()
     expect(wrapper.vm.$route.name).toBe(RouteNames.AMEND_REGISTRATION)
@@ -150,31 +153,13 @@ describe('Amendment registration component', () => {
 
   it('saves the draft and redirects to dashboard', async () => {
     wrapper.find(StickyContainer).vm.$emit('back', true)
-    await Vue.nextTick()
+    await nextTick()
     await flushPromises()
     expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)
   })
 
-  // this test is not applicable at the moment
-  /* it('checks for length trust indenture & court order validity -if invalid', async () => {
-    await store.dispatch('setLengthTrust', {
-      valid: true,
-      trustIndenture: true,
-      lifeInfinite: false,
-      lifeYears: 5,
-      showInvalid: false,
-      surrenderDate: '',
-      lienAmount: '',
-      action: ActionTypes.EDITED
-    })
-    wrapper.find(StickyContainer).vm.$emit('submit', true)
-    await flushPromises()
-    expect(wrapper.vm.showInvalid).toBe(false)
-  })
-  */
-
   it('checks for length trust indenture & court order validity -if valid', async () => {
-    await store.dispatch('setLengthTrust', {
+    await store.setLengthTrust({
       valid: true,
       trustIndenture: true,
       lifeInfinite: false,
@@ -220,7 +205,7 @@ describe('Amendment for repairers lien component', () => {
       name: RouteNames.AMEND_REGISTRATION,
       query: { 'reg-num': '123456B' }
     })
-    wrapper = shallowMount(AmendRegistration, { localVue, store, router, vuetify })
+    wrapper = shallowMount((AmendRegistration as any), { localVue, store, router, vuetify })
     wrapper.setProps({ appReady: true })
     await flushPromises()
   })
@@ -236,7 +221,7 @@ describe('Amendment for repairers lien component', () => {
     expect(wrapper.vm.$route.name).toBe(RouteNames.AMEND_REGISTRATION)
     expect(wrapper.vm.appReady).toBe(true)
     expect(wrapper.vm.dataLoaded).toBe(true)
-    const state = wrapper.vm.$store.state.stateModel as StateModelIF
+    const state = store.getStateModel
     // check length trust summary
     expect(state.registration.lengthTrust.lifeInfinite).toBe(mockedFinancingStatementAll.lifeInfinite)
     expect(state.registration.lengthTrust.lifeYears).toBe(1)

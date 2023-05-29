@@ -25,13 +25,12 @@
         <sbc-system-banner
           v-if="bannerText != null"
           v-bind:show="bannerText != null"
-          v-bind:type="warning"
+          v-bind:type="null"
           v-bind:message="bannerText"
           icon=" "
-          align="center"
         ></sbc-system-banner>
-        <breadcrumb :setCurrentPath="currentPath" :setCurrentPathName="currentPathName" v-if="haveData" />
-        <tombstone :setCurrentPath="currentPath" v-if="haveData" />
+        <breadcrumb v-if="haveData" />
+        <tombstone v-if="haveData" />
         <v-container class="view-container pa-0 ma-0">
           <v-row no-gutters>
             <v-col cols="12">
@@ -56,9 +55,11 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onBeforeMount, reactive, toRefs, watch } from '@vue/composition-api'
-import { useActions, useGetters } from 'vuex-composition-helpers'
-import { Route } from 'vue-router' // eslint-disable-line
+import { computed, defineComponent, onBeforeMount, toRefs, reactive, watch } from 'vue-demi'
+import { useStore } from '@/store/store'
+import { useRoute, useRouter } from 'vue2-helpers/vue-router'
+import { storeToRefs } from 'pinia'
+
 import { StatusCodes } from 'http-status-codes'
 import KeycloakService from 'sbc-common-components/src/services/keycloak.services'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
@@ -95,28 +96,42 @@ import {
 } from '@/enums'
 import {
   AccountProductSubscriptionIF, DialogOptionsIF, // eslint-disable-line
-  ErrorIF, UserInfoIF, UserSettingsIF // eslint-disable-line
+  ErrorIF, RegistrationTypeIF, UserInfoIF, UserSettingsIF // eslint-disable-line
 } from '@/interfaces'
 
 export default defineComponent({
   name: 'App',
   components: {
-    Breadcrumb,
     SbcHeader,
     SbcFooter,
+    Breadcrumb,
     SbcSystemBanner,
     Tombstone,
     ...Dialogs,
     ...Views
   },
-  setup (props, context) {
+  setup () {
+    const route = useRoute()
+    const router = useRouter()
     const {
+      // Actions
+      setRoleSbc,
+      setUserInfo,
+      setAuthRoles,
+      setRegistrationNumber,
+      setAccountInformation,
+      setUserProductSubscriptions,
+      setAccountProductSubscription,
+      setUserProductSubscriptionsCodes
+    } = useStore()
+    const {
+      // Getters
       isRoleStaff,
       isRoleStaffBcol,
       isRoleStaffReg,
       hasPprEnabled,
       hasMhrEnabled,
-      getAccountModel,
+      getAccountId,
       getUserEmail,
       getUserFirstName,
       getUserLastName,
@@ -127,47 +142,9 @@ export default defineComponent({
       getRegistrationOther,
       getRegistrationFlowType,
       getUserProductSubscriptionsCodes
-    } = useGetters([
-      'isRoleStaff',
-      'isRoleStaffBcol',
-      'isRoleStaffReg',
-      'hasPprEnabled',
-      'hasMhrEnabled',
-      'getAccountModel',
-      'getUserEmail',
-      'getUserFirstName',
-      'getUserLastName',
-      'getUserRoles',
-      'getUserUsername',
-      'hasUnsavedChanges',
-      'getRegistrationType',
-      'getRegistrationOther',
-      'getRegistrationFlowType',
-      'getUserProductSubscriptionsCodes'
-    ])
+    } = storeToRefs(useStore())
 
-    const {
-      setRoleSbc,
-      setUserInfo,
-      setAuthRoles,
-      setRegistrationNumber,
-      setAccountInformation,
-      setUserProductSubscriptions,
-      setAccountProductSubscription,
-      setUserProductSubscriptionsCodes
-    } = useActions([
-      'setRoleSbc',
-      'setUserInfo',
-      'setAuthRoles',
-      'setRegistrationNumber',
-      'setAccountInformation',
-      'setUserProductSubscriptions',
-      'setAccountProductSubscription',
-      'setUserProductSubscriptionsCodes'
-    ])
     const localState = reactive({
-      currentPath: '',
-      currentPathName: null as RouteNames,
       errorDisplay: false,
       errorOptions: loginError as DialogOptionsIF,
       saveDraftExitToggle: false,
@@ -207,18 +184,20 @@ export default defineComponent({
         return Boolean(false)
       }),
       registrationTypeUI: computed((): string => {
-        if (getRegistrationType.value?.registrationTypeAPI === APIRegistrationTypes.OTHER) {
-          return getRegistrationOther.value || ''
+        const regType = getRegistrationType.value
+        const regOther = getRegistrationOther.value
+        if (regType.registrationTypeAPI === APIRegistrationTypes.OTHER) {
+          return regOther || ''
         }
-        return getRegistrationType.value?.registrationTypeUI || ''
+        return regType?.registrationTypeUI || ''
       })
     })
 
     onBeforeMount((): void => {
-      if (context.root.$route?.query?.logout) {
+      if (route?.query?.logout) {
         localState.loggedOut = true
         sessionStorage.removeItem(SessionStorageKeys.KeyCloakToken)
-        context.root.$router.push(`${window.location.origin}`)
+        router.push(`${window.location.origin}`)
       } else {
         localState.loggedOut = false
         // before unloading this page, if there are changes then prompt user
@@ -248,7 +227,7 @@ export default defineComponent({
             RouteNames.MHRSEARCH_CONFIRM
           ]
 
-          const routeName = context.root.$router.currentRoute.name as RouteNames
+          const routeName = router.currentRoute.name as RouteNames
           if (
             (changeRoutes.includes(routeName) || newAmendRoutes.includes(routeName) || mhrRoutes.includes(routeName)) &&
             hasUnsavedChanges.value) {
@@ -269,13 +248,14 @@ export default defineComponent({
     })
 
     const payErrorDialogHandler = (confirmed: boolean) => {
+      const flowType = getRegistrationFlowType.value
       localState.payErrorDisplay = false
       if (confirmed) {
-        if ([RegistrationFlowType.NEW, RegistrationFlowType.AMENDMENT].includes(getRegistrationFlowType.value)) {
+        if ([RegistrationFlowType.NEW, RegistrationFlowType.AMENDMENT].includes(flowType)) {
           localState.saveDraftExitToggle = !localState.saveDraftExitToggle
         } else {
           setRegistrationNumber(null)
-          context.root.$router.push({ name: RouteNames.DASHBOARD })
+          router.push({ name: RouteNames.DASHBOARD })
         }
       }
     }
@@ -325,7 +305,6 @@ export default defineComponent({
         }
       }
 
-      // Safety check for client account products
       if (!isRoleStaff.value && !isRoleStaffReg.value && !isRoleStaffBcol.value && !hasPprEnabled.value &&
         !hasMhrEnabled.value) {
         handleError({
@@ -435,10 +414,8 @@ export default defineComponent({
         }
         setUserInfo(userInfo)
 
-        const accountId = getAccountModel.value?.currentAccount?.id
-
-        if (accountId) {
-          const subscribedProducts = await fetchAccountProducts(accountId)
+        if (getAccountId.value) {
+          const subscribedProducts = await fetchAccountProducts((getAccountId.value))
           if (subscribedProducts) {
             setUserProductSubscriptions(subscribedProducts)
 
@@ -473,8 +450,9 @@ export default defineComponent({
 
     /** Gets user products and sets browser title accordingly. */
     const setBrowserTitle = (): void => {
-      const userProducts = getUserProductSubscriptionsCodes.value
-      if (userProducts.includes(ProductCode.PPR) && userProducts.includes(ProductCode.MHR)) {
+      const userProducts = Array.from(getUserProductSubscriptionsCodes.value) as ProductCode[]
+      if (userProducts.includes(ProductCode.PPR) &&
+        userProducts.includes(ProductCode.MHR)) {
         document.title = 'BC Asset Registries (MHR/PPR)'
       } else if (userProducts.includes(ProductCode.MHR)) {
         document.title = 'BC Manufactured Home Registry'
@@ -510,10 +488,10 @@ export default defineComponent({
     /** Updates Launch Darkly with user info. */
     const updateLaunchDarkly = async (): Promise<any> => {
       // since username is unique, use it as the user key
-      const key: string = getUserUsername.value
-      const email: string = getUserEmail.value
-      const firstName: string = getUserFirstName.value
-      const lastName: string = getUserLastName.value
+      const key: string = getUserUsername.value as string
+      const email: string = getUserEmail.value as string
+      const firstName: string = getUserFirstName.value as string
+      const lastName: string = getUserLastName.value as string
       // remove leading { and trailing } and tokenize string
       const custom: any = { roles: getUserRoles.value }
 
@@ -560,7 +538,7 @@ export default defineComponent({
         case ErrorCategories.REGISTRATION_LOAD:
           localState.errorOptions = registrationLoadError
           localState.errorDisplay = true
-          context.root.$router.push({ name: RouteNames.DASHBOARD })
+          router.push({ name: RouteNames.DASHBOARD })
           break
         case ErrorCategories.REGISTRATION_SAVE:
           localState.errorOptions = registrationSaveDraftError
@@ -587,8 +565,10 @@ export default defineComponent({
     const handleErrorRegCreate = (error: ErrorIF) => {
       // prep for registration payment issues
       let filing = localState.registrationTypeUI
-      if (getRegistrationFlowType.value !== RegistrationFlowType.NEW) {
-        filing = getRegistrationFlowType.value?.toLowerCase() || 'registration'
+      const flowType = getRegistrationFlowType.value as RegistrationFlowType
+
+      if (flowType !== RegistrationFlowType.NEW) {
+        filing = flowType?.toLowerCase() || 'registration'
       }
       localState.payErrorOptions = { ...paymentErrorReg }
       if (localState.registrationTypeUI) {
@@ -603,7 +583,7 @@ export default defineComponent({
           ErrorCodes.BCOL_UNAVAILABLE
         ):
           // bcol expected errors
-          if ([RegistrationFlowType.NEW, RegistrationFlowType.AMENDMENT].includes(getRegistrationFlowType.value)) {
+          if ([RegistrationFlowType.NEW, RegistrationFlowType.AMENDMENT].includes(flowType)) {
             localState.payErrorOptions.text += '<br/><br/>' + error.detail +
               `<br/><br/>Your ${filing} will be saved as a draft and you can retry your payment ` +
               'once the issue has been resolved.'
@@ -624,7 +604,7 @@ export default defineComponent({
         default:
           if (error.type && error.type?.includes('BCOL') && error.detail) {
             // generic catch all bcol
-            if ([RegistrationFlowType.NEW, RegistrationFlowType.AMENDMENT].includes(getRegistrationFlowType.value)) {
+            if ([RegistrationFlowType.NEW, RegistrationFlowType.AMENDMENT].includes(flowType)) {
               localState.payErrorOptions.text += '<br/><br/>' + error.detail +
                 `<br/><br/>Your ${filing} will be saved as a draft and you can retry your payment ` +
                 'once the issue has been resolved.'
@@ -715,11 +695,6 @@ export default defineComponent({
         setBrowserTitle()
       }
     }
-
-    watch(() => context.root.$route, (newVal: Route) => {
-      localState.currentPath = newVal.path
-      localState.currentPathName = newVal.name as RouteNames
-    }, { immediate: true, deep: true })
 
     /** Called when profile is ready -- we can now init app. */
     watch(() => localState.profileReady, async (val: boolean) => {

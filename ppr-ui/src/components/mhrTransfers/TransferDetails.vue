@@ -83,11 +83,12 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, ref, toRefs, watch } from '@vue/composition-api'
-import { useActions, useGetters } from 'vuex-composition-helpers'
+import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue-demi'
+import { useStore } from '@/store/store'
 import { useInputRules, useTransferOwners } from '@/composables'
 import { SharedDatePicker } from '@/components/common'
-import { FormIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { FormIF } from '@/interfaces'
+import { storeToRefs } from 'pinia' // eslint-disable-line no-unused-vars
 
 export default defineComponent({
   name: 'TransferDetails',
@@ -105,36 +106,26 @@ export default defineComponent({
   },
   setup (props, context) {
     const { customRules, required, maxLength } = useInputRules()
-
     const {
-      getMhrTransferDeclaredValue,
-      getMhrTransferConsideration,
-      getMhrTransferDate,
-      getMhrTransferOwnLand
-    } = useGetters<any>([
-      'getMhrTransferDeclaredValue',
-      'getMhrTransferConsideration',
-      'getMhrTransferDate',
-      'getMhrTransferOwnLand'
-    ])
-
-    const {
+      // Actions
       setMhrTransferConsideration,
       setMhrTransferDate,
       setMhrTransferOwnLand,
       setUnsavedChanges
-    } = useActions([
-      'setMhrTransferConsideration',
-      'setMhrTransferDate',
-      'setMhrTransferOwnLand',
-      'setUnsavedChanges'
-    ])
-
+    } = useStore()
+    const {
+      // Getters
+      getMhrTransferDeclaredValue,
+      getMhrTransferConsideration,
+      getMhrTransferDate,
+      getMhrTransferOwnLand
+    } = storeToRefs(useStore())
     const {
       isTransferDueToDeath,
       isTransferToExecutorProbateWill
     } = useTransferOwners()
 
+    const transferDetailsForm = ref(null) as FormIF
     const considerationRef = ref(null)
 
     const updateConsideration = () => {
@@ -175,7 +166,7 @@ export default defineComponent({
     }
 
     watch(() => props.validate, (val: boolean) => {
-      (context.refs.transferDetailsForm as FormIF).validate()
+      transferDetailsForm.value?.validate()
     })
 
     watch(() => localState.consideration, (val: string) => {

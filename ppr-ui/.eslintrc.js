@@ -12,6 +12,7 @@ module.exports = {
     'plugin:vuetify/recommended'
   ],
   rules: {
+    'standard/computed-property-even-spacing': 'off',
     'vue/multi-word-component-names': 'off',
     'vue/no-side-effects-in-computed-properties': 'off',
     'vue/valid-v-slot': ['error', { allowModifiers: true }],

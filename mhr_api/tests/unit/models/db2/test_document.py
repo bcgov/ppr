@@ -22,10 +22,33 @@ import pytest
 from mhr_api.models import Db2Document, utils as model_utils
 
 
+SUBMITITNG_1 =  {
+    'personName': {
+        'first': 'Michael',
+        'middle': 'James',
+        'last': 'Smith'
+    }
+}
+SUBMITITNG_2 =  {
+    'personName': {
+        'first': 'Michael',
+        'last': 'Smith'
+    }
+}
+SUBMITITNG_3 =  {
+    'businessName': 'DYE & DURHAM CORPORATION'
+}
+
 # testdata pattern is ({exists}, {id}, {mhr_num}, {doc_type}, {doc_reg_id})
 TEST_DATA = [
     (True, '10085347', '100013', 'TRAN', '00384555'),
     (False, 0, None, None, None)
+]
+# testdata pattern is (name_json, {name_db2})
+TEST_SUBMITTING_DATA = [
+    (SUBMITITNG_1, 'MICHAEL JAMES SMITH'),
+    (SUBMITITNG_2, 'MICHAEL SMITH'),
+    (SUBMITITNG_3, 'DYE & DURHAM CORPORATION'),
 ]
 
 
@@ -198,3 +221,10 @@ def test_document_json(session):
         # 'transferDate': '0001-01-01'
     }
     assert doc.json == test_json
+
+
+@pytest.mark.parametrize('name_json,name_db2', TEST_SUBMITTING_DATA)
+def test_submitting_name(session, name_json, name_db2):
+    """Assert that submitting party DB2 conversion works as expected."""
+    test_name = Db2Document.to_db2_submitting_name(name_json)
+    assert test_name == name_db2

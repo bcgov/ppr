@@ -1,13 +1,15 @@
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { getVuexStore } from '@/store'
-import CompositionApi from '@vue/composition-api'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
+
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import { getTestId } from './utils'
 import { RebuiltStatus } from '@/components/mhrRegistration'
 
 Vue.use(Vuetify)
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 /**
  * Creates and mounts a component, so that it can be tested.
@@ -16,8 +18,8 @@ const store = getVuexStore()
  */
 function createComponent (): Wrapper<any> {
   const localVue = createLocalVue()
-  localVue.use(CompositionApi)
-  return mount(RebuiltStatus, {
+
+  return mount((RebuiltStatus as any), {
     localVue,
     store
   })
@@ -40,8 +42,8 @@ describe('Rebuilt Status component', () => {
   it('show error message for text area input', async () => {
     wrapper.find('#rebuilt-status-text').exists()
     wrapper.find('#rebuilt-status-text').setValue('x'.repeat(290))
-    await Vue.nextTick()
-    await Vue.nextTick()
+    await nextTick()
+    await nextTick()
 
     const messages = wrapper.findAll('.v-messages__message')
     expect(messages.length).toBe(1)

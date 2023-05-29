@@ -1,13 +1,13 @@
 import { mount } from '@vue/test-utils'
 import { SortingIcon } from '@/components/tables/common'
-import { nextTick } from '@vue/composition-api'
+import { nextTick } from 'vue'
 import { getTestId } from './utils'
 
 describe('SortingIcon', () => {
   let wrapper
 
   beforeEach(() => {
-    wrapper = mount(SortingIcon, {
+    wrapper = mount((SortingIcon as any), {
       propsData: {
         sortAsc: false
       }

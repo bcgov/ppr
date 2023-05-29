@@ -43,8 +43,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs } from '@vue/composition-api'
-import { useGetters } from 'vuex-composition-helpers'
+import { defineComponent, reactive, toRefs } from 'vue-demi'
+import { useStore } from '@/store/store'
+import { useRoute, useRouter } from 'vue2-helpers/vue-router'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'Stepper',
@@ -55,17 +57,17 @@ export default defineComponent({
       default: false
     }
   },
-  setup (props, context) {
-    const { getSteps, showStepErrors } = useGetters<any>([
-      'getSteps', 'showStepErrors'
-    ])
+  setup (props) {
+    const route = useRoute()
+    const router = useRouter()
+    const { getSteps, showStepErrors } = storeToRefs(useStore())
 
     const goTo = (step) => {
-      context.root.$router.push(step.to).catch(error => error)
+      router.push(step.to).catch(error => error)
     }
 
     const isCurrentStep = (step): boolean => {
-      return context.root.$route.name === step.to
+      return route.name === step.to
     }
 
     const showInvalid = (step): boolean => {

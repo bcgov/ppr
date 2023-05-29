@@ -1,12 +1,13 @@
-import { reactive, toRefs, computed } from '@vue/composition-api'
+import { reactive, toRefs } from 'vue-demi'
 import { PartyIF, AddressIF } from '@/interfaces' // eslint-disable-line no-unused-vars
-import { useGetters, useActions } from 'vuex-composition-helpers'
+import { useStore } from '@/store/store'
 import { PartyAddressSchema } from '@/schemas'
-import { ActionTypes, APIRegistrationTypes, RegistrationFlowType, SecuredPartyTypes } from '@/enums'
+import { ActionTypes, RegistrationFlowType, SecuredPartyTypes } from '@/enums'
 import { checkAddress, formatAddress } from '@/composables/address/factories/address-factory'
 import { cloneDeep, isEqual } from 'lodash'
 import { useParty } from '@/composables/useParty'
 import { isObjectEqual } from '@/utils/validation-helper'
+import { storeToRefs } from 'pinia'
 const initPerson = { first: '', middle: '', last: '' }
 const initAddress = {
   street: '',
@@ -20,12 +21,14 @@ const initAddress = {
 const { isPartiesValid } = useParty()
 
 export const useSecuredParty = (props, context) => {
-  const { setAddSecuredPartiesAndDebtors } = useActions<any>([
-    'setAddSecuredPartiesAndDebtors'
-  ])
-  const { getAddSecuredPartiesAndDebtors, getRegistrationFlowType, getRegistrationType } = useGetters<any>([
-    'getAddSecuredPartiesAndDebtors', 'getRegistrationFlowType', 'getRegistrationType'
-  ])
+  const { setAddSecuredPartiesAndDebtors } = useStore()
+  const {
+    // Getters
+    getAddSecuredPartiesAndDebtors,
+    getRegistrationFlowType,
+    getRegistrationType
+  } = storeToRefs(useStore())
+
   const localState = reactive({
     currentSecuredParty: {
       businessName: '',
@@ -35,7 +38,7 @@ export const useSecuredParty = (props, context) => {
     } as PartyIF,
     currentIsBusiness: null,
     partyType: SecuredPartyTypes.NONE,
-    registrationFlowType: getRegistrationFlowType.value,
+    registrationFlowType: getRegistrationFlowType,
     originalSecuredParty: null
   })
 

@@ -83,7 +83,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, reactive, ref, toRefs, watch, nextTick } from '@vue/composition-api'
+import { defineComponent, onMounted, reactive, ref, toRefs, watch, nextTick } from 'vue-demi'
 import { StaffPaymentOptions } from '@bcrs-shared-components/enums'
 import { FolioNumberInput } from '@bcrs-shared-components/folio-number-input'
 // eslint-disable-next-line no-unused-vars
@@ -183,14 +183,10 @@ export default defineComponent({
 
     /** Emits an event indicating whether this component is valid. */
     const emitValid = (): void => {
-      console.log(localState.fasFormValid)
-      console.log(localState.bcolFormValid)
-      console.log(localState.staffPaymentData.option)
-
       context.emit(
         'valid',
         (localState.fasFormValid ||
-          (localState.bcolFormValid && (context.refs.folioNumberInputRef as FormIF).validateFolioNumber()) ||
+          (localState.bcolFormValid && (folioNumberInputRef as FormIF).validateFolioNumber()) ||
           (localState.staffPaymentData.option === StaffPaymentOptions.NO_FEE)
         )
       )
@@ -201,10 +197,10 @@ export default defineComponent({
       switch (val) {
         case StaffPaymentOptions.FAS:
           // reset other form
-          (context.refs.bcolForm as FormIF).resetValidation();
-          (context.refs.folioNumberInputRef as FormIF).resetFolioNumberValidation();
+          bcolForm.resetValidation();
+          (folioNumberInputRef as FormIF).resetFolioNumberValidation();
           // enable validation for this form
-          (context.refs.fasForm as FormIF).validate()
+          (fasForm as FormIF).validate()
           await nextTick()
           // update data
           emitStaffPaymentData({ option: StaffPaymentOptions.FAS })
@@ -212,9 +208,9 @@ export default defineComponent({
 
         case StaffPaymentOptions.BCOL:
           // reset other form
-          (context.refs.fasForm as FormIF).resetValidation();
+          fasForm.resetValidation()
           // enable validation for this form
-          (context.refs.bcolForm as FormIF).validate()
+          bcolForm.validate()
           await nextTick()
           // update data
           emitStaffPaymentData({ option: StaffPaymentOptions.BCOL })
@@ -222,9 +218,9 @@ export default defineComponent({
 
         case StaffPaymentOptions.NO_FEE:
           // reset other forms
-          (context.refs.fasForm as FormIF).resetValidation();
-          (context.refs.bcolForm as FormIF).resetValidation();
-          (context.refs.folioNumberInputRef as FormIF).resetFolioNumberValidation()
+          fasForm.resetValidation()
+          bcolForm.resetValidation();
+          (folioNumberInputRef as FormIF).resetFolioNumberValidation()
           await nextTick()
           // update data
           emitStaffPaymentData({ option: StaffPaymentOptions.NO_FEE, isPriority: false })

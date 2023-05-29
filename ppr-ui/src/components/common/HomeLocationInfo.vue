@@ -190,31 +190,29 @@
 
 <script lang="ts">
 /* eslint-disable no-unused-vars */
-import { computed, defineComponent, onMounted, reactive, toRefs, watch } from '@vue/composition-api'
-import { MhrLocationInfoIF } from '@/interfaces'
+import { computed, defineComponent, onMounted, reactive, ref, toRefs, watch } from 'vue-demi'
+import { FormIF, MhrLocationInfoIF } from '@/interfaces'
 import { useInputRules } from '@/composables/useInputRules'
-import { useGetters } from 'vuex-composition-helpers'
+import { useStore } from '@/store/store'
+import { storeToRefs } from 'pinia'
 /* eslint-disable no-unused-vars */
 
 export default defineComponent({
   name: 'HomeLocationInfo',
-  emits: ['updateLocationInfo', 'updateLocationDescription', 'updateLocationValid'],
+  emits: ['updateLocationInfo', 'updateLocationDescription', 'updateLocationInfoValid'],
   props: {
     validate: { type: Boolean, default: false },
     isReserve: { type: Boolean, default: false },
     isStrata: { type: Boolean, default: false }
   },
   setup (props, context) {
-    const {
-      getMhrRegistrationLocation
-    } = useGetters<any>([
-      'getMhrRegistrationLocation'
-    ])
+    const { getMhrRegistrationLocation } = storeToRefs(useStore())
     const {
       customRules,
       maxLength,
       required
     } = useInputRules()
+    const homeLocationInfoRef = ref(null) as FormIF
 
     const localState = reactive({
       homeLocationInfoValid: false,
@@ -275,8 +273,7 @@ export default defineComponent({
     }
 
     const validateLocationInfo = (): void => {
-      // @ts-ignore - function exists
-      context.refs.homeLocationInfoRef.validate()
+      homeLocationInfoRef.value?.validate()
     }
 
     const emitOtherTypeValid = (): void => {
@@ -310,6 +307,7 @@ export default defineComponent({
     return {
       maxLength,
       locationInputRules,
+      homeLocationInfoRef,
       ...toRefs(localState)
     }
   }

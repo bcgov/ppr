@@ -6,14 +6,14 @@ import {
   HomeTenancyTypes, MhApiStatusTypes,
   SupportingDocumentsOptions
 } from '@/enums'
-import { useActions, useGetters } from 'vuex-composition-helpers'
+import { useStore } from '@/store/store'
 import {
   MhrHomeOwnerGroupIF,
   MhrRegistrationFractionalOwnershipIF,
   MhrRegistrationHomeOwnerGroupIF,
   MhrRegistrationHomeOwnerIF
 } from '@/interfaces'
-import { computed, reactive, toRefs } from '@vue/composition-api'
+import { computed, reactive, toRefs } from 'vue-demi'
 import { isEqual, find, uniq } from 'lodash'
 import { normalizeObject } from '@/utils'
 import { useHomeOwners } from '@/composables'
@@ -22,6 +22,7 @@ import {
   transferOwnerPartyTypes,
   transferSupportingDocumentTypes
 } from '@/resources/'
+import { storeToRefs } from 'pinia'
 
 /**
  * Composable to handle Ownership functionality and permissions specific to the varying Transfer of Ownership filings.
@@ -29,6 +30,12 @@ import {
  */
 export const useTransferOwners = (enableAllActions: boolean = false) => {
   const {
+    // Actions
+    setMhrTransferHomeOwnerGroups,
+    setMhrTransferAffidavitCompleted
+  } = useStore()
+  const {
+    // Getters
     hasUnsavedChanges,
     getMhrTransferType,
     getMhrInformation,
@@ -36,28 +43,11 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     getMhrTransferHomeOwnerGroups,
     getMhrTransferCurrentHomeOwnerGroups,
     getMhrTransferAffidavitCompleted
-  } = useGetters<any>([
-    'hasUnsavedChanges',
-    'getMhrTransferType',
-    'getMhrInformation',
-    'getMhrTransferHomeOwners',
-    'getMhrTransferHomeOwnerGroups',
-    'getMhrTransferCurrentHomeOwnerGroups',
-    'getMhrTransferAffidavitCompleted'
-  ])
-
-  const {
-    setMhrTransferHomeOwnerGroups,
-    setMhrTransferAffidavitCompleted
-  } = useActions<any>([
-    'setMhrTransferHomeOwnerGroups',
-    'setMhrTransferAffidavitCompleted'
-  ])
-
+  } = storeToRefs(useStore())
   const {
     getGroupById,
     getCurrentGroupById
-  } = useHomeOwners(true)
+  } = useHomeOwners(!!getMhrTransferType.value)
 
   /** Local State for custom computed properties. **/
   const localState = reactive({
@@ -443,7 +433,6 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       const transferType = getMhrTransferType.value?.transferType
       const allOwners = getMhrTransferHomeOwners.value
       const deletedOwnerGroup = find(getMhrTransferHomeOwnerGroups.value, { owners: [{ action: ActionTypes.REMOVED }] })
-      const supportingDocOfTheTransferType = TransToExec.getSupportingDocForActiveTransfer()
 
       // first try to find the deleted reg owner
       const deletedOwner = find(deletedOwnerGroup.owners, {

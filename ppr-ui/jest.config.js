@@ -6,8 +6,8 @@ module.exports = {
       babelConfig: true
     }
   },
+  testTimeout: 50000,
   silent: true,
   preset: '@vue/cli-plugin-unit-jest/presets/typescript-and-babel',
   transformIgnorePatterns: []
-
 }

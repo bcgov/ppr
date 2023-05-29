@@ -29,7 +29,7 @@ import {
   defineComponent,
   reactive,
   toRefs
-} from '@vue/composition-api'
+} from 'vue-demi'
 
 export default defineComponent({
   name: 'DialogButtons',

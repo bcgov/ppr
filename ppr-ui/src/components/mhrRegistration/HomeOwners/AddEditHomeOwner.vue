@@ -355,7 +355,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, ref, toRefs, watch } from '@vue/composition-api'
+import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue-demi'
 import { useInputRules } from '@/composables/useInputRules'
 import { useHomeOwners, useMhrValidations } from '@/composables/mhrRegistration'
 import { BusinessSearchAutocomplete } from '@/components/search'
@@ -363,23 +363,22 @@ import { BaseAddress } from '@/composables/address'
 import { PartyAddressSchema } from '@/schemas'
 import { focusOnFirstError, fromDisplayPhone } from '@/utils'
 import { VueMaskDirective } from 'v-mask'
-
-/* eslint-disable no-unused-vars */
 import {
   AdditionalNameConfigIF,
+  FormIF,
   MhrRegistrationFractionalOwnershipIF,
   MhrRegistrationHomeOwnerGroupIF,
   MhrRegistrationHomeOwnerIF
-} from '@/interfaces/mhr-registration-interfaces'
-/* eslint-enable no-unused-vars */
+} from '@/interfaces'
 import { SimpleHelpToggle } from '@/components/common'
 import HomeOwnerGroups from './HomeOwnerGroups.vue'
 import HomeOwnerRoles from './HomeOwnerRoles.vue'
-import { useActions, useGetters } from 'vuex-composition-helpers'
+import { useStore } from '@/store/store'
 import { find } from 'lodash'
 import { useMhrInformation, useTransferOwners } from '@/composables'
 import { ActionTypes, HomeOwnerPartyTypes } from '@/enums'
 import { AdditionalNameConfig, transfersContent } from '@/resources'
+import { storeToRefs } from 'pinia'
 
 interface FractionalOwnershipWithGroupIdIF extends MhrRegistrationFractionalOwnershipIF {
   groupId: number
@@ -419,26 +418,16 @@ export default defineComponent({
     }
   },
   setup (props, context) {
+    const { setUnsavedChanges } = useStore()
     const {
+      // Getters
       isRoleStaffReg,
       getMhrRegistrationHomeOwnerGroups,
       getMhrTransferHomeOwnerGroups,
       getMhrTransferHomeOwners,
       getMhrRegistrationValidationModel,
       getMhrTransferType
-    } = useGetters<any>([
-      'isRoleStaffReg',
-      'getMhrRegistrationHomeOwnerGroups',
-      'getMhrTransferHomeOwnerGroups',
-      'getMhrTransferHomeOwners',
-      'getMhrRegistrationValidationModel',
-      'getMhrTransferType'
-    ])
-    const {
-      setUnsavedChanges
-    } = useActions<any>(['setUnsavedChanges'])
-
-    // Composables
+    } = storeToRefs(useStore())
     const {
       MhrSectVal,
       getStepValidation,
@@ -481,7 +470,7 @@ export default defineComponent({
     } = useMhrInformation()
 
     const addressSchema = PartyAddressSchema
-    const addHomeOwnerForm = ref(null)
+    const addHomeOwnerForm = ref(null) as FormIF
 
     const getTransferOrRegistrationHomeOwnerGroups = () =>
       props.isMhrTransfer ? getMhrTransferHomeOwnerGroups.value : getMhrRegistrationHomeOwnerGroups.value
@@ -493,6 +482,7 @@ export default defineComponent({
       phoneNumber: props.editHomeOwner?.phoneNumber || '',
       phoneExtension: props.editHomeOwner?.phoneExtension || '',
       suffix: props.editHomeOwner?.suffix || '',
+      description: props.editHomeOwner?.description || '',
       address: {
         street: props.editHomeOwner?.address.street || '',
         streetAdditional: props.editHomeOwner?.address.streetAdditional || '',
@@ -568,7 +558,7 @@ export default defineComponent({
       showReviewedError: computed(() =>
         (!getStepValidation(MhrSectVal.HOME_OWNERS_VALID) && !getStepValidation(MhrSectVal.ADD_EDIT_OWNERS_VALID))),
       ownerGroupId: props.editHomeOwner?.groupId,
-      showGroups: showGroups,
+      showGroups: showGroups.value,
       isPerson: props.isHomeOwnerPerson,
       isAddingHomeOwner: props.editHomeOwner == null,
       groupFractionalData: computed((): FractionalOwnershipWithGroupIdIF =>
@@ -623,8 +613,7 @@ export default defineComponent({
     })
 
     const done = (): void => {
-      // @ts-ignore - function exists
-      context.refs.addHomeOwnerForm.validate()
+      addHomeOwnerForm.value.validate()
       if (localState.isHomeOwnerFormValid && localState.isAddressFormValid) {
         setValidation(MhrSectVal.ADD_EDIT_OWNERS_VALID, MhrCompVal.OWNERS_VALID, true)
         if (props.editHomeOwner) {
@@ -751,6 +740,8 @@ export default defineComponent({
       isFrozenMhr,
       customRules,
       required,
+      showGroups,
+      setShowGroups,
       AdditionalNameConfig,
       ...toRefs(localState)
     }

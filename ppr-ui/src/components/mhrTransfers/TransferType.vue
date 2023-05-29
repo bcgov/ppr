@@ -129,16 +129,17 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, ref, toRefs, watch } from '@vue/composition-api'
+import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue-demi'
 import { BaseDialog } from '@/components/dialogs'
 import { ClientTransferTypes, StaffTransferTypes, transfersContent, transfersErrors } from '@/resources'
-import { useGetters } from 'vuex-composition-helpers'
+import { useStore } from '@/store/store'
 import { changeTransferType } from '@/resources/dialogOptions'
 import { useInputRules, useTransferOwners } from '@/composables'
 // eslint-disable-next-line no-unused-vars
 import { FormIF, TransferTypeSelectIF } from '@/interfaces'
 import { ApiTransferTypes } from '@/enums'
 import { cloneDeep } from 'lodash'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'TransferType',
@@ -152,18 +153,15 @@ export default defineComponent({
     const { customRules, required, isNumber, maxLength, greaterThan } = useInputRules()
     const transferTypeSelectRef = ref(null)
     const declaredValueRef = ref(null)
+    const transferTypeForm = ref(null) as FormIF
 
     const {
+      // Getters
       isRoleStaffReg,
       hasUnsavedChanges,
       getMhrTransferType,
       getMhrTransferDeclaredValue
-    } = useGetters<any>([
-      'isRoleStaffReg',
-      'hasUnsavedChanges',
-      'getMhrTransferType',
-      'getMhrTransferDeclaredValue'
-    ])
+    } = storeToRefs(useStore())
 
     const {
       isJointTenancyStructure
@@ -203,9 +201,7 @@ export default defineComponent({
     const selectTransferType = (item: TransferTypeSelectIF): void => {
       context.emit('emitType', item)
       localState.selectedTransferType = cloneDeep(item)
-
-      // @ts-ignore - function exists
-      context.refs.transferTypeSelectRef.blur()
+      transferTypeSelectRef.value?.blur()
     }
 
     const handleTypeChange = async (item: TransferTypeSelectIF): Promise<void> => {
@@ -228,7 +224,7 @@ export default defineComponent({
     }
 
     watch(() => props.validate, (validate: boolean) => {
-      validate && (context.refs.transferTypeForm as FormIF).validate()
+      validate && transferTypeForm.value?.validate()
     })
 
     watch(() => localState.isValid, () => {
@@ -244,7 +240,7 @@ export default defineComponent({
     })
 
     watch(() => localState.selectedTransferType, (val:TransferTypeSelectIF) => {
-      (context.refs.transferTypeForm as FormIF).resetValidation()
+      transferTypeForm.value?.resetValidation()
 
       switch (val.transferType) {
         case ApiTransferTypes.SALE_OR_GIFT:

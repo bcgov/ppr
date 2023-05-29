@@ -253,8 +253,8 @@ import {
   toRefs,
   computed,
   watch
-} from '@vue/composition-api'
-import { useGetters, useActions } from 'vuex-composition-helpers'
+} from 'vue-demi'
+import { useStore } from '@/store/store'
 import { AddPartiesIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import EditDebtor from './EditDebtor.vue'
 import { useParty } from '@/composables/useParty'
@@ -264,6 +264,7 @@ import { debtorTableHeaders, editTableHeaders } from '@/resources'
 import { PartyAddressSchema } from '@/schemas'
 import { ActionTypes, RegistrationFlowType } from '@/enums'
 import { cloneDeep } from 'lodash'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   components: {
@@ -285,20 +286,14 @@ export default defineComponent({
     }
   },
   setup (props, { emit }) {
-    const { setAddSecuredPartiesAndDebtors } = useActions<any>([
-      'setAddSecuredPartiesAndDebtors'
-    ])
+    const { setAddSecuredPartiesAndDebtors } = useStore()
     const {
+      // Getters
       getAddSecuredPartiesAndDebtors,
       getRegistrationFlowType,
       getRegistrationType,
       getOriginalAddSecuredPartiesAndDebtors
-    } = useGetters<any>([
-      'getAddSecuredPartiesAndDebtors',
-      'getRegistrationFlowType',
-      'getRegistrationType',
-      'getOriginalAddSecuredPartiesAndDebtors'
-    ])
+    } = storeToRefs(useStore())
 
     const registrationFlowType = getRegistrationFlowType.value
     const addressSchema = PartyAddressSchema

@@ -1,7 +1,8 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { getVuexStore } from '@/store'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 
 // Components
@@ -20,7 +21,8 @@ import { defaultFlagSet } from '@/utils'
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 // Input field selectors / buttons
 const searchDropDown: string = '.search-bar-type-select'
@@ -34,7 +36,7 @@ function createComponent (): Wrapper<any> {
   const localVue = createLocalVue()
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
-  return mount(SearchBarList, {
+  return mount((SearchBarList as any), {
     localVue,
     propsData: {},
     store,
@@ -46,7 +48,7 @@ describe('SearchBar component basic tests', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
-    await store.dispatch('setUserInfo', {
+    await store.setUserInfo({
       firstname: 'test',
       lastname: 'tester',
       username: 'user',
@@ -65,30 +67,30 @@ describe('SearchBar component basic tests', () => {
 
   it('shows all of the options', async () => {
     defaultFlagSet['mhr-ui-enabled'] = true
-    await store.dispatch('setAuthRoles', ['mhr', 'ppr'])
-    await store.dispatch('setUserProductSubscriptionsCodes', ['PPR', 'MHR'])
+    await store.setAuthRoles(['mhr', 'ppr'])
+    await store.setUserProductSubscriptionsCodes(['PPR', 'MHR'])
 
     wrapper.vm.updateSelections()
     await flushPromises
-    expect(wrapper.vm.$data.displayItems.length).toBe(12)
+    expect(wrapper.vm.displayItems.length).toBe(12)
   })
 
   it('shows only ppr options', async () => {
-    await store.dispatch('setAuthRoles', ['ppr'])
-    await store.dispatch('setUserProductSubscriptionsCodes', ['PPR'])
+    await store.setAuthRoles(['ppr'])
+    await store.setUserProductSubscriptionsCodes(['PPR'])
 
     wrapper.vm.updateSelections()
     await flushPromises
-    expect(wrapper.vm.$data.displayItems.length).toBe(6)
+    expect(wrapper.vm.displayItems.length).toBe(6)
   })
 
   it('shows only mhr options', async () => {
-    await store.dispatch('setAuthRoles', ['mhr'])
-    await store.dispatch('setUserProductSubscriptionsCodes', ['MHR'])
+    await store.setAuthRoles(['mhr'])
+    await store.setUserProductSubscriptionsCodes(['MHR'])
 
     wrapper.vm.updateSelections()
     await flushPromises
-    expect(wrapper.vm.$data.displayItems.length).toBe(4)
+    expect(wrapper.vm.displayItems.length).toBe(4)
   })
 
   it('sends selected event', async () => {

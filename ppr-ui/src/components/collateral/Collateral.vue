@@ -86,8 +86,10 @@ import {
   toRefs,
   watch,
   onUnmounted
-} from '@vue/composition-api'
-import { useActions, useGetters } from 'vuex-composition-helpers'
+} from 'vue-demi'
+import { useStore } from '@/store/store'
+import { useRouter } from 'vue2-helpers/vue-router'
+
 // local components
 import { GeneralCollateral } from './generalCollateral'
 import { VehicleCollateral } from './vehicleCollateral'
@@ -100,6 +102,7 @@ import {
 } from '@/interfaces'
 import { useGeneralCollateral } from './generalCollateral/factories'
 import { useVehicle } from './vehicleCollateral/factories'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'Collateral',
@@ -118,19 +121,20 @@ export default defineComponent({
     }
   },
   setup (props, context) {
+    const router = useRouter()
     const {
-      getAddCollateral,
-      getRegistrationFlowType,
-      getRegistrationType
-    } = useGetters<any>(['getAddCollateral', 'getRegistrationFlowType', 'getRegistrationType'])
-
-    const {
+      // Actions
       setCollateralShowInvalid,
       setCollateralValid,
       setGeneralCollateral
-    } = useActions<any>(['setCollateralShowInvalid', 'setCollateralValid', 'setGeneralCollateral'])
+    } = useStore()
+    const {
+      // Getters
+      getAddCollateral,
+      getRegistrationFlowType,
+      getRegistrationType
+    } = storeToRefs(useStore())
 
-    const router = context.root.$router
     const registrationFlowType = getRegistrationFlowType.value
     const registrationType = getRegistrationType.value.registrationTypeAPI
 

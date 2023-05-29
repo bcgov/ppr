@@ -156,8 +156,10 @@
 <script lang="ts">
 // Components
 /* eslint-disable no-unused-vars */
-import { computed, defineComponent, onBeforeMount, reactive, toRefs, watch } from '@vue/composition-api'
-import { useActions, useGetters } from 'vuex-composition-helpers'
+import { computed, defineComponent, onBeforeMount, reactive, toRefs, watch } from 'vue-demi'
+import { useRouter } from 'vue2-helpers/vue-router'
+import { useStore } from '@/store/store'
+import { storeToRefs } from 'pinia'
 import { RegistrationBar } from '@/components/registration'
 import { RegistrationTable } from '@/components/tables'
 import { BaseDialog, RegistrationConfirmation } from '@/components/dialogs'
@@ -247,28 +249,21 @@ export default defineComponent({
     }
   },
   setup (props, context) {
+    const router = useRouter()
     const {
-      getRegTableBaseRegs, getRegTableDraftsBaseReg, isMhrRegistration, getRegTableTotalRowCount, getStateModel,
-      getRegTableDraftsChildReg, hasMorePages, getRegTableNewItem, getRegTableSortOptions, getRegTableSortPage,
-      getUserSettings, getMhRegTableBaseRegs
-    } = useGetters<any>([
-      'getRegTableBaseRegs', 'getRegTableDraftsBaseReg', 'isMhrRegistration', 'getRegTableTotalRowCount',
-      'getStateModel', 'getRegTableDraftsChildReg', 'hasMorePages', 'getRegTableNewItem', 'getRegTableSortOptions',
-      'getRegTableSortPage', 'getUserSettings', 'getMhRegTableBaseRegs'
-    ])
-    const {
+      // Actions
       resetNewRegistration, setRegistrationType, setRegTableCollapsed, setRegTableNewItem, setLengthTrust,
       setAddCollateral, setAddSecuredPartiesAndDebtors, setUnsavedChanges, setRegTableDraftsBaseReg,
       setRegTableDraftsChildReg, setRegTableTotalRowCount, setRegTableBaseRegs, setRegTableSortPage,
       setRegTableSortHasMorePages, setRegTableSortOptions, setUserSettings, resetRegTableData, setMhrInformation,
       setMhrTableHistory, setMhrDraftNumber, setEmptyMhr
-    } = useActions<any>([
-      'resetNewRegistration', 'setRegistrationType', 'setRegTableCollapsed', 'setRegTableNewItem', 'setLengthTrust',
-      'setAddCollateral', 'setAddSecuredPartiesAndDebtors', 'setUnsavedChanges', 'setRegTableDraftsBaseReg',
-      'setRegTableDraftsChildReg', 'setRegTableTotalRowCount', 'setRegTableBaseRegs', 'setRegTableSortPage',
-      'setRegTableSortHasMorePages', 'setRegTableSortOptions', 'setUserSettings', 'resetRegTableData',
-      'setMhrInformation', 'setMhrTableHistory', 'setMhrDraftNumber', 'setEmptyMhr'
-    ])
+    } = useStore()
+    const {
+      // Getters
+      getRegTableBaseRegs, getRegTableDraftsBaseReg, isMhrRegistration, getRegTableTotalRowCount, getStateModel,
+      getRegTableDraftsChildReg, hasMorePages, getRegTableNewItem, getRegTableSortOptions, getRegTableSortPage,
+      getUserSettings, getMhRegTableBaseRegs
+    } = storeToRefs(useStore())
 
     const {
       initNewMhr,
@@ -395,7 +390,7 @@ export default defineComponent({
       setRegTableCollapsed(null)
 
       const route = isMhrRegistration.value ? RouteNames.YOUR_HOME : RouteNames.LENGTH_TRUST
-      await context.root.$router.replace({ name: route })
+      await router.replace({ name: route })
     }
 
     const findRegistration = async (regNum: string): Promise<void> => {
@@ -628,7 +623,7 @@ export default defineComponent({
       resetNewRegistration(null) // Clear store data from the previous registration.
       // Go to the Amendment first step which loads the base registration and draft data.
       setRegTableCollapsed(null)
-      context.root.$router.replace({
+      router.replace({
         name: RouteNames.AMEND_REGISTRATION,
         query: { 'reg-num': regNum, 'document-id': docId }
       })
@@ -649,7 +644,7 @@ export default defineComponent({
         setUnsavedChanges(false)
         // Go to the first step.
         setRegTableCollapsed(null)
-        await context.root.$router.replace({ name: RouteNames.LENGTH_TRUST })
+        await router.replace({ name: RouteNames.LENGTH_TRUST })
       }
     }
 
@@ -660,7 +655,7 @@ export default defineComponent({
 
     const openMhr = async (mhrSummary: MhRegistrationSummaryIF): Promise<void> => {
       setMhrInformation(mhrSummary)
-      await context.root.$router.replace({ name: RouteNames.MHR_INFORMATION })
+      await router.replace({ name: RouteNames.MHR_INFORMATION })
     }
 
     const removeMhrDraft = async (mhrNumber: string): Promise<void> => {
@@ -682,7 +677,7 @@ export default defineComponent({
 
     const startNewChildDraft = (regNum: string, routeName: RouteNames): void => {
       setRegTableCollapsed(null)
-      context.root.$router.replace({
+      router.replace({
         name: routeName,
         query: { 'reg-num': regNum }
       })

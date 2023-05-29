@@ -17,9 +17,10 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs } from '@vue/composition-api'
-import { useGetters } from 'vuex-composition-helpers'
+import { computed, defineComponent, reactive, toRefs } from 'vue-demi'
+import { useStore } from '@/store/store'
 import { MixedRolesErrors } from '@/resources'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'HomeOwnersMixedRolesError',
@@ -34,11 +35,7 @@ export default defineComponent({
     }
   },
   setup () {
-    const {
-      getMhrRegistrationHomeOwnerGroups
-    } = useGetters<any>([
-      'getMhrRegistrationHomeOwnerGroups'
-    ])
+    const { getMhrRegistrationHomeOwnerGroups } = storeToRefs(useStore())
 
     const localState = reactive({
       mixedRoleErrorMsg: computed(() => getMhrRegistrationHomeOwnerGroups.value?.length === 1

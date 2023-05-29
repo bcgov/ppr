@@ -28,8 +28,8 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs } from '@vue/composition-api'
-import { useActions, useGetters } from 'vuex-composition-helpers'
+import { computed, defineComponent, reactive, toRefs } from 'vue-demi'
+import { useStore } from '@/store/store'
 
 import RegistrationBarButtonList from '@/components/registration/RegistrationBarButtonList.vue'
 import RegistrationBarTypeAheadList from '@/components/registration/RegistrationBarTypeAheadList.vue'
@@ -39,6 +39,7 @@ import {
 } from '@/enums'
 import { AccountProductSubscriptionIF, RegistrationTypeIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { MhrRegistrationType } from '@/resources'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   components: {
@@ -57,9 +58,13 @@ export default defineComponent({
   },
   emits: ['selected-registration-type'],
   setup (props, { emit }) {
-    const { getAccountProductSubscriptions, isRoleQualifiedSupplier, isRoleStaff } =
-      useGetters<any>(['getAccountProductSubscriptions', 'isRoleQualifiedSupplier', 'isRoleStaff'])
-    const { setRegistrationTypeOtherDesc } = useActions<any>(['setRegistrationTypeOtherDesc'])
+    const { setRegistrationTypeOtherDesc } = useStore()
+    const {
+      // Getters
+      getAccountProductSubscriptions,
+      isRoleQualifiedSupplier,
+      isRoleStaff
+    } = storeToRefs(useStore())
     const localState = reactive({
       labelText: 'Start a New Personal Property Registration'
     })

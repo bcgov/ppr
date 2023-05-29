@@ -29,10 +29,11 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs } from '@vue/composition-api'
+import { computed, defineComponent, reactive, toRefs } from 'vue-demi'
 import { convertDate } from '@/utils'
-import { useGetters } from 'vuex-composition-helpers'
+import { useStore } from '@/store/store'
 import { useTransferOwners } from '@/composables'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'TransferDetailsReview',
@@ -48,11 +49,7 @@ export default defineComponent({
       getMhrTransferConsideration,
       getMhrTransferDate,
       getMhrTransferOwnLand
-    } = useGetters<any>([
-      'getMhrTransferConsideration',
-      'getMhrTransferDate',
-      'getMhrTransferOwnLand'
-    ])
+    } = storeToRefs(useStore())
 
     const {
       isTransferDueToDeath,

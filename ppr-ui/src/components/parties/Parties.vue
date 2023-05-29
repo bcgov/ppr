@@ -91,8 +91,8 @@ import {
   reactive,
   toRefs,
   computed
-} from '@vue/composition-api'
-import { useGetters } from 'vuex-composition-helpers'
+} from 'vue-demi'
+import { useStore } from '@/store/store'
 // local components
 import PartySummary from './PartySummary.vue' // need to import like this for jest tests - cyclic issue?
 import { Debtors } from '@/components/parties/debtor'
@@ -104,6 +104,7 @@ import { CautionBox } from '@/components/common'
 // local helpers / types / etc.
 import { PartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { isSecuredPartyRestrictedList } from '@/utils'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   components: {
@@ -119,16 +120,14 @@ export default defineComponent({
       default: false
     }
   },
-  setup (props, context) {
-    const { getAddSecuredPartiesAndDebtors } = useGetters<any>([
-      'getAddSecuredPartiesAndDebtors'
-    ])
-    const { getRegistrationType, isRoleStaffSbc } = useGetters<any>(['getRegistrationType', 'isRoleStaffSbc'])
+  setup (props) {
+    const { isRoleStaffSbc } = useStore()
+    const { getAddSecuredPartiesAndDebtors, getRegistrationType } = storeToRefs(useStore())
     const registrationType = getRegistrationType.value.registrationTypeAPI
     const localState = reactive({
       securedParties: getAddSecuredPartiesAndDebtors.value.securedParties,
       debtors: getAddSecuredPartiesAndDebtors.value.debtors,
-      isSbc: isRoleStaffSbc.value,
+      isSbc: isRoleStaffSbc,
       cautionTxt: 'The Registry will not provide the verification statement for this registration ' +
         'to the Registering Party named above.',
       registeringParty: computed((): PartyIF => {
@@ -143,15 +142,9 @@ export default defineComponent({
       }),
       isSecuredPartyChecked: computed((): boolean => {
         if (isSecuredPartyRestrictedList(registrationType)) {
-          if (localState.securedParties.length === 1) {
-            return true
-          }
-          return false
+          return localState.securedParties.length === 1
         }
-        if (localState.securedParties.length > 0) {
-          return true
-        }
-        return false
+        return localState.securedParties.length > 0
       }),
       securedPartyTitle: computed((): string => {
         if (isSecuredPartyRestrictedList(registrationType)) {

@@ -1,4 +1,4 @@
-import { ref } from '@vue/composition-api'
+import { ref } from 'vue-demi'
 
 import { ValidationRule } from '@/composables/address/enums'
 
