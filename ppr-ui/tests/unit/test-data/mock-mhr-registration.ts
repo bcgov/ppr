@@ -40,7 +40,7 @@ export const mockedExecutor: MhrRegistrationHomeOwnerIF = {
     middle: 'A',
     last: 'Smith'
   },
-  suffix: 'Executor of the will of John Smith',
+  description: 'Executor of the will of John Smith',
   phoneNumber: '(545) 333-2211',
   phoneExtension: '1234',
   partyType: HomeOwnerPartyTypes.EXECUTOR,
@@ -68,11 +68,25 @@ export const mockedAddedExecutor: MhrRegistrationHomeOwnerIF = {
     middle: 'A',
     last: 'Smith'
   },
-  suffix: 'Sr.',
+  description: 'Sr.',
   phoneNumber: '(545) 333-2211',
   phoneExtension: '1234',
   partyType: HomeOwnerPartyTypes.EXECUTOR,
   action: ActionTypes.ADDED,
+  address: mockedAddress
+}
+
+export const mockedAdministrator: MhrRegistrationHomeOwnerIF = {
+  ownerId: 35,
+  individualName: {
+    first: 'Admin',
+    middle: 'M',
+    last: 'Smith'
+  },
+  description: 'ADMINISTRATOR 123',
+  phoneNumber: '(123) 777-6666',
+  phoneExtension: '7656',
+  partyType: HomeOwnerPartyTypes.ADMINISTRATOR,
   address: mockedAddress
 }
 
@@ -83,7 +97,7 @@ export const mockedAddedAdministrator: MhrRegistrationHomeOwnerIF = {
     middle: 'A',
     last: 'Smith'
   },
-  suffix: 'Sr.',
+  description: 'Sr.',
   phoneNumber: '(545) 333-2211',
   phoneExtension: '1234',
   partyType: HomeOwnerPartyTypes.ADMINISTRATOR,

@@ -493,6 +493,7 @@ export default defineComponent({
       phoneNumber: props.editHomeOwner?.phoneNumber || '',
       phoneExtension: props.editHomeOwner?.phoneExtension || '',
       suffix: props.editHomeOwner?.suffix || '',
+      description: props.editHomeOwner?.description || '',
       address: {
         street: props.editHomeOwner?.address.street || '',
         streetAdditional: props.editHomeOwner?.address.streetAdditional || '',
