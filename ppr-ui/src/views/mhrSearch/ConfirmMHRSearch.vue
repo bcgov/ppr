@@ -191,7 +191,7 @@ export default defineComponent({
         return ''
       }),
       combinedSearchFees: computed((): AdditionalSearchFeeIF => {
-        const searchQuantity = uniqBy(getSelectedManufacturedHomes, UIMHRSearchTypeValues.MHRMHR_NUMBER)
+        const searchQuantity = uniqBy(getSelectedManufacturedHomes.value, UIMHRSearchTypeValues.MHRMHR_NUMBER)
           .filter(item => item.includeLienInfo === true)
           .length
         return searchQuantity > 0
@@ -203,7 +203,7 @@ export default defineComponent({
       }),
       feeQuantity: computed((): number => {
         // Return selected quantity that is not a combination search
-        return uniqBy(getSelectedManufacturedHomes, UIMHRSearchTypeValues.MHRMHR_NUMBER)
+        return uniqBy(getSelectedManufacturedHomes.value, UIMHRSearchTypeValues.MHRMHR_NUMBER)
           .filter(result => result.selected && !result.includeLienInfo)
           .length
       }),
@@ -257,7 +257,7 @@ export default defineComponent({
       localState.validating = true
       await nextTick()
       if (!localState.validFolio || (
-        (getIsStaffClientPayment && !isRoleStaffSbc) && !localState.staffPaymentValid)
+        (getIsStaffClientPayment.value && !isRoleStaffSbc.value) && !localState.staffPaymentValid)
       ) {
         localState.showErrors = true
         document.getElementById('staff-payment-dialog').scrollIntoView({ behavior: 'smooth' })
@@ -268,7 +268,7 @@ export default defineComponent({
       if (isRoleStaffReg.value) {
         apiResponse = await submitSelectedMhr(
           getManufacturedHomeSearchResults.value.searchId,
-          uniqBy(getSelectedManufacturedHomes, UIMHRSearchTypeValues.MHRMHR_NUMBER),
+          uniqBy(getSelectedManufacturedHomes.value, UIMHRSearchTypeValues.MHRMHR_NUMBER),
           getFolioOrReferenceNumber.value,
           getStaffPayment.value,
           isSearchCertified.value
@@ -276,7 +276,7 @@ export default defineComponent({
       } else {
         apiResponse = await submitSelectedMhr(
           getManufacturedHomeSearchResults.value.searchId,
-          uniqBy(getSelectedManufacturedHomes, UIMHRSearchTypeValues.MHRMHR_NUMBER),
+          uniqBy(getSelectedManufacturedHomes.value, UIMHRSearchTypeValues.MHRMHR_NUMBER),
           getFolioOrReferenceNumber.value
         )
       }

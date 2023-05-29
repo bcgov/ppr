@@ -38,7 +38,7 @@
 
         <v-form id="submitting-party-form" ref="submittingPartyForm" v-model="submittingPartyValid">
           <!-- Person Name Input -->
-          <div v-show="isPersonOption">
+          <div v-if="isPersonOption && submittingParty.personName">
             <label class="generic-label" for="first-name">Person's Name</label>
             <v-row no-gutters>
               <v-col>
@@ -75,7 +75,7 @@
           </div>
 
           <!-- Business Name Input -->
-          <div v-show="isBusinessOption">
+          <div v-if="isBusinessOption">
             <label class="generic-label" for="business-name">Business Name</label>
             <v-row no-gutters>
               <v-col>

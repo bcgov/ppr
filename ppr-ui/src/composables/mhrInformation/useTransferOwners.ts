@@ -47,7 +47,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
   const {
     getGroupById,
     getCurrentGroupById
-  } = useHomeOwners(true)
+  } = useHomeOwners(!!getMhrTransferType.value)
 
   /** Local State for custom computed properties. **/
   const localState = reactive({
