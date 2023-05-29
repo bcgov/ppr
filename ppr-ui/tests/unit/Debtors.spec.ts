@@ -1,7 +1,9 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { getVuexStore } from '@/store'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
+
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import { mockedDebtors1, mockedDebtorsAmendment, mockedDebtorsDeleted } from './test-data'
 
@@ -13,7 +15,8 @@ import { getLastEvent } from './utils'
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 // Input field selectors / buttons
 const addIndividualSelector: string = '#btn-add-individual'
@@ -28,7 +31,7 @@ function createComponent (): Wrapper<any> {
   const localVue = createLocalVue()
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
-  return mount(Debtors, {
+  return mount((Debtors as any), {
     localVue,
     propsData: {},
     store,
@@ -56,7 +59,7 @@ describe('Debtor SA tests', () => {
     expect(wrapper.find(addIndividualSelector).exists()).toBe(true)
     expect(wrapper.find(addBusinessSelector).exists()).toBe(true)
     wrapper.find(addIndividualSelector).trigger('click')
-    await Vue.nextTick()
+    await nextTick()
     expect(wrapper.findComponent(EditDebtor).exists()).toBeTruthy()
     expect(wrapper.findComponent(EditDebtor).isVisible()).toBe(true)
   })
@@ -66,7 +69,7 @@ describe('Debtor store tests', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
-    await store.dispatch('setAddSecuredPartiesAndDebtors', {
+    await store.setAddSecuredPartiesAndDebtors({
       debtors: mockedDebtors1
     })
     wrapper = createComponent()
@@ -100,13 +103,13 @@ describe('Debtor amendment tests', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
-    await store.dispatch('setAddSecuredPartiesAndDebtors', {
+    await store.setAddSecuredPartiesAndDebtors({
       debtors: mockedDebtorsAmendment
     })
-    await store.dispatch('setOriginalAddSecuredPartiesAndDebtors', {
+    await store.setOriginalAddSecuredPartiesAndDebtors({
       debtors: mockedDebtorsAmendment
     })
-    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.AMENDMENT)
+    await store.setRegistrationFlowType(RegistrationFlowType.AMENDMENT)
     wrapper = createComponent()
   })
   afterEach(() => {
@@ -138,13 +141,13 @@ describe('Debtor amendment tests', () => {
     expect(dropDowns.length).toBe(2)
     // click the drop down arrow
     dropDowns.at(0).trigger('click')
-    await Vue.nextTick()
+    await nextTick()
     expect(wrapper.findAll('.actions__more-actions .v-list-item__subtitle').length).toBe(2)
     expect(item2.querySelectorAll('td')[4].textContent).toContain('Undo')
     expect(item3.querySelectorAll('td')[4].textContent).toContain('Edit')
     // click the second drop down
     dropDowns.at(1).trigger('click')
-    await Vue.nextTick()
+    await nextTick()
     const options = wrapper.findAll('.actions__more-actions .v-list-item__subtitle')
     // options from first drop down
     expect(options.at(0).text()).toContain('Amend')
@@ -163,10 +166,10 @@ describe('Debtor validation tests', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
-    await store.dispatch('setAddSecuredPartiesAndDebtors', {
+    await store.setAddSecuredPartiesAndDebtors({
       debtors: mockedDebtorsDeleted
     })
-    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.AMENDMENT)
+    await store.setRegistrationFlowType(RegistrationFlowType.AMENDMENT)
     wrapper = createComponent()
   })
   afterEach(() => {
@@ -185,21 +188,21 @@ describe('Debtor validation tests', () => {
     wrapper.vm.$props.setShowInvalid = true
     expect(wrapper.vm.getDebtorValidity()).toBe(false)
     wrapper.vm.$data.showErrorDebtors = true
-    await Vue.nextTick()
+    await nextTick()
     expect(wrapper.findAll('.invalid-message').length).toBe(1)
   })
 
   it('goes from valid to invalid', async () => {
-    wrapper.vm.$data.debtors = mockedDebtors1
-    await Vue.nextTick()
+    wrapper.vm.debtors = mockedDebtors1
+    await nextTick()
     expect(wrapper.vm.getDebtorValidity()).toBe(true)
     // remove said debtor
     // click the drop down arrow
     wrapper.find('.v-data-table .debtor-row .actions__more-actions__btn').trigger('click')
-    await Vue.nextTick()
+    await nextTick()
     // click remove
     wrapper.find('.actions__more-actions .v-list-item__subtitle').trigger('click')
-    await Vue.nextTick()
+    await nextTick()
     expect(wrapper.vm.getDebtorValidity()).toBe(false)
   })
 })

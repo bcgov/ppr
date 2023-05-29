@@ -1,25 +1,19 @@
-import { useGetters } from 'vuex-composition-helpers'
-// @ts-ignore
+import { useStore } from '@/store/store'
 import {
   mhrInfoValidationStateIF,
-  MhrRegistrationHomeOwnerGroupIF,
   MhrRegistrationHomeOwnerIF
 } from '@/interfaces'
-import { computed } from '@vue/composition-api'
+import { computed } from 'vue-demi'
 import { useHomeOwners, useTransferOwners } from '@/composables'
 import { ActionTypes } from '@/enums'
+import { storeToRefs } from 'pinia'
 
 export const useMhrInfoValidation = (validationState: mhrInfoValidationStateIF) => {
   const {
     hasLien,
     isRoleStaffReg,
     hasUnsavedChanges
-  } = useGetters<any>([
-    'hasLien',
-    'isRoleStaffReg',
-    'hasUnsavedChanges'
-  ])
-
+  } = storeToRefs(useStore())
   const {
     isGlobalEditingMode,
     getGroupById

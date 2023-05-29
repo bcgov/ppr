@@ -1,8 +1,8 @@
 import sinon from 'sinon'
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import CompositionApi from '@vue/composition-api'
-import { getVuexStore } from '@/store'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
 import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
 // local
 import { BaseDialog, ConfirmationDialog } from '@/components/dialogs'
@@ -17,7 +17,8 @@ import flushPromises from 'flush-promises'
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 // emitted events
 const proceed = 'proceed'
@@ -38,7 +39,7 @@ describe('Confirmation Dialog', () => {
     patch.returns(new Promise(resolve => resolve({
       data: mockedDisablePayUserSettingsResponse
     })))
-    await store.dispatch('setUserInfo', {
+    await store.setUserInfo({
       firstname: 'test',
       lastname: 'tester',
       username: 'user',
@@ -46,9 +47,9 @@ describe('Confirmation Dialog', () => {
     })
 
     const localVue = createLocalVue()
-    localVue.use(CompositionApi)
+
     localVue.use(Vuetify)
-    wrapper = mount(ConfirmationDialog,
+    wrapper = mount((ConfirmationDialog as any),
       {
         localVue,
         vuetify,
@@ -110,11 +111,11 @@ describe('Confirmation Dialog', () => {
       settingOption: SettingOptions.PAYMENT_CONFIRMATION_DIALOG
     })
     await flushPromises()
-    expect(wrapper.vm.$store.state.stateModel.userInfo.settings.paymentConfirmationDialog).toBe(true)
+    expect(store.getStateModel.userInfo.settings.paymentConfirmationDialog).toBe(true)
     expect(wrapper.vm.preventDialog).toBe(false)
     wrapper.vm.preventDialog = true
     await flushPromises()
     expect(wrapper.vm.updateFailed).toBe(false)
-    expect(wrapper.vm.$store.state.stateModel.userInfo.settings.paymentConfirmationDialog).toBe(false)
+    expect(store.getStateModel.userInfo.settings.paymentConfirmationDialog).toBe(false)
   })
 })

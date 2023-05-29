@@ -47,8 +47,8 @@
 import { useHomeOwners, useTransferOwners } from '@/composables'
 import { SupportingDocumentsOptions } from '@/enums/transferTypes'
 import { MhrRegistrationHomeOwnerIF } from '@/interfaces' // eslint-disable-line no-unused-vars
-import { defineComponent, reactive, toRefs, watch, computed } from '@vue/composition-api'
-import { useActions } from 'vuex-composition-helpers'
+import { defineComponent, reactive, toRefs, watch, computed } from 'vue-demi'
+import { useStore } from '@/store/store'
 import { transferSupportingDocuments } from '@/resources/'
 
 export default defineComponent({
@@ -83,12 +83,7 @@ export default defineComponent({
   setup (props, { emit }) {
     const { editHomeOwner, isGlobalEditingMode } = useHomeOwners(true)
     const { getMhrTransferType } = useTransferOwners()
-
-    const {
-      setUnsavedChanges
-    } = useActions([
-      'setUnsavedChanges'
-    ])
+    const { setUnsavedChanges } = useStore()
 
     // Update deleted Owner based on supporting document selection
     // Only death certificate is captured in the api

@@ -24,9 +24,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
-import { useActions, useGetters } from 'vuex-composition-helpers'
+import { defineComponent, reactive, ref, toRefs, watch } from 'vue-demi'
+import { useStore } from '@/store/store'
 import { useInputRules, useMhrValidations } from '@/composables/'
+import { storeToRefs } from 'pinia'
+import { FormIF } from '@/interfaces'
 
 export default defineComponent({
   props: {
@@ -35,27 +37,16 @@ export default defineComponent({
       default: false
     }
   },
-  setup (props, context) {
-    const {
-      getMhrRegistrationOtherInfo,
-      getMhrRegistrationValidationModel
-    } = useGetters<any>([
-      'getMhrRegistrationOtherInfo',
-      'getMhrRegistrationValidationModel'
-    ])
-
-    const {
-      setMhrHomeDescription
-    } = useActions<any>([
-      'setMhrHomeDescription'
-    ])
-
+  setup (props) {
+    const { setMhrHomeDescription } = useStore()
+    const { getMhrRegistrationOtherInfo, getMhrRegistrationValidationModel } = storeToRefs(useStore())
     const { maxLength } = useInputRules()
     const {
       MhrCompVal,
       MhrSectVal,
       setValidation
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
+    const otherInformationForm = ref(null) as FormIF
 
     const localState = reactive({
       isOtherInfoValid: false,
@@ -70,9 +61,8 @@ export default defineComponent({
       setValidation(MhrSectVal.YOUR_HOME_VALID, MhrCompVal.OTHER_VALID, val)
     })
 
-    watch(() => props.validate, async () => {
-      // @ts-ignore - function exists
-      await context.refs.otherInformationForm.validate()
+    watch(() => props.validate, () => {
+      otherInformationForm.value.validate()
     })
 
     return { maxLength, ...toRefs(localState) }

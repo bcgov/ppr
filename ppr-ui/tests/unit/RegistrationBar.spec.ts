@@ -1,8 +1,9 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { getVuexStore } from '@/store'
-import CompositionApi from '@vue/composition-api'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
+
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import flushPromises from 'flush-promises'
 
@@ -18,7 +19,8 @@ import { RegistrationTypeIF } from '@/interfaces' // eslint-disable-line no-unus
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 // registration lists
 const standardRegistrations: Array<RegistrationTypeIF> = RegistrationTypesStandard
@@ -66,10 +68,10 @@ function getLastEvent (wrapper: Wrapper<any>, name: string): any {
  */
 function createComponent (): Wrapper<any> {
   const localVue = createLocalVue()
-  localVue.use(CompositionApi)
+
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
-  return mount(RegistrationBar, {
+  return mount((RegistrationBar as any), {
     localVue,
     propsData: {},
     store,
@@ -82,7 +84,7 @@ describe('RegistrationBar select basic drop down tests', () => {
   const defaultRegistration: RegistrationTypeIF = standardRegistrations[1]
 
   beforeEach(async () => {
-    await store.dispatch('setAccountProductSubscription', {
+    await store.setAccountProductSubscription({
       [AccountProductCodes.RPPR]: {
         membership: AccountProductMemberships.MEMBER,
         roles: []
@@ -101,7 +103,7 @@ describe('RegistrationBar select basic drop down tests', () => {
     * 1) account subscription with no roles
     * 2) default registration is set to security agreement
     */
-    expect(wrapper.vm.$store.state.stateModel.accountProductSubscriptions[AccountProductCodes.RPPR].roles).toEqual([])
+    expect(store.getStateModel.accountProductSubscriptions[AccountProductCodes.RPPR].roles).toEqual([])
     expect(defaultRegistration.registrationTypeUI).toBe(UIRegistrationTypes.SECURITY_AGREEMENT)
     // check security agreement displayed
     const button = wrapper.findAll(registrationButton)
@@ -146,7 +148,7 @@ describe('RegistrationBar rppr subscribed autocomplete tests', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
-    await store.dispatch('setAccountProductSubscription', {
+    await store.setAccountProductSubscription({
       [AccountProductCodes.RPPR]: {
         membership: AccountProductMemberships.MEMBER,
         roles: ['edit']
@@ -162,7 +164,7 @@ describe('RegistrationBar rppr subscribed autocomplete tests', () => {
     expect(wrapper.findComponent(RegistrationBar).exists()).toBe(true)
     expect(wrapper.find(registrationBar).exists()).toBe(true)
     // verify edit role set
-    const accountProductSubscriptions = wrapper.vm.$store.state.stateModel.accountProductSubscriptions
+    const accountProductSubscriptions = store.getStateModel.accountProductSubscriptions
     expect(accountProductSubscriptions[AccountProductCodes.RPPR].roles).toEqual(['edit'])
     // check autocomplete displayed
     const autocomplete = wrapper.findComponent(RegistrationBarTypeAheadList)

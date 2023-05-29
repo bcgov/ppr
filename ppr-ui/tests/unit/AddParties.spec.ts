@@ -1,8 +1,9 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
 import VueRouter from 'vue-router'
-import { getVuexStore } from '@/store'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '@/store/store'
 import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
 import flushPromises from 'flush-promises'
 
@@ -10,7 +11,7 @@ import flushPromises from 'flush-promises'
 import { Parties } from '@/components/parties'
 import { Stepper, StickyContainer } from '@/components/common'
 import ButtonFooter from '@/components/common/ButtonFooter.vue'
-import { AddSecuredPartiesAndDebtors } from '@/views'
+import { AddSecuredPartiesAndDebtors } from '@/views/newRegistration'
 // Local types/helpers
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { RegistrationFlowType, RouteNames, StatementTypes, UIRegistrationTypes } from '@/enums'
@@ -21,9 +22,10 @@ import mockRouter from './MockRouter'
 import { mockedSelectSecurityAgreement } from './test-data'
 
 Vue.use(Vuetify)
-
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+
+setActivePinia(createPinia())
+const store = useStore()
 
 // Input field selectors / buttons
 const header = '#registration-header'
@@ -44,7 +46,7 @@ function createComponent (): Wrapper<any> {
   const router = mockRouter.mock()
   router.push({ name: RouteNames.ADD_SECUREDPARTIES_AND_DEBTORS })
 
-  return mount(AddSecuredPartiesAndDebtors, {
+  return mount((AddSecuredPartiesAndDebtors as any), {
     localVue,
     propsData: {
       appReady: true,
@@ -66,8 +68,8 @@ describe('Add Parties new registration component', () => {
   sessionStorage.setItem('AUTH_API_URL', 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/')
 
   beforeEach(async () => {
-    await store.dispatch('setRegistrationType', null)
-    await store.dispatch('setRegistrationFlowType', null)
+    await store.setRegistrationType(null)
+    await store.setRegistrationFlowType(null)
   })
 
   afterEach(() => {
@@ -80,8 +82,8 @@ describe('Add Parties new registration component', () => {
   })
 
   it('renders Add Parties View with child components when store is set', async () => {
-    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement())
-    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.NEW)
+    await store.setRegistrationType(mockedSelectSecurityAgreement())
+    await store.setRegistrationFlowType(RegistrationFlowType.NEW)
     wrapper = createComponent()
     await flushPromises()
     expect(wrapper.vm.$route.name).toBe(RouteNames.ADD_SECUREDPARTIES_AND_DEBTORS)
@@ -112,8 +114,8 @@ describe('Add Parties new registration component', () => {
   })
 
   it('updates fee summary with registration length changes', async () => {
-    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement())
-    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.NEW)
+    await store.setRegistrationType(mockedSelectSecurityAgreement())
+    await store.setRegistrationFlowType(RegistrationFlowType.NEW)
     wrapper = createComponent()
     await flushPromises()
     expect(wrapper.findComponent(StickyContainer).vm.$props.setRegistrationLength).toEqual({
@@ -126,7 +128,7 @@ describe('Add Parties new registration component', () => {
       lifeInfinite: true,
       lifeYears: 0
     }
-    await store.dispatch('setLengthTrust', newLengthTrust1)
+    await store.setLengthTrust(newLengthTrust1)
     expect(wrapper.findComponent(StickyContainer).vm.$props.setRegistrationLength).toEqual({
       lifeInfinite: newLengthTrust1.lifeInfinite,
       lifeYears: newLengthTrust1.lifeYears
@@ -137,7 +139,7 @@ describe('Add Parties new registration component', () => {
       lifeInfinite: true,
       lifeYears: 0
     }
-    await store.dispatch('setLengthTrust', newLengthTrust2)
+    await store.setLengthTrust(newLengthTrust2)
     expect(wrapper.findComponent(StickyContainer).vm.$props.setRegistrationLength).toEqual({
       lifeInfinite: newLengthTrust2.lifeInfinite,
       lifeYears: newLengthTrust2.lifeYears
@@ -145,7 +147,6 @@ describe('Add Parties new registration component', () => {
   })
 
   it('displays correct info based on registration type', async () => {
-    jest.setTimeout(50000)
     for (let i = 0; i < RegistrationTypes.length; i++) {
       // skip dividers + other
       if (
@@ -154,8 +155,8 @@ describe('Add Parties new registration component', () => {
       ) {
         continue
       }
-      await store.dispatch('setRegistrationType', RegistrationTypes[i])
-      await store.dispatch('setRegistrationFlowType', RegistrationFlowType.NEW)
+      await store.setRegistrationType(RegistrationTypes[i])
+      await store.setRegistrationFlowType(RegistrationFlowType.NEW)
       wrapper = createComponent()
       await flushPromises()
       expect(wrapper.findComponent(StickyContainer).vm.$props.setRegistrationType).toBe(

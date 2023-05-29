@@ -74,7 +74,7 @@
 <script lang="ts">
 import { BaseAddress } from '@/composables/address'
 import { PartyAddressSchema } from '@/schemas'
-import { defineComponent } from '@vue/composition-api'
+import { defineComponent } from 'vue-demi'
 import { toDisplayPhone } from '@/utils'
 import { AccountInfoIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 

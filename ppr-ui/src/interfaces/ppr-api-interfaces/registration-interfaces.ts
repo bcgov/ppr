@@ -120,6 +120,7 @@ export interface RegistrationSummaryIF {
   clientReferenceId?: string // AKA folio max length 20.
   changes?: (RegistrationSummaryIF | DraftResultIF) []
   createDateTime?: string // Included in a successful response.
+  documentId?: string
   error?: ErrorIF
   expand?: boolean // used in UI table to toggle expansion.
   expireDays?: number // Number of days until expiry

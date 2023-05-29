@@ -54,7 +54,7 @@ export interface StateModelIF {
     lengthTrust: LengthTrustIF
     parties: AddPartiesIF
     registrationNumber: string
-    registrationType: RegistrationTypeIF
+    registrationType: RegistrationTypeIF | null
     registrationTypeOtherDesc: string
     showStepErrors: boolean
   }
@@ -62,7 +62,7 @@ export interface StateModelIF {
   search: {
     searchDebtorName: IndividualNameIF
     searchHistory: Array<SearchResponseIF>
-    searchHistoryLength: Number
+    searchHistoryLength: number
     searchResults: SearchResponseIF
     manufacturedHomeSearchResults: ManufacturedHomeSearchResponseIF
     searchedType: SearchTypeIF
@@ -74,7 +74,7 @@ export interface StateModelIF {
   isStaffClientPayment: boolean
   staffPayment: StaffPaymentIF
   unsavedChanges: boolean // used for cancel flows
-  currentRegistrationsTab: Number
+  currentRegistrationsTab: number
   userInfo: UserInfoIF
   mhrInformation: MhRegistrationSummaryIF
   mhrRegistration: MhrRegistrationIF

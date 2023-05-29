@@ -1,8 +1,9 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
 import VueRouter from 'vue-router'
-import { getVuexStore } from '@/store'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
 import { shallowMount, createLocalVue } from '@vue/test-utils'
 import sinon from 'sinon'
 import { axios } from '@/utils/axios-ppr'
@@ -31,7 +32,8 @@ import { RegisteringPartyChange } from '@/components/parties/party'
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 // Prevent the warning "[Vuetify] Unable to locate target [data-app]"
 document.body.setAttribute('data-app', 'true')
@@ -47,7 +49,7 @@ describe('Confirm Renewal new registration component', () => {
     delete window.location
     window.location = { assign: jest.fn() } as any
     // store setup
-    await store.dispatch('setRegistrationConfirmDebtorName', mockedDebtorNames[0])
+    await store.setRegistrationConfirmDebtorName(mockedDebtorNames[0])
     // stub api call
     sandbox = sinon.createSandbox()
     const get = sandbox.stub(axios, 'get')
@@ -68,7 +70,7 @@ describe('Confirm Renewal new registration component', () => {
       name: RouteNames.CONFIRM_RENEWAL,
       query: { 'reg-num': '123456B' }
     })
-    wrapper = shallowMount(ConfirmRenewal, { localVue, store, router, vuetify })
+    wrapper = shallowMount((ConfirmRenewal as any), { localVue, store, router, vuetify })
     wrapper.setProps({ appReady: true })
     await flushPromises()
   })
@@ -83,7 +85,7 @@ describe('Confirm Renewal new registration component', () => {
     expect(wrapper.vm.$route.name).toBe(RouteNames.CONFIRM_RENEWAL)
     expect(wrapper.vm.appReady).toBe(true)
     expect(wrapper.vm.dataLoaded).toBe(true)
-    const state = wrapper.vm.$store.state.stateModel as StateModelIF
+    const state = store.getStateModel as StateModelIF
 
     expect(wrapper.findComponent(ConfirmRenewal).exists()).toBe(true)
     expect(wrapper.findComponent(FolioNumberSummary).exists()).toBe(true)
@@ -116,7 +118,7 @@ describe('Confirm Renewal new registration component', () => {
 
   it('processes cancel button action', async () => {
     // setup
-    await wrapper.vm.$store.dispatch('setUnsavedChanges', true)
+    await store.setUnsavedChanges(true)
     // dialog doesn't start visible
     expect(wrapper.findComponent(BaseDialog).vm.$props.setDisplay).toBe(false)
     // pressing cancel triggers dialog
@@ -135,25 +137,25 @@ describe('Confirm Renewal new registration component', () => {
 
   it('allows submit of renewal', async () => {
     // Set up for valid discharge request
-    await store.dispatch('setRegistrationNumber', '023001B')
-    await store.dispatch('setFolioOrReferenceNumber', 'A-00000402')
-    await store.dispatch('setRegistrationConfirmDebtorName', mockedDebtorNames[0])
-    const state = wrapper.vm.$store.state.stateModel as StateModelIF
+    await store.setRegistrationNumber('023001B')
+    await store.setFolioOrReferenceNumber('A-00000402')
+    await store.setRegistrationConfirmDebtorName(mockedDebtorNames[0])
+    const state = store.getStateModel as StateModelIF
     const parties = state.registration.parties
     parties.registeringParty = mockedPartyCodeSearchResults[0]
-    await store.dispatch('setAddSecuredPartiesAndDebtors', parties)
+    await store.setAddSecuredPartiesAndDebtors(parties)
 
     await wrapper.findComponent(CertifyInformation).vm.$emit('certifyValid', true)
-    await Vue.nextTick()
+    await nextTick()
     await wrapper.findComponent(StickyContainer).vm.$emit('submit', true)
-    await Vue.nextTick()
+    await nextTick()
     await flushPromises()
     expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)
     // new renew registration is in store regTableData
-    expect(wrapper.vm.$store.state.stateModel.registrationTable.newItem.addedReg).toBe(
+    expect(store.getStateModel.registrationTable.newItem.addedReg).toBe(
       mockedRenewalResponse.renewalRegistrationNumber
     )
-    expect(wrapper.vm.$store.state.stateModel.registrationTable.newItem.addedRegParent).toBe(
+    expect(store.getStateModel.registrationTable.newItem.addedRegParent).toBe(
       mockedRenewalResponse.baseRegistrationNumber
     )
   })
@@ -170,7 +172,7 @@ describe('Confirm Renewal new RL registration component', () => {
     delete window.location
     window.location = { assign: jest.fn() } as any
     // store setup
-    await store.dispatch('setRegistrationConfirmDebtorName', mockedDebtorNames[0])
+    await store.setRegistrationConfirmDebtorName(mockedDebtorNames[0])
     // stub api call
     sandbox = sinon.createSandbox()
     const get = sandbox.stub(axios, 'get')
@@ -191,7 +193,7 @@ describe('Confirm Renewal new RL registration component', () => {
       name: RouteNames.CONFIRM_RENEWAL,
       query: { 'reg-num': '123456B' }
     })
-    wrapper = shallowMount(ConfirmRenewal, { localVue, store, router, vuetify })
+    wrapper = shallowMount((ConfirmRenewal as any), { localVue, store, router, vuetify })
     wrapper.setProps({ appReady: true })
     await flushPromises()
   })

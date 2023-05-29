@@ -20,7 +20,7 @@
             </v-col>
           </v-row>
           <v-row no-gutters>
-            <search-bar
+            <SearchBar
               class="soft-corners-bottom"
               :isNonBillable="isNonBillable"
               :serviceFee="getUserServiceFee"
@@ -80,8 +80,10 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, reactive, toRefs, watch } from '@vue/composition-api'
-import { useActions, useGetters } from 'vuex-composition-helpers'
+import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue-demi'
+import { useRouter } from 'vue2-helpers/vue-router'
+import { useStore } from '@/store/store'
+import { storeToRefs } from 'pinia'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { ProductCode, RouteNames } from '@/enums'
 import {
@@ -129,7 +131,20 @@ export default defineComponent({
     }
   },
   setup (props, context) {
+    const router = useRouter()
     const {
+      // Actions
+      setSearchHistory,
+      setSearchResults,
+      setSearchedType,
+      setSearchedValue,
+      setSearchDebtorName,
+      setRegistrationType,
+      resetNewRegistration,
+      setManufacturedHomeSearchResults
+    } = useStore()
+    const {
+      // Getters
       isRoleStaff,
       hasMhrRole,
       hasPprRole,
@@ -142,39 +157,7 @@ export default defineComponent({
       getSearchHistoryLength,
       isRoleQualifiedSupplier,
       getUserProductSubscriptionsCodes
-    } = useGetters([
-      'isRoleStaff',
-      'hasMhrRole',
-      'hasPprRole',
-      'isNonBillable',
-      'hasMhrEnabled',
-      'isRoleStaffBcol',
-      'isRoleStaffReg',
-      'getSearchHistory',
-      'getUserServiceFee',
-      'getSearchHistoryLength',
-      'isRoleQualifiedSupplier',
-      'getUserProductSubscriptionsCodes'
-    ])
-    const {
-      setSearchHistory,
-      setSearchResults,
-      setSearchedType,
-      setSearchedValue,
-      setSearchDebtorName,
-      setRegistrationType,
-      resetNewRegistration,
-      setManufacturedHomeSearchResults
-    } = useActions([
-      'setSearchHistory',
-      'setSearchResults',
-      'setSearchedType',
-      'setSearchedValue',
-      'setSearchDebtorName',
-      'setRegistrationType',
-      'resetNewRegistration',
-      'setManufacturedHomeSearchResults'
-    ])
+    } = storeToRefs(useStore())
 
     const localState = reactive({
       loading: false,
@@ -189,7 +172,7 @@ export default defineComponent({
         return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
       }),
       searchHistoryLength: computed((): number => {
-        return getSearchHistory.value?.length || 0
+        return (getSearchHistory.value as SearchResponseIF[])?.length || 0
       }),
       hasPPR: computed((): boolean => {
         // For Staff, we check roles, for Client we check Products
@@ -237,12 +220,12 @@ export default defineComponent({
       if (results) {
         if (localState.isMHRSearchType(results.searchQuery.type)) {
           setManufacturedHomeSearchResults(results)
-          context.root.$router.replace({
+          router.replace({
             name: RouteNames.MHRSEARCH
           })
         } else {
           setSearchResults(results)
-          context.root.$router.replace({
+          router.replace({
             name: RouteNames.SEARCH
           })
         }
@@ -267,7 +250,7 @@ export default defineComponent({
         return
       }
       emitHaveData(false)
-      resetNewRegistration(null) // Clear store data from any previous registration.
+      resetNewRegistration() // Clear store data from any previous registration.
       await retrieveSearchHistory()
 
       // tell App that we're finished loading

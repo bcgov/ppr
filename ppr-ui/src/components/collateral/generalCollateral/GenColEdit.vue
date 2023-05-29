@@ -43,8 +43,8 @@ import {
   watch,
   onMounted,
   computed
-} from '@vue/composition-api'
-import { useGetters, useActions } from 'vuex-composition-helpers'
+} from 'vue-demi'
+import { useStore } from '@/store/store'
 // local
 import { RegistrationFlowType } from '@/enums' // eslint-disable-line no-unused-vars
 import { GeneralCollateralIF } from '@/interfaces' // eslint-disable-line no-unused-vars
@@ -68,6 +68,7 @@ import {
   TableHeader,
   TableRow
 } from 'tiptap-vuetify'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'GenColEdit',
@@ -81,11 +82,8 @@ export default defineComponent({
     }
   },
   setup (props) {
-    const { getGeneralCollateral } = useGetters<any>(['getGeneralCollateral'])
-    const { getRegistrationFlowType } = useGetters<any>([
-      'getRegistrationFlowType'
-    ])
-    const { setGeneralCollateral } = useActions<any>(['setGeneralCollateral'])
+    const { setGeneralCollateral } = useStore()
+    const { getGeneralCollateral, getRegistrationFlowType } = storeToRefs(useStore())
     const extensions = [
       History,
       Blockquote,

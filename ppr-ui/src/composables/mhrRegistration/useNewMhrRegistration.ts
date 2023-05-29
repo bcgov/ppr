@@ -1,4 +1,5 @@
-import { useActions, useGetters } from 'vuex-composition-helpers'
+import { useStore } from '@/store/store'
+import { storeToRefs } from 'pinia'
 import {
   MhrRegistrationDescriptionIF,
   MhrRegistrationHomeLocationIF,
@@ -11,13 +12,26 @@ import {
   MhrDraftIF
 } from '@/interfaces'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
-import { APIMhrTypes, APIStatusTypes, HomeTenancyTypes, HomeLocationTypes, MhApiStatusTypes } from '@/enums'
+import { APIMhrTypes, HomeTenancyTypes, HomeLocationTypes, MhApiStatusTypes } from '@/enums'
 import { createMhrDraft, getMhrDrafts, mhrRegistrationHistory, updateMhrDraft } from '@/utils'
 import { orderBy } from 'lodash'
 import { useHomeOwners } from '@/composables'
 
 export const useNewMhrRegistration = () => {
   const {
+    // Actions
+    setMhrLocation,
+    setMhrDraftNumber,
+    setMhrTableHistory,
+    setMhrHomeDescription,
+    setMhrAttentionReferenceNum,
+    setMhrRegistrationDocumentId,
+    setMhrRegistrationSubmittingParty,
+    setMhrRegistrationHomeOwnerGroups,
+    setMhrRegistrationOwnLand
+  } = useStore()
+  const {
+    // Getters
     isRoleStaffReg,
     getMhrRegistrationHomeDescription,
     getMhrRegistrationSubmittingParty,
@@ -28,41 +42,7 @@ export const useNewMhrRegistration = () => {
     getMhrRegistrationOwnLand,
     getStaffPayment,
     getMhrDraftNumber
-  } = useGetters<any>([
-    'isRoleStaffReg',
-    'getMhrRegistrationHomeDescription',
-    'getMhrRegistrationSubmittingParty',
-    'getMhrRegistrationDocumentId',
-    'getMhrAttentionReferenceNum',
-    'getMhrRegistrationLocation',
-    'getMhrRegistrationHomeOwnerGroups',
-    'getMhrRegistrationOwnLand',
-    'getCertifyInformation',
-    'getStaffPayment',
-    'getMhrDraftNumber'
-  ])
-  const {
-    setMhrLocation,
-    setMhrDraftNumber,
-    setMhrTableHistory,
-    setMhrHomeDescription,
-    setMhrAttentionReferenceNum,
-    setMhrRegistrationDocumentId,
-    setMhrRegistrationOwnLand,
-    setMhrRegistrationSubmittingParty,
-    setMhrRegistrationHomeOwnerGroups
-  } = useActions<any>([
-    'setMhrLocation',
-    'setMhrDraftNumber',
-    'setMhrTableHistory',
-    'setMhrHomeDescription',
-    'setMhrAttentionReferenceNum',
-    'setMhrRegistrationDocumentId',
-    'setMhrRegistrationOwnLand',
-    'setMhrRegistrationSubmittingParty',
-    'setMhrRegistrationHomeOwnerGroups'
-  ])
-
+  } = storeToRefs(useStore())
   const {
     setShowGroups,
     getHomeTenancyType

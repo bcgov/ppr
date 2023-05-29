@@ -1,9 +1,10 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
 import VueRouter from 'vue-router'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
 import flushPromises from 'flush-promises'
-import { getVuexStore } from '@/store'
 import { shallowMount, createLocalVue } from '@vue/test-utils'
 import sinon from 'sinon'
 import { StatusCodes } from 'http-status-codes'
@@ -26,9 +27,10 @@ import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { AccountProductCodes, AccountProductMemberships } from '@/enums'
 
 Vue.use(Vuetify)
-
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+
+setActivePinia(createPinia())
+const store = useStore()
 
 // Prevent the warning "[Vuetify] Unable to locate target [data-app]"
 document.body.setAttribute('data-app', 'true')
@@ -94,7 +96,7 @@ describe('App component basic rendering normal account', () => {
     localVue.use(VueRouter)
     const router = mockRouter.mock()
     router.push({ name: 'dashboard' })
-    wrapper = shallowMount(App, { localVue, store, router, vuetify, stubs: { Affix: true } })
+    wrapper = shallowMount((App as any), { localVue, store, router, vuetify, stubs: { Affix: true } })
 
     // wait for all queries to complete
     await flushPromises()
@@ -115,15 +117,15 @@ describe('App component basic rendering normal account', () => {
   })
 
   it('gets auth and user info/settings properly', async () => {
-    expect(wrapper.vm.$store.state.stateModel.authorization.authRoles).toContain('ppr')
-    await Vue.nextTick()
-    expect(wrapper.vm.$store.state.stateModel.userInfo).not.toBeNull()
-    expect(wrapper.vm.$store.state.stateModel.userInfo.firstname).toBe('first')
-    expect(wrapper.vm.$store.state.stateModel.userInfo.lastname).toBe('last')
-    expect(wrapper.vm.$store.state.stateModel.userInfo.username).toBe('username')
-    expect(wrapper.vm.$store.state.stateModel.userInfo.settings.paymentConfirmationDialog).toBe(false)
-    expect(wrapper.vm.$store.state.stateModel.userInfo.settings.selectConfirmationDialog).toBe(false)
-    expect(wrapper.vm.$store.state.stateModel.userInfo.feeSettings).toBeNull()
+    expect(store.getStateModel.authorization.authRoles).toContain('ppr')
+    await nextTick()
+    expect(store.getStateModel.userInfo).not.toBeNull()
+    expect(store.getStateModel.userInfo.firstname).toBe('first')
+    expect(store.getStateModel.userInfo.lastname).toBe('last')
+    expect(store.getStateModel.userInfo.username).toBe('username')
+    expect(store.getStateModel.userInfo.settings.paymentConfirmationDialog).toBe(false)
+    expect(store.getStateModel.userInfo.settings.selectConfirmationDialog).toBe(false)
+    expect(store.getStateModel.userInfo.feeSettings).toBeNull()
     // verify no redirection
     expect(window.location.assign).not.toHaveBeenCalled()
   })
@@ -188,7 +190,7 @@ describe('App component basic rendering non billable account', () => {
     localVue.use(VueRouter)
     const router = mockRouter.mock()
     router.push({ name: 'dashboard' })
-    wrapper = shallowMount(App, { localVue, store, router, vuetify, stubs: { Affix: true } })
+    wrapper = shallowMount((App as any), { localVue, store, router, vuetify, stubs: { Affix: true } })
 
     // wait for all queries to complete
     await flushPromises()
@@ -201,7 +203,7 @@ describe('App component basic rendering non billable account', () => {
   })
 
   it('fee settings are set to expected values', async () => {
-    expect(wrapper.vm.$store.state.stateModel.userInfo.feeSettings.isNonBillable).toBe(true)
-    expect(wrapper.vm.$store.state.stateModel.userInfo.feeSettings.serviceFee).toBe(1)
+    expect(store.getStateModel.userInfo.feeSettings.isNonBillable).toBe(true)
+    expect(store.getStateModel.userInfo.feeSettings.serviceFee).toBe(1)
   })
 })

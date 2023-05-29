@@ -2,7 +2,7 @@
  * Delete this if we decide not to move forward with vuelidate
  * Fix it to work otherwise
  */
-import { computed, Ref, reactive } from '@vue/composition-api'
+import { computed, Ref, reactive } from 'vue-demi'
 
 import { AddressIF, SchemaIF } from '@/composables/address/interfaces'
 

@@ -126,7 +126,7 @@
                   >
                     <v-text-field
                       v-if="header.value === 'createDateTime'"
-                      :id="$style['reg-textfield']"
+                      id="reg-textfield"
                       class="reg-textfield date-filter"
                       :class="{ 'active': dateTxt === 'Custom' }"
                       append-icon="mdi-calendar"
@@ -197,7 +197,7 @@
                   />
                   <v-btn
                     v-if="header.value === 'actions' && headers.length > 1 && tableFiltersActive"
-                    :class="[$style['clear-filters-btn'], 'registration-action', 'ma-0', 'px-0', 'pl-6', 'pt-4']"
+                    class="clear-filters-btn registration-action ma-0 px-0 pl-6 pt-4"
                     color="primary"
                     :ripple="false"
                     text
@@ -238,7 +238,7 @@
         </thead>
       </template>
       <template v-slot:item="{ expand, item, isExpanded }">
-        <table-row
+        <TableRow
           class="registration-data-table"
           :ref="setRowRef(item)"
           :setAddRegEffect="['newRegItem', 'newAndFirstItem'].includes(setRowRef(item))"
@@ -254,7 +254,7 @@
         />
       </template>
       <template v-slot:expanded-item="{ item }">
-        <table-row
+        <TableRow
           v-for="change in item.changes"
           class="registration-data-table"
           :key="`change-${change.documentId || change.registrationNumber}`"
@@ -290,15 +290,13 @@ import {
   ref,
   toRefs,
   watch
-} from '@vue/composition-api'
-import { useGetters } from 'vuex-composition-helpers'
+} from 'vue-demi'
+import { useStore } from '@/store/store'
 import flushPromises from 'flush-promises'
 import _ from 'lodash'
-// local components
 import { DatePicker } from '@/components/common'
 import RegistrationBarTypeAheadList from '@/components/registration/RegistrationBarTypeAheadList.vue'
 import { TableObserver, TableRow } from './common'
-// local types/helpers/etc.
 /* eslint-disable no-unused-vars */
 import {
   RegistrationSummaryIF,
@@ -320,6 +318,7 @@ import {
 } from '@/enums'
 import { useRegistration } from '@/composables/useRegistration'
 import { MHRegistrationTypes, RegistrationTypesStandard, StatusTypes, MhStatusTypes } from '@/resources'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   components: {
@@ -401,9 +400,7 @@ export default defineComponent({
       clientReferenceId: 7
     }
     // getters
-    const { getAccountProductSubscriptions } = useGetters<any>([
-      'getAccountProductSubscriptions'
-    ])
+    const { getAccountProductSubscriptions } = storeToRefs(useStore())
     // helpers
     const {
       // filters
@@ -455,14 +452,9 @@ export default defineComponent({
       registrationHistory: computed(() => { return props.setRegistrationHistory }),
       search: computed(() => { return props.setSearch }),
       tableFiltersActive: computed((): boolean => {
-        if (
-          dateTxt.value || registrationNumber.value || registrationType.value ||
+        return !!(dateTxt.value || registrationNumber.value || registrationType.value ||
           status.value || registeredBy.value || registeringParty.value ||
-          securedParties.value || folioNumber.value
-        ) {
-          return true
-        }
-        return false
+          securedParties.value || folioNumber.value)
       }),
       tableHeadersWidth: computed(() => {
         const width = tableHeaderRef?.value?.clientWidth || 0
@@ -742,7 +734,7 @@ export default defineComponent({
 })
 </script>
 
-<style lang="scss" module>
+<style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
 #reg-textfield {
   cursor: pointer !important;

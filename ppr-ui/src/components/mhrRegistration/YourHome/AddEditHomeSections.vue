@@ -119,9 +119,9 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs } from '@vue/composition-api'
+import { computed, defineComponent, reactive, ref, toRefs } from 'vue-demi'
 /* eslint-disable no-unused-vars */
-import { HomeSectionIF } from '@/interfaces'
+import { FormIF, HomeSectionIF } from '@/interfaces'
 import { useInputRules } from '@/composables/useInputRules'
 /* eslint-disable no-unused-vars */
 
@@ -140,6 +140,7 @@ export default defineComponent({
       maxLength,
       required
     } = useInputRules()
+    const addEditHomeSectionsForm = ref(null) as FormIF
 
     const localState = reactive({
       addEditValid: false,
@@ -171,10 +172,9 @@ export default defineComponent({
 
     const close = (): void => { context.emit('close') }
     const remove = (): void => { context.emit('remove') }
-    const submit = async (): Promise<void> => {
+    const submit = (): void => {
       localState.hasSubmit = true
-      // @ts-ignore - function exists
-      await context.refs.addEditHomeSectionsForm.validate()
+      addEditHomeSectionsForm.value?.validate()
 
       if (localState.addEditValid) {
         context.emit('submit', {

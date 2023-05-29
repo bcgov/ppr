@@ -1,6 +1,6 @@
-import { reactive, toRefs } from '@vue/composition-api'
+import { reactive, toRefs } from 'vue-demi'
 import { PartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
-import { useGetters, useActions } from 'vuex-composition-helpers'
+import { useStore } from '@/store/store'
 import { Months } from '@/resources/months'
 import { PartyAddressSchema } from '@/schemas'
 import { useParty } from '@/composables/useParty'
@@ -8,6 +8,7 @@ import { ActionTypes, RegistrationFlowType } from '@/enums'
 import { checkAddress, formatAddress } from '@/composables/address/factories/address-factory'
 import { cloneDeep, isEqual } from 'lodash'
 import { localTodayDate } from '@/utils/date-helper'
+import { storeToRefs } from 'pinia'
 
 const initPerson = { first: '', middle: '', last: '' }
 const initAddress = {
@@ -22,12 +23,8 @@ const initAddress = {
 const { getDay, getMonth, getMonthFull, getYear } = useParty()
 
 export const useDebtor = (props, context) => {
-  const { setAddSecuredPartiesAndDebtors } = useActions<any>([
-    'setAddSecuredPartiesAndDebtors'
-  ])
-  const { getAddSecuredPartiesAndDebtors, getRegistrationFlowType } = useGetters<any>([
-    'getAddSecuredPartiesAndDebtors', 'getRegistrationFlowType'
-  ])
+  const { setAddSecuredPartiesAndDebtors } = useStore()
+  const { getAddSecuredPartiesAndDebtors, getRegistrationFlowType } = storeToRefs(useStore())
   const localState = reactive({
     addressSchema: { ...PartyAddressSchema },
     currentDebtor: {

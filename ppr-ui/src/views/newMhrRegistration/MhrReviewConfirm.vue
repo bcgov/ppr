@@ -52,7 +52,8 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
+import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
+import { useStore } from '@/store/store'
 import { StaffPayment } from '@bcrs-shared-components/staff-payment'
 import {
   HomeLocationReview,
@@ -63,11 +64,12 @@ import {
 import { CertifyInformation } from '@/components/common'
 import { useMhrValidations } from '@/composables'
 import { RouteNames } from '@/enums'
-import { useActions, useGetters } from 'vuex-composition-helpers'
 /* eslint-disable no-unused-vars */
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 import { StaffPaymentOptions } from '@bcrs-shared-components/enums'
 import { useHomeOwners } from '@/composables/mhrRegistration'
+import { useRoute } from 'vue-router/composables'
+import { storeToRefs } from 'pinia'
 /* eslint-enable no-unused-vars */
 
 /* eslint-disable */
@@ -81,14 +83,10 @@ export default defineComponent({
     CertifyInformation,
     StaffPayment
   },
-  props: {},
-  setup (props, context) {
-    const { getMhrRegistrationValidationModel, isRoleStaffReg } = useGetters<any>([
-      'isRoleStaffReg', 'getMhrRegistrationValidationModel'
-    ])
-
-    const { setStaffPayment } = useActions<any>(['setStaffPayment'])
-
+  setup () {
+    const { setStaffPayment } = useStore()
+    const { getMhrRegistrationValidationModel, isRoleStaffReg } = storeToRefs(useStore())
+    const route = useRoute()
     const {
       MhrCompVal,
       MhrSectVal,
@@ -99,6 +97,7 @@ export default defineComponent({
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
     const{
+      setShowGroups,
       isGlobalEditingMode
     } = useHomeOwners()
 
@@ -201,7 +200,7 @@ export default defineComponent({
       }
     )
 
-    watch(() => context.root.$route.name, (route: string) => {
+    watch(() => route.name, (route: string) => {
       switch (route) {
         case RouteNames.YOUR_HOME:
           scrollToInvalid(MhrSectVal.YOUR_HOME_VALID, 'mhr-describe-your-home')
@@ -234,6 +233,7 @@ export default defineComponent({
     })
 
     return {
+      setShowGroups,
       isRoleStaffReg,
       onStaffPaymentDataUpdate,
       ...toRefs(localState)

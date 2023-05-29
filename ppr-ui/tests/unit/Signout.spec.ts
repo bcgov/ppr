@@ -1,9 +1,11 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
 import VueRouter from 'vue-router'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
 import flushPromises from 'flush-promises'
-import { getVuexStore } from '@/store'
+
 import { mount, createLocalVue } from '@vue/test-utils'
 
 // Components
@@ -13,7 +15,8 @@ import { Signout } from '@/views'
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 // Prevent the warning "[Vuetify] Unable to locate target [data-app]"
 document.body.setAttribute('data-app', 'true')

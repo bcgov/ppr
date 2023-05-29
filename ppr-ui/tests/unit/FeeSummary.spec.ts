@@ -1,8 +1,9 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { getVuexStore } from '@/store'
-import CompositionApi from '@vue/composition-api'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
+
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 
 // Components
@@ -16,7 +17,8 @@ import { StaffPaymentIF } from '@bcrs-shared-components/interfaces' // eslint-di
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 const newRegStandard = [
   UIRegistrationTypes.SECURITY_AGREEMENT,
@@ -79,10 +81,10 @@ function createComponent (
   feeOverride: FeeSummaryI = null
 ): Wrapper<any> {
   const localVue = createLocalVue()
-  localVue.use(CompositionApi)
+
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
-  return mount(FeeSummary, {
+  return mount((FeeSummary as any), {
     localVue,
     propsData: {
       setFeeType: feeType,
@@ -103,7 +105,7 @@ describe('FeeSummary component tests', () => {
     lifeYears: 0
   }
   beforeEach(async () => {
-    await store.dispatch('setLengthTrust', {
+    await store.setLengthTrust({
       valid: true,
       trustIndenture: false,
       lifeInfinite: false,
@@ -112,7 +114,7 @@ describe('FeeSummary component tests', () => {
       surrenderDate: '',
       lienAmount: ''
     })
-    await store.dispatch('setStaffPayment', { isPriority: false } as StaffPaymentIF)
+    await store.setStaffPayment({ isPriority: false } as StaffPaymentIF)
     // these props will be changed in each test
     wrapper = createComponent(
       FeeSummaryTypes.NEW,
@@ -133,72 +135,72 @@ describe('FeeSummary component tests', () => {
         setRegistrationType: newRegistrationTypes[i],
         setFeeOverride: null
       })
-      expect(wrapper.vm.$data.feeType).toBe(FeeSummaryTypes.NEW)
-      expect(wrapper.vm.$data.registrationLength).toEqual(registrationLength)
-      expect(wrapper.vm.$data.registrationType).toBe(newRegistrationTypes[i])
-      expect(wrapper.vm.$data.feeLabel).toBe(newRegistrationTypes[i])
+      expect(wrapper.vm.feeType).toBe(FeeSummaryTypes.NEW)
+      expect(wrapper.vm.registrationLength).toEqual(registrationLength)
+      expect(wrapper.vm.registrationType).toBe(newRegistrationTypes[i])
+      expect(wrapper.vm.feeLabel).toBe(newRegistrationTypes[i])
 
       const noFeeStandard = [UIRegistrationTypes.LAND_TAX_LIEN, UIRegistrationTypes.MANUFACTURED_HOME_LIEN]
       if ([...newRegMisc, ...noFeeStandard].includes(newRegistrationTypes[i])) {
-        expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(0)
-        expect(wrapper.vm.$data.feeSummary.quantity).toBe(1)
-        expect(wrapper.vm.$data.feeSummary.serviceFee).toBe(0)
-        expect(wrapper.vm.$data.totalFees).toBe(0)
-        expect(wrapper.vm.$data.totalAmount).toBe(0)
-        expect(wrapper.vm.$data.isComplete).toBe(true)
-        expect(wrapper.vm.$data.hintFee).toBe('Infinite Registration (default)')
+        expect(wrapper.vm.feeSummary.feeAmount).toBe(0)
+        expect(wrapper.vm.feeSummary.quantity).toBe(1)
+        expect(wrapper.vm.feeSummary.serviceFee).toBe(0)
+        expect(wrapper.vm.totalFees).toBe(0)
+        expect(wrapper.vm.totalAmount).toBe(0)
+        expect(wrapper.vm.isComplete).toBe(true)
+        expect(wrapper.vm.hintFee).toBe('Infinite Registration (default)')
         // check renders the same for non billable
         await wrapper.setProps({ setFeeOverride: { feeAmount: 0, serviceFee: 4 } })
-        expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(0)
-        expect(wrapper.vm.$data.feeSummary.quantity).toBe(1)
-        expect(wrapper.vm.$data.feeSummary.serviceFee).toBe(0)
-        expect(wrapper.vm.$data.totalFees).toBe(0)
-        expect(wrapper.vm.$data.totalAmount).toBe(0)
-        expect(wrapper.vm.$data.isComplete).toBe(true)
-        expect(wrapper.vm.$data.hintFee).toBe('Infinite Registration (default)')
+        expect(wrapper.vm.feeSummary.feeAmount).toBe(0)
+        expect(wrapper.vm.feeSummary.quantity).toBe(1)
+        expect(wrapper.vm.feeSummary.serviceFee).toBe(0)
+        expect(wrapper.vm.totalFees).toBe(0)
+        expect(wrapper.vm.totalAmount).toBe(0)
+        expect(wrapper.vm.isComplete).toBe(true)
+        expect(wrapper.vm.hintFee).toBe('Infinite Registration (default)')
       } else if (newRegistrationTypes[i] === UIRegistrationTypes.REPAIRERS_LIEN) {
-        expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(5)
-        expect(wrapper.vm.$data.feeSummary.quantity).toBe(1)
-        expect(wrapper.vm.$data.feeSummary.serviceFee).toBe(1.5)
-        expect(wrapper.vm.$data.totalFees).toBe(5)
-        expect(wrapper.vm.$data.totalAmount).toBe(6.5)
-        expect(wrapper.vm.$data.isComplete).toBe(true)
-        expect(wrapper.vm.$data.hintFee).toBe('180 Day Registration (default)')
+        expect(wrapper.vm.feeSummary.feeAmount).toBe(5)
+        expect(wrapper.vm.feeSummary.quantity).toBe(1)
+        expect(wrapper.vm.feeSummary.serviceFee).toBe(1.5)
+        expect(wrapper.vm.totalFees).toBe(5)
+        expect(wrapper.vm.totalAmount).toBe(6.5)
+        expect(wrapper.vm.isComplete).toBe(true)
+        expect(wrapper.vm.hintFee).toBe('180 Day Registration (default)')
         // check for non billable user
         await wrapper.setProps({ setFeeOverride: { feeAmount: 0, serviceFee: 4 } })
-        expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(0)
-        expect(wrapper.vm.$data.feeSummary.quantity).toBe(1)
-        expect(wrapper.vm.$data.feeSummary.serviceFee).toBe(4)
-        expect(wrapper.vm.$data.totalFees).toBe(0)
-        expect(wrapper.vm.$data.totalAmount).toBe(4)
-        expect(wrapper.vm.$data.isComplete).toBe(true)
-        expect(wrapper.vm.$data.hintFee).toBe('180 Day Registration (default)')
+        expect(wrapper.vm.feeSummary.feeAmount).toBe(0)
+        expect(wrapper.vm.feeSummary.quantity).toBe(1)
+        expect(wrapper.vm.feeSummary.serviceFee).toBe(4)
+        expect(wrapper.vm.totalFees).toBe(0)
+        expect(wrapper.vm.totalAmount).toBe(4)
+        expect(wrapper.vm.isComplete).toBe(true)
+        expect(wrapper.vm.hintFee).toBe('180 Day Registration (default)')
       } else if (newRegistrationTypes[i] === UIRegistrationTypes.MARRIAGE_MH) {
-        expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(10)
-        expect(wrapper.vm.$data.feeSummary.quantity).toBe(1)
-        expect(wrapper.vm.$data.feeSummary.serviceFee).toBe(1.5)
-        expect(wrapper.vm.$data.totalFees).toBe(10)
-        expect(wrapper.vm.$data.totalAmount).toBe(11.5)
-        expect(wrapper.vm.$data.isComplete).toBe(true)
-        expect(wrapper.vm.$data.hintFee).toBe('Infinite Registration (default)')
+        expect(wrapper.vm.feeSummary.feeAmount).toBe(10)
+        expect(wrapper.vm.feeSummary.quantity).toBe(1)
+        expect(wrapper.vm.feeSummary.serviceFee).toBe(1.5)
+        expect(wrapper.vm.totalFees).toBe(10)
+        expect(wrapper.vm.totalAmount).toBe(11.5)
+        expect(wrapper.vm.isComplete).toBe(true)
+        expect(wrapper.vm.hintFee).toBe('Infinite Registration (default)')
         // check for non billable user
         await wrapper.setProps({ setFeeOverride: { feeAmount: 0, serviceFee: 1 } })
-        expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(0)
-        expect(wrapper.vm.$data.feeSummary.quantity).toBe(1)
-        expect(wrapper.vm.$data.feeSummary.serviceFee).toBe(1)
-        expect(wrapper.vm.$data.totalFees).toBe(0)
-        expect(wrapper.vm.$data.totalAmount).toBe(1)
-        expect(wrapper.vm.$data.isComplete).toBe(true)
-        expect(wrapper.vm.$data.hintFee).toBe('Infinite Registration (default)')
+        expect(wrapper.vm.feeSummary.feeAmount).toBe(0)
+        expect(wrapper.vm.feeSummary.quantity).toBe(1)
+        expect(wrapper.vm.feeSummary.serviceFee).toBe(1)
+        expect(wrapper.vm.totalFees).toBe(0)
+        expect(wrapper.vm.totalAmount).toBe(1)
+        expect(wrapper.vm.isComplete).toBe(true)
+        expect(wrapper.vm.hintFee).toBe('Infinite Registration (default)')
       } else {
         // standard selectable years / selectable infinite
-        expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(5)
-        expect(wrapper.vm.$data.feeSummary.quantity).toBe(0)
-        expect(wrapper.vm.$data.feeSummary.serviceFee).toBe(1.5)
-        expect(wrapper.vm.$data.totalFees).toBe(0)
-        expect(wrapper.vm.$data.totalAmount).toBe(1.5)
-        expect(wrapper.vm.$data.isComplete).toBe(false)
-        expect(wrapper.vm.$data.hintFee).toBe('Select registration length')
+        expect(wrapper.vm.feeSummary.feeAmount).toBe(5)
+        expect(wrapper.vm.feeSummary.quantity).toBe(0)
+        expect(wrapper.vm.feeSummary.serviceFee).toBe(1.5)
+        expect(wrapper.vm.totalFees).toBe(0)
+        expect(wrapper.vm.totalAmount).toBe(1.5)
+        expect(wrapper.vm.isComplete).toBe(false)
+        expect(wrapper.vm.hintFee).toBe('Select registration length')
         // select infinite
         await wrapper.setProps({
           setRegistrationLength: {
@@ -206,13 +208,13 @@ describe('FeeSummary component tests', () => {
             lifeYears: 0
           }
         })
-        expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(500)
-        expect(wrapper.vm.$data.feeSummary.quantity).toBe(1)
-        expect(wrapper.vm.$data.feeSummary.serviceFee).toBe(1.5)
-        expect(wrapper.vm.$data.totalFees).toBe(500)
-        expect(wrapper.vm.$data.totalAmount).toBe(501.5)
-        expect(wrapper.vm.$data.isComplete).toBe(true)
-        expect(wrapper.vm.$data.hintFee).toBe('Infinite Registration')
+        expect(wrapper.vm.feeSummary.feeAmount).toBe(500)
+        expect(wrapper.vm.feeSummary.quantity).toBe(1)
+        expect(wrapper.vm.feeSummary.serviceFee).toBe(1.5)
+        expect(wrapper.vm.totalFees).toBe(500)
+        expect(wrapper.vm.totalAmount).toBe(501.5)
+        expect(wrapper.vm.isComplete).toBe(true)
+        expect(wrapper.vm.hintFee).toBe('Infinite Registration')
         // select 1 year
         await wrapper.setProps({
           setRegistrationLength: {
@@ -220,13 +222,13 @@ describe('FeeSummary component tests', () => {
             lifeYears: 1
           }
         })
-        expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(5)
-        expect(wrapper.vm.$data.feeSummary.quantity).toBe(1)
-        expect(wrapper.vm.$data.feeSummary.serviceFee).toBe(1.5)
-        expect(wrapper.vm.$data.totalFees).toBe(5)
-        expect(wrapper.vm.$data.totalAmount).toBe(6.5)
-        expect(wrapper.vm.$data.isComplete).toBe(true)
-        expect(wrapper.vm.$data.hintFee).toBe('1 Year @ $5.00/year')
+        expect(wrapper.vm.feeSummary.feeAmount).toBe(5)
+        expect(wrapper.vm.feeSummary.quantity).toBe(1)
+        expect(wrapper.vm.feeSummary.serviceFee).toBe(1.5)
+        expect(wrapper.vm.totalFees).toBe(5)
+        expect(wrapper.vm.totalAmount).toBe(6.5)
+        expect(wrapper.vm.isComplete).toBe(true)
+        expect(wrapper.vm.hintFee).toBe('1 Year @ $5.00/year')
         // select multiple years
         await wrapper.setProps({
           setRegistrationLength: {
@@ -234,13 +236,13 @@ describe('FeeSummary component tests', () => {
             lifeYears: 12
           }
         })
-        expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(5)
-        expect(wrapper.vm.$data.feeSummary.quantity).toBe(12)
-        expect(wrapper.vm.$data.feeSummary.serviceFee).toBe(1.5)
-        expect(wrapper.vm.$data.totalFees).toBe(60)
-        expect(wrapper.vm.$data.totalAmount).toBe(61.5)
-        expect(wrapper.vm.$data.isComplete).toBe(true)
-        expect(wrapper.vm.$data.hintFee).toBe('12 Years @ $5.00/year')
+        expect(wrapper.vm.feeSummary.feeAmount).toBe(5)
+        expect(wrapper.vm.feeSummary.quantity).toBe(12)
+        expect(wrapper.vm.feeSummary.serviceFee).toBe(1.5)
+        expect(wrapper.vm.totalFees).toBe(60)
+        expect(wrapper.vm.totalAmount).toBe(61.5)
+        expect(wrapper.vm.isComplete).toBe(true)
+        expect(wrapper.vm.hintFee).toBe('12 Years @ $5.00/year')
 
         // check for non billable user
         await wrapper.setProps({
@@ -249,13 +251,13 @@ describe('FeeSummary component tests', () => {
           setRegistrationType: newRegistrationTypes[i],
           setFeeOverride: { feeAmount: 0, serviceFee: 2.5 }
         })
-        expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(0)
-        expect(wrapper.vm.$data.feeSummary.quantity).toBe(0)
-        expect(wrapper.vm.$data.feeSummary.serviceFee).toBe(2.5)
-        expect(wrapper.vm.$data.totalFees).toBe(0)
-        expect(wrapper.vm.$data.totalAmount).toBe(2.5)
-        expect(wrapper.vm.$data.isComplete).toBe(false)
-        expect(wrapper.vm.$data.hintFee).toBe('Select registration length')
+        expect(wrapper.vm.feeSummary.feeAmount).toBe(0)
+        expect(wrapper.vm.feeSummary.quantity).toBe(0)
+        expect(wrapper.vm.feeSummary.serviceFee).toBe(2.5)
+        expect(wrapper.vm.totalFees).toBe(0)
+        expect(wrapper.vm.totalAmount).toBe(2.5)
+        expect(wrapper.vm.isComplete).toBe(false)
+        expect(wrapper.vm.hintFee).toBe('Select registration length')
         // select infinite
         await wrapper.setProps({
           setRegistrationLength: {
@@ -263,13 +265,13 @@ describe('FeeSummary component tests', () => {
             lifeYears: 0
           }
         })
-        expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(0)
-        expect(wrapper.vm.$data.feeSummary.quantity).toBe(1)
-        expect(wrapper.vm.$data.feeSummary.serviceFee).toBe(2.5)
-        expect(wrapper.vm.$data.totalFees).toBe(0)
-        expect(wrapper.vm.$data.totalAmount).toBe(2.5)
-        expect(wrapper.vm.$data.isComplete).toBe(true)
-        expect(wrapper.vm.$data.hintFee).toBe('Infinite Registration')
+        expect(wrapper.vm.feeSummary.feeAmount).toBe(0)
+        expect(wrapper.vm.feeSummary.quantity).toBe(1)
+        expect(wrapper.vm.feeSummary.serviceFee).toBe(2.5)
+        expect(wrapper.vm.totalFees).toBe(0)
+        expect(wrapper.vm.totalAmount).toBe(2.5)
+        expect(wrapper.vm.isComplete).toBe(true)
+        expect(wrapper.vm.hintFee).toBe('Infinite Registration')
         // select 1 year
         await wrapper.setProps({
           setRegistrationLength: {
@@ -277,13 +279,13 @@ describe('FeeSummary component tests', () => {
             lifeYears: 1
           }
         })
-        expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(0)
-        expect(wrapper.vm.$data.feeSummary.quantity).toBe(1)
-        expect(wrapper.vm.$data.feeSummary.serviceFee).toBe(2.5)
-        expect(wrapper.vm.$data.totalFees).toBe(0)
-        expect(wrapper.vm.$data.totalAmount).toBe(2.5)
-        expect(wrapper.vm.$data.isComplete).toBe(true)
-        expect(wrapper.vm.$data.hintFee).toBe('1 Year @ $0.00/year')
+        expect(wrapper.vm.feeSummary.feeAmount).toBe(0)
+        expect(wrapper.vm.feeSummary.quantity).toBe(1)
+        expect(wrapper.vm.feeSummary.serviceFee).toBe(2.5)
+        expect(wrapper.vm.totalFees).toBe(0)
+        expect(wrapper.vm.totalAmount).toBe(2.5)
+        expect(wrapper.vm.isComplete).toBe(true)
+        expect(wrapper.vm.hintFee).toBe('1 Year @ $0.00/year')
         // select multiple years
         await wrapper.setProps({
           setRegistrationLength: {
@@ -291,13 +293,13 @@ describe('FeeSummary component tests', () => {
             lifeYears: 5
           }
         })
-        expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(0)
-        expect(wrapper.vm.$data.feeSummary.quantity).toBe(5)
-        expect(wrapper.vm.$data.feeSummary.serviceFee).toBe(2.5)
-        expect(wrapper.vm.$data.totalFees).toBe(0)
-        expect(wrapper.vm.$data.totalAmount).toBe(2.5)
-        expect(wrapper.vm.$data.isComplete).toBe(true)
-        expect(wrapper.vm.$data.hintFee).toBe('5 Years @ $0.00/year')
+        expect(wrapper.vm.feeSummary.feeAmount).toBe(0)
+        expect(wrapper.vm.feeSummary.quantity).toBe(5)
+        expect(wrapper.vm.feeSummary.serviceFee).toBe(2.5)
+        expect(wrapper.vm.totalFees).toBe(0)
+        expect(wrapper.vm.totalAmount).toBe(2.5)
+        expect(wrapper.vm.isComplete).toBe(true)
+        expect(wrapper.vm.hintFee).toBe('5 Years @ $0.00/year')
       }
     }
   })
@@ -310,28 +312,28 @@ describe('FeeSummary component tests', () => {
         setRegistrationLength: null,
         setRegistrationType: newRegistrationTypes[i]
       })
-      expect(wrapper.vm.$data.feeType).toBe(FeeSummaryTypes.DISCHARGE)
-      expect(wrapper.vm.$data.registrationType).toBe(newRegistrationTypes[i])
-      expect(wrapper.vm.$data.feeLabel).toBe('Total Discharge')
-      expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(0)
-      expect(wrapper.vm.$data.feeSummary.quantity).toBe(1)
-      expect(wrapper.vm.$data.feeSummary.serviceFee).toBe(0)
-      expect(wrapper.vm.$data.totalFees).toBe(0)
-      expect(wrapper.vm.$data.totalAmount).toBe(0)
-      expect(wrapper.vm.$data.isComplete).toBe(true)
-      expect(wrapper.vm.$data.hintFee).toBe('')
+      expect(wrapper.vm.feeType).toBe(FeeSummaryTypes.DISCHARGE)
+      expect(wrapper.vm.registrationType).toBe(newRegistrationTypes[i])
+      expect(wrapper.vm.feeLabel).toBe('Total Discharge')
+      expect(wrapper.vm.feeSummary.feeAmount).toBe(0)
+      expect(wrapper.vm.feeSummary.quantity).toBe(1)
+      expect(wrapper.vm.feeSummary.serviceFee).toBe(0)
+      expect(wrapper.vm.totalFees).toBe(0)
+      expect(wrapper.vm.totalAmount).toBe(0)
+      expect(wrapper.vm.isComplete).toBe(true)
+      expect(wrapper.vm.hintFee).toBe('')
       // check renders the same for non billable
       await wrapper.setProps({ setFeeOverride: { feeAmount: 0, serviceFee: 1 } })
-      expect(wrapper.vm.$data.feeType).toBe(FeeSummaryTypes.DISCHARGE)
-      expect(wrapper.vm.$data.registrationType).toBe(newRegistrationTypes[i])
-      expect(wrapper.vm.$data.feeLabel).toBe('Total Discharge')
-      expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(0)
-      expect(wrapper.vm.$data.feeSummary.quantity).toBe(1)
-      expect(wrapper.vm.$data.feeSummary.serviceFee).toBe(0)
-      expect(wrapper.vm.$data.totalFees).toBe(0)
-      expect(wrapper.vm.$data.totalAmount).toBe(0)
-      expect(wrapper.vm.$data.isComplete).toBe(true)
-      expect(wrapper.vm.$data.hintFee).toBe('')
+      expect(wrapper.vm.feeType).toBe(FeeSummaryTypes.DISCHARGE)
+      expect(wrapper.vm.registrationType).toBe(newRegistrationTypes[i])
+      expect(wrapper.vm.feeLabel).toBe('Total Discharge')
+      expect(wrapper.vm.feeSummary.feeAmount).toBe(0)
+      expect(wrapper.vm.feeSummary.quantity).toBe(1)
+      expect(wrapper.vm.feeSummary.serviceFee).toBe(0)
+      expect(wrapper.vm.totalFees).toBe(0)
+      expect(wrapper.vm.totalAmount).toBe(0)
+      expect(wrapper.vm.isComplete).toBe(true)
+      expect(wrapper.vm.hintFee).toBe('')
     }
   })
 
@@ -344,37 +346,37 @@ describe('FeeSummary component tests', () => {
         setRegistrationType: renewRegistrationTypes[i],
         setFeeOverride: null
       })
-      expect(wrapper.vm.$data.feeType).toBe(FeeSummaryTypes.RENEW)
-      expect(wrapper.vm.$data.registrationLength).toEqual(registrationLength)
-      expect(wrapper.vm.$data.registrationType).toBe(renewRegistrationTypes[i])
-      expect(wrapper.vm.$data.feeLabel).toBe('Registration Renewal')
+      expect(wrapper.vm.feeType).toBe(FeeSummaryTypes.RENEW)
+      expect(wrapper.vm.registrationLength).toEqual(registrationLength)
+      expect(wrapper.vm.registrationType).toBe(renewRegistrationTypes[i])
+      expect(wrapper.vm.feeLabel).toBe('Registration Renewal')
 
       if (newRegistrationTypes[i] === UIRegistrationTypes.REPAIRERS_LIEN) {
-        expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(5)
-        expect(wrapper.vm.$data.feeSummary.quantity).toBe(1)
-        expect(wrapper.vm.$data.feeSummary.serviceFee).toBe(1.5)
-        expect(wrapper.vm.$data.totalFees).toBe(5)
-        expect(wrapper.vm.$data.totalAmount).toBe(6.5)
-        expect(wrapper.vm.$data.isComplete).toBe(true)
-        expect(wrapper.vm.$data.hintFee).toBe('180 Day Registration (default)')
+        expect(wrapper.vm.feeSummary.feeAmount).toBe(5)
+        expect(wrapper.vm.feeSummary.quantity).toBe(1)
+        expect(wrapper.vm.feeSummary.serviceFee).toBe(1.5)
+        expect(wrapper.vm.totalFees).toBe(5)
+        expect(wrapper.vm.totalAmount).toBe(6.5)
+        expect(wrapper.vm.isComplete).toBe(true)
+        expect(wrapper.vm.hintFee).toBe('180 Day Registration (default)')
         // check values for non billable
         await wrapper.setProps({ setFeeOverride: { feeAmount: 0, serviceFee: 1 } })
-        expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(0)
-        expect(wrapper.vm.$data.feeSummary.quantity).toBe(1)
-        expect(wrapper.vm.$data.feeSummary.serviceFee).toBe(1)
-        expect(wrapper.vm.$data.totalFees).toBe(0)
-        expect(wrapper.vm.$data.totalAmount).toBe(1)
-        expect(wrapper.vm.$data.isComplete).toBe(true)
-        expect(wrapper.vm.$data.hintFee).toBe('180 Day Registration (default)')
+        expect(wrapper.vm.feeSummary.feeAmount).toBe(0)
+        expect(wrapper.vm.feeSummary.quantity).toBe(1)
+        expect(wrapper.vm.feeSummary.serviceFee).toBe(1)
+        expect(wrapper.vm.totalFees).toBe(0)
+        expect(wrapper.vm.totalAmount).toBe(1)
+        expect(wrapper.vm.isComplete).toBe(true)
+        expect(wrapper.vm.hintFee).toBe('180 Day Registration (default)')
       } else {
         // standard selectable years / selectable infinite
-        expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(5)
-        expect(wrapper.vm.$data.feeSummary.quantity).toBe(0)
-        expect(wrapper.vm.$data.feeSummary.serviceFee).toBe(1.5)
-        expect(wrapper.vm.$data.totalFees).toBe(0)
-        expect(wrapper.vm.$data.totalAmount).toBe(1.5)
-        expect(wrapper.vm.$data.isComplete).toBe(false)
-        expect(wrapper.vm.$data.hintFee).toBe('Select registration renewal length')
+        expect(wrapper.vm.feeSummary.feeAmount).toBe(5)
+        expect(wrapper.vm.feeSummary.quantity).toBe(0)
+        expect(wrapper.vm.feeSummary.serviceFee).toBe(1.5)
+        expect(wrapper.vm.totalFees).toBe(0)
+        expect(wrapper.vm.totalAmount).toBe(1.5)
+        expect(wrapper.vm.isComplete).toBe(false)
+        expect(wrapper.vm.hintFee).toBe('Select registration renewal length')
         // select infinite
         await wrapper.setProps({
           setRegistrationLength: {
@@ -382,13 +384,13 @@ describe('FeeSummary component tests', () => {
             lifeYears: 0
           }
         })
-        expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(500)
-        expect(wrapper.vm.$data.feeSummary.quantity).toBe(1)
-        expect(wrapper.vm.$data.feeSummary.serviceFee).toBe(1.5)
-        expect(wrapper.vm.$data.totalFees).toBe(500)
-        expect(wrapper.vm.$data.totalAmount).toBe(501.5)
-        expect(wrapper.vm.$data.isComplete).toBe(true)
-        expect(wrapper.vm.$data.hintFee).toBe('Infinite Registration')
+        expect(wrapper.vm.feeSummary.feeAmount).toBe(500)
+        expect(wrapper.vm.feeSummary.quantity).toBe(1)
+        expect(wrapper.vm.feeSummary.serviceFee).toBe(1.5)
+        expect(wrapper.vm.totalFees).toBe(500)
+        expect(wrapper.vm.totalAmount).toBe(501.5)
+        expect(wrapper.vm.isComplete).toBe(true)
+        expect(wrapper.vm.hintFee).toBe('Infinite Registration')
         // select 1 year
         await wrapper.setProps({
           setRegistrationLength: {
@@ -396,13 +398,13 @@ describe('FeeSummary component tests', () => {
             lifeYears: 1
           }
         })
-        expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(5)
-        expect(wrapper.vm.$data.feeSummary.quantity).toBe(1)
-        expect(wrapper.vm.$data.feeSummary.serviceFee).toBe(1.5)
-        expect(wrapper.vm.$data.totalFees).toBe(5)
-        expect(wrapper.vm.$data.totalAmount).toBe(6.5)
-        expect(wrapper.vm.$data.isComplete).toBe(true)
-        expect(wrapper.vm.$data.hintFee).toBe('1 Year @ $5.00/year')
+        expect(wrapper.vm.feeSummary.feeAmount).toBe(5)
+        expect(wrapper.vm.feeSummary.quantity).toBe(1)
+        expect(wrapper.vm.feeSummary.serviceFee).toBe(1.5)
+        expect(wrapper.vm.totalFees).toBe(5)
+        expect(wrapper.vm.totalAmount).toBe(6.5)
+        expect(wrapper.vm.isComplete).toBe(true)
+        expect(wrapper.vm.hintFee).toBe('1 Year @ $5.00/year')
         // select multiple years
         await wrapper.setProps({
           setRegistrationLength: {
@@ -410,13 +412,13 @@ describe('FeeSummary component tests', () => {
             lifeYears: 12
           }
         })
-        expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(5)
-        expect(wrapper.vm.$data.feeSummary.quantity).toBe(12)
-        expect(wrapper.vm.$data.feeSummary.serviceFee).toBe(1.5)
-        expect(wrapper.vm.$data.totalFees).toBe(60)
-        expect(wrapper.vm.$data.totalAmount).toBe(61.5)
-        expect(wrapper.vm.$data.isComplete).toBe(true)
-        expect(wrapper.vm.$data.hintFee).toBe('12 Years @ $5.00/year')
+        expect(wrapper.vm.feeSummary.feeAmount).toBe(5)
+        expect(wrapper.vm.feeSummary.quantity).toBe(12)
+        expect(wrapper.vm.feeSummary.serviceFee).toBe(1.5)
+        expect(wrapper.vm.totalFees).toBe(60)
+        expect(wrapper.vm.totalAmount).toBe(61.5)
+        expect(wrapper.vm.isComplete).toBe(true)
+        expect(wrapper.vm.hintFee).toBe('12 Years @ $5.00/year')
 
         // check values for non billable
         await wrapper.setProps({
@@ -425,13 +427,13 @@ describe('FeeSummary component tests', () => {
           setRegistrationType: renewRegistrationTypes[i],
           setFeeOverride: { feeAmount: 0, serviceFee: 1 }
         })
-        expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(0)
-        expect(wrapper.vm.$data.feeSummary.quantity).toBe(0)
-        expect(wrapper.vm.$data.feeSummary.serviceFee).toBe(1)
-        expect(wrapper.vm.$data.totalFees).toBe(0)
-        expect(wrapper.vm.$data.totalAmount).toBe(1)
-        expect(wrapper.vm.$data.isComplete).toBe(false)
-        expect(wrapper.vm.$data.hintFee).toBe('Select registration renewal length')
+        expect(wrapper.vm.feeSummary.feeAmount).toBe(0)
+        expect(wrapper.vm.feeSummary.quantity).toBe(0)
+        expect(wrapper.vm.feeSummary.serviceFee).toBe(1)
+        expect(wrapper.vm.totalFees).toBe(0)
+        expect(wrapper.vm.totalAmount).toBe(1)
+        expect(wrapper.vm.isComplete).toBe(false)
+        expect(wrapper.vm.hintFee).toBe('Select registration renewal length')
         // select infinite
         await wrapper.setProps({
           setRegistrationLength: {
@@ -439,13 +441,13 @@ describe('FeeSummary component tests', () => {
             lifeYears: 0
           }
         })
-        expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(0)
-        expect(wrapper.vm.$data.feeSummary.quantity).toBe(1)
-        expect(wrapper.vm.$data.feeSummary.serviceFee).toBe(1)
-        expect(wrapper.vm.$data.totalFees).toBe(0)
-        expect(wrapper.vm.$data.totalAmount).toBe(1)
-        expect(wrapper.vm.$data.isComplete).toBe(true)
-        expect(wrapper.vm.$data.hintFee).toBe('Infinite Registration')
+        expect(wrapper.vm.feeSummary.feeAmount).toBe(0)
+        expect(wrapper.vm.feeSummary.quantity).toBe(1)
+        expect(wrapper.vm.feeSummary.serviceFee).toBe(1)
+        expect(wrapper.vm.totalFees).toBe(0)
+        expect(wrapper.vm.totalAmount).toBe(1)
+        expect(wrapper.vm.isComplete).toBe(true)
+        expect(wrapper.vm.hintFee).toBe('Infinite Registration')
         // select 1 year
         await wrapper.setProps({
           setRegistrationLength: {
@@ -453,13 +455,13 @@ describe('FeeSummary component tests', () => {
             lifeYears: 1
           }
         })
-        expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(0)
-        expect(wrapper.vm.$data.feeSummary.quantity).toBe(1)
-        expect(wrapper.vm.$data.feeSummary.serviceFee).toBe(1)
-        expect(wrapper.vm.$data.totalFees).toBe(0)
-        expect(wrapper.vm.$data.totalAmount).toBe(1)
-        expect(wrapper.vm.$data.isComplete).toBe(true)
-        expect(wrapper.vm.$data.hintFee).toBe('1 Year @ $0.00/year')
+        expect(wrapper.vm.feeSummary.feeAmount).toBe(0)
+        expect(wrapper.vm.feeSummary.quantity).toBe(1)
+        expect(wrapper.vm.feeSummary.serviceFee).toBe(1)
+        expect(wrapper.vm.totalFees).toBe(0)
+        expect(wrapper.vm.totalAmount).toBe(1)
+        expect(wrapper.vm.isComplete).toBe(true)
+        expect(wrapper.vm.hintFee).toBe('1 Year @ $0.00/year')
         // select multiple years
         await wrapper.setProps({
           setRegistrationLength: {
@@ -467,13 +469,13 @@ describe('FeeSummary component tests', () => {
             lifeYears: 12
           }
         })
-        expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(0)
-        expect(wrapper.vm.$data.feeSummary.quantity).toBe(12)
-        expect(wrapper.vm.$data.feeSummary.serviceFee).toBe(1)
-        expect(wrapper.vm.$data.totalFees).toBe(0)
-        expect(wrapper.vm.$data.totalAmount).toBe(1)
-        expect(wrapper.vm.$data.isComplete).toBe(true)
-        expect(wrapper.vm.$data.hintFee).toBe('12 Years @ $0.00/year')
+        expect(wrapper.vm.feeSummary.feeAmount).toBe(0)
+        expect(wrapper.vm.feeSummary.quantity).toBe(12)
+        expect(wrapper.vm.feeSummary.serviceFee).toBe(1)
+        expect(wrapper.vm.totalFees).toBe(0)
+        expect(wrapper.vm.totalAmount).toBe(1)
+        expect(wrapper.vm.isComplete).toBe(true)
+        expect(wrapper.vm.hintFee).toBe('12 Years @ $0.00/year')
       }
     }
   })
@@ -487,38 +489,38 @@ describe('FeeSummary component tests', () => {
         setRegistrationType: newRegStandard[i],
         setFeeOverride: null
       })
-      expect(wrapper.vm.$data.feeType).toBe(FeeSummaryTypes.AMEND)
-      expect(wrapper.vm.$data.registrationType).toBe(newRegStandard[i])
-      expect(wrapper.vm.$data.feeLabel).toBe('Registration Amendment')
+      expect(wrapper.vm.feeType).toBe(FeeSummaryTypes.AMEND)
+      expect(wrapper.vm.registrationType).toBe(newRegStandard[i])
+      expect(wrapper.vm.feeLabel).toBe('Registration Amendment')
       if (UIRegistrationTypes.LAND_TAX_LIEN !== newRegStandard[i]) {
-        expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(10)
-        expect(wrapper.vm.$data.feeSummary.quantity).toBe(1)
-        expect(wrapper.vm.$data.feeSummary.serviceFee).toBe(1.5)
-        expect(wrapper.vm.$data.totalFees).toBe(10)
-        expect(wrapper.vm.$data.totalAmount).toBe(11.5)
+        expect(wrapper.vm.feeSummary.feeAmount).toBe(10)
+        expect(wrapper.vm.feeSummary.quantity).toBe(1)
+        expect(wrapper.vm.feeSummary.serviceFee).toBe(1.5)
+        expect(wrapper.vm.totalFees).toBe(10)
+        expect(wrapper.vm.totalAmount).toBe(11.5)
         // check values for non billable
         await wrapper.setProps({ setFeeOverride: { feeAmount: 0, serviceFee: 1 } })
-        expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(0)
-        expect(wrapper.vm.$data.feeSummary.quantity).toBe(1)
-        expect(wrapper.vm.$data.feeSummary.serviceFee).toBe(1)
-        expect(wrapper.vm.$data.totalFees).toBe(0)
-        expect(wrapper.vm.$data.totalAmount).toBe(1)
+        expect(wrapper.vm.feeSummary.feeAmount).toBe(0)
+        expect(wrapper.vm.feeSummary.quantity).toBe(1)
+        expect(wrapper.vm.feeSummary.serviceFee).toBe(1)
+        expect(wrapper.vm.totalFees).toBe(0)
+        expect(wrapper.vm.totalAmount).toBe(1)
       } else {
-        expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(0)
-        expect(wrapper.vm.$data.feeSummary.quantity).toBe(1)
-        expect(wrapper.vm.$data.feeSummary.serviceFee).toBe(0)
-        expect(wrapper.vm.$data.totalFees).toBe(0)
-        expect(wrapper.vm.$data.totalAmount).toBe(0)
+        expect(wrapper.vm.feeSummary.feeAmount).toBe(0)
+        expect(wrapper.vm.feeSummary.quantity).toBe(1)
+        expect(wrapper.vm.feeSummary.serviceFee).toBe(0)
+        expect(wrapper.vm.totalFees).toBe(0)
+        expect(wrapper.vm.totalAmount).toBe(0)
         // check values for non billable
         await wrapper.setProps({ setFeeOverride: { feeAmount: 0, serviceFee: 1 } })
-        expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(0)
-        expect(wrapper.vm.$data.feeSummary.quantity).toBe(1)
-        expect(wrapper.vm.$data.feeSummary.serviceFee).toBe(0)
-        expect(wrapper.vm.$data.totalFees).toBe(0)
-        expect(wrapper.vm.$data.totalAmount).toBe(0)
+        expect(wrapper.vm.feeSummary.feeAmount).toBe(0)
+        expect(wrapper.vm.feeSummary.quantity).toBe(1)
+        expect(wrapper.vm.feeSummary.serviceFee).toBe(0)
+        expect(wrapper.vm.totalFees).toBe(0)
+        expect(wrapper.vm.totalAmount).toBe(0)
       }
-      expect(wrapper.vm.$data.isComplete).toBe(true)
-      expect(wrapper.vm.$data.hintFee).toBe('')
+      expect(wrapper.vm.isComplete).toBe(true)
+      expect(wrapper.vm.hintFee).toBe('')
     }
   })
 
@@ -531,26 +533,26 @@ describe('FeeSummary component tests', () => {
         setRegistrationType: newRegMisc[i],
         setFeeOverride: null
       })
-      expect(wrapper.vm.$data.feeType).toBe(FeeSummaryTypes.AMEND)
-      expect(wrapper.vm.$data.registrationType).toBe(newRegMisc[i])
-      expect(wrapper.vm.$data.feeLabel).toBe('Registration Amendment')
-      expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(0)
-      expect(wrapper.vm.$data.feeSummary.quantity).toBe(1)
-      expect(wrapper.vm.$data.feeSummary.serviceFee).toBe(0)
-      expect(wrapper.vm.$data.totalFees).toBe(0)
-      expect(wrapper.vm.$data.totalAmount).toBe(0)
-      expect(wrapper.vm.$data.isComplete).toBe(true)
-      expect(wrapper.vm.$data.hintFee).toBe('')
+      expect(wrapper.vm.feeType).toBe(FeeSummaryTypes.AMEND)
+      expect(wrapper.vm.registrationType).toBe(newRegMisc[i])
+      expect(wrapper.vm.feeLabel).toBe('Registration Amendment')
+      expect(wrapper.vm.feeSummary.feeAmount).toBe(0)
+      expect(wrapper.vm.feeSummary.quantity).toBe(1)
+      expect(wrapper.vm.feeSummary.serviceFee).toBe(0)
+      expect(wrapper.vm.totalFees).toBe(0)
+      expect(wrapper.vm.totalAmount).toBe(0)
+      expect(wrapper.vm.isComplete).toBe(true)
+      expect(wrapper.vm.hintFee).toBe('')
       // check values for non billable
       await wrapper.setProps({ setFeeOverride: { feeAmount: 0, serviceFee: 1 } })
-      expect(wrapper.vm.$data.feeLabel).toBe('Registration Amendment')
-      expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(0)
-      expect(wrapper.vm.$data.feeSummary.quantity).toBe(1)
-      expect(wrapper.vm.$data.feeSummary.serviceFee).toBe(0)
-      expect(wrapper.vm.$data.totalFees).toBe(0)
-      expect(wrapper.vm.$data.totalAmount).toBe(0)
-      expect(wrapper.vm.$data.isComplete).toBe(true)
-      expect(wrapper.vm.$data.hintFee).toBe('')
+      expect(wrapper.vm.feeLabel).toBe('Registration Amendment')
+      expect(wrapper.vm.feeSummary.feeAmount).toBe(0)
+      expect(wrapper.vm.feeSummary.quantity).toBe(1)
+      expect(wrapper.vm.feeSummary.serviceFee).toBe(0)
+      expect(wrapper.vm.totalFees).toBe(0)
+      expect(wrapper.vm.totalAmount).toBe(0)
+      expect(wrapper.vm.isComplete).toBe(true)
+      expect(wrapper.vm.hintFee).toBe('')
     }
   })
 
@@ -562,16 +564,16 @@ describe('FeeSummary component tests', () => {
       setRegistrationLength: null,
       setRegistrationType: null
     })
-    expect(wrapper.vm.$data.feeType).toBe(FeeSummaryTypes.MHSEARCH)
-    expect(wrapper.vm.$data.registrationType).toBe(null)
-    expect(wrapper.vm.$data.feeLabel).toBe('Manufactured Home search')
-    expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(7)
-    expect(wrapper.vm.$data.feeSummary.quantity).toBe(1)
-    expect(wrapper.vm.$data.feeSummary.serviceFee).toBe(1.5)
-    expect(wrapper.vm.$data.totalFees).toBe(7)
-    expect(wrapper.vm.$data.totalAmount).toBe(8.5)
-    expect(wrapper.vm.$data.isComplete).toBe(true)
-    expect(wrapper.vm.$data.hintFee).toBe('')
+    expect(wrapper.vm.feeType).toBe(FeeSummaryTypes.MHSEARCH)
+    expect(wrapper.vm.registrationType).toBe(null)
+    expect(wrapper.vm.feeLabel).toBe('Manufactured Home search')
+    expect(wrapper.vm.feeSummary.feeAmount).toBe(7)
+    expect(wrapper.vm.feeSummary.quantity).toBe(1)
+    expect(wrapper.vm.feeSummary.serviceFee).toBe(1.5)
+    expect(wrapper.vm.totalFees).toBe(7)
+    expect(wrapper.vm.totalAmount).toBe(8.5)
+    expect(wrapper.vm.isComplete).toBe(true)
+    expect(wrapper.vm.hintFee).toBe('')
   })
 
   it('renders with correct values for a MHR Search and Combined Search', async () => {
@@ -586,24 +588,24 @@ describe('FeeSummary component tests', () => {
         quantity: 1
       }
     })
-    expect(wrapper.vm.$data.feeType).toBe(FeeSummaryTypes.MHSEARCH)
-    expect(wrapper.vm.$data.registrationType).toBe(null)
-    expect(wrapper.vm.$data.feeLabel).toBe('Manufactured Home search')
-    expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(7)
-    expect(wrapper.vm.$data.feeSummary.quantity).toBe(1)
-    expect(wrapper.vm.$data.feeSummary.serviceFee).toBe(1.5)
+    expect(wrapper.vm.feeType).toBe(FeeSummaryTypes.MHSEARCH)
+    expect(wrapper.vm.registrationType).toBe(null)
+    expect(wrapper.vm.feeLabel).toBe('Manufactured Home search')
+    expect(wrapper.vm.feeSummary.feeAmount).toBe(7)
+    expect(wrapper.vm.feeSummary.quantity).toBe(1)
+    expect(wrapper.vm.feeSummary.serviceFee).toBe(1.5)
 
-    expect(wrapper.vm.$data.additionalFeeLabel).toBe('Combined Home and Lien search')
-    expect(wrapper.vm.$data.additionalFeeSummary.feeAmount).toBe(12)
-    expect(wrapper.vm.$data.additionalFeeSummary.quantity).toBe(1)
-    expect(wrapper.vm.$data.additionalFeeSummary.serviceFee).toBe(1.5)
+    expect(wrapper.vm.additionalFeeLabel).toBe('Combined Home and Lien search')
+    expect(wrapper.vm.additionalFeeSummary.feeAmount).toBe(12)
+    expect(wrapper.vm.additionalFeeSummary.quantity).toBe(1)
+    expect(wrapper.vm.additionalFeeSummary.serviceFee).toBe(1.5)
 
-    expect(wrapper.vm.$data.totalFees).toBe(7)
-    expect(wrapper.vm.$data.totalAdditionalFees).toBe(12)
+    expect(wrapper.vm.totalFees).toBe(7)
+    expect(wrapper.vm.totalAdditionalFees).toBe(12)
 
-    expect(wrapper.vm.$data.totalAmount).toBe(20.5)
-    expect(wrapper.vm.$data.isComplete).toBe(true)
-    expect(wrapper.vm.$data.hintFee).toBe('')
+    expect(wrapper.vm.totalAmount).toBe(20.5)
+    expect(wrapper.vm.isComplete).toBe(true)
+    expect(wrapper.vm.hintFee).toBe('')
   })
 
   it('renders with correct values for a MHR Search and Combined Search with multiples', async () => {
@@ -618,31 +620,31 @@ describe('FeeSummary component tests', () => {
         quantity: 3
       }
     })
-    expect(wrapper.vm.$data.feeType).toBe(FeeSummaryTypes.MHSEARCH)
-    expect(wrapper.vm.$data.registrationType).toBe(null)
-    expect(wrapper.vm.$data.feeLabel).toBe('Manufactured Home search')
+    expect(wrapper.vm.feeType).toBe(FeeSummaryTypes.MHSEARCH)
+    expect(wrapper.vm.registrationType).toBe(null)
+    expect(wrapper.vm.feeLabel).toBe('Manufactured Home search')
     expect(wrapper.find('#quantity-label').text()).toBe('2 @ $7.00 each')
-    expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(7)
-    expect(wrapper.vm.$data.feeSummary.quantity).toBe(2)
-    expect(wrapper.vm.$data.feeSummary.serviceFee).toBe(1.5)
+    expect(wrapper.vm.feeSummary.feeAmount).toBe(7)
+    expect(wrapper.vm.feeSummary.quantity).toBe(2)
+    expect(wrapper.vm.feeSummary.serviceFee).toBe(1.5)
 
-    expect(wrapper.vm.$data.additionalFeeLabel).toBe('Combined Home and Lien search')
+    expect(wrapper.vm.additionalFeeLabel).toBe('Combined Home and Lien search')
     expect(wrapper.find('#additional-quantity-label').text()).toBe('3 @ $12.00 each')
-    expect(wrapper.vm.$data.additionalFeeSummary.feeAmount).toBe(12)
-    expect(wrapper.vm.$data.additionalFeeSummary.quantity).toBe(3)
-    expect(wrapper.vm.$data.additionalFeeSummary.serviceFee).toBe(1.5)
+    expect(wrapper.vm.additionalFeeSummary.feeAmount).toBe(12)
+    expect(wrapper.vm.additionalFeeSummary.quantity).toBe(3)
+    expect(wrapper.vm.additionalFeeSummary.serviceFee).toBe(1.5)
 
-    expect(wrapper.vm.$data.totalFees).toBe(14)
-    expect(wrapper.vm.$data.totalAdditionalFees).toBe(36)
+    expect(wrapper.vm.totalFees).toBe(14)
+    expect(wrapper.vm.totalAdditionalFees).toBe(36)
 
-    expect(wrapper.vm.$data.totalAmount).toBe(51.5)
-    expect(wrapper.vm.$data.isComplete).toBe(true)
-    expect(wrapper.vm.$data.hintFee).toBe('')
+    expect(wrapper.vm.totalAmount).toBe(51.5)
+    expect(wrapper.vm.isComplete).toBe(true)
+    expect(wrapper.vm.hintFee).toBe('')
   })
 
   it('renders with correct values for a MHR Search as Staff', async () => {
-    const state = wrapper.vm.$store.state.stateModel as StateModelIF
-    state.authorization.authRoles = ['staff']
+    const state = store.getStateModel as StateModelIF
+    await store.setAuthRoles(['staff'])
     expect(wrapper.findComponent(FeeSummary).exists()).toBe(true)
     await wrapper.setProps({
       setFeeType: FeeSummaryTypes.MHSEARCH,
@@ -650,22 +652,21 @@ describe('FeeSummary component tests', () => {
       setRegistrationLength: null,
       setRegistrationType: null
     })
-    await Vue.nextTick()
+    await nextTick()
 
-    expect(wrapper.vm.$data.feeType).toBe(FeeSummaryTypes.MHSEARCH)
-    expect(wrapper.vm.$data.feeLabel).toBe('Manufactured Home search')
-    expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(0)
-    expect(wrapper.vm.$data.feeSummary.quantity).toBe(1)
-    expect(wrapper.vm.$data.feeSummary.serviceFee).toBe(0)
-    expect(wrapper.vm.$data.totalFees).toBe(0)
-    expect(wrapper.vm.$data.totalAmount).toBe(0)
-    expect(wrapper.vm.$data.isComplete).toBe(true)
-    expect(wrapper.vm.$data.hintFee).toBe('')
+    expect(wrapper.vm.feeType).toBe(FeeSummaryTypes.MHSEARCH)
+    expect(wrapper.vm.feeLabel).toBe('Manufactured Home search')
+    expect(wrapper.vm.feeSummary.feeAmount).toBe(0)
+    expect(wrapper.vm.feeSummary.quantity).toBe(1)
+    expect(wrapper.vm.feeSummary.serviceFee).toBe(0)
+    expect(wrapper.vm.totalFees).toBe(0)
+    expect(wrapper.vm.totalAmount).toBe(0)
+    expect(wrapper.vm.isComplete).toBe(true)
+    expect(wrapper.vm.hintFee).toBe('')
   })
 
   it('renders with correct values for a MHR Search as Staff on behalf of a client', async () => {
-    const state = wrapper.vm.$store.state.stateModel as StateModelIF
-    state.authorization.authRoles = ['staff']
+    await store.setAuthRoles(['staff'])
     expect(wrapper.findComponent(FeeSummary).exists()).toBe(true)
     await wrapper.setProps({
       setFeeType: FeeSummaryTypes.MHSEARCH,
@@ -675,21 +676,20 @@ describe('FeeSummary component tests', () => {
       setStaffReg: true,
       setStaffClientPayment: true
     })
-    expect(wrapper.vm.$data.feeType).toBe(FeeSummaryTypes.MHSEARCH)
-    expect(wrapper.vm.$data.registrationType).toBe(null)
-    expect(wrapper.vm.$data.feeLabel).toBe('Manufactured Home search')
-    expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(10)
-    expect(wrapper.vm.$data.feeSummary.quantity).toBe(1)
+    expect(wrapper.vm.feeType).toBe(FeeSummaryTypes.MHSEARCH)
+    expect(wrapper.vm.registrationType).toBe(null)
+    expect(wrapper.vm.feeLabel).toBe('Manufactured Home search')
+    expect(wrapper.vm.feeSummary.feeAmount).toBe(10)
+    expect(wrapper.vm.feeSummary.quantity).toBe(1)
     expect(wrapper.find('#processing-fee-summary').exists()).toBe(false)
-    expect(wrapper.vm.$data.totalFees).toBe(10)
-    expect(wrapper.vm.$data.totalAmount).toBe(10)
-    expect(wrapper.vm.$data.isComplete).toBe(true)
-    expect(wrapper.vm.$data.hintFee).toBe('')
+    expect(wrapper.vm.totalFees).toBe(10)
+    expect(wrapper.vm.totalAmount).toBe(10)
+    expect(wrapper.vm.isComplete).toBe(true)
+    expect(wrapper.vm.hintFee).toBe('')
   })
 
   it('renders priority fee for a MHR Search as Staff on behalf of a client', async () => {
-    const state = wrapper.vm.$store.state.stateModel as StateModelIF
-    state.authorization.authRoles = ['staff']
+    await store.setAuthRoles(['staff'])
     expect(wrapper.findComponent(FeeSummary).exists()).toBe(true)
     await wrapper.setProps({
       setFeeType: FeeSummaryTypes.MHSEARCH,
@@ -699,25 +699,25 @@ describe('FeeSummary component tests', () => {
       setStaffReg: true,
       setStaffClientPayment: true
     })
-    await store.dispatch('setStaffPayment', { isPriority: true })
-    expect(wrapper.vm.$data.feeType).toBe(FeeSummaryTypes.MHSEARCH)
-    expect(wrapper.vm.$data.registrationType).toBe(null)
-    expect(wrapper.vm.$data.feeLabel).toBe('Manufactured Home search')
-    expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(10)
-    expect(wrapper.vm.$data.feeSummary.quantity).toBe(1)
+    await store.setStaffPayment({ isPriority: true })
+    expect(wrapper.vm.feeType).toBe(FeeSummaryTypes.MHSEARCH)
+    expect(wrapper.vm.registrationType).toBe(null)
+    expect(wrapper.vm.feeLabel).toBe('Manufactured Home search')
+    expect(wrapper.vm.feeSummary.feeAmount).toBe(10)
+    expect(wrapper.vm.feeSummary.quantity).toBe(1)
     expect(wrapper.find('#processing-fee-summary').exists()).toBe(false)
-    expect(wrapper.vm.$data.totalFees).toBe(10)
-    expect(wrapper.vm.$data.totalAmount).toBe(110)
-    expect(wrapper.vm.$data.isComplete).toBe(true)
-    expect(wrapper.vm.$data.hintFee).toBe('')
+    expect(wrapper.vm.totalFees).toBe(10)
+    expect(wrapper.vm.totalAmount).toBe(110)
+    expect(wrapper.vm.isComplete).toBe(true)
+    expect(wrapper.vm.hintFee).toBe('')
     expect(wrapper.find('#priority-fee').exists()).toBe(true)
     expect(wrapper.find('#priority-fee').text()).toContain('Priority Fee')
     expect(wrapper.find('#priority-fee').text()).toContain('$ 100.00')
   })
 
   it('renders certify search fee for a MHR Search as Staff on behalf of a client', async () => {
-    const state = wrapper.vm.$store.state.stateModel as StateModelIF
-    state.authorization.authRoles = ['staff']
+    const state = store.getStateModel as StateModelIF
+    await store.setAuthRoles(['staff'])
     state.search.searchCertified = true
     expect(wrapper.findComponent(FeeSummary).exists()).toBe(true)
     await wrapper.setProps({
@@ -728,17 +728,17 @@ describe('FeeSummary component tests', () => {
       setStaffReg: true,
       setStaffClientPayment: true
     })
-    await store.dispatch('setStaffPayment')
-    expect(wrapper.vm.$data.feeType).toBe(FeeSummaryTypes.MHSEARCH)
-    expect(wrapper.vm.$data.registrationType).toBe(null)
-    expect(wrapper.vm.$data.feeLabel).toBe('Manufactured Home search')
-    expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(10)
-    expect(wrapper.vm.$data.feeSummary.quantity).toBe(1)
+    await store.setStaffPayment()
+    expect(wrapper.vm.feeType).toBe(FeeSummaryTypes.MHSEARCH)
+    expect(wrapper.vm.registrationType).toBe(null)
+    expect(wrapper.vm.feeLabel).toBe('Manufactured Home search')
+    expect(wrapper.vm.feeSummary.feeAmount).toBe(10)
+    expect(wrapper.vm.feeSummary.quantity).toBe(1)
     expect(wrapper.find('#processing-fee-summary').exists()).toBe(false)
-    expect(wrapper.vm.$data.totalFees).toBe(10)
-    expect(wrapper.vm.$data.totalAmount).toBe(35)
-    expect(wrapper.vm.$data.isComplete).toBe(true)
-    expect(wrapper.vm.$data.hintFee).toBe('')
+    expect(wrapper.vm.totalFees).toBe(10)
+    expect(wrapper.vm.totalAmount).toBe(35)
+    expect(wrapper.vm.isComplete).toBe(true)
+    expect(wrapper.vm.hintFee).toBe('')
     expect(wrapper.find('#priority-fee').exists()).toBe(false)
     expect(wrapper.find('#certify-fee').exists()).toBe(true)
     expect(wrapper.find('#certify-fee').text()).toContain('Certified search')
@@ -746,8 +746,8 @@ describe('FeeSummary component tests', () => {
   })
 
   it('renders certify search and priority fee for a MHR Search as Staff on behalf of a client', async () => {
-    const state = wrapper.vm.$store.state.stateModel as StateModelIF
-    state.authorization.authRoles = ['staff']
+    const state = store.getStateModel as StateModelIF
+    await store.setAuthRoles(['staff'])
     state.search.searchCertified = true
     expect(wrapper.findComponent(FeeSummary).exists()).toBe(true)
     await wrapper.setProps({
@@ -758,17 +758,17 @@ describe('FeeSummary component tests', () => {
       setStaffReg: true,
       setStaffClientPayment: true
     })
-    await store.dispatch('setStaffPayment', { isPriority: true })
-    expect(wrapper.vm.$data.feeType).toBe(FeeSummaryTypes.MHSEARCH)
-    expect(wrapper.vm.$data.registrationType).toBe(null)
-    expect(wrapper.vm.$data.feeLabel).toBe('Manufactured Home search')
-    expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(10)
-    expect(wrapper.vm.$data.feeSummary.quantity).toBe(1)
+    await store.setStaffPayment({ isPriority: true })
+    expect(wrapper.vm.feeType).toBe(FeeSummaryTypes.MHSEARCH)
+    expect(wrapper.vm.registrationType).toBe(null)
+    expect(wrapper.vm.feeLabel).toBe('Manufactured Home search')
+    expect(wrapper.vm.feeSummary.feeAmount).toBe(10)
+    expect(wrapper.vm.feeSummary.quantity).toBe(1)
     expect(wrapper.find('#processing-fee-summary').exists()).toBe(false)
-    expect(wrapper.vm.$data.totalFees).toBe(10)
-    expect(wrapper.vm.$data.totalAmount).toBe(135)
-    expect(wrapper.vm.$data.isComplete).toBe(true)
-    expect(wrapper.vm.$data.hintFee).toBe('')
+    expect(wrapper.vm.totalFees).toBe(10)
+    expect(wrapper.vm.totalAmount).toBe(135)
+    expect(wrapper.vm.isComplete).toBe(true)
+    expect(wrapper.vm.hintFee).toBe('')
     expect(wrapper.find('#priority-fee').exists()).toBe(true)
     expect(wrapper.find('#priority-fee').text()).toContain('Priority Fee')
     expect(wrapper.find('#priority-fee').text()).toContain('$ 100.00')
@@ -778,8 +778,8 @@ describe('FeeSummary component tests', () => {
   })
 
   it('renders fee for Staff Sale or Gift Transfer', async () => {
-    const state = wrapper.vm.$store.state.stateModel as StateModelIF
-    state.authorization.authRoles = ['staff']
+    const state = store.getStateModel as StateModelIF
+    await store.setAuthRoles(['staff'])
     state.search.searchCertified = false
 
     await wrapper.setProps({
@@ -791,28 +791,28 @@ describe('FeeSummary component tests', () => {
 
     // Fee summary not updated until Transfer Type is selected
     expect(wrapper.findComponent(FeeSummary).exists()).toBe(true)
-    expect(wrapper.vm.$data.feeLabel).toBe('Ownership Transfer or Change')
+    expect(wrapper.vm.feeLabel).toBe('Ownership Transfer or Change')
     expect(wrapper.find('#transfer-type-text').text()).toContain('Select Transfer Type')
 
     await wrapper.setProps({
       transferType: UITransferTypes.SALE_OR_GIFT
     })
 
-    expect(wrapper.vm.$data.feeType).toBe(FeeSummaryTypes.MHR_TRANSFER)
-    expect(wrapper.vm.$data.registrationType).toBe(null)
-    expect(wrapper.vm.$data.feeLabel).toBe('Ownership Transfer or Change')
+    expect(wrapper.vm.feeType).toBe(FeeSummaryTypes.MHR_TRANSFER)
+    expect(wrapper.vm.registrationType).toBe(null)
+    expect(wrapper.vm.feeLabel).toBe('Ownership Transfer or Change')
     expect(wrapper.find('#transfer-type-text').text()).toContain('Transfer Due to Sale or Gift')
-    expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(50)
-    expect(wrapper.vm.$data.feeSummary.quantity).toBe(1)
+    expect(wrapper.vm.feeSummary.feeAmount).toBe(50)
+    expect(wrapper.vm.feeSummary.quantity).toBe(1)
     expect(wrapper.find('#processing-fee-summary').exists()).toBe(false)
-    expect(wrapper.vm.$data.totalFees).toBe(50)
-    expect(wrapper.vm.$data.totalAmount).toBe(50)
-    expect(wrapper.vm.$data.isComplete).toBe(true)
+    expect(wrapper.vm.totalFees).toBe(50)
+    expect(wrapper.vm.totalAmount).toBe(50)
+    expect(wrapper.vm.isComplete).toBe(true)
   })
 
   it('renders fee for SJT Transfer', async () => {
-    const state = wrapper.vm.$store.state.stateModel as StateModelIF
-    state.authorization.authRoles = ['staff']
+    const state = store.getStateModel as StateModelIF
+    await store.setAuthRoles(['staff'])
     state.search.searchCertified = false
 
     await wrapper.setProps({
@@ -824,28 +824,28 @@ describe('FeeSummary component tests', () => {
 
     // Fee summary not updated until Transfer Type is selected
     expect(wrapper.findComponent(FeeSummary).exists()).toBe(true)
-    expect(wrapper.vm.$data.feeLabel).toBe('Ownership Transfer or Change')
+    expect(wrapper.vm.feeLabel).toBe('Ownership Transfer or Change')
     expect(wrapper.find('#transfer-type-text').text()).toContain('Select Transfer Type')
 
     await wrapper.setProps({
       transferType: UITransferTypes.SURVIVING_JOINT_TENANT
     })
 
-    expect(wrapper.vm.$data.feeType).toBe(FeeSummaryTypes.MHR_TRANSFER)
-    expect(wrapper.vm.$data.registrationType).toBe(null)
-    expect(wrapper.vm.$data.feeLabel).toBe('Ownership Transfer or Change')
+    expect(wrapper.vm.feeType).toBe(FeeSummaryTypes.MHR_TRANSFER)
+    expect(wrapper.vm.registrationType).toBe(null)
+    expect(wrapper.vm.feeLabel).toBe('Ownership Transfer or Change')
     expect(wrapper.find('#transfer-type-text').text()).toContain('Transfer to Surviving Joint Tenant(s)')
-    expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(50)
-    expect(wrapper.vm.$data.feeSummary.quantity).toBe(1)
+    expect(wrapper.vm.feeSummary.feeAmount).toBe(50)
+    expect(wrapper.vm.feeSummary.quantity).toBe(1)
     expect(wrapper.find('#processing-fee-summary').exists()).toBe(false)
-    expect(wrapper.vm.$data.totalFees).toBe(50)
-    expect(wrapper.vm.$data.totalAmount).toBe(50)
-    expect(wrapper.vm.$data.isComplete).toBe(true)
+    expect(wrapper.vm.totalFees).toBe(50)
+    expect(wrapper.vm.totalAmount).toBe(50)
+    expect(wrapper.vm.isComplete).toBe(true)
   })
 
   it('renders fee for TRANS WILL Transfer', async () => {
-    const state = wrapper.vm.$store.state.stateModel as StateModelIF
-    state.authorization.authRoles = ['staff']
+    const state = store.getStateModel as StateModelIF
+    await store.setAuthRoles(['staff'])
     state.search.searchCertified = false
 
     await wrapper.setProps({
@@ -857,22 +857,22 @@ describe('FeeSummary component tests', () => {
 
     // Fee summary not updated until Transfer Type is selected
     expect(wrapper.findComponent(FeeSummary).exists()).toBe(true)
-    expect(wrapper.vm.$data.feeLabel).toBe('Ownership Transfer or Change')
+    expect(wrapper.vm.feeLabel).toBe('Ownership Transfer or Change')
     expect(wrapper.find('#transfer-type-text').text()).toContain('Select Transfer Type')
 
     await wrapper.setProps({
       transferType: UITransferTypes.TO_EXECUTOR_PROBATE_WILL
     })
 
-    expect(wrapper.vm.$data.feeType).toBe(FeeSummaryTypes.MHR_TRANSFER)
-    expect(wrapper.vm.$data.registrationType).toBe(null)
-    expect(wrapper.vm.$data.feeLabel).toBe('Ownership Transfer or Change')
+    expect(wrapper.vm.feeType).toBe(FeeSummaryTypes.MHR_TRANSFER)
+    expect(wrapper.vm.registrationType).toBe(null)
+    expect(wrapper.vm.feeLabel).toBe('Ownership Transfer or Change')
     expect(wrapper.find('#transfer-type-text').text()).toContain('Transfer to Executor - Grant of Probate with Will')
-    expect(wrapper.vm.$data.feeSummary.feeAmount).toBe(50)
-    expect(wrapper.vm.$data.feeSummary.quantity).toBe(1)
+    expect(wrapper.vm.feeSummary.feeAmount).toBe(50)
+    expect(wrapper.vm.feeSummary.quantity).toBe(1)
     expect(wrapper.find('#processing-fee-summary').exists()).toBe(false)
-    expect(wrapper.vm.$data.totalFees).toBe(50)
-    expect(wrapper.vm.$data.totalAmount).toBe(50)
-    expect(wrapper.vm.$data.isComplete).toBe(true)
+    expect(wrapper.vm.totalFees).toBe(50)
+    expect(wrapper.vm.totalAmount).toBe(50)
+    expect(wrapper.vm.isComplete).toBe(true)
   })
 })

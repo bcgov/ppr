@@ -1,12 +1,14 @@
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { getVuexStore } from '@/store'
-import CompositionApi from '@vue/composition-api'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
+
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import { HomeCivicAddress } from '@/components/mhrRegistration/HomeLocation'
 
 Vue.use(Vuetify)
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 const vuetify = new Vuetify({})
 
 /**
@@ -15,8 +17,8 @@ const vuetify = new Vuetify({})
  */
 function createComponent (): Wrapper<any> {
   const localVue = createLocalVue()
-  localVue.use(CompositionApi)
-  return mount(HomeCivicAddress, {
+
+  return mount((HomeCivicAddress as any), {
     localVue,
     store,
     vuetify
@@ -54,20 +56,19 @@ describe('mhr home civic address', () => {
     expect(civicAddressSection.exists()).toBe(true)
 
     expect(civicAddressSection.findAll(ERROR_MSG).length).toBe(0)
-    await Vue.nextTick()
-    await Vue.nextTick()
+    await nextTick()
     expect(civicAddressSection.findAll(ERROR_MSG).length).toBe(0)
 
     const city = civicAddressSection.find('#city')
     city.setValue('Vancouver')
-    await Vue.nextTick()
-    await Vue.nextTick()
+    await nextTick()
+    await nextTick()
     expect(civicAddressSection.findAll(ERROR_MSG).length).toBe(0)
 
     const region = civicAddressSection.find('#region')
     city.setValue('British Columbia')
-    await Vue.nextTick()
-    await Vue.nextTick()
+    await nextTick()
+    await nextTick()
     expect(civicAddressSection.findAll(ERROR_MSG).length).toBe(0)
   })
 })

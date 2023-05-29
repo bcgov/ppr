@@ -40,8 +40,8 @@ import {
   reactive,
   toRefs,
   watch
-} from '@vue/composition-api'
-import { useGetters } from 'vuex-composition-helpers'
+} from 'vue-demi'
+import { useStore } from '@/store/store'
 // local components
 import { ButtonsStacked } from '@/components/common'
 import { FeeSummary } from '@/composables/fees'
@@ -54,6 +54,7 @@ import {
   FeeSummaryI,
   RegistrationLengthI
 } from '@/composables/fees/interfaces'
+import { storeToRefs } from 'pinia'
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
@@ -120,16 +121,7 @@ export default defineComponent({
   setup (props, { emit }) {
     const {
       getUserServiceFee, isNonBillable, getIsStaffClientPayment, isRoleStaffReg, isRoleStaffSbc, getStaffPayment
-    } = useGetters<any>(
-      [
-        'getUserServiceFee',
-        'isNonBillable',
-        'getIsStaffClientPayment',
-        'isRoleStaffReg',
-        'isRoleStaffSbc',
-        'getStaffPayment'
-      ]
-    )
+    } = storeToRefs(useStore())
 
     const localState = reactive({
       cancelBtn: props.setCancelBtn,

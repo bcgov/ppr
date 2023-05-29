@@ -305,8 +305,10 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, nextTick, onMounted, reactive, ref, toRefs, watch } from '@vue/composition-api'
-import { useActions, useGetters } from 'vuex-composition-helpers'
+import { Component, computed, defineComponent, nextTick, onMounted, reactive, ref, toRefs, watch } from 'vue-demi'
+import { useRouter } from 'vue2-helpers/vue-router'
+import { useStore } from '@/store/store'
+import { storeToRefs } from 'pinia'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { StaffPayment } from '@bcrs-shared-components/staff-payment'
 import { StaffPaymentOptions } from '@bcrs-shared-components/enums'
@@ -384,7 +386,24 @@ export default defineComponent({
     }
   },
   setup (props, context) {
+    const router = useRouter()
     const {
+      // Actions
+      setMhrStatusType,
+      setMhrTransferSubmittingParty,
+      setMhrTransferAttentionReference,
+      setUnsavedChanges,
+      setRegTableNewItem,
+      setSearchedType,
+      setManufacturedHomeSearchResults,
+      setLienType,
+      setMhrTransferType,
+      setMhrTransferDeclaredValue,
+      setEmptyMhrTransfer,
+      setStaffPayment
+    } = useStore()
+    const {
+      // Getters
       getMhrTransferHomeOwners,
       getMhrInformation,
       getMhrTransferCurrentHomeOwnerGroups,
@@ -398,51 +417,7 @@ export default defineComponent({
       getMhrInfoValidation,
       getMhrAttentionReferenceNum,
       getMhrTransferSubmittingParty
-    } = useGetters<any>([
-      'getMhrTransferHomeOwners',
-      'getMhrInformation',
-      'getMhrTransferCurrentHomeOwnerGroups',
-      'getCertifyInformation',
-      'hasUnsavedChanges',
-      'hasLien',
-      'isRoleStaffReg',
-      'isRoleQualifiedSupplier',
-      'getMhrTransferType',
-      'getMhrTransferDeclaredValue',
-      'getMhrInfoValidation',
-      'getMhrAttentionReferenceNum',
-      'getMhrTransferSubmittingParty'
-    ])
-
-    const {
-      setMhrStatusType,
-      setMhrTransferSubmittingParty,
-      setMhrTransferAttentionReference,
-      setUnsavedChanges,
-      setRegTableNewItem,
-      setSearchedType,
-      setManufacturedHomeSearchResults,
-      setLienType,
-      setMhrTransferType,
-      setMhrTransferDeclaredValue,
-      setEmptyMhrTransfer,
-      setStaffPayment
-    } = useActions<any>([
-      'setMhrStatusType',
-      'setMhrTransferSubmittingParty',
-      'setMhrTransferAttentionReference',
-      'setUnsavedChanges',
-      'setRegTableNewItem',
-      'setSearchedType',
-      'setManufacturedHomeSearchResults',
-      'setLienType',
-      'setMhrTransferType',
-      'setMhrTransferDeclaredValue',
-      'setEmptyMhrTransfer',
-      'setStaffPayment'
-    ])
-
-    // Composable Instances
+    } = storeToRefs(useStore())
     const {
       isFrozenMhr,
       buildApiData,
@@ -471,8 +446,8 @@ export default defineComponent({
     } = useTransferOwners()
 
     // Refs
-    const homeOwnersComponentRef = ref(null)
-    const transferDetailsComponent = ref(null)
+    const homeOwnersComponentRef = ref(null) as Component
+    const transferDetailsComponent = ref(null) as Component
 
     const localState = reactive({
       dataLoaded: false,
@@ -712,7 +687,7 @@ export default defineComponent({
 
       // Force show removed/deceased homeOwners when invalid
       if (!getInfoValidation('isValidTransferOwners')) {
-        (context.refs.homeOwnersComponentRef as any)?.hideShowRemovedOwners(true)
+        (homeOwnersComponentRef as any).value?.hideShowRemovedOwners(true)
       }
 
       await nextTick()
@@ -753,7 +728,7 @@ export default defineComponent({
         setEmptyMhrTransfer(initMhrTransfer())
         resetValidationState()
 
-        context.root.$router.push({
+        router.push({
           name: RouteNames.DASHBOARD
         })
       }
@@ -818,7 +793,7 @@ export default defineComponent({
         results.results[0].includeLienInfo = true
 
         await setManufacturedHomeSearchResults(results)
-        await context.root.$router.replace({
+        await router.replace({
           name: RouteNames.MHRSEARCH
         })
       } else {
@@ -869,8 +844,8 @@ export default defineComponent({
     })
 
     watch(() => hasUnsavedChanges.value, (val: boolean) => {
-      if (!val && context.refs.transferDetailsComponent) {
-        (context.refs.transferDetailsComponent as any).clearTransferDetailsData()
+      if (!val && transferDetailsComponent) {
+        (transferDetailsComponent as any).value?.clearTransferDetailsData()
       }
     })
 

@@ -1,8 +1,9 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
 import VueRouter from 'vue-router'
-import { getVuexStore } from '@/store'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
 import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
 
 // Local Components
@@ -17,11 +18,13 @@ import { mockedFractionalOwnership, mockedPerson } from './test-data/mock-mhr-re
 import { MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF } from '@/interfaces/mhr-registration-interfaces'
 import { getTestId } from './utils'
 import { HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
+import { MhrCompVal, MhrSectVal } from '../../src/composables/mhrRegistration/enums'
 
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 /**
  * Creates and mounts a component, so that it can be tested.
@@ -56,7 +59,7 @@ describe('Mhr Review Confirm registration', () => {
   }
   sessionStorage.setItem('CURRENT_ACCOUNT', JSON.stringify(currentAccount))
   sessionStorage.setItem('AUTH_API_URL', 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/')
-  const reviewConfirmState = store.state.stateModel.mhrValidationState.reviewConfirmValid
+  const reviewConfirmState = store.getMhrRegistrationValidationModel.reviewConfirmValid
 
   afterEach(() => {
     wrapper.destroy()
@@ -88,7 +91,7 @@ describe('Mhr Review Confirm registration', () => {
     // Update validation state
     reviewConfirmState.validateSteps = true
     reviewConfirmState.validateApp = true
-    await Vue.nextTick()
+    await nextTick()
 
     // Verify prompt
     expect(wrapper.vm.isValidatingApp).toBe(true)
@@ -100,7 +103,7 @@ describe('Mhr Review Confirm registration', () => {
     const owners = [mockedPerson] as MhrRegistrationHomeOwnerIF[]
     const homeOwnerGroup = [{ groupId: 1, owners: owners }] as MhrRegistrationHomeOwnerGroupIF[]
 
-    await store.dispatch('setMhrRegistrationHomeOwnerGroups', homeOwnerGroup)
+    await store.setMhrRegistrationHomeOwnerGroups(homeOwnerGroup)
 
     const HomeOwnerReview = wrapper.findComponent(HomeOwnersReview)
 
@@ -128,17 +131,15 @@ describe('Mhr Review Confirm registration', () => {
 
   it('should show correct Home Ownership section (with a Group)', async () => {
     wrapper = createComponent()
+    wrapper.vm.setShowGroups(true)
 
     const owners = [mockedPerson] as MhrRegistrationHomeOwnerIF[]
     // eslint-disable-next-line max-len
     const homeOwnerGroup = [{ groupId: 1, owners: owners, ...mockedFractionalOwnership }] as MhrRegistrationHomeOwnerGroupIF[]
-
-    await store.dispatch('setMhrRegistrationHomeOwnerGroups', homeOwnerGroup)
+    await store.setMhrRegistrationHomeOwnerGroups(homeOwnerGroup)
+    await nextTick()
 
     const HomeOwnerReview = wrapper.findComponent(HomeOwnersReview)
-    HomeOwnerReview.vm.$data.showGroups = true // set show groups so
-    await Vue.nextTick()
-
     expect(HomeOwnerReview.exists()).toBeTruthy()
     expect(HomeOwnerReview.findComponent(HomeOwnersTable).exists()).toBeTruthy()
 

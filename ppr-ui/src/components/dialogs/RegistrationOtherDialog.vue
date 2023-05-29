@@ -39,8 +39,8 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
-import { useActions } from 'vuex-composition-helpers'
+import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
+import { useStore } from '@/store/store'
 // eslint-disable-next-line no-unused-vars
 import { DialogOptionsIF } from '@/interfaces'
 
@@ -62,12 +62,7 @@ export default defineComponent({
     }
   },
   setup (props, context) {
-    const {
-      setRegistrationTypeOtherDesc
-    } = useActions<any>([
-      'setRegistrationTypeOtherDesc'
-    ])
-
+    const { setRegistrationTypeOtherDesc } = useStore()
     const localState = reactive({
       displayDialog: computed(() => {
         return props.display

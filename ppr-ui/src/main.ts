@@ -7,13 +7,11 @@ import 'moment'
 import Vue from 'vue'
 import Vuetify from 'vuetify/lib'
 import Vuelidate from 'vuelidate'
-import VueCompositionApi from '@vue/composition-api'
 import { getVueRouter } from '@/router'
-import { getVuexStore } from '@/store'
+import { getPiniaStore, getVuexStore } from '@/store'
 import Affix from 'vue-affix'
 import * as Sentry from '@sentry/vue'
 import { TiptapVuetifyPlugin } from 'tiptap-vuetify'
-
 // Styles
 // NB: order matters - do not change
 import '@mdi/font/css/materialdesignicons.min.css' // ensure you are using css-loader
@@ -36,10 +34,10 @@ declare const window: any
 
 Vue.config.productionTip = false
 
-Vue.use(VueCompositionApi)
 Vue.use(Vuetify)
 Vue.use(Affix)
 Vue.use(Vuelidate)
+
 const vuetify = new Vuetify()
 // use this package's plugin
 Vue.use(TiptapVuetifyPlugin, {
@@ -109,6 +107,7 @@ async function start () {
     }),
     router: getVueRouter(),
     store: getVuexStore(),
+    pinia: getPiniaStore(),
     render: h => h(App)
   }).$mount('#app')
 }

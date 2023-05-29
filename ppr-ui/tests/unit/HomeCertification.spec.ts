@@ -1,8 +1,8 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { getVuexStore } from '@/store'
-import CompositionApi, { nextTick } from '@vue/composition-api'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 
 // Components
@@ -13,7 +13,8 @@ import flushPromises from 'flush-promises'
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 /**
  * Creates and mounts a component, so that it can be tested.
@@ -22,10 +23,10 @@ const store = getVuexStore()
  */
 function createComponent (): Wrapper<any> {
   const localVue = createLocalVue()
-  localVue.use(CompositionApi)
+
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
-  return mount(HomeCertification, {
+  return mount((HomeCertification as any), {
     localVue,
     propsData: {},
     store,
@@ -38,8 +39,8 @@ describe('Home Certification', () => {
 
   beforeEach(async () => {
     wrapper = createComponent()
-    await store.dispatch('setMhrHomeDescription', { key: 'certificationOption', value: null })
-    wrapper.vm.$data.certificationOption = null
+    await store.setMhrHomeDescription({ key: 'certificationOption', value: null })
+    wrapper.vm.certificationOption = null
     await nextTick()
     await flushPromises()
   })

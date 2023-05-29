@@ -8,7 +8,7 @@ import {
   SubmittingPartyIF,
   MhrRegistrationHomeOwnerGroupIF
 } from '@/interfaces'
-import { useActions, useGetters } from 'vuex-composition-helpers'
+import { useStore } from '@/store/store'
 import {
   ActionTypes,
   ApiHomeTenancyTypes,
@@ -23,41 +23,12 @@ import {
 import { fetchMhRegistration, normalizeObject } from '@/utils'
 import { cloneDeep } from 'lodash'
 import { useHomeOwners, useTransferOwners } from '@/composables'
-import { computed, reactive, toRefs } from '@vue/composition-api'
+import { computed, reactive, toRefs } from 'vue-demi'
+import { storeToRefs } from 'pinia'
 
 export const useMhrInformation = () => {
   const {
-    isRoleStaffReg,
-    getStaffPayment,
-    getMhrInformation,
-    isRoleQualifiedSupplier,
-    getMhrTransferDeclaredValue,
-    getMhrTransferConsideration,
-    getMhrTransferDate,
-    getMhrTransferOwnLand,
-    getMhrTransferSubmittingParty,
-    getMhrTransferAttentionReference,
-    getMhrTransferHomeOwnerGroups,
-    getMhrTransferCurrentHomeOwnerGroups,
-    getMhrTransferType
-  } = useGetters<any>([
-    'isRoleStaffReg',
-    'getStaffPayment',
-    'getMhrInformation',
-    'isRoleQualifiedSupplier',
-    'getMhrTransferHomeOwners',
-    'getMhrTransferDeclaredValue',
-    'getMhrTransferConsideration',
-    'getMhrTransferDate',
-    'getMhrTransferOwnLand',
-    'getMhrTransferSubmittingParty',
-    'getMhrTransferAttentionReference',
-    'getMhrTransferHomeOwnerGroups',
-    'getMhrTransferCurrentHomeOwnerGroups',
-    'getMhrTransferType'
-  ])
-
-  const {
+    // Actions
     setMhrStatusType,
     setMhrTransferHomeOwnerGroups,
     setMhrTransferCurrentHomeOwnerGroups,
@@ -71,21 +42,23 @@ export const useMhrInformation = () => {
     setMhrAttentionReferenceNum,
     setMhrTransferConsideration,
     setMhrTransferSubmittingParty
-  } = useActions<any>([
-    'setMhrStatusType',
-    'setMhrTransferHomeOwnerGroups',
-    'setMhrTransferCurrentHomeOwnerGroups',
-    'setMhrLocation',
-    'setIsManualLocation',
-    'setMhrHomeDescription',
-    'setMhrTransferType',
-    'setMhrTransferDate',
-    'setMhrTransferOwnLand',
-    'setMhrAttentionReferenceNum',
-    'setMhrTransferDeclaredValue',
-    'setMhrTransferConsideration',
-    'setMhrTransferSubmittingParty'
-  ])
+  } = useStore()
+  const {
+    // Getters
+    isRoleStaffReg,
+    getStaffPayment,
+    getMhrInformation,
+    isRoleQualifiedSupplier,
+    getMhrTransferDeclaredValue,
+    getMhrTransferConsideration,
+    getMhrTransferDate,
+    getMhrTransferOwnLand,
+    getMhrTransferSubmittingParty,
+    getMhrTransferAttentionReference,
+    getMhrTransferHomeOwnerGroups,
+    getMhrTransferCurrentHomeOwnerGroups,
+    getMhrTransferType
+  } = storeToRefs(useStore())
 
   const {
     setShowGroups

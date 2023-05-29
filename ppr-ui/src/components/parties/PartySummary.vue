@@ -70,8 +70,9 @@ import {
   reactive,
   computed,
   toRefs
-} from '@vue/composition-api'
-import { useGetters, useActions } from 'vuex-composition-helpers'
+} from 'vue-demi'
+import { useStore } from '@/store/store'
+import { useRouter } from 'vue2-helpers/vue-router'
 
 import {
   DebtorSummary,
@@ -87,6 +88,7 @@ import {
   debtorTableHeaders,
   registeringTableHeaders
 } from '@/resources'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   components: {
@@ -94,15 +96,10 @@ export default defineComponent({
     RegisteringPartySummary,
     SecuredPartySummary
   },
-  setup (props, context) {
-    const { getAddSecuredPartiesAndDebtors } = useGetters<any>([
-      'getAddSecuredPartiesAndDebtors'
-    ])
-    const { setAddSecuredPartiesAndDebtors } = useActions<any>([
-      'setAddSecuredPartiesAndDebtors'
-    ])
-    const router = context.root.$router
-
+  setup () {
+    const router = useRouter()
+    const { setAddSecuredPartiesAndDebtors } = useStore()
+    const { getAddSecuredPartiesAndDebtors } = storeToRefs(useStore())
     const parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
     const addressSchema = PartyAddressSchema
 
@@ -127,10 +124,7 @@ export default defineComponent({
         return !parties.valid
       }),
       shouldShowHint: computed((): boolean => {
-        if ((parties.registeringParty) && (parties.registeringParty.action)) {
-          return true
-        }
-        return false
+        return !!((parties.registeringParty) && (parties.registeringParty.action))
       })
     })
 

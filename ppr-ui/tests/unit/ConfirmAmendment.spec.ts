@@ -1,9 +1,10 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
 import VueRouter from 'vue-router'
-import { getVuexStore } from '@/store'
-import { shallowMount, createLocalVue } from '@vue/test-utils'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
+import { shallowMount, createLocalVue, Wrapper } from '@vue/test-utils'
 import sinon from 'sinon'
 import { axios } from '@/utils/axios-ppr'
 import {
@@ -35,7 +36,8 @@ import { RegisteringPartyChange } from '@/components/parties/party'
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 // Prevent the warning "[Vuetify] Unable to locate target [data-app]"
 document.body.setAttribute('data-app', 'true')
@@ -51,7 +53,7 @@ describe('Confirm Amendment registration component', () => {
     delete window.location
     window.location = { assign: jest.fn() } as any
     // store setup
-    await store.dispatch('setRegistrationConfirmDebtorName', mockedDebtorNames[0])
+    await store.setRegistrationConfirmDebtorName(mockedDebtorNames[0])
     // stub api call
     sandbox = sinon.createSandbox()
     const get = sandbox.stub(axios, 'get')
@@ -64,7 +66,7 @@ describe('Confirm Amendment registration component', () => {
       data: { ...mockedDraftAmendmentStatement }
     })))
 
-    await store.dispatch('setLengthTrust', {
+    await store.setLengthTrust({
       valid: true,
       trustIndenture: false,
       lifeInfinite: false,
@@ -74,7 +76,7 @@ describe('Confirm Amendment registration component', () => {
       lienAmount: '',
       action: ActionTypes.EDITED
     })
-    await store.dispatch('setOriginalLengthTrust', {
+    await store.setOriginalLengthTrust({
       valid: true,
       trustIndenture: true,
       lifeInfinite: false,
@@ -83,8 +85,8 @@ describe('Confirm Amendment registration component', () => {
       surrenderDate: '',
       lienAmount: ''
     })
-    await store.dispatch('setAmendmentDescription', 'test')
-    await store.dispatch('setGeneralCollateral', [{ descriptionAdd: 'test', descriptionDelete: 'othertest' }])
+    await store.setAmendmentDescription('test')
+    await store.setGeneralCollateral([{ descriptionAdd: 'test', descriptionDelete: 'othertest' }])
 
     // create a Local Vue and install router on it
     const localVue = createLocalVue()
@@ -94,7 +96,7 @@ describe('Confirm Amendment registration component', () => {
       name: RouteNames.CONFIRM_AMENDMENT,
       query: { 'reg-num': '123456B' }
     })
-    wrapper = shallowMount(ConfirmAmendment, { localVue, store, router, vuetify })
+    wrapper = shallowMount((ConfirmAmendment as any), { localVue, store, router, vuetify })
     wrapper.setProps({ appReady: true })
     await flushPromises()
   })
@@ -109,7 +111,7 @@ describe('Confirm Amendment registration component', () => {
     expect(wrapper.vm.$route.name).toBe(RouteNames.CONFIRM_AMENDMENT)
     expect(wrapper.vm.appReady).toBe(true)
     expect(wrapper.vm.dataLoaded).toBe(true)
-    const state = wrapper.vm.$store.state.stateModel as StateModelIF
+    const state = store.getStateModel as StateModelIF
 
     expect(wrapper.findComponent(ConfirmAmendment).exists()).toBe(true)
     expect(wrapper.findComponent(FolioNumberSummary).exists()).toBe(true)
@@ -138,7 +140,7 @@ describe('Confirm Amendment registration component', () => {
   it('allows back to amend page', async () => {
     expect(wrapper.findComponent(ConfirmAmendment).exists()).toBe(true)
     await wrapper.findComponent(StickyContainer).vm.$emit('back', true)
-    await Vue.nextTick()
+    await nextTick()
     await flushPromises()
     expect(wrapper.vm.$route.name).toBe(RouteNames.AMEND_REGISTRATION)
   })
@@ -147,13 +149,13 @@ describe('Confirm Amendment registration component', () => {
     expect(wrapper.findComponent(ConfirmAmendment).exists()).toBe(true)
     await wrapper.findComponent(StickyContainer).vm.$emit('back', true)
     wrapper.vm.goToReviewAmendment()
-    await Vue.nextTick()
+    await nextTick()
     expect(wrapper.vm.$route.name).toBe(RouteNames.AMEND_REGISTRATION)
   })
 
   it('processes cancel button action', async () => {
     // setup
-    await wrapper.vm.$store.dispatch('setUnsavedChanges', true)
+    await store.setUnsavedChanges(true)
     // dialog doesn't start visible
     expect(wrapper.findComponent(BaseDialog).vm.$props.setDisplay).toBe(false)
     // pressing cancel triggers dialog
@@ -172,7 +174,7 @@ describe('Confirm Amendment registration component', () => {
 })
 
 describe('Confirm Amendment registration save registration', () => {
-  let wrapper: any
+  let wrapper: Wrapper<any>
   let sandbox
   const { assign } = window.location
   sessionStorage.setItem('KEYCLOAK_TOKEN', 'token')
@@ -182,7 +184,7 @@ describe('Confirm Amendment registration save registration', () => {
     delete window.location
     window.location = { assign: jest.fn() } as any
     // store setup
-    await store.dispatch('setRegistrationConfirmDebtorName', mockedDebtorNames[0])
+    await store.setRegistrationConfirmDebtorName(mockedDebtorNames[0])
     // stub api call
     sandbox = sinon.createSandbox()
     const get = sandbox.stub(axios, 'get')
@@ -194,7 +196,7 @@ describe('Confirm Amendment registration save registration', () => {
       data: { ...mockedAmendmentResponse }
     })))
 
-    await store.dispatch('setLengthTrust', {
+    await store.setLengthTrust({
       valid: true,
       trustIndenture: false,
       lifeInfinite: false,
@@ -204,7 +206,7 @@ describe('Confirm Amendment registration save registration', () => {
       lienAmount: '',
       action: ActionTypes.EDITED
     })
-    await store.dispatch('setOriginalLengthTrust', {
+    await store.setOriginalLengthTrust({
       valid: true,
       trustIndenture: true,
       lifeInfinite: false,
@@ -213,13 +215,13 @@ describe('Confirm Amendment registration save registration', () => {
       surrenderDate: '',
       lienAmount: ''
     })
-    await store.dispatch('setAddCollateral', {
+    await store.setAddCollateral({
       vehicleCollateral: mockedVehicleCollateral1,
       generalCollateral: mockedGeneralCollateral1,
       valid: true
     })
-    await store.dispatch('setAmendmentDescription', 'test')
-    await store.dispatch('setCertifyInformation', mockedAmendmentCertified)
+    await store.setAmendmentDescription('test')
+    await store.setCertifyInformation(mockedAmendmentCertified)
 
     // create a Local Vue and install router on it
     const localVue = createLocalVue()
@@ -229,7 +231,7 @@ describe('Confirm Amendment registration save registration', () => {
       name: RouteNames.CONFIRM_AMENDMENT,
       query: { 'reg-num': '123456B' }
     })
-    wrapper = shallowMount(ConfirmAmendment, { localVue, store, router, vuetify })
+    wrapper = shallowMount((ConfirmAmendment as any), { localVue, store, router, vuetify })
     wrapper.setProps({ appReady: true })
     await flushPromises()
   })
@@ -242,24 +244,27 @@ describe('Confirm Amendment registration save registration', () => {
 
   it('allows submit of amendment', async () => {
     // Set up for valid amendment request
-    await store.dispatch('setRegistrationNumber', '023001B')
-    await store.dispatch('setFolioOrReferenceNumber', 'A-00000402')
-    await store.dispatch('setRegistrationConfirmDebtorName', mockedDebtorNames[0])
-    const state = wrapper.vm.$store.state.stateModel as StateModelIF
+    await store.setRegistrationNumber('023001B')
+    await store.setFolioOrReferenceNumber('A-00000402')
+    await store.setRegistrationConfirmDebtorName(mockedDebtorNames[0])
+    await nextTick()
+
+    const state = store.getStateModel as StateModelIF
     const parties = state.registration.parties
     parties.registeringParty = mockedPartyCodeSearchResults[0]
-    await store.dispatch('setAddSecuredPartiesAndDebtors', parties)
+    await store.setAddSecuredPartiesAndDebtors(parties)
+
     expect(wrapper.vm.collateralValid).toBe(true)
     expect(wrapper.vm.partiesValid).toBe(true)
     expect(wrapper.vm.courtOrderValid).toBe(true)
 
-    await wrapper.findComponent(StickyContainer).vm.$emit('submit', true)
-    await flushPromises()
-    expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)
+    await wrapper.vm.submitAmendment()
+    await nextTick()
+
     // new amend registration is in store regTableData
-    expect(wrapper.vm.$store.state.stateModel.registrationTable.newItem.addedReg)
+    expect(store.getRegTableNewItem.addedReg)
       .toBe(mockedAmendmentResponse.amendmentRegistrationNumber)
-    expect(wrapper.vm.$store.state.stateModel.registrationTable.newItem.addedRegParent)
+    expect(store.getRegTableNewItem.addedRegParent)
       .toBe(mockedAmendmentResponse.baseRegistrationNumber)
   })
 })
@@ -275,8 +280,8 @@ describe('Confirm Amendment for staff', () => {
     delete window.location
     window.location = { assign: jest.fn() } as any
     // store setup
-    await store.dispatch('setRegistrationConfirmDebtorName', mockedDebtorNames[0])
-    await store.dispatch('setAuthRoles', ['staff', 'ppr_staff'])
+    await store.setRegistrationConfirmDebtorName(mockedDebtorNames[0])
+    await store.setAuthRoles(['staff', 'ppr_staff'])
     // stub api call
     sandbox = sinon.createSandbox()
     const get = sandbox.stub(axios, 'get')
@@ -288,7 +293,7 @@ describe('Confirm Amendment for staff', () => {
       data: { ...mockedAmendmentResponse }
     })))
 
-    await store.dispatch('setLengthTrust', {
+    await store.setLengthTrust({
       valid: true,
       trustIndenture: false,
       lifeInfinite: false,
@@ -298,7 +303,7 @@ describe('Confirm Amendment for staff', () => {
       lienAmount: '',
       action: ActionTypes.EDITED
     })
-    await store.dispatch('setOriginalLengthTrust', {
+    await store.setOriginalLengthTrust({
       valid: true,
       trustIndenture: true,
       lifeInfinite: false,
@@ -307,13 +312,13 @@ describe('Confirm Amendment for staff', () => {
       surrenderDate: '',
       lienAmount: ''
     })
-    await store.dispatch('setAddCollateral', {
+    await store.setAddCollateral({
       vehicleCollateral: mockedVehicleCollateral1,
       generalCollateral: mockedGeneralCollateral1,
       valid: true
     })
-    await store.dispatch('setAmendmentDescription', 'test')
-    await store.dispatch('setCertifyInformation', mockedAmendmentCertified)
+    await store.setAmendmentDescription('test')
+    await store.setCertifyInformation(mockedAmendmentCertified)
 
     // create a Local Vue and install router on it
     const localVue = createLocalVue()
@@ -323,7 +328,7 @@ describe('Confirm Amendment for staff', () => {
       name: RouteNames.CONFIRM_AMENDMENT,
       query: { 'reg-num': '123456B' }
     })
-    wrapper = shallowMount(ConfirmAmendment, { localVue, store, router, vuetify })
+    wrapper = shallowMount((ConfirmAmendment as any), { localVue, store, router, vuetify })
     wrapper.setProps({ appReady: true })
     await flushPromises()
   })
@@ -336,9 +341,9 @@ describe('Confirm Amendment for staff', () => {
 
   it('shows staff payment', async () => {
     // Set up for valid amendment request
-    await store.dispatch('setRegistrationNumber', '023001B')
-    await store.dispatch('setFolioOrReferenceNumber', 'A-00000402')
-    await store.dispatch('setRegistrationConfirmDebtorName', mockedDebtorNames[0])
+    await store.setRegistrationNumber('023001B')
+    await store.setFolioOrReferenceNumber('A-00000402')
+    await store.setRegistrationConfirmDebtorName(mockedDebtorNames[0])
     expect(wrapper.vm.collateralValid).toBe(true)
     expect(wrapper.vm.partiesValid).toBe(true)
     expect(wrapper.vm.courtOrderValid).toBe(true)

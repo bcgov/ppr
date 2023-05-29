@@ -1,15 +1,17 @@
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { getVuexStore } from '@/store'
 import { mount, Wrapper } from '@vue/test-utils'
 // local
 import { ChangeSecuredPartyDialog } from '@/components/dialogs'
 import { getLastEvent } from './utils'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
 
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 // emitted events
 const proceed: string = 'proceed'
@@ -27,7 +29,7 @@ describe('Confirmation Dialog', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
-    wrapper = mount(ChangeSecuredPartyDialog, {
+    wrapper = mount((ChangeSecuredPartyDialog as any), {
       vuetify,
       store,
       propsData: {
@@ -35,7 +37,7 @@ describe('Confirmation Dialog', () => {
         securedPartyName: 'Test Company'
       }
     })
-    await Vue.nextTick()
+    await nextTick()
   })
   afterEach(() => {
     wrapper.destroy()
@@ -49,12 +51,12 @@ describe('Confirmation Dialog', () => {
 
     expect(wrapper.find(accept).exists()).toBe(true)
     wrapper.find(accept).trigger('click')
-    await Vue.nextTick()
+    await nextTick()
     expect(getLastEvent(wrapper, proceed)).toEqual(true)
 
     expect(wrapper.find(cancel).exists()).toBe(true)
     wrapper.find(cancel).trigger('click')
-    await Vue.nextTick()
+    await nextTick()
     expect(getLastEvent(wrapper, proceed)).toEqual(false)
   })
 })

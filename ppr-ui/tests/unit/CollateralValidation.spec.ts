@@ -1,8 +1,6 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { getVuexStore } from '@/store'
-import CompositionApi from '@vue/composition-api'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import flushPromises from 'flush-promises'
 import {
@@ -11,11 +9,14 @@ import {
 
 // Components
 import { EditCollateral } from '@/components/collateral'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
 
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 // Input field selectors / buttons
 const doneButtonSelector: string = '#done-btn-collateral'
@@ -32,10 +33,10 @@ function createComponent (
   invalidSection: boolean
 ): Wrapper<any> {
   const localVue = createLocalVue()
-  localVue.use(CompositionApi)
+
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
-  return mount(EditCollateral, {
+  return mount((EditCollateral as any), {
     localVue,
     propsData: { activeIndex, invalidSection },
     store,
@@ -47,7 +48,7 @@ describe('Collateral validation tests', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
-    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement)
+    await store.setRegistrationType(mockedSelectSecurityAgreement)
     wrapper = await createComponent(-1, false)
   })
   afterEach(() => {
@@ -85,7 +86,7 @@ describe('Collateral validation tests', () => {
 
   it('validates serial number for vehicle', async () => {
     await wrapper.find('#txt-type-drop').setValue('MV')
-    await Vue.nextTick()
+    await nextTick()
     wrapper.find('#txt-serial').setValue('234627834628736428734634234872364')
     wrapper.find('#txt-make').setValue('Honda')
     wrapper.find('#txt-model').setValue('Civic')
@@ -102,7 +103,7 @@ describe('Collateral validation tests', () => {
 
   it('validates number is correct for manufactured home', async () => {
     wrapper.find('#txt-type-drop').setValue('MH')
-    await Vue.nextTick()
+    await nextTick()
     wrapper.find('#txt-man').setValue('444555')
     wrapper.find('#txt-make').setValue('Honda')
     wrapper.find('#txt-model').setValue('Civic')
@@ -116,7 +117,7 @@ describe('Collateral validation tests', () => {
 
   it('validates numbers only for manufactured home', async () => {
     wrapper.find('#txt-type-drop').setValue('MH')
-    await Vue.nextTick()
+    await nextTick()
     wrapper.find('#txt-man').setValue('123$a')
     wrapper.find('#txt-make').setValue('Honda')
     wrapper.find('#txt-model').setValue('Civic')
@@ -132,7 +133,7 @@ describe('Collateral validation tests', () => {
 
   it('validates serial number max length for manufactured home', async () => {
     wrapper.find('#txt-type-drop').setValue('MH')
-    await Vue.nextTick()
+    await nextTick()
     wrapper.find('#txt-man').setValue('123456')
     wrapper.find('#txt-serial').setValue('123456789012345678901234567890')
     wrapper.find('#txt-make').setValue('Honda')
@@ -149,7 +150,7 @@ describe('Collateral validation tests', () => {
 
   it('validates max lengths', async () => {
     wrapper.find('#txt-type-drop').setValue('MV')
-    await Vue.nextTick()
+    await nextTick()
     wrapper.find('#txt-serial').setValue('ABC123')
     wrapper.find('#txt-make').setValue(
       'This is a very long make for a car or any vehicle for that matter but is it too long'

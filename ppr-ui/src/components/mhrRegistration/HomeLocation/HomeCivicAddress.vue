@@ -63,17 +63,19 @@
 
 <script lang="ts">
 /* eslint-disable no-unused-vars */
-import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
+import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue-demi'
 import { CivicAddressSchema } from '@/schemas/civic-address'
-import { useActions, useGetters } from 'vuex-composition-helpers'
+import { useStore } from '@/store/store'
 import { useMhrValidations } from '@/composables'
 import {
   useAddress,
   useAddressComplete,
   useCountriesProvinces
 } from '@/composables/address/factories'
-import { AddressIF } from '@/interfaces'
+import { AddressIF, FormIF } from '@/interfaces'
+import { storeToRefs } from 'pinia'
 /* eslint-enable no-unused-vars */
+
 export default defineComponent({
   name: 'HomeCivicAddress',
   components: {},
@@ -95,25 +97,14 @@ export default defineComponent({
     }
   },
   setup (props, context) {
-    const {
-      getMhrRegistrationValidationModel
-    } = useGetters<any>([
-      'getMhrRegistrationValidationModel'
-    ])
-    const {
-      setCivicAddress
-    } = useActions<any>([
-      'setCivicAddress'
-    ])
-
+    const { setCivicAddress } = useStore()
+    const { getMhrRegistrationValidationModel } = storeToRefs(useStore())
     const {
       MhrCompVal,
       MhrSectVal,
       setValidation
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
-
     const countryProvincesHelpers = useCountriesProvinces()
-
     const {
       addressLocal,
       country,
@@ -121,8 +112,8 @@ export default defineComponent({
       isSchemaRequired,
       labels
     } = useAddress(toRefs(props).value, CivicAddressSchema)
-
     const { enableAddressComplete, uniqueIds } = useAddressComplete(addressLocal)
+    const addressForm = ref(null) as FormIF
 
     const localState = reactive({
       isValidCivicAddress: false,
@@ -136,10 +127,9 @@ export default defineComponent({
       })
     })
 
-    const validateForm = (context): void => {
+    const validateForm = (): void => {
       if (props.validate) {
-        // @ts-ignore - function exists
-        context.refs.addressForm.validate()
+        addressForm.value?.validate()
       }
     }
 
@@ -163,9 +153,8 @@ export default defineComponent({
       setValidation(MhrSectVal.LOCATION_VALID, MhrCompVal.CIVIC_ADDRESS_VALID, val)
     })
 
-    watch(() => props.validate, async () => {
-      // @ts-ignore - function exists
-      validateForm(context)
+    watch(() => props.validate, () => {
+      validateForm()
     })
     /** Clear/reset forms when select option changes. **/
     return {

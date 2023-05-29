@@ -30,7 +30,7 @@
           <v-col class="text-right" v-if="!isReserve">
             <v-btn
               text
-              plain="true"
+              plain
               color="primary"
               class="mr-n4"
               :ripple="false"
@@ -89,11 +89,12 @@
 
 <script lang="ts">
 /* eslint-disable no-unused-vars */
-import { defineComponent, computed, reactive, toRefs, watch, onMounted } from '@vue/composition-api'
+import { defineComponent, computed, reactive, toRefs, watch, onMounted } from 'vue-demi'
 import { HomeLocationInfo } from '@/components/common'
-import { useActions, useGetters } from 'vuex-composition-helpers'
+import { useStore } from '@/store/store'
 import { useInputRules, useNewMhrRegistration } from '@/composables'
 import { MhrLocationInfoIF } from '@/interfaces'
+import { storeToRefs } from 'pinia'
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
@@ -109,16 +110,8 @@ export default defineComponent({
     isStrata: { type: Boolean, default: false }
   },
   setup (props, context) {
-    const {
-      getMhrRegistrationLocation
-    } = useGetters<any>([
-      'getMhrRegistrationLocation'
-    ])
-    const {
-      setIsManualLocation
-    } = useActions<any>([
-      'setIsManualLocation'
-    ])
+    const { setIsManualLocation } = useStore()
+    const { getMhrRegistrationLocation } = storeToRefs(useStore())
 
     const { maxLength } = useInputRules()
     const { resetLocationInfoFields } = useNewMhrRegistration()

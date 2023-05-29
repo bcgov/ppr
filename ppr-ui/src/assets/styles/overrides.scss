@@ -356,6 +356,16 @@ input#reg-textfield.v-text-field.v-input--dense:not(.v-text-field--outlined),
   padding-bottom: 0px !important;
 }
 
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  flex: 1 1 auto;
+  margin: 0 -12px;
+}
+.row + .row {
+  margin-top: 0;
+}
+
 .v-data-table.party-summary-table tr.v-data-table__empty-wrapper td {
   text-align: left;
   border-left: 3px solid #d3272c !important;

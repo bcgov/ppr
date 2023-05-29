@@ -1,6 +1,7 @@
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { getVuexStore } from '@/store'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 
 import { HomeOwners } from '@/views'
@@ -41,14 +42,15 @@ import { transferSupportingDocuments, transfersErrors, MixedRolesErrors } from '
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 function createComponent (): Wrapper<any> {
   const localVue = createLocalVue()
   localVue.use(Vuetify)
 
   document.body.setAttribute('data-app', 'true')
-  return mount(HomeOwners, {
+  return mount((HomeOwners as any), {
     localVue,
     propsData: {
       appReady: true,
@@ -68,7 +70,7 @@ describe('Home Owners', () => {
   beforeEach(async () => {
     wrapper = createComponent()
 
-    await store.dispatch('setMhrTransferType', {
+    await store.setMhrTransferType({
       transferType: ApiTransferTypes.SALE_OR_GIFT,
       textLabel: UITransferTypes.SALE_OR_GIFT
     })
@@ -80,29 +82,29 @@ describe('Home Owners', () => {
   // Helper functions
 
   const openAddPerson = async () => {
-    const homeOwnersSection = wrapper.findComponent(HomeOwners)
+    const homeOwnersSection = wrapper
     await homeOwnersSection.find(getTestId('add-person-btn'))?.trigger('click')
-    await Vue.nextTick()
+    await nextTick()
     expect(homeOwnersSection.findComponent(AddEditHomeOwner).exists()).toBeTruthy()
     expect(homeOwnersSection.findComponent(HomeOwnerGroups).exists()).toBeTruthy()
   }
 
   const openAddOrganization = async () => {
-    const homeOwnersSection = wrapper.findComponent(HomeOwners)
+    const homeOwnersSection = wrapper
     await homeOwnersSection.find(getTestId('add-org-btn'))?.trigger('click')
-    await Vue.nextTick()
+    await nextTick()
     expect(homeOwnersSection.findComponent(AddEditHomeOwner).exists()).toBeTruthy()
     expect(homeOwnersSection.findComponent(HomeOwnerGroups).exists()).toBeTruthy()
   }
 
   const clickCancelAddOwner = async () => {
-    const homeOwnersSection = wrapper.findComponent(HomeOwners)
+    const homeOwnersSection = wrapper
     const addOwnerSection = homeOwnersSection.findComponent(AddEditHomeOwner)
     expect(addOwnerSection.exists).toBeTruthy()
     const cancelBtn = addOwnerSection.find(getTestId('cancel-btn'))
     expect(cancelBtn.exists()).toBeTruthy()
     await cancelBtn.trigger('click')
-    await Vue.nextTick()
+    await nextTick()
     expect(homeOwnersSection.findComponent(AddEditHomeOwner).exists()).toBeFalsy()
   }
 
@@ -120,14 +122,14 @@ describe('Home Owners', () => {
   }
 
   const selectTransferType = async (transferType: ApiTransferTypes) => {
-    await store.dispatch('setMhrTransferType', { transferType: transferType } as TransferTypeSelectIF)
-    await Vue.nextTick()
+    await store.setMhrTransferType({ transferType: transferType } as TransferTypeSelectIF)
+    await nextTick()
   }
 
   // Tests
 
   it('renders Home Owners and its sub components', () => {
-    expect(wrapper.findComponent(HomeOwners).exists()).toBeTruthy()
+    expect(wrapper.exists()).toBeTruthy()
     expect(wrapper.findComponent(AddEditHomeOwner).exists()).toBeFalsy() // Hidden by default
     expect(wrapper.findComponent(HomeOwnersTable).exists()).toBeTruthy()
     expect(wrapper.findComponent(SimpleHelpToggle).exists()).toBeFalsy() // Verify it doesn't render in Transfers
@@ -151,11 +153,11 @@ describe('Home Owners', () => {
     const homeOwnerGroup = [{ groupId: 1, owners: [mockedPerson] }] as MhrRegistrationHomeOwnerGroupIF[]
 
     // add a person
-    await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerGroup)
+    await store.setMhrTransferHomeOwnerGroups(homeOwnerGroup)
 
     expect(wrapper.findComponent(AddEditHomeOwner).exists()).toBeFalsy()
 
-    let ownersTable = wrapper.findComponent(HomeOwners).findComponent(HomeOwnersTable)
+    let ownersTable = wrapper.findComponent(HomeOwnersTable)
 
     // renders all fields
 
@@ -179,11 +181,11 @@ describe('Home Owners', () => {
 
     // add an organization
     homeOwnerGroup[0].owners.push(mockedOrganization)
-    await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerGroup)
+    await store.setMhrTransferHomeOwnerGroups(homeOwnerGroup)
 
     expect(wrapper.findComponent(AddEditHomeOwner).exists()).toBeFalsy()
 
-    ownersTable = wrapper.findComponent(HomeOwners).findComponent(HomeOwnersTable)
+    ownersTable = wrapper.findComponent(HomeOwnersTable)
 
     // renders all fields
     expect(ownersTable.exists()).toBeTruthy()
@@ -203,11 +205,11 @@ describe('Home Owners', () => {
     const homeOwnerGroup = [{ groupId: 1, owners: [mockedAddedPerson, mockedAddedOrganization] }]
 
     // add a person
-    await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerGroup)
+    await store.setMhrTransferHomeOwnerGroups(homeOwnerGroup)
 
     expect(wrapper.findComponent(AddEditHomeOwner).exists()).toBeFalsy()
 
-    let ownersTable = wrapper.findComponent(HomeOwners).findComponent(HomeOwnersTable)
+    let ownersTable = wrapper.findComponent(HomeOwnersTable)
 
     // renders all fields
 
@@ -227,7 +229,7 @@ describe('Home Owners', () => {
 
     expect(wrapper.findComponent(AddEditHomeOwner).exists()).toBeFalsy()
 
-    ownersTable = wrapper.findComponent(HomeOwners).findComponent(HomeOwnersTable)
+    ownersTable = wrapper.findComponent(HomeOwnersTable)
 
     // renders all fields
     expect(ownersTable.exists()).toBeTruthy()
@@ -252,11 +254,11 @@ describe('Home Owners', () => {
     const homeOwnerGroup = [{ groupId: 1, owners: [mockedRemovedPerson, mockedRemovedOrganization] }]
 
     // add a person
-    await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerGroup)
+    await store.setMhrTransferHomeOwnerGroups(homeOwnerGroup)
 
     expect(wrapper.findComponent(AddEditHomeOwner).exists()).toBeFalsy()
 
-    let ownersTable = wrapper.findComponent(HomeOwners).findComponent(HomeOwnersTable)
+    let ownersTable = wrapper.findComponent(HomeOwnersTable)
 
     // renders all fields
 
@@ -276,7 +278,7 @@ describe('Home Owners', () => {
 
     expect(wrapper.findComponent(AddEditHomeOwner).exists()).toBeFalsy()
 
-    ownersTable = wrapper.findComponent(HomeOwners).findComponent(HomeOwnersTable)
+    ownersTable = wrapper.findComponent(HomeOwnersTable)
 
     // renders all fields
     expect(ownersTable.exists()).toBeTruthy()
@@ -317,14 +319,14 @@ describe('Home Owners', () => {
     ]
 
     // add a person
-    await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerGroups)
+    await store.setMhrTransferHomeOwnerGroups(homeOwnerGroups)
 
     expect(wrapper.findComponent(AddEditHomeOwner).exists()).toBeFalsy()
     // check current Owners and Groups
-    wrapper.findComponent(HomeOwners).vm.$data.setShowGroups(true)
+    wrapper.vm.setShowGroups(true)
     await Vue.nextTick()
 
-    const ownersTable = wrapper.findComponent(HomeOwners).findComponent(HomeOwnersTable)
+    const ownersTable = wrapper.findComponent(HomeOwnersTable)
 
     // renders all fields
     expect(ownersTable.exists()).toBe(true)
@@ -349,7 +351,7 @@ describe('Home Owners', () => {
     expect(ownersTable.findAllComponents(TableGroupHeader).at(1)
       .findComponent(InfoChip).text()).toContain('REMOVED')
 
-    wrapper.findComponent(HomeOwners).vm.$data.setShowGroups(false)
+    wrapper.vm.setShowGroups(false)
   })
 
   it('should display a CHANGED a home owner group', async () => {
@@ -372,14 +374,14 @@ describe('Home Owners', () => {
     ]
 
     // add a person
-    await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerGroups)
+    await store.setMhrTransferHomeOwnerGroups(homeOwnerGroups)
 
     expect(wrapper.findComponent(AddEditHomeOwner).exists()).toBeFalsy()
     // check current Owners and Groups
-    wrapper.findComponent(HomeOwners).vm.$data.setShowGroups(true)
+    wrapper.vm.setShowGroups(true)
     await Vue.nextTick()
 
-    const ownersTable = wrapper.findComponent(HomeOwners).findComponent(HomeOwnersTable)
+    const ownersTable = wrapper.findComponent(HomeOwnersTable)
 
     // Verify Headers
     expect(ownersTable.findAllComponents(TableGroupHeader).length).toBe(2)
@@ -390,7 +392,7 @@ describe('Home Owners', () => {
     expect(ownersTable.findAllComponents(TableGroupHeader).at(1)
       .findComponent(InfoChip).text()).toContain('CHANGED')
 
-    wrapper.findComponent(HomeOwners).vm.$data.setShowGroups(false)
+    wrapper.vm.setShowGroups(false)
   })
 
   it('TRANS SALE GIFT: validations with sole Owner in one group', async () => {
@@ -401,12 +403,12 @@ describe('Home Owners', () => {
 
     const homeOwnerGroup: MhrRegistrationHomeOwnerGroupIF[] = [{ groupId: 1, owners: [mockedPerson], type: '' }]
 
-    await store.dispatch('setMhrTransferCurrentHomeOwnerGroups', homeOwnerGroup)
-    await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerGroup)
+    await store.setMhrTransferCurrentHomeOwnerGroups(homeOwnerGroup)
+    await store.setMhrTransferHomeOwnerGroups(homeOwnerGroup)
 
     await selectTransferType(TRANSFER_TYPE)
 
-    const homeOwners = wrapper.findComponent(HomeOwners)
+    const homeOwners: Wrapper<any> = wrapper
     expect(homeOwners.find(getTestId('table-delete-btn')).exists()).toBeTruthy()
     await homeOwners.find(getTestId('table-delete-btn')).trigger('click')
     await Vue.nextTick()
@@ -419,7 +421,7 @@ describe('Home Owners', () => {
     expect(homeOwners.find(getTestId('no-data-msg')).text()).toContain('No owners added yet.')
 
     const deletedOwner: MhrRegistrationHomeOwnerIF =
-      homeOwners.vm.$data.getMhrTransferHomeOwnerGroups[0].owners[0]
+      homeOwners.vm.getMhrTransferHomeOwnerGroups[0].owners[0]
 
     const addedOwner: MhrRegistrationHomeOwnerIF = {
       ...mockedAddedPerson,
@@ -427,11 +429,11 @@ describe('Home Owners', () => {
       groupId: 1
     }
 
-    await store.dispatch('setMhrTransferHomeOwnerGroups',
+    await store.setMhrTransferHomeOwnerGroups(
       [{ groupId: 1, owners: [deletedOwner, addedOwner] }] as MhrRegistrationHomeOwnerGroupIF[])
 
     // check number of owners and that all errors are cleared
-    expect(homeOwners.vm.$data.getHomeOwners.length).toBe(2)
+    expect(homeOwners.vm.getHomeOwners.length).toBe(2)
     expect(homeOwners.text()).not.toContain('Group 1')
     expect(homeOwners.find(getTestId('invalid-group-msg')).exists()).toBeFalsy()
     expect(homeOwners.find(getTestId('no-data-msg')).exists()).toBeFalsy()
@@ -446,12 +448,12 @@ describe('Home Owners', () => {
 
     const homeOwnerGroup: MhrRegistrationHomeOwnerGroupIF[] = [{ groupId: 1, owners: [mockedPerson], type: '' }]
 
-    await store.dispatch('setMhrTransferCurrentHomeOwnerGroups', homeOwnerGroup)
-    await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerGroup)
+    await store.setMhrTransferCurrentHomeOwnerGroups(homeOwnerGroup)
+    await store.setMhrTransferHomeOwnerGroups(homeOwnerGroup)
 
     expect(wrapper.findComponent(AddEditHomeOwner).exists()).toBeFalsy()
 
-    const homeOwners = wrapper.findComponent(HomeOwners)
+    const homeOwners = wrapper
 
     // Add Person button should not be visible
     expect(homeOwners.find(getTestId('add-person-btn')).exists()).toBeFalsy()
@@ -460,9 +462,9 @@ describe('Home Owners', () => {
 
     expect(homeOwners.find(getTestId('transfer-table-error')).exists()).toBeFalsy()
 
-    expect(homeOwners.vm.$data.getMhrTransferCurrentHomeOwnerGroups[0].owners.length ===
+    expect(homeOwners.vm.getMhrTransferCurrentHomeOwnerGroups[0].owners.length ===
       homeOwnerGroup.length).toBeTruthy()
-    expect(homeOwners.vm.$data.getHomeOwners[0].individualName.first ===
+    expect(homeOwners.vm.getHomeOwners[0].individualName.first ===
       homeOwnerGroup[0].owners[0].individualName.first).toBeTruthy()
 
     expect(homeOwners.find(getTestId('table-delete-btn')).exists()).toBeTruthy()
@@ -491,7 +493,7 @@ describe('Home Owners', () => {
     // check disabled state of Death Certificate radio button
     expect(radioButtonDeathCert.disabled).toBeTruthy()
 
-    await wrapper.findComponent(HomeOwners).find(getTestId('add-person-btn'))?.trigger('click')
+    await wrapper.find(getTestId('add-person-btn'))?.trigger('click')
     await Vue.nextTick()
 
     const addEditHomeOwner = wrapper.findComponent(AddEditHomeOwner)
@@ -512,14 +514,14 @@ describe('Home Owners', () => {
     const TRANSFER_TYPE = ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL
 
     let homeOwnerGroup = [{ groupId: 1, owners: [mockedPerson] }]
-    await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerGroup)
+    await store.setMhrTransferHomeOwnerGroups(homeOwnerGroup)
 
     const homeOwnersTable = wrapper.findComponent(HomeOwnersTable)
 
     await selectTransferType(TRANSFER_TYPE)
 
     // Tenancy type should be SOLE before changes made
-    expect(wrapper.findComponent(HomeOwners).vm.$data.getHomeOwners.length).toBe(1)
+    expect(wrapper.vm.getHomeOwners.length).toBe(1)
     expect(
       wrapper
         .findComponent(HomeOwners)
@@ -529,10 +531,10 @@ describe('Home Owners', () => {
 
     // add executor
     homeOwnerGroup[0].owners.push(mockedExecutor)
-    await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerGroup)
+    await store.setMhrTransferHomeOwnerGroups(homeOwnerGroup)
 
     // Tenancy type should be N/A due to mix of Executor and living owner
-    expect(wrapper.findComponent(HomeOwners).vm.$data.getHomeOwners.length).toBe(2)
+    expect(wrapper.vm.getHomeOwners.length).toBe(2)
     expect(
       wrapper
         .findComponent(HomeOwners)
@@ -542,13 +544,13 @@ describe('Home Owners', () => {
 
     // reset owners
     homeOwnerGroup = [{ groupId: 1, owners: [mockedPerson] }]
-    await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerGroup)
+    await store.setMhrTransferHomeOwnerGroups(homeOwnerGroup)
 
     // delete original owner
     await homeOwnersTable.find(getTestId('table-delete-btn')).trigger('click')
 
     // Tenancy type should be N/A with no living owners
-    expect(wrapper.findComponent(HomeOwners).vm.$data.getHomeOwners.length).toBe(1)
+    expect(wrapper.vm.getHomeOwners.length).toBe(1)
     expect(
       wrapper
         .findComponent(HomeOwners)
@@ -558,10 +560,10 @@ describe('Home Owners', () => {
 
     // add executor
     homeOwnerGroup[0].owners.push(mockedExecutor)
-    await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerGroup)
+    await store.setMhrTransferHomeOwnerGroups(homeOwnerGroup)
 
     // Tenancy type should be SOLE
-    expect(wrapper.findComponent(HomeOwners).vm.$data.getHomeOwners.length).toBe(2)
+    expect(wrapper.vm.getHomeOwners.length).toBe(2)
     expect(
       wrapper
         .findComponent(HomeOwners)
@@ -571,10 +573,10 @@ describe('Home Owners', () => {
 
     // add another executor
     homeOwnerGroup[0].owners.push(mockedExecutor)
-    await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerGroup)
+    await store.setMhrTransferHomeOwnerGroups(homeOwnerGroup)
 
     // Tenancy type should be N/A due to multiple Executors
-    expect(wrapper.findComponent(HomeOwners).vm.$data.getHomeOwners.length).toBe(3)
+    expect(wrapper.vm.getHomeOwners.length).toBe(3)
     expect(
       wrapper
         .findComponent(HomeOwners)
@@ -607,9 +609,9 @@ describe('Home Owners', () => {
         type: ''
       }
     ]
-    await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerGroup)
+    await store.setMhrTransferHomeOwnerGroups(homeOwnerGroup)
 
-    const homeOwners = wrapper.findComponent(HomeOwners)
+    const homeOwners = wrapper
     const groupError = homeOwners.find(getTestId('invalid-group-msg'))
 
     expect(groupError.text()).toContain(MixedRolesErrors.hasMixedOwnerTypes)
@@ -621,7 +623,7 @@ describe('Home Owners', () => {
       type: ''
     } as MhrRegistrationHomeOwnerGroupIF)
 
-    await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerGroup)
+    await store.setMhrTransferHomeOwnerGroups(homeOwnerGroup)
 
     expect(groupError.text()).toContain(MixedRolesErrors.hasMixedOwnerTypesInGroup)
   })
@@ -633,12 +635,12 @@ describe('Home Owners', () => {
     const TRANSFER_TYPE = ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL
     const homeOwnerGroup: MhrRegistrationHomeOwnerGroupIF[] = [{ groupId: 1, owners: [mockedPerson], type: '' }]
 
-    await store.dispatch('setMhrTransferCurrentHomeOwnerGroups', homeOwnerGroup)
-    await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerGroup)
+    await store.setMhrTransferCurrentHomeOwnerGroups(homeOwnerGroup)
+    await store.setMhrTransferHomeOwnerGroups(homeOwnerGroup)
 
     await selectTransferType(TRANSFER_TYPE)
 
-    const homeOwners = wrapper.findComponent(HomeOwners)
+    const homeOwners = wrapper
 
     const invalidGroupMsg = homeOwners.find(getTestId('invalid-group-msg'))
     expect(invalidGroupMsg.exists()).toBeFalsy()
@@ -650,7 +652,7 @@ describe('Home Owners', () => {
     expect(homeOwners.find(getTestId('invalid-group-msg')).text()).toContain('Must contain at least one executor.')
 
     const deletedOwner: MhrRegistrationHomeOwnerIF =
-      homeOwners.vm.$data.getMhrTransferHomeOwnerGroups[0].owners[0]
+      homeOwners.vm.getMhrTransferHomeOwnerGroups[0].owners[0]
 
     const addedExecutor: MhrRegistrationHomeOwnerIF = {
       ...mockedAddedPerson,
@@ -661,13 +663,13 @@ describe('Home Owners', () => {
     }
 
     // add an executor to the group
-    await store.dispatch('setMhrTransferHomeOwnerGroups',
+    await store.setMhrTransferHomeOwnerGroups(
       [{ groupId: 1, owners: [deletedOwner, addedExecutor] }] as MhrRegistrationHomeOwnerGroupIF[])
 
     // make sure current owner group is not altered
-    expect(homeOwners.vm.$data.getMhrTransferCurrentHomeOwnerGroups[0].owners.length).toBe(1)
+    expect(homeOwners.vm.getMhrTransferCurrentHomeOwnerGroups[0].owners.length).toBe(1)
 
-    const homeOwnersData = homeOwners.vm.$data.getHomeOwners
+    const homeOwnersData = homeOwners.vm.getHomeOwners
     expect(homeOwnersData.length).toBe(2)
 
     // make sure all owners are in the same group, that is not shown for Sole Owner tenancy type
@@ -696,16 +698,16 @@ describe('Home Owners', () => {
     const TRANSFER_TYPE = ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL
     const homeOwnerGroup: MhrRegistrationHomeOwnerGroupIF[] = mockMhrTransferCurrentHomeOwnerGroup
 
-    await store.dispatch('setMhrTransferCurrentHomeOwnerGroups', homeOwnerGroup)
+    await store.setMhrTransferCurrentHomeOwnerGroups(homeOwnerGroup)
     // reset group ids as this is how it is implemented in the app
-    await store.dispatch('setMhrTransferHomeOwnerGroups', [
+    await store.setMhrTransferHomeOwnerGroups([
       { groupId: 1, ...homeOwnerGroup[0] },
       { groupId: 2, ...homeOwnerGroup[1] }
     ])
 
     await selectTransferType(TRANSFER_TYPE)
 
-    const homeOwners = wrapper.findComponent(HomeOwners)
+    const homeOwners = wrapper
     const allDeleteButtons = homeOwners.findAll(getTestId('table-delete-btn'))
     expect(allDeleteButtons.length).toBe(3)
     allDeleteButtons.at(0).trigger('click')
@@ -735,7 +737,7 @@ describe('Home Owners', () => {
     // error message under the Add a Person button should not be displayed
     expect(homeOwners.find(getTestId('transfer-table-error')).exists()).toBeFalsy()
 
-    const deletedOwnerGroup: MhrRegistrationHomeOwnerGroupIF = homeOwners.vm.$data.getMhrTransferHomeOwnerGroups[0]
+    const deletedOwnerGroup: MhrRegistrationHomeOwnerGroupIF = homeOwners.vm.getMhrTransferHomeOwnerGroups[0]
 
     const addedExecutor: MhrRegistrationHomeOwnerIF = {
       ...mockedAddedPerson,
@@ -752,14 +754,14 @@ describe('Home Owners', () => {
       { groupId: 2, ...homeOwnerGroup[1] }
     ]
 
-    await store.dispatch('setMhrTransferHomeOwnerGroups', updatedGroup)
+    await store.setMhrTransferHomeOwnerGroups(updatedGroup)
 
     // make sure current owner group is not altered
-    expect(homeOwners.vm.$data.getMhrTransferCurrentHomeOwnerGroups[0].owners.length).toBe(2)
-    expect(homeOwners.vm.$data.getMhrTransferCurrentHomeOwnerGroups[1].owners.length).toBe(1)
+    expect(homeOwners.vm.getMhrTransferCurrentHomeOwnerGroups[0].owners.length).toBe(2)
+    expect(homeOwners.vm.getMhrTransferCurrentHomeOwnerGroups[1].owners.length).toBe(1)
 
-    expect(homeOwners.vm.$data.getMhrTransferHomeOwnerGroups[0].owners.length).toBe(3)
-    expect(homeOwners.vm.$data.getMhrTransferHomeOwnerGroups[1].owners.length).toBe(1)
+    expect(homeOwners.vm.getMhrTransferHomeOwnerGroups[0].owners.length).toBe(3)
+    expect(homeOwners.vm.getMhrTransferHomeOwnerGroups[1].owners.length).toBe(1)
 
     // since we did not delete the second owner from the group one, the error message should be displayed
     expect(homeOwners.find(getTestId('invalid-group-msg')).text())
@@ -827,7 +829,7 @@ describe('Home Owners', () => {
     await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerGroupTwoExecutors)
     await selectTransferType(ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL)
 
-    const homeOwners = wrapper.findComponent(HomeOwners)
+    const homeOwners: Wrapper<any> = wrapper.findComponent(HomeOwners)
     await homeOwners.find(getTestId('table-delete-btn')).trigger('click')
     // error should not be shown when removing one out of two Executors in the group
     expect(homeOwners.find(getTestId('invalid-group-msg')).exists()).toBeFalsy()
@@ -839,16 +841,16 @@ describe('Home Owners', () => {
         type: ''
       }
     ]
-    await store.dispatch('setMhrTransferCurrentHomeOwnerGroups', homeOwnerGroup)
-    await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerGroup)
-
+    await store.setMhrTransferCurrentHomeOwnerGroups(homeOwnerGroup)
+    await store.setMhrTransferHomeOwnerGroups(homeOwnerGroup)
     await homeOwners.find(getTestId('table-delete-btn')).trigger('click')
 
     expect(homeOwners.find(getTestId('invalid-group-msg')).exists()).toBeTruthy()
     expect(homeOwners.find(getTestId('invalid-group-msg')).text())
       .toContain(transfersErrors.mustContainOneExecutor)
 
-    homeOwners.findComponent(InfoChip).vm.$data.action = 'DELETED'
+    const infoChip: Wrapper<any> = homeOwners.findComponent(InfoChip)
+    infoChip.vm.action = 'DELETED'
 
     await homeOwners.find(getTestId('add-person-btn')).trigger('click')
     const addOwnerSection = homeOwners.findComponent(AddEditHomeOwner)
@@ -860,7 +862,7 @@ describe('Home Owners', () => {
     await addOwnerSection.find(getTestId('cancel-btn')).trigger('click')
 
     // add a new Executor via store, preserving first deleted Executor
-    await store.dispatch('setMhrTransferHomeOwnerGroups', [
+    await store.setMhrTransferHomeOwnerGroups([
       {
         groupId: 1,
         owners: [
@@ -872,7 +874,7 @@ describe('Home Owners', () => {
     ])
 
     // should have two Executors in the table
-    const owners: MhrRegistrationHomeOwnerIF[] = homeOwners.vm.$data.getMhrTransferHomeOwnerGroups[0].owners
+    const owners: MhrRegistrationHomeOwnerIF[] = homeOwners.vm.getMhrTransferHomeOwnerGroups[0].owners
     expect(owners.length).toBe(2)
     // both Executors should have the same suffix, because it was pre-filled
     expect(owners[0].suffix).toBe(mockedExecutor.suffix)
@@ -904,20 +906,21 @@ describe('Home Owners', () => {
     ]
 
     await selectTransferType(TRANSFER_TYPE)
-    await store.dispatch('setMhrTransferCurrentHomeOwnerGroups', homeOwnerGroup)
+    await store.setMhrTransferCurrentHomeOwnerGroups(homeOwnerGroup)
 
     // One Owner is Deceased, no Executor added
-    await store.dispatch('setMhrTransferHomeOwnerGroups', [
+    await store.setMhrTransferHomeOwnerGroups([
       { groupId: 1, owners: [mockedPerson, { ...mockedPerson2, action: ActionTypes.REMOVED }], type: '' },
       { groupId: 2, owners: [mockedPerson], type: '' }
     ])
-    const homeOwners = wrapper.findComponent(HomeOwners)
-    const groupError = homeOwners.find(getTestId('invalid-group-msg'))
+    await nextTick()
+    await nextTick()
 
+    const groupError = wrapper.find(getTestId('invalid-group-msg'))
     expect(groupError.text()).toContain(transfersErrors.allOwnersHaveDeathCerts[TRANSFER_TYPE])
 
     // All Owners are Deceased, no Executor added
-    await store.dispatch('setMhrTransferHomeOwnerGroups', [
+    await store.setMhrTransferHomeOwnerGroups([
       {
         groupId: 1,
         owners: [
@@ -931,7 +934,7 @@ describe('Home Owners', () => {
     expect(groupError.text()).toContain(transfersErrors.allOwnersHaveDeathCerts[TRANSFER_TYPE])
 
     // No Owners removed, one Executor added
-    await store.dispatch('setMhrTransferHomeOwnerGroups', [
+    await store.setMhrTransferHomeOwnerGroups([
       { groupId: 1, owners: [mockedPerson, mockedPerson2, mockedAddedExecutor], type: '' },
       { groupId: 2, owners: [mockedPerson], type: '' }
     ])
@@ -963,10 +966,11 @@ describe('Home Owners', () => {
 
     const homeOwnerGroup: MhrRegistrationHomeOwnerGroupIF[] = [{ groupId: 1, owners: [mockedPerson], type: '' }]
 
-    await store.dispatch('setMhrTransferCurrentHomeOwnerGroups', homeOwnerGroup)
-    await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerGroup)
+    await store.setMhrTransferCurrentHomeOwnerGroups(homeOwnerGroup)
+    await store.setMhrTransferHomeOwnerGroups(homeOwnerGroup)
 
     await selectTransferType(TRANSFER_TYPE)
+
 
     // delete the sole owner
     await homeOwners.find(getTestId('table-delete-btn')).trigger('click')
@@ -994,14 +998,14 @@ describe('Home Owners', () => {
     ]
 
     await selectTransferType(TRANSFER_TYPE)
-    await store.dispatch('setMhrTransferCurrentHomeOwnerGroups', homeOwnerGroup)
-    await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerGroup)
+    await store.setMhrTransferCurrentHomeOwnerGroups(homeOwnerGroup)
+    await store.setMhrTransferHomeOwnerGroups(homeOwnerGroup)
 
-    const homeOwners = wrapper.findComponent(HomeOwners)
+    const homeOwners = wrapper
     expect(homeOwners.find(getTestId('invalid-group-msg')).exists()).toBeFalsy()
 
     // One Owner is Deceased, no Administrator added
-    await store.dispatch('setMhrTransferHomeOwnerGroups', [
+    await store.setMhrTransferHomeOwnerGroups([
       { groupId: 1, owners: [mockedPerson, { ...mockedPerson2, action: ActionTypes.REMOVED }], type: '' },
       { groupId: 2, owners: [mockedPerson], type: '' }
     ])
@@ -1011,7 +1015,7 @@ describe('Home Owners', () => {
     expect(groupError.text()).toContain(transfersErrors.allOwnersHaveDeathCerts[TRANSFER_TYPE])
 
     // All Owners are Deceased, no Administrator added
-    await store.dispatch('setMhrTransferHomeOwnerGroups', [
+    await store.setMhrTransferHomeOwnerGroups([
       {
         groupId: 1,
         owners: [
@@ -1025,7 +1029,7 @@ describe('Home Owners', () => {
     expect(groupError.text()).toContain(transfersErrors.allOwnersHaveDeathCerts[TRANSFER_TYPE])
 
     // No Owners removed, one Administrator added
-    await store.dispatch('setMhrTransferHomeOwnerGroups', [
+    await store.setMhrTransferHomeOwnerGroups([
       { groupId: 1, owners: [mockedPerson, mockedPerson2, mockedAddedAdministrator], type: '' },
       { groupId: 2, owners: [mockedPerson], type: '' }
     ])
@@ -1045,8 +1049,8 @@ describe('Home Owners', () => {
         type: ''
       }
     ]
-    await store.dispatch('setMhrTransferCurrentHomeOwnerGroups', homeOwnerGroup)
-    await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerGroup)
+    await store.setMhrTransferCurrentHomeOwnerGroups(homeOwnerGroup)
+    await store.setMhrTransferHomeOwnerGroups(homeOwnerGroup)
     await selectTransferType(TRANSFER_TYPE)
 
     const homeOwners = wrapper.findComponent(HomeOwners)
@@ -1069,7 +1073,7 @@ describe('Home Owners', () => {
     await addEditHomeOwner.find(getTestId('cancel-btn')).trigger('click')
 
     // add a new Executor via store, preserving first deleted Executor
-    await store.dispatch('setMhrTransferHomeOwnerGroups', [
+    await store.setMhrTransferHomeOwnerGroups([
       {
         groupId: 1,
         owners: [

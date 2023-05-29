@@ -28,23 +28,19 @@
 </template>
 
 <script lang="ts">
-// external
 import {
   computed,
   defineComponent,
   reactive,
   toRefs
-} from '@vue/composition-api'
-import { useActions, useGetters } from 'vuex-composition-helpers'
-
-// Components
+} from 'vue-demi'
+import { useStore } from '@/store/store'
 import { StaffPayment as StaffPaymentComponent } from '@bcrs-shared-components/staff-payment'
 import BaseDialog from '@/components/dialogs/BaseDialog.vue'
-
-// Interfaces and Enums
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces' // eslint-disable-line no-unused-vars
 import { StaffPaymentOptions } from '@bcrs-shared-components/enums'
-import { DialogOptionsIF } from '@/interfaces' // eslint-disable-line
+import { DialogOptionsIF } from '@/interfaces'
+import { storeToRefs } from 'pinia' // eslint-disable-line
 
 export default defineComponent({
   name: 'StaffPaymentDialog',
@@ -75,11 +71,8 @@ export default defineComponent({
   },
   emits: ['proceed'],
   setup (props, { emit }) {
-    const { setStaffPayment, setSearchCertified } = useActions<any>([
-      'setStaffPayment',
-      'setSearchCertified'
-    ])
-    const { getStaffPayment } = useGetters<any>(['getStaffPayment'])
+    const { setStaffPayment, setSearchCertified } = useStore()
+    const { getStaffPayment } = storeToRefs(useStore())
     const localState = reactive({
       certify: false,
       valid: false,

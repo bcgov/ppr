@@ -124,26 +124,24 @@
 </template>
 
 <script lang="ts">
-// external libraries
 import {
   defineComponent,
   onMounted,
   reactive,
   computed,
   toRefs
-} from '@vue/composition-api'
-import { useGetters } from 'vuex-composition-helpers'
-// local components
+} from 'vue-demi'
+import { useStore } from '@/store/store'
 import { EditParty } from '@/components/parties/party'
 import { BaseAddress } from '@/composables/address'
-// local helpers / types / etc.
 import { useParty } from '@/composables/useParty'
 import { useRegisteringParty } from '@/composables/useRegisteringParty'
 import { RegistrationFlowType, ActionTypes } from '@/enums'
 import { PartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { editTableHeaders, registeringTableHeaders } from '@/resources'
-import { PartyAddressSchema } from '@/schemas'
+import { PartyAddressSchema } from '@/schemas' // eslint-disable-line no-unused-vars
 import { ErrorContact } from '@/components/common'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   components: {
@@ -152,13 +150,7 @@ export default defineComponent({
     ErrorContact
   },
   setup (props, context) {
-    const {
-      getAddSecuredPartiesAndDebtors,
-      getRegistrationFlowType
-    } = useGetters<any>([
-      'getAddSecuredPartiesAndDebtors',
-      'getRegistrationFlowType'
-    ])
+    const { getAddSecuredPartiesAndDebtors, getRegistrationFlowType } = storeToRefs(useStore())
     const addressSchema = PartyAddressSchema
     const registrationFlowType = getRegistrationFlowType.value
 

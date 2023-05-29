@@ -63,7 +63,10 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, reactive, toRefs, watch } from '@vue/composition-api'
+import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue-demi'
+import { useStore } from '@/store/store'
+import { storeToRefs } from 'pinia'
+import { useRoute, useRouter } from 'vue-router/composables'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { CautionBox, StickyContainer } from '@/components/common'
 import { BaseDialog } from '@/components/dialogs'
@@ -81,12 +84,7 @@ import {
   UIRegistrationTypes
 } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
-import {
-  ActionBindingIF, ErrorIF, AddPartiesIF,
-  RegistrationTypeIF, AddCollateralIF, LengthTrustIF,
-  CertifyIF, DebtorNameIF, DialogOptionsIF
-} from '@/interfaces'
-import { useActions, useGetters } from 'vuex-composition-helpers'
+import { ErrorIF, AddPartiesIF, AddCollateralIF, LengthTrustIF, CertifyIF, DialogOptionsIF } from '@/interfaces'
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
@@ -113,14 +111,10 @@ export default defineComponent({
     }
   },
   setup (props, context) {
+    const route = useRoute()
+    const router = useRouter()
     const {
-      getRegistrationType,
-      getConfirmDebtorName
-    } = useGetters([
-      'getRegistrationType',
-      'getConfirmDebtorName'
-    ])
-    const {
+      // Actions
       setLengthTrust,
       setAddCollateral,
       setRegistrationType,
@@ -132,19 +126,12 @@ export default defineComponent({
       setRegistrationCreationDate,
       setAddSecuredPartiesAndDebtors,
       setOriginalAddSecuredPartiesAndDebtors
-    } = useActions([
-      'setLengthTrust',
-      'setAddCollateral',
-      'setRegistrationType',
-      'setCertifyInformation',
-      'setRegistrationNumber',
-      'setRegistrationFlowType',
-      'setFolioOrReferenceNumber',
-      'setRegistrationExpiryDate',
-      'setRegistrationCreationDate',
-      'setAddSecuredPartiesAndDebtors',
-      'setOriginalAddSecuredPartiesAndDebtors'
-    ])
+    } = useStore()
+    const {
+      // Getters
+      getRegistrationType,
+      getConfirmDebtorName
+    } = storeToRefs(useStore())
 
     const localState = reactive({
       cautionTxt: 'The Registry will provide the verification statement to all Secured Parties named in this ' +
@@ -167,7 +154,7 @@ export default defineComponent({
         return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
       }),
       registrationNumber: computed((): string => {
-        return context.root.$route.query['reg-num'] as string || ''
+        return route.query['reg-num'] as string || ''
       }),
       registrationTypeUI: computed((): UIRegistrationTypes => {
         return getRegistrationType.value?.registrationTypeUI || null
@@ -185,7 +172,7 @@ export default defineComponent({
       localState.showCancelDialog = false
       if (!val) {
         setRegistrationNumber(null)
-        context.root.$router.push({ name: RouteNames.DASHBOARD })
+        router.push({ name: RouteNames.DASHBOARD })
       }
     }
 
@@ -196,7 +183,7 @@ export default defineComponent({
         } else {
           console.error('No debtor name confirmed for discharge. Redirecting to dashboard...')
         }
-        context.root.$router.push({
+        router.push({
           name: RouteNames.DASHBOARD
         })
         return
@@ -263,7 +250,7 @@ export default defineComponent({
       if (!val) return
       // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
       if (!localState.isAuthenticated || (!props.isJestRunning && !getFeatureFlag('ppr-ui-enabled'))) {
-        context.root.$router.push({
+        router.push({
           name: RouteNames.DASHBOARD
         })
         return
@@ -280,7 +267,7 @@ export default defineComponent({
     }
 
     const confirmDischarge = (): void => {
-      context.root.$router.push({
+      router.push({
         name: RouteNames.CONFIRM_DISCHARGE,
         query: { 'reg-num': localState.registrationNumber }
       })

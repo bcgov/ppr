@@ -68,7 +68,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs, watch, computed } from '@vue/composition-api'
+import { defineComponent, reactive, toRefs, watch, computed } from 'vue-demi'
 import { SearchResponseI } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { useSearch } from '@/composables/useSearch'
 import { BusinessTypes } from '@/enums/business-types'

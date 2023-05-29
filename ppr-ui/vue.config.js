@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
+
 const webpack = require('webpack')
 const fs = require('fs')
 const packageJson = fs.readFileSync('./package.json')
@@ -12,26 +14,18 @@ module.exports = {
   configureWebpack: {
     plugins: [
       new webpack.DefinePlugin({
-        'process.env': {
-          ABOUT_TEXT:
-            (aboutText1 && aboutText2) ? `"${aboutText1}<br>${aboutText2}"`
-              : aboutText1 ? `"${aboutText1}"`
-                : aboutText2 ? `"${aboutText2}"`
-                  : ''
-        }
+        'process.env.ABOUT_TEXT':
+          (aboutText1 && aboutText2) ? `"${aboutText1}<br>${aboutText2}"`
+            : aboutText1 ? `"${aboutText1}"`
+              : aboutText2 ? `"${aboutText2}"`
+                : ''
       })
     ],
     devtool: 'source-map'
   },
-
   transpileDependencies: [
     'vuetify'
   ],
-
   publicPath: `${process.env.VUE_APP_PATH}`,
-
-  devServer: {
-  },
-
   assetsDir: 'assets'
 }
