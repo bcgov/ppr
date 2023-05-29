@@ -1019,8 +1019,8 @@ describe('Home Owners', () => {
         type: ''
       }
     ]
-    await store.dispatch('setMhrTransferCurrentHomeOwnerGroups', homeOwnerGroup)
-    await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerGroup)
+    await store.setMhrTransferCurrentHomeOwnerGroups(homeOwnerGroup)
+    await store.setMhrTransferHomeOwnerGroups(homeOwnerGroup)
     await selectTransferType(TRANSFER_TYPE)
 
     const homeOwners = wrapper.findComponent(HomeOwners)
@@ -1043,7 +1043,7 @@ describe('Home Owners', () => {
     await addEditHomeOwner.find(getTestId('cancel-btn')).trigger('click')
 
     // add a new Executor via store, preserving first deleted Executor
-    await store.dispatch('setMhrTransferHomeOwnerGroups', [
+    await store.setMhrTransferHomeOwnerGroups([
       {
         groupId: 1,
         owners: [
