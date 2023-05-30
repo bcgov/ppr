@@ -31,11 +31,15 @@ import {
 import { RegistrationTypes } from '@/resources'
 
 /** Set the amendment add/delete lists depending on the registration list actions */
-function setAmendmentList (baseList:Array<any>, addList:Array<any>, deleteList:Array<any>) {
+export function setAmendmentList (baseList:Array<any>, addList:Array<any>, deleteList:Array<any>) {
   for (let i = 0; i < baseList.length; i++) {
     if (baseList[i].action) {
       if (baseList[i].action === ActionTypes.ADDED || baseList[i].action === ActionTypes.EDITED) {
-        addList.push(JSON.parse(JSON.stringify(baseList[i])))
+        const listItem = {
+          ...baseList[i],
+          amendPartyId: baseList[i].action === ActionTypes.EDITED ? baseList[i].partyId : 0
+        }
+        addList.push(JSON.parse(JSON.stringify(listItem)))
       }
       if (baseList[i].action === ActionTypes.REMOVED || baseList[i].action === ActionTypes.EDITED) {
         deleteList.push(JSON.parse(JSON.stringify(baseList[i])))
