@@ -3,7 +3,6 @@ import { setAmendmentList } from '@/utils' // Import the function to be tested
 
 describe('setAmendmentList', () => {
     it('correctly updates the addList and deleteList arrays', () => {
-        // Arrange
         const baseList = [
             { action: ActionTypes.ADDED, partyId: 1 },
             { action: ActionTypes.REMOVED, partyId: 2 },

@@ -35,11 +35,11 @@ export function setAmendmentList (baseList:Array<any>, addList:Array<any>, delet
   for (let i = 0; i < baseList.length; i++) {
     if (baseList[i].action) {
       if (baseList[i].action === ActionTypes.ADDED || baseList[i].action === ActionTypes.EDITED) {
-        const listItem = {
+        const party = {
           ...baseList[i],
           amendPartyId: baseList[i].action === ActionTypes.EDITED ? baseList[i].partyId : 0
         }
-        addList.push(JSON.parse(JSON.stringify(listItem)))
+        addList.push(JSON.parse(JSON.stringify(party)))
       }
       if (baseList[i].action === ActionTypes.REMOVED || baseList[i].action === ActionTypes.EDITED) {
         deleteList.push(JSON.parse(JSON.stringify(baseList[i])))
