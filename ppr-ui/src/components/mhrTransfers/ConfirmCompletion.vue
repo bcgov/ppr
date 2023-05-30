@@ -54,7 +54,7 @@
                     of the original. A statement of death or a cremation certificate from a funeral director is not
                     acceptable.
                   </v-tooltip>
-                  of Death Certificate</strong> that has been issued by Vital Statistics and has been recieved for each
+                  of Death Certificate</strong> that has been issued by Vital Statistics and has been received for each
                   joint tenant owner being removed due to death. I confirm that it was
                   <v-tooltip
                     top
@@ -71,8 +71,7 @@
                     </template>
                     If the death certificate was issued outside of Canada or the US, the transfer will have to be sent
                     to the Manufactured Home Registry.
-                  </v-tooltip>
-                  , and the name on the death certificate matches the name displayed above exactly.
+                  </v-tooltip>, and the name on the death certificate matches the name displayed above exactly.
                   </p>
               </li>
               <li v-if="isRoleStaff" class="pl-3 pb-3 mb-7" data-test-id="change-ownership-section">
@@ -80,6 +79,12 @@
               </li>
               <li v-if="isTransferToExecutorProbateWill" class="pl-3 pb-3 mb-7" data-test-id="probate-will-section">
                 <p><strong>Court certified true copy of the Grant of Probate with the will attached.</strong></p>
+              </li>
+              <li v-if="isTransferToAdminNoWill" class="pl-3 pb-3 mb-7">
+                <p><strong>Certified true copy of Grant of Administration issued by the court.</strong></p>
+              </li>
+              <li v-if="isTransferToAdminNoWill" class="pl-3 pb-3 mb-7">
+                <p><strong>Affidavit of Administration with List of Assets and Liabilities.</strong></p>
               </li>
               <li v-if="isTransferToExecutorUnder25Will" class="pl-3 pb-3 mb-7">
                 <p><strong>Certified true copy of the will.</strong></p>
@@ -169,7 +174,8 @@ export default defineComponent({
     const {
       isTransferDueToDeath,
       isTransferToExecutorProbateWill,
-      isTransferToExecutorUnder25Will
+      isTransferToExecutorUnder25Will,
+      isTransferToAdminNoWill
     } = useTransferOwners()
 
     const localState = reactive({
@@ -193,6 +199,7 @@ export default defineComponent({
       isTransferDueToDeath,
       isTransferToExecutorProbateWill,
       isTransferToExecutorUnder25Will,
+      isTransferToAdminNoWill,
       ...toRefs(localState)
     }
   }
