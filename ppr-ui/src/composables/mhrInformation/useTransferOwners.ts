@@ -412,6 +412,14 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
         .find(group => group.groupId === groupId).owners
         .some(owner => owner.action === ActionTypes.REMOVED)
     },
+    hasAtLeastOneExecInGroup: (groupId): boolean => {
+      return getMhrTransferHomeOwnerGroups.value
+        .find(group => group.groupId === groupId).owners
+        .some(owner => isCurrentOwner(owner) &&
+          owner.action !== ActionTypes.REMOVED &&
+          owner.action !== ActionTypes.ADDED &&
+          owner.partyType === HomeOwnerPartyTypes.EXECUTOR)
+    },
     hasOwnerWithDeathCertificate: (): boolean => {
       return getMhrTransferHomeOwners.value.some(owner =>
         owner.supportingDocument === SupportingDocumentsOptions.DEATH_CERT)
@@ -555,7 +563,15 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
 
   const TransToAdmin = {
     hasAddedAdministratorsInGroup: (groupId): boolean =>
-      hasAddedPartyTypeToGroup(groupId, HomeOwnerPartyTypes.ADMINISTRATOR)
+      hasAddedPartyTypeToGroup(groupId, HomeOwnerPartyTypes.ADMINISTRATOR),
+    hasAtLeastOneAdminInGroup: (groupId): boolean => {
+      return getMhrTransferHomeOwnerGroups.value
+        .find(group => group.groupId === groupId).owners
+        .some(owner => isCurrentOwner(owner) &&
+            owner.action !== ActionTypes.REMOVED &&
+            owner.action !== ActionTypes.ADDED &&
+            owner.partyType === HomeOwnerPartyTypes.ADMINISTRATOR)
+    }
   }
 
   /** Return true if the specified owner is part of the current/base ownership structure **/

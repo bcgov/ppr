@@ -815,7 +815,23 @@ describe('Home Owners', () => {
     // reset transfer type
     await selectTransferType(null)
 
-    const TRANSFER_TYPE = ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL
+    const homeOwnerGroupTwoExecutors: MhrRegistrationHomeOwnerGroupIF[] = [
+      {
+        groupId: 1,
+        owners: [mockedExecutor, mockedExecutor],
+        type: ''
+      }
+    ]
+
+    await store.dispatch('setMhrTransferCurrentHomeOwnerGroups', homeOwnerGroupTwoExecutors)
+    await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerGroupTwoExecutors)
+    await selectTransferType(ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL)
+
+    const homeOwners = wrapper.findComponent(HomeOwners)
+    await homeOwners.find(getTestId('table-delete-btn')).trigger('click')
+    // error should not be shown when removing one out of two Executors in the group
+    expect(homeOwners.find(getTestId('invalid-group-msg')).exists()).toBeFalsy()
+
     const homeOwnerGroup: MhrRegistrationHomeOwnerGroupIF[] = [
       {
         groupId: 1,
@@ -825,9 +841,7 @@ describe('Home Owners', () => {
     ]
     await store.dispatch('setMhrTransferCurrentHomeOwnerGroups', homeOwnerGroup)
     await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerGroup)
-    await selectTransferType(TRANSFER_TYPE)
 
-    const homeOwners = wrapper.findComponent(HomeOwners)
     await homeOwners.find(getTestId('table-delete-btn')).trigger('click')
 
     expect(homeOwners.find(getTestId('invalid-group-msg')).exists()).toBeTruthy()
@@ -930,6 +944,23 @@ describe('Home Owners', () => {
     await selectTransferType(null)
     const TRANSFER_TYPE = ApiTransferTypes.TO_ADMIN_NO_WILL
 
+    const homeOwnerGroupTwoAdministrators: MhrRegistrationHomeOwnerGroupIF[] = [
+      {
+        groupId: 1,
+        owners: [mockedAdministrator, mockedAdministrator],
+        type: ''
+      }
+    ]
+
+    await store.dispatch('setMhrTransferCurrentHomeOwnerGroups', homeOwnerGroupTwoAdministrators)
+    await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerGroupTwoAdministrators)
+    await selectTransferType(TRANSFER_TYPE)
+
+    const homeOwners = wrapper.findComponent(HomeOwners)
+    await homeOwners.find(getTestId('table-delete-btn')).trigger('click')
+    // error should not be shown when removing one out of two Administrator in the group
+    expect(homeOwners.find(getTestId('invalid-group-msg')).exists()).toBeFalsy()
+
     const homeOwnerGroup: MhrRegistrationHomeOwnerGroupIF[] = [{ groupId: 1, owners: [mockedPerson], type: '' }]
 
     await store.dispatch('setMhrTransferCurrentHomeOwnerGroups', homeOwnerGroup)
@@ -937,7 +968,6 @@ describe('Home Owners', () => {
 
     await selectTransferType(TRANSFER_TYPE)
 
-    const homeOwners = wrapper.findComponent(HomeOwners)
     // delete the sole owner
     await homeOwners.find(getTestId('table-delete-btn')).trigger('click')
 

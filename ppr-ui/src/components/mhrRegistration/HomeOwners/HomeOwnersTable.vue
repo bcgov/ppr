@@ -693,11 +693,22 @@ export default defineComponent({
           ? TransToAdmin.hasAddedAdministratorsInGroup(groupId)
           : TransToExec.hasAddedExecutorsInGroup(groupId)
 
+        let hasAtLeastOneExecOrAdmin = false
+
+        // for WILL and LETA transfers, id one Exec or Admin is removed,
+        // do not shot group message that all owners must be removed
+        if (isTransferToExecutorProbateWill.value) {
+          hasAtLeastOneExecOrAdmin = TransToExec.hasAtLeastOneExecInGroup(groupId)
+        } else if (isTransferToAdminNoWill.value) {
+          hasAtLeastOneExecOrAdmin = TransToAdmin.hasAtLeastOneAdminInGroup(groupId)
+        }
+
         return (
           (TransToExec.hasSomeOwnersRemoved(groupId) || hasAddedRoleInGroup) &&
           !(hasAddedRoleInGroup &&
           TransToExec.hasAllCurrentOwnersRemoved(groupId) &&
-          !TransToExec.isAllGroupOwnersWithDeathCerts(groupId))
+          !TransToExec.isAllGroupOwnersWithDeathCerts(groupId)) &&
+          !hasAtLeastOneExecOrAdmin
         )
       }
 
