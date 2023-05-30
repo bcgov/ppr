@@ -6,7 +6,8 @@
       {{ transfersErrors.allOwnersHaveDeathCerts[getMhrTransferType.transferType] }}
     </span>
     <span v-else-if="!TransToExec.hasAllCurrentOwnersRemoved(groupId) &&
-      !TransToExec.hasAddedExecutorsInGroup(groupId)">
+      !TransToExec.hasAddedExecutorsInGroup(groupId) &&
+      !TransToExec.hasAtLeastOneExecInGroup(groupId)">
       {{ transfersErrors.ownersMustBeDeceasedAndExecutorAdded }}
     </span>
     <span v-else-if="!TransToExec.hasAddedExecutorsInGroup(groupId) && hasOneHomeOwnerGroup">
@@ -37,7 +38,8 @@
       {{ transfersErrors.allOwnersHaveDeathCerts[getMhrTransferType.transferType] }}
     </span>
     <span v-else-if="!TransToExec.hasAllCurrentOwnersRemoved(groupId) &&
-      !TransToAdmin.hasAddedAdministratorsInGroup(groupId)">
+      !TransToAdmin.hasAddedAdministratorsInGroup(groupId) &&
+      !TransToAdmin.hasAtLeastOneAdminInGroup(groupId)">
       {{ transfersErrors.ownersMustBeDeceasedAndAdminAdded }}
     </span>
     <span v-else-if="!TransToAdmin.hasAddedAdministratorsInGroup(groupId) && hasOneHomeOwnerGroup">
