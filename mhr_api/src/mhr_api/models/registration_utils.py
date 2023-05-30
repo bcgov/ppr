@@ -47,6 +47,28 @@ EXPIRY_DAYS_PARAM = 'expiryDays'
 SORT_ASCENDING = 'ascending'
 SORT_DESCENDING = 'descending'
 
+QUERY_BATCH_MANUFACTURER_MHREG_DEFAULT = """
+select r.id, r.account_id, r.registration_ts, rr.id, rr.report_data, rr.batch_storage_url
+  from mhr_registrations r, mhr_manufacturers m, mhr_registration_reports rr
+ where r.id = rr.registration_id
+   and r.account_id = m.account_id
+   and r.registration_type = 'MHREG'
+   and r.registration_ts between (now() - interval '5 days') and now()
+"""
+QUERY_BATCH_MANUFACTURER_MHREG = """
+select r.id, r.account_id, r.registration_ts, rr.id, rr.report_data, rr.batch_storage_url
+  from mhr_registrations r, mhr_manufacturers m, mhr_registration_reports rr
+ where r.id = rr.registration_id
+   and r.account_id = m.account_id
+   and r.registration_type = 'MHREG'
+   and r.registration_ts between to_timestamp(:query_val1, 'YYYY-MM-DD HH24:MI:SS')
+                             and to_timestamp(:query_val2, 'YYYY-MM-DD HH24:MI:SS')
+"""
+UPDATE_BATCH_REG_REPORT = """
+update mhr_registration_reports
+   set batch_storage_url = '{batch_url}'
+ where id in ({report_ids})
+"""
 QUERY_PPR_LIEN_COUNT = """
 SELECT COUNT(base_registration_num)
   FROM mhr_lien_check_vw
@@ -81,6 +103,7 @@ select nextval('mhr_registration_id_seq') AS reg_id,
 DOC_ID_QUALIFIED_CLAUSE = ',  get_mhr_doc_qualified_id() AS doc_id'
 DOC_ID_MANUFACTURER_CLAUSE = ',  get_mhr_doc_manufacturer_id() AS doc_id'
 DOC_ID_GOV_AGENT_CLAUSE = ',  get_mhr_doc_gov_agent_id() AS doc_id'
+BATCH_DOC_NAME_MANUFACTURER_MHREG = 'batch-manufacturer-mhreg-report-{time}.pdf'
 
 
 class AccountRegistrationParams():
@@ -318,3 +341,71 @@ def include_caution_note(notes, document_id: str) -> bool:
         elif latest_caution and note.get('documentType', '') not in ('CAUC', 'CAUE', 'CAU '):
             return False
     return latest_caution and not model_utils.date_elapsed(latest_caution.get('expiryDate'))
+
+
+def get_batch_manufacturer_reg_report_data(start_ts: str = None, end_ts: str = None) -> dict:
+    """Get recent manufacturer MHREG registration report data for a batch report."""
+    results_json = []
+    query_s = QUERY_BATCH_MANUFACTURER_MHREG_DEFAULT
+    if start_ts and end_ts:
+        query_s = QUERY_BATCH_MANUFACTURER_MHREG
+        current_app.logger.debug(f'Using timestamp range {start_ts} to {end_ts}.')
+    else:
+        current_app.logger.debug('Using a default timestamp range of within the previous day.')
+    query = text(query_s)
+    result = None
+    if start_ts and end_ts:
+        start: str = start_ts[:19].replace('T', ' ')
+        end: str = end_ts[:19].replace('T', ' ')
+        current_app.logger.debug(f'start={start} end={end}')
+        result = db.session.execute(query, {'query_val1': start, 'query_val2': end})
+    else:
+        result = db.session.execute(query)
+    rows = result.fetchall()
+    if rows is not None:
+        for row in rows:
+            batch_url = str(row[5]) if row[5] else ''
+            result_json = {
+                'registrationId': int(row[0]),
+                'accountId': str(row[1]),
+                'reportId': int(row[3]),
+                'reportData': row[4],
+                'batchStorageUrl': batch_url
+            }
+            results_json.append(result_json)
+    if results_json:
+        current_app.logger.debug(f'Found {len(results_json)} manufacturer MHREG registrations.')
+    else:
+        current_app.logger.debug('No manufacturer MHREG registrations found within the timestamp range.')
+    return results_json
+
+
+def update_reg_report_batch_url(json_data: dict, batch_url: str) -> int:
+    """Set the mhr registration reports batch storage url for the recent registrations in json_data."""
+    update_count: int = 0
+    if not json_data:
+        return update_count
+    query_s = UPDATE_BATCH_REG_REPORT
+    report_ids: str = ''
+    for report in json_data:
+        update_count += 1
+        if report_ids != '':
+            report_ids += ','
+        report_ids += str(report.get('reportId'))
+    query_s = query_s.format(batch_url=batch_url, report_ids=report_ids)
+    current_app.logger.debug(f'Executing update query {query_s}')
+    query = text(query_s)
+    result = db.session.execute(query)
+    db.session.commit()
+    if result:
+        current_app.logger.debug(f'Updated {update_count} manufacturer report registrations batch url to {batch_url}.')
+    return update_count
+
+
+def get_batch_storage_name_manufacturer_mhreg():
+    """Get a search document storage name in the format YYYY/MM/DD/batch-manufacturer-mhreg-report-time.pdf."""
+    now_ts = model_utils.now_ts()
+    name = now_ts.isoformat()[:10]
+    time = str(now_ts.hour) + '_' + str(now_ts.minute)
+    name = name.replace('-', '/') + '/' + BATCH_DOC_NAME_MANUFACTURER_MHREG.format(time=time)
+    return name

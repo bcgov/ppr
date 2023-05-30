@@ -58,6 +58,8 @@ BAND_NAME_REQUIRED = 'The location Indian Reserve band name is required for this
 RESERVE_NUMBER_REQUIRED = 'The location Indian Reserve number is required for this registration. '
 OWNERS_JOINT_INVALID = 'The owner group must contain at least 2 owners. '
 OWNERS_COMMON_INVALID = 'Each COMMON owner group must contain exactly 1 owner. '
+OWNERS_COMMON_SOLE_INVALID = 'SOLE owner group tenancy type is not allowed when there is more than 1 ' \
+    'owner group. Use COMMON instead. '
 LOCATION_DEALER_REQUIRED = 'Location dealer/manufacturer name is required for this registration. '
 STATUS_CONFIRMATION_REQUIRED = 'The land status confirmation is required for this registration. '
 LOCATION_PARK_NAME_REQUIRED = 'Location park name is required for this registration. '
@@ -550,6 +552,8 @@ def validate_owner_group(group, int_required: bool = False):
     elif orig_type != 'NA' and tenancy_type == Db2Owngroup.TenancyTypes.COMMON and \
             (not group.get('owners') or len(group.get('owners')) > 1):
         error_msg += OWNERS_COMMON_INVALID
+    elif orig_type == MhrTenancyTypes.SOLE and int_required:
+        error_msg += OWNERS_COMMON_SOLE_INVALID
     return error_msg
 
 

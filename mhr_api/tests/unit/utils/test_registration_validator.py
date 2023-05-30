@@ -245,6 +245,8 @@ TEST_REG_DATA_GROUP = [
     ('Valid SO', True, None, None, SO_VALID, None),
     ('Valid JT', True, None, None, JT_VALID, None),
     ('Invalid TC no owner', False, 1, 2, TC_GROUPS_VALID, validator.OWNERS_COMMON_INVALID),
+    ('Invalid TC SO group', False, 1, 2, TC_GROUPS_VALID, validator.OWNERS_COMMON_SOLE_INVALID),
+    ('Invalid TC 2 owners', False, 1, 2, TC_GROUPS_VALID, validator.OWNERS_COMMON_INVALID),
     ('Invalid TC only 1 group', False, 2, 2, TC_GROUPS_VALID, validator.GROUP_COMMON_INVALID),
     ('Invalid TC numerator missing', False, None, 2, TC_GROUPS_VALID, validator.GROUP_NUMERATOR_MISSING),
     ('Invalid TC numerator < 1', False, 0, 2, TC_GROUPS_VALID, validator.GROUP_NUMERATOR_MISSING),
@@ -361,6 +363,11 @@ def test_validate_registration_group(session, desc, valid, numerator, denominato
         del json_data['ownerGroups'][1]
     elif desc == 'Invalid TC no owner':
         json_data['ownerGroups'][0]['owners'] = []
+    elif desc == 'Invalid TC SO group':
+        json_data['ownerGroups'][0]['type'] = 'SOLE'
+    elif desc == 'Invalid TC 2 owners':
+        owners = copy.deepcopy(JT_GROUP_VALID).get('owners')
+        json_data['ownerGroups'][0]['owners'] = owners
     elif groups[0].get('type') == MhrTenancyTypes.COMMON:
         for group in json_data.get('ownerGroups'):
             if not numerator:
