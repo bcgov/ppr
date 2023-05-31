@@ -825,8 +825,8 @@ describe('Home Owners', () => {
       }
     ]
 
-    await store.dispatch('setMhrTransferCurrentHomeOwnerGroups', homeOwnerGroupTwoExecutors)
-    await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerGroupTwoExecutors)
+    await store.setMhrTransferCurrentHomeOwnerGroups(homeOwnerGroupTwoExecutors)
+    await store.setMhrTransferHomeOwnerGroups(homeOwnerGroupTwoExecutors)
     await selectTransferType(ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL)
 
     const homeOwners: Wrapper<any> = wrapper.findComponent(HomeOwners)
@@ -955,8 +955,8 @@ describe('Home Owners', () => {
       }
     ]
 
-    await store.dispatch('setMhrTransferCurrentHomeOwnerGroups', homeOwnerGroupTwoAdministrators)
-    await store.dispatch('setMhrTransferHomeOwnerGroups', homeOwnerGroupTwoAdministrators)
+    await store.setMhrTransferCurrentHomeOwnerGroups(homeOwnerGroupTwoAdministrators)
+    await store.setMhrTransferHomeOwnerGroups(homeOwnerGroupTwoAdministrators)
     await selectTransferType(TRANSFER_TYPE)
 
     const homeOwners = wrapper.findComponent(HomeOwners)
