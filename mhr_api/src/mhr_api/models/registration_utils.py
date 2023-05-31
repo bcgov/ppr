@@ -53,7 +53,7 @@ select r.id, r.account_id, r.registration_ts, rr.id, rr.report_data, rr.batch_st
  where r.id = rr.registration_id
    and r.account_id = m.account_id
    and r.registration_type = 'MHREG'
-   and r.registration_ts between (now() - interval '5 days') and now()
+   and r.registration_ts between (now() - interval '1 days') and now()
 """
 QUERY_BATCH_MANUFACTURER_MHREG = """
 select r.id, r.account_id, r.registration_ts, rr.id, rr.report_data, rr.batch_storage_url
