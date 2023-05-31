@@ -253,15 +253,13 @@ input#reg-textfield.v-text-field.v-input--dense:not(.v-text-field--outlined),
   opacity: 0.4 !important;
 }
 
+.v-text-field .v-input__icon--clear {
+  opacity: 1
+}
+
 .v-btn.edit-btn:disabled {
   color: $primary-blue !important;
   opacity: 0.4 !important;
-}
-
-.theme--light.v-btn.v-btn--disabled:not(.v-btn--flat):not(.v-btn--text):not(.v-btn--outlined) {
-  background-color: $primary-blue !important;
-  opacity: 0.4 !important;
-  color: white !important;
 }
 
 .v-btn.v-btn--outlined:disabled {
