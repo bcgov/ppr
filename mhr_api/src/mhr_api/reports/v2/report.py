@@ -78,10 +78,7 @@ class Report:  # pylint: disable=too-few-public-methods
                                  .format(self._account_id, self._report_key, url))
         meta_data = report_utils.get_report_meta_data(self._report_key)
         files = report_utils.get_report_files(data, self._report_key)
-        headers = {}
-        token = GoogleAuthService.get_report_api_token()
-        if token:
-            headers['Authorization'] = 'Bearer {}'.format(token)
+        headers = Report.get_headers()
         response = requests.post(url=url, headers=headers, data=meta_data, files=files)
         current_app.logger.debug('Account {0} report type {1} response status: {2}.'
                                  .format(self._account_id, self._report_key, response.status_code))
@@ -104,10 +101,7 @@ class Report:  # pylint: disable=too-few-public-methods
                                  .format(self._account_id, self._report_key, url))
         meta_data = report_utils.get_report_meta_data(self._report_key)
         files = report_utils.get_report_files(data, self._report_key)
-        headers = {}
-        token = GoogleAuthService.get_report_api_token()
-        if token:
-            headers['Authorization'] = 'Bearer {}'.format(token)
+        headers = Report.get_headers()
         response_reg = requests.post(url=url, headers=headers, data=meta_data, files=files)
         current_app.logger.debug('Account {0} report type {1} response status: {2}.'
                                  .format(self._account_id, self._report_key, response_reg.status_code))
@@ -141,10 +135,7 @@ class Report:  # pylint: disable=too-few-public-methods
         url = current_app.config.get('REPORT_SVC_URL') + SINGLE_URI
         meta_data = report_utils.get_report_meta_data(self._report_key)
         files = report_utils.get_report_files(data, self._report_key, False)
-        headers = {}
-        token = GoogleAuthService.get_report_api_token()
-        if token:
-            headers['Authorization'] = 'Bearer {}'.format(token)
+        headers = Report.get_headers()
         response_cover = requests.post(url=url, headers=headers, data=meta_data, files=files)
         current_app.logger.debug('Account {0} report type {1} response status: {2}.'
                                  .format(self._account_id, self._report_key, response_cover.status_code))
@@ -165,10 +156,7 @@ class Report:  # pylint: disable=too-few-public-methods
         url = current_app.config.get('REPORT_SVC_URL') + SINGLE_URI
         meta_data = report_utils.get_report_meta_data(self._report_key)
         files = report_utils.get_report_files(data, self._report_key, False)
-        headers = {}
-        token = GoogleAuthService.get_report_api_token()
-        if token:
-            headers['Authorization'] = 'Bearer {}'.format(token)
+        headers = Report.get_headers()
         response_cover = requests.post(url=url, headers=headers, data=meta_data, files=files)
         current_app.logger.debug('Account {0} report type {1} response status: {2}.'
                                  .format(self._account_id, self._report_key, response_cover.status_code))
@@ -200,19 +188,41 @@ class Report:  # pylint: disable=too-few-public-methods
             current_app.logger.error('Account {0} response status: {1} error: {2}.'
                                      .format(self._account_id, response_reg.status_code, content))
             return jsonify(message=content), response_reg.status_code, None
-        # 3: Merge cover letter and registraiton reports.
+        # 3: Merge cover letter and registration reports.
+        files = []
+        files.append(response_cover.content)
+        files.append(response_reg.content)
+        return Report.batch_merge(files)
+
+    @staticmethod
+    def get_headers() -> dict:
+        """Build the report service request headers."""
+        headers = {}
+        token = GoogleAuthService.get_report_api_token()
+        if token:
+            headers['Authorization'] = 'Bearer {}'.format(token)
+        return headers
+
+    @staticmethod
+    def batch_merge(pdf_list):
+        """Merge a list of pdf files into a single pdf."""
+        if not pdf_list:
+            return None
+        current_app.logger.debug(f'Setting up batch merge for {len(pdf_list)} files.')
+        count: int = 0
+        files = {}
+        for pdf in pdf_list:
+            count += 1
+            filename = 'file' + str(count) + '.pdf'
+            files[filename] = pdf
+        headers = Report.get_headers()
         url = current_app.config.get('REPORT_SVC_URL') + MERGE_URI
-        files = {
-            'pdf1.pdf': response_cover.content,
-            'pdf2.pdf': response_reg.content
-        }
         response = requests.post(url=url, headers=headers, files=files)
-        current_app.logger.debug('Merge cover and registration reports response status: {0}.'
-                                 .format(response.status_code))
+        current_app.logger.debug('Batch merge reports response status: {0}.'.format(response.status_code))
         if response.status_code != HTTPStatus.OK:
             content = ResourceErrorCodes.REPORT_ERR + ': ' + response.content.decode('ascii')
-            current_app.logger.error('Account {0} merge response status: {1} error: {2}.'
-                                     .format(self._account_id, response.status_code, content))
+            current_app.logger.error('Batch merge response status: {0} error: {1}.'.format(response.status_code,
+                                                                                           content))
             return jsonify(message=content), response.status_code, None
         return response.content, response.status_code, {'Content-Type': 'application/pdf'}
 

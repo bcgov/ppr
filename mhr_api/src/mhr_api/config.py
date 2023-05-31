@@ -178,6 +178,7 @@ class _Config():  # pylint: disable=too-few-public-methods
     GCP_CS_SA_SCOPES = os.getenv('GCP_CS_SA_SCOPES')
     GCP_CS_BUCKET_ID = os.getenv('mhr_search_result_report_dev')
     GCP_CS_BUCKET_ID_REGISTRATION = os.getenv('mhr_registration_report_dev')
+    GCP_CS_BUCKET_ID_BATCH = os.getenv('GCP_CS_BUCKET_ID_BATCH')
     # Pub/Sub
     GCP_PS_PROJECT_ID = os.getenv('GCP_PS_PROJECT_ID')
     GCP_PS_SEARCH_REPORT_TOPIC = os.getenv('GCP_PS_SEARCH_REPORT_TOPIC')

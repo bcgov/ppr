@@ -146,6 +146,13 @@ TEST_GET_REGISTRATION = [
     ('Invalid MHR Number', [MHR_ROLE], HTTPStatus.NOT_FOUND, '2523', 'TESTXXXX'),
     ('Invalid request Staff no account', [MHR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, None, '150062')
 ]
+# testdata pattern is ({description}, {start_ts}, {end_ts}, {status}, {has_key})
+TEST_BATCH_MANUFACTURER_MHREG_DATA = [
+    ('Unauthorized', None, None, HTTPStatus.UNAUTHORIZED, False),
+    ('Valid no data', '2023-02-25T07:01:00+00:00', '2023-02-26T07:01:00+00:00', HTTPStatus.NO_CONTENT, True),
+    ('Valid data', '2023-05-25T07:01:00+00:00', '2023-05-26T07:01:00+00:00', HTTPStatus.OK, True),
+    ('Valid default interval may have data', None, None, HTTPStatus.OK, True)
+]
 # testdata pattern is ({desc}, {roles}, {status}, {sort_criteria}, {sort_direction})
 TEST_GET_ACCOUNT_DATA_SORT2 = [
     ('Sort mhr number', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, reg_utils.MHR_NUMBER_PARAM, None)
@@ -375,3 +382,27 @@ def test_get_account_registrations_filter_date(session, client, jwt, desc, accou
         assert registration['clientReferenceId'] is not None
         assert registration['ownerNames'] is not None
         assert registration['path'] is not None
+
+
+@pytest.mark.parametrize('desc,start_ts,end_ts,status,has_key',TEST_BATCH_MANUFACTURER_MHREG_DATA)
+def test_get_batch_mhreg_manufacturer_report(session, client, jwt, desc, start_ts, end_ts, status, has_key):
+    """Assert that a get account registrations summary list endpoint with filtering works as expected."""
+    # setup
+    apikey = current_app.config.get('SUBSCRIPTION_API_KEY')
+    params: str = ''
+    if has_key:
+        params += '?x-apikey=' + apikey
+    if start_ts and end_ts:
+        start: str = reg_utils.START_TS_PARAM
+        end: str = reg_utils.END_TS_PARAM
+        if has_key:
+            params += f'&{start}={start_ts}&{end}={end_ts}'
+        else:
+            params += f'?{start}={start_ts}&{end}={end_ts}'
+    # test
+    rv = client.get('/api/v1/registrations/batch/manufacturer' + params)
+    # check
+    if desc == 'Valid default interval may have data':
+        assert rv.status_code == status or rv.status_code == HTTPStatus.NO_CONTENT
+    else:
+        assert rv.status_code == status

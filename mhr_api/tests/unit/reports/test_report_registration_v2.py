@@ -36,6 +36,7 @@ REGISTRATON_JOINT_PDFFILE = 'tests/unit/reports/data/registration-joint-example.
 REGISTRATON_MAIL_PDFFILE = 'tests/unit/reports/data/registration-mail-example.pdf'
 REGISTRATON_COVER_PDFFILE = 'tests/unit/reports/data/registration-cover-example.pdf'
 REGISTRATON_STAFF_PDFFILE = 'tests/unit/reports/data/registration-staff-example.pdf'
+REGISTRATON_BATCH_PDFFILE = 'tests/unit/reports/data/registration-batch-example.pdf'
 
 TRANSFER_TEST_SO_DATAFILE = 'tests/unit/reports/data/trans-test-example.json'
 TRANSFER_TEST_SO_PDFFILE = 'tests/unit/reports/data/trans-test-example-so.pdf'
@@ -240,6 +241,27 @@ def test_staff_registration(session, client, jwt):
         assert headers
         # verify
         check_response(content, status, REGISTRATON_STAFF_PDFFILE)
+
+
+def test_batch_merge(session, client, jwt):
+    """Assert that generation of a batch merge of registration reports is as expected."""
+    # setup
+    if is_report_v2():
+        reports = []
+        json_data = get_json_from_file(REGISTRATON_TEST_DATAFILE)
+        create_ts = json_data.get('createDateTime')
+        report = Report(json_data, '2523', ReportTypes.MHR_REGISTRATION_COVER, 'Account Name')
+        content, status, headers = report.get_pdf()
+        reports.append(content)
+        json_data['createDateTime'] = create_ts
+        report = Report(json_data, '2523', ReportTypes.MHR_REGISTRATION, 'Account Name')
+        content, status, headers = report.get_pdf()
+        reports.append(content)
+        # test
+        content, status, headers = Report.batch_merge(reports)
+        assert headers
+        # verify
+        check_response(content, status, REGISTRATON_BATCH_PDFFILE)
 
 
 def test_exemption_res(session, client, jwt):

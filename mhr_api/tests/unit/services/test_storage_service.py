@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Google storage service tests."""
+from flask import current_app
+
 from mhr_api.services.abstract_storage_service import DocumentTypes
 from mhr_api.services.document_storage.storage_service import GoogleStorageService
 
@@ -23,6 +25,8 @@ TEST_SAVE_DOC_NAME2 = '2022/05/06/search-results-report-ut-002.pdf'
 TEST_REGISTRATION_DOC_NAME = 'test_reg_doc.pdf'
 TEST_REGISTRATION_DATAFILE = 'tests/unit/services/test_reg_doc.pdf'
 TEST_REGISTRATION_SAVE_DOC_NAME = '2022/05/06/registration-ut-001.pdf'
+TEST_BATCH_REGISTRATION_SAVE_DOC_NAME = '2023/05/29/batch-manufacturer-mhreg-report-ut-001.pdf'
+TEST_BATCH_REGISTRATION_DATAFILE = 'tests/unit/services/test_batch_reg_doc.pdf'
 
 
 def test_cs_save_search_document_http(session):
@@ -58,7 +62,6 @@ def test_cs_save_registration_document(session):
 
     response = GoogleStorageService.save_document(TEST_REGISTRATION_SAVE_DOC_NAME, raw_data,
                                                   DocumentTypes.REGISTRATION)
-    print(response)
     assert response
 
 
@@ -95,3 +98,28 @@ def test_cs_get_registration_document(session):
 def test_cs_delete_search_document(session):
     """Assert that deleting a search bucket document from google cloud storage works as expected."""
     response = GoogleStorageService.delete_document(TEST_SAVE_DOC_NAME2, DocumentTypes.SEARCH_RESULTS)
+
+
+def test_save_batch_registration_document(session):
+    """Assert that saving a batch registration pdf to google cloud storage works as expected."""
+    bucket: str = current_app.config.get('GCP_CS_BUCKET_ID_BATCH')
+    current_app.logger.debug(f'Testing saving to bucket={bucket}')
+    raw_data = None
+    with open(TEST_REGISTRATION_DATAFILE, 'rb') as data_file:
+        raw_data = data_file.read()
+        data_file.close()
+
+    response = GoogleStorageService.save_document(TEST_BATCH_REGISTRATION_SAVE_DOC_NAME, raw_data,
+                                                  DocumentTypes.BATCH_REGISTRATION)
+    assert response
+
+
+def test_cs_get_batch_registration_document(session):
+    """Assert that getting a batch registration pdf from google cloud storage works as expected.""" 
+    raw_data = GoogleStorageService.get_document(TEST_BATCH_REGISTRATION_SAVE_DOC_NAME,
+                                                 DocumentTypes.BATCH_REGISTRATION)
+    assert raw_data
+    assert len(raw_data) > 0
+    with open(TEST_BATCH_REGISTRATION_DATAFILE, "wb") as pdf_file:
+        pdf_file.write(raw_data)
+        pdf_file.close()

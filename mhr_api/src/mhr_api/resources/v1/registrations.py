@@ -24,12 +24,16 @@ from mhr_api.utils.auth import jwt
 from mhr_api.exceptions import BusinessException, DatabaseException
 from mhr_api.services.authz import authorized, authorized_role, is_staff, is_all_staff_account, REGISTER_MH
 from mhr_api.services.authz import is_reg_staff_account, get_group, MANUFACTURER_GROUP
-from mhr_api.models import MhrRegistration, MhrManufacturer
+from mhr_api.models import MhrRegistration, MhrManufacturer, registration_utils as model_reg_utils
 from mhr_api.models.registration_utils import AccountRegistrationParams
+from mhr_api.reports import get_callback_pdf
+from mhr_api.reports.v2.report import Report
 from mhr_api.reports.v2.report_utils import ReportTypes
 from mhr_api.resources import utils as resource_utils, registration_utils as reg_utils
 from mhr_api.services.payment import TransactionTypes
 from mhr_api.services.payment.exceptions import SBCPaymentException
+from mhr_api.services.utils.exceptions import ReportDataException, ReportException, StorageException
+from mhr_api.services.document_storage.storage_service import DocumentTypes, GoogleStorageService
 
 
 bp = Blueprint('REGISTRATIONS1',  # pylint: disable=invalid-name
@@ -207,5 +211,61 @@ def get_registrations(mhr_number: str):  # pylint: disable=too-many-return-state
     except DatabaseException as db_exception:
         return resource_utils.db_exception_response(db_exception, account_id,
                                                     'GET MH registration id=' + mhr_number)
+    except Exception as default_exception:   # noqa: B902; return nicer default error
+        return resource_utils.default_exception_response(default_exception)
+
+
+@bp.route('/batch/manufacturer', methods=['GET', 'OPTIONS'])
+@cross_origin(origin='*')
+def get_batch_manufacturer_registrations():  # pylint: disable=too-many-return-statements, too-many-branches
+    """Get batch manufacturer registrations report for ."""
+    try:
+        current_app.logger.info('getting batch manufacturer registrations')
+        # Authenticate with request api key
+        if not resource_utils.valid_api_key(request):
+            return resource_utils.unauthorized_error_response('batch manufacturer registrations report')
+        start_ts: str = request.args.get(model_reg_utils.START_TS_PARAM, None)
+        end_ts: str = request.args.get(model_reg_utils.END_TS_PARAM, None)
+        if start_ts and end_ts:
+            start_ts = resource_utils.remove_quotes(start_ts)
+            end_ts = resource_utils.remove_quotes(end_ts)
+            current_app.logger.debug(f'Using request timestamp range {start_ts} to {end_ts}')
+        registrations = model_reg_utils.get_batch_manufacturer_reg_report_data(start_ts, end_ts)
+        if not registrations:
+            current_app.logger.debug(f'No manufacturer registrations found for timestamp range {start_ts} to {end_ts}')
+            return '', HTTPStatus.NO_CONTENT
+        # Generate individual registration reports with a cover letter
+        reports = []
+        for reg in registrations:
+            raw_data, status_code, headers = get_callback_pdf(reg.get('reportData'),
+                                                              reg.get('accountId'),
+                                                              ReportTypes.MHR_REGISTRATION_STAFF,
+                                                              None,
+                                                              None)
+            if status_code in (HTTPStatus.OK, HTTPStatus.CREATED):
+                reports.append(raw_data)
+            else:
+                current_app.logger.error(str(reg.get('registrationId')) + ' report api call failed: ' +
+                                         raw_data.get_data(as_text=True))
+        if reports and len(reports) > 1:
+            raw_data, status_code, headers = Report.batch_merge(reports)
+        if status_code not in (HTTPStatus.OK, HTTPStatus.CREATED):
+            current_app.logger.error('Batch manufacturer report merge call failed: ' + raw_data.get_data(as_text=True))
+            return raw_data, status_code, headers
+        batch_storage_url = model_reg_utils.get_batch_storage_name_manufacturer_mhreg()
+        current_app.logger.info(f'Saving batch manufacturer registration report to: {batch_storage_url}.')
+        GoogleStorageService.save_document(batch_storage_url, raw_data, DocumentTypes.BATCH_REGISTRATION)
+        model_reg_utils.update_reg_report_batch_url(registrations, batch_storage_url)
+        return raw_data, HTTPStatus.OK, headers
+    except ReportException as report_err:
+        return resource_utils.service_exception_response('Batch manufacturer report API error: ' + str(report_err))
+    except ReportDataException as report_data_err:
+        return resource_utils.service_exception_response('Batch manufacturerreport API data error: ' +
+                                                         str(report_data_err))
+    except StorageException as storage_err:
+        return resource_utils.service_exception_response('Batch manufacturer report storage API error: ' +
+                                                         str(storage_err))
+    except DatabaseException as db_exception:
+        return resource_utils.db_exception_response(db_exception, None, 'Batch manufacturer report error')
     except Exception as default_exception:   # noqa: B902; return nicer default error
         return resource_utils.default_exception_response(default_exception)
