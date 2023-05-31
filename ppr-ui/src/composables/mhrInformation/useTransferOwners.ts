@@ -574,6 +574,17 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     }
   }
 
+  // For WIll and LETA Transfers, at least one Exec or Admin is required to proceed
+  // Used for hiding group message (that all owners must be removed)
+  const hasMinOneExecOrAdminInGroup = (groupId) => {
+    if (isTransferToExecutorProbateWill.value) {
+      return TransToExec.hasAtLeastOneExecInGroup(groupId)
+    } else if (isTransferToAdminNoWill.value) {
+      return TransToAdmin.hasAtLeastOneAdminInGroup(groupId)
+    }
+    return false
+  }
+
   /** Return true if the specified owner is part of the current/base ownership structure **/
   const isCurrentOwner = (owner: MhrRegistrationHomeOwnerIF): boolean => {
     return getMhrTransferCurrentHomeOwnerGroups.value.some(group =>
@@ -712,6 +723,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     hasCurrentOwnerChanges,
     hasCurrentGroupChanges,
     moveCurrentOwnersToPreviousOwners,
+    hasMinOneExecOrAdminInGroup,
     ...toRefs(localState)
   }
 }

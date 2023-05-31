@@ -476,6 +476,7 @@ export default defineComponent({
       isTransferToAdminNoWill,
       groupHasRemovedAllCurrentOwners,
       moveCurrentOwnersToPreviousOwners,
+      hasMinOneExecOrAdminInGroup,
       TransSaleOrGift,
       TransToExec,
       TransToAdmin,
@@ -552,7 +553,7 @@ export default defineComponent({
       !localState.showTableError && !props.isReadonlyTable
 
     const isInvalidTransferOwnerGroup = (groupId: number, hasExecOrAdminInGroup: boolean) => {
-      if (props.validateTransfer && !hasUnsavedChanges.value) return false
+      if (props.validateTransfer && (!hasUnsavedChanges.value || hasMinOneExecOrAdminInGroup(groupId))) return false
 
       const hasRemovedOwners = TransToExec.hasSomeOwnersRemoved(groupId)
       // groups that are not edited are valid
@@ -693,22 +694,12 @@ export default defineComponent({
           ? TransToAdmin.hasAddedAdministratorsInGroup(groupId)
           : TransToExec.hasAddedExecutorsInGroup(groupId)
 
-        let hasAtLeastOneExecOrAdmin = false
-
-        // for WILL and LETA transfers, id one Exec or Admin is removed,
-        // do not shot group message that all owners must be removed
-        if (isTransferToExecutorProbateWill.value) {
-          hasAtLeastOneExecOrAdmin = TransToExec.hasAtLeastOneExecInGroup(groupId)
-        } else if (isTransferToAdminNoWill.value) {
-          hasAtLeastOneExecOrAdmin = TransToAdmin.hasAtLeastOneAdminInGroup(groupId)
-        }
-
         return (
           (TransToExec.hasSomeOwnersRemoved(groupId) || hasAddedRoleInGroup) &&
           !(hasAddedRoleInGroup &&
           TransToExec.hasAllCurrentOwnersRemoved(groupId) &&
           !TransToExec.isAllGroupOwnersWithDeathCerts(groupId)) &&
-          !hasAtLeastOneExecOrAdmin
+          !hasMinOneExecOrAdminInGroup(groupId)
         )
       }
 
