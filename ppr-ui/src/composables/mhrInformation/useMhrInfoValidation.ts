@@ -75,7 +75,7 @@ export const useMhrInfoValidation = (validationState: mhrInfoValidationStateIF) 
   const scrollToFirstError = async (scrollToTop: boolean = false, forceTarget: string = ''): Promise<void> => {
     setTimeout(() => {
       if (forceTarget) {
-        document.getElementById(forceTarget).scrollIntoView({ behavior: 'smooth' })
+        document.getElementById(forceTarget)?.scrollIntoView({ behavior: 'smooth' })
         return
       }
 
@@ -86,7 +86,7 @@ export const useMhrInfoValidation = (validationState: mhrInfoValidationStateIF) 
       document.getElementsByClassName('border-error-left').length > 0 &&
       document.getElementsByClassName('border-error-left')[0]
         .scrollIntoView({ block: 'start', inline: 'nearest', behavior: 'smooth' })
-    }, 10)
+    }, 500)
   }
 
   /** Reset the validation state to default **/
