@@ -107,7 +107,7 @@
                     <div v-if="otherTypeOption === HomeLocationTypes.OTHER_RESERVE" class="ml-8">
 
                       <HomeLocationDescription
-                        isReserve
+                        :isReserve="true"
                         :validate="validate"
                         :legalDescription="legalDescription"
                         @setIsValidLocationInfo="isValidLocationInfo = $event"
@@ -141,7 +141,7 @@
                       />
 
                       <HomeLocationDescription
-                        isStrata
+                        :isStrata="true"
                         :validate="validate"
                         :legalDescription="legalDescription"
                         @setIsValidLocationInfo="isValidLocationInfo = $event"
@@ -195,14 +195,15 @@
 
 <script lang="ts">
 /* eslint-disable no-unused-vars */
-import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
-import { useActions, useGetters } from 'vuex-composition-helpers'
+import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue-demi'
+import { useStore } from '@/store/store'
 import { HomeLocationTypes } from '@/enums'
 import { PidNumber } from '@/components/common'
 import HomeLocationDescription from './HomeLocationDescription.vue'
 import { useInputRules, useMhrValidations, useNewMhrRegistration } from '@/composables'
-import { MhrLocationInfoIF } from '@/interfaces'
+import { FormIF, MhrLocationInfoIF } from '@/interfaces'
 import { PidInfoIF } from '@/interfaces/ltsa-api-interfaces'
+import { storeToRefs } from 'pinia'
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
@@ -217,22 +218,17 @@ export default defineComponent({
       default: false
     }
   },
-  setup (props, context) {
+  setup (props) {
     const {
-      getMhrRegistrationLocation,
-      getMhrRegistrationValidationModel
-    } = useGetters<any>([
-      'getMhrRegistrationLocation',
-      'getMhrRegistrationValidationModel'
-    ])
-    const {
+      // Actions
       setMhrLocation,
       setIsManualLocation
-    } = useActions<any>([
-      'setMhrLocation',
-      'setIsManualLocation'
-    ])
-
+    } = useStore()
+    const {
+      // Getters
+      getMhrRegistrationLocation,
+      getMhrRegistrationValidationModel
+    } = storeToRefs(useStore())
     const { resetLocationInfoFields } = useNewMhrRegistration()
     const { customRules, maxLength, required } = useInputRules()
     const {
@@ -240,8 +236,11 @@ export default defineComponent({
       MhrSectVal,
       setValidation
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
+    const lotForm = ref(null) as FormIF
+    const homeParkForm = ref(null) as FormIF
 
     // Home location store properties
+    // Developer note: de-construction of store computed properties in this manner will result in the loss of reactivity
     const { additionalDescription, dealerName, legalDescription, locationType, pad, pidNumber, parkName, otherType } =
       getMhrRegistrationLocation.value
 
@@ -308,10 +307,8 @@ export default defineComponent({
 
     const validateForms = async () => {
       if (props.validate) {
-        // @ts-ignore - function exists
-        await context.refs.lotForm?.validate()
-        // @ts-ignore - function exists
-        await context.refs.homeParkForm?.validate()
+        lotForm.value?.validate()
+        homeParkForm.value?.validate()
       }
     }
 
@@ -346,7 +343,7 @@ export default defineComponent({
     watch(() => localState.isLocationTypeValid, (val: boolean) => {
       setValidation(MhrSectVal.LOCATION_VALID, MhrCompVal.LOCATION_TYPE_VALID, val)
     })
-    watch(() => props.validate, async (val: boolean) => {
+    watch(() => props.validate, async () => {
       await validateForms()
     })
 
@@ -378,6 +375,8 @@ export default defineComponent({
     })
 
     return {
+      lotForm,
+      homeParkForm,
       handlePidInfo,
       HomeLocationTypes,
       customRules,

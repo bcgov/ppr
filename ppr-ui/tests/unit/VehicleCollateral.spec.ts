@@ -1,8 +1,9 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { getVuexStore } from '@/store'
-import CompositionApi from '@vue/composition-api'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
+
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import {
   mockedVehicleCollateral1,
@@ -21,7 +22,8 @@ import { RegistrationFlowType } from '@/enums'
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 // Input field selectors / buttons
 const addButtonSelector: string = '#btn-add-collateral'
@@ -36,10 +38,10 @@ function createComponent (
   showInvalid: boolean
 ): Wrapper<any> {
   const localVue = createLocalVue()
-  localVue.use(CompositionApi)
+
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
-  return mount(VehicleCollateral, {
+  return mount((VehicleCollateral as any), {
     localVue,
     propsData: {
       isSummary: isSummary,
@@ -55,7 +57,7 @@ describe('Vehicle collateral summary tests', () => {
 
   beforeEach(async () => {
     const registrationType = mockedSelectSecurityAgreement()
-    await store.dispatch('setRegistrationType', registrationType)
+    await store.setRegistrationType(registrationType)
 
     wrapper = createComponent(true, false)
   })
@@ -64,7 +66,7 @@ describe('Vehicle collateral summary tests', () => {
   })
 
   it('renders with summary version with empty collateral', async () => {
-    await store.dispatch('setVehicleCollateral', null)
+    await store.setVehicleCollateral(null)
     expect(wrapper.findComponent(VehicleCollateral).exists()).toBe(true)
     // won't show edit collateral component until click
     expect(wrapper.findComponent(EditCollateral).exists()).toBe(false)
@@ -73,7 +75,7 @@ describe('Vehicle collateral summary tests', () => {
   })
 
   it('renders with summary version with vehicle collateral', async () => {
-    await store.dispatch('setVehicleCollateral', mockedVehicleCollateral1)
+    await store.setVehicleCollateral(mockedVehicleCollateral1)
     expect(wrapper.findComponent(VehicleCollateral).exists()).toBe(true)
     // won't show edit collateral component until click
     expect(wrapper.findComponent(EditCollateral).exists()).toBe(false)
@@ -85,8 +87,8 @@ describe('Vehicle collateral edit tests', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
-    await store.dispatch('setVehicleCollateral', mockedVehicleCollateral1)
-    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement())
+    await store.setVehicleCollateral(mockedVehicleCollateral1)
+    await store.setRegistrationType(mockedSelectSecurityAgreement())
     wrapper = createComponent(false, false)
   })
   afterEach(() => {
@@ -96,7 +98,7 @@ describe('Vehicle collateral edit tests', () => {
   it('add collateral button shows the add vehicle form', async () => {
     expect(wrapper.find(addButtonSelector).exists()).toBe(true)
     wrapper.find(addButtonSelector).trigger('click')
-    await Vue.nextTick()
+    await nextTick()
     expect(wrapper.findComponent(EditCollateral).exists()).toBe(true)
     expect(wrapper.findComponent(EditCollateral).isVisible()).toBe(true)
   })
@@ -127,9 +129,9 @@ describe('Vehicle Collateral amendment tests', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
-    await store.dispatch('setVehicleCollateral', mockedVehicleCollateralAmendment)
-    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement())
-    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.AMENDMENT)
+    await store.setVehicleCollateral(mockedVehicleCollateralAmendment)
+    await store.setRegistrationType(mockedSelectSecurityAgreement())
+    await store.setRegistrationFlowType(RegistrationFlowType.AMENDMENT)
     wrapper = createComponent(false, false)
   })
   afterEach(() => {
@@ -160,13 +162,13 @@ describe('Vehicle Collateral amendment tests', () => {
     expect(dropDowns.length).toBe(2)
     // click the drop down arrow
     dropDowns.at(0).trigger('click')
-    await Vue.nextTick()
+    await nextTick()
     expect(wrapper.findAll('.actions__more-actions .v-list-item__subtitle').length).toBe(2)
     expect(item2.querySelectorAll('td')[6].textContent).toContain('Undo')
     expect(item3.querySelectorAll('td')[6].textContent).toContain('Edit')
     // click the second drop down
     dropDowns.at(1).trigger('click')
-    await Vue.nextTick()
+    await nextTick()
     const options = wrapper.findAll('.actions__more-actions .v-list-item__subtitle')
     // options from first drop down
     expect(options.at(0).text()).toContain('Amend')
@@ -180,9 +182,9 @@ describe('Vehicle Collateral summary amendment tests', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
-    await store.dispatch('setVehicleCollateral', mockedVehicleCollateralAmendment)
-    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement())
-    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.AMENDMENT)
+    await store.setVehicleCollateral(mockedVehicleCollateralAmendment)
+    await store.setRegistrationType(mockedSelectSecurityAgreement())
+    await store.setRegistrationFlowType(RegistrationFlowType.AMENDMENT)
     wrapper = createComponent(true, false)
   })
   afterEach(() => {
@@ -210,9 +212,9 @@ describe('Vehicle Collateral repairers lien amendment tests', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
-    await store.dispatch('setVehicleCollateral', mockedVehicleCollateralAmendment2)
-    await store.dispatch('setRegistrationType', mockedRepairersLien())
-    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.AMENDMENT)
+    await store.setVehicleCollateral(mockedVehicleCollateralAmendment2)
+    await store.setRegistrationType(mockedRepairersLien())
+    await store.setRegistrationFlowType(RegistrationFlowType.AMENDMENT)
     wrapper = createComponent(false, false)
   })
   afterEach(() => {
@@ -241,9 +243,9 @@ describe('Vehicle Collateral crown charge tests', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
-    await store.dispatch('setVehicleCollateral', mockedVehicleCollateralAmendment2)
-    await store.dispatch('setRegistrationType', mockedOtherCarbon())
-    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.NEW)
+    await store.setVehicleCollateral(mockedVehicleCollateralAmendment2)
+    await store.setRegistrationType(mockedOtherCarbon())
+    await store.setRegistrationFlowType(RegistrationFlowType.NEW)
     wrapper = createComponent(false, false)
   })
   afterEach(() => {
@@ -257,7 +259,7 @@ describe('Vehicle Collateral crown charge tests', () => {
   })
 
   it('displays the data for the amendment', async () => {
-    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.AMENDMENT)
+    await store.setRegistrationFlowType(RegistrationFlowType.AMENDMENT)
     const vehicleRowCount = wrapper.vm.$el.querySelectorAll('.v-data-table .vehicle-row').length
     expect(vehicleRowCount).toEqual(2)
   })
@@ -267,9 +269,9 @@ describe('Vehicle Collateral forestry subcontractor tests', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
-    await store.dispatch('setVehicleCollateral', mockedVehicleCollateralAmendment2)
-    await store.dispatch('setRegistrationType', mockedForestrySubcontractor())
-    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.NEW)
+    await store.setVehicleCollateral(mockedVehicleCollateralAmendment2)
+    await store.setRegistrationType(mockedForestrySubcontractor())
+    await store.setRegistrationFlowType(RegistrationFlowType.NEW)
     wrapper = createComponent(false, false)
   })
   afterEach(() => {

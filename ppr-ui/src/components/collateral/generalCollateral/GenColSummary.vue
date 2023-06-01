@@ -170,13 +170,14 @@ import {
   reactive,
   toRefs,
   computed
-} from '@vue/composition-api'
-import { useActions, useGetters } from 'vuex-composition-helpers'
+} from 'vue-demi'
+import { useStore } from '@/store/store'
 // local
 import { RegistrationFlowType } from '@/enums' // eslint-disable-line no-unused-vars
 import { GeneralCollateralIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { pacificDate } from '@/utils'
 import { cloneDeep } from 'lodash'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'GenColSummary',
@@ -199,17 +200,8 @@ export default defineComponent({
     }
   },
   setup (props, { emit }) {
-    const {
-      getGeneralCollateral,
-      getOriginalAddCollateral,
-      getRegistrationFlowType
-    } = useGetters<any>([
-      'getGeneralCollateral',
-      'getOriginalAddCollateral',
-      'getRegistrationFlowType'
-    ])
-    const { setGeneralCollateral } = useActions<any>(['setGeneralCollateral'])
-
+    const { setGeneralCollateral } = useStore()
+    const { getGeneralCollateral, getOriginalAddCollateral, getRegistrationFlowType } = storeToRefs(useStore())
     const localState = reactive({
       showingHistory: props.setShowHistory,
       baseGenCollateralIndex: computed(() => {

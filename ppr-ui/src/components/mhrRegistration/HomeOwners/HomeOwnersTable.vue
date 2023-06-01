@@ -390,7 +390,8 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
+import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
+import { useStore } from '@/store/store'
 import { homeOwnersTableHeaders, homeOwnersTableHeadersReview } from '@/resources/tableHeaders'
 import { useHomeOwners, useMhrInfoValidation, useMhrValidations, useTransferOwners } from '@/composables'
 import { BaseAddress } from '@/composables/address'
@@ -408,8 +409,8 @@ import { InfoChip } from '@/components/common'
 /* eslint-disable no-unused-vars */
 import { MhrRegistrationHomeOwnerIF } from '@/interfaces'
 import { ActionTypes, HomeOwnerPartyTypes, HomeTenancyTypes, SupportingDocumentsOptions } from '@/enums'
+import { storeToRefs } from 'pinia'
 /* eslint-enable no-unused-vars */
-import { useActions, useGetters } from 'vuex-composition-helpers'
 
 export default defineComponent({
   name: 'HomeOwnersTable',
@@ -436,7 +437,13 @@ export default defineComponent({
   },
   setup (props, context) {
     const addressSchema = PartyAddressSchema
-
+    const { setUnsavedChanges } = useStore()
+    const { // Getters
+      getMhrRegistrationValidationModel,
+      getMhrInfoValidation,
+      hasUnsavedChanges,
+      getMhrTransferHomeOwnerGroups
+    } = storeToRefs(useStore())
     const {
       showGroups,
       removeOwner,
@@ -483,20 +490,6 @@ export default defineComponent({
       TransJointTenants,
       getMhrTransferType
     } = useTransferOwners(!props.isMhrTransfer)
-
-    const { setUnsavedChanges } = useActions<any>(['setUnsavedChanges'])
-
-    const {
-      getMhrRegistrationValidationModel,
-      getMhrInfoValidation,
-      hasUnsavedChanges,
-      getMhrTransferHomeOwnerGroups
-    } = useGetters<any>([
-      'getMhrRegistrationValidationModel',
-      'getMhrInfoValidation',
-      'hasUnsavedChanges',
-      'getMhrTransferHomeOwnerGroups'
-    ])
 
     const { getValidation, MhrSectVal, MhrCompVal } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
     const { isValidDeceasedOwnerGroup } = useMhrInfoValidation(getMhrInfoValidation.value)

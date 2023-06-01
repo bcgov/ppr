@@ -31,7 +31,7 @@
         </v-row>
       </v-col>
       <v-col align-self="end" style="padding-right: 30px; width: 320px;">
-        <v-btn id="btn-generate-result" class="float-right" color="primary" depressed plain @click="emit('submit')">
+        <v-btn id="btn-generate-result" class="float-right" color="primary" depressed @click="emit('submit')">
           <img class="pr-1" src="@/assets/svgs/pdf-icon-white.svg">
           Generate Search Result Report
         </v-btn>
@@ -143,13 +143,13 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
-import { useGetters } from 'vuex-composition-helpers'
-
+import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
+import { useStore } from '@/store/store'
 import { searchTableHeaders, VehicleTypes } from '@/resources'
 import { SearchResponseIF, SearchResultIF, TableHeadersIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { MatchTypes } from '@/enums'
 import { convertDate } from '@/utils'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   props: {
@@ -165,7 +165,8 @@ export default defineComponent({
   },
   emits: ['selected-matches', 'submit'],
   setup (props, { emit }) {
-    const { getSearchResults } = useGetters<any>(['getSearchResults'])
+    const { getSearchResults } = storeToRefs(useStore())
+
     const localState = reactive({
       searched: false,
       searchValue: '',

@@ -173,24 +173,15 @@
 </template>
 
 <script lang="ts">
-// external
-import {
-  defineComponent,
-  reactive,
-  toRefs,
-  watch,
-  computed,
-  onMounted
-} from '@vue/composition-api'
-import { useGetters, useActions } from 'vuex-composition-helpers'
+import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue-demi'
+import { useStore } from '@/store/store'
 import { isEqual } from 'lodash'
-// bcregistry
 import SharedDatePicker from '@/components/common/SharedDatePicker.vue'
-// local
 import { APIRegistrationTypes } from '@/enums'
 import { CourtOrderIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { convertDate, localTodayDate } from '@/utils'
 import { useCourtOrderValidation } from './composables'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   components: {
@@ -212,14 +203,18 @@ export default defineComponent({
     }
   },
   setup (props, { emit }) {
-    const { setCourtOrderInformation, setUnsavedChanges } = useActions<any>([
-      'setCourtOrderInformation', 'setUnsavedChanges'
-    ])
     const {
-      getCourtOrderInformation, getRegistrationType, getRegistrationCreationDate, hasUnsavedChanges
-    } = useGetters<any>([
-      'getCourtOrderInformation', 'getRegistrationType', 'getRegistrationCreationDate', 'hasUnsavedChanges'
-    ])
+      // Actions
+      setCourtOrderInformation,
+      setUnsavedChanges
+    } = useStore()
+    const {
+      // Getters
+      getCourtOrderInformation,
+      getRegistrationType,
+      getRegistrationCreationDate,
+      hasUnsavedChanges
+    } = storeToRefs(useStore())
     const {
       errors,
       valid,
@@ -275,8 +270,7 @@ export default defineComponent({
         }
       }),
       maxCourtDate: computed((): string => {
-        const maxDate = localTodayDate()
-        return maxDate
+        return localTodayDate()
       }),
       fileNumberMessage: computed((): string => {
         if (localState.fileNumber.length > 20) {
@@ -315,12 +309,9 @@ export default defineComponent({
     }
 
     const shouldValidate = () => {
-      if ((localState.courtName) || (localState.courtRegistry) ||
-          (localState.fileNumber) || (localState.orderDate) || (localState.effectOfOrder) ||
-          (localState.requireCourtOrder)) {
-        return true
-      }
-      return false
+      return !!((localState.courtName) || (localState.courtRegistry) ||
+        (localState.fileNumber) || (localState.orderDate) || (localState.effectOfOrder) ||
+        (localState.requireCourtOrder))
     }
 
     watch(

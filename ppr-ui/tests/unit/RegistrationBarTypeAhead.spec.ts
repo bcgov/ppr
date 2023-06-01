@@ -1,8 +1,9 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { getVuexStore } from '@/store'
-import CompositionApi from '@vue/composition-api'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
+
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import flushPromises from 'flush-promises'
 
@@ -21,7 +22,8 @@ import { UIRegistrationTypes } from '@/enums'
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 // registration lists
 const standardRegistrations: Array<RegistrationTypeIF> = RegistrationTypesStandard
@@ -59,10 +61,10 @@ function getLastEvent (wrapper: Wrapper<any>, name: string): any {
  */
 function createComponent (): Wrapper<any> {
   const localVue = createLocalVue()
-  localVue.use(CompositionApi)
+
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
-  return mount(RegistrationBarTypeAheadList, {
+  return mount((RegistrationBarTypeAheadList as any), {
     localVue,
     propsData: {},
     store,
@@ -87,7 +89,7 @@ describe('RegistrationBar rppr subscribed autocomplete tests', () => {
   })
 
   it('emits registration on select', async () => {
-    wrapper.vm.$data.selected = miscCrownChargeRegistrations[4]
+    wrapper.vm.selected = miscCrownChargeRegistrations[4]
     await flushPromises()
     expect(getLastEvent(wrapper, selected)).toBe(miscCrownChargeRegistrations[4])
   })
@@ -95,7 +97,7 @@ describe('RegistrationBar rppr subscribed autocomplete tests', () => {
   it('gives dialog when *other* type is selected', async () => {
     const otherRegistration = miscCrownChargeRegistrations[miscCrownChargeRegistrations.length - 1]
     expect(otherRegistration.registrationTypeUI).toBe(UIRegistrationTypes.OTHER)
-    wrapper.vm.$data.selected = otherRegistration
+    wrapper.vm.selected = otherRegistration
     await flushPromises()
     expect(getLastEvent(wrapper, selected)).toBeNull()
     const dialog = wrapper.findComponent(RegistrationOtherDialog)
@@ -105,8 +107,8 @@ describe('RegistrationBar rppr subscribed autocomplete tests', () => {
     await flushPromises()
     expect(getLastEvent(wrapper, selected)).toBeNull()
     expect(dialog.vm.$props.display).toBe(false)
-    expect(wrapper.vm.$data.selected).toBeNull()
-    wrapper.vm.$data.selected = otherRegistration
+    expect(wrapper.vm.selected).toBeNull()
+    wrapper.vm.selected = otherRegistration
     await flushPromises()
     dialog.vm.$emit('proceed', true)
     await flushPromises()

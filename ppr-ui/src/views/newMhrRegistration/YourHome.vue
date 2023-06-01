@@ -65,8 +65,8 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
-import { useGetters } from 'vuex-composition-helpers'
+import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
+import { useStore } from '@/store/store'
 import {
   HomeCertification,
   HomeSections,
@@ -75,6 +75,7 @@ import {
   OtherInformation
 } from '@/components/mhrRegistration/YourHome'
 import { useMhrValidations } from '@/composables/mhrRegistration/useMhrValidations'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'YourHome',
@@ -89,9 +90,7 @@ export default defineComponent({
   setup () {
     const {
       getMhrRegistrationValidationModel
-    } = useGetters<any>([
-      'getMhrRegistrationValidationModel'
-    ])
+    } = storeToRefs(useStore())
 
     const {
       MhrCompVal,

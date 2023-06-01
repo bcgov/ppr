@@ -158,12 +158,13 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs } from '@vue/composition-api'
-import { useGetters } from 'vuex-composition-helpers'
+import { computed, defineComponent, reactive, toRefs } from 'vue-demi'
+import { useStore } from '@/store/store'
 import { HomeCertificationOptions, RouteNames } from '@/enums'
 import { yyyyMmDdToPacificDate, formatAsHtml } from '@/utils'
 import { HomeSections } from '@/components/mhrRegistration'
 import { useMhrValidations } from '@/composables'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'YourHomeReview',
@@ -181,11 +182,7 @@ export default defineComponent({
       getMhrRegistrationHomeDescription,
       getMhrRegistrationOtherInfo,
       getMhrRegistrationValidationModel
-    } = useGetters<any>([
-      'getMhrRegistrationOtherInfo',
-      'getMhrRegistrationHomeDescription',
-      'getMhrRegistrationValidationModel'
-    ])
+    } = storeToRefs(useStore())
 
     const {
       MhrSectVal,

@@ -1,8 +1,10 @@
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { getVuexStore } from '@/store'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
+
 import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
-import CompositionApi from '@vue/composition-api'
+
 import flushPromises from 'flush-promises'
 // local
 import { ErrorContact } from '@/components/common'
@@ -11,7 +13,8 @@ import { DialogContent } from '@/components/dialogs/common'
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 // Input field selectors / buttons
 const text = '.dialog-text'
@@ -24,9 +27,9 @@ describe('Dialog Content tests', () => {
 
   beforeEach(async () => {
     const localVue = createLocalVue()
-    localVue.use(CompositionApi)
+
     localVue.use(Vuetify)
-    wrapper = mount(DialogContent,
+    wrapper = mount((DialogContent as any),
       {
         localVue,
         store,

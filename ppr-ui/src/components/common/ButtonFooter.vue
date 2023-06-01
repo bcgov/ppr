@@ -81,22 +81,21 @@
 </template>
 
 <script lang="ts">
-// external
 import VueRouter from 'vue-router' // eslint-disable-line no-unused-vars
-import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
-import { useActions, useGetters } from 'vuex-composition-helpers'
+import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
+import { useStore } from '@/store/store'
 import _ from 'lodash'
-// local helpers/enums/interfaces/resources
 import { saveFinancingStatement, saveFinancingStatementDraft } from '@/utils'
 import { RouteNames, StatementTypes } from '@/enums'
 import { BaseDialog } from '@/components/dialogs'
 import StaffPaymentDialog from '@/components/dialogs/StaffPaymentDialog.vue'
 import {
   // eslint-disable-next-line no-unused-vars
-  ButtonConfigIF, DraftIF, ErrorIF, FinancingStatementIF, MhrDraftIF, RegTableNewItemI, StateModelIF
+  ButtonConfigIF, DraftIF, ErrorIF, FinancingStatementIF, RegTableNewItemI, StateModelIF
 } from '@/interfaces'
 import { unsavedChangesDialog } from '@/resources/dialogOptions'
 import { useNewMhrRegistration } from '@/composables'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   components: {
@@ -130,26 +129,21 @@ export default defineComponent({
   },
   setup (props, { emit }) {
     const {
+      // Actions
+      resetNewRegistration,
+      setDraft,
+      setRegTableNewItem,
+      setUnsavedChanges
+    } = useStore()
+    const {
+      // Getters
       getFooterButtonConfig,
       getStateModel,
       hasUnsavedChanges,
       isRoleStaffBcol,
       isRoleStaffReg,
       isRoleStaffSbc
-    } = useGetters<any>([
-      'getFooterButtonConfig',
-      'getStateModel',
-      'hasUnsavedChanges',
-      'isRoleStaffBcol',
-      'isRoleStaffReg',
-      'isRoleStaffSbc'
-    ])
-
-    const {
-      resetNewRegistration, setDraft, setRegTableNewItem, setUnsavedChanges
-    } = useActions<any>([
-      'resetNewRegistration', 'setDraft', 'setRegTableNewItem', 'setUnsavedChanges'
-    ])
+    } = storeToRefs(useStore())
     const { mhrDraftHandler } = useNewMhrRegistration()
 
     const localState = reactive({
@@ -202,7 +196,7 @@ export default defineComponent({
     }
     const goToDashboard = () => {
       // clear all state set data
-      resetNewRegistration(null)
+      resetNewRegistration()
       // eslint-disable-next-line vue/no-mutating-props
       props.router.push({ name: RouteNames.DASHBOARD })
     }

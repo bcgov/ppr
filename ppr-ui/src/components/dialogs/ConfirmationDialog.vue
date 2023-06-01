@@ -27,8 +27,8 @@ import {
   reactive,
   toRefs,
   watch
-} from '@vue/composition-api'
-import { useActions } from 'vuex-composition-helpers'
+} from 'vue-demi'
+import { useStore } from '@/store/store'
 // local components
 import { BaseDialog } from '.'
 import { DialogContent } from './common'
@@ -50,7 +50,7 @@ export default defineComponent({
   },
   emits: ['proceed'],
   setup (props, { emit }) {
-    const { setUserSettings } = useActions<any>(['setUserSettings'])
+    const { setUserSettings } = useStore()
 
     const localState = reactive({
       preventDialog: false,

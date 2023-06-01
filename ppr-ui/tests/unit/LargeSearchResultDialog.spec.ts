@@ -1,7 +1,8 @@
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { getVuexStore } from '@/store'
-import CompositionApi from '@vue/composition-api'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
+
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 // local
 import { LargeSearchResultDialog, BaseDialog } from '@/components/dialogs'
@@ -13,7 +14,8 @@ import { getLastEvent } from './utils'
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 // emitted events
 const proceed: string = 'proceed'
@@ -30,11 +32,11 @@ document.body.setAttribute('data-app', 'true')
 describe('Large Search Result Dialog', () => {
   let wrapper: Wrapper<any>
   const localVue = createLocalVue()
-  localVue.use(CompositionApi)
+
   localVue.use(Vuetify)
 
   beforeEach(async () => {
-    wrapper = mount(LargeSearchResultDialog,
+    wrapper = mount((LargeSearchResultDialog as any),
       {
         localVue,
         store,
@@ -45,7 +47,7 @@ describe('Large Search Result Dialog', () => {
         },
         vuetify
       })
-    await Vue.nextTick()
+    await nextTick()
   })
   afterEach(() => {
     wrapper.destroy()
@@ -62,12 +64,12 @@ describe('Large Search Result Dialog', () => {
     expect(wrapper.find(text).text()).toContain('75 registrations')
     expect(wrapper.find(accept).exists()).toBe(true)
     wrapper.find(accept).trigger('click')
-    await Vue.nextTick()
+    await nextTick()
     expect(getLastEvent(wrapper, proceed)).toEqual(true)
 
     expect(wrapper.find(cancel).exists()).toBe(true)
     wrapper.find(cancel).trigger('click')
-    await Vue.nextTick()
+    await nextTick()
     expect(getLastEvent(wrapper, proceed)).toEqual(false)
   })
 })

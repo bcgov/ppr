@@ -106,8 +106,10 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, nextTick, onMounted, reactive, toRefs, watch } from '@vue/composition-api'
-import { useActions, useGetters } from 'vuex-composition-helpers'
+import { computed, defineComponent, nextTick, onMounted, reactive, toRefs, watch } from 'vue-demi'
+import { useRouter } from 'vue2-helpers/vue-router'
+import { useStore } from '@/store/store'
+import { storeToRefs } from 'pinia'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { FolioNumberSummary, StickyContainer } from '@/components/common'
 import { BaseDialog } from '@/components/dialogs'
@@ -120,7 +122,7 @@ import { getFeatureFlag, submitSelectedMhr } from '@/utils'
 import { SearchedResultMhr } from '@/components/tables'
 import { uniqBy } from 'lodash'
 /* eslint-disable no-unused-vars */
-import { ErrorIF, DialogOptionsIF } from '@/interfaces'
+import { DialogOptionsIF } from '@/interfaces'
 import { AdditionalSearchFeeIF } from '@/composables/fees/interfaces'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 /* eslint-enable no-unused-vars */
@@ -146,7 +148,14 @@ export default defineComponent({
     }
   },
   setup (props, context) {
+    const router = useRouter()
     const {
+      // Actions
+      setStaffPayment,
+      setSearchCertified
+    } = useStore()
+    const {
+      // Getters
       isRoleStaffReg,
       isRoleStaffSbc,
       getStaffPayment,
@@ -155,24 +164,8 @@ export default defineComponent({
       getFolioOrReferenceNumber,
       getSelectedManufacturedHomes,
       getManufacturedHomeSearchResults
-    } = useGetters([
-      'isRoleStaffReg',
-      'isRoleStaffSbc',
-      'getStaffPayment',
-      'isSearchCertified',
-      'getIsStaffClientPayment',
-      'getFolioOrReferenceNumber',
-      'getSelectedManufacturedHomes',
-      'getManufacturedHomeSearchResults'
-    ])
+    } = storeToRefs(useStore())
 
-    const {
-      setStaffPayment,
-      setSearchCertified
-    } = useActions([
-      'setStaffPayment',
-      'setSearchCertified'
-    ])
     const localState = reactive({
       dataLoaded: false,
       dataLoadError: false,
@@ -240,14 +233,14 @@ export default defineComponent({
     }
 
     const goToDashboard = (): void => {
-      context.root.$router.push({
+      router.push({
         name: RouteNames.DASHBOARD
       })
       emitHaveData(false)
     }
 
     const goToSearchResult = (): void => {
-      context.root.$router.push({
+      router.push({
         name: RouteNames.MHRSEARCH
       })
     }
@@ -361,7 +354,7 @@ export default defineComponent({
 
       // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
       if (!localState.isAuthenticated || (!props.isJestRunning && !getFeatureFlag('mhr-ui-enabled'))) {
-        context.root.$router.push({
+        router.push({
           name: RouteNames.DASHBOARD
         })
         return

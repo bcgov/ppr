@@ -1,8 +1,10 @@
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { getVuexStore } from '@/store'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
+
 import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
-import CompositionApi from '@vue/composition-api'
+
 import flushPromises from 'flush-promises'
 // local
 import { DialogButtons } from '@/components/dialogs/common'
@@ -11,7 +13,8 @@ import { getLastEvent } from './utils'
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 // emitted events
 const proceed: string = 'proceed'
@@ -28,9 +31,9 @@ describe('Dialog Button tests', () => {
 
   beforeEach(async () => {
     const localVue = createLocalVue()
-    localVue.use(CompositionApi)
+
     localVue.use(Vuetify)
-    wrapper = mount(DialogButtons,
+    wrapper = mount((DialogButtons as any),
       {
         localVue,
         store,

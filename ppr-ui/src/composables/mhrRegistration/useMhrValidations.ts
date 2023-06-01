@@ -64,7 +64,9 @@ export const useMhrValidations = (validationState: any) => {
 
       // If there is an invalid component, scroll to it
       if (invalidComponent) {
-        await invalidComponent.scrollIntoView({ block: 'start', inline: 'nearest', behavior: 'smooth' })
+        setTimeout(() => {
+          invalidComponent.scrollIntoView({ block: 'start', inline: 'nearest', behavior: 'smooth' })
+        }, 500)
         return false
       }
       return true

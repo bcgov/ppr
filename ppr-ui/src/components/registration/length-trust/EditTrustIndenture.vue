@@ -49,18 +49,16 @@
 </template>
 
 <script lang="ts">
-// external
 import {
   computed,
   defineComponent,
   reactive,
   toRefs
-} from '@vue/composition-api'
-import { useGetters, useActions } from 'vuex-composition-helpers'
-
-// local
+} from 'vue-demi'
+import { useStore } from '@/store/store'
 import { LengthTrustIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { ActionTypes } from '@/enums'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   props: {
@@ -71,10 +69,8 @@ export default defineComponent({
   },
   emits: ['editTrustIndenture', 'resetEvent'],
   setup (props, context) {
-    const { setLengthTrust } = useActions<any>(['setLengthTrust'])
-    const { getLengthTrust } = useGetters<any>(['getLengthTrust'])
-    const modal = false
-
+    const { setLengthTrust } = useStore()
+    const { getLengthTrust } = storeToRefs(useStore())
     const localState = reactive({
       existingTrustIndenture: props.currentTrustIndenture,
       trustIndenture: props.currentTrustIndenture,
@@ -100,7 +96,6 @@ export default defineComponent({
     return {
       onSubmitForm,
       resetData,
-      modal,
       ...toRefs(localState)
     }
   }

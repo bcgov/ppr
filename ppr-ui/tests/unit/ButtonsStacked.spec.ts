@@ -1,9 +1,9 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
 import VueRouter from 'vue-router'
-import { getVuexStore } from '@/store'
-import CompositionApi from '@vue/composition-api'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import flushPromises from 'flush-promises'
 
@@ -17,8 +17,8 @@ import { getLastEvent } from './utils'
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
-
+setActivePinia(createPinia())
+const store = useStore()
 // selectors
 const backBtn = '#btn-stacked-back'
 const cancelBtn = '#btn-stacked-cancel'
@@ -36,11 +36,10 @@ function createComponent (
   disabledSubmit: boolean
 ): Wrapper<any> {
   const localVue = createLocalVue()
-  localVue.use(CompositionApi)
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
 
-  return mount(ButtonsStacked, {
+  return mount((ButtonsStacked as any), {
     localVue,
     propsData: {
       setBackBtn: backBtn,

@@ -1,8 +1,9 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { getVuexStore } from '@/store'
-import CompositionApi from '@vue/composition-api'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
+
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 
 // Components
@@ -14,7 +15,8 @@ import { mockedHomeSections } from './test-data/mock-home-sections'
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 const addEditHomeSectionBtn = '.add-home-section-btn'
 const sectionCounter = '#section-count'
@@ -27,10 +29,10 @@ const errorText = '.error-text'
  */
 function createComponent (): Wrapper<any> {
   const localVue = createLocalVue()
-  localVue.use(CompositionApi)
+
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
-  return mount(HomeSections, {
+  return mount((HomeSections as any), {
     localVue,
     propsData: {},
     store,
@@ -43,7 +45,7 @@ describe('Home Sections', () => {
 
   beforeEach(async () => {
     // Set home sections default
-    await store.dispatch('setMhrHomeDescription', { key: 'sections', value: [] })
+    await store.setMhrHomeDescription({ key: 'sections', value: [] })
 
     wrapper = createComponent()
   })
@@ -85,7 +87,7 @@ describe('Home Sections', () => {
 
   it('counts the added Home Sections', async () => {
     expect(wrapper.find(sectionCounter).text()).toBe('Number of Sections: 0')
-    await store.dispatch('setMhrHomeDescription', { key: 'sections', value: mockedHomeSections })
+    await store.setMhrHomeDescription({ key: 'sections', value: mockedHomeSections })
 
     expect(wrapper.find(sectionCounter).text()).toBe('Number of Sections: 4')
   })
@@ -96,7 +98,7 @@ describe('Home Sections', () => {
     expect(wrapper.find(errorText).exists()).toBe(false)
 
     // Set homeSections
-    await store.dispatch('setMhrHomeDescription', { key: 'sections', value: mockedHomeSections })
+    await store.setMhrHomeDescription({ key: 'sections', value: mockedHomeSections })
 
     // Verify sections added
     expect(wrapper.find(sectionCounter).text()).toBe('Number of Sections: 4')

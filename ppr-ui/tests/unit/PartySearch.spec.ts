@@ -1,8 +1,8 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { getVuexStore } from '@/store'
-import CompositionApi from '@vue/composition-api'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 
 // Components
@@ -11,7 +11,8 @@ import { PartySearch } from '@/components/parties/party'
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 // Events
 
@@ -26,10 +27,9 @@ const addRegisteringPartyLink = '#add-registering-party'
  */
 function createComponent (): Wrapper<any> {
   const localVue = createLocalVue()
-  localVue.use(CompositionApi)
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
-  return mount(PartySearch, {
+  return mount((PartySearch as any), {
     localVue,
     propsData: {},
     store,

@@ -1,8 +1,9 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { getVuexStore } from '@/store'
-import CompositionApi from '@vue/composition-api'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
+
 import { TiptapVuetifyPlugin } from 'tiptap-vuetify'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 
@@ -21,7 +22,8 @@ Vue.use(TiptapVuetifyPlugin, {
   iconsGroup: 'mdi'
 })
 
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 /**
  * Creates and mounts a component, so that it can be tested.
@@ -33,10 +35,10 @@ function createComponent (
   setShowInvalid: boolean
 ): Wrapper<any> {
   const localVue = createLocalVue()
-  localVue.use(CompositionApi)
+
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
-  return mount(GeneralCollateral, {
+  return mount((GeneralCollateral as any), {
     localVue,
     propsData: {
       isSummary: isSummary,
@@ -51,8 +53,8 @@ describe('General Collateral tests', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
-    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.NEW)
-    await store.dispatch('setAddCollateral', {
+    await store.setRegistrationFlowType(RegistrationFlowType.NEW)
+    await store.setAddCollateral({
       generalCollateral: [],
       vehicleCollateral: [],
       valid: false,
@@ -82,7 +84,7 @@ describe('General Collateral tests', () => {
   })
 
   it('renders amendment view for amendments', async () => {
-    await store.dispatch('setRegistrationFlowType', RegistrationFlowType.AMENDMENT)
+    await store.setRegistrationFlowType(RegistrationFlowType.AMENDMENT)
     wrapper = createComponent(true, false)
     wrapper.vm.$data.amendMode = true
     expect(wrapper.findComponent(GeneralCollateral).exists()).toBe(true)

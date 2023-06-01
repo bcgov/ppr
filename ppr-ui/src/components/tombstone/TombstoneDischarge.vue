@@ -47,13 +47,14 @@
 </template>
 <script lang="ts">
 // external
-import { computed, defineComponent, reactive, toRefs } from '@vue/composition-api'
-import { useGetters } from 'vuex-composition-helpers'
+import { computed, defineComponent, reactive, toRefs } from 'vue-demi'
+import { useStore } from '@/store/store'
 // local
 import { formatExpiryDate, pacificDate } from '@/utils'
 import { RegistrationTypeIF } from '@/interfaces' // eslint-disable-line
 import { MhApiStatusTypes, MhUIStatusTypes } from '@/enums'
 import { useMhrInformation } from '@/composables'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'TombstoneDischarge',
@@ -69,14 +70,9 @@ export default defineComponent({
       getRegistrationNumber,
       getRegistrationType,
       getMhrInformation
-    } = useGetters<any>([
-      'getRegistrationCreationDate',
-      'getRegistrationExpiryDate',
-      'getRegistrationNumber',
-      'getRegistrationType',
-      'getMhrInformation'
-    ])
+    } = storeToRefs(useStore())
     const { isFrozenMhr } = useMhrInformation()
+
     const localState = reactive({
       creationDate: computed((): string => {
         if (getRegistrationCreationDate.value) {

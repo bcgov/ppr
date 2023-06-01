@@ -10,18 +10,13 @@
 </template>
 
 <script lang="ts">
-import {
-  defineComponent,
-  reactive,
-  computed,
-  toRefs
-} from '@vue/composition-api'
-import { useGetters, useActions } from 'vuex-composition-helpers'
-
+import { computed, defineComponent, reactive, toRefs } from 'vue-demi'
+import { useStore } from '@/store/store'
+import { useRouter } from 'vue2-helpers/vue-router'
 import { BasePartySummary } from '@/components/parties/summaries'
 import { AddPartiesIF, PartySummaryOptionsI } from '@/interfaces' // eslint-disable-line no-unused-vars
-
 import { debtorTableHeaders } from '@/resources'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'DebtorSummary',
@@ -36,21 +31,16 @@ export default defineComponent({
       default: ''
     }
   },
-  setup (props, context) {
-    const { getAddSecuredPartiesAndDebtors } = useGetters<any>([
-      'getAddSecuredPartiesAndDebtors'
-    ])
-    const { setAddSecuredPartiesAndDebtors } = useActions<any>([
-      'setAddSecuredPartiesAndDebtors'
-    ])
-    const router = context.root.$router
+  setup (props) {
+    const router = useRouter()
+    const { setAddSecuredPartiesAndDebtors } = useStore()
+    const { getAddSecuredPartiesAndDebtors } = storeToRefs(useStore())
     const parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
 
     const localState = reactive({
       debtors: parties.debtors,
       debtorHeaders: computed(function () {
-        const headersToShow = [...debtorTableHeaders]
-        return headersToShow
+        return [...debtorTableHeaders]
       }),
       debtorOptions: {
         header: props.setHeader,

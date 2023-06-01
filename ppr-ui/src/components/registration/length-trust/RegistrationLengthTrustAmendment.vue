@@ -98,14 +98,15 @@ import {
   toRefs,
   watch,
   onMounted
-} from '@vue/composition-api'
-import { useGetters, useActions } from 'vuex-composition-helpers'
+} from 'vue-demi'
+import { useStore } from '@/store/store'
 import EditTrustIndenture from './EditTrustIndenture.vue'
 
 // local
 import { LengthTrustIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { formatExpiryDate } from '@/utils'
 import { APIRegistrationTypes } from '@/enums'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   components: {
@@ -122,13 +123,14 @@ export default defineComponent({
     }
   },
   setup (props, context) {
-    const { setLengthTrust } = useActions<any>(['setLengthTrust'])
-    const { getLengthTrust } = useGetters<any>(['getLengthTrust'])
-    const { getOriginalLengthTrust } = useGetters<any>(['getOriginalLengthTrust'])
-
-    const { getRegistrationType, getRegistrationExpiryDate } = useGetters<any>([
-      'getRegistrationType', 'getRegistrationExpiryDate'
-    ])
+    const { setLengthTrust } = useStore()
+    const {
+      // Getters
+      getLengthTrust,
+      getOriginalLengthTrust,
+      getRegistrationType,
+      getRegistrationExpiryDate
+    } = storeToRefs(useStore())
     const registrationType = getRegistrationType.value?.registrationTypeAPI
     const modal = false
 

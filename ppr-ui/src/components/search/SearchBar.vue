@@ -231,10 +231,9 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
-import { useActions, useGetters } from 'vuex-composition-helpers'
+import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
+import { useStore } from '@/store/store'
 import _ from 'lodash'
-
 import { mhrSearch, search, staffSearch, validateSearchAction, validateSearchRealTime } from '@/utils'
 import { MHRSearchTypes, SearchTypes } from '@/resources'
 import { paymentConfirmaionDialog, staffPaymentDialog } from '@/resources/dialogOptions'
@@ -249,13 +248,13 @@ import {
 } from '@/interfaces'
 /* eslint-enable no-unused-vars */
 import { APIMHRMapSearchTypes, APISearchTypes, SettingOptions } from '@/enums'
-// won't render properly from @/components/search
 import AutoComplete from '@/components/search/AutoComplete.vue'
 import SearchBarList from '@/components/search/SearchBarList.vue'
 import BusinessSearchAutocomplete from '@/components/search/BusinessSearchAutocomplete.vue'
 import { FolioNumber } from '@/components/common'
 import { ConfirmationDialog, StaffPaymentDialog } from '@/components/dialogs'
 import { useSearch } from '@/composables/useSearch'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   components: {
@@ -285,19 +284,15 @@ export default defineComponent({
   },
   setup (props, { emit }) {
     const {
+      // Actions
       setIsStaffClientPayment,
       setSearching,
       setStaffPayment,
       setFolioOrReferenceNumber,
       setSelectedManufacturedHomes
-    } = useActions<any>([
-      'setIsStaffClientPayment',
-      'setSearching',
-      'setStaffPayment',
-      'setFolioOrReferenceNumber',
-      'setSelectedManufacturedHomes'
-    ])
+    } = useStore()
     const {
+      // Getters
       getUserSettings,
       isSearching,
       isRoleStaff,
@@ -308,18 +303,7 @@ export default defineComponent({
       getStaffPayment,
       hasPprEnabled,
       hasMhrEnabled
-    } = useGetters<any>([
-      'getUserSettings',
-      'isSearching',
-      'isRoleStaff',
-      'isRoleStaffBcol',
-      'isRoleStaffReg',
-      'isRoleStaffSbc',
-      'isSearchCertified',
-      'getStaffPayment',
-      'hasPprEnabled',
-      'hasMhrEnabled'
-    ])
+    } = storeToRefs(useStore())
     const { isMHRSearchType, isPPRSearchType, mapMhrSearchType } = useSearch()
     const localState = reactive({
       autoCompleteIsActive: true,

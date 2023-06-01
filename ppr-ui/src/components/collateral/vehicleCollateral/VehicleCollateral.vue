@@ -321,8 +321,8 @@ import {
   defineComponent,
   reactive,
   toRefs
-} from '@vue/composition-api'
-import { useGetters, useActions } from 'vuex-composition-helpers'
+} from 'vue-demi'
+import { useStore } from '@/store/store'
 // local components
 import { EditCollateral } from '.'
 // local types/etc.
@@ -331,6 +331,7 @@ import { VehicleCollateralIF } from '@/interfaces' // eslint-disable-line no-unu
 import { vehicleTableHeaders, VehicleTypes } from '@/resources'
 import { useVehicle } from './factories/useVehicle'
 import { cloneDeep } from 'lodash'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   components: {
@@ -351,19 +352,13 @@ export default defineComponent({
     }
   },
   setup (props, context) {
+    const { setVehicleCollateral } = useStore()
     const {
       getVehicleCollateral,
       getRegistrationFlowType,
       getOriginalAddCollateral,
       getRegistrationType
-    } = useGetters<any>([
-      'getVehicleCollateral',
-      'getRegistrationFlowType',
-      'getOriginalAddCollateral',
-      'getRegistrationType'
-    ])
-    const { setVehicleCollateral } = useActions<any>(['setVehicleCollateral'])
-
+    } = storeToRefs(useStore())
     const { hasVehicleCollateral, hasOptionalVehicleCollateral } = useVehicle(props, context)
 
     const registrationFlowType = getRegistrationFlowType.value
@@ -376,13 +371,8 @@ export default defineComponent({
       showAddVehicle: false,
       showEditVehicle: [false],
       isRepairersLienAmendment: computed((): boolean => {
-        if (
-          registrationFlowType === RegistrationFlowType.AMENDMENT &&
+        return registrationFlowType === RegistrationFlowType.AMENDMENT &&
           registrationType === APIRegistrationTypes.REPAIRERS_LIEN
-        ) {
-          return true
-        }
-        return false
       }),
       isLastDelete: computed((): boolean => {
         if (localState.isRepairersLienAmendment) {

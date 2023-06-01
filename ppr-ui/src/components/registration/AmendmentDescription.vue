@@ -53,8 +53,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs, watch, computed } from '@vue/composition-api'
-import { useGetters, useActions } from 'vuex-composition-helpers'
+import { defineComponent, reactive, toRefs, watch, computed } from 'vue-demi'
+import { useStore } from '@/store/store'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   props: {
@@ -69,9 +70,8 @@ export default defineComponent({
   },
   emits: ['valid'],
   setup (props, { emit }) {
-    const { getAmendmentDescription } = useGetters<any>(['getAmendmentDescription'])
-    const { setAmendmentDescription } = useActions<any>(['setAmendmentDescription'])
-
+    const { setAmendmentDescription } = useStore()
+    const { getAmendmentDescription } = storeToRefs(useStore())
     const localState = reactive({
       detailDescription: getAmendmentDescription.value || '',
       summaryView: computed((): boolean => {

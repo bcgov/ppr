@@ -88,8 +88,9 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, reactive, toRefs, watch } from '@vue/composition-api'
-import { useActions, useGetters } from 'vuex-composition-helpers'
+import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue-demi'
+import { useRoute, useRouter } from 'vue2-helpers/vue-router'
+import { useStore } from '@/store/store'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { StickyContainer, CourtOrder } from '@/components/common'
 import { BaseDialog } from '@/components/dialogs'
@@ -120,6 +121,7 @@ import {
   DialogOptionsIF
 } from '@/interfaces'
 import { RegistrationLengthI } from '@/composables/fees/interfaces'
+import { storeToRefs } from 'pinia'
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
@@ -147,20 +149,10 @@ export default defineComponent({
     }
   },
   setup (props, context) {
+    const route = useRoute()
+    const router = useRouter()
     const {
-      getLengthTrust,
-      getRegistrationType,
-      getConfirmDebtorName,
-      getRegistrationNumber,
-      getRegistrationFlowType
-    } = useGetters([
-      'getLengthTrust',
-      'getRegistrationType',
-      'getConfirmDebtorName',
-      'getRegistrationNumber',
-      'getRegistrationFlowType'
-    ])
-    const {
+      // Actions
       setLengthTrust,
       setAddCollateral,
       setStaffPayment,
@@ -174,21 +166,16 @@ export default defineComponent({
       setRegistrationCreationDate,
       setAddSecuredPartiesAndDebtors,
       setOriginalAddSecuredPartiesAndDebtors
-    } = useActions([
-      'setLengthTrust',
-      'setAddCollateral',
-      'setStaffPayment',
-      'setRegistrationNumber',
-      'setRegistrationType',
-      'setRegistrationFlowType',
-      'setCourtOrderInformation',
-      'setCertifyInformation',
-      'setFolioOrReferenceNumber',
-      'setRegistrationExpiryDate',
-      'setRegistrationCreationDate',
-      'setAddSecuredPartiesAndDebtors',
-      'setOriginalAddSecuredPartiesAndDebtors'
-    ])
+    } = useStore()
+    const {
+      // Getters
+      getLengthTrust,
+      getRegistrationType,
+      getConfirmDebtorName,
+      getRegistrationNumber,
+      getRegistrationFlowType
+    } = storeToRefs(useStore())
+
     const localState = reactive({
       dataLoaded: false,
       dataLoadError: false,
@@ -223,7 +210,7 @@ export default defineComponent({
         return getRegistrationType.value?.registrationTypeAPI || ''
       }),
       registrationNumber: computed((): string => {
-        return (context.root.$route.query['reg-num'] as string) || ''
+        return (route.query['reg-num'] as string) || ''
       }),
       registrationTypeRL: computed(() => {
         return APIRegistrationTypes.REPAIRERS_LIEN
@@ -238,7 +225,7 @@ export default defineComponent({
       localState.showCancelDialog = false
       if (!val) {
         setRegistrationNumber(null)
-        context.root.$router.push({ name: RouteNames.DASHBOARD })
+        router.push({ name: RouteNames.DASHBOARD })
       }
     }
 
@@ -247,13 +234,13 @@ export default defineComponent({
         !getRegistrationNumber.value ||
         getRegistrationFlowType.value !== RegistrationFlowType.RENEWAL
       ) {
-        if (!localState.registrationNumber || !getConfirmDebtorName.value) {
+        if (!localState.registrationNumber || !getConfirmDebtorName) {
           if (!localState.registrationNumber) {
             console.error('No registration number given to discharge. Redirecting to dashboard...')
           } else {
             console.error('No debtor name confirmed for discharge. Redirecting to dashboard...')
           }
-          context.root.$router.push({
+          router.push({
             name: RouteNames.DASHBOARD
           })
           return
@@ -349,7 +336,7 @@ export default defineComponent({
     const confirmRenewal = (): void => {
       localState.errMsg = ''
       if (localState.registrationValid) {
-        context.root.$router.push({
+        router.push({
           name: RouteNames.CONFIRM_RENEWAL,
           query: { 'reg-num': localState.registrationNumber }
         })
@@ -375,7 +362,7 @@ export default defineComponent({
       if (!val) return
       // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
       if (!localState.isAuthenticated || (!props.isJestRunning && !getFeatureFlag('ppr-ui-enabled'))) {
-        context.root.$router.push({
+        router.push({
           name: RouteNames.DASHBOARD
         })
         return

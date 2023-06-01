@@ -1,8 +1,9 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { getVuexStore } from '@/store'
-import CompositionApi from '@vue/composition-api'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
+
 import { createLocalVue, mount, Wrapper, WrapperArray } from '@vue/test-utils'
 import flushPromises from 'flush-promises'
 import { getTestId, getLastEvent } from './utils'
@@ -29,7 +30,8 @@ import {
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 const btnExpArr = '.btn-row-expand-arr'
 const btnExpTxt = '.btn-row-expand-txt'
@@ -45,10 +47,10 @@ const tableRowDraft = '.draft-registration-row'
 function createComponent (item: DraftResultIF | RegistrationSummaryIF | MhRegistrationSummaryIF, headers: any):
   Wrapper<any> {
   const localVue = createLocalVue()
-  localVue.use(CompositionApi)
+
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
-  return mount(TableRow, {
+  return mount((TableRow as any), {
     localVue,
     store,
     propsData: {
@@ -250,7 +252,7 @@ describe('TableRow tests', () => {
 
     // click dropdown for active reg
     buttons.at(0).trigger('click')
-    await Vue.nextTick()
+    await nextTick()
 
     // it renders the actions drop down
     const menuItems = wrapper.findAll('.registration-actions .v-list-item')
@@ -310,7 +312,7 @@ describe('TableRow tests', () => {
     let dropButtons = wrapper.findAll('.actions__more-actions__btn.reg-table')
     expect(dropButtons.length).toBe(1)
     dropButtons.at(0).trigger('click')
-    await Vue.nextTick()
+    await nextTick()
     // it renders the delete action in drop down
     let menuItems = wrapper.findAll('.registration-actions .v-list-item')
     expect(menuItems.length).toBe(1)
@@ -342,7 +344,7 @@ describe('TableRow tests', () => {
     dropButtons = wrapper.findAll('.actions__more-actions__btn')
     expect(dropButtons.length).toBe(1)
     dropButtons.at(0).trigger('click')
-    await Vue.nextTick()
+    await nextTick()
     // it renders the delete action in drop down
     menuItems = wrapper.findAll('.registration-actions .v-list-item')
     expect(menuItems.length).toBe(1)

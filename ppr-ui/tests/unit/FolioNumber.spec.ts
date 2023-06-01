@@ -1,8 +1,9 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { getVuexStore } from '@/store'
-import CompositionApi from '@vue/composition-api'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
+
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 
 // Components
@@ -11,7 +12,8 @@ import { FolioNumber } from '@/components/common'
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 // Input field selectors / buttons
 
@@ -43,10 +45,10 @@ function createComponent (
   defaultFolioNumber: string
 ): Wrapper<any> {
   const localVue = createLocalVue()
-  localVue.use(CompositionApi)
+
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
-  return mount(FolioNumber, {
+  return mount((FolioNumber as any), {
     localVue,
     propsData: { defaultFolioNumber },
     store,
@@ -76,14 +78,14 @@ describe('Folio number tests', () => {
   it('allows the user to edit the folio', async () => {
     const newFolio = '12'
     wrapper.vm.folioEditNumber = newFolio
-    await Vue.nextTick()
+    await nextTick()
     const newEdit = wrapper.findAll(folioEditTxt)
     expect(newEdit.length).toBe(1)
   })
 
   it('validates the folio number', async () => {
     wrapper.find(folioEditTxt).setValue('Test File Number that is too long')
-    await Vue.nextTick()
+    await nextTick()
     const messages = wrapper.findAll('.v-messages__message')
     expect(messages.length).toBe(1)
     expect(messages.at(0).text()).toBe('Maximum 15 characters reached')

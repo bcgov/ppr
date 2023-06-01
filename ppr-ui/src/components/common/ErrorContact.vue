@@ -15,11 +15,11 @@
 // external
 import {
   defineComponent
-} from '@vue/composition-api'
+} from 'vue-demi'
 
 export default defineComponent({
   name: 'ErrorContact',
-  setup (props) {
+  setup () {
     const contactInfo = [
       {
         icon: 'mdi-phone',

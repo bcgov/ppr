@@ -64,21 +64,19 @@
 </template>
 
 <script lang="ts">
-// external libraries
 import {
   defineComponent,
   reactive,
   toRefs,
   watch,
   computed
-} from '@vue/composition-api'
-import { useGetters } from 'vuex-composition-helpers'
-// local components
+} from 'vue-demi'
+import { useStore } from '@/store/store'
 import { PartyAutocomplete } from '@/components/parties/party'
-// local helpers / types / etc.
 import { RegistrationFlowType } from '@/enums'
 import { SearchPartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { partyCodeSearch } from '@/utils'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   components: {
@@ -107,14 +105,14 @@ export default defineComponent({
     }
   },
   emits: [
+    'selectItem',
+    'hideSearch',
     'showSecuredPartyAdd',
     'addRegisteringParty',
     'removeRegisteringParty'
   ],
   setup (props, context) {
-    const { getRegistrationFlowType } = useGetters<any>([
-      'getRegistrationFlowType'
-    ])
+    const { getRegistrationFlowType } = storeToRefs(useStore())
     const registrationFlowType = getRegistrationFlowType.value
     const localState = reactive({
       searchValue: '',

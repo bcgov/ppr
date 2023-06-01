@@ -24,9 +24,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
-import { useActions, useGetters } from 'vuex-composition-helpers'
+import { defineComponent, reactive, ref, toRefs, watch } from 'vue-demi'
+import { useStore } from '@/store/store'
 import { useInputRules, useMhrValidations } from '@/composables/'
+import { storeToRefs } from 'pinia'
+import { FormIF } from '@/interfaces'
 
 export default defineComponent({
   name: 'RebuiltStatus',
@@ -37,21 +39,16 @@ export default defineComponent({
       default: false
     }
   },
-  setup (props, context) {
-    const { getMhrRegistrationHomeDescription, getMhrRegistrationValidationModel } = useGetters<any>([
-      'getMhrRegistrationHomeDescription', 'getMhrRegistrationValidationModel'
-    ])
-
-    const { setMhrHomeDescription } = useActions<any>([
-      'setMhrHomeDescription'
-    ])
-
+  setup (props) {
+    const { setMhrHomeDescription } = useStore()
+    const { getMhrRegistrationHomeDescription, getMhrRegistrationValidationModel } = storeToRefs(useStore())
     const { maxLength } = useInputRules()
     const {
       MhrCompVal,
       MhrSectVal,
       setValidation
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
+    const rebuiltStatus = ref(null) as FormIF
 
     const localState = reactive({
       isRebuiltStatusValid: false,
@@ -67,8 +64,7 @@ export default defineComponent({
     })
 
     watch(() => props.validate, async () => {
-      // @ts-ignore - function exists
-      await context.refs.rebuiltStatus.validate()
+      rebuiltStatus.value?.validate()
     })
 
     return { maxLength, ...toRefs(localState) }

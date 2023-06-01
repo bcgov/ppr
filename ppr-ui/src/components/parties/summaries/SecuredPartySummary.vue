@@ -15,15 +15,15 @@ import {
   reactive,
   computed,
   toRefs
-} from '@vue/composition-api'
-import { useGetters, useActions } from 'vuex-composition-helpers'
-
+} from 'vue-demi'
+import { useStore } from '@/store/store'
 import { BasePartySummary } from '@/components/parties/summaries'
 import { AddPartiesIF, PartySummaryOptionsI } from '@/interfaces' // eslint-disable-line no-unused-vars
-
+import { useRouter } from 'vue2-helpers/vue-router'
 import { partyTableHeaders } from '@/resources'
 import { isSecuredPartyRestrictedList } from '@/utils'
 import { RegistrationFlowType } from '@/enums'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'SecuredPartySummary',
@@ -38,20 +38,15 @@ export default defineComponent({
       default: ''
     }
   },
-  setup (props, context) {
+  setup (props) {
+    const router = useRouter()
+    const { setAddSecuredPartiesAndDebtors } = useStore()
     const {
+      // Getters
       getAddSecuredPartiesAndDebtors,
       getRegistrationType,
       getRegistrationFlowType
-    } = useGetters<any>([
-      'getAddSecuredPartiesAndDebtors',
-      'getRegistrationType',
-      'getRegistrationFlowType'
-    ])
-    const { setAddSecuredPartiesAndDebtors } = useActions<any>([
-      'setAddSecuredPartiesAndDebtors'
-    ])
-    const router = context.root.$router
+    } = storeToRefs(useStore())
     const parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
 
     const localState = reactive({
@@ -65,8 +60,7 @@ export default defineComponent({
         return parties.securedParties
       }),
       securedPartyHeaders: computed(function () {
-        const headersToShow = [...partyTableHeaders]
-        return headersToShow
+        return [...partyTableHeaders]
       }),
       securedPartyOptions: {
         header: props.setHeader,

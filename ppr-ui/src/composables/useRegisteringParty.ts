@@ -1,26 +1,23 @@
-import { useGetters, useActions } from 'vuex-composition-helpers'
+import { useStore } from '@/store/store'
 import { useParty } from './useParty'
 import { AddPartiesIF } from '@/interfaces'
 import { getStaffegisteringParty, getRegisteringPartyFromAuth } from '@/utils'
+import { storeToRefs } from 'pinia'
 
 export const useRegisteringParty = () => {
   const { isPartiesValid } = useParty()
   const {
+    // Actions
+    setAddSecuredPartiesAndDebtors
+  } = useStore()
+  const {
+    // Getters
     getAddSecuredPartiesAndDebtors,
     getRegistrationType,
     isRoleStaffReg,
     isRoleStaffBcol,
     isRoleStaffSbc
-  } = useGetters<any>([
-    'getAddSecuredPartiesAndDebtors',
-    'getRegistrationType',
-    'isRoleStaffReg',
-    'isRoleStaffBcol',
-    'isRoleStaffSbc'
-  ])
-  const { setAddSecuredPartiesAndDebtors } = useActions<any>([
-    'setAddSecuredPartiesAndDebtors'
-  ])
+  } = storeToRefs(useStore())
 
   const getRegisteringParty = async () => {
     let regParty = null

@@ -45,10 +45,11 @@ import {
   toRefs,
   watch,
   ref,
-  onMounted,
   computed
-} from '@vue/composition-api'
-import { useGetters, useActions } from 'vuex-composition-helpers'
+} from 'vue-demi'
+import { useStore } from '@/store/store'
+import { storeToRefs } from 'pinia'
+import { FormIF } from '@/interfaces'
 
 export default defineComponent({
   props: {
@@ -60,17 +61,13 @@ export default defineComponent({
     }
   },
   setup (props, context) {
-    const { setFolioOrReferenceNumber } = useActions<any>([
-      'setFolioOrReferenceNumber'
-    ])
-    const { getFolioOrReferenceNumber } = useGetters<any>([
-      'getFolioOrReferenceNumber'
-    ])
-    const form = ref(null)
+    const { setFolioOrReferenceNumber } = useStore()
+    const { getFolioOrReferenceNumber } = storeToRefs(useStore())
+    const form = ref(null) as FormIF
 
     const localState = reactive({
       isValid: true,
-      folioNumber: '',
+      folioNumber: getFolioOrReferenceNumber.value || '',
       showErrors: props.setShowErrors,
       rules: [
         (v: string) => !v || v.length <= 50 || 'Maximum 50 characters reached' // maximum character count
@@ -91,16 +88,11 @@ export default defineComponent({
       }
     )
 
-    const setFolioAndEmit = async (val: string) => {
-      // @ts-ignore - function exists
-      await context.refs.form.validate()
+    const setFolioAndEmit = (val: string) => {
+      form.value.validate()
       context.emit('folioValid', localState.isValid)
       setFolioOrReferenceNumber(val)
     }
-
-    onMounted(() => {
-      localState.folioNumber = getFolioOrReferenceNumber.value
-    })
 
     return {
       form,

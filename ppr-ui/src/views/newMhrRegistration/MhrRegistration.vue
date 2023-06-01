@@ -57,10 +57,11 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, nextTick, onMounted, reactive, toRefs } from '@vue/composition-api'
-import { useActions, useGetters } from 'vuex-composition-helpers'
+import { computed, defineComponent, nextTick, onMounted, reactive, toRefs } from 'vue-demi'
+import { useRoute, useRouter } from 'vue2-helpers/vue-router'
+import { useStore } from '@/store/store'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
-import { RegistrationFlowType, RouteNames, StatementTypes } from '@/enums'
+import { RegistrationFlowType, RouteNames, StatementTypes, UIRegistrationTypes } from '@/enums'
 import { getFeatureFlag, getMhrDraft, submitMhrRegistration } from '@/utils'
 import { Stepper, StickyContainer } from '@/components/common'
 import ButtonFooter from '@/components/common/ButtonFooter.vue'
@@ -70,6 +71,7 @@ import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { ErrorIF, MhrRegistrationIF, RegistrationTypeIF, RegTableNewItemI } from '@/interfaces'
 import { RegistrationLengthI } from '@/composables/fees/interfaces'
 import BaseDialog from '@/components/dialogs/BaseDialog.vue'
+import { storeToRefs } from 'pinia'
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
@@ -95,29 +97,22 @@ export default defineComponent({
     }
   },
   setup (props, context) {
+    const route = useRoute()
+    const router = useRouter()
     const {
+      // Actions
+      setUnsavedChanges,
+      setRegTableNewItem,
+      setMhrTransferType
+    } = useStore()
+    const {
+      // Getters
       getSteps,
       getMhrDraftNumber,
       getRegistrationType,
       getRegistrationFlowType,
       getMhrRegistrationValidationModel
-    } = useGetters<any>([
-      'getSteps',
-      'getMhrDraftNumber',
-      'getRegistrationType',
-      'getRegistrationFlowType',
-      'getMhrRegistrationValidationModel'
-    ])
-
-    const {
-      setUnsavedChanges,
-      setRegTableNewItem,
-      setMhrTransferType
-    } = useActions<any>([
-      'setUnsavedChanges',
-      'setRegTableNewItem',
-      'setMhrTransferType'
-    ])
+    } = storeToRefs(useStore())
 
     const {
       MhrCompVal,
@@ -150,8 +145,8 @@ export default defineComponent({
       registrationLength: computed((): RegistrationLengthI => {
         return { lifeInfinite: true, lifeYears: 0 }
       }),
-      registrationTypeUI: computed((): RegistrationTypeIF => {
-        return getRegistrationType.value?.registrationTypeUI || ''
+      registrationTypeUI: computed((): UIRegistrationTypes => {
+        return getRegistrationType.value?.registrationTypeUI || ('' as UIRegistrationTypes)
       }),
       isValidatingApp: computed((): boolean => {
         return getValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_APP)
@@ -167,7 +162,7 @@ export default defineComponent({
 
     /** Helper to check is the current route matches */
     const isRouteName = (routeName: RouteNames): boolean => {
-      return (context.root.$route.name === routeName)
+      return (route.name === routeName)
     }
 
     const registrationIncomplete = (): void => {
@@ -180,7 +175,7 @@ export default defineComponent({
     }
 
     const goToDash = (): void => {
-      context.root.$router.push({
+      router.push({
         name: RouteNames.DASHBOARD
       })
     }
@@ -235,7 +230,7 @@ export default defineComponent({
           }
           setRegTableNewItem(newRegItem)
           setUnsavedChanges(false)
-          await context.root.$router.push({ name: RouteNames.DASHBOARD })
+          await router.push({ name: RouteNames.DASHBOARD })
         } else {
           emitError(mhrSubmission?.error)
         }

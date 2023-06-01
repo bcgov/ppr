@@ -1,10 +1,9 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { getVuexStore } from '@/store'
-import CompositionApi from '@vue/composition-api'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
-import flushPromises from 'flush-promises'
 
 // Components
 import { DischargeConfirmSummary } from '@/components/common'
@@ -18,7 +17,8 @@ import { getLastEvent } from './utils'
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 // selectors
 const summaryInfo = '.summary-info'
@@ -40,11 +40,11 @@ function createComponent (
   setShowErrors: Boolean
 ): Wrapper<any> {
   const localVue = createLocalVue()
-  localVue.use(CompositionApi)
+
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
 
-  return mount(DischargeConfirmSummary, {
+  return mount((DischargeConfirmSummary as any), {
     localVue,
     propsData: {
       setRegNum: setRegNum,
@@ -73,12 +73,11 @@ describe('Discharge confirm summary component tests', () => {
   })
 
   it('renders component with given props', () => {
-    const component = wrapper.findComponent(DischargeConfirmSummary)
-    expect(component.exists()).toBe(true)
-    expect(component.vm.$data.checkbox1).toBe(false)
-    expect(component.vm.$data.checkbox2).toBe(false)
-    expect(component.vm.$data.checkbox3).toBe(false)
-    expect(component.vm.valid).toBe(false)
+    expect(wrapper.findComponent(DischargeConfirmSummary).exists()).toBe(true)
+    expect(wrapper.vm.checkbox1).toBe(false)
+    expect(wrapper.vm.checkbox2).toBe(false)
+    expect(wrapper.vm.checkbox3).toBe(false)
+    expect(wrapper.vm.valid).toBe(false)
     const info = wrapper.findAll(summaryInfo)
     expect(info.length).toBe(1)
     expect(info.at(0).text()).toContain(`Base Registration Number: ${regNum}`)
@@ -98,29 +97,29 @@ describe('Discharge confirm summary component tests', () => {
   it('validates with checkboxes', async () => {
     const checkbox1 = wrapper.findAll(checkboxId1)
     checkbox1.trigger('click')
-    await flushPromises()
-    expect(wrapper.vm.$data.checkbox1).toBe(true)
+    await nextTick()
+    expect(wrapper.vm.checkbox1).toBe(true)
     // still not valid (1/3)
     expect(wrapper.vm.valid).toBe(false)
     expect(getLastEvent(wrapper, 'valid')).toBeNull()
     const checkbox2 = wrapper.findAll(checkboxId2)
     checkbox2.trigger('click')
-    await flushPromises()
-    expect(wrapper.vm.$data.checkbox2).toBe(true)
+    await nextTick()
+    expect(wrapper.vm.checkbox2).toBe(true)
     // still not valid (2/3)
     expect(wrapper.vm.valid).toBe(false)
     expect(getLastEvent(wrapper, 'valid')).toBeNull()
     const checkbox3 = wrapper.findAll(checkboxId3)
     checkbox3.trigger('click')
-    await flushPromises()
-    expect(wrapper.vm.$data.checkbox3).toBe(true)
+    await nextTick()
+    expect(wrapper.vm.checkbox3).toBe(true)
     // should be valid now (3/3)
     expect(wrapper.vm.valid).toBe(true)
     expect(getLastEvent(wrapper, 'valid')).toBe(true)
 
     checkbox2.trigger('click')
-    await flushPromises()
-    expect(wrapper.vm.$data.checkbox2).toBe(false)
+    await nextTick()
+    expect(wrapper.vm.checkbox2).toBe(false)
     // should be invalid again
     expect(wrapper.vm.valid).toBe(false)
     expect(getLastEvent(wrapper, 'valid')).toBe(false)
@@ -134,22 +133,22 @@ describe('Discharge confirm summary component tests', () => {
     expect(wrapper.findAll(checkboxTxtError).length).toBe(3)
     const checkbox1 = wrapper.findAll(checkboxId1)
     checkbox1.trigger('click')
-    await flushPromises()
+    await nextTick()
     expect(wrapper.findAll(checkboxTxtNormal).length).toBe(1)
     expect(wrapper.findAll(checkboxTxtError).length).toBe(2)
     const checkbox2 = wrapper.findAll(checkboxId2)
     checkbox2.trigger('click')
-    await flushPromises()
+    await nextTick()
     expect(wrapper.findAll(checkboxTxtNormal).length).toBe(2)
     expect(wrapper.findAll(checkboxTxtError).length).toBe(1)
     const checkbox3 = wrapper.findAll(checkboxId3)
     checkbox3.trigger('click')
-    await flushPromises()
+    await nextTick()
     expect(wrapper.findAll(checkboxTxtNormal).length).toBe(3)
     expect(wrapper.findAll(checkboxTxtError).length).toBe(0)
 
     checkbox2.trigger('click')
-    await flushPromises()
+    await nextTick()
     expect(wrapper.findAll(checkboxTxtNormal).length).toBe(2)
     expect(wrapper.findAll(checkboxTxtError).length).toBe(1)
     expect(wrapper.findAll(checkboxTxtError).at(0).text()).toContain(

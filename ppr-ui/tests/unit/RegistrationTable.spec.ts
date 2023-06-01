@@ -1,10 +1,10 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { getVuexStore } from '@/store'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
 import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
 import flushPromises from 'flush-promises'
-
 // local components
 import { DatePicker } from '@/components/common'
 import { RegistrationTable } from '@/components/tables'
@@ -30,7 +30,8 @@ import { getLastEvent, setupIntersectionObserverMock } from './utils'
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 const regTable = '#registration-table'
 const tableHeader = '.my-reg-header'
@@ -47,7 +48,7 @@ function createComponent (): Wrapper<any> {
   const localVue = createLocalVue()
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
-  return mount(RegistrationTable, {
+  return mount((RegistrationTable as any), {
     localVue,
     store,
     propsData: {
@@ -284,7 +285,7 @@ describe('Test registration table with results', () => {
   })
 
   it('renders and displays the typeahead dropdown', async () => {
-    await store.dispatch('setAccountProductSubscription', {
+    await store.setAccountProductSubscription({
       [AccountProductCodes.RPPR]: {
         membership: AccountProductMemberships.MEMBER,
         roles: ['edit']
@@ -307,7 +308,7 @@ describe('Test registration table with results', () => {
     expect(wrapper.find(dateFilter).exists()).toBe(true)
     expect(wrapper.find(dateFilter).trigger('click'))
     await flushPromises()
-    await Vue.nextTick()
+    await nextTick()
     expect(wrapper.vm.showDatePicker).toBe(true)
     expect(wrapper.findComponent(DatePicker).isVisible()).toBe(true)
     const startDate = '2021-10-24'
@@ -446,7 +447,7 @@ describe('Test registration table with results', () => {
     await wrapper.setProps({ setNewRegItem: newRegChildItem })
     expect(wrapper.vm.newReg).toEqual(newRegChildItem)
     const val = wrapper.vm.isNewRegItem(childRegItem)
-    await Vue.nextTick()
+    await nextTick()
     expect(val).toBe(true)
     expect(wrapper.vm.isNewRegParentItem(childRegItem)).toBe(false)
     expect(wrapper.vm.isNewRegParentItem(newRegistrationHistory[3])).toBe(true)

@@ -1,8 +1,9 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { getVuexStore } from '@/store'
-import CompositionApi from '@vue/composition-api'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
+
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import {
   LengthTrustIF
@@ -22,7 +23,8 @@ import { RegistrationLengthTrustAmendment, EditTrustIndenture } from '@/componen
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 // Input field selectors / buttons
 const undoButton: string = '#trust-indenture-undo-btn'
@@ -39,10 +41,10 @@ function createComponent (
   isSummary: boolean
 ): Wrapper<any> {
   const localVue = createLocalVue()
-  localVue.use(CompositionApi)
+
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
-  return mount(RegistrationLengthTrustAmendment, {
+  return mount((RegistrationLengthTrustAmendment as any), {
     localVue,
     propsData: { isSummary },
     store,
@@ -53,17 +55,17 @@ function createComponent (
 describe('RegistrationLengthTrustAmendment non-Security Agreement tests', () => {
   let wrapper: Wrapper<any>
   beforeEach(async () => {
-    await store.dispatch('setRegistrationType', mockedRepairersLien())
-    await store.dispatch('setFolioOrReferenceNumber', 'A-00000402')
-    await store.dispatch('setRegistrationNumber', '0023001B')
-    await store.dispatch('setVehicleCollateral', mockedVehicleCollateralExisting)
-    await store.dispatch('setGeneralCollateral', mockedGeneralCollateralExisting)
-    await store.dispatch('setAddSecuredPartiesAndDebtors', {
+    await store.setRegistrationType(mockedRepairersLien())
+    await store.setFolioOrReferenceNumber('A-00000402')
+    await store.setRegistrationNumber('0023001B')
+    await store.setVehicleCollateral(mockedVehicleCollateralExisting)
+    await store.setGeneralCollateral(mockedGeneralCollateralExisting)
+    await store.setAddSecuredPartiesAndDebtors({
       registeringParty: null,
       securedParties: mockedSecuredPartiesExisting,
       debtors: mockedDebtorsExisting
     })
-    await store.dispatch('setRegistrationExpiryDate', '2021-07-28T07:00:00+00:00')
+    await store.setRegistrationExpiryDate('2021-07-28T07:00:00+00:00')
     wrapper = createComponent(false)
   })
   afterEach(() => {
@@ -71,7 +73,7 @@ describe('RegistrationLengthTrustAmendment non-Security Agreement tests', () => 
   })
 
   it('renders with no trust indenture', async () => {
-    await store.dispatch('setOriginalLengthTrust', {
+    await store.setOriginalLengthTrust({
       valid: true,
       trustIndenture: false,
       lifeInfinite: false,
@@ -80,7 +82,7 @@ describe('RegistrationLengthTrustAmendment non-Security Agreement tests', () => 
       surrenderDate: '2022-10-02T06:59:59+00:00',
       lienAmount: '10000.00'
     })
-    await store.dispatch('setLengthTrust', {
+    await store.setLengthTrust({
       valid: true,
       trustIndenture: false,
       lifeInfinite: false,
@@ -101,17 +103,17 @@ describe('RegistrationLengthTrustAmendment non-Security Agreement tests', () => 
 describe('RegistrationLengthTrustAmendment Security Agreement tests', () => {
   let wrapper: Wrapper<any>
   beforeEach(async () => {
-    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement())
-    await store.dispatch('setFolioOrReferenceNumber', 'A-00000402')
-    await store.dispatch('setRegistrationNumber', '0023001B')
-    await store.dispatch('setVehicleCollateral', mockedVehicleCollateralExisting)
-    await store.dispatch('setGeneralCollateral', mockedGeneralCollateralExisting)
-    await store.dispatch('setAddSecuredPartiesAndDebtors', {
+    await store.setRegistrationType(mockedSelectSecurityAgreement())
+    await store.setFolioOrReferenceNumber('A-00000402')
+    await store.setRegistrationNumber('0023001B')
+    await store.setVehicleCollateral(mockedVehicleCollateralExisting)
+    await store.setGeneralCollateral(mockedGeneralCollateralExisting)
+    await store.setAddSecuredPartiesAndDebtors({
       registeringParty: null,
       securedParties: mockedSecuredPartiesExisting,
       debtors: mockedDebtorsExisting
     })
-    await store.dispatch('setRegistrationExpiryDate', '2021-07-28T07:00:00+00:00')
+    await store.setRegistrationExpiryDate('2021-07-28T07:00:00+00:00')
 
     wrapper = createComponent(false)
   })
@@ -120,7 +122,7 @@ describe('RegistrationLengthTrustAmendment Security Agreement tests', () => {
   })
 
   it('renders with trust indenture true', async () => {
-    await store.dispatch('setOriginalLengthTrust', {
+    await store.setOriginalLengthTrust({
       valid: true,
       trustIndenture: false,
       lifeInfinite: false,
@@ -129,7 +131,7 @@ describe('RegistrationLengthTrustAmendment Security Agreement tests', () => {
       surrenderDate: '',
       lienAmount: ''
     })
-    await store.dispatch('setLengthTrust', {
+    await store.setLengthTrust({
       valid: true,
       trustIndenture: true,
       lifeInfinite: false,
@@ -147,12 +149,12 @@ describe('RegistrationLengthTrustAmendment Security Agreement tests', () => {
     expect(wrapper.vm.computedExpiryDateFormatted).toBeDefined()
     expect(wrapper.find(undoButton).exists()).toBe(true)
     wrapper.find(undoButton).trigger('click')
-    await Vue.nextTick()
+    await nextTick()
     expect(wrapper.find(amendButton).exists()).toBe(true)
   })
 
   it('renders with trust indenture false', async () => {
-    await store.dispatch('setOriginalLengthTrust', {
+    await store.setOriginalLengthTrust({
       valid: true,
       trustIndenture: false,
       lifeInfinite: false,
@@ -161,7 +163,7 @@ describe('RegistrationLengthTrustAmendment Security Agreement tests', () => {
       surrenderDate: '',
       lienAmount: ''
     })
-    await store.dispatch('setLengthTrust', {
+    await store.setLengthTrust({
       valid: true,
       trustIndenture: false,
       lifeInfinite: false,
@@ -179,7 +181,7 @@ describe('RegistrationLengthTrustAmendment Security Agreement tests', () => {
     expect(wrapper.vm.computedExpiryDateFormatted).toBeDefined()
     expect(wrapper.find(amendButton).exists()).toBe(true)
     wrapper.find(amendButton).trigger('click')
-    await Vue.nextTick()
+    await nextTick()
     expect(wrapper.findComponent(EditTrustIndenture).exists()).toBeTruthy()
     expect(wrapper.findComponent(EditTrustIndenture).isVisible()).toBe(true)
     expect(wrapper.vm.showEditTrustIndenture).toBe(true)
@@ -213,18 +215,18 @@ describe('RegistrationLengthTrustAmendment Security Agreement tests', () => {
 describe('RegistrationLengthTrustAmendment summary view tests', () => {
   let wrapper: Wrapper<any>
   beforeEach(async () => {
-    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement())
-    await store.dispatch('setFolioOrReferenceNumber', 'A-00000402')
-    await store.dispatch('setRegistrationNumber', '0023001B')
-    await store.dispatch('setVehicleCollateral', mockedVehicleCollateralExisting)
-    await store.dispatch('setGeneralCollateral', mockedGeneralCollateralExisting)
-    await store.dispatch('setAddSecuredPartiesAndDebtors', {
+    await store.setRegistrationType(mockedSelectSecurityAgreement())
+    await store.setFolioOrReferenceNumber('A-00000402')
+    await store.setRegistrationNumber('0023001B')
+    await store.setVehicleCollateral(mockedVehicleCollateralExisting)
+    await store.setGeneralCollateral(mockedGeneralCollateralExisting)
+    await store.setAddSecuredPartiesAndDebtors({
       registeringParty: null,
       securedParties: mockedSecuredPartiesExisting,
       debtors: mockedDebtorsExisting
     })
-    await store.dispatch('setRegistrationExpiryDate', '2021-07-28T07:00:00+00:00')
-    await store.dispatch('setLengthTrust', {
+    await store.setRegistrationExpiryDate('2021-07-28T07:00:00+00:00')
+    await store.setLengthTrust({
       valid: true,
       trustIndenture: false,
       lifeInfinite: false,
@@ -233,7 +235,7 @@ describe('RegistrationLengthTrustAmendment summary view tests', () => {
       surrenderDate: '',
       lienAmount: ''
     })
-    await store.dispatch('setOriginalLengthTrust', {
+    await store.setOriginalLengthTrust({
       valid: true,
       trustIndenture: true,
       lifeInfinite: false,

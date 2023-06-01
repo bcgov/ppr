@@ -1,25 +1,19 @@
-import { useGetters } from 'vuex-composition-helpers'
-// @ts-ignore
+import { useStore } from '@/store/store'
 import {
   mhrInfoValidationStateIF,
-  MhrRegistrationHomeOwnerGroupIF,
   MhrRegistrationHomeOwnerIF
 } from '@/interfaces'
-import { computed } from '@vue/composition-api'
+import { computed } from 'vue-demi'
 import { useHomeOwners, useTransferOwners } from '@/composables'
 import { ActionTypes } from '@/enums'
+import { storeToRefs } from 'pinia'
 
 export const useMhrInfoValidation = (validationState: mhrInfoValidationStateIF) => {
   const {
     hasLien,
     isRoleStaffReg,
     hasUnsavedChanges
-  } = useGetters<any>([
-    'hasLien',
-    'isRoleStaffReg',
-    'hasUnsavedChanges'
-  ])
-
+  } = storeToRefs(useStore())
   const {
     isGlobalEditingMode,
     getGroupById
@@ -81,7 +75,7 @@ export const useMhrInfoValidation = (validationState: mhrInfoValidationStateIF) 
   const scrollToFirstError = async (scrollToTop: boolean = false, forceTarget: string = ''): Promise<void> => {
     setTimeout(() => {
       if (forceTarget) {
-        document.getElementById(forceTarget).scrollIntoView({ behavior: 'smooth' })
+        document.getElementById(forceTarget)?.scrollIntoView({ behavior: 'smooth' })
         return
       }
 
@@ -92,7 +86,7 @@ export const useMhrInfoValidation = (validationState: mhrInfoValidationStateIF) 
       document.getElementsByClassName('border-error-left').length > 0 &&
       document.getElementsByClassName('border-error-left')[0]
         .scrollIntoView({ block: 'start', inline: 'nearest', behavior: 'smooth' })
-    }, 10)
+    }, 500)
   }
 
   /** Reset the validation state to default **/

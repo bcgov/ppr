@@ -6,6 +6,8 @@
 
 import { routes } from '@/router'
 import VueRouter from 'vue-router'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
 import { mockRouterComponents } from 'vue-test-utils-helpers'
 
 export default {

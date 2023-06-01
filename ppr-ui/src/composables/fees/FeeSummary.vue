@@ -185,8 +185,8 @@
 
 <script lang="ts">
 // external
-import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
-import { useGetters } from 'vuex-composition-helpers'
+import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
+import { useStore } from '@/store/store'
 // local
 /* eslint-disable no-unused-vars */
 import { UIRegistrationTypes, UITransferTypes } from '@/enums'
@@ -195,6 +195,7 @@ import { FeeSummaryTypes } from './enums'
 import { AdditionalSearchFeeIF, FeeSummaryI, RegistrationLengthI } from './interfaces'
 // eslint-enable no-unused-vars
 import { getFeeHint, getFeeSummary } from './factories'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'FeeSummary',
@@ -230,9 +231,8 @@ export default defineComponent({
   setup (props) {
     const {
       getLengthTrust, isRoleStaff, getStaffPayment, isSearchCertified
-    } = useGetters<any>([
-      'getLengthTrust', 'isRoleStaff', 'getStaffPayment', 'isSearchCertified'
-    ])
+    } = storeToRefs(useStore())
+
     const localState = reactive({
       feeType: props.setFeeType,
       registrationType: props.setRegistrationType,

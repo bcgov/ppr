@@ -139,10 +139,11 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
-import { useGetters } from 'vuex-composition-helpers'
+import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
+import { useStore } from '@/store/store'
 import { ApiTransferTypes } from '@/enums'
 import { useTransferOwners } from '@/composables'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'ConfirmCompletion',
@@ -166,10 +167,7 @@ export default defineComponent({
     const {
       getMhrTransferType,
       isRoleStaff
-    } = useGetters<any>([
-      'getMhrTransferType',
-      'isRoleStaff'
-    ])
+    } = storeToRefs(useStore())
 
     const {
       isTransferDueToDeath,

@@ -53,22 +53,21 @@
   </v-row>
 </template>
 <script lang="ts">
-// external
 import {
   computed,
   defineComponent,
   onMounted,
   reactive,
   toRefs
-} from '@vue/composition-api'
-import { useGetters } from 'vuex-composition-helpers'
+} from 'vue-demi'
+import { useStore } from '@/store/store'
 import { tombstoneTitles } from '@/resources'
-// local
 import { pacificDate, getRoleProductCode } from '@/utils'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'TombstoneDefault',
-  setup (props, { root }) {
+  setup () {
     const {
       getAccountLabel,
       getUserFirstName,
@@ -78,16 +77,8 @@ export default defineComponent({
       isRoleStaffSbc,
       getUserRoles,
       getUserProductSubscriptionsCodes
-    } = useGetters<any>([
-      'getAccountLabel',
-      'getUserFirstName',
-      'getUserLastName',
-      'isRoleStaff',
-      'isRoleStaffBcol',
-      'isRoleStaffSbc',
-      'getUserRoles',
-      'getUserProductSubscriptionsCodes'
-    ])
+    } = storeToRefs(useStore())
+
     const localState = reactive({
       userName: computed((): string => {
         return `${getUserFirstName.value} ${getUserLastName.value}`

@@ -1,7 +1,9 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { getVuexStore } from '@/store'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
+
 import flushPromises from 'flush-promises'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import { mockedRegisteringParty1, mockedSecuredParties2 } from './test-data'
@@ -15,7 +17,8 @@ import { SecuredPartyTypes } from '@/enums'
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 // Input field selectors / buttons
 const doneButtonSelector: string = '#done-btn-party'
@@ -31,7 +34,7 @@ function createComponent (activeIndex: Number, invalidSection: boolean): Wrapper
   const localVue = createLocalVue()
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
-  return mount(EditParty, {
+  return mount((EditParty as any), {
     localVue,
     propsData: { activeIndex, invalidSection },
     store,
@@ -71,18 +74,18 @@ describe('Secured Party add individual tests', () => {
     wrapper.find('#txt-last-party').setValue('SCHMOE')
     wrapper.find('#txt-email-party').setValue('joe@apples.com')
     // for address
-    wrapper.vm.$data.currentSecuredParty.address.street = 'street'
-    wrapper.vm.$data.currentSecuredParty.address.city = 'victoria'
-    wrapper.vm.$data.currentSecuredParty.address.region = 'BC'
-    wrapper.vm.$data.currentSecuredParty.address.country = 'CA'
-    wrapper.vm.$data.currentSecuredParty.address.postalCode = 'v8r1w3'
-    await Vue.nextTick()
+    wrapper.vm.currentSecuredParty.address.street = 'street'
+    wrapper.vm.currentSecuredParty.address.city = 'victoria'
+    wrapper.vm.currentSecuredParty.address.region = 'BC'
+    wrapper.vm.currentSecuredParty.address.country = 'CA'
+    wrapper.vm.currentSecuredParty.address.postalCode = 'v8r1w3'
+    await nextTick()
     wrapper.find(doneButtonSelector).trigger('click')
     await flushPromises()
 
     expect(wrapper.emitted().resetEvent).toBeTruthy()
     // store should have 1 item now
-    expect(store.getters.getAddSecuredPartiesAndDebtors.securedParties.length).toBe(1)
+    expect(store.getAddSecuredPartiesAndDebtors.securedParties.length).toBe(1)
   })
 })
 
@@ -119,21 +122,21 @@ describe('Secured Party add business tests', () => {
     const radioIsBusiness = radioInput.at(1)
 
     await radioIsBusiness.trigger('click')
-    await Vue.nextTick()
+    await nextTick()
     wrapper.find('#txt-name-party').setValue('TONYS TOOLS')
     // for address
-    wrapper.vm.$data.currentSecuredParty.address.street = 'street'
-    wrapper.vm.$data.currentSecuredParty.address.city = 'victoria'
-    wrapper.vm.$data.currentSecuredParty.address.region = 'BC'
-    wrapper.vm.$data.currentSecuredParty.address.country = 'CA'
-    wrapper.vm.$data.currentSecuredParty.address.postalCode = 'v8r1w3'
-    await Vue.nextTick()
+    wrapper.vm.currentSecuredParty.address.street = 'street'
+    wrapper.vm.currentSecuredParty.address.city = 'victoria'
+    wrapper.vm.currentSecuredParty.address.region = 'BC'
+    wrapper.vm.currentSecuredParty.address.country = 'CA'
+    wrapper.vm.currentSecuredParty.address.postalCode = 'v8r1w3'
+    await nextTick()
     wrapper.find(doneButtonSelector).trigger('click')
     await flushPromises()
 
     expect(wrapper.emitted().resetEvent).toBeTruthy()
     // store should have 1 item now
-    expect(store.getters.getAddSecuredPartiesAndDebtors.securedParties[1].businessName).toBe('TONYS TOOLS')
+    expect(store.getAddSecuredPartiesAndDebtors.securedParties[1].businessName).toBe('TONYS TOOLS')
   })
 })
 
@@ -141,7 +144,7 @@ describe('Secured Party edit individual tests', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
-    await store.dispatch('setAddSecuredPartiesAndDebtors', {
+    await store.setAddSecuredPartiesAndDebtors({
       securedParties: mockedSecuredParties2
     })
     wrapper = createComponent(0, false)
@@ -159,14 +162,14 @@ describe('Secured Party edit individual tests', () => {
 
   it('Emits reset event', async () => {
     wrapper.find(cancelButtonSelector).trigger('click')
-    await Vue.nextTick()
+    await nextTick()
     expect(wrapper.emitted().resetEvent).toBeTruthy()
     expect(wrapper.find('.border-error-left').exists()).toBe(false)
   })
 
   it('shows error bar', async () => {
     await wrapper.setProps({ setShowErrorBar: true })
-    await Vue.nextTick()
+    await nextTick()
     expect(wrapper.find('.border-error-left').exists()).toBe(true)
   })
 })
@@ -175,7 +178,7 @@ describe('Registering party test', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
-    await store.dispatch('setAddSecuredPartiesAndDebtors', {
+    await store.setAddSecuredPartiesAndDebtors({
       registeringParty: mockedRegisteringParty1
     })
     wrapper = createComponent(-1, false)
@@ -187,7 +190,7 @@ describe('Registering party test', () => {
   it('renders registering party when editing', async () => {
     expect(wrapper.findComponent(EditParty).exists()).toBe(true)
     wrapper.vm.$props.setIsRegisteringParty = true
-    await Vue.nextTick()
+    await nextTick()
     expect(wrapper.find('.add-party-header').text()).toContain('Registering')
   })
 })

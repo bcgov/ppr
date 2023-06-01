@@ -85,7 +85,7 @@ import {
   defineComponent,
   reactive,
   toRefs
-} from '@vue/composition-api'
+} from 'vue-demi'
 
 export default defineComponent({
   name: 'ButtonsStacked',
@@ -106,16 +106,13 @@ export default defineComponent({
       default: ''
     }
   },
-  setup (props, { emit, root }) {
+  setup (props, { emit }) {
     const localState = reactive({
       cancelBtn: props.setCancelBtn,
       saveBtn: props.setSaveButton,
       disableSubmitBtn: props.setDisableSubmitBtn,
       isDoubledUp: computed(() => {
-        if (props.setSubmitBtn !== 'Review and Complete') {
-          return true
-        }
-        return false
+        return props.setSubmitBtn !== 'Review and Complete'
       })
     })
     const back = () => {

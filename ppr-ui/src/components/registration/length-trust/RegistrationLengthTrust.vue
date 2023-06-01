@@ -117,7 +117,6 @@
 </template>
 
 <script lang="ts">
-// external
 import {
   computed,
   defineComponent,
@@ -125,14 +124,13 @@ import {
   toRefs,
   watch,
   onMounted
-} from '@vue/composition-api'
-import { useGetters, useActions } from 'vuex-composition-helpers'
-
-// local
+} from 'vue-demi'
+import { useStore } from '@/store/store'
 import { LengthTrustIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { formatExpiryDate, isInt } from '@/utils'
 import { APIRegistrationTypes } from '@/enums'
 import { getFinancingFee } from '@/composables/fees/factories'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   props: {
@@ -146,11 +144,13 @@ export default defineComponent({
     }
   },
   setup (props, context) {
-    const { setLengthTrust } = useActions<any>(['setLengthTrust'])
-    const { getLengthTrust } = useGetters<any>(['getLengthTrust'])
-    const { getRegistrationType, getRegistrationExpiryDate } = useGetters<any>([
-      'getRegistrationType', 'getRegistrationExpiryDate'
-    ])
+    const { setLengthTrust } = useStore()
+    const {
+      // Getters
+      getLengthTrust,
+      getRegistrationType,
+      getRegistrationExpiryDate
+    } = storeToRefs(useStore())
     const registrationType = getRegistrationType.value?.registrationTypeAPI
     const feeInfoYears = getFinancingFee(false)
     const modal = false

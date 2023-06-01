@@ -1,8 +1,8 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { getVuexStore } from '@/store'
-import CompositionApi from '@vue/composition-api'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
 import flushPromises from 'flush-promises'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import {
@@ -19,7 +19,8 @@ import { EditCollateral } from '@/components/collateral'
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 // Events
 
@@ -39,10 +40,10 @@ function createComponent (
   invalidSection: boolean
 ): Wrapper<any> {
   const localVue = createLocalVue()
-  localVue.use(CompositionApi)
+
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
-  return mount(EditCollateral, {
+  return mount((EditCollateral as any), {
     localVue,
     propsData: { activeIndex, invalidSection },
     store,
@@ -54,7 +55,7 @@ describe('Collateral add tests', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
-    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement())
+    await store.setRegistrationType(mockedSelectSecurityAgreement())
     wrapper = createComponent(-1, false)
   })
   afterEach(() => {
@@ -75,8 +76,8 @@ describe('Collateral add tests', () => {
 
   it('adds a vehicle to the store', async () => {
     wrapper.find(vehicleTypeDrop).setValue(APIVehicleTypes.MOTOR_VEHICLE)
-    await Vue.nextTick()
-    wrapper.vm.$data.currentVehicle.type = APIVehicleTypes.MOTOR_VEHICLE
+    await nextTick()
+    wrapper.vm.currentVehicle.type = APIVehicleTypes.MOTOR_VEHICLE
     wrapper.find('#txt-serial').setValue('293847298374')
     wrapper.find('#txt-make').setValue('Honda')
     wrapper.find('#txt-years').setValue(2012)
@@ -87,7 +88,7 @@ describe('Collateral add tests', () => {
     // expect(messages.at(0).text()).toBe('Type is required')
     expect(wrapper.emitted().resetEvent).toBeTruthy()
     // store should have 1 item now
-    expect(store.getters.getAddCollateral.vehicleCollateral.length).toBe(1)
+    expect(store.getAddCollateral.vehicleCollateral.length).toBe(1)
   })
 })
 
@@ -95,7 +96,7 @@ describe('Collateral tests for MH', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
-    await store.dispatch('setRegistrationType', mockedMarriageMH())
+    await store.setRegistrationType(mockedMarriageMH())
     wrapper = createComponent(-1, false)
   })
   afterEach(() => {
@@ -117,11 +118,11 @@ describe('Collateral edit tests', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
-    await store.dispatch('setAddCollateral', {
+    await store.setAddCollateral({
       generalCollateral: mockedGeneralCollateral1,
       vehicleCollateral: mockedVehicleCollateral1
     })
-    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement())
+    await store.setRegistrationType(mockedSelectSecurityAgreement())
     wrapper = createComponent(0, false)
   })
   afterEach(() => {
@@ -137,14 +138,14 @@ describe('Collateral edit tests', () => {
 
   it('Emits reset event', async () => {
     wrapper.find(cancelButtonSelector).trigger('click')
-    await Vue.nextTick()
+    await nextTick()
     expect(wrapper.emitted().resetEvent).toBeTruthy()
     expect(wrapper.find('.border-error-left').exists()).toBe(false)
   })
 
   it('shows error bar', async () => {
     await wrapper.setProps({ setShowErrorBar: true, activeIndex: -1 })
-    await Vue.nextTick()
+    await nextTick()
     expect(wrapper.find('.border-error-left').exists()).toBe(true)
   })
 })

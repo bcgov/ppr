@@ -55,7 +55,7 @@
           class="pr-0"
           :ripple="false"
           :disabled="isGlobalEditingMode"
-          @click="openGroupForEditing(groupId)"
+          @click="openGroupForEditing()"
         >
           <v-icon small>mdi-pencil</v-icon>
           <span>Edit</span>
@@ -110,7 +110,7 @@
           <!-- More actions drop down list -->
           <v-list class="actions-dropdown actions__more-actions">
             <v-list-item class="my-n2">
-              <v-list-item-subtitle class="pa-0" @click="openGroupForEditing(groupId)">
+              <v-list-item-subtitle class="pa-0" @click="openGroupForEditing()">
                 <v-icon small style="margin-bottom: 3px;">mdi-pencil</v-icon>
                 <span class="ml-1 remove-btn-text">Edit Group Details</span>
               </v-list-item-subtitle>
@@ -146,7 +146,7 @@
             <!-- More actions drop down list -->
             <v-list class="actions-dropdown actions__more-actions">
               <v-list-item class="my-n2">
-                <v-list-item-subtitle class="pa-0" @click="openGroupForEditing(groupId)">
+                <v-list-item-subtitle class="pa-0" @click="openGroupForEditing()">
                   <v-icon small style="margin-bottom: 3px;">mdi-pencil</v-icon>
                   <span class="ml-1 remove-btn-text">Edit Group Details</span>
                 </v-list-item-subtitle>
@@ -215,11 +215,11 @@
 import { BaseDialog } from '@/components/dialogs'
 import { InfoChip } from '@/components/common'
 import { useHomeOwners, useTransferOwners } from '@/composables'
-import { computed, defineComponent, reactive, ref, toRefs, watch } from '@vue/composition-api'
+import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue-demi'
 import FractionalOwnership from './FractionalOwnership.vue'
 import { find } from 'lodash'
 /* eslint-disable no-unused-vars */
-import { MhrRegistrationFractionalOwnershipIF, MhrHomeOwnerGroupIF } from '@/interfaces/mhr-registration-interfaces'
+import { FormIF, MhrRegistrationFractionalOwnershipIF, MhrHomeOwnerGroupIF } from '@/interfaces/'
 import { ActionTypes } from '@/enums'
 import { toTitleCase } from '@/utils'
 /* eslint-enable no-unused-vars */
@@ -260,7 +260,7 @@ export default defineComponent({
       isChangedOwnerGroup
     } = useTransferOwners()
 
-    const homeFractionalOwnershipForm = ref(null)
+    const homeFractionalOwnershipForm = ref(null) as FormIF
 
     const localState = reactive({
       isEditGroupMode: false,
@@ -302,8 +302,7 @@ export default defineComponent({
     }
 
     const done = (): void => {
-      // @ts-ignore - function exists
-      context.refs.homeFractionalOwnershipForm.validate()
+      homeFractionalOwnershipForm.value?.validate()
 
       if (localState.isHomeFractionalOwnershipValid) {
         localState.isEditGroupMode = false

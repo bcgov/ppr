@@ -244,8 +244,9 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs, onMounted, watch } from '@vue/composition-api'
-import { useActions, useGetters } from 'vuex-composition-helpers' // eslint-disable-line no-unused-vars
+import { computed, defineComponent, reactive, toRefs, onMounted, watch } from 'vue-demi'
+import { useRouter } from 'vue2-helpers/vue-router'
+import { useStore } from '@/store/store' // eslint-disable-line no-unused-vars
 import {
   mhSearchMhrNumberHeaders,
   mhSearchMhrNumberHeadersReview,
@@ -258,6 +259,7 @@ import { BaseHeaderIF, ManufacturedHomeSearchResultIF } from '@/interfaces' // e
 import { FolioNumber } from '@/components/common'
 import { RouteNames, UIMHRSearchTypeMap, UIMHRSearchTypes, UIMHRSearchTypeValues } from '@/enums'
 import { cloneDeep, uniqBy, filter, sortBy, groupBy } from 'lodash'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   components: {
@@ -266,26 +268,20 @@ export default defineComponent({
   props: {
     isReviewMode: { default: false }
   },
-  setup (props, context) {
+  setup (props) {
+    const router = useRouter()
     const {
+      // Actions
+      setSelectedManufacturedHomes,
+      setFolioOrReferenceNumber
+    } = useStore()
+    const {
+      // Getters
       getManufacturedHomeSearchResults,
       getFolioOrReferenceNumber,
       getSearchedType,
       getSelectedManufacturedHomes
-    } = useGetters<any>([
-      'getManufacturedHomeSearchResults',
-      'getFolioOrReferenceNumber',
-      'getSearchedType',
-      'getSelectedManufacturedHomes'
-    ])
-    const {
-      setSelectedManufacturedHomes,
-      setFolioOrReferenceNumber
-    } = useActions<any>([
-      'setSelectedManufacturedHomes',
-      'setFolioOrReferenceNumber'
-    ])
-    const router = context.root.$router
+    } = storeToRefs(useStore())
 
     const localState = reactive({
       searched: false,

@@ -55,8 +55,7 @@
   </v-container>
 </template>
 <script lang="ts">
-import { defineComponent, onMounted, reactive, toRefs, watch } from '@vue/composition-api'
-
+import { defineComponent, onMounted, reactive, toRefs, watch } from 'vue-demi'
 import { RegistrationOtherDialog } from '@/components/dialogs'
 import { APIRegistrationTypes } from '@/enums' // eslint-disable-line no-unused-vars
 import { RegistrationTypeIF } from '@/interfaces' // eslint-disable-line no-unused-vars
@@ -222,10 +221,6 @@ export default defineComponent({
 
 ::v-deep .theme--light.v-list-item:not(.v-list-item--active):not(.v-list-item--disabled) {
   color: $gray7 !important;
-  min-height: 0;
-}
-
-::v-deep .theme--light.v-list-item--disabled {
   min-height: 0;
 }
 

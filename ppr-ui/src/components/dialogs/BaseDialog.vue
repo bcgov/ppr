@@ -43,7 +43,7 @@ import {
   defineComponent,
   reactive,
   toRefs
-} from '@vue/composition-api'
+} from 'vue-demi'
 // local components
 import DialogButtons from './common/DialogButtons.vue'
 import DialogContent from './common/DialogContent.vue'
@@ -57,8 +57,8 @@ export default defineComponent({
     DialogContent
   },
   props: {
-    setAttach: { default: '' },
-    setDisplay: { default: false },
+    setAttach: { type: String, default: '' },
+    setDisplay: { type: Boolean, default: false },
     setOptions: Object as () => DialogOptionsIF,
     reverseActionButtons: {
       type: Boolean,

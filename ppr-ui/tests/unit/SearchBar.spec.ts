@@ -1,8 +1,9 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { getVuexStore } from '@/store'
-import CompositionApi from '@vue/composition-api'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
+
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import sinon from 'sinon'
 import { axios } from '@/utils/axios-ppr'
@@ -29,7 +30,8 @@ import flushPromises from 'flush-promises'
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 // Events
 const searchError: string = 'search-error'
@@ -50,10 +52,10 @@ const searchTextField: string = '.search-bar-text-field'
  */
 function createComponent (): Wrapper<any> {
   const localVue = createLocalVue()
-  localVue.use(CompositionApi)
+
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
-  return mount(SearchBar, {
+  return mount((SearchBar as any), {
     localVue,
     propsData: {},
     store,
@@ -65,7 +67,7 @@ describe('SearchBar component basic tests', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
-    await store.dispatch('setUserInfo', {
+    await store.setUserInfo({
       firstname: 'test',
       lastname: 'tester',
       username: 'user',
@@ -85,12 +87,12 @@ describe('SearchBar component basic tests', () => {
     expect(wrapper.find(searchButtonSelector).exists()).toBe(true)
     // check the default is the regular fee
     expect(wrapper.vm.$props.isNonBillable).toBe(false)
-    expect(wrapper.vm.$data.fee).toBe('8.50')
+    expect(wrapper.vm.fee).toBe('8.50')
     // update to non billable and see fee change
     await wrapper.setProps({ isNonBillable: true, serviceFee: 3 })
     expect(wrapper.vm.$props.isNonBillable).toBe(true)
     expect(wrapper.vm.$props.serviceFee).toBe(3)
-    expect(wrapper.vm.$data.fee).toBe('3.00')
+    expect(wrapper.vm.fee).toBe('3.00')
   })
 })
 
@@ -101,7 +103,7 @@ describe('Payment confirmation popup', () => {
 
   beforeEach(async () => {
     // GET search data
-    await store.dispatch('setUserInfo', {
+    await store.setUserInfo({
       firstname: 'test',
       lastname: 'tester',
       username: 'user',
@@ -115,22 +117,21 @@ describe('Payment confirmation popup', () => {
 
   it('pops up with payment confirmation modal before searching', async () => {
     wrapper.vm.returnSearchSelection(select)
-    await Vue.nextTick()
-    wrapper.vm.$data.selectedSearchType = select
-    await Vue.nextTick()
-    wrapper.vm.$data.searchValue = 'F100'
+    await nextTick()
+    wrapper.vm.selectedSearchType = select
+    await nextTick()
+    wrapper.vm.searchValue = 'F100'
     wrapper.find(searchButtonSelector).trigger('click')
-    await Vue.nextTick()
-    expect(wrapper.vm.$data.validations).toBeNull()
+    await nextTick()
+    expect(wrapper.vm.validations).toBeNull()
     const messages = wrapper.findAll('.v-messages__message')
     expect(messages.length).toBe(1)
     // ensure its the hint message not a validation message
     expect(messages.at(0).text()).toContain('Serial numbers normally contain')
-    await Vue.nextTick()
-    await Vue.nextTick()
+    await nextTick()
     expect(getLastEvent(wrapper, searchError)).toBeNull()
     // verify payment confirmation enabled, otherwise it would skip the modal
-    expect(wrapper.vm.$store.state.stateModel.userInfo.settings.paymentConfirmationDialog).toBe(true)
+    expect(store.getStateModel.userInfo.settings.paymentConfirmationDialog).toBe(true)
     expect(getLastEvent(wrapper, searchData)).toBeNull()
     expect(wrapper.findComponent(ConfirmationDialog).exists()).toBe(true)
     expect(wrapper.findComponent(ConfirmationDialog).isVisible()).toBe(true)
@@ -155,7 +156,7 @@ describe('Serial number search', () => {
     post.returns(new Promise(resolve => resolve({
       data: resp
     })))
-    await store.dispatch('setUserInfo', {
+    await store.setUserInfo({
       firstname: 'test',
       lastname: 'tester',
       username: 'user',
@@ -169,8 +170,8 @@ describe('Serial number search', () => {
   })
 
   it('searches when fields are filled', async () => {
-    await store.dispatch('setAuthRoles', ['ppr'])
-    await store.dispatch('setUserProductSubscriptionsCodes', ['PPR'])
+    await store.setAuthRoles(['ppr'])
+    await store.setUserProductSubscriptionsCodes(['PPR'])
 
     expect(wrapper.find('.fee-text').exists()).toBeTruthy()
     const searchText = wrapper.find('.search-info').text()
@@ -179,33 +180,33 @@ describe('Serial number search', () => {
     // PPR info should be displayed for PPR only roles
     expect(wrapper.find(getTestId('ppr-search-info')).exists()).toBeTruthy()
     wrapper.vm.returnSearchSelection(select)
-    await Vue.nextTick()
-    wrapper.vm.$data.selectedSearchType = select
-    await Vue.nextTick()
+    await nextTick()
+    wrapper.vm.selectedSearchType = select
+    await nextTick()
     expect(wrapper.find(getTestId('ppr-search-info')).exists()).toBeTruthy()
-    wrapper.vm.$data.searchValue = 'F100'
+    wrapper.vm.searchValue = 'F100'
     wrapper.find(searchButtonSelector).trigger('click')
-    await Vue.nextTick()
-    expect(wrapper.vm.$data.validations).toBeNull()
+    await nextTick()
+    expect(wrapper.vm.validations).toBeNull()
     const messages = wrapper.findAll('.v-messages__message')
     expect(messages.length).toBe(1)
     // ensure its the hint message not a validation message
     expect(messages.at(0).text()).toContain('Serial numbers normally contain')
-    await Vue.nextTick()
-    await Vue.nextTick()
+    await nextTick()
+    await nextTick()
     expect(getLastEvent(wrapper, searchError)).toBeNull()
     // verify payment confirmation disabled, otherwise it would not have gotten the response yet
-    expect(wrapper.vm.$store.state.stateModel.userInfo.settings.paymentConfirmationDialog).toBe(false)
+    expect(store.getStateModel.userInfo.settings.paymentConfirmationDialog).toBe(false)
     expect(getLastEvent(wrapper, searchData)).toEqual(resp)
   })
 
   it('hides and shows things for staff', async () => {
-    await store.dispatch('setAuthRoles', ['staff', 'ppr_staff'])
-    await store.dispatch('setUserProductSubscriptionsCodes', [''])
+    await store.setAuthRoles(['staff', 'ppr_staff'])
+    await store.setUserProductSubscriptionsCodes([''])
 
     const searchText = wrapper.find('.search-info').text()
     expect(searchText).toContain('Select a search category and then enter a criteria to search')
-    await store.dispatch('setStaffPayment', {
+    await store.setStaffPayment({
       option: 1,
       routingSlipNumber: '888555222',
       isPriority: false,
@@ -213,32 +214,32 @@ describe('Serial number search', () => {
       datNumber: '',
       folioNumber: ''
     })
-    await store.dispatch('setSearchCertified', true)
+    await store.setSearchCertified(true)
     wrapper.vm.returnSearchSelection(select)
-    wrapper.vm.$data.selectedSearchType = select
-    await Vue.nextTick()
+    wrapper.vm.selectedSearchType = select
+    await nextTick()
     expect(wrapper.find(getTestId('ppr-search-info')).exists()).toBeFalsy()
     expect(wrapper.find(getTestId('mhr-search-info')).exists()).toBeFalsy()
-    wrapper.vm.$data.searchValue = 'F100'
+    wrapper.vm.searchValue = 'F100'
     wrapper.find(searchButtonSelector).trigger('click')
-    await Vue.nextTick()
+    await nextTick()
     const messages = wrapper.findAll('.v-messages__message')
     expect(messages.length).toBe(1)
     await flushPromises
-    await Vue.nextTick()
-    await Vue.nextTick()
+    await nextTick()
+    await nextTick()
     expect(getLastEvent(wrapper, searchError)).toBeNull()
     expect(getLastEvent(wrapper, searchData)).toEqual(resp)
-    expect(wrapper.vm.$store.state.stateModel.staffPayment).toBe(null)
+    expect(store.getStateModel.staffPayment).toBe(null)
 
     const staffGroups = ['helpdesk', 'ppr_staff']
     for (let i = 0; i < staffGroups.length; i++) {
-      await store.dispatch('setAuthRoles', ['staff', staffGroups[i]])
+      await store.setAuthRoles(['staff', staffGroups[i]])
       expect(wrapper.findComponent(FolioNumber).exists()).toBeTruthy()
       expect(wrapper.find('.fee-text').exists()).toBeFalsy()
     }
-    await store.dispatch('setAuthRoles', [])
-    await store.dispatch('setRoleSbc', true)
+    await store.setAuthRoles([])
+    await store.setRoleSbc(true)
     await flushPromises
     expect(wrapper.find('.fee-text').exists()).toBeTruthy()
     expect(wrapper.find('.fee-text').text()).toContain('10.00')
@@ -260,7 +261,7 @@ describe('Individual debtor search', () => {
     post.returns(new Promise(resolve => resolve({
       data: resp
     })))
-    await store.dispatch('setUserInfo', {
+    await store.setUserInfo({
       firstname: 'test',
       lastname: 'tester',
       username: 'user',
@@ -275,12 +276,12 @@ describe('Individual debtor search', () => {
 
   it('searches when fields are filled', async () => {
     wrapper.vm.returnSearchSelection(select)
-    wrapper.vm.$data.selectedSearchType = select
-    await Vue.nextTick()
-    wrapper.vm.$data.searchValueFirst = 'test'
-    wrapper.vm.$data.searchValueSecond = 'tester'
-    wrapper.vm.$data.searchValueLast = 'testing'
-    wrapper.vm.$data.folioNumber = '123'
+    wrapper.vm.selectedSearchType = select
+    await nextTick()
+    wrapper.vm.searchValueFirst = 'test'
+    wrapper.vm.searchValueSecond = 'tester'
+    wrapper.vm.searchValueLast = 'testing'
+    wrapper.vm.folioNumber = '123'
     expect(wrapper.vm.getSearchApiParams()).toStrictEqual({
       type: select.searchTypeAPI,
       criteria: {
@@ -293,23 +294,23 @@ describe('Individual debtor search', () => {
       clientReferenceId: '123'
     })
     wrapper.find(searchButtonSelector).trigger('click')
-    await Vue.nextTick()
-    expect(wrapper.vm.$data.validations).toBeNull()
+    await nextTick()
+    expect(wrapper.vm.validations).toBeNull()
     expect(wrapper.find('.v-messages__message').exists()).toBe(false)
-    await Vue.nextTick()
-    await Vue.nextTick()
+    await nextTick()
+    await nextTick()
     expect(getLastEvent(wrapper, searchError)).toBeNull()
     // verify payment confirmation disabled, otherwise it would not have gotten the response yet
-    expect(wrapper.vm.$store.state.stateModel.userInfo.settings.paymentConfirmationDialog).toBe(false)
+    expect(store.getStateModel.userInfo.settings.paymentConfirmationDialog).toBe(false)
     expect(getLastEvent(wrapper, searchData)).toEqual(resp)
   })
   it('Middle name is optional', async () => {
     wrapper.vm.returnSearchSelection(select)
-    wrapper.vm.$data.selectedSearchType = select
-    await Vue.nextTick()
-    wrapper.vm.$data.searchValueFirst = 'test'
-    wrapper.vm.$data.searchValueLast = 'testing'
-    wrapper.vm.$data.folioNumber = '123'
+    wrapper.vm.selectedSearchType = select
+    await nextTick()
+    wrapper.vm.searchValueFirst = 'test'
+    wrapper.vm.searchValueLast = 'testing'
+    wrapper.vm.folioNumber = '123'
     expect(wrapper.vm.getSearchApiParams()).toStrictEqual({
       type: select.searchTypeAPI,
       criteria: {
@@ -322,24 +323,24 @@ describe('Individual debtor search', () => {
       clientReferenceId: '123'
     })
     wrapper.find(searchButtonSelector).trigger('click')
-    await Vue.nextTick()
-    expect(wrapper.vm.$data.validations).toBeNull()
+    await nextTick()
+    expect(wrapper.vm.validations).toBeNull()
     expect(wrapper.find('.v-messages__message').exists()).toBe(false)
-    await Vue.nextTick()
-    await Vue.nextTick()
+    await nextTick()
+    await nextTick()
     expect(getLastEvent(wrapper, searchError)).toBeNull()
     // verify payment confirmation disabled, otherwise it would not have gotten the response yet
-    expect(wrapper.vm.$store.state.stateModel.userInfo.settings.paymentConfirmationDialog).toBe(false)
+    expect(store.getStateModel.userInfo.settings.paymentConfirmationDialog).toBe(false)
     expect(getLastEvent(wrapper, searchData)).toEqual(resp)
   })
   it('special characters are being replaced', async () => {
     wrapper.vm.returnSearchSelection(select)
-    wrapper.vm.$data.selectedSearchType = select
-    await Vue.nextTick()
-    wrapper.vm.$data.searchValueFirst = 'Apostrophe’'
-    wrapper.vm.$data.searchValueSecond = '‘Single Quotes’'
-    wrapper.vm.$data.searchValueLast = '“Double Quotes”'
-    wrapper.vm.$data.folioNumber = '123'
+    wrapper.vm.selectedSearchType = select
+    await nextTick()
+    wrapper.vm.searchValueFirst = 'Apostrophe’'
+    wrapper.vm.searchValueSecond = '‘Single Quotes’'
+    wrapper.vm.searchValueLast = '“Double Quotes”'
+    wrapper.vm.folioNumber = '123'
     expect(wrapper.vm.getSearchApiParams()).toStrictEqual({
       type: select.searchTypeAPI,
       criteria: {
@@ -375,7 +376,7 @@ describe('Business debtor search', () => {
     get.returns(new Promise(resolve => resolve({
       data: vonResp
     })))
-    await store.dispatch('setUserInfo', {
+    await store.setUserInfo({
       firstname: 'test',
       lastname: 'tester',
       username: 'user',
@@ -390,41 +391,41 @@ describe('Business debtor search', () => {
 
   it('searches when fields are filled', async () => {
     wrapper.vm.returnSearchSelection(select)
-    wrapper.vm.$data.selectedSearchType = select
-    await Vue.nextTick()
-    wrapper.vm.$data.searchValue = 'test business debtor'
+    wrapper.vm.selectedSearchType = select
+    await nextTick()
+    wrapper.vm.searchValue = 'test business debtor'
     wrapper.find(searchButtonSelector).trigger('click')
-    await Vue.nextTick()
-    expect(wrapper.vm.$data.validations).toBeNull()
+    await nextTick()
+    expect(wrapper.vm.validations).toBeNull()
     const messages = wrapper.findAll('.v-messages__message')
     if (messages) {
       expect(messages.length).toBe(1)
       // ensure its the hint message not a validation message
       expect(messages.at(0).text()).toContain('Business names must contain')
     }
-    await Vue.nextTick()
-    await Vue.nextTick()
+    await nextTick()
+    await nextTick()
     expect(getLastEvent(wrapper, searchError)).toBeNull()
     // verify payment confirmation disabled, otherwise it would not have gotten the response yet
-    expect(wrapper.vm.$store.state.stateModel.userInfo.settings.paymentConfirmationDialog).toBe(false)
+    expect(store.getStateModel.userInfo.settings.paymentConfirmationDialog).toBe(false)
     expect(getLastEvent(wrapper, searchData)).toEqual(resp)
   })
   it('shows business dropdown after 3 characters', async () => {
     wrapper.vm.returnSearchSelection(select)
-    wrapper.vm.$data.selectedSearchType = select
-    await Vue.nextTick()
-    wrapper.vm.$data.searchValue = 'Abc'
-    await Vue.nextTick()
+    wrapper.vm.selectedSearchType = select
+    await nextTick()
+    wrapper.vm.searchValue = 'Abc'
+    await nextTick()
 
     expect(wrapper.findComponent(BusinessSearchAutocomplete).exists()).toBe(true)
     expect(wrapper.find('#business-search-autocomplete').exists()).toBe(true)
-    expect(wrapper.vm.$data.autoCompleteSearchValue).toBe('Abc')
+    expect(wrapper.vm.autoCompleteSearchValue).toBe('Abc')
   })
   it('special characters are being replaced', async () => {
     wrapper.vm.returnSearchSelection(select)
-    wrapper.vm.$data.selectedSearchType = select
-    await Vue.nextTick()
-    wrapper.vm.$data.searchValue = 'Apostrophe’ ‘Single Quotes’ “Double Quotes”'
+    wrapper.vm.selectedSearchType = select
+    await nextTick()
+    wrapper.vm.searchValue = 'Apostrophe’ ‘Single Quotes’ “Double Quotes”'
     expect(wrapper.vm.getSearchApiParams()).toStrictEqual({
       type: select.searchTypeAPI,
       criteria: {
@@ -452,7 +453,7 @@ describe('MHR search', () => {
     post.returns(new Promise(resolve => resolve({
       data: resp
     })))
-    await store.dispatch('setUserInfo', {
+    await store.setUserInfo({
       firstname: 'test',
       lastname: 'tester',
       username: 'user',
@@ -467,21 +468,21 @@ describe('MHR search', () => {
 
   it('searches when fields are filled', async () => {
     wrapper.vm.returnSearchSelection(select)
-    wrapper.vm.$data.selectedSearchType = select
-    await Vue.nextTick()
-    wrapper.vm.$data.searchValue = '123456'
+    wrapper.vm.selectedSearchType = select
+    await nextTick()
+    wrapper.vm.searchValue = '123456'
     wrapper.find(searchButtonSelector).trigger('click')
-    await Vue.nextTick()
-    expect(wrapper.vm.$data.validations).toBeNull()
+    await nextTick()
+    expect(wrapper.vm.validations).toBeNull()
     const messages = wrapper.findAll('.v-messages__message')
     expect(messages.length).toBe(1)
     // ensure its the hint message not a validation message
     expect(messages.at(0).text()).toContain('Manufactured home registration numbers normally contain up to 6 digits')
-    await Vue.nextTick()
-    await Vue.nextTick()
+    await nextTick()
+    await nextTick()
     expect(getLastEvent(wrapper, searchError)).toBeNull()
     // verify payment confirmation disabled, otherwise it would not have gotten the response yet
-    expect(wrapper.vm.$store.state.stateModel.userInfo.settings.paymentConfirmationDialog).toBe(false)
+    expect(store.getStateModel.userInfo.settings.paymentConfirmationDialog).toBe(false)
     expect(getLastEvent(wrapper, searchData)).toEqual(resp)
   })
 })
@@ -501,7 +502,7 @@ describe('Mhr Owner name search', () => {
     post.returns(new Promise(resolve => resolve({
       data: resp
     })))
-    await store.dispatch('setUserInfo', {
+    await store.setUserInfo({
       firstname: 'test',
       lastname: 'tester',
       username: 'user',
@@ -516,14 +517,14 @@ describe('Mhr Owner name search', () => {
 
   it('searches when fields are filled', async () => {
     wrapper.vm.returnSearchSelection(select)
-    wrapper.vm.$data.selectedSearchType = select
-    await Vue.nextTick()
+    wrapper.vm.selectedSearchType = select
+    await nextTick()
     const searchText = wrapper.find('.search-info').text()
     expect(searchText).not.toContain('Each search will incur a fee')
-    wrapper.vm.$data.searchValueFirst = 'test first'
-    wrapper.vm.$data.searchValueSecond = 'test middle'
-    wrapper.vm.$data.searchValueLast = 'test last'
-    wrapper.vm.$data.folioNumber = '123'
+    wrapper.vm.searchValueFirst = 'test first'
+    wrapper.vm.searchValueSecond = 'test middle'
+    wrapper.vm.searchValueLast = 'test last'
+    wrapper.vm.folioNumber = '123'
     expect(wrapper.vm.getSearchApiParams()).toStrictEqual({
       type: APIMHRSearchTypes.MHROWNER_NAME,
       criteria: {
@@ -536,27 +537,27 @@ describe('Mhr Owner name search', () => {
       clientReferenceId: '123'
     })
     wrapper.find(searchButtonSelector).trigger('click')
-    await Vue.nextTick()
-    expect(wrapper.vm.$data.validations).toBeNull()
+    await nextTick()
+    expect(wrapper.vm.validations).toBeNull()
     expect(wrapper.find('.v-messages__message').exists()).toBe(false)
-    await Vue.nextTick()
-    await Vue.nextTick()
+    await nextTick()
+    await nextTick()
 
     expect(getLastEvent(wrapper, searchError)).toBeNull()
     // verify payment confirmation disabled, otherwise it would not have gotten the response yet
-    expect(wrapper.vm.$store.state.stateModel.userInfo.settings.paymentConfirmationDialog).toBe(false)
+    expect(store.getStateModel.userInfo.settings.paymentConfirmationDialog).toBe(false)
     expect(getLastEvent(wrapper, searchData)).toEqual(resp)
   })
 
   it('searches when fields are filled as Staff', async () => {
-    await store.dispatch('setAuthRoles', ['staff', 'ppr_staff'])
+    await store.setAuthRoles(['staff', 'ppr_staff'])
     wrapper.vm.returnSearchSelection(select)
-    wrapper.vm.$data.selectedSearchType = select
-    await Vue.nextTick()
-    wrapper.vm.$data.searchValueFirst = 'test first'
-    wrapper.vm.$data.searchValueSecond = 'test middle'
-    wrapper.vm.$data.searchValueLast = 'test last'
-    wrapper.vm.$data.folioNumber = '123'
+    wrapper.vm.selectedSearchType = select
+    await nextTick()
+    wrapper.vm.searchValueFirst = 'test first'
+    wrapper.vm.searchValueSecond = 'test middle'
+    wrapper.vm.searchValueLast = 'test last'
+    wrapper.vm.folioNumber = '123'
     expect(wrapper.vm.getSearchApiParams()).toStrictEqual({
       type: APIMHRSearchTypes.MHROWNER_NAME,
       criteria: {
@@ -569,25 +570,25 @@ describe('Mhr Owner name search', () => {
       clientReferenceId: '123'
     })
     wrapper.find(searchButtonSelector).trigger('click')
-    await Vue.nextTick()
-    expect(wrapper.vm.$data.validations).toBeNull()
+    await nextTick()
+    expect(wrapper.vm.validations).toBeNull()
     expect(wrapper.find('.v-messages__message').exists()).toBe(false)
-    await Vue.nextTick()
-    await Vue.nextTick()
+    await nextTick()
+    await nextTick()
 
     expect(getLastEvent(wrapper, searchError)).toBeNull()
     // verify payment confirmation disabled, otherwise it would not have gotten the response yet
-    expect(wrapper.vm.$store.state.stateModel.userInfo.settings.paymentConfirmationDialog).toBe(false)
+    expect(store.getStateModel.userInfo.settings.paymentConfirmationDialog).toBe(false)
     expect(getLastEvent(wrapper, searchData)).toEqual(resp)
   })
 
   it('Middle name is optional', async () => {
     wrapper.vm.returnSearchSelection(select)
-    wrapper.vm.$data.selectedSearchType = select
-    await Vue.nextTick()
-    wrapper.vm.$data.searchValueFirst = 'test first'
-    wrapper.vm.$data.searchValueLast = 'test last'
-    wrapper.vm.$data.folioNumber = '123'
+    wrapper.vm.selectedSearchType = select
+    await nextTick()
+    wrapper.vm.searchValueFirst = 'test first'
+    wrapper.vm.searchValueLast = 'test last'
+    wrapper.vm.folioNumber = '123'
     expect(wrapper.vm.getSearchApiParams()).toStrictEqual({
       type: APIMHRSearchTypes.MHROWNER_NAME,
       criteria: {
@@ -600,15 +601,15 @@ describe('Mhr Owner name search', () => {
       clientReferenceId: '123'
     })
     wrapper.find(searchButtonSelector).trigger('click')
-    await Vue.nextTick()
-    expect(wrapper.vm.$data.validations).toBeNull()
+    await nextTick()
+    expect(wrapper.vm.validations).toBeNull()
     expect(wrapper.find('.v-messages__message').exists()).toBe(false)
-    await Vue.nextTick()
-    await Vue.nextTick()
+    await nextTick()
+    await nextTick()
 
     expect(getLastEvent(wrapper, searchError)).toBeNull()
     // verify payment confirmation disabled, otherwise it would not have gotten the response yet
-    expect(wrapper.vm.$store.state.stateModel.userInfo.settings.paymentConfirmationDialog).toBe(false)
+    expect(store.getStateModel.userInfo.settings.paymentConfirmationDialog).toBe(false)
     expect(getLastEvent(wrapper, searchData)).toEqual(resp)
   })
 })
@@ -628,7 +629,7 @@ describe('Aircraft search', () => {
     post.returns(new Promise(resolve => resolve({
       data: resp
     })))
-    await store.dispatch('setUserInfo', {
+    await store.setUserInfo({
       firstname: 'test',
       lastname: 'tester',
       username: 'user',
@@ -643,21 +644,21 @@ describe('Aircraft search', () => {
 
   it('searches when fields are filled', async () => {
     wrapper.vm.returnSearchSelection(select)
-    wrapper.vm.$data.selectedSearchType = select
-    await Vue.nextTick()
-    wrapper.vm.$data.searchValue = 'abcd-efgh-fhgh' // dashes allowed
+    wrapper.vm.selectedSearchType = select
+    await nextTick()
+    wrapper.vm.searchValue = 'abcd-efgh-fhgh' // dashes allowed
     wrapper.find(searchButtonSelector).trigger('click')
-    await Vue.nextTick()
-    expect(wrapper.vm.$data.validations).toBeNull()
+    await nextTick()
+    expect(wrapper.vm.validations).toBeNull()
     const messages = wrapper.findAll('.v-messages__message')
     expect(messages.length).toBe(1)
     // ensure its the hint message not a validation message
     expect(messages.at(0).text()).toContain('Up to 25 characters')
-    await Vue.nextTick()
-    await Vue.nextTick()
+    await nextTick()
+    await nextTick()
     expect(getLastEvent(wrapper, searchError)).toBeNull()
     // verify payment confirmation disabled, otherwise it would not have gotten the response yet
-    expect(wrapper.vm.$store.state.stateModel.userInfo.settings.paymentConfirmationDialog).toBe(false)
+    expect(store.getStateModel.userInfo.settings.paymentConfirmationDialog).toBe(false)
     expect(getLastEvent(wrapper, searchData)).toEqual(resp)
   })
 })
@@ -677,7 +678,7 @@ describe('Registration number search', () => {
     post.returns(new Promise(resolve => resolve({
       data: resp
     })))
-    await store.dispatch('setUserInfo', {
+    await store.setUserInfo({
       firstname: 'test',
       lastname: 'tester',
       username: 'user',
@@ -692,21 +693,21 @@ describe('Registration number search', () => {
 
   it('searches when fields are filled', async () => {
     wrapper.vm.returnSearchSelection(select)
-    wrapper.vm.$data.selectedSearchType = select
-    await Vue.nextTick()
-    wrapper.vm.$data.searchValue = '123456A'
+    wrapper.vm.selectedSearchType = select
+    await nextTick()
+    wrapper.vm.searchValue = '123456A'
     wrapper.find(searchButtonSelector).trigger('click')
-    await Vue.nextTick()
-    expect(wrapper.vm.$data.validations).toBeNull()
+    await nextTick()
+    await nextTick()
+    expect(wrapper.vm.validations).toBeNull()
     const messages = wrapper.findAll('.v-messages__message')
     expect(messages.length).toBe(1)
     // ensure its the hint message not a validation message
     expect(messages.at(0).text()).toContain('Registration numbers contain')
-    await Vue.nextTick()
-    await Vue.nextTick()
+    await nextTick()
     expect(getLastEvent(wrapper, searchError)).toBeNull()
     // verify payment confirmation disabled, otherwise it would not have gotten the response yet
-    expect(wrapper.vm.$store.state.stateModel.userInfo.settings.paymentConfirmationDialog).toBe(false)
+    expect(store.getStateModel.userInfo.settings.paymentConfirmationDialog).toBe(false)
     expect(getLastEvent(wrapper, searchData)).toEqual(resp)
   })
 })
@@ -715,7 +716,7 @@ describe('Staff and Client search buttons', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
-    await store.dispatch('setUserInfo', {
+    await store.setUserInfo({
       firstname: 'test',
       lastname: 'tester',
       username: 'user',
@@ -728,35 +729,35 @@ describe('Staff and Client search buttons', () => {
   })
 
   it('should show/hide Staff and Client search buttons', async () => {
-    await store.dispatch('setRoleSbc', false)
+    await store.setRoleSbc(false)
 
     // Staff Roles
-    await store.dispatch('setAuthRoles', ['staff', 'mhr'])
+    await store.setAuthRoles(['staff', 'mhr'])
     expect(wrapper.find(getTestId('client-search-bar-btn')).exists()).toBe(true)
 
-    await store.dispatch('setAuthRoles', ['staff', 'ppr_staff', 'ppr'])
+    await store.setAuthRoles(['staff', 'ppr_staff', 'ppr'])
     expect(wrapper.find(getTestId('client-search-bar-btn')).exists()).toBe(true)
 
-    await store.dispatch('setAuthRoles', ['helpdesk', 'ppr'])
+    await store.setAuthRoles(['helpdesk', 'ppr'])
     expect(wrapper.find(getTestId('client-search-bar-btn')).exists()).toBe(true)
 
-    await store.dispatch('setAuthRoles', ['helpdesk', 'mhr'])
+    await store.setAuthRoles(['helpdesk', 'mhr'])
     expect(wrapper.find(getTestId('client-search-bar-btn')).exists()).toBe(true)
 
-    await store.dispatch('setAuthRoles', ['mhr'])
-    await store.dispatch('setRoleSbc', true)
+    await store.setAuthRoles(['mhr'])
+    await store.setRoleSbc(true)
     expect(wrapper.find(getTestId('client-search-bar-btn')).exists()).toBe(false)
 
-    await store.dispatch('setAuthRoles', ['ppr'])
-    await store.dispatch('setRoleSbc', true)
+    await store.setAuthRoles(['ppr'])
+    await store.setRoleSbc(true)
     expect(wrapper.find(getTestId('client-search-bar-btn')).exists()).toBe(false)
 
     // Client Roles
 
-    await store.dispatch('setAuthRoles', ['ppr'])
+    await store.setAuthRoles(['ppr'])
     expect(wrapper.find(getTestId('client-search-bar-btn')).exists()).toBe(false)
 
-    await store.dispatch('setAuthRoles', ['mhr'])
+    await store.setAuthRoles(['mhr'])
     expect(wrapper.find(getTestId('client-search-bar-btn')).exists()).toBe(false)
   })
 })

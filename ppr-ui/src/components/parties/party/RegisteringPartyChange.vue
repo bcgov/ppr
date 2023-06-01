@@ -45,7 +45,6 @@
 </template>
 
 <script lang="ts">
-// external libraries
 import {
   defineComponent,
   reactive,
@@ -53,12 +52,11 @@ import {
   onMounted,
   watch,
   computed
-} from '@vue/composition-api'
-import { useGetters } from 'vuex-composition-helpers'
-// local components
+} from 'vue-demi'
+import { useStore } from '@/store/store'
 import { EditParty, PartySearch, RegisteringParty } from '@/components/parties/party'
-// local helpers / types / etc.
-import { PartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { PartyIF } from '@/interfaces'
+import { storeToRefs } from 'pinia' // eslint-disable-line no-unused-vars
 
 export default defineComponent({
   components: {
@@ -77,10 +75,7 @@ export default defineComponent({
     }
   },
   setup (props, context) {
-    const { getAddSecuredPartiesAndDebtors } = useGetters<any>([
-      'getAddSecuredPartiesAndDebtors'
-    ])
-    const { isRoleStaffSbc } = useGetters<any>(['getRegistrationType', 'isRoleStaffSbc'])
+    const { getAddSecuredPartiesAndDebtors, isRoleStaffSbc } = storeToRefs(useStore())
     const localState = reactive({
       openChangeScreen: false,
       isSbc: isRoleStaffSbc.value,
@@ -118,10 +113,8 @@ export default defineComponent({
     const resetData = () => {
       localState.addEditInProgress = false
       localState.showAddRegisteringParty = false
-      localState.openChangeScreen = false
-      if ((isRoleStaffSbc.value) && ((!localState.registeringParty) || (!localState.registeringParty.action))) {
-        localState.openChangeScreen = true
-      }
+      localState.openChangeScreen = isRoleStaffSbc.value && ((!localState.registeringParty) ||
+        (!localState.registeringParty.action))
       context.emit('registeringPartyOpen', false)
     }
 

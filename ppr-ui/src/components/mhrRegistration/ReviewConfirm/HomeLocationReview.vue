@@ -253,10 +253,11 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs } from '@vue/composition-api'
+import { computed, defineComponent, reactive, toRefs } from 'vue-demi'
 import { HomeLocationTypes, RouteNames } from '@/enums'
-import { useGetters } from 'vuex-composition-helpers'
+import { useStore } from '@/store/store'
 import { useMhrValidations } from '@/composables'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'HomeLocationReview',
@@ -273,12 +274,7 @@ export default defineComponent({
       getMhrRegistrationValidationModel,
       getIsManualLocation,
       getMhrRegistrationOwnLand
-    } = useGetters<any>([
-      'getMhrRegistrationLocation',
-      'getMhrRegistrationValidationModel',
-      'getIsManualLocation',
-      'getMhrRegistrationOwnLand'
-    ])
+    } = storeToRefs(useStore())
 
     const {
       MhrSectVal,

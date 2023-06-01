@@ -161,9 +161,11 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, reactive, toRefs, watch } from '@vue/composition-api'
+import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue-demi'
+import { useRoute, useRouter } from 'vue2-helpers/vue-router'
+import { useStore } from '@/store/store'
+import { storeToRefs } from 'pinia'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
-// local components
 import {
   CautionBox,
   CourtOrder,
@@ -186,7 +188,6 @@ import {
   saveAmendmentStatement,
   saveAmendmentStatementDraft
 } from '@/utils'
-import { useActions, useGetters } from 'vuex-composition-helpers'
 /* eslint-disable no-unused-vars */
 import {
   ActionTypes,
@@ -244,7 +245,20 @@ export default defineComponent({
     }
   },
   setup (props, context) {
+    const route = useRoute()
+    const router = useRouter()
     const {
+      // Actions
+      setUnsavedChanges,
+      setRegTableNewItem,
+      setRegistrationType,
+      setRegistrationNumber,
+      setRegistrationExpiryDate,
+      setRegistrationCreationDate,
+      setAddSecuredPartiesAndDebtors
+    } = useStore()
+    const {
+      // Getters
       getStateModel,
       getLengthTrust,
       isRoleStaffBcol,
@@ -259,39 +273,8 @@ export default defineComponent({
       getAmendmentDescription,
       getCourtOrderInformation,
       getAddSecuredPartiesAndDebtors
-    } = useGetters<any>([
-      'getStateModel',
-      'getLengthTrust',
-      'isRoleStaffBcol',
-      'isRoleStaffReg',
-      'isRoleStaffSbc',
-      'getAddCollateral',
-      'hasUnsavedChanges',
-      'getRegistrationType',
-      'getConfirmDebtorName',
-      'getCertifyInformation',
-      'getRegistrationNumber',
-      'getAmendmentDescription',
-      'getCourtOrderInformation',
-      'getAddSecuredPartiesAndDebtors'
-    ])
-    const {
-      setUnsavedChanges,
-      setRegTableNewItem,
-      setRegistrationType,
-      setRegistrationNumber,
-      setRegistrationExpiryDate,
-      setRegistrationCreationDate,
-      setAddSecuredPartiesAndDebtors
-    } = useActions<any>([
-      'setUnsavedChanges',
-      'setRegTableNewItem',
-      'setRegistrationType',
-      'setRegistrationNumber',
-      'setRegistrationExpiryDate',
-      'setRegistrationCreationDate',
-      'setAddSecuredPartiesAndDebtors'
-    ])
+    } = storeToRefs(useStore())
+
     const localState = reactive({
       collateralSummary: '',
       dataLoaded: false,
@@ -324,7 +307,7 @@ export default defineComponent({
         return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
       }),
       registrationNumber: computed((): string => {
-        return (context.root.$route.query['reg-num'] as string) || ''
+        return (route.query['reg-num'] as string) || ''
       }),
       registrationTypeUI: computed((): UIRegistrationTypes => {
         return getRegistrationType.value?.registrationTypeUI || null
@@ -339,7 +322,7 @@ export default defineComponent({
         }
       }),
       showDescription: computed((): boolean => {
-        return !!getAmendmentDescription.value
+        return !!getAmendmentDescription
       }),
       currentRegNumber: computed((): string => {
         return getRegistrationNumber.value || ''
@@ -443,7 +426,7 @@ export default defineComponent({
     })
 
     const cancel = (): void => {
-      if (hasUnsavedChanges.value) localState.showCancelDialog = true
+      if (hasUnsavedChanges) localState.showCancelDialog = true
       else goToDashboard()
     }
 
@@ -475,13 +458,13 @@ export default defineComponent({
     }
 
     const loadRegistration = async (): Promise<void> => {
-      if (!localState.registrationNumber || !getConfirmDebtorName.value) {
+      if (!localState.registrationNumber || !getConfirmDebtorName) {
         if (!localState.registrationNumber) {
           console.error('No registration number this amendment. Redirecting to dashboard...')
         } else {
           console.error('No debtor name confirmed for this amendment. Redirecting to dashboard...')
         }
-        context.root.$router.push({
+        router.push({
           name: RouteNames.DASHBOARD
         })
         return
@@ -532,7 +515,7 @@ export default defineComponent({
     }
 
     const goToReviewAmendment = (): void => {
-      context.root.$router.push({
+      router.push({
         name: RouteNames.AMEND_REGISTRATION,
         query: { 'reg-num': localState.registrationNumber + '-confirm' }
       })
@@ -580,7 +563,7 @@ export default defineComponent({
           prevDraft: prevDraftId
         }
         setRegTableNewItem(newItem)
-        context.root.$router.push({
+        router.push({
           name: RouteNames.DASHBOARD
         })
         emitHaveData(false)
@@ -593,7 +576,7 @@ export default defineComponent({
         scrollToInvalid()
         return
       }
-      if ((isRoleStaffReg.value) || (isRoleStaffSbc.value)) {
+      if ((isRoleStaffReg) || (isRoleStaffSbc)) {
         localState.staffPaymentDialogDisplay = true
       } else {
         submitAmendment()
@@ -634,7 +617,7 @@ export default defineComponent({
     }
 
     const goToDashboard = (): void => {
-      context.root.$router.push({
+      router.push({
         name: RouteNames.DASHBOARD
       })
       emitHaveData(false)
@@ -646,7 +629,7 @@ export default defineComponent({
 
       // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
       if (!localState.isAuthenticated || (!props.isJestRunning && !getFeatureFlag('ppr-ui-enabled'))) {
-        context.root.$router.push({
+        router.push({
           name: RouteNames.DASHBOARD
         })
         return
@@ -689,6 +672,7 @@ export default defineComponent({
       isRoleStaffBcol,
       handleDialogResp,
       scrollToInvalid,
+      submitAmendment,
       goToReviewAmendment,
       onStaffPaymentChanges,
       ...toRefs(localState)

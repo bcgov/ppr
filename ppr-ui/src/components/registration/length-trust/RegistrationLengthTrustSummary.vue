@@ -99,14 +99,16 @@ import {
   defineComponent,
   reactive,
   toRefs
-} from '@vue/composition-api'
-import { useGetters, useActions } from 'vuex-composition-helpers'
+} from 'vue-demi'
+import { useStore } from '@/store/store'
+import { useRoute, useRouter } from 'vue2-helpers/vue-router'
 
 // local
 import { LengthTrustIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { convertDate, formatExpiryDate, isInt } from '@/utils'
 import { APIRegistrationTypes, RouteNames, RegistrationFlowType } from '@/enums'
 import { getFinancingFee } from '@/composables/fees/factories'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   props: {
@@ -115,24 +117,20 @@ export default defineComponent({
       default: false
     }
   },
-  setup (props, context) {
-    const { setLengthTrust } = useActions<any>(['setLengthTrust'])
-    const { getLengthTrust } = useGetters<any>(['getLengthTrust'])
+  setup (props) {
+    const route = useRoute()
+    const router = useRouter()
+    const { setLengthTrust } = useStore()
     const {
+      // Getters
+      getLengthTrust,
       getRegistrationType,
       getRegistrationExpiryDate,
       getRegistrationSurrenderDate,
       getRegistrationFlowType
-    } = useGetters<any>([
-      'getRegistrationType',
-      'getRegistrationExpiryDate',
-      'getRegistrationSurrenderDate',
-      'getRegistrationFlowType'
-    ])
+    } = storeToRefs(useStore())
     const registrationType = getRegistrationType.value?.registrationTypeAPI
     const feeInfoYears = getFinancingFee(false)
-    const router = context.root.$router
-    const route = context.root.$route
 
     const localState = reactive({
       renewalView: props.isRenewal,

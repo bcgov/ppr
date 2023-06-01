@@ -1,8 +1,9 @@
 // Libraries
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { getVuexStore } from '@/store'
-import CompositionApi from '@vue/composition-api'
+import { createPinia, setActivePinia } from 'pinia'
+import { useStore } from '../../src/store/store'
+
 import flushPromises from 'flush-promises'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import {
@@ -20,7 +21,8 @@ import { CautionBox } from '@/components/common'
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
-const store = getVuexStore()
+setActivePinia(createPinia())
+const store = useStore()
 
 /**
  * Creates and mounts a component, so that it can be tested.
@@ -29,10 +31,10 @@ const store = getVuexStore()
  */
 function createComponent (): Wrapper<any> {
   const localVue = createLocalVue()
-  localVue.use(CompositionApi)
+
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
-  return mount(RegisteringPartyChange, {
+  return mount((RegisteringPartyChange as any), {
     localVue,
     store,
     vuetify
@@ -43,9 +45,9 @@ describe('Parties tests', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
-    await store.dispatch('setAuthRoles', [])
-    await store.dispatch('setRegistrationType', mockedSelectSecurityAgreement())
-    await store.dispatch('setAddSecuredPartiesAndDebtors', {
+    await store.setAuthRoles([])
+    await store.setRegistrationType(mockedSelectSecurityAgreement())
+    await store.setAddSecuredPartiesAndDebtors({
       debtors: [],
       securedParties: [],
       registeringParty: mockedRegisteringParty1
@@ -67,7 +69,7 @@ describe('Parties tests', () => {
 
   it('shows the search on change', async () => {
     wrapper.vm.openChangeScreen = true
-    await Vue.nextTick()
+    await nextTick()
     // does not show party search and edit when not change
     expect(wrapper.findComponent(PartySearch).exists()).toBe(true)
     expect(wrapper.findComponent(EditParty).exists()).toBe(false)
@@ -91,13 +93,10 @@ describe('Parties tests', () => {
       deliveryInstructions: ''
     }
     newRegParty.address = addressChange1
-    await wrapper.vm.$store.dispatch(
-      'setAddSecuredPartiesAndDebtors',
+    await store.setAddSecuredPartiesAndDebtors(
       { registeringParty: newRegParty, debtors: [], securedParties: [] }
     )
-    expect(
-      wrapper.vm.$store.state.stateModel.registration.parties.registeringParty.address
-    ).toEqual(addressChange1)
+    expect(store.getStateModel.registration.parties.registeringParty.address).toEqual(addressChange1)
     expect(wrapper.vm.registeringParty).toEqual(newRegParty)
 
     // update address again - change country
@@ -111,19 +110,18 @@ describe('Parties tests', () => {
       deliveryInstructions: ''
     }
     newRegParty.address = addressChange2
-    await wrapper.vm.$store.dispatch(
-      'setAddSecuredPartiesAndDebtors',
+    await store.setAddSecuredPartiesAndDebtors(
       { registeringParty: newRegParty, debtors: [], securedParties: [] }
     )
     expect(
-      wrapper.vm.$store.state.stateModel.registration.parties.registeringParty.address
+      store.getStateModel.registration.parties.registeringParty.address
     ).toEqual(addressChange2)
     expect(wrapper.vm.registeringParty).toEqual(newRegParty)
   })
 
   it('trigger change registering party edit', async () => {
     wrapper.vm.changeRegisteringParty()
-    await Vue.nextTick()
+    await nextTick()
     // show cancel button
     expect(wrapper.find('#cancel-btn-chg-reg-party').exists()).toBeTruthy()
   })
@@ -134,13 +132,13 @@ describe('Parties sbc user tests', () => {
 
   beforeEach(async () => {
     const registrationType = mockedSelectSecurityAgreement()
-    await store.dispatch('setRegistrationType', registrationType)
-    await store.dispatch('setAddSecuredPartiesAndDebtors', {
+    await store.setRegistrationType(registrationType)
+    await store.setAddSecuredPartiesAndDebtors({
       debtors: mockedDebtors1,
       securedParties: mockedSecuredParties1,
       registeringParty: mockedRegisteringParty1
     })
-    store.dispatch('setRoleSbc', true)
+    store.setRoleSbc(true)
     wrapper = createComponent()
   })
   afterEach(() => {

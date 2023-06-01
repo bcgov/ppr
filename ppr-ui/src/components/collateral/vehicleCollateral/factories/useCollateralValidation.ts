@@ -1,11 +1,4 @@
-import {
-  ref,
-  computed,
-  defineComponent,
-  reactive,
-  toRefs,
-  onMounted
-} from '@vue/composition-api'
+import { ref } from 'vue-demi'
 import { createDefaultValidationResult } from '@lemoncode/fonk'
 import { formValidation } from './collateralFormValidator'
 

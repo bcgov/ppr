@@ -23,21 +23,21 @@
       @proceed="submit($event)"
     />
     <v-container class="container">
-      <b :class="$style['search-title']">Search Results</b>
-      <p v-if="!getSearchResults" :class="[$style['search-info'], 'ma-0']" style="padding-top: 26px;">
+      <b class="search-title">Search Results</b>
+      <p v-if="!getSearchResults" class="search-info ma-0" style="padding-top: 26px;">
         Your search results will display below.
       </p>
-      <div v-else no-gutters style="padding-top: 26px;">
+      <div v-else style="padding-top: 26px;">
         <p id="search-meta-info" class="ma-0">
-          <span :class="$style['search-sub-title']"><b>for {{ searchType }} "{{ searchValue }}"</b></span>
-          <span :class="$style['search-info']">{{ searchTime }}</span>
+          <span class="search-sub-title"><b>for {{ searchType }} "{{ searchValue }}"</b></span>
+          <span class="search-info">{{ searchTime }}</span>
         </p>
         <p v-if="folioNumber" id="results-folio-header" class="ma-0" style="padding-top: 22px;">
-          <b :class="$style['search-table-title']">Folio Number: </b>
-          <span :class="$style['search-info']">{{ folioNumber }}</span>
+          <b class="search-table-title">Folio Number: </b>
+          <span class="search-info">{{ folioNumber }}</span>
         </p>
         <v-row no-gutters style="padding-top: 22px;">
-          <v-col :class="$style['search-info']">
+          <v-col class="'search-info">
             <span v-if="totalResultsLength !== 0" id="results-info">
               Select the registrations you want to include in a printable PDF search report. Exact matches
               are automatically selected. This report will contain the full record of the registration for
@@ -60,8 +60,9 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onBeforeMount, reactive, toRefs, watch } from '@vue/composition-api'
-import { useGetters } from 'vuex-composition-helpers'
+import { computed, defineComponent, onBeforeMount, reactive, toRefs, watch } from 'vue-demi'
+import { useRouter } from 'vue2-helpers/vue-router'
+import { useStore } from '@/store/store'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import {
   BaseDialog,
@@ -80,7 +81,8 @@ import {
   saveSelectionsError
 } from '@/resources/dialogOptions'
 import { getFeatureFlag, submitSelected, successfulPPRResponses, updateSelected, navigate, pacificDate } from '@/utils'
-import { SearchResultIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { SearchResultIF } from '@/interfaces'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'Search',
@@ -111,15 +113,12 @@ export default defineComponent({
     }
   },
   setup (props, context) {
+    const router = useRouter()
     const {
       getSearchedType,
       getUserSettings,
       getSearchResults
-    } = useGetters([
-      'getSearchedType',
-      'getUserSettings',
-      'getSearchResults'
-    ])
+    } = storeToRefs(useStore())
 
     const localState = reactive({
       loading: false,
@@ -198,7 +197,7 @@ export default defineComponent({
       similarResultsLength: computed((): number => {
         const searchResult = getSearchResults.value
         let similarCount = 0
-        if (searchResult?.results) {
+        if (searchResult && searchResult.results) {
           for (const result of searchResult.results) {
             if (result.matchType !== 'EXACT') {
               similarCount += 1
@@ -213,9 +212,9 @@ export default defineComponent({
       window.onbeforeunload = (event) => {
         // unsaved selections if app is ready, search results exist, and on the search page
         const isSearchReportUnsaved = (
-          context.root.$router.currentRoute.name === RouteNames.SEARCH &&
+          router.currentRoute.name === RouteNames.SEARCH &&
           props.appReady &&
-          !!getSearchResults.value
+          !!getSearchResults
         )
         if (isSearchReportUnsaved) {
           event.preventDefault()
@@ -230,7 +229,7 @@ export default defineComponent({
       localState.errorDialog = false
       if (!stayOnSearchResults || (localState.errorOptions !== searchReportError &&
         localState.errorOptions !== saveSelectionsError)) {
-        context.root.$router.push({ name: RouteNames.DASHBOARD })
+        router.push({ name: RouteNames.DASHBOARD })
       }
     }
 
@@ -287,7 +286,7 @@ export default defineComponent({
           localState.errorDialog = true
           console.error({ statusCode: statusCode })
         } else {
-          context.root.$router.push({ name: RouteNames.DASHBOARD })
+          router.push({ name: RouteNames.DASHBOARD })
         }
       }
     }
@@ -314,8 +313,8 @@ export default defineComponent({
       }
 
       // if navigated here without search results redirect to the dashboard
-      if (!getSearchResults.value) {
-        context.root.$router.push({
+      if (!getSearchResults) {
+        router.push({
           name: RouteNames.DASHBOARD
         })
         emitHaveData(false)
@@ -350,7 +349,7 @@ export default defineComponent({
 })
 </script>
 
-<style lang="scss" module>
+<style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
 #done-btn {
   font-size: 0.825rem !important;

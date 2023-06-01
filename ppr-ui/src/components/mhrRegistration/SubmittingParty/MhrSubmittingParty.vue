@@ -38,7 +38,7 @@
 
         <v-form id="submitting-party-form" ref="submittingPartyForm" v-model="submittingPartyValid">
           <!-- Person Name Input -->
-          <div v-show="isPersonOption">
+          <div v-if="isPersonOption && submittingParty.personName">
             <label class="generic-label" for="first-name">Person's Name</label>
             <v-row no-gutters>
               <v-col>
@@ -75,7 +75,7 @@
           </div>
 
           <!-- Business Name Input -->
-          <div v-show="isBusinessOption">
+          <div v-if="isBusinessOption">
             <label class="generic-label" for="business-name">Business Name</label>
             <v-row no-gutters>
               <v-col>
@@ -156,18 +156,18 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable no-unused-vars */
-import { computed, defineComponent, reactive, toRefs, watch } from '@vue/composition-api'
+import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue-demi'
 import { useInputRules, useMhrValidations } from '@/composables'
-import { useActions, useGetters } from 'vuex-composition-helpers'
+import { useStore } from '@/store/store'
+import { storeToRefs } from 'pinia'
 import { BaseAddress } from '@/composables/address'
 import { SubmittingPartyTypes } from '@/enums'
 import { PartyAddressSchema } from '@/schemas'
 import { cloneDeep } from 'lodash'
 import { VueMaskDirective } from 'v-mask'
 import { fromDisplayPhone, toDisplayPhone } from '@/utils'
-import { ContentIF, SubmittingPartyIF } from '@/interfaces'
-
+/* eslint-disable no-unused-vars */
+import { ContentIF, FormIF, SubmittingPartyIF } from '@/interfaces'
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
@@ -195,22 +195,16 @@ export default defineComponent({
   },
   setup (props, context) {
     const {
+      // Actions
       setMhrRegistrationSubmittingParty,
       setMhrTransferSubmittingParty
-    } = useActions<any>([
-      'setMhrRegistrationSubmittingParty',
-      'setMhrTransferSubmittingParty'
-    ])
+    } = useStore()
     const {
+      // Getters
       getMhrRegistrationSubmittingParty,
       getMhrTransferSubmittingParty,
       getMhrRegistrationValidationModel
-    } = useGetters<any>([
-      'getMhrRegistrationSubmittingParty',
-      'getMhrTransferSubmittingParty',
-      'getMhrRegistrationValidationModel'
-    ])
-
+    } = storeToRefs(useStore())
     // InputField Rules
     const {
       customRules,
@@ -222,12 +216,12 @@ export default defineComponent({
       isEmailOptional,
       isPhone
     } = useInputRules()
-
     const {
       MhrCompVal,
       MhrSectVal,
       setValidation
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
+    const submittingPartyForm = ref(null) as FormIF
 
     const localState = reactive({
       enableLookUp: true,
@@ -364,8 +358,7 @@ export default defineComponent({
     })
 
     watch(() => props.validate, async () => {
-      // @ts-ignore - function exists
-      await context.refs.submittingPartyForm.validate()
+      submittingPartyForm.value?.validate()
     })
 
     watch(() => localState.isSubmitterValid, (val: boolean) => {

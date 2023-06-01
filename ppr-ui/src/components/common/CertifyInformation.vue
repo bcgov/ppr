@@ -97,14 +97,15 @@ import {
   toRefs,
   watch,
   onMounted
-} from '@vue/composition-api'
-import { useGetters, useActions } from 'vuex-composition-helpers'
+} from 'vue-demi'
+import { useStore } from '@/store/store'
 // local
 import { convertDate, getRegisteringPartyFromAuth } from '@/utils'
 import { BaseAddress } from '@/composables/address'
 import { DefaultSchema } from '@/composables/address/resources'
 import { BaseHeaderIF, CertifyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   components: {
@@ -125,10 +126,9 @@ export default defineComponent({
     }
   },
   setup (props, { emit }) {
-    const { setCertifyInformation } = useActions<any>([
-      'setCertifyInformation'
-    ])
+    const { setCertifyInformation } = useStore()
     const {
+      // Getters
       getCertifyInformation,
       getUserFirstName,
       getUserLastName,
@@ -136,10 +136,8 @@ export default defineComponent({
       isRoleStaffSbc,
       isRoleStaffBcol,
       getUserEmail
-    } = useGetters<any>([
-      'getCertifyInformation', 'getUserFirstName', 'getUserLastName', 'isRoleStaff', 'isRoleStaffSbc',
-      'isRoleStaffBcol', 'getUserEmail'
-    ])
+    } = storeToRefs(useStore())
+
     const authorizedTableHeaders: Array<BaseHeaderIF> = [
       {
         class: 'column-md extra-indent py-4',

@@ -1,26 +1,29 @@
-import { reactive, toRefs, computed } from '@vue/composition-api'
+import { reactive, toRefs, computed } from 'vue-demi'
 import { VehicleTypes, VehicleTypesNoMH } from '@/resources'
 import { VehicleCollateralIF } from '@/interfaces' // eslint-disable-line no-unused-vars
-import { useGetters, useActions } from 'vuex-composition-helpers'
+import { useStore } from '@/store/store'
 import { ActionTypes, APIRegistrationTypes, RegistrationFlowType } from '@/enums'
 import { cloneDeep, isEqual } from 'lodash'
 
 export const useVehicle = (props, context) => {
   const {
+    // Getters
     getRegistrationType,
     getRegistrationFlowType,
-    getVehicleCollateral
-  } = useGetters<any>(['getRegistrationType', 'getRegistrationFlowType', 'getVehicleCollateral'])
-  const { setCollateralValid } = useActions<any>(['setCollateralValid'])
-  const { setVehicleCollateral } = useActions<any>(['setVehicleCollateral'])
+    getVehicleCollateral,
 
-  const registrationType = getRegistrationType.value.registrationTypeAPI
+    // Actions
+    setCollateralValid,
+    setVehicleCollateral
+  } = useStore()
+
+  const registrationType = getRegistrationType.registrationTypeAPI
 
   const localState = reactive({
     currentVehicle: {} as VehicleCollateralIF,
     vehicleTypes: VehicleTypes,
     vehicleTypesNoMH: VehicleTypesNoMH,
-    registrationFlowType: getRegistrationFlowType.value,
+    registrationFlowType: getRegistrationFlowType,
     getSerialLabel: computed(function () {
       switch (localState.currentVehicle.type) {
         case '':
@@ -48,7 +51,7 @@ export const useVehicle = (props, context) => {
   })
 
   const getVehicle = () => {
-    const vehicles = getVehicleCollateral.value as VehicleCollateralIF[]
+    const vehicles = getVehicleCollateral as VehicleCollateralIF[]
     if (props.activeIndex >= 0) {
       // deep copy so original object doesn't get modified
       localState.currentVehicle = JSON.parse(JSON.stringify(vehicles[props.activeIndex]))
@@ -76,7 +79,7 @@ export const useVehicle = (props, context) => {
   }
 
   const addVehicle = () => {
-    let newList = getVehicleCollateral.value as VehicleCollateralIF[] || []// eslint-disable-line
+    let newList = getVehicleCollateral as VehicleCollateralIF[] || []// eslint-disable-line
 
     // if they blanked out the mhr number, take it out, so api does not bomb
     if (localState.currentVehicle.manufacturedHomeRegistrationNumber?.trim() === '') {
