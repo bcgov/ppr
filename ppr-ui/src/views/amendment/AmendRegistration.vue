@@ -134,7 +134,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue-demi'
-import { useRoute, useRouter } from 'vue-router/composables'
+import { useRoute, useRouter } from 'vue2-helpers/vue-router'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { cloneDeep, isEqual } from 'lodash'
@@ -567,7 +567,7 @@ export default defineComponent({
         getOriginalAddSecuredPartiesAndDebtors.value.debtors)) {
         hasChanged = true
       }
-      if (!isEqual(getLengthTrust, getOriginalLengthTrust)) {
+      if (!isEqual(getLengthTrust.value, getOriginalLengthTrust.value)) {
         hasChanged = true
       }
       if (!isEqual(getAddCollateral.value.vehicleCollateral, getOriginalAddCollateral.value.vehicleCollateral)) {
@@ -579,7 +579,7 @@ export default defineComponent({
         hasChanged = true
       }
 
-      if (getAmendmentDescription) {
+      if (getAmendmentDescription.value) {
         hasChanged = true
       }
 
@@ -590,7 +590,7 @@ export default defineComponent({
         fileNumber: '',
         orderDate: ''
       }
-      if (!isEqual(getCourtOrderInformation, blankCourtOrder)) {
+      if (!isEqual(getCourtOrderInformation.value, blankCourtOrder)) {
         hasChanged = true
       }
       return hasChanged

@@ -58,7 +58,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, nextTick, onMounted, reactive, toRefs } from 'vue-demi'
-import { useRoute, useRouter } from 'vue-router/composables'
+import { useRoute, useRouter } from 'vue2-helpers/vue-router'
 import { useStore } from '@/store/store'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { RegistrationFlowType, RouteNames, StatementTypes, UIRegistrationTypes } from '@/enums'

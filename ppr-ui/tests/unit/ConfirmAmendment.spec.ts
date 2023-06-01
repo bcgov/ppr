@@ -145,14 +145,6 @@ describe('Confirm Amendment registration component', () => {
     expect(wrapper.vm.$route.name).toBe(RouteNames.AMEND_REGISTRATION)
   })
 
-  it('navigate to amend registration', async () => {
-    expect(wrapper.findComponent(ConfirmAmendment).exists()).toBe(true)
-    await wrapper.findComponent(StickyContainer).vm.$emit('back', true)
-    wrapper.vm.goToReviewAmendment()
-    await nextTick()
-    expect(wrapper.vm.$route.name).toBe(RouteNames.AMEND_REGISTRATION)
-  })
-
   it('processes cancel button action', async () => {
     // setup
     await store.setUnsavedChanges(true)

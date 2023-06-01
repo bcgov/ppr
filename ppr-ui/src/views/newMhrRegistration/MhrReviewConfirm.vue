@@ -68,7 +68,7 @@ import { RouteNames } from '@/enums'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 import { StaffPaymentOptions } from '@bcrs-shared-components/enums'
 import { useHomeOwners } from '@/composables/mhrRegistration'
-import { useRoute } from 'vue-router/composables'
+import { useRoute } from 'vue2-helpers/vue-router'
 import { storeToRefs } from 'pinia'
 /* eslint-enable no-unused-vars */
 

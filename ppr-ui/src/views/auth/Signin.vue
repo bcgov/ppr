@@ -4,7 +4,7 @@
 
 <script lang="ts">
 import { defineComponent, reactive, toRefs } from 'vue-demi'
-import { useRoute, useRouter } from 'vue-router/composables'
+import { useRoute, useRouter } from 'vue2-helpers/vue-router'
 // Common Component
 import SbcSignin from 'sbc-common-components/src/components/SbcSignin.vue'
 import { navigate } from '@/utils'
