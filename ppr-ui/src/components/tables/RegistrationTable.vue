@@ -104,7 +104,7 @@
                       single-line
                       item-text="registrationTypeUI"
                       item-value="registrationTypeAPI"
-                      class="table-registration-types"
+                      class="table-registration-types registration-type-select"
                       filled
                       dense
                       clearable
@@ -113,9 +113,9 @@
                       id="txt-type"
                       :menu-props="{ bottom: true, offsetY: true }"
                     >
-                      <template slot="item" slot-scope="data">
-                        <span class="list-item">
-                          {{ data.item.registrationTypeUI }}
+                      <template v-slot="item">
+                        <span class="list-item py-3">
+                          {{ item.registrationTypeUI }}
                         </span>
                       </template>
                     </v-select>
@@ -769,5 +769,9 @@ export default defineComponent({
   border-top-left-radius: 0;
   height: 35px !important;
   width: 35px;
+}
+
+::v-deep .registration-type-select .v-select__selections:first-child {
+  width: 125px;
 }
 </style>
