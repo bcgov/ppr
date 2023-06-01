@@ -330,6 +330,15 @@ export const MHRegistrationTypes: Array<MhRegistrationTypeIF> = [
     disabled: false,
     divider: false,
     group: 3,
+    registrationTypeUI: UIMhrDescriptionTypes.CONVERTED,
+    registrationTypeAPI: APIMhrDescriptionTypes.CONVERTED,
+    text: `${UIMhrDescriptionTypes.CONVERTED} (${APIMhrDescriptionTypes.CONVERTED})`
+  },
+  {
+    class: 'registration-list-item',
+    disabled: false,
+    divider: false,
+    group: 3,
     registrationTypeUI: UIMhrDescriptionTypes.REGISTER_NEW_UNIT,
     registrationTypeAPI: APIMhrDescriptionTypes.REGISTER_NEW_UNIT,
     text: `${UIMhrDescriptionTypes.REGISTER_NEW_UNIT} (${APIMhrDescriptionTypes.REGISTER_NEW_UNIT})`
@@ -348,9 +357,39 @@ export const MHRegistrationTypes: Array<MhRegistrationTypeIF> = [
     disabled: false,
     divider: false,
     group: 3,
-    registrationTypeUI: UIMhrDescriptionTypes.CONVERTED,
-    registrationTypeAPI: APIMhrDescriptionTypes.CONVERTED,
-    text: `${UIMhrDescriptionTypes.CONVERTED} (${APIMhrDescriptionTypes.CONVERTED})`
+    registrationTypeUI: UIMhrDescriptionTypes.SURVIVING_JOINT_TEANT,
+    registrationTypeAPI: APIMhrDescriptionTypes.SURVIVING_JOINT_TEANT,
+    text: `${UIMhrDescriptionTypes.SURVIVING_JOINT_TEANT} (${APIMhrDescriptionTypes.SURVIVING_JOINT_TEANT})`
+  },
+  {
+    class: 'registration-list-item',
+    disabled: false,
+    divider: false,
+    group: 3,
+    registrationTypeUI: UIMhrDescriptionTypes.TRANSFER_EXECUTOR_PROBATE_WILL,
+    registrationTypeAPI: APIMhrDescriptionTypes.TRANSFER_EXECUTOR_PROBATE_WILL,
+    text: `${UIMhrDescriptionTypes.TRANSFER_EXECUTOR_PROBATE_WILL} 
+          (${APIMhrDescriptionTypes.TRANSFER_EXECUTOR_PROBATE_WILL})`
+  },
+  {
+    class: 'registration-list-item',
+    disabled: false,
+    divider: false,
+    group: 3,
+    registrationTypeUI: UIMhrDescriptionTypes.TRANSFER_EXECUTOR_UNDER_25_WILL,
+    registrationTypeAPI: APIMhrDescriptionTypes.TRANSFER_EXECUTOR_UNDER_25_WILL,
+    text: `${UIMhrDescriptionTypes.TRANSFER_EXECUTOR_UNDER_25_WILL} 
+          (${APIMhrDescriptionTypes.TRANSFER_EXECUTOR_UNDER_25_WILL})`
+  },
+  {
+    class: 'registration-list-item',
+    disabled: false,
+    divider: false,
+    group: 3,
+    registrationTypeUI: UIMhrDescriptionTypes.TRANSFER_ADMINISTRATOR,
+    registrationTypeAPI: APIMhrDescriptionTypes.TRANSFER_ADMINISTRATOR,
+    text: `${UIMhrDescriptionTypes.TRANSFER_ADMINISTRATOR} 
+          (${APIMhrDescriptionTypes.TRANSFER_ADMINISTRATOR})`
   }
 ]
 
