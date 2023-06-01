@@ -913,6 +913,15 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
         former_name = ''
         for party in self.financing_statement.parties:
             if new_party.party_type == party.party_type and new_party.registration_id == party.registration_id_end:
+                # If address change do not return a former name.
+                address1 = party.address
+                address2 = new_party.address
+                if address1 is None and party.client_code:
+                    address1 = party.client_code.address
+                if address2 is None and new_party.client_code:
+                    address2 = new_party.client_code.address
+                if address1 and address2 and address1.json != address2.json:
+                    return former_name
                 if new_party.previous_party_id and new_party.previous_party_id == party.id:
                     if party.client_code and party.client_code.name:
                         former_name = party.client_code.name
@@ -923,12 +932,6 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
                         if party.middle_initial:
                             former_name += ' ' + party.middle_initial
                     return former_name
-                address1 = party.address
-                address2 = new_party.address
-                if address1 is None and party.client_code:
-                    address1 = party.client_code.address
-                if address2 is None and new_party.client_code:
-                    address2 = new_party.client_code.address
                 if address1 and address2 and address1.json == address2.json:
                     if party.client_code and party.client_code.name:
                         former_name = party.client_code.name
@@ -937,8 +940,6 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
                     else:
                         # match if only 1 name is different in addition to same address.
                         former_name = Registration.__get_matching_party_name(new_party, party)
-                    if former_name:
-                        return former_name
         return former_name
 
     @staticmethod
