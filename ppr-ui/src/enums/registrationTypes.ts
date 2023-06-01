@@ -166,15 +166,24 @@ export enum UIRegistrationClassTypes {
 }
 
 export enum APIMhrDescriptionTypes {
+  CONVERTED = 'RECORD CONVERSION',
   REGISTER_NEW_UNIT = 'MANUFACTURED HOME REGISTRATION',
-  SALE_OR_GIFT = 'SALE / GIFT TRANSFER',
-  CONVERTED = 'RECORD CONVERSION'
+  SALE_OR_GIFT = 'TRANSFER DUE TO SALE OR GIFT',
+  SURVIVING_JOINT_TEANT = 'TRANSFER TO SURVIVING JOINT TENANT(S)',
+  // \u2013 is a less common dash, returned by the API, do not confuse it with ASCII char (\u002d)
+  TRANSFER_EXECUTOR_PROBATE_WILL = 'TRANSFER TO EXECUTOR \u2013 GRANT OF PROBATE WITH WILL',
+  TRANSFER_EXECUTOR_UNDER_25_WILL = 'TRANSFER TO EXECUTOR \u2013 ESTATE UNDER $25,000 WITH WILL',
+  TRANSFER_ADMINISTRATOR = 'TRANSFER TO ADMINISTRATOR \u2013 GRANT OF ADMINISTRATION',
 }
 
 export enum UIMhrDescriptionTypes {
-  REGISTER_NEW_UNIT = 'REGISTER NEW UNIT',
-  SALE_OR_GIFT = 'SALE OR GIFT',
-  CONVERTED = 'CONVERTED'
+  CONVERTED = 'Record Conversion',
+  REGISTER_NEW_UNIT = 'Manufactured Home Registration',
+  SALE_OR_GIFT = 'Transfer Due to Sale or Gift',
+  SURVIVING_JOINT_TEANT = 'Transfer to Surviving Joint Teant(s)',
+  TRANSFER_EXECUTOR_PROBATE_WILL = 'Transfer to Executor - Grant of Probate with Will',
+  TRANSFER_EXECUTOR_UNDER_25_WILL = 'Transfer to Executor - Estate under $25,000 with Will',
+  TRANSFER_ADMINISTRATOR = 'Transfer to Administrator - Grant of Administration',
 }
 
 export enum APIMhrTypes {
