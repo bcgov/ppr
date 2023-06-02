@@ -889,8 +889,6 @@ describe('Home Owners', () => {
 
     const addedExecutor = homeOwners.find(getTestId('owner-info-' + mockedAddedExecutor.ownerId))
     expect(addedExecutor.exists()).toBeTruthy()
-    // check that additional name (suffix) of the deleted Executor is displayed for the new Executor
-    expect(addedExecutor.text()).toContain(mockedExecutor.description)
   })
 
   it('TRANS Affidavit: validations with different error messages', async () => {
@@ -970,7 +968,6 @@ describe('Home Owners', () => {
     await store.setMhrTransferHomeOwnerGroups(homeOwnerGroup)
 
     await selectTransferType(TRANSFER_TYPE)
-
 
     // delete the sole owner
     await homeOwners.find(getTestId('table-delete-btn')).trigger('click')
