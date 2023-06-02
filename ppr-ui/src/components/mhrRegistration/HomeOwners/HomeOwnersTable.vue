@@ -129,11 +129,7 @@
                   {{ row.item.organizationName }}
                 </div>
               </div>
-              <div v-if="row.item.suffix"
-                class="font-light suffix"
-                :class="{ 'suffix-error': showSuffixError &&
-                  row.item.partyType === getPartyTypeForActiveTransfer &&
-                  row.item.action === ActionTypes.ADDED }">
+              <div v-if="row.item.suffix" class="font-light suffix">
                 {{ row.item.suffix }}
               </div>
               <div v-else-if="row.item.description"
@@ -403,7 +399,6 @@ import { DeathCertificate, SupportingDocuments, HomeOwnersGroupError } from '@/c
 import { BaseDialog } from '@/components/dialogs'
 import TableGroupHeader from '@/components/mhrRegistration/HomeOwners/TableGroupHeader.vue'
 import { mhrDeceasedOwnerChanges } from '@/resources/dialogOptions'
-import { transferOwnerPartyTypes, transfersErrors } from '@/resources'
 import { yyyyMmDdToPacificDate } from '@/utils/date-helper'
 import { InfoChip } from '@/components/common'
 /* eslint-disable no-unused-vars */
@@ -487,8 +482,7 @@ export default defineComponent({
       TransSaleOrGift,
       TransToExec,
       TransToAdmin,
-      TransJointTenants,
-      getMhrTransferType
+      TransJointTenants
     } = useTransferOwners(!props.isMhrTransfer)
 
     const { getValidation, MhrSectVal, MhrCompVal } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
@@ -498,7 +492,6 @@ export default defineComponent({
       currentlyEditingHomeOwnerId: -1,
       reviewed: false,
       showOwnerChangesDialog: false,
-      showSuffixError: false,
       ownerToDecease: null as MhrRegistrationHomeOwnerIF,
       isEditingMode: computed((): boolean => localState.currentlyEditingHomeOwnerId >= 0),
       isAddingMode: computed((): boolean => props.isAdding),
@@ -537,8 +530,7 @@ export default defineComponent({
       }),
       isValidAllocation: computed((): boolean => {
         return !showGroups.value || !getTotalOwnershipAllocationStatus().hasTotalAllocationError
-      }),
-      getPartyTypeForActiveTransfer: computed(() => transferOwnerPartyTypes[getMhrTransferType.value?.transferType])
+      })
     })
 
     const isInvalidRegistrationOwnerGroup = (groupId: number) =>
@@ -755,13 +747,6 @@ export default defineComponent({
     watch(() => props.homeOwners, (val) => {
       setUnsavedChanges(val.some(owner => !!owner.action || !owner.ownerId))
 
-      // update suffix for executor(s) in certain Transfers flows
-      if (isTransferToExecutorProbateWill.value ||
-        isTransferToExecutorUnder25Will.value ||
-        isTransferToAdminNoWill.value) {
-        localState.showSuffixError = TransToExec.updateExecutorSuffix()
-      }
-
       context.emit('isValidTransferOwners',
         hasMinimumGroups() &&
         localState.isValidAllocation &&
@@ -837,8 +822,6 @@ export default defineComponent({
       TransToAdmin,
       getMhrInfoValidation,
       isTransferGroupValid,
-      transfersErrors,
-      getMhrTransferType,
       getHomeOwnerIcon,
       isPartyTypeNotEAT,
       ...toRefs(localState)

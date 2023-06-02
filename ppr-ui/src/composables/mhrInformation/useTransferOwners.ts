@@ -467,12 +467,6 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
         groupId: deletedOwnerGroup.groupId // new Owner will be added to the same group as deleted Owner
       } as MhrRegistrationHomeOwnerIF)
     },
-    updateExecutorSuffix: (): boolean => {
-      const deceasedOwners = getMhrTransferHomeOwners.value
-        .filter(owner => owner.action === ActionTypes.REMOVED)
-
-      return TransToExec.addRemoveExecutorSuffix(deceasedOwners[0] || null)
-    },
     // find owners that 1. belong to groupId, 2. that are also removed, 3. have Grant of Probate as supporting document
     // switch their supporting document to Death Certificate if they have Grant of Probate selected
     resetGrantOfProbate: (groupId, excludedOwnerId) => {
@@ -484,38 +478,6 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
             owner.supportingDocument = SupportingDocumentsOptions.DEATH_CERT
           }
         })
-    },
-    addRemoveExecutorSuffix: (owner: MhrRegistrationHomeOwnerIF): boolean => {
-      const transferType = getMhrTransferType.value?.transferType
-      let showSuffixError = false
-
-      const allExecutors = getMhrTransferHomeOwners.value
-        .filter(owner => owner.partyType === transferOwnerPartyTypes[transferType] &&
-          owner.action === ActionTypes.ADDED)
-
-      if (allExecutors.length === 1 && owner !== null) {
-        let suffix = ''
-
-        if ([HomeOwnerPartyTypes.OWNER_IND, HomeOwnerPartyTypes.OWNER_BUS].includes(owner.partyType)) {
-          const { first, middle, last } = owner.individualName || {}
-          suffix = owner.organizationName?.length > 0
-            ? transferOwnerPrefillAdditionalName[transferType] + owner.organizationName
-            : transferOwnerPrefillAdditionalName[transferType] + [first, middle, last].filter(Boolean).join(' ')
-        } else {
-          suffix = owner.description
-        }
-
-        allExecutors[0].suffix = suffix
-        showSuffixError = false
-      } else {
-        allExecutors.forEach((executor: MhrRegistrationHomeOwnerIF) => {
-          // reset suffix or description
-          const additionalName = transferOwnerPrefillAdditionalName[transferType] + 'N/A'
-          executor.suffix = executor.suffix ? additionalName : executor.description = additionalName
-          showSuffixError = true
-        })
-      }
-      return showSuffixError
     }
   }
 
