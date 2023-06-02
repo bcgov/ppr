@@ -430,7 +430,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       return getMhrTransferHomeOwnerGroups.value.some(group =>
         group.owners.some(owner =>
           (owner.action === ActionTypes.REMOVED &&
-          owner.partyType === HomeOwnerPartyTypes.OWNER_IND &&
+          [HomeOwnerPartyTypes.OWNER_IND, HomeOwnerPartyTypes.OWNER_BUS].includes(owner.partyType) &&
           owner.supportingDocument === TransToExec.getSupportingDocForActiveTransfer()) ||
           (owner.action === ActionTypes.REMOVED &&
             [HomeOwnerPartyTypes.EXECUTOR, HomeOwnerPartyTypes.ADMINISTRATOR, HomeOwnerPartyTypes.TRUSTEE]
@@ -443,9 +443,15 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       const deletedOwnerGroup = find(getMhrTransferHomeOwnerGroups.value, { owners: [{ action: ActionTypes.REMOVED }] })
 
       // first try to find the deleted reg owner
-      const deletedOwner = find(deletedOwnerGroup.owners, {
-        action: ActionTypes.REMOVED
-      }) as MhrRegistrationHomeOwnerIF
+      let deletedOwner: MhrRegistrationHomeOwnerIF = find(deletedOwnerGroup.owners, {
+        action: ActionTypes.REMOVED,
+        supportingDocument: TransToExec.getSupportingDocForActiveTransfer()
+      })
+
+      // if reg owner is not found, check for Exec, Admin, or Trustee
+      if (!deletedOwner) {
+        deletedOwner = find(deletedOwnerGroup.owners, { action: ActionTypes.REMOVED })
+      }
 
       let suffix = ''
       if ([HomeOwnerPartyTypes.OWNER_IND, HomeOwnerPartyTypes.OWNER_BUS].includes(deletedOwner.partyType)) {
