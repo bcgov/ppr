@@ -562,8 +562,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
   const groupHasRemovedAllCurrentOwners = (group: MhrRegistrationHomeOwnerGroupIF) => {
     const owners = group.owners
 
-    return owners && localState.isSOorJT &&
-        owners.some(owner => owner.action === ActionTypes.ADDED) &&
+    return localState.isSOorJT && owners.some(owner => owner.action === ActionTypes.ADDED) &&
         owners.every(owner => !!owner.action)
   }
 
