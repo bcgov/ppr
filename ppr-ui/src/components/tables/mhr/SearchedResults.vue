@@ -53,182 +53,407 @@
     <!-- Search Results Table -->
     <v-row v-if="totalResultsLength !== 0" class="pt-3">
       <v-col cols="12">
-        <v-data-table
-          v-if="results"
+        <v-simple-table
           id="mh-search-results-table"
           class="results-table"
           :class="{ 'review-mode' : isReviewMode }"
-          disable-sort
-          fixed
           fixed-header
-          :headers="headers"
-          hide-default-footer
-          :items="results"
-          item-key="id"
-          :items-per-page="-1"
-          :item-class="getItemClass"
-          mobile-breakpoint="0"
-          return-object
         >
+          <template v-slot:default>
+            <!-- Table Headers -->
+            <thead>
+              <tr>
+                <th v-for="(header, index) in headers" :key="header.value" :class="header.class">
+                  <!-- First Header -->
+                  <!-- Search selection checkbox -->
+                  <template v-if="index === 0 && !isReviewMode">
+                    <v-tooltip
+                        top
+                        content-class="top-tooltip"
+                        transition="fade-transition"
+                        nudge-left="73"
+                    >
+                      <template v-slot:activator="{ on, attrs }">
+                        <span v-bind="attrs" v-on="on">
+                          <v-checkbox
+                            id="select-all-checkbox"
+                            class="header-checkbox ma-0 pa-0"
+                            hide-details
+                            :label="headerSlotLabel"
+                            v-model="selectAll"
+                            @click="onSelectAllClick()"
+                          />
+                        </span>
+                      </template>
+                      <div class="pt-2 pb-2">
+                        Select this to include all manufactured homes.
+                      </div>
+                    </v-tooltip>
+                  </template>
 
-          <template v-slot:[`header.ownerName`]>
-            <span>{{ ownerOrOrgHeader }} Name</span>
-          </template>
+                  <!-- Last Header -->
+                  <!-- Lien selection checkbox -->
+                  <template v-else-if="index === 9 && !isReviewMode">
+                    <v-checkbox
+                      id="select-all-lien-checkbox"
+                      class="header-checkbox ma-0 pa-0"
+                      label="Include lien information for all selections"
+                      v-model="selectAllLien"
+                      :disabled="selectedMatchesLength === 0"
+                      @click="onSelectAllLienClick()"
+                      hide-details
+                    />
+                  </template>
 
-          <template v-if="!isReviewMode" v-slot:[`header.ownerStatus`]>
-            <span>{{ ownerOrOrgHeader }} Status</span>
-          </template>
+                  <!-- Standard Headers -->
+                  <template v-else>
+                    <span v-if="header.value === 'ownerName'" :class="index === 0 && 'pl-8'">
+                      {{ ownerOrOrgHeader }} Name
+                    </span>
+                    <span v-else-if="header.value === 'ownerStatus'" :class="index === 0 && 'pl-8'">
+                      {{ ownerOrOrgHeader }} Status
+                    </span>
+                    <span v-else>
+                      {{ header.text }}
+                    </span>
+                  </template>
+                </th>
+              </tr>
+            </thead>
 
-          <template  v-if="!isReviewMode" v-slot:[headerSearchTypeSlot]>
-            <v-tooltip
-              top
-              content-class="top-tooltip"
-              transition="fade-transition"
-              nudge-left="73"
-            >
-              <template v-slot:activator="{ on, attrs }">
-                <span v-bind="attrs" v-on="on">
-                  <v-checkbox
-                    id="select-all-checkbox"
-                    class="header-checkbox ma-0 pa-0"
-                    hide-details
-                    :label="headerSlotLabel"
-                    v-model="selectAll"
-                    @click="onSelectAllClick()"
-                  />
-                </span>
-              </template>
-              <div class="pt-2 pb-2">
-                Select this to include all manufactured homes.
-              </div>
-            </v-tooltip>
-          </template>
+            <!-- Table Body -->
+            <tbody v-if="results.length > 0">
+              <tr
+                v-for="item in results"
+                :key="item.id"
+                :class="{
+                  'selected': item.selected && !$props.isReviewMode,
+                  'no-border-bottom': hasMultipleSelections(item.mhrNumber) &&
+                   isFirstSelectionOfMultiples(item.mhrNumber, item.id)
+                 }"
+              >
+                <!-- Name search -->
+                <template v-if="isOwnerOrOrgSearch">
+                  <td>
+                    <v-checkbox
+                      v-model="item.selected"
+                      @click="onSelectionCheckboxClick(item)"
+                      :label="isReviewMode ? getOwnerName(item) + ' ' + getOwnerCount(item) : getOwnerName(item) "
+                      :ripple="false"
+                      hide-details
+                    />
+                  </td>
+                  <template v-if="!isReviewMode">
+                    <td>{{ getOwnerStatusText(item) }}</td>
+                    <td>{{ item.mhrNumber }}</td>
+                    <td>{{ item.status }}</td>
+                    <td>{{ item.baseInformation.year || '-' }}</td>
+                    <td>{{ item.baseInformation.make || '-' }}</td>
+                    <td>{{ item.baseInformation.model || '-' }}</td>
+                    <td>{{ item.homeLocation }}</td>
+                    <td>{{ item.serialNumber }}</td>
+                    <td>
+                      <v-tooltip
+                          top
+                          content-class="top-tooltip"
+                          transition="fade-transition"
+                      >
+                        <template v-slot:activator="{ on, attrs }">
+                      <span  v-bind="attrs" v-on="on">
+                        <v-checkbox
+                            v-model="item.includeLienInfo"
+                            :label="`${!isReviewMode ? 'Include lien' : 'Lien'} information`"
+                            :disabled="isReviewMode ? hasMhrNumberSelected(item.mhrNumber) : !item.selected"
+                            :ripple="false"
+                            hide-details
+                        />
+                      </span>
+                        </template>
+                        <div class="pt-2 pb-2">
+                          Select this to include a Personal Property Registry (PPR) lien search for the manufactured
+                          home for an additional fee.
+                          You must have the manufactured home selected before you can include the home's lien search.
+                        </div>
+                      </v-tooltip>
+                    </td>
+                  </template>
+                  <template v-else>
+                    <template v-if="hasMultipleSelections(item.mhrNumber)">
+                      <template v-if="isFirstSelectionOfMultiples(item.mhrNumber, item.id)">
+                        <td>
+                          <v-tooltip
+                              top
+                              content-class="top-tooltip"
+                              transition="fade-transition"
+                          >
+                            <template v-slot:activator="{ on, attrs }">
+                          <span  v-bind="attrs" v-on="on" class="mhr-number">
+                            <u>{{ item.mhrNumber }}</u>
+                          </span>
+                            </template>
+                            <div class="pt-2 pb-2">
+                              Multiple selections in the same registration are displayed together.
+                            </div>
+                          </v-tooltip>
+                        </td>
+                        <td>
+                          {{ item.baseInformation.year }} {{ item.baseInformation.make }}
+                          {{ item.baseInformation.model }}
+                        </td>
+                        <td>{{ item.homeLocation }}</td>
+                        <td>{{ item.serialNumber }}</td>
+                        <td>
+                          <v-tooltip
+                              top
+                              content-class="top-tooltip"
+                              transition="fade-transition"
+                          >
+                            <template v-slot:activator="{ on, attrs }">
+                              <span  v-bind="attrs" v-on="on">
+                                <v-checkbox
+                                    v-model="item.includeLienInfo"
+                                    :label="`${!isReviewMode ? 'Include lien' : 'Lien'} information`"
+                                    :disabled="isReviewMode ? hasMhrNumberSelected(item.mhrNumber) : !item.selected"
+                                    :ripple="false"
+                                    hide-details
+                                />
+                              </span>
+                            </template>
+                            <div class="pt-2 pb-2">
+                              Select this to include a Personal Property Registry (PPR) lien search for the manufactured
+                              home for an additional fee.
+                              You must have the manufactured home selected before you can include the home's lien
+                              search.
+                            </div>
+                          </v-tooltip>
+                        </td>
+                      </template>
+                      <template v-else>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                      </template>
+                    </template>
 
-          <template  v-else v-slot:[headerSearchTypeSlot]>
-            <span v-if="isOwnerOrOrgSearch" class="pl-8">
-              {{ ownerOrOrgHeader }} Name
-            </span>
-            <span v-else class="pl-8">{{ headerSlotLabel }}</span>
-          </template>
+                    <template v-else-if="!hasMultipleSelections(item.mhrNumber)">
+                      <td class="font-weight-bold">{{ item.mhrNumber }}</td>
+                      <td>
+                        {{ item.baseInformation.year }} {{ item.baseInformation.make }}
+                        {{ item.baseInformation.model }}
+                      </td>
+                      <td>{{ item.homeLocation }}</td>
+                      <td>{{ item.serialNumber }}</td>
+                      <td>
+                        <v-tooltip
+                            top
+                            content-class="top-tooltip"
+                            transition="fade-transition"
+                        >
+                          <template v-slot:activator="{ on, attrs }">
+                              <span  v-bind="attrs" v-on="on">
+                                <v-checkbox
+                                    v-model="item.includeLienInfo"
+                                    :label="`${!isReviewMode ? 'Include lien' : 'Lien'} information`"
+                                    :disabled="isReviewMode ? hasMhrNumberSelected(item.mhrNumber) : !item.selected"
+                                    :ripple="false"
+                                    hide-details
+                                />
+                              </span>
+                          </template>
+                          <div class="pt-2 pb-2">
+                            Select this to include a Personal Property Registry (PPR) lien search for the manufactured
+                            home for an additional fee.
+                            You must have the manufactured home selected before you can include the home's lien search.
+                          </div>
+                        </v-tooltip>
+                      </td>
+                    </template>
+                  </template>
+                </template>
 
-          <template  v-if="!isReviewMode" v-slot:[`header.edit`]>
-            <v-checkbox
-              id="select-all-lien-checkbox"
-              class="header-checkbox ma-0 pa-0"
-              label="Include lien information for all selections"
-              v-model="selectAllLien"
-              :disabled="selectedMatchesLength === 0"
-              @click="onSelectAllLienClick()"
-              hide-details
-            />
-          </template>
+                <!-- Mhr number search -->
+                <template v-if="searchType === UIMHRSearchTypes.MHRMHR_NUMBER">
+                  <td v-if="hasMultipleSelections(item.mhrNumber) && isReviewMode">
+                    <v-tooltip
+                      top
+                      content-class="top-tooltip"
+                      transition="fade-transition"
+                    >
+                      <template v-slot:activator="{ on, attrs }">
+                    <span  v-bind="attrs" v-on="on" class="mhr-number">
+                      <u>{{ item.mhrNumber }}</u>
+                    </span>
+                      </template>
+                      <div class="pt-2 pb-2">
+                        Multiple selections in the same registration are displayed together.
+                      </div>
+                    </v-tooltip>
+                  </td>
+                  <td v-else >
+                    <v-checkbox
+                      v-model="item.selected"
+                      @click="onSelectionCheckboxClick(item)"
+                      :label="item.mhrNumber"
+                      :ripple="false"
+                      hide-details
+                    />
+                  </td>
+                  <template v-if="!isReviewMode">
+                    <td>{{ item.status }}</td>
+                    <td>{{ getOwnerName(item) }}</td>
+                    <td>{{ getOwnerStatusText(item) }}</td>
+                    <td>{{ item.baseInformation.year || '-' }}</td>
+                    <td>{{ item.baseInformation.make || '-' }}</td>
+                    <td>{{ item.baseInformation.model || '-' }}</td>
+                    <td>{{ item.homeLocation }}</td>
+                    <td>{{ item.serialNumber }}</td>
+                    <td>
+                      <v-tooltip
+                          top
+                          content-class="top-tooltip"
+                          transition="fade-transition"
+                      >
+                        <template v-slot:activator="{ on, attrs }">
+                      <span  v-bind="attrs" v-on="on">
+                        <v-checkbox
+                            v-model="item.includeLienInfo"
+                            :label="`${!isReviewMode ? 'Include lien' : 'Lien'} information`"
+                            :disabled="isReviewMode ? hasMhrNumberSelected(item.mhrNumber) : !item.selected"
+                            :ripple="false"
+                            hide-details
+                        />
+                      </span>
+                        </template>
+                        <div class="pt-2 pb-2">
+                          Select this to include a Personal Property Registry (PPR) lien search for the manufactured
+                          home for an additional fee.
+                          You must have the manufactured home selected before you can include the home's lien search.
+                        </div>
+                      </v-tooltip>
+                    </td>
+                  </template>
+                  <template v-else>
+                    <td>{{ getOwnerName(item) }}</td>
+                    <td>
+                      {{ item.baseInformation.year }} {{ item.baseInformation.make }} {{ item.baseInformation.model }}
+                    </td>
+                    <td>{{ item.homeLocation }}</td>
+                    <td>{{ item.serialNumber }}</td>
+                    <td>
+                      <v-tooltip
+                          top
+                          content-class="top-tooltip"
+                          transition="fade-transition"
+                      >
+                        <template v-slot:activator="{ on, attrs }">
+                      <span  v-bind="attrs" v-on="on">
+                        <v-checkbox
+                            v-model="item.includeLienInfo"
+                            :label="`${!isReviewMode ? 'Include lien' : 'Lien'} information`"
+                            :disabled="isReviewMode ? hasMhrNumberSelected(item.mhrNumber) : !item.selected"
+                            :ripple="false"
+                            hide-details
+                        />
+                      </span>
+                        </template>
+                        <div class="pt-2 pb-2">
+                          Select this to include a Personal Property Registry (PPR) lien search for the manufactured
+                          home for an additional fee.
+                          You must have the manufactured home selected before you can include the home's lien search.
+                        </div>
+                      </v-tooltip>
+                    </td>
+                  </template>
+                </template>
 
-          <template v-slot:[`item.ownerName`]="{ item }">
-            <div
-              v-if="isOwnerOrOrgSearch"
-              :class="item.selected && !$props.isReviewMode ? 'selected' : ''"
-            >
-              <v-checkbox
-                v-model="item.selected"
-                @click="onSelectionCheckboxClick(item)"
-                :label="isReviewMode ? getOwnerName(item) + ' ' + getOwnerCount(item) : getOwnerName(item) "
-                :ripple="false"
-                hide-details
-              />
-            </div>
-            <span v-else>{{ getOwnerName(item) }}</span>
+                <!-- Serial number search -->
+                <template v-if="searchType === UIMHRSearchTypes.MHRSERIAL_NUMBER">
+                  <td :class="item.selected && !$props.isReviewMode ? 'selected' : ''">
+                    <v-checkbox
+                      v-model="item.selected"
+                      @click="onSelectionCheckboxClick(item)"
+                      :label="item.activeCount > 1
+                        ? `${item.serialNumber} (${item.activeCount})`
+                        : `${item.serialNumber}`"
+                      :ripple="false"
+                      hide-details
+                    />
+                  </td>
+                  <template v-if="!isReviewMode">
+                    <td>{{ item.mhrNumber }}</td>
+                    <td>{{ item.status }}</td>
+                    <td>{{ getOwnerName(item) }}</td>
+                    <td>{{ getOwnerStatusText(item) }}</td>
+                    <td>{{ item.baseInformation.year || '-' }}</td>
+                    <td>{{ item.baseInformation.make || '-' }}</td>
+                    <td>{{ item.baseInformation.model || '-' }}</td>
+                    <td>{{ item.homeLocation }}</td>
+                    <td>
+                      <v-tooltip
+                          top
+                          content-class="top-tooltip"
+                          transition="fade-transition"
+                      >
+                        <template v-slot:activator="{ on, attrs }">
+                      <span  v-bind="attrs" v-on="on">
+                        <v-checkbox
+                            v-model="item.includeLienInfo"
+                            :label="`${!isReviewMode ? 'Include lien' : 'Lien'} information`"
+                            :disabled="isReviewMode ? hasMhrNumberSelected(item.mhrNumber) : !item.selected"
+                            :ripple="false"
+                            hide-details
+                        />
+                      </span>
+                        </template>
+                        <div class="pt-2 pb-2">
+                          Select this to include a Personal Property Registry (PPR) lien search for the manufactured
+                          home for an additional fee.
+                          You must have the manufactured home selected before you can include the home's lien search.
+                        </div>
+                      </v-tooltip>
+                    </td>
+                  </template>
+                  <template v-else>
+                    <td class="font-weight-bold">{{ item.mhrNumber }}</td>
+                    <td>{{ getOwnerName(item) }}</td>
+                    <td>
+                      {{ item.baseInformation.year }} {{ item.baseInformation.make }}
+                      {{ item.baseInformation.model }}
+                    </td>
+                    <td>{{ item.homeLocation }}</td>
+                    <td>
+                      <v-tooltip
+                          top
+                          content-class="top-tooltip"
+                          transition="fade-transition"
+                      >
+                        <template v-slot:activator="{ on, attrs }">
+                            <span  v-bind="attrs" v-on="on">
+                              <v-checkbox
+                                  v-model="item.includeLienInfo"
+                                  :label="`${!isReviewMode ? 'Include lien' : 'Lien'} information`"
+                                  :disabled="isReviewMode ? hasMhrNumberSelected(item.mhrNumber) : !item.selected"
+                                  :ripple="false"
+                                  hide-details
+                              />
+                            </span>
+                        </template>
+                        <div class="pt-2 pb-2">
+                          Select this to include a Personal Property Registry (PPR) lien search for the manufactured
+                          home for an additional fee.
+                          You must have the manufactured home selected before you can include the home's lien search.
+                        </div>
+                      </v-tooltip>
+                    </td>
+                  </template>
+                </template>
+              </tr>
+            </tbody>
           </template>
-          <template v-slot:[`item.mhrNumber`]="{ item }">
-            <div
-              v-if="searchType === UIMHRSearchTypes.MHRMHR_NUMBER"
-              :class="item.selected && !$props.isReviewMode ? 'selected' : ''"
-            >
-              <v-checkbox
-                v-model="item.selected"
-                @click="onSelectionCheckboxClick(item)"
-                :label="item.mhrNumber"
-                :ripple="false"
-                hide-details
-              />
-            </div>
-            <v-tooltip
-              v-else-if="hasMultipleSelections(item.mhrNumber) && isReviewMode"
-              top
-              content-class="top-tooltip"
-              transition="fade-transition"
-            >
-              <template v-slot:activator="{ on, attrs }">
-                <span  v-bind="attrs" v-on="on" class="mhr-number">
-                  <u>{{ item.mhrNumber }}</u>
-                </span>
-              </template>
-              <div class="pt-2 pb-2">
-                Multiple selections in the same registration are displayed together.
-              </div>
-            </v-tooltip>
-            <span v-else-if="isReviewMode"><b>{{ item.mhrNumber }}</b></span>
-            <span v-else>{{ item.mhrNumber }}</span>
-          </template>
-          <template v-slot:[`item.ownerStatus`]="{ item }">
-            {{ getOwnerStatusText(item) }}
-          </template>
-          <template v-if="isReviewMode" v-slot:[`item.yearMakeModel`]="{ item }">
-            <span>
-              {{ item.baseInformation.year }} {{ item.baseInformation.make }} {{ item.baseInformation.model }}
-            </span>
-          </template>
-          <template v-else v-slot:[`item.year`]="{ item }">
-            {{ item.baseInformation.year || '-' }}
-          </template>
-          <template v-slot:[`item.make`]="{ item }">
-            {{ item.baseInformation.make || '-' }}
-          </template>
-          <template v-slot:[`item.model`]="{ item }">
-            {{ item.baseInformation.model || '-' }}
-          </template>
-          <template v-slot:[`item.homeLocation`]="{ item }">
-            <span>{{ item.homeLocation }}</span>
-          </template>
-          <template v-slot:[`item.serialNumber`]="{ item }">
-            <div
-              v-if="searchType === UIMHRSearchTypes.MHRSERIAL_NUMBER"
-              :class="item.selected && !$props.isReviewMode ? 'selected' : ''"
-            >
-              <v-checkbox
-                v-model="item.selected"
-                @click="onSelectionCheckboxClick(item)"
-                :label="item.activeCount > 1 ? `${item.serialNumber} (${item.activeCount})` : `${item.serialNumber}`"
-                :ripple="false"
-                hide-details
-              />
-            </div>
-            <div v-else>{{ item.serialNumber }}</div>
-          </template>
-          <template v-slot:[`item.edit`]="{ item }">
-            <v-tooltip
-              top
-              content-class="top-tooltip"
-              transition="fade-transition"
-            >
-              <template v-slot:activator="{ on, attrs }">
-                <span  v-bind="attrs" v-on="on">
-                  <v-checkbox
-                    v-model="item.includeLienInfo"
-                    :label="`${!isReviewMode ? 'Include lien' : 'Lien'} information`"
-                    :disabled="isReviewMode ? hasMhrNumberSelected(item.mhrNumber) : !item.selected"
-                    :ripple="false"
-                    hide-details
-                  />
-                </span>
-              </template>
-              <div class="pt-2 pb-2">
-                Select this to include a Personal Property Registry (PPR) lien search for the manufactured home
-                for an additional fee.
-                You must have the manufactured home selected before you can include the home's lien search.
-              </div>
-            </v-tooltip>
-          </template>
-        </v-data-table>
+        </v-simple-table>
       </v-col>
     </v-row>
     <v-row v-else id="search-no-results-info" class="no-results-info pb-10" justify="center">
@@ -292,7 +517,7 @@ export default defineComponent({
       folioNumber: getFolioOrReferenceNumber.value,
       tooltipTxtSrchMtchs: 'One or more of the selected matches appear in ' +
         'the same registration. That registration will only be shown once in the report.',
-      results: [],
+      results: [] as ManufacturedHomeSearchResultIF[],
       groupedResults: [] as Object as { string: ManufacturedHomeSearchResultIF[] }, // results grouped by Mhr Number
       uniqueResults: [] as ManufacturedHomeSearchResultIF[],
       uniqueResultsSelected: computed((): ManufacturedHomeSearchResultIF[] =>
@@ -395,6 +620,12 @@ export default defineComponent({
     // check if MHR number belongs to multiple results
     const hasMultipleSelections = (mhrNumber: string): boolean => {
       return filter(localState.results, { mhrNumber: mhrNumber }).length > 1
+    }
+
+    // check if MHR number selection is first of
+    const isFirstSelectionOfMultiples = (mhrNumber: string, id: number): boolean => {
+      const multipleSelections = filter(localState.results, { mhrNumber: mhrNumber })
+      return multipleSelections.findIndex(item => item.id === id) === 0
     }
 
     // check if MHR number belongs to multiple selected results
@@ -559,6 +790,7 @@ export default defineComponent({
       UIMHRSearchTypes,
       reviewAndConfirm,
       hasMultipleSelections,
+      isFirstSelectionOfMultiples,
       hasMhrNumberSelected,
       getOwnerName,
       getOwnerStatus,
@@ -627,6 +859,9 @@ th {
 .result-info {
   color: $gray7 !important;
   font-size: 1rem;
+}
+.no-border-bottom td {
+  border-bottom: none !important;
 }
 ::v-deep {
   .header-checkbox .v-input__control .v-input__slot .v-label {
