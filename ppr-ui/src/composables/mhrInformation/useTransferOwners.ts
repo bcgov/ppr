@@ -16,7 +16,6 @@ import {
 import { computed, reactive, toRefs } from 'vue-demi'
 import { isEqual, find, uniq } from 'lodash'
 import { normalizeObject } from '@/utils'
-import { useHomeOwners } from '@/composables'
 import {
   transferOwnerPrefillAdditionalName,
   transferOwnerPartyTypes,
@@ -44,10 +43,6 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     getMhrTransferCurrentHomeOwnerGroups,
     getMhrTransferAffidavitCompleted
   } = storeToRefs(useStore())
-  const {
-    getGroupById,
-    getCurrentGroupById
-  } = useHomeOwners(true)
 
   /** Local State for custom computed properties. **/
   const localState = reactive({
@@ -564,17 +559,17 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
   }
 
   /** Return true when all CURRENT owners of a group have been removed and some owners added in a SO/JT structure. **/
-  const groupHasRemovedAllCurrentOwners = (groupId: number) => {
-    const owners = getGroupById(groupId).owners
+  const groupHasRemovedAllCurrentOwners = (group: MhrRegistrationHomeOwnerGroupIF) => {
+    const owners = group.owners
 
     return localState.isSOorJT && owners.some(owner => owner.action === ActionTypes.ADDED) &&
       owners.every(owner => !!owner.action)
   }
 
   /** Remove current owners from existing ownership and move them to New Previous Owners group.  **/
-  const moveCurrentOwnersToPreviousOwners = async (groupId: number) => {
+  const moveCurrentOwnersToPreviousOwners = async (group: MhrRegistrationHomeOwnerGroupIF) => {
     // Retrieve and mark for removal all current owners
-    const currentOwners = getGroupById(groupId)?.owners.filter(owner => owner.action !== ActionTypes.ADDED)
+    const currentOwners = group?.owners.filter(owner => owner.action !== ActionTypes.ADDED)
       .map(owner => { return { ...owner, action: ActionTypes.REMOVED } })
 
     // Get current ownership structure and modify group ids and remove current owners
@@ -640,13 +635,13 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
   }
 
   /** Return true if the specified group has been modified from current state **/
-  const hasCurrentGroupChanges = (groupId: number, fractionalData: MhrRegistrationFractionalOwnershipIF): boolean => {
-    const currentGroup = getCurrentGroupById(groupId)
-    const isEqualNumerator = isEqual(currentGroup?.interestNumerator, fractionalData.interestNumerator)
-    const isEqualDenominator = isEqual(currentGroup?.interestDenominator, fractionalData.interestDenominator)
+  const hasCurrentGroupChanges =
+    (group: MhrRegistrationHomeOwnerGroupIF, fractionalData: MhrRegistrationFractionalOwnershipIF): boolean => {
+      const isEqualNumerator = isEqual(group?.interestNumerator, fractionalData.interestNumerator)
+      const isEqualDenominator = isEqual(group?.interestDenominator, fractionalData.interestDenominator)
 
-    return currentGroup && (!isEqualNumerator || !isEqualDenominator)
-  }
+      return group && (!isEqualNumerator || !isEqualDenominator)
+    }
 
   /** Return true if a member of a specified partyType has been added to the group **/
   const hasAddedPartyTypeToGroup = (groupId: number, partyType: HomeOwnerPartyTypes): boolean => {

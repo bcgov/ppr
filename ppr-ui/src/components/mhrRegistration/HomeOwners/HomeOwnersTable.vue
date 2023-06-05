@@ -587,8 +587,8 @@ export default defineComponent({
       )
 
       // When base ownership is SO/JT and all current owners have been removed: Move them to a previous owners group.
-      if (groupHasRemovedAllCurrentOwners(item.groupId) && showGroups.value) {
-        moveCurrentOwnersToPreviousOwners(item.groupId)
+      if (groupHasRemovedAllCurrentOwners(getGroupById(item.groupId)) && showGroups.value) {
+        moveCurrentOwnersToPreviousOwners(getGroupById(item.groupId))
       }
     }
 

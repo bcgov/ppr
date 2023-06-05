@@ -250,7 +250,8 @@ export default defineComponent({
       hasUndefinedGroupInterest,
       getTransferOrRegistrationHomeOwnerGroups,
       getHomeTenancyType,
-      getGroupTenancyType
+      getGroupTenancyType,
+      getCurrentGroupById
     } = useHomeOwners(props.isMhrTransfer)
     const {
       isSOorJT,
@@ -309,7 +310,7 @@ export default defineComponent({
         setGroupFractionalInterest(
           props.groupId,
           localState.fractionalData,
-          hasCurrentGroupChanges(props.groupId, localState.fractionalData)
+          hasCurrentGroupChanges(getCurrentGroupById(props.groupId), localState.fractionalData)
         )
       }
     }
