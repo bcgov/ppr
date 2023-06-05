@@ -55,7 +55,7 @@
       <template v-slot:item="row" v-if="homeOwners.length">
 
         <!-- Transfer scenario: Display error for groups that 'removed' all owners but they still exist in the table -->
-        <tr v-if="isGroupWithNoOwners(row.item, row.index) || isTransferGroupValid(row.item.groupId, row.index)">
+        <tr v-if="isGroupWithNoOwners(row.item, row.index) || isTransferGroupInvalid(row.item.groupId, row.index)">
           <td :colspan="4"
             class="py-1"
             :class="{ 'border-error-left': isInvalidOwnerGroup(row.item.groupId)}"
@@ -538,7 +538,10 @@ export default defineComponent({
       !localState.showTableError && !props.isReadonlyTable
 
     const isInvalidTransferOwnerGroup = (groupId: number, hasExecOrAdminInGroup: boolean) => {
-      if (props.validateTransfer && (!hasUnsavedChanges.value || hasMinOneExecOrAdminInGroup(groupId))) return false
+      if (props.validateTransfer &&
+        (!hasUnsavedChanges.value || hasMinOneExecOrAdminInGroup(groupId)) &&
+        TransToExec.hasAllCurrentOwnersRemoved(groupId)
+      ) return false
 
       const hasRemovedOwners = TransToExec.hasSomeOwnersRemoved(groupId)
       // groups that are not edited are valid
@@ -670,7 +673,7 @@ export default defineComponent({
     }
 
     // validate group for different Transfers types
-    const isTransferGroupValid = (groupId: number, index) => {
+    const isTransferGroupInvalid = (groupId: number, index) => {
       if (index !== 0 || !hasUnsavedChanges.value) return false
       if (isTransferToExecutorProbateWill.value ||
           isTransferToExecutorUnder25Will.value ||
@@ -683,8 +686,7 @@ export default defineComponent({
           (TransToExec.hasSomeOwnersRemoved(groupId) || hasAddedRoleInGroup) &&
           !(hasAddedRoleInGroup &&
           TransToExec.hasAllCurrentOwnersRemoved(groupId) &&
-          !TransToExec.isAllGroupOwnersWithDeathCerts(groupId)) &&
-          !hasMinOneExecOrAdminInGroup(groupId)
+          !TransToExec.isAllGroupOwnersWithDeathCerts(groupId))
         )
       }
 
@@ -821,7 +823,7 @@ export default defineComponent({
       TransToExec,
       TransToAdmin,
       getMhrInfoValidation,
-      isTransferGroupValid,
+      isTransferGroupInvalid,
       getHomeOwnerIcon,
       isPartyTypeNotEAT,
       ...toRefs(localState)
