@@ -39,61 +39,58 @@
                   <td>{{ item.code }}</td>
                   <td class="actions-cell actions-width px-0">
                     <div class="actions float-right actions-up pr-4">
-
                       <v-btn
-                          text
-                          color="primary"
-                          class="smaller-button edit-btn pr-0"
-                          v-if="!item.action"
-                          @click="changeRegisteringParty()"
+                        text
+                        color="primary"
+                        class="smaller-button edit-btn pr-0"
+                        v-if="!item.action"
+                        @click="changeRegisteringParty()"
                       >
                         <v-icon small>mdi-pencil</v-icon>
                         <span class="ml-1 mr-2">Change</span>
                       </v-btn>
                       <v-btn
-                          text
-                          color="primary"
-                          class="smaller-button edit-btn pr-0"
-                          :disabled="addEditInProgress"
-                          v-else
-                          @click="undo()"
+                        text
+                        color="primary"
+                        class="smaller-button edit-btn pr-0"
+                        :disabled="addEditInProgress"
+                        v-else
+                        @click="undo()"
                       >
                         <v-icon small>mdi-undo</v-icon>
                         <span class="ml-1 mr-2">Undo</span>
                       </v-btn>
-                      <span class="actions-border actions__more"
-                            v-if="item.action && !item.code"
-                      >
-                    <v-menu offset-y left nudge-bottom="4">
-                      <template v-slot:activator="{ on }">
-                        <v-btn
-                            text
-                            small
-                            v-on="on"
-                            color="primary"
-                            :disabled="addEditInProgress"
-                            class="smaller-actions actions__more-actions__btn"
-                        >
-                          <v-icon>mdi-menu-down</v-icon>
-                        </v-btn>
-                      </template>
-                      <v-list class="actions__more-actions">
-                        <v-list-item @click="editRegisteringParty()">
-                          <v-list-item-subtitle>
-                            <v-icon small>mdi-pencil</v-icon>
-                            <span class="ml-1">Edit</span>
-                          </v-list-item-subtitle>
-                        </v-list-item>
-                      </v-list>
-                    </v-menu>
-                  </span>
+                      <span v-if="item.action && !item.code" class="actions-border actions__more">
+                        <v-menu offset-y left nudge-bottom="4">
+                          <template v-slot:activator="{ on }">
+                            <v-btn
+                              text
+                              small
+                              v-on="on"
+                              color="primary"
+                              :disabled="addEditInProgress"
+                              class="smaller-actions actions__more-actions__btn"
+                            >
+                              <v-icon>mdi-menu-down</v-icon>
+                            </v-btn>
+                          </template>
+                          <v-list class="actions__more-actions">
+                            <v-list-item @click="editRegisteringParty()">
+                              <v-list-item-subtitle>
+                                <v-icon small>mdi-pencil</v-icon>
+                                <span class="ml-1">Edit</span>
+                              </v-list-item-subtitle>
+                            </v-list-item>
+                          </v-list>
+                        </v-menu>
+                      </span>
                     </div>
                   </td>
                 </tr>
                 <tr v-if="showEditParty">
                   <td
-                      colspan="5"
-                      class="pa-0"
+                    colspan="5"
+                    class="pa-0"
                   >
                     <v-expand-transition>
                       <div class="edit-Party-container pa-0 col-12">
@@ -112,10 +109,10 @@
                     again later. If this issue persists, please contact us.
                     <br /><br />
                     <v-btn
-                        id="retry-registering-party"
-                        outlined
-                        color="primary"
-                        @click="getRegisteringParty()"
+                      id="retry-registering-party"
+                      outlined
+                      color="primary"
+                      @click="getRegisteringParty()"
                     >
                       Retry <v-icon>mdi-refresh</v-icon>
                     </v-btn>

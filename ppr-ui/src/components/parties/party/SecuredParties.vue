@@ -132,7 +132,7 @@
               >
                 <!-- Edit Form -->
                 <template v-if="showEditParty[index]">
-                  <tr v-if="showEditParty[index]">
+                  <tr>
                     <td
                       colspan="5"
                       class="pa-0"
@@ -265,12 +265,12 @@
                         <v-menu offset-y left nudge-bottom="4">
                           <template v-slot:activator="{ on }">
                             <v-btn
-                                text
-                                small
-                                v-on="on"
-                                color="primary"
-                                class="smaller-actions actions__more-actions__btn"
-                                :disabled="addEditInProgress"
+                              text
+                              small
+                              v-on="on"
+                              color="primary"
+                              class="smaller-actions actions__more-actions__btn"
+                              :disabled="addEditInProgress"
                             >
                               <v-icon>mdi-menu-down</v-icon>
                             </v-btn>
@@ -299,12 +299,12 @@
                         && item.action === ActionTypes.EDITED ? '' : 'mr-10'"
                       >
                         <v-btn
-                            text
-                            color="primary"
-                            class="smaller-button edit-btn"
-                            :id="'class-' + index + '-undo-btn'"
-                            @click="undo(index)"
-                            :disabled="addEditInProgress"
+                          text
+                          color="primary"
+                          class="smaller-button edit-btn"
+                          :id="'class-' + index + '-undo-btn'"
+                          @click="undo(index)"
+                          :disabled="addEditInProgress"
                         >
                           <v-icon small>mdi-undo</v-icon>
                           <span>Undo</span>
