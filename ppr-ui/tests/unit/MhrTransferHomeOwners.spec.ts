@@ -24,7 +24,8 @@ import {
   mockedPerson2,
   mockedAddedExecutor,
   mockedAddedAdministrator,
-  mockedAdministrator
+  mockedAdministrator,
+  mockedRemovedAdministrator
 } from './test-data'
 import { getTestId } from './utils'
 import { MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF, TransferTypeSelectIF } from '@/interfaces'
@@ -1091,5 +1092,43 @@ describe('Home Owners', () => {
     expect(addedAdministrator.exists()).toBeTruthy()
     // check that additional name (suffix) of the deleted Administrator is displayed for the new Administrator
     expect(addedAdministrator.text()).toContain(mockedAdministrator.description)
+  })
+
+  it('TRANS TO EXEC and ADMIN: validate removing Execs and adding Admins', async () => {
+    // reset transfer type
+    await selectTransferType(null)
+
+    await selectTransferType(ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL)
+
+    await store.setMhrTransferHomeOwnerGroups([
+      {
+        groupId: 1,
+        owners: [mockedExecutor, mockedExecutor, mockedAddedExecutor],
+        type: ''
+      }
+    ])
+    let homeOwners = wrapper.findComponent(HomeOwners)
+    expect(homeOwners.findAll('.owner-info').length).toBe(3)
+    // For Will Transfers, adding new Executor should show not show any errors
+    expect(homeOwners.find(getTestId('invalid-group-msg')).exists()).toBeFalsy()
+    expect(homeOwners.findAll('.border-error-left').length).toBe(0)
+
+    await store.setMhrTransferHomeOwnerGroups([
+      {
+        groupId: 1,
+        owners: [mockedRemovedAdministrator, mockedRemovedAdministrator],
+        type: ''
+      }
+    ])
+
+    homeOwners = wrapper.findComponent(HomeOwners)
+    expect(homeOwners.findAll('.owner-info').length).toBe(2)
+    // For Will Transfers, removing all owners should show error that Executors must be added
+    expect(homeOwners.find(getTestId('invalid-group-msg')).text()).toBe(transfersErrors.mustContainOneExecutor)
+    expect(homeOwners.findAll('.border-error-left').length).toBe(0)
+
+    // For Admin Transfers, removing all owners show error that Admins must be added
+    await selectTransferType(ApiTransferTypes.TO_ADMIN_NO_WILL)
+    expect(homeOwners.find(getTestId('invalid-group-msg')).text()).toBe(transfersErrors.mustContainOneAdmin)
   })
 })

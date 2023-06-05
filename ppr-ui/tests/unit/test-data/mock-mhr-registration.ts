@@ -76,6 +76,21 @@ export const mockedAddedExecutor: MhrRegistrationHomeOwnerIF = {
   address: mockedAddress
 }
 
+export const mockedRemovedExecutor: MhrRegistrationHomeOwnerIF = {
+  ownerId: 27,
+  individualName: {
+    first: 'Roy',
+    middle: 'B',
+    last: 'Harper'
+  },
+  description: 'Sr.',
+  phoneNumber: '(676) 888-4455',
+  phoneExtension: '4321',
+  partyType: HomeOwnerPartyTypes.EXECUTOR,
+  action: ActionTypes.REMOVED,
+  address: mockedAddress
+}
+
 export const mockedAdministrator: MhrRegistrationHomeOwnerIF = {
   ownerId: 35,
   individualName: {
@@ -102,6 +117,21 @@ export const mockedAddedAdministrator: MhrRegistrationHomeOwnerIF = {
   phoneExtension: '1234',
   partyType: HomeOwnerPartyTypes.ADMINISTRATOR,
   action: ActionTypes.ADDED,
+  address: mockedAddress
+}
+
+export const mockedRemovedAdministrator: MhrRegistrationHomeOwnerIF = {
+  ownerId: 37,
+  individualName: {
+    first: 'John',
+    middle: 'A',
+    last: 'Smith'
+  },
+  description: 'Sr.',
+  phoneNumber: '(545) 333-2211',
+  phoneExtension: '1234',
+  partyType: HomeOwnerPartyTypes.ADMINISTRATOR,
+  action: ActionTypes.REMOVED,
   address: mockedAddress
 }
 

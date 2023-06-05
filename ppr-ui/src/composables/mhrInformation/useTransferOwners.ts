@@ -16,7 +16,6 @@ import {
 import { computed, reactive, toRefs } from 'vue-demi'
 import { isEqual, find, uniq } from 'lodash'
 import { normalizeObject } from '@/utils'
-import { useHomeOwners } from '@/composables'
 import {
   transferOwnerPrefillAdditionalName,
   transferOwnerPartyTypes,
@@ -44,10 +43,6 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     getMhrTransferCurrentHomeOwnerGroups,
     getMhrTransferAffidavitCompleted
   } = storeToRefs(useStore())
-  const {
-    getGroupById,
-    getCurrentGroupById
-  } = useHomeOwners(!!getMhrTransferType.value)
 
   /** Local State for custom computed properties. **/
   const localState = reactive({
@@ -340,7 +335,17 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       const groupWithDeletedOwners: MhrRegistrationHomeOwnerGroupIF = getMhrTransferHomeOwnerGroups.value?.find(group =>
         group.owners.some(owner => owner.action === ActionTypes.REMOVED))
 
-      if (!groupWithDeletedOwners) return false
+      if (!groupWithDeletedOwners) {
+        const groupWithAddedOwner = getMhrTransferHomeOwnerGroups.value?.find(group =>
+          group.owners.some(owner => owner.action === ActionTypes.ADDED))
+
+        // if there are no groups with deleted owners, check if all owners are of the same type
+        // if owners are same type, then group is valid
+        const hasSameOwnerTypesInGroup = groupWithAddedOwner?.owners.every(owner =>
+          owner.partyType === transferOwnerPartyTypes[getMhrTransferType.value?.transferType])
+
+        return !!hasSameOwnerTypesInGroup
+      }
 
       const isValidGroup = TransToExec.isValidGroup(groupWithDeletedOwners)
       const hasOwnersWithoutDeathCert = !TransToExec.isAllGroupOwnersWithDeathCerts(groupWithDeletedOwners.groupId)
@@ -353,7 +358,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       })
       // Group has at least one Executor
       const hasAddedExecutor = group.owners.some((owner: MhrRegistrationHomeOwnerIF) =>
-        owner.action === ActionTypes.ADDED && owner.partyType === HomeOwnerPartyTypes.EXECUTOR)
+        owner.action !== ActionTypes.REMOVED && owner.partyType === HomeOwnerPartyTypes.EXECUTOR)
       return isValidAddedOwner && hasAddedExecutor
     },
     hasOwnersWithValidSupportDocs: (groupId: number): boolean => {
@@ -365,7 +370,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     },
     // check if supportingDocument is either Death Certificate or Grant of Probate
     hasValidSupportDocs: (owner: MhrRegistrationHomeOwnerIF): boolean => {
-      if (owner.action === ActionTypes.ADDED) return true
+      if (!owner.action || owner.action === ActionTypes.ADDED) return true
 
       // if deleted Exec, Admin or Trustee, then docs are not required and are valid
       if (owner.action === ActionTypes.REMOVED &&
@@ -391,8 +396,15 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     },
     hasAddedExecutorsInGroup: (groupId): boolean => hasAddedPartyTypeToGroup(groupId, HomeOwnerPartyTypes.EXECUTOR),
     hasAllCurrentOwnersRemoved: (groupId): boolean => {
-      return getMhrTransferHomeOwnerGroups.value
+      const regOwners = getMhrTransferHomeOwnerGroups.value
         .find(group => group.groupId === groupId).owners
+        // Filter as Execs, Admins and Trustees doest not have to be removed in order to have a valid group
+        .filter(owner => [HomeOwnerPartyTypes.OWNER_IND, HomeOwnerPartyTypes.OWNER_BUS]
+          .includes(owner.partyType))
+
+      if (regOwners?.length === 0) return true
+
+      return regOwners
         .every(owner => isCurrentOwner(owner)
           ? owner.action === ActionTypes.REMOVED
           : owner.action === ActionTypes.ADDED)
@@ -405,9 +417,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     hasAtLeastOneExecInGroup: (groupId): boolean => {
       return getMhrTransferHomeOwnerGroups.value
         .find(group => group.groupId === groupId).owners
-        .some(owner => isCurrentOwner(owner) &&
-          owner.action !== ActionTypes.REMOVED &&
-          owner.action !== ActionTypes.ADDED &&
+        .some(owner => owner.action !== ActionTypes.REMOVED &&
           owner.partyType === HomeOwnerPartyTypes.EXECUTOR)
     },
     hasOwnerWithDeathCertificate: (): boolean => {
@@ -525,17 +535,15 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     hasAtLeastOneAdminInGroup: (groupId): boolean => {
       return getMhrTransferHomeOwnerGroups.value
         .find(group => group.groupId === groupId).owners
-        .some(owner => isCurrentOwner(owner) &&
-            owner.action !== ActionTypes.REMOVED &&
-            owner.action !== ActionTypes.ADDED &&
-            owner.partyType === HomeOwnerPartyTypes.ADMINISTRATOR)
+        .some(owner => owner.action !== ActionTypes.REMOVED &&
+          owner.partyType === HomeOwnerPartyTypes.ADMINISTRATOR)
     }
   }
 
   // For WIll and LETA Transfers, at least one Exec or Admin is required to proceed
   // Used for hiding group message (that all owners must be removed)
   const hasMinOneExecOrAdminInGroup = (groupId) => {
-    if (isTransferToExecutorProbateWill.value) {
+    if (isTransferToExecutorProbateWill.value || isTransferToExecutorUnder25Will.value) {
       return TransToExec.hasAtLeastOneExecInGroup(groupId)
     } else if (isTransferToAdminNoWill.value) {
       return TransToAdmin.hasAtLeastOneAdminInGroup(groupId)
@@ -551,17 +559,17 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
   }
 
   /** Return true when all CURRENT owners of a group have been removed and some owners added in a SO/JT structure. **/
-  const groupHasRemovedAllCurrentOwners = (groupId: number) => {
-    const owners = getGroupById(groupId).owners
+  const groupHasRemovedAllCurrentOwners = (group: MhrRegistrationHomeOwnerGroupIF) => {
+    const owners = group.owners
 
     return localState.isSOorJT && owners.some(owner => owner.action === ActionTypes.ADDED) &&
       owners.every(owner => !!owner.action)
   }
 
   /** Remove current owners from existing ownership and move them to New Previous Owners group.  **/
-  const moveCurrentOwnersToPreviousOwners = async (groupId: number) => {
+  const moveCurrentOwnersToPreviousOwners = async (group: MhrRegistrationHomeOwnerGroupIF) => {
     // Retrieve and mark for removal all current owners
-    const currentOwners = getGroupById(groupId)?.owners.filter(owner => owner.action !== ActionTypes.ADDED)
+    const currentOwners = group?.owners.filter(owner => owner.action !== ActionTypes.ADDED)
       .map(owner => { return { ...owner, action: ActionTypes.REMOVED } })
 
     // Get current ownership structure and modify group ids and remove current owners
@@ -627,20 +635,29 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
   }
 
   /** Return true if the specified group has been modified from current state **/
-  const hasCurrentGroupChanges = (groupId: number, fractionalData: MhrRegistrationFractionalOwnershipIF): boolean => {
-    const currentGroup = getCurrentGroupById(groupId)
-    const isEqualNumerator = isEqual(currentGroup?.interestNumerator, fractionalData.interestNumerator)
-    const isEqualDenominator = isEqual(currentGroup?.interestDenominator, fractionalData.interestDenominator)
+  const hasCurrentGroupChanges =
+    (group: MhrRegistrationHomeOwnerGroupIF, fractionalData: MhrRegistrationFractionalOwnershipIF): boolean => {
+      const isEqualNumerator = isEqual(group?.interestNumerator, fractionalData.interestNumerator)
+      const isEqualDenominator = isEqual(group?.interestDenominator, fractionalData.interestDenominator)
 
-    return currentGroup && (!isEqualNumerator || !isEqualDenominator)
-  }
+      return group && (!isEqualNumerator || !isEqualDenominator)
+    }
 
   /** Return true if a member of a specified partyType has been added to the group **/
   const hasAddedPartyTypeToGroup = (groupId: number, partyType: HomeOwnerPartyTypes): boolean => {
+    const isEAT = [
+      HomeOwnerPartyTypes.EXECUTOR,
+      HomeOwnerPartyTypes.ADMINISTRATOR,
+      HomeOwnerPartyTypes.TRUSTEE
+    ].includes(partyType)
+
     return getMhrTransferHomeOwnerGroups.value
-      .find(group => group.groupId === groupId).owners
-      .some(owner => owner.partyType === partyType &&
-        owner.action === ActionTypes.ADDED)
+      .find(group => group.groupId === groupId)
+      .owners.some(owner =>
+        owner.partyType === partyType && isEAT
+          ? owner.action !== ActionTypes.REMOVED
+          : owner.action === ActionTypes.ADDED
+      )
   }
 
   return {
