@@ -97,7 +97,7 @@ describe('Secured Party list tests', () => {
   it('renders secured party table and headers', async () => {
     expect(wrapper.find('.party-summary-table').exists()).toBeTruthy()
     // column header class is text-start
-    expect(wrapper.findAll('.party-summary-table .text-start').length).toBe(4)
+    expect(wrapper.findAll('.party-summary-table th').length).toBe(4)
   })
 
   it('displays the correct rows when data is present', () => {
@@ -134,11 +134,11 @@ describe('Debtor list tests', () => {
   it('renders debtor table and headers', async () => {
     expect(wrapper.find('.party-summary-table').exists()).toBeTruthy()
     // column header class is text-start
-    expect(wrapper.findAll('.party-summary-table .text-start').length).toBe(4)
+    expect(wrapper.findAll('.party-summary-table th').length).toBe(4)
   })
 
   it('displays the correct rows when data is present', () => {
-    const rowCount = wrapper.vm.$el.querySelectorAll('.v-data-table .party-row').length
+    const rowCount = wrapper.vm.$el.querySelectorAll('.party-row').length
 
     expect(rowCount).toEqual(1)
   })
@@ -173,7 +173,7 @@ describe('Secured Party amendment list tests', () => {
   it('renders secured party table and headers', async () => {
     expect(wrapper.find('.party-summary-table').exists()).toBeTruthy()
     // column header class is text-start
-    expect(wrapper.findAll('.party-summary-table .text-start').length).toBe(4)
+    expect(wrapper.findAll('.party-summary-table th').length).toBe(4)
   })
 
   it('displays the correct rows when data is present', () => {

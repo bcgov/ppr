@@ -107,7 +107,7 @@ describe('Vehicle collateral edit tests', () => {
     expect(wrapper.findComponent(VehicleCollateral).exists()).toBe(true)
     expect(wrapper.findComponent(EditCollateral).exists()).toBe(false)
     expect(wrapper.find('.collateral-table').exists()).toBe(true)
-    expect(wrapper.findAll('.text-start').length).toBe(6)
+    expect(wrapper.findAll('th').length).toBe(6)
   })
 
   it('displays the correct vehicle rows when data is present', () => {

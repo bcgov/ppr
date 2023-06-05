@@ -81,7 +81,7 @@ describe('Debtor store tests', () => {
   it('renders debtor table and headers', async () => {
     expect(wrapper.find('.debtor-table').exists()).toBeTruthy()
     // column header class is text-start
-    expect(wrapper.findAll('.text-start').length).toBe(5)
+    expect(wrapper.findAll('th').length).toBe(5)
   })
 
   it('displays the correct rows when data is present', () => {

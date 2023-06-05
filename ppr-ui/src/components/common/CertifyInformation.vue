@@ -10,45 +10,50 @@
     </v-row>
     <v-row no-gutters class="mb-5 party-summary">
       <v-col>
-        <v-data-table
-          class="party-summary-table party-data-table"
-          :headers="authorizedHeaders"
-          :items="registeringParty"
-          disable-pagination
-          disable-sort
-          hide-default-footer
-          no-data-text=""
-        >
-          <template v-slot:item="row">
-            <tr :key="row.item.id" class="party-row">
-              <td class="list-item__title title-text" style="padding-left:30px">
-                <v-row no-gutters>
-                  <v-col cols="3">
-                    <div class="icon-div mt-n1 pr-4">
-                      <v-icon>mdi-account</v-icon>
-                    </div>
-                  </v-col>
-                  <v-col cols="9">
-                    <div>
-                      {{ legalName }}
-                    </div>
-                  </v-col>
-                </v-row>
-              </td>
-              <td class="pl-1">{{ row.item.businessName }}</td>
-              <td>
-                <base-address
-                  :editing="false"
-                  :schema="DefaultSchema"
-                  :value="row.item.address"
-                />
-              </td>
-              <td>{{ row.item.emailAddress }}</td>
-            </tr>
+        <v-simple-table class="party-summary-table party-data-table">
+          <template v-slot:default>
+            <!-- Table Headers -->
+            <thead>
+              <tr>
+                <th v-for="header in authorizedTableHeaders" :key="header.value" :class="header.class">
+                  {{ header.text }}
+                </th>
+              </tr>
+            </thead>
+
+            <!-- Table Body -->
+            <tbody v-if="registeringParty.length > 0">
+              <tr v-for="(item, index) in registeringParty" :key="`${item}: ${index}`" class="party-row">
+                <td class="list-item__title title-text" style="padding-left:30px">
+                  <v-row no-gutters>
+                    <v-col cols="3">
+                      <div class="icon-div mt-n1 pr-4">
+                        <v-icon>mdi-account</v-icon>
+                      </div>
+                    </v-col>
+                    <v-col cols="9">
+                      <div>
+                        {{ legalName }}
+                      </div>
+                    </v-col>
+                  </v-row>
+                </td>
+                <td class="pl-1">{{ item.businessName }}</td>
+                <td>
+                  <base-address
+                      :editing="false"
+                      :schema="DefaultSchema"
+                      :value="item.address"
+                  />
+                </td>
+                <td>{{ item.emailAddress }}</td>
+              </tr>
+            </tbody>
           </template>
-        </v-data-table>
+        </v-simple-table>
       </v-col>
     </v-row>
+
     <v-row class="no-gutters">
       <v-col cols="12" class="pa-0" :class="showErrorComponent ? 'border-error-left': ''">
         <v-card flat id="certify-information">
@@ -99,15 +104,16 @@ import {
   onMounted
 } from 'vue-demi'
 import { useStore } from '@/store/store'
-// local
 import { convertDate, getRegisteringPartyFromAuth } from '@/utils'
 import { BaseAddress } from '@/composables/address'
 import { DefaultSchema } from '@/composables/address/resources'
-import { BaseHeaderIF, CertifyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { CertifyIF, PartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { storeToRefs } from 'pinia'
+import { authorizedTableHeaders } from '@/resources'
 
 export default defineComponent({
+  name: 'CertifyInformation',
   components: {
     BaseAddress
   },
@@ -138,33 +144,6 @@ export default defineComponent({
       getUserEmail
     } = storeToRefs(useStore())
 
-    const authorizedTableHeaders: Array<BaseHeaderIF> = [
-      {
-        class: 'column-md extra-indent py-4',
-        sortable: false,
-        text: 'Name',
-        value: 'name'
-      },
-      {
-        class: 'column-md pl-1 py-4',
-        sortable: false,
-        text: 'Account Name',
-        value: 'legalName'
-      },
-      {
-        class: 'column-md py-4',
-        sortable: false,
-        text: 'Address',
-        value: 'address'
-      },
-      {
-        class: 'column-mds py-4',
-        sortable: false,
-        text: 'Email Address',
-        value: 'emailAddress'
-      }
-    ]
-
     const localState = reactive({
       legalName: '',
       certified: false,
@@ -177,12 +156,8 @@ export default defineComponent({
       showErrorComponent: computed((): boolean => {
         return (localState.showErrors && !localState.valid)
       }),
-      authorizedHeaders: computed(function () {
-        const headersToShow = [...authorizedTableHeaders]
-        return headersToShow
-      }),
       certifyInformation: null,
-      registeringParty: [],
+      registeringParty: [] as Array<PartyIF>,
       currentDate: computed((): string => {
         return convertDate(new Date(), false, false)
       }),
@@ -274,8 +249,9 @@ export default defineComponent({
     })
 
     return {
-      ...toRefs(localState),
-      DefaultSchema
+      DefaultSchema,
+      authorizedTableHeaders,
+      ...toRefs(localState)
     }
   }
 })

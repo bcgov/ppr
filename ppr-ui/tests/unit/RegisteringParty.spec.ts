@@ -185,7 +185,7 @@ describe('Test result table with error', () => {
     expect(wrapper.findComponent(RegisteringParty).exists()).toBe(true)
     expect(wrapper.vm.registeringParty.length).toBe(0)
     expect(wrapper.find('.registering-table').exists()).toBe(true)
-    const noResultsDisplay = wrapper.findAll('.v-data-table__empty-wrapper')
+    const noResultsDisplay = wrapper.findAll('tr td')
     expect(noResultsDisplay.at(0).text()).toContain('We were unable to retrieve Registering Party')
     expect(wrapper.find('#retry-registering-party').exists()).toBe(true)
   })

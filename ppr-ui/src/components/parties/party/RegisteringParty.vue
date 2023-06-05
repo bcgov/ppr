@@ -1,74 +1,78 @@
 <template>
   <v-container class="pa-0 flat">
     <v-container class="pa-0">
-      <v-row v-if="registeringParty" no-gutters class="pb-8 pt-2 rounded-top">
+      <v-row no-gutters class="pb-8 pt-2 rounded-top">
         <v-col>
-          <v-data-table
-            class="registering-table party-data-table"
-            :headers="partyHeaders"
-            :items="registeringParty"
-            disable-pagination
-            disable-sort
-            hide-default-footer
-          >
-            <template v-slot:item="row">
-              <tr :key="row.item.id" class="registering-row">
-                <td class="list-item__title title-text" style="padding-left:30px">
-                  <v-row no-gutters>
-                    <v-col cols="auto">
-                      <div class="icon-div mt-n1 pr-4">
-                        <v-icon v-if="isBusiness(row.item)">mdi-domain</v-icon>
-                        <v-icon v-else>mdi-account</v-icon>
-                      </div>
-                    </v-col>
-                    <v-col cols="9">
-                      <div>
-                        {{ getName(row.item) }}
-                      </div>
-                    </v-col>
-                  </v-row>
-                </td>
-                <td>
-                  <base-address :editing="false" :schema="addressSchema" :value="row.item.address" />
-                </td>
-                <td>{{ row.item.emailAddress }}</td>
-                <td>{{ row.item.code }}</td>
-                <td class="actions-cell actions-width px-0">
-                <div class="actions float-right actions-up pr-4">
+          <v-simple-table class="registering-table party-data-table">
+            <template v-slot:default>
+              <!-- Table Headers -->
+              <thead>
+                <tr>
+                  <th v-for="header in headers" :key="header.value" :class="header.class">
+                    {{ header.text }}
+                  </th>
+                </tr>
+              </thead>
 
-                  <v-btn
-                      text
-                      color="primary"
-                      class="smaller-button edit-btn pr-0"
-                      v-if="!row.item.action"
-                      @click="changeRegisteringParty()"
-                  >
+              <!-- Table Body -->
+              <tbody v-if="registeringParty.length > 0">
+                <tr v-for="item in registeringParty" :key="item.partyId" class="registering-row">
+                  <td class="list-item__title title-text" style="padding-left:30px">
+                    <v-row no-gutters>
+                      <v-col cols="auto">
+                        <div class="icon-div mt-n1 pr-4">
+                          <v-icon v-if="isBusiness(item)">mdi-domain</v-icon>
+                          <v-icon v-else>mdi-account</v-icon>
+                        </div>
+                      </v-col>
+                      <v-col cols="9">
+                        <div>
+                          {{ getName(item) }}
+                        </div>
+                      </v-col>
+                    </v-row>
+                  </td>
+                  <td>
+                    <base-address :editing="false" :schema="addressSchema" :value="item.address" />
+                  </td>
+                  <td>{{ item.emailAddress }}</td>
+                  <td>{{ item.code }}</td>
+                  <td class="actions-cell actions-width px-0">
+                    <div class="actions float-right actions-up pr-4">
+
+                      <v-btn
+                          text
+                          color="primary"
+                          class="smaller-button edit-btn pr-0"
+                          v-if="!item.action"
+                          @click="changeRegisteringParty()"
+                      >
                         <v-icon small>mdi-pencil</v-icon>
                         <span class="ml-1 mr-2">Change</span>
-                  </v-btn>
-                  <v-btn
-                      text
-                      color="primary"
-                      class="smaller-button edit-btn pr-0"
-                      :disabled="addEditInProgress"
-                      v-else
-                      @click="undo()"
-                  >
+                      </v-btn>
+                      <v-btn
+                          text
+                          color="primary"
+                          class="smaller-button edit-btn pr-0"
+                          :disabled="addEditInProgress"
+                          v-else
+                          @click="undo()"
+                      >
                         <v-icon small>mdi-undo</v-icon>
                         <span class="ml-1 mr-2">Undo</span>
-                  </v-btn>
-                  <span class="actions-border actions__more"
-                    v-if="row.item.action && !row.item.code"
-                  >
+                      </v-btn>
+                      <span class="actions-border actions__more"
+                            v-if="item.action && !item.code"
+                      >
                     <v-menu offset-y left nudge-bottom="4">
                       <template v-slot:activator="{ on }">
                         <v-btn
-                          text
-                          small
-                          v-on="on"
-                          color="primary"
-                          :disabled="addEditInProgress"
-                          class="smaller-actions actions__more-actions__btn"
+                            text
+                            small
+                            v-on="on"
+                            color="primary"
+                            :disabled="addEditInProgress"
+                            class="smaller-actions actions__more-actions__btn"
                         >
                           <v-icon>mdi-menu-down</v-icon>
                         </v-btn>
@@ -83,41 +87,45 @@
                       </v-list>
                     </v-menu>
                   </span>
-                </div>
-                </td>
-              </tr>
-              <tr v-if="showEditParty">
-              <td
-                colspan="5"
-                class="pa-0"
-              >
-                <v-expand-transition>
-                  <div class="edit-Party-container pa-0 col-12">
-                    <edit-party :setIsRegisteringParty="true" @resetEvent="resetData" />
-                  </div>
-                </v-expand-transition>
-              </td>
-            </tr>
+                    </div>
+                  </td>
+                </tr>
+                <tr v-if="showEditParty">
+                  <td
+                      colspan="5"
+                      class="pa-0"
+                  >
+                    <v-expand-transition>
+                      <div class="edit-Party-container pa-0 col-12">
+                        <edit-party :setIsRegisteringParty="true" @resetEvent="resetData" />
+                      </div>
+                    </v-expand-transition>
+                  </td>
+                </tr>
+              </tbody>
+
+              <!-- No Data Message -->
+              <tbody v-else>
+                <tr class="text-center">
+                  <td :colspan="headers.length">
+                    We were unable to retrieve Registering Party from your account. Please try
+                    again later. If this issue persists, please contact us.
+                    <br /><br />
+                    <v-btn
+                        id="retry-registering-party"
+                        outlined
+                        color="primary"
+                        @click="getRegisteringParty()"
+                    >
+                      Retry <v-icon>mdi-refresh</v-icon>
+                    </v-btn>
+                    <error-contact class="search-contact-container pt-6" />
+                  </td>
+                </tr>
+              </tbody>
             </template>
-            <template  v-slot:no-data>
-              We were unable to retrieve Registering Party from your account. Please try
-              again later. If this issue persists, please contact us.
-              <br /><br />
-              <v-btn
-                id="retry-registering-party"
-                outlined
-                color="primary"
-                @click="getRegisteringParty()"
-              >
-                Retry <v-icon>mdi-refresh</v-icon>
-              </v-btn>
-              <error-contact class="search-contact-container pt-6" />
-            </template>
-          </v-data-table>
+          </v-simple-table>
         </v-col>
-      </v-row>
-      <v-row v-else no-gutters class="pb-6 pt-4">
-        <v-col>No Registering Party obtained from user Account Information.</v-col>
       </v-row>
     </v-container>
   </v-container>
@@ -177,7 +185,7 @@ export default defineComponent({
         }
         return []
       }),
-      partyHeaders: computed((): Array<any> => {
+      headers: computed((): Array<any> => {
         return [...registeringTableHeaders, ...editTableHeaders]
       })
     })
