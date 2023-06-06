@@ -53,194 +53,209 @@
         </div>
       </v-col>
     </v-row>
+
     <v-row no-gutters class="pt-4">
       <v-col>
-        <v-data-table
+        <v-simple-table
           class="debtor-table debtor-data-table"
           :class="{ 'invalid-message': showErrorDebtors && !getDebtorValidity() }"
-          :headers="headers"
-          :items="debtors"
-          disable-pagination
-          disable-sort
-          hide-default-footer
-          no-data-text="No debtors added yet."
         >
-          <template v-slot:item="row">
-            <tr
-              v-if="!showEditDebtor[row.index]"
-              :key="row.item.id"
-              class="debtor-row"
-              :class="{ 'disabled-text-not-action': row.item.action === ActionTypes.REMOVED}"
-            >
-              <td class="list-item__title title-text" style="padding-left:30px">
-                <v-row no-gutters>
-                  <v-col cols="3" :class="{ 'disabled-text': row.item.action === ActionTypes.REMOVED}">
-                    <div class="icon-div mt-n1 pr-4">
-                      <v-icon v-if="isBusiness(row.item)">mdi-domain</v-icon>
-                      <v-icon v-else>mdi-account</v-icon>
-                    </div>
-                  </v-col>
-                  <v-col cols="9">
-                    <div :class="{ 'disabled-text': row.item.action === ActionTypes.REMOVED}">
-                      {{ getName(row.item) }}
-                    </div>
-                    <div v-if="row.item.action && registrationFlowType === RegistrationFlowType.AMENDMENT">
-                      <v-chip v-if="row.item.action === ActionTypes.REMOVED"
-                          x-small label color="#grey lighten-2" text-color="$gray9">
-                          {{ row.item.action }}
-                      </v-chip>
-                      <v-chip v-else x-small label color="#1669BB" text-color="white">
-                        {{ row.item.action }}
-                      </v-chip>
-                    </div>
-                  </v-col>
-                </v-row>
-              </td>
-              <td>
-                <base-address :editing="false" :schema="addressSchema" :value="row.item.address" />
-              </td>
-              <td>{{ row.item.emailAddress }}</td>
-              <td>{{ getFormattedBirthdate(row.item) }}</td>
-              <!-- Action Btns -->
-              <td class="actions-width actions-cell px-0">
-                <div class="actions-up actions float-right pr-4">
-                  <span
-                    v-if="registrationFlowType !== RegistrationFlowType.AMENDMENT
-                    || (registrationFlowType === RegistrationFlowType.AMENDMENT &&
-                    (row.item.action === ActionTypes.ADDED) || !row.item.action)"
-                    class="edit-button"
-                  >
-                    <v-btn
-                      text
-                      color="primary"
-                      class="smaller-button edit-btn"
-                      :id="'class-' + row.index + '-change-added-btn'"
-                      @click="initEdit(row.index)"
-                      :disabled="addEditInProgress"
-                    >
-                      <v-icon small>mdi-pencil</v-icon>
+          <template v-slot:default>
+            <!-- Table Headers -->
+            <thead>
+              <tr>
+                <th v-for="header in headers" :key="header.value" :class="header.class">
+                  {{ header.text }}
+                </th>
+              </tr>
+            </thead>
+
+            <!-- Table Body -->
+            <tbody v-if="debtors.length > 0">
+              <tr
+                v-for="(item, index) in debtors"
+                :key="`${item}: ${index}`"
+                class="debtor-row"
+                :class="{ 'disabled-text-not-action': item.action === ActionTypes.REMOVED}"
+              >
+                <template v-if="showEditDebtor[index]">
+                  <!-- Edit Form -->
+                  <td colspan="5" class="pa-0" :class="{ 'invalid-section': invalidSection }">
+                    <v-card flat class="edit-debtor-container">
+                      <edit-debtor
+                          :activeIndex="activeIndex"
+                          :invalidSection="invalidSection"
+                          :setShowErrorBar="showErrorBar"
+                          @removeDebtor="removeDebtor"
+                          @resetEvent="resetData"
+                      />
+                    </v-card>
+                  </td>
+                </template>
+                <template v-else>
+                  <td class="list-item__title title-text" style="padding-left:30px">
+                    <v-row no-gutters>
+                      <v-col cols="3" :class="{ 'disabled-text': item.action === ActionTypes.REMOVED}">
+                        <div class="icon-div mt-n1 pr-4">
+                          <v-icon v-if="isBusiness(item)">mdi-domain</v-icon>
+                          <v-icon v-else>mdi-account</v-icon>
+                        </div>
+                      </v-col>
+                      <v-col cols="9">
+                        <div :class="{ 'disabled-text': item.action === ActionTypes.REMOVED}">
+                          {{ getName(item) }}
+                        </div>
+                        <div v-if="item.action && registrationFlowType === RegistrationFlowType.AMENDMENT">
+                          <v-chip v-if="item.action === ActionTypes.REMOVED"
+                                  x-small label color="#grey lighten-2" text-color="$gray9">
+                            {{ item.action }}
+                          </v-chip>
+                          <v-chip v-else x-small label color="#1669BB" text-color="white">
+                            {{ item.action }}
+                          </v-chip>
+                        </div>
+                      </v-col>
+                    </v-row>
+                  </td>
+                  <td>
+                    <base-address :editing="false" :schema="addressSchema" :value="item.address" />
+                  </td>
+                  <td>{{ item.emailAddress }}</td>
+                  <td>{{ getFormattedBirthdate(item) }}</td>
+                  <!-- Action Btns -->
+                  <td class="actions-width actions-cell px-0">
+                    <div class="actions-up actions float-right pr-4">
+                      <span
+                          v-if="registrationFlowType !== RegistrationFlowType.AMENDMENT
+                        || (registrationFlowType === RegistrationFlowType.AMENDMENT &&
+                        (item.action === ActionTypes.ADDED) || !item.action)"
+                          class="edit-button"
+                      >
+                        <v-btn
+                            text
+                            color="primary"
+                            class="smaller-button edit-btn"
+                            :id="'class-' + index + '-change-added-btn'"
+                            @click="initEdit(index)"
+                            :disabled="addEditInProgress"
+                        >
+                          <v-icon small>mdi-pencil</v-icon>
+                          <span
+                              v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
+                            && item.action !== ActionTypes.ADDED"
+                          >
+                            Amend
+                          </span>
+                          <span v-else>Edit</span>
+                        </v-btn>
+                      </span>
+                      <span
+                        v-if="registrationFlowType !== RegistrationFlowType.AMENDMENT
+                        || (registrationFlowType === RegistrationFlowType.AMENDMENT && (!item.action ||
+                        item.action === ActionTypes.ADDED))"
+                        class="actions-border actions__more"
+
+                      >
+                        <v-menu offset-y left nudge-bottom="4">
+                          <template v-slot:activator="{ on }">
+                            <v-btn
+                                text
+                                small
+                                v-on="on"
+                                color="primary"
+                                class="smaller-actions actions__more-actions__btn"
+                                :disabled="addEditInProgress"
+                            >
+                              <v-icon>mdi-menu-down</v-icon>
+                            </v-btn>
+                          </template>
+                          <v-list class="actions__more-actions">
+                            <v-list-item @click="removeDebtor(index)">
+                              <v-list-item-subtitle>
+                                <v-icon small>mdi-delete</v-icon>
+                                <span
+                                    v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
+                                  && item.action !== ActionTypes.ADDED"
+                                >
+                                  Delete
+                                </span>
+                                <span v-else class="ml-1">Remove</span>
+                              </v-list-item-subtitle>
+                            </v-list-item>
+                          </v-list>
+                        </v-menu>
+                      </span>
                       <span
                         v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
-                        && row.item.action !== ActionTypes.ADDED"
+                        && ((item.action === ActionTypes.REMOVED) || (item.action === ActionTypes.EDITED))"
+                        class="undo-button"
                       >
-                        Amend
+                        <v-btn
+                            text
+                            color="primary"
+                            class="smaller-button edit-btn"
+                            :id="'class-' + index + '-undo-btn'"
+                            @click="undo(index)"
+                            :disabled="addEditInProgress"
+                        >
+                          <v-icon small>mdi-undo</v-icon>
+                          <span>Undo</span>
+                        </v-btn>
                       </span>
-                      <span v-else>Edit</span>
-                    </v-btn>
-                  </span>
-                  <span class="actions-border actions__more"
-                    v-if="registrationFlowType !== RegistrationFlowType.AMENDMENT
-                    || (registrationFlowType === RegistrationFlowType.AMENDMENT && (!row.item.action ||
-                    row.item.action === ActionTypes.ADDED))"
-                  >
-                    <v-menu offset-y left nudge-bottom="4">
-                      <template v-slot:activator="{ on }">
-                        <v-btn
-                          text
-                          small
-                          v-on="on"
-                          color="primary"
-                          class="smaller-actions actions__more-actions__btn"
-                          :disabled="addEditInProgress"
-                        >
-                          <v-icon>mdi-menu-down</v-icon>
-                        </v-btn>
-                      </template>
-                      <v-list class="actions__more-actions">
-                        <v-list-item @click="removeDebtor(row.index)">
-                          <v-list-item-subtitle>
-                            <v-icon small>mdi-delete</v-icon>
-                            <span
-                              v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
-                              && row.item.action !== ActionTypes.ADDED"
-                            >
-                              Delete
-                            </span>
-                            <span v-else class="ml-1">Remove</span>
-                          </v-list-item-subtitle>
-                        </v-list-item>
-                      </v-list>
-                    </v-menu>
-                  </span>
-                  <span
-                    v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
-                    && ((row.item.action === ActionTypes.REMOVED) || (row.item.action === ActionTypes.EDITED))"
-                    class="undo-button"
-                  >
-                    <v-btn
-                      text
-                      color="primary"
-                      class="smaller-button edit-btn"
-                      :id="'class-' + row.index + '-undo-btn'"
-                      @click="undo(row.index)"
-                      :disabled="addEditInProgress"
-                    >
-                      <v-icon small>mdi-undo</v-icon>
-                      <span>Undo</span>
-                    </v-btn>
-                  </span>
 
-                  <span class="actions-border actions__more"
-                    v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
-                    && row.item.action === ActionTypes.EDITED"
-                  >
-                    <v-menu offset-y left nudge-bottom="4">
-                      <template v-slot:activator="{ on }">
-                        <v-btn
-                          text
-                          small
-                          v-on="on"
-                          color="primary"
-                          class="smaller-actions actions__more-actions__btn"
-                          :disabled="addEditInProgress"
-                        >
-                          <v-icon>mdi-menu-down</v-icon>
-                        </v-btn>
-                      </template>
-                      <v-list class="actions__more-actions">
-                        <v-list-item @click="initEdit(row.index)">
-                          <v-list-item-subtitle>
-                            <v-icon small>mdi-pencil</v-icon>
-                            <span class="ml-1">Amend</span>
-                          </v-list-item-subtitle>
-                        </v-list-item>
-                        <v-list-item @click="removeDebtor(row.index)">
-                          <v-list-item-subtitle>
-                            <v-icon small>mdi-delete</v-icon>
-                            <span
-                              v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
-                              && row.item.action !== ActionTypes.ADDED"
+                      <span
+                        class="actions-border actions__more"
+                        v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
+                        && item.action === ActionTypes.EDITED"
+                      >
+                        <v-menu offset-y left nudge-bottom="4">
+                          <template v-slot:activator="{ on }">
+                            <v-btn
+                                text
+                                small
+                                v-on="on"
+                                color="primary"
+                                class="smaller-actions actions__more-actions__btn"
+                                :disabled="addEditInProgress"
                             >
-                              Delete
-                            </span>
-                            <span v-else class="ml-1">Remove</span>
-                          </v-list-item-subtitle>
-                        </v-list-item>
-                      </v-list>
-                    </v-menu>
-                  </span>
-                </div>
-              </td>
-            </tr>
-
-            <!-- Edit Form -->
-            <tr v-if="showEditDebtor[row.index]">
-              <td colspan="5" class="pa-0" :class="{ 'invalid-section': invalidSection }">
-                <v-expand-transition>
-                  <v-card flat class="edit-debtor-container">
-                    <edit-debtor
-                      :activeIndex="activeIndex"
-                      :invalidSection="invalidSection"
-                      :setShowErrorBar="showErrorBar"
-                      @removeDebtor="removeDebtor"
-                      @resetEvent="resetData"
-                    />
-                  </v-card>
-                </v-expand-transition>
-              </td>
-            </tr>
+                              <v-icon>mdi-menu-down</v-icon>
+                            </v-btn>
+                          </template>
+                          <v-list class="actions__more-actions">
+                            <v-list-item @click="initEdit(index)">
+                              <v-list-item-subtitle>
+                                <v-icon small>mdi-pencil</v-icon>
+                                <span class="ml-1">Amend</span>
+                              </v-list-item-subtitle>
+                            </v-list-item>
+                            <v-list-item @click="removeDebtor(index)">
+                              <v-list-item-subtitle>
+                                <v-icon small>mdi-delete</v-icon>
+                                <span
+                                    v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
+                                  && item.action !== ActionTypes.ADDED"
+                                >
+                                  Delete
+                                </span>
+                                <span v-else class="ml-1">Remove</span>
+                              </v-list-item-subtitle>
+                            </v-list-item>
+                          </v-list>
+                        </v-menu>
+                      </span>
+                    </div>
+                  </td>
+                </template>
+              </tr>
+            </tbody>
+            <!-- No Data Message -->
+            <tbody v-else>
+              <tr class="text-center">
+                <td :colspan="headers.length">No debtors added yet</td>
+              </tr>
+            </tbody>
           </template>
-        </v-data-table>
+        </v-simple-table>
       </v-col>
     </v-row>
   </v-container>

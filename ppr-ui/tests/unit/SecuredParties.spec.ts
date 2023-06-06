@@ -87,7 +87,7 @@ describe('Secured Party store tests', () => {
   it('renders secured party table and headers', async () => {
     expect(wrapper.find('.party-table').exists()).toBeTruthy()
     // column header class is text-start
-    expect(wrapper.findAll('.text-start').length).toBe(5)
+    expect(wrapper.findAll('th').length).toBe(5)
   })
 
   it('displays the correct rows when data is present', () => {

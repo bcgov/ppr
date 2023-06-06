@@ -563,7 +563,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
     const owners = group.owners
 
     return localState.isSOorJT && owners.some(owner => owner.action === ActionTypes.ADDED) &&
-      owners.every(owner => !!owner.action)
+        owners.every(owner => !!owner.action)
   }
 
   /** Remove current owners from existing ownership and move them to New Previous Owners group.  **/
