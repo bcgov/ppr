@@ -4,7 +4,7 @@
       <v-col>
         <div class="actions">
           <v-btn
-            v-if="isMhr && (!isRoleQualifiedSupplier || isRoleStaff)"
+            v-if="isMhr && (!isRoleQualifiedSupplier || isRoleStaff || (isRoleManufactuer && hasMhrEnabled))"
             filled
             class="mhr-registration-bar-btn px-5"
             @click="newRegistration(MhrRegistrationType)"
@@ -14,7 +14,7 @@
           </v-btn>
           <registration-bar-type-ahead-list
             v-else-if="hasRPPR && !isMhr"
-            :defaultLabel="labelText"
+            defaultLabel="Start a New Personal Property Registration"
             :defaultDense="false"
             :defaultClearable="false"
             :isLightBackGround="!isTabView"
@@ -28,7 +28,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs } from 'vue-demi'
+import { computed, defineComponent } from 'vue-demi'
 import { useStore } from '@/store/store'
 
 import RegistrationBarButtonList from '@/components/registration/RegistrationBarButtonList.vue'
@@ -62,12 +62,11 @@ export default defineComponent({
     const {
       // Getters
       getAccountProductSubscriptions,
+      hasMhrEnabled,
       isRoleQualifiedSupplier,
-      isRoleStaff
+      isRoleStaff,
+      isRoleManufactuer
     } = storeToRefs(useStore())
-    const localState = reactive({
-      labelText: 'Start a New Personal Property Registration'
-    })
     const hasRPPR = computed(() => {
       const productSubscriptions = getAccountProductSubscriptions.value as AccountProductSubscriptionIF
       return (
@@ -83,11 +82,12 @@ export default defineComponent({
 
     return {
       hasRPPR,
+      hasMhrEnabled,
       isRoleStaff,
+      isRoleManufactuer,
       isRoleQualifiedSupplier,
       newRegistration,
-      MhrRegistrationType,
-      ...toRefs(localState)
+      MhrRegistrationType
     }
   }
 })
