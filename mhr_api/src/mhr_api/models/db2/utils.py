@@ -35,6 +35,18 @@ FROM_LEGACY_REGISTRATION_TYPE = {
     'EXRS': 'EXEMPTION_RES',
     'EXNR': 'EXEMPTION_NON_RES'
 }
+FROM_LEGACY_NOTE_REG_TYPE = {
+    'CAU': 'REG_STAFF_ADMIN',
+    'CAUC': 'REG_STAFF_ADMIN',
+    'CAUE': 'REG_STAFF_ADMIN',
+    'NCAN': 'REG_STAFF_ADMIN',
+    'NCON': 'REG_STAFF_ADMIN',
+    'NPUB': 'REG_STAFF_ADMIN',
+    'REST': 'REG_STAFF_ADMIN',
+    'TAXN': 'REG_STAFF_ADMIN',
+    'REGC': 'REG_STAFF_ADMIN',
+    '102': 'REG_STAFF_ADMIN'
+}
 FROM_LEGACY_DOC_TYPE = {
     '101': 'REG_101',
     '102': 'REG_102',
@@ -913,7 +925,9 @@ def get_registration_json(registration):
     """Build the registration json from bot DB2 and PosgreSQL."""
     reg_json = registration.manuhome.json
     doc_type = reg_json.get('documentType')
-    if FROM_LEGACY_REGISTRATION_TYPE.get(doc_type):
+    if FROM_LEGACY_NOTE_REG_TYPE.get(doc_type):
+        reg_json['registrationType'] = FROM_LEGACY_NOTE_REG_TYPE.get(doc_type)
+    elif FROM_LEGACY_REGISTRATION_TYPE.get(doc_type):
         reg_json['registrationType'] = FROM_LEGACY_REGISTRATION_TYPE.get(doc_type)
     if FROM_LEGACY_DOC_TYPE.get(doc_type):
         doc_type = FROM_LEGACY_DOC_TYPE.get(doc_type)
@@ -950,16 +964,12 @@ def get_search_json(registration):
                 note['remarks'] = 'MANUFACTURED HOME REGISTRATION CANCELLED'
             elif doc_type in ('TAXN', 'EXNR', 'NPUB', 'REST') and note.get('status') != 'A':  # Exclude if not active.
                 include = False
-            elif doc_type in ('CAU', 'CAUC', 'CAUE') and note.get('expiryDate') and \
-                    model_utils.date_elapsed(note.get('expiryDate')):  # Exclude if expiry elapsed.
+            elif doc_type in ('CAU', 'CAUC', 'CAUE') and note.get('expiryDateTime') and \
+                    model_utils.date_elapsed(note.get('expiryDateTime')):  # Exclude if expiry elapsed.
                 include = reg_utils.include_caution_note(reg_json.get('notes'), note.get('documentId'))
             if doc_type == 'FZE':  # Do not display contact info.
-                if note.get('contactName'):
-                    del note['contactName']
-                if note.get('contactAddress'):
-                    del note['contactAddress']
-                if note.get('contactPhoneNumber'):
-                    del note['contactPhoneNumber']
+                if note.get('givingNoticeParty'):
+                    del note['givingNoticeParty']
             if include:
                 if FROM_LEGACY_DOC_TYPE.get(doc_type):
                     doc_type = FROM_LEGACY_DOC_TYPE.get(doc_type)
@@ -983,7 +993,9 @@ def get_new_registration_json(registration):
             reg_doc = doc
     if reg_doc:
         doc_type = reg_doc.document_type
-        if FROM_LEGACY_REGISTRATION_TYPE.get(doc_type):
+        if FROM_LEGACY_NOTE_REG_TYPE.get(doc_type):
+            reg_json['registrationType'] = FROM_LEGACY_NOTE_REG_TYPE.get(doc_type)
+        elif FROM_LEGACY_REGISTRATION_TYPE.get(doc_type):
             reg_json['registrationType'] = FROM_LEGACY_REGISTRATION_TYPE.get(doc_type)
         if FROM_LEGACY_DOC_TYPE.get(doc_type):
             doc_type = FROM_LEGACY_DOC_TYPE.get(doc_type)

@@ -125,6 +125,17 @@ class Db2Mhomnote(db.Model):
                 note.strip()
         return notes
 
+    def notice_party(self):
+        """Build giving notice party JSON from the unit note information."""
+        # No way to distinguish individual from business: only used for display anyway.
+        party = {
+            'businessName': self.name,
+            'address': address_utils.get_address_from_db2(self.legacy_address)
+        }
+        if self.phone_number:
+            party['phoneNumber'] = self.phone_number
+        return party
+
     @property
     def json(self):
         """Return a dict of this object, with keys in JSON format."""
@@ -135,15 +146,13 @@ class Db2Mhomnote(db.Model):
             'destroyed': False
         }
         if self.expiry_date and self.expiry_date.isoformat() != '0001-01-01':
-            note['expiryDate'] = model_utils.format_local_date(self.expiry_date)
+            note['expiryDateTime'] = model_utils.format_local_date(self.expiry_date)
         if self.destroyed and self.destroyed == 'Y':
             note['destroyed'] = True
         if self.document_type not in (Db2Document.DocumentTypes.RES_EXEMPTION,
                                       Db2Document.DocumentTypes.NON_RES_EXEMPTION):
-            note['contactName'] = self.name
-            note['contactAddress'] = address_utils.get_address_from_db2(self.legacy_address)
-            if self.phone_number:
-                note['contactPhoneNumber'] = self.phone_number
+            if self.name:
+                note['givingNoticeParty'] = self.notice_party()
         return note
 
     @property
@@ -153,14 +162,12 @@ class Db2Mhomnote(db.Model):
             'documentType': self.document_type.strip(),
             'documentId': self.reg_document_id,
             'status': self.status,
-            'remarks': self.remarks,
-            'contactName': self.name,
-            'contactAddress': address_utils.get_address_from_db2(self.legacy_address)
+            'remarks': self.remarks
         }
-        if self.phone_number:
-            note['contactPhoneNumber'] = self.phone_number
+        if self.name:
+            note['givingNoticeParty'] = self.notice_party()
         if self.expiry_date and self.expiry_date.isoformat() != '0001-01-01':
-            note['expiryDate'] = model_utils.format_local_date(self.expiry_date)
+            note['expiryDateTime'] = model_utils.format_local_date(self.expiry_date)
         if self.document and self.document.registration_ts:
             current_app.logger.debug(f'Db2Mhomnote setting createDateTime for doc id {self.reg_document_id}.')
             note['createDateTime'] = model_utils.format_local_ts(self.document.registration_ts)
@@ -180,8 +187,8 @@ class Db2Mhomnote(db.Model):
                            legacy_address=new_info.get('legacyAddress', ''),
                            remarks=new_info.get('remarks', ''))
 
-        if new_info.get('expiryDate', None):
-            date_val: str = str(new_info.get('expiryDate'))[0:10]
+        if new_info.get('expiryDateTime', None):
+            date_val: str = str(new_info.get('expiryDateTime'))[0:10]
             note.expiry_date = model_utils.date_from_iso_format(date_val)
         return note
 
@@ -200,7 +207,7 @@ class Db2Mhomnote(db.Model):
                            note_number=0,
                            status=Db2Mhomnote.StatusTypes.ACTIVE,
                            reg_document_id=document.id,
-                           document_type=json_data.get('documentType', document.document_type),
+                           document_type=document.document_type,
                            destroyed='N',
                            phone_number=document.phone_number,
                            name=document.name,
@@ -208,18 +215,18 @@ class Db2Mhomnote(db.Model):
                            remarks=json_data.get('remarks', ''),
                            can_document_id='')
 
-        if json_data.get('contactName'):
-            note.name = str(json_data.get('contactName'))[0: 40]
-        if json_data.get('contactAddress'):
-            note.legacy_address = address_utils.to_db2_address(json_data.get('contactAddress'))
-        if json_data.get('contactPhoneNumber'):
-            note.phone_number = str(json_data.get('contactPhoneNumber'))[0: 10]
+        if json_data.get('givingNoticeParty'):
+            notice = json_data.get('givingNoticeParty')
+            if notice.get('phoneNumber'):
+                note.phone_number = str(notice.get('phoneNumber'))[0:10]
+            note.name = Db2Document.to_db2_submitting_name(notice)   # Same format and length as DB2 document.name
+            note.legacy_address = address_utils.to_db2_address(notice.get('address'))
         if json_data.get('status'):
             note.status = json_data.get('status')
         if json_data.get('destroyed'):
             note.destroyed = 'Y'
-        if json_data.get('expiryDate', None):
-            date_val: str = str(json_data.get('expiryDate'))[0:10]
+        if json_data.get('expiryDateTime', None):
+            date_val: str = str(json_data.get('expiryDateTime'))[0:10]
             note.expiry_date = model_utils.date_from_iso_format(date_val)
         else:
             note.expiry_date = model_utils.date_from_iso_format('0001-01-01')

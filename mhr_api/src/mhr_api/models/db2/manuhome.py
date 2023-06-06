@@ -38,6 +38,24 @@ LEGACY_STATUS_DESCRIPTION = {
 }
 DOCUMENT_TYPE_REG = '101'
 DOCUMENT_TYPE_CONV = 'CONV'
+TO_LEGACY_DOC_TYPE = {
+    'REG_101': '101 ',
+    'REG_102': '102 ',
+    'REG_103': '103 ',
+    'REG_103E': '103E'
+}
+FROM_LEGACY_NOTE_REG_TYPE = {
+    'CAU': 'REG_STAFF_ADMIN',
+    'CAUC': 'REG_STAFF_ADMIN',
+    'CAUE': 'REG_STAFF_ADMIN',
+    'NCAN': 'REG_STAFF_ADMIN',
+    'NCON': 'REG_STAFF_ADMIN',
+    'NPUB': 'REG_STAFF_ADMIN',
+    'REST': 'REG_STAFF_ADMIN',
+    'TAXN': 'REG_STAFF_ADMIN',
+    'REGC': 'REG_STAFF_ADMIN',
+    '102': 'REG_STAFF_ADMIN'
+}
 
 
 class Db2Manuhome(db.Model):
@@ -135,6 +153,23 @@ class Db2Manuhome(db.Model):
                         note.save()
         except Exception as db_exception:   # noqa: B902; return nicer error
             current_app.logger.error('Db2Manuhome.save_exemption exception: ' + str(db_exception))
+            raise DatabaseException(db_exception)
+
+    def save_note(self):
+        """Save the unit note registraiton to the database immediately."""
+        try:
+            db.session.add(self)
+            if self.reg_documents:
+                index: int = len(self.reg_documents) - 1
+                doc: Db2Document = self.reg_documents[index]
+                doc.save()
+                if self.reg_notes:
+                    index: int = len(self.reg_notes) - 1
+                    note: Db2Mhomnote = self.reg_notes[index]
+                    if note.reg_document_id == doc.id:
+                        note.save()
+        except Exception as db_exception:   # noqa: B902; return nicer error
+            current_app.logger.error('Db2Manuhome.save_note exception: ' + str(db_exception))
             raise DatabaseException(db_exception)
 
     def save_permit(self):
@@ -361,6 +396,10 @@ class Db2Manuhome(db.Model):
                 man_home['newLocation'] = self.new_location.registration_json
             elif self.reg_location:
                 man_home['newLocation'] = self.reg_location.registration_json
+        elif FROM_LEGACY_NOTE_REG_TYPE.get(doc.document_type):
+            for note in self.reg_notes:
+                if note.reg_document_id == doc_id:
+                    man_home['note'] = note.json
         else:
             if self.reg_owner_groups:
                 groups = []
@@ -757,4 +796,39 @@ class Db2Manuhome(db.Model):
         manuhome.new_location.location_id = (manuhome.reg_location.location_id + 1)
         manuhome.reg_location.status = Db2Location.StatusTypes.HISTORICAL
         manuhome.reg_location.can_document_id = doc.id
+        return manuhome
+
+    @staticmethod
+    def create_from_note(registration, reg_json):
+        """Create a new note registration: update manuhome, create document, create note."""
+        if not registration.manuhome:
+            current_app.logger.info(f'registration id={registration.id} no manuhome: nothing to save.')
+            return
+        manuhome: Db2Manuhome = registration.manuhome
+        now_local = model_utils.today_local()
+        manuhome.update_date = now_local.date()
+        manuhome.update_time = now_local.time()
+        manuhome.update_count = manuhome.update_count + 1
+        doc = registration.documents[0]
+        doc_type = TO_LEGACY_DOC_TYPE.get(doc.document_type, doc.document_type)
+        if len(doc_type) == 3:
+            doc_type += ' '
+        # Create document
+        ts_local = now_local
+        if reg_json.get('effectiveDateTime'):
+            effective_ts = model_utils.ts_from_iso_format(reg_json['effectiveDateTime'])
+            ts_local = model_utils.to_local_timestamp(effective_ts)
+        doc: Db2Document = Db2Document.create_from_registration(registration,
+                                                                reg_json,
+                                                                doc_type,
+                                                                ts_local)
+        doc.update_id = current_app.config.get('DB2_RACF_ID', '')
+        manuhome.reg_documents.append(doc)
+        # Add note.
+        if reg_json.get('note'):
+            reg_note = registration.notes[0]
+            note: Db2Mhomnote = Db2Mhomnote.create_from_registration(reg_json.get('note'), doc, manuhome.id)
+            if reg_note.expiry_date:
+                note.expiry_date = reg_note.expiry_date.date()
+            manuhome.reg_notes.append(note)
         return manuhome

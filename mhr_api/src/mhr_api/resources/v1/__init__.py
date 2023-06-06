@@ -23,6 +23,7 @@ from .exemptions import bp as exemptions_bp
 from .ltsa_sync import bp as ltsa_sync_bp
 from .manufacturer import bp as manufacturers_bp
 from .meta import bp as meta_bp
+from .notes import bp as notes_bp
 from .ops import bp as ops_bp
 from .other_registrations import bp as other_registrations_bp
 from .permits import bp as permits_bp
@@ -55,6 +56,7 @@ class V1Endpoint:
         self.app.register_blueprint(ltsa_sync_bp)
         self.app.register_blueprint(manufacturers_bp)
         self.app.register_blueprint(meta_bp)
+        self.app.register_blueprint(notes_bp)
         self.app.register_blueprint(ops_bp)
         self.app.register_blueprint(other_registrations_bp)
         self.app.register_blueprint(permits_bp)
