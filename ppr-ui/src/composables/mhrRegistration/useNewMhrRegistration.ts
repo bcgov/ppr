@@ -33,6 +33,7 @@ export const useNewMhrRegistration = () => {
   const {
     // Getters
     isRoleStaffReg,
+    isMhrManufactuerRegistration,
     getMhrRegistrationHomeDescription,
     getMhrRegistrationSubmittingParty,
     getMhrRegistrationDocumentId,
@@ -259,7 +260,6 @@ export const useNewMhrRegistration = () => {
 
   const buildApiData = (): NewMhrRegistrationApiIF => {
     const data: NewMhrRegistrationApiIF = {
-      documentId: getMhrRegistrationDocumentId.value,
       ownLand: getMhrRegistrationOwnLand.value,
       submittingParty: parseSubmittingParty(),
       ownerGroups: parseOwnerGroups(),
@@ -267,6 +267,9 @@ export const useNewMhrRegistration = () => {
       description: parseDescription(),
       ...(isRoleStaffReg.value && !!getStaffPayment.value && {
         clientReferenceId: getStaffPayment.value.folioNumber
+      }),
+      ...(!isMhrManufactuerRegistration.value && {
+        documentId: getMhrRegistrationDocumentId.value
       })
     }
 
