@@ -8,6 +8,12 @@ export enum AuthRoles {
    SBC = 'sbc',
    HELPDESK = 'helpdesk',
 
+   // Manufactuers
+   MHR_REGISTER = 'mhr_register',
+   MHR_TRANSPORT = 'mhr_transport',
+   MHR_TRANSFER_SALE = 'mhr_transfer_sale',
+   MHR_PAYMENT = 'mhr_payment',
+
    // Client/Public
    PUBLIC = 'public_user'
 }

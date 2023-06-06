@@ -58,6 +58,31 @@ export const MHRButtonFooterConfig: Array<ButtonConfigIF> = [
     nextRouteName: RouteNames.DASHBOARD
   }]
 
+export const MHRManufactuerButtonFooterConfig: Array<ButtonConfigIF> = [
+  {
+    stepName: RouteNames.YOUR_HOME,
+    showCancel: true,
+    showSave: true,
+    showSaveResume: true,
+    showBack: false,
+    showNext: true,
+    backRouteName: '',
+    nextText: 'Review and Confirm',
+    nextRouteName: RouteNames.MHR_REVIEW_CONFIRM
+  },
+  {
+    stepName: RouteNames.MHR_REVIEW_CONFIRM,
+    showCancel: true,
+    showSave: true,
+    showSaveResume: true,
+    showBack: true,
+    showNext: true,
+    backRouteName: RouteNames.YOUR_HOME,
+    nextText: 'Register and Pay',
+    nextRouteName: RouteNames.DASHBOARD
+  }
+]
+
 export const RegistrationButtonFooterConfig: Array<ButtonConfigIF> = [
   {
     stepName: RouteNames.LENGTH_TRUST,
