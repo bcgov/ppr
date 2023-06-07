@@ -714,6 +714,8 @@ def test_create_new_from_json(session):
     registration: MhrRegistration = MhrRegistration.create_new_from_json(json_data, 'PS12345')
     assert registration.id > 0
     assert registration.mhr_number
+    if model_utils.is_legacy():
+        assert not str(registration.mhr_number).startswith('15')
     assert registration.registration_ts
     assert registration.status_type in MhrRegistrationStatusTypes
     assert registration.registration_type in MhrRegistrationTypes

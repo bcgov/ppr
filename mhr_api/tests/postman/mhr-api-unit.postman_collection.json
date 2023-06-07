@@ -1519,6 +1519,57 @@
 			]
 		},
 		{
+			"name": "unit notes",
+			"item": [
+				{
+					"name": "Create MH NPUB Unit Note",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"clientReferenceId\": \"UT-NPUB-001\",\n  \"attentionReference\": \"JACK BROWN\",\n  \"submittingParty\": {\n    \"businessName\": \"ABC SEARCHING COMPANY\",\n    \"address\": {\n      \"street\": \"222 SUMMER STREET\",\n      \"city\": \"VICTORIA\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V8W 2V8\"\n    },\n    \"emailAddress\": \"bsmith@abc-search.com\"\n  },\n  \"note\": {\n    \"documentType\": \"NPUB\",\n    \"documentId\": \"81111158\",\n    \"remarks\": \"NPUB UNIT NOTE TEST\",\n    \"givingNoticeParty\": {\n\t    \"businessName\": \"TEST GIVING NOTICE COMPANY\",\n\t    \"address\": {\n\t      \"street\": \"1222 SUMMER STREET\",\n\t      \"city\": \"VICTORIA\",\n\t      \"region\": \"BC\",\n\t      \"country\": \"CA\",\n\t      \"postalCode\": \"V8W 2V8\"\n\t    },\n      \"phoneNumber\": \"2508289999\"\n    }\n  }\n}\n"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/notes/106768",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"notes",
+								"106768"
+							]
+						},
+						"description": "Search step 1 submit a query example: search by a Financing Statement registration number which returns no results."
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "documents",
 			"item": [
 				{
@@ -1614,11 +1665,11 @@
 	"variable": [
 		{
 			"key": "apikey",
-			"value": "PROVIDE"
+			"value": "Provide"
 		},
 		{
 			"key": "account_id",
-			"value": "PROVIDE"
+			"value": "Provide"
 		},
 		{
 			"key": "base_url_prism",
@@ -1631,7 +1682,7 @@
 		},
 		{
 			"key": "jwt",
-			"value": "PROVIDE",
+			"value": "Provide",
 			"type": "string"
 		},
 		{

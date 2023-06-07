@@ -557,7 +557,10 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         reg_vals: MhrRegistration = reg_utils.get_generated_values(MhrRegistration(), draft, user_group)
         registration: MhrRegistration = MhrRegistration()
         registration.id = reg_vals.id  # pylint: disable=invalid-name; allow name of id.
-        registration.mhr_number = reg_vals.mhr_number
+        if model_utils.is_legacy():
+            registration.mhr_number = legacy_utils.get_next_mhr_number()
+        else:
+            registration.mhr_number = reg_vals.mhr_number
         registration.doc_reg_number = reg_vals.doc_reg_number
         registration.doc_pkey = reg_vals.doc_pkey
         registration.registration_ts = model_utils.now_ts()

@@ -250,7 +250,11 @@ def test_create(session, client, jwt, desc, has_submitting, roles, status, has_a
     # check
     assert response.status_code == status
     if response.status_code == HTTPStatus.CREATED:
-        registration: MhrRegistration = MhrRegistration.find_by_mhr_number(response.json['mhrNumber'],
+        response_json = response.json
+        assert response_json.get('mhrNumber')
+        if model_utils.is_legacy():
+            assert not str(response_json.get('mhrNumber')).startswith('15')
+        registration: MhrRegistration = MhrRegistration.find_by_mhr_number(response_json.get('mhrNumber'),
                                                                            'PS12345')
         assert registration
 
