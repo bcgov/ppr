@@ -224,7 +224,8 @@ class Db2Mhomnote(db.Model):
                            legacy_address=document.legacy_address,
                            remarks=json_data.get('remarks', ''),
                            can_document_id='')
-
+        if not note.remarks:
+            note.remarks = ''
         if json_data.get('givingNoticeParty'):
             notice = json_data.get('givingNoticeParty')
             if notice.get('phoneNumber'):
