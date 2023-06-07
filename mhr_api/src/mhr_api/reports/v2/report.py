@@ -489,9 +489,16 @@ class Report:  # pylint: disable=too-few-public-methods
                             note['expiryDate'] = ''
                         elif note.get('expiryDate'):
                             note['expiryDate'] = Report._to_report_datetime(note['expiryDate'], False)
+                        elif note.get('expiryDateTime') and str(note['expiryDateTime']).startswith('0001-01-01'):
+                            note['expiryDateTime'] = ''
+                        elif note.get('expiryDateTime'):
+                            note['expiryDateTime'] = Report._to_report_datetime(note['expiryDateTime'], False)
                         if note.get('contactPhoneNumber'):
                             phone = note.get('contactPhoneNumber')
                             note['contactPhoneNumber'] = phone[0:3] + '-' + phone[3:6] + '-' + phone[6:]
+                        elif note.get('givingNoticeParty') and note['givingNoticeParty'].get('phoneNumber'):
+                            phone = note['givingNoticeParty'].get('phoneNumber')
+                            note['givingNoticeParty']['phoneNumber'] = phone[0:3] + '-' + phone[3:6] + '-' + phone[6:]
 
     def _set_search_additional_message(self):
         """Conditionally add a message to the search report data."""

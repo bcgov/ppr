@@ -17,10 +17,10 @@ from flask import current_app
 from sqlalchemy.dialects.postgresql import ENUM as PG_ENUM
 
 from mhr_api.exceptions import DatabaseException
-from mhr_api.models import utils as model_utils
+from mhr_api.models import utils as model_utils, MhrDocument
 
 from .db import db
-from .type_tables import MhrDocumentTypes, MhrNoteStatusTypes
+from .type_tables import MhrDocumentTypes, MhrNoteStatusTypes, MhrPartyTypes, MhrDocumentType
 
 
 class MhrNote(db.Model):  # pylint: disable=too-many-instance-attributes
@@ -32,6 +32,7 @@ class MhrNote(db.Model):  # pylint: disable=too-many-instance-attributes
     remarks = db.Column('remarks', db.String(500), nullable=True)
     destroyed = db.Column('destroyed', db.String(1), nullable=True)
     expiry_date = db.Column('expiry_date', db.DateTime, nullable=True)
+    effective_ts = db.Column('effective_ts', db.DateTime, nullable=False, index=True)
 
     # parent keys
     document_id = db.Column('document_id', db.Integer, db.ForeignKey('mhr_documents.id'), nullable=False,
@@ -51,18 +52,47 @@ class MhrNote(db.Model):  # pylint: disable=too-many-instance-attributes
     @property
     def json(self) -> dict:
         """Return the note as a json object."""
-        document = {
+        note = {
             'documentId': str(self.document_id).rjust(8, '0'),
             'documentType': self.document_type,
             'status': self.status_type,
             'remarks': self.remarks,
             'destroyed': False
         }
+        if self.registration:
+            note['createDateTime'] = model_utils.format_ts(self.registration.registration_ts)
+        doc: MhrDocument = self.get_document()
+        notice = self.get_giving_notice()
+        doc_type: MhrDocumentType = MhrDocumentType.find_by_doc_type(self.document_type)
+        if doc_type:
+            note['documentDescription'] = doc_type.document_type_desc
+        if doc:
+            note['documentRegistrationNumber'] = model_utils.format_doc_reg_number(doc.document_registration_number)
+        if self.effective_ts:
+            note['effectiveDateTime'] = model_utils.format_ts(self.effective_ts)
+        if notice:
+            note['givingNoticeParty'] = notice.json
         if self.destroyed == 'Y':
-            document['destroyed'] = True
+            note['destroyed'] = True
         if self.expiry_date:
-            document['expiryDate'] = model_utils.format_ts(self.expiry_date)
-        return document
+            note['expiryDateTime'] = model_utils.format_ts(self.expiry_date)
+        return note
+
+    def get_document(self) -> MhrDocument:
+        """Return the document for the registration the note was created for."""
+        if self.registration and self.registration.documents:
+            for doc in self.registration.documents:
+                if doc.registration_id == self.registration_id:
+                    return doc
+        return None
+
+    def get_giving_notice(self):
+        """Return the contact party for the registration the note was created for."""
+        if self.registration and self.registration.parties:
+            for party in self.registration.parties:
+                if party.registration_id == self.registration_id and party.party_type == MhrPartyTypes.CONTACT:
+                    return party
+        return None
 
     @classmethod
     def find_by_id(cls, pkey: int = None):
@@ -113,7 +143,11 @@ class MhrNote(db.Model):  # pylint: disable=too-many-instance-attributes
         return notes
 
     @staticmethod
-    def create_from_json(reg_json, registration_id: int, document_id: int, change_registration_id: int = None):
+    def create_from_json(reg_json,
+                         registration_id: int,
+                         document_id: int,
+                         registration_ts,
+                         change_registration_id: int = None):
         """Create a new note object from a registration."""
         note = MhrNote(registration_id=registration_id,
                        document_id=document_id,
@@ -128,6 +162,12 @@ class MhrNote(db.Model):  # pylint: disable=too-many-instance-attributes
             note.remarks = reg_json['remarks']
         if reg_json.get('destroyed'):
             note.destroyed = 'Y'
-        if reg_json.get('expiryDate'):
-            note.expiry_date = model_utils.ts_from_iso_format(reg_json['expiryDate'])
+        if reg_json.get('effectiveDateTime'):
+            note.effective_ts = model_utils.ts_from_iso_format(reg_json['effectiveDateTime'])
+        else:
+            note.effective_ts = registration_ts
+        if note.document_type == MhrDocumentTypes.CAU:  # Compute expiry date.
+            note.expiry_date = model_utils.compute_caution_expiry(note.effective_ts, False)
+        elif reg_json.get('expiryDateTime'):
+            note.expiry_date = model_utils.ts_from_iso_format(reg_json['expiryDateTime'])
         return note

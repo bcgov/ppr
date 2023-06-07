@@ -78,22 +78,25 @@ def test_find_by_manuhome_id_active(session, exists, manuhome_id, doc_id, doc_ty
             assert note.legacy_address is not None
             assert note.remarks is not None
             reg_json = note.registration_json
-            current_app.logger.debug(reg_json)
+            # current_app.logger.debug(reg_json)
             assert reg_json.get('documentType') == doc_type
             assert reg_json.get('documentId') == doc_id
             assert reg_json.get('createDateTime') is not None
             if not expiry:
-                assert not reg_json.get('expiryDate')
+                assert not reg_json.get('expiryDateTime')
             else:
-                assert str(reg_json.get('expiryDate'))[0:10] == expiry
+                assert str(reg_json.get('expiryDateTime'))[0:10] == expiry
             assert reg_json.get('remarks') is not None
-            assert reg_json.get('contactName') is not None
-            assert reg_json.get('contactAddress')
-            assert reg_json['contactAddress']['street']
-            assert reg_json['contactAddress']['city']
-            assert reg_json['contactAddress']['region']
-            assert reg_json['contactAddress']['country']
-            assert reg_json['contactAddress']['postalCode'] is not None
+            assert reg_json.get('givingNoticeParty') is not None
+            notice_json = reg_json.get('givingNoticeParty')
+            assert notice_json.get('businessName')
+            assert notice_json.get('phoneNumber')
+            assert notice_json.get('address')
+            assert notice_json['address']['street']
+            assert notice_json['address']['city']
+            assert notice_json['address']['region']
+            assert notice_json['address']['country']
+            assert notice_json['address']['postalCode'] is not None
     else:
         assert not notes
 
@@ -117,8 +120,10 @@ def test_note_json(session):
         'documentId': note.reg_document_id,
         'remarks': note.remarks,
         'destroyed': False,
-        'contactName': note.name,
-        'contactAddress': address_utils.get_address_from_db2(note.legacy_address),
-        'contactPhoneNumber': note.phone_number
+        'givingNoticeParty': {
+            'businessName': note.name,
+            'address': address_utils.get_address_from_db2(note.legacy_address),
+            'phoneNumber': note.phone_number
+        }
     }
     assert note.json == test_json

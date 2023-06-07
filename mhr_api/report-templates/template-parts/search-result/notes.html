@@ -28,6 +28,8 @@
                     </td>
                     <td>{% if note.expiryDate is defined and note.expiryDate != '' %} 
                             {{note.expiryDate}}
+                        {% elif note.expiryDateTime is defined and note.expiryDateTime != '' %} 
+                           {{note.expiryDateTime}}
                         {% else %}
                             N/A
                         {% endif %}
@@ -48,6 +50,18 @@
                         <div>
                             {% if note.contactName is defined and note.contactName != '' %}
                                 {{note.contactName}}
+                            {% elif note.givingNoticeParty is defined %}
+                                {% if note.givingNoticeParty.businessName is defined %}
+                                    {{ note.givingNoticeParty.businessName }}
+                                {% elif note.givingNoticeParty.personName is defined %}
+                                    {{ note.givingNoticeParty.personName.last }},
+                                    {{ note.givingNoticeParty.personName.first }}
+                                    {% if note.givingNoticeParty.personName.middle is defined %}
+                                        &nbsp;{{ note.givingNoticeParty.personName.middle }}
+                                    {% endif %}
+                                {% else %}
+                                    N/A    
+                                {% endif %}
                             {% else %}
                                 N/A
                             {% endif %}
@@ -62,6 +76,16 @@
                                 {% endif %}
                                 {{ note.contactAddress.country }}
                             </div>
+                        {% elif note.givingNoticeParty is defined and note.givingNoticeParty.address is defined and note.givingNoticeParty.address.street != ''  %}
+                            <div>{{ note.givingNoticeParty.address.street }}</div>
+                            <div>{{ note.givingNoticeParty.address.streetAdditional }}</div>
+                            <div>{{ note.givingNoticeParty.address.city }} {{ note.givingNoticeParty.address.region }}</div>
+                            <div>
+                                {% if note.givingNoticeParty.address.postalCode is defined and note.givingNoticeParty.address.postalCode != '' %}
+                                    {{ note.givingNoticeParty.address.postalCode }}&nbsp;&nbsp; 
+                                {% endif %}
+                                {{ note.givingNoticeParty.address.country }}
+                            </div>
                         {% endif %}
                     </td>
                 </tr>
@@ -69,6 +93,8 @@
                     <td class="section-sub-title">Phone:</td>
                     <td>{% if note.contactPhoneNumber is defined and note.contactPhoneNumber != '' %} 
                             {{note.contactPhoneNumber}}
+                        {% elif note.givingNoticeParty is defined and note.givingNoticeParty.phoneNumber is defined and note.givingNoticeParty.phoneNumber != ''  %}
+                            {{note.givingNoticeParty.phoneNumber}}
                         {% else %}
                             N/A
                         {% endif %}

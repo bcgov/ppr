@@ -20,6 +20,7 @@ from flask import request, current_app, g
 from mhr_api.exceptions import DatabaseException
 from mhr_api.models import EventTracking, MhrRegistration, MhrRegistrationReport
 from mhr_api.models import utils as model_utils
+from mhr_api.models.type_tables import MhrDocumentType
 from mhr_api.reports import get_pdf  # get_callback_pdf, get_report_api_payload
 from mhr_api.resources import utils as resource_utils
 from mhr_api.services.authz import is_reg_staff_account
@@ -262,6 +263,50 @@ def pay_and_save_permit(req: request,  # pylint: disable=too-many-arguments
     return registration
 
 
+def pay_and_save_note(req: request,  # pylint: disable=too-many-arguments
+                      current_reg: MhrRegistration,
+                      request_json,
+                      account_id: str,
+                      user_group: str,
+                      trans_type: str,
+                      trans_id: str = None):
+    """Set up the registration statement, pay, and save the data."""
+    # Charge a fee.
+    token: dict = g.jwt_oidc_token_info
+    current_app.logger.debug(f'user_group={user_group}')
+    request_json['affirmByName'] = get_affirmby(token)
+    registration: MhrRegistration = MhrRegistration.create_note_from_json(current_reg,
+                                                                          request_json,
+                                                                          account_id,
+                                                                          token.get('username', None),
+                                                                          user_group)
+    invoice_id = None
+    pay_ref = None
+    payment_info = build_staff_payment(req, trans_type, 1, trans_id)
+    payment = Payment(jwt=jwt.get_token_auth_header(),
+                      account_id=None,
+                      details=get_payment_details_note(registration, trans_id))
+    current_app.logger.info('Creating staff payment')
+    pay_ref = payment.create_payment_staff(payment_info, registration.client_reference_id)
+    invoice_id = pay_ref['invoiceId']
+    registration.pay_invoice_id = int(invoice_id)
+    registration.pay_path = pay_ref['receipt']
+    # Try to save the registration: failure throws an exception.
+    try:
+        registration.save()
+    except Exception as db_exception:   # noqa: B902; handle all db related errors.
+        current_app.logger.error(SAVE_ERROR_MESSAGE.format(account_id, 'registration', str(db_exception)))
+        if account_id and invoice_id is not None:
+            current_app.logger.info(PAY_REFUND_MESSAGE.format(account_id, 'registration', invoice_id))
+            try:
+                payment.cancel_payment(invoice_id)
+            except SBCPaymentException as cancel_exception:
+                current_app.logger.error(PAY_REFUND_ERROR.format(account_id, 'registration', invoice_id,
+                                                                 str(cancel_exception)))
+        raise DatabaseException(db_exception)
+    return registration
+
+
 def build_staff_payment(req: request, trans_type: str, quantity: int = 1, transaction_id: str = None):
     """Extract staff payment information from request parameters."""
     payment_info = {
@@ -312,6 +357,23 @@ def get_payment_details(registration: MhrRegistration, trans_id: str = None):
     details = {
         'label': label,
         'value': registration.reg_type.registration_type_desc
+    }
+    return details
+
+
+def get_payment_details_note(registration: MhrRegistration, trans_id: str = None):
+    """Build pay api transaction description details."""
+    doc = registration.documents[0]
+    doc_desc: MhrDocumentType = MhrDocumentType.find_by_doc_type(doc.document_type)
+    value: str = ''
+    if doc_desc:
+        value = doc_desc.document_type_desc
+    label = PAY_DETAILS_LABEL
+    if trans_id:
+        label = PAY_DETAILS_LABEL_TRANS_ID.format(trans_id=trans_id)
+    details = {
+        'label': label,
+        'value': value
     }
     return details
 

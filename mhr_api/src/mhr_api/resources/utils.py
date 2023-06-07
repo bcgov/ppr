@@ -22,7 +22,7 @@ from mhr_api.models import utils as model_utils, registration_utils as reg_utils
 from mhr_api.models.registration_utils import AccountRegistrationParams
 from mhr_api.services.authz import user_orgs, is_reg_staff_account, is_sbc_office_account, is_bcol_help
 from mhr_api.services.payment.exceptions import SBCPaymentException
-from mhr_api.utils import registration_validator, manufacturer_validator
+from mhr_api.utils import registration_validator, manufacturer_validator, note_validator
 
 
 # Resource error messages
@@ -269,6 +269,11 @@ def validate_exemption(registration, json_data, is_staff: bool = False):
 def validate_permit(registration, json_data, is_staff: bool = False, group_name: str = None):
     """Perform non-schema extra validation on a transport permit registration."""
     return registration_validator.validate_permit(registration, json_data, is_staff, group_name)
+
+
+def validate_note(registration, json_data, is_staff: bool, group: str):
+    """Perform non-schema extra validation on a unit note registration."""
+    return note_validator.validate_note(registration, json_data, is_staff, group)
 
 
 def valid_api_key(req) -> bool:

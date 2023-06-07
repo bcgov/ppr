@@ -21,7 +21,7 @@ import copy
 import pytest
 from registry_schemas.example_data.mhr import NOTE
 
-from mhr_api.models import MhrNote
+from mhr_api.models import MhrNote, utils as model_utils
 from mhr_api.models.type_tables import MhrDocumentTypes, MhrNoteStatusTypes
 
 
@@ -35,7 +35,9 @@ TEST_NOTE = MhrNote(id=1,
     document_type=MhrDocumentTypes.REG_101,
     document_id=200000000,
     remarks='remarks',
-    destroyed='N')
+    destroyed='N',
+    effective_ts = model_utils.now_ts(),
+    expiry_date = model_utils.now_ts_offset(90, True))
 
 
 @pytest.mark.parametrize('id, has_results', TEST_ID_DATA)
@@ -115,8 +117,11 @@ def test_note_json(session):
         'documentId': str(note.document_id),
         'status': note.status_type,
         'documentType': note.document_type,
+        'documentDescription': 'MANUFACTURED HOME REGISTRATION',
         'remarks': note.remarks,
-        'destroyed': False
+        'destroyed': False,
+        'effectiveDateTime': model_utils.format_ts(note.effective_ts),
+        'expiryDateTime': model_utils.format_ts(note.expiry_date)
     }
     assert note.json == note_json
 
@@ -125,12 +130,17 @@ def test_create_from_reg_json(session):
     """Assert that the new MHR note is created from MH registration json data correctly."""
     json_data = copy.deepcopy(NOTE)
     json_data['remarks'] = 'remarks'
-    json_data['documentType'] = MhrDocumentTypes.EXNR
-    note: MhrNote = MhrNote.create_from_json(json_data, 1000, 2000, 3000)
+    json_data['documentType'] = MhrDocumentTypes.CAU
+    reg_ts = model_utils.now_ts()
+    effective_ts = model_utils.now_ts_offset(10, False)
+    json_data['effectiveDateTime'] = model_utils.format_ts(effective_ts)
+    note: MhrNote = MhrNote.create_from_json(json_data, 1000, 2000, reg_ts, 3000)
     assert note
     assert note.registration_id == 1000
     assert note.document_id == 2000
     assert note.change_registration_id == 3000
     assert note.destroyed == 'N'
-    assert note.document_type == MhrDocumentTypes.EXNR
+    assert note.document_type == MhrDocumentTypes.CAU
     assert note.remarks == 'remarks'
+    assert note.effective_ts
+    assert note.expiry_date

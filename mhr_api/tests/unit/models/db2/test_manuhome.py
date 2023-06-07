@@ -26,7 +26,7 @@ from registry_schemas.example_data.mhr import REGISTRATION, LOCATION, TRANSFER, 
 from mhr_api.exceptions import BusinessException
 from mhr_api.models import Db2Document, Db2Manuhome, Db2Mhomnote, Db2Owngroup, MhrRegistration, Db2Location
 from mhr_api.models.type_tables import MhrPartyTypes, MhrTenancyTypes
-from mhr_api.services.authz import MANUFACTURER_GROUP, QUALIFIED_USER_GROUP, GOV_ACCOUNT_ROLE
+from mhr_api.services.authz import MANUFACTURER_GROUP, QUALIFIED_USER_GROUP, GOV_ACCOUNT_ROLE, STAFF_ROLE
 
 
 COMMON_GROUP_1 = Db2Owngroup(interest='UNDIVIDED',
@@ -47,6 +47,42 @@ COMMON_GROUP_3 = Db2Owngroup(interest='UNDIVIDED',
                              group_id=3,
                              tenancy_type='TC',
                              status='3')
+NOTE_REGISTRATION = {
+  'clientReferenceId': 'EX-TP001234',
+  'attentionReference': 'JOHN SMITH',
+  'submittingParty': {
+    'businessName': 'BOB PATERSON HOMES INC.',
+    'address': {
+      'street': '1200 S. MACKENZIE AVE.',
+      'city': 'WILLIAMS LAKE',
+      'region': 'BC',
+      'country': 'CA',
+      'postalCode': 'V2G 3Y1'
+    },
+    'phoneNumber': '6044620279'
+  },
+  'note': {
+    'documentType': 'CAU',
+    'documentId': '62133670',
+    'effectiveDateTime': '2023-02-21T18:56:00+00:00',
+    'remarks': 'NOTICE OF ACTION COMMENCED MARCH 1 2022 WITH CRANBROOK COURT REGISTRY COURT FILE NO. 3011.',
+    'givingNoticeParty': {
+      'personName': {
+        'first': 'JOHNNY',
+        'middle': 'B',
+        'last': 'SMITH'
+      },
+      'address': {
+        'street': '222 SUMMER STREET',
+        'city': 'VICTORIA',
+        'region': 'BC',
+        'country': 'CA',
+        'postalCode': 'V8W 2V8'
+      },
+      'phoneNumber': '2504930122'
+    }
+  }
+}
 # testdata pattern is ({exists}, {id}, {mhr_num}, {status}, {doc_id})
 TEST_DATA = [
     (True, 1, '022911', 'E', 'REG22911'),
@@ -101,6 +137,10 @@ TEST_DATA_GROUP_TYPE = [
     (MhrTenancyTypes.NA, 8, '004764', MhrPartyTypes.EXECUTOR),
     (MhrTenancyTypes.NA, 6, '051414', MhrPartyTypes.ADMINISTRATOR),
     (MhrTenancyTypes.NA, 4, '098504', MhrPartyTypes.TRUSTEE)
+]
+# testdata pattern is ({mhr_num}, {group_id}, {doc_id_prefix}, {account_id})
+TEST_DATA_NOTE = [
+    ('003936', STAFF_ROLE, '6', 'ppr_staff')
 ]
 
 
@@ -418,7 +458,7 @@ def test_create_exemption_from_json(session, mhr_num, user_group, doc_id_prefix,
     json_data['mhrNumber'] = mhr_num
     json_data['nonResidential'] = False
     json_data['note']['remarks'] = 'remarks'
-    json_data['note']['expiryDate'] = '2022-10-07T18:43:45+00:00'
+    json_data['note']['expiryDateTime'] = '2022-10-07T18:43:45+00:00'
     base_reg: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account_id)
     assert base_reg
     assert base_reg.manuhome
@@ -529,3 +569,41 @@ def test_save_new(session):
     assert len(manuhome.reg_owner_groups) == 2
     for group in manuhome.reg_owner_groups:
         assert group.status == '3'
+
+
+@pytest.mark.parametrize('mhr_num,user_group,doc_id_prefix,account_id', TEST_DATA_NOTE)
+def test_create_note_from_json(session, mhr_num, user_group, doc_id_prefix, account_id):
+    """Assert that an MHR unit note registration is created from json correctly."""
+    json_data = copy.deepcopy(NOTE_REGISTRATION)
+    base_reg: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account_id)
+    assert base_reg
+    # current_app.logger.info(json_data)
+    registration: MhrRegistration = MhrRegistration.create_note_from_json(base_reg,
+                                                                          json_data,
+                                                                          'ppr_staff',
+                                                                          'userid',
+                                                                          user_group)
+    assert registration.id > 0
+    assert registration.doc_id
+    assert json_data.get('documentId')
+    assert str(json_data.get('documentId')).startswith(doc_id_prefix)
+    manuhome: Db2Manuhome = Db2Manuhome.create_from_note(registration, json_data)
+    assert len(manuhome.reg_documents) > 1
+    index: int = len(manuhome.reg_documents) - 1
+    doc: Db2Document = manuhome.reg_documents[index]
+    assert doc.id == registration.doc_id
+    assert doc.document_type == 'CAU '
+    assert doc.document_reg_id == registration.doc_reg_number
+    assert doc.attention_reference
+    assert doc.client_reference_id
+    assert doc.registration_ts
+    assert manuhome.reg_notes
+    note: Db2Mhomnote = manuhome.reg_notes[0]
+    assert note.document_type == doc.document_type
+    assert note.reg_document_id == doc.id
+    assert note.destroyed == 'N'
+    assert note.remarks
+    assert note.expiry_date
+    assert note.name
+    assert note.phone_number
+    assert note.legacy_address

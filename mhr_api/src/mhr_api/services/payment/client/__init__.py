@@ -41,7 +41,8 @@ TRANSACTION_TO_FILING_TYPE = {
     'EXEMPTION_RES': 'EXEMP',
     'EXEMPTION_NON_RES': 'EXEMN',
     'TRANSPORT_PERMIT': 'TRAPP',
-    'TRANSPORT_PERMIT_EXT': 'TRAPP'
+    'TRANSPORT_PERMIT_EXT': 'TRAPP',
+    'UNIT_NOTE': 'CCONT'
 }
 
 # Mapping from normal filing type to staff version of filing type

@@ -49,7 +49,8 @@ REG_TO_DOC_TYPE = {
     'TRANS': 'TRAN',
     'TRANS_AFFIDAVIT': 'AFFE',
     'TRANS_ADMIN': 'LETA',
-    'TRANS_WILL': 'WILL'
+    'TRANS_WILL': 'WILL',
+    'REG_STAFF_ADMIN': 'CAU'
 }
 
 
@@ -130,6 +131,12 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                 reg_json = self.set_transfer_group_json(reg_json)
             elif self.registration_type in (MhrRegistrationTypes.EXEMPTION_NON_RES, MhrRegistrationTypes.EXEMPTION_RES):
                 reg_json = self.set_note_json(reg_json, False)
+            elif self.registration_type == MhrRegistrationTypes.REG_NOTE:
+                reg_json = self.set_note_json(reg_json, False)
+                del reg_json['documentId']
+                del reg_json['declaredValue']
+                del reg_json['documentDescription']
+                del reg_json['documentRegistrationNumber']
             elif self.registration_type == MhrRegistrationTypes.MHREG:
                 reg_json['ownLand'] = doc_json.get('ownLand')
             current_app.logger.debug(f'Built registration JSON for type={self.registration_type}.')
@@ -312,6 +319,9 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
             elif self.registration_type == MhrRegistrationTypes.PERMIT:
                 self.manuhome = Db2Manuhome.create_from_permit(self, self.reg_json)
                 self.manuhome.save_permit()
+            elif self.registration_type == MhrRegistrationTypes.REG_NOTE:
+                self.manuhome = Db2Manuhome.create_from_note(self, self.reg_json)
+                self.manuhome.save_note()
         db.session.commit()
 
     def save_exemption(self):
@@ -601,9 +611,12 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         registration.id = reg_vals.id  # pylint: disable=invalid-name; allow name of id.
         registration.mhr_number = base_reg.mhr_number
         registration.doc_reg_number = reg_vals.doc_reg_number
-        registration.doc_id = reg_vals.doc_id
-        registration.doc_pkey = reg_vals.doc_pkey
         registration.registration_type = json_data.get('registrationType')
+        if registration.registration_type == MhrRegistrationTypes.REG_NOTE and json_data.get('documentId'):
+            registration.doc_id = json_data.get('documentId')
+        else:
+            registration.doc_id = reg_vals.doc_id
+        registration.doc_pkey = reg_vals.doc_pkey
         registration.registration_ts = model_utils.now_ts()
         registration.status_type = MhrRegistrationStatusTypes.ACTIVE
         registration.account_id = account_id
@@ -624,6 +637,8 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         doc: MhrDocument = MhrDocument.create_from_json(registration,
                                                         json_data,
                                                         REG_TO_DOC_TYPE[registration.registration_type])
+        if registration.registration_type == MhrRegistrationTypes.REG_NOTE:
+            doc.document_type = json_data['note'].get('documentType')
         doc.registration_id = base_reg.id
         registration.documents = [doc]
         return registration
@@ -670,7 +685,8 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                 json_data['note']['noteId'] = len(base_reg.manuhome.reg_notes) + 1
             else:
                 json_data['note']['noteId'] = 1
-            registration.notes = [MhrNote.create_from_json(json_data.get('note'), base_reg.id, doc.id, registration.id)]
+            registration.notes = [MhrNote.create_from_json(json_data.get('note'), base_reg.id, doc.id,
+                                                           registration.registration_ts, registration.id)]
         if base_reg:
             registration.manuhome = base_reg.manuhome
         return registration
@@ -709,6 +725,34 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         registration.notes = [note]
         # New location
         registration.locations.append(MhrLocation.create_from_json(json_data.get('newLocation'), registration.id))
+        if base_reg:
+            registration.manuhome = base_reg.manuhome
+        return registration
+
+    @staticmethod
+    def create_note_from_json(base_reg,
+                              json_data,
+                              account_id: str = None,
+                              user_id: str = None,
+                              user_group: str = None):
+        """Create unit note registration objects from dict/json."""
+        json_data['registrationType'] = MhrRegistrationTypes.REG_NOTE
+        json_data['documentId'] = json_data['note'].get('documentId', '')
+        registration: MhrRegistration = MhrRegistration.create_change_from_json(base_reg,
+                                                                                json_data,
+                                                                                account_id,
+                                                                                user_id,
+                                                                                user_group)
+        if json_data['note'].get('givingNoticeParty'):
+            notice_json = json_data['note']['givingNoticeParty']
+            registration.parties.append(MhrParty.create_from_json(notice_json, MhrPartyTypes.CONTACT, registration.id))
+        doc: MhrDocument = registration.documents[0]
+        if base_reg and base_reg.manuhome and base_reg.manuhome.reg_notes:
+            json_data['note']['noteId'] = len(base_reg.manuhome.reg_notes) + 1
+        else:
+            json_data['note']['noteId'] = 1
+        registration.notes = [MhrNote.create_from_json(json_data.get('note'), base_reg.id, doc.id,
+                                                       registration.registration_ts, registration.id)]
         if base_reg:
             registration.manuhome = base_reg.manuhome
         return registration

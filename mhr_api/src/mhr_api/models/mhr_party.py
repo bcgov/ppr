@@ -80,13 +80,13 @@ class MhrParty(db.Model):  # pylint: disable=too-many-instance-attributes
         """Return the party as a json object."""
         party = {
         }
-        if self.party_type != MhrPartyTypes.SUBMITTING:
+        if self.party_type not in (MhrPartyTypes.SUBMITTING, MhrPartyTypes.CONTACT):
             party['ownerId'] = self.id
             party['status'] = self.status_type
             party['partyType'] = self.party_type
 
         if self.business_name:
-            if self.party_type == MhrPartyTypes.SUBMITTING:
+            if self.party_type in (MhrPartyTypes.SUBMITTING, MhrPartyTypes.CONTACT):
                 party['businessName'] = self.business_name
             else:
                 party['organizationName'] = self.business_name
@@ -97,7 +97,7 @@ class MhrParty(db.Model):  # pylint: disable=too-many-instance-attributes
             }
             if self.middle_name:
                 person_name['middle'] = self.middle_name
-            if self.party_type == MhrPartyTypes.SUBMITTING:
+            if self.party_type in (MhrPartyTypes.SUBMITTING, MhrPartyTypes.CONTACT):
                 party['personName'] = person_name
             else:
                 party['individualName'] = person_name
