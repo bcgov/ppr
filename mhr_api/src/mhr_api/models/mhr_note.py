@@ -56,7 +56,7 @@ class MhrNote(db.Model):  # pylint: disable=too-many-instance-attributes
             'documentId': str(self.document_id).rjust(8, '0'),
             'documentType': self.document_type,
             'status': self.status_type,
-            'remarks': self.remarks,
+            'remarks': self.remarks if self.remarks is not None else '',
             'destroyed': False
         }
         if self.registration:

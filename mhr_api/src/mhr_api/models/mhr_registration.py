@@ -34,8 +34,18 @@ from .mhr_note import MhrNote
 from .mhr_owner_group import MhrOwnerGroup
 from .mhr_party import MhrParty
 from .mhr_section import MhrSection
-from .type_tables import MhrDocumentType, MhrRegistrationType, MhrRegistrationTypes, MhrRegistrationStatusTypes
-from .type_tables import MhrOwnerStatusTypes, MhrPartyTypes, MhrTenancyTypes, MhrNoteStatusTypes, MhrStatusTypes
+from .type_tables import (
+    MhrDocumentType,
+    MhrDocumentTypes,
+    MhrNoteStatusTypes,
+    MhrOwnerStatusTypes,
+    MhrPartyTypes,
+    MhrRegistrationType,
+    MhrRegistrationTypes,
+    MhrRegistrationStatusTypes,
+    MhrStatusTypes,
+    MhrTenancyTypes
+)
 
 
 REG_TO_DOC_TYPE = {
@@ -139,21 +149,12 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                 del reg_json['documentRegistrationNumber']
             elif self.registration_type == MhrRegistrationTypes.MHREG:
                 reg_json['ownLand'] = doc_json.get('ownLand')
+            reg_json['hasCaution'] = self.set_caution()
             current_app.logger.debug(f'Built registration JSON for type={self.registration_type}.')
             return self.set_payment_json(reg_json)
-
         if model_utils.is_legacy() and self.manuhome:
             return legacy_utils.get_registration_json(self)
-        # Definition after data migration.
-        registration = {
-            'mhrNumber': self.mhr_number,
-            'createDateTime': model_utils.format_ts(self.registration_ts)
-        }
-        if self.client_reference_id:
-            registration['clientReferenceId'] = self.client_reference_id
-
-        # registration_id = self.id
-        return self.set_payment_json(registration)
+        return {}
 
     @property
     def registration_json(self) -> dict:
@@ -187,6 +188,9 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
             reg_json = self.set_location_json(reg_json, self.current_view)
             reg_json = self.set_description_json(reg_json, self.current_view)
             reg_json = self.set_group_json(reg_json, self.current_view)
+            if self.current_view and self.staff:
+                reg_json = self.set_notes_json(reg_json)
+            reg_json['hasCaution'] = self.set_caution()
             current_app.logger.debug('Built new registration JSON')
             return self.set_payment_json(reg_json)
 
@@ -246,6 +250,30 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                 else:
                     reg_json['location'] = location.json
         return reg_json
+
+    def set_caution(self) -> bool:
+        """Check if an active caution exists on the MH registration: exists and not cancelled or expired."""
+        has_caution: bool = False
+        if not self.notes:
+            return has_caution
+        for note in self.notes:
+            if note.document_type in (MhrDocumentTypes.CAU, MhrDocumentTypes.CAUC, MhrDocumentTypes.CAUE) and \
+                    note.status_type == MhrNoteStatusTypes.ACTIVE.value:
+                if not note.expiry_date and note.document_type == MhrDocumentTypes.CAUC:
+                    has_caution = True
+                elif note.expiry_date:
+                    now_ts = model_utils.now_ts()
+                    has_caution = note.expiry_date.timestamp() > now_ts.timestamp()
+                    break
+        return has_caution
+
+    def set_notes_json(self, reg_json) -> dict:
+        """Build the unit notes JSON for registries staff and current requests."""
+        notes = []
+        if reg_json and self.notes:
+            for note in reversed(self.notes):
+                notes.append(note.json)
+        return notes
 
     def set_group_json(self, reg_json, current: bool) -> dict:
         """Build the owner group JSON conditional on current."""

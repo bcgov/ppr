@@ -19,7 +19,7 @@ from flask import current_app
 
 from mhr_api.exceptions import BusinessException, DatabaseException, ResourceErrorCodes
 from mhr_api.models import utils as model_utils
-from mhr_api.models.type_tables import MhrTenancyTypes, MhrPartyTypes, MhrRegistrationTypes
+from mhr_api.models.type_tables import MhrTenancyTypes, MhrPartyTypes, MhrRegistrationTypes, MhrDocumentTypes
 from mhr_api.models import db
 
 from .descript import Db2Descript
@@ -103,6 +103,7 @@ class Db2Manuhome(db.Model):
     reg_notes = []
     reg_owner_groups = []
     current_view: bool = False
+    staff: bool = False
 
     def save(self):
         """Save the object to the database immediately."""
@@ -477,6 +478,7 @@ class Db2Manuhome(db.Model):
                 notes.append(note_json)
             # Now sort in descending timestamp order.
             man_home['notes'] = Db2Manuhome.__sort_notes(notes)
+        man_home['hasCaution'] = self.set_caution()
         return man_home
 
     @property
@@ -533,6 +535,18 @@ class Db2Manuhome(db.Model):
             man_home['location'] = self.reg_location.new_registration_json
         if self.reg_descript:
             man_home['description'] = self.reg_descript.registration_json
+        if self.current_view and self.staff:
+            notes = []
+            if self.reg_notes:
+                for note in self.reg_notes:
+                    note_json = note.registration_json
+                    note_json['documentRegistrationNumber'] = self.__get_note_doc_reg_num(note.reg_document_id)
+                    notes.append(note_json)
+                # Now sort in descending timestamp order.
+                man_home['notes'] = Db2Manuhome.__sort_notes(notes)
+            else:
+                man_home['notes'] = notes
+        man_home['hasCaution'] = self.set_caution()
         return man_home
 
     def __get_note_doc_reg_num(self, doc_id: str) -> str:
@@ -543,6 +557,23 @@ class Db2Manuhome(db.Model):
                 if doc.id == doc_id:
                     return doc.document_reg_id
         return reg_num
+
+    def set_caution(self) -> bool:
+        """Check if an active caution exists on the MH registration: exists and not cancelled or expired."""
+        has_caution: bool = False
+        if not self.notes:
+            return has_caution
+        for note in self.notes:
+            if note.document_type in (MhrDocumentTypes.CAU, MhrDocumentTypes.CAUC, MhrDocumentTypes.CAUE) and \
+                    note.status == Db2Mhomnote.StatusTypes.ACTIVE:
+                if (not note.expiry_date or note.expiry_date.isoformat() != '0001-01-01') and \
+                        note.document_type == MhrDocumentTypes.CAUC:
+                    has_caution = True
+                elif note.expiry_date:
+                    now_ts = model_utils.now_ts()
+                    has_caution = note.expiry_date > now_ts.date()
+                    break
+        return has_caution
 
     @classmethod
     def __update_group_type(cls, groups, existing_count: int = 0):

@@ -188,6 +188,7 @@ def get_registrations(mhr_number: str):  # pylint: disable=too-many-return-state
                                                               account_id,
                                                               is_all_staff_account(account_id))
             registration.current_view = True
+            registration.staff = is_staff(jwt)
         else:
             registration = MhrRegistration.find_original_by_mhr_number(mhr_number,
                                                                        account_id,
