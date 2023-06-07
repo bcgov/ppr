@@ -76,7 +76,7 @@ TEST_QUERY_FILTER_DATA_DATE = [
 
 # testdata pattern is ({account_id}, {collapse}, {start_value}, {end_value}, {second_filter_name},
 #                      {second_filter_value}, {mhr_numbers}, {expected_date_clause}, {expected_second_clause})
-TEST_QUERY_FILTER_DATA_MULTIPLE = [
+TEST_QUERY_FILTER_DATA_MULTIPLE= [
     ('2523', False, '2021-10-14T09:53:57-07:53', '2021-10-17T09:53:57-07:53', reg_utils.MHR_NUMBER_PARAM,
      '098487', "'dgfhdgf'", db2_utils.REG_FILTER_DATE, 'mh.mhregnum IN (?)'),
     ('2523', False, '2021-10-14T09:53:57-07:53', '2021-10-17T09:53:57-07:53', reg_utils.REG_TYPE_PARAM,
@@ -90,7 +90,6 @@ TEST_QUERY_FILTER_DATA_MULTIPLE = [
     ('2523', False, '2021-10-14T09:53:57-07:53', '2021-10-17T09:53:57-07:53', reg_utils.USER_NAME_PARAM,
      'BCREG2', "'098487'", db2_utils.REG_FILTER_DATE, db2_utils.REG_FILTER_USERNAME),
 ]
-
 
 @pytest.mark.parametrize('account_id, has_results', TEST_ACCOUNT_REG_DATA)
 def test_find_account_registrations(session, account_id, has_results):
@@ -264,6 +263,8 @@ def test_account_reg_filter_multiple(session, account_id, collapse, start_value,
     filter_query: str = db2_utils.build_account_query_filter(base_query, params, mhr_numbers,
                                                              MhrDocumentType.find_all())
 
+    #current_app.logger.info(filter_query)
+    #current_app.logger.info(second_filter_clause)
     assert filter_query.find(date_filter_clause) > 0
     assert filter_query.find(second_filter_clause) > 0
 
@@ -311,7 +312,7 @@ def test_get_pid_list(session):
     pid_list = db2_utils.get_pid_list()
     # assert pid_list
     for pid in pid_list:
-        assert pid.get('pidNumber');
+        assert pid.get('pidNumber')
 
 
 def test_update_pid_list(session):
@@ -319,3 +320,12 @@ def test_update_pid_list(session):
     pid_list = [{'pidNumber': '  1789805'}]
     db2_utils.update_pid_list(pid_list, db2_utils.UPDATE_PID_STATUS_SUCCESS)
     db2_utils.update_pid_list(pid_list, ' ')
+
+
+def test_get_next_mhr_number(session):
+    """Assert that the get next mhr number query works as expected."""
+    mhr1 = db2_utils.get_next_mhr_number()
+    mhr2 = db2_utils.get_next_mhr_number()
+    # assert number generated
+    assert mhr1 and mhr2
+    assert int(mhr1) + 1 == int(mhr2)
