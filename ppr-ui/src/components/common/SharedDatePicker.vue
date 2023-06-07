@@ -67,10 +67,10 @@ export default defineComponent({
     initialValue: { type: String, default: '' },
     minDate: { type: String, default: '' },
     maxDate: { type: String, default: '' },
-    nudgeTop: { type: Number || String, default: null },
-    nudgeBottom: { type: Number || String, default: null },
-    nudgeRight: { type: Number || String, default: null },
-    nudgeLeft: { type: Number || String, default: null },
+    nudgeTop: { type: String, default: null },
+    nudgeBottom: { type: String, default: null },
+    nudgeRight: { type: String, default: null },
+    nudgeLeft: { type: String, default: null },
     hint: { type: String, default: '' },
     persistentHint: { type: Boolean, default: false },
     clearable: { type: Boolean, default: false }
@@ -205,7 +205,6 @@ export default defineComponent({
 }
 
 ::v-deep .theme--light.v-btn:not(.v-btn--flat):not(.v-btn--text):not(.v-btn--outlined) {
-  background-color: $app-blue !important;
   border-color: $app-blue !important;
   color: white !important;
 }

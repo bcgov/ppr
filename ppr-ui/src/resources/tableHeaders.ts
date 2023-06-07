@@ -922,3 +922,30 @@ export const homeOwnersTableHeadersReview: Array<BaseHeaderIF> = [
     value: 'phoneNumber'
   }
 ]
+
+export const personGivingNoticeTableHeaders: Array<BaseHeaderIF> = [
+  {
+    class: 'column-mdxl',
+    sortable: false,
+    text: 'Name',
+    value: 'fullName'
+  },
+  {
+    class: 'column-lg',
+    sortable: false,
+    text: 'Mailing Address',
+    value: 'mailingAddress'
+  },
+  {
+    class: 'column-lg',
+    sortable: false,
+    text: 'Email Address',
+    value: 'emailAddress'
+  },
+  {
+    class: 'column-lg',
+    sortable: false,
+    text: 'Phone Number',
+    value: 'phoneNumber'
+  }
+]

@@ -272,6 +272,10 @@
                   :validate="!isTransferDueToDeath && validate"
                   @isValid="setValidation('isTransferDetailsValid', $event)"
                 />
+
+                <UnitNotePanels v-if="isRoleStaffReg" :unitNotes="mockUnitNotes" :disabled="showTransferType" />
+
+                <v-spacer class="py-10 my-10"></v-spacer>
               </template>
             </section>
           </v-col>
@@ -320,6 +324,7 @@ import { MhrSubmittingParty } from '@/components/mhrRegistration/SubmittingParty
 import { ConfirmCompletion, TransferDetails, TransferDetailsReview, TransferType } from '@/components/mhrTransfers'
 import { HomeLocationReview, YourHomeReview } from '@/components/mhrRegistration/ReviewConfirm'
 import { HomeOwners } from '@/views'
+import { UnitNotePanels } from '@/components/unitNotes'
 import { BaseDialog } from '@/components/dialogs'
 import { cancelOwnerChangeConfirm, transferRequiredDialog, unsavedChangesDialog } from '@/resources/dialogOptions'
 import AccountInfo from '@/components/common/AccountInfo.vue'
@@ -355,6 +360,8 @@ import {
   updateMhrDraft
 } from '@/utils'
 import { clientConfig, staffConfig } from '@/resources/attnRefConfigs'
+import { UnitNoteIF } from '@/interfaces/unit-note-interfaces/unit-note-interface'
+import { mockUnitNotes } from '../../../tests/unit/test-data/'
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
@@ -373,7 +380,8 @@ export default defineComponent({
     AccountInfo,
     ConfirmCompletion,
     YourHomeReview,
-    StaffPayment
+    StaffPayment,
+    UnitNotePanels
   },
   props: {
     appReady: {
@@ -887,6 +895,7 @@ export default defineComponent({
       cancelOwnerChangeConfirm,
       transferRequiredDialog,
       getMhrTransferSubmittingParty,
+      mockUnitNotes,
       ...toRefs(localState)
     }
   }

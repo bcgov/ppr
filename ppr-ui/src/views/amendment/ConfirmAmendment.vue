@@ -322,7 +322,7 @@ export default defineComponent({
         }
       }),
       showDescription: computed((): boolean => {
-        return !!getAmendmentDescription
+        return !!getAmendmentDescription.value
       }),
       currentRegNumber: computed((): string => {
         return getRegistrationNumber.value || ''

@@ -25,5 +25,7 @@ export enum MhApiStatusTypes {
   ACTIVE = 'ACTIVE',
   EXEMPT = 'EXEMPT',
   HISTORICAL = 'HISTORICAL',
-  FROZEN = 'FROZEN'
+  FROZEN = 'FROZEN',
+  CANCELLED = 'CANCELLED',
+  EXPIRED = 'EXPIRED'
 }

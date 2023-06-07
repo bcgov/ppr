@@ -28,6 +28,7 @@ export * from './business-statuses'
 export * from './business-types'
 export * from './transferTypes'
 export * from './homeOwnerPartyTypes'
+export * from './unitNoteDocTypes'
 
 // external enums
 export { CorpTypeCd } from '@bcrs-shared-components/corp-type-module'
