@@ -566,7 +566,7 @@ class Db2Manuhome(db.Model):
         for note in self.notes:
             if note.document_type in (MhrDocumentTypes.CAU, MhrDocumentTypes.CAUC, MhrDocumentTypes.CAUE) and \
                     note.status == Db2Mhomnote.StatusTypes.ACTIVE:
-                if (not note.expiry_date or note.expiry_date.isoformat() != '0001-01-01') and \
+                if (not note.expiry_date or note.expiry_date.isoformat() == '0001-01-01') and \
                         note.document_type == MhrDocumentTypes.CAUC:
                     has_caution = True
                 elif note.expiry_date:
