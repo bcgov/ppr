@@ -139,10 +139,10 @@ export default defineComponent({
           mhrInfoBreadcrumb[2].text = `MHR Number ${getMhrInformation.value.mhrNumber}`
           return mhrInfoBreadcrumb
         } else if (route.name === RouteNames.MHR_INFORMATION_NOTE) {
-          const addUnitNoteBreadcrumb = [...tombstoneBreadcrumbMhrUnitNote]
-          addUnitNoteBreadcrumb[2].text = `MHR Number ${getMhrInformation.value.mhrNumber}`
-          addUnitNoteBreadcrumb[3].text = unitNotes[getMhrUnitNoteType.value].header
-          return addUnitNoteBreadcrumb
+          const mhrUnitNoteBreadcrumb = [...tombstoneBreadcrumbMhrUnitNote]
+          mhrUnitNoteBreadcrumb[2].text = `MHR Number ${getMhrInformation.value.mhrNumber}`
+          mhrUnitNoteBreadcrumb[3].text = unitNotes[getMhrUnitNoteType.value].header
+          return mhrUnitNoteBreadcrumb
         } else {
           const registrationBreadcrumb = [...tombstoneBreadcrumbRegistration]
           registrationBreadcrumb[1].text = roleBasedBreadcrumbTitle || registrationBreadcrumb[1].text

@@ -11,42 +11,28 @@
       <div class="container pa-0 pt-4">
         <v-row no-gutters>
           <v-col cols="9">
-            <v-row no-gutters id="mhr-information-header" class="pt-3 soft-corners-top">
-              <v-col cols="auto">
-                <h1>
-                  {{ unitNote.header }}
-                </h1>
-                <p class="mt-7">
-                  Enter the information below to file a {{ unitNote.typeDesc }} on manufactured home registration number
-                  {{ mhrNumber }}.
-                </p>
+            <div v-if="!isReviewMode" id="mhr-unit-note" class="pt-3">
+              <h1>
+                {{ unitNote.header }}
+              </h1>
+              <p class="mt-7">
+                Enter the information below to file a {{ unitNote.typeDesc }} on manufactured home registration number
+                {{ mhrNumber }}.
+              </p>
 
-                <section id="mhr-unit-note-doc-id" class="mt-10">
-                  <h2>Document ID</h2>
-                  <p class="mt-2">
-                    Enter the 8-digit Document ID number.
-                  </p>
-                  // Add Document ID component //
-                </section>
+              <UnitNoteAdd :docType='unitNoteDocType' />
+            </div>
 
-                <section id="mhr-unit-note-remarks" class="mt-10">
-                  <h2>Remarks</h2>
-                  <p class="mt-2">
-                    Add remarks to provide further details on this {{ unitNote.typeDesc }}.
-                  </p>
-                  // Add Remarks //
-                </section>
+            <div v-else class="pt-3">
+              <h1>
+               Review and Confirm
+              </h1>
+              <p class="mt-7">
+                Review your changes and complete the additional information before registering.
+              </p>
 
-                <section id="mhr-unit-note-person-giving-notice" class="mt-10">
-                  <h2>Person Giving Notice</h2>
-                  <p class="mt-2">
-                    Enter the contact information for the person making the claim.
-                  </p>
-                  // Add Person Giving Notice //
-                </section>
-
-              </v-col>
-            </v-row>
+              <UnitNoteReview />
+            </div>
           </v-col>
 
           <v-col class="pl-6 pt-5" cols="3">
@@ -54,6 +40,7 @@
               <affix class="sticky-container" relative-element-selector=".col-9" :offset="{ top: 90, bottom: -100 }">
                 <StickyContainer
                   :setShowButtons="true"
+                  :setBackBtn="showBackBtn"
                   :setCancelBtn="'Cancel'"
                   :setSubmitBtn="reviewConfirmText"
                   :setRightOffset="true"
@@ -84,10 +71,16 @@ import { StickyContainer } from '@/components/common'
 import { BaseDialog } from '@/components/dialogs'
 import { unitNotes } from '@/resources/mhr-transfers/unit-notes'
 import { unsavedChangesDialog } from '@/resources/dialogOptions/cancelDialogs'
+import { UnitNoteAdd, UnitNoteReview } from '@/components/unitNotes'
 
 export default defineComponent({
-  name: 'AddUnitNote',
-  components: { BaseDialog, StickyContainer },
+  name: 'MhrUnitNote',
+  components: {
+    BaseDialog,
+    StickyContainer,
+    UnitNoteAdd,
+    UnitNoteReview
+  },
   props: {
   },
   setup () {
@@ -107,7 +100,9 @@ export default defineComponent({
       isReviewMode: false,
       cancelOptions: unsavedChangesDialog,
       showCancelDialog: false,
+      showBackBtn: computed((): string => localState.isReviewMode ? 'Back' : ''),
 
+      unitNoteDocType: getMhrUnitNoteType.value,
       unitNote: unitNotes[getMhrUnitNoteType.value],
       mhrNumber: getMhrInformation.value.mhrNumber,
 
@@ -122,9 +117,11 @@ export default defineComponent({
       if (!getMhrUnitNoteType.value) {
         await router.push({ name: RouteNames.DASHBOARD })
       }
+      // localState.unitNoteDocType = getMhrUnitNoteType.value
     })
 
     const goToReview = async (): Promise<void> => {
+      localState.isReviewMode = true
     }
 
     const goToDash = (): void => {
