@@ -1,6 +1,12 @@
 <template>
   <v-container class="view-container pa-0" fluid>
 
+    <BaseDialog
+      :setOptions="cancelOptions"
+      :setDisplay="showCancelDialog"
+      @proceed="handleDialogResp($event)"
+    />
+
     <div class="view-container px-15 pt-0 pb-5">
       <div class="container pa-0 pt-4">
         <v-row no-gutters>
@@ -68,18 +74,20 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, reactive, toRefs } from 'vue-demi'
+import { defineComponent, computed, reactive, toRefs, onMounted } from 'vue-demi'
 import { useRouter } from 'vue2-helpers/vue-router'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
-import { unitNotes } from '@/resources/mhr-transfers/unit-notes'
-import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { RouteNames } from '@/enums'
+import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { StickyContainer } from '@/components/common'
+import { BaseDialog } from '@/components/dialogs'
+import { unitNotes } from '@/resources/mhr-transfers/unit-notes'
+import { unsavedChangesDialog } from '@/resources/dialogOptions/cancelDialogs'
 
 export default defineComponent({
   name: 'AddUnitNote',
-  components: { StickyContainer },
+  components: { BaseDialog, StickyContainer },
   props: {
   },
   setup () {
@@ -90,12 +98,15 @@ export default defineComponent({
     } = useStore()
 
     const {
+      hasUnsavedChanges,
       getMhrUnitNoteType,
       getMhrInformation
     } = storeToRefs(useStore())
 
     const localState = reactive({
       isReviewMode: false,
+      cancelOptions: unsavedChangesDialog,
+      showCancelDialog: false,
 
       unitNote: unitNotes[getMhrUnitNoteType.value],
       mhrNumber: getMhrInformation.value.mhrNumber,
@@ -107,26 +118,41 @@ export default defineComponent({
       })
     })
 
+    onMounted(async () => {
+      if (!getMhrUnitNoteType.value) {
+        await router.push({ name: RouteNames.DASHBOARD })
+      }
+    })
+
     const goToReview = async (): Promise<void> => {
     }
 
     const goToDash = (): void => {
-      // if (hasUnsavedChanges.value === true) localState.showCancelDialog = true
-      // else {
-      setUnsavedChanges(false)
-      // setGlobalEditingMode(false)
-      // setEmptyMhrTransfer(initMhrTransfer())
-      // resetValidationState()
+      if (hasUnsavedChanges.value === true) localState.showCancelDialog = true
+      else {
+        setUnsavedChanges(false)
+        // resetValidationState()
 
-      router.push({
-        name: RouteNames.DASHBOARD
-      })
-      // }
+        router.push({
+          name: RouteNames.DASHBOARD
+        })
+      }
+    }
+
+    const handleDialogResp = (val: boolean): void => {
+      if (!val) {
+        setUnsavedChanges(false)
+        if (localState.showCancelDialog) {
+          goToDash()
+        }
+      }
+      localState.showCancelDialog = false
     }
 
     return {
       goToReview,
       goToDash,
+      handleDialogResp,
       ...toRefs(localState)
     }
   }
