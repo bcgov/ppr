@@ -242,22 +242,7 @@ export const stateModel: StateModelIF = {
       rebuiltRemarks: '',
       otherRemarks: ''
     },
-    notes: [
-      {
-        documentType: '',
-        documentId: '',
-        createDateTime: '',
-        remarks: '',
-        contactName: '',
-        contactAddress: {
-          street: '',
-          city: '',
-          region: '',
-          postalCode: '',
-          country: ''
-        }
-      }
-    ]
+    notes: [] // MhrRegistrationNoteIF[]
   },
   // Mhr Unit Notes
   mhrUnitNotes: [],
@@ -309,6 +294,48 @@ export const stateModel: StateModelIF = {
     attentionReference: '',
     ownLand: false,
     isAffidavitTransferCompleted: false
+  },
+  mhrUnitNote: {
+    clientReferenceId: '',
+    attentionReference: '',
+    submittingParty: {
+      businessName: '',
+      address: {
+        street: '',
+        streetAdditional: '',
+        city: '',
+        region: '',
+        country: '',
+        postalCode: ''
+      },
+      phoneNumber: '',
+      emailAddress: ''
+    },
+    note: {
+      documentType: null,
+      documentId: '',
+      documentRegistrationNumber: '',
+      documentDescription: '',
+      createDateTime: '',
+      effectiveDateTime: '',
+      expiryDateTime: '',
+      status: null,
+      remarks: '',
+      givingNoticeParty: {
+        businessName: '',
+        address: {
+          street: '',
+          streetAdditional: '',
+          city: '',
+          region: '',
+          country: '',
+          postalCode: ''
+        },
+        emailAddress: '',
+        phoneNumber: ''
+      },
+      destroyed: null
+    }
   },
   // Manufactured Home Registration Information Validation Flags
   mhrInfoValidationState: {

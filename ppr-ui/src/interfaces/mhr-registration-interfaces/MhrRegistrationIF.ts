@@ -2,7 +2,8 @@ import {
   MhrRegistrationDescriptionIF,
   MhrRegistrationHomeOwnerGroupIF,
   MhrRegistrationHomeLocationIF,
-  SubmittingPartyIF
+  SubmittingPartyIF,
+  MhrRegistrationUnitNoteIF
 } from '@/interfaces'
 export interface MhrRegistrationIF {
   draftNumber: string
@@ -16,22 +17,7 @@ export interface MhrRegistrationIF {
   ownLand: boolean
   location: MhrRegistrationHomeLocationIF
   description: MhrRegistrationDescriptionIF
-  notes: [
-    {
-      documentType: string
-      documentId: string
-      createDateTime: string
-      remarks: string
-      contactName: string
-      contactAddress: {
-        street: string
-        city: string
-        region: string
-        postalCode: string
-        country: string
-      }
-    }
-  ]
+  notes: MhrRegistrationUnitNoteIF[]
 }
 
 export interface NewMhrRegistrationApiIF {

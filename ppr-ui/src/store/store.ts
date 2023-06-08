@@ -43,7 +43,8 @@ import {
   MhApiStatusTypes,
   ProductCode,
   RegistrationFlowType,
-  RouteNames
+  RouteNames,
+  UnitNoteDocTypes
 } from '@/enums'
 import { computed, ComputedRef, ref, set, toRefs } from 'vue-demi'
 import { useMhrValidations } from '@/composables'
@@ -51,8 +52,9 @@ import { MhrSectVal } from '@/composables/mhrRegistration/enums'
 import { getFeatureFlag } from '@/utils'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 import { HomeLocation, HomeOwners, MhrReviewConfirm, SubmittingParty, YourHome } from '@/views'
-import { MHRButtonFooterConfig, RegistrationButtonFooterConfig } from '@/resources/buttoneFooterConfig'
 import { UnitNoteIF } from '@/interfaces/unit-note-interfaces/unit-note-interface'
+import { MHRButtonFooterConfig, RegistrationButtonFooterConfig } from '@/resources/buttonFooterConfig'
+import { MhrRegistrationUnitNoteIF } from '@/interfaces/mhr-registration-interfaces/MhrUnitNoteIF'
 
 export const useStore = defineStore('assetsStore', () => {
   // State Model
@@ -519,6 +521,14 @@ export const useStore = defineStore('assetsStore', () => {
     return state.value.mhrRegistration.ownLand
   })
 
+  // MHR Unit Notes
+  const getMhrRegistrationUnitNotes = computed<MhrRegistrationUnitNoteIF[]>(() => {
+    return state.value.mhrRegistration.notes
+  })
+  const getMhrUnitNoteType = computed<UnitNoteDocTypes>(() => {
+    return state.value.mhrUnitNote.note.documentType
+  })
+
   /** MHR Getters **/
   const getMhrInfoValidation = computed(() => {
     return state.value.mhrInfoValidationState
@@ -951,6 +961,11 @@ export const useStore = defineStore('assetsStore', () => {
     setUnsavedChanges(true)
   }
 
+  // MHR Unit Notes
+  function setMhrUnitNoteType (documentType: UnitNoteDocTypes) {
+    state.value.mhrUnitNote.note.documentType = documentType
+  }
+
   return {
     // User-related getters
     getAccountModel,
@@ -1105,6 +1120,10 @@ export const useStore = defineStore('assetsStore', () => {
     getMhrTransferAttentionReference,
     getMhrTransferAffidavitCompleted,
 
+    // MHR Unit Notes
+    getMhrRegistrationUnitNotes,
+    getMhrUnitNoteType,
+
     // ACTIONS
 
     // Registration
@@ -1200,6 +1219,10 @@ export const useStore = defineStore('assetsStore', () => {
     setMhrTransferSubmittingPartyKey,
     setMhrTransferSubmittingParty,
     setMhrTransferAttentionReference,
-    setMhrTransferAffidavitCompleted
+    setMhrTransferAffidavitCompleted,
+
+    // MHR Unit Notes
+    setMhrUnitNoteType
+
   }
 })

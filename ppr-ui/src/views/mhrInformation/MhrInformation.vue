@@ -275,6 +275,8 @@
                   @isValidTransferOwners="setValidation('isValidTransferOwners', $event)"
                 />
 
+                <UnitNotesTable v-if="isRoleStaffReg" />
+
                 <TransferDetails
                   v-if="hasUnsavedChanges"
                   ref="transferDetailsComponent"
@@ -341,6 +343,7 @@ import { HomeLocationReview, YourHomeReview } from '@/components/mhrRegistration
 import { HomeOwners } from '@/views'
 import { UnitNotePanels } from '@/components/unitNotes'
 import { BaseDialog } from '@/components/dialogs'
+import { UnitNotesTable } from '@/components/unitNotes'
 import { cancelOwnerChangeConfirm, transferRequiredDialog, unsavedChangesDialog } from '@/resources/dialogOptions'
 import AccountInfo from '@/components/common/AccountInfo.vue'
 /* eslint-disable no-unused-vars */
@@ -383,6 +386,7 @@ export default defineComponent({
   components: {
     BaseDialog,
     HomeOwners,
+    UnitNotesTable,
     PartySearch,
     MhrSubmittingParty,
     TransferType,
