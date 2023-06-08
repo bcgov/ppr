@@ -145,3 +145,26 @@ export const tombstoneBreadcrumbMhrInformation: Array<BreadcrumbIF> = [
     text: 'MHR Number'
   }
 ]
+export const tombstoneBreadcrumbMhrUnitNote: Array<BreadcrumbIF> = [
+  {
+    disabled: false,
+    href: sessionStorage.getItem('REGISTRY_URL'),
+    text: 'BC Registries Dashboard'
+  },
+  {
+    disabled: false,
+    to: { name: RouteNames.DASHBOARD },
+    text: 'My Asset Registries'
+  },
+  {
+    disabled: false,
+    // href: sessionStorage.getItem('BASE_URL') + '/mhr-information',
+    to: { name: RouteNames.MHR_INFORMATION },
+    text: 'MHR Number'
+  },
+  {
+    disabled: true,
+    href: '',
+    text: ''
+  }
+]
