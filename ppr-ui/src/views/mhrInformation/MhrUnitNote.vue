@@ -11,7 +11,7 @@
       <div class="container pa-0 pt-4">
         <v-row no-gutters>
           <v-col cols="9">
-            <div v-if="!isReviewMode" id="mhr-unit-note" class="pt-3">
+            <div v-if="!isReviewMode" id="mhr-unit-note" class="pt-3" data-test-id="unit-note-add">
               <h1>
                 {{ unitNote.header }}
               </h1>
@@ -23,7 +23,7 @@
               <UnitNoteAdd :docType='unitNoteDocType' />
             </div>
 
-            <div v-else class="pt-3">
+            <div v-else class="pt-3" data-test-id="unit-note-review">
               <h1>
                Review and Confirm
               </h1>
