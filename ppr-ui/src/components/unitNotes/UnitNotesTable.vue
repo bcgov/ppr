@@ -45,7 +45,7 @@ import { unitNotes } from '@/resources/mhr-transfers/unit-notes'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { MhrUnitNoteIF } from '@/interfaces'
-import { UnitNoteDocTypes } from '@/enums'
+import { RouteNames, UnitNoteDocTypes } from '@/enums'
 
 export default defineComponent({
   name: 'UnitNotesTable',
@@ -62,7 +62,7 @@ export default defineComponent({
     const initUnitNote =
       (documentType: UnitNoteDocTypes): void => {
         setMhrUnitNoteType(documentType)
-        router.push({ path: '/mhr-information/add-unit-note' })
+        router.push({ path: '/' + RouteNames.MHR_INFORMATION_NOTE })
       }
 
     const localState = reactive({

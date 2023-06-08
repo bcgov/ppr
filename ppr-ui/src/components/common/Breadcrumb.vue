@@ -138,7 +138,7 @@ export default defineComponent({
           const mhrInfoBreadcrumb = [...tombstoneBreadcrumbMhrInformation]
           mhrInfoBreadcrumb[2].text = `MHR Number ${getMhrInformation.value.mhrNumber}`
           return mhrInfoBreadcrumb
-        } else if (route.name === RouteNames.ADD_UNIT_NOTE) {
+        } else if (route.name === RouteNames.MHR_INFORMATION_NOTE) {
           const addUnitNoteBreadcrumb = [...tombstoneBreadcrumbMhrUnitNote]
           addUnitNoteBreadcrumb[2].text = `MHR Number ${getMhrInformation.value.mhrNumber}`
           addUnitNoteBreadcrumb[3].text = unitNotes[getMhrUnitNoteType.value].header

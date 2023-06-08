@@ -27,7 +27,5 @@ export enum RouteNames {
   SIGN_OUT = 'signout',
   YOUR_HOME = 'your-home',
   MHR_INFORMATION = 'mhr-information',
-
-  // unit notes
-  ADD_UNIT_NOTE = 'add-unit-note'
+  MHR_INFORMATION_NOTE = 'mhr-information-note'
 }

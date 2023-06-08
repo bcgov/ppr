@@ -234,8 +234,8 @@ export const routes = [
     }
   },
   {
-    path: '/mhr-information/add-unit-note',
-    name: RouteNames.ADD_UNIT_NOTE,
+    path: '/mhr-information-note',
+    name: RouteNames.MHR_INFORMATION_NOTE,
     component: AddUnitNote,
     meta: {
       requiresAuth: true

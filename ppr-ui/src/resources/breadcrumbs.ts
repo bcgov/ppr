@@ -158,13 +158,12 @@ export const tombstoneBreadcrumbMhrUnitNote: Array<BreadcrumbIF> = [
   },
   {
     disabled: false,
-    // href: sessionStorage.getItem('BASE_URL') + '/mhr-information',
+    href: sessionStorage.getItem('BASE_URL') + RouteNames.MHR_INFORMATION,
     to: { name: RouteNames.MHR_INFORMATION },
     text: 'MHR Number'
   },
   {
     disabled: true,
-    href: '',
-    text: ''
+    text: '' // dynamic based on the Unit Note type
   }
 ]
