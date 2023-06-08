@@ -76,7 +76,7 @@ TEST_QUERY_FILTER_DATA_DATE = [
 
 # testdata pattern is ({account_id}, {collapse}, {start_value}, {end_value}, {second_filter_name},
 #                      {second_filter_value}, {mhr_numbers}, {expected_date_clause}, {expected_second_clause})
-TEST_QUERY_FILTER_DATA_MULTIPLE= [
+TEST_QUERY_FILTER_DATA_MULTIPLE = [
     ('2523', False, '2021-10-14T09:53:57-07:53', '2021-10-17T09:53:57-07:53', reg_utils.MHR_NUMBER_PARAM,
      '098487', "'dgfhdgf'", db2_utils.REG_FILTER_DATE, 'mh.mhregnum IN (?)'),
     ('2523', False, '2021-10-14T09:53:57-07:53', '2021-10-17T09:53:57-07:53', reg_utils.REG_TYPE_PARAM,

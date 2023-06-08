@@ -142,6 +142,13 @@ TEST_DATA_GROUP_TYPE = [
 TEST_DATA_NOTE = [
     ('003936', STAFF_ROLE, '6', 'ppr_staff')
 ]
+# testdata pattern is ({mhr_num}, {staff}, {current}, {has_notes})
+TEST_MHR_NUM_DATA_NOTE = [
+    ('080282', True, True, True),
+    ('003936', True, True, False),
+    ('003936', True, False, False),
+    ('003936', False, True, False)
+]
 
 
 @pytest.mark.parametrize('tenancy_type,group_id,mhr_num,party_type', TEST_DATA_GROUP_TYPE)
@@ -197,7 +204,7 @@ def test_find_by_id(session, exists, id, mhr_num, status, doc_id):
 
 @pytest.mark.parametrize('http_status,id,mhr_num,status,doc_id,own_land', TEST_MHR_NUM_DATA)
 def test_find_by_mhr_number(session, http_status, id, mhr_num, status, doc_id, own_land):
-    """Assert that find manufauctured home by mhr_number contains all expected elements."""
+    """Assert that find a manufactured home by mhr_number contains all expected elements."""
     if http_status == HTTPStatus.OK:
         manuhome: Db2Manuhome = Db2Manuhome.find_by_mhr_number(mhr_num)
         assert manuhome
@@ -237,6 +244,30 @@ def test_find_by_mhr_number(session, http_status, id, mhr_num, status, doc_id, o
         # check
         assert request_err
         assert request_err.value.status_code == http_status
+
+
+@pytest.mark.parametrize('mhr_num,staff,current,has_notes', TEST_MHR_NUM_DATA_NOTE)
+def test_find_by_mhr_number_note(session, mhr_num, staff, current, has_notes):
+    """Assert that find a manufactured home by mhr_number conditionally includes notes."""
+    manuhome: Db2Manuhome = Db2Manuhome.find_by_mhr_number(mhr_num)
+    assert manuhome
+    manuhome.current_view = current
+    manuhome.staff = staff
+    reg_json = manuhome.new_registration_json
+    if has_notes:
+        assert reg_json.get('notes')
+        for note in reg_json.get('notes'):
+            assert note.get('documentRegistrationNumber')
+            assert note.get('documentId')
+            assert note.get('createDateTime')
+            assert note.get('status')
+            assert 'remarks' in note
+            assert note.get('givingNoticeParty')
+    elif staff and current:
+        assert 'notes' in reg_json
+        assert not reg_json.get('notes')
+    else:
+        assert 'notes' not in reg_json
 
 
 @pytest.mark.parametrize('http_status,id,mhr_num,status,doc_id,own_land', TEST_MHR_NUM_DATA)
@@ -603,6 +634,7 @@ def test_create_note_from_json(session, mhr_num, user_group, doc_id_prefix, acco
     assert note.reg_document_id == doc.id
     assert note.destroyed == 'N'
     assert note.remarks
+    assert note.status
     assert note.expiry_date
     assert note.name
     assert note.phone_number

@@ -23,6 +23,7 @@ from flask import current_app
 
 from mhr_api.models import Db2Mhomnote
 from mhr_api.models.db2 import address_utils
+from mhr_api.models.type_tables import MhrNoteStatusTypes
 
 
 # testdata pattern is ({exists}, {manuhome_id}, {doc_id}, {doc_type}, {expiry}, {count})
@@ -46,7 +47,7 @@ def test_find_by_manuhome_id(session, exists, manuhome_id, doc_id, doc_type, exp
             assert note.note_id > 0
             assert note.note_number >= 0
             assert note.status
-            if note.status == 'A':
+            if note.status == MhrNoteStatusTypes.ACTIVE:
                 assert note.reg_document_id == doc_id
                 assert note.document_type == doc_type
             assert note.can_document_id is not None
@@ -97,6 +98,9 @@ def test_find_by_manuhome_id_active(session, exists, manuhome_id, doc_id, doc_ty
             assert notice_json['address']['region']
             assert notice_json['address']['country']
             assert notice_json['address']['postalCode'] is not None
+            assert reg_json.get('status') in (MhrNoteStatusTypes.ACTIVE,
+                                              MhrNoteStatusTypes.CANCELLED,
+                                              MhrNoteStatusTypes.EXPIRED)
     else:
         assert not notes
 
@@ -119,6 +123,7 @@ def test_note_json(session):
         'documentType': note.document_type,
         'documentId': note.reg_document_id,
         'remarks': note.remarks,
+        'status': MhrNoteStatusTypes.ACTIVE.value,
         'destroyed': False,
         'givingNoticeParty': {
             'businessName': note.name,

@@ -18,7 +18,7 @@ from sqlalchemy.sql import text
 from mhr_api.exceptions import DatabaseException
 from mhr_api.models import Db2Manuhome, Db2Document, utils as model_utils, registration_utils as reg_utils
 from mhr_api.models.registration_utils import AccountRegistrationParams
-from mhr_api.models.type_tables import MhrDocumentType, MhrRegistrationTypes
+from mhr_api.models.type_tables import MhrDocumentType, MhrRegistrationTypes, MhrNoteStatusTypes
 from mhr_api.models.db import db
 from mhr_api.models.db2.queries import (
     UPDATE_LTSA_PID,
@@ -755,7 +755,8 @@ def get_search_json(registration):
                     note['remarks'] != 'MANUFACTURED HOME REGISTRATION CANCELLED':
                 # Only staff can see remarks if not default.
                 note['remarks'] = 'MANUFACTURED HOME REGISTRATION CANCELLED'
-            elif doc_type in ('TAXN', 'EXNR', 'NPUB', 'REST') and note.get('status') != 'A':  # Exclude if not active.
+            elif doc_type in ('TAXN', 'EXNR', 'NPUB', 'REST') and \
+                    note.get('status') != MhrNoteStatusTypes.ACTIVE:  # Exclude if not active.
                 include = False
             elif doc_type in ('CAU', 'CAUC', 'CAUE') and note.get('expiryDateTime') and \
                     model_utils.date_elapsed(note.get('expiryDateTime')):  # Exclude if expiry elapsed.
@@ -778,6 +779,7 @@ def get_search_json(registration):
 def get_new_registration_json(registration):
     """Build the new registration version of the registration as a json object."""
     registration.manuhome.current_view = registration.current_view
+    registration.manuhome.staff = registration.staff
     reg_json = registration.manuhome.new_registration_json
     reg_doc = None
     doc_type = ''
@@ -796,6 +798,13 @@ def get_new_registration_json(registration):
     reg_json = registration.set_submitting_json(reg_json)
     reg_json = registration.set_location_json(reg_json, False)
     reg_json = registration.set_description_json(reg_json, False)
+    if reg_json.get('notes'):
+        for note in reg_json.get('notes'):
+            note_doc_type: str = note.get('documentType')
+            if FROM_LEGACY_DOC_TYPE.get(note_doc_type):
+                note_doc_type = FROM_LEGACY_DOC_TYPE.get(note_doc_type)
+                note['documentType'] = note_doc_type
+            note['documentDescription'] = get_doc_desc(note_doc_type)
     current_app.logger.debug('Built JSON from DB2 and PostgreSQL')
     return registration.set_payment_json(reg_json)
 

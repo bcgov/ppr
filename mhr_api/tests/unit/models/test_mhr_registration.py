@@ -473,6 +473,16 @@ TEST_DATA_STATUS = [
     ('003936', '2523', 'FROZEN'),
     ('003304', '2523', 'ACTIVE')
 ]
+# testdata pattern is ({mhr_num}, {staff}, {current}, {has_notes}, {account_id}, {has_caution})
+TEST_MHR_NUM_DATA_NOTE = [
+    ('080282', True, True, True, '2523', False),
+    ('003936', True, True, False, '2523', False),
+    ('003936', True, False, False, '2523', False),
+    ('003936', False, True, False, '2523', False),
+    ('035159', True, True, True, 'ppr_staff', True),
+    ('080104', True, True, True, 'ppr_staff', True),
+    ('046315', True, True, True, 'ppr_staff', False)
+]
 
 
 @pytest.mark.parametrize('account_id,mhr_num,exists,reg_desc,in_list', TEST_SUMMARY_REG_DATA)
@@ -623,6 +633,32 @@ def test_find_by_mhr_number(session, mhr_number, has_results, account_id):
             MhrRegistration.find_by_mhr_number(mhr_number, 'PS12345')
         # check
         assert not_found_err
+
+
+@pytest.mark.parametrize('mhr_num,staff,current,has_notes,account_id,has_caution', TEST_MHR_NUM_DATA_NOTE)
+def test_find_by_mhr_number_note(session, mhr_num, staff, current, has_notes, account_id, has_caution):
+    """Assert that find a manufactured home by mhr_number conditionally includes notes."""
+    registration: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account_id)
+    assert registration
+    registration.current_view = current
+    registration.staff = staff
+    reg_json = registration.new_registration_json
+    if has_notes:
+        assert reg_json.get('notes')
+        for note in reg_json.get('notes'):
+            assert note.get('documentRegistrationNumber')
+            assert note.get('documentId')
+            assert note.get('documentDescription')
+            assert note.get('createDateTime')
+            assert note.get('status')
+            assert 'remarks' in note
+            assert note.get('givingNoticeParty')
+    elif staff and current:
+        assert 'notes' in reg_json
+        assert not reg_json.get('notes')
+    else:
+        assert 'notes' not in reg_json
+    assert reg_json.get('hasCaution') == has_caution
 
 
 @pytest.mark.parametrize('mhr_number, account_id, has_pid', TEST_DATA_LTSA_PID)

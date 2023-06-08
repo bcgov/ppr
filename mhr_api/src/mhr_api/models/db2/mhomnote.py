@@ -18,7 +18,16 @@ from flask import current_app
 from mhr_api.exceptions import DatabaseException
 from mhr_api.models import db, utils as model_utils, Db2Document
 from mhr_api.models.db2 import address_utils
+from mhr_api.models.type_tables import MhrNoteStatusTypes
 from mhr_api.utils.base import BaseEnum
+
+
+FROM_LEGACY_STATUS = {
+    'A': MhrNoteStatusTypes.ACTIVE.value,
+    'C': MhrNoteStatusTypes.CANCELLED.value,
+    'E': MhrNoteStatusTypes.EXPIRED.value,
+    'F': MhrNoteStatusTypes.CORRECTED.value
+}
 
 
 class Db2Mhomnote(db.Model):
@@ -143,6 +152,7 @@ class Db2Mhomnote(db.Model):
             'documentType': self.document_type.strip(),
             'documentId': self.reg_document_id,
             'remarks': self.remarks,
+            'status': FROM_LEGACY_STATUS.get(self.status),
             'destroyed': False
         }
         if self.expiry_date and self.expiry_date.isoformat() != '0001-01-01':
@@ -161,7 +171,7 @@ class Db2Mhomnote(db.Model):
         note = {
             'documentType': self.document_type.strip(),
             'documentId': self.reg_document_id,
-            'status': self.status,
+            'status': FROM_LEGACY_STATUS.get(self.status),
             'remarks': self.remarks
         }
         if self.name:
@@ -214,7 +224,8 @@ class Db2Mhomnote(db.Model):
                            legacy_address=document.legacy_address,
                            remarks=json_data.get('remarks', ''),
                            can_document_id='')
-
+        if not note.remarks:
+            note.remarks = ''
         if json_data.get('givingNoticeParty'):
             notice = json_data.get('givingNoticeParty')
             if notice.get('phoneNumber'):
