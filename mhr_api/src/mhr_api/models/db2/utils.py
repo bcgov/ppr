@@ -18,7 +18,7 @@ from sqlalchemy.sql import text
 from mhr_api.exceptions import DatabaseException
 from mhr_api.models import Db2Manuhome, Db2Document, utils as model_utils, registration_utils as reg_utils
 from mhr_api.models.registration_utils import AccountRegistrationParams
-from mhr_api.models.type_tables import MhrDocumentType, MhrRegistrationTypes, MhrNoteStatusTypes
+from mhr_api.models.type_tables import MhrDocumentType, MhrDocumentTypes, MhrRegistrationTypes, MhrNoteStatusTypes
 from mhr_api.models.db import db
 from mhr_api.models.db2.queries import (
     UPDATE_LTSA_PID,
@@ -180,6 +180,8 @@ REG_STATUS_FROZEN = 'FROZEN'
 OWNER_TYPE_INDIVIDUAL = 'I'
 REGISTRATION_PATH = '/mhr/api/v1/registrations/'
 DOCUMENT_PATH = '/mhr/api/v1/documents/'
+CAUTION_CANCELLED_DAYS: int = -9999
+CAUTION_INDEFINITE_DAYS: int = 9999
 
 
 def find_by_id(registration_id: int, search: bool = False):
@@ -214,11 +216,10 @@ def find_summary_by_mhr_number(account_id: str, mhr_number: str, staff: bool):
             lien_registration_type: str = str(row[3]) if row[3] else ''
             current_app.logger.debug(f'reg_count={reg_count}, extra_count={extra_count}, staff={staff}')
             # Set inUserList to true if MHR number already added to account extra registrations.
-            doc_types = MhrDocumentType.find_all()
             for registration in registrations:
                 if reg_count > 0 or extra_count > 0:
                     registration['inUserList'] = True
-                __update_summary_info(registration, registrations, None, doc_types, staff, account_id)
+                __update_summary_info(registration, registrations, None, staff, account_id)
                 if registration['documentType'] in \
                         (Db2Document.DocumentTypes.CONV, Db2Document.DocumentTypes.MHREG_TRIM):
                     registration['lienRegistrationType'] = lien_registration_type
@@ -265,11 +266,10 @@ def find_summary_by_doc_reg_number(account_id: str, doc_reg_number: str, staff: 
             lien_registration_type: str = str(row[3]) if row[3] else ''
             current_app.logger.debug(f'reg_count={reg_count}, extra_count={extra_count}, staff={staff}')
             # Set inUserList to true if MHR number already added to account extra registrations.
-            doc_types = MhrDocumentType.find_all()
             for registration in registrations:
                 if reg_count > 0 or extra_count > 0:
                     registration['inUserList'] = True
-                __update_summary_info(registration, registrations, None, doc_types, staff, account_id)
+                __update_summary_info(registration, registrations, None, staff, account_id)
                 if registration['documentType'] in \
                         (Db2Document.DocumentTypes.CONV, Db2Document.DocumentTypes.MHREG_TRIM):
                     registration['lienRegistrationType'] = lien_registration_type
@@ -321,7 +321,7 @@ def find_all_by_account_id(params: AccountRegistrationParams):
                 for row in rows:
                     results.append(__build_summary(row, False, mhr_list))
             for result in results:
-                __update_summary_info(result, results, reg_summary_list, doc_types, params.sbc_staff, params.account_id)
+                __update_summary_info(result, results, reg_summary_list, params.sbc_staff, params.account_id)
                 if not params.collapse:
                     del result['documentType']  # Not in the schema.
             if results and params.collapse:
@@ -548,7 +548,7 @@ def __get_summary_result(result, reg_summary_list) -> dict:
     return match
 
 
-def __update_summary_info(result, results, reg_summary_list, doc_types, staff, account_id):
+def __update_summary_info(result, results, reg_summary_list, staff, account_id):
     """Update summary information with new application matches."""
     # Some registrations may have no owner change: use the previous owner names.
     if not result.get('ownerNames'):
@@ -558,17 +558,20 @@ def __update_summary_info(result, results, reg_summary_list, doc_types, staff, a
         doc_type = result.get('documentType')
         if FROM_LEGACY_DOC_TYPE.get(doc_type):
             doc_type = FROM_LEGACY_DOC_TYPE[doc_type]
-        for doc_rec in doc_types:
-            if doc_type == doc_rec.document_type:
-                result['registrationDescription'] = doc_rec.document_type_desc
-                break
+        result['registrationDescription'] = get_doc_desc(doc_type)
         if TO_REGISTRATION_TYPE.get(doc_type):
             result['registrationType'] = TO_REGISTRATION_TYPE.get(doc_type)
         else:
             result['registrationType'] = TO_REGISTRATION_TYPE.get('DEFAULT')
     else:
-        result['registrationDescription'] = summary_result.get('reg_description')
         result['registrationType'] = summary_result.get('registration_type')
+        if result['registrationType'] == MhrRegistrationTypes.REG_NOTE:
+            doc_type = result.get('documentType')
+            if FROM_LEGACY_DOC_TYPE.get(doc_type):
+                doc_type = FROM_LEGACY_DOC_TYPE[doc_type]
+            result['registrationDescription'] = get_doc_desc(doc_type)
+        else:
+            result['registrationDescription'] = summary_result.get('reg_description')
         # result['username'] = summary_result.get('username')  # Sorting by username does not work with this.
         if staff or account_id == summary_result.get('account_id'):
             if summary_result.get('report_url') or model_utils.report_retry_elapsed(summary_result.get('report_ts')):
@@ -620,6 +623,23 @@ def __build_summary(row, add_in_user_list: bool = True, mhr_list=None):
         summary['inUserList'] = False
     if mhr_list and summary['documentType'] in (Db2Document.DocumentTypes.CONV, Db2Document.DocumentTypes.MHREG_TRIM):
         summary['lienRegistrationType'] = __get_lien_registration_type(mhr_number, mhr_list)
+    elif summary['documentType'] in (MhrDocumentTypes.CAU, MhrDocumentTypes.CAUC, MhrDocumentTypes.CAUE):
+        summary = __get_caution_info(summary, row)
+    return summary
+
+
+def __get_caution_info(summary: dict, row) -> dict:
+    """Add expireDays to summary for CAU, CAUC, CAUE document types."""
+    status: str = str(row[11]) if row[11] else None
+    if status and status == 'C':
+        summary['expireDays'] = CAUTION_CANCELLED_DAYS  # Cancelled.
+    else:
+        expiry = row[12] if row[12] else None
+        if (not expiry or expiry.isoformat() == '0001-01-01') and \
+                summary.get('documentType') == MhrDocumentTypes.CAUC:
+            summary['expireDays'] = CAUTION_INDEFINITE_DAYS  # Indefinite expiry.
+        elif expiry and expiry.isoformat() != '0001-01-01':
+            summary['expireDays'] = model_utils.expiry_date_days(expiry)
     return summary
 
 
@@ -631,13 +651,17 @@ def __collapse_results(results):
             registrations.append(result)
     for reg in registrations:
         del reg['documentType']
+        has_caution: bool = False
         changes = []
         for result in results:
             if result['mhrNumber'] == reg['mhrNumber'] and result['documentId'] != reg['documentId']:
                 del result['documentType']
+                if result.get('expireDays') and result.get('expireDays') >= 0:
+                    has_caution = True
                 changes.append(result)
         if changes:
             reg['changes'] = changes
+        reg['hasCaution'] = has_caution
     return registrations
 
 

@@ -345,6 +345,20 @@ def today_local():
     return now_ts().astimezone(LOCAL_TZ)
 
 
+def expiry_date_days(expiry_dt: date) -> int:
+    """Create a date representing the date at 23:59:59 local time as UTC from the current expiry date."""
+    today_ts = today_local()
+    date_diff = expiry_dt - today_ts.date()
+    return date_diff.days
+
+
+def expiry_ts_days(expiry_ts: _datetime) -> int:
+    """Create a date representing the date at 23:59:59 local time as UTC from the current expiry date."""
+    today_ts = now_ts()
+    date_diff = today_ts - expiry_ts
+    return date_diff.days
+
+
 def expiry_dt_from_years(life_years: int, iso_date: str = None):
     """Create a date representing the date at 23:59:59 local time as UTC.
 

@@ -492,6 +492,8 @@ def test_find_summary_by_mhr_number(session, account_id, mhr_num, exists, reg_de
     if exists:
         current_app.logger.info(registration)
         assert registration['mhrNumber'] == mhr_num
+        assert registration['registrationType']
+        assert 'hasCaution' in registration
         assert registration['registrationDescription'] == reg_desc
         assert registration['statusType'] is not None
         assert registration['createDateTime'] is not None
@@ -513,6 +515,8 @@ def test_find_summary_by_doc_reg_number(session, account_id, doc_reg_num, mhr_nu
     if result_count > 0:
         current_app.logger.info(registration)
         assert registration['mhrNumber'] == mhr_num
+        assert registration['registrationType']
+        assert 'hasCaution' in registration
         assert registration['registrationDescription'] == reg_desc
         assert registration['statusType'] is not None
         assert registration['createDateTime'] is not None
@@ -528,6 +532,10 @@ def test_find_summary_by_doc_reg_number(session, account_id, doc_reg_num, mhr_nu
         else:
             assert registration.get('changes')
             assert len(registration['changes']) >= (result_count - 1)
+            for reg in registration.get('changes'):
+                desc: str = reg['registrationDescription']
+                if reg.get('registrationType') == MhrRegistrationTypes.REG_NOTE and desc.find('CAUTION') > 0:
+                    assert reg.get('expireDays')
     else:
         assert not registration
 
@@ -543,6 +551,8 @@ def test_find_account_registrations(session, account_id, has_results):
     if has_results:
         for registration in reg_list:
             assert registration['mhrNumber']
+            assert registration['registrationType']
+            assert 'hasCaution' in registration
             assert registration['registrationDescription']
             assert registration['statusType'] is not None
             assert registration['createDateTime'] is not None
@@ -555,6 +565,11 @@ def test_find_account_registrations(session, account_id, has_results):
             assert not registration.get('inUserList')
             if registration['registrationDescription'] == REG_DESCRIPTION:
                 assert 'lienRegistrationType' in registration
+            if registration.get('changes'):
+                for reg in registration.get('changes'):
+                    desc: str = reg['registrationDescription']
+                    if reg.get('registrationType') == MhrRegistrationTypes.REG_NOTE and desc.find('CAUTION') > 0:
+                        assert reg.get('expireDays')
     else:
         assert not reg_list
 

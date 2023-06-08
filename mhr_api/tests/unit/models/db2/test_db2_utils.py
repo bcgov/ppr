@@ -24,7 +24,7 @@ from flask import current_app
 from mhr_api.models import registration_utils as reg_utils, utils as model_utils
 from mhr_api.models.registration_utils import AccountRegistrationParams
 from mhr_api.models.db2 import utils as db2_utils
-from mhr_api.models.type_tables import MhrDocumentType
+from mhr_api.models.type_tables import MhrDocumentType, MhrRegistrationTypes
 
 
 # testdata pattern is ({account_id}, {has_results})
@@ -102,6 +102,7 @@ def test_find_account_registrations(session, account_id, has_results):
     if has_results:
         for registration in reg_list:
             assert registration['mhrNumber']
+            assert registration['registrationType']
             assert registration['registrationDescription']
             assert registration['statusType'] is not None
             assert registration['createDateTime'] is not None
@@ -112,12 +113,20 @@ def test_find_account_registrations(session, account_id, has_results):
             assert registration['path'] is not None
             assert registration['documentId'] is not None
             assert not registration.get('inUserList')
-            if registration['registrationDescription'] == 'REGISTER NEW UNIT':
+            reg_desc: str = registration['registrationDescription']
+            ## current_app.logger.info(f'$$$ {reg_type} {reg_desc}')
+            if reg_desc == MhrRegistrationTypes.MHREG:
                 assert 'lienRegistrationType' in registration
+                assert 'hasCaution' in registration
             if registration.get('mhrNumber') == '003936':
                 assert registration.get('statusType') == 'FROZEN'
             elif registration.get('mhrNumber') == '003304':
                 assert registration.get('statusType') != 'FROZEN'
+            if registration.get('changes'):
+                for reg in registration.get('changes'):
+                    desc: str = reg['registrationDescription']
+                    if reg.get('registrationType') == MhrRegistrationTypes.REG_NOTE and desc.find('CAUTION') > 0:
+                        assert reg.get('expireDays')
     else:
         assert not reg_list
 
