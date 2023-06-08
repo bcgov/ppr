@@ -35,8 +35,17 @@
                     This is the current information for this registration as of
                     <span class="font-weight-bold">{{ asOfDateTime }}</span>.
                   </p>
-                  <p class="mt-n2">Ensure ALL of the information below is correct before making any changes to this
-                    registration. Necessary fees will be applied as updates are made.</p>
+                  <p>Ensure ALL of the information below is correct before making any changes to this
+                    registration. Necessary fees will be applied as updates are made.
+                  </p>
+                  <p v-if="mockUnitNotes && mockUnitNotes.length >= 1 && !isRoleStaffReg">
+                    There are unit notes attached to this manufactured home. To view unit note information on this home,
+                    complete a manufactured home search.
+                  </p>
+                  <p v-else>
+                    There are unit notes attached to this manufactured home.
+                    <a class="" href="#unit-note-component">See Unit Notes</a>
+                  </p>
                 </template>
                 <p class="mt-7" v-else>
                   Review your changes and complete the additional information before registering.
@@ -273,7 +282,12 @@
                   @isValid="setValidation('isTransferDetailsValid', $event)"
                 />
 
-                <UnitNotePanels v-if="isRoleStaffReg" :unitNotes="mockUnitNotes" :disabled="showTransferType" />
+                <UnitNotePanels
+                    v-if="isRoleStaffReg"
+                    id="unit-note-component"
+                    :unitNotes="mockUnitNotes"
+                    :disabled="showTransferType"
+                />
 
                 <v-spacer class="py-10 my-10"></v-spacer>
               </template>

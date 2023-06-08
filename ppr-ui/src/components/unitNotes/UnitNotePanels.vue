@@ -49,21 +49,30 @@
     </header>
 
     <!-- Unit notes expansion panels -->
-    <v-row no-gutters justify="center" class="unit-note-panel-row">
+    <v-row
+      no-gutters
+      justify="center"
+      class="unit-note-panel-row"
+      :class="{'cap-panels-height': unitNotes.length > 5}"
+    >
       <v-expansion-panels
         v-if="unitNotes.length"
-        multiple
+        multiple flat
         v-model="activePanels"
       >
         <v-expansion-panel
           v-for="(item, index) in unitNotes"
           :key="index"
-          class="unit-note-panel py-4 px-1"
+          class="unit-note-panel pb-4 px-1"
         >
           <v-expansion-panel-header disable-icon-rotate>
             <v-row no-gutters>
               <v-col cols="12">
-                <h3 class="py-3">{{ getUnText(item.documentType) }}</h3>
+                <h3 class="py-3">
+                  {{ getUnText(item.documentType) }}
+                  {{ item.status === MhApiStatusTypes.EXPIRED ? ` - ${MhUIStatusTypes.EXPIRED}` : '' }}
+                  {{ item.status === MhApiStatusTypes.CANCELLED ? ` - ${MhUIStatusTypes.CANCELLED}` : '' }}
+                </h3>
               </v-col>
               <v-col>
                 <span class="info-text">
@@ -115,9 +124,9 @@
             <v-divider class="ml-0 my-4"/>
 
             <!-- Note information -->
-            <v-row no-gutters class="pt-3">
+            <v-row v-if="item.effectiveDateTime" no-gutters class="pt-3">
               <v-col cols="3">
-                <h3>Effective Date and Time</h3>
+                <h3 class="effective-date">Effective Date and Time</h3>
               </v-col>
               <v-col cols="9">
                 <span class="info-text fs-14">
@@ -126,7 +135,18 @@
               </v-col>
             </v-row>
 
-            <v-row no-gutters class="mt-1 py-3">
+            <v-row v-if="item.expiryDateTime" no-gutters class="pt-3">
+              <v-col cols="3">
+                <h3>Expiry Date and Time</h3>
+              </v-col>
+              <v-col cols="9">
+                <span class="info-text fs-14">
+                  {{ pacificDate(item.expiryDateTime) }}
+                </span>
+              </v-col>
+            </v-row>
+
+            <v-row v-if="item.remarks" no-gutters class="mt-1 py-3">
               <v-col cols="3">
                 <h3>Remarks</h3>
               </v-col>
@@ -165,9 +185,11 @@
                       <tr>
                         <td class="pl-0">
                           <div class="mr-2">
-                            <v-icon>{{ getNoticePartyIcon(item.givingNoticeParty) }}</v-icon>
+                            <v-icon class="notice-party-icon colour-dk-text mt-n2">
+                              {{ getNoticePartyIcon(item.givingNoticeParty) }}
+                            </v-icon>
                           </div>
-                          <span class="generic-label fs-14">
+                          <span class="notice-party-name generic-label fs-14">
                             {{ getNoticePartyName(item.givingNoticeParty) }}
                           </span>
                         </td>
@@ -197,7 +219,7 @@
 
 <script lang="ts">
 import { defineComponent, reactive, toRefs } from 'vue-demi'
-import { RouteNames, UnitNoteDocTypes } from '@/enums'
+import { MhApiStatusTypes, MhUIStatusTypes, RouteNames, UnitNoteDocTypes } from '@/enums'
 import { useRouter } from 'vue2-helpers/vue-router'
 import { personGivingNoticeTableHeaders, UnitNoteTypes } from '@/resources'
 import { UnitNoteIF } from '@/interfaces/unit-note-interfaces/unit-note-interface'
@@ -264,6 +286,8 @@ export default defineComponent({
       getNoticePartyIcon,
       getNoticePartyName,
       UnitNoteTypes,
+      MhUIStatusTypes,
+      MhApiStatusTypes,
       personGivingNoticeTableHeaders,
       ...toRefs(localState)
     }
@@ -281,12 +305,19 @@ h3 {
 }
 .unit-note-panel-row {
   background: $gray1;
-}
-.unit-note-list-item {
-  background-color: white;
-  :hover {
-    cursor: pointer;
+  .unit-note-panel {
+    border-bottom: 2px solid $gray1;
   }
+  .unit-note-list-item {
+    background-color: white;
+    :hover {
+      cursor: pointer;
+    }
+  }
+}
+.cap-panels-height {
+  max-height: 750px;
+  overflow-y: auto;
 }
 .empty-notes-msg {
   background: white;
