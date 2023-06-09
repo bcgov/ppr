@@ -104,7 +104,7 @@ describe('UnitNotePanels', () => {
 
       // Check the unit note type
       const typeText = header.find('h3').text()
-      expect(typeText).toContain(wrapper.vm.getUnText(item.documentType))
+      expect(typeText).toContain(wrapper.vm.getUnitNoteText(item.documentType))
 
       // Check the registration number and date
       const registrationInfo = header.find('.info-text')
