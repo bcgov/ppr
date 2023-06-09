@@ -38,13 +38,14 @@
                   <p>Ensure ALL of the information below is correct before making any changes to this
                     registration. Necessary fees will be applied as updates are made.
                   </p>
-                  <p v-if="getMhrUnitNotes && getMhrUnitNotes.length >= 1 && !isRoleStaffReg">
-                    There are unit notes attached to this manufactured home. To view unit note information on this home,
-                    complete a manufactured home search.
-                  </p>
-                  <p v-else-if="getMhrUnitNotes && getMhrUnitNotes.length >= 1">
+                  <p v-if="getMhrUnitNotes && getMhrUnitNotes.length >= 1">
                     There are unit notes attached to this manufactured home.
-                    <a href="#unit-note-component">See Unit Notes</a>
+                    <span v-if="!isRoleStaffReg">
+                      To view unit note information on this home, complete a manufactured home search.
+                    </span>
+                    <span v-else>
+                      <a href="#unit-note-component">See Unit Notes</a>
+                    </span>
                   </p>
                 </template>
                 <p class="mt-7" v-else>
