@@ -15,7 +15,8 @@ export interface PartyIF {
   emailAddress?: string // Optional future for everyone currently only client code?.
   partyId?: number // System generated used for amendment/change registrations.
   address?: AddressIF // Required for debtors or if no party code.
-  action?: ActionTypes // Optional action type for amendments
+  action?: ActionTypes // Optional action type for amendments,
+  phoneNumber?: string
 }
 
 export interface SubmittingPartyIF {

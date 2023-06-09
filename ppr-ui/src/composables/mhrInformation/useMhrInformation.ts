@@ -33,6 +33,7 @@ export const useMhrInformation = () => {
     setMhrTransferHomeOwnerGroups,
     setMhrTransferCurrentHomeOwnerGroups,
     setMhrLocation,
+    setMhrUnitNotes,
     setIsManualLocation,
     setMhrHomeDescription,
     setMhrTransferDeclaredValue,
@@ -113,6 +114,9 @@ export const useMhrInformation = () => {
 
     const currentOwnerGroups = data?.ownerGroups || [] // Safety check. Should always have ownerGroups
     await parseMhrHomeOwners(cloneDeep(currentOwnerGroups))
+
+    const unitNotes = data?.notes || []
+    await setMhrUnitNotes(unitNotes)
 
     // Parse transfer details conditionally.
     // Some situations call for it being pre-populated from base registration.

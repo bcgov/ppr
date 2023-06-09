@@ -259,6 +259,8 @@ export const stateModel: StateModelIF = {
       }
     ]
   },
+  // Mhr Unit Notes
+  mhrUnitNotes: [],
   mhrSearchResultSelectAllLien: false,
   // Manufactured Home Registration Validation Flags
   mhrValidationState: {

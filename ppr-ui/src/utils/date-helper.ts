@@ -49,7 +49,7 @@ export function convertDate (date: Date, includeTime: boolean, includeTz: boolea
   else return moment(date).format('MMMM D, Y') + ` ${datetime}`
 }
 
-export function pacificDate (date: Date): string {
+export function pacificDate (date: Date | string): string {
   date = new Date(date.toLocaleString('en-US', { timeZone: 'America/Vancouver' }))
   const datetime = format12HourTime(date)
 

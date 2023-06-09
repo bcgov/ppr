@@ -710,7 +710,7 @@ tr.registration-row.draft-registration-row.added-reg-effect td.actions-cell,
   }
 }
 
-.review-header {
+.review-header, .default-header {
   display: flex; // to align icons
   background-color: $app-lt-blue;
   padding: 1.25rem;

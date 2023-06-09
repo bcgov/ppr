@@ -549,13 +549,15 @@ export default defineComponent({
     }
 
     const scrollToRef = (ref: any): void => {
-      if (ref?.value?.$el?.scrollIntoView) {
-        ref.value.$el.scrollIntoView({ behavior: 'smooth', block: 'center' })
-      }
-      // if a child row it will be an array
-      if (ref?.value?.length > 0 && ref?.value[0].$el?.scrollIntoView) {
-        ref.value[0].$el.scrollIntoView({ behavior: 'smooth', block: 'center' })
-      }
+      setTimeout(() => {
+        if (ref?.value?.$el?.scrollIntoView) {
+          ref.value.$el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        }
+        // if a child row it will be an array
+        if (ref?.value?.length > 0 && ref?.value[0].$el?.scrollIntoView) {
+          ref.value[0].$el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        }
+      }, 500)
     }
 
     const setRowRef = (item: RegistrationSummaryIF | DraftResultIF | MhRegistrationSummaryIF | MhrDraftIF): string => {
@@ -619,10 +621,12 @@ export default defineComponent({
     watch(() => localState.showDatePicker, async (val) => {
       if (val) {
         await flushPromises()
-        // wait to ensure it is visible before attempting to scroll to it
-        if (datePicker?.value?.$el?.scrollIntoView) {
-          datePicker.value.$el.scrollIntoView({ behavior: 'smooth' })
-        }
+        setTimeout(() => {
+          // wait to ensure it is visible before attempting to scroll to it
+          if (datePicker?.value?.$el?.scrollIntoView) {
+            datePicker.value.$el.scrollIntoView({ behavior: 'smooth' })
+          }
+        }, 500)
       }
     })
 

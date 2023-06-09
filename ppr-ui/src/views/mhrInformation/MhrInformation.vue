@@ -35,8 +35,18 @@
                     This is the current information for this registration as of
                     <span class="font-weight-bold">{{ asOfDateTime }}</span>.
                   </p>
-                  <p class="mt-n2">Ensure ALL of the information below is correct before making any changes to this
-                    registration. Necessary fees will be applied as updates are made.</p>
+                  <p>Ensure ALL of the information below is correct before making any changes to this
+                    registration. Necessary fees will be applied as updates are made.
+                  </p>
+                  <p v-if="getMhrUnitNotes && getMhrUnitNotes.length >= 1">
+                    There are unit notes attached to this manufactured home.
+                    <span v-if="!isRoleStaffReg">
+                      To view unit note information on this home, complete a manufactured home search.
+                    </span>
+                    <span v-else>
+                      <a href="#unit-note-component">See Unit Notes</a>
+                    </span>
+                  </p>
                 </template>
                 <p class="mt-7" v-else>
                   Review your changes and complete the additional information before registering.
@@ -272,6 +282,15 @@
                   :validate="!isTransferDueToDeath && validate"
                   @isValid="setValidation('isTransferDetailsValid', $event)"
                 />
+
+                <UnitNotePanels
+                    v-if="isRoleStaffReg"
+                    id="unit-note-component"
+                    :unitNotes="getMhrUnitNotes"
+                    :disabled="showTransferType"
+                />
+
+                <v-spacer class="py-10 my-10"></v-spacer>
               </template>
             </section>
           </v-col>
@@ -320,6 +339,7 @@ import { MhrSubmittingParty } from '@/components/mhrRegistration/SubmittingParty
 import { ConfirmCompletion, TransferDetails, TransferDetailsReview, TransferType } from '@/components/mhrTransfers'
 import { HomeLocationReview, YourHomeReview } from '@/components/mhrRegistration/ReviewConfirm'
 import { HomeOwners } from '@/views'
+import { UnitNotePanels } from '@/components/unitNotes'
 import { BaseDialog } from '@/components/dialogs'
 import { cancelOwnerChangeConfirm, transferRequiredDialog, unsavedChangesDialog } from '@/resources/dialogOptions'
 import AccountInfo from '@/components/common/AccountInfo.vue'
@@ -355,6 +375,7 @@ import {
   updateMhrDraft
 } from '@/utils'
 import { clientConfig, staffConfig } from '@/resources/attnRefConfigs'
+import { mockUnitNotes } from '../../../tests/unit/test-data'
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
@@ -373,7 +394,8 @@ export default defineComponent({
     AccountInfo,
     ConfirmCompletion,
     YourHomeReview,
-    StaffPayment
+    StaffPayment,
+    UnitNotePanels
   },
   props: {
     appReady: {
@@ -404,6 +426,7 @@ export default defineComponent({
     } = useStore()
     const {
       // Getters
+      getMhrUnitNotes,
       getMhrTransferHomeOwners,
       getMhrInformation,
       getMhrTransferCurrentHomeOwnerGroups,
@@ -415,8 +438,7 @@ export default defineComponent({
       getMhrTransferType,
       getMhrTransferDeclaredValue,
       getMhrInfoValidation,
-      getMhrAttentionReferenceNum,
-      getMhrTransferSubmittingParty
+      getMhrAttentionReferenceNum
     } = storeToRefs(useStore())
     const {
       isFrozenMhr,
@@ -886,7 +908,7 @@ export default defineComponent({
       handleStartTransferRequiredDialogResp,
       cancelOwnerChangeConfirm,
       transferRequiredDialog,
-      getMhrTransferSubmittingParty,
+      getMhrUnitNotes,
       ...toRefs(localState)
     }
   }
