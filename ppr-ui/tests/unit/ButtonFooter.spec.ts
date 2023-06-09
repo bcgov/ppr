@@ -17,7 +17,7 @@ import { getLastEvent } from './utils'
 import mockRouter from './MockRouter'
 import { RouteNames, StatementTypes } from '@/enums'
 import { axios } from '@/utils/axios-ppr'
-import { mockedManufactuerAuthRoles, mockedModelAmendmdmentAdd } from './test-data'
+import { mockedManufacturerAuthRoles, mockedModelAmendmdmentAdd } from './test-data'
 import { createPinia, setActivePinia } from 'pinia'
 import { useStore } from '../../src/store/store'
 import { ButtonConfigIF } from '@/interfaces'
@@ -382,9 +382,8 @@ describe('Button events', () => {
   })
 })
 
-describe('Mhr Manufactuer Registration step 1 - Your Home', () => {
+describe('Mhr Manufacturer Registration step 1 - Your Home', () => {
   let wrapper: Wrapper<any>
-  let wrapper2: any // eslint-disable-line no-unused-vars
   const currentStatementType = StatementTypes.FINANCING_STATEMENT
   const currentStepName = RouteNames.YOUR_HOME
 
@@ -392,7 +391,7 @@ describe('Mhr Manufactuer Registration step 1 - Your Home', () => {
     if (router.currentRoute.name !== RouteNames.YOUR_HOME) {
       router.replace({ name: RouteNames.YOUR_HOME })
     }
-    await store.setAuthRoles(mockedManufactuerAuthRoles)
+    await store.setAuthRoles(mockedManufacturerAuthRoles)
     await store.setRegistrationType(MhrRegistrationType)
   })
 
@@ -404,7 +403,6 @@ describe('Mhr Manufactuer Registration step 1 - Your Home', () => {
   beforeEach(async () => {
     const localVue = createLocalVue()
     localVue.use(VueRouter)
-    wrapper2 = shallowMount((YourHome as any), { localVue, store, router, vuetify })
     wrapper = createComponent(currentStatementType, currentStepName)
   })
   afterEach(() => {
@@ -445,14 +443,13 @@ describe('Mhr Manufactuer Registration step 1 - Your Home', () => {
   })
 })
 
-describe('Mhr Manufactuer Registration step 2 - Review and Confirm', () => {
+describe('Mhr Manufacturer Registration step 2 - Review and Confirm', () => {
   let wrapper: Wrapper<any>
-  let wrapper2: any // eslint-disable-line no-unused-vars
   const currentStatementType = StatementTypes.FINANCING_STATEMENT
   const currentStepName = RouteNames.MHR_REVIEW_CONFIRM
 
   beforeAll(async () => {
-    await store.setAuthRoles(mockedManufactuerAuthRoles)
+    await store.setAuthRoles(mockedManufacturerAuthRoles)
     await store.setRegistrationType(MhrRegistrationType)
   })
 
@@ -463,7 +460,6 @@ describe('Mhr Manufactuer Registration step 2 - Review and Confirm', () => {
   beforeEach(async () => {
     const localVue = createLocalVue()
     localVue.use(VueRouter)
-    wrapper2 = shallowMount((MhrReviewConfirm as any), { localVue, store, router, vuetify })
     wrapper = createComponent(currentStatementType, currentStepName)
     if (router.currentRoute.name !== RouteNames.MHR_REVIEW_CONFIRM) {
       router.replace({ name: RouteNames.MHR_REVIEW_CONFIRM })
