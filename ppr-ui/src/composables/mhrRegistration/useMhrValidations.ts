@@ -16,8 +16,6 @@ export const useMhrValidations = (validationState: any) => {
 
   /** Is true when all flags are true in specified section. */
   const getStepValidation = (section: MhrSectVal): boolean => {
-    // If section is not part of validation model return true
-    if (!validationState[section]) return true
     return Object.values(validationState[section].value).every(val => val)
   }
 

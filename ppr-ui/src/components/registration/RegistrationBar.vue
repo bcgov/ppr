@@ -4,7 +4,7 @@
       <v-col>
         <div class="actions">
           <v-btn
-            v-if="isMhr && (!isRoleQualifiedSupplier || isRoleStaff || (isRoleManufactuer && hasMhrEnabled))"
+            v-if="isMhr && (!isRoleQualifiedSupplier || isRoleStaff || isRoleManufactuer)"
             filled
             class="mhr-registration-bar-btn px-5"
             @click="newRegistration(MhrRegistrationType)"
@@ -62,7 +62,6 @@ export default defineComponent({
     const {
       // Getters
       getAccountProductSubscriptions,
-      hasMhrEnabled,
       isRoleQualifiedSupplier,
       isRoleStaff,
       isRoleManufactuer
@@ -82,7 +81,6 @@ export default defineComponent({
 
     return {
       hasRPPR,
-      hasMhrEnabled,
       isRoleStaff,
       isRoleManufactuer,
       isRoleQualifiedSupplier,

@@ -5,8 +5,8 @@
       <label class="font-weight-bold pl-2">Submitting Party</label>
     </header>
 
-    <div :class="{ 'border-error-left': !getStepValidation(MhrSectVal.SUBMITTING_PARTY_VALID)}">
-      <section class="mx-6 pt-8" v-if="!getStepValidation(MhrSectVal.SUBMITTING_PARTY_VALID)">
+    <div :class="{ 'border-error-left': showStepError }">
+      <section class="mx-6 pt-8" v-if="showStepError">
         <span>
           <v-icon color="error">mdi-information-outline</v-icon>
           <span class="error-text mx-1">This step is unfinished.</span>
@@ -127,7 +127,8 @@ export default defineComponent({
       getMhrRegistrationSubmittingParty,
       getMhrRegistrationDocumentId,
       getMhrAttentionReferenceNum,
-      getMhrRegistrationValidationModel
+      getMhrRegistrationValidationModel,
+      isMhrManufactuerRegistration
     } = storeToRefs(useStore())
 
     const {
@@ -142,6 +143,9 @@ export default defineComponent({
       hasAddress: computed(() => !Object.values(localState.address).every(val => !val)),
       attnOrRefConfig: computed((): AttnRefConfigIF => {
         return isRoleStaffReg.value ? staffConfig : clientConfig
+      }),
+      showStepError: computed(() => {
+        return !isMhrManufactuerRegistration.value && !getStepValidation(MhrSectVal.SUBMITTING_PARTY_VALID)
       })
     })
 

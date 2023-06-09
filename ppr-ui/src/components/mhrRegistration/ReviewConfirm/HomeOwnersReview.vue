@@ -5,8 +5,8 @@
       <label class="font-weight-bold pl-2">Home Owners</label>
     </header>
 
-    <div :class="{ 'border-error-left': !getStepValidation(MhrSectVal.HOME_OWNERS_VALID) }">
-      <section v-show="!getStepValidation(MhrSectVal.HOME_OWNERS_VALID)"
+    <div :class="{ 'border-error-left': showStepError }">
+      <section v-show="showStepError"
         :class="hasHomeOwners ? 'pt-30px px-6' : 'px-6 py-8'">
         <span>
           <v-icon color="error">mdi-information-outline</v-icon>
@@ -56,7 +56,7 @@ export default defineComponent({
     }
   },
   setup (props) {
-    const { getMhrRegistrationValidationModel } = storeToRefs(useStore())
+    const { getMhrRegistrationValidationModel, isMhrManufactuerRegistration } = storeToRefs(useStore())
 
     const { MhrSectVal, getStepValidation } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
     const {
@@ -71,7 +71,9 @@ export default defineComponent({
       homeOwners: computed(() => getTransferOrRegistrationHomeOwners()),
       hasHomeOwners: computed(() => !!getTransferOrRegistrationHomeOwners().find(owner => owner.ownerId)),
       hasGroups: computed(() => getTransferOrRegistrationHomeOwnerGroups().length > 0),
-      showStepError: computed(() => !getStepValidation(MhrSectVal.HOME_OWNERS_VALID))
+      showStepError: computed(() => {
+        return !isMhrManufactuerRegistration.value && !getStepValidation(MhrSectVal.HOME_OWNERS_VALID)
+      })
     })
 
     return {

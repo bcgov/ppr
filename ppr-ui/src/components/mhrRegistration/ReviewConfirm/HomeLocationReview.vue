@@ -5,8 +5,8 @@
       <label class="font-weight-bold pl-2">Location of Home</label>
     </header>
 
-    <div :class="{ 'border-error-left': !getStepValidation(MhrSectVal.LOCATION_VALID) && !isTransferReview }">
-      <section v-if="!getStepValidation(MhrSectVal.LOCATION_VALID) && !isTransferReview"
+    <div :class="{ 'border-error-left':  showStepError && !isTransferReview }">
+      <section v-if="showStepError && !isTransferReview"
         :class="{ 'pb-8': !(!!getMhrRegistrationLocation.locationType) && !hasAddress }" class="mx-6 pt-8"
       >
         <span>
@@ -273,7 +273,8 @@ export default defineComponent({
       getMhrRegistrationLocation,
       getMhrRegistrationValidationModel,
       getIsManualLocation,
-      getMhrRegistrationOwnLand
+      getMhrRegistrationOwnLand,
+      isMhrManufactuerRegistration
     } = storeToRefs(useStore())
 
     const {
@@ -327,6 +328,9 @@ export default defineComponent({
       landOwnershipLabel: computed(() => {
         return `The manufactured home is <b>${getMhrRegistrationOwnLand.value ? '' : 'not'}</b> located on land that the
             homeowners own, or on which they have a registered lease of 3 years or more.`
+      }),
+      showStepError: computed(() => {
+        return !isMhrManufactuerRegistration.value && !getStepValidation(MhrSectVal.LOCATION_VALID)
       })
     })
 

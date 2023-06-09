@@ -70,6 +70,7 @@ import { StaffPaymentOptions } from '@bcrs-shared-components/enums'
 import { useHomeOwners } from '@/composables/mhrRegistration'
 import { useRoute } from 'vue2-helpers/vue-router'
 import { storeToRefs } from 'pinia'
+import { StepIF } from '@/interfaces'
 /* eslint-enable no-unused-vars */
 
 /* eslint-disable */
@@ -85,7 +86,7 @@ export default defineComponent({
   },
   setup () {
     const { setStaffPayment } = useStore()
-    const { getMhrRegistrationValidationModel, isRoleStaffReg } = storeToRefs(useStore())
+    const { getMhrRegistrationValidationModel, isRoleStaffReg, getSteps } = storeToRefs(useStore())
     const route = useRoute()
     const {
       MhrCompVal,
@@ -215,14 +216,10 @@ export default defineComponent({
           scrollToInvalid(MhrSectVal.LOCATION_VALID, 'mhr-home-location')
           break
         case RouteNames.MHR_REVIEW_CONFIRM:
+          let stepsValidation = getSteps.value.filter((step : StepIF) => step.valid)
+          stepsValidation.pop() // Removes review confirm step from stepsValidation
           localState.isValidatingApp &&
-          scrollToInvalid(MhrSectVal.REVIEW_CONFIRM_VALID, 'mhr-review-confirm',
-            [
-              getStepValidation(MhrSectVal.YOUR_HOME_VALID),
-              getStepValidation(MhrSectVal.SUBMITTING_PARTY_VALID),
-              getStepValidation(MhrSectVal.HOME_OWNERS_VALID),
-              getStepValidation(MhrSectVal.LOCATION_VALID)
-            ])
+          scrollToInvalid(MhrSectVal.REVIEW_CONFIRM_VALID, 'mhr-review-confirm', stepsValidation)
           // Only set reviewed if add/edit form was open when review reached
           if (isGlobalEditingMode.value) {
             setValidation(MhrSectVal.ADD_EDIT_OWNERS_VALID, MhrCompVal.OWNERS_VALID, false)
