@@ -216,7 +216,7 @@ export default defineComponent({
           scrollToInvalid(MhrSectVal.LOCATION_VALID, 'mhr-home-location')
           break
         case RouteNames.MHR_REVIEW_CONFIRM:
-          let stepsValidation = getSteps.value.filter((step : StepIF) => step.valid)
+          let stepsValidation = getSteps.value.map((step : StepIF) => step.valid)
           stepsValidation.pop() // Removes review confirm step from stepsValidation
           localState.isValidatingApp &&
           scrollToInvalid(MhrSectVal.REVIEW_CONFIRM_VALID, 'mhr-review-confirm', stepsValidation)
