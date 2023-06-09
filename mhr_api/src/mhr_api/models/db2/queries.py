@@ -123,7 +123,13 @@ SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRI
          WHERE d2.mhregnum = d.mhregnum
            AND d2.regidate = (SELECT MAX(d3.regidate)
                                 FROM document d3
-                               WHERE d3.mhregnum = d.mhregnum)) AS last_doc_type
+                               WHERE d3.mhregnum = d.mhregnum)) AS last_doc_type,
+       (SELECT n.status
+          FROM mhomnote n
+         WHERE mh.manhomid = n.manhomid AND n.regdocid = d.documtid) AS note_status,
+       (SELECT n.expiryda
+          FROM mhomnote n
+         WHERE mh.manhomid = n.manhomid AND n.regdocid = d.documtid) AS note_expiry
   FROM manuhome mh, document d
  WHERE mh.mhregnum = :query_mhr_number
    AND mh.mhregnum = d.mhregnum
@@ -144,7 +150,13 @@ SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRI
          WHERE d4.mhregnum = d.mhregnum
            AND d4.regidate = (SELECT MAX(d3.regidate)
                                 FROM document d3
-                               WHERE d3.mhregnum = d.mhregnum)) AS last_doc_type
+                               WHERE d3.mhregnum = d.mhregnum)) AS last_doc_type,
+       (SELECT n.status
+          FROM mhomnote n
+         WHERE mh.manhomid = n.manhomid AND n.regdocid = d.documtid) AS note_status,
+       (SELECT n.expiryda
+          FROM mhomnote n
+         WHERE mh.manhomid = n.manhomid AND n.regdocid = d.documtid) AS note_expiry
   FROM manuhome mh, document d, document d2
  WHERE d2.docuregi = :query_value
    AND d2.mhregnum = mh.mhregnum
@@ -166,7 +178,13 @@ SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRI
          WHERE d2.mhregnum = d.mhregnum
            AND d2.regidate = (SELECT MAX(d3.regidate)
                                 FROM document d3
-                               WHERE d3.mhregnum = d.mhregnum)) AS last_doc_type
+                               WHERE d3.mhregnum = d.mhregnum)) AS last_doc_type,
+       (SELECT n.status
+          FROM mhomnote n
+         WHERE mh.manhomid = n.manhomid AND n.regdocid = d.documtid) AS note_status,
+       (SELECT n.expiryda
+          FROM mhomnote n
+         WHERE mh.manhomid = n.manhomid AND n.regdocid = d.documtid) AS note_expiry
   FROM manuhome mh, document d
  WHERE mh.mhregnum IN (?)
    AND mh.mhregnum = d.mhregnum
@@ -189,6 +207,12 @@ SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRI
            AND d2.regidate = (SELECT MAX(d3.regidate)
                                 FROM document d3
                                WHERE d3.mhregnum = d.mhregnum)) AS last_doc_type,
+       (SELECT n.status
+          FROM mhomnote n
+         WHERE mh.manhomid = n.manhomid AND n.regdocid = d.documtid) AS note_status,
+       (SELECT n.expiryda
+          FROM mhomnote n
+         WHERE mh.manhomid = n.manhomid AND n.regdocid = d.documtid) AS note_expiry,
        (SELECT TRIM(o2.ownrname)
           FROM owner o2, owngroup og2
          WHERE o2.manhomid = mh.manhomid
