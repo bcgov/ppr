@@ -69,7 +69,7 @@
             <v-row no-gutters>
               <v-col cols="12">
                 <h3 class="py-3">
-                  {{ getUnText(item.documentType) }}
+                  {{ getUnitNoteText(item.documentType) }}
                   {{ item.status === MhApiStatusTypes.EXPIRED ? ` - ${MhUIStatusTypes.EXPIRED}` : '' }}
                   {{ item.status === MhApiStatusTypes.CANCELLED ? ` - ${MhUIStatusTypes.CANCELLED}` : '' }}
                 </h3>
@@ -249,7 +249,7 @@ export default defineComponent({
       activePanels: []
     })
 
-    const getUnText = (noteType: UnitNoteDocTypes): string => {
+    const getUnitNoteText = (noteType: UnitNoteDocTypes): string => {
       return UnitNoteTypes.find(item => item.unitNoteType === noteType)?.textLabel
     }
 
@@ -279,7 +279,7 @@ export default defineComponent({
     }
 
     return {
-      getUnText,
+      getUnitNoteText,
       initUnitNote,
       cancelUnitNote,
       pacificDate,

@@ -163,7 +163,7 @@ export interface MhRegistrationSummaryIF {
   documentRegistrationNumber?: string
   expand?: boolean // used in UI table to toggle expansion.
   expireDays?: number // Number of days until expiry
-  lienRegistrationType?: string,
+  lienRegistrationType?: string
 }
 
 // Discharge Registration interface. Base registration number debtor name and registering party are required.
