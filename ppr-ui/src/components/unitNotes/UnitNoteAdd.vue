@@ -11,7 +11,7 @@
     <section id="mhr-unit-note-remarks" class="mt-10">
       <h2>Remarks</h2>
       <p class="mt-2">
-        Add remarks to provide further details on this {{ unitNote.typeDesc }}.
+        Add remarks to provide further details on this {{ unitNote.header }}.
       </p>
       // Add Remarks placeholder //
     </section>
@@ -28,7 +28,7 @@
 
 <script lang="ts">
 import { defineComponent, reactive, toRefs } from 'vue-demi'
-import { unitNotes as unitNotesResources } from '@/resources/mhr-transfers/unit-notes'
+import { UnitNotesInfo } from '@/resources/unitNotes'
 import { UnitNoteDocTypes } from '@/enums'
 
 export default defineComponent({
@@ -40,7 +40,7 @@ export default defineComponent({
   },
   setup (props) {
     const localState = reactive({
-      unitNote: unitNotesResources[props.docType]
+      unitNote: UnitNotesInfo[props.docType]
     })
 
     return {

@@ -10,7 +10,7 @@ import { MhrUnitNote } from '@/views'
 import { RouteNames, UnitNoteDocTypes } from '@/enums'
 import { UnitNoteAdd, UnitNoteReview } from '@/components/unitNotes'
 import { getTestId } from './utils'
-import { unitNotes } from '@/resources/mhr-transfers/unit-notes'
+import { UnitNotesInfo } from '@/resources/unitNotes'
 
 Vue.use(Vuetify)
 
@@ -28,7 +28,7 @@ function createComponent (): Wrapper<any> {
   })
 
   document.body.setAttribute('data-app', 'true')
-  return shallowMount((MhrUnitNote as any), {
+  return shallowMount(MhrUnitNote as any, {
     localVue,
     router,
     vuetify
@@ -53,7 +53,7 @@ describe('Should render MHR Unit Note', () => {
     expect(wrapper.exists()).toBeTruthy()
 
     const unitNoteAdd = wrapper.find(getTestId('unit-note-add'))
-    expect(unitNoteAdd.find('h1').text()).toContain(unitNotes[UNIT_NOTE_DOC_TYPE].header)
+    expect(unitNoteAdd.find('h1').text()).toContain(UnitNotesInfo[UNIT_NOTE_DOC_TYPE].header)
     expect(wrapper.findComponent(UnitNoteAdd).exists()).toBeTruthy()
     expect(wrapper.findComponent(UnitNoteReview).exists()).toBeFalsy()
   })

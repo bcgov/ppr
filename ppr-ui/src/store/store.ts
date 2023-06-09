@@ -54,7 +54,6 @@ import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 import { HomeLocation, HomeOwners, MhrReviewConfirm, SubmittingParty, YourHome } from '@/views'
 import { UnitNoteIF } from '@/interfaces/unit-note-interfaces/unit-note-interface'
 import { MHRButtonFooterConfig, RegistrationButtonFooterConfig } from '@/resources/buttonFooterConfig'
-import { MhrRegistrationUnitNoteIF } from '@/interfaces/mhr-registration-interfaces/MhrUnitNoteIF'
 
 export const useStore = defineStore('assetsStore', () => {
   // State Model
@@ -521,10 +520,6 @@ export const useStore = defineStore('assetsStore', () => {
     return state.value.mhrRegistration.ownLand
   })
 
-  // MHR Unit Notes
-  const getMhrRegistrationUnitNotes = computed<MhrRegistrationUnitNoteIF[]>(() => {
-    return state.value.mhrRegistration.notes
-  })
   const getMhrUnitNoteType = computed<UnitNoteDocTypes>(() => {
     return state.value.mhrUnitNote.note.documentType
   })
@@ -1121,8 +1116,7 @@ export const useStore = defineStore('assetsStore', () => {
     getMhrTransferAffidavitCompleted,
 
     // MHR Unit Notes
-    getMhrRegistrationUnitNotes,
-    getMhrUnitNoteType,
+    getMhrUnitNoteType, // doc type of the Unit Note to register
 
     // ACTIONS
 

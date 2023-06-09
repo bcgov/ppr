@@ -59,7 +59,7 @@ import {
 import { RouteNames } from '@/enums'
 import { getRoleProductCode } from '@/utils'
 import { storeToRefs } from 'pinia'
-import { unitNotes } from '@/resources/mhr-transfers/unit-notes'
+import { UnitNotesInfo } from '@/resources/unitNotes'
 
 export default defineComponent({
   name: 'Breadcrumb',
@@ -141,7 +141,7 @@ export default defineComponent({
         } else if (route.name === RouteNames.MHR_INFORMATION_NOTE) {
           const mhrUnitNoteBreadcrumb = [...tombstoneBreadcrumbMhrUnitNote]
           mhrUnitNoteBreadcrumb[2].text = `MHR Number ${getMhrInformation.value.mhrNumber}`
-          mhrUnitNoteBreadcrumb[3].text = unitNotes[getMhrUnitNoteType.value].header
+          mhrUnitNoteBreadcrumb[3].text = UnitNotesInfo[getMhrUnitNoteType.value].header
           return mhrUnitNoteBreadcrumb
         } else {
           const registrationBreadcrumb = [...tombstoneBreadcrumbRegistration]

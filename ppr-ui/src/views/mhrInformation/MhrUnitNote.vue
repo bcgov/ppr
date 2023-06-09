@@ -16,7 +16,7 @@
                 {{ unitNote.header }}
               </h1>
               <p class="mt-7">
-                Enter the information below to file a {{ unitNote.typeDesc }} on manufactured home registration number
+                Enter the information below to file a {{ unitNote.header }} on manufactured home registration number
                 {{ mhrNumber }}.
               </p>
 
@@ -69,7 +69,7 @@ import { RouteNames } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { StickyContainer } from '@/components/common'
 import { BaseDialog } from '@/components/dialogs'
-import { unitNotes } from '@/resources/mhr-transfers/unit-notes'
+import { UnitNotesInfo } from '@/resources/unitNotes'
 import { unsavedChangesDialog } from '@/resources/dialogOptions/cancelDialogs'
 import { UnitNoteAdd, UnitNoteReview } from '@/components/unitNotes'
 
@@ -103,7 +103,7 @@ export default defineComponent({
       showBackBtn: computed((): string => localState.isReviewMode ? 'Back' : ''),
 
       unitNoteDocType: getMhrUnitNoteType.value,
-      unitNote: unitNotes[getMhrUnitNoteType.value],
+      unitNote: UnitNotesInfo[getMhrUnitNoteType.value],
       mhrNumber: getMhrInformation.value.mhrNumber,
 
       // fee summary
@@ -117,7 +117,6 @@ export default defineComponent({
       if (!getMhrUnitNoteType.value) {
         await router.push({ name: RouteNames.DASHBOARD })
       }
-      // localState.unitNoteDocType = getMhrUnitNoteType.value
     })
 
     const goToReview = async (): Promise<void> => {

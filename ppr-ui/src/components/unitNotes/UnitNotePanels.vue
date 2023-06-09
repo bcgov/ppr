@@ -32,13 +32,13 @@
             <!-- Drop down list -->
             <v-list width="350" height="325">
               <v-list-item
-                v-for="item in UnitNoteTypes"
-                :key="item.unitNoteType"
+                v-for="item in UnitNotesDropdown"
+                :key="item"
                 class="unit-note-list-item"
-                @click="initUnitNote(item.unitNoteType)"
+                @click="initUnitNote(item)"
               >
                 <v-list-item-subtitle class="pa-0">
-                  {{ item.textLabel }}
+                  {{ UnitNotesInfo[item].dropdownText }}
                 </v-list-item-subtitle>
               </v-list-item>
             </v-list>
@@ -69,7 +69,7 @@
             <v-row no-gutters>
               <v-col cols="12">
                 <h3 class="py-3">
-                  {{ getUnitNoteText(item.documentType) }}
+                  {{ UnitNotesInfo[item.documentType].header }}
                   {{ item.status === MhApiStatusTypes.EXPIRED ? ` - ${MhUIStatusTypes.EXPIRED}` : '' }}
                   {{ item.status === MhApiStatusTypes.CANCELLED ? ` - ${MhUIStatusTypes.CANCELLED}` : '' }}
                 </h3>
@@ -221,7 +221,8 @@
 import { defineComponent, reactive, toRefs } from 'vue-demi'
 import { MhApiStatusTypes, MhUIStatusTypes, RouteNames, UnitNoteDocTypes } from '@/enums'
 import { useRouter } from 'vue2-helpers/vue-router'
-import { personGivingNoticeTableHeaders, UnitNoteTypes } from '@/resources'
+import { useStore } from '@/store/store'
+import { personGivingNoticeTableHeaders, UnitNotesInfo, UnitNotesDropdown } from '@/resources'
 import { UnitNoteIF } from '@/interfaces/unit-note-interfaces/unit-note-interface'
 import { pacificDate } from '@/utils'
 import { PartyIF } from '@/interfaces'
@@ -245,20 +246,17 @@ export default defineComponent({
   setup () {
     const router = useRouter()
 
+    const {
+      setMhrUnitNoteType
+    } = useStore()
+
     const localState = reactive({
       activePanels: []
     })
 
-    const getUnitNoteText = (noteType: UnitNoteDocTypes): string => {
-      return UnitNoteTypes.find(item => item.unitNoteType === noteType)?.textLabel
-    }
-
     const initUnitNote = (noteType: UnitNoteDocTypes): void => {
-      // Set unit note type
-      // setSomeUnitNoteDocType(noteType) - to state to identify the the configuration to use for Unit Note flow
-
-      // Redirect to unit note flow
-      router.push({ name: RouteNames.DASHBOARD }) // Replaced by Framework route
+      setMhrUnitNoteType(noteType)
+      router.push({ path: '/' + RouteNames.MHR_INFORMATION_NOTE })
     }
 
     const getNoticePartyIcon = (givingNoticeParty: PartyIF): string => {
@@ -279,13 +277,13 @@ export default defineComponent({
     }
 
     return {
-      getUnitNoteText,
       initUnitNote,
       cancelUnitNote,
       pacificDate,
       getNoticePartyIcon,
       getNoticePartyName,
-      UnitNoteTypes,
+      UnitNotesInfo,
+      UnitNotesDropdown,
       MhUIStatusTypes,
       MhApiStatusTypes,
       personGivingNoticeTableHeaders,
@@ -308,13 +306,13 @@ h3 {
   .unit-note-panel {
     border-bottom: 2px solid $gray1;
   }
-  .unit-note-list-item {
+}
+.unit-note-list-item {
     background-color: white;
     :hover {
       cursor: pointer;
     }
   }
-}
 .cap-panels-height {
   max-height: 750px;
   overflow-y: auto;

@@ -1,7 +1,6 @@
 export * from './HomeSectionIF'
 export * from './MhrLocationInfoIF'
 export * from './MhrRegistrationIF'
-export * from './MhrUnitNoteIF'
 export * from './MhrRegistrationDescriptionIF'
 export * from './MhrRegistrationHomeOwnerIF'
 export * from './MhrRegistrationHomeLocationIF'

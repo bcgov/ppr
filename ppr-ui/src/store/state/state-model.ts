@@ -242,7 +242,7 @@ export const stateModel: StateModelIF = {
       rebuiltRemarks: '',
       otherRemarks: ''
     },
-    notes: [] // MhrRegistrationNoteIF[]
+    notes: [] // UnitNoteIF[]
   },
   // Mhr Unit Notes
   mhrUnitNotes: [],

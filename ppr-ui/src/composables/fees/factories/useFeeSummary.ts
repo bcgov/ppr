@@ -6,7 +6,7 @@ import { isInt } from '@/utils'
 import { getFinancingFee } from '@/composables/fees/factories'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
-import { unitNotes } from '@/resources/mhr-transfers/unit-notes'
+import { UnitNotesInfo } from '@/resources/unitNotes'
 
 export const hasNoCharge = (val: UIRegistrationTypes): boolean => {
   const hfArray = [
@@ -113,7 +113,7 @@ export function getFeeSummary (
     return { ...defaultFeeSummaries[FeeSummaryDefaults.AMEND] }
   }
   if (feeType === FeeSummaryTypes.MHR_UNIT_NOTE) {
-    const unitNoteFeeSummary = unitNotes[getMhrUnitNoteType.value].fee
+    const unitNoteFeeSummary = UnitNotesInfo[getMhrUnitNoteType.value].fee
     return { ...defaultFeeSummaries[unitNoteFeeSummary] }
   }
   if ((feeType === FeeSummaryTypes.NEW) || (feeType === FeeSummaryTypes.RENEW)) {

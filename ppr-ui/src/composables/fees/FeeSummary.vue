@@ -196,7 +196,7 @@ import { AdditionalSearchFeeIF, FeeSummaryI, RegistrationLengthI } from './inter
 // eslint-enable no-unused-vars
 import { getFeeHint, getFeeSummary } from './factories'
 import { storeToRefs } from 'pinia'
-import { unitNotes } from '@/resources/mhr-transfers/unit-notes'
+import { UnitNotesInfo } from '@/resources/unitNotes'
 
 export default defineComponent({
   name: 'FeeSummary',
@@ -364,7 +364,7 @@ export default defineComponent({
         case FeeSummaryTypes.MHSEARCH: return 'Manufactured Home search'
         case FeeSummaryTypes.MHR_COMBINED_SEARCH: return 'Combined Home and Lien search'
         case FeeSummaryTypes.MHR_TRANSFER: return 'Ownership Transfer or Change'
-        case FeeSummaryTypes.MHR_UNIT_NOTE: return unitNotes[localState.feeSubType].header
+        case FeeSummaryTypes.MHR_UNIT_NOTE: return UnitNotesInfo[localState.feeSubType].header
         default: return localState.registrationType
       }
     }
