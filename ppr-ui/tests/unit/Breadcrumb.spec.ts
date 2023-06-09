@@ -24,7 +24,7 @@ import { getTestId } from './utils'
 
 // unit test resources
 import mockRouter from './MockRouter'
-import { mockedManufactuerAuthRoles } from './test-data'
+import { mockedManufacturerAuthRoles } from './test-data'
 
 import { defaultFlagSet, getRoleProductCode } from '@/utils'
 import flushPromises from 'flush-promises'
@@ -286,9 +286,9 @@ describe('Breadcrumb component tests', () => {
     }
   })
 
-  it('renders on Mhr Registration: Manufactuer - Only Mhr', async () => {
+  it('renders on Mhr Registration: Manufacturer - Only Mhr', async () => {
     // Set up
-    await store.setAuthRoles(mockedManufactuerAuthRoles)
+    await store.setAuthRoles(mockedManufacturerAuthRoles)
 
     defaultFlagSet['mhr-ui-enabled'] = true
 
@@ -315,9 +315,9 @@ describe('Breadcrumb component tests', () => {
     store.setUserProductSubscriptionsCodes([])
   })
 
-  it('renders on Mhr Registration: Manufactuer - MHR and PPR', async () => {
+  it('renders on Mhr Registration: Manufacturer - MHR and PPR', async () => {
     // Set up
-    await store.setAuthRoles(mockedManufactuerAuthRoles)
+    await store.setAuthRoles(mockedManufacturerAuthRoles)
 
     defaultFlagSet['mhr-ui-enabled'] = true
 

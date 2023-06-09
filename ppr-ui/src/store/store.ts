@@ -26,7 +26,7 @@ import {
   MhrRegistrationIF,
   MhrTransferIF,
   MhrValidationStateIF,
-  MhrValidationManufactuerStateIF,
+  MhrValidationManufacturerStateIF,
   RegistrationSortIF,
   RegistrationSummaryIF,
   RegistrationTypeIF,
@@ -59,7 +59,7 @@ import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 import { HomeLocation, HomeOwners, MhrReviewConfirm, SubmittingParty, YourHome } from '@/views'
 import {
   MHRButtonFooterConfig,
-  MHRManufactuerButtonFooterConfig,
+  MHRManufacturerButtonFooterConfig,
   RegistrationButtonFooterConfig
 } from '@/resources/buttoneFooterConfig'
 import { UnitNoteIF } from '@/interfaces/unit-note-interfaces/unit-note-interface'
@@ -84,8 +84,8 @@ export const useStore = defineStore('assetsStore', () => {
   const isRoleStaff = computed((): boolean => {
     return (state.value.authorization?.authRoles.includes(AuthRoles.STAFF) || isRoleStaffSbc.value)
   })
-  /** Whether the user has 'manufactuer' keycloak role. */
-  const isRoleManufactuer = computed((): boolean => {
+  /** Whether the user has 'manufacturer' keycloak role. */
+  const isRoleManufacturer = computed((): boolean => {
     return (state.value.authorization?.authRoles.includes(AuthRoles.MHR_REGISTER) &&
     state.value.authorization?.authRoles.includes(AuthRoles.MHR_PAYMENT) &&
     state.value.authorization?.authRoles.includes(AuthRoles.MHR_TRANSPORT) &&
@@ -193,12 +193,12 @@ export const useStore = defineStore('assetsStore', () => {
   const isMhrStaffRegistration = computed<boolean>(() => {
     return isMhrRegistration.value && isRoleStaff.value
   })
-  const isMhrManufactuerRegistration = computed<boolean>(() => {
-    return isMhrRegistration.value && isRoleManufactuer.value
+  const isMhrManufacturerRegistration = computed<boolean>(() => {
+    return isMhrRegistration.value && isRoleManufacturer.value
   })
   const isMhrRegistrationReviewValid = computed<boolean>(() => {
-    return isMhrManufactuerRegistration.value
-      ? isMhrManufactuerRegistrationReviewValid.value
+    return isMhrManufacturerRegistration.value
+      ? isMhrManufacturerRegistrationReviewValid.value
       : isMhrStaffRegistrationReviewValid.value
   })
   /** Is true when all steps are valid as well as staff payment and authorization are valid */
@@ -211,11 +211,11 @@ export const useStore = defineStore('assetsStore', () => {
       useMhrValidations(modelRef).getStepValidation(MhrSectVal.HOME_OWNERS_VALID) &&
       useMhrValidations(modelRef).getStepValidation(MhrSectVal.LOCATION_VALID)
   })
-  const isMhrManufactuerRegistrationReviewValid = computed<boolean>(() => {
+  const isMhrManufacturerRegistrationReviewValid = computed<boolean>(() => {
     const modelRef = toRefs(getMhrRegistrationValidationModel.value)
-    return state.value.mhrValidationManufactuerState.reviewConfirmValid.authorizationValid &&
-      state.value.mhrValidationManufactuerState.reviewConfirmValid?.attentionValid &&
-      state.value.mhrValidationManufactuerState.reviewConfirmValid?.folioOrRefNumValid &&
+    return state.value.mhrValidationManufacturerState.reviewConfirmValid.authorizationValid &&
+      state.value.mhrValidationManufacturerState.reviewConfirmValid?.attentionValid &&
+      state.value.mhrValidationManufacturerState.reviewConfirmValid?.folioOrRefNumValid &&
       useMhrValidations(modelRef).getStepValidation(MhrSectVal.YOUR_HOME_VALID)
   })
   /** The selected registration flow type object. */
@@ -433,7 +433,7 @@ export const useStore = defineStore('assetsStore', () => {
       }
     ]
   })
-  const getMhrManufactuerSteps = computed(() => {
+  const getMhrManufacturerSteps = computed(() => {
     return [
       {
         id: 'step-1-btn',
@@ -458,7 +458,7 @@ export const useStore = defineStore('assetsStore', () => {
       }]
   })
   const getMhrSteps = computed(() => {
-    return isMhrManufactuerRegistration.value ? getMhrManufactuerSteps.value : getMhrStaffSteps.value
+    return isMhrManufacturerRegistration.value ? getMhrManufacturerSteps.value : getMhrStaffSteps.value
   })
   const getMaxStep = computed<number>(() => {
     return getSteps.value ? getSteps.value.filter((step: any) => step.step !== -1).length : -1
@@ -467,7 +467,7 @@ export const useStore = defineStore('assetsStore', () => {
     return isMhrRegistration.value ? getMhrButtonFooterConfig.value : RegistrationButtonFooterConfig
   })
   const getMhrButtonFooterConfig = computed<ButtonConfigIF[]>(() => {
-    return isMhrManufactuerRegistration.value ? MHRManufactuerButtonFooterConfig : MHRButtonFooterConfig
+    return isMhrManufacturerRegistration.value ? MHRManufacturerButtonFooterConfig : MHRButtonFooterConfig
   })
   const isBusySaving = computed<boolean>(() => {
     return false
@@ -569,9 +569,9 @@ export const useStore = defineStore('assetsStore', () => {
   const getMhrRegistrationHomeOwnerGroups = computed<MhrRegistrationHomeOwnerGroupIF[]>(() => {
     return state.value.mhrRegistration.ownerGroups
   })
-  const getMhrRegistrationValidationModel = computed<MhrValidationStateIF | MhrValidationManufactuerStateIF>(() => {
-    return isMhrManufactuerRegistration.value
-      ? state.value.mhrValidationManufactuerState
+  const getMhrRegistrationValidationModel = computed<MhrValidationStateIF | MhrValidationManufacturerStateIF>(() => {
+    return isMhrManufacturerRegistration.value
+      ? state.value.mhrValidationManufacturerState
       : state.value.mhrValidationState
   })
   const getMhrInformation = computed<MhRegistrationSummaryIF>(() => {
@@ -1054,7 +1054,7 @@ export const useStore = defineStore('assetsStore', () => {
     isRoleStaff,
     isRoleStaffBcol,
     isRoleStaffReg,
-    isRoleManufactuer,
+    isRoleManufacturer,
     isRoleQualifiedSupplier,
     hasPprRole,
     hasMhrRole,
@@ -1093,7 +1093,7 @@ export const useStore = defineStore('assetsStore', () => {
     getRegistrationType,
     isMhrRegistration,
     isMhrStaffRegistration,
-    isMhrManufactuerRegistration,
+    isMhrManufacturerRegistration,
     isMhrRegistrationReviewValid,
     getRegistrationFlowType,
     getRegistrationOther,

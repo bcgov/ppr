@@ -24,7 +24,7 @@ import {
   MhrTransferIF,
   MhRegistrationSummaryIF,
   mhrInfoValidationStateIF,
-  MhrValidationManufactuerStateIF,
+  MhrValidationManufacturerStateIF,
   UnitNoteRegistrationIF
 } from '@/interfaces'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
@@ -85,7 +85,7 @@ export interface StateModelIF {
   mhrUnitNote: UnitNoteRegistrationIF // used for Unit Note filing/registration
   mhrSearchResultSelectAllLien: boolean
   mhrValidationState?: MhrValidationStateIF
-  mhrValidationManufactuerState?: MhrValidationManufactuerStateIF
+  mhrValidationManufacturerState?: MhrValidationManufacturerStateIF
   mhrTransfer: MhrTransferIF
   mhrInfoValidationState: mhrInfoValidationStateIF
 }

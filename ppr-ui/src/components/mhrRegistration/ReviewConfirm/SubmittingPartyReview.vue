@@ -128,7 +128,7 @@ export default defineComponent({
       getMhrRegistrationDocumentId,
       getMhrAttentionReferenceNum,
       getMhrRegistrationValidationModel,
-      isMhrManufactuerRegistration
+      isMhrManufacturerRegistration
     } = storeToRefs(useStore())
 
     const {
@@ -145,7 +145,7 @@ export default defineComponent({
         return isRoleStaffReg.value ? staffConfig : clientConfig
       }),
       showStepError: computed(() => {
-        return !isMhrManufactuerRegistration.value && !getStepValidation(MhrSectVal.SUBMITTING_PARTY_VALID)
+        return !isMhrManufacturerRegistration.value && !getStepValidation(MhrSectVal.SUBMITTING_PARTY_VALID)
       })
     })
 

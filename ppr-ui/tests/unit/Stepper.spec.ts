@@ -14,7 +14,7 @@ import { ProductCode, RouteNames } from '@/enums'
 import mockRouter from './MockRouter'
 
 // Auth Roles
-import { mockedManufactuerAuthRoles } from './test-data'
+import { mockedManufacturerAuthRoles } from './test-data'
 
 // Others
 import { MhrRegistrationType } from '@/resources'
@@ -128,10 +128,10 @@ describe('Stepper - MHR Staff Registration', () => {
   })
 })
 
-describe('Stepper - MHR Manufactuer Registration', () => {
+describe('Stepper - MHR Manufacturer Registration', () => {
   let expectedSteps: StepIF[]
   beforeAll(async () => {
-    await store.setAuthRoles(mockedManufactuerAuthRoles)
+    await store.setAuthRoles(mockedManufacturerAuthRoles)
     await store.setUserProductSubscriptionsCodes([ProductCode.MHR])
     await store.setRegistrationType(MhrRegistrationType)
     expectedSteps = await store.getSteps

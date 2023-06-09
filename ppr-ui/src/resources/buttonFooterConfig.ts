@@ -58,7 +58,7 @@ export const MHRButtonFooterConfig: Array<ButtonConfigIF> = [
     nextRouteName: RouteNames.DASHBOARD
   }]
 
-export const MHRManufactuerButtonFooterConfig: Array<ButtonConfigIF> = [
+export const MHRManufacturerButtonFooterConfig: Array<ButtonConfigIF> = [
   {
     stepName: RouteNames.YOUR_HOME,
     showCancel: true,

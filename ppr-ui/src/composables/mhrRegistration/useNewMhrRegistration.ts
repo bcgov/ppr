@@ -33,7 +33,7 @@ export const useNewMhrRegistration = () => {
   const {
     // Getters
     isRoleStaffReg,
-    isMhrManufactuerRegistration,
+    isMhrManufacturerRegistration,
     getMhrRegistrationHomeDescription,
     getMhrRegistrationSubmittingParty,
     getMhrRegistrationDocumentId,
@@ -268,7 +268,7 @@ export const useNewMhrRegistration = () => {
       ...(isRoleStaffReg.value && !!getStaffPayment.value && {
         clientReferenceId: getStaffPayment.value.folioNumber
       }),
-      ...(!isMhrManufactuerRegistration.value && {
+      ...(!isMhrManufacturerRegistration.value && {
         documentId: getMhrRegistrationDocumentId.value
       })
     }

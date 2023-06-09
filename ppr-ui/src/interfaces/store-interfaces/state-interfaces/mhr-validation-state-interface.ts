@@ -40,7 +40,7 @@ export interface mhrInfoValidationStateIF {
   isStaffPaymentValid: false
 }
 
-export interface MhrValidationManufactuerStateIF {
+export interface MhrValidationManufacturerStateIF {
   yourHomeValid: {
     makeModelValid: boolean,
     homeSectionsValid: boolean,

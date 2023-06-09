@@ -1,6 +1,6 @@
 import { AuthRoles } from '@/enums'
 
-export const mockedManufactuerAuthRoles: AuthRoles[] = [
+export const mockedManufacturerAuthRoles: AuthRoles[] = [
   AuthRoles.MHR_TRANSPORT,
   AuthRoles.MHR_PAYMENT,
   AuthRoles.MHR_TRANSFER_SALE,

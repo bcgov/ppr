@@ -56,7 +56,7 @@ export default defineComponent({
     }
   },
   setup (props) {
-    const { getMhrRegistrationValidationModel, isMhrManufactuerRegistration } = storeToRefs(useStore())
+    const { getMhrRegistrationValidationModel, isMhrManufacturerRegistration } = storeToRefs(useStore())
 
     const { MhrSectVal, getStepValidation } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
     const {
@@ -72,7 +72,7 @@ export default defineComponent({
       hasHomeOwners: computed(() => !!getTransferOrRegistrationHomeOwners().find(owner => owner.ownerId)),
       hasGroups: computed(() => getTransferOrRegistrationHomeOwnerGroups().length > 0),
       showStepError: computed(() => {
-        return !isMhrManufactuerRegistration.value && !getStepValidation(MhrSectVal.HOME_OWNERS_VALID)
+        return !isMhrManufacturerRegistration.value && !getStepValidation(MhrSectVal.HOME_OWNERS_VALID)
       })
     })
 

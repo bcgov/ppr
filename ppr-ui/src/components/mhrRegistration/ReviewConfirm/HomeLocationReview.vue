@@ -274,7 +274,7 @@ export default defineComponent({
       getMhrRegistrationValidationModel,
       getIsManualLocation,
       getMhrRegistrationOwnLand,
-      isMhrManufactuerRegistration
+      isMhrManufacturerRegistration
     } = storeToRefs(useStore())
 
     const {
@@ -330,7 +330,7 @@ export default defineComponent({
             homeowners own, or on which they have a registered lease of 3 years or more.`
       }),
       showStepError: computed(() => {
-        return !isMhrManufactuerRegistration.value && !getStepValidation(MhrSectVal.LOCATION_VALID)
+        return !isMhrManufacturerRegistration.value && !getStepValidation(MhrSectVal.LOCATION_VALID)
       })
     })
 

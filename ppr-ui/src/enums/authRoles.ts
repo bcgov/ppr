@@ -8,7 +8,7 @@ export enum AuthRoles {
    SBC = 'sbc',
    HELPDESK = 'helpdesk',
 
-   // Manufactuers
+   // Manufacturers
    MHR_REGISTER = 'mhr_register',
    MHR_TRANSPORT = 'mhr_transport',
    MHR_TRANSFER_SALE = 'mhr_transfer_sale',

@@ -15,7 +15,7 @@ import { defaultFlagSet } from '@/utils'
 import mockRouter from './MockRouter'
 import { RouteNames } from '@/enums'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
-import { mockedManufactuerAuthRoles } from './test-data'
+import { mockedManufacturerAuthRoles } from './test-data'
 
 Vue.use(Vuetify)
 
@@ -85,7 +85,7 @@ describe('Mhr Registration', () => {
   })
 })
 
-describe('Mhr Manufactuer Registration', () => {
+describe('Mhr Manufacturer Registration', () => {
   let wrapper: Wrapper<any>
   const currentAccount = {
     id: 'test_id'
@@ -97,7 +97,7 @@ describe('Mhr Manufactuer Registration', () => {
   beforeEach(async () => {
     // Staff with MHR enabled
     defaultFlagSet['mhr-registration-enabled'] = true
-    await store.setAuthRoles(mockedManufactuerAuthRoles)
+    await store.setAuthRoles(mockedManufacturerAuthRoles)
     await store.setRegistrationType(MhrRegistrationType)
 
     wrapper = createComponent()

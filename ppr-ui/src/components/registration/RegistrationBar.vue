@@ -4,7 +4,7 @@
       <v-col>
         <div class="actions">
           <v-btn
-            v-if="isMhr && (!isRoleQualifiedSupplier || isRoleStaff || isRoleManufactuer)"
+            v-if="isMhr && (!isRoleQualifiedSupplier || isRoleStaff || isRoleManufacturer)"
             filled
             class="mhr-registration-bar-btn px-5"
             @click="newRegistration(MhrRegistrationType)"
@@ -64,7 +64,7 @@ export default defineComponent({
       getAccountProductSubscriptions,
       isRoleQualifiedSupplier,
       isRoleStaff,
-      isRoleManufactuer
+      isRoleManufacturer
     } = storeToRefs(useStore())
     const hasRPPR = computed(() => {
       const productSubscriptions = getAccountProductSubscriptions.value as AccountProductSubscriptionIF
@@ -82,7 +82,7 @@ export default defineComponent({
     return {
       hasRPPR,
       isRoleStaff,
-      isRoleManufactuer,
+      isRoleManufacturer,
       isRoleQualifiedSupplier,
       newRegistration,
       MhrRegistrationType

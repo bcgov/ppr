@@ -278,7 +278,7 @@ export const stateModel: StateModelIF = {
     }
   },
 
-  mhrValidationManufactuerState: {
+  mhrValidationManufacturerState: {
     yourHomeValid: {
       makeModelValid: false,
       homeSectionsValid: false,
