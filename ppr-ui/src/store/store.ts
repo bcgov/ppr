@@ -61,9 +61,8 @@ import {
   MHRButtonFooterConfig,
   MHRManufacturerButtonFooterConfig,
   RegistrationButtonFooterConfig
-} from '@/resources/buttoneFooterConfig'
+} from '@/resources/buttonFooterConfig'
 import { UnitNoteIF } from '@/interfaces/unit-note-interfaces/unit-note-interface'
-import { MHRButtonFooterConfig, RegistrationButtonFooterConfig } from '@/resources/buttonFooterConfig'
 
 export const useStore = defineStore('assetsStore', () => {
   // State Model
