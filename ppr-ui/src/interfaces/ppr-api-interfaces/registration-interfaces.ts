@@ -1,4 +1,4 @@
-import { APIAmendmentTypes, APIMhrTypes, APIRegistrationTypes, DraftTypes, MhApiStatusTypes } from '@/enums'
+import { APIAmendmentTypes, APIMhrTypes, APIRegistrationTypes, DraftTypes } from '@/enums'
 import {
   CourtOrderIF,
   DebtorNameIF,
@@ -8,7 +8,7 @@ import {
   PartyIF,
   VehicleCollateralIF
 } from '@/interfaces'
-import mhrRegistration from '@/views/newMhrRegistration/MhrRegistration.vue'
+import { UnitNoteIF } from '@/interfaces/unit-note-interfaces/unit-note-interface'
 
 // Payment (pay-api) reference interface.
 export interface PaymentIF {
@@ -163,7 +163,7 @@ export interface MhRegistrationSummaryIF {
   documentRegistrationNumber?: string
   expand?: boolean // used in UI table to toggle expansion.
   expireDays?: number // Number of days until expiry
-  lienRegistrationType?: string
+  lienRegistrationType?: string,
 }
 
 // Discharge Registration interface. Base registration number debtor name and registering party are required.

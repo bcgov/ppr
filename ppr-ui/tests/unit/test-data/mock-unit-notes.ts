@@ -1,6 +1,7 @@
-import { UnitNoteDocTypes } from '@/enums'
+import { MhApiStatusTypes, UnitNoteDocTypes } from '@/enums'
+import { UnitNoteIF } from '@/interfaces/unit-note-interfaces/unit-note-interface'
 
-export const mockUnitNotes = [
+export const mockUnitNotes: Array<UnitNoteIF> = [
   {
     documentType: UnitNoteDocTypes.NOTICE_OF_CAUTION,
     documentId: '1',
@@ -22,7 +23,7 @@ export const mockUnitNotes = [
       phoneNumber: '2508289998',
       emailAddress: 'testing@email.com'
     },
-    status: 'ACTIVE',
+    status: MhApiStatusTypes.ACTIVE,
     destroyed: false
   },
   {
@@ -50,7 +51,7 @@ export const mockUnitNotes = [
       phoneNumber: '2508289998',
       emailAddress: 'testing@email.com'
     },
-    status: 'CANCELLED',
+    status: MhApiStatusTypes.CANCELLED,
     destroyed: false
   },
   {
@@ -78,7 +79,7 @@ export const mockUnitNotes = [
       phoneNumber: '2508289998',
       emailAddress: 'testing@email.com'
     },
-    status: 'EXPIRED',
+    status: MhApiStatusTypes.EXPIRED,
     destroyed: false
   },
   {
@@ -102,7 +103,7 @@ export const mockUnitNotes = [
       phoneNumber: '2508289998',
       emailAddress: 'testing@email.com'
     },
-    status: 'ACTIVE',
+    status: MhApiStatusTypes.ACTIVE,
     destroyed: false
   },
   {
@@ -130,7 +131,7 @@ export const mockUnitNotes = [
       phoneNumber: '2508289998',
       emailAddress: 'testing@email.com'
     },
-    status: 'CANCELLED',
+    status: MhApiStatusTypes.CANCELLED,
     destroyed: false
   },
   {
@@ -158,7 +159,7 @@ export const mockUnitNotes = [
       phoneNumber: '2508289998',
       emailAddress: 'testing@email.com'
     },
-    status: 'EXPIRED',
+    status: MhApiStatusTypes.CANCELLED,
     destroyed: false
   },
   {
@@ -182,7 +183,7 @@ export const mockUnitNotes = [
       phoneNumber: '2508289998',
       emailAddress: 'testing@email.com'
     },
-    status: 'ACTIVE',
+    status: MhApiStatusTypes.ACTIVE,
     destroyed: false
   }
 ]

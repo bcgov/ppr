@@ -65,7 +65,7 @@
           :key="index"
           class="unit-note-panel pb-4 px-1"
         >
-          <v-expansion-panel-header disable-icon-rotate>
+          <v-expansion-panel-header disable-icon-rotate :disabled="disabled">
             <v-row no-gutters>
               <v-col cols="12">
                 <h3 class="py-3">
@@ -97,7 +97,7 @@
                     >
                       <span>{{ activePanels.includes(index) ? 'Hide Note' : 'View Note' }}</span>
                       <v-divider vertical />
-                      <v-icon class="menu-drop-down-icon" color="primary" v-on="on">
+                      <v-icon class="menu-drop-down-icon" color="primary" v-on="on" :disabled="disabled">
                         {{ value ? 'mdi-menu-up' : 'mdi-menu-down' }}
                       </v-icon>
                     </v-btn>

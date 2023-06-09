@@ -38,13 +38,13 @@
                   <p>Ensure ALL of the information below is correct before making any changes to this
                     registration. Necessary fees will be applied as updates are made.
                   </p>
-                  <p v-if="mockUnitNotes && mockUnitNotes.length >= 1 && !isRoleStaffReg">
+                  <p v-if="getMhrUnitNotes && getMhrUnitNotes.length >= 1 && !isRoleStaffReg">
                     There are unit notes attached to this manufactured home. To view unit note information on this home,
                     complete a manufactured home search.
                   </p>
-                  <p v-else>
+                  <p v-else-if="getMhrUnitNotes && getMhrUnitNotes.length >= 1">
                     There are unit notes attached to this manufactured home.
-                    <a class="" href="#unit-note-component">See Unit Notes</a>
+                    <a href="#unit-note-component">See Unit Notes</a>
                   </p>
                 </template>
                 <p class="mt-7" v-else>
@@ -285,7 +285,7 @@
                 <UnitNotePanels
                     v-if="isRoleStaffReg"
                     id="unit-note-component"
-                    :unitNotes="mockUnitNotes"
+                    :unitNotes="getMhrUnitNotes"
                     :disabled="showTransferType"
                 />
 
@@ -374,8 +374,7 @@ import {
   updateMhrDraft
 } from '@/utils'
 import { clientConfig, staffConfig } from '@/resources/attnRefConfigs'
-import { UnitNoteIF } from '@/interfaces/unit-note-interfaces/unit-note-interface'
-import { mockUnitNotes } from '../../../tests/unit/test-data/'
+import { mockUnitNotes } from '../../../tests/unit/test-data'
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
@@ -426,6 +425,7 @@ export default defineComponent({
     } = useStore()
     const {
       // Getters
+      getMhrUnitNotes,
       getMhrTransferHomeOwners,
       getMhrInformation,
       getMhrTransferCurrentHomeOwnerGroups,
@@ -437,8 +437,7 @@ export default defineComponent({
       getMhrTransferType,
       getMhrTransferDeclaredValue,
       getMhrInfoValidation,
-      getMhrAttentionReferenceNum,
-      getMhrTransferSubmittingParty
+      getMhrAttentionReferenceNum
     } = storeToRefs(useStore())
     const {
       isFrozenMhr,
@@ -908,8 +907,7 @@ export default defineComponent({
       handleStartTransferRequiredDialogResp,
       cancelOwnerChangeConfirm,
       transferRequiredDialog,
-      getMhrTransferSubmittingParty,
-      mockUnitNotes,
+      getMhrUnitNotes,
       ...toRefs(localState)
     }
   }

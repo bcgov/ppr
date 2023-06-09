@@ -45,13 +45,14 @@ import {
   RegistrationFlowType,
   RouteNames
 } from '@/enums'
-import { computed, ref, set, toRefs } from 'vue-demi'
+import { computed, ComputedRef, ref, set, toRefs } from 'vue-demi'
 import { useMhrValidations } from '@/composables'
 import { MhrSectVal } from '@/composables/mhrRegistration/enums'
 import { getFeatureFlag } from '@/utils'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 import { HomeLocation, HomeOwners, MhrReviewConfirm, SubmittingParty, YourHome } from '@/views'
 import { MHRButtonFooterConfig, RegistrationButtonFooterConfig } from '@/resources/buttoneFooterConfig'
+import { UnitNoteIF } from '@/interfaces/unit-note-interfaces/unit-note-interface'
 
 export const useStore = defineStore('assetsStore', () => {
   // State Model
@@ -511,6 +512,9 @@ export const useStore = defineStore('assetsStore', () => {
     // Current state is to verify the property exists. Future state may be more granular dependent on type.
     return !!state.value.mhrInformation.lienRegistrationType
   })
+  const getMhrUnitNotes: ComputedRef<Array<UnitNoteIF>> = computed<Array<UnitNoteIF>>(() => {
+    return state.value.mhrUnitNotes
+  })
   const getMhrRegistrationOwnLand = computed<boolean>(() => {
     return state.value.mhrRegistration.ownLand
   })
@@ -899,6 +903,9 @@ export const useStore = defineStore('assetsStore', () => {
   function setLienType (lienType: string) {
     state.value.mhrInformation.lienRegistrationType = lienType
   }
+  function setMhrUnitNotes (unitNotes: Array<UnitNoteIF>) {
+    state.value.mhrUnitNotes = unitNotes
+  }
 
   /** MHR Ownership Transfer Actions */
   function setEmptyMhrTransfer (emptyMhrTransfer: MhrTransferIF) {
@@ -1058,6 +1065,7 @@ export const useStore = defineStore('assetsStore', () => {
     // MHR-related getters
     getMhrHomeSections,
     getMhrDraftNumber,
+    getMhrUnitNotes,
     getMhrRegistrationManufacturerName,
     getMhrRegistrationYearOfManufacture,
     getMhrRegistrationIsYearApproximate,
@@ -1180,6 +1188,7 @@ export const useStore = defineStore('assetsStore', () => {
     setMhrInformation,
     setMhrStatusType,
     setLienType,
+    setMhrUnitNotes,
     setEmptyMhrTransfer,
     setMhrTransferHomeOwnerGroups,
     setMhrTransferCurrentHomeOwnerGroups,
