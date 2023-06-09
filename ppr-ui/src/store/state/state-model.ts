@@ -295,7 +295,7 @@ export const stateModel: StateModelIF = {
     ownLand: false,
     isAffidavitTransferCompleted: false
   },
-  mhrUnitNote: {
+  mhrUnitNote: { // standalone singe note used for Unit Note filing/registration
     clientReferenceId: '',
     attentionReference: '',
     submittingParty: {

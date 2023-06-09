@@ -17,7 +17,6 @@ export interface MhrRegistrationIF {
   ownLand: boolean
   location: MhrRegistrationHomeLocationIF
   description: MhrRegistrationDescriptionIF
-  notes: UnitNoteIF[]
 }
 
 export interface NewMhrRegistrationApiIF {

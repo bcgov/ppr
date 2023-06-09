@@ -127,8 +127,7 @@ export const useNewMhrRegistration = () => {
         certificationOption: null,
         rebuiltRemarks: '',
         otherRemarks: ''
-      },
-      notes: []
+      }
     }
   }
 
