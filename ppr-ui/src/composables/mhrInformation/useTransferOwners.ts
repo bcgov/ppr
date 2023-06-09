@@ -470,7 +470,9 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
 
         suffix = deletedOwner.organizationName?.length > 0
           ? transferOwnerPrefillAdditionalName[transferType] + deletedOwner.organizationName
-          : transferOwnerPrefillAdditionalName[transferType] + [first, middle, last].filter(Boolean).join(' ')
+          : transferOwnerPrefillAdditionalName[transferType] +
+            [first, middle, last].filter(Boolean).join(' ') +
+            ', deceased'
       } else {
         // if executor, admin or trustee, copy the additional name (suffix) from the suffix of deleted owner
         suffix = deletedOwner.description
