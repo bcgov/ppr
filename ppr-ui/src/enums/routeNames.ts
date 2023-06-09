@@ -27,5 +27,5 @@ export enum RouteNames {
   SIGN_OUT = 'signout',
   YOUR_HOME = 'your-home',
   MHR_INFORMATION = 'mhr-information',
-  UNIT_NOTES_PLACEHOLDER = 'unit-notes-placeholder' // Replaced by Framework route
+  MHR_INFORMATION_NOTE = 'mhr-information-note'
 }

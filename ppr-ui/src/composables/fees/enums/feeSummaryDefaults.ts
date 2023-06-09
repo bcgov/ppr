@@ -10,5 +10,8 @@ export enum FeeSummaryDefaults {
   SEARCH_7 = 'feeSearch7',
   SEARCH_10 = 'feeSearch10',
   SEARCH_12 = 'feeSearch12',
-  SEARCH_15 = 'feeSearch15'
+  SEARCH_15 = 'feeSearch15',
+  UNIT_NOTE_10 = 'unitNote10',
+  UNIT_NOTE_20 = 'unitNote20',
+  UNIT_NOTE_50 = 'unitNote50'
 }

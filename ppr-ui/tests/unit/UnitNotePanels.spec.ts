@@ -8,6 +8,7 @@ import { UnitNoteDocTypes } from '../../src/enums'
 import { mockUnitNotes } from './test-data'
 import { BaseAddress } from '@/composables/address'
 import { pacificDate } from '@/utils'
+import { UnitNotesInfo } from '@/resources/unitNotes'
 
 Vue.use(Vuetify)
 const vuetify = new Vuetify({})
@@ -104,7 +105,7 @@ describe('UnitNotePanels', () => {
 
       // Check the unit note type
       const typeText = header.find('h3').text()
-      expect(typeText).toContain(wrapper.vm.getUnitNoteText(item.documentType))
+      expect(typeText).toContain(UnitNotesInfo[item.documentType].header)
 
       // Check the registration number and date
       const registrationInfo = header.find('.info-text')

@@ -189,13 +189,14 @@ import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
 import { useStore } from '@/store/store'
 // local
 /* eslint-disable no-unused-vars */
-import { UIRegistrationTypes, UITransferTypes } from '@/enums'
+import { UIRegistrationTypes, UITransferTypes, UnitNoteDocTypes } from '@/enums'
 /* eslint-disable no-unused-vars */
 import { FeeSummaryTypes } from './enums'
 import { AdditionalSearchFeeIF, FeeSummaryI, RegistrationLengthI } from './interfaces'
 // eslint-enable no-unused-vars
 import { getFeeHint, getFeeSummary } from './factories'
 import { storeToRefs } from 'pinia'
+import { UnitNotesInfo } from '@/resources/unitNotes'
 
 export default defineComponent({
   name: 'FeeSummary',
@@ -230,18 +231,20 @@ export default defineComponent({
   },
   setup (props) {
     const {
-      getLengthTrust, isRoleStaff, getStaffPayment, isSearchCertified
+      getLengthTrust, isRoleStaff, getStaffPayment, isSearchCertified, getMhrUnitNoteType
     } = storeToRefs(useStore())
 
     const localState = reactive({
       feeType: props.setFeeType,
+      feeSubType: computed((): UnitNoteDocTypes => getMhrUnitNoteType.value),
       registrationType: props.setRegistrationType,
       hasPriorityFee: computed((): Boolean => getStaffPayment.value?.isPriority),
       hasCertifyFee: computed((): Boolean => isSearchCertified.value),
       registrationLength: computed((): RegistrationLengthI => props.setRegistrationLength),
       isValid: computed((): boolean => {
         return getLengthTrust.value.valid ||
-          [FeeSummaryTypes.MHSEARCH, FeeSummaryTypes.NEW_MHR, FeeSummaryTypes.MHR_TRANSFER].includes(localState.feeType)
+          [FeeSummaryTypes.MHSEARCH, FeeSummaryTypes.NEW_MHR, FeeSummaryTypes.MHR_TRANSFER,
+            FeeSummaryTypes.MHR_UNIT_NOTE].includes(localState.feeType)
       }),
       isPPRFee: computed((): boolean => {
         return [
@@ -361,6 +364,7 @@ export default defineComponent({
         case FeeSummaryTypes.MHSEARCH: return 'Manufactured Home search'
         case FeeSummaryTypes.MHR_COMBINED_SEARCH: return 'Combined Home and Lien search'
         case FeeSummaryTypes.MHR_TRANSFER: return 'Ownership Transfer or Change'
+        case FeeSummaryTypes.MHR_UNIT_NOTE: return UnitNotesInfo[localState.feeSubType].header
         default: return localState.registrationType
       }
     }

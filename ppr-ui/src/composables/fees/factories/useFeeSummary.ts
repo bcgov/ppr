@@ -4,6 +4,9 @@ import { FeeSummaryI, RegistrationLengthI } from '../interfaces'
 import { defaultFeeSummaries } from '../resources'
 import { isInt } from '@/utils'
 import { getFinancingFee } from '@/composables/fees/factories'
+import { useStore } from '@/store/store'
+import { storeToRefs } from 'pinia'
+import { UnitNotesInfo } from '@/resources/unitNotes'
 
 export const hasNoCharge = (val: UIRegistrationTypes): boolean => {
   const hfArray = [
@@ -80,6 +83,10 @@ export function getFeeSummary (
   isStaff: boolean = false,
   isStaffClientPayment: boolean = false
 ): FeeSummaryI {
+  const {
+    getMhrUnitNoteType
+  } = storeToRefs(useStore())
+
   if (feeType === FeeSummaryTypes.MHSEARCH) {
     if (isStaff && isStaffClientPayment) return { ...defaultFeeSummaries[FeeSummaryDefaults.SEARCH_10] }
     if (isStaff) return { ...defaultFeeSummaries[FeeSummaryDefaults.NO_FEE] }
@@ -104,6 +111,10 @@ export function getFeeSummary (
       return { ...defaultFeeSummaries[FeeSummaryDefaults.NO_FEE] }
     }
     return { ...defaultFeeSummaries[FeeSummaryDefaults.AMEND] }
+  }
+  if (feeType === FeeSummaryTypes.MHR_UNIT_NOTE) {
+    const unitNoteFeeSummary = UnitNotesInfo[getMhrUnitNoteType.value].fee
+    return { ...defaultFeeSummaries[unitNoteFeeSummary] }
   }
   if ((feeType === FeeSummaryTypes.NEW) || (feeType === FeeSummaryTypes.RENEW)) {
     if (hasNoCharge(registrationType)) {

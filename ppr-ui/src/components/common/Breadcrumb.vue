@@ -53,11 +53,13 @@ import {
   tombstoneBreadcrumbSearch,
   tombstoneBreadcrumbSearchConfirm,
   breadcrumbsTitles,
-  tombstoneBreadcrumbMhrInformation
+  tombstoneBreadcrumbMhrInformation,
+  tombstoneBreadcrumbMhrUnitNote
 } from '@/resources'
 import { RouteNames } from '@/enums'
 import { getRoleProductCode } from '@/utils'
 import { storeToRefs } from 'pinia'
+import { UnitNotesInfo } from '@/resources/unitNotes'
 
 export default defineComponent({
   name: 'Breadcrumb',
@@ -71,7 +73,8 @@ export default defineComponent({
       isRoleStaff,
       getUserRoles,
       getUserProductSubscriptionsCodes,
-      getMhrInformation
+      getMhrInformation,
+      getMhrUnitNoteType
     } = storeToRefs(useStore())
 
     const localState = reactive({
@@ -95,7 +98,8 @@ export default defineComponent({
           tombstoneBreadcrumbRegistration,
           tombstoneBreadcrumbSearch,
           tombstoneBreadcrumbSearchConfirm,
-          tombstoneBreadcrumbMhrInformation
+          tombstoneBreadcrumbMhrInformation,
+          tombstoneBreadcrumbMhrUnitNote
         ]
         if (isRoleStaff.value) {
           for (const tombstoneBreadcrumb of allTombstoneBreadcrumbs) {
@@ -134,6 +138,11 @@ export default defineComponent({
           const mhrInfoBreadcrumb = [...tombstoneBreadcrumbMhrInformation]
           mhrInfoBreadcrumb[2].text = `MHR Number ${getMhrInformation.value.mhrNumber}`
           return mhrInfoBreadcrumb
+        } else if (route.name === RouteNames.MHR_INFORMATION_NOTE) {
+          const mhrUnitNoteBreadcrumb = [...tombstoneBreadcrumbMhrUnitNote]
+          mhrUnitNoteBreadcrumb[2].text = `MHR Number ${getMhrInformation.value.mhrNumber}`
+          mhrUnitNoteBreadcrumb[3].text = UnitNotesInfo[getMhrUnitNoteType.value].header
+          return mhrUnitNoteBreadcrumb
         } else {
           const registrationBreadcrumb = [...tombstoneBreadcrumbRegistration]
           registrationBreadcrumb[1].text = roleBasedBreadcrumbTitle || registrationBreadcrumb[1].text

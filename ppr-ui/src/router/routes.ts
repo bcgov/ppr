@@ -18,7 +18,8 @@ import {
   Signout,
   AmendRegistration,
   ConfirmAmendment,
-  Login
+  Login,
+  MhrUnitNote
 } from '@/views'
 import { RouteNames } from '@/enums'
 
@@ -228,6 +229,14 @@ export const routes = [
     path: '/mhr-information',
     name: RouteNames.MHR_INFORMATION,
     component: MhrInformation,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/mhr-information-note',
+    name: RouteNames.MHR_INFORMATION_NOTE,
+    component: MhrUnitNote,
     meta: {
       requiresAuth: true
     }

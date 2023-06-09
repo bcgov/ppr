@@ -127,23 +127,7 @@ export const useNewMhrRegistration = () => {
         certificationOption: null,
         rebuiltRemarks: '',
         otherRemarks: ''
-      },
-      notes: [
-        {
-          documentType: '',
-          documentId: '',
-          createDateTime: '',
-          remarks: '',
-          contactName: '',
-          contactAddress: {
-            street: '',
-            city: '',
-            region: '',
-            postalCode: '',
-            country: ''
-          }
-        }
-      ]
+      }
     }
   }
 
