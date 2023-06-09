@@ -26,16 +26,12 @@ export const useMhrValidations = (validationState: any) => {
 
   /** Reset submission validations to default . */
   const resetAllValidations = (): void => {
-    // Gets all sections in model
     const sections = Object.keys(validationState) as MhrSectVal[]
-    for (const section of sections) {
-      // Gets all components for the specifc section
-      const components = Object.keys(validationState[section].value) as MhrCompVal[]
-      // Sets all components to false
-      for (const component of components) {
-        setValidation(section, component, false)
-      }
-    }
+
+    sections.forEach(section =>
+      Object.keys(validationState[section].value).forEach(component =>
+        setValidation(section, component as MhrCompVal, false)))
+
     // Default for ADD_EDIT_OWNERS_VALID -> OWNERS_VALID is true
     if (sections.includes(MhrSectVal.ADD_EDIT_OWNERS_VALID)) {
       setValidation(MhrSectVal.ADD_EDIT_OWNERS_VALID, MhrCompVal.OWNERS_VALID, true)

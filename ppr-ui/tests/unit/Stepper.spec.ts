@@ -73,6 +73,7 @@ describe('Stepper - MHR Staff Registration', () => {
     // Verify that all steps are rendered correctly
     expect(wrapper.props().showStepErrorsFlag).toBe(false)
     const steps = wrapper.findAll('.step')
+    expect(steps.length).toBe(5)
     expect(steps.length).toBe(expectedSteps.length)
   })
 
@@ -147,6 +148,7 @@ describe('Stepper - MHR Manufactuer Registration', () => {
     // Verify that all steps are rendered correctly
     expect(wrapper.props().showStepErrorsFlag).toBe(false)
     const steps = wrapper.findAll('.step')
+    expect(steps.length).toBe(2)
     expect(steps.length).toBe(expectedSteps.length)
     await wrapper.setProps({ showStepErrorsFlag: true })
     expect(wrapper.props().showStepErrorsFlag).toBe(true)
@@ -157,7 +159,6 @@ describe('Stepper - MHR Manufactuer Registration', () => {
     for (const step of expectedSteps) {
       const stepIcon = wrapper.find(`#${step.id}`)
       const stepText = wrapper.find(getTestId(step.id))
-      // This is the icon for the step
       expect(stepIcon.text()).toContain(step.icon)
       expect(stepText.text()).toContain(step.text.replaceAll('<br />', ''))
     }
