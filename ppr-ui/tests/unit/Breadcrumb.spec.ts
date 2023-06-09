@@ -24,6 +24,7 @@ import { getTestId } from './utils'
 
 // unit test resources
 import mockRouter from './MockRouter'
+import { mockedManufactuerAuthRoles } from './test-data'
 
 import { defaultFlagSet, getRoleProductCode } from '@/utils'
 import flushPromises from 'flush-promises'
@@ -267,5 +268,79 @@ describe('Breadcrumb component tests', () => {
 
     tombstoneBreadcrumbAmendment[1].text = breadcrumbsTitles[userRoleProductCode]
     expect(breadcrumbs.at(1).text()).toContain('Staff')
+  })
+
+  it('renders on Mhr Registration: staff', () => {
+    wrapper = createComponent(RouteNames.MHR_REGISTRATION)
+
+    const userRoleProductCode = getRoleProductCode(store.getUserRoles, [ProductCode.MHR])
+    expect(wrapper.find(backBtn).exists()).toBe(true)
+
+    const breadcrumbs = wrapper.findAll(getTestId('breadcrumb-item'))
+    expect(breadcrumbs.length).toBe(tombstoneBreadcrumbRegistration.length)
+    expect(breadcrumbs.at(1).text()).toContain('Staff')
+
+    tombstoneBreadcrumbRegistration[1].text = breadcrumbsTitles[userRoleProductCode]
+    for (let i = 0; i < tombstoneBreadcrumbRegistration.length; i++) {
+      expect(breadcrumbs.at(i).text()).toContain(wrapper.vm.handleStaff(tombstoneBreadcrumbRegistration[i].text))
+    }
+  })
+
+  it('renders on Mhr Registration: Manufactuer - Only Mhr', async () => {
+    // Set up
+    await store.setAuthRoles(mockedManufactuerAuthRoles)
+
+    defaultFlagSet['mhr-ui-enabled'] = true
+
+    store.setUserProductSubscriptionsCodes([ProductCode.MHR])
+
+    await nextTick()
+
+    wrapper = createComponent(RouteNames.MHR_REGISTRATION)
+
+    const userRoleProductCode = getRoleProductCode(store.getUserRoles, [ProductCode.MHR])
+    expect(wrapper.find(backBtn).exists()).toBe(true)
+
+    const breadcrumbs = wrapper.findAll(getTestId('breadcrumb-item'))
+    expect(breadcrumbs.length).toBe(tombstoneBreadcrumbRegistration.length)
+    expect(breadcrumbs.at(1).text()).toContain('My Manufactured Home Registry')
+
+    tombstoneBreadcrumbRegistration[1].text = breadcrumbsTitles[userRoleProductCode]
+    for (let i = 0; i < tombstoneBreadcrumbRegistration.length; i++) {
+      expect(breadcrumbs.at(i).text()).toContain(wrapper.vm.handleStaff(tombstoneBreadcrumbRegistration[i].text))
+    }
+
+    // Tear down
+    defaultFlagSet['mhr-ui-enabled'] = false
+    store.setUserProductSubscriptionsCodes([])
+  })
+
+  it('renders on Mhr Registration: Manufactuer - MHR and PPR', async () => {
+    // Set up
+    await store.setAuthRoles(mockedManufactuerAuthRoles)
+
+    defaultFlagSet['mhr-ui-enabled'] = true
+
+    store.setUserProductSubscriptionsCodes([ProductCode.MHR, ProductCode.PPR])
+
+    await nextTick()
+
+    wrapper = createComponent(RouteNames.MHR_REGISTRATION)
+
+    const userRoleProductCode = getRoleProductCode(store.getUserRoles, [ProductCode.MHR, ProductCode.PPR])
+    expect(wrapper.find(backBtn).exists()).toBe(true)
+
+    const breadcrumbs = wrapper.findAll(getTestId('breadcrumb-item'))
+    expect(breadcrumbs.length).toBe(tombstoneBreadcrumbRegistration.length)
+
+    tombstoneBreadcrumbRegistration[1].text = breadcrumbsTitles[userRoleProductCode]
+    expect(breadcrumbs.at(1).text()).toContain('My Asset')
+    for (let i = 0; i < tombstoneBreadcrumbRegistration.length; i++) {
+      expect(breadcrumbs.at(i).text()).toContain(wrapper.vm.handleStaff(tombstoneBreadcrumbRegistration[i].text))
+    }
+
+    // Tear down
+    defaultFlagSet['mhr-ui-enabled'] = false
+    store.setUserProductSubscriptionsCodes([])
   })
 })

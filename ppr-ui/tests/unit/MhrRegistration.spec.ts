@@ -15,6 +15,7 @@ import { defaultFlagSet } from '@/utils'
 import mockRouter from './MockRouter'
 import { RouteNames } from '@/enums'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
+import { mockedManufactuerAuthRoles } from './test-data'
 
 Vue.use(Vuetify)
 
@@ -60,6 +61,43 @@ describe('Mhr Registration', () => {
   beforeEach(async () => {
     // Staff with MHR enabled
     defaultFlagSet['mhr-registration-enabled'] = true
+    await store.setRegistrationType(MhrRegistrationType)
+
+    wrapper = createComponent()
+  })
+
+  afterEach(() => {
+    wrapper.destroy()
+  })
+
+  it('renders and displays the Mhr Registration View', async () => {
+    expect(wrapper.findComponent(MhrRegistration).exists()).toBe(true)
+    expect(wrapper.find('#registration-header').text()).toBe('Manufactured Home Registration')
+  })
+
+  it('renders and displays the correct sub components', async () => {
+    // Stepper
+    expect(wrapper.findComponent(Stepper).exists()).toBe(true)
+    // Action button footers
+    expect(wrapper.findComponent(ButtonFooter).exists()).toBe(true)
+    // Sticky container w/ Fee Summary
+    expect(wrapper.findComponent(StickyContainer).exists()).toBe(true)
+  })
+})
+
+describe('Mhr Manufactuer Registration', () => {
+  let wrapper: Wrapper<any>
+  const currentAccount = {
+    id: 'test_id'
+  }
+  sessionStorage.setItem('KEYCLOAK_TOKEN', 'token')
+  sessionStorage.setItem('CURRENT_ACCOUNT', JSON.stringify(currentAccount))
+  sessionStorage.setItem('AUTH_API_URL', 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/')
+
+  beforeEach(async () => {
+    // Staff with MHR enabled
+    defaultFlagSet['mhr-registration-enabled'] = true
+    await store.setAuthRoles(mockedManufactuerAuthRoles)
     await store.setRegistrationType(MhrRegistrationType)
 
     wrapper = createComponent()
