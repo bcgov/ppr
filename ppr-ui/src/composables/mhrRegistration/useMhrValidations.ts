@@ -3,7 +3,10 @@ import { MhrCompVal, MhrSectVal } from '@/composables/mhrRegistration/enums'
 export const useMhrValidations = (validationState: any) => {
   /** Set specified flag */
   const setValidation = (section: MhrSectVal, component: MhrCompVal, isValid: boolean): void => {
-    validationState[section].value[component] = isValid
+    // Only sets specified flag if the section and component are part of the validation model
+    if (validationState[section]?.value[component] !== undefined) {
+      validationState[section].value[component] = isValid
+    }
   }
 
   /** Get specified flag */
@@ -23,24 +26,16 @@ export const useMhrValidations = (validationState: any) => {
 
   /** Reset submission validations to default . */
   const resetAllValidations = (): void => {
-    // Reset your home validations
-    setValidation(MhrSectVal.YOUR_HOME_VALID, MhrCompVal.MAKE_MODEL_VALID, false)
-    setValidation(MhrSectVal.YOUR_HOME_VALID, MhrCompVal.HOME_SECTION_VALID, false)
-    setValidation(MhrSectVal.YOUR_HOME_VALID, MhrCompVal.HOME_CERTIFICATION_VALID, false)
-    setValidation(MhrSectVal.YOUR_HOME_VALID, MhrCompVal.REBUILT_STATUS_VALID, false)
-    setValidation(MhrSectVal.YOUR_HOME_VALID, MhrCompVal.OTHER_VALID, false)
-    // Reset submitting party validations
-    setValidation(MhrSectVal.SUBMITTING_PARTY_VALID, MhrCompVal.SUBMITTER_VALID, false)
-    setValidation(MhrSectVal.SUBMITTING_PARTY_VALID, MhrCompVal.DOC_ID_VALID, false)
-    setValidation(MhrSectVal.SUBMITTING_PARTY_VALID, MhrCompVal.REF_NUM_VALID, false)
-    // Reset home owner validations
-    setValidation(MhrSectVal.HOME_OWNERS_VALID, MhrCompVal.OWNERS_VALID, false)
-    // Reset home location validations
-    setValidation(MhrSectVal.LOCATION_VALID, MhrCompVal.LOCATION_TYPE_VALID, false)
-    setValidation(MhrSectVal.LOCATION_VALID, MhrCompVal.CIVIC_ADDRESS_VALID, false)
+    const sections = Object.keys(validationState) as MhrSectVal[]
 
-    // Reset Review validations
-    setValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_STEPS, false)
+    sections.forEach(section =>
+      Object.keys(validationState[section].value).forEach(component =>
+        setValidation(section, component as MhrCompVal, false)))
+
+    // Default for ADD_EDIT_OWNERS_VALID -> OWNERS_VALID is true
+    if (sections.includes(MhrSectVal.ADD_EDIT_OWNERS_VALID)) {
+      setValidation(MhrSectVal.ADD_EDIT_OWNERS_VALID, MhrCompVal.OWNERS_VALID, true)
+    }
   }
 
   /** Is true when input field ref is in error. */

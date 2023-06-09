@@ -22,19 +22,21 @@
               {{ step.icon }}
             </v-icon>
           </v-btn>
-          <v-icon :class="$style['step__btn2']" size="30" color="green darken-3" v-show=step.valid>
+          <v-icon :class="$style['step__btn2']" size="30" color="green darken-3" v-show=step.valid
+            :data-test-id="`step-valid-${step.id}`">
             mdi-check-circle
           </v-icon>
-          <v-icon :class="$style['step__btn2']" size="30" color="error" v-show=showInvalid(step)>
+          <v-icon :class="$style['step__btn2']" size="30" color="error" v-show=showInvalid(step)
+            :data-test-id="`step-invalid-${step.id}`">
             mdi-close-circle
           </v-icon>
         </div>
         <v-btn :class="[$style['step__label'], $style['pre-line']]" text color="primary" :ripple="false"
-          :disabled=step.disabled v-show=!isCurrentStep(step)>
+          :disabled=step.disabled v-show=!isCurrentStep(step) :data-test-id="step.id">
           <span :class="$style['step__label__text']" v-html="step.text"></span>
         </v-btn>
         <v-btn :class="[$style['step__label__current'], $style['pre-line']]" text color="primary" :ripple="false"
-          :disabled=step.disabled v-show=isCurrentStep(step)>
+          :disabled=step.disabled v-show=isCurrentStep(step) :data-test-id="`current-${step.id}`">
           <span :class="$style['step__label__text__current']" v-html="step.text"></span>
         </v-btn>
       </div>

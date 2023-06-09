@@ -68,7 +68,7 @@ import ButtonFooter from '@/components/common/ButtonFooter.vue'
 import { useHomeOwners, useMhrValidations, useNewMhrRegistration } from '@/composables'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 /* eslint-disable no-unused-vars */
-import { ErrorIF, MhrRegistrationIF, RegistrationTypeIF, RegTableNewItemI } from '@/interfaces'
+import { ErrorIF, MhrRegistrationIF, RegTableNewItemI, StepIF } from '@/interfaces'
 import { RegistrationLengthI } from '@/composables/fees/interfaces'
 import BaseDialog from '@/components/dialogs/BaseDialog.vue'
 import { storeToRefs } from 'pinia'
@@ -119,7 +119,6 @@ export default defineComponent({
       MhrSectVal,
       setValidation,
       getValidation,
-      getStepValidation,
       resetAllValidations,
       scrollToInvalid
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
@@ -152,11 +151,7 @@ export default defineComponent({
         return getValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_APP)
       }),
       isValidMhrRegistration: computed((): boolean => {
-        return getStepValidation(MhrSectVal.YOUR_HOME_VALID) &&
-            getStepValidation(MhrSectVal.SUBMITTING_PARTY_VALID) &&
-            getStepValidation(MhrSectVal.HOME_OWNERS_VALID) &&
-            getStepValidation(MhrSectVal.LOCATION_VALID) &&
-            getStepValidation(MhrSectVal.REVIEW_CONFIRM_VALID)
+        return getSteps.value.every((step: StepIF) => step.valid)
       })
     })
 
@@ -235,13 +230,9 @@ export default defineComponent({
           emitError(mhrSubmission?.error)
         }
       } else {
-        await scrollToInvalid(MhrSectVal.REVIEW_CONFIRM_VALID, 'mhr-review-confirm',
-          [
-            getStepValidation(MhrSectVal.YOUR_HOME_VALID),
-            getStepValidation(MhrSectVal.SUBMITTING_PARTY_VALID),
-            getStepValidation(MhrSectVal.HOME_OWNERS_VALID),
-            getStepValidation(MhrSectVal.LOCATION_VALID)
-          ])
+        let stepsValidation = getSteps.value.map((step : StepIF) => step.valid)
+        stepsValidation.pop() // Removes review confirm step from stepsValidation
+        await scrollToInvalid(MhrSectVal.REVIEW_CONFIRM_VALID, 'mhr-review-confirm', stepsValidation)
       }
     }
 

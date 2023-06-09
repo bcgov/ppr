@@ -277,6 +277,21 @@ export const stateModel: StateModelIF = {
       validateApp: false
     }
   },
+
+  mhrValidationManufacturerState: {
+    yourHomeValid: {
+      makeModelValid: false,
+      homeSectionsValid: false,
+      homeCertificationValid: false
+    },
+    reviewConfirmValid: {
+      attentionValid: false,
+      folioOrRefNumValid: false,
+      authorizationValid: false,
+      validateSteps: false,
+      validateApp: false
+    }
+  },
   // Transfer of Ownership State
   mhrTransfer: {
     mhrNumber: '',

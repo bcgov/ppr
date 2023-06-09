@@ -7,7 +7,7 @@ import {
 } from '@/interfaces'
 export interface MhrRegistrationIF {
   draftNumber: string
-  documentId: string
+  documentId?: string
   clientReferenceId: string
   declaredValue: string
   submittingParty: SubmittingPartyIF
@@ -21,7 +21,7 @@ export interface MhrRegistrationIF {
 
 export interface NewMhrRegistrationApiIF {
   draftNumber?: string
-  documentId: string
+  documentId?: string
   clientReferenceId?: string
   declaredValue?: string
   submittingParty: {

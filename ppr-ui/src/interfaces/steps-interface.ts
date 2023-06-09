@@ -1,4 +1,5 @@
 import { RouteNames } from '@/enums'
+import { Component } from 'vue'
 
 export interface StepIF {
   id: string
@@ -6,6 +7,7 @@ export interface StepIF {
   icon: string
   text: string
   to: RouteNames
-  component: string
+  component: Component
+  valid: boolean
   disabled?: boolean
 }

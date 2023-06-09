@@ -39,3 +39,18 @@ export interface mhrInfoValidationStateIF {
   isAuthorizationValid: false,
   isStaffPaymentValid: false
 }
+
+export interface MhrValidationManufacturerStateIF {
+  yourHomeValid: {
+    makeModelValid: boolean,
+    homeSectionsValid: boolean,
+    homeCertificationValid: boolean,
+  },
+  reviewConfirmValid: {
+    attentionValid: boolean,
+    authorizationValid: boolean,
+    folioOrRefNumValid: boolean,
+    validateSteps: boolean,
+    validateApp: boolean
+  }
+}

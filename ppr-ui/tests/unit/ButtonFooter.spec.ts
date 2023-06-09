@@ -10,15 +10,18 @@ import sinon from 'sinon'
 import { ButtonFooter } from '@/components/common'
 import { StaffPaymentDialog } from '@/components/dialogs'
 import { LengthTrust, AddSecuredPartiesAndDebtors, AddCollateral, ReviewConfirm } from '@/views/newRegistration'
+import { YourHome, MhrReviewConfirm } from '@/views/newMhrRegistration'
 import { getLastEvent } from './utils'
 
 // Other
 import mockRouter from './MockRouter'
 import { RouteNames, StatementTypes } from '@/enums'
 import { axios } from '@/utils/axios-ppr'
-import { mockedModelAmendmdmentAdd } from './test-data'
+import { mockedManufacturerAuthRoles, mockedModelAmendmdmentAdd } from './test-data'
 import { createPinia, setActivePinia } from 'pinia'
 import { useStore } from '../../src/store/store'
+import { ButtonConfigIF } from '@/interfaces'
+import { MhrRegistrationType } from '@/resources'
 
 Vue.use(Vuetify)
 
@@ -376,5 +379,123 @@ describe('Button events', () => {
     await wrapper.vm.submitNext()
     await flushPromises()
     expect(getLastEvent(wrapper, 'error')).not.toBeNull()
+  })
+})
+
+describe('Mhr Manufacturer Registration step 1 - Your Home', () => {
+  let wrapper: Wrapper<any>
+  const currentStatementType = StatementTypes.FINANCING_STATEMENT
+  const currentStepName = RouteNames.YOUR_HOME
+
+  beforeAll(async () => {
+    if (router.currentRoute.name !== RouteNames.YOUR_HOME) {
+      router.replace({ name: RouteNames.YOUR_HOME })
+    }
+    await store.setAuthRoles(mockedManufacturerAuthRoles)
+    await store.setRegistrationType(MhrRegistrationType)
+  })
+
+  afterAll(async () => {
+    await store.setAuthRoles([])
+    await store.setRegistrationType(null)
+  })
+
+  beforeEach(async () => {
+    const localVue = createLocalVue()
+    localVue.use(VueRouter)
+    wrapper = createComponent(currentStatementType, currentStepName)
+  })
+  afterEach(() => {
+    wrapper.destroy()
+  })
+
+  it('renders with correct footer configs', async () => {
+    expect(router.currentRoute.name).toBe(RouteNames.YOUR_HOME)
+    expect(wrapper.findComponent(ButtonFooter).exists()).toBe(true)
+    expect(wrapper.find(backBtn).exists()).toBe(false)
+    expect(wrapper.find(nextBtn).exists()).toBe(true)
+    expect(wrapper.find(saveBtn).exists()).toBe(true)
+    expect(wrapper.find(saveResumeBtn).exists()).toBe(true)
+    expect(wrapper.find(cancelBtn).exists()).toBe(true)
+    const buttonConfig = wrapper.vm.buttonConfig as ButtonConfigIF
+    expect(buttonConfig.nextRouteName).toBe(RouteNames.MHR_REVIEW_CONFIRM)
+    expect(buttonConfig.nextText).toBe('Review and Confirm')
+  })
+
+  it('Step 1 buttons work properly', async () => {
+    await wrapper.find(saveBtn).trigger('click')
+    await nextTick()
+    expect(router.currentRoute.name).toBe(RouteNames.YOUR_HOME)
+
+    expect(store.getStateModel.unsavedChanges).toBe(false)
+    await wrapper.find(cancelBtn).trigger('click')
+    await nextTick()
+    expect(wrapper.vm.showCancelDialog).toBe(false)
+    expect(router.currentRoute.name).toBe(RouteNames.DASHBOARD)
+
+    await wrapper.find(saveResumeBtn).trigger('click')
+    await nextTick()
+    expect(router.currentRoute.name).toBe(RouteNames.DASHBOARD)
+
+    wrapper.find(nextBtn).trigger('click')
+    await nextTick()
+    expect(router.currentRoute.name).toBe(RouteNames.MHR_REVIEW_CONFIRM)
+  })
+})
+
+describe('Mhr Manufacturer Registration step 2 - Review and Confirm', () => {
+  let wrapper: Wrapper<any>
+  const currentStatementType = StatementTypes.FINANCING_STATEMENT
+  const currentStepName = RouteNames.MHR_REVIEW_CONFIRM
+
+  beforeAll(async () => {
+    await store.setAuthRoles(mockedManufacturerAuthRoles)
+    await store.setRegistrationType(MhrRegistrationType)
+  })
+
+  afterAll(async () => {
+    await store.setAuthRoles([])
+    await store.setRegistrationType(null)
+  })
+  beforeEach(async () => {
+    const localVue = createLocalVue()
+    localVue.use(VueRouter)
+    wrapper = createComponent(currentStatementType, currentStepName)
+    if (router.currentRoute.name !== RouteNames.MHR_REVIEW_CONFIRM) {
+      router.replace({ name: RouteNames.MHR_REVIEW_CONFIRM })
+    }
+  })
+  afterEach(() => {
+    wrapper.destroy()
+  })
+
+  it('renders with correct footer configs', async () => {
+    expect(router.currentRoute.name).toBe(RouteNames.MHR_REVIEW_CONFIRM)
+    expect(wrapper.findComponent(ButtonFooter).exists()).toBe(true)
+    expect(wrapper.find(backBtn).exists()).toBe(true)
+    expect(wrapper.find(nextBtn).exists()).toBe(true)
+    expect(wrapper.find(saveBtn).exists()).toBe(true)
+    expect(wrapper.find(saveResumeBtn).exists()).toBe(true)
+    expect(wrapper.find(cancelBtn).exists()).toBe(true)
+    const buttonConfig = wrapper.vm.buttonConfig as ButtonConfigIF
+    expect(buttonConfig.nextRouteName).toBe(RouteNames.DASHBOARD)
+    expect(buttonConfig.backRouteName).toBe(RouteNames.YOUR_HOME)
+    expect(buttonConfig.nextText).toBe('Register and Pay')
+  })
+
+  it('Step 2 buttons work properly', async () => {
+    await wrapper.find(saveBtn).trigger('click')
+    await nextTick()
+    expect(router.currentRoute.name).toBe(RouteNames.MHR_REVIEW_CONFIRM)
+
+    expect(store.getStateModel.unsavedChanges).toBe(false)
+    await wrapper.find(cancelBtn).trigger('click')
+    await nextTick()
+    expect(wrapper.vm.showCancelDialog).toBe(false)
+    expect(router.currentRoute.name).toBe(RouteNames.DASHBOARD)
+
+    await wrapper.find(saveResumeBtn).trigger('click')
+    await nextTick()
+    expect(router.currentRoute.name).toBe(RouteNames.DASHBOARD)
   })
 })
