@@ -3,12 +3,11 @@ import {
   CourtOrderIF,
   DebtorNameIF,
   ErrorIF,
-  GeneralCollateralIF, MhrTransferApiIF,
+  GeneralCollateralIF,
   NewMhrRegistrationApiIF,
   PartyIF,
   VehicleCollateralIF
 } from '@/interfaces'
-import { UnitNoteIF } from '@/interfaces/unit-note-interfaces/unit-note-interface'
 
 // Payment (pay-api) reference interface.
 export interface PaymentIF {
