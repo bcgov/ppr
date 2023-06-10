@@ -507,7 +507,7 @@ describe('Home Owners', () => {
     // check that suffix field value is pre-populated with the name of deleted person
     const suffix = <HTMLInputElement>(addEditHomeOwner.find(getTestId('suffix'))).element
     const { first, middle, last } = mockedPerson.individualName
-    expect(suffix.value).toBe(`Executor of the will of ${first} ${middle} ${last}`)
+    expect(suffix.value).toBe(`Executor of the will of ${first} ${middle} ${last}, deceased`)
   })
 
   it('TRANS WILL: displays correct tenancy type in Executor scenarios', async () => {
