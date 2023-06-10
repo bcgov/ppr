@@ -15,13 +15,11 @@
 # pylint: disable=too-few-public-methods
 
 """This module holds methods to support registration model updates - mostly account registration summary."""
-import json
-
 from flask import current_app
 from sqlalchemy.sql import text
 
-from mhr_api.exceptions import BusinessException, DatabaseException
-from mhr_api.models import utils as model_utils, MhrDraft
+from mhr_api.exceptions import DatabaseException
+from mhr_api.models import utils as model_utils
 from mhr_api.models.db import db
 from mhr_api.models.type_tables import MhrRegistrationTypes
 from mhr_api.services.authz import MANUFACTURER_GROUP, QUALIFIED_USER_GROUP, GENERAL_USER_GROUP, BCOL_HELP
@@ -288,26 +286,6 @@ def get_change_generated_values(registration, draft, user_group: str = None):
     else:
         registration.doc_id = str(row[5])
     return registration
-
-
-def find_draft(json_data, registration_type: str = None):
-    """Try to find an existing draft if a draftNumber is in json_data.).
-
-    Return None if not found or no documentId.
-    """
-    draft = None
-    if json_data.get('draftNumber'):
-        try:
-            draft_number = json_data['draftNumber'].strip()
-            if draft_number != '':
-                draft: MhrDraft = MhrDraft.find_by_draft_number(draft_number, False)
-                if draft:
-                    draft.draft = json.dumps(json_data)
-                    if registration_type:
-                        draft.registration_type = registration_type
-        except BusinessException:
-            draft = None
-    return draft
 
 
 def update_deceased(owners_json, owner):

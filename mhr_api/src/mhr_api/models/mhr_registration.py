@@ -581,7 +581,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
     def create_new_from_json(json_data, account_id: str = None, user_id: str = None, user_group: str = None):
         """Create a new registration object from dict/json."""
         # Create or update draft.
-        draft = reg_utils.find_draft(json_data)
+        draft = MhrDraft.find_draft(json_data)
         reg_vals: MhrRegistration = reg_utils.get_generated_values(MhrRegistration(), draft, user_group)
         registration: MhrRegistration = MhrRegistration()
         registration.id = reg_vals.id  # pylint: disable=invalid-name; allow name of id.
@@ -636,7 +636,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                                 user_group: str = None):
         """Create common change registration objects from dict/json."""
         # Create or update draft.
-        draft = reg_utils.find_draft(json_data)
+        draft = MhrDraft.find_draft(json_data)
         reg_vals: MhrRegistration = reg_utils.get_change_generated_values(MhrRegistration(), draft, user_group)
         registration: MhrRegistration = MhrRegistration()
         registration.id = reg_vals.id  # pylint: disable=invalid-name; allow name of id.
