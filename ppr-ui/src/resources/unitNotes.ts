@@ -70,5 +70,20 @@ export const UnitNotesInfo = {
     header: 'Residential Exemption Order',
     dropdownText: 'Residential Exemption Order',
     fee: FeeSummaryDefaults.UNIT_NOTE_50
+  },
+  [UnitNoteDocTypes.TRANSPORT_PERMIT]: {
+    header: 'Transport Permit',
+    dropdownText: 'Transport Permit',
+    fee: FeeSummaryDefaults.NO_FEE
+  },
+  [UnitNoteDocTypes.TRANSPORT_PERMIT_EXTENSION]: {
+    header: 'Transport Permit Extension',
+    dropdownText: 'Transport Permit Extension',
+    fee: FeeSummaryDefaults.NO_FEE
+  },
+  [UnitNoteDocTypes.REGISTRATION_CORRECTION]: {
+    header: 'Registration Correction',
+    dropdownText: 'Registration Correction',
+    fee: FeeSummaryDefaults.NO_FEE
   }
 }

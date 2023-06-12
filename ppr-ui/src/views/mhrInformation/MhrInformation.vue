@@ -287,7 +287,7 @@
                     v-if="isRoleStaffReg"
                     id="unit-note-component"
                     :unitNotes="getMhrUnitNotes"
-                    :disabled="showTransferType"
+                    :disabled="!enableHomeOwnerChanges || showTransferType"
                 />
 
                 <v-spacer class="py-10 my-10"></v-spacer>
