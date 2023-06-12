@@ -118,7 +118,19 @@ TEST_GET_DRAFT = [
     ('Invalid Draft Number', [MHR_ROLE], HTTPStatus.NOT_FOUND, 'PS12345', 'XXXXXX'),
     ('Invalid request Staff no account', [MHR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, None, 'UT0001')
 ]
-
+# testdata pattern is ({results_size}, {params})
+TEST_GET_ACCOUNT_DATA_FILTER = [
+    (2, '?sortCriteriaName=createDateTime&sortDirection=ascending'),
+    (2, '?sortCriteriaName=mhrNumber&sortDirection=descending'),
+    (2, '?sortCriteriaName=clientReferenceId&sortDirection=ascending'),
+    (2, '?sortCriteriaName=submittingName'),
+    (2, '?sortCriteriaName=username'),
+    (2, '?sortCriteriaName=registrationType&sortDirection=ascending'),
+    (1, '?mhrNumber=UT-001'),
+    (2, '?submittingName=ABC&username=TEST USER'),
+    (2, '?startDateTime=2022-08-01T23:59:27%2B00:00&endDateTime=2022-10-31T23:59:27%2B00:00'),
+    (1, '?registrationType=MANUFACTURED HOME REGISTRATION&clientReferenceId=EX&sortCriteriaName=createDateTime')
+]
 
 @pytest.mark.parametrize('desc,roles,status,has_account,results_size', TEST_GET_ACCOUNT_DATA)
 def test_get_account_drafts(session, client, jwt, desc, roles, status, has_account, results_size):
@@ -150,6 +162,22 @@ def test_get_account_drafts(session, client, jwt, desc, roles, status, has_accou
             assert registration['path'] is not None
             if registration['registrationType'] != MhrRegistrationTypes.MHREG:
                 assert registration.get('mhrNumber')
+
+
+@pytest.mark.parametrize('results_size,request_params', TEST_GET_ACCOUNT_DATA_FILTER)
+def test_get_account_drafts_filter(session, client, jwt, results_size, request_params):
+    """Assert that a get account drafts summary list endpoint works as expected with sorting and filtering."""
+    headers = None
+    # setup
+    headers = create_header_account(jwt, [MHR_ROLE])
+    # test
+    rv = client.get('/api/v1/drafts' + request_params,
+                    headers=headers)
+
+    # check
+    assert rv.status_code == HTTPStatus.OK
+    assert rv.json
+    assert len(rv.json) >= results_size
 
 
 @pytest.mark.parametrize('desc,roles,status,has_account,reg_type', TEST_CREATE_DATA)

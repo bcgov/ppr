@@ -26,10 +26,11 @@ import pytest
 from registry_schemas.example_data.mhr import REGISTRATION
 
 from mhr_api.exceptions import BusinessException
-from mhr_api.models import MhrDraft, utils as model_utils
+from mhr_api.models import mhr_draft, MhrDraft, utils as model_utils, registration_utils as reg_utils
+from mhr_api.models.registration_utils import AccountRegistrationParams
 from mhr_api.models.type_tables import MhrRegistrationTypes
 
-
+DEFAULT_ORDER = mhr_draft.QUERY_ACCOUNT_DRAFTS_DEFAULT_ORDER + mhr_draft.QUERY_ACCOUNT_DRAFTS_LIMIT
 DRAFT_TRANSFER = {
   'type': 'TRANS',
   'registration': {
@@ -122,12 +123,42 @@ TEST_UPDATE_DRAFT_DATA = [
     (HTTPStatus.NOT_FOUND, None, None, None, None),
     (HTTPStatus.BAD_REQUEST, 'T500001', None, None, None)
 ]
+# testdata pattern is ({sort_criteria}, {sort_order}, {expected_clause})
+TEST_QUERY_ORDER_DATA = [
+    (None, None, DEFAULT_ORDER),
+    ('invalid', None, DEFAULT_ORDER),
+    (reg_utils.REG_TS_PARAM, None, 
+     mhr_draft.ORDER_BY_DATE + mhr_draft.SORT_DESCENDING + mhr_draft.QUERY_ACCOUNT_DRAFTS_LIMIT),
+    (reg_utils.MHR_NUMBER_PARAM, reg_utils.SORT_DESCENDING,
+     mhr_draft.ORDER_BY_MHR_NUMBER + mhr_draft.SORT_DESCENDING + mhr_draft.QUERY_ACCOUNT_DRAFTS_LIMIT),
+    (reg_utils.REG_TYPE_PARAM, reg_utils.SORT_ASCENDING,
+     mhr_draft.ORDER_BY_REG_TYPE + mhr_draft.SORT_ASCENDING + mhr_draft.QUERY_ACCOUNT_DRAFTS_LIMIT),
+    (reg_utils.SUBMITTING_NAME_PARAM, reg_utils.SORT_ASCENDING,
+     mhr_draft.ORDER_BY_SUBMITTING_NAME + mhr_draft.SORT_ASCENDING + mhr_draft.QUERY_ACCOUNT_DRAFTS_LIMIT),
+    (reg_utils.CLIENT_REF_PARAM, reg_utils.SORT_DESCENDING,
+     mhr_draft.ORDER_BY_CLIENT_REF + mhr_draft.SORT_DESCENDING + mhr_draft.QUERY_ACCOUNT_DRAFTS_LIMIT),
+    (reg_utils.REG_TS_PARAM, reg_utils.SORT_ASCENDING,
+     mhr_draft.ORDER_BY_DATE + mhr_draft.SORT_DESCENDING + mhr_draft.QUERY_ACCOUNT_DRAFTS_LIMIT),
+    (reg_utils.USER_NAME_PARAM, reg_utils.SORT_DESCENDING,
+     mhr_draft.ORDER_BY_USERNAME + mhr_draft.SORT_DESCENDING + mhr_draft.QUERY_ACCOUNT_DRAFTS_LIMIT)
+]
+# testdata pattern is ({filter1}, {value1}, {filter2}, {value2}, {clause1}, {clause2})
+TEST_QUERY_FILTER_DATA = [
+    (reg_utils.MHR_NUMBER_PARAM, '107600', None, None, mhr_draft.FILTER_MHR_NUMBER, None),
+    (reg_utils.START_TS_PARAM, '2023-06-01T07:00:00+00:00', reg_utils.END_TS_PARAM, '2023-06-02T07:00:00+00:00', mhr_draft.FILTER_DATE, None),
+    (reg_utils.USER_NAME_PARAM, 'USER', None, None, mhr_draft.FILTER_USERNAME, None),
+    (reg_utils.SUBMITTING_NAME_PARAM, 'SUBMITTING', None, None, mhr_draft.FILTER_SUBMITTING_NAME, None),
+    (reg_utils.REG_TYPE_PARAM, 'REG TYPE', None, None, mhr_draft.FILTER_REG_TYPE, None),
+    (reg_utils.CLIENT_REF_PARAM, 'CLIENT', None, None, mhr_draft.FILTER_CLIENT_REF, None)
+]
 
 
 @pytest.mark.parametrize('account_id, has_results, draft_num, mhr_num, reg_type', TEST_ACCOUNT_DRAFT_DATA)
 def test_find_all_by_account_id(session, account_id, has_results, draft_num, mhr_num, reg_type):
     """Assert that the draft summary list items contains all expected elements."""
-    draft_list = MhrDraft.find_all_by_account_id(account_id)
+    params: AccountRegistrationParams = AccountRegistrationParams(account_id=account_id,
+                                                                  sbc_staff=False)
+    draft_list = MhrDraft.find_all_by_account_id(params)
     if has_results:
         assert draft_list
         found_draft = False
@@ -277,3 +308,63 @@ def test_draft_create_from_json(session):
     assert draft.draft == json_data['registration']
     assert draft.account_id == 'PS12345'
     assert draft.registration_type == json_data['type']
+
+
+@pytest.mark.parametrize('sort_criteria,sort_order,expected_clause', TEST_QUERY_ORDER_DATA)
+def test_account_order_by(session, sort_criteria, sort_order, expected_clause):
+    """Assert that account registration query order by clause is as expected."""
+    params: AccountRegistrationParams = AccountRegistrationParams(account_id='PS12345',
+                                                                  sbc_staff=False)
+    params.sort_criteria = sort_criteria
+    params.sort_direction = sort_order
+
+    query: str = MhrDraft.build_account_query(params)
+    # current_app.logger.debug(query)
+    # current_app.logger.debug(expected_clause)
+    assert query.endswith(expected_clause) or query.endswith((expected_clause + '\n'))
+
+
+@pytest.mark.parametrize('filter1,value1,filter2,value2,clause1,clause2', TEST_QUERY_FILTER_DATA)
+def test_account_filter(session, filter1, value1, filter2, value2, clause1, clause2):
+    """Assert that the account drafts query filter clauses work as expected."""
+    params: AccountRegistrationParams = AccountRegistrationParams(account_id='PS12345',
+                                                                  sbc_staff=False)
+    filter_clause: str = clause1
+    filter_clause2: str = None
+    if filter1 == reg_utils.START_TS_PARAM:
+        params.filter_reg_start_date = value1
+    else:
+        filter_clause = filter_clause.replace('?', value1)      
+    if filter1 == reg_utils.REG_TYPE_PARAM:
+        params.filter_registration_type = value1
+    elif filter1 == reg_utils.MHR_NUMBER_PARAM:
+        params.filter_mhr_number = value1
+    elif filter1 == reg_utils.CLIENT_REF_PARAM:
+        params.filter_client_reference_id = value1
+    elif filter1 == reg_utils.SUBMITTING_NAME_PARAM:
+        params.filter_submitting_name = value1
+    elif filter1 == reg_utils.USER_NAME_PARAM:
+        params.filter_username = value1
+    if filter2 and value2:
+      if filter2 == reg_utils.END_TS_PARAM:
+          params.filter_reg_end_date = value2
+      elif clause2:
+          filter_clause2 = clause2.replace('?', value2)
+      if filter2 == reg_utils.REG_TYPE_PARAM:
+          params.filter_registration_type = value2
+      elif filter2 == reg_utils.MHR_NUMBER_PARAM:
+          params.filter_mhr_number = value2
+      elif filter2 == reg_utils.CLIENT_REF_PARAM:
+          params.filter_client_reference_id = value2
+      elif filter2 == reg_utils.SUBMITTING_NAME_PARAM:
+          params.filter_submitting_name = value2
+      elif filter2 == reg_utils.USER_NAME_PARAM:
+          params.filter_username = value2
+
+    base_query: str = mhr_draft.QUERY_ACCOUNT_DRAFTS_BASE
+    filter_query: str = MhrDraft.build_account_query_filter(base_query, params)
+    #current_app.logger.debug(filter_clause)
+    #current_app.logger.debug(filter_query)
+    assert filter_query.find(filter_clause) > 0
+    if filter_clause2:
+      assert filter_query.find(filter_clause2) > 0

@@ -23,8 +23,9 @@ from registry_schemas import utils as schema_utils
 from mhr_api.utils.auth import jwt
 from mhr_api.exceptions import BusinessException, DatabaseException
 from mhr_api.models import MhrDraft
+from mhr_api.models.registration_utils import AccountRegistrationParams
 from mhr_api.resources import utils as resource_utils
-from mhr_api.services.authz import authorized
+from mhr_api.services.authz import authorized, is_staff
 
 
 bp = Blueprint('DRAFTS1',  # pylint: disable=invalid-name
@@ -47,8 +48,12 @@ def get_account_drafts():
         if not authorized(account_id, jwt):
             return resource_utils.unauthorized_error_response(account_id)
 
+        params: AccountRegistrationParams = AccountRegistrationParams(account_id=account_id,
+                                                                      sbc_staff=is_staff(jwt))
+        params = resource_utils.get_account_registration_params(request, params)
+
         # Try to fetch draft list for account ID
-        draft_list = MhrDraft.find_all_by_account_id(account_id)
+        draft_list = MhrDraft.find_all_by_account_id(params)
         return jsonify(draft_list), HTTPStatus.OK
     except DatabaseException as db_exception:
         return resource_utils.db_exception_response(db_exception, account_id,
@@ -73,6 +78,7 @@ def post_drafts():  # pylint: disable=too-many-return-statements
             return resource_utils.account_required_response()
         # Verify request JWT and account ID
         if not authorized(account_id, jwt):
+            current_app.logger.debug('unauthorized')
             return resource_utils.unauthorized_error_response(account_id)
         request_json = request.get_json(silent=True)
         valid_format, errors = schema_utils.validate(request_json, 'draft', 'mhr')
