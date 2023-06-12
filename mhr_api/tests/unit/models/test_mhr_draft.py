@@ -138,7 +138,7 @@ TEST_QUERY_ORDER_DATA = [
     (reg_utils.CLIENT_REF_PARAM, reg_utils.SORT_DESCENDING,
      mhr_draft.ORDER_BY_CLIENT_REF + mhr_draft.SORT_DESCENDING + mhr_draft.QUERY_ACCOUNT_DRAFTS_LIMIT),
     (reg_utils.REG_TS_PARAM, reg_utils.SORT_ASCENDING,
-     mhr_draft.ORDER_BY_DATE + mhr_draft.SORT_ASCENDING + mhr_draft.QUERY_ACCOUNT_DRAFTS_LIMIT),
+     mhr_draft.ORDER_BY_DATE + mhr_draft.SORT_DESCENDING + mhr_draft.QUERY_ACCOUNT_DRAFTS_LIMIT),
     (reg_utils.USER_NAME_PARAM, reg_utils.SORT_DESCENDING,
      mhr_draft.ORDER_BY_USERNAME + mhr_draft.SORT_DESCENDING + mhr_draft.QUERY_ACCOUNT_DRAFTS_LIMIT)
 ]

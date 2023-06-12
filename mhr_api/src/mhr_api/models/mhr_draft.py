@@ -184,11 +184,9 @@ class MhrDraft(db.Model):
         if params.has_sort():
             order_clause: str = QUERY_ACCOUNT_ORDER_BY.get(params.sort_criteria)
             if params.sort_direction and params.sort_direction == reg_utils.SORT_DESCENDING:
-                order_clause += SORT_DESCENDING
-                if params.sort_direction and params.sort_direction == reg_utils.SORT_ASCENDING:
-                    order_clause = order_clause.replace(SORT_DESCENDING, SORT_ASCENDING)
+                order_clause += SORT_DESCENDING if params.sort_criteria != reg_utils.REG_TS_PARAM else SORT_ASCENDING
             elif params.sort_direction and params.sort_direction == reg_utils.SORT_ASCENDING:
-                order_clause += SORT_ASCENDING
+                order_clause += SORT_ASCENDING if params.sort_criteria != reg_utils.REG_TS_PARAM else SORT_DESCENDING
             else:
                 order_clause += SORT_DESCENDING
             query_text += order_clause
