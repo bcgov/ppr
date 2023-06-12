@@ -30,7 +30,7 @@
             </template>
 
             <!-- Drop down list -->
-            <v-list class="unit-note-options-list" width="350" height="325">
+            <v-list width="350" height="325">
               <v-list-item
                 v-for="item in UnitNotesDropdown"
                 :key="item"
