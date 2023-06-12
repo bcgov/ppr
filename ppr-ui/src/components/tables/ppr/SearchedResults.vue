@@ -101,19 +101,24 @@
                     </v-row>
                   </td>
 
-                  <!-- Vehicle Items -->
+                  <!-- Vehicle -->
                   <template v-if="item.vehicleCollateral">
+                    <td v-if="searchType === APISearchTypes.MHR_NUMBER">
+                      {{ item.vehicleCollateral.manufacturedHomeRegistrationNumber }}
+                    </td>
                     <td>{{ item.vehicleCollateral.serialNumber }}</td>
-                    <td>{{ getVehicleDescription(item.vehicleCollateral.type) }}</td>
+                    <td v-if="![APISearchTypes.MHR_NUMBER, APISearchTypes.AIRCRAFT].includes(searchType)">
+                      {{ getVehicleDescription(item.vehicleCollateral.type) }}
+                    </td>
                     <td>{{ item.vehicleCollateral.year }}</td>
                     <td>
                       {{ item.vehicleCollateral.make }} {{ item.vehicleCollateral.model }}
                     </td>
                   </template>
 
-                  <!-- Debtor Items -->
+                  <!-- Debtor -->
                   <template v-if="item.debtor">
-                    <!-- Person Items -->
+                    <!-- Person -->
                     <template v-if="item.debtor.personName">
                       <td>
                         {{ item.debtor.personName.last }},
@@ -124,11 +129,18 @@
                       <td>{{ displayDate(item.debtor.birthDate) }}</td>
                       <td>{{ item.baseRegistrationNumber }}</td>
                     </template>
-                    <!-- Business Items -->
+
+                    <!-- Business -->
                     <template v-if="item.debtor.businessName">
                       <td>{{ item.debtor.businessName }}</td>
                     </template>
                   </template>
+
+                  <!-- Base Registration -->
+                  <template v-if="searchType === APISearchTypes.REGISTRATION_NUMBER">
+                    <td>{{ item.baseRegistrationNumber }}</td>
+                  </template>
+
                 </tr>
               </template>
               <tr v-else>
@@ -165,19 +177,24 @@
                     </v-row>
                   </td>
 
-                  <!-- Vehicle Items -->
+                  <!-- Vehicle -->
                   <template v-if="item.vehicleCollateral">
+                    <td v-if="searchType === APISearchTypes.MHR_NUMBER">
+                      {{ item.vehicleCollateral.manufacturedHomeRegistrationNumber }}
+                    </td>
                     <td>{{ item.vehicleCollateral.serialNumber }}</td>
-                    <td>{{ getVehicleDescription(item.vehicleCollateral.type) }}</td>
+                    <td v-if="![APISearchTypes.MHR_NUMBER, APISearchTypes.AIRCRAFT].includes(searchType)">
+                      {{ getVehicleDescription(item.vehicleCollateral.type) }}
+                    </td>
                     <td>{{ item.vehicleCollateral.year }}</td>
                     <td>
                       {{ item.vehicleCollateral.make }} {{ item.vehicleCollateral.model }}
                     </td>
                   </template>
 
-                  <!-- Debtor Items -->
+                  <!-- Debtor -->
                   <template v-if="item.debtor">
-                    <!-- Person Items -->
+                    <!-- Person -->
                     <template v-if="item.debtor.personName">
                       <td>
                         {{ item.debtor.personName.last }},
@@ -188,11 +205,17 @@
                       <td>{{ displayDate(item.debtor.birthDate) }}</td>
                       <td>{{ item.baseRegistrationNumber }}</td>
                     </template>
-                    <!-- Business Items -->
+                    <!-- Business -->
                     <template v-if="item.debtor.businessName">
                       <td>{{ item.debtor.businessName }}</td>
                     </template>
                   </template>
+
+                  <!-- Base Registration -->
+                  <template v-if="searchType === APISearchTypes.REGISTRATION_NUMBER">
+                    <td>{{ item.baseRegistrationNumber }}</td>
+                  </template>
+
                 </tr>
               </template>
             </tbody>
@@ -216,7 +239,8 @@
 import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
 import { useStore } from '@/store/store'
 import { searchTableHeaders, VehicleTypes } from '@/resources'
-import { BaseHeaderIF, SearchResponseIF, SearchResultIF, TableHeadersIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+// eslint-disable-line no-unused-vars
+import { BaseHeaderIF, SearchResponseIF, SearchResultIF, TableHeadersIF } from '@/interfaces'
 import { APISearchTypes, MatchTypes } from '@/enums'
 import { convertDate } from '@/utils'
 import { storeToRefs } from 'pinia'
@@ -245,7 +269,6 @@ export default defineComponent({
       headers: props.defaultHeaders as Array<BaseHeaderIF>,
       results: props.defaultResults,
       exactMatchRegistrations: 0,
-      exactMatchesLength: 0,
       totalResultsLength: 0,
       selectedRegistrationsLength: 0,
       searchType: computed((): APISearchTypes => {
@@ -339,13 +362,13 @@ export default defineComponent({
     })
 
     return {
-      getSearchResults,
+      emit,
+      displayDate,
       isSelected,
       toggleSelected,
-      ...toRefs(localState),
-      displayDate,
-      emit,
-      getVehicleDescription
+      getVehicleDescription,
+      APISearchTypes,
+      ...toRefs(localState)
     }
   }
 })
