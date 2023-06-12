@@ -1,5 +1,6 @@
 <template>
   <v-container class="main-results-div pa-0 white">
+    <!-- Results Header -->
     <v-row v-if="searched" class="result-info pl-5 pt-30px" align="center" no-gutters>
       <v-col style="padding-right: 30px;" cols="auto">
         <v-row no-gutters>
@@ -7,7 +8,7 @@
             <b>{{ totalResultsLength }}</b> matches found
           </v-col>
           <v-col :class="totalResultsLength !== 0 ? 'divider pr-3 mr-3' : ''" cols="auto">
-            <b>{{ exactMatchesLength }}</b> exact matches
+            <b>{{ exactMatchResults.length }}</b> exact matches
           </v-col>
           <v-col v-if="totalResultsLength !== 0" cols="auto">
             <b>{{ selectedLength }}</b> total matches in
@@ -37,97 +38,166 @@
         </v-btn>
       </v-col>
     </v-row>
-    <v-row v-if="totalResultsLength !== 0" class="pt-3" no-gutters>
+
+    <!-- Results Table -->
+    <v-row v-if="results && results.length" class="pt-3" no-gutters>
       <v-col cols="12">
-        <v-data-table
+        <v-simple-table
           v-if="results"
           id="search-results-table"
           class="results-table"
-          disable-sort
-          fixed
           fixed-header
-          group-by="matchType"
-          :headers="headers"
-          hide-default-footer
-          :items="results"
-          :item-class="getClass"
-          item-key="id"
-          :items-per-page="-1"
-          mobile-breakpoint="0"
-          return-object
-          show-select
-          @toggle-select-all="selectAll($event)"
-          v-model="selected"
         >
-          <template v-slot:[`header.data-table-select`]="{ props, on }">
-            <v-checkbox
-              class="header-checkbox ma-0 pa-0"
-              color="primary"
-              hide-details
-              :indeterminate="props.indeterminate"
-              label="Select All"
-              :value="props.value"
-              @click="on.input(!props.value)"
-            />
+          <template v-slot:default>
+            <!-- Table Headers -->
+            <thead>
+              <tr>
+                <th v-for="(header, index) in headers" :key="header.value" :class="header.class">
+                  <!-- Search selection checkbox -->
+                  <template v-if="index === 0">
+                    <v-checkbox
+                      class="header-checkbox ma-0 pa-0"
+                      color="primary"
+                      hide-details
+                      label="Select All"
+                      :indeterminate="(exactMatchResults.length && !selectAll) || false"
+                      v-model="selectAll"
+                    />
+                  </template>
+                  <template v-else>
+                    {{ header.text }}
+                  </template>
+                </th>
+              </tr>
+            </thead>
+
+            <!-- Table Body -->
+            <tbody v-if="results.length > 0">
+
+              <!-- Exact Matches -->
+              <template v-if="exactMatchResults.length">
+                <!-- Group Header -->
+                <tr>
+                  <td class="group-header px-2" :colspan="headers.length">
+                    <span>Exact Matches ({{ exactMatchResults.length }})</span>
+                  </td>
+                </tr>
+                <!-- Grouped Rows -->
+                <tr
+                  v-for="(item, index) in exactMatchResults"
+                  disabled
+                  class="selected-row"
+                  :key="`exact - ${item}: ${index}`"
+                >
+                  <!-- Exact Selection Checkboxes -->
+                  <td class="checkbox-info exact-match">
+                    <v-row no-gutters>
+                      <v-col cols="2">
+                        <v-simple-checkbox readonly :ripple="false" :value="isSelected(item)"/>
+                      </v-col>
+                      <v-col cols="auto" class="pl-2 pt-1">
+                        exact match added
+                      </v-col>
+                    </v-row>
+                  </td>
+
+                  <!-- Vehicle Items -->
+                  <template v-if="item.vehicleCollateral">
+                    <td>{{ item.vehicleCollateral.serialNumber }}</td>
+                    <td>{{ getVehicleDescription(item.vehicleCollateral.type) }}</td>
+                    <td>{{ item.vehicleCollateral.year }}</td>
+                    <td>
+                      {{ item.vehicleCollateral.make }} {{ item.vehicleCollateral.model }}
+                    </td>
+                  </template>
+
+                  <!-- Debtor Items -->
+                  <template v-if="item.debtor">
+                    <!-- Person Items -->
+                    <template v-if="item.debtor.personName">
+                      <td>
+                        {{ item.debtor.personName.last }},
+                        {{ item.debtor.personName.first }}
+                        {{ item.debtor.personName.middle }}
+                        {{ item.debtor.personName.second }}
+                      </td>
+                      <td>{{ displayDate(item.debtor.birthDate) }}</td>
+                      <td>{{ item.baseRegistrationNumber }}</td>
+                    </template>
+                    <!-- Business Items -->
+                    <template v-if="item.debtor.businessName">
+                      <td>{{ item.debtor.businessName }}</td>
+                    </template>
+                  </template>
+                </tr>
+              </template>
+              <tr v-else>
+                <td class="group-header px-2 text-center" :colspan="headers.length"><span>No Exact Matches</span></td>
+              </tr>
+
+              <!-- Similar matches -->
+              <template v-if="similarMatchResults.length">
+                <!-- Group Header -->
+                <tr v-if="exactMatchResults.length">
+                  <td class="group-header px-2" :colspan="headers.length">
+                    <span>Similar Matches ({{ similarMatchResults.length }})</span>
+                  </td>
+                </tr>
+                <!-- Grouped Rows -->
+                <tr
+                  v-for="(item, index) in similarMatchResults"
+                  :key="`similar - ${item}: ${index}`"
+                  :class="{'selected-row' : isSelected(item)}"
+                >
+                  <!-- Exact Selection Checkboxes -->
+                  <td class="checkbox-info">
+                    <v-row no-gutters>
+                      <v-col cols="2">
+                        <v-simple-checkbox
+                          :ripple="false"
+                          :value="isSelected(item)"
+                          @input="toggleSelected(item)"
+                        />
+                      </v-col>
+                      <v-col v-if="isSelected(item)" cols="auto" class="pl-2 pt-1">
+                        added
+                      </v-col>
+                    </v-row>
+                  </td>
+
+                  <!-- Vehicle Items -->
+                  <template v-if="item.vehicleCollateral">
+                    <td>{{ item.vehicleCollateral.serialNumber }}</td>
+                    <td>{{ getVehicleDescription(item.vehicleCollateral.type) }}</td>
+                    <td>{{ item.vehicleCollateral.year }}</td>
+                    <td>
+                      {{ item.vehicleCollateral.make }} {{ item.vehicleCollateral.model }}
+                    </td>
+                  </template>
+
+                  <!-- Debtor Items -->
+                  <template v-if="item.debtor">
+                    <!-- Person Items -->
+                    <template v-if="item.debtor.personName">
+                      <td>
+                        {{ item.debtor.personName.last }},
+                        {{ item.debtor.personName.first }}
+                        {{ item.debtor.personName.middle }}
+                        {{ item.debtor.personName.second }}
+                      </td>
+                      <td>{{ displayDate(item.debtor.birthDate) }}</td>
+                      <td>{{ item.baseRegistrationNumber }}</td>
+                    </template>
+                    <!-- Business Items -->
+                    <template v-if="item.debtor.businessName">
+                      <td>{{ item.debtor.businessName }}</td>
+                    </template>
+                  </template>
+                </tr>
+              </template>
+            </tbody>
           </template>
-          <template v-slot:[`group.header`]="{ group }">
-            <td
-              class="group-header px-2"
-              :colspan="headers.length"
-              :style="exactMatchesLength === 0 ? 'text-align: center;' : ''"
-            >
-              <span v-if="group === 'EXACT'">
-                Exact Matches ({{ exactMatchesLength }})
-              </span>
-              <span v-else-if="exactMatchesLength === 0">
-                No Exact Matches
-              </span>
-              <span v-else>
-                Similar Matches ({{ totalResultsLength - exactMatchesLength }})
-              </span>
-            </td>
-          </template>
-          <template v-slot:[`item.data-table-select`]="{ item, isSelected, select }">
-            <td v-if="isSelected && item.matchType === 'EXACT'" class="checkbox-info">
-              <v-row no-gutters>
-                <v-col cols="2">
-                  <v-simple-checkbox readonly :ripple="false" :value="isSelected"/>
-                </v-col>
-                <v-col cols="auto" class="pl-2 pt-1">
-                  exact match added
-                </v-col>
-              </v-row>
-            </td>
-            <td v-else class="checkbox-info">
-              <v-row no-gutters>
-                <v-col cols="2">
-                  <v-simple-checkbox :ripple="false" :value="isSelected" @click="select(!isSelected)"/>
-                </v-col>
-                <v-col v-if="isSelected" cols="auto" class="pl-2 pt-1">
-                  added
-                </v-col>
-              </v-row>
-            </td>
-          </template>
-          <template v-slot:[`item.vehicleCollateral.type`]="{ item }">
-            {{ getVehicleDescription(item.vehicleCollateral.type) }}
-          </template>
-          <template v-slot:[`item.vehicleCollateral.make`]="{ item }">
-            {{ item.vehicleCollateral.make }} {{ item.vehicleCollateral.model }}
-          </template>
-          <template v-slot:[`item.debtor.personName`]="{ item }">
-            {{ item.debtor.personName.last }},
-            {{ item.debtor.personName.first }}
-            {{ item.debtor.personName.middle }}
-            {{ item.debtor.personName.second }}
-          </template>
-          <template v-slot:[`item.debtor.birthDate`]="{ item }">
-            {{ displayDate(item.debtor.birthDate) }}
-          </template>
-          <template v-slot:[`item.registrationNumber`]="{ item }">
-            <span>{{ item.baseRegistrationNumber }}</span>
-          </template>
-        </v-data-table>
+        </v-simple-table>
       </v-col>
     </v-row>
     <v-row v-else id="search-no-results-info" class="no-results-info pb-10" justify="center" no-gutters>
@@ -146,8 +216,8 @@
 import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
 import { useStore } from '@/store/store'
 import { searchTableHeaders, VehicleTypes } from '@/resources'
-import { SearchResponseIF, SearchResultIF, TableHeadersIF } from '@/interfaces' // eslint-disable-line no-unused-vars
-import { MatchTypes } from '@/enums'
+import { BaseHeaderIF, SearchResponseIF, SearchResultIF, TableHeadersIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { APISearchTypes, MatchTypes } from '@/enums'
 import { convertDate } from '@/utils'
 import { storeToRefs } from 'pinia'
 
@@ -158,9 +228,6 @@ export default defineComponent({
     },
     defaultResults: {
       type: Array as () => Array<SearchResultIF>
-    },
-    defaultSelected: {
-      type: Array as () => Array<SearchResultIF>
     }
   },
   emits: ['selected-matches', 'submit'],
@@ -170,16 +237,20 @@ export default defineComponent({
     const localState = reactive({
       searched: false,
       searchValue: '',
-      selected: props.defaultSelected,
+      selected: [],
+      selectAll: false,
       selectedInitialized: false,
       tooltipTxtSrchMtchs: 'One or more of the selected matches appear in ' +
-        'the same registration. That registration will only be shown once in the report.',
-      headers: props.defaultHeaders,
+          'the same registration. That registration will only be shown once in the report.',
+      headers: props.defaultHeaders as Array<BaseHeaderIF>,
       results: props.defaultResults,
       exactMatchRegistrations: 0,
       exactMatchesLength: 0,
       totalResultsLength: 0,
       selectedRegistrationsLength: 0,
+      searchType: computed((): APISearchTypes => {
+        return getSearchResults.value?.searchQuery.type
+      }),
       selectedLength: computed((): number => {
         return localState.selected?.length | 0
       }),
@@ -206,8 +277,31 @@ export default defineComponent({
           },
           results: []
         }
+      }),
+      exactMatchResults: computed((): Array<SearchResultIF> => {
+        return localState.results?.filter(result => result.matchType === MatchTypes.EXACT) || []
+      }),
+      similarMatchResults: computed((): Array<SearchResultIF> => {
+        return localState.results?.filter(result => result.matchType === MatchTypes.SIMILAR) || []
       })
     })
+
+    const isSelected = (item: SearchResultIF): boolean => {
+      return localState.selected.some(result => result.id === item.id)
+    }
+
+    const toggleSelected = (item: SearchResultIF): void => {
+      isSelected(item)
+        ? localState.selected = [...localState.selected.filter(result => result.id !== item.id)]
+        : localState.selected = [...localState.selected, { ...item }]
+    }
+
+    const toggleSelectAll = (selectAll: boolean): void => {
+      selectAll
+        ? localState.selected = [...localState.selected, ...localState.similarMatchResults]
+        : localState.selected = [...localState.exactMatchResults]
+    }
+
     const displayDate = (dateString:string):string => {
       if (!dateString) {
         return ''
@@ -215,38 +309,19 @@ export default defineComponent({
       const date = new Date(dateString)
       return convertDate(date, false, false)
     }
-    const getClass = (item:SearchResultIF):string => {
-      if (item.matchType === MatchTypes.EXACT) return 'exact-match'
-      return 'normal-match'
-    }
+
     const getVehicleDescription = (code: string): string => {
       const vehicle = VehicleTypes.find(obj => obj.value === code)
       return vehicle.text
     }
-    const selectAll = (props: { items:Array<SearchResultIF>, value:boolean }):void => {
-      // ensures exact matches are never deselected
-      if (!props.value) {
-        const selected = []
-        props.items.forEach(item => {
-          if (item.matchType === MatchTypes.EXACT) {
-            selected.push(item)
-          }
-        })
-        localState.selected = selected
-      }
-    }
+
     watch(() => localState.results, (results) => {
-      const selectedExactMatches = []
-      let count = 0
-      for (const x in results) {
-        if (results[x].matchType === MatchTypes.EXACT) {
-          count += 1
-          selectedExactMatches.push(results[x])
-        }
-      }
-      localState.exactMatchesLength = count
-      localState.selected = selectedExactMatches
+      localState.selected = [...localState.exactMatchResults]
     })
+    watch(() => localState.selectAll, (selectAll: boolean) => {
+      toggleSelectAll(selectAll)
+    })
+
     watch(() => localState.selected, (selected) => {
       const baseRegs = []
       for (const x in selected) {
@@ -264,12 +339,13 @@ export default defineComponent({
     })
 
     return {
+      getSearchResults,
+      isSelected,
+      toggleSelected,
       ...toRefs(localState),
       displayDate,
       emit,
-      getClass,
-      getVehicleDescription,
-      selectAll
+      getVehicleDescription
     }
   }
 })
@@ -288,6 +364,15 @@ th {
   font-size: 0.875rem !important;
   color: $gray9 !important;
 }
+thead tr th:first-child {
+  width: 11rem;
+  min-width: 11rem;
+}
+.selected-row {
+  td {
+    background: $blueSelected;
+  }
+}
 .checkbox-info {
   font-size: 0.725rem !important;
   font-weight: bold;
@@ -302,6 +387,7 @@ th {
   pointer-events: none;
 }
 .exact-match i {
+  cursor: default;
   color: $gray7 !important;
 }
 .group-header, .group-header:hover {
