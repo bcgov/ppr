@@ -53,7 +53,6 @@
       no-gutters
       justify="center"
       class="unit-note-panel-row"
-      :class="{'cap-panels-height': unitNotes.length > 5}"
     >
       <v-expansion-panels
         v-if="unitNotes.length"
@@ -75,8 +74,8 @@
                 </h3>
               </v-col>
               <v-col>
-                <span class="info-text">
-                  Registered on {{ pacificDate(item.createDateTime) }}
+                <span class="info-text fs-14">
+                  Registered on {{ pacificDate(item.createDateTime, true) }}
                   <v-divider vertical />
                   Document Registration Number {{ item.documentRegistrationNumber }}
                 </span>
@@ -126,7 +125,7 @@
             <!-- Note information -->
             <v-row v-if="item.effectiveDateTime" no-gutters class="pt-3">
               <v-col cols="3">
-                <h3 class="effective-date">Effective Date and Time</h3>
+                <h3 class="fs-14">Effective Date and Time</h3>
               </v-col>
               <v-col cols="9">
                 <span class="info-text fs-14">
@@ -137,7 +136,7 @@
 
             <v-row v-if="item.expiryDateTime" no-gutters class="pt-3">
               <v-col cols="3">
-                <h3>Expiry Date and Time</h3>
+                <h3 class="fs-14">Expiry Date and Time</h3>
               </v-col>
               <v-col cols="9">
                 <span class="info-text fs-14">
@@ -148,7 +147,7 @@
 
             <v-row v-if="item.remarks" no-gutters class="mt-1 py-3">
               <v-col cols="3">
-                <h3>Remarks</h3>
+                <h3 class="fs-14">Remarks</h3>
               </v-col>
               <v-col cols="9">
                 <span class="info-text fs-14">
@@ -156,7 +155,11 @@
                 </span>
               </v-col>
             </v-row>
-            <v-divider class="ml-0 my-4"/>
+
+            <v-divider
+              v-if="item.effectiveDateTime || item.expiryDateTime || item.remarks"
+              class="ml-0 my-4"
+            />
 
             <!-- Person Giving Notice Table -->
             <v-row no-gutters class="pt-2">
@@ -218,7 +221,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs } from 'vue-demi'
+import { defineComponent, reactive, toRefs, watch } from 'vue-demi'
 import { MhApiStatusTypes, MhUIStatusTypes, RouteNames, UnitNoteDocTypes } from '@/enums'
 import { useRouter } from 'vue2-helpers/vue-router'
 import { useStore } from '@/store/store'
@@ -276,6 +279,10 @@ export default defineComponent({
       // Request to delete unit note here
     }
 
+    watch(() => localState.activePanels, () => {
+      localState.activePanels.length > 1 && localState.activePanels.shift()
+    })
+
     return {
       initUnitNote,
       cancelUnitNote,
@@ -303,6 +310,8 @@ h3 {
 }
 .unit-note-panel-row {
   background: $gray1;
+  max-height: 750px;
+  overflow-y: auto;
   .unit-note-panel {
     border-bottom: 2px solid $gray1;
   }
@@ -313,10 +322,6 @@ h3 {
       cursor: pointer;
     }
   }
-.cap-panels-height {
-  max-height: 750px;
-  overflow-y: auto;
-}
 .empty-notes-msg {
   background: white;
 }

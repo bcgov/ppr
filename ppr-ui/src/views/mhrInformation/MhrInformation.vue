@@ -375,7 +375,6 @@ import {
   updateMhrDraft
 } from '@/utils'
 import { clientConfig, staffConfig } from '@/resources/attnRefConfigs'
-import { mockUnitNotes } from '../../../tests/unit/test-data'
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
