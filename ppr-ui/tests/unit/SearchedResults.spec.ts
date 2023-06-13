@@ -105,7 +105,7 @@ describe('Serial number results', () => {
   })
 
   it('preselects exact results', () => {
-    expect(wrapper.vm.exactMatchesLength).toBe(2)
+    expect(wrapper.vm.exactMatchResults.length).toBe(2)
     expect(wrapper.vm.selected).toStrictEqual([testResults.results[0], testResults.results[1]])
   })
 
@@ -147,7 +147,7 @@ describe('Individual debtor results', () => {
   })
 
   it('preselects exact results', () => {
-    expect(wrapper.vm.exactMatchesLength).toBe(3)
+    expect(wrapper.vm.exactMatchResults.length).toBe(3)
     expect(wrapper.vm.selected).toStrictEqual(
       [testResults.results[0], testResults.results[1], testResults.results[2]])
   })
@@ -195,7 +195,7 @@ describe('Business debtor results', () => {
   })
 
   it('preselects exact results', () => {
-    expect(wrapper.vm.exactMatchesLength).toBe(2)
+    expect(wrapper.vm.exactMatchResults.length).toBe(2)
     expect(wrapper.vm.selected).toStrictEqual([testResults.results[0], testResults.results[1]])
   })
 
@@ -233,7 +233,7 @@ describe('Manufactured home results', () => {
   })
 
   it('preselects exact results', () => {
-    expect(wrapper.vm.exactMatchesLength).toBe(2)
+    expect(wrapper.vm.exactMatchResults.length).toBe(2)
     expect(wrapper.vm.selected).toStrictEqual([testResults.results[0], testResults.results[1]])
   })
 
@@ -276,7 +276,7 @@ describe('Aircraft results', () => {
   })
 
   it('preselects exact results', () => {
-    expect(wrapper.vm.exactMatchesLength).toBe(2)
+    expect(wrapper.vm.exactMatchResults.length).toBe(2)
     expect(wrapper.vm.selected).toStrictEqual([testResults.results[0], testResults.results[1]])
   })
 
@@ -317,7 +317,7 @@ describe('Registration number results', () => {
   })
 
   it('preselects exact results', () => {
-    expect(wrapper.vm.exactMatchesLength).toBe(1)
+    expect(wrapper.vm.exactMatchResults.length).toBe(1)
     expect(wrapper.vm.selected).toStrictEqual([testResults.results[0]])
   })
 
