@@ -286,7 +286,7 @@
                 <UnitNotePanels
                     v-if="isRoleStaffReg"
                     id="unit-note-component"
-                    :unitNotes="mockUnitNotes"
+                    :unitNotes="getMhrUnitNotes"
                     :disabled="!enableHomeOwnerChanges || showTransferType"
                 />
 
@@ -375,7 +375,6 @@ import {
   updateMhrDraft
 } from '@/utils'
 import { clientConfig, staffConfig } from '@/resources/attnRefConfigs'
-import { mockUnitNotes } from '../../../tests/unit/test-data'
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
@@ -877,7 +876,6 @@ export default defineComponent({
     })
 
     return {
-      mockUnitNotes,
       isFrozenMhr,
       emitError,
       setValidation,
