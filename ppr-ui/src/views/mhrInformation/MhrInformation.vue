@@ -286,7 +286,7 @@
                 <UnitNotePanels
                     v-if="isRoleStaffReg"
                     id="unit-note-component"
-                    :unitNotes="getMhrUnitNotes"
+                    :unitNotes="mockUnitNotes"
                     :disabled="!enableHomeOwnerChanges || showTransferType"
                 />
 
@@ -877,6 +877,7 @@ export default defineComponent({
     })
 
     return {
+      mockUnitNotes,
       isFrozenMhr,
       emitError,
       setValidation,

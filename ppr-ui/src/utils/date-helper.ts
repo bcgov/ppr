@@ -3,7 +3,7 @@ import 'moment-timezone'
 import { isDate } from 'lodash'
 
 /** returns timstamp string in 12 hour format */
-export function format12HourTime (date: Date): string {
+export function format12HourTime (date: Date, omitSeconds = false): string {
   // format datetime -- have to put in zeros manually when needed
   let hours = date.getHours()
   const ampm = hours < 12 ? 'am' : 'pm'
@@ -15,7 +15,9 @@ export function format12HourTime (date: Date): string {
   if (min.length > 2) min = min.slice(1)
   if (sec.length > 2) sec = sec.slice(1)
 
-  return `${hours}:${min}:${sec} ${ampm}`
+  return omitSeconds
+    ? `${hours}:${min} ${ampm}`
+    : `${hours}:${min}:${sec} ${ampm}`
 }
 
 export function format12HourTimeMoment (date: Moment): string {
@@ -49,9 +51,9 @@ export function convertDate (date: Date, includeTime: boolean, includeTz: boolea
   else return moment(date).format('MMMM D, Y') + ` ${datetime}`
 }
 
-export function pacificDate (date: Date | string): string {
+export function pacificDate (date: Date | string, omitSeconds = false): string {
   date = new Date(date.toLocaleString('en-US', { timeZone: 'America/Vancouver' }))
-  const datetime = format12HourTime(date)
+  const datetime = format12HourTime(date, omitSeconds)
 
   return moment(date).format('MMMM D, Y') + ` at ${datetime} Pacific time`
 }
