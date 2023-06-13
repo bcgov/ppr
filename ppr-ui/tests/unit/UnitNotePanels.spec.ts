@@ -110,7 +110,7 @@ describe('UnitNotePanels', () => {
       // Check the registration number and date
       const registrationInfo = header.find('.info-text')
       expect(registrationInfo.exists()).toBe(true)
-      expect(registrationInfo.text()).toContain(`Registered on ${pacificDate(item.createDateTime)}`)
+      expect(registrationInfo.text()).toContain(`Registered on ${pacificDate(item.createDateTime, true)}`)
       expect(registrationInfo.text()).toContain(`Document Registration Number ${item.documentRegistrationNumber}`)
 
       // Check the panel actions
