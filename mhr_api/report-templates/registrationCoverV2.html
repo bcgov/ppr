@@ -80,6 +80,8 @@
       <div class="cover-data mt-4"><span class="cover-data-bold">Registration Type:</span>
         {% if registrationType == 'MHREG' %}    
           {{ documentDescription|title }}
+        {% elif registrationType in ('REG_STAFF_ADMIN', 'EXEMPTION_NON_RES', 'EXEMPTION_RES') and note is defined %}    
+          {{ note.documentDescription|title }}
         {% else %}
           {{ documentDescription }}
         {% endif %}        
@@ -87,6 +89,8 @@
       <div class="cover-data"><span class="cover-data-bold">Document Registration Number:</span>
         {% if documentRegistrationNumber is defined and documentRegistrationNumber != '' %}
          {{ documentRegistrationNumber }}
+        {% elif note is defined and note.documentRegistrationNumber is defined and note.documentRegistrationNumber != '' %}
+          {{ note.documentRegistrationNumber }}
         {% else %}
           N/A
         {% endif %}

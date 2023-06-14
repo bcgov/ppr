@@ -16,7 +16,7 @@
 from http import HTTPStatus
 
 from flask import Blueprint
-from flask import current_app, request, jsonify
+from flask import g, current_app, request, jsonify
 from flask_cors import cross_origin
 from registry_schemas import utils as schema_utils
 
@@ -25,6 +25,7 @@ from mhr_api.exceptions import BusinessException, DatabaseException
 from mhr_api.services.authz import authorized_role, is_staff, is_all_staff_account, get_group
 from mhr_api.services.authz import REQUEST_EXEMPTION_RES, REQUEST_EXEMPTION_NON_RES
 from mhr_api.models import MhrRegistration
+from mhr_api.models.type_tables import MhrRegistrationStatusTypes
 from mhr_api.reports.v2.report_utils import ReportTypes
 from mhr_api.resources import utils as resource_utils, registration_utils as reg_utils
 from mhr_api.services.payment import TransactionTypes
@@ -60,10 +61,33 @@ def post_exemptions(mhr_number: str):  # pylint: disable=too-many-return-stateme
         current_reg: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_number,
                                                                           account_id,
                                                                           is_all_staff_account(account_id))
+        return submit_exemption(current_reg, account_id, request_json, request, jwt)
+    except DatabaseException as db_exception:
+        return resource_utils.db_exception_response(db_exception, account_id,
+                                                    'POST mhr exemption id=' + account_id)
+    except BusinessException as exception:
+        return resource_utils.business_exception_response(exception)
+    except Exception as default_exception:   # noqa: B902; return nicer default error
+        return resource_utils.default_exception_response(default_exception)
 
+
+def submit_exemption(current_reg: MhrRegistration,  # pylint: disable=too-many-branches,too-many-locals
+                     account_id: str,
+                     request_json,
+                     req,
+                     j_token):
+    """Validate, pay, save, set up report generation request."""
+    try:
         # Validate request against the schema.
+        remarks: str = None
+        if request_json.get('note'):
+            remarks = request_json['note'].get('remarks')
+            if not remarks:   # Temporary substitution to pas schema validation, some doc types allow.
+                request_json['note']['remarks'] = ' '
         valid_format, errors = schema_utils.validate(request_json, 'exemption', 'mhr')
         # Additional validation not covered by the schema.
+        if request_json.get('note'):
+            request_json['note']['remarks'] = remarks
         extra_validation_msg = resource_utils.validate_exemption(current_reg, request_json, is_staff(jwt))
         if not valid_format or extra_validation_msg != '':
             return resource_utils.validation_error_response(errors, reg_utils.VAL_ERROR, extra_validation_msg)
@@ -71,20 +95,30 @@ def post_exemptions(mhr_number: str):  # pylint: disable=too-many-return-stateme
         tran_type = TransactionTypes.EXEMPTION_RES
         if request_json.get('nonResidential'):
             tran_type = TransactionTypes.EXEMPTION_NON_RES
-        registration = reg_utils.pay_and_save_exemption(request,
+        group: str = get_group(j_token)
+        registration = reg_utils.pay_and_save_exemption(req,
                                                         current_reg,
                                                         request_json,
                                                         account_id,
-                                                        get_group(jwt),
+                                                        group,
                                                         tran_type)
-        current_app.logger.debug(f'building exemption response json for {mhr_number}')
+        current_app.logger.debug(f'building exemption response json for {registration.mhr_number}')
         response_json = registration.json
+        response_json['status'] = MhrRegistrationStatusTypes.EXEMPT
         # Return report if request header Accept MIME type is application/pdf.
         if resource_utils.is_pdf(request):
             current_app.logger.info('Report not yet available: returning JSON.')
-        reg_utils.enqueue_registration_report(registration, response_json, ReportTypes.MHR_EXEMPTION)
+        response_json['usergroup'] = group
+        if is_staff(j_token):
+            response_json['username'] = reg_utils.get_affirmby(g.jwt_oidc_token_info)
+            reg_utils.enqueue_registration_report(registration, response_json, ReportTypes.MHR_REGISTRATION_STAFF)
+            del response_json['username']
+        else:
+            if not response_json.get('affirmbyName'):
+                request_json['affirmByName'] = reg_utils.get_affirmby(g.jwt_oidc_token_info)
+            reg_utils.enqueue_registration_report(registration, response_json, ReportTypes.MHR_EXEMPTION)
+        del response_json['usergroup']
         return jsonify(response_json), HTTPStatus.CREATED
-
     except DatabaseException as db_exception:
         return resource_utils.db_exception_response(db_exception, account_id,
                                                     'POST mhr exemption id=' + account_id)

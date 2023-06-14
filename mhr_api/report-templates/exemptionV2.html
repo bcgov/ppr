@@ -29,6 +29,10 @@
         <td>{{createDateTime}}</td>
       </tr>
       <tr>
+        <td>Destroyed Date and Time:</td>
+        <td>{{note.effectiveDateTime}}</td>
+      </tr>
+      <tr>
         <td>Folio Number:</td>
         <td>
             {% if clientReferenceId is defined and clientReferenceId != '' %}
@@ -41,34 +45,27 @@
     </table>
   </div>
 
-  <div class="container pt-4">
-    {% if note is defined and note.remarks is defined and note.remarks != '' %}
-      <div class="no-page-break">
-        <div class="separator-header mt-6"></div>
-        <div class="section-title-centre mt-2">UNIT NOTE</div>
-        <div class="separator-header mt-0"></div>
-      </div>
-      <table class="no-page-break section-data details-table mt-4" role="presentation">
-        <tr>
-            <td class="section-sub-title">Expired Date:</td>
-            <td>{% if note.expiryDate is defined and note.expiryDate != '' %} 
-                    {{note.expiryDate}}
-                {% else %}
-                    N/A
-                {% endif %}
-            </td>
-        </tr>
-        <tr>
-            <td class="section-sub-title">Remarks:</td>
-            <td>{{note.remarks}}</td>
-        </tr>
-      </table>
 
+  <div class="container pt-4">
+
+    <div class="no-page-break">
+      <div class="section-title mt-5">Remarks</div>
+      {% if note is defined and note.remarks is defined and note.remarks != '' %}
+        <div class="section-data pt-3">{{note.remarks|safe}}</div>
+      {% else %}
+        <div class="section-data pt-3">N/A</div>
+      {% endif %}
+    </div>
+
+    {% if note is defined and note.givingNoticeParty is defined %}
+      [[registration/givingNoticeParty.html]]
     {% endif %}
 
     [[registration/submittingParty.html]]
   </div>
-  <p class="last-page"></p>
+  {% if cover is not defined %}
+    <p class="last-page"></p>
+  {% endif %}
   </body>
 </html>
 

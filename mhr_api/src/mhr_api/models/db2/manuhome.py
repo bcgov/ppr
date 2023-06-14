@@ -304,7 +304,7 @@ class Db2Manuhome(db.Model):
         current_app.logger.debug('Db2Manuhome.find_by_mhr_number Db2Location query.')
         manuhome.reg_location = Db2Location.find_by_manuhome_id_active(manuhome.id)
         current_app.logger.debug('Db2Manuhome.find_by_mhr_number Db2Mhomnote query.')
-        manuhome.reg_notes = Db2Mhomnote.find_by_manuhome_id_active(manuhome.id)
+        manuhome.reg_notes = Db2Mhomnote.find_by_manuhome_id(manuhome.id)
         current_app.logger.debug('Db2Manuhome.find_by_mhr_number completed.')
         return manuhome
 
@@ -840,14 +840,14 @@ class Db2Manuhome(db.Model):
         manuhome.update_date = now_local.date()
         manuhome.update_time = now_local.time()
         manuhome.update_count = manuhome.update_count + 1
-        doc = registration.documents[0]
-        doc_type = TO_LEGACY_DOC_TYPE.get(doc.document_type, doc.document_type)
+        new_doc = registration.documents[0]
+        doc_type = TO_LEGACY_DOC_TYPE.get(new_doc.document_type, new_doc.document_type)
         if len(doc_type) == 3:
             doc_type += ' '
         # Create document
         ts_local = now_local
-        if reg_json.get('effectiveDateTime'):
-            effective_ts = model_utils.ts_from_iso_format(reg_json['effectiveDateTime'])
+        if reg_json.get('note') and reg_json['note'].get('effectiveDateTime'):
+            effective_ts = model_utils.ts_from_iso_format(reg_json['note']['effectiveDateTime'])
             ts_local = model_utils.to_local_timestamp(effective_ts)
         doc: Db2Document = Db2Document.create_from_registration(registration,
                                                                 reg_json,
@@ -855,11 +855,22 @@ class Db2Manuhome(db.Model):
                                                                 ts_local)
         doc.update_id = current_app.config.get('DB2_RACF_ID', '')
         manuhome.reg_documents.append(doc)
+        cancel_remarks: str = None
+        if new_doc.document_type == MhrDocumentTypes.NCAN and reg_json.get('cancelDocumentId'):
+            cancel_doc_id: str = reg_json.get('cancelDocumentId')
+            for note in manuhome.reg_notes:
+                if note.reg_document_id == cancel_doc_id:
+                    note.can_document_id = doc.id
+                    note.status = Db2Mhomnote.StatusTypes.CANCELLED
+                    cancel_remarks = note.remarks
+                    break
         # Add note.
         if reg_json.get('note'):
             reg_note = registration.notes[0]
             note: Db2Mhomnote = Db2Mhomnote.create_from_registration(reg_json.get('note'), doc, manuhome.id)
             if reg_note.expiry_date:
                 note.expiry_date = reg_note.expiry_date.date()
+            if cancel_remarks:
+                note.remarks = cancel_remarks
             manuhome.reg_notes.append(note)
         return manuhome

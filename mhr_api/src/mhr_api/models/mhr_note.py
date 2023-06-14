@@ -68,6 +68,7 @@ class MhrNote(db.Model):  # pylint: disable=too-many-instance-attributes
             note['documentDescription'] = doc_type.document_type_desc
         if doc:
             note['documentRegistrationNumber'] = model_utils.format_doc_reg_number(doc.document_registration_number)
+            note['documentId'] = doc.document_id
         if self.effective_ts:
             note['effectiveDateTime'] = model_utils.format_ts(self.effective_ts)
         if notice:

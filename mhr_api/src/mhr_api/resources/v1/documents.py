@@ -25,7 +25,7 @@ from mhr_api.models import MhrRegistration
 from mhr_api.services.authz import authorized, is_all_staff_account
 from mhr_api.reports.v2.report_utils import ReportTypes
 from mhr_api.resources import utils as resource_utils, registration_utils as reg_utils
-from mhr_api.utils import registration_validator
+from mhr_api.utils import validator_utils as registration_validator
 
 
 bp = Blueprint('DOCUMENTS1',  # pylint: disable=invalid-name

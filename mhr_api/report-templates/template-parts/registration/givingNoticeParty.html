@@ -1,0 +1,48 @@
+{% if note is defined and note.givingNoticeParty is defined  %}
+<div class="no-page-break">
+    <div class="separator mt-5"></div>
+    <div class="section-title mt-3">
+        {% if note.documentType is defined and note.documentType == 'TAXN' %} 
+            Collector
+        {% else %}
+            Person Giving Notice
+        {% endif %}
+    </div>
+    <table class="section-data section-data-table-new mt-4" role="presentation">
+        <tr class="no-page-break">
+            <td class="col-33">
+                <div class="section-sub-title">
+                    {% if note.givingNoticeParty.businessName is defined %}
+                        {{ note.givingNoticeParty.businessName }}
+                    {% elif note.givingNoticeParty.personName is defined %}
+                        {{ note.givingNoticeParty.personName.last }},
+                        {{ note.givingNoticeParty.personName.first }}
+                        {% if note.givingNoticeParty.personName.middle is defined %}
+                            &nbsp;{{ note.givingNoticeParty.personName.middle }}
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </td>
+            <td class="col-33">
+                <div class="section-sub-title">Address</div>
+                <div class="pt-2">{{ note.givingNoticeParty.address.street }}</div>
+                <div>{{ note.givingNoticeParty.address.streetAdditional }}</div>
+                <div>{{ note.givingNoticeParty.address.city }} 
+                     {{ note.givingNoticeParty.address.region }}</div>
+                <div>{{ note.givingNoticeParty.address.postalCode }} 
+                     {{ note.givingNoticeParty.address.country }}</div>
+            </td>
+            <td class="col-33">
+                <div class="section-sub-title">Phone Number</div>
+                <div class="pt-2">
+                    {% if note.givingNoticeParty.phoneNumber is defined and note.givingNoticeParty.phoneNumber != '' %} 
+                        {{ note.givingNoticeParty.phoneNumber }}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </div>
+            </td>
+         </tr>
+</table>
+</div>
+{% endif %}

@@ -34,6 +34,7 @@ MOCK_AUTH_URL = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/a
 MOCK_PAY_URL = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/pay/api/v1/'
 
 QUALIFIED_USER = [MHR_ROLE, REQUEST_EXEMPTION_NON_RES, REQUEST_EXEMPTION_RES, TRANSFER_DEATH_JT, TRANSFER_SALE_BENEFICIARY]
+DOC_ID_VALID = '63166035'
 # testdata pattern is ({description}, {mhr_num}, {roles}, {status}, {account})
 TEST_CREATE_DATA = [
     ('Invalid schema validation missing submitting', '098666', [MHR_ROLE, REQUEST_EXEMPTION_RES],
@@ -49,8 +50,8 @@ TEST_CREATE_DATA = [
     ('Invalid mhr num', '300655', [MHR_ROLE, REQUEST_EXEMPTION_RES], HTTPStatus.UNAUTHORIZED, 'PS12345'),
     ('Invalid exempt', '098655', [MHR_ROLE, REQUEST_EXEMPTION_RES], HTTPStatus.BAD_REQUEST, 'PS12345'),
     ('Invalid historical', '099942', [MHR_ROLE, REQUEST_EXEMPTION_RES], HTTPStatus.BAD_REQUEST, 'PS12345'),
-    ('Invalid missing note remarks', '098666', [MHR_ROLE, REQUEST_EXEMPTION_NON_RES, REQUEST_EXEMPTION_RES],
-     HTTPStatus.BAD_REQUEST, 'PS12345')
+    ('Valid missing note remarks', '098666', [MHR_ROLE, REQUEST_EXEMPTION_NON_RES, REQUEST_EXEMPTION_RES],
+     HTTPStatus.CREATED, 'PS12345')
 ]
 TEST_CREATE_DATA_1 = [
     ('Valid non-staff new', '150081', QUALIFIED_USER, HTTPStatus.CREATED, '2523')
@@ -76,6 +77,8 @@ def test_create(session, client, jwt, desc, mhr_num, roles, status, account):
         del json_data['submittingParty']
     elif desc == 'Invalid missing note remarks':
         del json_data['note']['remarks']
+    elif desc == 'Valid staff':
+        json_data['documentId'] = DOC_ID_VALID
     if account:
         headers = create_header_account(jwt, roles, 'UT-TEST', account)
     else:

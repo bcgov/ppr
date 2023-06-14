@@ -18,7 +18,7 @@ from flask import current_app
 import pytest
 from registry_schemas import utils as schema_utils
 
-from mhr_api.utils import registration_validator as validator
+from mhr_api.utils import registration_validator as validator, validator_utils
 from mhr_api.models import MhrRegistration
 from mhr_api.models.type_tables import MhrRegistrationStatusTypes
 from mhr_api.services.authz import REQUEST_TRANSPORT_PERMIT, STAFF_ROLE, MANUFACTURER_GROUP
@@ -285,13 +285,13 @@ TEST_LOCATION_DATA = [
 TEST_PERMIT_DATA = [
     (DESC_VALID, True, True, None, None, MhrRegistrationStatusTypes.ACTIVE, STAFF_ROLE),
     ('Valid no doc id not staff', True, False, None, None, None, REQUEST_TRANSPORT_PERMIT),
-    ('Invalid FROZEN', False, False, None, validator.STATE_NOT_ALLOWED, MhrRegistrationStatusTypes.ACTIVE,
+    ('Invalid FROZEN', False, False, None, validator_utils.STATE_NOT_ALLOWED, MhrRegistrationStatusTypes.ACTIVE,
      REQUEST_TRANSPORT_PERMIT),
-    ('Invalid staff FROZEN', False, True, None, validator.STATE_FROZEN_AFFIDAVIT, MhrRegistrationStatusTypes.ACTIVE,
+    ('Invalid staff FROZEN', False, True, None, validator_utils.STATE_FROZEN_AFFIDAVIT, MhrRegistrationStatusTypes.ACTIVE,
      REQUEST_TRANSPORT_PERMIT),
-    ('Invalid EXEMPT', False, False, None, validator.STATE_NOT_ALLOWED, MhrRegistrationStatusTypes.EXEMPT,
+    ('Invalid EXEMPT', False, False, None, validator_utils.STATE_NOT_ALLOWED, MhrRegistrationStatusTypes.EXEMPT,
      STAFF_ROLE),
-    ('Invalid HISTORICAL', False, False, None, validator.STATE_NOT_ALLOWED, MhrRegistrationStatusTypes.HISTORICAL,
+    ('Invalid HISTORICAL', False, False, None, validator_utils.STATE_NOT_ALLOWED, MhrRegistrationStatusTypes.HISTORICAL,
      REQUEST_TRANSPORT_PERMIT)
 ]
 # testdata pattern is ({description}, {valid}, {mhr_num}, {location}, {message content}, {group})
@@ -328,7 +328,7 @@ TEST_DATA_PERMIT_COUNT = [
 # testdata pattern is ({description}, {pid}, {valid}, {message_content})
 TEST_DATA_PID = [
     ('Valid pid', '012684597', True, None),
-    ('Invalid pid',  '888684597', False, validator.LOCATION_PID_INVALID)
+    ('Invalid pid',  '888684597', False, validator_utils.LOCATION_PID_INVALID)
 ]
 
 
@@ -436,6 +436,7 @@ def test_validate_pid(session, desc, pid, valid, message_content):
     # Additional validation not covered by the schema.
     registration: MhrRegistration = MhrRegistration.find_by_mhr_number('100413', 'PS12345')
     error_msg = validator.validate_permit(registration, json_data, False, STAFF_ROLE)
+    # current_app.logger.info(f'$$$$$ {error_msg}')
     if errors:
         for err in errors:
             current_app.logger.debug(err.message)
@@ -450,7 +451,7 @@ def test_validate_pid(session, desc, pid, valid, message_content):
 @pytest.mark.parametrize('mhr_number,name,count', TEST_DATA_PERMIT_COUNT)
 def test_permit_count(session, mhr_number, name, count):
     """Assert that counting existing permits for manufacturers works as expected."""
-    permit_count: int = validator.get_permit_count(mhr_number, name)
+    permit_count: int = validator_utils.get_permit_count(mhr_number, name)
     assert permit_count == count
 
 
