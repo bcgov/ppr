@@ -576,7 +576,7 @@ export default defineComponent({
         scrollToInvalid()
         return
       }
-      if ((isRoleStaffReg) || (isRoleStaffSbc)) {
+      if ((isRoleStaffReg.value) || (isRoleStaffSbc.value)) {
         localState.staffPaymentDialogDisplay = true
       } else {
         submitAmendment()
