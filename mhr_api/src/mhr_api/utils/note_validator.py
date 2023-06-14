@@ -18,10 +18,9 @@ Validation includes verifying the data combination for various registration docu
 from flask import current_app
 
 from mhr_api.models import MhrRegistration, utils as model_utils
-from mhr_api.models.type_tables import MhrRegistrationTypes, MhrDocumentTypes
-
-from .registration_validator import validate_ppr_lien, validate_submitting_party, \
-    validate_registration_state, checksum_valid
+from mhr_api.models.type_tables import MhrRegistrationTypes, MhrDocumentTypes, MhrNoteStatusTypes
+from mhr_api.models.db2.mhomnote import FROM_LEGACY_STATUS
+from mhr_api.utils import validator_utils
 
 
 VALIDATOR_ERROR = 'Error performing manufacturer extra validation. '
@@ -41,6 +40,9 @@ REMARKS_NOT_ALLOWED = 'Remarks are not allowed with the registration document ty
 NOTICE_REQUIRED = 'The giving notice party is required with the registration document type. '
 NOTICE_NAME_REQUIRED = 'The giving notice party person or business name is required. '
 NOTICE_ADDRESS_REQUIRED = 'The giving notice address is required. '
+NCAN_DOCUMENT_ID_REQUIRED = 'The cancellation document ID is required. '
+NCAN_DOCUMENT_ID_INVALID = 'The cancellation document ID is invalid. '
+NCAN_DOCUMENT_ID_STATUS = 'The cancellation document ID is for a note that is not active. '
 
 
 def validate_note(registration: MhrRegistration, json_data, staff: bool = False, group_name: str = None) -> str:
@@ -49,10 +51,10 @@ def validate_note(registration: MhrRegistration, json_data, staff: bool = False,
     try:
         current_app.logger.info(f'Validating unit note registration staff={staff}, group={group_name}')
         if registration:
-            error_msg += validate_ppr_lien(registration.mhr_number)
+            error_msg += validator_utils.validate_ppr_lien(registration.mhr_number)
         error_msg += validate_doc_id(json_data)
-        error_msg += validate_submitting_party(json_data)
-        error_msg += validate_registration_state(registration, staff, MhrRegistrationTypes.REG_NOTE)
+        error_msg += validator_utils.validate_submitting_party(json_data)
+        error_msg += validator_utils.validate_registration_state(registration, staff, MhrRegistrationTypes.REG_NOTE)
         doc_type: str = None
         if json_data.get('note') and json_data['note'].get('documentType'):
             doc_type = json_data['note'].get('documentType')
@@ -60,8 +62,10 @@ def validate_note(registration: MhrRegistration, json_data, staff: bool = False,
         error_msg += validate_giving_notice(json_data, doc_type)
         error_msg += validate_effective_ts(json_data, doc_type)
         error_msg += validate_expiry_ts(registration, json_data, doc_type)
+        if doc_type and doc_type == MhrDocumentTypes.NCAN:
+            error_msg += validate_ncan(registration, json_data)
     except Exception as validation_exception:   # noqa: B902; eat all errors
-        current_app.logger.error('validate_noteexception: ' + str(validation_exception))
+        current_app.logger.error('validate_note exception: ' + str(validation_exception))
         error_msg += VALIDATOR_ERROR
     return error_msg
 
@@ -75,7 +79,7 @@ def validate_doc_id(json_data, check_exists: bool = True) -> str:
     error_msg: str = ''
     if not doc_id:
         error_msg += DOC_ID_REQUIRED
-    elif not checksum_valid(doc_id):
+    elif not validator_utils.checksum_valid(doc_id):
         error_msg += DOC_ID_INVALID_CHECKSUM
     elif check_exists:
         exists_count = MhrRegistration.get_doc_id_count(doc_id)
@@ -157,6 +161,32 @@ def validate_expiry_ts(registration: MhrRegistration, json_data, doc_type: str) 
                 error_msg += EXPIRY_BEFORE_CURRENT
             if expiry and expiry < now.date():
                 error_msg += EXPIRY_CURRENT_EXPIRED
+    return error_msg
+
+
+def validate_ncan(registration: MhrRegistration, json_data) -> str:
+    """Validate the notice of cancellation document id."""
+    error_msg: str = ''
+    if not json_data.get('note'):
+        return error_msg
+    if not json_data.get('cancelDocumentId'):
+        return NCAN_DOCUMENT_ID_REQUIRED
+    if not registration:
+        return error_msg
+    status = None
+    cancel_doc_id = json_data.get('cancelDocumentId')
+    if model_utils.is_legacy() and registration.manuhome and registration.manuhome.notes:
+        for note in registration.manuhome.notes:
+            if note.reg_document_id == cancel_doc_id:
+                status = FROM_LEGACY_STATUS.get(note.status)
+    elif not model_utils.is_legacy:
+        note = registration.get_cancel_note(cancel_doc_id)
+        if note:
+            status = note.status_type
+    if not status:
+        error_msg += NCAN_DOCUMENT_ID_INVALID
+    elif status != MhrNoteStatusTypes.ACTIVE:
+        error_msg += NCAN_DOCUMENT_ID_STATUS
     return error_msg
 
 

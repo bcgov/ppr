@@ -20,8 +20,8 @@ from flask import request, current_app, g
 from mhr_api.exceptions import DatabaseException
 from mhr_api.models import EventTracking, MhrRegistration, MhrRegistrationReport
 from mhr_api.models import utils as model_utils
-from mhr_api.models.type_tables import MhrDocumentType
-from mhr_api.reports import get_pdf  # get_callback_pdf, get_report_api_payload
+from mhr_api.models.type_tables import MhrDocumentType, MhrDocumentTypes
+from mhr_api.reports import get_pdf
 from mhr_api.resources import utils as resource_utils
 from mhr_api.services.authz import is_reg_staff_account
 from mhr_api.services.payment.exceptions import SBCPaymentException
@@ -294,6 +294,8 @@ def pay_and_save_note(req: request,  # pylint: disable=too-many-arguments
     # Try to save the registration: failure throws an exception.
     try:
         registration.save()
+        if request_json.get('cancelDocumentId') and request_json['note'].get('documentType') == MhrDocumentTypes.NCAN:
+            current_reg.save_cancel_note(request_json, registration.id)
     except Exception as db_exception:   # noqa: B902; handle all db related errors.
         current_app.logger.error(SAVE_ERROR_MESSAGE.format(account_id, 'registration', str(db_exception)))
         if account_id and invoice_id is not None:

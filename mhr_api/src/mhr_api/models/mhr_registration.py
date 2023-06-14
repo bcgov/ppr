@@ -363,6 +363,15 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         self.remove_groups(json_data, new_reg_id)
         db.session.commit()
 
+    def save_cancel_note(self, json_data, new_reg_id):
+        """Update the original MH removed owner groups."""
+        cancel_note: MhrNote = self.get_cancel_note(json_data.get('cancelDocumentId', ''))
+        if cancel_note:
+            cancel_note.status_type = MhrNoteStatusTypes.CANCELLED
+            cancel_note.change_registration_id = new_reg_id
+            current_app.logger.debug(f'updating note status, change reg id for reg id {cancel_note.registration_id}')
+            db.session.commit()
+
     def save_permit(self, new_reg_id):
         """Update the existing location state to historical."""
         if self.locations and self.locations[0].status_type == MhrStatusTypes.ACTIVE:
@@ -643,7 +652,9 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         registration.mhr_number = base_reg.mhr_number
         registration.doc_reg_number = reg_vals.doc_reg_number
         registration.registration_type = json_data.get('registrationType')
-        if registration.registration_type == MhrRegistrationTypes.REG_NOTE and json_data.get('documentId'):
+        if registration.registration_type in (MhrRegistrationTypes.EXEMPTION_NON_RES,
+                                              MhrRegistrationTypes.EXEMPTION_RES,
+                                              MhrRegistrationTypes.REG_NOTE) and json_data.get('documentId'):
             registration.doc_id = json_data.get('documentId')
         else:
             registration.doc_id = reg_vals.doc_id
@@ -710,12 +721,16 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                                                                                 account_id,
                                                                                 user_id,
                                                                                 user_group)
+        if json_data['note'].get('givingNoticeParty'):
+            notice_json = json_data['note']['givingNoticeParty']
+            registration.parties.append(MhrParty.create_from_json(notice_json, MhrPartyTypes.CONTACT, registration.id))
         doc: MhrDocument = registration.documents[0]
         if json_data.get('note'):
             if base_reg and base_reg.manuhome and base_reg.manuhome.reg_notes:
                 json_data['note']['noteId'] = len(base_reg.manuhome.reg_notes) + 1
             else:
                 json_data['note']['noteId'] = 1
+            json_data['note']['destroyed'] = True
             registration.notes = [MhrNote.create_from_json(json_data.get('note'), base_reg.id, doc.id,
                                                            registration.registration_ts, registration.id)]
         if base_reg:
@@ -778,15 +793,38 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
             notice_json = json_data['note']['givingNoticeParty']
             registration.parties.append(MhrParty.create_from_json(notice_json, MhrPartyTypes.CONTACT, registration.id))
         doc: MhrDocument = registration.documents[0]
-        if base_reg and base_reg.manuhome and base_reg.manuhome.reg_notes:
+        cancel_note: MhrNote = None
+        if doc.document_type == MhrDocumentTypes.NCAN and json_data.get('cancelDocumentId'):
+            cancel_doc_id: str = json_data.get('cancelDocumentId')
+            cancel_note = base_reg.get_cancel_note(cancel_doc_id)
+            if cancel_note:
+                json_data['note']['remarks'] = cancel_note.remarks
+            elif model_utils.is_legacy() and base_reg.manuhome and base_reg.manuhome.reg_notes:
+                for note in base_reg.manuhome.reg_notes:
+                    if note.reg_document_id == cancel_doc_id:
+                        json_data['note']['remarks'] = note.remarks
+                        break
+        if model_utils.is_legacy() and base_reg and base_reg.manuhome and base_reg.manuhome.reg_notes:
             json_data['note']['noteId'] = len(base_reg.manuhome.reg_notes) + 1
         else:
             json_data['note']['noteId'] = 1
-        registration.notes = [MhrNote.create_from_json(json_data.get('note'), base_reg.id, doc.id,
+        registration.notes = [MhrNote.create_from_json(json_data.get('note'), registration.id, doc.id,
                                                        registration.registration_ts, registration.id)]
         if base_reg:
             registration.manuhome = base_reg.manuhome
         return registration
+
+    def get_cancel_note(self, cancel_document_id: str) -> MhrNote:
+        """Try and find the note matching the cancel document id."""
+        cancel_note: MhrNote = None
+        if not self.change_registrations:
+            return cancel_note
+        for reg in self.change_registrations:
+            if reg.notes:
+                doc: MhrDocument = reg.documents[0]
+                if doc.document_id == cancel_document_id:
+                    return reg.notes[0]
+        return cancel_note
 
     def adjust_group_interest(self, new: bool):
         """For tenants in common groups adjust group interest to a common denominator."""

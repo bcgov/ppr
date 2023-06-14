@@ -518,7 +518,7 @@ def test_create_exemption_from_json(session, mhr_num, user_group, doc_id_prefix,
     note: Db2Mhomnote = manuhome.reg_notes[0]
     assert note.document_type == doc.document_type
     assert note.reg_document_id == doc.id
-    assert note.destroyed == 'N'
+    assert note.destroyed == 'Y'
     assert note.remarks == 'remarks'
     assert note.expiry_date
     assert note.expiry_date.year == 2022

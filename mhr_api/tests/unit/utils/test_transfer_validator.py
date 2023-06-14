@@ -19,7 +19,7 @@ import pytest
 from registry_schemas import utils as schema_utils
 from registry_schemas.example_data.mhr import TRANSFER
 
-from mhr_api.utils import registration_validator as validator
+from mhr_api.utils import registration_validator as validator, validator_utils
 from mhr_api.models import MhrRegistration, utils as model_utils
 from mhr_api.models.type_tables import MhrRegistrationStatusTypes, MhrTenancyTypes, MhrRegistrationTypes
 from mhr_api.models.type_tables import MhrPartyTypes
@@ -72,10 +72,10 @@ TEST_TRANSFER_DATA = [
     (DESC_VALID, True, True, None, None, MhrRegistrationStatusTypes.ACTIVE),
     ('Valid staff FROZEN', True, True, None, None, MhrRegistrationStatusTypes.ACTIVE),
     ('Valid no doc id not staff', True, False, None, None, None),
-    ('Invalid EXEMPT', False, False, None, validator.STATE_NOT_ALLOWED, MhrRegistrationStatusTypes.EXEMPT),
-    ('Invalid HISTORICAL', False, False, None, validator.STATE_NOT_ALLOWED, MhrRegistrationStatusTypes.HISTORICAL),
-    ('Invalid FROZEN', False, False, None, validator.STATE_NOT_ALLOWED, MhrRegistrationStatusTypes.ACTIVE),
-    ('Invalid draft', False, False, None, validator.DRAFT_NOT_ALLOWED, MhrRegistrationStatusTypes.ACTIVE),
+    ('Invalid EXEMPT', False, False, None, validator_utils.STATE_NOT_ALLOWED, MhrRegistrationStatusTypes.EXEMPT),
+    ('Invalid HISTORICAL', False, False, None, validator_utils.STATE_NOT_ALLOWED, MhrRegistrationStatusTypes.HISTORICAL),
+    ('Invalid FROZEN', False, False, None, validator_utils.STATE_NOT_ALLOWED, MhrRegistrationStatusTypes.ACTIVE),
+    ('Invalid draft', False, False, None, validator_utils.DRAFT_NOT_ALLOWED, MhrRegistrationStatusTypes.ACTIVE),
     (DESC_INVALID_GROUP_ID, False, False, None, validator.DELETE_GROUP_ID_INVALID, MhrRegistrationStatusTypes.ACTIVE),
     (DESC_NONEXISTENT_GROUP_ID, False, False, None, validator.DELETE_GROUP_ID_NONEXISTENT,
      MhrRegistrationStatusTypes.ACTIVE),
@@ -109,9 +109,9 @@ TEST_TRANSFER_DATA_TRAND = [
     ('Valid', True,  '001004', '2523', TRAND_DELETE_GROUPS, TRAND_ADD_GROUPS, None),
     ('Valid with no/empty middle name', True,  '001020', '2523', TRAND_DELETE_GROUPS2, TRAND_ADD_GROUPS2, None),
     ('Invalid FROZEN', False,  '003936', '2523', TRAND_DELETE_GROUPS, TRAND_ADD_GROUPS,
-     validator.STATE_NOT_ALLOWED),
+     validator_utils.STATE_NOT_ALLOWED),
     ('Invalid staff FROZEN', False,  '003936', '2523', TRAND_DELETE_GROUPS, TRAND_ADD_GROUPS,
-     validator.STATE_FROZEN_AFFIDAVIT),
+     validator_utils.STATE_FROZEN_AFFIDAVIT),
     ('Invalid party type', False,  '001004', '2523', TRAND_DELETE_GROUPS, TRAND_ADD_GROUPS,
      validator.TRAN_DEATH_NEW_OWNER),
     ('Invalid add owner', False,  '001004', '2523', TRAND_DELETE_GROUPS, TRAND_ADD_GROUPS,

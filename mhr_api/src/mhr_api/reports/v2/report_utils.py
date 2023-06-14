@@ -56,6 +56,7 @@ class ReportTypes(BaseEnum):
 
     MHR_COVER = 'mhrCover'
     MHR_EXEMPTION = 'mhrExemption'
+    MHR_NOTE = 'mhrNote'
     MHR_REGISTRATION = 'mhrRegistration'
     MHR_REGISTRATION_COVER = 'mhrRegistrationCover'
     MHR_REGISTRATION_MAIL = 'mhrRegistrationMail'
@@ -275,7 +276,8 @@ def get_report_meta_data(report_type: str = '') -> dict:
                                               ReportTypes.MHR_COVER,
                                               ReportTypes.MHR_TRANSFER,
                                               ReportTypes.MHR_TRANSPORT_PERMIT,
-                                              ReportTypes.MHR_EXEMPTION):
+                                              ReportTypes.MHR_EXEMPTION,
+                                              ReportTypes.MHR_NOTE):
         return copy.deepcopy(REPORT_META_DATA)
     data = copy.deepcopy(REPORT_META_DATA)
     data['marginTop'] = MARGIN_TOP_REG_REPORT
@@ -295,19 +297,23 @@ def get_report_files(request_data: dict, report_type: str, mail: bool = False) -
                        ReportTypes.MHR_REGISTRATION_COVER,
                        ReportTypes.MHR_TRANSFER,
                        ReportTypes.MHR_TRANSPORT_PERMIT,
-                       ReportTypes.MHR_EXEMPTION):
+                       ReportTypes.MHR_EXEMPTION,
+                       ReportTypes.MHR_NOTE):
         if report_type in (ReportTypes.SEARCH_BODY_REPORT,
                            ReportTypes.SEARCH_DETAIL_REPORT,
                            ReportTypes.SEARCH_TOC_REPORT,
                            ReportTypes.MHR_REGISTRATION_COVER,
                            ReportTypes.MHR_TRANSFER):
             title_text = request_data['templateVars'].get('meta_title', '')
+        elif report_type == ReportTypes.MHR_NOTE:
+            title_text = request_data['templateVars']['note'].get('documentDescription', '')
         else:
             title_text = request_data['templateVars'].get('documentDescription', '')
         subtitle_text = request_data['templateVars'].get('meta_subtitle', '')
         footer_text = request_data['templateVars'].get('footer_content', '')
     if report_type in (ReportTypes.MHR_REGISTRATION, ReportTypes.MHR_COVER, ReportTypes.MHR_REGISTRATION_COVER,
-                       ReportTypes.MHR_TRANSFER, ReportTypes.MHR_EXEMPTION, ReportTypes.MHR_TRANSPORT_PERMIT):
+                       ReportTypes.MHR_TRANSFER, ReportTypes.MHR_EXEMPTION, ReportTypes.MHR_TRANSPORT_PERMIT,
+                       ReportTypes.MHR_NOTE):
         subject_text = request_data['templateVars'].get('meta_subject', '')
         if report_type == ReportTypes.MHR_COVER:
             files['header.html'] = get_cover_header_data(title_text, subtitle_text, subject_text)

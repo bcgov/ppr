@@ -19,7 +19,7 @@ import pytest
 from registry_schemas import utils as schema_utils
 from registry_schemas.example_data.mhr import REGISTRATION, TRANSFER, EXEMPTION
 
-from mhr_api.utils import registration_validator as validator, manufacturer_validator as man_validator
+from mhr_api.utils import registration_validator as validator, manufacturer_validator as man_validator, validator_utils
 from mhr_api.models import MhrRegistration, MhrManufacturer
 from mhr_api.models.type_tables import MhrRegistrationStatusTypes, MhrTenancyTypes, MhrDocumentTypes
 from mhr_api.models.utils import is_legacy, now_ts
@@ -78,11 +78,11 @@ INVALID_CHARSET_MESSAGE = 'The character set is not supported'
 TEST_REG_DATA = [
     (DESC_VALID, True, True, DOC_ID_VALID, None),
     ('Valid no doc id not staff', True, False, None, None),
-    (DESC_MISSING_SUBMITTING, False, True, DOC_ID_VALID, validator.SUBMITTING_REQUIRED),
-    (DESC_MISSING_SUBMITTING, False, False, DOC_ID_VALID, validator.SUBMITTING_REQUIRED),
+    (DESC_MISSING_SUBMITTING, False, True, DOC_ID_VALID, validator_utils.SUBMITTING_REQUIRED),
+    (DESC_MISSING_SUBMITTING, False, False, DOC_ID_VALID, validator_utils.SUBMITTING_REQUIRED),
     (DESC_MISSING_OWNER_GROUP, False, True, DOC_ID_VALID, validator.OWNER_GROUPS_REQUIRED),
-    (DESC_MISSING_DOC_ID, False, True, None, validator.DOC_ID_REQUIRED),
-    (DESC_DOC_ID_EXISTS, False, True, DOC_ID_EXISTS, validator.DOC_ID_EXISTS)
+    (DESC_MISSING_DOC_ID, False, True, None, validator_utils.DOC_ID_REQUIRED),
+    (DESC_DOC_ID_EXISTS, False, True, DOC_ID_EXISTS, validator_utils.DOC_ID_EXISTS)
 ]
 # testdata pattern is ({description}, {valid}, {submitting}, {owners}, {location}, {desc}, {message content})
 TEST_MANUFACTURER_DATA = [
@@ -233,10 +233,10 @@ TEST_DESCRIPTION_DATA = [
 ]
 # testdata pattern is ({description}, {valid}, {staff}, {doc_id}, {message content}, {status})
 TEST_EXEMPTION_DATA = [
-    (DESC_VALID, True, True, None, None, MhrRegistrationStatusTypes.ACTIVE),
+    (DESC_VALID, True, True, DOC_ID_VALID, None, MhrRegistrationStatusTypes.ACTIVE),
     ('Valid no doc id not staff', True, False, None, None, None),
-    ('Invalid EXEMPT', False, False, None, validator.STATE_NOT_ALLOWED, MhrRegistrationStatusTypes.EXEMPT),
-    ('Invalid HISTORICAL', False, False, None, validator.STATE_NOT_ALLOWED, MhrRegistrationStatusTypes.HISTORICAL),
+    ('Invalid EXEMPT', False, False, None, validator_utils.STATE_NOT_ALLOWED, MhrRegistrationStatusTypes.EXEMPT),
+    ('Invalid HISTORICAL', False, False, None, validator_utils.STATE_NOT_ALLOWED, MhrRegistrationStatusTypes.HISTORICAL),
     ('Invalid note doc type', False, False, None, validator.NOTE_DOC_TYPE_INVALID, MhrRegistrationStatusTypes.ACTIVE)
 ]
 # testdata pattern is ({description}, {valid}, {numerator}, {denominator}, {groups}, {message content})
@@ -560,7 +560,7 @@ def test_validate_registration_legacy(session, desc, valid, street, city, messag
 @pytest.mark.parametrize('doc_id, valid', TEST_CHECKSUM_DATA)
 def test_checksum_valid(session, doc_id, valid):
     """Assert that the document id checksum validation works as expected."""
-    result = validator.checksum_valid(doc_id)
+    result = validator_utils.checksum_valid(doc_id)
     assert result == valid
 
 
@@ -599,7 +599,7 @@ def get_valid_registration(o_type):
 @pytest.mark.parametrize('desc, mhr_number, message_content', TEST_DATA_LIEN_COUNT)
 def test_validate_ppr_lien(session, desc, mhr_number, message_content):
     """Assert that the PPR lien check validation works as expected."""
-    error_msg = validator.validate_ppr_lien(mhr_number)
+    error_msg = validator_utils.validate_ppr_lien(mhr_number)
     assert error_msg == message_content
 
 

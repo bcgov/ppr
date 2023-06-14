@@ -17,28 +17,18 @@ Validation includes verifying the data combination for various registrations/fil
 """
 from flask import current_app
 
-from mhr_api.models import MhrRegistration, Db2Owngroup, Db2Owner, Db2Document, MhrDraft
+from mhr_api.models import MhrRegistration, Db2Owngroup, Db2Owner
 from mhr_api.models import registration_utils as reg_utils, utils as model_utils
-from mhr_api.models.type_tables import MhrRegistrationStatusTypes, MhrDocumentTypes, MhrLocationTypes, MhrStatusTypes
+from mhr_api.models.type_tables import MhrDocumentTypes, MhrLocationTypes
 from mhr_api.models.type_tables import MhrOwnerStatusTypes, MhrTenancyTypes, MhrPartyTypes, MhrRegistrationTypes
 from mhr_api.models.db2.owngroup import NEW_TENANCY_LEGACY
-from mhr_api.models.db2.utils import get_db2_permit_count
 from mhr_api.models.utils import is_legacy, to_db2_ind_name, now_ts, ts_from_iso_format, valid_tax_cert_date
 from mhr_api.services.authz import MANUFACTURER_GROUP, QUALIFIED_USER_GROUP
-from mhr_api.services import ltsa
-from mhr_api.utils import valid_charset
+from mhr_api.utils import validator_utils
 
 
-STATE_NOT_ALLOWED = 'The MH registration is not in a state where changes are allowed. '
-STATE_FROZEN_AFFIDAVIT = 'A transfer to a benificiary is pending after an AFFIDAVIT transfer. '
-DRAFT_NOT_ALLOWED = 'The draft for this registration is out of date: delete the draft and resubmit. '
 OWNERS_NOT_ALLOWED = 'Owners not allowed with new registrations: use ownerGroups instead. '
-DOC_ID_REQUIRED = 'Document ID is required for staff registrations. '
-SUBMITTING_REQUIRED = 'Submitting Party is required for MH registrations. '
 OWNER_GROUPS_REQUIRED = 'At least one owner group is required for staff registrations. '
-DOC_ID_EXISTS = 'Document ID must be unique: provided value already exists. '
-DOC_ID_INVALID_CHECKSUM = 'Document ID is invalid: checksum failed. '
-CHARACTER_SET_UNSUPPORTED = 'The character set is not supported for {desc} value {value}. '
 DELETE_GROUP_ID_INVALID = 'The owner group with ID {group_id} is not active and cannot be changed. '
 DELETE_GROUP_ID_NONEXISTENT = 'No owner group with ID {group_id} exists. '
 DELETE_GROUP_TYPE_INVALID = 'The owner group tenancy type with ID {group_id} is invalid. '
@@ -52,8 +42,6 @@ GROUP_DENOMINATOR_MISSING = 'The owner group interest denominator is required an
 GROUP_INTEREST_MISMATCH = 'The owner group interest numerator sum does not equal the interest common denominator. '
 VALIDATOR_ERROR = 'Error performing extra validation. '
 NOTE_DOC_TYPE_INVALID = 'The note document type is invalid for the registration type. '
-PPR_LIEN_EXISTS = 'This registration is not allowed to complete as an outstanding Personal Property Registry lien ' + \
-    'exists on the manufactured home. '
 BAND_NAME_REQUIRED = 'The location Indian Reserve band name is required for this registration. '
 RESERVE_NUMBER_REQUIRED = 'The location Indian Reserve number is required for this registration. '
 OWNERS_JOINT_INVALID = 'The owner group must contain at least 2 owners. '
@@ -73,8 +61,6 @@ MANUFACTURER_DEALER_INVALID = 'The existing location must be a dealer or manufac
 MANUFACTURER_PERMIT_INVALID = 'A manufacturer can only submit a transport permit once for a home. '
 LOCATION_TAX_DATE_INVALID = 'Location tax certificate date is invalid. '
 LOCATION_TAX_CERT_REQUIRED = 'Location tax certificate and tax certificate expiry date is required. '
-LOCATION_PID_INVALID = 'Location PID verification failed: either the PID is invalid or the LTSA service is ' + \
-                       'unavailable. '
 PARTY_TYPE_INVALID = 'Death of owner requires an executor, trustee, administrator owner party type. '
 GROUP_PARTY_TYPE_INVALID = 'For TRUSTEE, ADMINISTRATOR, or EXECUTOR, all owner party types within the group ' + \
                             'must be identical. '
@@ -114,6 +100,9 @@ LOCATION_STRATA_ALLOWED = 'Dealer/manufacturer name, park name, PAD, band name, 
 LOCATION_OTHER_ALLOWED = 'Dealer/manufacturer name, park name, PAD, band name, and reserve number are not allowed ' \
     'with an OTHER location type. '
 TRAN_QUALIFIED_DELETE = 'Qualified suppliers mut either delete one owner group or all owner groups. '
+NOTICE_NAME_REQUIRED = 'The giving notice party person or business name is required. '
+NOTICE_ADDRESS_REQUIRED = 'The giving notice address is required. '
+DESTROYED_FUTURE = 'The destroyed date and time cannot be in the future. '
 
 
 def validate_registration(json_data, staff: bool = False):
@@ -121,10 +110,10 @@ def validate_registration(json_data, staff: bool = False):
     error_msg = ''
     try:
         if staff:
-            error_msg += validate_doc_id(json_data)
+            error_msg += validator_utils.validate_doc_id(json_data)
             if not json_data.get('ownerGroups'):
                 error_msg += OWNER_GROUPS_REQUIRED
-        error_msg += validate_submitting_party(json_data)
+        error_msg += validator_utils.validate_submitting_party(json_data)
         owner_count: int = len(json_data.get('ownerGroups')) if json_data.get('ownerGroups') else 0
         error_msg += validate_owner_groups(json_data.get('ownerGroups'), True, None, None, owner_count)
         error_msg += validate_owner_party_type(json_data, json_data.get('ownerGroups'), True, owner_count)
@@ -143,9 +132,9 @@ def validate_transfer(registration: MhrRegistration, json_data, staff: bool, gro
         if not staff and reg_utils.is_transfer_due_to_death_staff(json_data.get('registrationType')):
             return REG_STAFF_ONLY
         if registration:
-            error_msg += validate_ppr_lien(registration.mhr_number)
+            error_msg += validator_utils.validate_ppr_lien(registration.mhr_number)
         active_group_count: int = get_active_group_count(json_data, registration)
-        error_msg += validate_submitting_party(json_data)
+        error_msg += validator_utils.validate_submitting_party(json_data)
         error_msg += validate_owner_groups(json_data.get('addOwnerGroups'),
                                            False,
                                            registration,
@@ -153,8 +142,8 @@ def validate_transfer(registration: MhrRegistration, json_data, staff: bool, gro
                                            active_group_count)
         error_msg += validate_owner_party_type(json_data, json_data.get('addOwnerGroups'), False, active_group_count)
         reg_type: str = json_data.get('registrationType', MhrRegistrationTypes.TRANS)
-        error_msg += validate_registration_state(registration, staff, reg_type)
-        error_msg += validate_draft_state(json_data)
+        error_msg += validator_utils.validate_registration_state(registration, staff, reg_type)
+        error_msg += validator_utils.validate_draft_state(json_data)
         if is_legacy() and registration and registration.manuhome and json_data.get('deleteOwnerGroups'):
             error_msg += validate_delete_owners_legacy(registration, json_data)
         if not staff:
@@ -167,7 +156,7 @@ def validate_transfer(registration: MhrRegistration, json_data, staff: bool, gro
                 error_msg += TRANSFER_DATE_REQUIRED
             if json_data.get('deleteOwnerGroups') and len(json_data.get('deleteOwnerGroups')) != 1 and \
                     group == QUALIFIED_USER_GROUP and \
-                    len(json_data.get('deleteOwnerGroups')) != get_existing_group_count(registration):
+                    len(json_data.get('deleteOwnerGroups')) != validator_utils.get_existing_group_count(registration):
                 error_msg += TRAN_QUALIFIED_DELETE
         if reg_utils.is_transfer_due_to_death(json_data.get('registrationType')):
             error_msg += validate_transfer_death(registration, json_data)
@@ -182,15 +171,30 @@ def validate_exemption(registration: MhrRegistration, json_data, staff: bool = F
     error_msg = ''
     try:
         current_app.logger.info(f'Validating exemption staff={staff}')
+        if staff:
+            error_msg += validator_utils.validate_doc_id(json_data)
         if registration:
-            error_msg += validate_ppr_lien(registration.mhr_number)
-        error_msg += validate_submitting_party(json_data)
-        error_msg += validate_registration_state(registration, staff, MhrRegistrationTypes.EXEMPTION_RES)
-        error_msg += validate_draft_state(json_data)
+            error_msg += validator_utils.validate_ppr_lien(registration.mhr_number)
+        error_msg += validator_utils.validate_submitting_party(json_data)
+        error_msg += validator_utils.validate_registration_state(registration, staff,
+                                                                 MhrRegistrationTypes.EXEMPTION_RES)
+        error_msg += validator_utils.validate_draft_state(json_data)
         if json_data.get('note'):
             if json_data['note'].get('documentType') and \
                     json_data['note'].get('documentType') not in (MhrDocumentTypes.EXRS, MhrDocumentTypes.EXNR):
                 error_msg += NOTE_DOC_TYPE_INVALID
+            if json_data['note'].get('givingNoticeParty'):
+                notice = json_data['note'].get('givingNoticeParty')
+                if not notice.get('address'):
+                    error_msg += NOTICE_ADDRESS_REQUIRED
+                if not notice.get('personName') and not notice.get('businessName'):
+                    error_msg += NOTICE_NAME_REQUIRED
+            if json_data['note'].get('effectiveDateTime'):
+                effective = json_data['note'].get('effectiveDateTime')
+                effective_ts = model_utils.ts_from_iso_format(effective)
+                now = model_utils.now_ts()
+                if effective_ts > now:
+                    error_msg += DESTROYED_FUTURE
     except Exception as validation_exception:   # noqa: B902; eat all errors
         current_app.logger.error('validate_exemption exception: ' + str(validation_exception))
         error_msg += VALIDATOR_ERROR
@@ -202,15 +206,15 @@ def validate_permit(registration: MhrRegistration, json_data, staff: bool = Fals
     error_msg = ''
     try:
         current_app.logger.info(f'Validating permit staff={staff}')
-        current_location = get_existing_location(registration)
+        current_location = validator_utils.get_existing_location(registration)
         if registration and group_name and group_name == MANUFACTURER_GROUP:
             error_msg += validate_manufacturer_permit(registration.mhr_number, json_data.get('submittingParty'),
                                                       current_location)
         if registration:
-            error_msg += validate_ppr_lien(registration.mhr_number)
-        error_msg += validate_submitting_party(json_data)
-        error_msg += validate_registration_state(registration, staff, MhrRegistrationTypes.PERMIT)
-        error_msg += validate_draft_state(json_data)
+            error_msg += validator_utils.validate_ppr_lien(registration.mhr_number)
+        error_msg += validator_utils.validate_submitting_party(json_data)
+        error_msg += validator_utils.validate_registration_state(registration, staff, MhrRegistrationTypes.PERMIT)
+        error_msg += validator_utils.validate_draft_state(json_data)
         if json_data.get('newLocation'):
             location = json_data.get('newLocation')
             error_msg += validate_location(location)
@@ -227,7 +231,7 @@ def validate_permit(registration: MhrRegistration, json_data, staff: bool = Fals
                     if not existing_name or location.get('parkName').strip().upper() != existing_name:
                         error_msg += STATUS_CONFIRMATION_REQUIRED
             if location.get('pidNumber'):
-                error_msg += validate_pid(location.get('pidNumber'))
+                error_msg += validator_utils.validate_pid(location.get('pidNumber'))
         if current_location and json_data.get('existingLocation') and \
                 not location_address_match(current_location, json_data.get('existingLocation')):
             error_msg += LOCATION_ADDRESS_MISMATCH
@@ -236,90 +240,6 @@ def validate_permit(registration: MhrRegistration, json_data, staff: bool = Fals
     except Exception as validation_exception:   # noqa: B902; eat all errors
         current_app.logger.error('validate_transfer exception: ' + str(validation_exception))
         error_msg += VALIDATOR_ERROR
-    return error_msg
-
-
-def validate_doc_id(json_data, check_exists: bool = True):
-    """Validate the registration document id."""
-    doc_id = json_data.get('documentId')
-    current_app.logger.debug(f'Validating doc_id={doc_id}.')
-    error_msg = ''
-    if not doc_id:
-        error_msg += DOC_ID_REQUIRED
-    elif not checksum_valid(doc_id):
-        error_msg += DOC_ID_INVALID_CHECKSUM
-    elif check_exists:
-        exists_count = MhrRegistration.get_doc_id_count(doc_id)
-        if exists_count > 0:
-            error_msg += DOC_ID_EXISTS
-    return error_msg
-
-
-def checksum_valid(doc_id: str) -> bool:
-    """Validate the document id with a checksum algorithm."""
-    if not doc_id or len(doc_id) != 8:
-        return False
-    if doc_id.startswith('1') or doc_id.startswith('9') or doc_id.startswith('8') or doc_id.startswith('REG'):
-        return True
-    if not doc_id.isnumeric():
-        return False
-    dig1: int = int(doc_id[0:1])
-    dig2: int = int(doc_id[1:2]) * 2
-    dig3: int = int(doc_id[2:3])
-    dig4: int = int(doc_id[3:4]) * 2
-    dig5: int = int(doc_id[4:5])
-    dig6: int = int(doc_id[5:6]) * 2
-    dig7: int = int(doc_id[6:7])
-    check_digit: int = int(doc_id[7:])
-    dig_sum = dig1 + dig3 + dig5 + dig7
-    if dig2 > 9:
-        dig_sum += 1 + (dig2 % 10)
-    else:
-        dig_sum += dig2
-    if dig4 > 9:
-        dig_sum += 1 + (dig4 % 10)
-    else:
-        dig_sum += dig4
-    if dig6 > 9:
-        dig_sum += 1 + (dig6 % 10)
-    else:
-        dig_sum += dig6
-    mod_sum = dig_sum % 10
-    current_app.logger.debug(f'sum={dig_sum}, checkdigit= {check_digit}, mod_sum={mod_sum}')
-    if mod_sum == 0:
-        return mod_sum == check_digit
-    return (10 - mod_sum) == check_digit
-
-
-def validate_registration_state(registration: MhrRegistration, staff: bool, reg_type: str):
-    """Validate registration state: changes are only allowed on active homes."""
-    error_msg = ''
-    if not registration:
-        return error_msg
-    if registration.status_type and registration.status_type != MhrRegistrationStatusTypes.ACTIVE:
-        error_msg += STATE_NOT_ALLOWED
-    elif is_legacy() and registration.manuhome:
-        if registration.manuhome.mh_status != registration.manuhome.StatusTypes.REGISTERED:
-            error_msg += STATE_NOT_ALLOWED
-        elif registration.manuhome.reg_documents:
-            last_doc: Db2Document = registration.manuhome.reg_documents[-1]
-            if not staff and last_doc.document_type == Db2Document.DocumentTypes.TRANS_AFFIDAVIT:
-                error_msg += STATE_NOT_ALLOWED
-            elif staff and last_doc.document_type == Db2Document.DocumentTypes.TRANS_AFFIDAVIT and \
-                    reg_type != MhrRegistrationTypes.TRANS:
-                error_msg += STATE_NOT_ALLOWED
-                error_msg += STATE_FROZEN_AFFIDAVIT
-    return error_msg
-
-
-def validate_draft_state(json_data):
-    """Validate draft state: no change registration on the home after the draft was created."""
-    error_msg = ''
-    if not json_data.get('draftNumber'):
-        return error_msg
-    draft: MhrDraft = MhrDraft.find_by_draft_number(json_data.get('draftNumber'))
-    if draft and draft.stale_count > 0:
-        error_msg += DRAFT_NOT_ALLOWED
     return error_msg
 
 
@@ -499,20 +419,6 @@ def validate_transfer_death(registration: MhrRegistration, json_data):
     return error_msg
 
 
-def validate_submitting_party(json_data):
-    """Verify submitting party names are valid."""
-    error_msg = ''
-    if not json_data.get('submittingParty'):
-        return SUBMITTING_REQUIRED
-    party = json_data.get('submittingParty')
-    desc: str = 'submitting party'
-    if party.get('businessName'):
-        error_msg += validate_text(party.get('businessName'), desc + ' business name')
-    elif party.get('personName'):
-        error_msg += validate_individual_name(party.get('personName'), desc)
-    return error_msg
-
-
 def validate_owner(owner):
     """Verify owner names are valid."""
     error_msg = ''
@@ -520,9 +426,9 @@ def validate_owner(owner):
         return error_msg
     desc: str = 'owner'
     if owner.get('organizationName'):
-        error_msg += validate_text(owner.get('organizationName'), desc + ' organization name')
+        error_msg += validator_utils.validate_text(owner.get('organizationName'), desc + ' organization name')
     elif owner.get('individualName'):
-        error_msg += validate_individual_name(owner.get('individualName'), desc)
+        error_msg += validator_utils.validate_individual_name(owner.get('individualName'), desc)
     return error_msg
 
 
@@ -538,7 +444,6 @@ def validate_owner_group(group, int_required: bool = False):
             error_msg += GROUP_NUMERATOR_MISSING
         if not group.get('interestDenominator') or group.get('interestDenominator', 0) < 1:
             error_msg += GROUP_DENOMINATOR_MISSING
-
     if orig_type == MhrTenancyTypes.NA and group.get('owners') and len(group.get('owners')) > 1:
         owner_count: int = 0
         for owner in group.get('owners'):
@@ -589,7 +494,6 @@ def validate_group_interest(groups,  # pylint: disable=too-many-branches
                         numerator_sum += (denominator/den * existing.interest_numerator)
                     else:
                         numerator_sum += int((denominator * existing.interest_numerator)/den)
-        # current_app.logger.debug(f'existing numerator_sum={numerator_sum}, denominator={denominator}')
     if group_count < 2:  # Could have transfer of joint tenants with no interest.
         return error_msg
     for group in groups:
@@ -600,7 +504,6 @@ def validate_group_interest(groups,  # pylint: disable=too-many-branches
                 numerator_sum += num
             else:
                 numerator_sum += (denominator/den * num)
-    # current_app.logger.debug(f'final numerator_sum={numerator_sum}, denominator={denominator}')
     if numerator_sum != denominator:
         error_msg = GROUP_INTEREST_MISMATCH
     return error_msg
@@ -755,32 +658,6 @@ def has_location_ltsa_details(location) -> bool:
     return False
 
 
-def validate_individual_name(name_json, desc: str = ''):
-    """Verify individual name is valid."""
-    error_msg = validate_text(name_json.get('first'), desc + ' first')
-    error_msg += validate_text(name_json.get('last'), desc + ' last')
-    error_msg += validate_text(name_json.get('middle'), desc + ' middle')
-    return error_msg
-
-
-def validate_text(value: str, desc: str = ''):
-    """Verify text characters are valid."""
-    if value and not valid_charset(value):
-        return CHARACTER_SET_UNSUPPORTED.format(desc=desc, value=value)
-    return ''
-
-
-def validate_ppr_lien(mhr_number: str):
-    """Validate that there are no PPR liens for a change registration."""
-    current_app.logger.debug(f'Validating mhr_number={mhr_number}.')
-    error_msg = ''
-    if mhr_number:
-        lien_count: int = reg_utils.get_ppr_lien_count(mhr_number)
-        if lien_count > 0:
-            return PPR_LIEN_EXISTS
-    return error_msg
-
-
 def validate_manufacturer_permit(mhr_number: str, party, current_location):
     """Validate transport permit business rules specific to manufacturers."""
     error_msg = ''
@@ -797,25 +674,10 @@ def validate_manufacturer_permit(mhr_number: str, party, current_location):
                 name += party['personName'].get('middle').strip().upper() + ' '
             name += party['personName'].get('last').strip().upper()
         if name:
-            permit_count: int = get_permit_count(mhr_number, name)
+            permit_count: int = validator_utils.get_permit_count(mhr_number, name)
             if permit_count > 0:
                 error_msg += MANUFACTURER_PERMIT_INVALID
     return error_msg
-
-
-def get_existing_location(registration: MhrRegistration):
-    """Get the currently active location JSON."""
-    if not registration:
-        return {}
-    if is_legacy() and registration.manuhome and registration.manuhome.reg_location:
-        return registration.manuhome.reg_location.registration_json
-    if registration.locations and registration.locations[0].status_type == MhrStatusTypes.ACTIVE:
-        return registration.locations[0].json
-    if registration.change_registrations:
-        for reg in registration.change_registrations:
-            if reg.locations and reg.locations[0].status_type == MhrStatusTypes.ACTIVE:
-                return reg.locations[0].json
-    return {}
 
 
 def location_address_match(current_location, request_location):
@@ -883,13 +745,6 @@ def owner_name_match(registration: MhrRegistration,  # pylint: disable=too-many-
     return match
 
 
-def get_permit_count(mhr_number: str, name: str) -> int:
-    """Execute a query to count existing transport permit registrations on a home."""
-    if is_legacy():
-        return get_db2_permit_count(mhr_number, name)
-    return 0
-
-
 def validate_tax_certificate(request_location, current_location):
     """Validate transport permit business rules specific to a tax certificate."""
     error_msg = ''
@@ -908,17 +763,6 @@ def validate_tax_certificate(request_location, current_location):
             if park_1 == park_2:
                 return error_msg
         error_msg += LOCATION_TAX_CERT_REQUIRED
-    return error_msg
-
-
-def validate_pid(pid: str):
-    """Validate location pid exists with an LTSA lookup."""
-    error_msg = ''
-    if not pid:
-        return error_msg
-    lookup_result = ltsa.pid_lookup(pid)
-    if not lookup_result:
-        error_msg = LOCATION_PID_INVALID
     return error_msg
 
 
@@ -976,15 +820,5 @@ def get_active_group_count(json_data, registration: MhrRegistration) -> int:
             group_count += len(json_data.get('addOwnerGroups'))
         if json_data.get('deleteOwnerGroups'):
             group_count -= len(json_data.get('deleteOwnerGroups'))
-        group_count += get_existing_group_count(registration)
-    return group_count
-
-
-def get_existing_group_count(registration: MhrRegistration) -> int:
-    """Count number of existing owner groups."""
-    group_count: int = 0
-    if registration and is_legacy() and registration.manuhome:
-        for existing in registration.manuhome.reg_owner_groups:
-            if existing.status in (Db2Owngroup.StatusTypes.ACTIVE, Db2Owngroup.StatusTypes.EXEMPT):
-                group_count += 1
+        group_count += validator_utils.get_existing_group_count(registration)
     return group_count

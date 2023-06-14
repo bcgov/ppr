@@ -174,6 +174,11 @@ class Report:  # pylint: disable=too-few-public-methods
                                                              MhrRegistrationTypes.TRANS_AFFIDAVIT,
                                                              MhrRegistrationTypes.TRANS_WILL):
             self._report_key = ReportTypes.MHR_TRANSFER
+        elif self._report_data.get('registrationType', '') in (MhrRegistrationTypes.EXEMPTION_RES,
+                                                               MhrRegistrationTypes.EXEMPTION_NON_RES):
+            self._report_key = ReportTypes.MHR_EXEMPTION
+        elif self._report_data.get('registrationType', '') == MhrRegistrationTypes.REG_NOTE:
+            self._report_key = ReportTypes.MHR_NOTE
         self._report_data['createDateTime'] = create_ts
         data = self._setup_report_data()
         current_app.logger.debug('Account {0} report type {1} calling report-api {2}.'
@@ -304,6 +309,7 @@ class Report:  # pylint: disable=too-few-public-methods
             'macros',
             'registrarSignature',
             'registration/details',
+            'registration/givingNoticeParty',
             'registration/location',
             'registration/notes',
             'registration/owners',
@@ -363,19 +369,22 @@ class Report:  # pylint: disable=too-few-public-methods
             if str(self._report_data.get('registrationType', '')).startswith('TRAN'):
                 self._report_data['documentDescription'] = \
                     TO_TRANSFER_DESC.get(self._report_data.get('registrationType'))
+            elif self._report_data.get('registrationType', '') == MhrRegistrationTypes.REG_NOTE:
+                self._report_data['documentDescription'] = self._report_data['note'].get('documentDescription', '')
         else:
             if self._report_key == ReportTypes.SEARCH_DETAIL_REPORT:
                 self._set_search_additional_message()
             elif self._report_key == ReportTypes.MHR_TRANSFER:
                 self._report_data['documentDescription'] = \
                     TO_TRANSFER_DESC.get(self._report_data.get('registrationType'))
+            elif self._report_data.get('registrationType', '') == MhrRegistrationTypes.REG_NOTE:
+                self._report_data['documentDescription'] = self._report_data['note'].get('documentDescription', '')
             self._set_date_times()
             self._set_addresses()
             self._set_owner_groups()
             if self._report_key not in (ReportTypes.MHR_REGISTRATION,
                                         ReportTypes.MHR_TRANSFER,
-                                        ReportTypes.MHR_TRANSPORT_PERMIT,
-                                        ReportTypes.MHR_EXEMPTION):
+                                        ReportTypes.MHR_TRANSPORT_PERMIT):
                 self._set_notes()
             if self._report_key == ReportTypes.SEARCH_DETAIL_REPORT:
                 self._set_selected()
@@ -383,7 +392,7 @@ class Report:  # pylint: disable=too-few-public-methods
             elif self._report_key == ReportTypes.SEARCH_BODY_REPORT:
                 # Add PPR search template setup here:
                 self._set_ppr_search()
-            if self._report_key not in (ReportTypes.MHR_TRANSFER, ReportTypes.MHR_EXEMPTION):
+            if self._report_key not in (ReportTypes.MHR_TRANSFER, ReportTypes.MHR_EXEMPTION, ReportTypes.MHR_NOTE):
                 self._set_location()
                 if self._report_key != ReportTypes.MHR_TRANSPORT_PERMIT:
                     self._set_description()
@@ -405,6 +414,8 @@ class Report:  # pylint: disable=too-few-public-methods
         """Add note type descriptions and dates."""
         if self._report_key == ReportTypes.SEARCH_DETAIL_REPORT and self._report_data['totalResultsSize'] > 0:
             self._set_search_notes()
+        elif self._report_key != ReportTypes.SEARCH_DETAIL_REPORT:
+            self._set_note()
 
     def _set_description(self):
         """Set up report description information."""
@@ -499,6 +510,24 @@ class Report:  # pylint: disable=too-few-public-methods
                         elif note.get('givingNoticeParty') and note['givingNoticeParty'].get('phoneNumber'):
                             phone = note['givingNoticeParty'].get('phoneNumber')
                             note['givingNoticeParty']['phoneNumber'] = phone[0:3] + '-' + phone[3:6] + '-' + phone[6:]
+                        if note.get('effectiveDateTime'):
+                            note['effectiveDateTime'] = Report._to_report_datetime(note.get('effectiveDateTime'))
+
+    def _set_note(self):
+        """Add registration note document type description and dates."""
+        if self._report_data and self._report_data['note']:
+            note = self._report_data['note']
+            if note.get('createDateTime'):
+                note['createDateTime'] = Report._to_report_datetime(note.get('createDateTime'))
+            if note.get('expiryDateTime') and str(note['expiryDateTime']).startswith('0001-01-01'):
+                note['expiryDateTime'] = ''
+            elif note.get('expiryDateTime'):
+                note['expiryDateTime'] = Report._to_report_datetime(note.get('expiryDateTime'))
+            if note.get('effectiveDateTime'):
+                note['effectiveDateTime'] = Report._to_report_datetime(note.get('effectiveDateTime'))
+            if note.get('givingNoticeParty') and note['givingNoticeParty'].get('phoneNumber'):
+                phone = note['givingNoticeParty'].get('phoneNumber')
+                note['givingNoticeParty']['phoneNumber'] = phone[0:3] + '-' + phone[3:6] + '-' + phone[6:]
 
     def _set_search_additional_message(self):
         """Conditionally add a message to the search report data."""
@@ -539,7 +568,7 @@ class Report:  # pylint: disable=too-few-public-methods
                 self._report_data['totalResultsSize'] > 0:
             self._set_search_addresses()
         elif self._report_key in (ReportTypes.MHR_REGISTRATION, ReportTypes.MHR_TRANSFER,
-                                  ReportTypes.MHR_EXEMPTION, ReportTypes.MHR_TRANSPORT_PERMIT):
+                                  ReportTypes.MHR_EXEMPTION, ReportTypes.MHR_TRANSPORT_PERMIT, ReportTypes.MHR_NOTE):
             self._set_registration_addresses()
 
     def _set_search_addresses(self):
@@ -556,6 +585,8 @@ class Report:  # pylint: disable=too-few-public-methods
                     for note in detail['notes']:
                         if note.get('contactAddress'):
                             Report._format_address(note['contactAddress'])
+                        elif note.get('givingNoticeParty') and note['givingNoticeParty'].get('address'):
+                            Report._format_address(note['givingNoticeParty']['address'])
 
     def _set_registration_addresses(self):
         """Replace registration addresses country code with description."""
@@ -577,6 +608,9 @@ class Report:  # pylint: disable=too-few-public-methods
                         Report._format_address(owner['address'])
             if reg.get('location') and 'address' in reg['location']:
                 Report._format_address(reg['location']['address'])
+            if reg.get('note') and reg['note'].get('givingNoticeParty') and \
+                    reg['note']['givingNoticeParty'].get('address'):
+                Report._format_address(reg['note']['givingNoticeParty']['address'])
 
     def _set_date_times(self):
         """Replace API ISO UTC strings with local report format strings."""
@@ -617,7 +651,7 @@ class Report:  # pylint: disable=too-few-public-methods
             if reg.get('location') and reg['location'].get('taxExpiryDate'):
                 reg['location']['taxExpiryDate'] = Report._to_report_datetime(reg['location']['taxExpiryDate'], False)
         elif self._report_key in (ReportTypes.MHR_TRANSFER, ReportTypes.MHR_EXEMPTION,
-                                  ReportTypes.MHR_TRANSPORT_PERMIT):
+                                  ReportTypes.MHR_TRANSPORT_PERMIT, ReportTypes.MHR_NOTE):
             reg = self._report_data
             reg['createDateTime'] = Report._to_report_datetime(reg['createDateTime'])
             if reg.get('declaredValue'):
@@ -628,8 +662,6 @@ class Report:  # pylint: disable=too-few-public-methods
                     reg['declaredValue'] = '$' + '{:0,.2f}'.format(float(declared_value))
                 else:
                     reg['declaredValue'] = ''
-            if reg.get('note') and reg['note'].get('expiryDate'):
-                reg['note']['expiryDate'] = Report._to_report_datetime(reg['note']['expiryDate'], False)
             if self._report_key == ReportTypes.MHR_TRANSPORT_PERMIT and reg.get('newLocation'):
                 reg['location'] = reg.get('newLocation')
                 if reg.get('location') and reg['location'].get('taxExpiryDate'):
@@ -702,7 +734,7 @@ class Report:  # pylint: disable=too-few-public-methods
             else:
                 self._report_data['footer_content'] = f'MHR {search_desc} Search - "{criteria}"'
         elif self._report_key in (ReportTypes.MHR_REGISTRATION, ReportTypes.MHR_COVER,
-                                  ReportTypes.MHR_TRANSFER, ReportTypes.MHR_EXEMPTION,
+                                  ReportTypes.MHR_TRANSFER, ReportTypes.MHR_EXEMPTION, ReportTypes.MHR_NOTE,
                                   ReportTypes.MHR_TRANSPORT_PERMIT, ReportTypes.MHR_REGISTRATION_COVER):
             reg_num = self._report_data.get('mhrNumber', '')
             self._report_data['footer_content'] = f'Manufactured Home Registration #{reg_num}'
@@ -810,6 +842,13 @@ class ReportMeta:  # pylint: disable=too-few-public-methods
             'reportDescription': 'MHRTransportPermit',
             'fileName': 'transportPermitV2',
             'metaTitle': 'TRANSPORT PERMIT VERIFICATION',
+            'metaSubtitle': 'MANUFACTURED HOME ACT',
+            'metaSubject': ''
+        },
+        ReportTypes.MHR_NOTE: {
+            'reportDescription': 'MHRNote',
+            'fileName': 'unitNoteV2',
+            'metaTitle': 'UNIT NOTE VERIFICATION',
             'metaSubtitle': 'MANUFACTURED HOME ACT',
             'metaSubject': ''
         }

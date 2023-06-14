@@ -20,8 +20,7 @@ from registry_schemas import utils as schema_utils
 
 from mhr_api.utils import note_validator as validator
 from mhr_api.models import MhrRegistration, utils as model_utils
-from mhr_api.models.type_tables import MhrRegistrationStatusTypes, MhrDocumentTypes
-from mhr_api.services.authz import REQUEST_TRANSPORT_PERMIT, STAFF_ROLE, MANUFACTURER_GROUP
+from mhr_api.services.authz import STAFF_ROLE
 
 
 DOC_ID_EXISTS = '80038730'
