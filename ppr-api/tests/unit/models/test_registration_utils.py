@@ -66,11 +66,11 @@ TEST_FILTER_API_DATA = [
     ('TEST0018A', None, None, None),
     ('test', None, None, None),
     (None, 'TEST-SA-00', None, None),
+    (None, 'SA', None, None),
     (None, None, '2021-09-02T16:00:00+00:00', '2022-01-28T16:00:00+00:00'),
     ('TEST0', 'TEST-SA-00', None, None),
     ('TEST0', None, '2021-09-02T16:00:00+00:00', '2022-01-28T16:00:00+00:00')
 ]
- 
 
 @pytest.mark.parametrize('desc,account_id,result_count,valid', TEST_REG_COUNT_DATA)
 def test_get_account_reg_count(session, desc, account_id, result_count, valid):
