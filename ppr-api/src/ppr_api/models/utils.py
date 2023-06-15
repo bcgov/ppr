@@ -261,12 +261,15 @@ SELECT r.registration_number, r.registration_ts, r.registration_type, r.registra
          WHERE r2.financing_id = r.financing_id) AS last_update_ts,
        (SELECT CASE WHEN p.business_name IS NOT NULL THEN p.business_name
                     WHEN p.branch_id IS NOT NULL THEN (SELECT name FROM client_codes WHERE id = p.branch_id)
+                    WHEN p.middle_initial IS NOT NULL THEN p.first_name || ' ' || p.middle_initial || ' ' || p.last_name
                     ELSE p.first_name || ' ' || p.last_name END
           FROM parties p
          WHERE p.registration_id = r.id
            AND p.party_type = 'RG') AS registering_party,
        (SELECT string_agg((CASE WHEN p.business_name IS NOT NULL THEN p.business_name
                                 WHEN p.branch_id IS NOT NULL THEN (SELECT name FROM client_codes WHERE id = p.branch_id)
+                                WHEN p.middle_initial IS NOT NULL THEN p.first_name || ' ' || p.middle_initial ||
+                                     ' ' || p.last_name
                                 ELSE p.first_name || ' ' || p.last_name END), ', ')
           FROM parties p
          WHERE p.financing_id = fs.id
@@ -313,12 +316,15 @@ SELECT r.registration_number, r.registration_ts, r.registration_type, r.registra
          WHERE r2.financing_id = r.financing_id) AS last_update_ts,
        (SELECT CASE WHEN p.business_name IS NOT NULL THEN p.business_name
                     WHEN p.branch_id IS NOT NULL THEN (SELECT name FROM client_codes WHERE id = p.branch_id)
+                    WHEN p.middle_initial IS NOT NULL THEN p.first_name || ' ' || p.middle_initial || ' ' || p.last_name
                     ELSE p.first_name || ' ' || p.last_name END
           FROM parties p
          WHERE p.registration_id = r.id
            AND p.party_type = 'RG') AS registering_party,
        (SELECT string_agg((CASE WHEN p.business_name IS NOT NULL THEN p.business_name
                                 WHEN p.branch_id IS NOT NULL THEN (SELECT name FROM client_codes WHERE id = p.branch_id)
+                                WHEN p.middle_initial IS NOT NULL THEN p.first_name || ' ' || p.middle_initial ||
+                                     ' ' || p.last_name
                                 ELSE p.first_name || ' ' || p.last_name END), ', ')
           FROM parties p
          WHERE p.financing_id = fs.id
@@ -410,8 +416,8 @@ ORDER BY r.registration_ts DESC
 QUERY_ACCOUNT_DRAFTS_LIMIT = " FETCH FIRST :max_results_size ROWS ONLY"
 QUERY_ACCOUNT_DRAFTS_DEFAULT_ORDER = " ORDER BY create_ts DESC"
 QUERY_ACCOUNT_DRAFTS_DOC_NUM_CLAUSE = " AND document_number LIKE :doc_num || '%'"
-QUERY_ACCOUNT_DRAFTS_CLIENT_REF_CLAUSE = " AND client_reference_id LIKE :client_reference_id || '%'"
-QUERY_ACCOUNT_DRAFTS_CLIENT_REF_CLAUSE_NEW = " AND client_reference_id ILIKE :client_reference_id || '%'"
+QUERY_ACCOUNT_DRAFTS_CLIENT_REF_CLAUSE = " AND client_reference_id LIKE '%' || :client_reference_id || '%'"
+QUERY_ACCOUNT_DRAFTS_CLIENT_REF_CLAUSE_NEW = " AND client_reference_id ILIKE '%' || :client_reference_id || '%'"
 QUERY_ACCOUNT_DRAFTS_REG_NAME_CLAUSE = " AND registering_name LIKE '%' || :registering_name || '%'"
 QUERY_ACCOUNT_DRAFTS_REG_NAME_CLAUSE_NEW = " AND registering_name ILIKE '%' || :registering_name || '%'"
 QUERY_ACCOUNT_DRAFTS_REG_TYPE_CLAUSE = ' AND registration_type = :registration_type'

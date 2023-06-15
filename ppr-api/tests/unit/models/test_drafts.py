@@ -57,6 +57,21 @@ TEST_QUERY_BASE_DATA = [
     ('D-T-', None, None, None, '2022-01-22T16:00:00+00:00', '2022-01-28T16:00:00+00:00'),
     (None, 'SA', None, None, '2022-01-22T16:00:00+00:00', '2022-01-28T16:00:00+00:00')
 ]
+# testdata pattern is ({doc_num}, {reg_type}, {client_ref}, {registering_name}, {start_ts}, {end_ts})
+TEST_QUERY_FILTER_DATA = [
+    (None, None, None, None, None, None),
+    ('D-T', None, None, None, None, None),
+    ('d-t', None, None, None, None, None),
+    (None, 'SA', None, None, None, None),
+    (None, 'AM', None, None, None, None),
+    (None, None, 'A-00000', None, None, None),
+    (None, None, '00000', None, None, None),
+    (None, None, None, 'TEST U', None, None),
+    (None, None, None, None, '2022-01-22T16:00:00+00:00', '2022-01-28T16:00:00+00:00'),
+    ('D-T-', None, 'A-00000', None, None, None),
+    ('D-T-', None, None, None, '2022-01-22T16:00:00+00:00', '2022-01-28T16:00:00+00:00'),
+    (None, 'SA', None, None, '2022-01-22T16:00:00+00:00', '2022-01-28T16:00:00+00:00')
+]
 
 
 def test_find_all_by_account_id(session):
@@ -262,7 +277,7 @@ def test_account_draft_query(session, doc_num, reg_type, client_ref, registering
     params.registering_name = registering
     params.start_date_time = start_ts
     params.end_date_time = end_ts
-    query = Draft.build_account_draft_query(params)
+    query = Draft.build_account_draft_query(params, False)
     # current_app.logger.info('\n' + query)
     if params.registration_number:
         assert query.find(model_utils.QUERY_ACCOUNT_DRAFTS_DOC_NUM_CLAUSE) != -1
@@ -321,7 +336,7 @@ def test_account_draft_query_params(session, doc_num, reg_type, client_ref, regi
         assert 'end_date_time' not in query_params
 
 
-@pytest.mark.parametrize('doc_num,reg_type,client_ref,registering,start_ts,end_ts', TEST_QUERY_BASE_DATA)
+@pytest.mark.parametrize('doc_num,reg_type,client_ref,registering,start_ts,end_ts', TEST_QUERY_FILTER_DATA)
 def test_find_all_by_account_id_filter(session, doc_num, reg_type, client_ref, registering, start_ts, end_ts):
     """Assert that account change registration query is as expected."""
     params: AccountRegistrationParams = AccountRegistrationParams(account_id='PS12345',

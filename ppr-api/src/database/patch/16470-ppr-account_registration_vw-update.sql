@@ -1,5 +1,4 @@
--- 10903 2022-02-04 Run this manually for now
---DROP VIEW public.account_registration_vw;
+-- 16470 DEV 2023-06-15 TEST/SANDBOX 2023-06- PROD 2023-06-
 CREATE OR REPLACE VIEW public.account_registration_vw AS
 WITH q AS (
   SELECT (now() at time zone 'utc')
@@ -121,3 +120,4 @@ SELECT r.registration_number, r.registration_ts, r.registration_type, r.registra
   AND r2.registration_type_cl IN ('CROWNLIEN', 'MISCLIEN', 'PPSALIEN')
 )
 ;
+
