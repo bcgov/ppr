@@ -110,6 +110,7 @@ export interface DraftResultIF {
   registrationDescription: string
   registrationType: APIRegistrationTypes | APIAmendmentTypes
   type: DraftTypes // One of enum DraftTypes.
+  expand?: boolean
 }
 
 // Financing Statement registration interface.

@@ -332,7 +332,7 @@ export async function mhrRegistrationHistory (withCollapse: boolean = false, sor
       throw new Error('Invalid API response')
     }
 
-    return result.data
+    return result.data.map(item => ({ ...item, expand: false }))
   } catch (error: any) {
     return {
       error: {

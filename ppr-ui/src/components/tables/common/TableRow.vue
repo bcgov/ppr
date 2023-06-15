@@ -10,7 +10,7 @@
   >
     <td
       v-if="inSelectedHeaders('registrationNumber') || inSelectedHeaders('mhrNumber')"
-      :class="(isChild || isExpanded) ? 'border-left': ''"
+      :class="(isChild || setIsExpanded) ? 'border-left': ''"
     >
       <v-row no-gutters>
         <v-col v-if="item.changes" class="pr-2" cols="auto">
@@ -23,7 +23,7 @@
             @mouseover="rollover = true"
             @mouseleave="rollover = false"
           >
-            <v-icon v-if="isExpanded">mdi-chevron-up</v-icon>
+            <v-icon v-if="setIsExpanded">mdi-chevron-up</v-icon>
             <v-icon v-else>mdi-chevron-down</v-icon>
           </v-btn>
         </v-col>
@@ -86,23 +86,23 @@
       </div>
       <div v-else class="pr-2">{{ item.registrationDescription }}
         <v-tooltip
-        v-if="item.registrationDescription === APIMhrDescriptionTypes.CONVERTED"
-        class="pa-2"
-        content-class="top-tooltip"
-        nudge-right="2"
-        top
-        transition="fade-transition"
-      >
-        <template v-slot:activator="{ on, attrs }">
-          <v-icon style="vertical-align: baseline" color="primary" small v-bind="attrs" v-on="on">
-            mdi-information-outline
-          </v-icon>
-        </template>
-        <div class="pt-2 pb-2">
-          The records for this registration were converted from paper to digital format on November 14, 1995, and may
-          not contain the full history of transactions prior to the conversion date.
-        </div>
-      </v-tooltip>
+          v-if="item.registrationDescription === APIMhrDescriptionTypes.CONVERTED"
+          class="pa-2"
+          content-class="top-tooltip"
+          nudge-right="2"
+          top
+          transition="fade-transition"
+        >
+          <template v-slot:activator="{ on, attrs }">
+            <v-icon style="vertical-align: baseline" color="primary" small v-bind="attrs" v-on="on">
+              mdi-information-outline
+            </v-icon>
+          </template>
+          <div class="pt-2 pb-2">
+            The records for this registration were converted from paper to digital format on November 14, 1995, and may
+            not contain the full history of transactions prior to the conversion date.
+          </div>
+        </v-tooltip>
       </div>
       <v-btn
         v-if="item.changes"
@@ -115,7 +115,7 @@
         @mouseleave="rollover = false"
       >
         <label style="cursor: pointer;">
-          <span v-if="!isExpanded">View </span>
+          <span v-if="!setIsExpanded">View </span>
           <span v-else>Hide </span>
           {{ isPpr ? 'Amendments' : 'History' }}
         </label>
@@ -436,7 +436,13 @@ import { getRegistrationSummary, mhRegistrationPDF, registrationPDF, stripChars 
 import { useStore } from '@/store/store'
 import InfoChip from '@/components/common/InfoChip.vue'
 /* eslint-disable no-unused-vars */
-import { BaseHeaderIF, DraftResultIF, MhRegistrationSummaryIF, RegistrationSummaryIF } from '@/interfaces'
+import {
+  BaseHeaderIF,
+  DraftResultIF,
+  MhRegistrationSummaryIF,
+  RegistrationSummaryIF,
+  RegTableNewItemI
+} from '@/interfaces'
 /* eslint-enable no-unused-vars */
 import {
   APIMhrDescriptionTypes,
@@ -464,7 +470,10 @@ export default defineComponent({
     setChild: { default: false },
     setHeaders: { default: [] as BaseHeaderIF[] },
     setIsExpanded: { default: false },
-    setItem: { default: {} as (RegistrationSummaryIF | DraftResultIF) }
+    setItem: {
+      default: () => {},
+      type: Object as () => RegistrationSummaryIF | DraftResultIF | MhRegistrationSummaryIF | any
+    }
   },
   emits: ['action', 'error', 'freezeScroll', 'toggleExpand'],
   setup (props, { emit }) {
@@ -496,7 +505,7 @@ export default defineComponent({
         return props.setAddRegEffect
       }),
       applyRolloverEffect: computed((): boolean => {
-        return localState.rollover || localState.isExpanded
+        return localState.rollover || props.setIsExpanded
       }),
       disableActionShadow: computed((): boolean => {
         return props.setDisableActionShadow
@@ -507,10 +516,7 @@ export default defineComponent({
       isChild: computed(() => {
         return props.setChild
       }),
-      isExpanded: computed(() => {
-        return props.setIsExpanded
-      }),
-      item: computed(() => {
+      item: computed<any>(() => {
         if (!isDraft(props.setItem) && !props.setChild) {
           // if base reg && not draft check to update expand
           const baseReg = props.setItem as RegistrationSummaryIF

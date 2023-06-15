@@ -10,7 +10,7 @@ export const defaultFlagSet: LDFlagSet = {
   'search-registration-number': false,
   'search-serial-number': false,
   'mhr-ui-enabled': true, // Enables MHR search options
-  'mhr-registration-enabled': true, // Enables MHR table tab
+  'mhr-registration-enabled': false, // Enables MHR table tab
   'mhr-transfer-enabled': false, // Enables changes to base MHR Home Owners within the MHR Information flow
   'mhr-exemption-enabled': false,
   'mhr-transport-permit-enabled': '',

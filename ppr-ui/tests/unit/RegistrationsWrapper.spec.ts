@@ -261,7 +261,7 @@ describe('Dashboard add registration tests', () => {
   let wrapper: Wrapper<any>
   let sandbox
   const { assign } = window.location
-  const myRegAdd: RegistrationSummaryIF = mockedRegistration1
+  const myRegAdd: RegistrationSummaryIF = { ...mockedRegistration1, expand: false }
   sessionStorage.setItem('PPR_API_URL', 'mock-url-ppr')
   sessionStorage.setItem('KEYCLOAK_TOKEN', 'token')
 
