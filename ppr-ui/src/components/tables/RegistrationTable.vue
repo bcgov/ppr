@@ -34,14 +34,12 @@
               <v-row class="my-reg-header pl-2" no-gutters @click="toggleOrderBy(header.value, header.sortable)">
                 <v-col :class="{ 'pl-7': header.value === 'actions' }">
                   {{ header.text }}
-                  <span v-if="header.value === orderBy && header.sortable">
-                  <v-icon v-if="orderVal === 'asc'" small style="color: black;">
-                    mdi-arrow-up
-                  </v-icon>
-                  <v-icon v-else small style="color: black;">
-                    mdi-arrow-down
-                  </v-icon>
-                </span>
+                  <!-- Date Sort Icon/Button -->
+                  <SortingIcon
+                    v-if="header.value === orderBy && header.sortable"
+                    :sortAsc="sortAsc"
+                    @sortEvent="dateSortHandler(setRegistrationHistory, 'createDateTime', $event)"
+                  />
                 </v-col>
               </v-row>
               <v-row class="my-reg-filter pl-2 pt-2" no-gutters>
@@ -328,10 +326,11 @@ import {
 import { useRegistration } from '@/composables/useRegistration'
 import { MHRegistrationTypes, RegistrationTypesStandard, StatusTypes, MhStatusTypes } from '@/resources'
 import { storeToRefs } from 'pinia'
+import { useTableFeatures } from '@/composables'
 
 export default defineComponent({
   components: {
-    // SortingIcon,
+    SortingIcon,
     DatePicker,
     RegistrationBarTypeAheadList,
     TableObserver,
@@ -432,12 +431,14 @@ export default defineComponent({
       dateTxt,
       clearFilters
     } = useRegistration(props.setSort)
+    const { sortDates } = useTableFeatures()
 
     const localState = reactive({
       expanded: [],
       freezeTableScroll: false,
       loadingPDF: '',
       overrideWidth: false,
+      sortAsc: false,
       registrationTypes: [...RegistrationTypesStandard].slice(1),
       mhrRegistrationTypes: [...MHRegistrationTypes].slice(1),
       showDatePicker: false,
@@ -612,6 +613,12 @@ export default defineComponent({
       registrationType.value = val?.registrationTypeAPI || ''
     }
 
+    /** Date sort handler to sort and change sort icon state **/
+    const dateSortHandler = (registrationHistory: Array<any>, dateType: string, reverse: boolean) => {
+      localState.sortAsc = !localState.sortAsc
+      sortDates(registrationHistory, dateType, reverse)
+    }
+
     const getNext = _.throttle(() => {
       // if not loading and reg history exists
       if (!localState.loadingData && props.setRegistrationHistory?.length > 0) {
@@ -703,6 +710,7 @@ export default defineComponent({
     })
 
     return {
+      dateSortHandler,
       datePicker,
       dateTxt,
       emitError,
