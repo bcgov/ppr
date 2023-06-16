@@ -10,7 +10,9 @@
       <v-icon class="mr-1">
         mdi-help-circle-outline
       </v-icon>
-      {{ isHelpContentOpen ? 'Hide ' + title : title }}
+      {{ isHelpContentOpen ?
+          defaultHideText ? 'Hide Help' : 'Hide ' + title
+          : title }}
     </v-btn>
     <v-expand-transition>
       <div v-show="isHelpContentOpen" class="help-content mb-10">
@@ -41,7 +43,8 @@ export default defineComponent({
   props: {
     toggleButtonTitle: { default: '' },
     /* show or hide secondary toggle within content */
-    hasBottomHideToggle: { default: true }
+    hasBottomHideToggle: { default: true },
+    defaultHideText: { default: false }
   },
   setup (props) {
     const localState = reactive({
