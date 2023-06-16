@@ -9,6 +9,9 @@ import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import { HomeCertification } from '@/components/mhrRegistration'
 import { SharedDatePicker } from '@/components/common'
 import flushPromises from 'flush-promises'
+import { MhrRegistrationType } from '@/resources'
+import { mockedManufacturerAuthRoles } from './test-data'
+import { HomeCertificationOptions } from '@/enums'
 
 Vue.use(Vuetify)
 
@@ -34,7 +37,7 @@ function createComponent (): Wrapper<any> {
   })
 }
 
-describe('Home Certification', () => {
+describe('Home Certification - staff', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
@@ -138,5 +141,42 @@ describe('Home Certification', () => {
     // Click the btn
     await wrapper.find('#engineer-option').trigger('click')
     expect(wrapper.findComponent(SharedDatePicker).exists()).toBe(true)
+  })
+})
+
+describe('Home Certification - manufacturer', () => {
+  let wrapper: Wrapper<any>
+
+  beforeAll(async () => {
+    await store.setAuthRoles(mockedManufacturerAuthRoles)
+    await store.setRegistrationType(MhrRegistrationType)
+    // When a manufacturer registration is inited it sets the certificatonOption to CSA
+    await store.setMhrHomeDescription({ key: 'certificationOption', value: HomeCertificationOptions.CSA })
+  })
+
+  beforeEach(async () => {
+    wrapper = createComponent()
+    await nextTick()
+    await flushPromises()
+  })
+  afterEach(() => {
+    wrapper.destroy()
+  })
+
+  afterAll(async () => {
+    await store.setAuthRoles(null)
+    await store.setRegistrationType(null)
+  })
+
+  it('renders base component with correct sub components', async () => {
+    expect(wrapper.findComponent(HomeCertification).exists()).toBe(true)
+    expect(wrapper.findComponent(SharedDatePicker).exists()).toBe(false)
+
+    /// Verify Radio group does not exist
+    expect(wrapper.find('#certification-option-btns').exists()).toBe(false)
+
+    // Verify only csa-form is shown
+    expect(wrapper.find('#csa-form').isVisible()).toBe(true)
+    expect(wrapper.find('#engineer-form').exists()).toBe(false)
   })
 })

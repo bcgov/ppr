@@ -5,7 +5,9 @@ import { useStore } from '../../src/store/store'
 
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import { getTestId } from './utils'
-import { ManufacturerMakeModel } from '@/components/mhrRegistration'
+import { ManufacturerMakeModel, ManufacturedYearInput, ManufacturedYearSelect } from '@/components/mhrRegistration'
+import { MhrRegistrationType } from '@/resources'
+import { mockedManufacturerAuthRoles } from './test-data'
 
 Vue.use(Vuetify)
 const vuetify = new Vuetify({})
@@ -31,7 +33,7 @@ function createComponent (): Wrapper<any> {
 // Error message class selector
 const ERROR_MSG = '.error--text .v-messages__message'
 
-describe('ManufacturerMakeModel component', () => {
+describe('ManufacturerMakeModel component - staff', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
@@ -43,6 +45,8 @@ describe('ManufacturerMakeModel component', () => {
 
   it('renders the component', async () => {
     expect(wrapper.findComponent(ManufacturerMakeModel).exists()).toBe(true)
+    expect(wrapper.findComponent(ManufacturedYearInput).exists()).toBe(true)
+    expect(wrapper.findComponent(ManufacturedYearSelect).exists()).toBe(false)
 
     wrapper.find(getTestId('manufacturer-name')).exists()
     wrapper.find(getTestId('manufacture-year')).exists()
@@ -50,6 +54,10 @@ describe('ManufacturerMakeModel component', () => {
     wrapper.find(getTestId('circa-year-tooltip')).exists()
     wrapper.find(getTestId('manufacturer-make')).exists()
     wrapper.find(getTestId('manufacturer-model')).exists()
+  })
+
+  it('verifes Name of Manufactuer field is not disabled', async () => {
+    expect(wrapper.find(getTestId('manufacturer-name')).attributes('disabled')).toBe(undefined)
   })
 
   it('show error messages for Name of Manufacturer field', async () => {
@@ -128,5 +136,60 @@ describe('ManufacturerMakeModel component', () => {
     expect(wrapper.findAll(ERROR_MSG).length).toBe(2)
     expect(wrapper.findAll(ERROR_MSG).at(0).text()).toContain('cannot exceed 65')
     expect(wrapper.findAll(ERROR_MSG).at(1).text()).toContain('cannot exceed 65')
+  })
+})
+
+describe('ManufacturerMakeModel component - manufacturer', () => {
+  let wrapper: Wrapper<any>
+
+  beforeAll(async () => {
+    await store.setAuthRoles(mockedManufacturerAuthRoles)
+    await store.setRegistrationType(MhrRegistrationType)
+  })
+
+  beforeEach(async () => {
+    wrapper = createComponent()
+  })
+  afterEach(() => {
+    wrapper.destroy()
+  })
+
+  afterAll(async () => {
+    await store.setAuthRoles(null)
+    await store.setRegistrationType(null)
+  })
+
+  it('renders the component', async () => {
+    expect(wrapper.findComponent(ManufacturerMakeModel).exists()).toBe(true)
+    expect(wrapper.findComponent(ManufacturedYearInput).exists()).toBe(false)
+    expect(wrapper.findComponent(ManufacturedYearSelect).exists()).toBe(true)
+
+    wrapper.find(getTestId('manufacturer-name')).exists()
+    expect(wrapper.find(getTestId('manufacture-year')).exists()).toBe(false)
+    expect(wrapper.find(getTestId('manufacture-year-select')).exists()).toBe(true)
+    expect(wrapper.find(getTestId('circa-year-checkbox')).exists()).toBe(false)
+    expect(wrapper.find(getTestId('circa-year-tooltip')).exists()).toBe(false)
+    wrapper.find(getTestId('manufacturer-make')).exists()
+    wrapper.find(getTestId('manufacturer-model')).exists()
+  })
+
+  it('verifes Name of Manufacturer field is disabled', async () => {
+    expect(wrapper.find(getTestId('manufacturer-name')).attributes('disabled')).toBe('disabled')
+  })
+
+  it('show error messages for Manufacturer Make Model inputs', async () => {
+    wrapper.find(getTestId('manufacturer-make')).setValue('x'.repeat(70))
+    wrapper.find(getTestId('manufacturer-model')).setValue('x'.repeat(70))
+    await nextTick()
+    const messages = wrapper.findAll(ERROR_MSG)
+    expect(messages.length).toBe(2)
+  })
+
+  it('checks year of manufacturer select works as expected', async () => {
+    const yearSelect = wrapper.findComponent(ManufacturedYearSelect)
+    const select = yearSelect.find('.v-select')
+    const items = select.props('items')
+    const currentYear = new Date().getFullYear()
+    expect(items).toStrictEqual([currentYear + 1, currentYear, currentYear - 1])
   })
 })
