@@ -260,13 +260,14 @@ export default defineComponent({
     } = useStore()
     const {
       // Getters
-      getRegTableBaseRegs, getRegTableDraftsBaseReg, isMhrRegistration, getRegTableTotalRowCount, getStateModel,
-      getRegTableDraftsChildReg, hasMorePages, getRegTableNewItem, getRegTableSortOptions, getRegTableSortPage,
-      getUserSettings, getMhRegTableBaseRegs
+      getRegTableBaseRegs, getRegTableDraftsBaseReg, isMhrRegistration, isMhrManufacturerRegistration,
+      getRegTableTotalRowCount, getStateModel, getRegTableDraftsChildReg, hasMorePages, getRegTableNewItem,
+      getRegTableSortOptions, getRegTableSortPage, getUserSettings, getMhRegTableBaseRegs
     } = storeToRefs(useStore())
 
     const {
       initNewMhr,
+      initNewManufacturerMhr,
       fetchMhRegistrations
     } = useNewMhrRegistration()
 
@@ -388,6 +389,10 @@ export default defineComponent({
       resetNewRegistration(null) // Clear store data from the previous registration.
       setRegistrationType(selectedRegistration)
       setRegTableCollapsed(null)
+
+      if (!isMhDraft && isMhrManufacturerRegistration.value) {
+        await initNewManufacturerMhr()
+      }
 
       const route = isMhrRegistration.value ? RouteNames.YOUR_HOME : RouteNames.LENGTH_TRUST
       await router.replace({ name: route })
