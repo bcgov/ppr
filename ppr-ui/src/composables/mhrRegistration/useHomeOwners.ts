@@ -408,7 +408,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false) {
     setMhrTransferHomeOwnerGroups(homeOwnerGroups)
   }
 
-  const hasRemovedAllHomeOwners = (homeOwners: MhrHomeOwnerGroupIF[]): boolean => {
+  const hasRemovedAllHomeOwners = (homeOwners: MhrRegistrationHomeOwnerIF[]): boolean => {
     return homeOwners.every(group => group.action === ActionTypes.REMOVED)
   }
 

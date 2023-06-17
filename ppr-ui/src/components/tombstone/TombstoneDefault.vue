@@ -43,7 +43,7 @@
                 </template>
                 Learn how to use the BC Registries applications through step-by-step
                 downloadable user guides and online help videos,
-                or contact us to recieve help by email or phone.
+                or contact us to receive help by email or phone.
               </v-tooltip>
             </v-row>
           </v-col>
