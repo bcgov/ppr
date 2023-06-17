@@ -409,10 +409,6 @@
         </tr>
       </tbody>
     </v-simple-table>
-
-     <!-- start of data-table -->
-     <!-- end of data-table -->
-
   </v-card>
 </template>
 

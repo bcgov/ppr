@@ -708,6 +708,7 @@ describe('Home Owners', () => {
 
     await selectTransferType(TRANSFER_TYPE)
 
+    wrapper.vm.setShowGroups(true)
     const homeOwners = wrapper
     const allDeleteButtons = homeOwners.findAll(getTestId('table-delete-btn'))
     expect(allDeleteButtons.length).toBe(3)
@@ -844,6 +845,7 @@ describe('Home Owners', () => {
     ]
     await store.setMhrTransferCurrentHomeOwnerGroups(homeOwnerGroup)
     await store.setMhrTransferHomeOwnerGroups(homeOwnerGroup)
+    wrapper.vm.setShowGroups(false)
     await homeOwners.find(getTestId('table-delete-btn')).trigger('click')
 
     expect(homeOwners.find(getTestId('invalid-group-msg')).exists()).toBeTruthy()
@@ -1050,6 +1052,7 @@ describe('Home Owners', () => {
     await store.setMhrTransferCurrentHomeOwnerGroups(homeOwnerGroup)
     await store.setMhrTransferHomeOwnerGroups(homeOwnerGroup)
     await selectTransferType(TRANSFER_TYPE)
+    wrapper.vm.setShowGroups(false)
 
     const homeOwners = wrapper.findComponent(HomeOwners)
     await homeOwners.find(getTestId('table-delete-btn')).trigger('click')

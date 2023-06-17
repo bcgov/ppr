@@ -8,8 +8,7 @@ import {
   HomeOwnersTable,
   HomeOwnerGroups,
   TableGroupHeader,
-  FractionalOwnership,
-  HomeOwnersMixedRolesError
+  FractionalOwnership
 } from '@/components/mhrRegistration/HomeOwners'
 import { SimpleHelpToggle } from '@/components/common'
 import { mockedPerson, mockedOrganization, mockedExecutor, mockedOwner } from './test-data'
@@ -278,7 +277,7 @@ describe('Home Owners', () => {
   })
 
   it('should correctly display At Least One Owner check mark', async () => {
-    await store.setMhrRegistrationHomeOwnerGroups([{ groupId: 1, owners: [mockedPerson] }])
+    await store.setMhrRegistrationHomeOwnerGroups([{ groupId: 1, owners: [mockedPerson], type: '' }])
 
     const registeredOwnerCheck = wrapper.find(getTestId('reg-owner-checkmark'))
     expect(registeredOwnerCheck.exists()).toBeTruthy()
@@ -315,6 +314,7 @@ describe('Home Owners', () => {
     ] as MhrRegistrationHomeOwnerGroupIF[]
 
     await store.setMhrRegistrationHomeOwnerGroups(homeOwnerGroup)
+    wrapper.vm.setShowGroups(true)
 
     const homeOwnersData = wrapper.vm
     expect(homeOwnersData.getHomeOwners.length).toBe(1)
@@ -432,9 +432,10 @@ describe('Home Owners', () => {
   })
 
   it('should show correct Home Tenancy Type for MHR Registration', async () => {
-    const homeOwnerGroup = [{ groupId: '1', owners: [mockedPerson] }]
+    const homeOwnerGroup: MhrRegistrationHomeOwnerGroupIF[] = [{ groupId: 1, owners: [mockedPerson], type: '' }]
 
     await store.setMhrRegistrationHomeOwnerGroups(homeOwnerGroup)
+    wrapper.vm.setShowGroups(false)
     await nextTick()
 
     expect(wrapper.vm.getMhrRegistrationHomeOwners.length).toBe(1)
@@ -445,7 +446,7 @@ describe('Home Owners', () => {
     ).toBe(HomeTenancyTypes.SOLE)
 
     // Add a second Owner to the Group
-    homeOwnerGroup.push({ groupId: '1', owners: [mockedOrganization] })
+    homeOwnerGroup.push({ groupId: 1, owners: [mockedOrganization], type: '' })
 
     await store.setMhrRegistrationHomeOwnerGroups(homeOwnerGroup)
     await nextTick()
