@@ -29,7 +29,7 @@
         </article>
 
         <HomeOwnersTable
-          :homeOwners="homeOwners"
+          :homeOwnerGroups="getHomeOwnerGroups"
           isReadonlyTable
           class="readonly-home-owners-table px-0 py-3"
         />
@@ -68,7 +68,7 @@ export default defineComponent({
     } = useHomeOwners(props.isMhrTransfer)
 
     const localState = reactive({
-      homeOwners: computed(() => getTransferOrRegistrationHomeOwners()),
+      getHomeOwnerGroups: computed(() => getTransferOrRegistrationHomeOwnerGroups()),
       hasHomeOwners: computed(() => !!getTransferOrRegistrationHomeOwners().find(owner => owner.ownerId)),
       hasGroups: computed(() => getTransferOrRegistrationHomeOwnerGroups().length > 0),
       showStepError: computed(() => {
