@@ -368,12 +368,15 @@ SELECT r.registration_number, r.registration_ts, r.registration_type, r.registra
          WHERE r2.financing_id = r.financing_id) AS last_update_ts,
        (SELECT CASE WHEN p.business_name IS NOT NULL THEN p.business_name
                     WHEN p.branch_id IS NOT NULL THEN (SELECT name FROM client_codes WHERE id = p.branch_id)
+                    WHEN p.middle_initial IS NOT NULL THEN p.first_name || ' ' || p.middle_initial || ' ' || p.last_name
                     ELSE p.first_name || ' ' || p.last_name END
           FROM parties p
          WHERE p.registration_id = r.id
            AND p.party_type = 'RG') AS registering_party,
        (SELECT string_agg((CASE WHEN p.business_name IS NOT NULL THEN p.business_name
                                 WHEN p.branch_id IS NOT NULL THEN (SELECT name FROM client_codes WHERE id = p.branch_id)
+                                WHEN p.middle_initial IS NOT NULL THEN p.first_name || ' ' || p.middle_initial ||
+                                ' ' || p.last_name
                                 ELSE p.first_name || ' ' || p.last_name END), ', ')
           FROM parties p
          WHERE p.financing_id = fs.id
