@@ -1,5 +1,5 @@
 <template>
-  <v-card id="home-owner-table-card" flat rounded :class="{ 'border-error-left': showTableError}">
+  <v-card id="home-owner-table-card" flat rounded :class="{ 'border-error-left': showTableError }">
     <BaseDialog
       :setOptions="mhrDeceasedOwnerChanges"
       :setDisplay="showOwnerChangesDialog"
@@ -15,52 +15,58 @@
     >
       <thead class="simple">
         <tr>
-            <th v-for="header in homeOwnersTableHeaders" :key="header.value" :class="header.class">
-              {{ header.text }}
-            </th>
-          </tr>
+          <th v-for="header in homeOwnersTableHeaders" :key="header.value" :class="header.class">
+            {{ header.text }}
+          </th>
+        </tr>
       </thead>
       <tbody v-if="homeOwners.length > 0">
         <tr v-for="(group, groupIndex) in homeOwnerGroups" :key="`${group}: ${groupIndex}`">
-          <td class="pa-0" colspan="4"> <!-- Start of Home Owner Group -->
+          <td class="pa-0" colspan="4">
+            <!-- Start of Home Owner Group -->
             <div
-                v-if="showGroups && !(disableGroupHeader(group.groupId) && (hideRemovedOwners || isReadonlyTable))"
-                :colspan="4"
-                class="py-1 px-7 group-header-slot"
-                :class="{'spacer-header': disableGroupHeader(group.groupId),
-                  'border-error-left': isInvalidOwnerGroup(group.groupId)
-                }"
-              >
-                <TableGroupHeader
-                  :groupId="group.groupId"
-                  :groupNumber="getGroupNumberById(group.groupId)"
-                  :owners="hasActualOwners(group.owners) ? group.owners : []"
-                  :showEditActions="showEditActions && enableTransferOwnerGroupActions()"
-                  :disableGroupHeader="disableGroupHeader(group.groupId)"
-                  :isMhrTransfer="isMhrTransfer"
-                />
-              </div> <!-- End of Table Group Header -->
+              v-if="showGroups && !(disableGroupHeader(group.groupId) && (hideRemovedOwners || isReadonlyTable))"
+              :colspan="4"
+              class="py-1 px-7 group-header-slot"
+              :class="{
+                'spacer-header': disableGroupHeader(group.groupId),
+                'border-error-left': isInvalidOwnerGroup(group.groupId)
+              }"
+            >
+              <TableGroupHeader
+                :groupId="group.groupId"
+                :groupNumber="getGroupNumberById(group.groupId)"
+                :owners="hasActualOwners(group.owners) ? group.owners : []"
+                :showEditActions="showEditActions && enableTransferOwnerGroupActions()"
+                :disableGroupHeader="disableGroupHeader(group.groupId)"
+                :isMhrTransfer="isMhrTransfer"
+              />
+            </div>
+            <!-- End of Table Group Header -->
 
             <div v-for="(item, index) in group.owners" :key="`${item}: ${index}`" class="owner-row">
-
-              <div v-if="isMhrTransfer && !hasActualOwners(group.owners) && group.owners.length > 0 &&
-                hasRemovedAllHomeOwnerGroups() &&
-                !isTransferToExecutorProbateWill &&
-                !isTransferToExecutorUnder25Will &&
-                !isTransferToAdminNoWill"
-                >
+              <div
+                v-if="
+                  isMhrTransfer &&
+                  !hasActualOwners(group.owners) &&
+                  group.owners.length > 0 &&
+                  hasRemovedAllHomeOwnerGroups() &&
+                  !isTransferToExecutorProbateWill &&
+                  !isTransferToExecutorUnder25Will &&
+                  !isTransferToAdminNoWill
+                "
+              >
                 <div class="pa-6 fs-14 text-center no-owners-head-row" data-test-id="no-data-msg">
-                    No owners added yet.
+                  No owners added yet.
                 </div>
               </div>
 
               <!-- Transfer scenario: Display error for groups that 'removed' all owners
-                but they still exist in the table -->
-              <div v-if="isGroupWithNoOwners(item.groupId, index) ||
-                isTransferGroupInvalid(group.groupId, index)">
+              but they still exist in the table -->
+              <div v-if="isGroupWithNoOwners(item.groupId, index) || isTransferGroupInvalid(group.groupId, index)">
                 <div
                   class="py-1 bottom-border"
-                  :class="{ 'border-error-left': isInvalidOwnerGroup(group.groupId)}"
+                  :class="{ 'border-error-left': isInvalidOwnerGroup(group.groupId) }"
                   data-test-id="invalid-group-msg"
                 >
                   <div
@@ -72,12 +78,11 @@
                 </div>
               </div>
 
-              <tr v-else-if="!isMhrTransfer && index === 0 && hasMixedOwnersInGroup(item.groupId)
-                && !isReadonlyTable">
+              <tr v-else-if="!isMhrTransfer && index === 0 && hasMixedOwnersInGroup(item.groupId) && !isReadonlyTable">
                 <HomeOwnersMixedRolesError
                   :groupId="item.groupId"
-                  :showBorderError ='isInvalidOwnerGroup(item.groupId)'
-                  />
+                  :showBorderError="isInvalidOwnerGroup(item.groupId)"
+                />
               </tr>
 
               <template v-if="isCurrentlyEditing(group.owners.indexOf(item))">
@@ -104,15 +109,19 @@
                   <!-- Start of Name -->
                   <td
                     class="owner-name"
-                    :class="[{'no-bottom-border' : hideRowBottomBorder(item),
-                      'border-error-left': isInvalidOwnerGroup(item.groupId) },
-                      homeOwnersTableHeaders[0].class]"
+                    :class="[
+                      {
+                        'no-bottom-border': hideRowBottomBorder(item),
+                        'border-error-left': isInvalidOwnerGroup(item.groupId)
+                      },
+                      homeOwnersTableHeaders[0].class
+                    ]"
                   >
-                    <div :class="{'removed-owner': isRemovedHomeOwner(item)}">
+                    <div :class="{ 'removed-owner': isRemovedHomeOwner(item) }">
                       <div v-if="item.individualName" class="owner-icon-name">
                         <v-icon
                           class="mr-2"
-                          :class="{'person-executor-icon': item.partyType !== HomeOwnerPartyTypes.OWNER_IND}"
+                          :class="{ 'person-executor-icon': item.partyType !== HomeOwnerPartyTypes.OWNER_IND }"
                         >
                           {{ getHomeOwnerIcon(item.partyType) }}
                         </v-icon>
@@ -125,7 +134,7 @@
                       <div v-else class="owner-icon-name">
                         <v-icon
                           class="mr-2"
-                          :class="{'business-executor-icon': item.partyType !== HomeOwnerPartyTypes.OWNER_BUS}"
+                          :class="{ 'business-executor-icon': item.partyType !== HomeOwnerPartyTypes.OWNER_BUS }"
                         >
                           {{ getHomeOwnerIcon(item.partyType, true) }}
                         </v-icon>
@@ -136,9 +145,7 @@
                       <div v-if="item.suffix" class="font-light suffix">
                         {{ item.suffix }}
                       </div>
-                      <div v-else-if="item.description"
-                        class="font-light description"
-                      >
+                      <div v-else-if="item.description" class="font-light description">
                         {{ item.description }}
                       </div>
                     </div>
@@ -147,31 +154,33 @@
                     <template v-if="isMhrTransfer && (!isReadonlyTable || showChips)">
                       <InfoChip class="ml-8 mt-2" :action="mapInfoChipAction(item)" />
                     </template>
-                  </td> <!-- End of Name -->
+                  </td>
+                  <!-- End of Name -->
 
-                  <td :class="[{'no-bottom-border' : hideRowBottomBorder(item)}, homeOwnersTableHeaders[1].class]">
+                  <td :class="[{ 'no-bottom-border': hideRowBottomBorder(item) }, homeOwnersTableHeaders[1].class]">
                     <base-address
                       :schema="addressSchema"
                       :value="item.address"
-                      :class="{'removed-owner': isRemovedHomeOwner(item)}"
+                      :class="{ 'removed-owner': isRemovedHomeOwner(item) }"
                     />
-                  </td> <!-- End of Address -->
+                  </td>
+                  <!-- End of Address -->
 
-                  <td :class="[{'no-bottom-border' : hideRowBottomBorder(item)}, homeOwnersTableHeaders[2].class]">
-                    <div :class="{'removed-owner': isRemovedHomeOwner(item)}">
+                  <td :class="[{ 'no-bottom-border': hideRowBottomBorder(item) }, homeOwnersTableHeaders[2].class]">
+                    <div :class="{ 'removed-owner': isRemovedHomeOwner(item) }">
                       {{ toDisplayPhone(item.phoneNumber) }}
                       <span v-if="item.phoneExtension"> Ext {{ item.phoneExtension }} </span>
                     </div>
-                  </td> <!-- End of Phone -->
+                  </td>
+                  <!-- End of Phone -->
 
-                  <td v-if="showEditActions" class="row-actions text-right"
-                    :class="[{'no-bottom-border' : hideRowBottomBorder(item)}, homeOwnersTableHeaders[3].class]">
-
+                  <td
+                    v-if="showEditActions"
+                    class="row-actions text-right"
+                    :class="[{ 'no-bottom-border': hideRowBottomBorder(item) }, homeOwnersTableHeaders[3].class]"
+                  >
                     <!-- New Owner Actions -->
-                    <div
-                      v-if="(!isMhrTransfer || isAddedHomeOwner(item)) && enableHomeOwnerChanges()"
-                      class="mr-n4"
-                    >
+                    <div v-if="(!isMhrTransfer || isAddedHomeOwner(item)) && enableHomeOwnerChanges()" class="mr-n4">
                       <v-btn
                         text
                         color="primary"
@@ -188,9 +197,12 @@
                       <!-- Actions drop down menu -->
                       <v-menu offset-y left nudge-bottom="0">
                         <template v-slot:activator="{ on }">
-                          <v-btn text v-on="on"
-                                color="primary" class="px-0"
-                                :disabled="isAddingMode || isGlobalEditingMode"
+                          <v-btn
+                            text
+                            v-on="on"
+                            color="primary"
+                            class="px-0"
+                            :disabled="isAddingMode || isGlobalEditingMode"
                           >
                             <v-icon>mdi-menu-down</v-icon>
                           </v-btn>
@@ -200,22 +212,30 @@
                         <v-list class="actions-dropdown actions__more-actions">
                           <v-list-item class="my-n2">
                             <v-list-item-subtitle class="pa-0" @click="remove(item)">
-                              <v-icon small style="margin-bottom: 3px;">mdi-delete</v-icon>
+                              <v-icon small style="margin-bottom: 3px">mdi-delete</v-icon>
                               <span class="ml-1 remove-btn-text">Remove</span>
                             </v-list-item-subtitle>
                           </v-list-item>
                         </v-list>
                       </v-menu>
-                    </div> <!-- End of Owner Actions -->
+                    </div>
+                    <!-- End of Owner Actions -->
 
                     <!-- Existing Owner Actions -->
                     <template v-else-if="enableTransferOwnerActions(item)">
                       <v-btn
                         v-if="!isRemovedHomeOwner(item) && !isChangedOwner(item) && !isDisabledForSoGChanges(item)"
-                        text color="primary" class="mr-n4"
+                        text
+                        color="primary"
+                        class="mr-n4"
                         :ripple="false"
-                        :disabled="isAddingMode || isEditingMode || isGlobalEditingMode ||
-                          isDisabledForSJTChanges(item) || isDisabledForWillChanges(item)"
+                        :disabled="
+                          isAddingMode ||
+                          isEditingMode ||
+                          isGlobalEditingMode ||
+                          isDisabledForSJTChanges(item) ||
+                          isDisabledForWillChanges(item)
+                        "
                         @click="markForRemoval(item)"
                         data-test-id="table-delete-btn"
                       >
@@ -226,10 +246,13 @@
 
                       <v-btn
                         v-if="isRemovedHomeOwner(item) || isChangedOwner(item)"
-                        text color="primary" class="mr-n4"
+                        text
+                        color="primary"
+                        class="mr-n4"
                         :ripple="false"
-                        :disabled="isAddingMode || isEditingMode || isGlobalEditingMode ||
-                          isDisabledForSJTChanges(item)"
+                        :disabled="
+                          isAddingMode || isEditingMode || isGlobalEditingMode || isDisabledForSJTChanges(item)
+                        "
                         @click="undo(item)"
                         data-test-id="table-undo-btn"
                       >
@@ -237,7 +260,8 @@
                         <span>Undo</span>
                         <v-divider
                           v-if="enableTransferOwnerMenuActions(item) && !isRemovedHomeOwner(item)"
-                          class="ma-0 pl-3" vertical
+                          class="ma-0 pl-3"
+                          vertical
                         />
                       </v-btn>
 
@@ -246,7 +270,8 @@
                         <v-menu offset-y left nudge-bottom="0">
                           <template v-slot:activator="{ on }">
                             <v-btn
-                              text v-on="on"
+                              text
+                              v-on="on"
                               color="primary"
                               class="px-0 mr-n3"
                               :disabled="isAddingMode || isGlobalEditingMode || isDisabledForSJTChanges(item)"
@@ -282,9 +307,7 @@
 
               <!-- For MHR scenarios where users can entirely remove added owners -->
               <tr v-else-if="!hideRemovedOwners && !showGroups">
-                <div class="my-6 text-center" data-test-id="no-owners-mgs">
-                  No owners added yet.
-                </div>
+                <div class="my-6 text-center" data-test-id="no-owners-mgs">No owners added yet.</div>
               </tr>
               <tr
                 v-if="isRemovedHomeOwner(item) && showDeathCertificate() && !isReadonlyTable"
@@ -296,10 +319,7 @@
                   :class="{ 'border-error-left': isInvalidOwnerGroup(item.groupId) }"
                 >
                   <v-expand-transition>
-                    <DeathCertificate
-                      :deceasedOwner="item"
-                      :validate="validateTransfer"
-                    />
+                    <DeathCertificate :deceasedOwner="item" :validate="validateTransfer" />
                   </v-expand-transition>
                 </td>
               </tr>
@@ -308,38 +328,46 @@
                   (showDeathCertificate() || showSupportingDocuments()) &&
                   isReadonlyTable"
               >
-                <td v-if="item.supportingDocument"
-                  :colspan="homeOwnersTableHeaders.length" class="deceased-review-info">
+                <td
+                  v-if="item.supportingDocument"
+                  :colspan="homeOwnersTableHeaders.length"
+                  class="deceased-review-info"
+                >
                   <v-row no-gutters class="ml-8 my-n3">
                     <v-col cols="12">
-                      <div v-if="item.supportingDocument === SupportingDocumentsOptions.AFFIDAVIT"
-                        data-test-id="affidavit-review-note">
+                      <div
+                        v-if="item.supportingDocument === SupportingDocumentsOptions.AFFIDAVIT"
+                        data-test-id="affidavit-review-note"
+                      >
                         <p class="generic-label fs-14 mb-3">
-                          Affidavit of Executor with Death Certificate<br>
+                          Affidavit of Executor with Death Certificate<br />
                           <span class="font-light ml-0">
-                            Note: Ensure you have the original signed Affidavit of Executor form and a
-                            court certified true copy of the will.
+                            Note: Ensure you have the original signed Affidavit of Executor form and a court certified
+                            true copy of the will.
                           </span>
                         </p>
-                          <p class="generic-label fs-14">
-                            Death Certificate Registration Number:
-                            <span class="font-light mx-1">{{item.deathCertificateNumber}}</span>
-                          </p>
-                          <p class="generic-label fs-14 mt-n4">Date of Death:
-                            <span class="font-light mx-1">{{yyyyMmDdToPacificDate(item.deathDateTime, true)}}</span>
-                          </p>
+                        <p class="generic-label fs-14">
+                          Death Certificate Registration Number:
+                          <span class="font-light mx-1">{{ item.deathCertificateNumber }}</span>
+                        </p>
+                        <p class="generic-label fs-14 mt-n4">
+                          Date of Death:
+                          <span class="font-light mx-1">{{ yyyyMmDdToPacificDate(item.deathDateTime, true) }}</span>
+                        </p>
                       </div>
                       <div
-                        v-if="item.supportingDocument === SupportingDocumentsOptions.DEATH_CERT ||
-                        showDeathCertificate()"
+                        v-if="
+                          item.supportingDocument === SupportingDocumentsOptions.DEATH_CERT || showDeathCertificate()
+                        "
                         data-test-id="death-cert-review-note"
                       >
                         <p class="generic-label fs-14">
                           Death Certificate Registration Number:
-                          <span class="font-light mx-1">{{item.deathCertificateNumber}}</span>
+                          <span class="font-light mx-1">{{ item.deathCertificateNumber }}</span>
                         </p>
-                        <p class="generic-label fs-14 mt-n4">Date of Death:
-                          <span class="font-light mx-1">{{yyyyMmDdToPacificDate(item.deathDateTime, true)}}</span>
+                        <p class="generic-label fs-14 mt-n4">
+                          Date of Death:
+                          <span class="font-light mx-1">{{ yyyyMmDdToPacificDate(item.deathDateTime, true) }}</span>
                         </p>
                       </div>
                       <div
@@ -347,10 +375,10 @@
                         data-test-id="grant-review-note"
                       >
                         <p class="generic-label fs-14">
-                          Grant of Probate with Will<br>
+                          Grant of Probate with Will<br />
                           <span class="font-light ml-0">
-                            Note: Ensure you have a court certified true copy of the Grant of Probate with the
-                            will attached.
+                            Note: Ensure you have a court certified true copy of the Grant of Probate with the will
+                            attached.
                           </span>
                         </p>
                       </div>
@@ -389,7 +417,6 @@
                   </v-expand-transition>
                 </td>
               </tr>
-
             </div>
             <div v-if="group.owners.length === 0" class="my-6 text-center" data-test-id="no-data-msg">
               No owners added yet.
@@ -401,9 +428,7 @@
       <!-- No Data -->
       <tbody v-else>
         <tr class="text-center">
-          <td :colspan="homeOwnersTableHeaders.length"
-            class="pa-4 text-center"
-            data-test-id="no-data-msg">
+          <td :colspan="homeOwnersTableHeaders.length" class="pa-4 text-center" data-test-id="no-data-msg">
             No owners added yet.
           </td>
         </tr>
@@ -428,11 +453,9 @@ import TableGroupHeader from '@/components/mhrRegistration/HomeOwners/TableGroup
 import { mhrDeceasedOwnerChanges } from '@/resources/dialogOptions'
 import { yyyyMmDdToPacificDate } from '@/utils/date-helper'
 import { InfoChip } from '@/components/common'
-/* eslint-disable no-unused-vars */
-import { MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF } from '@/interfaces'
-import { ActionTypes, HomeOwnerPartyTypes, HomeTenancyTypes, SupportingDocumentsOptions } from '@/enums'
+import { MhrRegistrationHomeOwnerIF } from '@/interfaces'
+import { ActionTypes, HomeOwnerPartyTypes, SupportingDocumentsOptions } from '@/enums'
 import { storeToRefs } from 'pinia'
-/* eslint-enable no-unused-vars */
 
 export default defineComponent({
   name: 'HomeOwnersTable',
@@ -542,11 +565,14 @@ export default defineComponent({
           )
         )
       }),
-      homeOwners: computed(() => props.homeOwnerGroups
-        // need to have groupId to display Group Header for groups with no Owners
-        .flatMap(group => group.owners.length > 0 ? group.owners : { groupId: group.groupId })),
+      homeOwners: computed(() =>
+        props.homeOwnerGroups
+          // need to have groupId to display Group Header for groups with no Owners
+          .flatMap(group => (group.owners.length > 0 ? group.owners : { groupId: group.groupId }))
+      ),
       reviewedOwners: computed((): boolean =>
-        getValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_STEPS)),
+        getValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_STEPS)
+      ),
       showEditActions: computed((): boolean => !props.isReadonlyTable),
       homeOwnersTableHeaders: props.isReadonlyTable ? homeOwnersTableHeadersReview : homeOwnersTableHeaders,
       addedOwnerCount: computed((): number => {
@@ -592,7 +618,7 @@ export default defineComponent({
       if (isTransferDueToSaleOrGift.value) return TransSaleOrGift.hasMixedOwnersInGroup(groupId)
 
       if ((isTransferToExecutorProbateWill.value ||
-          isTransferToExecutorUnder25Will.value ||
+        isTransferToExecutorUnder25Will.value ||
           isTransferToAdminNoWill.value)) {
         const hasExecOrAdminInGroup = isTransferToAdminNoWill.value
           ? TransToAdmin.hasAddedAdministratorsInGroup(groupId)
@@ -643,7 +669,7 @@ export default defineComponent({
 
     const mapInfoChipAction = (item: MhrRegistrationHomeOwnerIF): string => {
       return item.action === ActionTypes.REMOVED &&
-       isPartyTypeNotEAT(item) &&
+        isPartyTypeNotEAT(item) &&
         (showDeathCertificate() ||
           isTransferToExecutorProbateWill.value ||
           isTransferToExecutorUnder25Will.value ||
@@ -698,8 +724,11 @@ export default defineComponent({
     const isGroupWithNoOwners = (groupId: number, index: number): boolean => {
       const group = getGroupById(groupId)
 
-      const hasNoOwners = group.action !== ActionTypes.REMOVED && group.interestNumerator &&
-        group.interestDenominator && group.owners.filter(owner => owner.action !== ActionTypes.REMOVED).length === 0
+      const hasNoOwners =
+        group.action !== ActionTypes.REMOVED &&
+        group.interestNumerator &&
+        group.interestDenominator &&
+        group.owners.filter(owner => owner.action !== ActionTypes.REMOVED).length === 0
 
       return hasNoOwners && index === 0
     }
@@ -708,7 +737,7 @@ export default defineComponent({
     const isTransferGroupInvalid = (groupId: number, index) => {
       if (index !== 0 || !hasUnsavedChanges.value) return false
       if (isTransferToExecutorProbateWill.value ||
-          isTransferToExecutorUnder25Will.value ||
+        isTransferToExecutorUnder25Will.value ||
           isTransferToAdminNoWill.value) {
         const hasAddedRoleInGroup = isTransferToAdminNoWill.value
           ? TransToAdmin.hasAddedAdministratorsInGroup(groupId)
@@ -717,7 +746,7 @@ export default defineComponent({
         return (
           (TransToExec.hasSomeOwnersRemoved(groupId) || hasAddedRoleInGroup) &&
           !(hasAddedRoleInGroup &&
-          TransToExec.hasAllCurrentOwnersRemoved(groupId) &&
+            TransToExec.hasAllCurrentOwnersRemoved(groupId) &&
           !TransToExec.isAllGroupOwnersWithDeathCerts(groupId))
         )
       }
@@ -750,8 +779,8 @@ export default defineComponent({
     // Hide bottom border for the owner's row that requires additional input (Death Certificate etc.)
     const hideRowBottomBorder = (rowItem: MhrRegistrationHomeOwnerIF): boolean => {
       return isRemovedHomeOwner(rowItem) &&
-      isPartyTypeNotEAT(rowItem) && // show the bottom border line for Execs, Admins and Trustees
-      (showDeathCertificate() || showSupportingDocuments())
+        isPartyTypeNotEAT(rowItem) && // show the bottom border line for Execs, Admins and Trustees
+        (showDeathCertificate() || showSupportingDocuments())
     }
 
     const getHomeOwnerIcon = (partyType: HomeOwnerPartyTypes, isBusiness = false): string => {
@@ -913,7 +942,7 @@ export default defineComponent({
   }
 
   .removed-owner {
-    opacity: .4;
+    opacity: 0.4;
   }
 
   table {
