@@ -10,14 +10,16 @@
         v-if="showHelp"
         class="mb-7"
         toggleButtonTitle="Need Help? Contact Us"
-        :defaultHideText="true">
+        :defaultHideText="true"
+      >
         <h3 class="text-center mb-2">
           Contact BC Registries
         </h3>
         <div class="ml-7">
           <DialogContent
             :setBaseText="`If you require assistance with changes to your manufacturer information please contact us.`"
-            :setHasContactInfo="true"/>
+            :setHasContactInfo="true"
+          />
           <div class="mt-3">
             <h4>Hours of Operation:</h4>
             <p class="mb-0">Monday to Friday, 8:30 am - 4:30 pm Pacific time</p>
@@ -51,7 +53,7 @@
       />
     </section>
 
-    <section id="mhr-rebuilt-status" class="mt-10" v-if="showRebuiltStatus">
+    <section v-if="showRebuiltStatus" id="mhr-rebuilt-status" class="mt-10">
       <h2>Rebuilt Status</h2>
       <p class="mt-2">
         If the home was rebuilt, include the description of the changes to the home (normally accompanied by a statutory
@@ -65,7 +67,7 @@
       />
     </section>
 
-    <section id="mhr-other-information" class="mt-10" v-if="showOtherInformation">
+    <section v-if="showOtherInformation" id="mhr-other-information" class="mt-10">
       <h2>Other Information</h2>
       <p class="mt-2">
         Include any other relevant information about the home.
