@@ -12,8 +12,8 @@ import {
   MhrDraftIF
 } from '@/interfaces'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
-import { APIMhrTypes, HomeTenancyTypes, HomeLocationTypes, MhApiStatusTypes } from '@/enums'
-import { createMhrDraft, getMhrDrafts, mhrRegistrationHistory, updateMhrDraft } from '@/utils'
+import { APIMhrTypes, HomeTenancyTypes, HomeLocationTypes, MhApiStatusTypes, HomeCertificationOptions } from '@/enums'
+import { createMhrDraft, getMhrDrafts, getMhrManufacturerInfo, mhrRegistrationHistory, updateMhrDraft } from '@/utils'
 import { orderBy } from 'lodash'
 import { useHomeOwners } from '@/composables'
 
@@ -130,6 +130,14 @@ export const useNewMhrRegistration = () => {
         otherRemarks: ''
       }
     }
+  }
+
+  const initNewManufacturerMhr = async (): Promise<void> => {
+    const data = await getMhrManufacturerInfo()
+    setMhrHomeDescription({ key: 'manufacturer', value: data.description.manufacturer })
+    setMhrHomeDescription({ key: 'certificationOption', value: HomeCertificationOptions.CSA })
+    setMhrRegistrationSubmittingParty(data.submittingParty)
+    setMhrRegistrationHomeOwnerGroups(data.ownerGroups)
   }
 
   /**
@@ -392,6 +400,7 @@ export const useNewMhrRegistration = () => {
 
   return {
     initNewMhr,
+    initNewManufacturerMhr,
     initDraftMhr,
     mhrDraftHandler,
     resetLocationInfoFields,

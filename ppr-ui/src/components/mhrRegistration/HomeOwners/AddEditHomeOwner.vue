@@ -108,6 +108,7 @@
 
                 <simple-help-toggle
                   toggleButtonTitle="Help with Business and Organization Owners"
+                  :defaultHideText="false"
                 >
                   <h3 class="text-center mb-2">
                     Business and Organization Owners

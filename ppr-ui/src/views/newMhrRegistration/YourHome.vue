@@ -2,10 +2,29 @@
   <div id="mhr-describe-your-home">
     <section id="mhr-make-model" class="mt-10">
       <h2>Manufacturer, Make, and Model</h2>
-      <p class="mt-2 mb-6">
-        Enter the Year of Manufacture (not the model year), Make, and Model of
-        the home.
+      <p :class="['mt-2', showHelp ? 'mb-3' : 'mb-6']" data-test-id="make-model-prompt">
+        {{ manufacturerMakeModelPrompt }}
       </p>
+
+      <SimpleHelpToggle
+        v-if="showHelp"
+        class="mb-7"
+        toggleButtonTitle="Need Help? Contact Us"
+      >
+        <h3 class="text-center mb-2">
+          Contact BC Registries
+        </h3>
+        <div class="ml-7">
+          <DialogContent
+            :setBaseText="`If you require assistance with changes to your manufacturer information please contact us.`"
+            :setHasContactInfo="true"
+          />
+          <div class="mt-3">
+            <h4>Hours of Operation:</h4>
+            <p class="mb-0">Monday to Friday, 8:30 am - 4:30 pm Pacific time</p>
+          </div>
+        </div>
+      </SimpleHelpToggle>
 
       <ManufacturerMakeModel
         :validate="validateMakeModel"
@@ -25,9 +44,7 @@
 
     <section id="mhr-home-certification" class="mt-10">
       <h2>Home Certification</h2>
-      <p class="mt-2">
-        Enter either the Canadian Standards Association (CSA) number OR the Engineer's inspection information.
-      </p>
+      <p class="mt-2" data-test-id="home-certification-prompt"> {{ homeCertificationPrompt }} </p>
 
       <HomeCertification
         :validate="validateCertification"
@@ -35,7 +52,7 @@
       />
     </section>
 
-    <section id="mhr-rebuilt-status" class="mt-10">
+    <section v-if="showRebuiltStatus" id="mhr-rebuilt-status" class="mt-10">
       <h2>Rebuilt Status</h2>
       <p class="mt-2">
         If the home was rebuilt, include the description of the changes to the home (normally accompanied by a statutory
@@ -49,7 +66,7 @@
       />
     </section>
 
-    <section id="mhr-other-information" class="mt-10">
+    <section v-if="showOtherInformation" id="mhr-other-information" class="mt-10">
       <h2>Other Information</h2>
       <p class="mt-2">
         Include any other relevant information about the home.
@@ -74,8 +91,11 @@ import {
   RebuiltStatus,
   OtherInformation
 } from '@/components/mhrRegistration/YourHome'
+import { SimpleHelpToggle } from '@/components/common'
+import { DialogContent } from '@/components/dialogs/common'
 import { useMhrValidations } from '@/composables/mhrRegistration/useMhrValidations'
 import { storeToRefs } from 'pinia'
+import { ManufacturerMakeModelPrompt, HomeCertificationPrompt } from '@/resources/mhr-registration'
 
 export default defineComponent({
   name: 'YourHome',
@@ -84,12 +104,16 @@ export default defineComponent({
     HomeSections,
     ManufacturerMakeModel,
     RebuiltStatus,
-    OtherInformation
+    OtherInformation,
+    SimpleHelpToggle,
+    DialogContent
   },
   props: {},
   setup () {
     const {
-      getMhrRegistrationValidationModel
+      getMhrRegistrationValidationModel,
+      isMhrManufacturerRegistration,
+      isRoleManufacturer
     } = storeToRefs(useStore())
 
     const {
@@ -114,6 +138,19 @@ export default defineComponent({
       }),
       validateOther: computed(() => {
         return getSectionValidation(MhrSectVal.YOUR_HOME_VALID, MhrCompVal.OTHER_VALID)
+      }),
+      showHelp: computed(() => isMhrManufacturerRegistration.value),
+      showRebuiltStatus: computed(() => !isMhrManufacturerRegistration.value),
+      showOtherInformation: computed(() => !isMhrManufacturerRegistration.value),
+      manufacturerMakeModelPrompt: computed(() : string => {
+        return isRoleManufacturer.value
+          ? ManufacturerMakeModelPrompt.manufacturer
+          : ManufacturerMakeModelPrompt.staff
+      }),
+      homeCertificationPrompt: computed(() : string => {
+        return isRoleManufacturer.value
+          ? HomeCertificationPrompt.manufacturer
+          : HomeCertificationPrompt.staff
       })
     })
 

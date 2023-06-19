@@ -6,11 +6,12 @@
       class="help-btn px-0"
       :ripple="false"
       @click="isHelpContentOpen = !isHelpContentOpen"
+      data-test-id="help-toggle-btn"
     >
       <v-icon class="mr-1">
         mdi-help-circle-outline
       </v-icon>
-      {{ isHelpContentOpen ? 'Hide ' + title : title }}
+      {{ title }}
     </v-btn>
     <v-expand-transition>
       <div v-show="isHelpContentOpen" class="help-content mb-10">
@@ -34,19 +35,22 @@
 </template>
 
 <script lang="ts">
+import { computed } from 'vue'
 import { defineComponent, reactive, toRefs } from 'vue-demi'
 
 export default defineComponent({
-  name: 'SimleHelpToggle',
+  name: 'SimpleHelpToggle',
   props: {
     toggleButtonTitle: { default: '' },
     /* show or hide secondary toggle within content */
-    hasBottomHideToggle: { default: true }
+    hasBottomHideToggle: { default: true },
+    defaultHideText: { default: true }
   },
   setup (props) {
     const localState = reactive({
       isHelpContentOpen: false,
-      title: props.toggleButtonTitle,
+      hideText: props.defaultHideText ? 'Hide Help' : 'Hide ' + props.toggleButtonTitle,
+      title: computed(() : string => localState.isHelpContentOpen ? localState.hideText : props.toggleButtonTitle),
       showBottomToggle: props.hasBottomHideToggle
     })
 

@@ -11,7 +11,8 @@ import {
   ErrorIF,
   MhrDraftApiIF,
   RegistrationSortIF,
-  MhrDraftIF
+  MhrDraftIF,
+  MhrManufacturerInfoIF
 } from '@/interfaces'
 import { APIMhrTypes, ErrorCategories, ErrorCodes } from '@/enums'
 import { useSearch } from '@/composables/useSearch'
@@ -673,4 +674,17 @@ function addSortParams (url: string, sortOptions: RegistrationSortIF): string {
     }
   }
   return url
+}
+
+// Get the manufacturer information for a manufacturer MHR
+export async function getMhrManufacturerInfo (): Promise<MhrManufacturerInfoIF> {
+  return axios
+    .get<MhrManufacturerInfoIF>('manufacturers', getDefaultConfig())
+    .then(response => {
+      const data: MhrManufacturerInfoIF = response?.data
+      if (!data) {
+        throw new Error('Invalid API response')
+      }
+      return data
+    })
 }

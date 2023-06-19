@@ -1,35 +1,37 @@
 <template>
-  <v-card flat rounded id="mhr-home-certification" class="mt-8 pa-8 pr-6">
+  <v-card flat rounded id="mhr-home-certification" class="mt-8 pa-8 pr-6" :class="{'py-10': !showRadio}">
     <v-row no-gutters>
       <v-col cols="12" sm="2">
         <label class="generic-label" :class="{'error-text': validate}">Certification</label>
       </v-col>
       <v-col cols="12" sm="10" class="pl-1">
-        <v-radio-group
-          id="certification-option-btns"
-          v-model="certificationOption"
-          class="mt-0 pr-1" row
-          hide-details="true"
-        >
-          <v-radio
-            id="csa-option"
-            class="csa-radio"
-            label="CSA Number"
-            active-class="selected-radio"
-            :value="HomeCertificationOptions.CSA"
-          />
-          <v-radio
-            id="engineer-option"
-            class="engineer-radio"
-            label="Engineer's Inspection"
-            active-class="selected-radio"
-            :value="HomeCertificationOptions.ENGINEER_INSPECTION"
-          />
-        </v-radio-group>
+        <template v-if="showRadio">
+          <v-radio-group
+            id="certification-option-btns"
+            v-model="certificationOption"
+            class="mt-0 pr-1" row
+            hide-details="true"
+          >
+            <v-radio
+              id="csa-option"
+              class="csa-radio"
+              label="CSA Number"
+              active-class="selected-radio"
+              :value="HomeCertificationOptions.CSA"
+            />
+            <v-radio
+              id="engineer-option"
+              class="engineer-radio"
+              label="Engineer's Inspection"
+              active-class="selected-radio"
+              :value="HomeCertificationOptions.ENGINEER_INSPECTION"
+            />
+          </v-radio-group>
+          <v-divider class="my-9 ml-0 mr-2" v-if="!!certificationOption"/>
+        </template>
 
         <!-- CSA Section -->
         <div v-show="isCsaOption">
-          <v-divider class="my-9 ml-0 mr-2" />
           <v-row no-gutters>
             <v-col cols="12">
               <v-form id="csa-form" ref="csaForm" v-model="isCsaValid">
@@ -59,8 +61,7 @@
         </div>
 
         <!-- Engineer Section -->
-        <div v-show="isEngineerOption">
-          <v-divider class="my-9 ml-0 mr-2" />
+        <div v-show="isEngineerOption" v-if="showEngineerOption">
           <v-row no-gutters>
             <v-col cols="12">
               <v-form id="engineer-form" ref="engineerForm" v-model="isEngineerValid">
@@ -124,7 +125,8 @@ export default defineComponent({
   },
   setup (props) {
     const { setMhrHomeDescription } = useStore()
-    const { getMhrRegistrationHomeDescription, getMhrRegistrationValidationModel } = storeToRefs(useStore())
+    const { getMhrRegistrationHomeDescription, getMhrRegistrationValidationModel,
+      isMhrManufacturerRegistration } = storeToRefs(useStore())
     // Composable(s)
     const {
       customRules,
@@ -180,7 +182,9 @@ export default defineComponent({
         // Determined by YEAR value in Manufacturers, Make, Model Section
         const utcDate = createUtcDate(getMhrRegistrationHomeDescription.value?.baseInformation.year, 0, 1)
         return localTodayDate(utcDate)
-      })
+      }),
+      showRadio: computed(() => !isMhrManufacturerRegistration.value),
+      showEngineerOption: computed(() => !isMhrManufacturerRegistration.value)
     })
 
     const validateForms = async () => {
