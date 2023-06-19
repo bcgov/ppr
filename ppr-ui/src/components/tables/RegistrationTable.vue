@@ -9,7 +9,7 @@
       @submit="updateDateRange($event)"
     />
 
-    <v-data-table
+    <v-simple-table
       id="registration-table"
       :class="{
         'freeze-scroll': freezeTableScroll,
@@ -17,44 +17,32 @@
         'registration-table': true
       }"
       ref="regTable"
-      disable-pagination
-      disable-sort
-      :expanded.sync="expanded"
       fixed-header
-      :headers="headers"
       height="100%"
-      hide-default-footer
-      hide-default-header
-      :items="registrationHistory"
-      item-key="baseRegistrationNumber"
-      mobile-breakpoint="0"
-      :no-data-text="tableFiltersActive ? 'No registrations found.' : 'No registrations to show.'"
     >
-      <template v-slot:header="{ props }">
-        <thead v-if="headers.length > 1">
+      <template v-slot:default>
+        <thead v-if="setHeaders.length > 1">
           <tr>
             <th
-              v-for="(header, index) in props.headers"
+              v-for="(header, index) in setHeaders"
               :key="index"
               :class="header.class"
               class="text-left pa-0"
               :ref="header.value + 'Ref'"
               :style="overrideWidth ? getHeaderStyle(overrideWidth, header.value) : ''"
             >
-              <v-row class="my-reg-header pl-3" no-gutters @click="toggleOrderBy(header.value, header.sortable)">
+              <v-row class="my-reg-header pl-2" no-gutters @click="toggleOrderBy(header.value, header.sortable)">
                 <v-col :class="{ 'pl-7': header.value === 'actions' }">
                   {{ header.text }}
-                  <span v-if="header.value === orderBy && header.sortable">
-                    <v-icon v-if="orderVal === 'asc'" small style="color: black;">
-                      mdi-arrow-up
-                    </v-icon>
-                    <v-icon v-else small style="color: black;">
-                      mdi-arrow-down
-                    </v-icon>
-                  </span>
+                  <!-- Date Sort Icon/Button -->
+                  <SortingIcon
+                    v-if="header.value === orderBy && header.sortable"
+                    :sortAsc="sortAsc"
+                    @sortEvent="dateSortHandler(setRegistrationHistory, 'createDateTime', $event)"
+                  />
                 </v-col>
               </v-row>
-              <v-row class="my-reg-filter pl-3 pt-2" no-gutters>
+              <v-row class="my-reg-filter pl-2 pt-2" no-gutters>
                 <v-col>
                   <v-text-field
                     v-if="header.value === 'registrationNumber' || header.value === 'mhrNumber'"
@@ -92,9 +80,9 @@
                       :menu-props="{ bottom: true, offsetY: true }"
                     >
                       <template v-slot="item">
-                        <span class="list-item py-3">
-                          {{ item.registrationTypeUI }}
-                        </span>
+                      <span class="list-item py-3">
+                        {{ item.registrationTypeUI }}
+                      </span>
                       </template>
                     </v-select>
                   </div>
@@ -114,9 +102,9 @@
                       :menu-props="{ bottom: true, offsetY: true }"
                     >
                       <template v-slot="item">
-                        <span class="list-item py-3">
-                          {{ item.registrationTypeUI }}
-                        </span>
+                      <span class="list-item py-3">
+                        {{ item.registrationTypeUI }}
+                      </span>
                       </template>
                     </v-select>
                   </div>
@@ -236,48 +224,67 @@
             </th>
           </tr>
         </thead>
+
+        <tbody v-if="setRegistrationHistory.length">
+        <!-- Parent Registration items -->
+          <template v-for="(item, index) in setRegistrationHistory">
+            <TableRow
+              :key="`registration: ${item.baseRegistrationNumber} - ${index}`"
+              class="registration-data-table"
+              :ref="setRowRef(item)"
+              :setAddRegEffect="['newRegItem', 'newAndFirstItem'].includes(setRowRef(item))"
+              :setDisableActionShadow="overrideWidth"
+              :setHeaders="headers"
+              :setIsExpanded="item.expand || isNewRegParentItem(item)"
+              :setItem="item"
+              :isPpr="isPpr"
+              @action="emitRowAction($event)"
+              @error="emitError($event)"
+              @freezeScroll="freezeTableScroll = $event"
+              @toggleExpand="item.expand = !item.expand"
+            />
+
+            <!-- Children items -->
+            <template v-if="item.expand">
+              <TableRow
+                v-for="childItem in item.changes"
+                class="registration-data-table"
+                :key="`change-${childItem.documentId || childItem.registrationNumber}`"
+                :ref="setRowRef(childItem)"
+                :isPpr="isPpr"
+                :setAddRegEffect="['newRegItem', 'newAndFirstItem'].includes(setRowRef(childItem))"
+                :setDisableActionShadow="overrideWidth"
+                :setChild="true"
+                :setHeaders="setHeaders"
+                :setItem="childItem"
+                @action="emitRowAction($event)"
+                @freezeScroll="freezeTableScroll = $event"
+              />
+            </template>
+          </template>
+
+          <!-- Simulated Pagination -->
+          <template v-if="morePages">
+            <tr>
+              <td :colspan="tableLiteralWidth">
+                <table-observer @intersect="getNext()" />
+                <v-skeleton-loader class="ma-0" :style="`width: ${tableLiteralWidth - 180}px`" type="list-item" />
+              </td>
+            </tr>
+          </template>
+        </tbody>
+
+        <!-- No Data Message -->
+        <tbody v-else>
+          <tr class="text-center">
+            <td :colspan="setHeaders.length">
+              {{tableFiltersActive ? 'No registrations found.' : 'No registrations to show.'}}
+            </td>
+          </tr>
+        </tbody>
+
       </template>
-      <template v-slot:item="{ expand, item, isExpanded }">
-        <TableRow
-          class="registration-data-table"
-          :ref="setRowRef(item)"
-          :setAddRegEffect="['newRegItem', 'newAndFirstItem'].includes(setRowRef(item))"
-          :setDisableActionShadow="overrideWidth"
-          :setHeaders="headers"
-          :setIsExpanded="isExpanded || isNewRegParentItem(item)"
-          :setItem="item"
-          :isPpr="isPpr"
-          @action="emitRowAction($event)"
-          @error="emitError($event)"
-          @freezeScroll="freezeTableScroll = $event"
-          @toggleExpand="item.expand = !isExpanded, expand(!isExpanded)"
-        />
-      </template>
-      <template v-slot:expanded-item="{ item }">
-        <TableRow
-          v-for="change in item.changes"
-          class="registration-data-table"
-          :key="`change-${change.documentId || change.registrationNumber}`"
-          :ref="setRowRef(change)"
-          :isPpr="isPpr"
-          :setAddRegEffect="['newRegItem', 'newAndFirstItem'].includes(setRowRef(change))"
-          :setDisableActionShadow="overrideWidth"
-          :setChild="true"
-          :setHeaders="headers"
-          :setItem="change"
-          @action="emitRowAction($event)"
-          @freezeScroll="freezeTableScroll = $event"
-        />
-      </template>
-      <template v-slot:[`body.append`]>
-        <tr v-if="morePages">
-          <td :colspan="tableLiteralWidth">
-            <table-observer @intersect="getNext()" />
-            <v-skeleton-loader class="ma-0" :style="`width: ${tableLiteralWidth - 180}px`" type="list-item" />
-          </td>
-        </tr>
-      </template>
-    </v-data-table>
+    </v-simple-table>
   </v-container>
 </template>
 
@@ -296,8 +303,8 @@ import flushPromises from 'flush-promises'
 import _ from 'lodash'
 import { DatePicker } from '@/components/common'
 import RegistrationBarTypeAheadList from '@/components/registration/RegistrationBarTypeAheadList.vue'
-import { TableObserver, TableRow } from './common'
 /* eslint-disable no-unused-vars */
+import { SortingIcon, TableObserver, TableRow } from './common'
 import {
   RegistrationSummaryIF,
   AccountProductSubscriptionIF,
@@ -319,9 +326,11 @@ import {
 import { useRegistration } from '@/composables/useRegistration'
 import { MHRegistrationTypes, RegistrationTypesStandard, StatusTypes, MhStatusTypes } from '@/resources'
 import { storeToRefs } from 'pinia'
+import { useTableFeatures } from '@/composables'
 
 export default defineComponent({
   components: {
+    SortingIcon,
     DatePicker,
     RegistrationBarTypeAheadList,
     TableObserver,
@@ -354,7 +363,9 @@ export default defineComponent({
       default: ''
     },
     setRegistrationHistory: {
-      default: [] as (RegistrationSummaryIF | DraftResultIF)[]
+      default: () => [],
+      // To fix: Vue3 supports TS in templates
+      type: Array as () => RegistrationSummaryIF | DraftResultIF | MhrDraftIF | any
     },
     setSort: {
       type: Object as () => RegistrationSortIF,
@@ -420,12 +431,14 @@ export default defineComponent({
       dateTxt,
       clearFilters
     } = useRegistration(props.setSort)
+    const { sortDates } = useTableFeatures()
 
     const localState = reactive({
       expanded: [],
       freezeTableScroll: false,
       loadingPDF: '',
       overrideWidth: false,
+      sortAsc: false,
       registrationTypes: [...RegistrationTypesStandard].slice(1),
       mhrRegistrationTypes: [...MHRegistrationTypes].slice(1),
       showDatePicker: false,
@@ -449,7 +462,6 @@ export default defineComponent({
         return props.setMorePages
       }),
       newReg: computed(() => { return props.setNewRegItem }),
-      registrationHistory: computed(() => { return props.setRegistrationHistory }),
       search: computed(() => { return props.setSearch }),
       tableFiltersActive: computed((): boolean => {
         return !!(dateTxt.value || registrationNumber.value || registrationType.value ||
@@ -502,16 +514,16 @@ export default defineComponent({
     }
 
     const isFirstItem = (item: RegistrationSummaryIF | DraftResultIF): boolean => {
-      const firstBaseReg = localState.registrationHistory[0].baseRegistrationNumber
-      const firstDocId = localState.registrationHistory[0].documentId
+      const firstBaseReg = props.setRegistrationHistory[0].baseRegistrationNumber
+      const firstDocId = props.setRegistrationHistory[0].documentId
       return item.baseRegistrationNumber
         ? item.baseRegistrationNumber === firstBaseReg
         : (item as DraftResultIF).documentId === firstDocId
     }
 
     const isFirstItemMhr = (item: MhRegistrationSummaryIF | MhrDraftIF): boolean => {
-      const firstMhrNumber = localState.registrationHistory[0].mhrNumber
-      const firstDocId = localState.registrationHistory[0].draftNumber
+      const firstMhrNumber = props.setRegistrationHistory[0].mhrNumber
+      const firstDocId = props.setRegistrationHistory[0].draftNumber
       return item.mhrNumber
         ? item.mhrNumber === firstMhrNumber
         : item.draftNumber === firstDocId
@@ -601,9 +613,15 @@ export default defineComponent({
       registrationType.value = val?.registrationTypeAPI || ''
     }
 
+    /** Date sort handler to sort and change sort icon state **/
+    const dateSortHandler = (registrationHistory: Array<any>, dateType: string, reverse: boolean) => {
+      localState.sortAsc = !localState.sortAsc
+      sortDates(registrationHistory, dateType, reverse)
+    }
+
     const getNext = _.throttle(() => {
       // if not loading and reg history exists
-      if (!localState.loadingData && localState.registrationHistory?.length > 0) {
+      if (!localState.loadingData && props.setRegistrationHistory?.length > 0) {
         emit('getNext')
       }
     }, 500, { trailing: false })
@@ -692,6 +710,7 @@ export default defineComponent({
     })
 
     return {
+      dateSortHandler,
       datePicker,
       dateTxt,
       emitError,

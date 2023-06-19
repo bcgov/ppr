@@ -40,7 +40,8 @@ export const mockedRegistration2: RegistrationSummaryIF = {
   registrationNumber: 'BC456788',
   registrationType: APIAmendmentTypes.AMENDMENT,
   securedParties: 'Bank of Montreal',
-  statusType: APIStatusTypes.ACTIVE
+  statusType: APIStatusTypes.ACTIVE,
+  expand: false
 }
 
 export const mockedRegistration2Child: RegistrationSummaryIF = {
@@ -82,7 +83,8 @@ export const mockedDraft1: DraftResultIF = {
   registrationDescription: '',
   path: '/path/to/doc',
   createDateTime: '2021-08-03T17:21:17+00:00',
-  clientReferenceId: 'FFF555'
+  clientReferenceId: 'FFF555',
+  expand: false
 }
 
 export const mockedDraft2: DraftResultIF = {
@@ -124,7 +126,8 @@ export const mockedRegistration1Collapsed: RegistrationSummaryIF = {
   registrationNumber: 'GOV2343',
   registrationType: APIRegistrationTypes.SECURITY_AGREEMENT,
   securedParties: 'Bank of Nova Scotia',
-  statusType: APIStatusTypes.ACTIVE
+  statusType: APIStatusTypes.ACTIVE,
+  expand: false
 }
 
 export const mockedRegistration2Collapsed: RegistrationSummaryIF = {
@@ -141,7 +144,8 @@ export const mockedRegistration2Collapsed: RegistrationSummaryIF = {
   registrationNumber: 'BC456788',
   registrationType: APIAmendmentTypes.AMENDMENT,
   securedParties: 'Bank of Montreal',
-  statusType: APIStatusTypes.ACTIVE
+  statusType: APIStatusTypes.ACTIVE,
+  expand: false
 }
 
 export const mockedMhRegistration: MhRegistrationSummaryIF = {
@@ -158,7 +162,8 @@ export const mockedMhRegistration: MhRegistrationSummaryIF = {
   documentRegistrationNumber: 'GOV2343',
   baseRegistrationNumber: '654321',
   registrationType: APIMhrTypes.MANUFACTURED_HOME_REGISTRATION,
-  statusType: MhApiStatusTypes.ACTIVE
+  statusType: MhApiStatusTypes.ACTIVE,
+  expand: true
 }
 
 export const mockedMhDraft: MhrDraftIF = {

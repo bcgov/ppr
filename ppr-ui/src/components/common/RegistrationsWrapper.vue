@@ -910,7 +910,7 @@ export default defineComponent({
             if (parentIndex === -1) {
               // reg was a child of a new base reg so we are adding the full base reg
               newRegSummary.expand = true
-              baseRegs.unshift(newRegSummary)
+              baseRegs.unshift({ ...newRegSummary, expand: false })
               setRegTableBaseRegs([...baseRegs])
               setRegTableTotalRowCount(getRegTableTotalRowCount.value + 1)
             } else {
@@ -958,7 +958,7 @@ export default defineComponent({
             if (baseRegs.some(reg => reg.registrationNumber === newRegSummary.registrationNumber)) return
 
             // new base reg
-            baseRegs.unshift(newRegSummary)
+            baseRegs.unshift({ ...newRegSummary, expand: false })
             setRegTableBaseRegs([...baseRegs])
             if (!val.prevDraft) {
               // not from a draft so increase

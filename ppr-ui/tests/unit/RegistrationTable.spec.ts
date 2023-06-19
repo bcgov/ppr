@@ -161,6 +161,8 @@ describe('Test registration table with results', () => {
         // expand
         rows.at(i).vm.$emit('toggleExpand', true)
         await flushPromises()
+        await nextTick()
+
         expect(rows.at(i).vm.$props.setIsExpanded).toEqual(true)
         // child row will not be part of original rows list
         const childRow = wrapper.findAllComponents(TableRow).at(i + 1)
