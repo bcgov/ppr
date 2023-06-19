@@ -10,7 +10,6 @@
         v-if="showHelp"
         class="mb-7"
         toggleButtonTitle="Need Help? Contact Us"
-        :defaultHideText="true"
       >
         <h3 class="text-center mb-2">
           Contact BC Registries
@@ -113,7 +112,8 @@ export default defineComponent({
   setup () {
     const {
       getMhrRegistrationValidationModel,
-      isMhrManufacturerRegistration
+      isMhrManufacturerRegistration,
+      isRoleManufacturer
     } = storeToRefs(useStore())
 
     const {
@@ -143,12 +143,12 @@ export default defineComponent({
       showRebuiltStatus: computed(() => !isMhrManufacturerRegistration.value),
       showOtherInformation: computed(() => !isMhrManufacturerRegistration.value),
       manufacturerMakeModelPrompt: computed(() : string => {
-        return isMhrManufacturerRegistration.value
+        return isRoleManufacturer.value
           ? ManufacturerMakeModelPrompt.manufacturer
           : ManufacturerMakeModelPrompt.staff
       }),
       homeCertificationPrompt: computed(() : string => {
-        return isMhrManufacturerRegistration.value
+        return isRoleManufacturer.value
           ? HomeCertificationPrompt.manufacturer
           : HomeCertificationPrompt.staff
       })

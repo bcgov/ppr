@@ -39,12 +39,12 @@ import { computed } from 'vue'
 import { defineComponent, reactive, toRefs } from 'vue-demi'
 
 export default defineComponent({
-  name: 'SimleHelpToggle',
+  name: 'SimpleHelpToggle',
   props: {
     toggleButtonTitle: { default: '' },
     /* show or hide secondary toggle within content */
     hasBottomHideToggle: { default: true },
-    defaultHideText: { default: false }
+    defaultHideText: { default: true }
   },
   setup (props) {
     const localState = reactive({

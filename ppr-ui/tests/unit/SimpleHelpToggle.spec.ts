@@ -37,18 +37,19 @@ describe('SimpleHelpToggle', () => {
     expect(toggleButton.text().includes('Hide')).toBe(false)
   })
 
-  it('has the proper hide text - none default hide text', async () => {
+  it('has the proper hide text - default hide text', async () => {
     const wrapper: Wrapper<any> = createComponent({ toggleButtonTitle: 'test' })
     const toggleButton = wrapper.find(getTestId('help-toggle-btn'))
     await toggleButton.trigger('click')
     expect(toggleButton.text()).not.toBe('test')
-    expect(toggleButton.text()).toBe('Hide test')
+    expect(toggleButton.text()).toBe('Hide Help')
   })
 
-  it('has the proper hide text - default hide text', async () => {
-    const wrapper: Wrapper<any> = createComponent({ toggleButtonTitle: 'test', defaultHideText: true })
+  it('has the proper hide text - none default hide text', async () => {
+    const wrapper: Wrapper<any> = createComponent({ toggleButtonTitle: 'test', defaultHideText: false })
     const toggleButton = wrapper.find(getTestId('help-toggle-btn'))
     await toggleButton.trigger('click')
-    expect(toggleButton.text()).toBe('Hide Help')
+    expect(toggleButton.text()).not.toBe('test')
+    expect(toggleButton.text()).toBe('Hide test')
   })
 })
