@@ -226,10 +226,14 @@ TEST_LOCATION_DATA_OTHER = [
     ('Invalid other band', None, None, None, None, 'band', '123-456-789', None, None, None, None,
      validator.LOCATION_OTHER_ALLOWED)
 ]
-# testdata pattern is ({description}, {rebuilt}, {other}, {message content})
+# testdata pattern is ({description}, {rebuilt}, {other}, {csa_num}, {eng_date}, {staff}, {message content})
 TEST_DESCRIPTION_DATA = [
-    ('Non utf-8 rebuilt remarks', INVALID_TEXT_CHARSET, None, None),
-    ('Non utf-8 other remarks', None, INVALID_TEXT_CHARSET, None)
+    ('Non utf-8 rebuilt remarks', INVALID_TEXT_CHARSET, None, None, None, True, None),
+    ('Non utf-8 other remarks', None, INVALID_TEXT_CHARSET, None, None, True, None),
+    ('Staff no csa, engineer', 'remarks', 'other', None, None, True, None),
+    ('Non-staff csa', 'remarks', 'other', '1234', None, False, None),
+    ('Non-staff eng date', 'remarks', 'other', None, '2023-06-09T19:00:00+00:00', False, None),
+    ('Non-staff no csa, eng date', 'remarks', 'other', None, None, False, validator.DESCRIPTION_CSA_ENGINEER_REQUIRED)
 ]
 # testdata pattern is ({description}, {valid}, {staff}, {doc_id}, {message content}, {status})
 TEST_EXEMPTION_DATA = [
@@ -521,17 +525,27 @@ def test_validate_location_man(session, desc, park_name, dealer, pad, reserve_nu
         assert not error_msg
 
 
-@pytest.mark.parametrize('desc,rebuilt,other,message_content', TEST_DESCRIPTION_DATA)
-def test_validate_reg_description(session, desc, rebuilt, other, message_content):
+@pytest.mark.parametrize('desc,rebuilt,other,csa_num,eng_date,staff,message_content', TEST_DESCRIPTION_DATA)
+def test_validate_reg_description(session, desc, rebuilt, other, csa_num, eng_date, staff, message_content):
     """Assert that description validation works as expected."""
     # setup
     json_data = get_valid_registration(MhrTenancyTypes.SOLE)
+    if staff:
+        json_data['documentId'] = DOC_ID_VALID
     description = json_data.get('description')
     if rebuilt:
         description['rebuiltRemarks'] = rebuilt
     elif other:
         description['otherRemarks'] = other
-    error_msg = validator.validate_registration(json_data, False)
+    if csa_num:
+        description['csaNumber'] = csa_num
+    else:
+        del description['csaNumber']
+        del description['csaStandard']
+    if eng_date:
+        description['engineerDate'] = eng_date
+        description['engineerName'] = 'ENG NAME'
+    error_msg = validator.validate_registration(json_data, staff)
     if message_content:
         assert error_msg.find(message_content) != -1
     else:

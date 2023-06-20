@@ -85,6 +85,26 @@ OWNER_NAME_JSON = {
     },
     'clientReferenceId': 'T-SQ-MI-1'
 }
+OWNER_NAME_VALID_JSON = {
+    'type': 'OWNER_NAME',
+    'criteria': {
+        'ownerName': {
+            'first': 'B',
+            'last': 'MCKAY'
+        }
+    },
+    'clientReferenceId': 'T-SQ-MI-1'
+}
+OWNER_NAME_NONE_JSON = {
+    'type': 'OWNER_NAME',
+    'criteria': {
+        'ownerName': {
+            'first': 'JUNKJUNK',
+            'last': 'JUNK'
+        }
+    },
+    'clientReferenceId': 'T-SQ-MI-1'
+}
 OWNER_NAME_JSON2 = {
     'type': 'OWNER_NAME',
     'criteria': {
@@ -323,10 +343,15 @@ TEST_SERIAL_NUMBER_DATA = [
     ('999999', 0, None, None, None, None),
     ('D1644', 6, '010469', 'D1644', '100570', '03A001644'),
     ('S60009493', 2, '103147', 'S60009493', '017874', '9493'),
-    ('WIN24440204003A', 2, '088121', 'WIN24440204003A', '033168', '3E4003A'),
+    ('WIN24440204003A', 1, '088121', 'WIN24440204003A', '088121', 'WIN24440204003B'),
     ('003000ZA002773B', 1, '102878', '003000ZA002773B', None, None),
-    ('PHH310OR1812828CRCM', 1, '102909', 'PHH310OR1812828CRCM', None, None)
+    ('PHH310OR1812828CRCM', 1, '102909', 'PHH310OR1812828CRCM', None, None),
+    ('0310282AB', 1, '058161', '0310282AB', None, None),
+    ('681323', 1, '010448', '681323', None, None),
+    ('681324', 1, '010448', '681324', None, None),
+    ('A4820717A', 1, '007109', 'A4820717A', '007109', 'A4820717B')
 ]
+
 # testdata pattern is ({last_name}, {first_name}, count)
 TEST_OWNER_IND_DATA = [
     ('Hamm', 'David', 2),
@@ -361,6 +386,27 @@ TEST_COLLAPSE_DATA = [
     ('091688', ORG_NAME_JSON_COLLAPSE, 1, 0, 2),
     ('005520', OWNER_NAME_JSON_COLLAPSE, 1, 0, 5),
     ('099327', SERIAL_NUMBER_JSON_COLLAPSE, 3, 0, 0)
+]
+# testdata pattern is ({mhr_num}, {status}, {city}, {serial}, {year}, {make}, {model}, {id}, {o_status})
+TEST_MHR_NUMBER_DATA_DIRECT = [
+    ('UT-001', 'ACTIVE', 'CITY', '003000ZA002783A', 2015, 'make', 'model', 200000000, 'ACTIVE'),
+    ('JUNK01', 'ACTIVE', 'CITY', '003000ZA002783A', 2015, 'make', 'model', 200000000, 'ACTIVE')
+]
+# testdata pattern is ({mhr_num}, {status}, {city}, {serial}, {year}, {make}, {model}, {id}, {o_status})
+TEST_SERIAL_NUMBER_DATA_DIRECT = [
+    ('UT-001', 'ACTIVE', 'CITY', '003000ZA002783A', 2015, 'make', 'model', 200000000, 'ACTIVE'),
+    ('JUNK01', 'ACTIVE', 'CITY', '9999999', 2015, 'make', 'model', 200000000, 'ACTIVE')
+]
+# testdata pattern is ({mhr_num}, {status}, {city}, {serial}, {year}, {id}, {criteria}, {bus_name}, {o_status})
+TEST_OWNER_BUS_DATA_DIRECT = [
+    ('UT-001', 'ACTIVE', 'CITY', '003000ZA002783A', 2015, 200000000, 'REAL', 'REAL ENGINEERED HOMES INC', 'ACTIVE'),
+    ('JUNK01', 'ACTIVE', 'CITY', '9999999', 2015, 200000000, 'JUNK NON-EXISTENT', None, 'ACTIVE')
+]
+# testdata pattern is ({mhr_num}, {status}, {city}, {serial}, {year}, {id}, {criteria}, {last}, {first}, {middle}, {o_status})
+TEST_OWNER_IND_DATA_DIRECT = [
+    ('UT-001', 'ACTIVE', 'CITY', '003000ZA002783A', 2015, 200000000, OWNER_NAME_VALID_JSON, 'MCKAY', 'BOB', 'ARTHUR',
+     'ACTIVE'),
+    ('JUNK01', 'ACTIVE', 'CITY', '9999999', 2015, 200000000, OWNER_NAME_NONE_JSON, None, None, None, 'ACTIVE')
 ]
 
 
@@ -489,15 +535,15 @@ def test_search_serial(session, search_value, count, mhr1, result1, mhr2, result
     assert query.id
     if count < 1:
         assert not result.get('results')
-    else:
+    elif not model_utils.is_legacy():
         assert len(result['results']) >= count
         match_count = 0
         for match in result['results']:
             if match['mhrNumber'] == mhr1:
                 match_count += 1
-                assert match['serialNumber'] == result1
-            elif mhr2 and match['mhrNumber'] == mhr1:
-                assert match['serialNumber'] == result2
+                assert match['serialNumber'].find(result1) != -1
+            if mhr2 and result2 and match['mhrNumber'] == mhr2:
+                assert match['serialNumber'].find(result2) != -1
         assert match_count > 0
 
 
@@ -585,3 +631,176 @@ def test_search_collapse(session, mhr_num, json_data, active_count, exempt_count
             assert match.get('activeCount') == active_count
             assert match.get('exemptCount') == exempt_count
             assert match.get('historicalCount') == historical_count
+
+
+@pytest.mark.parametrize('mhr_num,status,city,serial,year,make,model,id,o_status', TEST_MHR_NUMBER_DATA_DIRECT)
+def test_search_mhr_number_direct(session, mhr_num, status, city, serial, year, make, model, id, o_status):
+    """Assert that a success mhr number search works as expected."""
+    test_data = copy.deepcopy(MHR_NUMBER_JSON)
+    test_data['criteria']['value'] = mhr_num
+
+    query: SearchRequest = SearchRequest.create_from_json(test_data, 'PS12345', 'UNIT_TEST')
+    query.search_by_mhr_number()
+    results = query.json
+    if mhr_num == 'JUNK01':
+        assert results['totalResultsSize'] == 0
+        assert results['returnedResultsSize'] == 0
+        assert not results.get('results')
+    else:
+        assert results['totalResultsSize'] == 1
+        assert results['returnedResultsSize'] == 1
+        assert results.get('maxResultsSize')
+        assert results.get('searchId')
+        assert results.get('searchDateTime')
+        assert results.get('searchQuery')
+        assert results.get('results')
+        assert len(results['results']) == 1
+        result = results['results'][0]
+        assert result.get('mhrNumber') == mhr_num
+        assert result.get('status') == status
+        assert result.get('homeLocation') == city
+        assert result.get('serialNumber') == serial
+        assert result.get('baseInformation')
+        assert result['baseInformation'].get('year') == year
+        assert result['baseInformation'].get('make') == make
+        assert result['baseInformation'].get('model') == model
+        assert result.get('mhId') == id
+        if o_status == 'ACTIVE':
+            assert result.get('activeCount') == 1
+        elif o_status == 'EXEMPT':
+            assert result.get('exemptCount') == 1
+        elif o_status == 'PREVIOUS':
+            assert result.get('historicalCount') == 1
+
+
+@pytest.mark.parametrize('mhr_num,status,city,serial,year,make,model,id,o_status', TEST_SERIAL_NUMBER_DATA_DIRECT)
+def test_search_serial_number_direct(session, mhr_num, status, city, serial, year, make, model, id, o_status):
+    """Assert that a serial number search works as expected."""
+    test_data = copy.deepcopy(SERIAL_NUMBER_JSON)
+    test_data['criteria']['value'] = serial
+
+    query: SearchRequest = SearchRequest.create_from_json(test_data, 'PS12345', 'UNIT_TEST')
+    query.search_by_serial_number()
+    results = query.json
+    if mhr_num == 'JUNK01':
+        assert results['totalResultsSize'] == 0
+        assert results['returnedResultsSize'] == 0
+        assert not results.get('results')
+    else:
+        assert results['totalResultsSize'] == 1
+        assert results['returnedResultsSize'] == 1
+        assert results.get('maxResultsSize')
+        assert results.get('searchId')
+        assert results.get('searchDateTime')
+        assert results.get('searchQuery')
+        assert results.get('results')
+        assert len(results['results']) == 1
+        result = results['results'][0]
+        assert result.get('mhrNumber') == mhr_num
+        assert result.get('status') == status
+        assert result.get('homeLocation') == city
+        assert result.get('serialNumber') == serial
+        assert result.get('baseInformation')
+        assert result['baseInformation'].get('year') == year
+        assert result['baseInformation'].get('make') == make
+        assert result['baseInformation'].get('model') == model
+        assert result.get('mhId') == id
+        if o_status == 'ACTIVE':
+            assert result.get('activeCount') == 1
+        elif o_status == 'EXEMPT':
+            assert result.get('exemptCount') == 1
+        elif o_status == 'PREVIOUS':
+            assert result.get('historicalCount') == 1
+
+
+@pytest.mark.parametrize('mhr_num,status,city,serial,year,id,criteria,bus_name,o_status', TEST_OWNER_BUS_DATA_DIRECT)
+def test_search_owner_bus_direct(session, mhr_num, status, city, serial, year, id, criteria, bus_name, o_status):
+    """Assert that a owner business name search works as expected."""
+    test_data = copy.deepcopy(ORG_NAME_JSON)
+    test_data['criteria']['value'] = criteria
+
+    query: SearchRequest = SearchRequest.create_from_json(test_data, 'PS12345', 'UNIT_TEST')
+    query.search_by_organization_name()
+    results = query.json
+    if mhr_num == 'JUNK01':
+        assert results['totalResultsSize'] == 0
+        assert results['returnedResultsSize'] == 0
+        assert not results.get('results')
+    else:
+        assert results['totalResultsSize'] >= 1
+        assert results['returnedResultsSize'] >= 1
+        assert results.get('maxResultsSize')
+        assert results.get('searchId')
+        assert results.get('searchDateTime')
+        assert results.get('searchQuery')
+        assert results.get('results')
+        assert len(results['results']) >= 1
+        for result in results['results']:
+            assert result.get('mhrNumber')
+            if result.get('mhrNumber') == mhr_num:
+                assert result.get('status') == status
+                assert result.get('homeLocation') == city
+                assert result.get('serialNumber') == serial
+                assert result.get('baseInformation')
+                assert result['baseInformation'].get('year') == year
+                assert result.get('mhId') == id
+                assert result.get('organizationName') == bus_name
+                if o_status == 'ACTIVE':
+                    assert result.get('activeCount') == 1
+                elif o_status == 'EXEMPT':
+                    assert result.get('exemptCount') == 1
+                elif o_status == 'PREVIOUS':
+                    assert result.get('historicalCount') == 1
+
+
+@pytest.mark.parametrize('mhr_num,status,city,serial,year,id,criteria,last,first,middle,o_status',
+                         TEST_OWNER_IND_DATA_DIRECT)
+def test_search_owner_ind_direct(session, mhr_num, status, city, serial, year, id, criteria, last, first, middle,
+                                 o_status):
+    """Assert that a owner individual name search works as expected."""
+    query: SearchRequest = SearchRequest.create_from_json(criteria, 'PS12345', 'UNIT_TEST')
+    query.search_by_owner_name()
+    results = query.json
+    if mhr_num == 'JUNK01':
+        assert results['totalResultsSize'] == 0
+        assert results['returnedResultsSize'] == 0
+        assert not results.get('results')
+    else:
+        assert results['totalResultsSize'] >= 1
+        assert results['returnedResultsSize'] >= 1
+        assert results.get('maxResultsSize')
+        assert results.get('searchId')
+        assert results.get('searchDateTime')
+        assert results.get('searchQuery')
+        assert results.get('results')
+        assert len(results['results']) >= 1
+        for result in results['results']:
+            assert result.get('mhrNumber')
+            if result.get('mhrNumber') == mhr_num:
+                assert result.get('status') == status
+                assert result.get('homeLocation') == city
+                assert result.get('serialNumber') == serial
+                assert result.get('baseInformation')
+                assert result['baseInformation'].get('year') == year
+                assert result.get('mhId') == id
+                assert result.get('ownerName')
+                assert result['ownerName'].get('last') == last
+                assert result['ownerName'].get('first') == first
+                if middle:
+                    assert result['ownerName'].get('middle') == middle
+                if o_status == 'ACTIVE':
+                    assert result.get('activeCount') == 1
+                elif o_status == 'EXEMPT':
+                    assert result.get('exemptCount') == 1
+                elif o_status == 'PREVIOUS':
+                    assert result.get('historicalCount') == 1
+
+
+def test_search_key(session):
+    """Use to check the value of a specific serial number search key."""
+    key1: str = search_utils.get_serial_number_key('0312269A')
+    key2: str = search_utils.get_serial_number_key('0312269B')
+    current_app.logger.info(f'key1={key1} key2={key2}')
+    key1: str = search_utils.get_serial_number_key('003000ZA00S783A')
+    key2: str = search_utils.get_serial_number_key('003000ZA00S7834')
+    current_app.logger.info(f'key1={key1} key2={key2}')

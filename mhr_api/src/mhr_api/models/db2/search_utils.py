@@ -19,12 +19,13 @@ Search constants and helper functions.
 # Disable Q000: Allow query strings to be in double quotation marks that contain single quotation marks.
 # Disable E122: allow query strings to be more human readable.
 # Disable E131: allow query strings to be more human readable.
-
 import re
+from flask import current_app
 from sqlalchemy.sql import text
 
 from mhr_api.exceptions import DatabaseException
 from mhr_api.models import utils as model_utils
+from mhr_api.models.db2 import utils as db2_utils
 
 
 GET_DETAIL_DAYS_LIMIT = 7 # Number of days in the past a get details request is allowed.
@@ -74,7 +75,8 @@ SELECT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate,
            AND og.status IN ('3', '4')
            FETCH FIRST 1 ROWS ONLY) AS owner_info,
        l.towncity, TRIM(de.sernumb1) AS serial_num, de.yearmade,
-       de.makemodl, mh.manhomid
+       TRIM(de.makemodl) AS make_model, mh.manhomid,
+       TRIM(de.sernumb2) AS serial_num2, TRIM(de.sernumb3) AS serial_num3, TRIM(de.sernumb4) AS serial_num4
   FROM manuhome mh, document d, location l, descript de
  WHERE mh.mhregnum = d.mhregnum
    AND mh.mhstatus != 'D'
@@ -83,73 +85,10 @@ SELECT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate,
    AND l.status = 'A'
    AND mh.manhomid = de.manhomid
    AND de.status = 'A'
-   AND RIGHT(('000000' || TRANSLATE(TRIM(de.sernumb1), '08600064100100000050000042', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')),
-             6) = :query_value
- UNION ALL (
-SELECT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate,
-       (SELECT o.ownrtype || og.status || o.ownrname
-          FROM owner o, owngroup og
-         WHERE mh.manhomid = o.manhomid
-           AND mh.manhomid = og.manhomid
-           AND o.owngrpid = og.owngrpid
-           AND og.status IN ('3', '4')
-           FETCH FIRST 1 ROWS ONLY) AS owner_info,
-       l.towncity, TRIM(de.sernumb2) AS serial_num, de.yearmade,
-       de.makemodl, mh.manhomid
-  FROM manuhome mh, document d, location l, descript de
- WHERE mh.mhregnum = d.mhregnum
-   AND mh.mhstatus != 'D'
-   AND mh.regdocid = d.documtid
-   AND mh.manhomid = l.manhomid
-   AND l.status = 'A'
-   AND mh.manhomid = de.manhomid
-   AND de.status = 'A'
-   AND RIGHT(('000000' || TRANSLATE(TRIM(de.sernumb2), '08600064100100000050000042', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')),
-             6) = :query_value
-) UNION ALL (
-SELECT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate,
-       (SELECT o.ownrtype || og.status || o.ownrname
-          FROM owner o, owngroup og
-         WHERE mh.manhomid = o.manhomid
-           AND mh.manhomid = og.manhomid
-           AND o.owngrpid = og.owngrpid
-           AND og.status IN ('3', '4')
-           FETCH FIRST 1 ROWS ONLY) AS owner_info,
-       l.towncity, TRIM(de.sernumb3) AS serial_num, de.yearmade,
-       de.makemodl, mh.manhomid
-  FROM manuhome mh, document d, location l, descript de
- WHERE mh.mhregnum = d.mhregnum
-   AND mh.mhstatus != 'D'
-   AND mh.regdocid = d.documtid
-   AND mh.manhomid = l.manhomid
-   AND l.status = 'A'
-   AND mh.manhomid = de.manhomid
-   AND de.status = 'A'
-   AND RIGHT(('000000' || TRANSLATE(TRIM(de.sernumb3), '08600064100100000050000042', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')),
-              6) = :query_value
-) UNION ALL (
-SELECT mh.mhregnum, mh.mhstatus, mh.exemptfl, d.regidate,
-       (SELECT o.ownrtype || og.status || o.ownrname
-          FROM owner o, owngroup og
-         WHERE mh.manhomid = o.manhomid
-           AND mh.manhomid = og.manhomid
-           AND o.owngrpid = og.owngrpid
-           AND og.status IN ('3', '4')
-           FETCH FIRST 1 ROWS ONLY) AS owner_info,
-       l.towncity, TRIM(de.sernumb4) AS serial_num, de.yearmade,
-       de.makemodl, mh.manhomid
-  FROM manuhome mh, document d, location l, descript de
- WHERE mh.mhregnum = d.mhregnum
-   AND mh.mhstatus != 'D'
-   AND mh.regdocid = d.documtid
-   AND mh.manhomid = l.manhomid
-   AND l.status = 'A'
-   AND mh.manhomid = de.manhomid
-   AND de.status = 'A'
-   AND RIGHT(('000000' || TRANSLATE(TRIM(de.sernumb4), '08600064100100000050000042', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')),
-             6) = :query_value
-)
-ORDER BY serial_num ASC, mhstatus ASC, mhregnum DESC
+   AND EXISTS (SELECT c.manhomid
+                 FROM cmpserno c
+                WHERE mh.manhomid = c.manhomid
+                  AND HEX(c.serialno) = :query_value)
 """
 
 OWNER_NAME_QUERY = """
@@ -251,7 +190,7 @@ def search_by_owner_name(current_app, db, request_json):
 def search_by_serial_number(current_app, db, request_json):
     """Execute a DB2 search by serial number query."""
     serial_num:str = request_json['criteria']['value']
-    serial_key = get_search_serial_number_key(serial_num)
+    serial_key = get_search_serial_number_key_hex(serial_num)
     current_app.logger.debug(f'DB2 search_by_serial_number search value={serial_num}, key={serial_key}.')
     try:
         query = text(SERIAL_NUM_QUERY)
@@ -280,6 +219,49 @@ def get_search_serial_number_key(serial_num: str) -> str:
     key = re.sub('[A-Z]', '0', key)
     start_pos: int = len(key) - 6
     return key[start_pos:]
+
+def get_search_serial_number_key_hex(serial_num: str) -> str:
+    """Get the compressed search serial number key for the MH serial number."""
+    key: str = ''
+
+    if not serial_num:
+        return key
+    key = serial_num.strip().upper()
+    # 1. Remove all non-alphanumberic characters.
+    key = re.sub('[^0-9A-Z]+', '', key)
+    # current_app.logger.debug(f'1: key={key}')
+    # 2. Add 6 zeroes to the start of the serial number.
+    key = '000000' + key
+    # current_app.logger.debug(f'2: key={key}')
+    # 3. Determine the value of I as last position in the serial number that contains a numeric value.
+    last_pos: int = 0
+    for index, char in enumerate(key):
+        if char.isdigit():
+            last_pos = index
+    # current_app.logger.debug(f'3: last_pos={last_pos}')
+    # 4. Replace alphas with the corresponding integers:
+    # 08600064100100000050000042  where A=0, B=8, C=6…Z=2
+    key = key.replace('B', '8')
+    key = key.replace('C', '6')
+    key = key.replace('G', '6')
+    key = key.replace('H', '4')
+    key = key.replace('I', '1')
+    key = key.replace('L', '1')
+    key = key.replace('S', '5')
+    key = key.replace('Y', '4')
+    key = key.replace('Z', '2')
+    key = re.sub('[A-Z]', '0', key)
+    # current_app.logger.debug(f'4: key={key}')
+    # 5. Take 6 characters of the string beginning at position I – 5 and ending with the position determined by I
+    # in step 3.
+    start_pos = last_pos - 5
+    key = key[start_pos:(last_pos + 1)]
+    # current_app.logger.debug(f'5: key={key}')
+    # 6. Convert it to bytes and return the last 3.
+    key_bytes: bytes = int(key).to_bytes(3, 'big')
+    key_hex = key_bytes.hex().upper()
+    current_app.logger.debug(f'key={key} last 3 bytes={key_bytes} hex={key_hex}')
+    return key_hex
 
 def build_search_result_owner(row):
     """Build a single search by owner summary json from a DB row."""
@@ -366,7 +348,7 @@ def build_search_result_mhr(row):
     # current_app.logger.info(result_json)
     return result_json
 
-def build_search_result_serial(row):
+def build_search_result_serial(row, request_json: dict):
     """Build a single search summary json from a DB row for a serial number search."""
     mh_status = str(row[1])
     status = LEGACY_TO_REGISTRATION_STATUS[mh_status]
@@ -401,4 +383,35 @@ def build_search_result_serial(row):
     else:
         result_json['ownerName'] = model_utils.get_ind_name_from_db2(owner_name)
     result_json['ownerStatus'] = LEGACY_TO_OWNER_STATUS[owner_status]
+    return get_matching_serial_numbers(row, request_json, result_json)
+
+def get_matching_serial_numbers(row, request_json: dict, result_json: dict) -> dict:
+    """Get matching serial number(s) for an individual searcy by serial number result."""
+    serial2: str = str(row[10]) if row[10] else ''
+    serial3: str = str(row[11]) if row[11] else ''
+    serial4: str = str(row[12]) if row[12] else ''
+    if not serial2 and not serial3 and not serial4:
+        return result_json
+    search_val:str = request_json['criteria']['value']
+    search_key = get_search_serial_number_key_hex(search_val)
+    serial_match: str = result_json.get('serialNumber')
+    match_count: int = 0
+    if search_key != get_search_serial_number_key_hex(serial_match):
+        serial_match = ''
+    else:
+        match_count = 1
+    if serial2 and search_key == get_search_serial_number_key_hex(serial2):
+        match_count += 1
+        if serial_match == '' or serial_match.find(serial2) == -1:
+            serial_match += ', ' + serial2 if serial_match != '' else serial2
+    if serial3 and search_key == get_search_serial_number_key_hex(serial3):
+        match_count += 1
+        if serial_match == '' or serial_match.find(serial3) == -1:
+            serial_match += ', ' + serial3 if serial_match != '' else serial3
+    if serial4 and search_key == get_search_serial_number_key_hex(serial4):
+        match_count += 1
+        if serial_match == '' or serial_match.find(serial4) == -1:
+            serial_match += ', ' + serial4 if serial_match != '' else serial4
+    result_json['serialNumber'] = serial_match
+    result_json['activeCount'] = match_count
     return result_json

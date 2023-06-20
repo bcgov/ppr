@@ -56,6 +56,7 @@ LOCATION_STRATA_REQUIRED = 'Location parcel ID or all of lot, plan, land distric
 LOCATION_OTHER_REQUIRED = 'Location parcel ID or all of lot, plan, land district or all of land district, district ' \
     'lot are required for this registration. '
 LOCATION_ADDRESS_MISMATCH = 'The existing location address must match the current location address. '
+DESCRIPTION_CSA_ENGINEER_REQUIRED = 'Either a CSA number or engineer information is required for this registration. '
 OWNER_NAME_MISMATCH = 'The existing owner name must match exactly a current owner name for this registration. '
 MANUFACTURER_DEALER_INVALID = 'The existing location must be a dealer or manufacturer lot for this registration. '
 MANUFACTURER_PERMIT_INVALID = 'A manufacturer can only submit a transport permit once for a home. '
@@ -118,6 +119,7 @@ def validate_registration(json_data, staff: bool = False):
         error_msg += validate_owner_groups(json_data.get('ownerGroups'), True, None, None, owner_count)
         error_msg += validate_owner_party_type(json_data, json_data.get('ownerGroups'), True, owner_count)
         error_msg += validate_location(json_data.get('location'))
+        error_msg += validate_description(json_data.get('description'), staff)
     except Exception as validation_exception:   # noqa: B902; eat all errors
         current_app.logger.error('validate_registration exception: ' + str(validation_exception))
         error_msg += VALIDATOR_ERROR
@@ -583,6 +585,16 @@ def validate_owner_groups_common(groups, registration: MhrRegistration = None, d
     error_msg += validate_group_interest(groups, common_denominator, registration, delete_groups)
     if tc_owner_count_invalid:
         error_msg += OWNERS_COMMON_INVALID
+    return error_msg
+
+
+def validate_description(description, staff: bool):
+    """Verify the description values."""
+    error_msg = ''
+    if not description or staff:
+        return error_msg
+    if not description.get('csaNumber') and not description.get('engineerDate'):
+        error_msg += DESCRIPTION_CSA_ENGINEER_REQUIRED
     return error_msg
 
 

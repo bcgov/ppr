@@ -20,7 +20,7 @@ from .db import db
 from .type_tables import MhrStatusTypes
 
 
-KEY_STATEMENT = "SELECT searchkey_vehicle(:serial_number) AS search_key"  # noqa: Q000
+KEY_STATEMENT = "SELECT mhr_serial_compressed_key(:serial_number) AS search_key"  # noqa: Q000
 
 
 class MhrSection(db.Model):  # pylint: disable=too-many-instance-attributes

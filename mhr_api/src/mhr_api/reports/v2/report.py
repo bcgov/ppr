@@ -150,6 +150,13 @@ class Report:  # pylint: disable=too-few-public-methods
         """Render a staff MH registration report with cover letter."""
         current_app.logger.debug(f'Account {self._account_id} setting up staff reg report data.')
         create_ts = self._report_data['createDateTime']
+        if self._report_data.get('registrationType', '') == MhrRegistrationTypes.REG_NOTE and \
+                self._report_data.get('note'):
+            doc_desc = self._report_data['note'].get('documentDescription')
+            doc_desc = doc_desc.lower().title()
+            doc_desc = doc_desc.replace(' Of ', ' of ')
+            doc_desc = doc_desc.replace(' To ', ' to ')
+            self._report_data['note']['coverDocumentDescription'] = doc_desc
         # 1: Generate the cover page report.
         self._report_key = ReportTypes.MHR_REGISTRATION_COVER
         data = self._setup_report_data()
