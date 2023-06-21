@@ -16,7 +16,7 @@ export const attentionConfig: AttnRefConfigIF = {
   inputLabel: 'Attention (Optional)'
 }
 
-export const attentionConfigManufactuer: AttnRefConfigIF = {
+export const attentionConfigManufacturer: AttnRefConfigIF = {
   ...attentionConfig,
   description: 'If the intended recipient of the registration verification statement and decal is' +
    ' different from the Submitting Party name, add an optional name.' +

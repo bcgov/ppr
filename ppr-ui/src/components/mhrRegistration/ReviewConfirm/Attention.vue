@@ -19,7 +19,7 @@ import { storeToRefs } from 'pinia'
 import { defineComponent, toRefs, PropType, computed, reactive } from 'vue-demi'
 import { useInputRules, useMhrValidations } from '@/composables'
 import { FieldForm } from '@/components/common'
-import { attentionConfig, attentionConfigManufactuer } from '@/resources/attnRefConfigs'
+import { attentionConfig, attentionConfigManufacturer } from '@/resources/attnRefConfigs'
 import { MhrSectVal } from '@/composables/mhrRegistration/enums'
 
 export default defineComponent({
@@ -49,11 +49,10 @@ export default defineComponent({
     }
 
     const localState = reactive({
-      config: computed(() => isRoleManufacturer.value ? attentionConfigManufactuer : attentionConfig)
+      config: computed(() => isRoleManufacturer.value ? attentionConfigManufacturer : attentionConfig)
     })
 
     return {
-      attentionConfig,
       getMhrAttentionReference,
       maxLength,
       setAttenionValidation,
