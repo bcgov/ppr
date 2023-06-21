@@ -21,10 +21,26 @@
       <HomeLocationReview />
     </div>
 
+    <template  v-if="isMhrManufacturerRegistration">
+      <!-- Attention -->
+      <Attention
+        :mhr-sect="MhrSectVal.REVIEW_CONFIRM_VALID"
+        :section-number="1"
+        :validate="isValidatingApp"
+      />
+
+      <!-- Folio or Reference Number -->
+      <FolioOrReferenceNumber
+        :mhr-sect="MhrSectVal.REVIEW_CONFIRM_VALID"
+        :section-number="2"
+        :validate="isValidatingApp"
+      />
+    </template>
+
     <!-- Authorization -->
-    <section id="mh-certify-section" class="mt-10 pt-4">
+    <section id="mhr-certify-section" class="mt-10 pt-4">
       <CertifyInformation
-        :sectionNumber=1
+        :sectionNumber="isMhrManufacturerRegistration ? 3 : 1"
         :setShowErrors="validateAuthorization"
         @certifyValid="authorizationValid = $event"
       />
@@ -56,6 +72,8 @@ import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
 import { useStore } from '@/store/store'
 import { StaffPayment } from '@bcrs-shared-components/staff-payment'
 import {
+  Attention,
+  FolioOrReferenceNumber,
   HomeLocationReview,
   HomeOwnersReview,
   SubmittingPartyReview,
@@ -81,12 +99,19 @@ export default defineComponent({
     SubmittingPartyReview,
     HomeOwnersReview,
     HomeLocationReview,
+    Attention,
+    FolioOrReferenceNumber,
     CertifyInformation,
     StaffPayment
   },
   setup () {
     const { setStaffPayment } = useStore()
-    const { getMhrRegistrationValidationModel, isRoleStaffReg, getSteps } = storeToRefs(useStore())
+    const { 
+      getMhrRegistrationValidationModel, 
+      isRoleStaffReg, 
+      getSteps,
+      isMhrManufacturerRegistration 
+    } = storeToRefs(useStore())
     const route = useRoute()
     const {
       MhrCompVal,
@@ -94,13 +119,9 @@ export default defineComponent({
       setValidation,
       scrollToInvalid,
       getValidation,
-      getStepValidation
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
-    const{
-      setShowGroups,
-      isGlobalEditingMode
-    } = useHomeOwners()
+    const { setShowGroups, isGlobalEditingMode } = useHomeOwners()
 
     const localState = reactive({
       authorizationValid: false,
@@ -112,7 +133,7 @@ export default defineComponent({
           !getValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.AUTHORIZATION_VALID)
       }),
       validateStaffPayment: computed(() => {
-        return localState.isValidatingApp &&
+        return isRoleStaffReg && localState.isValidatingApp &&
           !getValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.STAFF_PAYMENT_VALID)
       }),
       hasStaffPaymentValues: computed(() => {
@@ -231,7 +252,9 @@ export default defineComponent({
 
     return {
       setShowGroups,
+      isMhrManufacturerRegistration,
       isRoleStaffReg,
+      MhrSectVal,
       onStaffPaymentDataUpdate,
       ...toRefs(localState)
     }
