@@ -78,9 +78,11 @@
       </div>
       <div class="cover-data mt-4"><span class="cover-data-bold">Manufactured Home Registration Number:</span> {{ mhrNumber }}</div>
       <div class="cover-data mt-4"><span class="cover-data-bold">Registration Type:</span>
-        {% if registrationType == 'MHREG' %}    
+        {% if registrationType in ('MHREG', 'EXEMPTION_NON_RES', 'EXEMPTION_RES') %}    
           {{ documentDescription|title }}
-        {% elif registrationType in ('REG_STAFF_ADMIN', 'EXEMPTION_NON_RES', 'EXEMPTION_RES') and note is defined %}    
+        {% elif registrationType == 'REG_STAFF_ADMIN' and note is defined and note.coverDocumentDescription is defined %}    
+          {{ note.coverDocumentDescription }}
+        {% elif registrationType == 'REG_STAFF_ADMIN' and note is defined %}    
           {{ note.documentDescription|title }}
         {% else %}
           {{ documentDescription }}

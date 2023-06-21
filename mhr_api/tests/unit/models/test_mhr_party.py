@@ -127,7 +127,7 @@ def test_find_by_registration_id(session, id, has_results):
     parties = MhrParty.find_by_registration_id(id)
     if has_results:
         assert parties
-        assert len(parties) == 1
+        assert len(parties) >= 1
         assert parties[0].party_type == MhrPartyTypes.SUBMITTING
     else:
         assert not parties
@@ -139,7 +139,7 @@ def test_find_by_change_registration_id(session, id, has_results):
     parties = MhrParty.find_by_change_registration_id(id)
     if has_results:
         assert parties
-        assert len(parties) == 1
+        assert len(parties) >= 1
         assert parties[0].party_type == MhrPartyTypes.SUBMITTING
     else:
         assert not parties

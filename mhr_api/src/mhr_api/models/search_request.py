@@ -200,7 +200,7 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         if rows is not None:
             results_json = []
             for row in rows:
-                match = db2_search_utils.build_search_result_serial(row)
+                match = db2_search_utils.build_search_result_serial(row, self.request_json)
                 SearchRequest.update_result_matches(results_json, match, SearchRequest.SearchTypes.SERIAL_NUM)
             self.returned_results_size = len(results_json)
             self.total_results_size = self.returned_results_size
@@ -209,41 +209,109 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
             self.returned_results_size = 0
             self.total_results_size = 0
 
+
+    def search_by_mhr_number(self):
+        """Execute a search by mhr number query."""
+        result = search_utils.search_by_mhr_number(self.request_json)
+        row = None
+        try:
+            row = result.first()
+        except Exception as db_exception:   # noqa: B902; return nicer error
+            current_app.logger.error('DB search_by_mhr_number exception: ' + str(db_exception))
+            raise DatabaseException(db_exception)
+
+        result_json = []
+        if row is not None:
+            result_json.append(search_utils.build_search_result_mhr(row))
+            self.returned_results_size = 1
+            self.total_results_size = 1
+            self.search_response = result_json
+        else:
+            self.returned_results_size = 0
+            self.total_results_size = 0
+
     def search_by_serial_number(self):
-        """Execute a search query for either a serial number search type."""
-        #search_value = self.request_json['criteria']['value']
-        self.returned_results_size = 0
-        self.total_results_size = 0
-        self.search_response = None
+        """Execute a search query for a serial number search type."""
+        result = search_utils.search_by_serial_number(self.request_json)
+        rows = None
+        try:
+            rows = result.fetchall()
+        except Exception as db_exception:   # noqa: B902; return nicer error
+            current_app.logger.error('DB search_by_serial_number exception: ' + str(db_exception))
+            raise DatabaseException(db_exception)
+
+        if rows is not None:
+            results_json = []
+            for row in rows:
+                match = search_utils.build_search_result_serial(row)
+                SearchRequest.update_result_matches(results_json, match, SearchRequest.SearchTypes.SERIAL_NUM)
+            self.returned_results_size = len(results_json)
+            self.total_results_size = self.returned_results_size
+            self.search_response = results_json
+        else:
+            self.returned_results_size = 0
+            self.total_results_size = 0
 
     def search_by_organization_name(self):
         """Execute a owner organization/business name search query."""
-        # search_value = self.request_json['criteria']['organizationName']
-        self.returned_results_size = 0
-        self.total_results_size = 0
-        self.search_response = None
+        result = search_utils.search_by_owner_business(self.request_json)
+        rows = None
+        try:
+            rows = result.fetchall()
+        except Exception as db_exception:   # noqa: B902; return nicer error
+            current_app.logger.error('DB search_by_owner_business exception: ' + str(db_exception))
+            raise DatabaseException(db_exception)
 
-    def search_by_owner_name(self):  # pylint: disable=too-many-locals; easier to follow
+        if rows is not None:
+            results_json = []
+            for row in rows:
+                match = search_utils.build_search_result_owner_bus(row)
+                SearchRequest.update_result_matches(results_json, match, SearchRequest.SearchTypes.ORGANIZATION_NAME)
+            self.returned_results_size = len(results_json)
+            self.total_results_size = self.returned_results_size
+            self.search_response = results_json
+        else:
+            self.returned_results_size = 0
+            self.total_results_size = 0
+
+    def search_by_owner_name(self):
         """Execute a owner individual name search query."""
-        #result = None
-        #middle_name = None
-        #last_name = self.request_json['criteria']['individualName']['last']
-        #first_name = self.request_json['criteria']['individualName']['first']
-        #if 'middle' in self.request_json['criteria']['individualName']:
-        #    middle_name = self.request_json['criteria']['individualName']['middle']
-        self.returned_results_size = 0
-        self.total_results_size = 0
-        self.search_response = None
+        result = search_utils.search_by_owner_individual(self.request_json)
+        rows = None
+        try:
+            rows = result.fetchall()
+        except Exception as db_exception:   # noqa: B902; return nicer error
+            current_app.logger.error('DB search_by_owner_individual exception: ' + str(db_exception))
+            raise DatabaseException(db_exception)
+
+        if rows is not None:
+            results_json = []
+            for row in rows:
+                match = search_utils.build_search_result_owner_ind(row)
+                SearchRequest.update_result_matches(results_json, match, SearchRequest.SearchTypes.OWNER_NAME)
+            self.returned_results_size = len(results_json)
+            self.total_results_size = self.returned_results_size
+            self.search_response = results_json
+        else:
+            self.returned_results_size = 0
+            self.total_results_size = 0
 
     def search(self):
         """Execute a search with the previously set search type and criteria."""
-        use_legacy_db: bool = current_app.config.get('USE_LEGACY_DB', True)
         if self.search_type == self.SearchTypes.MANUFACTURED_HOME_NUM:
             # Format before searching
             search_utils.format_mhr_number(self.request_json)
 
-        if use_legacy_db:
+        if model_utils.is_legacy():
             self.search_db2()
+        elif self.search_type == self.SearchTypes.MANUFACTURED_HOME_NUM:
+            self.search_by_mhr_number()
+        elif self.search_type == self.SearchTypes.SERIAL_NUM:
+            self.search_by_serial_number()
+        elif self.search_type == self.SearchTypes.ORGANIZATION_NAME:
+            self.search_by_organization_name()
+        elif self.search_type == self.SearchTypes.OWNER_NAME:
+            self.search_by_owner_name()
         else:
             raise DatabaseException('SearchRequest.search PosgreSQL not yet implemented.')
 

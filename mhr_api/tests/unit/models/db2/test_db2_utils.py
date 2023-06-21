@@ -91,6 +91,7 @@ TEST_QUERY_FILTER_DATA_MULTIPLE = [
      'BCREG2', "'098487'", db2_utils.REG_FILTER_DATE, db2_utils.REG_FILTER_USERNAME),
 ]
 
+
 @pytest.mark.parametrize('account_id, has_results', TEST_ACCOUNT_REG_DATA)
 def test_find_account_registrations(session, account_id, has_results):
     """Assert that finding account summary MHR registration information works as expected."""
