@@ -27,7 +27,7 @@
             <div
               v-if="showGroups && !(disableGroupHeader(group.groupId) && (hideRemovedOwners || isReadonlyTable))"
               :colspan="4"
-              class="py-1 px-7 group-header-slot"
+              class="py-3 px-7 pl-0 group-header-slot"
               :class="{
                 'spacer-header': disableGroupHeader(group.groupId),
                 'border-error-left': isInvalidOwnerGroup(group.groupId)
@@ -100,8 +100,7 @@
                 </div>
               </template>
 
-              <template v-else-if="item.ownerId">
-                <tr
+                <tr v-else-if="item.ownerId"
                   :key="`owner-row-key-${group.owners.indexOf(item)}`"
                   class="owner-info"
                   :data-test-id="`owner-info-${item.ownerId}`"
@@ -303,7 +302,6 @@
                     </template>
                   </td>
                 </tr>
-              </template>
 
               <!-- For MHR scenarios where users can entirely remove added owners -->
               <tr v-else-if="!hideRemovedOwners && !showGroups">
@@ -428,7 +426,7 @@
       <!-- No Data -->
       <tbody v-else>
         <tr class="text-center">
-          <td :colspan="homeOwnersTableHeaders.length" class="pa-4 text-center" data-test-id="no-data-msg">
+          <td :colspan="homeOwnersTableHeaders.length" class="pa-7 text-center" data-test-id="no-data-msg">
             No owners added yet.
           </td>
         </tr>
@@ -946,9 +944,9 @@ export default defineComponent({
   }
 
   table {
+
+    min-width: 60rem;
     thead.simple {
-      display:table-header-group;
-      table-layout: fixed;
 
       th {
         padding: 0 12px;
@@ -1034,6 +1032,11 @@ export default defineComponent({
     th:first-child,
     td:first-child {
       padding-left: 0 !important;
+    }
+
+    .owner-info {
+      min-width: 60rem;
+      display: flex;
     }
   }
   tbody > tr.v-row-group__header {
