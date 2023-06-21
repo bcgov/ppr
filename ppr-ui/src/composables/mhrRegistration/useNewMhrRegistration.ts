@@ -24,7 +24,7 @@ export const useNewMhrRegistration = () => {
     setMhrDraftNumber,
     setMhrTableHistory,
     setMhrHomeDescription,
-    setMhrAttentionReferenceNum,
+    setMhrAttentionReference,
     setMhrRegistrationDocumentId,
     setMhrRegistrationSubmittingParty,
     setMhrRegistrationHomeOwnerGroups,
@@ -34,10 +34,11 @@ export const useNewMhrRegistration = () => {
     // Getters
     isRoleStaffReg,
     isMhrManufacturerRegistration,
+    getFolioOrReferenceNumber,
     getMhrRegistrationHomeDescription,
     getMhrRegistrationSubmittingParty,
     getMhrRegistrationDocumentId,
-    getMhrAttentionReferenceNum,
+    getMhrAttentionReference,
     getMhrRegistrationLocation,
     getMhrRegistrationHomeOwnerGroups,
     getMhrRegistrationOwnLand,
@@ -138,6 +139,17 @@ export const useNewMhrRegistration = () => {
     setMhrHomeDescription({ key: 'certificationOption', value: HomeCertificationOptions.CSA })
     setMhrRegistrationSubmittingParty(data.submittingParty)
     setMhrRegistrationHomeOwnerGroups(data.ownerGroups)
+    for (const [key, val] of Object.entries(data.location)) {
+      setMhrLocation({ key: key, value: val })
+
+      // Map radio button options for Other Land Types
+      if (
+        [HomeLocationTypes.OTHER_RESERVE, HomeLocationTypes.OTHER_STRATA, HomeLocationTypes.OTHER_TYPE].includes(val)
+      ) {
+        setMhrLocation({ key: 'otherType', value: val })
+        setMhrLocation({ key: 'locationType', value: HomeLocationTypes.OTHER_LAND })
+      }
+    }
   }
 
   /**
@@ -158,7 +170,7 @@ export const useNewMhrRegistration = () => {
     // Set Land Ownership
     setMhrRegistrationOwnLand(draft.ownLand)
     // Set attention
-    setMhrAttentionReferenceNum(draft.attentionReference)
+    setMhrAttentionReference(draft.attentionReference)
     // Set HomeOwners
     setMhrRegistrationHomeOwnerGroups(draft.ownerGroups)
     // Show groups for Tenants in Common
@@ -238,7 +250,7 @@ export const useNewMhrRegistration = () => {
     location.address.region = 'BC'
 
     // Work around require to satisfy schema validations. Currently, not collected by UI.
-    location.address.postalCode = 'A1A 1A1'
+    if (!location.address.postalCode) location.address.postalCode = 'A1A 1A1'
 
     // otherType is not required by API and locationType should have otherType's value (#14751)
     if (location.otherType) {
@@ -278,11 +290,14 @@ export const useNewMhrRegistration = () => {
       }),
       ...(!isMhrManufacturerRegistration.value && {
         documentId: getMhrRegistrationDocumentId.value
+      }),
+      ...(isMhrManufacturerRegistration.value && !!getFolioOrReferenceNumber.value && {
+        clientReferenceId: getFolioOrReferenceNumber.value
       })
     }
 
-    if (getMhrAttentionReferenceNum.value) {
-      data.attentionReference = getMhrAttentionReferenceNum.value
+    if (getMhrAttentionReference.value) {
+      data.attentionReference = getMhrAttentionReference.value
     }
 
     if (getMhrDraftNumber.value) {
