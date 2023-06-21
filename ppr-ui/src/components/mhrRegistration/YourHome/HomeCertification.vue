@@ -223,7 +223,6 @@ export default defineComponent({
     /** Clear/reset forms when select option changes. **/
     watch(() => localState.certificationOption, async () => {
       if (localState.isCsaOption) {
-        // @ts-ignore - function exists
         engineerForm.value?.resetValidation()
         props.validate && await validateForms()
 
@@ -231,7 +230,6 @@ export default defineComponent({
         localState.engineerDate = ''
       }
       if (localState.isEngineerOption) {
-        // @ts-ignore - function exists
         csaForm.value?.resetValidation()
         props.validate && await validateForms()
 
@@ -240,6 +238,9 @@ export default defineComponent({
       }
     })
     return {
+      csaForm,
+      engineerForm,
+      datePicker,
       HomeCertificationOptions,
       required,
       ...toRefs(localState)

@@ -278,6 +278,7 @@ export default defineComponent({
       handleTypeChange,
       handleTypeChangeDialogResp,
       transfersContent,
+      transferTypeForm,
       ...toRefs(localState)
     }
   }
