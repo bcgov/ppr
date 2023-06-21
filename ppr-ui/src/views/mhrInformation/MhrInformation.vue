@@ -103,7 +103,6 @@
                   <HomeOwners
                     isMhrTransfer
                     isReadonlyTable
-                    :homeOwners="reviewOwners"
                     :currentHomeOwners="getMhrTransferCurrentHomeOwnerGroups"
                   />
                 </section>
@@ -426,7 +425,7 @@ export default defineComponent({
     const {
       // Getters
       getMhrUnitNotes,
-      getMhrTransferHomeOwners,
+      getMhrTransferHomeOwners, // used in tests, would need to refactor to remove it
       getMhrInformation,
       getMhrTransferCurrentHomeOwnerGroups,
       getCertifyInformation,
@@ -530,9 +529,6 @@ export default defineComponent({
       }),
       reviewConfirmText: computed((): string => {
         return localState.isReviewMode ? 'Register Changes and Pay' : 'Review and Confirm'
-      }),
-      reviewOwners: computed(() => {
-        return getMhrTransferHomeOwners.value.filter(owner => owner.action !== ActionTypes.REMOVED)
       }),
       enableHomeOwnerChanges: computed(() => {
         return getFeatureFlag('mhr-transfer-enabled')

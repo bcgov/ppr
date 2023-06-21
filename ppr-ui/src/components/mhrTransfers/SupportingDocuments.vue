@@ -47,7 +47,7 @@
 import { useHomeOwners, useTransferOwners } from '@/composables'
 import { SupportingDocumentsOptions } from '@/enums/transferTypes'
 import { MhrRegistrationHomeOwnerIF } from '@/interfaces' // eslint-disable-line no-unused-vars
-import { defineComponent, reactive, toRefs, watch, computed } from 'vue-demi'
+import { defineComponent, reactive, toRefs, watch, computed, onUpdated } from 'vue-demi'
 import { useStore } from '@/store/store'
 import { transferSupportingDocuments } from '@/resources/'
 
@@ -96,8 +96,12 @@ export default defineComponent({
       setUnsavedChanges(true)
     }
 
+    onUpdated(() => {
+      localState.deletedOwnerState = props.deletedOwner
+    })
+
     const localState = reactive({
-      deletedOwnerState: computed(() => props.deletedOwner),
+      deletedOwnerState: props.deletedOwner,
       showDocumentsSelectionError: computed(() => {
         return props.validate && !localState.deletedOwnerState.supportingDocument
       }),

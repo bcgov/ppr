@@ -247,7 +247,7 @@
         <HomeOwnersTable
           class="px-7"
           showChips
-          :homeOwners="hideRemovedOwners ? filteredHomeOwners : getHomeOwners"
+          :homeOwnerGroups="hideRemovedOwners ? filteredHomeOwnersGroups : getHomeOwnerGroups"
           :isAdding="disableAddHomeOwnerBtn"
           :isMhrTransfer="isMhrTransfer"
           :isReadonlyTable="isReadonlyTable"
@@ -278,7 +278,7 @@
     <div v-if="!isReadonlyTable">
       <v-fade-transition>
         <HomeOwnersTable
-          :homeOwners="hideRemovedOwners ? filteredHomeOwners : getHomeOwners"
+          :homeOwnerGroups="hideRemovedOwners ? filteredHomeOwnersGroups : getHomeOwnerGroups"
           :isAdding="disableAddHomeOwnerBtn"
           :isMhrTransfer="isMhrTransfer"
           :hideRemovedOwners="hideRemovedOwners"
@@ -299,7 +299,7 @@ import { BaseDialog } from '@/components/dialogs'
 import { SimpleHelpToggle } from '@/components/common'
 import { useHomeOwners, useMhrValidations, useMhrInformation, useTransferOwners } from '@/composables'
 /* eslint-disable no-unused-vars */
-import { MhrRegistrationTotalOwnershipAllocationIF } from '@/interfaces'
+import { MhrRegistrationHomeOwnerGroupIF, MhrRegistrationTotalOwnershipAllocationIF } from '@/interfaces'
 import { ActionTypes } from '@/enums'
 /* eslint-enable no-unused-vars */
 import { transfersErrors } from '@/resources'
@@ -381,7 +381,7 @@ export default defineComponent({
       showDeleteAllGroupsDialog: false,
       showRemovedAllOwnersMsg: false,
       hideRemovedOwners: false,
-      filteredHomeOwners: [],
+      filteredHomeOwnersGroups: [] as MhrRegistrationHomeOwnerGroupIF[],
       disableAddHomeOwnerBtn: computed(
         () => localState.showAddPersonOrganizationSection || localState.showAddPersonSection
       ),
@@ -415,6 +415,7 @@ export default defineComponent({
       isValidGroups: computed(() => { return hasMinimumGroups() }),
       homeTenancyType: computed(() => { return getHomeTenancyType() }),
       getHomeOwners: computed(() => { return getTransferOrRegistrationHomeOwners() }),
+      getHomeOwnerGroups: computed(() => { return getTransferOrRegistrationHomeOwnerGroups() }),
       hasRemovedOwners: computed(() => {
         return localState.getHomeOwners.filter(ownerGroup => ownerGroup.action === ActionTypes.REMOVED).length > 0
       }),
@@ -474,7 +475,7 @@ export default defineComponent({
     }
 
     const filterDisplayedHomeOwners = (): void => {
-      localState.filteredHomeOwners = []
+      localState.filteredHomeOwnersGroups = []
       getTransferOrRegistrationHomeOwnerGroups().forEach(ownerGroup => {
         // isTransferToExecutorProbateWill condition here due to new owners being added to removed groups in WILL flow
         if (ownerGroup.action !== ActionTypes.REMOVED || isTransferToExecutorProbateWill.value) {
@@ -483,7 +484,7 @@ export default defineComponent({
               if (owner.action === ActionTypes.REMOVED) return { groupId: ownerGroup.groupId }
               else return { ...owner, groupId: ownerGroup.groupId }
             })
-          localState.filteredHomeOwners.push(...owners)
+          localState.filteredHomeOwnersGroups.push({ ...ownerGroup, owners: owners })
         }
       })
     }

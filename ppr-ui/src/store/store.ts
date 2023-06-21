@@ -566,7 +566,14 @@ export const useStore = defineStore('assetsStore', () => {
     return state.value.mhrRegistration.isManualLocationInfo
   })
   const getMhrRegistrationHomeOwnerGroups = computed<MhrRegistrationHomeOwnerGroupIF[]>(() => {
-    return state.value.mhrRegistration.ownerGroups
+    const ownerGroups: MhrRegistrationHomeOwnerGroupIF[] = state.value.mhrRegistration.ownerGroups
+    // add groupId to each owner in every group - required for HomeOwnersTable
+    for (const group of ownerGroups) {
+      for (const owner of group.owners) {
+        owner.groupId = group.groupId
+      }
+    }
+    return ownerGroups
   })
   const getMhrRegistrationValidationModel = computed<MhrValidationStateIF | MhrValidationManufacturerStateIF>(() => {
     return isMhrManufacturerRegistration.value
@@ -606,8 +613,15 @@ export const useStore = defineStore('assetsStore', () => {
     })
     return owners
   })
-  const getMhrTransferHomeOwnerGroups = computed(() => {
-    return state.value.mhrTransfer.ownerGroups
+  const getMhrTransferHomeOwnerGroups = computed((): MhrRegistrationHomeOwnerGroupIF[] => {
+    const ownerGroups: MhrRegistrationHomeOwnerGroupIF[] = state.value.mhrTransfer.ownerGroups
+    // add groupId to each owner in every group - required for HomeOwnersTable
+    for (const group of ownerGroups) {
+      for (const owner of group.owners) {
+        owner.groupId = group.groupId
+      }
+    }
+    return ownerGroups
   })
   const getMhrTransferCurrentHomeOwnerGroups = computed(() => {
     return state.value.mhrTransfer.currentOwnerGroups

@@ -802,7 +802,7 @@ describe('Mhr Information', () => {
     const ownersTable = homeOwnersComponent.findComponent(HomeOwnersTable)
 
     // check owners are in table
-    expect(ownersTable.props().homeOwners.length).toBe(2)
+    expect(homeOwnersComponent.vm.getHomeOwners.length).toBe(2)
 
     // review table doesn't exist yet
     expect(wrapper.find('#owners-review').exists()).toBeFalsy()
@@ -825,7 +825,7 @@ describe('Mhr Information', () => {
 
     // values remain in table
     expect(homeOwnerReadOnly.props().isReadonlyTable).toBe(true)
-    expect(ownersTable.props().homeOwners.length).toBe(2)
+    expect(homeOwnersComponent.vm.getHomeOwners.length).toBe(2)
   })
 
   it('should validate and show components errors on Review screen', async () => {
