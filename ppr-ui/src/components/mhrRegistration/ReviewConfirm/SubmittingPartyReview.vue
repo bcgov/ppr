@@ -94,7 +94,7 @@
               <p class="side-header">{{ attnOrRefConfig.title }}</p>
             </v-col>
             <v-col cols="9">
-              <p class="content ref-text">{{getMhrAttentionReferenceNum || '(Not Entered)'}}</p>
+              <p class="content ref-text">{{getMhrAttentionReference || '(Not Entered)'}}</p>
             </v-col>
           </v-row>
         </section>
@@ -112,7 +112,7 @@ import { PartyAddressSchema } from '@/schemas'
 import { toDisplayPhone } from '@/utils'
 import { useMhrValidations } from '@/composables'
 import { AttnRefConfigIF } from '@/interfaces'
-import { clientConfig, staffConfig } from '@/resources/attnRefConfigs'
+import { attentionConfig, folioOrRefConfig } from '@/resources/attnRefConfigs'
 import { storeToRefs } from 'pinia'
 
 export default defineComponent({
@@ -126,7 +126,7 @@ export default defineComponent({
       isRoleStaffReg,
       getMhrRegistrationSubmittingParty,
       getMhrRegistrationDocumentId,
-      getMhrAttentionReferenceNum,
+      getMhrAttentionReference,
       getMhrRegistrationValidationModel,
       isMhrManufacturerRegistration
     } = storeToRefs(useStore())
@@ -142,7 +142,7 @@ export default defineComponent({
       personName: computed(() => getMhrRegistrationSubmittingParty.value.personName),
       hasAddress: computed(() => !Object.values(localState.address).every(val => !val)),
       attnOrRefConfig: computed((): AttnRefConfigIF => {
-        return isRoleStaffReg.value ? staffConfig : clientConfig
+        return isRoleStaffReg.value ? attentionConfig : folioOrRefConfig
       }),
       showStepError: computed(() => {
         return !isMhrManufacturerRegistration.value && !getStepValidation(MhrSectVal.SUBMITTING_PARTY_VALID)
@@ -179,7 +179,7 @@ export default defineComponent({
       isRoleStaffReg,
       getMhrRegistrationSubmittingParty,
       getMhrRegistrationDocumentId,
-      getMhrAttentionReferenceNum,
+      getMhrAttentionReference,
       getStepValidation,
       getSubmittingPartyName,
       parsePhoneNumber,

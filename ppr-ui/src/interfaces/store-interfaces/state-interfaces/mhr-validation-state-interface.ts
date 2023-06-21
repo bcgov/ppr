@@ -49,7 +49,7 @@ export interface MhrValidationManufacturerStateIF {
   reviewConfirmValid: {
     attentionValid: boolean,
     authorizationValid: boolean,
-    folioOrRefNumValid: boolean,
+    refNumValid: boolean,
     validateSteps: boolean,
     validateApp: boolean
   }
