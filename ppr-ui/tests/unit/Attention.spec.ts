@@ -8,15 +8,14 @@ import { Attention } from '@/components/mhrRegistration/ReviewConfirm'
 import { FieldForm } from '@/components/common'
 
 // Utilities
-import { getTestId } from './utils'
+import { getLastEvent, getTestId } from './utils'
 import { useStore } from '@/store/store'
 import { setActivePinia, createPinia } from 'pinia'
 
 // Resources
 import { attentionConfig, attentionConfigManufacturer } from '@/resources/attnRefConfigs'
 import { mockedManufacturerAuthRoles } from './test-data'
-import { MhrRegistrationType } from '@/resources'
-import { MhrSectVal } from '@/composables/mhrRegistration/enums'
+
 Vue.use(Vuetify)
 const vuetify = new Vuetify({})
 setActivePinia(createPinia())
@@ -39,33 +38,35 @@ function createComponent (propsData: any): Wrapper<any> {
   })
 }
 
+const sectionId = 'attention'
+
 const attentionProps = {
-  mhrSect: '',
+  sectionId,
   sectionNumber: null,
   validate: false
 }
 
 describe('Attention', () => {
   it('renders the component properly', () => {
-    const wrapper: Wrapper<any> = createComponent({ attentionProps })
+    const wrapper: Wrapper<any> = createComponent(attentionProps)
     expect(wrapper.findComponent(Attention).exists()).toBe(true)
     expect(wrapper.findComponent(FieldForm).exists()).toBe(true)
-    expect(wrapper.find(getTestId('mhr-attention-title')).exists()).toBe(true)
-    expect(wrapper.find(getTestId('mhr-attention-description')).exists()).toBe(true)
-    expect(wrapper.find(getTestId('mhr-attention-form')).exists()).toBe(true)
-    expect(wrapper.find(getTestId('mhr-attention-label')).exists()).toBe(true)
-    expect(wrapper.find(getTestId('mhr-attention-text-field')).exists()).toBe(true)
+    expect(wrapper.find(getTestId(`${sectionId}-title`)).exists()).toBe(true)
+    expect(wrapper.find(getTestId(`${sectionId}-description`)).exists()).toBe(true)
+    expect(wrapper.find(getTestId(`${sectionId}-form`)).exists()).toBe(true)
+    expect(wrapper.find(getTestId(`${sectionId}-label`)).exists()).toBe(true)
+    expect(wrapper.find(getTestId(`${sectionId}-text-field`)).exists()).toBe(true)
   })
   it('adds a section number to title', () => {
     const wrapper: Wrapper<any> = createComponent({ ...attentionProps, sectionNumber: 1 })
-    const title = wrapper.find(getTestId('mhr-attention-title'))
+    const title = wrapper.find(getTestId(`${sectionId}-title`))
     expect(title.text()).toBe(`1. ${attentionConfig.title}`)
   })
   it('has the right configurations for staff', () => {
-    const wrapper: Wrapper<any> = createComponent({ attentionProps })
-    const description = wrapper.find(getTestId('mhr-attention-description'))
-    const title = wrapper.find(getTestId('mhr-attention-title'))
-    const label = wrapper.find(getTestId('mhr-attention-label'))
+    const wrapper: Wrapper<any> = createComponent(attentionProps)
+    const description = wrapper.find(getTestId(`${sectionId}-description`))
+    const title = wrapper.find(getTestId(`${sectionId}-title`))
+    const label = wrapper.find(getTestId(`${sectionId}-label`))
     const inputLabel = wrapper.find('.v-label')
 
     expect(description.text()).toBe(attentionConfig.description)
@@ -76,11 +77,11 @@ describe('Attention', () => {
 
   it('has the right configurations for manufacturer', async () => {
     await store.setAuthRoles(mockedManufacturerAuthRoles)
-    const wrapper: Wrapper<any> = createComponent({ attentionProps })
+    const wrapper: Wrapper<any> = createComponent(attentionProps)
 
-    const description = wrapper.find(getTestId('mhr-attention-description'))
-    const title = wrapper.find(getTestId('mhr-attention-title'))
-    const label = wrapper.find(getTestId('mhr-attention-label'))
+    const description = wrapper.find(getTestId(`${sectionId}-description`))
+    const title = wrapper.find(getTestId(`${sectionId}-title`))
+    const label = wrapper.find(getTestId(`${sectionId}-label`))
     const inputLabel = wrapper.find('.v-label')
 
     expect(description.text()).toBe(attentionConfigManufacturer.description)
@@ -90,28 +91,23 @@ describe('Attention', () => {
     await store.setAuthRoles([])
   })
 
-  it('validates maxCharacters', async () => {
-    await store.setAuthRoles(mockedManufacturerAuthRoles)
-    await store.setRegistrationType(MhrRegistrationType)
-    const wrapper: Wrapper<any> = createComponent({ mhrSect: MhrSectVal.REVIEW_CONFIRM_VALID, validate: true })
-    const input = wrapper.find(getTestId('mhr-attention-text-field'))
+  it('validates the attention', async () => {
+    const wrapper: Wrapper<any> = createComponent({ sectionId, validate: true })
+    const input = wrapper.find(getTestId(`${sectionId}-text-field`))
 
     await input.setValue('a'.repeat(40))
     await nextTick()
     let messages = wrapper.findAll('.v-messages__message')
     expect(wrapper.find('.error-text').exists()).toBe(false)
     expect(messages.length).toBe(0)
-    expect(store.getStateModel.mhrValidationManufacturerState.reviewConfirmValid?.attentionValid).toBe(true)
+    expect(getLastEvent(wrapper, 'isAttentionValid')).toBe(true)
 
-    await input.setValue('a'.repeat(256))
+    await input.setValue('a'.repeat(41))
     await nextTick()
     messages = wrapper.findAll('.v-messages__message')
     expect(wrapper.find('.error-text').exists()).toBe(true)
     expect(messages.length).toBe(1)
     expect(messages.at(0).text()).toBe('Maximum 40 characters')
-    expect(store.getStateModel.mhrValidationManufacturerState.reviewConfirmValid?.attentionValid).toBe(false)
-
-    await store.setAuthRoles([])
-    await store.setRegistrationType(null)
+    expect(getLastEvent(wrapper, 'isAttentionValid')).toBe(false)
   })
 })

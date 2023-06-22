@@ -8,15 +8,13 @@ import { FolioOrReferenceNumber } from '@/components/mhrRegistration/ReviewConfi
 import { FieldForm } from '@/components/common'
 
 // Utilities
-import { getTestId } from './utils'
+import { getLastEvent, getTestId } from './utils'
 import { useStore } from '@/store/store'
 import { setActivePinia, createPinia } from 'pinia'
 
 // Resources
 import { folioOrRefConfig } from '@/resources/attnRefConfigs'
-import { mockedManufacturerAuthRoles } from './test-data'
-import { MhrRegistrationType } from '@/resources'
-import { MhrSectVal } from '@/composables/mhrRegistration/enums'
+
 Vue.use(Vuetify)
 const vuetify = new Vuetify({})
 setActivePinia(createPinia())
@@ -39,17 +37,17 @@ function createComponent (propsData: any): Wrapper<any> {
   })
 }
 
-const folioOrRefSectionId = 'mhr-folio-or-reference-number'
+const folioOrRefSectionId = 'folio-or-reference-number'
 
 const folioOrRefProps = {
-  mhrSect: '',
+  sectionId: folioOrRefSectionId,
   sectionNumber: null,
   validate: false
 }
 
 describe('Attention', () => {
   it('renders the component properly', () => {
-    const wrapper: Wrapper<any> = createComponent({ folioOrRefProps })
+    const wrapper: Wrapper<any> = createComponent(folioOrRefProps)
     expect(wrapper.findComponent(FolioOrReferenceNumber).exists()).toBe(true)
     expect(wrapper.findComponent(FieldForm).exists()).toBe(true)
     expect(wrapper.find(getTestId(`${folioOrRefSectionId}-title`)).exists()).toBe(true)
@@ -64,7 +62,7 @@ describe('Attention', () => {
     expect(title.text()).toBe(`1. ${folioOrRefConfig.title}`)
   })
   it('has the right configurations', () => {
-    const wrapper: Wrapper<any> = createComponent({ folioOrRefProps })
+    const wrapper: Wrapper<any> = createComponent(folioOrRefProps)
     const description = wrapper.find(getTestId(`${folioOrRefSectionId}-description`))
     const title = wrapper.find(getTestId(`${folioOrRefSectionId}-title`))
     const label = wrapper.find(getTestId(`${folioOrRefSectionId}-label`))
@@ -76,10 +74,8 @@ describe('Attention', () => {
     expect(inputLabel.text()).toBe(folioOrRefConfig.inputLabel)
   })
 
-  it('validates maxCharacters', async () => {
-    await store.setAuthRoles(mockedManufacturerAuthRoles)
-    await store.setRegistrationType(MhrRegistrationType)
-    const wrapper: Wrapper<any> = createComponent({ mhrSect: MhrSectVal.REVIEW_CONFIRM_VALID, validate: true })
+  it('validates folioOrRefNumber', async () => {
+    const wrapper: Wrapper<any> = createComponent({ sectionId: folioOrRefSectionId, validate: true })
     const input = wrapper.find(getTestId(`${folioOrRefSectionId}-text-field`))
 
     await input.setValue('a'.repeat(30))
@@ -87,17 +83,14 @@ describe('Attention', () => {
     let messages = wrapper.findAll('.v-messages__message')
     expect(wrapper.find('.error-text').exists()).toBe(false)
     expect(messages.length).toBe(0)
-    expect(store.getStateModel.mhrValidationManufacturerState.reviewConfirmValid?.refNumValid).toBe(true)
+    expect(getLastEvent(wrapper, 'isFolioOrRefNumValid')).toBe(true)
 
-    await input.setValue('a'.repeat(256))
+    await input.setValue('a'.repeat(31))
     await nextTick()
     messages = wrapper.findAll('.v-messages__message')
     expect(wrapper.find('.error-text').exists()).toBe(true)
     expect(messages.length).toBe(1)
     expect(messages.at(0).text()).toBe('Maximum 30 characters')
-    expect(store.getStateModel.mhrValidationManufacturerState.reviewConfirmValid?.refNumValid).toBe(false)
-
-    await store.setAuthRoles([])
-    await store.setRegistrationType(null)
+    expect(getLastEvent(wrapper, 'isFolioOrRefNumValid')).toBe(false)
   })
 })

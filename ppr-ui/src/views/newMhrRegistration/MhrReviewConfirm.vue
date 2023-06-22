@@ -24,16 +24,18 @@
     <template  v-if="isMhrManufacturerRegistration">
       <!-- Attention -->
       <Attention
-        :mhr-sect="MhrSectVal.REVIEW_CONFIRM_VALID"
+        section-id="mhr-attention"
         :section-number="1"
         :validate="isValidatingApp"
+        @isAttentionValid="setAttentionValidation"
       />
 
       <!-- Folio or Reference Number -->
       <FolioOrReferenceNumber
-        :mhr-sect="MhrSectVal.REVIEW_CONFIRM_VALID"
+        section-id="mhr-folio-or-reference-number"
         :section-number="2"
         :validate="isValidatingApp"
+        @isFolioOrRefNumValid="setFolioOrReferenceNumberValidation"
       />
     </template>
 
@@ -159,6 +161,14 @@ export default defineComponent({
       }
     })
 
+    const setAttentionValidation = (val : boolean) => {
+      setValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.ATTENTION_VALID, val)
+    }
+
+    const setFolioOrReferenceNumberValidation = (val : boolean) => {
+      setValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.REF_NUM_VALID, val)
+    }
+
     const onStaffPaymentDataUpdate = (val: StaffPaymentIF) => {
       let staffPaymentData: StaffPaymentIF = {
         ...val
@@ -254,8 +264,9 @@ export default defineComponent({
       setShowGroups,
       isMhrManufacturerRegistration,
       isRoleStaffReg,
-      MhrSectVal,
       onStaffPaymentDataUpdate,
+      setAttentionValidation,
+      setFolioOrReferenceNumberValidation,
       ...toRefs(localState)
     }
   }

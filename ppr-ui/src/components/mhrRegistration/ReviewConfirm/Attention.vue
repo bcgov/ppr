@@ -1,33 +1,49 @@
 <template>
-  <FieldForm
-    sectionId="mhr-attention"
-    :description="config.description"
-    :initialValue="getMhrAttentionReference"
-    :inputTitle="config.inputTitle"
-    :inputLabel="config.inputLabel"
-    @isValid="setAttenionValidation"
-    :rules="maxLength(40)"
-    :setValue="setMhrAttentionReference"
-    :title="`${sectionNumber ? sectionNumber + '.' : ''} ${config.title}`"
-    :validate="validate"
-  />
+  <section :id="sectionId" class="mt-13">
+    <h2 :data-test-id="`${sectionId}-title`">
+      {{ `${sectionNumber ? sectionNumber + '.' : ''} ${config.title}`}}
+    </h2>
+    <p class="mt-2" :data-test-id="`${sectionId}-description`">
+      {{ config.description }}
+    </p>
+
+    <v-form ref="attentionForm" v-model="isFormValid" :data-test-id="`${sectionId}-form`">
+      <v-card
+        flat
+        rounded
+        class="mt-6 pt-10 px-7 pb-5"
+        :class="{ 'border-error-left': setShowErrors }"
+        :data-test-id="`${sectionId}-card`"
+      >
+        <FieldForm
+          :section-id="sectionId"
+          :initial-value="getMhrAttentionReference"
+          :input-title="config.inputTitle"
+          :input-label="config.inputLabel"
+          :rules="maxLength(40)"
+          :set-value="setMhrAttentionReference"
+          :show-errors="setShowErrors"
+        />
+      </v-card>
+    </v-form>
+  </section>
 </template>
 
 <script lang="ts">
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
-import { defineComponent, toRefs, PropType, computed, reactive } from 'vue-demi'
-import { useInputRules, useMhrValidations } from '@/composables'
+import { defineComponent, toRefs, computed, reactive, ref, watch } from 'vue-demi'
+import { useInputRules } from '@/composables'
 import { FieldForm } from '@/components/common'
 import { attentionConfig, attentionConfigManufacturer } from '@/resources/attnRefConfigs'
-import { MhrSectVal } from '@/composables/mhrRegistration/enums'
 
 export default defineComponent({
   name: 'Attention',
   components: { FieldForm },
+  emits: ['isAttentionValid'],
   props: {
-    mhrSect: {
-      type: String as PropType<MhrSectVal>,
+    sectionId: {
+      type: String,
       required: true
     },
     sectionNumber: {
@@ -39,23 +55,30 @@ export default defineComponent({
       default: false
     }
   },
-  setup (props) {
+  setup (props, { emit }) {
+    const attentionForm = ref(null)
     const { setMhrAttentionReference } = useStore()
-    const { getMhrAttentionReference, getMhrRegistrationValidationModel, isRoleManufacturer } = storeToRefs(useStore())
-    const { MhrCompVal, setValidation } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
+    const { getMhrAttentionReference, isRoleManufacturer } = storeToRefs(useStore())
     const { maxLength } = useInputRules()
-    const setAttenionValidation = (isValid: boolean) => {
-      setValidation(props.mhrSect, MhrCompVal.ATTENTION_VALID, isValid)
-    }
 
     const localState = reactive({
-      config: computed(() => isRoleManufacturer.value ? attentionConfigManufacturer : attentionConfig)
+      config: computed(() => isRoleManufacturer.value ? attentionConfigManufacturer : attentionConfig),
+      isFormValid: false,
+      setShowErrors: computed(() => props.validate && !localState.isFormValid)
+    })
+
+    watch(() => localState.isFormValid, (val: boolean) => {
+      emit('isAttentionValid', val)
+    })
+
+    watch(() => props.validate, (validate: boolean) => {
+      validate && attentionForm.value?.validate()
     })
 
     return {
+      attentionForm,
       getMhrAttentionReference,
       maxLength,
-      setAttenionValidation,
       setMhrAttentionReference,
       ...toRefs(localState)
     }

@@ -1,33 +1,49 @@
 <template>
-  <FieldForm
-    sectionId="mhr-folio-or-reference-number"
-    :description="folioOrRefConfig.description"
-    :initialValue="getFolioOrReferenceNumber"
-    :inputTitle="folioOrRefConfig.inputTitle"
-    :inputLabel="folioOrRefConfig.inputLabel"
-    @isValid="setRefNumValidation"
-    :rules="maxLength(30)"
-    :setValue="setFolioOrReferenceNumber"
-    :validate="validate"
-    :title="`${sectionNumber ? sectionNumber + '.' : ''} ${folioOrRefConfig.title}`"
-  />
- </template>
+  <section :id="sectionId" class="mt-13">
+    <h2 :data-test-id="`${sectionId}-title`">
+      {{ `${sectionNumber ? sectionNumber + '.' : ''} ${folioOrRefConfig.title}`}}
+    </h2>
+    <p class="mt-2" :data-test-id="`${sectionId}-description`">
+      {{ folioOrRefConfig.description }}
+    </p>
+
+    <v-form ref="folioOrRefForm" v-model="isFormValid" :data-test-id="`${sectionId}-form`">
+      <v-card
+        flat
+        rounded
+        class="mt-6 pt-10 px-7 pb-5"
+        :class="{ 'border-error-left': setShowErrors }"
+        :data-test-id="`${sectionId}-card`"
+      >
+        <FieldForm
+          :section-id="sectionId"
+          :initial-value="getFolioOrReferenceNumber"
+          :input-title="folioOrRefConfig.inputTitle"
+          :input-label="folioOrRefConfig.inputLabel"
+          :rules="maxLength(30)"
+          :set-value="setFolioOrReferenceNumber"
+          :show-errors="setShowErrors"
+        />
+      </v-card>
+    </v-form>
+  </section>
+</template>
 
 <script lang="ts">
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
-import { defineComponent, toRefs, PropType } from 'vue-demi'
-import { useInputRules, useMhrValidations } from '@/composables'
+import { defineComponent, toRefs, ref, computed, reactive, watch } from 'vue-demi'
+import { useInputRules } from '@/composables'
 import { FieldForm } from '@/components/common'
 import { folioOrRefConfig } from '@/resources/attnRefConfigs'
-import { MhrSectVal } from '@/composables/mhrRegistration/enums'
 
 export default defineComponent({
   name: 'FolioOrReferenceNumber',
   components: { FieldForm },
+  emits: ['isFolioOrRefNumValid'],
   props: {
-    mhrSect: {
-      type: String as PropType<MhrSectVal>,
+    sectionId: {
+      type: String,
       required: true
     },
     sectionNumber: {
@@ -39,21 +55,33 @@ export default defineComponent({
       default: false
     }
   },
-  setup (props) {
+  setup (props, { emit }) {
     const { setFolioOrReferenceNumber } = useStore()
-    const { getFolioOrReferenceNumber, getMhrRegistrationValidationModel } = storeToRefs(useStore())
-    const { MhrCompVal, setValidation } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
+    const { getFolioOrReferenceNumber } = storeToRefs(useStore())
     const { maxLength } = useInputRules()
-    const setRefNumValidation = (isValid: boolean) => {
-      setValidation(props.mhrSect, MhrCompVal.REF_NUM_VALID, isValid)
-    }
+
+    const folioOrRefForm = ref(null)
+
+    const localState = reactive({
+      isFormValid: false,
+      setShowErrors: computed(() => props.validate && !localState.isFormValid)
+    })
+
+    watch(() => localState.isFormValid, (val: boolean) => {
+      emit('isFolioOrRefNumValid', val)
+    })
+
+    watch(() => props.validate, (validate: boolean) => {
+      validate && folioOrRefForm.value?.validate()
+    })
 
     return {
       folioOrRefConfig,
+      folioOrRefForm,
       getFolioOrReferenceNumber,
       maxLength,
-      setRefNumValidation,
-      setFolioOrReferenceNumber
+      setFolioOrReferenceNumber,
+      ...toRefs(localState)
     }
   }
 })
