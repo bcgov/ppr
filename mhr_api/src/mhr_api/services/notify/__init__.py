@@ -17,7 +17,6 @@ from http import HTTPStatus
 import google.auth.transport.requests
 import google.oauth2.id_token
 import requests
-
 from flask import current_app
 
 

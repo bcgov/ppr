@@ -230,8 +230,10 @@ def get_batch_manufacturer_registrations():  # pylint: disable=too-many-return-s
             return resource_utils.unauthorized_error_response('batch manufacturer registrations report')
         start_ts: str = request.args.get(model_reg_utils.START_TS_PARAM, None)
         end_ts: str = request.args.get(model_reg_utils.END_TS_PARAM, None)
-        notify: bool = request.args.get(NOTIFY_PARAM, False)
-        return_link: bool = request.args.get(DOWNLOAD_LINK_PARAM, notify)
+        notify: bool = get_optional_param(request, NOTIFY_PARAM, False)
+        return_link: bool = get_optional_param(request, DOWNLOAD_LINK_PARAM, notify)
+        if notify:
+            return_link = True
         if start_ts and end_ts:
             start_ts = resource_utils.remove_quotes(start_ts)
             end_ts = resource_utils.remove_quotes(end_ts)
@@ -364,3 +366,16 @@ def event_error_response(code: str, status_code, message: str = None):
                          status_code,
                          message[:8000])
     return resource_utils.error_response(status_code, error)
+
+
+def get_optional_param(req, param_name: str, default: bool = False) -> bool:
+    """Try and obtain an optional boolean parameter value from the request parameters."""
+    value: bool = default
+    param = req.args.get(param_name)
+    if param is None or not isinstance(param, (bool, str)):
+        return value
+    if isinstance(param, str) and param.lower() in ['true', '1', 'y', 'yes']:
+        value = True
+    elif isinstance(param, bool):
+        value = param
+    return value
