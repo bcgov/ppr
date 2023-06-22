@@ -132,24 +132,22 @@
               >
                 <!-- Edit Form -->
                 <template v-if="showEditParty[index]">
-                  <tr>
-                    <td
-                      colspan="5"
-                      class="pa-0"
-                      :class="{ 'invalid-section': invalidSection }"
-                    >
-                      <v-card flat class="edit-Party-container">
-                        <edit-party
-                          :activeIndex="activeIndex"
-                          :invalidSection="invalidSection"
-                          :setShowErrorBar="showErrorBar"
-                          :isEditMode="true"
-                          @removeSecuredParty="removeParty"
-                          @resetEvent="resetData"
-                        />
-                      </v-card>
-                    </td>
-                  </tr>
+                  <td
+                    colspan="5"
+                    class="pa-0"
+                    :class="{ 'invalid-section': invalidSection }"
+                  >
+                    <v-card flat class="edit-Party-container">
+                      <edit-party
+                        :activeIndex="activeIndex"
+                        :invalidSection="invalidSection"
+                        :setShowErrorBar="showErrorBar"
+                        :isEditMode="true"
+                        @removeSecuredParty="removeParty"
+                        @resetEvent="resetData"
+                      />
+                    </v-card>
+                  </td>
                 </template>
                 <!-- Table Cells -->
                 <template v-else>
