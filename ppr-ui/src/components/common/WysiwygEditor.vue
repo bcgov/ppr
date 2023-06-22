@@ -1,5 +1,5 @@
 <template>
-  <div class="wysiwyg-editor">
+  <div id="wysiwyg-editor">
     <!-- Insert Table Dialog -->
     <base-dialog
       :width="'450px'"
@@ -17,12 +17,12 @@
         />
 
         <v-text-field
-        filled
-        id="insert-columns-input"
-        class="mt-3"
-        label="Number of Columns"
-        v-model.number="insertTableCols"
-        :rules="isNumber('Columns', null,20)"
+          filled
+          id="insert-columns-input"
+          class="mt-3"
+          label="Number of Columns"
+          v-model.number="insertTableCols"
+          :rules="isNumber('Columns', null,20)"
         />
       </template>
     </base-dialog>
@@ -51,10 +51,10 @@
 
       <!-- Clear editor content -->
       <v-btn
+        text small
         class="clear-editor-btn float-right mt-2"
         color="primary"
         :ripple="false"
-        text small
         @click="setEditorContent(null)"
       >
         Clear
@@ -196,7 +196,7 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-.wysiwyg-editor {
+#wysiwyg-editor {
   width: 100%;
   overflow: hidden;
 }
@@ -215,7 +215,6 @@ export default defineComponent({
   overflow: auto;
   padding-right: 0; /* Remove any padding that may affect scrollbar visibility */
   box-sizing: border-box; /* Adjust the box-sizing to include the padding in the width */
-
   background-color: rgba(0, 0, 0, 0.06);
 }
 </style>
