@@ -62,7 +62,7 @@
           />
 
           <tiptap-vuetify
-            v-if="false"
+            v-else
             :extensions="extensions"
             v-model="addDesc"
             id="general-collateral-add-desc"
