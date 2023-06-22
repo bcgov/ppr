@@ -1,10 +1,11 @@
 // Libraries
-import Vue, { nextTick } from 'vue'
+import Vue from 'vue'
 import Vuetify from 'vuetify'
 import { createPinia, setActivePinia } from 'pinia'
 import { useStore } from '../../src/store/store'
 import { TiptapVuetifyPlugin } from 'tiptap-vuetify'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
+import { defaultFlagSet } from '@/utils'
 import {
   mockedGeneralCollateral1,
   mockedVehicleCollateral1,
@@ -16,7 +17,8 @@ import {
 
 // Components
 import { Collateral, GeneralCollateral, VehicleCollateral } from '@/components/collateral'
-import { APIRegistrationTypes, RegistrationFlowType } from '@/enums'
+import { RegistrationFlowType } from '@/enums'
+defaultFlagSet['assets-tiptap-enabled'] = false
 
 Vue.use(Vuetify)
 

@@ -5,6 +5,7 @@ import { createPinia, setActivePinia } from 'pinia'
 import { useStore } from '../../src/store/store'
 import { TiptapVuetifyPlugin, TiptapVuetify } from 'tiptap-vuetify'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
+import { defaultFlagSet } from '@/utils'
 
 // Components
 import { GenColAmend } from '@/components/collateral'
@@ -53,6 +54,7 @@ describe('GenColAmend tests', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
+    defaultFlagSet['assets-tiptap-enabled'] = false
     await store.setRegistrationFlowType(RegistrationFlowType.AMENDMENT)
     await store.setGeneralCollateral([])
   })
