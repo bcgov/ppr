@@ -192,6 +192,7 @@ export default defineComponent({
       hasError,
       considerationRef,
       isTransferDueToDeath,
+      transferDetailsForm,
       updateConsideration,
       clearTransferDetailsData,
       ...toRefs(localState)

@@ -378,6 +378,7 @@ export default defineComponent({
       businessNameRules,
       phoneRules,
       phoneExtensionRules,
+      submittingPartyForm,
       ...toRefs(localState)
     }
   }

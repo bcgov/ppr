@@ -158,6 +158,7 @@ export default defineComponent({
     })
     /** Clear/reset forms when select option changes. **/
     return {
+      addressForm,
       CivicAddressSchema,
       addressLocal,
       country,

@@ -18,7 +18,7 @@ export enum MhrCompVal {
   // Submitting Party Section
   SUBMITTER_VALID = 'submitterValid',
   DOC_ID_VALID = 'documentIdValid',
-  REF_NUM_VALID = 'refNumValid',
+  REF_NUM_VALID = 'refNumValid', // Under review and confirm section for manufacturer registration
 
   // HomeOwners Section
   OWNERS_VALID = 'ownersValid',
@@ -28,8 +28,9 @@ export enum MhrCompVal {
   CIVIC_ADDRESS_VALID = 'civicAddressValid',
 
   // Review Confirm Section
+  ATTENTION_VALID = 'attentionValid', // Only used in Manufacturer registrations
   AUTHORIZATION_VALID = 'authorizationValid',
-  STAFF_PAYMENT_VALID = 'staffPaymentValid',
+  STAFF_PAYMENT_VALID = 'staffPaymentValid', // Only used for staff registrations
   VALIDATE_STEPS = 'validateSteps', // prompt all Step validations
   VALIDATE_APP = 'validateApp' // prompt all APP validations
 

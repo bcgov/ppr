@@ -189,6 +189,7 @@ export default defineComponent({
     }
 
     return {
+      addEditHomeSectionsForm,
       close,
       remove,
       submit,

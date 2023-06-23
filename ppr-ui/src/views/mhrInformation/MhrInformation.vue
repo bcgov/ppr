@@ -373,7 +373,7 @@ import {
   submitMhrTransfer,
   updateMhrDraft
 } from '@/utils'
-import { clientConfig, staffConfig } from '@/resources/attnRefConfigs'
+import { folioOrRefConfig, attentionConfig } from '@/resources/attnRefConfigs'
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
@@ -436,7 +436,7 @@ export default defineComponent({
       getMhrTransferType,
       getMhrTransferDeclaredValue,
       getMhrInfoValidation,
-      getMhrAttentionReferenceNum
+      getMhrAttentionReference
     } = storeToRefs(useStore())
     const {
       isFrozenMhr,
@@ -486,7 +486,7 @@ export default defineComponent({
         isPriority: false
       },
       showTransferType: !!getMhrInformation.value.draftNumber || isFrozenMhr.value || false,
-      attentionReference: getMhrAttentionReferenceNum.value || '',
+      attentionReference: getMhrAttentionReference.value || '',
       cancelOptions: unsavedChangesDialog,
       showCancelDialog: false,
       showCancelChangeDialog: false,
@@ -534,7 +534,7 @@ export default defineComponent({
         return getFeatureFlag('mhr-transfer-enabled')
       }),
       attnOrRefConfig: computed((): AttnRefConfigIF => {
-        return isRoleStaffReg.value ? staffConfig : clientConfig
+        return isRoleStaffReg.value ? attentionConfig : folioOrRefConfig
       }),
       /** True if Jest is running the code. */
       isJestRunning: computed((): boolean => {

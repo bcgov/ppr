@@ -107,8 +107,8 @@ async function start () {
     }),
     router: getVueRouter(),
     store: getVuexStore(),
-    pinia: getPiniaStore(),
-    render: h => h(App)
+    render: h => h(App),
+    pinia: getPiniaStore() // Having pinia last shows pinia in vue devtools plugins
   }).$mount('#app')
 }
 

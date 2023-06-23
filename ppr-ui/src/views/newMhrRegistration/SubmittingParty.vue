@@ -112,7 +112,7 @@ import { useInputRules } from '@/composables'
 import { validateDocumentID } from '@/utils'
 // eslint-disable-next-line no-unused-vars
 import { AttnRefConfigIF, MhrDocIdResponseIF, FormIF } from '@/interfaces'
-import { clientConfig, staffConfig } from '@/resources/attnRefConfigs'
+import { attentionConfig, folioOrRefConfig } from '@/resources/attnRefConfigs'
 import { storeToRefs } from 'pinia'
 
 export default defineComponent({
@@ -125,12 +125,12 @@ export default defineComponent({
     const {
       // Actions
       setMhrRegistrationDocumentId,
-      setMhrAttentionReferenceNum
+      setMhrAttentionReference
     } = useStore()
     const {
       // Getters
       isRoleStaffReg,
-      getMhrAttentionReferenceNum,
+      getMhrAttentionReference,
       getMhrRegistrationDocumentId,
       getMhrRegistrationValidationModel
     } = storeToRefs(useStore())
@@ -147,7 +147,7 @@ export default defineComponent({
     const documentIdForm = ref(null) as FormIF
 
     const localState = reactive({
-      attentionReference: getMhrAttentionReferenceNum.value || '',
+      attentionReference: getMhrAttentionReference.value || '',
       documentId: getMhrRegistrationDocumentId.value || '',
       isDocumentIdValid: false,
       isRefNumValid: false,
@@ -184,7 +184,7 @@ export default defineComponent({
         return localState.displayDocIdError ? ['Must be unique number'] : []
       }),
       attnOrRefConfig: computed((): AttnRefConfigIF => {
-        return isRoleStaffReg.value ? staffConfig : clientConfig
+        return isRoleStaffReg.value ? attentionConfig : folioOrRefConfig
       })
     })
 
@@ -211,7 +211,7 @@ export default defineComponent({
     })
 
     watch(() => localState.attentionReference, (val: string) => {
-      setMhrAttentionReferenceNum(val)
+      setMhrAttentionReference(val)
     })
 
     watch(() => localState.isRefNumValid, (val: boolean) => {
@@ -227,6 +227,7 @@ export default defineComponent({
     }, { deep: true })
 
     return {
+      documentIdForm,
       MhrCompVal,
       MhrSectVal,
       maxLength,

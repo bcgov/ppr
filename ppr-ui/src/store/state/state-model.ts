@@ -286,7 +286,7 @@ export const stateModel: StateModelIF = {
     },
     reviewConfirmValid: {
       attentionValid: false,
-      folioOrRefNumValid: false,
+      refNumValid: false,
       authorizationValid: false,
       validateSteps: false,
       validateApp: false

@@ -67,7 +67,7 @@ export default defineComponent({
       rebuiltStatus.value?.validate()
     })
 
-    return { maxLength, ...toRefs(localState) }
+    return { maxLength, rebuiltStatus, ...toRefs(localState) }
   }
 })
 </script>

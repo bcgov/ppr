@@ -40,7 +40,7 @@ export const useMhrInformation = () => {
     setMhrTransferType,
     setMhrTransferDate,
     setMhrTransferOwnLand,
-    setMhrAttentionReferenceNum,
+    setMhrAttentionReference,
     setMhrTransferConsideration,
     setMhrTransferSubmittingParty
   } = useStore()
@@ -200,7 +200,7 @@ export const useMhrInformation = () => {
     setMhrTransferSubmittingParty(draft.submittingParty)
 
     // Set Attention
-    setMhrAttentionReferenceNum(draft.attentionReference)
+    setMhrAttentionReference(draft.attentionReference)
   }
 
   const parseTransferDetails = (data: MhrTransferApiIF): void => {

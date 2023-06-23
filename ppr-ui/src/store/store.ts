@@ -214,7 +214,7 @@ export const useStore = defineStore('assetsStore', () => {
     const modelRef = toRefs(getMhrRegistrationValidationModel.value)
     return state.value.mhrValidationManufacturerState.reviewConfirmValid.authorizationValid &&
       state.value.mhrValidationManufacturerState.reviewConfirmValid?.attentionValid &&
-      state.value.mhrValidationManufacturerState.reviewConfirmValid?.folioOrRefNumValid &&
+      state.value.mhrValidationManufacturerState.reviewConfirmValid?.refNumValid &&
       useMhrValidations(modelRef).getStepValidation(MhrSectVal.YOUR_HOME_VALID)
   })
   /** The selected registration flow type object. */
@@ -556,7 +556,7 @@ export const useStore = defineStore('assetsStore', () => {
   const getMhrRegistrationDocumentId = computed<string>(() => {
     return state.value.mhrRegistration.documentId
   })
-  const getMhrAttentionReferenceNum = computed<any>(() => {
+  const getMhrAttentionReference = computed<any>(() => {
     return state.value.mhrRegistration.attentionReference
   })
   const getMhrRegistrationLocation = computed<MhrRegistrationHomeLocationIF>((): MhrRegistrationHomeLocationIF => {
@@ -957,7 +957,7 @@ export const useStore = defineStore('assetsStore', () => {
     state.value.mhrRegistration.documentId = value
     setUnsavedChanges(true)
   }
-  function setMhrAttentionReferenceNum (value: string) {
+  function setMhrAttentionReference (value: string) {
     state.value.mhrRegistration.attentionReference = value
     setUnsavedChanges(true)
   }
@@ -1170,7 +1170,7 @@ export const useStore = defineStore('assetsStore', () => {
     getMhrRegistrationSubmittingParty,
     getMhrRegistrationHomeOwners,
     getMhrRegistrationDocumentId,
-    getMhrAttentionReferenceNum,
+    getMhrAttentionReference,
     getMhrRegistrationLocation,
     getIsManualLocation,
     getMhrRegistrationHomeOwnerGroups,
@@ -1273,7 +1273,7 @@ export const useStore = defineStore('assetsStore', () => {
     setMhrSubmittingParty,
     setMhrRegistrationSubmittingParty,
     setMhrRegistrationDocumentId,
-    setMhrAttentionReferenceNum,
+    setMhrAttentionReference,
     setMhrLocation,
     setIsManualLocation,
     setCivicAddress,
