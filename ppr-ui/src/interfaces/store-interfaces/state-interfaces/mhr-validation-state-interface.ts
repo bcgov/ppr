@@ -54,3 +54,11 @@ export interface MhrValidationManufacturerStateIF {
     validateApp: boolean
   }
 }
+
+export interface MhrUnitNoteValidationStateIF {
+  unitNoteAddValid: {
+    documentIdValid: false,
+    remarksValid: false,
+    personGivingNoticeValid: false
+  }
+}

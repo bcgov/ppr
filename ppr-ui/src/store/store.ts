@@ -39,7 +39,8 @@ import {
   UserInfoIF,
   UserProductSubscriptionIF,
   UserSettingsIF,
-  VehicleCollateralIF
+  VehicleCollateralIF,
+  UnitNoteStoreActionIF
 } from '@/interfaces'
 import {
   AccountTypes,
@@ -599,8 +600,16 @@ export const useStore = defineStore('assetsStore', () => {
     return state.value.mhrRegistration.ownLand
   })
 
+  const getMhrUnitNote = computed<UnitNoteIF>(() => {
+    return state.value.mhrUnitNote.note
+  })
+
   const getMhrUnitNoteType = computed<UnitNoteDocTypes>(() => {
     return state.value.mhrUnitNote.note.documentType
+  })
+
+  const getMhrUnitNoteValidation = computed(() => {
+    return state.value.mhrUnitNoteValidationState
   })
 
   /** MHR Getters **/
@@ -1047,6 +1056,10 @@ export const useStore = defineStore('assetsStore', () => {
     state.value.mhrUnitNote.note.documentType = documentType
   }
 
+  function setMhrUnitNote (storeAction: UnitNoteStoreActionIF) {
+    set(state.value.mhrUnitNote.note, storeAction.key, storeAction.value)
+  }
+
   return {
     // Temp feature flag getters
     isTiptapEnabled,
@@ -1208,7 +1221,9 @@ export const useStore = defineStore('assetsStore', () => {
     getMhrTransferAffidavitCompleted,
 
     // MHR Unit Notes
+    getMhrUnitNote,
     getMhrUnitNoteType, // doc type of the Unit Note to register
+    getMhrUnitNoteValidation,
 
     // ACTIONS
 
@@ -1308,7 +1323,8 @@ export const useStore = defineStore('assetsStore', () => {
     setMhrTransferAffidavitCompleted,
 
     // MHR Unit Notes
-    setMhrUnitNoteType
+    setMhrUnitNoteType,
+    setMhrUnitNote
 
   }
 })
