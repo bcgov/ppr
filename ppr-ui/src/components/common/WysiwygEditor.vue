@@ -38,8 +38,8 @@
         <template v-slot:activator="{ on }">
           <v-btn
             v-on="on" text
-            :class="{ 'is-active': editor.isActive(tool.isActiveClass) }"
-            @click="getToolAction(editor, tool)"
+            :class="{ 'is-active': isActiveTool(tool) }"
+            @click="getToolAction(tool)"
           >
             <v-icon small>{{ tool.icon }}</v-icon>
           </v-btn>
@@ -70,7 +70,7 @@
 <script lang="ts">
 import { defineComponent, reactive, toRefs, watch, onMounted, computed } from 'vue-demi'
 import BaseDialog from '@/components/dialogs/BaseDialog.vue'
-import { DialogOptionsIF } from '@/interfaces'
+import { DialogOptionsIF, WysiwygToolsIF } from '@/interfaces'
 import { useInputRules } from '@/composables'
 
 // External editor package and extensions
@@ -139,10 +139,17 @@ export default defineComponent({
       localState.editor.commands.setContent(val)
     }
 
+    /** Returns true if the current tool is active on the selected content **/
+    const isActiveTool = (tool: WysiwygToolsIF) => {
+      return tool.isActiveClass === 'heading'
+        ? localState.editor?.isActive(tool.isActiveClass, { level: tool.hLevel })
+        : localState.editor?.isActive(tool.isActiveClass)
+    }
+
     /** Returns the toolkit formatting function **/
-    const getToolAction = (editor, tool) => {
+    const getToolAction = (tool: WysiwygToolsIF) => {
       if (tool.action === 'insertTable') localState.displayTableInput = true
-      else return editor.chain().focus()[tool.action](tool.hLevel ? { level: tool.hLevel } : null).run()
+      else return localState.editor?.chain().focus()[tool.action](tool.hLevel ? { level: tool.hLevel } : null).run()
     }
 
     /** Handle user input from dialog actions **/
@@ -183,6 +190,7 @@ export default defineComponent({
     return {
       StarterKit,
       isNumber,
+      isActiveTool,
       getToolAction,
       setEditorContent,
       handleDialogAction,

@@ -1,4 +1,13 @@
-import { Wrapper } from '@vue/test-utils'
+import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
+import Vuetify from 'vuetify'
+import VueRouter from 'vue-router'
+import mockRouter from '../MockRouter'
+import { useStore } from '@/store/store'
+import { createPinia, setActivePinia } from 'pinia'
+
+const vuetify = new Vuetify({})
+setActivePinia(createPinia())
+const store = useStore()
 
 /**
  * Returns the last event for a given name, to be used for testing event propagation in response to component changes.
@@ -59,4 +68,26 @@ export function setupIntersectionObserverMock ({
  */
 export function getTestId (dataTestId: string) {
   return `[data-test-id='${dataTestId}']`
+}
+
+/**
+ * Creates and mounts a component, so that it can be tested.
+ *
+ * @returns a Wrapper<any> object with the given parameters.
+ */
+export function createComponent (component: any, props: any): Wrapper<any> {
+  const localVue = createLocalVue()
+  localVue.use(Vuetify)
+  // Prevent the warning "[Vuetify] Unable to locate target [data-app]"
+  document.body.setAttribute('data-app', 'true')
+  localVue.use(VueRouter)
+  const router = mockRouter.mock()
+
+  return mount((component as any), {
+    localVue,
+    propsData: props,
+    router,
+    store,
+    vuetify
+  })
 }

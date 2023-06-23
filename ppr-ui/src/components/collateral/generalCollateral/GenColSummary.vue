@@ -157,7 +157,7 @@
         </v-row>
       </div>
     </div>
-    <div v-else class="general-collateral-summary pt-5">
+    <div v-else class="general-collateral-summary pt-5 pr-3">
       <p v-if="generalCollateral.length > 0" class="ma-0">
         <span v-html="generalCollateral[0].description"></span>
       </p>

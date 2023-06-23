@@ -62,7 +62,7 @@ export const wysiwygToolkitConfig: Array<WysiwygToolsIF> = [
     tooltipText: 'Level 1 Header',
     action: 'toggleHeading',
     hLevel: 1,
-    isActiveClass: 'heading1',
+    isActiveClass: 'heading',
     icon: 'mdi-format-header-1'
   },
   {
@@ -70,7 +70,7 @@ export const wysiwygToolkitConfig: Array<WysiwygToolsIF> = [
     tooltipText: 'Level 2 Header',
     action: 'toggleHeading',
     hLevel: 2,
-    isActiveClass: 'heading2',
+    isActiveClass: 'heading',
     icon: 'mdi-format-header-2'
   },
   {
@@ -78,7 +78,7 @@ export const wysiwygToolkitConfig: Array<WysiwygToolsIF> = [
     tooltipText: 'Level 3 Header',
     action: 'toggleHeading',
     hLevel: 3,
-    isActiveClass: 'heading3',
+    isActiveClass: 'heading',
     icon: 'mdi-format-header-3'
   },
   {
