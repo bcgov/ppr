@@ -33,7 +33,7 @@ import {
 } from 'vue-demi'
 
 export default defineComponent({
-  name: 'FieldForm',
+  name: 'FormField',
   props: {
     initialValue: {
       type: String,

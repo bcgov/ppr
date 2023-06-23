@@ -15,14 +15,14 @@
         :class="{ 'border-error-left': setShowErrors }"
         :data-test-id="`${sectionId}-card`"
       >
-        <FieldForm
-          :section-id="sectionId"
-          :initial-value="getFolioOrReferenceNumber"
-          :input-title="folioOrRefConfig.inputTitle"
-          :input-label="folioOrRefConfig.inputLabel"
+        <FormField
+          :sectionId="sectionId"
+          :initialValue="getFolioOrReferenceNumber"
+          :inputTitle="folioOrRefConfig.inputTitle"
+          :inputLabel="folioOrRefConfig.inputLabel"
           :rules="maxLength(30)"
-          :set-value="setFolioOrReferenceNumber"
-          :show-errors="setShowErrors"
+          :setValue="setFolioOrReferenceNumber"
+          :showErrors="setShowErrors"
         />
       </v-card>
     </v-form>
@@ -34,12 +34,12 @@ import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { defineComponent, toRefs, ref, computed, reactive, watch } from 'vue-demi'
 import { useInputRules } from '@/composables'
-import { FieldForm } from '@/components/common'
+import { FormField } from '@/components/common'
 import { folioOrRefConfig } from '@/resources/attnRefConfigs'
 
 export default defineComponent({
   name: 'FolioOrReferenceNumber',
-  components: { FieldForm },
+  components: { FormField },
   emits: ['isFolioOrRefNumValid'],
   props: {
     sectionId: {

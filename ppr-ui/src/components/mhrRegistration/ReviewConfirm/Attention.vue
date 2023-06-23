@@ -15,14 +15,14 @@
         :class="{ 'border-error-left': setShowErrors }"
         :data-test-id="`${sectionId}-card`"
       >
-        <FieldForm
-          :section-id="sectionId"
-          :initial-value="getMhrAttentionReference"
-          :input-title="config.inputTitle"
-          :input-label="config.inputLabel"
+        <FormField
+          :sectionId="sectionId"
+          :initialValue="getMhrAttentionReference"
+          :inputTitle="config.inputTitle"
+          :inputLabel="config.inputLabel"
           :rules="maxLength(40)"
-          :set-value="setMhrAttentionReference"
-          :show-errors="setShowErrors"
+          :setValue="setMhrAttentionReference"
+          :showErrors="setShowErrors"
         />
       </v-card>
     </v-form>
@@ -34,12 +34,12 @@ import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { defineComponent, toRefs, computed, reactive, ref, watch } from 'vue-demi'
 import { useInputRules } from '@/composables'
-import { FieldForm } from '@/components/common'
+import { FormField } from '@/components/common'
 import { attentionConfig, attentionConfigManufacturer } from '@/resources/attnRefConfigs'
 
 export default defineComponent({
   name: 'Attention',
-  components: { FieldForm },
+  components: { FormField },
   emits: ['isAttentionValid'],
   props: {
     sectionId: {

@@ -5,7 +5,7 @@ import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
 
 // Components
 import { Attention } from '@/components/mhrRegistration/ReviewConfirm'
-import { FieldForm } from '@/components/common'
+import { FormField } from '@/components/common'
 
 // Utilities
 import { getLastEvent, getTestId } from './utils'
@@ -50,7 +50,7 @@ describe('Attention', () => {
   it('renders the component properly', () => {
     const wrapper: Wrapper<any> = createComponent(attentionProps)
     expect(wrapper.findComponent(Attention).exists()).toBe(true)
-    expect(wrapper.findComponent(FieldForm).exists()).toBe(true)
+    expect(wrapper.findComponent(FormField).exists()).toBe(true)
     expect(wrapper.find(getTestId(`${sectionId}-title`)).exists()).toBe(true)
     expect(wrapper.find(getTestId(`${sectionId}-description`)).exists()).toBe(true)
     expect(wrapper.find(getTestId(`${sectionId}-form`)).exists()).toBe(true)
