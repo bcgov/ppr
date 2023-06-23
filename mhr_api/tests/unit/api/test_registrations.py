@@ -24,6 +24,7 @@ from flask import current_app
 from registry_schemas.example_data.mhr import REGISTRATION
 
 from mhr_api.models import MhrRegistration, registration_utils as reg_utils, utils as model_utils
+from mhr_api.resources.registration_utils import notify_man_reg_config, email_batch_man_report_data
 from mhr_api.services.authz import COLIN_ROLE, MHR_ROLE, STAFF_ROLE, BCOL_HELP, ASSETS_HELP
 from mhr_api.services.authz import REGISTER_MH, TRANSFER_SALE_BENEFICIARY, MANUFACTURER_GROUP
 
@@ -146,12 +147,15 @@ TEST_GET_REGISTRATION = [
     ('Invalid MHR Number', [MHR_ROLE], HTTPStatus.NOT_FOUND, '2523', 'TESTXXXX'),
     ('Invalid request Staff no account', [MHR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, None, '150062')
 ]
-# testdata pattern is ({description}, {start_ts}, {end_ts}, {status}, {has_key})
+# testdata pattern is ({description}, {start_ts}, {end_ts}, {status}, {has_key}, {download_link})
 TEST_BATCH_MANUFACTURER_MHREG_DATA = [
-    ('Unauthorized', None, None, HTTPStatus.UNAUTHORIZED, False),
-    ('Valid no data', '2023-02-25T07:01:00+00:00', '2023-02-26T07:01:00+00:00', HTTPStatus.NO_CONTENT, True),
-    ('Valid data', '2023-05-25T07:01:00+00:00', '2023-05-26T07:01:00+00:00', HTTPStatus.OK, True),
-    ('Valid default interval may have data', None, None, HTTPStatus.OK, True)
+    ('Unauthorized', None, None, HTTPStatus.UNAUTHORIZED, False, False),
+    ('Valid no data', '2023-02-25T07:01:00+00:00', '2023-02-26T07:01:00+00:00', HTTPStatus.NO_CONTENT, True, False),
+    ('Valid no data download', '2023-02-25T07:01:00+00:00', '2023-02-26T07:01:00+00:00', HTTPStatus.NO_CONTENT, True,
+     True),
+    ('Valid data', '2023-05-25T07:01:00+00:00', '2023-05-26T07:01:00+00:00', HTTPStatus.OK, True, False),
+    ('Valid data download', '2023-05-25T07:01:00+00:00', '2023-05-26T07:01:00+00:00', HTTPStatus.OK, True, True),
+    ('Valid default interval may have data', None, None, HTTPStatus.OK, True, False)
 ]
 # testdata pattern is ({desc}, {roles}, {status}, {sort_criteria}, {sort_direction})
 TEST_GET_ACCOUNT_DATA_SORT2 = [
@@ -388,9 +392,9 @@ def test_get_account_registrations_filter_date(session, client, jwt, desc, accou
         assert registration['path'] is not None
 
 
-@pytest.mark.parametrize('desc,start_ts,end_ts,status,has_key',TEST_BATCH_MANUFACTURER_MHREG_DATA)
-def test_get_batch_mhreg_manufacturer_report(session, client, jwt, desc, start_ts, end_ts, status, has_key):
-    """Assert that a get account registrations summary list endpoint with filtering works as expected."""
+@pytest.mark.parametrize('desc,start_ts,end_ts,status,has_key,download_link',TEST_BATCH_MANUFACTURER_MHREG_DATA)
+def test_get_batch_mhreg_manufacturer_report(session, client, jwt, desc, start_ts, end_ts, status, has_key, download_link):
+    """Assert that requesting a batch manufacturer registration report works as expected."""
     # setup
     apikey = current_app.config.get('SUBSCRIPTION_API_KEY')
     params: str = ''
@@ -403,6 +407,8 @@ def test_get_batch_mhreg_manufacturer_report(session, client, jwt, desc, start_t
             params += f'&{start}={start_ts}&{end}={end_ts}'
         else:
             params += f'?{start}={start_ts}&{end}={end_ts}'
+    if download_link:
+        params += '&downloadLink=true'
     # test
     rv = client.get('/api/v1/registrations/batch/manufacturer' + params)
     # check
@@ -410,3 +416,33 @@ def test_get_batch_mhreg_manufacturer_report(session, client, jwt, desc, start_t
         assert rv.status_code == status or rv.status_code == HTTPStatus.NO_CONTENT
     else:
         assert rv.status_code == status
+    if download_link and rv.status_code == HTTPStatus.OK:
+        assert rv.json
+        assert rv.json.get('reportDownloadUrl')
+
+
+def test_batch_manufacturer_notify_config(session, client, jwt):
+    """Assert that building the batch manufacturer registration report notify configuration works as expected."""
+    config = notify_man_reg_config()
+    assert config
+    assert config.get('url')
+    assert config.get('recipients')
+    assert config.get('subject')
+    assert config.get('body')
+    assert config.get('bodyNone')
+    assert config.get('filename')
+
+
+def test_batch_manufacturer_notify_email_data(session, client, jwt):
+    """Assert that building the batch manufacturer registration report email data works as expected."""
+    config = notify_man_reg_config()
+    email_data = email_batch_man_report_data(config, None)
+    assert email_data
+    assert email_data.get('recipients')
+    assert email_data.get('content')
+    assert email_data['content'].get('subject')
+    assert email_data['content'].get('body')
+    current_app.logger.debug(email_data)
+    email_data = email_batch_man_report_data(config, 'junk-link')
+    current_app.logger.debug(email_data)
+

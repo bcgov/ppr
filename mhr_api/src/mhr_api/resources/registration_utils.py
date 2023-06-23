@@ -23,6 +23,7 @@ from mhr_api.models import utils as model_utils
 from mhr_api.models.type_tables import MhrDocumentType, MhrDocumentTypes
 from mhr_api.reports import get_pdf
 from mhr_api.resources import utils as resource_utils
+from mhr_api.services.notify import Notify
 from mhr_api.services.authz import is_reg_staff_account
 from mhr_api.services.payment.exceptions import SBCPaymentException
 from mhr_api.services.payment.payment import Payment
@@ -57,6 +58,8 @@ CALLBACK_MESSAGES = {
 }
 PAY_DETAILS_LABEL = 'MH Registration Type:'
 PAY_DETAILS_LABEL_TRANS_ID = 'MH Registration {trans_id} Type:'
+EMAIL_DOWNLOAD = '\n\nTo access the file,\n\n[[{0}]]({1})'
+EVENT_KEY_BATCH_MAN_REG: int = 99000000
 
 
 def pay_and_save_registration(req: request,  # pylint: disable=too-many-arguments
@@ -507,3 +510,47 @@ def get_affirmby(token) -> str:
     if not lastname:
         lastname = token.get('lastname', '')
     return firstname + ' ' + lastname
+
+
+def notify_man_reg_config() -> dict:
+    """Build the notify configuration for a staff manufacturer registrations batch job."""
+    env_var: str = current_app.config.get('NOTIFY_MAN_REG_CONFIG', None)
+    if not env_var:
+        return None
+    return json.loads(env_var)
+
+
+def email_batch_man_report_data(config: dict, report_url: str) -> dict:
+    """Build email notification to reg staff with report download link."""
+    body: str = config.get('body') if report_url else config.get('bodyNone')
+    now_local = model_utils.today_local()
+    rep_date: str = now_local.strftime('%B %-d, %Y')
+    body = body.format(rep_date=rep_date)
+    if report_url:
+        body += EMAIL_DOWNLOAD.format(config.get('filename'), report_url)
+    email_data = {
+        'recipients': config.get('recipients'),
+        'content': {
+            'subject': config.get('subject'),
+            'body': body
+        }
+    }
+    return email_data
+
+
+def email_batch_man_report_staff(report_url: str):
+    """Send email notification to reg staff with batch manufacturer reg report download link."""
+    config = notify_man_reg_config()
+    email_data = email_batch_man_report_data(config, report_url)
+    current_app.logger.debug(email_data)
+    # Send email
+    notify_url = config.get('url')
+    notify = Notify(**{'url': notify_url})
+    status_code = notify.send_email(email_data)
+    message: str = f'Email sent to {notify_url}, return code: {status_code}'
+    current_app.logger.info(message)
+    if status_code != HTTPStatus.OK:
+        EventTracking.create(EVENT_KEY_BATCH_MAN_REG,
+                             EventTracking.EventTrackingTypes.MHR_REGISTRATION_REPORT,
+                             status_code,
+                             message)

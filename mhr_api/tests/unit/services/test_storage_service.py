@@ -60,8 +60,9 @@ def test_cs_save_registration_document(session):
         raw_data = data_file.read()
         data_file.close()
 
-    response = GoogleStorageService.save_document(TEST_REGISTRATION_SAVE_DOC_NAME, raw_data,
-                                                  DocumentTypes.REGISTRATION)
+    response = GoogleStorageService.save_document_link(TEST_REGISTRATION_SAVE_DOC_NAME, raw_data,
+                                                       DocumentTypes.REGISTRATION, 2)
+    current_app.logger.info(response)
     assert response
 
 
@@ -77,7 +78,7 @@ def test_cs_get_search_document_http(session):
 
 def test_cs_get_search_document(session):
     """Assert that getting a search bucket document from google cloud storage works as expected."""
-    raw_data = GoogleStorageService.get_document(TEST_SAVE_DOC_NAME2, DocumentTypes.SEARCH_RESULTS)
+    raw_data = GoogleStorageService.get_document(TEST_SAVE_DOC_NAME, DocumentTypes.SEARCH_RESULTS)
     assert raw_data
     assert len(raw_data) > 0
     with open(TEST_DATAFILE, "wb") as pdf_file:
@@ -93,6 +94,14 @@ def test_cs_get_registration_document(session):
     with open(TEST_REGISTRATION_DATAFILE, "wb") as pdf_file:
         pdf_file.write(raw_data)
         pdf_file.close()
+
+
+def test_cs_get_registration_document_link(session):
+    """Assert that getting a document link from google cloud storage works as expected."""
+    download_link = GoogleStorageService.get_document_link(TEST_REGISTRATION_SAVE_DOC_NAME,
+                                                           DocumentTypes.REGISTRATION,
+                                                           2)
+    assert download_link
 
 
 def test_cs_delete_search_document(session):
