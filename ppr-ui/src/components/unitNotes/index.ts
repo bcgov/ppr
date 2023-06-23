@@ -1,3 +1,5 @@
 export { default as UnitNotePanels } from './UnitNotePanels.vue'
 export { default as UnitNoteAdd } from './UnitNoteAdd.vue'
 export { default as UnitNoteReview } from './UnitNoteReview.vue'
+export { default as DocumentId } from './DocumentId.vue'
+export { default as Remarks } from './Remarks.vue'

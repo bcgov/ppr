@@ -8,9 +8,10 @@ import mockRouter from './MockRouter'
 
 import { MhrUnitNote } from '@/views'
 import { RouteNames, UnitNoteDocTypes } from '@/enums'
-import { UnitNoteAdd, UnitNoteReview } from '@/components/unitNotes'
+import { DocumentId, Remarks, UnitNoteAdd, UnitNoteReview } from '@/components/unitNotes'
 import { getTestId } from './utils'
 import { UnitNotesInfo } from '@/resources/unitNotes'
+import { ContactInformation } from '@/components/common'
 
 Vue.use(Vuetify)
 
@@ -35,7 +36,7 @@ function createComponent (): Wrapper<any> {
   })
 }
 
-describe('Should render MHR Unit Note', () => {
+describe('MHR Unit Note Filing', () => {
   let wrapper: Wrapper<any>
 
   const UNIT_NOTE_DOC_TYPE = UnitNoteDocTypes.NOTICE_OF_CAUTION
@@ -56,5 +57,20 @@ describe('Should render MHR Unit Note', () => {
     expect(unitNoteAdd.find('h1').text()).toContain(UnitNotesInfo[UNIT_NOTE_DOC_TYPE].header)
     expect(wrapper.findComponent(UnitNoteAdd).exists()).toBeTruthy()
     expect(wrapper.findComponent(UnitNoteReview).exists()).toBeFalsy()
+  })
+
+  it('renders MhrUnitNote base component for filing the Unit Note', async () => {
+    expect(wrapper.vm.$route.name).toBe(RouteNames.MHR_INFORMATION_NOTE)
+    expect(wrapper.exists()).toBeTruthy()
+
+    const AddUnitNoteContainer = wrapper.findComponent(UnitNoteAdd)
+    expect(AddUnitNoteContainer.exists()).toBeTruthy()
+
+    expect(AddUnitNoteContainer.findComponent(DocumentId)).toBeTruthy()
+    expect(AddUnitNoteContainer.findComponent(Remarks)).toBeTruthy()
+    expect(AddUnitNoteContainer.findComponent(ContactInformation)).toBeTruthy()
+
+    expect(AddUnitNoteContainer.findAll('.border-error-left').length).toBe(0)
+    expect(AddUnitNoteContainer.findAll('.error-text').length).toBe(0)
   })
 })
