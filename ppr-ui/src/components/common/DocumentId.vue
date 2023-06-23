@@ -73,7 +73,7 @@ export default defineComponent({
   },
   emits: ['isValid'],
   setup (props, { emit }) {
-    const { customRules, isNumber, maxLength } = useInputRules()
+    const { customRules, isNumber, maxLength, required } = useInputRules()
 
     const documentIdForm = ref(null) as FormIF
 
@@ -90,11 +90,14 @@ export default defineComponent({
       uniqueDocIdError: computed(() => {
         // Manual error handling for Unique DocId Lookup
         return localState.displayDocIdError ? ['Must be unique number'] : []
-      }),
-      documentIdRules: computed(() => {
-        return customRules(maxLength(8, true), isNumber())
       })
     })
+
+    const documentIdRules = customRules(
+      required('Enter a Document ID'),
+      maxLength(8, true),
+      isNumber()
+    )
 
     watch(() => props.validate, async () => {
       documentIdForm.value?.validate()
@@ -126,6 +129,7 @@ export default defineComponent({
     )
 
     return {
+      documentIdRules,
       ...toRefs(localState)
     }
   }

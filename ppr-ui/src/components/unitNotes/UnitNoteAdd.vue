@@ -4,7 +4,7 @@
       <DocumentId
         :documentId="unitNoteDocumentId"
         :setStoreProperty="setDocumentId"
-        :validate="true"
+        :validate="false"
         @isValid="handleComponentValid(MhrCompVal.DOC_ID_VALID, $event)"
       />
     </section>
