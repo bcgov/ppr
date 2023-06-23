@@ -3,7 +3,7 @@ import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
 import { createPinia, setActivePinia } from 'pinia'
 import { useStore } from '../../src/store/store'
-
+import { defaultFlagSet } from '@/utils'
 import { TiptapVuetifyPlugin, TiptapVuetify } from 'tiptap-vuetify'
 
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
@@ -11,7 +11,6 @@ import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 // Components
 import { GenColEdit } from '@/components/collateral'
 import { RegistrationFlowType } from '@/enums'
-import { getLastEvent } from './utils'
 
 Vue.use(Vuetify)
 
@@ -54,6 +53,7 @@ describe('GenColEdit tests', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
+    defaultFlagSet['assets-tiptap-enabled'] = false
     await store.setGeneralCollateral([])
   })
   afterEach(() => {

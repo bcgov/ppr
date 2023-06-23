@@ -9,8 +9,16 @@
         <v-col cols="3" class="generic-label pa-4">
           General Collateral
         </v-col>
-        <v-col cols="9" class="pr-4">
+        <v-col cols="9" class="pr-6">
+          <WysiwygEditor
+            v-if="isTiptapEnabled"
+            placeHolderText="Description of General Collateral"
+            :editorContent="newDesc"
+            @emitEditorContent="newDesc = $event"
+          />
+
           <tiptap-vuetify
+            v-else
             :extensions="extensions"
             v-model="newDesc"
             id="general-collateral-new-desc"
@@ -21,7 +29,7 @@
             }"
             :editor-properties="{ editorProps: editorProperties }"
           />
-          <p class="summary-text">
+          <p class="summary-text mt-8">
             Note: If you are pasting text,
             <strong>we recommend pasting plain text</strong>
             to avoid formatting and font issues with PDF and printed
@@ -70,10 +78,13 @@ import {
 } from 'tiptap-vuetify'
 import { storeToRefs } from 'pinia'
 
+import { WysiwygEditor } from '@/components/common'
+
 export default defineComponent({
   name: 'GenColEdit',
   components: {
-    TiptapVuetify
+    TiptapVuetify,
+    WysiwygEditor
   },
   props: {
     showInvalid: {
@@ -83,7 +94,7 @@ export default defineComponent({
   },
   setup (props) {
     const { setGeneralCollateral } = useStore()
-    const { getGeneralCollateral, getRegistrationFlowType } = storeToRefs(useStore())
+    const { getGeneralCollateral, getRegistrationFlowType, isTiptapEnabled } = storeToRefs(useStore())
     const extensions = [
       History,
       Blockquote,
@@ -120,7 +131,7 @@ export default defineComponent({
     }
 
     const localState = reactive({
-      newDesc: '',
+      newDesc: getGeneralCollateral.value[0]?.description || '',
       generalCollateral: computed((): GeneralCollateralIF[] => {
         return (getGeneralCollateral.value as GeneralCollateralIF[]) || []
       }),
@@ -162,6 +173,7 @@ export default defineComponent({
     )
 
     return {
+      isTiptapEnabled,
       extensions,
       editorProperties,
       ...toRefs(localState)

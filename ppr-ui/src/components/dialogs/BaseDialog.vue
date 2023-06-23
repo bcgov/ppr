@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="display" width="720px" persistent :attach="attach">
+  <v-dialog v-model="display" :width="width" persistent :attach="attach">
     <v-card v-if="options" class="px-10 py-9">
       <v-row no-gutters>
         <v-col cols="11">
@@ -59,6 +59,7 @@ export default defineComponent({
   props: {
     setAttach: { type: String, default: '' },
     setDisplay: { type: Boolean, default: false },
+    width: { type: String, default: '720px' },
     setOptions: Object as () => DialogOptionsIF,
     reverseActionButtons: {
       type: Boolean,

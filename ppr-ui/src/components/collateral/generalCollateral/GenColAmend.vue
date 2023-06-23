@@ -28,7 +28,16 @@
       </v-row>
       <v-row no-gutters>
         <v-col class="pr-4">
+          <WysiwygEditor
+            v-if="isTiptapEnabled"
+            class="mt-4"
+            placeHolderText="Enter the General Collateral to be deleted from this registration"
+            :editorContent="delDesc"
+            @emitEditorContent="delDesc = $event"
+          />
+
           <tiptap-vuetify
+            v-else
             :extensions="extensions"
             v-model="delDesc"
             id="general-collateral-delete-desc"
@@ -38,14 +47,22 @@
           />
         </v-col>
       </v-row>
-      <v-row no-gutters>
+      <v-row no-gutters class="mt-4">
         <v-col class="generic-label">
           General Collateral to be Added
         </v-col>
       </v-row>
       <v-row no-gutters>
         <v-col class="pr-4">
+          <WysiwygEditor
+            v-if="isTiptapEnabled"
+            placeHolderText="Enter the General Collateral to be added to this registration"
+            :editorContent="addDesc"
+            @emitEditorContent="addDesc = $event"
+          />
+
           <tiptap-vuetify
+            v-else
             :extensions="extensions"
             v-model="addDesc"
             id="general-collateral-add-desc"
@@ -115,7 +132,8 @@ import {
 } from 'tiptap-vuetify'
 // local
 import { GeneralCollateralIF } from '@/interfaces'
-import { storeToRefs } from 'pinia' // eslint-disable-line no-unused-vars
+import { storeToRefs } from 'pinia'
+import { WysiwygEditor } from '@/components/common'
 
 export default defineComponent({
   props: {
@@ -129,11 +147,12 @@ export default defineComponent({
     }
   },
   components: {
+    WysiwygEditor,
     TiptapVuetify
   },
   setup (props, { emit }) {
     const { setGeneralCollateral } = useStore()
-    const { getGeneralCollateral } = storeToRefs(useStore())
+    const { getGeneralCollateral, isTiptapEnabled } = storeToRefs(useStore())
     const extensions = [
       History,
       Blockquote,
@@ -239,6 +258,7 @@ export default defineComponent({
     })
 
     return {
+      isTiptapEnabled,
       editorProperties,
       extensions,
       onSubmitForm,
