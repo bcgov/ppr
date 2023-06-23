@@ -8,10 +8,10 @@ import mockRouter from './MockRouter'
 
 import { MhrUnitNote } from '@/views'
 import { RouteNames, UnitNoteDocTypes } from '@/enums'
-import { DocumentId, Remarks, UnitNoteAdd, UnitNoteReview } from '@/components/unitNotes'
 import { getTestId } from './utils'
 import { UnitNotesInfo } from '@/resources/unitNotes'
-import { ContactInformation } from '@/components/common'
+import { ContactInformation, DocumentId, Remarks } from '@/components/common'
+import { UnitNoteAdd, UnitNoteReview } from '@/components/unitNotes'
 
 Vue.use(Vuetify)
 

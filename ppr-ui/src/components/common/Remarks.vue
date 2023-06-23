@@ -2,11 +2,11 @@
   <div id="remarks-container">
     <h2>Remarks</h2>
     <p class="mt-2">{{ description }}</p>
-    <v-form ref="remarksForm" v-model="isRemarksFormValid">
+    <v-form ref="remarksForm" v-model="isFormValid">
       <v-card
         id="remarks-card"
         class="py-6 px-8 rounded"
-        :class="{ 'border-error-left': validateRemarks }"
+        :class="{ 'border-error-left': showErrors }"
         flat
       >
         <v-row>
@@ -14,7 +14,7 @@
               <label
                 for="remarks-textarea"
                 class="generic-label"
-                :class="{ 'error-text': validateRemarks }"
+                :class="{ 'error-text': showErrors }"
               >Add Remarks</label>
             </v-col>
           <v-col cols="10">
@@ -64,9 +64,9 @@ export default defineComponent({
     const { maxLength } = useInputRules()
 
     const localState = reactive({
-      isRemarksFormValid: false,
+      isFormValid: false,
       remarks: props.unitNoteRemarks,
-      validateRemarks: computed(() => props.validate && !localState.isRemarksFormValid)
+      showErrors: computed(() => props.validate && !localState.isFormValid)
     })
 
     watch(
@@ -76,7 +76,7 @@ export default defineComponent({
       }
     )
 
-    watch(() => localState.isRemarksFormValid, (val: boolean) => {
+    watch(() => localState.isFormValid, (val: boolean) => {
       emit('isValid', val)
     })
 

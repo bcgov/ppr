@@ -7,13 +7,13 @@
       flat
       rounded
       class="mt-8 pa-8 pr-6"
-      :class="{ 'border-error-left': validateContactInfo }"
+      :class="{ 'border-error-left': showError }"
     >
       <v-row no-gutters>
         <v-col cols="12" sm="2">
           <label
             class="generic-label"
-            :class="{'error-text': validateContactInfo}"
+            :class="{ 'error-text': showError }"
           >
             {{ content.sideLabel }}
           </label>
@@ -229,7 +229,7 @@ export default defineComponent({
       isBusinessOption: computed((): boolean =>
         localState.contactInfoType === SubmittingPartyTypes.BUSINESS
       ),
-      validateContactInfo: computed(() => props.validate && !localState.isContactInfoFormValid)
+      showError: computed(() => props.validate && !localState.isContactInfoFormValid)
     })
 
     watch(() => localState.contactInfoModel, (val) => {
@@ -286,7 +286,7 @@ export default defineComponent({
 
     const businessNameRules = customRules(
       required('Business name is required'),
-      maxLength(70),
+      maxLength(40),
       invalidSpaces()
     )
 

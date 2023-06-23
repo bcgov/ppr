@@ -44,9 +44,7 @@ import { storeToRefs } from 'pinia'
 import { PartyIF, UnitNoteIF } from '@/interfaces'
 import { useMhrValidations } from '@/composables'
 import { MhrCompVal, MhrSectVal } from '@/composables/mhrRegistration/enums'
-import { ContactInformation } from '../common'
-import DocumentId from './DocumentId.vue'
-import Remarks from './Remarks.vue'
+import { DocumentId, Remarks, ContactInformation } from '../common'
 
 export default defineComponent({
   name: 'UnitNoteAdd',
