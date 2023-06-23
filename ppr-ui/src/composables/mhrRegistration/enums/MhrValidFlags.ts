@@ -4,7 +4,8 @@ export enum MhrSectVal {
   HOME_OWNERS_VALID = 'homeOwnersValid',
   ADD_EDIT_OWNERS_VALID = 'addEditOwnersValid',
   LOCATION_VALID = 'locationValid',
-  REVIEW_CONFIRM_VALID = 'reviewConfirmValid'
+  REVIEW_CONFIRM_VALID = 'reviewConfirmValid',
+  UNIT_NOTE_VALID = 'unitNoteAddValid'
 }
 
 export enum MhrCompVal {
@@ -17,7 +18,7 @@ export enum MhrCompVal {
 
   // Submitting Party Section
   SUBMITTER_VALID = 'submitterValid',
-  DOC_ID_VALID = 'documentIdValid',
+  DOC_ID_VALID = 'documentIdValid', // also used for Unit Note
   REF_NUM_VALID = 'refNumValid', // Under review and confirm section for manufacturer registration
 
   // HomeOwners Section
@@ -32,6 +33,9 @@ export enum MhrCompVal {
   AUTHORIZATION_VALID = 'authorizationValid',
   STAFF_PAYMENT_VALID = 'staffPaymentValid', // Only used for staff registrations
   VALIDATE_STEPS = 'validateSteps', // prompt all Step validations
-  VALIDATE_APP = 'validateApp' // prompt all APP validations
+  VALIDATE_APP = 'validateApp', // prompt all APP validations
 
+  // Unit Note Registration
+  REMARKS_VALID = 'remarksValid',
+  PERSON_GIVING_NOTICE_VALID = 'personGivingNoticeValid'
 }

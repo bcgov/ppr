@@ -11,3 +11,8 @@ export interface UnitNoteRegistrationIF {
   }
   note: UnitNoteIF
 }
+
+export interface UnitNoteStoreActionIF {
+  key: string,
+  value: any
+}

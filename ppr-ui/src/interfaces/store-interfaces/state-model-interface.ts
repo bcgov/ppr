@@ -25,7 +25,8 @@ import {
   MhRegistrationSummaryIF,
   mhrInfoValidationStateIF,
   MhrValidationManufacturerStateIF,
-  UnitNoteRegistrationIF
+  UnitNoteRegistrationIF,
+  MhrUnitNoteValidationStateIF
 } from '@/interfaces'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 import { UnitNoteIF } from '@/interfaces/unit-note-interfaces/unit-note-interface'
@@ -83,6 +84,7 @@ export interface StateModelIF {
   mhrRegistration: MhrRegistrationIF
   mhrUnitNotes?: Array<UnitNoteIF>
   mhrUnitNote: UnitNoteRegistrationIF // used for Unit Note filing/registration
+  mhrUnitNoteValidationState: MhrUnitNoteValidationStateIF
   mhrSearchResultSelectAllLien: boolean
   mhrValidationState?: MhrValidationStateIF
   mhrValidationManufacturerState?: MhrValidationManufacturerStateIF
