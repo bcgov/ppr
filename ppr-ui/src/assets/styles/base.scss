@@ -734,6 +734,21 @@ tr.registration-row.draft-registration-row.added-reg-effect td.actions-cell,
 // TipTap focus styling override
 .ProseMirror {
   padding: 12px;
+  h1 {
+    font-size: 20px;
+    line-height: 26px;
+  }
+  h2 {
+    font-size: 18px;
+    line-height: 20px;
+  }
+  h3 {
+    font-size: 16px;
+    line-height: 17px;
+  }
+  hr {
+    margin: 20px 0;
+  }
   p {
     color: $gray9;
   }
