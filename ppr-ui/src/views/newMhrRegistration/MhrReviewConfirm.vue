@@ -8,6 +8,25 @@
         change anything, return to the previous step to make the necessary change.
       </p>
 
+      <!-- Information for manufacturers registration only -->
+      <template v-if="isMhrManufacturerRegistration">
+
+        <p class="mt-3 mb-6">
+          <b>Note: </b>
+          Submitting Party, Home Owner and Location of Home information is based on your manufacturer information
+          and cannot be changed here. If you wish to update this information please contact BC Registries.
+        </p>
+
+        <HelpInformationToggle
+          helpText="If you require assistance with changes to your manufacturer information please contact us."
+        />
+
+        <CautionBox
+          setMsg="After registering, the verification statement and decals will be sent to the Submitting Party."
+        />
+
+      </template>
+
       <!-- Your Home Summary -->
       <YourHomeReview />
 
@@ -81,7 +100,7 @@ import {
   SubmittingPartyReview,
   YourHomeReview
 } from '@/components/mhrRegistration/ReviewConfirm'
-import { CertifyInformation } from '@/components/common'
+import { CertifyInformation, HelpInformationToggle, CautionBox } from '@/components/common'
 import { useMhrValidations } from '@/composables'
 import { RouteNames } from '@/enums'
 /* eslint-disable no-unused-vars */
@@ -104,8 +123,10 @@ export default defineComponent({
     Attention,
     FolioOrReferenceNumber,
     CertifyInformation,
-    StaffPayment
-  },
+    StaffPayment,
+    HelpInformationToggle,
+    CautionBox
+},
   setup () {
     const { setStaffPayment } = useStore()
     const { 
