@@ -6,25 +6,10 @@
         {{ manufacturerMakeModelPrompt }}
       </p>
 
-      <SimpleHelpToggle
+      <HelpInformationToggle
         v-if="showHelp"
-        class="mb-7"
-        toggleButtonTitle="Need Help? Contact Us"
-      >
-        <h3 class="text-center mb-2">
-          Contact BC Registries
-        </h3>
-        <div class="ml-7">
-          <DialogContent
-            :setBaseText="`If you require assistance with changes to your manufacturer information please contact us.`"
-            :setHasContactInfo="true"
-          />
-          <div class="mt-3">
-            <h4>Hours of Operation:</h4>
-            <p class="mb-0">Monday to Friday, 8:30 am - 4:30 pm Pacific time</p>
-          </div>
-        </div>
-      </SimpleHelpToggle>
+        helpText="If you require assistance with changes to your manufacturer information please contact us."
+      />
 
       <ManufacturerMakeModel
         :validate="validateMakeModel"
@@ -91,8 +76,7 @@ import {
   RebuiltStatus,
   OtherInformation
 } from '@/components/mhrRegistration/YourHome'
-import { SimpleHelpToggle } from '@/components/common'
-import { DialogContent } from '@/components/dialogs/common'
+import { HelpInformationToggle } from '@/components/common'
 import { useMhrValidations } from '@/composables/mhrRegistration/useMhrValidations'
 import { storeToRefs } from 'pinia'
 import { ManufacturerMakeModelPrompt, HomeCertificationPrompt } from '@/resources/mhr-registration'
@@ -105,8 +89,7 @@ export default defineComponent({
     ManufacturerMakeModel,
     RebuiltStatus,
     OtherInformation,
-    SimpleHelpToggle,
-    DialogContent
+    HelpInformationToggle
   },
   props: {},
   setup () {

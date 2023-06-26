@@ -224,19 +224,17 @@
             </v-col>
           </v-row>
 
-          <div class="px-4">
-            <v-divider />
-          </div>
+          <v-divider  v-if="showLandDetails" class="mx-4"/>
 
           <!-- Land Details -->
-          <v-row no-gutters class="px-6 pt-6" >
+          <v-row v-if="showLandDetails" no-gutters class="px-6 pt-6" >
             <v-col cols="3" class="pt-1">
               <h3>Land Details</h3>
             </v-col>
           </v-row>
 
           <!-- Lease or Land Ownership -->
-          <v-row no-gutters class="px-6 pt-1" >
+          <v-row v-if="showLandDetails" no-gutters class="px-6 pt-1" >
             <v-col cols="3" class="pt-1">
               <h3>Lease or Land Ownership</h3>
             </v-col>
@@ -329,6 +327,7 @@ export default defineComponent({
         return `The manufactured home is <b>${getMhrRegistrationOwnLand.value ? '' : 'not'}</b> located on land that the
             homeowners own, or on which they have a registered lease of 3 years or more.`
       }),
+      showLandDetails: computed(() => !isMhrManufacturerRegistration.value),
       showStepError: computed(() => {
         return !isMhrManufacturerRegistration.value && !getStepValidation(MhrSectVal.LOCATION_VALID)
       })

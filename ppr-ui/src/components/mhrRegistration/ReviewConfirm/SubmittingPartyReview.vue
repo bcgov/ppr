@@ -35,9 +35,7 @@
             </v-col>
           </v-row>
 
-          <div class="px-4">
-            <v-divider />
-          </div>
+          <v-divider class="mx-4"/>
 
           <v-row no-gutters class="px-6 py-7">
             <v-col cols="3">
@@ -65,38 +63,35 @@
               <p v-else class="content"> (Not Entered) </p>
             </v-col>
             <v-col cols="3" class="pl-3">
-              <p class="content">{{getMhrRegistrationSubmittingParty.emailAddress || '(Not Entered)'}}</p>
+              <p class="content">{{getMhrRegistrationSubmittingParty.emailAddress || emptyText }}</p>
             </v-col>
             <v-col cols="3" class="pl-4">
               <p class="content" v-html="parsePhoneNumber()"></p>
             </v-col>
           </v-row>
 
-          <div class="px-4">
-            <v-divider />
-          </div>
+          <v-divider v-if="showDocumentID" class="mx-4"/>
 
-          <v-row no-gutters class="px-6 py-7">
+          <v-row v-if="showDocumentID" no-gutters class="px-6 py-7">
             <v-col cols="3">
               <h3>Document ID</h3>
             </v-col>
             <v-col cols="9">
-              <p class="content ref-text">{{getMhrRegistrationDocumentId || '(Not Entered)'}}</p>
+              <p class="content ref-text">{{getMhrRegistrationDocumentId || emptyText }}</p>
             </v-col>
           </v-row>
 
-          <div class="px-4">
-            <v-divider />
-          </div>
+          <v-divider v-if="showAttnOrRef" class="mx-4"/>
 
-          <v-row no-gutters class="px-6 py-7">
+          <v-row v-if="showAttnOrRef" no-gutters class="px-6 py-7">
             <v-col cols="3">
               <p class="side-header">{{ attnOrRefConfig.title }}</p>
             </v-col>
             <v-col cols="9">
-              <p class="content ref-text">{{getMhrAttentionReference || '(Not Entered)'}}</p>
+              <p class="content ref-text">{{getMhrAttentionReference || emptyText }}</p>
             </v-col>
           </v-row>
+
         </section>
       </template>
     </div>
@@ -141,9 +136,10 @@ export default defineComponent({
       businessName: computed(() => getMhrRegistrationSubmittingParty.value.businessName),
       personName: computed(() => getMhrRegistrationSubmittingParty.value.personName),
       hasAddress: computed(() => !Object.values(localState.address).every(val => !val)),
-      attnOrRefConfig: computed((): AttnRefConfigIF => {
-        return isRoleStaffReg.value ? attentionConfig : folioOrRefConfig
-      }),
+      attnOrRefConfig: computed((): AttnRefConfigIF => isRoleStaffReg.value ? attentionConfig : folioOrRefConfig),
+      emptyText: computed(() => isMhrManufacturerRegistration.value ? '' : '(Not Entered)'),
+      showAttnOrRef: computed(() => !isMhrManufacturerRegistration.value),
+      showDocumentID: computed(() => !isMhrManufacturerRegistration.value),
       showStepError: computed(() => {
         return !isMhrManufacturerRegistration.value && !getStepValidation(MhrSectVal.SUBMITTING_PARTY_VALID)
       })
@@ -155,12 +151,12 @@ export default defineComponent({
       const phone = getMhrRegistrationSubmittingParty.value
       const phoneNum = phone.phoneNumber
       const ext = phone.phoneExtension ? ' &nbsp;Ext ' + phone.phoneExtension : ''
-      return phoneNum ? `${toDisplayPhone(phoneNum)}${ext}` : '(Not Entered)'
+      return phoneNum ? `${toDisplayPhone(phoneNum)}${ext}` : localState.emptyText
     }
 
     const getSubmittingPartyName = () => {
       if (!localState.businessName && Object.values(localState.personName).every(val => !val)) {
-        return '(Not Entered)'
+        return localState.emptyText
       } else {
         if (localState.businessName) {
           return localState.businessName
