@@ -222,7 +222,7 @@ def get_registrations(mhr_number: str):  # pylint: disable=too-many-return-state
 @bp.route('/batch/manufacturer', methods=['GET', 'OPTIONS'])
 @cross_origin(origin='*')
 def get_batch_manufacturer_registrations():  # pylint: disable=too-many-return-statements
-    """Get and optionally batch manufacturer registrations report for registries staff."""
+    """Get the batch manufacturer registrations report for registries staff and optionally email."""
     try:
         current_app.logger.info('getting batch manufacturer registrations')
         # Authenticate with request api key
@@ -274,7 +274,7 @@ def get_batch_manufacturer_registrations():  # pylint: disable=too-many-return-s
 @bp.route('/batch/manufacturer', methods=['POST', 'OPTIONS'])
 @cross_origin(origin='*')
 def post_batch_manufacturer_registrations():  # pylint: disable=too-many-return-statements
-    """Generate and optionally batch manufacturer registrations report for registries staff."""
+    """Generate the batch manufacturer registrations report for registries staff and optionally email."""
     return get_batch_manufacturer_registrations()
 
 
