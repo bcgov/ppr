@@ -19,14 +19,14 @@ const store = useStore()
  *
  * @returns a Wrapper<SearchedResultPpr> object with the given parameters.
  */
-function createComponent (setMsg: string): Wrapper<any> {
+function createComponent (setMsg: string, setImportantWord?: string): Wrapper<any> {
   const localVue = createLocalVue()
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
 
   return mount((CautionBox as any), {
     localVue,
-    propsData: { setMsg: setMsg },
+    propsData: { setMsg: setMsg, setImportantWord: setImportantWord },
     store,
     vuetify
   })
@@ -44,10 +44,22 @@ describe('Caution box component tests', () => {
 
   it('renders caution box component with given text', () => {
     const testMsg = 'this is very important'
+    const importantText = 'Important'
     wrapper = createComponent(testMsg)
-    expect(wrapper.vm.msg).toBe(testMsg)
     const cautionBoxTxt = wrapper.findAll('.caution-box')
     expect(cautionBoxTxt.length).toBe(1)
     expect(cautionBoxTxt.at(0).text()).toContain(testMsg)
+    expect(cautionBoxTxt.at(0).text()).toContain(importantText)
+  })
+
+  it('renders caution box component with changed bold text', () => {
+    const testMsg = 'this is very important'
+    const importantText = 'Caution'
+    wrapper = createComponent(testMsg, importantText)
+    const cautionBoxTxt = wrapper.findAll('.caution-box')
+    expect(cautionBoxTxt.length).toBe(1)
+    expect(cautionBoxTxt.at(0).text()).toContain(testMsg)
+    expect(cautionBoxTxt.at(0).text()).not.toContain('Important')
+    expect(cautionBoxTxt.at(0).text()).toContain(importantText)
   })
 })
