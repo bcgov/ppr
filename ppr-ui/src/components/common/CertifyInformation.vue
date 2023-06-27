@@ -5,7 +5,7 @@
     </v-row>
     <v-row no-gutters class="pb-6 pt-4">
       <v-col>
-        {{ (content && content.description) || infoText }}
+        {{ infoText }}
       </v-col>
     </v-row>
     <v-row no-gutters class="mb-5 party-summary">
@@ -151,9 +151,10 @@ export default defineComponent({
     const localState = reactive({
       legalName: '',
       certified: false,
-      infoText: 'The following account information will be recorded by BC Registries upon registration and payment. ' +
-                'This information is used to confirm you have the authority to submit this registration and will ' +
-                'not appear on the verification statement.',
+      infoText: props.content?.description ||
+        'The following account information will be recorded by BC Registries upon registration and payment. ' +
+        'This information is used to confirm you have the authority to submit this registration and will ' +
+        'not appear on the verification statement.',
       showErrors: computed((): boolean => {
         return props.setShowErrors
       }),

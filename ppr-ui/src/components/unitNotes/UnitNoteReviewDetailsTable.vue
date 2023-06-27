@@ -6,7 +6,7 @@
     </header>
 
     <section class="unit-note-review-details-table pa-6">
-      <v-row no-gutters class="">
+      <v-row no-gutters>
         <v-col cols="3">
           <h3>Unit Note Type</h3>
         </v-col>
@@ -57,13 +57,13 @@
                     {{ givingNoticeParty.personName.last }}
                   </span>
                 </td>
-                <td class="">
+                <td>
                   <base-address :editing="false" :schema="PartyAddressSchema" :value="givingNoticeParty.address" />
                 </td>
-                <td class="">
+                <td>
                   {{ givingNoticeParty.emailAddress }}
                 </td>
-                <td class="">
+                <td>
                   {{ toDisplayPhone(givingNoticeParty.phoneNumber) }}
                   <span v-if="givingNoticeParty.phoneExtension"> Ext {{ givingNoticeParty.phoneExtension }} </span>
                 </td>

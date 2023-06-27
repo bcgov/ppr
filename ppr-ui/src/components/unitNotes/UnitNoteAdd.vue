@@ -26,12 +26,14 @@
           title: 'Person Giving Notice',
           description: 'Contact information for the person making the claim will be shown ' +
             'when a search result is produced for this manufactured home.',
-          sideLabel: 'Person Giving Notice'
+          sideLabel: 'Person Giving Notice',
+          mailAddressInfo: ' ' // hide the info text under Mailing Address label
         }"
         :validate="validate"
         :setStoreProperty="setGivingNoticeParty"
         @isValid="handleComponentValid(MhrCompVal.PERSON_GIVING_NOTICE_VALID, $event)"
         hidePartySearch
+        hideDeliveryAddress
       />
     </section>
   </div>

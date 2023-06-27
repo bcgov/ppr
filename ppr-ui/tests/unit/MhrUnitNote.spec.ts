@@ -11,7 +11,7 @@ import { RouteNames, UnitNoteDocTypes } from '@/enums'
 import { getTestId, setupMockUser } from './utils'
 import { UnitNotesInfo } from '@/resources/unitNotes'
 import { CertifyInformation, ContactInformation, DocumentId, Remarks } from '@/components/common'
-import { UnitNoteAdd, UnitNoteReview } from '@/components/unitNotes'
+import { UnitNoteAdd, UnitNoteReview, UnitNoteReviewDetailsTable } from '@/components/unitNotes'
 import { Attention } from '@/components/mhrRegistration/ReviewConfirm'
 import { StaffPayment } from '@bcrs-shared-components/staff-payment'
 
@@ -88,7 +88,7 @@ describe('MHR Unit Note Filing', () => {
     const UnitNoteReviewComponent = wrapper.findComponent(UnitNoteReview)
     expect(UnitNoteReviewComponent.exists()).toBeTruthy()
 
-    expect(UnitNoteReviewComponent.find('#unit-note-info-review').exists()).toBeTruthy()
+    expect(UnitNoteReviewComponent.findComponent(UnitNoteReviewDetailsTable)).toBeTruthy()
     expect(UnitNoteReviewComponent.findComponent(ContactInformation)).toBeTruthy()
     expect(UnitNoteReviewComponent.findComponent(Attention)).toBeTruthy()
     expect(UnitNoteReviewComponent.findComponent(CertifyInformation)).toBeTruthy()

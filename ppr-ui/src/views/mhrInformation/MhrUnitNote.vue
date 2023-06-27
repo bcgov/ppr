@@ -129,7 +129,6 @@ export default defineComponent({
       localState.validate = true // validate Unit Note components
       await nextTick()
       if (localState.isUnitNoteValid) localState.isReviewMode = true
-      localState.isReviewMode = true
     }
 
     const goToDash = (): void => {

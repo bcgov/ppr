@@ -24,7 +24,7 @@
               filled
               :rules="maxLength(420)"
               name="name"
-              counter="350"
+              counter="420"
               label="Remarks (Optional)"
               class="pl-1"
               data-test-id="remarks-textarea"

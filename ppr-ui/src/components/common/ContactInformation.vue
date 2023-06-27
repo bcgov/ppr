@@ -156,6 +156,7 @@
               <base-address
                 editing
                 hideAddressHint
+                :hideDeliveryAddress="hideDeliveryAddress"
                 ref="submittingPartyAddress"
                 id="contact-info-address"
                 :schema="PartyAddressSchema"
@@ -206,6 +207,10 @@ export default defineComponent({
       required: true
     },
     hidePartySearch: {
+      type: Boolean,
+      default: false
+    },
+    hideDeliveryAddress: {
       type: Boolean,
       default: false
     }
