@@ -120,29 +120,31 @@
         </section>
       </template>
 
-      <v-divider v-if="showRebuiltStatus" class="mx-4"/>
+      <template v-if="!isMhrManufacturerRegistration">
+        <v-divider class="mx-4"/>
 
-      <!-- Rebuilt Status Review -->
-      <v-row  v-if="showRebuiltStatus" no-gutters class="pa-6">
-        <v-col cols="3">
-          <h3>Rebuilt Status</h3>
-        </v-col>
-        <v-col cols="9">
-          <p v-html="formatAsHtml(getMhrRegistrationHomeDescription.rebuiltRemarks) || '(Not Entered)'"></p>
-        </v-col>
-      </v-row>
+        <!-- Rebuilt Status Review -->
+        <v-row no-gutters class="pa-6">
+          <v-col cols="3">
+            <h3>Rebuilt Status</h3>
+          </v-col>
+          <v-col cols="9">
+            <p v-html="formatAsHtml(getMhrRegistrationHomeDescription.rebuiltRemarks) || '(Not Entered)'"></p>
+          </v-col>
+        </v-row>
 
-      <v-divider v-if="showOtherInformation" class="mx-4"/>
+        <v-divider class="mx-4"/>
 
-      <!-- Other Information Review -->
-      <v-row  v-if="showOtherInformation" no-gutters class="pa-6">
-        <v-col cols="3">
-          <h3>Other Information</h3>
-        </v-col>
-        <v-col cols="9">
-          <p v-html="formatAsHtml(getMhrRegistrationOtherInfo) || '(Not Entered)'"></p>
-        </v-col>
-      </v-row>
+        <!-- Other Information Review -->
+        <v-row no-gutters class="pa-6">
+          <v-col cols="3">
+            <h3>Other Information</h3>
+          </v-col>
+          <v-col cols="9">
+            <p v-html="formatAsHtml(getMhrRegistrationOtherInfo) || '(Not Entered)'"></p>
+          </v-col>
+        </v-row>
+      </template>
 
     </div>
   </v-card>
@@ -192,8 +194,6 @@ export default defineComponent({
       engineerDisplayDate: computed((): string => {
         return yyyyMmDdToPacificDate(getMhrRegistrationHomeDescription.value?.engineerDate, true)
       }),
-      showOtherInformation: computed(() => !isMhrManufacturerRegistration.value),
-      showRebuiltStatus: computed(() => !isMhrManufacturerRegistration.value),
       showStepError: computed(() => !getStepValidation(MhrSectVal.YOUR_HOME_VALID))
     })
 
@@ -202,6 +202,7 @@ export default defineComponent({
       RouteNames,
       getMhrRegistrationOtherInfo,
       getMhrRegistrationHomeDescription,
+      isMhrManufacturerRegistration,
       ...toRefs(localState)
     }
   }

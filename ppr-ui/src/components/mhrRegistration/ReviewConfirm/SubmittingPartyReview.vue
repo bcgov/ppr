@@ -70,28 +70,30 @@
             </v-col>
           </v-row>
 
-          <v-divider v-if="showDocumentID" class="mx-4"/>
+          <template v-if="!isMhrManufacturerRegistration">
+            <v-divider class="mx-4"/>
 
-          <v-row v-if="showDocumentID" no-gutters class="px-6 py-7">
-            <v-col cols="3">
-              <h3>Document ID</h3>
-            </v-col>
-            <v-col cols="9">
-              <p class="content ref-text">{{getMhrRegistrationDocumentId || emptyText }}</p>
-            </v-col>
-          </v-row>
+            <v-row no-gutters class="px-6 py-7">
+              <v-col cols="3">
+                <h3>Document ID</h3>
+              </v-col>
+              <v-col cols="9">
+                <p class="content ref-text">{{getMhrRegistrationDocumentId || emptyText }}</p>
+              </v-col>
+            </v-row>
 
-          <v-divider v-if="showAttnOrRef" class="mx-4"/>
+            <v-divider class="mx-4"/>
 
-          <v-row v-if="showAttnOrRef" no-gutters class="px-6 py-7">
-            <v-col cols="3">
-              <p class="side-header">{{ attnOrRefConfig.title }}</p>
-            </v-col>
-            <v-col cols="9">
-              <p class="content ref-text">{{getMhrAttentionReference || emptyText }}</p>
-            </v-col>
-          </v-row>
+            <v-row no-gutters class="px-6 py-7">
+              <v-col cols="3">
+                <p class="side-header">{{ attnOrRefConfig.title }}</p>
+              </v-col>
+              <v-col cols="9">
+                <p class="content ref-text">{{getMhrAttentionReference || emptyText }}</p>
+              </v-col>
+            </v-row>
 
+          </template>
         </section>
       </template>
     </div>
@@ -138,8 +140,6 @@ export default defineComponent({
       hasAddress: computed(() => !Object.values(localState.address).every(val => !val)),
       attnOrRefConfig: computed((): AttnRefConfigIF => isRoleStaffReg.value ? attentionConfig : folioOrRefConfig),
       emptyText: computed(() => isMhrManufacturerRegistration.value ? '' : '(Not Entered)'),
-      showAttnOrRef: computed(() => !isMhrManufacturerRegistration.value),
-      showDocumentID: computed(() => !isMhrManufacturerRegistration.value),
       showStepError: computed(() => {
         return !isMhrManufacturerRegistration.value && !getStepValidation(MhrSectVal.SUBMITTING_PARTY_VALID)
       })
@@ -173,6 +173,7 @@ export default defineComponent({
       addressSchema,
       MhrSectVal,
       isRoleStaffReg,
+      isMhrManufacturerRegistration,
       getMhrRegistrationSubmittingParty,
       getMhrRegistrationDocumentId,
       getMhrAttentionReference,
