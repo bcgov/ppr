@@ -22,7 +22,7 @@
               id="remarks-textarea"
               v-model.trim="remarks"
               filled
-              :rules="maxLength(350)"
+              :rules="maxLength(420)"
               name="name"
               counter="350"
               label="Remarks (Optional)"

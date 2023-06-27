@@ -4,7 +4,7 @@
       <DocumentId
         :documentId="unitNoteDocumentId"
         :setStoreProperty="setDocumentId"
-        :validate="false"
+        :validate="validate"
         @isValid="handleComponentValid(MhrCompVal.DOC_ID_VALID, $event)"
       />
     </section>
@@ -14,7 +14,7 @@
         :unitNoteRemarks="unitNoteRemarks"
         description="Remarks will be shown when a search result is produced for this manufactured home."
         :setStoreProperty="setRemarks"
-        :validate="false"
+        :validate="validate"
         @isValid="handleComponentValid(MhrCompVal.REMARKS_VALID, $event)"
       />
     </section>
@@ -24,19 +24,21 @@
         :contactInfo="unitNoteGivingNoticeParty"
         :content="{
           title: 'Person Giving Notice',
-          description: 'Enter the contact information for the person making the claim',
+          description: 'Contact information for the person making the claim will be shown ' +
+            'when a search result is produced for this manufactured home.',
           sideLabel: 'Person Giving Notice'
         }"
-        :validate="false"
+        :validate="validate"
         :setStoreProperty="setGivingNoticeParty"
         @isValid="handleComponentValid(MhrCompVal.PERSON_GIVING_NOTICE_VALID, $event)"
+        hidePartySearch
       />
     </section>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs } from 'vue-demi'
+import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
 import { UnitNotesInfo } from '@/resources/unitNotes'
 import { UnitNoteDocTypes } from '@/enums'
 import { useStore } from '@/store/store'
@@ -63,7 +65,8 @@ export default defineComponent({
       default: UnitNoteDocTypes.NOTICE_OF_CAUTION
     }
   },
-  setup (props) {
+  emits: ['isValid'],
+  setup (props, { emit }) {
     const {
       setMhrUnitNote
     } = useStore()
@@ -74,12 +77,17 @@ export default defineComponent({
     } = storeToRefs(useStore())
 
     const {
-      setValidation // eslint-disable-line no-unused-vars
+      getValidation,
+      setValidation
     } = useMhrValidations(toRefs(getMhrUnitNoteValidation.value))
 
     const localState = reactive({
       unitNoteInfo: UnitNotesInfo[props.docType],
-      isUnitNoteValid: false,
+      isUnitNoteValid: computed((): boolean =>
+        getValidation(MhrSectVal.UNIT_NOTE_VALID, MhrCompVal.DOC_ID_VALID) &&
+        getValidation(MhrSectVal.UNIT_NOTE_VALID, MhrCompVal.REMARKS_VALID) &&
+        getValidation(MhrSectVal.UNIT_NOTE_VALID, MhrCompVal.PERSON_GIVING_NOTICE_VALID)
+      ),
 
       // Remarks
       unitNoteRemarks: (getMhrUnitNote.value as UnitNoteIF).remarks || '',
@@ -106,6 +114,10 @@ export default defineComponent({
     const setGivingNoticeParty = (val: PartyIF) => {
       setMhrUnitNote({ key: 'givingNoticeParty', value: val })
     }
+
+    watch(() => localState.isUnitNoteValid, (val) => {
+      emit('isValid', val)
+    })
 
     return {
       MhrCompVal,
