@@ -1,5 +1,5 @@
 import { RegistrationFlowType } from '@/enums'
-import { AddressIF, PartyIF, RegistrationTypeIF, StateModelIF, SubmittingPartyIF, UnitNoteRegistrationIF } from '@/interfaces'
+import { PartyIF, RegistrationTypeIF, StateModelIF } from '@/interfaces'
 
 export const stateModel: StateModelIF = {
   accountInformation: {
@@ -309,7 +309,8 @@ export const stateModel: StateModelIF = {
     ownLand: false,
     isAffidavitTransferCompleted: false
   },
-  mhrUnitNote: { // standalone singe note used for Unit Note filing/registration
+  mhrUnitNote: {
+    // standalone singe note used for Unit Note filing/registration
     clientReferenceId: '',
     attentionReference: '',
     submittingParty: {
@@ -326,11 +327,11 @@ export const stateModel: StateModelIF = {
         region: '',
         country: '',
         postalCode: ''
-      } as AddressIF,
+      },
       emailAddress: '',
       phoneNumber: '',
       phoneExtension: ''
-    } as SubmittingPartyIF,
+    },
     note: {
       documentType: null,
       documentId: '',
@@ -361,7 +362,7 @@ export const stateModel: StateModelIF = {
       } as PartyIF,
       destroyed: null
     }
-  } as UnitNoteRegistrationIF,
+  },
   mhrUnitNoteValidationState: {
     unitNoteAddValid: {
       documentIdValid: false,
