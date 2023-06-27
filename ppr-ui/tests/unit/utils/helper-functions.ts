@@ -91,3 +91,18 @@ export function createComponent (component: any, props: any): Wrapper<any> {
     vuetify
   })
 }
+
+/**
+ * Setup mock current user, auth and keycloak token.
+ * Required when using a mount (vs. shallowMount) when creating components to test.
+ *
+ * @returns void
+ */
+export function setupMockUser (): void {
+  const currentAccount = {
+    id: 'test_id'
+  }
+  sessionStorage.setItem('KEYCLOAK_TOKEN', 'token')
+  sessionStorage.setItem('CURRENT_ACCOUNT', JSON.stringify(currentAccount))
+  sessionStorage.setItem('AUTH_API_URL', 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/')
+}

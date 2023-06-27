@@ -1,17 +1,19 @@
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
 import { createPinia, setActivePinia } from 'pinia'
 import { useStore } from '../../src/store/store'
 import VueRouter from 'vue-router'
-import { createLocalVue, shallowMount, Wrapper } from '@vue/test-utils'
+import { createLocalVue, mount, shallowMount, Wrapper } from '@vue/test-utils'
 import mockRouter from './MockRouter'
 
 import { MhrUnitNote } from '@/views'
 import { RouteNames, UnitNoteDocTypes } from '@/enums'
-import { getTestId } from './utils'
+import { getTestId, setupMockUser } from './utils'
 import { UnitNotesInfo } from '@/resources/unitNotes'
-import { ContactInformation, DocumentId, Remarks } from '@/components/common'
+import { CertifyInformation, ContactInformation, DocumentId, Remarks } from '@/components/common'
 import { UnitNoteAdd, UnitNoteReview } from '@/components/unitNotes'
+import { Attention } from '@/components/mhrRegistration/ReviewConfirm'
+import { StaffPayment } from '@bcrs-shared-components/staff-payment'
 
 Vue.use(Vuetify)
 
@@ -29,7 +31,7 @@ function createComponent (): Wrapper<any> {
   })
 
   document.body.setAttribute('data-app', 'true')
-  return shallowMount(MhrUnitNote as any, {
+  return mount(MhrUnitNote as any, {
     localVue,
     router,
     vuetify
@@ -38,6 +40,7 @@ function createComponent (): Wrapper<any> {
 
 describe('MHR Unit Note Filing', () => {
   let wrapper: Wrapper<any>
+  setupMockUser()
 
   const UNIT_NOTE_DOC_TYPE = UnitNoteDocTypes.NOTICE_OF_CAUTION
 
@@ -72,5 +75,26 @@ describe('MHR Unit Note Filing', () => {
 
     expect(AddUnitNoteContainer.findAll('.border-error-left').length).toBe(0)
     expect(AddUnitNoteContainer.findAll('.error-text').length).toBe(0)
+  })
+
+  it('renders MhrUnitNote Review and Confirm page with its components', async () => {
+    expect(wrapper.vm.$route.name).toBe(RouteNames.MHR_INFORMATION_NOTE)
+    expect(wrapper.exists()).toBeTruthy()
+
+    await wrapper.findComponent(UnitNoteAdd).vm.$emit('isValid', true)
+    await wrapper.find('#btn-stacked-submit').trigger('click')
+    await nextTick()
+
+    const UnitNoteReviewComponent = wrapper.findComponent(UnitNoteReview)
+    expect(UnitNoteReviewComponent.exists()).toBeTruthy()
+
+    expect(UnitNoteReviewComponent.find('#unit-note-info-review').exists()).toBeTruthy()
+    expect(UnitNoteReviewComponent.findComponent(ContactInformation)).toBeTruthy()
+    expect(UnitNoteReviewComponent.findComponent(Attention)).toBeTruthy()
+    expect(UnitNoteReviewComponent.findComponent(CertifyInformation)).toBeTruthy()
+    expect(UnitNoteReviewComponent.findComponent(StaffPayment)).toBeTruthy()
+
+    expect(UnitNoteReviewComponent.findAll('.border-error-left').length).toBe(0)
+    expect(UnitNoteReviewComponent.findAll('.error-text').length).toBe(0)
   })
 })
