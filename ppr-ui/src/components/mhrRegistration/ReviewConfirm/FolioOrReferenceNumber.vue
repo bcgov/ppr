@@ -1,5 +1,5 @@
 <template>
-  <section :id="sectionId" class="mt-13">
+  <div>
     <h2 :data-test-id="`${sectionId}-title`">
       {{ `${sectionNumber ? sectionNumber + '.' : ''} ${folioOrRefConfig.title}`}}
     </h2>
@@ -26,7 +26,7 @@
         />
       </v-card>
     </v-form>
-  </section>
+  </div>
 </template>
 
 <script lang="ts">

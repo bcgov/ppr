@@ -42,20 +42,24 @@
 
     <template  v-if="isMhrManufacturerRegistration">
       <!-- Attention -->
-      <Attention
-        section-id="mhr-attention"
-        :section-number="1"
-        :validate="isValidatingApp"
-        @isAttentionValid="setAttentionValidation"
-      />
+      <section id="mhr-attention" class="mt-13">
+        <Attention
+          section-id="mhr-attention"
+          :section-number="1"
+          :validate="isValidatingApp"
+          @isAttentionValid="setAttentionValidation"
+        />
+      </section>
 
       <!-- Folio or Reference Number -->
-      <FolioOrReferenceNumber
-        section-id="mhr-folio-or-reference-number"
-        :section-number="2"
-        :validate="isValidatingApp"
-        @isFolioOrRefNumValid="setFolioOrReferenceNumberValidation"
-      />
+      <section id="mhr-folio-or-reference-number" class="mt-13">
+        <FolioOrReferenceNumber
+          section-id="mhr-folio-or-reference-number"
+          :section-number="2"
+          :validate="isValidatingApp"
+          @isFolioOrRefNumValid="setFolioOrReferenceNumberValidation"
+        />
+      </section>
     </template>
 
     <!-- Authorization -->
