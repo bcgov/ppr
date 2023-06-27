@@ -9,9 +9,10 @@ import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
 // Local Components
 import { MhrReviewConfirm } from '@/views'
 import {
+  Attention, FolioOrReferenceNumber,
   HomeLocationReview, HomeOwnersReview, SubmittingPartyReview, YourHomeReview
 } from '@/components/mhrRegistration/ReviewConfirm'
-import { CertifyInformation } from '@/components/common'
+import { CautionBox, CertifyInformation, HelpInformationToggle } from '@/components/common'
 import { HomeTenancyTypes, RouteNames } from '@/enums'
 import mockRouter from './MockRouter'
 import { mockedFractionalOwnership, mockedPerson } from './test-data/mock-mhr-registration'
@@ -19,6 +20,10 @@ import { MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF } from '@/i
 import { getTestId } from './utils'
 import { HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
 import { MhrCompVal, MhrSectVal } from '../../src/composables/mhrRegistration/enums'
+import { MhrRegistrationType } from '@/resources'
+import { mockedManufacturerAuthRoles } from './test-data'
+import { defaultFlagSet } from '@/utils'
+import { StaffPayment } from '@bcrs-shared-components/staff-payment'
 
 Vue.use(Vuetify)
 
@@ -73,6 +78,12 @@ describe('Mhr Review Confirm registration', () => {
     expect(wrapper.findComponent(HomeOwnersReview).exists()).toBe(true)
     expect(wrapper.findComponent(HomeLocationReview).exists()).toBe(true)
     expect(wrapper.findComponent(CertifyInformation).exists()).toBe(true)
+
+    // Should not exists for staff registration
+    expect(wrapper.findComponent(Attention).exists()).toBe(false)
+    expect(wrapper.findComponent(CautionBox).exists()).toBe(false)
+    expect(wrapper.findComponent(HelpInformationToggle).exists()).toBe(false)
+    expect(wrapper.findComponent(FolioOrReferenceNumber).exists()).toBe(false)
   })
 
   it('verifies Authorization default values', async () => {
@@ -164,5 +175,51 @@ describe('Mhr Review Confirm registration', () => {
     expect(homeOwnersTable.text()).toContain(mockedPerson.phoneExtension)
     expect(homeOwnersTable.text()).toContain(mockedPerson.address.city)
     expect(homeOwnersTable.text()).toContain(HomeTenancyTypes.NA)
+  })
+})
+
+describe('Mhr Manufacturer Registration Review and Confirm', () => {
+  let wrapper: Wrapper<any>
+  const currentAccount = {
+    id: 'test_id'
+  }
+  sessionStorage.setItem('KEYCLOAK_TOKEN', 'token')
+  sessionStorage.setItem('CURRENT_ACCOUNT', JSON.stringify(currentAccount))
+  sessionStorage.setItem('AUTH_API_URL', 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/')
+
+  beforeAll(async () => {
+    defaultFlagSet['mhr-registration-enabled'] = true
+    await store.setAuthRoles(mockedManufacturerAuthRoles)
+    await store.setRegistrationType(MhrRegistrationType)
+  })
+
+  beforeEach(async () => {
+    wrapper = createComponent()
+  })
+
+  afterEach(() => {
+    wrapper.destroy()
+  })
+
+  afterAll(async () => {
+    defaultFlagSet['mhr-registration-enabled'] = false
+    await store.setAuthRoles([])
+    await store.setRegistrationType(null)
+  })
+
+  it('renders and displays the Mhr Registration View', async () => {
+    expect(wrapper.findComponent(MhrReviewConfirm).exists()).toBe(true)
+    expect(wrapper.findComponent(YourHomeReview).exists()).toBe(true)
+    expect(wrapper.findComponent(SubmittingPartyReview).exists()).toBe(true)
+    expect(wrapper.findComponent(HomeOwnersReview).exists()).toBe(true)
+    expect(wrapper.findComponent(HomeLocationReview).exists()).toBe(true)
+    expect(wrapper.findComponent(CertifyInformation).exists()).toBe(true)
+    expect(wrapper.findComponent(Attention).exists()).toBe(true)
+    expect(wrapper.findComponent(FolioOrReferenceNumber).exists()).toBe(true)
+    expect(wrapper.findComponent(HelpInformationToggle).exists()).toBe(true)
+    expect(wrapper.findComponent(CautionBox).exists()).toBe(true)
+
+    // Should not exist for manufacturer registration
+    expect(wrapper.findComponent(StaffPayment).exists()).toBe(false)
   })
 })

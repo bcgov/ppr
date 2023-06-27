@@ -5,7 +5,7 @@
       <label class="font-weight-bold pl-2">{{ isTransferReview ? 'Description of Home' : 'Your Home' }}</label>
     </header>
 
-    <div :class="{'border-error-left': showStepError && !isTransferReview}">
+    <div :class="{'border-error-left': showStepError && !isTransferReview }">
       <section class="mx-6 pt-8" v-if="showStepError && !isTransferReview">
         <span>
           <v-icon color="error">mdi-information-outline</v-icon>
