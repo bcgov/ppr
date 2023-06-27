@@ -1,3 +1,10 @@
+<!--
+  This component is a toggle with prefilled contact information.
+  It leverages the single help toggle functionality (not a toggle within a toggle).
+  The component is useful if you require a toggle that showcases
+  a paragraph/line of text followed by bc registry contact information.
+  If you require a more general help toggle use the SimpleHelpToggle component.
+-->
 <template>
   <SimpleHelpToggle
     class="mb-7"
@@ -25,7 +32,7 @@ import { SimpleHelpToggle } from '@/components/common'
 import { DialogContent } from '@/components/dialogs/common'
 
 export default defineComponent({
-  name: 'HelpInformationToggle',
+  name: 'ContactUsToggle',
   components: {
     SimpleHelpToggle,
     DialogContent

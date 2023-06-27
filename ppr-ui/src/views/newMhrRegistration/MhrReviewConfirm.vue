@@ -17,7 +17,7 @@
           and cannot be changed here. If you wish to update this information please contact BC Registries.
         </p>
 
-        <HelpInformationToggle
+        <ContactUsToggle
           helpText="If you require assistance with changes to your manufacturer information please contact us."
         />
 
@@ -104,7 +104,7 @@ import {
   SubmittingPartyReview,
   YourHomeReview
 } from '@/components/mhrRegistration/ReviewConfirm'
-import { CertifyInformation, HelpInformationToggle, CautionBox } from '@/components/common'
+import { CertifyInformation, ContactUsToggle, CautionBox } from '@/components/common'
 import { useMhrValidations } from '@/composables'
 import { RouteNames } from '@/enums'
 /* eslint-disable no-unused-vars */
@@ -128,7 +128,7 @@ export default defineComponent({
     FolioOrReferenceNumber,
     CertifyInformation,
     StaffPayment,
-    HelpInformationToggle,
+    ContactUsToggle,
     CautionBox
 },
   setup () {

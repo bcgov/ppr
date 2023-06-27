@@ -6,7 +6,7 @@
         {{ manufacturerMakeModelPrompt }}
       </p>
 
-      <HelpInformationToggle
+      <ContactUsToggle
         v-if="showHelp"
         helpText="If you require assistance with changes to your manufacturer information please contact us."
       />
@@ -76,7 +76,7 @@ import {
   RebuiltStatus,
   OtherInformation
 } from '@/components/mhrRegistration/YourHome'
-import { HelpInformationToggle } from '@/components/common'
+import { ContactUsToggle } from '@/components/common'
 import { useMhrValidations } from '@/composables/mhrRegistration/useMhrValidations'
 import { storeToRefs } from 'pinia'
 import { ManufacturerMakeModelPrompt, HomeCertificationPrompt } from '@/resources/mhr-registration'
@@ -89,7 +89,7 @@ export default defineComponent({
     ManufacturerMakeModel,
     RebuiltStatus,
     OtherInformation,
-    HelpInformationToggle
+    ContactUsToggle
   },
   props: {},
   setup () {

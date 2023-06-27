@@ -12,7 +12,7 @@ import {
   Attention, FolioOrReferenceNumber,
   HomeLocationReview, HomeOwnersReview, SubmittingPartyReview, YourHomeReview
 } from '@/components/mhrRegistration/ReviewConfirm'
-import { CautionBox, CertifyInformation, HelpInformationToggle } from '@/components/common'
+import { CautionBox, CertifyInformation, ContactUsToggle } from '@/components/common'
 import { HomeTenancyTypes, RouteNames } from '@/enums'
 import mockRouter from './MockRouter'
 import { mockedFractionalOwnership, mockedPerson } from './test-data/mock-mhr-registration'
@@ -82,7 +82,7 @@ describe('Mhr Review Confirm registration', () => {
     // Should not exists for staff registration
     expect(wrapper.findComponent(Attention).exists()).toBe(false)
     expect(wrapper.findComponent(CautionBox).exists()).toBe(false)
-    expect(wrapper.findComponent(HelpInformationToggle).exists()).toBe(false)
+    expect(wrapper.findComponent(ContactUsToggle).exists()).toBe(false)
     expect(wrapper.findComponent(FolioOrReferenceNumber).exists()).toBe(false)
   })
 
@@ -216,7 +216,7 @@ describe('Mhr Manufacturer Registration Review and Confirm', () => {
     expect(wrapper.findComponent(CertifyInformation).exists()).toBe(true)
     expect(wrapper.findComponent(Attention).exists()).toBe(true)
     expect(wrapper.findComponent(FolioOrReferenceNumber).exists()).toBe(true)
-    expect(wrapper.findComponent(HelpInformationToggle).exists()).toBe(true)
+    expect(wrapper.findComponent(ContactUsToggle).exists()).toBe(true)
     expect(wrapper.findComponent(CautionBox).exists()).toBe(true)
 
     // Should not exist for manufacturer registration
