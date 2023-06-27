@@ -36,6 +36,8 @@ export enum MhrCompVal {
   VALIDATE_APP = 'validateApp', // prompt all APP validations
 
   // Unit Note Registration
+  VALIDATE_UNIT_NOTE = 'validateUnitNote',
   REMARKS_VALID = 'remarksValid',
-  PERSON_GIVING_NOTICE_VALID = 'personGivingNoticeValid'
+  PERSON_GIVING_NOTICE_VALID = 'personGivingNoticeValid',
+  SUBMITTING_PARTY_VALID = 'submittingPartyValid'
 }

@@ -57,8 +57,12 @@ export interface MhrValidationManufacturerStateIF {
 
 export interface MhrUnitNoteValidationStateIF {
   unitNoteAddValid: {
-    documentIdValid: false,
-    remarksValid: false,
-    personGivingNoticeValid: false
+    documentIdValid: boolean,
+    remarksValid: boolean,
+    personGivingNoticeValid: boolean,
+    submittingPartyValid: boolean,
+    attentionValid: boolean,
+    authorizationValid: boolean,
+    staffPaymentValid: boolean
   }
 }

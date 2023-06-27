@@ -40,7 +40,8 @@ import {
   UserProductSubscriptionIF,
   UserSettingsIF,
   VehicleCollateralIF,
-  UnitNoteStoreActionIF
+  UnitNoteStoreActionIF,
+  UnitNoteRegistrationIF
 } from '@/interfaces'
 import {
   AccountTypes,
@@ -600,6 +601,10 @@ export const useStore = defineStore('assetsStore', () => {
     return state.value.mhrRegistration.ownLand
   })
 
+  const getMhrUnitNoteRegistration = computed<UnitNoteRegistrationIF>(() => {
+    return state.value.mhrUnitNote
+  })
+
   const getMhrUnitNote = computed<UnitNoteIF>(() => {
     return state.value.mhrUnitNote.note
   })
@@ -1056,6 +1061,10 @@ export const useStore = defineStore('assetsStore', () => {
     state.value.mhrUnitNote.note.documentType = documentType
   }
 
+  function setMhrUnitNoteRegistration (storeAction: UnitNoteStoreActionIF) {
+    set(state.value.mhrUnitNote, storeAction.key, storeAction.value)
+  }
+
   function setMhrUnitNote (storeAction: UnitNoteStoreActionIF) {
     set(state.value.mhrUnitNote.note, storeAction.key, storeAction.value)
   }
@@ -1221,6 +1230,7 @@ export const useStore = defineStore('assetsStore', () => {
     getMhrTransferAffidavitCompleted,
 
     // MHR Unit Notes
+    getMhrUnitNoteRegistration,
     getMhrUnitNote,
     getMhrUnitNoteType, // doc type of the Unit Note to register
     getMhrUnitNoteValidation,
@@ -1324,6 +1334,7 @@ export const useStore = defineStore('assetsStore', () => {
 
     // MHR Unit Notes
     setMhrUnitNoteType,
+    setMhrUnitNoteRegistration,
     setMhrUnitNote
 
   }

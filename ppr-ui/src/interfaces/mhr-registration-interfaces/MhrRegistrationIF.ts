@@ -2,8 +2,7 @@ import {
   MhrRegistrationDescriptionIF,
   MhrRegistrationHomeOwnerGroupIF,
   MhrRegistrationHomeLocationIF,
-  SubmittingPartyIF,
-  UnitNoteIF
+  SubmittingPartyIF
 } from '@/interfaces'
 export interface MhrRegistrationIF {
   draftNumber: string

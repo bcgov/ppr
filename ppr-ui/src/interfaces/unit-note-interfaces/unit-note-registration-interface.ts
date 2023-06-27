@@ -1,14 +1,9 @@
-import { AddressIF, UnitNoteIF } from '@/interfaces'
+import { SubmittingPartyIF, UnitNoteIF } from '@/interfaces'
 
 export interface UnitNoteRegistrationIF {
   clientReferenceId: string
   attentionReference: string
-  submittingParty: {
-    businessName: string
-    address: AddressIF
-    phoneNumber: string
-    emailAddress: string
-  }
+  submittingParty: SubmittingPartyIF
   note: UnitNoteIF
 }
 
