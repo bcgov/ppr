@@ -36,7 +36,7 @@
           :setIsRegisteringParty="isRegisteringParty"
           :isMhrPartySearch="isMhrPartySearch"
           :isMhrTransfer="isMhrTransfer"
-          @selectItem="selectItem"
+          @selectItem="selectItem($event)"
         />
       </v-col>
     </v-row>
@@ -162,9 +162,9 @@ export default defineComponent({
       localState.autoCompleteResults = []
     }
 
-    const selectItem = () => {
+    const selectItem = (selectedItem) => {
       localState.searchValue = ''
-      context.emit('selectItem')
+      context.emit('selectItem', selectedItem)
       context.emit('hideSearch')
     }
 

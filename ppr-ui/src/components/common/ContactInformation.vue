@@ -2,6 +2,13 @@
   <div id="contact-info-container">
     <h2>{{ content.title }}</h2>
     <p class="mt-2">{{ content.description }}</p>
+
+    <PartySearch
+      v-if="!hidePartySearch"
+      isMhrPartySearch
+      @selectItem="setStoreProperty($event)"
+    />
+
     <v-card
       id="contact-info"
       flat
@@ -10,7 +17,7 @@
       :class="{ 'border-error-left': showError }"
     >
       <v-row no-gutters>
-        <v-col cols="12" sm="2">
+        <v-col cols="12" sm="3">
           <label
             class="generic-label"
             :class="{ 'error-text': showError }"
@@ -18,12 +25,13 @@
             {{ content.sideLabel }}
           </label>
         </v-col>
-        <v-col cols="12" sm="10" class="px-1">
+        <v-col cols="12" sm="9" class="px-1">
           <v-radio-group
             id="contact-info-type-options"
             v-model="contactInfoType"
             class="mt-0 pr-1" row
             hide-details="true"
+            @change="clearFields($event)"
           >
             <v-radio
               id="person-option"
@@ -42,8 +50,6 @@
           </v-radio-group>
 
           <v-divider class="my-9 ml-0 mr-2" />
-
-          <!-- Placeholder for Business Lookup would be here -->
 
           <v-form id="contact-info-form" ref="contactInfoForm" v-model="isContactInfoFormValid">
             <!-- Person Name Input -->
@@ -168,17 +174,19 @@
 <script lang="ts">
 import { useInputRules } from '@/composables'
 import { SubmittingPartyTypes } from '@/enums'
-import { ContentIF, FormIF, PartyIF } from '@/interfaces'
+import { ContentIF, FormIF, PartyIF, SubmittingPartyIF } from '@/interfaces'
 import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue-demi'
 import { PartyAddressSchema } from '@/schemas'
 import { VueMaskDirective } from 'v-mask'
 import { BaseAddress } from '@/composables/address'
+import { PartySearch } from '../parties/party'
 
 export default defineComponent({
   name: 'ContactInformation',
   emits: ['isValid'],
   components: {
-    BaseAddress
+    BaseAddress,
+    PartySearch
   },
   props: {
     contactInfo: {
@@ -196,6 +204,10 @@ export default defineComponent({
     setStoreProperty: {
       type: Function,
       required: true
+    },
+    hidePartySearch: {
+      type: Boolean,
+      default: false
     }
   },
   directives: {
@@ -206,7 +218,6 @@ export default defineComponent({
       customRules,
       invalidSpaces,
       maxLength,
-      isStringOrNumber,
       required,
       isNumber,
       isEmailOptional,
@@ -216,7 +227,8 @@ export default defineComponent({
     const contactInfoForm = ref(null) as FormIF
 
     const localState = reactive({
-      contactInfoModel: props.contactInfo as PartyIF,
+      enableLookUp: true,
+      contactInfoModel: computed(() => props.contactInfo as PartyIF | SubmittingPartyIF),
       contactInfoType: SubmittingPartyTypes.PERSON,
       isContactInfoFormValid: false,
       isAddressValid: false,
@@ -232,14 +244,19 @@ export default defineComponent({
       showError: computed(() => props.validate && !localState.isContactInfoFormValid)
     })
 
+    watch(() => localState.contactInfoModel.businessName, (val: string) => {
+      val
+        ? localState.contactInfoType = SubmittingPartyTypes.BUSINESS
+        : localState.contactInfoType = SubmittingPartyTypes.PERSON
+    })
+
     watch(() => localState.contactInfoModel, (val) => {
       props.setStoreProperty(val)
     }, { deep: true, immediate: true })
 
-    watch(() => localState.contactInfoType, () => {
+    const clearFields = () => {
       if (localState.isPersonOption) {
         localState.contactInfoModel.businessName = ''
-        props.setStoreProperty(localState.contactInfoModel)
       }
       if (localState.isBusinessOption) {
         localState.contactInfoModel.personName = {
@@ -247,9 +264,8 @@ export default defineComponent({
           middle: '',
           last: ''
         }
-        props.setStoreProperty(localState.contactInfoModel)
       }
-    })
+    }
 
     watch(() => props.validate, async () => {
       contactInfoForm.value?.validate()
@@ -261,7 +277,6 @@ export default defineComponent({
 
     const firstNameRules = customRules(
       required('Enter a first name'),
-      isStringOrNumber(),
       maxLength(15),
       invalidSpaces()
     )
@@ -276,11 +291,10 @@ export default defineComponent({
       isPhone(14)
     )
 
-    const middleNameRules = customRules(isStringOrNumber(), maxLength(15), invalidSpaces())
+    const middleNameRules = customRules(maxLength(15), invalidSpaces())
 
     const lastNameRules = customRules(
       required('Enter a last name'),
-      isStringOrNumber(),
       maxLength(25),
       invalidSpaces())
 
@@ -296,6 +310,7 @@ export default defineComponent({
     )
 
     return {
+      clearFields,
       emailRules,
       firstNameRules,
       middleNameRules,
