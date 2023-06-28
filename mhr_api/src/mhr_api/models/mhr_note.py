@@ -23,6 +23,9 @@ from .db import db
 from .type_tables import MhrDocumentTypes, MhrNoteStatusTypes, MhrPartyTypes, MhrDocumentType
 
 
+REMARKS_CAUC_NO_EXPIRY = 'Continued until further order of the court.'
+
+
 class MhrNote(db.Model):  # pylint: disable=too-many-instance-attributes
     """This class manages all of the MHR note information."""
 
@@ -171,4 +174,10 @@ class MhrNote(db.Model):  # pylint: disable=too-many-instance-attributes
             note.expiry_date = model_utils.compute_caution_expiry(note.effective_ts, True)
         elif reg_json.get('expiryDateTime'):
             note.expiry_date = model_utils.expiry_datetime(reg_json['expiryDateTime'])
+        if note.document_type == MhrDocumentTypes.CAUC and not note.expiry_date:
+            if not note.remarks:
+                note.remarks = REMARKS_CAUC_NO_EXPIRY
+            elif note.remarks.lower().find(REMARKS_CAUC_NO_EXPIRY.lower()) < 0:
+                note.remarks += ' ' + REMARKS_CAUC_NO_EXPIRY
+            reg_json['remarks'] = note.remarks
         return note
