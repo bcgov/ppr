@@ -2,12 +2,15 @@
   <div id="mhr-describe-your-home">
     <section id="mhr-make-model" class="mt-10">
       <h2>Manufacturer, Make, and Model</h2>
-      <p :class="['mt-2', showHelp ? 'mb-3' : 'mb-6']" data-test-id="make-model-prompt">
+      <p
+        :class="['mt-2', isMhrManufacturerRegistration ? 'mb-3' : 'mb-6']"
+        data-test-id="make-model-prompt"
+      >
         {{ manufacturerMakeModelPrompt }}
       </p>
 
       <ContactUsToggle
-        v-if="showHelp"
+        v-if="isMhrManufacturerRegistration"
         helpText="If you require assistance with changes to your manufacturer information please contact us."
       />
 
@@ -37,32 +40,36 @@
       />
     </section>
 
-    <section v-if="showRebuiltStatus" id="mhr-rebuilt-status" class="mt-10">
-      <h2>Rebuilt Status</h2>
-      <p class="mt-2">
-        If the home was rebuilt, include the description of the changes to the home (normally accompanied by a statutory
-        declaration).
-      </p>
+    <template v-if="!isMhrManufacturerRegistration">
 
-      <RebuiltStatus
-        class="mt-6"
-        :validate="validateRebuilt"
-        :class="{'border-error-left': validateRebuilt}"
-      />
-    </section>
+      <section id="mhr-rebuilt-status" class="mt-10">
+        <h2>Rebuilt Status</h2>
+        <p class="mt-2">
+          If the home was rebuilt, include the description of the changes to the home
+          (normally accompanied by a statutory declaration).
+        </p>
 
-    <section v-if="showOtherInformation" id="mhr-other-information" class="mt-10">
-      <h2>Other Information</h2>
-      <p class="mt-2">
-        Include any other relevant information about the home.
-      </p>
+        <RebuiltStatus
+          class="mt-6"
+          :validate="validateRebuilt"
+          :class="{'border-error-left': validateRebuilt}"
+        />
+      </section>
 
-      <OtherInformation
-        class="mt-6"
-        :validate="validateOther"
-        :class="{'border-error-left': validateOther}"
-      />
-    </section>
+      <section id="mhr-other-information" class="mt-10">
+        <h2>Other Information</h2>
+        <p class="mt-2">
+          Include any other relevant information about the home.
+        </p>
+
+        <OtherInformation
+          class="mt-6"
+          :validate="validateOther"
+          :class="{'border-error-left': validateOther}"
+        />
+      </section>
+
+    </template>
   </div>
 </template>
 
@@ -122,9 +129,6 @@ export default defineComponent({
       validateOther: computed(() => {
         return getSectionValidation(MhrSectVal.YOUR_HOME_VALID, MhrCompVal.OTHER_VALID)
       }),
-      showHelp: computed(() => isMhrManufacturerRegistration.value),
-      showRebuiltStatus: computed(() => !isMhrManufacturerRegistration.value),
-      showOtherInformation: computed(() => !isMhrManufacturerRegistration.value),
       manufacturerMakeModelPrompt: computed(() : string => {
         return isRoleManufacturer.value
           ? ManufacturerMakeModelPrompt.manufacturer
@@ -149,6 +153,7 @@ export default defineComponent({
       MhrCompVal,
       MhrSectVal,
       getSectionValidation,
+      isMhrManufacturerRegistration,
       ...toRefs(localState)
     }
   }
