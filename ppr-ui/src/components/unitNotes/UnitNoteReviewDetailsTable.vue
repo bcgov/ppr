@@ -120,10 +120,12 @@ export default defineComponent({
   .unit-note-review-details-table {
     .details {
       line-height: 2em;
+      color: $gray7;
     }
     .remarks {
-      padding-top: 6px;
+      padding: 6px 0;
       line-height: 24px;
+      color: $gray7;
     }
   }
   .giving-notice-party-table.v-data-table {
