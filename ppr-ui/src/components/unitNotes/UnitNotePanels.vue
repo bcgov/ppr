@@ -10,14 +10,14 @@
         </v-col>
 
         <!-- Unit note header actions -->
-        <v-col cols="3" class="text-right pr-6">
+        <v-col cols="3" class="text-right">
           <v-menu offset-y left nudge-bottom="0" class="add-unit-note-menu">
             <template v-slot:activator="{ on, value }">
               <v-btn
                 id="open-unit-notes-btn"
                 text v-on="on"
                 color="primary"
-                class="pa-0"
+                class="pa-3"
                 :disabled="disabled"
                 :ripple="false"
               >
@@ -305,8 +305,15 @@ export default defineComponent({
 h3 {
   line-height: 1.5;
 }
+#unit-notes-header.default-header {
+  padding: 10px;
+  padding-left: 17px;
+}
 .unit-note-header-action {
   color: $primary-blue;
+  .unit-note-menu-btn {
+    padding-right: 10px;
+  }
 }
 .unit-note-panel-row {
   background: $gray1;
@@ -314,6 +321,9 @@ h3 {
   overflow-y: auto;
   .unit-note-panel {
     border-bottom: 2px solid $gray1;
+  }
+  .v-expansion-panel-header {
+    padding-right: 6px;
   }
 }
 .unit-note-list-item {
