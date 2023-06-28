@@ -61,7 +61,10 @@
                     filled
                     id="first-name"
                     class="pt-4 pr-2"
+                    :class="{ 'long-error-message': enableCombinedNameValidation }"
                     label="First Name"
+                    :error="hasLongCombinedName"
+                    :error-messages="longCombinedNameErrorMsg"
                     v-model="contactInfoModel.personName.first"
                     :rules="isPersonOption ? firstNameRules : []"
                   />
@@ -72,6 +75,8 @@
                     id="middle-name"
                     class="pt-4 px-2"
                     label="Middle Name (Optional)"
+                    :error="hasLongCombinedName"
+                    :hide-details="hasLongCombinedName"
                     v-model="contactInfoModel.personName.middle"
                     :rules="isPersonOption ? middleNameRules : []"
                   />
@@ -82,6 +87,8 @@
                     id="last-name"
                     class="pt-4 px-2"
                     label="Last Name"
+                    :error="hasLongCombinedName"
+                    :hide-details="hasLongCombinedName"
                     v-model="contactInfoModel.personName.last"
                     :rules="isPersonOption ? lastNameRules : []"
                   />
@@ -213,6 +220,10 @@ export default defineComponent({
     hideDeliveryAddress: {
       type: Boolean,
       default: false
+    },
+    enableCombinedNameValidation: {
+      type: Boolean,
+      default: false
     }
   },
   directives: {
@@ -237,6 +248,9 @@ export default defineComponent({
       contactInfoType: SubmittingPartyTypes.PERSON,
       isContactInfoFormValid: false,
       isAddressValid: false,
+      hasLongCombinedName: false,
+      longCombinedNameErrorMsg: computed(() =>
+        localState.hasLongCombinedName ? 'Person\'s Legal Name combined cannot exceed 40 characters' : ''),
       isContactInfoValid: computed(() =>
         localState.isContactInfoFormValid && localState.isAddressValid
       ),
@@ -279,6 +293,14 @@ export default defineComponent({
     watch(() => localState.isContactInfoValid, (val: boolean) => {
       emit('isValid', val)
     })
+
+    watch(() => localState.contactInfoModel.personName, async () => {
+      localState.hasLongCombinedName =
+        props.enableCombinedNameValidation &&
+        (0 || localState.contactInfoModel.personName?.first.length) +
+        (0 || localState.contactInfoModel.personName?.middle.length) +
+        (0 || localState.contactInfoModel.personName?.last.length) > 40
+    }, { deep: true })
 
     const firstNameRules = customRules(
       required('Enter a first name'),
@@ -359,6 +381,11 @@ export default defineComponent({
     ::v-deep .theme--light.v-label:not(.v-label--is-disabled), .theme--light.v-messages {
       color: $gray9 !important;
     }
+  }
+
+  .long-error-message::v-deep .v-messages.error--text {
+    position: absolute;
+    width: 350px;
   }
 
 </style>

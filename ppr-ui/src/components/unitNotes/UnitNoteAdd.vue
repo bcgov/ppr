@@ -32,6 +32,7 @@
         :validate="validate"
         :setStoreProperty="setGivingNoticeParty"
         @isValid="handleComponentValid(MhrCompVal.PERSON_GIVING_NOTICE_VALID, $event)"
+        enableCombinedNameValidation
         hidePartySearch
         hideDeliveryAddress
       />
