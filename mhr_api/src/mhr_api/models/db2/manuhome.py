@@ -866,12 +866,10 @@ class Db2Manuhome(db.Model):
                     cancel_remarks = note.remarks
                     cancel_doc_type = note.document_type
                     break
-            current_app.logger.info(f'$$$ cancel_doc_type=${cancel_doc_type}$')
             if cancel_doc_type and cancel_doc_type in ('CAU', Db2Document.DocumentTypes.CAUTION,
                                                        Db2Document.DocumentTypes.CONTINUE_CAUTION,
                                                        Db2Document.DocumentTypes.EXTEND_CAUTION):
                 for note in manuhome.reg_notes:
-                    current_app.logger.info(f'$$$ checking {note.status} ${note.document_type}$')
                     if note.status == Db2Mhomnote.StatusTypes.ACTIVE and \
                             note.document_type in (Db2Document.DocumentTypes.CAUTION,
                                                    Db2Document.DocumentTypes.CONTINUE_CAUTION,
