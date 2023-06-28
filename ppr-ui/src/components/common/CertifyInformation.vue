@@ -107,7 +107,7 @@ import { useStore } from '@/store/store'
 import { convertDate, getRegisteringPartyFromAuth } from '@/utils'
 import { BaseAddress } from '@/composables/address'
 import { DefaultSchema } from '@/composables/address/resources'
-import { CertifyIF, PartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
+import { CertifyIF, ContentIF, PartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { storeToRefs } from 'pinia'
 import { authorizedTableHeaders } from '@/resources'
@@ -129,6 +129,10 @@ export default defineComponent({
     isMhr: {
       type: Boolean,
       default: false
+    },
+    content: {
+      type: Object as () => ContentIF,
+      default: () => {}
     }
   },
   setup (props, { emit }) {
@@ -147,9 +151,10 @@ export default defineComponent({
     const localState = reactive({
       legalName: '',
       certified: false,
-      infoText: 'The following account information will be recorded by BC Registries upon registration and payment. ' +
-                'This information is used to confirm you have the authority to submit this registration and will ' +
-                'not appear on the verification statement.',
+      infoText: props.content?.description ||
+        'The following account information will be recorded by BC Registries upon registration and payment. ' +
+        'This information is used to confirm you have the authority to submit this registration and will ' +
+        'not appear on the verification statement.',
       showErrors: computed((): boolean => {
         return props.setShowErrors
       }),

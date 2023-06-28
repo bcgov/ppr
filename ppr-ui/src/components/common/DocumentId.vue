@@ -111,13 +111,11 @@ export default defineComponent({
           const validateDocId: MhrDocIdResponseIF = await validateDocumentID(localState.documentIdModel)
           localState.isUniqueDocId = !validateDocId.exists && validateDocId.valid
           localState.displayDocIdError = !localState.isUniqueDocId
-          localState.isUnitNoteValid = localState.isVerifiedDocId
 
           emit('isValid', localState.isVerifiedDocId)
         } else {
           localState.isUniqueDocId = false
           localState.displayDocIdError = false
-          localState.isUnitNoteValid = false
 
           emit('isValid', false)
         }

@@ -115,7 +115,7 @@
             :rules="[...schemaLocal.postalCode]"
           />
         </div>
-        <div class="form__row">
+        <div v-if="!hideDeliveryAddress" class="form__row">
           <v-textarea
             auto-grow
             filled
@@ -177,6 +177,11 @@ export default defineComponent({
     },
     /* Hides the persistent hint field on Address Input */
     hideAddressHint: {
+      type: Boolean,
+      default: false
+    },
+    /* Hides Delivery Address field (e.g. for Unit Notes) */
+    hideDeliveryAddress: {
       type: Boolean,
       default: false
     }

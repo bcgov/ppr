@@ -183,7 +183,7 @@ export default defineComponent({
         addSecuredParty(newParty)
       }
 
-      context.emit('selectItem')
+      context.emit('selectItem', newParty)
       closeAutoComplete()
     }
 

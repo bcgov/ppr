@@ -1,5 +1,5 @@
 import { RegistrationFlowType } from '@/enums'
-import { PartyIF, RegistrationTypeIF, StateModelIF, SubmittingPartyIF } from '@/interfaces'
+import { PartyIF, RegistrationTypeIF, StateModelIF } from '@/interfaces'
 
 export const stateModel: StateModelIF = {
   accountInformation: {
@@ -309,10 +309,16 @@ export const stateModel: StateModelIF = {
     ownLand: false,
     isAffidavitTransferCompleted: false
   },
-  mhrUnitNote: { // standalone singe note used for Unit Note filing/registration
+  mhrUnitNote: {
+    // standalone singe note used for Unit Note filing/registration
     clientReferenceId: '',
     attentionReference: '',
     submittingParty: {
+      personName: {
+        first: '',
+        last: '',
+        middle: ''
+      },
       businessName: '',
       address: {
         street: '',
@@ -322,8 +328,9 @@ export const stateModel: StateModelIF = {
         country: '',
         postalCode: ''
       },
+      emailAddress: '',
       phoneNumber: '',
-      emailAddress: ''
+      phoneExtension: ''
     },
     note: {
       documentType: null,
@@ -360,7 +367,11 @@ export const stateModel: StateModelIF = {
     unitNoteAddValid: {
       documentIdValid: false,
       remarksValid: false,
-      personGivingNoticeValid: false
+      personGivingNoticeValid: false,
+      submittingPartyValid: false,
+      attentionValid: false,
+      authorizationValid: false,
+      staffPaymentValid: false
     }
   },
   // Manufactured Home Registration Information Validation Flags

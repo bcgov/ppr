@@ -20,7 +20,11 @@
                 {{ mhrNumber }}.
               </p>
 
-              <UnitNoteAdd :docType='unitNoteDocType' />
+              <UnitNoteAdd
+                :docType='unitNoteDocType'
+                :validate="validate"
+                @isValid="isUnitNoteValid = $event"
+              />
             </div>
 
             <div v-else class="pt-3" data-test-id="unit-note-review">
@@ -61,7 +65,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, reactive, toRefs, onMounted } from 'vue-demi'
+import { defineComponent, computed, reactive, toRefs, onMounted, nextTick } from 'vue-demi'
 import { useRouter } from 'vue2-helpers/vue-router'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
@@ -97,6 +101,8 @@ export default defineComponent({
     } = storeToRefs(useStore())
 
     const localState = reactive({
+      isUnitNoteValid: false,
+      validate: false,
       isReviewMode: false,
       cancelOptions: unsavedChangesDialog,
       showCancelDialog: false,
@@ -120,7 +126,9 @@ export default defineComponent({
     })
 
     const goToReview = async (): Promise<void> => {
-      localState.isReviewMode = true
+      localState.validate = true // validate Unit Note components
+      await nextTick()
+      if (localState.isUnitNoteValid) localState.isReviewMode = true
     }
 
     const goToDash = (): void => {
