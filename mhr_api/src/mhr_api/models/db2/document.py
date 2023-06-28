@@ -40,6 +40,9 @@ class Db2Document(db.Model):
         PERMIT = '103 '
         PERMIT_TRIM = '103'
         PERMIT_EXTENSION = '103E'
+        CAUTION = 'CAU '
+        CONTINUE_CAUTION = 'CAUC'
+        EXTEND_CAUTION = 'CAUE'
 
     __bind_key__ = 'db2'
     __tablename__ = 'document'

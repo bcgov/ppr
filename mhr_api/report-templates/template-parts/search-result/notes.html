@@ -9,22 +9,32 @@
     {% for note in detail.notes %}
         <div class="no-page-break">
             <div class="section-title mt-4">{{note.documentDescription}}</div>      
-            <table class="no-page-break section-data details-table mt-4" role="presentation">
+            <table class="no-page-break section-data notes-table mt-4" role="presentation">
                 <tr>
                     <td class="section-sub-title">MHR Number:</td>
                     <td>{{detail.mhrNumber}}</td>
                 </tr>
                 <tr>
-                    <td class="section-sub-title">Document Number:</td>
-                    <td>{{note.documentId}}</td>
+                    <td class="section-sub-title">Document Registration Number:</td>
+                    <td>{{note.documentRegistrationNumber}}</td>
                 </tr>
                 <tr>
-                    <td class="section-sub-title">Registration Date and Time:</td>
+                    <td class="section-sub-title">Document Registration Date and Time:</td>
                     <td>{{note.createDateTime}}</td>
                 </tr>
                 <tr>
+                    <td class="section-sub-title">Effective Date and Time:</td>
+                    <td>
+                        {% if note.effectiveDateTime is defined and note.effectiveDateTime != '' %}
+                            {{note.effectiveDateTime}}
+                        {% else %}
+                            {{note.createDateTime}}
+                        {% endif %}                        
+                    </td>
+                </tr>
+                <tr>
                     <td class="section-sub-title">
-                        {% if note.documentType == 'EXNR' %}Destroyed Date:{% else %}Expired Date:{% endif %}
+                        {% if note.documentType == 'EXNR' %}Destroyed Date:{% else %}Expiry Date:{% endif %}
                     </td>
                     <td>{% if note.expiryDate is defined and note.expiryDate != '' %} 
                             {{note.expiryDate}}
@@ -104,5 +114,8 @@
                 </tr>
         </table>
         </div>
+        {% if not loop.last %}
+            <div class="separator mt-4 mb-1"></div>
+        {% endif %}
     {% endfor %}
 {% endif %}

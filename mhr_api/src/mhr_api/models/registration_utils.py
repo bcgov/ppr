@@ -249,9 +249,9 @@ def get_generated_values(registration, draft, user_group: str = None):
         registration.draft_number = str(row[4])
         registration.draft_id = int(row[5])
     if gen_doc_id and not draft:
-        registration.doc_id = str(row[4])
-    elif gen_doc_id and draft:
         registration.doc_id = str(row[6])
+    elif gen_doc_id and draft:
+        registration.doc_id = str(row[4])
     return registration
 
 

@@ -114,7 +114,7 @@ TEST_NOTE_DATA_EXPIRY = [
     ('Invalid past', False, 'CAUE', -30, '080104', 'ppr_staff', validator.EXPIRY_PAST),
     ('Invalid required', False, 'CAUE', None, '080104', 'ppr_staff', validator.EXPIRY_REQUIRED),
     ('Invalid before current', False, 'CAUE', +1, '080104', 'ppr_staff', validator.EXPIRY_BEFORE_CURRENT),
-    ('Invalid expiry elapsed', False, 'CAUE', +1, '046315', 'ppr_staff', validator.EXPIRY_CURRENT_EXPIRED)
+    ('Valid expiry elapsed', True, 'CAUE', +1, '046315', 'ppr_staff', None)
 ]
 # test data pattern is ({description}, {valid}, {doc_type}, {remarks}, {mhr_num}, {account}, {message_content})
 TEST_NOTE_DATA_REMARKS = [

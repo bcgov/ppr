@@ -76,6 +76,12 @@ TEST_DATA_LTSA_PID = [
     (True, 7284, 'REG01020', False),
     (True, 7282, 'REG01019', True)
 ]
+# testdata pattern is ({manhomid}, {street}, {city}, {region}, {country})
+TEST_ADDRESS_DATA_FIND = [
+    (107725, '3737 PALM HARBOR DRIVE', 'MILLERSBURG', 'OR', 'US'),
+    (26, '3120 NORTH ISLAND HIGHWAY', 'CAMPBELL RIVER', 'BC', 'CA'),
+    (87950, '13455 FORT ROAD', 'EDMONTON', 'AB', 'CA')
+]
 
 
 @pytest.mark.parametrize('exists,manuhome_id,park_name,pad,street_num,street,city,count', TEST_DATA)
@@ -159,6 +165,19 @@ def test_find_by_manuhome_id_active(session, exists, manuhome_id, park_name, pad
         assert reg_json['address']['postalCode'] is not None
     else:
         assert not location
+
+
+@pytest.mark.parametrize('manuhome_id,street,city,region,country', TEST_ADDRESS_DATA_FIND)
+def test_find_address(session, manuhome_id, street, city, region, country):
+    """Assert that find a location address json contains all expected elements."""
+    location: Db2Location = Db2Location.find_by_manuhome_id_active(manuhome_id)
+    assert location
+    loc_json = location.registration_json
+    assert loc_json.get('address')
+    assert loc_json['address'].get('city') == city
+    assert loc_json['address'].get('street') == street
+    assert loc_json['address'].get('region') == region
+    assert loc_json['address'].get('country') == country
 
 
 @pytest.mark.parametrize('exists,manuhome_id,doc_id', TEST_DATA_DOC_ID)

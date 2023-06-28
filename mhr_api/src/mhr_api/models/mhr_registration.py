@@ -364,12 +364,25 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         db.session.commit()
 
     def save_cancel_note(self, json_data, new_reg_id):
-        """Update the original MH removed owner groups."""
+        """Update the original note status and change registration id."""
         cancel_note: MhrNote = self.get_cancel_note(json_data.get('cancelDocumentId', ''))
-        if cancel_note:
+        if cancel_note:  # pylint: disable=too-many-nested-blocks; only 1 more.
             cancel_note.status_type = MhrNoteStatusTypes.CANCELLED
             cancel_note.change_registration_id = new_reg_id
             current_app.logger.debug(f'updating note status, change reg id for reg id {cancel_note.registration_id}')
+            # Cancelling one active caution registration cancels all active caution registrations
+            if cancel_note.document_type in (MhrDocumentTypes.CAU, MhrDocumentTypes.CAUC, MhrDocumentTypes.CAUE):
+                for reg in self.change_registrations:
+                    if reg.notes:
+                        doc: MhrDocument = reg.documents[0]
+                        if doc.document_id != json_data.get('cancelDocumentId') and \
+                                doc.document_type in (MhrDocumentTypes.CAU,
+                                                      MhrDocumentTypes.CAUC,
+                                                      MhrDocumentTypes.CAUE):
+                            note: MhrNote = reg.notes[0]
+                            if note.status_type == MhrNoteStatusTypes.ACTIVE:
+                                note.status_type = MhrNoteStatusTypes.CANCELLED
+                                note.change_registration_id = new_reg_id
             db.session.commit()
 
     def save_permit(self, new_reg_id):
@@ -408,6 +421,15 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                     current_app.logger.debug(f'No new registration found for id={registration_id}')
                     registration = MhrRegistration()
                 registration.manuhome = legacy_utils.find_by_id(registration_id, search)
+        if search and registration and registration.mhr_number:
+            try:
+                registration.change_registrations = \
+                    cls.query.filter(MhrRegistration.mhr_number == registration.mhr_number,
+                                     MhrRegistration.registration_type != MhrRegistrationTypes.MHREG).all()
+            except Exception as db_exception:   # noqa: B902; return nicer error
+                current_app.logger.error('DB find_by_id change registrations exception: ' + str(db_exception))
+                raise DatabaseException(db_exception)
+
         return registration
 
     @classmethod
@@ -861,6 +883,10 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                 party_type = owner_json.get('partyType', None)
                 if not party_type and owner_json.get('individualName'):
                     party_type = MhrPartyTypes.OWNER_IND
+                elif party_type and party_type == MhrPartyTypes.OWNER_BUS and owner_json.get('individualName'):
+                    party_type = MhrPartyTypes.OWNER_IND
+                elif party_type and party_type == MhrPartyTypes.OWNER_IND and owner_json.get('organizationName'):
+                    party_type = MhrPartyTypes.OWNER_BUS
                 elif not party_type:
                     party_type = MhrPartyTypes.OWNER_BUS
                 group.owners.append(MhrParty.create_from_json(owner_json, party_type, self.id))

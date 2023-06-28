@@ -16,6 +16,7 @@ from flask import current_app
 
 from mhr_api.exceptions import DatabaseException
 from mhr_api.models import db, utils as model_utils
+from mhr_api.models.db2 import address_utils
 from mhr_api.models.type_tables import MhrLocationTypes
 from mhr_api.models.ltsa_description import LtsaDescription
 from mhr_api.utils.base import BaseEnum
@@ -224,7 +225,7 @@ class Db2Location(db.Model):
                 'street': street,
                 'city': self.town_city,
                 'region': self.province,
-                'country': 'CA',
+                'country': Db2Location.get_country(self.province),
                 'postalCode': ''
             },
             'pidNumber': self.pid_number,
@@ -245,6 +246,11 @@ class Db2Location(db.Model):
             'dealerName': self.dealer_name,
             'additionalDescription': self.additional_description
         }
+        # 1 location with an invalid province code:
+        if self.province and self.province == 'XX' and self.town_city and self.town_city.find('WA USA') != -1:
+            location['address']['region'] = 'WA'
+            location['address']['country'] = 'US'
+            location['address']['city'] = self.town_city.replace('WA USA', '').strip()
         if self.leave_bc == 'Y':
             location['leaveProvince'] = True
         if self.tax_certificate == 'Y':
@@ -272,7 +278,7 @@ class Db2Location(db.Model):
                 'street': street,
                 'city': self.town_city,
                 'region': self.province,
-                'country': 'CA',
+                'country': Db2Location.get_country(self.province),
                 'postalCode': ''
             },
             'pidNumber': self.pid_number,
@@ -412,3 +418,14 @@ class Db2Location(db.Model):
         location = Db2Location.create_from_dict(json_data)
 
         return location
+
+    @staticmethod
+    def get_country(region: str) -> str:
+        """Try to derive a country code from a region code."""
+        if not region:
+            return ''
+        if address_utils.PROVINCE_CODES.find(region) > 0:
+            return address_utils.COUNTRY_CA
+        if address_utils.STATE_CODES.find(region) > 0 or region == address_utils.COUNTRY_US:
+            return address_utils.COUNTRY_US
+        return ''

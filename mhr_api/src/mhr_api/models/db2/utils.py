@@ -792,6 +792,7 @@ def get_search_json(registration):
                 if FROM_LEGACY_DOC_TYPE.get(doc_type):
                     doc_type = FROM_LEGACY_DOC_TYPE.get(doc_type)
                 note['documentDescription'] = get_doc_desc(doc_type)
+                note = update_note_json(registration, note)
                 updated_notes.append(note)
         reg_json['notes'] = updated_notes
     reg_json = registration.set_location_json(reg_json, True)
@@ -850,3 +851,20 @@ def get_next_mhr_number() -> str:
     except Exception as db_exception:   # noqa: B902; return nicer error
         current_app.logger.error('DB2 get_next_mhr_number exception: ' + str(db_exception))
         raise DatabaseException(db_exception)
+
+
+def update_note_json(registration, note_json: dict) -> dict:
+    """Conditionally update the note json with new registration data if available."""
+    if not registration.change_registrations:
+        return note_json
+    for reg in registration.change_registrations:
+        if reg.notes:
+            doc = reg.documents[0]
+            if doc.document_id == note_json.get('documentId'):
+                note_json['createDateTime'] = model_utils.format_ts(reg.registration_ts)
+                note = reg.notes[0]
+                if note.expiry_date:
+                    note_json['expiryDateTime'] = model_utils.format_ts(note.expiry_date)
+                if note.effective_ts:
+                    note_json['effectiveDateTime'] = model_utils.format_ts(note.effective_ts)
+    return note_json
