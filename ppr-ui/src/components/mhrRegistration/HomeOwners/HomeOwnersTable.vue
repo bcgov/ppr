@@ -27,7 +27,7 @@
             <div
               v-if="showGroups && !(disableGroupHeader(group.groupId) && (hideRemovedOwners || isReadonlyTable))"
               :colspan="4"
-              class="py-3 px-7 pl-0 group-header-slot"
+              class="py-3 px-7 group-header-slot"
               :class="{
                 'spacer-header': disableGroupHeader(group.groupId),
                 'border-error-left': isInvalidOwnerGroup(group.groupId)
@@ -71,7 +71,7 @@
                 >
                   <div
                     class="error-text my-6 text-center"
-                    :data-test-id="`no-owners-msg-group-${group.owners.indexOf(item)}`"
+                    :data-test-id="`no-owners-msg-group-${homeOwners.indexOf(item)}`"
                   >
                     <HomeOwnersGroupError :groupId="group.groupId" />
                   </div>
@@ -85,7 +85,7 @@
                 />
               </tr>
 
-              <template v-if="isCurrentlyEditing(group.owners.indexOf(item))">
+              <template v-if="isCurrentlyEditing(homeOwners.indexOf(item))">
                 <div class="pa-0" :colspan="homeOwnersTableHeaders.length">
                   <v-expand-transition>
                     <AddEditHomeOwner
@@ -101,7 +101,7 @@
               </template>
 
                 <tr v-else-if="item.ownerId"
-                  :key="`owner-row-key-${group.owners.indexOf(item)}`"
+                  :key="`owner-row-key-${homeOwners.indexOf(item)}`"
                   class="owner-info"
                   :data-test-id="`owner-info-${item.ownerId}`"
                 >
@@ -186,7 +186,7 @@
                         class="mr-n4"
                         :ripple="false"
                         :disabled="isAddingMode || isEditingMode || isGlobalEditingMode"
-                        @click="openForEditing(group.owners.indexOf(item))"
+                        @click="openForEditing(homeOwners.indexOf(item))"
                         data-test-id="table-edit-btn"
                       >
                         <v-icon small>mdi-pencil</v-icon>
@@ -283,7 +283,7 @@
                           <v-list class="actions-dropdown actions__more-actions">
                             <!-- Menu Edit Option -->
                             <v-list-item class="my-n2">
-                              <v-list-item-subtitle class="pa-0" @click="openForEditing(group.owners.indexOf(item))">
+                              <v-list-item-subtitle class="pa-0" @click="openForEditing(homeOwners.indexOf(item))">
                                 <v-icon small class="mb-1">mdi-pencil</v-icon>
                                 <span class="ml-1 remove-btn-text">Change Details</span>
                               </v-list-item-subtitle>
