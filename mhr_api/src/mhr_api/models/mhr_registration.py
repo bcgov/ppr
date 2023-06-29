@@ -815,17 +815,6 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
             notice_json = json_data['note']['givingNoticeParty']
             registration.parties.append(MhrParty.create_from_json(notice_json, MhrPartyTypes.CONTACT, registration.id))
         doc: MhrDocument = registration.documents[0]
-        cancel_note: MhrNote = None
-        if doc.document_type == MhrDocumentTypes.NCAN and json_data.get('cancelDocumentId'):
-            cancel_doc_id: str = json_data.get('cancelDocumentId')
-            cancel_note = base_reg.get_cancel_note(cancel_doc_id)
-            if cancel_note:
-                json_data['note']['remarks'] = cancel_note.remarks
-            elif model_utils.is_legacy() and base_reg.manuhome and base_reg.manuhome.reg_notes:
-                for note in base_reg.manuhome.reg_notes:
-                    if note.reg_document_id == cancel_doc_id:
-                        json_data['note']['remarks'] = note.remarks
-                        break
         if model_utils.is_legacy() and base_reg and base_reg.manuhome and base_reg.manuhome.reg_notes:
             json_data['note']['noteId'] = len(base_reg.manuhome.reg_notes) + 1
         else:
