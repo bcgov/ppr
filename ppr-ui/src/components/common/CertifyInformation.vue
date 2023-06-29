@@ -25,18 +25,7 @@
             <tbody v-if="registeringParty.length > 0">
               <tr v-for="(item, index) in registeringParty" :key="`${item}: ${index}`" class="party-row">
                 <td class="list-item__title title-text" style="padding-left:30px">
-                  <v-row no-gutters>
-                    <v-col cols="3">
-                      <div class="icon-div mt-n1 pr-4">
-                        <v-icon>mdi-account</v-icon>
-                      </div>
-                    </v-col>
-                    <v-col cols="9">
-                      <div>
-                        {{ legalName }}
-                      </div>
-                    </v-col>
-                  </v-row>
+                  <v-icon class="v-icon mt-n2">mdi-account</v-icon><span>{{ legalName }}</span>
                 </td>
                 <td class="pl-1">{{ item.businessName }}</td>
                 <td>
