@@ -46,7 +46,7 @@
       </tr>
       {% if note is defined and note.documentType is defined and note.documentType in ('CAU', 'CAUC', 'CAUE') %}
         <tr>
-            <td>Expiry Date and Time:</td>
+            <td>Expiry Date:</td>
             <td>
                 {% if note.expiryDateTime is defined and note.expiryDateTime != '' %}
                     {{note.expiryDateTime}}

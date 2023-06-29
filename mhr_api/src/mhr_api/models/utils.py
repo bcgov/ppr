@@ -772,3 +772,15 @@ def compute_caution_expiry(effective_ts, end_of_day: bool = False):
         # Return as UTC
         return _datetime.utcfromtimestamp(local_ts.timestamp()).replace(tzinfo=timezone.utc)
     return effective_ts
+
+
+def expiry_datetime(expiry_iso: str):
+    """Set the expiry time to the end of the day."""
+    base_date = date_from_iso_format(expiry_iso)
+    # Naive time
+    expiry_time = time(23, 59, 59, tzinfo=None)
+    expiry_ts = _datetime.combine(base_date, expiry_time)
+    # Explicitly set to local timezone which will adjust for daylight savings.
+    local_ts = LOCAL_TZ.localize(expiry_ts)
+    # Return as UTC
+    return _datetime.utcfromtimestamp(local_ts.timestamp()).replace(tzinfo=timezone.utc)

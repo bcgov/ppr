@@ -856,6 +856,7 @@ class Db2Manuhome(db.Model):
         doc.update_id = current_app.config.get('DB2_RACF_ID', '')
         manuhome.reg_documents.append(doc)
         cancel_remarks: str = None
+        cancel_doc_type: str = None
         if new_doc.document_type == MhrDocumentTypes.NCAN and reg_json.get('cancelDocumentId'):
             cancel_doc_id: str = reg_json.get('cancelDocumentId')
             for note in manuhome.reg_notes:
@@ -863,7 +864,18 @@ class Db2Manuhome(db.Model):
                     note.can_document_id = doc.id
                     note.status = Db2Mhomnote.StatusTypes.CANCELLED
                     cancel_remarks = note.remarks
+                    cancel_doc_type = note.document_type
                     break
+            if cancel_doc_type and cancel_doc_type in ('CAU', Db2Document.DocumentTypes.CAUTION,
+                                                       Db2Document.DocumentTypes.CONTINUE_CAUTION,
+                                                       Db2Document.DocumentTypes.EXTEND_CAUTION):
+                for note in manuhome.reg_notes:
+                    if note.status == Db2Mhomnote.StatusTypes.ACTIVE and \
+                            note.document_type in (Db2Document.DocumentTypes.CAUTION,
+                                                   Db2Document.DocumentTypes.CONTINUE_CAUTION,
+                                                   Db2Document.DocumentTypes.EXTEND_CAUTION):
+                        note.can_document_id = doc.id
+                        note.status = Db2Mhomnote.StatusTypes.CANCELLED
         # Add note.
         if reg_json.get('note'):
             reg_note = registration.notes[0]

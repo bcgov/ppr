@@ -17,7 +17,7 @@ Validation includes verifying the data combination for various registration docu
 """
 from flask import current_app
 
-from mhr_api.models import MhrRegistration, utils as model_utils
+from mhr_api.models import MhrRegistration, utils as model_utils, MhrNote
 from mhr_api.models.type_tables import MhrRegistrationTypes, MhrDocumentTypes, MhrNoteStatusTypes
 from mhr_api.models.db2.mhomnote import FROM_LEGACY_STATUS
 from mhr_api.utils import validator_utils
@@ -159,8 +159,6 @@ def validate_expiry_ts(registration: MhrRegistration, json_data, doc_type: str) 
             expiry = get_cau_note_expiry(registration)
             if expiry and expiry_ts.date() < expiry:
                 error_msg += EXPIRY_BEFORE_CURRENT
-            if expiry and expiry < now.date():
-                error_msg += EXPIRY_CURRENT_EXPIRED
     return error_msg
 
 
@@ -199,8 +197,13 @@ def get_cau_note_expiry(registration: MhrRegistration):
         for note in registration.manuhome.notes:
             if note.document_type in ('CAU', 'CAU '):
                 expiry = note.expiry_date
-    elif not model_utils.is_legacy and registration.notes:
-        for note in registration.notes:
-            if note.document_type == MhrDocumentTypes.CAU:
-                expiry = note.expiry_date
+    elif not model_utils.is_legacy and registration.change_registrations:
+        note: MhrNote = None
+        for reg in registration.change_registrations:
+            if reg.notes and reg.documents and reg.documents[0].document_type == MhrDocumentTypes.CAU:
+                cau_note: MhrNote = reg.notes[0]
+                if note is None or cau_note.registration_id > note.registration_id:
+                    note = cau_note
+        if note:
+            expiry = note.expiry_date
     return expiry

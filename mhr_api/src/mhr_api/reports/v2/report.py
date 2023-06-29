@@ -529,7 +529,7 @@ class Report:  # pylint: disable=too-few-public-methods
             if note.get('expiryDateTime') and str(note['expiryDateTime']).startswith('0001-01-01'):
                 note['expiryDateTime'] = ''
             elif note.get('expiryDateTime'):
-                note['expiryDateTime'] = Report._to_report_datetime(note.get('expiryDateTime'))
+                note['expiryDateTime'] = Report._to_report_datetime(note.get('expiryDateTime'), False)
             if note.get('effectiveDateTime'):
                 note['effectiveDateTime'] = Report._to_report_datetime(note.get('effectiveDateTime'))
             if note.get('givingNoticeParty') and note['givingNoticeParty'].get('phoneNumber'):
