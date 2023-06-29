@@ -1,5 +1,5 @@
 <template>
-  <v-card flat id="home-owners-summary" class="mt-6">
+  <v-card flat id="home-owners-summary" class="mt-10">
     <header class="review-header">
       <img class="ml-1 home-owners-icon" src="@/assets/svgs/homeownersicon_reviewscreen.svg" />
       <label class="font-weight-bold pl-2">Home Owners</label>

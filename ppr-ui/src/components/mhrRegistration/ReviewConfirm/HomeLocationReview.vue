@@ -1,5 +1,5 @@
 <template>
-  <v-card flat id="home-location-summary" class="mt-6">
+  <v-card flat id="home-location-summary" class="mt-10">
     <header class="review-header">
       <img class="ml-1 home-location-icon" color="darkBlue" src="@/assets/svgs/homelocationicon_reviewscreen.svg"/>
       <label class="font-weight-bold pl-2">Location of Home</label>
@@ -224,28 +224,28 @@
             </v-col>
           </v-row>
 
-          <div class="px-4">
-            <v-divider />
-          </div>
+          <template v-if="!isMhrManufacturerRegistration">
+            <v-divider class="mx-4"/>
 
-          <!-- Land Details -->
-          <v-row no-gutters class="px-6 pt-6" >
-            <v-col cols="3" class="pt-1">
-              <h3>Land Details</h3>
-            </v-col>
-          </v-row>
+            <!-- Land Details -->
+            <v-row no-gutters class="px-6 pt-6" >
+              <v-col cols="3" class="pt-1">
+                <h3>Land Details</h3>
+              </v-col>
+            </v-row>
 
-          <!-- Lease or Land Ownership -->
-          <v-row no-gutters class="px-6 pt-1" >
-            <v-col cols="3" class="pt-1">
-              <h3>Lease or Land Ownership</h3>
-            </v-col>
-            <v-col cols="9" class="pt-1">
-              <p>
-                <span v-html="landOwnershipLabel"></span>
-              </p>
-            </v-col>
-          </v-row>
+            <!-- Lease or Land Ownership -->
+            <v-row no-gutters class="px-6 pt-1" >
+              <v-col cols="3" class="pt-1">
+                <h3>Lease or Land Ownership</h3>
+              </v-col>
+              <v-col cols="9" class="pt-1">
+                <p>
+                  <span v-html="landOwnershipLabel"></span>
+                </p>
+              </v-col>
+            </v-row>
+          </template>
 
       </section>
     </div>
@@ -341,6 +341,7 @@ export default defineComponent({
       getStepValidation,
       getMhrRegistrationLocation,
       getIsManualLocation,
+      isMhrManufacturerRegistration,
       ...toRefs(localState)
     }
   }

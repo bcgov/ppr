@@ -1,12 +1,12 @@
 <template>
-  <v-card flat id="mhr-registration-summary" class="mt-6">
+  <v-card flat id="mhr-registration-summary" class="mt-10">
     <header class="review-header">
       <v-icon class="ml-1" color="darkBlue">mdi-home</v-icon>
       <label class="font-weight-bold pl-2">{{ isTransferReview ? 'Description of Home' : 'Your Home' }}</label>
     </header>
 
-    <div :class="{'border-error-left': !getStepValidation(MhrSectVal.YOUR_HOME_VALID)} && !isTransferReview">
-      <section class="mx-6 pt-8" v-if="!getStepValidation(MhrSectVal.YOUR_HOME_VALID) && !isTransferReview">
+    <div :class="{'border-error-left': showStepError && !isTransferReview }">
+      <section class="mx-6 pt-8" v-if="showStepError && !isTransferReview">
         <span>
           <v-icon color="error">mdi-information-outline</v-icon>
           <span class="error-text mx-1">This step is unfinished.</span>
@@ -58,10 +58,7 @@
         </v-row>
       </section>
 
-      <!-- divider -->
-      <div class="px-4">
-        <v-divider />
-      </div>
+      <v-divider class="mx-4"/>
 
       <!-- CSA Review -->
       <template v-if="isCSA || isEngineerInspection">
@@ -113,10 +110,7 @@
         </v-row>
       </template>
 
-      <!-- divider -->
-      <div class="px-4">
-        <v-divider />
-      </div>
+      <v-divider class="mx-4"/>
 
       <!-- Home Sections Review -->
       <template>
@@ -126,33 +120,32 @@
         </section>
       </template>
 
-      <div class="px-4">
-        <v-divider />
-      </div>
+      <template v-if="!isMhrManufacturerRegistration">
+        <v-divider class="mx-4"/>
 
-      <!-- Rebuilt Status Review -->
-      <v-row no-gutters class="pa-6">
-        <v-col cols="3">
-          <h3>Rebuilt Status</h3>
-        </v-col>
-        <v-col cols="9">
-          <p v-html="formatAsHtml(getMhrRegistrationHomeDescription.rebuiltRemarks) || '(Not Entered)'"></p>
-        </v-col>
-      </v-row>
+        <!-- Rebuilt Status Review -->
+        <v-row no-gutters class="pa-6">
+          <v-col cols="3">
+            <h3>Rebuilt Status</h3>
+          </v-col>
+          <v-col cols="9">
+            <p v-html="formatAsHtml(getMhrRegistrationHomeDescription.rebuiltRemarks) || '(Not Entered)'"></p>
+          </v-col>
+        </v-row>
 
-      <div class="px-4">
-        <v-divider />
-      </div>
+        <v-divider class="mx-4"/>
 
-      <!-- Other Information Review -->
-      <v-row no-gutters class="pa-6">
-        <v-col cols="3">
-          <h3>Other Information</h3>
-        </v-col>
-        <v-col cols="9">
-          <p v-html="formatAsHtml(getMhrRegistrationOtherInfo) || '(Not Entered)'"></p>
-        </v-col>
-      </v-row>
+        <!-- Other Information Review -->
+        <v-row no-gutters class="pa-6">
+          <v-col cols="3">
+            <h3>Other Information</h3>
+          </v-col>
+          <v-col cols="9">
+            <p v-html="formatAsHtml(getMhrRegistrationOtherInfo) || '(Not Entered)'"></p>
+          </v-col>
+        </v-row>
+      </template>
+
     </div>
   </v-card>
 </template>
@@ -181,7 +174,8 @@ export default defineComponent({
     const {
       getMhrRegistrationHomeDescription,
       getMhrRegistrationOtherInfo,
-      getMhrRegistrationValidationModel
+      getMhrRegistrationValidationModel,
+      isMhrManufacturerRegistration
     } = storeToRefs(useStore())
 
     const {
@@ -199,16 +193,16 @@ export default defineComponent({
       }),
       engineerDisplayDate: computed((): string => {
         return yyyyMmDdToPacificDate(getMhrRegistrationHomeDescription.value?.engineerDate, true)
-      })
+      }),
+      showStepError: computed(() => !getStepValidation(MhrSectVal.YOUR_HOME_VALID))
     })
 
     return {
       formatAsHtml,
       RouteNames,
-      MhrSectVal,
-      getStepValidation,
       getMhrRegistrationOtherInfo,
       getMhrRegistrationHomeDescription,
+      isMhrManufacturerRegistration,
       ...toRefs(localState)
     }
   }

@@ -138,6 +138,13 @@ export const useNewMhrRegistration = () => {
     setMhrHomeDescription({ key: 'manufacturer', value: data.description.manufacturer })
     setMhrHomeDescription({ key: 'certificationOption', value: HomeCertificationOptions.CSA })
     setMhrRegistrationSubmittingParty(data.submittingParty)
+
+    // Add id to owners to ensure home owners table functionality works.
+    let defaultID = 1
+    data.ownerGroups.forEach((group: MhrRegistrationHomeOwnerGroupIF) => {
+      group.owners.forEach((owner) => { owner.ownerId = defaultID++ })
+    })
+
     setMhrRegistrationHomeOwnerGroups(data.ownerGroups)
     for (const [key, val] of Object.entries(data.location)) {
       setMhrLocation({ key: key, value: val })

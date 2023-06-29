@@ -1,18 +1,14 @@
 <template>
-  <div :class="$style['caution-box']" class="caution-box">
+  <div class="caution-box">
     <p class="ma-0 pa-4">
-      <b>{{ importantWord }}:</b> {{ msg }}
+      <b>{{ setImportantWord }}:</b> {{ setMsg }}
     </p>
   </div>
 </template>
 
 <script lang="ts">
 // external
-import {
-  defineComponent,
-  reactive,
-  toRefs
-} from 'vue-demi'
+import { defineComponent } from 'vue-demi'
 
 export default defineComponent({
   name: 'CautionBox',
@@ -22,21 +18,11 @@ export default defineComponent({
       type: String,
       default: 'Important'
     }
-  },
-  setup (props) {
-    const localState = reactive({
-      msg: props.setMsg,
-      importantWord: props.setImportantWord
-    })
-
-    return {
-      ...toRefs(localState)
-    }
   }
 })
 </script>
 
-<style lang="scss" module>
+<style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
 .caution-box {
   background-color: $BCgovGold0;
