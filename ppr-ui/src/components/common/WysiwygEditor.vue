@@ -41,7 +41,13 @@
             :class="{ 'is-active': isActiveTool(tool) }"
             @click="getToolAction(tool)"
           >
-            <v-icon small>{{ tool.icon }}</v-icon>
+            <v-icon
+              small
+              class="toolbar-icon"
+              :class="tool.isActiveClass === 'heading' ? 'fs-17' : 'fs-21'"
+            >
+              {{ tool.icon }}
+            </v-icon>
           </v-btn>
         </template>
         <div class="pt-2 pb-2">
@@ -215,7 +221,10 @@ export default defineComponent({
   background-color: $gray3!important;
 }
 .toolbar-tooltip {
-  width: 120px !important;
+  width: 120px!important;
+}
+.toolbar-icon {
+  color: $gray7!important;
 }
 .editor-block {
   width: 100%;
