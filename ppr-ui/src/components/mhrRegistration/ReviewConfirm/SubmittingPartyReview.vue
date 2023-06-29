@@ -220,7 +220,7 @@ export default defineComponent({
 
 .content {
   margin-bottom: unset;
-  line-height: 24px;
+  line-height: 22px;
   font-size: 14px;
   color: $gray7;
 }
