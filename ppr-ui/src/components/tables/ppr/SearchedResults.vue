@@ -359,7 +359,7 @@ export default defineComponent({
         return
       }
       emit('selected-matches', selected)
-    })
+    }, { immediate: true })
 
     return {
       emit,
