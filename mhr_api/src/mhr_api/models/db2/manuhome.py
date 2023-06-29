@@ -855,7 +855,6 @@ class Db2Manuhome(db.Model):
                                                                 ts_local)
         doc.update_id = current_app.config.get('DB2_RACF_ID', '')
         manuhome.reg_documents.append(doc)
-        cancel_remarks: str = None
         cancel_doc_type: str = None
         if new_doc.document_type == MhrDocumentTypes.NCAN and reg_json.get('cancelDocumentId'):
             cancel_doc_id: str = reg_json.get('cancelDocumentId')
@@ -863,7 +862,6 @@ class Db2Manuhome(db.Model):
                 if note.reg_document_id == cancel_doc_id:
                     note.can_document_id = doc.id
                     note.status = Db2Mhomnote.StatusTypes.CANCELLED
-                    cancel_remarks = note.remarks
                     cancel_doc_type = note.document_type
                     break
             if cancel_doc_type and cancel_doc_type in ('CAU', Db2Document.DocumentTypes.CAUTION,
@@ -881,8 +879,6 @@ class Db2Manuhome(db.Model):
             reg_note = registration.notes[0]
             note: Db2Mhomnote = Db2Mhomnote.create_from_registration(reg_json.get('note'), doc, manuhome.id)
             if reg_note.expiry_date:
-                note.expiry_date = reg_note.expiry_date.date()
-            if cancel_remarks:
-                note.remarks = cancel_remarks
+                note.expiry_date = model_utils.to_local_timestamp(reg_note.expiry_date).date()
             manuhome.reg_notes.append(note)
         return manuhome

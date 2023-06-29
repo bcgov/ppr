@@ -95,8 +95,6 @@ def validate_remarks(json_data, doc_type: str) -> str:
         return error_msg
     if doc_type and not json_data['note'].get('remarks') and doc_type == MhrDocumentTypes.CAU:
         error_msg += REMARKS_REQUIRED
-    elif doc_type and json_data['note'].get('remarks') and doc_type == MhrDocumentTypes.NCAN:
-        error_msg += REMARKS_NOT_ALLOWED
     return error_msg
 
 

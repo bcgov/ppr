@@ -119,7 +119,7 @@ TEST_NOTE_DATA_EXPIRY = [
 # test data pattern is ({description}, {valid}, {doc_type}, {remarks}, {mhr_num}, {account}, {message_content})
 TEST_NOTE_DATA_REMARKS = [
     ('Invalid required', False, 'CAU', None, '102876', 'ppr_staff', validator.REMARKS_REQUIRED),
-    ('Invalid not allowed', False, 'NCAN', 'REMARKS', '102876', 'ppr_staff', validator.REMARKS_NOT_ALLOWED),
+    ('Valid NCAN allowed new rule', True, 'NCAN', 'REMARKS', '080104', 'ppr_staff', None),
     ('Valid optional', True, 'NPUB', None, '102876', 'ppr_staff', None)
 ]
 # test data pattern is ({description}, {valid}, {doc_type}, {notice}, {mhr_num}, {account}, {message_content})
@@ -201,6 +201,8 @@ def test_validate_remarks(session, desc, valid, doc_type, remarks, mhr_num, acco
         json_data['note']['remarks'] = remarks
     else:
         del json_data['note']['remarks']
+    if doc_type == 'NCAN' and mhr_num == '080104':
+        json_data['cancelDocumentId'] = '63057279'
     del json_data['note']['effectiveDateTime']
     registration: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account)
     error_msg = validator.validate_note(registration, json_data, True, STAFF_ROLE)
