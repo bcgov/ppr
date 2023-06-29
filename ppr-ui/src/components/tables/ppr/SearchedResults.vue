@@ -1,5 +1,5 @@
 <template>
-  <v-container class="main-results-div pa-0 white">
+  <v-container class="main-results-div pa-0 white">{{selected}}
     <!-- Results Header -->
     <v-row v-if="searched" class="result-info pl-5 pt-30px" align="center" no-gutters>
       <v-col style="padding-right: 30px;" cols="auto">
@@ -359,7 +359,7 @@ export default defineComponent({
         return
       }
       emit('selected-matches', selected)
-    })
+    }, { immediate: true })
 
     return {
       emit,
