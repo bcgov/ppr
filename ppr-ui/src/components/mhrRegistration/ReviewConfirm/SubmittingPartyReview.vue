@@ -1,5 +1,5 @@
 <template>
-  <v-card flat id="submitting-party-summary" class="mt-6">
+  <v-card flat id="submitting-party-summary" class="mt-10">
     <header class="review-header">
       <v-icon class="ml-1" color="darkBlue">mdi-account</v-icon>
       <label class="font-weight-bold pl-2">Submitting Party</label>
@@ -18,9 +18,9 @@
 
       <!-- -->
       <template>
-        <section class="pt-6" id="review-submitting-party-section">
+        <section id="review-submitting-party-section">
           <!-- Insert Review mode of component here -->
-          <v-row no-gutters class="px-6 pb-7">
+          <v-row no-gutters class="px-6 pb-5 pt-6">
             <v-col cols="3">
               <h3 class="table-header">Name</h3>
             </v-col>

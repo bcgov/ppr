@@ -209,5 +209,8 @@ export default defineComponent({
 <style lang="scss" scoped>
 ::v-deep .unselectable {
   user-select: none;
+  .v-label {
+    pointer-events: none;
+  }
 }
 </style>

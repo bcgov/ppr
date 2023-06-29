@@ -42,20 +42,20 @@
 
     <template  v-if="isMhrManufacturerRegistration">
       <!-- Attention -->
-      <section id="mhr-attention" class="mt-13">
+      <section id="mhr-attention" class="mt-15">
         <Attention
-          section-id="mhr-attention"
-          :section-number="1"
+          sectionId="mhr-attention"
+          :sectionNumber="1"
           :validate="isValidatingApp"
           @isAttentionValid="setAttentionValidation"
         />
       </section>
 
       <!-- Folio or Reference Number -->
-      <section id="mhr-folio-or-reference-number" class="mt-13">
+      <section id="mhr-folio-or-reference-number" class="mt-15">
         <FolioOrReferenceNumber
-          section-id="mhr-folio-or-reference-number"
-          :section-number="2"
+          sectionId="mhr-folio-or-reference-number"
+          :sectionNumber="2"
           :validate="isValidatingApp"
           @isFolioOrRefNumValid="setFolioOrReferenceNumberValidation"
         />
@@ -63,7 +63,7 @@
     </template>
 
     <!-- Authorization -->
-    <section id="mhr-certify-section" class="mt-10 pt-4">
+    <section id="mhr-certify-section" class="mt-15">
       <CertifyInformation
         :sectionNumber="isMhrManufacturerRegistration ? 3 : 1"
         :setShowErrors="validateAuthorization"
@@ -72,7 +72,7 @@
     </section>
 
     <!-- Staff Payment -->
-    <section id="mhr-staff-payment-section" class="mt-10" v-if="isRoleStaffReg">
+    <section id="mhr-staff-payment-section" class="mt-15" v-if="isRoleStaffReg">
       <h2>
         2. Staff Payment
       </h2>

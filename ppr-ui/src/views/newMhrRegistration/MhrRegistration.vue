@@ -38,7 +38,7 @@
         </v-row>
       </div>
     </div>
-    <v-row no-gutters class="pt-10">
+    <v-row no-gutters class="mt-20">
       <v-col cols="12">
         <button-footer
           isMhr

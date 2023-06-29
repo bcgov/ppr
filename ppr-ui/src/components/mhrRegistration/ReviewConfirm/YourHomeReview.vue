@@ -1,5 +1,5 @@
 <template>
-  <v-card flat id="mhr-registration-summary" class="mt-6">
+  <v-card flat id="mhr-registration-summary" class="mt-10">
     <header class="review-header">
       <v-icon class="ml-1" color="darkBlue">mdi-home</v-icon>
       <label class="font-weight-bold pl-2">{{ isTransferReview ? 'Description of Home' : 'Your Home' }}</label>

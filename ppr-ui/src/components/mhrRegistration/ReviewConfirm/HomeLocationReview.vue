@@ -1,5 +1,5 @@
 <template>
-  <v-card flat id="home-location-summary" class="mt-6">
+  <v-card flat id="home-location-summary" class="mt-10">
     <header class="review-header">
       <img class="ml-1 home-location-icon" color="darkBlue" src="@/assets/svgs/homelocationicon_reviewscreen.svg"/>
       <label class="font-weight-bold pl-2">Location of Home</label>
