@@ -24,10 +24,27 @@
         <tr v-for="(group, groupIndex) in homeOwnerGroups" :key="`${group}: ${groupIndex}`">
           <td class="pa-0" colspan="4">
             <!-- Start of Home Owner Group -->
+
+            <div v-if="
+                groupIndex === 0 &&
+                isMhrTransfer &&
+                !hasActualOwners(group.owners) &&
+                group.owners.length > 0 &&
+                hasRemovedAllHomeOwnerGroups() &&
+                !isTransferToExecutorProbateWill &&
+                !isTransferToExecutorUnder25Will &&
+                !isTransferToAdminNoWill
+              "
+            >
+              <div class="pa-6 fs-14 text-center no-owners-head-row" data-test-id="no-data-msg">
+                No owners added yet.
+              </div>
+            </div>
+
             <div
               v-if="showGroups && !(disableGroupHeader(group.groupId) && (hideRemovedOwners || isReadonlyTable))"
               :colspan="4"
-              class="py-3 px-7 group-header-slot"
+              class="py-3 group-header-slot"
               :class="{
                 'spacer-header': disableGroupHeader(group.groupId),
                 'border-error-left': isInvalidOwnerGroup(group.groupId)
@@ -45,21 +62,6 @@
             <!-- End of Table Group Header -->
 
             <div v-for="(item, index) in group.owners" :key="`${item}: ${index}`" class="owner-row">
-              <div
-                v-if="
-                  isMhrTransfer &&
-                  !hasActualOwners(group.owners) &&
-                  group.owners.length > 0 &&
-                  hasRemovedAllHomeOwnerGroups() &&
-                  !isTransferToExecutorProbateWill &&
-                  !isTransferToExecutorUnder25Will &&
-                  !isTransferToAdminNoWill
-                "
-              >
-                <div class="pa-6 fs-14 text-center no-owners-head-row" data-test-id="no-data-msg">
-                  No owners added yet.
-                </div>
-              </div>
 
               <!-- Transfer scenario: Display error for groups that 'removed' all owners
               but they still exist in the table -->
@@ -416,8 +418,8 @@
                 </td>
               </tr>
             </div>
-            <div v-if="group.owners.length === 0" class="my-6 text-center" data-test-id="no-data-msg">
-              No owners added yet.
+            <div v-if="group.owners.length === 0" class="error-text my-6 text-center" data-test-id="no-owners-err-msg">
+              Group must contain at least one owner.
             </div>
           </td>
         </tr>
@@ -1022,6 +1024,10 @@ export default defineComponent({
     color: #1669bb !important;
     opacity: 0.4 !important;
   }
+}
+
+.home-owners-table:not(.review-mode) .group-header-slot {
+    padding: 0 28px;
 }
 
 .v-menu__content {
