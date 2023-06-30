@@ -180,8 +180,8 @@ export default defineComponent({
     ]
 
     const localState = reactive({
-      delDesc: '',
-      addDesc: '',
+      delDesc: getGeneralCollateral.value[1]?.descriptionDelete || '',
+      addDesc: getGeneralCollateral.value[1]?.descriptionAdd || '',
       generalCollateral: computed((): GeneralCollateralIF[] => {
         return (getGeneralCollateral.value as GeneralCollateralIF[]) || []
       }),
@@ -206,8 +206,8 @@ export default defineComponent({
       const newGeneralCollateral = localState.generalCollateral
 
       if (localState.addDesc || localState.delDesc) {
-        if (localState.addDesc.replace(/(<([^>]+)>)/ig, '').trim().length === 0) localState.addDesc = ''
-        if (localState.delDesc.replace(/(<([^>]+)>)/ig, '').trim().length === 0) localState.delDesc = ''
+        if (localState.addDesc?.replace(/(<([^>]+)>)/ig, '').trim().length === 0) localState.addDesc = ''
+        if (localState.delDesc?.replace(/(<([^>]+)>)/ig, '').trim().length === 0) localState.delDesc = ''
         const amendedGC = {
           descriptionAdd: localState.addDesc,
           descriptionDelete: localState.delDesc
