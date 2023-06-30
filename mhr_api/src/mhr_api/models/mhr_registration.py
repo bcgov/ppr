@@ -132,7 +132,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
             reg_json = self.set_submitting_json(reg_json)
             if self.registration_type in (MhrRegistrationTypes.PERMIT, MhrRegistrationTypes.PERMIT_EXTENSION):
                 reg_json = self.set_location_json(reg_json, False)
-                reg_json = self.set_note_json(reg_json, False)
+                reg_json = self.set_note_json(reg_json)
             elif self.is_transfer():
                 reg_json['transferDate'] = doc_json.get('transferDate')
                 reg_json['consideration'] = doc_json.get('consideration')
@@ -140,9 +140,9 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                 reg_json['affirmByName'] = doc_json.get('affirmByName')
                 reg_json = self.set_transfer_group_json(reg_json)
             elif self.registration_type in (MhrRegistrationTypes.EXEMPTION_NON_RES, MhrRegistrationTypes.EXEMPTION_RES):
-                reg_json = self.set_note_json(reg_json, False)
+                reg_json = self.set_note_json(reg_json)
             elif self.registration_type == MhrRegistrationTypes.REG_NOTE:
-                reg_json = self.set_note_json(reg_json, False)
+                reg_json = self.set_note_json(reg_json)
                 del reg_json['documentId']
                 del reg_json['declaredValue']
                 del reg_json['documentDescription']
@@ -189,7 +189,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
             reg_json = self.set_description_json(reg_json, self.current_view)
             reg_json = self.set_group_json(reg_json, self.current_view)
             if self.current_view and self.staff:
-                reg_json = self.set_notes_json(reg_json)
+                reg_json['notes'] = reg_utils.get_notes_json(self, False)
             reg_json['hasCaution'] = self.set_caution()
             current_app.logger.debug('Built new registration JSON')
             return self.set_payment_json(reg_json)
@@ -267,14 +267,6 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                     break
         return has_caution
 
-    def set_notes_json(self, reg_json) -> dict:
-        """Build the unit notes JSON for registries staff and current requests."""
-        notes = []
-        if reg_json and self.notes:
-            for note in reversed(self.notes):
-                notes.append(note.json)
-        return notes
-
     def set_group_json(self, reg_json, current: bool) -> dict:
         """Build the owner group JSON conditional on current."""
         owner_groups = []
@@ -309,19 +301,17 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
             reg_json['submittingParty'] = submitting.json
         return reg_json
 
-    def set_note_json(self, reg_json, current: bool) -> dict:
-        """Build the note JSON conditional on current."""
-        notes = []
-        reg_note = {}
+    def set_note_json(self, reg_json) -> dict:
+        """Build the note JSON for an individual registration that has a unit note."""
         if reg_json and self.notes:
-            for note in self.notes:
-                if (current or self.current_view) and note.status_type == MhrNoteStatusTypes.ACTIVE:
-                    notes.append(note.json)
-                elif note.registration_id == self.id:
-                    reg_note = note.json
-        if notes:
-            reg_json['notes'] = notes
-        else:
+            reg_note = self.notes[0].json
+            if reg_note.get('documentType') == MhrDocumentTypes.NCAN:
+                cnote: MhrNote = reg_utils.find_cancelled_note(self, self.id)
+                if cnote:
+                    current_app.logger.debug(f'Found cancelled note {cnote.document_type}')
+                    reg_note['cancelledDocumentType'] = cnote.document_type
+                    reg_note['cancelledDocumentDescription'] = reg_utils.get_document_description(cnote.document_type)
+                    reg_note['cancelledDocumentRegistrationNumber'] = self.documents[0].document_registration_number
             reg_json['note'] = reg_note
         return reg_json
 

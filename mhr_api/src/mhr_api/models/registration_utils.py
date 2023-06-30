@@ -21,7 +21,7 @@ from sqlalchemy.sql import text
 from mhr_api.exceptions import DatabaseException
 from mhr_api.models import utils as model_utils
 from mhr_api.models.db import db
-from mhr_api.models.type_tables import MhrRegistrationTypes
+from mhr_api.models.type_tables import MhrRegistrationTypes, MhrDocumentType, MhrDocumentTypes, MhrNoteStatusTypes
 from mhr_api.services.authz import MANUFACTURER_GROUP, QUALIFIED_USER_GROUP, GENERAL_USER_GROUP, BCOL_HELP
 from mhr_api.services.authz import GOV_ACCOUNT_ROLE
 
@@ -387,3 +387,53 @@ def get_batch_storage_name_manufacturer_mhreg():
     time = str(now_ts.hour) + '_' + str(now_ts.minute)
     name = name.replace('-', '/') + '/' + BATCH_DOC_NAME_MANUFACTURER_MHREG.format(time=time)
     return name
+
+
+def find_cancelled_note(registration, reg_id: int):
+    """Try and find the cancelled note matching the cancel registration document id."""
+    if not registration.change_registrations:
+        return None
+    for reg in registration.change_registrations:
+        if reg.notes and reg.notes[0].change_registration_id == reg_id:
+            return reg.notes[0]
+    return None
+
+
+def get_notes_json(registration, search: bool):
+    """Fetch all the unit notes for the manufactured home. Search has special conditions on what is included."""
+    notes = []
+    if not registration.change_registrations:
+        return notes
+    cancel_notes = []
+    for reg in registration.change_registrations:
+        if reg.notes and (not search or reg.notes[0].status_type == MhrNoteStatusTypes.ACTIVE):
+            note = reg.notes[0]
+            if note.document_type == MhrDocumentTypes.NCAN:
+                cnote = find_cancelled_note(registration, note.registration_id)
+                if cnote:
+                    cancel_note = cnote.json
+                    cancel_note['ncan'] = note.json
+                    cancel_notes.append(cancel_note)
+            notes.append(note)
+    if not notes:
+        return notes
+    notes_json = []
+    for note in reversed(notes):
+        note_json = note.json
+        if note_json.get('documentType') == MhrDocumentTypes.NCAN and cancel_notes:
+            for cnote in cancel_notes:
+                if cnote['ncan'].get('documentId') == note_json.get('documentId'):
+                    note_json['cancelledDocumentType'] = cnote.get('documentType')
+                    note_json['cancelledDocumentDescription'] = cnote.get('documentDescription')
+                    note_json['cancelledDocumentRegistrationNumber'] = cnote.get('documentRegistrationNumber')
+        notes_json.append(note_json)
+    return notes_json
+
+
+def get_document_description(doc_type: str) -> str:
+    """Try to find the document description by document type."""
+    if doc_type:
+        doc_type_info: MhrDocumentType = MhrDocumentType.find_by_doc_type(doc_type)
+        if doc_type_info:
+            return doc_type_info.document_type_desc
+    return ''

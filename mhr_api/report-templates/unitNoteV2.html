@@ -71,13 +71,19 @@
 
   <div class="container pt-4">
     <div class="no-page-break">
-      {% if note is defined and note.documentType is defined and note.documentType in ('CAU', 'CAUC', 'CAUE') %}
-      <div class="section-title mt-5">Instructions</div>
-      <div class="section-data pt-3">This caution will not prevent a transfer of ownership or the issuance of a transport permit. 
-        {% if note.expiryDateTime is defined and note.expiryDateTime != '' %}
-          This caution will expire on {{note.expiryDateTime}} unless continued by a court order.
-        {% endif %}
-      </div>
+      {% if note is defined and note.documentType is defined and note.documentType in ('CAU', 'CAUC', 'CAUE', 'NCAN') %}
+        <div class="section-title mt-5">Instructions</div>
+        <div class="section-data pt-3">
+          {% if note.documentType in ('CAU', 'CAUC', 'CAUE') %}
+            This caution will not prevent a transfer of ownership or the issuance of a transport permit. 
+            {% if note.expiryDateTime is defined and note.expiryDateTime != '' %}
+              This caution will expire on {{note.expiryDateTime}} unless continued by a court order.
+            {% endif %}          
+          {% else %}
+            The {{note.cancelledDocumentDescription}} with registration number {{note.cancelledDocumentRegistrationNumber}} has been cancelled.
+            The following unit note will no longer be shown when a search result is produced for this manufactured home.
+          {% endif %}
+        </div>
       <div class="separator mt-5"></div>
       <div class="section-title mt-3">Remarks</div>
       {% else %}

@@ -541,6 +541,14 @@ class Db2Manuhome(db.Model):
                 for note in self.reg_notes:
                     note_json = note.registration_json
                     note_json['documentRegistrationNumber'] = self.__get_note_doc_reg_num(note.reg_document_id)
+                    if note.document_type == MhrDocumentTypes.NCAN:
+                        for unote in self.reg_notes:
+                            if note.reg_document_id == unote.can_document_id:
+                                cancel_json = unote.registration_json
+                                note_json['cancelledDocumentType'] = cancel_json.get('documentType')
+                                note_json['cancelledDocumentRegistrationNumber'] = \
+                                    self.__get_note_doc_reg_num(note.reg_document_id)
+                                break
                     notes.append(note_json)
                 # Now sort in descending timestamp order.
                 man_home['notes'] = Db2Manuhome.__sort_notes(notes)

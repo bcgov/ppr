@@ -129,7 +129,15 @@ SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRI
          WHERE mh.manhomid = n.manhomid AND n.regdocid = d.documtid) AS note_status,
        (SELECT n.expiryda
           FROM mhomnote n
-         WHERE mh.manhomid = n.manhomid AND n.regdocid = d.documtid) AS note_expiry
+         WHERE mh.manhomid = n.manhomid AND n.regdocid = d.documtid) AS note_expiry,
+        CASE
+        WHEN d.docutype = 'NCAN' THEN
+          (SELECT n.docutype
+             FROM mhomnote n
+            WHERE n.manhomid = mh.manhomid AND n.candocid = d.documtid AND n.docutype NOT IN ('CAUC', 'CAUE')
+          FETCH FIRST 1 ROWS ONLY)
+        ELSE NULL
+        END AS cancel_doc_type
   FROM manuhome mh, document d
  WHERE mh.mhregnum = :query_mhr_number
    AND mh.mhregnum = d.mhregnum
@@ -156,7 +164,15 @@ SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRI
          WHERE mh.manhomid = n.manhomid AND n.regdocid = d.documtid) AS note_status,
        (SELECT n.expiryda
           FROM mhomnote n
-         WHERE mh.manhomid = n.manhomid AND n.regdocid = d.documtid) AS note_expiry
+         WHERE mh.manhomid = n.manhomid AND n.regdocid = d.documtid) AS note_expiry,
+        CASE
+        WHEN d.docutype = 'NCAN' THEN
+          (SELECT n.docutype
+             FROM mhomnote n
+            WHERE n.manhomid = mh.manhomid AND n.candocid = d.documtid AND n.docutype NOT IN ('CAUC', 'CAUE')
+          FETCH FIRST 1 ROWS ONLY)
+        ELSE NULL
+        END AS cancel_doc_type
   FROM manuhome mh, document d, document d2
  WHERE d2.docuregi = :query_value
    AND d2.mhregnum = mh.mhregnum
@@ -184,7 +200,15 @@ SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRI
          WHERE mh.manhomid = n.manhomid AND n.regdocid = d.documtid) AS note_status,
        (SELECT n.expiryda
           FROM mhomnote n
-         WHERE mh.manhomid = n.manhomid AND n.regdocid = d.documtid) AS note_expiry
+         WHERE mh.manhomid = n.manhomid AND n.regdocid = d.documtid) AS note_expiry,
+        CASE
+        WHEN d.docutype = 'NCAN' THEN
+          (SELECT n.docutype
+             FROM mhomnote n
+            WHERE n.manhomid = mh.manhomid AND n.candocid = d.documtid AND n.docutype NOT IN ('CAUC', 'CAUE')
+          FETCH FIRST 1 ROWS ONLY)
+        ELSE NULL
+        END AS cancel_doc_type
   FROM manuhome mh, document d
  WHERE mh.mhregnum IN (?)
    AND mh.mhregnum = d.mhregnum
@@ -213,6 +237,14 @@ SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRI
        (SELECT n.expiryda
           FROM mhomnote n
          WHERE mh.manhomid = n.manhomid AND n.regdocid = d.documtid) AS note_expiry,
+        CASE
+        WHEN d.docutype = 'NCAN' THEN
+          (SELECT n.docutype
+             FROM mhomnote n
+            WHERE n.manhomid = mh.manhomid AND n.candocid = d.documtid AND n.docutype NOT IN ('CAUC', 'CAUE')
+          FETCH FIRST 1 ROWS ONLY)
+        ELSE NULL
+        END AS cancel_doc_type,
        (SELECT TRIM(o2.ownrname)
           FROM owner o2, owngroup og2
          WHERE o2.manhomid = mh.manhomid
