@@ -1,94 +1,94 @@
 <template>
-  <div id="mhr-review-confirm">
+  <div id="mhr-review-confirm" class="mt-10">
     <!-- Review and Confirm -->
-    <div class="mt-10">
-      <h2>Review and Confirm</h2>
-      <p class="mt-4">
-        Review the information in your registration and complete the additional information below. If you need to
-        change anything, return to the previous step to make the necessary change.
+    <h2>Review and Confirm</h2>
+    <p class="mt-4">
+      Review the information in your registration and complete the additional information below. If you need to
+      change anything, return to the previous step to make the necessary change.
+    </p>
+
+    <!-- Information for manufacturers registration only -->
+    <template v-if="isMhrManufacturerRegistration">
+
+      <p class="mt-3 mb-6">
+        <b>Note: </b>
+        Submitting Party, Home Owner and Location of Home information is based on your manufacturer information
+        and cannot be changed here. If you wish to update this information please contact BC Registries.
       </p>
 
-      <!-- Information for manufacturers registration only -->
-      <template v-if="isMhrManufacturerRegistration">
+      <ContactUsToggle
+        helpText="If you require assistance with changes to your manufacturer information please contact us."
+      />
 
-        <p class="mt-3 mb-6">
-          <b>Note: </b>
-          Submitting Party, Home Owner and Location of Home information is based on your manufacturer information
-          and cannot be changed here. If you wish to update this information please contact BC Registries.
-        </p>
+      <CautionBox
+        setMsg="After registering, the verification statement and decals will be sent to the Submitting Party."
+      />
 
-        <ContactUsToggle
-          helpText="If you require assistance with changes to your manufacturer information please contact us."
-        />
-
-        <CautionBox
-          setMsg="After registering, the verification statement and decals will be sent to the Submitting Party."
-        />
-
-      </template>
-
-      <!-- Your Home Summary -->
-      <YourHomeReview />
-
-      <!-- Submitting Party Review -->
-      <SubmittingPartyReview />
-
-      <!-- Home Owners Review -->
-      <HomeOwnersReview />
-
-      <!-- Home Location Review -->
-      <HomeLocationReview />
-    </div>
-
-    <template  v-if="isMhrManufacturerRegistration">
-      <!-- Attention -->
-      <section id="mhr-attention" class="mt-15">
-        <Attention
-          sectionId="mhr-attention"
-          :sectionNumber="1"
-          :validate="isValidatingApp"
-          @isAttentionValid="setAttentionValidation"
-        />
-      </section>
-
-      <!-- Folio or Reference Number -->
-      <section id="mhr-folio-or-reference-number" class="mt-15">
-        <FolioOrReferenceNumber
-          sectionId="mhr-folio-or-reference-number"
-          :sectionNumber="2"
-          :validate="isValidatingApp"
-          @isFolioOrRefNumValid="setFolioOrReferenceNumberValidation"
-        />
-      </section>
     </template>
 
-    <!-- Authorization -->
-    <section id="mhr-certify-section" class="mt-15">
-      <CertifyInformation
-        :sectionNumber="isMhrManufacturerRegistration ? 3 : 1"
-        :setShowErrors="validateAuthorization"
-        @certifyValid="authorizationValid = $event"
-      />
-    </section>
+    <!-- Your Home Summary -->
+    <YourHomeReview />
 
-    <!-- Staff Payment -->
-    <section id="mhr-staff-payment-section" class="mt-15" v-if="isRoleStaffReg">
-      <h2>
-        2. Staff Payment
-      </h2>
-      <v-card flat class="mt-6 pa-6" :class="{ 'border-error-left': validateStaffPayment }">
-        <StaffPayment
-          id="staff-payment"
-          :displaySideLabel="true"
-          :displayPriorityCheckbox="true"
-          :staffPaymentData="staffPayment"
-          :invalidSection="validateStaffPayment"
-          :validate="hasStaffPaymentValues || isValidatingApp"
-          @update:staffPaymentData="onStaffPaymentDataUpdate($event)"
-          @valid="staffPaymentValid = $event"
+    <!-- Submitting Party Review -->
+    <SubmittingPartyReview />
+
+    <!-- Home Owners Review -->
+    <HomeOwnersReview />
+
+    <!-- Home Location Review -->
+    <HomeLocationReview />
+
+    <div id="mhr-review-confirm-components">
+      <template  v-if="isMhrManufacturerRegistration">
+        <!-- Attention -->
+        <section id="mhr-attention" class="mt-15">
+          <Attention
+            sectionId="mhr-attention"
+            :sectionNumber="1"
+            :validate="isValidatingApp"
+            @isAttentionValid="setAttentionValidation"
+          />
+        </section>
+
+        <!-- Folio or Reference Number -->
+        <section id="mhr-folio-or-reference-number" class="mt-15">
+          <FolioOrReferenceNumber
+            sectionId="mhr-folio-or-reference-number"
+            :sectionNumber="2"
+            :validate="isValidatingApp"
+            @isFolioOrRefNumValid="setFolioOrReferenceNumberValidation"
+          />
+        </section>
+      </template>
+
+      <!-- Authorization -->
+      <section id="mhr-certify-section" class="mt-15">
+        <CertifyInformation
+          :sectionNumber="isMhrManufacturerRegistration ? 3 : 1"
+          :setShowErrors="validateAuthorization"
+          @certifyValid="authorizationValid = $event"
         />
-      </v-card>
-    </section>
+      </section>
+
+      <!-- Staff Payment -->
+      <section id="mhr-staff-payment-section" class="mt-15" v-if="isRoleStaffReg">
+        <h2>
+          2. Staff Payment
+        </h2>
+        <v-card flat class="mt-6 pa-6" :class="{ 'border-error-left': validateStaffPayment }">
+          <StaffPayment
+            id="staff-payment"
+            :displaySideLabel="true"
+            :displayPriorityCheckbox="true"
+            :staffPaymentData="staffPayment"
+            :invalidSection="validateStaffPayment"
+            :validate="hasStaffPaymentValues || isValidatingApp"
+            @update:staffPaymentData="onStaffPaymentDataUpdate($event)"
+            @valid="staffPaymentValid = $event"
+          />
+        </v-card>
+      </section>
+    </div>
   </div>
 </template>
 
@@ -145,6 +145,7 @@ export default defineComponent({
       MhrSectVal,
       setValidation,
       scrollToInvalid,
+      scrollToInvalidReviewConfirm,
       getValidation,
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
@@ -275,7 +276,7 @@ export default defineComponent({
           let stepsValidation = getSteps.value.map((step : StepIF) => step.valid)
           stepsValidation.pop() // Removes review confirm step from stepsValidation
           localState.isValidatingApp &&
-          scrollToInvalid(MhrSectVal.REVIEW_CONFIRM_VALID, 'mhr-review-confirm', stepsValidation)
+          scrollToInvalidReviewConfirm(stepsValidation)
           // Only set reviewed if add/edit form was open when review reached
           if (isGlobalEditingMode.value) {
             setValidation(MhrSectVal.ADD_EDIT_OWNERS_VALID, MhrCompVal.OWNERS_VALID, false)

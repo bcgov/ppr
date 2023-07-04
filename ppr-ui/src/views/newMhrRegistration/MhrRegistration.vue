@@ -46,7 +46,6 @@
           :currentStepName="$route.name"
           :router="$router"
           :forceSave="saveDraftExit"
-          @registration-incomplete="registrationIncomplete()"
           @error="emitError($event)"
           @submit="submit()"
           @cancelProceed="resetAllValidations()"
@@ -120,7 +119,7 @@ export default defineComponent({
       setValidation,
       getValidation,
       resetAllValidations,
-      scrollToInvalid
+      scrollToInvalidReviewConfirm
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
 
     const {
@@ -158,11 +157,6 @@ export default defineComponent({
     /** Helper to check is the current route matches */
     const isRouteName = (routeName: RouteNames): boolean => {
       return (route.name === routeName)
-    }
-
-    const registrationIncomplete = (): void => {
-      scrollToInvalid(MhrSectVal.REVIEW_CONFIRM_VALID, 'mhr-review-confirm')
-      setValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_APP, true)
     }
 
     const emitError = (error: ErrorIF): void => {
@@ -231,7 +225,7 @@ export default defineComponent({
       } else {
         let stepsValidation = getSteps.value.map((step : StepIF) => step.valid)
         stepsValidation.pop() // Removes review confirm step from stepsValidation
-        await scrollToInvalid(MhrSectVal.REVIEW_CONFIRM_VALID, 'mhr-review-confirm', stepsValidation)
+        scrollToInvalidReviewConfirm(stepsValidation)
       }
     }
 
@@ -239,7 +233,6 @@ export default defineComponent({
       getSteps,
       emitError,
       isRouteName,
-      registrationIncomplete,
       submit,
       resetAllValidations,
       ...toRefs(localState)
