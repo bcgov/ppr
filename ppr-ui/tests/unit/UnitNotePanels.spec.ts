@@ -56,7 +56,7 @@ describe('UnitNotePanels', () => {
     addButton.trigger('click')
     await nextTick()
 
-    const unitNoteType = UnitNoteDocTypes.NOTICE_OF_CAUTION
+    const unitNoteType = UnitNoteDocTypes.DECAL_REPLACEMENT
     const initUnitNoteMock = jest.fn()
     wrapper.vm.initUnitNote = initUnitNoteMock
 

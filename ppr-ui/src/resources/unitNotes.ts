@@ -2,17 +2,18 @@ import { FeeSummaryDefaults } from '@/composables/fees/enums'
 import { UnitNoteDocTypes } from '@/enums'
 
 export const UnitNotesDropdown: Array<UnitNoteDocTypes> = [
-  UnitNoteDocTypes.NOTICE_OF_CAUTION,
-  UnitNoteDocTypes.CONTINUED_NOTE_OF_CAUTION,
-  UnitNoteDocTypes.EXTENSION_TO_NOTICE_OF_CAUTION,
-  UnitNoteDocTypes.NOTE_CANCELLATION,
-  UnitNoteDocTypes.CONFIDENTIAL_NOTE,
-  UnitNoteDocTypes.PUBLIC_NOTE,
-  UnitNoteDocTypes.RESTRAINING_ORDER,
-  UnitNoteDocTypes.NOTICE_OF_TAX_SALE,
   UnitNoteDocTypes.DECAL_REPLACEMENT,
-  UnitNoteDocTypes.NON_RESIDENTIAL_EXEMPTION,
-  UnitNoteDocTypes.RESIDENTIAL_EXEMPTION_ORDER
+  UnitNoteDocTypes.PUBLIC_NOTE,
+  UnitNoteDocTypes.NOTICE_OF_CAUTION,
+  UnitNoteDocTypes.CONFIDENTIAL_NOTE,
+  UnitNoteDocTypes.NOTICE_OF_TAX_SALE,
+  UnitNoteDocTypes.RESTRAINING_ORDER
+  // original list of Note types
+  // UnitNoteDocTypes.CONTINUED_NOTE_OF_CAUTION,
+  // UnitNoteDocTypes.EXTENSION_TO_NOTICE_OF_CAUTION,
+  // UnitNoteDocTypes.NOTE_CANCELLATION,
+  // UnitNoteDocTypes.NON_RESIDENTIAL_EXEMPTION,
+  // UnitNoteDocTypes.RESIDENTIAL_EXEMPTION_ORDER
 ]
 
 export const UnitNotesInfo = {
