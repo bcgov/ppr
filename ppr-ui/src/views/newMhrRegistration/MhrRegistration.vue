@@ -191,8 +191,7 @@ export default defineComponent({
 
       // Reset validations
       setMhrTransferType(null)
-      setValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_STEPS, false)
-      setValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_APP, false)
+      resetAllValidations()
 
       // page is ready to view
       if (getMhrDraftNumber.value) {
