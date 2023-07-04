@@ -309,9 +309,10 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                 cnote: MhrNote = reg_utils.find_cancelled_note(self, self.id)
                 if cnote:
                     current_app.logger.debug(f'Found cancelled note {cnote.document_type}')
-                    reg_note['cancelledDocumentType'] = cnote.document_type
-                    reg_note['cancelledDocumentDescription'] = reg_utils.get_document_description(cnote.document_type)
-                    reg_note['cancelledDocumentRegistrationNumber'] = self.documents[0].document_registration_number
+                    cnote_json = cnote.json
+                    reg_note['cancelledDocumentType'] = cnote_json.get('documentType')
+                    reg_note['cancelledDocumentDescription'] = cnote_json.get('documentDescription')
+                    reg_note['cancelledDocumentRegistrationNumber'] = cnote_json.get('documentRegistrationNumber')
             reg_json['note'] = reg_note
         return reg_json
 
