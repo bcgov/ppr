@@ -56,7 +56,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, nextTick, onMounted, reactive, toRefs } from 'vue-demi'
+import { computed, defineComponent, nextTick, onMounted, onUnmounted, reactive, toRefs } from 'vue-demi'
 import { useRoute, useRouter } from 'vue2-helpers/vue-router'
 import { useStore } from '@/store/store'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
@@ -195,6 +195,12 @@ export default defineComponent({
 
       context.emit('emitHaveData', true)
       localState.dataLoaded = true
+    })
+
+    // Ensures validations state does not presist, between different MHR registrations
+    // and for authorization and staff payment
+    onUnmounted(() => {
+      resetAllValidations()
     })
 
     const submit = async () => {
