@@ -239,11 +239,6 @@ export const useNewMhrRegistration = () => {
   const parseDescription = (): MhrRegistrationDescriptionIF => {
     let description: MhrRegistrationDescriptionIF = getMhrRegistrationHomeDescription.value
 
-    // Apply default manufacturer
-    if (!description.manufacturer) {
-      description.manufacturer = '*'
-    }
-
     description = cleanEmpty(description)
     description.sections = Object.values(description.sections)
     description.sectionCount = description.sections.length
