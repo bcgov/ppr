@@ -623,6 +623,8 @@ def __build_summary(row, add_in_user_list: bool = True, mhr_list=None):
         summary['inUserList'] = False
     if mhr_list and summary['documentType'] in (Db2Document.DocumentTypes.CONV, Db2Document.DocumentTypes.MHREG_TRIM):
         summary['lienRegistrationType'] = __get_lien_registration_type(mhr_number, mhr_list)
+    elif summary['documentType'] == MhrDocumentTypes.NCAN:
+        summary = __get_cancel_info(summary, row)
     elif summary['documentType'] in (MhrDocumentTypes.CAU, MhrDocumentTypes.CAUC, MhrDocumentTypes.CAUE):
         summary = __get_caution_info(summary, row)
     return summary
@@ -640,6 +642,15 @@ def __get_caution_info(summary: dict, row) -> dict:
             summary['expireDays'] = CAUTION_INDEFINITE_DAYS  # Indefinite expiry.
         elif expiry and expiry.isoformat() != '0001-01-01':
             summary['expireDays'] = model_utils.expiry_date_days(expiry)
+    return summary
+
+
+def __get_cancel_info(summary: dict, row) -> dict:
+    """For registrations with the NCAN document type get the cancelled note type and description."""
+    doc_type: str = str(row[13]) if row[13] else None
+    if doc_type:
+        summary['cancelledDocumentType'] = doc_type.strip()
+        summary['cancelledDocumentDescription'] = get_doc_desc(doc_type.strip())
     return summary
 
 
@@ -830,6 +841,8 @@ def get_new_registration_json(registration):
                 note_doc_type = FROM_LEGACY_DOC_TYPE.get(note_doc_type)
                 note['documentType'] = note_doc_type
             note['documentDescription'] = get_doc_desc(note_doc_type)
+            if note.get('cancelledDocumentType'):
+                note['cancelledDocumentDescription'] = get_doc_desc(note.get('cancelledDocumentType'))
     current_app.logger.debug('Built JSON from DB2 and PostgreSQL')
     return registration.set_payment_json(reg_json)
 

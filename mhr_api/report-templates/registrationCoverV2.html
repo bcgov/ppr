@@ -82,6 +82,9 @@
           {{ documentDescription|title }}
         {% elif registrationType == 'REG_STAFF_ADMIN' and note is defined and note.coverDocumentDescription is defined %}    
           {{ note.coverDocumentDescription }}
+          {% if note.cancelledDocumentDescription is defined and note.cancelledDocumentDescription != '' %}
+            ({{ note.cancelledDocumentDescription }})
+          {% endif %}
         {% elif registrationType == 'REG_STAFF_ADMIN' and note is defined %}    
           {{ note.documentDescription|title }}
         {% else %}

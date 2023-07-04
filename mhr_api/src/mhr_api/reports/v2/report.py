@@ -157,6 +157,12 @@ class Report:  # pylint: disable=too-few-public-methods
             doc_desc = doc_desc.replace(' Of ', ' of ')
             doc_desc = doc_desc.replace(' To ', ' to ')
             self._report_data['note']['coverDocumentDescription'] = doc_desc
+            if self._report_data['note'].get('cancelledDocumentDescription'):
+                doc_desc = self._report_data['note'].get('cancelledDocumentDescription')
+                doc_desc = doc_desc.lower().title()
+                doc_desc = doc_desc.replace(' Of ', ' of ')
+                doc_desc = doc_desc.replace(' To ', ' to ')
+                self._report_data['note']['cancelledDocumentDescription'] = doc_desc
         # 1: Generate the cover page report.
         self._report_key = ReportTypes.MHR_REGISTRATION_COVER
         data = self._setup_report_data()
