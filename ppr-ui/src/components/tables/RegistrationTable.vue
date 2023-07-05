@@ -693,19 +693,24 @@ export default defineComponent({
       if (!localState.firstColRef || val < 350) localState.overrideWidth = false
     })
 
+    // Triggers scrolling on changes to the registration history
+    watch(() => props.setRegistrationHistory,
+      () => {
+        if (localState.newReg?.addedReg) {
+          // need both (only one ref will scroll)
+          scrollToRef(newRegItem)
+          scrollToRef(newAndFirstItem)
+        }
+      },
+      { deep: true }
+    )
+
     onUpdated(() => {
       // needed to set overrideWidth to true
       if (localState.firstColRef?.value?.length > 0) {
         if (localState.firstColRef.value[0].clientWidth > 350) {
           localState.overrideWidth = true
         }
-      }
-
-      // if new reg -> scroll to new reg
-      if (localState.newReg?.addedReg) {
-        // need both (only one ref will scroll)
-        scrollToRef(newRegItem)
-        scrollToRef(newAndFirstItem)
       }
     })
 
