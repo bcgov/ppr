@@ -25,7 +25,7 @@
       :clearable="isClearable"
       @keypress="showAllGroups()"
     >
-      <template v-slot:item="{ parent, item }">
+      <template v-slot:item="{ item }">
         <template v-if="item.class === 'registration-list-header'">
           <v-list-item-content>
             <v-row
@@ -47,7 +47,7 @@
         </template>
         <template v-else>
           <v-list-item-content class="py-3 registration-list">
-            <span class="registration-list-item" v-html="`${parent.genFilteredText(item.text)}`"></span>
+            <span class="registration-list-item" v-html="item.text"></span>
           </v-list-item-content>
         </template>
       </template>
