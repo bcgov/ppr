@@ -25,7 +25,7 @@
       :clearable="isClearable"
       @keypress="showAllGroups()"
     >
-      <template v-slot:item="{ parent, item }">
+      <template v-slot:item="{ item }">
         <template v-if="item.class === 'registration-list-header'">
           <v-list-item-content>
             <v-row
