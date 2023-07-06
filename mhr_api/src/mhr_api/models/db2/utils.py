@@ -790,7 +790,7 @@ def get_search_json(registration):
                     note['remarks'] != 'MANUFACTURED HOME REGISTRATION CANCELLED':
                 # Only staff can see remarks if not default.
                 note['remarks'] = 'MANUFACTURED HOME REGISTRATION CANCELLED'
-            elif doc_type in ('TAXN', 'EXNR', 'NPUB', 'REST', 'CAU', 'CAUC', 'CAUE') and \
+            elif doc_type in ('TAXN', 'EXNR', 'EXRS', 'NPUB', 'REST', 'CAU', 'CAUC', 'CAUE') and \
                     note.get('status') != MhrNoteStatusTypes.ACTIVE:  # Exclude if not active.
                 include = False
             elif doc_type in ('CAU', 'CAUC', 'CAUE') and note.get('expiryDateTime') and \
