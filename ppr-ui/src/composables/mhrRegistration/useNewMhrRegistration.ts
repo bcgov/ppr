@@ -20,6 +20,7 @@ import { useHomeOwners } from '@/composables'
 export const useNewMhrRegistration = () => {
   const {
     // Actions
+    setFolioOrReferenceNumber,
     setMhrLocation,
     setMhrDraftNumber,
     setMhrTableHistory,
@@ -178,6 +179,8 @@ export const useNewMhrRegistration = () => {
     setMhrRegistrationOwnLand(draft.ownLand)
     // Set attention
     setMhrAttentionReference(draft.attentionReference)
+    // Set folio or reference number
+    setFolioOrReferenceNumber(draft.clientReferenceId)
     // Set HomeOwners
     setMhrRegistrationHomeOwnerGroups(draft.ownerGroups)
     // Show groups for Tenants in Common
