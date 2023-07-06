@@ -187,9 +187,9 @@ def get_registrations(mhr_number: str):  # pylint: disable=too-many-return-state
         # Try to fetch MH registration by MHR number
         # Not found or not in the account list throw exceptions.
         if current_param:
-            registration = MhrRegistration.find_by_mhr_number(mhr_number,
-                                                              account_id,
-                                                              is_all_staff_account(account_id))
+            registration = MhrRegistration.find_all_by_mhr_number(mhr_number,
+                                                                  account_id,
+                                                                  is_all_staff_account(account_id))
             registration.current_view = True
             registration.staff = is_staff(jwt)
         else:

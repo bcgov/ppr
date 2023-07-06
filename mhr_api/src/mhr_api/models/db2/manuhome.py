@@ -471,13 +471,7 @@ class Db2Manuhome(db.Model):
         if self.reg_descript:
             man_home['description'] = self.reg_descript.registration_json
         if self.reg_notes:
-            notes = []
-            for note in self.reg_notes:
-                note_json = note.registration_json
-                note_json['documentRegistrationNumber'] = self.__get_note_doc_reg_num(note.reg_document_id)
-                notes.append(note_json)
-            # Now sort in descending timestamp order.
-            man_home['notes'] = Db2Manuhome.__sort_notes(notes)
+            man_home['notes'] = self.__get_notes_json()
         man_home['hasCaution'] = self.set_caution()
         return man_home
 
@@ -536,26 +530,39 @@ class Db2Manuhome(db.Model):
         if self.reg_descript:
             man_home['description'] = self.reg_descript.registration_json
         if self.current_view and self.staff:
-            notes = []
-            if self.reg_notes:
-                for note in self.reg_notes:
-                    note_json = note.registration_json
-                    note_json['documentRegistrationNumber'] = self.__get_note_doc_reg_num(note.reg_document_id)
-                    if note.document_type == MhrDocumentTypes.NCAN:
-                        for unote in self.reg_notes:
-                            if note.reg_document_id == unote.can_document_id:
-                                cancel_json = unote.registration_json
-                                note_json['cancelledDocumentType'] = cancel_json.get('documentType')
-                                note_json['cancelledDocumentRegistrationNumber'] = \
-                                    self.__get_note_doc_reg_num(note.reg_document_id)
-                                break
-                    notes.append(note_json)
-                # Now sort in descending timestamp order.
-                man_home['notes'] = Db2Manuhome.__sort_notes(notes)
-            else:
-                man_home['notes'] = notes
+            man_home['notes'] = self.__get_notes_json()
         man_home['hasCaution'] = self.set_caution()
         return man_home
+
+    def __get_notes_json(self):
+        """Get the unit notes json sorted in descending order by timestamp (most recent first)."""
+        notes = []
+        if not self.reg_notes:
+            return notes
+        for note in self.reg_notes:
+            note_json = note.registration_json
+            note_json['documentRegistrationNumber'] = self.__get_note_doc_reg_num(note.reg_document_id)
+            notes.append(note_json)
+        # Add any NCAN registration using the cancelled note as a base.
+        for doc in self.reg_documents:
+            if doc.document_type == MhrDocumentTypes.NCAN:
+                for note in self.reg_notes:
+                    if doc.id == note.can_document_id:
+                        cancel_json = note.registration_json
+                        note_json = {
+                            'cancelledDocumentType': cancel_json.get('documentType'),
+                            'cancelledDocumentRegistrationNumber': self.__get_note_doc_reg_num(note.reg_document_id),
+                            'documentType': doc.document_type.strip(),
+                            'documentId': doc.id,
+                            'documentRegistrationNumber': doc.document_reg_id,
+                            'status': Db2Mhomnote.StatusTypes.ACTIVE,
+                            'createDateTime':  model_utils.format_local_ts(doc.registration_ts),
+                            'remarks': cancel_json.get('remarks'),
+                            'givingNoticeParty': cancel_json.get('givingNoticeParty')
+                        }
+                        notes.append(note_json)
+        # Now sort in descending timestamp order.
+        return Db2Manuhome.__sort_notes(notes)
 
     def __get_note_doc_reg_num(self, doc_id: str) -> str:
         """Get the document registration number matching the doc_id from document."""
@@ -882,8 +889,8 @@ class Db2Manuhome(db.Model):
                                                    Db2Document.DocumentTypes.EXTEND_CAUTION):
                         note.can_document_id = doc.id
                         note.status = Db2Mhomnote.StatusTypes.CANCELLED
-        # Add note.
-        if reg_json.get('note'):
+        # Add note record except for the NCAN.
+        if reg_json.get('note') and new_doc.document_type != MhrDocumentTypes.NCAN:
             reg_note = registration.notes[0]
             note: Db2Mhomnote = Db2Mhomnote.create_from_registration(reg_json.get('note'), doc, manuhome.id)
             if reg_note.expiry_date:

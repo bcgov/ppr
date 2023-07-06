@@ -25,7 +25,7 @@ from registry_schemas.example_data.mhr import REGISTRATION, LOCATION, TRANSFER, 
 
 from mhr_api.exceptions import BusinessException
 from mhr_api.models import Db2Document, Db2Manuhome, Db2Mhomnote, Db2Owngroup, MhrRegistration, Db2Location
-from mhr_api.models.type_tables import MhrPartyTypes, MhrTenancyTypes
+from mhr_api.models.type_tables import MhrPartyTypes, MhrTenancyTypes, MhrDocumentTypes
 from mhr_api.services.authz import MANUFACTURER_GROUP, QUALIFIED_USER_GROUP, GOV_ACCOUNT_ROLE, STAFF_ROLE
 
 
@@ -138,16 +138,18 @@ TEST_DATA_GROUP_TYPE = [
     (MhrTenancyTypes.NA, 6, '051414', MhrPartyTypes.ADMINISTRATOR),
     (MhrTenancyTypes.NA, 4, '098504', MhrPartyTypes.TRUSTEE)
 ]
-# testdata pattern is ({mhr_num}, {group_id}, {doc_id_prefix}, {account_id})
+# testdata pattern is ({mhr_num}, {group_id}, {doc_id_prefix}, {account_id}, {doc_type}, {can_doc_id})
 TEST_DATA_NOTE = [
-    ('003936', STAFF_ROLE, '6', 'ppr_staff')
+    ('003936', STAFF_ROLE, '6', 'ppr_staff', 'CAU', None),
+    ('022873', STAFF_ROLE, '6', 'ppr_staff', 'NCAN', 50435493)
 ]
-# testdata pattern is ({mhr_num}, {staff}, {current}, {has_notes})
+# testdata pattern is ({mhr_num}, {staff}, {current}, {has_notes}, {ncan_doc_id})
 TEST_MHR_NUM_DATA_NOTE = [
-    ('080282', True, True, True),
-    ('003936', True, True, False),
-    ('003936', True, False, False),
-    ('003936', False, True, False)
+    ('080282', True, True, True, None),
+    ('092238', True, True, True, '63116143'),
+    ('003936', True, True, False, None),
+    ('003936', True, False, False, None),
+    ('003936', False, True, False, None)
 ]
 
 
@@ -246,8 +248,8 @@ def test_find_by_mhr_number(session, http_status, id, mhr_num, status, doc_id, o
         assert request_err.value.status_code == http_status
 
 
-@pytest.mark.parametrize('mhr_num,staff,current,has_notes', TEST_MHR_NUM_DATA_NOTE)
-def test_find_by_mhr_number_note(session, mhr_num, staff, current, has_notes):
+@pytest.mark.parametrize('mhr_num,staff,current,has_notes,ncan_doc_id', TEST_MHR_NUM_DATA_NOTE)
+def test_find_by_mhr_number_note(session, mhr_num, staff, current, has_notes, ncan_doc_id):
     """Assert that find a manufactured home by mhr_number conditionally includes notes."""
     manuhome: Db2Manuhome = Db2Manuhome.find_by_mhr_number(mhr_num)
     assert manuhome
@@ -256,16 +258,43 @@ def test_find_by_mhr_number_note(session, mhr_num, staff, current, has_notes):
     reg_json = manuhome.new_registration_json
     if has_notes:
         assert reg_json.get('notes')
+        has_ncan: bool = False
         for note in reg_json.get('notes'):
             assert note.get('documentRegistrationNumber')
             assert note.get('documentId')
+            if ncan_doc_id and note.get('documentId') == ncan_doc_id:
+                has_ncan = True
+                assert note.get('cancelledDocumentType')
+                assert note.get('cancelledDocumentRegistrationNumber')
             assert note.get('createDateTime')
             assert note.get('status')
             assert 'remarks' in note
             assert note.get('givingNoticeParty')
+        if ncan_doc_id:
+            assert has_ncan
     elif staff and current:
         assert 'notes' in reg_json
         assert not reg_json.get('notes')
+    else:
+        assert 'notes' not in reg_json
+    # search version
+    reg_json = manuhome.registration_json
+    if has_notes:
+        assert reg_json.get('notes')
+        has_ncan: bool = False
+        for note in reg_json.get('notes'):
+            assert note.get('documentRegistrationNumber')
+            assert note.get('documentId')
+            if ncan_doc_id and note.get('documentId') == ncan_doc_id:
+                has_ncan = True
+                assert note.get('cancelledDocumentType')
+                assert note.get('cancelledDocumentRegistrationNumber')
+            assert note.get('createDateTime')
+            assert note.get('status')
+            assert 'remarks' in note
+            assert note.get('givingNoticeParty')
+        if ncan_doc_id:
+            assert has_ncan
     else:
         assert 'notes' not in reg_json
 
@@ -602,12 +631,16 @@ def test_save_new(session):
         assert group.status == '3'
 
 
-@pytest.mark.parametrize('mhr_num,user_group,doc_id_prefix,account_id', TEST_DATA_NOTE)
-def test_create_note_from_json(session, mhr_num, user_group, doc_id_prefix, account_id):
+@pytest.mark.parametrize('mhr_num,user_group,doc_id_prefix,account_id,doc_type,can_doc_id', TEST_DATA_NOTE)
+def test_create_note_from_json(session, mhr_num, user_group, doc_id_prefix, account_id, doc_type, can_doc_id):
     """Assert that an MHR unit note registration is created from json correctly."""
     json_data = copy.deepcopy(NOTE_REGISTRATION)
+    json_data['note']['documentType'] = doc_type
+    if doc_type == MhrDocumentTypes.NCAN:
+        json_data['cancelDocumentId'] = can_doc_id
     base_reg: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account_id)
     assert base_reg
+    existing_count = len(base_reg.manuhome.reg_notes)
     # current_app.logger.info(json_data)
     registration: MhrRegistration = MhrRegistration.create_note_from_json(base_reg,
                                                                           json_data,
@@ -623,19 +656,22 @@ def test_create_note_from_json(session, mhr_num, user_group, doc_id_prefix, acco
     index: int = len(manuhome.reg_documents) - 1
     doc: Db2Document = manuhome.reg_documents[index]
     assert doc.id == registration.doc_id
-    assert doc.document_type == 'CAU '
+    assert doc.document_type.strip() == doc_type
     assert doc.document_reg_id == registration.doc_reg_number
     assert doc.attention_reference
     assert doc.client_reference_id
     assert doc.registration_ts
-    assert manuhome.reg_notes
-    note: Db2Mhomnote = manuhome.reg_notes[0]
-    assert note.document_type == doc.document_type
-    assert note.reg_document_id == doc.id
-    assert note.destroyed == 'N'
-    assert note.remarks
-    assert note.status
-    assert note.expiry_date
-    assert note.name
-    assert note.phone_number
-    assert note.legacy_address
+    if doc_type != MhrDocumentTypes.NCAN:
+        assert manuhome.reg_notes
+        note: Db2Mhomnote = manuhome.reg_notes[0]
+        assert note.document_type == doc.document_type
+        assert note.reg_document_id == doc.id
+        assert note.destroyed == 'N'
+        assert note.remarks
+        assert note.status
+        assert note.expiry_date
+        assert note.name
+        assert note.phone_number
+        assert note.legacy_address
+    else:
+        assert len(manuhome.reg_notes) == existing_count

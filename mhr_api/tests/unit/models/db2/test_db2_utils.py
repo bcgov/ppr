@@ -21,7 +21,7 @@ from flask import current_app
 import pytest
 from flask import current_app
 
-from mhr_api.models import registration_utils as reg_utils, utils as model_utils
+from mhr_api.models import registration_utils as reg_utils, MhrRegistration, Db2Manuhome
 from mhr_api.models.registration_utils import AccountRegistrationParams
 from mhr_api.models.db2 import utils as db2_utils
 from mhr_api.models.type_tables import MhrDocumentType, MhrRegistrationTypes
@@ -89,6 +89,12 @@ TEST_QUERY_FILTER_DATA_MULTIPLE = [
      'EXEMPT', "'098487'", db2_utils.REG_FILTER_DATE, db2_utils.REG_FILTER_STATUS),
     ('2523', False, '2021-10-14T09:53:57-07:53', '2021-10-17T09:53:57-07:53', reg_utils.USER_NAME_PARAM,
      'BCREG2', "'098487'", db2_utils.REG_FILTER_DATE, db2_utils.REG_FILTER_USERNAME),
+]
+# testdata pattern is ({mhr_num}, {staff}, {current}, {has_notes}, {ncan_doc_id}, {has_search_notes})
+TEST_MHR_NUM_DATA_NOTE = [
+    ('080282', True, True, True, None, False),
+    ('003936', True, True, False, None, False),
+    ('092238', True, True, True, '63116143', True)
 ]
 
 
@@ -339,3 +345,63 @@ def test_get_next_mhr_number(session):
     # assert number generated
     assert mhr1 and mhr2
     assert int(mhr1) + 1 == int(mhr2)
+
+
+@pytest.mark.parametrize('mhr_num,staff,current,has_notes,ncan_doc_id,has_search_notes', TEST_MHR_NUM_DATA_NOTE)
+def test_get_new_reg_json_note(session, mhr_num, staff, current, has_notes, ncan_doc_id, has_search_notes):
+    """Assert that registration unit notes work as expected."""
+    manuhome: Db2Manuhome = Db2Manuhome.find_by_mhr_number(mhr_num)
+    assert manuhome
+    registration: MhrRegistration = MhrRegistration(current_view=current, staff=staff, manuhome=manuhome)
+    reg_json = db2_utils.get_new_registration_json(registration)
+    if has_notes:
+        assert reg_json.get('notes')
+        has_ncan: bool = False
+        for note in reg_json.get('notes'):
+            assert note.get('documentRegistrationNumber')
+            assert note.get('documentId')
+            assert note.get('documentDescription')
+            if ncan_doc_id and note.get('documentId') == ncan_doc_id:
+                has_ncan = True
+                assert note.get('cancelledDocumentType')
+                assert note.get('cancelledDocumentRegistrationNumber')
+                assert note.get('cancelledDocumentDescription')
+            assert note.get('createDateTime')
+            assert note.get('status')
+            assert 'remarks' in note
+            assert note.get('givingNoticeParty')
+            if ncan_doc_id:
+                assert has_ncan
+    elif staff and current:
+        assert 'notes' in reg_json
+        assert not reg_json.get('notes')
+    else:
+        assert 'notes' not in reg_json
+
+
+@pytest.mark.parametrize('mhr_num,staff,current,has_notes,ncan_doc_id,has_search_notes', TEST_MHR_NUM_DATA_NOTE)
+def test_get_search_json_note(session, mhr_num, staff, current, has_notes, ncan_doc_id, has_search_notes):
+    """Assert that search unit notes work as expected."""
+    manuhome: Db2Manuhome = Db2Manuhome.find_by_mhr_number(mhr_num)
+    assert manuhome
+    registration: MhrRegistration = MhrRegistration(current_view=current, staff=staff, manuhome=manuhome)
+    reg_json = db2_utils.get_search_json(registration)
+    if has_notes and has_search_notes:
+        assert reg_json.get('notes')
+        has_ncan: bool = False
+        for note in reg_json.get('notes'):
+            assert note.get('documentRegistrationNumber')
+            assert note.get('documentId')
+            assert note.get('documentDescription')
+            if ncan_doc_id and note.get('documentId') == ncan_doc_id:
+                has_ncan = True
+                assert note.get('cancelledDocumentType')
+                assert note.get('cancelledDocumentRegistrationNumber')
+            assert note.get('createDateTime')
+            assert note.get('status')
+            assert 'remarks' in note
+            assert note.get('givingNoticeParty')
+            if ncan_doc_id:
+                assert has_ncan
+    else:
+        assert not reg_json.get('notes')

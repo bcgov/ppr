@@ -473,15 +473,16 @@ TEST_DATA_STATUS = [
     ('003936', '2523', 'FROZEN'),
     ('003304', '2523', 'ACTIVE')
 ]
-# testdata pattern is ({mhr_num}, {staff}, {current}, {has_notes}, {account_id}, {has_caution})
+# testdata pattern is ({mhr_num}, {staff}, {current}, {has_notes}, {account_id}, {has_caution}, {ncan_doc_id})
 TEST_MHR_NUM_DATA_NOTE = [
-    ('080282', True, True, True, '2523', False),
-    ('003936', True, True, False, '2523', False),
-    ('003936', True, False, False, '2523', False),
-    ('003936', False, True, False, '2523', False),
-    ('035159', True, True, True, 'ppr_staff', True),
-    ('080104', True, True, True, 'ppr_staff', True),
-    ('046315', True, True, True, 'ppr_staff', False)
+    ('080282', True, True, True, '2523', False, None),
+    ('003936', True, True, False, '2523', False, None),
+    ('003936', True, False, False, '2523', False, None),
+    ('003936', False, True, False, '2523', False, None),
+    ('035159', True, True, True, 'ppr_staff', True, None),
+    ('080104', True, True, True, 'ppr_staff', True, None),
+    ('046315', True, True, True, 'ppr_staff', False, None),
+    ('092238', True, True, True, 'ppr_staff', False, '63116143')
 ]
 
 
@@ -650,8 +651,8 @@ def test_find_by_mhr_number(session, mhr_number, has_results, account_id):
         assert not_found_err
 
 
-@pytest.mark.parametrize('mhr_num,staff,current,has_notes,account_id,has_caution', TEST_MHR_NUM_DATA_NOTE)
-def test_find_by_mhr_number_note(session, mhr_num, staff, current, has_notes, account_id, has_caution):
+@pytest.mark.parametrize('mhr_num,staff,current,has_notes,account_id,has_caution,ncan_doc_id', TEST_MHR_NUM_DATA_NOTE)
+def test_find_by_mhr_number_note(session, mhr_num, staff, current, has_notes, account_id, has_caution, ncan_doc_id):
     """Assert that find a manufactured home by mhr_number conditionally includes notes."""
     registration: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account_id)
     assert registration
@@ -660,20 +661,48 @@ def test_find_by_mhr_number_note(session, mhr_num, staff, current, has_notes, ac
     reg_json = registration.new_registration_json
     if has_notes:
         assert reg_json.get('notes')
+        has_ncan: bool = False
         for note in reg_json.get('notes'):
             assert note.get('documentRegistrationNumber')
             assert note.get('documentId')
             assert note.get('documentDescription')
+            if ncan_doc_id and note.get('documentId') == ncan_doc_id:
+                has_ncan = True
+                assert note.get('cancelledDocumentType')
+                assert note.get('cancelledDocumentDescription')
+                assert note.get('cancelledDocumentRegistrationNumber')
             assert note.get('createDateTime')
             assert note.get('status')
             assert 'remarks' in note
             assert note.get('givingNoticeParty')
+        if ncan_doc_id:
+            assert has_ncan
     elif staff and current:
         assert 'notes' in reg_json
         assert not reg_json.get('notes')
     else:
         assert 'notes' not in reg_json
     assert reg_json.get('hasCaution') == has_caution
+    # search version
+    reg_json = registration.registration_json
+    if has_notes and mhr_num != '080282':
+        assert reg_json.get('notes')
+        has_ncan: bool = False
+        for note in reg_json.get('notes'):
+            assert note.get('documentRegistrationNumber')
+            assert note.get('documentId')
+            if ncan_doc_id and note.get('documentId') == ncan_doc_id:
+                has_ncan = True
+                assert note.get('cancelledDocumentType')
+                assert note.get('cancelledDocumentRegistrationNumber')
+            assert note.get('createDateTime')
+            assert note.get('status')
+            assert 'remarks' in note
+            assert note.get('givingNoticeParty')
+        if ncan_doc_id:
+            assert has_ncan
+    else:
+        assert not reg_json.get('notes')
 
 
 @pytest.mark.parametrize('mhr_number, account_id, has_pid', TEST_DATA_LTSA_PID)

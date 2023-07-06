@@ -207,6 +207,12 @@ TEST_SELECT_SORT_DATA_IND = [
     (SELECT_1_IND, SELECT_2_IND, SELECT_3_IND, SELECT_4_IND),
     (SELECT_2_IND, SELECT_1_IND, SELECT_3_IND, SELECT_4_IND)
 ]
+# testdata pattern is ({mhr_num}, {has_notes}, {ncan_doc_id})
+TEST_MHR_NUM_DATA_NOTE = [
+    ('080282', False, None),
+    ('092238', True, '63116143'),
+    ('022873', True, None)
+]
 
 
 @pytest.mark.parametrize('desc,search_data,select_data,certified', TEST_VALID_DATA)
@@ -427,3 +433,48 @@ def test_search_sort_ind(session, client, jwt, mhr1, mhr2, mhr3, mhr4):
     assert len(extra) == 1
     assert extra[0].get('mhrNumber') == '002200'
     assert extra[0].get('ownerName')['first'] == 'JOHN'
+
+
+@pytest.mark.parametrize('mhr_num,has_notes,ncan_doc_id', TEST_MHR_NUM_DATA_NOTE)
+def test_search_notes(session, mhr_num, has_notes, ncan_doc_id):
+    """Assert that search detail results on registration matches returns the expected unit note results."""
+    # test
+    search_data = copy.deepcopy(MHR_NUMBER_JSON)
+    search_data['criteria']['value'] = mhr_num
+    search_query = SearchRequest.create_from_json(search_data, 'PS12345')
+    search_query.search()
+    # current_app.logger.info(search_query.json)
+    search_detail = SearchResult.create_from_search_query(search_query)
+    search_detail.save()
+
+    # check
+    assert search_detail.search_id == search_query.id
+    assert not search_detail.search_select
+    query_json = search_query.json
+    select_data = query_json.get('results')
+    search_detail2 = SearchResult.validate_search_select(select_data, search_detail.search_id)
+    search_detail2.update_selection(select_data, 'account name', None, False)
+    # check
+    # current_app.logger.debug(search_detail2.search_select)
+    assert search_detail2.search_select
+    result = search_detail2.json
+    assert result.get('details')
+    reg_json = result['details'][0]
+    if has_notes:
+        assert reg_json.get('notes')
+        has_ncan: bool = False
+        for note in reg_json.get('notes'):
+            assert note.get('documentRegistrationNumber')
+            assert note.get('documentId')
+            if ncan_doc_id and note.get('documentId') == ncan_doc_id:
+                has_ncan = True
+                assert note.get('cancelledDocumentType')
+                assert note.get('cancelledDocumentRegistrationNumber')
+            assert note.get('createDateTime')
+            assert note.get('status')
+            assert 'remarks' in note
+            assert note.get('givingNoticeParty')
+        if ncan_doc_id:
+            assert has_ncan
+    else:
+        assert not reg_json.get('notes')
