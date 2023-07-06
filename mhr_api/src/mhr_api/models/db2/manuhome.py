@@ -20,6 +20,7 @@ from flask import current_app
 from mhr_api.exceptions import BusinessException, DatabaseException, ResourceErrorCodes
 from mhr_api.models import utils as model_utils
 from mhr_api.models.type_tables import MhrTenancyTypes, MhrPartyTypes, MhrRegistrationTypes, MhrDocumentTypes
+from mhr_api.models.type_tables import MhrNoteStatusTypes
 from mhr_api.models import db
 
 from .descript import Db2Descript
@@ -545,7 +546,7 @@ class Db2Manuhome(db.Model):
             notes.append(note_json)
         # Add any NCAN registration using the cancelled note as a base.
         for doc in self.reg_documents:
-            if doc.document_type == MhrDocumentTypes.NCAN:
+            if doc.document_type in (MhrDocumentTypes.NCAN, MhrDocumentTypes.NRED):
                 for note in self.reg_notes:
                     if doc.id == note.can_document_id:
                         cancel_json = note.registration_json
@@ -555,7 +556,7 @@ class Db2Manuhome(db.Model):
                             'documentType': doc.document_type.strip(),
                             'documentId': doc.id,
                             'documentRegistrationNumber': doc.document_reg_id,
-                            'status': Db2Mhomnote.StatusTypes.ACTIVE,
+                            'status': MhrNoteStatusTypes.ACTIVE.value,
                             'createDateTime':  model_utils.format_local_ts(doc.registration_ts),
                             'remarks': cancel_json.get('remarks'),
                             'givingNoticeParty': cancel_json.get('givingNoticeParty')

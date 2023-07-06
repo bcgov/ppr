@@ -881,6 +881,6 @@ def update_note_json(registration, note_json: dict) -> dict:
                     note_json['expiryDateTime'] = model_utils.format_ts(note.expiry_date)
                 if note.effective_ts:
                     note_json['effectiveDateTime'] = model_utils.format_ts(note.effective_ts)
-                if note.document_type == MhrDocumentTypes.NCAN:
+                if note.document_type in (MhrDocumentTypes.NCAN, MhrDocumentTypes.NRED):
                     note_json['remarks'] = note.remarks
     return note_json

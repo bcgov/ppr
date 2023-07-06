@@ -211,7 +211,7 @@ TEST_SELECT_SORT_DATA_IND = [
 TEST_MHR_NUM_DATA_NOTE = [
     ('080282', False, None),
     ('092238', True, '63116143'),
-    ('022873', True, None)
+    ('022873', True, '43599221')
 ]
 
 

@@ -482,7 +482,8 @@ TEST_MHR_NUM_DATA_NOTE = [
     ('035159', True, True, True, 'ppr_staff', True, None),
     ('080104', True, True, True, 'ppr_staff', True, None),
     ('046315', True, True, True, 'ppr_staff', False, None),
-    ('092238', True, True, True, 'ppr_staff', False, '63116143')
+    ('092238', True, True, True, 'ppr_staff', False, '63116143'),
+    ('022873', True, True, True, 'ppr_staff', False, '43599221')
 ]
 
 
