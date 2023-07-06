@@ -51,7 +51,7 @@ export const useMhrValidations = (validationState: any) => {
 
     // Find the _first_ corresponding Section that is invalid in the specified view
     const view = document.getElementById(viewId)
-    const invalidComponent = view.getElementsByTagName('section')[flagBlockArr.indexOf(false)]
+    const invalidComponent = view?.getElementsByTagName('section')[flagBlockArr.indexOf(false)]
 
     // If there is an invalid component, scroll to it
     if (invalidComponent) {
@@ -70,7 +70,7 @@ export const useMhrValidations = (validationState: any) => {
   const scrollToInvalidReviewConfirm = (stepsValidation: Array<boolean>): boolean => {
     // Find the _first_ corresponding step that is invalid in the specified view
     const view = document.getElementById('mhr-review-confirm')
-    const invalidStep = view.getElementsByTagName('header')[stepsValidation.indexOf(false)]
+    const invalidStep = view?.getElementsByTagName('header')[stepsValidation.indexOf(false)]
 
     // If there is an invalid step, scroll to its header
     if (invalidStep) {
