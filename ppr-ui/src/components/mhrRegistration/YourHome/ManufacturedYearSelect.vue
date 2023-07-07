@@ -78,7 +78,7 @@ export default defineComponent({
       yearOfManufacture: getMhrRegistrationYearOfManufacture?.value
     })
 
-    watch(() => localState.yearOfManufacture, (val: string) => {
+    watch(() => localState.yearOfManufacture, (val: number) => {
       setMhrHomeBaseInformation({ key: 'year', value: val })
     })
 
