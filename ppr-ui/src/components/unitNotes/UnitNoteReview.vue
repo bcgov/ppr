@@ -23,12 +23,16 @@
     </section>
 
     <section class="mt-15">
-      <h2>2. Effective Date and Time</h2>
-      <p class="mt-2">
-        Select the effective date and time for this {{ unitNoteType.header }}. Custom date and time can
-        be a date and time in the past. Notice of Caution will expire 90 days after the effective date.
-      </p>
-      // Placeholder for the component
+      <EffectiveDateTime
+        :content="{
+          title: '2. Effective Date and Time',
+          description: `Select the effective date and time for this ${unitNoteType.header}.  ` +
+          'Custom date and time can be a date and time in the past.' + effectiveDateDescForCAU,
+          sideLabel: 'Effective Date and Time'
+        }"
+        :validate="validate"
+        @setStoreProperty="handleEffectiveDateUpdate($event)"
+      />
     </section>
 
     <section class="mt-15">
@@ -87,12 +91,15 @@ import { Attention } from '../mhrRegistration/ReviewConfirm'
 import { StaffPayment } from '@bcrs-shared-components/staff-payment'
 import { StaffPaymentOptions } from '@bcrs-shared-components/enums'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
+import EffectiveDateTime from './EffectiveDateTime.vue'
+import { UnitNoteDocTypes } from '@/enums'
 
 export default defineComponent({
   name: 'UnitNoteReview',
   components: {
     UnitNoteReviewDetailsTable,
     ContactInformation,
+    EffectiveDateTime,
     Attention,
     CertifyInformation,
     StaffPayment
@@ -112,7 +119,7 @@ export default defineComponent({
     } = storeToRefs(useStore())
 
     const {
-      // setMhrUnitNote,
+      setMhrUnitNote,
       setMhrUnitNoteRegistration,
       setStaffPayment
     } = useStore()
@@ -147,9 +154,17 @@ export default defineComponent({
       setMhrUnitNoteRegistration({ key: 'submittingParty', value: val })
     }
 
+    const handleEffectiveDateUpdate = (val: string) => {
+      setMhrUnitNote({ key: 'effectiveDateTime', value: val })
+    }
+
     const handleComponentValid = (component: MhrCompVal, isValid: boolean) => {
       setValidation(MhrSectVal.UNIT_NOTE_VALID, component, isValid)
     }
+
+    const effectiveDateDescForCAU = getMhrUnitNote.value.documentType === UnitNoteDocTypes.NOTICE_OF_CAUTION
+      ? ' Notice of Caution will expire 90 days after the effective date.'
+      : ''
 
     const onStaffPaymentDataUpdate = (val: StaffPaymentIF) => {
       let staffPaymentData: StaffPaymentIF = {
@@ -202,8 +217,10 @@ export default defineComponent({
       MhrCompVal,
       getMhrUnitNote,
       setSubmittingParty,
+      handleEffectiveDateUpdate,
       handleComponentValid,
       onStaffPaymentDataUpdate,
+      effectiveDateDescForCAU,
       ...toRefs(localState)
     }
   }
