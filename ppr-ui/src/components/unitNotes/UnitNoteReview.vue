@@ -156,6 +156,9 @@ export default defineComponent({
 
     const handleEffectiveDateUpdate = (val: string) => {
       setMhrUnitNote({ key: 'effectiveDateTime', value: val })
+      // expiry date is 90 days from effective date
+      const expiryDateTime = new Date(new Date(val).getTime() + 90 * 24 * 60 * 60 * 1000).toISOString()
+      setMhrUnitNote({ key: 'expiryDateTime', value: expiryDateTime })
     }
 
     const handleComponentValid = (component: MhrCompVal, isValid: boolean) => {

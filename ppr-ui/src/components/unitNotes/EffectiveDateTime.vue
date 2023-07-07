@@ -87,7 +87,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, onBeforeMount, reactive, ref, toRefs, watch } from 'vue-demi'
 import { EffectiveDateTypes, PeriodTypes } from '@/enums/'
 import { createUtcDate, localTodayDate, pacificDate } from '@/utils'
 import { ContentIF, FormIF } from '@/interfaces'
@@ -151,6 +151,11 @@ export default defineComponent({
       const date = new Date(localState.selectedPastDate)
       return createUtcDate(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), hours, minutes)
     }
+
+    onBeforeMount((): void => {
+      // set todays date as Immediate radio button is selected by default
+      localState.effectiveDate = new Date().toISOString()
+    })
 
     watch(
       () => [localState.effectiveDateType],
