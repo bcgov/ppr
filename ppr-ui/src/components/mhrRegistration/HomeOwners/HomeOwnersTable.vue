@@ -990,6 +990,9 @@ export default defineComponent({
     }
 
     .owner-info {
+      width: 100%;
+      display: block;
+
       td {
         white-space: normal;
         vertical-align: top;
