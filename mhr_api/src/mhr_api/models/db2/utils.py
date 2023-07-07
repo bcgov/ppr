@@ -790,7 +790,7 @@ def get_search_json(registration):
                     note['remarks'] != 'MANUFACTURED HOME REGISTRATION CANCELLED':
                 # Only staff can see remarks if not default.
                 note['remarks'] = 'MANUFACTURED HOME REGISTRATION CANCELLED'
-            elif doc_type in ('TAXN', 'EXNR', 'NPUB', 'REST') and \
+            elif doc_type in ('TAXN', 'EXNR', 'EXRS', 'NPUB', 'REST', 'CAU', 'CAUC', 'CAUE') and \
                     note.get('status') != MhrNoteStatusTypes.ACTIVE:  # Exclude if not active.
                 include = False
             elif doc_type in ('CAU', 'CAUC', 'CAUE') and note.get('expiryDateTime') and \
@@ -843,6 +843,7 @@ def get_new_registration_json(registration):
             note['documentDescription'] = get_doc_desc(note_doc_type)
             if note.get('cancelledDocumentType'):
                 note['cancelledDocumentDescription'] = get_doc_desc(note.get('cancelledDocumentType'))
+            note = update_note_json(registration, note)
     current_app.logger.debug('Built JSON from DB2 and PostgreSQL')
     return registration.set_payment_json(reg_json)
 
@@ -880,4 +881,6 @@ def update_note_json(registration, note_json: dict) -> dict:
                     note_json['expiryDateTime'] = model_utils.format_ts(note.expiry_date)
                 if note.effective_ts:
                     note_json['effectiveDateTime'] = model_utils.format_ts(note.effective_ts)
+                if note.document_type in (MhrDocumentTypes.NCAN, MhrDocumentTypes.NRED):
+                    note_json['remarks'] = note.remarks
     return note_json
