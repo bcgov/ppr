@@ -75,13 +75,11 @@ export default defineComponent({
 
     const localState = reactive({
       currentYear: new Date().getFullYear(),
-      yearOfManufacture: getMhrRegistrationYearOfManufacture.value?.toString()
+      yearOfManufacture: getMhrRegistrationYearOfManufacture?.value
     })
 
-    watch(() => localState.yearOfManufacture, (val: string) => {
-      if (parseInt(val)) {
-        setMhrHomeBaseInformation({ key: 'year', value: parseInt(val) })
-      }
+    watch(() => localState.yearOfManufacture, (val: number) => {
+      setMhrHomeBaseInformation({ key: 'year', value: val })
     })
 
     return {
