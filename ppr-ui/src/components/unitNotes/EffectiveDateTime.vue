@@ -1,8 +1,8 @@
 <template>
-  <div id="contact-info-container">
+  <div id="effective-date-time-container">
     <h2>{{ content.title }}</h2>
     <p class="mt-2">{{ content.description }}</p>
-    <v-card id="effective-date-time-box" flat rounded class="mt-8 px-7 py-10">
+    <v-card id="effective-date-time-card" flat rounded class="mt-8 px-7 py-10">
       <v-row no-gutters>
         <v-col cols="12" sm="3">
           <label class="generic-label" :class="{ 'error-text': false }">
@@ -11,10 +11,17 @@
         </v-col>
         <v-col cols="12" sm="9" class="px-1">
           <v-radio-group v-model="effectiveDateType" column class="pt-0 mt-0">
-            <v-radio label="Immediate (date and time of registration)" :value="EffectiveDateTypes.IMMEDIATE" />
-            <v-radio label="Date and time in the past" :value="EffectiveDateTypes.PAST" />
+            <v-radio
+              :value="EffectiveDateTypes.IMMEDIATE"
+              label="Immediate (date and time of registration)"
+              data-test-id="immediate-date-radio"
+            />
+            <v-radio
+              :value="EffectiveDateTypes.PAST"
+              label="Date and time in the past"
+              data-test-id="past-date-radio"
+            />
           </v-radio-group>
-
           <v-form ref="effectiveDateTimeForm" class="date-time-selectors" v-model="isEffectiveDateTimeFormValid">
             <SharedDatePicker
               id="effective-date-picker"
@@ -62,7 +69,6 @@
                 filled
                 class="mr-1"
                 :items="[PeriodTypes.AM, PeriodTypes.PM]"
-                :rules="required('Required')"
                 :disabled="isImmediateDateSelected"
               />
 
@@ -73,7 +79,7 @@
           <div
             v-if="!isImmediateDateSelected && selectedPastDate && isTimeSelected"
             class="ml-8"
-            data-test-id="footnote-label"
+            data-test-id="date-summary-label"
           >
             Caution on this home effective: <br />
             <b>
