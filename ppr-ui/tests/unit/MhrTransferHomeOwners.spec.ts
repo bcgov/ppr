@@ -28,7 +28,12 @@ import {
   mockedRemovedAdministrator
 } from './test-data'
 import { getTestId } from './utils'
-import { MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF, TransferTypeSelectIF } from '@/interfaces'
+import {
+  MhrHomeOwnerGroupIF,
+  MhrRegistrationHomeOwnerGroupIF,
+  MhrRegistrationHomeOwnerIF,
+  TransferTypeSelectIF
+} from '@/interfaces'
 import {
   ActionTypes,
   ApiHomeTenancyTypes,
@@ -72,9 +77,12 @@ describe('Home Owners', () => {
     wrapper = createComponent()
 
     await store.setMhrTransferType({
+      divider: false,
+      selectDisabled: false,
       transferType: ApiTransferTypes.SALE_OR_GIFT,
-      textLabel: UITransferTypes.SALE_OR_GIFT
-    })
+      textLabel: UITransferTypes.SALE_OR_GIFT,
+      group: 1
+    } as TransferTypeSelectIF)
   })
   afterEach(() => {
     wrapper.destroy()
@@ -591,7 +599,7 @@ describe('Home Owners', () => {
     ).toBe(HomeTenancyTypes.NA)
   })
 
-  it('TRANS Sale or Gift: validations for mixed owners types in the table', async () => {
+  it('TRANS: validations for mixed owners types in the table', async () => {
     // reset transfer type
     await selectTransferType(null)
 
@@ -606,12 +614,13 @@ describe('Home Owners', () => {
             id: '1',
             partyType: HomeOwnerPartyTypes.EXECUTOR
           } as MhrRegistrationHomeOwnerIF,
-        {
-          ...mockedPerson,
-          id: '2',
-          partyType: HomeOwnerPartyTypes.OWNER_IND,
-          action: ActionTypes.ADDED
-        } as MhrRegistrationHomeOwnerIF],
+          {
+            ...mockedPerson,
+            id: '2',
+            partyType: HomeOwnerPartyTypes.OWNER_IND,
+            action: ActionTypes.ADDED
+          } as MhrRegistrationHomeOwnerIF
+        ],
         type: ''
       }
     ]
@@ -632,6 +641,20 @@ describe('Home Owners', () => {
     await store.setMhrTransferHomeOwnerGroups(homeOwnerGroup)
 
     expect(groupError.text()).toContain(MixedRolesErrors.hasMixedOwnerTypesInGroup)
+
+    // change transfer type and check for mixed owners again
+    await selectTransferType(ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL)
+    homeOwnerGroup.pop()
+    await store.setMhrTransferHomeOwnerGroups(homeOwnerGroup)
+
+    expect(wrapper.vm.getHomeOwners.length).toBe(2)
+    expect(homeOwners.find(getTestId('invalid-group-msg')).text()).toContain(MixedRolesErrors.hasMixedOwnerTypes)
+
+    // change transfer type and check for mixed owners again
+    await selectTransferType(ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL)
+    await store.setMhrTransferHomeOwnerGroups(homeOwnerGroup)
+
+    expect(homeOwners.find(getTestId('invalid-group-msg')).text()).toContain(MixedRolesErrors.hasMixedOwnerTypes)
   })
 
   it('TRANS WILL: validations with sole Owner in one group', async () => {
@@ -655,7 +678,7 @@ describe('Home Owners', () => {
 
     // group error message should be displayed
     expect(homeOwners.find(getTestId('invalid-group-msg')).exists()).toBeTruthy()
-    expect(homeOwners.find(getTestId('invalid-group-msg')).text()).toContain('Must contain at least one executor.')
+    expect(homeOwners.find(getTestId('invalid-group-msg')).text()).toContain(transfersErrors.mustContainOneExecutor)
 
     const deletedOwner: MhrRegistrationHomeOwnerIF =
       homeOwners.vm.getMhrTransferHomeOwnerGroups[0].owners[0]
@@ -689,7 +712,7 @@ describe('Home Owners', () => {
     await homeOwners.find(getTestId('table-undo-btn')).trigger('click')
 
     expect(homeOwners.find(getTestId('invalid-group-msg')).text())
-      .toContain('All owners must be deceased.')
+      .toContain(MixedRolesErrors.hasMixedOwnerTypes)
 
     await homeOwners.find(getTestId('table-delete-btn')).trigger('click')
 
@@ -772,7 +795,7 @@ describe('Home Owners', () => {
 
     // since we did not delete the second owner from the group one, the error message should be displayed
     expect(homeOwners.find(getTestId('invalid-group-msg')).text())
-      .toContain('All owners must be deceased.')
+      .toContain(MixedRolesErrors.hasMixedOwnerTypesInGroup)
 
     // delete the second owner from the first group
     allDeleteButtons.at(1).trigger('click')
@@ -793,7 +816,7 @@ describe('Home Owners', () => {
     expect(homeOwners.findAllComponents(DeathCertificate).length).toBe(2)
 
     expect(homeOwners.find(getTestId('invalid-group-msg')).text())
-      .toContain('One of the deceased owners must have a Grant of Probate with Will.')
+      .toContain(transfersErrors.allOwnersHaveDeathCerts[TRANSFER_TYPE])
 
     // click back on Grant of Probate with Will radio button for first owner
     allSupportingDocuments.at(0).find(getTestId('supporting-doc-option-one')).trigger('click')
@@ -945,7 +968,7 @@ describe('Home Owners', () => {
       { groupId: 2, owners: [mockedPerson], type: '' }
     ])
 
-    expect(groupError.text()).toContain(transfersErrors.ownersMustBeDeceased)
+    expect(groupError.text()).toContain(MixedRolesErrors.hasMixedOwnerTypesInGroup)
   })
 
   it('TRANS ADMIN No Will: display Supporting Document component for deleted Owner', async () => {

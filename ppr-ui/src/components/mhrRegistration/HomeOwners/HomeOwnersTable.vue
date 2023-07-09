@@ -80,7 +80,10 @@
                 </div>
               </div>
 
-              <tr v-else-if="!isMhrTransfer && index === 0 && hasMixedOwnersInGroup(item.groupId) && !isReadonlyTable">
+              <tr v-else-if="!isMhrTransfer && index === 0 && hasMixedOwnersInGroup(item.groupId) && !isReadonlyTable"
+                class="d-block"
+              >
+                <!-- Mixed owners error for Registrations -->
                 <HomeOwnersMixedRolesError
                   :groupId="item.groupId"
                   :showBorderError="isInvalidOwnerGroup(item.groupId)"
@@ -394,10 +397,12 @@
               <tr v-else-if="isRemovedHomeOwner(item) &&
                 showSupportingDocuments() &&
                 !isReadonlyTable &&
-                isPartyTypeNotEAT(item)">
+                isPartyTypeNotEAT(item)"
+                class="d-block"
+              >
                 <td
                   :colspan="homeOwnersTableHeaders.length"
-                  class="pl-14"
+                  class="pl-14 d-block"
                   :class="{ 'border-error-left': isInvalidOwnerGroup(group.groupId) }"
                 >
                   <v-expand-transition>
@@ -619,7 +624,8 @@ export default defineComponent({
     const isInvalidOwnerGroup = (groupId: number): boolean => {
       if (!props.isMhrTransfer) return isInvalidRegistrationOwnerGroup(groupId)
       if (!props.validateTransfer) return false
-      if (isTransferDueToSaleOrGift.value) return TransSaleOrGift.hasMixedOwnersInGroup(groupId)
+      // check mixed owners in for all transfer types
+      if (TransSaleOrGift.hasMixedOwnersInGroup(groupId)) return true
 
       if ((isTransferToExecutorProbateWill.value ||
         isTransferToExecutorUnder25Will.value ||
@@ -750,6 +756,7 @@ export default defineComponent({
         return (
           (TransToExec.hasSomeOwnersRemoved(groupId) || hasAddedRoleInGroup) &&
           !(hasAddedRoleInGroup &&
+            !TransSaleOrGift.hasMixedOwnersInGroup(groupId) &&
             TransToExec.hasAllCurrentOwnersRemoved(groupId) &&
           !TransToExec.isAllGroupOwnersWithDeathCerts(groupId))
         )
