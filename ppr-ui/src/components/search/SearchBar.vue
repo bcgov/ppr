@@ -80,6 +80,46 @@
             </v-card>
           </v-col>
 
+          <v-col v-else-if="isMhrOrgSearch">
+            <v-text-field
+                filled
+                id="txt-mhr-org-name-"
+                ref="mhrOrgNameRef"
+                label="Enter an organization name"
+                v-model="searchValue"
+                persistent-hint
+                :hint="searchHint"
+                :hide-details="hideDetails"
+                :clearable="showClear"
+                :disabled="!selectedSearchType"
+                :error-messages="searchMessage ? searchMessage : ''"
+                @click:clear="showClear = false"
+            >
+              <template v-slot:append>
+                <v-progress-circular
+                    v-if="loadingSearchResults"
+                    indeterminate
+                    color="primary"
+                    class="mx-3"
+                    :size="25"
+                    :width="3"
+                />
+              </template>
+            </v-text-field>
+
+            <v-card flat>
+              <BusinessSearchAutocomplete
+                  :searchValue="autoCompleteSearchValue"
+                  :setAutoCompleteIsActive="autoCompleteIsActive"
+                  v-click-outside="setCloseAutoComplete"
+                  @search-value="setSearchValue"
+                  @searching="loadingSearchResults = $event"
+                  :showDropdown="$refs.mhrOrgNameRef && $refs.mhrOrgNameRef.isFocused"
+                  isPPR
+              />
+            </v-card>
+          </v-col>
+
           <v-col v-else-if="!isIndividual" class="col-xl pb-0">
             <v-tooltip
               content-class="bottom-tooltip"
@@ -363,6 +403,9 @@ export default defineComponent({
       isBusinessDebtor: computed((): boolean => {
         return localState.selectedSearchType?.searchTypeAPI === APISearchTypes.BUSINESS_DEBTOR
       }),
+      isMhrOrgSearch: computed((): boolean => {
+        return localState.selectedSearchType?.searchTypeAPI === APIMHRMapSearchTypes.MHRORGANIZATION_NAME
+      }),
       wrapClass: computed(() => {
         // Add wrap css class only to MHR Home Owner search fields
         if (localState.selectedSearchType?.searchTypeAPI !== APIMHRMapSearchTypes.MHROWNER_NAME) return ''
@@ -610,8 +653,7 @@ export default defineComponent({
     watch(() => localState.searchValue, (val: string) => {
       if (!val) localState.validations = null
       else localState.validations = validateSearchRealTime(localState)
-      if (localState.selectedSearchType?.searchTypeAPI === APISearchTypes.BUSINESS_DEBTOR &&
-          localState.autoCompleteIsActive) {
+      if ((localState.isBusinessDebtor || localState.isMhrOrgSearch) && localState.autoCompleteIsActive) {
         localState.autoCompleteSearchValue = val
       }
       // show autocomplete results when there is a searchValue and if no error messages
