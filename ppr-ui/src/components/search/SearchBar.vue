@@ -83,7 +83,7 @@
           <v-col v-else-if="isMhrOrgSearch">
             <v-text-field
                 filled
-                id="txt-mhr-org-name-"
+                id="txt-mhr-org-name"
                 ref="mhrOrgNameRef"
                 label="Enter an organization name"
                 v-model="searchValue"
