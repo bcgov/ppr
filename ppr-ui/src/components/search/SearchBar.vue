@@ -69,13 +69,13 @@
 
             <v-card flat>
               <BusinessSearchAutocomplete
+                isPPR disableHelpText
+                v-click-outside="setCloseAutoComplete"
                 :searchValue="autoCompleteSearchValue"
                 :setAutoCompleteIsActive="autoCompleteIsActive"
-                v-click-outside="setCloseAutoComplete"
+                :showDropdown="$refs.debtorNameSearchField && $refs.debtorNameSearchField.isFocused"
                 @search-value="setSearchValue"
                 @searching="loadingSearchResults = $event"
-                :showDropdown="$refs.debtorNameSearchField && $refs.debtorNameSearchField.isFocused"
-                isPPR
               />
             </v-card>
           </v-col>
@@ -109,13 +109,13 @@
 
             <v-card flat>
               <BusinessSearchAutocomplete
-                  :searchValue="autoCompleteSearchValue"
-                  :setAutoCompleteIsActive="autoCompleteIsActive"
-                  v-click-outside="setCloseAutoComplete"
-                  @search-value="setSearchValue"
-                  @searching="loadingSearchResults = $event"
-                  :showDropdown="$refs.mhrOrgNameRef && $refs.mhrOrgNameRef.isFocused"
-                  isPPR
+                isPPR disableHelpText
+                v-click-outside="setCloseAutoComplete"
+                :searchValue="autoCompleteSearchValue"
+                :setAutoCompleteIsActive="autoCompleteIsActive"
+                :showDropdown="$refs.mhrOrgNameRef && $refs.mhrOrgNameRef.isFocused"
+                @search-value="setSearchValue"
+                @searching="loadingSearchResults = $event"
               />
             </v-card>
           </v-col>
