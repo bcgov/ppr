@@ -35,7 +35,10 @@
                 Review your changes and complete the additional information before registering.
               </p>
 
-              <UnitNoteReview />
+              <UnitNoteReview
+                :validate="validate"
+                @isValid="isUnitNoteReviewValid = $event"
+              />
             </div>
           </v-col>
 
@@ -102,6 +105,7 @@ export default defineComponent({
 
     const localState = reactive({
       isUnitNoteValid: false,
+      isUnitNoteReviewValid: false,
       validate: false,
       isReviewMode: false,
       cancelOptions: unsavedChangesDialog,
@@ -126,9 +130,17 @@ export default defineComponent({
     })
 
     const goToReview = async (): Promise<void> => {
-      localState.validate = true // validate Unit Note components
+      localState.validate = true // trigger validation for Unit Note component
       await nextTick()
-      if (localState.isUnitNoteValid) localState.isReviewMode = true
+
+      if (localState.isReviewMode) {
+        if (localState.isUnitNoteReviewValid) {
+          // submit Unit Note filing
+        }
+      } else if (localState.isUnitNoteValid) {
+        localState.isReviewMode = true
+        localState.validate = false
+      }
     }
 
     const goToDash = (): void => {

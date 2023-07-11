@@ -14,13 +14,13 @@
       flat
       rounded
       class="mt-8 pa-8 pr-6"
-      :class="{ 'border-error-left': showError }"
+      :class="{ 'border-error-left': showBorderError }"
     >
       <v-row no-gutters>
         <v-col cols="12" sm="3">
           <label
             class="generic-label"
-            :class="{ 'error-text': showError }"
+            :class="{ 'error-text': showBorderError }"
           >
             {{ content.sideLabel }}
           </label>
@@ -251,16 +251,18 @@ export default defineComponent({
       hasLongCombinedName: false,
       longCombinedNameErrorMsg: computed(() =>
         localState.hasLongCombinedName ? 'Person\'s Legal Name combined cannot exceed 40 characters' : ''),
-      isContactInfoValid: computed(() =>
-        localState.isContactInfoFormValid && localState.isAddressValid
-      ),
       isPersonOption: computed((): boolean =>
         localState.contactInfoType === SubmittingPartyTypes.PERSON
       ),
       isBusinessOption: computed((): boolean =>
         localState.contactInfoType === SubmittingPartyTypes.BUSINESS
       ),
-      showError: computed(() => props.validate && !localState.isContactInfoFormValid)
+      showBorderError: computed((): boolean => props.validate &&
+        !(localState.isContactInfoFormValid && localState.isAddressValid))
+    })
+
+    watch(() => [localState.isContactInfoFormValid, localState.isAddressValid], () => {
+      emit('isValid', localState.isContactInfoFormValid && localState.isAddressValid)
     })
 
     watch(() => localState.contactInfoModel.businessName, (val: string) => {
@@ -288,10 +290,6 @@ export default defineComponent({
 
     watch(() => props.validate, async () => {
       contactInfoForm.value?.validate()
-    })
-
-    watch(() => localState.isContactInfoValid, (val: boolean) => {
-      emit('isValid', val)
     })
 
     watch(() => localState.contactInfoModel.personName, async () => {
@@ -338,6 +336,7 @@ export default defineComponent({
 
     return {
       clearFields,
+      contactInfoForm,
       emailRules,
       firstNameRules,
       middleNameRules,

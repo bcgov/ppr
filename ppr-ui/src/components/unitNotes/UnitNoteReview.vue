@@ -78,7 +78,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs } from 'vue-demi'
+import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { PartyIF, SubmittingPartyIF } from '@/interfaces'
@@ -110,7 +110,8 @@ export default defineComponent({
       default: false
     }
   },
-  setup () {
+  emits: ['isValid'],
+  setup (props, { emit }) {
     const {
       getMhrUnitNote,
       getMhrUnitNoteRegistration,
@@ -130,7 +131,6 @@ export default defineComponent({
     } = useMhrValidations(toRefs(getMhrUnitNoteValidation.value))
 
     const localState = reactive({
-      validate: false,
       validateSubmittingParty: false,
       unitNoteType: UnitNotesInfo[getMhrUnitNote.value.documentType],
       givingNoticeParty: computed((): PartyIF => getMhrUnitNote.value.givingNoticeParty),
@@ -145,9 +145,15 @@ export default defineComponent({
       },
       validateStaffPayment: computed(() => {
         return isRoleStaffReg.value &&
-        localState.validate &&
+        props.validate &&
         !getValidation(MhrSectVal.UNIT_NOTE_VALID, MhrCompVal.STAFF_PAYMENT_VALID)
-      })
+      }),
+      isUnitNoteReviewValid: computed((): boolean =>
+        getValidation(MhrSectVal.UNIT_NOTE_VALID, MhrCompVal.SUBMITTING_PARTY_VALID) &&
+        getValidation(MhrSectVal.UNIT_NOTE_VALID, MhrCompVal.ATTENTION_VALID) &&
+        getValidation(MhrSectVal.UNIT_NOTE_VALID, MhrCompVal.AUTHORIZATION_VALID) &&
+        getValidation(MhrSectVal.UNIT_NOTE_VALID, MhrCompVal.STAFF_PAYMENT_VALID)
+      )
     })
 
     const setSubmittingParty = (val: SubmittingPartyIF) => {
@@ -214,6 +220,10 @@ export default defineComponent({
       localState.staffPayment = staffPaymentData
       setStaffPayment(staffPaymentData)
     }
+
+    watch(() => localState.isUnitNoteReviewValid, (val) => {
+      emit('isValid', val)
+    })
 
     return {
       isRoleStaffReg,
