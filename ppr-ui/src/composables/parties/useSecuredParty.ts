@@ -1,4 +1,4 @@
-import { reactive, toRefs } from 'vue-demi'
+import { computed, reactive, toRefs } from 'vue-demi'
 import { PartyIF, AddressIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { useStore } from '@/store/store'
 import { PartyAddressSchema } from '@/schemas'
@@ -8,6 +8,7 @@ import { cloneDeep, isEqual } from 'lodash'
 import { useParty } from '@/composables/useParty'
 import { isObjectEqual } from '@/utils/validation-helper'
 import { storeToRefs } from 'pinia'
+import { SecuredPartyRestrictedList } from '@/resources'
 const initPerson = { first: '', middle: '', last: '' }
 const initAddress = {
   street: '',
@@ -20,7 +21,7 @@ const initAddress = {
 }
 const { isPartiesValid } = useParty()
 
-export const useSecuredParty = (props, context) => {
+export const useSecuredParty = (props?, context?) => {
   const { setAddSecuredPartiesAndDebtors } = useStore()
   const {
     // Getters
@@ -37,9 +38,11 @@ export const useSecuredParty = (props, context) => {
       address: initAddress
     } as PartyIF,
     currentIsBusiness: null,
-    partyType: SecuredPartyTypes.NONE,
+    partyType: null,
     registrationFlowType: getRegistrationFlowType,
-    originalSecuredParty: null
+    originalSecuredParty: null,
+    isSecuredPartiesRestricted: computed((): boolean =>
+      SecuredPartyRestrictedList.includes(getRegistrationType.value?.registrationTypeAPI))
   })
 
   const getSecuredParty = (isRegisteringParty) => {
@@ -69,7 +72,7 @@ export const useSecuredParty = (props, context) => {
         localState.currentSecuredParty.personName = Object.assign({}, initPerson)
       }
     } else {
-      localState.partyType = SecuredPartyTypes.NONE
+      localState.partyType = null
       const blankSecuredParty = {
         businessName: '',
         personName: Object.assign({}, initPerson),
@@ -90,12 +93,12 @@ export const useSecuredParty = (props, context) => {
     }
   }
 
-  const isExistingSecuredParty = (partyCode: string): boolean => {
-    let parties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
-    const idx = parties.securedParties.findIndex(party =>
-      party.code === partyCode
-    )
-    return idx !== -1
+  const isExistingSecuredParty = (partyCode: string, isRegisteringParty: boolean): boolean => {
+    if (isRegisteringParty) {
+      return getAddSecuredPartiesAndDebtors.value?.registeringParty?.code === partyCode
+    }
+    const securedParties = getAddSecuredPartiesAndDebtors.value.securedParties
+    return securedParties.some(party => party.code === partyCode)
   }
 
   const hasMatchingSecuredParty = (addedParty: PartyIF, isEditMode: boolean): boolean => {
