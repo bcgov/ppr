@@ -463,24 +463,25 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
         deletedOwner = find(deletedOwnerGroup.owners, { action: ActionTypes.REMOVED })
       }
 
-      let suffix = ''
+      // prefill Description field Execs, Admin, Trustees have description as Additional Name
+      let desc = ''
       if ([HomeOwnerPartyTypes.OWNER_IND, HomeOwnerPartyTypes.OWNER_BUS].includes(deletedOwner.partyType)) {
         // if reg or business owner is deleted, prefill the additional name (suffix) with the name of the deleted owner
         const { first, middle, last } = deletedOwner.individualName || {}
 
-        suffix = deletedOwner.organizationName?.length > 0
+        desc = deletedOwner.organizationName?.length > 0
           ? transferOwnerPrefillAdditionalName[transferType] + deletedOwner.organizationName
           : transferOwnerPrefillAdditionalName[transferType] +
             [first, middle, last].filter(Boolean).join(' ') +
             ', deceased'
       } else {
         // if executor, admin or trustee, copy the additional name (suffix) from the suffix of deleted owner
-        suffix = deletedOwner.description
+        desc = deletedOwner.description
       }
 
       Object.assign(owner, {
         ownerId: allOwners.length + 1,
-        suffix: suffix,
+        description: desc,
         partyType: transferOwnerPartyTypes[transferType],
         groupId: deletedOwnerGroup.groupId // new Owner will be added to the same group as deleted Owner
       } as MhrRegistrationHomeOwnerIF)
