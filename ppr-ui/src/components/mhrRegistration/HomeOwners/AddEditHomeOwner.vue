@@ -242,7 +242,7 @@
                   <v-text-field
                     v-on="on"
                     id="suffix"
-                    v-model="owner.suffix"
+                    v-model="owner[getSuffixOrDesc(owner)]"
                     filled
                     :label="nameConfig.label"
                     data-test-id="suffix"
@@ -705,6 +705,14 @@ export default defineComponent({
       localState.autoCompleteIsActive = false
     }
 
+    // For Individual and Business Owners, bind suffix to additional name field model
+    // For all other owners, bind description field
+    const getSuffixOrDesc = (owner: MhrRegistrationHomeOwnerIF): string => {
+      return [HomeOwnerPartyTypes.OWNER_IND, HomeOwnerPartyTypes.OWNER_BUS].includes(owner.partyType)
+        ? 'suffix'
+        : 'description'
+    }
+
     watch(
       () => localState.searchValue,
       (val: string) => {
@@ -730,6 +738,7 @@ export default defineComponent({
       addressSchema,
       setSearchValue,
       setCloseAutoComplete,
+      getSuffixOrDesc,
       getStepValidation,
       MhrSectVal,
       isCurrentOwner,
