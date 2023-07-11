@@ -82,7 +82,7 @@ export default defineComponent({
         case HomeOwnerPartyTypes.OWNER_IND:
         case HomeOwnerPartyTypes.OWNER_BUS:
           return isTransferToExecutorProbateWill.value || isTransferToExecutorUnder25Will.value ||
-            isTransferToAdminNoWill.value
+            isTransferToAdminNoWill.value || isTransferToSurvivingJointTenant.value
         case HomeOwnerPartyTypes.EXECUTOR:
           return disableNameFields.value || isTransferToAdminNoWill.value || isFrozenMhr.value
         case HomeOwnerPartyTypes.ADMINISTRATOR:
