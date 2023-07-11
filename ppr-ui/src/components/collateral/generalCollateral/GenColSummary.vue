@@ -85,7 +85,7 @@
         <v-chip class="badge-delete" label color="#grey lighten-2" text-color="$gray9" x-small>
           <b>DELETED</b>
         </v-chip>
-        <p class="pt-3 ma-0">
+        <p class="ProseMirror pt-3 ma-0">
           <span style="white-space: pre-wrap;" v-html="lastGeneralCollateral.descriptionDelete"></span>
         </p>
       </div>
@@ -93,7 +93,7 @@
         <v-chip color="primary" label text-color="white" x-small>
           <b>ADDED</b>
         </v-chip>
-        <p class="pt-3 ma-0">
+        <p class="ProseMirror pt-3 ma-0">
           <span style="white-space: pre-wrap;" v-html="lastGeneralCollateral.descriptionAdd"></span>
         </p>
       </div>
@@ -149,7 +149,7 @@
                    class="pb-5">
                 <b>Base Registration General Collateral:</b>
               </div>
-              <p v-if="item.description" class="ma-0">
+              <p v-if="item.description" class="ProseMirror ma-0">
                 <span style="white-space: pre-wrap;" v-html="item.description"></span>
               </p>
             </div>
@@ -157,7 +157,7 @@
         </v-row>
       </div>
     </div>
-    <div v-else class="general-collateral-summary pt-5 pr-3">
+    <div v-else class="ProseMirror general-collateral-summary pt-5 pr-3">
       <p v-if="generalCollateral.length > 0" class="ma-0">
         <span v-html="generalCollateral[0].description"></span>
       </p>
@@ -365,7 +365,6 @@ export default defineComponent({
     vertical-align: baseline;
     border: 1px solid $gray3;
     padding: 3px 5px;
-    width: 33%;
   }
 }
 </style>
