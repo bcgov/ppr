@@ -94,7 +94,7 @@
                   >
                     <v-expand-transition>
                       <div class="edit-Party-container pa-0 col-12">
-                        <edit-party :setIsRegisteringParty="true" @resetEvent="resetData" />
+                        <edit-party :isRegisteringParty="true" @resetEvent="resetData" />
                       </div>
                     </v-expand-transition>
                   </td>

@@ -2,46 +2,42 @@
   <v-card
     v-if="autoCompleteIsActive"
     id="party-search-auto-complete"
-    :class="['mt-1', $style['auto-complete-card']]"
+    class="auto-complete-card"
     elevation="5"
     v-click-outside="closeAutoComplete"
   >
     <v-row no-gutters justify="center" class="pl-2">
       <v-col class="no-gutters" cols="12">
         <v-list v-if="autoCompleteResults && autoCompleteResults.length > 0"
-          :class="$style['auto-complete-list']" class="pt-0">
+          class="pt-0 auto-complete-list">
           <v-list-item-group v-model="autoCompleteSelected">
             <v-list-item
               v-for="(result, i) in autoCompleteResults"
               :key="i"
-              :ripple="!isExistingSecuredParty(result.code)"
-              :class="[
-                'pt-0', 'pb-0', 'pl-1',
-                $style[!isExistingSecuredParty(result.code) ? 'auto-complete-item' : 'auto-complete-added-item'],
-                $style[wasSelected(result)]
-              ]"
-              :active-class="isExistingSecuredParty(result.code) ? 'added-color' : ''"
+              :ripple="!isExistingSecuredParty(result.code, isRegisteringParty)"
+              class="pt-0 pb-0 pl-1"
+              :class="
+                [
+                  wasSelected(result),
+                  !isExistingSecuredParty(result.code, isRegisteringParty) ?
+                  'auto-complete-item' : 'auto-complete-added-item'
+                ]"
+              :active-class="isExistingSecuredParty(result.code, isRegisteringParty) ? 'added-color' : ''"
               @mouseover="mouseOver = true"
               @mouseleave="mouseOver = false"
             >
               <v-list-item-content
-                :disabled="isExistingSecuredParty(result.code)"
-                :class="[
-                  $style[isExistingSecuredParty(result.code) ? 'auto-complete-added-item' : ''], 'pt-2', 'pb-2'
-                ]"
-                @click="!isExistingSecuredParty(result.code) ? addResult(result, i) : ''"
+                :disabled="isExistingSecuredParty(result.code, isRegisteringParty)"
+                :class="{'auto-complete-added-item' : isExistingSecuredParty(result.code, isRegisteringParty)}"
+                @click="!isExistingSecuredParty(result.code, isRegisteringParty) && addResult(result, i)"
               >
                 <v-list-item-subtitle>
-                  <v-row :class="[
-                    $style['auto-complete-row'],
-                    $style[mouseOver ? '' : wasSelected(result)]
-                    ]
-                  ">
-                    <v-col cols="2" :class="$style['title-size']">
+                  <v-row class="auto-complete-row" :class="!mouseOver && wasSelected(result)">
+                    <v-col cols="2" class="title-size">
                       {{ result.code }}
                     </v-col>
                     <v-col cols="9"
-                      ><span :class="$style['title-size']">{{ result.businessName }}</span>
+                      ><span class="title-size">{{ result.businessName }}</span>
                       <div class="mt-2">
                       {{ result.address.street }},
                       {{ result.address.city }}
@@ -54,15 +50,17 @@
                 </v-list-item-subtitle>
               </v-list-item-content>
               <v-list-item-action
-                :disabled="isExistingSecuredParty(result.code)"
+                :disabled="isExistingSecuredParty(result.code, isRegisteringParty)"
                 v-if="!isMhrPartySearch"
-                :class="[$style['auto-complete-action'], 'mt-n1']"
+                class="auto-complete-action mt-n1"
               >
-                <span v-if="!resultAdded[i] && !isExistingSecuredParty(result.code)" @click="addResult(result, i)">
-                  <v-icon :class="$style['icon-bump']">mdi-plus</v-icon>Add
+                <span
+                   v-if="!resultAdded[i] && !isExistingSecuredParty(result.code, isRegisteringParty)"
+                   @click="addResult(result, i)">
+                  <v-icon class="icon-bump">mdi-plus</v-icon>Add
                 </span>
-                <span class="auto-complete-added" v-else>
-                  <v-icon :class="[$style['icon-bump'], 'auto-complete-added']">mdi-check</v-icon>Added
+                <span v-else class="auto-complete-added">
+                  <v-icon class="icon-bump auto-complete-added">mdi-check</v-icon>Added
                 </span>
               </v-list-item-action>
             </v-list-item>
@@ -70,12 +68,12 @@
         </v-list>
         <v-list v-else-if="autoCompleteIsActive">
            <v-list-item
-              :class="['pt-0', 'pb-0', 'pl-1', $style['auto-complete-item']]"
+              class="pt-0 pb-0 pl-1 auto-complete-item"
             >
               <v-list-item-content class="pt-2 pb-2">
                 <v-list-item-subtitle>
-                  <v-row :class="$style['auto-complete-row']">
-                    <v-col cols="12" :class="$style['title-size']" id="no-party-matches">
+                  <v-row class="auto-complete-row">
+                    <v-col cols="12" class="title-size" id="no-party-matches">
                       No matches found. Check your name or number, or add a
                       {{ partyWord }} Party
                       that doesn't have a code.
@@ -93,7 +91,7 @@
 <script lang="ts">
 import { defineComponent, reactive, toRefs, watch, computed } from 'vue-demi'
 import { useCountriesProvinces } from '@/composables/address/factories'
-import { useSecuredParty } from '@/components/parties/composables/useSecuredParty'
+import { useSecuredParty } from '@/composables/parties'
 import { ActionTypes } from '@/enums'
 import { SearchPartyIF, PartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { useStore } from '@/store/store'
@@ -109,7 +107,7 @@ export default defineComponent({
       type: Boolean,
       default: false
     },
-    setIsRegisteringParty: {
+    isRegisteringParty: {
       type: Boolean,
       default: false
     },
@@ -139,15 +137,8 @@ export default defineComponent({
       resultAdded: [],
       selectedCode: null,
       mouseOver: false,
-      isRegisteringParty: computed((): boolean => {
-        return props.setIsRegisteringParty
-      }),
-      partyWord: computed((): string => {
-        if (props.setIsRegisteringParty) {
-          return 'Registering'
-        }
-        return 'Secured'
-      })
+      partyWord: computed((): string => props.isRegisteringParty
+        ? 'Registering' : 'Secured')
     })
 
     const wasSelected = (val: SearchPartyIF) => {
@@ -165,7 +156,7 @@ export default defineComponent({
         contact: { ...party.contact }
       }
 
-      if (localState.isRegisteringParty) {
+      if (props.isRegisteringParty) {
         newParty.action = ActionTypes.EDITED
         setRegisteringParty(newParty)
       } else if (props.isMhrPartySearch) {
@@ -220,7 +211,7 @@ export default defineComponent({
 })
 </script>
 
-<style lang="scss" module>
+<style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
 .auto-complete-item {
   min-height: 0;

@@ -155,7 +155,6 @@ import { unsavedChangesDialog } from '@/resources/dialogOptions'
 import {
   getFeatureFlag,
   getFinancingStatement,
-  isSecuredPartyRestrictedList,
   pacificDate,
   saveAmendmentStatementDraft,
   setupAmendmentStatementFromDraft
@@ -181,6 +180,7 @@ import {
   FinancingStatementIF,
   RegTableNewItemI
 } from '@/interfaces'
+import { useSecuredParty } from '@/composables/parties'
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
@@ -251,6 +251,8 @@ export default defineComponent({
       getAddSecuredPartiesAndDebtors,
       getOriginalAddSecuredPartiesAndDebtors
     } = storeToRefs(useStore())
+
+    const { isSecuredPartiesRestricted } = useSecuredParty()
 
     const localState = reactive({
       cautionTxt: 'The Registry will provide the verification statement to all Secured Parties named in this ' +
@@ -647,20 +649,10 @@ export default defineComponent({
     }
 
     const isCrownError = (): boolean => {
-      const sp = getAddSecuredPartiesAndDebtors.value.securedParties
-      let securedPartyCount = 0
-      if (isSecuredPartyRestrictedList(localState.registrationType)) {
-        for (let i = 0; i < sp.length; i++) {
-          // is valid if there is at least one secured party
-          if (sp[i].action !== ActionTypes.REMOVED) {
-            securedPartyCount++
-          }
-        }
-        if (securedPartyCount > 1) {
-          return true
-        }
-      }
-      return false
+      if (!isSecuredPartiesRestricted.value) return false
+      const securedParties = getAddSecuredPartiesAndDebtors.value.securedParties
+      let securedPartyCount = securedParties.filter(party => party.action !== ActionTypes.REMOVED).length
+      return securedPartyCount > 1
     }
 
     const setValidCollateral = (val: boolean) => {

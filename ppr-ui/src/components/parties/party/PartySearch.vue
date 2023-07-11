@@ -33,7 +33,7 @@
           :autoCompleteItems="autoCompleteResults"
           :defaultClickToAdd="false"
           :setAutoCompleteActive="setAutoCompleteActive"
-          :setIsRegisteringParty="isRegisteringParty"
+          :isRegisteringParty="isRegisteringParty"
           :isMhrPartySearch="isMhrPartySearch"
           :isMhrTransfer="isMhrTransfer"
           @selectItem="selectItem($event)"
@@ -91,7 +91,7 @@ export default defineComponent({
       type: Boolean,
       default: false
     },
-    setIsRegisteringParty: {
+    isRegisteringParty: {
       type: Boolean,
       default: false
     },
@@ -124,18 +124,11 @@ export default defineComponent({
       autoCompleteDisabled: computed((): boolean => {
         return props.isAutoCompleteDisabled
       }),
-      isRegisteringParty: computed((): boolean => {
-        return props.setIsRegisteringParty
-      }),
-      partyWord: computed((): string => {
-        if (props.setIsRegisteringParty) {
-          return 'Registering'
-        }
-        return 'Secured'
-      }),
+      partyWord: computed((): string => props.isRegisteringParty
+        ? 'Registering' : 'Secured'),
       searchFieldLabel: computed((): string => {
         if (props.isMhrPartySearch) return 'Use PPR Party Code or Name'
-        else if (localState.isRegisteringParty) return 'Registering Party Code or Name'
+        else if (props.isRegisteringParty) return 'Registering Party Code or Name'
         else return 'Secured Party Code or Name'
       })
     })
