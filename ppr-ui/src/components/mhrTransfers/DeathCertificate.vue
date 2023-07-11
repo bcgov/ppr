@@ -101,8 +101,8 @@ export default defineComponent({
     const { customRules, required, maxLength } = useInputRules()
     const { editHomeOwner } = useHomeOwners(true)
     const { setUnsavedChanges } = useStore()
-    const deathCertificateForm = ref(null)
-    const deathCertificateNumberRef = ref(null)
+    const deathCertificateForm: FormIF = ref(null)
+    const deathCertificateNumberRef: FormIF = ref(null)
     const deathCertificateNumberRules = computed(
       (): Array<Function> => customRules(
         maxLength(20),
@@ -142,7 +142,7 @@ export default defineComponent({
     // Validate form when prompted
     watch(() => props.validate, async (validate: boolean) => {
       await nextTick()
-      validate && (deathCertificateForm as FormIF).validate()
+      validate && deathCertificateForm.value.validate()
     }, { immediate: true })
 
     // Update deceased owner deathCertificateNumber when value changes
