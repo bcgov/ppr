@@ -1062,7 +1062,7 @@ describe('Home Owners', () => {
       { groupId: 2, owners: [mockedPerson], type: '' }
     ])
 
-    expect(groupError.text()).toContain(transfersErrors.ownersMustBeDeceased)
+    expect(groupError.text()).toContain(MixedRolesErrors.hasMixedOwnerTypesInGroup)
   })
 
   it('TRANS ADMIN No Will: remove existing Administrator and add a new one', async () => {
