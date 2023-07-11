@@ -173,6 +173,7 @@ export const mockedAddedPerson: MhrRegistrationHomeOwnerIF = {
   suffix: 'Sr.',
   phoneNumber: '(545) 333-2211',
   phoneExtension: '1234',
+  partyType: HomeOwnerPartyTypes.OWNER_IND,
   address: mockedAddress,
   action: ActionTypes.ADDED
 }
@@ -188,6 +189,7 @@ export const mockedRemovedPerson: MhrRegistrationHomeOwnerIF = {
   phoneNumber: '(545) 333-2211',
   phoneExtension: '1234',
   address: mockedAddress,
+  partyType: HomeOwnerPartyTypes.OWNER_IND,
   action: ActionTypes.REMOVED
 }
 
@@ -197,6 +199,7 @@ export const mockedOrganization: MhrRegistrationHomeOwnerIF = {
   suffix: 'Inc.',
   phoneNumber: '(999) 888-7766',
   phoneExtension: '4321',
+  partyType: HomeOwnerPartyTypes.OWNER_BUS,
   address: mockedAddressAlt
 }
 
@@ -206,6 +209,7 @@ export const mockedAddedOrganization: MhrRegistrationHomeOwnerIF = {
   suffix: 'Inc.',
   phoneNumber: '(999) 888-7766',
   phoneExtension: '4321',
+  partyType: HomeOwnerPartyTypes.OWNER_BUS,
   address: mockedAddressAlt,
   action: ActionTypes.ADDED
 }
@@ -216,6 +220,7 @@ export const mockedRemovedOrganization: MhrRegistrationHomeOwnerIF = {
   suffix: 'Inc.',
   phoneNumber: '(999) 888-7766',
   phoneExtension: '4321',
+  partyType: HomeOwnerPartyTypes.OWNER_BUS,
   address: mockedAddressAlt,
   action: ActionTypes.REMOVED
 }
