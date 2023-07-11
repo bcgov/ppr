@@ -322,7 +322,7 @@ export default defineComponent({
   }
   .vue-affix {
     position: relative;
-    top: 0px !important;
+    top: 0 !important;
   }
   table {
     table-layout: auto;
