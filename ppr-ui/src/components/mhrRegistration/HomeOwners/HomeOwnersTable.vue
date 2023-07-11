@@ -143,10 +143,14 @@
                           {{ item.organizationName }}
                         </div>
                       </div>
-                      <div v-if="item.suffix" class="font-light suffix">
+
+                      <div v-if="item.partyType === HomeOwnerPartyTypes.OWNER_IND ||
+                        item.partyType === HomeOwnerPartyTypes.OWNER_BUS"
+                        class="font-light suffix"
+                      >
                         {{ item.suffix }}
                       </div>
-                      <div v-else-if="item.description" class="font-light description">
+                      <div v-else class="font-light description">
                         {{ item.description }}
                       </div>
                     </div>

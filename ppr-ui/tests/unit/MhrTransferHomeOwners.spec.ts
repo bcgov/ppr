@@ -203,7 +203,7 @@ describe('Home Owners', () => {
   })
 
   it('displays badge for ADDED owners (Persons and Orgs)', async () => {
-    const homeOwnerGroup = [{ groupId: 1, owners: [mockedAddedPerson, mockedAddedOrganization] }]
+    const homeOwnerGroup = [{ groupId: 1, owners: [mockedAddedPerson, mockedAddedOrganization], type: '' }]
 
     // add a person
     await store.setMhrTransferHomeOwnerGroups(homeOwnerGroup)
@@ -252,7 +252,7 @@ describe('Home Owners', () => {
   })
 
   it('displays badge for REMOVED owners (Persons and Orgs)', async () => {
-    const homeOwnerGroup = [{ groupId: 1, owners: [mockedRemovedPerson, mockedRemovedOrganization] }]
+    const homeOwnerGroup = [{ groupId: 1, owners: [mockedRemovedPerson, mockedRemovedOrganization], type: '' }]
 
     // add a person
     await store.setMhrTransferHomeOwnerGroups(homeOwnerGroup)
@@ -301,21 +301,23 @@ describe('Home Owners', () => {
   })
 
   it('should display a DELETED home owner group', async () => {
-    const homeOwnerGroups = [
+    const homeOwnerGroups: MhrRegistrationHomeOwnerGroupIF[] = [
       {
         groupId: 1,
         interest: 'Undivided',
         interestNumerator: 2,
         interestDenominator: 4,
-        owners: [mockedPerson]
+        owners: [mockedPerson],
+        type: ''
       },
       {
         groupId: 2,
         interest: 'Undivided',
-        action: 'REMOVED',
+        action: ActionTypes.REMOVED,
         interestNumerator: 2,
         interestDenominator: 4,
-        owners: [mockedOrganization]
+        owners: [mockedOrganization],
+        type: ''
       }
     ]
 
@@ -346,31 +348,34 @@ describe('Home Owners', () => {
     // Verify Headers
     expect(ownersTable.findAllComponents(TableGroupHeader).length).toBe(2)
     expect(ownersTable.text()).toContain('Group 1')
-    expect(ownersTable.text()).toContain('Group 2')
+    expect(ownersTable.text()).not.toContain('Group 2')
+    expect(ownersTable.text()).toContain('Previous Owner Group')
 
     // there should be 'DELETED' badges shown for the Deleted Group
     expect(ownersTable.findAllComponents(TableGroupHeader).at(1)
-      .findComponent(InfoChip).text()).toContain('REMOVED')
+      .findComponent(InfoChip).text()).toContain(ActionTypes.REMOVED)
 
     wrapper.vm.setShowGroups(false)
   })
 
   it('should display a CHANGED a home owner group', async () => {
-    const homeOwnerGroups = [
+    const homeOwnerGroups: MhrRegistrationHomeOwnerGroupIF[] = [
       {
         groupId: 1,
         interest: 'Undivided',
         interestNumerator: 2,
         interestDenominator: 4,
-        owners: [mockedPerson]
+        owners: [mockedPerson],
+        type: ''
       },
       {
         groupId: 2,
         interest: 'Undivided',
-        action: 'CHANGED',
+        action: ActionTypes.CHANGED,
         interestNumerator: 3,
         interestDenominator: 4,
-        owners: [mockedOrganization]
+        owners: [mockedOrganization],
+        type: ''
       }
     ]
 
@@ -514,7 +519,7 @@ describe('Home Owners', () => {
     // setup transfer type to test
     const TRANSFER_TYPE = ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL
 
-    let homeOwnerGroup = [{ groupId: 1, owners: [mockedPerson] }]
+    let homeOwnerGroup = [{ groupId: 1, owners: [mockedPerson], type: '' }]
     await store.setMhrTransferHomeOwnerGroups(homeOwnerGroup)
 
     const homeOwnersTable = wrapper.findComponent(HomeOwnersTable)
@@ -544,7 +549,7 @@ describe('Home Owners', () => {
     ).toBe(HomeTenancyTypes.NA)
 
     // reset owners
-    homeOwnerGroup = [{ groupId: 1, owners: [mockedPerson] }]
+    homeOwnerGroup = [{ groupId: 1, owners: [mockedPerson], type: '' }]
     await store.setMhrTransferHomeOwnerGroups(homeOwnerGroup)
 
     // delete original owner
