@@ -370,8 +370,7 @@ export default defineComponent({
           currentSecuredParty.value.personName.last = ''
         }
         // check for duplicate
-        if (!props.isRegisteringParty &&
-          hasMatchingSecuredParty(currentSecuredParty.value, props.isEditMode, props.activeIndex)) {
+        if (hasMatchingSecuredParty(currentSecuredParty.value, props.isEditMode, props.activeIndex)) {
           // trigger duplicate secured party dialog
           localState.foundDuplicate = true
           showDialog()
