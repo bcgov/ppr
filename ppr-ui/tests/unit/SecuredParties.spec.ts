@@ -1,9 +1,8 @@
 // Libraries
 import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { createPinia, setActivePinia } from 'pinia'
 import { useStore } from '../../src/store/store'
-import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
+import { Wrapper } from '@vue/test-utils'
 import sinon from 'sinon'
 import { axios } from '@/utils/axios-ppr'
 import { cloneDeep } from 'lodash'
@@ -15,7 +14,8 @@ import {
   mockedSelectSecurityAgreement,
   mockedSecuredPartiesAmendment,
   mockedPartyCodeSearchResults,
-  mockedOtherCarbon
+  mockedOtherCarbon,
+  mockedLienUnpaid
 } from './test-data'
 
 // Components
@@ -23,41 +23,21 @@ import { SecuredParties, EditParty, PartySearch } from '@/components/parties/par
 import { ChangeSecuredPartyDialog } from '@/components/dialogs'
 import { SearchPartyIF } from '@/interfaces'
 import { ActionTypes, RegistrationFlowType } from '@/enums'
-import { getLastEvent } from './utils'
+import { getLastEvent, getTestId, createComponent } from './utils'
 import flushPromises from 'flush-promises'
 
 Vue.use(Vuetify)
 
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
 const store = useStore()
 
 const partyAutoComplete = '#secured-party-autocomplete'
-
-/**
- * Creates and mounts a component, so that it can be tested.
- *
- * @returns a Wrapper<Debtors> object with the given parameters.
- */
-function createComponent (
-): Wrapper<any> {
-  const localVue = createLocalVue()
-  localVue.use(Vuetify)
-  document.body.setAttribute('data-app', 'true')
-  return mount((SecuredParties as any), {
-    localVue,
-    propsData: {},
-    store,
-    vuetify
-  })
-}
 
 describe('Secured Party SA tests', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
     await store.setRegistrationType(mockedSelectSecurityAgreement())
-    wrapper = createComponent()
+    wrapper = createComponent(SecuredParties, {})
   })
   afterEach(() => {
     wrapper.destroy()
@@ -78,7 +58,7 @@ describe('Secured Party store tests', () => {
     await store.setAddSecuredPartiesAndDebtors({
       securedParties: mockedSecuredParties1
     })
-    wrapper = createComponent()
+    wrapper = createComponent(SecuredParties, {})
   })
   afterEach(() => {
     wrapper.destroy()
@@ -126,7 +106,7 @@ describe('Secured Party Other registration type tests', () => {
       registeringParty: mockedRegisteringParty1,
       securedParties: mockedSecuredParties2
     })
-    wrapper = createComponent()
+    wrapper = createComponent(SecuredParties, {})
   })
   afterEach(() => {
     sandbox.restore()
@@ -223,7 +203,7 @@ describe('Secured party amendment tests', () => {
     })
     await store.setRegistrationType(mockedSelectSecurityAgreement())
     await store.setRegistrationFlowType(RegistrationFlowType.AMENDMENT)
-    wrapper = createComponent()
+    wrapper = createComponent(SecuredParties, {})
   })
   afterEach(() => {
     wrapper.destroy()
@@ -308,6 +288,10 @@ describe('Secured party amendment tests', () => {
     await nextTick()
     expect(wrapper.findAll('.invalid-message').length).toBe(1)
   })
+
+  it('It does not display restrict secured party', () => {
+    expect(wrapper.find(getTestId('restricted-prompt')).exists()).toBe(false)
+  })
 })
 
 describe('Secured party with code test', () => {
@@ -321,7 +305,7 @@ describe('Secured party with code test', () => {
       securedParties: mockedSecuredParties3
     })
     await store.setRegistrationType(mockedSelectSecurityAgreement())
-    wrapper = createComponent()
+    wrapper = createComponent(SecuredParties, {})
   })
   afterEach(() => {
     wrapper.destroy()
@@ -334,5 +318,32 @@ describe('Secured party with code test', () => {
     const dropDowns = wrapper.findAll('.v-data-table .party-row .actions__more-actions__btn')
     // 0 drop downs
     expect(dropDowns.length).toBe(0)
+  })
+})
+
+describe('Restricted secured party test', () => {
+  let wrapper: Wrapper<any>
+
+  beforeEach(async () => {
+    await store.setAddSecuredPartiesAndDebtors({
+      securedParties: mockedSecuredParties3
+    })
+
+    await store.setRegistrationType(mockedLienUnpaid())
+    wrapper = createComponent(SecuredParties, {})
+  })
+
+  afterEach(() => {
+    wrapper.destroy()
+  })
+
+  it('displays the correct prompt for a registration with restrictions on secured party', async () => {
+    expect(wrapper.find(getTestId('restricted-prompt')).exists()).toBe(true)
+  })
+
+  it('validates secured parties properly', async () => {
+    expect(wrapper.vm.getSecuredPartyValidity()).toBe(true)
+    wrapper.vm.securedParties = [...mockedSecuredParties3, ...mockedSecuredParties1]
+    expect(wrapper.vm.getSecuredPartyValidity()).toBe(false)
   })
 })
