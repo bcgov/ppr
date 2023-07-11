@@ -2,7 +2,7 @@
   <div id="effective-date-time-container">
     <h2>{{ content.title }}</h2>
     <p class="mt-2">{{ content.description }}</p>
-    <v-card id="effective-date-time-card" flat rounded class="mt-8 px-7 py-10">
+    <v-card id="effective-date-time-card" flat rounded class="mt-8 px-7 pt-10 pb-3">
       <v-row no-gutters>
         <v-col cols="12" sm="3">
           <label class="generic-label" :class="{ 'error-text': false }">
