@@ -240,7 +240,7 @@ export default defineComponent({
       isExistingSecuredParty,
       addEditSecuredParty,
       currentSecuredParty
-    } = useSecuredParty(props, context)
+    } = useSecuredParty(context)
 
     const selectParty = (idx: number) => {
       const selectedResult = localState.results[idx]
@@ -255,7 +255,7 @@ export default defineComponent({
         setRegisteringParty(newParty)
       } else {
         currentSecuredParty.value = newParty
-        addEditSecuredParty()
+        addEditSecuredParty(props.activeIndex)
       }
       context.emit('emitResetClose')
     }
@@ -266,7 +266,7 @@ export default defineComponent({
         setRegisteringParty(localState.party)
       } else {
         currentSecuredParty.value = localState.party
-        addEditSecuredParty()
+        addEditSecuredParty(props.activeIndex)
       }
       context.emit('emitResetClose')
     }

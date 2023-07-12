@@ -2,7 +2,7 @@
   <v-card
     v-if="autoCompleteIsActive"
     id="party-search-auto-complete"
-    class="auto-complete-card"
+    class="mt-1 auto-complete-card"
     elevation="5"
     v-click-outside="closeAutoComplete"
   >
@@ -127,7 +127,7 @@ export default defineComponent({
       setMhrTransferSubmittingPartyKey,
       setMhrRegistrationSubmittingParty
     } = useStore()
-    const { addSecuredParty, setRegisteringParty, isExistingSecuredParty } = useSecuredParty(props, context)
+    const { addSecuredParty, setRegisteringParty, isExistingSecuredParty } = useSecuredParty(context)
     const countryProvincesHelpers = useCountriesProvinces()
     const localState = reactive({
       searchValue: '',

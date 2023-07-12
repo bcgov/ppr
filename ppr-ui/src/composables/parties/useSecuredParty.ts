@@ -21,7 +21,7 @@ const initAddress = {
 }
 const { isPartiesValid } = useParty()
 
-export const useSecuredParty = (props?, context?) => {
+export const useSecuredParty = (context?) => {
   const { setAddSecuredPartiesAndDebtors } = useStore()
   const {
     // Getters
@@ -45,7 +45,7 @@ export const useSecuredParty = (props?, context?) => {
       SecuredPartyRestrictedList.includes(getRegistrationType.value?.registrationTypeAPI))
   })
 
-  const getSecuredParty = (isRegisteringParty) => {
+  const getSecuredParty = (isRegisteringParty: boolean, activeIndex: number) => {
     const securedParties: PartyIF[] =
       getAddSecuredPartiesAndDebtors.value.securedParties
     const registeringParty: PartyIF = getAddSecuredPartiesAndDebtors.value.registeringParty
@@ -60,9 +60,9 @@ export const useSecuredParty = (props?, context?) => {
         localState.partyType = SecuredPartyTypes.BUSINESS
         localState.currentSecuredParty.personName = Object.assign({}, initPerson)
       }
-    } else if (props.activeIndex >= 0) {
+    } else if (activeIndex >= 0) {
       // deep copy so original object doesn't get modified
-      localState.currentSecuredParty = JSON.parse(JSON.stringify(securedParties[props.activeIndex]))
+      localState.currentSecuredParty = JSON.parse(JSON.stringify(securedParties[activeIndex]))
       localState.currentSecuredParty.address = checkAddress(localState.currentSecuredParty.address, PartyAddressSchema)
       localState.currentIsBusiness = false
       localState.partyType = SecuredPartyTypes.INDIVIDUAL
@@ -89,7 +89,7 @@ export const useSecuredParty = (props?, context?) => {
 
   const resetFormAndData = (emitEvent: boolean): void => {
     if (emitEvent) {
-      context.emit('resetEvent')
+      context?.emit('resetEvent')
     }
   }
 
@@ -101,10 +101,10 @@ export const useSecuredParty = (props?, context?) => {
     return securedParties.some(party => party.code === partyCode)
   }
 
-  const hasMatchingSecuredParty = (addedParty: PartyIF, isEditMode: boolean): boolean => {
+  const hasMatchingSecuredParty = (addedParty: PartyIF, isEditMode: boolean, activeIndex: number): boolean => {
     // store state without newly added party.
     const parties = cloneDeep(getAddSecuredPartiesAndDebtors.value.securedParties)
-    if (isEditMode) parties.splice(props.activeIndex, 1)
+    if (isEditMode) parties.splice(activeIndex, 1)
     if (localState.partyType === SecuredPartyTypes.INDIVIDUAL) {
       return parties.some(party =>
         isObjectEqual(party.personName, addedParty.personName) &&
@@ -118,12 +118,12 @@ export const useSecuredParty = (props?, context?) => {
     }
   }
 
-  const removeSecuredParty = (): void => {
-    context.emit('removeSecuredParty', props.activeIndex)
+  const removeSecuredParty = (activeIndex: number): void => {
+    context?.emit('removeSecuredParty', activeIndex)
     resetFormAndData(true)
   }
 
-  const addEditSecuredParty = async () => {
+  const addEditSecuredParty = async (activeIndex: number) => {
     let parties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
     let newList: PartyIF[] = parties.securedParties // eslint-disable-line
     if (!localState.currentSecuredParty.businessName) {
@@ -141,7 +141,7 @@ export const useSecuredParty = (props?, context?) => {
       return
     }
     // New secured party
-    if (props.activeIndex === -1) {
+    if (activeIndex === -1) {
       localState.currentSecuredParty.action = ActionTypes.ADDED
       newList.push(localState.currentSecuredParty)
     } else {
@@ -149,11 +149,11 @@ export const useSecuredParty = (props?, context?) => {
       if (!localState.currentSecuredParty.action) {
         localState.currentSecuredParty.action = ActionTypes.EDITED
       }
-      newList.splice(props.activeIndex, 1, localState.currentSecuredParty)
+      newList.splice(activeIndex, 1, localState.currentSecuredParty)
     }
     parties.securedParties = newList
     setAddSecuredPartiesAndDebtors(parties)
-    context.emit('resetEvent')
+    context?.emit('resetEvent')
   }
 
   const setRegisteringParty = (registeringParty: PartyIF) => {
@@ -169,7 +169,7 @@ export const useSecuredParty = (props?, context?) => {
     const newList: PartyIF[] = parties.securedParties
     if (activeIndex > -1) {
       newParty.action = ActionTypes.ADDED
-      newList.splice(props.activeIndex, 1, newParty)
+      newList.splice(activeIndex, 1, newParty)
     } else {
       // Add
       // eslint-disable-line

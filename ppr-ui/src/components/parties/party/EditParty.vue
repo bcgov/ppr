@@ -193,7 +193,7 @@
                     color="error"
                     v-if="!isRegisteringParty"
                     :disabled="activeIndex === -1"
-                    @click="removeSecuredParty()"
+                    @click="removeSecuredParty(activeIndex)"
                     id="remove-btn-party"
                     class="remove-btn"
                     >
@@ -302,7 +302,7 @@ export default defineComponent({
       addressSchema,
       hasMatchingSecuredParty,
       originalSecuredParty
-    } = useSecuredParty(props, context)
+    } = useSecuredParty(context)
 
     const {
       errors,
@@ -370,7 +370,8 @@ export default defineComponent({
           currentSecuredParty.value.personName.last = ''
         }
         // check for duplicate
-        if (!props.isRegisteringParty && hasMatchingSecuredParty(currentSecuredParty.value, props.isEditMode)) {
+        if (!props.isRegisteringParty &&
+          hasMatchingSecuredParty(currentSecuredParty.value, props.isEditMode, props.activeIndex)) {
           // trigger duplicate secured party dialog
           localState.foundDuplicate = true
           showDialog()
@@ -396,7 +397,7 @@ export default defineComponent({
           setRegisteringParty(currentSecuredParty.value)
           context.emit('resetEvent')
         } else {
-          addEditSecuredParty()
+          addEditSecuredParty(props.activeIndex)
         }
       } else {
         // trigger show validation
@@ -442,7 +443,7 @@ export default defineComponent({
     )
 
     onMounted(() => {
-      getSecuredParty(props.isRegisteringParty)
+      getSecuredParty(props.isRegisteringParty, props.activeIndex)
       currentSecuredParty.value.businessName && setSearchValue(currentSecuredParty.value.businessName)
     })
 
