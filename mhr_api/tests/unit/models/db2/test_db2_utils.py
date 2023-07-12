@@ -16,10 +16,13 @@
 
 Test-Suite to ensure that the MH Registration DB2 Model helper methods are working as expected.
 """
+import copy
+
 from flask import current_app
 
 import pytest
 from flask import current_app
+from registry_schemas.example_data.mhr import REGISTRATION
 
 from mhr_api.models import registration_utils as reg_utils, MhrRegistration, Db2Manuhome
 from mhr_api.models.registration_utils import AccountRegistrationParams
@@ -27,6 +30,46 @@ from mhr_api.models.db2 import utils as db2_utils
 from mhr_api.models.type_tables import MhrDocumentType, MhrRegistrationTypes
 
 
+LOCATION = {
+  'locationType': 'STRATA',
+  'address': {
+    'street': '940 BLANSHARD STREET',
+    'city': 'VICTORIA',
+    'region': 'BC',
+    'postalCode': 'V1V 1V1',
+    'country': 'CA'
+  },
+  'leaveProvince': False,
+  'pidNumber': '000010626',
+  'taxCertificate': True,
+  'taxExpiryDate': '2022-05-21T07:59:59+00:00',
+  'dealerName': 'NOR-TEC DESIGN GROUP LTD.',
+  'exceptionPlan': 'TEST EXCEPTION',
+  'additionalDescription': 'TEST DESCRIPTION',
+  'legalDescription': 'LOT 14, BLOCK 521, NANOOSE DISTRICT, PLAN 35625'
+}
+DESCRIPTION = {
+  'manufacturer': 'STARLINE',
+  'baseInformation': {
+    'year': 2018,
+    'make': 'HEAVENLY HOMES',
+    'model': 'CELESTIAL CASTLE 6000'
+  },
+  'sectionCount': 1,
+  'sections': [
+    {
+      'serialNumber': '52D70556',
+      'lengthFeet': 52,
+      'lengthInches': 0,
+      'widthFeet': 12,
+      'widthInches': 0
+    }
+  ],
+  'csaNumber': '786356',
+  'csaStandard': 'Z240',
+  'rebuiltRemarks': 'Rebuilt comments',
+  'otherRemarks': 'Other comments'
+}
 # testdata pattern is ({account_id}, {has_results})
 TEST_ACCOUNT_REG_DATA = [
     ('2523', True),
@@ -96,6 +139,10 @@ TEST_MHR_NUM_DATA_NOTE = [
     ('003936', True, True, False, None, False),
     ('092238', True, True, True, '63116143', True),
     ('022873', True, True, True, '43599221', True)
+]
+# testdata pattern is ({loc_data}, {desc_data})
+TEST_DATA_NEW_REG = [
+    (LOCATION, DESCRIPTION)
 ]
 
 
@@ -407,3 +454,60 @@ def test_get_search_json_note(session, mhr_num, staff, current, has_notes, ncan_
             assert has_ncan
     else:
         assert not reg_json.get('notes')
+
+
+@pytest.mark.parametrize('loc_data,desc_data', TEST_DATA_NEW_REG)
+def test_save_new_reg(session, loc_data, desc_data):
+    """Assert that new MHR registration JSON uses the new location and description."""
+    json_data = copy.deepcopy(REGISTRATION)
+    json_data['documentId'] = '88878888'
+    json_data['location'] = copy.deepcopy(loc_data)
+    json_data['description'] = copy.deepcopy(desc_data)
+    registration: MhrRegistration = MhrRegistration.create_new_from_json(json_data, 'PS12345')
+    registration.save()
+    reg_json = db2_utils.get_new_registration_json(registration)
+    assert reg_json.get('location')
+    loc = reg_json.get('location')
+    assert loc.get('locationType') == loc_data.get('locationType')
+    assert loc.get('pidNumber') == loc_data.get('pidNumber')
+    assert loc.get('legalDescription') == loc_data.get('legalDescription')
+    assert loc['address'].get('postalCode') == loc_data['address'].get('postalCode')
+    assert reg_json.get('description')
+    desc = reg_json.get('description')
+    assert desc.get('make') == desc_data.get('make')
+    assert desc.get('model') == desc_data.get('model')
+    registration.current_view = True
+    reg_json = db2_utils.get_new_registration_json(registration)
+    assert reg_json.get('location')
+    loc = reg_json.get('location')
+    assert loc.get('locationType') == loc_data.get('locationType')
+    assert loc.get('pidNumber') == loc_data.get('pidNumber')
+    assert loc.get('legalDescription') == loc_data.get('legalDescription')
+    assert loc['address'].get('postalCode') == loc_data['address'].get('postalCode')
+    assert reg_json.get('description')
+    desc = reg_json.get('description')
+    assert desc.get('make') == desc_data.get('make')
+    assert desc.get('model') == desc_data.get('model')
+
+
+@pytest.mark.parametrize('loc_data,desc_data', TEST_DATA_NEW_REG)
+def test_save_new_search(session, loc_data, desc_data):
+    """Assert that new MHR search JSON uses the new location and description."""
+    json_data = copy.deepcopy(REGISTRATION)
+    json_data['documentId'] = '88878888'
+    json_data['location'] = copy.deepcopy(loc_data)
+    json_data['description'] = copy.deepcopy(desc_data)
+    test_reg: MhrRegistration = MhrRegistration.create_new_from_json(json_data, 'PS12345')
+    test_reg.save()
+    registration: MhrRegistration = MhrRegistration.find_by_id(test_reg.id, True, True)
+    reg_json = db2_utils.get_search_json(registration)
+    assert reg_json.get('location')
+    loc = reg_json.get('location')
+    assert loc.get('locationType') == loc_data.get('locationType')
+    assert loc.get('pidNumber') == loc_data.get('pidNumber')
+    assert loc.get('legalDescription') == loc_data.get('legalDescription')
+    assert loc['address'].get('postalCode') == loc_data['address'].get('postalCode')
+    assert reg_json.get('description')
+    desc = reg_json.get('description')
+    assert desc.get('make') == desc_data.get('make')
+    assert desc.get('model') == desc_data.get('model')
