@@ -65,7 +65,7 @@ describe('Secured Party search autocomplete tests', () => {
     expect(autoCompleteItems.length).toBeGreaterThan(1)
   })
 
-  it('adds the party aafter a name in the list is clicked', async () => {
+  it('adds the party after a name in the list is clicked', async () => {
     const partySearchAddLinks = wrapper.findAll('.v-list-item__action')
     expect(store.getAddSecuredPartiesAndDebtors.securedParties.length).toBe(0)
     expect(partySearchAddLinks.length).toBe(3)
@@ -92,7 +92,7 @@ describe('Registering Party search autocomplete tests', () => {
   })
 
   it('shows the auto complete drop down when searching for a party', async () => {
-    wrapper.setProps({ setIsRegisteringParty: true })
+    wrapper.setProps({ isRegisteringParty: true })
     await nextTick()
 
     expect(wrapper.find('#no-party-matches').text()).toContain('No matches found')

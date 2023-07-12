@@ -1,37 +1,37 @@
 <template>
-  <v-container fluid class="pa-0 no-gutters" v-if="summaryView">
+  <v-container v-if="isSummary" fluid class="pa-0 no-gutters">
     <party-summary />
   </v-container>
-  <v-container fluid v-else class="pa-0 no-gutters">
+  <v-container v-else fluid class="pa-0 no-gutters">
     <v-row no-gutters>
-      <v-col cols="auto" class="generic-label"
-        >Your registration must include the following:</v-col
-      >
+      <v-col cols="auto" class="generic-label">
+        Your registration must include the following:
+      </v-col>
     </v-row>
     <v-row no-gutters class="pt-6">
       <v-col class="ps-4" cols="auto">
-        <div v-if="registeringParty">
-          <v-icon color="green darken-2" class="agreement-valid-icon"
-            >mdi-check</v-icon
-          >
+        <div v-if="!!parties.registeringParty">
+          <v-icon color="green darken-2" class="agreement-valid-icon">
+            mdi-check
+          </v-icon>
           The Registering Party
         </div>
         <ul v-else>
           <li>The Registering Party</li>
         </ul>
         <div v-if="isSecuredPartyChecked">
-          <v-icon color="green darken-2" class="agreement-valid-icon"
-            >mdi-check</v-icon
-          >
+          <v-icon color="green darken-2" class="agreement-valid-icon">
+            mdi-check
+          </v-icon>
           {{ securedPartyText }}
         </div>
         <ul v-else>
           <li>{{ securedPartyText }}</li>
         </ul>
-        <div v-if="debtors.length > 0">
-          <v-icon color="green darken-2" class="agreement-valid-icon"
-            >mdi-check</v-icon
-          >
+        <div v-if="parties.debtors.length > 0">
+          <v-icon color="green darken-2" class="agreement-valid-icon">
+            mdi-check
+          </v-icon>
           At least one Debtor
         </div>
         <ul v-else>
@@ -44,16 +44,16 @@
         <h3>
           Registering Party
           <v-tooltip
-            top
+            v-if="!isRoleStaffSbc"
             class="registering-tooltip"
             content-class="top-tooltip pa-5"
             transition="fade-transition"
-            v-if="!isSbc"
+            top
           >
             <template v-slot:activator="{ on }">
-              <v-icon class="pl-1 mt-n1" color="primary" v-on="on"
-                >mdi-information-outline</v-icon
-              >
+              <v-icon class="pl-1 mt-n1" color="primary" v-on="on">
+                mdi-information-outline
+              </v-icon>
             </template>
             The default Registering Party is based on your BC Registries user
             account information. This information can be updated within your
@@ -64,7 +64,7 @@
       </v-col>
     </v-row>
     <registering-party-change />
-    <v-row no-gutters v-if="registeringParty && registeringParty.action">
+    <v-row no-gutters v-if="!!parties.registeringParty && !!parties.registeringParty.action">
       <v-col>
         <caution-box class="mt-4 mb-8" :setMsg="cautionTxt" :setImportantWord="'Note'" />
       </v-col>
@@ -102,9 +102,9 @@ import {
 } from '@/components/parties/party'
 import { CautionBox } from '@/components/common'
 // local helpers / types / etc.
-import { PartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
-import { isSecuredPartyRestrictedList } from '@/utils'
+import { AddPartiesIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { storeToRefs } from 'pinia'
+import { useSecuredParty } from '@/composables/parties'
 
 export default defineComponent({
   components: {
@@ -120,45 +120,24 @@ export default defineComponent({
       default: false
     }
   },
-  setup (props) {
-    const { isRoleStaffSbc } = useStore()
-    const { getAddSecuredPartiesAndDebtors, getRegistrationType } = storeToRefs(useStore())
-    const registrationType = getRegistrationType.value.registrationTypeAPI
+  setup () {
+    const { getAddSecuredPartiesAndDebtors, isRoleStaffSbc } = storeToRefs(useStore())
+    const { isSecuredPartiesRestricted } = useSecuredParty()
+
     const localState = reactive({
-      securedParties: getAddSecuredPartiesAndDebtors.value.securedParties,
-      debtors: getAddSecuredPartiesAndDebtors.value.debtors,
-      isSbc: isRoleStaffSbc,
+      parties: computed((): AddPartiesIF => getAddSecuredPartiesAndDebtors.value),
       cautionTxt: 'The Registry will not provide the verification statement for this registration ' +
         'to the Registering Party named above.',
-      registeringParty: computed((): PartyIF => {
-        return getAddSecuredPartiesAndDebtors.value.registeringParty
-      }),
-      securedPartyText: computed((): string => {
-        if (isSecuredPartyRestrictedList(registrationType)) {
-          return 'The Secured Party'
-        } else {
-          return 'At least one Secured Party'
-        }
-      }),
-      isSecuredPartyChecked: computed((): boolean => {
-        if (isSecuredPartyRestrictedList(registrationType)) {
-          return localState.securedParties.length === 1
-        }
-        return localState.securedParties.length > 0
-      }),
-      securedPartyTitle: computed((): string => {
-        if (isSecuredPartyRestrictedList(registrationType)) {
-          return 'Secured Party'
-        } else {
-          return 'Secured Parties'
-        }
-      }),
-      summaryView: computed((): boolean => {
-        return props.isSummary
+      securedPartyText: isSecuredPartiesRestricted.value ? 'The Secured Party' : 'At least one Secured Party',
+      securedPartyTitle: isSecuredPartiesRestricted.value ? 'Secured Party' : 'Secured Parties',
+      isSecuredPartyChecked: computed(() : boolean => {
+        const len = localState.parties.securedParties.length
+        return isSecuredPartiesRestricted.value ? len === 1 : len > 0
       })
     })
 
     return {
+      isRoleStaffSbc,
       ...toRefs(localState)
     }
   }

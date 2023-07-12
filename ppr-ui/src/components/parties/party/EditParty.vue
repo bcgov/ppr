@@ -1,13 +1,13 @@
 <template>
-  <div id="edit-party" class="white pa-6" :class="{ 'border-error-left': showErrorBar }">
+  <div id="edit-party" class="white pa-6" :class="{ 'border-error-left': setShowErrorBar }">
     <secured-party-dialog
       attach="#app"
       :isDuplicate="foundDuplicate"
       :defaultDialog="toggleDialog"
       :defaultParty="currentSecuredParty"
       :defaultResults="dialogResults"
-      :defaultIsRegisteringParty="isRegisteringParty"
-      :activeIndex="currentIndex"
+      :isRegisteringParty="isRegisteringParty"
+      :activeIndex="activeIndex"
       @emitResetClose="closeAndReset"
       @emitClose="toggleDialog = false"
     />
@@ -17,16 +17,7 @@
           <label
             class="add-party-header generic-label ml"
             :class="{ 'error-text': invalidSection }"
-          >
-            <span v-if="activeIndex === -1 && (!currentSecuredParty || !currentSecuredParty.action)" class="">Add</span>
-            <span v-else>
-              <span v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
-                        && (!currentSecuredParty.action || currentSecuredParty.action !== ActionTypes.ADDED)">
-                Amend
-              </span>
-              <span v-else>Edit</span>
-            </span>
-            <span v-if="isRegisteringParty"> Registering</span><span v-else> Secured</span> Party
+          > {{ labelText }}
           </label>
         </v-col>
         <v-col cols="9">
@@ -65,19 +56,16 @@
               </v-col>
             </v-row>
             <v-divider class="pb-4" />
-            <v-row no-gutters v-if="partyType !== SecuredPartyTypes.NONE">
+            <v-row v-if="partyType" no-gutters>
               <v-col cols="12">
-                <v-row v-if="partyType === SecuredPartyTypes.BUSINESS" no-gutters class="pb-4">
+                <v-row no-gutters class="pb-4">
                   <v-col>
-                    <label class="generic-label">Business Name</label>
+                    <label class="generic-label">
+                      {{ isPartyTypeBusiness ? "Business Name" : "Person's Name" }}
+                    </label>
                   </v-col>
                 </v-row>
-                <v-row v-else no-gutters class="pb-4">
-                  <v-col>
-                    <label class="generic-label">Person's Name</label>
-                  </v-col>
-                </v-row>
-                <v-row v-if="partyType === SecuredPartyTypes.BUSINESS" no-gutters>
+                <v-row v-if="isPartyTypeBusiness" no-gutters>
                   <v-col>
                     <v-text-field
                       filled
@@ -169,7 +157,7 @@
                     <v-text-field
                       filled
                       id="txt-email-party"
-                      :label="isRegisteringParty? 'Email Address' : 'Email Address (Optional)'"
+                      :label="isRegisteringParty ? 'Email Address' : 'Email Address (Optional)'"
                       v-model="currentSecuredParty.emailAddress"
                       :error-messages="
                         errors.emailAddress.message
@@ -205,12 +193,12 @@
                     color="error"
                     v-if="!isRegisteringParty"
                     :disabled="activeIndex === -1"
-                    @click="removeSecuredParty()"
+                    @click="removeSecuredParty(activeIndex)"
                     id="remove-btn-party"
                     class="remove-btn"
                     >
-                    <span v-if="registrationFlowType === RegistrationFlowType.AMENDMENT
-                              && currentIndex !== -1
+                    <span v-if="isAmendment
+                              && activeIndex !== -1
                               && (!currentSecuredParty.action || currentSecuredParty.action !== ActionTypes.ADDED)">
                       Delete
                     </span>
@@ -222,7 +210,7 @@
                     id="done-btn-party"
                     class="ml-auto"
                     color="primary"
-                    :disabled="partyType === SecuredPartyTypes.NONE"
+                    :disabled="!partyType"
                     @click="onSubmitForm()"
                   >
                     Done
@@ -260,8 +248,7 @@ import { SecuredPartyDialog } from '@/components/dialogs'
 import { BusinessSearchAutocomplete } from '@/components/search'
 import { BaseAddress } from '@/composables/address'
 import { SecuredPartyTypes } from '@/enums'
-import { useSecuredParty } from '@/components/parties/composables/useSecuredParty'
-import { useSecuredPartyValidation } from '@/components/parties/composables/useSecuredPartyValidation'
+import { useSecuredParty, useSecuredPartyValidation } from '@/composables/parties'
 import { formatAddress } from '@/composables/address/factories'
 import { SearchPartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { partyCodeSearch } from '@/utils'
@@ -284,7 +271,7 @@ export default defineComponent({
       type: Boolean,
       default: false
     },
-    setIsRegisteringParty: {
+    isRegisteringParty: {
       type: Boolean,
       default: false
     },
@@ -315,7 +302,7 @@ export default defineComponent({
       addressSchema,
       hasMatchingSecuredParty,
       originalSecuredParty
-    } = useSecuredParty(props, context)
+    } = useSecuredParty(context)
 
     const {
       errors,
@@ -341,14 +328,19 @@ export default defineComponent({
       toggleDialog: false,
       dialogResults: [],
       showAllAddressErrors: false,
-      currentIndex: computed((): number => {
-        return props.activeIndex
-      }),
-      isRegisteringParty: computed((): boolean => {
-        return props.setIsRegisteringParty
-      }),
-      showErrorBar: computed((): boolean => {
-        return props.setShowErrorBar
+      isPartyTypeBusiness: computed(() => partyType.value === SecuredPartyTypes.BUSINESS),
+      isPartyTypeIndividual: computed(() => partyType.value === SecuredPartyTypes.INDIVIDUAL),
+      isAmendment: computed(() => registrationFlowType.value === RegistrationFlowType.AMENDMENT),
+      labelText: computed((): string => {
+        let text = ''
+        if (props.activeIndex === -1 && (!currentSecuredParty.value?.action)) {
+          text = 'Add '
+        } else {
+          text = (localState.isAmendment && currentSecuredParty.value?.action !== ActionTypes.ADDED)
+            ? 'Amend ' : 'Edit '
+        }
+        text += props.isRegisteringParty ? 'Registering Party' : 'Secured Party'
+        return text
       })
     })
 
@@ -369,7 +361,7 @@ export default defineComponent({
       localState.foundDuplicate = false
       currentSecuredParty.value.address = formatAddress(currentSecuredParty.value.address)
 
-      if (validateSecuredPartyForm(partyType.value, currentSecuredParty, localState.isRegisteringParty)) {
+      if (validateSecuredPartyForm(partyType.value, currentSecuredParty, props.isRegisteringParty)) {
         if (partyType.value === SecuredPartyTypes.INDIVIDUAL) {
           currentSecuredParty.value.businessName = ''
         } else {
@@ -378,13 +370,14 @@ export default defineComponent({
           currentSecuredParty.value.personName.last = ''
         }
         // check for duplicate
-        if (hasMatchingSecuredParty(currentSecuredParty.value, props.isEditMode)) {
+        if (!props.isRegisteringParty &&
+          hasMatchingSecuredParty(currentSecuredParty.value, props.isEditMode, props.activeIndex)) {
           // trigger duplicate secured party dialog
           localState.foundDuplicate = true
           showDialog()
           return
         }
-        if (currentSecuredParty.value.businessName && partyType.value === SecuredPartyTypes.BUSINESS) {
+        if (currentSecuredParty.value.businessName && localState.isPartyTypeBusiness) {
           if (!isEqual(currentSecuredParty, originalSecuredParty)) {
             // go to the service and see if there are similar secured parties
             const response: [SearchPartyIF] = await partyCodeSearch(
@@ -400,11 +393,11 @@ export default defineComponent({
           }
         }
 
-        if (localState.isRegisteringParty) {
+        if (props.isRegisteringParty) {
           setRegisteringParty(currentSecuredParty.value)
           context.emit('resetEvent')
         } else {
-          addEditSecuredParty()
+          addEditSecuredParty(props.activeIndex)
         }
       } else {
         // trigger show validation
@@ -450,7 +443,7 @@ export default defineComponent({
     )
 
     onMounted(() => {
-      getSecuredParty(localState.isRegisteringParty)
+      getSecuredParty(props.isRegisteringParty, props.activeIndex)
       currentSecuredParty.value.businessName && setSearchValue(currentSecuredParty.value.businessName)
     })
 
@@ -471,8 +464,6 @@ export default defineComponent({
       setCloseAutoComplete,
       errors,
       closeAndReset,
-      registrationFlowType,
-      RegistrationFlowType,
       ActionTypes,
       ...toRefs(localState)
     }

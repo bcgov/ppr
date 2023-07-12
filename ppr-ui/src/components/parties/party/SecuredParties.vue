@@ -6,20 +6,20 @@
       :securedPartyName="currentPartyName"
       @proceed="dialogSubmit($event)"
     />
-    <v-row v-if="isSecuredPartyRestrictedList(registrationType)">
-      <v-col cols="auto"
-        >Include the Secured Party in your registration by adding their secured
+    <v-row v-if="isSecuredPartiesRestricted">
+      <v-col cols="auto">
+        Include the Secured Party in your registration by adding their secured
         party code or their name (business or person). The account number of the
         Secured Party must match the account number of the Registering Party.<br />
-        <div class="font-weight-bold pt-2">
+        <div class="font-weight-bold pt-2" data-test-id="restricted-prompt">
           Only one Secured Party is allowed.
         </div>
       </v-col>
     </v-row>
     <v-row
+      v-if="isSecuredPartiesRestricted && !isStaffReg"
       no-gutters
       class="pb-4 pt-6"
-      v-if="isSecuredPartyRestrictedList(registrationType) && !isStaffReg"
     >
       <v-col cols="12" class="party-search">
         <v-autocomplete
@@ -68,18 +68,18 @@
       </v-col>
     </v-row>
 
-    <v-row no-gutters v-if="!isSecuredPartyRestrictedList(registrationType)">
-      <v-col cols="auto"
-        >Include Secured Parties in your registration by adding their secured
+    <v-row v-if="!isSecuredPartiesRestricted" no-gutters >
+      <v-col cols="auto">
+        Include Secured Parties in your registration by adding their secured
         party code or their name (business or person), or if the Secured Party
         you want to include is new (i.e., they do not have a secured party code)
         you can add their information manually.
       </v-col>
     </v-row>
     <v-row
+      v-if="!isSecuredPartiesRestricted || isStaffReg"
       no-gutters
       class="pb-4 pt-6"
-      v-if="!isSecuredPartyRestrictedList(registrationType) || isStaffReg"
     >
       <party-search
         :isAutoCompleteDisabled="addEditInProgress"
@@ -98,7 +98,7 @@
               <edit-party
                 :activeIndex="activeIndex"
                 :invalidSection="invalidSection"
-                :setShowErrorBar="showErrorBar"
+                :setShowErrorBar="setShowErrorBar"
                 @resetEvent="resetData"
               />
             </v-card>
@@ -141,7 +141,7 @@
                       <edit-party
                         :activeIndex="activeIndex"
                         :invalidSection="invalidSection"
-                        :setShowErrorBar="showErrorBar"
+                        :setShowErrorBar="setShowErrorBar"
                         :isEditMode="true"
                         @removeSecuredParty="removeParty"
                         @resetEvent="resetData"
@@ -163,7 +163,7 @@
                         <div :class="{ 'disabled-text': item.action === ActionTypes.REMOVED}">
                           {{ getName(item) }}
                         </div>
-                        <div v-if="item.action && registrationFlowType === RegistrationFlowType.AMENDMENT">
+                        <div v-if="item.action && isAmendment">
                           <v-chip v-if="item.action === ActionTypes.REMOVED"
                                   x-small label color="#grey lighten-2" text-color="$gray9">
                             {{ item.action }}
@@ -188,7 +188,7 @@
                   <td class="actions-cell actions-width px-0">
                     <div
                       class="actions float-right actions-up pr-4"
-                      v-if="isRegisteringParty(item) || isSecuredPartyRestrictedList(registrationType) ||
+                      v-if="isRegisteringParty(item) || isSecuredPartiesRestricted ||
                       item.code > ''"
                     >
                       <v-list
@@ -196,11 +196,12 @@
                         :disabled="addEditInProgress"
                       >
                         <v-list-item
-                          v-if="(registrationFlowType === RegistrationFlowType.AMENDMENT
-                          && (item.action === ActionTypes.REMOVED || item.action === ActionTypes.EDITED) &&
-                          !isSecuredPartyRestrictedList(registrationType))
-                          || (isSecuredPartyRestrictedList(registrationType) && item.action === ActionTypes.ADDED
-                          && registrationFlowType === RegistrationFlowType.AMENDMENT)"
+                          v-if="isAmendment &&
+                          (
+                            (isSecuredPartiesRestricted && item.action === ActionTypes.ADDED) ||
+                            (!isSecuredPartiesRestricted &&
+                            (item.action === ActionTypes.REMOVED || item.action === ActionTypes.EDITED))
+                          )"
                           class="v-remove"
                           @click="undo(index)"
                         >
@@ -210,7 +211,7 @@
                           </v-list-item-subtitle>
                         </v-list-item>
                         <v-list-item
-                          v-else-if="!isSecuredPartyRestrictedList(registrationType)
+                          v-else-if="!isSecuredPartiesRestricted
                           || registrationFlowType === RegistrationFlowType.NEW"
                           class="v-remove"
                           @click="removeParty(index)"
@@ -388,11 +389,12 @@ import { EditParty, PartySearch } from '@/components/parties/party'
 import { BaseAddress } from '@/composables/address'
 import { useCountriesProvinces } from '@/composables/address/factories'
 import { useParty } from '@/composables/useParty'
+import { useSecuredParty } from '@/composables/parties'
 import { ActionTypes, RegistrationFlowType } from '@/enums'
 import { PartyIF, AddPartiesIF, SearchPartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { editTableHeaders, partyTableHeaders } from '@/resources'
 import { PartyAddressSchema } from '@/schemas'
-import { isSecuredPartyRestrictedList, partyCodeAccount } from '@/utils'
+import { partyCodeAccount } from '@/utils'
 import { storeToRefs } from 'pinia'
 
 export default defineComponent({
@@ -432,9 +434,9 @@ export default defineComponent({
 
     const addressSchema = PartyAddressSchema
     const { getName, isPartiesValid, isBusiness } = useParty()
+    const { isSecuredPartiesRestricted } = useSecuredParty()
 
     const localState = reactive({
-      summaryView: props.isSummary,
       showAddSecuredParty: false,
       currentIsBusiness: true,
       addEditInProgress: false,
@@ -445,23 +447,15 @@ export default defineComponent({
       savedPartyResults: [],
       searchValue: { code: '', businessName: '' },
       loading: false,
-      parties: computed((): AddPartiesIF => {
-        return getAddSecuredPartiesAndDebtors.value
-      }),
-      isStaffReg: computed((): boolean => {
-        return isRoleStaffReg.value
-      }),
+      parties: computed((): AddPartiesIF => getAddSecuredPartiesAndDebtors.value),
+      isStaffReg: computed((): boolean => isRoleStaffReg.value),
+      isAmendment: computed(() => registrationFlowType === RegistrationFlowType.AMENDMENT),
       securedParties: getAddSecuredPartiesAndDebtors.value.securedParties,
       registeringPartyAdded: false,
       currentPartyName: '',
       showDialog: false,
       savedParty: null,
-      showErrorSummary: computed((): boolean => {
-        return !getAddSecuredPartiesAndDebtors.value.valid
-      }),
-      showErrorBar: computed((): boolean => {
-        return props.setShowErrorBar
-      }),
+      showErrorSummary: computed((): boolean => !getAddSecuredPartiesAndDebtors.value.valid),
       showErrorSecuredParties: false,
       headers: [...partyTableHeaders, ...editTableHeaders]
     })
@@ -473,7 +467,7 @@ export default defineComponent({
       }
       const currentParty = cloneDeep(localState.securedParties[index])
 
-      if ((registrationFlowType === RegistrationFlowType.AMENDMENT) && (currentParty.action !== ActionTypes.ADDED)) {
+      if ((localState.isAmendment) && (currentParty.action !== ActionTypes.ADDED)) {
         currentParty.action = ActionTypes.REMOVED
         localState.securedParties.splice(index, 1, currentParty)
         currentParties.securedParties = localState.securedParties
@@ -506,7 +500,7 @@ export default defineComponent({
     const undo = (index: number): void => {
       const originalParties = getOriginalAddSecuredPartiesAndDebtors.value
       const currentParties = getAddSecuredPartiesAndDebtors.value
-      if (isSecuredPartyRestrictedList(registrationType)) {
+      if (isSecuredPartiesRestricted.value) {
         localState.securedParties = cloneDeep(originalParties.securedParties)
         delete localState.securedParties[0].action
         localState.searchValue = { code: '', businessName: '' }
@@ -533,12 +527,8 @@ export default defineComponent({
       localState.registeringPartyAdded = true
     }
 
-    const isRegisteringParty = (partyRow: PartyIF): boolean => {
-      if (isEqual(partyRow, localState.parties.registeringParty)) {
-        return true
-      }
-      return false
-    }
+    const isRegisteringParty = (partyRow: PartyIF): boolean =>
+      isEqual(partyRow, localState.parties.registeringParty)
 
     const initEdit = (index: number) => {
       localState.activeIndex = index
@@ -587,31 +577,20 @@ export default defineComponent({
         }
       }
 
-      if (isSecuredPartyRestrictedList(registrationType) && !localState.isStaffReg) {
+      if (isSecuredPartiesRestricted.value && !localState.isStaffReg) {
         fetchOtherSecuredParties()
       }
     })
 
     const getSecuredPartyValidity = (): boolean => {
       let partyCount = 0
-      if (registrationFlowType === RegistrationFlowType.AMENDMENT) {
-        for (let i = 0; i < localState.securedParties.length; i++) {
-          // is valid if there is at least one debtor
-          if (localState.securedParties[i].action !== ActionTypes.REMOVED) {
-            partyCount++
-          }
-        }
+      if (localState.isAmendment) {
+        partyCount = localState.securedParties.filter((party: PartyIF) =>
+          party.action !== ActionTypes.REMOVED).length
       } else {
         partyCount = localState.securedParties.length
       }
-      if (isSecuredPartyRestrictedList(registrationType)) {
-        if (partyCount === 1) {
-          return true
-        }
-        return false
-      } else {
-        return partyCount >= 1
-      }
+      return isSecuredPartiesRestricted.value ? partyCount === 1 : partyCount >= 1
     }
 
     const emitSecuredPartyValidity = (validity: boolean): void => {
@@ -696,7 +675,7 @@ export default defineComponent({
       addRegisteringParty,
       removeRegisteringParty,
       addressSchema,
-      isSecuredPartyRestrictedList,
+      isSecuredPartiesRestricted,
       registrationType,
       registrationFlowType,
       RegistrationFlowType,

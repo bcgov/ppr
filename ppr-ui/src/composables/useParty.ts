@@ -1,14 +1,12 @@
-import { ActionTypes } from '@/enums'
+import { APIRegistrationTypes, ActionTypes } from '@/enums'
 import { PartyIF, AddPartiesIF } from '@/interfaces' // eslint-disable-line no-unused-vars
-import { isSecuredPartyRestrictedList } from '@/utils'
+import { SecuredPartyRestrictedList } from '@/resources'
 
 export const useParty = () => {
   const getName = (party: PartyIF): string => {
-    if (party.businessName) {
-      return party.businessName
-    } else {
-      return party.personName.first + ' ' + (party.personName.middle || '') + ' ' + party.personName.last
-    }
+    return isBusiness(party)
+      ? party.businessName
+      : party.personName.first + ' ' + (party.personName.middle || '') + ' ' + party.personName.last
   }
 
   const isBusiness = (party: PartyIF): boolean => {
@@ -31,8 +29,7 @@ export const useParty = () => {
   const getMonth = (party: PartyIF): number => {
     if (party.birthDate) {
       const date = new Date(party.birthDate)
-      const mon = date.getMonth() + 1
-      return mon
+      return date.getMonth() + 1
     }
   }
 
@@ -57,38 +54,16 @@ export const useParty = () => {
     }
   }
 
-  const isPartiesValid = (parties: AddPartiesIF, regType: string): boolean => {
-    let debtorValid = false
-    let securedPartyValid = false
-    let registeringPartyValid = false
-    let securedPartyCount = 0
-    for (let i = 0; i < parties.debtors.length; i++) {
-      // is valid if there is at least one debtor
-      if (parties.debtors[i].action !== ActionTypes.REMOVED) {
-        debtorValid = true
-      }
-    }
-    for (let i = 0; i < parties.securedParties.length; i++) {
-      // is valid if there is at least one secured party
-      if (parties.securedParties[i].action !== ActionTypes.REMOVED) {
-        securedPartyCount++
-      }
-    }
+  const isPartiesValid = (parties: AddPartiesIF, regType: APIRegistrationTypes): boolean => {
+    const securedPartyCount = parties.securedParties.filter((securedParty) =>
+      securedParty.action !== ActionTypes.REMOVED).length
 
     // if the registration is a crown registration, we can only have one secured party
-    if (isSecuredPartyRestrictedList(regType)) {
-      if (securedPartyCount === 1) {
-        securedPartyValid = true
-      }
-    } else {
-      if (securedPartyCount >= 1) {
-        securedPartyValid = true
-      }
-    }
+    const isSecuredPartiesRestricted = SecuredPartyRestrictedList.includes(regType)
+    const securedPartyValid = isSecuredPartiesRestricted ? securedPartyCount === 1 : securedPartyCount >= 1
 
-    if (parties.registeringParty) {
-      registeringPartyValid = true
-    }
+    const debtorValid = parties.debtors.some((debtor) => debtor.action !== ActionTypes.REMOVED)
+    const registeringPartyValid = !!parties.registeringParty
 
     return debtorValid && securedPartyValid && registeringPartyValid
   }

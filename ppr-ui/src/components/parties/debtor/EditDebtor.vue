@@ -264,8 +264,7 @@ import {
 } from 'vue-demi'
 import { BusinessSearchAutocomplete } from '@/components/search'
 import { BaseAddress } from '@/composables/address'
-import { useDebtor } from '@/components/parties/composables/useDebtor'
-import { useDebtorValidation } from '@/components/parties/composables/useDebtorValidation'
+import { useDebtor, useDebtorValidation } from '@/composables/parties'
 import { formatAddress } from '@/composables/address/factories'
 import { useValidation } from '@/utils/validators/use-validation'
 

@@ -55,7 +55,7 @@ describe('Secured Party add individual tests', () => {
   it('renders with default values', async () => {
     expect(wrapper.findComponent(EditParty).exists()).toBe(true)
     // radio button value is blank
-    expect(wrapper.vm.partyType).toBe(SecuredPartyTypes.NONE)
+    expect(wrapper.vm.partyType).toBe(null)
   })
 
   it('shows buttons on the form and remove button is disabled', async () => {
@@ -189,7 +189,7 @@ describe('Registering party test', () => {
 
   it('renders registering party when editing', async () => {
     expect(wrapper.findComponent(EditParty).exists()).toBe(true)
-    wrapper.vm.$props.setIsRegisteringParty = true
+    wrapper.vm.$props.isRegisteringParty = true
     await nextTick()
     expect(wrapper.find('.add-party-header').text()).toContain('Registering')
   })

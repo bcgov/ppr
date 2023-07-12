@@ -11,17 +11,17 @@
         <v-col cols="11">
           <v-row no-gutters>
             <v-col class="text-md-center ml-8">
-              <v-icon :class="$style['iconRed']">mdi-alert-circle-outline</v-icon>
+              <v-icon class="iconRed">mdi-alert-circle-outline</v-icon>
             </v-col>
           </v-row>
           <v-row no-gutters v-if="!isDuplicate" class="pt-5">
             <v-col class="text-md-center ml-8">
-              <h1 :class="$style['dialogTitle']">{{ totalParties }} Similar {{ partyWord }} Parties Found</h1>
+              <h1 class="dialogTitle">{{ totalParties }} Similar {{ partyWord }} Parties Found</h1>
             </v-col>
           </v-row>
           <v-row v-else no-gutters class="pt-5">
             <v-col class="text-md-center ml-8">
-              <h1 :class="$style['dialogTitle']">Duplicate Secured Parties</h1>
+              <h1 class="dialogTitle">Duplicate Secured Parties</h1>
             </v-col>
           </v-row>
         </v-col>
@@ -35,40 +35,42 @@
       </v-row>
 
       <div>
-        <p v-if="!isDuplicate" class="text-md-center px-6 pt-3" :class="$style['intro']">
+        <p v-if="!isDuplicate" class="text-md-center px-6 pt-3 intro">
           One or more similar {{ partyWord }} Parties were found. Do you want to use an
           existing {{ partyWord }} Party listed below or use your information to create
           a new {{ partyWord }} Party?
         </p>
-        <p v-else-if="!isReview" class="text-md-center px-6 pt-3" :class="$style['intro']">
+        <p v-else-if="!isReview" class="text-md-center px-6 pt-3 intro">
           Registrations cannot list a Secured Party with the same name and address more than once. This registration
           already contains this Secured Party:
         </p>
-        <p v-else class="text-md-center px-6 pt-3" :class="$style['intro']">
+        <p v-else class="text-md-center px-6 pt-3 intro">
           Duplicate Secured Parties have been detected in this registration.<br>
           Registrations cannot list a Secured Party with the same name and address more than once.<br>
           <b>Note:</b> these duplicates may not be visible due to a system error.
         </p>
       </div>
-      <div :class="$style['partyWindow']">
+      <div class="partyWindow">
         <div v-if="!isDuplicate" class="text-md-center generic-label" id="create-new-party">
           Use my information and create a new {{ partyWord }} Party:
         </div>
 
         <v-container class="currentParty">
-          <v-row :class="[$style[isDuplicate ? 'companyRowDuplicate' : 'companyRow'],
-            { 'primaryRow': showSelected && !isDuplicate }]">
-            <v-col cols="auto" :class="$style['iconColumn']">
-              <v-icon :class="$style['companyIcon']">
+          <v-row :class="[
+            { 'primaryRow': showSelected && !isDuplicate },
+            isDuplicate ? 'companyRowDuplicate' : 'companyRow'
+          ]">
+            <v-col cols="auto" class="iconColumn">
+              <v-icon class="companyIcon">
                 {{party.businessName ? 'mdi-domain' : 'mdi-account'}}
               </v-icon>
             </v-col>
             <v-col cols="9">
-              <div :class="$style['companyText']" class="businessName">
+              <div class="companyText businessName">
                 {{party.businessName ? party.businessName :
                 party.personName.first+" "+party.personName.middle+" "+party.personName.last}}
               </div>
-              <div :class="$style['addressText']">
+              <div class="addressText">
                 {{ party.address.street }},
                 {{ party.address.streetAdditional ? `${party.address.streetAdditional},` : ""}}
                 {{ party.address.city }}
@@ -85,9 +87,8 @@
             <v-col cols="2" class="pt-5"
               ><v-btn
                 v-if="!isDuplicate"
-                class="ml-auto float-right"
+                class="ml-auto float-right partyButton"
                 color="primary"
-                :class="$style['partyButton']"
                 @click="createParty()"
               >
                 Select
@@ -101,63 +102,62 @@
         <v-container v-if="!isDuplicate">
           <v-row
             class="searchResponse"
-            :class="$style[isExistingSecuredParty(result.code) ? 'company-row-no-hover' : 'companyRow']"
+            :class="isExistingSecuredParty(result.code, isRegisteringParty)
+                    ? 'company-row-no-hover' : 'companyRow'"
             v-for="(result, i) in results"
             :key="i"
             @mouseover="onHover"
           >
-            <v-col cols="auto" :class="$style['iconColumn']"
-              ><v-icon :class="$style['companyIcon']">mdi-domain</v-icon>
+            <v-col cols="auto" class="iconColumn"
+              ><v-icon class="companyIcon">mdi-domain</v-icon>
             </v-col>
             <v-col cols="9">
-              <div :class="$style['companyText']" class="businessName">
+              <div class="companyText businessName">
                 {{ result.businessName }}
               </div>
-              <div :class="$style['addressText']">
+              <div class="addressText">
                 {{ result.address.street }}, {{ result.address.city }}
                 {{ result.address.region }} , {{ result.address.postalCode }},
                 {{ getCountryName(result.address.country) }}
               </div>
-              <div :class="$style['addressText']">
+              <div class="addressText">
                 {{ partyWord }} Party Code: {{ result.code }}
               </div>
             </v-col>
-            <v-col v-if="!isExistingSecuredParty(result.code)" cols="2" class="pt-5">
+            <v-col v-if="!isExistingSecuredParty(result.code, isRegisteringParty)" cols="2" class="pt-5">
               <v-btn
-                class="ml-auto float-right"
+                class="ml-auto float-right partyButton"
                 color="primary"
-                :class="$style['partyButton']"
                 @click="selectParty(i)"
               >
                 Select
               </v-btn>
             </v-col>
             <v-col v-else cols="2">
-              <span :class="$style['added-text']" class="auto-complete-added float-right">
+              <span  class="auto-complete-added float-right added-text">
                 <v-icon class="auto-complete-added">mdi-check</v-icon>Added
               </span>
             </v-col>
           </v-row>
         </v-container>
         <div v-else-if="isReview" >
-          <p class="text-md-center px-6 pt-3" :class="$style['intro']">
+          <p class="text-md-center px-6 pt-3 intro">
             Cancelling and re-starting you registration may resolve this issue.<br>
             If you do not wish to proceed, contact BC registries staff:
           </p>
-          <error-contact :class="$style['pad-left']"/>
+          <error-contact class="pad-left"/>
         </div>
       </div>
       <v-card-actions class="pt-6 pb-8">
         <v-btn v-if="!isDuplicate && !isReview"
-          :class="$style['dialogButton']"
+          class="dialogButton"
           id="dialog-cancel-button"
           color="primary"
           outlined
           @click="exit()"
           >Exit</v-btn>
         <v-btn v-else
-          :class="$style['dialogButton']"
-          class="primary dialog-btn"
+          class="primary dialog-btn dialogButton"
           color="primary"
           @click="exit()"
           >OK</v-btn>
@@ -174,7 +174,7 @@ import {
   computed
 } from 'vue-demi'
 import { SearchPartyIF, PartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
-import { useSecuredParty } from '@/components/parties/composables/useSecuredParty'
+import { useSecuredParty } from '@/composables/parties'
 import {
   useCountriesProvinces
 } from '@/composables/address/factories'
@@ -201,11 +201,14 @@ export default defineComponent({
       type: Boolean,
       default: false
     },
+    isRegisteringParty: {
+      type: Boolean,
+      default: false
+    },
     activeIndex: {
       type: Number,
       default: -1
-    },
-    defaultIsRegisteringParty: Boolean
+    }
   },
   setup (props, context) {
     const localState = reactive({
@@ -216,9 +219,6 @@ export default defineComponent({
       dialog: computed((): boolean => {
         return props.defaultDialog
       }),
-      isRegisteringParty: computed((): boolean => {
-        return props.defaultIsRegisteringParty
-      }),
       results: computed((): Array<SearchPartyIF> => {
         return props.defaultResults
       }),
@@ -226,7 +226,7 @@ export default defineComponent({
         return props.defaultResults.length
       }),
       partyWord: computed((): string => {
-        if (props.defaultIsRegisteringParty) {
+        if (props.isRegisteringParty) {
           return 'Registering'
         }
         return 'Secured'
@@ -240,7 +240,7 @@ export default defineComponent({
       isExistingSecuredParty,
       addEditSecuredParty,
       currentSecuredParty
-    } = useSecuredParty(props, context)
+    } = useSecuredParty(context)
 
     const selectParty = (idx: number) => {
       const selectedResult = localState.results[idx]
@@ -250,23 +250,23 @@ export default defineComponent({
         emailAddress: selectedResult.emailAddress,
         code: selectedResult.code
       }
-      if (localState.isRegisteringParty) {
+      if (props.isRegisteringParty) {
         newParty.action = ActionTypes.EDITED
         setRegisteringParty(newParty)
       } else {
         currentSecuredParty.value = newParty
-        addEditSecuredParty()
+        addEditSecuredParty(props.activeIndex)
       }
       context.emit('emitResetClose')
     }
 
     const createParty = () => {
-      if (localState.isRegisteringParty) {
+      if (props.isRegisteringParty) {
         localState.party.action = ActionTypes.EDITED
         setRegisteringParty(localState.party)
       } else {
         currentSecuredParty.value = localState.party
-        addEditSecuredParty()
+        addEditSecuredParty(props.activeIndex)
       }
       context.emit('emitResetClose')
     }
@@ -292,7 +292,7 @@ export default defineComponent({
 })
 </script>
 
-<style lang="scss" module>
+<style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
 .addressText {
   font-size: 0.875rem;

@@ -19,12 +19,12 @@
           </div>
           <party-search
             :isAutoCompleteDisabled="addEditInProgress"
-            :setIsRegisteringParty="true"
+            :isRegisteringParty="true"
             @showSecuredPartyAdd="initAdd"
             @hideSearch="resetData"
           />
           <div v-if="showAddRegisteringParty">
-            <edit-party :setIsRegisteringParty="true" @resetEvent="resetData" />
+            <edit-party :isRegisteringParty="true" @resetEvent="resetData" />
           </div>
           <div v-if="!showAddRegisteringParty" class="px-5 pt-0 pb-8" style="height:80px">
             <v-btn

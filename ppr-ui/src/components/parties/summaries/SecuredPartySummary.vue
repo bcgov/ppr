@@ -21,9 +21,9 @@ import { BasePartySummary } from '@/components/parties/summaries'
 import { AddPartiesIF, PartySummaryOptionsI } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { useRouter } from 'vue2-helpers/vue-router'
 import { partyTableHeaders } from '@/resources'
-import { isSecuredPartyRestrictedList } from '@/utils'
 import { RegistrationFlowType } from '@/enums'
 import { storeToRefs } from 'pinia'
+import { useSecuredParty } from '@/composables/parties'
 
 export default defineComponent({
   name: 'SecuredPartySummary',
@@ -44,16 +44,15 @@ export default defineComponent({
     const {
       // Getters
       getAddSecuredPartiesAndDebtors,
-      getRegistrationType,
       getRegistrationFlowType
     } = storeToRefs(useStore())
+    const { isSecuredPartiesRestricted } = useSecuredParty()
     const parties: AddPartiesIF = getAddSecuredPartiesAndDebtors.value
 
     const localState = reactive({
       securedParties: computed(function () {
         if (getRegistrationFlowType.value === RegistrationFlowType.NEW) {
-          if (isSecuredPartyRestrictedList(getRegistrationType.value.registrationTypeAPI) &&
-            parties.securedParties.length > 1) {
+          if (isSecuredPartiesRestricted.value && parties?.securedParties?.length > 1) {
             return []
           }
         }
@@ -86,6 +85,6 @@ export default defineComponent({
 })
 </script>
 
-<style lang="scss" module>
+<style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
 </style>
