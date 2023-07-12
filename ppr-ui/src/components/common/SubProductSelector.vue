@@ -62,7 +62,7 @@ export default defineComponent({
     }
   },
   setup (props, { emit }) {
-    const productSelectorRef = ref(null)
+    const productSelectorFormRef = ref(null)
     const localState = reactive({
       selectedProduct: ''
     })
