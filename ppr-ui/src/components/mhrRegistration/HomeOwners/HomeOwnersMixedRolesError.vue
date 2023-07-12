@@ -1,18 +1,11 @@
 <template>
       <td
-        class="py-1"
+        class="py-6 error-text text-center d-block"
         :class="{ 'border-error-left': showBorderError }"
         :colspan="4"
-        data-test-id="invalid-group-mixed-owners"
+        :data-test-id="`mixed-owners-msg-group-${groupId}`"
         >
-          <div
-          class="error-text my-6 text-center"
-          :data-test-id="`mixed-owners-msg-group-${groupId}`"
-          >
-            <span>
-            {{ mixedRoleErrorMsg }}
-            </span>
-          </div>
+          {{ mixedRoleErrorMsg }}
       </td>
 </template>
 

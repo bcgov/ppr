@@ -481,7 +481,7 @@ describe('Home Owners', () => {
     await nextTick()
 
     const homeOwners = wrapper
-    const MixedRolesError = homeOwners.find(getTestId('invalid-group-mixed-owners'))
+    const MixedRolesError = homeOwners.find(getTestId('mixed-owners-msg-group-1'))
     expect(MixedRolesError.exists()).toBeTruthy()
     expect(MixedRolesError.text()).toContain(MixedRolesErrors.hasMixedOwnerTypes)
 
@@ -514,7 +514,7 @@ describe('Home Owners', () => {
     await nextTick()
 
     const homeOwners = wrapper
-    const MixedRolesError = homeOwners.find(getTestId('invalid-group-mixed-owners'))
+    const MixedRolesError = homeOwners.find(getTestId('mixed-owners-msg-group-1'))
     expect(MixedRolesError.exists()).toBeTruthy()
 
     // remove the executor from the group
