@@ -313,7 +313,7 @@ export const useNewMhrRegistration = () => {
   }
 
   const fetchMhRegistrations = async (sortOptions: RegistrationSortIF = null): Promise<void> => {
-    const draftFilings = await getMhrDrafts()
+    const draftFilings = await getMhrDrafts(sortOptions)
     const myMhrHistory = await mhrRegistrationHistory(true, sortOptions)
     const filteredMhrHistory = addHistoryDraftsToMhr(myMhrHistory, draftFilings, sortOptions)
     setMhrTableHistory(filteredMhrHistory)

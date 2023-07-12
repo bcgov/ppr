@@ -592,9 +592,15 @@ export async function updateMhrDraft (draftId: string, type: APIMhrTypes, draft:
 }
 
 // Get all existing drafts
-export async function getMhrDrafts (): Promise<Array<MhrDraftIF>> {
+export async function getMhrDrafts (sortOptions?): Promise<Array<MhrDraftIF>> {
+  let path = 'drafts'
+  if (sortOptions) {
+    path = addSortParams(
+      path + '?',
+      sortOptions)
+  }
   return axios
-    .get<Array<MhrDraftIF>>('drafts', getDefaultConfig())
+    .get<Array<MhrDraftIF>>(path, getDefaultConfig())
     .then(response => {
       const data: Array<MhrDraftIF> = response?.data
       if (!data) {
