@@ -3,7 +3,7 @@ import Vuetify from 'vuetify'
 import { createPinia, setActivePinia } from 'pinia'
 import { useStore } from '../../src/store/store'
 import VueRouter from 'vue-router'
-import { createLocalVue, mount, shallowMount, Wrapper } from '@vue/test-utils'
+import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
 import mockRouter from './MockRouter'
 
 import { MhrUnitNote } from '@/views'
@@ -11,7 +11,7 @@ import { RouteNames, UnitNoteDocTypes } from '@/enums'
 import { getTestId, setupMockUser } from './utils'
 import { UnitNotesInfo } from '@/resources/unitNotes'
 import { CertifyInformation, ContactInformation, DocumentId, Remarks } from '@/components/common'
-import { UnitNoteAdd, UnitNoteReview, UnitNoteReviewDetailsTable } from '@/components/unitNotes'
+import { EffectiveDateTime, UnitNoteAdd, UnitNoteReview, UnitNoteReviewDetailsTable } from '@/components/unitNotes'
 import { Attention } from '@/components/mhrRegistration/ReviewConfirm'
 import { StaffPayment } from '@bcrs-shared-components/staff-payment'
 
@@ -90,6 +90,7 @@ describe('MHR Unit Note Filing', () => {
 
     expect(UnitNoteReviewComponent.findComponent(UnitNoteReviewDetailsTable)).toBeTruthy()
     expect(UnitNoteReviewComponent.findComponent(ContactInformation)).toBeTruthy()
+    expect(UnitNoteReviewComponent.findComponent(EffectiveDateTime)).toBeTruthy()
     expect(UnitNoteReviewComponent.findComponent(Attention)).toBeTruthy()
     expect(UnitNoteReviewComponent.findComponent(CertifyInformation)).toBeTruthy()
     expect(UnitNoteReviewComponent.findComponent(StaffPayment)).toBeTruthy()
