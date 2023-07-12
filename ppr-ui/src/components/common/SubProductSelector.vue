@@ -1,25 +1,25 @@
 <template>
   <v-form
-      id="sub-product-selector"
-      class="pl-1 pr-3"
-      ref="productSelectorFormRef"
+    id="sub-product-selector"
+    class="pl-1 pr-3"
+    ref="productSelectorFormRef"
   >
     <p>Select the access type you want (Required):</p>
     <v-radio-group
-        hide-details
-        v-model="selectedProduct"
-        class="sub-product-radio-group"
+      hide-details
+      v-model="selectedProduct"
+      class="sub-product-radio-group"
     >
       <div
-          v-for="subProduct in subProductConfig"
-          :key="subProduct.type"
-          class="sub-product-radio-wrapper ml-n9"
-          :class="{'selected' : selectedProduct === subProduct.type }"
+        v-for="subProduct in subProductConfig"
+        :key="subProduct.type"
+        class="sub-product-radio-wrapper ml-n9"
+        :class="{'selected' : selectedProduct === subProduct.type }"
       >
         <v-divider />
         <v-radio
-            class="sub-product-radio-btn mt-6 ml-9"
-            :value="subProduct.type"
+          class="sub-product-radio-btn mt-6 ml-9"
+          :value="subProduct.type"
         >
           <template v-slot:label>
             <v-row no-gutters>
