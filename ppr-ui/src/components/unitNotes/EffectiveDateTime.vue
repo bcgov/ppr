@@ -78,7 +78,7 @@
 
           <div
             v-if="!isImmediateDateSelected && selectedPastDate && isTimeSelected"
-            class="ml-8"
+            class="ml-8 mb-6"
             data-test-id="date-summary-label"
           >
             Caution on this home effective: <br />
