@@ -48,7 +48,7 @@
                 :rules="required('This field is required')"
                 :disabled="isImmediateDateSelected"
               />
-              <span class="px-2 pt-4" :class="{ disabled: isImmediateDateSelected }"> : </span>
+              <span class="time-separator pt-4" :class="{ disabled: isImmediateDateSelected }"> : </span>
 
               <v-select
                 id="minute-selector"
@@ -67,7 +67,7 @@
                 ref="periodSelector"
                 v-model="selectPeriod"
                 filled
-                class="mr-1"
+                class="mr-1 period-selector"
                 :items="[PeriodTypes.AM, PeriodTypes.PM]"
                 :disabled="isImmediateDateSelected"
               />
@@ -210,10 +210,20 @@ export default defineComponent({
 
 .time-picker {
   display: flex;
+  gap: 5px;
   justify-content: space-between;
   align-content: center;
+  max-width: 600px;
   .v-select {
     max-width: 148px;
+  }
+
+  .time-separator {
+    margin-right: 2px;
+  }
+
+  .period-selector::v-deep .v-input__slot{
+    height: 58px;
   }
 
   .timezone-label {
