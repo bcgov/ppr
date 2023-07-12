@@ -256,6 +256,7 @@ class MhrRegistrationStatusTypes(BaseEnum):
     """Render an Enum of the MHR registration status types."""
 
     ACTIVE = 'ACTIVE'
+    CANCELLED = 'CANCELLED'
     DRAFT = 'DRAFT'
     EXEMPT = 'EXEMPT'
     HISTORICAL = 'HISTORICAL'
