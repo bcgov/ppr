@@ -77,7 +77,7 @@ export default defineComponent({
     })
 
     return {
-      productSelectorRef,
+      productSelectorFormRef,
       isImportantBullet,
       ...toRefs(localState)
     }
