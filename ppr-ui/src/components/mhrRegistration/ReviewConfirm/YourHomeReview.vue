@@ -6,7 +6,7 @@
     </header>
 
     <div :class="{'border-error-left': showStepError && !isTransferReview }">
-      <section class="mx-6 pt-8" v-if="showStepError && !isTransferReview">
+      <section v-if="showStepError && !isTransferReview" class="mx-6 pt-8" :class="{ 'pb-8': !hasData}">
         <span>
           <v-icon color="error">mdi-information-outline</v-icon>
           <span class="error-text mx-1">This step is unfinished.</span>
@@ -16,136 +16,137 @@
         </span>
       </section>
 
-      <!-- Manufacturer Make Model -->
-      <section class="py-6">
-        <v-row no-gutters class="px-6">
-          <v-col cols="3">
-            <h3>Manufacturer's Name</h3>
-          </v-col>
-          <v-col cols="9">
-            <p>{{ getMhrRegistrationHomeDescription.manufacturer || '(Not Entered)' }}</p>
-          </v-col>
-        </v-row>
-        <v-row no-gutters class="pt-3 px-6">
-          <v-col cols="3">
-            <h3>Year of Manufacture</h3>
-          </v-col>
-          <v-col cols="9">
-            <p v-if="getMhrRegistrationHomeDescription.baseInformation.year">
-              {{ getMhrRegistrationHomeDescription.baseInformation.circa
-              ? 'Circa ' + getMhrRegistrationHomeDescription.baseInformation.year
-              : getMhrRegistrationHomeDescription.baseInformation.year
-              }}
-            </p>
-            <p v-else>(Not Entered)</p>
-          </v-col>
-        </v-row>
-        <v-row no-gutters class="pt-3 px-6">
-          <v-col cols="3">
-            <h3>Make</h3>
-          </v-col>
-          <v-col cols="9">
-            <p>{{ getMhrRegistrationHomeDescription.baseInformation.make || '(Not Entered)'  }}</p>
-          </v-col>
-        </v-row>
-        <v-row no-gutters class="pt-3 px-6">
-          <v-col cols="3">
-            <h3>Model</h3>
-          </v-col>
-          <v-col cols="9">
-            <p>{{ getMhrRegistrationHomeDescription.baseInformation.model || '(Not Entered)'  }}</p>
-          </v-col>
-        </v-row>
-      </section>
-
-      <v-divider class="mx-4"/>
-
-      <!-- CSA Review -->
-      <template v-if="isCSA || isEngineerInspection">
-        <template v-if="isCSA">
-          <v-row no-gutters class="pa-6">
-            <v-col cols="3" class="pt-1">
-              <h3>CSA Number</h3>
+      <template v-if="hasData">
+        <!-- Manufacturer Make Model -->
+        <section class="py-6">
+          <v-row no-gutters class="px-6">
+            <v-col cols="3">
+              <h3>Manufacturer's Name</h3>
             </v-col>
-            <v-col cols="9" class="pt-1">
-              <p>{{ getMhrRegistrationHomeDescription.csaNumber || '(Not Entered)' }}</p>
-            </v-col>
-            <v-col cols="3" class="pt-1">
-              <h3>CSA Standard</h3>
-            </v-col>
-            <v-col cols="9" class="pt-1">
-              <p>{{ getMhrRegistrationHomeDescription.csaStandard || '(Not Entered)' }}</p>
+            <v-col cols="9">
+              <p>{{ getMhrRegistrationHomeDescription.manufacturer || '(Not Entered)' }}</p>
             </v-col>
           </v-row>
-        </template>
-
-        <!-- Engineer Review -->
-        <template v-if="isEngineerInspection">
-          <v-row no-gutters class="pa-6">
-            <v-col cols="3" class="pt-1">
-              <h3>Engineer's Name</h3>
+          <v-row no-gutters class="pt-3 px-6">
+            <v-col cols="3">
+              <h3>Year of Manufacture</h3>
             </v-col>
-            <v-col cols="9" class="pt-1">
-              <p>{{ getMhrRegistrationHomeDescription.engineerName || '(Not Entered)' }}</p>
-            </v-col>
-            <v-col cols="3" class="pt-1">
-              <h3>Date of Engineer's Report</h3>
-            </v-col>
-            <v-col cols="9" class="pt-1">
-              <p>{{ engineerDisplayDate || '(Not Entered)' }}</p>
+            <v-col cols="9">
+              <p v-if="getMhrRegistrationHomeDescription.baseInformation.year">
+                {{ getMhrRegistrationHomeDescription.baseInformation.circa
+                ? 'Circa ' + getMhrRegistrationHomeDescription.baseInformation.year
+                : getMhrRegistrationHomeDescription.baseInformation.year
+                }}
+              </p>
+              <p v-else>(Not Entered)</p>
             </v-col>
           </v-row>
-        </template>
-      </template>
-
-      <!-- Default no Home Certification option is selected -->
-      <template v-else>
-        <v-row no-gutters class="pa-6">
-          <v-col cols="3">
-            <h3>Home Certification</h3>
-          </v-col>
-          <v-col cols="9">
-            <p>(Not Entered)</p>
-          </v-col>
-        </v-row>
-      </template>
-
-      <v-divider class="mx-4"/>
-
-      <!-- Home Sections Review -->
-      <template>
-        <section class="pt-6" id="review-home-sections">
-          <h3 class="px-6">Home Sections</h3>
-          <HomeSections class="mt-n4 px-6 py-0" :isReviewMode="true" />
+          <v-row no-gutters class="pt-3 px-6">
+            <v-col cols="3">
+              <h3>Make</h3>
+            </v-col>
+            <v-col cols="9">
+              <p>{{ getMhrRegistrationHomeDescription.baseInformation.make || '(Not Entered)'  }}</p>
+            </v-col>
+          </v-row>
+          <v-row no-gutters class="pt-3 px-6">
+            <v-col cols="3">
+              <h3>Model</h3>
+            </v-col>
+            <v-col cols="9">
+              <p>{{ getMhrRegistrationHomeDescription.baseInformation.model || '(Not Entered)'  }}</p>
+            </v-col>
+          </v-row>
         </section>
-      </template>
-
-      <template v-if="!isMhrManufacturerRegistration">
-        <v-divider class="mx-4"/>
-
-        <!-- Rebuilt Status Review -->
-        <v-row no-gutters class="pa-6">
-          <v-col cols="3">
-            <h3>Rebuilt Status</h3>
-          </v-col>
-          <v-col cols="9">
-            <p v-html="formatAsHtml(getMhrRegistrationHomeDescription.rebuiltRemarks) || '(Not Entered)'"></p>
-          </v-col>
-        </v-row>
 
         <v-divider class="mx-4"/>
 
-        <!-- Other Information Review -->
-        <v-row no-gutters class="pa-6">
-          <v-col cols="3">
-            <h3>Other Information</h3>
-          </v-col>
-          <v-col cols="9">
-            <p v-html="formatAsHtml(getMhrRegistrationOtherInfo) || '(Not Entered)'"></p>
-          </v-col>
-        </v-row>
-      </template>
+        <!-- CSA Review -->
+        <template v-if="isCSA || isEngineerInspection">
+          <template v-if="isCSA">
+            <v-row no-gutters class="pa-6">
+              <v-col cols="3" class="pt-1">
+                <h3>CSA Number</h3>
+              </v-col>
+              <v-col cols="9" class="pt-1">
+                <p>{{ getMhrRegistrationHomeDescription.csaNumber || '(Not Entered)' }}</p>
+              </v-col>
+              <v-col cols="3" class="pt-1">
+                <h3>CSA Standard</h3>
+              </v-col>
+              <v-col cols="9" class="pt-1">
+                <p>{{ getMhrRegistrationHomeDescription.csaStandard || '(Not Entered)' }}</p>
+              </v-col>
+            </v-row>
+          </template>
 
+          <!-- Engineer Review -->
+          <template v-if="isEngineerInspection">
+            <v-row no-gutters class="pa-6">
+              <v-col cols="3" class="pt-1">
+                <h3>Engineer's Name</h3>
+              </v-col>
+              <v-col cols="9" class="pt-1">
+                <p>{{ getMhrRegistrationHomeDescription.engineerName || '(Not Entered)' }}</p>
+              </v-col>
+              <v-col cols="3" class="pt-1">
+                <h3>Date of Engineer's Report</h3>
+              </v-col>
+              <v-col cols="9" class="pt-1">
+                <p>{{ engineerDisplayDate || '(Not Entered)' }}</p>
+              </v-col>
+            </v-row>
+          </template>
+        </template>
+
+        <!-- Default no Home Certification option is selected -->
+        <template v-else>
+          <v-row no-gutters class="pa-6">
+            <v-col cols="3">
+              <h3>Home Certification</h3>
+            </v-col>
+            <v-col cols="9">
+              <p>(Not Entered)</p>
+            </v-col>
+          </v-row>
+        </template>
+
+        <v-divider class="mx-4"/>
+
+        <!-- Home Sections Review -->
+        <template>
+          <section class="pt-6" id="review-home-sections">
+            <h3 class="px-6">Home Sections</h3>
+            <HomeSections class="mt-n4 px-6 py-0" :isReviewMode="true" />
+          </section>
+        </template>
+
+        <template v-if="!isMhrManufacturerRegistration">
+          <v-divider class="mx-4"/>
+
+          <!-- Rebuilt Status Review -->
+          <v-row no-gutters class="pa-6">
+            <v-col cols="3">
+              <h3>Rebuilt Status</h3>
+            </v-col>
+            <v-col cols="9">
+              <p v-html="formatAsHtml(getMhrRegistrationHomeDescription.rebuiltRemarks) || '(Not Entered)'"></p>
+            </v-col>
+          </v-row>
+
+          <v-divider class="mx-4"/>
+
+          <!-- Other Information Review -->
+          <v-row no-gutters class="pa-6">
+            <v-col cols="3">
+              <h3>Other Information</h3>
+            </v-col>
+            <v-col cols="9">
+              <p v-html="formatAsHtml(getMhrRegistrationOtherInfo) || '(Not Entered)'"></p>
+            </v-col>
+          </v-row>
+        </template>
+      </template>
     </div>
   </v-card>
 </template>
@@ -154,7 +155,7 @@
 import { computed, defineComponent, reactive, toRefs } from 'vue-demi'
 import { useStore } from '@/store/store'
 import { HomeCertificationOptions, RouteNames } from '@/enums'
-import { yyyyMmDdToPacificDate, formatAsHtml } from '@/utils'
+import { yyyyMmDdToPacificDate, formatAsHtml, hasTruthyValue } from '@/utils'
 import { HomeSections } from '@/components/mhrRegistration'
 import { useMhrValidations } from '@/composables'
 import { storeToRefs } from 'pinia'
@@ -194,7 +195,11 @@ export default defineComponent({
       engineerDisplayDate: computed((): string => {
         return yyyyMmDdToPacificDate(getMhrRegistrationHomeDescription.value?.engineerDate, true)
       }),
-      showStepError: computed(() => !getStepValidation(MhrSectVal.YOUR_HOME_VALID))
+      showStepError: computed(() => !getStepValidation(MhrSectVal.YOUR_HOME_VALID)),
+      hasData: computed(() : boolean => {
+        return hasTruthyValue(getMhrRegistrationHomeDescription.value) ||
+        (!isMhrManufacturerRegistration.value && !!getMhrRegistrationOtherInfo.value)
+      })
     })
 
     return {

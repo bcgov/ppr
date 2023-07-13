@@ -6,7 +6,7 @@
     </header>
 
     <div :class="{ 'border-error-left': showStepError }">
-      <section class="mx-6 pt-8" v-if="showStepError">
+      <section  v-if="showStepError" class="mx-6 pt-8" :class="{ 'pb-8': !hasData }">
         <span>
           <v-icon color="error">mdi-information-outline</v-icon>
           <span class="error-text mx-1">This step is unfinished.</span>
@@ -17,7 +17,7 @@
       </section>
 
       <!-- -->
-      <template>
+      <template v-if="hasData">
         <section id="review-submitting-party-section">
           <!-- Insert Review mode of component here -->
           <v-row no-gutters class="px-6 pb-5 pt-6">
@@ -106,7 +106,7 @@ import { RouteNames } from '@/enums'
 import { useStore } from '@/store/store'
 import { BaseAddress } from '@/composables/address'
 import { PartyAddressSchema } from '@/schemas'
-import { toDisplayPhone } from '@/utils'
+import { toDisplayPhone, hasTruthyValue } from '@/utils'
 import { useMhrValidations } from '@/composables'
 import { AttnRefConfigIF } from '@/interfaces'
 import { attentionConfig, folioOrRefConfig } from '@/resources/attnRefConfigs'
@@ -137,11 +137,16 @@ export default defineComponent({
       address: computed(() => getMhrRegistrationSubmittingParty.value.address),
       businessName: computed(() => getMhrRegistrationSubmittingParty.value.businessName),
       personName: computed(() => getMhrRegistrationSubmittingParty.value.personName),
-      hasAddress: computed(() => !Object.values(localState.address).every(val => !val)),
+      hasAddress: computed(() => hasTruthyValue(localState.address)),
       attnOrRefConfig: computed((): AttnRefConfigIF => isRoleStaffReg.value ? attentionConfig : folioOrRefConfig),
       emptyText: computed(() => isMhrManufacturerRegistration.value ? '' : '(Not Entered)'),
       showStepError: computed(() => {
         return !isMhrManufacturerRegistration.value && !getStepValidation(MhrSectVal.SUBMITTING_PARTY_VALID)
+      }),
+      hasData: computed(() : boolean => {
+        return hasTruthyValue(getMhrRegistrationSubmittingParty.value) ||
+        (!isMhrManufacturerRegistration.value &&
+        (!!getMhrRegistrationDocumentId.value || !!getMhrAttentionReference.value))
       })
     })
 
