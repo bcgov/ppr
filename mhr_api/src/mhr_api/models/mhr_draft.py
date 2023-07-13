@@ -72,7 +72,7 @@ FILTER_MHR_NUMBER = " AND mhr_number = '?'"
 FILTER_REG_TYPE = " AND registration_type_desc = '?'"
 FILTER_SUBMITTING_NAME = " AND submitting_party LIKE '%?%'"
 FILTER_CLIENT_REF = " AND UPPER(TRIM(clientReferenceId)) LIKE '%?%'"
-FILTER_USERNAME = " AND TRIM(registering_name) LIKE '%?%'"
+FILTER_USERNAME = " AND TRIM(UPPER(registering_name)) LIKE '%?%'"
 FILTER_DATE = ' AND create_ts BETWEEN :query_start AND :query_end'
 
 ORDER_BY_DATE = ' ORDER BY create_ts'
@@ -184,9 +184,9 @@ class MhrDraft(db.Model):
         if params.has_sort():
             order_clause: str = QUERY_ACCOUNT_ORDER_BY.get(params.sort_criteria)
             if params.sort_direction and params.sort_direction == reg_utils.SORT_DESCENDING:
-                order_clause += SORT_DESCENDING if params.sort_criteria != reg_utils.REG_TS_PARAM else SORT_ASCENDING
+                order_clause += SORT_DESCENDING
             elif params.sort_direction and params.sort_direction == reg_utils.SORT_ASCENDING:
-                order_clause += SORT_ASCENDING if params.sort_criteria != reg_utils.REG_TS_PARAM else SORT_DESCENDING
+                order_clause += SORT_ASCENDING
             else:
                 order_clause += SORT_DESCENDING
             query_text += order_clause
@@ -208,6 +208,7 @@ class MhrDraft(db.Model):
         if params.filter_client_reference_id:
             filters.append((reg_utils.CLIENT_REF_PARAM, params.filter_client_reference_id))
         if params.filter_submitting_name:
+            current_app.logger.info(f'$$$$$$ {params.filter_submitting_name}')
             filters.append((reg_utils.SUBMITTING_NAME_PARAM, params.filter_submitting_name))
         if params.filter_username:
             filters.append((reg_utils.USER_NAME_PARAM, params.filter_username))

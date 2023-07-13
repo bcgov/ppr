@@ -898,7 +898,7 @@ def update_note_json(registration, note_json: dict) -> dict:
 
 def update_location_json(registration, reg_json: dict) -> dict:
     """Conditionally update the location json with the modernized registration data if available."""
-    if not registration.locations and not registration.change_registrations:
+    if not registration.locations:
         return reg_json
     active_loc = registration.locations[0]
     active_ts = registration.registration_ts
@@ -918,7 +918,7 @@ def update_location_json(registration, reg_json: dict) -> dict:
 
 def update_description_json(registration, reg_json: dict) -> dict:
     """Conditionally update the description json with the modernized registration data if available."""
-    if not registration.descriptions and not registration.change_registrations:
+    if not registration.descriptions:
         return reg_json
     active_desc = registration.descriptions[0]
     active_ts = registration.registration_ts

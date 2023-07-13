@@ -334,6 +334,6 @@ def get_account_registration_params(req: request, params: AccountRegistrationPar
 def remove_quotes(text: str) -> str:
     """Remove single and double quotation marks from request parameters."""
     if text:
-        text = text.replace("'", '')
-        text = text.replace('"', '')
+        text = text.replace("'", "''")
+        text = text.replace('"', '""')
     return text

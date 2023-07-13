@@ -53,7 +53,10 @@ from tests.unit.utils.test_transfer_data import (
     TRANS_QS_1,
     TRANS_QS_2,
     TRANS_QS_3,
-    TRANS_TC_3
+    TRANS_TC_3,
+    TRANS_TC_4,
+    TRANS_TC_5,
+    TRANS_TC_6
 )
 DESC_VALID = 'Valid'
 DESC_MISSING_DOC_ID = 'Missing document id'
@@ -223,8 +226,12 @@ TEST_TRANSFER_DATA_QS = [
 # testdata pattern is ({description}, {valid}, {staff}, {gtype}, {mhr_num}, {json_data}, {message content})
 TEST_TRANSFER_DATA_TC = [
     ('Valid', True, True, 'SOLE', '004834', TRANS_TC_3, None),
+    ('Valid existing exec', True, True, 'COMMON', '100443', TRANS_TC_4, None),
+    ('Valid unchanged exec', True, True, 'COMMON', '100443', TRANS_TC_5, None),
+    ('Valid split exec', True, True, 'COMMON', '100443', TRANS_TC_6, None),
     ('Invalid add TC type', False, True, 'COMMON', '004834', TRANS_TC_3, validator.GROUP_COMMON_INVALID),
-    ('Invalid add NA type', False, True, 'NA', '004834', TRANS_TC_3, validator.GROUP_COMMON_INVALID)
+    ('Invalid add NA type', False, True, 'NA', '004834', TRANS_TC_3, validator.GROUP_COMMON_INVALID),
+    ('Invalid add exec', False, True, 'COMMON', '100443', TRANS_TC_5, validator.TRANSFER_PARTY_TYPE_INVALID)
 ]
 
 
@@ -615,6 +622,9 @@ def test_validate_transfer_tc(session, desc, valid, staff, gtype, mhr_num, data,
     # setup
     json_data = copy.deepcopy(data)
     json_data['addOwnerGroups'][0]['type'] = gtype
+    if desc == 'Invalid add exec':
+        json_data['addOwnerGroups'][1]['owners'][0]['partyType'] = 'EXECUTOR'
+        json_data['addOwnerGroups'][1]['owners'][0]['description'] = 'EXECUTOR OF THE ESTATED OF ...'
     valid_format, errors = schema_utils.validate(json_data, 'transfer', 'mhr')
     # Additional validation not covered by the schema.
     registration: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, '2523')
