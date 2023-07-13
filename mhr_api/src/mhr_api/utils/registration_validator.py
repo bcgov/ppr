@@ -787,6 +787,8 @@ def validate_owner_party_type(json_data,  # pylint: disable=too-many-branches
     if not groups:
         return error_msg
     for group in groups:
+        if not new and len(groups) > 1 and group_owners_unchanged(json_data, group):
+            continue
         party_count: int = 0
         owner_count: int = 0
         group_parties_invalid: bool = False
@@ -834,3 +836,37 @@ def get_active_group_count(json_data, registration: MhrRegistration) -> int:
             group_count -= len(json_data.get('deleteOwnerGroups'))
         group_count += validator_utils.get_existing_group_count(registration)
     return group_count
+
+
+def group_owners_unchanged(json_data, add_group) -> bool:
+    """Check if the owners in an added group are identical to the owners in a deleted group."""
+    if not json_data.get('deleteOwnerGroups') or not add_group.get('owners'):
+        return False
+    for group in json_data.get('deleteOwnerGroups'):
+        if group.get('owners') and len(group['owners']) == len(add_group['owners']):
+            identical: bool = True
+            for add_owner in add_group.get('owners'):
+                owner_match: bool = False
+                for del_owner in group.get('owners'):
+                    if owner_name_address_match(add_owner, del_owner):
+                        owner_match = True
+                if not owner_match:
+                    identical = False
+            if identical:
+                return True
+    return False
+
+
+def owner_name_address_match(owner1, owner2) -> bool:
+    """Check if 2 owner json name and addresses are identical."""
+    address_match: bool = False
+    name_match: bool = False
+    if owner1.get('address') and owner2.get('address') and owner1.get('address') == owner2.get('address'):
+        address_match = True
+    if owner1.get('organizationName') and owner2.get('organizationName') and \
+            owner1.get('organizationName') == owner2.get('organizationName'):
+        name_match = True
+    elif owner1.get('individualName') and owner2.get('individualName') and \
+            owner1.get('individualName') == owner2.get('individualName'):
+        name_match = True
+    return address_match and name_match

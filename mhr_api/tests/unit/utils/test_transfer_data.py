@@ -813,19 +813,20 @@ ADD_GROUP = {
         ],
         'type': 'JOINT'
 }
+SUBMITTING = {
+  'businessName': 'ABC SEARCHING COMPANY',
+  'address': {
+    'street': '222 SUMMER STREET',
+    'city': 'VICTORIA',
+    'region': 'BC',
+    'country': 'CA',
+    'postalCode': 'V8W 2V8'
+  }
+}
 TRANS_QS_1 = {
   'mhrNumber': '125234',
   'registrationType': 'TRANS',
-  'submittingParty': {
-    'businessName': 'ABC SEARCHING COMPANY',
-    'address': {
-      'street': '222 SUMMER STREET',
-      'city': 'VICTORIA',
-      'region': 'BC',
-      'country': 'CA',
-      'postalCode': 'V8W 2V8'
-    }
-  },
+  'submittingParty': SUBMITTING,
   'deleteOwnerGroups': [
     {
       'groupId': 4,
@@ -883,16 +884,7 @@ TRANS_QS_1 = {
 TRANS_QS_2 = {
   'mhrNumber': '125234',
   'registrationType': 'TRANS',
-  'submittingParty': {
-    'businessName': 'ABC SEARCHING COMPANY',
-    'address': {
-      'street': '222 SUMMER STREET',
-      'city': 'VICTORIA',
-      'region': 'BC',
-      'country': 'CA',
-      'postalCode': 'V8W 2V8'
-    }
-  },
+  'submittingParty': SUBMITTING,
   'deleteOwnerGroups': [
     {
       'groupId': 4,
@@ -994,16 +986,7 @@ TRANS_QS_2 = {
 TRANS_QS_3 = {
   'mhrNumber': '125234',
   'registrationType': 'TRANS',
-  'submittingParty': {
-    'businessName': 'ABC SEARCHING COMPANY',
-    'address': {
-      'street': '222 SUMMER STREET',
-      'city': 'VICTORIA',
-      'region': 'BC',
-      'country': 'CA',
-      'postalCode': 'V8W 2V8'
-    }
-  },
+  'submittingParty': SUBMITTING,
   'deleteOwnerGroups': [
     {
       'groupId': 4,
@@ -1149,16 +1132,7 @@ TRANS_QS_3 = {
 TRANS_TC_3 = {
   'mhrNumber': '004834',
   'registrationType': 'TRANS',
-  'submittingParty': {
-    'businessName': 'ABC SEARCHING COMPANY',
-    'address': {
-      'street': '222 SUMMER STREET',
-      'city': 'VICTORIA',
-      'region': 'BC',
-      'country': 'CA',
-      'postalCode': 'V8W 2V8'
-    }
-  },
+  'submittingParty': SUBMITTING,
   'deleteOwnerGroups': [
     {
       'groupId': 3,
@@ -1257,5 +1231,299 @@ TRANS_TC_3 = {
   'consideration': '$78766.00',
   'transferDate': '2022-10-04T20:29:36+00:00'
 }
-
-
+TRANS_TC_4 = {
+  'mhrNumber': '100443',
+  'registrationType': 'TRANS',
+  'submittingParty': SUBMITTING,
+  'deleteOwnerGroups': [
+    {
+      'groupId': 5,
+      'owners': [
+        {
+          'individualName': {
+            'first': 'BRENT',
+            'last': 'BOGLE'
+          },
+          'partyType': 'OWNER_IND',
+          'address': {
+            'street': '43 - 8300 GALLAGHER LAKE FRONTAGE ROAD',
+            'city': 'OLIVER',
+            'region': 'BC',
+            'postalCode': 'V0H 1T2',
+            'country': 'CA'
+          }
+        }
+      ],
+        'type': 'COMMON',
+        'interest': 'UNDIVIDED 1/100',
+        'interestNumerator': 1,
+        'interestDenominator': 100
+    }
+  ],
+  'addOwnerGroups': [
+    {
+      'groupId': 6,
+      'owners': [
+        {
+          'individualName': {
+            'first': 'JANET',
+            'middle': 'ALICE',
+            'last': 'HUFF'
+          },
+          'partyType': 'OWNER_IND',
+          'address': {
+            'street': '3122B LYNNLARK PLACE',
+            'city': 'VICTORIA',
+            'region': 'BC',
+            'postalCode': ' ',
+            'country': 'CA'
+          }
+        }
+      ],
+        'type': 'COMMON',
+        'interest': 'UNDIVIDED 1/100',
+        'interestNumerator': 1,
+        'interestDenominator': 100
+    }
+  ],
+  'declaredValue': 78766,
+  'consideration': '$78766.00',
+  'transferDate': '2022-10-04T20:29:36+00:00'
+}
+TRANS_TC_5 = {
+  'mhrNumber': '100443',
+  'registrationType': 'TRANS',
+  'submittingParty': SUBMITTING,
+  'deleteOwnerGroups': [
+    {
+      'groupId': 4,
+      'owners': [
+        {
+          'individualName': {
+            'first': 'ARTHUR',
+            'middle': 'ROSS',
+            'last': 'WOODLAND'
+          },
+          'partyType': 'EXECUTOR',
+          'description': 'EXECUTOR OF THE WILL OF BLANCHE ROSE VERDERA BUSTIN, DECEASED',
+          'address': {
+            'street': '1002 WHARF STREET',
+            'city': 'VICTORIA',
+            'region': 'BC',
+            'postalCode': 'V8W 1T4',
+            'country': 'CA'
+          }
+        }
+      ],
+        'type': 'NA',
+        'interest': 'UNDIVIDED 99/100',
+        'interestNumerator': 99,
+        'interestDenominator': 100
+    }, {
+      'groupId': 5,
+      'owners': [
+        {
+          'individualName': {
+            'first': 'BRENT',
+            'last': 'BOGLE'
+          },
+          'partyType': 'OWNER_IND',
+          'address': {
+            'street': '43 - 8300 GALLAGHER LAKE FRONTAGE ROAD',
+            'city': 'OLIVER',
+            'region': 'BC',
+            'postalCode': 'V0H 1T2',
+            'country': 'CA'
+          }
+        }
+      ],
+        'type': 'COMMON',
+        'interest': 'UNDIVIDED 1/100',
+        'interestNumerator': 1,
+        'interestDenominator': 100
+    }
+  ],
+  'addOwnerGroups': [
+    {
+      'groupId': 4,
+      'owners': [
+        {
+          'individualName': {
+            'first': 'ARTHUR',
+            'middle': 'ROSS',
+            'last': 'WOODLAND'
+          },
+          'partyType': 'EXECUTOR',
+          'description': 'EXECUTOR OF THE WILL OF BLANCHE ROSE VERDERA BUSTIN, DECEASED',
+          'address': {
+            'street': '1002 WHARF STREET',
+            'city': 'VICTORIA',
+            'region': 'BC',
+            'postalCode': 'V8W 1T4',
+            'country': 'CA'
+          }
+        }
+      ],
+        'type': 'NA',
+        'interest': 'UNDIVIDED 99/100',
+        'interestNumerator': 99,
+        'interestDenominator': 100
+    }, {
+      'groupId': 6,
+      'owners': [
+        {
+          'individualName': {
+            'first': 'JANET',
+            'middle': 'ALICE',
+            'last': 'HUFF'
+          },
+          'partyType': 'OWNER_IND',
+          'address': {
+            'street': '3122B LYNNLARK PLACE',
+            'city': 'VICTORIA',
+            'region': 'BC',
+            'postalCode': ' ',
+            'country': 'CA'
+          }
+        }
+      ],
+        'type': 'COMMON',
+        'interest': 'UNDIVIDED 1/100',
+        'interestNumerator': 1,
+        'interestDenominator': 100
+    }
+  ],
+  'declaredValue': 78766,
+  'consideration': '$78766.00',
+  'transferDate': '2022-10-04T20:29:36+00:00'
+}
+TRANS_TC_6 = {
+  'mhrNumber': '100443',
+  'registrationType': 'TRANS',
+  'submittingParty': SUBMITTING,
+  'deleteOwnerGroups': [
+    {
+      'groupId': 4,
+      'owners': [
+        {
+          'individualName': {
+            'first': 'ARTHUR',
+            'middle': 'ROSS',
+            'last': 'WOODLAND'
+          },
+          'partyType': 'EXECUTOR',
+          'description': 'EXECUTOR OF THE WILL OF BLANCHE ROSE VERDERA BUSTIN, DECEASED',
+          'address': {
+            'street': '1002 WHARF STREET',
+            'city': 'VICTORIA',
+            'region': 'BC',
+            'postalCode': 'V8W 1T4',
+            'country': 'CA'
+          }
+        }
+      ],
+        'type': 'NA',
+        'interest': 'UNDIVIDED 99/100',
+        'interestNumerator': 99,
+        'interestDenominator': 100
+    }, {
+      'groupId': 5,
+      'owners': [
+        {
+          'individualName': {
+            'first': 'BRENT',
+            'last': 'BOGLE'
+          },
+          'partyType': 'OWNER_IND',
+          'address': {
+            'street': '43 - 8300 GALLAGHER LAKE FRONTAGE ROAD',
+            'city': 'OLIVER',
+            'region': 'BC',
+            'postalCode': 'V0H 1T2',
+            'country': 'CA'
+          }
+        }
+      ],
+        'type': 'COMMON',
+        'interest': 'UNDIVIDED 1/100',
+        'interestNumerator': 1,
+        'interestDenominator': 100
+    }
+  ],
+  'addOwnerGroups': [
+    {
+      'groupId': 4,
+      'owners': [
+        {
+          'individualName': {
+            'first': 'ARTHUR',
+            'middle': 'ROSS',
+            'last': 'WOODLAND'
+          },
+          'partyType': 'EXECUTOR',
+          'description': 'EXECUTOR OF THE WILL OF BLANCHE ROSE VERDERA BUSTIN, DECEASED',
+          'address': {
+            'street': '1002 WHARF STREET',
+            'city': 'VICTORIA',
+            'region': 'BC',
+            'postalCode': 'V8W 1T4',
+            'country': 'CA'
+          }
+        }
+      ],
+        'type': 'NA',
+        'interest': 'UNDIVIDED 98/100',
+        'interestNumerator': 98,
+        'interestDenominator': 100
+    }, {
+      'groupId': 6,
+      'owners': [
+        {
+          'individualName': {
+            'first': 'JANET',
+            'middle': 'ALICE',
+            'last': 'HUFF'
+          },
+          'partyType': 'OWNER_IND',
+          'address': {
+            'street': '3122B LYNNLARK PLACE',
+            'city': 'VICTORIA',
+            'region': 'BC',
+            'postalCode': ' ',
+            'country': 'CA'
+          }
+        }
+      ],
+        'type': 'COMMON',
+        'interest': 'UNDIVIDED 1/100',
+        'interestNumerator': 1,
+        'interestDenominator': 100
+    }, {
+      'groupId': 7,
+      'owners': [
+        {
+          'individualName': {
+            'first': 'JEROLD',
+            'middle': 'ARTHUR',
+            'last': 'MACBETH'
+          },
+          'partyType': 'OWNER_IND',
+          'address': {
+            'street': '3122B LYNNLARK PLACE',
+            'city': 'VICTORIA',
+            'region': 'BC',
+            'postalCode': ' ',
+            'country': 'CA'
+          }
+        }
+      ],
+        'type': 'COMMON',
+        'interest': 'UNDIVIDED 1/100',
+        'interestNumerator': 1,
+        'interestDenominator': 100
+    }
+  ],
+  'declaredValue': 78766,
+  'consideration': '$78766.00',
+  'transferDate': '2022-10-04T20:29:36+00:00'
+}
