@@ -24,6 +24,7 @@ import { MhrRegistrationType } from '@/resources'
 import { mockedManufacturerAuthRoles } from './test-data'
 import { defaultFlagSet } from '@/utils'
 import { StaffPayment } from '@bcrs-shared-components/staff-payment'
+import { HomeSections } from '@/components/mhrRegistration'
 
 Vue.use(Vuetify)
 
@@ -57,7 +58,7 @@ function createComponent (): Wrapper<any> {
 }
 
 describe('Mhr Review Confirm registration', () => {
-  let wrapper: any
+  let wrapper: Wrapper<any>
   sessionStorage.setItem('KEYCLOAK_TOKEN', 'token')
   const currentAccount = {
     id: 'test_id'
@@ -175,6 +176,21 @@ describe('Mhr Review Confirm registration', () => {
     expect(homeOwnersTable.text()).toContain(mockedPerson.phoneExtension)
     expect(homeOwnersTable.text()).toContain(mockedPerson.address.city)
     expect(homeOwnersTable.text()).toContain(HomeTenancyTypes.NA)
+  })
+
+  it('does not show portions of yourHomeReview and SubmittingPartyReview if no data was entered', async () => {
+    wrapper = createComponent()
+    const yourHomeReview = wrapper.findComponent(YourHomeReview)
+    expect(yourHomeReview.exists()).toBeTruthy()
+    expect(yourHomeReview.findComponent(HomeSections).exists()).toBe(false)
+    await store.setMhrHomeDescription({ key: 'manufacturer', value: 'test' })
+    expect(yourHomeReview.findComponent(HomeSections).exists()).toBe(true)
+
+    const submittingPartyReview = wrapper.findComponent(SubmittingPartyReview)
+    expect(submittingPartyReview.exists()).toBeTruthy()
+    expect(submittingPartyReview.find('#review-submitting-party-section').exists()).toBe(false)
+    await store.setMhrSubmittingParty({ key: 'phoneNumber', value: '123' })
+    expect(submittingPartyReview.find('#review-submitting-party-section').exists()).toBe(true)
   })
 })
 
