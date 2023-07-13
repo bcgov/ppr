@@ -36,3 +36,13 @@ export function addTimestampToDate (dateToConvert: string, isEndDate: boolean): 
   }
   return dateToConvert
 }
+
+/**
+ * Checks if an object or its nested objects
+ * have a non-object property with a truthy value
+ */
+export function hasTruthyValue (obj: Object) {
+  return Object.values(obj).some(
+    (value) => !!value && (typeof value === 'object' ? hasTruthyValue(value) : true)
+  )
+}
