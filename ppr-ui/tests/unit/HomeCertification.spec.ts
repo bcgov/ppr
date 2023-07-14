@@ -12,31 +12,11 @@ import flushPromises from 'flush-promises'
 import { MhrRegistrationType } from '@/resources'
 import { mockedManufacturerAuthRoles } from './test-data'
 import { HomeCertificationOptions, AuthRoles } from '@/enums'
-import { getTestId } from './utils'
+import { getTestId, createComponent } from './utils'
 
 Vue.use(Vuetify)
 
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
 const store = useStore()
-
-/**
- * Creates and mounts a component, so that it can be tested.
- *
- * @returns a Wrapper<SearchBar> object with the given parameters.
- */
-function createComponent (): Wrapper<any> {
-  const localVue = createLocalVue()
-
-  localVue.use(Vuetify)
-  document.body.setAttribute('data-app', 'true')
-  return mount((HomeCertification as any), {
-    localVue,
-    propsData: {},
-    store,
-    vuetify
-  })
-}
 
 describe('Home Certification - staff', () => {
   let wrapper: Wrapper<any>
@@ -46,7 +26,7 @@ describe('Home Certification - staff', () => {
   })
 
   beforeEach(async () => {
-    wrapper = createComponent()
+    wrapper = createComponent(HomeCertification, {})
     await store.setMhrHomeDescription({ key: 'certificationOption', value: null })
     await store.setMhrHomeDescription({ key: 'noCertification', value: null })
     wrapper.vm.certificationOption = null
@@ -194,7 +174,7 @@ describe('Home Certification - manufacturer', () => {
   })
 
   beforeEach(async () => {
-    wrapper = createComponent()
+    wrapper = createComponent(HomeCertification, {})
     await nextTick()
     await flushPromises()
   })
