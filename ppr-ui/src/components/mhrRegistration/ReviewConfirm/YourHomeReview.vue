@@ -100,7 +100,7 @@
         </template>
 
         <!-- Has no home certification is checked -->
-        <template v-else-if="getMhrRegistrationHomeDescription.noCertification">
+        <template v-else-if="getMhrRegistrationHomeDescription.hasNoCertification">
           <v-row no-gutters class="pa-6">
             <v-col cols="3">
               <h3>Home Certification</h3>

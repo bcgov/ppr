@@ -16,7 +16,7 @@ export interface MhrRegistrationDescriptionIF {
   engineerName: string,
   engineerDate: string,
   certificationOption?: HomeCertificationOptions, // Optional because it's a local property. Not used for submission
-  noCertification?: boolean, // For staff registration use only. Not submitted with registration
+  hasNoCertification?: boolean, // For staff registration use only. Not submitted with registration
   rebuiltRemarks: string,
   otherRemarks: string
 }

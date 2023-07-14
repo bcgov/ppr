@@ -207,12 +207,12 @@ export default defineComponent({
         localState.submitting = true
         const data = buildApiData()
 
-        // In cases where noCertification is selected:
-        // Need to clear noCertification for submission and replace it with an empty csa number
+        // In cases where hasNoCertification is selected:
+        // Need to clear hasNoCertification for submission and replace it with an empty csa number
         // This is to meet the API Schema requirements.
         // This does not apply to drafts as we want to maintain that property for resuming drafts
-        if (data?.description?.noCertification) {
-          delete data.description.noCertification
+        if (data?.description?.hasNoCertification) {
+          delete data.description.hasNoCertification
           data.description.csaNumber = ''
         }
 

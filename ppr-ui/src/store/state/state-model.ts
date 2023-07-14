@@ -239,7 +239,7 @@ export const stateModel: StateModelIF = {
       engineerName: '',
       engineerDate: '',
       certificationOption: null,
-      noCertification: null,
+      hasNoCertification: null,
       rebuiltRemarks: '',
       otherRemarks: ''
     }

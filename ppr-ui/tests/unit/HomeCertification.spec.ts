@@ -1,9 +1,8 @@
 // Libraries
 import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { createPinia, setActivePinia } from 'pinia'
 import { useStore } from '../../src/store/store'
-import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
+import { Wrapper } from '@vue/test-utils'
 
 // Components
 import { HomeCertification } from '@/components/mhrRegistration'
@@ -12,7 +11,7 @@ import flushPromises from 'flush-promises'
 import { MhrRegistrationType } from '@/resources'
 import { mockedManufacturerAuthRoles } from './test-data'
 import { HomeCertificationOptions, AuthRoles } from '@/enums'
-import { getTestId, createComponent } from './utils'
+import { createComponent } from './utils'
 
 Vue.use(Vuetify)
 
@@ -28,7 +27,7 @@ describe('Home Certification - staff', () => {
   beforeEach(async () => {
     wrapper = createComponent(HomeCertification, {})
     await store.setMhrHomeDescription({ key: 'certificationOption', value: null })
-    await store.setMhrHomeDescription({ key: 'noCertification', value: null })
+    await store.setMhrHomeDescription({ key: 'hasNoCertification', value: null })
     wrapper.vm.certificationOption = null
     wrapper.vm.hasNoCertification = false
     await nextTick()
@@ -55,7 +54,7 @@ describe('Home Certification - staff', () => {
     expect(wrapper.find('#csa-form').isVisible()).toBe(false)
     expect(wrapper.find('#engineer-form').isVisible()).toBe(false)
     expect(wrapper.find('#no-certification-checkbox').isVisible()).toBe(true)
-    expect(wrapper.find(getTestId('no-certification-tooltip')).exists()).toBe(true)
+    expect(wrapper.find('#no-certification-tooltip').exists()).toBe(true)
   })
 
   it('opens the CSA Form when selected', async () => {
@@ -198,6 +197,6 @@ describe('Home Certification - manufacturer', () => {
     expect(wrapper.find('#csa-form').isVisible()).toBe(true)
     expect(wrapper.find('#engineer-form').exists()).toBe(false)
     expect(wrapper.find('#no-certification').exists()).toBe(false)
-    expect(wrapper.find(getTestId('no-certification-tooltip')).exists()).toBe(false)
+    expect(wrapper.find('#no-certification-tooltip').exists()).toBe(false)
   })
 })

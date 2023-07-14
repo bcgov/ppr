@@ -1,10 +1,10 @@
 <template>
   <v-card
-  id="mhr-home-certification"
-  class="mt-8 pa-8 pr-6"
-  flat
-  rounded
-  :class="{ 'py-10': isMhrManufacturerRegistration }"
+    id="mhr-home-certification"
+    class="mt-8 pa-8 pr-6"
+    flat
+    rounded
+    :class="{ 'py-10': isMhrManufacturerRegistration }"
   >
     <v-row no-gutters>
       <v-col cols="12" sm="2">
@@ -112,13 +112,12 @@
             label="There is no certification available for this home."
             v-model="hasNoCertification"
             class="mt-9 float-left"
-            data-test-id="no-certification-checkbox"
           />
           <v-tooltip
+            id="no-certification-tooltip"
             top
             content-class="top-tooltip pa-4"
             transition="fade-transition"
-            data-test-id="no-certification-tooltip"
             nudge-right="4"
           >
             <template v-slot:activator="{ on }">
@@ -224,7 +223,7 @@ export default defineComponent({
         const utcDate = createUtcDate(getMhrRegistrationHomeDescription.value?.baseInformation.year, 0, 1)
         return localTodayDate(utcDate)
       }),
-      hasNoCertification: getMhrRegistrationHomeDescription.value?.noCertification || false
+      hasNoCertification: getMhrRegistrationHomeDescription.value?.hasNoCertification || false
     })
 
     const validateForms = async () => {
@@ -279,7 +278,7 @@ export default defineComponent({
     })
 
     watch(() => localState.hasNoCertification, (val: boolean) => {
-      setMhrHomeDescription({ key: 'noCertification', value: localState.hasNoCertification })
+      setMhrHomeDescription({ key: 'hasNoCertification', value: localState.hasNoCertification })
       localState.certificationOption = null
       engineerForm.value?.resetValidation()
       csaForm.value?.resetValidation()
