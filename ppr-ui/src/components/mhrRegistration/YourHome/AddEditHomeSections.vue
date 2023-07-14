@@ -119,7 +119,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, ref, toRefs } from 'vue-demi'
+import { computed, defineComponent, reactive, ref, toRefs, nextTick } from 'vue-demi'
 /* eslint-disable no-unused-vars */
 import { FormIF, HomeSectionIF } from '@/interfaces'
 import { useInputRules } from '@/composables/useInputRules'
@@ -172,8 +172,10 @@ export default defineComponent({
 
     const close = (): void => { context.emit('close') }
     const remove = (): void => { context.emit('remove') }
-    const submit = (): void => {
+    const submit = async (): Promise<void> => {
       localState.hasSubmit = true
+      await nextTick()
+
       addEditHomeSectionsForm.value?.validate()
 
       if (localState.addEditValid) {
