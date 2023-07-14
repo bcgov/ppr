@@ -260,7 +260,7 @@ class Db2Owngroup(db.Model):
         tenancy: str = new_info.get('type', Db2Owngroup.TenancyTypes.SOLE)
         tenancy_type: str = NEW_TENANCY_LEGACY.get(tenancy)
         if tenancy == MhrTenancyTypes.NA and len(new_info.get('owners')) > 1:
-            tenancy_type = Db2Owngroup.TenancyTypes.JOINT
+            tenancy_type = Db2Owngroup.TenancyTypes.JOINT.value
         interest: str = new_info.get('interest', '')
         if tenancy_type == Db2Owngroup.TenancyTypes.COMMON or \
                 (tenancy_type == Db2Owngroup.TenancyTypes.JOINT and new_info.get('interestDenominator') and
@@ -282,7 +282,9 @@ class Db2Owngroup(db.Model):
                                lessor=new_info.get('lessor', ''),
                                interest=interest,
                                interest_numerator=new_info.get('interestNumerator', 0),
-                               tenancy_specified=new_info.get('tenancySpecified', 'Y'))
+                               tenancy_specified='Y')
+        if 'tenancySpecified' in new_info and not new_info.get('tenancySpecified'):
+            owngroup.tenancy_specified = 'N'
         owngroup.interest_denominator = new_info.get('interestDenominator', 0)
         owngroup.owners = []
         # TBD: only applies to JOINT tenancy type with 2 or more executors:
