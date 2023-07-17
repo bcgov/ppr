@@ -30,6 +30,7 @@ export * from './transferTypes'
 export * from './homeOwnerPartyTypes'
 export * from './unitNoteDocTypes'
 export * from './effectiveDateTypes'
+export * from './mhrSubProductActions'
 
 // external enums
 export { CorpTypeCd } from '@bcrs-shared-components/corp-type-module'
