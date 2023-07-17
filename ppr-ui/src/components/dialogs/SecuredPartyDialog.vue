@@ -16,7 +16,7 @@
           </v-row>
           <v-row no-gutters v-if="!isDuplicate" class="pt-5">
             <v-col class="text-md-center ml-8">
-              <h1 class="dialogTitle">{{ totalParties }} Similar {{ partyWord }} Parties Found</h1>
+              <h1 class="dialogTitle">{{ totalParties }} Similar Secured Parties Found</h1>
             </v-col>
           </v-row>
           <v-row v-else no-gutters class="pt-5">
@@ -36,9 +36,9 @@
 
       <div>
         <p v-if="!isDuplicate" class="text-md-center px-6 pt-3 intro">
-          One or more similar {{ partyWord }} Parties were found. Do you want to use an
-          existing {{ partyWord }} Party listed below or use your information to create
-          a new {{ partyWord }} Party?
+          One or more similar Secured Parties were found. Do you want to use an
+          existing Secured Party listed below or use your information to create
+          a new Secured Party?
         </p>
         <p v-else-if="!isReview" class="text-md-center px-6 pt-3 intro">
           Registrations cannot list a Secured Party with the same name and address more than once. This registration
@@ -52,7 +52,7 @@
       </div>
       <div class="partyWindow">
         <div v-if="!isDuplicate" class="text-md-center generic-label" id="create-new-party">
-          Use my information and create a new {{ partyWord }} Party:
+          Use my information and create a new Secured Party:
         </div>
 
         <v-container class="currentParty">
@@ -97,12 +97,12 @@
         </v-container>
 
         <div v-if="!isDuplicate" class="text-md-center generic-label">
-          Use an existing {{ partyWord }} Party:
+          Use an existing Secured Party:
         </div>
         <v-container v-if="!isDuplicate">
           <v-row
             class="searchResponse"
-            :class="isExistingSecuredParty(result.code, isRegisteringParty)
+            :class="isExistingSecuredParty(result.code)
                     ? 'company-row-no-hover' : 'companyRow'"
             v-for="(result, i) in results"
             :key="i"
@@ -121,10 +121,10 @@
                 {{ getCountryName(result.address.country) }}
               </div>
               <div class="addressText">
-                {{ partyWord }} Party Code: {{ result.code }}
+                Secured Party Code: {{ result.code }}
               </div>
             </v-col>
-            <v-col v-if="!isExistingSecuredParty(result.code, isRegisteringParty)" cols="2" class="pt-5">
+            <v-col v-if="!isExistingSecuredParty(result.code)" cols="2" class="pt-5">
               <v-btn
                 class="ml-auto float-right partyButton"
                 color="primary"
@@ -178,7 +178,6 @@ import { useSecuredParty } from '@/composables/parties'
 import {
   useCountriesProvinces
 } from '@/composables/address/factories'
-import { ActionTypes } from '@/enums'
 import ErrorContact from '@/components/common/ErrorContact.vue'
 
 export default defineComponent({
@@ -201,10 +200,6 @@ export default defineComponent({
       type: Boolean,
       default: false
     },
-    isRegisteringParty: {
-      type: Boolean,
-      default: false
-    },
     activeIndex: {
       type: Number,
       default: -1
@@ -224,19 +219,12 @@ export default defineComponent({
       }),
       totalParties: computed((): number => {
         return props.defaultResults.length
-      }),
-      partyWord: computed((): string => {
-        if (props.isRegisteringParty) {
-          return 'Registering'
-        }
-        return 'Secured'
       })
     })
 
     const countryProvincesHelpers = useCountriesProvinces()
 
     const {
-      setRegisteringParty,
       isExistingSecuredParty,
       addEditSecuredParty,
       currentSecuredParty
@@ -250,24 +238,14 @@ export default defineComponent({
         emailAddress: selectedResult.emailAddress,
         code: selectedResult.code
       }
-      if (props.isRegisteringParty) {
-        newParty.action = ActionTypes.EDITED
-        setRegisteringParty(newParty)
-      } else {
-        currentSecuredParty.value = newParty
-        addEditSecuredParty(props.activeIndex)
-      }
+      currentSecuredParty.value = newParty
+      addEditSecuredParty(props.activeIndex)
       context.emit('emitResetClose')
     }
 
     const createParty = () => {
-      if (props.isRegisteringParty) {
-        localState.party.action = ActionTypes.EDITED
-        setRegisteringParty(localState.party)
-      } else {
-        currentSecuredParty.value = localState.party
-        addEditSecuredParty(props.activeIndex)
-      }
+      currentSecuredParty.value = localState.party
+      addEditSecuredParty(props.activeIndex)
       context.emit('emitResetClose')
     }
 

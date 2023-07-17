@@ -46,21 +46,3 @@ describe('Secured Party Dialog SA tests', () => {
     expect(wrapper.find('.currentParty .businessName').text()).toBe(mockedSecuredParties1[0].businessName)
   })
 })
-
-describe('Registering Party Dialog SA tests', () => {
-  let wrapper: Wrapper<any>
-
-  beforeEach(async () => {
-    wrapper = createComponent(SecuredPartyDialog, props)
-  })
-  afterEach(() => {
-    wrapper.destroy()
-  })
-
-  it('renders with default values', async () => {
-    expect(wrapper.findComponent(SecuredPartyDialog).exists()).toBe(true)
-    wrapper.setProps({ isRegisteringParty: true })
-    await nextTick()
-    expect(wrapper.find('#create-new-party').text()).toContain('new Registering Party')
-  })
-})
