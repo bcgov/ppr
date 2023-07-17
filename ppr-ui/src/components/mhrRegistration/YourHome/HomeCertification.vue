@@ -106,12 +106,12 @@
 
         <!-- Home Certification Checkbox -->
         <template v-if="isRoleStaffReg">
-          <v-divider  v-if="certificationOption" class="mt-7 ml-0 mr-2"/>
+          <v-divider v-if="certificationOption" class="mt-4 ml-0 mr-2"/>
           <v-checkbox
             id="no-certification-checkbox"
             label="There is no certification available for this home."
             v-model="hasNoCertification"
-            class="mt-9 float-left"
+            class="mt-8 pt-0 mb-n4 float-left"
           />
           <v-tooltip
             id="no-certification-tooltip"
@@ -122,7 +122,7 @@
           >
             <template v-slot:activator="{ on }">
               <v-icon
-                class="ml-2 mt-10"
+                class="ml-2 mt-8"
                 color="primary"
                 v-on="on"
               >
