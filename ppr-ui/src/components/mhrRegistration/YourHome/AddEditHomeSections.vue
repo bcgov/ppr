@@ -1,5 +1,10 @@
 <template>
-  <v-card flat rounded id="add-edit-home-sections-form" class="mt-2 mb-5 pa-7">
+  <v-card
+    id="add-edit-home-sections-form"
+    flat
+    rounded
+    class="mt-2 mb-5 pa-7"
+    :class="{'border-error-left': validate && isNewHomeSection }">
     <v-form ref="addEditHomeSectionsForm" v-model="addEditValid">
       <v-row no-gutters>
         <v-col cols="12" sm="2">
@@ -130,7 +135,8 @@ export default defineComponent({
   emits: ['close', 'remove', 'submit'],
   props: {
     isNewHomeSection: { type: Boolean, default: true },
-    editHomeSection: { type: Object as () => HomeSectionIF, default: () => {} }
+    editHomeSection: { type: Object as () => HomeSectionIF, default: () => {} },
+    validate: { type: Boolean, default: false }
   },
   setup (props, context) {
     const {
