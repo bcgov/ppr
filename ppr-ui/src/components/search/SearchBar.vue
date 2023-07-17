@@ -97,12 +97,12 @@
             >
               <template v-slot:append>
                 <v-progress-circular
-                    v-if="loadingSearchResults"
-                    indeterminate
-                    color="primary"
-                    class="mx-3"
-                    :size="25"
-                    :width="3"
+                  v-if="loadingSearchResults"
+                  indeterminate
+                  color="primary"
+                  class="mx-3"
+                  :size="25"
+                  :width="3"
                 />
               </template>
             </v-text-field>
@@ -653,7 +653,7 @@ export default defineComponent({
     watch(() => localState.searchValue, (val: string) => {
       if (!val) localState.validations = null
       else localState.validations = validateSearchRealTime(localState)
-      if ((localState.isBusinessDebtor || localState.isMhrOrgSearch) && localState.autoCompleteIsActive) {
+      if ((localState.isBusinessDebtor || localState.isMhrOrgSearch)) {
         localState.autoCompleteSearchValue = val
       }
       // show autocomplete results when there is a searchValue and if no error messages
@@ -674,8 +674,8 @@ export default defineComponent({
     watch(() => localState.selectedSearchType, (val: SearchTypeIF) => {
       localState.validations = null
       localState.searchValue = null
-      if (val.searchTypeAPI !== APISearchTypes.BUSINESS_DEBTOR) localState.autoCompleteIsActive = false
-      else localState.autoCompleteIsActive = true
+      localState.autoCompleteIsActive = [APISearchTypes.BUSINESS_DEBTOR, APIMHRMapSearchTypes.MHRORGANIZATION_NAME]
+        .includes(val.searchTypeAPI as APISearchTypes|APIMHRMapSearchTypes)
     })
 
     return {
