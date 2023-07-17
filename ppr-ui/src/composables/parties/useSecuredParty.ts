@@ -93,7 +93,7 @@ export const useSecuredParty = (context?) => {
     }
   }
 
-  const isExistingSecuredParty = (partyCode: string, isRegisteringParty: boolean): boolean => {
+  const isExistingSecuredParty = (partyCode: string, isRegisteringParty: boolean = false): boolean => {
     if (isRegisteringParty) {
       return getAddSecuredPartiesAndDebtors.value?.registeringParty?.code === partyCode
     }

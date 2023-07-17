@@ -1,12 +1,12 @@
 <template>
   <div id="edit-party" class="white pa-6" :class="{ 'border-error-left': setShowErrorBar }">
     <secured-party-dialog
+      v-if="!isRegisteringParty"
       attach="#app"
       :isDuplicate="foundDuplicate"
       :defaultDialog="toggleDialog"
       :defaultParty="currentSecuredParty"
       :defaultResults="dialogResults"
-      :isRegisteringParty="isRegisteringParty"
       :activeIndex="activeIndex"
       @emitResetClose="closeAndReset"
       @emitClose="toggleDialog = false"
@@ -369,14 +369,21 @@ export default defineComponent({
           currentSecuredParty.value.personName.middle = ''
           currentSecuredParty.value.personName.last = ''
         }
+
+        if (props.isRegisteringParty) {
+          setRegisteringParty(currentSecuredParty.value)
+          context.emit('resetEvent')
+          return
+        }
+
         // check for duplicate
-        if (!props.isRegisteringParty &&
-          hasMatchingSecuredParty(currentSecuredParty.value, props.isEditMode, props.activeIndex)) {
+        if (hasMatchingSecuredParty(currentSecuredParty.value, props.isEditMode, props.activeIndex)) {
           // trigger duplicate secured party dialog
           localState.foundDuplicate = true
           showDialog()
           return
         }
+
         if (currentSecuredParty.value.businessName && localState.isPartyTypeBusiness) {
           if (!isEqual(currentSecuredParty, originalSecuredParty)) {
             // go to the service and see if there are similar secured parties
@@ -393,12 +400,7 @@ export default defineComponent({
           }
         }
 
-        if (props.isRegisteringParty) {
-          setRegisteringParty(currentSecuredParty.value)
-          context.emit('resetEvent')
-        } else {
-          addEditSecuredParty(props.activeIndex)
-        }
+        addEditSecuredParty(props.activeIndex)
       } else {
         // trigger show validation
         localState.showAllAddressErrors = !localState.showAllAddressErrors
