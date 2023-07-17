@@ -28,6 +28,7 @@
       <AddEditHomeSections
         v-if="showAddEditHomeSections"
         :isNewHomeSection="isNewHomeSection"
+        :validate="validate"
         @close="showAddEditHomeSections = false"
         @submit="addHomeSection($event)"
       />
