@@ -1,9 +1,8 @@
 // Libraries
 import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
-import { createPinia, setActivePinia } from 'pinia'
 import { useStore } from '../../src/store/store'
-import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
+import { Wrapper } from '@vue/test-utils'
 
 // Components
 import { HomeCertification } from '@/components/mhrRegistration'
@@ -11,44 +10,35 @@ import { SharedDatePicker } from '@/components/common'
 import flushPromises from 'flush-promises'
 import { MhrRegistrationType } from '@/resources'
 import { mockedManufacturerAuthRoles } from './test-data'
-import { HomeCertificationOptions } from '@/enums'
+import { HomeCertificationOptions, AuthRoles } from '@/enums'
+import { createComponent } from './utils'
 
 Vue.use(Vuetify)
 
-const vuetify = new Vuetify({})
-setActivePinia(createPinia())
 const store = useStore()
-
-/**
- * Creates and mounts a component, so that it can be tested.
- *
- * @returns a Wrapper<SearchBar> object with the given parameters.
- */
-function createComponent (): Wrapper<any> {
-  const localVue = createLocalVue()
-
-  localVue.use(Vuetify)
-  document.body.setAttribute('data-app', 'true')
-  return mount((HomeCertification as any), {
-    localVue,
-    propsData: {},
-    store,
-    vuetify
-  })
-}
 
 describe('Home Certification - staff', () => {
   let wrapper: Wrapper<any>
 
+  beforeAll(async () => {
+    await store.setAuthRoles([AuthRoles.PPR_STAFF, AuthRoles.STAFF, AuthRoles.MHR, AuthRoles.PPR])
+  })
+
   beforeEach(async () => {
-    wrapper = createComponent()
+    wrapper = createComponent(HomeCertification, {})
     await store.setMhrHomeDescription({ key: 'certificationOption', value: null })
+    await store.setMhrHomeDescription({ key: 'hasNoCertification', value: null })
     wrapper.vm.certificationOption = null
+    wrapper.vm.hasNoCertification = false
     await nextTick()
     await flushPromises()
   })
   afterEach(() => {
     wrapper.destroy()
+  })
+
+  afterAll(async () => {
+    await store.setAuthRoles([])
   })
 
   it('renders base component with default sub components', async () => {
@@ -63,6 +53,8 @@ describe('Home Certification - staff', () => {
     // Verify Forms hidden before radio btn selection
     expect(wrapper.find('#csa-form').isVisible()).toBe(false)
     expect(wrapper.find('#engineer-form').isVisible()).toBe(false)
+    expect(wrapper.find('#no-certification-checkbox').isVisible()).toBe(true)
+    expect(wrapper.find('#no-certification-tooltip').exists()).toBe(true)
   })
 
   it('opens the CSA Form when selected', async () => {
@@ -142,6 +134,32 @@ describe('Home Certification - staff', () => {
     await wrapper.find('#engineer-option').trigger('click')
     expect(wrapper.findComponent(SharedDatePicker).exists()).toBe(true)
   })
+
+  it('collapses form if no certification checkbox is selected', async () => {
+    await wrapper.find('#csa-option').trigger('click')
+    expect(wrapper.find('#csa-form').isVisible()).toBe(true)
+
+    await wrapper.find('#no-certification-checkbox').trigger('click')
+    expect(wrapper.find('#csa-form').isVisible()).toBe(false)
+  })
+
+  it('disables buttons if no certification checkbox is selected', async () => {
+    await wrapper.find('#no-certification-checkbox').trigger('click')
+
+    expect(wrapper.find('#csa-option').attributes('disabled')).toBe('disabled')
+    expect(wrapper.find('#engineer-option').attributes('disabled')).toBe('disabled')
+
+    // Enables button after unselected
+    await wrapper.find('#no-certification-checkbox').trigger('click')
+    expect(wrapper.find('#csa-option').attributes('disabled')).toBe(undefined)
+    expect(wrapper.find('#engineer-option').attributes('disabled')).toBe(undefined)
+  })
+
+  it('sets the home certification section to valid if no certification checkbox is selected', async () => {
+    expect(store.getMhrRegistrationValidationModel.yourHomeValid.homeCertificationValid).toBe(false)
+    await wrapper.find('#no-certification-checkbox').trigger('click')
+    expect(store.getMhrRegistrationValidationModel.yourHomeValid.homeCertificationValid).toBe(true)
+  })
 })
 
 describe('Home Certification - manufacturer', () => {
@@ -155,7 +173,7 @@ describe('Home Certification - manufacturer', () => {
   })
 
   beforeEach(async () => {
-    wrapper = createComponent()
+    wrapper = createComponent(HomeCertification, {})
     await nextTick()
     await flushPromises()
   })
@@ -178,5 +196,7 @@ describe('Home Certification - manufacturer', () => {
     // Verify only csa-form is shown
     expect(wrapper.find('#csa-form').isVisible()).toBe(true)
     expect(wrapper.find('#engineer-form').exists()).toBe(false)
+    expect(wrapper.find('#no-certification').exists()).toBe(false)
+    expect(wrapper.find('#no-certification-tooltip').exists()).toBe(false)
   })
 })

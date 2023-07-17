@@ -128,6 +128,7 @@ export const useNewMhrRegistration = () => {
         engineerName: '',
         engineerDate: '',
         certificationOption: null,
+        hasNoCertification: null,
         rebuiltRemarks: '',
         otherRemarks: ''
       }

@@ -205,7 +205,18 @@ export default defineComponent({
       if (localState.isValidMhrRegistration) {
         // Submit Filing
         localState.submitting = true
-        const mhrSubmission = await submitMhrRegistration(buildApiData(), parseStaffPayment())
+        const data = buildApiData()
+
+        // In cases where hasNoCertification is selected:
+        // Need to clear hasNoCertification for submission and replace it with an empty csa number
+        // This is to meet the API Schema requirements.
+        // This does not apply to drafts as we want to maintain that property for resuming drafts
+        if (data?.description?.hasNoCertification) {
+          delete data.description.hasNoCertification
+          data.description.csaNumber = ''
+        }
+
+        const mhrSubmission = await submitMhrRegistration(data, parseStaffPayment())
         localState.submitting = false
         if (!mhrSubmission.error && mhrSubmission?.mhrNumber) {
           resetAllValidations()

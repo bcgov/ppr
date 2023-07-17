@@ -1,16 +1,24 @@
 <template>
-  <v-card flat rounded id="mhr-home-certification" class="mt-8 pa-8 pr-6" :class="{'py-10': !showRadio}">
+  <v-card
+    id="mhr-home-certification"
+    class="mt-8 pa-8 pr-6"
+    flat
+    rounded
+    :class="{ 'py-10': isMhrManufacturerRegistration }"
+  >
     <v-row no-gutters>
       <v-col cols="12" sm="2">
-        <label class="generic-label" :class="{'error-text': validate}">Certification</label>
+        <label class="generic-label" :class="{ 'error-text': validate }">Certification</label>
       </v-col>
       <v-col cols="12" sm="10" class="pl-1">
-        <template v-if="showRadio">
+        <template v-if="!isMhrManufacturerRegistration">
           <v-radio-group
             id="certification-option-btns"
             v-model="certificationOption"
             class="mt-0 pr-1" row
             hide-details="true"
+            :disabled="hasNoCertification"
+            :class="{ 'disabled-radio': hasNoCertification }"
           >
             <v-radio
               id="csa-option"
@@ -27,7 +35,7 @@
               :value="HomeCertificationOptions.ENGINEER_INSPECTION"
             />
           </v-radio-group>
-          <v-divider class="my-9 ml-0 mr-2" v-if="!!certificationOption"/>
+          <v-divider v-if="!!certificationOption" class="my-9 ml-0 mr-2"/>
         </template>
 
         <!-- CSA Section -->
@@ -61,7 +69,7 @@
         </div>
 
         <!-- Engineer Section -->
-        <div v-show="isEngineerOption" v-if="showEngineerOption">
+        <div v-if="!isMhrManufacturerRegistration" v-show="isEngineerOption">
           <v-row no-gutters>
             <v-col cols="12">
               <v-form id="engineer-form" ref="engineerForm" v-model="isEngineerValid">
@@ -95,6 +103,38 @@
             </v-col>
           </v-row>
         </div>
+
+        <!-- Home Certification Checkbox -->
+        <template v-if="isRoleStaffReg">
+          <v-divider v-if="certificationOption" class="mt-4 ml-0 mr-2"/>
+          <v-checkbox
+            id="no-certification-checkbox"
+            label="There is no certification available for this home."
+            v-model="hasNoCertification"
+            class="mt-8 pt-0 mb-n4 float-left"
+          />
+          <v-tooltip
+            id="no-certification-tooltip"
+            top
+            content-class="top-tooltip pa-4"
+            transition="fade-transition"
+            nudge-right="4"
+          >
+            <template v-slot:activator="{ on }">
+              <v-icon
+                class="ml-2 mt-8"
+                color="primary"
+                v-on="on"
+              >
+                mdi-information-outline
+              </v-icon>
+            </template>
+            If a CSA Number or Engineer’s Inspection is not available for this home,
+            select this option and enter a description of the safety evidence in the
+            Other Information section.
+          </v-tooltip>
+        </template>
+
       </v-col>
     </v-row>
   </v-card>
@@ -126,7 +166,7 @@ export default defineComponent({
   setup (props) {
     const { setMhrHomeDescription } = useStore()
     const { getMhrRegistrationHomeDescription, getMhrRegistrationValidationModel,
-      isMhrManufacturerRegistration } = storeToRefs(useStore())
+      isMhrManufacturerRegistration, isRoleStaffReg } = storeToRefs(useStore())
     // Composable(s)
     const {
       customRules,
@@ -144,7 +184,6 @@ export default defineComponent({
     const datePicker = ref(null) as FormIF
 
     const localState = reactive({
-      homeCertificationValid: false,
       certificationOption: getMhrRegistrationHomeDescription.value?.certificationOption || null,
       csaNumber: getMhrRegistrationHomeDescription.value?.csaNumber || '',
       csaStandard: getMhrRegistrationHomeDescription.value?.csaStandard || '',
@@ -175,7 +214,8 @@ export default defineComponent({
       }),
       isHomeCertificationValid: computed((): boolean => {
         return (localState.isCsaOption && localState.isCsaValid) ||
-          (localState.isEngineerOption && localState.isEngineerValid && !!localState.engineerDate)
+          (localState.isEngineerOption && localState.isEngineerValid && !!localState.engineerDate) ||
+          localState.hasNoCertification
       }),
       today: computed(() => localTodayDate()),
       minDate: computed(() => {
@@ -183,8 +223,7 @@ export default defineComponent({
         const utcDate = createUtcDate(getMhrRegistrationHomeDescription.value?.baseInformation.year, 0, 1)
         return localTodayDate(utcDate)
       }),
-      showRadio: computed(() => !isMhrManufacturerRegistration.value),
-      showEngineerOption: computed(() => !isMhrManufacturerRegistration.value)
+      hasNoCertification: getMhrRegistrationHomeDescription.value?.hasNoCertification || false
     })
 
     const validateForms = async () => {
@@ -215,7 +254,7 @@ export default defineComponent({
     })
     watch(() => localState.isHomeCertificationValid, (val: boolean) => {
       setValidation(MhrSectVal.YOUR_HOME_VALID, MhrCompVal.HOME_CERTIFICATION_VALID, val)
-    })
+    }, { immediate: true })
     watch(() => props.validate, async (val: boolean) => {
       await validateForms()
     })
@@ -237,11 +276,25 @@ export default defineComponent({
         localState.csaStandard = ''
       }
     })
+
+    watch(() => localState.hasNoCertification, (val: boolean) => {
+      setMhrHomeDescription({ key: 'hasNoCertification', value: localState.hasNoCertification })
+      localState.certificationOption = null
+      engineerForm.value?.resetValidation()
+      csaForm.value?.resetValidation()
+      localState.engineerName = ''
+      localState.engineerDate = ''
+      localState.csaNumber = ''
+      localState.csaStandard = ''
+    })
+
     return {
       csaForm,
       engineerForm,
       datePicker,
       HomeCertificationOptions,
+      isMhrManufacturerRegistration,
+      isRoleStaffReg,
       required,
       ...toRefs(localState)
     }
@@ -296,6 +349,10 @@ export default defineComponent({
     .v-list-item__title, .v-list-item .v-list-item__subtitle {
       color: $app-blue !important;
     }
+  }
+
+  .disabled-radio {
+   opacity: 40% !important;
   }
 }
 </style>

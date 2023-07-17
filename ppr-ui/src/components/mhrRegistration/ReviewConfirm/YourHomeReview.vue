@@ -99,7 +99,19 @@
           </template>
         </template>
 
-        <!-- Default no Home Certification option is selected -->
+        <!-- Has no home certification is checked -->
+        <template v-else-if="getMhrRegistrationHomeDescription.hasNoCertification">
+          <v-row no-gutters class="pa-6">
+            <v-col cols="3">
+              <h3>Home Certification</h3>
+            </v-col>
+            <v-col cols="9">
+              <p>There is no certification available for this home.</p>
+            </v-col>
+          </v-row>
+        </template>
+
+        <!-- No option selected -->
         <template v-else>
           <v-row no-gutters class="pa-6">
             <v-col cols="3">
