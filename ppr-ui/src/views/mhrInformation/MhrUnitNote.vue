@@ -50,6 +50,7 @@
                   :setRightOffset="true"
                   :setShowFeeSummary="true"
                   :setFeeType="feeType"
+                  :setErrMsg="feeSummaryErrorMsg"
                   @cancel="goToDash()"
                   @back="isReviewMode = false"
                   @submit="goToReview()"
@@ -131,7 +132,7 @@ export default defineComponent({
 
       isUnitNoteAddValid: computed((): boolean => {
         const { documentId, remarks, personGivingNotice } =
-          getMhrUnitNoteValidation.value.unitNoteAddValid
+          getMhrUnitNoteValidation.value
         return documentId && remarks && personGivingNotice
       }),
 
@@ -139,6 +140,12 @@ export default defineComponent({
       feeType: FeeSummaryTypes.MHR_UNIT_NOTE,
       reviewConfirmText: computed((): string => {
         return localState.isReviewMode ? 'Register Changes and Pay' : 'Review and Confirm'
+      }),
+      feeSummaryErrorMsg: computed((): string => {
+        const isValid = localState.isReviewMode ? localState.isUnitNoteReviewValid : localState.isUnitNoteValid
+        return localState.validate && !isValid
+          ? '< Please complete required information'
+          : ''
       })
     })
 

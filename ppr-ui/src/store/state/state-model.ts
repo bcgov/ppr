@@ -370,7 +370,8 @@ export const stateModel: StateModelIF = {
       remarksValid: false,
       personGivingNoticeValid: false,
       submittingPartyValid: false,
-      attentionValid: false,
+      effectiveDateTimeValid: true, // pre-selected value is valid by default
+      attentionValid: true, // optional so valid by default
       authorizationValid: false,
       staffPaymentValid: false
     }

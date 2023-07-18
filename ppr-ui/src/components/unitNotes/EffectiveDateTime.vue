@@ -120,7 +120,7 @@ export default defineComponent({
       default: () => {}
     }
   },
-  emits: ['setStoreProperty', 'isValid'],
+  emits: ['isValid', 'setStoreProperty'],
   setup (props, { emit }) {
     const { required } = useInputRules()
 

@@ -39,6 +39,7 @@
         }"
         :validate="validate"
         @setStoreProperty="handleEffectiveDateUpdate($event)"
+        @isValid="handleComponentValid(MhrCompVal.EFFECTIVE_DATE_TIME_VALID, $event)"
       />
     </section>
 
@@ -157,6 +158,7 @@ export default defineComponent({
       }),
       isUnitNoteReviewValid: computed((): boolean =>
         getValidation(MhrSectVal.UNIT_NOTE_VALID, MhrCompVal.SUBMITTING_PARTY_VALID) &&
+        getValidation(MhrSectVal.UNIT_NOTE_VALID, MhrCompVal.EFFECTIVE_DATE_TIME_VALID) &&
         getValidation(MhrSectVal.UNIT_NOTE_VALID, MhrCompVal.ATTENTION_VALID) &&
         getValidation(MhrSectVal.UNIT_NOTE_VALID, MhrCompVal.AUTHORIZATION_VALID) &&
         getValidation(MhrSectVal.UNIT_NOTE_VALID, MhrCompVal.STAFF_PAYMENT_VALID)
