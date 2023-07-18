@@ -1,4 +1,4 @@
-import { RegistrationFlowType } from '@/enums'
+import { RegistrationFlowType, UnitNoteStatusTypes } from '@/enums'
 import { PartyIF, RegistrationTypeIF, StateModelIF } from '@/interfaces'
 
 export const stateModel: StateModelIF = {
@@ -341,7 +341,7 @@ export const stateModel: StateModelIF = {
       createDateTime: '',
       effectiveDateTime: '',
       expiryDateTime: '',
-      status: null,
+      status: UnitNoteStatusTypes.ACTIVE,
       remarks: '',
       givingNoticeParty: {
         businessName: '',
@@ -361,7 +361,7 @@ export const stateModel: StateModelIF = {
         emailAddress: '',
         phoneNumber: ''
       } as PartyIF,
-      destroyed: null
+      destroyed: false
     }
   },
   mhrUnitNoteValidationState: {
@@ -370,7 +370,8 @@ export const stateModel: StateModelIF = {
       remarksValid: false,
       personGivingNoticeValid: false,
       submittingPartyValid: false,
-      attentionValid: false,
+      effectiveDateTimeValid: true, // pre-selected value is valid by default
+      attentionValid: true, // optional so valid by default
       authorizationValid: false,
       staffPaymentValid: false
     }

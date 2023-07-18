@@ -180,3 +180,12 @@ export const changeTransferType: DialogOptionsIF = {
   title: 'Change Transfer Type',
   text: 'Changing the Transfer Type will undo any changes you have made and return you to the original state.'
 }
+
+export const unitNoteFilingError: DialogOptionsIF = {
+  acceptText: 'OK',
+  cancelText: '',
+  hasContactInfo: true,
+  title: 'Unable to file a Unit Note',
+  text: 'We are unable to file Unit Note at this time. Please try again later. ' +
+  'If this issue persists, please contact us.'
+}

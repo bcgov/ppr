@@ -1,6 +1,13 @@
 <template>
   <div id="unit-note-review-confirm">
 
+    <h1>
+      Review and Confirm
+    </h1>
+    <p class="mt-7">
+      Review your changes and complete the additional information before registering.
+    </p>
+
     <UnitNoteReviewDetailsTable
       :unitNote="getMhrUnitNote"
       :unitNoteType="unitNoteType.header"
@@ -17,7 +24,7 @@
           sideLabel: 'Add Submitting Party'
         }"
         :validate="validate"
-        :setStoreProperty="setSubmittingParty"
+        @setStoreProperty="handleStoreUpdate('submittingParty', $event)"
         @isValid="handleComponentValid(MhrCompVal.SUBMITTING_PARTY_VALID, $event)"
       />
     </section>
@@ -32,6 +39,7 @@
         }"
         :validate="validate"
         @setStoreProperty="handleEffectiveDateUpdate($event)"
+        @isValid="handleComponentValid(MhrCompVal.EFFECTIVE_DATE_TIME_VALID, $event)"
       />
     </section>
 
@@ -78,10 +86,10 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs } from 'vue-demi'
+import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue-demi'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
-import { PartyIF, SubmittingPartyIF } from '@/interfaces'
+import { PartyIF } from '@/interfaces'
 import { UnitNotesInfo } from '@/resources/unitNotes'
 import { MhrCompVal, MhrSectVal } from '@/composables/mhrRegistration/enums'
 import { useMhrValidations } from '@/composables'
@@ -110,7 +118,8 @@ export default defineComponent({
       default: false
     }
   },
-  setup () {
+  emits: ['isValid'],
+  setup (props, { emit }) {
     const {
       getMhrUnitNote,
       getMhrUnitNoteRegistration,
@@ -130,7 +139,6 @@ export default defineComponent({
     } = useMhrValidations(toRefs(getMhrUnitNoteValidation.value))
 
     const localState = reactive({
-      validate: false,
       validateSubmittingParty: false,
       unitNoteType: UnitNotesInfo[getMhrUnitNote.value.documentType],
       givingNoticeParty: computed((): PartyIF => getMhrUnitNote.value.givingNoticeParty),
@@ -145,14 +153,17 @@ export default defineComponent({
       },
       validateStaffPayment: computed(() => {
         return isRoleStaffReg.value &&
-        localState.validate &&
+        props.validate &&
         !getValidation(MhrSectVal.UNIT_NOTE_VALID, MhrCompVal.STAFF_PAYMENT_VALID)
-      })
+      }),
+      isUnitNoteReviewValid: computed((): boolean =>
+        getValidation(MhrSectVal.UNIT_NOTE_VALID, MhrCompVal.SUBMITTING_PARTY_VALID) &&
+        getValidation(MhrSectVal.UNIT_NOTE_VALID, MhrCompVal.EFFECTIVE_DATE_TIME_VALID) &&
+        getValidation(MhrSectVal.UNIT_NOTE_VALID, MhrCompVal.ATTENTION_VALID) &&
+        getValidation(MhrSectVal.UNIT_NOTE_VALID, MhrCompVal.AUTHORIZATION_VALID) &&
+        getValidation(MhrSectVal.UNIT_NOTE_VALID, MhrCompVal.STAFF_PAYMENT_VALID)
+      )
     })
-
-    const setSubmittingParty = (val: SubmittingPartyIF) => {
-      setMhrUnitNoteRegistration({ key: 'submittingParty', value: val })
-    }
 
     const handleEffectiveDateUpdate = (val: string) => {
       setMhrUnitNote({ key: 'effectiveDateTime', value: val })
@@ -163,6 +174,10 @@ export default defineComponent({
 
     const handleComponentValid = (component: MhrCompVal, isValid: boolean) => {
       setValidation(MhrSectVal.UNIT_NOTE_VALID, component, isValid)
+    }
+
+    const handleStoreUpdate = (key: string, val) => {
+      setMhrUnitNoteRegistration({ key: key, value: val })
     }
 
     const effectiveDateDescForCAU = getMhrUnitNote.value.documentType === UnitNoteDocTypes.NOTICE_OF_CAUTION
@@ -215,13 +230,24 @@ export default defineComponent({
       setStaffPayment(staffPaymentData)
     }
 
+    onMounted(() => {
+      // scroll to top
+      setTimeout(() => {
+        document.getElementById('unit-note-review-confirm').scrollIntoView({ behavior: 'smooth' })
+      }, 500)
+    })
+
+    watch(() => localState.isUnitNoteReviewValid, (val) => {
+      emit('isValid', val)
+    })
+
     return {
       isRoleStaffReg,
       MhrCompVal,
       getMhrUnitNote,
-      setSubmittingParty,
       handleEffectiveDateUpdate,
       handleComponentValid,
+      handleStoreUpdate,
       onStaffPaymentDataUpdate,
       effectiveDateDescForCAU,
       ...toRefs(localState)

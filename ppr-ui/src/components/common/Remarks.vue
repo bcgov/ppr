@@ -6,7 +6,7 @@
       <v-card
         id="remarks-card"
         class="py-6 px-8 rounded"
-        :class="{ 'border-error-left': showErrors }"
+        :class="{ 'border-error-left': showBorderError }"
         flat
       >
         <v-row>
@@ -14,7 +14,7 @@
               <label
                 for="remarks-textarea"
                 class="generic-label"
-                :class="{ 'error-text': showErrors }"
+                :class="{ 'error-text': showBorderError }"
               >Add Remarks</label>
             </v-col>
           <v-col cols="10">
@@ -42,7 +42,7 @@ import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
 
 export default defineComponent({
   name: 'Remarks',
-  emits: ['isValid'],
+  emits: ['isValid', 'setStoreProperty'],
   props: {
     unitNoteRemarks: {
       type: String,
@@ -50,10 +50,6 @@ export default defineComponent({
     },
     description: {
       type: String
-    },
-    setStoreProperty: {
-      type: Function,
-      required: true
     },
     validate: {
       type: Boolean,
@@ -66,13 +62,13 @@ export default defineComponent({
     const localState = reactive({
       isFormValid: false,
       remarks: props.unitNoteRemarks,
-      showErrors: computed(() => props.validate && !localState.isFormValid)
+      showBorderError: computed(() => props.validate && !localState.isFormValid)
     })
 
     watch(
       () => localState.remarks,
       (val: string) => {
-        props.setStoreProperty(val)
+        emit('setStoreProperty', val)
       }
     )
 

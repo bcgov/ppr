@@ -6,7 +6,7 @@
     <PartySearch
       v-if="!hidePartySearch"
       isMhrPartySearch
-      @selectItem="setStoreProperty($event)"
+      @selectItem="emitStoreUpdate($event)"
     />
 
     <v-card
@@ -14,13 +14,13 @@
       flat
       rounded
       class="mt-8 pa-8 pr-6"
-      :class="{ 'border-error-left': showError }"
+      :class="{ 'border-error-left': showBorderError }"
     >
       <v-row no-gutters>
         <v-col cols="12" sm="3">
           <label
             class="generic-label"
-            :class="{ 'error-text': showError }"
+            :class="{ 'error-text': showBorderError }"
           >
             {{ content.sideLabel }}
           </label>
@@ -191,7 +191,7 @@ import { PartySearch } from '../parties/party'
 
 export default defineComponent({
   name: 'ContactInformation',
-  emits: ['isValid'],
+  emits: ['isValid', 'setStoreProperty'],
   components: {
     BaseAddress,
     PartySearch
@@ -208,10 +208,6 @@ export default defineComponent({
     content: {
       type: Object as () => ContentIF,
       default: () => {}
-    },
-    setStoreProperty: {
-      type: Function,
-      required: true
     },
     hidePartySearch: {
       type: Boolean,
@@ -251,16 +247,22 @@ export default defineComponent({
       hasLongCombinedName: false,
       longCombinedNameErrorMsg: computed(() =>
         localState.hasLongCombinedName ? 'Person\'s Legal Name combined cannot exceed 40 characters' : ''),
-      isContactInfoValid: computed(() =>
-        localState.isContactInfoFormValid && localState.isAddressValid
-      ),
       isPersonOption: computed((): boolean =>
         localState.contactInfoType === SubmittingPartyTypes.PERSON
       ),
       isBusinessOption: computed((): boolean =>
         localState.contactInfoType === SubmittingPartyTypes.BUSINESS
       ),
-      showError: computed(() => props.validate && !localState.isContactInfoFormValid)
+      showBorderError: computed((): boolean => props.validate &&
+        !(localState.isContactInfoFormValid && localState.isAddressValid))
+    })
+
+    const emitStoreUpdate = (val) => {
+      emit('setStoreProperty', val)
+    }
+
+    watch(() => [localState.isContactInfoFormValid, localState.isAddressValid], () => {
+      emit('isValid', localState.isContactInfoFormValid && localState.isAddressValid)
     })
 
     watch(() => localState.contactInfoModel.businessName, (val: string) => {
@@ -270,7 +272,7 @@ export default defineComponent({
     })
 
     watch(() => localState.contactInfoModel, (val) => {
-      props.setStoreProperty(val)
+      emitStoreUpdate(val)
     }, { deep: true, immediate: true })
 
     const clearFields = () => {
@@ -290,16 +292,12 @@ export default defineComponent({
       contactInfoForm.value?.validate()
     })
 
-    watch(() => localState.isContactInfoValid, (val: boolean) => {
-      emit('isValid', val)
-    })
-
     watch(() => localState.contactInfoModel.personName, async () => {
       localState.hasLongCombinedName =
         props.enableCombinedNameValidation &&
-        (0 || localState.contactInfoModel.personName?.first.length) +
-        (0 || localState.contactInfoModel.personName?.middle.length) +
-        (0 || localState.contactInfoModel.personName?.last.length) > 40
+        (0 || localState.contactInfoModel.personName?.first?.length) +
+        (0 || localState.contactInfoModel.personName?.middle?.length) +
+        (0 || localState.contactInfoModel.personName?.last?.length) > 40
     }, { deep: true })
 
     const firstNameRules = customRules(
@@ -338,6 +336,8 @@ export default defineComponent({
 
     return {
       clearFields,
+      emitStoreUpdate,
+      contactInfoForm,
       emailRules,
       firstNameRules,
       middleNameRules,

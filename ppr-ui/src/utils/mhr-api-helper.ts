@@ -430,6 +430,27 @@ export async function submitMhrTransfer (payloadData, mhrNumber, staffPayment) {
   }
 }
 
+// Register a Unit Note on an existing manufactured home.
+export async function submitMhrUnitNote (mhrNumber, payloadData) {
+  try {
+    const result = await axios.post(`notes/${mhrNumber}`, payloadData, getDefaultConfig())
+    if (!result?.data) {
+      throw new Error('Invalid API response')
+    }
+    return result.data
+  } catch (error: any) {
+    return {
+      error: {
+        category: ErrorCategories.MHR_UNIT_NOTE_FILING,
+        statusCode: error?.response?.status || StatusCodes.BAD_REQUEST,
+        message: error?.response?.data?.message || error?.errorMessage,
+        detail: error?.response?.data?.rootCause?.detail || error?.rootCause,
+        type: error?.response?.data?.rootCause?.type?.trim() as ErrorCodes || ErrorCodes.SERVICE_UNAVAILABLE
+      } as ErrorIF
+    }
+  }
+}
+
 export async function fetchMhRegistration (
   mhRegistrationNum: string
 ): Promise<any> {
@@ -646,6 +667,20 @@ export async function deleteMhrDraft (draftID: string): Promise<ErrorIF> {
 // UX util function to delay any actions for defined number of milliseconds
 export function delayActions (milliseconds: number): Promise<any> {
   return new Promise(resolve => setTimeout(resolve, milliseconds))
+}
+
+// Delete empty properties and objects and used to cleanup payload before API submission
+export function deleteEmptyProperties (obj) {
+  for (const key in obj) {
+    if (typeof obj[key] === 'object') {
+      deleteEmptyProperties(obj[key]) // recursively process nested objects
+      if (Object.keys(obj[key]).length === 0) {
+        delete obj[key] // delete empty nested object
+      }
+    } else if (obj[key] === null || obj[key] === undefined || obj[key] === '') {
+      delete obj[key] // delete empty property value
+    }
+  }
 }
 
 const UIFilterToApiFilter = {

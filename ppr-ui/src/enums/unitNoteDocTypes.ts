@@ -17,7 +17,7 @@ export enum UnitNoteDocTypes {
 }
 
 export enum UnitNoteStatusTypes {
-  ACTIVE,
-  CANCELLED,
-  EXPIRED
+  ACTIVE = 'ACTIVE',
+  CANCELLED = 'CANCELLED',
+  EXPIRED = 'EXPIRED'
 }

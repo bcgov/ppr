@@ -1,6 +1,10 @@
 <template>
   <v-container class="view-container pa-0" fluid>
 
+    <v-overlay v-model="loading">
+      <v-progress-circular color="primary" size="50" indeterminate />
+    </v-overlay>
+
     <BaseDialog
       :setOptions="cancelOptions"
       :setDisplay="showCancelDialog"
@@ -28,14 +32,10 @@
             </div>
 
             <div v-else class="pt-3" data-test-id="unit-note-review">
-              <h1>
-               Review and Confirm
-              </h1>
-              <p class="mt-7">
-                Review your changes and complete the additional information before registering.
-              </p>
-
-              <UnitNoteReview />
+              <UnitNoteReview
+                :validate="validate"
+                @isValid="isUnitNoteReviewValid = $event"
+              />
             </div>
           </v-col>
 
@@ -50,6 +50,7 @@
                   :setRightOffset="true"
                   :setShowFeeSummary="true"
                   :setFeeType="feeType"
+                  :setErrMsg="feeSummaryErrorMsg"
                   @cancel="goToDash()"
                   @back="isReviewMode = false"
                   @submit="goToReview()"
@@ -76,6 +77,9 @@ import { BaseDialog } from '@/components/dialogs'
 import { UnitNotesInfo } from '@/resources/unitNotes'
 import { unsavedChangesDialog } from '@/resources/dialogOptions/cancelDialogs'
 import { UnitNoteAdd, UnitNoteReview } from '@/components/unitNotes'
+import { ErrorIF } from '@/interfaces'
+import { useMhrUnitNote, useMhrValidations } from '@/composables'
+import { scrollToFirstErrorComponent } from '@/utils'
 
 export default defineComponent({
   name: 'MhrUnitNote',
@@ -87,21 +91,35 @@ export default defineComponent({
   },
   props: {
   },
-  setup () {
+  setup (props, context) {
     const router = useRouter()
 
     const {
-      setUnsavedChanges
+      setUnsavedChanges,
+      setEmptyUnitNoteRegistration
     } = useStore()
 
     const {
       hasUnsavedChanges,
       getMhrUnitNoteType,
-      getMhrInformation
+      getMhrUnitNoteRegistration,
+      getMhrInformation,
+      getMhrUnitNoteValidation
     } = storeToRefs(useStore())
 
+    const {
+      resetAllValidations
+    } = useMhrValidations(toRefs(getMhrUnitNoteValidation.value))
+
+    const {
+      initUnitNote,
+      buildApiDataAndSubmit
+    } = useMhrUnitNote(getMhrUnitNoteType.value)
+
     const localState = reactive({
+      loading: false,
       isUnitNoteValid: false,
+      isUnitNoteReviewValid: false,
       validate: false,
       isReviewMode: false,
       cancelOptions: unsavedChangesDialog,
@@ -112,10 +130,22 @@ export default defineComponent({
       unitNote: UnitNotesInfo[getMhrUnitNoteType.value],
       mhrNumber: getMhrInformation.value.mhrNumber,
 
+      isUnitNoteAddValid: computed((): boolean => {
+        const { documentId, remarks, personGivingNotice } =
+          getMhrUnitNoteValidation.value
+        return documentId && remarks && personGivingNotice
+      }),
+
       // fee summary
       feeType: FeeSummaryTypes.MHR_UNIT_NOTE,
       reviewConfirmText: computed((): string => {
         return localState.isReviewMode ? 'Register Changes and Pay' : 'Review and Confirm'
+      }),
+      feeSummaryErrorMsg: computed((): string => {
+        const isValid = localState.isReviewMode ? localState.isUnitNoteReviewValid : localState.isUnitNoteValid
+        return localState.validate && !isValid
+          ? '< Please complete required information'
+          : ''
       })
     })
 
@@ -123,19 +153,53 @@ export default defineComponent({
       if (!getMhrUnitNoteType.value) {
         await router.push({ name: RouteNames.DASHBOARD })
       }
+
+      // set empty Unit Note but keep the Unit Note Document Type
+      const initialUnitNote = initUnitNote()
+      initialUnitNote.note.documentType = getMhrUnitNoteType.value
+
+      setEmptyUnitNoteRegistration(initialUnitNote)
+
+      // reset validation trigger
+      localState.validate = false
     })
 
     const goToReview = async (): Promise<void> => {
-      localState.validate = true // validate Unit Note components
+      localState.validate = true // trigger validation for Unit Note component
       await nextTick()
-      if (localState.isUnitNoteValid) localState.isReviewMode = true
+
+      if (localState.isReviewMode) {
+        if (!localState.isUnitNoteReviewValid) {
+          scrollToFirstErrorComponent()
+        } else {
+          // register Unit Note
+          localState.loading = true
+
+          // build payload and submit
+          const unitNoteRegistrationResp = await buildApiDataAndSubmit(getMhrUnitNoteRegistration.value)
+
+          if (!unitNoteRegistrationResp.error) {
+            resetAllValidations()
+            goToDash()
+          } else {
+            emitError(unitNoteRegistrationResp?.error)
+          }
+          localState.loading = false
+        }
+      } else if (localState.isUnitNoteValid) {
+        // go to Review if there are no errors on Unit Note Add screen
+        localState.isReviewMode = true
+        localState.validate = false
+      }
+
+      scrollToFirstErrorComponent()
     }
 
     const goToDash = (): void => {
       if (hasUnsavedChanges.value === true) localState.showCancelDialog = true
       else {
         setUnsavedChanges(false)
-        // resetValidationState()
+        resetAllValidations()
 
         router.push({
           name: RouteNames.DASHBOARD
@@ -143,10 +207,16 @@ export default defineComponent({
       }
     }
 
+    // Emit error to router view
+    const emitError = (error: ErrorIF): void => {
+      context.emit('error', error)
+    }
+
     const handleDialogResp = (val: boolean): void => {
       if (!val) {
         setUnsavedChanges(false)
         if (localState.showCancelDialog) {
+          resetAllValidations()
           goToDash()
         }
       }
@@ -157,6 +227,7 @@ export default defineComponent({
       goToReview,
       goToDash,
       handleDialogResp,
+      getMhrUnitNoteValidation,
       ...toRefs(localState)
     }
   }

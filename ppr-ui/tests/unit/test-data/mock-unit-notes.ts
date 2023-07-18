@@ -1,4 +1,4 @@
-import { MhApiStatusTypes, UnitNoteDocTypes } from '@/enums'
+import { UnitNoteDocTypes, UnitNoteStatusTypes } from '@/enums'
 import { UnitNoteIF } from '@/interfaces/unit-note-interfaces/unit-note-interface'
 
 export const mockUnitNotes: Array<UnitNoteIF> = [
@@ -23,7 +23,7 @@ export const mockUnitNotes: Array<UnitNoteIF> = [
       phoneNumber: '2508289998',
       emailAddress: 'testing@email.com'
     },
-    status: MhApiStatusTypes.ACTIVE,
+    status: UnitNoteStatusTypes.ACTIVE,
     destroyed: false
   },
   {
@@ -51,7 +51,7 @@ export const mockUnitNotes: Array<UnitNoteIF> = [
       phoneNumber: '2508289998',
       emailAddress: 'testing@email.com'
     },
-    status: MhApiStatusTypes.CANCELLED,
+    status: UnitNoteStatusTypes.CANCELLED,
     destroyed: false
   },
   {
@@ -79,7 +79,7 @@ export const mockUnitNotes: Array<UnitNoteIF> = [
       phoneNumber: '2508289998',
       emailAddress: 'testing@email.com'
     },
-    status: MhApiStatusTypes.EXPIRED,
+    status: UnitNoteStatusTypes.EXPIRED,
     destroyed: false
   },
   {
@@ -103,7 +103,7 @@ export const mockUnitNotes: Array<UnitNoteIF> = [
       phoneNumber: '2508289998',
       emailAddress: 'testing@email.com'
     },
-    status: MhApiStatusTypes.ACTIVE,
+    status: UnitNoteStatusTypes.ACTIVE,
     destroyed: false
   },
   {
@@ -131,7 +131,7 @@ export const mockUnitNotes: Array<UnitNoteIF> = [
       phoneNumber: '2508289998',
       emailAddress: 'testing@email.com'
     },
-    status: MhApiStatusTypes.CANCELLED,
+    status: UnitNoteStatusTypes.CANCELLED,
     destroyed: false
   },
   {
@@ -159,7 +159,7 @@ export const mockUnitNotes: Array<UnitNoteIF> = [
       phoneNumber: '2508289998',
       emailAddress: 'testing@email.com'
     },
-    status: MhApiStatusTypes.CANCELLED,
+    status: UnitNoteStatusTypes.CANCELLED,
     destroyed: false
   },
   {
@@ -183,7 +183,7 @@ export const mockUnitNotes: Array<UnitNoteIF> = [
       phoneNumber: '2508289998',
       emailAddress: 'testing@email.com'
     },
-    status: MhApiStatusTypes.ACTIVE,
+    status: UnitNoteStatusTypes.ACTIVE,
     destroyed: false
   }
 ]
