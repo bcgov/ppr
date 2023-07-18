@@ -38,15 +38,30 @@
                   <p>Ensure ALL of the information below is correct before making any changes to this
                     registration. Necessary fees will be applied as updates are made.
                   </p>
+
+                  <!-- Unit Note Info -->
                   <p v-if="getMhrUnitNotes && getMhrUnitNotes.length >= 1">
                     There are unit notes attached to this manufactured home.
-                    <span v-if="!isRoleStaffReg">
-                      To view unit note information on this home, complete a manufactured home search.
-                    </span>
-                    <span v-else>
+                    <span v-if="isRoleStaffReg">
                       <a href="#unit-note-component">See Unit Notes</a>
                     </span>
+                    <span v-else>
+                      To view unit note information on this home, complete a manufactured home search.
+                    </span>
                   </p>
+
+                  <!-- Has Caution Message -->
+                  <template v-if="getMhrInformation.hasCaution">
+                    <header id="yellow-message-bar" class="message-bar mt-9">
+                      <label>
+                        <b>Important:</b> A Caution has been filed against this home.
+                        <span v-if="isRoleStaffReg">See unit notes for further details.</span>
+                        <span v-else>If you require further information please contact BC Registries staff.</span>
+                      </label>
+                    </header>
+                    <v-divider class="mx-0 mt-11" />
+                  </template>
+
                 </template>
                 <p class="mt-7" v-else>
                   Review your changes and complete the additional information before registering.
@@ -84,7 +99,11 @@
               </v-col>
             </v-row>
 
-            <header id="yellow-message-bar" class="message-bar" v-if="isReviewMode && !isTransferToExecutorProbateWill">
+            <header
+              v-if="isReviewMode && !isTransferToExecutorProbateWill"
+              id="yellow-message-bar"
+              class="message-bar mt-3 mb-5"
+            >
               <label><b>Important:</b> This information must match the information on the bill of sale.</label>
             </header>
 
@@ -941,8 +960,6 @@ export default defineComponent({
   background-color: $BCgovGold0;
   border: 1px solid $BCgovGold5;
   color: $gray7;
-  margin-top: 10px;
-  margin-bottom: 20px;
 }
 
 ::v-deep {

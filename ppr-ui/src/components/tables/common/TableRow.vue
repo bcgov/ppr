@@ -739,7 +739,7 @@ export default defineComponent({
     }
 
     const showExpireDays = (item: RegistrationSummaryIF): string => {
-      if (localState.isChild) return ''
+      if (localState.isChild && props.isPpr) return ''
       if (isExpired(item) || isDischarged(item)) return '—'
 
       const days = item.expireDays
