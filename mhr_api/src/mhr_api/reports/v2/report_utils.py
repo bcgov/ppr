@@ -54,6 +54,7 @@ REG_PAGE_PREFIX = 'Manufactured Home Registration Number: '
 class ReportTypes(BaseEnum):
     """Render an Enum of the MHR PDF report types."""
 
+    MHR_ADMIN_REGISTRATION = 'mhrAdminRegistration'
     MHR_COVER = 'mhrCover'
     MHR_EXEMPTION = 'mhrExemption'
     MHR_NOTE = 'mhrNote'
@@ -277,6 +278,7 @@ def get_report_meta_data(report_type: str = '') -> dict:
                                               ReportTypes.MHR_TRANSFER,
                                               ReportTypes.MHR_TRANSPORT_PERMIT,
                                               ReportTypes.MHR_EXEMPTION,
+                                              ReportTypes.MHR_ADMIN_REGISTRATION,
                                               ReportTypes.MHR_NOTE):
         return copy.deepcopy(REPORT_META_DATA)
     data = copy.deepcopy(REPORT_META_DATA)
@@ -298,6 +300,7 @@ def get_report_files(request_data: dict, report_type: str, mail: bool = False) -
                        ReportTypes.MHR_TRANSFER,
                        ReportTypes.MHR_TRANSPORT_PERMIT,
                        ReportTypes.MHR_EXEMPTION,
+                       ReportTypes.MHR_ADMIN_REGISTRATION,
                        ReportTypes.MHR_NOTE):
         if report_type in (ReportTypes.SEARCH_BODY_REPORT,
                            ReportTypes.SEARCH_DETAIL_REPORT,
@@ -313,7 +316,7 @@ def get_report_files(request_data: dict, report_type: str, mail: bool = False) -
         footer_text = request_data['templateVars'].get('footer_content', '')
     if report_type in (ReportTypes.MHR_REGISTRATION, ReportTypes.MHR_COVER, ReportTypes.MHR_REGISTRATION_COVER,
                        ReportTypes.MHR_TRANSFER, ReportTypes.MHR_EXEMPTION, ReportTypes.MHR_TRANSPORT_PERMIT,
-                       ReportTypes.MHR_NOTE):
+                       ReportTypes.MHR_NOTE, ReportTypes.MHR_ADMIN_REGISTRATION):
         subject_text = request_data['templateVars'].get('meta_subject', '')
         if report_type == ReportTypes.MHR_COVER:
             files['header.html'] = get_cover_header_data(title_text, subtitle_text, subject_text)

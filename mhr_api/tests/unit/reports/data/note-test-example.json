@@ -1,0 +1,49 @@
+{
+  "mhrNumber": "107710",
+  "createDateTime": "2023-06-19T18:39:33+00:00",
+  "registrationType": "REG_STAFF_ADMIN",
+  "status": "ACTIVE",
+  "clientReferenceId": "UT-CAU-001",
+  "attentionReference": "JACK BROWN",
+  "submittingParty": {
+    "businessName": "ABC SEARCHING COMPANY",
+    "address": {
+      "street": "222 SUMMER STREET",
+      "city": "VICTORIA",
+      "region": "BC",
+      "country": "CA",
+      "postalCode": "V8W 2V8"
+    },
+    "emailAddress": "bsmith@abc-search.com"
+  },
+  "note": {
+    "documentId": "63286842",
+    "documentType": "CAU",
+    "status": "ACTIVE",
+    "remarks": "CAU UNIT NOTE TEST",
+    "destroyed": false,
+    "createDateTime": "2023-06-19T18:39:33+00:00",
+    "documentDescription": "NOTICE OF CAUTION",
+    "documentRegistrationNumber": "00501411",
+    "effectiveDateTime": "2023-06-19T18:39:33+00:00",
+    "givingNoticeParty": {
+      "businessName": "HALSTON MODULAR HOMES LTD.",
+      "address": {
+        "street": "1222 SUMMER STREET",
+        "city": "VICTORIA",
+        "region": "BC",
+        "country": "CA",
+        "postalCode": "V8W 2V8"
+      },
+      "phoneNumber": "2508289999"
+    },
+    "expiryDateTime": "2023-09-17T18:39:33+00:00"
+  },
+  "hasCaution": true,
+  "payment": {
+    "invoiceId": "29236",
+    "receipt": "/api/v1/payment-requests/29236/receipts"
+  },
+  "usergroup": "ppr_staff",
+  "username": "Business Registry Test 1"
+}

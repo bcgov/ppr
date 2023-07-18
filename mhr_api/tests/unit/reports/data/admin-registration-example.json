@@ -1,0 +1,55 @@
+{
+  "mhrNumber": "060946",
+  "createDateTime": "2023-07-18T18:34:56+00:00",
+  "registrationType": "REG_STAFF_ADMIN",
+  "status": "ACTIVE",
+  "documentDescription": "NOTICE OF REDEMPTION",
+  "documentId": "90051583",
+  "documentRegistrationNumber": "00504168",
+  "clientReferenceId": "UT-ADMIN-NRED-TAXN-005",
+  "attentionReference": "JANE GIBSON",
+  "submittingParty": {
+    "businessName": "ABC SEARCHING COMPANY",
+    "address": {
+      "street": "222 SUMMER STREET",
+      "city": "VICTORIA",
+      "region": "BC",
+      "country": "CA",
+      "postalCode": "V8W 2V8"
+    },
+    "emailAddress": "bsmith@abc-search.com"
+  },
+  "documentType": "NRED",
+  "note": {
+    "documentId": "90051583",
+    "documentType": "NRED",
+    "status": "ACTIVE",
+    "remarks": "UT NRED CANCEL A NOTICE PURSUANT TO SECTION 413 OF THE LOCAL GOVERNMENT ACT WAS FILED",
+    "destroyed": false,
+    "createDateTime": "2023-07-18T18:34:56+00:00",
+    "documentDescription": "NOTICE OF REDEMPTION",
+    "documentRegistrationNumber": "00504168",
+    "effectiveDateTime": "2023-07-18T18:34:56+00:00",
+    "givingNoticeParty": {
+      "businessName": "FRONTIER LAW",
+      "address": {
+        "street": "#101-10343 100 AVENUE",
+        "city": "FORT ST. JOHN",
+        "region": "BC",
+        "country": "CA",
+        "postalCode": "V1J 1Y8"
+      },
+      "phoneNumber": "2507851924"
+    },
+    "cancelledDocumentType": "TAXN",
+    "cancelledDocumentDescription": "NOTICE OF TAX SALE",
+    "cancelledDocumentRegistrationNumber": "00102478"
+  },
+  "hasCaution": false,
+  "payment": {
+    "invoiceId": "29906",
+    "receipt": "/api/v1/payment-requests/29906/receipts"
+  },
+  "usergroup": "ppr_staff",
+  "username": "Business Registry Test 1"
+}

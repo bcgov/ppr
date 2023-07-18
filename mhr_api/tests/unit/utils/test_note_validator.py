@@ -20,6 +20,7 @@ from registry_schemas import utils as schema_utils
 
 from mhr_api.utils import note_validator as validator
 from mhr_api.models import MhrRegistration, utils as model_utils
+from mhr_api.models.type_tables import MhrDocumentTypes
 from mhr_api.services.authz import STAFF_ROLE
 
 
@@ -119,7 +120,7 @@ TEST_NOTE_DATA_EXPIRY = [
 # test data pattern is ({description}, {valid}, {doc_type}, {remarks}, {mhr_num}, {account}, {message_content})
 TEST_NOTE_DATA_REMARKS = [
     ('Invalid required', False, 'CAU', None, '102876', 'ppr_staff', validator.REMARKS_REQUIRED),
-    ('Valid NCAN allowed new rule', True, 'NCAN', 'REMARKS', '080104', 'ppr_staff', None),
+    ('Valid NCAN allowed new rule', True, 'NCAN', 'REMARKS', '045718', 'ppr_staff', None),
     ('Valid optional', True, 'NPUB', None, '102876', 'ppr_staff', None)
 ]
 # test data pattern is ({description}, {valid}, {doc_type}, {notice}, {mhr_num}, {account}, {message_content})
@@ -133,7 +134,13 @@ TEST_NOTE_DATA_NOTICE = [
     ('Valid optional', True, 'NPUB', None, '102876', 'ppr_staff', None),
     ('Valid', True, 'TAXN', NOTICE_VALID, '102876', 'ppr_staff', None)
 ]
-
+# test data pattern is ({description}, {valid}, {cancel_doc_id}, {mhr_num}, {account}, {message_content})
+TEST_NOTE_DATA_NCAN = [
+    ('Valid REST', True, '43641595', '045718', 'ppr_staff', None),
+    ('Invalid no doc id', False, None, '045718', 'ppr_staff', validator.NCAN_DOCUMENT_ID_REQUIRED),
+    ('Invalid status', False, '44161815', '022873', 'ppr_staff', validator.NCAN_DOCUMENT_ID_STATUS),
+    ('Invalid doc type TAXN', False, '50435493', '022873', 'ppr_staff', validator.NCAN_NOT_ALLOWED)
+]
 
 @pytest.mark.parametrize('desc,valid,doc_type,ts_offset,mhr_num,account,message_content', TEST_NOTE_DATA_EFFECTIVE)
 def test_validate_effective_ts(session, desc, valid, doc_type, ts_offset, mhr_num, account, message_content):
@@ -201,8 +208,8 @@ def test_validate_remarks(session, desc, valid, doc_type, remarks, mhr_num, acco
         json_data['note']['remarks'] = remarks
     else:
         del json_data['note']['remarks']
-    if doc_type == 'NCAN' and mhr_num == '080104':
-        json_data['cancelDocumentId'] = '63057279'
+    if doc_type == 'NCAN' and mhr_num == '045718':
+        json_data['cancelDocumentId'] = '43641595'
     del json_data['note']['effectiveDateTime']
     registration: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account)
     error_msg = validator.validate_note(registration, json_data, True, STAFF_ROLE)
@@ -235,6 +242,30 @@ def test_validate_notice(session, desc, valid, doc_type, notice, mhr_num, accoun
         assert error_msg != ''
         if message_content:
             assert error_msg.find(message_content) != -1
+
+
+@pytest.mark.parametrize('desc,valid,can_doc_id,mhr_num,account,message_content', TEST_NOTE_DATA_NCAN)
+def test_validate_ncan(session, desc, valid, can_doc_id, mhr_num, account, message_content):
+    """Assert that NCAN document type validation works as expected."""
+    # setup
+    json_data = get_valid_registration()
+    if can_doc_id:
+        json_data['cancelDocumentId'] = can_doc_id
+    json_data['note']['documentType'] = MhrDocumentTypes.NCAN
+    del json_data['note']['effectiveDateTime']
+    registration: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account)
+    error_msg = validator.validate_note(registration, json_data, True, STAFF_ROLE)
+    current_app.logger.debug(error_msg)
+    if valid:
+        assert error_msg == ''
+    else:
+        assert error_msg != ''
+        if message_content:
+            if message_content == validator.NCAN_NOT_ALLOWED:
+                msg: str = validator.NCAN_NOT_ALLOWED.format(doc_type='TAXN')
+                assert error_msg.find(msg) != -1
+            else:
+                assert error_msg.find(message_content) != -1
 
 
 def get_valid_registration():

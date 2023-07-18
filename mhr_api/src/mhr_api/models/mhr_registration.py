@@ -141,10 +141,15 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                 reg_json = self.set_transfer_group_json(reg_json)
             elif self.registration_type in (MhrRegistrationTypes.EXEMPTION_NON_RES, MhrRegistrationTypes.EXEMPTION_RES):
                 reg_json = self.set_note_json(reg_json)
+            elif self.registration_type == MhrRegistrationTypes.REG_STAFF_ADMIN and \
+                    (not self.notes or doc_json.get('documentType') == MhrDocumentTypes.NRED):
+                reg_json['documentType'] = doc_json.get('documentType')
+                del reg_json['declaredValue']
+                if doc_json.get('documentType') == MhrDocumentTypes.NRED:
+                    reg_json = self.set_note_json(reg_json)
             elif self.registration_type == MhrRegistrationTypes.REG_NOTE:
                 reg_json = self.set_note_json(reg_json)
                 del reg_json['documentId']
-                del reg_json['declaredValue']
                 del reg_json['documentDescription']
                 del reg_json['documentRegistrationNumber']
             elif self.registration_type == MhrRegistrationTypes.MHREG:
@@ -303,9 +308,9 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
 
     def set_note_json(self, reg_json) -> dict:
         """Build the note JSON for an individual registration that has a unit note."""
-        if reg_json and self.notes:
+        if reg_json and self.notes:  # pylint: disable=too-many-nested-blocks; only 1 more.
             reg_note = self.notes[0].json
-            if reg_note.get('documentType') == MhrDocumentTypes.NCAN:
+            if reg_note.get('documentType') in (MhrDocumentTypes.NCAN, MhrDocumentTypes.NRED):
                 cnote: MhrNote = reg_utils.find_cancelled_note(self, self.id)
                 if cnote:
                     current_app.logger.debug(f'Found cancelled note {cnote.document_type}')
@@ -313,6 +318,17 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                     reg_note['cancelledDocumentType'] = cnote_json.get('documentType')
                     reg_note['cancelledDocumentDescription'] = cnote_json.get('documentDescription')
                     reg_note['cancelledDocumentRegistrationNumber'] = cnote_json.get('documentRegistrationNumber')
+                elif model_utils.is_legacy() and self.manuhome:
+                    doc_id: str = self.documents[0].document_id
+                    for note in self.manuhome.reg_notes:
+                        if doc_id == note.can_document_id:
+                            reg_note['cancelledDocumentType'] = note.document_type
+                            reg_note['cancelledDocumentDescription'] = \
+                                reg_utils.get_document_description(note.document_type)
+                            for doc in self.manuhome.reg_documents:
+                                if doc.id == note.reg_document_id:
+                                    reg_note['cancelledDocumentRegistrationNumber'] = doc.document_reg_id
+
             reg_json['note'] = reg_note
         return reg_json
 
@@ -338,6 +354,9 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
             elif self.registration_type == MhrRegistrationTypes.PERMIT:
                 self.manuhome = Db2Manuhome.create_from_permit(self, self.reg_json)
                 self.manuhome.save_permit()
+            elif self.registration_type == MhrRegistrationTypes.REG_STAFF_ADMIN and self.reg_json.get('documentType'):
+                self.manuhome = Db2Manuhome.create_from_admin(self, self.reg_json)
+                self.manuhome.save_admin()
             elif self.registration_type == MhrRegistrationTypes.REG_NOTE:
                 self.manuhome = Db2Manuhome.create_from_note(self, self.reg_json)
                 self.manuhome.save_note()
@@ -356,7 +375,10 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
 
     def save_cancel_note(self, json_data, new_reg_id):
         """Update the original note status and change registration id."""
-        cancel_note: MhrNote = self.get_cancel_note(json_data.get('cancelDocumentId', ''))
+        cancel_doc_id: str = json_data.get('cancelDocumentId', '')
+        if not cancel_doc_id:
+            cancel_doc_id: str = json_data.get('updateDocumentId', '')
+        cancel_note: MhrNote = self.get_cancel_note(cancel_doc_id)
         if cancel_note:  # pylint: disable=too-many-nested-blocks; only 1 more.
             cancel_note.status_type = MhrNoteStatusTypes.CANCELLED
             cancel_note.change_registration_id = new_reg_id
@@ -366,7 +388,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                 for reg in self.change_registrations:
                     if reg.notes:
                         doc: MhrDocument = reg.documents[0]
-                        if doc.document_id != json_data.get('cancelDocumentId') and \
+                        if doc.document_id != cancel_doc_id and \
                                 doc.document_type in (MhrDocumentTypes.CAU,
                                                       MhrDocumentTypes.CAUC,
                                                       MhrDocumentTypes.CAUE):
@@ -812,6 +834,34 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
             json_data['note']['noteId'] = 1
         registration.notes = [MhrNote.create_from_json(json_data.get('note'), registration.id, doc.id,
                                                        registration.registration_ts, registration.id)]
+        if base_reg:
+            registration.manuhome = base_reg.manuhome
+        return registration
+
+    @staticmethod
+    def create_admin_from_json(base_reg,
+                               json_data,
+                               account_id: str = None,
+                               user_id: str = None,
+                               user_group: str = None):
+        """Create admin registration objects from dict/json."""
+        json_data['registrationType'] = MhrRegistrationTypes.REG_STAFF_ADMIN
+        registration: MhrRegistration = MhrRegistration.create_change_from_json(base_reg,
+                                                                                json_data,
+                                                                                account_id,
+                                                                                user_id,
+                                                                                user_group)
+        if json_data.get('note') and json_data['note'].get('givingNoticeParty'):
+            notice_json = json_data['note']['givingNoticeParty']
+            registration.parties.append(MhrParty.create_from_json(notice_json, MhrPartyTypes.CONTACT, registration.id))
+        doc: MhrDocument = registration.documents[0]
+        if json_data.get('note'):
+            if model_utils.is_legacy() and base_reg and base_reg.manuhome and base_reg.manuhome.reg_notes:
+                json_data['note']['noteId'] = len(base_reg.manuhome.reg_notes) + 1
+            else:
+                json_data['note']['noteId'] = 1
+            registration.notes = [MhrNote.create_from_json(json_data.get('note'), registration.id, doc.id,
+                                                           registration.registration_ts, registration.id)]
         if base_reg:
             registration.manuhome = base_reg.manuhome
         return registration

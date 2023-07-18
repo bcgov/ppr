@@ -191,7 +191,10 @@ class Report:  # pylint: disable=too-few-public-methods
                                                                MhrRegistrationTypes.EXEMPTION_NON_RES):
             self._report_key = ReportTypes.MHR_EXEMPTION
         elif self._report_data.get('registrationType', '') == MhrRegistrationTypes.REG_NOTE:
-            self._report_key = ReportTypes.MHR_NOTE
+            if self._report_data.get('documentType'):
+                self._report_key = ReportTypes.MHR_ADMIN_REGISTRATION
+            else:
+                self._report_key = ReportTypes.MHR_NOTE
         self._report_data['createDateTime'] = create_ts
         data = self._setup_report_data()
         current_app.logger.debug('Account {0} report type {1} calling report-api {2}.'
@@ -862,6 +865,13 @@ class ReportMeta:  # pylint: disable=too-few-public-methods
             'reportDescription': 'MHRNote',
             'fileName': 'unitNoteV2',
             'metaTitle': 'UNIT NOTE VERIFICATION',
+            'metaSubtitle': 'MANUFACTURED HOME ACT',
+            'metaSubject': ''
+        },
+        ReportTypes.MHR_ADMIN_REGISTRATION: {
+            'reportDescription': 'MHRAdminRegistration',
+            'fileName': 'adminRegistrationV2',
+            'metaTitle': 'REPLACED',
             'metaSubtitle': 'MANUFACTURED HOME ACT',
             'metaSubject': ''
         }
