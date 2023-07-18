@@ -8,7 +8,7 @@ import mockRouter from './MockRouter'
 
 import { MhrUnitNote } from '@/views'
 import { RouteNames, UnitNoteDocTypes } from '@/enums'
-import { getTestId, setupMockUser } from './utils'
+import { getTestId, setupMockStaffUser } from './utils'
 import { UnitNotesInfo } from '@/resources/unitNotes'
 import { CertifyInformation, ContactInformation, DocumentId, Remarks } from '@/components/common'
 import { EffectiveDateTime, UnitNoteAdd, UnitNoteReview, UnitNoteReviewDetailsTable } from '@/components/unitNotes'
@@ -40,7 +40,7 @@ function createComponent (): Wrapper<any> {
 
 describe('MHR Unit Note Filing', () => {
   let wrapper: Wrapper<any>
-  setupMockUser()
+  setupMockStaffUser()
 
   const UNIT_NOTE_DOC_TYPE = UnitNoteDocTypes.NOTICE_OF_CAUTION
 
@@ -66,36 +66,50 @@ describe('MHR Unit Note Filing', () => {
     expect(wrapper.vm.$route.name).toBe(RouteNames.MHR_INFORMATION_NOTE)
     expect(wrapper.exists()).toBeTruthy()
 
-    const AddUnitNoteContainer = wrapper.findComponent(UnitNoteAdd)
-    expect(AddUnitNoteContainer.exists()).toBeTruthy()
+    const UnitNoteAddComponent = wrapper.findComponent(UnitNoteAdd)
+    expect(UnitNoteAddComponent.exists()).toBeTruthy()
 
-    expect(AddUnitNoteContainer.findComponent(DocumentId)).toBeTruthy()
-    expect(AddUnitNoteContainer.findComponent(Remarks)).toBeTruthy()
-    expect(AddUnitNoteContainer.findComponent(ContactInformation)).toBeTruthy()
+    expect(UnitNoteAddComponent.findComponent(DocumentId).exists()).toBeTruthy()
+    expect(UnitNoteAddComponent.findComponent(Remarks).exists()).toBeTruthy()
+    expect(UnitNoteAddComponent.findComponent(ContactInformation).exists()).toBeTruthy()
 
-    expect(AddUnitNoteContainer.findAll('.border-error-left').length).toBe(0)
-    expect(AddUnitNoteContainer.findAll('.error-text').length).toBe(0)
+    expect(UnitNoteAddComponent.findAll('.border-error-left').length).toBe(0)
+    expect(UnitNoteAddComponent.findAll('.error-text').length).toBe(0)
   })
 
   it('renders MhrUnitNote Review and Confirm page with its components', async () => {
     expect(wrapper.vm.$route.name).toBe(RouteNames.MHR_INFORMATION_NOTE)
     expect(wrapper.exists()).toBeTruthy()
 
+    await wrapper.find('#btn-stacked-submit').trigger('click')
+    await nextTick()
+
+    // make sure Review page is not showing up as there are errors
+    expect(wrapper.findComponent(UnitNoteReview).exists()).toBeFalsy()
+    expect(wrapper.findAll('.border-error-left').length).toBe(2)
+
+    // simulate valid fields for Unit Note App screen
     await wrapper.findComponent(UnitNoteAdd).vm.$emit('isValid', true)
+
     await wrapper.find('#btn-stacked-submit').trigger('click')
     await nextTick()
 
     const UnitNoteReviewComponent = wrapper.findComponent(UnitNoteReview)
     expect(UnitNoteReviewComponent.exists()).toBeTruthy()
 
-    expect(UnitNoteReviewComponent.findComponent(UnitNoteReviewDetailsTable)).toBeTruthy()
-    expect(UnitNoteReviewComponent.findComponent(ContactInformation)).toBeTruthy()
-    expect(UnitNoteReviewComponent.findComponent(EffectiveDateTime)).toBeTruthy()
-    expect(UnitNoteReviewComponent.findComponent(Attention)).toBeTruthy()
-    expect(UnitNoteReviewComponent.findComponent(CertifyInformation)).toBeTruthy()
-    expect(UnitNoteReviewComponent.findComponent(StaffPayment)).toBeTruthy()
+    expect(UnitNoteReviewComponent.findComponent(UnitNoteReviewDetailsTable).exists()).toBeTruthy()
+    expect(UnitNoteReviewComponent.findComponent(ContactInformation).exists()).toBeTruthy()
+    expect(UnitNoteReviewComponent.findComponent(EffectiveDateTime).exists()).toBeTruthy()
+    expect(UnitNoteReviewComponent.findComponent(Attention).exists()).toBeTruthy()
+    expect(UnitNoteReviewComponent.findComponent(CertifyInformation).exists()).toBeTruthy()
+    expect(UnitNoteReviewComponent.findComponent(StaffPayment).exists()).toBeTruthy()
 
     expect(UnitNoteReviewComponent.findAll('.border-error-left').length).toBe(0)
     expect(UnitNoteReviewComponent.findAll('.error-text').length).toBe(0)
+
+    await wrapper.find('#btn-stacked-submit').trigger('click')
+    await nextTick()
+
+    expect(wrapper.findAll('.border-error-left').length).toBe(3)
   })
 })
