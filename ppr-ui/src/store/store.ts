@@ -1061,6 +1061,10 @@ export const useStore = defineStore('assetsStore', () => {
     state.value.mhrUnitNote.note.documentType = documentType
   }
 
+  function setEmptyUnitNoteRegistration (unitNote: UnitNoteRegistrationIF) {
+    state.value.mhrUnitNote = unitNote
+  }
+
   function setMhrUnitNoteRegistration (storeAction: UnitNoteStoreActionIF) {
     set(state.value.mhrUnitNote, storeAction.key, storeAction.value)
   }
@@ -1334,6 +1338,7 @@ export const useStore = defineStore('assetsStore', () => {
 
     // MHR Unit Notes
     setMhrUnitNoteType,
+    setEmptyUnitNoteRegistration,
     setMhrUnitNoteRegistration,
     setMhrUnitNote
 

@@ -6,7 +6,7 @@
     <PartySearch
       v-if="!hidePartySearch"
       isMhrPartySearch
-      @selectItem="setStoreProperty($event)"
+      @selectItem="emitStoreUpdate($event)"
     />
 
     <v-card
@@ -191,7 +191,7 @@ import { PartySearch } from '../parties/party'
 
 export default defineComponent({
   name: 'ContactInformation',
-  emits: ['isValid'],
+  emits: ['isValid', 'setStoreProperty'],
   components: {
     BaseAddress,
     PartySearch
@@ -208,10 +208,6 @@ export default defineComponent({
     content: {
       type: Object as () => ContentIF,
       default: () => {}
-    },
-    setStoreProperty: {
-      type: Function,
-      required: true
     },
     hidePartySearch: {
       type: Boolean,
@@ -261,6 +257,10 @@ export default defineComponent({
         !(localState.isContactInfoFormValid && localState.isAddressValid))
     })
 
+    const emitStoreUpdate = (val) => {
+      emit('setStoreProperty', val)
+    }
+
     watch(() => [localState.isContactInfoFormValid, localState.isAddressValid], () => {
       emit('isValid', localState.isContactInfoFormValid && localState.isAddressValid)
     })
@@ -272,7 +272,7 @@ export default defineComponent({
     })
 
     watch(() => localState.contactInfoModel, (val) => {
-      props.setStoreProperty(val)
+      emitStoreUpdate(val)
     }, { deep: true, immediate: true })
 
     const clearFields = () => {
@@ -295,9 +295,9 @@ export default defineComponent({
     watch(() => localState.contactInfoModel.personName, async () => {
       localState.hasLongCombinedName =
         props.enableCombinedNameValidation &&
-        (0 || localState.contactInfoModel.personName?.first.length) +
-        (0 || localState.contactInfoModel.personName?.middle.length) +
-        (0 || localState.contactInfoModel.personName?.last.length) > 40
+        (0 || localState.contactInfoModel.personName?.first?.length) +
+        (0 || localState.contactInfoModel.personName?.middle?.length) +
+        (0 || localState.contactInfoModel.personName?.last?.length) > 40
     }, { deep: true })
 
     const firstNameRules = customRules(
@@ -336,6 +336,7 @@ export default defineComponent({
 
     return {
       clearFields,
+      emitStoreUpdate,
       contactInfoForm,
       emailRules,
       firstNameRules,

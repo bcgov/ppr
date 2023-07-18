@@ -3,8 +3,8 @@
     <section id="mhr-unit-note-doc-id" class="mt-10">
       <DocumentId
         :documentId="unitNoteDocumentId"
-        :setStoreProperty="setDocumentId"
         :validate="validate"
+        @setStoreProperty="handleStoreUpdate('documentId', $event)"
         @isValid="handleComponentValid(MhrCompVal.DOC_ID_VALID, $event)"
       />
     </section>
@@ -13,8 +13,8 @@
       <Remarks
         :unitNoteRemarks="unitNoteRemarks"
         description="Remarks will be shown when a search result is produced for this manufactured home."
-        :setStoreProperty="setRemarks"
         :validate="validate"
+        @setStoreProperty="handleStoreUpdate('remarks', $event)"
         @isValid="handleComponentValid(MhrCompVal.REMARKS_VALID, $event)"
       />
     </section>
@@ -30,7 +30,7 @@
           mailAddressInfo: ' ' // hide the info text under Mailing Address label
         }"
         :validate="validate"
-        :setStoreProperty="setGivingNoticeParty"
+        @setStoreProperty="handleStoreUpdate('givingNoticeParty', $event)"
         @isValid="handleComponentValid(MhrCompVal.PERSON_GIVING_NOTICE_VALID, $event)"
         enableCombinedNameValidation
         hidePartySearch
@@ -46,7 +46,7 @@ import { UnitNotesInfo } from '@/resources/unitNotes'
 import { UnitNoteDocTypes } from '@/enums'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
-import { PartyIF, UnitNoteIF } from '@/interfaces'
+import { UnitNoteIF } from '@/interfaces'
 import { useMhrValidations } from '@/composables'
 import { MhrCompVal, MhrSectVal } from '@/composables/mhrRegistration/enums'
 import { DocumentId, Remarks, ContactInformation } from '../common'
@@ -96,7 +96,7 @@ export default defineComponent({
       unitNoteRemarks: (getMhrUnitNote.value as UnitNoteIF).remarks || '',
 
       // Document Id
-      unitNoteDocumentId: (getMhrUnitNote.value as UnitNoteIF).documentId || '',
+      unitNoteDocumentId: computed(() => (getMhrUnitNote.value as UnitNoteIF).documentId || ''),
 
       // Person Giving Notice
       unitNoteGivingNoticeParty: (getMhrUnitNote.value as UnitNoteIF).givingNoticeParty || {}
@@ -106,27 +106,17 @@ export default defineComponent({
       setValidation(MhrSectVal.UNIT_NOTE_VALID, component, isValid)
     }
 
-    const setDocumentId = (val) => {
-      setMhrUnitNote({ key: 'documentId', value: val })
+    const handleStoreUpdate = (key: string, val) => {
+      setMhrUnitNote({ key: key, value: val })
     }
 
-    const setRemarks = (val) => {
-      setMhrUnitNote({ key: 'remarks', value: val })
-    }
-
-    const setGivingNoticeParty = (val: PartyIF) => {
-      setMhrUnitNote({ key: 'givingNoticeParty', value: val })
-    }
-
-    watch(() => localState.isUnitNoteValid, (val) => {
-      emit('isValid', val)
+    watch(() => [localState.isUnitNoteValid, props.validate], () => {
+      emit('isValid', localState.isUnitNoteValid)
     })
 
     return {
       MhrCompVal,
-      setDocumentId,
-      setRemarks,
-      setGivingNoticeParty,
+      handleStoreUpdate,
       handleComponentValid,
       ...toRefs(localState)
     }

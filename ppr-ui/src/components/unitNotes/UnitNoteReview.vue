@@ -1,6 +1,13 @@
 <template>
   <div id="unit-note-review-confirm">
 
+    <h1>
+      Review and Confirm
+    </h1>
+    <p class="mt-7">
+      Review your changes and complete the additional information before registering.
+    </p>
+
     <UnitNoteReviewDetailsTable
       :unitNote="getMhrUnitNote"
       :unitNoteType="unitNoteType.header"
@@ -17,7 +24,7 @@
           sideLabel: 'Add Submitting Party'
         }"
         :validate="validate"
-        :setStoreProperty="setSubmittingParty"
+        @setStoreProperty="handleStoreUpdate('submittingParty', $event)"
         @isValid="handleComponentValid(MhrCompVal.SUBMITTING_PARTY_VALID, $event)"
       />
     </section>
@@ -78,10 +85,10 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue-demi'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
-import { PartyIF, SubmittingPartyIF } from '@/interfaces'
+import { PartyIF } from '@/interfaces'
 import { UnitNotesInfo } from '@/resources/unitNotes'
 import { MhrCompVal, MhrSectVal } from '@/composables/mhrRegistration/enums'
 import { useMhrValidations } from '@/composables'
@@ -156,10 +163,6 @@ export default defineComponent({
       )
     })
 
-    const setSubmittingParty = (val: SubmittingPartyIF) => {
-      setMhrUnitNoteRegistration({ key: 'submittingParty', value: val })
-    }
-
     const handleEffectiveDateUpdate = (val: string) => {
       setMhrUnitNote({ key: 'effectiveDateTime', value: val })
       // expiry date is 90 days from effective date
@@ -169,6 +172,10 @@ export default defineComponent({
 
     const handleComponentValid = (component: MhrCompVal, isValid: boolean) => {
       setValidation(MhrSectVal.UNIT_NOTE_VALID, component, isValid)
+    }
+
+    const handleStoreUpdate = (key: string, val) => {
+      setMhrUnitNoteRegistration({ key: key, value: val })
     }
 
     const effectiveDateDescForCAU = getMhrUnitNote.value.documentType === UnitNoteDocTypes.NOTICE_OF_CAUTION
@@ -221,6 +228,13 @@ export default defineComponent({
       setStaffPayment(staffPaymentData)
     }
 
+    onMounted(() => {
+      // scroll to top
+      setTimeout(() => {
+        document.getElementById('unit-note-review-confirm').scrollIntoView({ behavior: 'smooth' })
+      }, 500)
+    })
+
     watch(() => localState.isUnitNoteReviewValid, (val) => {
       emit('isValid', val)
     })
@@ -229,9 +243,9 @@ export default defineComponent({
       isRoleStaffReg,
       MhrCompVal,
       getMhrUnitNote,
-      setSubmittingParty,
       handleEffectiveDateUpdate,
       handleComponentValid,
+      handleStoreUpdate,
       onStaffPaymentDataUpdate,
       effectiveDateDescForCAU,
       ...toRefs(localState)

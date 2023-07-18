@@ -1,4 +1,4 @@
-import { MhApiStatusTypes, UnitNoteDocTypes } from '@/enums'
+import { UnitNoteDocTypes, UnitNoteStatusTypes } from '@/enums'
 import { PartyIF } from '@/interfaces'
 
 export interface UnitNoteIF {
@@ -11,6 +11,6 @@ export interface UnitNoteIF {
   expiryDateTime?: string
   remarks?: string
   givingNoticeParty: PartyIF
-  status?: MhApiStatusTypes
+  status?: UnitNoteStatusTypes
   destroyed?: boolean
 }

@@ -2,10 +2,15 @@
   <div id="effective-date-time-container">
     <h2>{{ content.title }}</h2>
     <p class="mt-2">{{ content.description }}</p>
-    <v-card id="effective-date-time-card" flat rounded class="mt-8 px-7 pt-10 pb-3">
+    <v-card
+      id="effective-date-time-card"
+      class="mt-8 px-7 pt-10 pb-3"
+      :class="{ 'border-error-left': showBorderError }"
+      flat
+    >
       <v-row no-gutters>
         <v-col cols="12" sm="3">
-          <label class="generic-label" :class="{ 'error-text': false }">
+          <label class="generic-label" :class="{ 'error-text': showBorderError }">
             {{ content.sideLabel }}
           </label>
         </v-col>
@@ -115,7 +120,7 @@ export default defineComponent({
       default: () => {}
     }
   },
-  emits: ['setStoreProperty'],
+  emits: ['setStoreProperty', 'isValid'],
   setup (props, { emit }) {
     const { required } = useInputRules()
 
@@ -125,7 +130,7 @@ export default defineComponent({
     const date = new Date()
 
     const localState = reactive({
-      isEffectiveDateTimeFormValid: false,
+      isEffectiveDateTimeFormValid: true,
       selectHour: null,
       selectMinute: null,
       selectPeriod: PeriodTypes.AM,
@@ -138,7 +143,18 @@ export default defineComponent({
       minutes: [...Array(60).keys()].map(num => num.toString().padStart(2, '0')),
       maxDate: computed((): string => localTodayDate(new Date(date.setDate(date.getDate() - 1)))),
       isImmediateDateSelected: computed((): boolean => localState.effectiveDateType === EffectiveDateTypes.IMMEDIATE),
-      isTimeSelected: computed((): boolean => localState.selectHour && localState.selectMinute)
+      isTimeSelected: computed((): boolean => !!localState.selectHour && !!localState.selectMinute),
+      isEffectiveDateTimeValid: computed((): boolean =>
+        localState.isImmediateDateSelected ||
+        (!localState.isImmediateDateSelected && !!localState.selectedPastDate &&
+          localState.isTimeSelected)
+      ),
+      showBorderError: computed(() => {
+        return props.validate &&
+        !localState.isImmediateDateSelected &&
+        !(localState.isEffectiveDateTimeFormValid && localState.selectedPastDate !== '')
+      })
+
     })
 
     const buildFullDate = (): Date => {
@@ -163,13 +179,23 @@ export default defineComponent({
       localState.effectiveDate = new Date().toISOString()
     })
 
+    watch(() => props.validate, async (val) => {
+      if (val && !localState.isImmediateDateSelected) {
+        effectiveDatePicker.value?.validate()
+        effectiveDateTimeForm.value?.validate()
+      }
+    })
+
     watch(
       () => [localState.effectiveDateType],
       () => {
         if (localState.isImmediateDateSelected) {
           // today's date radio selected
           localState.effectiveDate = new Date().toISOString()
-        } else if (localState.isTimeSelected) {
+        } else if (props.validate) {
+          effectiveDatePicker.value?.validate()
+          effectiveDateTimeForm.value.validate()
+        } else if (localState.isTimeSelected && !!localState.selectedPastDate) {
           // past date radio selected and all time dropdowns are selected
           localState.effectiveDate = buildFullDate().toISOString()
         }
@@ -179,7 +205,7 @@ export default defineComponent({
     watch(
       () => [localState.selectedPastDate, localState.selectHour, localState.selectMinute, localState.selectPeriod],
       () => {
-        if (localState.isTimeSelected) {
+        if (localState.isTimeSelected && !!localState.selectedPastDate) {
           localState.effectiveDate = buildFullDate().toISOString()
         }
       }

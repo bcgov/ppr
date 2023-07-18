@@ -6,14 +6,14 @@
       <v-card
         id="document-id-card"
         class="mt-8 pa-8 pr-6 pb-3"
-        :class="{ 'border-error-left': validateDocId }"
+        :class="{ 'border-error-left': showBorderError }"
         flat
       >
         <v-row no-gutters>
           <v-col cols="12" sm="2">
             <label
               class="generic-label"
-              :class="{ 'error-text': validateDocId }"
+              :class="{ 'error-text': showBorderError }"
               for="doc-id-field"
             >
             Document ID
@@ -28,6 +28,7 @@
               label="Document ID Number"
               v-model="documentIdModel"
               :rules="documentIdRules"
+              :error="!isUniqueDocId && validate"
               :error-messages="uniqueDocIdError"
             >
               <template v-slot:append>
@@ -50,7 +51,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, nextTick, onMounted, reactive, ref, toRefs, watch } from 'vue-demi'
 import { validateDocumentID } from '@/utils'
 import { FormIF, MhrDocIdResponseIF } from '@/interfaces'
 import { useInputRules } from '@/composables'
@@ -62,18 +63,14 @@ export default defineComponent({
       type: String,
       required: true
     },
-    setStoreProperty: {
-      type: Function,
-      required: true
-    },
     validate: {
       type: Boolean,
       default: false
     }
   },
-  emits: ['isValid'],
+  emits: ['isValid', 'setStoreProperty'],
   setup (props, { emit }) {
-    const { customRules, isNumber, maxLength, required } = useInputRules()
+    const { customRules, isNumber, maxLength, minLength, required } = useInputRules()
 
     const documentIdForm = ref(null) as FormIF
 
@@ -83,35 +80,50 @@ export default defineComponent({
       loadingDocId: false,
       isUniqueDocId: false,
       displayDocIdError: false,
-      validateDocId: computed(() => props.validate && !localState.isVerifiedDocId),
+      showBorderError: computed(() => props.validate && !localState.isVerifiedDocId),
       isVerifiedDocId: computed(() => {
         return localState.isDocumentIdFormValid && localState.isUniqueDocId
       }),
       uniqueDocIdError: computed(() => {
         // Manual error handling for Unique DocId Lookup
-        return localState.displayDocIdError ? ['Must be unique number'] : []
+        return localState.displayDocIdError ? ['Must be unique number'] : ''
+      }),
+      documentIdRules: computed(() => {
+        return props.validate
+          ? customRules(
+            required('Enter a Document ID'),
+            maxLength(8, true),
+            minLength(8, true),
+            isNumber()
+          )
+          : customRules(
+            maxLength(8, true),
+            isNumber()
+          )
       })
     })
 
-    const documentIdRules = customRules(
-      required('Enter a Document ID'),
-      maxLength(8, true),
-      isNumber()
-    )
-
-    watch(() => props.validate, async () => {
+    const validateForm = () => {
       documentIdForm.value?.validate()
+    }
+
+    onMounted(() => {
+      if (props.validate) validateForm()
+    })
+
+    watch(() => props.validate, async (val) => {
+      if (val) validateForm()
     })
 
     watch(
       () => localState.documentIdModel,
       async (val: string) => {
-        if (localState.documentIdModel.length === 8) {
+        if (localState.documentIdModel?.length === 8) {
           localState.loadingDocId = true
           const validateDocId: MhrDocIdResponseIF = await validateDocumentID(localState.documentIdModel)
           localState.isUniqueDocId = !validateDocId.exists && validateDocId.valid
           localState.displayDocIdError = !localState.isUniqueDocId
-
+          await nextTick()
           emit('isValid', localState.isVerifiedDocId)
         } else {
           localState.isUniqueDocId = false
@@ -121,13 +133,12 @@ export default defineComponent({
         }
 
         localState.loadingDocId = false
-        props.setStoreProperty(val)
+        emit('setStoreProperty', val)
       },
       { immediate: true }
     )
 
     return {
-      documentIdRules,
       ...toRefs(localState)
     }
   }
