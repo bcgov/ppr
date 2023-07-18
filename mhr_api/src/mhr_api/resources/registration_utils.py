@@ -312,6 +312,52 @@ def pay_and_save_note(req: request,  # pylint: disable=too-many-arguments
     return registration
 
 
+def pay_and_save_admin(req: request,  # pylint: disable=too-many-arguments
+                       current_reg: MhrRegistration,
+                       request_json,
+                       account_id: str,
+                       user_group: str,
+                       trans_type: str,
+                       trans_id: str = None):
+    """Set up the registration statement, pay, and save the data."""
+    # Charge a fee.
+    token: dict = g.jwt_oidc_token_info
+    current_app.logger.debug(f'user_group={user_group}')
+    request_json['affirmByName'] = get_affirmby(token)
+    registration: MhrRegistration = MhrRegistration.create_admin_from_json(current_reg,
+                                                                           request_json,
+                                                                           account_id,
+                                                                           token.get('username', None),
+                                                                           user_group)
+    invoice_id = None
+    pay_ref = None
+    payment_info = build_staff_payment(req, trans_type, 1, trans_id)
+    payment = Payment(jwt=jwt.get_token_auth_header(),
+                      account_id=None,
+                      details=get_payment_details_note(registration, trans_id))
+    current_app.logger.info('Creating staff payment')
+    pay_ref = payment.create_payment_staff(payment_info, registration.client_reference_id)
+    invoice_id = pay_ref['invoiceId']
+    registration.pay_invoice_id = int(invoice_id)
+    registration.pay_path = pay_ref['receipt']
+    # Try to save the registration: failure throws an exception.
+    try:
+        registration.save()
+        if request_json.get('updateDocumentId') and request_json.get('documentType') == MhrDocumentTypes.NRED:
+            current_reg.save_cancel_note(request_json, registration.id)
+    except Exception as db_exception:   # noqa: B902; handle all db related errors.
+        current_app.logger.error(SAVE_ERROR_MESSAGE.format(account_id, 'registration', str(db_exception)))
+        if account_id and invoice_id is not None:
+            current_app.logger.info(PAY_REFUND_MESSAGE.format(account_id, 'registration', invoice_id))
+            try:
+                payment.cancel_payment(invoice_id)
+            except SBCPaymentException as cancel_exception:
+                current_app.logger.error(PAY_REFUND_ERROR.format(account_id, 'registration', invoice_id,
+                                                                 str(cancel_exception)))
+        raise DatabaseException(db_exception)
+    return registration
+
+
 def build_staff_payment(req: request, trans_type: str, quantity: int = 1, transaction_id: str = None):
     """Extract staff payment information from request parameters."""
     payment_info = {

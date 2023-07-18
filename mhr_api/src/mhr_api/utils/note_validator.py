@@ -20,10 +20,13 @@ from flask import current_app
 from mhr_api.models import MhrRegistration, utils as model_utils, MhrNote
 from mhr_api.models.type_tables import MhrRegistrationTypes, MhrDocumentTypes, MhrNoteStatusTypes
 from mhr_api.models.db2.mhomnote import FROM_LEGACY_STATUS
+from mhr_api.models.db2.utils import FROM_LEGACY_DOC_TYPE
 from mhr_api.utils import validator_utils
 
 
-VALIDATOR_ERROR = 'Error performing manufacturer extra validation. '
+NCAN_DOC_TYPES = ' CAU CAUC CAUE NCON NPUB REGC REST '  # Set of doc types NCAN can cancel.
+
+VALIDATOR_ERROR = 'Error performing unit note registration extra validation. '
 DOC_ID_REQUIRED = 'Document ID is required for staff registrations. '
 DOC_ID_EXISTS = 'Document ID must be unique: provided value already exists. '
 DOC_ID_INVALID_CHECKSUM = 'Document ID is invalid: checksum failed. '
@@ -43,6 +46,7 @@ NOTICE_ADDRESS_REQUIRED = 'The giving notice address is required. '
 NCAN_DOCUMENT_ID_REQUIRED = 'The cancellation document ID is required. '
 NCAN_DOCUMENT_ID_INVALID = 'The cancellation document ID is invalid. '
 NCAN_DOCUMENT_ID_STATUS = 'The cancellation document ID is for a note that is not active. '
+NCAN_NOT_ALLOWED = 'Cancel Notice is not allowed with the registration document type {doc_type}. '
 
 
 def validate_note(registration: MhrRegistration, json_data, staff: bool = False, group_name: str = None) -> str:
@@ -163,26 +167,33 @@ def validate_expiry_ts(registration: MhrRegistration, json_data, doc_type: str) 
 def validate_ncan(registration: MhrRegistration, json_data) -> str:
     """Validate the notice of cancellation document id."""
     error_msg: str = ''
-    if not json_data.get('note'):
-        return error_msg
     if not json_data.get('cancelDocumentId'):
         return NCAN_DOCUMENT_ID_REQUIRED
     if not registration:
         return error_msg
     status = None
+    cancel_type: str = None
     cancel_doc_id = json_data.get('cancelDocumentId')
     if model_utils.is_legacy() and registration.manuhome and registration.manuhome.notes:
         for note in registration.manuhome.notes:
             if note.reg_document_id == cancel_doc_id:
                 status = FROM_LEGACY_STATUS.get(note.status)
+                if FROM_LEGACY_DOC_TYPE.get(note.document_type):
+                    cancel_type = FROM_LEGACY_DOC_TYPE.get(note.document_type)
+                else:
+                    cancel_type = note.document_type
     elif not model_utils.is_legacy:
         note = registration.get_cancel_note(cancel_doc_id)
         if note:
             status = note.status_type
+            cancel_type = note.document_type
     if not status:
         error_msg += NCAN_DOCUMENT_ID_INVALID
     elif status != MhrNoteStatusTypes.ACTIVE:
         error_msg += NCAN_DOCUMENT_ID_STATUS
+    if cancel_type and NCAN_DOC_TYPES.find(cancel_type) < 0:
+        error_msg += NCAN_NOT_ALLOWED.format(doc_type=cancel_type)
+
     return error_msg
 
 

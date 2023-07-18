@@ -361,6 +361,43 @@ NOTE_REGISTRATION = {
     }
   }
 }
+ADMIN_REGISTRATION = {
+  'clientReferenceId': 'EX-TP001234',
+  'attentionReference': 'JOHN SMITH',
+  'documentType': 'NRED',
+  'documentId': '62133670',
+  'submittingParty': {
+    'businessName': 'BOB PATERSON HOMES INC.',
+    'address': {
+      'street': '1200 S. MACKENZIE AVE.',
+      'city': 'WILLIAMS LAKE',
+      'region': 'BC',
+      'country': 'CA',
+      'postalCode': 'V2G 3Y1'
+    },
+    'phoneNumber': '6044620279'
+  },
+  'note': {
+    'documentType': 'NRED',
+    'documentId': '62133670',
+    'remarks': 'REMARKS',
+    'givingNoticeParty': {
+      'personName': {
+        'first': 'JOHNNY',
+        'middle': 'B',
+        'last': 'SMITH'
+      },
+      'address': {
+        'street': '222 SUMMER STREET',
+        'city': 'VICTORIA',
+        'region': 'BC',
+        'country': 'CA',
+        'postalCode': 'V8W 2V8'
+      },
+      'phoneNumber': '2504930122'
+    }
+  }
+}
 # testdata pattern is ({account_id}, {mhr_num}, {exists}, {reg_description}, {in_list})
 TEST_SUMMARY_REG_DATA = [
     ('PS12345', '077741', True, CONV_DESCRIPTION, False),
@@ -442,6 +479,10 @@ TEST_DATA_PERMIT_SAVE = [
 # testdata pattern is ({mhr_num}, {group_id}, {doc_id_prefix}, {account_id})
 TEST_DATA_NOTE = [
     ('003936', STAFF_ROLE, '6', 'ppr_staff')
+]
+# testdata pattern is ({mhr_num}, {group_id}, {doc_id_prefix}, {account_id}, {doc_type}, {can_doc_id})
+TEST_DATA_ADMIN = [
+    ('022873', STAFF_ROLE, '6', 'ppr_staff', 'NRED', 50435493)
 ]
 # testdata pattern is ({http_status}, {document_id}, {mhr_num}, {doc_type}, {legacy}, {owner_count})
 TEST_DATA_DOC_ID = [
@@ -1356,3 +1397,64 @@ def test_create_note_from_json(session, mhr_num, user_group, doc_id_prefix, acco
     assert note.remarks
     assert note.expiry_date
     assert note.effective_ts
+
+
+@pytest.mark.parametrize('mhr_num,user_group,doc_id_prefix,account_id,doc_type,can_doc_id', TEST_DATA_ADMIN)
+def test_create_admin_from_json(session, mhr_num, user_group, doc_id_prefix, account_id, doc_type, can_doc_id):
+    """Assert that an MHR admin registration is created from json correctly."""
+    json_data = copy.deepcopy(ADMIN_REGISTRATION)
+    json_data['documentType'] = doc_type
+    if doc_type == MhrDocumentTypes.NRED:
+        json_data['note']['documentType'] = doc_type
+        json_data['updateDocumentId'] = can_doc_id
+    else:
+        del json_data['note']
+    base_reg: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account_id)
+    assert base_reg
+    # current_app.logger.info(json_data)
+    registration: MhrRegistration = MhrRegistration.create_admin_from_json(base_reg,
+                                                                           json_data,
+                                                                           account_id,
+                                                                           'userid',
+                                                                           user_group)
+    assert registration.id > 0
+    assert registration.doc_id
+    assert json_data.get('documentId')
+    assert str(json_data.get('documentId')).startswith(doc_id_prefix)
+    assert registration.mhr_number == mhr_num
+    assert registration.registration_ts
+    assert registration.status_type == MhrRegistrationStatusTypes.ACTIVE
+    assert registration.registration_type == MhrRegistrationTypes.REG_STAFF_ADMIN
+    assert registration.account_id == account_id
+    assert registration.client_reference_id    
+    assert registration.draft
+    assert registration.draft.id > 0
+    assert registration.draft_id == registration.draft.id
+    assert registration.draft.draft_number
+    assert registration.draft.registration_type == registration.registration_type
+    assert registration.draft.create_ts == registration.registration_ts
+    assert registration.draft.account_id == registration.account_id
+    assert registration.parties
+    sub_party = registration.parties[0]
+    assert sub_party.registration_id == registration.id
+    assert sub_party.party_type == MhrPartyTypes.SUBMITTING
+    if json_data.get('note') and json_data['note'].get('givingNoticeParty'):
+        notice_party = registration.parties[1]
+        assert notice_party.registration_id == registration.id
+        assert notice_party.party_type == MhrPartyTypes.CONTACT
+    assert registration.documents
+    doc: MhrDocument = registration.documents[0]
+    assert doc.id > 0
+    assert doc.document_id == registration.doc_id
+    assert doc.document_type == json_data.get('documentType')
+    if json_data.get('note'):
+        assert registration.notes
+        note: MhrNote = registration.notes[0]
+        assert note.document_type == doc.document_type
+        assert note.document_id == doc.id
+        assert note.destroyed == 'N'
+        assert note.remarks
+        assert note.effective_ts
+        assert not note.expiry_date
+    else:
+        assert not registration.notes

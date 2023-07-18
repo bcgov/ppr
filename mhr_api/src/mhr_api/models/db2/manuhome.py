@@ -174,6 +174,23 @@ class Db2Manuhome(db.Model):
             current_app.logger.error('Db2Manuhome.save_note exception: ' + str(db_exception))
             raise DatabaseException(db_exception)
 
+    def save_admin(self):
+        """Save the admin registraiton to the database immediately."""
+        try:
+            db.session.add(self)
+            if self.reg_documents:
+                index: int = len(self.reg_documents) - 1
+                doc: Db2Document = self.reg_documents[index]
+                doc.save()
+                if self.reg_notes:
+                    index: int = len(self.reg_notes) - 1
+                    note: Db2Mhomnote = self.reg_notes[index]
+                    if note.reg_document_id == doc.id:
+                        note.save()
+        except Exception as db_exception:   # noqa: B902; return nicer error
+            current_app.logger.error('Db2Manuhome.save_admin exception: ' + str(db_exception))
+            raise DatabaseException(db_exception)
+
     def save_permit(self):
         """Save the object with transport permit changes to the database immediately."""
         try:
@@ -852,7 +869,7 @@ class Db2Manuhome(db.Model):
             current_app.logger.info(f'registration id={registration.id} no manuhome: nothing to save.')
             return
         manuhome: Db2Manuhome = registration.manuhome
-        now_local = model_utils.today_local()
+        now_local = model_utils.to_local_timestamp(registration.registration_ts)
         manuhome.update_date = now_local.date()
         manuhome.update_time = now_local.time()
         manuhome.update_count = manuhome.update_count + 1
@@ -897,4 +914,38 @@ class Db2Manuhome(db.Model):
             if reg_note.expiry_date:
                 note.expiry_date = model_utils.to_local_timestamp(reg_note.expiry_date).date()
             manuhome.reg_notes.append(note)
+        return manuhome
+
+    @staticmethod
+    def create_from_admin(registration, reg_json):
+        """Create a new admin registration: update manuhome, create document, create records for whatever changed."""
+        if not registration.manuhome:
+            current_app.logger.info(f'registration id={registration.id} no manuhome: nothing to save.')
+            return
+        manuhome: Db2Manuhome = registration.manuhome
+        now_local = model_utils.to_local_timestamp(registration.registration_ts)
+        manuhome.update_date = now_local.date()
+        manuhome.update_time = now_local.time()
+        manuhome.update_count = manuhome.update_count + 1
+        new_doc = registration.documents[0]
+        doc_type = TO_LEGACY_DOC_TYPE.get(new_doc.document_type, new_doc.document_type)
+        if len(doc_type) == 3:
+            doc_type += ' '
+        # Create document
+        doc: Db2Document = Db2Document.create_from_registration(registration,
+                                                                reg_json,
+                                                                doc_type,
+                                                                now_local)
+        doc.update_id = current_app.config.get('DB2_RACF_ID', '')
+        manuhome.reg_documents.append(doc)
+        if new_doc.document_type == MhrDocumentTypes.NRED and reg_json.get('updateDocumentId'):
+            cancel_doc_id: str = reg_json.get('updateDocumentId')
+            for note in manuhome.reg_notes:
+                if note.reg_document_id == cancel_doc_id:
+                    note.can_document_id = doc.id
+                    note.status = Db2Mhomnote.StatusTypes.CANCELLED
+                    break
+        # Add note record except for the NRED.
+        if reg_json.get('note') and new_doc.document_type != MhrDocumentTypes.NRED:
+            manuhome.reg_notes.append(Db2Mhomnote.create_from_registration(reg_json.get('note'), doc, manuhome.id))
         return manuhome

@@ -58,6 +58,10 @@ EXEMPTION_TEST_RES_PDFFILE = 'tests/unit/reports/data/exempt-res-test-example.pd
 
 PERMIT_TEST_DATAFILE = 'tests/unit/reports/data/permit-test-example.json'
 PERMIT_TEST_PDFFILE = 'tests/unit/reports/data/permit-test-example.pdf'
+NOTE_TEST_DATAFILE = 'tests/unit/reports/data/note-test-example.json'
+NOTE_TEST_PDFFILE = 'tests/unit/reports/data/note-test-example.pdf'
+ADMIN_TEST_DATAFILE = 'tests/unit/reports/data/admin-registration-example.json'
+ADMIN_TEST_PDFFILE = 'tests/unit/reports/data/admin-registration-example.pdf'
 REPORT_VERSION_V2 = '2'
 
 
@@ -275,6 +279,32 @@ def test_exemption_res(session, client, jwt):
         assert headers
         # verify
         check_response(content, status, EXEMPTION_TEST_RES_PDFFILE)
+
+
+def test_unit_note(session, client, jwt):
+    """Assert that generation of a test report is as expected."""
+    # setup
+    if is_report_v2():
+        json_data = get_json_from_file(NOTE_TEST_DATAFILE)
+        report = Report(json_data, 'ppr_staff', ReportTypes.MHR_NOTE, '')
+        # test
+        content, status, headers = report.get_pdf()
+        assert headers
+        # verify
+        check_response(content, status, NOTE_TEST_PDFFILE)
+
+
+def test_admin_reg(session, client, jwt):
+    """Assert that generation of a test report is as expected."""
+    # setup
+    if is_report_v2():
+        json_data = get_json_from_file(ADMIN_TEST_DATAFILE)
+        report = Report(json_data, 'ppr_staff', ReportTypes.MHR_ADMIN_REGISTRATION, '')
+        # test
+        content, status, headers = report.get_pdf()
+        assert headers
+        # verify
+        check_response(content, status, ADMIN_TEST_PDFFILE)
 
 
 def get_json_from_file(data_file: str):

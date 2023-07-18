@@ -17,6 +17,7 @@ from typing import Optional
 
 from flask import Flask
 
+from .admin_registrations import bp as admin_registrations_bp
 from .documents import bp as documents_bp
 from .drafts import bp as drafts_bp
 from .exemptions import bp as exemptions_bp
@@ -50,6 +51,7 @@ class V1Endpoint:
 
         self.app = app
 
+        self.app.register_blueprint(admin_registrations_bp)
         self.app.register_blueprint(documents_bp)
         self.app.register_blueprint(drafts_bp)
         self.app.register_blueprint(exemptions_bp)
