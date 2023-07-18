@@ -51,7 +51,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, nextTick, onMounted, reactive, ref, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, nextTick, reactive, ref, toRefs, watch } from 'vue-demi'
 import { validateDocumentID } from '@/utils'
 import { FormIF, MhrDocIdResponseIF } from '@/interfaces'
 import { useInputRules } from '@/composables'
@@ -103,17 +103,9 @@ export default defineComponent({
       })
     })
 
-    const validateForm = () => {
-      documentIdForm.value?.validate()
-    }
-
-    onMounted(() => {
-      if (props.validate) validateForm()
-    })
-
     watch(() => props.validate, async (val) => {
-      if (val) validateForm()
-    })
+      if (val) documentIdForm.value?.validate()
+    }, { immediate: true })
 
     watch(
       () => localState.documentIdModel,

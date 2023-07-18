@@ -14,6 +14,8 @@ import { CertifyInformation, ContactInformation, DocumentId, Remarks } from '@/c
 import { EffectiveDateTime, UnitNoteAdd, UnitNoteReview, UnitNoteReviewDetailsTable } from '@/components/unitNotes'
 import { Attention } from '@/components/mhrRegistration/ReviewConfirm'
 import { StaffPayment } from '@bcrs-shared-components/staff-payment'
+import { MhrUnitNoteValidationStateIF } from '@/interfaces'
+import { isEqual } from 'lodash'
 
 Vue.use(Vuetify)
 
@@ -77,7 +79,7 @@ describe('MHR Unit Note Filing', () => {
     expect(UnitNoteAddComponent.findAll('.error-text').length).toBe(0)
   })
 
-  it('renders MhrUnitNote Review and Confirm page with its components', async () => {
+  it('renders and validates MhrUnitNote Review and Confirm page with its components', async () => {
     expect(wrapper.vm.$route.name).toBe(RouteNames.MHR_INFORMATION_NOTE)
     expect(wrapper.exists()).toBeTruthy()
 
@@ -87,6 +89,24 @@ describe('MHR Unit Note Filing', () => {
     // make sure Review page is not showing up as there are errors
     expect(wrapper.findComponent(UnitNoteReview).exists()).toBeFalsy()
     expect(wrapper.findAll('.border-error-left').length).toBe(2)
+
+    const unitNoteValidationState = store.getMhrUnitNoteValidation
+
+    const expectedUnitNoteValidationState: MhrUnitNoteValidationStateIF = {
+      unitNoteAddValid: {
+        documentIdValid: false,
+        remarksValid: true,
+        personGivingNoticeValid: false,
+        submittingPartyValid: false,
+        effectiveDateTimeValid: true,
+        attentionValid: true,
+        authorizationValid: false,
+        staffPaymentValid: false
+      }
+    }
+
+    // compare app validation state of components against expected validation state
+    expect(isEqual(unitNoteValidationState, expectedUnitNoteValidationState)).toBeTruthy()
 
     // simulate valid fields for Unit Note App screen
     await wrapper.findComponent(UnitNoteAdd).vm.$emit('isValid', true)
