@@ -37,6 +37,7 @@
     <!-- Home Sections Table -->
     <HomeSectionsTable
       :class="{ 'border-error-left': validate }"
+      :validate="validate"
       :isAdding="showAddEditHomeSections"
       :homeSections="getMhrHomeSections"
       :isReviewMode="isReviewMode"

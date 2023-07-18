@@ -24,6 +24,7 @@
                 <AddEditHomeSections
                     :editHomeSection="item"
                     :isNewHomeSection="false"
+                    :validate="validate"
                     @close="activeIndex = -1"
                     @remove="remove(item)"
                     @submit="edit($event)"
@@ -105,7 +106,8 @@ export default defineComponent({
   props: {
     isAdding: { default: false },
     isReviewMode: { default: false },
-    homeSections: { type: Array as () => HomeSectionIF[], default: () => [] }
+    homeSections: { type: Array as () => HomeSectionIF[], default: () => [] },
+    validate: { type: Boolean, default: false }
   },
   setup (props, context) {
     const localState = reactive({
