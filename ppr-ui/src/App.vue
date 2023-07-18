@@ -73,7 +73,7 @@ import * as Views from '@/views'
 import {
   authPprError, authAssetsError, draftDeleteError, historyRegError, loginError, openDocError, paymentErrorReg,
   paymentErrorSearch, registrationCompleteError, registrationDeleteError, registrationLoadError,
-  registrationOpenDraftError, registrationSaveDraftError, searchResultsError
+  registrationOpenDraftError, registrationSaveDraftError, searchResultsError, unitNoteFilingError
 } from '@/resources/dialogOptions'
 import {
   getFees,
@@ -546,6 +546,10 @@ export default defineComponent({
           break
         case ErrorCategories.REPORT_GENERATION:
           localState.errorOptions = openDocError
+          localState.errorDisplay = true
+          break
+        case ErrorCategories.MHR_UNIT_NOTE_FILING:
+          localState.errorOptions = unitNoteFilingError
           localState.errorDisplay = true
           break
         case ErrorCategories.SEARCH:
