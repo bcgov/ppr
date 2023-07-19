@@ -180,8 +180,8 @@ export default defineComponent({
     ]
 
     const localState = reactive({
-      delDesc: getGeneralCollateral.value[1]?.descriptionDelete || '',
-      addDesc: getGeneralCollateral.value[1]?.descriptionAdd || '',
+      delDesc: (getGeneralCollateral?.value && getGeneralCollateral.value[1]?.descriptionDelete) || '',
+      addDesc: (getGeneralCollateral?.value && getGeneralCollateral.value[1]?.descriptionAdd) || '',
       generalCollateral: computed((): GeneralCollateralIF[] => {
         return (getGeneralCollateral.value as GeneralCollateralIF[]) || []
       }),
