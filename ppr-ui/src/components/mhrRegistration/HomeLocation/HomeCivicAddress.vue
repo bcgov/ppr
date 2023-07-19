@@ -7,6 +7,24 @@
       <v-col cols="12" sm="10" class="mt-n1">
         <v-form ref="addressForm" name="address-form" v-model="isValidCivicAddress">
           <div class="form__row">
+            <div class="form__row">
+              <v-autocomplete
+                  autocomplete="new-password"
+                  :name="Math.random()"
+                  filled
+                  class="address-country"
+                  hide-no-data
+                  item-text="name"
+                  item-value="code"
+                  :items="getCountries(true)"
+                  :label="countryLabel"
+                  :rules="[...schemaLocal.country]"
+                  v-model="addressLocal.country"
+              />
+              <!-- special field to select AddressComplete country, separate from our model field -->
+              <input type="hidden" :id="countryId" :value="country" />
+            </div>
+
             <v-text-field
               autocomplete="new-password"
               :id="streetId"
@@ -167,6 +185,7 @@ export default defineComponent({
       enableAddressComplete,
       ...labels,
       ...uniqueIds,
+      ...countryProvincesHelpers,
       ...toRefs(localState)
     }
   }

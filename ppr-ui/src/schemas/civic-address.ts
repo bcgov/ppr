@@ -18,6 +18,8 @@ export const CivicAddressSchema = {
     ...spaceRules
   ],
   country: [
+    baseRules[ValidationRule.REQUIRED],
+    ...spaceRules
   ],
   region: [
     baseRules[ValidationRule.REQUIRED],
