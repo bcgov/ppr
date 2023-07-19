@@ -8,7 +8,12 @@
     <v-form ref="addEditHomeSectionsForm" v-model="addEditValid">
       <v-row no-gutters>
         <v-col cols="12" sm="2">
-          <label class="generic-label">{{ isNewHomeSection ? 'Add' : 'Edit' }} Section</label>
+          <label
+            class="generic-label"
+            :class="{ 'error-text': validate }"
+          >
+            {{ isNewHomeSection ? 'Add' : 'Edit' }} Section
+          </label>
         </v-col>
         <v-col cols="12" sm="10" class="pl-2">
           <!-- Add Edit Form -->
