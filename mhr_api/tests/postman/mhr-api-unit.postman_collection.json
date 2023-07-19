@@ -1570,6 +1570,108 @@
 			]
 		},
 		{
+			"name": "admin registrations",
+			"item": [
+				{
+					"name": "Create MH NRED Admin Reg",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"clientReferenceId\": \"UT-ADMIN-NRED-TAXN-006\",\n  \"attentionReference\": \"JANE GIBSON\",\n  \"documentType\": \"NRED\",\n  \"updateDocumentId\": \"80888225\",\n  \"submittingParty\": {\n    \"businessName\": \"ABC SEARCHING COMPANY\",\n    \"address\": {\n      \"street\": \"222 SUMMER STREET\",\n      \"city\": \"VICTORIA\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V8W 2V8\"\n    },\n    \"emailAddress\": \"bsmith@abc-search.com\"\n  },\n  \"note\": {\n    \"documentType\": \"NRED\",\n    \"documentId\": \"80888227\",\n    \"remarks\": \"UT NRED CANCEL A NOTICE PURSUANT TO SECTION 413 OF THE LOCAL GOVERNMENT ACT WAS FILED\",\n    \"givingNoticeParty\": {\n\t    \"businessName\": \"FRONTIER LAW\",\n\t    \"address\": {\n\t      \"street\": \"#101-10343 100 AVENUE\",\n\t      \"city\": \"FORT ST. JOHN\",\n\t      \"region\": \"BC\",\n\t      \"country\": \"CA\",\n\t      \"postalCode\": \"V1J 1Y8\"\n\t    },\n      \"phoneNumber\": \"2507851924\"\n    }\n  }\n}\n"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/admin-registrations/106830",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"admin-registrations",
+								"106830"
+							]
+						},
+						"description": "Search step 1 submit a query example: search by a Financing Statement registration number which returns no results."
+					},
+					"response": []
+				},
+				{
+					"name": "Create EXRE Admin Reg",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							},
+							{
+								"key": "Staff-Account-Id",
+								"value": "{{staff_account_id}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"clientReferenceId\": \"UT-ADMIN-EXRE-004\",\n  \"attentionReference\": \"JANE GIBSON\",\n  \"documentType\": \"EXRE\",\n  \"updateDocumentId\": \"80888183\",\n  \"documentId\": \"80888228\",\n  \"submittingParty\": {\n    \"businessName\": \"ABC SEARCHING COMPANY\",\n    \"address\": {\n      \"street\": \"222 SUMMER STREET\",\n      \"city\": \"VICTORIA\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V8W 2V8\"\n    },\n    \"emailAddress\": \"bsmith@abc-search.com\"\n  }\n}\n"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/admin-registrations/106797",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"admin-registrations",
+								"106797"
+							]
+						},
+						"description": "Search step 1 submit a query example: search by a Financing Statement registration number which returns no results."
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "documents",
 			"item": [
 				{
@@ -1665,11 +1767,11 @@
 	"variable": [
 		{
 			"key": "apikey",
-			"value": "Provide"
+			"value": "PROVIDE"
 		},
 		{
 			"key": "account_id",
-			"value": "Provide"
+			"value": "ppr_staff"
 		},
 		{
 			"key": "base_url_prism",
@@ -1682,7 +1784,7 @@
 		},
 		{
 			"key": "jwt",
-			"value": "Provide",
+			"value": "PROVIDE",
 			"type": "string"
 		},
 		{
