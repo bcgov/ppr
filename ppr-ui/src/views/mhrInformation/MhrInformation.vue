@@ -52,13 +52,7 @@
 
                   <!-- Has Caution Message -->
                   <template v-if="getMhrInformation.hasCaution">
-                    <header id="yellow-message-bar" class="message-bar mt-9">
-                      <label>
-                        <b>Important:</b> A Caution has been filed against this home.
-                        <span v-if="isRoleStaffReg">See unit notes for further details.</span>
-                        <span v-else>If you require further information please contact BC Registries staff.</span>
-                      </label>
-                    </header>
+                    <CautionBox class="mt-9" :setMsg="hasCautionMsg" />
                     <v-divider class="mx-0 mt-11" />
                   </template>
 
@@ -99,13 +93,11 @@
               </v-col>
             </v-row>
 
-            <header
+            <CautionBox
               v-if="isReviewMode && !isTransferToExecutorProbateWill"
-              id="yellow-message-bar"
-              class="message-bar mt-3 mb-5"
-            >
-              <label><b>Important:</b> This information must match the information on the bill of sale.</label>
-            </header>
+              class="mt-3 mb-5"
+              setMsg="This information must match the information on the bill of sale."
+            />
 
             <!-- Mhr Information Body -->
             <section v-if="dataLoaded" class="py-4">
@@ -349,7 +341,7 @@ import { storeToRefs } from 'pinia'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { StaffPayment } from '@bcrs-shared-components/staff-payment'
 import { StaffPaymentOptions } from '@bcrs-shared-components/enums'
-import { CertifyInformation, StickyContainer } from '@/components/common'
+import { CautionBox, CertifyInformation, StickyContainer } from '@/components/common'
 import { useHomeOwners, useInputRules, useMhrInformation, useMhrInfoValidation, useTransferOwners } from '@/composables'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { PartySearch } from '@/components/parties/party'
@@ -399,6 +391,7 @@ export default defineComponent({
   name: 'MhrInformation',
   components: {
     BaseDialog,
+    CautionBox,
     HomeOwners,
     PartySearch,
     MhrSubmittingParty,
@@ -558,6 +551,13 @@ export default defineComponent({
       /** True if Jest is running the code. */
       isJestRunning: computed((): boolean => {
         return process.env.JEST_WORKER_ID !== undefined
+      }),
+      hasCautionMsg: computed((): string => {
+        let baseMsg = 'A Caution has been filed against this home.'
+
+        return isRoleStaffReg.value
+          ? `${baseMsg} See unit notes for further details.`
+          : `${baseMsg} If you require further information please contact BC Registries staff.`
       })
     })
 
@@ -952,14 +952,6 @@ export default defineComponent({
 
 .submitting-party {
   margin-top: 55px;
-}
-
-.message-bar {
-  font-size: 14px;
-  padding: 1.25rem;
-  background-color: $BCgovGold0;
-  border: 1px solid $BCgovGold5;
-  color: $gray7;
 }
 
 ::v-deep {
