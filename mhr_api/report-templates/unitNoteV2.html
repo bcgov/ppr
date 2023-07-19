@@ -97,14 +97,8 @@
       {% endif %}
     </div>
 
-    {% if note is defined and note.givingNoticeParty is defined %}
+    {% if note is defined %}
       [[registration/givingNoticeParty.html]]
-    {% elif note is defined and note.documentType is defined and note.documentType == 'TAXN' %}
-      <div class="section-title mt-5">Collector</div>
-      <div class="section-data pt-3">N/A</div>
-    {% else %}
-        <div class="section-title mt-5">Person Giving Notice</div>
-        <div class="section-data pt-3">N/A</div>
     {% endif %}
 
     [[registration/submittingParty.html]]

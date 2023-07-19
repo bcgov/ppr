@@ -83,7 +83,7 @@ def post_notes(mhr_number: str):  # pylint: disable=too-many-return-statements,t
                                                    request_json,
                                                    account_id,
                                                    group,
-                                                   TransactionTypes.UNIT_NOTE)
+                                                   get_transaction_type(request_json))
         current_app.logger.debug(f'building note response json for {mhr_number}')
         registration.change_registrations = current_reg.change_registrations
         response_json = registration.json
@@ -109,3 +109,13 @@ def post_notes(mhr_number: str):  # pylint: disable=too-many-return-statements,t
         return resource_utils.business_exception_response(exception)
     except Exception as default_exception:   # noqa: B902; return nicer default error
         return resource_utils.default_exception_response(default_exception)
+
+
+def get_transaction_type(request_json) -> str:
+    """Try and obtain an optional boolean parameter value from the request parameters."""
+    tran_type: str = TransactionTypes.UNIT_NOTE
+    if request_json.get('note') and request_json['note'].get('documentType', '') == MhrDocumentTypes.TAXN:
+        tran_type = TransactionTypes.UNIT_NOTE_TAXN
+    elif request_json.get('note') and request_json['note'].get('documentType', '') == MhrDocumentTypes.REG_102:
+        tran_type = TransactionTypes.UNIT_NOTE_102
+    return tran_type
