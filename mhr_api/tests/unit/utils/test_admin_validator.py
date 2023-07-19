@@ -92,8 +92,8 @@ TEST_REG_DATA = [
     ('Invalid missing submitting party', False, 'NRED', DOC_ID_VALID, '022873', 'ppr_staff',
      validator_utils.SUBMITTING_REQUIRED),
     ('Invalid FROZEN', False, 'NRED', DOC_ID_VALID, '003936', '2523', validator_utils.STATE_NOT_ALLOWED),
-    ('Invalid EXEMPT', False, 'NRED', DOC_ID_VALID, '022873', 'ppr_staff', validator_utils.STATE_NOT_ALLOWED),
-    ('Invalid CANCELLED', False, 'NRED', DOC_ID_VALID, '022873', 'ppr_staff', validator_utils.STATE_NOT_ALLOWED),
+    ('Invalid EXEMPT', False, 'NRED', DOC_ID_VALID, '077010', 'ppr_staff', validator_utils.STATE_NOT_ALLOWED),
+    ('Invalid CANCELLED', False, 'NRED', DOC_ID_VALID, '001453', 'ppr_staff', validator_utils.STATE_NOT_ALLOWED),
     ('Invalid missing doc id', False, 'NRED', None, '022873', 'ppr_staff', validator.DOC_ID_REQUIRED),
     ('Invalid doc id checksum', False, 'NRED', DOC_ID_INVALID_CHECKSUM, '022873', 'ppr_staff',
      validator.DOC_ID_INVALID_CHECKSUM),
@@ -117,6 +117,37 @@ TEST_NOTE_DATA_NOTICE = [
     ('Invalid business no address', False, 'NRED', NOTICE_NO_ADDRESS2, '022873', 'ppr_staff',
      validator.NOTICE_ADDRESS_REQUIRED)
 ]
+# test data pattern is ({description}, {valid}, {update_doc_id}, {mhr_num}, {account}, {message_content})
+TEST_DATA_EXRE = [
+    ('Invalid FROZEN', False, None, '003936', '2523', validator_utils.STATE_NOT_ALLOWED),
+    ('Invalid ACTIVE', False, '44161815', '022873', 'ppr_staff', validator_utils.STATE_NOT_ALLOWED),
+    ('Invalid CANCELLED', False, '43641595', '001453', 'ppr_staff', validator_utils.STATE_NOT_ALLOWED),
+    ('Valid state', True, '41617884', '077010', 'ppr_staff', None),
+    ('Valid no note', True, '41617884', '077010', 'ppr_staff', None)
+]
+
+
+@pytest.mark.parametrize('desc,valid,update_doc_id,mhr_num,account,message_content', TEST_DATA_EXRE)
+def test_validate_exre(session, desc, valid, update_doc_id, mhr_num, account, message_content):
+    """Assert that EXRE document type validation works as expected."""
+    # setup
+    json_data = get_valid_registration()
+    if update_doc_id:
+        json_data['updateDocumentId'] = update_doc_id
+    json_data['documentType'] = MhrDocumentTypes.EXRE
+    if desc == 'Valid no note':
+        del json_data['note']
+    if json_data.get('note'):
+        json_data['note']['documentType'] = MhrDocumentTypes.EXRE
+    registration: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account)
+    error_msg = validator.validate_admin_reg(registration, json_data)
+    current_app.logger.debug(error_msg)
+    if valid:
+        assert error_msg == ''
+    else:
+        assert error_msg != ''
+        if message_content:
+            assert error_msg.find(message_content) != -1
 
 
 @pytest.mark.parametrize('desc,valid,update_doc_id,mhr_num,account,message_content', TEST_NOTE_DATA_NRED)
@@ -184,10 +215,6 @@ def test_validate_admin_reg(session, desc, valid, doc_type, doc_id, mhr_num, acc
         del json_data['note']['documentId']
 
     registration: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account)
-    if desc == 'Invalid EXEMPT':
-        registration.status_type =  MhrRegistrationStatusTypes.EXEMPT
-    elif desc == 'Invalid CANCELLED':
-        registration.status_type =  MhrRegistrationStatusTypes.CANCELLED
     error_msg = validator.validate_admin_reg(registration, json_data)
     current_app.logger.debug(error_msg)
     if valid:

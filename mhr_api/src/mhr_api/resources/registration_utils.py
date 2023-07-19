@@ -20,6 +20,7 @@ from flask import request, current_app, g
 from mhr_api.exceptions import DatabaseException
 from mhr_api.models import EventTracking, MhrRegistration, MhrRegistrationReport
 from mhr_api.models import utils as model_utils
+from mhr_api.models.registration_utils import save_cancel_note, save_active
 from mhr_api.models.type_tables import MhrDocumentType, MhrDocumentTypes
 from mhr_api.reports import get_pdf
 from mhr_api.resources import utils as resource_utils
@@ -298,7 +299,7 @@ def pay_and_save_note(req: request,  # pylint: disable=too-many-arguments
     try:
         registration.save()
         if request_json.get('cancelDocumentId') and request_json['note'].get('documentType') == MhrDocumentTypes.NCAN:
-            current_reg.save_cancel_note(request_json, registration.id)
+            save_cancel_note(current_reg, request_json, registration.id)
     except Exception as db_exception:   # noqa: B902; handle all db related errors.
         current_app.logger.error(SAVE_ERROR_MESSAGE.format(account_id, 'registration', str(db_exception)))
         if account_id and invoice_id is not None:
@@ -343,8 +344,11 @@ def pay_and_save_admin(req: request,  # pylint: disable=too-many-arguments
     # Try to save the registration: failure throws an exception.
     try:
         registration.save()
-        if request_json.get('updateDocumentId') and request_json.get('documentType') == MhrDocumentTypes.NRED:
-            current_reg.save_cancel_note(request_json, registration.id)
+        if request_json.get('updateDocumentId') and request_json.get('documentType') in (MhrDocumentTypes.NRED,
+                                                                                         MhrDocumentTypes.EXRE):
+            save_cancel_note(current_reg, request_json, registration.id)
+        if request_json.get('documentType') == MhrDocumentTypes.EXRE:
+            save_active(current_reg)
     except Exception as db_exception:   # noqa: B902; handle all db related errors.
         current_app.logger.error(SAVE_ERROR_MESSAGE.format(account_id, 'registration', str(db_exception)))
         if account_id and invoice_id is not None:

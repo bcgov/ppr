@@ -21,7 +21,13 @@ from sqlalchemy.sql import text
 from mhr_api.exceptions import DatabaseException
 from mhr_api.models import utils as model_utils
 from mhr_api.models.db import db
-from mhr_api.models.type_tables import MhrRegistrationTypes, MhrDocumentType, MhrDocumentTypes, MhrNoteStatusTypes
+from mhr_api.models.type_tables import (
+    MhrDocumentType,
+    MhrDocumentTypes,
+    MhrNoteStatusTypes,
+    MhrRegistrationTypes,
+    MhrRegistrationStatusTypes
+)
 from mhr_api.services.authz import MANUFACTURER_GROUP, QUALIFIED_USER_GROUP, GENERAL_USER_GROUP, BCOL_HELP
 from mhr_api.services.authz import GOV_ACCOUNT_ROLE
 
@@ -437,3 +443,68 @@ def get_document_description(doc_type: str) -> str:
         if doc_type_info:
             return doc_type_info.document_type_desc
     return ''
+
+
+def save_cancel_note(registration, json_data, new_reg_id):  # pylint: disable=too-many-branches; only 1 more.
+    """Update the original note status and change registration id."""
+    cancel_doc_id: str = json_data.get('cancelDocumentId', '')
+    if not cancel_doc_id:
+        cancel_doc_id: str = json_data.get('updateDocumentId', '')
+    cancel_note = get_cancel_note(registration, cancel_doc_id)
+    if cancel_note:  # pylint: disable=too-many-nested-blocks; only 1 more.
+        cancel_note.status_type = MhrNoteStatusTypes.CANCELLED
+        cancel_note.change_registration_id = new_reg_id
+        current_app.logger.debug(f'updating note status, change reg id for reg id {cancel_note.registration_id}')
+        # Cancelling one active caution registration cancels all active caution registrations
+        if cancel_note.document_type in (MhrDocumentTypes.CAU, MhrDocumentTypes.CAUC, MhrDocumentTypes.CAUE):
+            for reg in registration.change_registrations:
+                if reg.notes:
+                    doc = reg.documents[0]
+                    if doc.document_id != cancel_doc_id and \
+                            doc.document_type in (MhrDocumentTypes.CAU,
+                                                  MhrDocumentTypes.CAUC,
+                                                  MhrDocumentTypes.CAUE):
+                        note = reg.notes[0]
+                        if note.status_type == MhrNoteStatusTypes.ACTIVE:
+                            note.status_type = MhrNoteStatusTypes.CANCELLED
+                            note.change_registration_id = new_reg_id
+        elif cancel_note.document_type in (MhrDocumentTypes.EXNR, MhrDocumentTypes.EXRS, MhrDocumentTypes.EXMN):
+            for reg in registration.change_registrations:
+                if reg.notes:
+                    doc = reg.documents[0]
+                    if doc.document_id != cancel_doc_id and \
+                            doc.document_type in (MhrDocumentTypes.EXNR,
+                                                  MhrDocumentTypes.EXRS,
+                                                  MhrDocumentTypes.EXMN):
+                        note = reg.notes[0]
+                        if note.status_type == MhrNoteStatusTypes.ACTIVE:
+                            note.status_type = MhrNoteStatusTypes.CANCELLED
+                            note.change_registration_id = new_reg_id
+        db.session.commit()
+    else:
+        current_app.logger.debug(f'No modernized note found to cancel for reg id= {registration.id}')
+
+
+def save_active(registration):
+    """Set the state of the original MH registration to active."""
+    if registration.status_type:
+        current_app.logger.info(f'Setting MH state to ACTIVE for registration id={registration.id}')
+        registration.status_type = MhrRegistrationStatusTypes.ACTIVE
+        db.session.commit()
+    else:
+        current_app.logger.info('No modernized registration to set to active status.')
+
+
+def get_cancel_note(registration, cancel_document_id: str):
+    """Try and find the note matching the cancel document id."""
+    cancel_note = None
+    current_app.logger.info(f'Looking up note to cancel with doc id={cancel_document_id}')
+    if not registration.change_registrations:
+        current_app.logger.info('No change registrations so no notes to cancel.')
+        return cancel_note
+    for reg in registration.change_registrations:
+        if reg.notes:
+            doc = reg.documents[0]
+            if doc.document_id == cancel_document_id:
+                return reg.notes[0]
+    return cancel_note

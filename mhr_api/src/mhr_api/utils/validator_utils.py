@@ -19,8 +19,12 @@ from flask import current_app
 
 from mhr_api.models import MhrRegistration, Db2Owngroup, Db2Document, MhrDraft
 from mhr_api.models import registration_utils as reg_utils
-from mhr_api.models.type_tables import MhrRegistrationStatusTypes, MhrStatusTypes
-from mhr_api.models.type_tables import MhrRegistrationTypes
+from mhr_api.models.type_tables import (
+    MhrDocumentTypes,
+    MhrRegistrationStatusTypes,
+    MhrRegistrationTypes,
+    MhrStatusTypes
+)
 from mhr_api.models.db2.utils import get_db2_permit_count
 from mhr_api.models.utils import is_legacy
 from mhr_api.services import ltsa
@@ -98,9 +102,9 @@ def validate_registration_state(registration: MhrRegistration, staff: bool, reg_
     error_msg = ''
     if not registration:
         return error_msg
-    if registration.status_type and registration.status_type != MhrRegistrationStatusTypes.ACTIVE:
-        error_msg += STATE_NOT_ALLOWED
-    elif is_legacy() and registration.manuhome:
+    if reg_type and reg_type == MhrDocumentTypes.EXRE:
+        return validate_registration_state_exre(registration)
+    if is_legacy() and registration.manuhome:
         if registration.manuhome.mh_status != registration.manuhome.StatusTypes.REGISTERED:
             error_msg += STATE_NOT_ALLOWED
         elif registration.manuhome.reg_documents:
@@ -111,6 +115,31 @@ def validate_registration_state(registration: MhrRegistration, staff: bool, reg_
                     reg_type != MhrRegistrationTypes.TRANS:
                 error_msg += STATE_NOT_ALLOWED
                 error_msg += STATE_FROZEN_AFFIDAVIT
+    elif registration.status_type:
+        if registration.status_type != MhrRegistrationStatusTypes.ACTIVE:
+            error_msg += STATE_NOT_ALLOWED
+        elif registration.change_registrations:
+            last_reg: MhrRegistration = registration.change_registrations[-1]
+            if not staff and last_reg.registration_type == MhrRegistrationTypes.TRANS_AFFIDAVIT:
+                error_msg += STATE_NOT_ALLOWED
+            elif staff and last_reg.registration_type == MhrRegistrationTypes.TRANS_AFFIDAVIT and \
+                    (not reg_type or reg_type != MhrRegistrationTypes.TRANS):
+                error_msg += STATE_NOT_ALLOWED
+                error_msg += STATE_FROZEN_AFFIDAVIT
+    return error_msg
+
+
+def validate_registration_state_exre(registration: MhrRegistration):
+    """Validate registration state for rescind exemption requests."""
+    error_msg = ''
+    if is_legacy() and registration.manuhome:
+        if registration.manuhome.mh_status == registration.manuhome.StatusTypes.EXEMPT:
+            return error_msg
+        error_msg += STATE_NOT_ALLOWED
+    elif registration.status_type:
+        if registration.status_type == MhrRegistrationStatusTypes.EXEMPT:
+            return error_msg
+        error_msg += STATE_NOT_ALLOWED
     return error_msg
 
 

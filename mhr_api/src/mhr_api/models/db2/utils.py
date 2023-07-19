@@ -629,7 +629,7 @@ def __build_summary(row, add_in_user_list: bool = True, mhr_list=None):
         summary['inUserList'] = False
     if mhr_list and summary['documentType'] in (Db2Document.DocumentTypes.CONV, Db2Document.DocumentTypes.MHREG_TRIM):
         summary['lienRegistrationType'] = __get_lien_registration_type(mhr_number, mhr_list)
-    elif summary['documentType'] == MhrDocumentTypes.NCAN:
+    elif summary['documentType'] in (MhrDocumentTypes.NCAN, MhrDocumentTypes.NRED, MhrDocumentTypes.EXRE):
         summary = __get_cancel_info(summary, row)
     elif summary['documentType'] in (MhrDocumentTypes.CAU, MhrDocumentTypes.CAUC, MhrDocumentTypes.CAUE):
         summary = __get_caution_info(summary, row)
@@ -891,7 +891,7 @@ def update_note_json(registration, note_json: dict) -> dict:
                     note_json['expiryDateTime'] = model_utils.format_ts(note.expiry_date)
                 if note.effective_ts:
                     note_json['effectiveDateTime'] = model_utils.format_ts(note.effective_ts)
-                if note.document_type in (MhrDocumentTypes.NCAN, MhrDocumentTypes.NRED):
+                if note.document_type in (MhrDocumentTypes.NCAN, MhrDocumentTypes.NRED, MhrDocumentTypes.EXRE):
                     note_json['remarks'] = note.remarks
     return note_json
 
