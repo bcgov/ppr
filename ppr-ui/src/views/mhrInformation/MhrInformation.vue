@@ -38,15 +38,24 @@
                   <p>Ensure ALL of the information below is correct before making any changes to this
                     registration. Necessary fees will be applied as updates are made.
                   </p>
+
+                  <!-- Unit Note Info -->
                   <p v-if="getMhrUnitNotes && getMhrUnitNotes.length >= 1">
                     There are unit notes attached to this manufactured home.
-                    <span v-if="!isRoleStaffReg">
-                      To view unit note information on this home, complete a manufactured home search.
-                    </span>
-                    <span v-else>
+                    <span v-if="isRoleStaffReg">
                       <a href="#unit-note-component">See Unit Notes</a>
                     </span>
+                    <span v-else>
+                      To view unit note information on this home, complete a manufactured home search.
+                    </span>
                   </p>
+
+                  <!-- Has Caution Message -->
+                  <template v-if="getMhrInformation.hasCaution">
+                    <CautionBox class="mt-9" :setMsg="hasCautionMsg" />
+                    <v-divider class="mx-0 mt-11" />
+                  </template>
+
                 </template>
                 <p class="mt-7" v-else>
                   Review your changes and complete the additional information before registering.
@@ -84,9 +93,11 @@
               </v-col>
             </v-row>
 
-            <header id="yellow-message-bar" class="message-bar" v-if="isReviewMode && !isTransferToExecutorProbateWill">
-              <label><b>Important:</b> This information must match the information on the bill of sale.</label>
-            </header>
+            <CautionBox
+              v-if="isReviewMode && !isTransferToExecutorProbateWill"
+              class="mt-3 mb-5"
+              setMsg="This information must match the information on the bill of sale."
+            />
 
             <!-- Mhr Information Body -->
             <section v-if="dataLoaded" class="py-4">
@@ -330,7 +341,7 @@ import { storeToRefs } from 'pinia'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { StaffPayment } from '@bcrs-shared-components/staff-payment'
 import { StaffPaymentOptions } from '@bcrs-shared-components/enums'
-import { CertifyInformation, StickyContainer } from '@/components/common'
+import { CautionBox, CertifyInformation, StickyContainer } from '@/components/common'
 import { useHomeOwners, useInputRules, useMhrInformation, useMhrInfoValidation, useTransferOwners } from '@/composables'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { PartySearch } from '@/components/parties/party'
@@ -380,6 +391,7 @@ export default defineComponent({
   name: 'MhrInformation',
   components: {
     BaseDialog,
+    CautionBox,
     HomeOwners,
     PartySearch,
     MhrSubmittingParty,
@@ -539,6 +551,13 @@ export default defineComponent({
       /** True if Jest is running the code. */
       isJestRunning: computed((): boolean => {
         return process.env.JEST_WORKER_ID !== undefined
+      }),
+      hasCautionMsg: computed((): string => {
+        let baseMsg = 'A Caution has been filed against this home.'
+
+        return isRoleStaffReg.value
+          ? `${baseMsg} See unit notes for further details.`
+          : `${baseMsg} If you require further information please contact BC Registries staff.`
       })
     })
 
@@ -933,16 +952,6 @@ export default defineComponent({
 
 .submitting-party {
   margin-top: 55px;
-}
-
-.message-bar {
-  font-size: 14px;
-  padding: 1.25rem;
-  background-color: $BCgovGold0;
-  border: 1px solid $BCgovGold5;
-  color: $gray7;
-  margin-top: 10px;
-  margin-bottom: 20px;
 }
 
 ::v-deep {

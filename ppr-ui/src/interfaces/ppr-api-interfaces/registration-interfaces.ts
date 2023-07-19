@@ -148,6 +148,7 @@ export interface MhRegistrationSummaryIF {
   createDateTime: string
   declaredValue?: string
   draftNumber?: string
+  hasCaution?: boolean
   mhrNumber: string
   ownerNames: string
   path: string

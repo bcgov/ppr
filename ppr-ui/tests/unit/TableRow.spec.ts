@@ -2,7 +2,7 @@
 import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
 import { createPinia, setActivePinia } from 'pinia'
-import { useStore } from '../../src/store/store'
+import { useStore } from '@/store/store'
 
 import { createLocalVue, mount, Wrapper, WrapperArray } from '@vue/test-utils'
 import flushPromises from 'flush-promises'
@@ -451,7 +451,7 @@ describe('Mhr TableRow tests', () => {
           // status type
           expect(rowData.at(3).text()).toEqual('Active')
           // expiry days
-          expect(rowData.at(8).text()).toEqual('')
+          expect(rowData.at(8).text()).toEqual('1 year 134 days')
           // action btn is not there
           expect(rowData.at(10).text()).toContain('')
         }

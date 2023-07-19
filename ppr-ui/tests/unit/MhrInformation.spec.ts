@@ -8,7 +8,7 @@ import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
 
 // local components
 import { HomeOwners, MhrInformation } from '@/views'
-import { AccountInfo, StickyContainer, CertifyInformation, SharedDatePicker } from '@/components/common'
+import { AccountInfo, CautionBox, StickyContainer, CertifyInformation, SharedDatePicker } from '@/components/common'
 import mockRouter from './MockRouter'
 import { AuthRoles, HomeTenancyTypes, RouteNames, ApiTransferTypes, UITransferTypes } from '@/enums'
 import { HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
@@ -612,7 +612,7 @@ describe('Mhr Information', () => {
     await nextTick()
 
     // exists on review page
-    expect(wrapper.find('#yellow-message-bar').exists()).toBeTruthy()
+    expect(wrapper.findComponent(CautionBox).exists()).toBe(true)
 
     // trigger back button
     wrapper.find('#btn-stacked-back').trigger('click')
