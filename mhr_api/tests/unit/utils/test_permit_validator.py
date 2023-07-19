@@ -281,17 +281,16 @@ TEST_LOCATION_DATA = [
     ('Non utf-8 exception plan', None, None, None, INVALID_TEXT_CHARSET, None, None),
     ('Non utf-8 band name', None, None, None, None, INVALID_TEXT_CHARSET, None)
 ]
-# test data pattern is ({description}, {valid}, {staff}, {doc_id}, {message_content}, {status}, {group})
+# test data pattern is ({description}, {valid}, {staff}, {doc_id}, {message_content}, {mhr_num}, {account}, {group})
 TEST_PERMIT_DATA = [
-    (DESC_VALID, True, True, None, None, MhrRegistrationStatusTypes.ACTIVE, STAFF_ROLE),
-    ('Valid no doc id not staff', True, False, None, None, None, REQUEST_TRANSPORT_PERMIT),
-    ('Invalid FROZEN', False, False, None, validator_utils.STATE_NOT_ALLOWED, MhrRegistrationStatusTypes.ACTIVE,
+    (DESC_VALID, True, True, None, None, '100413', 'PS12345', STAFF_ROLE),
+    ('Valid no doc id not staff', True, False, None, None, '100413', 'PS12345', REQUEST_TRANSPORT_PERMIT),
+    ('Invalid FROZEN', False, False, None, validator_utils.STATE_NOT_ALLOWED, '003936', '2523',
      REQUEST_TRANSPORT_PERMIT),
-    ('Invalid staff FROZEN', False, True, None, validator_utils.STATE_FROZEN_AFFIDAVIT, MhrRegistrationStatusTypes.ACTIVE,
+    ('Invalid staff FROZEN', False, True, None, validator_utils.STATE_FROZEN_AFFIDAVIT, '003936', 'ppr_staff',
      REQUEST_TRANSPORT_PERMIT),
-    ('Invalid EXEMPT', False, False, None, validator_utils.STATE_NOT_ALLOWED, MhrRegistrationStatusTypes.EXEMPT,
-     STAFF_ROLE),
-    ('Invalid HISTORICAL', False, False, None, validator_utils.STATE_NOT_ALLOWED, MhrRegistrationStatusTypes.HISTORICAL,
+    ('Invalid EXEMPT', False, False, None, validator_utils.STATE_NOT_ALLOWED, '077010', 'ppr_staff', STAFF_ROLE),
+    ('Invalid CANCELLED', False, False, None, validator_utils.STATE_NOT_ALLOWED, '001453', 'ppr_staff',
      REQUEST_TRANSPORT_PERMIT)
 ]
 # testdata pattern is ({description}, {valid}, {mhr_num}, {location}, {message content}, {group})
@@ -332,26 +331,19 @@ TEST_DATA_PID = [
 ]
 
 
-@pytest.mark.parametrize('desc,valid,staff,doc_id,message_content,status,group', TEST_PERMIT_DATA)
-def test_validate_permit(session, desc, valid, staff, doc_id, message_content, status, group):
+@pytest.mark.parametrize('desc,valid,staff,doc_id,message_content,mhr_num,account,group', TEST_PERMIT_DATA)
+def test_validate_permit(session, desc, valid, staff, doc_id, message_content, mhr_num, account, group):
     """Assert that basic MH transport permit validation works as expected."""
     # setup
-    mhr_num: str = '100413'
-    account_id: str = 'PS12345'
     json_data = get_valid_registration()
     if staff and doc_id:
         json_data['documentId'] = doc_id
     elif json_data.get('documentId'):
         del json_data['documentId']
-    if desc in ('Invalid FROZEN', 'Invalid staff FROZEN'):
-        mhr_num = '003936'
-        account_id = '2523'
     # current_app.logger.info(json_data)
     valid_format, errors = schema_utils.validate(json_data, 'permit', 'mhr')
     # Additional validation not covered by the schema.
-    registration: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account_id)
-    if status:
-        registration.status_type = status
+    registration: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account)
     error_msg = validator.validate_permit(registration, json_data, staff, group)
     if errors:
         for err in errors:

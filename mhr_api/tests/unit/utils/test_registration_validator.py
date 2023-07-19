@@ -240,7 +240,7 @@ TEST_EXEMPTION_DATA = [
     (DESC_VALID, True, True, DOC_ID_VALID, None, MhrRegistrationStatusTypes.ACTIVE),
     ('Valid no doc id not staff', True, False, None, None, None),
     ('Invalid EXEMPT', False, False, None, validator_utils.STATE_NOT_ALLOWED, MhrRegistrationStatusTypes.EXEMPT),
-    ('Invalid HISTORICAL', False, False, None, validator_utils.STATE_NOT_ALLOWED, MhrRegistrationStatusTypes.HISTORICAL),
+    ('Invalid CANCELLED', False, False, None, validator_utils.STATE_NOT_ALLOWED, MhrRegistrationStatusTypes.HISTORICAL),
     ('Invalid note doc type', False, False, None, validator.NOTE_DOC_TYPE_INVALID, MhrRegistrationStatusTypes.ACTIVE)
 ]
 # testdata pattern is ({description}, {valid}, {numerator}, {denominator}, {groups}, {message content})
@@ -401,6 +401,8 @@ def test_validate_registration_group(session, desc, valid, numerator, denominato
 def test_validate_exemption(session, desc, valid, staff, doc_id, message_content, status):
     """Assert that MH exemption validation works as expected."""
     # setup
+    mhr_num: str = '045349'
+    account_id: str = 'PS12345'
     json_data = copy.deepcopy(EXEMPTION)
     if staff and doc_id:
         json_data['documentId'] = doc_id
@@ -408,13 +410,18 @@ def test_validate_exemption(session, desc, valid, staff, doc_id, message_content
         del json_data['documentId']
     if desc == 'Invalid note doc type':
         json_data['note']['documentType'] = MhrDocumentTypes.CAUC
+    elif desc == 'Invalid EXEMPT':
+        mhr_num = '077010'
+        account_id = 'ppr_staff'
+    elif desc == 'Invalid CANCELLED':
+        mhr_num = '001453'
+        account_id = 'ppr_staff'
     del json_data['submittingParty']['phoneExtension']
     # current_app.logger.info(json_data)
     valid_format, errors = schema_utils.validate(json_data, 'exemption', 'mhr')
     # Additional validation not covered by the schema.
-    registration: MhrRegistration = MhrRegistration.find_by_mhr_number('045349', 'PS12345')
-    if status:
-        registration.status_type = status
+    registration: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account_id)
+
     error_msg = validator.validate_exemption(registration, json_data, staff)
     if errors:
         for err in errors:

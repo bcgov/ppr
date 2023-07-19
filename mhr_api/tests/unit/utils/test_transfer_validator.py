@@ -76,7 +76,7 @@ TEST_TRANSFER_DATA = [
     ('Valid staff FROZEN', True, True, None, None, MhrRegistrationStatusTypes.ACTIVE),
     ('Valid no doc id not staff', True, False, None, None, None),
     ('Invalid EXEMPT', False, False, None, validator_utils.STATE_NOT_ALLOWED, MhrRegistrationStatusTypes.EXEMPT),
-    ('Invalid HISTORICAL', False, False, None, validator_utils.STATE_NOT_ALLOWED, MhrRegistrationStatusTypes.HISTORICAL),
+    ('Invalid CANCELLED', False, False, None, validator_utils.STATE_NOT_ALLOWED, MhrRegistrationStatusTypes.HISTORICAL),
     ('Invalid FROZEN', False, False, None, validator_utils.STATE_NOT_ALLOWED, MhrRegistrationStatusTypes.ACTIVE),
     ('Invalid draft', False, False, None, validator_utils.DRAFT_NOT_ALLOWED, MhrRegistrationStatusTypes.ACTIVE),
     (DESC_INVALID_GROUP_ID, False, False, None, validator.DELETE_GROUP_ID_INVALID, MhrRegistrationStatusTypes.ACTIVE),
@@ -261,6 +261,13 @@ def test_validate_transfer(session, desc, valid, staff, doc_id, message_content,
         account_id = 'ppr_staff'
         json_data['mhrNumber'] = '100377'
         json_data['draftNumber'] = '101421'
+    elif desc == 'Invalid EXEMPT':
+        mhr_num = '077010'
+        account_id = 'ppr_staff'
+    elif desc == 'Invalid CANCELLED':
+        mhr_num = '001453'
+        account_id = 'ppr_staff'
+
     valid_format, errors = schema_utils.validate(json_data, 'transfer', 'mhr')
     # Additional validation not covered by the schema.
     registration: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account_id)

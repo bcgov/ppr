@@ -142,10 +142,10 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
             elif self.registration_type in (MhrRegistrationTypes.EXEMPTION_NON_RES, MhrRegistrationTypes.EXEMPTION_RES):
                 reg_json = self.set_note_json(reg_json)
             elif self.registration_type == MhrRegistrationTypes.REG_STAFF_ADMIN and \
-                    (not self.notes or doc_json.get('documentType') == MhrDocumentTypes.NRED):
+                    (not self.notes or doc_json.get('documentType') in (MhrDocumentTypes.NRED, MhrDocumentTypes.EXRE)):
                 reg_json['documentType'] = doc_json.get('documentType')
                 del reg_json['declaredValue']
-                if doc_json.get('documentType') == MhrDocumentTypes.NRED:
+                if doc_json.get('documentType') in (MhrDocumentTypes.NRED, MhrDocumentTypes.EXRE):
                     reg_json = self.set_note_json(reg_json)
             elif self.registration_type == MhrRegistrationTypes.REG_NOTE:
                 reg_json = self.set_note_json(reg_json)
@@ -310,7 +310,9 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         """Build the note JSON for an individual registration that has a unit note."""
         if reg_json and self.notes:  # pylint: disable=too-many-nested-blocks; only 1 more.
             reg_note = self.notes[0].json
-            if reg_note.get('documentType') in (MhrDocumentTypes.NCAN, MhrDocumentTypes.NRED):
+            if reg_note.get('documentType') in (MhrDocumentTypes.NCAN,
+                                                MhrDocumentTypes.NRED,
+                                                MhrDocumentTypes.EXRE):
                 cnote: MhrNote = reg_utils.find_cancelled_note(self, self.id)
                 if cnote:
                     current_app.logger.debug(f'Found cancelled note {cnote.document_type}')
@@ -372,31 +374,6 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         """Update the original MH removed owner groups."""
         self.remove_groups(json_data, new_reg_id)
         db.session.commit()
-
-    def save_cancel_note(self, json_data, new_reg_id):
-        """Update the original note status and change registration id."""
-        cancel_doc_id: str = json_data.get('cancelDocumentId', '')
-        if not cancel_doc_id:
-            cancel_doc_id: str = json_data.get('updateDocumentId', '')
-        cancel_note: MhrNote = self.get_cancel_note(cancel_doc_id)
-        if cancel_note:  # pylint: disable=too-many-nested-blocks; only 1 more.
-            cancel_note.status_type = MhrNoteStatusTypes.CANCELLED
-            cancel_note.change_registration_id = new_reg_id
-            current_app.logger.debug(f'updating note status, change reg id for reg id {cancel_note.registration_id}')
-            # Cancelling one active caution registration cancels all active caution registrations
-            if cancel_note.document_type in (MhrDocumentTypes.CAU, MhrDocumentTypes.CAUC, MhrDocumentTypes.CAUE):
-                for reg in self.change_registrations:
-                    if reg.notes:
-                        doc: MhrDocument = reg.documents[0]
-                        if doc.document_id != cancel_doc_id and \
-                                doc.document_type in (MhrDocumentTypes.CAU,
-                                                      MhrDocumentTypes.CAUC,
-                                                      MhrDocumentTypes.CAUE):
-                            note: MhrNote = reg.notes[0]
-                            if note.status_type == MhrNoteStatusTypes.ACTIVE:
-                                note.status_type = MhrNoteStatusTypes.CANCELLED
-                                note.change_registration_id = new_reg_id
-            db.session.commit()
 
     def save_permit(self, new_reg_id):
         """Update the existing location state to historical."""
@@ -595,14 +572,12 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('DB find_by_document_id exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)
-
         if not registration and not model_utils.is_legacy():
             raise BusinessException(
                 error=model_utils.ERR_DOCUMENT_NOT_FOUND_ID.format(code=ResourceErrorCodes.NOT_FOUND_ERR,
                                                                    document_id=document_id),
                 status_code=HTTPStatus.NOT_FOUND
             )
-
         if not staff and account_id and registration and registration.account_id != account_id:
             # Check extra registrations
             extra_reg = MhrExtraRegistration.find_by_mhr_number(registration.mhr_number, account_id)
@@ -654,10 +629,8 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
             draft.draft = json_data
             registration.draft_id = draft.id
         registration.draft = draft
-
         if 'clientReferenceId' in json_data:
             registration.client_reference_id = json_data['clientReferenceId']
-
         registration.create_new_groups(json_data)
         # Other parties
         registration.parties = MhrParty.create_from_registration_json(json_data, registration.id)
@@ -714,7 +687,9 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         doc: MhrDocument = MhrDocument.create_from_json(registration,
                                                         json_data,
                                                         REG_TO_DOC_TYPE[registration.registration_type])
-        if registration.registration_type == MhrRegistrationTypes.REG_NOTE:
+        if registration.registration_type == MhrRegistrationTypes.REG_STAFF_ADMIN and json_data.get('documentType'):
+            doc.document_type = json_data.get('documentType')
+        elif registration.registration_type == MhrRegistrationTypes.REG_NOTE and json_data.get('note'):
             doc.document_type = json_data['note'].get('documentType')
         doc.registration_id = base_reg.id
         registration.documents = [doc]
@@ -865,18 +840,6 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         if base_reg:
             registration.manuhome = base_reg.manuhome
         return registration
-
-    def get_cancel_note(self, cancel_document_id: str) -> MhrNote:
-        """Try and find the note matching the cancel document id."""
-        cancel_note: MhrNote = None
-        if not self.change_registrations:
-            return cancel_note
-        for reg in self.change_registrations:
-            if reg.notes:
-                doc: MhrDocument = reg.documents[0]
-                if doc.document_id == cancel_document_id:
-                    return reg.notes[0]
-        return cancel_note
 
     def adjust_group_interest(self, new: bool):
         """For tenants in common groups adjust group interest to a common denominator."""

@@ -60,7 +60,7 @@ def post_admin_registration(mhr_number: str):  # pylint: disable=too-many-return
             remarks = request_json['note'].get('remarks')
             if not remarks:   # Temporary substitution to pass schema validation, some doc types allow.
                 request_json['note']['remarks'] = ' '
-        valid_format, errors = schema_utils.validate(request_json, 'noteRegistration', 'mhr')
+        valid_format, errors = schema_utils.validate(request_json, 'adminRegistration', 'mhr')
         # Additional validation not covered by the schema.
         if request_json.get('note'):
             request_json['note']['remarks'] = remarks

@@ -11,14 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""This module holds unit note registration validation for rules not covered by the schema.
+"""This module holds staff admin registration validation for rules not covered by the schema.
 
 Validation includes verifying the data combination for various registration document types and timestamps.
 """
 from flask import current_app
 
 from mhr_api.models import MhrRegistration, utils as model_utils
-from mhr_api.models.type_tables import MhrRegistrationTypes, MhrDocumentTypes, MhrNoteStatusTypes
+from mhr_api.models.type_tables import MhrDocumentTypes, MhrNoteStatusTypes
 from mhr_api.models.db2.mhomnote import FROM_LEGACY_STATUS
 from mhr_api.models.db2.utils import FROM_LEGACY_DOC_TYPE
 from mhr_api.utils import validator_utils
@@ -46,12 +46,12 @@ def validate_admin_reg(registration: MhrRegistration, json_data) -> str:
         current_app.logger.info('Validating staff admin registration')
         if registration:
             error_msg += validator_utils.validate_ppr_lien(registration.mhr_number)
-        error_msg += validate_doc_id(json_data)
+        error_msg += validate_doc_id(json_data)  # Initially required for all document types.
         error_msg += validator_utils.validate_submitting_party(json_data)
-        error_msg += validator_utils.validate_registration_state(registration, True, MhrRegistrationTypes.REG_NOTE)
         doc_type: str = json_data.get('documentType', '')
         if not doc_type and json_data.get('note') and json_data['note'].get('documentType'):
             doc_type = json_data['note'].get('documentType')
+        error_msg += validator_utils.validate_registration_state(registration, True, doc_type)
         error_msg += validate_giving_notice(json_data, doc_type)
         if doc_type and doc_type == MhrDocumentTypes.NRED:
             error_msg += validate_nred(registration, json_data)

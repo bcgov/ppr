@@ -49,9 +49,11 @@ FROM_LEGACY_NOTE_REG_TYPE = {
     'CAU': 'REG_STAFF_ADMIN',
     'CAUC': 'REG_STAFF_ADMIN',
     'CAUE': 'REG_STAFF_ADMIN',
+    'EXRE': 'REG_STAFF_ADMIN',
     'NCAN': 'REG_STAFF_ADMIN',
     'NCON': 'REG_STAFF_ADMIN',
     'NPUB': 'REG_STAFF_ADMIN',
+    'NRED': 'REG_STAFF_ADMIN',
     'REST': 'REG_STAFF_ADMIN',
     'TAXN': 'REG_STAFF_ADMIN',
     'REGC': 'REG_STAFF_ADMIN',
@@ -563,7 +565,7 @@ class Db2Manuhome(db.Model):
             notes.append(note_json)
         # Add any NCAN registration using the cancelled note as a base.
         for doc in self.reg_documents:
-            if doc.document_type in (MhrDocumentTypes.NCAN, MhrDocumentTypes.NRED):
+            if doc.document_type in (MhrDocumentTypes.NCAN, MhrDocumentTypes.NRED, MhrDocumentTypes.EXRE):
                 for note in self.reg_notes:
                     if doc.id == note.can_document_id:
                         cancel_json = note.registration_json
@@ -928,6 +930,9 @@ class Db2Manuhome(db.Model):
         manuhome.update_time = now_local.time()
         manuhome.update_count = manuhome.update_count + 1
         new_doc = registration.documents[0]
+        if new_doc.document_type == MhrDocumentTypes.EXRE:
+            manuhome.mh_status = Db2Manuhome.StatusTypes.REGISTERED
+            current_app.logger.info(f'Setting MH status to R for manhomid={manuhome.id}')
         doc_type = TO_LEGACY_DOC_TYPE.get(new_doc.document_type, new_doc.document_type)
         if len(doc_type) == 3:
             doc_type += ' '
@@ -938,14 +943,16 @@ class Db2Manuhome(db.Model):
                                                                 now_local)
         doc.update_id = current_app.config.get('DB2_RACF_ID', '')
         manuhome.reg_documents.append(doc)
-        if new_doc.document_type == MhrDocumentTypes.NRED and reg_json.get('updateDocumentId'):
+        if new_doc.document_type in (MhrDocumentTypes.NRED, MhrDocumentTypes.EXRE) and reg_json.get('updateDocumentId'):
             cancel_doc_id: str = reg_json.get('updateDocumentId')
             for note in manuhome.reg_notes:
-                if note.reg_document_id == cancel_doc_id:
+                if note.reg_document_id == cancel_doc_id or (note.document_type in (MhrDocumentTypes.EXNR,
+                                                                                    MhrDocumentTypes.EXRS,
+                                                                                    MhrDocumentTypes.EXMN) and
+                                                             note.status == Db2Mhomnote.StatusTypes.ACTIVE):
                     note.can_document_id = doc.id
                     note.status = Db2Mhomnote.StatusTypes.CANCELLED
-                    break
-        # Add note record except for the NRED.
-        if reg_json.get('note') and new_doc.document_type != MhrDocumentTypes.NRED:
+        # Add note record except for the NRED, EXRE.
+        if reg_json.get('note') and new_doc.document_type not in (MhrDocumentTypes.NRED, MhrDocumentTypes.EXRE):
             manuhome.reg_notes.append(Db2Mhomnote.create_from_registration(reg_json.get('note'), doc, manuhome.id))
         return manuhome
