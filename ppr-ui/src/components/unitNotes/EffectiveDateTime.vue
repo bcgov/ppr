@@ -218,6 +218,10 @@ export default defineComponent({
       }
     )
 
+    watch(() => localState.isEffectiveDateTimeValid, (val: boolean) => {
+      emit('isValid', val)
+    })
+
     return {
       required,
       effectiveDatePicker,
