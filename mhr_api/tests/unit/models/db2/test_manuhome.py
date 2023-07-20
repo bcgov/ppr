@@ -25,6 +25,7 @@ from registry_schemas.example_data.mhr import REGISTRATION, LOCATION, TRANSFER, 
 
 from mhr_api.exceptions import BusinessException
 from mhr_api.models import Db2Document, Db2Manuhome, Db2Mhomnote, Db2Owngroup, MhrRegistration, Db2Location
+from mhr_api.models.db2.manuhome import LEGACY_STATUS_DESCRIPTION
 from mhr_api.models.type_tables import MhrPartyTypes, MhrTenancyTypes, MhrDocumentTypes
 from mhr_api.services.authz import MANUFACTURER_GROUP, QUALIFIED_USER_GROUP, GOV_ACCOUNT_ROLE, STAFF_ROLE
 
@@ -123,11 +124,13 @@ ADMIN_REGISTRATION = {
 # testdata pattern is ({exists}, {id}, {mhr_num}, {status}, {doc_id})
 TEST_DATA = [
     (True, 1, '022911', 'E', 'REG22911'),
+    (True, 10444, '001453', 'C', 'REG01453'),
     (False, 0, None, None, None)
 ]
 # testdata pattern is ({http_status}, {id}, {mhr_num}, {status}, {doc_id}, {own_land})
 TEST_MHR_NUM_DATA = [
     (HTTPStatus.OK, 1, '022911', 'E', 'REG22911', False),
+    (HTTPStatus.OK, 10444, '001453', 'C', 'REG01453', False),
     (HTTPStatus.NOT_FOUND, 0, None, None, None, False)
 ]
 # testdata pattern is ({mhr_num}, {group_id}, {doc_id_prefix}, {account_id})
@@ -234,7 +237,7 @@ def test_find_by_id(session, exists, id, mhr_num, status, doc_id):
         assert manuhome.reg_notes
         report_json = manuhome.registration_json
         assert report_json['mhrNumber'] == mhr_num
-        assert report_json['status'] in ('E', 'EXEMPT')
+        assert report_json['status'] == LEGACY_STATUS_DESCRIPTION.get(status)
         assert report_json.get('createDateTime')
         assert report_json.get('clientReferenceId') is not None
         assert report_json.get('declaredValue') >= 0
@@ -271,7 +274,7 @@ def test_find_by_mhr_number(session, http_status, id, mhr_num, status, doc_id, o
         assert manuhome.reg_notes
         report_json = manuhome.registration_json
         assert report_json['mhrNumber'] == mhr_num
-        assert report_json['status'] in ('E', 'EXEMPT')
+        assert report_json['status'] == LEGACY_STATUS_DESCRIPTION.get(status)
         assert report_json.get('createDateTime')
         assert report_json.get('clientReferenceId') is not None
         assert report_json.get('declaredValue') >= 0
@@ -366,7 +369,7 @@ def test_find_original_by_mhr_number(session, http_status, id, mhr_num, status, 
         report_json = manuhome.new_registration_json
         # current_app.logger.info(report_json)
         assert report_json['mhrNumber'] == mhr_num
-        assert report_json['status'] == 'EXEMPT'
+        assert report_json['status'] == LEGACY_STATUS_DESCRIPTION.get(status)
         assert report_json.get('createDateTime')
         assert report_json.get('clientReferenceId') is not None
         assert report_json.get('declaredValue') >= 0

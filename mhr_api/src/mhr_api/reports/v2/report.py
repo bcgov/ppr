@@ -562,7 +562,7 @@ class Report:  # pylint: disable=too-few-public-methods
                             break
                 if detail.get('notes'):
                     for note in detail['notes']:
-                        if detail['status'] == 'HISTORICAL' and note.get('documentType', '') == 'REGC':
+                        if detail['status'] == 'CANCELLED' and note.get('documentType', '') == 'REGC':
                             messages.append({'messageType': 'REGC'})
                         elif note.get('documentType', '') in ('EXRS', 'EXNR') and note.get('createDateTime'):
                             has_exempt_note = True

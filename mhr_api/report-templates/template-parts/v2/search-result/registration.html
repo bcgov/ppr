@@ -27,15 +27,7 @@
     </tr>
       <tr>
       <td>Home Registration Status:</td>
-      <td>
-        {% if detail.status in ('C', 'HISTORICAL') %}
-          Historical
-        {% elif detail.status in ('E', 'EXEMPT') %}
-          Exempt
-        {% else %}
-          Active
-        {% endif %}
-      </td>
+      <td>{{detail.status|title}}</td>
     </tr>
     <tr>
       <td>Declared Value:</td>
