@@ -23,7 +23,6 @@ export const CivicAddressSchema = {
   ],
   region: [
     baseRules[ValidationRule.REQUIRED],
-    baseRules[ValidationRule.BC],
     ...spaceRules
   ],
   /* NOTE: Canada/US postal code and zip code regex rules

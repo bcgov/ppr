@@ -59,6 +59,12 @@ describe('mhr home civic address', () => {
     await nextTick()
     expect(civicAddressSection.findAll(ERROR_MSG).length).toBe(0)
 
+    const country = civicAddressSection.find('#country')
+    country.setValue('Canada')
+    await nextTick()
+    await nextTick()
+    expect(civicAddressSection.findAll(ERROR_MSG).length).toBe(0)
+
     const city = civicAddressSection.find('#city')
     city.setValue('Vancouver')
     await nextTick()
