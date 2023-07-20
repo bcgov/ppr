@@ -42,7 +42,10 @@ TRANSACTION_TO_FILING_TYPE = {
     'EXEMPTION_NON_RES': 'EXEMN',
     'TRANSPORT_PERMIT': 'TRAPP',
     'TRANSPORT_PERMIT_EXT': 'TRAPP',
-    'UNIT_NOTE': 'CCONT'
+    'UNIT_NOTE': 'CCONT',
+    'UNIT_NOTE_TAXN': 'TXSNT',
+    'UNIT_NOTE_102': 'MHDEC',
+    'DECAL_REPLACE': 'MHDEC'
 }
 
 # Mapping from normal filing type to staff version of filing type
