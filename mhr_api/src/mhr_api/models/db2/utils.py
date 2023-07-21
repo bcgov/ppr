@@ -844,7 +844,7 @@ def get_new_registration_json(registration):
     else:
         reg_json = update_location_json(registration, reg_json)
         reg_json = update_description_json(registration, reg_json)
-    if reg_json.get('notes'):
+    if reg_json.get('notes') and registration.staff:
         for note in reg_json.get('notes'):
             note_doc_type: str = note.get('documentType')
             if FROM_LEGACY_DOC_TYPE.get(note_doc_type):
@@ -854,6 +854,8 @@ def get_new_registration_json(registration):
             if note.get('cancelledDocumentType'):
                 note['cancelledDocumentDescription'] = get_doc_desc(note.get('cancelledDocumentType'))
             note = update_note_json(registration, note)
+    elif reg_json.get('notes'):  # Non BC Registries staff minimal information, same subset as search
+        reg_json['notes'] = get_non_staff_notes(reg_json)
     current_app.logger.debug('Built JSON from DB2 and PostgreSQL')
     return registration.set_payment_json(reg_json)
 
@@ -940,3 +942,31 @@ def update_description_json(registration, reg_json: dict) -> dict:
                     desc_json['sections'] = reg_json['description'].get('sections')
                     reg_json['description'] = desc_json
     return reg_json
+
+
+def get_non_staff_notes(reg_json):
+    """Build the non-BC Registries staff version of the active unit notes as JSON."""
+    updated_notes = []
+    if not reg_json.get('notes'):
+        return updated_notes
+    for note in reg_json.get('notes'):
+        include: bool = True
+        doc_type = note.get('documentType', '')
+        if doc_type in ('103', '103E', 'STAT', '102', 'NCON'):  # Always exclude for non-staff
+            include = False
+        elif doc_type in ('TAXN', 'EXNR', 'EXRS', 'NPUB', 'REST', 'CAU', 'CAUC', 'CAUE') and \
+                note.get('status') != MhrNoteStatusTypes.ACTIVE:  # Exclude if not active.
+            include = False
+        elif doc_type in ('CAU', 'CAUC', 'CAUE') and note.get('expiryDateTime') and \
+                model_utils.date_elapsed(note.get('expiryDateTime')):  # Exclude if expiry elapsed.
+            include = reg_utils.include_caution_note(reg_json.get('notes'), note.get('documentId'))
+        if include:
+            if FROM_LEGACY_DOC_TYPE.get(doc_type):
+                doc_type = FROM_LEGACY_DOC_TYPE.get(doc_type)
+            minimal_note = {
+                'createDateTime': note.get('createDateTime'),
+                'documentType': doc_type,
+                'documentDescription':  get_doc_desc(doc_type)
+            }
+            updated_notes.append(minimal_note)
+    return updated_notes

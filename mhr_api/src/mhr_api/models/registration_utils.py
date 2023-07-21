@@ -436,6 +436,35 @@ def get_notes_json(registration, search: bool):
     return notes_json
 
 
+def get_non_staff_notes_json(registration, search: bool):
+    """Build the non-BC Registries staff version of the active unit notes as JSON."""
+    if search:
+        return get_notes_json(registration, search)
+    notes = get_notes_json(registration, search)
+    if not notes:
+        return notes
+    updated_notes = []
+    for note in notes:
+        include: bool = True
+        doc_type = note.get('documentType', '')
+        if doc_type in ('103', '103E', 'STAT', '102', 'NCON'):  # Always exclude for non-staff
+            include = False
+        elif doc_type in ('TAXN', 'EXNR', 'EXRS', 'NPUB', 'REST', 'CAU', 'CAUC', 'CAUE') and \
+                note.get('status') != MhrNoteStatusTypes.ACTIVE:  # Exclude if not active.
+            include = False
+        elif doc_type in ('CAU', 'CAUC', 'CAUE') and note.get('expiryDateTime') and \
+                model_utils.date_elapsed(note.get('expiryDateTime')):  # Exclude if expiry elapsed.
+            include = include_caution_note(notes, note.get('documentId'))
+        if include:
+            minimal_note = {
+                'createDateTime': note.get('createDateTime'),
+                'documentType': doc_type,
+                'documentDescription':  note.get('documentDescription')
+            }
+            updated_notes.append(minimal_note)
+    return updated_notes
+
+
 def get_document_description(doc_type: str) -> str:
     """Try to find the document description by document type."""
     if doc_type:

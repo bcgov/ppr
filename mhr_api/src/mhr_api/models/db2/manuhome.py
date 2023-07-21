@@ -549,7 +549,7 @@ class Db2Manuhome(db.Model):
             man_home['location'] = self.reg_location.new_registration_json
         if self.reg_descript:
             man_home['description'] = self.reg_descript.registration_json
-        if self.current_view and self.staff:
+        if self.current_view:
             man_home['notes'] = self.__get_notes_json()
         man_home['hasCaution'] = self.set_caution()
         return man_home

@@ -195,6 +195,8 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
             reg_json = self.set_group_json(reg_json, self.current_view)
             if self.current_view and self.staff:
                 reg_json['notes'] = reg_utils.get_notes_json(self, False)
+            elif self.current_view:
+                reg_json['notes'] = reg_utils.get_non_staff_notes_json(self, False)
             reg_json['hasCaution'] = self.set_caution()
             current_app.logger.debug('Built new registration JSON')
             return self.set_payment_json(reg_json)

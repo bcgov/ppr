@@ -517,6 +517,7 @@ TEST_DATA_STATUS = [
 # testdata pattern is ({mhr_num}, {staff}, {current}, {has_notes}, {account_id}, {has_caution}, {ncan_doc_id})
 TEST_MHR_NUM_DATA_NOTE = [
     ('080282', True, True, True, '2523', False, None),
+    ('080282', False, True, False, '2523', False, None),
     ('003936', True, True, False, '2523', False, None),
     ('003936', True, False, False, '2523', False, None),
     ('003936', False, True, False, '2523', False, None),
@@ -524,7 +525,9 @@ TEST_MHR_NUM_DATA_NOTE = [
     ('080104', True, True, True, 'ppr_staff', True, None),
     ('046315', True, True, True, 'ppr_staff', False, None),
     ('092238', True, True, True, 'ppr_staff', False, '63116143'),
-    ('022873', True, True, True, 'ppr_staff', False, '43599221')
+    ('092238', False, True, True, 'ppr_staff', False, '63116143'),
+    ('022873', True, True, True, 'ppr_staff', False, '43599221'),
+    ('022873', False, True, True, 'ppr_staff', False, '43599221')
 ]
 
 
@@ -705,25 +708,35 @@ def test_find_by_mhr_number_note(session, mhr_num, staff, current, has_notes, ac
         assert reg_json.get('notes')
         has_ncan: bool = False
         for note in reg_json.get('notes'):
-            assert note.get('documentRegistrationNumber')
-            assert note.get('documentId')
-            assert note.get('documentDescription')
-            if ncan_doc_id and note.get('documentId') == ncan_doc_id:
-                has_ncan = True
-                assert note.get('cancelledDocumentType')
-                assert note.get('cancelledDocumentDescription')
-                assert note.get('cancelledDocumentRegistrationNumber')
-            assert note.get('createDateTime')
-            assert note.get('status')
-            assert 'remarks' in note
-            assert note.get('givingNoticeParty')
-        if ncan_doc_id:
+            if staff:
+                assert note.get('documentRegistrationNumber')
+                assert note.get('documentId')
+                assert note.get('documentDescription')
+                if ncan_doc_id and note.get('documentId') == ncan_doc_id:
+                    has_ncan = True
+                    assert note.get('cancelledDocumentType')
+                    assert note.get('cancelledDocumentRegistrationNumber')
+                    assert note.get('cancelledDocumentDescription')
+                assert note.get('createDateTime')
+                assert note.get('status')
+                assert 'remarks' in note
+                assert note.get('givingNoticeParty')
+            else:
+                assert note.get('documentType')
+                assert note.get('documentDescription')
+                assert note.get('createDateTime')
+                assert 'remarks' not in note
+                assert 'documentRegistrationNumber' not in note
+                assert 'status' not in note
+                assert 'documentId' not in note
+                assert 'givingNoticeParty' not in note
+        if ncan_doc_id and staff:
             assert has_ncan
     elif staff and current:
         assert 'notes' in reg_json
         assert not reg_json.get('notes')
     else:
-        assert 'notes' not in reg_json
+        assert not reg_json.get('notes')
     assert reg_json.get('hasCaution') == has_caution
     # search version
     reg_json = registration.registration_json
