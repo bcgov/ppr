@@ -1,10 +1,10 @@
 import { UnitNoteDocTypes, UnitNoteStatusTypes } from '@/enums/unitNoteDocTypes'
-import { PartyIF, UnitNoteRegistrationIF } from '@/interfaces'
+import { PartyIF, UnitNoteIF, UnitNoteRegistrationIF } from '@/interfaces'
 import { useStore } from '@/store/store'
 import { deleteEmptyProperties, submitMhrUnitNote } from '@/utils'
 import { storeToRefs } from 'pinia'
 
-export const useMhrUnitNote = (unitNoteType: UnitNoteDocTypes) => {
+export const useMhrUnitNote = () => {
   const {
     getMhrInformation
   } = storeToRefs(useStore())
@@ -94,7 +94,7 @@ export const useMhrUnitNote = (unitNoteType: UnitNoteDocTypes) => {
 
     // Unit note expiryDateTime can only be submitted for CAUC, CAUE
     if (![UnitNoteDocTypes.CONTINUED_NOTE_OF_CAUTION,
-      UnitNoteDocTypes.EXTENSION_TO_NOTICE_OF_CAUTION].includes(unitNoteType)) {
+      UnitNoteDocTypes.EXTENSION_TO_NOTICE_OF_CAUTION].includes(unitNoteData.note.documentType)) {
       delete unitNoteData.note.expiryDateTime
     } else {
       unitNoteData.note.expiryDateTime = unitNoteData.note.expiryDateTime.replace('Z', '')
@@ -109,8 +109,16 @@ export const useMhrUnitNote = (unitNoteType: UnitNoteDocTypes) => {
     return submitMhrUnitNote(getMhrInformation.value.mhrNumber, payloadData)
   }
 
+  // Identify if a unit note is notice of caution or an extended/continued notice of caution
+  const isNoticeOfCautionOrRelatedDocType = (note: UnitNoteIF): boolean => {
+    return [UnitNoteDocTypes.NOTICE_OF_CAUTION,
+      UnitNoteDocTypes.CONTINUED_NOTE_OF_CAUTION,
+      UnitNoteDocTypes.EXTENSION_TO_NOTICE_OF_CAUTION].includes(note.documentType)
+  }
+
   return {
     initUnitNote,
-    buildApiDataAndSubmit
+    buildApiDataAndSubmit,
+    isNoticeOfCautionOrRelatedDocType
   }
 }
