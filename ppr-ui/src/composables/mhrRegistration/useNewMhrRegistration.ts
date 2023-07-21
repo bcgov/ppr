@@ -251,9 +251,6 @@ export const useNewMhrRegistration = () => {
 
   const parseLocation = (): MhrRegistrationHomeLocationIF => {
     const location: MhrRegistrationHomeLocationIF = cleanEmpty(getMhrRegistrationLocation.value)
-    // location is always in BC
-    location.address.country = 'CA'
-    location.address.region = 'BC'
 
     // Work around require to satisfy schema validations. Currently, not collected by UI.
     if (!location.address.postalCode) location.address.postalCode = 'A1A 1A1'

@@ -103,7 +103,7 @@ export default defineComponent({
       default: () => ({
         street: '',
         city: '',
-        region: 'BC',
+        region: '',
         postalCode: '',
         country: '',
         deliveryInstructions: ''
