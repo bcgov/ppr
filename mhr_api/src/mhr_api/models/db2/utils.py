@@ -169,12 +169,12 @@ LEGACY_STATUS_DESCRIPTION = {
     'R': 'ACTIVE',
     'E': 'EXEMPT',
     'D': 'DRAFT',
-    'C': 'HISTORICAL'
+    'C': 'CANCELLED'
 }
 TO_LEGACY_STATUS = {
     'ACTIVE': 'R',
     'EXEMPT': 'E',
-    'HISTORICAL': 'C'
+    'CANCELLED': 'C'
 }
 LEGACY_REGISTRATION_DESCRIPTION = {
     '101': REGISTRATION_DESC_NEW,
@@ -901,18 +901,20 @@ def update_location_json(registration, reg_json: dict) -> dict:
     if not registration.locations:
         return reg_json
     active_loc = registration.locations[0]
-    active_ts = registration.registration_ts
+    active_doc_id = registration.documents[0].document_id
     if active_loc.status_type != MhrStatusTypes.ACTIVE and registration.change_registrations:
         for reg in registration.change_registrations:
             if reg.locations and reg.locations[0].status_type == MhrStatusTypes.ACTIVE:
                 active_loc = reg.locations[0]
-                active_ts = reg.registration_ts
-    if active_loc.status_type == MhrStatusTypes.ACTIVE and active_ts:
+                active_doc_id = reg.documents[0].document_id
+    if active_loc.status_type == MhrStatusTypes.ACTIVE and active_doc_id:
         legacy_loc = registration.manuhome.reg_location
         for doc in registration.manuhome.reg_documents:
-            if legacy_loc.reg_document_id == doc.id and doc.registration_ts <= active_ts:
-                current_app.logger.debug('Using modernized location data')
-                reg_json['location'] = active_loc.json
+            if legacy_loc.reg_document_id == doc.id:
+                current_app.logger.info(f'Comparing modern doc_id={active_doc_id} to legacy id={doc.id}')
+                if active_doc_id == legacy_loc.reg_document_id:
+                    current_app.logger.debug('Using modernized location data')
+                    reg_json['location'] = active_loc.json
     return reg_json
 
 
@@ -921,18 +923,20 @@ def update_description_json(registration, reg_json: dict) -> dict:
     if not registration.descriptions:
         return reg_json
     active_desc = registration.descriptions[0]
-    active_ts = registration.registration_ts
+    active_doc_id = registration.documents[0].document_id
     if active_desc.status_type != MhrStatusTypes.ACTIVE and registration.change_registrations:
         for reg in registration.change_registrations:
             if reg.descriptions and reg.descriptions[0].status_type == MhrStatusTypes.ACTIVE:
                 active_desc = reg.descriptions[0]
-                active_ts = reg.registration_ts
-    if active_desc.status_type == MhrStatusTypes.ACTIVE and active_ts:
+                active_doc_id = reg.documents[0].document_id
+    if active_desc.status_type == MhrStatusTypes.ACTIVE and active_doc_id:
         legacy_desc = registration.manuhome.reg_descript
         for doc in registration.manuhome.reg_documents:
-            if legacy_desc.reg_document_id == doc.id and doc.registration_ts <= active_ts:
-                current_app.logger.debug('Using modernized description data')
-                desc_json = active_desc.json
-                desc_json['sections'] = reg_json['description'].get('sections')
-                reg_json['description'] = desc_json
+            if legacy_desc.reg_document_id == doc.id:
+                current_app.logger.info(f'Comparing modern doc_id={active_doc_id} to legacy id={doc.id}')
+                if active_doc_id == legacy_desc.reg_document_id:
+                    current_app.logger.debug('Using modernized description data')
+                    desc_json = active_desc.json
+                    desc_json['sections'] = reg_json['description'].get('sections')
+                    reg_json['description'] = desc_json
     return reg_json
