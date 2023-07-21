@@ -106,8 +106,8 @@ import {
   defineComponent,
   reactive,
   toRefs,
-  onMounted,
-  computed
+  computed,
+  watch
 } from 'vue-demi'
 import { useStore } from '@/store/store'
 // import the component and the necessary extensions
@@ -180,8 +180,8 @@ export default defineComponent({
     ]
 
     const localState = reactive({
-      delDesc: (getGeneralCollateral?.value && getGeneralCollateral.value[1]?.descriptionDelete) || '',
-      addDesc: (getGeneralCollateral?.value && getGeneralCollateral.value[1]?.descriptionAdd) || '',
+      delDesc: '',
+      addDesc: '',
       generalCollateral: computed((): GeneralCollateralIF[] => {
         return (getGeneralCollateral.value as GeneralCollateralIF[]) || []
       }),
@@ -247,15 +247,15 @@ export default defineComponent({
       emit('closeGenColAmend', true)
     }
 
-    onMounted(() => {
-      const gc = localState.generalCollateral
+    /** Called when general collateral updates */
+    watch(() => localState.generalCollateral, async (gc: GeneralCollateralIF[]) => {
       if (gc.length > 0) {
         if (gc[gc.length - 1].addedDateTime === undefined) {
-          localState.addDesc = gc[gc.length - 1].descriptionAdd
-          localState.delDesc = gc[gc.length - 1].descriptionDelete
+          localState.addDesc = gc[gc.length - 1].descriptionAdd || ''
+          localState.delDesc = gc[gc.length - 1].descriptionDelete || ''
         }
       }
-    })
+    }, { deep: true, immediate: true })
 
     return {
       isTiptapEnabled,
