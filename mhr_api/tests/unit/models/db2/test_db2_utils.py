@@ -136,9 +136,12 @@ TEST_QUERY_FILTER_DATA_MULTIPLE = [
 # testdata pattern is ({mhr_num}, {staff}, {current}, {has_notes}, {ncan_doc_id}, {has_search_notes})
 TEST_MHR_NUM_DATA_NOTE = [
     ('080282', True, True, True, None, False),
+    ('080282', False, True, False, None, False),
     ('003936', True, True, False, None, False),
     ('092238', True, True, True, '63116143', True),
-    ('022873', True, True, True, '43599221', True)
+    ('092238', False, True, True, '63116143', True),
+    ('022873', True, True, True, '43599221', True),
+    ('022873', False, True, True, '43599221', True)
 ]
 # testdata pattern is ({loc_data}, {desc_data})
 TEST_DATA_NEW_REG = [
@@ -406,26 +409,36 @@ def test_get_new_reg_json_note(session, mhr_num, staff, current, has_notes, ncan
         assert reg_json.get('notes')
         has_ncan: bool = False
         for note in reg_json['notes']:
-            current_app.logger.info(note)
-            assert note.get('documentRegistrationNumber')
-            assert note.get('documentId')
-            assert note.get('documentDescription')
-            if ncan_doc_id and note.get('documentId') == ncan_doc_id:
-                has_ncan = True
-                assert note.get('cancelledDocumentType')
-                assert note.get('cancelledDocumentRegistrationNumber')
-                assert note.get('cancelledDocumentDescription')
-            assert note.get('createDateTime')
-            assert note.get('status')
-            assert 'remarks' in note
-            assert note.get('givingNoticeParty')
-        if ncan_doc_id:
+            # current_app.logger.info(note)
+            if staff:
+                assert note.get('documentRegistrationNumber')
+                assert note.get('documentId')
+                assert note.get('documentDescription')
+                if ncan_doc_id and note.get('documentId') == ncan_doc_id:
+                    has_ncan = True
+                    assert note.get('cancelledDocumentType')
+                    assert note.get('cancelledDocumentRegistrationNumber')
+                    assert note.get('cancelledDocumentDescription')
+                assert note.get('createDateTime')
+                assert note.get('status')
+                assert 'remarks' in note
+                assert note.get('givingNoticeParty')
+            else:
+                assert note.get('documentType')
+                assert note.get('documentDescription')
+                assert note.get('createDateTime')
+                assert 'remarks' not in note
+                assert 'documentRegistrationNumber' not in note
+                assert 'status' not in note
+                assert 'documentId' not in note
+                assert 'givingNoticeParty' not in note
+        if ncan_doc_id and staff:
             assert has_ncan
     elif staff and current:
         assert 'notes' in reg_json
         assert not reg_json.get('notes')
     else:
-        assert 'notes' not in reg_json
+        assert not reg_json.get('notes')
 
 
 @pytest.mark.parametrize('mhr_num,staff,current,has_notes,ncan_doc_id,has_search_notes', TEST_MHR_NUM_DATA_NOTE)

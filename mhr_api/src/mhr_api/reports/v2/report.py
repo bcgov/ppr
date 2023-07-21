@@ -671,13 +671,13 @@ class Report:  # pylint: disable=too-few-public-methods
             reg = self._report_data
             reg['createDateTime'] = Report._to_report_datetime(reg['createDateTime'])
             if reg.get('declaredValue'):
-                if reg.get('declaredDateTime'):
-                    reg['declaredDateTime'] = Report._to_report_datetime(reg['declaredDateTime'], False)
                 declared_value = str(reg['declaredValue'])
                 if declared_value.isnumeric() and declared_value != '0':
                     reg['declaredValue'] = '$' + '{:0,.2f}'.format(float(declared_value))
                 else:
                     reg['declaredValue'] = ''
+            if reg.get('transferDate'):
+                reg['transferDate'] = Report._to_report_datetime(reg['transferDate'], False)
             if self._report_key == ReportTypes.MHR_TRANSPORT_PERMIT and reg.get('newLocation'):
                 reg['location'] = reg.get('newLocation')
                 if reg.get('location') and reg['location'].get('taxExpiryDate'):

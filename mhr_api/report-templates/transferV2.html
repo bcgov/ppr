@@ -33,6 +33,26 @@
         <td>{{createDateTime}}</td>
       </tr>
       <tr>
+        <td>Bill of Sale Date of Execution:</td>
+        <td>
+          {% if transferDate is defined and transferDate != '' %}
+            {{transferDate}}
+          {% else %}
+            N/A
+          {% endif %}
+        </td>
+      </tr>
+      <tr>
+        <td>Consideration:</td>
+        <td>
+          {% if declaredValue is defined and declaredValue != '' %}
+            {{declaredValue}} 
+          {% else %}
+            N/A
+          {% endif %}
+        </td>
+      </tr>
+      <tr>
         <td>Folio Number:</td>
         <td>
             {% if clientReferenceId is defined and clientReferenceId != '' %}
@@ -42,19 +62,6 @@
             {% endif %}
         </td>
       </tr>      
-     {# 
-      <tr>
-        <td>Declared Value:</td>
-        <td>
-          {% if declaredValue is defined and declaredValue != '' %}
-            {{declaredValue}} 
-            {% if declaredDateTime is defined and declaredDateTime != '' %} as of {{declaredDateTime}}{% endif %}
-          {% else %}
-            N/A
-          {% endif %}
-        </td>
-      </tr>
-      #}
     </table>
   </div>
 
