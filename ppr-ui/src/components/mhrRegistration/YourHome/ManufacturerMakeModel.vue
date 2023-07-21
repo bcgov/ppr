@@ -164,8 +164,8 @@ export default defineComponent({
     const localState = reactive({
       makeModelValid: false,
       manufacturerName: getMhrRegistrationManufacturerName.value,
-      make: getMhrRegistrationHomeMake.value,
-      model: getMhrRegistrationHomeModel.value
+      make: getMhrRegistrationHomeMake.value || '',
+      model: getMhrRegistrationHomeModel.value || ''
     })
 
     watch(() => localState.manufacturerName, (val: string) => {
