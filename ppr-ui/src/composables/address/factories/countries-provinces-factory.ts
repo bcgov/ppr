@@ -20,13 +20,15 @@ export function useCountriesProvinces () {
    * Helper function to return a list of countries.
    * @returns An array of country objects, sorted alphabetically.
    */
-  const getCountries = (): Array<object> => {
+  const getCountries = (naOnly = false): Array<object> => {
     let countries = []
     countries.push({ code: 'CA', name: 'Canada' })
-    countries.push({ code: 'US', name: 'United States of America' })
-    // name is set this way to ensure the divider is there in the search when CA/US are not the only options
-    countries.push({ code: '0', name: 'Can.nada. United States .Of.America', divider: true })
-    countries = countries.concat(window['countries'])
+    countries.push({ code: 'US', name: 'United States' })
+    if (!naOnly) {
+      // name is set this way to ensure the divider is there in the search when CA/US are not the only options
+      countries.push({ code: '0', name: 'Can.nada. United States .Of.America', divider: true })
+      countries = countries.concat(window['countries'])
+    }
     return countries
   }
   /**

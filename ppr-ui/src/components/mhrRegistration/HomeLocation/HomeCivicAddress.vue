@@ -7,6 +7,25 @@
       <v-col cols="12" sm="10" class="mt-n1">
         <v-form ref="addressForm" name="address-form" v-model="isValidCivicAddress">
           <div class="form__row">
+            <div class="form__row">
+              <v-autocomplete
+                id="country"
+                autocomplete="new-password"
+                :name="Math.random()"
+                filled
+                class="address-country"
+                hide-no-data
+                item-text="name"
+                item-value="code"
+                :items="getCountries(true)"
+                :label="countryLabel"
+                :rules="[...schemaLocal.country]"
+                v-model="addressLocal.country"
+              />
+              <!-- special field to select AddressComplete country, separate from our model field -->
+              <input type="hidden" :id="countryId" :value="country" />
+            </div>
+
             <v-text-field
               autocomplete="new-password"
               :id="streetId"
@@ -40,11 +59,10 @@
               <v-col>
                 <v-select
                   id="region"
-                  label="Province"
+                  :label="provinceStateLabel"
                   class="item address-region"
                   autocomplete="off"
                   filled
-                  hint="Address must be in B.C."
                   persistent-hint
                   :items="provinceOptions"
                   item-text="name"
@@ -85,7 +103,7 @@ export default defineComponent({
       default: () => ({
         street: '',
         city: '',
-        region: 'BC',
+        region: '',
         postalCode: '',
         country: '',
         deliveryInstructions: ''
@@ -117,8 +135,18 @@ export default defineComponent({
 
     const localState = reactive({
       isValidCivicAddress: false,
+      provinceStateLabel: computed((): string => {
+        switch (addressLocal.value.country) {
+          case 'CA':
+            return 'Province'
+          case 'US':
+            return 'State'
+          default:
+            return 'Province/State'
+        }
+      }),
       provinceOptions: computed((): Array<Object> => {
-        return countryProvincesHelpers.getCountryRegions('CA', true).map((region: any) => {
+        return countryProvincesHelpers.getCountryRegions(addressLocal.value.country, true).map((region: any) => {
           return {
             name: region.name,
             value: region.short
@@ -134,19 +162,25 @@ export default defineComponent({
     }
 
     /** Apply local model updates to store. **/
-    watch(() => addressLocal.value.street, async () => {
-      // Set civic address data to store
-      await setCivicAddress({ key: 'street', value: addressLocal.value.street })
+    watch(() => addressLocal.value.country, async (country: string) => {
+      // Clear fields when country changes
+      addressLocal.value.street = ''
+      addressLocal.value.city = ''
+      addressLocal.value.region = ''
+
+      await setCivicAddress({ key: 'country', value: country })
     })
 
-    watch(() => addressLocal.value.city, async () => {
-      // Set civic address data to store
-      await setCivicAddress({ key: 'city', value: addressLocal.value.city })
+    watch(() => addressLocal.value.street, async (street: string) => {
+      await setCivicAddress({ key: 'street', value: street })
     })
 
-    watch(() => addressLocal.value.region, async () => {
-      // Set civic address data to store
-      await setCivicAddress({ key: 'region', value: addressLocal.value.region })
+    watch(() => addressLocal.value.city, async (city: string) => {
+      await setCivicAddress({ key: 'city', value: city })
+    })
+
+    watch(() => addressLocal.value.region, async (region: string) => {
+      await setCivicAddress({ key: 'region', value: region })
     })
 
     watch(() => localState.isValidCivicAddress, async (val: boolean) => {
@@ -167,6 +201,7 @@ export default defineComponent({
       enableAddressComplete,
       ...labels,
       ...uniqueIds,
+      ...countryProvincesHelpers,
       ...toRefs(localState)
     }
   }
@@ -184,6 +219,9 @@ export default defineComponent({
   }
   .v-text-field.v-text-field--enclosed .v-text-field__details {
     margin-bottom: 0;
+  }
+  .v-list .v-list-item--active {
+    background-color: $blueSelected!important;
   }
 }
 </style>

@@ -216,7 +216,9 @@
                 <span v-if="!!getMhrRegistrationLocation.address.streetAdditional">
                   {{getMhrRegistrationLocation.address.streetAdditional}}<br/>
                 </span>
-                {{ getMhrRegistrationLocation.address.city }} {{ 'BC' }}
+                {{ getMhrRegistrationLocation.address.city }}
+                {{ getMhrRegistrationLocation.address.region }}
+                <br>{{ getCountryName(getMhrRegistrationLocation.address.country) }}
               </p>
               <p v-else>
                 {{ '(Not Entered)' }}
@@ -258,10 +260,10 @@ import { HomeLocationTypes, RouteNames } from '@/enums'
 import { useStore } from '@/store/store'
 import { useMhrValidations } from '@/composables'
 import { storeToRefs } from 'pinia'
+import { useCountriesProvinces } from '@/composables/address/factories'
 
 export default defineComponent({
   name: 'HomeLocationReview',
-  components: {},
   props: {
     isTransferReview: {
       type: Boolean,
@@ -281,6 +283,7 @@ export default defineComponent({
       MhrSectVal,
       getStepValidation
     } = useMhrValidations(toRefs(getMhrRegistrationValidationModel.value))
+    const countryProvincesHelpers = useCountriesProvinces()
 
     const localState = reactive({
       includesPid: computed((): boolean => {
@@ -342,6 +345,7 @@ export default defineComponent({
       getMhrRegistrationLocation,
       getIsManualLocation,
       isMhrManufacturerRegistration,
+      ...countryProvincesHelpers,
       ...toRefs(localState)
     }
   }
