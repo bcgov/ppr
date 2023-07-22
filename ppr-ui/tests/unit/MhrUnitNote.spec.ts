@@ -160,7 +160,7 @@ describe('MHR Unit Note Filing', () => {
     // ExpiryDate component should exist for this Unit Note type
     expect(UnitNoteReviewComponent.findComponent(ExpiryDate).exists()).toBeTruthy()
 
-    // check that section numbers are updated because ExpiryDate is displayed
+    // check that section numbers have default sequence
     expect(UnitNoteReviewComponent.findComponent(ContactInformation).find('h2').text()).toContain('1.')
     expect(UnitNoteReviewComponent.findComponent(EffectiveDateTime).find('h2').text()).toContain('2.')
     expect(UnitNoteReviewComponent.findComponent(ExpiryDate).find('h2').text()).toContain('3.')
