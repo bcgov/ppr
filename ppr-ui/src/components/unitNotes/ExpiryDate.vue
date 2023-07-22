@@ -1,7 +1,7 @@
 <template>
   <div id="expiry-date-time-container">
     <h2>
-      {{ `${sectionNumber ? sectionNumber + '.' : ''} ${content.title}`}}
+      {{ `${sectionNumber ? sectionNumber + '.' : ''} ${content.title}` }}
     </h2>
     <p class="mt-2">{{ content.description }}</p>
     <v-card
@@ -25,7 +25,7 @@
             />
             <v-radio
               :value="EffectiveDateTypes.FUTURE"
-              label="Date in future"
+              label="Date in the future"
               data-test-id="future-date-radio"
             />
           </v-radio-group>
@@ -93,16 +93,13 @@ export default defineComponent({
 
       minDate: computed((): string => localTodayDate(new Date(date.setDate(date.getDate() + 1)))),
       isContinuedDateSelected: computed((): boolean => localState.expiryDateType === EffectiveDateTypes.CONTINUED),
-      isExpiryDateValid: computed((): boolean =>
-        localState.isContinuedDateSelected ||
-        (!localState.isContinuedDateSelected && !!localState.selectedFutureDate)
+      isExpiryDateValid: computed(
+        (): boolean =>
+          localState.isContinuedDateSelected || (!localState.isContinuedDateSelected && !!localState.selectedFutureDate)
       ),
-      showBorderError: computed(() => {
-        return props.validate &&
-        !localState.isContinuedDateSelected &&
-        localState.selectedFutureDate === ''
-      })
-
+      showBorderError: computed(
+        (): boolean => props.validate && !localState.isContinuedDateSelected && localState.selectedFutureDate === ''
+      )
     })
 
     // build a full UTC date based on selected future date
@@ -116,11 +113,14 @@ export default defineComponent({
       localState.expiryDateTime = new Date().toISOString()
     })
 
-    watch(() => props.validate, async (val) => {
-      if (val && !localState.isContinuedDateSelected) {
-        expiryDatePicker.value?.validate()
+    watch(
+      () => props.validate,
+      async val => {
+        if (val && !localState.isContinuedDateSelected) {
+          expiryDatePicker.value?.validate()
+        }
       }
-    })
+    )
 
     watch(
       () => [localState.expiryDateType],
@@ -153,9 +153,12 @@ export default defineComponent({
       }
     )
 
-    watch(() => localState.isExpiryDateValid, (val: boolean) => {
-      emit('isValid', val)
-    })
+    watch(
+      () => localState.isExpiryDateValid,
+      (val: boolean) => {
+        emit('isValid', val)
+      }
+    )
 
     return {
       required,
