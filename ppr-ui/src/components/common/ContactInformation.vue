@@ -1,6 +1,8 @@
 <template>
   <div id="contact-info-container">
-    <h2>{{ content.title }}</h2>
+    <h2>
+      {{ `${sectionNumber ? sectionNumber + '.' : ''} ${content.title}`}}
+    </h2>
     <p class="mt-2">{{ content.description }}</p>
 
     <PartySearch
@@ -204,6 +206,10 @@ export default defineComponent({
     validate: {
       type: Boolean,
       default: false
+    },
+    sectionNumber: {
+      type: Number,
+      required: false
     },
     content: {
       type: Object as () => ContentIF,

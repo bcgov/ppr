@@ -1,7 +1,9 @@
 <template>
   <div id="remarks-container">
-    <h2>Remarks</h2>
-    <p class="mt-2">{{ description }}</p>
+    <h2>
+      {{ `${sectionNumber ? sectionNumber + '.' : ''} ${content.title}`}}
+    </h2>
+    <p class="mt-2">{{ content.description }}</p>
     <v-form ref="remarksForm" v-model="isFormValid">
       <v-card
         id="remarks-card"
@@ -15,7 +17,9 @@
                 for="remarks-textarea"
                 class="generic-label"
                 :class="{ 'error-text': showBorderError }"
-              >Add Remarks</label>
+              >
+                {{ content.sideLabel }}
+              </label>
             </v-col>
           <v-col cols="10">
             <v-textarea
@@ -38,6 +42,7 @@
 
 <script lang="ts">
 import { useInputRules } from '@/composables'
+import { ContentIF } from '@/interfaces'
 import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
 
 export default defineComponent({
@@ -48,8 +53,13 @@ export default defineComponent({
       type: String,
       required: true
     },
-    description: {
-      type: String
+    sectionNumber: {
+      type: Number,
+      required: false
+    },
+    content: {
+      type: Object as () => ContentIF,
+      default: () => {}
     },
     validate: {
       type: Boolean,

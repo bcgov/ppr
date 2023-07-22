@@ -1,7 +1,9 @@
 <template>
   <div id="document-id-container">
-    <h2>Document ID</h2>
-    <p class="mt-2">Enter the 8-digit Document ID number.</p>
+    <h2>
+      {{ `${sectionNumber ? sectionNumber + '.' : ''} ${content.title}`}}
+    </h2>
+    <p class="mt-2">{{ content.description }}</p>
     <v-form ref="documentIdForm" v-model="isDocumentIdFormValid">
       <v-card
         id="document-id-card"
@@ -16,7 +18,7 @@
               :class="{ 'error-text': showBorderError }"
               for="doc-id-field"
             >
-            Document ID
+            {{ content.sideLabel }}
           </label>
           </v-col>
           <v-col cols="12" sm="10" class="px-1">
@@ -53,7 +55,7 @@
 <script lang="ts">
 import { computed, defineComponent, nextTick, reactive, ref, toRefs, watch } from 'vue-demi'
 import { validateDocumentID } from '@/utils'
-import { FormIF, MhrDocIdResponseIF } from '@/interfaces'
+import { ContentIF, FormIF, MhrDocIdResponseIF } from '@/interfaces'
 import { useInputRules } from '@/composables'
 
 export default defineComponent({
@@ -62,6 +64,14 @@ export default defineComponent({
     documentId: {
       type: String,
       required: true
+    },
+    sectionNumber: {
+      type: Number,
+      required: false
+    },
+    content: {
+      type: Object as () => ContentIF,
+      default: () => {}
     },
     validate: {
       type: Boolean,
