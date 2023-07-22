@@ -66,7 +66,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, reactive, toRefs, onMounted, nextTick } from 'vue-demi'
+import { defineComponent, computed, reactive, toRefs, onBeforeMount, nextTick } from 'vue-demi'
 import { useRouter } from 'vue2-helpers/vue-router'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
@@ -149,7 +149,7 @@ export default defineComponent({
       })
     })
 
-    onMounted(async () => {
+    onBeforeMount(async () => {
       if (!getMhrUnitNoteType.value) {
         await router.push({ name: RouteNames.DASHBOARD })
       }
@@ -158,7 +158,7 @@ export default defineComponent({
       const initialUnitNote = initUnitNote()
       initialUnitNote.note.documentType = getMhrUnitNoteType.value
 
-      setEmptyUnitNoteRegistration(initialUnitNote)
+      await setEmptyUnitNoteRegistration(initialUnitNote)
 
       // reset validation trigger
       localState.validate = false

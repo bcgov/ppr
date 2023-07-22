@@ -87,7 +87,10 @@ export const useMhrUnitNote = (unitNoteType: UnitNoteDocTypes) => {
 
     // status is not required
     delete unitNoteData.note.status
+
+    // cleanup dateTime strings to be accepted by API
     unitNoteData.note.effectiveDateTime = unitNoteData.note.effectiveDateTime.replace('Z', '')
+    unitNoteData.note.expiryDateTime = unitNoteData.note.expiryDateTime.replace('Z', '')
 
     // Unit note expiryDateTime can only be submitted for CAUC, CAUE
     if (![UnitNoteDocTypes.CONTINUED_NOTE_OF_CAUTION,
