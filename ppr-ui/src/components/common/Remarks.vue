@@ -22,12 +22,12 @@
               id="remarks-textarea"
               v-model.trim="remarks"
               filled
-              :rules="maxLength(420)"
-              name="name"
-              counter="420"
-              label="Remarks (Optional)"
+              :counter="remarksMaxLength"
+              :rules="maxLength(remarksMaxLength)"
+              :label="label"
               class="pl-1"
               data-test-id="remarks-textarea"
+              :error-messages="showRemarksRequiredMsg ? 'Enter remarks' : ''"
             ></v-textarea>
           </v-col>
         </v-row>
@@ -38,7 +38,8 @@
 
 <script lang="ts">
 import { useInputRules } from '@/composables'
-import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
+import { FormIF } from '@/interfaces'
+import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue-demi'
 
 export default defineComponent({
   name: 'Remarks',
@@ -54,15 +55,24 @@ export default defineComponent({
     validate: {
       type: Boolean,
       default: false
+    },
+    isRequired: {
+      type: Boolean,
+      default: false
     }
   },
   setup (props, { emit }) {
     const { maxLength } = useInputRules()
 
+    const remarksForm = ref(null) as FormIF
+
     const localState = reactive({
+      remarksMaxLength: 420,
+      label: props.isRequired ? 'Remarks' : 'Remarks (Optional)',
       isFormValid: false,
       remarks: props.unitNoteRemarks,
-      showBorderError: computed(() => props.validate && !localState.isFormValid)
+      showBorderError: computed(() => props.validate && !localState.isFormValid),
+      showRemarksRequiredMsg: computed((): boolean => props.validate && props.isRequired && localState.remarks === '')
     })
 
     watch(
@@ -71,6 +81,10 @@ export default defineComponent({
         emit('setStoreProperty', val)
       }
     )
+
+    watch(() => props.validate, async (val) => {
+      if (val) remarksForm.value?.validate()
+    }, { immediate: true })
 
     watch(() => localState.isFormValid, (val: boolean) => {
       emit('isValid', val)

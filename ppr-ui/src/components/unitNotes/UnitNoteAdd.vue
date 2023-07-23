@@ -16,6 +16,7 @@
         :validate="validate"
         @setStoreProperty="handleStoreUpdate('remarks', $event)"
         @isValid="handleComponentValid(MhrCompVal.REMARKS_VALID, $event)"
+        :isRequired="isRemarksRequired"
       />
     </section>
 
@@ -76,6 +77,7 @@ export default defineComponent({
 
     const {
       getMhrUnitNote,
+      getMhrUnitNoteType,
       getMhrUnitNoteValidation
     } = storeToRefs(useStore())
 
@@ -94,6 +96,8 @@ export default defineComponent({
 
       // Remarks
       unitNoteRemarks: (getMhrUnitNote.value as UnitNoteIF).remarks || '',
+      isRemarksRequired: computed((): boolean =>
+        getMhrUnitNoteType.value === UnitNoteDocTypes.NOTICE_OF_CAUTION),
 
       // Document Id
       unitNoteDocumentId: computed(() => (getMhrUnitNote.value as UnitNoteIF).documentId || ''),

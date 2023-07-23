@@ -88,14 +88,15 @@ describe('MHR Unit Note Filing', () => {
 
     // make sure Review page is not showing up as there are errors
     expect(wrapper.findComponent(UnitNoteReview).exists()).toBeFalsy()
-    expect(wrapper.findAll('.border-error-left').length).toBe(2)
+    // required fields are Doc Id, Remarks, Person Giving Notice
+    expect(wrapper.findAll('.border-error-left').length).toBe(3)
 
     const unitNoteValidationState = store.getMhrUnitNoteValidation
 
     const expectedUnitNoteValidationState: MhrUnitNoteValidationStateIF = {
       unitNoteAddValid: {
         documentIdValid: false,
-        remarksValid: true,
+        remarksValid: false,
         personGivingNoticeValid: false,
         submittingPartyValid: false,
         effectiveDateTimeValid: true,
