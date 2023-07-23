@@ -194,7 +194,7 @@ export default defineComponent({
         getMhrUnitNote.value.documentType === UnitNoteDocTypes.EXTENSION_TO_NOTICE_OF_CAUTION
       ),
       getSectionNumber: computed((): Object =>
-        localState.unitNoteType?.reviewSectionNumber?.sectionNumber || {}
+        localState.unitNoteType?.reviewSectionNumber || {}
       )
     })
 

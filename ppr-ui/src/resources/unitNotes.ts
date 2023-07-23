@@ -27,13 +27,11 @@ export const UnitNotesInfo = {
     dropdownText: 'Continued Notice of Caution',
     fee: FeeSummaryDefaults.NO_FEE,
     reviewSectionNumber: { // section numbers on Review page
-      sectionNumber: {
-        effectiveDateTime: 2,
-        expiryDate: 3,
-        attention: 4,
-        certifyInfo: 5,
-        staffPayment: 6
-      }
+      effectiveDateTime: 2,
+      expiryDate: 3,
+      attention: 4,
+      certifyInfo: 5,
+      staffPayment: 6
     }
   },
   [UnitNoteDocTypes.EXTENSION_TO_NOTICE_OF_CAUTION]: {
@@ -41,13 +39,11 @@ export const UnitNotesInfo = {
     dropdownText: 'Extension to Notice of Caution',
     fee: FeeSummaryDefaults.UNIT_NOTE_10,
     reviewSectionNumber: { // section numbers on Review page
-      sectionNumber: {
-        effectiveDateTime: 2,
-        expiryDate: 3,
-        attention: 4,
-        certifyInfo: 5,
-        staffPayment: 6
-      }
+      effectiveDateTime: 2,
+      expiryDate: 3,
+      attention: 4,
+      certifyInfo: 5,
+      staffPayment: 6
     }
   },
   [UnitNoteDocTypes.NOTE_CANCELLATION]: {
