@@ -244,17 +244,10 @@ export const useMhrInformation = () => {
       if (ownerGroup.owners.some(owner => owner.action === ActionTypes.REMOVED)) {
         ownerGroups.push({
           ...ownerGroup,
-          owners: ownerGroup.owners.filter(owner => owner.action !== ActionTypes.REMOVED).map(owner => {
-            return owner.individualName
-              ? {
-                ...owner,
-                description: owner.suffix,
-                individualName: normalizeObject(owner.individualName)
-              } : {
-                ...owner,
-                description: owner.suffix
-              }
-          }),
+          owners: ownerGroup.owners.filter(owner => owner.action !== ActionTypes.REMOVED)
+            .map(owner => {
+              return owner.individualName ? { ...owner, individualName: normalizeObject(owner.individualName) } : owner
+            }),
           type: ApiHomeTenancyTypes[
             Object.keys(HomeTenancyTypes).find(key => HomeTenancyTypes[key] as string === ownerGroup.type)
           ]

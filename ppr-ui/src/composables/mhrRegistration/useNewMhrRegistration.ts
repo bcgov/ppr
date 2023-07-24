@@ -218,14 +218,7 @@ export const useNewMhrRegistration = () => {
   }
 
   const parseOwnerGroups = (): MhrRegistrationHomeOwnerGroupIF[] => {
-    const ownersGroups: MhrRegistrationHomeOwnerGroupIF[] =
-      getMhrRegistrationHomeOwnerGroups.value.map(group => {
-        group.owners.forEach(owner => {
-          owner.description = owner.suffix
-        })
-
-        return group
-      })
+    const ownersGroups: MhrRegistrationHomeOwnerGroupIF[] = getMhrRegistrationHomeOwnerGroups.value
 
     const parsedOwnerGroups = Object.values(cleanEmpty(ownersGroups))
     parsedOwnerGroups.forEach((ownerGroup: MhrRegistrationHomeOwnerGroupIF) => {
@@ -285,7 +278,7 @@ export const useNewMhrRegistration = () => {
     const data: NewMhrRegistrationApiIF = {
       ownLand: getMhrRegistrationOwnLand.value,
       submittingParty: parseSubmittingParty(),
-      ownerGroups: getMhrRegistrationHomeOwnerGroups.value,
+      ownerGroups: parseOwnerGroups(),
       location: parseLocation(),
       description: parseDescription(),
       ...(isRoleStaffReg.value && !!getStaffPayment.value && {
