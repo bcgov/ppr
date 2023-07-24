@@ -95,7 +95,6 @@ export default defineComponent({
     const router = useRouter()
 
     const {
-      setUnsavedChanges,
       setEmptyUnitNoteRegistration
     } = useStore()
 
@@ -198,9 +197,7 @@ export default defineComponent({
     const goToDash = (): void => {
       if (hasUnsavedChanges.value === true) localState.showCancelDialog = true
       else {
-        setUnsavedChanges(false)
         resetAllValidations()
-
         router.push({
           name: RouteNames.DASHBOARD
         })
@@ -213,12 +210,9 @@ export default defineComponent({
     }
 
     const handleDialogResp = (val: boolean): void => {
-      if (!val) {
-        setUnsavedChanges(false)
-        if (localState.showCancelDialog) {
-          resetAllValidations()
-          goToDash()
-        }
+      if (!val && localState.showCancelDialog) {
+        resetAllValidations()
+        goToDash()
       }
       localState.showCancelDialog = false
     }
