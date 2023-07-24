@@ -3,6 +3,12 @@
     <section id="mhr-unit-note-doc-id" class="mt-10">
       <DocumentId
         :documentId="unitNoteDocumentId"
+        :sectionNumber="1"
+        :content="{
+          title: 'Document ID',
+          description: 'Enter the 8-digit Document ID number.',
+          sideLabel: 'Document ID'
+        }"
         :validate="validate"
         @setStoreProperty="handleStoreUpdate('documentId', $event)"
         @isValid="handleComponentValid(MhrCompVal.DOC_ID_VALID, $event)"
@@ -12,7 +18,12 @@
     <section id="mhr-unit-note-remarks" class="mt-10">
       <Remarks
         :unitNoteRemarks="unitNoteRemarks"
-        description="Remarks will be shown when a search result is produced for this manufactured home."
+        :sectionNumber="2"
+        :content="{
+          title: 'Remarks',
+          description: 'Remarks will be shown when a search result is produced for this manufactured home.',
+          sideLabel: 'Add Remarks'
+        }"
         :validate="validate"
         @setStoreProperty="handleStoreUpdate('remarks', $event)"
         @isValid="handleComponentValid(MhrCompVal.REMARKS_VALID, $event)"
@@ -22,6 +33,7 @@
     <section id="mhr-unit-note-person-giving-notice" class="mt-10">
       <ContactInformation
         :contactInfo="unitNoteGivingNoticeParty"
+        :sectionNumber="3"
         :content="{
           title: 'Person Giving Notice',
           description: 'Contact information for the person making the claim will be shown ' +

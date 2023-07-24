@@ -1,6 +1,8 @@
 export enum EffectiveDateTypes {
+  FUTURE = 'future',
   PAST = 'past',
-  IMMEDIATE = 'immediate'
+  IMMEDIATE = 'immediate',
+  CONTINUED = 'continued'
 }
 
 export enum PeriodTypes {

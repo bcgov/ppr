@@ -31,8 +31,9 @@
 
     <section class="mt-15">
       <EffectiveDateTime
+        :sectionNumber="getSectionNumber.effectiveDateTime || 2"
         :content="{
-          title: '2. Effective Date and Time',
+          title: 'Effective Date and Time',
           description: `Select the effective date and time for this ${unitNoteType.header}.  ` +
           'Custom date and time can be a date and time in the past.' + effectiveDateDescForCAU,
           sideLabel: 'Effective Date and Time'
@@ -43,10 +44,26 @@
       />
     </section>
 
+    <section v-if="hasExpiryDate" class="mt-15">
+      <ExpiryDate
+        :sectionNumber="getSectionNumber.expiryDate || 2"
+        :content="{
+          title: 'Expiry Date',
+          description: `Select the expiry date for this ${unitNoteType.header}.`,
+          sideLabel: 'Expiry Date'
+        }"
+        :validate="validate"
+        :hideContinuedExpiryDate="isUnitNoteTypeCAUE"
+        @setStoreProperty="handleStoreUpdate('expiryDateTime', $event)"
+        @isValid="handleComponentValid(MhrCompVal.EXPIRY_DATE_TIME_VALID, $event)"
+      />
+
+    </section>
+
     <section class="mt-15">
       <Attention
         section-id="mhr-attention"
-        :section-number="3"
+        :section-number="getSectionNumber.attention || 3"
         :validate="validate"
         @isAttentionValid="handleComponentValid(MhrCompVal.ATTENTION_VALID, $event)"
       />
@@ -55,7 +72,7 @@
     <!-- Authorization -->
     <section id="mhr-certify-section" class="mt-15">
       <CertifyInformation
-        :sectionNumber="4"
+        :sectionNumber="getSectionNumber.certifyInfo || 4"
         :setShowErrors="validate"
         :content="{
           description: 'The following account information will be recorded by BC Registries upon ' +
@@ -68,7 +85,7 @@
     </section>
 
     <section id="staff-transfer-payment-section" class="mt-10 pt-4 pb-10" v-if="isRoleStaffReg">
-      <h2>5. Staff Payment</h2>
+      <h2>{{ getSectionNumber.staffPayment || 5 }}. Staff Payment</h2>
       <v-card flat class="mt-6 pa-6" :class="{ 'border-error-left': validateStaffPayment }">
         <StaffPayment
           id="staff-payment"
@@ -99,8 +116,9 @@ import { Attention } from '../mhrRegistration/ReviewConfirm'
 import { StaffPayment } from '@bcrs-shared-components/staff-payment'
 import { StaffPaymentOptions } from '@bcrs-shared-components/enums'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
-import EffectiveDateTime from './EffectiveDateTime.vue'
 import { UnitNoteDocTypes } from '@/enums'
+import EffectiveDateTime from './EffectiveDateTime.vue'
+import ExpiryDate from './ExpiryDate.vue'
 
 export default defineComponent({
   name: 'UnitNoteReview',
@@ -108,6 +126,7 @@ export default defineComponent({
     UnitNoteReviewDetailsTable,
     ContactInformation,
     EffectiveDateTime,
+    ExpiryDate,
     Attention,
     CertifyInformation,
     StaffPayment
@@ -161,7 +180,21 @@ export default defineComponent({
         getValidation(MhrSectVal.UNIT_NOTE_VALID, MhrCompVal.EFFECTIVE_DATE_TIME_VALID) &&
         getValidation(MhrSectVal.UNIT_NOTE_VALID, MhrCompVal.ATTENTION_VALID) &&
         getValidation(MhrSectVal.UNIT_NOTE_VALID, MhrCompVal.AUTHORIZATION_VALID) &&
-        getValidation(MhrSectVal.UNIT_NOTE_VALID, MhrCompVal.STAFF_PAYMENT_VALID)
+        getValidation(MhrSectVal.UNIT_NOTE_VALID, MhrCompVal.STAFF_PAYMENT_VALID) && (
+          localState.hasExpiryDate
+            ? getValidation(MhrSectVal.UNIT_NOTE_VALID, MhrCompVal.EXPIRY_DATE_TIME_VALID)
+            : true
+        )
+      ),
+      hasExpiryDate: computed(() =>
+        [UnitNoteDocTypes.CONTINUED_NOTE_OF_CAUTION, UnitNoteDocTypes.EXTENSION_TO_NOTICE_OF_CAUTION]
+          .includes(getMhrUnitNote.value.documentType)
+      ),
+      isUnitNoteTypeCAUE: computed((): boolean =>
+        getMhrUnitNote.value.documentType === UnitNoteDocTypes.EXTENSION_TO_NOTICE_OF_CAUTION
+      ),
+      getSectionNumber: computed((): Object =>
+        localState.unitNoteType?.reviewSectionNumber || {}
       )
     })
 

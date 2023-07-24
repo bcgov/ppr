@@ -1,6 +1,8 @@
 <template>
   <div id="effective-date-time-container">
-    <h2>{{ content.title }}</h2>
+    <h2>
+      {{ `${sectionNumber ? sectionNumber + '.' : ''} ${content.title}`}}
+    </h2>
     <p class="mt-2">{{ content.description }}</p>
     <v-card
       id="effective-date-time-card"
@@ -114,6 +116,10 @@ export default defineComponent({
     validate: {
       type: Boolean,
       default: false
+    },
+    sectionNumber: {
+      type: Number,
+      required: false
     },
     content: {
       type: Object as () => ContentIF,

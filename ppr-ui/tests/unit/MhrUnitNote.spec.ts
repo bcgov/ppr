@@ -11,7 +11,13 @@ import { RouteNames, UnitNoteDocTypes } from '@/enums'
 import { getTestId, setupMockStaffUser } from './utils'
 import { UnitNotesInfo } from '@/resources/unitNotes'
 import { CertifyInformation, ContactInformation, DocumentId, Remarks } from '@/components/common'
-import { EffectiveDateTime, UnitNoteAdd, UnitNoteReview, UnitNoteReviewDetailsTable } from '@/components/unitNotes'
+import {
+  EffectiveDateTime,
+  ExpiryDate,
+  UnitNoteAdd,
+  UnitNoteReview,
+  UnitNoteReviewDetailsTable
+} from '@/components/unitNotes'
 import { Attention } from '@/components/mhrRegistration/ReviewConfirm'
 import { StaffPayment } from '@bcrs-shared-components/staff-payment'
 import { MhrUnitNoteValidationStateIF } from '@/interfaces'
@@ -118,11 +124,15 @@ describe('MHR Unit Note Filing', () => {
     expect(UnitNoteReviewComponent.exists()).toBeTruthy()
 
     expect(UnitNoteReviewComponent.findComponent(UnitNoteReviewDetailsTable).exists()).toBeTruthy()
-    expect(UnitNoteReviewComponent.findComponent(ContactInformation).exists()).toBeTruthy()
-    expect(UnitNoteReviewComponent.findComponent(EffectiveDateTime).exists()).toBeTruthy()
-    expect(UnitNoteReviewComponent.findComponent(Attention).exists()).toBeTruthy()
-    expect(UnitNoteReviewComponent.findComponent(CertifyInformation).exists()).toBeTruthy()
-    expect(UnitNoteReviewComponent.findComponent(StaffPayment).exists()).toBeTruthy()
+    // ExpiryDate component should not exists for this Unit Note type
+    expect(UnitNoteReviewComponent.findComponent(ExpiryDate).exists()).toBeFalsy()
+
+    // check that section numbers are updated because ExpiryDate is displayed
+    expect(UnitNoteReviewComponent.findComponent(ContactInformation).find('h2').text()).toContain('1.')
+    expect(UnitNoteReviewComponent.findComponent(EffectiveDateTime).find('h2').text()).toContain('2.')
+    expect(UnitNoteReviewComponent.findComponent(Attention).find('h2').text()).toContain('3.')
+    expect(UnitNoteReviewComponent.findComponent(CertifyInformation).find('h2').text()).toContain('4.')
+    expect(UnitNoteReviewComponent.find('#staff-transfer-payment-section h2').text()).toContain('5.')
 
     expect(UnitNoteReviewComponent.findAll('.border-error-left').length).toBe(0)
     expect(UnitNoteReviewComponent.findAll('.error-text').length).toBe(0)
@@ -131,5 +141,91 @@ describe('MHR Unit Note Filing', () => {
     await nextTick()
 
     expect(wrapper.findAll('.border-error-left').length).toBe(3)
+  })
+
+  it('Continued Notice of Caution (CAUC): renders and validates MhrUnitNote Review and Confirm', async () => {
+    await store.setMhrUnitNoteType(UnitNoteDocTypes.CONTINUED_NOTE_OF_CAUTION)
+
+    // trigger initial validation
+    await wrapper.find('#btn-stacked-submit').trigger('click')
+    await wrapper.findComponent(UnitNoteAdd).vm.$emit('isValid', true)
+    await nextTick()
+
+    await wrapper.find('#btn-stacked-submit').trigger('click')
+    await nextTick()
+
+    const UnitNoteReviewComponent = wrapper.findComponent(UnitNoteReview)
+    expect(UnitNoteReviewComponent.exists()).toBeTruthy()
+
+    // ExpiryDate component should exist for this Unit Note type
+    expect(UnitNoteReviewComponent.findComponent(ExpiryDate).exists()).toBeTruthy()
+
+    // check that section numbers have default sequence
+    expect(UnitNoteReviewComponent.findComponent(ContactInformation).find('h2').text()).toContain('1.')
+    expect(UnitNoteReviewComponent.findComponent(EffectiveDateTime).find('h2').text()).toContain('2.')
+    expect(UnitNoteReviewComponent.findComponent(ExpiryDate).find('h2').text()).toContain('3.')
+    expect(UnitNoteReviewComponent.findComponent(Attention).find('h2').text()).toContain('4.')
+    expect(UnitNoteReviewComponent.findComponent(CertifyInformation).find('h2').text()).toContain('5.')
+    expect(UnitNoteReviewComponent.findComponent(StaffPayment).exists()).toBeTruthy()
+    expect(UnitNoteReviewComponent.find('#staff-transfer-payment-section h2').text()).toContain('6.')
+
+    await wrapper.find('#btn-stacked-submit').trigger('click')
+    await nextTick()
+
+    expect(wrapper.findAll('.border-error-left').length).toBe(3)
+
+    // select past date in EffectiveDateTime to trigger validation
+    UnitNoteReviewComponent.findComponent(EffectiveDateTime).findAll('input[type=radio]').at(1).trigger('click')
+
+    const expiryDateRadioButtons = UnitNoteReviewComponent.findComponent(ExpiryDate).findAll('input[type=radio]')
+    // should be two radio buttons for this Unit Note type
+    expect(expiryDateRadioButtons.length).toBe(2)
+    // select future date in ExpiryDate to trigger validation
+    expiryDateRadioButtons.at(1).trigger('click')
+
+    await nextTick()
+    expect(wrapper.findAll('.border-error-left').length).toBe(5)
+  })
+
+  it('Extension to Notice of Caution (CAUE): renders and validates MhrUnitNote Review and Confirm', async () => {
+    await store.setMhrUnitNoteType(UnitNoteDocTypes.EXTENSION_TO_NOTICE_OF_CAUTION)
+
+    // trigger initial validation
+    await wrapper.find('#btn-stacked-submit').trigger('click')
+    await wrapper.findComponent(UnitNoteAdd).vm.$emit('isValid', true)
+    await nextTick()
+
+    await wrapper.find('#btn-stacked-submit').trigger('click')
+    await nextTick()
+
+    const UnitNoteReviewComponent = wrapper.findComponent(UnitNoteReview)
+    expect(UnitNoteReviewComponent.exists()).toBeTruthy()
+
+    // ExpiryDate component should exist for this Unit Note type
+    expect(UnitNoteReviewComponent.findComponent(ExpiryDate).exists()).toBeTruthy()
+
+    // check that section numbers are updated because ExpiryDate is displayed
+    expect(UnitNoteReviewComponent.findComponent(ContactInformation).find('h2').text()).toContain('1.')
+    expect(UnitNoteReviewComponent.findComponent(EffectiveDateTime).find('h2').text()).toContain('2.')
+    expect(UnitNoteReviewComponent.findComponent(ExpiryDate).find('h2').text()).toContain('3.')
+    expect(UnitNoteReviewComponent.findComponent(Attention).find('h2').text()).toContain('4.')
+    expect(UnitNoteReviewComponent.findComponent(CertifyInformation).find('h2').text()).toContain('5.')
+    expect(UnitNoteReviewComponent.findComponent(StaffPayment).exists()).toBeTruthy()
+    expect(UnitNoteReviewComponent.find('#staff-transfer-payment-section h2').text()).toContain('6.')
+
+    await wrapper.find('#btn-stacked-submit').trigger('click')
+    await nextTick()
+
+    expect(wrapper.findAll('.border-error-left').length).toBe(4)
+
+    // select past date in EffectiveDateTime to trigger validation
+    UnitNoteReviewComponent.findComponent(EffectiveDateTime).findAll('input[type=radio]').at(1).trigger('click')
+
+    const expiryDateRadioButtons = UnitNoteReviewComponent.findComponent(ExpiryDate).findAll('input[type=radio]')
+    // should be no radio buttons for this Unit Note type
+    expect(expiryDateRadioButtons.length).toBe(0)
+
+    await nextTick()
+    expect(wrapper.findAll('.border-error-left').length).toBe(5)
   })
 })

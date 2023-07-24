@@ -40,5 +40,6 @@ export enum MhrCompVal {
   REMARKS_VALID = 'remarksValid',
   PERSON_GIVING_NOTICE_VALID = 'personGivingNoticeValid',
   EFFECTIVE_DATE_TIME_VALID = 'effectiveDateTimeValid',
+  EXPIRY_DATE_TIME_VALID = 'expiryDateTimeValid',
   SUBMITTING_PARTY_VALID = 'submittingPartyValid'
 }
