@@ -285,7 +285,7 @@ export const useNewMhrRegistration = () => {
     const data: NewMhrRegistrationApiIF = {
       ownLand: getMhrRegistrationOwnLand.value,
       submittingParty: parseSubmittingParty(),
-      ownerGroups: parseOwnerGroups(),
+      ownerGroups: getMhrRegistrationHomeOwnerGroups.value,
       location: parseLocation(),
       description: parseDescription(),
       ...(isRoleStaffReg.value && !!getStaffPayment.value && {
