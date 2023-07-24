@@ -62,7 +62,6 @@ def validate_note(registration: MhrRegistration, json_data, staff: bool = False,
         doc_type: str = None
         if json_data.get('note') and json_data['note'].get('documentType'):
             doc_type = json_data['note'].get('documentType')
-        error_msg += validate_remarks(json_data, doc_type)
         error_msg += validate_giving_notice(json_data, doc_type)
         error_msg += validate_effective_ts(json_data, doc_type)
         error_msg += validate_expiry_ts(registration, json_data, doc_type)

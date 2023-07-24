@@ -108,7 +108,16 @@ SELECT COUNT(documtid)
  WHERE documtid = :query_value
 """
 QUERY_ACCOUNT_ADD_REGISTRATION = """
-SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRIM(d.docutype),
+SELECT mh.mhregnum,
+       CASE
+        WHEN mh.mhstatus = 'R' AND
+             EXISTS (SELECT n.regdocid
+                       FROM mhomnote n
+                      WHERE n.manhomid = mh.manhomid AND n.status = 'A' and n.docutype in ('TAXN')) THEN
+             'F'
+        ELSE mh.mhstatus
+       END AS mhstatus,
+       d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRIM(d.docutype),
        (SELECT XMLSERIALIZE(XMLAGG ( XMLELEMENT ( NAME "owner", o2.ownrtype || TRIM(o2.ownrname))) AS CLOB)
           FROM owner o2, owngroup og2
          WHERE o2.manhomid = mh.manhomid
@@ -131,7 +140,7 @@ SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRI
           FROM mhomnote n
          WHERE mh.manhomid = n.manhomid AND n.regdocid = d.documtid) AS note_expiry,
         CASE
-        WHEN d.docutype = 'NCAN' THEN
+        WHEN d.docutype in ('NCAN', 'NRED') THEN
           (SELECT n.docutype
              FROM mhomnote n
             WHERE n.manhomid = mh.manhomid AND n.candocid = d.documtid AND n.docutype NOT IN ('CAUC', 'CAUE')
@@ -143,7 +152,16 @@ SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRI
    AND mh.mhregnum = d.mhregnum
 """
 QUERY_ACCOUNT_ADD_REGISTRATION_DOC = """
-SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRIM(d.docutype),
+SELECT mh.mhregnum,
+       CASE
+        WHEN mh.mhstatus = 'R' AND
+             EXISTS (SELECT n.regdocid
+                       FROM mhomnote n
+                      WHERE n.manhomid = mh.manhomid AND n.status = 'A' and n.docutype in ('TAXN')) THEN
+             'F'
+        ELSE mh.mhstatus
+       END AS mhstatus,
+       d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRIM(d.docutype),
        (SELECT XMLSERIALIZE(XMLAGG ( XMLELEMENT ( NAME "owner", o2.ownrtype || TRIM(o2.ownrname))) AS CLOB)
           FROM owner o2, owngroup og2
          WHERE o2.manhomid = mh.manhomid
@@ -166,7 +184,7 @@ SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRI
           FROM mhomnote n
          WHERE mh.manhomid = n.manhomid AND n.regdocid = d.documtid) AS note_expiry,
         CASE
-        WHEN d.docutype = 'NCAN' THEN
+        WHEN d.docutype in ('NCAN', 'NRED') THEN
           (SELECT n.docutype
              FROM mhomnote n
             WHERE n.manhomid = mh.manhomid AND n.candocid = d.documtid AND n.docutype NOT IN ('CAUC', 'CAUE')
@@ -179,7 +197,16 @@ SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRI
    AND mh.mhregnum = d.mhregnum
 """
 QUERY_ACCOUNT_REGISTRATIONS = """
-SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRIM(d.docutype),
+SELECT mh.mhregnum,
+       CASE
+        WHEN mh.mhstatus = 'R' AND
+             EXISTS (SELECT n.regdocid
+                       FROM mhomnote n
+                      WHERE n.manhomid = mh.manhomid AND n.status = 'A' and n.docutype in ('TAXN')) THEN
+             'F'
+        ELSE mh.mhstatus
+       END AS mhstatus,
+       d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRIM(d.docutype),
        (SELECT XMLSERIALIZE(XMLAGG ( XMLELEMENT ( NAME "owner", o2.ownrtype || TRIM(o2.ownrname))) AS CLOB)
           FROM owner o2, owngroup og2
          WHERE o2.manhomid = mh.manhomid
@@ -202,7 +229,7 @@ SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRI
           FROM mhomnote n
          WHERE mh.manhomid = n.manhomid AND n.regdocid = d.documtid) AS note_expiry,
         CASE
-        WHEN d.docutype = 'NCAN' THEN
+        WHEN d.docutype in ('NCAN', 'NRED') THEN
           (SELECT n.docutype
              FROM mhomnote n
             WHERE n.manhomid = mh.manhomid AND n.candocid = d.documtid AND n.docutype NOT IN ('CAUC', 'CAUE')
@@ -215,7 +242,16 @@ SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRI
  ORDER BY d.regidate DESC
 """
 QUERY_ACCOUNT_REGISTRATIONS_SORT = """
-SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRIM(d.docutype),
+SELECT mh.mhregnum,
+       CASE
+        WHEN mh.mhstatus = 'R' AND
+             EXISTS (SELECT n.regdocid
+                       FROM mhomnote n
+                      WHERE n.manhomid = mh.manhomid AND n.status = 'A' and n.docutype in ('TAXN')) THEN
+             'F'
+        ELSE mh.mhstatus
+       END AS mhstatus,
+       d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRIM(d.docutype),
        (SELECT XMLSERIALIZE(XMLAGG ( XMLELEMENT ( NAME "owner", o2.ownrtype || TRIM(o2.ownrname))) AS CLOB)
           FROM owner o2, owngroup og2
          WHERE o2.manhomid = mh.manhomid
@@ -238,7 +274,7 @@ SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRI
           FROM mhomnote n
          WHERE mh.manhomid = n.manhomid AND n.regdocid = d.documtid) AS note_expiry,
         CASE
-        WHEN d.docutype = 'NCAN' THEN
+        WHEN d.docutype in ('NCAN', 'NRED') THEN
           (SELECT n.docutype
              FROM mhomnote n
             WHERE n.manhomid = mh.manhomid AND n.candocid = d.documtid AND n.docutype NOT IN ('CAUC', 'CAUE')

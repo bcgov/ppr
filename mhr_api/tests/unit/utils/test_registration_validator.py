@@ -241,7 +241,8 @@ TEST_EXEMPTION_DATA = [
     ('Valid no doc id not staff', True, False, None, None, None),
     ('Invalid EXEMPT', False, False, None, validator_utils.STATE_NOT_ALLOWED, MhrRegistrationStatusTypes.EXEMPT),
     ('Invalid CANCELLED', False, False, None, validator_utils.STATE_NOT_ALLOWED, MhrRegistrationStatusTypes.HISTORICAL),
-    ('Invalid note doc type', False, False, None, validator.NOTE_DOC_TYPE_INVALID, MhrRegistrationStatusTypes.ACTIVE)
+    ('Invalid note doc type', False, False, None, validator.NOTE_DOC_TYPE_INVALID, MhrRegistrationStatusTypes.ACTIVE),
+    ('Invalid FROZEN TAXN', False, False, None, validator_utils.STATE_FROZEN_TAXN, MhrRegistrationStatusTypes.ACTIVE)
 ]
 # testdata pattern is ({description}, {valid}, {numerator}, {denominator}, {groups}, {message content})
 TEST_REG_DATA_GROUP = [
@@ -415,6 +416,9 @@ def test_validate_exemption(session, desc, valid, staff, doc_id, message_content
         account_id = 'ppr_staff'
     elif desc == 'Invalid CANCELLED':
         mhr_num = '001453'
+        account_id = 'ppr_staff'
+    elif desc == 'Invalid FROZEN TAXN':
+        mhr_num = '022873'
         account_id = 'ppr_staff'
     del json_data['submittingParty']['phoneExtension']
     # current_app.logger.info(json_data)

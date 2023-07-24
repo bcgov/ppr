@@ -287,6 +287,8 @@ TEST_PERMIT_DATA = [
     ('Valid no doc id not staff', True, False, None, None, '100413', 'PS12345', REQUEST_TRANSPORT_PERMIT),
     ('Invalid FROZEN', False, False, None, validator_utils.STATE_NOT_ALLOWED, '003936', '2523',
      REQUEST_TRANSPORT_PERMIT),
+    ('Invalid FROZEN TAXN', False, False, None, validator_utils.STATE_FROZEN_TAXN, '022873', 'ppr_staff',
+     REQUEST_TRANSPORT_PERMIT),
     ('Invalid staff FROZEN', False, True, None, validator_utils.STATE_FROZEN_AFFIDAVIT, '003936', 'ppr_staff',
      REQUEST_TRANSPORT_PERMIT),
     ('Invalid EXEMPT', False, False, None, validator_utils.STATE_NOT_ALLOWED, '077010', 'ppr_staff', STAFF_ROLE),
