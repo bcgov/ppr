@@ -62,6 +62,7 @@ export interface MhrUnitNoteValidationStateIF {
     personGivingNoticeValid: boolean,
     submittingPartyValid: boolean,
     effectiveDateTimeValid: boolean,
+    expiryDateTimeValid: boolean,
     attentionValid: boolean,
     authorizationValid: boolean,
     staffPaymentValid: boolean
