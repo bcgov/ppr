@@ -77,12 +77,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs, watch, computed } from 'vue-demi'
+import { defineComponent, reactive, toRefs, watch } from 'vue-demi'
 import { RouteNames, UnitNoteDocTypes } from '@/enums'
 import { useRouter } from 'vue2-helpers/vue-router'
 import { useStore } from '@/store/store'
 import { UnitNotesInfo, UnitNotesDropdown } from '@/resources'
-import { UnitNoteIF, GroupedNotesIF } from '@/interfaces/unit-note-interfaces'
+import { UnitNoteIF } from '@/interfaces/unit-note-interfaces'
 import UnitNotePanel from './UnitNotePanel.vue'
 import { useMhrUnitNote } from '@/composables'
 
@@ -109,45 +109,12 @@ export default defineComponent({
     } = useStore()
 
     const {
-      isNoticeOfCautionOrRelatedDocType
+      groupUnitNotes
     } = useMhrUnitNote()
 
     const localState = reactive({
       activePanels: [],
-      groupedUnitNotes: computed(() : Array<GroupedNotesIF> => {
-        // The notes should already be in order by creation date and time (filter preserves order)
-        const noticeOfCautionNotes = props.unitNotes.filter((note) => isNoticeOfCautionOrRelatedDocType(note))
-
-        let primaryUnitNote: UnitNoteIF = null
-        let additionalUnitNotes: UnitNoteIF[] = []
-
-        const groupedNoticeOfCautions: GroupedNotesIF[] = []
-
-        // NOTICE_OF_CAUTION is used as an interval for grouping the notes
-        // When a NOTICE_OF_CAUTION is encountered, the group is added
-        // and a new group is started on the next iteration
-        noticeOfCautionNotes.forEach((note) => {
-          if (!primaryUnitNote) { primaryUnitNote = note } else { additionalUnitNotes.push(note) }
-
-          if (note.documentType === UnitNoteDocTypes.NOTICE_OF_CAUTION) {
-            groupedNoticeOfCautions.push({ primaryUnitNote, additionalUnitNotes })
-            primaryUnitNote = null
-            additionalUnitNotes = []
-          }
-        })
-
-        const nonNoticeOfCautionUnitNotes = props.unitNotes.filter((note) => !isNoticeOfCautionOrRelatedDocType(note))
-
-        const groupedUnitNotes: GroupedNotesIF[] = nonNoticeOfCautionUnitNotes.map((note) => {
-          return { primaryUnitNote: note }
-        })
-
-        // Adds the notice of caution notes to the other unit notes and sort in descending creation time
-        return groupedUnitNotes.concat(groupedNoticeOfCautions).sort((note1, note2) =>
-          new Date(note2.primaryUnitNote.createDateTime).getTime() -
-          new Date(note1.primaryUnitNote.createDateTime).getTime()
-        )
-      })
+      groupedUnitNotes: groupUnitNotes(props.unitNotes)
     })
 
     const initUnitNote = (noteType: UnitNoteDocTypes): void => {
