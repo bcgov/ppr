@@ -226,7 +226,7 @@ export default defineComponent({
 
     watch(() => localState.isEffectiveDateTimeValid, (val: boolean) => {
       emit('isValid', val)
-    })
+    }, { immediate: true })
 
     return {
       required,

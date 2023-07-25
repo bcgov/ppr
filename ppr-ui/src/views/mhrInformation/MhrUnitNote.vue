@@ -95,12 +95,10 @@ export default defineComponent({
     const router = useRouter()
 
     const {
-      setUnsavedChanges,
       setEmptyUnitNoteRegistration
     } = useStore()
 
     const {
-      hasUnsavedChanges,
       getMhrUnitNoteType,
       getMhrUnitNoteRegistration,
       getMhrInformation,
@@ -179,7 +177,6 @@ export default defineComponent({
           const unitNoteRegistrationResp = await buildApiDataAndSubmit(getMhrUnitNoteRegistration.value)
 
           if (!unitNoteRegistrationResp.error) {
-            resetAllValidations()
             goToDash()
           } else {
             emitError(unitNoteRegistrationResp?.error)
@@ -196,15 +193,10 @@ export default defineComponent({
     }
 
     const goToDash = (): void => {
-      if (hasUnsavedChanges.value === true) localState.showCancelDialog = true
-      else {
-        setUnsavedChanges(false)
-        resetAllValidations()
-
-        router.push({
-          name: RouteNames.DASHBOARD
-        })
-      }
+      resetAllValidations()
+      router.push({
+        name: RouteNames.DASHBOARD
+      })
     }
 
     // Emit error to router view
@@ -213,12 +205,8 @@ export default defineComponent({
     }
 
     const handleDialogResp = (val: boolean): void => {
-      if (!val) {
-        setUnsavedChanges(false)
-        if (localState.showCancelDialog) {
-          resetAllValidations()
-          goToDash()
-        }
+      if (!val && localState.showCancelDialog) {
+        goToDash()
       }
       localState.showCancelDialog = false
     }
