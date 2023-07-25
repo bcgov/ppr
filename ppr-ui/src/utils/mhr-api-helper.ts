@@ -674,7 +674,7 @@ export function deleteEmptyProperties (obj) {
   for (const key in obj) {
     if (typeof obj[key] === 'object') {
       deleteEmptyProperties(obj[key]) // recursively process nested objects
-      if (Object.keys(obj[key]).length === 0) {
+      if (Object.keys(obj[key] || {}).length === 0) {
         delete obj[key] // delete empty nested object
       }
     } else if (obj[key] === null || obj[key] === undefined || obj[key] === '') {
