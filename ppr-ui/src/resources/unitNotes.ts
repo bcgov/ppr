@@ -1,5 +1,6 @@
 import { FeeSummaryDefaults } from '@/composables/fees/enums'
 import { UnitNoteDocTypes } from '@/enums'
+import { UnitNoteInfoIF } from '@/interfaces'
 
 export const UnitNotesDropdown: Array<UnitNoteDocTypes> = [
   UnitNoteDocTypes.DECAL_REPLACEMENT,
@@ -16,7 +17,12 @@ export const UnitNotesDropdown: Array<UnitNoteDocTypes> = [
   // UnitNoteDocTypes.RESIDENTIAL_EXEMPTION_ORDER
 ]
 
-export const UnitNotesInfo = {
+export const NoticeOfCautionDropDown: Array<UnitNoteDocTypes> = [
+  UnitNoteDocTypes.CONTINUED_NOTE_OF_CAUTION,
+  UnitNoteDocTypes.EXTENSION_TO_NOTICE_OF_CAUTION
+]
+
+export const UnitNotesInfo: Record<UnitNoteDocTypes, UnitNoteInfoIF> = {
   [UnitNoteDocTypes.NOTICE_OF_CAUTION]: {
     header: 'Notice of Caution',
     dropdownText: 'Notice of Caution',
@@ -24,7 +30,7 @@ export const UnitNotesInfo = {
   },
   [UnitNoteDocTypes.CONTINUED_NOTE_OF_CAUTION]: {
     header: 'Continued Notice of Caution',
-    dropdownText: 'Continued Notice of Caution',
+    dropdownText: 'Add Continued Notice of Caution',
     fee: FeeSummaryDefaults.NO_FEE,
     reviewSectionNumber: { // section numbers on Review page
       effectiveDateTime: 2,
@@ -32,11 +38,12 @@ export const UnitNotesInfo = {
       attention: 4,
       certifyInfo: 5,
       staffPayment: 6
-    }
+    },
+    panelHeader: 'Notice of Caution (Continued)'
   },
   [UnitNoteDocTypes.EXTENSION_TO_NOTICE_OF_CAUTION]: {
     header: 'Extension to Notice of Caution',
-    dropdownText: 'Extension to Notice of Caution',
+    dropdownText: 'Add Extension to Notice of Caution',
     fee: FeeSummaryDefaults.UNIT_NOTE_10,
     reviewSectionNumber: { // section numbers on Review page
       effectiveDateTime: 2,
@@ -44,7 +51,8 @@ export const UnitNotesInfo = {
       attention: 4,
       certifyInfo: 5,
       staffPayment: 6
-    }
+    },
+    panelHeader: 'Notice of Caution (Extended)'
   },
   [UnitNoteDocTypes.NOTE_CANCELLATION]: {
     header: 'Cancel Note',

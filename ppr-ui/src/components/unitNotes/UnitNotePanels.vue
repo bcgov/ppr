@@ -59,158 +59,14 @@
         multiple flat
         v-model="activePanels"
       >
-        <v-expansion-panel
-          v-for="(item, index) in unitNotes"
-          :key="index"
-          class="unit-note-panel pb-4 px-1"
-        >
-          <v-expansion-panel-header disable-icon-rotate :disabled="disabled">
-            <v-row no-gutters>
-              <v-col cols="12">
-                <h3 class="py-3">
-                  {{ UnitNotesInfo[item.documentType].header }}
-                  {{ item.status === MhApiStatusTypes.EXPIRED ? ` - ${MhUIStatusTypes.EXPIRED}` : '' }}
-                  {{ item.status === MhApiStatusTypes.CANCELLED ? ` - ${MhUIStatusTypes.CANCELLED}` : '' }}
-                </h3>
-              </v-col>
-              <v-col>
-                <span class="info-text fs-14">
-                  Registered on {{ pacificDate(item.createDateTime, true) }}
-                  <v-divider vertical />
-                  Document Registration Number {{ item.documentRegistrationNumber }}
-                </span>
-              </v-col>
-            </v-row>
-
-            <!-- Custom Panel Actions -->
-            <template v-slot:actions>
-              <span class="unit-note-header-action mt-n4">
-                <v-menu offset-y left nudge-bottom="0" class="unit-note-menu">
-                  <template v-slot:activator="{ on, value }">
-                    <v-btn
-                      class="unit-note-menu-btn"
-                      text
-                      color="primary"
-                      :disabled="disabled"
-                      :ripple="false"
-                    >
-                      <span>{{ activePanels.includes(index) ? 'Hide Note' : 'View Note' }}</span>
-                      <v-divider vertical />
-                      <v-icon class="menu-drop-down-icon" color="primary" v-on="on" :disabled="disabled">
-                        {{ value ? 'mdi-menu-up' : 'mdi-menu-down' }}
-                      </v-icon>
-                    </v-btn>
-                  </template>
-
-                  <!-- Drop down list -->
-                  <v-list>
-                    <v-list-item
-                      class="cancel-unit-note-list-item"
-                      @click="cancelUnitNote(item)"
-                    >
-                      <v-list-item-subtitle class="text-center">
-                        <v-icon color="primary">mdi-delete</v-icon>
-                        Cancel
-                      </v-list-item-subtitle>
-                    </v-list-item>
-                  </v-list>
-                </v-menu>
-              </span>
-            </template>
-          </v-expansion-panel-header>
-
-          <v-expansion-panel-content>
-            <v-divider class="ml-0 my-4"/>
-
-            <!-- Note information -->
-            <v-row v-if="item.effectiveDateTime" no-gutters class="pt-3">
-              <v-col cols="3">
-                <h3 class="fs-14">Effective Date and Time</h3>
-              </v-col>
-              <v-col cols="9">
-                <span class="info-text fs-14">
-                  {{ pacificDate(item.effectiveDateTime) }}
-                </span>
-              </v-col>
-            </v-row>
-
-            <v-row v-if="item.expiryDateTime" no-gutters class="pt-3">
-              <v-col cols="3">
-                <h3 class="fs-14">Expiry Date and Time</h3>
-              </v-col>
-              <v-col cols="9">
-                <span class="info-text fs-14">
-                  {{ pacificDate(item.expiryDateTime) }}
-                </span>
-              </v-col>
-            </v-row>
-
-            <v-row v-if="item.remarks" no-gutters class="mt-1 py-3">
-              <v-col cols="3">
-                <h3 class="fs-14">Remarks</h3>
-              </v-col>
-              <v-col cols="9">
-                <span class="info-text fs-14">
-                  {{ item.remarks }}
-                </span>
-              </v-col>
-            </v-row>
-
-            <v-divider
-              v-if="item.effectiveDateTime || item.expiryDateTime || item.remarks"
-              class="ml-0 my-4"
-            />
-
-            <!-- Person Giving Notice Table -->
-            <v-row no-gutters class="pt-2">
-              <v-col cols="3">
-                <h3 class="py-2">Person Giving Notice</h3>
-              </v-col>
-            </v-row>
-            <v-row no-gutters>
-              <v-col>
-                <v-simple-table
-                  id="persons-giving-notice-table"
-                  fixed-header
-                >
-                  <template v-slot:default>
-                    <!-- Table Headers -->
-                    <thead>
-                      <tr>
-                        <th v-for="header in personGivingNoticeTableHeaders" :key="header.value" :class="header.class">
-                          {{ header.text }}
-                        </th>
-                      </tr>
-                    </thead>
-
-                    <!-- Table Body -->
-                    <tbody v-if="item.givingNoticeParty">
-                      <tr>
-                        <td class="pl-0">
-                          <div class="mr-2">
-                            <v-icon class="notice-party-icon colour-dk-text mt-n2">
-                              {{ getNoticePartyIcon(item.givingNoticeParty) }}
-                            </v-icon>
-                          </div>
-                          <span class="notice-party-name generic-label fs-14">
-                            {{ getNoticePartyName(item.givingNoticeParty) }}
-                          </span>
-                        </td>
-                        <td>
-                          <BaseAddress
-                            :value="item.givingNoticeParty.address"
-                          />
-                        </td>
-                        <td>{{ item.givingNoticeParty.emailAddress }}</td>
-                        <td>{{ item.givingNoticeParty.phoneNumber }}</td>
-                      </tr>
-                    </tbody>
-                  </template>
-                </v-simple-table>
-              </v-col>
-            </v-row>
-          </v-expansion-panel-content>
-        </v-expansion-panel>
+        <UnitNotePanel
+            v-for="(item, index) in groupedUnitNotes"
+            :disabled="disabled"
+            :key="index"
+            :note="item.primaryUnitNote"
+            :additionalNotes="item.additionalUnitNotes"
+            :isActive="activePanels.includes(index)"
+        />
       </v-expansion-panels>
       <v-col v-else class="empty-notes-msg text-center pt-8 pb-3">
         <p class="gray7 fs-14">A unit note has not been filed for this manufactured home.</p>
@@ -222,19 +78,18 @@
 
 <script lang="ts">
 import { defineComponent, reactive, toRefs, watch } from 'vue-demi'
-import { MhApiStatusTypes, MhUIStatusTypes, RouteNames, UnitNoteDocTypes } from '@/enums'
+import { RouteNames, UnitNoteDocTypes } from '@/enums'
 import { useRouter } from 'vue2-helpers/vue-router'
 import { useStore } from '@/store/store'
-import { personGivingNoticeTableHeaders, UnitNotesInfo, UnitNotesDropdown } from '@/resources'
-import { UnitNoteIF } from '@/interfaces/unit-note-interfaces/unit-note-interface'
-import { pacificDate } from '@/utils'
-import { PartyIF } from '@/interfaces'
-import { BaseAddress } from '@/composables/address'
+import { UnitNotesInfo, UnitNotesDropdown } from '@/resources'
+import { UnitNoteIF } from '@/interfaces/unit-note-interfaces'
+import UnitNotePanel from './UnitNotePanel.vue'
+import { useMhrUnitNote } from '@/composables'
 
 export default defineComponent({
   name: 'UnitNotePanels',
   components: {
-    BaseAddress
+    UnitNotePanel
   },
   props: {
     unitNotes: {
@@ -246,37 +101,25 @@ export default defineComponent({
       default: false
     }
   },
-  setup () {
+  setup (props) {
     const router = useRouter()
 
     const {
       setMhrUnitNoteType
     } = useStore()
 
+    const {
+      groupUnitNotes
+    } = useMhrUnitNote()
+
     const localState = reactive({
-      activePanels: []
+      activePanels: [],
+      groupedUnitNotes: groupUnitNotes(props.unitNotes)
     })
 
     const initUnitNote = (noteType: UnitNoteDocTypes): void => {
       setMhrUnitNoteType(noteType)
       router.push({ path: '/' + RouteNames.MHR_INFORMATION_NOTE })
-    }
-
-    const getNoticePartyIcon = (givingNoticeParty: PartyIF): string => {
-      return givingNoticeParty.businessName
-        ? 'mdi-domain'
-        : 'mdi-account'
-    }
-
-    const getNoticePartyName = (givingNoticeParty: PartyIF): string => {
-      return givingNoticeParty.businessName
-        ? givingNoticeParty.businessName
-        : `${givingNoticeParty.personName.first}${givingNoticeParty.personName.middle}
-          ${givingNoticeParty.personName.last}`
-    }
-
-    const cancelUnitNote = (unitNote: UnitNoteIF): void => {
-      // Request to delete unit note here
     }
 
     watch(() => localState.activePanels, () => {
@@ -285,15 +128,8 @@ export default defineComponent({
 
     return {
       initUnitNote,
-      cancelUnitNote,
-      pacificDate,
-      getNoticePartyIcon,
-      getNoticePartyName,
       UnitNotesInfo,
       UnitNotesDropdown,
-      MhUIStatusTypes,
-      MhApiStatusTypes,
-      personGivingNoticeTableHeaders,
       ...toRefs(localState)
     }
   }
@@ -319,12 +155,6 @@ h3 {
   background: $gray1;
   max-height: 750px;
   overflow-y: auto;
-  .unit-note-panel {
-    border-bottom: 2px solid $gray1;
-  }
-  .v-expansion-panel-header {
-    padding-right: 6px;
-  }
 }
 .unit-note-list-item {
     background-color: white;
@@ -338,24 +168,6 @@ h3 {
 ::v-deep {
   .theme--light.v-btn.v-btn--disabled {
     color: $primary-blue!important;
-  }
-  .v-divider {
-    color: $gray3
-  }
-  .theme--light.v-data-table > .v-data-table__wrapper > table > thead > tr:last-child > th:first-child {
-    padding-left: 0;
-  }
-
-  tbody > tr > td {
-    vertical-align: baseline;
-    padding: 20px 12px 0 18px!important;
-  }
-
-  td:first-child {
-    display: flex;
-    align-items: flex-start;
-    white-space: pre-line;
-    overflow: visible;
   }
 }
 </style>

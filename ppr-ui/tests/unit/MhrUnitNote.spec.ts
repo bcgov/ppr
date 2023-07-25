@@ -105,6 +105,7 @@ describe('MHR Unit Note Filing', () => {
         personGivingNoticeValid: false,
         submittingPartyValid: false,
         effectiveDateTimeValid: true,
+        expiryDateTimeValid: true,
         attentionValid: true,
         authorizationValid: false,
         staffPaymentValid: false

@@ -112,7 +112,7 @@ export default defineComponent({
     const {
       initUnitNote,
       buildApiDataAndSubmit
-    } = useMhrUnitNote(getMhrUnitNoteType.value)
+    } = useMhrUnitNote()
 
     const localState = reactive({
       loading: false,
