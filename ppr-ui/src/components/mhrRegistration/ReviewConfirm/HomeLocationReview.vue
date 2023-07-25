@@ -19,7 +19,7 @@
       </section>
 
       <section v-if="(!!getMhrRegistrationLocation.locationType || hasAddress)"
-        class="py-6" id="review-home-location-section"
+        class="py-10" id="review-home-location-section"
       >
         <v-row no-gutters class="px-6">
           <v-col cols="3" class="pt-1">
@@ -206,7 +206,7 @@
           </template>
 
           <!-- Civic Address -->
-          <v-row no-gutters class="px-6 pt-1 pb-6" >
+          <v-row no-gutters class="px-6 pt-1" >
             <v-col cols="3" class="pt-1">
               <h3>Civic Address</h3>
             </v-col>
@@ -226,8 +226,8 @@
             </v-col>
           </v-row>
 
-          <template v-if="!isMhrManufacturerRegistration">
-            <v-divider class="mx-4"/>
+          <template v-if="!isMhrManufacturerRegistration && !isTransferReview">
+            <v-divider class="mx-4 mt-6"/>
 
             <!-- Land Details -->
             <v-row no-gutters class="px-6 pt-6" >
