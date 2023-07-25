@@ -514,7 +514,11 @@ TEST_DATA_STATUS = [
     ('003936', '2523', 'FROZEN', True),
     ('003304', '2523', 'ACTIVE', True),
     ('022873', 'ppr_staff', 'ACTIVE', True),
-    ('022873', 'ppr_staff', 'FROZEN', False)
+    ('022873', 'ppr_staff', 'FROZEN', False),
+    ('040289', 'ppr_staff', 'ACTIVE', True),
+    ('040289', 'ppr_staff', 'FROZEN', False),
+    ('045718', 'ppr_staff', 'ACTIVE', True),
+    ('045718', 'ppr_staff', 'FROZEN', False)
 ]
 # testdata pattern is ({mhr_num}, {staff}, {current}, {has_notes}, {account_id}, {has_caution}, {ncan_doc_id})
 TEST_MHR_NUM_DATA_NOTE = [

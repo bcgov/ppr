@@ -956,7 +956,7 @@ def get_non_staff_notes(reg_json):
     for note in reg_json.get('notes'):
         include: bool = True
         doc_type = note.get('documentType', '')
-        if doc_type in ('103', '103E', 'STAT', '102', 'NCON'):  # Always exclude for non-staff
+        if doc_type in ('103', '103E', 'STAT', '102'):  # Always exclude for non-staff
             include = False
         elif doc_type in ('TAXN', 'EXNR', 'EXRS', 'NPUB', 'REST', 'CAU', 'CAUC', 'CAUE') and \
                 note.get('status') != MhrNoteStatusTypes.ACTIVE:  # Exclude if not active.

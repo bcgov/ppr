@@ -113,7 +113,7 @@ SELECT mh.mhregnum,
         WHEN mh.mhstatus = 'R' AND
              EXISTS (SELECT n.regdocid
                        FROM mhomnote n
-                      WHERE n.manhomid = mh.manhomid AND n.status = 'A' and n.docutype in ('TAXN')) THEN
+                      WHERE n.manhomid = mh.manhomid AND n.status = 'A' and n.docutype in ('TAXN', 'NCON', 'REST')) THEN
              'F'
         ELSE mh.mhstatus
        END AS mhstatus,
@@ -157,7 +157,7 @@ SELECT mh.mhregnum,
         WHEN mh.mhstatus = 'R' AND
              EXISTS (SELECT n.regdocid
                        FROM mhomnote n
-                      WHERE n.manhomid = mh.manhomid AND n.status = 'A' and n.docutype in ('TAXN')) THEN
+                      WHERE n.manhomid = mh.manhomid AND n.status = 'A' and n.docutype in ('TAXN', 'NCON', 'REST')) THEN
              'F'
         ELSE mh.mhstatus
        END AS mhstatus,
@@ -202,7 +202,7 @@ SELECT mh.mhregnum,
         WHEN mh.mhstatus = 'R' AND
              EXISTS (SELECT n.regdocid
                        FROM mhomnote n
-                      WHERE n.manhomid = mh.manhomid AND n.status = 'A' and n.docutype in ('TAXN')) THEN
+                      WHERE n.manhomid = mh.manhomid AND n.status = 'A' and n.docutype in ('TAXN', 'NCON', 'REST')) THEN
              'F'
         ELSE mh.mhstatus
        END AS mhstatus,
@@ -247,7 +247,7 @@ SELECT mh.mhregnum,
         WHEN mh.mhstatus = 'R' AND
              EXISTS (SELECT n.regdocid
                        FROM mhomnote n
-                      WHERE n.manhomid = mh.manhomid AND n.status = 'A' and n.docutype in ('TAXN')) THEN
+                      WHERE n.manhomid = mh.manhomid AND n.status = 'A' and n.docutype in ('TAXN', 'NCON', 'REST')) THEN
              'F'
         ELSE mh.mhstatus
        END AS mhstatus,

@@ -78,7 +78,9 @@ TEST_TRANSFER_DATA = [
     ('Invalid EXEMPT', False, False, None, validator_utils.STATE_NOT_ALLOWED, MhrRegistrationStatusTypes.EXEMPT),
     ('Invalid CANCELLED', False, False, None, validator_utils.STATE_NOT_ALLOWED, MhrRegistrationStatusTypes.HISTORICAL),
     ('Invalid FROZEN', False, False, None, validator_utils.STATE_NOT_ALLOWED, MhrRegistrationStatusTypes.ACTIVE),
-    ('Invalid FROZEN TAXN', False, False, None, validator_utils.STATE_FROZEN_TAXN, MhrRegistrationStatusTypes.ACTIVE),
+    ('Invalid FROZEN TAXN', False, False, None, validator_utils.STATE_FROZEN_NOTE, MhrRegistrationStatusTypes.ACTIVE),
+    ('Invalid FROZEN REST', False, False, None, validator_utils.STATE_FROZEN_NOTE, MhrRegistrationStatusTypes.ACTIVE),
+    ('Invalid FROZEN NCON', False, False, None, validator_utils.STATE_FROZEN_NOTE, MhrRegistrationStatusTypes.ACTIVE),
     ('Invalid draft', False, False, None, validator_utils.DRAFT_NOT_ALLOWED, MhrRegistrationStatusTypes.ACTIVE),
     (DESC_INVALID_GROUP_ID, False, False, None, validator.DELETE_GROUP_ID_INVALID, MhrRegistrationStatusTypes.ACTIVE),
     (DESC_NONEXISTENT_GROUP_ID, False, False, None, validator.DELETE_GROUP_ID_NONEXISTENT,
@@ -270,6 +272,12 @@ def test_validate_transfer(session, desc, valid, staff, doc_id, message_content,
         account_id = 'ppr_staff'
     elif desc == 'Invalid FROZEN TAXN':
         mhr_num = '022873'
+        account_id = 'ppr_staff'
+    elif desc == 'Invalid FROZEN REST':
+        mhr_num = '040289'
+        account_id = 'ppr_staff'
+    elif desc == 'Invalid FROZEN NCON':
+        mhr_num = '045718'
         account_id = 'ppr_staff'
 
     valid_format, errors = schema_utils.validate(json_data, 'transfer', 'mhr')
