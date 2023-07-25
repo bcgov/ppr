@@ -20,5 +20,6 @@ export interface UnitNoteInfoIF {
   header: string,
   dropdownText: string,
   fee: FeeSummaryDefaults,
+  reviewSectionNumber?: Record<string, number>,
   panelHeader?: string,
 }
