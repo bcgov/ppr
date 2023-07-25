@@ -788,12 +788,12 @@ def expiry_datetime(expiry_iso: str):
     return _datetime.utcfromtimestamp(local_ts.timestamp()).replace(tzinfo=timezone.utc)
 
 
-def has_taxn_note(reg_json: dict) -> bool:
-    """For registries non-staff check if an active TAXN unit note exists."""
+def has_frozen_note(reg_json: dict) -> bool:
+    """For registries non-staff check if an active TAXN, NCON, or REST unit note exists."""
     if not reg_json or not reg_json.get('notes'):
         return False
     for note in reg_json.get('notes'):
-        if note.get('documentType') == MhrDocumentTypes.TAXN and \
+        if note.get('documentType') in (MhrDocumentTypes.TAXN, MhrDocumentTypes.NCON, MhrDocumentTypes.REST) and \
                 (not note.get('status') or note.get('status') == MhrNoteStatusTypes.ACTIVE):
             return True
     return False

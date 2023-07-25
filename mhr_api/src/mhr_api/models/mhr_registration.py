@@ -198,13 +198,13 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
             elif self.current_view:
                 reg_json['notes'] = reg_utils.get_non_staff_notes_json(self, False)
             reg_json['hasCaution'] = self.set_caution()
-            if self.current_view and not self.staff and model_utils.has_taxn_note(reg_json):
+            if self.current_view and not self.staff and model_utils.has_frozen_note(reg_json):
                 reg_json['status'] = model_utils.STATUS_FROZEN
             current_app.logger.debug('Built new registration JSON')
             return self.set_payment_json(reg_json)
         if model_utils.is_legacy() and self.manuhome:
             reg_json = legacy_utils.get_new_registration_json(self)
-            if self.current_view and not self.staff and model_utils.has_taxn_note(reg_json):
+            if self.current_view and not self.staff and model_utils.has_frozen_note(reg_json):
                 reg_json['status'] = model_utils.STATUS_FROZEN
             return reg_json
         return self.json
@@ -456,9 +456,8 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         raise DatabaseException('MhrRegistration.find_all_by_account_id PosgreSQL not yet implemented.')
 
     @classmethod
-    def get_doc_id_count(cls, doc_id):
+    def get_doc_id_count(cls, doc_id: str):
         """Execute a query to count existing document id (must not exist check)."""
-        current_app.logger.debug(f'document id={doc_id}')
         if model_utils.is_legacy():
             return legacy_utils.get_doc_id_count(doc_id)
 
