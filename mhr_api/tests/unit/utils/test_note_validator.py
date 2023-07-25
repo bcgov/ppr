@@ -119,7 +119,7 @@ TEST_NOTE_DATA_EXPIRY = [
 ]
 # test data pattern is ({description}, {valid}, {doc_type}, {remarks}, {mhr_num}, {account}, {message_content})
 TEST_NOTE_DATA_REMARKS = [
-    ('Invalid required', False, 'CAU', None, '102876', 'ppr_staff', validator.REMARKS_REQUIRED),
+    ('Valid optional CAU new rule', True, 'CAU', None, '102876', 'ppr_staff', None),
     ('Valid NCAN allowed new rule', True, 'NCAN', 'REMARKS', '045718', 'ppr_staff', None),
     ('Valid optional', True, 'NPUB', None, '102876', 'ppr_staff', None)
 ]

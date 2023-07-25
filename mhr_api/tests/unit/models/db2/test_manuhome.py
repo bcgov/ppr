@@ -321,7 +321,7 @@ def test_find_by_mhr_number_note(session, mhr_num, staff, current, has_notes, nc
         assert 'notes' in reg_json
         assert not reg_json.get('notes')
     else:
-        assert 'notes' not in reg_json
+        assert not reg_json.get('notes')
     # search version
     reg_json = manuhome.registration_json
     if has_notes:

@@ -198,11 +198,15 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
             elif self.current_view:
                 reg_json['notes'] = reg_utils.get_non_staff_notes_json(self, False)
             reg_json['hasCaution'] = self.set_caution()
+            if self.current_view and not self.staff and model_utils.has_taxn_note(reg_json):
+                reg_json['status'] = model_utils.STATUS_FROZEN
             current_app.logger.debug('Built new registration JSON')
             return self.set_payment_json(reg_json)
-
         if model_utils.is_legacy() and self.manuhome:
-            return legacy_utils.get_new_registration_json(self)
+            reg_json = legacy_utils.get_new_registration_json(self)
+            if self.current_view and not self.staff and model_utils.has_taxn_note(reg_json):
+                reg_json['status'] = model_utils.STATUS_FROZEN
+            return reg_json
         return self.json
 
     def set_payment_json(self, registration):

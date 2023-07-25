@@ -23,6 +23,7 @@ from mhr_api.models.type_tables import (
     MhrDocumentTypes,
     MhrNoteStatusTypes,
     MhrRegistrationTypes,
+    MhrRegistrationStatusTypes,
     MhrStatusTypes
 )
 from mhr_api.models.db import db
@@ -169,7 +170,8 @@ LEGACY_STATUS_DESCRIPTION = {
     'R': 'ACTIVE',
     'E': 'EXEMPT',
     'D': 'DRAFT',
-    'C': 'CANCELLED'
+    'C': 'CANCELLED',
+    'F': 'FROZEN'  # Account registration summary queries only
 }
 TO_LEGACY_STATUS = {
     'ACTIVE': 'R',
@@ -560,6 +562,8 @@ def __update_summary_info(result, results, reg_summary_list, staff, account_id):
     if not result.get('ownerNames'):
         result['ownerNames'] = __get_owner_names(result, results)
     summary_result = __get_summary_result(result, reg_summary_list)
+    if staff and result.get('statusType') == model_utils.STATUS_FROZEN:
+        result['statusType'] = MhrRegistrationStatusTypes.ACTIVE
     if not summary_result:
         doc_type = result.get('documentType')
         if FROM_LEGACY_DOC_TYPE.get(doc_type):

@@ -17,10 +17,11 @@ Refactored from registration_validator.
 """
 from flask import current_app
 
-from mhr_api.models import MhrRegistration, Db2Owngroup, Db2Document, MhrDraft
+from mhr_api.models import MhrRegistration, Db2Owngroup, Db2Document, Db2Mhomnote, MhrDraft
 from mhr_api.models import registration_utils as reg_utils
 from mhr_api.models.type_tables import (
     MhrDocumentTypes,
+    MhrNoteStatusTypes,
     MhrRegistrationStatusTypes,
     MhrRegistrationTypes,
     MhrStatusTypes
@@ -36,6 +37,7 @@ DOC_ID_EXISTS = 'Document ID must be unique: provided value already exists. '
 DOC_ID_INVALID_CHECKSUM = 'Document ID is invalid: checksum failed. '
 STATE_NOT_ALLOWED = 'The MH registration is not in a state where changes are allowed. '
 STATE_FROZEN_AFFIDAVIT = 'A transfer to a benificiary is pending after an AFFIDAVIT transfer. '
+STATE_FROZEN_TAXN = 'Registration not allowed: this manufactured home has an active TAXN unit note. '
 DRAFT_NOT_ALLOWED = 'The draft for this registration is out of date: delete the draft and resubmit. '
 CHARACTER_SET_UNSUPPORTED = 'The character set is not supported for {desc} value {value}. '
 PPR_LIEN_EXISTS = 'This registration is not allowed to complete as an outstanding Personal Property Registry lien ' + \
@@ -126,7 +128,7 @@ def validate_registration_state(registration: MhrRegistration, staff: bool, reg_
                     (not reg_type or reg_type != MhrRegistrationTypes.TRANS):
                 error_msg += STATE_NOT_ALLOWED
                 error_msg += STATE_FROZEN_AFFIDAVIT
-    return error_msg
+    return check_state_taxn(registration, staff, error_msg)
 
 
 def validate_registration_state_exre(registration: MhrRegistration):
@@ -235,3 +237,19 @@ def get_existing_group_count(registration: MhrRegistration) -> int:
             if existing.status in (Db2Owngroup.StatusTypes.ACTIVE, Db2Owngroup.StatusTypes.EXEMPT):
                 group_count += 1
     return group_count
+
+
+def check_state_taxn(registration: MhrRegistration, staff: bool, error_msg: str) -> str:
+    """Check registration state for non-staff: frozen if active TAXN unit note."""
+    if not registration or staff:
+        return error_msg
+    if is_legacy() and registration.manuhome and registration.manuhome.notes:
+        for note in registration.manuhome.reg_notes:
+            if note.document_type == MhrDocumentTypes.TAXN and note.status == Db2Mhomnote.StatusTypes.ACTIVE:
+                error_msg += STATE_FROZEN_TAXN
+    elif registration.change_registrations:
+        for reg in registration.change_registrations:
+            if reg.notes and reg.notes[0].document_type == MhrDocumentTypes.TAXN and \
+                    reg.notes[0].status_type == MhrNoteStatusTypes.ACTIVE:
+                error_msg += STATE_FROZEN_TAXN
+    return error_msg

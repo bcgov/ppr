@@ -78,6 +78,7 @@ TEST_TRANSFER_DATA = [
     ('Invalid EXEMPT', False, False, None, validator_utils.STATE_NOT_ALLOWED, MhrRegistrationStatusTypes.EXEMPT),
     ('Invalid CANCELLED', False, False, None, validator_utils.STATE_NOT_ALLOWED, MhrRegistrationStatusTypes.HISTORICAL),
     ('Invalid FROZEN', False, False, None, validator_utils.STATE_NOT_ALLOWED, MhrRegistrationStatusTypes.ACTIVE),
+    ('Invalid FROZEN TAXN', False, False, None, validator_utils.STATE_FROZEN_TAXN, MhrRegistrationStatusTypes.ACTIVE),
     ('Invalid draft', False, False, None, validator_utils.DRAFT_NOT_ALLOWED, MhrRegistrationStatusTypes.ACTIVE),
     (DESC_INVALID_GROUP_ID, False, False, None, validator.DELETE_GROUP_ID_INVALID, MhrRegistrationStatusTypes.ACTIVE),
     (DESC_NONEXISTENT_GROUP_ID, False, False, None, validator.DELETE_GROUP_ID_NONEXISTENT,
@@ -267,10 +268,13 @@ def test_validate_transfer(session, desc, valid, staff, doc_id, message_content,
     elif desc == 'Invalid CANCELLED':
         mhr_num = '001453'
         account_id = 'ppr_staff'
+    elif desc == 'Invalid FROZEN TAXN':
+        mhr_num = '022873'
+        account_id = 'ppr_staff'
 
     valid_format, errors = schema_utils.validate(json_data, 'transfer', 'mhr')
     # Additional validation not covered by the schema.
-    registration: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account_id)
+    registration: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_num, account_id)
     if status:
         registration.status_type = status
     error_msg = validator.validate_transfer(registration, json_data, staff, STAFF_ROLE)
