@@ -226,7 +226,7 @@
             </v-col>
           </v-row>
 
-          <template v-if="!isMhrManufacturerRegistration">
+          <template v-if="!isMhrManufacturerRegistration && !isTransferReview">
             <v-divider class="mx-4"/>
 
             <!-- Land Details -->
