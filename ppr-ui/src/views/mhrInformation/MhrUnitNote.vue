@@ -77,7 +77,7 @@ import { BaseDialog } from '@/components/dialogs'
 import { UnitNotesInfo } from '@/resources/unitNotes'
 import { unsavedChangesDialog } from '@/resources/dialogOptions/cancelDialogs'
 import { UnitNoteAdd, UnitNoteReview } from '@/components/unitNotes'
-import { ErrorIF } from '@/interfaces'
+import { ErrorIF, RegTableNewItemI } from '@/interfaces'
 import { useMhrUnitNote, useMhrValidations } from '@/composables'
 import { scrollToFirstErrorComponent } from '@/utils'
 
@@ -95,6 +95,7 @@ export default defineComponent({
     const router = useRouter()
 
     const {
+      setRegTableNewItem,
       setEmptyUnitNoteRegistration
     } = useStore()
 
@@ -177,6 +178,15 @@ export default defineComponent({
           const unitNoteRegistrationResp = await buildApiDataAndSubmit(getMhrUnitNoteRegistration.value)
 
           if (!unitNoteRegistrationResp.error) {
+            // this will scroll & highlight a new row for Unit Note in Registration Table
+            const newItem: RegTableNewItemI = {
+              addedReg: unitNoteRegistrationResp.note.documentRegistrationNumber,
+              addedRegParent: unitNoteRegistrationResp.mhrNumber,
+              addedRegSummary: null,
+              prevDraft: ''
+            }
+
+            setRegTableNewItem(newItem)
             goToDash()
           } else {
             emitError(unitNoteRegistrationResp?.error)
