@@ -1,19 +1,19 @@
 <template>
   <div>
-  <v-row no-gutters>
-    <v-col cols="12" class="py-3">
-      <h3> {{ noteHeader }} </h3>
-    </v-col>
-  </v-row>
-  <v-row no-gutters>
-    <v-col>
-      <span class="info-text fs-14">
-        Registered on {{ pacificDate(note.createDateTime, true) }}
-        <v-divider vertical />
-        Document Registration Number {{ note.documentRegistrationNumber }}
-      </span>
-    </v-col>
-  </v-row>
+    <v-row no-gutters>
+      <v-col cols="12" class="py-3">
+        <h3> {{ noteHeader }} </h3>
+      </v-col>
+    </v-row>
+    <v-row no-gutters>
+      <v-col>
+        <span class="info-text fs-14">
+          Registered on {{ pacificDate(note.createDateTime, true) }}
+          <v-divider vertical />
+          Document Registration Number {{ note.documentRegistrationNumber }}
+        </span>
+      </v-col>
+    </v-row>
   </div>
 </template>
 
