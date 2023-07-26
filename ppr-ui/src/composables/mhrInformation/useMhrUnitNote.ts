@@ -69,14 +69,6 @@ export const useMhrUnitNote = () => {
   const buildPayload = (unitNoteData: UnitNoteRegistrationIF): UnitNoteRegistrationIF => {
     deleteEmptyProperties(unitNoteData)
 
-    if (!unitNoteData.attentionReference) {
-      unitNoteData.attentionReference = unitNoteData.submittingParty.businessName
-        ? unitNoteData.submittingParty.businessName
-        : [unitNoteData.submittingParty.personName.first,
-          (unitNoteData.submittingParty.personName.middle || null),
-          unitNoteData.submittingParty.personName.last].join(' ')
-    }
-
     if (unitNoteData.note.givingNoticeParty?.phoneNumber) {
       unitNoteData.note.givingNoticeParty.phoneNumber = unitNoteData.note.givingNoticeParty?.phoneNumber?.replace(/[^A-Z0-9]/ig, '')
     }
