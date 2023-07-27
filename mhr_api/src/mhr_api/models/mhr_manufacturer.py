@@ -146,7 +146,6 @@ class MhrManufacturer(db.Model):  # pylint: disable=too-many-instance-attributes
         manufacturer.registration_id = registration.id
         party = json_data.get('submittingParty')
         manufacturer.submitting_party = MhrParty.create_from_json(party, MhrPartyTypes.SUBMITTING, registration.id)
-        party = json_data.get('submittingParty')
         owner = json_data['ownerGroups'][0]['owners'][0]
         manufacturer.owner = MhrParty.create_from_json(owner, MhrPartyTypes.OWNER_BUS, registration.id)
         dealer: MhrParty = MhrParty(party_type=MhrPartyTypes.MANUFACTURER,
