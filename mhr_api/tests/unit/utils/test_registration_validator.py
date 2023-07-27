@@ -108,6 +108,16 @@ TEST_MANUFACTURER_DESC_DATA = [
     (0, None, None, '786356', '2022-11-28T17:05:15-07:53', None, man_validator.ENGINEER_DATE_INVALID),
     (0, None, None, '786356', None, 'TEST', man_validator.ENGINEER_NAME_INVALID)
 ]
+# testdata pattern is ({description}, {valid}, {submitting}, {oname}, {oaddress} {dname}, {daddress}, {desc}, {message content})
+TEST_CREATE_MANUFACTURER_DATA = [
+    ('Valid', True, True, True, True, True, True, True, None),
+    ('Missing submitting party', False, False, True, True, True, True, True, validator_utils.SUBMITTING_REQUIRED),
+    ('Missing owner name', False, True, False, True, True, True, True, man_validator.OWNER_NAME_REQUIRED),
+    ('Missing owner address', False, True, True, False, True, True, True, man_validator.OWNER_ADDRESS_REQUIRED),
+    ('Missing dealer name', False, True, True, True, False, True, True, man_validator.LOCATION_DEALER_REQUIRED),
+    ('Missing dealer address', False, True, True, True, True, False, True, man_validator.LOCATION_ADDRESS_REQUIRED),
+    ('Missing manufacturer name', False, True, True, True, True, True, False, man_validator.DESC_MANUFACTURER_REQUIRED)
+]
 # testdata pattern is ({doc_id}, {valid})
 TEST_CHECKSUM_DATA = [
     ('80048750', True),
@@ -831,6 +841,34 @@ def test_validate_man_desc(session, year_offset, rebuilt, other, csa, eng_date, 
     error_msg = man_validator.validate_registration(json_data, manufacturer)
     if not message_content:
         assert error_msg == ''
+    else:
+        assert error_msg != ''
+        if message_content:
+            assert error_msg.find(message_content) != -1
+
+@pytest.mark.parametrize('desc,valid,submitting,oname,oaddress,dname,daddress,mname,message_content',
+                         TEST_CREATE_MANUFACTURER_DATA)
+def test_validate_manufacturer(session, desc, valid, submitting, oname, oaddress, dname, daddress, mname,
+                               message_content):
+    """Assert that validation of new manufacturer information works as expected."""
+    # setup
+    json_data = copy.deepcopy(MANUFACTURER_VALID)
+    if not submitting:
+        del json_data['submittingParty']
+    if not oname:
+        del json_data['ownerGroups'][0]['owners'][0]['organizationName']
+    if not oaddress:
+        del json_data['ownerGroups'][0]['owners'][0]['address']
+    if not dname:
+        del json_data['location']['dealerName']
+    if not daddress:
+        del json_data['location']['address']
+    if not mname:
+        del json_data['description']['manufacturer']
+    valid_format, errors = schema_utils.validate(json_data, 'manufacturerInfo', 'mhr')
+    error_msg = man_validator.validate_manufacturer(json_data)
+    if valid:
+        assert valid_format and error_msg == ''
     else:
         assert error_msg != ''
         if message_content:

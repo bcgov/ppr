@@ -16,9 +16,23 @@
 from flask import current_app
 
 from mhr_api.exceptions import DatabaseException
+from mhr_api.models import utils as model_utils, registration_utils as reg_utils
 
-from mhr_api.models.type_tables import MhrLocationTypes
+from .address import Address
+from .mhr_party import MhrParty
+from .mhr_registration import MhrRegistration
+from .type_tables import (
+    MhrLocationTypes,
+    MhrOwnerStatusTypes,
+    MhrPartyTypes,
+    MhrRegistrationTypes,
+    MhrRegistrationStatusTypes
+)
 from .db import db
+
+
+MANUFACTURER_MHR_NUMBER: str = 'MAN000'
+MANUFACTURER_DRAFT_ID: int = 0
 
 
 class MhrManufacturer(db.Model):  # pylint: disable=too-many-instance-attributes
@@ -39,6 +53,7 @@ class MhrManufacturer(db.Model):  # pylint: disable=too-many-instance-attributes
     dealer_party_id = db.Column('dealer_party_id', db.Integer, db.ForeignKey('mhr_parties.id'), nullable=False)
 
     # Relationships
+    registration = db.relationship('MhrRegistration', foreign_keys=[registration_id], uselist=False)
     submitting_party = db.relationship('MhrParty', foreign_keys=[submitting_party_id], uselist=False)
     owner = db.relationship('MhrParty', foreign_keys=[owner_party_id], uselist=False)
     dealer = db.relationship('MhrParty', foreign_keys=[dealer_party_id], uselist=False)
@@ -74,6 +89,11 @@ class MhrManufacturer(db.Model):  # pylint: disable=too-many-instance-attributes
         manufacturer['ownerGroups'].append(group)
         return manufacturer
 
+    def save(self):
+        """Render a registration to the local cache."""
+        db.session.add(self)
+        db.session.commit()
+
     @classmethod
     def find_by_id(cls, pkey: int = None):
         """Return a manufacturer object by primary key."""
@@ -108,4 +128,33 @@ class MhrManufacturer(db.Model):  # pylint: disable=too-many-instance-attributes
             except Exception as db_exception:   # noqa: B902; return nicer error
                 current_app.logger.error('MhrManufacturer.find_by_account_id exception: ' + str(db_exception))
                 raise DatabaseException(db_exception)
+        return manufacturer
+
+    @staticmethod
+    def create_manufacturer_from_json(json_data, account_id: str, user_id: str):
+        """Create manufacturer objects from dict/json."""
+        manufacturer: MhrManufacturer = MhrManufacturer(account_id=account_id)
+        registration: MhrRegistration = MhrRegistration(registration_type=MhrRegistrationTypes.MANUFACTURER,
+                                                        mhr_number=MANUFACTURER_MHR_NUMBER,
+                                                        status_type=MhrRegistrationStatusTypes.ACTIVE,
+                                                        draft_id=MANUFACTURER_DRAFT_ID,
+                                                        account_id=account_id,
+                                                        user_id=user_id)
+        registration.id = reg_utils.get_registration_id()
+        registration.registration_ts = model_utils.now_ts()
+        manufacturer.registration = registration
+        manufacturer.registration_id = registration.id
+        party = json_data.get('submittingParty')
+        manufacturer.submitting_party = MhrParty.create_from_json(party, MhrPartyTypes.SUBMITTING, registration.id)
+        party = json_data.get('submittingParty')
+        owner = json_data['ownerGroups'][0]['owners'][0]
+        manufacturer.owner = MhrParty.create_from_json(owner, MhrPartyTypes.OWNER_BUS, registration.id)
+        dealer: MhrParty = MhrParty(party_type=MhrPartyTypes.MANUFACTURER,
+                                    registration_id=registration.id,
+                                    change_registration_id=registration.id,
+                                    status_type=MhrOwnerStatusTypes.ACTIVE,
+                                    business_name=json_data['location'].get('dealerName'))
+        dealer.address = Address.create_from_json(json_data['location'].get('address'))
+        manufacturer.dealer = dealer
+        manufacturer.manufacturer_name = json_data['description'].get('manufacturer')
         return manufacturer
