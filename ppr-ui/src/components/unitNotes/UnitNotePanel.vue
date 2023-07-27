@@ -8,14 +8,14 @@
           <v-menu offset-y left nudge-right="2" nudge-bottom="0" class="unit-note-menu">
             <template v-slot:activator="{ on, value }">
               <v-btn
-                class="unit-note-menu-btn pr-0"
+                class="unit-note-menu-btn px-0"
                 text
                 color="primary"
                 :disabled="disabled"
                 :ripple="false"
               >
-                <span>{{ isActive ? 'Hide Note' : 'View Note' }}</span>
-                <v-divider vertical class='mr-0' />
+                <span class="px-4">{{ isActive ? 'Hide Note' : 'View Note' }}</span>
+                <v-divider vertical class='mx-0' />
               </v-btn>
               <v-btn
                 class="unit-note-menu-btn pa-0"
