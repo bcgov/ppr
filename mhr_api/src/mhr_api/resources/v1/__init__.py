@@ -28,6 +28,7 @@ from .notes import bp as notes_bp
 from .ops import bp as ops_bp
 from .other_registrations import bp as other_registrations_bp
 from .permits import bp as permits_bp
+from .qualified_supplier import bp as qualified_supplier_bp
 from .registration_report_callback import bp as registration_report_callback_bp
 from .registrations import bp as registrations_bp
 from .search_history import bp as search_history_bp
@@ -62,6 +63,7 @@ class V1Endpoint:
         self.app.register_blueprint(ops_bp)
         self.app.register_blueprint(other_registrations_bp)
         self.app.register_blueprint(permits_bp)
+        self.app.register_blueprint(qualified_supplier_bp)
         self.app.register_blueprint(registrations_bp)
         self.app.register_blueprint(searches_bp)
         self.app.register_blueprint(search_history_bp)

@@ -42,6 +42,7 @@ from .mhr_manufacturer import MhrManufacturer
 from .mhr_note import MhrNote
 from .mhr_owner_group import MhrOwnerGroup
 from .mhr_party import MhrParty
+from .mhr_qualified_supplier import MhrQualifiedSupplier
 from .mhr_registration import MhrRegistration
 from .mhr_registration_report import MhrRegistrationReport
 from .mhr_section import MhrSection
@@ -80,7 +81,7 @@ __all__ = ('db',
            'LtsaDescription', 'MhrDraft', 'MhrDocument', 'MhrDescription', 'MhrExtraRegistration',
            'MhrLocation', 'MhrManufacturer', 'MhrNote', 'MhrParty', 'MhrRegistration',
            'MhrRegistrationReport', 'MhrDocumentType', 'MhrLocationType', 'MhrNoteStatusType', 'MhrOwnerGroup',
-           'MhrOwnerStatusType', 'MhrPartyType',
+           'MhrOwnerStatusType', 'MhrPartyType', 'MhrQualifiedSupplier',
            'MhrRegistrationStatusType', 'MhrRegistrationType', 'MhrSection', 'MhrStatusType', 'MhrTenancyType',
            'Party', 'PartyType', 'ProvinceType', 'Registration', 'RegistrationType',
            'RegistrationTypeClass', 'SearchRequest', 'SearchResult', 'SearchType', 'StateType', 'SerialType',
