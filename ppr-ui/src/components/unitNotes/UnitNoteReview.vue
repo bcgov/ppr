@@ -16,13 +16,8 @@
     <section id="mhr-unit-note-person-giving-notice" class="mt-15">
       <ContactInformation
         :contactInfo="unitNoteSubmittingParty"
-        :content="{
-          title: '1. Submitting Party for this Change',
-          description: 'Provide the name and contact information for the person or business submitting ' +
-          ' this registration. You can add the submitting party information manually, or, if the submitting ' +
-          'party has a Personal Property Registry party code, you can look up the party code or name.',
-          sideLabel: 'Add Submitting Party'
-        }"
+        :sectionNumber="1"
+        :content="submittingPartyChangeContent"
         :validate="validate"
         @setStoreProperty="handleStoreUpdate('submittingParty', $event)"
         @isValid="handleComponentValid(MhrCompVal.SUBMITTING_PARTY_VALID, $event)"
@@ -120,6 +115,7 @@ import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 import { UnitNoteDocTypes } from '@/enums'
 import EffectiveDateTime from './EffectiveDateTime.vue'
 import ExpiryDate from './ExpiryDate.vue'
+import { submittingPartyChangeContent } from '@/resources'
 
 export default defineComponent({
   name: 'UnitNoteReview',
@@ -288,6 +284,7 @@ export default defineComponent({
       effectiveDateDescForCAU,
       hasEffectiveDateTime,
       hasExpiryDate,
+      submittingPartyChangeContent,
       ...toRefs(localState)
     }
   }

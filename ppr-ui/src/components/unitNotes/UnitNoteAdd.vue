@@ -34,13 +34,7 @@
       <ContactInformation
         :contactInfo="unitNoteGivingNoticeParty"
         :sectionNumber="3"
-        :content="{
-          title: 'Person Giving Notice',
-          description: 'Contact information for the person making the claim will be shown ' +
-            'when a search result is produced for this manufactured home.',
-          sideLabel: 'Person Giving Notice',
-          mailAddressInfo: ' ' // hide the info text under Mailing Address label
-        }"
+        :content="personGivingNoticeContent"
         :validate="validate"
         :isInfoOptional="isPersonGivingNoticeOptional()"
         @setStoreProperty="handleStoreUpdate('givingNoticeParty', $event)"
@@ -62,7 +56,8 @@ import { storeToRefs } from 'pinia'
 import { UnitNoteIF } from '@/interfaces'
 import { useMhrUnitNote, useMhrValidations } from '@/composables'
 import { MhrCompVal, MhrSectVal } from '@/composables/mhrRegistration/enums'
-import { DocumentId, Remarks, ContactInformation } from '../common'
+import { DocumentId, Remarks, ContactInformation } from '@/components/common'
+import { personGivingNoticeContent } from '@/resources'
 
 export default defineComponent({
   name: 'UnitNoteAdd',
@@ -132,6 +127,7 @@ export default defineComponent({
     })
 
     return {
+      personGivingNoticeContent,
       MhrCompVal,
       handleStoreUpdate,
       handleComponentValid,
