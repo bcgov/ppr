@@ -3,3 +3,10 @@
 export interface ContentIF {
   [key: string]: string
 }
+
+export interface ContactInformationContentIF {
+  title: string;
+  description: string;
+  sideLabel: string;
+  mailAddressInfo?: string;
+}
