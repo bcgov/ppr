@@ -311,7 +311,7 @@ export default defineComponent({
     }, { deep: true })
 
     const firstNameRules = customRules(
-      !props.isInfoOptional ? required('Enter a first name 123') : [],
+      !props.isInfoOptional ? required('Enter a first name') : [],
       maxLength(15),
       invalidSpaces()
     )
