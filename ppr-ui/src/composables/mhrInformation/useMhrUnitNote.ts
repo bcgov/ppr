@@ -6,6 +6,7 @@ import { storeToRefs } from 'pinia'
 
 export const useMhrUnitNote = () => {
   const {
+    getMhrUnitNoteType,
     getMhrInformation
   } = storeToRefs(useStore())
 
@@ -101,6 +102,13 @@ export const useMhrUnitNote = () => {
     return submitMhrUnitNote(getMhrInformation.value.mhrNumber, payloadData)
   }
 
+  // Make optional Person Giving Notice fields for certain Unit Note types
+  const isPersonGivingNoticeOptional = (): boolean => {
+    return [UnitNoteDocTypes.DECAL_REPLACEMENT,
+      UnitNoteDocTypes.PUBLIC_NOTE,
+      UnitNoteDocTypes.CONFIDENTIAL_NOTE].includes(getMhrUnitNoteType.value)
+  }
+
   // Identify if a unit note is notice of caution or an extended/continued notice of caution
   const isNoticeOfCautionOrRelatedDocType = (note: UnitNoteIF): boolean => {
     return [UnitNoteDocTypes.NOTICE_OF_CAUTION,
@@ -147,6 +155,7 @@ export const useMhrUnitNote = () => {
   return {
     initUnitNote,
     buildApiDataAndSubmit,
+    isPersonGivingNoticeOptional,
     groupUnitNotes,
     isNoticeOfCautionOrRelatedDocType
   }

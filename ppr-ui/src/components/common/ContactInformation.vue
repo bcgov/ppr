@@ -168,7 +168,7 @@
                 :hideDeliveryAddress="hideDeliveryAddress"
                 ref="submittingPartyAddress"
                 id="contact-info-address"
-                :schema="PartyAddressSchema"
+                :schema="isInfoOptional ? OptionalPartyAddressSchema : PartyAddressSchema"
                 :value="contactInfoModel.address"
                 :triggerErrors="validate"
                 @valid="isAddressValid = $event"
@@ -186,7 +186,7 @@ import { useInputRules } from '@/composables'
 import { SubmittingPartyTypes } from '@/enums'
 import { ContentIF, FormIF, PartyIF, SubmittingPartyIF } from '@/interfaces'
 import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue-demi'
-import { PartyAddressSchema } from '@/schemas'
+import { PartyAddressSchema, OptionalPartyAddressSchema } from '@/schemas'
 import { VueMaskDirective } from 'v-mask'
 import { BaseAddress } from '@/composables/address'
 import { PartySearch } from '../parties/party'
@@ -224,6 +224,10 @@ export default defineComponent({
       default: false
     },
     enableCombinedNameValidation: {
+      type: Boolean,
+      default: false
+    },
+    isInfoOptional: { // form fields are optional
       type: Boolean,
       default: false
     }
@@ -307,7 +311,7 @@ export default defineComponent({
     }, { deep: true })
 
     const firstNameRules = customRules(
-      required('Enter a first name'),
+      !props.isInfoOptional ? required('Enter a first name 123') : [],
       maxLength(15),
       invalidSpaces()
     )
@@ -325,17 +329,18 @@ export default defineComponent({
     const middleNameRules = customRules(maxLength(15), invalidSpaces())
 
     const lastNameRules = customRules(
-      required('Enter a last name'),
+      !props.isInfoOptional ? required('Enter a last name') : [],
       maxLength(25),
       invalidSpaces())
 
     const businessNameRules = customRules(
-      required('Business name is required'),
+      !props.isInfoOptional ? required('Business name is required') : [],
       maxLength(40),
       invalidSpaces()
     )
 
-    const phoneExtensionRules = customRules(isNumber(null, null, null, 'Enter numbers only'),
+    const phoneExtensionRules = customRules(
+      isNumber(null, null, null, 'Enter numbers only'),
       invalidSpaces(),
       maxLength(5, true)
     )
@@ -353,6 +358,7 @@ export default defineComponent({
       phoneExtensionRules,
       SubmittingPartyTypes,
       PartyAddressSchema,
+      OptionalPartyAddressSchema,
       ...toRefs(localState)
     }
   }

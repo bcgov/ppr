@@ -42,6 +42,7 @@
           mailAddressInfo: ' ' // hide the info text under Mailing Address label
         }"
         :validate="validate"
+        :isInfoOptional="isPersonGivingNoticeOptional()"
         @setStoreProperty="handleStoreUpdate('givingNoticeParty', $event)"
         @isValid="handleComponentValid(MhrCompVal.PERSON_GIVING_NOTICE_VALID, $event)"
         enableCombinedNameValidation
@@ -59,7 +60,7 @@ import { UnitNoteDocTypes } from '@/enums'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { UnitNoteIF } from '@/interfaces'
-import { useMhrValidations } from '@/composables'
+import { useMhrUnitNote, useMhrValidations } from '@/composables'
 import { MhrCompVal, MhrSectVal } from '@/composables/mhrRegistration/enums'
 import { DocumentId, Remarks, ContactInformation } from '../common'
 
@@ -96,6 +97,10 @@ export default defineComponent({
       setValidation
     } = useMhrValidations(toRefs(getMhrUnitNoteValidation.value))
 
+    const {
+      isPersonGivingNoticeOptional
+    } = useMhrUnitNote()
+
     const localState = reactive({
       unitNoteInfo: UnitNotesInfo[props.docType],
       isUnitNoteValid: computed((): boolean =>
@@ -130,6 +135,7 @@ export default defineComponent({
       MhrCompVal,
       handleStoreUpdate,
       handleComponentValid,
+      isPersonGivingNoticeOptional,
       ...toRefs(localState)
     }
   }

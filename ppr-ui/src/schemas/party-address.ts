@@ -38,3 +38,35 @@ export const PartyAddressSchema = {
     ...spaceRules
   ]
 }
+
+// The Party Address schema containing Vuelidate rules for cases where Party Address is Optional/Not Required
+export const OptionalPartyAddressSchema = {
+  street: [
+    baseRules[ValidationRule.MAX_LENGTH](50),
+    ...spaceRules
+  ],
+  streetAdditional: [
+    baseRules[ValidationRule.MAX_LENGTH](50),
+    ...spaceRules
+  ],
+  city: [
+    baseRules[ValidationRule.MAX_LENGTH](40),
+    ...spaceRules
+  ],
+  country: [
+    ...spaceRules
+  ],
+  region: [
+    ...spaceRules
+  ],
+  /* NOTE: Canada/US postal code and zip code regex rules
+   * are added automatically as extra rules based on country
+   * inside the address components
+   */
+  postalCode: [
+  ],
+  deliveryInstructions: [
+    baseRules[ValidationRule.MAX_LENGTH](80),
+    ...spaceRules
+  ]
+}
