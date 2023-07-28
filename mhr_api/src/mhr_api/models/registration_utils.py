@@ -104,6 +104,9 @@ select nextval('mhr_registration_id_seq') AS reg_id,
        nextval('mhr_document_id_seq') AS doc_id,
        get_mhr_doc_reg_number() AS doc_reg_id
 """
+QUERY_REG_ID_PKEY = """
+select nextval('mhr_registration_id_seq') AS reg_id
+"""
 DOC_ID_QUALIFIED_CLAUSE = ',  get_mhr_doc_qualified_id() AS doc_id'
 DOC_ID_MANUFACTURER_CLAUSE = ',  get_mhr_doc_manufacturer_id() AS doc_id'
 DOC_ID_GOV_AGENT_CLAUSE = ',  get_mhr_doc_gov_agent_id() AS doc_id'
@@ -292,6 +295,13 @@ def get_change_generated_values(registration, draft, user_group: str = None):
     else:
         registration.doc_id = str(row[5])
     return registration
+
+
+def get_registration_id() -> int:
+    """Get db generated registration id, initially for creating a manufacturer."""
+    result = db.session.execute(QUERY_REG_ID_PKEY)
+    row = result.first()
+    return int(row[0])
 
 
 def update_deceased(owners_json, owner):

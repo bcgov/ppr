@@ -196,3 +196,78 @@ def test_manufacturer_json(session):
     manufacturer.manufacturer_name=MANUFACTURER_JSON['description'].get('manufacturer')
     current_app.logger.debug(manufacturer.json)
     assert MANUFACTURER_JSON == manufacturer.json
+
+
+def test_create_from_json(session):
+    """Assert that creating a valid manufacturer from JSON is as expected."""
+    account_id: str = '1234'
+    user_id: str = 'user'
+    manufacturer: MhrManufacturer = MhrManufacturer.create_manufacturer_from_json(MANUFACTURER_JSON,
+                                                                                  account_id,
+                                                                                  user_id)
+    assert manufacturer
+    assert manufacturer.registration_id
+    assert manufacturer.account_id == account_id
+    assert manufacturer.manufacturer_name
+    assert manufacturer.submitting_party
+    assert manufacturer.submitting_party.business_name or manufacturer.submitting_party.last_name
+    assert manufacturer.submitting_party.address
+    assert manufacturer.submitting_party.party_type
+    assert manufacturer.submitting_party.status_type
+    assert manufacturer.submitting_party.registration_id
+    assert manufacturer.submitting_party.change_registration_id
+    assert manufacturer.owner
+    assert manufacturer.owner.business_name
+    assert manufacturer.owner.address
+    assert manufacturer.owner.party_type
+    assert manufacturer.owner.status_type
+    assert manufacturer.owner.registration_id
+    assert manufacturer.owner.change_registration_id
+    assert manufacturer.dealer
+    assert manufacturer.dealer.business_name
+    assert manufacturer.dealer.address
+    assert manufacturer.dealer.party_type
+    assert manufacturer.dealer.status_type
+    assert manufacturer.dealer.registration_id
+    assert manufacturer.dealer.change_registration_id
+
+
+def test_save_new_from_json(session):
+    """Assert that saving a valid manufacturer from JSON is as expected."""
+    account_id: str = '1234'
+    user_id: str = 'user'
+    manufacturer: MhrManufacturer = MhrManufacturer.create_manufacturer_from_json(MANUFACTURER_JSON,
+                                                                                  account_id,
+                                                                                  user_id)
+    manufacturer.save()
+    assert manufacturer
+    assert manufacturer.registration_id
+    assert manufacturer.account_id == account_id
+    assert manufacturer.manufacturer_name
+    assert manufacturer.submitting_party
+    assert manufacturer.submitting_party.business_name or manufacturer.submitting_party.last_name
+    assert manufacturer.submitting_party.address
+    assert manufacturer.submitting_party.party_type
+    assert manufacturer.submitting_party.status_type
+    assert manufacturer.submitting_party.registration_id
+    assert manufacturer.submitting_party.change_registration_id
+    assert manufacturer.owner
+    assert manufacturer.owner.business_name
+    assert manufacturer.owner.address
+    assert manufacturer.owner.party_type
+    assert manufacturer.owner.status_type
+    assert manufacturer.owner.registration_id
+    assert manufacturer.owner.change_registration_id
+    assert manufacturer.dealer
+    assert manufacturer.dealer.business_name
+    assert manufacturer.dealer.address
+    assert manufacturer.dealer.party_type
+    assert manufacturer.dealer.status_type
+    assert manufacturer.dealer.registration_id
+    assert manufacturer.dealer.change_registration_id
+    assert manufacturer.id
+    assert manufacturer.submitting_party_id
+    assert manufacturer.owner_party_id
+    assert manufacturer.dealer.id
+    assert manufacturer.owner.id
+    assert manufacturer.submitting_party.id

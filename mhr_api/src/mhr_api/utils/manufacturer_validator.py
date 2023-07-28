@@ -18,6 +18,7 @@ Validation includes verifying the data combination for various registrations/fil
 from flask import current_app
 
 from mhr_api.models import MhrManufacturer, utils as model_utils
+from mhr_api.utils import validator_utils
 
 
 VALIDATOR_ERROR = 'Error performing manufacturer extra validation. '
@@ -36,6 +37,11 @@ ENGINEER_DATE_INVALID = 'Description engineer date is not allowed. '
 ENGINEER_NAME_INVALID = 'Description engineer name is not allowed. '
 YEAR_INVALID = 'Description manufactured home year invalid: it must be within 1 year of the current year. '
 CSA_NUMBER_REQIRED = 'Description CSA number is required. '
+DESC_MANUFACTURER_REQUIRED = 'The request Description manufacturer is required. '
+LOCATION_DEALER_REQUIRED = 'The request Location dealerName is required. '
+LOCATION_ADDRESS_REQUIRED = 'The request Location address is required. '
+OWNER_NAME_REQUIRED = 'The request first owner group first owner organizationName is required. '
+OWNER_ADDRESS_REQUIRED = 'The request first owner group first owner address is required. '
 
 
 def validate_registration(json_data, manufacturer: MhrManufacturer):
@@ -50,6 +56,30 @@ def validate_registration(json_data, manufacturer: MhrManufacturer):
         error_msg += validate_description(json_data, man_json)
     except Exception as validation_exception:   # noqa: B902; eat all errors
         current_app.logger.error('validate_registration exception: ' + str(validation_exception))
+        error_msg += VALIDATOR_ERROR
+    return error_msg
+
+
+def validate_manufacturer(json_data):
+    """Perform all extra new manufacturer data validation checks not covered by schema validation."""
+    error_msg = ''
+    try:
+        current_app.logger.debug('Performing new manufacturer extra data validation.')
+        error_msg += validator_utils.validate_submitting_party(json_data)
+        if not json_data.get('location') or not json_data['location'].get('dealerName'):
+            error_msg += LOCATION_DEALER_REQUIRED
+        if not json_data.get('location') or not json_data['location'].get('address'):
+            error_msg += LOCATION_ADDRESS_REQUIRED
+        if json_data.get('ownerGroups') and json_data['ownerGroups'][0].get('owners'):
+            owner = json_data['ownerGroups'][0]['owners'][0]
+            if not owner.get('organizationName'):
+                error_msg += OWNER_NAME_REQUIRED
+            if not owner.get('address'):
+                error_msg += OWNER_ADDRESS_REQUIRED
+        if not json_data.get('description') or not json_data['description'].get('manufacturer'):
+            error_msg += DESC_MANUFACTURER_REQUIRED
+    except Exception as validation_exception:   # noqa: B902; eat all errors
+        current_app.logger.error('validate_manufacturer exception: ' + str(validation_exception))
         error_msg += VALIDATOR_ERROR
     return error_msg
 
