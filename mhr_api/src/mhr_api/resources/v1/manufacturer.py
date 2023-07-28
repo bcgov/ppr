@@ -18,7 +18,7 @@
 from http import HTTPStatus
 
 from flask import Blueprint
-from flask import request, jsonify, current_app
+from flask import g, request, jsonify, current_app
 from flask_cors import cross_origin
 from registry_schemas import utils as schema_utils
 
@@ -65,6 +65,7 @@ def get_account_manufacturer():
 
 @bp.route('', methods=['POST', 'OPTIONS'])
 @cross_origin(origin='*')
+@jwt.requires_auth
 def post_account_manufacturer():
     """Create manufacturer information for an account."""
     try:
@@ -84,9 +85,10 @@ def post_account_manufacturer():
         extra_validation_msg = manufacturer_validator.validate_manufacturer(request_json)
         if not valid_format or extra_validation_msg != '':
             return resource_utils.validation_error_response(errors, reg_utils.VAL_ERROR, extra_validation_msg)
+        token: dict = g.jwt_oidc_token_info
         manufacturer = MhrManufacturer.create_manufacturer_from_json(request_json,
                                                                      account_id,
-                                                                     None)
+                                                                     token.get('username', None))
         manufacturer.save()
         return jsonify(manufacturer.json), HTTPStatus.OK
     except DatabaseException as db_exception:
