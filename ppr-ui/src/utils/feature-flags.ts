@@ -9,13 +9,13 @@ export const defaultFlagSet: LDFlagSet = {
   'bcregistry-ui-mhr-enabled': false,
   'search-registration-number': false,
   'search-serial-number': false,
-  'mhr-ui-enabled': true, // Enables MHR search options
-  'mhr-registration-enabled': true, // Enables MHR table tab
-  'mhr-transfer-enabled': true, // Enables changes to base MHR Home Owners within the MHR Information flow
-  'assets-tiptap-enabled': true, // Enables new TipTap wysiwyg editor
-  'mhr-exemption-enabled': true,
+  'mhr-ui-enabled': false, // Enables MHR search options
+  'mhr-registration-enabled': false, // Enables MHR table tab
+  'mhr-transfer-enabled': false, // Enables changes to base MHR Home Owners within the MHR Information flow
+  'assets-tiptap-enabled': false, // Enables new TipTap wysiwyg editor
+  'mhr-exemption-enabled': false,
   'mhr-transport-permit-enabled': '',
-  'mhr-user-access-enabled': true,
+  'mhr-user-access-enabled': false,
   'sentry-enable': false, // by default, no sentry logs
   'banner-text': '' // by default, there is no banner text
 }
