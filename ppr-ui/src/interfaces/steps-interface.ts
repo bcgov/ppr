@@ -7,7 +7,7 @@ export interface StepIF {
   icon: string
   text: string
   to: RouteNames
-  component: Component
+  component: Component | string
   valid: boolean
   disabled?: boolean
 }

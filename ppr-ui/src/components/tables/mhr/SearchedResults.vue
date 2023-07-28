@@ -485,6 +485,7 @@ import { FolioNumber } from '@/components/common'
 import { RouteNames, UIMHRSearchTypeMap, UIMHRSearchTypes, UIMHRSearchTypeValues } from '@/enums'
 import { cloneDeep, uniqBy, filter, sortBy, groupBy } from 'lodash'
 import { storeToRefs } from 'pinia'
+import { useNavigation } from '@/composables'
 
 export default defineComponent({
   components: {
@@ -495,6 +496,7 @@ export default defineComponent({
   },
   setup (props) {
     const router = useRouter()
+    const { goToDash } = useNavigation()
     const {
       // Actions
       setSelectedManufacturedHomes,
@@ -731,7 +733,7 @@ export default defineComponent({
 
     onMounted(async () => {
       const resp = getManufacturedHomeSearchResults.value
-      if (!resp) await router.push({ name: RouteNames.DASHBOARD })
+      if (!resp) goToDash()
       localState.searchValue = resp?.searchQuery.criteria.value || getOwnerName(resp?.searchQuery.criteria)
       localState.searched = true
       localState.searchType = getSearchedType.value?.searchTypeUI || ''

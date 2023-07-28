@@ -59,7 +59,7 @@ describe('Stepper - MHR Staff Registration', () => {
     await store.setAuthRoles(['ppr-staff', 'staff'])
     await store.setUserProductSubscriptionsCodes([ProductCode.MHR, ProductCode.PPR])
     await store.setRegistrationType(MhrRegistrationType)
-    expectedSteps = await store.getSteps
+    expectedSteps = await store.getMhrSteps
   })
 
   afterAll(async () => {
@@ -69,16 +69,22 @@ describe('Stepper - MHR Staff Registration', () => {
   })
 
   it('renders correctly', async () => {
-    const wrapper = createComponent(RouteNames.YOUR_HOME, { showStepErrorsFlag: false })
+    const wrapper = createComponent(RouteNames.YOUR_HOME, {
+      stepConfig: expectedSteps,
+      showStepErrors: false
+    })
     // Verify that all steps are rendered correctly
-    expect(wrapper.props().showStepErrorsFlag).toBe(false)
+    expect(wrapper.props().showStepErrors).toBe(false)
     const steps = wrapper.findAll('.step')
     expect(steps.length).toBe(5)
     expect(steps.length).toBe(expectedSteps.length)
   })
 
   it('verify steps', async () => {
-    const wrapper = createComponent(RouteNames.YOUR_HOME, { showStepErrorsFlag: false })
+    const wrapper = createComponent(RouteNames.YOUR_HOME, {
+      stepConfig: expectedSteps,
+      showStepErrors: false
+    })
     for (const step of expectedSteps) {
       const stepIcon = wrapper.find(`#${step.id}`)
       const stepText = wrapper.find(getTestId(step.id))
@@ -89,7 +95,10 @@ describe('Stepper - MHR Staff Registration', () => {
   })
 
   it('check stepper validation icon - validation flag off, step invalid', async () => {
-    const wrapper = createComponent(RouteNames.YOUR_HOME, { showStepErrorsFlag: false })
+    const wrapper = createComponent(RouteNames.YOUR_HOME, {
+      stepConfig: expectedSteps,
+      showStepErrors: false
+    })
     const validIcon = wrapper.find(getTestId(`step-valid-${expectedSteps[0].id}`))
     const invalidIcon = wrapper.find(getTestId(`step-invalid-${expectedSteps[0].id}`))
 
@@ -98,7 +107,10 @@ describe('Stepper - MHR Staff Registration', () => {
   })
 
   it('check stepper validation icon - validation flag on, step invalid', async () => {
-    const wrapper = createComponent(RouteNames.YOUR_HOME, { showStepErrorsFlag: true })
+    const wrapper = createComponent(RouteNames.YOUR_HOME, {
+      stepConfig: expectedSteps,
+      showStepErrors: true
+    })
     const validIcon = wrapper.find(getTestId(`step-valid-${expectedSteps[0].id}`))
     const invalidIcon = wrapper.find(getTestId(`step-invalid-${expectedSteps[0].id}`))
 
@@ -107,24 +119,17 @@ describe('Stepper - MHR Staff Registration', () => {
   })
 
   it('check stepper validation icon - step valid', async () => {
-    // setup
-    const {
-      MhrCompVal,
-      MhrSectVal,
-      setValidation
-    } = useMhrValidations(toRefs(store.getMhrRegistrationValidationModel))
-    await setValidation(MhrSectVal.HOME_OWNERS_VALID, MhrCompVal.OWNERS_VALID, true)
-    await nextTick()
+    expectedSteps[2].valid = true
+    const wrapper = createComponent(RouteNames.YOUR_HOME, {
+      stepConfig: expectedSteps,
+      showStepErrors: false
+    })
 
-    const wrapper = createComponent(RouteNames.YOUR_HOME, { showStepErrorsFlag: false })
     const validIcon = wrapper.find(getTestId(`step-valid-${expectedSteps[2].id}`)) // Your home valid step
     const invalidIcon = wrapper.find(getTestId(`step-invalid-${expectedSteps[2].id}`))
 
     expect(validIcon.isVisible()).toBe(true)
     expect(invalidIcon.isVisible()).toBe(false)
-
-    // teardown
-    await setValidation(MhrSectVal.HOME_OWNERS_VALID, MhrCompVal.OWNERS_VALID, false)
   })
 })
 
@@ -134,7 +139,7 @@ describe('Stepper - MHR Manufacturer Registration', () => {
     await store.setAuthRoles(mockedManufacturerAuthRoles)
     await store.setUserProductSubscriptionsCodes([ProductCode.MHR])
     await store.setRegistrationType(MhrRegistrationType)
-    expectedSteps = await store.getSteps
+    expectedSteps = await store.getMhrSteps
   })
 
   afterAll(async () => {
@@ -144,18 +149,24 @@ describe('Stepper - MHR Manufacturer Registration', () => {
   })
 
   it('renders correctly', async () => {
-    const wrapper = createComponent(RouteNames.YOUR_HOME, { showStepErrorsFlag: false })
+    const wrapper = createComponent(RouteNames.YOUR_HOME, {
+      stepConfig: expectedSteps,
+      showStepErrors: false
+    })
     // Verify that all steps are rendered correctly
-    expect(wrapper.props().showStepErrorsFlag).toBe(false)
+    expect(wrapper.props().showStepErrors).toBe(false)
     const steps = wrapper.findAll('.step')
     expect(steps.length).toBe(2)
     expect(steps.length).toBe(expectedSteps.length)
-    await wrapper.setProps({ showStepErrorsFlag: true })
-    expect(wrapper.props().showStepErrorsFlag).toBe(true)
+    await wrapper.setProps({ showStepErrors: true })
+    expect(wrapper.props().showStepErrors).toBe(true)
   })
 
   it('verify steps', async () => {
-    const wrapper = createComponent(RouteNames.YOUR_HOME, { showStepErrorsFlag: false })
+    const wrapper = createComponent(RouteNames.YOUR_HOME, {
+      stepConfig: expectedSteps,
+      showStepErrors: false
+    })
     for (const step of expectedSteps) {
       const stepIcon = wrapper.find(`#${step.id}`)
       const stepText = wrapper.find(getTestId(step.id))
@@ -165,7 +176,10 @@ describe('Stepper - MHR Manufacturer Registration', () => {
   })
 
   it('check current step', async () => {
-    const wrapper = createComponent(expectedSteps[1].to, { showStepErrorsFlag: false })
+    const wrapper = createComponent(expectedSteps[1].to, {
+      stepConfig: expectedSteps,
+      showStepErrors: false
+    })
     const currentStep = wrapper.find('.selected-btn')
     const btnForNotCurrentStep = wrapper.find(getTestId(expectedSteps[1].id))
     const btnForCurrentStep = wrapper.find(getTestId(`current-${expectedSteps[1].id}`))

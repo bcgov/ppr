@@ -81,7 +81,6 @@
 </template>
 
 <script lang="ts">
-import VueRouter from 'vue-router' // eslint-disable-line no-unused-vars
 import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
 import { useStore } from '@/store/store'
 import _ from 'lodash'
@@ -94,21 +93,24 @@ import {
   ButtonConfigIF, DraftIF, ErrorIF, FinancingStatementIF, RegTableNewItemI, StateModelIF
 } from '@/interfaces'
 import { unsavedChangesDialog } from '@/resources/dialogOptions'
-import { useNewMhrRegistration } from '@/composables'
+import { useNavigation, useNewMhrRegistration } from '@/composables'
 import { storeToRefs } from 'pinia'
+import { useRouter } from 'vue2-helpers/vue-router'
 
 export default defineComponent({
   components: {
     BaseDialog,
     StaffPaymentDialog
   },
+  emits: ['cancelProceed', 'error', 'registration-incomplete', 'submit'],
   props: {
+    navConfig: {
+      type: Array as () => Array<ButtonConfigIF>,
+      default: null
+    },
     currentStatementType: {
       type: String,
       default: 'financing'
-    },
-    router: {
-      type: Object as () => VueRouter
     },
     currentStepName: {
       type: String,
@@ -128,6 +130,8 @@ export default defineComponent({
     }
   },
   setup (props, { emit }) {
+    const router = useRouter()
+    const { goToDash } = useNavigation()
     const {
       // Actions
       resetNewRegistration,
@@ -137,7 +141,6 @@ export default defineComponent({
     } = useStore()
     const {
       // Getters
-      getFooterButtonConfig,
       getStateModel,
       hasUnsavedChanges,
       isRoleStaffBcol,
@@ -149,7 +152,6 @@ export default defineComponent({
     const localState = reactive({
       options: unsavedChangesDialog,
       showCancelDialog: false,
-      statementType: props.currentStatementType,
       staffPaymentDialogDisplay: false,
       staffPaymentDialogOptions: {
         acceptText: 'Submit Registration',
@@ -175,14 +177,10 @@ export default defineComponent({
         return isRoleStaffSbc.value
       }),
       buttonConfig: computed((): ButtonConfigIF => {
-        if (localState.statementType.toUpperCase() === StatementTypes.FINANCING_STATEMENT) {
-          const stepConfig: Array<ButtonConfigIF> = getFooterButtonConfig.value
-          let config: ButtonConfigIF
-
-          for (const i in stepConfig) {
-            config = stepConfig[i]
-            if (config.stepName === props.currentStepName) {
-              return config
+        if (props.currentStatementType.toUpperCase() === StatementTypes.FINANCING_STATEMENT) {
+          for (const i in props.navConfig) {
+            if (props.navConfig[i].stepName === props.currentStepName) {
+              return props.navConfig[i]
             }
           }
         }
@@ -197,8 +195,7 @@ export default defineComponent({
     const goToDashboard = () => {
       // clear all state set data
       resetNewRegistration()
-      // eslint-disable-next-line vue/no-mutating-props
-      props.router.push({ name: RouteNames.DASHBOARD })
+      goToDash()
     }
     const handleDialogResp = (val: boolean) => {
       localState.showCancelDialog = false
@@ -247,7 +244,7 @@ export default defineComponent({
     }
     const submitBack = () => {
       // eslint-disable-next-line vue/no-mutating-props
-      props.router.push({
+      router.push({
         name: localState.buttonConfig.backRouteName
       })
     }
@@ -255,7 +252,7 @@ export default defineComponent({
       // Undetected Duplicate Secured Party API check to be implemented here.
       // Use secured party dialog with isDuplicate and isReview props to display error if found.
       if (
-        localState.statementType.toUpperCase() ===
+        props.currentStatementType.toUpperCase() ===
           StatementTypes.FINANCING_STATEMENT &&
         [RouteNames.REVIEW_CONFIRM, RouteNames.MHR_REVIEW_CONFIRM].includes(props.currentStepName as RouteNames)
       ) {
@@ -281,7 +278,7 @@ export default defineComponent({
         }
       } else {
         // eslint-disable-next-line vue/no-mutating-props
-        props.router.push({
+        router.push({
           name: localState.buttonConfig.nextRouteName
         })
       }
@@ -321,7 +318,7 @@ export default defineComponent({
           }
           setRegTableNewItem(newItem)
           // eslint-disable-next-line vue/no-mutating-props
-          props.router.push({
+          router.push({
             name: localState.buttonConfig.nextRouteName
           })
         }

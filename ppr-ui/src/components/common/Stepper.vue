@@ -1,6 +1,6 @@
 <template>
   <v-container class="pb-0" id="step-buttons-container" :class="$style['step-buttons-container']">
-    <template v-for="(step, index) in getSteps">
+    <template v-for="(step, index) in stepConfig">
       <div
         :class="isCurrentStep(step) ? [$style['step__border__current'], $style['step']]: $style['step']"
         :key="index"
@@ -45,16 +45,18 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs } from 'vue-demi'
-import { useStore } from '@/store/store'
+import { defineComponent } from 'vue-demi'
 import { useRoute, useRouter } from 'vue2-helpers/vue-router'
-import { storeToRefs } from 'pinia'
+import { StepIF } from '@/interfaces'
 
 export default defineComponent({
   name: 'Stepper',
-  components: {},
   props: {
-    showStepErrorsFlag: {
+    stepConfig: {
+      type: Array as () => Array<StepIF>,
+      default: () => []
+    },
+    showStepErrors: {
       type: Boolean,
       default: false
     }
@@ -62,7 +64,6 @@ export default defineComponent({
   setup (props) {
     const route = useRoute()
     const router = useRouter()
-    const { getSteps, showStepErrors } = storeToRefs(useStore())
 
     const goTo = (step) => {
       router.push(step.to).catch(error => error)
@@ -73,17 +74,13 @@ export default defineComponent({
     }
 
     const showInvalid = (step): boolean => {
-      return ((showStepErrors.value || props.showStepErrorsFlag) && (!step.valid))
+      return props.showStepErrors && !step.valid
     }
 
-    const localState = reactive({})
-
     return {
-      getSteps,
       goTo,
       isCurrentStep,
-      showInvalid,
-      ...toRefs(localState)
+      showInvalid
     }
   }
 })

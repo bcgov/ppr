@@ -135,8 +135,8 @@ export default defineComponent({
     const { setStaffPayment } = useStore()
     const { 
       getMhrRegistrationValidationModel, 
-      isRoleStaffReg, 
-      getSteps,
+      isRoleStaffReg,
+      getMhrSteps,
       isMhrManufacturerRegistration 
     } = storeToRefs(useStore())
     const route = useRoute()
@@ -273,7 +273,7 @@ export default defineComponent({
           scrollToInvalid(MhrSectVal.LOCATION_VALID, 'mhr-home-location')
           break
         case RouteNames.MHR_REVIEW_CONFIRM:
-          let stepsValidation = getSteps.value.map((step : StepIF) => step.valid)
+          let stepsValidation = getMhrSteps.value.map((step : StepIF) => step.valid)
           stepsValidation.pop() // Removes review confirm step from stepsValidation
           localState.isValidatingApp &&
           scrollToInvalidReviewConfirm(stepsValidation)

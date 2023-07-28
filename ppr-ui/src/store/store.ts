@@ -35,7 +35,8 @@ import {
   SearchResponseIF,
   SearchTypeIF,
   StateModelIF,
-  SubmittingPartyIF, TransferTypeSelectIF,
+  SubmittingPartyIF,
+  TransferTypeSelectIF,
   UserInfoIF,
   UserProductSubscriptionIF,
   UserSettingsIF,
@@ -58,7 +59,15 @@ import { useMhrValidations } from '@/composables'
 import { MhrSectVal } from '@/composables/mhrRegistration/enums'
 import { getFeatureFlag } from '@/utils'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
-import { HomeLocation, HomeOwners, MhrReviewConfirm, SubmittingParty, YourHome } from '@/views'
+import {
+  HomeLocation,
+  HomeOwners,
+  MhrReviewConfirm,
+  QsInformation,
+  QsReviewConfirm,
+  SubmittingParty,
+  YourHome
+} from '@/views'
 import {
   MHRButtonFooterConfig,
   MHRManufacturerButtonFooterConfig,
@@ -323,11 +332,6 @@ export const useStore = defineStore('assetsStore', () => {
   const showStepErrors = computed<boolean>(() => {
     return state.value.registration.showStepErrors
   })
-  const getSteps = computed<any[]>(() => {
-    return isMhrRegistration.value
-      ? getMhrSteps.value
-      : getPprSteps.value
-  })
   const getPprSteps = computed(() => {
     const regType = getRegistrationType.value
     let lengthTrustText = 'Registration<br />Length'
@@ -463,11 +467,32 @@ export const useStore = defineStore('assetsStore', () => {
         component: MhrReviewConfirm
       }]
   })
+  const getUserAccessSteps = computed(() => {
+    return [
+      {
+        id: 'step-1-btn',
+        step: 1,
+        icon: 'mdi-account-lock',
+        text: 'Qualified Supplier <br />Information',
+        to: RouteNames.QS_ACCESS_INFORMATION,
+        disabled: false,
+        valid: true,
+        component: QsInformation
+      },
+      {
+        id: 'step-2-btn',
+        step: 2,
+        icon: 'mdi-text-box-check-outline',
+        text: 'Review <br />and Confirm',
+        to: RouteNames.QS_ACCESS_REVIEW_CONFIRM,
+        disabled: false,
+        valid: true,
+        component: QsReviewConfirm
+      }
+    ]
+  })
   const getMhrSteps = computed(() => {
     return isMhrManufacturerRegistration.value ? getMhrManufacturerSteps.value : getMhrStaffSteps.value
-  })
-  const getMaxStep = computed<number>(() => {
-    return getSteps.value ? getSteps.value.filter((step: any) => step.step !== -1).length : -1
   })
   const getFooterButtonConfig = computed<ButtonConfigIF[]>(() => {
     return isMhrRegistration.value ? getMhrButtonFooterConfig.value : RegistrationButtonFooterConfig
@@ -1170,11 +1195,12 @@ export const useStore = defineStore('assetsStore', () => {
     showStepErrors,
 
     // Steps and Navigation getters
-    getSteps,
     getPprSteps,
     getMhrSteps,
+    getMhrStaffSteps,
+    getUserAccessSteps,
+    getMhrManufacturerSteps,
     getFooterButtonConfig,
-    getMaxStep,
     isBusySaving,
     isRegistrationValid,
 

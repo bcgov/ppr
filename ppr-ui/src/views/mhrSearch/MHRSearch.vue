@@ -35,13 +35,12 @@
 
 <script lang="ts">
 import { computed, defineComponent, onBeforeMount, reactive, toRefs, watch } from 'vue-demi'
-import { useRouter } from 'vue2-helpers/vue-router'
 import { useStore } from '@/store/store'
-import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { SearchedResultMhr } from '@/components/tables'
 import { RouteNames } from '@/enums'
-import { getFeatureFlag, navigate } from '@/utils'
+import { getFeatureFlag } from '@/utils'
 import { storeToRefs } from 'pinia'
+import { useAuth, useNavigation } from '@/composables'
 
 export default defineComponent({
   name: 'MHRSearch',
@@ -68,16 +67,12 @@ export default defineComponent({
     }
   },
   setup (props, context) {
-    const router = useRouter()
-    const {
-      getManufacturedHomeSearchResults
-    } = storeToRefs(useStore())
+    const { goToDash, isRouteName, navigateTo } = useNavigation()
+    const { isAuthenticated } = useAuth()
+    const { getManufacturedHomeSearchResults } = storeToRefs(useStore())
 
     const localState = reactive({
       loading: false,
-      isAuthenticated: computed((): boolean => {
-        return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
-      }),
       totalResultsLength: computed((): number => {
         const searchResult = getManufacturedHomeSearchResults.value
         if (searchResult) {
@@ -91,9 +86,7 @@ export default defineComponent({
       window.onbeforeunload = (event) => {
         // unsaved selections if app is ready, search results exist, and on the search page
         const isSearchReportUnsaved = (
-          router.currentRoute.name === RouteNames.MHRSEARCH &&
-           props.appReady &&
-           !!getManufacturedHomeSearchResults.value
+          isRouteName(RouteNames.MHRSEARCH) && props.appReady && !!getManufacturedHomeSearchResults.value
         )
 
         if (isSearchReportUnsaved) {
@@ -107,7 +100,7 @@ export default defineComponent({
 
     /** Redirects browser to Business Registry home page. */
     const redirectRegistryHome = (): void => {
-      navigate(props.registryUrl)
+      navigateTo(props.registryUrl)
     }
 
     /** Emits Have Data event. */
@@ -121,17 +114,15 @@ export default defineComponent({
       if (!val) return
 
       // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
-      if (!localState.isAuthenticated || (!props.isJestRunning && !getFeatureFlag('ppr-ui-enabled'))) {
+      if (!isAuthenticated.value || (!props.isJestRunning && !getFeatureFlag('ppr-ui-enabled'))) {
         window.alert('Personal Property Registry is under construction. Please check again later.')
         redirectRegistryHome()
         return
       }
 
       // if navigated here without search results redirect to the dashboard
-      if (!getManufacturedHomeSearchResults) {
-        router.push({
-          name: RouteNames.DASHBOARD
-        })
+      if (!getManufacturedHomeSearchResults.value) {
+        goToDash()
         emitHaveData(false)
         return
       }

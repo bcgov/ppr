@@ -3,14 +3,6 @@ import { SubProductConfigIF } from '@/interfaces'
 
 export const MhrSubProductConfig: Array<SubProductConfigIF> = [
   {
-    type: MhrSubTypes.GENERAL_PUBLIC,
-    label: `Search Access Only - ${MhrSubTypes.GENERAL_PUBLIC}`,
-    productBullets: [
-      MhrActions.MHR_SEARCH
-    ],
-    hasImportantBullet: false
-  },
-  {
     type: MhrSubTypes.LAWYERS_NOTARIES,
     label: `${MhrSubTypes.QUALIFIED_SUPPLIER} - ${MhrSubTypes.LAWYERS_NOTARIES}`,
     productBullets: [

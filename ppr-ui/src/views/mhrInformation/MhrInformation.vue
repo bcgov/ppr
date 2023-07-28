@@ -318,7 +318,7 @@
                   :setFeeType="feeType"
                   :setErrMsg="transferErrorMsg"
                   :transferType="getUiTransferType()"
-                  @cancel="goToDash()"
+                  @cancel="goToDashboard()"
                   @back="isReviewMode = false"
                   @save="onSave()"
                   @submit="goToReview()"
@@ -338,11 +338,18 @@ import { Component, computed, defineComponent, nextTick, onMounted, reactive, re
 import { useRouter } from 'vue2-helpers/vue-router'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
-import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { StaffPayment } from '@bcrs-shared-components/staff-payment'
 import { StaffPaymentOptions } from '@bcrs-shared-components/enums'
 import { CautionBox, CertifyInformation, StickyContainer } from '@/components/common'
-import { useHomeOwners, useInputRules, useMhrInformation, useMhrInfoValidation, useTransferOwners } from '@/composables'
+import {
+  useAuth,
+  useHomeOwners,
+  useInputRules,
+  useMhrInformation,
+  useMhrInfoValidation,
+  useNavigation,
+  useTransferOwners
+} from '@/composables'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { PartySearch } from '@/components/parties/party'
 import { MhrSubmittingParty } from '@/components/mhrRegistration/SubmittingParty'
@@ -419,6 +426,8 @@ export default defineComponent({
   },
   setup (props, context) {
     const router = useRouter()
+    const { goToDash } = useNavigation()
+    const { isAuthenticated } = useAuth()
     const {
       // Actions
       setMhrStatusType,
@@ -512,9 +521,6 @@ export default defineComponent({
         return localState.showTransferType &&
           (hasUnsavedChanges.value || !!getMhrTransferDeclaredValue.value || !!getMhrTransferType.value)
       }),
-      isAuthenticated: computed((): boolean => {
-        return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
-      }),
       asOfDateTime: computed((): string => {
         return `${pacificDate(new Date())}`
       }),
@@ -564,8 +570,8 @@ export default defineComponent({
     onMounted(async (): Promise<void> => {
       // do not proceed if app is not ready
       // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
-      if (!props.appReady || !localState.isAuthenticated) {
-        goToDash()
+      if (!props.appReady || !isAuthenticated.value) {
+        goToDashboard()
         return
       }
       // page is ready to view
@@ -709,7 +715,7 @@ export default defineComponent({
 
             localState.isReviewMode = false
             localState.showStartTransferRequiredDialog = true
-          } else goToDash()
+          } else goToDashboard()
         } else emitError(mhrTransferFiling?.error)
         localState.loading = false
       }
@@ -750,13 +756,13 @@ export default defineComponent({
       localState.loading = false
       if (!mhrTransferDraft.error) {
         setUnsavedChanges(false)
-        goToDash()
+        goToDashboard()
       } else {
         emitError(mhrTransferDraft?.error)
       }
     }
 
-    const goToDash = (): void => {
+    const goToDashboard = (): void => {
       if (hasUnsavedChanges.value === true) localState.showCancelDialog = true
       else {
         setUnsavedChanges(false)
@@ -764,9 +770,7 @@ export default defineComponent({
         setEmptyMhrTransfer(initMhrTransfer())
         resetValidationState()
 
-        router.push({
-          name: RouteNames.DASHBOARD
-        })
+        goToDash()
       }
     }
 
@@ -774,7 +778,7 @@ export default defineComponent({
       if (!val) {
         setUnsavedChanges(false)
         if (localState.showCancelDialog) {
-          goToDash()
+          goToDashboard()
         }
       }
       localState.showCancelDialog = false
@@ -798,7 +802,7 @@ export default defineComponent({
       if (proceed) {
         // Complete Later button cancels and navigates to dashboard
         setUnsavedChanges(false) // prevent unsaved changes dialog from showing up
-        goToDash()
+        goToDashboard()
       } else {
         // Start Gift/Sale Transfer simply closes the dialog, since the data is already pre-filled
         localState.showStartTransferRequiredDialog = false
@@ -898,7 +902,7 @@ export default defineComponent({
       hasUnsavedChanges,
       goToReview,
       onSave,
-      goToDash,
+      goToDashboard,
       getMhrTransferHomeOwners,
       getMhrTransferCurrentHomeOwnerGroups,
       getCertifyInformation,

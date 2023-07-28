@@ -110,7 +110,6 @@ import { computed, defineComponent, nextTick, onMounted, reactive, toRefs, watch
 import { useRouter } from 'vue2-helpers/vue-router'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
-import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { FolioNumberSummary, StickyContainer } from '@/components/common'
 import { BaseDialog } from '@/components/dialogs'
 import { StaffPayment as StaffPaymentComponent } from '@bcrs-shared-components/staff-payment'
@@ -125,6 +124,7 @@ import { uniqBy } from 'lodash'
 import { DialogOptionsIF } from '@/interfaces'
 import { AdditionalSearchFeeIF } from '@/composables/fees/interfaces'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
+import { useAuth, useNavigation } from '@/composables'
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
@@ -149,6 +149,8 @@ export default defineComponent({
   },
   setup (props, context) {
     const router = useRouter()
+    const { goToDash } = useNavigation()
+    const { isAuthenticated } = useAuth()
     const {
       // Actions
       setStaffPayment,
@@ -178,9 +180,6 @@ export default defineComponent({
       staffPaymentValid: false,
       validating: false,
       paymentOption: StaffPaymentOptions.NONE,
-      isAuthenticated: computed((): boolean => {
-        return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
-      }),
       showErrorAlert: computed((): boolean => {
         return (!localState.validFolio || !localState.staffPaymentValid) && localState.showErrors
       }),
@@ -233,9 +232,7 @@ export default defineComponent({
     }
 
     const goToDashboard = (): void => {
-      router.push({
-        name: RouteNames.DASHBOARD
-      })
+      goToDash()
       emitHaveData(false)
     }
 
@@ -353,10 +350,8 @@ export default defineComponent({
       if (!val) return
 
       // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
-      if (!localState.isAuthenticated || (!props.isJestRunning && !getFeatureFlag('mhr-ui-enabled'))) {
-        router.push({
-          name: RouteNames.DASHBOARD
-        })
+      if (!isAuthenticated.value || (!props.isJestRunning && !getFeatureFlag('mhr-ui-enabled'))) {
+        goToDash()
         return
       }
 

@@ -16,7 +16,9 @@ export const useMhrValidations = (validationState: any) => {
 
   /** Is true when all flags are true in specified section. */
   const getStepValidation = (section: MhrSectVal): boolean => {
-    return Object.values(validationState[section].value).every(val => val)
+    return validationState[section]
+      ? Object.values(validationState[section].value).every(val => val)
+      : null
   }
 
   /** Is true when app-wide validations is flagged and specified component is invalid . */

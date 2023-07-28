@@ -7,7 +7,7 @@ import { defineComponent, reactive, toRefs } from 'vue-demi'
 import { useRoute, useRouter } from 'vue2-helpers/vue-router'
 // Common Component
 import SbcSignin from 'sbc-common-components/src/components/SbcSignin.vue'
-import { navigate } from '@/utils'
+import { useNavigation } from '@/composables'
 
 /**
  * Operation:
@@ -31,6 +31,7 @@ export default defineComponent({
   setup (props, context) {
     const route = useRoute()
     const router = useRouter()
+    const { navigateTo } = useNavigation()
     const localState = reactive({})
 
     /** Called when user profile is ready (ie, the user is authenticated). */
@@ -44,9 +45,14 @@ export default defineComponent({
       } else {
         console.error('Signin page missing redirect param') // eslint-disable-line no-console
         // redirect to PPR home page
-        navigate(props.registryUrl)
+        redirectRegistryHome()
       }
     }
+
+    const redirectRegistryHome = (): void => {
+      navigateTo(props.registryUrl)
+    }
+
     const emitProfileReady = (profileReady: boolean = true) => {
       context.emit('profileReady', profileReady)
     }

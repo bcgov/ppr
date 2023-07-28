@@ -63,7 +63,6 @@
 import { computed, defineComponent, onBeforeMount, reactive, toRefs, watch } from 'vue-demi'
 import { useRouter } from 'vue2-helpers/vue-router'
 import { useStore } from '@/store/store'
-import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import {
   BaseDialog,
   ConfirmationDialog,
@@ -80,9 +79,10 @@ import {
   saveResultsError,
   saveSelectionsError
 } from '@/resources/dialogOptions'
-import { getFeatureFlag, submitSelected, successfulPPRResponses, updateSelected, navigate, pacificDate } from '@/utils'
+import { getFeatureFlag, submitSelected, successfulPPRResponses, updateSelected, pacificDate } from '@/utils'
 import { SearchResultIF } from '@/interfaces'
 import { storeToRefs } from 'pinia'
+import { useAuth, useNavigation } from '@/composables'
 
 export default defineComponent({
   name: 'Search',
@@ -114,6 +114,8 @@ export default defineComponent({
   },
   setup (props, context) {
     const router = useRouter()
+    const { goToDash, navigateTo } = useNavigation()
+    const { isAuthenticated } = useAuth()
     const {
       getSearchedType,
       getUserSettings,
@@ -134,9 +136,6 @@ export default defineComponent({
       settingOption: SettingOptions.SELECT_CONFIRMATION_DIALOG,
       folioNumber: computed((): string => {
         return getSearchResults.value?.searchQuery?.clientReferenceId || ''
-      }),
-      isAuthenticated: computed((): boolean => {
-        return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
       }),
       searchTime: computed((): string => {
         // return formatted date
@@ -229,7 +228,7 @@ export default defineComponent({
       localState.errorDialog = false
       if (!stayOnSearchResults || (localState.errorOptions !== searchReportError &&
         localState.errorOptions !== saveSelectionsError)) {
-        router.push({ name: RouteNames.DASHBOARD })
+        goToDash()
       }
     }
 
@@ -246,7 +245,7 @@ export default defineComponent({
     }
 
     const redirectRegistryHome = (): void => {
-      navigate(props.registryUrl)
+      navigateTo(props.registryUrl)
     }
 
     const submitCheck = (): void => {
@@ -286,7 +285,7 @@ export default defineComponent({
           localState.errorDialog = true
           console.error({ statusCode: statusCode })
         } else {
-          router.push({ name: RouteNames.DASHBOARD })
+          goToDash()
         }
       }
     }
@@ -306,7 +305,7 @@ export default defineComponent({
       if (!val) return
 
       // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
-      if (!localState.isAuthenticated || (!props.isJestRunning && !getFeatureFlag('ppr-ui-enabled'))) {
+      if (!isAuthenticated.value || (!props.isJestRunning && !getFeatureFlag('ppr-ui-enabled'))) {
         window.alert('Personal Property Registry is under contruction. Please check again later.')
         redirectRegistryHome()
         return
@@ -314,9 +313,7 @@ export default defineComponent({
 
       // if navigated here without search results redirect to the dashboard
       if (!getSearchResults) {
-        router.push({
-          name: RouteNames.DASHBOARD
-        })
+        goToDash()
         emitHaveData(false)
         return
       }

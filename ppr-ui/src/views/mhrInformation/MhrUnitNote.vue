@@ -51,7 +51,7 @@
                   :setShowFeeSummary="true"
                   :setFeeType="feeType"
                   :setErrMsg="feeSummaryErrorMsg"
-                  @cancel="goToDash()"
+                  @cancel="goToDashboard()"
                   @back="isReviewMode = false"
                   @submit="goToReview()"
                   data-test-id="fee-summary"
@@ -67,10 +67,8 @@
 
 <script lang="ts">
 import { defineComponent, computed, reactive, toRefs, onBeforeMount, nextTick } from 'vue-demi'
-import { useRouter } from 'vue2-helpers/vue-router'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
-import { RouteNames } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { StickyContainer } from '@/components/common'
 import { BaseDialog } from '@/components/dialogs'
@@ -78,7 +76,7 @@ import { UnitNotesInfo } from '@/resources/unitNotes'
 import { unsavedChangesDialog } from '@/resources/dialogOptions/cancelDialogs'
 import { UnitNoteAdd, UnitNoteReview } from '@/components/unitNotes'
 import { ErrorIF, RegTableNewItemI } from '@/interfaces'
-import { useMhrUnitNote, useMhrValidations } from '@/composables'
+import { useMhrUnitNote, useMhrValidations, useNavigation } from '@/composables'
 import { scrollToFirstErrorComponent } from '@/utils'
 
 export default defineComponent({
@@ -89,10 +87,9 @@ export default defineComponent({
     UnitNoteAdd,
     UnitNoteReview
   },
-  props: {
-  },
+  props: {},
   setup (props, context) {
-    const router = useRouter()
+    const { goToDash } = useNavigation()
 
     const {
       setRegTableNewItem,
@@ -150,7 +147,7 @@ export default defineComponent({
 
     onBeforeMount(async () => {
       if (!getMhrUnitNoteType.value) {
-        await router.push({ name: RouteNames.DASHBOARD })
+        goToDash()
       }
 
       // set empty Unit Note but keep the Unit Note Document Type
@@ -202,11 +199,9 @@ export default defineComponent({
       scrollToFirstErrorComponent()
     }
 
-    const goToDash = (): void => {
+    const goToDashboard = (): void => {
       resetAllValidations()
-      router.push({
-        name: RouteNames.DASHBOARD
-      })
+      goToDash()
     }
 
     // Emit error to router view
@@ -216,14 +211,14 @@ export default defineComponent({
 
     const handleDialogResp = (val: boolean): void => {
       if (!val && localState.showCancelDialog) {
-        goToDash()
+        goToDashboard()
       }
       localState.showCancelDialog = false
     }
 
     return {
       goToReview,
-      goToDash,
+      goToDashboard,
       handleDialogResp,
       getMhrUnitNoteValidation,
       ...toRefs(localState)

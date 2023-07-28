@@ -84,13 +84,8 @@ import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'v
 import { useRouter } from 'vue2-helpers/vue-router'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
-import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { ProductCode, RouteNames } from '@/enums'
-import {
-  getFeatureFlag,
-  searchHistory,
-  navigate
-} from '@/utils'
+import { getFeatureFlag, searchHistory } from '@/utils'
 import { BaseSnackbar, RegistrationsWrapper } from '@/components/common'
 import { SearchHistory } from '@/components/tables'
 import { SearchBar } from '@/components/search'
@@ -98,9 +93,10 @@ import { useSearch } from '@/composables/useSearch'
 import { DashboardTabs } from '@/components/dashboard'
 import {
   ErrorIF, // eslint-disable-line no-unused-vars
-  ManufacturedHomeSearchResponseIF, RegTableNewItemI, // eslint-disable-line no-unused-vars
+  ManufacturedHomeSearchResponseIF, // eslint-disable-line no-unused-vars
   SearchResponseIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
+import { useAuth, useNavigation } from '@/composables'
 
 export default defineComponent({
   name: 'Dashboard',
@@ -132,6 +128,8 @@ export default defineComponent({
   },
   setup (props, context) {
     const router = useRouter()
+    const { navigateTo } = useNavigation()
+    const { isAuthenticated } = useAuth()
     const {
       // Actions
       setSearchHistory,
@@ -168,9 +166,6 @@ export default defineComponent({
         return getFeatureFlag('mhr-registration-enabled') &&
           hasPprRole.value && hasMhrRole.value && (isRoleStaff.value || isRoleQualifiedSupplier.value)
       }),
-      isAuthenticated: computed((): boolean => {
-        return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
-      }),
       searchHistoryLength: computed((): number => {
         return (getSearchHistory.value as SearchResponseIF[])?.length || 0
       }),
@@ -203,7 +198,7 @@ export default defineComponent({
 
     /** Redirects browser to Business Registry home page. */
     const redirectRegistryHome = (): void => {
-      navigate(props.registryUrl)
+      navigateTo(props.registryUrl)
     }
 
     const retrieveSearchHistory = async (): Promise<void> => {
@@ -244,7 +239,7 @@ export default defineComponent({
       if (!val) return
 
       // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
-      if (!localState.isAuthenticated || (!props.isJestRunning && !getFeatureFlag('ppr-ui-enabled'))) {
+      if (!isAuthenticated.value || (!props.isJestRunning && !getFeatureFlag('ppr-ui-enabled'))) {
         window.alert('Personal Property Registry is under construction. Please check again later.')
         redirectRegistryHome()
         return

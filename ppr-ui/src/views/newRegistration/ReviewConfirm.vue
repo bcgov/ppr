@@ -11,7 +11,11 @@
                 <h1>{{ registrationTypeUI }}<span class="only-print"> - Draft</span></h1>
               </v-col>
             </v-row>
-            <stepper class="mt-4" :showStepErrorsFlag="showStepErrors"/>
+            <Stepper
+              class="mt-4"
+              :stepConfig="getPprSteps"
+              :showStepErrors="showStepErrors"
+            />
             <v-row class='pt-10' no-gutters>
               <v-col cols="auto" class="sub-header">
                 Review and Confirm
@@ -91,10 +95,10 @@
     </div>
     <v-row no-gutters class='pt-15'>
       <v-col cols="12">
-        <button-footer
+        <ButtonFooter
+          :navConfig="getFooterButtonConfig"
           :currentStatementType="statementType"
           :currentStepName="stepName"
-          :router="this.$router"
           :certifyValid="validCertify && validFolio"
           :forceSave="saveDraftExit"
           @registration-incomplete="registrationIncomplete()"
@@ -107,9 +111,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue-demi'
-import { useRouter } from 'vue2-helpers/vue-router'
 import { useStore } from '@/store/store'
-import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { APIRegistrationTypes, RegistrationFlowType, RouteNames, StatementTypes } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { Stepper, StickyContainer, CertifyInformation } from '@/components/common'
@@ -121,7 +123,8 @@ import FolioNumberSummary from '@/components/common/FolioNumberSummary.vue'
 import { getFeatureFlag } from '@/utils'
 import { ErrorIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { RegistrationLengthI } from '@/composables/fees/interfaces'
-import { storeToRefs } from 'pinia' // eslint-disable-line no-unused-vars
+import { storeToRefs } from 'pinia'
+import { useAuth, useNavigation } from '@/composables' // eslint-disable-line no-unused-vars
 
 export default defineComponent({
   name: 'ReviewConfirm',
@@ -151,7 +154,8 @@ export default defineComponent({
     }
   },
   setup (props, context) {
-    const router = useRouter()
+    const { goToDash } = useNavigation()
+    const { isAuthenticated } = useAuth()
     const {
       // Actions
       setLengthTrust,
@@ -162,13 +166,16 @@ export default defineComponent({
     } = useStore()
     const {
       // Getters
+      getPprSteps,
+      showStepErrors,
       getAddCollateral,
       getLengthTrust,
       hasUnsavedChanges,
       getRegistrationOther,
       getRegistrationType,
       getRegistrationFlowType,
-      getAddSecuredPartiesAndDebtors
+      getAddSecuredPartiesAndDebtors,
+      getFooterButtonConfig
     } = storeToRefs(useStore())
 
     const localState = reactive({
@@ -179,9 +186,6 @@ export default defineComponent({
       stepName: RouteNames.REVIEW_CONFIRM,
       validCertify: false,
       validFolio: true,
-      isAuthenticated: computed((): boolean => {
-        return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
-      }),
       registrationLength: computed((): RegistrationLengthI => {
         return {
           lifeInfinite: getLengthTrust.value?.lifeInfinite || false,
@@ -208,17 +212,13 @@ export default defineComponent({
       // do not proceed if app is not ready
       if (!val) return
       // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
-      if (!localState.isAuthenticated || (!props.isJestRunning && !getFeatureFlag('ppr-ui-enabled'))) {
-        router.push({
-          name: RouteNames.DASHBOARD
-        })
+      if (!isAuthenticated.value || (!props.isJestRunning && !getFeatureFlag('ppr-ui-enabled'))) {
+        goToDash()
         return
       }
       // redirect if store doesn't contain all needed data (happens on page reload, etc.)
       if (!getRegistrationType.value || getRegistrationFlowType.value !== RegistrationFlowType.NEW) {
-        router.push({
-          name: RouteNames.DASHBOARD
-        })
+        goToDash()
         return
       }
       const unsavedChanges = hasUnsavedChanges.value
@@ -266,7 +266,10 @@ export default defineComponent({
 
     return {
       emitError,
+      getPprSteps,
+      showStepErrors,
       registrationIncomplete,
+      getFooterButtonConfig,
       ...toRefs(localState)
     }
   }
