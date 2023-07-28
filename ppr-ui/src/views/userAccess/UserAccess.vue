@@ -77,6 +77,7 @@ import { ErrorIF } from '@/interfaces'
 
 export default defineComponent({
   name: 'UserAccess',
+  emits: ['emitHaveData', 'error'],
   components: {
     Stepper,
     BaseDialog,
@@ -93,7 +94,7 @@ export default defineComponent({
       default: false
     }
   },
-  setup (props, context) {
+  setup (props, { emit }) {
     const { getUserAccessSteps } = storeToRefs(useStore())
     const { isRouteName, goToDash } = useNavigation()
     const { isAuthenticated } = useAuth()
@@ -112,12 +113,12 @@ export default defineComponent({
         return
       }
 
-      context.emit('emitHaveData', true)
+      emit('emitHaveData', true)
       localState.dataLoaded = true
     })
 
     const emitError = (error: ErrorIF): void => {
-      context.emit('error', error)
+      emit('error', error)
     }
 
     const submit = (): void => {
@@ -139,8 +140,4 @@ export default defineComponent({
 
 <style lang="scss" module>
 @import '@/assets/styles/theme.scss';
-.step-container {
-  margin-top: 1rem;
-  padding: 1.25rem;
-}
 </style>

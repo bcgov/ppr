@@ -243,7 +243,6 @@ export default defineComponent({
       }
     }
     const submitBack = () => {
-      // eslint-disable-next-line vue/no-mutating-props
       router.push({
         name: localState.buttonConfig.backRouteName
       })
@@ -317,7 +316,6 @@ export default defineComponent({
             prevDraft: prevDraftId
           }
           setRegTableNewItem(newItem)
-          // eslint-disable-next-line vue/no-mutating-props
           router.push({
             name: localState.buttonConfig.nextRouteName
           })

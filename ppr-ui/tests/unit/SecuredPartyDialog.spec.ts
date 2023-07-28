@@ -23,7 +23,7 @@ describe('Secured Party Dialog SA tests', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
-    wrapper = createComponent(SecuredPartyDialog, props)
+    wrapper = await createComponent(SecuredPartyDialog, props)
   })
   afterEach(() => {
     wrapper.destroy()

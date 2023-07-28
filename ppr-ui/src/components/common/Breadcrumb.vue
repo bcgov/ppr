@@ -54,7 +54,8 @@ import {
   tombstoneBreadcrumbSearchConfirm,
   breadcrumbsTitles,
   tombstoneBreadcrumbMhrInformation,
-  tombstoneBreadcrumbMhrUnitNote, tombstoneBreadcrumbQsApplication
+  tombstoneBreadcrumbMhrUnitNote,
+  tombstoneBreadcrumbQsApplication
 } from '@/resources'
 import { RouteNames } from '@/enums'
 import { getRoleProductCode } from '@/utils'

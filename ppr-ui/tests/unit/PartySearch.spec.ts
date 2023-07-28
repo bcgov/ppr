@@ -18,7 +18,7 @@ describe('Secured Party search event tests', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
-    wrapper = createComponent(PartySearch, {})
+    wrapper = await createComponent(PartySearch, {})
   })
   afterEach(() => {
     wrapper.destroy()

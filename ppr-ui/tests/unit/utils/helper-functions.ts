@@ -4,6 +4,8 @@ import VueRouter from 'vue-router'
 import mockRouter from '../MockRouter'
 import { useStore } from '@/store/store'
 import { createPinia, setActivePinia } from 'pinia'
+import { RouteNames } from '@/enums'
+import { markRaw } from 'vue'
 
 const vuetify = new Vuetify({})
 setActivePinia(createPinia())
@@ -75,13 +77,15 @@ export function getTestId (dataTestId: string) {
  *
  * @returns a Wrapper<any> object with the given parameters.
  */
-export function createComponent (component: any, props: any): Wrapper<any> {
+export async function createComponent
+(component: any, props: any, routeName: RouteNames = null): Promise<Wrapper<any>> {
   const localVue = createLocalVue()
   localVue.use(Vuetify)
   // Prevent the warning "[Vuetify] Unable to locate target [data-app]"
   document.body.setAttribute('data-app', 'true')
   localVue.use(VueRouter)
   const router = mockRouter.mock()
+  if (routeName) await router.push({ name: routeName })
 
   return mount((component as any), {
     localVue,
