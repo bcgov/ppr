@@ -5,18 +5,27 @@
       <!-- Custom Panel Actions -->
       <template v-slot:actions>
         <span class="unit-note-header-action mt-n4">
-          <v-menu offset-y left nudge-bottom="0" class="unit-note-menu">
+          <v-menu offset-y left nudge-right="2" nudge-bottom="0" class="unit-note-menu">
             <template v-slot:activator="{ on, value }">
               <v-btn
-                class="unit-note-menu-btn"
+                class="unit-note-menu-btn px-0"
                 text
                 color="primary"
                 :disabled="disabled"
                 :ripple="false"
               >
-                <span>{{ isActive ? 'Hide Note' : 'View Note' }}</span>
-                <v-divider vertical />
-                <v-icon class="menu-drop-down-icon" color="primary" v-on="on" :disabled="disabled">
+                <span class="px-4">{{ isActive ? 'Hide Note' : 'View Note' }}</span>
+                <v-divider vertical class='mx-0' />
+              </v-btn>
+              <v-btn
+                class="unit-note-menu-btn pa-0"
+                text
+                color="primary"
+                :disabled="disabled"
+                :ripple="false"
+                v-on="on"
+              >
+                <v-icon class="menu-drop-down-icon" color="primary" :disabled="disabled">
                   {{ value ? 'mdi-menu-up' : 'mdi-menu-down' }}
                 </v-icon>
               </v-btn>
@@ -152,9 +161,6 @@ h3 {
 }
 .unit-note-header-action {
   color: $primary-blue;
-  .unit-note-menu-btn {
-    padding-right: 10px;
-  }
 }
 .unit-note-panel {
     border-bottom: 2px solid $gray1;
