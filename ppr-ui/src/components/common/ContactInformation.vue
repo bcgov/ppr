@@ -185,7 +185,7 @@
 import { useInputRules } from '@/composables'
 import { SubmittingPartyTypes } from '@/enums'
 import { ContentIF, FormIF, PartyIF, SubmittingPartyIF } from '@/interfaces'
-import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, onBeforeMount, reactive, ref, toRefs, watch } from 'vue-demi'
 import { PartyAddressSchema, OptionalPartyAddressSchema } from '@/schemas'
 import { VueMaskDirective } from 'v-mask'
 import { BaseAddress } from '@/composables/address'
@@ -251,7 +251,7 @@ export default defineComponent({
     const localState = reactive({
       enableLookUp: true,
       contactInfoModel: computed(() => props.contactInfo as PartyIF | SubmittingPartyIF),
-      contactInfoType: SubmittingPartyTypes.PERSON,
+      contactInfoType: null as SubmittingPartyTypes,
       isContactInfoFormValid: false,
       isAddressValid: false,
       hasLongCombinedName: false,
@@ -284,6 +284,12 @@ export default defineComponent({
     watch(() => localState.contactInfoModel, (val) => {
       emitStoreUpdate(val)
     }, { deep: true, immediate: true })
+
+    onBeforeMount(() => {
+      // pre-select Person or Business radio buttons, default is Person
+      localState.contactInfoType =
+        localState.contactInfoModel.businessName ? SubmittingPartyTypes.BUSINESS : SubmittingPartyTypes.PERSON
+    })
 
     const clearFields = () => {
       if (localState.isPersonOption) {
