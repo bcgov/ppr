@@ -51,6 +51,20 @@ async function createUnitNoteComponent (unitNoteType: UnitNoteDocTypes) {
   return createComponent()
 }
 
+// Go to Unit Note Review & Confirm screen and return its component for further testing
+async function getReviewConfirmComponent (wrapper: Wrapper<any>): Promise<Wrapper<any, Element>> {
+  // trigger initial validation
+  await wrapper.find('#btn-stacked-submit').trigger('click')
+  await wrapper.findComponent(UnitNoteAdd).vm.$emit('isValid', true)
+  await wrapper.find('#btn-stacked-submit').trigger('click')
+  await nextTick()
+
+  const reviewConfirmComponent = wrapper.findComponent(UnitNoteReview)
+  expect(reviewConfirmComponent.exists()).toBeTruthy()
+
+  return reviewConfirmComponent
+}
+
 describe('MHR Unit Note Filing', () => {
   let wrapper: Wrapper<any>
   setupMockStaffUser()
@@ -156,16 +170,7 @@ describe('MHR Unit Note Filing', () => {
   it('Continued Notice of Caution (CAUC): renders and validates MhrUnitNote Review and Confirm', async () => {
     wrapper = await createUnitNoteComponent(UnitNoteDocTypes.CONTINUED_NOTE_OF_CAUTION)
 
-    // trigger initial validation
-    await wrapper.find('#btn-stacked-submit').trigger('click')
-    await wrapper.findComponent(UnitNoteAdd).vm.$emit('isValid', true)
-    await nextTick()
-
-    await wrapper.find('#btn-stacked-submit').trigger('click')
-    await nextTick()
-
-    const UnitNoteReviewComponent = wrapper.findComponent(UnitNoteReview)
-    expect(UnitNoteReviewComponent.exists()).toBeTruthy()
+    const UnitNoteReviewComponent = await getReviewConfirmComponent(wrapper)
 
     // ExpiryDate component should exist for this Unit Note type
     expect(UnitNoteReviewComponent.findComponent(ExpiryDate).exists()).toBeTruthy()
@@ -200,16 +205,7 @@ describe('MHR Unit Note Filing', () => {
   it('Extension to Notice of Caution (CAUE): renders and validates MhrUnitNote Review and Confirm', async () => {
     wrapper = await createUnitNoteComponent(UnitNoteDocTypes.EXTENSION_TO_NOTICE_OF_CAUTION)
 
-    // trigger initial validation
-    await wrapper.find('#btn-stacked-submit').trigger('click')
-    await wrapper.findComponent(UnitNoteAdd).vm.$emit('isValid', true)
-    await nextTick()
-
-    await wrapper.find('#btn-stacked-submit').trigger('click')
-    await nextTick()
-
-    const UnitNoteReviewComponent = wrapper.findComponent(UnitNoteReview)
-    expect(UnitNoteReviewComponent.exists()).toBeTruthy()
+    const UnitNoteReviewComponent = await getReviewConfirmComponent(wrapper)
 
     // ExpiryDate component should exist for this Unit Note type
     expect(UnitNoteReviewComponent.findComponent(ExpiryDate).exists()).toBeTruthy()
@@ -267,5 +263,31 @@ describe('MHR Unit Note Filing', () => {
 
     // 'Not Entered' should be shown 4 times for each column in the table
     expect(wrapper.find(getTestId('party-info-table')).findAll('.text-not-entered').length).toBe(4)
+  })
+
+  it('should not show EffectiveDateTime component for Decal Replacement and Public Note', async () => {
+    wrapper = await createUnitNoteComponent(UnitNoteDocTypes.DECAL_REPLACEMENT)
+
+    expect(store.getMhrUnitNoteType).toBe(UnitNoteDocTypes.DECAL_REPLACEMENT)
+
+    let UnitNoteReviewComponent = await getReviewConfirmComponent(wrapper)
+    expect(UnitNoteReviewComponent.findComponent(EffectiveDateTime).exists()).toBeFalsy()
+    expect(UnitNoteReviewComponent.findComponent(ExpiryDate).exists()).toBeFalsy()
+    expect(UnitNoteReviewComponent.findComponent(ContactInformation).find('h2').text()).toContain('1.')
+    expect(UnitNoteReviewComponent.findComponent(Attention).find('h2').text()).toContain('2.')
+    expect(UnitNoteReviewComponent.findComponent(CertifyInformation).find('h2').text()).toContain('3.')
+    expect(UnitNoteReviewComponent.find('#staff-transfer-payment-section h2').text()).toContain('4.')
+
+    wrapper = await createUnitNoteComponent(UnitNoteDocTypes.PUBLIC_NOTE)
+
+    expect(store.getMhrUnitNoteType).toBe(UnitNoteDocTypes.PUBLIC_NOTE)
+
+    UnitNoteReviewComponent = await getReviewConfirmComponent(wrapper)
+    expect(UnitNoteReviewComponent.findComponent(EffectiveDateTime).exists()).toBeFalsy()
+    expect(UnitNoteReviewComponent.findComponent(ExpiryDate).exists()).toBeFalsy()
+    expect(UnitNoteReviewComponent.findComponent(ContactInformation).find('h2').text()).toContain('1.')
+    expect(UnitNoteReviewComponent.findComponent(Attention).find('h2').text()).toContain('2.')
+    expect(UnitNoteReviewComponent.findComponent(CertifyInformation).find('h2').text()).toContain('3.')
+    expect(UnitNoteReviewComponent.find('#staff-transfer-payment-section h2').text()).toContain('4.')
   })
 })
