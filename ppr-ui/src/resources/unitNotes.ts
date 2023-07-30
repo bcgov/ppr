@@ -67,7 +67,12 @@ export const UnitNotesInfo: Record<UnitNoteDocTypes, UnitNoteInfoIF> = {
   [UnitNoteDocTypes.PUBLIC_NOTE]: {
     header: 'Public Note',
     dropdownText: 'Public Note',
-    fee: FeeSummaryDefaults.NO_FEE
+    fee: FeeSummaryDefaults.NO_FEE,
+    reviewSectionNumber: { // section numbers on Review page
+      attention: 2,
+      certifyInfo: 3,
+      staffPayment: 4
+    }
   },
   [UnitNoteDocTypes.RESTRAINING_ORDER]: {
     header: 'Restraining Order',
@@ -82,7 +87,12 @@ export const UnitNotesInfo: Record<UnitNoteDocTypes, UnitNoteInfoIF> = {
   [UnitNoteDocTypes.DECAL_REPLACEMENT]: {
     header: 'Decal Replacement',
     dropdownText: 'Decal Replacement',
-    fee: FeeSummaryDefaults.UNIT_NOTE_10
+    fee: FeeSummaryDefaults.UNIT_NOTE_10,
+    reviewSectionNumber: { // section numbers on Review page
+      attention: 2,
+      certifyInfo: 3,
+      staffPayment: 4
+    }
   },
   [UnitNoteDocTypes.NON_RESIDENTIAL_EXEMPTION]: {
     header: 'Non-Residential Exemption',

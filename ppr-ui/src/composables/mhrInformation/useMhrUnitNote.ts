@@ -3,6 +3,7 @@ import { GroupedNotesIF, PartyIF, UnitNoteIF, UnitNoteRegistrationIF } from '@/i
 import { useStore } from '@/store/store'
 import { deleteEmptyProperties, submitMhrUnitNote } from '@/utils'
 import { storeToRefs } from 'pinia'
+import { cloneDeep } from 'lodash'
 
 export const useMhrUnitNote = () => {
   const {
@@ -27,16 +28,20 @@ export const useMhrUnitNote = () => {
     // status is not required
     delete unitNoteData.note.status
 
-    // cleanup dateTime strings to be accepted by API
-    unitNoteData.note.effectiveDateTime = unitNoteData.note.effectiveDateTime.replace('Z', '')
-    unitNoteData.note.expiryDateTime = unitNoteData.note.expiryDateTime.replace('Z', '')
-
     // Unit note expiryDateTime can only be submitted for CAUC, CAUE
-    if (![UnitNoteDocTypes.CONTINUED_NOTE_OF_CAUTION,
-      UnitNoteDocTypes.EXTENSION_TO_NOTICE_OF_CAUTION].includes(unitNoteData.note.documentType)) {
-      delete unitNoteData.note.expiryDateTime
-    } else {
+    if (hasExpiryDate()) {
+      // cleanup dateTime to be accepted by API
       unitNoteData.note.expiryDateTime = unitNoteData.note.expiryDateTime.replace('Z', '')
+    } else {
+      delete unitNoteData.note.expiryDateTime
+    }
+
+    // Do not submit effectiveDateTime if from does not show the component (REG_102, NPUB)
+    if (hasEffectiveDateTime()) {
+      // cleanup dateTime to be accepted by API
+      unitNoteData.note.effectiveDateTime = unitNoteData.note.effectiveDateTime.replace('Z', '')
+    } else {
+      delete unitNoteData.note.effectiveDateTime
     }
 
     return unitNoteData
@@ -44,7 +49,7 @@ export const useMhrUnitNote = () => {
 
   // Submit Unit Note after building the payload data
   const buildApiDataAndSubmit = (unitNoteData: UnitNoteRegistrationIF) => {
-    const payloadData = buildPayload(unitNoteData)
+    const payloadData = buildPayload(cloneDeep(unitNoteData))
     return submitMhrUnitNote(getMhrInformation.value.mhrNumber, payloadData)
   }
 
@@ -53,6 +58,17 @@ export const useMhrUnitNote = () => {
     return [UnitNoteDocTypes.DECAL_REPLACEMENT,
       UnitNoteDocTypes.PUBLIC_NOTE,
       UnitNoteDocTypes.CONFIDENTIAL_NOTE].includes(getMhrUnitNoteType.value)
+  }
+
+  // Effective Date Time component not required for certain Unit Note types
+  const hasEffectiveDateTime = (): boolean => {
+    return ![UnitNoteDocTypes.DECAL_REPLACEMENT, UnitNoteDocTypes.PUBLIC_NOTE].includes(getMhrUnitNoteType.value)
+  }
+
+  // Expiry Date Time component not required for certain Unit Note types
+  const hasExpiryDate = (): boolean => {
+    return [UnitNoteDocTypes.CONTINUED_NOTE_OF_CAUTION, UnitNoteDocTypes.EXTENSION_TO_NOTICE_OF_CAUTION]
+      .includes(getMhrUnitNoteType.value)
   }
 
   // Identify if a unit note is notice of caution or an extended/continued notice of caution
@@ -158,6 +174,8 @@ export const useMhrUnitNote = () => {
     initUnitNote,
     buildApiDataAndSubmit,
     isPersonGivingNoticeOptional,
+    hasEffectiveDateTime,
+    hasExpiryDate,
     groupUnitNotes,
     isNoticeOfCautionOrRelatedDocType
   }
