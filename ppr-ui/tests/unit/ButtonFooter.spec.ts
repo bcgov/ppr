@@ -22,7 +22,7 @@ import { useStore } from '../../src/store/store'
 import { ButtonConfigIF } from '@/interfaces'
 import { MhrRegistrationType } from '@/resources'
 import {
-  MHRManufacturerButtonFooterConfig,
+  MHRManufacturerButtonFooterConfig, MhrUserAccessButtonFooterConfig,
   RegistrationButtonFooterConfig
 } from '@/resources/buttonFooterConfig'
 import { createRouter } from 'vue2-helpers/vue-router'
@@ -46,7 +46,6 @@ const nextBtn: string = '#reg-next-btn'
  * @returns a Wrapper<SearchBar> object with the given parameters.
  */
 function createComponent (
-  currentStatementType: String,
   currentStepName: String,
   navConfig: Array<ButtonConfigIF>,
   routeName: RouteNames
@@ -63,7 +62,7 @@ function createComponent (
   document.body.setAttribute('data-app', 'true')
   return mount((ButtonFooter as any), {
     localVue,
-    propsData: { currentStatementType, currentStepName, navConfig },
+    propsData: { currentStepName, navConfig },
     store,
     router,
     vuetify
@@ -73,15 +72,12 @@ function createComponent (
 describe('New Financing Statement Registration Buttons Step 1', () => {
   let wrapper: Wrapper<any>
   let wrapper2: any // eslint-disable-line no-unused-vars
-  const currentStatementType: String = String(StatementTypes.FINANCING_STATEMENT)
   const currentStepName: String = String(RouteNames.LENGTH_TRUST)
 
   beforeEach(async () => {
     const localVue = createLocalVue()
     wrapper2 = shallowMount((LengthTrust as any), { localVue, store, vuetify })
-    wrapper = createComponent(
-      currentStatementType, currentStepName, RegistrationButtonFooterConfig, RouteNames.LENGTH_TRUST
-    )
+    wrapper = createComponent(currentStepName, RegistrationButtonFooterConfig, RouteNames.LENGTH_TRUST)
   })
   afterEach(() => {
     wrapper.destroy()
@@ -94,7 +90,6 @@ describe('New Financing Statement Registration Buttons Step 1', () => {
     expect(wrapper.find(saveResumeBtn).exists()).toBe(true)
     expect(wrapper.find(backBtn).exists()).toBe(false)
     expect(wrapper.find(nextBtn).exists()).toBe(true)
-    expect(wrapper.vm.currentStatementType).toBe(StatementTypes.FINANCING_STATEMENT)
     expect(wrapper.props().currentStepName).toBe(RouteNames.LENGTH_TRUST)
     expect(wrapper.vm.buttonConfig.showCancel).toBe(true)
     expect(wrapper.vm.buttonConfig.showSave).toBe(true)
@@ -126,7 +121,6 @@ describe('New Financing Statement Registration Buttons Step 1', () => {
 describe('New Financing Statement Registration Buttons Step 2', () => {
   let wrapper: Wrapper<any>
   let wrapper2: any // eslint-disable-line no-unused-vars
-  const currentStatementType: String = String(StatementTypes.FINANCING_STATEMENT)
   const currentStepName: String = String(RouteNames.ADD_SECUREDPARTIES_AND_DEBTORS)
 
   beforeEach(async () => {
@@ -134,7 +128,7 @@ describe('New Financing Statement Registration Buttons Step 2', () => {
     localVue.use(VueRouter)
     wrapper2 = shallowMount((AddSecuredPartiesAndDebtors as any), { localVue, store, vuetify })
     wrapper = createComponent(
-      currentStatementType, currentStepName, RegistrationButtonFooterConfig, RouteNames.ADD_SECUREDPARTIES_AND_DEBTORS
+      currentStepName, RegistrationButtonFooterConfig, RouteNames.ADD_SECUREDPARTIES_AND_DEBTORS
     )
   })
   afterEach(() => {
@@ -148,7 +142,6 @@ describe('New Financing Statement Registration Buttons Step 2', () => {
     expect(wrapper.find(saveResumeBtn).exists()).toBe(true)
     expect(wrapper.find(backBtn).exists()).toBe(true)
     expect(wrapper.find(nextBtn).exists()).toBe(true)
-    expect(wrapper.vm.currentStatementType).toBe(StatementTypes.FINANCING_STATEMENT)
     expect(wrapper.props().currentStepName).toBe(RouteNames.ADD_SECUREDPARTIES_AND_DEBTORS)
     expect(wrapper.vm.buttonConfig.showCancel).toBe(true)
     expect(wrapper.vm.buttonConfig.showSave).toBe(true)
@@ -191,7 +184,6 @@ describe('New Financing Statement Registration Buttons Step 2', () => {
 describe('New Financing Statement Registration Buttons Step 3', () => {
   let wrapper: Wrapper<any>
   let wrapper2: any // eslint-disable-line no-unused-vars
-  const currentStatementType: String = String(StatementTypes.FINANCING_STATEMENT)
   const currentStepName: String = String(RouteNames.ADD_COLLATERAL)
 
   beforeEach(async () => {
@@ -199,7 +191,7 @@ describe('New Financing Statement Registration Buttons Step 3', () => {
     localVue.use(VueRouter)
     wrapper2 = shallowMount((AddCollateral as any), { localVue, store, vuetify })
     wrapper = createComponent(
-      currentStatementType, currentStepName, RegistrationButtonFooterConfig, RouteNames.ADD_COLLATERAL
+      currentStepName, RegistrationButtonFooterConfig, RouteNames.ADD_COLLATERAL
     )
   })
   afterEach(() => {
@@ -213,7 +205,6 @@ describe('New Financing Statement Registration Buttons Step 3', () => {
     expect(wrapper.find(saveResumeBtn).exists()).toBe(true)
     expect(wrapper.find(backBtn).exists()).toBe(true)
     expect(wrapper.find(nextBtn).exists()).toBe(true)
-    expect(wrapper.vm.currentStatementType).toBe(StatementTypes.FINANCING_STATEMENT)
     expect(wrapper.props().currentStepName).toBe(RouteNames.ADD_COLLATERAL)
     expect(wrapper.vm.buttonConfig.showCancel).toBe(true)
     expect(wrapper.vm.buttonConfig.showSave).toBe(true)
@@ -255,14 +246,13 @@ describe('New Financing Statement Registration Buttons Step 3', () => {
 describe('New Financing Statement Registration Buttons Step 4', () => {
   let wrapper: Wrapper<any>
   let wrapper2: any // eslint-disable-line no-unused-vars
-  const currentStatementType: String = String(StatementTypes.FINANCING_STATEMENT)
   const currentStepName: String = String(RouteNames.REVIEW_CONFIRM)
 
   beforeEach(async () => {
     const localVue = createLocalVue()
     localVue.use(VueRouter)
     wrapper2 = shallowMount((ReviewConfirm as any), { localVue, store, vuetify })
-    wrapper = createComponent(currentStatementType, currentStepName, RegistrationButtonFooterConfig, RouteNames.REVIEW_CONFIRM)
+    wrapper = createComponent(currentStepName, RegistrationButtonFooterConfig, RouteNames.REVIEW_CONFIRM)
   })
   afterEach(() => {
     wrapper.destroy()
@@ -275,7 +265,6 @@ describe('New Financing Statement Registration Buttons Step 4', () => {
     expect(wrapper.find(saveResumeBtn).exists()).toBe(true)
     expect(wrapper.find(backBtn).exists()).toBe(true)
     expect(wrapper.find(nextBtn).exists()).toBe(true)
-    expect(wrapper.vm.currentStatementType).toBe(StatementTypes.FINANCING_STATEMENT)
     expect(wrapper.props().currentStepName).toBe(RouteNames.REVIEW_CONFIRM)
     expect(wrapper.vm.buttonConfig.showCancel).toBe(true)
     expect(wrapper.vm.buttonConfig.showSave).toBe(true)
@@ -317,7 +306,6 @@ describe('New Financing Statement Registration Buttons Step 4', () => {
 describe('Step 4 for SBC staff', () => {
   let wrapper: Wrapper<any>
   let wrapper2: any // eslint-disable-line no-unused-vars
-  const currentStatementType: String = String(StatementTypes.FINANCING_STATEMENT)
   const currentStepName: String = String(RouteNames.REVIEW_CONFIRM)
 
   beforeEach(async () => {
@@ -325,7 +313,7 @@ describe('Step 4 for SBC staff', () => {
     localVue.use(VueRouter)
     await store.setAuthRoles(['staff', 'ppr_staff'])
     wrapper2 = shallowMount((ReviewConfirm as any), { localVue, store, vuetify })
-    wrapper = createComponent(currentStatementType, currentStepName, RegistrationButtonFooterConfig, RouteNames.REVIEW_CONFIRM)
+    wrapper = createComponent(currentStepName, RegistrationButtonFooterConfig, RouteNames.REVIEW_CONFIRM)
   })
   afterEach(() => {
     wrapper.destroy()
@@ -374,11 +362,8 @@ describe('Button events', () => {
     post.returns(new Promise(resolve => resolve({ data: null })))
     const localVue = createLocalVue()
     localVue.use(VueRouter)
-    const currentStatementType: String = String(StatementTypes.FINANCING_STATEMENT)
     const currentStepName: String = String(RouteNames.REVIEW_CONFIRM)
-    wrapper = createComponent(
-      currentStatementType, currentStepName, RegistrationButtonFooterConfig, RouteNames.REVIEW_CONFIRM
-    )
+    wrapper = createComponent(currentStepName, RegistrationButtonFooterConfig, RouteNames.REVIEW_CONFIRM)
     await flushPromises()
   })
   afterEach(() => {
@@ -401,7 +386,6 @@ describe('Button events', () => {
 
 describe('Mhr Manufacturer Registration step 1 - Your Home', () => {
   let wrapper: Wrapper<any>
-  const currentStatementType = StatementTypes.FINANCING_STATEMENT
   const currentStepName = RouteNames.YOUR_HOME
 
   beforeAll(async () => {
@@ -417,9 +401,7 @@ describe('Mhr Manufacturer Registration step 1 - Your Home', () => {
   beforeEach(async () => {
     const localVue = createLocalVue()
     localVue.use(VueRouter)
-    wrapper = createComponent(
-      currentStatementType, currentStepName, MHRManufacturerButtonFooterConfig, RouteNames.YOUR_HOME
-    )
+    wrapper = createComponent(currentStepName, MHRManufacturerButtonFooterConfig, RouteNames.YOUR_HOME)
   })
   afterEach(() => {
     wrapper.destroy()
@@ -462,7 +444,6 @@ describe('Mhr Manufacturer Registration step 1 - Your Home', () => {
 
 describe('Mhr Manufacturer Registration step 2 - Review and Confirm', () => {
   let wrapper: Wrapper<any>
-  const currentStatementType = StatementTypes.FINANCING_STATEMENT
   const currentStepName = RouteNames.MHR_REVIEW_CONFIRM
 
   beforeAll(async () => {
@@ -477,9 +458,7 @@ describe('Mhr Manufacturer Registration step 2 - Review and Confirm', () => {
   beforeEach(async () => {
     const localVue = createLocalVue()
     localVue.use(VueRouter)
-    wrapper = createComponent(
-      currentStatementType, currentStepName, MHRManufacturerButtonFooterConfig, RouteNames.MHR_REVIEW_CONFIRM
-    )
+    wrapper = createComponent(currentStepName, MHRManufacturerButtonFooterConfig, RouteNames.MHR_REVIEW_CONFIRM)
   })
   afterEach(() => {
     wrapper.destroy()
@@ -513,5 +492,37 @@ describe('Mhr Manufacturer Registration step 2 - Review and Confirm', () => {
     await wrapper.find(saveResumeBtn).trigger('click')
     await nextTick()
     expect(wrapper.vm.$router.currentRoute.name).toBe(RouteNames.DASHBOARD)
+  })
+})
+
+describe('Mhr User Access', () => {
+  let wrapper: Wrapper<any>
+  const currentStepName = RouteNames.QS_ACCESS_TYPE
+
+  beforeEach(async () => {
+    const localVue = createLocalVue()
+    localVue.use(VueRouter)
+    wrapper = createComponent(currentStepName, MhrUserAccessButtonFooterConfig, RouteNames.QS_ACCESS_TYPE)
+    await store.setMhrSubProduct(null)
+  })
+  afterEach(() => {
+    wrapper.destroy()
+  })
+
+  it('renders with correct footer configs', async () => {
+    expect(wrapper.vm.currentStepName).toBe(RouteNames.QS_ACCESS_TYPE)
+    expect(wrapper.findComponent(ButtonFooter).exists()).toBe(true)
+    expect(wrapper.find(backBtn).exists()).toBe(false)
+    expect(wrapper.find(nextBtn).exists()).toBe(true)
+    expect(wrapper.find(saveBtn).exists()).toBe(false)
+    expect(wrapper.find(saveResumeBtn).exists()).toBe(false)
+    expect(wrapper.find(cancelBtn).exists()).toBe(true)
+
+    const buttonConfig = wrapper.vm.buttonConfig as ButtonConfigIF
+    expect(buttonConfig.nextRouteName).toBe(RouteNames.QS_ACCESS_INFORMATION)
+    expect(buttonConfig.nextText).toBe('Complete Qualified Supplier Application')
+
+    // Verify nav enabled by default
+    expect(wrapper.vm.$props.disableNav).toBe(false)
   })
 })

@@ -103,7 +103,6 @@ describe('Add Parties new registration component', () => {
     )
     expect(wrapper.findComponent(StickyContainer).vm.$props.setShowButtons).toBe(false)
     expect(wrapper.findComponent(ButtonFooter).exists()).toBe(true)
-    expect(wrapper.findComponent(ButtonFooter).vm.$props.currentStatementType).toBe(StatementTypes.FINANCING_STATEMENT)
     expect(wrapper.findComponent(ButtonFooter).vm.$props.currentStepName).toBe(
       RouteNames.ADD_SECUREDPARTIES_AND_DEBTORS
     )

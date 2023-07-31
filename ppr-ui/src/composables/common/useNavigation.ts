@@ -6,16 +6,27 @@ export const useNavigation = () => {
   const route: Route = useRoute()
   const router: Router = useRouter()
 
+  /**
+   * Simple Navigation helper
+   * @routeName The specified route name to navigate too.
+   */
+  const goToRoute = async (routeName: RouteNames): Promise<void> => {
+    await router.push({ name: routeName })
+  }
+
+  /** Navigate to home Dashboard **/
+  const goToDash = async (): Promise<void> => {
+    await router.push({ name: RouteNames.DASHBOARD })
+  }
+
   /** Helper to check is the current route matches */
   const isRouteName = (routeName: RouteNames): boolean => {
     return route.name === routeName
   }
 
-  /** Navigate to home Dashboard **/
-  const goToDash = (): void => {
-    router.push({
-      name: RouteNames.DASHBOARD
-    })
+  /** Helper to check if the specified routes contain the current route */
+  const containsCurrentRoute = (routeNames: Array<RouteNames>): boolean => {
+    return routeNames.includes(route.name as RouteNames)
   }
 
   /**
@@ -45,8 +56,10 @@ export const useNavigation = () => {
   }
 
   return {
+    goToRoute,
     goToDash,
+    navigateTo,
     isRouteName,
-    navigateTo
+    containsCurrentRoute
   }
 }

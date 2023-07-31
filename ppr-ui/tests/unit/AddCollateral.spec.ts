@@ -105,7 +105,6 @@ describe('Add Collateral new registration component', () => {
     )
     expect(wrapper.findComponent(StickyContainer).vm.$props.setShowButtons).toBe(false)
     expect(wrapper.findComponent(ButtonFooter).exists()).toBe(true)
-    expect(wrapper.findComponent(ButtonFooter).vm.$props.currentStatementType).toBe(StatementTypes.FINANCING_STATEMENT)
     expect(wrapper.findComponent(ButtonFooter).vm.$props.currentStepName).toBe(RouteNames.ADD_COLLATERAL)
     expect(wrapper.findComponent(Collateral).exists()).toBe(true)
     expect(wrapper.find(header).exists()).toBe(true)

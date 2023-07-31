@@ -54,7 +54,6 @@
       <v-col cols="12">
         <ButtonFooter
           :navConfig="getFooterButtonConfig"
-          :currentStatementType="statementType"
           :currentStepName="stepName"
           @error="emitError($event)"
         />
@@ -66,7 +65,7 @@
 <script lang="ts">
 import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue-demi'
 import { useStore } from '@/store/store'
-import { APIRegistrationTypes, RegistrationFlowType, RouteNames, StatementTypes } from '@/enums'
+import { APIRegistrationTypes, RegistrationFlowType, RouteNames } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { Stepper, StickyContainer } from '@/components/common'
 import ButtonFooter from '@/components/common/ButtonFooter.vue'
@@ -112,7 +111,6 @@ export default defineComponent({
     const localState = reactive({
       dataLoaded: false,
       feeType: FeeSummaryTypes.NEW,
-      statementType: StatementTypes.FINANCING_STATEMENT,
       stepName: RouteNames.ADD_SECUREDPARTIES_AND_DEBTORS,
       registrationLength: computed((): RegistrationLengthI => {
         return {

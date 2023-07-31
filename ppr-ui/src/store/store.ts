@@ -48,7 +48,7 @@ import {
   AccountTypes,
   APIRegistrationTypes,
   AuthRoles,
-  MhApiStatusTypes,
+  MhApiStatusTypes, MhrSubTypes,
   ProductCode,
   RegistrationFlowType,
   RouteNames,
@@ -694,6 +694,10 @@ export const useStore = defineStore('assetsStore', () => {
   const getMhrTransferAffidavitCompleted = computed(() => {
     return state.value.mhrTransfer.isAffidavitTransferCompleted
   })
+  // User Access Flow
+  const getMhrSubProduct = computed((): MhrSubTypes => {
+    return state.value.mhrUserAccess.mrhSubProduct
+  })
 
   /** Actions **/
   function resetNewRegistration () {
@@ -1098,6 +1102,11 @@ export const useStore = defineStore('assetsStore', () => {
     set(state.value.mhrUnitNote.note, storeAction.key, storeAction.value)
   }
 
+  // User Access Flow
+  function setMhrSubProduct (subProduct: MhrSubTypes) {
+    state.value.mhrUserAccess.mrhSubProduct = subProduct
+  }
+
   return {
     // Temp feature flag getters
     isTiptapEnabled,
@@ -1265,6 +1274,9 @@ export const useStore = defineStore('assetsStore', () => {
     getMhrUnitNoteType, // doc type of the Unit Note to register
     getMhrUnitNoteValidation,
 
+    // MHR User Access
+    getMhrSubProduct,
+
     // ACTIONS
 
     // Registration
@@ -1366,7 +1378,10 @@ export const useStore = defineStore('assetsStore', () => {
     setMhrUnitNoteType,
     setEmptyUnitNoteRegistration,
     setMhrUnitNoteRegistration,
-    setMhrUnitNote
+    setMhrUnitNote,
+
+    // MHR User Access
+    setMhrSubProduct
 
   }
 })

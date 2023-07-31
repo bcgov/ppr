@@ -85,7 +85,7 @@ import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
 import { useStore } from '@/store/store'
 import _ from 'lodash'
 import { saveFinancingStatement, saveFinancingStatementDraft } from '@/utils'
-import { RouteNames, StatementTypes } from '@/enums'
+import { RouteNames } from '@/enums'
 import { BaseDialog } from '@/components/dialogs'
 import StaffPaymentDialog from '@/components/dialogs/StaffPaymentDialog.vue'
 import {
@@ -95,22 +95,21 @@ import {
 import { unsavedChangesDialog } from '@/resources/dialogOptions'
 import { useNavigation, useNewMhrRegistration } from '@/composables'
 import { storeToRefs } from 'pinia'
-import { useRouter } from 'vue2-helpers/vue-router'
 
 export default defineComponent({
   components: {
     BaseDialog,
     StaffPaymentDialog
   },
-  emits: ['cancelProceed', 'error', 'registration-incomplete', 'submit'],
+  emits: ['cancelProceed', 'error', 'registration-incomplete', 'submit', 'navigationDisabled'],
   props: {
     navConfig: {
       type: Array as () => Array<ButtonConfigIF>,
       default: null
     },
-    currentStatementType: {
-      type: String,
-      default: 'financing'
+    disableNav: {
+      type: Boolean,
+      default: false
     },
     currentStepName: {
       type: String,
@@ -130,8 +129,7 @@ export default defineComponent({
     }
   },
   setup (props, { emit }) {
-    const router = useRouter()
-    const { goToDash } = useNavigation()
+    const { goToDash, goToRoute } = useNavigation()
     const {
       // Actions
       resetNewRegistration,
@@ -177,16 +175,12 @@ export default defineComponent({
         return isRoleStaffSbc.value
       }),
       buttonConfig: computed((): ButtonConfigIF => {
-        if (props.currentStatementType.toUpperCase() === StatementTypes.FINANCING_STATEMENT) {
-          for (const i in props.navConfig) {
-            if (props.navConfig[i].stepName === props.currentStepName) {
-              return props.navConfig[i]
-            }
+        for (const i in props.navConfig) {
+          if (props.navConfig[i].stepName === props.currentStepName) {
+            return props.navConfig[i]
           }
         }
-        return null
-      }
-      )
+      })
     })
     const cancel = () => {
       if (hasUnsavedChanges.value === true) localState.showCancelDialog = true
@@ -242,19 +236,19 @@ export default defineComponent({
         goToDashboard()
       }
     }
-    const submitBack = () => {
-      router.push({
-        name: localState.buttonConfig.backRouteName
-      })
+    const submitBack = async () => {
+      await goToRoute(localState.buttonConfig.backRouteName as RouteNames)
     }
-    const submitNext = () => {
+    const submitNext = async () => {
+      // Handle disabled navigation
+      if (props.disableNav) {
+        emit('navigationDisabled', props.disableNav)
+        return
+      }
+
       // Undetected Duplicate Secured Party API check to be implemented here.
       // Use secured party dialog with isDuplicate and isReview props to display error if found.
-      if (
-        props.currentStatementType.toUpperCase() ===
-          StatementTypes.FINANCING_STATEMENT &&
-        [RouteNames.REVIEW_CONFIRM, RouteNames.MHR_REVIEW_CONFIRM].includes(props.currentStepName as RouteNames)
-      ) {
+      if ([RouteNames.REVIEW_CONFIRM, RouteNames.MHR_REVIEW_CONFIRM].includes(props.currentStepName as RouteNames)) {
         // -- Intersect here for Submitting MHR Registration --
         if (props.currentStepName === RouteNames.MHR_REVIEW_CONFIRM) {
           emit('submit')
@@ -276,10 +270,7 @@ export default defineComponent({
           emit('registration-incomplete', error)
         }
       } else {
-        // eslint-disable-next-line vue/no-mutating-props
-        router.push({
-          name: localState.buttonConfig.nextRouteName
-        })
+        await goToRoute(localState.buttonConfig.nextRouteName as RouteNames)
       }
     }
 
@@ -316,9 +307,7 @@ export default defineComponent({
             prevDraft: prevDraftId
           }
           setRegTableNewItem(newItem)
-          router.push({
-            name: localState.buttonConfig.nextRouteName
-          })
+          await goToRoute(localState.buttonConfig.nextRouteName as RouteNames)
         }
       } else {
         // emit registation incomplete error

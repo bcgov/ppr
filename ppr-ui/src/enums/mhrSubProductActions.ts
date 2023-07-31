@@ -11,7 +11,7 @@ export enum MhrActions {
     TRANSPORT_PERMITS = 'Transport permits',
     TRANSPORT_PERMITS_NO_CERT = 'Transport permits (where no tax certificate is required)',
     TRANSFER_TRANSACTIONS = 'Transfer transactions',
-    HOME_TRANSFER_TRANSACTIONS = 'Transfer transactions (related to homes manufacturers currently own',
+    HOME_TRANSFER_TRANSACTIONS = 'Transfer transactions (related to homes manufacturers currently own)',
     RESIDENTIAL_EXEMPTIONS = 'Residential exemptions',
     REGISTRATIONS = 'Registrations',
     APPLICATION_REQUIRED = 'Application process required'

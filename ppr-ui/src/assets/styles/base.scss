@@ -396,6 +396,12 @@ span.invalid-color {
   text-decoration: underline;
 }
 
+.dotted-underline {
+  cursor: default;
+  border-bottom: 1px dotted $gray7;
+  text-decoration: none;
+}
+
 .disabled-text {
   opacity: 0.4;
 }
