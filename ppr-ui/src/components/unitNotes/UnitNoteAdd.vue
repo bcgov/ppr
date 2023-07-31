@@ -35,7 +35,7 @@
         :contactInfo="unitNoteGivingNoticeParty"
         :sectionNumber="3"
         :content="{
-          title: `${ isPersonGivingNoticeOptional() ? 'Person Giving Notice (Optional)' : 'Person Giving Notice' }`,
+          title: 'Person Giving Notice',
           description: 'Contact information for the person making the claim will be shown ' +
             'when a search result is produced for this manufactured home.',
           sideLabel: 'Person Giving Notice',

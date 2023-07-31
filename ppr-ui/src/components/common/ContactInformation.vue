@@ -64,7 +64,7 @@
                     id="first-name"
                     class="pt-4 pr-2"
                     :class="{ 'long-error-message': enableCombinedNameValidation }"
-                    label="First Name"
+                    :label="isInfoOptional ? 'First Name (Optional)' : 'First Name'"
                     :error="hasLongCombinedName"
                     :error-messages="longCombinedNameErrorMsg"
                     v-model="contactInfoModel.personName.first"
@@ -88,7 +88,7 @@
                     filled
                     id="last-name"
                     class="pt-4 px-2"
-                    label="Last Name"
+                    :label="isInfoOptional ? 'Last Name (Optional)' : 'Last Name'"
                     :error="hasLongCombinedName"
                     :hide-details="hasLongCombinedName"
                     v-model="contactInfoModel.personName.last"
