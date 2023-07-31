@@ -13,10 +13,14 @@
                 <h1>Manufactured Home Registration</h1>
               </v-col>
             </v-row>
-            <stepper class="mt-4" :showStepErrorsFlag="isValidatingApp && !isValidMhrRegistration"/>
-            <!-- Component Steps -->
+            <Stepper
+              class="mt-4"
+              :stepConfig="getMhrSteps"
+              :showStepErrors="isValidatingApp && !isValidMhrRegistration"
+            />
+           <!-- Component Steps -->
             <component
-              v-for="step in getSteps"
+              v-for="step in getMhrSteps"
               v-show="isRouteName(step.to)"
               :is="step.component"
               :key="step.step"
@@ -40,11 +44,10 @@
     </div>
     <v-row no-gutters class="mt-20">
       <v-col cols="12">
-        <button-footer
+        <ButtonFooter
           isMhr
-          :currentStatementType="statementType"
+          :navConfig="getFooterButtonConfig"
           :currentStepName="$route.name"
-          :router="$router"
           :forceSave="saveDraftExit"
           @error="emitError($event)"
           @submit="submit()"
@@ -57,20 +60,16 @@
 
 <script lang="ts">
 import { computed, defineComponent, nextTick, onMounted, reactive, toRefs } from 'vue-demi'
-import { useRoute, useRouter } from 'vue2-helpers/vue-router'
 import { useStore } from '@/store/store'
-import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
-import { RegistrationFlowType, RouteNames, StatementTypes, UIRegistrationTypes } from '@/enums'
+import { storeToRefs } from 'pinia'
+import { RegistrationFlowType, UIRegistrationTypes } from '@/enums'
 import { getFeatureFlag, getMhrDraft, submitMhrRegistration } from '@/utils'
-import { Stepper, StickyContainer } from '@/components/common'
-import ButtonFooter from '@/components/common/ButtonFooter.vue'
-import { useHomeOwners, useMhrValidations, useNewMhrRegistration } from '@/composables'
+import { ButtonFooter, Stepper, StickyContainer } from '@/components/common'
+import { useAuth, useHomeOwners, useMhrValidations, useNavigation, useNewMhrRegistration } from '@/composables'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 /* eslint-disable no-unused-vars */
 import { ErrorIF, MhrRegistrationIF, RegTableNewItemI, StepIF } from '@/interfaces'
 import { RegistrationLengthI } from '@/composables/fees/interfaces'
-import BaseDialog from '@/components/dialogs/BaseDialog.vue'
-import { storeToRefs } from 'pinia'
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
@@ -78,8 +77,7 @@ export default defineComponent({
   components: {
     ButtonFooter,
     Stepper,
-    StickyContainer,
-    BaseDialog
+    StickyContainer
   },
   props: {
     appReady: {
@@ -96,8 +94,8 @@ export default defineComponent({
     }
   },
   setup (props, context) {
-    const route = useRoute()
-    const router = useRouter()
+    const { isRouteName, goToDash } = useNavigation()
+    const { isAuthenticated } = useAuth()
     const {
       // Actions
       setUnsavedChanges,
@@ -106,7 +104,8 @@ export default defineComponent({
     } = useStore()
     const {
       // Getters
-      getSteps,
+      getMhrSteps,
+      getFooterButtonConfig,
       getMhrDraftNumber,
       getRegistrationType,
       getRegistrationFlowType,
@@ -136,10 +135,6 @@ export default defineComponent({
       dataLoaded: false,
       submitting: false,
       feeType: FeeSummaryTypes.NEW_MHR,
-      statementType: StatementTypes.FINANCING_STATEMENT,
-      isAuthenticated: computed((): boolean => {
-        return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
-      }),
       registrationLength: computed((): RegistrationLengthI => {
         return { lifeInfinite: true, lifeYears: 0 }
       }),
@@ -150,29 +145,18 @@ export default defineComponent({
         return getValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_APP)
       }),
       isValidMhrRegistration: computed((): boolean => {
-        return getSteps.value.every((step: StepIF) => step.valid)
+        return getMhrSteps.value.every((step: StepIF) => step.valid)
       })
     })
-
-    /** Helper to check is the current route matches */
-    const isRouteName = (routeName: RouteNames): boolean => {
-      return (route.name === routeName)
-    }
 
     const emitError = (error: ErrorIF): void => {
       context.emit('error', error)
     }
 
-    const goToDash = (): void => {
-      router.push({
-        name: RouteNames.DASHBOARD
-      })
-    }
-
     onMounted(async (): Promise<void> => {
       // do not proceed if app is not ready
       // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
-      if (!props.appReady || !localState.isAuthenticated ||
+      if (!props.appReady || !isAuthenticated.value ||
         (!props.isJestRunning && !getFeatureFlag('mhr-registration-enabled'))) {
         goToDash()
         return
@@ -229,23 +213,24 @@ export default defineComponent({
           }
           setRegTableNewItem(newRegItem)
           setUnsavedChanges(false)
-          await router.push({ name: RouteNames.DASHBOARD })
+          goToDash()
         } else {
           emitError(mhrSubmission?.error)
         }
       } else {
-        let stepsValidation = getSteps.value.map((step : StepIF) => step.valid)
+        let stepsValidation = getMhrSteps.value.map((step : StepIF) => step.valid)
         stepsValidation.pop() // Removes review confirm step from stepsValidation
         scrollToInvalidReviewConfirm(stepsValidation)
       }
     }
 
     return {
-      getSteps,
+      getMhrSteps,
       emitError,
       isRouteName,
       submit,
       resetAllValidations,
+      getFooterButtonConfig,
       ...toRefs(localState)
     }
   }

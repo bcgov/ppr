@@ -100,7 +100,6 @@ import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'v
 import { useRoute, useRouter } from 'vue2-helpers/vue-router'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
-import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import {
   CautionBox,
   DischargeConfirmSummary,
@@ -124,6 +123,7 @@ import {
   DialogOptionsIF,
   RegTableNewItemI
 } from '@/interfaces'
+import { useAuth, useNavigation } from '@/composables'
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
@@ -151,6 +151,8 @@ export default defineComponent({
   setup (props, context) {
     const route = useRoute()
     const router = useRouter()
+    const { goToDash } = useNavigation()
+    const { isAuthenticated } = useAuth()
     const {
       // Actions
       setRegTableNewItem,
@@ -190,9 +192,6 @@ export default defineComponent({
       validConfirm: false,
       validFolio: true,
       validCertify: false,
-      isAuthenticated: computed((): boolean => {
-        return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
-      }),
       registrationNumber: computed((): string => {
         return (route.query['reg-num'] as string) || ''
       }),
@@ -221,9 +220,7 @@ export default defineComponent({
         } else {
           console.error('No debtor name confirmed for discharge. Redirecting to dashboard...')
         }
-        router.push({
-          name: RouteNames.DASHBOARD
-        })
+        goToDash()
         return
       }
       localState.financingStatementDate = new Date()
@@ -278,10 +275,8 @@ export default defineComponent({
       // do not proceed if app is not ready
       if (!val) return
       // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
-      if (!localState.isAuthenticated || (!props.isJestRunning && !getFeatureFlag('ppr-ui-enabled'))) {
-        router.push({
-          name: RouteNames.DASHBOARD
-        })
+      if (!isAuthenticated.value || (!props.isJestRunning && !getFeatureFlag('ppr-ui-enabled'))) {
+        goToDash()
         return
       }
 
@@ -299,7 +294,7 @@ export default defineComponent({
       localState.showCancelDialog = false
       if (!val) {
         setRegistrationNumber(null)
-        router.push({ name: RouteNames.DASHBOARD })
+        goToDash()
       }
     }
 
@@ -346,9 +341,7 @@ export default defineComponent({
     }
 
     const goToDashboard = (): void => {
-      router.push({
-        name: RouteNames.DASHBOARD
-      })
+      goToDash()
       emitHaveData(false)
     }
 

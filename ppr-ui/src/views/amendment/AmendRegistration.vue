@@ -138,7 +138,6 @@ import { useRoute, useRouter } from 'vue2-helpers/vue-router'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { cloneDeep, isEqual } from 'lodash'
-import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { CautionBox, StickyContainer, CourtOrder } from '@/components/common'
 import { BaseDialog } from '@/components/dialogs'
 import { Debtors } from '@/components/parties/debtor'
@@ -181,6 +180,7 @@ import {
   RegTableNewItemI
 } from '@/interfaces'
 import { useSecuredParty } from '@/composables/parties'
+import { useAuth, useNavigation } from '@/composables'
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
@@ -214,6 +214,8 @@ export default defineComponent({
   setup (props, context) {
     const route = useRoute()
     const router = useRouter()
+    const { goToDash } = useNavigation()
+    const { isAuthenticated } = useAuth()
     const {
       // Actions
       setAddCollateral,
@@ -287,9 +289,6 @@ export default defineComponent({
         }
         return `${pacificDate(new Date())}`
       }),
-      isAuthenticated: computed((): boolean => {
-        return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
-      }),
       registrationNumber: computed((): string => {
         let regNum = route.query['reg-num'] as string
         if (regNum && regNum.endsWith('-confirm')) {
@@ -344,9 +343,7 @@ export default defineComponent({
         } else {
           console.error('No debtor name confirmed for this amendment. Redirecting to dashboard...')
         }
-        router.push({
-          name: RouteNames.DASHBOARD
-        })
+        goToDash()
         return
       }
       // Conditionally load: could be coming back from confirm.
@@ -441,7 +438,7 @@ export default defineComponent({
           await setupAmendmentStatementFromDraft(getStateModel.value, localState.documentId)
         if (stateModel.registration.draft.error) {
           emitError(stateModel.registration.draft.error)
-          router.push({ name: RouteNames.DASHBOARD })
+          goToDash()
         } else {
           setAddCollateral(stateModel.registration.collateral)
           setLengthTrust(stateModel.registration.lengthTrust)
@@ -462,10 +459,8 @@ export default defineComponent({
       if (!val) return
 
       // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
-      if (!localState.isAuthenticated || (!props.isJestRunning && !getFeatureFlag('ppr-ui-enabled'))) {
-        router.push({
-          name: RouteNames.DASHBOARD
-        })
+      if (!isAuthenticated.value || (!props.isJestRunning && !getFeatureFlag('ppr-ui-enabled'))) {
+        goToDash()
         return
       }
 
@@ -601,7 +596,7 @@ export default defineComponent({
     const goToDashboard = (): void => {
       // unset registration number
       setRegistrationNumber(null)
-      router.push({ name: RouteNames.DASHBOARD })
+      goToDash()
     }
 
     const setCourtOrderValid = (valid): void => {
@@ -688,9 +683,7 @@ export default defineComponent({
           prevDraft: prevDraftId
         }
         setRegTableNewItem(newItem)
-        router.push({
-          name: RouteNames.DASHBOARD
-        })
+        goToDash()
         emitHaveData(false)
       }
     }

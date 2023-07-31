@@ -27,5 +27,8 @@ export enum RouteNames {
   SIGN_OUT = 'signout',
   YOUR_HOME = 'your-home',
   MHR_INFORMATION = 'mhr-information',
-  MHR_INFORMATION_NOTE = 'mhr-information-note'
+  MHR_INFORMATION_NOTE = 'mhr-information-note',
+  QS_ACCESS_TYPE = 'qs-access-type',
+  QS_ACCESS_INFORMATION = 'qs-access-information',
+  QS_ACCESS_REVIEW_CONFIRM = 'qs-access-review-confirm'
 }

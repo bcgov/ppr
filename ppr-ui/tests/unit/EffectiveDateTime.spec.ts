@@ -22,7 +22,7 @@ describe('EffectiveDateTime', () => {
   let wrapper: Wrapper<any>
 
   beforeEach(async () => {
-    wrapper = createComponent(EffectiveDateTime, props)
+    wrapper = await createComponent(EffectiveDateTime, props)
   })
 
   afterEach(() => {

@@ -13,7 +13,11 @@
                 <h1>{{ registrationTypeUI }}</h1>
               </v-col>
             </v-row>
-            <stepper class="mt-4" />
+            <Stepper
+              class="mt-4"
+              :stepConfig="getPprSteps"
+              :showStepErrors="showStepErrors"
+            />
             <v-row no-gutters class="pt-10">
               <v-col cols="auto" class="sub-header">
                 Add Secured Parties and Debtors
@@ -48,10 +52,10 @@
     </div>
     <v-row no-gutters class="pt-10">
       <v-col cols="12">
-        <button-footer
+        <ButtonFooter
+          :navConfig="getFooterButtonConfig"
           :currentStatementType="statementType"
           :currentStepName="stepName"
-          :router="this.$router"
           @error="emitError($event)"
         />
       </v-col>
@@ -61,9 +65,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue-demi'
-import { useRouter } from 'vue2-helpers/vue-router'
 import { useStore } from '@/store/store'
-import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { APIRegistrationTypes, RegistrationFlowType, RouteNames, StatementTypes } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { Stepper, StickyContainer } from '@/components/common'
@@ -72,7 +74,8 @@ import { Parties } from '@/components/parties'
 import { getFeatureFlag } from '@/utils'
 import { ErrorIF } from '@/interfaces' // eslint-disable-line
 import { RegistrationLengthI } from '@/composables/fees/interfaces'
-import { storeToRefs } from 'pinia' // eslint-disable-line no-unused-vars
+import { storeToRefs } from 'pinia'
+import { useAuth, useNavigation } from '@/composables' // eslint-disable-line no-unused-vars
 
 export default defineComponent({
   name: 'AddParties',
@@ -94,12 +97,16 @@ export default defineComponent({
     }
   },
   setup (props, context) {
-    const router = useRouter()
+    const { goToDash } = useNavigation()
+    const { isAuthenticated } = useAuth()
     const {
+      getPprSteps,
+      showStepErrors,
       getLengthTrust,
       getRegistrationType,
       getRegistrationOther,
-      getRegistrationFlowType
+      getRegistrationFlowType,
+      getFooterButtonConfig
     } = storeToRefs(useStore())
 
     const localState = reactive({
@@ -107,9 +114,6 @@ export default defineComponent({
       feeType: FeeSummaryTypes.NEW,
       statementType: StatementTypes.FINANCING_STATEMENT,
       stepName: RouteNames.ADD_SECUREDPARTIES_AND_DEBTORS,
-      isAuthenticated: computed((): boolean => {
-        return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
-      }),
       registrationLength: computed((): RegistrationLengthI => {
         return {
           lifeInfinite: getLengthTrust.value?.lifeInfinite || false,
@@ -133,18 +137,14 @@ export default defineComponent({
       // do not proceed if app is not ready
       if (!val) return
       // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
-      if (!localState.isAuthenticated || (!props.isJestRunning && !getFeatureFlag('ppr-ui-enabled'))) {
-        router.push({
-          name: RouteNames.DASHBOARD
-        })
+      if (!isAuthenticated.value || (!props.isJestRunning && !getFeatureFlag('ppr-ui-enabled'))) {
+        goToDash()
         return
       }
 
       // redirect if store doesn't contain all needed data (happens on page reload, etc.)
       if (!getRegistrationType.value || getRegistrationFlowType.value !== RegistrationFlowType.NEW) {
-        router.push({
-          name: RouteNames.DASHBOARD
-        })
+        goToDash()
         return
       }
 
@@ -170,6 +170,9 @@ export default defineComponent({
 
     return {
       emitError,
+      getPprSteps,
+      showStepErrors,
+      getFooterButtonConfig,
       ...toRefs(localState)
     }
   }

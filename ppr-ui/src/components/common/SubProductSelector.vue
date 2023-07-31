@@ -1,51 +1,64 @@
 <template>
-  <v-form
-    id="sub-product-selector"
-    class="pl-1 pr-3"
-    ref="productSelectorFormRef"
-  >
-    <p>Select the access type you want (Required):</p>
-    <v-radio-group
-      hide-details
-      v-model="selectedProduct"
-      class="sub-product-radio-group"
-    >
-      <div
-        v-for="subProduct in subProductConfig"
-        :key="subProduct.type"
-        class="sub-product-radio-wrapper ml-n9"
-        :class="{'selected' : selectedProduct === subProduct.type }"
-      >
-        <v-divider />
-        <v-radio
-          class="sub-product-radio-btn mt-6 ml-9"
-          :value="subProduct.type"
+  <v-card flat class="px-8 py-8">
+    <v-row no-gutters>
+      <v-col cols="2">
+        <label
+          class="generic-label"
+          for="sub-product-selector"
+          :class="{ 'error-text': false }"
         >
-          <template v-slot:label>
-            <v-row no-gutters>
-              <v-col cols="12">
-                <v-label>{{ subProduct.label }}</v-label>
-              </v-col>
-              <v-col class="mt-1">
-                <p>
-                  <ul>
-                    <li v-for="(bullet, index) in subProduct.productBullets" :key="index" class="bullet mt-2 ml-n1">
-                      <span :class="{ 'font-weight-bold': isImportantBullet(subProduct, index) }">
-                        {{ bullet }}
-                      </span>
-                    </li>
-                  </ul>
-                </p>
-                <p v-if="subProduct.note" class="sub-product-note my-6 pr-3">
-                  <strong>Note:</strong> <span v-html="subProduct.note"></span>
-                </p>
-              </v-col>
-            </v-row>
-          </template>
-        </v-radio>
-      </div>
-    </v-radio-group>
-  </v-form>
+          Select Access Type
+        </label>
+      </v-col>
+      <v-col class="ml-8">
+        <!-- Access Type Form -->
+        <v-form
+          id="sub-product-selector"
+          ref="productSelectorFormRef"
+        >
+          <v-radio-group
+            hide-details
+            v-model="selectedProduct"
+            class="sub-product-radio-group pt-0 mt-0"
+          >
+            <div
+              v-for="(subProduct, index) in subProductConfig"
+              :key="subProduct.type"
+              class="sub-product-radio-wrapper"
+            >
+              <v-radio
+                class="sub-product-radio-btn"
+                :value="subProduct.type"
+              >
+                <template v-slot:label>
+                  <v-row no-gutters>
+                    <v-col cols="12">
+                      <label class="sub-product-label">{{ subProduct.label }}</label>
+                    </v-col>
+                    <v-col class="mt-1">
+                      <p>
+                        <ul class="ml-n1">
+                          <li v-for="(bullet, index) in subProduct.productBullets" :key="index" class="bullet mt-2">
+                            <span :class="{ 'font-weight-bold': isImportantBullet(subProduct, index) }">
+                              {{ bullet }}
+                            </span>
+                          </li>
+                        </ul>
+                      </p>
+                      <p v-if="subProduct.note" class="sub-product-note pr-3">
+                        <strong>Note:</strong> <span v-html="subProduct.note"></span>
+                      </p>
+                    </v-col>
+                  </v-row>
+                </template>
+              </v-radio>
+              <v-divider v-if="index !== subProductConfig.length - 1" class="ml-n1 mb-6" />
+            </div>
+          </v-radio-group>
+        </v-form>
+      </v-col>
+    </v-row>
+  </v-card>
 </template>
 
 <script lang="ts">
@@ -87,14 +100,13 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+.sub-product-label {
+  cursor: pointer;
+}
 .sub-product-note {
   font-size: 14px;
   line-height: 22px;
   cursor: default;
-}
-
-.selected {
-  background-color: $blueSelected;
 }
 
 ::v-deep {

@@ -37,7 +37,7 @@ describe('Secured Party SA tests', () => {
 
   beforeEach(async () => {
     await store.setRegistrationType(mockedSelectSecurityAgreement())
-    wrapper = createComponent(SecuredParties, {})
+    wrapper = await createComponent(SecuredParties, {})
   })
   afterEach(() => {
     wrapper.destroy()
@@ -58,7 +58,7 @@ describe('Secured Party store tests', () => {
     await store.setAddSecuredPartiesAndDebtors({
       securedParties: mockedSecuredParties1
     })
-    wrapper = createComponent(SecuredParties, {})
+    wrapper = await createComponent(SecuredParties, {})
   })
   afterEach(() => {
     wrapper.destroy()
@@ -106,7 +106,7 @@ describe('Secured Party Other registration type tests', () => {
       registeringParty: mockedRegisteringParty1,
       securedParties: mockedSecuredParties2
     })
-    wrapper = createComponent(SecuredParties, {})
+    wrapper = await createComponent(SecuredParties, {})
   })
   afterEach(() => {
     sandbox.restore()
@@ -203,7 +203,7 @@ describe('Secured party amendment tests', () => {
     })
     await store.setRegistrationType(mockedSelectSecurityAgreement())
     await store.setRegistrationFlowType(RegistrationFlowType.AMENDMENT)
-    wrapper = createComponent(SecuredParties, {})
+    wrapper = await createComponent(SecuredParties, {})
   })
   afterEach(() => {
     wrapper.destroy()
@@ -305,7 +305,7 @@ describe('Secured party with code test', () => {
       securedParties: mockedSecuredParties3
     })
     await store.setRegistrationType(mockedSelectSecurityAgreement())
-    wrapper = createComponent(SecuredParties, {})
+    wrapper = await createComponent(SecuredParties, {})
   })
   afterEach(() => {
     wrapper.destroy()
@@ -330,7 +330,7 @@ describe('Restricted secured party test', () => {
     })
 
     await store.setRegistrationType(mockedLienUnpaid())
-    wrapper = createComponent(SecuredParties, {})
+    wrapper = await createComponent(SecuredParties, {})
   })
 
   afterEach(() => {

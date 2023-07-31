@@ -54,7 +54,8 @@ import {
   tombstoneBreadcrumbSearchConfirm,
   breadcrumbsTitles,
   tombstoneBreadcrumbMhrInformation,
-  tombstoneBreadcrumbMhrUnitNote
+  tombstoneBreadcrumbMhrUnitNote,
+  tombstoneBreadcrumbQsApplication
 } from '@/resources'
 import { RouteNames } from '@/enums'
 import { getRoleProductCode } from '@/utils'
@@ -116,6 +117,10 @@ export default defineComponent({
           tombstoneBreadcrumbSearchConfirm[1].text = roleBasedBreadcrumbTitle ||
             tombstoneBreadcrumbSearchConfirm[1].text
           return tombstoneBreadcrumbSearchConfirm
+        } else if (route.path?.includes('user-access')) {
+          tombstoneBreadcrumbQsApplication[1].text = roleBasedBreadcrumbTitle ||
+            tombstoneBreadcrumbQsApplication[1].text
+          return tombstoneBreadcrumbQsApplication
         } else if (route.path?.includes('discharge')) {
           const dischargeBreadcrumb = [...tombstoneBreadcrumbDischarge]
           dischargeBreadcrumb[1].text = roleBasedBreadcrumbTitle

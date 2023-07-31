@@ -19,7 +19,8 @@ import {
   AmendRegistration,
   ConfirmAmendment,
   Login,
-  MhrUnitNote
+  MhrUnitNote,
+  UserAccess
 } from '@/views'
 import { RouteNames } from '@/enums'
 
@@ -238,6 +239,34 @@ export const routes = [
     name: RouteNames.MHR_INFORMATION_NOTE,
     component: MhrUnitNote,
     meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/user-access/qs-access-type',
+    name: RouteNames.QS_ACCESS_TYPE,
+    component: UserAccess,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/user-access/qs-access-information',
+    name: RouteNames.QS_ACCESS_INFORMATION,
+    component: UserAccess,
+    meta: {
+      step: 1,
+      label: 'Qualified Supplier Information',
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/user-access/qs-access-review-confirm',
+    name: RouteNames.QS_ACCESS_REVIEW_CONFIRM,
+    component: UserAccess,
+    meta: {
+      step: 2,
+      label: 'Review and Confirm',
       requiresAuth: true
     }
   },

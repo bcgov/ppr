@@ -82,7 +82,6 @@ import {
   getProductSubscription,
   getPPRUserSettings,
   getSbcFromAuth,
-  navigate,
   updateLdUser,
   fetchAccountProducts,
   axios,
@@ -98,6 +97,7 @@ import {
   AccountProductSubscriptionIF, DialogOptionsIF, // eslint-disable-line
   ErrorIF, RegistrationTypeIF, UserInfoIF, UserSettingsIF // eslint-disable-line
 } from '@/interfaces'
+import { useAuth, useNavigation } from '@/composables'
 
 export default defineComponent({
   name: 'App',
@@ -113,6 +113,8 @@ export default defineComponent({
   setup () {
     const route = useRoute()
     const router = useRouter()
+    const { goToDash, navigateTo } = useNavigation()
+    const { isAuthenticated } = useAuth()
     const {
       // Actions
       setRoleSbc,
@@ -169,9 +171,6 @@ export default defineComponent({
       }),
       isJestRunning: computed((): boolean => {
         return (process.env.JEST_WORKER_ID !== undefined)
-      }),
-      isAuthenticated: computed((): boolean => {
-        return Boolean(sessionStorage.getItem(SessionStorageKeys.KeyCloakToken))
       }),
       aboutText: computed((): string => {
         return process.env.ABOUT_TEXT
@@ -241,7 +240,7 @@ export default defineComponent({
 
         // When we are authenticated, allow time for session storage propagation from auth, then initialize application
         // (since we won't get the event from Signin component)
-        if (localState.isAuthenticated) {
+        if (isAuthenticated.value) {
           setTimeout(() => { onProfileReady(true) }, localState.isJestRunning ? 0 : 1000)
         }
       }
@@ -255,7 +254,7 @@ export default defineComponent({
           localState.saveDraftExitToggle = !localState.saveDraftExitToggle
         } else {
           setRegistrationNumber(null)
-          router.push({ name: RouteNames.DASHBOARD })
+          goToDash()
         }
       }
     }
@@ -538,7 +537,7 @@ export default defineComponent({
         case ErrorCategories.REGISTRATION_LOAD:
           localState.errorOptions = registrationLoadError
           localState.errorDisplay = true
-          router.push({ name: RouteNames.DASHBOARD })
+          goToDash()
           break
         case ErrorCategories.REGISTRATION_SAVE:
           localState.errorOptions = registrationSaveDraftError
@@ -678,7 +677,7 @@ export default defineComponent({
       if (localState.errorOptions === loginError || localState.errorOptions === authPprError ||
         localState.errorOptions === authAssetsError
       ) {
-        navigate(localState.registryUrl)
+        navigateTo(localState.registryUrl)
       }
       // for now just refresh app
       if (!proceed) initApp()

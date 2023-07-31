@@ -2,15 +2,14 @@
 import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
 import VueRouter from 'vue-router' // eslint-disable-line no-unused-vars
-import { mount, createLocalVue, shallowMount, Wrapper } from '@vue/test-utils'
+import { createLocalVue, mount, shallowMount, Wrapper } from '@vue/test-utils'
 import flushPromises from 'flush-promises'
 import sinon from 'sinon'
 
 // Components
 import { ButtonFooter } from '@/components/common'
 import { StaffPaymentDialog } from '@/components/dialogs'
-import { LengthTrust, AddSecuredPartiesAndDebtors, AddCollateral, ReviewConfirm } from '@/views/newRegistration'
-import { YourHome, MhrReviewConfirm } from '@/views/newMhrRegistration'
+import { AddCollateral, AddSecuredPartiesAndDebtors, LengthTrust, ReviewConfirm } from '@/views/newRegistration'
 import { getLastEvent } from './utils'
 
 // Other
@@ -22,14 +21,18 @@ import { createPinia, setActivePinia } from 'pinia'
 import { useStore } from '../../src/store/store'
 import { ButtonConfigIF } from '@/interfaces'
 import { MhrRegistrationType } from '@/resources'
+import {
+  MHRManufacturerButtonFooterConfig,
+  RegistrationButtonFooterConfig
+} from '@/resources/buttonFooterConfig'
+import { createRouter } from 'vue2-helpers/vue-router'
+import { routes } from '@/router'
 
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
 setActivePinia(createPinia())
 const store = useStore()
-// Events
-
 // Input field selectors / buttons
 const cancelBtn: string = '#reg-cancel-btn'
 const saveBtn: string = '#reg-save-btn'
@@ -37,7 +40,6 @@ const saveResumeBtn: string = '#reg-save-resume-btn'
 const backBtn: string = '#reg-back-btn'
 const nextBtn: string = '#reg-next-btn'
 
-const router = mockRouter.mock()
 /**
  * Creates and mounts a component, so that it can be tested.
  *
@@ -45,15 +47,23 @@ const router = mockRouter.mock()
  */
 function createComponent (
   currentStatementType: String,
-  currentStepName: String
+  currentStepName: String,
+  navConfig: Array<ButtonConfigIF>,
+  routeName: RouteNames
 ): Wrapper<any> {
   const localVue = createLocalVue()
   localVue.use(Vuetify)
+  localVue.use(VueRouter)
+  const router = mockRouter.mock()
+
+  router.push({
+    name: routeName
+  })
 
   document.body.setAttribute('data-app', 'true')
   return mount((ButtonFooter as any), {
     localVue,
-    propsData: { currentStatementType, router, currentStepName },
+    propsData: { currentStatementType, currentStepName, navConfig },
     store,
     router,
     vuetify
@@ -68,9 +78,10 @@ describe('New Financing Statement Registration Buttons Step 1', () => {
 
   beforeEach(async () => {
     const localVue = createLocalVue()
-    localVue.use(VueRouter)
-    wrapper2 = shallowMount((LengthTrust as any), { localVue, store, router, vuetify })
-    wrapper = createComponent(currentStatementType, currentStepName)
+    wrapper2 = shallowMount((LengthTrust as any), { localVue, store, vuetify })
+    wrapper = createComponent(
+      currentStatementType, currentStepName, RegistrationButtonFooterConfig, RouteNames.LENGTH_TRUST
+    )
   })
   afterEach(() => {
     wrapper.destroy()
@@ -83,7 +94,7 @@ describe('New Financing Statement Registration Buttons Step 1', () => {
     expect(wrapper.find(saveResumeBtn).exists()).toBe(true)
     expect(wrapper.find(backBtn).exists()).toBe(false)
     expect(wrapper.find(nextBtn).exists()).toBe(true)
-    expect(wrapper.vm.statementType).toBe(StatementTypes.FINANCING_STATEMENT)
+    expect(wrapper.vm.currentStatementType).toBe(StatementTypes.FINANCING_STATEMENT)
     expect(wrapper.props().currentStepName).toBe(RouteNames.LENGTH_TRUST)
     expect(wrapper.vm.buttonConfig.showCancel).toBe(true)
     expect(wrapper.vm.buttonConfig.showSave).toBe(true)
@@ -121,8 +132,10 @@ describe('New Financing Statement Registration Buttons Step 2', () => {
   beforeEach(async () => {
     const localVue = createLocalVue()
     localVue.use(VueRouter)
-    wrapper2 = shallowMount((AddSecuredPartiesAndDebtors as any), { localVue, store, router, vuetify })
-    wrapper = createComponent(currentStatementType, currentStepName)
+    wrapper2 = shallowMount((AddSecuredPartiesAndDebtors as any), { localVue, store, vuetify })
+    wrapper = createComponent(
+      currentStatementType, currentStepName, RegistrationButtonFooterConfig, RouteNames.ADD_SECUREDPARTIES_AND_DEBTORS
+    )
   })
   afterEach(() => {
     wrapper.destroy()
@@ -135,7 +148,7 @@ describe('New Financing Statement Registration Buttons Step 2', () => {
     expect(wrapper.find(saveResumeBtn).exists()).toBe(true)
     expect(wrapper.find(backBtn).exists()).toBe(true)
     expect(wrapper.find(nextBtn).exists()).toBe(true)
-    expect(wrapper.vm.statementType).toBe(StatementTypes.FINANCING_STATEMENT)
+    expect(wrapper.vm.currentStatementType).toBe(StatementTypes.FINANCING_STATEMENT)
     expect(wrapper.props().currentStepName).toBe(RouteNames.ADD_SECUREDPARTIES_AND_DEBTORS)
     expect(wrapper.vm.buttonConfig.showCancel).toBe(true)
     expect(wrapper.vm.buttonConfig.showSave).toBe(true)
@@ -184,8 +197,10 @@ describe('New Financing Statement Registration Buttons Step 3', () => {
   beforeEach(async () => {
     const localVue = createLocalVue()
     localVue.use(VueRouter)
-    wrapper2 = shallowMount((AddCollateral as any), { localVue, store, router, vuetify })
-    wrapper = createComponent(currentStatementType, currentStepName)
+    wrapper2 = shallowMount((AddCollateral as any), { localVue, store, vuetify })
+    wrapper = createComponent(
+      currentStatementType, currentStepName, RegistrationButtonFooterConfig, RouteNames.ADD_COLLATERAL
+    )
   })
   afterEach(() => {
     wrapper.destroy()
@@ -198,7 +213,7 @@ describe('New Financing Statement Registration Buttons Step 3', () => {
     expect(wrapper.find(saveResumeBtn).exists()).toBe(true)
     expect(wrapper.find(backBtn).exists()).toBe(true)
     expect(wrapper.find(nextBtn).exists()).toBe(true)
-    expect(wrapper.vm.statementType).toBe(StatementTypes.FINANCING_STATEMENT)
+    expect(wrapper.vm.currentStatementType).toBe(StatementTypes.FINANCING_STATEMENT)
     expect(wrapper.props().currentStepName).toBe(RouteNames.ADD_COLLATERAL)
     expect(wrapper.vm.buttonConfig.showCancel).toBe(true)
     expect(wrapper.vm.buttonConfig.showSave).toBe(true)
@@ -246,8 +261,8 @@ describe('New Financing Statement Registration Buttons Step 4', () => {
   beforeEach(async () => {
     const localVue = createLocalVue()
     localVue.use(VueRouter)
-    wrapper2 = shallowMount((ReviewConfirm as any), { localVue, store, router, vuetify })
-    wrapper = createComponent(currentStatementType, currentStepName)
+    wrapper2 = shallowMount((ReviewConfirm as any), { localVue, store, vuetify })
+    wrapper = createComponent(currentStatementType, currentStepName, RegistrationButtonFooterConfig, RouteNames.REVIEW_CONFIRM)
   })
   afterEach(() => {
     wrapper.destroy()
@@ -260,7 +275,7 @@ describe('New Financing Statement Registration Buttons Step 4', () => {
     expect(wrapper.find(saveResumeBtn).exists()).toBe(true)
     expect(wrapper.find(backBtn).exists()).toBe(true)
     expect(wrapper.find(nextBtn).exists()).toBe(true)
-    expect(wrapper.vm.statementType).toBe(StatementTypes.FINANCING_STATEMENT)
+    expect(wrapper.vm.currentStatementType).toBe(StatementTypes.FINANCING_STATEMENT)
     expect(wrapper.props().currentStepName).toBe(RouteNames.REVIEW_CONFIRM)
     expect(wrapper.vm.buttonConfig.showCancel).toBe(true)
     expect(wrapper.vm.buttonConfig.showSave).toBe(true)
@@ -309,8 +324,8 @@ describe('Step 4 for SBC staff', () => {
     const localVue = createLocalVue()
     localVue.use(VueRouter)
     await store.setAuthRoles(['staff', 'ppr_staff'])
-    wrapper2 = shallowMount((ReviewConfirm as any), { localVue, store, router, vuetify })
-    wrapper = createComponent(currentStatementType, currentStepName)
+    wrapper2 = shallowMount((ReviewConfirm as any), { localVue, store, vuetify })
+    wrapper = createComponent(currentStatementType, currentStepName, RegistrationButtonFooterConfig, RouteNames.REVIEW_CONFIRM)
   })
   afterEach(() => {
     wrapper.destroy()
@@ -361,7 +376,9 @@ describe('Button events', () => {
     localVue.use(VueRouter)
     const currentStatementType: String = String(StatementTypes.FINANCING_STATEMENT)
     const currentStepName: String = String(RouteNames.REVIEW_CONFIRM)
-    wrapper = createComponent(currentStatementType, currentStepName)
+    wrapper = createComponent(
+      currentStatementType, currentStepName, RegistrationButtonFooterConfig, RouteNames.REVIEW_CONFIRM
+    )
     await flushPromises()
   })
   afterEach(() => {
@@ -388,9 +405,6 @@ describe('Mhr Manufacturer Registration step 1 - Your Home', () => {
   const currentStepName = RouteNames.YOUR_HOME
 
   beforeAll(async () => {
-    if (router.currentRoute.name !== RouteNames.YOUR_HOME) {
-      router.replace({ name: RouteNames.YOUR_HOME })
-    }
     await store.setAuthRoles(mockedManufacturerAuthRoles)
     await store.setRegistrationType(MhrRegistrationType)
   })
@@ -403,20 +417,23 @@ describe('Mhr Manufacturer Registration step 1 - Your Home', () => {
   beforeEach(async () => {
     const localVue = createLocalVue()
     localVue.use(VueRouter)
-    wrapper = createComponent(currentStatementType, currentStepName)
+    wrapper = createComponent(
+      currentStatementType, currentStepName, MHRManufacturerButtonFooterConfig, RouteNames.YOUR_HOME
+    )
   })
   afterEach(() => {
     wrapper.destroy()
   })
 
   it('renders with correct footer configs', async () => {
-    expect(router.currentRoute.name).toBe(RouteNames.YOUR_HOME)
+    expect(wrapper.vm.currentStepName).toBe(RouteNames.YOUR_HOME)
     expect(wrapper.findComponent(ButtonFooter).exists()).toBe(true)
     expect(wrapper.find(backBtn).exists()).toBe(false)
     expect(wrapper.find(nextBtn).exists()).toBe(true)
     expect(wrapper.find(saveBtn).exists()).toBe(true)
     expect(wrapper.find(saveResumeBtn).exists()).toBe(true)
     expect(wrapper.find(cancelBtn).exists()).toBe(true)
+
     const buttonConfig = wrapper.vm.buttonConfig as ButtonConfigIF
     expect(buttonConfig.nextRouteName).toBe(RouteNames.MHR_REVIEW_CONFIRM)
     expect(buttonConfig.nextText).toBe('Review and Confirm')
@@ -425,21 +442,21 @@ describe('Mhr Manufacturer Registration step 1 - Your Home', () => {
   it('Step 1 buttons work properly', async () => {
     await wrapper.find(saveBtn).trigger('click')
     await nextTick()
-    expect(router.currentRoute.name).toBe(RouteNames.YOUR_HOME)
+    expect(wrapper.vm.currentStepName).toBe(RouteNames.YOUR_HOME)
 
     expect(store.getStateModel.unsavedChanges).toBe(false)
     await wrapper.find(cancelBtn).trigger('click')
     await nextTick()
     expect(wrapper.vm.showCancelDialog).toBe(false)
-    expect(router.currentRoute.name).toBe(RouteNames.DASHBOARD)
+    expect(wrapper.vm.$router.currentRoute.name).toBe(RouteNames.DASHBOARD)
 
     await wrapper.find(saveResumeBtn).trigger('click')
     await nextTick()
-    expect(router.currentRoute.name).toBe(RouteNames.DASHBOARD)
+    expect(wrapper.vm.$router.currentRoute.name).toBe(RouteNames.DASHBOARD)
 
     wrapper.find(nextBtn).trigger('click')
     await nextTick()
-    expect(router.currentRoute.name).toBe(RouteNames.MHR_REVIEW_CONFIRM)
+    expect(wrapper.vm.$router.currentRoute.name).toBe(RouteNames.MHR_REVIEW_CONFIRM)
   })
 })
 
@@ -460,17 +477,16 @@ describe('Mhr Manufacturer Registration step 2 - Review and Confirm', () => {
   beforeEach(async () => {
     const localVue = createLocalVue()
     localVue.use(VueRouter)
-    wrapper = createComponent(currentStatementType, currentStepName)
-    if (router.currentRoute.name !== RouteNames.MHR_REVIEW_CONFIRM) {
-      router.replace({ name: RouteNames.MHR_REVIEW_CONFIRM })
-    }
+    wrapper = createComponent(
+      currentStatementType, currentStepName, MHRManufacturerButtonFooterConfig, RouteNames.MHR_REVIEW_CONFIRM
+    )
   })
   afterEach(() => {
     wrapper.destroy()
   })
 
   it('renders with correct footer configs', async () => {
-    expect(router.currentRoute.name).toBe(RouteNames.MHR_REVIEW_CONFIRM)
+    expect(wrapper.vm.currentStepName).toBe(RouteNames.MHR_REVIEW_CONFIRM)
     expect(wrapper.findComponent(ButtonFooter).exists()).toBe(true)
     expect(wrapper.find(backBtn).exists()).toBe(true)
     expect(wrapper.find(nextBtn).exists()).toBe(true)
@@ -486,16 +502,16 @@ describe('Mhr Manufacturer Registration step 2 - Review and Confirm', () => {
   it('Step 2 buttons work properly', async () => {
     await wrapper.find(saveBtn).trigger('click')
     await nextTick()
-    expect(router.currentRoute.name).toBe(RouteNames.MHR_REVIEW_CONFIRM)
+    expect(wrapper.vm.$router.currentRoute.name).toBe(RouteNames.MHR_REVIEW_CONFIRM)
 
     expect(store.getStateModel.unsavedChanges).toBe(false)
     await wrapper.find(cancelBtn).trigger('click')
     await nextTick()
     expect(wrapper.vm.showCancelDialog).toBe(false)
-    expect(router.currentRoute.name).toBe(RouteNames.DASHBOARD)
+    expect(wrapper.vm.$router.currentRoute.name).toBe(RouteNames.DASHBOARD)
 
     await wrapper.find(saveResumeBtn).trigger('click')
     await nextTick()
-    expect(router.currentRoute.name).toBe(RouteNames.DASHBOARD)
+    expect(wrapper.vm.$router.currentRoute.name).toBe(RouteNames.DASHBOARD)
   })
 })

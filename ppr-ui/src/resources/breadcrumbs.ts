@@ -167,3 +167,20 @@ export const tombstoneBreadcrumbMhrUnitNote: Array<BreadcrumbIF> = [
     text: '' // dynamic based on the Unit Note type
   }
 ]
+export const tombstoneBreadcrumbQsApplication: Array<BreadcrumbIF> = [
+  {
+    disabled: false,
+    href: sessionStorage.getItem('REGISTRY_URL'),
+    text: 'BC Registries Dashboard'
+  },
+  {
+    disabled: false,
+    to: { name: RouteNames.DASHBOARD },
+    text: 'My Asset Registries'
+  },
+  {
+    disabled: true,
+    href: '',
+    text: 'Qualified Supplier Application'
+  }
+]

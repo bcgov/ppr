@@ -83,6 +83,42 @@ export const MHRManufacturerButtonFooterConfig: Array<ButtonConfigIF> = [
   }
 ]
 
+export const MhrUserAccessButtonFooterConfig: Array<ButtonConfigIF> = [
+  {
+    stepName: RouteNames.QS_ACCESS_TYPE,
+    showCancel: true,
+    showSave: false,
+    showSaveResume: false,
+    showBack: false,
+    showNext: true,
+    backRouteName: '',
+    nextText: 'Complete Qualified Supplier Application',
+    nextRouteName: RouteNames.QS_ACCESS_INFORMATION
+  },
+  {
+    stepName: RouteNames.QS_ACCESS_INFORMATION,
+    showCancel: true,
+    showSave: false,
+    showSaveResume: false,
+    showBack: true,
+    showNext: true,
+    backRouteName: RouteNames.QS_ACCESS_TYPE,
+    nextText: 'Review and Confirm',
+    nextRouteName: RouteNames.QS_ACCESS_REVIEW_CONFIRM
+  },
+  {
+    stepName: RouteNames.QS_ACCESS_REVIEW_CONFIRM,
+    showCancel: true,
+    showSave: false,
+    showSaveResume: false,
+    showBack: true,
+    showNext: true,
+    backRouteName: RouteNames.QS_ACCESS_INFORMATION,
+    nextText: 'Submit Application',
+    nextRouteName: RouteNames.DASHBOARD
+  }
+]
+
 export const RegistrationButtonFooterConfig: Array<ButtonConfigIF> = [
   {
     stepName: RouteNames.LENGTH_TRUST,

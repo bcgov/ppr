@@ -24,6 +24,10 @@
             </v-row>
           </v-col>
           <v-col cols="5">
+            <!-- Qualified Suppler Access Btn -->
+            <v-row v-if="isQsAccessEnabled" no-gutters justify="end" class="mt-n8 mb-2">
+              <QsAccessBtn />
+            </v-row>
             <v-row no-gutters justify="end">
               <v-tooltip top content-class="top-tooltip pa-5" nudge-left="30" transition="fade-transition">
                 <template  v-slot:activator="{ on, attrs }">
@@ -64,9 +68,12 @@ import { useStore } from '@/store/store'
 import { tombstoneTitles } from '@/resources'
 import { pacificDate, getRoleProductCode } from '@/utils'
 import { storeToRefs } from 'pinia'
+import { QsAccessBtn } from '@/components/common'
+import { useUserAccess } from '@/composables/userAccess'
 
 export default defineComponent({
   name: 'TombstoneDefault',
+  components: { QsAccessBtn },
   setup () {
     const {
       getAccountLabel,
@@ -78,6 +85,7 @@ export default defineComponent({
       getUserRoles,
       getUserProductSubscriptionsCodes
     } = storeToRefs(useStore())
+    const { isQsAccessEnabled } = useUserAccess()
 
     const localState = reactive({
       userName: computed((): string => {
@@ -109,6 +117,7 @@ export default defineComponent({
     })
 
     return {
+      isQsAccessEnabled,
       ...toRefs(localState)
     }
   }

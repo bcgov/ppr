@@ -25,7 +25,7 @@ describe('Home Certification - staff', () => {
   })
 
   beforeEach(async () => {
-    wrapper = createComponent(HomeCertification, {})
+    wrapper = await createComponent(HomeCertification, {})
     await store.setMhrHomeDescription({ key: 'certificationOption', value: null })
     await store.setMhrHomeDescription({ key: 'hasNoCertification', value: null })
     wrapper.vm.certificationOption = null
@@ -173,7 +173,7 @@ describe('Home Certification - manufacturer', () => {
   })
 
   beforeEach(async () => {
-    wrapper = createComponent(HomeCertification, {})
+    wrapper = await createComponent(HomeCertification, {})
     await nextTick()
     await flushPromises()
   })
