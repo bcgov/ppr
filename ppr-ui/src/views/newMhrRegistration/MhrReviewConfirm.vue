@@ -30,7 +30,7 @@
     <YourHomeReview />
 
     <!-- Submitting Party Review -->
-    <SubmittingPartyReview />
+    <SubmittingPartyReview v-if="!isMhrManufacturerRegistration"/>
 
     <!-- Home Owners Review -->
     <HomeOwnersReview />
@@ -40,6 +40,16 @@
 
     <div id="mhr-review-confirm-components">
       <template  v-if="isMhrManufacturerRegistration">
+        <!-- Submitting Party based on Account-->
+        <section id="mhr-manufacturer-submitting-party" class="mt-15">
+          <AccountInfo
+            title="Submtting Party for this Registration"
+            :tooltipContent="'The default Submitting Party is based on your BC Registries user account information. ' +
+                              'This information can be updated within your account settings.'"
+            :accountInfo="accountInfo"
+          />
+        </section>
+
         <!-- Attention -->
         <section id="mhr-review-confirm-attention" class="mt-15">
           <Attention
@@ -97,7 +107,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, onBeforeMount, reactive, toRefs, watch } from 'vue-demi'
 import { useStore } from '@/store/store'
 import { StaffPayment } from '@bcrs-shared-components/staff-payment'
 import {
@@ -106,7 +116,14 @@ import {
   SubmittingPartyReview,
   YourHomeReview
 } from '@/components/mhrRegistration/ReviewConfirm'
-import { Attention, CertifyInformation, ContactUsToggle, CautionBox, FolioOrReferenceNumber } from '@/components/common'
+import {
+  AccountInfo,
+  Attention,
+  CertifyInformation,
+  ContactUsToggle,
+  CautionBox,
+  FolioOrReferenceNumber
+} from '@/components/common'
 import { useMhrValidations } from '@/composables'
 import { RouteNames } from '@/enums'
 /* eslint-disable no-unused-vars */
@@ -115,7 +132,8 @@ import { StaffPaymentOptions } from '@bcrs-shared-components/enums'
 import { useHomeOwners } from '@/composables/mhrRegistration'
 import { useRoute } from 'vue2-helpers/vue-router'
 import { storeToRefs } from 'pinia'
-import { StepIF } from '@/interfaces'
+import { AccountInfoIF, StepIF } from '@/interfaces'
+import { getAccountInfoFromAuth, parseAccountToSubmittingParty } from '@/utils'
 /* eslint-enable no-unused-vars */
 
 /* eslint-disable */
@@ -126,6 +144,7 @@ export default defineComponent({
     SubmittingPartyReview,
     HomeOwnersReview,
     HomeLocationReview,
+    AccountInfo,
     Attention,
     FolioOrReferenceNumber,
     CertifyInformation,
@@ -134,7 +153,12 @@ export default defineComponent({
     CautionBox
 },
   setup () {
-    const { setStaffPayment, setMhrAttentionReference, setFolioOrReferenceNumber } = useStore()
+    const { 
+      setStaffPayment, 
+      setMhrAttentionReference, 
+      setFolioOrReferenceNumber, 
+      setMhrRegistrationSubmittingParty 
+    } = useStore()
     const { 
       getFolioOrReferenceNumber,
       getMhrAttentionReference,
@@ -157,6 +181,7 @@ export default defineComponent({
 
     const localState = reactive({
       authorizationValid: false,
+      accountInfo: null as AccountInfoIF | null,
       isValidatingApp: computed( (): boolean => {
         return getValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_APP)
       }),
@@ -188,6 +213,13 @@ export default defineComponent({
         datNumber: '',
         folioNumber: '',
         isPriority: false
+      }
+    })
+
+    onBeforeMount(async () => {
+      if (isMhrManufacturerRegistration.value) {
+        localState.accountInfo = await getAccountInfoFromAuth()
+        setMhrRegistrationSubmittingParty(parseAccountToSubmittingParty(localState.accountInfo))
       }
     })
 

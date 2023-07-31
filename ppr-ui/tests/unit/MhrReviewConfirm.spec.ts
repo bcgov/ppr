@@ -10,7 +10,8 @@ import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
 import { MhrReviewConfirm } from '@/views'
 import { HomeLocationReview, HomeOwnersReview,
   SubmittingPartyReview, YourHomeReview } from '@/components/mhrRegistration/ReviewConfirm'
-import { Attention, CautionBox, CertifyInformation, ContactUsToggle, FolioOrReferenceNumber } from '@/components/common'
+import { AccountInfo, Attention, CautionBox, CertifyInformation, 
+  ContactUsToggle, FolioOrReferenceNumber } from '@/components/common'
 import { HomeTenancyTypes, RouteNames } from '@/enums'
 import mockRouter from './MockRouter'
 import { mockedFractionalOwnership, mockedPerson } from './test-data/mock-mhr-registration'
@@ -224,10 +225,10 @@ describe('Mhr Manufacturer Registration Review and Confirm', () => {
   it('renders and displays the Mhr Registration View', async () => {
     expect(wrapper.findComponent(MhrReviewConfirm).exists()).toBe(true)
     expect(wrapper.findComponent(YourHomeReview).exists()).toBe(true)
-    expect(wrapper.findComponent(SubmittingPartyReview).exists()).toBe(true)
     expect(wrapper.findComponent(HomeOwnersReview).exists()).toBe(true)
     expect(wrapper.findComponent(HomeLocationReview).exists()).toBe(true)
     expect(wrapper.findComponent(CertifyInformation).exists()).toBe(true)
+    expect(wrapper.findComponent(AccountInfo).exists()).toBe(true)
     expect(wrapper.findComponent(Attention).exists()).toBe(true)
     expect(wrapper.findComponent(FolioOrReferenceNumber).exists()).toBe(true)
     expect(wrapper.findComponent(ContactUsToggle).exists()).toBe(true)
