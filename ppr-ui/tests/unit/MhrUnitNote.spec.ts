@@ -46,21 +46,40 @@ function createComponent (): Wrapper<any> {
   })
 }
 
+async function createUnitNoteComponent (unitNoteType: UnitNoteDocTypes) {
+  await store.setMhrUnitNoteType(unitNoteType)
+  return createComponent()
+}
+
+// Go to Unit Note Review & Confirm screen and return its component for further testing
+async function getReviewConfirmComponent (wrapper: Wrapper<any>): Promise<Wrapper<any, Element>> {
+  // trigger initial validation
+  await wrapper.find('#btn-stacked-submit').trigger('click')
+  await wrapper.findComponent(UnitNoteAdd).vm.$emit('isValid', true)
+  await wrapper.find('#btn-stacked-submit').trigger('click')
+  await nextTick()
+
+  const reviewConfirmComponent = wrapper.findComponent(UnitNoteReview)
+  expect(reviewConfirmComponent.exists()).toBeTruthy()
+
+  return reviewConfirmComponent
+}
+
 describe('MHR Unit Note Filing', () => {
   let wrapper: Wrapper<any>
   setupMockStaffUser()
 
   const UNIT_NOTE_DOC_TYPE = UnitNoteDocTypes.NOTICE_OF_CAUTION
 
-  beforeEach(async () => {
-    await store.setMhrUnitNoteType(UNIT_NOTE_DOC_TYPE)
-    wrapper = createComponent()
-  })
   afterEach(() => {
     wrapper.destroy()
   })
 
   it('renders MhrUnitNote component and related sub-components', async () => {
+    wrapper = await createUnitNoteComponent(UnitNoteDocTypes.NOTICE_OF_CAUTION)
+
+    await createUnitNoteComponent(UnitNoteDocTypes.NOTICE_OF_CAUTION)
+
     expect(wrapper.vm.$route.name).toBe(RouteNames.MHR_INFORMATION_NOTE)
     expect(wrapper.exists()).toBeTruthy()
 
@@ -71,6 +90,8 @@ describe('MHR Unit Note Filing', () => {
   })
 
   it('renders MhrUnitNote base component for filing the Unit Note', async () => {
+    wrapper = await createUnitNoteComponent(UnitNoteDocTypes.NOTICE_OF_CAUTION)
+
     expect(wrapper.vm.$route.name).toBe(RouteNames.MHR_INFORMATION_NOTE)
     expect(wrapper.exists()).toBeTruthy()
 
@@ -86,6 +107,8 @@ describe('MHR Unit Note Filing', () => {
   })
 
   it('renders and validates MhrUnitNote Review and Confirm page with its components', async () => {
+    wrapper = await createUnitNoteComponent(UnitNoteDocTypes.NOTICE_OF_CAUTION)
+
     expect(wrapper.vm.$route.name).toBe(RouteNames.MHR_INFORMATION_NOTE)
     expect(wrapper.exists()).toBeTruthy()
 
@@ -145,18 +168,9 @@ describe('MHR Unit Note Filing', () => {
   })
 
   it('Continued Notice of Caution (CAUC): renders and validates MhrUnitNote Review and Confirm', async () => {
-    await store.setMhrUnitNoteType(UnitNoteDocTypes.CONTINUED_NOTE_OF_CAUTION)
+    wrapper = await createUnitNoteComponent(UnitNoteDocTypes.CONTINUED_NOTE_OF_CAUTION)
 
-    // trigger initial validation
-    await wrapper.find('#btn-stacked-submit').trigger('click')
-    await wrapper.findComponent(UnitNoteAdd).vm.$emit('isValid', true)
-    await nextTick()
-
-    await wrapper.find('#btn-stacked-submit').trigger('click')
-    await nextTick()
-
-    const UnitNoteReviewComponent = wrapper.findComponent(UnitNoteReview)
-    expect(UnitNoteReviewComponent.exists()).toBeTruthy()
+    const UnitNoteReviewComponent = await getReviewConfirmComponent(wrapper)
 
     // ExpiryDate component should exist for this Unit Note type
     expect(UnitNoteReviewComponent.findComponent(ExpiryDate).exists()).toBeTruthy()
@@ -189,18 +203,9 @@ describe('MHR Unit Note Filing', () => {
   })
 
   it('Extension to Notice of Caution (CAUE): renders and validates MhrUnitNote Review and Confirm', async () => {
-    await store.setMhrUnitNoteType(UnitNoteDocTypes.EXTENSION_TO_NOTICE_OF_CAUTION)
+    wrapper = await createUnitNoteComponent(UnitNoteDocTypes.EXTENSION_TO_NOTICE_OF_CAUTION)
 
-    // trigger initial validation
-    await wrapper.find('#btn-stacked-submit').trigger('click')
-    await wrapper.findComponent(UnitNoteAdd).vm.$emit('isValid', true)
-    await nextTick()
-
-    await wrapper.find('#btn-stacked-submit').trigger('click')
-    await nextTick()
-
-    const UnitNoteReviewComponent = wrapper.findComponent(UnitNoteReview)
-    expect(UnitNoteReviewComponent.exists()).toBeTruthy()
+    const UnitNoteReviewComponent = await getReviewConfirmComponent(wrapper)
 
     // ExpiryDate component should exist for this Unit Note type
     expect(UnitNoteReviewComponent.findComponent(ExpiryDate).exists()).toBeTruthy()
@@ -228,5 +233,61 @@ describe('MHR Unit Note Filing', () => {
 
     await nextTick()
     expect(wrapper.findAll('.border-error-left').length).toBe(5)
+  })
+
+  it('should not show field errors for optional Party Giving Notice', async () => {
+    wrapper = await createUnitNoteComponent(UnitNoteDocTypes.DECAL_REPLACEMENT)
+
+    const UnitNoteAddComponent = wrapper.findComponent(UnitNoteAdd)
+    expect(UnitNoteAddComponent.findAll('.border-error-left').length).toBe(0)
+
+    await wrapper.find('#btn-stacked-submit').trigger('click')
+    await nextTick()
+
+    expect(wrapper.findComponent(UnitNoteReview).exists()).toBeFalsy()
+
+    // only one error for Document ID should be shown, as the other fields are optional
+    expect(UnitNoteAddComponent.findAll('.border-error-left').length).toBe(1)
+    expect(UnitNoteAddComponent.findAll('.error-text').length).toBe(1)
+
+    const PersonGivingNoticeComponent = UnitNoteAddComponent.findComponent(ContactInformation)
+    expect(PersonGivingNoticeComponent.exists()).toBeTruthy()
+    expect(PersonGivingNoticeComponent.findAll('.error-text').length).toBe(0)
+
+    await wrapper.findComponent(UnitNoteAdd).vm.$emit('isValid', true)
+    await wrapper.find('#btn-stacked-submit').trigger('click')
+    await nextTick()
+
+    // should be on the Review & Confirm screen
+    expect(wrapper.findComponent(UnitNoteReview).exists()).toBeTruthy()
+
+    // 'Not Entered' should be shown 4 times for each column in the table
+    expect(wrapper.find(getTestId('party-info-table')).findAll('.text-not-entered').length).toBe(4)
+  })
+
+  it('should not show EffectiveDateTime component for Decal Replacement and Public Note', async () => {
+    wrapper = await createUnitNoteComponent(UnitNoteDocTypes.DECAL_REPLACEMENT)
+
+    expect(store.getMhrUnitNoteType).toBe(UnitNoteDocTypes.DECAL_REPLACEMENT)
+
+    let UnitNoteReviewComponent = await getReviewConfirmComponent(wrapper)
+    expect(UnitNoteReviewComponent.findComponent(EffectiveDateTime).exists()).toBeFalsy()
+    expect(UnitNoteReviewComponent.findComponent(ExpiryDate).exists()).toBeFalsy()
+    expect(UnitNoteReviewComponent.findComponent(ContactInformation).find('h2').text()).toContain('1.')
+    expect(UnitNoteReviewComponent.findComponent(Attention).find('h2').text()).toContain('2.')
+    expect(UnitNoteReviewComponent.findComponent(CertifyInformation).find('h2').text()).toContain('3.')
+    expect(UnitNoteReviewComponent.find('#staff-transfer-payment-section h2').text()).toContain('4.')
+
+    wrapper = await createUnitNoteComponent(UnitNoteDocTypes.PUBLIC_NOTE)
+
+    expect(store.getMhrUnitNoteType).toBe(UnitNoteDocTypes.PUBLIC_NOTE)
+
+    UnitNoteReviewComponent = await getReviewConfirmComponent(wrapper)
+    expect(UnitNoteReviewComponent.findComponent(EffectiveDateTime).exists()).toBeFalsy()
+    expect(UnitNoteReviewComponent.findComponent(ExpiryDate).exists()).toBeFalsy()
+    expect(UnitNoteReviewComponent.findComponent(ContactInformation).find('h2').text()).toContain('1.')
+    expect(UnitNoteReviewComponent.findComponent(Attention).find('h2').text()).toContain('2.')
+    expect(UnitNoteReviewComponent.findComponent(CertifyInformation).find('h2').text()).toContain('3.')
+    expect(UnitNoteReviewComponent.find('#staff-transfer-payment-section h2').text()).toContain('4.')
   })
 })

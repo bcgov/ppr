@@ -3,11 +3,116 @@ import { GroupedNotesIF, PartyIF, UnitNoteIF, UnitNoteRegistrationIF } from '@/i
 import { useStore } from '@/store/store'
 import { deleteEmptyProperties, submitMhrUnitNote } from '@/utils'
 import { storeToRefs } from 'pinia'
+import { cloneDeep } from 'lodash'
 
 export const useMhrUnitNote = () => {
   const {
+    getMhrUnitNoteType,
     getMhrInformation
   } = storeToRefs(useStore())
+
+  // Build Unit Note payload data with all the submission rules
+  const buildPayload = (unitNoteData: UnitNoteRegistrationIF): UnitNoteRegistrationIF => {
+    // Person Giving Notice is optional for Decal Replacement (102), Public Note (NPUB), Confidential Note (NCON)
+    // The givingNoticeParty obj would be removed if it contains no date
+    deleteEmptyProperties(unitNoteData)
+
+    if (unitNoteData.note.givingNoticeParty?.phoneNumber) {
+      unitNoteData.note.givingNoticeParty.phoneNumber = unitNoteData.note.givingNoticeParty?.phoneNumber?.replace(/[^A-Z0-9]/ig, '')
+    }
+
+    if (unitNoteData.submittingParty.phoneNumber) {
+      unitNoteData.submittingParty.phoneNumber = unitNoteData.submittingParty.phoneNumber?.replace(/[^A-Z0-9]/ig, '')
+    }
+
+    // status is not required
+    delete unitNoteData.note.status
+
+    // Unit note expiryDateTime can only be submitted for CAUC, CAUE
+    if (hasExpiryDate()) {
+      // cleanup dateTime to be accepted by API
+      unitNoteData.note.expiryDateTime = unitNoteData.note.expiryDateTime.replace('Z', '')
+    } else {
+      delete unitNoteData.note.expiryDateTime
+    }
+
+    // Do not submit effectiveDateTime if from does not show the component (REG_102, NPUB)
+    if (hasEffectiveDateTime()) {
+      // cleanup dateTime to be accepted by API
+      unitNoteData.note.effectiveDateTime = unitNoteData.note.effectiveDateTime.replace('Z', '')
+    } else {
+      delete unitNoteData.note.effectiveDateTime
+    }
+
+    return unitNoteData
+  }
+
+  // Submit Unit Note after building the payload data
+  const buildApiDataAndSubmit = (unitNoteData: UnitNoteRegistrationIF) => {
+    const payloadData = buildPayload(cloneDeep(unitNoteData))
+    return submitMhrUnitNote(getMhrInformation.value.mhrNumber, payloadData)
+  }
+
+  // Make optional Person Giving Notice fields for certain Unit Note types
+  const isPersonGivingNoticeOptional = (): boolean => {
+    return [UnitNoteDocTypes.DECAL_REPLACEMENT,
+      UnitNoteDocTypes.PUBLIC_NOTE,
+      UnitNoteDocTypes.CONFIDENTIAL_NOTE].includes(getMhrUnitNoteType.value)
+  }
+
+  // Effective Date Time component not required for certain Unit Note types
+  const hasEffectiveDateTime = (): boolean => {
+    return ![UnitNoteDocTypes.DECAL_REPLACEMENT, UnitNoteDocTypes.PUBLIC_NOTE].includes(getMhrUnitNoteType.value)
+  }
+
+  // Expiry Date Time component not required for certain Unit Note types
+  const hasExpiryDate = (): boolean => {
+    return [UnitNoteDocTypes.CONTINUED_NOTE_OF_CAUTION, UnitNoteDocTypes.EXTENSION_TO_NOTICE_OF_CAUTION]
+      .includes(getMhrUnitNoteType.value)
+  }
+
+  // Identify if a unit note is notice of caution or an extended/continued notice of caution
+  const isNoticeOfCautionOrRelatedDocType = (note: UnitNoteIF): boolean => {
+    return [UnitNoteDocTypes.NOTICE_OF_CAUTION,
+      UnitNoteDocTypes.CONTINUED_NOTE_OF_CAUTION,
+      UnitNoteDocTypes.EXTENSION_TO_NOTICE_OF_CAUTION].includes(note.documentType)
+  }
+
+  // Groups unit notes for the panels
+  const groupUnitNotes = (unitNotes: UnitNoteIF[]): GroupedNotesIF[] => {
+    // The notes should already be in order by creation date and time (filter preserves order)
+    const noticeOfCautionNotes = unitNotes.filter((note) => isNoticeOfCautionOrRelatedDocType(note))
+
+    let primaryUnitNote: UnitNoteIF = null
+    let additionalUnitNotes: UnitNoteIF[] = []
+
+    const groupedNoticeOfCautions: GroupedNotesIF[] = []
+
+    // NOTICE_OF_CAUTION is used as an interval for grouping the notes
+    // When a NOTICE_OF_CAUTION is encountered, the group is added
+    // and a new group is started on the next iteration
+    noticeOfCautionNotes.forEach((note) => {
+      if (!primaryUnitNote) { primaryUnitNote = note } else { additionalUnitNotes.push(note) }
+
+      if (note.documentType === UnitNoteDocTypes.NOTICE_OF_CAUTION) {
+        groupedNoticeOfCautions.push({ primaryUnitNote, additionalUnitNotes })
+        primaryUnitNote = null
+        additionalUnitNotes = []
+      }
+    })
+
+    const nonNoticeOfCautionUnitNotes = unitNotes.filter((note) => !isNoticeOfCautionOrRelatedDocType(note))
+
+    const groupedUnitNotes: GroupedNotesIF[] = nonNoticeOfCautionUnitNotes.map((note) => {
+      return { primaryUnitNote: note }
+    })
+
+    // Adds the notice of caution notes to the other unit notes and sort in descending creation time
+    return groupedUnitNotes.concat(groupedNoticeOfCautions).sort((note1, note2) =>
+      new Date(note2.primaryUnitNote.createDateTime).getTime() -
+       new Date(note1.primaryUnitNote.createDateTime).getTime()
+    )
+  }
 
   const initUnitNote = (): UnitNoteRegistrationIF => {
     return {
@@ -65,88 +170,12 @@ export const useMhrUnitNote = () => {
     }
   }
 
-  // Build Unit Note payload data with all the submission rules
-  const buildPayload = (unitNoteData: UnitNoteRegistrationIF): UnitNoteRegistrationIF => {
-    deleteEmptyProperties(unitNoteData)
-
-    if (unitNoteData.note.givingNoticeParty?.phoneNumber) {
-      unitNoteData.note.givingNoticeParty.phoneNumber = unitNoteData.note.givingNoticeParty?.phoneNumber?.replace(/[^A-Z0-9]/ig, '')
-    }
-
-    if (unitNoteData.submittingParty.phoneNumber) {
-      unitNoteData.submittingParty.phoneNumber = unitNoteData.submittingParty.phoneNumber?.replace(/[^A-Z0-9]/ig, '')
-    }
-
-    // status is not required
-    delete unitNoteData.note.status
-
-    // cleanup dateTime strings to be accepted by API
-    unitNoteData.note.effectiveDateTime = unitNoteData.note.effectiveDateTime.replace('Z', '')
-    unitNoteData.note.expiryDateTime = unitNoteData.note.expiryDateTime.replace('Z', '')
-
-    // Unit note expiryDateTime can only be submitted for CAUC, CAUE
-    if (![UnitNoteDocTypes.CONTINUED_NOTE_OF_CAUTION,
-      UnitNoteDocTypes.EXTENSION_TO_NOTICE_OF_CAUTION].includes(unitNoteData.note.documentType)) {
-      delete unitNoteData.note.expiryDateTime
-    } else {
-      unitNoteData.note.expiryDateTime = unitNoteData.note.expiryDateTime.replace('Z', '')
-    }
-
-    return unitNoteData
-  }
-
-  // Submit Unit Note after building the payload data
-  const buildApiDataAndSubmit = (unitNoteData: UnitNoteRegistrationIF) => {
-    const payloadData = buildPayload(unitNoteData)
-    return submitMhrUnitNote(getMhrInformation.value.mhrNumber, payloadData)
-  }
-
-  // Identify if a unit note is notice of caution or an extended/continued notice of caution
-  const isNoticeOfCautionOrRelatedDocType = (note: UnitNoteIF): boolean => {
-    return [UnitNoteDocTypes.NOTICE_OF_CAUTION,
-      UnitNoteDocTypes.CONTINUED_NOTE_OF_CAUTION,
-      UnitNoteDocTypes.EXTENSION_TO_NOTICE_OF_CAUTION].includes(note.documentType)
-  }
-
-  // Groups unit notes for the panels
-  const groupUnitNotes = (unitNotes: UnitNoteIF[]): GroupedNotesIF[] => {
-    // The notes should already be in order by creation date and time (filter preserves order)
-    const noticeOfCautionNotes = unitNotes.filter((note) => isNoticeOfCautionOrRelatedDocType(note))
-
-    let primaryUnitNote: UnitNoteIF = null
-    let additionalUnitNotes: UnitNoteIF[] = []
-
-    const groupedNoticeOfCautions: GroupedNotesIF[] = []
-
-    // NOTICE_OF_CAUTION is used as an interval for grouping the notes
-    // When a NOTICE_OF_CAUTION is encountered, the group is added
-    // and a new group is started on the next iteration
-    noticeOfCautionNotes.forEach((note) => {
-      if (!primaryUnitNote) { primaryUnitNote = note } else { additionalUnitNotes.push(note) }
-
-      if (note.documentType === UnitNoteDocTypes.NOTICE_OF_CAUTION) {
-        groupedNoticeOfCautions.push({ primaryUnitNote, additionalUnitNotes })
-        primaryUnitNote = null
-        additionalUnitNotes = []
-      }
-    })
-
-    const nonNoticeOfCautionUnitNotes = unitNotes.filter((note) => !isNoticeOfCautionOrRelatedDocType(note))
-
-    const groupedUnitNotes: GroupedNotesIF[] = nonNoticeOfCautionUnitNotes.map((note) => {
-      return { primaryUnitNote: note }
-    })
-
-    // Adds the notice of caution notes to the other unit notes and sort in descending creation time
-    return groupedUnitNotes.concat(groupedNoticeOfCautions).sort((note1, note2) =>
-      new Date(note2.primaryUnitNote.createDateTime).getTime() -
-       new Date(note1.primaryUnitNote.createDateTime).getTime()
-    )
-  }
-
   return {
     initUnitNote,
     buildApiDataAndSubmit,
+    isPersonGivingNoticeOptional,
+    hasEffectiveDateTime,
+    hasExpiryDate,
     groupUnitNotes,
     isNoticeOfCautionOrRelatedDocType
   }

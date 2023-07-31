@@ -35,7 +35,7 @@
       <div class="px">
         <h3>Person Giving Notice</h3>
 
-        <v-simple-table v-if="unitNote" class="giving-notice-party-table" data-test-id="account-info-table">
+        <v-simple-table v-if="unitNote" class="giving-notice-party-table" data-test-id="party-info-table">
           <template v-slot:default>
             <thead>
               <tr>
@@ -48,24 +48,34 @@
             <tbody>
               <tr>
                 <td class="person-name">
-                  <v-icon class="mt-n2">
-                    {{ givingNoticeParty.businessName ? 'mdi-domain' : 'mdi-account' }}
-                  </v-icon>
-                  <span class="font-weight-bold">
-                    {{ givingNoticeParty.personName.first }}
-                    {{ givingNoticeParty.personName.middle }}
-                    {{ givingNoticeParty.personName.last }}
+                  <span v-if="hasName">
+                    <v-icon class="mt-n2">
+                      {{ givingNoticeParty.businessName ? 'mdi-domain' : 'mdi-account' }}
+                    </v-icon>
+                    <span class="font-weight-bold">
+                      {{ displayFullOrBusinessName }}
+                    </span>
+                  </span>
+                  <span v-else class="text-not-entered">(Not Entered)</span>
+                </td>
+                <td>
+                  <base-address
+                    v-if="hasAddress"
+                    :editing="false"
+                    :schema="PartyAddressSchema"
+                    :value="givingNoticeParty.address"
+                  />
+                  <span v-else class="text-not-entered">(Not Entered)</span>
+                </td>
+                <td>
+                  <span :class="{'text-not-entered': !givingNoticeParty.emailAddress}">
+                    {{ givingNoticeParty.emailAddress || '(Not Entered)' }}
                   </span>
                 </td>
                 <td>
-                  <base-address :editing="false" :schema="PartyAddressSchema" :value="givingNoticeParty.address" />
-                </td>
-                <td>
-                  {{ givingNoticeParty.emailAddress }}
-                </td>
-                <td>
-                  {{ toDisplayPhone(givingNoticeParty.phoneNumber) }}
-                  <span v-if="givingNoticeParty.phoneExtension"> Ext {{ givingNoticeParty.phoneExtension }} </span>
+                  <span :class="{'text-not-entered': !givingNoticeParty.phoneNumber}">
+                    {{ givingNoticeParty.phoneNumber ? displayPhoneAndExt : '(Not Entered)' }}
+                  </span>
                 </td>
               </tr>
             </tbody>
@@ -100,7 +110,27 @@ export default defineComponent({
   },
   setup (props) {
     const localState = reactive({
-      givingNoticeParty: computed((): PartyIF => props.unitNote.givingNoticeParty)
+      givingNoticeParty: computed((): PartyIF => props.unitNote.givingNoticeParty),
+      hasName: computed((): boolean => {
+        return !!(localState.givingNoticeParty.businessName ||
+          localState.givingNoticeParty.personName.first ||
+          localState.givingNoticeParty.personName.middle ||
+          localState.givingNoticeParty.personName.last)
+      }),
+      hasAddress: computed((): boolean => {
+        return !!(localState.givingNoticeParty.address?.street ||
+        localState.givingNoticeParty.address?.streetAdditional ||
+        localState.givingNoticeParty.address?.city)
+      }),
+      displayFullOrBusinessName: computed((): string => {
+        if (localState.givingNoticeParty?.businessName.length > 0) { return localState.givingNoticeParty.businessName }
+        const { first, middle, last } = localState.givingNoticeParty.personName
+        return [first, middle, last].filter(Boolean).join(' ')
+      }),
+      displayPhoneAndExt: computed((): string =>
+        toDisplayPhone(localState.givingNoticeParty.phoneNumber) +
+        (localState.givingNoticeParty.phoneExtension ? ' Ext ' + localState.givingNoticeParty.phoneExtension : '')
+      )
     })
 
     return {

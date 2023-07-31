@@ -168,7 +168,7 @@
                 :hideDeliveryAddress="hideDeliveryAddress"
                 ref="submittingPartyAddress"
                 id="contact-info-address"
-                :schema="PartyAddressSchema"
+                :schema="isInfoOptional ? OptionalPartyAddressSchema : PartyAddressSchema"
                 :value="contactInfoModel.address"
                 :triggerErrors="validate"
                 @valid="isAddressValid = $event"
@@ -185,8 +185,8 @@
 import { useInputRules } from '@/composables'
 import { SubmittingPartyTypes } from '@/enums'
 import { ContentIF, FormIF, PartyIF, SubmittingPartyIF } from '@/interfaces'
-import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue-demi'
-import { PartyAddressSchema } from '@/schemas'
+import { computed, defineComponent, onBeforeMount, reactive, ref, toRefs, watch } from 'vue-demi'
+import { PartyAddressSchema, OptionalPartyAddressSchema } from '@/schemas'
 import { VueMaskDirective } from 'v-mask'
 import { BaseAddress } from '@/composables/address'
 import { PartySearch } from '../parties/party'
@@ -226,6 +226,10 @@ export default defineComponent({
     enableCombinedNameValidation: {
       type: Boolean,
       default: false
+    },
+    isInfoOptional: { // form fields are optional
+      type: Boolean,
+      default: false
     }
   },
   directives: {
@@ -247,7 +251,7 @@ export default defineComponent({
     const localState = reactive({
       enableLookUp: true,
       contactInfoModel: computed(() => props.contactInfo as PartyIF | SubmittingPartyIF),
-      contactInfoType: SubmittingPartyTypes.PERSON,
+      contactInfoType: null as SubmittingPartyTypes,
       isContactInfoFormValid: false,
       isAddressValid: false,
       hasLongCombinedName: false,
@@ -281,6 +285,12 @@ export default defineComponent({
       emitStoreUpdate(val)
     }, { deep: true, immediate: true })
 
+    onBeforeMount(() => {
+      // pre-select Person or Business radio buttons, default is Person
+      localState.contactInfoType =
+        localState.contactInfoModel.businessName ? SubmittingPartyTypes.BUSINESS : SubmittingPartyTypes.PERSON
+    })
+
     const clearFields = () => {
       if (localState.isPersonOption) {
         localState.contactInfoModel.businessName = ''
@@ -307,7 +317,7 @@ export default defineComponent({
     }, { deep: true })
 
     const firstNameRules = customRules(
-      required('Enter a first name'),
+      !props.isInfoOptional ? required('Enter a first name') : [],
       maxLength(15),
       invalidSpaces()
     )
@@ -325,17 +335,18 @@ export default defineComponent({
     const middleNameRules = customRules(maxLength(15), invalidSpaces())
 
     const lastNameRules = customRules(
-      required('Enter a last name'),
+      !props.isInfoOptional ? required('Enter a last name') : [],
       maxLength(25),
       invalidSpaces())
 
     const businessNameRules = customRules(
-      required('Business name is required'),
+      !props.isInfoOptional ? required('Business name is required') : [],
       maxLength(40),
       invalidSpaces()
     )
 
-    const phoneExtensionRules = customRules(isNumber(null, null, null, 'Enter numbers only'),
+    const phoneExtensionRules = customRules(
+      isNumber(null, null, null, 'Enter numbers only'),
       invalidSpaces(),
       maxLength(5, true)
     )
@@ -353,6 +364,7 @@ export default defineComponent({
       phoneExtensionRules,
       SubmittingPartyTypes,
       PartyAddressSchema,
+      OptionalPartyAddressSchema,
       ...toRefs(localState)
     }
   }

@@ -29,7 +29,7 @@
       />
     </section>
 
-    <section class="mt-15">
+    <section v-if="hasEffectiveDateTime()" class="mt-15">
       <EffectiveDateTime
         :sectionNumber="getSectionNumber.effectiveDateTime || 2"
         :content="{
@@ -44,7 +44,7 @@
       />
     </section>
 
-    <section v-if="hasExpiryDate" class="mt-15">
+    <section v-if="hasExpiryDate()" class="mt-15">
       <ExpiryDate
         :sectionNumber="getSectionNumber.expiryDate || 2"
         :content="{
@@ -109,7 +109,7 @@ import { storeToRefs } from 'pinia'
 import { PartyIF } from '@/interfaces'
 import { UnitNotesInfo } from '@/resources/unitNotes'
 import { MhrCompVal, MhrSectVal } from '@/composables/mhrRegistration/enums'
-import { useMhrValidations } from '@/composables'
+import { useMhrUnitNote, useMhrValidations } from '@/composables'
 import { CertifyInformation, ContactInformation } from '../common'
 import UnitNoteReviewDetailsTable from './UnitNoteReviewDetailsTable.vue'
 import { Attention } from '../mhrRegistration/ReviewConfirm'
@@ -157,6 +157,11 @@ export default defineComponent({
       setValidation
     } = useMhrValidations(toRefs(getMhrUnitNoteValidation.value))
 
+    const {
+      hasEffectiveDateTime,
+      hasExpiryDate
+    } = useMhrUnitNote()
+
     const localState = reactive({
       validateSubmittingParty: false,
       unitNoteType: UnitNotesInfo[getMhrUnitNote.value.documentType],
@@ -181,14 +186,10 @@ export default defineComponent({
         getValidation(MhrSectVal.UNIT_NOTE_VALID, MhrCompVal.ATTENTION_VALID) &&
         getValidation(MhrSectVal.UNIT_NOTE_VALID, MhrCompVal.AUTHORIZATION_VALID) &&
         getValidation(MhrSectVal.UNIT_NOTE_VALID, MhrCompVal.STAFF_PAYMENT_VALID) && (
-          localState.hasExpiryDate
+          hasExpiryDate()
             ? getValidation(MhrSectVal.UNIT_NOTE_VALID, MhrCompVal.EXPIRY_DATE_TIME_VALID)
             : true
         )
-      ),
-      hasExpiryDate: computed(() =>
-        [UnitNoteDocTypes.CONTINUED_NOTE_OF_CAUTION, UnitNoteDocTypes.EXTENSION_TO_NOTICE_OF_CAUTION]
-          .includes(getMhrUnitNote.value.documentType)
       ),
       isUnitNoteTypeCAUE: computed((): boolean =>
         getMhrUnitNote.value.documentType === UnitNoteDocTypes.EXTENSION_TO_NOTICE_OF_CAUTION
@@ -283,6 +284,8 @@ export default defineComponent({
       handleStoreUpdate,
       onStaffPaymentDataUpdate,
       effectiveDateDescForCAU,
+      hasEffectiveDateTime,
+      hasExpiryDate,
       ...toRefs(localState)
     }
   }
