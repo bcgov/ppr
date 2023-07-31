@@ -15,7 +15,7 @@
                 <h1>Request MHR Qualified Supplier Access</h1>
               </v-col>
             </v-row>
-            <QsSelectAccess />
+            <QsSelectAccess :showErrors="!getMhrSubProduct && promptAccessSelect" />
           </v-col>
         </v-row>
       </div>
@@ -54,6 +54,8 @@
         <ButtonFooter
           :navConfig="MhrUserAccessButtonFooterConfig"
           :currentStepName="$route.name"
+          :disableNav="!getMhrSubProduct"
+          @navigationDisabled="promptAccessSelect = $event"
           @error="emitError($event)"
           @submit="submit()"
         />
@@ -95,13 +97,14 @@ export default defineComponent({
     }
   },
   setup (props, { emit }) {
-    const { getUserAccessSteps } = storeToRefs(useStore())
+    const { getMhrSubProduct, getUserAccessSteps } = storeToRefs(useStore())
     const { isRouteName, goToDash } = useNavigation()
     const { isAuthenticated } = useAuth()
 
     const localState = reactive({
       dataLoaded: false,
-      submitting: false
+      submitting: false,
+      promptAccessSelect: false
     })
 
     onMounted(async (): Promise<void> => {
@@ -109,7 +112,7 @@ export default defineComponent({
       // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
       if (!props.appReady || !isAuthenticated.value ||
           (!props.isJestRunning && !getFeatureFlag('mhr-user-access-enabled'))) {
-        goToDash()
+        await goToDash()
         return
       }
 
@@ -130,6 +133,7 @@ export default defineComponent({
       emitError,
       isRouteName,
       RouteNames,
+      getMhrSubProduct,
       getUserAccessSteps,
       MhrUserAccessButtonFooterConfig,
       ...toRefs(localState)

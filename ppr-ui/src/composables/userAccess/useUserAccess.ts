@@ -1,17 +1,14 @@
-import { Router, useRoute, useRouter } from 'vue2-helpers/vue-router'
 import { computed, ComputedRef } from 'vue-demi'
 import { getFeatureFlag } from '@/utils'
 import { RouteNames } from '@/enums'
-import { Route } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useStore } from '@/store/store'
+import { useNavigation } from '@/composables'
 
 export const useUserAccess = () => {
-  const route: Route = useRoute()
-  const router: Router = useRouter()
-  const {
-    isRoleStaffReg
-  } = storeToRefs(useStore())
+  const { goToRoute, containsCurrentRoute } = useNavigation()
+  const { setMhrSubProduct } = useStore()
+  const { isRoleStaffReg } = storeToRefs(useStore())
 
   /** Returns true when on the appropriate routes and the feature flag is enabled **/
   const isQsAccessEnabled: ComputedRef<boolean> = computed((): boolean => {
@@ -26,19 +23,29 @@ export const useUserAccess = () => {
 
   /** Returns true while the User is within the User Access Routes **/
   const isUserAccessRoute: ComputedRef<boolean> = computed((): boolean => {
-    return [RouteNames.QS_ACCESS_TYPE, RouteNames.QS_ACCESS_INFORMATION, RouteNames.QS_ACCESS_REVIEW_CONFIRM]
-      .includes(route.name as RouteNames)
+    return containsCurrentRoute(
+      [RouteNames.QS_ACCESS_TYPE, RouteNames.QS_ACCESS_INFORMATION, RouteNames.QS_ACCESS_REVIEW_CONFIRM]
+    )
   })
 
   /** Navigate to User Access Home route **/
-  const goToUserAccess = (): void => {
-    !isPendingQsAccess.value && !isUserAccessRoute.value && router.push({ name: RouteNames.QS_ACCESS_TYPE })
+  const goToUserAccess = async (): Promise<void> => {
+    if (!isPendingQsAccess.value && !isUserAccessRoute.value) {
+      initUserAccess()
+      await goToRoute(RouteNames.QS_ACCESS_TYPE)
+    }
+  }
+
+  /** Initialize user access properties to default state **/
+  const initUserAccess = (): void => {
+    setMhrSubProduct(null)
   }
 
   return {
     goToUserAccess,
     isQsAccessEnabled,
     isPendingQsAccess,
-    isUserAccessRoute
+    isUserAccessRoute,
+    initUserAccess
   }
 }

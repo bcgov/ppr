@@ -97,7 +97,6 @@
       <v-col cols="12">
         <ButtonFooter
           :navConfig="getFooterButtonConfig"
-          :currentStatementType="statementType"
           :currentStepName="stepName"
           :certifyValid="validCertify && validFolio"
           :forceSave="saveDraftExit"
@@ -112,7 +111,7 @@
 <script lang="ts">
 import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue-demi'
 import { useStore } from '@/store/store'
-import { APIRegistrationTypes, RegistrationFlowType, RouteNames, StatementTypes } from '@/enums'
+import { APIRegistrationTypes, RegistrationFlowType, RouteNames } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { Stepper, StickyContainer, CertifyInformation } from '@/components/common'
 import ButtonFooter from '@/components/common/ButtonFooter.vue'
@@ -182,7 +181,6 @@ export default defineComponent({
       dataLoaded: false,
       feeType: FeeSummaryTypes.NEW,
       showStepErrors: false,
-      statementType: StatementTypes.FINANCING_STATEMENT,
       stepName: RouteNames.REVIEW_CONFIRM,
       validCertify: false,
       validFolio: true,

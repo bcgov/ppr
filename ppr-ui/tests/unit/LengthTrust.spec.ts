@@ -97,7 +97,6 @@ describe('Length and Trust Indenture new registration component', () => {
     )
     expect(wrapper.findComponent(StickyContainer).vm.$props.setShowButtons).toBe(false)
     expect(wrapper.findComponent(ButtonFooter).exists()).toBe(true)
-    expect(wrapper.findComponent(ButtonFooter).vm.$props.currentStatementType).toBe(StatementTypes.FINANCING_STATEMENT)
     expect(wrapper.findComponent(ButtonFooter).vm.$props.currentStepName).toBe(RouteNames.LENGTH_TRUST)
     expect(wrapper.findComponent(RegistrationLengthTrust).exists()).toBe(true)
     expect(wrapper.find(header).exists()).toBe(true)

@@ -55,7 +55,6 @@
       <v-col cols="12">
         <ButtonFooter
           :navConfig="getFooterButtonConfig"
-          :currentStatementType="statementType"
           :currentStepName="stepName"
           @error="emitError($event)"
         />
@@ -71,12 +70,7 @@ import { getFeatureFlag } from '@/utils'
 import { Stepper, StickyContainer } from '@/components/common'
 import ButtonFooter from '@/components/common/ButtonFooter.vue'
 import { RegistrationLengthTrust, RegistrationRepairersLien } from '@/components/registration'
-import {
-  APIRegistrationTypes,
-  RegistrationFlowType,
-  RouteNames,
-  StatementTypes
-} from '@/enums'
+import { APIRegistrationTypes, RegistrationFlowType, RouteNames } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { ErrorIF } from '@/interfaces' // eslint-disable-line no-unused-vars
 import { RegistrationLengthI } from '@/composables/fees/interfaces'
@@ -119,7 +113,6 @@ export default defineComponent({
     const localState = reactive({
       dataLoaded: false,
       feeType: FeeSummaryTypes.NEW,
-      statementType: StatementTypes.FINANCING_STATEMENT,
       stepName: RouteNames.LENGTH_TRUST,
       registrationLength: computed((): RegistrationLengthI => {
         return {

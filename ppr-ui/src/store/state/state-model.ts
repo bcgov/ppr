@@ -1,4 +1,4 @@
-import { RegistrationFlowType, UnitNoteStatusTypes } from '@/enums'
+import { MhrSubTypes, RegistrationFlowType, UnitNoteStatusTypes } from '@/enums'
 import { PartyIF, RegistrationTypeIF, StateModelIF } from '@/interfaces'
 
 export const stateModel: StateModelIF = {
@@ -363,6 +363,10 @@ export const stateModel: StateModelIF = {
       } as PartyIF,
       destroyed: false
     }
+  },
+  mhrUserAccess: {
+    mrhSubProduct: null,
+    qsInformation: {}
   },
   mhrUnitNoteValidationState: {
     unitNoteAddValid: {
