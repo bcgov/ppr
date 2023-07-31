@@ -6,11 +6,11 @@
     </v-overlay>
 
     <!-- Request Access Type Pre-Step -->
-    <div v-if="isRouteName(RouteNames.QS_ACCESS_TYPE)" class="view-container px-15 py-0">
+    <div v-if="isRouteName(RouteNames.QS_ACCESS_TYPE)" class="view-container px-15 py-0 mt-4">
       <div class="container pa-0 pt-4">
         <v-row no-gutters>
           <v-col cols="9">
-            <v-row no-gutters id="registration-header" class="pt-3 pb-3 soft-corners-top">
+            <v-row no-gutters id="registration-header" class="pt-3 soft-corners-top">
               <v-col cols="auto">
                 <h1>Request MHR Qualified Supplier Access</h1>
               </v-col>

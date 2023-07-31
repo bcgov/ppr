@@ -1,6 +1,6 @@
 <template>
   <div id="qs-select-access">
-    <section id="qs-access-type" class="mt-10">
+    <section id="qs-access-type" class="mt-9">
       <h2>Qualified Supplier Access Type</h2>
       <p class="mt-4">
         If you are an

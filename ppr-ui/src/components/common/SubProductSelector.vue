@@ -33,7 +33,7 @@
                 <template v-slot:label>
                   <v-row no-gutters>
                     <v-col cols="12">
-                      <label class="sub-product-label">{{ subProduct.label }}</label>
+                      <label class="sub-product-label generic-label">{{ subProduct.label }}</label>
                     </v-col>
                     <v-col class="mt-2">
                       <p>
@@ -113,10 +113,14 @@ export default defineComponent({
 .sub-product-label {
   cursor: pointer;
 }
+#sub-product-selector {
+  margin-top: 2px;
+}
 .sub-product-note {
   font-size: 14px;
   line-height: 22px;
   cursor: default;
+  color: $gray7;
 }
 
 ::v-deep {
