@@ -29,7 +29,7 @@ export const MhrSubProductConfig: Array<SubProductConfigIF> = [
     type: MhrSubTypes.DEALERS,
     label: `${MhrSubTypes.QUALIFIED_SUPPLIER} - ${MhrSubTypes.DEALERS}`,
     productBullets: [
-      MhrActions.MHR_SEARCH, MhrActions.TRANSPORT_PERMITS_NO_CERT, MhrActions.TRANSPORT_PERMITS_NO_CERT
+      MhrActions.MHR_SEARCH, MhrActions.TRANSPORT_PERMITS_NO_CERT
     ],
     hasImportantBullet: false
   }
