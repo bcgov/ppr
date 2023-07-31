@@ -1,13 +1,13 @@
 <template>
   <div>
     <h2 :data-test-id="`${sectionId}-title`">
-      {{ `${sectionNumber ? sectionNumber + '.' : ''} ${folioOrRefConfig.title}`}}
+      {{ `${sectionNumber ? sectionNumber + '.' : ''} ${config.title}`}}
     </h2>
     <p class="mt-2" :data-test-id="`${sectionId}-description`">
-      {{ folioOrRefConfig.description }}
+      {{ config.description }}
     </p>
 
-    <v-form ref="folioOrRefForm" v-model="isFormValid" :data-test-id="`${sectionId}-form`">
+    <v-form ref="attentionForm" v-model="isFormValid" :data-test-id="`${sectionId}-form`">
       <v-card
         flat
         rounded
@@ -17,12 +17,14 @@
       >
         <FormField
           :sectionId="sectionId"
-          :initialValue="getFolioOrReferenceNumber"
-          :inputTitle="folioOrRefConfig.inputTitle"
-          :inputLabel="folioOrRefConfig.inputLabel"
-          :rules="maxLength(30)"
-          :setValue="setFolioOrReferenceNumber"
+          :initialValue="initialValue"
+          :inputTitle="config.inputTitle"
+          :inputLabel="config.inputLabel"
+          :inputColWidth="hasWiderInput ? 10 : undefined"
+          :labelColWidth="hasWiderInput ? 2 : undefined"
+          :rules="maxLength(40)"
           :showErrors="setShowErrors"
+          @updateValue="$emit('setStoreProperty', $event)"
         />
       </v-card>
     </v-form>
@@ -32,16 +34,24 @@
 <script lang="ts">
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
-import { defineComponent, toRefs, ref, computed, reactive, watch } from 'vue-demi'
+import { defineComponent, toRefs, computed, reactive, ref, watch } from 'vue-demi'
 import { useInputRules } from '@/composables'
 import { FormField } from '@/components/common'
-import { folioOrRefConfig } from '@/resources/attnRefConfigs'
+import { attentionConfigManufacturer, attentionConfig } from '@/resources/attnRefConfigs'
 
 export default defineComponent({
-  name: 'FolioOrReferenceNumber',
+  name: 'Attention',
   components: { FormField },
-  emits: ['isFolioOrRefNumValid'],
+  emits: ['isAttentionValid', 'setStoreProperty'],
   props: {
+    initialValue: {
+      type: String,
+      default: ''
+    },
+    hasWiderInput: {
+      type: Boolean,
+      default: false
+    },
     sectionId: {
       type: String,
       required: true
@@ -56,31 +66,27 @@ export default defineComponent({
     }
   },
   setup (props, { emit }) {
-    const { setFolioOrReferenceNumber } = useStore()
-    const { getFolioOrReferenceNumber } = storeToRefs(useStore())
+    const attentionForm = ref(null)
+    const { isRoleManufacturer } = storeToRefs(useStore())
     const { maxLength } = useInputRules()
 
-    const folioOrRefForm = ref(null)
-
     const localState = reactive({
+      config: isRoleManufacturer.value ? attentionConfigManufacturer : attentionConfig,
       isFormValid: false,
-      setShowErrors: computed(() => props.validate && !localState.isFormValid)
+      setShowErrors: computed((): boolean => props.validate && !localState.isFormValid)
     })
 
     watch(() => localState.isFormValid, (val: boolean) => {
-      emit('isFolioOrRefNumValid', val)
+      emit('isAttentionValid', val)
     })
 
     watch(() => props.validate, (validate: boolean) => {
-      validate && folioOrRefForm.value?.validate()
+      validate && attentionForm.value?.validate()
     })
 
     return {
-      folioOrRefConfig,
-      folioOrRefForm,
-      getFolioOrReferenceNumber,
+      attentionForm,
       maxLength,
-      setFolioOrReferenceNumber,
       ...toRefs(localState)
     }
   }

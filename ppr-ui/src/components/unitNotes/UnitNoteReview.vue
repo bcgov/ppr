@@ -62,10 +62,12 @@
 
     <section class="mt-15">
       <Attention
-        section-id="mhr-attention"
-        :section-number="getSectionNumber.attention || 3"
+        sectionId="mhr-unit-note-attention"
+        :sectionNumber="getSectionNumber.attention || 3"
         :validate="validate"
+        :initialValue="initialAttention"
         @isAttentionValid="handleComponentValid(MhrCompVal.ATTENTION_VALID, $event)"
+        @setStoreProperty="handleStoreUpdate('attentionReference', $event)"
       />
     </section>
 
@@ -110,9 +112,8 @@ import { PartyIF } from '@/interfaces'
 import { UnitNotesInfo } from '@/resources/unitNotes'
 import { MhrCompVal, MhrSectVal } from '@/composables/mhrRegistration/enums'
 import { useMhrUnitNote, useMhrValidations } from '@/composables'
-import { CertifyInformation, ContactInformation } from '../common'
+import { Attention, CertifyInformation, ContactInformation } from '../common'
 import UnitNoteReviewDetailsTable from './UnitNoteReviewDetailsTable.vue'
-import { Attention } from '../mhrRegistration/ReviewConfirm'
 import { StaffPayment } from '@bcrs-shared-components/staff-payment'
 import { StaffPaymentOptions } from '@bcrs-shared-components/enums'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
@@ -164,6 +165,7 @@ export default defineComponent({
 
     const localState = reactive({
       validateSubmittingParty: false,
+      initialAttention: getMhrUnitNoteRegistration.value?.attentionReference,
       unitNoteType: UnitNotesInfo[getMhrUnitNote.value.documentType],
       givingNoticeParty: computed((): PartyIF => getMhrUnitNote.value.givingNoticeParty),
       unitNoteSubmittingParty: computed(() => getMhrUnitNoteRegistration.value.submittingParty || {}),

@@ -152,40 +152,26 @@
                 </section>
 
                 <section id="transfer-ref-num-section" class="mt-10 py-4">
-                  <h2>{{ isRoleStaffReg ? '2.' : '1.'}} {{ attnOrRefConfig.title }}</h2>
-                  <p class="mt-2">{{ attnOrRefConfig.description }}</p>
-                  <v-card
-                    flat
-                    rounded
-                    id="attention-or-reference-number-card"
-                    class="mt-8 pa-8 pr-6 pb-3"
-                    :class="{ 'border-error-left': !getInfoValidation('isRefNumValid') }"
+                  <Attention
+                    v-if="isRoleStaffReg"
+                    sectionId="transfer-ref-num-section"
+                    :intialValue="getMhrTransferAttentionReference"
+                    :sectionNumber="2"
+                    :validate="!getInfoValidation('isRefNumValid')"
+                    @isAttentionValid="setValidation('isRefNumValid', $event)"
+                    @setStoreProperty="setMhrTransferAttentionReference"
                     data-test-id="attn-ref-number-card"
-                  >
-                    <v-form ref="reference-number-form" v-model="refNumValid">
-                      <v-row no-gutters class="pt-3">
-                        <v-col cols="3">
-                          <label
-                            class="generic-label"
-                            :class="{ 'error-text': !getInfoValidation('isRefNumValid') }"
-                          >
-                            {{ attnOrRefConfig.inputTitle || attnOrRefConfig.title }}
-                          </label>
-                        </v-col>
-                        <v-col cols="9" class="px-1">
-                          <v-text-field
-                            filled
-                            id="attention-or-reference-number"
-                            class="pr-2"
-                            :label="attnOrRefConfig.inputLabel"
-                            v-model="attentionReference"
-                            :rules="isRoleStaffReg ? maxLength(40) : maxLength(30)"
-                            data-test-id="attn-ref-number-field"
-                          />
-                        </v-col>
-                      </v-row>
-                    </v-form>
-                  </v-card>
+                  />
+                  <FolioOrReferenceNumber
+                    v-else
+                    sectionId="transfer-ref-num-section"
+                    :initialValue="getMhrTransferAttentionReference"
+                    :sectionNumber="1"
+                    :validate="!getInfoValidation('isRefNumValid')"
+                    @isFolioOrRefNumValid="setValidation('isRefNumValid', $event)"
+                    @setStoreProperty="setMhrTransferAttentionReference"
+                    data-test-id="attn-ref-number-card"
+                  />
                 </section>
 
                 <section id="transfer-confirm-section" class="mt-10 transfer-confirm">
@@ -340,7 +326,7 @@ import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { StaffPayment } from '@bcrs-shared-components/staff-payment'
 import { StaffPaymentOptions } from '@bcrs-shared-components/enums'
-import { CautionBox, CertifyInformation, StickyContainer } from '@/components/common'
+import { Attention, CautionBox, CertifyInformation, FolioOrReferenceNumber, StickyContainer } from '@/components/common'
 import {
   useAuth,
   useHomeOwners,
@@ -363,7 +349,6 @@ import AccountInfo from '@/components/common/AccountInfo.vue'
 /* eslint-disable no-unused-vars */
 import {
   AccountInfoIF,
-  AttnRefConfigIF,
   DialogOptionsIF,
   ErrorIF,
   MhrTransferApiIF,
@@ -391,14 +376,15 @@ import {
   submitMhrTransfer,
   updateMhrDraft
 } from '@/utils'
-import { folioOrRefConfig, attentionConfig } from '@/resources/attnRefConfigs'
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
   name: 'MhrInformation',
   components: {
+    Attention,
     BaseDialog,
     CautionBox,
+    FolioOrReferenceNumber,
     HomeOwners,
     PartySearch,
     MhrSubmittingParty,
@@ -457,7 +443,7 @@ export default defineComponent({
       getMhrTransferType,
       getMhrTransferDeclaredValue,
       getMhrInfoValidation,
-      getMhrAttentionReference
+      getMhrTransferAttentionReference
     } = storeToRefs(useStore())
     const {
       isFrozenMhr,
@@ -507,7 +493,6 @@ export default defineComponent({
         isPriority: false
       },
       showTransferType: !!getMhrInformation.value.draftNumber || isFrozenMhr.value || false,
-      attentionReference: getMhrAttentionReference.value || '',
       cancelOptions: unsavedChangesDialog,
       showCancelDialog: false,
       showCancelChangeDialog: false,
@@ -550,9 +535,6 @@ export default defineComponent({
       }),
       enableHomeOwnerChanges: computed(() => {
         return getFeatureFlag('mhr-transfer-enabled')
-      }),
-      attnOrRefConfig: computed((): AttnRefConfigIF => {
-        return isRoleStaffReg.value ? attentionConfig : folioOrRefConfig
       }),
       /** True if Jest is running the code. */
       isJestRunning: computed((): boolean => {
@@ -873,14 +855,8 @@ export default defineComponent({
       await setMhrTransferDeclaredValue(declaredValue)
     }
 
-    watch(() => localState.attentionReference, (val: string) => {
-      val && setMhrTransferAttentionReference(val)
-    })
     watch(() => isValidTransfer.value, (val: boolean) => {
       if (val) localState.validate = false
-    })
-    watch(() => localState.refNumValid, (isValid: boolean) => {
-      setValidation('isRefNumValid', isValid)
     })
 
     watch(() => hasUnsavedChanges.value, (val: boolean) => {
@@ -903,6 +879,7 @@ export default defineComponent({
       goToReview,
       onSave,
       goToDashboard,
+      getMhrTransferAttentionReference,
       getMhrTransferHomeOwners,
       getMhrTransferCurrentHomeOwnerGroups,
       getCertifyInformation,
@@ -916,6 +893,7 @@ export default defineComponent({
       isRoleStaffReg,
       isTransferDueToDeath,
       isTransferToExecutorProbateWill,
+      setMhrTransferAttentionReference,
       setMhrTransferSubmittingParty,
       handleTransferTypeChange,
       getUiTransferType,

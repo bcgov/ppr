@@ -65,39 +65,15 @@
     </section>
 
     <section id="mhr-submitting-party-reference" class="mt-10">
-      <h2>{{ attnOrRefConfig.title }}</h2>
-      <p class="mt-2">
-        {{ attnOrRefConfig.description }}
-      </p>
-
-      <!-- Insert Attention or Reference Number here -->
-      <v-form ref="reference-number-form" v-model="isRefNumValid">
-        <v-card
-          flat
-          rounded
-          id="attention-or-reference-number-card"
-          class="mt-8 pa-8 pr-6 pb-3"
-          :class="{ 'border-error-left': validateRefNum }"
-        >
-          <v-row no-gutters class="pt-3">
-            <v-col cols="12" sm="2">
-              <label class="generic-label" :class="{ 'error-text': validateRefNum }">
-                {{ attnOrRefConfig.title }}
-              </label>
-            </v-col>
-            <v-col cols="12" sm="10" class="px-1">
-              <v-text-field
-                filled
-                id="attention-or-reference-number"
-                class="pr-2"
-                :label="attnOrRefConfig.inputLabel"
-                v-model="attentionReference"
-                :rules="maxLength(40)"
-              />
-            </v-col>
-          </v-row>
-        </v-card>
-      </v-form>
+      <Attention
+        sectionId="mhr-attention"
+        hasWiderInput
+        :intialValue="getMhrAttentionReference"
+        :sectionNumber="3"
+        :validate="validateRefNum"
+        @isAttentionValid="setAttentionValidation"
+        @setStoreProperty="setMhrAttentionReference"
+      />
     </section>
   </div>
 </template>
@@ -105,19 +81,20 @@
 <script lang="ts">
 import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue-demi'
 import { MhrSubmittingParty } from '@/components/mhrRegistration/SubmittingParty'
+import { Attention } from '@/components/common'
 import { PartySearch } from '@/components/parties/party'
 import { useMhrValidations } from '@/composables/mhrRegistration/useMhrValidations'
 import { useStore } from '@/store/store'
 import { useInputRules } from '@/composables'
 import { validateDocumentID } from '@/utils'
 // eslint-disable-next-line no-unused-vars
-import { AttnRefConfigIF, MhrDocIdResponseIF, FormIF } from '@/interfaces'
-import { attentionConfig, folioOrRefConfig } from '@/resources/attnRefConfigs'
+import { MhrDocIdResponseIF, FormIF } from '@/interfaces'
 import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'SubmittingParty',
   components: {
+    Attention,
     PartySearch,
     MhrSubmittingParty
   },
@@ -129,7 +106,6 @@ export default defineComponent({
     } = useStore()
     const {
       // Getters
-      isRoleStaffReg,
       getMhrAttentionReference,
       getMhrRegistrationDocumentId,
       getMhrRegistrationValidationModel
@@ -147,7 +123,6 @@ export default defineComponent({
     const documentIdForm = ref(null) as FormIF
 
     const localState = reactive({
-      attentionReference: getMhrAttentionReference.value || '',
       documentId: getMhrRegistrationDocumentId.value || '',
       isDocumentIdValid: false,
       isRefNumValid: false,
@@ -182,9 +157,6 @@ export default defineComponent({
       uniqueDocIdError: computed(() => {
         // Manual error handling for Unique DocId Lookup
         return localState.displayDocIdError ? ['Must be unique number'] : []
-      }),
-      attnOrRefConfig: computed((): AttnRefConfigIF => {
-        return isRoleStaffReg.value ? attentionConfig : folioOrRefConfig
       })
     })
 
@@ -210,13 +182,9 @@ export default defineComponent({
       documentIdForm.value?.validate()
     })
 
-    watch(() => localState.attentionReference, (val: string) => {
-      setMhrAttentionReference(val)
-    })
-
-    watch(() => localState.isRefNumValid, (val: boolean) => {
+    const setAttentionValidation = (val: boolean) => {
       setValidation(MhrSectVal.SUBMITTING_PARTY_VALID, MhrCompVal.REF_NUM_VALID, val)
-    })
+    }
 
     const scrollOnValidationUpdates = () => {
       scrollToInvalid(MhrSectVal.SUBMITTING_PARTY_VALID, 'mhr-submitting-party')
@@ -232,7 +200,10 @@ export default defineComponent({
       MhrSectVal,
       maxLength,
       hasError,
+      getMhrAttentionReference,
       getSectionValidation,
+      setMhrAttentionReference,
+      setAttentionValidation,
       ...toRefs(localState)
     }
   }

@@ -8,7 +8,15 @@ import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
 
 // local components
 import { HomeOwners, MhrInformation } from '@/views'
-import { AccountInfo, CautionBox, StickyContainer, CertifyInformation, SharedDatePicker } from '@/components/common'
+import {
+  AccountInfo,
+  CautionBox,
+  StickyContainer,
+  CertifyInformation,
+  SharedDatePicker,
+  Attention,
+  FormField
+} from '@/components/common'
 import mockRouter from './MockRouter'
 import { AuthRoles, HomeTenancyTypes, RouteNames, ApiTransferTypes, UITransferTypes } from '@/enums'
 import { HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
@@ -382,27 +390,29 @@ describe('Mhr Information', () => {
     await wrapper.find('#btn-stacked-submit').trigger('click')
     await nextTick()
 
-    expect(wrapper.find('#transfer-ref-num-section').exists()).toBeTruthy()
-    expect(wrapper.find(getTestId('attn-ref-number-card')).classes('border-error-left')).toBeFalsy()
+    const section = 'transfer-ref-num-section'
 
-    expect(wrapper.find(getTestId('attn-ref-number-field')).exists()).toBeTruthy()
+    expect(wrapper.find(`#${section}`).exists()).toBeTruthy()
+    expect(wrapper.find(getTestId(`${section}-card`)).classes('border-error-left')).toBeFalsy()
+
+    expect(wrapper.find(getTestId(`${section}-text-field`)).exists()).toBe(true)
 
     // trigger error in Attn Ref Num field (40+ chars)
-    wrapper.find(getTestId('attn-ref-number-field')).setValue('5'.repeat(45))
-    expect(wrapper.vm.attentionReference).toBe('5'.repeat(45))
+    await wrapper.find(getTestId(`${section}-text-field`)).setValue('5'.repeat(45))
+    expect(store.getMhrTransferAttentionReference).toBe('5'.repeat(45))
     await nextTick()
     await nextTick()
 
-    expect(wrapper.find(getTestId('attn-ref-number-card')).classes('border-error-left')).toBeTruthy()
+    expect(wrapper.find(getTestId(`${section}-card`)).classes('border-error-left')).toBeTruthy()
     expect(
       wrapper
-        .find(getTestId('attn-ref-number-card'))
+        .find(getTestId(`${section}-card`))
         .find('.v-input')
         .classes('error--text')
     ).toBeTruthy()
     expect(
       wrapper
-        .find(getTestId('attn-ref-number-card'))
+        .find(getTestId(`${section}-card`))
         .find('.v-text-field__details .v-messages__message')
         .exists()
     ).toBeTruthy()
@@ -851,8 +861,7 @@ describe('Mhr Information', () => {
     expect(wrapper.find('#mhr-information-header').text()).toContain('Review and Confirm')
     expect(feeSummaryContainer.find('.err-msg').exists()).toBeFalsy()
     expect(wrapper.findAll('.border-error-left').length).toBe(0)
-    wrapper.find(getTestId('attn-ref-number-field')).setValue('5'.repeat(45))
-    await nextTick()
+    await wrapper.find(getTestId('transfer-ref-num-section-text-field')).setValue('5'.repeat(45))
 
     wrapper.find('#btn-stacked-submit').trigger('click')
     await nextTick()
