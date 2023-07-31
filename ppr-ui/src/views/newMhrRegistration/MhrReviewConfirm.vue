@@ -41,14 +41,13 @@
     <div id="mhr-review-confirm-components">
       <template  v-if="isMhrManufacturerRegistration">
         <!-- Submitting Party based on Account-->
-        <section id="mhr-manufacturer-submitting-party" class="mt-15">
-          <AccountInfo
-            title="Submtting Party for this Registration"
-            :tooltipContent="'The default Submitting Party is based on your BC Registries user account information. ' +
-                              'This information can be updated within your account settings.'"
-            :accountInfo="accountInfo"
-          />
-        </section>
+        <AccountInfo
+          class="mt-15"
+          title="Submtting Party for this Registration"
+          :tooltipContent="'The default Submitting Party is based on your BC Registries user account information. ' +
+                            'This information can be updated within your account settings.'"
+          :accountInfo="accountInfo"
+        />
 
         <!-- Attention -->
         <section id="mhr-review-confirm-attention" class="mt-15">
