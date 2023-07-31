@@ -1,6 +1,6 @@
 <template>
   <v-row no-gutters>
-    <v-col cols="3">
+    <v-col :cols="labelColWidth">
       <label
         class="generic-label"
         :class="{ 'error-text': showErrors && hasError }"
@@ -9,8 +9,9 @@
         {{ inputTitle }}
       </label>
     </v-col>
-    <v-col cols="9">
+    <v-col :cols="inputColWidth">
       <v-text-field
+        class="px-1"
         ref="field"
         filled
         :label="inputLabel"
@@ -34,7 +35,16 @@ import {
 
 export default defineComponent({
   name: 'FormField',
+  emits: ['updateValue'],
   props: {
+    labelColWidth: {
+      type: Number,
+      default: 3
+    },
+    inputColWidth: {
+      type: Number,
+      default: 9
+    },
     initialValue: {
       type: String,
       required: false
@@ -55,16 +65,12 @@ export default defineComponent({
       type: String,
       required: true
     },
-    setValue: {
-      type: Function,
-      required: true
-    },
     showErrors: {
       type: Boolean,
       default: false
     }
   },
-  setup (props) {
+  setup (props, { emit }) {
     const field = ref(null)
     const localState = reactive({
       inputModel: props.initialValue || '',
@@ -72,7 +78,7 @@ export default defineComponent({
     })
 
     watch(() => localState.inputModel, (val: string) => {
-      props.setValue(val)
+      emit('updateValue', val)
     })
 
     return {
