@@ -170,6 +170,16 @@ def validate_submitting_party(json_data):
     return error_msg
 
 
+def validate_party(party: dict, desc: str):
+    """Verify party names are valid."""
+    error_msg = ''
+    if party.get('businessName'):
+        error_msg += validate_text(party.get('businessName'), desc + ' business name')
+    elif party.get('personName'):
+        error_msg += validate_individual_name(party.get('personName'), desc + ' person name')
+    return error_msg
+
+
 def validate_individual_name(name_json, desc: str = ''):
     """Verify individual name is valid."""
     error_msg = validate_text(name_json.get('first'), desc + ' first')
