@@ -41,12 +41,14 @@
     <div id="mhr-review-confirm-components">
       <template  v-if="isMhrManufacturerRegistration">
         <!-- Attention -->
-        <section id="mhr-attention" class="mt-15">
+        <section id="mhr-review-confirm-attention" class="mt-15">
           <Attention
-            sectionId="mhr-attention"
+            sectionId="mhr-review-confirm-attention"
+            :intialValue="getMhrAttentionReference"
             :sectionNumber="1"
             :validate="isValidatingApp"
             @isAttentionValid="setAttentionValidation"
+            @setStoreProperty="setMhrAttentionReference"
           />
         </section>
 
@@ -54,9 +56,11 @@
         <section id="mhr-folio-or-reference-number" class="mt-15">
           <FolioOrReferenceNumber
             sectionId="mhr-folio-or-reference-number"
+            :intialValue="getFolioOrReferenceNumber"
             :sectionNumber="2"
             :validate="isValidatingApp"
             @isFolioOrRefNumValid="setFolioOrReferenceNumberValidation"
+            @setStoreProperty="setFolioOrReferenceNumber"
           />
         </section>
       </template>
@@ -97,14 +101,12 @@ import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
 import { useStore } from '@/store/store'
 import { StaffPayment } from '@bcrs-shared-components/staff-payment'
 import {
-  Attention,
-  FolioOrReferenceNumber,
   HomeLocationReview,
   HomeOwnersReview,
   SubmittingPartyReview,
   YourHomeReview
 } from '@/components/mhrRegistration/ReviewConfirm'
-import { CertifyInformation, ContactUsToggle, CautionBox } from '@/components/common'
+import { Attention, CertifyInformation, ContactUsToggle, CautionBox, FolioOrReferenceNumber } from '@/components/common'
 import { useMhrValidations } from '@/composables'
 import { RouteNames } from '@/enums'
 /* eslint-disable no-unused-vars */
@@ -132,8 +134,10 @@ export default defineComponent({
     CautionBox
 },
   setup () {
-    const { setStaffPayment } = useStore()
+    const { setStaffPayment, setMhrAttentionReference, setFolioOrReferenceNumber } = useStore()
     const { 
+      getFolioOrReferenceNumber,
+      getMhrAttentionReference,
       getMhrRegistrationValidationModel, 
       isRoleStaffReg,
       getMhrSteps,
@@ -288,10 +292,14 @@ export default defineComponent({
 
     return {
       setShowGroups,
+      getFolioOrReferenceNumber,
+      getMhrAttentionReference,
       isMhrManufacturerRegistration,
       isRoleStaffReg,
       onStaffPaymentDataUpdate,
       setAttentionValidation,
+      setFolioOrReferenceNumber,
+      setMhrAttentionReference,
       setFolioOrReferenceNumberValidation,
       ...toRefs(localState)
     }
