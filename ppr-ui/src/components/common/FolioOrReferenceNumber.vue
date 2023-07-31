@@ -20,6 +20,8 @@
           :initialValue="initialValue"
           :inputTitle="folioOrRefConfig.inputTitle"
           :inputLabel="folioOrRefConfig.inputLabel"
+          :inputColWidth="hasWiderInput ? 10 : undefined"
+          :labelColWidth="hasWiderInput ? 2 : undefined"
           :rules="maxLength(30)"
           :showErrors="setShowErrors"
           @updateValue="$emit('setStoreProperty', $event)"
@@ -43,6 +45,10 @@ export default defineComponent({
     initialValue: {
       type: String,
       default: ''
+    },
+    hasWiderInput: {
+      type: Boolean,
+      default: false
     },
     sectionId: {
       type: String,
