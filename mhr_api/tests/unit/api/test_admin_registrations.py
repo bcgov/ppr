@@ -75,7 +75,8 @@ TEST_CREATE_DATA = [
     ('Staff missing account', '003936', [MHR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, None),
     ('Invalid role product', '003936', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, 'ppr_staff'),
     ('Invalid non-staff role', '003936', [MHR_ROLE, TRANSFER_DEATH_JT], HTTPStatus.UNAUTHORIZED, 'ppr_staff'),
-    ('Valid staff', '022873', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'ppr_staff'),
+    ('Valid staff NRED', '022873', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'ppr_staff'),
+    ('Valid staff NCAN', '045718', [MHR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, 'ppr_staff'),
     ('Invalid mhr num', '300655', [MHR_ROLE, STAFF_ROLE], HTTPStatus.NOT_FOUND, 'ppr_staff'),
     ('Invalid exempt', '098655', [MHR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, 'ppr_staff'),
     ('Invalid historical', '099942', [MHR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, 'ppr_staff'),
@@ -103,6 +104,10 @@ def test_create(session, client, jwt, desc, mhr_num, roles, status, account):
         json_data['note']['documentId'] = '80058756'
     if mhr_num == '022873':
         json_data['updateDocumentId'] = '50435493'
+    elif mhr_num == '045718':
+        json_data['updateDocumentId'] = '43641595'
+        json_data['documentType'] = MhrDocumentTypes.NCAN
+        json_data['note']['documentType'] = MhrDocumentTypes.NCAN
     if account:
         headers = create_header_account(jwt, roles, 'UT-TEST', account)
     else:

@@ -18,7 +18,7 @@ from flask import current_app
 import pytest
 from registry_schemas import utils as schema_utils
 
-from mhr_api.utils import note_validator as validator
+from mhr_api.utils import note_validator as validator, admin_validator
 from mhr_api.models import MhrRegistration, utils as model_utils
 from mhr_api.models.type_tables import MhrDocumentTypes
 from mhr_api.services.authz import STAFF_ROLE
@@ -137,9 +137,9 @@ TEST_NOTE_DATA_NOTICE = [
 # test data pattern is ({description}, {valid}, {cancel_doc_id}, {mhr_num}, {account}, {message_content})
 TEST_NOTE_DATA_NCAN = [
     ('Valid REST', True, '43641595', '045718', 'ppr_staff', None),
-    ('Invalid no doc id', False, None, '045718', 'ppr_staff', validator.NCAN_DOCUMENT_ID_REQUIRED),
-    ('Invalid status', False, '44161815', '022873', 'ppr_staff', validator.NCAN_DOCUMENT_ID_STATUS),
-    ('Invalid doc type TAXN', False, '50435493', '022873', 'ppr_staff', validator.NCAN_NOT_ALLOWED)
+    ('Invalid no doc id', False, None, '045718', 'ppr_staff', admin_validator.NCAN_DOCUMENT_ID_REQUIRED),
+    ('Invalid status', False, '44161815', '022873', 'ppr_staff', admin_validator.NCAN_DOCUMENT_ID_STATUS),
+    ('Invalid doc type TAXN', False, '50435493', '022873', 'ppr_staff', admin_validator.NCAN_NOT_ALLOWED)
 ]
 
 @pytest.mark.parametrize('desc,valid,doc_type,ts_offset,mhr_num,account,message_content', TEST_NOTE_DATA_EFFECTIVE)
@@ -261,8 +261,8 @@ def test_validate_ncan(session, desc, valid, can_doc_id, mhr_num, account, messa
     else:
         assert error_msg != ''
         if message_content:
-            if message_content == validator.NCAN_NOT_ALLOWED:
-                msg: str = validator.NCAN_NOT_ALLOWED.format(doc_type='TAXN')
+            if message_content == admin_validator.NCAN_NOT_ALLOWED:
+                msg: str = admin_validator.NCAN_NOT_ALLOWED.format(doc_type='TAXN')
                 assert error_msg.find(msg) != -1
             else:
                 assert error_msg.find(message_content) != -1

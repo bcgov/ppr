@@ -30,8 +30,8 @@
       </tr>
       <tr>
         <td>
-            {% if note is defined and note.documentType is defined and note.documentType == 'NCAN' %}
-                Cancellation Date and Time:
+            {% if note is defined and note.documentType is defined and note.documentType in ('NCAN', 'NRED') %}
+                Cancelled Date and Time:
             {% else %}
                Effective Date and Time:
             {% endif %}
@@ -71,7 +71,7 @@
 
   <div class="container pt-4">
     <div class="no-page-break">
-        {% if note is defined and note.documentType is defined and note.documentType in ('NRED') %}
+        {% if note is defined and note.documentType is defined and note.documentType in ('NCAN', 'NRED') %}
           <div class="section-title mt-5">Instructions</div>
           <div class="section-data pt-3">
               The {{note.cancelledDocumentDescription}} with registration number {{note.cancelledDocumentRegistrationNumber}} has been cancelled.

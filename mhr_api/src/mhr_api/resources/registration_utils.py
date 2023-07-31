@@ -344,8 +344,11 @@ def pay_and_save_admin(req: request,  # pylint: disable=too-many-arguments
     # Try to save the registration: failure throws an exception.
     try:
         registration.save()
-        if request_json.get('updateDocumentId') and request_json.get('documentType') in (MhrDocumentTypes.NRED,
-                                                                                         MhrDocumentTypes.EXRE):
+        if request_json.get('cancelDocumentId') and request_json['note'].get('documentType') == MhrDocumentTypes.NCAN:
+            save_cancel_note(current_reg, request_json, registration.id)
+        elif request_json.get('updateDocumentId') and request_json.get('documentType') in (MhrDocumentTypes.NCAN,
+                                                                                           MhrDocumentTypes.NRED,
+                                                                                           MhrDocumentTypes.EXRE):
             save_cancel_note(current_reg, request_json, registration.id)
         if request_json.get('documentType') == MhrDocumentTypes.EXRE:
             save_active(current_reg)

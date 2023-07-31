@@ -142,10 +142,12 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
             elif self.registration_type in (MhrRegistrationTypes.EXEMPTION_NON_RES, MhrRegistrationTypes.EXEMPTION_RES):
                 reg_json = self.set_note_json(reg_json)
             elif self.registration_type == MhrRegistrationTypes.REG_STAFF_ADMIN and \
-                    (not self.notes or doc_json.get('documentType') in (MhrDocumentTypes.NRED, MhrDocumentTypes.EXRE)):
+                    (not self.notes or doc_json.get('documentType') in (MhrDocumentTypes.NCAN,
+                                                                        MhrDocumentTypes.NRED, MhrDocumentTypes.EXRE)):
                 reg_json['documentType'] = doc_json.get('documentType')
                 del reg_json['declaredValue']
-                if doc_json.get('documentType') in (MhrDocumentTypes.NRED, MhrDocumentTypes.EXRE):
+                if doc_json.get('documentType') in (MhrDocumentTypes.NCAN,
+                                                    MhrDocumentTypes.NRED, MhrDocumentTypes.EXRE):
                     reg_json = self.set_note_json(reg_json)
             elif self.registration_type == MhrRegistrationTypes.REG_NOTE:
                 reg_json = self.set_note_json(reg_json)
@@ -741,10 +743,6 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
             registration.parties.append(MhrParty.create_from_json(notice_json, MhrPartyTypes.CONTACT, registration.id))
         doc: MhrDocument = registration.documents[0]
         if json_data.get('note'):
-            if base_reg and base_reg.manuhome and base_reg.manuhome.reg_notes:
-                json_data['note']['noteId'] = len(base_reg.manuhome.reg_notes) + 1
-            else:
-                json_data['note']['noteId'] = 1
             json_data['note']['destroyed'] = True
             registration.notes = [MhrNote.create_from_json(json_data.get('note'), base_reg.id, doc.id,
                                                            registration.registration_ts, registration.id)]
@@ -767,14 +765,6 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                                                                                 user_group)
         doc: MhrDocument = registration.documents[0]
         # Save permit expiry date as a note.
-        if base_reg and base_reg.manuhome and base_reg.manuhome.reg_notes:
-            json_data['note'] = {
-                'noteId': (len(base_reg.manuhome.reg_notes) + 1)
-            }
-        else:
-            json_data['note'] = {
-                'noteId': 1
-            }
         note: MhrNote = MhrNote(registration_id=base_reg.id,
                                 document_id=doc.id,
                                 document_type=doc.document_type,
@@ -797,6 +787,10 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                               user_id: str = None,
                               user_group: str = None):
         """Create unit note registration objects from dict/json."""
+        if MhrDocumentTypes.NCAN == json_data['note'].get('documentType'):
+            json_data['documentType'] = json_data['note'].get('documentType')
+            json_data['updateDocumentId'] = json_data.get('cancelDocumentId')
+            return MhrRegistration.create_admin_from_json(base_reg, json_data, account_id, user_id, user_group)
         json_data['registrationType'] = MhrRegistrationTypes.REG_NOTE
         json_data['documentId'] = json_data['note'].get('documentId', '')
         registration: MhrRegistration = MhrRegistration.create_change_from_json(base_reg,
@@ -808,10 +802,6 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
             notice_json = json_data['note']['givingNoticeParty']
             registration.parties.append(MhrParty.create_from_json(notice_json, MhrPartyTypes.CONTACT, registration.id))
         doc: MhrDocument = registration.documents[0]
-        if model_utils.is_legacy() and base_reg and base_reg.manuhome and base_reg.manuhome.reg_notes:
-            json_data['note']['noteId'] = len(base_reg.manuhome.reg_notes) + 1
-        else:
-            json_data['note']['noteId'] = 1
         registration.notes = [MhrNote.create_from_json(json_data.get('note'), registration.id, doc.id,
                                                        registration.registration_ts, registration.id)]
         if base_reg:
@@ -836,10 +826,6 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
             registration.parties.append(MhrParty.create_from_json(notice_json, MhrPartyTypes.CONTACT, registration.id))
         doc: MhrDocument = registration.documents[0]
         if json_data.get('note'):
-            if model_utils.is_legacy() and base_reg and base_reg.manuhome and base_reg.manuhome.reg_notes:
-                json_data['note']['noteId'] = len(base_reg.manuhome.reg_notes) + 1
-            else:
-                json_data['note']['noteId'] = 1
             registration.notes = [MhrNote.create_from_json(json_data.get('note'), registration.id, doc.id,
                                                            registration.registration_ts, registration.id)]
         if base_reg:
