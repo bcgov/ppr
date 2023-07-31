@@ -56,7 +56,7 @@
         <section id="mhr-folio-or-reference-number" class="mt-15">
           <FolioOrReferenceNumber
             sectionId="mhr-folio-or-reference-number"
-            :intialValue="getFolioOrReferenceNumber"
+            :initialValue="getFolioOrReferenceNumber"
             :sectionNumber="2"
             :validate="isValidatingApp"
             @isFolioOrRefNumValid="setFolioOrReferenceNumberValidation"

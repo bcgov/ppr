@@ -165,7 +165,7 @@
                   <FolioOrReferenceNumber
                     v-else
                     sectionId="transfer-ref-num-section"
-                    :intialValue="getMhrTransferAttentionReference"
+                    :initialValue="getMhrTransferAttentionReference"
                     :sectionNumber="1"
                     :validate="!getInfoValidation('isRefNumValid')"
                     @isFolioOrRefNumValid="setValidation('isRefNumValid', $event)"

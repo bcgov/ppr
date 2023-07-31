@@ -17,7 +17,7 @@
       >
         <FormField
           :sectionId="sectionId"
-          :initialValue="intialValue"
+          :initialValue="initialValue"
           :inputTitle="folioOrRefConfig.inputTitle"
           :inputLabel="folioOrRefConfig.inputLabel"
           :rules="maxLength(30)"
@@ -40,7 +40,7 @@ export default defineComponent({
   components: { FormField },
   emits: ['isFolioOrRefNumValid', 'setStoreProperty'],
   props: {
-    intialValue: {
+    initialValue: {
       type: String,
       default: ''
     },
