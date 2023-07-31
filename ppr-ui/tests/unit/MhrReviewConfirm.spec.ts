@@ -8,11 +8,9 @@ import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
 
 // Local Components
 import { MhrReviewConfirm } from '@/views'
-import {
-  Attention, FolioOrReferenceNumber,
-  HomeLocationReview, HomeOwnersReview, SubmittingPartyReview, YourHomeReview
-} from '@/components/mhrRegistration/ReviewConfirm'
-import { CautionBox, CertifyInformation, ContactUsToggle } from '@/components/common'
+import { HomeLocationReview, HomeOwnersReview,
+  SubmittingPartyReview, YourHomeReview } from '@/components/mhrRegistration/ReviewConfirm'
+import { Attention, CautionBox, CertifyInformation, ContactUsToggle, FolioOrReferenceNumber } from '@/components/common'
 import { HomeTenancyTypes, RouteNames } from '@/enums'
 import mockRouter from './MockRouter'
 import { mockedFractionalOwnership, mockedPerson } from './test-data/mock-mhr-registration'

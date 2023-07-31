@@ -10,7 +10,7 @@ import { MhrUnitNote } from '@/views'
 import { RouteNames, UnitNoteDocTypes } from '@/enums'
 import { getTestId, setupMockStaffUser } from './utils'
 import { UnitNotesInfo } from '@/resources/unitNotes'
-import { CertifyInformation, ContactInformation, DocumentId, Remarks } from '@/components/common'
+import { Attention, CertifyInformation, ContactInformation, DocumentId, Remarks } from '@/components/common'
 import {
   EffectiveDateTime,
   ExpiryDate,
@@ -18,7 +18,6 @@ import {
   UnitNoteReview,
   UnitNoteReviewDetailsTable
 } from '@/components/unitNotes'
-import { Attention } from '@/components/mhrRegistration/ReviewConfirm'
 import { StaffPayment } from '@bcrs-shared-components/staff-payment'
 import { MhrUnitNoteValidationStateIF } from '@/interfaces'
 import { isEqual } from 'lodash'

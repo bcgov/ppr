@@ -4,8 +4,7 @@ import Vuetify from 'vuetify'
 import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
 
 // Components
-import { FolioOrReferenceNumber } from '@/components/mhrRegistration/ReviewConfirm'
-import { FormField } from '@/components/common'
+import { FormField, FolioOrReferenceNumber } from '@/components/common'
 
 // Utilities
 import { getLastEvent, getTestId } from './utils'
