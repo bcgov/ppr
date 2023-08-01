@@ -830,6 +830,7 @@ class Db2Manuhome(db.Model):
         manuhome.reg_documents.append(doc)
         # Add note.
         if reg_json.get('note'):
+            reg_json['note']['noteId'] = manuhome.get_next_note_id(manuhome.reg_notes)
             manuhome.reg_notes.append(Db2Mhomnote.create_from_registration(reg_json.get('note'), doc, manuhome.id))
         return manuhome
 
@@ -852,8 +853,11 @@ class Db2Manuhome(db.Model):
                                                                 now_local)
         doc.update_id = current_app.config.get('DB2_RACF_ID', '')
         manuhome.reg_documents.append(doc)
-        # Create note, which holds permit expiry date.
-        note: Db2Mhomnote = Db2Mhomnote.create_from_registration(reg_json.get('note'), doc, manuhome.id)
+        # Always create note, which holds permit expiry date.
+        note_json = {
+            'noteId': manuhome.get_next_note_id(manuhome.reg_notes)
+        }
+        note: Db2Mhomnote = Db2Mhomnote.create_from_registration(note_json, doc, manuhome.id)
         note.expiry_date = model_utils.date_offset(manuhome.update_date, 30, True)
         manuhome.reg_notes.append(note)
         # Update location:
@@ -890,28 +894,12 @@ class Db2Manuhome(db.Model):
                                                                 ts_local)
         doc.update_id = current_app.config.get('DB2_RACF_ID', '')
         manuhome.reg_documents.append(doc)
-        cancel_doc_type: str = None
-        if new_doc.document_type == MhrDocumentTypes.NCAN and reg_json.get('cancelDocumentId'):
-            cancel_doc_id: str = reg_json.get('cancelDocumentId')
-            for note in manuhome.reg_notes:
-                if note.reg_document_id == cancel_doc_id:
-                    note.can_document_id = doc.id
-                    note.status = Db2Mhomnote.StatusTypes.CANCELLED
-                    cancel_doc_type = note.document_type
-                    break
-            if cancel_doc_type and cancel_doc_type in ('CAU', Db2Document.DocumentTypes.CAUTION,
-                                                       Db2Document.DocumentTypes.CONTINUE_CAUTION,
-                                                       Db2Document.DocumentTypes.EXTEND_CAUTION):
-                for note in manuhome.reg_notes:
-                    if note.status == Db2Mhomnote.StatusTypes.ACTIVE and \
-                            note.document_type in (Db2Document.DocumentTypes.CAUTION,
-                                                   Db2Document.DocumentTypes.CONTINUE_CAUTION,
-                                                   Db2Document.DocumentTypes.EXTEND_CAUTION):
-                        note.can_document_id = doc.id
-                        note.status = Db2Mhomnote.StatusTypes.CANCELLED
+        if new_doc.document_type == MhrDocumentTypes.NCAN:
+            manuhome.cancel_note(manuhome, reg_json, new_doc.document_type, doc.id)
         # Add note record except for the NCAN.
         if reg_json.get('note') and new_doc.document_type != MhrDocumentTypes.NCAN:
             reg_note = registration.notes[0]
+            reg_json['note']['noteId'] = manuhome.get_next_note_id(manuhome.reg_notes)
             note: Db2Mhomnote = Db2Mhomnote.create_from_registration(reg_json.get('note'), doc, manuhome.id)
             if reg_note.expiry_date:
                 note.expiry_date = model_utils.to_local_timestamp(reg_note.expiry_date).date()
@@ -943,16 +931,56 @@ class Db2Manuhome(db.Model):
                                                                 now_local)
         doc.update_id = current_app.config.get('DB2_RACF_ID', '')
         manuhome.reg_documents.append(doc)
-        if new_doc.document_type in (MhrDocumentTypes.NRED, MhrDocumentTypes.EXRE) and reg_json.get('updateDocumentId'):
-            cancel_doc_id: str = reg_json.get('updateDocumentId')
-            for note in manuhome.reg_notes:
-                if note.reg_document_id == cancel_doc_id or (note.document_type in (MhrDocumentTypes.EXNR,
-                                                                                    MhrDocumentTypes.EXRS,
-                                                                                    MhrDocumentTypes.EXMN) and
-                                                             note.status == Db2Mhomnote.StatusTypes.ACTIVE):
-                    note.can_document_id = doc.id
-                    note.status = Db2Mhomnote.StatusTypes.CANCELLED
-        # Add note record except for the NRED, EXRE.
-        if reg_json.get('note') and new_doc.document_type not in (MhrDocumentTypes.NRED, MhrDocumentTypes.EXRE):
+        if new_doc.document_type in (MhrDocumentTypes.NCAN, MhrDocumentTypes.NRED, MhrDocumentTypes.EXRE):
+            manuhome.cancel_note(manuhome, reg_json, new_doc.document_type, doc.id)
+        # Add note record except for the NCAN, NRED, EXRE.
+        if reg_json.get('note') and new_doc.document_type not in (MhrDocumentTypes.NCAN,
+                                                                  MhrDocumentTypes.NRED, MhrDocumentTypes.EXRE):
+            reg_json['note']['noteId'] = manuhome.get_next_note_id(manuhome.reg_notes)
             manuhome.reg_notes.append(Db2Mhomnote.create_from_registration(reg_json.get('note'), doc, manuhome.id))
         return manuhome
+
+    @staticmethod
+    def cancel_note(manuhome, reg_json, doc_type: str, doc_id: int):
+        """Update status, candocid for a registration that cancels a unit note."""
+        if not reg_json.get('cancelDocumentId') and not reg_json.get('updateDocumentId'):
+            return
+        cancel_doc_type: str = None
+        cancel_doc_id: str = reg_json.get('cancelDocumentId')
+        if not cancel_doc_id:
+            cancel_doc_id: str = reg_json.get('updateDocumentId')
+        for note in manuhome.reg_notes:
+            if note.reg_document_id == cancel_doc_id:
+                note.can_document_id = doc_id
+                note.status = Db2Mhomnote.StatusTypes.CANCELLED
+                cancel_doc_type = note.document_type
+                break
+        if doc_type == MhrDocumentTypes.NCAN and cancel_doc_type in (MhrDocumentTypes.CAU,
+                                                                     Db2Document.DocumentTypes.CAUTION,
+                                                                     Db2Document.DocumentTypes.CONTINUE_CAUTION,
+                                                                     Db2Document.DocumentTypes.EXTEND_CAUTION):
+            for note in manuhome.reg_notes:
+                if note.status == Db2Mhomnote.StatusTypes.ACTIVE and \
+                        note.document_type in (MhrDocumentTypes.CAU, Db2Document.DocumentTypes.CAUTION,
+                                               Db2Document.DocumentTypes.CONTINUE_CAUTION,
+                                               Db2Document.DocumentTypes.EXTEND_CAUTION):
+                    note.can_document_id = doc_id
+                    note.status = Db2Mhomnote.StatusTypes.CANCELLED
+        elif doc_type == MhrDocumentTypes.EXRE and cancel_doc_type in (MhrDocumentTypes.EXNR,
+                                                                       MhrDocumentTypes.EXRS,
+                                                                       MhrDocumentTypes.EXMN):
+            for note in manuhome.reg_notes:
+                if note.status == Db2Mhomnote.StatusTypes.ACTIVE and \
+                        note.document_type in (MhrDocumentTypes.EXNR, MhrDocumentTypes.EXRS, MhrDocumentTypes.EXMN):
+                    note.can_document_id = doc_id
+                    note.status = Db2Mhomnote.StatusTypes.CANCELLED
+
+    @staticmethod
+    def get_next_note_id(reg_notes) -> int:
+        """Get the next mhomnote.note_id value: part of the composite key."""
+        note_id: int = 1
+        if reg_notes:
+            for note in reg_notes:
+                if note.note_id >= note_id:
+                    note_id = note.note_id + 1
+        return note_id

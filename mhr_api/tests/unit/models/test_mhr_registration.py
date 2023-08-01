@@ -482,6 +482,7 @@ TEST_DATA_NOTE = [
 ]
 # testdata pattern is ({mhr_num}, {group_id}, {doc_id_prefix}, {account_id}, {doc_type}, {can_doc_id})
 TEST_DATA_ADMIN = [
+    ('003936', STAFF_ROLE, '6', 'ppr_staff', 'NCAN', '43641595'),
     ('022873', STAFF_ROLE, '6', 'ppr_staff', 'NRED', 50435493)
 ]
 # testdata pattern is ({http_status}, {document_id}, {mhr_num}, {doc_type}, {legacy}, {owner_count})
@@ -1424,7 +1425,7 @@ def test_create_admin_from_json(session, mhr_num, user_group, doc_id_prefix, acc
     """Assert that an MHR admin registration is created from json correctly."""
     json_data = copy.deepcopy(ADMIN_REGISTRATION)
     json_data['documentType'] = doc_type
-    if doc_type == MhrDocumentTypes.NRED:
+    if doc_type in (MhrDocumentTypes.NRED, MhrDocumentTypes.NCAN):
         json_data['note']['documentType'] = doc_type
         json_data['updateDocumentId'] = can_doc_id
     else:

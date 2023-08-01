@@ -2,7 +2,7 @@
 <div class="no-page-break">
     <div class="separator mt-5"></div>
     <div class="section-title mt-3">
-        {% if note.documentType is defined and note.documentType == 'TAXN' %} 
+        {% if note.documentType is defined and note.documentType in ('TAXN', 'NRED') %} 
             Collector
         {% else %}
             Person Giving Notice

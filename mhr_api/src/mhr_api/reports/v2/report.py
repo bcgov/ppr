@@ -667,7 +667,8 @@ class Report:  # pylint: disable=too-few-public-methods
             if reg.get('location') and reg['location'].get('taxExpiryDate'):
                 reg['location']['taxExpiryDate'] = Report._to_report_datetime(reg['location']['taxExpiryDate'], False)
         elif self._report_key in (ReportTypes.MHR_TRANSFER, ReportTypes.MHR_EXEMPTION,
-                                  ReportTypes.MHR_TRANSPORT_PERMIT, ReportTypes.MHR_NOTE):
+                                  ReportTypes.MHR_TRANSPORT_PERMIT, ReportTypes.MHR_NOTE,
+                                  ReportTypes.MHR_ADMIN_REGISTRATION):
             reg = self._report_data
             reg['createDateTime'] = Report._to_report_datetime(reg['createDateTime'])
             if reg.get('declaredValue'):

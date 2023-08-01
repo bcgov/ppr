@@ -125,6 +125,13 @@ TEST_DATA_EXRE = [
     ('Valid state', True, '41617884', '077010', 'ppr_staff', None),
     ('Valid no note', True, '41617884', '077010', 'ppr_staff', None)
 ]
+# test data pattern is ({description}, {valid}, {update_doc_id}, {mhr_num}, {account}, {message_content})
+TEST_NOTE_DATA_NCAN = [
+    ('Valid REST', True, '43641595', '045718', 'ppr_staff', None),
+    ('Invalid no doc id', False, None, '045718', 'ppr_staff', validator.NCAN_DOCUMENT_ID_REQUIRED),
+    ('Invalid status', False, '44161815', '022873', 'ppr_staff', validator.NCAN_DOCUMENT_ID_STATUS),
+    ('Invalid doc type TAXN', False, '50435493', '022873', 'ppr_staff', validator.NCAN_NOT_ALLOWED)
+]
 
 
 @pytest.mark.parametrize('desc,valid,update_doc_id,mhr_num,account,message_content', TEST_DATA_EXRE)
@@ -169,6 +176,31 @@ def test_validate_nred(session, desc, valid, update_doc_id, mhr_num, account, me
         assert error_msg != ''
         if message_content:
             assert error_msg.find(message_content) != -1
+
+
+@pytest.mark.parametrize('desc,valid,update_doc_id,mhr_num,account,message_content', TEST_NOTE_DATA_NCAN)
+def test_validate_ncan(session, desc, valid, update_doc_id, mhr_num, account, message_content):
+    """Assert that NCAN document type validation works as expected."""
+    # setup
+    json_data = get_valid_registration()
+    if update_doc_id:
+        json_data['updateDocumentId'] = update_doc_id
+    json_data['documentType'] = MhrDocumentTypes.NCAN
+    if json_data.get('note'):
+        json_data['note']['documentType'] = MhrDocumentTypes.NCAN
+    registration: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account)
+    error_msg = validator.validate_admin_reg(registration, json_data)
+    current_app.logger.debug(error_msg)
+    if valid:
+        assert error_msg == ''
+    else:
+        assert error_msg != ''
+        if message_content:
+            if message_content == validator.NCAN_NOT_ALLOWED:
+                msg: str = validator.NCAN_NOT_ALLOWED.format(doc_type='TAXN')
+                assert error_msg.find(msg) != -1
+            else:
+                assert error_msg.find(message_content) != -1
 
 
 @pytest.mark.parametrize('desc,valid,doc_type,notice,mhr_num,account,message_content', TEST_NOTE_DATA_NOTICE)

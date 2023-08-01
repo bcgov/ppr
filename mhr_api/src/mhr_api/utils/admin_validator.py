@@ -24,6 +24,8 @@ from mhr_api.models.db2.utils import FROM_LEGACY_DOC_TYPE
 from mhr_api.utils import validator_utils
 
 
+NCAN_DOC_TYPES = ' CAU CAUC CAUE NCON NPUB REGC REST '  # Set of doc types NCAN can cancel.
+
 VALIDATOR_ERROR = 'Error performing admin registration extra validation. '
 DOC_ID_REQUIRED = 'Document ID is required for staff registrations. '
 DOC_ID_EXISTS = 'Document ID must be unique: provided value already exists. '
@@ -37,6 +39,10 @@ UPDATE_DOCUMENT_ID_REQUIRED = 'The update document ID is required. '
 UPDATE_DOCUMENT_ID_INVALID = 'The update document ID is invalid. '
 UPDATE_DOCUMENT_ID_STATUS = 'The update document ID is for a note or registration that is not active. '
 NRED_INVALID_TYPE = 'Notice of Redemption NRED is only allowed with the TAXN document type. '
+NCAN_DOCUMENT_ID_REQUIRED = 'The cancellation update document ID is required. '
+NCAN_DOCUMENT_ID_INVALID = 'The cancellation udpate document ID is invalid. '
+NCAN_DOCUMENT_ID_STATUS = 'The cancellation update document ID is for a note that is not active. '
+NCAN_NOT_ALLOWED = 'Cancel Notice is not allowed with the registration document type {doc_type}. '
 
 
 def validate_admin_reg(registration: MhrRegistration, json_data) -> str:
@@ -55,6 +61,8 @@ def validate_admin_reg(registration: MhrRegistration, json_data) -> str:
         error_msg += validate_giving_notice(json_data, doc_type)
         if doc_type and doc_type == MhrDocumentTypes.NRED:
             error_msg += validate_nred(registration, json_data)
+        elif doc_type and doc_type == MhrDocumentTypes.NCAN:
+            error_msg += validate_ncan(registration, json_data)
     except Exception as validation_exception:   # noqa: B902; eat all errors
         current_app.logger.error('validate_admin exception: ' + str(validation_exception))
         error_msg += VALIDATOR_ERROR
@@ -127,4 +135,37 @@ def validate_nred(registration: MhrRegistration, json_data) -> str:
         error_msg += UPDATE_DOCUMENT_ID_STATUS
     if cancel_type and cancel_type != MhrDocumentTypes.TAXN:
         error_msg += NRED_INVALID_TYPE
+    return error_msg
+
+
+def validate_ncan(registration: MhrRegistration, json_data) -> str:
+    """Validate the notice of cancellation document id."""
+    error_msg: str = ''
+    if not json_data.get('updateDocumentId') and not json_data.get('cancelDocumentId'):
+        return NCAN_DOCUMENT_ID_REQUIRED
+    if not registration:
+        return error_msg
+    status = None
+    cancel_type: str = None
+    cancel_doc_id = json_data.get('updateDocumentId') if json_data.get('updateDocumentId') \
+        else json_data.get('cancelDocumentId')
+    if model_utils.is_legacy() and registration.manuhome and registration.manuhome.notes:
+        for note in registration.manuhome.notes:
+            if note.reg_document_id == cancel_doc_id:
+                status = FROM_LEGACY_STATUS.get(note.status)
+                if FROM_LEGACY_DOC_TYPE.get(note.document_type):
+                    cancel_type = FROM_LEGACY_DOC_TYPE.get(note.document_type)
+                else:
+                    cancel_type = note.document_type
+    elif not model_utils.is_legacy:
+        note = registration.get_cancel_note(cancel_doc_id)
+        if note:
+            status = note.status_type
+            cancel_type = note.document_type
+    if not status:
+        error_msg += NCAN_DOCUMENT_ID_INVALID
+    elif status != MhrNoteStatusTypes.ACTIVE:
+        error_msg += NCAN_DOCUMENT_ID_STATUS
+    if cancel_type and NCAN_DOC_TYPES.find(cancel_type) < 0:
+        error_msg += NCAN_NOT_ALLOWED.format(doc_type=cancel_type)
     return error_msg
