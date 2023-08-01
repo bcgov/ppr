@@ -139,7 +139,6 @@ export const useNewMhrRegistration = () => {
     const data = await getMhrManufacturerInfo()
     setMhrHomeDescription({ key: 'manufacturer', value: data.description.manufacturer })
     setMhrHomeDescription({ key: 'certificationOption', value: HomeCertificationOptions.CSA })
-    setMhrRegistrationSubmittingParty(data.submittingParty)
 
     // Add id to owners to ensure home owners table functionality works.
     let defaultID = 1

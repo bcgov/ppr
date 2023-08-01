@@ -5,7 +5,6 @@ import {
   MhrRegistrationHomeLocationIF,
   MhrTransferApiIF,
   MhrTransferIF,
-  SubmittingPartyIF,
   MhrRegistrationHomeOwnerGroupIF
 } from '@/interfaces'
 import { useStore } from '@/store/store'
@@ -20,7 +19,7 @@ import {
   UIRegistrationTypes,
   UITransferTypes
 } from '@/enums'
-import { fetchMhRegistration, normalizeObject } from '@/utils'
+import { fetchMhRegistration, normalizeObject, parseAccountToSubmittingParty } from '@/utils'
 import { cloneDeep } from 'lodash'
 import { useHomeOwners, useTransferOwners } from '@/composables'
 import { computed, reactive, toRefs } from 'vue-demi'
@@ -147,14 +146,7 @@ export const useMhrInformation = () => {
   }
 
   const parseSubmittingPartyInfo = (accountInfo: AccountInfoIF): void => {
-    const submittingParty = {
-      businessName: accountInfo.name,
-      address: accountInfo.mailingAddress,
-      emailAddress: accountInfo.accountAdmin.email,
-      email: accountInfo.accountAdmin.email,
-      phoneNumber: accountInfo.accountAdmin.phone,
-      phoneExtension: accountInfo.accountAdmin.phoneExtension
-    } as SubmittingPartyIF
+    const submittingParty = parseAccountToSubmittingParty(accountInfo)
 
     setMhrTransferSubmittingParty(submittingParty)
   }
