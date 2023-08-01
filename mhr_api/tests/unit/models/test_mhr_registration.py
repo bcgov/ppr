@@ -791,6 +791,10 @@ def test_find_by_mhr_number_status(session, mhr_number, account_id, status, staf
     registration.staff = staff
     reg_json = registration.new_registration_json
     assert reg_json.get('status') == status
+    if status == model_utils.STATUS_FROZEN:
+        assert reg_json.get('frozenDocumentType')
+    else:
+        assert not reg_json.get('frozenDocumentType')
 
 
 @pytest.mark.parametrize('mhr_number, has_results, account_id', TEST_MHR_NUM_DATA)
