@@ -37,7 +37,7 @@
 
               <!-- Actions other than Cancel Note-->
               <v-list-item
-                v-for="option in getNoteOptions(note)"
+                v-for="option in noteOptions"
                 :key="UnitNotesInfo[option].header"
                 @click="handleOptionSelection(option, note)"
                 :data-test-id="`unit-note-option-${option}`"
@@ -143,7 +143,6 @@ export default defineComponent({
     return {
       handleOptionSelection,
       pacificDate,
-      getNoteOptions,
       UnitNoteDocTypes,
       UnitNotesInfo,
       ...toRefs(localState)
