@@ -8,7 +8,7 @@
     <PartySearch
       v-if="!hidePartySearch"
       isMhrPartySearch
-      @selectItem="handleSelect($event)"
+      @selectItem="handlePartySelect($event)"
     />
 
     <v-card
@@ -52,7 +52,7 @@
 
           <v-divider class="my-9 ml-0 mr-2" />
 
-          <CautionBox v-if="hasLookedUpParty"
+          <CautionBox v-if="contactInfoModel.hasUsedPartyLookup"
            class="mb-9"
            set-msg="If you make changes to the submitting party information below, the changes will
               only be applicable to this registration. The party code information will not be updated."
@@ -187,13 +187,14 @@
 <script lang="ts">
 import { useInputRules } from '@/composables'
 import { ContactTypes } from '@/enums'
-import { ContactInformationContentIF, FormIF, PartyIF } from '@/interfaces'
+import { ContactInformationContentIF, FormIF, PartyIF, SubmittingPartyIF } from '@/interfaces'
 import { computed, defineComponent, nextTick, reactive, ref, toRefs, watch } from 'vue-demi'
 import { PartyAddressSchema, OptionalPartyAddressSchema } from '@/schemas'
 import { VueMaskDirective } from 'v-mask'
 import { BaseAddress } from '@/composables/address'
 import { PartySearch } from '../parties/party'
 import { CautionBox } from '@/components/common'
+import { emptyContactInfo } from '@/resources'
 
 export default defineComponent({
   name: 'ContactInformation',
@@ -205,7 +206,7 @@ export default defineComponent({
   },
   props: {
     contactInfo: {
-      type: Object as () => PartyIF,
+      type: Object as () => PartyIF | SubmittingPartyIF,
       required: true
     },
     validate: {
@@ -251,36 +252,14 @@ export default defineComponent({
       isPhone
     } = useInputRules()
 
-    const emptyContactInfo = {
-      personName: {
-        first: '',
-        last: '',
-        middle: ''
-      },
-      businessName: '',
-      emailAddress: '',
-      phoneNumber: '',
-      phoneExtension: '',
-      address: {
-        street: '',
-        streetAdditional: '',
-        city: '',
-        region: '',
-        country: '',
-        postalCode: '',
-        deliveryInstructions: ''
-      }
-    }
-
     const contactInfoForm = ref(null) as FormIF
 
     const localState = reactive({
-      contactInfoModel: { ...emptyContactInfo, ...props.contactInfo as PartyIF } as PartyIF,
+      contactInfoModel: { ...emptyContactInfo, ...props.contactInfo as SubmittingPartyIF | PartyIF },
       contactInfoType: (props.contactInfo as PartyIF)?.businessName
         ? ContactTypes.BUSINESS : ContactTypes.PERSON,
       isContactInfoFormValid: false,
       isAddressValid: false,
-      hasLookedUpParty: false,
       hasLongCombinedName: false,
       longCombinedNameErrorMsg: computed((): string =>
         localState.hasLongCombinedName ? 'Person\'s Legal Name combined cannot exceed 40 characters' : ''),
@@ -294,16 +273,12 @@ export default defineComponent({
         !(localState.isContactInfoFormValid && localState.isAddressValid))
     })
 
-    const handleSelect = async (party: PartyIF) => {
+    const handlePartySelect = async (party: SubmittingPartyIF) => {
       localState.contactInfoType = party.businessName ? ContactTypes.BUSINESS : ContactTypes.PERSON
-      localState.hasLookedUpParty = true
+      party.hasUsedPartyLookup = true
       localState.contactInfoModel.address.country = party.address.country // Deals with bug (13637)
       await nextTick()
       localState.contactInfoModel = party
-    }
-
-    const emitStoreUpdate = (val) => {
-      emit('setStoreProperty', val)
     }
 
     watch(() => localState.contactInfoType, async (val) => {
@@ -332,7 +307,7 @@ export default defineComponent({
     })
 
     watch(() => localState.contactInfoModel, (val) => {
-      emitStoreUpdate(val)
+      emit('setStoreProperty', val)
     }, { deep: true, immediate: true })
 
     watch(() => props.validate, async () => {
@@ -372,7 +347,7 @@ export default defineComponent({
 
     const businessNameRules = customRules(
       !props.isInfoOptional ? required('Business name is required') : [],
-      maxLength(40),
+      maxLength(150),
       invalidSpaces()
     )
 
@@ -383,7 +358,7 @@ export default defineComponent({
     )
 
     return {
-      handleSelect,
+      handlePartySelect,
       contactInfoForm,
       emailRules,
       firstNameRules,

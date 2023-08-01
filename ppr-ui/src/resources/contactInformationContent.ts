@@ -1,4 +1,4 @@
-import { ContactInformationContentIF } from '@/interfaces'
+import { ContactInformationContentIF, PartyIF, SubmittingPartyIF } from '@/interfaces'
 
 export const submittingPartyRegistrationContent: ContactInformationContentIF = {
   title: 'Submitting Party',
@@ -23,4 +23,25 @@ export const personGivingNoticeContent: ContactInformationContentIF = {
   description: 'Contact information for the person making the claim will be shown ' +
     'when a search result is produced for this manufactured home.',
   sideLabel: 'Person Giving Notice'
+}
+
+export const emptyContactInfo: PartyIF | SubmittingPartyIF = {
+  personName: {
+    first: '',
+    last: '',
+    middle: ''
+  },
+  businessName: '',
+  emailAddress: '',
+  phoneNumber: '',
+  phoneExtension: '',
+  address: {
+    street: '',
+    streetAdditional: '',
+    city: '',
+    region: '',
+    country: '',
+    postalCode: '',
+    deliveryInstructions: ''
+  }
 }

@@ -22,10 +22,10 @@ const props = {
 }
 
 describe('mhr submitting party', () => {
-  let wrapper: Wrapper<any>
+  let wrapper: Wrapper<any, Element>
 
   beforeEach(async () => {
-    wrapper = createComponent(ContactInformation, props)
+    wrapper = await createComponent(ContactInformation, props)
   })
   afterEach(() => {
     wrapper.destroy()

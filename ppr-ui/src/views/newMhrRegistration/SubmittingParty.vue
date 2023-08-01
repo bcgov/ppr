@@ -5,7 +5,7 @@
         :contactInfo="getMhrRegistrationSubmittingParty"
         :content="submittingPartyRegistrationContent"
         :validate="validateSubmitter"
-        @setStoreProperty="setMhrSubmittingParty"
+        @setStoreProperty="setMhrRegistrationSubmittingParty"
         @isValid="setValidation(MhrSectVal.SUBMITTING_PARTY_VALID, MhrCompVal.SUBMITTER_VALID, $event)"
       />
     </section>
@@ -95,7 +95,7 @@ export default defineComponent({
     const {
       // Actions
       setMhrRegistrationDocumentId,
-      setMhrSubmittingParty,
+      setMhrRegistrationSubmittingParty,
       setMhrAttentionReference
     } = useStore()
     const {
@@ -194,7 +194,7 @@ export default defineComponent({
       MhrCompVal,
       MhrSectVal,
       getMhrRegistrationSubmittingParty,
-      setMhrSubmittingParty,
+      setMhrRegistrationSubmittingParty,
       setValidation,
       submittingPartyRegistrationContent,
       maxLength,

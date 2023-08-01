@@ -318,6 +318,9 @@ export const useMhrInformation = () => {
         }),
         ...(getMhrTransferSubmittingParty.value.phoneExtension && {
           phoneExtension: getMhrTransferSubmittingParty.value.phoneExtension
+        }),
+        ...(isDraft && getMhrTransferSubmittingParty.value.hasUsedPartyLookup && {
+          hasUsedPartyLookup: true
         })
       },
       ...(isRoleQualifiedSupplier.value && !isRoleStaffReg.value && {
