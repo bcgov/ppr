@@ -71,7 +71,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs } from 'vue-demi'
+import { defineComponent } from 'vue-demi'
 import { RouteNames, UnitNoteDocTypes } from '@/enums'
 import { useRouter } from 'vue2-helpers/vue-router'
 import { useStore } from '@/store/store'
@@ -117,9 +117,7 @@ export default defineComponent({
       getNoteOptions
     } = useMhrUnitNote()
 
-    const localState = reactive({
-      noteOptions: getNoteOptions(props.note)
-    })
+    const noteOptions = getNoteOptions(props.note)
 
     const initUnitNote = (noteType: UnitNoteDocTypes): void => {
       setMhrUnitNoteType(noteType)
@@ -145,7 +143,7 @@ export default defineComponent({
       pacificDate,
       UnitNoteDocTypes,
       UnitNotesInfo,
-      ...toRefs(localState)
+      noteOptions
     }
   }
 })
