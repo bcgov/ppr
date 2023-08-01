@@ -15,9 +15,10 @@
                 :ripple="false"
               >
                 <span class="px-4">{{ isActive ? 'Hide Note' : 'View Note' }}</span>
-                <v-divider vertical class='mx-0' />
+                <v-divider v-if="noteOptions.length > 0" vertical class='mx-0' />
               </v-btn>
               <v-btn
+                v-if="noteOptions.length > 0"
                 class="unit-note-menu-btn pa-0"
                 text
                 color="primary"
@@ -38,24 +39,15 @@
               <v-list-item
                 v-for="option in getNoteOptions(note)"
                 :key="UnitNotesInfo[option].header"
-                @click="initUnitNote(option)"
-                data-test-id="unit-note-option"
+                @click="handleOptionSelection(option, note)"
+                :data-test-id="`unit-note-option-${option}`"
               >
                 <v-list-item-subtitle class="text-right">
-                  <v-icon color="primary" size="1.125rem">mdi-plus</v-icon>
+                  <v-icon color="primary" size="1.125rem">{{ UnitNotesInfo[option].dropdownIcon }}</v-icon>
                   {{ UnitNotesInfo[option].dropdownText }}
                 </v-list-item-subtitle>
               </v-list-item>
 
-              <v-list-item
-                class="cancel-unit-note-list-item"
-                @click="cancelUnitNote(note)"
-              >
-                <v-list-item-subtitle class="text-right">
-                  <v-icon color="primary" size="1.125rem">mdi-delete</v-icon>
-                  Cancel Note
-                </v-list-item-subtitle>
-              </v-list-item>
             </v-list>
           </v-menu>
         </span>
@@ -79,11 +71,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue-demi'
+import { defineComponent, reactive, toRefs } from 'vue-demi'
 import { RouteNames, UnitNoteDocTypes } from '@/enums'
 import { useRouter } from 'vue2-helpers/vue-router'
 import { useStore } from '@/store/store'
-import { UnitNotesInfo, NoticeOfCautionDropDown } from '@/resources'
+import { UnitNotesInfo } from '@/resources'
 import { UnitNoteIF } from '@/interfaces/unit-note-interfaces/unit-note-interface'
 import { pacificDate } from '@/utils'
 import UnitNoteHeaderInfo from './UnitNoteHeaderInfo.vue'
@@ -114,7 +106,7 @@ export default defineComponent({
     UnitNoteHeaderInfo,
     UnitNoteContentInfo
   },
-  setup () {
+  setup (props) {
     const router = useRouter()
 
     const {
@@ -122,33 +114,39 @@ export default defineComponent({
     } = useStore()
 
     const {
-      isNoticeOfCautionOrRelatedDocType
+      getNoteOptions
     } = useMhrUnitNote()
+
+    const localState = reactive({
+      noteOptions: getNoteOptions(props.note)
+    })
 
     const initUnitNote = (noteType: UnitNoteDocTypes): void => {
       setMhrUnitNoteType(noteType)
       router.push({ path: '/' + RouteNames.MHR_INFORMATION_NOTE })
     }
 
-    const getNoteOptions = (unitNote: UnitNoteIF): Array<UnitNoteDocTypes> => {
-      let options = []
-      if (isNoticeOfCautionOrRelatedDocType(unitNote)) {
-        options = [...NoticeOfCautionDropDown]
-      }
-      return options
-    }
-
-    const cancelUnitNote = (unitNote: UnitNoteIF): void => {
+    const cancelUnitNote = (note: UnitNoteIF): void => {
       // Request to delete unit note here
     }
 
+    const handleOptionSelection = (option: UnitNoteDocTypes, note: UnitNoteIF): void => {
+      switch (option) {
+        case UnitNoteDocTypes.NOTE_CANCELLATION:
+          cancelUnitNote(note)
+          break
+        default:
+          initUnitNote(option)
+      }
+    }
+
     return {
-      initUnitNote,
-      cancelUnitNote,
+      handleOptionSelection,
       pacificDate,
       getNoteOptions,
       UnitNoteDocTypes,
-      UnitNotesInfo
+      UnitNotesInfo,
+      ...toRefs(localState)
     }
   }
 })

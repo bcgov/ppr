@@ -4,6 +4,7 @@ import { useStore } from '@/store/store'
 import { deleteEmptyProperties, submitMhrUnitNote } from '@/utils'
 import { storeToRefs } from 'pinia'
 import { cloneDeep } from 'lodash'
+import { CancellableUnitNoteTypes, NoticeOfCautionDropDown } from '@/resources'
 
 export const useMhrUnitNote = () => {
   const {
@@ -114,6 +115,24 @@ export const useMhrUnitNote = () => {
     )
   }
 
+  const getNoteOptions = (unitNote: UnitNoteIF): UnitNoteDocTypes[] => {
+    const options = []
+
+    if (unitNote.status === UnitNoteStatusTypes.CANCELLED) {
+      return options
+    }
+
+    if (isNoticeOfCautionOrRelatedDocType(unitNote)) {
+      options.push(...NoticeOfCautionDropDown)
+    }
+
+    if (CancellableUnitNoteTypes.includes(unitNote.documentType)) {
+      options.push(UnitNoteDocTypes.NOTE_CANCELLATION)
+    }
+
+    return options
+  }
+
   const initUnitNote = (): UnitNoteRegistrationIF => {
     return {
       clientReferenceId: '',
@@ -176,6 +195,7 @@ export const useMhrUnitNote = () => {
     isPersonGivingNoticeOptional,
     hasEffectiveDateTime,
     hasExpiryDate,
+    getNoteOptions,
     groupUnitNotes,
     isNoticeOfCautionOrRelatedDocType
   }

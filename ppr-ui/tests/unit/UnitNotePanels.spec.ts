@@ -5,11 +5,12 @@ import { useStore } from '../../src/store/store'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import { UnitNoteContentInfo, UnitNoteHeaderInfo, UnitNotePanel, UnitNotePanels } from '../../src/components/unitNotes'
 import { UnitNoteDocTypes, UnitNoteStatusTypes } from '../../src/enums'
-import { mockUnitNotes } from './test-data'
+import { mockUnitNotes, mockedUnitNotes2 } from './test-data'
 import { BaseAddress } from '@/composables/address'
 import { pacificDate } from '@/utils'
 import { UnitNotesInfo } from '@/resources/unitNotes'
 import { UnitNoteIF } from '@/interfaces'
+import { getTestId } from './utils'
 
 Vue.use(Vuetify)
 const vuetify = new Vuetify({})
@@ -22,7 +23,7 @@ const store = useStore()
  *
  * @returns a Wrapper<SearchedResultPpr> object with the given parameters.
  */
-function createComponent (): Wrapper<any> {
+function createComponent (otherMockNotes?: UnitNoteIF[]): Wrapper<any> {
   const localVue = createLocalVue()
   localVue.use(Vuetify)
   document.body.setAttribute('data-app', 'true')
@@ -32,7 +33,7 @@ function createComponent (): Wrapper<any> {
     store,
     vuetify,
     propsData: {
-      unitNotes: mockUnitNotes,
+      unitNotes: otherMockNotes ?? mockUnitNotes,
       disabled: false
     }
   })
@@ -164,9 +165,9 @@ describe('UnitNotePanels', () => {
     expect(panels.length).toBe(expectedNumberOfPanels)
   })
 
-  it('calls cancelUnitNote when a unit note is cancelled', async () => {
+  it('calls handleOptionSelection when a unit note cancel option is clicked', async () => {
     const wrapper = createComponent()
-    const cancelUnitNoteMock = jest.fn()
+    const handleOptionSelection = jest.fn()
 
     // Opens the drop down menu
     const panels = wrapper.findAll('.menu-drop-down-icon')
@@ -175,12 +176,12 @@ describe('UnitNotePanels', () => {
 
     const unitNotePanel = wrapper.findComponent(UnitNotePanel) as Wrapper<any>
 
-    unitNotePanel.vm.cancelUnitNote = cancelUnitNoteMock
-    const cancelUnitNoteItem = wrapper.findAll('.cancel-unit-note-list-item')
-    await cancelUnitNoteItem.at(0).trigger('click')
+    unitNotePanel.vm.handleOptionSelection = handleOptionSelection
+    const cancelUnitNoteOption = unitNotePanel.find(getTestId(`unit-note-option-${UnitNoteDocTypes.NOTE_CANCELLATION}`))
+    await cancelUnitNoteOption.trigger('click')
     await nextTick()
 
-    expect(cancelUnitNoteMock).toHaveBeenCalledWith(mockUnitNotes[0])
+    expect(handleOptionSelection).toHaveBeenCalledWith(UnitNoteDocTypes.NOTE_CANCELLATION, mockUnitNotes[0])
   })
 
   it('displays the unit note panels with the correct data', async () => {
@@ -296,5 +297,44 @@ describe('UnitNotePanels', () => {
     await nextTick()
 
     expect(store.getMhrUnitNoteType).toBe(UnitNoteDocTypes.EXTENSION_TO_NOTICE_OF_CAUTION)
+  })
+
+  it('displays the cancel unit note option for cancellable unit notes', async () => {
+    const wrapper = createComponent(mockedUnitNotes2)
+    const panels = wrapper.findAll('.unit-note-panel')
+
+    // First panel is an active public note
+    const panel = panels.at(0)
+    const header = panel.find('.v-expansion-panel-header')
+    const headerText = header.find('h3').text()
+
+    expect(headerText).toBe('Public Note')
+
+    // Opens the drop down menu
+    panel.find('.menu-drop-down-icon').trigger('click')
+    await nextTick()
+    const buttons = panel.findAll('.v-list-item')
+    expect(buttons.length).toBe(1)
+    expect(buttons.at(0).text()).toBe('Cancel Note')
+
+    // Second panel is a cancelled public note (no drop down menu)
+    const panel2 = panels.at(1)
+    const header2 = panel2.find('.v-expansion-panel-header')
+    const headerText2 = header2.find('h3').text()
+
+    expect(headerText2).toBe('Public Note - Cancelled')
+
+    // No dropdown menu
+    expect(panel2.find('.menu-drop-down-icon').exists()).toBe(false)
+
+    // Third panel is a decal replacement note (no drop down menu)
+    const panel3 = panels.at(2)
+    const header3 = panel3.find('.v-expansion-panel-header')
+    const headerText3 = header3.find('h3').text()
+
+    expect(headerText3).toBe('Decal Replacement')
+
+    // No dropdown menu
+    expect(panel3.find('.menu-drop-down-icon').exists()).toBe(false)
   })
 })

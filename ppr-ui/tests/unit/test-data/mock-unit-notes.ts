@@ -187,3 +187,78 @@ export const mockUnitNotes: Array<UnitNoteIF> = [
     destroyed: false
   }
 ]
+
+export const mockedUnitNotes2 = [
+  {
+    documentType: UnitNoteDocTypes.PUBLIC_NOTE,
+    documentId: '1',
+    documentRegistrationNumber: '123456',
+    documentDescription: 'Public Note',
+    createDateTime: '2023-07-30T09:00:00Z',
+    effectiveDateTime: '2023-12-01T12:00:00Z',
+    expiryDateTime: '2023-13-30T23:59:59Z',
+    remarks: 'This is a public Note.',
+    givingNoticeParty: {
+      businessName: 'HALSTON MODULAR HOMES LTD.',
+      address: {
+        street: 'PO BOX 266',
+        city: 'KNUTSFORD',
+        region: 'BC',
+        country: 'CA',
+        postalCode: 'V0E 2A0'
+      },
+      phoneNumber: '2508289998',
+      emailAddress: 'testing@email.com'
+    },
+    status: UnitNoteStatusTypes.ACTIVE,
+    destroyed: false
+  },
+  {
+    documentType: UnitNoteDocTypes.PUBLIC_NOTE,
+    documentId: '2',
+    documentRegistrationNumber: '123456',
+    documentDescription: 'Public Note',
+    createDateTime: '2023-06-30T09:00:00Z',
+    effectiveDateTime: '2023-06-01T12:00:00Z',
+    expiryDateTime: '2023-07-30T23:59:59Z',
+    remarks: 'This is a public Note.',
+    givingNoticeParty: {
+      businessName: 'HALSTON MODULAR HOMES LTD.',
+      address: {
+        street: 'PO BOX 266',
+        city: 'KNUTSFORD',
+        region: 'BC',
+        country: 'CA',
+        postalCode: 'V0E 2A0'
+      },
+      phoneNumber: '2508289998',
+      emailAddress: 'testing@email.com'
+    },
+    status: UnitNoteStatusTypes.CANCELLED,
+    destroyed: false
+  },
+  {
+    documentType: UnitNoteDocTypes.DECAL_REPLACEMENT,
+    documentId: '3',
+    documentRegistrationNumber: '123456',
+    documentDescription: 'Decal Replacement Note',
+    createDateTime: '2023-05-30T09:00:00Z',
+    effectiveDateTime: '2023-06-01T12:00:00Z',
+    expiryDateTime: '2023-08-30T23:59:59Z',
+    remarks: 'This is a decal replacment Note.',
+    givingNoticeParty: {
+      businessName: 'HALSTON MODULAR HOMES LTD.',
+      address: {
+        street: 'PO BOX 266',
+        city: 'KNUTSFORD',
+        region: 'BC',
+        country: 'CA',
+        postalCode: 'V0E 2A0'
+      },
+      phoneNumber: '2508289998',
+      emailAddress: 'testing@email.com'
+    },
+    status: UnitNoteStatusTypes.ACTIVE,
+    destroyed: false
+  }
+]

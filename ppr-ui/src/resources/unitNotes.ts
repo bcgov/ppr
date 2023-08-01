@@ -31,6 +31,7 @@ export const UnitNotesInfo: Record<UnitNoteDocTypes, UnitNoteInfoIF> = {
   [UnitNoteDocTypes.CONTINUED_NOTE_OF_CAUTION]: {
     header: 'Continued Notice of Caution',
     dropdownText: 'Add Continued Notice of Caution',
+    dropdownIcon: 'mdi-plus',
     fee: FeeSummaryDefaults.NO_FEE,
     reviewSectionNumber: { // section numbers on Review page
       effectiveDateTime: 2,
@@ -44,6 +45,7 @@ export const UnitNotesInfo: Record<UnitNoteDocTypes, UnitNoteInfoIF> = {
   [UnitNoteDocTypes.EXTENSION_TO_NOTICE_OF_CAUTION]: {
     header: 'Extension to Notice of Caution',
     dropdownText: 'Add Extension to Notice of Caution',
+    dropdownIcon: 'mdi-plus',
     fee: FeeSummaryDefaults.UNIT_NOTE_10,
     reviewSectionNumber: { // section numbers on Review page
       effectiveDateTime: 2,
@@ -57,6 +59,7 @@ export const UnitNotesInfo: Record<UnitNoteDocTypes, UnitNoteInfoIF> = {
   [UnitNoteDocTypes.NOTE_CANCELLATION]: {
     header: 'Cancel Note',
     dropdownText: 'Cancel Note',
+    dropdownIcon: 'mdi-delete',
     fee: FeeSummaryDefaults.NO_FEE
   },
   [UnitNoteDocTypes.CONFIDENTIAL_NOTE]: {
@@ -120,3 +123,16 @@ export const UnitNotesInfo: Record<UnitNoteDocTypes, UnitNoteInfoIF> = {
     fee: FeeSummaryDefaults.NO_FEE
   }
 }
+
+export const CancellableUnitNoteTypes: UnitNoteDocTypes[] = [
+  UnitNoteDocTypes.NOTICE_OF_CAUTION,
+  UnitNoteDocTypes.CONTINUED_NOTE_OF_CAUTION,
+  UnitNoteDocTypes.EXTENSION_TO_NOTICE_OF_CAUTION,
+  UnitNoteDocTypes.CONFIDENTIAL_NOTE,
+  UnitNoteDocTypes.PUBLIC_NOTE,
+  UnitNoteDocTypes.RESTRAINING_ORDER
+  /*
+  Possible Future Filing
+  Exemptions (EXRS) (EXRN)
+  */
+]
