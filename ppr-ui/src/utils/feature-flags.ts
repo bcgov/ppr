@@ -15,7 +15,7 @@ export const defaultFlagSet: LDFlagSet = {
   'assets-tiptap-enabled': false, // Enables new TipTap wysiwyg editor
   'mhr-exemption-enabled': false,
   'mhr-transport-permit-enabled': '',
-  'mhr-user-access-enabled': false,
+  'mhr-user-access-enabled': true,
   'sentry-enable': false, // by default, no sentry logs
   'banner-text': '' // by default, there is no banner text
 }

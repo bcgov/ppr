@@ -1,0 +1,32 @@
+<template>
+  <v-card id="form-card" flat class="pa-8">
+    <v-row no-gutters>
+      <v-col cols="2">
+        <label class="generic-label" :class="{ 'error-text': showErrors }">{{ label }}</label>
+      </v-col>
+      <v-col class="ml-8">
+        <!-- Form information slot -->
+        <slot name="infoSlot" />
+        <!-- Form slot -->
+        <slot name="formSlot" />
+      </v-col>
+    </v-row>
+  </v-card>
+</template>
+
+<script lang="ts">
+import { defineComponent } from 'vue-demi'
+
+export default defineComponent({
+  name: 'FormCard',
+  props: {
+    label: { type: String, default: 'Label' },
+    showErrors: { type: Boolean, default: false }
+  },
+  setup () {}
+})
+</script>
+
+<style lang="scss" scoped>
+@import '@/assets/styles/theme.scss';
+</style>

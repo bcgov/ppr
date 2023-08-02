@@ -1,4 +1,4 @@
-import { computed, ComputedRef } from 'vue-demi'
+import { computed, ComputedRef, Ref } from 'vue-demi'
 import { getFeatureFlag } from '@/utils'
 import { RouteNames } from '@/enums'
 import { storeToRefs } from 'pinia'
@@ -7,8 +7,8 @@ import { useNavigation } from '@/composables'
 
 export const useUserAccess = () => {
   const { goToRoute, containsCurrentRoute } = useNavigation()
-  const { setMhrSubProduct } = useStore()
-  const { isRoleStaffReg } = storeToRefs(useStore())
+  const { setMhrQsInformation, setMhrSubProduct, setMhrQsValidation } = useStore()
+  const { getMhrUserAccessValidation, isRoleStaffReg } = storeToRefs(useStore())
 
   /** Returns true when on the appropriate routes and the feature flag is enabled **/
   const isQsAccessEnabled: ComputedRef<boolean> = computed((): boolean => {
@@ -39,6 +39,25 @@ export const useUserAccess = () => {
   /** Initialize user access properties to default state **/
   const initUserAccess = (): void => {
     setMhrSubProduct(null)
+    setMhrQsInformation({
+      businessName: '',
+      address: {
+        street: '',
+        streetAdditional: '',
+        city: '',
+        region: '',
+        postalCode: '',
+        country: '',
+        deliveryInstructions: ''
+      },
+      phoneNumber: '',
+      phoneExtension: ''
+    })
+
+    // Reset Validations
+    for (const flag in getMhrUserAccessValidation.value) {
+      setMhrQsValidation({ key: flag, value: false })
+    }
   }
 
   return {

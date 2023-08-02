@@ -42,7 +42,7 @@ import {
   UserSettingsIF,
   VehicleCollateralIF,
   UnitNoteStoreActionIF,
-  UnitNoteRegistrationIF
+  UnitNoteRegistrationIF, PartyIF, UserAccessValidationIF
 } from '@/interfaces'
 import {
   AccountTypes,
@@ -476,7 +476,7 @@ export const useStore = defineStore('assetsStore', () => {
         text: 'Qualified Supplier <br />Information',
         to: RouteNames.QS_ACCESS_INFORMATION,
         disabled: false,
-        valid: true,
+        valid: getMhrUserAccessValidation.value.qsInformationValid,
         component: QsInformation
       },
       {
@@ -486,7 +486,7 @@ export const useStore = defineStore('assetsStore', () => {
         text: 'Review <br />and Confirm',
         to: RouteNames.QS_ACCESS_REVIEW_CONFIRM,
         disabled: false,
-        valid: true,
+        valid: false,
         component: QsReviewConfirm
       }
     ]
@@ -697,6 +697,12 @@ export const useStore = defineStore('assetsStore', () => {
   // User Access Flow
   const getMhrSubProduct = computed((): MhrSubTypes => {
     return state.value.mhrUserAccess.mrhSubProduct
+  })
+  const getMhrQsInformation = computed((): PartyIF => {
+    return state.value.mhrUserAccess.qsInformation
+  })
+  const getMhrUserAccessValidation = computed((): UserAccessValidationIF => {
+    return state.value.mhrUserAccessValidation
   })
 
   /** Actions **/
@@ -1107,6 +1113,14 @@ export const useStore = defineStore('assetsStore', () => {
     state.value.mhrUserAccess.mrhSubProduct = subProduct
   }
 
+  function setMhrQsInformation (qsInformation: PartyIF) {
+    state.value.mhrUserAccess.qsInformation = qsInformation
+  }
+
+  function setMhrQsValidation (qsValidation: { key: string, value: boolean }) {
+    set(state.value.mhrUserAccessValidation, qsValidation.key, qsValidation.value)
+  }
+
   return {
     // Temp feature flag getters
     isTiptapEnabled,
@@ -1276,6 +1290,8 @@ export const useStore = defineStore('assetsStore', () => {
 
     // MHR User Access
     getMhrSubProduct,
+    getMhrQsInformation,
+    getMhrUserAccessValidation,
 
     // ACTIONS
 
@@ -1381,7 +1397,8 @@ export const useStore = defineStore('assetsStore', () => {
     setMhrUnitNote,
 
     // MHR User Access
-    setMhrSubProduct
-
+    setMhrSubProduct,
+    setMhrQsInformation,
+    setMhrQsValidation
   }
 })

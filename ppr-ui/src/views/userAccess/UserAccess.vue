@@ -1,16 +1,16 @@
 <template>
   <v-container v-if="dataLoaded" class="view-container pa-0" fluid>
-    <!-- Overlays and Dialogs -->
-    <v-overlay v-model="submitting">
-      <v-progress-circular color="primary" size="50" indeterminate />
-    </v-overlay>
+    <v-container class="px-0 mt-11">
+      <!-- Overlays and Dialogs -->
+      <v-overlay v-model="submitting">
+        <v-progress-circular color="primary" size="50" indeterminate />
+      </v-overlay>
 
-    <!-- Request Access Type Pre-Step -->
-    <div v-if="isRouteName(RouteNames.QS_ACCESS_TYPE)" class="view-container px-15 py-0 mt-4">
-      <div class="container pa-0 pt-4">
+      <!-- Request Access Type Pre-Step -->
+      <article v-if="isRouteName(RouteNames.QS_ACCESS_TYPE)" class="pa-0">
         <v-row no-gutters>
           <v-col cols="9">
-            <v-row no-gutters id="registration-header" class="pt-3 soft-corners-top">
+            <v-row no-gutters id="registration-header" class="soft-corners-top">
               <v-col cols="auto">
                 <h1>Request MHR Qualified Supplier Access</h1>
               </v-col>
@@ -18,23 +18,21 @@
             <QsSelectAccess :showErrors="!getMhrSubProduct && promptAccessSelect" />
           </v-col>
         </v-row>
-      </div>
-    </div>
+      </article>
 
-    <!-- User Access Content Flow -->
-    <div v-else class="view-container px-15 py-0">
-      <div class="container pa-0 pt-4">
+      <!-- User Access Content Flow -->
+      <article v-else class="pa-0">
         <v-row no-gutters>
           <v-col cols="9">
-            <v-row no-gutters id="registration-header" class="pt-3 pb-3 soft-corners-top">
+            <v-row no-gutters id="registration-header" class="soft-corners-top">
               <v-col cols="auto">
                 <h1>Manufactured Home Registry Qualified Supplier Application</h1>
               </v-col>
             </v-row>
             <Stepper
-              class="mt-4"
+              class="mt-11"
               :stepConfig="getUserAccessSteps"
-              :showStepErrorsFlag="false"
+              :showStepErrors="validateUserAccess"
             />
             <!-- Component Steps -->
             <component
@@ -42,11 +40,12 @@
               v-show="isRouteName(step.to)"
               :is="step.component"
               :key="step.step"
+              :validate="validateUserAccess"
             />
           </v-col>
         </v-row>
-      </div>
-    </div>
+      </article>
+    </v-container>
 
     <!-- Footer Navigation -->
     <v-row no-gutters class="mt-20">
@@ -65,7 +64,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, reactive, toRefs } from 'vue-demi'
+import { defineComponent, onMounted, reactive, toRefs, watch } from 'vue-demi'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { getFeatureFlag } from '@/utils'
@@ -98,12 +97,13 @@ export default defineComponent({
   },
   setup (props, { emit }) {
     const { getMhrSubProduct, getUserAccessSteps } = storeToRefs(useStore())
-    const { isRouteName, goToDash } = useNavigation()
+    const { isRouteName, goToDash, route } = useNavigation()
     const { isAuthenticated } = useAuth()
 
     const localState = reactive({
       dataLoaded: false,
       submitting: false,
+      validateUserAccess: false,
       promptAccessSelect: false
     })
 
@@ -127,6 +127,10 @@ export default defineComponent({
     const submit = (): void => {
       // Submit the filing, do stuff
     }
+
+    watch(() => route.name, () => {
+      if (isRouteName(RouteNames.QS_ACCESS_REVIEW_CONFIRM)) localState.validateUserAccess = true
+    })
 
     return {
       submit,

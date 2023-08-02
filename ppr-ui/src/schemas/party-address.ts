@@ -1,9 +1,10 @@
 import { ValidationRule } from '@/composables/address/enums'
 import { baseRules, spaceRules } from '@/composables/address/factories/validation-factory'
+import { SchemaIF } from '@/composables/address/interfaces'
 
 // The Party Address schema containing Vuelidate rules.
 // NB: This should match the subject JSON schema.
-export const PartyAddressSchema = {
+export const PartyAddressSchema: SchemaIF = {
   street: [
     baseRules[ValidationRule.REQUIRED],
     baseRules[ValidationRule.MAX_LENGTH](50),
@@ -40,7 +41,7 @@ export const PartyAddressSchema = {
 }
 
 // The Party Address schema containing Vuelidate rules for cases where Party Address is Optional/Not Required
-export const OptionalPartyAddressSchema = {
+export const OptionalPartyAddressSchema: SchemaIF = {
   street: [
     baseRules[ValidationRule.MAX_LENGTH](50),
     ...spaceRules

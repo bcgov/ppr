@@ -57,10 +57,7 @@
               No <span v-if="!isPPR">active </span>B.C. businesses found.
             </strong>
           </p>
-          <p v-if="!disableHelpText">
-            Ensure you have entered the correct, full legal name of the organization before entering the phone number
-            and mailing address.
-          </p>
+          <p>{{ nilSearchText }}</p>
         </div>
       </v-col>
     </v-row>
@@ -91,9 +88,10 @@ export default defineComponent({
       type: Boolean,
       default: false
     },
-    disableHelpText: {
-      type: Boolean,
-      default: false
+    nilSearchText: {
+      type: String,
+      default: 'Ensure you have entered the correct, full legal name of the organization before entering the phone' +
+          ' number and mailing address.'
     }
   },
   setup (props, { emit }) {

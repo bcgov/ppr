@@ -1,4 +1,4 @@
-import { MhrSubTypes, RegistrationFlowType, UnitNoteStatusTypes } from '@/enums'
+import { RegistrationFlowType, UnitNoteStatusTypes } from '@/enums'
 import { PartyIF, RegistrationTypeIF, StateModelIF } from '@/interfaces'
 
 export const stateModel: StateModelIF = {
@@ -366,7 +366,24 @@ export const stateModel: StateModelIF = {
   },
   mhrUserAccess: {
     mrhSubProduct: null,
-    qsInformation: {}
+    qsInformation: {
+      businessName: '',
+      address: {
+        street: '',
+        streetAdditional: '',
+        city: '',
+        region: '',
+        postalCode: '',
+        country: '',
+        deliveryInstructions: ''
+      },
+      phoneNumber: '',
+      phoneExtension: ''
+    }
+  },
+  mhrUserAccessValidation: {
+    qsInformationValid: false,
+    qsReviewConfirmValid: false
   },
   mhrUnitNoteValidationState: {
     unitNoteAddValid: {
