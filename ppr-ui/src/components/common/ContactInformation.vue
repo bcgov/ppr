@@ -54,7 +54,7 @@
 
           <CautionBox v-if="contactInfoModel.hasUsedPartyLookup"
            class="mb-9"
-           set-msg="If you make changes to the submitting party information below, the changes will
+           setMsg="If you make changes to the submitting party information below, the changes will
               only be applicable to this registration. The party code information will not be updated."
           />
 

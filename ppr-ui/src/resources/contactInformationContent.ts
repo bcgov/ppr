@@ -25,7 +25,7 @@ export const personGivingNoticeContent: ContactInformationContentIF = {
   sideLabel: 'Person Giving Notice'
 }
 
-export const emptyContactInfo: PartyIF | SubmittingPartyIF = {
+export const emptyContactInfo: Readonly<PartyIF | SubmittingPartyIF> = {
   personName: {
     first: '',
     last: '',
