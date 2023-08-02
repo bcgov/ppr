@@ -115,6 +115,7 @@ export const useMhrUnitNote = () => {
     )
   }
 
+  // Provides document types based on the given unit note that configure the unit note dropdown options
   const getNoteOptions = (unitNote: UnitNoteIF): UnitNoteDocTypes[] => {
     const options = []
 
