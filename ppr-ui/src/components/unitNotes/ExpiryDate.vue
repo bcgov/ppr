@@ -17,10 +17,12 @@
           </label>
         </v-col>
         <v-col cols="12" sm="9" class="px-1">
-          <p v-if="hideContinuedExpiryDate" class="mb-6">
-            Date in the Future
-          </p>
-          <v-radio-group v-model="expiryDateType" column class="pt-0 mt-0" v-if="!hideContinuedExpiryDate"
+          <p v-if="hideContinuedExpiryDate" class="mb-6">Date in the Future</p>
+          <v-radio-group
+            v-else
+            v-model="expiryDateType"
+            class="pt-0 mt-0"
+            column
           >
             <v-radio
               :value="EffectiveDateTypes.CONTINUED"
