@@ -18,13 +18,36 @@ Test-Suite to ensure that the legacy DB2 MH Note Model is working as expected.
 """
 
 import pytest
+import copy
 
 from flask import current_app
 
-from mhr_api.models import Db2Mhomnote
+from mhr_api.models import Db2Mhomnote, Db2Document
 from mhr_api.models.db2 import address_utils
 from mhr_api.models.type_tables import MhrNoteStatusTypes
 
+NOTE = {
+    'noteId': 2,
+    'documentType': 'NPUB',
+    'documentId': '62133670',
+    'effectiveDateTime': '2023-02-21T18:56:00+00:00',
+    'remarks': 'NOTICE OF ACTION COMMENCED MARCH 1 2022 WITH CRANBROOK COURT REGISTRY COURT FILE NO. 3011.',
+    'givingNoticeParty': {
+      'personName': {
+        'first': 'JOHNNY',
+        'middle': 'B',
+        'last': 'SMITH'
+      },
+      'address': {
+        'street': '222 SUMMER STREET',
+        'city': 'VICTORIA',
+        'region': 'BC',
+        'country': 'CA',
+        'postalCode': 'V8W 2V8'
+      },
+      'phoneNumber': '2504930122'
+    }
+}
 
 # testdata pattern is ({exists}, {manuhome_id}, {doc_id}, {doc_type}, {expiry}, {count})
 TEST_DATA = [
@@ -32,8 +55,14 @@ TEST_DATA = [
     (True, 7, '90011251', '103', '2012-02-24', 2),
     (False, 0, None, None, None, 0)
 ]
+# testdata pattern is ({manuhome_id}, {doc_id}, {doc_type}, {expiry}, {has_party})
+TEST_CREATE_DATA = [
+    (100000, '90600001', 'CAUC', '2023-10-14T00:00:01-08:00', True),
+    (100000, '90600002', 'NPUB', None, False)
+]
 LEGACY_ADDRESS = '222 SUMMER STREET                                                               VICTORIA' + \
                  '                                BC CA                            V8W 2V8'
+
 
 @pytest.mark.parametrize('exists,manuhome_id,doc_id,doc_type,expiry,count', TEST_DATA)
 def test_find_by_manuhome_id(session, exists, manuhome_id, doc_id, doc_type, expiry, count):
@@ -132,3 +161,37 @@ def test_note_json(session):
         }
     }
     assert note.json == test_json
+
+
+# testdata pattern is ({manuhome_id}, {doc_id}, {doc_type}, {expiry}, {has_party})
+@pytest.mark.parametrize('manuhome_id,doc_id,doc_type,expiry,has_party', TEST_CREATE_DATA)
+def test_create_from_json(session, manuhome_id, doc_id, doc_type, expiry, has_party):
+    """Assert that creating a note from JSON contains all expected elements."""
+    doc: Db2Document = Db2Document(id=doc_id,
+                                   document_type=doc_type,
+                                   name='TEST NAME',
+                                   legacy_address='1234 TEST ST KELOWNA',
+                                   phone_number='2501234442')
+    note_json = copy.deepcopy(NOTE)
+    note_json['documentId'] = doc_id
+    note_json['documentType'] = doc_type
+    if expiry:
+        note_json['expiryDateTime'] = expiry
+    if not has_party:
+        del note_json['givingNoticeParty']
+    note: Db2Mhomnote = Db2Mhomnote.create_from_registration(note_json, doc, manuhome_id)
+    assert note
+    assert note.manuhome_id == manuhome_id
+    assert note.reg_document_id == doc_id
+    assert note.remarks == note_json.get('remarks')
+    assert note.status == Db2Mhomnote.StatusTypes.ACTIVE
+    assert note.note_id == note_json.get('noteId')
+    assert note.expiry_date
+    if has_party:
+        assert note.name
+        assert note.phone_number
+        assert note.legacy_address
+    else:
+        assert not note.name
+        assert not note.phone_number
+        assert not note.legacy_address

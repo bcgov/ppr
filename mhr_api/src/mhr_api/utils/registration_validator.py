@@ -100,7 +100,7 @@ LOCATION_STRATA_ALLOWED = 'Dealer/manufacturer name, park name, PAD, band name, 
     'with a STRATA location type. '
 LOCATION_OTHER_ALLOWED = 'Dealer/manufacturer name, park name, PAD, band name, and reserve number are not allowed ' \
     'with an OTHER location type. '
-TRAN_QUALIFIED_DELETE = 'Qualified suppliers mut either delete one owner group or all owner groups. '
+TRAN_QUALIFIED_DELETE = 'Qualified suppliers must either delete one owner group or all owner groups. '
 NOTICE_NAME_REQUIRED = 'The giving notice party person or business name is required. '
 NOTICE_ADDRESS_REQUIRED = 'The giving notice address is required. '
 DESTROYED_FUTURE = 'The destroyed date and time cannot be in the future. '
