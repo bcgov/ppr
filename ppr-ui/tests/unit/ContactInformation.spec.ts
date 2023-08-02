@@ -21,7 +21,7 @@ const props = {
   content: submittingPartyRegistrationContent
 }
 
-describe('mhr submitting party', () => {
+describe('Contact Information', () => {
   let wrapper: Wrapper<any, Element>
 
   beforeEach(async () => {
@@ -116,7 +116,7 @@ describe('mhr submitting party', () => {
     expect(wrapper.vm.contactInfoModel.businessName).toBe(' abc ')
     expect(wrapper.findAll(ERROR_MSG).at(0).text()).toContain('Invalid spaces')
 
-    await businessName.setValue('garyblabla123'.repeat(7))
+    await businessName.setValue('garyblabla123'.repeat(14))
     await nextTick()
     expect(wrapper.findAll('.v-messages__message').length).toBe(2)
     expect(wrapper.findAll(ERROR_MSG).at(0).text()).toContain('Maximum')
@@ -156,13 +156,17 @@ describe('mhr submitting party', () => {
   it('shows a left-border and trigger field validation when validate is passed', async () => {
     await wrapper.setProps({ validate: true })
     await nextTick()
-    expect(wrapper.findAll(ERROR_MSG).length).toBe(2) // first name and last name required
-    expect(wrapper.find(BORDER_ERROR).exists()).toBe(true)
 
     await wrapper.find('#business-option').trigger('click')
     await nextTick()
     expect(wrapper.vm.contactInfoType).toBe('business')
     expect(wrapper.findAll(ERROR_MSG).at(0).text()).toBe('Business name is required')
     expect(wrapper.find(BORDER_ERROR).exists()).toBe(true)
+
+    await wrapper.find('#person-option').trigger('click')
+    await nextTick()
+    expect(wrapper.vm.contactInfoType).toBe('person')
+    expect(wrapper.find(BORDER_ERROR).exists()).toBe(true)
+    expect(wrapper.findAll(ERROR_MSG).length).toBe(2) // first name and last name required
   })
 })
