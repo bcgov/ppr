@@ -17,7 +17,11 @@
           </label>
         </v-col>
         <v-col cols="12" sm="9" class="px-1">
-          <v-radio-group v-model="expiryDateType" column class="pt-0 mt-0" v-if="!hideContinuedExpiryDate">
+          <p v-if="hideContinuedExpiryDate" class="mb-6">
+            Date in the Future
+          </p>
+          <v-radio-group v-model="expiryDateType" column class="pt-0 mt-0" v-if="!hideContinuedExpiryDate"
+          >
             <v-radio
               :value="EffectiveDateTypes.CONTINUED"
               label="Continued until further order of the court"
@@ -33,6 +37,7 @@
             id="expiry-date-picker"
             ref="expiryDatePicker"
             title="Date"
+            :class="{ 'ml-8' : !hideContinuedExpiryDate }"
             :initialValue="selectedFutureDate"
             :disablePicker="isContinuedDateSelected && !hideContinuedExpiryDate"
             :inputRules="required('This field is required')"
