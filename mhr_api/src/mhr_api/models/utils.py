@@ -25,7 +25,7 @@ import pytz
 from datedelta import datedelta
 from flask import current_app
 
-from mhr_api.models.type_tables import MhrDocumentTypes, MhrNoteStatusTypes
+from mhr_api.models.type_tables import MhrDocumentTypes, MhrNoteStatusTypes, MhrRegistrationStatusTypes
 
 
 # Local timzone
@@ -788,12 +788,15 @@ def expiry_datetime(expiry_iso: str):
     return _datetime.utcfromtimestamp(local_ts.timestamp()).replace(tzinfo=timezone.utc)
 
 
-def has_frozen_note(reg_json: dict) -> bool:
-    """For registries non-staff check if an active TAXN, NCON, or REST unit note exists."""
-    if not reg_json or not reg_json.get('notes'):
-        return False
+def update_reg_status(reg_json: dict, current: bool, staff: bool) -> dict:
+    """Conditionally set the status and frozenDocumentType for non-staff based on active unit note doc types."""
+    if not current or staff:
+        return reg_json
+    if not reg_json or not reg_json.get('notes') or reg_json.get('status', '') != MhrRegistrationStatusTypes.ACTIVE:
+        return reg_json
     for note in reg_json.get('notes'):
         if note.get('documentType') in (MhrDocumentTypes.TAXN, MhrDocumentTypes.NCON, MhrDocumentTypes.REST) and \
                 (not note.get('status') or note.get('status') == MhrNoteStatusTypes.ACTIVE):
-            return True
-    return False
+            reg_json['status'] = STATUS_FROZEN
+            reg_json['frozenDocumentType'] = note.get('documentType')
+    return reg_json

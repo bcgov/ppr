@@ -184,7 +184,6 @@ LEGACY_REGISTRATION_DESCRIPTION = {
 }
 DOCUMENT_TYPE_REG = '101'
 DOCUMENT_TYPE_AFFIDAVIT = 'AFFE'
-REG_STATUS_FROZEN = 'FROZEN'
 OWNER_TYPE_INDIVIDUAL = 'I'
 REGISTRATION_PATH = '/mhr/api/v1/registrations/'
 DOCUMENT_PATH = '/mhr/api/v1/documents/'
@@ -562,8 +561,11 @@ def __update_summary_info(result, results, reg_summary_list, staff, account_id):
     if not result.get('ownerNames'):
         result['ownerNames'] = __get_owner_names(result, results)
     summary_result = __get_summary_result(result, reg_summary_list)
-    if staff and result.get('statusType') == model_utils.STATUS_FROZEN:
+    if staff and result.get('statusType') == model_utils.STATUS_FROZEN and \
+            result.get('frozenDocumentType', '') != DOCUMENT_TYPE_AFFIDAVIT:
         result['statusType'] = MhrRegistrationStatusTypes.ACTIVE
+        if result.get('frozenDocumentType'):
+            del result['frozenDocumentType']
     if not summary_result:
         doc_type = result.get('documentType')
         if FROM_LEGACY_DOC_TYPE.get(doc_type):
@@ -626,9 +628,6 @@ def __build_summary(row, add_in_user_list: bool = True, mhr_list=None):
         'documentRegistrationNumber': str(row[9]),
         'documentType': str(row[5])
     }
-    last_doc_type: str = str(row[10])
-    if last_doc_type == DOCUMENT_TYPE_AFFIDAVIT:
-        summary['statusType'] = REG_STATUS_FROZEN
     if add_in_user_list:
         summary['inUserList'] = False
     if mhr_list and summary['documentType'] in (Db2Document.DocumentTypes.CONV, Db2Document.DocumentTypes.MHREG_TRIM):
@@ -637,6 +636,7 @@ def __build_summary(row, add_in_user_list: bool = True, mhr_list=None):
         summary = __get_cancel_info(summary, row)
     elif summary['documentType'] in (MhrDocumentTypes.CAU, MhrDocumentTypes.CAUC, MhrDocumentTypes.CAUE):
         summary = __get_caution_info(summary, row)
+    summary = __set_frozen_status(summary, row)
     return summary
 
 
@@ -661,6 +661,20 @@ def __get_cancel_info(summary: dict, row) -> dict:
     if doc_type:
         summary['cancelledDocumentType'] = doc_type.strip()
         summary['cancelledDocumentDescription'] = get_doc_desc(doc_type.strip())
+    return summary
+
+
+def __set_frozen_status(summary: dict, row) -> dict:
+    """Conditionally set FROZEN status based on active note document types or last registration doc type."""
+    last_doc_type: str = str(row[10])
+    if last_doc_type == DOCUMENT_TYPE_AFFIDAVIT:
+        summary['statusType'] = model_utils.STATUS_FROZEN
+        summary['frozenDocumentType'] = last_doc_type
+    else:
+        doc_type: str = str(row[14]) if row[14] else None
+        if doc_type:
+            summary['statusType'] = model_utils.STATUS_FROZEN
+            summary['frozenDocumentType'] = doc_type.strip()
     return summary
 
 

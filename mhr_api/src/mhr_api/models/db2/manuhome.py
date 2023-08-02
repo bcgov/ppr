@@ -524,6 +524,7 @@ class Db2Manuhome(db.Model):
                     declared_ts = doc.registration_ts
             if self.reg_documents[-1].document_type == Db2Document.DocumentTypes.TRANS_AFFIDAVIT:
                 man_home['status'] = model_utils.STATUS_FROZEN
+                man_home['frozenDocumentType'] = Db2Document.DocumentTypes.TRANS_AFFIDAVIT
         man_home['declaredValue'] = declared_value
         if declared_ts:
             man_home['declaredDateTime'] = model_utils.format_local_ts(declared_ts)

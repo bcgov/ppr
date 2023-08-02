@@ -108,16 +108,7 @@ SELECT COUNT(documtid)
  WHERE documtid = :query_value
 """
 QUERY_ACCOUNT_ADD_REGISTRATION = """
-SELECT mh.mhregnum,
-       CASE
-        WHEN mh.mhstatus = 'R' AND
-             EXISTS (SELECT n.regdocid
-                       FROM mhomnote n
-                      WHERE n.manhomid = mh.manhomid AND n.status = 'A' and n.docutype in ('TAXN', 'NCON', 'REST')) THEN
-             'F'
-        ELSE mh.mhstatus
-       END AS mhstatus,
-       d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRIM(d.docutype),
+SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRIM(d.docutype),
        (SELECT XMLSERIALIZE(XMLAGG ( XMLELEMENT ( NAME "owner", o2.ownrtype || TRIM(o2.ownrname))) AS CLOB)
           FROM owner o2, owngroup og2
          WHERE o2.manhomid = mh.manhomid
@@ -146,22 +137,17 @@ SELECT mh.mhregnum,
             WHERE n.manhomid = mh.manhomid AND n.candocid = d.documtid AND n.docutype NOT IN ('CAUC', 'CAUE')
           FETCH FIRST 1 ROWS ONLY)
         ELSE NULL
-        END AS cancel_doc_type
+        END AS cancel_doc_type,
+       (SELECT n.docutype
+              FROM mhomnote n
+             WHERE n.manhomid = mh.manhomid AND n.status = 'A' and n.docutype in ('TAXN', 'NCON', 'REST')
+         FETCH FIRST 1 ROWS ONLY) AS frozen_doc_type
   FROM manuhome mh, document d
  WHERE mh.mhregnum = :query_mhr_number
    AND mh.mhregnum = d.mhregnum
 """
 QUERY_ACCOUNT_ADD_REGISTRATION_DOC = """
-SELECT mh.mhregnum,
-       CASE
-        WHEN mh.mhstatus = 'R' AND
-             EXISTS (SELECT n.regdocid
-                       FROM mhomnote n
-                      WHERE n.manhomid = mh.manhomid AND n.status = 'A' and n.docutype in ('TAXN', 'NCON', 'REST')) THEN
-             'F'
-        ELSE mh.mhstatus
-       END AS mhstatus,
-       d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRIM(d.docutype),
+SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRIM(d.docutype),
        (SELECT XMLSERIALIZE(XMLAGG ( XMLELEMENT ( NAME "owner", o2.ownrtype || TRIM(o2.ownrname))) AS CLOB)
           FROM owner o2, owngroup og2
          WHERE o2.manhomid = mh.manhomid
@@ -190,68 +176,18 @@ SELECT mh.mhregnum,
             WHERE n.manhomid = mh.manhomid AND n.candocid = d.documtid AND n.docutype NOT IN ('CAUC', 'CAUE')
           FETCH FIRST 1 ROWS ONLY)
         ELSE NULL
-        END AS cancel_doc_type
+        END AS cancel_doc_type,
+       (SELECT n.docutype
+              FROM mhomnote n
+             WHERE n.manhomid = mh.manhomid AND n.status = 'A' and n.docutype in ('TAXN', 'NCON', 'REST')
+         FETCH FIRST 1 ROWS ONLY) AS frozen_doc_type
   FROM manuhome mh, document d, document d2
  WHERE d2.docuregi = :query_value
    AND d2.mhregnum = mh.mhregnum
    AND mh.mhregnum = d.mhregnum
 """
 QUERY_ACCOUNT_REGISTRATIONS = """
-SELECT mh.mhregnum,
-       CASE
-        WHEN mh.mhstatus = 'R' AND
-             EXISTS (SELECT n.regdocid
-                       FROM mhomnote n
-                      WHERE n.manhomid = mh.manhomid AND n.status = 'A' and n.docutype in ('TAXN', 'NCON', 'REST')) THEN
-             'F'
-        ELSE mh.mhstatus
-       END AS mhstatus,
-       d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRIM(d.docutype),
-       (SELECT XMLSERIALIZE(XMLAGG ( XMLELEMENT ( NAME "owner", o2.ownrtype || TRIM(o2.ownrname))) AS CLOB)
-          FROM owner o2, owngroup og2
-         WHERE o2.manhomid = mh.manhomid
-           AND og2.manhomid = mh.manhomid
-           AND og2.owngrpid = o2.owngrpid
-           AND og2.regdocid = d.documtid) as owner_names,
-       TRIM(d.affirmby),
-       d.documtid as document_id,
-       d.docuregi as doc_reg_number,
-       (SELECT d2.docutype
-          FROM document d2
-         WHERE d2.mhregnum = d.mhregnum
-           AND d2.regidate = (SELECT MAX(d3.regidate)
-                                FROM document d3
-                               WHERE d3.mhregnum = d.mhregnum)) AS last_doc_type,
-       (SELECT n.status
-          FROM mhomnote n
-         WHERE mh.manhomid = n.manhomid AND n.regdocid = d.documtid) AS note_status,
-       (SELECT n.expiryda
-          FROM mhomnote n
-         WHERE mh.manhomid = n.manhomid AND n.regdocid = d.documtid) AS note_expiry,
-        CASE
-        WHEN d.docutype in ('NCAN', 'NRED') THEN
-          (SELECT n.docutype
-             FROM mhomnote n
-            WHERE n.manhomid = mh.manhomid AND n.candocid = d.documtid AND n.docutype NOT IN ('CAUC', 'CAUE')
-          FETCH FIRST 1 ROWS ONLY)
-        ELSE NULL
-        END AS cancel_doc_type
-  FROM manuhome mh, document d
- WHERE mh.mhregnum IN (?)
-   AND mh.mhregnum = d.mhregnum
- ORDER BY d.regidate DESC
-"""
-QUERY_ACCOUNT_REGISTRATIONS_SORT = """
-SELECT mh.mhregnum,
-       CASE
-        WHEN mh.mhstatus = 'R' AND
-             EXISTS (SELECT n.regdocid
-                       FROM mhomnote n
-                      WHERE n.manhomid = mh.manhomid AND n.status = 'A' and n.docutype in ('TAXN', 'NCON', 'REST')) THEN
-             'F'
-        ELSE mh.mhstatus
-       END AS mhstatus,
-       d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRIM(d.docutype),
+SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRIM(d.docutype),
        (SELECT XMLSERIALIZE(XMLAGG ( XMLELEMENT ( NAME "owner", o2.ownrtype || TRIM(o2.ownrname))) AS CLOB)
           FROM owner o2, owngroup og2
          WHERE o2.manhomid = mh.manhomid
@@ -281,6 +217,50 @@ SELECT mh.mhregnum,
           FETCH FIRST 1 ROWS ONLY)
         ELSE NULL
         END AS cancel_doc_type,
+       (SELECT n.docutype
+              FROM mhomnote n
+             WHERE n.manhomid = mh.manhomid AND n.status = 'A' and n.docutype in ('TAXN', 'NCON', 'REST')
+         FETCH FIRST 1 ROWS ONLY) AS frozen_doc_type
+  FROM manuhome mh, document d
+ WHERE mh.mhregnum IN (?)
+   AND mh.mhregnum = d.mhregnum
+ ORDER BY d.regidate DESC
+"""
+QUERY_ACCOUNT_REGISTRATIONS_SORT = """
+SELECT mh.mhregnum, mh.mhstatus, d.regidate, TRIM(d.name), TRIM(d.olbcfoli), TRIM(d.docutype),
+       (SELECT XMLSERIALIZE(XMLAGG ( XMLELEMENT ( NAME "owner", o2.ownrtype || TRIM(o2.ownrname))) AS CLOB)
+          FROM owner o2, owngroup og2
+         WHERE o2.manhomid = mh.manhomid
+           AND og2.manhomid = mh.manhomid
+           AND og2.owngrpid = o2.owngrpid
+           AND og2.regdocid = d.documtid) as owner_names,
+       TRIM(d.affirmby),
+       d.documtid as document_id,
+       d.docuregi as doc_reg_number,
+       (SELECT d2.docutype
+          FROM document d2
+         WHERE d2.mhregnum = d.mhregnum
+           AND d2.regidate = (SELECT MAX(d3.regidate)
+                                FROM document d3
+                               WHERE d3.mhregnum = d.mhregnum)) AS last_doc_type,
+       (SELECT n.status
+          FROM mhomnote n
+         WHERE mh.manhomid = n.manhomid AND n.regdocid = d.documtid) AS note_status,
+       (SELECT n.expiryda
+          FROM mhomnote n
+         WHERE mh.manhomid = n.manhomid AND n.regdocid = d.documtid) AS note_expiry,
+        CASE
+        WHEN d.docutype in ('NCAN', 'NRED') THEN
+          (SELECT n.docutype
+             FROM mhomnote n
+            WHERE n.manhomid = mh.manhomid AND n.candocid = d.documtid AND n.docutype NOT IN ('CAUC', 'CAUE')
+          FETCH FIRST 1 ROWS ONLY)
+        ELSE NULL
+        END AS cancel_doc_type,
+       (SELECT n.docutype
+              FROM mhomnote n
+             WHERE n.manhomid = mh.manhomid AND n.status = 'A' and n.docutype in ('TAXN', 'NCON', 'REST')
+         FETCH FIRST 1 ROWS ONLY) AS frozen_doc_type,
        (SELECT TRIM(o2.ownrname)
           FROM owner o2, owngroup og2
          WHERE o2.manhomid = mh.manhomid
