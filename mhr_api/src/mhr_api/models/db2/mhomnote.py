@@ -219,9 +219,9 @@ class Db2Mhomnote(db.Model):
                            reg_document_id=document.id,
                            document_type=document.document_type,
                            destroyed='N',
-                           phone_number=document.phone_number,
-                           name=document.name,
-                           legacy_address=document.legacy_address,
+                           phone_number='',
+                           name='',
+                           legacy_address='',
                            remarks=json_data.get('remarks', ''),
                            can_document_id='')
         if not note.remarks:
