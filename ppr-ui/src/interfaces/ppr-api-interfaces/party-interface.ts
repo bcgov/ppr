@@ -18,6 +18,7 @@ export interface PartyIF {
   action?: ActionTypes // Optional action type for amendments,
   phoneNumber?: string,
   phoneExtension?: string
+  hasUsedPartyLookup?: boolean // used for drafts to maintain lookup state, not submitted with non-drafts
 }
 
 export interface SubmittingPartyIF {
@@ -32,4 +33,5 @@ export interface SubmittingPartyIF {
   emailAddress: string
   phoneNumber: string
   phoneExtension?: string
+  hasUsedPartyLookup?: boolean // used for drafts to maintain lookup state, not submitted with non-drafts
 }

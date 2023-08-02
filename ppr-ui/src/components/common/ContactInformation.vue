@@ -3,12 +3,12 @@
     <h2>
       {{ `${sectionNumber ? sectionNumber + '.' : ''} ${content.title}`}}
     </h2>
-    <p class="mt-2">{{ content.description }}</p>
+    <p class="mt-2 mb-6">{{ content.description }}</p>
 
     <PartySearch
       v-if="!hidePartySearch"
       isMhrPartySearch
-      @selectItem="emitStoreUpdate($event)"
+      @selectItem="handlePartySelect($event)"
     />
 
     <v-card
@@ -18,8 +18,8 @@
       class="mt-8 pa-8 pr-6"
       :class="{ 'border-error-left': showBorderError }"
     >
-      <v-row no-gutters>
-        <v-col cols="12" sm="3">
+      <v-row no-gutters justify="space-between">
+        <v-col cols="12" sm="2" class="mt-1">
           <label
             class="generic-label"
             :class="{ 'error-text': showBorderError }"
@@ -27,31 +27,36 @@
             {{ content.sideLabel }}
           </label>
         </v-col>
-        <v-col cols="12" sm="9" class="px-1">
+        <v-col cols="12" sm="10" class="px-1">
           <v-radio-group
             id="contact-info-type-options"
             v-model="contactInfoType"
             class="mt-0 pr-1" row
             hide-details="true"
-            @change="clearFields($event)"
           >
             <v-radio
               id="person-option"
               class="person-radio"
               label="Individual Person"
               active-class="selected-radio"
-              :value="SubmittingPartyTypes.PERSON"
+              :value="ContactTypes.PERSON"
             />
             <v-radio
               id="business-option"
               class="business-radio"
               label="Business"
               active-class="selected-radio"
-              :value="SubmittingPartyTypes.BUSINESS"
+              :value="ContactTypes.BUSINESS"
             />
           </v-radio-group>
 
           <v-divider class="my-9 ml-0 mr-2" />
+
+          <CautionBox v-if="contactInfoModel.hasUsedPartyLookup"
+           class="mb-9"
+           setMsg="If you make changes to the submitting party information below, the changes will
+              only be applicable to this registration. The party code information will not be updated."
+          />
 
           <v-form id="contact-info-form" ref="contactInfoForm" v-model="isContactInfoFormValid">
             <!-- Person Name Input -->
@@ -155,19 +160,17 @@
             <!-- Mailing Address -->
             <article class="pt-4 pr-1">
               <label class="generic-label" for="contact-info-address">Mailing Address</label>
-              <p v-if="content && content.mailAddressInfo" class="py-1">
+              <p v-if="content && content.mailAddressInfo" class="mt-2">
                 {{ content.mailAddressInfo }}
-              </p>
-              <p v-else class="py-1">
-                Registry documents and decal will be mailed to this address.
               </p>
 
               <base-address
+                id="contact-info-address"
+                ref="contactAddress"
+                class="mt-2"
                 editing
                 hideAddressHint
                 :hideDeliveryAddress="hideDeliveryAddress"
-                ref="submittingPartyAddress"
-                id="contact-info-address"
                 :schema="isInfoOptional ? OptionalPartyAddressSchema : PartyAddressSchema"
                 :value="contactInfoModel.address"
                 :triggerErrors="validate"
@@ -183,24 +186,27 @@
 
 <script lang="ts">
 import { useInputRules } from '@/composables'
-import { SubmittingPartyTypes } from '@/enums'
-import { ContentIF, FormIF, PartyIF, SubmittingPartyIF } from '@/interfaces'
-import { computed, defineComponent, onBeforeMount, reactive, ref, toRefs, watch } from 'vue-demi'
+import { ContactTypes } from '@/enums'
+import { ContactInformationContentIF, FormIF, PartyIF, SubmittingPartyIF } from '@/interfaces'
+import { computed, defineComponent, nextTick, reactive, ref, toRefs, watch } from 'vue-demi'
 import { PartyAddressSchema, OptionalPartyAddressSchema } from '@/schemas'
 import { VueMaskDirective } from 'v-mask'
 import { BaseAddress } from '@/composables/address'
 import { PartySearch } from '../parties/party'
+import { CautionBox } from '@/components/common'
+import { emptyContactInfo } from '@/resources'
 
 export default defineComponent({
   name: 'ContactInformation',
   emits: ['isValid', 'setStoreProperty'],
   components: {
     BaseAddress,
+    CautionBox,
     PartySearch
   },
   props: {
     contactInfo: {
-      type: Object as () => PartyIF,
+      type: Object as () => PartyIF | SubmittingPartyIF,
       required: true
     },
     validate: {
@@ -212,7 +218,7 @@ export default defineComponent({
       required: false
     },
     content: {
-      type: Object as () => ContentIF,
+      type: Object as () => ContactInformationContentIF,
       default: () => {}
     },
     hidePartySearch: {
@@ -249,60 +255,60 @@ export default defineComponent({
     const contactInfoForm = ref(null) as FormIF
 
     const localState = reactive({
-      enableLookUp: true,
-      contactInfoModel: computed(() => props.contactInfo as PartyIF | SubmittingPartyIF),
-      contactInfoType: null as SubmittingPartyTypes,
+      contactInfoModel: { ...emptyContactInfo, ...props.contactInfo as SubmittingPartyIF | PartyIF },
+      contactInfoType: (props.contactInfo as PartyIF)?.businessName
+        ? ContactTypes.BUSINESS : ContactTypes.PERSON,
       isContactInfoFormValid: false,
       isAddressValid: false,
       hasLongCombinedName: false,
-      longCombinedNameErrorMsg: computed(() =>
+      longCombinedNameErrorMsg: computed((): string =>
         localState.hasLongCombinedName ? 'Person\'s Legal Name combined cannot exceed 40 characters' : ''),
       isPersonOption: computed((): boolean =>
-        localState.contactInfoType === SubmittingPartyTypes.PERSON
+        localState.contactInfoType === ContactTypes.PERSON
       ),
       isBusinessOption: computed((): boolean =>
-        localState.contactInfoType === SubmittingPartyTypes.BUSINESS
+        localState.contactInfoType === ContactTypes.BUSINESS
       ),
       showBorderError: computed((): boolean => props.validate &&
         !(localState.isContactInfoFormValid && localState.isAddressValid))
     })
 
-    const emitStoreUpdate = (val) => {
-      emit('setStoreProperty', val)
+    const handlePartySelect = async (party: SubmittingPartyIF) => {
+      localState.contactInfoType = party.businessName ? ContactTypes.BUSINESS : ContactTypes.PERSON
+      party.hasUsedPartyLookup = true
+      localState.contactInfoModel.address.country = party.address.country // Deals with bug (13637)
+      await nextTick()
+      localState.contactInfoModel = party
     }
 
-    watch(() => [localState.isContactInfoFormValid, localState.isAddressValid], () => {
-      emit('isValid', localState.isContactInfoFormValid && localState.isAddressValid)
-    })
-
-    watch(() => localState.contactInfoModel.businessName, (val: string) => {
-      val
-        ? localState.contactInfoType = SubmittingPartyTypes.BUSINESS
-        : localState.contactInfoType = SubmittingPartyTypes.PERSON
-    })
-
-    watch(() => localState.contactInfoModel, (val) => {
-      emitStoreUpdate(val)
-    }, { deep: true, immediate: true })
-
-    onBeforeMount(() => {
-      // pre-select Person or Business radio buttons, default is Person
-      localState.contactInfoType =
-        localState.contactInfoModel.businessName ? SubmittingPartyTypes.BUSINESS : SubmittingPartyTypes.PERSON
-    })
-
-    const clearFields = () => {
-      if (localState.isPersonOption) {
-        localState.contactInfoModel.businessName = ''
-      }
-      if (localState.isBusinessOption) {
+    watch(() => localState.contactInfoType, async (val) => {
+      if (val === ContactTypes.BUSINESS) {
         localState.contactInfoModel.personName = {
           first: '',
           middle: '',
           last: ''
         }
+      } else {
+        localState.contactInfoModel.businessName = ''
       }
-    }
+      if (props.validate) {
+        await nextTick()
+        await contactInfoForm.value?.validate()
+      } else {
+        // Deals with lingering validation errors when switching between person and business
+        if (contactInfoForm.value?.errorMessages?.length > 0) {
+          await contactInfoForm.value?.resetValidation()
+        }
+      }
+    })
+
+    watch(() => [localState.isContactInfoFormValid, localState.isAddressValid], () => {
+      emit('isValid', localState.isContactInfoFormValid && localState.isAddressValid)
+    })
+
+    watch(() => localState.contactInfoModel, (val) => {
+      emit('setStoreProperty', val)
+    }, { deep: true, immediate: true })
 
     watch(() => props.validate, async () => {
       contactInfoForm.value?.validate()
@@ -341,7 +347,7 @@ export default defineComponent({
 
     const businessNameRules = customRules(
       !props.isInfoOptional ? required('Business name is required') : [],
-      maxLength(40),
+      maxLength(150),
       invalidSpaces()
     )
 
@@ -352,8 +358,7 @@ export default defineComponent({
     )
 
     return {
-      clearFields,
-      emitStoreUpdate,
+      handlePartySelect,
       contactInfoForm,
       emailRules,
       firstNameRules,
@@ -362,7 +367,7 @@ export default defineComponent({
       businessNameRules,
       phoneRules,
       phoneExtensionRules,
-      SubmittingPartyTypes,
+      ContactTypes,
       PartyAddressSchema,
       OptionalPartyAddressSchema,
       ...toRefs(localState)

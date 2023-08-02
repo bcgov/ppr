@@ -14,6 +14,7 @@ import {
   StickyContainer,
   CertifyInformation,
   SharedDatePicker,
+  ContactInformation,
   Attention,
   FormField
 } from '@/components/common'
@@ -525,8 +526,8 @@ describe('Mhr Information', () => {
 
     const staffSubmittingParty = wrapper.find('#staff-transfer-submitting-party')
     expect(staffSubmittingParty.exists()).toBeTruthy()
-    expect(staffSubmittingParty.find('#ppr-party-code').exists()).toBeTruthy()
-    expect(staffSubmittingParty.find('#submitting-party').exists()).toBeTruthy()
+    expect(staffSubmittingParty.find('#ppr-party-code').exists()).toBe(true)
+    expect(staffSubmittingParty.findComponent(ContactInformation).exists()).toBe(true)
 
     // click submit to trigger errors
     wrapper.find('#btn-stacked-submit').trigger('click')

@@ -1,6 +1,5 @@
 <template>
   <v-card
-    v-if="autoCompleteIsActive"
     id="party-search-auto-complete"
     class="mt-1 auto-complete-card"
     elevation="5"
@@ -8,11 +7,11 @@
   >
     <v-row no-gutters justify="center" class="pl-2">
       <v-col class="no-gutters" cols="12">
-        <v-list v-if="autoCompleteResults && autoCompleteResults.length > 0"
+        <v-list v-if="autoCompleteItems && autoCompleteItems.length > 0"
           class="pt-0 auto-complete-list">
           <v-list-item-group v-model="autoCompleteSelected">
             <v-list-item
-              v-for="(result, i) in autoCompleteResults"
+              v-for="(result, i) in autoCompleteItems"
               :key="i"
               :ripple="!isExistingSecuredParty(result.code, isRegisteringParty)"
               class="pt-0 pb-0 pl-1"
@@ -66,7 +65,7 @@
             </v-list-item>
           </v-list-item-group>
         </v-list>
-        <v-list v-else-if="autoCompleteIsActive">
+        <v-list v-else>
            <v-list-item
               class="pt-0 pb-0 pl-1 auto-complete-item"
             >
@@ -89,23 +88,19 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs, watch, computed } from 'vue-demi'
+import { defineComponent, reactive, toRefs, computed } from 'vue-demi'
 import { useCountriesProvinces } from '@/composables/address/factories'
 import { useSecuredParty } from '@/composables/parties'
 import { ActionTypes } from '@/enums'
 import { SearchPartyIF, PartyIF } from '@/interfaces' // eslint-disable-line no-unused-vars
-import { useStore } from '@/store/store'
 
 export default defineComponent({
   name: 'PartyAutocomplete',
+  emits: ['closeAutoComplete', 'selectItem'],
   props: {
     autoCompleteItems: {
-      type: Array,
+      type: Array as () => Array<any>,
       default: () => []
-    },
-    setAutoCompleteActive: {
-      type: Boolean,
-      default: false
     },
     isRegisteringParty: {
       type: Boolean,
@@ -114,26 +109,14 @@ export default defineComponent({
     isMhrPartySearch: {
       type: Boolean,
       default: false
-    },
-    isMhrTransfer: {
-      type: Boolean,
-      default: false
     }
   },
-  setup (props, context) {
-    const {
-      setMhrSubmittingParty,
-      setMhrTransferSubmittingParty,
-      setMhrTransferSubmittingPartyKey,
-      setMhrRegistrationSubmittingParty
-    } = useStore()
-    const { addSecuredParty, setRegisteringParty, isExistingSecuredParty } = useSecuredParty(context)
+  setup (props, { emit }) {
+    const { addSecuredParty, setRegisteringParty, isExistingSecuredParty } = useSecuredParty()
     const countryProvincesHelpers = useCountriesProvinces()
     const localState = reactive({
       searchValue: '',
-      autoCompleteIsActive: props.setAutoCompleteActive,
       autoCompleteSelected: -1,
-      autoCompleteResults: [],
       resultAdded: [],
       selectedCode: null,
       mouseOver: false,
@@ -161,43 +144,17 @@ export default defineComponent({
         setRegisteringParty(newParty)
       } else if (props.isMhrPartySearch) {
         localState.selectedCode = newParty.code
-        if (props.isMhrTransfer) {
-          // pre-set country code to prevent clearing of base-address component fields
-          setMhrTransferSubmittingPartyKey({ key: 'address.country', value: newParty.address.country })
-          setMhrTransferSubmittingParty(newParty)
-        } else {
-          // pre-set country code to prevent clearing of base-address component fields (bug 13637)
-          setMhrSubmittingParty({ key: 'address.country', value: newParty.address.country })
-          setMhrRegistrationSubmittingParty(newParty)
-        }
       } else {
         addSecuredParty(newParty)
       }
 
-      context.emit('selectItem', newParty)
+      emit('selectItem', newParty)
       closeAutoComplete()
     }
 
     const closeAutoComplete = () => {
-      localState.autoCompleteIsActive = false
-      localState.resultAdded = []
+      emit('closeAutoComplete')
     }
-
-    watch(
-      () => props.autoCompleteItems,
-      (items: Array<any>) => {
-        localState.autoCompleteResults = items
-        localState.autoCompleteIsActive = !!items
-      },
-      { immediate: true, deep: true }
-    )
-
-    watch(
-      () => props.setAutoCompleteActive,
-      (val: boolean) => {
-        localState.autoCompleteIsActive = props.setAutoCompleteActive
-      }
-    )
 
     return {
       addResult,

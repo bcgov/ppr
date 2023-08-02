@@ -26,6 +26,11 @@ export const useMhrUnitNote = () => {
       unitNoteData.submittingParty.phoneNumber = unitNoteData.submittingParty.phoneNumber?.replace(/[^A-Z0-9]/ig, '')
     }
 
+    // Remove the hasUsedPartyLookup flag from submittingParty as its not used by the API
+    if (unitNoteData.submittingParty.hasUsedPartyLookup) {
+      delete unitNoteData.submittingParty.hasUsedPartyLookup
+    }
+
     // status is not required
     delete unitNoteData.note.status
 

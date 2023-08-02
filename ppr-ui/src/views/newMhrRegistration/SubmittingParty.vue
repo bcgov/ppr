@@ -1,18 +1,13 @@
 <template>
   <div id="mhr-submitting-party">
     <section id="mhr-add-submitting-party" class="mt-10">
-      <h2>Submitting Party</h2>
-      <p class="mt-2">
-        Provide the name and contact information for the person or business submitting this registration. You can add
-        the submitting party information manually, or, if the submitting party has a Personal Property Registry party
-        code, you can look up the party code or name.
-      </p>
-
-      <!-- Parties Look Up -->
-      <PartySearch isMhrPartySearch />
-
-      <!-- Mhr Submitting Party Form -->
-      <MhrSubmittingParty :validate="validateSubmitter" :class="{ 'border-error-left': validateSubmitter }" />
+      <ContactInformation
+        :contactInfo="getMhrRegistrationSubmittingParty"
+        :content="submittingPartyRegistrationContent"
+        :validate="validateSubmitter"
+        @setStoreProperty="setMhrRegistrationSubmittingParty"
+        @isValid="setValidation(MhrSectVal.SUBMITTING_PARTY_VALID, MhrCompVal.SUBMITTER_VALID, $event)"
+      />
     </section>
 
     <section id="mhr-submitting-party-doc-id" class="mt-10">
@@ -80,9 +75,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue-demi'
-import { MhrSubmittingParty } from '@/components/mhrRegistration/SubmittingParty'
-import { Attention } from '@/components/common'
-import { PartySearch } from '@/components/parties/party'
+import { Attention, ContactInformation } from '@/components/common'
 import { useMhrValidations } from '@/composables/mhrRegistration/useMhrValidations'
 import { useStore } from '@/store/store'
 import { useInputRules } from '@/composables'
@@ -90,25 +83,27 @@ import { validateDocumentID } from '@/utils'
 // eslint-disable-next-line no-unused-vars
 import { MhrDocIdResponseIF, FormIF } from '@/interfaces'
 import { storeToRefs } from 'pinia'
+import { submittingPartyRegistrationContent } from '@/resources'
 
 export default defineComponent({
   name: 'SubmittingParty',
   components: {
     Attention,
-    PartySearch,
-    MhrSubmittingParty
+    ContactInformation
   },
   setup () {
     const {
       // Actions
       setMhrRegistrationDocumentId,
+      setMhrRegistrationSubmittingParty,
       setMhrAttentionReference
     } = useStore()
     const {
       // Getters
       getMhrAttentionReference,
       getMhrRegistrationDocumentId,
-      getMhrRegistrationValidationModel
+      getMhrRegistrationValidationModel,
+      getMhrRegistrationSubmittingParty
     } = storeToRefs(useStore())
     const { customRules, isNumber, maxLength, minLength, required } = useInputRules()
     const {
@@ -129,7 +124,7 @@ export default defineComponent({
       loadingDocId: false,
       isUniqueDocId: false,
       displayDocIdError: false,
-      documentIdRules: computed(() => {
+      documentIdRules: computed((): any[] => {
         return getValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_STEPS)
           ? customRules(
             required('Enter a Document ID'),
@@ -145,16 +140,16 @@ export default defineComponent({
       validateSubmitter: computed((): boolean => {
         return getSectionValidation(MhrSectVal.SUBMITTING_PARTY_VALID, MhrCompVal.SUBMITTER_VALID)
       }),
-      validateDocId: computed(() => {
+      validateDocId: computed((): boolean => {
         return getSectionValidation(MhrSectVal.SUBMITTING_PARTY_VALID, MhrCompVal.DOC_ID_VALID)
       }),
-      validateRefNum: computed(() => {
+      validateRefNum: computed((): boolean => {
         return getSectionValidation(MhrSectVal.SUBMITTING_PARTY_VALID, MhrCompVal.REF_NUM_VALID)
       }),
-      isVerifiedDocId: computed(() => {
+      isVerifiedDocId: computed((): boolean => {
         return localState.isDocumentIdValid && localState.isUniqueDocId
       }),
-      uniqueDocIdError: computed(() => {
+      uniqueDocIdError: computed((): string[] => {
         // Manual error handling for Unique DocId Lookup
         return localState.displayDocIdError ? ['Must be unique number'] : []
       })
@@ -198,6 +193,10 @@ export default defineComponent({
       documentIdForm,
       MhrCompVal,
       MhrSectVal,
+      getMhrRegistrationSubmittingParty,
+      setMhrRegistrationSubmittingParty,
+      setValidation,
+      submittingPartyRegistrationContent,
       maxLength,
       hasError,
       getMhrAttentionReference,

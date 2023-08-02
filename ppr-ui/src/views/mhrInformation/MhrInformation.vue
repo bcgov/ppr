@@ -124,21 +124,13 @@
                 </section>
 
                 <section v-if="isRoleStaffReg" id="staff-transfer-submitting-party" class="submitting-party">
-                  <h2>1. Submitting Party for this Change</h2>
-                  <p class="mt-2 mb-6">
-                    Provide the name and contact information for the person or business submitting this registration.
-                    You can add the submitting party information manually, or, if the submitting party has a Personal
-                    Property Registry party code, you can look up the party code or name.
-                  </p>
-
-                  <PartySearch isMhrPartySearch isMhrTransfer />
-
-                  <MhrSubmittingParty
+                  <ContactInformation
+                    :contactInfo="getMhrTransferSubmittingParty"
+                    :sectionNumber="1"
+                    :content="submittingPartyChangeContent"
                     :validate="validateSubmittingParty"
-                    :class="{ 'border-error-left': validateSubmittingParty }"
+                    @setStoreProperty="setMhrTransferSubmittingParty"
                     @isValid="setValidation('isSubmittingPartyValid', $event)"
-                    :content="{ mailAddressInfo: 'Registry documents and decal will be mailed to this address.' }"
-                    isMhrTransfer
                   />
                 </section>
 
@@ -326,7 +318,14 @@ import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { StaffPayment } from '@bcrs-shared-components/staff-payment'
 import { StaffPaymentOptions } from '@bcrs-shared-components/enums'
-import { Attention, CautionBox, CertifyInformation, FolioOrReferenceNumber, StickyContainer } from '@/components/common'
+import {
+  Attention,
+  CautionBox,
+  CertifyInformation,
+  FolioOrReferenceNumber,
+  ContactInformation,
+  StickyContainer
+} from '@/components/common'
 import {
   useAuth,
   useHomeOwners,
@@ -337,13 +336,12 @@ import {
   useTransferOwners
 } from '@/composables'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
-import { PartySearch } from '@/components/parties/party'
-import { MhrSubmittingParty } from '@/components/mhrRegistration/SubmittingParty'
 import { ConfirmCompletion, TransferDetails, TransferDetailsReview, TransferType } from '@/components/mhrTransfers'
 import { HomeLocationReview, YourHomeReview } from '@/components/mhrRegistration/ReviewConfirm'
 import { HomeOwners } from '@/views'
 import { UnitNotePanels } from '@/components/unitNotes'
 import { BaseDialog } from '@/components/dialogs'
+import { submittingPartyChangeContent } from '@/resources'
 import { cancelOwnerChangeConfirm, transferRequiredDialog, unsavedChangesDialog } from '@/resources/dialogOptions'
 import AccountInfo from '@/components/common/AccountInfo.vue'
 /* eslint-disable no-unused-vars */
@@ -386,8 +384,7 @@ export default defineComponent({
     CautionBox,
     FolioOrReferenceNumber,
     HomeOwners,
-    PartySearch,
-    MhrSubmittingParty,
+    ContactInformation,
     TransferType,
     TransferDetails,
     TransferDetailsReview,
@@ -443,7 +440,8 @@ export default defineComponent({
       getMhrTransferType,
       getMhrTransferDeclaredValue,
       getMhrInfoValidation,
-      getMhrTransferAttentionReference
+      getMhrTransferAttentionReference,
+      getMhrTransferSubmittingParty
     } = storeToRefs(useStore())
     const {
       isFrozenMhr,
@@ -521,7 +519,7 @@ export default defineComponent({
       validateAuthorizationError: computed((): boolean => {
         return localState.validate && !getInfoValidation('isAuthorizationValid')
       }),
-      validateStaffPayment: computed(() => {
+      validateStaffPayment: computed((): boolean => {
         return isRoleStaffReg.value && localState.validate && !getInfoValidation('isStaffPaymentValid')
       }),
       transferErrorMsg: computed((): string => {
@@ -533,7 +531,7 @@ export default defineComponent({
       reviewConfirmText: computed((): string => {
         return localState.isReviewMode ? 'Register Changes and Pay' : 'Review and Confirm'
       }),
-      enableHomeOwnerChanges: computed(() => {
+      enableHomeOwnerChanges: computed((): boolean => {
         return getFeatureFlag('mhr-transfer-enabled')
       }),
       /** True if Jest is running the code. */
@@ -764,7 +762,6 @@ export default defineComponent({
         }
       }
       localState.showCancelDialog = false
-      localState.showSaveDialog = false
     }
 
     const handleCancelDialogResp = async (val: boolean): Promise<void> => {
@@ -847,7 +844,6 @@ export default defineComponent({
         (transferTypeSelect?.transferType !== getMhrTransferType.value?.transferType)
       ) await resetMhrInformation()
 
-      localState.showTransferChangeDialog = true
       await setMhrTransferType(transferTypeSelect)
     }
 
@@ -905,6 +901,8 @@ export default defineComponent({
       cancelOwnerChangeConfirm,
       transferRequiredDialog,
       getMhrUnitNotes,
+      getMhrTransferSubmittingParty,
+      submittingPartyChangeContent,
       ...toRefs(localState)
     }
   }

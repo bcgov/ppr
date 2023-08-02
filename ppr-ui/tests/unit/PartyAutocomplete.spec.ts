@@ -58,11 +58,10 @@ describe('Secured Party search autocomplete tests', () => {
   })
 
   it('shows the auto complete drop down when searching for a party', async () => {
-    expect(wrapper.vm.autoCompleteIsActive).toBe(true)
-    expect(wrapper.vm.autoCompleteResults.length).toBe(3)
     const autoCompleteItems = wrapper.findAll('.v-list-item__subtitle')
     expect(wrapper.find(partyCodeAutoComplete).exists()).toBe(true)
     expect(autoCompleteItems.length).toBeGreaterThan(1)
+    expect(wrapper.find('#no-party-matches').exists()).toBe(false)
   })
 
   it('adds the party after a name in the list is clicked', async () => {

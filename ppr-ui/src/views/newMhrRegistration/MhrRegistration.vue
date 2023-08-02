@@ -200,6 +200,11 @@ export default defineComponent({
           data.description.csaNumber = ''
         }
 
+        // Property is maintained for resuming draft but removed for submission
+        if (data.submittingParty.hasUsedPartyLookup) {
+          delete data.submittingParty.hasUsedPartyLookup
+        }
+
         const mhrSubmission = await submitMhrRegistration(data, parseStaffPayment())
         localState.submitting = false
         if (!mhrSubmission.error && mhrSubmission?.mhrNumber) {

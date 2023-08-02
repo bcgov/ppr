@@ -9,20 +9,20 @@
           v-model="searchValue"
           persistent-hint
           hint="Enter at least the first 3 characters"
-          :class="autoCompleteDisabled ? 'disabled-custom' : ''"
-          :disabled="autoCompleteDisabled"
+          :class="isAutoCompleteDisabled ? 'disabled-custom' : ''"
+          :disabled="isAutoCompleteDisabled"
         />
       </v-col>
-      <v-col cols="6" class="pt-0 mt-n5" :class="{ 'disabled-text': autoCompleteDisabled }">
+      <v-col cols="6" class="pt-0 mt-n5" :class="{ 'disabled-text': isAutoCompleteDisabled }">
         or
         <a
           v-if="!isMhrPartySearch"
           id="add-party"
           class="generic-link pl-2"
-          :class="{ 'disabled-text': autoCompleteDisabled }"
+          :class="{ 'disabled-text': isAutoCompleteDisabled }"
           @click="goToAddSecuredParty"
-          :disabled="autoCompleteDisabled"
-          >Add a {{ partyWord}} Party that doesn't have a code
+          :disabled="isAutoCompleteDisabled"
+          >Add a {{ partyWord }} Party that doesn't have a code
         </a>
         <span v-else>Manually enter submitting party information below</span>
       </v-col>
@@ -30,13 +30,13 @@
     <v-row no-gutters>
       <v-col cols="12">
         <PartyAutocomplete
+          v-if="setAutoCompleteActive"
           :autoCompleteItems="autoCompleteResults"
           :defaultClickToAdd="false"
-          :setAutoCompleteActive="setAutoCompleteActive"
           :isRegisteringParty="isRegisteringParty"
           :isMhrPartySearch="isMhrPartySearch"
-          :isMhrTransfer="isMhrTransfer"
           @selectItem="selectItem($event)"
+          @closeAutoComplete="closeAutoComplete"
         />
       </v-col>
     </v-row>
@@ -52,11 +52,11 @@
           @click="addRegisteringParty"
           v-model="registeringPartySelected"
           :hide-details="true"
-          :disabled="autoCompleteDisabled"
+          :disabled="isAutoCompleteDisabled"
         >
         </v-checkbox>
       </v-col>
-      <v-col class="pl-0" :class="{ 'disabled-text': autoCompleteDisabled }">
+      <v-col class="pl-0" :class="{ 'disabled-text': isAutoCompleteDisabled }">
         Include the Registering Party as a Secured Party
       </v-col>
     </v-row>
@@ -98,10 +98,6 @@ export default defineComponent({
     isMhrPartySearch: {
       type: Boolean,
       default: false
-    },
-    isMhrTransfer: {
-      type: Boolean,
-      default: false
     }
   },
   emits: [
@@ -121,9 +117,6 @@ export default defineComponent({
       registeringPartySelected: false,
       resultAdded: [],
       partyCode: 0,
-      autoCompleteDisabled: computed((): boolean => {
-        return props.isAutoCompleteDisabled
-      }),
       partyWord: computed((): string => props.isRegisteringParty
         ? 'Registering' : 'Secured'),
       searchFieldLabel: computed((): string => {
