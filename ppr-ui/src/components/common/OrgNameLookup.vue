@@ -39,7 +39,7 @@ import { defineComponent, reactive, toRefs, watch } from 'vue-demi'
 import { BusinessSearchAutocomplete } from '@/components/search'
 
 export default defineComponent({
-  name: 'BusinessNameLookup',
+  name: 'OrgNameLookup',
   emits: ['updateOrgName'],
   components: {
     BusinessSearchAutocomplete

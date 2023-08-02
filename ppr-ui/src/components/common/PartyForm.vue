@@ -110,7 +110,7 @@ import { VueMaskDirective } from 'v-mask'
 import OrgNameLookup from '@/components/common/OrgNameLookup.vue'
 
 export default defineComponent({
-  name: 'ContactInformation',
+  name: 'PartyForm',
   emits: ['isValid'],
   components: {
     BaseAddress,
