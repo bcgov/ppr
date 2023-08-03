@@ -28,7 +28,7 @@
           <h3>Remarks</h3>
         </v-col>
         <v-col cols="9" class="remarks">
-          {{ unitNote.remarks }}
+          {{ unitNote.remarks || '(Not Entered)' }}
         </v-col>
       </v-row>
       <v-divider class="my-3 mx-0" />

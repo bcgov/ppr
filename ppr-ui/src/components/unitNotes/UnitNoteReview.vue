@@ -49,7 +49,7 @@
         }"
         :validate="validate"
         :hideContinuedExpiryDate="isUnitNoteTypeCAUE"
-        @setStoreProperty="handleStoreUpdate('expiryDateTime', $event)"
+        @setStoreProperty="handleExpiryDateUpdate($event)"
         @isValid="handleComponentValid(MhrCompVal.EXPIRY_DATE_TIME_VALID, $event)"
       />
 
@@ -204,6 +204,10 @@ export default defineComponent({
       setMhrUnitNote({ key: 'expiryDateTime', value: expiryDateTime })
     }
 
+    const handleExpiryDateUpdate = (val: string) => {
+      setMhrUnitNote({ key: 'expiryDateTime', value: val })
+    }
+
     const handleComponentValid = (component: MhrCompVal, isValid: boolean) => {
       setValidation(MhrSectVal.UNIT_NOTE_VALID, component, isValid)
     }
@@ -283,6 +287,7 @@ export default defineComponent({
       onStaffPaymentDataUpdate,
       effectiveDateDescForCAU,
       hasEffectiveDateTime,
+      handleExpiryDateUpdate,
       hasExpiryDate,
       submittingPartyChangeContent,
       ...toRefs(localState)
