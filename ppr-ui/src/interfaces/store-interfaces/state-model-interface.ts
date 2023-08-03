@@ -26,11 +26,12 @@ import {
   mhrInfoValidationStateIF,
   MhrValidationManufacturerStateIF,
   UnitNoteRegistrationIF,
-  MhrUnitNoteValidationStateIF
+  MhrUnitNoteValidationStateIF,
+  UserAccessIF,
+  UserAccessValidationIF
 } from '@/interfaces'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 import { UnitNoteIF } from '@/interfaces/unit-note-interfaces/unit-note-interface'
-import { UserAccessIF } from '@/interfaces/store-interfaces/state-interfaces/user-access-interface'
 
 // State model example
 export interface StateModelIF {
@@ -87,6 +88,7 @@ export interface StateModelIF {
   mhrUnitNote: UnitNoteRegistrationIF // used for Unit Note filing/registration
   mhrUnitNoteValidationState: MhrUnitNoteValidationStateIF
   mhrUserAccess: UserAccessIF
+  mhrUserAccessValidation: UserAccessValidationIF
   mhrSearchResultSelectAllLien: boolean
   mhrValidationState?: MhrValidationStateIF
   mhrValidationManufacturerState?: MhrValidationManufacturerStateIF

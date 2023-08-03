@@ -56,6 +56,8 @@ export const useNavigation = () => {
   }
 
   return {
+    route,
+    router,
     goToRoute,
     goToDash,
     navigateTo,

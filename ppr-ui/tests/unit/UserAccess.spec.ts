@@ -3,7 +3,7 @@ import Vue, { nextTick } from 'vue'
 import Vuetify from 'vuetify'
 import { ButtonFooter, Stepper } from '@/components/common'
 import QsSelectAccess from '@/views/userAccess/QsSelectAccess.vue'
-import { createComponent } from './utils'
+import { createComponent, setupMockUser } from './utils'
 import { Wrapper } from '@vue/test-utils'
 import { RouteNames } from '@/enums'
 import { defaultFlagSet } from '@/utils'
@@ -13,12 +13,7 @@ Vue.use(Vuetify)
 describe('UserAccess', () => {
   let wrapper: Wrapper<any>
   defaultFlagSet['mhr-user-access-enabled'] = true
-  const currentAccount = {
-    id: 'test_id'
-  }
-  sessionStorage.setItem('KEYCLOAK_TOKEN', 'token')
-  sessionStorage.setItem('CURRENT_ACCOUNT', JSON.stringify(currentAccount))
-  sessionStorage.setItem('AUTH_API_URL', 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/')
+  setupMockUser()
 
   beforeEach(async () => {
     wrapper = await createComponent(UserAccess,

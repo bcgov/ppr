@@ -143,7 +143,7 @@ import {
   useBaseValidations,
   spaceRules
 } from '@/composables/address/factories'
-import { AddressIF, SchemaIF } from '@/composables/address/interfaces' // eslint-disable-line no-unused-vars
+import { AddressIF, SchemaIF } from '@/composables/address/interfaces'
 
 export default defineComponent({
   name: 'base-address',

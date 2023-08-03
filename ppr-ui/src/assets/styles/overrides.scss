@@ -613,6 +613,10 @@ input#reg-textfield.v-text-field.v-input--dense:not(.v-text-field--outlined),
   }
 }
 
+.v-icon.mdi-close {
+  color: $primary-blue !important;
+}
+
 #registration-table {
   .v-icon.mdi-calendar {
     color: $gray7;

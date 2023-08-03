@@ -69,8 +69,9 @@
 
             <v-card flat>
               <BusinessSearchAutocomplete
-                isPPR disableHelpText
+                isPPR
                 v-click-outside="setCloseAutoComplete"
+                nilSearchText
                 :searchValue="autoCompleteSearchValue"
                 :setAutoCompleteIsActive="autoCompleteIsActive"
                 :showDropdown="$refs.debtorNameSearchField && $refs.debtorNameSearchField.isFocused"
@@ -109,8 +110,9 @@
 
             <v-card flat>
               <BusinessSearchAutocomplete
-                isPPR disableHelpText
+                isPPR
                 v-click-outside="setCloseAutoComplete"
+                nilSearchText
                 :searchValue="autoCompleteSearchValue"
                 :setAutoCompleteIsActive="autoCompleteIsActive"
                 :showDropdown="$refs.mhrOrgNameRef && $refs.mhrOrgNameRef.isFocused"

@@ -7,18 +7,6 @@ const vuetify = new Vuetify({})
 setActivePinia(createPinia())
 const store = useStore()
 
-// Mock the useUserAccess composable to provide necessary values for testing
-jest.mock('@/composables', () => ({
-  useUserAccess: jest.fn(() => ({
-    isPendingQsAccess: false,
-    isUserAccessRoute: false,
-    goToUserAccess: jest.fn()
-  })),
-  useMhrValidations: jest.fn(() => ({
-    getStepValidation: jest.fn()
-  }))
-}))
-
 describe('QsAccessBtn', () => {
   it('renders Approved Qualified Supplier link when isRoleQualifiedSupplier is true', () => {
     const wrapper = mount(QsAccessBtn, {

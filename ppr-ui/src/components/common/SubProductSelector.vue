@@ -1,65 +1,46 @@
 <template>
-  <v-card flat class="px-8 pt-9 pb-5">
-    <v-row no-gutters>
-      <v-col cols="2">
-        <label
-          class="generic-label"
-          for="sub-product-selector"
-          :class="{ 'error-text': showErrors }"
+  <v-form id="sub-product-selector" ref="productSelectorFormRef">
+    <v-radio-group
+      hide-details
+      v-model="selectedProduct"
+      class="sub-product-radio-group pt-0 mt-0"
+    >
+      <div
+        v-for="(subProduct, index) in subProductConfig"
+        class="sub-product-radio-wrapper"
+        :key="subProduct.type"
+      >
+        <v-radio
+          class="sub-product-radio-btn"
+          :value="subProduct.type"
         >
-          Select Access Type
-        </label>
-      </v-col>
-      <v-col class="ml-8">
-        <!-- Access Type Form -->
-        <v-form
-          id="sub-product-selector"
-          ref="productSelectorFormRef"
-        >
-          <v-radio-group
-            hide-details
-            v-model="selectedProduct"
-            class="sub-product-radio-group pt-0 mt-0"
-          >
-            <div
-              v-for="(subProduct, index) in subProductConfig"
-              class="sub-product-radio-wrapper"
-              :key="subProduct.type"
-            >
-              <v-radio
-                class="sub-product-radio-btn"
-                :value="subProduct.type"
-              >
-                <template v-slot:label>
-                  <v-row no-gutters>
-                    <v-col cols="12">
-                      <label class="sub-product-label generic-label">{{ subProduct.label }}</label>
-                    </v-col>
-                    <v-col class="mt-2">
-                      <p>
-                        <ul class="ml-n2">
-                          <li v-for="(bullet, index) in subProduct.productBullets" :key="index" class="bullet mt-2">
-                            <span :class="{ 'font-weight-bold': isImportantBullet(subProduct, index) }">
-                              {{ bullet }}
-                            </span>
-                          </li>
-                        </ul>
-                      </p>
-                    </v-col>
-                  </v-row>
-                </template>
-              </v-radio>
-              <!-- Attached Selection Notes -->
-              <p v-if="subProduct.note" class="sub-product-note mt-n2 ml-8 mb-6">
-                <strong>Note:</strong> <span v-html="subProduct.note"></span>
-              </p>
-              <v-divider v-if="index !== subProductConfig.length - 1" class="ml-n1 mb-6" />
-            </div>
-          </v-radio-group>
-        </v-form>
-      </v-col>
-    </v-row>
-  </v-card>
+          <template v-slot:label>
+            <v-row no-gutters>
+              <v-col cols="12">
+                <label class="sub-product-label generic-label">{{ subProduct.label }}</label>
+              </v-col>
+              <v-col class="mt-2">
+                <p>
+                  <ul class="ml-n2">
+                    <li v-for="(bullet, index) in subProduct.productBullets" :key="index" class="bullet mt-2">
+                      <span :class="{ 'font-weight-bold': isImportantBullet(subProduct, index) }">
+                        {{ bullet }}
+                      </span>
+                    </li>
+                  </ul>
+                </p>
+              </v-col>
+            </v-row>
+          </template>
+        </v-radio>
+        <!-- Attached Selection Notes -->
+        <p v-if="subProduct.note" class="sub-product-note mt-n2 ml-8 mb-6">
+          <strong>Note:</strong> <span v-html="subProduct.note"></span>
+        </p>
+        <v-divider v-if="index !== subProductConfig.length - 1" class="ml-n1 mb-6" />
+      </div>
+    </v-radio-group>
+  </v-form>
 </template>
 
 <script lang="ts">
@@ -74,10 +55,6 @@ export default defineComponent({
     subProductConfig: {
       type: Array as () => Array<SubProductConfigIF>,
       default: () => []
-    },
-    showErrors: {
-      type: Boolean,
-      default: false
     },
     defaultProduct: {
       type: String,
@@ -110,11 +87,11 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-.sub-product-label {
-  cursor: pointer;
-}
 #sub-product-selector {
   margin-top: 2px;
+}
+.sub-product-label {
+  cursor: pointer;
 }
 .sub-product-note {
   font-size: 14px;
@@ -123,6 +100,7 @@ export default defineComponent({
   color: $gray7;
 }
 
+// TODO: Move this to Base
 ::v-deep {
   a {
     color: $app-blue!important;

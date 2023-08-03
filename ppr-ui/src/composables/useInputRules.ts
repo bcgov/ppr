@@ -105,6 +105,51 @@ export const useInputRules = () => {
     return [].concat(...rules)
   }
 
+  // Common Custom Compound Rules
+  const firstNameRules = (isOptional: boolean = false) => {
+    return customRules(
+      !isOptional ? required('Enter a first name') : [],
+      maxLength(15),
+      invalidSpaces()
+    )
+  }
+
+  const middleNameRules = customRules(maxLength(15), invalidSpaces())
+
+  const lastNameRules = (isOptional: boolean = false) => {
+    return customRules(
+      !isOptional ? required('Enter a last name') : [],
+      maxLength(25),
+      invalidSpaces())
+  }
+
+  const emailRules = customRules(
+    maxLength(250),
+    isEmailOptional(),
+    invalidSpaces()
+  )
+
+  const phoneRules = (isOptional: boolean = false) => {
+    return customRules(
+      !isOptional ? required('Phone Number is required') : [],
+      isPhone(14)
+    )
+  }
+
+  const businessNameRules = (isOptional: boolean = false) => {
+    return customRules(
+      !isOptional ? required('Enter full legal business name') : [],
+      maxLength(150),
+      invalidSpaces()
+    )
+  }
+
+  const phoneExtensionRules = customRules(
+    isNumber(null, null, null, 'Enter numbers only'),
+    invalidSpaces(),
+    maxLength(5, true)
+  )
+
   return {
     customRules,
     isEmailOptional,
@@ -119,6 +164,13 @@ export const useInputRules = () => {
     lessThan,
     minLength,
     maxLength,
-    isPhone
+    isPhone,
+    firstNameRules,
+    middleNameRules,
+    lastNameRules,
+    businessNameRules,
+    phoneRules,
+    phoneExtensionRules,
+    emailRules
   }
 }
