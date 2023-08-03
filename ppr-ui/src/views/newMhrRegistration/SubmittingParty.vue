@@ -5,13 +5,14 @@
         :contactInfo="getMhrRegistrationSubmittingParty"
         :content="submittingPartyRegistrationContent"
         :validate="validateSubmitter"
+        :sectionNumber="1"
         @setStoreProperty="setMhrRegistrationSubmittingParty"
         @isValid="setValidation(MhrSectVal.SUBMITTING_PARTY_VALID, MhrCompVal.SUBMITTER_VALID, $event)"
       />
     </section>
 
     <section id="mhr-submitting-party-doc-id" class="mt-10">
-      <h2>Document ID</h2>
+      <h2>2. Document ID</h2>
       <p class="mt-2">
         Enter the 8-digit Document ID number.
       </p>
@@ -211,14 +212,4 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-#mhr-submitting-party {
-  /* Set "header-counter" to 0 */
-  counter-reset: header-counter;
-}
-
-h2::before {
-  /* Increment "header-counter" by 1 */
-  counter-increment: header-counter;
-  content: counter(header-counter) '. ';
-}
 </style>
