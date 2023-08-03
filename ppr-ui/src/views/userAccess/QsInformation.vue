@@ -2,10 +2,16 @@
   <div id="qs-information">
     <section class="qs-information-intro mt-10">
       <p>
-        To request <strong>{{ getMhrSubProduct }}</strong> access to the Manufactured Home Registry, complete the
-        information below. BC Registries staff will review your application and if approved, will provide access.
+        To request <strong>Qualified Supplier - {{ getMhrSubProduct }}</strong> access to the Manufactured Home
+        Registry, complete the information below. BC Registries staff will review your application and if approved,
+        will provide access.
       </p>
-      <CautionBox class="mt-8" :setMsg="`This is intended for the exclusive use of B.C. ${getMhrSubProduct} only.`" />
+
+      <CautionBox
+        class="mt-8"
+        :setMsg="`This is intended for the exclusive use of B.C. ${getMhrSubProduct && getMhrSubProduct.toLowerCase()}
+        only.`"
+      />
     </section>
 
     <section class="qs-service-agreement mt-8">

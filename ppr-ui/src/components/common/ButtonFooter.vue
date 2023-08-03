@@ -248,9 +248,11 @@ export default defineComponent({
 
       // Undetected Duplicate Secured Party API check to be implemented here.
       // Use secured party dialog with isDuplicate and isReview props to display error if found.
-      if ([RouteNames.REVIEW_CONFIRM, RouteNames.MHR_REVIEW_CONFIRM].includes(props.currentStepName as RouteNames)) {
+      if ([RouteNames.REVIEW_CONFIRM, RouteNames.MHR_REVIEW_CONFIRM, RouteNames.QS_ACCESS_REVIEW_CONFIRM]
+        .includes(props.currentStepName as RouteNames)) {
         // -- Intersect here for Submitting MHR Registration --
-        if (props.currentStepName === RouteNames.MHR_REVIEW_CONFIRM) {
+        if ([RouteNames.MHR_REVIEW_CONFIRM, RouteNames.QS_ACCESS_REVIEW_CONFIRM]
+          .includes(props.currentStepName as RouteNames)) {
           emit('submit')
           return
         }

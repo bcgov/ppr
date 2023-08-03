@@ -15,7 +15,7 @@
                 <h1>Request MHR Qualified Supplier Access</h1>
               </v-col>
             </v-row>
-            <QsSelectAccess :showErrors="!getMhrSubProduct && promptAccessSelect" />
+            <QsSelectAccess :showErrors="!getMhrSubProduct && validateQsSelect" />
           </v-col>
         </v-row>
       </article>
@@ -32,7 +32,7 @@
             <Stepper
               class="mt-11"
               :stepConfig="getUserAccessSteps"
-              :showStepErrors="validateUserAccess"
+              :showStepErrors="validateQsComponents && validateQsApplication"
             />
             <!-- Component Steps -->
             <component
@@ -40,7 +40,7 @@
               v-show="isRouteName(step.to)"
               :is="step.component"
               :key="step.step"
-              :validate="validateUserAccess"
+              :validate="validateQsComponents"
             />
           </v-col>
         </v-row>
@@ -54,7 +54,7 @@
           :navConfig="MhrUserAccessButtonFooterConfig"
           :currentStepName="$route.name"
           :disableNav="!getMhrSubProduct"
-          @navigationDisabled="promptAccessSelect = $event"
+          @navigationDisabled="validateQsSelect = $event"
           @error="emitError($event)"
           @submit="submit()"
         />
@@ -96,15 +96,16 @@ export default defineComponent({
     }
   },
   setup (props, { emit }) {
-    const { getMhrSubProduct, getUserAccessSteps } = storeToRefs(useStore())
-    const { isRouteName, goToDash, route } = useNavigation()
     const { isAuthenticated } = useAuth()
+    const { isRouteName, goToDash, route } = useNavigation()
+    const { getMhrSubProduct, getUserAccessSteps } = storeToRefs(useStore())
 
     const localState = reactive({
       dataLoaded: false,
       submitting: false,
-      validateUserAccess: false,
-      promptAccessSelect: false
+      validateQsSelect: false,
+      validateQsComponents: false,
+      validateQsApplication: false
     })
 
     onMounted(async (): Promise<void> => {
@@ -125,11 +126,12 @@ export default defineComponent({
     }
 
     const submit = (): void => {
-      // Submit the filing, do stuff
+      localState.validateQsApplication = true
+      // Do Filing Stuff Here
     }
 
     watch(() => route.name, () => {
-      if (isRouteName(RouteNames.QS_ACCESS_REVIEW_CONFIRM)) localState.validateUserAccess = true
+      if (isRouteName(RouteNames.QS_ACCESS_REVIEW_CONFIRM)) localState.validateQsComponents = true
     })
 
     return {

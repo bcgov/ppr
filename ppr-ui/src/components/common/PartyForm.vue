@@ -63,23 +63,23 @@
       <v-row no-gutters class="mt-5">
         <v-col>
           <v-text-field
-              v-mask="'(NNN) NNN-NNNN'"
-              filled
-              id="party-form-phone"
-              class="pr-3"
-              label="Phone Number"
-              v-model="partyModel.phoneNumber"
-              :rules="schema.phone"
+            v-mask="'(NNN) NNN-NNNN'"
+            filled
+            id="party-form-phone"
+            class="pr-3"
+            label="Phone Number"
+            v-model="partyModel.phoneNumber"
+            :rules="schema.phone"
           />
         </v-col>
         <v-col>
           <v-text-field
-              filled
-              id="party-form-phone-ext"
-              class="px-2"
-              label="Extension (Optional)"
-              v-model="partyModel.phoneExtension"
-              :rules="schema.phoneExt"
+            filled
+            id="party-form-phone-ext"
+            class="px-2"
+            label="Extension (Optional)"
+            v-model="partyModel.phoneExtension"
+            :rules="schema.phoneExt"
           />
         </v-col>
       </v-row>
@@ -91,6 +91,7 @@
 
       <BaseAddress
         editing
+        hideAddressHint
         class="mt-5"
         id="party-form-address"
         ref="baseAddressRef"
@@ -145,7 +146,7 @@ export default defineComponent({
     })
 
     const hasPropData = (propertyName: string): boolean => {
-      return props.baseParty?.hasOwnProperty(propertyName)
+      return localState.partyModel?.hasOwnProperty(propertyName)
     }
 
     /** Validation function exposed for parent use **/
