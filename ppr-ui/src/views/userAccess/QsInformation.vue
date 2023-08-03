@@ -100,7 +100,7 @@ export default defineComponent({
 })
 </script>
 
-<style lang="scss" module>
+<style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
 section:first-child,
 section:not(:first-child) h2 + section {
