@@ -17,7 +17,7 @@ Validation includes verifying the data combination for various registrations/fil
 """
 from flask import current_app
 
-from mhr_api.models import MhrManufacturer, utils as model_utils
+from mhr_api.models import MhrManufacturer
 from mhr_api.utils import validator_utils
 
 
@@ -153,6 +153,6 @@ def validate_description(json_data, manufacturer: MhrManufacturer):
     if not desc.get('csaNumber'):
         error_msg += CSA_NUMBER_REQIRED
     if desc.get('baseInformation') and desc['baseInformation'].get('year') and \
-            not model_utils.valid_manufacturer_year(desc['baseInformation'].get('year')):
+            not validator_utils.valid_manufacturer_year(desc['baseInformation'].get('year')):
         error_msg += YEAR_INVALID
     return error_msg

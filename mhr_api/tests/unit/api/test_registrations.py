@@ -235,6 +235,7 @@ def test_create(session, client, jwt, desc, has_submitting, roles, status, has_a
     current_app.config.update(AUTH_SVC_URL=MOCK_AUTH_URL)
     headers = None
     json_data = copy.deepcopy(REGISTRATION)
+    json_data['description']['baseInformation']['year'] = model_utils.now_ts().year
     json_data['location'] = copy.deepcopy(LOCATION)
     if not has_submitting:
         del json_data['submittingParty']
@@ -408,7 +409,7 @@ def test_get_batch_mhreg_manufacturer_report(session, client, jwt, desc, start_t
         else:
             params += f'?{start}={start_ts}&{end}={end_ts}'
     if download_link:
-        params += '&downloadLink=true'
+        params += '&downloadLink=true&notify=false'
     # test
     rv = client.get('/api/v1/registrations/batch/manufacturer' + params)
     # check

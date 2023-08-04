@@ -18,7 +18,7 @@ Refactored from registration_validator.
 from flask import current_app
 
 from mhr_api.models import MhrRegistration, Db2Owngroup, Db2Document, Db2Mhomnote, MhrDraft
-from mhr_api.models import registration_utils as reg_utils
+from mhr_api.models import registration_utils as reg_utils, utils as model_utils
 from mhr_api.models.type_tables import (
     MhrDocumentTypes,
     MhrNoteStatusTypes,
@@ -32,6 +32,7 @@ from mhr_api.services import ltsa
 from mhr_api.utils import valid_charset
 
 
+HOME_DESCRIPTION_MIN_YEAR: int = 1900
 DOC_ID_REQUIRED = 'Document ID is required for staff registrations. '
 DOC_ID_EXISTS = 'Document ID must be unique: provided value already exists. '
 DOC_ID_INVALID_CHECKSUM = 'Document ID is invalid: checksum failed. '
@@ -45,6 +46,11 @@ PPR_LIEN_EXISTS = 'This registration is not allowed to complete as an outstandin
 LOCATION_PID_INVALID = 'Location PID verification failed: either the PID is invalid or the LTSA service is ' + \
                        'unavailable. '
 SUBMITTING_REQUIRED = 'Submitting Party is required for MH registrations. '
+DESCRIPTION_CSA_ENGINEER_REQUIRED = 'Either a CSA number or engineer information is required for this registration. '
+DESCRIPTION_MAKE_MODEL_REQUIRED = 'Either description make or description model is required. '
+DESCRIPTION_YEAR_INVALID = 'Description manufactured home year invalid: it must be between 1900 and 1 year after ' + \
+    'the current year. '
+DESCRIPTION_YEAR_REQUIRED = 'Description manufactured home year is required. '
 
 
 def validate_doc_id(json_data, check_exists: bool = True):
@@ -266,4 +272,39 @@ def check_state_note(registration: MhrRegistration, staff: bool, error_msg: str)
                                                    MhrDocumentTypes.REST) and \
                     reg.notes[0].status_type == MhrNoteStatusTypes.ACTIVE:
                 error_msg += STATE_FROZEN_NOTE
+    return error_msg
+
+
+def valid_manufacturer_year(year: int) -> bool:
+    """Check if a manufacturer MH home year is within 1 year of the current year."""
+    now = model_utils.now_ts()
+    return now.year == year or now.year == (year + 1) or now.year == (year - 1)
+
+
+def valid_description_year(year: int, staff: bool) -> bool:
+    """Check if a MH home year is within a valid range year."""
+    if not staff:
+        return valid_manufacturer_year(year)
+    if year < HOME_DESCRIPTION_MIN_YEAR:
+        return False
+    now = model_utils.now_ts()
+    current_app.logger.debug(f'!!!!!!!! year={year} now year={now.year}')
+    return year <= (now.year + 1)
+
+
+def validate_description(description, staff: bool):
+    """Verify the description values."""
+    error_msg = ''
+    if not description:
+        return error_msg
+    if description.get('baseInformation'):
+        base_info = description.get('baseInformation')
+        if not base_info.get('year'):
+            error_msg += DESCRIPTION_YEAR_REQUIRED
+        elif not valid_description_year(base_info.get('year'), staff):
+            error_msg += DESCRIPTION_YEAR_INVALID
+        if not base_info.get('make') and not base_info.get('model'):
+            error_msg += DESCRIPTION_MAKE_MODEL_REQUIRED
+    if not staff and not description.get('csaNumber') and not description.get('engineerDate'):
+        error_msg += DESCRIPTION_CSA_ENGINEER_REQUIRED
     return error_msg

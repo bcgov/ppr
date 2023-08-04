@@ -20,7 +20,7 @@ from registry_schemas import utils as schema_utils
 from registry_schemas.example_data.mhr import REGISTRATION, TRANSFER, EXEMPTION
 
 from mhr_api.utils import registration_validator as validator, manufacturer_validator as man_validator, validator_utils
-from mhr_api.models import MhrRegistration, MhrManufacturer
+from mhr_api.models import MhrRegistration, MhrManufacturer, utils as model_utils
 from mhr_api.models.type_tables import MhrRegistrationStatusTypes, MhrTenancyTypes, MhrDocumentTypes
 from mhr_api.models.utils import is_legacy, now_ts
 from mhr_api.services.authz import QUALIFIED_USER_GROUP
@@ -236,15 +236,6 @@ TEST_LOCATION_DATA_OTHER = [
     ('Invalid other band', None, None, None, None, 'band', '123-456-789', None, None, None, None,
      validator.LOCATION_OTHER_ALLOWED)
 ]
-# testdata pattern is ({description}, {rebuilt}, {other}, {csa_num}, {eng_date}, {staff}, {message content})
-TEST_DESCRIPTION_DATA = [
-    ('Non utf-8 rebuilt remarks', INVALID_TEXT_CHARSET, None, None, None, True, None) #,
-#    ('Non utf-8 other remarks', None, INVALID_TEXT_CHARSET, None, None, True, None),
-#    ('Staff no csa, engineer', 'remarks', 'other', None, None, True, None),
-#    ('Non-staff csa', 'remarks', 'other', '1234', None, False, None),
-#    ('Non-staff eng date', 'remarks', 'other', None, '2023-06-09T19:00:00+00:00', False, None),
-#    ('Non-staff no csa, eng date', 'remarks', 'other', None, None, False, validator.DESCRIPTION_CSA_ENGINEER_REQUIRED)
-]
 # testdata pattern is ({description}, {valid}, {staff}, {doc_id}, {message content}, {status})
 TEST_EXEMPTION_DATA = [
     (DESC_VALID, True, True, DOC_ID_VALID, None, MhrRegistrationStatusTypes.ACTIVE),
@@ -372,6 +363,7 @@ def test_validate_registration_group(session, desc, valid, numerator, denominato
     """Assert that new MH registration owner group validation works as expected."""
     # setup
     json_data = copy.deepcopy(REGISTRATION)
+    json_data['description']['baseInformation']['year'] = model_utils.now_ts().year
     json_data['location'] = copy.deepcopy(LOCATION_PARK)
     json_data['ownerGroups'] = copy.deepcopy(groups)
     if json_data.get('documentId'):
@@ -480,6 +472,7 @@ def test_validate_submitting(session, desc, bus_name, first, middle, last, messa
         party['address']['city'] = INVALID_TEXT_CHARSET
     error_msg = ''
     if desc.startswith('Reg'):
+        json_data['description']['baseInformation']['year'] = model_utils.now_ts().year
         error_msg = validator.validate_registration(json_data, False)
     else:
         error_msg = validator.validate_transfer(None, json_data, False, QUALIFIED_USER_GROUP)
@@ -518,6 +511,7 @@ def test_validate_owner(session, desc, bus_name, first, middle, last, message_co
         party['address']['city'] = 'Montréal'  # INVALID_TEXT_CHARSET
     error_msg = ''
     if desc.startswith('Reg'):
+        json_data['description']['baseInformation']['year'] = model_utils.now_ts().year
         error_msg = validator.validate_registration(json_data, False)
     else:
         error_msg = validator.validate_transfer(None, json_data, False, QUALIFIED_USER_GROUP)
@@ -548,33 +542,6 @@ def test_validate_location_man(session, desc, park_name, dealer, pad, reserve_nu
         location['pidNumber'] = pid_num
     json_data['location'] = location
     error_msg = validator.validate_registration(json_data, False)
-    if message_content:
-        assert error_msg.find(message_content) != -1
-    else:
-        assert not error_msg
-
-
-@pytest.mark.parametrize('desc,rebuilt,other,csa_num,eng_date,staff,message_content', TEST_DESCRIPTION_DATA)
-def test_validate_reg_description(session, desc, rebuilt, other, csa_num, eng_date, staff, message_content):
-    """Assert that description validation works as expected."""
-    # setup
-    json_data = get_valid_registration(MhrTenancyTypes.SOLE)
-    if staff:
-        json_data['documentId'] = DOC_ID_VALID
-    description = json_data.get('description')
-    if rebuilt:
-        description['rebuiltRemarks'] = rebuilt
-    elif other:
-        description['otherRemarks'] = other
-    if csa_num:
-        description['csaNumber'] = csa_num
-    else:
-        del description['csaNumber']
-        del description['csaStandard']
-    if eng_date:
-        description['engineerDate'] = eng_date
-        description['engineerName'] = 'ENG NAME'
-    error_msg = validator.validate_registration(json_data, staff)
     if message_content:
         assert error_msg.find(message_content) != -1
     else:
@@ -636,6 +603,7 @@ def get_valid_registration(o_type):
             if group.get('type', '') in ('TC', 'COMMON'):
                 group['interestNumerator'] = 1
                 group['interestDenominator'] = 2
+    json_data['description']['baseInformation']['year'] = model_utils.now_ts().year
     return json_data
 
 

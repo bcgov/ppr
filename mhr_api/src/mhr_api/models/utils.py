@@ -754,12 +754,6 @@ def search_ts_local(date_iso: str, start: bool = True):
     return _datetime.combine(date_part, day_time)
 
 
-def valid_manufacturer_year(year: int) -> bool:
-    """Check if a manufacturer MH home year is within 1 year of the current year."""
-    now = now_ts()
-    return now.year == year or now.year == (year + 1) or now.year == (year - 1)
-
-
 def compute_caution_expiry(effective_ts, end_of_day: bool = False):
     """For Notice of Caution add 90 days to the effective timestamp."""
     if effective_ts and not end_of_day:
