@@ -288,7 +288,6 @@ def valid_description_year(year: int, staff: bool) -> bool:
     if year < HOME_DESCRIPTION_MIN_YEAR:
         return False
     now = model_utils.now_ts()
-    current_app.logger.debug(f'!!!!!!!! year={year} now year={now.year}')
     return year <= (now.year + 1)
 
 
