@@ -13,7 +13,14 @@ import {
 } from '@/interfaces'
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 import { APIMhrTypes, HomeTenancyTypes, HomeLocationTypes, MhApiStatusTypes, HomeCertificationOptions } from '@/enums'
-import { createMhrDraft, getMhrDrafts, getMhrManufacturerInfo, mhrRegistrationHistory, updateMhrDraft } from '@/utils'
+import {
+  createMhrDraft,
+  fromDisplayPhone,
+  getMhrDrafts,
+  getMhrManufacturerInfo,
+  mhrRegistrationHistory,
+  updateMhrDraft
+} from '@/utils'
 import { orderBy } from 'lodash'
 import { useHomeOwners } from '@/composables'
 
@@ -207,10 +214,14 @@ export const useNewMhrRegistration = () => {
   }
 
   const parseSubmittingParty = () => {
-    const submittingParty = cleanEmpty(getMhrRegistrationSubmittingParty.value)
+    let submittingParty = cleanEmpty(getMhrRegistrationSubmittingParty.value)
 
     if (submittingParty.businessName) {
       delete submittingParty.personName
+    }
+    // Format phone numbers to digits only for submission
+    if (submittingParty.phoneNumber) {
+      submittingParty = { ...submittingParty, phoneNumber: fromDisplayPhone(submittingParty.phoneNumber) }
     }
 
     return submittingParty
