@@ -103,14 +103,14 @@ MANUFACTURER_VALID = {
   ], 
   'submittingParty': {
     'address': {
-      'city': 'PENTICTON', 
+      'city': 'VICTORIA', 
       'country': 'CA', 
-      'postalCode': 'V2A 7A1', 
+      'postalCode': 'V8R 7A3', 
       'region': 'BC', 
-      'street': '1704 GOVERNMENT ST.'
+      'street': '1722 GOVERNMENT ST.'
     }, 
-    'businessName': 'REAL ENGINEERED HOMES INC', 
-    'phoneNumber': '2507701067'
+    'businessName': 'REAL ENGINEERED HOMES', 
+    'phoneNumber': '2507701066'
   }
 }
 MANUFACTURER_ROLES = [MHR_ROLE, TRANSFER_SALE_BENEFICIARY, REGISTER_MH]
