@@ -42,7 +42,7 @@ import {
   UserSettingsIF,
   VehicleCollateralIF,
   UnitNoteStoreActionIF,
-  UnitNoteRegistrationIF, PartyIF, UserAccessValidationIF
+  UnitNoteRegistrationIF, PartyIF, UserAccessValidationIF, AccountInfoIF
 } from '@/interfaces'
 import {
   AccountTypes,
@@ -701,6 +701,9 @@ export const useStore = defineStore('assetsStore', () => {
   const getMhrQsInformation = computed((): PartyIF => {
     return state.value.mhrUserAccess.qsInformation
   })
+  const getMhrQsSubmittingParty = computed((): AccountInfoIF => {
+    return state.value.mhrUserAccess.qsSubmittingParty
+  })
   const getMhrUserAccessValidation = computed((): UserAccessValidationIF => {
     return state.value.mhrUserAccessValidation
   })
@@ -1117,6 +1120,10 @@ export const useStore = defineStore('assetsStore', () => {
     state.value.mhrUserAccess.qsInformation = qsInformation
   }
 
+  function setMhrQsSubmittingParty (qsSubmittingParty: AccountInfoIF) {
+    state.value.mhrUserAccess.qsSubmittingParty = qsSubmittingParty
+  }
+
   function setMhrQsValidation (qsValidation: { key: string, value: boolean }) {
     set(state.value.mhrUserAccessValidation, qsValidation.key, qsValidation.value)
   }
@@ -1291,6 +1298,7 @@ export const useStore = defineStore('assetsStore', () => {
     // MHR User Access
     getMhrSubProduct,
     getMhrQsInformation,
+    getMhrQsSubmittingParty,
     getMhrUserAccessValidation,
 
     // ACTIONS
@@ -1399,6 +1407,7 @@ export const useStore = defineStore('assetsStore', () => {
     // MHR User Access
     setMhrSubProduct,
     setMhrQsInformation,
+    setMhrQsSubmittingParty,
     setMhrQsValidation
   }
 })
