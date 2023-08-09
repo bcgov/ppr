@@ -41,6 +41,7 @@
               :is="step.component"
               :key="step.step"
               :validate="validateQsComponents"
+              :validateReview="validateQsApplication"
             />
           </v-col>
         </v-row>
