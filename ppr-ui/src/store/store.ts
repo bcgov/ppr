@@ -42,7 +42,11 @@ import {
   UserSettingsIF,
   VehicleCollateralIF,
   UnitNoteStoreActionIF,
-  UnitNoteRegistrationIF, PartyIF, UserAccessValidationIF, AccountInfoIF
+  UnitNoteRegistrationIF,
+  PartyIF,
+  UserAccessValidationIF,
+  AccountInfoIF,
+  QsReviewConfirmIF
 } from '@/interfaces'
 import {
   AccountTypes,
@@ -486,7 +490,7 @@ export const useStore = defineStore('assetsStore', () => {
         text: 'Review <br />and Confirm',
         to: RouteNames.QS_ACCESS_REVIEW_CONFIRM,
         disabled: false,
-        valid: false,
+        valid: getMhrUserAccessValidation.value.qsReviewConfirmValid,
         component: QsReviewConfirm
       }
     ]
@@ -704,6 +708,11 @@ export const useStore = defineStore('assetsStore', () => {
   const getMhrQsSubmittingParty = computed((): AccountInfoIF => {
     return state.value.mhrUserAccess.qsSubmittingParty
   })
+
+  const getMhrQSReviewConfirm = computed((): QsReviewConfirmIF => {
+    return state.value.mhrUserAccess.qsReviewConfirm
+  })
+
   const getMhrUserAccessValidation = computed((): UserAccessValidationIF => {
     return state.value.mhrUserAccessValidation
   })
@@ -1124,6 +1133,10 @@ export const useStore = defineStore('assetsStore', () => {
     state.value.mhrUserAccess.qsSubmittingParty = qsSubmittingParty
   }
 
+  function setMhrQsReviewConfirm (qsReviewConfirm: QsReviewConfirmIF) {
+    state.value.mhrUserAccess.qsReviewConfirm = qsReviewConfirm
+  }
+
   function setMhrQsValidation (qsValidation: { key: string, value: boolean }) {
     set(state.value.mhrUserAccessValidation, qsValidation.key, qsValidation.value)
   }
@@ -1300,6 +1313,7 @@ export const useStore = defineStore('assetsStore', () => {
     getMhrQsInformation,
     getMhrQsSubmittingParty,
     getMhrUserAccessValidation,
+    getMhrQSReviewConfirm,
 
     // ACTIONS
 
@@ -1408,6 +1422,7 @@ export const useStore = defineStore('assetsStore', () => {
     setMhrSubProduct,
     setMhrQsInformation,
     setMhrQsSubmittingParty,
+    setMhrQsReviewConfirm,
     setMhrQsValidation
   }
 })
