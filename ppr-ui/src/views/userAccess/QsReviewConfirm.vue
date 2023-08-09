@@ -72,4 +72,12 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+section:first-child,
+section:not(:first-child) h2 + section {
+  counter-reset: section 0;
+}
+section h2:before {
+  counter-increment: section;
+  content: counters(section, ".") ". ";
+}
 </style>
