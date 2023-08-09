@@ -11,7 +11,7 @@ import flushPromises from 'flush-promises'
 setActivePinia(createPinia())
 const store = useStore()
 
-describe('QsInformation', () => {
+describe('QsReviewConfirm', () => {
   let wrapper: Wrapper<any> | any
   const submittingPartyInfo = {
     name: 'John Doe',
