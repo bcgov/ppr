@@ -379,7 +379,8 @@ export const stateModel: StateModelIF = {
       },
       phoneNumber: '',
       phoneExtension: ''
-    }
+    },
+    qsSubmittingParty: null
   },
   mhrUserAccessValidation: {
     qsInformationValid: false,

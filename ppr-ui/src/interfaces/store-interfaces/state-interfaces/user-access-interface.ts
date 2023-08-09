@@ -1,9 +1,10 @@
 import { MhrSubTypes } from '@/enums'
-import { PartyIF } from '@/interfaces'
+import { AccountInfoIF, PartyIF } from '@/interfaces'
 
 export interface UserAccessIF {
   mrhSubProduct: MhrSubTypes
   qsInformation: PartyIF
+  qsSubmittingParty: AccountInfoIF
 }
 
 export interface UserAccessValidationIF {

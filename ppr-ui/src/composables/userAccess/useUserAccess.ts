@@ -1,5 +1,5 @@
 import { computed, ComputedRef, Ref } from 'vue-demi'
-import { getFeatureFlag } from '@/utils'
+import { getFeatureFlag, getAccountInfoFromAuth } from '@/utils'
 import { RouteNames } from '@/enums'
 import { storeToRefs } from 'pinia'
 import { useStore } from '@/store/store'
@@ -7,7 +7,7 @@ import { useNavigation } from '@/composables'
 
 export const useUserAccess = () => {
   const { goToRoute, containsCurrentRoute } = useNavigation()
-  const { setMhrQsInformation, setMhrSubProduct, setMhrQsValidation } = useStore()
+  const { setMhrQsInformation, setMhrSubProduct, setMhrQsSubmittingParty, setMhrQsValidation } = useStore()
   const { getMhrUserAccessValidation, isRoleStaffReg } = storeToRefs(useStore())
 
   /** Returns true when on the appropriate routes and the feature flag is enabled **/
@@ -37,7 +37,7 @@ export const useUserAccess = () => {
   }
 
   /** Initialize user access properties to default state **/
-  const initUserAccess = (): void => {
+  const initUserAccess = async (): Promise<void> => {
     setMhrSubProduct(null)
     setMhrQsInformation({
       businessName: '',
@@ -53,6 +53,10 @@ export const useUserAccess = () => {
       phoneNumber: '',
       phoneExtension: ''
     })
+
+    // Set qs submitting party to state
+    const accountInfo = await getAccountInfoFromAuth()
+    setMhrQsSubmittingParty(accountInfo)
 
     // Reset Validations
     for (const flag in getMhrUserAccessValidation.value) {
