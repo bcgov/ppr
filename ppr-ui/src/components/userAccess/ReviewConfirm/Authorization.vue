@@ -58,14 +58,14 @@ export default defineComponent({
   props: { validateReview: { type: Boolean, default: false } },
   setup (props) {
     const { getMhrQSReviewConfirm } = storeToRefs(useStore())
-    const { required, invalidSpaces, customRules } = useInputRules()
+    const { required, customRules } = useInputRules()
 
     const authorizationForm = ref(null)
 
     const localState = reactive({
       authorization: getMhrQSReviewConfirm.value.authorization as UserAccessAuthorizationIF,
       authorizationFormValid: false,
-      authorizationRules: customRules(required('Enter the legal name of authorized person'), invalidSpaces()),
+      authorizationRules: customRules(required('Enter the legal name of authorized person')),
       showErrors: computed((): boolean =>
         props.validateReview &&
         (!authorizationForm.value?.validate() || !localState.authorization.isAuthorizationConfirmed)
