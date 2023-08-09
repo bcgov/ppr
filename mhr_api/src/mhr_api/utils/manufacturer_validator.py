@@ -50,7 +50,7 @@ def validate_registration(json_data, manufacturer: MhrManufacturer):
     try:
         current_app.logger.debug('Performing manufacturer extra data validation.')
         man_json = manufacturer.json
-        error_msg += validate_submitting_party(json_data, man_json)
+        # Use common submitting party validation (already done) - no matching on stored submitting party.
         error_msg += validate_owner(json_data, man_json)
         error_msg += validate_location(json_data, man_json)
         error_msg += validate_description(json_data, man_json)
