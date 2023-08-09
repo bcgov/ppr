@@ -142,14 +142,14 @@ export default defineComponent({
 
     const makeRules = computed((): Array<Function> =>
       customRules(
-        required('Enter a make'),
+        (!localState.model ? required('Enter at least the make or the model of the home') : null),
         combinedMakeModelLengthRule(localState)
       )
     )
 
     const modelRules = computed((): Array<Function> =>
       customRules(
-        required('Enter a model'),
+        (!localState.make ? required('Enter at least the make or the model of the home') : null),
         combinedMakeModelLengthRule(localState)
       )
     )
