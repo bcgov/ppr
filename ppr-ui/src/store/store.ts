@@ -42,7 +42,11 @@ import {
   UserSettingsIF,
   VehicleCollateralIF,
   UnitNoteStoreActionIF,
-  UnitNoteRegistrationIF, PartyIF, UserAccessValidationIF, AccountInfoIF
+  UnitNoteRegistrationIF,
+  PartyIF,
+  UserAccessValidationIF,
+  AccountInfoIF,
+  UserAccessAuthorizationIF
 } from '@/interfaces'
 import {
   AccountTypes,
@@ -486,7 +490,7 @@ export const useStore = defineStore('assetsStore', () => {
         text: 'Review <br />and Confirm',
         to: RouteNames.QS_ACCESS_REVIEW_CONFIRM,
         disabled: false,
-        valid: false,
+        valid: getMhrUserAccessValidation.value.qsReviewConfirmValid,
         component: QsReviewConfirm
       }
     ]
@@ -704,6 +708,15 @@ export const useStore = defineStore('assetsStore', () => {
   const getMhrQsSubmittingParty = computed((): AccountInfoIF => {
     return state.value.mhrUserAccess.qsSubmittingParty
   })
+
+  const getMhrQsIsRequirementsConfirmed = computed((): boolean => {
+    return state.value.mhrUserAccess.isRequirementsConfirmed
+  })
+
+  const getMhrQsAuthorization = computed((): UserAccessAuthorizationIF => {
+    return state.value.mhrUserAccess.authorization
+  })
+
   const getMhrUserAccessValidation = computed((): UserAccessValidationIF => {
     return state.value.mhrUserAccessValidation
   })
@@ -1124,6 +1137,14 @@ export const useStore = defineStore('assetsStore', () => {
     state.value.mhrUserAccess.qsSubmittingParty = qsSubmittingParty
   }
 
+  function setMhrQsIsRequirementsConfirmed (isRequirementsConfirmed: boolean) {
+    state.value.mhrUserAccess.isRequirementsConfirmed = isRequirementsConfirmed
+  }
+
+  function setMhrQsAuthorization (authorization: UserAccessAuthorizationIF) {
+    state.value.mhrUserAccess.authorization = authorization
+  }
+
   function setMhrQsValidation (qsValidation: { key: string, value: boolean }) {
     set(state.value.mhrUserAccessValidation, qsValidation.key, qsValidation.value)
   }
@@ -1300,6 +1321,8 @@ export const useStore = defineStore('assetsStore', () => {
     getMhrQsInformation,
     getMhrQsSubmittingParty,
     getMhrUserAccessValidation,
+    getMhrQsIsRequirementsConfirmed,
+    getMhrQsAuthorization,
 
     // ACTIONS
 
@@ -1408,6 +1431,8 @@ export const useStore = defineStore('assetsStore', () => {
     setMhrSubProduct,
     setMhrQsInformation,
     setMhrQsSubmittingParty,
+    setMhrQsIsRequirementsConfirmed,
+    setMhrQsAuthorization,
     setMhrQsValidation
   }
 })

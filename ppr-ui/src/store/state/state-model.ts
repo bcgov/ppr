@@ -380,6 +380,12 @@ export const stateModel: StateModelIF = {
       phoneNumber: '',
       phoneExtension: ''
     },
+    isRequirementsConfirmed: false,
+    authorization: {
+      isAuthorizationConfirmed: false,
+      legalName: '',
+      date: ''
+    },
     qsSubmittingParty: null
   },
   mhrUserAccessValidation: {

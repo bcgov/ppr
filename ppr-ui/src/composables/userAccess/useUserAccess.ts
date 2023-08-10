@@ -1,5 +1,5 @@
 import { computed, ComputedRef, Ref } from 'vue-demi'
-import { getFeatureFlag, getAccountInfoFromAuth } from '@/utils'
+import { convertDate, getFeatureFlag, getAccountInfoFromAuth } from '@/utils'
 import { RouteNames } from '@/enums'
 import { storeToRefs } from 'pinia'
 import { useStore } from '@/store/store'
@@ -7,8 +7,20 @@ import { useNavigation } from '@/composables'
 
 export const useUserAccess = () => {
   const { goToRoute, containsCurrentRoute } = useNavigation()
-  const { setMhrQsInformation, setMhrSubProduct, setMhrQsSubmittingParty, setMhrQsValidation } = useStore()
-  const { getMhrUserAccessValidation, isRoleStaffReg } = storeToRefs(useStore())
+  const {
+    setMhrQsInformation,
+    setMhrSubProduct,
+    setMhrQsSubmittingParty,
+    setMhrQsAuthorization,
+    setMhrQsIsRequirementsConfirmed,
+    setMhrQsValidation
+  } = useStore()
+  const {
+    getMhrUserAccessValidation,
+    getUserFirstName,
+    getUserLastName,
+    isRoleStaffReg
+  } = storeToRefs(useStore())
 
   /** Returns true when on the appropriate routes and the feature flag is enabled **/
   const isQsAccessEnabled: ComputedRef<boolean> = computed((): boolean => {
@@ -57,6 +69,13 @@ export const useUserAccess = () => {
     // Set qs submitting party to state
     const accountInfo = await getAccountInfoFromAuth()
     setMhrQsSubmittingParty(accountInfo)
+
+    setMhrQsIsRequirementsConfirmed(false)
+    setMhrQsAuthorization({
+      isAuthorizationConfirmed: false,
+      legalName: getUserFirstName.value + ' ' + getUserLastName.value,
+      date: convertDate(new Date(), false, false)
+    })
 
     // Reset Validations
     for (const flag in getMhrUserAccessValidation.value) {
