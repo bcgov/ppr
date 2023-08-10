@@ -11,7 +11,6 @@ import Vuetify from 'vuetify'
 import { Authorization, ConfirmRequirements, ListRequirements } from '@/components/userAccess/ReviewConfirm'
 import { mockedAccountInfo } from './test-data'
 
-
 Vue.use(Vuetify)
 setActivePinia(createPinia())
 const store = useStore()
@@ -20,19 +19,17 @@ describe('QsReviewConfirm', () => {
   let wrapper: Wrapper<any, Element>
   const subProduct = MhrSubTypes.LAWYERS_NOTARIES
 
-  const qsReviewConfirm = {
-    isRequirementsConfirmed: false,
-    authorization: {
-      isAuthorizationConfirmed: false,
-      date: convertDate(new Date(), false, false),
-      legalName: 'Test User'
-    }
+  const authorization = {
+    isAuthorizationConfirmed: false,
+    date: convertDate(new Date(), false, false),
+    legalName: 'Test User'
   }
   beforeAll(async () => {
     defaultFlagSet['mhr-user-access-enabled'] = true
     await store.setMhrSubProduct(subProduct)
     await store.setMhrQsSubmittingParty(mockedAccountInfo)
-    await store.setMhrQsReviewConfirm(qsReviewConfirm)
+    await store.setMhrQsIsRequirementsConfirmed(false)
+    await store.setMhrQsAuthorization(authorization)
     await setupMockUser()
     await flushPromises()
   })
@@ -87,7 +84,7 @@ describe('QsReviewConfirm', () => {
     const confirmationCheckboxContainer = confirmRequirementsSection.find('.confirmation-checkbox')
     expect(confirmationCheckboxContainer.exists()).toBe(true)
 
-    expect(store.getMhrQSReviewConfirm.isRequirementsConfirmed).toBe(false)
+    expect(store.getMhrQsIsRequirementsConfirmed).toBe(false)
 
     const checkboxText = confirmationCheckboxContainer.find('span')
     expect(checkboxText.exists()).toBe(true)
@@ -95,7 +92,7 @@ describe('QsReviewConfirm', () => {
 
     await confirmationCheckboxContainer.find('.confirmation-checkbox').find('input').trigger('click')
 
-    expect(store.getMhrQSReviewConfirm.isRequirementsConfirmed).toBe(true)
+    expect(store.getMhrQsIsRequirementsConfirmed).toBe(true)
   })
 
   it('confirm authorization works as expected', async () => {
@@ -106,7 +103,7 @@ describe('QsReviewConfirm', () => {
     expect(heading.exists()).toBe(true)
     expect(heading.text()).toBe('Authorization')
 
-    expect(store.getMhrQSReviewConfirm.authorization.legalName).toBe('Test User')
+    expect(store.getMhrQsAuthorization.legalName).toBe('Test User')
 
     // setup
     const authorizationCheckbox = authorizationSection.find('#authorization-checkbox')
@@ -119,15 +116,15 @@ describe('QsReviewConfirm', () => {
     expect(checkboxText.exists()).toBe(true)
 
     // Checks that text is updated and reflected in text next to checkbox
-    expect(checkboxText.text().includes(store.getMhrQSReviewConfirm.authorization.legalName)).toBe(true)
+    expect(checkboxText.text().includes(store.getMhrQsAuthorization.legalName)).toBe(true)
 
     await authorizationTextField.setValue('Hello its me')
 
-    expect(store.getMhrQSReviewConfirm.authorization.legalName).toBe('Hello its me')
-    expect(checkboxText.text().includes(store.getMhrQSReviewConfirm.authorization.legalName)).toBe(true)
+    expect(store.getMhrQsAuthorization.legalName).toBe('Hello its me')
+    expect(checkboxText.text().includes(store.getMhrQsAuthorization.legalName)).toBe(true)
 
     await authorizationCheckbox.trigger('click')
 
-    expect(store.getMhrQSReviewConfirm.authorization.isAuthorizationConfirmed).toBe(true)
+    expect(store.getMhrQsAuthorization.isAuthorizationConfirmed).toBe(true)
   })
 })

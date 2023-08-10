@@ -1,13 +1,5 @@
 import { MhrSubTypes } from '@/enums'
-
-export interface RequirementsConfigIF {
-  boldText?: string
-  boldTextPreTooltip?: string
-  boldTextPostTooltip?: string
-  underlinedText?: string
-  tooltipText?: string
-  regularText?: string
-}
+import { RequirementsConfigIF } from '@/interfaces'
 
 export const userAccessRequirements: Record<MhrSubTypes, RequirementsConfigIF[]> = {
   [MhrSubTypes.LAWYERS_NOTARIES]: [

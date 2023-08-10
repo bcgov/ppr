@@ -46,7 +46,7 @@ import {
   PartyIF,
   UserAccessValidationIF,
   AccountInfoIF,
-  QsReviewConfirmIF
+  UserAccessAuthorizationIF
 } from '@/interfaces'
 import {
   AccountTypes,
@@ -709,8 +709,12 @@ export const useStore = defineStore('assetsStore', () => {
     return state.value.mhrUserAccess.qsSubmittingParty
   })
 
-  const getMhrQSReviewConfirm = computed((): QsReviewConfirmIF => {
-    return state.value.mhrUserAccess.qsReviewConfirm
+  const getMhrQsIsRequirementsConfirmed = computed((): boolean => {
+    return state.value.mhrUserAccess.isRequirementsConfirmed
+  })
+
+  const getMhrQsAuthorization = computed((): UserAccessAuthorizationIF => {
+    return state.value.mhrUserAccess.authorization
   })
 
   const getMhrUserAccessValidation = computed((): UserAccessValidationIF => {
@@ -1133,8 +1137,12 @@ export const useStore = defineStore('assetsStore', () => {
     state.value.mhrUserAccess.qsSubmittingParty = qsSubmittingParty
   }
 
-  function setMhrQsReviewConfirm (qsReviewConfirm: QsReviewConfirmIF) {
-    state.value.mhrUserAccess.qsReviewConfirm = qsReviewConfirm
+  function setMhrQsIsRequirementsConfirmed (isRequirementsConfirmed: boolean) {
+    state.value.mhrUserAccess.isRequirementsConfirmed = isRequirementsConfirmed
+  }
+
+  function setMhrQsAuthorization (authorization: UserAccessAuthorizationIF) {
+    state.value.mhrUserAccess.authorization = authorization
   }
 
   function setMhrQsValidation (qsValidation: { key: string, value: boolean }) {
@@ -1313,7 +1321,8 @@ export const useStore = defineStore('assetsStore', () => {
     getMhrQsInformation,
     getMhrQsSubmittingParty,
     getMhrUserAccessValidation,
-    getMhrQSReviewConfirm,
+    getMhrQsIsRequirementsConfirmed,
+    getMhrQsAuthorization,
 
     // ACTIONS
 
@@ -1422,7 +1431,8 @@ export const useStore = defineStore('assetsStore', () => {
     setMhrSubProduct,
     setMhrQsInformation,
     setMhrQsSubmittingParty,
-    setMhrQsReviewConfirm,
+    setMhrQsIsRequirementsConfirmed,
+    setMhrQsAuthorization,
     setMhrQsValidation
   }
 })

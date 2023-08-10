@@ -57,13 +57,13 @@ export default defineComponent({
   components: { FormCard },
   props: { validateReview: { type: Boolean, default: false } },
   setup (props) {
-    const { getMhrQSReviewConfirm } = storeToRefs(useStore())
+    const { getMhrQsAuthorization } = storeToRefs(useStore())
     const { required, customRules } = useInputRules()
 
     const authorizationForm = ref(null)
 
     const localState = reactive({
-      authorization: getMhrQSReviewConfirm.value.authorization as UserAccessAuthorizationIF,
+      authorization: getMhrQsAuthorization.value as UserAccessAuthorizationIF,
       authorizationFormValid: false,
       authorizationRules: customRules(required('Enter the legal name of authorized person')),
       showErrors: computed((): boolean =>
@@ -77,6 +77,7 @@ export default defineComponent({
     })
 
     return {
+      getMhrQsAuthorization,
       authorizationForm,
       ...toRefs(localState)
     }

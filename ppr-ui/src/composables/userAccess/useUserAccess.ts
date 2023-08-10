@@ -11,7 +11,8 @@ export const useUserAccess = () => {
     setMhrQsInformation,
     setMhrSubProduct,
     setMhrQsSubmittingParty,
-    setMhrQsReviewConfirm,
+    setMhrQsAuthorization,
+    setMhrQsIsRequirementsConfirmed,
     setMhrQsValidation
   } = useStore()
   const {
@@ -69,13 +70,11 @@ export const useUserAccess = () => {
     const accountInfo = await getAccountInfoFromAuth()
     setMhrQsSubmittingParty(accountInfo)
 
-    setMhrQsReviewConfirm({
-      isRequirementsConfirmed: false,
-      authorization: {
-        isAuthorizationConfirmed: false,
-        legalName: getUserFirstName.value + ' ' + getUserLastName.value,
-        date: convertDate(new Date(), false, false)
-      }
+    setMhrQsIsRequirementsConfirmed(false)
+    setMhrQsAuthorization({
+      isAuthorizationConfirmed: false,
+      legalName: getUserFirstName.value + ' ' + getUserLastName.value,
+      date: convertDate(new Date(), false, false)
     })
 
     // Reset Validations

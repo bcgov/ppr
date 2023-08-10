@@ -380,13 +380,11 @@ export const stateModel: StateModelIF = {
       phoneNumber: '',
       phoneExtension: ''
     },
-    qsReviewConfirm: {
-      isRequirementsConfirmed: false,
-      authorization: {
-        isAuthorizationConfirmed: false,
-        legalName: '',
-        date: ''
-      }
+    isRequirementsConfirmed: false,
+    authorization: {
+      isAuthorizationConfirmed: false,
+      legalName: '',
+      date: ''
     },
     qsSubmittingParty: null
   },

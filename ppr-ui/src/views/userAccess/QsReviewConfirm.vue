@@ -42,7 +42,12 @@ export default defineComponent({
   props: { validateReview: { type: Boolean, default: false } },
   setup () {
     const { setMhrQsValidation } = useStore()
-    const { getMhrQSReviewConfirm, getMhrQsSubmittingParty, getMhrUserAccessValidation } = storeToRefs(useStore())
+    const {
+      getMhrQsAuthorization,
+      getMhrQsIsRequirementsConfirmed,
+      getMhrQsSubmittingParty,
+      getMhrUserAccessValidation
+    } = storeToRefs(useStore())
 
     const authorizationForm = ref(null)
 
@@ -50,9 +55,9 @@ export default defineComponent({
       isValid: computed((): boolean => {
         return (
           getMhrUserAccessValidation.value.qsInformationValid &&
-          getMhrQSReviewConfirm.value.isRequirementsConfirmed &&
-          getMhrQSReviewConfirm.value.authorization.isAuthorizationConfirmed &&
-          getMhrQSReviewConfirm.value.authorization.legalName.trim() !== ''
+          getMhrQsIsRequirementsConfirmed.value &&
+          getMhrQsAuthorization.value.isAuthorizationConfirmed &&
+          getMhrQsAuthorization.value.legalName.trim() !== ''
         )
       })
     })

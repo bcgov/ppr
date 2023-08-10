@@ -35,21 +35,13 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from 'vue-demi'
-import { useStore } from '@/store/store'
-import { storeToRefs } from 'pinia'
+import { defineComponent } from 'vue-demi'
 import { RequirementsConfigIF } from '@/interfaces'
-import { userAccessRequirements } from '@/resources'
 
 export default defineComponent({
-  name: 'listRequirements',
-  setup () {
-    const { getMhrSubProduct } = storeToRefs(useStore())
-
-    const requirements = computed((): RequirementsConfigIF[] => userAccessRequirements[getMhrSubProduct.value])
-
-    return { requirements }
-  }
+  name: 'ListRequirements',
+  props: { requirements: { type: Array as () => Array<RequirementsConfigIF>, required: true } },
+  setup () {}
 })
 </script>
 
