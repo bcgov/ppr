@@ -66,23 +66,28 @@
             </thead>
 
             <!-- Table Body -->
-            <tbody v-if="note.givingNoticeParty">
+            <tbody>
               <tr>
                 <td class="pl-0">
-                  <div class="mr-2">
-                  <v-icon class="notice-party-icon colour-dk-text mt-n2">
-                    {{ getNoticePartyIcon(note.givingNoticeParty) }}
-                  </v-icon>
-                  </div>
-                  <span class="notice-party-name generic-label fs-14">
-                    {{ getNoticePartyName(note.givingNoticeParty) }}
-                  </span>
+                  <template  v-if="getPartyData('personName') || getPartyData('businessName')">
+                    <div class="mr-2">
+                      <v-icon
+                        class="notice-party-icon colour-dk-text mt-n2">
+                        {{ getNoticePartyIcon(note.givingNoticeParty) }}
+                      </v-icon>
+                    </div>
+                    <span class="notice-party-name generic-label fs-14">
+                        {{ getNoticePartyName(note.givingNoticeParty) }}
+                    </span>
+                  </template>
+                  <span v-else>(Not Entered)</span>
                 </td>
                 <td>
-                  <BaseAddress :value="note.givingNoticeParty.address"/>
+                  <BaseAddress v-if="getPartyData('address')" :value="note.givingNoticeParty.address"/>
+                  <span v-else>(Not Entered)</span>
                 </td>
-                <td>{{ note.givingNoticeParty.emailAddress }}</td>
-                <td>{{ note.givingNoticeParty.phoneNumber }}</td>
+                <td>{{ getPartyData('emailAddress') || '(Not Entered)' }}</td>
+                <td>{{ getPartyData('phoneNumber') || '(Not Entered)'  }}</td>
               </tr>
             </tbody>
           </template>
@@ -111,7 +116,7 @@ export default defineComponent({
   components: {
     BaseAddress
   },
-  setup () {
+  setup (props) {
     const getNoticePartyIcon = (givingNoticeParty: PartyIF): string => {
       return givingNoticeParty.businessName
         ? 'mdi-domain'
@@ -125,8 +130,13 @@ export default defineComponent({
           ${givingNoticeParty.personName.last}`
     }
 
+    const getPartyData = (property: keyof(PartyIF)): any => {
+      return props.note?.givingNoticeParty?.[property]
+    }
+
     return {
       pacificDate,
+      getPartyData,
       getNoticePartyIcon,
       getNoticePartyName,
       personGivingNoticeTableHeaders
