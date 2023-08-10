@@ -47,4 +47,7 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+li {
+  color: $gray7;
+}
 </style>
