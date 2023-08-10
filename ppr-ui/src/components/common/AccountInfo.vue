@@ -40,7 +40,7 @@
           <tbody>
             <tr class="table-info">
               <td class="account-name pl-6 py-6">
-                <v-icon>
+                <v-icon class="mt-n2">
                   {{ accountInfo.isBusinessAccount ? 'mdi-domain' : 'mdi-account' }}
                 </v-icon>
                 <span class="pt-1 font-weight-bold">
@@ -109,6 +109,9 @@ export default defineComponent({
   .account-name,
   i {
     color: $gray9 !important;
+    span {
+      padding-left: 2px;
+    }
   }
 }
 </style>
