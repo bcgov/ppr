@@ -365,6 +365,9 @@ span.invalid-color {
   color: $gray9;
   font-weight: bold;
   font-size: 1rem;
+  i {
+    color: $gray9 !important;
+  }
 }
 
 .remove.theme--light.v-btn.v-btn--disabled {
@@ -845,4 +848,14 @@ tr.registration-row.draft-registration-row.added-reg-effect td.actions-cell,
 }
 .theme--light.v-application code {
   white-space: break-spaces;
+}
+
+// Section H2 Counters
+.increment-sections {
+  counter-reset: section 0;
+
+  section h2:before {
+    counter-increment: section;
+    content: counters(section, ".") ". ";
+  }
 }

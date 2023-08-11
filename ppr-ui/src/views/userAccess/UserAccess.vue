@@ -7,7 +7,7 @@
       </v-overlay>
 
       <!-- Request Access Type Pre-Step -->
-      <article v-if="isRouteName(RouteNames.QS_ACCESS_TYPE)" class="pa-0">
+      <section v-if="isRouteName(RouteNames.QS_ACCESS_TYPE)" class="pa-0">
         <v-row no-gutters>
           <v-col cols="9">
             <v-row no-gutters id="registration-header" class="soft-corners-top">
@@ -18,10 +18,10 @@
             <QsSelectAccess :showErrors="!getMhrSubProduct && validateQsSelect" />
           </v-col>
         </v-row>
-      </article>
+      </section>
 
       <!-- User Access Content Flow -->
-      <article v-else class="pa-0">
+      <section v-else class="pa-0">
         <v-row no-gutters>
           <v-col cols="9">
             <v-row no-gutters id="registration-header" class="soft-corners-top">
@@ -45,7 +45,7 @@
             />
           </v-col>
         </v-row>
-      </article>
+      </section>
     </v-container>
 
     <!-- Footer Navigation -->
