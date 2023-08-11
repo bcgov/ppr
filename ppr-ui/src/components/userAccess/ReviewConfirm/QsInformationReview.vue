@@ -14,7 +14,7 @@
 
     <!-- Conditional based on service agreement checkbox -->
     <template v-slot:topInfoSlot>
-      <p class="ml-7 pb-2 mt-8">
+      <p class="icon-text ml-7 pb-2 mt-8">
         <v-icon color="success" class="pr-2">mdi-check</v-icon>
         I have read, understood and agree to the terms and conditions of the Qualified Suppliers’ Agreement for the
         Manufactured Home Registry.
@@ -61,4 +61,8 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+.icon-text {
+  display: flex;
+  align-items: flex-start;
+}
 </style>
