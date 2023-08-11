@@ -54,11 +54,11 @@ export function convertDate (date: Date, includeTime: boolean, includeTz: boolea
 export function pacificDate (date: Date | string, omitSeconds = false): string {
   // Converts date to string and pacific time
   // Example Output: August 11, 2023 at 10:38 AM
-  let pacificDate = (new Intl.DateTimeFormat('en-US', { dateStyle: 'long',
+  let pacificDate = new Intl.DateTimeFormat('en-US', { dateStyle: 'long',
     timeStyle: omitSeconds ? 'short' : 'medium',
     timeZone: 'America/Vancouver',
     hour12: true })
-    .format(new Date(date)))
+    .format(new Date(date))
 
   // Convert AM/PM to lowercase
   pacificDate = pacificDate.replace('AM', 'am')
