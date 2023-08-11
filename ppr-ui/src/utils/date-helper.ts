@@ -52,10 +52,19 @@ export function convertDate (date: Date, includeTime: boolean, includeTz: boolea
 }
 
 export function pacificDate (date: Date | string, omitSeconds = false): string {
-  date = new Date(date.toLocaleString('en-US', { timeZone: 'America/Vancouver' }))
-  const datetime = format12HourTime(date, omitSeconds)
+  // Converts date to string and pacific time
+  // Example Output: August 11, 2023 at 10:38 AM
+  let pacificDate = (new Intl.DateTimeFormat('en-US', { dateStyle: 'long',
+    timeStyle: omitSeconds ? 'short' : 'medium',
+    timeZone: 'America/Vancouver',
+    hour12: true })
+    .format(new Date(date)))
 
-  return moment(date).format('MMMM D, Y') + ` at ${datetime} Pacific time`
+  // Convert AM/PM to lowercase
+  pacificDate = pacificDate.replace('AM', 'am')
+  pacificDate = pacificDate.replace('PM', 'pm')
+
+  return `${pacificDate} Pacific time`
 }
 
 export function tzOffsetMinutes (date: Date): number {
