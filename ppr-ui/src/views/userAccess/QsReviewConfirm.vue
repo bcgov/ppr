@@ -12,7 +12,7 @@
     <section id="qs-confirm-requirements" class="mt-15">
       <h2>Confirm</h2>
       <p class="mt-1">
-        The following requirements must be confirmed
+        The following requirements must be confirmed.
       </p>
       <ConfirmRequirements :validateReview="validateReview" />
     </section>
@@ -52,12 +52,18 @@ export default defineComponent({
     const authorizationForm = ref(null)
 
     const localState = reactive({
+      isAuthorizationValid: computed(() => {
+        return (
+          getMhrQsAuthorization.value.isAuthorizationConfirmed &&
+          getMhrQsAuthorization.value.legalName.trim() !== '' &&
+          getMhrQsAuthorization.value.legalName.length <= 150
+        )
+      }),
       isValid: computed((): boolean => {
         return (
           getMhrUserAccessValidation.value.qsInformationValid &&
           getMhrQsIsRequirementsConfirmed.value &&
-          getMhrQsAuthorization.value.isAuthorizationConfirmed &&
-          getMhrQsAuthorization.value.legalName.trim() !== ''
+          localState.isAuthorizationValid
         )
       })
     })

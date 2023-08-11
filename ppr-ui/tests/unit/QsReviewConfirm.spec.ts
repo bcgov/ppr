@@ -107,7 +107,7 @@ describe('QsReviewConfirm', () => {
 
     // setup
     const authorizationCheckbox = authorizationSection.find('#authorization-checkbox')
-    const checkboxText = authorizationSection.find('#authorization-text')
+    const checkboxText = authorizationSection.find('.authorization-text')
     const authorizationTextField = authorizationSection.find('#authorization-text-field')
     const authorizationDate = authorizationSection.find('#authorization-date')
     expect(authorizationCheckbox.exists()).toBe(true)

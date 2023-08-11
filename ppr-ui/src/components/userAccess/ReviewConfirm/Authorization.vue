@@ -21,11 +21,10 @@
         >
           <template #label>
             <span
-              id="authorization-text"
               class="ml-2"
               :class="{ 'error-text': validateReview && !authorization.isAuthorizationConfirmed}"
             >
-              <b>{{ authorization.legalName }}</b>
+              <b class=authorization-text>{{ authorization.legalName }}</b>
               certifies that they have relevant knowledge of the Qualified Supplier
               and is authorized to submit this application.
             </span>
@@ -58,14 +57,14 @@ export default defineComponent({
   props: { validateReview: { type: Boolean, default: false } },
   setup (props) {
     const { getMhrQsAuthorization } = storeToRefs(useStore())
-    const { required, customRules } = useInputRules()
+    const { required, maxLength, customRules } = useInputRules()
 
     const authorizationForm = ref(null)
 
     const localState = reactive({
       authorization: getMhrQsAuthorization.value as UserAccessAuthorizationIF,
       authorizationFormValid: false,
-      authorizationRules: customRules(required('Enter the legal name of authorized person')),
+      authorizationRules: customRules(required('Enter the legal name of authorized person'), maxLength(150)),
       showErrors: computed((): boolean =>
         props.validateReview &&
         (!authorizationForm.value?.validate() || !localState.authorization.isAuthorizationConfirmed)
@@ -88,7 +87,16 @@ export default defineComponent({
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
 .offence-note {
-  line-height: 20px;
+  line-height: 22px;
+  font-size: 14px;
+}
+
+.authorization-text {
+  word-break: break-all;
+}
+
+span {
+  color: $gray7;
 }
 
 ::v-deep {
@@ -100,6 +108,11 @@ export default defineComponent({
   .v-input--selection-controls .v-input__slot {
     align-items: flex-start;
   }
+
+  .v-text-field__slot > label {
+    height: fit-content;
+  }
+
 }
 
 </style>
