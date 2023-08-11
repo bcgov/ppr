@@ -41,6 +41,7 @@ class GoogleStorageService(StorageService):  # pylint: disable=too-few-public-me
     GCP_BUCKET_ID = str(os.getenv('GCP_CS_BUCKET_ID'))
     GCP_BUCKET_ID_REGISTRATION = str(os.getenv('GCP_CS_BUCKET_ID_REGISTRATION'))
     GCP_BUCKET_ID_BATCH = str(os.getenv('GCP_CS_BUCKET_ID_BATCH'))
+    GCP_BUCKET_ID_TERMS = str(os.getenv('GCP_CS_BUCKET_ID_TERMS'))
     GCP_URL = str(os.getenv('GCP_CS_URL', 'https://storage.googleapis.com'))
     DOC_URL = GCP_URL + '/storage/v1/b/{bucket_id}/o/{name}'
     GET_DOC_URL = DOC_URL + '?alt=media'
@@ -166,6 +167,8 @@ class GoogleStorageService(StorageService):  # pylint: disable=too-few-public-me
             return cls.GCP_BUCKET_ID_REGISTRATION
         if doc_type == DocumentTypes.BATCH_REGISTRATION:
             return cls.GCP_BUCKET_ID_BATCH
+        if doc_type == DocumentTypes.SERVICE_AGREEMENT:
+            return cls.GCP_BUCKET_ID_TERMS
         return cls.GCP_BUCKET_ID
 
     @classmethod

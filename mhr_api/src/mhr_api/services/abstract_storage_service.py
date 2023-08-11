@@ -23,6 +23,7 @@ class DocumentTypes(BaseEnum):
     SEARCH_RESULTS = 'SEARCH_RESULTS'
     REGISTRATION = 'REGISTRATION'
     BATCH_REGISTRATION = 'BATCH_REGISTRATION'
+    SERVICE_AGREEMENT = 'SERVICE_AGREEMENT'
 
 
 class StorageService(ABC):  # pylint: disable=too-few-public-methods

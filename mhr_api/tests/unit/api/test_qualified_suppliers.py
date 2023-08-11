@@ -43,16 +43,16 @@ SUPPLIER_JSON = {
 }
 # testdata pattern is ({desc}, {roles}, {account_id}, {status})
 TEST_ACCOUNT_DATA = [
-    ('Valid', [MHR_ROLE], 'test', HTTPStatus.OK),
+    ('Valid', [MHR_ROLE], '3026', HTTPStatus.OK),
     ('Valid no results', [MHR_ROLE], '1234', HTTPStatus.NOT_FOUND),
     ('Non-staff no account', [MHR_ROLE], None, HTTPStatus.BAD_REQUEST),
     ('Staff no account', [MHR_ROLE, STAFF_ROLE], None, HTTPStatus.BAD_REQUEST),
-    ('Unauthorized', [COLIN_ROLE], 'test', HTTPStatus.UNAUTHORIZED)
+    ('Unauthorized', [COLIN_ROLE], '3026', HTTPStatus.UNAUTHORIZED)
 ]
 # testdata pattern is ({desc}, {roles}, {account_id}, {status}, {bus_name})
 TEST_CREATE_DATA = [
     ('Valid', [MHR_ROLE], 'new-test', HTTPStatus.OK, VALID_BUS_NAME),
-    ('Invalid exists', [MHR_ROLE], 'test', HTTPStatus.BAD_REQUEST, VALID_BUS_NAME),
+    ('Invalid exists', [MHR_ROLE], '3026', HTTPStatus.BAD_REQUEST, VALID_BUS_NAME),
     ('Invalid validation error', [MHR_ROLE], 'new-test', HTTPStatus.BAD_REQUEST, INVALID_BUS_NAME)
 ]
 

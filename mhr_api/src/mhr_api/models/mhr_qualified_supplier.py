@@ -34,10 +34,13 @@ class MhrQualifiedSupplier(db.Model):  # pylint: disable=too-many-instance-attri
     last_name = db.Column('last_name', db.String(50), nullable=True)
     # or party business
     business_name = db.Column('business_name', db.String(150), nullable=True)
+    dba_name = db.Column('dba_name', db.String(150), nullable=True)
+    authorization_name = db.Column('authorization_name', db.String(150), nullable=True)
     account_id = db.Column('account_id', db.String(20), nullable=False)
     email_id = db.Column('email_address', db.String(250), nullable=True)
     phone_number = db.Column('phone_number', db.String(20), nullable=True)
     phone_extension = db.Column('phone_extension', db.String(10), nullable=True)
+    terms_accepted = db.Column('terms_accepted', db.String(1), nullable=True)
 
     # parent keys
     address_id = db.Column('address_id', db.Integer, db.ForeignKey('addresses.id'), nullable=True, index=True)
@@ -50,6 +53,7 @@ class MhrQualifiedSupplier(db.Model):  # pylint: disable=too-many-instance-attri
     def json(self) -> dict:
         """Return the party as a json object."""
         party = {
+            'termsAccepted': bool(self.terms_accepted and self.terms_accepted == 'Y'),
             'partyType': self.party_type,
             'address': self.address.json
         }
@@ -63,12 +67,16 @@ class MhrQualifiedSupplier(db.Model):  # pylint: disable=too-many-instance-attri
             if self.middle_name:
                 person_name['middle'] = self.middle_name
             party['personName'] = person_name
+        if self.dba_name:
+            party['dbaName'] = self.dba_name
         if self.email_id:
             party['emailAddress'] = self.email_id
         if self.phone_number:
             party['phoneNumber'] = self.phone_number
         if self.phone_extension:
             party['phoneExtension'] = self.phone_extension
+        if self.authorization_name:
+            party['authorizationName'] = self.authorization_name
         return party
 
     def save(self):
@@ -78,7 +86,7 @@ class MhrQualifiedSupplier(db.Model):  # pylint: disable=too-many-instance-attri
 
     @classmethod
     def find_by_id(cls, supplier_id: int = None):
-        """Return a qualified suppier party object by primary key ID."""
+        """Return a qualified supplier party object by primary key ID."""
         supplier = None
         if supplier_id:
             supplier = cls.query.get(supplier_id)
@@ -86,7 +94,7 @@ class MhrQualifiedSupplier(db.Model):  # pylint: disable=too-many-instance-attri
 
     @classmethod
     def find_by_account_id(cls, account_id: str = None):
-        """Return a list of party objects by registration id."""
+        """Return a qualified supplier party object by account ID."""
         supplier = None
         if account_id:
             supplier = cls.query.filter(MhrQualifiedSupplier.account_id == account_id).one_or_none()
@@ -105,11 +113,17 @@ class MhrQualifiedSupplier(db.Model):  # pylint: disable=too-many-instance-attri
             supplier.first_name = json_data['personName']['first'].strip().upper()
             if json_data['personName'].get('middle'):
                 supplier.middle_name = json_data['personName']['middle'].strip().upper()
+        if json_data.get('dbaName'):
+            supplier.dba_name = json_data['dbaName'].strip().upper()
+        if json_data.get('authorizationName'):
+            supplier.authorization_name = json_data['authorizationName'].strip()
         if json_data.get('emailAddress'):
             supplier.email_id = json_data['emailAddress'].strip()
         if json_data.get('phoneNumber'):
             supplier.phone_number = json_data['phoneNumber'].strip()
         if json_data.get('phoneExtension'):
             supplier.phone_extension = json_data['phoneExtension'].strip()
+        if json_data.get('termsAccepted'):
+            supplier.terms_accepted = 'Y'
         supplier.address = Address.create_from_json(json_data['address'])
         return supplier

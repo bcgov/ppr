@@ -31,7 +31,7 @@ TEST_ID_DATA = [
 ]
 # testdata pattern is ({account_id}, {has_results})
 TEST_ACCOUNT_ID_DATA = [
-    ('test', True),
+    ('3026', True),
     ('JUNK', False)
 ]
 SUPPLIER_JSON = {
@@ -45,7 +45,10 @@ SUPPLIER_JSON = {
         'country': 'CA'
     },
     'emailAddress': 'test@gmail.com',
-    'phoneNumber': '2507701067'
+    'phoneNumber': '2507701067',
+    'termsAccepted': False,
+    'dbaName': 'DBA NAME',
+    'authorizationName': 'John Smith'
 }
 
 
@@ -88,13 +91,15 @@ def test_find_by_account_id(session, account_id, has_results):
 def test_supplier_json(session):
     """Assert that the qualifed supplier model renders to a json format correctly."""
     address: Address = Address.create_from_json(SUPPLIER_JSON.get('address'))
-    supplier: MhrQualifiedSupplier = MhrQualifiedSupplier(id=1, 
+    supplier: MhrQualifiedSupplier = MhrQualifiedSupplier(id=1,
                                                           party_type=MhrPartyTypes.CONTACT,
                                                           business_name=SUPPLIER_JSON.get('businessName'),
                                                           address=address,
                                                           email_id=SUPPLIER_JSON.get('emailAddress'),
-                                                          phone_number=SUPPLIER_JSON.get('phoneNumber'))
-    current_app.logger.debug(supplier.json)
+                                                          phone_number=SUPPLIER_JSON.get('phoneNumber'),
+                                                          dba_name=SUPPLIER_JSON.get('dbaName'),
+                                                          authorization_name=SUPPLIER_JSON.get('authorizationName'))
+    # current_app.logger.debug(supplier.json)
     assert SUPPLIER_JSON == supplier.json
 
 

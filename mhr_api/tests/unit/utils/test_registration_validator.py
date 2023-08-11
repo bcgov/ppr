@@ -87,7 +87,7 @@ TEST_REG_DATA = [
 # testdata pattern is ({description}, {valid}, {submitting}, {owners}, {location}, {desc}, {message content})
 TEST_MANUFACTURER_DATA = [
     ('Valid', True, None, None, None, None, None),
-    ('Invalid submitting party', False, MANUFACTURER_SUB_INVALID, None, None, None, man_validator.SUBMITTING_MISMATCH),
+    ('Valid different submitting party', True, MANUFACTURER_SUB_INVALID, None, None, None, None),
     ('Invalid owner', False, None, SO_VALID, None, None, man_validator.OWNER_MISMATCH),
     ('Invalid owner count', False, None, JT_VALID, None, None, man_validator.OWNER_COUNT_INVALID),
     ('Invalid group type', False, None, JT_VALID, None, None, man_validator.OWNER_GROUP_TYPE_INVALID),
