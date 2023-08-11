@@ -14,7 +14,7 @@
 
     <!-- Conditional based on service agreement checkbox -->
     <template v-slot:topInfoSlot>
-      <p class="ml-7 pb-2 mt-8 fs-16">
+      <p class="ml-7 pb-2 mt-8">
         <v-icon color="success" class="pr-2">mdi-check</v-icon>
         I have read, understood and agree to the terms and conditions of the Qualified Suppliers’ Agreement for the
         Manufactured Home Registry.
@@ -34,14 +34,10 @@ import { RouteNames } from '@/enums'
 export default defineComponent({
   name: 'QsInformationReview',
   computed: {
-    RouteNames () {
-      return RouteNames
-    }
+    RouteNames () { return RouteNames }
   },
   components: {
     PartyReview
-  },
-  props: {
   },
   setup () {
     const {

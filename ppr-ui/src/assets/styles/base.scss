@@ -58,15 +58,11 @@ h2,
 h3,
 h4 {
   color: $gray9;
-}
-
-h1,
-h2 {
   font-weight: 700;
+  line-height: 2.25rem;
 }
 
 h1 {
-  line-height: 2.25rem;
   font-size: 2rem;
 }
 
@@ -75,9 +71,11 @@ h2 {
 }
 
 h3 {
-  font-size: 16px;
-  font-weight: 700;
-  line-height: 2.25rem;
+  font-size: 1rem;
+}
+
+h4 {
+  font-size: 0.875rem;
 }
 
 p {

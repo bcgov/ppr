@@ -20,7 +20,7 @@
       <!-- Party Info -->
       <template v-if="hasData">
 
-        <section class="party-info fs-14">
+        <section class="party-info">
           <!-- Upper party info slot -->
           <slot name="topInfoSlot" />
 
@@ -29,16 +29,16 @@
           <v-row no-gutters class="px-6 pt-6 pb-2">
             <!-- Future: Handle person name -->
             <v-col v-if="hasPropData('businessName')">
-              <h3>Name</h3>
+              <h4>Name</h4>
             </v-col>
             <v-col v-if="hasPropData('address')">
-              <h3>Mailing Address</h3>
+              <h4>Mailing Address</h4>
             </v-col>
             <v-col v-if="hasPropData('emailAddress')">
-              <h3>Email Address</h3>
+              <h4>Email Address</h4>
             </v-col>
             <v-col v-if="hasPropData('phoneNumber')">
-              <h3>Phone Number</h3 >
+              <h4>Phone Number</h4 >
             </v-col>
           </v-row>
           <v-divider class="mx-4"/>
