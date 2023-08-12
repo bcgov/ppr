@@ -84,21 +84,35 @@ export function isInt (intValue) {
 }
 
 /**
- * Creates and returns a new Date object in UTC, given parameters in Pacific timezone.
+ * Takes a pacific time and creates a new date adjusted to user localtime.
  * (This works regardless of user's local clock/timezone.)
  * @example "2021, 0, 1, 0, 0" -> "2021-01-01T08:00:00.000Z"
  * @example "2021, 6, 1, 0, 0" -> "2021-07-01T07:00:00.000Z"
  */
-export function createUtcDate (year: number, month: number, day: number, hours: number = 0, minutes: number = 0): Date {
+export function createDateFromPacificTime (year: number, month: number, day: number,
+  hours: number = 0, minutes: number = 0): Date {
   // FUTURE: change this to get the date from the server
-  const jsDate = new Date()
-  const date = new Date(jsDate.toLocaleString('en-US', { timeZone: 'America/Vancouver' }))
+  const currUserTime = new Date()
+  const currPacificTime = new Date(currUserTime.toLocaleString('en-US', { timeZone: 'America/Vancouver' }))
 
-  // update all date and time fields
-  date.setFullYear(year, month, day)
-  date.setHours(hours, minutes, 0, 0) // zero out seconds and milliseconds
+  // Handle extremely rare race condition if minute changed between the two calls above
+  // This interval should be more than sufficient to catch this race condition
+  if (currUserTime.getSeconds() >= 57 && currPacificTime.getSeconds() <= 3) {
+    // Try again condition should not occur again
+    return createDateFromPacificTime(year, month, day, hours, minutes)
+  }
 
-  return date
+  // zero out seconds and milliseconds
+  currUserTime.setSeconds(0, 0)
+  currPacificTime.setSeconds(0, 0)
+
+  // Difference between current time zone to pacific time zone
+  const timeZoneDiff = currUserTime.getTime() - currPacificTime.getTime()
+
+  // Date object is always set to the localtime zone in javascript
+  const adjustedDateObject = new Date(new Date(year, month, day, hours, minutes).getTime() + timeZoneDiff)
+
+  return adjustedDateObject // Date Objects are always in user localtime
 }
 
 /**
@@ -115,7 +129,7 @@ export function yyyyMmDdToDate (dateStr: string): Date {
   const month = +split[1]
   const day = +split[2]
 
-  return createUtcDate(year, (month - 1), day)
+  return createDateFromPacificTime(year, (month - 1), day)
 }
 
 /**

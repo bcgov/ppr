@@ -83,7 +83,7 @@
             </div>
           </v-form>
 
-          <div
+          <p
             v-if="!isImmediateDateSelected && selectedPastDate && isTimeSelected"
             class="ml-8 mb-6"
             data-test-id="date-summary-label"
@@ -92,7 +92,7 @@
             <b>
               {{ pacificDate(effectiveDate, true) }}
             </b>
-          </div>
+          </p>
         </v-col>
       </v-row>
     </v-card>
@@ -102,7 +102,7 @@
 <script lang="ts">
 import { computed, defineComponent, onBeforeMount, reactive, ref, toRefs, watch } from 'vue-demi'
 import { EffectiveDateTypes, PeriodTypes } from '@/enums/'
-import { createUtcDate, localTodayDate, pacificDate } from '@/utils'
+import { createDateFromPacificTime, localTodayDate, pacificDate } from '@/utils'
 import { ContentIF, FormIF } from '@/interfaces'
 import { useInputRules } from '@/composables'
 import SharedDatePicker from '@/components/common/SharedDatePicker.vue'
@@ -177,7 +177,7 @@ export default defineComponent({
       }
 
       const date = new Date(localState.selectedPastDate)
-      return createUtcDate(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), hours, minutes)
+      return createDateFromPacificTime(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), hours, minutes)
     }
 
     onBeforeMount((): void => {
