@@ -520,7 +520,7 @@ describe('Mhr TableRow tests', () => {
   it('displays the correct status for all mhStatusTypes', async () => {
     const registrations: (MhRegistrationSummaryIF)[] = [
       { ...mockedMhRegistration, statusType: MhApiStatusTypes.EXEMPT },
-      { ...mockedMhRegistration, statusType: MhApiStatusTypes.HISTORICAL },
+      { ...mockedMhRegistration, statusType: MhApiStatusTypes.CANCELLED },
       { ...mockedMhRegistration, statusType: MhApiStatusTypes.ACTIVE },
       { ...mockedMhRegistration, statusType: MhApiStatusTypes.DRAFT },
       { ...mockedMhRegistration, statusType: MhApiStatusTypes.FROZEN }
@@ -548,8 +548,8 @@ describe('Mhr TableRow tests', () => {
         case MhApiStatusTypes.FROZEN:
           expect(rowData.at(3).text()).toContain(MhUIStatusTypes.ACTIVE)
           break
-        case MhApiStatusTypes.HISTORICAL:
-          expect(rowData.at(3).text()).toContain(MhUIStatusTypes.HISTORICAL)
+        case MhApiStatusTypes.CANCELLED:
+          expect(rowData.at(3).text()).toContain(MhUIStatusTypes.CANCELLED)
           break
         default:
           fail('No/Unknown MhStatusType')
@@ -560,7 +560,7 @@ describe('Mhr TableRow tests', () => {
   it('displays the correct status for all mhStatusTypes as children', async () => {
     const registrations: (MhRegistrationSummaryIF)[] = [
       { ...mockedMhRegistration, statusType: MhApiStatusTypes.EXEMPT },
-      { ...mockedMhRegistration, statusType: MhApiStatusTypes.HISTORICAL },
+      { ...mockedMhRegistration, statusType: MhApiStatusTypes.CANCELLED },
       { ...mockedMhRegistration, statusType: MhApiStatusTypes.ACTIVE },
       { ...mockedMhRegistration, statusType: MhApiStatusTypes.DRAFT },
       { ...mockedMhRegistration, statusType: MhApiStatusTypes.FROZEN }
@@ -589,7 +589,7 @@ describe('Mhr TableRow tests', () => {
         case MhApiStatusTypes.FROZEN:
           expect(rowData.at(3).text()).toContain(MhUIStatusTypes.ACTIVE)
           break
-        case MhApiStatusTypes.HISTORICAL:
+        case MhApiStatusTypes.CANCELLED:
           expect(rowData.at(3).text()).toContain('')
           break
         default:
