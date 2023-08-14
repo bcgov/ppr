@@ -86,8 +86,6 @@ export function isInt (intValue) {
 /**
  * Takes a pacific time and creates a new date adjusted to user localtime.
  * (This works regardless of user's local clock/timezone.)
- * @example "2021, 0, 1, 0, 0" -> "2021-01-01T08:00:00.000Z"
- * @example "2021, 6, 1, 0, 0" -> "2021-07-01T07:00:00.000Z"
  */
 export function createDateFromPacificTime (year: number, month: number, day: number,
   hours: number = 0, minutes: number = 0): Date {
@@ -102,7 +100,7 @@ export function createDateFromPacificTime (year: number, month: number, day: num
     return createDateFromPacificTime(year, month, day, hours, minutes)
   }
 
-  // zero out seconds and milliseconds
+  // Zero out seconds and milliseconds
   currUserTime.setSeconds(0, 0)
   currPacificTime.setSeconds(0, 0)
 
@@ -112,12 +110,12 @@ export function createDateFromPacificTime (year: number, month: number, day: num
   // Date object is always set to the localtime zone in javascript
   const adjustedDateObject = new Date(new Date(year, month, day, hours, minutes).getTime() + timeZoneDiff)
 
-  return adjustedDateObject // Date Objects are always in user localtime
+  return adjustedDateObject
 }
 
 /**
  * Converts a date string (YYYY-MM-DD) to a Date object at 12:00:00 am Pacific time.
- * @example 2021-11-22 -> 2021-11-22T08:00:00.00Z
+ * @example 2021-11-22 -> 2021-11-22T00:00:00.00 Pacific Time
  */
 export function yyyyMmDdToDate (dateStr: string): Date {
   // safety checks

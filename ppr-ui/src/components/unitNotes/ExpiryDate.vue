@@ -111,8 +111,11 @@ export default defineComponent({
 
     // build a full UTC date based on selected future date
     const buildFullDate = (): Date => {
-      const date = new Date(localState.selectedFutureDate)
-      return createDateFromPacificTime(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())
+      const YearMonthDay = localState.selectedFutureDate.split('-')
+      const year = parseInt(YearMonthDay[0])
+      const month = parseInt(YearMonthDay[1]) - 1
+      const day = parseInt(YearMonthDay[2])
+      return createDateFromPacificTime(year, month, day)
     }
 
     onBeforeMount((): void => {
