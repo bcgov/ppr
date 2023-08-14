@@ -42,8 +42,11 @@ class MhrManufacturer(db.Model):  # pylint: disable=too-many-instance-attributes
 
     id = db.Column('id', db.Integer, db.Sequence('mhr_manufacturer_id_seq'), primary_key=True)
     manufacturer_name = db.Column('manufacturer_name', db.String(150), nullable=False)
+    dba_name = db.Column('dba_name', db.String(150), nullable=True)
+    authorization_name = db.Column('authorization_name', db.String(150), nullable=True)
     account_id = db.Column('account_id', db.String(20), nullable=True)
     bcol_account = db.Column('bcol_account', db.String(8), nullable=True)
+    terms_accepted = db.Column('terms_accepted', db.String(1), nullable=True)
 
     # parent keys
     registration_id = db.Column('registration_id', db.Integer, db.ForeignKey('mhr_registrations.id'), nullable=False,
@@ -62,6 +65,7 @@ class MhrManufacturer(db.Model):  # pylint: disable=too-many-instance-attributes
     def json(self) -> dict:
         """Return the manufacturer as a json object."""
         manufacturer = {
+            'termsAccepted': bool(self.terms_accepted and self.terms_accepted == 'Y'),
             'submittingParty': self.submitting_party.json,
             'ownerGroups': [],
             'location': {
@@ -87,6 +91,10 @@ class MhrManufacturer(db.Model):  # pylint: disable=too-many-instance-attributes
             'owners': owners
         }
         manufacturer['ownerGroups'].append(group)
+        if self.dba_name:
+            manufacturer['dbaName'] = self.dba_name
+        if self.authorization_name:
+            manufacturer['authorizationName'] = self.authorization_name
         return manufacturer
 
     def save(self):
@@ -148,12 +156,20 @@ class MhrManufacturer(db.Model):  # pylint: disable=too-many-instance-attributes
         manufacturer.submitting_party = MhrParty.create_from_json(party, MhrPartyTypes.SUBMITTING, registration.id)
         owner = json_data['ownerGroups'][0]['owners'][0]
         manufacturer.owner = MhrParty.create_from_json(owner, MhrPartyTypes.OWNER_BUS, registration.id)
+        name: str = json_data['location'].get('dealerName')
         dealer: MhrParty = MhrParty(party_type=MhrPartyTypes.MANUFACTURER,
                                     registration_id=registration.id,
                                     change_registration_id=registration.id,
                                     status_type=MhrOwnerStatusTypes.ACTIVE,
-                                    business_name=json_data['location'].get('dealerName'))
+                                    business_name=name.strip().upper())
         dealer.address = Address.create_from_json(json_data['location'].get('address'))
         manufacturer.dealer = dealer
-        manufacturer.manufacturer_name = json_data['description'].get('manufacturer')
+        name = json_data['description'].get('manufacturer')
+        manufacturer.manufacturer_name = name.strip().upper()
+        if json_data.get('dbaName'):
+            manufacturer.dba_name = json_data['dbaName'].strip().upper()
+        if json_data.get('authorizationName'):
+            manufacturer.authorization_name = json_data['authorizationName'].strip()
+        if json_data.get('termsAccepted'):
+            manufacturer.terms_accepted = 'Y'
         return manufacturer

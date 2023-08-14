@@ -71,6 +71,9 @@ def post_account_qualified_supplier():
         account_id = resource_utils.get_account_id(request)
         if account_id is None:
             return resource_utils.account_required_response()
+        # Verify request JWT and account ID
+        if not authorized(account_id, jwt):
+            return resource_utils.unauthorized_error_response(account_id)
         current_app.logger.info(f'Creating qualified supplier  information for account {account_id}.')
         supplier: MhrQualifiedSupplier = MhrQualifiedSupplier.find_by_account_id(account_id)
         if supplier:

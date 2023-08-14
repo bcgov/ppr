@@ -84,7 +84,10 @@ MANUFACTURER_JSON = {
   },
   'description': {
     'manufacturer': 'REAL ENGINEERED HOMES INC',
-  }
+  },
+  'termsAccepted': False,
+  'dbaName': 'DBA NAME',
+  'authorizationName': 'John Smith'
 }
 
 
@@ -192,7 +195,9 @@ def test_manufacturer_json(session):
                                                     dealer_party_id=3,
                                                     submitting_party=sub_party,
                                                     owner=owner,
-                                                    dealer=dealer)
+                                                    dealer=dealer,
+                                                    dba_name=MANUFACTURER_JSON.get('dbaName'),
+                                                    authorization_name=MANUFACTURER_JSON.get('authorizationName'))
     manufacturer.manufacturer_name=MANUFACTURER_JSON['description'].get('manufacturer')
     current_app.logger.debug(manufacturer.json)
     assert MANUFACTURER_JSON == manufacturer.json

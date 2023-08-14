@@ -932,6 +932,67 @@
 					"response": []
 				},
 				{
+					"name": "Create account manufacturer information",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"accept": true
+						}
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"description": "Prism only local mock server header.",
+								"key": "Prefer",
+								"type": "text",
+								"value": "example=/api/v1/searches/1294376/put"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"authorizationName\": \"John Smith\",\n  \"dbaName\": \"MAGICAL ENGINEERED HOMES\",\n  \"submittingParty\": {\n    \"businessName\": \"MAGICAL ENGINEERED HOMES INC\",\n    \"address\": {\n      \"street\": \"800 535 THURLOW STREET\",\n      \"city\": \"VANCOUNVER\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V6E 3L2\"\n    },\n    \"phoneNumber\": \"6042912323\"\n  },\n  \"ownerGroups\": [\n    {\n      \"groupId\": 1,\n      \"type\": \"SOLE\",\n      \"owners\": [\n        {\n          \"organizationName\": \"MAGICAL ENGINEERED HOMES INC\",\n          \"partyType\": \"OWNER_BUS\",\n          \"address\": {\n            \"street\": \"7570 TETAYUT ROAD\",\n            \"city\": \"SAANICH\",\n            \"region\": \"BC\",\n            \"country\": \"CA\",\n            \"postalCode\": \"V8M 2H4\"\n          },\n          \"phoneNumber\": \"6042912323\"\n        }\n      ]\n    }\n  ],\n  \"location\": {\n    \"locationType\": \"MANUFACTURER\",\n    \"dealerName\": \"MAGICAL ENGINEERED HOMES INC - SAANICH\",\n    \"address\": {\n      \"street\": \"7570 TETAYUT ROAD\",\n      \"city\": \"SAANICH\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V8M 2H4\"\n    }\n  },\n  \"description\": {\n    \"manufacturer\": \"MAGICAL ENGINEERED HOMES INC\"\n  }\n}\n"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/manufacturers",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"manufacturers"
+							]
+						},
+						"description": "Retrieve the recent history of search requests for the account."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "qualified suppliers",
+			"item": [
+				{
 					"name": "Create account qualified supplier information",
 					"protocolProfileBehavior": {
 						"disabledSystemHeaders": {
@@ -964,7 +1025,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"businessName\": \"UNIT TEST NOTARY PUBLIC\",\n  \"address\": {\n    \"street\": \"1088 FORT STREET\",\n    \"city\": \"VICTORIA\",\n    \"region\": \"BC\",\n    \"country\": \"CA\",\n    \"postalCode\": \"V8S 7J4\"\n  },\n  \"phoneNumber\": \"2503862484\"\n}\n"
+							"raw": "{\n  \"authorizationName\": \"John Smith\",\n  \"dbaName\": \"UNIT TEST NOTARY PUBLIC\",\n  \"businessName\": \"UNIT TEST NOTARY PUBLIC INC.\",\n  \"address\": {\n    \"street\": \"1088 FORT STREET\",\n    \"city\": \"VICTORIA\",\n    \"region\": \"BC\",\n    \"country\": \"CA\",\n    \"postalCode\": \"V8S 7J4\"\n  },\n  \"phoneNumber\": \"2503862484\"\n}\n"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/qualified-suppliers",
@@ -980,12 +1041,7 @@
 						"description": "Retrieve the recent history of search requests for the account."
 					},
 					"response": []
-				}
-			]
-		},
-		{
-			"name": "qualified suppliers",
-			"item": [
+				},
 				{
 					"name": "Get account qualified supplier information",
 					"protocolProfileBehavior": {
@@ -1037,9 +1093,14 @@
 						"description": "Retrieve the recent history of search requests for the account."
 					},
 					"response": []
-				},
+				}
+			]
+		},
+		{
+			"name": "service agreements",
+			"item": [
 				{
-					"name": "Create account manufacturer information",
+					"name": "Create accept latest",
 					"protocolProfileBehavior": {
 						"disabledSystemHeaders": {
 							"accept": true
@@ -1047,6 +1108,57 @@
 					},
 					"request": {
 						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"agreementType\": \"DEFAULT\",\n  \"version\": \"latest\",\n  \"accepted\": true\n}\n"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/service-agreements/latest",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"service-agreements",
+								"latest"
+							]
+						},
+						"description": "Retrieve the recent history of search requests for the account."
+					},
+					"response": []
+				},
+				{
+					"name": "Get agreement list",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"accept": true
+						}
+					},
+					"request": {
+						"method": "GET",
 						"header": [
 							{
 								"key": "Accept",
@@ -1075,19 +1187,126 @@
 								"type": "text"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"submittingParty\": {\n    \"businessName\": \"MAGICAL ENGINEERED HOMES INC\",\n    \"address\": {\n      \"street\": \"800 535 THURLOW STREET\",\n      \"city\": \"VANCOUNVER\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V6E 3L2\"\n    },\n    \"phoneNumber\": \"6042912323\"\n  },\n  \"ownerGroups\": [\n    {\n      \"groupId\": 1,\n      \"type\": \"SOLE\",\n      \"owners\": [\n        {\n          \"organizationName\": \"MAGICAL ENGINEERED HOMES INC\",\n          \"partyType\": \"OWNER_BUS\",\n          \"address\": {\n            \"street\": \"7570 TETAYUT ROAD\",\n            \"city\": \"SAANICH\",\n            \"region\": \"BC\",\n            \"country\": \"CA\",\n            \"postalCode\": \"V8M 2H4\"\n          },\n          \"phoneNumber\": \"6042912323\"\n        }\n      ]\n    }\n  ],\n  \"location\": {\n    \"locationType\": \"MANUFACTURER\",\n    \"dealerName\": \"MAGICAL ENGINEERED HOMES INC - SAANICH\",\n    \"address\": {\n      \"street\": \"7570 TETAYUT ROAD\",\n      \"city\": \"SAANICH\",\n      \"region\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V8M 2H4\"\n    }\n  },\n  \"description\": {\n    \"manufacturer\": \"MAGICAL ENGINEERED HOMES INC\"\n  }\n}\n"
-						},
 						"url": {
-							"raw": "{{base_url}}/api/v1/manufacturers",
+							"raw": "{{base_url}}/api/v1/service-agreements",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"api",
 								"v1",
-								"manufacturers"
+								"service-agreements"
+							]
+						},
+						"description": "Retrieve the recent history of search requests for the account."
+					},
+					"response": []
+				},
+				{
+					"name": "Get latest version",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"accept": true
+						}
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"description": "Prism only local mock server header.",
+								"key": "Prefer",
+								"type": "text",
+								"value": "example=/api/v1/searches/1294376/put"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/service-agreements/latest",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"service-agreements",
+								"latest"
+							]
+						},
+						"description": "Retrieve the recent history of search requests for the account."
+					},
+					"response": []
+				},
+				{
+					"name": "Get v1",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"accept": true,
+							"host": true,
+							"user-agent": true,
+							"accept-encoding": true
+						}
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json",
+								"disabled": true
+							},
+							{
+								"key": "Account-Id",
+								"type": "text",
+								"value": "{{account_id}}"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"description": "Prism only local mock server header.",
+								"key": "Prefer",
+								"type": "text",
+								"value": "example=/api/v1/searches/1294376/put",
+								"disabled": true
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/service-agreements/v1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"service-agreements",
+								"v1"
 							]
 						},
 						"description": "Retrieve the recent history of search requests for the account."
@@ -1952,12 +2171,12 @@
 		},
 		{
 			"key": "base_url_local",
-			"value": "http://127.0.0.1:5000",
+			"value": "http://localhost:5000",
 			"type": "string"
 		},
 		{
 			"key": "staff_account_id",
-			"value": "3040",
+			"value": "PROVIDE",
 			"type": "string"
 		}
 	]

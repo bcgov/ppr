@@ -46,6 +46,7 @@ from .mhr_qualified_supplier import MhrQualifiedSupplier
 from .mhr_registration import MhrRegistration
 from .mhr_registration_report import MhrRegistrationReport
 from .mhr_section import MhrSection
+from .mhr_service_agreement import MhrServiceAgreement
 from .party import Party
 from .registration import Registration
 from .search_request import SearchRequest
@@ -82,7 +83,8 @@ __all__ = ('db',
            'MhrLocation', 'MhrManufacturer', 'MhrNote', 'MhrParty', 'MhrRegistration',
            'MhrRegistrationReport', 'MhrDocumentType', 'MhrLocationType', 'MhrNoteStatusType', 'MhrOwnerGroup',
            'MhrOwnerStatusType', 'MhrPartyType', 'MhrQualifiedSupplier',
-           'MhrRegistrationStatusType', 'MhrRegistrationType', 'MhrSection', 'MhrStatusType', 'MhrTenancyType',
+           'MhrRegistrationStatusType', 'MhrRegistrationType', 'MhrSection', 'MhrStatusType',
+           'MhrServiceAgreement', 'MhrTenancyType',
            'Party', 'PartyType', 'ProvinceType', 'Registration', 'RegistrationType',
            'RegistrationTypeClass', 'SearchRequest', 'SearchResult', 'SearchType', 'StateType', 'SerialType',
            'TrustIndenture', 'VehicleCollateral')

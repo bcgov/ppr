@@ -27,6 +27,8 @@ TEST_REGISTRATION_DATAFILE = 'tests/unit/services/test_reg_doc.pdf'
 TEST_REGISTRATION_SAVE_DOC_NAME = '2022/05/06/registration-ut-001.pdf'
 TEST_BATCH_REGISTRATION_SAVE_DOC_NAME = '2023/05/29/batch-manufacturer-mhreg-report-ut-001.pdf'
 TEST_BATCH_REGISTRATION_DATAFILE = 'tests/unit/services/test_batch_reg_doc.pdf'
+TEST_SERVICE_AGREEMENT_SAVE_DOC_NAME = 'default/v1/QS-Terms-of-Use.pdf'
+TEST_SERVICE_AGREEMENT_DATAFILE = 'tests/unit/services/test_qs_terms_of_use.pdf'
 
 
 def test_cs_save_search_document_http(session):
@@ -130,5 +132,16 @@ def test_cs_get_batch_registration_document(session):
     assert raw_data
     assert len(raw_data) > 0
     with open(TEST_BATCH_REGISTRATION_DATAFILE, "wb") as pdf_file:
+        pdf_file.write(raw_data)
+        pdf_file.close()
+
+
+def test_cs_get_service_agreement_document(session):
+    """Assert that getting a qualified supplier service agreement pdf from google cloud storage works as expected."""
+    raw_data = GoogleStorageService.get_document(TEST_SERVICE_AGREEMENT_SAVE_DOC_NAME,
+                                                 DocumentTypes.SERVICE_AGREEMENT)
+    assert raw_data
+    assert len(raw_data) > 0
+    with open(TEST_SERVICE_AGREEMENT_DATAFILE, "wb") as pdf_file:
         pdf_file.write(raw_data)
         pdf_file.close()
