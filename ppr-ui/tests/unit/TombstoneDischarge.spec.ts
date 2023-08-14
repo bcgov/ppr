@@ -174,4 +174,21 @@ describe('TombstoneDischarge component - MHR', () => {
     expect(extraInfo.at(0).text()).toContain('Registration Status:')
     expect(extraInfo.at(0).text()).toContain('Active')
   })
+
+  it('renders Tombstone component properly for Mhr Cancelled', async () => {
+    await store.setMhrInformation({ ...mockedMhrInformation, statusType: 'CANCELLED' })
+    wrapper = createComponent(RouteNames.MHR_INFORMATION)
+    const tombstoneDischarge = wrapper.findComponent(TombstoneDischarge)
+    tombstoneDischarge.vm.$props.isMhrInformation = true
+    await Vue.nextTick()
+    expect(wrapper.findComponent(TombstoneDischarge).exists()).toBe(true)
+    const header = wrapper.findAll(tombstoneHeader)
+    expect(header.length).toBe(1)
+    expect(header.at(0).text()).toContain('Manufactured Home Registration Number ' +
+                                          mhrRegistrationInfo.mhrNumber)
+    const extraInfo = wrapper.findAll(tombstoneInfo)
+    expect(extraInfo.length).toBe(1)
+    expect(extraInfo.at(0).text()).toContain('Registration Status:')
+    expect(extraInfo.at(0).text()).toContain('Cancelled')
+  })
 })

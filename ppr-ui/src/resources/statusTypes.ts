@@ -33,8 +33,8 @@ export const MhStatusTypes = [
     text: MhUIStatusTypes.EXEMPT
   },
   {
-    value: MhApiStatusTypes.HISTORICAL,
-    text: MhUIStatusTypes.HISTORICAL
+    value: MhApiStatusTypes.CANCELLED,
+    text: MhUIStatusTypes.CANCELLED
   }
 ]
 
@@ -49,5 +49,5 @@ export const MhrAPIToUIStatusTypesMap = {
   [MhApiStatusTypes.DRAFT]: MhUIStatusTypes.DRAFT,
   [MhApiStatusTypes.ACTIVE]: MhUIStatusTypes.ACTIVE,
   [MhApiStatusTypes.EXEMPT]: MhUIStatusTypes.EXEMPT,
-  [MhApiStatusTypes.HISTORICAL]: MhUIStatusTypes.HISTORICAL
+  [MhApiStatusTypes.CANCELLED]: MhUIStatusTypes.CANCELLED
 }

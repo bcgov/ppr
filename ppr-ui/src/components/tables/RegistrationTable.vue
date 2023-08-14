@@ -292,6 +292,7 @@
 import {
   computed,
   defineComponent,
+  onBeforeMount,
   onUpdated,
   reactive,
   ref,
@@ -704,6 +705,11 @@ export default defineComponent({
       },
       { deep: true }
     )
+
+    // Ensures filtering is cleared when returing to dashboard from registrations
+    onBeforeMount(() => {
+      clearFilters()
+    })
 
     onUpdated(() => {
       // needed to set overrideWidth to true

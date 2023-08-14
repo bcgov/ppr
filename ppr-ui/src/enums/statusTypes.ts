@@ -17,7 +17,6 @@ export enum MhUIStatusTypes {
   DRAFT = 'Draft',
   ACTIVE = 'Active',
   EXEMPT = 'Exempt',
-  HISTORICAL = 'Historical',
   CANCELLED = 'Cancelled',
   EXPIRED = 'Expired'
 }
@@ -26,7 +25,6 @@ export enum MhApiStatusTypes {
   DRAFT = 'DRAFT',
   ACTIVE = 'ACTIVE',
   EXEMPT = 'EXEMPT',
-  HISTORICAL = 'HISTORICAL',
   FROZEN = 'FROZEN',
   CANCELLED = 'CANCELLED',
   EXPIRED = 'EXPIRED'
