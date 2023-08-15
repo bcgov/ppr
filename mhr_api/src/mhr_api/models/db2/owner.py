@@ -265,7 +265,7 @@ class Db2Owner(db.Model):
         owner = Db2Owner(manuhome_id=registration.id,
                          group_id=group_id,
                          owner_id=owner_id,
-                         sequence_number=1,
+                         sequence_number=owner_id,  # Identical value to owner_id in the legacy db.
                          owner_type=owner_type,
                          verified_flag='',
                          phone_number=str(new_info.get('phoneNumber', ''))[0:10],
