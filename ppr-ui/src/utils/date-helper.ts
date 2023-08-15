@@ -52,10 +52,19 @@ export function convertDate (date: Date, includeTime: boolean, includeTz: boolea
 }
 
 export function pacificDate (date: Date | string, omitSeconds = false): string {
-  date = new Date(date.toLocaleString('en-US', { timeZone: 'America/Vancouver' }))
-  const datetime = format12HourTime(date, omitSeconds)
+  // Converts date to string and pacific time
+  // Example Output: August 11, 2023 at 10:38 AM
+  let pacificDate = new Intl.DateTimeFormat('en-US', { dateStyle: 'long',
+    timeStyle: omitSeconds ? 'short' : 'medium',
+    timeZone: 'America/Vancouver',
+    hour12: true })
+    .format(new Date(date))
 
-  return moment(date).format('MMMM D, Y') + ` at ${datetime} Pacific time`
+  // Convert AM/PM to lowercase
+  pacificDate = pacificDate.replace('AM', 'am')
+  pacificDate = pacificDate.replace('PM', 'pm')
+
+  return `${pacificDate} Pacific time`
 }
 
 export function tzOffsetMinutes (date: Date): number {
@@ -75,26 +84,38 @@ export function isInt (intValue) {
 }
 
 /**
- * Creates and returns a new Date object in UTC, given parameters in Pacific timezone.
+ * Takes a pacific time and creates a new date adjusted to user localtime.
  * (This works regardless of user's local clock/timezone.)
- * @example "2021, 0, 1, 0, 0" -> "2021-01-01T08:00:00.000Z"
- * @example "2021, 6, 1, 0, 0" -> "2021-07-01T07:00:00.000Z"
  */
-export function createUtcDate (year: number, month: number, day: number, hours: number = 0, minutes: number = 0): Date {
+export function createDateFromPacificTime (year: number, month: number, day: number,
+  hours: number = 0, minutes: number = 0): Date {
   // FUTURE: change this to get the date from the server
-  const jsDate = new Date()
-  const date = new Date(jsDate.toLocaleString('en-US', { timeZone: 'America/Vancouver' }))
+  const currUserTime = new Date()
+  const currPacificTime = new Date(currUserTime.toLocaleString('en-US', { timeZone: 'America/Vancouver' }))
 
-  // update all date and time fields
-  date.setFullYear(year, month, day)
-  date.setHours(hours, minutes, 0, 0) // zero out seconds and milliseconds
+  // Handle extremely rare race condition if minute changed between the two calls above
+  // This interval should be more than sufficient to catch this race condition
+  if (currUserTime.getSeconds() >= 57 && currPacificTime.getSeconds() <= 3) {
+    // Try again condition should not occur again
+    return createDateFromPacificTime(year, month, day, hours, minutes)
+  }
 
-  return date
+  // Zero out seconds and milliseconds
+  currUserTime.setSeconds(0, 0)
+  currPacificTime.setSeconds(0, 0)
+
+  // Difference between current time zone to pacific time zone
+  const timeZoneDiff = currUserTime.getTime() - currPacificTime.getTime()
+
+  // Date object is always set to the localtime zone in javascript
+  const adjustedDateObject = new Date(new Date(year, month, day, hours, minutes).getTime() + timeZoneDiff)
+
+  return adjustedDateObject
 }
 
 /**
  * Converts a date string (YYYY-MM-DD) to a Date object at 12:00:00 am Pacific time.
- * @example 2021-11-22 -> 2021-11-22T08:00:00.00Z
+ * @example 2021-11-22 -> 2021-11-22T00:00:00.00 Pacific Time
  */
 export function yyyyMmDdToDate (dateStr: string): Date {
   // safety checks
@@ -106,7 +127,7 @@ export function yyyyMmDdToDate (dateStr: string): Date {
   const month = +split[1]
   const day = +split[2]
 
-  return createUtcDate(year, (month - 1), day)
+  return createDateFromPacificTime(year, (month - 1), day)
 }
 
 /**

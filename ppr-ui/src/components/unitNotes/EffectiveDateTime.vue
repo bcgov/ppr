@@ -83,7 +83,7 @@
             </div>
           </v-form>
 
-          <div
+          <p
             v-if="!isImmediateDateSelected && selectedPastDate && isTimeSelected"
             class="ml-8 mb-6"
             data-test-id="date-summary-label"
@@ -92,7 +92,7 @@
             <b>
               {{ pacificDate(effectiveDate, true) }}
             </b>
-          </div>
+          </p>
         </v-col>
       </v-row>
     </v-card>
@@ -102,7 +102,7 @@
 <script lang="ts">
 import { computed, defineComponent, onBeforeMount, reactive, ref, toRefs, watch } from 'vue-demi'
 import { EffectiveDateTypes, PeriodTypes } from '@/enums/'
-import { createUtcDate, localTodayDate, pacificDate } from '@/utils'
+import { createDateFromPacificTime, localTodayDate, pacificDate } from '@/utils'
 import { ContentIF, FormIF } from '@/interfaces'
 import { useInputRules } from '@/composables'
 import SharedDatePicker from '@/components/common/SharedDatePicker.vue'
@@ -155,7 +155,7 @@ export default defineComponent({
         (!localState.isImmediateDateSelected && !!localState.selectedPastDate &&
           localState.isTimeSelected)
       ),
-      showBorderError: computed(() => {
+      showBorderError: computed((): boolean => {
         return props.validate &&
         !localState.isImmediateDateSelected &&
         !(localState.isEffectiveDateTimeFormValid && localState.selectedPastDate !== '')
@@ -164,20 +164,23 @@ export default defineComponent({
     })
 
     const buildFullDate = (): Date => {
+      const YearMonthDay = localState.selectedPastDate.split('-')
+      const year = parseInt(YearMonthDay[0])
+      const month = parseInt(YearMonthDay[1]) - 1
+      const day = parseInt(YearMonthDay[2])
       let hours = parseInt(localState.selectHour)
       const minutes = parseInt(localState.selectMinute)
 
       // convert 12 am -> 0
-      if (localState.selectPeriod === PeriodTypes.AM && localState.selectHour === 12) {
+      if (localState.selectPeriod === PeriodTypes.AM && hours === 12) {
         hours = hours - 12
       }
       // convert 1-11 pm -> 13-23
-      if (localState.selectPeriod === PeriodTypes.PM && localState.selectHour < 12) {
+      if (localState.selectPeriod === PeriodTypes.PM && hours < 12) {
         hours = hours + 12
       }
 
-      const date = new Date(localState.selectedPastDate)
-      return createUtcDate(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), hours, minutes)
+      return createDateFromPacificTime(year, month, day, hours, minutes)
     }
 
     onBeforeMount((): void => {

@@ -77,7 +77,6 @@ import { useRouter } from 'vue2-helpers/vue-router'
 import { useStore } from '@/store/store'
 import { UnitNotesInfo } from '@/resources'
 import { UnitNoteIF } from '@/interfaces/unit-note-interfaces/unit-note-interface'
-import { pacificDate } from '@/utils'
 import UnitNoteHeaderInfo from './UnitNoteHeaderInfo.vue'
 import UnitNoteContentInfo from './UnitNoteContentInfo.vue'
 import { useMhrUnitNote } from '@/composables'
@@ -140,7 +139,6 @@ export default defineComponent({
 
     return {
       handleOptionSelection,
-      pacificDate,
       UnitNoteDocTypes,
       UnitNotesInfo,
       noteOptions

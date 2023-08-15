@@ -68,7 +68,7 @@ const verifyBodyContent = (note: UnitNoteIF, content: Wrapper<any>) => {
     const effectiveDate = content.findAll('h3').at(0).text()
     const effectiveDateTime = content.findAll('.info-text.fs-14').at(0).text()
     expect(effectiveDate).toBe('Effective Date and Time')
-    expect(effectiveDateTime).toBe(pacificDate(note.effectiveDateTime))
+    expect(effectiveDateTime).toBe(pacificDate(note.effectiveDateTime, true))
   }
 
   // Check the expiry date and time
@@ -76,7 +76,7 @@ const verifyBodyContent = (note: UnitNoteIF, content: Wrapper<any>) => {
     const expiryDate = content.findAll('h3').at(1).text()
     const expiryDateTime = content.findAll('.info-text.fs-14').at(1).text()
     expect(expiryDate).toBe('Expiry Date and Time')
-    expect(expiryDateTime).toBe(pacificDate(note.expiryDateTime))
+    expect(expiryDateTime).toBe(pacificDate(note.expiryDateTime, true))
   }
 
   // Check the remarks

@@ -7,7 +7,7 @@
       </v-col>
       <v-col cols="9">
         <span class="info-text fs-14">
-          {{ pacificDate(note.effectiveDateTime) }}
+          {{ pacificDate(note.effectiveDateTime, true) }}
         </span>
       </v-col>
     </v-row>
@@ -18,7 +18,7 @@
       </v-col>
       <v-col cols="9">
         <span class="info-text fs-14">
-          {{ pacificDate(note.expiryDateTime) }}
+          {{ pacificDate(note.expiryDateTime, true) }}
         </span>
       </v-col>
     </v-row>

@@ -5,6 +5,7 @@ import { createComponent, getTestId } from './utils'
 import { EffectiveDateTime } from '@/components/unitNotes'
 import { SharedDatePicker } from '@/components/common'
 import { useStore } from '@/store/store'
+import { PeriodTypes } from '@/enums'
 
 Vue.use(Vuetify)
 const store = useStore()
@@ -64,5 +65,20 @@ describe('EffectiveDateTime', () => {
     const dateSummaryLabel = EffectiveDateTimeComponent.find(getTestId('date-summary-label'))
     expect(dateSummaryLabel.exists()).toBeTruthy()
     expect(dateSummaryLabel.text()).toContain('July 1, 2023 at 10:25 am')
+
+    wrapper.vm.selectHour = '12'
+    wrapper.vm.selectMinute = '00'
+
+    await Vue.nextTick()
+
+    expect(dateSummaryLabel.text()).toContain('July 1, 2023 at 12:00 am')
+
+    wrapper.vm.selectHour = '9'
+    wrapper.vm.selectMinute = '45'
+    wrapper.vm.selectPeriod = PeriodTypes.PM
+
+    await Vue.nextTick()
+
+    expect(dateSummaryLabel.text()).toContain('July 1, 2023 at 9:45 pm')
   })
 })

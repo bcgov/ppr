@@ -146,7 +146,7 @@ import { SharedDatePicker } from '@/components/common'
 import { HomeCertificationOptions } from '@/enums'
 import { useInputRules, useMhrValidations } from '@/composables'
 import { useStore } from '@/store/store'
-import { createUtcDate, localTodayDate } from '@/utils/date-helper'
+import { createDateFromPacificTime, localTodayDate } from '@/utils/date-helper'
 import { storeToRefs } from 'pinia'
 /* eslint-disable no-unused-vars */
 import { FormIF } from '@/interfaces'
@@ -220,8 +220,8 @@ export default defineComponent({
       today: computed(() => localTodayDate()),
       minDate: computed(() => {
         // Determined by YEAR value in Manufacturers, Make, Model Section
-        const utcDate = createUtcDate(getMhrRegistrationHomeDescription.value?.baseInformation.year, 0, 1)
-        return localTodayDate(utcDate)
+        const ptDate = createDateFromPacificTime(getMhrRegistrationHomeDescription.value?.baseInformation.year, 0, 1)
+        return localTodayDate(ptDate)
       }),
       hasNoCertification: getMhrRegistrationHomeDescription.value?.hasNoCertification || false
     })

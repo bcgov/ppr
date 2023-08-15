@@ -57,7 +57,7 @@
 <script lang="ts">
 import { computed, defineComponent, onBeforeMount, reactive, ref, toRefs, watch } from 'vue-demi'
 import { EffectiveDateTypes } from '@/enums/'
-import { createUtcDate, localTodayDate } from '@/utils'
+import { createDateFromPacificTime, localTodayDate } from '@/utils'
 import { ContentIF, FormIF } from '@/interfaces'
 import { useInputRules } from '@/composables'
 import SharedDatePicker from '@/components/common/SharedDatePicker.vue'
@@ -111,8 +111,11 @@ export default defineComponent({
 
     // build a full UTC date based on selected future date
     const buildFullDate = (): Date => {
-      const date = new Date(localState.selectedFutureDate)
-      return createUtcDate(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())
+      const YearMonthDay = localState.selectedFutureDate.split('-')
+      const year = parseInt(YearMonthDay[0])
+      const month = parseInt(YearMonthDay[1]) - 1
+      const day = parseInt(YearMonthDay[2])
+      return createDateFromPacificTime(year, month, day)
     }
 
     onBeforeMount((): void => {

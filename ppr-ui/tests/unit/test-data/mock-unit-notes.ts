@@ -8,8 +8,8 @@ export const mockUnitNotes: Array<UnitNoteIF> = [
     documentRegistrationNumber: '123456',
     documentDescription: 'Notice of Caution',
     createDateTime: '2023-12-30T09:00:00Z',
-    effectiveDateTime: '2023-13-01T12:00:00Z',
-    expiryDateTime: '2023-13-30T23:59:59Z',
+    effectiveDateTime: '2024-01-01T12:00:00Z',
+    expiryDateTime: '2024-01-30T23:59:59Z',
     remarks: 'This is a notice of caution.',
     givingNoticeParty: {
       businessName: 'HALSTON MODULAR HOMES LTD.',
