@@ -109,6 +109,7 @@ class MhrServiceAgreement(db.Model):
     def update_user_profile(json_data: dict, account_id: str, username: str) -> int:
         """Add the service agreement info to the user profile."""
         update_count: int = 0
+        current_app.logger.debug(f'Update user_profiles.service_agreements account={account_id}, user={username}')
         if not json_data or not account_id or not username:
             return update_count
         agreement_json: dict = copy.deepcopy(json_data)
@@ -116,7 +117,7 @@ class MhrServiceAgreement(db.Model):
         agreement = json.dumps(agreement_json)
         query_s = UPDATE_USER_PROFILE
         query_s = query_s.format(agreement=agreement, account_id=account_id, username=username)
-        current_app.logger.debug(f'Executing update query {query_s}')
+        # current_app.logger.debug(f'Executing update query {query_s}')
         query = text(query_s)
         result = db.session.execute(query)
         update_count = result.rowcount
@@ -135,10 +136,8 @@ class MhrServiceAgreement(db.Model):
             query = text(SELECT_USER_PROFILE)
             result = db.session.execute(query, {'query_value1': account_id, 'query_value2': username})
             if result:
-                current_app.logger.info('11111111')
                 row = result.first()
                 if row:
-                    current_app.logger.info('22222222')
                     agreement_json = row[0]
         except Exception as db_exception:   # noqa: B902; return nicer error
             current_app.logger.error('get_agreement_profile exception: ' + str(db_exception))

@@ -144,8 +144,7 @@ def post_agreement_versions(version: str):  # pylint: disable=too-many-return-st
         agreement_json['acceptedDateTime'] = model_utils.format_ts(model_utils.now_ts())
         # Record acceptance for the user.
         token: dict = g.jwt_oidc_token_info
-        username: str = token.get('username', '')
-        current_app.logger.debug(f'username={username}')
+        MhrServiceAgreement.update_user_profile(agreement_json, account_id, token.get('username', ''))
         return jsonify(agreement_json), HTTPStatus.OK
     except DatabaseException as db_exception:
         return resource_utils.db_exception_response(db_exception,
