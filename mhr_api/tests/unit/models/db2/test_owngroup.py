@@ -256,3 +256,5 @@ def test_create_type(session, tenancy_type, legacy_tenancy_type, data):
     group_data['type'] = tenancy_type
     group: Db2Owngroup = Db2Owngroup.create_from_registration(registration, group_data, 2)
     assert group.tenancy_type == legacy_tenancy_type
+    for owner in group.owners:
+        assert owner.owner_id == owner.sequence_number

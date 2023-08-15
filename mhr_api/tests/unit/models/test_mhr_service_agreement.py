@@ -36,10 +36,10 @@ TEST_VERSION_DATA = [
     ('v1', True),
     ('v1000', False)
 ]
-# testdata pattern is ({account_id}, {username}, {has_results})
+# testdata pattern is ({account_id}, {username}, {has_results}, {has_agreement})
 TEST_ACCEPT_DATA = [
-    ('3026', 'UT-test-qa', True),
-    ('JUNK', 'JUNK', False)
+    ('3026', 'UT-test-qa', True, True),
+    ('JUNK', 'JUNK', False, False)
 ]
 # testdata pattern is ({id}, {version}, {current_version}, {agree_type}, {doc_url} )
 TEST_CURRENT_DATA = [
@@ -107,8 +107,8 @@ def test_find_by_current(session, id, version, current_version, agree_type, doc_
     assert agreement.doc_storage_url == doc_url
 
 
-@pytest.mark.parametrize('account_id, username, has_results', TEST_ACCEPT_DATA)
-def test_update_profile(session, account_id, username, has_results):
+@pytest.mark.parametrize('account_id, username, has_results, has_agreement', TEST_ACCEPT_DATA)
+def test_update_profile(session, account_id, username, has_results, has_agreement):
     """Assert that updating the user profile with the service agreement information is as expected."""
     update_count: int = MhrServiceAgreement.update_user_profile(TEST_ACCEPT_JSON, account_id, username)
     if has_results:
@@ -117,13 +117,16 @@ def test_update_profile(session, account_id, username, has_results):
         assert update_count == 0
 
 
-@pytest.mark.parametrize('account_id, username, has_results', TEST_ACCEPT_DATA)
-def test_get_profile(session, account_id, username, has_results):
+@pytest.mark.parametrize('account_id, username, has_results, has_agreement', TEST_ACCEPT_DATA)
+def test_get_profile(session, account_id, username, has_results, has_agreement):
     """Assert that fetching the agreement info from the user profile works as expected."""
     agreement_json: dict = MhrServiceAgreement.get_agreement_profile(account_id, username)
     if has_results:
         assert agreement_json
-        assert 'acceptAgreementRequired' in agreement_json and not agreement_json.get('acceptAgreementRequired')
+        if has_agreement:
+            assert agreement_json.get('acceptAgreementRequired')
+        else:
+            assert 'acceptAgreementRequired' in agreement_json and not agreement_json.get('acceptAgreementRequired')
         assert agreement_json.get('accepted')
         assert agreement_json.get('version')
         assert agreement_json.get('acceptedDateTime')
