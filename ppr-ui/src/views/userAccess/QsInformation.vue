@@ -81,10 +81,12 @@ export default defineComponent({
     })
 
     const updateQsInfoValid = (isValid: boolean): void => {
+      localState.showErrors = !isValid
       setMhrQsValidation({ key: 'qsInformationValid', value: isValid })
     }
 
-    watch(() => props.validate, () => {
+    watch(() => props.validate, (val: boolean) => {
+      localState.showErrors = val
       qsInformationRef.value?.validatePartyForm()
     })
 

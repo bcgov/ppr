@@ -55,6 +55,7 @@
           :navConfig="MhrUserAccessButtonFooterConfig"
           :currentStepName="$route.name"
           :disableNav="!getMhrSubProduct"
+          :baseDialogOptions="incompleteApplicationDialog"
           @navigationDisabled="validateQsSelect = $event"
           @error="emitError($event)"
           @submit="submit()"
@@ -65,7 +66,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, reactive, toRefs, watch } from 'vue-demi'
+import { defineComponent, nextTick, onMounted, reactive, toRefs, watch } from 'vue-demi'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { getFeatureFlag } from '@/utils'
@@ -74,8 +75,9 @@ import QsSelectAccess from '@/views/userAccess/QsSelectAccess.vue'
 import { ButtonFooter, Stepper } from '@/components/common'
 import BaseDialog from '@/components/dialogs/BaseDialog.vue'
 import { MhrUserAccessButtonFooterConfig } from '@/resources/buttonFooterConfig'
-import { useAuth, useNavigation } from '@/composables'
+import { useAuth, useNavigation, useUserAccess } from '@/composables'
 import { ErrorIF } from '@/interfaces'
+import { incompleteApplicationDialog } from '@/resources/dialogOptions'
 
 export default defineComponent({
   name: 'UserAccess',
@@ -100,6 +102,7 @@ export default defineComponent({
     const { isAuthenticated } = useAuth()
     const { isRouteName, goToDash, route } = useNavigation()
     const { getMhrSubProduct, getUserAccessSteps } = storeToRefs(useStore())
+    const { isValid, submitQsApplication } = useUserAccess()
 
     const localState = reactive({
       dataLoaded: false,
@@ -126,9 +129,15 @@ export default defineComponent({
       emit('error', error)
     }
 
-    const submit = (): void => {
+    const submit = async (): Promise<void> => {
       localState.validateQsApplication = true
-      // Do Filing Stuff Here
+      await nextTick()
+
+      if (isValid.value) {
+        localState.submitting = true
+        await submitQsApplication()
+        localState.submitting = false
+      }
     }
 
     watch(() => route.name, () => {
@@ -142,6 +151,7 @@ export default defineComponent({
       RouteNames,
       getMhrSubProduct,
       getUserAccessSteps,
+      incompleteApplicationDialog,
       MhrUserAccessButtonFooterConfig,
       ...toRefs(localState)
     }

@@ -5,7 +5,14 @@ import { StatusCodes } from 'http-status-codes'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 
 // Interfaces, Enums
-import { AccountProductCodes, AccountProductMemberships, AccountProductRoles, AccountTypes } from '@/enums'
+import {
+  AccountProductCodes,
+  AccountProductMemberships,
+  AccountProductRoles,
+  AccountTypes,
+  ProductCode,
+  MhrSubTypes
+} from '@/enums'
 import {
   AccountProductSubscriptionIF, AddressIF, PartyIF, SearchPartyIF, UserProductSubscriptionIF
 } from '@/interfaces'
@@ -213,6 +220,43 @@ export async function fetchAccountProducts (accountId: number): Promise<Array<Us
     })
     .catch(error => {
       throw new Error('Error fetching account products, status code = ' +
+        error?.response?.status?.toString() || StatusCodes.NOT_FOUND.toString())
+    })
+}
+
+/**
+ * Request auth product access
+ * If requested type requires review, will create a Staff Task in Auth Web.
+ *
+ * @param productCode The specified auth product code
+ */
+export async function requestProductAccess (productCode: ProductCode): Promise<any> {
+  const currentAccount = sessionStorage.getItem(SessionStorageKeys.CurrentAccount)
+  const accountInfo = JSON.parse(currentAccount)
+  const accountId = accountInfo.id
+
+  const config = {
+    baseURL: sessionStorage.getItem(SessionStorageKeys.AuthApiUrl),
+    headers: { Accept: 'application/json' }
+  }
+
+  const payload = {
+    subscriptions: [{
+      productCode: productCode,
+      externalSourceId: accountId.toString()
+    }]
+  }
+
+  return axios.post(`orgs/${accountId}/products`, payload, config)
+    .then(response => {
+      const data: UserProductSubscriptionIF[] = response?.data as Array<UserProductSubscriptionIF>
+      if (!data) {
+        throw new Error('Invalid API response')
+      }
+      return data
+    })
+    .catch(error => {
+      throw new Error('Error requesting account product, status code = ' +
         error?.response?.status?.toString() || StatusCodes.NOT_FOUND.toString())
     })
 }

@@ -12,7 +12,7 @@ import {
   MhrDraftApiIF,
   RegistrationSortIF,
   MhrDraftIF,
-  MhrManufacturerInfoIF
+  MhrManufacturerInfoIF, PartyIF, MhrQsPayloadIF
 } from '@/interfaces'
 import { APIMhrTypes, ErrorCategories, ErrorCodes } from '@/enums'
 import { useSearch } from '@/composables/useSearch'
@@ -723,6 +723,22 @@ export async function getMhrManufacturerInfo (): Promise<MhrManufacturerInfoIF> 
     .get<MhrManufacturerInfoIF>('manufacturers', getDefaultConfig())
     .then(response => {
       const data: MhrManufacturerInfoIF = response?.data
+      if (!data) {
+        throw new Error('Invalid API response')
+      }
+      return data
+    })
+}
+
+/**
+ * Request creation of a Qualified Supplier in MHR
+ * @param payload The request payload containing the qualified supplier application information
+ */
+export async function createQualifiedSupplier (payload: MhrQsPayloadIF): Promise<MhrQsPayloadIF> {
+  return axios
+    .post<MhrQsPayloadIF>('qualified-suppliers', payload, getDefaultConfig())
+    .then(response => {
+      const data: MhrQsPayloadIF = response?.data
       if (!data) {
         throw new Error('Invalid API response')
       }

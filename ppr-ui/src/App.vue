@@ -79,23 +79,23 @@ import {
   getFees,
   getFeatureFlag,
   getKeycloakRoles,
-  getProductSubscription,
   getPPRUserSettings,
   getSbcFromAuth,
   updateLdUser,
-  fetchAccountProducts,
   axios,
   parsePayDetail
 } from '@/utils'
 import { FeeCodes } from '@/composables/fees/enums'
 import {
-  AccountProductCodes, AccountProductMemberships, AccountProductRoles, APIRegistrationTypes,
+  APIRegistrationTypes,
   ErrorCategories,
-  ErrorCodes, ProductStatus, RegistrationFlowType, RouteNames, ProductCode
+  ErrorCodes,
+  RegistrationFlowType,
+  RouteNames,
+  ProductCode
 } from '@/enums'
 import {
-  AccountProductSubscriptionIF, DialogOptionsIF, // eslint-disable-line
-  ErrorIF, RegistrationTypeIF, UserInfoIF, UserSettingsIF // eslint-disable-line
+  DialogOptionsIF, ErrorIF, UserInfoIF, UserSettingsIF // eslint-disable-line
 } from '@/interfaces'
 import { useAuth, useNavigation } from '@/composables'
 
@@ -114,17 +114,14 @@ export default defineComponent({
     const route = useRoute()
     const router = useRouter()
     const { goToDash, navigateTo } = useNavigation()
-    const { isAuthenticated } = useAuth()
+    const { isAuthenticated, loadAccountProductSubscriptions, initializeUserProducts } = useAuth()
     const {
       // Actions
       setRoleSbc,
       setUserInfo,
       setAuthRoles,
       setRegistrationNumber,
-      setAccountInformation,
-      setUserProductSubscriptions,
-      setAccountProductSubscription,
-      setUserProductSubscriptionsCodes
+      setAccountInformation
     } = useStore()
     const {
       // Getters
@@ -414,17 +411,7 @@ export default defineComponent({
         setUserInfo(userInfo)
 
         if (getAccountId.value) {
-          const subscribedProducts = await fetchAccountProducts((getAccountId.value))
-          if (subscribedProducts) {
-            setUserProductSubscriptions(subscribedProducts)
-
-            const activeProductCodes = subscribedProducts
-              .filter(product => product.subscriptionStatus === ProductStatus.ACTIVE)
-              .map(product => product.code)
-            setUserProductSubscriptionsCodes(activeProductCodes)
-          } else {
-            throw new Error('Unable to get Products for the User')
-          }
+          await initializeUserProducts()
         }
       } else {
         message = 'Unable to get user info.'
@@ -465,23 +452,6 @@ export default defineComponent({
         const accountInfo = JSON.parse(currentAccount)
         setAccountInformation(accountInfo)
       }
-    }
-
-    /** Gets product subscription autorizations (for now just RPPR) and stores it. */
-    const loadAccountProductSubscriptions = async (): Promise<any> => {
-      let rpprSubscription = {} as AccountProductSubscriptionIF
-      if (isRoleStaff.value) {
-        rpprSubscription = {
-          [AccountProductCodes.RPPR]: {
-            membership: AccountProductMemberships.MEMBER,
-            roles: [AccountProductRoles.PAY, AccountProductRoles.SEARCH]
-          }
-        }
-        if (isRoleStaffBcol.value || isRoleStaffReg.value) {
-          rpprSubscription.RPPR.roles.push(AccountProductRoles.EDIT)
-        }
-      } else rpprSubscription = await getProductSubscription(AccountProductCodes.RPPR)
-      setAccountProductSubscription(rpprSubscription)
     }
 
     /** Updates Launch Darkly with user info. */

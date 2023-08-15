@@ -49,11 +49,12 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
+import { defineComponent, reactive, toRefs, watch } from 'vue-demi'
 import { AccountInfo, CautionBox } from '@/components/common'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { ConfirmRequirements, Authorization, QsInformationReview } from '@/components/userAccess/ReviewConfirm'
+import { useUserAccess } from '@/composables'
 
 export default defineComponent({
   name: 'QsReviewConfirm',
@@ -61,31 +62,11 @@ export default defineComponent({
   props: { validateReview: { type: Boolean, default: false } },
   setup () {
     const { setMhrQsValidation } = useStore()
-    const {
-      getMhrQsAuthorization,
-      getMhrQsIsRequirementsConfirmed,
-      getMhrQsSubmittingParty,
-      getMhrUserAccessValidation
-    } = storeToRefs(useStore())
+    const { getMhrQsSubmittingParty } = storeToRefs(useStore())
+    const { isValid } = useUserAccess()
+    const localState = reactive({})
 
-    const localState = reactive({
-      isAuthorizationValid: computed(() => {
-        return (
-          getMhrQsAuthorization.value.isAuthorizationConfirmed &&
-          getMhrQsAuthorization.value.legalName.trim() !== '' &&
-          getMhrQsAuthorization.value.legalName.length <= 150
-        )
-      }),
-      isValid: computed((): boolean => {
-        return (
-          getMhrUserAccessValidation.value.qsInformationValid &&
-          getMhrQsIsRequirementsConfirmed.value &&
-          localState.isAuthorizationValid
-        )
-      })
-    })
-
-    watch(() => localState.isValid, (val: boolean) => {
+    watch(() => isValid.value, (val: boolean) => {
       setMhrQsValidation({ key: 'qsReviewConfirmValid', value: val })
     })
 

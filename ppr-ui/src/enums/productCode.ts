@@ -5,5 +5,8 @@ export enum ProductCode {
   PPR = 'PPR',
   MHR = 'MHR',
   RPT = 'RPT',
-  VS = 'VS'
+  VS = 'VS',
+  LAWYERS_NOTARIES = 'MHR_QSLN',
+  MANUFACTURER = 'MHR_QSHM',
+  DEALERS = 'MHR_QSHD'
 }

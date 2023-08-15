@@ -5,6 +5,7 @@
     </v-overlay>
 
     <BaseDialog
+      :closeAction="true"
       :setOptions="cancelOptions"
       :setDisplay="showCancelDialog"
       @proceed="handleDialogResp($event)"

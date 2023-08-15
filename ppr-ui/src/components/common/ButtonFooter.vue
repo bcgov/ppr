@@ -6,10 +6,12 @@
     </v-overlay>
 
     <BaseDialog
+      :closeAction="true"
       :setOptions="options"
       :setDisplay="showCancelDialog"
       @proceed="handleDialogResp($event)"
     />
+
     <StaffPaymentDialog
       attach=""
       class="mt-10"
@@ -90,7 +92,7 @@ import { BaseDialog } from '@/components/dialogs'
 import StaffPaymentDialog from '@/components/dialogs/StaffPaymentDialog.vue'
 import {
   // eslint-disable-next-line no-unused-vars
-  ButtonConfigIF, DraftIF, ErrorIF, FinancingStatementIF, RegTableNewItemI, StateModelIF
+  ButtonConfigIF, DialogOptionsIF, DraftIF, ErrorIF, FinancingStatementIF, RegTableNewItemI, StateModelIF
 } from '@/interfaces'
 import { unsavedChangesDialog } from '@/resources/dialogOptions'
 import { useNavigation, useNewMhrRegistration } from '@/composables'
@@ -126,6 +128,10 @@ export default defineComponent({
     isMhr: {
       type: Boolean,
       default: false
+    },
+    baseDialogOptions: {
+      type: Object as () => DialogOptionsIF,
+      default: () => null
     }
   },
   setup (props, { emit }) {
@@ -148,7 +154,7 @@ export default defineComponent({
     const { mhrDraftHandler } = useNewMhrRegistration()
 
     const localState = reactive({
-      options: unsavedChangesDialog,
+      options: props.baseDialogOptions as DialogOptionsIF || unsavedChangesDialog,
       showCancelDialog: false,
       staffPaymentDialogDisplay: false,
       staffPaymentDialogOptions: {
@@ -156,7 +162,7 @@ export default defineComponent({
         cancelText: 'Cancel',
         title: 'Staff Payment',
         label: ''
-      },
+      } as DialogOptionsIF,
       submitting: false,
       isCertifyValid: computed((): boolean => {
         return props.certifyValid

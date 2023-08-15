@@ -1,6 +1,6 @@
 <template>
   <div id="qs-access-btn">
-    <template v-if="isRoleQualifiedSupplier">
+    <template v-if="hasActiveQsAccess">
       <a class="approved-qs-link">
         <v-icon left color="primary" class="fs-21 mt-n1">mdi-account-lock</v-icon>
         <span class="primary--text fs-13">Approved Qualified Supplier</span>
@@ -12,13 +12,13 @@
         class="request-qs-tooltip"
         content-class="top-tooltip pa-4 mr-2"
         transition="fade-transition"
-        :disabled="!isPendingQsAccess"
+        :disabled="!hasPendingQsAccess"
       >
         <template v-slot:activator="{ on }">
           <a
             v-on="on"
             class="request-qs-link"
-            :class="{'pending-qs-link': isPendingQsAccess || isUserAccessRoute }"
+            :class="{'pending-qs-link': hasPendingQsAccess || isUserAccessRoute }"
             @click="goToUserAccess()"
           >
             <v-icon left color="primary" class="fs-21 mt-n1">mdi-account-lock</v-icon>
@@ -41,15 +41,15 @@ import { useUserAccess } from '@/composables'
 export default defineComponent({
   name: 'QsAccessBtn',
   setup () {
-    const { isRoleQualifiedSupplier, isRoleStaffReg } = storeToRefs(useStore())
-    const { isPendingQsAccess, isUserAccessRoute, goToUserAccess } = useUserAccess()
+    const { isRoleStaffReg } = storeToRefs(useStore())
+    const { hasActiveQsAccess, hasPendingQsAccess, isUserAccessRoute, goToUserAccess } = useUserAccess()
 
     return {
       goToUserAccess,
       isRoleStaffReg,
-      isPendingQsAccess,
-      isUserAccessRoute,
-      isRoleQualifiedSupplier
+      hasActiveQsAccess,
+      hasPendingQsAccess,
+      isUserAccessRoute
     }
   }
 })
