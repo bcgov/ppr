@@ -64,7 +64,7 @@
       <Attention
         sectionId="mhr-attention"
         hasWiderInput
-        :intialValue="getMhrAttentionReference"
+        :initialValue="getMhrAttentionReference"
         :sectionNumber="3"
         :validate="validateRefNum"
         @isAttentionValid="setAttentionValidation"

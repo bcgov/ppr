@@ -5,7 +5,7 @@ import { useStore } from '../../src/store/store'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import { UnitNoteContentInfo, UnitNoteHeaderInfo, UnitNotePanel, UnitNotePanels } from '../../src/components/unitNotes'
 import { UnitNoteDocTypes, UnitNoteStatusTypes } from '../../src/enums'
-import { mockUnitNotes, mockedUnitNotes2 } from './test-data'
+import { mockUnitNotes, mockedUnitNotes2, mockedUnitNotes3 } from './test-data'
 import { BaseAddress } from '@/composables/address'
 import { pacificDate } from '@/utils'
 import { UnitNotesInfo } from '@/resources/unitNotes'
@@ -336,5 +336,23 @@ describe('UnitNotePanels', () => {
 
     // No dropdown menu
     expect(panel3.find('.menu-drop-down-icon').exists()).toBe(false)
+  })
+
+  it('displays the correct text when there is no person giving notice', async () => {
+    const wrapper = createComponent(mockedUnitNotes3)
+    // First panel is an active public note with no person giving notice
+    const panel = wrapper.find('.unit-note-panel')
+
+    // Expand panel
+    const panelShowBtn = panel.find('.unit-note-menu-btn')
+    await panelShowBtn.trigger('click')
+    await nextTick()
+
+    // Check the panel content
+    const content = panel.findComponent(UnitNoteContentInfo)
+    expect(content.exists()).toBe(true)
+
+    expect(content.find('#persons-giving-notice-table').exists()).toBe(false)
+    expect(content.find('#no-person-giving-notice').exists()).toBe(true)
   })
 })

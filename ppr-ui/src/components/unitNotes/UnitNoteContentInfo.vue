@@ -1,7 +1,7 @@
 <template>
   <!-- Note Information-->
   <div>
-    <v-row v-if="note.effectiveDateTime" no-gutters class="pt-3">
+    <v-row v-if="note.effectiveDateTime" no-gutters class="my-7">
       <v-col cols="3">
         <h3 class="fs-14">Effective Date and Time</h3>
       </v-col>
@@ -12,7 +12,7 @@
       </v-col>
     </v-row>
 
-    <v-row v-if="note.expiryDateTime" no-gutters class="pt-3">
+    <v-row v-if="note.expiryDateTime" no-gutters class="my-7">
       <v-col cols="3">
         <h3 class="fs-14">Expiry Date and Time</h3>
       </v-col>
@@ -23,7 +23,7 @@
       </v-col>
     </v-row>
 
-    <v-row v-if="note.remarks" no-gutters class="mt-1 py-3">
+    <v-row v-if="note.remarks" no-gutters class="my-7">
       <v-col cols="3">
         <h3 class="fs-14">Remarks</h3>
       </v-col>
@@ -40,12 +40,17 @@
     />
 
     <!-- Person Giving Notice Table -->
-    <v-row no-gutters class="pt-2">
+    <v-row no-gutters class="mt-7">
       <v-col cols="3">
-        <h3 class="py-2">Person Giving Notice</h3>
+        <h3 class="fs-14">Person Giving Notice</h3>
+      </v-col>
+      <v-col v-if="!note.givingNoticeParty" cols="9">
+        <span id="no-person-giving-notice" class="info-text fs-14">
+          There is not a Person Giving Notice for this unit note.
+        </span>
       </v-col>
     </v-row>
-    <v-row no-gutters>
+    <v-row v-if="note.givingNoticeParty" no-gutters>
       <v-col>
         <v-simple-table
           id="persons-giving-notice-table"
@@ -66,7 +71,7 @@
             </thead>
 
             <!-- Table Body -->
-            <tbody v-if="note.givingNoticeParty">
+            <tbody>
               <tr>
                 <td class="pl-0">
                   <div class="mr-2">
@@ -81,8 +86,8 @@
                 <td>
                   <BaseAddress :value="note.givingNoticeParty.address"/>
                 </td>
-                <td>{{ note.givingNoticeParty.emailAddress }}</td>
-                <td>{{ note.givingNoticeParty.phoneNumber }}</td>
+                <td>{{ note.givingNoticeParty.emailAddress || '(Not Entered)' }}</td>
+                <td>{{ note.givingNoticeParty.phoneNumber || '(Not Entered)' }}</td>
               </tr>
             </tbody>
           </template>
