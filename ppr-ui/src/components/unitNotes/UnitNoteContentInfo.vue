@@ -45,7 +45,7 @@
         <h3 class="fs-14">Person Giving Notice</h3>
       </v-col>
       <v-col v-if="!note.givingNoticeParty" cols="9">
-        <span class="info-text fs-14">
+        <span id="no-person-giving-notice" class="info-text fs-14">
           There is not a Person Giving Notice for this unit note.
         </span>
       </v-col>

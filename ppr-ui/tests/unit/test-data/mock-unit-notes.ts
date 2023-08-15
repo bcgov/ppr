@@ -196,7 +196,7 @@ export const mockedUnitNotes2 = [
     documentDescription: 'Public Note',
     createDateTime: '2023-07-30T09:00:00Z',
     effectiveDateTime: '2023-12-01T12:00:00Z',
-    expiryDateTime: '2023-13-30T23:59:59Z',
+    expiryDateTime: '2024-01-30T23:59:59Z',
     remarks: 'This is a public Note.',
     givingNoticeParty: {
       businessName: 'HALSTON MODULAR HOMES LTD.',
@@ -258,6 +258,21 @@ export const mockedUnitNotes2 = [
       phoneNumber: '2508289998',
       emailAddress: 'testing@email.com'
     },
+    status: UnitNoteStatusTypes.ACTIVE,
+    destroyed: false
+  }
+]
+
+export const mockedUnitNotes3 = [
+  {
+    documentType: UnitNoteDocTypes.PUBLIC_NOTE,
+    documentId: '1',
+    documentRegistrationNumber: '123456',
+    documentDescription: 'Public Note',
+    createDateTime: '2023-07-30T09:00:00Z',
+    effectiveDateTime: '2023-12-01T12:00:00Z',
+    expiryDateTime: '2024-01-30T23:59:59Z',
+    remarks: 'This is a public Note.',
     status: UnitNoteStatusTypes.ACTIVE,
     destroyed: false
   }
