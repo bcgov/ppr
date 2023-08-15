@@ -256,7 +256,7 @@ export default defineComponent({
       setAddCollateral, setAddSecuredPartiesAndDebtors, setUnsavedChanges, setRegTableDraftsBaseReg,
       setRegTableDraftsChildReg, setRegTableTotalRowCount, setRegTableBaseRegs, setRegTableSortPage,
       setRegTableSortHasMorePages, setRegTableSortOptions, setUserSettings, resetRegTableData, setMhrInformation,
-      setMhrTableHistory, setMhrDraftNumber, setEmptyMhr
+      setMhrTableHistory, setEmptyMhr
     } = useStore()
     const {
       // Getters
@@ -382,15 +382,16 @@ export default defineComponent({
     })
 
     /** Set registration type in the store and route to the first registration step */
-    const startNewRegistration = async (selectedRegistration: RegistrationTypeIF, isMhDraft = false): Promise<void> => {
+    const startNewRegistration = async (selectedRegistration: RegistrationTypeIF, draftNumber: string = ''):
+       Promise<void> => {
       // Clear store data for MHR
-      if (!isMhDraft) await setEmptyMhr(initNewMhr())
+      await setEmptyMhr({ ...initNewMhr(), draftNumber })
 
       resetNewRegistration(null) // Clear store data from the previous registration.
       setRegistrationType(selectedRegistration)
       setRegTableCollapsed(null)
 
-      if (!isMhDraft && isMhrManufacturerRegistration.value) {
+      if (!draftNumber && isMhrManufacturerRegistration.value) {
         await initNewManufacturerMhr()
       }
 
@@ -654,8 +655,7 @@ export default defineComponent({
     }
 
     const openMhrDraft = async (mhrInfo: MhrDraftIF): Promise<void> => {
-      await setMhrDraftNumber(mhrInfo.draftNumber)
-      await startNewRegistration(MhrRegistrationType, true)
+      await startNewRegistration(MhrRegistrationType, mhrInfo.draftNumber)
     }
 
     const openMhr = async (mhrSummary: MhRegistrationSummaryIF): Promise<void> => {

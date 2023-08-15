@@ -10,8 +10,8 @@ import { createLocalVue, mount, Wrapper } from '@vue/test-utils'
 import { MhrReviewConfirm } from '@/views'
 import { HomeLocationReview, HomeOwnersReview,
   SubmittingPartyReview, YourHomeReview } from '@/components/mhrRegistration/ReviewConfirm'
-import { AccountInfo, Attention, CautionBox, CertifyInformation, 
-  ContactUsToggle, FolioOrReferenceNumber } from '@/components/common'
+import { AccountInfo, Attention, CautionBox, CertifyInformation,
+  ContactUsToggle, FolioOrReferenceNumber, FormField } from '@/components/common'
 import { HomeTenancyTypes, RouteNames } from '@/enums'
 import mockRouter from './MockRouter'
 import { mockedFractionalOwnership, mockedPerson } from './test-data/mock-mhr-registration'
@@ -20,7 +20,7 @@ import { getTestId } from './utils'
 import { HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
 import { MhrCompVal, MhrSectVal } from '../../src/composables/mhrRegistration/enums'
 import { MhrRegistrationType } from '@/resources'
-import { mockedManufacturerAuthRoles } from './test-data'
+import { mockedAccountInfo, mockedManufacturerAuthRoles } from './test-data'
 import { defaultFlagSet } from '@/utils'
 import { StaffPayment } from '@bcrs-shared-components/staff-payment'
 import { HomeSections } from '@/components/mhrRegistration'
@@ -223,6 +223,8 @@ describe('Mhr Manufacturer Registration Review and Confirm', () => {
   })
 
   it('renders and displays the Mhr Registration View', async () => {
+    wrapper.vm.accountInfo = mockedAccountInfo
+    await nextTick()
     expect(wrapper.findComponent(MhrReviewConfirm).exists()).toBe(true)
     expect(wrapper.findComponent(YourHomeReview).exists()).toBe(true)
     expect(wrapper.findComponent(HomeOwnersReview).exists()).toBe(true)
@@ -236,5 +238,16 @@ describe('Mhr Manufacturer Registration Review and Confirm', () => {
 
     // Should not exist for manufacturer registration
     expect(wrapper.findComponent(StaffPayment).exists()).toBe(false)
+  })
+
+  it('correctly set attention and folio', async () => {
+    store.setMhrAttentionReference('TEST 123')
+    store.setFolioOrReferenceNumber('TEST 245')
+    wrapper = createComponent()
+    await nextTick()
+    const attention = wrapper.findComponent(Attention)
+    const folio = wrapper.findComponent(FolioOrReferenceNumber)
+    expect((attention.find(FormField) as Wrapper<any>).vm.inputModel).toBe('TEST 123')
+    expect((folio.find(FormField) as Wrapper<any>).vm.inputModel).toBe('TEST 245')
   })
 })

@@ -42,6 +42,7 @@
       <template  v-if="isMhrManufacturerRegistration">
         <!-- Submitting Party based on Account-->
         <AccountInfo
+          v-if="accountInfo"
           class="mt-15"
           title="Submtting Party for this Registration"
           :tooltipContent="'The default Submitting Party is based on your BC Registries user account information. ' +
@@ -53,7 +54,7 @@
         <section id="mhr-review-confirm-attention" class="mt-15">
           <Attention
             sectionId="mhr-review-confirm-attention"
-            :intialValue="getMhrAttentionReference"
+            :initialValue="getMhrAttentionReference"
             :sectionNumber="1"
             :validate="isValidatingApp"
             @isAttentionValid="setAttentionValidation"
