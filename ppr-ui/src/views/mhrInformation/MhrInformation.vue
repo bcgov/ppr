@@ -147,7 +147,7 @@
                   <Attention
                     v-if="isRoleStaffReg"
                     sectionId="transfer-ref-num-section"
-                    :intialValue="getMhrTransferAttentionReference"
+                    :initialValue="getMhrTransferAttentionReference"
                     :sectionNumber="2"
                     :validate="!getInfoValidation('isRefNumValid')"
                     @isAttentionValid="setValidation('isRefNumValid', $event)"
