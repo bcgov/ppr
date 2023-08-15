@@ -45,6 +45,8 @@ class UserProfile(db.Model):
     registrations_table = db.Column('registrations_table', db.JSON, nullable=True)
     # Additional user account miscellaneous preferences: UI can pass whatever settings it wants; API stores as is.
     misc_preferences = db.Column('misc_preferences', db.JSON, nullable=True)
+    # Initially stored MHR service agreement required/accepted for qualified suppliers. Read only, set by the MHR API.
+    service_agreements = db.Column('service_agreements', db.JSON, nullable=True)
 
     # parent keys
 

@@ -12,9 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """API endpoints for maintaining user profile UI settings."""
-
 # pylint: disable=too-many-return-statements
-
 from http import HTTPStatus
 
 from flask import request, g, current_app
@@ -23,7 +21,14 @@ from registry_schemas import utils as schema_utils
 
 from ppr_api.exceptions import BusinessException
 from ppr_api.models import User, UserProfile
-from ppr_api.services.authz import is_staff, authorized
+from ppr_api.services.authz import (
+    is_staff,
+    authorized,
+    get_mhr_group,
+    MANUFACTURER_GROUP,
+    QUALIFIED_USER_GROUP,
+    GENERAL_USER_GROUP
+)
 from ppr_api.utils.auth import jwt
 from ppr_api.utils.util import cors_preflight
 from ppr_api.resources import utils as resource_utils
@@ -52,7 +57,6 @@ class UserProfileResource(Resource):
             # Verify request JWT and account ID
             if not authorized(account_id, jwt):
                 return resource_utils.unauthorized_error_response(account_id)
-
             token = g.jwt_oidc_token_info
             current_app.logger.debug(f'Getting user profile for account {account_id} with token: {token}')
 
@@ -65,13 +69,13 @@ class UserProfileResource(Resource):
                 user = User.create_from_jwt_token(token, account_id)
                 user.user_profile = UserProfile.create_from_json(None, user.id)
                 user.user_profile.save()
-
-            return user.user_profile.json, HTTPStatus.OK
+            profile_json = set_service_agreements(jwt, user.user_profile)
+            return profile_json, HTTPStatus.OK
 
         except BusinessException as exception:
             return resource_utils.business_exception_response(exception)
         except Exception as default_exception:   # noqa: B902; return nicer default error
-            current_app.logger.error(f'Get user profile {account_id} failed: ' + repr(default_exception))
+            current_app.logger.error(f'Get user profile {account_id} failed: ' + str(default_exception))
             return resource_utils.default_exception_response(default_exception)
 
     @staticmethod
@@ -114,7 +118,7 @@ class UserProfileResource(Resource):
         except BusinessException as exception:
             return resource_utils.business_exception_response(exception)
         except Exception as default_exception:   # noqa: B902; return nicer default error
-            current_app.logger.error(f'Get user profile {account_id} failed: ' + repr(default_exception))
+            current_app.logger.error(f'Get user profile {account_id} failed: ' + str(default_exception))
             return resource_utils.default_exception_response(default_exception)
 
 
@@ -127,3 +131,14 @@ def bypass_validation(request_json) -> bool:
                 'defaultTableFilters' not in request_json:
             return True
     return False
+
+
+def set_service_agreements(jwt_, profile: UserProfile) -> dict:
+    """For MHR user requests conditionally set service agreement acceptance required."""
+    profile_json: dict = profile.json
+    if get_mhr_group(jwt_) in (MANUFACTURER_GROUP, QUALIFIED_USER_GROUP, GENERAL_USER_GROUP):
+        if profile.service_agreements and 'acceptAgreementRequired' in profile.service_agreements:
+            profile_json['acceptAgreementRequired'] = profile.service_agreements.get('acceptAgreementRequired')
+        else:
+            profile_json['acceptAgreementRequired'] = False
+    return profile_json
