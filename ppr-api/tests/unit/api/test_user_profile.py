@@ -20,8 +20,16 @@ from http import HTTPStatus
 
 import pytest
 
-from ppr_api.services.authz import STAFF_ROLE, PPR_ROLE, COLIN_ROLE
-from tests.unit.services.utils import create_header_account, create_header
+from ppr_api.services.authz import (
+    STAFF_ROLE,
+    PPR_ROLE,
+    COLIN_ROLE,
+    REGISTER_MH,
+    TRANSFER_SALE_BENEFICIARY,
+    REQUEST_TRANSPORT_PERMIT,
+    TRANSFER_DEATH_JT
+)
+from tests.unit.services.utils import create_header_account, create_header, create_header_account_idp
 
 
 # Properties can be anything, using show* for testing.
@@ -67,6 +75,43 @@ TEST_DATA_UPDATE = [
     ('Valid data but unauthorized', False, True, HTTPStatus.UNAUTHORIZED, COLIN_ROLE, TEST_UPDATE_JSON),
     ('Schema validation error', False, True, HTTPStatus.BAD_REQUEST, PPR_ROLE, TEST_INVALID_JSON)
 ]
+MANUFACTURER_ROLES = [PPR_ROLE, REGISTER_MH, TRANSFER_SALE_BENEFICIARY, REQUEST_TRANSPORT_PERMIT]
+LAWYER_ROLES = [PPR_ROLE, TRANSFER_SALE_BENEFICIARY, TRANSFER_DEATH_JT]
+DEALER_ROLES = [PPR_ROLE, REQUEST_TRANSPORT_PERMIT]
+# testdata pattern is ({description}, {account_id}, {idp_userid}, {response status}, {roles}, {agreement_required})
+TEST_DATA_AGREEMENT = [
+    ('PPR USER', None, None, HTTPStatus.OK, [PPR_ROLE], False),
+    ('MHR manufacturer not required', '2617', '190000000', HTTPStatus.OK, MANUFACTURER_ROLES, False),
+    ('MHR manufacturer required', '3026', '190000001', HTTPStatus.OK, MANUFACTURER_ROLES, True),
+    ('MHR lawyer not required', '2617', '190000000', HTTPStatus.OK, LAWYER_ROLES, False),
+    ('MHR lawyer required', '3026', '190000001', HTTPStatus.OK, LAWYER_ROLES, True),
+    ('MHR dealer not required', '2617', '190000000', HTTPStatus.OK, DEALER_ROLES, False),
+    ('MHR dealer required', '3026', '190000001', HTTPStatus.OK, DEALER_ROLES, True)
+]
+
+
+@pytest.mark.parametrize('desc,account_id,idp_userid,status,roles,agreement_required', TEST_DATA_AGREEMENT)
+def test_get_user_profile_agreement(session, client, jwt, desc, account_id, idp_userid, status, roles,
+                                    agreement_required):
+    """Assert that a get user profile conditionally returns the expected MHR service agreement information."""
+    # setup
+    headers = None
+    if account_id:
+        headers = create_header_account_idp(jwt, roles, idp_userid, 'test-user', account_id)
+    else:
+        headers = create_header_account(jwt, roles)
+
+    # test
+    rv = client.get('/api/v1/user-profile', headers=headers)
+    # check
+    assert rv.status_code == status
+    if rv.status_code == HTTPStatus.OK:
+        response_data = rv.json
+        assert response_data
+        if agreement_required:
+            assert response_data.get('acceptAgreementRequired')
+        else:
+            assert not response_data.get('acceptAgreementRequired')
 
 
 @pytest.mark.parametrize('desc,staff,include_account,status,role', TEST_DATA)

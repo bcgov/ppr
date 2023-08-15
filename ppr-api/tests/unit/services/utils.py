@@ -18,7 +18,7 @@ from typing import List
 STAFF_ROLE = 'staff'
 
 
-def helper_create_jwt(jwt_manager, roles: List[str] = [], username: str = 'test-user'):
+def helper_create_jwt(jwt_manager, roles: List[str] = [], username: str = 'test-user', idp_userid: str = '123'):
     """Create a jwt bearer token with the correct keys, roles and username."""
     token_header = {
         'alg': 'RS256',
@@ -34,7 +34,7 @@ def helper_create_jwt(jwt_manager, roles: List[str] = [], username: str = 'test-
         'jti': 'flask-jwt-oidc-test-support',
         'typ': 'Bearer',
         'username': f'{username}',
-        'idp_userid': '123',
+        'idp_userid': f'{idp_userid}',
         'loginSourcee': 'IDIR',
         'realm_access': {
             'roles': [] + roles
@@ -63,6 +63,17 @@ def create_header_account(jwt_manager,
                           account_id: str = 'PS12345', **kwargs):
     """Return a header containing a JWT bearer token and an account ID."""
     token = helper_create_jwt(jwt_manager, roles=roles, username=username)
+    headers = {**kwargs, **{'Authorization': 'Bearer ' + token}, **{'Account-Id': account_id}}
+    return headers
+
+
+def create_header_account_idp(jwt_manager,
+                              roles: List[str] = [],
+                              idp_userid: str = '123',
+                              username: str = 'test-user',
+                              account_id: str = 'PS12345', **kwargs):
+    """Return a header containing a JWT bearer token and an account ID."""
+    token = helper_create_jwt(jwt_manager, roles=roles, username=username, idp_userid=idp_userid)
     headers = {**kwargs, **{'Authorization': 'Bearer ' + token}, **{'Account-Id': account_id}}
     return headers
 

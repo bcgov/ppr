@@ -106,6 +106,11 @@ TEST_TOKEN_DATA = [
     (TOKEN1),
     (TOKEN2)
 ]
+# testdata pattern is ({id}, {agreement_required})
+TEST_MHR_AGREEMENT_DATA = [
+    (190000000, False),
+    (190000001, True)
+]
 
 
 @pytest.mark.parametrize('json_data', TEST_VALID_DATA)
@@ -269,3 +274,15 @@ def test_update_user_profile(session, client, jwt):
     assert save_json['selectConfirmationDialog'] == COMBO_JSON['selectConfirmationDialog']
     assert save_json['registrationsTable'] == COMBO_JSON['registrationsTable']
     assert save_json['miscellaneousPreferences'] == COMBO_JSON['miscellaneousPreferences']
+
+
+@pytest.mark.parametrize('id,agreement_required', TEST_MHR_AGREEMENT_DATA)
+def test_find_service_agreements(session, client, jwt, id, agreement_required):
+    """Assert that getting UserProfile object service agreement information works as expected."""
+    profile: UserProfile = UserProfile.find_by_id(id)
+    if profile:
+        if agreement_required:
+            assert profile.service_agreements
+            assert profile.service_agreements.get('acceptAgreementRequired')
+        else:
+            assert not profile.service_agreements or not profile.service_agreements.get('acceptAgreementRequired')

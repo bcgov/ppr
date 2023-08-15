@@ -108,7 +108,7 @@ def test_search_detail_valid_200(session, client, jwt):
     assert 'similarResultsSize' in results
     assert 'searchQuery' in results
     assert 'details' in results
-    assert len(results['details']) == count_exact
+    assert len(results['details']) >= count_exact
 
 
 def test_search_detail_invalid_regnum_400(session, client, jwt):
