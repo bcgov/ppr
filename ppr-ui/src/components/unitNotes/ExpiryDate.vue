@@ -55,7 +55,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onBeforeMount, reactive, ref, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue-demi'
 import { EffectiveDateTypes } from '@/enums/'
 import { createDateFromPacificTime, localTodayDate } from '@/utils'
 import { ContentIF, FormIF } from '@/interfaces'
@@ -118,11 +118,6 @@ export default defineComponent({
       return createDateFromPacificTime(year, month, day)
     }
 
-    onBeforeMount((): void => {
-      // set todays date as Immediate radio button is selected by default
-      localState.expiryDateTime = new Date().toISOString()
-    })
-
     watch(
       () => props.validate,
       async val => {
@@ -167,7 +162,8 @@ export default defineComponent({
       () => localState.isExpiryDateValid,
       (val: boolean) => {
         emit('isValid', val)
-      }
+      },
+      { immediate: true }
     )
 
     return {
