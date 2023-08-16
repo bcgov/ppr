@@ -46,3 +46,8 @@ export function hasTruthyValue (obj: Object) {
     (value) => !!value && (typeof value === 'object' ? hasTruthyValue(value) : true)
   )
 }
+
+/** Returns the key of specified value */
+export function getKeyByValue (obj, value) {
+  return Object.keys(obj)?.find(key => obj[key] === value) || null
+}

@@ -69,3 +69,25 @@ export function parsePayDetail (rootCause: string): string {
 export function stripChars (string: string): string {
   return string.replace(/[^A-Za-z0-9]/g, '')
 }
+
+/**
+ * @function cleanEmpty
+ *
+ * Cleans the given object.
+ * Deletes properties that has `null`, `undefined`, or `''` as values.
+ *
+ * @typeParam Type - type of object getting passed in
+ * @param obj - The object to be cleaned up
+ * @returns A new Object excluding `null`, `undefined`, or `''` values from the original Object.
+ */
+export function cleanEmpty<Type> (obj:Type): Type {
+  const newObj = {}
+  Object.keys(obj).forEach((key) => {
+    if (obj[key] !== null && typeof obj[key] === 'object') { // getting deep into a nested object
+      newObj[key] = cleanEmpty(obj[key])
+    } else if (!!obj[key] || obj[key] === 0) { // add the key/value when it's not null, undefined, or empty string
+      newObj[key] = obj[key]
+    }
+  })
+  return newObj as Type
+}

@@ -7,11 +7,34 @@
 
     <base-snackbar :setMessage="snackbarMsg" :toggleSnackbar="toggleSnackbar" />
     <div v-if="appReady" class="container pa-0">
+
+      <!-- Qualified Supplier application messages -->
+      <CautionBox
+        v-if="!!qsMsgContent"
+        class="mb-10"
+        setImportantWord="Note"
+        :setAlert="qsMsgContent.status === ProductStatus.REJECTED"
+        :setMsg="qsMsgContent.msg"
+      >
+        <template #prependSLot>
+          <v-icon class="mt-n1 mr-2" :color="qsMsgContent.color">{{ qsMsgContent.icon }}</v-icon>
+        </template>
+
+<!--        FUTURE SLOT: Implement Cancel Btn Functionality in Status Message Ticket  -->
+<!--        <template #appendSLot v-if="qsMsgContent.status != ProductStatus.PENDING">-->
+<!--          <v-btn class="ml-4 mt-n2 mr-n1" icon :ripple="false">-->
+<!--            <v-icon color="primary">mdi-close</v-icon>-->
+<!--          </v-btn>-->
+<!--        </template>-->
+
+      </CautionBox>
+
       <v-row no-gutters>
         <v-col>
           <v-row no-gutters
-                  id="search-header"
-                  :class="[$style['dashboard-title'], 'pl-6', 'pt-3', 'pb-3', 'soft-corners-top']">
+            id="search-header"
+            :class="[$style['dashboard-title'], 'pl-6', 'pt-3', 'pb-3', 'soft-corners-top']"
+          >
             <v-col cols="auto">
               <b v-if="hasPPR && hasMHR">
                 Manufactured Home and Personal Property Registries Search</b>
@@ -84,9 +107,9 @@ import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'v
 import { useRouter } from 'vue2-helpers/vue-router'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
-import { ProductCode, RouteNames } from '@/enums'
+import { ProductCode, ProductStatus, RouteNames } from '@/enums'
 import { getFeatureFlag, searchHistory } from '@/utils'
-import { BaseSnackbar, RegistrationsWrapper } from '@/components/common'
+import { BaseSnackbar, CautionBox, RegistrationsWrapper } from '@/components/common'
 import { SearchHistory } from '@/components/tables'
 import { SearchBar } from '@/components/search'
 import { useSearch } from '@/composables/useSearch'
@@ -96,12 +119,18 @@ import {
   ManufacturedHomeSearchResponseIF, // eslint-disable-line no-unused-vars
   SearchResponseIF // eslint-disable-line no-unused-vars
 } from '@/interfaces'
-import { useAuth, useNavigation } from '@/composables'
+import { useAuth, useNavigation, useUserAccess } from '@/composables'
 
 export default defineComponent({
   name: 'Dashboard',
+  computed: {
+    ProductStatus () {
+      return ProductStatus
+    }
+  },
   components: {
     BaseSnackbar,
+    CautionBox,
     DashboardTabs,
     SearchBar,
     SearchHistory,
@@ -130,6 +159,7 @@ export default defineComponent({
     const router = useRouter()
     const { navigateTo } = useNavigation()
     const { isAuthenticated } = useAuth()
+    const { qsMsgContent } = useUserAccess()
     const {
       // Actions
       setSearchHistory,
@@ -283,6 +313,7 @@ export default defineComponent({
       snackBarEvent,
       setSearchedType,
       setSearchedValue,
+      qsMsgContent,
       getUserServiceFee,
       setSearchDebtorName,
       redirectRegistryHome,

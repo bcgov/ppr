@@ -14,6 +14,7 @@ import {
 import { StaffPaymentIF } from '@bcrs-shared-components/interfaces'
 import { APIMhrTypes, HomeTenancyTypes, HomeLocationTypes, MhApiStatusTypes, HomeCertificationOptions } from '@/enums'
 import {
+  cleanEmpty,
   createMhrDraft,
   fromDisplayPhone,
   getMhrDrafts,
@@ -396,27 +397,6 @@ export const useNewMhrRegistration = () => {
     })
     if (sortOptions?.status !== MhApiStatusTypes.DRAFT) mhrTableData = mhrHistory
     return [...mhRegDrafts, ...mhrTableData]
-  }
-  /**
-   * @function cleanEmpty
-   *
-   * Cleans the given object.
-   * Deletes properties that has `null`, `undefined`, or `''` as values.
-   *
-   * @typeParam Type - type of object getting passed in
-   * @param obj - The object to be cleaned up
-   * @returns A new Object excluding `null`, `undefined`, or `''` values from the original Object.
-   */
-  function cleanEmpty<Type> (obj:Type): Type {
-    const newObj = {}
-    Object.keys(obj).forEach((key) => {
-      if (obj[key] !== null && typeof obj[key] === 'object') { // getting deep into a nested object
-        newObj[key] = cleanEmpty(obj[key])
-      } else if (!!obj[key] || obj[key] === 0) { // add the key/value when it's not null, undefined, or empty string
-        newObj[key] = obj[key]
-      }
-    })
-    return newObj as Type
   }
 
   return {

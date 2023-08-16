@@ -12,7 +12,7 @@ describe('QsAccessBtn', () => {
     const wrapper = mount(QsAccessBtn, {
       data () {
         return {
-          isRoleQualifiedSupplier: true
+          hasActiveQsAccess: true
         }
       },
       store,
@@ -27,7 +27,7 @@ describe('QsAccessBtn', () => {
     const wrapper = mount(QsAccessBtn, {
       data () {
         return {
-          isRoleQualifiedSupplier: false
+          hasActiveQsAccess: false
         }
       },
       store,

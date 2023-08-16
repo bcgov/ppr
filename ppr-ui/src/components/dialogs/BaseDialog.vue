@@ -16,7 +16,7 @@
           </div>
         </v-col>
         <v-col cols="1">
-          <v-btn class="close-btn float-right" color="primary" icon :ripple="false" @click="proceed(false)">
+          <v-btn class="close-btn float-right" color="primary" icon :ripple="false" @click="proceed(closeAction)">
             <v-icon size="32px">mdi-close</v-icon>
           </v-btn>
         </v-col>
@@ -61,6 +61,7 @@ export default defineComponent({
     setDisplay: { type: Boolean, default: false },
     width: { type: String, default: '720px' },
     setOptions: Object as () => DialogOptionsIF,
+    closeAction: { type: Boolean, default: false },
     reverseActionButtons: {
       type: Boolean,
       default: false

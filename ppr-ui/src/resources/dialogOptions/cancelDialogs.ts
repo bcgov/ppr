@@ -36,3 +36,12 @@ export const pidNotFoundDialog: DialogOptionsIF = {
     'assistance.',
   hasContactInfo: true
 }
+
+export const incompleteApplicationDialog: DialogOptionsIF = {
+  acceptText: 'Return to My Application',
+  cancelText: 'Exit and Discard',
+  title: 'Application Not Complete',
+  label: '',
+  text: 'Your application has not been completed. Do you want to exit and discard ' +
+    'this application, or return to your application and complete it?'
+}
