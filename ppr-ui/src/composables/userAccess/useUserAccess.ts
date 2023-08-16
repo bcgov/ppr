@@ -194,7 +194,7 @@ export const useUserAccess = () => {
   const submitQsApplication = async (): Promise<void> => {
     const payload: MhrQsPayloadIF = {
       ...cleanEmpty(getMhrQsInformation.value),
-      authorizationName: getMhrQsAuthorization.value.legalName,
+      legalName: getMhrQsAuthorization.value.legalName,
       phoneNumber: fromDisplayPhone(getMhrQsInformation.value.phoneNumber)
     }
 
