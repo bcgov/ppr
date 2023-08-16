@@ -100,7 +100,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onBeforeMount, reactive, ref, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue-demi'
 import { EffectiveDateTypes, PeriodTypes } from '@/enums/'
 import { createDateFromPacificTime, localTodayDate, pacificDate } from '@/utils'
 import { ContentIF, FormIF } from '@/interfaces'
@@ -183,11 +183,6 @@ export default defineComponent({
       return createDateFromPacificTime(year, month, day, hours, minutes)
     }
 
-    onBeforeMount((): void => {
-      // set todays date as Immediate radio button is selected by default
-      localState.effectiveDate = new Date().toISOString()
-    })
-
     watch(() => props.validate, async (val) => {
       if (val && !localState.isImmediateDateSelected) {
         effectiveDatePicker.value?.validate()
@@ -199,8 +194,8 @@ export default defineComponent({
       () => [localState.effectiveDateType],
       () => {
         if (localState.isImmediateDateSelected) {
-          // today's date radio selected
-          localState.effectiveDate = new Date().toISOString()
+          // Let the API set the effective date and time
+          localState.effectiveDate = ''
         } else if (props.validate) {
           effectiveDatePicker.value?.validate()
           effectiveDateTimeForm.value.validate()

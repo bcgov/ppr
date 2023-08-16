@@ -51,7 +51,7 @@ describe('EffectiveDateTime', () => {
   it('should set the Effective and Expiry Date Times', async () => {
     const EffectiveDateTimeComponent = wrapper.findComponent(EffectiveDateTime)
 
-    expect(wrapper.vm.effectiveDate).toBeTruthy()
+    expect(wrapper.vm.effectiveDate).toBe('')
 
     EffectiveDateTimeComponent.find(getTestId('past-date-radio')).trigger('click')
     EffectiveDateTimeComponent.findComponent(SharedDatePicker).vm.$emit('emitDate', '2023-07-01')

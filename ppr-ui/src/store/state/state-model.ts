@@ -399,7 +399,7 @@ export const stateModel: StateModelIF = {
       personGivingNoticeValid: false,
       submittingPartyValid: false,
       effectiveDateTimeValid: true, // pre-selected value is valid by default
-      expiryDateTimeValid: true, // pre-selected or absent, value is valid by default
+      expiryDateTimeValid: true, // if pre-selected or absent, value is valid by default
       attentionValid: true, // optional so valid by default
       authorizationValid: false,
       staffPaymentValid: false

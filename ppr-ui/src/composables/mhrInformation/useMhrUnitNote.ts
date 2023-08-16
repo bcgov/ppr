@@ -34,16 +34,15 @@ export const useMhrUnitNote = () => {
     // status is not required
     delete unitNoteData.note.status
 
-    // Unit note expiryDateTime can only be submitted for CAUC, CAUE
-    if (hasExpiryDate()) {
-      // cleanup dateTime to be accepted by API
+    // Unit note expiryDateTime can only be submitted for CAUC(optional), CAUE
+    if (hasExpiryDate() && !!unitNoteData.note.expiryDateTime) {
       unitNoteData.note.expiryDateTime = unitNoteData.note.expiryDateTime.replace('Z', '')
     } else {
       delete unitNoteData.note.expiryDateTime
     }
 
-    // Do not submit effectiveDateTime if from does not show the component (REG_102, NPUB)
-    if (hasEffectiveDateTime()) {
+    // Do not submit effectiveDateTime if form does not show the component (REG_102, NPUB)
+    if (hasEffectiveDateTime() && !!unitNoteData.note.effectiveDateTime) {
       // cleanup dateTime to be accepted by API
       unitNoteData.note.effectiveDateTime = unitNoteData.note.effectiveDateTime.replace('Z', '')
     } else {
