@@ -10,7 +10,7 @@
           id="authorization-text-field"
           filled
           label="Legal name of authorized person (must be a lawyer or notary)"
-          v-model="authorization.legalName"
+          v-model="authorization.authorizationName"
           :rules="authorizationRules"
         />
         <v-checkbox
@@ -24,7 +24,7 @@
               class="ml-2"
               :class="{ 'error-text': validateReview && !authorization.isAuthorizationConfirmed}"
             >
-              <b class=authorization-text>{{ authorization.legalName }}</b>
+              <b class=authorization-text>{{ authorization.authorizationName }}</b>
               certifies that they have relevant knowledge of the Qualified Supplier
               and is authorized to submit this application.
             </span>

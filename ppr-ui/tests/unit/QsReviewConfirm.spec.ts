@@ -22,7 +22,7 @@ describe('QsReviewConfirm', () => {
   const authorization = {
     isAuthorizationConfirmed: false,
     date: convertDate(new Date(), false, false),
-    legalName: 'Test User'
+    authorizationName: 'Test User'
   }
   beforeAll(async () => {
     defaultFlagSet['mhr-user-access-enabled'] = true
@@ -103,7 +103,7 @@ describe('QsReviewConfirm', () => {
     expect(heading.exists()).toBe(true)
     expect(heading.text()).toBe('Authorization')
 
-    expect(store.getMhrQsAuthorization.legalName).toBe('Test User')
+    expect(store.getMhrQsAuthorization.authorizationName).toBe('Test User')
 
     // setup
     const authorizationCheckbox = authorizationSection.find('#authorization-checkbox')
@@ -116,12 +116,12 @@ describe('QsReviewConfirm', () => {
     expect(checkboxText.exists()).toBe(true)
 
     // Checks that text is updated and reflected in text next to checkbox
-    expect(checkboxText.text().includes(store.getMhrQsAuthorization.legalName)).toBe(true)
+    expect(checkboxText.text().includes(store.getMhrQsAuthorization.authorizationName)).toBe(true)
 
     await authorizationTextField.setValue('Hello its me')
 
-    expect(store.getMhrQsAuthorization.legalName).toBe('Hello its me')
-    expect(checkboxText.text().includes(store.getMhrQsAuthorization.legalName)).toBe(true)
+    expect(store.getMhrQsAuthorization.authorizationName).toBe('Hello its me')
+    expect(checkboxText.text().includes(store.getMhrQsAuthorization.authorizationName)).toBe(true)
 
     await authorizationCheckbox.trigger('click')
 

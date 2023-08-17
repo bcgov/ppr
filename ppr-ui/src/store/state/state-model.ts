@@ -383,7 +383,7 @@ export const stateModel: StateModelIF = {
     isRequirementsConfirmed: false,
     authorization: {
       isAuthorizationConfirmed: false,
-      legalName: '',
+      authorizationName: '',
       date: ''
     },
     qsSubmittingParty: null

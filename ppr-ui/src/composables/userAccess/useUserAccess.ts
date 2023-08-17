@@ -7,9 +7,10 @@ import {
   getAccountInfoFromAuth,
   getFeatureFlag,
   getKeyByValue,
-  requestProductAccess
+  requestProductAccess,
+  updateUserSettings
 } from '@/utils'
-import { ProductCode, MhrSubTypes, ProductStatus, RouteNames } from '@/enums'
+import { MhrSubTypes, ProductCode, ProductStatus, RouteNames, SettingOptions } from '@/enums'
 import { storeToRefs } from 'pinia'
 import { useStore } from '@/store/store'
 import { useAuth, useNavigation } from '@/composables'
@@ -19,6 +20,7 @@ export const useUserAccess = () => {
   const { initializeUserProducts } = useAuth()
   const { goToDash, goToRoute, containsCurrentRoute } = useNavigation()
   const {
+    setUserSettings,
     setUnsavedChanges,
     setMhrQsInformation,
     setMhrSubProduct,
@@ -29,6 +31,7 @@ export const useUserAccess = () => {
   } = useStore()
   const {
     isRoleStaffReg,
+    getUserSettings,
     getUserLastName,
     getUserFirstName,
     getMhrSubProduct,
@@ -90,10 +93,12 @@ export const useUserAccess = () => {
 
   /** Content for the QS Application Caution and Alert component **/
   const qsMsgContent: ComputedRef<UserAccessMessageIF> = computed((): UserAccessMessageIF => {
-    const productName = MhrSubTypes[getKeyByValue(ProductCode, currentSubProduct.value?.code)]
-    const helpEmail = currentSubProduct.value?.code === ProductCode.LAWYERS_NOTARIES
+    const product = currentSubProduct.value
+    const productName = MhrSubTypes[getKeyByValue(ProductCode, product?.code)]
+    const helpEmail = product?.code === ProductCode.LAWYERS_NOTARIES
       ? 'bcolhelp@gov.bc.ca'
       : 'bcregistries@gov.bc.ca'
+
     const content: UserAccessMessageIF[] = [
       {
         status: ProductStatus.ACTIVE,
@@ -119,15 +124,20 @@ export const useUserAccess = () => {
       }
     ]
 
-    return content.find(content => content.status === currentSubProduct.value?.subscriptionStatus)
+    // Return if the user has previously close the status message
+    if (getUserSettings.value?.[SettingOptions.MISCELLANEOUS_PREFERENCES]?.[SettingOptions.QS_STATUS_MSG_HIDE]) {
+      return
+    }
+
+    return content.find(content => content.status === product?.subscriptionStatus)
   })
 
   /** Returns true while the Authorization Component is valid **/
   const isAuthorizationValid: ComputedRef<boolean> = computed(() => {
     return (
       getMhrQsAuthorization.value.isAuthorizationConfirmed &&
-      getMhrQsAuthorization.value.legalName.trim() !== '' &&
-      getMhrQsAuthorization.value.legalName.length <= 150
+      getMhrQsAuthorization.value.authorizationName.trim() !== '' &&
+      getMhrQsAuthorization.value.authorizationName.length <= 150
     )
   })
 
@@ -173,7 +183,7 @@ export const useUserAccess = () => {
     setMhrQsIsRequirementsConfirmed(false)
     setMhrQsAuthorization({
       isAuthorizationConfirmed: false,
-      legalName: getUserFirstName.value + ' ' + getUserLastName.value,
+      authorizationName: getUserFirstName.value + ' ' + getUserLastName.value,
       date: convertDate(new Date(), false, false)
     })
 
@@ -186,6 +196,16 @@ export const useUserAccess = () => {
     setUnsavedChanges(true)
   }
 
+  /** Close Qualified Supplier status message - update locally and user settings **/
+  const closeQsMessage = async (): Promise<void> => {
+    const updatedPreference = { [SettingOptions.QS_STATUS_MSG_HIDE]: true }
+    await updateUserSettings(SettingOptions.MISCELLANEOUS_PREFERENCES, updatedPreference)
+    await setUserSettings({
+      ...getUserSettings.value,
+      [SettingOptions.MISCELLANEOUS_PREFERENCES]: updatedPreference
+    })
+  }
+
   /**
    * Submit qualified supplier application
    * Includes a request to CREATE a Qualified Supplier in MHR
@@ -194,7 +214,7 @@ export const useUserAccess = () => {
   const submitQsApplication = async (): Promise<void> => {
     const payload: MhrQsPayloadIF = {
       ...cleanEmpty(getMhrQsInformation.value),
-      legalName: getMhrQsAuthorization.value.legalName,
+      authorizationName: getMhrQsAuthorization.value.authorizationName,
       phoneNumber: fromDisplayPhone(getMhrQsInformation.value.phoneNumber)
     }
 
@@ -207,6 +227,12 @@ export const useUserAccess = () => {
         // Re-initialize user products to pull status changes on requested sub products
         await initializeUserProducts()
         await nextTick()
+
+        // Reset user preferences to show application messages on new submission
+        await updateUserSettings(
+          SettingOptions.MISCELLANEOUS_PREFERENCES, {
+            [SettingOptions.QS_STATUS_MSG_HIDE]: false
+          })
 
         setUnsavedChanges(false)
         await goToDash()
@@ -221,6 +247,7 @@ export const useUserAccess = () => {
     initUserAccess,
     goToUserAccess,
     qsMsgContent,
+    closeQsMessage,
     isQsAccessEnabled,
     hasPendingQsAccess,
     hasRejectedQsAccess,

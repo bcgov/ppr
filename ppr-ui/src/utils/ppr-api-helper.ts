@@ -417,7 +417,7 @@ export async function getPPRUserSettings (): Promise<UserSettingsIF> {
 // Update user setting
 export async function updateUserSettings (
   setting: SettingOptions,
-  settingValue: boolean | { columns: BaseHeaderIF[], mhrColumns: BaseHeaderIF[] }
+  settingValue: boolean | { columns: BaseHeaderIF[], mhrColumns: BaseHeaderIF[] } | object
 ): Promise<UserSettingsIF> {
   const url = sessionStorage.getItem('PPR_API_URL')
   const config = { baseURL: url, headers: { Accept: 'application/json' } }

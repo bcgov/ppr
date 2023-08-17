@@ -1,5 +1,5 @@
 export interface UserAccessAuthorizationIF {
   isAuthorizationConfirmed: boolean
-  legalName: string
+  authorizationName: string
   date: string
 }
