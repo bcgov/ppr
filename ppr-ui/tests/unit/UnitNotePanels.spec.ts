@@ -5,7 +5,7 @@ import { useStore } from '../../src/store/store'
 import { mount, createLocalVue, Wrapper } from '@vue/test-utils'
 import { UnitNoteContentInfo, UnitNoteHeaderInfo, UnitNotePanel, UnitNotePanels } from '../../src/components/unitNotes'
 import { UnitNoteDocTypes, UnitNoteStatusTypes } from '../../src/enums'
-import { mockUnitNotes, mockedUnitNotes2, mockedUnitNotes3 } from './test-data'
+import { mockUnitNotes, mockedUnitNotes2, mockedUnitNotes3, mockedUnitNotes4 } from './test-data'
 import { BaseAddress } from '@/composables/address'
 import { pacificDate } from '@/utils'
 import { UnitNotesInfo } from '@/resources/unitNotes'
@@ -64,27 +64,31 @@ const verifyHeaderContent = (note: UnitNoteIF, header: Wrapper<any>) => {
 
 const verifyBodyContent = (note: UnitNoteIF, content: Wrapper<any>) => {
   // Check the effective date and time
+  let headerIndex = 0
   if (note.effectiveDateTime) {
-    const effectiveDate = content.findAll('h3').at(0).text()
-    const effectiveDateTime = content.findAll('.info-text.fs-14').at(0).text()
+    const effectiveDate = content.findAll('h3').at(headerIndex).text()
+    const effectiveDateTime = content.findAll('.info-text.fs-14').at(headerIndex).text()
     expect(effectiveDate).toBe('Effective Date and Time')
     expect(effectiveDateTime).toBe(pacificDate(note.effectiveDateTime, true))
+    headerIndex++
   }
 
   // Check the expiry date and time
   if (note.expiryDateTime) {
-    const expiryDate = content.findAll('h3').at(1).text()
-    const expiryDateTime = content.findAll('.info-text.fs-14').at(1).text()
+    const expiryDate = content.findAll('h3').at(headerIndex).text()
+    const expiryDateTime = content.findAll('.info-text.fs-14').at(headerIndex).text()
     expect(expiryDate).toBe('Expiry Date and Time')
     expect(expiryDateTime).toBe(pacificDate(note.expiryDateTime, true))
+    headerIndex++
   }
 
   // Check the remarks
   if (note.remarks) {
-    const remarks = content.findAll('h3').at(2).text()
-    const remarksText = content.findAll('.info-text.fs-14').at(2).text()
+    const remarks = content.findAll('h3').at(headerIndex).text()
+    const remarksText = content.findAll('.info-text.fs-14').at(headerIndex).text()
     expect(remarks).toBe('Remarks')
     expect(remarksText).toBe(note.remarks)
+    headerIndex++
   }
 
   // Check the person giving notice table
@@ -354,5 +358,22 @@ describe('UnitNotePanels', () => {
 
     expect(content.find('#persons-giving-notice-table').exists()).toBe(false)
     expect(content.find('#no-person-giving-notice').exists()).toBe(true)
+  })
+
+  it('displays the correctly when a continued notice of caution is filled with no expiry date', async () => {
+    const wrapper = createComponent(mockedUnitNotes4)
+    // An active continued notice of caution with no expiry date
+    const panel = wrapper.find('.unit-note-panel')
+
+    // Expand panel
+    const panelShowBtn = panel.find('.unit-note-menu-btn')
+    await panelShowBtn.trigger('click')
+    await nextTick()
+
+    // Check the panel content
+    const content = panel.findComponent(UnitNoteContentInfo)
+    expect(content.exists()).toBe(true)
+
+    expect(content.find('#no-expiry').text()).toBe('N/A')
   })
 })

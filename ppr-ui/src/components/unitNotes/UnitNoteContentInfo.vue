@@ -12,13 +12,16 @@
       </v-col>
     </v-row>
 
-    <v-row v-if="note.expiryDateTime" no-gutters class="my-7">
+    <v-row v-if="isNoticeOfCautionOrRelatedDocType(note)" no-gutters class="my-7">
       <v-col cols="3">
         <h3 class="fs-14">Expiry Date and Time</h3>
       </v-col>
       <v-col cols="9">
-        <span class="info-text fs-14">
+        <span v-if="note.expiryDateTime" class="info-text fs-14">
           {{ pacificDate(note.expiryDateTime, true) }}
+        </span>
+        <span v-else id="no-expiry" class="info-text fs-14">
+          N/A
         </span>
       </v-col>
     </v-row>
@@ -104,6 +107,7 @@ import { UnitNoteIF } from '@/interfaces/unit-note-interfaces/unit-note-interfac
 import { pacificDate } from '@/utils'
 import { PartyIF } from '@/interfaces'
 import { BaseAddress } from '@/composables/address'
+import { useMhrUnitNote } from '@/composables'
 
 export default defineComponent({
   name: 'UnitNoteContentInfo',
@@ -117,6 +121,7 @@ export default defineComponent({
     BaseAddress
   },
   setup () {
+    const { isNoticeOfCautionOrRelatedDocType } = useMhrUnitNote()
     const getNoticePartyIcon = (givingNoticeParty: PartyIF): string => {
       return givingNoticeParty.businessName
         ? 'mdi-domain'
@@ -134,6 +139,7 @@ export default defineComponent({
       pacificDate,
       getNoticePartyIcon,
       getNoticePartyName,
+      isNoticeOfCautionOrRelatedDocType,
       personGivingNoticeTableHeaders
     }
   }
