@@ -20,13 +20,15 @@
           <v-icon class="mt-n1 mr-2" :color="qsMsgContent.color">{{ qsMsgContent.icon }}</v-icon>
         </template>
 
-<!--        FUTURE SLOT: Implement Cancel Btn Functionality in Status Message Ticket  -->
-<!--        <template #appendSLot v-if="qsMsgContent.status != ProductStatus.PENDING">-->
-<!--          <v-btn class="ml-4 mt-n2 mr-n1" icon :ripple="false">-->
-<!--            <v-icon color="primary">mdi-close</v-icon>-->
-<!--          </v-btn>-->
-<!--        </template>-->
-
+        <template v-if="qsMsgContent.status != ProductStatus.PENDING" #appendSLot>
+          <v-row no-gutters>
+            <v-col>
+              <v-btn icon class="ml-4 mt-n2 mr-n1 float-right" :ripple="false" @click="closeQsMessage()">
+                <v-icon color="primary">mdi-close</v-icon>
+              </v-btn>
+            </v-col>
+          </v-row>
+        </template>
       </CautionBox>
 
       <v-row no-gutters>
@@ -159,7 +161,7 @@ export default defineComponent({
     const router = useRouter()
     const { navigateTo } = useNavigation()
     const { isAuthenticated } = useAuth()
-    const { qsMsgContent } = useUserAccess()
+    const { qsMsgContent, closeQsMessage } = useUserAccess()
     const {
       // Actions
       setSearchHistory,
@@ -314,6 +316,7 @@ export default defineComponent({
       setSearchedType,
       setSearchedValue,
       qsMsgContent,
+      closeQsMessage,
       getUserServiceFee,
       setSearchDebtorName,
       redirectRegistryHome,
