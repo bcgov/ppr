@@ -33,6 +33,7 @@ from .db import db
 
 MANUFACTURER_MHR_NUMBER: str = 'MAN000'
 MANUFACTURER_DRAFT_ID: int = 0
+COMBINED_NAME: str = '{owner_name} / {dba_name}'
 
 
 class MhrManufacturer(db.Model):  # pylint: disable=too-many-instance-attributes
@@ -93,6 +94,9 @@ class MhrManufacturer(db.Model):  # pylint: disable=too-many-instance-attributes
         manufacturer['ownerGroups'].append(group)
         if self.dba_name:
             manufacturer['dbaName'] = self.dba_name
+            name: str = COMBINED_NAME.format(owner_name=self.owner.business_name, dba_name=self.dba_name)
+            manufacturer['location']['dealerName'] = name
+            manufacturer['description']['manufacturer'] = name
         if self.authorization_name:
             manufacturer['authorizationName'] = self.authorization_name
         return manufacturer
@@ -101,6 +105,54 @@ class MhrManufacturer(db.Model):  # pylint: disable=too-many-instance-attributes
         """Render a registration to the local cache."""
         db.session.add(self)
         db.session.commit()
+
+    def update(self, json_data: dict):
+        """Update the manufacturer information."""
+        if not json_data:
+            return
+        if json_data.get('dbaName'):
+            self.dba_name = json_data['dbaName'].strip().upper()
+        else:
+            self.dba_name = None
+        if json_data.get('authorizationName'):
+            self.authorization_name = json_data['authorizationName'].strip()
+        else:
+            self.authorization_name = None
+        self.terms_accepted = 'Y' if json_data.get('termsAccepted') else None
+        owner = json_data['ownerGroups'][0]['owners'][0]
+        self.owner.email_id = owner['emailAddress'].strip() if owner.get('emailAddress') else None
+        self.owner.phone_number = owner['phoneNumber'].strip() if owner.get('phoneNumber') else None
+        self.owner.phone_extension = owner['phoneExtension'].strip() if owner.get('phoneExtension') else None
+        if owner.get('organizationName'):
+            self.owner.business_name = owner['organizationName'].strip().upper()
+            self.owner.last_name = None
+            self.owner.first_name = None
+            self.owner.middle_name = None
+        else:
+            self.owner.business_name = None
+            self.owner.last_name = owner['individualName']['last'].strip().upper()
+            self.owner.first_name = owner['individualName']['first'].strip().upper()
+            if owner['individualName'].get('middle'):
+                self.owner.middle_name = owner['individualName']['middle'].strip().upper()
+        if self.owner.address.json != owner.get('address'):
+            self.owner.address = Address.create_from_json(owner.get('address'))
+        self.dealer.business_name = str(json_data['location'].get('dealerName')).strip().upper()
+        if self.dealer.address.json != json_data['location'].get('address'):
+            self.dealer.address = Address.create_from_json(json_data['location']['address'])
+        self.manufacturer_name = str(json_data['description'].get('manufacturer')).strip().upper()
+        db.session.add(self)
+        db.session.commit()
+
+    @classmethod
+    def delete(cls, account_id: str):
+        """Delete a manufacturer by account ID."""
+        manufacturer = None
+        if account_id:
+            manufacturer = cls.find_by_account_id(account_id)
+        if manufacturer:
+            db.session.delete(manufacturer)
+            db.session.commit()
+        return manufacturer
 
     @classmethod
     def find_by_id(cls, pkey: int = None):

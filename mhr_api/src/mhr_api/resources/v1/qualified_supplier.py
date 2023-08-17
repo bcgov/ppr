@@ -54,7 +54,7 @@ def get_account_qualified_supplier():
         current_app.logger.info(f'No qualified supplier info found for account {account_id}.')
         return resource_utils.not_found_error_response('qualified supplier information', account_id)
     except DatabaseException as db_exception:
-        return resource_utils.db_exception_response(db_exception, account_id, 'GET manufacturer info')
+        return resource_utils.db_exception_response(db_exception, account_id, 'GET qualified supplier info')
     except BusinessException as exception:
         return resource_utils.business_exception_response(exception)
     except Exception as default_exception:   # noqa: B902; return nicer default error
@@ -90,7 +90,66 @@ def post_account_qualified_supplier():
         supplier.save()
         return jsonify(supplier.json), HTTPStatus.OK
     except DatabaseException as db_exception:
-        return resource_utils.db_exception_response(db_exception, account_id, 'GET manufacturer info')
+        return resource_utils.db_exception_response(db_exception, account_id, 'PUT qualified supplier info')
+    except BusinessException as exception:
+        return resource_utils.business_exception_response(exception)
+    except Exception as default_exception:   # noqa: B902; return nicer default error
+        return resource_utils.default_exception_response(default_exception)
+
+
+@bp.route('', methods=['DELETE', 'OPTIONS'])
+@cross_origin(origin='*')
+@jwt.requires_auth
+def delete_account_qualified_supplier():
+    """Delete a qualified supplier by account id."""
+    try:
+        # Quick check: must be staff or provide an account ID.
+        account_id = resource_utils.get_account_id(request)
+        if account_id is None:
+            return resource_utils.account_required_response()
+        # Verify request JWT and account ID
+        if not authorized(account_id, jwt):
+            return resource_utils.unauthorized_error_response(account_id)
+        current_app.logger.info(f'delete_account_qualified_supplier account_id={account_id}')
+        # Try to delete the account qualified supplier.
+        MhrQualifiedSupplier.delete(account_id)
+        return '', HTTPStatus.NO_CONTENT
+    except BusinessException as exception:
+        return resource_utils.business_exception_response(exception)
+    except DatabaseException as db_exception:   # noqa: B902; return nicer default error
+        return resource_utils.db_exception_response(db_exception, account_id, f'DELETE account id={account_id}')
+    except Exception as default_exception:   # noqa: B902; return nicer default error
+        return resource_utils.default_exception_response(default_exception)
+
+
+@bp.route('', methods=['PUT', 'OPTIONS'])
+@cross_origin(origin='*')
+@jwt.requires_auth
+def put_account_qualified_supplier():
+    """Replace existing account qualified supplier information with updated values."""
+    try:
+        # Quick check: must have an account ID.
+        account_id = resource_utils.get_account_id(request)
+        if account_id is None:
+            return resource_utils.account_required_response()
+        # Verify request JWT and account ID
+        if not authorized(account_id, jwt):
+            return resource_utils.unauthorized_error_response(account_id)
+        request_json = request.get_json(silent=True)
+        valid_format, errors = schema_utils.validate(request_json, 'party', 'common')
+        # Additional validation not covered by the schema.
+        extra_validation_msg = validator_utils.validate_party(request_json, 'qualified supplier')
+        if not valid_format or extra_validation_msg != '':
+            return resource_utils.validation_error_response(errors, reg_utils.VAL_ERROR, extra_validation_msg)
+        supplier: MhrQualifiedSupplier = MhrQualifiedSupplier.find_by_account_id(account_id)
+        if not supplier:
+            current_app.logger.info(f'No qualified supplier info found for account {account_id}.')
+            return resource_utils.not_found_error_response('qualified supplier information', account_id)
+        current_app.logger.info(f'Updating qualified supplier information for account {account_id}.')
+        supplier.update(request_json)
+        return jsonify(supplier.json), HTTPStatus.OK
+    except DatabaseException as db_exception:
+        return resource_utils.db_exception_response(db_exception, account_id, 'PUT qualified supplier info')
     except BusinessException as exception:
         return resource_utils.business_exception_response(exception)
     except Exception as default_exception:   # noqa: B902; return nicer default error

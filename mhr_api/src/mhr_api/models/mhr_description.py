@@ -36,7 +36,7 @@ class MhrDescription(db.Model):  # pylint: disable=too-many-instance-attributes
     circa = db.Column('circa', db.String(1), nullable=True)
     engineer_date = db.Column('engineer_date', db.DateTime, nullable=True)
     engineer_name = db.Column('engineer_name', db.String(150), nullable=True)
-    manufacturer_name = db.Column('manufacturer_name', db.String(150), nullable=True)
+    manufacturer_name = db.Column('manufacturer_name', db.String(310), nullable=True)
     make = db.Column('make', db.String(60), nullable=True)
     model = db.Column('model', db.String(60), nullable=True)
     rebuilt_remarks = db.Column('rebuilt_remarks', db.String(300), nullable=True)

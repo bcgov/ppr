@@ -16,6 +16,8 @@
 
 Test-Suite to ensure that the MHR manufacturer Model is working as expected.
 """
+import copy
+
 from flask import current_app
 
 import pytest
@@ -199,8 +201,12 @@ def test_manufacturer_json(session):
                                                     dba_name=MANUFACTURER_JSON.get('dbaName'),
                                                     authorization_name=MANUFACTURER_JSON.get('authorizationName'))
     manufacturer.manufacturer_name=MANUFACTURER_JSON['description'].get('manufacturer')
-    current_app.logger.debug(manufacturer.json)
-    assert MANUFACTURER_JSON == manufacturer.json
+    man_json = copy.deepcopy(MANUFACTURER_JSON)
+    name = man_json['ownerGroups'][0]['owners'][0].get('organizationName') + ' / ' + man_json.get('dbaName')
+    man_json['location']['dealerName'] = name
+    man_json['description']['manufacturer'] = name
+    # current_app.logger.debug(manufacturer.json)
+    assert man_json == manufacturer.json
 
 
 def test_create_from_json(session):

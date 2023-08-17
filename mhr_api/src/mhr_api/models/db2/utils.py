@@ -913,6 +913,10 @@ def update_note_json(registration, note_json: dict) -> dict:
                     note_json['effectiveDateTime'] = model_utils.format_ts(note.effective_ts)
                 if note.document_type in (MhrDocumentTypes.NCAN, MhrDocumentTypes.NRED, MhrDocumentTypes.EXRE):
                     note_json['remarks'] = note.remarks
+                # Use modernized person giving notice data if available.
+                notice_party = note.get_giving_notice()
+                if notice_party:
+                    note_json['givingNoticeParty'] = notice_party.json
     return note_json
 
 

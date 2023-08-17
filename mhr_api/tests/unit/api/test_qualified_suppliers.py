@@ -41,6 +41,22 @@ SUPPLIER_JSON = {
     'emailAddress': 'test@gmail.com',
     'phoneNumber': '2507701067'
 }
+UPDATE_JSON = {
+    'businessName': 'MODIFIED NOTARY PUBLIC',
+    'dbaName': 'DBA NAME',
+    'authorizationName': 'John Smith',
+    'termsAccepted': True,
+    'address': {
+        'street': '1704 GOVERNMENT RD.',
+        'city': 'VICTORIA',
+        'region': 'BC',
+        'postalCode': 'V2A 8A1',
+        'country': 'CA'
+    },
+    'emailAddress': 'test2@gmail.com',
+    'phoneNumber': '7777701067'
+}
+
 # testdata pattern is ({desc}, {roles}, {account_id}, {status})
 TEST_ACCOUNT_DATA = [
     ('Valid', [MHR_ROLE], '3026', HTTPStatus.OK),
@@ -54,6 +70,19 @@ TEST_CREATE_DATA = [
     ('Valid', [MHR_ROLE], 'new-test', HTTPStatus.OK, VALID_BUS_NAME),
     ('Invalid exists', [MHR_ROLE], '3026', HTTPStatus.BAD_REQUEST, VALID_BUS_NAME),
     ('Invalid validation error', [MHR_ROLE], 'new-test', HTTPStatus.BAD_REQUEST, INVALID_BUS_NAME)
+]
+# testdata pattern is ({desc}, {roles}, {account_id}, {status})
+TEST_DELETE_DATA = [
+    ('Valid', [MHR_ROLE], '3026', HTTPStatus.NO_CONTENT),
+    ('Valid no results', [MHR_ROLE], '1234', HTTPStatus.NO_CONTENT),
+    ('Staff no account', [MHR_ROLE, STAFF_ROLE], None, HTTPStatus.BAD_REQUEST),
+    ('Unauthorized', [COLIN_ROLE], '3026', HTTPStatus.UNAUTHORIZED)
+]
+# testdata pattern is ({desc}, {roles}, {account_id}, {status}, {bus_name})
+TEST_UPDATE_DATA = [
+    ('Valid', [MHR_ROLE], '3026', HTTPStatus.OK, VALID_BUS_NAME),
+    ('Invalid does not exist', [MHR_ROLE], 'junk-id', HTTPStatus.NOT_FOUND, VALID_BUS_NAME),
+    ('Invalid validation error', [MHR_ROLE], '3026', HTTPStatus.BAD_REQUEST, INVALID_BUS_NAME)
 ]
 
 
@@ -95,9 +124,9 @@ def test_create_account_supplier(session, client, jwt, desc, roles, account, sta
                            content_type='application/json')
 
     # check
-    current_app.logger.debug(response.json)
+    # current_app.logger.debug(response.json)
     assert response.status_code == status
-    if response.status_code == HTTPStatus.CREATED:
+    if response.status_code == HTTPStatus.OK:
         json_data = response.json
         assert json_data
         assert json_data.get('businessName')
@@ -106,3 +135,46 @@ def test_create_account_supplier(session, client, jwt, desc, roles, account, sta
         assert json_data.get('phoneNumber')
         supplier: MhrQualifiedSupplier = MhrQualifiedSupplier.find_by_account_id(account)
         assert supplier
+
+
+@pytest.mark.parametrize('desc,roles,account_id,status', TEST_DELETE_DATA)
+def test_delete_account_supplier(session, client, jwt, desc, roles, account_id, status):
+    """Assert that the DELETE account qualified supplier info endpoint behaves as expected."""
+    # setup
+    headers = create_header_account(jwt, roles, 'test-user', account_id) if account_id else create_header(jwt, roles)
+    # test
+    response = client.delete('/api/v1/qualified-suppliers', headers=headers)
+    # check
+    assert response.status_code == status
+
+
+@pytest.mark.parametrize('desc,roles,account,status,bus_name', TEST_UPDATE_DATA)
+def test_update_account_supplier(session, client, jwt, desc, roles, account, status, bus_name):
+    """Assert that a PUT MH qualified supplier information works as expected."""
+    # setup
+    headers = None
+    json_data = copy.deepcopy(UPDATE_JSON)
+    json_data['businessName'] = bus_name
+    if account:
+        headers = create_header_account(jwt, roles, 'UT-TEST', account)
+    else:
+        headers = create_header(jwt, roles)
+    # test
+    response = client.put('/api/v1/qualified-suppliers',
+                          json=json_data,
+                          headers=headers,
+                          content_type='application/json')
+
+    # check
+    # current_app.logger.debug(response.json)
+    assert response.status_code == status
+    if response.status_code == HTTPStatus.OK:
+        response_data = response.json
+        assert response_data
+        assert json_data.get('businessName') == response_data.get('businessName')
+        assert json_data.get('dbaName') == response_data.get('dbaName')
+        assert json_data.get('authorizationName') == response_data.get('authorizationName')
+        assert json_data.get('termsAccepted') == response_data.get('termsAccepted')
+        assert json_data.get('address') == response_data.get('address')
+        assert json_data.get('phoneNumber') == response_data.get('phoneNumber')
+        assert json_data.get('emailAddress') == response_data.get('emailAddress')
