@@ -274,7 +274,7 @@ export const mockedUnitNotes3: Array<UnitNoteIF> = [
 
 export const mockedUnitNotes4: Array<UnitNoteIF> = [
   {
-    documentType: UnitNoteDocTypes.NOTICE_OF_CAUTION,
+    documentType: UnitNoteDocTypes.CONTINUED_NOTE_OF_CAUTION,
     documentId: '2',
     documentRegistrationNumber: '123456',
     documentDescription: 'Notice of Caution (continued)',

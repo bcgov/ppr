@@ -371,9 +371,10 @@ describe('UnitNotePanels', () => {
     await nextTick()
 
     // Check the panel content
-    const content = panel.findComponent(UnitNoteContentInfo)
+    const content = panel.findComponent(UnitNoteContentInfo) as any
     expect(content.exists()).toBe(true)
 
     expect(content.find('#no-expiry').text()).toBe('N/A')
+    expect(content.find('#separated-remarks').text()).toContain('Continued until further order of the court.\n')
   })
 })
