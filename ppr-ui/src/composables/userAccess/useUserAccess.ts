@@ -1,4 +1,4 @@
-import { computed, ComputedRef, nextTick } from 'vue-demi'
+import { computed, ComputedRef, nextTick, reactive } from 'vue-demi'
 import {
   cleanEmpty,
   convertDate,
@@ -30,6 +30,7 @@ export const useUserAccess = () => {
     setMhrQsValidation
   } = useStore()
   const {
+    getAccountId,
     isRoleStaffReg,
     getUserSettings,
     getUserLastName,
@@ -93,9 +94,8 @@ export const useUserAccess = () => {
 
   /** Content for the QS Application Caution and Alert component **/
   const qsMsgContent: ComputedRef<UserAccessMessageIF> = computed((): UserAccessMessageIF => {
-    const product = currentSubProduct.value
-    const productName = MhrSubTypes[getKeyByValue(ProductCode, product?.code)]
-    const helpEmail = product?.code === ProductCode.LAWYERS_NOTARIES
+    const productName = MhrSubTypes[getKeyByValue(ProductCode, currentSubProduct.value?.code)]
+    const helpEmail = currentSubProduct.value?.code === ProductCode.LAWYERS_NOTARIES
       ? 'bcolhelp@gov.bc.ca'
       : 'bcregistries@gov.bc.ca'
 
@@ -124,12 +124,13 @@ export const useUserAccess = () => {
       }
     ]
 
-    // Return if the user has previously close the status message
-    if (getUserSettings.value?.[SettingOptions.MISCELLANEOUS_PREFERENCES]?.[SettingOptions.QS_STATUS_MSG_HIDE]) {
-      return
-    }
+    // Return if the account has previously closed the status message
+    if (getUserSettings.value[SettingOptions.MISCELLANEOUS_PREFERENCES]?.some(
+      setting => setting.accountId === getAccountId.value && !!setting[SettingOptions.QS_STATUS_MSG_HIDE]
+    )
+    ) { return null }
 
-    return content.find(content => content.status === product?.subscriptionStatus)
+    return content.find(content => content.status === currentSubProduct.value?.subscriptionStatus)
   })
 
   /** Returns true while the Authorization Component is valid **/
@@ -196,14 +197,20 @@ export const useUserAccess = () => {
     setUnsavedChanges(true)
   }
 
-  /** Close Qualified Supplier status message - update locally and user settings **/
-  const closeQsMessage = async (): Promise<void> => {
-    const updatedPreference = { [SettingOptions.QS_STATUS_MSG_HIDE]: true }
-    await updateUserSettings(SettingOptions.MISCELLANEOUS_PREFERENCES, updatedPreference)
-    await setUserSettings({
-      ...getUserSettings.value,
-      [SettingOptions.MISCELLANEOUS_PREFERENCES]: updatedPreference
-    })
+  /** Update Qualified Supplier status message - locally and user settings **/
+  const hideStatusMsg = async (hideMsg: boolean): Promise<void> => {
+    const msgSettings = getUserSettings.value[SettingOptions.MISCELLANEOUS_PREFERENCES] || []
+
+    // Update existing account setting if it exists, otherwise create new misc setting for account.
+    if (msgSettings?.find(setting => setting.accountId === getAccountId.value)) {
+      msgSettings.map(pref => pref.accountId === getAccountId.value
+        ? { ...pref, [SettingOptions.QS_STATUS_MSG_HIDE]: hideMsg }
+        : pref
+      )
+    } else msgSettings.push({ accountId: getAccountId.value, [SettingOptions.QS_STATUS_MSG_HIDE]: hideMsg })
+
+    await updateUserSettings(SettingOptions.MISCELLANEOUS_PREFERENCES, msgSettings)
+    await setUserSettings({ ...getUserSettings.value, [SettingOptions.MISCELLANEOUS_PREFERENCES]: msgSettings })
   }
 
   /**
@@ -228,11 +235,8 @@ export const useUserAccess = () => {
         await initializeUserProducts()
         await nextTick()
 
-        // Reset user preferences to show application messages on new submission
-        await updateUserSettings(
-          SettingOptions.MISCELLANEOUS_PREFERENCES, {
-            [SettingOptions.QS_STATUS_MSG_HIDE]: false
-          })
+        // Reset msg preferences for account on new submission
+        await hideStatusMsg(false)
 
         setUnsavedChanges(false)
         await goToDash()
@@ -247,7 +251,7 @@ export const useUserAccess = () => {
     initUserAccess,
     goToUserAccess,
     qsMsgContent,
-    closeQsMessage,
+    hideStatusMsg,
     isQsAccessEnabled,
     hasPendingQsAccess,
     hasRejectedQsAccess,

@@ -23,7 +23,7 @@
         <template v-if="qsMsgContent.status != ProductStatus.PENDING" #appendSLot>
           <v-row no-gutters>
             <v-col>
-              <v-btn icon class="ml-4 mt-n2 mr-n1 float-right" :ripple="false" @click="closeQsMessage()">
+              <v-btn icon class="ml-4 mt-n2 mr-n1 float-right" :ripple="false" @click="hideStatusMsg(true)">
                 <v-icon color="primary">mdi-close</v-icon>
               </v-btn>
             </v-col>
@@ -161,7 +161,7 @@ export default defineComponent({
     const router = useRouter()
     const { navigateTo } = useNavigation()
     const { isAuthenticated } = useAuth()
-    const { qsMsgContent, closeQsMessage } = useUserAccess()
+    const { qsMsgContent, hideStatusMsg } = useUserAccess()
     const {
       // Actions
       setSearchHistory,
@@ -316,7 +316,7 @@ export default defineComponent({
       setSearchedType,
       setSearchedValue,
       qsMsgContent,
-      closeQsMessage,
+      hideStatusMsg,
       getUserServiceFee,
       setSearchDebtorName,
       redirectRegistryHome,
