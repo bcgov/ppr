@@ -723,6 +723,7 @@ export const useStore = defineStore('assetsStore', () => {
 
   /** Actions **/
   function resetNewRegistration () {
+    state.value.registration.registrationNumber = null
     state.value.registration.showStepErrors = false
     state.value.registration.lengthTrust.valid = false
     state.value.registration.lengthTrust.showInvalid = false
