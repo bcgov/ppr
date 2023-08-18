@@ -58,7 +58,8 @@ select r.id, r.account_id, r.registration_ts, rr.id, rr.report_data, rr.batch_st
    and r.account_id = m.account_id
    and r.registration_type = 'MHREG'
    and r.registration_ts between (now() - interval '1 days') and now()
-"""
+  order by r.account_id, r.mhr_number
+ """
 QUERY_BATCH_MANUFACTURER_MHREG = """
 select r.id, r.account_id, r.registration_ts, rr.id, rr.report_data, rr.batch_storage_url
   from mhr_registrations r, mhr_manufacturers m, mhr_registration_reports rr
@@ -67,6 +68,7 @@ select r.id, r.account_id, r.registration_ts, rr.id, rr.report_data, rr.batch_st
    and r.registration_type = 'MHREG'
    and r.registration_ts between to_timestamp(:query_val1, 'YYYY-MM-DD HH24:MI:SS')
                              and to_timestamp(:query_val2, 'YYYY-MM-DD HH24:MI:SS')
+  order by r.account_id, r.mhr_number
 """
 UPDATE_BATCH_REG_REPORT = """
 update mhr_registration_reports
