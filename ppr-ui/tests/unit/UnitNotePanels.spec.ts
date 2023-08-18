@@ -371,7 +371,7 @@ describe('UnitNotePanels', () => {
     await nextTick()
 
     // Check the panel content
-    const content = panel.findComponent(UnitNoteContentInfo) as any
+    const content = panel.findComponent(UnitNoteContentInfo)
     expect(content.exists()).toBe(true)
 
     expect(content.find('#no-expiry').text()).toBe('N/A')
