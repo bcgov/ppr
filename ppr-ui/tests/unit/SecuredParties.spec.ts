@@ -143,7 +143,7 @@ describe('Secured Party Other registration type tests', () => {
     expect(wrapper.find(ChangeSecuredPartyDialog).isVisible()).toBeTruthy()
   })
 
-  it('is not valid if you remove the secured party for admendment', async () => {
+  it('is not valid if you remove the secured party for amendment', async () => {
     await store.setRegistrationFlowType(RegistrationFlowType.AMENDMENT)
     const parties = cloneDeep(mockedSecuredParties2)
     parties[0].action = ActionTypes.REMOVED
@@ -158,7 +158,7 @@ describe('Secured Party Other registration type tests', () => {
     expect(wrapper.vm.getSecuredPartyValidity()).toBe(false)
   })
 
-  it('shows the the removed & added secured parties for admendment', async () => {
+  it('shows the the removed & added secured parties for amendment', async () => {
     await store.setRegistrationFlowType(RegistrationFlowType.AMENDMENT)
     const parties = cloneDeep(mockedSecuredParties1)
     expect(parties.length).toEqual(1)

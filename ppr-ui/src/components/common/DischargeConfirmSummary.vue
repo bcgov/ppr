@@ -66,9 +66,7 @@ import {
   toRefs,
   watch
 } from 'vue-demi'
-
-// local
-import { UIRegistrationTypes } from '@/enums' // eslint-disable-line no-unused-vars
+import { UIRegistrationTypes } from '@/enums'
 
 export default defineComponent({
   name: 'DischargeConfirmSummary',
