@@ -8,7 +8,7 @@ import { createLocalVue, shallowMount } from '@vue/test-utils'
 import sinon from 'sinon'
 import flushPromises from 'flush-promises'
 // Components
-import { ReviewRegistration } from '@/views'
+import { DischargeRegistration } from '@/views'
 import { Collateral } from '@/components/collateral'
 import { RegistrationLengthTrustSummary } from '@/components/registration'
 import { CautionBox, StickyContainer } from '@/components/common'
@@ -61,7 +61,7 @@ describe('ReviewConfirm new registration component', () => {
       name: RouteNames.REVIEW_DISCHARGE,
       query: { 'reg-num': '123456B' }
     })
-    wrapper = shallowMount((ReviewRegistration as any), { localVue, store, router, vuetify })
+    wrapper = shallowMount((DischargeRegistration as any), { localVue, store, router, vuetify })
     wrapper.setProps({ appReady: true })
     await flushPromises()
   })
@@ -73,7 +73,7 @@ describe('ReviewConfirm new registration component', () => {
   })
 
   it('renders Review Registration View with child components', async () => {
-    expect(wrapper.findComponent(ReviewRegistration).exists()).toBe(true)
+    expect(wrapper.findComponent(DischargeRegistration).exists()).toBe(true)
     expect(wrapper.findComponent(CautionBox).exists()).toBe(true)
     expect(wrapper.findComponent(CautionBox).vm.setMsg).toContain(
       'provide the verification statement to all Secured Parties')
