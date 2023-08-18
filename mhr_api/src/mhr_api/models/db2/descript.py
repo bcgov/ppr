@@ -333,7 +333,7 @@ class Db2Descript(db.Model):
                                square_feet=new_info.get('squareFeet', 0),
                                year_made=str(base_info.get('year', '')),
                                circa=' ',
-                               manufacturer_name=new_info.get('manufacturer', ''),
+                               manufacturer_name=str(new_info.get('manufacturer', ''))[0:65],
                                make_model=make_model[0:64],
                                engineer_name=new_info.get('engineerName', ''),
                                rebuilt_remarks=new_info.get('rebuiltRemarks', ''),

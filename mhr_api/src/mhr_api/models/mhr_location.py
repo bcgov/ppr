@@ -31,7 +31,7 @@ class MhrLocation(db.Model):  # pylint: disable=too-many-instance-attributes
     id = db.Column('id', db.Integer, db.Sequence('mhr_location_id_seq'), primary_key=True)
     ltsa_description = db.Column('ltsa_description', db.String(1000), nullable=True)
     additional_description = db.Column('additional_description', db.String(250), nullable=True)
-    dealer_name = db.Column('dealer_name', db.String(150), nullable=True)
+    dealer_name = db.Column('dealer_name', db.String(310), nullable=True)
     exception_plan = db.Column('exception_plan', db.String(150), index=True, nullable=True)
     leave_province = db.Column('leave_province', db.String(1), nullable=True)
     tax_certification = db.Column('tax_certification', db.String(1), nullable=True)

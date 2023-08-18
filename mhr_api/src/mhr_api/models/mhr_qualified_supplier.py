@@ -84,6 +84,49 @@ class MhrQualifiedSupplier(db.Model):  # pylint: disable=too-many-instance-attri
         db.session.add(self)
         db.session.commit()
 
+    def update(self, json_data: dict):
+        """Update the qualified supplier information."""
+        if not json_data:
+            return
+        if json_data.get('businessName'):
+            self.business_name = json_data['businessName'].strip().upper()
+            self.last_name = None
+            self.first_name = None
+            self.middle_name = None
+        else:
+            self.business_name = None
+            self.last_name = json_data['personName']['last'].strip().upper()
+            self.first_name = json_data['personName']['first'].strip().upper()
+            if json_data['personName'].get('middle'):
+                self.middle_name = json_data['personName']['middle'].strip().upper()
+        if json_data.get('dbaName'):
+            self.dba_name = json_data['dbaName'].strip().upper()
+        else:
+            self.dba_name = None
+        if json_data.get('authorizationName'):
+            self.authorization_name = json_data['authorizationName'].strip()
+        else:
+            self.authorization_name = None
+        self.email_id = json_data['emailAddress'].strip() if json_data.get('emailAddress') else None
+        self.phone_number = json_data['phoneNumber'].strip() if json_data.get('phoneNumber') else None
+        self.phone_extension = json_data['phoneExtension'].strip() if json_data.get('phoneExtension') else None
+        self.terms_accepted = 'Y' if json_data.get('termsAccepted') else None
+        if json_data.get('address') != self.address.json:
+            self.address = Address.create_from_json(json_data['address'])
+        db.session.add(self)
+        db.session.commit()
+
+    @classmethod
+    def delete(cls, account_id: str):
+        """Delete a qualified supplier by account ID."""
+        supplier = None
+        if account_id:
+            supplier = cls.find_by_account_id(account_id)
+        if supplier:
+            db.session.delete(supplier)
+            db.session.commit()
+        return supplier
+
     @classmethod
     def find_by_id(cls, supplier_id: int = None):
         """Return a qualified supplier party object by primary key ID."""

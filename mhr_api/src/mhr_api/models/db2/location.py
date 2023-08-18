@@ -397,7 +397,7 @@ class Db2Location(db.Model):
                                land_district=new_info.get('landDistrict', ''),
                                plan=new_info.get('plan', ''),
                                except_plan=new_info.get('exceptionPlan', ''),
-                               dealer_name=new_info.get('dealerName', ''),
+                               dealer_name=str(new_info.get('dealerName', ''))[0:60],
                                additional_description=additional_desc,
                                leave_bc='N',
                                tax_certificate='N')

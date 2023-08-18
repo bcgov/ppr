@@ -178,6 +178,6 @@ class MhrNote(db.Model):  # pylint: disable=too-many-instance-attributes
             if not note.remarks:
                 note.remarks = REMARKS_CAUC_NO_EXPIRY
             elif note.remarks.lower().find(REMARKS_CAUC_NO_EXPIRY.lower()) < 0:
-                note.remarks += ' ' + REMARKS_CAUC_NO_EXPIRY
+                note.remarks = REMARKS_CAUC_NO_EXPIRY + ' ' + note.remarks
             reg_json['remarks'] = note.remarks
         return note
