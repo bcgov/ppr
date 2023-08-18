@@ -2,6 +2,7 @@ import APP from '@/App.vue'
 import {
   AddCollateral,
   AddSecuredPartiesAndDebtors,
+  DischargeRegistration,
   ConfirmDischarge,
   Dashboard,
   LengthTrust,
@@ -10,7 +11,6 @@ import {
   MhrInformation,
   ConfirmMHRSearch,
   ReviewConfirm,
-  ReviewRegistration,
   RenewRegistration,
   ConfirmRenewal,
   Search,
@@ -75,7 +75,7 @@ export const routes = [
   {
     path: '/discharge/review-discharge',
     name: RouteNames.REVIEW_DISCHARGE,
-    component: ReviewRegistration,
+    component: DischargeRegistration,
     meta: {
       requiresAuth: true
     }
@@ -105,7 +105,7 @@ export const routes = [
     }
   },
   {
-    path: '/amendment/confirm-admendment',
+    path: '/amendment/confirm-amendment',
     name: RouteNames.CONFIRM_AMENDMENT,
     component: ConfirmAmendment,
     meta: {

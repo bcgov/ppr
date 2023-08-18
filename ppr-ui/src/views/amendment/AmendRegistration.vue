@@ -137,7 +137,7 @@ import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'v
 import { useRoute, useRouter } from 'vue2-helpers/vue-router'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
-import { cloneDeep, isEqual } from 'lodash'
+import { isEqual } from 'lodash'
 import { CautionBox, StickyContainer, CourtOrder } from '@/components/common'
 import { BaseDialog } from '@/components/dialogs'
 import { Debtors } from '@/components/parties/debtor'
@@ -149,7 +149,6 @@ import {
 } from '@/components/registration'
 import { Collateral } from '@/components/collateral'
 import { RegisteringPartySummary, SecuredPartySummary, DebtorSummary } from '@/components/parties/summaries'
-import { AllRegistrationTypes } from '@/resources'
 import { unsavedChangesDialog } from '@/resources/dialogOptions'
 import {
   getFeatureFlag,
@@ -180,7 +179,7 @@ import {
   RegTableNewItemI
 } from '@/interfaces'
 import { useSecuredParty } from '@/composables/parties'
-import { useAuth, useNavigation } from '@/composables'
+import { useAuth, useNavigation, usePprRegistration } from '@/composables'
 /* eslint-enable no-unused-vars */
 
 export default defineComponent({
@@ -216,27 +215,17 @@ export default defineComponent({
     const router = useRouter()
     const { goToDash } = useNavigation()
     const { isAuthenticated } = useAuth()
+    const { initPprUpdateFilling } = usePprRegistration()
     const {
       // Actions
       setAddCollateral,
-      setStaffPayment,
       setLengthTrust,
-      setOriginalAddCollateral,
-      setRegistrationNumber,
-      setRegistrationType,
-      setRegistrationFlowType,
-      setCertifyInformation,
       setCollateralShowInvalid,
       setRegTableNewItem,
       setUnsavedChanges,
       setAmendmentDescription,
       setCourtOrderInformation,
-      setFolioOrReferenceNumber,
-      setOriginalLengthTrust,
-      setRegistrationCreationDate,
-      setRegistrationExpiryDate,
-      setAddSecuredPartiesAndDebtors,
-      setOriginalAddSecuredPartiesAndDebtors
+      setAddSecuredPartiesAndDebtors
     } = useStore()
     const {
       // Getters
@@ -317,12 +306,12 @@ export default defineComponent({
 
     const cancel = (): void => {
       if (hasUnsavedChanges.value) localState.showCancelDialog = true
-      else goToDashboard()
+      else goToDash()
     }
 
     const handleDialogResp = (val: boolean): void => {
       localState.showCancelDialog = false
-      if (!val) goToDashboard()
+      if (!val) goToDash()
     }
 
     /** Emits error to app.vue for handling */
@@ -366,73 +355,7 @@ export default defineComponent({
     }
 
     const setStore = async (financingStatement: FinancingStatementIF): Promise<void> => {
-      // load data into the store
-      const registrationType = AllRegistrationTypes.find((reg) => {
-        if (reg.registrationTypeAPI === financingStatement.type) {
-          return true
-        }
-      })
-      const collateral = {
-        valid: true,
-        vehicleCollateral: financingStatement.vehicleCollateral || null,
-        generalCollateral: financingStatement.generalCollateral
-      } as AddCollateralIF
-      const lengthTrust = {
-        valid: true,
-        trustIndenture: financingStatement.trustIndenture || false,
-        lifeInfinite: financingStatement.lifeInfinite || false,
-        lifeYears: financingStatement.lifeYears || null,
-        surrenderDate: financingStatement.surrenderDate || null,
-        lienAmount: financingStatement.lienAmount || null
-      } as LengthTrustIF
-      const parties = {
-        valid: true,
-        registeringParty: null, // will be taken from account info
-        securedParties: financingStatement.securedParties,
-        debtors: financingStatement.debtors
-      } as AddPartiesIF
-      const origParties = {
-        registeringParty: financingStatement.registeringParty, // will be used for summary
-        securedParties: financingStatement.securedParties,
-        debtors: financingStatement.debtors
-      } as AddPartiesIF
-      const courtOrder: CourtOrderIF = {
-        courtRegistry: '',
-        courtName: '',
-        fileNumber: '',
-        effectOfOrder: '',
-        orderDate: ''
-      }
-      const certifyInfo: CertifyIF = {
-        valid: false,
-        certified: false,
-        legalName: '',
-        registeringParty: null
-      }
-      setRegistrationCreationDate(financingStatement.createDateTime)
-      setRegistrationExpiryDate(financingStatement.expiryDate)
-      setRegistrationNumber(financingStatement.baseRegistrationNumber)
-      setRegistrationType(registrationType)
-      setAddCollateral(collateral)
-      setLengthTrust(lengthTrust)
-      setAddSecuredPartiesAndDebtors(cloneDeep(parties))
-      setOriginalAddCollateral(cloneDeep(collateral))
-      setOriginalLengthTrust(cloneDeep(lengthTrust))
-      setOriginalAddSecuredPartiesAndDebtors(cloneDeep(origParties))
-      setRegistrationFlowType(RegistrationFlowType.AMENDMENT)
-      // Reset anything left in the store that is amendment registration related.
-      setAmendmentDescription('')
-      setCourtOrderInformation(courtOrder)
-      setFolioOrReferenceNumber('')
-      setCertifyInformation(certifyInfo)
-      setStaffPayment({
-        option: -1,
-        routingSlipNumber: '',
-        bcolAccountNumber: '',
-        datNumber: '',
-        folioNumber: '',
-        isPriority: false
-      })
+      initPprUpdateFilling(financingStatement, RegistrationFlowType.AMENDMENT)
       if (localState.documentId) {
         const stateModel: StateModelIF =
           await setupAmendmentStatementFromDraft(getStateModel.value, localState.documentId)
@@ -591,12 +514,6 @@ export default defineComponent({
         hasChanged = true
       }
       return hasChanged
-    }
-
-    const goToDashboard = (): void => {
-      // unset registration number
-      setRegistrationNumber(null)
-      goToDash()
     }
 
     const setCourtOrderValid = (valid): void => {

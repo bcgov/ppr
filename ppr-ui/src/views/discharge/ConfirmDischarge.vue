@@ -14,7 +14,7 @@
       :setDisplay="showCancelDialog"
       @proceed="handleDialogResp($event)"
     />
-    <div v-if="dataLoaded && !dataLoadError" class="container pa-0" style="min-width: 960px;">
+    <div v-if="appReady" class="container pa-0" style="min-width: 960px;">
       <v-row no-gutters>
         <v-col cols="9">
           <h1>Confirm and Complete Total Discharge</h1>
@@ -46,7 +46,7 @@
           />
           <caution-box v-if="showRegMsg" :setMsg="cautionTxtRP" :setImportantWord="'Note'"/>
           <folio-number-summary
-            @folioValid="setFolioValid($event)"
+            @folioValid="validFolio = $event"
             :setShowErrors="showErrors"
             class="pt-15"
           />
@@ -65,6 +65,7 @@
           />
           <certify-information
             @certifyValid="validCertify = $event"
+            :sectionNumber="3"
             :setShowErrors="showErrors"
             class="pt-10"
           />
@@ -83,8 +84,8 @@
                 :setCancelBtn="'Cancel'"
                 :setSubmitBtn="'Register Total Discharge'"
                 :setDisableSubmitBtn="isRoleStaffBcol"
-                @back="goToReviewRegistration()"
-                @cancel="showDialog()"
+                @back="goToDischarge()"
+                @cancel="showCancelDialog = true"
                 @submit="submitDischarge()"
               />
             </affix>
@@ -96,7 +97,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
 import { useRoute, useRouter } from 'vue2-helpers/vue-router'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
@@ -109,22 +110,17 @@ import {
 } from '@/components/common'
 import { RegisteringPartyChange } from '@/components/parties/party'
 import { BaseDialog } from '@/components/dialogs'
-import { AllRegistrationTypes } from '@/resources'
 import { notCompleteDialog } from '@/resources/dialogOptions'
-import { getFeatureFlag, getFinancingStatement, saveDischarge } from '@/utils'
-/* eslint-disable no-unused-vars */
+import { getFeatureFlag, saveDischarge } from '@/utils'
 import { ActionTypes, APIRegistrationTypes, RouteNames, UIRegistrationTypes } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import {
   DischargeRegistrationIF,
-  ErrorIF,
-  AddPartiesIF,
   StateModelIF,
   DialogOptionsIF,
   RegTableNewItemI
 } from '@/interfaces'
 import { useAuth, useNavigation } from '@/composables'
-/* eslint-enable no-unused-vars */
 
 export default defineComponent({
   name: 'ConfirmDischarge',
@@ -148,26 +144,24 @@ export default defineComponent({
       default: false
     }
   },
-  setup (props, context) {
+  setup (props, { emit }) {
     const route = useRoute()
     const router = useRouter()
     const { goToDash } = useNavigation()
     const { isAuthenticated } = useAuth()
     const {
       // Actions
-      setRegTableNewItem,
-      setRegistrationType,
-      setRegistrationNumber,
-      setRegistrationExpiryDate,
-      setRegistrationCreationDate,
-      setAddSecuredPartiesAndDebtors
+      setRegTableNewItem
     } = useStore()
     const {
       // Getters
       getStateModel,
       isRoleStaffBcol,
       getConfirmDebtorName,
+      getGeneralCollateral,
+      getVehicleCollateral,
       getRegistrationType,
+      getRegistrationNumber,
       getAddSecuredPartiesAndDebtors
     } = storeToRefs(useStore())
 
@@ -176,11 +170,7 @@ export default defineComponent({
         'registration.',
       cautionTxtRP: 'The Registry will not provide the verification statement for this total discharge to the ' +
         'Registering Party named above.',
-      collateralSummary: '',
-      dataLoaded: false,
-      dataLoadError: false,
       feeType: FeeSummaryTypes.DISCHARGE,
-      financingStatementDate: null as Date,
       options: notCompleteDialog as DialogOptionsIF,
       showCancelDialog: false,
       showErrors: false,
@@ -192,6 +182,12 @@ export default defineComponent({
       validConfirm: false,
       validFolio: true,
       validCertify: false,
+      collateralSummary: computed((): string => {
+        if (!getGeneralCollateral.value && !getVehicleCollateral.value) return 'No Collateral'
+        return `${getGeneralCollateral.value ? '' : 'No '}General Collateral and ` +
+                  `${getVehicleCollateral.value?.length || 0} ` +
+                  `${getVehicleCollateral.value?.length !== 1 ? 'Vehicles' : 'Vehicle'}`
+      }),
       registrationNumber: computed((): string => {
         return (route.query['reg-num'] as string) || ''
       }),
@@ -209,109 +205,36 @@ export default defineComponent({
       })
     })
 
-    onMounted(() => {
-      onAppReady(props.appReady)
-    })
-
-    const loadRegistration = async (): Promise<void> => {
-      if (!localState.registrationNumber || !getConfirmDebtorName) {
-        if (!localState.registrationNumber) {
-          console.error('No registration number given to discharge. Redirecting to dashboard...')
-        } else {
-          console.error('No debtor name confirmed for discharge. Redirecting to dashboard...')
-        }
-        goToDash()
-        return
-      }
-      localState.financingStatementDate = new Date()
-      const financingStatement = await getFinancingStatement(
-        true,
-        localState.registrationNumber
-      )
-      if (financingStatement.error) {
-        localState.dataLoadError = true
-        emitError(financingStatement.error)
-      } else {
-        // set collateral summary
-        if (
-          financingStatement.generalCollateral &&
-          !financingStatement.vehicleCollateral
-        ) {
-          localState.collateralSummary = 'General Collateral and 0 Vehicles'
-        } else if (financingStatement.generalCollateral) {
-          localState.collateralSummary = `General Collateral and ${financingStatement.vehicleCollateral.length} ` +
-            'Vehicles'
-        } else if (financingStatement.vehicleCollateral) {
-          localState.collateralSummary = `No General Collateral and ${financingStatement.vehicleCollateral.length} ` +
-            'Vehicles'
-        } else {
-          localState.collateralSummary += 'No Collateral'
-        }
-        if (financingStatement.vehicleCollateral?.length === 1) {
-          localState.collateralSummary = localState.collateralSummary
-            .replace('Vehicles', 'Vehicle')
-        }
-        // load data into the store
-        const registrationType = AllRegistrationTypes.find((reg, index) => {
-          if (reg.registrationTypeAPI === financingStatement.type) {
-            return true
-          }
-        })
-        const parties = {
-          valid: true,
-          registeringParty: null,
-          securedParties: financingStatement.securedParties,
-          debtors: financingStatement.debtors
-        } as AddPartiesIF
-        setRegistrationCreationDate(financingStatement.createDateTime)
-        setRegistrationExpiryDate(financingStatement.expiryDate)
-        setRegistrationNumber(financingStatement.baseRegistrationNumber)
-        setRegistrationType(registrationType)
-        setAddSecuredPartiesAndDebtors(parties)
-      }
-    }
-
-    const onAppReady = async (val: boolean): Promise<void> => {
-      // do not proceed if app is not ready
-      if (!val) return
+    const onAppReady = (): void => {
       // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
-      if (!isAuthenticated.value || (!props.isJestRunning && !getFeatureFlag('ppr-ui-enabled'))) {
+      if (!isAuthenticated.value || (!props.isJestRunning && !getFeatureFlag('ppr-ui-enabled'))) goToDash()
+
+      // if data is not accurate/missing (could be caused if user manually edits the url)
+      if (!localState.registrationNumber || !getConfirmDebtorName.value ||
+          localState.registrationNumber !== getRegistrationNumber.value) {
+        emit('error', 'Invalid Registration State')
         goToDash()
-        return
       }
-
-      // get registration data from api and load into store
-      localState.submitting = true
-      await loadRegistration()
-      localState.submitting = false
-
-      // page is ready to view
-      emitHaveData(true)
-      localState.dataLoaded = true
     }
+
+    /** Called when App is ready and this component can load its data. */
+    watch(() => props.appReady, (appReady: boolean) => {
+      if (appReady) onAppReady()
+    }, { immediate: true })
 
     const handleDialogResp = (val: boolean): void => {
       localState.showCancelDialog = false
       if (!val) {
-        setRegistrationNumber(null)
         goToDash()
       }
     }
 
-    const goToReviewRegistration = (): void => {
+    const goToDischarge = (): void => {
       router.push({
         name: RouteNames.REVIEW_DISCHARGE,
-        query: { 'reg-num': localState.registrationNumber }
+        query: { 'reg-num': localState.registrationNumber + '-confirm' }
       })
-      emitHaveData(false)
-    }
-
-    const setFolioValid = (valid: boolean): void => {
-      localState.validFolio = valid
-    }
-
-    const showDialog = (): void => {
-      localState.showCancelDialog = true
+      emit('haveData', false)
     }
 
     const submitDischarge = async (): Promise<void> => {
@@ -325,7 +248,7 @@ export default defineComponent({
       const apiResponse: DischargeRegistrationIF = await saveDischarge(stateModel)
       localState.submitting = false
       if (apiResponse === undefined || apiResponse?.error !== undefined) {
-        emitError(apiResponse?.error)
+        emit('error', apiResponse?.error)
       } else {
         // set new added reg
         const newItem: RegTableNewItemI = {
@@ -336,13 +259,8 @@ export default defineComponent({
         }
         setRegTableNewItem(newItem)
         // On success return to dashboard
-        goToDashboard()
+        goToDash()
       }
-    }
-
-    const goToDashboard = (): void => {
-      goToDash()
-      emitHaveData(false)
     }
 
     const setShowWarning = (): void => {
@@ -350,31 +268,12 @@ export default defineComponent({
       localState.showRegMsg = parties.registeringParty?.action === ActionTypes.EDITED
     }
 
-    /** Emits Have Data event. */
-    const emitHaveData = (haveData: Boolean = true): void => {
-      context.emit('haveData', haveData)
-    }
-
-    /** Emits error to app.vue for handling */
-    const emitError = (error: ErrorIF): void => {
-      context.emit('error', error)
-      console.error(error)
-    }
-
-    /** Called when App is ready and this component can load its data. */
-    watch(() => props.appReady, (val: boolean) => {
-      onAppReady(val)
-    })
-
     return {
-      showDialog,
-      setFolioValid,
-      goToDashboard,
+      goToDischarge,
       setShowWarning,
       isRoleStaffBcol,
       submitDischarge,
       handleDialogResp,
-      goToReviewRegistration,
       ...toRefs(localState)
     }
   }

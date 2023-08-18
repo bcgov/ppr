@@ -21,7 +21,7 @@
       :setShowCertifiedCheckbox="false"
       @proceed="onStaffPaymentChanges($event)"
     />
-    <div v-if="dataLoaded && !dataLoadError" class="container pa-0" style="min-width: 960px;">
+    <div v-if="appReady" class="container pa-0" style="min-width: 960px;">
       <v-row no-gutters>
         <v-col class="review-page" cols="9">
           <h1>Review and Complete Amendment</h1>
@@ -178,12 +178,10 @@ import { SecuredPartySummary, DebtorSummary } from '@/components/parties/summari
 import { RegisteringPartyChange } from '@/components/parties/party'
 import { AmendmentDescription, RegistrationLengthTrustAmendment } from '@/components/registration'
 import { VehicleCollateral } from '@/components/collateral/vehicleCollateral'
-import { AllRegistrationTypes } from '@/resources'
 import { unsavedChangesDialog } from '@/resources/dialogOptions'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import {
   getFeatureFlag,
-  getFinancingStatement,
   saveAmendmentStatement,
   saveAmendmentStatementDraft
 } from '@/utils'
@@ -244,7 +242,7 @@ export default defineComponent({
       default: false
     }
   },
-  setup (props, context) {
+  setup (props, { emit }) {
     const route = useRoute()
     const router = useRouter()
     const { goToDash } = useNavigation()
@@ -252,12 +250,7 @@ export default defineComponent({
     const {
       // Actions
       setUnsavedChanges,
-      setRegTableNewItem,
-      setRegistrationType,
-      setRegistrationNumber,
-      setRegistrationExpiryDate,
-      setRegistrationCreationDate,
-      setAddSecuredPartiesAndDebtors
+      setRegTableNewItem
     } = useStore()
     const {
       // Getters
@@ -279,8 +272,6 @@ export default defineComponent({
 
     const localState = reactive({
       collateralSummary: '',
-      dataLoaded: false,
-      dataLoadError: false,
       registeringOpen: false,
       showRegMsg: false,
       financingStatementDate: null as Date,
@@ -322,9 +313,6 @@ export default defineComponent({
       }),
       showDescription: computed((): boolean => {
         return !!getAmendmentDescription.value
-      }),
-      currentRegNumber: computed((): string => {
-        return getRegistrationNumber.value || ''
       }),
       showCourtOrder: computed((): boolean => {
         const courtOrder: CourtOrderIF = getCourtOrderInformation.value
@@ -426,89 +414,29 @@ export default defineComponent({
 
     const cancel = (): void => {
       if (hasUnsavedChanges) localState.showCancelDialog = true
-      else goToDashboard()
+      else goToDash()
     }
 
     const handleDialogResp = (val: boolean): void => {
       localState.showCancelDialog = false
-      if (!val) goToDashboard()
+      if (!val) goToDash()
     }
 
     const scrollToInvalid = async (): Promise<void> => {
+      let docId = ''
       if (!localState.validFolio) {
-        const component = document.getElementById('folio-summary')
-        await component.scrollIntoView({ behavior: 'smooth' })
-        return
+        docId = 'folio-summary'
+      } else if (localState.registeringOpen) {
+        docId = 'reg-party-change'
+      } else if (!localState.courtOrderValid) {
+        docId = 'court-order-component'
+      } else if (!localState.certifyInformationValid) {
+        docId = 'certify-information'
       }
-      if (localState.registeringOpen) {
-        const component = document.getElementById('reg-party-change')
-        await component.scrollIntoView({ behavior: 'smooth' })
-        return
-      }
-      if (!localState.courtOrderValid) {
-        const component = document.getElementById('court-order-component')
-        await component.scrollIntoView({ behavior: 'smooth' })
-        return
-      }
-      if (!localState.certifyInformationValid) {
-        const component = document.getElementById('certify-information')
+      if (docId) {
+        const component = document.getElementById(docId)
         await component.scrollIntoView({ behavior: 'smooth' })
       }
-    }
-
-    const loadRegistration = async (): Promise<void> => {
-      if (!localState.registrationNumber || !getConfirmDebtorName) {
-        if (!localState.registrationNumber) {
-          console.error('No registration number this amendment. Redirecting to dashboard...')
-        } else {
-          console.error('No debtor name confirmed for this amendment. Redirecting to dashboard...')
-        }
-        goToDash()
-        return
-      }
-
-      if (localState.currentRegNumber === localState.registrationNumber) {
-        return
-      }
-
-      localState.financingStatementDate = new Date()
-      localState.submitting = true
-      const financingStatement = await getFinancingStatement(
-        true,
-        localState.registrationNumber
-      )
-
-      if (financingStatement.error) {
-        localState.dataLoadError = true
-        emitError(financingStatement.error)
-      } else {
-        await setStore(financingStatement)
-        // give time for setStore to finish
-        setTimeout(() => {
-          setUnsavedChanges(false)
-        }, 200)
-      }
-      localState.submitting = false
-    }
-
-    const setStore = async (financingStatement: FinancingStatementIF): Promise<void> => {
-      // load data into the store
-      const registrationType = AllRegistrationTypes.find((reg, index) => {
-        if (reg.registrationTypeAPI === financingStatement.type) {
-          return true
-        }
-      })
-      const parties = {
-        valid: true,
-        registeringParty: null, // will be taken from account info
-        securedParties: financingStatement.securedParties,
-        debtors: financingStatement.debtors
-      } as AddPartiesIF
-      setRegistrationCreationDate(financingStatement.createDateTime)
-      setRegistrationExpiryDate(financingStatement.expiryDate)
-      setRegistrationNumber(financingStatement.baseRegistrationNumber)
-      setRegistrationType(registrationType)
-      setAddSecuredPartiesAndDebtors(parties)
     }
 
     const goToReviewAmendment = (): void => {
@@ -516,7 +444,7 @@ export default defineComponent({
         name: RouteNames.AMEND_REGISTRATION,
         query: { 'reg-num': localState.registrationNumber + '-confirm' }
       })
-      emitHaveData(false)
+      emit('haveData', false)
     }
 
     const setShowWarning = (): void => {
@@ -548,7 +476,7 @@ export default defineComponent({
       const draft: DraftIF = await saveAmendmentStatementDraft(stateModel)
       localState.submitting = false
       if (draft.error) {
-        emitError(draft.error)
+        emit('error', draft.error)
       } else {
         setUnsavedChanges(false)
         const prevDraftId = stateModel.registration?.draft?.amendmentStatement?.documentId || ''
@@ -560,10 +488,7 @@ export default defineComponent({
           prevDraft: prevDraftId
         }
         setRegTableNewItem(newItem)
-        router.push({
-          name: RouteNames.DASHBOARD
-        })
-        emitHaveData(false)
+        goToDash()
       }
     }
 
@@ -588,7 +513,7 @@ export default defineComponent({
         const apiResponse: AmendmentStatementIF = await saveAmendmentStatement(stateModel)
         localState.submitting = false
         if (apiResponse === undefined || apiResponse?.error !== undefined) {
-          emitError(apiResponse?.error)
+          emit('error', apiResponse?.error)
         } else {
           const prevDraftId = stateModel.registration?.draft?.amendmentStatement?.documentId || ''
           // set new added reg
@@ -600,7 +525,7 @@ export default defineComponent({
           }
           setRegTableNewItem(newItem)
           // On success return to dashboard
-          goToDashboard()
+          goToDash()
         }
       } else {
         // emit registration incomplete error
@@ -613,11 +538,6 @@ export default defineComponent({
       }
     }
 
-    const goToDashboard = (): void => {
-      goToDash()
-      emitHaveData(false)
-    }
-
     const onAppReady = async (val: boolean): Promise<void> => {
       // do not proceed if app is not ready
       if (!val) return
@@ -628,23 +548,11 @@ export default defineComponent({
         return
       }
 
-      // get registration data from api and load into store
-      await loadRegistration()
-
-      // page is ready to view
-      emitHaveData(true)
-      localState.dataLoaded = true
-    }
-
-    /** Emits Have Data event. */
-    const emitHaveData = (haveData: Boolean = true): void => {
-      context.emit('haveData', haveData)
-    }
-
-    /** Emits error to app.vue for handling */
-    const emitError = (error: ErrorIF): void => {
-      context.emit('error', error)
-      console.error(error)
+      if (!localState.registrationNumber || !getConfirmDebtorName.value ||
+          localState.registrationNumber !== getRegistrationNumber.value) {
+        goToDash()
+        emit('error', 'Invalid Registration State')
+      }
     }
 
     /** Called when App is ready and this component can load its data. */

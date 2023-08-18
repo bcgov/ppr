@@ -72,10 +72,8 @@ import { BaseDialog } from '@/components/dialogs'
 import { RegistrationLengthTrustSummary } from '@/components/registration'
 import { Collateral } from '@/components/collateral'
 import { DebtorSummary, RegisteringPartySummary, SecuredPartySummary } from '@/components/parties/summaries'
-import { AllRegistrationTypes } from '@/resources'
 import { notCompleteDialog } from '@/resources/dialogOptions'
 import { getFeatureFlag, getFinancingStatement, pacificDate } from '@/utils'
-/* eslint-disable no-unused-vars */
 import {
   APIRegistrationTypes,
   RouteNames,
@@ -83,12 +81,11 @@ import {
   UIRegistrationTypes
 } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
-import { ErrorIF, AddPartiesIF, AddCollateralIF, LengthTrustIF, CertifyIF, DialogOptionsIF } from '@/interfaces'
-import { useAuth, useNavigation } from '@/composables'
-/* eslint-enable no-unused-vars */
+import { ErrorIF, DialogOptionsIF } from '@/interfaces'
+import { useAuth, useNavigation, usePprRegistration } from '@/composables'
 
 export default defineComponent({
-  name: 'ReviewRegistration',
+  name: 'DischargeRegistration',
   components: {
     BaseDialog,
     CautionBox,
@@ -115,20 +112,7 @@ export default defineComponent({
     const router = useRouter()
     const { goToDash } = useNavigation()
     const { isAuthenticated } = useAuth()
-    const {
-      // Actions
-      setLengthTrust,
-      setAddCollateral,
-      setRegistrationType,
-      setCertifyInformation,
-      setRegistrationNumber,
-      setRegistrationFlowType,
-      setFolioOrReferenceNumber,
-      setRegistrationExpiryDate,
-      setRegistrationCreationDate,
-      setAddSecuredPartiesAndDebtors,
-      setOriginalAddSecuredPartiesAndDebtors
-    } = useStore()
+    const { initPprUpdateFilling } = usePprRegistration()
     const {
       // Getters
       getRegistrationType,
@@ -142,6 +126,7 @@ export default defineComponent({
       dataLoadError: false,
       feeType: FeeSummaryTypes.DISCHARGE,
       financingStatementDate: null as Date,
+      fromConfirmation: false,
       loading: false,
       options: notCompleteDialog as DialogOptionsIF,
       showCancelDialog: false,
@@ -153,7 +138,12 @@ export default defineComponent({
         return ''
       }),
       registrationNumber: computed((): string => {
-        return route.query['reg-num'] as string || ''
+        let regNum = route.query['reg-num'] as string
+        if (regNum && regNum.endsWith('-confirm')) {
+          localState.fromConfirmation = true
+          regNum = regNum.replace('-confirm', '')
+        }
+        return regNum || ''
       }),
       registrationTypeUI: computed((): UIRegistrationTypes => {
         return getRegistrationType.value?.registrationTypeUI || null
@@ -170,7 +160,6 @@ export default defineComponent({
     const handleDialogResp = (val: boolean): void => {
       localState.showCancelDialog = false
       if (!val) {
-        setRegistrationNumber(null)
         goToDash()
       }
     }
@@ -185,60 +174,19 @@ export default defineComponent({
         goToDash()
         return
       }
+
+      // Conditionally load: could be coming back from confirm.
+      if (localState.fromConfirmation) {
+        return
+      }
+
       localState.financingStatementDate = new Date()
       const financingStatement = await getFinancingStatement(true, localState.registrationNumber)
       if (financingStatement.error) {
         localState.dataLoadError = true
         emitError(financingStatement.error)
       } else {
-        // load data into the store
-        const registrationType = AllRegistrationTypes.find(
-          (reg, index) => {
-            if (reg.registrationTypeAPI === financingStatement.type) {
-              return true
-            }
-          })
-        const collateral = {
-          valid: true,
-          vehicleCollateral: financingStatement.vehicleCollateral,
-          generalCollateral: financingStatement.generalCollateral
-        } as AddCollateralIF
-        const lengthTrust = {
-          valid: true,
-          trustIndenture: financingStatement.trustIndenture || false,
-          lifeInfinite: financingStatement.lifeInfinite || false,
-          lifeYears: financingStatement.lifeYears || null,
-          surrenderDate: financingStatement.surrenderDate || null,
-          lienAmount: financingStatement.lienAmount || null
-        } as LengthTrustIF
-        const parties = {
-          valid: true,
-          registeringParty: null, // will be taken from account info
-          securedParties: financingStatement.securedParties,
-          debtors: financingStatement.debtors
-        } as AddPartiesIF
-        const origParties = {
-          registeringParty: financingStatement.registeringParty, // will be used for summary
-          securedParties: financingStatement.securedParties,
-          debtors: financingStatement.debtors
-        } as AddPartiesIF
-        const certifyInfo: CertifyIF = {
-          valid: false,
-          certified: false,
-          legalName: '',
-          registeringParty: null
-        }
-        setRegistrationCreationDate(financingStatement.createDateTime)
-        setRegistrationExpiryDate(financingStatement.expiryDate)
-        setRegistrationNumber(financingStatement.baseRegistrationNumber)
-        setRegistrationType(registrationType)
-        setAddCollateral(collateral)
-        setLengthTrust(lengthTrust)
-        setAddSecuredPartiesAndDebtors(parties)
-        setOriginalAddSecuredPartiesAndDebtors(origParties)
-        setRegistrationFlowType(RegistrationFlowType.DISCHARGE)
-        setFolioOrReferenceNumber('')
-        setCertifyInformation(certifyInfo)
+        initPprUpdateFilling(financingStatement, RegistrationFlowType.DISCHARGE)
       }
     }
 
