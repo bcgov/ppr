@@ -375,5 +375,6 @@ describe('UnitNotePanels', () => {
     expect(content.exists()).toBe(true)
 
     expect(content.find('#no-expiry').text()).toBe('N/A')
+    expect(content.find('#separated-remarks').text()).toContain('Continued until further order of the court.\n')
   })
 })

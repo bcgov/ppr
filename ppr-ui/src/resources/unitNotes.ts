@@ -40,7 +40,8 @@ export const UnitNotesInfo: Record<UnitNoteDocTypes, UnitNoteInfoIF> = {
       certifyInfo: 5,
       staffPayment: 6
     },
-    panelHeader: 'Notice of Caution (Continued)'
+    panelHeader: 'Notice of Caution (Continued)',
+    generatedRemarks: 'Continued until further order of the court.'
   },
   [UnitNoteDocTypes.EXTENSION_TO_NOTICE_OF_CAUTION]: {
     header: 'Extension to Notice of Caution',

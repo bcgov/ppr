@@ -31,9 +31,16 @@
         <h3 class="fs-14">Remarks</h3>
       </v-col>
       <v-col cols="9">
-        <span class="info-text fs-14">
+        <span v-if=!separatedRemarks class="info-text fs-14">
           {{ note.remarks }}
         </span>
+        <template v-else>
+          <span id="separated-remarks" class="info-text fs-14">
+            {{ separatedRemarks[0] }}
+            <br />
+            {{ separatedRemarks[1] }}
+          </span>
+        </template>
       </v-col>
     </v-row>
 
@@ -102,12 +109,14 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue-demi'
-import { personGivingNoticeTableHeaders } from '@/resources'
+import { UnitNotesInfo, personGivingNoticeTableHeaders } from '@/resources'
 import { UnitNoteIF } from '@/interfaces/unit-note-interfaces/unit-note-interface'
 import { pacificDate } from '@/utils'
 import { PartyIF } from '@/interfaces'
 import { BaseAddress } from '@/composables/address'
 import { useMhrUnitNote } from '@/composables'
+import { UnitNoteDocTypes } from '@/enums'
+import { computed, reactive, toRefs } from 'vue'
 
 export default defineComponent({
   name: 'UnitNoteContentInfo',
@@ -120,8 +129,23 @@ export default defineComponent({
   components: {
     BaseAddress
   },
-  setup () {
+  setup (props) {
     const { isNoticeOfCautionOrRelatedDocType } = useMhrUnitNote()
+
+    const localState = reactive({
+      separatedRemarks: computed(() : string[] | null => {
+        if (props.note.documentType === UnitNoteDocTypes.CONTINUED_NOTE_OF_CAUTION && !props.note.expiryDateTime) {
+          const remarks = props.note.remarks
+          const generatedRemarks = UnitNotesInfo[props.note.documentType].generatedRemarks
+          // No need to seperate if no additional remarks + extra safety check
+          if (remarks.trim() !== generatedRemarks && remarks.startsWith(generatedRemarks)) {
+            return [generatedRemarks, remarks.substring(generatedRemarks.length)]
+          }
+        }
+        return null
+      })
+    })
+
     const getNoticePartyIcon = (givingNoticeParty: PartyIF): string => {
       return givingNoticeParty.businessName
         ? 'mdi-domain'
@@ -140,7 +164,8 @@ export default defineComponent({
       getNoticePartyIcon,
       getNoticePartyName,
       isNoticeOfCautionOrRelatedDocType,
-      personGivingNoticeTableHeaders
+      personGivingNoticeTableHeaders,
+      ...toRefs(localState)
     }
   }
 })
