@@ -11,7 +11,7 @@
 
     <div :class="{ 'border-error-left': showIncomplete }">
       <!-- Incomplete Section Msg -->
-      <section v-if="showIncomplete" class="mx-6 py-9">
+      <section v-if="showIncomplete" class="mx-7 py-9">
         <v-icon color="error">mdi-information-outline</v-icon>
         <span class="error-text mx-1">This step is unfinished.</span>
         <router-link :to="{ path: returnRoute }">Return to this step to complete it.</router-link>
@@ -25,8 +25,12 @@
           <slot name="topInfoSlot" />
 
           <!--- Party Info Headers -->
-          <v-divider class="mx-4"/>
-          <v-row no-gutters class="px-6 pt-6 pb-2">
+          <v-divider class="mx-8"/>
+
+          <!-- Party info label slot -->
+          <slot name="partyInfoLabelSlot" />
+
+          <v-row no-gutters class="px-8 pt-6 pb-2">
             <!-- Future: Handle person name -->
             <v-col v-if="hasPropData('businessName')">
               <h4>Name</h4>
@@ -41,10 +45,10 @@
               <h4>Phone Number</h4 >
             </v-col>
           </v-row>
-          <v-divider class="mx-4"/>
+          <v-divider class="mx-8"/>
 
           <!-- Party Info Data -->
-          <v-row no-gutters class="px-6 py-7">
+          <v-row no-gutters class="px-8 py-7">
             <v-col v-if="hasPropData('businessName')">
               <!-- Future: Handle person name -->
               <label class="generic-label fs-14">

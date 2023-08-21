@@ -23,7 +23,7 @@
         <template v-slot:default>
           <thead>
             <tr>
-              <th class="pl-6 py-4">
+              <th class="pl-8 py-4">
                 Name
               </th>
               <th class="py-4">
@@ -39,7 +39,7 @@
           </thead>
           <tbody>
             <tr class="table-info">
-              <td class="account-name pl-6 py-6">
+              <td class="account-name pl-8 py-6">
                 <v-icon class="mt-n2">
                   {{ accountInfo.isBusinessAccount ? 'mdi-domain' : 'mdi-account' }}
                 </v-icon>

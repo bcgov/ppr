@@ -1,24 +1,36 @@
 <template>
   <PartyReview
     :baseParty="getMhrQsInformation"
-    :showIncomplete="!getMhrUserAccessValidation.qsInformationValid"
+    :showIncomplete="!getMhrUserAccessValidation.qsInformationValid || !getMhrUserAccessValidation.qsSaConfirmValid"
     :returnToRoutes="[RouteNames.QS_USER_ACCESS, RouteNames.QS_ACCESS_INFORMATION]"
   >
     <!-- Header Override -->
-    <template v-slot:headerSlot>
+    <template #headerSlot>
       <header class="review-header">
         <v-icon class="ml-1" color="darkBlue">mdi-account-lock</v-icon>
         <label class="font-weight-bold pl-2">Qualified Supplier ({{ getMhrSubProduct }}) Information</label>
       </header>
     </template>
 
+    <template #partyInfoLabelSlot>
+      <v-row no-gutters class="px-8 pt-6 mb-n2">
+        <v-col cols="2">
+          <label class="generic-label">Qualified Supplier</label>
+        </v-col>
+      </v-row>
+    </template>
+
     <!-- Conditional based on service agreement checkbox -->
-    <template v-slot:topInfoSlot>
-      <p class="icon-text ml-7 pb-2 mt-8">
-        <v-icon color="success" class="pr-2">mdi-check</v-icon>
-        I have read, understood and agree to the terms and conditions of the Qualified Suppliers’ Agreement for the
-        Manufactured Home Registry.
-      </p>
+    <template v-if="getMhrUserAccessValidation.qsSaConfirmValid" v-slot:topInfoSlot>
+      <FormCard label="Service Agreement">
+        <template #infoSlot>
+          <p class="icon-text ml-10 mb-n1">
+            <v-icon color="success" class="pr-2">mdi-check</v-icon>
+            I have read, understood and agree to the terms and conditions of the Qualified Suppliers’ Agreement for the
+            Manufactured Home Registry.
+          </p>
+        </template>
+      </FormCard>
     </template>
 
   </PartyReview>
@@ -26,7 +38,7 @@
 
 <script lang="ts">
 import { defineComponent, reactive, toRefs } from 'vue-demi'
-import { PartyReview } from '@/components/common'
+import { FormCard, PartyReview } from '@/components/common'
 import { storeToRefs } from 'pinia'
 import { useStore } from '@/store/store'
 import { RouteNames } from '@/enums'
@@ -37,6 +49,7 @@ export default defineComponent({
     RouteNames () { return RouteNames }
   },
   components: {
+    FormCard,
     PartyReview
   },
   setup () {

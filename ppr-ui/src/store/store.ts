@@ -480,7 +480,7 @@ export const useStore = defineStore('assetsStore', () => {
         text: 'Qualified Supplier <br />Information',
         to: RouteNames.QS_ACCESS_INFORMATION,
         disabled: false,
-        valid: getMhrUserAccessValidation.value.qsInformationValid,
+        valid: getMhrUserAccessValidation.value.qsInformationValid && getMhrUserAccessValidation.value.qsSaConfirmValid,
         component: QsInformation
       },
       {

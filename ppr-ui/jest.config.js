@@ -9,5 +9,6 @@ module.exports = {
   testTimeout: 50000,
   silent: true,
   preset: '@vue/cli-plugin-unit-jest/presets/typescript-and-babel',
-  transformIgnorePatterns: []
+  transformIgnorePatterns: [],
+  setupFiles: ['<rootDir>/tests/jest.setup.ts']
 }

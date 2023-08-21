@@ -745,3 +745,30 @@ export async function createQualifiedSupplier (payload: MhrQsPayloadIF): Promise
       return data
     })
 }
+
+// Get pdf for a Qualified Supplier Service Agreement
+export async function getQsServiceAgreements (): Promise<any> {
+  const url = sessionStorage.getItem('MHR_API_URL')
+  const config = {
+    baseURL: url,
+    headers: { Accept: 'application/pdf' },
+    responseType: 'blob' as 'json'
+  }
+  return axios
+    .get(`service-agreements/latest`, config)
+    .then(response => {
+      const data = response?.data
+      if (!data) {
+        throw new Error('Invalid API response')
+      }
+      return data
+    })
+    .catch(error => {
+      return {
+        error: {
+          category: ErrorCategories.REPORT_GENERATION,
+          statusCode: error?.response?.status || StatusCodes.NOT_FOUND
+        }
+      }
+    })
+}
