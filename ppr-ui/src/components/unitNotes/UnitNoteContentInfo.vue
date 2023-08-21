@@ -109,7 +109,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue-demi'
-import { personGivingNoticeTableHeaders } from '@/resources'
+import { UnitNotesInfo, personGivingNoticeTableHeaders } from '@/resources'
 import { UnitNoteIF } from '@/interfaces/unit-note-interfaces/unit-note-interface'
 import { pacificDate } from '@/utils'
 import { PartyIF } from '@/interfaces'
@@ -134,12 +134,12 @@ export default defineComponent({
 
     const localState = reactive({
       separatedRemarks: computed(() : string[] | null => {
-        if (props.note.documentType === UnitNoteDocTypes.CONTINUED_NOTE_OF_CAUTION && !props.note?.expiryDateTime) {
+        if (props.note.documentType === UnitNoteDocTypes.CONTINUED_NOTE_OF_CAUTION && !props.note.expiryDateTime) {
           const remarks = props.note.remarks
-          const generatedRemarks = 'Continued until further order of the court. '
+          const generatedRemarks = UnitNotesInfo[props.note.documentType].generatedRemarks
           // No need to seperate if no additional remarks + extra safety check
-          if (remarks.trim() !== generatedRemarks.trim() && remarks.startsWith(generatedRemarks)) {
-            return [generatedRemarks.trim(), remarks.substring(generatedRemarks.length)]
+          if (remarks.trim() !== generatedRemarks && remarks.startsWith(generatedRemarks)) {
+            return [generatedRemarks, remarks.substring(generatedRemarks.length)]
           }
         }
         return null
