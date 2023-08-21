@@ -264,7 +264,8 @@ describe('MHR Unit Note Filing', () => {
     expect(wrapper.find(getTestId('party-info-table')).findAll('.text-not-entered').length).toBe(4)
   })
 
-  it('should not show EffectiveDateTime component for Decal Replacement and Public Note', async () => {
+  // eslint-disable-next-line max-len
+  it('should not show EffectiveDateTime component for Decal Replacement, Public Note, and Confidential Note', async () => {
     wrapper = await createUnitNoteComponent(UnitNoteDocTypes.DECAL_REPLACEMENT)
 
     expect(store.getMhrUnitNoteType).toBe(UnitNoteDocTypes.DECAL_REPLACEMENT)
@@ -281,6 +282,17 @@ describe('MHR Unit Note Filing', () => {
 
     expect(store.getMhrUnitNoteType).toBe(UnitNoteDocTypes.PUBLIC_NOTE)
 
+    UnitNoteReviewComponent = await getReviewConfirmComponent(wrapper)
+    expect(UnitNoteReviewComponent.findComponent(EffectiveDateTime).exists()).toBeFalsy()
+    expect(UnitNoteReviewComponent.findComponent(ExpiryDate).exists()).toBeFalsy()
+    expect(UnitNoteReviewComponent.findComponent(ContactInformation).find('h2').text()).toContain('1.')
+    expect(UnitNoteReviewComponent.findComponent(Attention).find('h2').text()).toContain('2.')
+    expect(UnitNoteReviewComponent.findComponent(CertifyInformation).find('h2').text()).toContain('3.')
+    expect(UnitNoteReviewComponent.find('#staff-transfer-payment-section h2').text()).toContain('4.')
+
+    wrapper = await createUnitNoteComponent(UnitNoteDocTypes.CONFIDENTIAL_NOTE)
+
+    expect(store.getMhrUnitNoteType).toBe(UnitNoteDocTypes.CONFIDENTIAL_NOTE)
     UnitNoteReviewComponent = await getReviewConfirmComponent(wrapper)
     expect(UnitNoteReviewComponent.findComponent(EffectiveDateTime).exists()).toBeFalsy()
     expect(UnitNoteReviewComponent.findComponent(ExpiryDate).exists()).toBeFalsy()

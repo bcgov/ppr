@@ -66,7 +66,12 @@ export const UnitNotesInfo: Record<UnitNoteDocTypes, UnitNoteInfoIF> = {
   [UnitNoteDocTypes.CONFIDENTIAL_NOTE]: {
     header: 'Confidential Note',
     dropdownText: 'Confidential Note',
-    fee: FeeSummaryDefaults.NO_FEE
+    fee: FeeSummaryDefaults.NO_FEE,
+    reviewSectionNumber: { // section numbers on Review page
+      attention: 2,
+      certifyInfo: 3,
+      staffPayment: 4
+    }
   },
   [UnitNoteDocTypes.PUBLIC_NOTE]: {
     header: 'Public Note',

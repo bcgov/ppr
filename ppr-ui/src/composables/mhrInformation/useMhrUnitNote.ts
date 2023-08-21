@@ -67,7 +67,8 @@ export const useMhrUnitNote = () => {
 
   // Effective Date Time component not required for certain Unit Note types
   const hasEffectiveDateTime = (): boolean => {
-    return ![UnitNoteDocTypes.DECAL_REPLACEMENT, UnitNoteDocTypes.PUBLIC_NOTE].includes(getMhrUnitNoteType.value)
+    return ![UnitNoteDocTypes.DECAL_REPLACEMENT, UnitNoteDocTypes.PUBLIC_NOTE, UnitNoteDocTypes.CONFIDENTIAL_NOTE]
+      .includes(getMhrUnitNoteType.value)
   }
 
   // Expiry Date Time component not required for certain Unit Note types
