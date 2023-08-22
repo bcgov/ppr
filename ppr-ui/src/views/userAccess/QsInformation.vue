@@ -30,8 +30,10 @@
 
         <!-- service agreement preview container -->
         <v-card flat class="mt-10 scroll-container">
-          <vue-pdf-embed v-if="serviceAgreementUrl" :source="serviceAgreementUrl" />
-          <v-progress-circular v-else class="loading-spinner" color="primary" size="50" indeterminate ce/>
+          <!-- TODO: Design Currently reviewing pdf preview options - Placeholder & Example implementation below -->
+          <label>Document Preview/html Placeholder</label>
+<!--          <vue-pdf-embed v-if="serviceAgreementUrl" :source="serviceAgreementUrl" />-->
+<!--          <v-progress-circular v-else class="loading-spinner" color="primary" size="50" indeterminate ce/>-->
         </v-card>
 
         <!-- service agreement confirmation -->
@@ -97,12 +99,11 @@ import { PartyFormSchema } from '@/schemas'
 import { UserAccessOrgLookupConfig } from '@/resources'
 import { OrgLookupConfigIF } from '@/interfaces'
 import { useUserAccess } from '@/composables'
-import VuePdfEmbed from 'vue-pdf-embed/dist/vue2-pdf-embed'
 import { getQsServiceAgreements } from '@/utils'
 
 export default defineComponent({
   name: 'QsInformation',
-  components: { CautionBox, FormCard, PartyForm, VuePdfEmbed },
+  components: { CautionBox, FormCard, PartyForm },
   props: { validate: { type: Boolean, default: false } },
   setup (props) {
     const qsInformationRef = ref(null) as any

@@ -129,7 +129,10 @@ export const useStore = defineStore('assetsStore', () => {
     return state.value.authorization?.authRoles.includes('ppr_staff')
   })
   const isRoleQualifiedSupplier = computed((): boolean => {
-    return state.value.authorization?.authRoles.includes('mhr_transfer_sale')
+    return state.value.authorization?.authRoles.includes('mhr_transfer_sale') &&
+      getUserProductSubscriptionsCodes.value?.some(code =>
+        [ProductCode.LAWYERS_NOTARIES, ProductCode.MANUFACTURER, ProductCode.DEALERS].includes(code)
+      )
   })
   /** The current account label/name. */
   const getAccountLabel = computed((): string => {

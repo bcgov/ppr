@@ -202,11 +202,11 @@ export const useUserAccess = () => {
 
   /** Update Qualified Supplier status message - locally and user settings **/
   const hideStatusMsg = async (hideMsg: boolean): Promise<void> => {
-    const msgSettings = getUserSettings.value[SettingOptions.MISCELLANEOUS_PREFERENCES] || []
+    let msgSettings = getUserSettings.value[SettingOptions.MISCELLANEOUS_PREFERENCES] || []
 
     // Update existing account setting if it exists, otherwise create new misc setting for account.
     if (msgSettings?.find(setting => setting.accountId === getAccountId.value)) {
-      msgSettings.map(pref => pref.accountId === getAccountId.value
+      msgSettings = msgSettings.map(pref => pref.accountId === getAccountId.value
         ? { ...pref, [SettingOptions.QS_STATUS_MSG_HIDE]: hideMsg }
         : pref
       )
