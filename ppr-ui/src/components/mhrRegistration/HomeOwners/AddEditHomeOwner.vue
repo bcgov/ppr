@@ -356,10 +356,11 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, nextTick, reactive, ref, toRefs, watch } from 'vue-demi'
 import { useInputRules } from '@/composables/useInputRules'
 import { useHomeOwners, useMhrValidations } from '@/composables/mhrRegistration'
 import { BusinessSearchAutocomplete } from '@/components/search'
+import { formatAddress } from '@/composables/address/factories'
 import { BaseAddress } from '@/composables/address'
 import { PartyAddressSchema } from '@/schemas'
 import { focusOnFirstError, fromDisplayPhone } from '@/utils'
@@ -613,8 +614,11 @@ export default defineComponent({
         Ownership Transfer or Change for more information. `
     })
 
-    const done = (): void => {
+    const done = async (): Promise<void> => {
+      localState.owner.address = formatAddress(localState.owner.address)
       addHomeOwnerForm.value.validate()
+      await nextTick()
+
       if (localState.isHomeOwnerFormValid && localState.isAddressFormValid) {
         setValidation(MhrSectVal.ADD_EDIT_OWNERS_VALID, MhrCompVal.OWNERS_VALID, true)
         if (props.editHomeOwner) {
