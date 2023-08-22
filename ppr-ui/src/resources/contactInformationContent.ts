@@ -1,5 +1,6 @@
 import { ContactInformationContentIF, PartyIF, SubmittingPartyIF } from '@/interfaces'
 
+/* eslint-disable max-len */
 export const submittingPartyRegistrationContent: ContactInformationContentIF = {
   title: 'Submitting Party',
   description: 'Provide the name and contact information for the person or business submitting this registration. ' +
@@ -24,6 +25,13 @@ export const personGivingNoticeContent: ContactInformationContentIF = {
     'when a search result is produced for this manufactured home.',
   sideLabel: 'Person Giving Notice'
 }
+
+export const collectorInformationContent: ContactInformationContentIF = {
+  title: 'Collector',
+  description: 'Contact information for the collector will be shown when a search result is produced for this manufactured home.',
+  sideLabel: 'Collector'
+}
+/* eslint-enable max-len */
 
 export const emptyContactInfo: Readonly<PartyIF | SubmittingPartyIF> = {
   personName: {

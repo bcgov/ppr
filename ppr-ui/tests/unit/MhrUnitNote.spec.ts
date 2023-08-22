@@ -21,6 +21,7 @@ import {
 import { StaffPayment } from '@bcrs-shared-components/staff-payment'
 import { MhrUnitNoteValidationStateIF } from '@/interfaces'
 import { isEqual } from 'lodash'
+import { collectorInformationContent } from '@/resources'
 
 Vue.use(Vuetify)
 
@@ -267,5 +268,18 @@ describe('MHR Unit Note Filing', () => {
     UnitNoteReviewComponent = await getReviewConfirmComponent(wrapper)
     expect(UnitNoteReviewComponent.findComponent(EffectiveDateTime).exists()).toBeFalsy()
     expect(UnitNoteReviewComponent.findComponent(ExpiryDate).exists()).toBeFalsy()
+  })
+
+  it('should show correct title for Giving Notice Party', async () => {
+    wrapper = await createUnitNoteComponent(UnitNoteDocTypes.NOTICE_OF_TAX_SALE)
+
+    const ContactInformationComponent = wrapper.findComponent(UnitNoteAdd).findComponent(ContactInformation)
+
+    expect(ContactInformationComponent.find('h2').text()).toContain(collectorInformationContent.title)
+
+    const UnitNoteReviewComponent = await getReviewConfirmComponent(wrapper)
+    const UnitNoteReviewTable = UnitNoteReviewComponent.findComponent(UnitNoteReviewDetailsTable)
+
+    expect(UnitNoteReviewTable.text()).toContain(collectorInformationContent.title)
   })
 })
