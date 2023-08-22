@@ -79,7 +79,7 @@ export default defineComponent({
           const date = new Date(getRegistrationCreationDate.value)
           return pacificDate(date)
         }
-        if (getMhrInformation.value) {
+        if (getMhrInformation.value?.createDateTime) {
           const date = new Date(getMhrInformation.value.createDateTime)
           return pacificDate(date)
         }

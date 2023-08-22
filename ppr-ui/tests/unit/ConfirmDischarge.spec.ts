@@ -20,7 +20,7 @@ import {
 import { BaseDialog } from '@/components/dialogs'
 import { RegisteringPartyChange } from '@/components/parties/party'
 // ppr enums/utils/etc.
-import { RouteNames } from '@/enums'
+import { RegistrationFlowType, RouteNames } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { StateModelIF } from '@/interfaces'
 import { axios } from '@/utils/axios-ppr'
@@ -29,12 +29,14 @@ import mockRouter from './MockRouter'
 import {
   mockedDebtorNames, mockedDischargeResponse, mockedFinancingStatementAll, mockedPartyCodeSearchResults
 } from './test-data'
+import { usePprRegistration } from '@/composables'
 
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
 setActivePinia(createPinia())
 const store = useStore()
+const { initPprUpdateFilling } = usePprRegistration()
 
 // Prevent the warning "[Vuetify] Unable to locate target [data-app]"
 document.body.setAttribute('data-app', 'true')
@@ -45,6 +47,13 @@ describe('ConfirmDischarge registration view', () => {
   const { assign } = window.location
   sessionStorage.setItem('KEYCLOAK_TOKEN', 'token')
   const regNum = '123456B'
+
+  beforeAll(async () => {
+    // Mimicks loading the data in the store in the previous step.
+    const financingStatement = mockedFinancingStatementAll
+    financingStatement.baseRegistrationNumber = regNum
+    initPprUpdateFilling(financingStatement, RegistrationFlowType.DISCHARGE)
+  })
 
   beforeEach(async () => {
     delete window.location
@@ -87,7 +96,6 @@ describe('ConfirmDischarge registration view', () => {
       'provide the verification statement to all Secured Parties')
     expect(wrapper.vm.$route.name).toBe(RouteNames.CONFIRM_DISCHARGE)
     expect(wrapper.vm.appReady).toBe(true)
-    expect(wrapper.vm.dataLoaded).toBe(true)
     const state = store.getStateModel
     // check registering party
     expect(state.registration.parties.registeringParty).toBe(null)
@@ -95,11 +103,9 @@ describe('ConfirmDischarge registration view', () => {
     // check confirm discharge section
     expect(wrapper.findComponent(DischargeConfirmSummary).exists()).toBe(true)
     expect(wrapper.findComponent(DischargeConfirmSummary).vm.setRegNum).toContain(regNum)
-    // eslint-disable-next-line max-len
     expect(wrapper.findComponent(DischargeConfirmSummary).vm.setRegType).toContain(
       state.registration.registrationType.registrationTypeUI
     )
-    // eslint-disable-next-line max-len
     expect(wrapper.findComponent(DischargeConfirmSummary).vm.setCollateralSummary).toBe(
       'General Collateral and 2 Vehicles'
     )

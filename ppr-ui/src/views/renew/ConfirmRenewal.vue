@@ -22,7 +22,7 @@
       :setShowCertifiedCheckbox="false"
       @proceed="onStaffPaymentChanges($event)"
     />
-    <div v-if="dataLoaded && !dataLoadError" class="container pa-0" style="min-width: 960px;">
+    <div v-if="appReady" class="container pa-0" style="min-width: 960px;">
       <v-row no-gutters>
         <v-col cols="9">
           <h1>Review and Complete Renewal</h1>
@@ -54,19 +54,17 @@
           <caution-box v-if="showRegMsg" :setMsg="cautionTxt" :setImportantWord="'Note'" />
           <registration-length-trust-summary class="mt-10" :isRenewal="true"
           />
-          <div v-if="showCourtOrderInfo">
-            <court-order :setSummary="true" :isRenewal="true" class="pt-10" />
-          </div>
+          <court-order v-if="showCourtOrderInfo" :setSummary="true" :isRenewal="true" class="mt-10" />
 
           <folio-number-summary
-            @folioValid="setFolioValid($event)"
+            @folioValid="validFolio =$event"
             :setShowErrors="showErrors"
-            class="pt-10"
+            class="mt-10"
           />
           <certify-information
             @certifyValid="validCertify = $event"
             :setShowErrors="showErrors"
-            class="pt-10"
+            class="mt-10"
           />
         </v-col>
         <v-col class="pl-6" cols="3">
@@ -97,7 +95,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, reactive, toRefs, watch } from 'vue-demi'
 import { useRoute, useRouter } from 'vue2-helpers/vue-router'
 import { useStore } from '@/store/store'
 import {
@@ -110,16 +108,12 @@ import {
 import { BaseDialog, StaffPaymentDialog } from '@/components/dialogs'
 import { RegistrationLengthTrustSummary } from '@/components/registration'
 import { RegisteringPartyChange } from '@/components/parties/party'
-import { AllRegistrationTypes } from '@/resources'
 import { notCompleteDialog } from '@/resources/dialogOptions'
-import { getFeatureFlag, getFinancingStatement, saveRenewal } from '@/utils'
-/* eslint-disable no-unused-vars */
-import { ActionTypes, APIRegistrationTypes, RouteNames } from '@/enums'
+import { getFeatureFlag, saveRenewal } from '@/utils'
+import { ActionTypes, APIRegistrationTypes, RouteNames, UIRegistrationTypes } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import {
   RenewRegistrationIF,
-  ErrorIF,
-  AddPartiesIF,
   StateModelIF,
   DialogOptionsIF,
   RegTableNewItemI
@@ -127,7 +121,6 @@ import {
 import { RegistrationLengthI } from '@/composables/fees/interfaces'
 import { storeToRefs } from 'pinia'
 import { useAuth, useNavigation } from '@/composables'
-/* eslint-enable no-unused-vars */
 
 export default defineComponent({
   name: 'ConfirmRenewal',
@@ -153,19 +146,14 @@ export default defineComponent({
       default: false
     }
   },
-  setup (props, context) {
+  setup (props, { emit }) {
     const route = useRoute()
     const router = useRouter()
     const { goToDash } = useNavigation()
     const { isAuthenticated } = useAuth()
     const {
       // Actions
-      setRegistrationType,
-      setRegTableNewItem,
-      setRegistrationNumber,
-      setRegistrationCreationDate,
-      setRegistrationExpiryDate,
-      setAddSecuredPartiesAndDebtors
+      setRegTableNewItem
     } = useStore()
     const {
       // Getters
@@ -174,16 +162,12 @@ export default defineComponent({
       isRoleStaffBcol,
       isRoleStaffReg,
       isRoleStaffSbc,
+      getRegistrationNumber,
       getRegistrationType,
-      getConfirmDebtorName,
       getAddSecuredPartiesAndDebtors
     } = storeToRefs(useStore())
 
     const localState = reactive({
-      collateralSummary: '', // eslint-disable-line lines-between-class-members
-      dataLoaded: false,
-      dataLoadError: false,
-      financingStatementDate: null as Date,
       options: notCompleteDialog as DialogOptionsIF,
       showCancelDialog: false,
       submitting: false,
@@ -212,7 +196,7 @@ export default defineComponent({
           lifeYears: getLengthTrust.value?.lifeYears || 0
         }
       }),
-      registrationTypeUI: computed((): string => {
+      registrationTypeUI: computed((): UIRegistrationTypes => {
         return getRegistrationType.value?.registrationTypeUI || null
       }),
       registrationType: computed((): APIRegistrationTypes => {
@@ -232,86 +216,35 @@ export default defineComponent({
       })
     })
 
-    onMounted(() => {
-      onAppReady(props.appReady)
-    })
+    /** Called when App is ready and this component can load its data. */
+    const onAppReady = (): void => {
+      // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
+      if (!isAuthenticated.value || (!props.isJestRunning && !getFeatureFlag('ppr-ui-enabled'))) {
+        goToDash()
+      }
+
+      // if data is not accurate/missing (could be caused if user manually edits the url)
+      if (!localState.registrationNumber || localState.registrationNumber !== getRegistrationNumber.value) {
+        emit('error', 'Invalid Registration State')
+        goToDash()
+      }
+    }
+
+    watch(() => props.appReady, (appReady: boolean) => {
+      if (appReady) onAppReady()
+    }, { immediate: true })
 
     const handleDialogResp = (val: boolean): void => {
       localState.showCancelDialog = false
-      if (!val) {
-        setRegistrationNumber(null)
-        goToDash()
-      }
+      if (!val) goToDash()
     }
 
     const goToReviewRenewal = (): void => {
       router.push({
         name: RouteNames.RENEW_REGISTRATION,
-        query: { 'reg-num': localState.registrationNumber }
+        query: { 'reg-num': localState.registrationNumber + '-confirm' }
       })
-      emitHaveData(false)
-    }
-
-    const loadRegistration = async (): Promise<void> => {
-      if (!localState.registrationNumber || !getConfirmDebtorName.value) {
-        if (!localState.registrationNumber) {
-          console.error('No registration number given to discharge. Redirecting to dashboard...')
-        } else {
-          console.error('No debtor name confirmed for discharge. Redirecting to dashboard...')
-        }
-        goToDash()
-        return
-      }
-      localState.financingStatementDate = new Date()
-      const financingStatement = await getFinancingStatement(
-        true,
-        localState.registrationNumber
-      )
-      if (financingStatement.error) {
-        localState.dataLoadError = true
-        emitError(financingStatement.error)
-      } else {
-        // set collateral summary
-        if (
-          financingStatement.generalCollateral &&
-          !financingStatement.vehicleCollateral
-        ) {
-          localState.collateralSummary = 'General Collateral and 0 Vehicles'
-        } else if (financingStatement.generalCollateral) {
-          localState.collateralSummary =
-            `General Collateral and ${financingStatement.vehicleCollateral.length} Vehicles`
-        } else if (financingStatement.vehicleCollateral) {
-          localState.collateralSummary =
-            `No General Collateral and ${financingStatement.vehicleCollateral.length} Vehicles`
-        } else {
-          localState.collateralSummary += 'No Collateral'
-        }
-        if (financingStatement.vehicleCollateral?.length === 1) {
-          localState.collateralSummary =
-            localState.collateralSummary.replace('Vehicles', 'Vehicle')
-        }
-        // load data into the store
-        const registrationType = AllRegistrationTypes.find((reg, index) => {
-          if (reg.registrationTypeAPI === financingStatement.type) {
-            return true
-          }
-        })
-        const parties = {
-          valid: true,
-          registeringParty: null,
-          securedParties: financingStatement.securedParties,
-          debtors: financingStatement.debtors
-        } as AddPartiesIF
-        setRegistrationCreationDate(financingStatement.createDateTime)
-        setRegistrationExpiryDate(financingStatement.expiryDate)
-        setRegistrationNumber(financingStatement.baseRegistrationNumber)
-        setRegistrationType(registrationType)
-        setAddSecuredPartiesAndDebtors(parties)
-      }
-    }
-
-    const setFolioValid = (valid: boolean): void => {
-      localState.validFolio = valid
+      emit('haveData', false)
     }
 
     const onStaffPaymentChanges = (pay: boolean): void => {
@@ -339,11 +272,8 @@ export default defineComponent({
       const apiResponse: RenewRegistrationIF = await saveRenewal(stateModel)
       localState.submitting = false
       if (apiResponse === undefined || apiResponse?.error !== undefined) {
-        console.error(apiResponse?.error)
-        emitError(apiResponse?.error)
+        emit('error', apiResponse?.error)
       } else {
-        // unset registration number
-        setRegistrationNumber(null)
         // set new added reg
         const newItem: RegTableNewItemI = {
           addedReg: apiResponse.renewalRegistrationNumber,
@@ -353,15 +283,8 @@ export default defineComponent({
         }
         setRegTableNewItem(newItem)
         // On success return to dashboard
-        goToDashboard()
+        goToDash()
       }
-    }
-
-    const goToDashboard = (): void => {
-      // unset registration number
-      setRegistrationNumber(null)
-      goToDash()
-      emitHaveData(false)
     }
 
     const setShowWarning = (): void => {
@@ -369,44 +292,8 @@ export default defineComponent({
       localState.showRegMsg = parties.registeringParty?.action === ActionTypes.EDITED
     }
 
-    /** Called when App is ready and this component can load its data. */
-    const onAppReady = async (val: boolean): Promise<void> => {
-      // do not proceed if app is not ready
-      if (!val) return
-      // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
-      if (!isAuthenticated.value || (!props.isJestRunning && !getFeatureFlag('ppr-ui-enabled'))) {
-        goToDash()
-        return
-      }
-
-      // get registration data from api and load into store
-      localState.submitting = true
-      await loadRegistration()
-      localState.submitting = false
-
-      // page is ready to view
-      emitHaveData(true)
-      localState.dataLoaded = true
-    }
-
-    /** Emits error to app.vue for handling */
-    const emitError = (error: ErrorIF): void => {
-      context.emit('error', error)
-      console.error(error)
-    }
-
-    /** Emits Have Data event. */
-    const emitHaveData = (haveData: Boolean = true): void => {
-      context.emit('haveData', haveData)
-    }
-
-    watch(() => props.appReady, (val: boolean) => {
-      onAppReady(val)
-    })
-
     return {
       submitButton,
-      setFolioValid,
       setShowWarning,
       isRoleStaffBcol,
       handleDialogResp,

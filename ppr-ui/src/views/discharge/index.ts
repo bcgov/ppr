@@ -1,2 +1,2 @@
 export { default as ConfirmDischarge } from './ConfirmDischarge.vue'
-export { default as ReviewRegistration } from './ReviewRegistration.vue'
+export { default as DischargeRegistration } from './DischargeRegistration.vue'

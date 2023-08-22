@@ -228,12 +228,7 @@ export default defineComponent({
 
     const handleDialogResp = (val: boolean): void => {
       localState.showCancelDialog = false
-      if (!val) goToDashboard()
-    }
-
-    const goToDashboard = (): void => {
-      goToDash()
-      emitHaveData(false)
+      if (!val) goToDash()
     }
 
     const goToSearchResult = (): void => {
@@ -283,7 +278,7 @@ export default defineComponent({
         console.error('Api Error: ' + apiResponse)
       } else {
         // On success return to dashboard
-        goToDashboard()
+        goToDash()
       }
     }
 

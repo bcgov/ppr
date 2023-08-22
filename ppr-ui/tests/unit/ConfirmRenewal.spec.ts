@@ -23,17 +23,19 @@ import { RegistrationLengthTrustSummary } from '@/components/registration'
 
 // Other
 import mockRouter from './MockRouter'
-import { RouteNames } from '@/enums'
-import { StateModelIF } from '@/interfaces'
+import { RegistrationFlowType, RouteNames } from '@/enums'
+import { FinancingStatementIF, StateModelIF } from '@/interfaces'
 import flushPromises from 'flush-promises'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { RegisteringPartyChange } from '@/components/parties/party'
+import { usePprRegistration } from '@/composables'
 
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
 setActivePinia(createPinia())
 const store = useStore()
+const { initPprUpdateFilling } = usePprRegistration()
 
 // Prevent the warning "[Vuetify] Unable to locate target [data-app]"
 document.body.setAttribute('data-app', 'true')
@@ -43,6 +45,13 @@ describe('Confirm Renewal new registration component', () => {
   let sandbox
   const { assign } = window.location
   sessionStorage.setItem('KEYCLOAK_TOKEN', 'token')
+
+  beforeAll(async () => {
+    // Mimicks loading the data in the store in the previous step.
+    const financingStatement = mockedFinancingStatementAll
+    financingStatement.baseRegistrationNumber = '123456B'
+    initPprUpdateFilling(financingStatement, RegistrationFlowType.RENEWAL)
+  })
 
   beforeEach(async () => {
     // mock the window.location.assign function
@@ -84,7 +93,6 @@ describe('Confirm Renewal new registration component', () => {
   it('renders Review Confirm View with child components', () => {
     expect(wrapper.vm.$route.name).toBe(RouteNames.CONFIRM_RENEWAL)
     expect(wrapper.vm.appReady).toBe(true)
-    expect(wrapper.vm.dataLoaded).toBe(true)
     const state = store.getStateModel as StateModelIF
 
     expect(wrapper.findComponent(ConfirmRenewal).exists()).toBe(true)
@@ -167,6 +175,13 @@ describe('Confirm Renewal new RL registration component', () => {
   const { assign } = window.location
   sessionStorage.setItem('KEYCLOAK_TOKEN', 'token')
 
+  beforeAll(async () => {
+    // Mimicks loading the data in the store in the previous step.
+    const financingStatement = mockedFinancingStatementRepairers
+    financingStatement.baseRegistrationNumber = '123456B'
+    initPprUpdateFilling(financingStatement, RegistrationFlowType.RENEWAL)
+  })
+
   beforeEach(async () => {
     // mock the window.location.assign function
     delete window.location
@@ -207,7 +222,6 @@ describe('Confirm Renewal new RL registration component', () => {
   it('renders Review Confirm View with child components including court order', () => {
     expect(wrapper.vm.$route.name).toBe(RouteNames.CONFIRM_RENEWAL)
     expect(wrapper.vm.appReady).toBe(true)
-    expect(wrapper.vm.dataLoaded).toBe(true)
     expect(wrapper.findComponent(CourtOrder).exists()).toBe(true)
   })
 })

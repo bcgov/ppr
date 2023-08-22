@@ -27,17 +27,19 @@ import { GenColSummary } from '@/components/collateral/generalCollateral'
 
 // Other
 import mockRouter from './MockRouter'
-import { ActionTypes, RouteNames } from '@/enums'
+import { ActionTypes, RegistrationFlowType, RouteNames } from '@/enums'
 import { StateModelIF } from '@/interfaces'
 import flushPromises from 'flush-promises'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { RegisteringPartyChange } from '@/components/parties/party'
+import { usePprRegistration } from '@/composables'
 
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({})
 setActivePinia(createPinia())
 const store = useStore()
+const { initPprUpdateFilling } = usePprRegistration()
 
 // Prevent the warning "[Vuetify] Unable to locate target [data-app]"
 document.body.setAttribute('data-app', 'true')
@@ -47,6 +49,13 @@ describe('Confirm Amendment registration component', () => {
   let sandbox
   const { assign } = window.location
   sessionStorage.setItem('KEYCLOAK_TOKEN', 'token')
+
+  beforeAll(async () => {
+    // Mimicks loading the data in the store in the previous step.
+    const financingStatement = mockedFinancingStatementAll
+    financingStatement.baseRegistrationNumber = '123456B'
+    initPprUpdateFilling(financingStatement, RegistrationFlowType.AMENDMENT)
+  })
 
   beforeEach(async () => {
     // mock the window.location.assign function
@@ -110,7 +119,6 @@ describe('Confirm Amendment registration component', () => {
   it('renders Review Confirm View with child components', () => {
     expect(wrapper.vm.$route.name).toBe(RouteNames.CONFIRM_AMENDMENT)
     expect(wrapper.vm.appReady).toBe(true)
-    expect(wrapper.vm.dataLoaded).toBe(true)
     const state = store.getStateModel as StateModelIF
 
     expect(wrapper.findComponent(ConfirmAmendment).exists()).toBe(true)

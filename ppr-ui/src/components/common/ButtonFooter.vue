@@ -138,7 +138,6 @@ export default defineComponent({
     const { goToDash, goToRoute } = useNavigation()
     const {
       // Actions
-      resetNewRegistration,
       setDraft,
       setRegTableNewItem,
       setUnsavedChanges
@@ -190,18 +189,13 @@ export default defineComponent({
     })
     const cancel = () => {
       if (hasUnsavedChanges.value === true) localState.showCancelDialog = true
-      else goToDashboard()
-    }
-    const goToDashboard = () => {
-      // clear all state set data
-      resetNewRegistration()
-      goToDash()
+      else goToDash()
     }
     const handleDialogResp = (val: boolean) => {
       localState.showCancelDialog = false
       if (!val) {
         emit('cancelProceed')
-        goToDashboard()
+        goToDash()
       }
     }
     /** Save the draft version from data stored in the state model. */
@@ -239,7 +233,7 @@ export default defineComponent({
     const submitSaveResume = async (): Promise<void> => {
       const success = await saveDraft()
       if (success) {
-        goToDashboard()
+        goToDash()
       }
     }
     const submitBack = async () => {
