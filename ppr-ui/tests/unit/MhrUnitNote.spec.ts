@@ -150,12 +150,9 @@ describe('MHR Unit Note Filing', () => {
     // ExpiryDate component should not exists for this Unit Note type
     expect(UnitNoteReviewComponent.findComponent(ExpiryDate).exists()).toBeFalsy()
 
-    // check that section numbers are updated because ExpiryDate is displayed
-    expect(UnitNoteReviewComponent.findComponent(ContactInformation).find('h2').text()).toContain('1.')
-    expect(UnitNoteReviewComponent.findComponent(EffectiveDateTime).find('h2').text()).toContain('2.')
-    expect(UnitNoteReviewComponent.findComponent(Attention).find('h2').text()).toContain('3.')
-    expect(UnitNoteReviewComponent.findComponent(CertifyInformation).find('h2').text()).toContain('4.')
-    expect(UnitNoteReviewComponent.find('#staff-transfer-payment-section h2').text()).toContain('5.')
+    expect(UnitNoteReviewComponent.findComponent(Attention).exists()).toBeTruthy()
+    expect(UnitNoteReviewComponent.findComponent(CertifyInformation).exists()).toBeTruthy()
+    expect(UnitNoteReviewComponent.findComponent(StaffPayment).exists()).toBeTruthy()
 
     expect(UnitNoteReviewComponent.findAll('.border-error-left').length).toBe(0)
     expect(UnitNoteReviewComponent.findAll('.error-text').length).toBe(0)
@@ -173,15 +170,6 @@ describe('MHR Unit Note Filing', () => {
 
     // ExpiryDate component should exist for this Unit Note type
     expect(UnitNoteReviewComponent.findComponent(ExpiryDate).exists()).toBeTruthy()
-
-    // check that section numbers have default sequence
-    expect(UnitNoteReviewComponent.findComponent(ContactInformation).find('h2').text()).toContain('1.')
-    expect(UnitNoteReviewComponent.findComponent(EffectiveDateTime).find('h2').text()).toContain('2.')
-    expect(UnitNoteReviewComponent.findComponent(ExpiryDate).find('h2').text()).toContain('3.')
-    expect(UnitNoteReviewComponent.findComponent(Attention).find('h2').text()).toContain('4.')
-    expect(UnitNoteReviewComponent.findComponent(CertifyInformation).find('h2').text()).toContain('5.')
-    expect(UnitNoteReviewComponent.findComponent(StaffPayment).exists()).toBeTruthy()
-    expect(UnitNoteReviewComponent.find('#staff-transfer-payment-section h2').text()).toContain('6.')
 
     await wrapper.find('#btn-stacked-submit').trigger('click')
     await nextTick()
@@ -208,15 +196,6 @@ describe('MHR Unit Note Filing', () => {
 
     // ExpiryDate component should exist for this Unit Note type
     expect(UnitNoteReviewComponent.findComponent(ExpiryDate).exists()).toBeTruthy()
-
-    // check that section numbers are updated because ExpiryDate is displayed
-    expect(UnitNoteReviewComponent.findComponent(ContactInformation).find('h2').text()).toContain('1.')
-    expect(UnitNoteReviewComponent.findComponent(EffectiveDateTime).find('h2').text()).toContain('2.')
-    expect(UnitNoteReviewComponent.findComponent(ExpiryDate).find('h2').text()).toContain('3.')
-    expect(UnitNoteReviewComponent.findComponent(Attention).find('h2').text()).toContain('4.')
-    expect(UnitNoteReviewComponent.findComponent(CertifyInformation).find('h2').text()).toContain('5.')
-    expect(UnitNoteReviewComponent.findComponent(StaffPayment).exists()).toBeTruthy()
-    expect(UnitNoteReviewComponent.find('#staff-transfer-payment-section h2').text()).toContain('6.')
 
     await wrapper.find('#btn-stacked-submit').trigger('click')
     await nextTick()
@@ -273,10 +252,6 @@ describe('MHR Unit Note Filing', () => {
     let UnitNoteReviewComponent = await getReviewConfirmComponent(wrapper)
     expect(UnitNoteReviewComponent.findComponent(EffectiveDateTime).exists()).toBeFalsy()
     expect(UnitNoteReviewComponent.findComponent(ExpiryDate).exists()).toBeFalsy()
-    expect(UnitNoteReviewComponent.findComponent(ContactInformation).find('h2').text()).toContain('1.')
-    expect(UnitNoteReviewComponent.findComponent(Attention).find('h2').text()).toContain('2.')
-    expect(UnitNoteReviewComponent.findComponent(CertifyInformation).find('h2').text()).toContain('3.')
-    expect(UnitNoteReviewComponent.find('#staff-transfer-payment-section h2').text()).toContain('4.')
 
     wrapper = await createUnitNoteComponent(UnitNoteDocTypes.PUBLIC_NOTE)
 
@@ -285,10 +260,6 @@ describe('MHR Unit Note Filing', () => {
     UnitNoteReviewComponent = await getReviewConfirmComponent(wrapper)
     expect(UnitNoteReviewComponent.findComponent(EffectiveDateTime).exists()).toBeFalsy()
     expect(UnitNoteReviewComponent.findComponent(ExpiryDate).exists()).toBeFalsy()
-    expect(UnitNoteReviewComponent.findComponent(ContactInformation).find('h2').text()).toContain('1.')
-    expect(UnitNoteReviewComponent.findComponent(Attention).find('h2').text()).toContain('2.')
-    expect(UnitNoteReviewComponent.findComponent(CertifyInformation).find('h2').text()).toContain('3.')
-    expect(UnitNoteReviewComponent.find('#staff-transfer-payment-section h2').text()).toContain('4.')
 
     wrapper = await createUnitNoteComponent(UnitNoteDocTypes.CONFIDENTIAL_NOTE)
 
@@ -296,9 +267,5 @@ describe('MHR Unit Note Filing', () => {
     UnitNoteReviewComponent = await getReviewConfirmComponent(wrapper)
     expect(UnitNoteReviewComponent.findComponent(EffectiveDateTime).exists()).toBeFalsy()
     expect(UnitNoteReviewComponent.findComponent(ExpiryDate).exists()).toBeFalsy()
-    expect(UnitNoteReviewComponent.findComponent(ContactInformation).find('h2').text()).toContain('1.')
-    expect(UnitNoteReviewComponent.findComponent(Attention).find('h2').text()).toContain('2.')
-    expect(UnitNoteReviewComponent.findComponent(CertifyInformation).find('h2').text()).toContain('3.')
-    expect(UnitNoteReviewComponent.find('#staff-transfer-payment-section h2').text()).toContain('4.')
   })
 })

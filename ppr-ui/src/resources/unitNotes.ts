@@ -33,13 +33,6 @@ export const UnitNotesInfo: Record<UnitNoteDocTypes, UnitNoteInfoIF> = {
     dropdownText: 'Add Continued Notice of Caution',
     dropdownIcon: 'mdi-plus',
     fee: FeeSummaryDefaults.NO_FEE,
-    reviewSectionNumber: { // section numbers on Review page
-      effectiveDateTime: 2,
-      expiryDate: 3,
-      attention: 4,
-      certifyInfo: 5,
-      staffPayment: 6
-    },
     panelHeader: 'Notice of Caution (Continued)',
     generatedRemarks: 'Continued until further order of the court.'
   },
@@ -48,13 +41,6 @@ export const UnitNotesInfo: Record<UnitNoteDocTypes, UnitNoteInfoIF> = {
     dropdownText: 'Add Extension to Notice of Caution',
     dropdownIcon: 'mdi-plus',
     fee: FeeSummaryDefaults.UNIT_NOTE_10,
-    reviewSectionNumber: { // section numbers on Review page
-      effectiveDateTime: 2,
-      expiryDate: 3,
-      attention: 4,
-      certifyInfo: 5,
-      staffPayment: 6
-    },
     panelHeader: 'Notice of Caution (Extended)'
   },
   [UnitNoteDocTypes.NOTE_CANCELLATION]: {
@@ -66,22 +52,12 @@ export const UnitNotesInfo: Record<UnitNoteDocTypes, UnitNoteInfoIF> = {
   [UnitNoteDocTypes.CONFIDENTIAL_NOTE]: {
     header: 'Confidential Note',
     dropdownText: 'Confidential Note',
-    fee: FeeSummaryDefaults.NO_FEE,
-    reviewSectionNumber: { // section numbers on Review page
-      attention: 2,
-      certifyInfo: 3,
-      staffPayment: 4
-    }
+    fee: FeeSummaryDefaults.NO_FEE
   },
   [UnitNoteDocTypes.PUBLIC_NOTE]: {
     header: 'Public Note',
     dropdownText: 'Public Note',
-    fee: FeeSummaryDefaults.NO_FEE,
-    reviewSectionNumber: { // section numbers on Review page
-      attention: 2,
-      certifyInfo: 3,
-      staffPayment: 4
-    }
+    fee: FeeSummaryDefaults.NO_FEE
   },
   [UnitNoteDocTypes.RESTRAINING_ORDER]: {
     header: 'Restraining Order',
@@ -96,12 +72,7 @@ export const UnitNotesInfo: Record<UnitNoteDocTypes, UnitNoteInfoIF> = {
   [UnitNoteDocTypes.DECAL_REPLACEMENT]: {
     header: 'Decal Replacement',
     dropdownText: 'Decal Replacement',
-    fee: FeeSummaryDefaults.UNIT_NOTE_10,
-    reviewSectionNumber: { // section numbers on Review page
-      attention: 2,
-      certifyInfo: 3,
-      staffPayment: 4
-    }
+    fee: FeeSummaryDefaults.UNIT_NOTE_10
   },
   [UnitNoteDocTypes.NON_RESIDENTIAL_EXEMPTION]: {
     header: 'Non-Residential Exemption',

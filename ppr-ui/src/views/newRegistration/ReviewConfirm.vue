@@ -68,9 +68,10 @@
                 <v-row no-gutters class='pt-1'>
                   <v-col>
                     <certify-information
-                      @certifyValid="validCertify = $event"
-                      :setShowErrors="showStepErrors"
                       class="pt-10"
+                      :sectionNumber="2"
+                      :setShowErrors="showStepErrors"
+                      @certifyValid="validCertify = $event"
                     />
                   </v-col>
                 </v-row>

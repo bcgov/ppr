@@ -126,9 +126,10 @@
             class="pt-10"
           />
           <certify-information
-            @certifyValid="showErrors = false"
-            :setShowErrors="showErrors"
-            class="pt-10"
+          class="pt-10"
+          :sectionNumber="2"
+          :setShowErrors="showErrors"
+          @certifyValid="showErrors = false"
           />
         </v-col>
         <v-col class="right-page pl-6" cols="3">
