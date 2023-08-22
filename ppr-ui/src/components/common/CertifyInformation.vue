@@ -1,7 +1,11 @@
 <template>
   <v-container class="pa-0 flat" id="certify-summary">
     <v-row no-gutters>
-      <v-col class="generic-label"><h2><span>{{ sectionNumber }}</span>. Authorization</h2></v-col>
+      <v-col class="generic-label">
+        <h2>
+          {{ `${sectionNumber ? sectionNumber + '.' : ''} Authorization` }}
+        </h2>
+      </v-col>
     </v-row>
     <v-row no-gutters class="pb-6 pt-4">
       <v-col>
@@ -109,7 +113,7 @@ export default defineComponent({
   props: {
     sectionNumber: {
       type: Number,
-      default: 2
+      required: false
     },
     setShowErrors: {
       type: Boolean,

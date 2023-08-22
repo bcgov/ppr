@@ -62,9 +62,10 @@
             class="mt-10"
           />
           <certify-information
-            @certifyValid="validCertify = $event"
-            :setShowErrors="showErrors"
             class="mt-10"
+            :sectionNumber="2"
+            :setShowErrors="showErrors"
+            @certifyValid="validCertify = $event"
           />
         </v-col>
         <v-col class="pl-6" cols="3">

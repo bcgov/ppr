@@ -1,5 +1,5 @@
 <template>
-  <div id="unit-note-review-confirm">
+  <div id="unit-note-review-confirm" class="increment-sections">
 
     <h1>
       Review and Confirm
@@ -16,7 +16,6 @@
     <section id="mhr-unit-note-person-giving-notice" class="mt-15">
       <ContactInformation
         :contactInfo="unitNoteSubmittingParty"
-        :sectionNumber="1"
         :content="submittingPartyChangeContent"
         :validate="validate"
         @setStoreProperty="handleStoreUpdate('submittingParty', $event)"
@@ -26,7 +25,6 @@
 
     <section v-if="hasEffectiveDateTime()" class="mt-15">
       <EffectiveDateTime
-        :sectionNumber="getSectionNumber.effectiveDateTime || 2"
         :content="{
           title: 'Effective Date and Time',
           description: `Select the effective date and time for this ${unitNoteType.header}.  ` +
@@ -41,7 +39,6 @@
 
     <section v-if="hasExpiryDate()" class="mt-15">
       <ExpiryDate
-        :sectionNumber="getSectionNumber.expiryDate || 2"
         :content="{
           title: 'Expiry Date',
           description: `Select the expiry date for this ${unitNoteType.header}.`,
@@ -58,7 +55,6 @@
     <section class="mt-15">
       <Attention
         sectionId="mhr-unit-note-attention"
-        :sectionNumber="getSectionNumber.attention || 3"
         :validate="validate"
         :initialValue="initialAttention"
         @isAttentionValid="handleComponentValid(MhrCompVal.ATTENTION_VALID, $event)"
@@ -69,20 +65,19 @@
     <!-- Authorization -->
     <section id="mhr-certify-section" class="mt-15">
       <CertifyInformation
-        :sectionNumber="getSectionNumber.certifyInfo || 4"
-        :setShowErrors="validate"
         :content="{
           description: 'The following account information will be recorded by BC Registries upon ' +
           'registration and payment. This information is used to confirm you have the authority ' +
           'to submit this registration. The following information must be completed and confirmed ' +
           'before submitting this registration.',
         }"
+        :setShowErrors="validate"
         @certifyValid="handleComponentValid(MhrCompVal.AUTHORIZATION_VALID, $event)"
       />
     </section>
 
     <section id="staff-transfer-payment-section" class="mt-10 pt-4 pb-10" v-if="isRoleStaffReg">
-      <h2>{{ getSectionNumber.staffPayment || 5 }}. Staff Payment</h2>
+      <h2>Staff Payment</h2>
       <v-card flat class="mt-6 pa-6" :class="{ 'border-error-left': validateStaffPayment }">
         <StaffPayment
           id="staff-payment"
@@ -191,9 +186,6 @@ export default defineComponent({
       ),
       isUnitNoteTypeCAUE: computed((): boolean =>
         getMhrUnitNote.value.documentType === UnitNoteDocTypes.EXTENSION_TO_NOTICE_OF_CAUTION
-      ),
-      getSectionNumber: computed((): Object =>
-        localState.unitNoteType?.reviewSectionNumber || {}
       )
     })
 
@@ -294,4 +286,5 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+@import '@/assets/styles/theme.scss';
 </style>

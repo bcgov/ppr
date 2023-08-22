@@ -64,10 +64,10 @@
             @valid="validConfirm = $event"
           />
           <certify-information
-            @certifyValid="validCertify = $event"
+            class="pt-10"
             :sectionNumber="3"
             :setShowErrors="showErrors"
-            class="pt-10"
+            @certifyValid="validCertify = $event"
           />
         </v-col>
         <v-col class="pl-6" cols="3">
