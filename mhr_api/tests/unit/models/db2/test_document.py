@@ -188,8 +188,8 @@ def test_document_json(session):
     doc.affirm_by_name = 'affirmByName'
     doc.liens_with_consent = 'liensWithConsent'
     doc.client_reference_id = 'clientReferenceId'
-    doc.draft_ts = model_utils.ts_from_iso_format('1995-11-10T17:20:22+00:00')
-    doc.registration_ts = model_utils.ts_from_iso_format('1995-11-14T08:00:01+00:00')
+    doc.draft_ts = model_utils.ts_from_iso_format('1995-11-10T17:20:22-08:00')
+    doc.registration_ts = model_utils.ts_from_iso_format('1995-11-14T08:00:01-08:00')
     doc.transfer_execution_date = model_utils.date_from_iso_format('0001-01-01')
 
     test_json = {
@@ -216,8 +216,8 @@ def test_document_json(session):
         'affirmByName': doc.affirm_by_name,
         'liensWithConsent': doc.liens_with_consent,
         'clientReferenceId': doc.client_reference_id,
-        'draftDateTime': '1995-11-10T17:20:22-07:53',
-        'createDateTime': '1995-11-14T08:00:01-07:53',
+        'draftDateTime': '1995-11-11T01:20:22+00:00',
+        'createDateTime': '1995-11-14T16:00:01+00:00'
         # 'transferDate': '0001-01-01'
     }
     assert doc.json == test_json

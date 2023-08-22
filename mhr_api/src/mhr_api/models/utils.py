@@ -246,7 +246,12 @@ def format_local_ts(time_stamp):
     formatted_ts: str = None
     if time_stamp:
         try:
-            formatted_ts = time_stamp.replace(tzinfo=LOCAL_TZ).replace(microsecond=0).isoformat()
+            local_ts = LOCAL_TZ.localize(time_stamp, is_dst=True)
+            formatted_ts: str = local_ts.replace(microsecond=0).isoformat()
+            if formatted_ts.endswith('-07:53'):   # Correct DB2 conversion idiosyncrasy.
+                formatted_ts.replace('-07:53', '-08:00')
+            elif formatted_ts.endswith('-06:53'):
+                formatted_ts.replace('-06:53', '-07:00')
         except Exception as format_exception:   # noqa: B902; return nicer error
             current_app.logger.error('format_ts exception: ' + str(format_exception))
             formatted_ts = time_stamp.isoformat()
