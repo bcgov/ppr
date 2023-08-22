@@ -92,6 +92,20 @@ def test_create(session, client, jwt, desc, mhr_num, roles, status, account):
     # check
     assert response.status_code == status
     if response.status_code == HTTPStatus.CREATED:
-        registration: MhrRegistration = MhrRegistration.find_by_mhr_number(response.json['mhrNumber'],
-                                                                           account)
+        resp_json = response.json
+        assert resp_json.get('mhrNumber')
+        assert resp_json.get('documentId')
+        assert resp_json.get('documentDescription')
+        assert resp_json.get('documentRegistrationNumber')
+        assert resp_json.get('createDateTime')
+        assert resp_json.get('status')
+        assert resp_json.get('registrationType')
+        assert resp_json.get('submittingParty')
+        assert resp_json.get('location')
+        assert resp_json.get('ownerGroups')
+        if resp_json.get('note') and resp_json['note'].get('expiryDateTime'):
+            assert resp_json['note'].get('destroyed')
+        registration: MhrRegistration = MhrRegistration.find_by_document_id(resp_json.get('documentId'),
+                                                                            account,
+                                                                            True)
         assert registration

@@ -408,6 +408,8 @@ class Db2Manuhome(db.Model):
             for note in self.reg_notes:
                 if note.reg_document_id == doc_id:
                     man_home['note'] = note.json
+                    if man_home['note'].get('documentType') == MhrDocumentTypes.EXNR:
+                        man_home['nonResidential'] = True
         elif doc.document_type in (Db2Document.DocumentTypes.PERMIT, Db2Document.DocumentTypes.PERMIT_TRIM,
                                    Db2Document.DocumentTypes.PERMIT_EXTENSION):
             for note in self.reg_notes:

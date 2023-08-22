@@ -51,10 +51,13 @@ def validate_note(registration: MhrRegistration, json_data, staff: bool = False,
             error_msg += validator_utils.validate_ppr_lien(registration.mhr_number)
         error_msg += validate_doc_id(json_data)
         error_msg += validator_utils.validate_submitting_party(json_data)
-        error_msg += validator_utils.validate_registration_state(registration, staff, MhrRegistrationTypes.REG_NOTE)
         doc_type: str = None
         if json_data.get('note') and json_data['note'].get('documentType'):
             doc_type = json_data['note'].get('documentType')
+        error_msg += validator_utils.validate_registration_state(registration,
+                                                                 staff,
+                                                                 MhrRegistrationTypes.REG_NOTE,
+                                                                 doc_type)
         error_msg += validate_giving_notice(json_data, doc_type)
         error_msg += validate_effective_ts(json_data, doc_type)
         error_msg += validate_expiry_ts(registration, json_data, doc_type)

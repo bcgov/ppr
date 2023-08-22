@@ -96,7 +96,7 @@ def validate_submitting_party(json_data, manufacturer: MhrManufacturer):
     return error_msg
 
 
-def validate_location(json_data, manufacturer: MhrManufacturer):
+def validate_location(json_data: dict, manufacturer: dict):
     """Verify location matches manufacturer location information."""
     error_msg = ''
     if not json_data.get('location'):
@@ -110,7 +110,7 @@ def validate_location(json_data, manufacturer: MhrManufacturer):
     return error_msg
 
 
-def validate_owner(json_data, manufacturer: MhrManufacturer):
+def validate_owner(json_data: dict, manufacturer: dict):
     """Verify owner matches manufacturer owner information."""
     error_msg = ''
     if not json_data.get('ownerGroups'):
@@ -133,7 +133,7 @@ def validate_owner(json_data, manufacturer: MhrManufacturer):
     return error_msg
 
 
-def validate_description(json_data, manufacturer: MhrManufacturer):
+def validate_description(json_data: dict, manufacturer: dict):
     """Verify description passes manufacturer rules."""
     error_msg = ''
     if not json_data.get('description'):

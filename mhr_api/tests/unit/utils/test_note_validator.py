@@ -18,7 +18,7 @@ from flask import current_app
 import pytest
 from registry_schemas import utils as schema_utils
 
-from mhr_api.utils import note_validator as validator, admin_validator
+from mhr_api.utils import note_validator as validator, admin_validator, validator_utils
 from mhr_api.models import MhrRegistration, utils as model_utils
 from mhr_api.models.type_tables import MhrDocumentTypes
 from mhr_api.services.authz import STAFF_ROLE
@@ -141,6 +141,14 @@ TEST_NOTE_DATA_NCAN = [
     ('Invalid status', False, '44161815', '022873', 'ppr_staff', admin_validator.NCAN_DOCUMENT_ID_STATUS),
     ('Invalid doc type TAXN', False, '50435493', '022873', 'ppr_staff', admin_validator.NCAN_NOT_ALLOWED)
 ]
+# test data pattern is ({description}, {valid}, {doc_type}, {mhr_num}, {account}, {message_content})
+TEST_NOTE_DATA_STATE = [
+    ('Valid', True, 'CAUC', '080104', 'ppr_staff', None),
+    ('Valid exempt NPUB', True, 'NPUB', '077010', 'ppr_staff', None),
+    ('Invalid exempt not NPUB', False, 'CAUC', '077010', 'ppr_staff', validator_utils.STATE_NOT_ALLOWED),
+    ('Invalid cancelled', False, 'CAUC', '001453', 'ppr_staff', validator_utils.STATE_NOT_ALLOWED)
+ ]
+
 
 @pytest.mark.parametrize('desc,valid,doc_type,ts_offset,mhr_num,account,message_content', TEST_NOTE_DATA_EFFECTIVE)
 def test_validate_effective_ts(session, desc, valid, doc_type, ts_offset, mhr_num, account, message_content):
@@ -273,3 +281,22 @@ def get_valid_registration():
     json_data = copy.deepcopy(NOTE_REGISTRATION)
     json_data['note']['documentId'] = DOC_ID_VALID
     return json_data
+
+
+@pytest.mark.parametrize('desc,valid,doc_type,mhr_num,account,message_content', TEST_NOTE_DATA_STATE)
+def test_validate_state(session, desc, valid, doc_type, mhr_num, account, message_content):
+    """Assert that MH state validation works as expected."""
+    # setup
+    json_data = get_valid_registration()
+    json_data['note']['documentType'] = doc_type
+    del json_data['note']['effectiveDateTime']
+    registration: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account)
+    valid_format, errors = schema_utils.validate(json_data, 'noteRegistration', 'mhr')
+    error_msg = validator.validate_note(registration, json_data, True, STAFF_ROLE)
+    # current_app.logger.debug(error_msg)
+    if valid:
+        assert valid_format and error_msg == ''
+    else:
+        assert error_msg != ''
+        if message_content:
+            assert error_msg.find(message_content) != -1

@@ -240,12 +240,25 @@ TEST_LOCATION_DATA_OTHER = [
 TEST_EXEMPTION_DATA = [
     (DESC_VALID, True, True, DOC_ID_VALID, None, MhrRegistrationStatusTypes.ACTIVE),
     ('Valid no doc id not staff', True, False, None, None, None),
-    ('Invalid EXEMPT', False, False, None, validator_utils.STATE_NOT_ALLOWED, MhrRegistrationStatusTypes.EXEMPT),
+    ('Invalid EXEMPT', False, False, None, validator_utils.EXEMPT_EXRS_INVALID, MhrRegistrationStatusTypes.EXEMPT),
     ('Invalid CANCELLED', False, False, None, validator_utils.STATE_NOT_ALLOWED, MhrRegistrationStatusTypes.HISTORICAL),
     ('Invalid note doc type', False, False, None, validator.NOTE_DOC_TYPE_INVALID, MhrRegistrationStatusTypes.ACTIVE),
     ('Invalid FROZEN TAXN', False, False, None, validator_utils.STATE_FROZEN_NOTE, MhrRegistrationStatusTypes.ACTIVE),
     ('Invalid FROZEN REST', False, False, None, validator_utils.STATE_FROZEN_NOTE, MhrRegistrationStatusTypes.ACTIVE),
     ('Invalid FROZEN NCON', False, False, None, validator_utils.STATE_FROZEN_NOTE, MhrRegistrationStatusTypes.ACTIVE)
+]
+# test data pattern is ({description}, {valid}, {ts_offset}, {mhr_num}, {account}, {message_content})
+TEST_EXEMPTION_DATA_DESTROYED = [
+    ('Valid no date', True, None, '045349', 'PS12345', None),
+    ('Valid in the past', True, -1, '045349', 'PS12345', None),
+    ('Invalid future tommorow', False, 1, '045349', 'PS12345', validator.DESTROYED_FUTURE)
+]
+# test data pattern is ({description}, {valid}, {doc_type}, {mhr_num}, {account}, {message_content})
+TEST_EXEMPTION_DATA_EXEMPT = [
+    ('Valid EXEMPT EXRS add EXNR', True, 'EXNR', '037525', 'PS12345', None),
+    ('Invalid EXEMPT EXRS EXNR exists', False, 'EXRS', '037407', 'PS12345', validator_utils.EXEMPT_EXRS_INVALID),
+    ('Invalid EXEMPT EXNR EXNR exists', False, 'EXNR', '037407', 'PS12345', validator_utils.EXEMPT_EXNR_INVALID),
+    ('Invalid EXEMPT EXRS exists', False, 'EXRS', '037525', 'PS12345', validator_utils.EXEMPT_EXRS_INVALID)
 ]
 # testdata pattern is ({description}, {valid}, {numerator}, {denominator}, {groups}, {message content})
 TEST_REG_DATA_GROUP = [
@@ -269,8 +282,8 @@ TEST_DATA_GROUP_INTEREST = [
     ('Valid 2 groups', True, INTEREST_VALID_1, 2, None),
     ('Valid 3 groups', True, INTEREST_VALID_2, 4, None),
     ('Valid 3 groups', True, INTEREST_VALID_3, 10, None),
-    ('Invalid numerator sum low', False, INTEREST_INVALID_1, 4, validator.GROUP_INTEREST_MISMATCH),
-    ('Inalid numerator sum high', False, INTEREST_INVALID_2, 4, validator.GROUP_INTEREST_MISMATCH)
+    ('Invalid numerator sum low', False, INTEREST_INVALID_1, 4, validator_utils.GROUP_INTEREST_MISMATCH),
+    ('Invalid numerator sum high', False, INTEREST_INVALID_2, 4, validator_utils.GROUP_INTEREST_MISMATCH)
 ]
 # testdata pattern is ({description}, {mhr_number}, {message content})
 TEST_DATA_LIEN_COUNT = [
@@ -434,9 +447,64 @@ def test_validate_exemption(session, desc, valid, staff, doc_id, message_content
     # current_app.logger.info(json_data)
     valid_format, errors = schema_utils.validate(json_data, 'exemption', 'mhr')
     # Additional validation not covered by the schema.
-    registration: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account_id)
+    registration: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_num, account_id)
 
     error_msg = validator.validate_exemption(registration, json_data, staff)
+    if errors:
+        for err in errors:
+            current_app.logger.debug(err.message)
+    if valid:
+        assert valid_format and error_msg == ''
+    else:
+        assert error_msg != ''
+        if message_content:
+            assert error_msg.find(message_content) != -1
+
+
+@pytest.mark.parametrize('desc,valid,ts_offset,mhr_num,account_id,message_content', TEST_EXEMPTION_DATA_DESTROYED)
+def test_validate_exemption_destroy(session, desc, valid, ts_offset, mhr_num, account_id, message_content):
+    """Assert that MH exemption destroyed date validation works as expected."""
+    # setup
+    json_data = copy.deepcopy(EXEMPTION)
+    del json_data['submittingParty']['phoneExtension']
+    if not ts_offset and json_data['note'].get('expiryDateTime'):
+        del json_data['note']['expiryDateTime']
+    if ts_offset:
+        expiry_ts = model_utils.now_ts_offset(ts_offset, True)
+        json_data['note']['expiryDateTime'] = model_utils.format_ts(expiry_ts)
+    # current_app.logger.info(json_data)
+    valid_format, errors = schema_utils.validate(json_data, 'exemption', 'mhr')
+    # Additional validation not covered by the schema.
+    registration: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_num, account_id)
+
+    error_msg = validator.validate_exemption(registration, json_data, False)
+    if errors:
+        for err in errors:
+            current_app.logger.debug(err.message)
+    if valid:
+        assert valid_format and error_msg == ''
+    else:
+        assert error_msg != ''
+        if message_content:
+            assert error_msg.find(message_content) != -1
+
+
+# test data pattern is ({description}, {valid}, {ts_offset}, {mhr_num}, {account}, {message_content})
+@pytest.mark.parametrize('desc,valid,doc_type,mhr_num,account_id,message_content', TEST_EXEMPTION_DATA_EXEMPT)
+def test_validate_exemption_exempt(session, desc, valid, doc_type, mhr_num, account_id, message_content):
+    """Assert that MH exemption validation on existing exempt state works as expected."""
+    # setup
+    json_data = copy.deepcopy(EXEMPTION)
+    del json_data['submittingParty']['phoneExtension']
+    json_data['note']['documentType'] = doc_type
+    if doc_type == MhrDocumentTypes.EXNR:
+        json_data['nonResidential'] = True
+    # current_app.logger.info(json_data)
+    valid_format, errors = schema_utils.validate(json_data, 'exemption', 'mhr')
+    # Additional validation not covered by the schema.
+    registration: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_num, account_id)
+
+    error_msg = validator.validate_exemption(registration, json_data, False)
     if errors:
         for err in errors:
             current_app.logger.debug(err.message)
@@ -583,7 +651,7 @@ def test_validate_group_interest(session, desc, valid, interest_data, common_den
         group['interestNumerator'] = interest.get('numerator')
         group['interestDenominator'] = interest.get('denominator')
         json_data.append(group)
-    error_msg = validator.validate_group_interest(json_data, common_den)
+    error_msg = validator_utils.validate_group_interest(json_data, common_den)
     if valid:
         assert error_msg == ''
     else:
