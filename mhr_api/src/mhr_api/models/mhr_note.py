@@ -59,8 +59,7 @@ class MhrNote(db.Model):  # pylint: disable=too-many-instance-attributes
             'documentId': str(self.document_id).rjust(8, '0'),
             'documentType': self.document_type,
             'status': self.status_type,
-            'remarks': self.remarks if self.remarks is not None else '',
-            'destroyed': False
+            'remarks': self.remarks if self.remarks is not None else ''
         }
         if self.registration:
             note['createDateTime'] = model_utils.format_ts(self.registration.registration_ts)
@@ -76,8 +75,8 @@ class MhrNote(db.Model):  # pylint: disable=too-many-instance-attributes
             note['effectiveDateTime'] = model_utils.format_ts(self.effective_ts)
         if notice:
             note['givingNoticeParty'] = notice.json
-        if self.destroyed == 'Y':
-            note['destroyed'] = True
+        if self.document_type in (MhrDocumentTypes.EXNR, MhrDocumentTypes.EXRS, MhrDocumentTypes.EXMN):
+            note['destroyed'] = bool(self.destroyed and self.destroyed == 'Y')
         if self.expiry_date:
             note['expiryDateTime'] = model_utils.format_ts(self.expiry_date)
         return note
@@ -164,8 +163,6 @@ class MhrNote(db.Model):  # pylint: disable=too-many-instance-attributes
             note.change_registration_id = change_registration_id
         if reg_json.get('remarks'):
             note.remarks = reg_json['remarks']
-        if reg_json.get('destroyed'):
-            note.destroyed = 'Y'
         if reg_json.get('effectiveDateTime'):
             note.effective_ts = model_utils.ts_from_iso_format(reg_json['effectiveDateTime'])
         else:
@@ -174,6 +171,8 @@ class MhrNote(db.Model):  # pylint: disable=too-many-instance-attributes
             note.expiry_date = model_utils.compute_caution_expiry(note.effective_ts, True)
         elif reg_json.get('expiryDateTime'):
             note.expiry_date = model_utils.expiry_datetime(reg_json['expiryDateTime'])
+            if note.document_type in (MhrDocumentTypes.EXNR, MhrDocumentTypes.EXRS, MhrDocumentTypes.EXMN):
+                note.destroyed = 'Y'
         if note.document_type == MhrDocumentTypes.CAUC and not note.expiry_date:
             if not note.remarks:
                 note.remarks = REMARKS_CAUC_NO_EXPIRY

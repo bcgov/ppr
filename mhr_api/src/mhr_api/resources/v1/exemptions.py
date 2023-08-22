@@ -58,9 +58,9 @@ def post_exemptions(mhr_number: str):  # pylint: disable=too-many-return-stateme
             return resource_utils.unauthorized_error_response(account_id)
 
         # Not found or not allowed to access throw exceptions.
-        current_reg: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_number,
-                                                                          account_id,
-                                                                          is_all_staff_account(account_id))
+        current_reg: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_number,
+                                                                              account_id,
+                                                                              is_all_staff_account(account_id))
         return submit_exemption(current_reg, account_id, request_json, request, jwt)
     except DatabaseException as db_exception:
         return resource_utils.db_exception_response(db_exception, account_id,
@@ -105,7 +105,11 @@ def submit_exemption(current_reg: MhrRegistration,  # pylint: disable=too-many-b
         current_app.logger.debug(f'building exemption response json for {registration.mhr_number}')
         response_json = registration.json
         response_json['status'] = MhrRegistrationStatusTypes.EXEMPT
-        # Return report if request header Accept MIME type is application/pdf.
+        # Add current location and owners for reporting
+        current_reg.current_view = True
+        current_json = current_reg.new_registration_json
+        response_json['location'] = current_json.get('location')
+        response_json['ownerGroups'] = current_json.get('ownerGroups')
         if resource_utils.is_pdf(request):
             current_app.logger.info('Report not yet available: returning JSON.')
         response_json['usergroup'] = group
@@ -115,7 +119,7 @@ def submit_exemption(current_reg: MhrRegistration,  # pylint: disable=too-many-b
             del response_json['username']
         else:
             if not response_json.get('affirmbyName'):
-                request_json['affirmByName'] = reg_utils.get_affirmby(g.jwt_oidc_token_info)
+                response_json['affirmByName'] = reg_utils.get_affirmby(g.jwt_oidc_token_info)
             reg_utils.enqueue_registration_report(registration, response_json, ReportTypes.MHR_EXEMPTION)
         del response_json['usergroup']
         return jsonify(response_json), HTTPStatus.CREATED

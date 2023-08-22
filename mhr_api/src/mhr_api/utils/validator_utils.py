@@ -17,19 +17,19 @@ Refactored from registration_validator.
 """
 from flask import current_app
 
-from mhr_api.models import MhrRegistration, Db2Owngroup, Db2Document, Db2Mhomnote, MhrDraft
+from mhr_api.models import MhrRegistration, MhrDraft
 from mhr_api.models import registration_utils as reg_utils, utils as model_utils
 from mhr_api.models.type_tables import (
     MhrDocumentTypes,
     MhrNoteStatusTypes,
+    MhrOwnerStatusTypes,
     MhrRegistrationStatusTypes,
     MhrRegistrationTypes,
     MhrStatusTypes
 )
-from mhr_api.models.db2.utils import get_db2_permit_count
 from mhr_api.models.utils import is_legacy
 from mhr_api.services import ltsa
-from mhr_api.utils import valid_charset
+from mhr_api.utils import valid_charset, validator_utils_legacy
 
 
 HOME_DESCRIPTION_MIN_YEAR: int = 1900
@@ -51,6 +51,12 @@ DESCRIPTION_MAKE_MODEL_REQUIRED = 'Either description make or description model 
 DESCRIPTION_YEAR_INVALID = 'Description manufactured home year invalid: it must be between 1900 and 1 year after ' + \
     'the current year. '
 DESCRIPTION_YEAR_REQUIRED = 'Description manufactured home year is required. '
+EXEMPT_EXNR_INVALID = 'Registration not allowed: the home is exempt because of an existing non-residential exemption. '
+EXEMPT_EXRS_INVALID = 'Residential exemption registration not allowed: the home is already exempt. '
+DELETE_GROUP_ID_INVALID = 'The owner group with ID {group_id} is not active and cannot be changed. '
+DELETE_GROUP_ID_NONEXISTENT = 'No owner group with ID {group_id} exists. '
+DELETE_GROUP_TYPE_INVALID = 'The owner group tenancy type with ID {group_id} is invalid. '
+GROUP_INTEREST_MISMATCH = 'The owner group interest numerator sum does not equal the interest common denominator. '
 
 
 def validate_doc_id(json_data, check_exists: bool = True):
@@ -105,27 +111,23 @@ def checksum_valid(doc_id: str) -> bool:
     return (10 - mod_sum) == check_digit
 
 
-def validate_registration_state(registration: MhrRegistration, staff: bool, reg_type: str):
+def validate_registration_state(registration: MhrRegistration, staff: bool, reg_type: str, doc_type: str = None):
     """Validate registration state: changes are only allowed on active homes."""
     error_msg = ''
     if not registration:
         return error_msg
+    if is_legacy():
+        return validator_utils_legacy.validate_registration_state(registration, staff, reg_type, doc_type)
     if reg_type and reg_type == MhrDocumentTypes.EXRE:
         return validate_registration_state_exre(registration)
-    if is_legacy() and registration.manuhome:
-        if registration.manuhome.mh_status != registration.manuhome.StatusTypes.REGISTERED:
-            error_msg += STATE_NOT_ALLOWED
-        elif registration.manuhome.reg_documents:
-            last_doc: Db2Document = registration.manuhome.reg_documents[-1]
-            if not staff and last_doc.document_type == Db2Document.DocumentTypes.TRANS_AFFIDAVIT:
-                error_msg += STATE_NOT_ALLOWED
-            elif staff and last_doc.document_type == Db2Document.DocumentTypes.TRANS_AFFIDAVIT and \
-                    reg_type != MhrRegistrationTypes.TRANS:
-                error_msg += STATE_NOT_ALLOWED
-                error_msg += STATE_FROZEN_AFFIDAVIT
-    elif registration.status_type:
+    if reg_type and reg_type in (MhrRegistrationTypes.EXEMPTION_NON_RES, MhrRegistrationTypes.EXEMPTION_RES):
+        return validate_registration_state_exemption(registration, reg_type, staff)
+    if registration.status_type:
         if registration.status_type != MhrRegistrationStatusTypes.ACTIVE:
-            error_msg += STATE_NOT_ALLOWED
+            if registration.status_type == MhrRegistrationStatusTypes.CANCELLED or \
+                    doc_type is None or \
+                    doc_type != MhrDocumentTypes.NPUB:
+                error_msg += STATE_NOT_ALLOWED
         elif registration.change_registrations:
             last_reg: MhrRegistration = registration.change_registrations[-1]
             if not staff and last_reg.registration_type == MhrRegistrationTypes.TRANS_AFFIDAVIT:
@@ -140,14 +142,28 @@ def validate_registration_state(registration: MhrRegistration, staff: bool, reg_
 def validate_registration_state_exre(registration: MhrRegistration):
     """Validate registration state for rescind exemption requests."""
     error_msg = ''
-    if is_legacy() and registration.manuhome:
-        if registration.manuhome.mh_status == registration.manuhome.StatusTypes.EXEMPT:
-            return error_msg
-        error_msg += STATE_NOT_ALLOWED
-    elif registration.status_type:
+    if registration.status_type:
         if registration.status_type == MhrRegistrationStatusTypes.EXEMPT:
             return error_msg
         error_msg += STATE_NOT_ALLOWED
+    return error_msg
+
+
+def validate_registration_state_exemption(registration: MhrRegistration, reg_type: str, staff: bool):
+    """Validate registration state for residential/non-residential exemption requests."""
+    error_msg = ''
+    if registration.status_type:
+        if registration.status_type == MhrRegistrationStatusTypes.ACTIVE:
+            return check_state_note(registration, staff, error_msg)
+        if registration.status_type == MhrRegistrationStatusTypes.CANCELLED:
+            error_msg += STATE_NOT_ALLOWED
+        elif reg_type == MhrRegistrationTypes.EXEMPTION_RES:
+            error_msg += EXEMPT_EXRS_INVALID
+        elif registration.change_registrations:
+            for reg in registration.change_registrations:
+                if reg.registration_type == MhrRegistrationTypes.EXEMPTION_NON_RES and \
+                        reg.notes and reg.notes[0].status_type == MhrNoteStatusTypes.ACTIVE:
+                    error_msg += EXEMPT_EXNR_INVALID
     return error_msg
 
 
@@ -216,8 +232,8 @@ def get_existing_location(registration: MhrRegistration):
     """Get the currently active location JSON."""
     if not registration:
         return {}
-    if is_legacy() and registration.manuhome and registration.manuhome.reg_location:
-        return registration.manuhome.reg_location.registration_json
+    if is_legacy():
+        return validator_utils_legacy.get_existing_location(registration)
     if registration.locations and registration.locations[0].status_type == MhrStatusTypes.ACTIVE:
         return registration.locations[0].json
     if registration.change_registrations:
@@ -230,7 +246,7 @@ def get_existing_location(registration: MhrRegistration):
 def get_permit_count(mhr_number: str, name: str) -> int:
     """Execute a query to count existing transport permit registrations on a home."""
     if is_legacy():
-        return get_db2_permit_count(mhr_number, name)
+        return validator_utils_legacy.get_permit_count(mhr_number, name)
     return 0
 
 
@@ -248,10 +264,8 @@ def validate_pid(pid: str):
 def get_existing_group_count(registration: MhrRegistration) -> int:
     """Count number of existing owner groups."""
     group_count: int = 0
-    if registration and is_legacy() and registration.manuhome:
-        for existing in registration.manuhome.reg_owner_groups:
-            if existing.status in (Db2Owngroup.StatusTypes.ACTIVE, Db2Owngroup.StatusTypes.EXEMPT):
-                group_count += 1
+    if is_legacy():
+        return validator_utils_legacy.get_existing_group_count(registration)
     return group_count
 
 
@@ -259,12 +273,7 @@ def check_state_note(registration: MhrRegistration, staff: bool, error_msg: str)
     """Check registration state for non-staff: frozen if active TAXN, NCON, or REST unit note."""
     if not registration or staff:
         return error_msg
-    if is_legacy() and registration.manuhome and registration.manuhome.notes:
-        for note in registration.manuhome.reg_notes:
-            if note.document_type in (MhrDocumentTypes.TAXN, MhrDocumentTypes.NCON, MhrDocumentTypes.REST) and \
-                    note.status == Db2Mhomnote.StatusTypes.ACTIVE:
-                error_msg += STATE_FROZEN_NOTE
-    elif registration.change_registrations:
+    if registration.change_registrations:
         for reg in registration.change_registrations:
             if reg.notes and \
                     reg.notes[0].document_type in (MhrDocumentTypes.TAXN,
@@ -307,3 +316,106 @@ def validate_description(description, staff: bool):
     if not staff and not description.get('csaNumber') and not description.get('engineerDate'):
         error_msg += DESCRIPTION_CSA_ENGINEER_REQUIRED
     return error_msg
+
+
+def owner_name_match(registration: MhrRegistration = None,  # pylint: disable=too-many-branches
+                     request_owner=None):
+    """Verify the request owner name matches one of the current owner names."""
+    if not registration or not request_owner:
+        return False
+    if is_legacy():
+        return validator_utils_legacy.owner_name_match(registration, request_owner)
+    request_name: str = ''
+    first_name: str = ''
+    last_name: str = ''
+    match: bool = False
+    is_business = request_owner.get('organizationName')
+    if is_business:
+        request_name = request_owner.get('organizationName').strip().upper()
+    elif request_owner.get('individualName') and request_owner['individualName'].get('first') and \
+            request_owner['individualName'].get('last'):
+        first_name = request_owner['individualName'].get('first').strip().upper()
+        last_name = request_owner['individualName'].get('last').strip().upper()
+    if not request_name:
+        return False
+    if registration.owner_groups:
+        for group in registration.owner_groups:
+            if group.status_type == MhrOwnerStatusTypes.ACTIVE:
+                for owner in group.owners:
+                    if is_business and owner.business_name == request_name:
+                        match = True
+                    elif not is_business and owner.first_name == first_name and owner.last_name == last_name:
+                        match = True
+    if not match and registration.change_registrations:  # pylint: disable=too-many-nested-blocks
+        for reg in registration.change_registrations:
+            for group in reg.owner_groups:
+                if group.status_type == MhrOwnerStatusTypes.ACTIVE:
+                    for owner in group.owners:
+                        if is_business and owner.business_name == request_name:
+                            match = True
+                        elif not is_business and owner.first_name == first_name and owner.last_name == last_name:
+                            match = True
+    return match
+
+
+def validate_delete_owners(registration: MhrRegistration = None, json_data: dict = None) -> str:
+    """Check groups id's and owners are valid for deleted groups."""
+    error_msg = ''
+    if is_legacy():
+        return validator_utils_legacy.validate_delete_owners(registration, json_data)
+    current_app.logger.error('validate_delete_owners not implemented')
+    return error_msg
+
+
+def delete_group(group_id: int, delete_groups):
+    """Check if owner group is flagged for deletion."""
+    if not delete_groups or group_id < 1:
+        return False
+    for group in delete_groups:
+        if group.get('groupId', 0) == group_id:
+            return True
+    return False
+
+
+def interest_required(groups, registration: MhrRegistration = None, delete_groups=None) -> bool:
+    """Determine if group interest is required."""
+    group_count: int = len(groups)  # Verify interest if multiple groups or existing interest.
+    if group_count > 1:
+        return True
+    if is_legacy():
+        return validator_utils_legacy.interest_required(groups, registration, delete_groups)
+    current_app.logger.error('interest_required not implemented')
+    return group_count > 1
+
+
+def validate_group_interest(groups, denominator: int, registration: MhrRegistration = None, delete_groups=None):
+    """Verify owner group interest values are valid."""
+    error_msg = ''
+    numerator_sum: int = 0
+    group_count: int = len(groups)  # Verify interest if multiple groups or existing interest.
+    if is_legacy():
+        return validator_utils_legacy.validate_group_interest(groups, denominator, registration, delete_groups)
+    if registration and registration.change_registrations:
+        current_app.logger.error('validate_group_interest not implemented')
+    if group_count < 2:  # Could have transfer of joint tenants with no interest.
+        return error_msg
+    for group in groups:
+        num = group.get('interestNumerator', 0)
+        den = group.get('interestDenominator', 0)
+        if num and den and num > 0 and den > 0:
+            if den == denominator:
+                numerator_sum += num
+            else:
+                numerator_sum += (denominator/den * num)
+    if numerator_sum != denominator:
+        error_msg = GROUP_INTEREST_MISMATCH
+    return error_msg
+
+
+def get_modified_group(registration: MhrRegistration, group_id: int) -> dict:
+    """Find the existing owner group as JSON, matching on the group id."""
+    group = {}
+    if is_legacy():
+        return validator_utils_legacy.get_modified_group(registration, group_id)
+    current_app.logger.error('get_modified_group not implemented')
+    return group

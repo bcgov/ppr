@@ -141,6 +141,8 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                 reg_json = self.set_transfer_group_json(reg_json)
             elif self.registration_type in (MhrRegistrationTypes.EXEMPTION_NON_RES, MhrRegistrationTypes.EXEMPTION_RES):
                 reg_json = self.set_note_json(reg_json)
+                if reg_json['note'].get('documentType') == MhrDocumentTypes.EXNR:
+                    reg_json['nonResidential'] = True
             elif self.registration_type == MhrRegistrationTypes.REG_STAFF_ADMIN and \
                     (not self.notes or doc_json.get('documentType') in (MhrDocumentTypes.NCAN,
                                                                         MhrDocumentTypes.NRED, MhrDocumentTypes.EXRE)):
@@ -741,7 +743,6 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
             registration.parties.append(MhrParty.create_from_json(notice_json, MhrPartyTypes.CONTACT, registration.id))
         doc: MhrDocument = registration.documents[0]
         if json_data.get('note'):
-            json_data['note']['destroyed'] = True
             registration.notes = [MhrNote.create_from_json(json_data.get('note'), base_reg.id, doc.id,
                                                            registration.registration_ts, registration.id)]
         if base_reg:

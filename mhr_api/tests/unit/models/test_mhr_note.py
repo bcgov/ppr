@@ -32,7 +32,7 @@ TEST_ID_DATA = [
 ]
 TEST_NOTE = MhrNote(id=1,
     status_type='ACTIVE',
-    document_type=MhrDocumentTypes.REG_101,
+    document_type=MhrDocumentTypes.EXRS,
     document_id=200000000,
     remarks='remarks',
     destroyed='N',
@@ -117,7 +117,7 @@ def test_note_json(session):
         'documentId': str(note.document_id),
         'status': note.status_type,
         'documentType': note.document_type,
-        'documentDescription': 'MANUFACTURED HOME REGISTRATION',
+        'documentDescription': 'RESIDENTIAL EXEMPTION',
         'remarks': note.remarks,
         'destroyed': False,
         'effectiveDateTime': model_utils.format_ts(note.effective_ts),

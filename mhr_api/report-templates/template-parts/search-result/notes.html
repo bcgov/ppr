@@ -34,7 +34,7 @@
                 </tr>
                 <tr>
                     <td class="section-sub-title">
-                        {% if note.documentType == 'EXNR' %}Destroyed Date:{% else %}Expiry Date:{% endif %}
+                        {% if note.documentType in ('EXNR', 'EXRS') %}Destroyed Date:{% else %}Expiry Date:{% endif %}
                     </td>
                     <td>{% if note.expiryDate is defined and note.expiryDate != '' %} 
                             {{note.expiryDate}}

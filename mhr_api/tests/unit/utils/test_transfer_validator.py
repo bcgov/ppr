@@ -82,10 +82,11 @@ TEST_TRANSFER_DATA = [
     ('Invalid FROZEN REST', False, False, None, validator_utils.STATE_FROZEN_NOTE, MhrRegistrationStatusTypes.ACTIVE),
     ('Invalid FROZEN NCON', False, False, None, validator_utils.STATE_FROZEN_NOTE, MhrRegistrationStatusTypes.ACTIVE),
     ('Invalid draft', False, False, None, validator_utils.DRAFT_NOT_ALLOWED, MhrRegistrationStatusTypes.ACTIVE),
-    (DESC_INVALID_GROUP_ID, False, False, None, validator.DELETE_GROUP_ID_INVALID, MhrRegistrationStatusTypes.ACTIVE),
-    (DESC_NONEXISTENT_GROUP_ID, False, False, None, validator.DELETE_GROUP_ID_NONEXISTENT,
+    (DESC_INVALID_GROUP_ID, False, False, None, validator_utils.DELETE_GROUP_ID_INVALID,
      MhrRegistrationStatusTypes.ACTIVE),
-    (DESC_INVALID_GROUP_TYPE, False, False, None, validator.DELETE_GROUP_TYPE_INVALID,
+    (DESC_NONEXISTENT_GROUP_ID, False, False, None, validator_utils.DELETE_GROUP_ID_NONEXISTENT,
+     MhrRegistrationStatusTypes.ACTIVE),
+    (DESC_INVALID_GROUP_TYPE, False, False, None, validator_utils.DELETE_GROUP_TYPE_INVALID,
      MhrRegistrationStatusTypes.ACTIVE)
 ]
 # testdata pattern is ({description}, {valid}, {staff}, {tran_dt}, {dec_val}, {consideration}, {message content})
@@ -216,8 +217,8 @@ TEST_TRANSFER_DEATH_NA_DATA = [
 # testdata pattern is ({description}, {valid}, {numerator}, {denominator}, {message content})
 TEST_TRANSFER_DATA_GROUP_INTEREST = [
     ('Valid add', True, 1, 2, None),
-    ('Invalid numerator < 1', False, 1, 4, validator.GROUP_INTEREST_MISMATCH),
-    ('Invalid numerator sum high', False, 3, 4, validator.GROUP_INTEREST_MISMATCH)
+    ('Invalid numerator < 1', False, 1, 4, validator_utils.GROUP_INTEREST_MISMATCH),
+    ('Invalid numerator sum high', False, 3, 4, validator_utils.GROUP_INTEREST_MISMATCH)
 ]
 # testdata pattern is ({description}, {valid}, {staff}, {kc_group}, {mhr_num}, {json_data}, {message content})
 TEST_TRANSFER_DATA_QS = [
