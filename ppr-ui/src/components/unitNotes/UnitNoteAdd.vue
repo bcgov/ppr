@@ -34,7 +34,7 @@
       <ContactInformation
         :contactInfo="unitNoteGivingNoticeParty"
         :sectionNumber="3"
-        :content="personGivingNoticeContent"
+        :content="contactInfoContent"
         :validate="validate"
         :isInfoOptional="isPersonGivingNoticeOptional()"
         @setStoreProperty="handleStoreUpdate('givingNoticeParty', $event)"
@@ -53,11 +53,11 @@ import { UnitNotesInfo } from '@/resources/unitNotes'
 import { UnitNoteDocTypes } from '@/enums'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
-import { UnitNoteIF } from '@/interfaces'
+import { ContactInformationContentIF, UnitNoteIF } from '@/interfaces'
 import { useMhrUnitNote, useMhrValidations } from '@/composables'
 import { MhrCompVal, MhrSectVal } from '@/composables/mhrRegistration/enums'
 import { DocumentId, Remarks, ContactInformation } from '@/components/common'
-import { personGivingNoticeContent } from '@/resources'
+import { personGivingNoticeContent, collectorInformationContent } from '@/resources'
 
 export default defineComponent({
   name: 'UnitNoteAdd',
@@ -102,6 +102,11 @@ export default defineComponent({
         getValidation(MhrSectVal.UNIT_NOTE_VALID, MhrCompVal.DOC_ID_VALID) &&
         getValidation(MhrSectVal.UNIT_NOTE_VALID, MhrCompVal.REMARKS_VALID) &&
         getValidation(MhrSectVal.UNIT_NOTE_VALID, MhrCompVal.PERSON_GIVING_NOTICE_VALID)
+      ),
+      contactInfoContent: computed((): ContactInformationContentIF =>
+        props.docType === UnitNoteDocTypes.NOTICE_OF_TAX_SALE
+          ? collectorInformationContent
+          : personGivingNoticeContent
       ),
 
       // Remarks

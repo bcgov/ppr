@@ -33,7 +33,7 @@
       </v-row>
       <v-divider class="my-3 mx-0" />
       <div class="px">
-        <h3>Person Giving Notice</h3>
+        <h3>{{ contactInfoTitle }}</h3>
 
         <v-simple-table v-if="unitNote" class="giving-notice-party-table" data-test-id="party-info-table">
           <template v-slot:default>
@@ -92,6 +92,8 @@ import { BaseAddress } from '@/composables/address'
 import { PartyIF, UnitNoteIF } from '@/interfaces'
 import { PartyAddressSchema } from '@/schemas'
 import { toDisplayPhone } from '@/utils'
+import { personGivingNoticeContent, collectorInformationContent } from '@/resources'
+import { UnitNoteDocTypes } from '@/enums/unitNoteDocTypes'
 
 export default defineComponent({
   name: 'UnitNoteReviewDetailsTable',
@@ -130,6 +132,11 @@ export default defineComponent({
       displayPhoneAndExt: computed((): string =>
         toDisplayPhone(localState.givingNoticeParty.phoneNumber) +
         (localState.givingNoticeParty.phoneExtension ? ' Ext ' + localState.givingNoticeParty.phoneExtension : '')
+      ),
+      contactInfoTitle: computed((): string =>
+        props.unitNote.documentType === UnitNoteDocTypes.NOTICE_OF_TAX_SALE
+          ? collectorInformationContent.title
+          : personGivingNoticeContent.title
       )
     })
 
