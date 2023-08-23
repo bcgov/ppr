@@ -172,6 +172,7 @@ export const useMhrUnitNote = () => {
         expiryDateTime: '',
         status: UnitNoteStatusTypes.ACTIVE,
         remarks: '',
+        additionalRemarks: '',
         givingNoticeParty: {
           businessName: '',
           personName: {

@@ -11,6 +11,7 @@ export interface UnitNoteIF {
   effectiveDateTime?: string
   expiryDateTime?: string
   remarks?: string
+  additionalRemarks?: string
   givingNoticeParty?: PartyIF
   status?: UnitNoteStatusTypes
   destroyed?: boolean

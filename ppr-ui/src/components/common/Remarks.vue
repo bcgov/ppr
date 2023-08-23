@@ -26,13 +26,22 @@
               id="remarks-textarea"
               v-model.trim="remarks"
               filled
-              :rules="maxLength(420)"
+              :rules="maxLength(remarksMaxLength)"
               name="name"
-              counter="420"
+              :counter="remarksMaxLength"
               label="Remarks (Optional)"
               class="pl-1"
               data-test-id="remarks-textarea"
             ></v-textarea>
+
+            <v-checkbox
+              v-if="showAdditionalRemarksCheckbox"
+              id="additional-remarks-checkbox"
+              class="py-0 pr-0 pl-2 ma-0"
+              v-model="hasAdditionalRemarks"
+              :label="content.checkboxLabel"
+              :hide-details="true"
+            />
           </v-col>
         </v-row>
       </v-card>
@@ -53,6 +62,10 @@ export default defineComponent({
       type: String,
       required: true
     },
+    additionalRemarks: {
+      type: String,
+      required: false
+    },
     sectionNumber: {
       type: Number,
       required: false
@@ -64,6 +77,10 @@ export default defineComponent({
     validate: {
       type: Boolean,
       default: false
+    },
+    showAdditionalRemarksCheckbox: {
+      type: Boolean,
+      default: false
     }
   },
   setup (props, { emit }) {
@@ -72,13 +89,23 @@ export default defineComponent({
     const localState = reactive({
       isFormValid: false,
       remarks: props.unitNoteRemarks,
+      hasAdditionalRemarks: !!props.additionalRemarks,
+      remarksMaxLength: computed((): number =>
+        props.showAdditionalRemarksCheckbox ? 420 - props.content.checkboxLabel.length : 420),
       showBorderError: computed(() => props.validate && !localState.isFormValid)
     })
 
     watch(
       () => localState.remarks,
       (val: string) => {
-        emit('setStoreProperty', val)
+        emit('setStoreProperty', { key: 'remarks', value: val })
+      }
+    )
+
+    watch(
+      () => localState.hasAdditionalRemarks,
+      (val: boolean) => {
+        emit('setStoreProperty', { key: 'additionalRemarks', value: val ? props.content.checkboxLabel + '. ' : '' })
       }
     )
 

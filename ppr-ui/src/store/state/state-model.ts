@@ -343,6 +343,7 @@ export const stateModel: StateModelIF = {
       expiryDateTime: '',
       status: UnitNoteStatusTypes.ACTIVE,
       remarks: '',
+      additionalRemarks: '',
       givingNoticeParty: {
         businessName: '',
         personName: {
