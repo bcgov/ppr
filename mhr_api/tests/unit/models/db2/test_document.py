@@ -55,47 +55,87 @@ TEST_SUBMITTING_DATA = [
 @pytest.mark.parametrize('exists,id,mhr_num,doc_type,doc_reg_id', TEST_DATA)
 def test_find_by_id(session, exists, id, mhr_num, doc_type, doc_reg_id):
     """Assert that find document by id contains all expected elements."""
-    doc: Db2Document = Db2Document.find_by_id(id)
-    if exists:
-        assert doc
-        assert doc.id == id
-        assert doc.mhr_number == mhr_num
-        assert doc.document_type == doc_type
-        assert doc.document_reg_id == doc_reg_id
-        assert doc.draft_ts is not None
-        assert doc.registration_ts is not None
-        assert doc.interimed is not None
-        assert doc.owner_cross_reference is not None
-        assert doc.interest_denominator is not None
-        assert doc.declared_value is not None
-        assert doc.own_land is not None
-        assert doc.routing_slip_number is not None
-        assert doc.last_service is not None
-        assert doc.bcol_account is not None
-        assert doc.dat_number is not None
-        assert doc.examiner_id is not None
-        assert doc.update_id is not None
-        assert doc.phone_number is not None
-        assert doc.attention_reference is not None
-        assert doc.legacy_address is not None
-        assert doc.number_of_pages is not None
-        assert doc.transfer_execution_date is not None
-        assert doc.consideration_value is not None
-        assert doc.affirm_by_name is not None
-        assert doc.liens_with_consent is not None
-        assert doc.client_reference_id is not None
+    if model_utils.is_legacy():
+        doc: Db2Document = Db2Document.find_by_id(id)
+        if exists:
+            assert doc
+            assert doc.id == id
+            assert doc.mhr_number == mhr_num
+            assert doc.document_type == doc_type
+            assert doc.document_reg_id == doc_reg_id
+            assert doc.draft_ts is not None
+            assert doc.registration_ts is not None
+            assert doc.interimed is not None
+            assert doc.owner_cross_reference is not None
+            assert doc.interest_denominator is not None
+            assert doc.declared_value is not None
+            assert doc.own_land is not None
+            assert doc.routing_slip_number is not None
+            assert doc.last_service is not None
+            assert doc.bcol_account is not None
+            assert doc.dat_number is not None
+            assert doc.examiner_id is not None
+            assert doc.update_id is not None
+            assert doc.phone_number is not None
+            assert doc.attention_reference is not None
+            assert doc.legacy_address is not None
+            assert doc.number_of_pages is not None
+            assert doc.transfer_execution_date is not None
+            assert doc.consideration_value is not None
+            assert doc.affirm_by_name is not None
+            assert doc.liens_with_consent is not None
+            assert doc.client_reference_id is not None
 
-    else:
-        assert not doc
+        else:
+            assert not doc
 
 
 @pytest.mark.parametrize('exists,id,mhr_num,doc_type,doc_reg_id', TEST_DATA)
 def test_find_by_mhr_number(session, exists, id, mhr_num, doc_type, doc_reg_id):
     """Assert that find document by mhr number contains all expected elements."""
-    docs = Db2Document.find_by_mhr_number(mhr_num)
-    if exists:
-        assert docs
-        for doc in docs:
+    if model_utils.is_legacy():
+        docs = Db2Document.find_by_mhr_number(mhr_num)
+        if exists:
+            assert docs
+            for doc in docs:
+                assert doc.mhr_number == mhr_num
+                if doc.id == id:
+                    assert doc.document_type == doc_type
+                    assert doc.document_reg_id == doc_reg_id
+                    assert doc.draft_ts is not None
+                    assert doc.registration_ts is not None
+                    assert doc.interimed is not None
+                    assert doc.owner_cross_reference is not None
+                    assert doc.interest_denominator is not None
+                    assert doc.declared_value is not None
+                    assert doc.own_land is not None
+                    assert doc.routing_slip_number is not None
+                    assert doc.last_service is not None
+                    assert doc.bcol_account is not None
+                    assert doc.dat_number is not None
+                    assert doc.examiner_id is not None
+                    assert doc.update_id is not None
+                    assert doc.phone_number is not None
+                    assert doc.attention_reference is not None
+                    assert doc.legacy_address is not None
+                    assert doc.number_of_pages is not None
+                    assert doc.transfer_execution_date is not None
+                    assert doc.consideration_value is not None
+                    assert doc.affirm_by_name is not None
+                    assert doc.liens_with_consent is not None
+                    assert doc.client_reference_id is not None
+
+        else:
+            assert not docs
+
+
+@pytest.mark.parametrize('exists,id,mhr_num,doc_type,doc_reg_id', TEST_DATA)
+def test_find_by_doc_reg_num(session, exists, id, mhr_num, doc_type, doc_reg_id):
+    """Assert that find document by document registration number contains all expected elements."""
+    if model_utils.is_legacy():
+        doc = Db2Document.find_by_doc_reg_num(doc_reg_id)
+        if exists:
+            assert doc
             assert doc.mhr_number == mhr_num
             if doc.id == id:
                 assert doc.document_type == doc_type
@@ -122,109 +162,74 @@ def test_find_by_mhr_number(session, exists, id, mhr_num, doc_type, doc_reg_id):
                 assert doc.affirm_by_name is not None
                 assert doc.liens_with_consent is not None
                 assert doc.client_reference_id is not None
-
-    else:
-        assert not docs
-
-
-@pytest.mark.parametrize('exists,id,mhr_num,doc_type,doc_reg_id', TEST_DATA)
-def test_find_by_doc_reg_num(session, exists, id, mhr_num, doc_type, doc_reg_id):
-    """Assert that find document by document registration number contains all expected elements."""
-    doc = Db2Document.find_by_doc_reg_num(doc_reg_id)
-    if exists:
-        assert doc
-        assert doc.mhr_number == mhr_num
-        if doc.id == id:
-            assert doc.document_type == doc_type
-            assert doc.document_reg_id == doc_reg_id
-            assert doc.draft_ts is not None
-            assert doc.registration_ts is not None
-            assert doc.interimed is not None
-            assert doc.owner_cross_reference is not None
-            assert doc.interest_denominator is not None
-            assert doc.declared_value is not None
-            assert doc.own_land is not None
-            assert doc.routing_slip_number is not None
-            assert doc.last_service is not None
-            assert doc.bcol_account is not None
-            assert doc.dat_number is not None
-            assert doc.examiner_id is not None
-            assert doc.update_id is not None
-            assert doc.phone_number is not None
-            assert doc.attention_reference is not None
-            assert doc.legacy_address is not None
-            assert doc.number_of_pages is not None
-            assert doc.transfer_execution_date is not None
-            assert doc.consideration_value is not None
-            assert doc.affirm_by_name is not None
-            assert doc.liens_with_consent is not None
-            assert doc.client_reference_id is not None
-    else:
-        assert not doc
+        else:
+            assert not doc
 
 
 def test_document_json(session):
     """Assert that the document renders to a json format correctly."""
-    doc = Db2Document(mhr_number='022911',
-                        document_type='CONV',
-                        document_reg_id='00022911',
-                        interimed=' ',
-                        owner_cross_reference=' ',
-                        interest_denominator=0,
-                        declared_value=12000,
-                        own_land='N',
-                        routing_slip_number='1234')
-    doc.last_service = ' '
-    doc.bcol_account = '1234'
-    doc.dat_number = '5678'
-    doc.examiner_id = 'X1234'
-    doc.update_id = 'Y1234'
-    doc.phone_number = '6041234567'
-    doc.attention_reference = 'attn'
-    doc.name = 'name'
-    doc.legacy_address = 'address'
-    doc.number_of_pages = 0
-    doc.consideration_value = 'considerationValue'
-    doc.affirm_by_name = 'affirmByName'
-    doc.liens_with_consent = 'liensWithConsent'
-    doc.client_reference_id = 'clientReferenceId'
-    doc.draft_ts = model_utils.ts_from_iso_format('1995-11-10T17:20:22-08:00')
-    doc.registration_ts = model_utils.ts_from_iso_format('1995-11-14T08:00:01-08:00')
-    doc.transfer_execution_date = model_utils.date_from_iso_format('0001-01-01')
+    if model_utils.is_legacy():
+        doc = Db2Document(mhr_number='022911',
+                          document_type='CONV',
+                          document_reg_id='00022911',
+                          interimed=' ',
+                          owner_cross_reference=' ',
+                          interest_denominator=0,
+                          declared_value=12000,
+                          own_land='N',
+                          routing_slip_number='1234')
+        doc.last_service = ' '
+        doc.bcol_account = '1234'
+        doc.dat_number = '5678'
+        doc.examiner_id = 'X1234'
+        doc.update_id = 'Y1234'
+        doc.phone_number = '6041234567'
+        doc.attention_reference = 'attn'
+        doc.name = 'name'
+        doc.legacy_address = 'address'
+        doc.number_of_pages = 0
+        doc.consideration_value = 'considerationValue'
+        doc.affirm_by_name = 'affirmByName'
+        doc.liens_with_consent = 'liensWithConsent'
+        doc.client_reference_id = 'clientReferenceId'
+        doc.draft_ts = model_utils.ts_from_iso_format('1995-11-10T17:20:22-08:00')
+        doc.registration_ts = model_utils.ts_from_iso_format('1995-11-14T08:00:01-08:00')
+        doc.transfer_execution_date = model_utils.date_from_iso_format('0001-01-01')
 
-    test_json = {
-        'mhrNumber': doc.mhr_number,
-        'documentType': doc.document_type,
-        'documentRegistrationNumber': doc.document_reg_id,
-        'interimed': doc.interimed,
-        'ownerCrossReference': doc.owner_cross_reference,
-        'interestDenominator': doc.interest_denominator,
-        'declaredValue': doc.declared_value,
-        'ownLand': doc.own_land,
-        'routingSlipNumber': doc.routing_slip_number,
-        'lastService': doc.last_service,
-        'bcolAccount': doc.bcol_account,
-        'datNumber': doc.dat_number,
-        'examinerId': doc.examiner_id,
-        'updateId': doc.update_id,
-        'phoneNumber': doc.phone_number,
-        'attentionReference': doc.attention_reference,
-        'name': doc.name,
-        'legacyAddress': doc.legacy_address,
-        'numberOfPages': doc.number_of_pages,
-        'considerationValue': doc.consideration_value,
-        'affirmByName': doc.affirm_by_name,
-        'liensWithConsent': doc.liens_with_consent,
-        'clientReferenceId': doc.client_reference_id,
-        'draftDateTime': '1995-11-11T01:20:22+00:00',
-        'createDateTime': '1995-11-14T16:00:01+00:00'
-        # 'transferDate': '0001-01-01'
-    }
-    assert doc.json == test_json
+        test_json = {
+            'mhrNumber': doc.mhr_number,
+            'documentType': doc.document_type,
+            'documentRegistrationNumber': doc.document_reg_id,
+            'interimed': doc.interimed,
+            'ownerCrossReference': doc.owner_cross_reference,
+            'interestDenominator': doc.interest_denominator,
+            'declaredValue': doc.declared_value,
+            'ownLand': doc.own_land,
+            'routingSlipNumber': doc.routing_slip_number,
+            'lastService': doc.last_service,
+            'bcolAccount': doc.bcol_account,
+            'datNumber': doc.dat_number,
+            'examinerId': doc.examiner_id,
+            'updateId': doc.update_id,
+            'phoneNumber': doc.phone_number,
+            'attentionReference': doc.attention_reference,
+            'name': doc.name,
+            'legacyAddress': doc.legacy_address,
+            'numberOfPages': doc.number_of_pages,
+            'considerationValue': doc.consideration_value,
+            'affirmByName': doc.affirm_by_name,
+            'liensWithConsent': doc.liens_with_consent,
+            'clientReferenceId': doc.client_reference_id,
+            'draftDateTime': '1995-11-11T01:20:22+00:00',
+            'createDateTime': '1995-11-14T16:00:01+00:00'
+            # 'transferDate': '0001-01-01'
+        }
+        assert doc.json == test_json
 
 
 @pytest.mark.parametrize('name_json,name_db2', TEST_SUBMITTING_DATA)
 def test_submitting_name(session, name_json, name_db2):
     """Assert that submitting party DB2 conversion works as expected."""
-    test_name = Db2Document.to_db2_submitting_name(name_json)
-    assert test_name == name_db2
+    if model_utils.is_legacy():
+        test_name = Db2Document.to_db2_submitting_name(name_json)
+        assert test_name == name_db2

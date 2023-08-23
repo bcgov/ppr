@@ -18,7 +18,7 @@ Test-Suite to ensure that the legacy DB2 Docdes Model is working as expected.
 """
 import pytest
 
-from mhr_api.models import Db2Docdes
+from mhr_api.models import Db2Docdes, utils as model_utils
 
 
 # testdata pattern is ({exists}, {type}, {name}, {fee_code})
@@ -33,31 +33,31 @@ TEST_DATA = [
 @pytest.mark.parametrize('exists,type, name, fee_code', TEST_DATA)
 def test_find_by_id(session, exists, type, name, fee_code):
     """Assert that find doc description by type contains all expected elements."""
-    docdes: Db2Docdes = Db2Docdes.find_by_id(type)
-    if exists:
-        assert docdes
-        assert docdes.doc_type == type
-        assert docdes.doc_name == name
-        assert docdes.fee_code == fee_code
-        json_data = docdes.json
-        assert json_data['documentType'] == type
-        assert json_data['documentName'] == name
-        assert json_data['feeCode'] == fee_code
-    else:
-        assert not docdes
+    if model_utils.is_legacy():
+        docdes: Db2Docdes = Db2Docdes.find_by_id(type)
+        if exists:
+            assert docdes
+            assert docdes.doc_type == type
+            assert docdes.doc_name == name
+            assert docdes.fee_code == fee_code
+            json_data = docdes.json
+            assert json_data['documentType'] == type
+            assert json_data['documentName'] == name
+            assert json_data['feeCode'] == fee_code
+        else:
+            assert not docdes
 
 
 def test_docdes_json(session):
     """Assert that the doc description renders to a json format correctly."""
-    docdes = Db2Docdes(
-        doc_type='1234',
-        doc_name='Doc Name',
-        fee_code='abcde'
-    )
+    if model_utils.is_legacy():
+        docdes = Db2Docdes(doc_type='1234',
+                           doc_name='Doc Name',
+                           fee_code='abcde')
 
-    test_json = {
-        'documentType': docdes.doc_type,
-        'documentName': docdes.doc_name,
-        'feeCode': docdes.fee_code
-    }
-    assert docdes.json == test_json
+        test_json = {
+            'documentType': docdes.doc_type,
+            'documentName': docdes.doc_name,
+            'feeCode': docdes.fee_code
+        }
+        assert docdes.json == test_json

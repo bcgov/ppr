@@ -20,7 +20,7 @@ import copy
 
 import pytest
 
-from mhr_api.models import Db2Owngroup, MhrRegistration
+from mhr_api.models import Db2Owngroup, MhrRegistration, utils as model_utils
 
 
 SOLE_OWNER_GROUP = {
@@ -105,60 +105,10 @@ TEST_DATA_GROUP_TYPE = [
 @pytest.mark.parametrize('exists,manuhome_id,group_id,reg_doc_id,type', TEST_DATA)
 def test_find_by_manuhome_id(session, exists, manuhome_id, group_id, reg_doc_id, type):
     """Assert that find an owner group by manuhome id and group id contains all expected elements."""
-    owngroup: Db2Owngroup = Db2Owngroup.find_by_manuhome_id(manuhome_id, group_id)
-    if exists:
-        assert owngroup
-        assert owngroup.manuhome_id == manuhome_id
-        assert owngroup.group_id == group_id
-        assert owngroup.reg_document_id == reg_doc_id
-        assert owngroup.tenancy_type == type
-        assert owngroup.can_document_id is not None
-        assert owngroup.copy_id is not None
-        assert owngroup.status is not None
-        assert owngroup.sequence_number is not None
-        assert owngroup.pending_flag is not None
-        assert owngroup.lessee is not None
-        assert owngroup.lessor is not None
-        assert owngroup.interest is not None
-        assert owngroup.interest_numerator is not None
-        assert owngroup.tenancy_specified is not None
-
-    else:
-        assert not owngroup
-
-
-@pytest.mark.parametrize('exists,manuhome_id,group_id,reg_doc_id,type', TEST_DATA)
-def test_find_all_by_manuhome_id(session, exists, manuhome_id, group_id, reg_doc_id, type):
-    """Assert that find all owner groups by manuhome id contains all expected elements."""
-    groups = Db2Owngroup.find_all_by_manuhome_id(manuhome_id)
-    if exists:
-        assert groups
-        for owngroup in groups:
-            assert owngroup.manuhome_id == manuhome_id
-            assert owngroup.group_id
-            assert owngroup.reg_document_id
-            assert owngroup.tenancy_type == type
-            assert owngroup.can_document_id is not None
-            assert owngroup.copy_id is not None
-            assert owngroup.status is not None
-            assert owngroup.sequence_number is not None
-            assert owngroup.pending_flag is not None
-            assert owngroup.lessee is not None
-            assert owngroup.lessor is not None
-            assert owngroup.interest is not None
-            assert owngroup.interest_numerator is not None
-            assert owngroup.tenancy_specified is not None
-    else:
-        assert not groups
-
-
-@pytest.mark.parametrize('exists,manuhome_id,group_id,reg_doc_id,type', TEST_DATA)
-def test_find_by_reg_doc_id(session, exists, manuhome_id, group_id, reg_doc_id, type):
-    """Assert that find document by manuhome id contains all expected elements."""
-    groups = Db2Owngroup.find_by_reg_doc_id(manuhome_id, reg_doc_id)
-    if exists:
-        assert groups
-        for owngroup in groups:
+    if model_utils.is_legacy():
+        owngroup: Db2Owngroup = Db2Owngroup.find_by_manuhome_id(manuhome_id, group_id)
+        if exists:
+            assert owngroup
             assert owngroup.manuhome_id == manuhome_id
             assert owngroup.group_id == group_id
             assert owngroup.reg_document_id == reg_doc_id
@@ -173,8 +123,61 @@ def test_find_by_reg_doc_id(session, exists, manuhome_id, group_id, reg_doc_id, 
             assert owngroup.interest is not None
             assert owngroup.interest_numerator is not None
             assert owngroup.tenancy_specified is not None
-    else:
-        assert not groups
+
+        else:
+            assert not owngroup
+
+
+@pytest.mark.parametrize('exists,manuhome_id,group_id,reg_doc_id,type', TEST_DATA)
+def test_find_all_by_manuhome_id(session, exists, manuhome_id, group_id, reg_doc_id, type):
+    """Assert that find all owner groups by manuhome id contains all expected elements."""
+    if model_utils.is_legacy():
+        groups = Db2Owngroup.find_all_by_manuhome_id(manuhome_id)
+        if exists:
+            assert groups
+            for owngroup in groups:
+                assert owngroup.manuhome_id == manuhome_id
+                assert owngroup.group_id
+                assert owngroup.reg_document_id
+                assert owngroup.tenancy_type == type
+                assert owngroup.can_document_id is not None
+                assert owngroup.copy_id is not None
+                assert owngroup.status is not None
+                assert owngroup.sequence_number is not None
+                assert owngroup.pending_flag is not None
+                assert owngroup.lessee is not None
+                assert owngroup.lessor is not None
+                assert owngroup.interest is not None
+                assert owngroup.interest_numerator is not None
+                assert owngroup.tenancy_specified is not None
+        else:
+            assert not groups
+
+
+@pytest.mark.parametrize('exists,manuhome_id,group_id,reg_doc_id,type', TEST_DATA)
+def test_find_by_reg_doc_id(session, exists, manuhome_id, group_id, reg_doc_id, type):
+    """Assert that find document by manuhome id contains all expected elements."""
+    if model_utils.is_legacy():
+        groups = Db2Owngroup.find_by_reg_doc_id(manuhome_id, reg_doc_id)
+        if exists:
+            assert groups
+            for owngroup in groups:
+                assert owngroup.manuhome_id == manuhome_id
+                assert owngroup.group_id == group_id
+                assert owngroup.reg_document_id == reg_doc_id
+                assert owngroup.tenancy_type == type
+                assert owngroup.can_document_id is not None
+                assert owngroup.copy_id is not None
+                assert owngroup.status is not None
+                assert owngroup.sequence_number is not None
+                assert owngroup.pending_flag is not None
+                assert owngroup.lessee is not None
+                assert owngroup.lessor is not None
+                assert owngroup.interest is not None
+                assert owngroup.interest_numerator is not None
+                assert owngroup.tenancy_specified is not None
+        else:
+            assert not groups
 
 
 @pytest.mark.parametrize('interest, numerator, denominator', TEST_DATA_INTEREST)
@@ -190,71 +193,74 @@ def test_get_interest_fraction(interest, numerator, denominator):
 @pytest.mark.parametrize('tenancy_type, legacy_tenancy_type', TEST_DATA_JSON)
 def test_owngroup_json(session, tenancy_type, legacy_tenancy_type):
     """Assert that the owngroup renders to a json format correctly."""
-    owngroup = Db2Owngroup(manuhome_id=1,
-                           group_id=1,
-                           copy_id=0,
-                           status='5',
-                           sequence_number=1,
-                           reg_document_id='REG22911',
-                           can_document_id='42400339',
-                           tenancy_type=legacy_tenancy_type,
-                           lessee='',
-                           lessor='',
-                           interest='UNDIVIDED 1/2',
-                           interest_numerator=1,
-                           tenancy_specified='Y')
+    if model_utils.is_legacy():
+        owngroup = Db2Owngroup(manuhome_id=1,
+                               group_id=1,
+                               copy_id=0,
+                               status='5',
+                               sequence_number=1,
+                               reg_document_id='REG22911',
+                               can_document_id='42400339',
+                               tenancy_type=legacy_tenancy_type,
+                               lessee='',
+                               lessor='',
+                               interest='UNDIVIDED 1/2',
+                               interest_numerator=1,
+                               tenancy_specified='Y')
 
-    test_json = {
-        'groupId': owngroup.group_id,
-        'type': tenancy_type,
-        'status': 'PREVIOUS',
-        'interest': 'UNDIVIDED',
-        'interestNumerator': owngroup.interest_numerator,
-        'interestDenominator': 2,
-        'tenancySpecified': True,
-        'owners': []
-    }
-    assert owngroup.json == test_json
+        test_json = {
+            'groupId': owngroup.group_id,
+            'type': tenancy_type,
+            'status': 'PREVIOUS',
+            'interest': 'UNDIVIDED',
+            'interestNumerator': owngroup.interest_numerator,
+            'interestDenominator': 2,
+            'tenancySpecified': True,
+            'owners': []
+        }
+        assert owngroup.json == test_json
 
 
 @pytest.mark.parametrize('tenancy_type, legacy_tenancy_type', TEST_DATA_JSON)
 def test_owngroup_reg_json(session, tenancy_type, legacy_tenancy_type):
     """Assert that the owngroup renders to a registration json format correctly."""
-    owngroup = Db2Owngroup(manuhome_id=1,
-                           group_id=1,
-                           copy_id=0,
-                           status='3',
-                           sequence_number=1,
-                           reg_document_id='REG22911',
-                           can_document_id='42400339',
-                           tenancy_type=legacy_tenancy_type,
-                           lessee='',
-                           lessor='',
-                           interest='UNDIVIDED 1/2',
-                           interest_numerator=1,
-                           tenancy_specified='Y')
+    if model_utils.is_legacy():
+        owngroup = Db2Owngroup(manuhome_id=1,
+                            group_id=1,
+                            copy_id=0,
+                            status='3',
+                            sequence_number=1,
+                            reg_document_id='REG22911',
+                            can_document_id='42400339',
+                            tenancy_type=legacy_tenancy_type,
+                            lessee='',
+                            lessor='',
+                            interest='UNDIVIDED 1/2',
+                            interest_numerator=1,
+                            tenancy_specified='Y')
 
-    test_json = {
-        'groupId': owngroup.group_id,
-        'type': tenancy_type,
-        'status': 'ACTIVE',
-        'interest': 'UNDIVIDED',
-        'interestNumerator': owngroup.interest_numerator,
-        'interestDenominator': 2,
-        'tenancySpecified': True,
-        'owners': []
-    }
-    assert owngroup.registration_json == test_json
+        test_json = {
+            'groupId': owngroup.group_id,
+            'type': tenancy_type,
+            'status': 'ACTIVE',
+            'interest': 'UNDIVIDED',
+            'interestNumerator': owngroup.interest_numerator,
+            'interestDenominator': 2,
+            'tenancySpecified': True,
+            'owners': []
+        }
+        assert owngroup.registration_json == test_json
 
 
 # testdata pattern is ({type}, {legacy_type}, {data})
 @pytest.mark.parametrize('tenancy_type, legacy_tenancy_type, data', TEST_DATA_GROUP_TYPE)
 def test_create_type(session, tenancy_type, legacy_tenancy_type, data):
     """Assert that the owngroup type maps from new to legacy correctly."""
-    registration: MhrRegistration = MhrRegistration(id=1)
-    group_data = copy.deepcopy(data)
-    group_data['type'] = tenancy_type
-    group: Db2Owngroup = Db2Owngroup.create_from_registration(registration, group_data, 2)
-    assert group.tenancy_type == legacy_tenancy_type
-    for owner in group.owners:
-        assert owner.owner_id == owner.sequence_number
+    if model_utils.is_legacy():
+        registration: MhrRegistration = MhrRegistration(id=1)
+        group_data = copy.deepcopy(data)
+        group_data['type'] = tenancy_type
+        group: Db2Owngroup = Db2Owngroup.create_from_registration(registration, group_data, 2)
+        assert group.tenancy_type == legacy_tenancy_type
+        for owner in group.owners:
+            assert owner.owner_id == owner.sequence_number

@@ -166,7 +166,7 @@ class _Config():  # pylint: disable=too-few-public-methods
     MAX_SIZE_SEARCH_RT: int = int(os.getenv('MAX_SIZE_SEARCH_RT', '400000'))
 
     # Default true, set to false when switching from legacy DB2 to Postgres
-    USE_LEGACY_DB: bool = bool(os.getenv('USE_LEGACY_DB', 'True'))
+    USE_LEGACY_DB: bool = bool(os.getenv('USE_LEGACY_DB', 'true') == 'true')
     # Default 2, set to 1 to revert to original report api client
     REPORT_VERSION = os.getenv('REPORT_VERSION', '2')
     REPORT_API_AUDIENCE = os.getenv('REPORT_API_AUDIENCE', '')
