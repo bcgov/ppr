@@ -113,3 +113,10 @@ export const CancellableUnitNoteTypes: UnitNoteDocTypes[] = [
   Exemptions (EXRS) (EXRN)
   */
 ]
+
+export const remarksContent = {
+  title: 'Remarks',
+  description: 'Remarks will be shown when a search result is produced for this manufactured home.',
+  sideLabel: 'Add Remarks',
+  checkboxLabel: 'A notice pursuant to section 645/656 of the Local Government Act was filed'
+}

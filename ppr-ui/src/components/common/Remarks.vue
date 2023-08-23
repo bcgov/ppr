@@ -36,11 +36,11 @@
 
             <v-checkbox
               v-if="showAdditionalRemarksCheckbox"
-              id="additional-remarks-checkbox"
               class="py-0 pr-0 pl-2 ma-0"
               v-model="hasAdditionalRemarks"
               :label="content.checkboxLabel"
               :hide-details="true"
+              data-test-id="additional-remarks-checkbox"
             />
           </v-col>
         </v-row>

@@ -21,7 +21,7 @@ import {
 import { StaffPayment } from '@bcrs-shared-components/staff-payment'
 import { MhrUnitNoteValidationStateIF } from '@/interfaces'
 import { isEqual } from 'lodash'
-import { collectorInformationContent } from '@/resources'
+import { collectorInformationContent, remarksContent } from '@/resources'
 
 Vue.use(Vuetify)
 
@@ -101,6 +101,9 @@ describe('MHR Unit Note Filing', () => {
     expect(UnitNoteAddComponent.findComponent(DocumentId).exists()).toBeTruthy()
     expect(UnitNoteAddComponent.findComponent(Remarks).exists()).toBeTruthy()
     expect(UnitNoteAddComponent.findComponent(ContactInformation).exists()).toBeTruthy()
+    expect(
+      UnitNoteAddComponent.findComponent(Remarks).find(getTestId('additional-remarks-checkbox')).exists()
+    ).toBeFalsy()
 
     expect(UnitNoteAddComponent.findAll('.border-error-left').length).toBe(0)
     expect(UnitNoteAddComponent.findAll('.error-text').length).toBe(0)
@@ -270,16 +273,25 @@ describe('MHR Unit Note Filing', () => {
     expect(UnitNoteReviewComponent.findComponent(ExpiryDate).exists()).toBeFalsy()
   })
 
-  it('should show correct title for Giving Notice Party', async () => {
+  it('Notice of Tax Sale (TAXN): should show additional Remarks & correct title for Giving Notice Party', async () => {
     wrapper = await createUnitNoteComponent(UnitNoteDocTypes.NOTICE_OF_TAX_SALE)
 
-    const ContactInformationComponent = wrapper.findComponent(UnitNoteAdd).findComponent(ContactInformation)
+    const UnitNoteAddComponent = wrapper.findComponent(UnitNoteAdd)
+    const additionalRemarksCheckbox = UnitNoteAddComponent.findComponent(Remarks).find(
+      getTestId('additional-remarks-checkbox')
+    )
+
+    expect(additionalRemarksCheckbox.exists()).toBeTruthy()
+    additionalRemarksCheckbox.trigger('click')
+
+    const ContactInformationComponent = UnitNoteAddComponent.findComponent(ContactInformation)
 
     expect(ContactInformationComponent.find('h2').text()).toContain(collectorInformationContent.title)
 
     const UnitNoteReviewComponent = await getReviewConfirmComponent(wrapper)
     const UnitNoteReviewTable = UnitNoteReviewComponent.findComponent(UnitNoteReviewDetailsTable)
 
+    expect(UnitNoteReviewTable.text()).toContain(remarksContent.checkboxLabel)
     expect(UnitNoteReviewTable.text()).toContain(collectorInformationContent.title)
   })
 })

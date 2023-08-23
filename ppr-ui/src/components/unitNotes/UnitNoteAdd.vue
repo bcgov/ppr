@@ -21,12 +21,7 @@
         :additionalRemarks="additionalRemarks"
         :showAdditionalRemarksCheckbox="isNoticeOfTaxSale"
         :sectionNumber="2"
-        :content="{
-          title: 'Remarks',
-          description: 'Remarks will be shown when a search result is produced for this manufactured home.',
-          sideLabel: 'Add Remarks',
-          checkboxLabel: 'A notice pursuant to section 645/656 of the Local Government Act was filed'
-        }"
+        :content="remarksContent"
         :validate="validate"
         @setStoreProperty="handleStoreUpdate($event.key, $event.value)"
         @isValid="handleComponentValid(MhrCompVal.REMARKS_VALID, $event)"
@@ -60,7 +55,7 @@ import { ContactInformationContentIF, UnitNoteIF } from '@/interfaces'
 import { useMhrUnitNote, useMhrValidations } from '@/composables'
 import { MhrCompVal, MhrSectVal } from '@/composables/mhrRegistration/enums'
 import { DocumentId, Remarks, ContactInformation } from '@/components/common'
-import { personGivingNoticeContent, collectorInformationContent } from '@/resources'
+import { personGivingNoticeContent, collectorInformationContent, remarksContent } from '@/resources'
 
 export default defineComponent({
   name: 'UnitNoteAdd',
@@ -142,6 +137,7 @@ export default defineComponent({
       handleStoreUpdate,
       handleComponentValid,
       isPersonGivingNoticeOptional,
+      remarksContent,
       ...toRefs(localState)
     }
   }
