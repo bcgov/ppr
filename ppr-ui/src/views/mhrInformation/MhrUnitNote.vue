@@ -6,7 +6,8 @@
     </v-overlay>
 
     <BaseDialog
-      :setOptions="cancelOptions"
+      :closeAction="true"
+      :setOptions="notCompleteDialog"
       :setDisplay="showCancelDialog"
       @proceed="handleDialogResp($event)"
     />
@@ -51,7 +52,7 @@
                   :setShowFeeSummary="true"
                   :setFeeType="feeType"
                   :setErrMsg="feeSummaryErrorMsg"
-                  @cancel="goToDashboard()"
+                  @cancel="showCancelDialog = true"
                   @back="isReviewMode = false"
                   @submit="goToReview()"
                   data-test-id="fee-summary"
@@ -73,7 +74,7 @@ import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { StickyContainer } from '@/components/common'
 import { BaseDialog } from '@/components/dialogs'
 import { UnitNotesInfo } from '@/resources/unitNotes'
-import { unsavedChangesDialog } from '@/resources/dialogOptions/cancelDialogs'
+import { notCompleteDialog } from '@/resources/dialogOptions/cancelDialogs'
 import { UnitNoteAdd, UnitNoteReview } from '@/components/unitNotes'
 import { ErrorIF, RegTableNewItemI } from '@/interfaces'
 import { useMhrUnitNote, useMhrValidations, useNavigation } from '@/composables'
@@ -118,7 +119,6 @@ export default defineComponent({
       isUnitNoteReviewValid: false,
       validate: false,
       isReviewMode: false,
-      cancelOptions: unsavedChangesDialog,
       showCancelDialog: false,
       showBackBtn: computed((): string => localState.isReviewMode ? 'Back' : ''),
 
@@ -217,6 +217,7 @@ export default defineComponent({
     }
 
     return {
+      notCompleteDialog,
       goToReview,
       goToDashboard,
       handleDialogResp,
