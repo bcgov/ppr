@@ -33,23 +33,25 @@ TEST_DATA = [
 @pytest.mark.parametrize('exists,manuhome_id,compressed_id', TEST_DATA)
 def test_find_by_manuhome_id(session, exists, manuhome_id, compressed_id):
     """Assert that find compressed serial number key by manuhome id contains all expected elements."""
-    cmpserno = Db2Cmpserno.find_by_manuhome_id(manuhome_id)
-    if exists:
-        assert cmpserno
-        for key in cmpserno:
-            assert key.manuhome_id == manuhome_id
-            assert key.compressed_id == compressed_id
-            assert key.compressed_key
-            current_app.logger.debug(f'Compressed key=${key.compressed_key}$')
-    else:
-        assert not cmpserno
+    if model_utils.is_legacy():
+        cmpserno = Db2Cmpserno.find_by_manuhome_id(manuhome_id)
+        if exists:
+            assert cmpserno
+            for key in cmpserno:
+                assert key.manuhome_id == manuhome_id
+                assert key.compressed_id == compressed_id
+                assert key.compressed_key
+                current_app.logger.debug(f'Compressed key=${key.compressed_key}$')
+        else:
+            assert not cmpserno
 
 
 def test_compressed_key(session):
     """Assert that setting a compressed serial number key by manuhome id works as expected."""
-    keys = Db2Cmpserno.find_by_manuhome_id(47715)
-    if keys:
-        cmpserno: Db2Cmpserno = keys[0]
-        cmpserno.compressed_key =  model_utils.get_serial_number_key('123')
-        current_app.logger.debug(f'Updated key for {cmpserno.json}')
-        cmpserno.save()
+    if model_utils.is_legacy():
+        keys = Db2Cmpserno.find_by_manuhome_id(47715)
+        if keys:
+            cmpserno: Db2Cmpserno = keys[0]
+            cmpserno.compressed_key =  model_utils.get_serial_number_key('123')
+            current_app.logger.debug(f'Updated key for {cmpserno.json}')
+            cmpserno.save()

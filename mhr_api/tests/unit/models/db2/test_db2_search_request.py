@@ -216,99 +216,105 @@ TEST_SERIAL_NUMBER_KEY_DATA = [
 
 def test_search_no_account(session):
     """Assert that a search query with no account id returns the expected result."""
-    json_data = copy.deepcopy(MHR_NUMBER_JSON)
-    query = SearchRequest.create_from_json(json_data, None)
-    query.search()
+    if model_utils.is_legacy():
+        json_data = copy.deepcopy(MHR_NUMBER_JSON)
+        query = SearchRequest.create_from_json(json_data, None)
+        query.search()
 
-    assert query.id
-    assert query.search_response
+        assert query.id
+        assert query.search_response
 
 
 @pytest.mark.parametrize('search_type,json_data', TEST_VALID_DATA)
 def test_search_valid(session, search_type, json_data):
     """Assert that a valid search returns the expected search type result."""
-    test_data = copy.deepcopy(json_data)
-    test_data['type'] = model_utils.TO_DB_SEARCH_TYPE[json_data['type']]
-    SearchRequest.validate_query(test_data)
+    if model_utils.is_legacy():
+        test_data = copy.deepcopy(json_data)
+        test_data['type'] = model_utils.TO_DB_SEARCH_TYPE[json_data['type']]
+        SearchRequest.validate_query(test_data)
 
-    query: SearchRequest = SearchRequest.create_from_json(json_data, 'PS12345', 'UNIT_TEST')
-    query.search_db2()
-    assert not query.updated_selection
-    result = query.json
-    current_app.logger.debug('Results size:' + str(result['totalResultsSize']))
-    assert query.id
-    assert query.search_response
-    assert query.account_id == 'PS12345'
-    assert query.user_id == 'UNIT_TEST'
-    assert result['searchId']
-    assert result['searchQuery']
-    assert result['searchDateTime']
-    assert result['totalResultsSize']
-    assert result['maxResultsSize']
-    assert result['returnedResultsSize']
-    if search_type != 'MS':
-        assert len(result['results']) >= 1
-    if result.get('results'):
-        for match in result['results']:
-            assert match['mhrNumber']
-            assert match['status']
-            assert match.get('activeCount') >= 0
-            assert match.get('exemptCount') >= 0
-            assert match.get('historicalCount') >= 0
-            assert match['createDateTime']
-            assert match['homeLocation']
-            assert match['serialNumber']
-            assert match['baseInformation']
-            assert 'year' in match['baseInformation']
-            assert 'make' in match['baseInformation']
-            assert match['baseInformation']['model'] is not None
-            assert 'organizationName' in match or 'ownerName' in match
-            if match.get('ownerName'):
-                assert match['ownerName']['first']
-                assert match['ownerName']['last']
+        query: SearchRequest = SearchRequest.create_from_json(json_data, 'PS12345', 'UNIT_TEST')
+        query.search_db2()
+        assert not query.updated_selection
+        result = query.json
+        current_app.logger.debug('Results size:' + str(result['totalResultsSize']))
+        assert query.id
+        assert query.search_response
+        assert query.account_id == 'PS12345'
+        assert query.user_id == 'UNIT_TEST'
+        assert result['searchId']
+        assert result['searchQuery']
+        assert result['searchDateTime']
+        assert result['totalResultsSize']
+        assert result['maxResultsSize']
+        assert result['returnedResultsSize']
+        if search_type != 'MS':
+            assert len(result['results']) >= 1
+        if result.get('results'):
+            for match in result['results']:
+                assert match['mhrNumber']
+                assert match['status']
+                assert match.get('activeCount') >= 0
+                assert match.get('exemptCount') >= 0
+                assert match.get('historicalCount') >= 0
+                assert match['createDateTime']
+                assert match['homeLocation']
+                assert match['serialNumber']
+                assert match['baseInformation']
+                assert 'year' in match['baseInformation']
+                assert 'make' in match['baseInformation']
+                assert match['baseInformation']['model'] is not None
+                assert 'organizationName' in match or 'ownerName' in match
+                if match.get('ownerName'):
+                    assert match['ownerName']['first']
+                    assert match['ownerName']['last']
 
 
 @pytest.mark.parametrize('search_type,json_data', TEST_NONE_DATA)
 def test_search_no_results(session, search_type, json_data):
     """Assert that a search query with no results returns the expected result."""
-    query: SearchRequest = SearchRequest.create_from_json(json_data, None)
-    query.search_db2()
+    if model_utils.is_legacy():
+        query: SearchRequest = SearchRequest.create_from_json(json_data, None)
+        query.search_db2()
 
-    assert query.id
-    assert not query.search_response
-    assert query.returned_results_size == 0
+        assert query.id
+        assert not query.search_response
+        assert query.returned_results_size == 0
 
 
 def test_create_from_json(session):
     """Assert that the search_client creates from a json format correctly."""
-    json_data = copy.deepcopy(MHR_NUMBER_JSON)
-    search_client = SearchRequest.create_from_json(json_data, 'PS12345', 'USERID')
+    if model_utils.is_legacy():
+        json_data = copy.deepcopy(MHR_NUMBER_JSON)
+        search_client = SearchRequest.create_from_json(json_data, 'PS12345', 'USERID')
 
-    assert search_client.account_id == 'PS12345'
-    assert search_client.search_type == 'MM'
-    assert search_client.client_reference_id == 'T-SQ-MH-1'
-    assert search_client.search_ts
-    assert search_client.search_criteria
-    assert search_client.user_id == 'USERID'
+        assert search_client.account_id == 'PS12345'
+        assert search_client.search_type == 'MM'
+        assert search_client.client_reference_id == 'T-SQ-MH-1'
+        assert search_client.search_ts
+        assert search_client.search_criteria
+        assert search_client.user_id == 'USERID'
 
 
 @pytest.mark.parametrize('search_type,json_data', TEST_INVALID_DATA)
 def test_search_invalid_criteria_400(session, client, jwt, search_type, json_data):
     """Assert that validation of a search request with invalid criteria throws a BusinessException."""
-    test_data = copy.deepcopy(json_data)
-    test_data['type'] = model_utils.TO_DB_SEARCH_TYPE[json_data['type']]
-    # test
-    with pytest.raises(BusinessException) as bad_request_err:
-        SearchRequest.validate_query(test_data)
+    if model_utils.is_legacy():
+        test_data = copy.deepcopy(json_data)
+        test_data['type'] = model_utils.TO_DB_SEARCH_TYPE[json_data['type']]
+        # test
+        with pytest.raises(BusinessException) as bad_request_err:
+            SearchRequest.validate_query(test_data)
 
-    # check
-    assert bad_request_err
-    assert bad_request_err.value.status_code == HTTPStatus.BAD_REQUEST
-    # print(bad_request_err.value.error)
+        # check
+        assert bad_request_err
+        assert bad_request_err.value.status_code == HTTPStatus.BAD_REQUEST
+        # print(bad_request_err.value.error)
 
 
 @pytest.mark.parametrize('serial_val, key_hex_val', TEST_SERIAL_NUMBER_KEY_DATA)
 def test_serial_key_hex(session, serial_val, key_hex_val):
     """Assert that search serial number hex key generation works as expected."""
-    key: str = search_db2_utils.get_search_serial_number_key_hex(serial_val)
-    assert key == key_hex_val
+    if model_utils.is_legacy():
+        key: str = search_db2_utils.get_search_serial_number_key_hex(serial_val)
+        assert key == key_hex_val

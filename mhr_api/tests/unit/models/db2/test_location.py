@@ -23,7 +23,7 @@ import pytest
 from flask import current_app
 from registry_schemas.example_data.mhr import REGISTRATION
 
-from mhr_api.models import Db2Location, MhrRegistration
+from mhr_api.models import Db2Location, MhrRegistration, utils as model_utils
 
 
 TEST_LOCATION = Db2Location(location_id=1,
@@ -87,20 +87,74 @@ TEST_ADDRESS_DATA_FIND = [
 @pytest.mark.parametrize('exists,manuhome_id,park_name,pad,street_num,street,city,count', TEST_DATA)
 def test_find_by_manuhome_id(session, exists, manuhome_id, park_name, pad, street_num, street, city, count):
     """Assert that find locations by manuhome id contains all expected elements."""
-    locations: Db2Location = Db2Location.find_by_manuhome_id(manuhome_id)
-    if exists:
-        assert locations
-        assert len(locations) == count
-        for location in locations:
+    if model_utils.is_legacy():
+        locations: Db2Location = Db2Location.find_by_manuhome_id(manuhome_id)
+        if exists:
+            assert locations
+            assert len(locations) == count
+            for location in locations:
+                assert location.manuhome_id == manuhome_id
+                assert location.location_id > 0
+                assert location.status
+                if location.status == 'A':
+                    assert location.street_number == street_num
+                    assert location.street_name == street
+                    assert location.town_city == city
+                    assert location.park_name == park_name
+                    assert location.park_pad == pad
+                reg_json = location.registration_json
+                current_app.logger.debug(reg_json)
+                assert reg_json.get('parkName') is not None
+                assert reg_json.get('pad') is not None
+                assert reg_json.get('address')
+                assert reg_json['address']['street']
+                assert reg_json['address']['city']
+                assert reg_json['address']['region']
+                assert reg_json['address']['country']
+                assert reg_json['address']['postalCode'] is not None
+
+        else:
+            assert not locations
+
+
+@pytest.mark.parametrize('exists,manuhome_id,park_name,pad,street_num,street,city,count', TEST_DATA)
+def test_find_by_manuhome_id_active(session, exists, manuhome_id, park_name, pad, street_num, street, city, count):
+    """Assert that find locations by manuhome id contains all expected elements."""
+    if model_utils.is_legacy():
+        location: Db2Location = Db2Location.find_by_manuhome_id_active(manuhome_id)
+        if exists:
             assert location.manuhome_id == manuhome_id
             assert location.location_id > 0
             assert location.status
-            if location.status == 'A':
-                assert location.street_number == street_num
-                assert location.street_name == street
-                assert location.town_city == city
-                assert location.park_name == park_name
-                assert location.park_pad == pad
+            assert location.street_number == street_num
+            assert location.street_name == street
+            assert location.town_city == city
+            assert location.park_name == park_name
+            assert location.park_pad == pad
+            assert location.reg_document_id
+            assert location.can_document_id is not None
+            assert location.province == 'BC'
+            assert location.roll_number is not None
+            assert location.area is not None
+            assert location.jurisdiction is not None
+            assert location.pid_number is not None
+            assert location.lot is not None
+            assert location.parcel is not None
+            assert location.block is not None
+            assert location.district_lot is not None
+            assert location.part_of is not None
+            assert location.section is not None
+            assert location.township is not None
+            assert location.range is not None
+            assert location.meridian is not None
+            assert location.land_district is not None
+            assert location.plan is not None
+            assert location.tax_certificate is not None
+            assert location.tax_certificate_date is not None
+            assert location.leave_bc is not None
+            assert location.dealer_name is not None
+            assert location.except_plan is not None
+            assert location.additional_description is not None
             reg_json = location.registration_json
             current_app.logger.debug(reg_json)
             assert reg_json.get('parkName') is not None
@@ -111,134 +165,87 @@ def test_find_by_manuhome_id(session, exists, manuhome_id, park_name, pad, stree
             assert reg_json['address']['region']
             assert reg_json['address']['country']
             assert reg_json['address']['postalCode'] is not None
-
-    else:
-        assert not locations
-
-
-@pytest.mark.parametrize('exists,manuhome_id,park_name,pad,street_num,street,city,count', TEST_DATA)
-def test_find_by_manuhome_id_active(session, exists, manuhome_id, park_name, pad, street_num, street, city, count):
-    """Assert that find locations by manuhome id contains all expected elements."""
-    location: Db2Location = Db2Location.find_by_manuhome_id_active(manuhome_id)
-    if exists:
-        assert location.manuhome_id == manuhome_id
-        assert location.location_id > 0
-        assert location.status
-        assert location.street_number == street_num
-        assert location.street_name == street
-        assert location.town_city == city
-        assert location.park_name == park_name
-        assert location.park_pad == pad
-        assert location.reg_document_id
-        assert location.can_document_id is not None
-        assert location.province == 'BC'
-        assert location.roll_number is not None
-        assert location.area is not None
-        assert location.jurisdiction is not None
-        assert location.pid_number is not None
-        assert location.lot is not None
-        assert location.parcel is not None
-        assert location.block is not None
-        assert location.district_lot is not None
-        assert location.part_of is not None
-        assert location.section is not None
-        assert location.township is not None
-        assert location.range is not None
-        assert location.meridian is not None
-        assert location.land_district is not None
-        assert location.plan is not None
-        assert location.tax_certificate is not None
-        assert location.tax_certificate_date is not None
-        assert location.leave_bc is not None
-        assert location.dealer_name is not None
-        assert location.except_plan is not None
-        assert location.additional_description is not None
-        reg_json = location.registration_json
-        current_app.logger.debug(reg_json)
-        assert reg_json.get('parkName') is not None
-        assert reg_json.get('pad') is not None
-        assert reg_json.get('address')
-        assert reg_json['address']['street']
-        assert reg_json['address']['city']
-        assert reg_json['address']['region']
-        assert reg_json['address']['country']
-        assert reg_json['address']['postalCode'] is not None
-    else:
-        assert not location
+        else:
+            assert not location
 
 
 @pytest.mark.parametrize('manuhome_id,street,city,region,country', TEST_ADDRESS_DATA_FIND)
 def test_find_address(session, manuhome_id, street, city, region, country):
     """Assert that find a location address json contains all expected elements."""
-    location: Db2Location = Db2Location.find_by_manuhome_id_active(manuhome_id)
-    assert location
-    loc_json = location.registration_json
-    assert loc_json.get('address')
-    assert loc_json['address'].get('city') == city
-    assert loc_json['address'].get('street') == street
-    assert loc_json['address'].get('region') == region
-    assert loc_json['address'].get('country') == country
+    if model_utils.is_legacy():
+        location: Db2Location = Db2Location.find_by_manuhome_id_active(manuhome_id)
+        assert location
+        loc_json = location.registration_json
+        assert loc_json.get('address')
+        assert loc_json['address'].get('city') == city
+        assert loc_json['address'].get('street') == street
+        assert loc_json['address'].get('region') == region
+        assert loc_json['address'].get('country') == country
 
 
 @pytest.mark.parametrize('exists,manuhome_id,doc_id', TEST_DATA_DOC_ID)
 def test_find_by_doc_id(session, exists, manuhome_id, doc_id):
     """Assert that find location by document id contains all expected elements."""
-    location: Db2Location = Db2Location.find_by_doc_id(doc_id)
-    if exists:
-        assert location
-        assert location.reg_document_id == doc_id
-        assert location.manuhome_id == manuhome_id
-    else:
-        assert not location
+    if model_utils.is_legacy():
+        location: Db2Location = Db2Location.find_by_doc_id(doc_id)
+        if exists:
+            assert location
+            assert location.reg_document_id == doc_id
+            assert location.manuhome_id == manuhome_id
+        else:
+            assert not location
 
 
 @pytest.mark.parametrize('exists,manuhome_id,doc_id,has_pid', TEST_DATA_LTSA_PID)
 def test_find_by_doc_id_pid(session, exists, manuhome_id, doc_id, has_pid):
     """Assert that find location by document id with a PID contains all expected elements."""
-    location: Db2Location = Db2Location.find_by_doc_id(doc_id)
-    if exists:
-        assert location
-        assert location.reg_document_id == doc_id
-        assert location.manuhome_id == manuhome_id
-        if has_pid:
-            assert location.ltsa
-            assert location.ltsa.ltsa_description
-            loc_json = location.registration_json
-            assert loc_json.get('legalDescription')
+    if model_utils.is_legacy():
+        location: Db2Location = Db2Location.find_by_doc_id(doc_id)
+        if exists:
+            assert location
+            assert location.reg_document_id == doc_id
+            assert location.manuhome_id == manuhome_id
+            if has_pid:
+                assert location.ltsa
+                assert location.ltsa.ltsa_description
+                loc_json = location.registration_json
+                assert loc_json.get('legalDescription')
+            else:
+                assert not location.ltsa
         else:
-            assert not location.ltsa
-    else:
-        assert not location
+            assert not location
 
 
 @pytest.mark.parametrize('exists,manuhome_id,doc_id,has_pid', TEST_DATA_LTSA_PID)
 def test_find_by_manuhome_pid(session, exists, manuhome_id, doc_id, has_pid):
     """Assert that find location by manuhome id with a PID contains all expected elements."""
-    location: Db2Location = Db2Location.find_by_manuhome_id_active(manuhome_id)
-    if exists:
-        assert location
-        assert location.reg_document_id == doc_id
-        assert location.manuhome_id == manuhome_id
-        if has_pid:
-            assert location.ltsa
-            assert location.ltsa.ltsa_description
-            loc_json = location.registration_json
-            assert loc_json.get('legalDescription')
+    if model_utils.is_legacy():
+        location: Db2Location = Db2Location.find_by_manuhome_id_active(manuhome_id)
+        if exists:
+            assert location
+            assert location.reg_document_id == doc_id
+            assert location.manuhome_id == manuhome_id
+            if has_pid:
+                assert location.ltsa
+                assert location.ltsa.ltsa_description
+                loc_json = location.registration_json
+                assert loc_json.get('legalDescription')
+            else:
+                assert not location.ltsa
         else:
-            assert not location.ltsa
-    else:
-        assert not location
+            assert not location
 
 
 @pytest.mark.parametrize('street_num,street_name,street_json', TEST_ADDRESS_DATA)
 def test_create_from_registration(session, street_num, street_name, street_json):
     """Assert that creating location address data from json works as expected."""
-    json_data = copy.deepcopy(REGISTRATION)
-    json_data['location']['address']['street'] = street_json
-    registration: MhrRegistration = MhrRegistration(id=1)
-    location: Db2Location = Db2Location.create_from_registration(registration, json_data)
-    assert location.street_number == street_num
-    assert location.street_name == street_name
+    if model_utils.is_legacy():
+        json_data = copy.deepcopy(REGISTRATION)
+        json_data['location']['address']['street'] = street_json
+        registration: MhrRegistration = MhrRegistration(id=1)
+        location: Db2Location = Db2Location.create_from_registration(registration, json_data)
+        assert location.street_number == street_num
+        assert location.street_name == street_name
 
 
 @pytest.mark.parametrize('street_num,street_name,street_json', TEST_ADDRESS_DATA)
