@@ -11,7 +11,7 @@
 
     <div :class="{ 'border-error-left': showIncomplete }">
       <!-- Incomplete Section Msg -->
-      <section v-if="showIncomplete" class="mx-7 py-9">
+      <section v-if="showIncomplete" class="mx-7 pt-9">
         <v-icon color="error">mdi-information-outline</v-icon>
         <span class="error-text mx-1">This step is unfinished.</span>
         <router-link :to="{ path: returnRoute }">Return to this step to complete it.</router-link>
@@ -25,7 +25,7 @@
           <slot name="topInfoSlot" />
 
           <!--- Party Info Headers -->
-          <v-divider class="mx-8"/>
+          <v-divider class="mx-8 mt-6"/>
 
           <!-- Party info label slot -->
           <slot name="partyInfoLabelSlot" />

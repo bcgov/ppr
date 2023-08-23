@@ -21,8 +21,8 @@
     </template>
 
     <!-- Conditional based on service agreement checkbox -->
-    <template v-if="getMhrUserAccessValidation.qsSaConfirmValid" v-slot:topInfoSlot>
-      <FormCard label="Service Agreement">
+    <template v-if="getMhrUserAccessValidation.qsSaConfirmValid" #topInfoSlot>
+      <FormCard label="Service Agreement" class="pb-2">
         <template #infoSlot>
           <p class="icon-text ml-10 mb-n1">
             <v-icon color="success" class="pr-2">mdi-check</v-icon>
