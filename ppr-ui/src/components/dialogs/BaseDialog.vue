@@ -1,10 +1,10 @@
 <template>
   <v-dialog v-model="display" :width="width" persistent :attach="attach">
-    <v-card v-if="options" class="px-10 py-9">
+    <v-card v-if="options" class="pa-10">
       <v-row no-gutters>
         <v-col cols="11">
           <h2 class="dialog-title">{{ options.title }}</h2>
-          <div class="pt-9">
+          <div class="mt-30px">
             <!-- can be replaced with <template v-slot:content> -->
             <slot name="content">
               <dialog-content
@@ -21,7 +21,7 @@
           </v-btn>
         </v-col>
       </v-row>
-      <div class="pt-7 action-buttons">
+      <div class="mt-30px action-buttons">
         <!-- can be replaced with <template v-slot:buttons> -->
         <slot name="buttons">
           <dialog-buttons

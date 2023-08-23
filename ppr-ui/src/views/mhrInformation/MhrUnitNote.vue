@@ -79,6 +79,7 @@ import { UnitNoteAdd, UnitNoteReview } from '@/components/unitNotes'
 import { ErrorIF, RegTableNewItemI } from '@/interfaces'
 import { useMhrUnitNote, useMhrValidations, useNavigation } from '@/composables'
 import { scrollToFirstErrorComponent } from '@/utils'
+import { RouteNames } from '@/enums'
 
 export default defineComponent({
   name: 'MhrUnitNote',
@@ -90,7 +91,7 @@ export default defineComponent({
   },
   props: {},
   setup (props, context) {
-    const { goToDash } = useNavigation()
+    const { goToDash, goToRoute } = useNavigation()
 
     const {
       setRegTableNewItem,
@@ -211,7 +212,7 @@ export default defineComponent({
 
     const handleDialogResp = (val: boolean): void => {
       if (!val && localState.showCancelDialog) {
-        goToDashboard()
+        goToRoute(RouteNames.MHR_INFORMATION)
       }
       localState.showCancelDialog = false
     }
