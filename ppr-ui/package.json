@@ -45,6 +45,7 @@
     "vue": "^2.0.0 || >=3.0.0",
     "vue-affix": "^0.5.2",
     "vue-demi": "^0.14.5",
+    "vue-pdf-embed": "^1.1.6",
     "vue-plugin-helper-decorator": "^0.0.12",
     "vue-property-decorator": "^9.1.2",
     "vue-router": "3.6.5",

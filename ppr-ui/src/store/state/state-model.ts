@@ -390,6 +390,7 @@ export const stateModel: StateModelIF = {
   },
   mhrUserAccessValidation: {
     qsInformationValid: false,
+    qsSaConfirmValid: false,
     qsReviewConfirmValid: false
   },
   mhrUnitNoteValidationState: {

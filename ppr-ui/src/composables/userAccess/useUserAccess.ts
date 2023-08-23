@@ -7,6 +7,7 @@ import {
   getAccountInfoFromAuth,
   getFeatureFlag,
   getKeyByValue,
+  getQsServiceAgreements,
   requestProductAccess,
   updateUserSettings
 } from '@/utils'
@@ -31,6 +32,7 @@ export const useUserAccess = () => {
   } = useStore()
   const {
     getAccountId,
+    hasMhrEnabled,
     isRoleStaffReg,
     getUserSettings,
     getUserLastName,
@@ -60,7 +62,7 @@ export const useUserAccess = () => {
 
   /** Returns true when not staff, on the appropriate routes and the feature flag is enabled **/
   const isQsAccessEnabled: ComputedRef<boolean> = computed((): boolean => {
-    return !isRoleStaffReg.value &&
+    return !isRoleStaffReg.value && hasMhrEnabled.value &&
       getFeatureFlag('mhr-user-access-enabled')
   })
 
@@ -146,6 +148,7 @@ export const useUserAccess = () => {
   const isValid: ComputedRef<any> = computed((): boolean => {
     return (
       getMhrUserAccessValidation.value.qsInformationValid &&
+      getMhrUserAccessValidation.value.qsSaConfirmValid &&
       getMhrQsIsRequirementsConfirmed.value &&
       isAuthorizationValid.value
     )
@@ -199,11 +202,11 @@ export const useUserAccess = () => {
 
   /** Update Qualified Supplier status message - locally and user settings **/
   const hideStatusMsg = async (hideMsg: boolean): Promise<void> => {
-    const msgSettings = getUserSettings.value[SettingOptions.MISCELLANEOUS_PREFERENCES] || []
+    let msgSettings = getUserSettings.value[SettingOptions.MISCELLANEOUS_PREFERENCES] || []
 
     // Update existing account setting if it exists, otherwise create new misc setting for account.
     if (msgSettings?.find(setting => setting.accountId === getAccountId.value)) {
-      msgSettings.map(pref => pref.accountId === getAccountId.value
+      msgSettings = msgSettings.map(pref => pref.accountId === getAccountId.value
         ? { ...pref, [SettingOptions.QS_STATUS_MSG_HIDE]: hideMsg }
         : pref
       )
@@ -211,6 +214,28 @@ export const useUserAccess = () => {
 
     await updateUserSettings(SettingOptions.MISCELLANEOUS_PREFERENCES, msgSettings)
     await setUserSettings({ ...getUserSettings.value, [SettingOptions.MISCELLANEOUS_PREFERENCES]: msgSettings })
+  }
+
+  /** Download QS Service Agreement via user browser **/
+  const downloadServiceAgreement = async (): Promise<void> => {
+    const serviceAgreementBlob = await getQsServiceAgreements()
+
+    // Create a URL for the blob
+    const url = URL.createObjectURL(serviceAgreementBlob)
+
+    // Create a link element and set its attributes
+    const link = document.createElement('a')
+    link.href = url
+    link.download = 'service-agreement.pdf' // Specify the desired filename for the downloaded PDF
+    link.style.display = 'none'
+
+    // Append the link to the DOM and trigger a click event
+    document.body.appendChild(link)
+    link.click()
+
+    // Clean up: remove the link and revoke the blob URL
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
   }
 
   /**
@@ -258,6 +283,7 @@ export const useUserAccess = () => {
     hasActiveQsAccess,
     isUserAccessRoute,
     isAuthorizationValid,
+    downloadServiceAgreement,
     submitQsApplication
   }
 }

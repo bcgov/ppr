@@ -10,6 +10,7 @@ export interface UserAccessIF {
 }
 
 export interface UserAccessValidationIF {
-  qsInformationValid: false,
-  qsReviewConfirmValid: false
+  qsInformationValid: boolean
+  qsSaConfirmValid: boolean
+  qsReviewConfirmValid: boolean
 }
