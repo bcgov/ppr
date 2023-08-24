@@ -317,13 +317,6 @@ export default defineComponent({
 
     watch(() => [props.validate, props.isDisabled], async ([validate, isDisabled]) => {
       if (validate && !isDisabled) contactInfoForm.value?.validate()
-      if (isDisabled) {
-        localState.contactInfoType = ContactTypes.PERSON
-        localState.contactInfoModel = cloneDeep(emptyContactInfo)
-        await nextTick()
-        contactAddress.value?.resetValidation()
-        contactInfoForm.value?.resetValidation()
-      }
     })
 
     watch(() => localState.contactInfoModel.personName, async () => {
@@ -333,6 +326,16 @@ export default defineComponent({
         (0 || localState.contactInfoModel.personName?.middle?.length) +
         (0 || localState.contactInfoModel.personName?.last?.length) > 40
     }, { deep: true })
+
+    watch(() => props.isDisabled, async (isDisabled: boolean) => {
+      if (isDisabled) {
+        localState.contactInfoType = ContactTypes.PERSON
+        localState.contactInfoModel = cloneDeep(emptyContactInfo)
+        await nextTick()
+        contactAddress.value?.resetValidation()
+        contactInfoForm.value?.resetValidation()
+      }
+    })
 
     const firstNameRules = customRules(
       required('Enter a first name'),
