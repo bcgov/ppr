@@ -15,7 +15,7 @@ export const useMhrUnitNote = () => {
   // Build Unit Note payload data with all the submission rules
   const buildPayload = (unitNoteData: UnitNoteRegistrationIF): UnitNoteRegistrationIF => {
     // Person Giving Notice is optional for Decal Replacement (102), Public Note (NPUB), Confidential Note (NCON)
-    // The givingNoticeParty obj would be removed if it contains no date
+    // The givingNoticeParty obj would be removed if it contains no data
     deleteEmptyProperties(unitNoteData)
 
     if (unitNoteData.note.additionalRemarks) {
@@ -35,6 +35,11 @@ export const useMhrUnitNote = () => {
     // Remove the hasUsedPartyLookup flag from submittingParty as its not used by the API
     if (unitNoteData.submittingParty.hasUsedPartyLookup) {
       delete unitNoteData.submittingParty.hasUsedPartyLookup
+    }
+
+    // Remove the hasNoPersonGivingNotice flag as its not used by the API
+    if (unitNoteData.note.hasNoPersonGivingNotice) {
+      delete unitNoteData.note.hasNoPersonGivingNotice
     }
 
     // status is not required
@@ -197,6 +202,7 @@ export const useMhrUnitNote = () => {
           emailAddress: '',
           phoneNumber: ''
         } as PartyIF,
+        hasNoPersonGivingNotice: false, // local property not sent to API
         destroyed: false
       }
     }

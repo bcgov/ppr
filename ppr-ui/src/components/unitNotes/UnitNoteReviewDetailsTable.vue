@@ -32,10 +32,18 @@
         </v-col>
       </v-row>
       <v-divider class="my-3 mx-0" />
-      <div class="px">
+      <v-row no-gutters v-if="unitNote.hasNoPersonGivingNotice">
+        <v-col cols="3">
+          <h3>{{ contactInfoTitle }}</h3>
+        </v-col>
+        <v-col cols="9" class="no-person-giving-notice">
+          There is not a Person Giving Notice for this unit note.
+        </v-col>
+      </v-row>
+      <template v-else>
         <h3>{{ contactInfoTitle }}</h3>
 
-        <v-simple-table v-if="unitNote" class="giving-notice-party-table" data-test-id="party-info-table">
+        <v-simple-table class="giving-notice-party-table" data-test-id="party-info-table">
           <template v-slot:default>
             <thead>
               <tr>
@@ -48,7 +56,7 @@
             <tbody>
               <tr>
                 <td class="person-name">
-                  <span v-if="hasName">
+                  <span>
                     <v-icon class="mt-n2">
                       {{ givingNoticeParty.businessName ? 'mdi-domain' : 'mdi-account' }}
                     </v-icon>
@@ -56,16 +64,13 @@
                       {{ displayFullOrBusinessName }}
                     </span>
                   </span>
-                  <span v-else class="text-not-entered">(Not Entered)</span>
                 </td>
                 <td>
                   <base-address
-                    v-if="hasAddress"
                     :editing="false"
                     :schema="PartyAddressSchema"
                     :value="givingNoticeParty.address"
                   />
-                  <span v-else class="text-not-entered">(Not Entered)</span>
                 </td>
                 <td>
                   <span :class="{'text-not-entered': !givingNoticeParty.emailAddress}">
@@ -81,7 +86,7 @@
             </tbody>
           </template>
         </v-simple-table>
-      </div>
+      </template>
     </section>
   </v-card>
 </template>
@@ -118,17 +123,6 @@ export default defineComponent({
           ? props.unitNote.additionalRemarks + '<br/>' + props.unitNote.remarks
           : props.unitNote.remarks
       ),
-      hasName: computed((): boolean => {
-        return !!(localState.givingNoticeParty.businessName ||
-          localState.givingNoticeParty.personName.first ||
-          localState.givingNoticeParty.personName.middle ||
-          localState.givingNoticeParty.personName.last)
-      }),
-      hasAddress: computed((): boolean => {
-        return !!(localState.givingNoticeParty.address?.street ||
-        localState.givingNoticeParty.address?.streetAdditional ||
-        localState.givingNoticeParty.address?.city)
-      }),
       displayFullOrBusinessName: computed((): string => {
         if (localState.givingNoticeParty?.businessName.length > 0) { return localState.givingNoticeParty.businessName }
         const { first, middle, last } = localState.givingNoticeParty.personName
@@ -165,6 +159,11 @@ export default defineComponent({
       color: $gray7;
     }
     .remarks {
+      padding: 6px 0;
+      line-height: 24px;
+      color: $gray7;
+    }
+    .no-person-giving-notice {
       padding: 6px 0;
       line-height: 24px;
       color: $gray7;

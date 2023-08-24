@@ -362,6 +362,7 @@ export const stateModel: StateModelIF = {
         emailAddress: '',
         phoneNumber: ''
       } as PartyIF,
+      hasNoPersonGivingNotice: false,
       destroyed: false
     }
   },

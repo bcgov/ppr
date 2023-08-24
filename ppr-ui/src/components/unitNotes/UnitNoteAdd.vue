@@ -34,13 +34,23 @@
         :sectionNumber="3"
         :content="contactInfoContent"
         :validate="validate"
-        :isInfoOptional="isPersonGivingNoticeOptional()"
+        :isDisabled="hasNoPersonGivingNotice"
         @setStoreProperty="handleStoreUpdate('givingNoticeParty', $event)"
         @isValid="handleComponentValid(MhrCompVal.PERSON_GIVING_NOTICE_VALID, $event)"
         enableCombinedNameValidation
         hidePartySearch
         hideDeliveryAddress
-      />
+      >
+        <template #preForm v-if="isPersonGivingNoticeOptional()">
+          <v-checkbox
+              id="no-person-giving-notice-checkbox"
+              class="mb-n3 mt-n2"
+              label="There is not a Person Giving Notice for this unit note."
+              v-model="hasNoPersonGivingNotice"
+              hide-details
+          />
+        </template>
+      </ContactInformation>
     </section>
   </div>
 </template>
@@ -107,6 +117,7 @@ export default defineComponent({
           : personGivingNoticeContent
       ),
       isNoticeOfTaxSale: computed((): boolean => props.docType === UnitNoteDocTypes.NOTICE_OF_TAX_SALE),
+      hasNoPersonGivingNotice: (getMhrUnitNote.value as UnitNoteIF).hasNoPersonGivingNotice || false,
 
       // Remarks
       unitNoteRemarks: (getMhrUnitNote.value as UnitNoteIF).remarks || '',
@@ -126,6 +137,11 @@ export default defineComponent({
     const handleStoreUpdate = (key: string, val) => {
       setMhrUnitNote({ key: key, value: val })
     }
+
+    watch(() => localState.hasNoPersonGivingNotice, (val) => {
+      setValidation(MhrSectVal.UNIT_NOTE_VALID, MhrCompVal.PERSON_GIVING_NOTICE_VALID, val)
+      handleStoreUpdate('hasNoPersonGivingNotice', val)
+    })
 
     watch(() => [localState.isUnitNoteValid, props.validate], () => {
       emit('isValid', localState.isUnitNoteValid)
