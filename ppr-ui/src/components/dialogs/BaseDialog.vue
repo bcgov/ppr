@@ -4,7 +4,7 @@
       <v-row no-gutters>
         <v-col cols="11">
           <h2 class="dialog-title">{{ options.title }}</h2>
-          <div class="mt-30px">
+          <div class="mt-10">
             <!-- can be replaced with <template v-slot:content> -->
             <slot name="content">
               <dialog-content
@@ -21,7 +21,7 @@
           </v-btn>
         </v-col>
       </v-row>
-      <div class="mt-30px action-buttons">
+      <div class="mt-10 action-buttons">
         <!-- can be replaced with <template v-slot:buttons> -->
         <slot name="buttons">
           <dialog-buttons
