@@ -18,6 +18,12 @@ export const useMhrUnitNote = () => {
     // The givingNoticeParty obj would be removed if it contains no date
     deleteEmptyProperties(unitNoteData)
 
+    if (unitNoteData.note.additionalRemarks) {
+      unitNoteData.note.remarks = unitNoteData.note.additionalRemarks + ' ' + unitNoteData.note.remarks
+      // don't submit additional remarks because it's included with regular remarks
+      delete unitNoteData.note.additionalRemarks
+    }
+
     if (unitNoteData.note.givingNoticeParty?.phoneNumber) {
       unitNoteData.note.givingNoticeParty.phoneNumber = unitNoteData.note.givingNoticeParty?.phoneNumber?.replace(/[^A-Z0-9]/ig, '')
     }
@@ -172,6 +178,7 @@ export const useMhrUnitNote = () => {
         expiryDateTime: '',
         status: UnitNoteStatusTypes.ACTIVE,
         remarks: '',
+        additionalRemarks: '',
         givingNoticeParty: {
           businessName: '',
           personName: {

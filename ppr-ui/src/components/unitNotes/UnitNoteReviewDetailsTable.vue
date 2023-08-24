@@ -28,7 +28,7 @@
           <h3>Remarks</h3>
         </v-col>
         <v-col cols="9" class="remarks">
-          {{ unitNote.remarks || '(Not Entered)' }}
+          <span v-html="unitNoteRemarks || '(Not Entered)'"></span>
         </v-col>
       </v-row>
       <v-divider class="my-3 mx-0" />
@@ -113,6 +113,11 @@ export default defineComponent({
   setup (props) {
     const localState = reactive({
       givingNoticeParty: computed((): PartyIF => props.unitNote.givingNoticeParty),
+      unitNoteRemarks: computed((): string =>
+        props.unitNote.additionalRemarks
+          ? props.unitNote.additionalRemarks + '<br/>' + props.unitNote.remarks
+          : props.unitNote.remarks
+      ),
       hasName: computed((): boolean => {
         return !!(localState.givingNoticeParty.businessName ||
           localState.givingNoticeParty.personName.first ||

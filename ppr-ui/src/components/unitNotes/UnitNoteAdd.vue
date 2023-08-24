@@ -18,14 +18,12 @@
     <section id="mhr-unit-note-remarks" class="mt-10">
       <Remarks
         :unitNoteRemarks="unitNoteRemarks"
+        :additionalRemarks="additionalRemarks"
+        :showAdditionalRemarksCheckbox="isNoticeOfTaxSale"
         :sectionNumber="2"
-        :content="{
-          title: 'Remarks',
-          description: 'Remarks will be shown when a search result is produced for this manufactured home.',
-          sideLabel: 'Add Remarks'
-        }"
+        :content="remarksContent"
         :validate="validate"
-        @setStoreProperty="handleStoreUpdate('remarks', $event)"
+        @setStoreProperty="handleStoreUpdate($event.key, $event.value)"
         @isValid="handleComponentValid(MhrCompVal.REMARKS_VALID, $event)"
       />
     </section>
@@ -57,7 +55,7 @@ import { ContactInformationContentIF, UnitNoteIF } from '@/interfaces'
 import { useMhrUnitNote, useMhrValidations } from '@/composables'
 import { MhrCompVal, MhrSectVal } from '@/composables/mhrRegistration/enums'
 import { DocumentId, Remarks, ContactInformation } from '@/components/common'
-import { personGivingNoticeContent, collectorInformationContent } from '@/resources'
+import { personGivingNoticeContent, collectorInformationContent, remarksContent } from '@/resources'
 
 export default defineComponent({
   name: 'UnitNoteAdd',
@@ -108,9 +106,11 @@ export default defineComponent({
           ? collectorInformationContent
           : personGivingNoticeContent
       ),
+      isNoticeOfTaxSale: computed((): boolean => props.docType === UnitNoteDocTypes.NOTICE_OF_TAX_SALE),
 
       // Remarks
       unitNoteRemarks: (getMhrUnitNote.value as UnitNoteIF).remarks || '',
+      additionalRemarks: (getMhrUnitNote.value as UnitNoteIF).additionalRemarks,
 
       // Document Id
       unitNoteDocumentId: computed(() => (getMhrUnitNote.value as UnitNoteIF).documentId || ''),
@@ -137,6 +137,7 @@ export default defineComponent({
       handleStoreUpdate,
       handleComponentValid,
       isPersonGivingNoticeOptional,
+      remarksContent,
       ...toRefs(localState)
     }
   }
