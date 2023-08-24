@@ -155,7 +155,7 @@ export default defineComponent({
     const getNoticePartyName = (givingNoticeParty: PartyIF): string => {
       return givingNoticeParty.businessName
         ? givingNoticeParty.businessName
-        : `${givingNoticeParty.personName.first}${givingNoticeParty.personName.middle}
+        : `${givingNoticeParty.personName.first} ${givingNoticeParty.personName.middle ?? ''}
           ${givingNoticeParty.personName.last}`
     }
 
