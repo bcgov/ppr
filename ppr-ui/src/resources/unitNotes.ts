@@ -131,8 +131,6 @@ export const remarksContent = {
   checkboxLabel: 'A notice pursuant to section 645/656 of the Local Government Act was filed'
 }
 
-export const hasNoPersonGivingNoticeText = 'There is no Person Giving Notice for this unit note.'
-
 // List of Unit Notes that can put MHR in Locked state for Qualified Suppliers
 export const QSLockedStateUnitNoteTypes: string[] = [
   UnitNoteDocTypes.NOTICE_OF_TAX_SALE,
