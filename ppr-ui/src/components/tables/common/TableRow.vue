@@ -683,7 +683,10 @@ export default defineComponent({
     const hasLockedState = (item: MhRegistrationSummaryIF): boolean => {
       const parentReg: MhRegistrationSummaryIF =
         item.mhrNumber && getMhRegTableBaseRegs.value?.find(reg => reg.mhrNumber === item.mhrNumber)
-      return QSLockedStateUnitNoteTypes.includes(parentReg?.frozenDocumentType)
+      return (
+        parentReg?.statusType === MhApiStatusTypes.FROZEN &&
+        QSLockedStateUnitNoteTypes.includes(parentReg?.frozenDocumentType)
+      )
     }
 
     const isDischarged = (item: RegistrationSummaryIF): boolean => {

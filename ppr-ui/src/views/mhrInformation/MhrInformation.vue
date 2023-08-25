@@ -554,6 +554,7 @@ export default defineComponent({
       hasAlertMsg: computed((): boolean => {
         // show alert msg for Qualified Supplier if MHR has a Locked state
         return isRoleQualifiedSupplier.value &&
+          isFrozenMhr.value &&
           QSLockedStateUnitNoteTypes.includes(getMhrInformation.value?.frozenDocumentType)
       }),
       alertMsg: computed((): string => {
